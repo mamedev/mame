@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6800/m6800.h"
@@ -26,8 +27,13 @@
 #include "machine/mc68681.h"
 #include "machine/tdc1008.h"
 #include "video/mc6845.h"
-#include "emupal.h"
+
 #include "screen.h"
+#include "emupal.h"
+
+#include "dpb7000.lh"
+
+#include <algorithm>
 #include <deque>
 
 #define LOG_UNKNOWN         (1 << 0)
@@ -49,11 +55,15 @@
 #define LOG_KEYBC           (1 << 16)
 #define LOG_TDS             (1 << 17)
 #define LOG_TABLET          (1 << 18)
+#define LOG_COMMANDS        (1 << 19)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_ADDR | \
-							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_TABLET)
+							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_TABLET | LOG_COMMANDS | LOG_OUTPUT_TIMING)
 
-#define VERBOSE             (LOG_TABLET)
+#define VERBOSE             (LOG_CSR | LOG_CTRLBUS | LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_BRUSH_ADDR | LOG_COMMANDS | LOG_OUTPUT_TIMING)
 #include "logmacro.h"
+
+namespace
+{
 
 static const uint16_t temp_pen_reads[4] = { 573, 840, 1320, 1360 };
 
@@ -82,6 +92,26 @@ public:
 		, m_fdd_serial(*this, "fddserial")
 		, m_floppy0(*this, "0")
 		, m_floppy(nullptr)
+		, m_output_cursor_region(*this, "output_timing_cursor")
+		, m_output_hlines_region(*this, "output_timing_hlines")
+		, m_output_hflags_region(*this, "output_timing_hflags")
+		, m_output_vlines_region(*this, "output_timing_vlines")
+		, m_output_vflags_region(*this, "output_timing_vflags")
+		, m_output_cursor(nullptr)
+		, m_output_hlines(nullptr)
+		, m_output_hflags(nullptr)
+		, m_output_vlines(nullptr)
+		, m_output_vflags(nullptr)
+		, m_storeaddr_protx_region(*this, "storeaddr_prom_protx")
+		, m_storeaddr_proty_region(*this, "storeaddr_prom_proty")
+		, m_storeaddr_xlnib_region(*this, "storeaddr_prom_xlnib")
+		, m_storeaddr_xmnib_region(*this, "storeaddr_prom_xmnib")
+		, m_storeaddr_xhnib_region(*this, "storeaddr_prom_xhnib")
+		, m_storeaddr_protx(nullptr)
+		, m_storeaddr_proty(nullptr)
+		, m_storeaddr_xlnib(nullptr)
+		, m_storeaddr_xmnib(nullptr)
+		, m_storeaddr_xhnib(nullptr)
 		, m_keybcpu(*this, "keybcpu")
 		, m_keybc_cols(*this, "KEYB_COL%u", 0U)
 		, m_tds_cpu(*this, "tds")
@@ -93,6 +123,7 @@ public:
 		, m_pen_prox(*this, "PENPROX")
 		, m_pen_x(*this, "PENX")
 		, m_pen_y(*this, "PENY")
+		, m_pen_press(*this, "PENPRESS")
 		, m_filter_signalprom(*this, "filter_signalprom")
 		, m_filter_multprom(*this, "filter_multprom")
 		, m_filter_signal(nullptr)
@@ -101,18 +132,23 @@ public:
 		, m_size_yh(*this, "filter_df")
 		, m_size_xl(*this, "filter_dg")
 		, m_size_xh(*this, "filter_dh")
+		, m_brushproc_prom_region(*this, "brushproc_prom")
+		, m_brushproc_pal_region(*this, "brushproc_pal")
+		, m_brushproc_prom(nullptr)
+		, m_brushproc_pal(nullptr)
 	{
 	}
 
 	void dpb7000(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(pen_prox_changed);
+	//DECLARE_INPUT_CHANGED_MEMBER(pen_prox_changed);
 
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	template <int StoreNum> uint32_t store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t combined_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
 	void fddcpu_map(address_map &map);
@@ -130,8 +166,9 @@ private:
 	uint16_t cpu_ctrlbus_r();
 	void cpu_ctrlbus_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(req_a_w);
-	DECLARE_WRITE_LINE_MEMBER(req_b_w);
+	TIMER_CALLBACK_MEMBER(req_a_w);
+	TIMER_CALLBACK_MEMBER(req_b_w);
+	TIMER_CALLBACK_MEMBER(cmd_done);
 
 	void fdd_index_callback(floppy_image_device *floppy, int state);
 	uint8_t fdd_ctrl_r();
@@ -144,10 +181,6 @@ private:
 	void handle_command(uint16_t data);
 	void store_address_w(uint8_t card, uint16_t data);
 	void combiner_reg_w(uint16_t data);
-
-	TIMER_CALLBACK_MEMBER(diskseq_complete);
-	TIMER_CALLBACK_MEMBER(field_in);
-	TIMER_CALLBACK_MEMBER(field_out);
 
 	enum : uint16_t
 	{
@@ -166,7 +199,7 @@ private:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr_changed);
 
 	void diskseq_y_w(uint16_t data);
-	void diskseq_tick();
+	//void diskseq_tick();
 
 	void advance_line_count();
 	void toggle_line_clock();
@@ -210,6 +243,7 @@ private:
 	emu_timer *m_diskseq_complete_clk;
 	emu_timer *m_field_in_clk;
 	emu_timer *m_field_out_clk;
+	emu_timer *m_cmd_done_timer;
 
 	enum : size_t
 	{
@@ -283,6 +317,18 @@ private:
 	uint16_t m_cursor_origin_y;
 	uint16_t m_cursor_size_x;
 	uint16_t m_cursor_size_y;
+	uint8_t m_output_csflags;
+	uint8_t m_output_cpflags;
+	required_memory_region m_output_cursor_region;
+	required_memory_region m_output_hlines_region;
+	required_memory_region m_output_hflags_region;
+	required_memory_region m_output_vlines_region;
+	required_memory_region m_output_vflags_region;
+	uint8_t *m_output_cursor;
+	uint8_t *m_output_hlines;
+	uint8_t *m_output_hflags;
+	uint8_t *m_output_vlines;
+	uint8_t *m_output_vflags;
 
 	// Brush Address Card
 	uint8_t m_line_clock;
@@ -296,8 +342,8 @@ private:
 	uint16_t m_bylen;
 	uint16_t m_bxlen_counter;
 	uint16_t m_bylen_counter;
-	uint8_t m_plum;
-	uint8_t m_pchr;
+	uint8_t m_brush_press_lum;
+	uint8_t m_brush_press_chr;
 	std::unique_ptr<uint8_t[]> m_framestore_chr[2];
 	std::unique_ptr<uint8_t[]> m_framestore_lum[2];
 	std::unique_ptr<uint8_t[]> m_framestore_ext[2];
@@ -319,12 +365,22 @@ private:
 	uint16_t m_cxpos[2];
 	uint16_t m_cypos[2];
 	uint16_t m_ca0;
+	required_memory_region m_storeaddr_protx_region;
+	required_memory_region m_storeaddr_proty_region;
+	required_memory_region m_storeaddr_xlnib_region;
+	required_memory_region m_storeaddr_xmnib_region;
+	required_memory_region m_storeaddr_xhnib_region;
+	uint8_t *m_storeaddr_protx;
+	uint8_t *m_storeaddr_proty;
+	uint8_t *m_storeaddr_xlnib;
+	uint8_t *m_storeaddr_xmnib;
+	uint8_t *m_storeaddr_xhnib;
 
 	// Combiner Card
 	uint8_t m_cursor_y;
 	uint8_t m_cursor_u;
 	uint8_t m_cursor_v;
-	uint8_t m_invert_mask;
+	uint8_t m_ext_store_flags;
 	bool m_select_matte[2];
 	uint8_t m_matte_ext[2];
 	uint8_t m_matte_y[2];
@@ -345,12 +401,22 @@ private:
 	uint8_t m_keybc_tx;
 
 	// TDS Box
+	enum tds_press_state : uint32_t
+	{
+		STATE_IDLE,
+		STATE_PRESS_IN,
+		STATE_PRESSED,
+		STATE_PRESS_OUT
+	};
+
 	required_device<m6803_cpu_device> m_tds_cpu;
 	required_device<scn2681_device> m_tds_duart;
 	required_ioport m_tds_dips;
 	required_ioport m_pen_switches;
 	uint8_t tds_p1_r();
 	uint8_t tds_p2_r();
+	uint8_t tds_p3_r();
+	uint8_t tds_p4_r();
 	void tds_p1_w(uint8_t data);
 	void tds_p2_w(uint8_t data);
 	void tds_dac_w(uint8_t data);
@@ -359,9 +425,19 @@ private:
 	uint8_t tds_pen_switches_r();
 	DECLARE_WRITE_LINE_MEMBER(duart_b_w);
 	TIMER_CALLBACK_MEMBER(tablet_tx_tick);
+	TIMER_CALLBACK_MEMBER(tds_adc_tick);
+	TIMER_CALLBACK_MEMBER(tds_press_tick);
 	uint8_t m_tds_dac_value;
+	uint8_t m_tds_dac_offset;
+	float m_tds_dac_percent;
+	bool m_tds_adc_busy;
 	uint8_t m_tds_adc_value;
 	uint8_t m_tds_p1_data;
+	uint32_t m_tds_press_state;
+	uint8_t m_tds_pressure_shift;
+	emu_timer *m_tds_adc_timer;
+	emu_timer *m_tds_press_timer;
+	bool m_tds_in_proximity;
 
 	// Tablet
 	required_device<z8681_device> m_tablet_cpu;
@@ -369,6 +445,7 @@ private:
 	required_ioport m_pen_prox;
 	required_ioport m_pen_x;
 	required_ioport m_pen_y;
+	required_ioport m_pen_press;
 	uint8_t tablet_p2_r(offs_t offset, uint8_t mem_mask);
 	void tablet_p2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 	uint8_t tablet_p3_r(offs_t offset, uint8_t mem_mask);
@@ -385,8 +462,15 @@ private:
 	emu_timer *m_tablet_tx_timer;
 	emu_timer *m_tablet_irq_timer;
 	uint8_t m_tablet_tx_bit;
-	bool m_tablet_pen_in_proximity;
+	uint16_t m_tablet_pen_x;
+	uint16_t m_tablet_pen_y;
+	uint16_t m_tablet_pen_switches;
 	uint8_t m_tablet_state;
+
+	// Table HLE
+	TIMER_CALLBACK_MEMBER(tablet_hle_tick);
+	std::deque<int> m_tablet_hle_tx_bits;
+	emu_timer *m_tablet_hle_timer;
 
 	// Filter Card
 	required_memory_region m_filter_signalprom;
@@ -408,13 +492,20 @@ private:
 	uint8_t m_size_h;
 	uint8_t m_size_v;
 
+	// Brush Processor Card
+	required_memory_region m_brushproc_prom_region;
+	required_memory_region m_brushproc_pal_region;
+	uint8_t *m_brushproc_prom;
+	uint16_t *m_brushproc_pal;
+
 	// Utility
 	std::unique_ptr<uint32_t[]> m_yuv_lut;
 };
 
 void dpb7000_state::main_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom().region("monitor", 0);
+	map(0x000000, 0x09ffff).rom().region("monitor", 0);
+	map(0x0006aa, 0x0006ab).nopw();
 	map(0xb00000, 0xb7ffff).rw(FUNC(dpb7000_state::bus_error_r), FUNC(dpb7000_state::bus_error_w));
 	map(0xb80000, 0xbfffff).ram();
 	map(0xffd000, 0xffd3ff).rw(FUNC(dpb7000_state::bus_error_r), FUNC(dpb7000_state::bus_error_w));
@@ -546,27 +637,30 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // PORT_NAME("Carriage Return") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR('\x0d')
 
 	PORT_START("PENSW")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Pen Button 1") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Pen Button 1") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Pen Button 2") PORT_CODE(MOUSECODE_BUTTON3)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Pen Button 3") PORT_CODE(MOUSECODE_BUTTON4)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Pen Button 4") PORT_CODE(MOUSECODE_BUTTON5)
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("PENPROX")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Pen Proximity") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, dpb7000_state, pen_prox_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Pen Proximity") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("PENX")
-	PORT_BIT( 0xffff, 5000, IPT_LIGHTGUN_X) PORT_NAME("Pen X") PORT_MINMAX(0, 10000) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.0, 0.0, 0)
+	PORT_BIT( 0xffff, 3800, IPT_LIGHTGUN_X) PORT_NAME("Pen X") PORT_MINMAX(500, 4599) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.225, -0.145, 0)
 
 	PORT_START("PENY")
-	PORT_BIT( 0xffff, 5000, IPT_LIGHTGUN_Y) PORT_NAME("Pen Y") PORT_MINMAX(0, 10000) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
+	PORT_BIT( 0xffff, 2048, IPT_LIGHTGUN_Y) PORT_NAME("Pen Y") PORT_MINMAX(1000, 4399) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.525, -0.33, 0)
+
+	PORT_START("PENPRESS")
+	PORT_BIT( 0xff, 0x02, IPT_PEDAL ) PORT_MINMAX(0x02,0xaf) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 	PORT_START("TDSDIPS")
-	PORT_DIPNAME(0x08, 0x00, "TDS Box Encoding")
+	PORT_DIPNAME(0x08, 0x08, "TDS Box Encoding")
 	PORT_DIPSETTING(   0x08, "Binary")
 	PORT_DIPSETTING(   0x00, "ASCII")
-	PORT_DIPNAME(0x10, 0x00, "TDS Box Mode")
+	PORT_DIPNAME(0x10, 0x10, "TDS Box Mode")
 	PORT_DIPSETTING(   0x10, "Normal")
 	PORT_DIPSETTING(   0x00, "Monitor")
 	PORT_DIPNAME(0x40, 0x00, "TDS Box Standard")
@@ -645,7 +739,7 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_DIPSETTING(   0x0f, "19200")
 
 	PORT_START("AUTOSTART")
-	PORT_DIPNAME(0x0001, 0x0000, "Auto-Start")
+	PORT_DIPNAME(0x0001, 0x0001, "Auto-Start")
 	PORT_DIPSETTING(     0x0000, DEF_STR( Off ))
 	PORT_DIPSETTING(     0x0001, DEF_STR( On ))
 	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -654,7 +748,7 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "NTSC/PAL" )
+	PORT_DIPNAME( 0x0002, 0x0000, "NTSC/PAL" )
 	PORT_DIPSETTING(    0x0002, "NTSC" )
 	PORT_DIPSETTING(    0x0000, "PAL" )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
@@ -706,7 +800,7 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_DIPSETTING(    0x0002, "Two" )
 	PORT_DIPSETTING(    0x0001, "Three" )
 	PORT_DIPSETTING(    0x0000, "Four" )
-	PORT_DIPNAME( 0x001c, 0x0018, "Disc Group 0 Type" )
+	PORT_DIPNAME( 0x001c, 0x000c, "Disc Group 0 Type" )
 	PORT_DIPSETTING(    0x001c, "None" )
 	PORT_DIPSETTING(    0x0018, "160Mb Fujitsu" )
 	PORT_DIPSETTING(    0x0014, "330Mb Fujitsu" )
@@ -720,7 +814,7 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_DIPSETTING(    0x0040, "Two" )
 	PORT_DIPSETTING(    0x0020, "Three" )
 	PORT_DIPSETTING(    0x0000, "Four" )
-	PORT_DIPNAME( 0x0380, 0x0180, "Disc Group 1 Type" )
+	PORT_DIPNAME( 0x0380, 0x0380, "Disc Group 1 Type" )
 	PORT_DIPSETTING(    0x0380, "None" )
 	PORT_DIPSETTING(    0x0300, "160Mb Fujitsu" )
 	PORT_DIPSETTING(    0x0280, "330Mb Fujitsu" )
@@ -754,11 +848,14 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_csr));
 	save_item(NAME(m_sys_ctrl));
 
-	m_field_in_clk = timer_alloc(FUNC(dpb7000_state::field_in), this);
+	m_field_in_clk = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::req_a_w), this));
 	m_field_in_clk->adjust(attotime::never);
 
-	m_field_out_clk = timer_alloc(FUNC(dpb7000_state::field_out), this);
+	m_field_out_clk = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::req_a_w), this));
 	m_field_out_clk->adjust(attotime::never);
+
+	m_cmd_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::cmd_done), this));
+	m_cmd_done_timer->adjust(attotime::never);
 
 	// Disc Sequencer Card
 	save_item(NAME(m_diskseq_cp));
@@ -777,7 +874,7 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_diskseq_ucode_latch));
 	save_item(NAME(m_diskseq_cc_inputs));
 	save_item(NAME(m_diskseq_cyl_read_pending));
-	m_diskseq_complete_clk = timer_alloc(FUNC(dpb7000_state::diskseq_complete), this);
+	m_diskseq_complete_clk = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::req_b_w), this));;
 	m_diskseq_complete_clk->adjust(attotime::never);
 
 	// Floppy Disc Controller Card
@@ -799,6 +896,13 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_cursor_origin_y));
 	save_item(NAME(m_cursor_size_x));
 	save_item(NAME(m_cursor_size_y));
+	save_item(NAME(m_output_csflags));
+	save_item(NAME(m_output_cpflags));
+	m_output_cursor = m_output_cursor_region->base();
+	m_output_hlines = m_output_hlines_region->base();
+	m_output_hflags = m_output_hflags_region->base();
+	m_output_vlines = m_output_vlines_region->base();
+	m_output_vflags = m_output_vflags_region->base();
 
 	// Brush Address Card
 	save_item(NAME(m_line_clock));
@@ -812,8 +916,8 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_bylen));
 	save_item(NAME(m_bxlen_counter));
 	save_item(NAME(m_bylen_counter));
-	save_item(NAME(m_plum));
-	save_item(NAME(m_pchr));
+	save_item(NAME(m_brush_press_lum));
+	save_item(NAME(m_brush_press_chr));
 
 	// Frame Store Cards, 640x1024
 	for (int i = 0; i < 2; i++)
@@ -849,12 +953,17 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_cxpos));
 	save_item(NAME(m_cypos));
 	save_item(NAME(m_ca0));
+	m_storeaddr_protx = m_storeaddr_protx_region->base();
+	m_storeaddr_proty = m_storeaddr_proty_region->base();
+	m_storeaddr_xlnib = m_storeaddr_xlnib_region->base();
+	m_storeaddr_xmnib = m_storeaddr_xmnib_region->base();
+	m_storeaddr_xhnib = m_storeaddr_xhnib_region->base();
 
 	// Combiner Card
 	save_item(NAME(m_cursor_y));
 	save_item(NAME(m_cursor_u));
 	save_item(NAME(m_cursor_v));
-	save_item(NAME(m_invert_mask));
+	save_item(NAME(m_ext_store_flags));
 	save_item(NAME(m_select_matte));
 	save_item(NAME(m_matte_ext));
 	save_item(NAME(m_matte_y));
@@ -881,7 +990,17 @@ void dpb7000_state::machine_start()
 
 	// TDS Box
 	save_item(NAME(m_tds_dac_value));
+	save_item(NAME(m_tds_dac_offset));
+	save_item(NAME(m_tds_dac_percent));
+	save_item(NAME(m_tds_adc_busy));
 	save_item(NAME(m_tds_adc_value));
+	save_item(NAME(m_tds_press_state));
+	save_item(NAME(m_tds_pressure_shift));
+	save_item(NAME(m_tds_in_proximity));
+	m_tds_adc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::tds_adc_tick), this));
+	m_tds_adc_timer->adjust(attotime::never);
+	m_tds_press_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::tds_press_tick), this));
+	m_tds_press_timer->adjust(attotime::never);
 
 	// Tablet
 	save_item(NAME(m_tablet_p2_data));
@@ -889,12 +1008,18 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_tablet_dip_shifter));
 	save_item(NAME(m_tablet_counter_latch));
 	save_item(NAME(m_tablet_tx_bit));
-	save_item(NAME(m_tablet_pen_in_proximity));
+	save_item(NAME(m_tablet_pen_x));
+	save_item(NAME(m_tablet_pen_y));
+	save_item(NAME(m_tablet_pen_switches));
 	save_item(NAME(m_tablet_state));
-	m_tablet_tx_timer = timer_alloc(FUNC(dpb7000_state::tablet_tx_tick), this);
+	m_tablet_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::tablet_tx_tick), this));
 	m_tablet_tx_timer->adjust(attotime::never);
-	m_tablet_irq_timer = timer_alloc(FUNC(dpb7000_state::tablet_irq_tick), this);
+	m_tablet_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::tablet_irq_tick), this));
 	m_tablet_irq_timer->adjust(attotime::never);
+
+	// Tablet HLE
+	m_tablet_hle_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::tablet_hle_tick), this));
+	m_tablet_hle_timer->adjust(attotime::never);
 
 	m_yuv_lut = std::make_unique<uint32_t[]>(0x1000000);
 	for (uint16_t u = 0; u < 256; u++)
@@ -913,6 +1038,10 @@ void dpb7000_state::machine_start()
 			}
 		}
 	}
+
+	// Brush Processor Card
+	m_brushproc_prom = m_brushproc_prom_region->base();
+	m_brushproc_pal = (uint16_t *)m_brushproc_pal_region->base();
 }
 
 void dpb7000_state::machine_reset()
@@ -927,7 +1056,7 @@ void dpb7000_state::machine_reset()
 		m_acia[i]->write_dcd(0);
 	}
 
-	m_field_in_clk->adjust(attotime::from_hz(59.94), 0, attotime::from_hz(59.94));
+	m_field_in_clk->adjust(attotime::from_hz(59.94), 1, attotime::from_hz(59.94));
 	m_field_out_clk->adjust(attotime::from_hz(59.94) + attotime::from_hz(15734.0 / 1.0), 0, attotime::from_hz(59.94));
 
 	// Disc Sequencer Card
@@ -972,6 +1101,8 @@ void dpb7000_state::machine_reset()
 	m_cursor_origin_y = 0;
 	m_cursor_size_x = 0;
 	m_cursor_size_y = 0;
+	m_output_csflags = 0;
+	m_output_cpflags = 0;
 
 	// Brush Address Card
 	m_line_clock = 0;
@@ -985,8 +1116,8 @@ void dpb7000_state::machine_reset()
 	m_bylen = 0;
 	m_bxlen_counter = 0;
 	m_bylen_counter = 0;
-	m_plum = 0;
-	m_pchr = 0;
+	m_brush_press_lum = 0;
+	m_brush_press_chr = 0;
 
 	// Frame Store Cards, 640x1024
 	for (int i = 0; i < 2; i++)
@@ -1018,7 +1149,7 @@ void dpb7000_state::machine_reset()
 	m_cursor_y = 0;
 	m_cursor_u = 0;
 	m_cursor_v = 0;
-	m_invert_mask = 0;
+	m_ext_store_flags = 0;
 	memset(m_select_matte, 0, 2);
 	memset(m_matte_ext, 0, 2);
 	memset(m_matte_y, 0, 2);
@@ -1043,7 +1174,15 @@ void dpb7000_state::machine_reset()
 
 	// TDS Box
 	m_tds_dac_value = 0;
-	m_tds_adc_value = 0;
+	m_tds_dac_offset = 0;
+	m_tds_dac_percent = 0.0f;
+	m_tds_adc_busy = false;
+	m_tds_adc_value = 0x00;
+	m_tds_pressure_shift = 0;
+	m_tds_in_proximity = false;
+	m_tds_press_state = STATE_IDLE;
+	m_tds_adc_timer->adjust(attotime::never);
+	m_tds_press_timer->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
 
 	// Tablet
 	m_tablet_p2_data = 0;
@@ -1055,23 +1194,14 @@ void dpb7000_state::machine_reset()
 	m_tablet_tx_timer->adjust(attotime::from_hz(9600), 0, attotime::from_hz(9600));
 	m_tablet_irq_timer->adjust(attotime::never);
 	m_tablet_tx_bit = 1;
-	m_tablet_pen_in_proximity = false;
+	m_tablet_pen_x = 0;
+	m_tablet_pen_y = 0;
+	m_tablet_pen_switches = 0;
 	m_tablet_state = 0;
-}
 
-TIMER_CALLBACK_MEMBER(dpb7000_state::diskseq_complete)
-{
-	req_b_w(1);
-}
-
-TIMER_CALLBACK_MEMBER(dpb7000_state::field_in)
-{
-	req_a_w(1);
-}
-
-TIMER_CALLBACK_MEMBER(dpb7000_state::field_out)
-{
-	req_a_w(0);
+	// Tablet HLE
+	m_tablet_hle_tx_bits.clear();
+	m_tablet_hle_timer->adjust(attotime::from_hz(40), 0, attotime::from_hz(40));
 }
 
 MC6845_UPDATE_ROW(dpb7000_state::crtc_update_row)
@@ -1273,7 +1403,7 @@ void dpb7000_state::diskseq_y_w(uint16_t data)
 }
 
 // NOTE: This function is not used, but is retained in the event we wish for low-level disk sequencer emulation.
-void dpb7000_state::diskseq_tick()
+/*void dpb7000_state::diskseq_tick()
 {
 	m_diskseq_cp = (m_diskseq_cp ? 0 : 1);
 	m_diskseq->cp_w(m_diskseq_cp);
@@ -1282,7 +1412,7 @@ void dpb7000_state::diskseq_tick()
 	{
 		m_diskseq_reset = false;
 	}
-}
+}*/
 
 uint16_t dpb7000_state::bus_error_r(offs_t offset)
 {
@@ -1307,7 +1437,7 @@ void dpb7000_state::bus_error_w(offs_t offset, uint16_t data)
 
 void dpb7000_state::csr_w(uint8_t data)
 {
-	LOGMASKED(LOG_CSR, "%s: Card Select write: %02x\n", machine().describe_context(), data & 0x0f);
+	LOGMASKED(LOG_CSR, "%s: Card Select write: %02x (%04x)\n", machine().describe_context(), data & 0x0f, data);
 	m_csr = data & 0x0f;
 }
 
@@ -1375,6 +1505,7 @@ void dpb7000_state::store_address_w(uint8_t card, uint16_t data)
 	case 4:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set CXPOS: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
 		m_cxpos[card] = data & 0xfff;
+		m_ca0 = data & 1;
 		break;
 	case 5:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set CYPOS: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
@@ -1388,50 +1519,71 @@ void dpb7000_state::store_address_w(uint8_t card, uint16_t data)
 
 void dpb7000_state::combiner_reg_w(uint16_t data)
 {
-	static const char* const s_const_names[16] = { "Y0", "CY", "CU", "CV", "ES", "EI", "EII", "Y7", "IS", "IY", "IU", "IV", "IIS", "IIY", "IIU", "IIV" };
-	LOGMASKED(LOG_COMBINER, "%s: Combiner Card register write: %s = %02x\n", machine().describe_context(), s_const_names[(data >> 10) & 0xf], (uint8_t)data);
-	switch ((data >> 10) & 0xf)
+	const uint8_t reg_idx = (data >> 10) & 0xf;
+	switch (reg_idx)
 	{
+		case 0: // Output Timing CS Flags
+			LOGMASKED(LOG_OUTPUT_TIMING, "%s: Output Timing Card CS Register write: %02x\n", machine().describe_context(), (uint8_t)data);
+			m_output_csflags = (uint8_t)(data & 0x0003);
+			break;
 		case 1: // CY
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Constant Y write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_cursor_y = (uint8_t)data;
 			break;
-		case 2: // CU
-			m_cursor_u = (uint8_t)data;
-			break;
-		case 3: // CV
+		case 2: // CV
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Constant V write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_cursor_v = (uint8_t)data;
 			break;
+		case 3: // CU
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Constant U write: %02x\n", machine().describe_context(), (uint8_t)data);
+			m_cursor_u = (uint8_t)data;
+			break;
 		case 4: // ES
-			m_invert_mask = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Ext. Store Flags (ES) write: %02x\n", machine().describe_context(), (uint8_t)data);
+			m_ext_store_flags = (uint8_t)data;
 			break;
 		case 5: // EI
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Ext I Matte (EI) write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_matte_ext[0] = (uint8_t)data;
 			break;
 		case 6: // EII
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Ext II Matte (EII) write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_matte_ext[1] = (uint8_t)data;
 			break;
+		case 7: // Output Timing CP Flags
+			LOGMASKED(LOG_OUTPUT_TIMING, "%s: Output Timing Card CP Register write: %02x\n", machine().describe_context(), (uint8_t)data);
+			m_output_cpflags = (uint8_t)(data & 0x001f);
+			break;
 		case 8: // IS
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I Select (IS) write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_select_matte[0] = BIT(data, 0);
 			break;
 		case 9: // IY
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I Y (IY) write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_matte_y[0] = (uint8_t)data;
 			break;
 		case 10: // IU
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I U (IU) write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_matte_u[0] = (uint8_t)data;
 			break;
 		case 11: // IV
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I V (IV) write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_matte_v[0] = (uint8_t)data;
 			break;
 		case 12: // IIS
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II Select (IIS) write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_select_matte[1] = BIT(data, 0);
 			break;
 		case 13: // IIY
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II Y (IIY) write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_matte_y[1] = (uint8_t)data;
 			break;
 		case 14: // IIU
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II U (IIU) write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_matte_u[1] = (uint8_t)data;
 			break;
 		case 15: // IIV
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II V (IIV) write: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_matte_v[1] = (uint8_t)data;
 			break;
 	}
@@ -1440,104 +1592,415 @@ void dpb7000_state::combiner_reg_w(uint16_t data)
 void dpb7000_state::handle_command(uint16_t data)
 {
 	//printf("handle_command %d, cxpos %d, cypos %d\n", (data >> 1) & 0xf, m_cxpos[1], m_cypos[1]);
-	switch ((data >> 1) & 0xf)
+	const uint8_t command = (data >> 1) & 0xf;
+	switch (command)
 	{
 	case 0: // Live Video
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Live Video\n");
 		break;
 	case 1: // Brush Store Read
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Brush Store Read\n");
 		break;
 	case 2: // Brush Store Write
 		m_bxlen_counter = m_bxlen;
 		m_bylen_counter = m_bylen;
 		break;
 	case 3: // Framestore Read
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Framestore Read\n");
 		break;
 	case 4: // Framestore Write
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Framestore Write\n");
 		break;
 	case 5: // Fast Wipe Video
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Fast Wipe Video\n");
 		break;
 	case 6: // Fast Wipe Brush Store
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Fast Wipe Brush Store\n");
 		break;
-	case 7: // Fast Wipe Framestore
+	/*case 7: // Fast Wipe Framestore
 		for (int i = 0; i < 2; i++)
 		{
-			if (!BIT(data, 5 + i) && m_cxpos[i] < 800 && m_cypos[i] < 768)
+			if (!BIT(data, 5 + i))
 			{
 				m_bylen_counter = m_bylen;
-				for (uint16_t y = m_cypos[i]; m_bylen_counter != 0x1000 && y < 768; m_bylen_counter++, y++)
+				for (uint16_t y = m_cypos[1]; m_bylen_counter != 0x1000; m_bylen_counter++, y = (y + 1) & 0xfff)
 				{
+					if (y >= 768)
+						continue;
+
 					uint8_t *lum = &m_framestore_lum[i][y * 800];
 					uint8_t *chr = &m_framestore_chr[i][y * 800];
+					uint8_t *ext = &m_framestore_ext[i][y * 800];
 					m_bxlen_counter = m_bxlen;
-					for (uint16_t x = m_cxpos[i]; m_bxlen_counter != 0x1000 && x < 800; m_bxlen_counter++, x++)
+					for (uint16_t x = m_cxpos[1]; m_bxlen_counter != 0x1000; m_bxlen_counter++, x = (x + 1) & 0xfff)
 					{
+						if (x >= 800)
+							continue;
+
 						lum[x] = m_bs_y_latch;
 						chr[x] = (x & 1) ? m_bs_v_latch : m_bs_u_latch;
+						if (BIT(data, 9))
+							ext[x] = m_bs_y_latch;
 					}
 				}
 			}
 		}
-		break;
+		break;*/
+	case 7: // Fast Wipe Framestore
 	case 8: // Draw
-		for (int i = 0; i < 2; i++)
-		{
-			if (!BIT(data, 5 + i) && m_cxpos[i] < 800 && m_cypos[i] < 768)
-			{
-				uint16_t bxlen = m_bxlen;//(((m_bxlen << 3) | (m_bixos & 7)) >> (m_bif & 3)) & 0xfff;
-				uint16_t bylen = m_bylen;//(((m_bylen << 3) | (m_biyos & 7)) >> ((m_bif >> 2) & 3)) & 0xfff;
-				for (uint16_t y = m_cypos[i], bly = bylen; bly != 0x1000 && y < 768; bly++, y++)
-				{
-					uint8_t *lum = &m_framestore_lum[i][y * 800];
-					uint8_t *chr = &m_framestore_chr[i][y * 800];
-					for (uint16_t x = m_cxpos[i], blx = bxlen; blx != 0x1000 && x < 800; blx++, x++)
-					{
-						if (BIT(data, 13)) // Fixed Colour Select
-						{
-							uint8_t y = m_bs_y_latch;
-							uint8_t u = m_bs_u_latch;
-							uint8_t v = m_bs_v_latch;
-							if (!BIT(data, 12)) // Brush Zero
-							{
-								y = 0x00;
-								u = 0x80;
-								v = 0x80;
-							}
-							else if (!BIT(data, 9))
-							{
-								uint16_t bx = ((((blx - bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
-								uint16_t by = ((((bly - bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
+	{
+		bool use_brush = (command == 8);
+		bool lum_en = BIT(data, 7);
+		bool chr_en = BIT(data, 8);
+		bool write_en[2] = { lum_en, chr_en };
 
-								// TODO: Actual Brush Processor functionality
-								uint16_t lum_sum = lum[x] + m_brushstore_lum[by * 256 + bx];
-								uint16_t chr_sum = chr[x] + m_brushstore_chr[by * 256 + bx];
-								y = lum_sum > 0xff ? 0xff : (uint16_t)lum_sum;
-								uint8_t chr_clamped = chr_sum > 0xff ? 0xff : (uint16_t)chr_sum;
-								if (m_cxpos[i] & 1)
-									v = chr_clamped;
-								else
-									u = chr_clamped;
+		bool s1_disable = BIT(data, 5);
+		bool s2_disable = BIT(data, 6);
+		int ext_idx = (s1_disable ? 1 : 0);
+
+		uint16_t sel_1 = (uint16_t)s1_disable << 5;
+		uint16_t sel_2 = (uint16_t)s2_disable << 4;
+		uint16_t sel_ext = BIT(data, 9) << 6;
+		uint16_t fcs = BIT(data, 13);
+		uint16_t prom_addr = (fcs << 8) | (use_brush ? 0x80 : 0x00) | sel_ext | sel_1 | sel_2 | bitswap<4>(data, 1, 2, 3, 4);
+		uint8_t prom_data = m_brushproc_prom[prom_addr];
+
+		bool brush_zero = BIT(~data, 12);
+		bool oe1 = BIT(prom_data, 0);
+		bool oe2 = BIT(prom_data, 1);
+		bool oe3 = BIT(prom_data, 2);
+		bool oe4 = BIT(prom_data, 7);
+
+		bool use_s1_data = (oe3 == oe4);
+		bool use_s2_data = !oe4;
+		bool use_ext_data = !oe3;
+		bool mask_sel = BIT(prom_data, 3);
+		bool word_width = BIT(prom_data, 4);
+		bool use_k_data = BIT(~prom_data, 6);
+		bool brush_invert = BIT(~data, 11);
+		uint16_t pal_addr_extra = (BIT(prom_data, 5) << 8) | (brush_invert << 9);
+
+		uint8_t *store_1[2] = { &m_framestore_lum[0][0], &m_framestore_chr[0][0] };
+		uint8_t *store_2[2] = { &m_framestore_lum[1][0], &m_framestore_chr[1][0] };
+		uint8_t *store_ext[2] = { &m_framestore_ext[1][0], &m_framestore_ext[1][0] }; // TODO: unsure about this, check
+		uint8_t pressure[2] = { m_brush_press_lum, m_brush_press_chr };
+
+		uint16_t bxlen = m_bxlen;//(((m_bxlen << 3) | (m_bixos & 7)) >> (m_bif & 3)) & 0xfff;
+		uint16_t bylen = m_bylen;//(((m_bylen << 3) | (m_biyos & 7)) >> ((m_bif >> 2) & 3)) & 0xfff;
+		uint16_t width = 0x1000 - bxlen;
+		//printf("\nDrawing %dx%d brush at %d,%d (data %04x)\n", 0x1000 - m_bxlen, 0x1000 - m_bylen, m_cxpos[1], m_cypos[1], data);
+		if (data == 0x3991 || (!s2_disable && width < 50))
+		{
+			//printf("/S1:%d /S2:%d LUM:%d CHR:%d EXT:%d BZ:%d /BI:%d FCS:%d\n", s1_disable, s2_disable, lum_en, chr_en, BIT(data, 9), brush_zero, brush_invert, fcs);
+			//printf("PROMAddr:%03x PROMVal:%02x OE1:%d OE2:%d OE3:%d OE4:%d MSEL:%d 16BIT:%d\n", prom_addr, prom_data, oe1, oe2, oe3, oe4, mask_sel, word_width);
+		}
+		for (uint16_t y = m_cypos[1], bly = bylen; bly != 0x1000; bly++, y = (y + 1) & 0xfff)
+		{
+			if (y >= 768)
+				continue;
+
+			uint32_t line_idx = y * 800;
+			for (uint16_t x = m_cxpos[1], blx = bxlen; blx != 0x1000; blx++, x = (x + 1) & 0xfff)
+			{
+				if (x >= 800)
+					continue;
+
+				if (m_output_cpflags & 0x0c)
+				{
+					const uint16_t x_nib_addr = (x >> 1) & 0x3ff;
+					uint16_t x_xlnib = m_storeaddr_xlnib[x_nib_addr] & 0xe;
+					uint16_t x_xmnib = (m_storeaddr_xmnib[x_nib_addr] & 0x0f) << 4;
+					uint16_t x_xhnib = (m_storeaddr_xhnib[x_nib_addr] & 0x0f) << 8;
+					uint16_t remapped_x = x_xhnib | x_xmnib | x_xlnib | (x & 1);
+
+					uint16_t prot_addr = (BIT(~m_output_cpflags, 2) << 8) | (BIT(~m_output_cpflags, 3) << 9);
+					uint16_t prot_x_addr = (remapped_x >> 4) & 0xff;
+					uint16_t prot_y_addr = ((y - 8) >> 2) & 0xff;
+					const bool prot_x = m_storeaddr_protx[prot_addr | prot_x_addr] & 1;
+					const bool prot_y = m_storeaddr_proty[prot_addr | prot_y_addr] & 1;
+
+					if (prot_x || prot_y)
+					{
+						LOGMASKED(LOG_CSR, "Prot Reject: %03x, %03x (%d, %d)\n", prot_addr | prot_x_addr, prot_addr | prot_y_addr, prot_x, prot_y);
+						continue;
+					}
+				}
+
+				uint32_t pix_idx = line_idx + x;
+
+				uint8_t uv_bsel = x & 1;
+
+				uint8_t fixed_chr = (uv_bsel ? m_bs_v_latch : m_bs_u_latch);
+				uint8_t brush_values[2] = { m_bs_y_latch, fixed_chr };
+				uint8_t brush_ext = 0xff;
+
+				if (use_brush)
+				{
+					uint16_t bx = ((((blx - bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
+					uint16_t by = ((((bly - bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
+					uint16_t uv_bx = ((x & 1) ? (bx | 1) : (bx & ~1));
+					uint8_t brush_lum = m_brushstore_lum[by * 256 + bx];
+					uint8_t brush_chr = m_brushstore_chr[by * 256 + uv_bx];
+					brush_ext = m_brushstore_ext[by * 256 + bx];
+					brush_values[0] = fcs ? m_bs_y_latch : brush_lum;
+					brush_values[1] = fcs ? fixed_chr : brush_chr;
+
+					if (data == 0x3991 || (!s2_disable && width < 50))
+					{
+						//printf("    Brush pixel %d,%d (bl %03x,%03x) (blen %03x,%03x) (store %d,%d), Brush LCE %02x %02x %02x:\n", 0x1000 - blx, 0x1000 - bly, blx, bly, bxlen, bylen, bx, by, brush_values[0], brush_values[1], brush_ext);
+					}
+				}
+				else if (data == 0x3991 || (!s2_disable && width < 50))
+				{
+					//printf("    Fixed brush value LCE %02x %02x %02x (YUV %02x %02x %02x)\n", brush_values[0], brush_values[1], brush_ext, m_bs_y_latch, m_bs_u_latch, m_bs_v_latch);
+				}
+
+				for (int ch = 0; ch < 2; ch++)
+				{
+					uint8_t s1_data = store_1[ch][pix_idx];
+					uint8_t s2_data = store_2[ch][pix_idx];
+					uint8_t sext_data = store_ext[ext_idx][pix_idx];
+
+					uint8_t brush_data = brush_values[ch];
+					uint8_t brush_ext_data = (use_k_data && ch == 0) ? brush_ext : 0xff;
+					uint8_t other_data = 0x00;
+					uint8_t pressure_data = pressure[ch];
+					uint8_t press_product = (uint8_t)((brush_ext_data * pressure_data + 0x0080) >> 8);
+
+					uint8_t mask_multiplicand = 0x00;
+					if (!brush_zero)
+						mask_multiplicand = (mask_sel ? sext_data : 0xff);
+
+					uint8_t press_result = (uint8_t)((press_product * mask_multiplicand + 0x0080) >> 8);
+					uint16_t pal_addr = press_result | pal_addr_extra;
+					uint16_t pal_data = m_brushproc_pal[pal_addr];
+					uint8_t pal_value = (uint8_t)bitswap<8>(pal_data, 0, 1, 2, 3, 4, 5, 6, 7);
+					bool pal_sel = BIT(pal_data, 8);
+					bool pal_invert = BIT(pal_data, 9);
+
+					if (data == 0x3991 || (!s2_disable && width < 50))
+					{
+						//printf("\n        Brush %s data: %02x\n", ch ? "chr" : "lum", brush_data);
+						//printf("        Bext:%02x, PressDat:%02x, PressProd:%02x, MaskMult:%02x, PressRes:%02x, PALAddr:%03x, PALData:%03x, PALVal:%02x\n", brush_ext_data, pressure_data, press_product, mask_multiplicand, press_result, pal_addr, pal_data, pal_value);
+						//printf("        S1:%02x S2:%02x SE:%02x\n", s1_data, s2_data, sext_data);
+					}
+
+					if (use_s1_data)
+					{
+						other_data = s1_data;
+						//if (data == 0x3991 || (!s2_disable && width < 50)) printf("        Using Store I for other data, %02x\n", other_data);
+					}
+					else if (use_s2_data)
+					{
+						other_data = s2_data;
+						//if (data == 0x3991 || (!s2_disable && width < 50)) printf("        Using Store II for other data, %02x\n", other_data);
+					}
+					else if (use_ext_data)
+					{
+						other_data = sext_data;
+						//if (data == 0x3991 || (!s2_disable && width < 50)) printf("        Using Stencil for other data, %02x\n", other_data);
+					}
+
+					if (!oe1)
+					{
+						brush_data = s1_data;
+						//if (data == 0x3991 || (!s2_disable && width < 50)) printf("        Using Store I for brush data, %02x\n", other_data);
+					}
+					else if (!oe2)
+					{
+						brush_data = s2_data;
+						//if (data == 0x3991 || (!s2_disable && width < 50)) printf("        Using Store II for brush data, %02x\n", other_data);
+					}
+
+					if (data == 0x3991 || (!s2_disable && width < 50))
+					{
+						//printf("        Before-comp brush data %02x, other data %02x\n", brush_data, other_data);
+					}
+
+					uint8_t comp_a = brush_data;
+					uint8_t comp_b = other_data;
+
+					uint8_t alu_out = 0x00;
+					bool final_add = false;
+					if(comp_a < comp_b)
+					{
+						if (data == 0x3991 || (!s2_disable && width < 50))
+						{
+							//printf("        comp_a %02x < comp_b %02x, final ALU pass should subtract\n", comp_a, comp_b);
+						}
+						alu_out = other_data - brush_data;
+					}
+					else
+					{
+						if (data == 0x3991 || (!s2_disable && width < 50))
+						{
+							//printf("        comp_a %02x > comp_b %02x, final ALU pass should add, calculating %02x - %02x = %02x\n", comp_a, comp_b, comp_b, comp_a, comp_a - comp_b);
+						}
+						alu_out = brush_data - other_data;
+						final_add = true;
+					}
+
+					if (pal_invert)
+						brush_data = ~brush_data;
+
+					uint16_t out_product = (uint16_t)alu_out * (uint16_t)pal_value;
+					if (data == 0x3991 || (!s2_disable && width < 50))
+					{
+						//printf("        ALU out %02x, out product %04x (%02x * %02x), PALSel:%d, PALInv:%d\n", alu_out, out_product, alu_out, pal_value, pal_sel, pal_invert);
+					}
+					uint8_t final_msb = 0;
+					uint8_t final_lsb = 0;
+					if (!word_width)
+					{
+						uint8_t alu_a_val = (use_s2_data ? s2_data : s1_data);
+						uint8_t alu_b_val = (out_product + 0x0080) >> 8;
+						uint8_t final_alu_msb_out = (final_add ? (alu_a_val + alu_b_val) : (alu_a_val - alu_b_val));
+
+						final_msb = (pal_sel ? final_alu_msb_out : brush_data);
+						final_lsb = final_msb;
+
+						if (data == 0x3991 || (!s2_disable && width < 50))
+						{
+							if (final_add)
+							{
+								//printf("        8bpp, S1D %02x, S2D %02x, ALUA %02x, ALUB %02x, ALU final %02x+%02x=%02x, MSB %02x\n", s1_data, s2_data, alu_a_val, alu_b_val, alu_a_val, alu_b_val, final_alu_msb_out, final_msb);
 							}
-							lum[x] = y;
-							chr[x] = (m_cxpos[i] & 1) ? v : u;
+							else
+							{
+								//printf("        8bpp, S1D %02x, S2D %02x, ALUA %02x, ALUB %02x, ALU final %02x-%02x=%02x, MSB %02x\n", s1_data, s2_data, alu_a_val, alu_b_val, alu_a_val, alu_b_val, final_alu_msb_out, final_msb);
+							}
+						}
+					}
+					else
+					{
+						uint16_t alu_a = ((use_s2_data ? s2_data : s1_data) << 8) | s2_data;
+						uint16_t alu_b = out_product;
+						uint16_t final_alu_out = (final_add ? (alu_a + alu_b) : (alu_a - alu_b));
+						final_msb = (pal_sel ? (final_alu_out >> 8) : brush_data);
+						final_lsb = (uint8_t)final_alu_out;
+
+						if (data == 0x3991 || (!s2_disable && width < 50))
+						{
+							if (final_add)
+							{
+								//printf("        16bpp, ALUA %04x, ALUB %04x, %04x+%04x=%04x, MSB %02x, LSB %02x\n", alu_a, alu_b, alu_a, alu_b, final_alu_out, final_msb, final_lsb);
+							}
+							else
+							{
+								//printf("        16bpp, ALUA %04x, ALUB %04x, %04x-%04x=%04x, MSB %02x, LSB %02x\n", alu_a, alu_b, alu_a, alu_b, final_alu_out, final_msb, final_lsb);
+							}
+						}
+					}
+
+					if (write_en[ch])
+					{
+						if (!s1_disable)
+						{
+							if (data == 0x3991 || (!s2_disable && width < 50))
+							{
+								//printf("        Storing %02x in Store 1 %s\n", final_msb, ch ? "chr" : "lum");
+							}
+							store_1[ch][pix_idx] = s2_disable ? final_lsb : final_msb;
+						}
+						if (!s2_disable)
+						{
+							store_2[ch][pix_idx] = final_lsb;
+							if (data == 0x3991 || (!s2_disable && width < 50))
+							{
+								//printf("        Storing %02x in Store 2 %s\n", final_lsb, ch ? "chr" : "lum");
+							}
+						}
+					}
+					if (ch == 0 && BIT(data, 9))
+					{
+						if (!s1_disable)
+						{
+							if (data == 0x3991 || (!s2_disable && width < 50))
+							{
+								//printf("        Storing %02x in EXT 1\n", final_msb);
+							}
+							store_ext[0][pix_idx] = final_msb;
+						}
+						if (!s2_disable)
+						{
+							if (data == 0x3991 || (!s2_disable && width < 50))
+							{
+								//printf("        Storing %02x in EXT 1\n", final_lsb);
+							}
+							store_ext[1][pix_idx] = final_lsb;
 						}
 					}
 				}
+
+				/*if (fixed_colour_select)
+				{
+					uint8_t y = m_bs_y_latch;
+					uint8_t u = m_bs_u_latch;
+					uint8_t v = m_bs_v_latch;
+					if (BIT(data, 12)) // Brush Zero
+					{
+						y = 0x00;
+						u = 0x80;
+						v = 0x80;
+					}
+
+					if (!BIT(data, 9))
+					{
+						uint16_t bx = ((((blx - bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
+						uint16_t by = ((((bly - bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
+
+						// TODO: Actual Brush Processor functionality
+						uint8_t brush_lum = m_brushstore_lum[by * 256 + bx];;
+						uint8_t brush_chr = m_brushstore_chr[by * 256 + bx];
+						if (brush_invert)
+						{
+							brush_lum = 0xff - brush_lum;
+							brush_chr = 0xff - brush_chr;
+						}
+
+						//uint16_t lum_prod = lum[x] *
+						//if (brush_zero)
+						//{
+						//}
+
+						uint16_t lum_sum = lum[x] + m_brushstore_lum[by * 256 + bx];
+						uint16_t chr_sum = chr[x] + m_brushstore_chr[by * 256 + bx];
+
+						y = lum_sum > 0xff ? 0xff : (uint16_t)lum_sum;
+						uint8_t chr_clamped = chr_sum > 0xff ? 0xff : (uint16_t)chr_sum;
+						if (m_cxpos[i] & 1)
+							v = chr_clamped;
+						else
+							u = chr_clamped;
+					}
+
+					lum[x] = y;
+					chr[x] = (m_cxpos[i] & 1) ? v : u;
+				}*/
 			}
 		}
-		break;
+		//printf("\n");
+	}	break;
 	case 9: // Draw with Stencil I
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Draw with Stencil I\n");
 		break;
 	case 10: // Draw with Stencil II
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Draw with Stencil II\n");
 		break;
 	case 11: // Copy to Framestore
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Copy to Framestore\n");
 		break;
 	case 12: // Copy to Brush Store
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Copy to Brush Store\n");
 		break;
 	case 13: // Paste with Stencil I
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Paste with Stencil I\n");
 		break;
 	case 14: // Paste with Stencil II
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Paste with Stencil II\n");
 		break;
 	case 15: // Copy to same Framestore (Invert)
+		LOGMASKED(LOG_COMMANDS, "Unsupported command: Copy to Framestore (Invert)\n");
 		break;
 	}
 }
@@ -1557,19 +2020,21 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		};
 		LOGMASKED(LOG_BRUSH_ADDR, "%s: Brush Address Card, Function Select: %04x\n", machine().describe_context(), data);
 		LOGMASKED(LOG_BRUSH_ADDR, "                Function:           %s\n", s_func_names[(data >> 1) & 0xf]);
-		LOGMASKED(LOG_BRUSH_ADDR, "                Store I:            %d\n", BIT(data, 5));
-		LOGMASKED(LOG_BRUSH_ADDR, "                Store II:           %d\n", BIT(data, 6));
-		LOGMASKED(LOG_BRUSH_ADDR, "                Luma Enable:        %d\n", BIT(data, 7));
-		LOGMASKED(LOG_BRUSH_ADDR, "                Chroma Enable:      %d\n", BIT(data, 8));
-		LOGMASKED(LOG_BRUSH_ADDR, "                Brush Select:       %d\n", BIT(data, 9));
-		LOGMASKED(LOG_BRUSH_ADDR, "                Disc Enable:        %d\n", BIT(data, 10));
-		LOGMASKED(LOG_BRUSH_ADDR, "                Brush Invert:       %d\n", BIT(data, 11));
-		LOGMASKED(LOG_BRUSH_ADDR, "                Brush Zero:         %d\n", BIT(data, 12));
-		LOGMASKED(LOG_BRUSH_ADDR, "                Fixed Color Select: %d\n", BIT(data, 13));
+		LOGMASKED(LOG_BRUSH_ADDR, "                /S1:                %d\n", BIT(data, 5));
+		LOGMASKED(LOG_BRUSH_ADDR, "                /S2:                %d\n", BIT(data, 6));
+		LOGMASKED(LOG_BRUSH_ADDR, "                LUMEN:              %d\n", BIT(data, 7));
+		LOGMASKED(LOG_BRUSH_ADDR, "                CHREN:              %d\n", BIT(data, 8));
+		LOGMASKED(LOG_BRUSH_ADDR, "                KSEL:               %d\n", BIT(data, 9));
+		LOGMASKED(LOG_BRUSH_ADDR, "                DISCEN:             %d\n", BIT(data, 10));
+		LOGMASKED(LOG_BRUSH_ADDR, "                /KINV:              %d\n", BIT(data, 11));
+		LOGMASKED(LOG_BRUSH_ADDR, "                KZERO:              %d\n", BIT(data, 12));
+		LOGMASKED(LOG_BRUSH_ADDR, "                FCS:                %d\n", BIT(data, 13));
 		LOGMASKED(LOG_BRUSH_ADDR, "                Go:                 %d\n", BIT(data, 0));
 		m_brush_addr_func = data & ~1;
 		if (BIT(data, 0))
 		{
+			m_brush_addr_func |= 0x8000;
+			m_cmd_done_timer->adjust(attotime::from_usec(500));
 			handle_command(data);
 		}
 		break;
@@ -1629,8 +2094,8 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			case 9:
 			case 13:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: No command\n", machine().describe_context());
-				req_b_w(1);
-				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				req_b_w(0);
+				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			case 0:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read track to buffer RAM\n", machine().describe_context());
@@ -1671,26 +2136,26 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			case 8:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track from Buffer RAM (not yet implemented)\n", machine().describe_context());
 				req_b_w(1);
-				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			case 10:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track, stride 2, from Buffer RAM (not yet implemented)\n", machine().describe_context());
 				req_b_w(1);
-				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			case 12:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track (not yet implemented)\n", machine().describe_context());
 				req_b_w(1);
-				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			case 14:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Write Track (not yet implemented)\n", machine().describe_context());
 				req_b_w(1);
-				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			default:
 				LOGMASKED(LOG_CTRLBUS, "%s: Unknown Disk Sequencer Card command.\n", machine().describe_context());
-				m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			}
 		}
@@ -1702,9 +2167,10 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 	}
 
 	case 2: // Store Address Card
-		store_address_w(1, data);
 		if (BIT(data, 15))
 			store_address_w(0, data);
+		else
+			store_address_w(1, data);
 		break;
 
 	case 3: // Size Card, Y6/Y7
@@ -1732,16 +2198,17 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		break;
 
 	case 8: // Brush Store Card color latches
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Store Card color latches (%s): %04x\n", machine().describe_context(), m_ca0 ? "VY" : "UY", data);
 		if (m_ca0)
 		{
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Store Card color latches (VY): %04x\n\n", machine().describe_context(), data);
 			m_bs_v_latch = (uint8_t)(data >> 8);
-			m_bs_y_latch = (uint8_t)data;
 		}
 		else
 		{
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Store Card color latches (UY): %04x\n", machine().describe_context(), data);
 			m_bs_u_latch = (uint8_t)(data >> 8);
 		}
+		m_bs_y_latch = (uint8_t)data;
 		m_ca0 = 1 - m_ca0;
 		break;
 
@@ -1771,12 +2238,12 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			m_bylen_counter = data & 0xfff;
 			break;
 		case 6:
-			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: PLUM = %03x(?)\n", machine().describe_context(), data & 0xff);
-			m_plum = data & 0xff;
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: PLUM = %03x\n", machine().describe_context(), data & 0xff);
+			m_brush_press_lum = data & 0xff;
 			break;
 		case 7:
-			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: PCHR = %03x(?)\n", machine().describe_context(), data & 0xff);
-			m_pchr = data & 0xff;
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: PCHR = %03x\n", machine().describe_context(), data & 0xff);
+			m_brush_press_chr = data & 0xff;
 			break;
 		default:
 			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: Unknown (%04x)\n", machine().describe_context(), data);
@@ -1789,21 +2256,23 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		const uint8_t hi_bits = (data >> 14) & 3;
 		if (hi_bits == 0) // Cursor Parameters
 		{
-			static const char* const s_reg_names[4] = { "Cursor X Origin", "Cursor Y Origin", "Cursor X Size", "Cursor Y Size" };
 			const uint8_t reg = (data >> 12) & 3;
-			LOGMASKED(LOG_CTRLBUS | LOG_OUTPUT_TIMING, "%s: CPU write to Output Timing Card: %s = %03x\n", machine().describe_context(), s_reg_names[reg], data & 0xfff);
 			switch (reg)
 			{
 			case 0: // Cursor X Origin
+				LOGMASKED(LOG_CTRLBUS | LOG_OUTPUT_TIMING, "%s: CPU write to Output Timing Card: Cursor Origin X = %03x\n", machine().describe_context(), data & 0xfff);
 				m_cursor_origin_x = data & 0xfff;
 				break;
 			case 1: // Cursor Y Origin
+				LOGMASKED(LOG_CTRLBUS | LOG_OUTPUT_TIMING, "%s: CPU write to Output Timing Card: Cursor Origin Y = %03x\n", machine().describe_context(), data & 0xfff);
 				m_cursor_origin_y = data & 0xfff;
 				break;
 			case 2: // Cursor X Size
+				LOGMASKED(LOG_CTRLBUS | LOG_OUTPUT_TIMING, "%s: CPU write to Output Timing Card: Cursor Size X = %03x\n", machine().describe_context(), data & 0xfff);
 				m_cursor_size_x = data & 0xfff;
 				break;
 			case 3: // Cursor Y Size
+				LOGMASKED(LOG_CTRLBUS | LOG_OUTPUT_TIMING, "%s: CPU write to Output Timing Card: Cursor Size Y = %03x\n", machine().describe_context(), data & 0xfff);
 				m_cursor_size_y = data & 0xfff;
 				break;
 			}
@@ -1830,9 +2299,9 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(dpb7000_state::req_a_w)
+TIMER_CALLBACK_MEMBER(dpb7000_state::req_a_w)
 {
-	if (state)
+	if (param)
 		m_sys_ctrl |= SYSCTRL_REQ_A_IN;
 	else
 		m_sys_ctrl &= ~SYSCTRL_REQ_A_IN;
@@ -1840,9 +2309,14 @@ WRITE_LINE_MEMBER(dpb7000_state::req_a_w)
 	update_req_irqs();
 }
 
-WRITE_LINE_MEMBER(dpb7000_state::req_b_w)
+TIMER_CALLBACK_MEMBER(dpb7000_state::cmd_done)
 {
-	if (state)
+	m_brush_addr_func &= ~0x8000;
+}
+
+TIMER_CALLBACK_MEMBER(dpb7000_state::req_b_w)
+{
+	if (param)
 		m_sys_ctrl |= SYSCTRL_REQ_B_IN;
 	else
 		m_sys_ctrl &= ~SYSCTRL_REQ_B_IN;
@@ -1904,10 +2378,15 @@ void dpb7000_state::process_sample()
 	const uint16_t x = (m_bxlen_counter - m_bxlen);
 	const uint16_t y = (m_bylen_counter - m_bylen);
 	//printf("Processing sample %d,%d (%04x:%04x, %04x:%04x) LC:%d\n", x, y, m_bxlen_counter, m_bxlen, m_bylen_counter, m_bylen, m_line_count);
-	if (BIT(m_brush_addr_func, 7))
-		m_brushstore_lum[y * 256 + x] = m_incoming_lum;
-	if (BIT(m_brush_addr_func, 8))
-		m_brushstore_chr[y * 256 + x] = m_incoming_chr;
+	if ((m_brush_addr_func & 0x1e) == (2 << 1))
+	{
+		if (BIT(m_brush_addr_func, 7))
+			m_brushstore_lum[y * 256 + x] = m_incoming_lum;
+		if (BIT(m_brush_addr_func, 8))
+			m_brushstore_chr[y * 256 + x] = m_incoming_chr;
+		if (BIT(m_brush_addr_func, 9))
+			m_brushstore_ext[y * 256 + x] = m_incoming_lum;
+	}
 
 	m_bxlen_counter++;
 	if (m_bxlen_counter == 0x1000)
@@ -1946,6 +2425,7 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 	if (!state && m_diskseq_cyl_read_pending && m_floppy && m_fdd_side < 2)
 	{
 		//printf("Cylinder read is pending, index just passed by, we have a floppy. Let's go.\n");
+		LOGMASKED(LOG_COMMANDS, "Reading cylinder from floppy\n");
 		m_fdd_pll.read_reset(machine().time());
 
 		static const uint16_t PREGAP_MARK = 0xaaaa;
@@ -2218,19 +2698,73 @@ READ_LINE_MEMBER(dpb7000_state::keyboard_t1_r)
 
 void dpb7000_state::tds_dac_w(uint8_t data)
 {
-	LOGMASKED(LOG_TDS, "%s: TDS DAC Write: %02x\n", machine().describe_context(), data);
-	m_tds_dac_value = data;
+	m_tds_dac_value = ~data;
+	uint16_t offset = 0x67 * m_tds_dac_value;
+	m_tds_dac_offset = (uint8_t)(offset >> 8);
+	m_tds_dac_percent = std::clamp(m_tds_dac_value / 255.0f, 0.0f, 1.0f);
+	LOGMASKED(LOG_TDS, "%s: TDS DAC Write: %02x (%f)\n", machine().describe_context(), data, m_tds_dac_percent);
+}
+
+TIMER_CALLBACK_MEMBER(dpb7000_state::tds_press_tick)
+{
+	m_tds_in_proximity = !m_pen_prox->read();
+
+	switch (m_tds_press_state)
+	{
+	case STATE_IDLE:
+		if (m_tds_in_proximity)
+		{
+			m_tds_press_state = STATE_PRESS_IN;
+			m_tds_pressure_shift = 6;
+		}
+		break;
+	case STATE_PRESS_IN:
+		if (!m_tds_in_proximity)
+			m_tds_press_state = STATE_PRESS_OUT;
+		else if (m_tds_pressure_shift > 0)
+			m_tds_pressure_shift--;
+		else
+			m_tds_press_state = STATE_PRESSED;
+		break;
+	case STATE_PRESSED:
+		if (!m_tds_in_proximity)
+			m_tds_press_state = STATE_PRESS_OUT;
+		break;
+	case STATE_PRESS_OUT:
+		if (m_tds_in_proximity)
+			m_tds_press_state = STATE_PRESS_IN;
+		else if (m_tds_pressure_shift < 6)
+			m_tds_pressure_shift++;
+		else
+			m_tds_press_state = STATE_IDLE;
+		break;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(dpb7000_state::tds_adc_tick)
+{
+	m_tds_adc_busy = false;
+
+	uint16_t value = m_tds_dac_offset;
+	if (m_tds_press_state != STATE_IDLE)
+	{
+		value += (m_pen_press->read() >> m_tds_pressure_shift);
+	}
+	m_tds_adc_value = (value >= 0xf8 ? 0xf7 : (uint8_t)value);
 }
 
 void dpb7000_state::tds_convert_w(uint8_t data)
 {
-	LOGMASKED(LOG_TDS, "%s: TDS ADC Convert Start\n", machine().describe_context());
-	m_tds_adc_value = m_tds_dac_value;
+	LOGMASKED(LOG_TDS, "%s: TDS ADC Convert Start: %02x\n", machine().describe_context(), data);
+
+	m_tds_adc_busy = true;
+	m_tds_adc_value = 0x80;
+	m_tds_adc_timer->adjust(attotime::from_ticks(8, 120000));
 }
 
 uint8_t dpb7000_state::tds_adc_r()
 {
-	LOGMASKED(LOG_TDS, "%s: TDS ADC Read: %02x\n", machine().describe_context(), m_tds_adc_value);
+	LOGMASKED(LOG_TDS, "%s: TDS ADC Read: %02x (DAC value %02x)\n", machine().describe_context(), m_tds_adc_value, m_tds_dac_value);
 	return m_tds_adc_value;
 }
 
@@ -2243,7 +2777,16 @@ uint8_t dpb7000_state::tds_pen_switches_r()
 
 TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_tx_tick)
 {
-	m_tds_duart->rx_b_w(m_tablet_tx_bit);
+	//m_tds_duart->rx_b_w(m_tablet_tx_bit);
+	if (!m_tablet_hle_tx_bits.empty())
+	{
+		m_tds_duart->rx_b_w(m_tablet_hle_tx_bits[0]);
+		m_tablet_hle_tx_bits.pop_front();
+	}
+	else
+	{
+		m_tds_duart->rx_b_w(1);
+	}
 }
 
 WRITE_LINE_MEMBER(dpb7000_state::duart_b_w)
@@ -2253,8 +2796,8 @@ WRITE_LINE_MEMBER(dpb7000_state::duart_b_w)
 
 uint8_t dpb7000_state::tds_p1_r()
 {
-	const uint8_t latched = m_tds_p1_data & 0x82;
-	const uint8_t adc_not_busy = (1 << 5);
+	const uint8_t latched = m_tds_p1_data & 0x80;
+	const uint8_t adc_not_busy = m_tds_adc_busy ? 0x00 : 0x20;
 	uint8_t data = m_tds_dips->read() | adc_not_busy | latched;
 	LOGMASKED(LOG_TDS, "%s: TDS Port 1 Read, %02x\n", machine().describe_context(), data);
 	return data;
@@ -2265,6 +2808,18 @@ uint8_t dpb7000_state::tds_p2_r()
 	uint8_t data = 0x02 | (m_keybc_tx << 3);
 	LOGMASKED(LOG_TDS, "%s: TDS Port 2 Read, %02x\n", machine().describe_context(), data);
 	return data;
+}
+
+uint8_t dpb7000_state::tds_p3_r()
+{
+	LOGMASKED(LOG_TDS, "%s: TDS Port 3 Read, %02x\n", machine().describe_context(), 0);
+	return 0;
+}
+
+uint8_t dpb7000_state::tds_p4_r()
+{
+	LOGMASKED(LOG_TDS, "%s: TDS Port 4 Read, %02x\n", machine().describe_context(), 0);
+	return 0;
 }
 
 void dpb7000_state::tds_p1_w(uint8_t data)
@@ -2284,13 +2839,42 @@ void dpb7000_state::tds_p2_w(uint8_t data)
 	LOGMASKED(LOG_TDS, "%s: TDS Port 2 Write = %02x\n", machine().describe_context(), data);
 }
 
-INPUT_CHANGED_MEMBER(dpb7000_state::pen_prox_changed)
+/*INPUT_CHANGED_MEMBER(dpb7000_state::pen_prox_changed)
 {
-	m_tablet_pen_in_proximity = newval ? false : true;
-	if (m_tablet_pen_in_proximity)
+	m_tds_in_proximity = newval ? false : true;
+	if (m_tds_in_proximity)
 	{
 		LOGMASKED(LOG_TABLET, "Triggering IRQ due to proximity\n");
 		m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	}
+}*/
+
+TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_hle_tick)
+{
+	if (m_tds_press_state != STATE_IDLE || (m_pen_switches->read() == 1))
+	{
+		m_tablet_pen_x = m_pen_x->read();
+		m_tablet_pen_y = 4799 - m_pen_y->read();
+		m_tablet_pen_switches = m_pen_switches->read();
+		uint8_t data[5] =
+		{
+			(uint8_t)(0x40 | (BIT(m_tablet_pen_switches, 1) << 2) | (BIT(m_tablet_pen_y, 12) << 1) | BIT(m_tablet_pen_x, 12)),
+			(uint8_t)(m_tablet_pen_x & 0x003f),
+			(uint8_t)((m_tablet_pen_x & 0x0fc0) >> 6),
+			(uint8_t)(m_tablet_pen_y & 0x003f),
+			(uint8_t)((m_tablet_pen_y & 0x0fc0) >> 6)
+		};
+
+		for (int i = 0; i < 5; i++)
+		{
+			data[i] |= (population_count_32(data[i]) & 1) ? 0x80 : 0x00;
+			m_tablet_hle_tx_bits.push_back(0);
+			for (int bit = 0; bit < 8; bit++)
+			{
+				m_tablet_hle_tx_bits.push_back(BIT(data[i], bit));
+			}
+			m_tablet_hle_tx_bits.push_back(1);
+		}
 	}
 }
 
@@ -2323,7 +2907,7 @@ void dpb7000_state::tablet_p2_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 		LOGMASKED(LOG_TABLET, "Tablet DRQ: %d\n", m_tablet_drq);
 		LOGMASKED(LOG_TABLET, "Clearing tablet CPU IRQ\n");
 		m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-		if (old_drq && !m_tablet_drq && m_tablet_pen_in_proximity) // DRQ transition to low
+		if (old_drq && !m_tablet_drq && m_tds_in_proximity) // DRQ transition to low
 		{
 			if (m_tablet_state == 0) // We're idle
 			{
@@ -2405,6 +2989,189 @@ uint8_t dpb7000_state::tablet_rdl_r()
 	return data;
 }
 
+uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const bool blank_1_q = true;
+	const bool blank_2_q = true;
+	const uint16_t upper_flag_addr = (uint16_t)((m_output_cpflags & 3) << 8);
+
+	int32_t y_addr[2] = { m_rvscr[0], m_rvscr[1] };
+	for (int32_t y = 0; y < 625; y++, y_addr[0]++, y_addr[1]++)
+	{
+		const uint8_t vlines = m_output_vlines[y + 0x18f] & 0x0f;
+
+		const uint8_t hlines = m_output_hlines[0xa0 + 70] & 0x0f;
+		const uint16_t flag_addr = (hlines & 0x0f) | ((vlines & 0x0f) << 4);
+		const uint8_t hflags = m_output_hflags[flag_addr | upper_flag_addr] & 0x0f;
+
+		const bool palette = BIT(hflags, 3);
+		const bool use_store1_matte = palette && (!blank_1_q || m_select_matte[0]);
+		const bool use_store2_matte = palette && (!blank_2_q || m_select_matte[1]);
+		const bool use_ext_store1_matte = !blank_1_q || !BIT(m_ext_store_flags, 0);
+		const bool use_ext_store2_matte = !blank_2_q || !BIT(m_ext_store_flags, 1);
+		const bool invert_a = palette ? BIT(~m_ext_store_flags, 3) : BIT(m_ext_store_flags, 2);
+		const bool invert_b = !invert_a;
+		//const bool invert_ext = BIT(m_ext_store_flags, 4);
+		const uint8_t ext_a_mask = (invert_a ? 0xff : 0x00);
+		const uint8_t ext_b_mask = (invert_b ? 0xff : 0x00);
+
+		if (palette && !BIT(hflags, 1))
+		{
+			y_addr[0] = 0;
+			y_addr[1] = 0;
+		}
+
+		uint32_t *d = &bitmap.pix(y);
+		for (int32_t x = 0; x < 800; x++)
+		{
+			const uint8_t uv_sel = (x & 1);
+
+			int32_t read_y1 = (y_addr[0]);
+			int32_t read_y2 = (y_addr[1]);
+			const uint32_t pix_idx1 = (read_y1 * 800) + x;
+			const uint32_t pix_idx2 = (read_y2 * 800) + x;
+
+			const uint16_t lum1 = use_store1_matte ? m_matte_y[0] : m_framestore_lum[0][pix_idx1];
+			const uint16_t chr1 = use_store1_matte ? (uv_sel ? m_matte_v[0] : m_matte_u[0]) : m_framestore_chr[0][pix_idx1];
+			const uint16_t ext1 = use_ext_store1_matte ? m_matte_ext[0] : m_framestore_ext[0][pix_idx1];
+
+			const uint16_t lum2 = use_store2_matte ? m_matte_y[1] : m_framestore_lum[1][pix_idx2];
+			const uint16_t chr2 = use_store2_matte ? (uv_sel ? m_matte_v[1] : m_matte_u[1]) : m_framestore_chr[1][pix_idx2];
+			const uint16_t ext2 = use_ext_store2_matte ? m_matte_ext[1] : m_framestore_ext[1][pix_idx2];
+
+			const uint16_t ext_product = (ext1 * ext2) + 0x0080;
+			const uint8_t ext_a = (uint8_t)(ext_product >> 8) ^ ext_a_mask;
+			const uint8_t ext_b = (uint8_t)(ext_product >> 8) ^ ext_b_mask;
+
+			const uint16_t lum1_product = ((lum1 * ext_a) + 0x0080) >> 8;
+			const uint16_t lum2_product = ((lum2 * ext_b) + 0x0080) >> 8;
+			const uint16_t chr1_product = ((chr1 * ext_a) + 0x0080) >> 8;
+			const uint16_t chr2_product = ((chr2 * ext_b) + 0x0080) >> 8;
+
+			const uint8_t lum_sum = (uint8_t)(lum1_product + lum2_product);
+			const uint8_t chr_sum = (uint8_t)(chr1_product + chr2_product);
+
+			//uint32_t flag_color = 0;
+			//if (!BIT(hflags, 0))
+			//	flag_color |= 0x0000ff00;
+			//if (!BIT(hflags, 1))
+			//	flag_color |= 0x00ff0000;
+			//if (flag_color)
+			//	*d++ = 0xff000000 | flag_color;
+			//else
+				*d++ = (lum_sum << 8) | chr_sum;
+		}
+	}
+
+	const uint32_t cursor_rgb = m_yuv_lut[(m_cursor_u << 16) | (m_cursor_v << 8) | m_cursor_y];
+	uint16_t cursor_origin_y_counter = m_cursor_origin_y;
+	uint16_t cursor_y_size = m_cursor_size_y;
+	uint16_t cursor_y_index = 0;
+
+	//for (uint16_t vert = 0xd8f; vert < 0x1000; vert++, dst_y++)
+	for (int32_t dst_y = 0; dst_y < 625; dst_y++)
+	{
+		uint16_t cursor_origin_x_counter = m_cursor_origin_x;
+		uint16_t cursor_x_size = m_cursor_size_x;
+		uint16_t cursor_x_index = 0;
+
+		uint32_t *d = &bitmap.pix(dst_y);
+		for (int32_t x = 0; x < 800; x += 2)
+		{
+			//const uint8_t hlines = m_output_hlines[h & 0x3ff] & 0x0f;
+			//const uint16_t flag_addr = (hlines & 0x0f) | ((vlines & 0x0f) << 4);
+			//const uint8_t hflags = m_output_hflags[flag_addr | upper_flag_addr] & 0x0f;
+			//const uint8_t vflags = m_output_vflags[flag_addr];
+
+			//uint8_t r = (vflags & 0xf0) | (vflags >> 4);
+			//uint8_t b = (vflags & 0x0f) | (vflags << 4);
+			//uint8_t g = (hflags << 4) | hflags;
+			const uint32_t u = (d[x] << 16) & 0xff0000;
+			const uint32_t v = (d[x | 1] << 8) & 0x00ff00;
+			const uint32_t y0 = (d[x] >> 8) & 0x0000ff;
+			const uint32_t y1 = (d[x | 1] >> 8) & 0x0000ff;
+
+			uint32_t combined[2] = { m_yuv_lut[u | v | y0], m_yuv_lut[u | v | y1] };
+			for (int32_t h = 0; h < 2; h++)
+			{
+				if (m_output_csflags)
+				{
+					const bool cursor_in_window = (cursor_origin_x_counter == 0x1000 && cursor_origin_y_counter == 0x1000);
+					const bool cursor_enable = cursor_in_window && (cursor_x_index < 0x20 && cursor_y_index < 0x20);
+					if (cursor_enable)
+					{
+						const uint16_t cursor_addr_x = cursor_x_index ^ 0x10;
+						const uint16_t cursor_addr_y = cursor_y_index ^ 0x10;
+						const uint16_t cursor_addr = (cursor_addr_y << 5) | cursor_addr_x;
+
+						const uint8_t cursor_data = m_output_cursor[cursor_addr];
+
+						bool cursor_bit = true;
+						bool cursor_colored = true;
+						switch (m_output_csflags)
+						{
+						case 1:
+							cursor_bit = BIT(cursor_data, 0);
+							cursor_colored = BIT(cursor_data, 1);
+							break;
+						case 2:
+							cursor_bit = BIT(cursor_data, 2);
+							cursor_colored = BIT(cursor_data, 3);
+							break;
+						case 3:
+							cursor_bit = ((cursor_addr_x & cursor_addr_y) & 0x10) ? 0 : 1;
+							break;
+						default:
+							// Cursor inactive
+							break;
+						}
+
+						if (!cursor_bit)
+						{
+							combined[h] = cursor_colored ? cursor_rgb : 0xff000000;
+						}
+					}
+
+					if (cursor_origin_x_counter < 0x1000)
+					{
+						cursor_origin_x_counter++;
+					}
+					else if (cursor_x_size < 0x1000)
+					{
+						cursor_x_size++;
+						cursor_x_index++;
+					}
+					else if (cursor_x_index < 0x20)
+					{
+						cursor_x_index++;
+					}
+				}
+
+				d[x + h] = combined[h];
+			}
+		}
+
+		if (m_output_csflags)
+		{
+			if (cursor_origin_y_counter < 0x1000)
+			{
+				cursor_origin_y_counter++;
+			}
+			else if (cursor_y_size < 0x1000)
+			{
+				cursor_y_size++;
+				cursor_y_index++;
+			}
+			else if (cursor_y_index < 0x20)
+			{
+				cursor_y_index++;
+			}
+		}
+	}
+
+	return 0;
+}
+
 template <int StoreNum>
 uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -2412,9 +3179,12 @@ uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 
 	{
 		const uint8_t *src_lum = &m_framestore_lum[StoreNum][py * 800];
 		const uint8_t *src_chr = &m_framestore_chr[StoreNum][py * 800];
+		//const uint8_t *src_ext = &m_framestore_ext[StoreNum][py * 800];
 		uint32_t *dst = &bitmap.pix(py);
-		for (int px = 0; px < 800; px++)
+		for (int px = 0; px < 800; px += 2)
 		{
+			//const uint8_t y = *src_ext++;
+			//*dst++ = 0xff000000 | (y << 16) | (y << 8) | y;
 			const uint32_t u = *src_chr++ << 16;
 			const uint32_t v = *src_chr++ << 8;
 			*dst++ = m_yuv_lut[u | v | *src_lum++];
@@ -2428,9 +3198,12 @@ uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 
 		{
 			const uint8_t *src_lum = &m_brushstore_lum[(py - 512) * 256];
 			const uint8_t *src_chr = &m_brushstore_chr[(py - 512) * 256];
+			//const uint8_t *src_ext = &m_brushstore_ext[(py - 512) * 256];
 			uint32_t *dst = &bitmap.pix(py);
 			for (int px = 0; px < 256; px += 2)
 			{
+				//const uint8_t y = *src_ext++;
+				//*dst++ = 0xff000000 | (y << 16) | (y << 8) | y;
 				const uint32_t u = *src_chr++ << 16;
 				const uint32_t v = *src_chr++ << 8;
 				*dst++ = m_yuv_lut[u | v | *src_lum++];
@@ -2485,6 +3258,12 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_brg->ft_handler().append(m_acia[1], FUNC(acia6850_device::write_rxc));
 	m_brg->ft_handler().append(m_acia[2], FUNC(acia6850_device::write_txc));
 	m_brg->ft_handler().append(m_acia[2], FUNC(acia6850_device::write_rxc));
+
+	screen_device &combined_screen(SCREEN(config, "combined_screen", SCREEN_TYPE_RASTER));
+	combined_screen.set_refresh_hz(60);
+	combined_screen.set_size(800, 625);
+	combined_screen.set_visarea(0, 799, 41, 616);
+	combined_screen.set_screen_update(FUNC(dpb7000_state::combined_screen_update));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -2559,6 +3338,8 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_tds_cpu->out_p1_cb().set(FUNC(dpb7000_state::tds_p1_w));
 	m_tds_cpu->in_p2_cb().set(FUNC(dpb7000_state::tds_p2_r));
 	m_tds_cpu->out_p2_cb().set(FUNC(dpb7000_state::tds_p2_w));
+	m_tds_cpu->in_p3_cb().set(FUNC(dpb7000_state::tds_p3_r));
+	m_tds_cpu->in_p4_cb().set(FUNC(dpb7000_state::tds_p4_r));
 
 	SCN2681(config, m_tds_duart, 3.6864_MHz_XTAL);
 	m_tds_duart->irq_cb().set_inputline(m_tds_cpu, M6803_IRQ_LINE);
@@ -2573,27 +3354,40 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_tablet_cpu->p2_out_cb().set(FUNC(dpb7000_state::tablet_p2_w));
 	m_tablet_cpu->p3_in_cb().set(FUNC(dpb7000_state::tablet_p3_r));
 	m_tablet_cpu->p3_out_cb().set(FUNC(dpb7000_state::tablet_p3_w));
+
+	config.set_default_layout(layout_dpb7000);
 }
 
-
 ROM_START( dpb7000 )
-	ROM_REGION16_BE(0x80000, "monitor", 0)
-	ROM_LOAD16_BYTE("01616a-nad-4af2.bin", 0x00001, 0x8000, CRC(a42eace6) SHA1(78c629a8afb48a95fc0a86ca762cc5b84bd9929b))
-	ROM_LOAD16_BYTE("01616a-ncd-58de.bin", 0x00000, 0x8000, CRC(f70fff2a) SHA1(a6f85d086a0c53d156eeeb157184ebcad4adecb3))
-	ROM_LOAD16_BYTE("01616a-mad-f512.bin", 0x10001, 0x8000, CRC(4c3e39f6) SHA1(443095c56481fbcadd4dcec1757d889c8f78805d))
-	ROM_LOAD16_BYTE("01616a-mcd-91f2.bin", 0x10000, 0x8000, CRC(4b6b6eb3) SHA1(1bef443d78197d33e44c708ead9604020881f67f))
-	ROM_LOAD16_BYTE("01616a-lad-0059.bin", 0x20001, 0x8000, CRC(0daf670d) SHA1(2342a43054ed141de298a1c1a6867949297bb52a))
-	ROM_LOAD16_BYTE("01616a-lcd-5639.bin", 0x20000, 0x8000, CRC(c8977d3f) SHA1(4ee9f3a883400b4771e6ae33c6e4edcd5c0b49e7))
-	ROM_LOAD16_BYTE("01616a-kad-1d9b.bin", 0x30001, 0x8000, CRC(bda7e309) SHA1(377edf2675a6736fe7ec775894858967b0e9247e))
-	ROM_LOAD16_BYTE("01616a-kcd-e51c.bin", 0x30000, 0x8000, CRC(aa05a5cc) SHA1(85dce335a72643f7640524b18cfe480a3c299f23))
-	ROM_LOAD16_BYTE("01616a-jad-47a8.bin", 0x40001, 0x8000, CRC(60fff4c9) SHA1(ba60281c0dd8627dffe07e7ea66f4eb688e74001))
-	ROM_LOAD16_BYTE("01616a-jcd-7825.bin", 0x40000, 0x8000, CRC(bb258ede) SHA1(ab8042391cd361bcd874b2f9d8fcaf20d4b2ebe7))
-	ROM_LOAD16_BYTE("01616a-iad-73a8.bin", 0x50001, 0x8000, CRC(98709fd2) SHA1(bd0f4689600e9fc49dbd8f2f326e18f8d602825e))
-	ROM_LOAD16_BYTE("01616a-icd-0562.bin", 0x50000, 0x8000, CRC(bab5274e) SHA1(3e51977da3dfe8fda089b9d2c3199acb4fed3212))
-	ROM_LOAD16_BYTE("01616a-had-d6fa.bin", 0x60001, 0x8000, CRC(70d791c5) SHA1(c281e4f27404e58ad5a80d6de1c5583cd9f3fe0e))
-	ROM_LOAD16_BYTE("01616a-hcd-9c0e.bin", 0x60000, 0x8000, CRC(938cb614) SHA1(ea7ea8a13e0ab1497691bab53090296ba51d271f))
-	ROM_LOAD16_BYTE("01616a-gcd-3ab8.bin", 0x70001, 0x8000, CRC(e9c21438) SHA1(1784ab2de1bb6023565b2e27872a0fcda25e1b1f))
-	ROM_LOAD16_BYTE("01616a-gad-397d.bin", 0x70000, 0x8000, CRC(0b95f9ed) SHA1(77126ee6c1f3dcdb8aa669ab74ff112e3f01918a))
+	ROM_REGION16_BE(0xa0000, "monitor", 0)
+	ROM_SYSTEM_BIOS( 0, "v406", "V4.06A" )
+	ROMX_LOAD("01616a-nad-4af2.bin", 0x00001,  0x8000, CRC(a42eace6) SHA1(78c629a8afb48a95fc0a86ca762cc5b84bd9929b), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-ncd-58de.bin", 0x00000,  0x8000, CRC(f70fff2a) SHA1(a6f85d086a0c53d156eeeb157184ebcad4adecb3), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-mad-f512.bin", 0x10001,  0x8000, CRC(4c3e39f6) SHA1(443095c56481fbcadd4dcec1757d889c8f78805d), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-mcd-91f2.bin", 0x10000,  0x8000, CRC(4b6b6eb3) SHA1(1bef443d78197d33e44c708ead9604020881f67f), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-lad-0059.bin", 0x20001,  0x8000, CRC(0daf670d) SHA1(2342a43054ed141de298a1c1a6867949297bb52a), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-lcd-5639.bin", 0x20000,  0x8000, CRC(c8977d3f) SHA1(4ee9f3a883400b4771e6ae33c6e4edcd5c0b49e7), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-kad-1d9b.bin", 0x30001,  0x8000, CRC(bda7e309) SHA1(377edf2675a6736fe7ec775894858967b0e9247e), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-kcd-e51c.bin", 0x30000,  0x8000, CRC(aa05a5cc) SHA1(85dce335a72643f7640524b18cfe480a3c299f23), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-jad-47a8.bin", 0x40001,  0x8000, CRC(60fff4c9) SHA1(ba60281c0dd8627dffe07e7ea66f4eb688e74001), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-jcd-7825.bin", 0x40000,  0x8000, CRC(bb258ede) SHA1(ab8042391cd361bcd874b2f9d8fcaf20d4b2ebe7), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-iad-73a8.bin", 0x50001,  0x8000, CRC(98709fd2) SHA1(bd0f4689600e9fc49dbd8f2f326e18f8d602825e), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-icd-0562.bin", 0x50000,  0x8000, CRC(bab5274e) SHA1(3e51977da3dfe8fda089b9d2c3199acb4fed3212), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-had-d6fa.bin", 0x60001,  0x8000, CRC(70d791c5) SHA1(c281e4f27404e58ad5a80d6de1c5583cd9f3fe0e), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-hcd-9c0e.bin", 0x60000,  0x8000, CRC(938cb614) SHA1(ea7ea8a13e0ab1497691bab53090296ba51d271f), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-gad-397d.bin", 0x70001,  0x8000, CRC(0b95f9ed) SHA1(77126ee6c1f3dcdb8aa669ab74ff112e3f01918a), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("01616a-gcd-3ab8.bin", 0x70000,  0x8000, CRC(e9c21438) SHA1(1784ab2de1bb6023565b2e27872a0fcda25e1b1f), ROM_BIOS(0) | ROM_SKIP(1))
+	ROM_SYSTEM_BIOS( 1, "v411", "V4.11A" )
+	ROMX_LOAD("01993c-naa-0608.bin", 0x00001, 0x10000, CRC(9e4cfd96) SHA1(faae2ba849d30c894d9f929bae371ae76e05bdac), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("01993c-nca-3964.bin", 0x00000, 0x10000, CRC(04d75a15) SHA1(79f706296ba0c399b4e2d3acf947cae7706f9d63), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("01993c-maa-fa58.bin", 0x20001, 0x10000, CRC(88dc8ee0) SHA1(a2f6b80022ddb5adf687b678c621c8f5db1f3575), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("01993c-mca-b2b0.bin", 0x20000, 0x10000, CRC(16bf9db4) SHA1(a4696ee5a68b8a304c2433f16a6d57d7108f6406), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("01993c-laa-6be3.bin", 0x40001, 0x10000, CRC(56e693cc) SHA1(b4f3e0f8b635fe2b3fa975ed57f966e8ade7fbb1), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("01993c-lca-7c0d.bin", 0x40000, 0x10000, CRC(9540fa68) SHA1(79e46c4b6e86f6e53e3f5fea72e3be8c64de03af), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("01993c-kaa-3b12.bin", 0x60001, 0x10000, CRC(41e2ec71) SHA1(37112f878b3db24b198e878f5dba90fcbb4175d2), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("01993c-kca-f705.bin", 0x60000, 0x10000, CRC(00bfbd62) SHA1(17a5f2cbc91cabf1113c7d6e26124b67e5ece848), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("01993c-jaa-3cc9.bin", 0x80001, 0x10000, CRC(9e477845) SHA1(b89e5d2b69a6043452a56685a1227df86c83a328), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("01993c-jca-0b41.bin", 0x80000, 0x10000, CRC(58e8f302) SHA1(b37953046d81027b069b7a7a1834cd8c94fd9dca), ROM_BIOS(1) | ROM_SKIP(1))
 
 	ROM_REGION(0x1000, "vduchar", 0)
 	ROM_LOAD("bw14char.ic1",  0x0000, 0x1000, BAD_DUMP CRC(f9dd68b5) SHA1(50132b759a6d84c22c387c39c0f57535cd380411))
@@ -2613,12 +3407,20 @@ ROM_START( dpb7000 )
 	ROM_REGION(0x800, "fddprom", 0)
 	ROM_LOAD("17446a-gd-m2716.bin", 0x000, 0x800, CRC(a0be00ca) SHA1(48c4f8c07b9f6bc9b68698e1e326782e0b01e1b0))
 
-	ROM_REGION(0x1200, "output_timing_proms", 0)
-	ROM_LOAD("pb-037-17418-bea.bin", 0x0000, 0x400, CRC(644e82a3) SHA1(d7634e03809abe2db924571c05821c1b2aca051b))
-	ROM_LOAD("pb-037-17418-bga.bin", 0x0400, 0x400, CRC(3b2c3635) SHA1(2038d616dd7f65ba55497bd037b0ad69aaa801ed))
-	ROM_LOAD("pb-037-17418-cda.bin", 0x0800, 0x400, CRC(a31f3793) SHA1(4e74e528088c155e2c2592fa937e4cabfe6324c8))
-	ROM_LOAD("pb-037-17418-dfa.bin", 0x0c00, 0x400, CRC(ca2ec308) SHA1(4232f44ea5bd3fa240eaf7c14e4b925140f90a1e))
-	ROM_LOAD("pb-037-17418-bfa.bin", 0x1000, 0x200, CRC(db84a171) SHA1(ed63f384928a017dafd694c7bcf99e315af6bd3c))
+	ROM_REGION(0x400, "output_timing_cursor", 0)
+	ROM_LOAD("pb-037-17418-cda.bin", 0x000, 0x400, CRC(a31f3793) SHA1(4e74e528088c155e2c2592fa937e4cabfe6324c8))
+
+	ROM_REGION(0x400, "output_timing_hlines", 0)
+	ROM_LOAD("pb-037-17418-bga.bin", 0x000, 0x400, CRC(3b2c3635) SHA1(2038d616dd7f65ba55497bd037b0ad69aaa801ed))
+
+	ROM_REGION(0x400, "output_timing_hflags", 0)
+	ROM_LOAD("pb-037-17418-bea.bin", 0x000, 0x400, CRC(644e82a3) SHA1(d7634e03809abe2db924571c05821c1b2aca051b))
+
+	ROM_REGION(0x400, "output_timing_vlines", 0)
+	ROM_LOAD("pb-037-17418-dfa.bin", 0x000, 0x400, CRC(ca2ec308) SHA1(4232f44ea5bd3fa240eaf7c14e4b925140f90a1e))
+
+	ROM_REGION(0x200, "output_timing_vflags", 0)
+	ROM_LOAD("pb-037-17418-bfa.bin", 0x000, 0x100, CRC(a4486aac) SHA1(3834d550da3f1865b921807300a94612149f69d4))
 
 	ROM_REGION(0x800, "keyboard", 0)
 	ROM_LOAD("etc2716 63b2.bin", 0x000, 0x800, CRC(04614a50) SHA1(e547458f2c9cf29cf52f02b8824b32e5e91807fd))
@@ -2630,7 +3432,7 @@ ROM_START( dpb7000 )
 	ROM_LOAD("nmc27c64q.bin", 0x0000, 0x2000, CRC(a453928f) SHA1(f4a25298fb446f0046c6f9f3ce70e7169dcebd01))
 
 	ROM_REGION(0x200, "brushproc_prom", 0)
-	ROM_LOAD("pb-02c-17593-baa.bin", 0x000, 0x200, CRC(a74cc1f5) SHA1(3b789d5a29c70c93dec56f44be8c14b41915bdef))
+	ROM_LOAD("pb-02c-17593-baa.bin", 0x000, 0x200, CRC(6e31339f) SHA1(72a92d97412be19c884c3b854f7d9831435391a5))
 
 	ROM_REGION16_BE(0x800, "brushproc_pal", 0)
 	ROMX_LOAD("pb-02c-17593-hba.bin", 0x000, 0x800, CRC(76018e4f) SHA1(73d995e2e78410676061d45857756d5305a9984a), ROM_GROUPWORD)
@@ -2664,6 +3466,26 @@ ROM_START( dpb7000 )
 
 	ROM_REGION(0x200, "size_prom_xl", 0)
 	ROM_LOAD("pb-012-17428a-gca.bin", 0x000, 0x200, CRC(ec7d26f3) SHA1(8bdbec33218f903294c135554d61271fa18d1a8d))
+
+	ROM_REGION(0x10000, "storeaddr_pal_blank", 0)
+	ROM_LOAD("pb-032-17425b-igb.bin", 0x00000, 0x10000, CRC(cdd80590) SHA1(fecb64695b61e8ec740af1480240088d5447688d))
+
+	ROM_REGION(0x400, "storeaddr_prom_xlnib", 0)
+	ROM_LOAD("pb-032-17425b-bbb.bin", 0x000, 0x400, CRC(2051a6e4) SHA1(3bd8a9015e77b034a94fe072a9753649b76f9f69))
+
+	ROM_REGION(0x400, "storeaddr_prom_xmnib", 0)
+	ROM_LOAD("pb-032-17425b-bcb.bin", 0x000, 0x400, CRC(01aaa6f7) SHA1(e31bff0c68f74996368443bfb58a3524a838f270))
+
+	ROM_REGION(0x400, "storeaddr_prom_xhnib", 0)
+	ROM_LOAD("pb-032-17425b-bdb.bin", 0x000, 0x400, CRC(20e2fb9e) SHA1(c4c77ec02ab6d3a1a28edf5543e57235a64a9d8d))
+
+	ROM_REGION(0x400, "storeaddr_prom_protx", 0)
+	ROM_LOAD("pb-032-17425b-deb.bin", 0x000, 0x400, CRC(faeb44dd) SHA1(3eaf981245824332d216e97095bdc02ff04e4800))
+
+	ROM_REGION(0x400, "storeaddr_prom_proty", 0)
+	ROM_LOAD("pb-032-17425b-edb.bin", 0x000, 0x400, CRC(183bfdc0) SHA1(175b052948e4e4a9421d8913479e7531b7e5f03c))
 ROM_END
+
+} // anonymous namespace
 
 COMP( 1981, dpb7000, 0, 0, dpb7000, dpb7000, dpb7000_state, empty_init, "Quantel", "DPB-7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
