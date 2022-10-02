@@ -8,10 +8,6 @@ NOTES:
     Current implementation based on ATM Turbo 2+. If anybody wants to validate ATM1, existing
     code must be moved to atmtb2_state not modified.
 
-TODO:
-    * ports read
-    * validate screen timings
-
 *******************************************************************************************/
 
 #include "emu.h"
@@ -402,8 +398,7 @@ void atm_state::atm_io(address_map &map)
 	m_io_view[0](0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
 	m_io_view[0](0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
 	m_io_view[0](0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
-	m_io_view[0](0x00ff, 0x00ff).mirror(0xff00).r(m_beta, FUNC(beta_disk_device::state_r));
-	m_io_view[0](0x00ff, 0x00ff).mirror(0xff00).w(FUNC(atm_state::atm_port_ff_w));
+	m_io_view[0](0x00ff, 0x00ff).mirror(0xff00).r(m_beta, FUNC(beta_disk_device::state_r)).w(FUNC(atm_state::atm_port_ff_w));
 
 	m_io_view[0](0x0077, 0x0077).select(0xff00).w(FUNC(atm_state::atm_port_77_w));
 	m_io_view[0](0x00f7, 0x00f7).select(0xff00).w(FUNC(atm_state::atm_port_f7_w));

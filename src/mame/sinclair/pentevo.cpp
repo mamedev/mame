@@ -612,7 +612,7 @@ void pentevo_state::pentevo_io(address_map &map)
 	m_io_view[0](0x00ff, 0x00ff).select(0xff00).r(m_beta, FUNC(beta_disk_device::state_r)).w(FUNC(pentevo_state::atm_port_ff_w));
 
 	m_io_view[0](0x0077, 0x0077).select(0xff00).lr8(NAME([]() { return 0xff; })).w(FUNC(pentevo_state::atm_port_77_w));
-	m_io_view[0](0x3ff7, 0x3ff7).select(0xc000).w(FUNC(pentevo_state::atm_port_f7_w));     // ATM
+	m_io_view[0](0x3ff7, 0x3ff7).select(0xc000).w(FUNC(pentevo_state::atm_port_f7_w));      // ATM
 	m_io_view[0](0x37f7, 0x37f7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_7f7_w)); // PENTEVO
 	m_io_view[0](0x3bf7, 0x3bf7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_bf7_w)); // RO
 
