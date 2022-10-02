@@ -10,6 +10,7 @@
 
 #include "agatkeyb.h"
 #include "machine/keyboard.ipp"
+#include "utf8.h"
 
 
 /***************************************************************************

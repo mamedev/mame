@@ -8,7 +8,7 @@ Technically, the main unit is the peripheral(buttons, display, speaker, power),
 and the cartridge holds the MCU(processor, ROM, RAM).
 
 Hardware notes:
-- cyan/red VFD display Futaba DM-16Z + cyan VFD 9-digit panel Futaba 9-ST-11A 1F
+- cyan/red VFD Futaba DM-16Z + cyan VFD 9-digit panel Futaba 9-ST-11A 1F
 - 1-bit sound, two 7-button control panels attached to each side
 - edge connector to cartridge, MCU on cartridge (HD38800 or TMS1670)
 

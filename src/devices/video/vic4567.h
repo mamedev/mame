@@ -134,7 +134,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_palette_interface override
-	virtual uint32_t palette_entries() const override { return 0x100; }
+	virtual uint32_t palette_entries() const noexcept override { return 0x100; }
 
 private:
 	static constexpr unsigned SPRITE_BASE_X_SIZE = 24;

@@ -45,7 +45,7 @@ public:
 
 	static void format(u32 key, floppy_image *image);
 
-	virtual void enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const override;
+	virtual void enumerate_f(floppy_enumerator &fe) const override;
 	virtual std::unique_ptr<filesystem_t> mount(fsblk_t &blockdev) const override;
 
 	virtual bool can_format() const override;

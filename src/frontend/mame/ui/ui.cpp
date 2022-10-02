@@ -42,7 +42,11 @@
 #include "screen.h"
 #include "uiinput.h"
 
+// FIXME: allow OSD module headers to be included in a less ugly way
+#include "../osd/modules/lib/osdlib.h"
 #include "../osd/modules/lib/osdobj_common.h"
+
+#include "utf8.h"
 
 #include <chrono>
 #include <functional>
@@ -1116,6 +1120,7 @@ void mame_ui_manager::decrease_frameskip()
 bool mame_ui_manager::can_paste()
 {
 	// check to see if the clipboard is not empty
+	// FIXME: this is expensive - need a cheaper way to check if clipboard contains suitable content
 	return !osd_get_clipboard_text().empty();
 }
 

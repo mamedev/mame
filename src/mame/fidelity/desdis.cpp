@@ -40,6 +40,7 @@ Designer Mach IV Master 2325 (model 6129) overview:
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/clock.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"

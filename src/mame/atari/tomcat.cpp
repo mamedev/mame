@@ -26,7 +26,7 @@
 
 #include "emu.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/m6502/m6502.h"
 #include "video/avgdvg.h"

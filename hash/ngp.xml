@@ -11,7 +11,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: SNK -->
 	<software name="bstars">
-		<description>Pocket Sports Series - Baseball Stars (Euro, Jpn)</description>
+		<description>Pocket Sports Series - Baseball Stars (Euro, Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00070" />
@@ -25,7 +25,7 @@ NEOP00060 Dokodemo Mahjong
 	</software>
 
 	<software name="kof_mlon">
-		<description>King of Fighters R-1 &amp; Melon-chan no Seichou Nikki (Jpn, Prototype)</description>
+		<description>King of Fighters R-1 &amp; Melon-chan no Seichou Nikki (Japan, prototype)</description>
 		<year>199?</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00130" />
@@ -38,7 +38,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: SNK -->
 	<software name="kofr1">
-		<description>Pocket Fighting Series - King of Fighters R-1 (Euro, Jpn)</description>
+		<description>Pocket Fighting Series - King of Fighters R-1 (Euro, Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00010" />
@@ -53,7 +53,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: ADK -->
 	<software name="melonchn">
-		<description>Melon-chan no Seichou Nikki (Jpn)</description>
+		<description>Melon-chan no Seichou Nikki (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00040" />
@@ -69,7 +69,7 @@ NEOP00060 Dokodemo Mahjong
 	<!-- Developer: Dyna -->
 	<software name="neocher">
 	<!-- NGPC, rated "Over 18" -->
-		<description>Pocket Casino Series - Neo Cherry Master (Euro, Jpn)</description>
+		<description>Pocket Casino Series - Neo Cherry Master (Euro, Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00140" />
@@ -84,7 +84,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: SNK -->
 	<software name="neocup98">
-		<description>Pocket Sports Series - Neo Geo Cup '98 (Euro, Jpn)</description>
+		<description>Pocket Sports Series - Neo Geo Cup '98 (Euro, Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00020" />
@@ -99,7 +99,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: Yumekobo -->
 	<software name="ptennis">
-		<description>Pocket Sports Series - Pocket Tennis (Euro, Jpn)</description>
+		<description>Pocket Sports Series - Pocket Tennis (Euro, Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00090" />
@@ -116,7 +116,7 @@ NEOP00060 Dokodemo Mahjong
 	<!-- Developer: SNK -->
 	<software name="samsho">
 	<!-- NGPC -->
-		<description>Pocket Fighting Series - Samurai Spirit! (Jpn) ~ Samurai Shodown! (Euro)</description>
+		<description>Pocket Fighting Series - Samurai Spirit! (Japan) ~ Samurai Shodown! (Euro)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00080" />
@@ -131,7 +131,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: ADK -->
 	<software name="shougi">
-		<description>Shougi no Tatsujin (Jpn)</description>
+		<description>Shougi no Tatsujin (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00050" />
@@ -146,7 +146,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: Yumekobo -->
 	<software name="tsunapn">
-		<description>Renketsu Puzzle Tsunagete Pon! (Jpn)</description>
+		<description>Renketsu Puzzle Tsunagete Pon! (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00120" />

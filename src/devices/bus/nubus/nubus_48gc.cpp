@@ -99,7 +99,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// palette implementation
-	uint32_t palette_entries() const override;
+	uint32_t palette_entries() const noexcept override;
 
 private:
 	static constexpr offs_t VRAM_MAX = 0x10'0000 / 4; // chip supports 2M but card can only use 1M
@@ -309,7 +309,7 @@ ioport_constructor nubus_824gc_device::device_input_ports() const
 //  palette_entries - entries in color palette
 //-------------------------------------------------
 
-uint32_t jmfb_device::palette_entries() const
+uint32_t jmfb_device::palette_entries() const noexcept
 {
 	return 256;
 }

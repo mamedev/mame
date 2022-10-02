@@ -4799,7 +4799,7 @@ license:CC0
 		<rom name="Cartoon Carnival (1993)(Philips)(EU-US)[!][DVC enhanced].iso" size="641084640" crc="304a68f5" md5="fdbbade3ab06126d651b69cf2682f928"/>
 		<rom name="Cartoon Carnival (1993)(Philips)(EU-US)[!][DVC enhanced].cue" size="145" crc="9edc0699" md5="e6102a0ebf0e095defd7019e57d9b02f"/>
 		-->
-		<description>Cartoon Carnival (Euro, USA)[DVC enhanced]</description>
+		<description>Cartoon Carnival (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5195,7 +5195,7 @@ license:CC0
 		<rom name="Compton's Interactive Encyclopedia (1995)(Compton's NewMedia)(EU)[DVC enhanced].iso" size="728729568" crc="f8b5b911" md5="5c6648134eda8e50b1c1e136e175494b"/>
 		<rom name="Compton's Interactive Encyclopedia (1995)(Compton's NewMedia)(EU)[DVC enhanced].cue" size="168" crc="8e13d8d3" md5="e18e364a2502d262cda9795feefab61e"/>
 		-->
-		<description>Compton's Interactive Encyclopedia (Euro)[DVC enhanced]</description>
+		<description>Compton's Interactive Encyclopedia (Euro)</description>
 		<year>1995</year>
 		<publisher>Compton's NewMedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10037,7 +10037,7 @@ license:CC0
 		<rom name="Titanic - An interactive exploration (1994)(Philips)(US)[DVC enhanced].iso" size="772726080" crc="d243236f" md5="6de9a2ab6a798f5bd34c326c7ba2538f"/>
 		<rom name="Titanic - An interactive exploration (1994)(Philips)(US)[DVC enhanced].cue" size="159" crc="32dccadd" md5="ece83df31993b810eefdaadc52e8d305"/>
 		-->
-		<description>Titanic - An interactive exploration (USA)[DVC enhanced]</description>
+		<description>Titanic - An interactive exploration (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10237,7 +10237,7 @@ license:CC0
 		<rom name="USA '94 - World Cup (1994)(Philips)(EU)(M3)[!][de-fr-nl][DVC enhanced][8100101V104 50404061 01].iso" size="662911200" crc="a1cfa7ac" md5="e09ff155324c4353f5a4d4df67b9f918"/>
 		<rom name="USA '94 - World Cup (1994)(Philips)(EU)(M3)[!][de-fr-nl][DVC enhanced][8100101V104 50404061 01].cue" size="184" crc="f7631340" md5="e2c4fa45afc0fda6d8756654d1f68abf"/>
 		-->
-		<description>USA '94 - World Cup (Euro, German / French / Dutch)[DVC enhanced]</description>
+		<description>USA '94 - World Cup (Euro, German / French / Dutch)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="8100101V104 50404061 01" />
@@ -10255,7 +10255,7 @@ license:CC0
 		<rom name="USA '94 - World Cup (1994)(Philips)(EU)(M3)[a][en-es-it][DVC enhanced][8100103V105 50404055 01].iso" size="651268800" crc="bb04b237" md5="6429d34ccaae6e40e66998fecaf34e42"/>
 		<rom name="USA '94 - World Cup (1994)(Philips)(EU)(M3)[a][en-es-it][DVC enhanced][8100103V105 50404055 01].cue" size="184" crc="e724e780" md5="e12b79bff784c8f2fda2e37d3f5c6602"/>
 		-->
-		<description>USA '94 - World Cup (Euro, English / Spanish / Italian)[DVC enhanced]</description>
+		<description>USA '94 - World Cup (Euro, English / Spanish / Italian)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="8100103V105 50404055 01" />
@@ -10273,7 +10273,7 @@ license:CC0
 		<rom name="USA '94 - World Cup (1994)(Philips)(EU)(M3)[en-es-it][DVC enhanced][8100103V105 50404055 01].iso" size="651268800" crc="bfaa9d74" md5="9627ea7ef77f8d801e11077b4734c962"/>
 		<rom name="USA '94 - World Cup (1994)(Philips)(EU)(M3)[en-es-it][DVC enhanced][8100103V105 50404055 01].cue" size="181" crc="7a3851e5" md5="5aaa18fc8507f05c4939eff6e890c3c8"/>
 		-->
-		<description>USA '94 - World Cup (Euro, English / Spanish / Italian, alt)[DVC enhanced]</description>
+		<description>USA '94 - World Cup (Euro, English / Spanish / Italian, alt)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="8100103V105 50404055 01" />
@@ -10876,7 +10876,7 @@ license:CC0
 		The info for the original cue is below.
 		<rom name="Depression - The Search for the NaSSA.cue" size="101" crc="e0683fe3" md5="04d6c528037689bab54873d0834418e6"/>
 		-->
-		<description>Depression - The Search For The NaSSA (NL)</description>
+		<description>Depression - The Search For The NaSSA (Netherlands)</description>
 		<year>1993</year>
 		<publisher>N.V. Organon</publisher>
 		<sharedfeat name="compatibility" value="DVC" />

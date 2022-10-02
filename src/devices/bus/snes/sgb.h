@@ -9,9 +9,7 @@
 #include "rom.h"
 
 #include "cpu/lr35902/lr35902.h"
-#include "bus/gameboy/gb_slot.h"
-#include "bus/gameboy/rom.h"
-#include "bus/gameboy/mbc.h"
+#include "bus/gameboy/gbslot.h"
 #include "video/gb_lcd.h"
 #include "sound/gb.h"
 
@@ -37,12 +35,6 @@ protected:
 	virtual uint8_t chip_read(offs_t offset) override;
 	virtual void chip_write(offs_t offset, uint8_t data) override;
 
-	uint8_t gb_cart_r(offs_t offset);
-	void gb_bank_w(offs_t offset, uint8_t data);
-	uint8_t gb_ram_r(offs_t offset);
-	void gb_ram_w(offs_t offset, uint8_t data);
-	uint8_t gb_echo_r(offs_t offset);
-	void gb_echo_w(offs_t offset, uint8_t data);
 	uint8_t gb_io_r(offs_t offset);
 	void gb_io_w(offs_t offset, uint8_t data);
 	uint8_t gb_ie_r(offs_t offset);
@@ -56,9 +48,11 @@ protected:
 	required_device<gb_cart_slot_device> m_cartslot;
 
 private:
-	required_memory_region m_region_bios;
-
 	void lcd_render(uint32_t *source);
+
+	required_region_ptr<u8> m_region_bootstrap;
+	memory_view m_view_bootstrap;
+	bool m_bootstrap_installed;
 
 	// ICD2 regs
 	uint8_t m_sgb_ly;
@@ -76,8 +70,6 @@ private:
 	// input bits
 	int m_packetsize;
 	uint8_t m_packet_data[64][16];
-
-	bool m_bios_disabled;
 };
 
 

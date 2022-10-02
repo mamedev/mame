@@ -17,12 +17,14 @@
 #include "machine/6522via.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
-#include "machine/applefdc.h"
+#include "machine/applefdintf.h"
+#include "machine/iwm.h"
 #include "machine/nvram.h"
-#include "machine/sonydriv.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
+
+#include "formats/ap_dsk35.h"
 
 /* lisa MMU segment regs */
 struct real_mmu_entry
@@ -107,6 +109,7 @@ public:
 		m_via0(*this, "via6522_0"),
 		m_via1(*this, "via6522_1"),
 		m_fdc(*this, "fdc"),
+		m_floppy(*this, "fdc:%d", 0U),
 		m_scc(*this, "scc"),
 		m_speaker(*this, "speaker"),
 		m_nvram(*this, "nvram"),
@@ -139,7 +142,8 @@ private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
-	optional_device<applefdc_base_device> m_fdc;
+	required_device<applefdintf_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<scc8530_legacy_device> m_scc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;

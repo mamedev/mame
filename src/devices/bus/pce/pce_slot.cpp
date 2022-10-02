@@ -48,11 +48,11 @@ device_pce_cart_interface::~device_pce_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_pce_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_pce_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(PCESLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -227,7 +227,7 @@ image_init_result pce_cart_slot_device::call_load()
 			fseek(offset, SEEK_SET);
 		}
 
-		m_cart->rom_alloc(len, tag());
+		m_cart->rom_alloc(len);
 		ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())

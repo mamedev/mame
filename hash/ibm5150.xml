@@ -2463,12 +2463,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<year>1985</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 2 - the knight of diamonds [master disk].img" size="737280" crc="d2c5ab5c" sha1="f5e5bc80c108ab12b9e26f9dd0fef602aa09400d"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 2 - the knight of diamonds [scenario disk].img" size="737280" crc="79c89e6a" sha1="a140db62ea136768299090eafc0e3a6a56a5438d"/>
 			</dataarea>
@@ -2480,12 +2480,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<year>1986</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 3 - the legacy of llylgamyn [master disk].img" size="737280" crc="5509a2d2" sha1="8238ce6606586b95d874e4adb70a5625403892ea"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 3 - the legacy of llylgamyn [scenario disk].img" size="737280" crc="86ff176f" sha1="3c85dca68fca70e4fa52dc0dd4e6679b47fb91ac"/>
 			</dataarea>
@@ -2498,7 +2498,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
 		<info name="cracked" value="Demonlord" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 4 - the return of werdna.img" size="737280" crc="e33b0ade" sha1="fa524474b8c05047baf8474ea2efdf6cb9052a06"/>
 			</dataarea>
@@ -2511,7 +2511,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
 		<info name="cracked" value="Demonlord" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 5 - heart of the maelstrom.img" size="737280" crc="a85a5459" sha1="c5a8dd0db15b0bf940b266775d3df19b385f146c"/>
 			</dataarea>
@@ -4117,7 +4117,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="msword1d" cloneof="msword1">
-		<description>Word (PC World Demo, October 1983)</description>
+		<description>Word (PC World demo, October 1983)</description>
 		<year>1983</year>
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -9275,6 +9275,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="cprogolf">
+		<description>California Pro Golf</description>
+		<year>1988</year>
+		<publisher>Mastertronic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="California Pro Golf [Mastertronic] [1988] [5.25DD] [Disk 1 of 2].img" size="368640" crc="e42f8d35" sha1="34703e62bc5d808cc6839e376785faafacc7236e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="California Pro Golf [Mastertronic] [1988] [5.25DD] [Disk 2 of 2].img" size="368640" crc="b76cf980" sha1="9b307fc2f9545edc4d678069348b5f37710ef63c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- dumped from an Olivetti Prodest PC1 branded release -->
 	<software name="capblood" supported="no">
 		<description>Captain Blood</description>
@@ -9536,6 +9552,30 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="chesssim">
+		<description>Chess Simulator</description>
+		<year>1990</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Oxford Softworks" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="Chess Simulator [Infogrames] [1990] [5.25DD] [Disk 1 of 1].img" size="368640" crc="5f3798b4" sha1="6f9753f56f024b970cdbe7352f7bf12a5b267a8e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The files in the [EGA] directory have a root modified date -->
+	<software name="chicag90">
+		<description>Chicago 90</description>
+		<year>1990</year>
+		<publisher>Microïds</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Chicago 90 [Microids] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="b551b41c" sha1="e7c53d41a1e22c2b7fa847a273acf46d74067745" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chipdale">
 		<description>Chip 'N Dale Rescue Rangers - The Adventure in Nimnul's Castle</description>
 		<year>1990</year>
@@ -9682,6 +9722,35 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="colossus 4 bridge.img" size="737280" crc="e8d92247" sha1="fa6ff45a9314a66e6eadc57f0a242f2e35edf391"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commandhq">
+		<description>Command H.Q. (5.25")</description>
+		<year>1990</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Ozark Softscape" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Command HQ [Microprose] [1990] [5.25DD] [Disk 1 of 2].img" size="368640" crc="f7e9f895" sha1="f950cdd0817115d9c00dcd988e66fe2a4fda0454"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Command HQ [Microprose] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="96fd9aa1" sha1="e755c823315f69712474d89634886ceeec43dc7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commandhq35" cloneof="commandhq">
+		<description>Command H.Q. (3.5")</description>
+		<year>1990</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Ozark Softscape" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Command HQ [Microprose] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="ca014f55" sha1="74b7d363bc7e8df127036f072aefb0224196f047"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10586,6 +10655,17 @@ has been replaced with an all-zero block. -->
 			<dataarea name="flop" size = "737280">
 				<!-- modified with chklist.ms file -->
 				<rom name="Empire.dsk" size="737280" crc="35b1cdd8" sha1="a99415fb5597197efcfde2a2fd54fa1326e48065" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expwill">
+		<description>Expert Will (v1.4)</description>
+		<year>1990</year>
+		<publisher>Expert Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Expert Will [Expert Software] [1990] [5.25DD] [Disk 1 of 1].img" size="368640" crc="2bd3661b" sha1="64e5a76a695d9c3c3350e06c1f389eb2c802143d"/>
 			</dataarea>
 		</part>
 	</software>

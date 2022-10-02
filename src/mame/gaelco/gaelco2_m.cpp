@@ -261,11 +261,6 @@ void gaelco2_state::init_snowboar()
 	save_item(NAME(m_snowboard_latch));
 }
 
-static u32 rol(u32 x, u8 c)
-{
-	return (x << c) | (x >> (32 - c));
-}
-
 static u16 get_lo(u32 x)
 {
 	return ((x & 0x00000010) <<  1) |
@@ -273,7 +268,7 @@ static u16 get_lo(u32 x)
 			((x & 0x40000000) >> 27) |
 			((x & 0x00000005) <<  6) |
 			((x & 0x00000008) <<  8) |
-			rol(x & 0x00800040, 9)   |
+			rotl_32(x & 0x00800040, 9) |
 			((x & 0x04000000) >> 16) |
 			((x & 0x00008000) >> 14) |
 			((x & 0x00002000) >> 11) |

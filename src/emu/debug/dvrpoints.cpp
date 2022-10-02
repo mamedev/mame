@@ -62,7 +62,7 @@ bool cConditionDescending(std::pair<device_t *, debug_registerpoint const *> con
 
 bool cActionAscending(std::pair<device_t *, debug_registerpoint const *> const &a, std::pair<device_t *, debug_registerpoint const *> const &b)
 {
-	return strcmp(a.second->action(), b.second->action()) < 0;
+	return a.second->action() < b.second->action();
 }
 
 bool cActionDescending(std::pair<device_t *, debug_registerpoint const *> const &a, std::pair<device_t *, debug_registerpoint const *> const &b)

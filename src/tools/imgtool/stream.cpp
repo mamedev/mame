@@ -14,9 +14,11 @@
 
 #include "corefile.h"
 #include "ioprocs.h"
+#include "path.h"
 #include "unzip.h"
 
 #include <cassert>
+#include <cstdarg>
 #include <cstdio>
 #include <cstring>
 

@@ -19,7 +19,7 @@
 
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
@@ -266,7 +266,6 @@ void macvail_state::maclc3_base(machine_config &config)
 	m_sonora->set_rom_tag("bootrom");
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 }
 
 void macvail_state::maclc3(machine_config &config)

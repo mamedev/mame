@@ -71,6 +71,11 @@ SN74LS14N -> | |       _________________|
   |                                 :   |
   |_____________________________________|
 
+
+  TODO (for games with video):
+  * main - video CPUs communications
+  * inputs
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -104,6 +109,8 @@ public:
 protected:
 	virtual void machine_start() override;
 
+	required_device<i8085a_cpu_device> m_maincpu;
+
 private:
 	void psg_pa_w(u8 data);
 	u8 psg_pb_r();
@@ -111,7 +118,6 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	required_device<i8085a_cpu_device> m_maincpu;
 	required_ioport_array<4> m_inputs;
 
 	u8 m_psg_pa;
@@ -130,6 +136,10 @@ public:
 
 private:
 	required_device<i8085a_cpu_device> m_videocpu;
+
+	void main_io_map(address_map &map);
+	void video_mem_map(address_map &map);
+	void video_io_map(address_map &map);
 };
 
 void falgasm89_state::machine_start()
@@ -154,13 +164,36 @@ u8 falgasm89_state::psg_pb_r()
 
 void falgasm89_state::mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().region("maincpu", 0);
+	map(0x0000, 0xbfff).rom().region("maincpu", 0);
+	map(0xfc00, 0xffff).ram();
 }
 
 void falgasm89_state::io_map(address_map &map)
 {
 	map(0x00, 0x00).rw("psg", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x04, 0x04).w("psg", FUNC(ay8910_device::address_w));
+}
+
+void falgasm89_video_state::main_io_map(address_map &map)
+{
+	map(0x00, 0x00).rw("psg", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x04, 0x04).w("psg", FUNC(ay8910_device::address_w));
+	map(0x98, 0x98).lw8(NAME([this] (u8 data) { logerror("to video: %02x\n", data); }));
+	map(0x99, 0x99).lr8(NAME([this] () -> u8 { logerror("from video\n"); return 0xff; }));
+}
+
+void falgasm89_video_state::video_mem_map(address_map &map)
+{
+	map(0x0000, 0x8fff).rom().region("videocpu", 0);
+	map(0xf800, 0xffff).ram();
+	//map(0xf800, 0xf8ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w)); // TODO: where's this?
+}
+
+void falgasm89_video_state::video_io_map(address_map &map)
+{
+	map(0x00, 0x07).rw("i8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x08, 0x08).rw("vdp", FUNC(tms9129_device::vram_read), FUNC(tms9129_device::vram_write));
+	map(0x09, 0x09).rw("vdp", FUNC(tms9129_device::register_read), FUNC(tms9129_device::register_write));
 }
 
 INPUT_PORTS_START(falgasm89)
@@ -212,14 +245,23 @@ void falgasm89_video_state::falgasm89_video(machine_config &config)
 {
 	falgasm89(config);
 
+	m_maincpu->set_addrmap(AS_IO, &falgasm89_video_state::main_io_map);
+
 	I8085A(config, m_videocpu, 6_MHz_XTAL); // OKI M80C85A-2
+	m_videocpu->set_addrmap(AS_PROGRAM, &falgasm89_video_state::video_mem_map);
+	m_videocpu->set_addrmap(AS_IO, &falgasm89_video_state::video_io_map);
 
 	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x10000); // 2 x UD61464DC
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	I8155(config, "i8155", 6_MHz_XTAL); // NEC D8155HC
+	i8155_device &i8155(I8155(config, "i8155", 6_MHz_XTAL)); // NEC D8155HC
+	i8155.in_pa_callback().set([this] () { logerror("from main (i8155 PA in)\n"); return 0x00; }); // TODO: from main? returning rand() shows inputs come from here, probably sent from the main CPU
+	i8155.out_pb_callback().set([this] (u8 data) { logerror("to main (i8155 PB out): %02x\n", data); }); // TODO: to main? bit 7 toggles continuously
+	// other ports seem unused
+	i8155.out_to_callback().set_inputline(m_videocpu, I8085_TRAP_LINE);
+	i8155.out_to_callback().append_inputline("maincpu", I8085_TRAP_LINE); // TODO: wrong
 }
 
 ROM_START(cbully)

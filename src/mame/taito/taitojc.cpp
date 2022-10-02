@@ -384,7 +384,7 @@ Notes:
 #include "taitojc.h"
 #include "taito_en.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68040.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "cpu/tms32051/tms32051.h"
 #include "machine/eepromser.h"

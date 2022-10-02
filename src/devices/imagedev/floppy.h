@@ -157,10 +157,11 @@ protected:
 		floppy_image_device *m_fid;
 		const fs::manager_t *m_manager;
 
-		fs_enum(floppy_image_device *fid) : fs::manager_t::floppy_enumerator(), m_fid(fid) {}
+		fs_enum(floppy_image_device *fid);
 
-		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override;
 		virtual void add_raw(const char *name, u32 key, const char *description) override;
+	protected:
+		virtual void add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override;
 	};
 
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

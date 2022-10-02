@@ -24,6 +24,7 @@ not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
 ROM source notes when dumped from another publisher, but confident it's the same:
 - arrball: Tandy Zingo
 - bcheetah: Fundimensions Incredible Brain Buggy
+- cchime: Videomaster Door Tunes
 - cmsport: Conic Basketball
 - cnbaskb: Cardinal Electronic Basketball
 - cnfball: Elecsonic Football
@@ -55,7 +56,6 @@ TODO:
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
-- add SVG for tgpachi
 
 ============================================================================
 
@@ -68,13 +68,16 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 --------------------------------------------------------------------
  @CP0904A  TMS0970   1977, Milton Bradley Comp IV
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
+ @MP0027A  TMS1000   1977, Texas Instruments OEM melody chip (used in eg. Chromatronics Chroma-Chime)
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
+ *MP0121   TMS1000   1979, Waddingtons Compute-A-Tune
  @MP0154   TMS1000   1979, Fonas 2 Player Baseball
  @MP0158   TMS1000   1979, Entex Soccer (6003)
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
  @MP0166   TMS1000   1980, A-One Arrange Ball/LJN Computer Impulse/Tandy Zingo (model 60-2123)
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
+ *MP0171   TMS1000   1979, Tomy Soccer
  *MP0220   TMS1000   1980, Tomy Teacher
  @MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Radio Shack Monkey See
@@ -106,13 +109,13 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1231   TMS1100   1984, Tandy 3 in 1 Sports Arena (model 60-2178)
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
- @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
+ @MP1312   TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
- *MP2012   TMS1300   1977, Atari Europe Hit Parade 144 (jukebox) (have decap/dump)
- *MP2032   TMS1300   1980, Atari Europe unknown (jukebox)
+  MP2012   TMS1300   1977, Atari Europe Hit Parade 144 (jukebox) -> atari/hitparade.cpp
+ *MP2032   TMS1300   1980, Atari Europe unknown (jukebox, same PCB as the other one)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
@@ -125,11 +128,14 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP3207   TMS1000   1978, Concept 2000 Lite 'n Learn: Electronic Organ (model 554)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
+ *MP3228   TMS1000   1979, Texas Instruments OEM melody chip
  *MP3232   TMS1000   1979, Fonas 2 Player Baseball (no "MP" on chip label)
  @MP3260   TMS1000   1979, Electroplay Quickfire
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
+ *MP3310   TMS1000   1979, Texas Instruments OEM melody chip
  *MP3312   TMS1000   1980, Nathan Mega 10000
+ *MP3318   TMS1000   1979, Texas Instruments OEM melody chip
  @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
  @MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
@@ -185,7 +191,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
   MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> entex/sag.cpp
  *M30026   TMS2370   1983, Yaesu FT-757 Display Unit part
- @M95041   TMS2670   1983, Tsukuda Game Pachinko
+ @M95041   TMS2670   1983, Tsukuda Slot Elepachi
 
   inconsistent:
 
@@ -215,6 +221,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "utf8.h"
 
 // internal artwork
 #include "t7in1ss.lh"
@@ -312,7 +320,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
-#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -1116,7 +1124,7 @@ ROM_END
   Canon Palmtronic F-31, Canon Canola L813, Toshiba BC-8111B, Toshiba BC-8018B,
   Triumph-Adler 81 SN, Silver-Reed 8J, more
   * TMS1040 MCU label TMS1045NL (die label: 1040A, 1045)
-  * 9-digit cyan VFD display (leftmost may be custom)
+  * 9-digit cyan VFD (leftmost may be custom)
 
   TMS1045NL is a versatile calculator chip for 3rd party manufacturers, used
   by Canon, Toshiba, and several smaller companies. It doesn't look like it
@@ -1284,7 +1292,7 @@ ROM_END
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
   * PCB label: Canon EHI-0115-03
   * TMS1070 MCU label TMC1079 (die label: 1070B, 1079A)
-  * 2-line cyan VFD display, each 9-digit 7seg + 1 custom (label 20-ST-22)
+  * 2-line cyan VFD, each 9-digit 7seg + 1 custom (label 20-ST-22)
 
   The only difference between MD-8 and MD 810 is the form factor. The latter
   is a tabletop calculator.
@@ -1441,6 +1449,183 @@ ROM_START( palmmd8 )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_palmmd8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Chromatronics Chroma-Chime
+  * PCB label: DESIGNED BY CHROMATRONICS, 118-2-003
+  * TMS1000NL MP0027A (die label: 1000B, MP0027A)
+  * 1-bit sound with volume decay
+
+  It was sold as a kit (so, the buyer had to assemble the PCB themselves).
+  Chromatronics claims it's the first ever processor-based musical doorbell.
+  It's likely they asked TI for a generic melody chip. It would be odd for
+  a UK product to play the US anthem (B2) much longer than the UK one (B1).
+
+  known releases:
+  - UK(1): Chroma-Chime, published by Chromatronics
+  - UK(2): Door Tunes, published by Videomaster (Chromatronics PCB, not a kit)
+
+  The MCU was also used in Bell-Fruit Oranges and Lemons (slot machine).
+
+***************************************************************************/
+
+class cchime_state : public hh_tms1k_state
+{
+public:
+	cchime_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_volume(*this, "volume"),
+		m_tempo_timer(*this, "tempo")
+	{ }
+
+	void cchime(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<filter_volume_device> m_volume;
+	required_device<timer_device> m_tempo_timer;
+
+	virtual void write_o(u16 data);
+	virtual void write_r(u32 data);
+	virtual u8 read_k();
+
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume = 0.0;
+};
+
+void cchime_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+	save_item(NAME(m_speaker_volume));
+}
+
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(cchime_state::speaker_decay_sim)
+{
+	m_volume->flt_volume_set_volume(m_speaker_volume);
+
+	// volume decays when speaker is off, decay scale is determined by tone knob
+	const double step = (1.005 - 1.0005) / 100.0; // approximation
+	m_speaker_volume /= 1.005 - (double)(u8)m_inputs[4]->read() * step;
+}
+
+void cchime_state::write_r(u32 data)
+{
+	// R9: trigger tempo knob timer
+	if (m_r & ~data & 0x200)
+	{
+		const double step = 50 / 100.0; // approximation
+		m_tempo_timer->adjust(attotime::from_msec(50 + (u8)m_inputs[3]->read() * step));
+	}
+
+	// R10: power off when low (combined with doorbell)
+	if (~data & 0x400 && !m_inputs[2]->read())
+		power_off();
+
+	m_r = data;
+}
+
+void cchime_state::write_o(u16 data)
+{
+	// O6+O7: speaker out
+	m_speaker->level_w(BIT(~data, 6) & BIT(~data, 7));
+
+	// O2: trigger speaker on
+	if (~m_o & data & 4)
+		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+
+	m_o = data;
+}
+
+u8 cchime_state::read_k()
+{
+	u8 inp = 0;
+
+	// R0-R7 + K1-K4: selected tune
+	u8 rs = m_inputs[0]->read();
+	u8 ks = m_inputs[1]->read();
+	inp |= (m_r & rs) ? ks : 0;
+
+	// K4: rear doorbell
+	inp |= m_inputs[2]->read() << 1 & 4;
+
+	// K8: tempo knob state
+	if (m_tempo_timer->enabled())
+		inp |= 8;
+
+	return inp;
+}
+
+// config
+
+static INPUT_PORTS_START( cchime )
+	PORT_START("IN.0") // R0-R7
+	PORT_CONFNAME( 0xff, 0x01, "Switch 1")
+	PORT_CONFSETTING(    0x01, "A" )
+	PORT_CONFSETTING(    0x02, "B" )
+	PORT_CONFSETTING(    0x04, "C" )
+	PORT_CONFSETTING(    0x08, "D" )
+	PORT_CONFSETTING(    0x10, "E" )
+	PORT_CONFSETTING(    0x20, "F" )
+	PORT_CONFSETTING(    0x40, "G" )
+	PORT_CONFSETTING(    0x80, "H" )
+
+	PORT_START("IN.1") // K1-K4
+	PORT_CONFNAME( 0x07, 0x01, "Switch 2")
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+
+	PORT_START("IN.2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Front Doorbell") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Rear Doorbell") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+
+	PORT_START("IN.3")
+	PORT_ADJUSTER(50, "Tempo Knob")
+
+	PORT_START("IN.4")
+	PORT_ADJUSTER(50, "Tone Knob")
+INPUT_PORTS_END
+
+void cchime_state::cchime(machine_config &config)
+{
+	// basic machine hardware
+	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	m_maincpu->read_k().set(FUNC(cchime_state::read_k));
+	m_maincpu->write_o().set(FUNC(cchime_state::write_o));
+	m_maincpu->write_r().set(FUNC(cchime_state::write_r));
+
+	TIMER(config, "tempo").configure_generic(nullptr);
+
+	// no visual feedback!
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "volume", 0.25);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	TIMER(config, "speaker_decay").configure_periodic(FUNC(cchime_state::speaker_decay_sim), attotime::from_msec(1));
+}
+
+// roms
+
+ROM_START( cchime )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0027a.n1", 0x0000, 0x0400, CRC(8b5e2c4d) SHA1(5364d2836e9daefee2529a20c022e811bb3c7d89) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_cchime_output.pla", 0, 365, CRC(75d68c56) SHA1(85abde0ca0bcc605720551bea360498db350a7af) )
 ROM_END
 
 
@@ -2217,7 +2402,7 @@ ROM_END
   Coleco Head to Head: Electronic Baseball (model 2180)
   * PCB labels: Coleco rev C 73891/2
   * TMS1170NLN MP1525-N2 (die label: 1170A, MP1525)
-  * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
+  * 9-digit cyan VFD, and other LEDs behind bezel, 1-bit sound
 
   known releases:
   - USA: Head to Head: Electronic Baseball, published by Coleco
@@ -4762,7 +4947,7 @@ ROM_END
 
   Entex Color Football 4
   * TMS1670 6009 MP7551 (die label: TMS1400, MP7551, 40H 01D D000 R000)
-  * 9-digit cyan VFD display, 60 red and green LEDs behind mask, 1-bit sound
+  * 9-digit cyan VFD, 60 red and green LEDs behind mask, 1-bit sound
 
   Another version exist, one with a LED(red) 7seg display.
 
@@ -5211,7 +5396,7 @@ ROM_END
   Entex Musical Marvin
   * TMS1100 MP1228 (no decap)
   * 1 7seg LED, 8 other leds, 1-bit sound with volume decay
-  * dials for speed, tone (volume decay), volume (also off/on switch)
+  * knobs for speed, tone (volume decay), volume (also off/on switch)
 
   The design patent was assigned to Hanzawa (Japan), so it's probably
   manufactured by them.
@@ -5257,8 +5442,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(mmarvin_state::speaker_decay_sim)
 {
 	m_volume->flt_volume_set_volume(m_speaker_volume);
 
-	// volume decays when speaker is off, decay scale is determined by tone dial
-	double step = (1.01 - 1.003) / 255.0; // approximation
+	// volume decays when speaker is off, decay scale is determined by tone knob
+	const double step = (1.01 - 1.003) / 100.0; // approximation
 	m_speaker_volume /= 1.01 - (double)(u8)m_inputs[5]->read() * step;
 }
 
@@ -5273,10 +5458,10 @@ void mmarvin_state::write_r(u32 data)
 	// R2-R5: input mux
 	m_inp_mux = data >> 2 & 0xf;
 
-	// R6: trigger speed dial timer
-	if (m_r & 0x40 && ~data & 0x40)
+	// R6: trigger speed knob timer
+	if (m_r & ~data & 0x40)
 	{
-		double step = (2100 - 130) / 255.0; // duration range is around 0.13s to 2.1s
+		const double step = (2100 - 130) / 100.0; // duration range is around 0.13s to 2.1s
 		m_speed_timer->adjust(attotime::from_msec(2100 - (u8)m_inputs[4]->read() * step));
 	}
 
@@ -5284,7 +5469,7 @@ void mmarvin_state::write_r(u32 data)
 	m_speaker->level_w(BIT(m_r, 10));
 
 	// R9: trigger speaker on
-	if (m_r & 0x200 && ~data & 0x200)
+	if (m_r & ~data & 0x200)
 		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
 
 	// R0,R1: digit/led select
@@ -5303,7 +5488,7 @@ void mmarvin_state::write_o(u16 data)
 u8 mmarvin_state::read_k()
 {
 	// K1-K4: multiplexed inputs
-	// K8: speed dial state
+	// K8: speed knob state
 	return (read_inputs(4) & 7) | (m_speed_timer->enabled() ? 0 : 8);
 }
 
@@ -5331,10 +5516,10 @@ static INPUT_PORTS_START( mmarvin )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Space")
 
 	PORT_START("IN.4")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_PLAYER(1) PORT_NAME("Speed Dial")
+	PORT_ADJUSTER(50, "Speed Knob")
 
 	PORT_START("IN.5")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_PLAYER(2) PORT_NAME("Tone Dial")
+	PORT_ADJUSTER(50, "Tone Knob")
 INPUT_PORTS_END
 
 void mmarvin_state::mmarvin(machine_config &config)
@@ -5672,7 +5857,7 @@ ROM_END
   Gakken Poker
   * PCB label: POKER. gakken
   * TMS1370 MP2105 (die label: 1170, MP2105)
-  * 11-digit cyan VFD display Itron FG1114B, oscillator sound
+  * 11-digit cyan VFD Itron FG1114B, oscillator sound
 
   known releases:
   - Japan: Poker, published by Gakken
@@ -5827,7 +6012,7 @@ ROM_END
   Gakken Jackpot: Gin Rummy & Black Jack
   * PCB label: gakken
   * TMS1670 MPF553 (die label: TMS1400, MPF553, 40H 01D D000 R000)
-  * 11-digit cyan VFD display Itron FG1114B, oscillator sound
+  * 11-digit cyan VFD Itron FG1114B, oscillator sound
 
   known releases:
   - Japan: Jackpot(?), published by Gakken
@@ -5950,7 +6135,7 @@ ROM_END
   Gakken Invader
   * PCB label: GAKKEN, INVADER, KS-00779
   * TMS1370 MP2110 (die label: 1370, MP2110)
-  * cyan VFD display Itron? CP5008A, 1-bit sound
+  * cyan VFD Itron? CP5008A, 1-bit sound
 
   known releases:
   - World: Invader, published by Gakken
@@ -6068,7 +6253,7 @@ ROM_START( ginv )
 	ROM_LOAD( "tms1100_ginv_output.pla", 0, 365, CRC(6e33a24e) SHA1(cdf7ecf12ddd3863e6301e20fe80f9737db429e5) )
 
 	ROM_REGION( 142959, "screen", 0)
-	ROM_LOAD( "ginv.svg", 0, 142959, CRC(b0dc9bac) SHA1(18f8cc51a432d14f08fdf766275222f3ed184d89) )
+	ROM_LOAD( "ginv.svg", 0, 142959, CRC(36a04f56) SHA1(a81c80e51d0a9d2855bf026236a257cf771be35c) )
 ROM_END
 
 
@@ -6079,7 +6264,7 @@ ROM_END
 
   Gakken Invader 1000
   * TMS1370 MP2139 (die label: 1170, MP2139)
-  * cyan/red VFD display Futaba DM-25Z 2D, 1-bit sound
+  * cyan/red VFD Futaba DM-25Z 2D, 1-bit sound
 
   known releases:
   - World: Galaxy Invader 1000, published by Gakken
@@ -6109,9 +6294,7 @@ private:
 
 void ginv1000_state::update_display()
 {
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,9,8,7);
-	u16 plate = bitswap<16>(m_plate,15,14,13,12,3,4,7,8,9,10,11,2,6,5,1,0);
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void ginv1000_state::write_r(u32 data)
@@ -6194,8 +6377,8 @@ ROM_START( ginv1000 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
 
-	ROM_REGION( 227224, "screen", 0)
-	ROM_LOAD( "ginv1000.svg", 0, 227224, CRC(f220711a) SHA1(729ad85fb9d9853a77c45b5ed072f10ede7649c4) )
+	ROM_REGION( 227219, "screen", 0)
+	ROM_LOAD( "ginv1000.svg", 0, 227219, CRC(4b21599a) SHA1(fbb728e44e504ab2169e0ee491a9ff3a231a717c) )
 ROM_END
 
 
@@ -6207,7 +6390,7 @@ ROM_END
   Gakken Invader 2000
   * TMS1370(28 pins) MP1604 (die label: 1370A, MP1604)
   * TMS1024 I/O expander
-  * cyan/red/green VFD display, 1-bit sound
+  * cyan/red/green VFD, 1-bit sound
 
   known releases:
   - World: Invader 2000, published by Gakken
@@ -6339,7 +6522,7 @@ ROM_START( ginv2000 )
 	ROM_LOAD( "tms1100_ginv2000_output.pla", 0, 365, CRC(520bb003) SHA1(1640ae54f8dcc257e0ad0cbe0281b38fcbd8da35) )
 
 	ROM_REGION( 374443, "screen", 0)
-	ROM_LOAD( "ginv2000.svg", 0, 374443, CRC(a4ce1e6d) SHA1(57d9ff05d634a8d495b9d544a2a959790cd10b6b) )
+	ROM_LOAD( "ginv2000.svg", 0, 374443, CRC(7fb7ac44) SHA1(3cb0cd453433fd65afcdf0e206c79c83b9687913) )
 ROM_END
 
 
@@ -6948,7 +7131,7 @@ ROM_END
 
   Kosmos Astro
   * TMS1470NLHL MP1133 (die label: TMS1400, MP1133, 28H 01D D000 R000)
-  * 9-digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
+  * 9-digit 7seg VFD + 8 LEDs(4 green, 4 yellow), no sound
 
   This is an astrological calculator, and also supports 4-function
   calculations. Refer to the official manual on how to use this device.
@@ -11324,7 +11507,7 @@ ROM_END
 
   TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
   * TMS1040 MCU label TMS1043NL ZA0352 (die label: 1040A, 1043A)
-  * 9-digit cyan VFD display
+  * 9-digit cyan VFD
 
   Only the TI-2550 III has the top button row (RV, SQRT, etc).
   TI-1600 doesn't have the memory buttons.
@@ -12367,7 +12550,7 @@ ROM_END
   TI-1680, TI-2550-IV
   * TMS1980 MCU label TMC1981NL (die label: 1980A 81F)
   * TMC0999NL 256x4 RAM (die label: 0999B)
-  * 9-digit cyan VFD display(leftmost digit is custom)
+  * 9-digit cyan VFD(leftmost digit is custom)
 
   The extra RAM is for scrolling back through calculations. For some reason,
   TI-2550-IV has the same hardware, this makes it very different from II and III.
@@ -12513,7 +12696,7 @@ ROM_END
 
   TI DataMan
   * TMS1980 MCU label TMC1982NL (die label: 1980A 82B)
-  * 10-digit cyan VFD display(3 digits are custom)
+  * 10-digit cyan VFD(3 digits are custom)
 
 ***************************************************************************/
 
@@ -12643,7 +12826,7 @@ ROM_END
 
   TI Math Marvel
   * TMS1980 MCU label TMC1986A-NL (die label: 1980A 86A)
-  * 9-digit cyan VFD display(2 digits are custom), 1-bit sound
+  * 9-digit cyan VFD(2 digits are custom), 1-bit sound
 
   This is the same hardware as DataMan, with R8 connected to a piezo.
 
@@ -14142,7 +14325,7 @@ ROM_END
   * PCB label: TOFL-001A / B
   * TMS1475 MP6354 (die label: TMS1175 /TMS1475, MP6354, 40H-PASS-0900-R300-0)
     note: no TMS1xxx label on MCU, PCB says "TMS1375L" but that can't be right
-  * cyan/red/green VFD display NEC FIP11AM32T no. 2-8, 1-bit sound
+  * cyan/red/green VFD NEC FIP11AM32T no. 2-8, 1-bit sound
 
   known releases:
   - Japan: The Dracula, published by Tsukuda
@@ -14256,7 +14439,7 @@ ROM_START( tdracula )
 	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(54408672) SHA1(8fdc6910a27c22c1df2cadeb25c74118d5774481) )
 
 	ROM_REGION( 416612, "screen", 0)
-	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(71b5e164) SHA1(357528d5df7433609931cd9f9a2e5d56fbd29774) )
+	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(b4e723dc) SHA1(7d90aa92755727fc21f3b2913cd5d86f8594ea20) )
 ROM_END
 
 
@@ -14265,11 +14448,11 @@ ROM_END
 
 /***************************************************************************
 
-  Tsukuda Game Pachinko
+  Tsukuda Slot Elepachi 「スロットエレパチ」
   * PCB label: TOFL003
   * TMS2670 M95041 (die label: TMS2400, M95041, 40H-01D-ND02-PHI0032-TTL O300-R300)
   * TMS1024 I/O expander
-  * cyan/red/green VFD display NEC FIP9AM31T no. 21-84, 1-bit sound
+  * cyan/red/green VFD NEC FIP9AM31T no. 21-84, 1-bit sound
 
   Two versions are known, one with a red trigger button and blue slot button,
   and one with a blue trigger button and red slot button. The game itself is
@@ -14277,15 +14460,15 @@ ROM_END
 
 ***************************************************************************/
 
-class tgpachi_state : public hh_tms1k_state
+class slepachi_state : public hh_tms1k_state
 {
 public:
-	tgpachi_state(const machine_config &mconfig, device_type type, const char *tag) :
+	slepachi_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag),
 		m_expander(*this, "expander")
 	{ }
 
-	void tgpachi(machine_config &config);
+	void slepachi(machine_config &config);
 
 private:
 	required_device<tms1024_device> m_expander;
@@ -14298,12 +14481,12 @@ private:
 
 // handlers
 
-void tgpachi_state::update_display()
+void slepachi_state::update_display()
 {
 	m_display->matrix(m_grid, m_plate);
 }
 
-void tgpachi_state::expander_w(offs_t offset, u8 data)
+void slepachi_state::expander_w(offs_t offset, u8 data)
 {
 	// TMS1024 port 4-7: VFD plate
 	int shift = (offset - tms1024_device::PORT4) * 4;
@@ -14311,7 +14494,7 @@ void tgpachi_state::expander_w(offs_t offset, u8 data)
 	update_display();
 }
 
-void tgpachi_state::write_r(u32 data)
+void slepachi_state::write_r(u32 data)
 {
 	// R13: speaker out
 	m_speaker->level_w(BIT(data, 13));
@@ -14328,7 +14511,7 @@ void tgpachi_state::write_r(u32 data)
 	update_display();
 }
 
-void tgpachi_state::write_o(u16 data)
+void slepachi_state::write_o(u16 data)
 {
 	// O0-O3: TMS1024 H1-H4 + VFD plate
 	m_expander->write_h(data & 0xf);
@@ -14338,7 +14521,7 @@ void tgpachi_state::write_o(u16 data)
 
 // config
 
-static INPUT_PORTS_START( tgpachi )
+static INPUT_PORTS_START( slepachi )
 	PORT_START("IN.0") // K
 	PORT_CONFNAME( 0x01, 0x00, "Factory Test" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -14354,24 +14537,28 @@ static INPUT_PORTS_START( tgpachi )
 	PORT_CONFSETTING(    0x08, "2" )
 INPUT_PORTS_END
 
-void tgpachi_state::tgpachi(machine_config &config)
+void slepachi_state::slepachi(machine_config &config)
 {
 	// basic machine hardware
 	TMS2670(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set_ioport("IN.0");
 	m_maincpu->read_j().set_ioport("IN.1");
-	m_maincpu->write_r().set(FUNC(tgpachi_state::write_r));
-	m_maincpu->write_o().set(FUNC(tgpachi_state::write_o));
+	m_maincpu->write_r().set(FUNC(slepachi_state::write_r));
+	m_maincpu->write_o().set(FUNC(slepachi_state::write_o));
 
 	TMS1024(config, m_expander).set_ms(1); // MS tied high
-	m_expander->write_port4_callback().set(FUNC(tgpachi_state::expander_w));
-	m_expander->write_port5_callback().set(FUNC(tgpachi_state::expander_w));
-	m_expander->write_port6_callback().set(FUNC(tgpachi_state::expander_w));
-	m_expander->write_port7_callback().set(FUNC(tgpachi_state::expander_w));
+	m_expander->write_port4_callback().set(FUNC(slepachi_state::expander_w));
+	m_expander->write_port5_callback().set(FUNC(slepachi_state::expander_w));
+	m_expander->write_port6_callback().set(FUNC(slepachi_state::expander_w));
+	m_expander->write_port7_callback().set(FUNC(slepachi_state::expander_w));
 
 	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(503, 1080);
+	screen.set_visarea_full();
+
 	PWM_DISPLAY(config, m_display).set_size(8, 21);
-	config.set_default_layout(layout_hh_tms1k_test);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -14381,17 +14568,17 @@ void tgpachi_state::tgpachi(machine_config &config)
 
 // roms
 
-ROM_START( tgpachi )
+ROM_START( slepachi )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m95041", 0x0000, 0x1000, CRC(18b39629) SHA1(46bbe2028717ab4a1ca92f45496f7636e1c81fcf) )
 
 	ROM_REGION( 759, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms2100_common1_micro.pla", 0, 759, CRC(4a60382f) SHA1(f66ed530ca3869367fc7afacd0b985d555781ba2) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms2100_tgpachi_output.pla", 0, 557, CRC(90849b91) SHA1(ed19444b655c48bbf2a662478d46c045d900080d) )
+	ROM_LOAD( "tms2100_slepachi_output.pla", 0, 557, CRC(90849b91) SHA1(ed19444b655c48bbf2a662478d46c045d900080d) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "tgpachi.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 140540, "screen", 0)
+	ROM_LOAD( "slepachi.svg", 0, 140540, CRC(95ad7b9f) SHA1(f2f5550ff6a406bcf8310674e55f1ab8ec21f5d2) )
 ROM_END
 
 
@@ -14743,6 +14930,8 @@ CONS( 1981, tc7atc,     0,         0, tc7atc,    tc7atc,    tc7atc_state,    emp
 COMP( 1977, palmf31,    0,         0, palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, palmmd8,    0,         0, palmmd8,   palmmd8,   palmmd8_state,   empty_init, "Canon", "Palmtronic MD-8 (Multi 8)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
+SYST( 1977, cchime,     0,         0, cchime,    cchime,    cchime_state,    empty_init, "Chromatronics", "Chroma-Chime", MACHINE_SUPPORTS_SAVE )
+
 CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1978, cqback,     0,         0, cqback,    cqback,    cqback_state,    empty_init, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
@@ -14785,7 +14974,7 @@ CONS( 1980, gjackpot,   0,         0, gjackpot,  gjackpot,  gjackpot_state,  emp
 CONS( 1980, ginv,       0,         0, ginv,      ginv,      ginv_state,      empty_init, "Gakken", "Invader (Gakken, cyan version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  empty_init, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, ginv2000,   0,         0, ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
 
@@ -14862,7 +15051,7 @@ CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  emp
 CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, tgpachi,    0,         0, tgpachi,   tgpachi,   tgpachi_state,   empty_init, "Tsukuda", "Game Pachinko", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, slepachi,   0,         0, slepachi,  slepachi,  slepachi_state,  empty_init, "Tsukuda", "Slot Elepachi", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

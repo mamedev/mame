@@ -25,6 +25,8 @@
    supreme 0x243e
 */
 
+// TODO: convert to use generic_spi_flash.cpp (but there seems to be some buffering of writes / reads?)
+
 #include "emu.h"
 
 #include "cpu/m6502/st2205u.h"

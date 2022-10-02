@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina, Peter Ferrie,Stephane Humbert
+// copyright-holders: Tomasz Slanina, Peter Ferrie, Stephane Humbert
 /***************************************************************************
 
  Arcade games (hacks of console games) running on SNES hardware.
@@ -16,7 +16,8 @@
     - Killer Instinct
     - Legend
     - Rushing Beat Shura
-    - Sonic Blast Man II Special Turbo (2 sets)
+    - Sonic Blast Man II Special Turbo
+    - Teenage Mutant Ninja Turtles - Mutant Warriors
     - Venom & Spider-Man - Separation Anxiety
     - Wild Guns
 
@@ -28,7 +29,7 @@ TODO:
    so you are awarded 55 credits on a hard reset)
  - sblast2b : dipswitches
  - sblast2b : pressing start during gameplay changes the character used. Intentional?
- - sblast2ba: needs decryption, seems to use a slightly different scheme and ROM size doesn't match the one from the original SNES game
+ - tmntmwb  : protection simulation
  - denseib,2: fix gfx glitches, missing texts
  - legendsb : unknown dipswitches
  - rushbets : dipswitches (stored at memory locations $785006 and $785008)
@@ -152,7 +153,9 @@ Iron PCB (same as Final Fight 2?)
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "snes.h"
+
 #include "speaker.h"
 
 
@@ -186,6 +189,7 @@ public:
 	void init_endless();
 	void init_legendsb();
 	void init_rushbets();
+	void init_tmntmwb();
 	void init_venom();
 	void init_wldgunsb();
 
@@ -1334,6 +1338,64 @@ void snesb_state::init_rushbets()
 	init_snes_hirom();
 }
 
+void snesb_state::init_tmntmwb()
+{
+	uint8_t *src = memregion("user7")->base();
+	uint8_t *dst = memregion("user3")->base();
+
+	static uint8_t address_tab_high[0x40] = {
+		0x0b, 0x1d, 0x38, 0x26, 0x09, 0x19, 0x30, 0x2c, 0x02, 0x1f, 0x36, 0x20, 0x0d, 0x11, 0x3c, 0x23,
+		0x14, 0x2e, 0x05, 0x35, 0x1e, 0x21, 0x04, 0x33, 0x1b, 0x2f, 0x07, 0x37, 0x12, 0x28, 0x0a, 0x3a,
+		0x2b, 0x3d, 0x18, 0x06, 0x29, 0x39, 0x10, 0x0c, 0x22, 0x3f, 0x16, 0x00, 0x2d, 0x31, 0x1c, 0x03,
+		0x34, 0x0e, 0x25, 0x15, 0x3e, 0x01, 0x24, 0x13, 0x3b, 0x0f, 0x27, 0x17, 0x32, 0x08, 0x2a, 0x1a
+	};
+
+	static uint8_t address_tab_low[0x40] = {
+		0x14, 0x1d, 0x11, 0x3c, 0x0a, 0x29, 0x2d, 0x2e, 0x30, 0x32, 0x16, 0x36, 0x05, 0x25, 0x26, 0x37,
+		0x20, 0x21, 0x27, 0x28, 0x33, 0x34, 0x23, 0x12, 0x1e, 0x1f, 0x3b, 0x24, 0x2c, 0x35, 0x38, 0x39,
+		0x3d, 0x0c, 0x2a, 0x0d, 0x22, 0x18, 0x19, 0x1a, 0x03, 0x08, 0x04, 0x3a, 0x0b, 0x0f, 0x15, 0x17,
+		0x1b, 0x13, 0x00, 0x1c, 0x2b, 0x01, 0x06, 0x2f, 0x07, 0x09, 0x02, 0x31, 0x10, 0x0e, 0x3f, 0x3e
+	};
+
+	static const uint8_t data_low[16]  = {
+		0x84, 0x20, 0x26, 0x04, 0x06, 0xa6, 0xa4, 0x24, 0xa2, 0x00, 0x80, 0x82, 0x22, 0x86, 0xa0, 0x02
+	};
+
+	static const uint8_t data_high[16] = {
+		0x41, 0x08, 0x58, 0x40, 0x50, 0x59, 0x49, 0x48, 0x19, 0x00, 0x01, 0x11, 0x18, 0x51, 0x09, 0x10
+	};
+
+	for (int i = 0; i < 0x200000; i++)
+	{
+		int j = (address_tab_high[i >> 15] << 15) + (i & 0x7fc0) + (address_tab_low[i & 0x3f]);
+
+		uint8_t x = src[j];
+		if (~i & 0x1000) x -= 0xb9;
+
+		x = data_high[x >> 4] | data_low[x & 0xf];
+
+		if (i >= 0x00000 && i < 0x10000)
+			x = bitswap<8>(x, 6, 1, 3, 0, 7, 2, 4, 5) ^ 0xff;
+
+		if (i >= 0x10000 && i < 0x20000)
+			x = bitswap<8>(x, 7, 3, 1, 2, 5, 4, 6, 0) ^ 0xff;
+
+		if (i >= 0x20000 && i < 0x30000)
+			x = bitswap<8>(x, 0, 4, 5, 6, 1, 2, 7, 3);
+
+		if (i >= 0x30000 && i < 0x40000)
+			x = bitswap<8>(x, 1, 2, 6, 3, 4, 5, 0, 7) ^ 0xff;
+
+		dst[i] = x;
+	}
+
+	//  boot vector. TODO: verify these
+	dst[0x7ffc] = 0x25;
+	dst[0x7ffd] = 0xff;
+
+	init_snes();
+}
+
 void snesb_state::init_venom()
 {
 	uint8_t *src = memregion("user7")->base();
@@ -1531,7 +1593,7 @@ ROM_START( sblast2b )
 	ROM_LOAD( "3.bin", 0x100000, 0x0080000, CRC(9e63a5ce) SHA1(1d18606fbb28b55a921fc37e1af1aff4caae9003) )
 ROM_END
 
-ROM_START( sblast2ba) // all 27c4000
+ROM_START( tmntmwb ) // all 27c4000
 	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x200000, "user7", 0 )
@@ -1630,17 +1692,17 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 199?, kinstb,       0,        kinstb,       kinstb,   snesb_state, init_kinstb,    ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, ffight2b,     0,        ffight2b,     ffight2b, snesb_state, init_ffight2b,  ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, ffight3b,     0,        extrainp,     ffight2b, snesb_state, init_ffight3b,  ROT0, "bootleg",  "Final Fight 3 (SNES bootleg)",                           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based on beta version? protection isn't figured out
-GAME( 1996, iron,         0,        extrainp,     iron,     snesb_state, init_iron,      ROT0, "bootleg",  "Iron (SNES bootleg)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, denseib,      0,        extrainp,     denseib,  snesb_state, init_denseib,   ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, denseib2,     denseib,  extrainp,     denseib,  snesb_state, init_denseib2,  ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sblast2b,     0,        sblast2b,     sblast2b, snesb_state, init_sblast2b,  ROT0, "bootleg",  "Sonic Blast Man II Special Turbo (SNES bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sblast2ba,    sblast2b, base,         sblast2b, snesb_state, empty_init,     ROT0, "bootleg",  "Sonic Blast Man II Special Turbo (SNES bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs to be descrambled
-GAME( 1996, endless,      0,        endless,      endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 1)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, endlessa,     endless,  endless,      endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 2)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, legendsb,     0,        extrainp,     kinstb,   snesb_state, init_legendsb,  ROT0, "bootleg",  "Legend (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rushbets,     0,        rushbets,     rushbets, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
+GAME( 199?, kinstb,       0,        kinstb,       kinstb,   snesb_state, init_kinstb,    ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, ffight2b,     0,        ffight2b,     ffight2b, snesb_state, init_ffight2b,  ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, ffight3b,     0,        extrainp,     ffight2b, snesb_state, init_ffight3b,  ROT0, "bootleg",  "Final Fight 3 (SNES bootleg)",                                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based on beta version? protection isn't figured out
+GAME( 1996, iron,         0,        extrainp,     iron,     snesb_state, init_iron,      ROT0, "bootleg",  "Iron (SNES bootleg)",                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, denseib,      0,        extrainp,     denseib,  snesb_state, init_denseib,   ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 1)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, denseib2,     denseib,  extrainp,     denseib,  snesb_state, init_denseib2,  ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 2)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sblast2b,     0,        sblast2b,     sblast2b, snesb_state, init_sblast2b,  ROT0, "bootleg",  "Sonic Blast Man II Special Turbo (SNES bootleg)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, tmntmwb,      0,        base,         sblast2b, snesb_state, init_tmntmwb,   ROT0, "bootleg",  "Teenage Mutant Ninja Turtles - Mutant Warriors (SNES bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // protected?
+GAME( 1996, endless,      0,        endless,      endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 1)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, endlessa,     endless,  endless,      endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 2)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, legendsb,     0,        extrainp,     kinstb,   snesb_state, init_legendsb,  ROT0, "bootleg",  "Legend (SNES bootleg)",                                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rushbets,     0,        rushbets,     rushbets, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version

@@ -191,12 +191,11 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
 #include "sound/saa1099.h"
-#include "sound/upd7759.h"
-#include "sound/ymopl.h"
 
 #include "video/ef9369.h"
 #include "video/scn2674.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -207,6 +206,9 @@ TODO:
 #include "v4dbltak.lh"
 #include "v4psi.lh"
 #include "v4strike.lh"
+
+
+#define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
 
 
 namespace {
@@ -227,6 +229,7 @@ public:
 		m_trackx_port(*this, "TRACKX"),
 		m_tracky_port(*this, "TRACKY"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_ef9369(*this, "ef9369")
 	{
 	}
@@ -285,6 +288,7 @@ private:
 	optional_ioport m_trackx_port;
 	optional_ioport m_tracky_port;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	optional_device<ef9369_device> m_ef9369;
 
@@ -1865,7 +1869,6 @@ void mpu4vid_state::machine_start()
 {
 	mpu4_config_common();
 
-	m_mod_number=2;
 	/* setup communications */
 	m_link7a_connected = true;
 }
@@ -8707,7 +8710,7 @@ the copyright dates recorded.
 TODO: Sort these better given the wide variation in dates/versions/core code (SWP version id, for one thing).
 */
 
-GAME(  199?, v4bios,     0,        mod2,       mpu4vid,     mpu4_state,    init_m4default,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
+GAME(  199?, v4bios,     0,        mod2(),     mpu4vid,     mpu4_state,    init_m4,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
 
 #define GAME_FLAGS MACHINE_NOT_WORKING
 #define GAME_FLAGS_OK (MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

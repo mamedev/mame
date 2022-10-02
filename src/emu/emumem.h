@@ -2402,66 +2402,6 @@ public:
 	virtual void write_qword_unaligned(offs_t address, u64 data) = 0;
 	virtual void write_qword_unaligned(offs_t address, u64 data, u64 mask) = 0;
 
-	// read accessors with flags
-	virtual std::pair<u8,  u16> read_byte_flags(offs_t address) = 0;
-	virtual std::pair<u16, u16> read_word_flags(offs_t address) = 0;
-	virtual std::pair<u16, u16> read_word_flags(offs_t address, u16 mask) = 0;
-	virtual std::pair<u16, u16> read_word_unaligned_flags(offs_t address) = 0;
-	virtual std::pair<u16, u16> read_word_unaligned_flags(offs_t address, u16 mask) = 0;
-	virtual std::pair<u32, u16> read_dword_flags(offs_t address) = 0;
-	virtual std::pair<u32, u16> read_dword_flags(offs_t address, u32 mask) = 0;
-	virtual std::pair<u32, u16> read_dword_unaligned_flags(offs_t address) = 0;
-	virtual std::pair<u32, u16> read_dword_unaligned_flags(offs_t address, u32 mask) = 0;
-	virtual std::pair<u64, u16> read_qword_flags(offs_t address) = 0;
-	virtual std::pair<u64, u16> read_qword_flags(offs_t address, u64 mask) = 0;
-	virtual std::pair<u64, u16> read_qword_unaligned_flags(offs_t address) = 0;
-	virtual std::pair<u64, u16> read_qword_unaligned_flags(offs_t address, u64 mask) = 0;
-
-	// write accessors with flags
-	virtual u16 write_byte_flags(offs_t address, u8 data) = 0;
-	virtual u16 write_word_flags(offs_t address, u16 data) = 0;
-	virtual u16 write_word_flags(offs_t address, u16 data, u16 mask) = 0;
-	virtual u16 write_word_unaligned_flags(offs_t address, u16 data) = 0;
-	virtual u16 write_word_unaligned_flags(offs_t address, u16 data, u16 mask) = 0;
-	virtual u16 write_dword_flags(offs_t address, u32 data) = 0;
-	virtual u16 write_dword_flags(offs_t address, u32 data, u32 mask) = 0;
-	virtual u16 write_dword_unaligned_flags(offs_t address, u32 data) = 0;
-	virtual u16 write_dword_unaligned_flags(offs_t address, u32 data, u32 mask) = 0;
-	virtual u16 write_qword_flags(offs_t address, u64 data) = 0;
-	virtual u16 write_qword_flags(offs_t address, u64 data, u64 mask) = 0;
-	virtual u16 write_qword_unaligned_flags(offs_t address, u64 data) = 0;
-	virtual u16 write_qword_unaligned_flags(offs_t address, u64 data, u64 mask) = 0;
-
-	// read flags lookup
-	virtual u16 lookup_read_byte_flags(offs_t address) = 0;
-	virtual u16 lookup_read_word_flags(offs_t address) = 0;
-	virtual u16 lookup_read_word_flags(offs_t address, u16 mask) = 0;
-	virtual u16 lookup_read_word_unaligned_flags(offs_t address) = 0;
-	virtual u16 lookup_read_word_unaligned_flags(offs_t address, u16 mask) = 0;
-	virtual u16 lookup_read_dword_flags(offs_t address) = 0;
-	virtual u16 lookup_read_dword_flags(offs_t address, u32 mask) = 0;
-	virtual u16 lookup_read_dword_unaligned_flags(offs_t address) = 0;
-	virtual u16 lookup_read_dword_unaligned_flags(offs_t address, u32 mask) = 0;
-	virtual u16 lookup_read_qword_flags(offs_t address) = 0;
-	virtual u16 lookup_read_qword_flags(offs_t address, u64 mask) = 0;
-	virtual u16 lookup_read_qword_unaligned_flags(offs_t address) = 0;
-	virtual u16 lookup_read_qword_unaligned_flags(offs_t address, u64 mask) = 0;
-
-	// write flags lookup
-	virtual u16 lookup_write_byte_flags(offs_t address) = 0;
-	virtual u16 lookup_write_word_flags(offs_t address) = 0;
-	virtual u16 lookup_write_word_flags(offs_t address, u16 mask) = 0;
-	virtual u16 lookup_write_word_unaligned_flags(offs_t address) = 0;
-	virtual u16 lookup_write_word_unaligned_flags(offs_t address, u16 mask) = 0;
-	virtual u16 lookup_write_dword_flags(offs_t address) = 0;
-	virtual u16 lookup_write_dword_flags(offs_t address, u32 mask) = 0;
-	virtual u16 lookup_write_dword_unaligned_flags(offs_t address) = 0;
-	virtual u16 lookup_write_dword_unaligned_flags(offs_t address, u32 mask) = 0;
-	virtual u16 lookup_write_qword_flags(offs_t address) = 0;
-	virtual u16 lookup_write_qword_flags(offs_t address, u64 mask) = 0;
-	virtual u16 lookup_write_qword_unaligned_flags(offs_t address) = 0;
-	virtual u16 lookup_write_qword_unaligned_flags(offs_t address, u64 mask) = 0;
-
 	// setup
 	void prepare_map();
 	void prepare_device_map(address_map &map);

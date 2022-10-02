@@ -129,6 +129,7 @@ better notes (complete chip lists) for each board still needed
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/tms32025/tms32025.h"
 #include "machine/nvram.h"
 #include "sound/c140.h"

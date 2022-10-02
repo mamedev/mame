@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  debugwininfo.c - Win32 debug window handling
+//  debugwininfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -14,12 +14,19 @@
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+
+#include "util/xmlfile.h"
+
 #include "window.h"
 #include "winutf8.h"
-
 #include "winutil.h"
+
 #include "modules/lib/osdobj_common.h"
 
+#include <cstring>
+
+
+namespace osd::debugger::win {
 
 bool debugwin_info::s_window_class_registered = false;
 
@@ -51,6 +58,12 @@ debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_
 
 debugwin_info::~debugwin_info()
 {
+}
+
+
+void debugwin_info::redraw()
+{
+	RedrawWindow(m_wnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 
@@ -251,6 +264,89 @@ bool debugwin_info::handle_key(WPARAM wparam, LPARAM lparam)
 }
 
 
+void debugwin_info::save_configuration(util::xml::data_node &parentnode)
+{
+	util::xml::data_node *const node = parentnode.add_child(NODE_WINDOW, nullptr);
+	if (node)
+		save_configuration_to_node(*node);
+}
+
+
+void debugwin_info::restore_configuration_from_node(util::xml::data_node const &node)
+{
+	// get current size to use for defaults
+	RECT bounds;
+	POINT origin;
+	origin.x = 0;
+	origin.y = 0;
+	if (!GetClientRect(window(), &bounds) && ClientToScreen(window(), &origin))
+		return;
+
+	// get saved size and adjust for window chrome
+	RECT desired;
+	desired.left = node.get_attribute_int(ATTR_WINDOW_POSITION_X, origin.x);
+	desired.top = node.get_attribute_int(ATTR_WINDOW_POSITION_Y, origin.y);
+	desired.right = desired.left + node.get_attribute_int(ATTR_WINDOW_WIDTH, bounds.right);
+	desired.bottom = desired.top + node.get_attribute_int(ATTR_WINDOW_HEIGHT, bounds.bottom);
+	// TODO: sanity checks...
+	if (!AdjustWindowRectEx(&desired, DEBUG_WINDOW_STYLE, GetMenu(window()) ? TRUE : FALSE, DEBUG_WINDOW_STYLE_EX))
+		return;
+
+	// actually move the window
+	MoveWindow(
+			window(),
+			desired.left,
+			desired.top,
+			desired.right - desired.left,
+			desired.bottom - desired.top,
+			TRUE);
+
+	// restrict to one monitor and avoid toolbars
+	HMONITOR const nearest_monitor = MonitorFromWindow(window(), MONITOR_DEFAULTTONEAREST);
+	if (nearest_monitor)
+	{
+		MONITORINFO info;
+		std::memset(&info, 0, sizeof(info));
+		info.cbSize = sizeof(info);
+		if (GetMonitorInfo(nearest_monitor, &info))
+		{
+			if (desired.right > info.rcWork.right)
+			{
+				desired.left -= desired.right - info.rcWork.right;
+				desired.right = info.rcWork.right;
+			}
+			if (desired.bottom > info.rcWork.bottom)
+			{
+				desired.top -= desired.bottom - info.rcWork.bottom;
+				desired.bottom = info.rcWork.bottom;
+			}
+			if (desired.left < info.rcWork.left)
+			{
+				desired.right += info.rcWork.left - desired.left;
+				desired.left = info.rcWork.left;
+			}
+			if (desired.top < info.rcWork.top)
+			{
+				desired.bottom += info.rcWork.top - desired.top;
+				desired.top = info.rcWork.top;
+			}
+			desired.bottom = std::min(info.rcWork.bottom, desired.bottom);
+			desired.right = std::min(info.rcWork.right, desired.right);
+			MoveWindow(
+					window(),
+					desired.left,
+					desired.top,
+					desired.right - desired.left,
+					desired.bottom - desired.top,
+					TRUE);
+		}
+	}
+
+	// sort out contents
+	recompute_children();
+}
+
+
 void debugwin_info::recompute_children()
 {
 	if (m_views[0] != nullptr)
@@ -389,6 +485,22 @@ void debugwin_info::draw_border(HDC dc, RECT &bounds)
 	ScreenToClient(m_wnd, &((POINT *)&bounds)[1]);
 	InflateRect(&bounds, EDGE_WIDTH, EDGE_WIDTH);
 	DrawEdge(dc, &bounds, EDGE_SUNKEN, BF_RECT);
+}
+
+
+void debugwin_info::save_configuration_to_node(util::xml::data_node &node)
+{
+	RECT bounds;
+	POINT origin;
+	origin.x = 0;
+	origin.y = 0;
+	if (GetClientRect(window(), &bounds) && ClientToScreen(window(), &origin))
+	{
+		node.set_attribute_int(ATTR_WINDOW_POSITION_X, origin.x);
+		node.set_attribute_int(ATTR_WINDOW_POSITION_Y, origin.y);
+		node.set_attribute_int(ATTR_WINDOW_WIDTH, bounds.right);
+		node.set_attribute_int(ATTR_WINDOW_HEIGHT, bounds.bottom);
+	}
 }
 
 
@@ -620,3 +732,5 @@ void debugwin_info::register_window_class()
 		s_window_class_registered = true;
 	}
 }
+
+} // namespace osd::debugger::win

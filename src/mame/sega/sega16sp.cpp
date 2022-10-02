@@ -132,7 +132,7 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	//
 	//  Special notes:
 	//
-	//      There is an interaction between the horizonal flip bit and the offset.
+	//      There is an interaction between the horizontal flip bit and the offset.
 	//      The offset is maintained as a 16-bit value, even though only the lower
 	//      15 bits are used for the address. The top bit is used to control flipping.
 	//      This means that if the low 15 bits overflow during rendering, the sprite
@@ -312,7 +312,7 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 	//
 	//  Special notes:
 	//
-	//      There is an interaction between the horizonal flip bit and the offset.
+	//      There is an interaction between the horizontal flip bit and the offset.
 	//      The offset is maintained as a 16-bit value, even though only the lower
 	//      15 bits are used for the address. The top bit is used to control flipping.
 	//      This means that if the low 15 bits overflow during rendering, the sprite
@@ -496,7 +496,7 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	//
 	//  Special notes:
 	//
-	//      There is an interaction between the horizonal flip bit and the offset.
+	//      There is an interaction between the horizontal flip bit and the offset.
 	//      The offset is maintained as a 16-bit value, even though only the lower
 	//      15 bits are used for the address. The top bit is used to control flipping.
 	//      This means that if the low 15 bits overflow during rendering, the sprite

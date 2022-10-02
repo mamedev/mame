@@ -43,8 +43,8 @@ class device_palette_interface : public device_interface
 
 public:
 	// getters
-	u32 entries() const { return palette_entries(); }
-	u32 indirect_entries() const { return palette_indirect_entries(); }
+	u32 entries() const noexcept { return palette_entries(); }
+	u32 indirect_entries() const noexcept { return palette_indirect_entries(); }
 	palette_t *palette() const { return m_palette; }
 	const pen_t &pen(int index) const { return m_pens[index]; }
 	const pen_t *pens() const { return m_pens; }
@@ -53,8 +53,8 @@ public:
 	double pen_contrast(pen_t pen) const { return m_palette->entry_contrast(pen); }
 	pen_t black_pen() const { return m_black_pen; }
 	pen_t white_pen() const { return m_white_pen; }
-	bool shadows_enabled() const { return palette_shadows_enabled(); }
-	bool hilights_enabled() const { return palette_hilights_enabled(); }
+	bool shadows_enabled() const noexcept { return palette_shadows_enabled(); }
+	bool hilights_enabled() const noexcept { return palette_hilights_enabled(); }
 
 	// setters
 	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
@@ -92,10 +92,10 @@ protected:
 	virtual void interface_post_stop() override;
 
 	// configuration-related overrides
-	virtual u32 palette_entries() const = 0;
-	virtual u32 palette_indirect_entries() const { return 0; }
-	virtual bool palette_shadows_enabled() const { return false; }
-	virtual bool palette_hilights_enabled() const { return false; }
+	virtual u32 palette_entries() const noexcept = 0;
+	virtual u32 palette_indirect_entries() const noexcept { return 0; }
+	virtual bool palette_shadows_enabled() const noexcept { return false; }
+	virtual bool palette_hilights_enabled() const noexcept { return false; }
 
 private:
 	// internal helpers

@@ -20,7 +20,7 @@ Other: LED, 20MHz crystal. Next to the MC68901P is another chip just as large (4
 
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "machine/74259.h"
 #include "machine/eepromser.h"
 

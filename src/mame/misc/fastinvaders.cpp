@@ -451,7 +451,7 @@ DECLARE_WRITE_LINE_MEMBER( fastinvaders_state::vsync)
 		m_maincpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 		m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 		//machine().scheduler().abort_timeslice(); // transfer occurs immediately
-		//machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); // smooth things out a bit
+		//machine().scheduler().perfect_quantum(attotime::from_usec(100)); // smooth things out a bit
 		m_av=0;
 	}
 }

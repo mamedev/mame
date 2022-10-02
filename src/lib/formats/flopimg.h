@@ -321,7 +321,7 @@ protected:
 	 @endverbatim
 	 */
 
-	static std::vector<bool> generate_bitstream_from_track(int track, int head, int cell_size, floppy_image *image, int subtrack = 0);
+	static std::vector<bool> generate_bitstream_from_track(int track, int head, int cell_size, floppy_image *image, int subtrack = 0, int *max_delta = nullptr);
 	static std::vector<uint8_t> generate_nibbles_from_bitstream(const std::vector<bool> &bitstream);
 
 	struct desc_pc_sector

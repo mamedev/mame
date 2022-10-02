@@ -13,9 +13,9 @@
 #include "main.h"
 #include "modules.h"
 
-#include "corefile.h"
 #include "corestr.h"
 #include "opresolv.h"
+#include "path.h"
 #include "strformat.h"
 #include "unicode.h"
 

@@ -212,7 +212,7 @@ void eolith_state::qs1000_p1_w(uint8_t data)
 void eolith_state::soundcpu_to_qs1000(uint8_t data)
 {
 	m_qs1000->serial_in(data);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
+	machine().scheduler().perfect_quantum(attotime::from_usec(250));
 }
 
 

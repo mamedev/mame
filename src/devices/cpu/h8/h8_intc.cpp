@@ -12,11 +12,12 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, d
 	h8_intc_device(mconfig, H8_INTC, tag, owner, clock)
 {
 	irq_vector_base = 4;
+	irq_vector_count = 8;
 	irq_vector_nmi = 3;
 }
 
 h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock), irq_vector_base(0), irq_vector_nmi(0),
+	device_t(mconfig, type, tag, owner, clock), irq_vector_base(0), irq_vector_count(0), irq_vector_nmi(0),
 	cpu(*this, DEVICE_SELF_OWNER), nmi_input(false), irq_input(0), ier(0), isr(0), iscr(0), icr_filter(0), ipr_filter(0)
 {
 }
@@ -48,7 +49,7 @@ int h8_intc_device::interrupt_taken(int vector)
 	if(0)
 		logerror("taking internal interrupt %d\n", vector);
 	pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
-	if(irq_vector_base >= 0 && vector >= irq_vector_base && vector < irq_vector_base + 8) {
+	if(vector >= irq_vector_base && vector < irq_vector_base + irq_vector_count) {
 		int irq = vector - irq_vector_base;
 		if(irq_type[irq] != IRQ_LEVEL || !(irq_input & (1 << irq)))
 			isr &= ~(1 << irq);
@@ -160,10 +161,12 @@ void h8_intc_device::update_irq_types()
 
 void h8_intc_device::update_irq_state()
 {
-	if (irq_vector_base >= 0)
+	if (irq_vector_count > 0)
 	{
-		pending_irqs[0] &= ~(255 << irq_vector_base);
-		pending_irqs[0] |= (isr & ier) << irq_vector_base;
+		const unsigned mask = (1 << irq_vector_count) - 1;
+
+		pending_irqs[0] &= ~(mask << irq_vector_base);
+		pending_irqs[0] |= (isr & ier & mask) << irq_vector_base;
 	}
 
 	int cur_vector = 0;
@@ -199,7 +202,8 @@ void h8_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	gt913_intc_device(mconfig, GT913_INTC, tag, owner, clock)
 {
-	irq_vector_base = -1; // no external IRQs
+	irq_vector_base = 4;
+	irq_vector_count = 1;
 	irq_vector_nmi = 3;
 }
 
@@ -208,11 +212,25 @@ gt913_intc_device::gt913_intc_device(const machine_config &mconfig, device_type 
 {
 }
 
+void gt913_intc_device::device_reset()
+{
+	h8_intc_device::device_reset();
+
+	ier = 0x01;
+}
+
+void gt913_intc_device::clear_interrupt(int vector)
+{
+	pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
+	update_irq_state();
+}
+
 
 h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8h_intc_device(mconfig, H8H_INTC, tag, owner, clock)
 {
 	irq_vector_base = 12;
+	irq_vector_count = 8;
 	irq_vector_nmi = 7;
 }
 
@@ -339,6 +357,7 @@ h8s_intc_device::h8s_intc_device(const machine_config &mconfig, const char *tag,
 	h8h_intc_device(mconfig, H8S_INTC, tag, owner, clock)
 {
 	irq_vector_base = 16;
+	irq_vector_count = 8;
 	irq_vector_nmi = 7;
 }
 

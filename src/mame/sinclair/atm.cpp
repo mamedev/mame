@@ -5,16 +5,15 @@
 MicroART ATM (clone of Spectrum)
 
 NOTES:
-	Current implementation based on ATM Turbo 2+. If anybody wants to validate ATM1, existing
-	code must be moved to atmtb2_state not modified.
+    Current implementation based on ATM Turbo 2+. If anybody wants to validate ATM1, existing
+    code must be moved to atmtb2_state not modified.
 
 TODO:
-	* ports read
-	* ATM2+ (compare to ATM2) has only 1M RAM vs 512K
-	* Mem masks are hardcoded to 1M RAM
-	* CMOS
-	* better handling of SHADOW ports
-	* validate screen timings
+    * ports read
+    * ATM2+ (compare to ATM2) has only 1M RAM vs 512K
+    * Mem masks are hardcoded to 1M RAM
+    * better handling of SHADOW ports
+    * validate screen timings
 
 *******************************************************************************************/
 
@@ -23,6 +22,7 @@ TODO:
 #include "specpls3.h"
 
 #include "beta_m.h"
+#include "glukrs.h"
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 
@@ -56,6 +56,7 @@ public:
 		, m_char_rom(*this, "charrom")
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_centronics(*this, "centronics")
+		, m_glukrs(*this, "glukrs")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -80,6 +81,7 @@ private:
 	void atm_port_ffff_w(offs_t offset, u8 data);
 	void atm_port_ff77_w(offs_t offset, u8 data);
 	void atm_port_fff7_w(offs_t offset, u8 data);
+	void atm_port_eff7_w(offs_t offset, u8 data);
 	void atm_port_7ffd_w(offs_t offset, u8 data);
 
 	void atm_io(address_map &map);
@@ -102,6 +104,7 @@ private:
 
 	required_device<beta_disk_device> m_beta;
 	required_device<centronics_device> m_centronics;
+	required_device<glukrs_device> m_glukrs;
 	required_device<device_palette_interface> m_palette;
 
 	bool is_shadow_active() { return m_beta->is_active(); }
@@ -123,15 +126,12 @@ void atm_state::atm_update_memory()
 	LOGMEM("7FFD.%d = %X:", BIT(m_port_7ffd_data, 4), (m_port_7ffd_data & 0x07));
 	for (auto bank = 0; bank < 4 ; bank++)
 	{
-		u8 page = pen_page(bank);
-		if (!m_pen)
-			page = ROM_MASK;
-
+		u8 page = m_pen ? pen_page(bank) : ROM_MASK;
 		if (page & PEN_RAM_MASK)
 		{
 			if (page & PEN_DOS7FFD_MASK)
 				page = (page & 0xf8) | (m_port_7ffd_data & 0x07);
-			page = page & 0x3f; // TODO size dependent
+			page &= 0x3f; // TODO size dependent
 			m_bank_ram[bank]->set_entry(page);
 			views[bank].get().disable();
 			LOGMEM(" RA(%X>%X)", m_bank_ram[bank]->entry(), page);
@@ -140,7 +140,7 @@ void atm_state::atm_update_memory()
 		{
 			if ((page & PEN_DOS7FFD_MASK) && !BIT(page, 1))
 				page = (page & ~1) | is_shadow_active();
-			page = page & ROM_MASK;
+			page &= ROM_MASK;
 			m_bank_rom[bank]->set_entry(page);
 			views[bank].get().select(0);
 			LOGMEM(" RO(%X>%X)", m_bank_rom[bank]->entry(), page);
@@ -210,9 +210,18 @@ void atm_state::atm_port_ff77_w(offs_t offset, u8 data)
 	}
 }
 
+void atm_state::atm_port_eff7_w(offs_t offset, u8 data)
+{
+	m_maincpu->set_clock(X1_128_SINCLAIR / 10 * (1 << BIT(data, 4))); // 0 - 3.5MHz, 1 - 7MHz
+	if (BIT(data, 7))
+		m_glukrs->enable();
+	else
+		m_glukrs->disable();
+}
+
 void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 {
-	if (!is_shadow_active())
+	if(!is_shadow_active())
 		return;
 
 	u8 bank = offset >> 14;
@@ -384,19 +393,19 @@ void atm_state::atm_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw(m_bank_ram[0]);
 	map(0x0000, 0x3fff).view(m_bank_view0);
-	m_bank_view0[0](0x0000, 0x3fff).bankr(m_bank_rom[0]);
+	m_bank_view0[0](0x0000, 0x3fff).bankr(m_bank_rom[0]).nopw();
 
 	map(0x4000, 0x7fff).bankrw(m_bank_ram[1]);
 	map(0x4000, 0x7fff).view(m_bank_view1);
-	m_bank_view1[0](0x4000, 0x7fff).bankr(m_bank_rom[1]);
+	m_bank_view1[0](0x4000, 0x7fff).bankr(m_bank_rom[1]).nopw();
 
 	map(0x8000, 0xbfff).bankrw(m_bank_ram[2]);
 	map(0x8000, 0xbfff).view(m_bank_view2);
-	m_bank_view2[0](0x8000, 0xbfff).bankr(m_bank_rom[2]);
+	m_bank_view2[0](0x8000, 0xbfff).bankr(m_bank_rom[2]).nopw();
 
 	map(0xc000, 0xffff).bankrw(m_bank_ram[3]);
 	map(0xc000, 0xffff).view(m_bank_view3);
-	m_bank_view3[0](0xc000, 0xffff).bankr(m_bank_rom[3]);
+	m_bank_view3[0](0xc000, 0xffff).bankr(m_bank_rom[3]).nopw();
 }
 
 void atm_state::atm_io(address_map &map)
@@ -413,6 +422,11 @@ void atm_state::atm_io(address_map &map)
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
 	map(0x0077, 0x0077).select(0xff00).w(FUNC(atm_state::atm_port_ff77_w));
 	map(0x00f7, 0x00f7).select(0xff00).w(FUNC(atm_state::atm_port_fff7_w));
+	map(0xeff7, 0xeff7).w(FUNC(atm_state::atm_port_eff7_w));
+	map(0xdef7, 0xdef7).mirror(0x0100).w(m_glukrs, FUNC(glukrs_device::address_w));
+	map(0xbff7, 0xbff7).r(m_glukrs, FUNC(glukrs_device::data_r));
+	map(0xbef7, 0xbef7).rw(m_glukrs, FUNC(glukrs_device::data_r), FUNC(glukrs_device::data_w));
+	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 }
@@ -448,6 +462,7 @@ void atm_state::machine_start()
 void atm_state::machine_reset()
 {
 	m_beta->enable();
+	m_glukrs->disable();
 
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
@@ -508,6 +523,7 @@ void atm_state::atm(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
 
 	BETA_DISK(config, m_beta, 0);
+	GLUKRS(config, m_glukrs);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "covox");
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
@@ -549,16 +565,17 @@ ROM_END
 
 ROM_START( atmtb2 )
 	ROM_REGION(0x030000, "maincpu", ROMREGION_ERASEFF)
-	ROM_SYSTEM_BIOS(0, "v1", "v.1.07.12 joined")
+	ROM_DEFAULT_BIOS("v1.07.13")
+	ROM_SYSTEM_BIOS(0, "v1.07.12", "BIOS v1.07.12, CP/M v2.2, TR-DOS v5.03") // joined dump
 	ROMX_LOAD( "atmtb2.rom",   0x020000, 0x10000,CRC(05218c26) SHA1(71ed9864e7aa85131de97cf1e53dc152e7c79488), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "v2", "v.1.07.12")
+	ROM_SYSTEM_BIOS(1, "v1.07.12a", "BIOS v1.07.12, CP/M v2.2, TR-DOS v5.03 (split)")
 	ROMX_LOAD( "atmtb2-1.rom", 0x020000, 0x4000, CRC(658c98f1) SHA1(1ec694795aa6cac10147e58f38a9db0bdf7ed89b), ROM_BIOS(1))
 	ROMX_LOAD( "atmtb2-2.rom", 0x024000, 0x4000, CRC(bc3f6b2b) SHA1(afa9df63857141fef270e2c97e12d2edc60cf919), ROM_BIOS(1))
 	ROMX_LOAD( "atmtb2-3.rom", 0x028000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(1))
 	ROMX_LOAD( "atmtb2-4.rom", 0x02c000, 0x4000, CRC(5869d8c4) SHA1(c3e198138f528ac4a8dff3c76cd289fd4713abff), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "v3", "v.1.07.13")
+	ROM_SYSTEM_BIOS(2, "v1.07.13", "BIOS v1.07.13, CP/M v2.2, TR-DOS v5.03")
 	ROMX_LOAD( "atmtb213.rom", 0x020000, 0x10000, CRC(34a91d53) SHA1(8f0af0f3c0ff1644535f20545c73d01576d6e52f), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "v4", "eXtra v1.37 XT")
+	ROM_SYSTEM_BIOS(3, "v1.37", "Dual eXtra v1.37XT: BIOS v1.07.15, CP/M v2.2, TR-DOS v5.04R")
 	ROMX_LOAD( "atmtb2x37xt.rom", 0x010000, 0x20000, CRC(e5ef44d9) SHA1(3fbb9ace7cb031e7365c19e4f8b67ed366e24064), ROM_BIOS(3))
 
 	ROM_REGION(0x01000, "keyboard", ROMREGION_ERASEFF)

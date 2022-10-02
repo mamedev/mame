@@ -34,7 +34,7 @@
 
     TODO:
 
-	- loadsys1 core dump
+    - loadsys1 core dump
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!

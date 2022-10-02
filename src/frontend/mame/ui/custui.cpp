@@ -22,6 +22,7 @@
 
 #include "corestr.h"
 #include "osdepend.h"
+#include "path.h"
 
 #include <algorithm>
 #include <iterator>
@@ -250,7 +251,7 @@ void menu_custom_ui::find_languages()
 	std::sort(
 			std::next(m_languages.begin()),
 			m_languages.end(),
-			[] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x.c_str(), y.c_str()); });
+			[] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x, y); });
 
 	char const *const lang = machine().options().language();
 	if (*lang)
@@ -259,8 +260,8 @@ void menu_custom_ui::find_languages()
 				std::next(m_languages.begin()),
 				m_languages.end(),
 				lang,
-				[] (std::string const &x, char const *y) { return 0 > core_stricmp(x.c_str(), y); });
-		if ((m_languages.end() != found) && !core_stricmp(found->c_str(), lang))
+				[] (std::string const &x, char const *y) { return 0 > core_stricmp(x, y); });
+		if ((m_languages.end() != found) && !core_stricmp(*found, lang))
 			m_currlang = std::distance(m_languages.begin(), found);
 	}
 	else
@@ -292,7 +293,7 @@ void menu_custom_ui::find_sysnames()
 	std::sort(
 			m_sysnames.begin(),
 			m_sysnames.end(),
-			[] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x.c_str(), y.c_str()); });
+			[] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x, y); });
 
 	char const *const names = ui().options().system_names();
 	if (*names)
@@ -301,9 +302,9 @@ void menu_custom_ui::find_sysnames()
 				std::next(m_sysnames.begin()),
 				m_sysnames.end(),
 				names,
-				[] (std::string const &x, char const *y) { return 0 > core_stricmp(x.c_str(), y); });
+				[] (std::string const &x, char const *y) { return 0 > core_stricmp(x, y); });
 		m_currsysnames = std::distance(m_sysnames.begin(), found);
-		if ((m_sysnames.end() == found) || core_stricmp(found->c_str(), names))
+		if ((m_sysnames.end() == found) || core_stricmp(*found, names))
 			m_sysnames.emplace(found, names);
 	}
 	else

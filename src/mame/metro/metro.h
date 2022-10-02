@@ -92,6 +92,7 @@ public:
 	void init_dharmak();
 	void init_metro();
 	void init_lastfortg();
+	void init_puzzlet() { save_item(NAME(m_ext_irq_enable)); }
 
 	DECLARE_READ_LINE_MEMBER(custom_soundstatus_r);
 

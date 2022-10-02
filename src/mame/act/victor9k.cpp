@@ -639,6 +639,19 @@ void victor9k_state::machine_start()
 	m_rom->base()[0x1d53] = 0x90;
 	m_rom->base()[0x1d54] = 0x90;
 #endif
+
+	//update RAM for ramsize
+	int m_ram_size = m_ram->size();
+	u8 *m_ram_ptr = m_ram->pointer();
+
+	int ramsize = m_ram_size;
+	if (ramsize > 0) {
+		address_space& space = m_maincpu->space(AS_PROGRAM);
+		if (ramsize > 0xdffff)   //the 896KB option overlaps 1 bit with
+			ramsize = 0xdffff;   //the I/O memory space, truncating
+		if (LOG) logerror("install_ram ramsize %x\n", ramsize);
+		space.install_ram(0x0, ramsize, m_ram_ptr);
+	}
 }
 
 void victor9k_state::machine_reset()
@@ -775,7 +788,7 @@ void victor9k_state::victor9k(machine_config &config)
 	m_fdc->syn_wr_callback().set(I8259A_TAG, FUNC(pic8259_device::ir0_w)).invert();
 	m_fdc->lbrdy_wr_callback().set_inputline(I8088_TAG, INPUT_LINE_TEST).invert();
 
-	RAM(config, m_ram).set_default_size("128K");
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("128K,256K,512K,640K,768K,896K");
 
 	SOFTWARE_LIST(config, "flop_list").set_original("victor9k_flop");
 }

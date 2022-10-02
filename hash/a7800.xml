@@ -408,7 +408,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="beefdrop">
-		<description>Beef Drop (NTSC, Added Pokey Chip)</description>
+		<description>Beef Drop (NTSC, added POKEY Chip)</description>
 		<year>2006</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Ken Siders" />
@@ -652,7 +652,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="dsrtflcna" cloneof="dsrtflcn">
-		<description>Desert Falcon (NTSC, Alternate)</description>
+		<description>Desert Falcon (NTSC, alternate)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7811"/>
@@ -950,7 +950,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop1">
-		<description>GATO (NTSC, Prototype, 198801xx)</description>
+		<description>GATO (NTSC, prototype, 198801xx)</description>
 		<year>1988</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -964,7 +964,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop2" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 198712xx)</description>
+		<description>GATO (NTSC, prototype, 198712xx)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -978,7 +978,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop3" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 198711xx)</description>
+		<description>GATO (NTSC, prototype, 198711xx)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -992,7 +992,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop4" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 19870727)</description>
+		<description>GATO (NTSC, prototype, 19870727)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -1006,7 +1006,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop5" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 19870623)</description>
+		<description>GATO (NTSC, prototype, 19870623)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -1020,7 +1020,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop6" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 19870611)</description>
+		<description>GATO (NTSC, prototype, 19870611)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -1034,7 +1034,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop7" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 19870523)</description>
+		<description>GATO (NTSC, prototype, 19870523)</description>
 		<!-- (27256 SUM16=1783) (27128 SUM16=A4D3) -->
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
@@ -1049,7 +1049,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop8" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 19870424)</description>
+		<description>GATO (NTSC, prototype, 19870424)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -1284,7 +1284,7 @@ game, you can keep pressed Button 1 during Atari logo (thanks to Mike
 Saarna for debugging the problem)
 -->
 	<software name="klax">
-		<description>Klax (NTSC, Prototype)</description>
+		<description>Klax (NTSC, prototype)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7888"/>
@@ -1441,7 +1441,7 @@ Saarna for debugging the problem)
 	</software>
 
 	<software name="mia" supported="partial">
-		<description>Missing In Action (Prototype)</description>
+		<description>Missing In Action (prototype)</description>
 		<!-- 5 Chips total 4 x 27256, 1 x 27128) -->
 		<year>1989</year>
 		<publisher>TNT Games</publisher>
@@ -1716,7 +1716,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="pitfight">
-		<description>Pit Fighter (Prototype)</description>
+		<description>Pit Fighter (prototype)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7891"/>
@@ -1757,7 +1757,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="plutos">
-		<description>Plutos (Prototype)</description>
+		<description>Plutos (prototype)</description>
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1827,7 +1827,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="rampart" supported="no">
-		<description>Rampart (Prototype)</description>
+		<description>Rampart (prototype)</description>
 		<!-- (2 x 27512 - U1, U2) -->
 		<year>1991</year>
 		<publisher>Imagitec Design</publisher>
@@ -1841,7 +1841,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="fractal">
-		<description>Rescue on Fractalus (NTSC, Prototype)</description>
+		<description>Rescue on Fractalus (NTSC, prototype)</description>
 		<!-- 2 x 27128 - U2 (LO), U3 (HI) -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
@@ -1928,7 +1928,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="sentinelu" cloneof="sentinel">
-		<description>Sentinel (NTSC, Prototype)</description>
+		<description>Sentinel (NTSC, prototype)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7869"/>
@@ -1958,7 +1958,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="sirius">
-		<description>Sirius (Prototype)</description>
+		<description>Sirius (prototype)</description>
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -2027,7 +2027,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="starwarsu" cloneof="starwars">
-		<description>Star Wars 7800 (NTSC, Hack)</description>
+		<description>Star Wars 7800 (NTSC, hack)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Gambler172" />
@@ -2041,7 +2041,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars 7800 (PAL, Hack)</description>
+		<description>Star Wars 7800 (PAL, hack)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Gambler172" />
@@ -2291,7 +2291,7 @@ almost nothing like the prototype.
      some erlier production run, until they found out the mistake and
      replaced it with the complete version -->
 	<software name="wingameso" cloneof="wingames">
-		<description>Winter Games (NTSC, Older?)</description>
+		<description>Winter Games (NTSC, older?)</description>
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<info name="serial" value="CX7831"/>
@@ -2430,7 +2430,7 @@ almost nothing like the prototype.
 
 	<!-- these ones are listed as 'working in MAME' but are apparently the only images that work on real hardware too -->
 	<software name="dkongxm">
-		<description>Donkey Kong (PAL, Demo, XM enhanced, V1.2)</description>
+		<description>Donkey Kong (PAL, demo, XM enhanced, V1.2)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2444,7 +2444,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="dkongxmu" cloneof="dkongxm">
-		<description>Donkey Kong (NTSC, Demo, XM enhanced, V1.2)</description>
+		<description>Donkey Kong (NTSC, demo, XM enhanced, V1.2)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2457,11 +2457,11 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
-	<!-- these are listed as 'with HSC emulation' and are designed for the prosystem emulator, they simulate some of the HSC features -->
+	<!-- these are listed as 'with HSC emulation' and are designed for the ProSystem Emulator, they simulate some of the HSC features -->
 	<!-- remove them? -->
 
 	<software name="dkongxmps" cloneof="dkongxm" supported="no">
-		<description>Donkey Kong (PAL, Demo, XM enhanced, V1.2, for prosystem emulator)</description>
+		<description>Donkey Kong (PAL, demo, XM enhanced, V1.2, for ProSystem Emulator)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2475,7 +2475,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="dkongxmups" cloneof="dkongxm" supported="no">
-		<description>Donkey Kong (NTSC, Demo, XM enhanced, V1.2, for prosystem emulator)</description>
+		<description>Donkey Kong (NTSC, demo, XM enhanced, V1.2, for ProSystem Emulator)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2492,7 +2492,7 @@ almost nothing like the prototype.
 
 	<!-- an older version? sound is broken, did it work on the real hardware? -->
 	<software name="dkongxmo" cloneof="dkongxm" supported="no">
-		<description>Donkey Kong (PAL, Demo, XM enhanced, older)</description>
+		<description>Donkey Kong (PAL, demo, XM enhanced, older)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2506,7 +2506,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="dkongxmou" cloneof="dkongxm" supported="no">
-		<description>Donkey Kong (NTSC, Demo, XM enhanced, older)</description>
+		<description>Donkey Kong (NTSC, demo, XM enhanced, older)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2521,7 +2521,7 @@ almost nothing like the prototype.
 
 	<!-- this one is meant to detect PAL / NTSC and runs on an A7800 CC2 development board, without sound? based off older code? -->
 	<software name="dkongxmcc" cloneof="dkongxm" supported="no">
-		<description>Donkey Kong (PAL/NTSC, Demo, XM enhanced, older, for CC2 board)</description>
+		<description>Donkey Kong (PAL/NTSC, demo, XM enhanced, older, for CC2 board)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />

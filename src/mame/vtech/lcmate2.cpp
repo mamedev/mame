@@ -30,14 +30,18 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/rp5c15.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "utf8.h"
 
 
 class lcmate2_state : public driver_device

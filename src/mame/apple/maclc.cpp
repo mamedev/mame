@@ -22,7 +22,8 @@
 
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/applefdintf.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
@@ -351,7 +352,6 @@ void maclc_state::maclc_base(machine_config &config)
 	m_v8->hmmu_enable_callback().set(FUNC(maclc_state::set_hmmu));
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 
 	EGRET(config, m_egret, EGRET_341S0850);
 	m_egret->reset_callback().set(FUNC(maclc_state::egret_reset_w));

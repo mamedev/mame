@@ -368,7 +368,6 @@ ROM_START( vsmilem )
 	*/
 	ROM_SYSTEM_BIOS( 1, "bios1", "bios1" )
 	ROMX_LOAD( "vmotionbios.bin", 0x000000, 0x200000, CRC(427087ea) SHA1(dc9eaa55f4a0047b6069ef73beea86d26f0f5394), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) ) // from a US unit
-
 ROM_END
 
 

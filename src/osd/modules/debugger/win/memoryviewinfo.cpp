@@ -2,15 +2,19 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  memoryviewinfo.c - Win32 debug window handling
+//  memoryviewinfo.cpp - Win32 debug window handling
 //
 //============================================================
 
 #include "emu.h"
 #include "memoryviewinfo.h"
 
+#include "util/xmlfile.h"
+
 #include "strconv.h"
 
+
+namespace osd::debugger::win {
 
 memoryview_info::memoryview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent) :
 	debugview_info(debugger, owner, parent, DVT_MEMORY)
@@ -20,6 +24,12 @@ memoryview_info::memoryview_info(debugger_windows_interface &debugger, debugwin_
 
 memoryview_info::~memoryview_info()
 {
+}
+
+
+char const *memoryview_info::expression() const
+{
+	return view<debug_view_memory>()->expression();
 }
 
 
@@ -80,6 +90,32 @@ void memoryview_info::set_physical(bool physical)
 void memoryview_info::set_address_radix(int radix)
 {
 	view<debug_view_memory>()->set_address_radix(radix);
+}
+
+
+void memoryview_info::restore_configuration_from_node(util::xml::data_node const &node)
+{
+	debug_view_memory &memview(*view<debug_view_memory>());
+	memview.set_reverse(0 != node.get_attribute_int(ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, memview.reverse() ? 1 : 0));
+	memview.set_physical(0 != node.get_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_MODE, memview.physical() ? 1 : 0));
+	memview.set_address_radix(node.get_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_RADIX, memview.address_radix()));
+	memview.set_data_format(debug_view_memory::data_format(node.get_attribute_int(ATTR_WINDOW_MEMORY_DATA_FORMAT, int(memview.get_data_format()))));
+	memview.set_chunks_per_row(node.get_attribute_int(ATTR_WINDOW_MEMORY_ROW_CHUNKS, memview.chunks_per_row()));
+
+	debugview_info::restore_configuration_from_node(node);
+}
+
+
+void memoryview_info::save_configuration_to_node(util::xml::data_node &node)
+{
+	debugview_info::save_configuration_to_node(node);
+
+	debug_view_memory &memview(*view<debug_view_memory>());
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, memview.reverse() ? 1 : 0);
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_MODE, memview.physical() ? 1 : 0);
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_RADIX, memview.address_radix());
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_DATA_FORMAT, int(memview.get_data_format()));
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_ROW_CHUNKS, memview.chunks_per_row());
 }
 
 
@@ -167,3 +203,5 @@ void memoryview_info::handle_context_menu(unsigned command)
 	};
 
 }
+
+} // namespace osd::debugger::win

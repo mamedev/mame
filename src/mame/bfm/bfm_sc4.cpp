@@ -1836,8 +1836,7 @@ ROM_START( sc4hrolr ) // uses RTC on romcard
 
 	ROM_REGION( 0x100000, "gals", 0 )
 	ROM_LOAD( "75585129.ic1.bin", 0x0000, 0x000117, CRC(2454bb33) SHA1(610cde14caef3f2d02f0076b924e015077c3832b) ) /* protected gal16v8 on romcard */
-
-	ROM_END
+ROM_END
 
 ROM_START( ad4skill )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )

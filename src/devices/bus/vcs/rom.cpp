@@ -451,7 +451,7 @@ void a26_rom_e0_device::install_memory_handlers(address_space *space)
 
 template <uint8_t Bank>
 void a26_rom_e0_device::switch_bank(offs_t offset, uint8_t data)
-{	
+{
 	m_bank[Bank]->set_entry(offset & 7);
 }
 
@@ -677,7 +677,7 @@ void a26_rom_fv_device::switch_bank(offs_t offset, uint8_t data)
  "JVP Bankswitch" Carts:
  read/write access to 0x0fa0-0x0fc0 determines the
  4K ROM bank to be read.
- 
+
  GAMES: No test case!?!
 
  -------------------------------------------------*/

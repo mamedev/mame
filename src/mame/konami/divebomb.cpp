@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Phil Bennett
+// copyright-holders: David Haywood, Phil Bennett
+
 /***************************************************************************
 
     Kyuukoukabakugekitai - Dive Bomber Squad
@@ -42,7 +43,7 @@
 |--------------------------------------------------------------------------|
 
  Notes:
-     There are numerous wire modificationss connecting pins of U15-U18 to
+     There are numerous wire modifications connecting pins of U15-U18 to
      various other components on the PCB
 
      MB81C86    - 64kx4 SRAM
@@ -91,11 +92,284 @@ To verify against original HW:
 ****************************************************************************/
 
 #include "emu.h"
-#include "divebomb.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/input_merger.h"
+#include "sound/sn76496.h"
+#include "video/k051316.h"
+#include "video/resnet.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
+// configurable logging
+#define LOG_ROZ     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_ROZ)
+
+#include "logmacro.h"
+
+#define LOGROZ(...)     LOGMASKED(LOG_ROZ,     __VA_ARGS__)
+
+
+namespace {
+
+class divebomb_state : public driver_device
+{
+public:
+	divebomb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_spritecpu(*this, "spritecpu")
+		, m_fgcpu(*this, "fgcpu")
+		, m_rozcpu(*this, "rozcpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_k051316(*this, "k051316_%u", 1)
+		, m_fgcpu_irq(*this, "fgcpu_irq")
+		, m_spr2fg_latch(*this, "spr2fg")
+		, m_roz2fg_latch(*this, "roz2fg")
+		, m_rozbank(*this, "rozbank")
+		, m_fgram(*this, "fgram")
+		, m_spriteram(*this, "spriteram")
+	{
+	}
+
+	void divebomb(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_spritecpu;
+	required_device<cpu_device> m_fgcpu;
+	required_device<cpu_device> m_rozcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device_array<k051316_device, 2> m_k051316;
+	required_device<input_merger_any_high_device> m_fgcpu_irq;
+	required_device<generic_latch_8_device> m_spr2fg_latch;
+	required_device<generic_latch_8_device> m_roz2fg_latch;
+
+	required_memory_bank m_rozbank;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	uint8_t m_roz_pal = 0;
+	bool m_roz_enable[2]{};
+
+	void palette(palette_device &palette) const;
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	static void decode_proms(palette_device &palette, const uint8_t* rgn, int size, int index, bool inv);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	K051316_CB_MEMBER(zoom_callback_1);
+	K051316_CB_MEMBER(zoom_callback_2);
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	uint8_t fgcpu_comm_flags_r();
+	void fgram_w(offs_t offset, uint8_t data);
+
+	void spritecpu_port00_w(uint8_t data);
+
+	void rozcpu_bank_w(uint8_t data);
+	template<int Chip> void rozcpu_wrap_enable_w(uint8_t data);
+	template<int Chip> void rozcpu_enable_w(uint8_t data);
+	void rozcpu_pal_w(uint8_t data);
+	void fgcpu_iomap(address_map &map);
+	void fgcpu_map(address_map &map);
+	void rozcpu_iomap(address_map &map);
+	void rozcpu_map(address_map &map);
+	void spritecpu_iomap(address_map &map);
+	void spritecpu_map(address_map &map);
+};
+
+
+// video
+
+/*************************************
+ *
+ *  Tilemap callbacks
+ *
+ *************************************/
+
+TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
+{
+	uint32_t code = m_fgram[tile_index + 0x000];
+	uint32_t attr = m_fgram[tile_index + 0x400];
+	uint32_t colour = attr >> 4;
+
+	code |= (attr & 0x3) << 8;
+
+	tileinfo.set(0, code, colour, 0);
+}
+
+
+
+/*************************************
+ *
+ *  K051316 callbacks
+ *
+ *************************************/
+
+K051316_CB_MEMBER(divebomb_state::zoom_callback_1)
+{
+	*code |= (*color & 0x03) << 8;
+	*color = 0 + ((m_roz_pal >> 4) & 3);
+}
+
+
+K051316_CB_MEMBER(divebomb_state::zoom_callback_2)
+{
+	*code |= (*color & 0x03) << 8;
+	*color = 4 + (m_roz_pal & 3);
+}
+
+
+
+/*************************************
+ *
+ *  Video hardware handlers
+ *
+ *************************************/
+
+void divebomb_state::fgram_w(offs_t offset, uint8_t data)
+{
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+
+void divebomb_state::rozcpu_pal_w(uint8_t data)
+{
+	//.... ..xx  K051316 1 palette select
+	//..xx ....  K051316 2 palette select
+
+	uint8_t old_pal = m_roz_pal;
+	m_roz_pal = data;
+
+	if ((old_pal & 0x03) != (data & 0x03))
+		m_k051316[1]->mark_tmap_dirty();
+
+	if ((old_pal & 0x30) != (data & 0x30))
+		m_k051316[0]->mark_tmap_dirty();
+
+	if (data & 0xcc)
+		LOGROZ("rozcpu_port50_w %02x\n", data);
+}
+
+
+
+/*************************************
+ *
+ *  Video hardware init
+ *
+ *************************************/
+
+void divebomb_state::decode_proms(palette_device &palette, const uint8_t * rgn, int size, int index, bool inv)
+{
+	static constexpr int resistances[4] = { 2000, 1000, 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[4], gweights[4], bweights[4];
+	compute_resistor_weights(0, 255, -1.0,
+			4, resistances, rweights, 0, 0,
+			4, resistances, gweights, 0, 0,
+			4, resistances, bweights, 0, 0);
+
+	// create a lookup table for the palette
+	for (uint32_t i = 0; i < size; ++i)
+	{
+		uint32_t const rdata = rgn[i + size*2] & 0x0f;
+		uint32_t const r = combine_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
+
+		uint32_t const gdata = rgn[i + size] & 0x0f;
+		uint32_t const g = combine_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
+
+		uint32_t const bdata = rgn[i] & 0x0f;
+		uint32_t const b = combine_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
+
+		if (!inv)
+			palette.set_pen_color(index + i, rgb_t(r, g, b));
+		else
+			palette.set_pen_color(index + (i ^ 0xff), rgb_t(r, g, b));
+	}
+}
+
+
+void divebomb_state::palette(palette_device &palette) const
+{
+	decode_proms(palette, memregion("spr_proms")->base(), 0x100, 0x400 + 0x400 + 0x400, false);
+	decode_proms(palette, memregion("fg_proms")->base(), 0x400, 0x400 + 0x400, false);
+	decode_proms(palette, memregion("k051316_1_pr")->base(), 0x400, 0, true);
+	decode_proms(palette, memregion("k051316_2_pr")->base(), 0x400, 0x400, true);
+}
+
+
+void divebomb_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(divebomb_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scrolly(0, 16);
+}
+
+
+
+/*************************************
+ *
+ *  Main update
+ *
+ *************************************/
+
+void divebomb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (uint32_t i = 0; i < m_spriteram.bytes(); i += 4)
+	{
+		uint32_t const sy = m_spriteram[i + 3];
+		uint32_t const sx = m_spriteram[i + 0];
+		uint32_t code = m_spriteram[i + 2];
+		uint32_t const attr = m_spriteram[i + 1];
+
+		code += (attr & 0x0f) << 8;
+
+		uint32_t const colour = attr >> 4;
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, colour, 0, 0, sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, colour, 0, 0, sx, sy - 256, 0);
+	}
+}
+
+
+uint32_t divebomb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	for (int chip = 1; chip >= 0; chip--)
+	{
+		if (m_roz_enable[chip])
+		{
+			m_k051316[chip]->zoom_draw(screen, bitmap, cliprect, 0, 0);
+		}
+	}
+
+	draw_sprites(bitmap, cliprect);
+
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -103,15 +377,15 @@ To verify against original HW:
  *
  *************************************/
 
-void divebomb_state::divebomb_fgcpu_map(address_map &map)
+void divebomb_state::fgcpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(FUNC(divebomb_state::fgram_w)).share("fgram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(divebomb_state::fgram_w)).share(m_fgram);
 	map(0xe000, 0xffff).ram();
 }
 
 
-void divebomb_state::divebomb_fgcpu_iomap(address_map &map)
+void divebomb_state::fgcpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w("sn0", FUNC(sn76489_device::write));
@@ -153,16 +427,16 @@ uint8_t divebomb_state::fgcpu_comm_flags_r()
  *
  *************************************/
 
-void divebomb_state::divebomb_spritecpu_map(address_map &map)
+void divebomb_state::spritecpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().share("spriteram");
+	map(0xc000, 0xc7ff).ram().share(m_spriteram);
 	map(0xc800, 0xdfff).nopw();
 	map(0xe000, 0xffff).ram();
 }
 
 
-void divebomb_state::divebomb_spritecpu_iomap(address_map &map)
+void divebomb_state::spritecpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(FUNC(divebomb_state::spritecpu_port00_w));
@@ -197,17 +471,17 @@ void divebomb_state::rozcpu_enable_w(uint8_t data)
 }
 
 
-void divebomb_state::divebomb_rozcpu_map(address_map &map)
+void divebomb_state::rozcpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("rozbank");
+	map(0x8000, 0xbfff).bankr(m_rozbank);
 	map(0xc000, 0xc7ff).ram().rw(m_k051316[0], FUNC(k051316_device::read), FUNC(k051316_device::write));
 	map(0xd000, 0xd7ff).ram().rw(m_k051316[1], FUNC(k051316_device::read), FUNC(k051316_device::write));
 	map(0xe000, 0xffff).ram();
 }
 
 
-void divebomb_state::divebomb_rozcpu_iomap(address_map &map)
+void divebomb_state::rozcpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(FUNC(divebomb_state::rozcpu_bank_w));
@@ -228,7 +502,7 @@ void divebomb_state::rozcpu_bank_w(uint8_t data)
 	m_rozbank->set_entry(bank);
 
 	if (data & 0x0f)
-		logerror("rozcpu_bank_w %02x\n", data);
+		LOGROZ("rozcpu_bank_w %02x\n", data);
 }
 
 
@@ -388,17 +662,19 @@ GFXDECODE_END
 
 void divebomb_state::divebomb(machine_config &config)
 {
-	Z80(config, m_fgcpu, XTAL1/4); // ?
-	m_fgcpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_fgcpu_map);
-	m_fgcpu->set_addrmap(AS_IO, &divebomb_state::divebomb_fgcpu_iomap);
+	static constexpr XTAL XTAL1 = XTAL(24'000'000);
 
-	Z80(config, m_spritecpu, XTAL1/4); // ?
-	m_spritecpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_spritecpu_map);
-	m_spritecpu->set_addrmap(AS_IO, &divebomb_state::divebomb_spritecpu_iomap);
+	Z80(config, m_fgcpu, XTAL1 / 4); // ?
+	m_fgcpu->set_addrmap(AS_PROGRAM, &divebomb_state::fgcpu_map);
+	m_fgcpu->set_addrmap(AS_IO, &divebomb_state::fgcpu_iomap);
 
-	Z80(config, m_rozcpu, XTAL1/4); // ?
-	m_rozcpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_rozcpu_map);
-	m_rozcpu->set_addrmap(AS_IO, &divebomb_state::divebomb_rozcpu_iomap);
+	Z80(config, m_spritecpu, XTAL1 / 4); // ?
+	m_spritecpu->set_addrmap(AS_PROGRAM, &divebomb_state::spritecpu_map);
+	m_spritecpu->set_addrmap(AS_IO, &divebomb_state::spritecpu_iomap);
+
+	Z80(config, m_rozcpu, XTAL1 / 4); // ?
+	m_rozcpu->set_addrmap(AS_PROGRAM, &divebomb_state::rozcpu_map);
+	m_rozcpu->set_addrmap(AS_IO, &divebomb_state::rozcpu_iomap);
 
 	config.set_perfect_quantum(m_fgcpu);
 
@@ -428,31 +704,31 @@ void divebomb_state::divebomb(machine_config &config)
 	m_k051316[1]->set_offsets(-88, -16);
 	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 0, 256-1-32);
-	screen.set_screen_update(FUNC(divebomb_state::screen_update_divebomb));
+	screen.set_screen_update(FUNC(divebomb_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_fgcpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append_inputline(m_spritecpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append_inputline(m_rozcpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_divebomb);
-	PALETTE(config, m_palette, FUNC(divebomb_state::divebomb_palette), 0x400+0x400+0x400+0x100);
+	PALETTE(config, m_palette, FUNC(divebomb_state::palette), 0x400 + 0x400 + 0x400 + 0x100);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	// All frequencies unverified
-	SN76489(config, "sn0", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn1", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn2", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn3", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn4", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn5", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn0", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn1", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn2", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn3", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn4", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn5", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 
@@ -553,7 +829,7 @@ void divebomb_state::machine_reset()
 	m_fgcpu_irq->in_w<1>(CLEAR_LINE);
 }
 
-
+} // anonymous namespace
 
 /*************************************
  *

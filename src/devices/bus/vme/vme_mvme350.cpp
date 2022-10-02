@@ -130,7 +130,7 @@
 #include "emu.h"
 #include "vme_mvme350.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/68230pit.h"
 
 #define LOG_GENERAL 0x01

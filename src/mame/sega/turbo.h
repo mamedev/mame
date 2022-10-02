@@ -36,6 +36,7 @@ public:
 		, m_videoram(*this, "videoram")
 		, m_sprite_position(*this, "spritepos")
 		, m_samples(*this, "samples")
+		, m_discrete(*this, "discrete")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_digits(*this, "digit%u", 0U)
@@ -57,6 +58,7 @@ protected:
 	required_shared_ptr<uint8_t> m_sprite_position;
 
 	required_device<samples_device> m_samples;
+	optional_device<discrete_device> m_discrete;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

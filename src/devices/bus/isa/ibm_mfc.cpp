@@ -315,7 +315,7 @@ void isa8_ibm_mfc_device::ibm_mfc_w(offs_t offset, uint8_t data)
 		case 0x2:
 		case 0x3:
 		{
-			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(1000));
+			machine().scheduler().perfect_quantum(attotime::from_usec(1000));
 			m_d71055c_0->write(offset, data);
 			break;
 		}

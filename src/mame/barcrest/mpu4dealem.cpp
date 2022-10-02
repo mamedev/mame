@@ -29,6 +29,7 @@ public:
 		: mpu4_state(mconfig, type, tag)
 		, m_dealem_videoram(*this, "dealem_videoram")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 	{
 	}
 
@@ -38,13 +39,18 @@ protected:
 	virtual void video_start() override;
 
 private:
-	optional_shared_ptr<uint8_t> m_dealem_videoram;
 	DECLARE_MACHINE_RESET(dealem_vid);
 	void dealem_palette(palette_device &palette) const;
 	uint32_t screen_update_dealem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<gfxdecode_device> m_gfxdecode;
+
 	void dealem_memmap(address_map &map);
 	TILE_GET_INFO_MEMBER(tile_info);
+
+	optional_shared_ptr<uint8_t> m_dealem_videoram;
+
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	tilemap_t *m_tilemap = nullptr;
 };
 

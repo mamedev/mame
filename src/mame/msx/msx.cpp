@@ -10606,7 +10606,8 @@ ROM_START(hx34)
 	ROM_LOAD("hx33bios.ic7", 0x0000, 0x20000, CRC(8dd5502b) SHA1(5e057526fe39d79e88e7ff1ce02ed669bd38929e))
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("hx34disk.rom", 0x0000, 0x4000, CRC(626b719d) SHA1(c88ef953b21370cbaef5e82575d093d6f9047ec6))
+	// hx34disk.rom has contents of floppy registers at offset 3ff0-3ff7 and mirrored at 3ff8-3fff
+	ROM_LOAD("hx34disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(626b719d) SHA1(c88ef953b21370cbaef5e82575d093d6f9047ec6))
 
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("hx34kfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967))

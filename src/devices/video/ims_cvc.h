@@ -31,7 +31,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return 256; }
+	virtual u32 palette_entries() const noexcept override { return 256; }
 
 	virtual void boot_w(u32 data) { m_boot = data & MASK24; }
 
@@ -176,7 +176,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return 256 + 3; }
+	virtual u32 palette_entries() const noexcept override { return 256 + 3; }
 
 	virtual void microport_map(address_map &map);
 

@@ -5109,7 +5109,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Cream Lemon - Star Trap</description>
 		<year>1987</year>
 		<publisher>ジャスト (Jast)</publisher>
-		<info name="alt_title" value="くりぃむレモン スタートラップ "/>
+		<info name="alt_title" value="くりぃむレモン スタートラップ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="414128">
 				<rom name="startrap-a.d88" size="414128" crc="a537e078" sha1="0a9f717e4877be0457f33b416605fb5213b0680d"/>

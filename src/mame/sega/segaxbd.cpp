@@ -561,7 +561,7 @@ void segaxbd_state::iocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void segaxbd_state::loffire_sync0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+	machine().scheduler().perfect_quantum(attotime::from_usec(10));
 }
 
 
@@ -806,7 +806,7 @@ void segaxbd_state::update_main_irqs()
 	if (irq)
 	{
 		m_maincpu->set_input_line(irq, ASSERT_LINE);
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 	}
 }
 
@@ -819,7 +819,7 @@ void segaxbd_state::update_main_irqs()
 WRITE_LINE_MEMBER(segaxbd_state::m68k_reset_callback)
 {
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 

@@ -1194,7 +1194,7 @@ bool input_manager::map_device_to_controller(const devicemap_table &table)
 			{
 				// remap devindex
 				input_devclass->remap_device_index(device->devindex(), devindex);
-				osd_printf_verbose("Input: Remapped %s #%d: %s (device id: %s)\n", input_devclass->name(), devindex, device->name(), device->id());
+				osd_printf_verbose("Input: Remapped %s #%d: %s (device id: %s)\n", input_devclass->name(), devindex + 1, device->name(), device->id());
 
 				break;
 			}

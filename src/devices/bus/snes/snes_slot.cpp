@@ -88,11 +88,11 @@ device_sns_cart_interface::~device_sns_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sns_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_sns_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(SNSSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -669,7 +669,7 @@ image_init_result base_sns_cart_slot_device::call_load()
 
 		len = !loaded_through_softlist() ? (length() - offset) : get_software_region_length("rom");
 
-		m_cart->rom_alloc(len, tag());
+		m_cart->rom_alloc(len);
 		ROM = m_cart->get_rom_base();
 		if (!loaded_through_softlist())
 			fread(ROM, len);
@@ -851,37 +851,37 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 		switch (m_addon)
 		{
 			case ADDON_DSP1:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP1B:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP2:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP3:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP4:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_ST010:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x11000);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
 				break;
 			case ADDON_ST011:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x11000);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
 				break;
