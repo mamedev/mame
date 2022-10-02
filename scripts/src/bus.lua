@@ -3913,6 +3913,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/epson_qx/keyboard/keyboard.h,BUSES["EPSON_QX_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["EPSON_QX_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/matrix.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/matrix.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/pce/pce_slot.h,BUSES["PCE"] = true
 ---------------------------------------------------
 if (BUSES["PCE"]~=null) then
