@@ -26,8 +26,13 @@
 **
 **
 ** Todo/known issues:
-** - general: - Add support for kana lock?
-** -           - Expansion slots not emulated
+** - internal:
+**   - Redo the memory handling to get rid of most trampolines and possible
+**     code duplication between msx_slot and msx_cart (eg, kanji roms, disk interfaces)
+**   - move subslot register ownership and handling from the main emuation to the
+**     slot owners (the system itself or cartridge slot expanders)
+** - general: - Add support for kana lock
+** -          - Expansion slots not emulated
 ** - kanji: The direct rom dump from FS-A1FX shows that the kanji font roms are accessed slightly differently. Most
 **          existing kanji font roms may haven been dumped from inside a running machine. Are all other kanji font
 **          roms bad? We need more direct rom dumps to know for sure.
@@ -1603,7 +1608,7 @@ uint8_t msx_state::ppi_port_b_r()
 
 /************************************************************************
  *
- * New memory emulation !!
+ * New memory emulation
  *
  ***********************************************************************/
 
@@ -3625,21 +3630,21 @@ void msx_state::canonv20e(machine_config &config)
 
 ROM_START(canonv20f)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("v20fbios.rom", 0x0000, 0x8000, CRC(e0e894b7) SHA1(d99eebded5db5fce1e072d08e642c0909bc7efdd)) // need verification
+	ROM_LOAD("v20fbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(e0e894b7) SHA1(d99eebded5db5fce1e072d08e642c0909bc7efdd)) // need verification
 ROM_END
 
 /* MSX - Canon V-20G */
 
 ROM_START(canonv20g)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("v20gbios.rom", 0x0000, 0x8000, CRC(d6e704ad) SHA1(d67be6d7d56d7229418f4e122f2ec27990db7d19)) // need verification
+	ROM_LOAD("v20gbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(d6e704ad) SHA1(d67be6d7d56d7229418f4e122f2ec27990db7d19)) // need verification
 ROM_END
 
 /* MSX - Canon V-20S */
 
 ROM_START(canonv20s)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("v20sbios.rom", 0x0000, 0x8000, CRC(c72b186e) SHA1(9fb289ea5c11d497ee00703f64e82575d1c59923)) // need verification
+	ROM_LOAD("v20sbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(c72b186e) SHA1(9fb289ea5c11d497ee00703f64e82575d1c59923)) // need verification
 ROM_END
 
 /* MSX - Casio MX-10 */
@@ -3692,7 +3697,7 @@ void msx_state::mx15(machine_config &config)
 
 ROM_START(mx101)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("3256d19-5k3_z-1", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+	ROM_LOAD("3256d19-5k3_z-1", 0x0000, 0x8000, BAD_DUMP CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
 ROM_END
 
 void msx_state::mx101(machine_config &config)
@@ -3768,10 +3773,10 @@ void msx_state::pv16(machine_config &config)
 
 ROM_START(cpc88)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("88bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78)) // need verification
+	ROM_LOAD("88bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78)) // need verification
 
 	ROM_REGION(0x4000, "hangul", 0)
-	ROM_LOAD("88han.rom",  0x0000, 0x2000, CRC(938db440) SHA1(d41676fde0a3047792f93c4a41509b8749e55e74)) // need verification
+	ROM_LOAD("88han.rom",  0x0000, 0x2000, BAD_DUMP CRC(938db440) SHA1(d41676fde0a3047792f93c4a41509b8749e55e74)) // need verification
 	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
 
@@ -3904,7 +3909,7 @@ ROM_START(cpc50a)
 	ROM_REGION(0x8000, "mainrom", 0)
 	// HM6264LP-15 / U0422880 (ic4)
 	// GMCE? VER1.01 (ic5)
-	ROM_LOAD("50abios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492)) // need verification
+	ROM_LOAD("50abios.rom", 0x0000, 0x8000, BAD_DUMP CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492)) // need verification
 ROM_END
 
 void msx_state::cpc50a(machine_config &config)
@@ -3931,7 +3936,7 @@ void msx_state::cpc50a(machine_config &config)
 
 ROM_START(cpc50b)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("50bbios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492)) // need verification
+	ROM_LOAD("50bbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492)) // need verification
 ROM_END
 
 void msx_state::cpc50b(machine_config &config)
@@ -3987,8 +3992,8 @@ void msx_state::cpc51(machine_config &config)
 
 ROM_START(dgnmsx)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("uk1msx048.ic37", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7)) // need verification
-	ROM_LOAD("uk2msx058.ic6",  0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62)) // need verification
+	ROM_LOAD("uk1msx048.ic37", 0x0000, 0x4000, BAD_DUMP CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7)) // need verification
+	ROM_LOAD("uk2msx058.ic6",  0x4000, 0x4000, BAD_DUMP CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62)) // need verification
 ROM_END
 
 void msx_state::dgnmsx(machine_config &config)
@@ -4017,7 +4022,7 @@ void msx_state::dgnmsx(machine_config &config)
 
 ROM_START(fdpc200)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("dpc200bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
+	ROM_LOAD("dpc200bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
 ROM_END
 
 void msx_state::fdpc200(machine_config &config)
@@ -4039,7 +4044,7 @@ void msx_state::fdpc200(machine_config &config)
 
 ROM_START(fpc500)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("fpc500bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
+	ROM_LOAD("fpc500bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
 ROM_END
 
 void msx_state::fpc500(machine_config &config)
@@ -4226,13 +4231,13 @@ void msx_state::gsfc200(machine_config &config)
 
 ROM_START(gfc1080)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("gfc1080bios.rom", 0x0000, 0x8000, CRC(d9cdd4a6) SHA1(6b0be712b9c95c1e912252ab5703e1c0bc457d9e)) // need verification
+	ROM_LOAD("gfc1080bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(d9cdd4a6) SHA1(6b0be712b9c95c1e912252ab5703e1c0bc457d9e)) // need verification
 
 	ROM_REGION(0x4000, "hangul", 0)
-	ROM_LOAD("gfc1080han.rom", 0x0000, 0x4000, CRC(f209448c) SHA1(141b44212ba28e7d03e0b54126fedd9e0807dc42)) // need verification
+	ROM_LOAD("gfc1080han.rom", 0x0000, 0x4000, BAD_DUMP CRC(f209448c) SHA1(141b44212ba28e7d03e0b54126fedd9e0807dc42)) // need verification
 
 	ROM_REGION(0x4000, "pasocalc", 0)
-	ROM_LOAD("gfc1080pasocalc.rom", 0x0000, 0x4000, CRC(4014f7ea) SHA1(a5581fa3ce10f90f15ba3dc53d57b02d6e4af172)) // need verification
+	ROM_LOAD("gfc1080pasocalc.rom", 0x0000, 0x4000, BAD_DUMP CRC(4014f7ea) SHA1(a5581fa3ce10f90f15ba3dc53d57b02d6e4af172)) // need verification
 ROM_END
 
 void msx_state::gfc1080(machine_config &config)
@@ -4256,10 +4261,10 @@ void msx_state::gfc1080(machine_config &config)
 
 ROM_START(gfc1080a)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("gfc1080abios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78)) // need verification
+	ROM_LOAD("gfc1080abios.rom", 0x0000, 0x8000, BAD_DUMP CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78)) // need verification
 
 	ROM_REGION(0x4000, "hangul", 0)
-	ROM_LOAD("gfc1080ahan.rom", 0x0000, 0x2000, CRC(0cdb8501) SHA1(58dbe73ae80c2c409e766c3ace730ecd7bec89d0)) // need verification
+	ROM_LOAD("gfc1080ahan.rom", 0x0000, 0x2000, BAD_DUMP CRC(0cdb8501) SHA1(58dbe73ae80c2c409e766c3ace730ecd7bec89d0)) // need verification
 	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
 
@@ -4283,7 +4288,7 @@ void msx_state::gfc1080a(machine_config &config)
 
 ROM_START(expert13)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("expbios13.rom", 0x0000, 0x8000, CRC(5638bc38) SHA1(605f5af3f358c6811f54e0173bad908614a198c0)) // need verification
+	ROM_LOAD("expbios13.rom", 0x0000, 0x8000, BAD_DUMP CRC(5638bc38) SHA1(605f5af3f358c6811f54e0173bad908614a198c0)) // need verification
 ROM_END
 
 void msx_state::expert13(machine_config &config)
@@ -4432,7 +4437,7 @@ void msx_state::mbh1(machine_config &config)
 
 ROM_START(mbh1e)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("mbh1bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+	ROM_LOAD("mbh1bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
 ROM_END
 
 void msx_state::mbh1e(machine_config &config)
@@ -4483,7 +4488,7 @@ void msx_state::mbh2(machine_config &config)
 
 ROM_START(mbh25)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("mbh25bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+	ROM_LOAD("mbh25bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
 ROM_END
 
 void msx_state::mbh25(machine_config &config)
@@ -4584,7 +4589,7 @@ void msx_state::ml8000(machine_config &config)
 ROM_START(mlf48)
 	ROM_REGION(0x8000, "mainrom", 0)
 	// 4j3 hn613256p m82 ?
-	ROM_LOAD("mlf48bios.ic2d", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e)) // needs verification
+	ROM_LOAD("mlf48bios.ic2d", 0x0000, 0x8000, BAD_DUMP CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e)) // needs verification
 ROM_END
 
 void msx_state::mlf48(machine_config &config)
@@ -4882,16 +4887,16 @@ void msx_state::fs4000(machine_config &config)
 
 ROM_START(fs4000a)
 	ROM_REGION(0x8000 ,"mainrom", 0)
-	ROM_LOAD("4000bios.rom",  0x0000, 0x8000, CRC(071135e0) SHA1(df48902f5f12af8867ae1a87f255145f0e5e0774)) // need verification
+	ROM_LOAD("4000bios.rom",  0x0000, 0x8000, BAD_DUMP CRC(071135e0) SHA1(df48902f5f12af8867ae1a87f255145f0e5e0774)) // need verification
 
 	ROM_REGION(0x8000, "word", 0)
-	ROM_LOAD("4000wora.rom",  0x0000, 0x8000, CRC(52f4cdf7) SHA1(acbac3cb5b700254bed2cacc19fa54f1950f371d)) // need verification
+	ROM_LOAD("4000wora.rom",  0x0000, 0x8000, BAD_DUMP CRC(52f4cdf7) SHA1(acbac3cb5b700254bed2cacc19fa54f1950f371d)) // need verification
 
 	ROM_REGION(0x8000, "kdr", 0)
-	ROM_LOAD("4000kdra.rom", 0x0000, 0x8000, CRC(b2db6bf5) SHA1(3a9a942ed888dd641cddf8deada1879c454df3c6)) // need verification
+	ROM_LOAD("4000kdra.rom", 0x0000, 0x8000, BAD_DUMP CRC(b2db6bf5) SHA1(3a9a942ed888dd641cddf8deada1879c454df3c6)) // need verification
 
 	ROM_REGION(0x20000, "kanji", 0)
-	ROM_LOAD("4000kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b)) // need verification
+	ROM_LOAD("4000kfn.rom", 0, 0x20000, BAD_DUMP CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b)) // need verification
 ROM_END
 
 void msx_state::fs4000a(machine_config &config)
@@ -4944,7 +4949,7 @@ void msx_state::phc2(machine_config &config)
 
 ROM_START(phc28)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("phc28bios.rom", 0x0000, 0x8000, CRC(eceb2802) SHA1(195950173701abeb460a1a070d83466f3f53b337)) // need verification
+	ROM_LOAD("phc28bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(eceb2802) SHA1(195950173701abeb460a1a070d83466f3f53b337)) // need verification
 ROM_END
 
 void msx_state::phc28(machine_config &config)
@@ -5303,10 +5308,10 @@ void msx_state::piopxv60(machine_config &config)
 
 ROM_START(ax150)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("ax150bios.rom", 0x0000, 0x8000, CRC(bd95c436) SHA1(5e094fca95ab8e91873ee372a3f1239b9a48a48d)) // need verification
+	ROM_LOAD("ax150bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(bd95c436) SHA1(5e094fca95ab8e91873ee372a3f1239b9a48a48d)) // need verification
 
 	ROM_REGION(0x8000, "arabic", 0)
-	ROM_LOAD("ax150arab.rom", 0x0000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb)) // need verification
+	ROM_LOAD("ax150arab.rom", 0x0000, 0x8000, BAD_DUMP CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb)) // need verification
 ROM_END
 
 void msx_state::ax150(machine_config &config)
@@ -5360,10 +5365,10 @@ void msx_state::ax170(machine_config &config)
 
 ROM_START (ax200)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("ax200bios.rom", 0x0000, 0x8000, CRC(cae98b30) SHA1(079c018739c37485f3d64ef2145a0267fce6e20e)) // need verification
+	ROM_LOAD("ax200bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(cae98b30) SHA1(079c018739c37485f3d64ef2145a0267fce6e20e)) // need verification
 
 	ROM_REGION(0x8000, "arabic", 0)
-	ROM_LOAD("ax200arab.rom", 0x0000, 0x8000, CRC(b041e610) SHA1(7574cc5655805ea316011a8123b064917f06f83c)) // need verification
+	ROM_LOAD("ax200arab.rom", 0x0000, 0x8000, BAD_DUMP CRC(b041e610) SHA1(7574cc5655805ea316011a8123b064917f06f83c)) // need verification
 ROM_END
 
 void msx1_v9938_state::ax200(machine_config &config)
@@ -5391,10 +5396,10 @@ void msx1_v9938_state::ax200(machine_config &config)
 
 ROM_START (ax200m)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("ax200bios.rom", 0x0000, 0x8000, CRC(cae98b30) SHA1(079c018739c37485f3d64ef2145a0267fce6e20e)) // need verification
+	ROM_LOAD("ax200bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(cae98b30) SHA1(079c018739c37485f3d64ef2145a0267fce6e20e)) // need verification
 
 	ROM_REGION(0x8000, "arabic", 0)
-	ROM_LOAD("ax200arab.rom", 0x0000, 0x8000, CRC(b041e610) SHA1(7574cc5655805ea316011a8123b064917f06f83c)) // need verification
+	ROM_LOAD("ax200arab.rom", 0x0000, 0x8000, BAD_DUMP CRC(b041e610) SHA1(7574cc5655805ea316011a8123b064917f06f83c)) // need verification
 ROM_END
 
 void msx1_v9938_state::ax200m(machine_config &config)
@@ -5458,10 +5463,10 @@ void msx_state::ax230(machine_config &config)
 
 ROM_START(spc800)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("spc800bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78)) // need verification
+	ROM_LOAD("spc800bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78)) // need verification
 
 	ROM_REGION(0x4000, "hangul", 0)
-	ROM_LOAD("spc800han.rom",  0x0000, 0x4000, CRC(5ae2b013) SHA1(1e7616261a203580c1044205ad8766d104f1d874)) // need verification
+	ROM_LOAD("spc800han.rom",  0x0000, 0x4000, BAD_DUMP CRC(5ae2b013) SHA1(1e7616261a203580c1044205ad8766d104f1d874)) // need verification
 ROM_END
 
 void msx_state::spc800(machine_config &config)
@@ -5493,7 +5498,7 @@ void msx_state::spc800(machine_config &config)
 ROM_START(mpc64)
 	ROM_REGION(0x8000, "mainrom", 0)
 	// hn613256p t22 5c1 ?
-	ROM_LOAD("mpc64bios.ic111", 0x0000, 0x8000, CRC(d6e704ad) SHA1(d67be6d7d56d7229418f4e122f2ec27990db7d19)) // needs verification
+	ROM_LOAD("mpc64bios.ic111", 0x0000, 0x8000, BAD_DUMP CRC(d6e704ad) SHA1(d67be6d7d56d7229418f4e122f2ec27990db7d19)) // needs verification
 ROM_END
 
 void msx_state::mpc64(machine_config &config)
@@ -5536,7 +5541,7 @@ void msx_state::mpc100(machine_config &config)
 
 ROM_START(mpc200)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("mpc200bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e)) // need verification
+	ROM_LOAD("mpc200bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e)) // need verification
 ROM_END
 
 void msx_state::mpc200(machine_config &config)
@@ -5559,7 +5564,7 @@ void msx_state::mpc200(machine_config &config)
 
 ROM_START(mpc200sp)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("mpcsp200bios.rom", 0x0000, 0x8000, CRC(bcd79900) SHA1(fc8c2b69351e60dc902add232032c2d69f00e41e)) // need verification
+	ROM_LOAD("mpcsp200bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(bcd79900) SHA1(fc8c2b69351e60dc902add232032c2d69f00e41e)) // need verification
 ROM_END
 
 void msx_state::mpc200sp(machine_config &config)
@@ -5677,7 +5682,7 @@ void msx_state::hb8000(machine_config &config)
 
 ROM_START(hotbi13b)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hotbit13b.rom", 0x0000, 0x8000, CRC(7a19820e) SHA1(e0c2bfb078562d15acabc5831020a2370ea87052)) // need verification
+	ROM_LOAD("hotbit13b.rom", 0x0000, 0x8000, BAD_DUMP CRC(7a19820e) SHA1(e0c2bfb078562d15acabc5831020a2370ea87052)) // need verification
 ROM_END
 
 void msx_state::hotbi13b(machine_config &config)
@@ -5698,7 +5703,7 @@ void msx_state::hotbi13b(machine_config &config)
 
 ROM_START(hotbi13p)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hotbit13p.rom", 0x0000, 0x8000, CRC(150e239c) SHA1(942f9507d206cd8156f15601fe8032fcf0e3875b)) // need verification
+	ROM_LOAD("hotbit13p.rom", 0x0000, 0x8000, BAD_DUMP CRC(150e239c) SHA1(942f9507d206cd8156f15601fe8032fcf0e3875b)) // need verification
 ROM_END
 
 void msx_state::hotbi13p(machine_config &config)
@@ -5877,10 +5882,10 @@ void msx_state::hb501p(machine_config &config)
 
 ROM_START(hb55)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hb55bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+	ROM_LOAD("hb55bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
 
 	ROM_REGION(0x4000, "firmware", 0)
-	ROM_LOAD("hb55note.rom", 0x0000, 0x2000, CRC(5743ab55) SHA1(b9179db93608c4da649532e704f072e0a3ea1b22)) // need verification
+	ROM_LOAD("hb55note.rom", 0x0000, 0x2000, BAD_DUMP CRC(5743ab55) SHA1(b9179db93608c4da649532e704f072e0a3ea1b22)) // need verification
 ROM_END
 
 void msx_state::hb55(machine_config &config)
@@ -5902,8 +5907,8 @@ void msx_state::hb55(machine_config &config)
 
 ROM_START(hb55d)
 	ROM_REGION(0xc000, "maincpu", 0)
-	ROM_LOAD("55dbios.rom", 0x0000, 0x8000, CRC(7e2b32dd) SHA1(38a645febd0e0fe86d594f27c2d14be995acc730)) // need verification
-	ROM_LOAD("55dnote.rom", 0x8000, 0x4000, CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3)) // need verification
+	ROM_LOAD("55dbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(7e2b32dd) SHA1(38a645febd0e0fe86d594f27c2d14be995acc730)) // need verification
+	ROM_LOAD("55dnote.rom", 0x8000, 0x4000, BAD_DUMP CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3)) // need verification
 ROM_END
 
 void msx_state::hb55d(machine_config &config)
@@ -6095,7 +6100,7 @@ void msx_state::hb101p(machine_config &config)
 
 ROM_START(hb701fd)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hb701fdbios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+	ROM_LOAD("hb701fdbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	// FDC register contents at 3ff8-3fff
@@ -6190,16 +6195,16 @@ void msx1_v9938_state::svi738(machine_config &config)
 
 ROM_START(svi738ar)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("738arbios.rom", 0x0000, 0x8000, CRC(ad007d62) SHA1(c53b3f2c00f31683914f7452f3f4d94ae2929c0d)) // need verification
+	ROM_LOAD("738arbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ad007d62) SHA1(c53b3f2c00f31683914f7452f3f4d94ae2929c0d)) // need verification
 
 	ROM_REGION(0x8000, "arab", 0)
-	ROM_LOAD("738arab.rom",  0x0000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb)) // need verification
+	ROM_LOAD("738arab.rom",  0x0000, 0x8000, BAD_DUMP CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("738ardisk.rom", 0x0000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4)) // meed verification
+	ROM_LOAD("738ardisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4)) // meed verification
 
 	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
-	ROM_LOAD("738ar232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
+	ROM_LOAD("738ar232c.rom", 0x0000, 0x2000, BAD_DUMP CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
 ROM_END
 
 void msx1_v9938_state::svi738ar(machine_config &config)
@@ -6212,13 +6217,13 @@ void msx1_v9938_state::svi738ar(machine_config &config)
 
 ROM_START(svi738dk)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("738dkbios.rom", 0x0000, 0x8000, CRC(88720320) SHA1(1bda5af20cb86565bdc1ebd1e59a691fed7f9256)) // need verification
+	ROM_LOAD("738dkbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(88720320) SHA1(1bda5af20cb86565bdc1ebd1e59a691fed7f9256)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("738dkdisk.rom", 0x0000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7)) // need verification
+	ROM_LOAD("738dkdisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7)) // need verification
 
 	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
-	ROM_LOAD("738dk232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
+	ROM_LOAD("738dk232c.rom", 0x0000, 0x2000, BAD_DUMP CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
 ROM_END
 
 /* MSX - Spectravideo SVI-738 German */
@@ -6227,26 +6232,26 @@ ROM_END
 
 ROM_START(svi738pl)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("738plbios.rom", 0x0000, 0x8000, CRC(431b8bf5) SHA1(c90077ed84133a947841e07856e71133ba779da6)) // IC51 on board, need verification
+	ROM_LOAD("738plbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(431b8bf5) SHA1(c90077ed84133a947841e07856e71133ba779da6)) // IC51 on board, need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("738disk.rom",   0x0000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4)) // need verification
+	ROM_LOAD("738disk.rom",   0x0000, 0x4000, BAD_DUMP CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4)) // need verification
 
 	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
-	ROM_LOAD("738232c.rom",   0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
+	ROM_LOAD("738232c.rom",   0x0000, 0x2000, BAD_DUMP CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
 ROM_END
 
 /* MSX - Spectravideo SVI-738 Spanish */
 
 ROM_START(svi738sp)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("738spbios.rom", 0x0000, 0x8000, CRC(f0c0cbb9) SHA1(5f04d5799ed72ea4993e7c4302a1dd55ac1ea8cd)) // need verification
+	ROM_LOAD("738spbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(f0c0cbb9) SHA1(5f04d5799ed72ea4993e7c4302a1dd55ac1ea8cd)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("738spdisk.rom", 0x0000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7)) // need verification
+	ROM_LOAD("738spdisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7)) // need verification
 
 	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
-	ROM_LOAD("738sp232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
+	ROM_LOAD("738sp232c.rom", 0x0000, 0x2000, BAD_DUMP CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
 ROM_END
 
 /* MSX - Spectravideo SVI-738 Swedish/Finnish */
@@ -6273,7 +6278,7 @@ ROM_END
 // International keyboard
 ROM_START(tadpc200b)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("dpc200altbios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
+	ROM_LOAD("dpc200altbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
 ROM_END
 
 void msx_state::tadpc200(machine_config &config)
@@ -6295,7 +6300,7 @@ void msx_state::tadpc200(machine_config &config)
 
 ROM_START(tadpc200a)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("dpc200abios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
+	ROM_LOAD("dpc200abios.rom", 0x0000, 0x8000, BAD_DUMP CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
 ROM_END
 
 void msx1_v9938_state::tadpc200a(machine_config &config)
@@ -6365,7 +6370,7 @@ void msx_state::hx10d(machine_config &config)
 
 ROM_START(hx10dp)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hx10dpbios.ic2", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+	ROM_LOAD("hx10dpbios.ic2", 0x0000, 0x8000, BAD_DUMP CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
 ROM_END
 
 void msx_state::hx10dp(machine_config &config)
@@ -6388,7 +6393,7 @@ void msx_state::hx10dp(machine_config &config)
 
 ROM_START(hx10e)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hx10ebios.rom", 0x0000, 0x8000, CRC(5486b711) SHA1(4dad9de7c28b452351cc12910849b51bd9a37ab3)) // need verification
+	ROM_LOAD("hx10ebios.rom", 0x0000, 0x8000, BAD_DUMP CRC(5486b711) SHA1(4dad9de7c28b452351cc12910849b51bd9a37ab3)) // need verification
 ROM_END
 
 void msx_state::hx10e(machine_config &config)
@@ -6409,7 +6414,7 @@ void msx_state::hx10e(machine_config &config)
 
 ROM_START(hx10f)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hx10fbios.rom", 0x0000, 0x8000, CRC(e0e894b7) SHA1(d99eebded5db5fce1e072d08e642c0909bc7efdd)) // need verification
+	ROM_LOAD("hx10fbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(e0e894b7) SHA1(d99eebded5db5fce1e072d08e642c0909bc7efdd)) // need verification
 ROM_END
 
 void msx_state::hx10f(machine_config &config)
@@ -6455,7 +6460,7 @@ void msx_state::hx10s(machine_config &config)
 
 ROM_START(hx10sa)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hx10sabios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+	ROM_LOAD("hx10sabios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
 ROM_END
 
 void msx_state::hx10sa(machine_config &config)
@@ -6539,10 +6544,10 @@ void msx_state::hx20e(machine_config &config)
 
 ROM_START(hx20i)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hx20ibios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
+	ROM_LOAD("hx20ibios.rom", 0x0000, 0x8000, BAD_DUMP CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
 
 	ROM_REGION(0x8000, "firmware", 0)
-	ROM_LOAD("hx20iword.rom", 0x0000, 0x8000, CRC(39b3e1c0) SHA1(9f7cfa932bd7dfd0d9ecaadc51655fb557c2e125)) // need verification
+	ROM_LOAD("hx20iword.rom", 0x0000, 0x8000, BAD_DUMP CRC(39b3e1c0) SHA1(9f7cfa932bd7dfd0d9ecaadc51655fb557c2e125)) // need verification
 ROM_END
 
 void msx_state::hx20i(machine_config &config)
@@ -6594,10 +6599,10 @@ void msx_state::hx21(machine_config &config)
 
 ROM_START(hx21f)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hx21fbios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
+	ROM_LOAD("hx21fbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
 
 	ROM_REGION(0x8000, "firmware", 0)
-	ROM_LOAD("hx21fword.rom", 0x0000, 0x8000, CRC(f9e29c66) SHA1(3289336b2c12161fd926a7e5ce865770ae7038af)) // need verification
+	ROM_LOAD("hx21fword.rom", 0x0000, 0x8000, BAD_DUMP CRC(f9e29c66) SHA1(3289336b2c12161fd926a7e5ce865770ae7038af)) // need verification
 ROM_END
 
 void msx_state::hx21f(machine_config &config)
@@ -6745,7 +6750,7 @@ void msx_state::hx51i(machine_config &config)
 
 ROM_START(hc5)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hc5bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+	ROM_LOAD("hc5bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
 ROM_END
 
 void msx_state::hc5(machine_config &config)
@@ -6767,7 +6772,7 @@ void msx_state::hc5(machine_config &config)
 
 ROM_START(hc6)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hc6bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+	ROM_LOAD("hc6bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
 ROM_END
 
 void msx_state::hc6(machine_config &config)
@@ -7161,7 +7166,7 @@ void msx1_v9938_state::y503iir(machine_config &config)
 
 ROM_START(y503iir2)
 	ROM_REGION(0x10000, "mainrom", 0)
-	ROM_LOAD("yis503ii2bios.rom", 0x0000, 0x8000, CRC(1548cee3) SHA1(42c7fff25b1bd90776ac0aea971241aedce8947d)) // need verification
+	ROM_LOAD("yis503ii2bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(1548cee3) SHA1(42c7fff25b1bd90776ac0aea971241aedce8947d)) // need verification
 // This is in the module slot by default
 // ROM_LOAD("yis503iirnet.rom",  0xc000, 0x2000, CRC(0731db3f) SHA1(264fbb2de69fdb03f87dc5413428f6aa19511a7f))
 ROM_END
@@ -7215,7 +7220,7 @@ void msx_state::yc64(machine_config &config)
 
 ROM_START(mx64)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("tmm23256p_7953.ic2d", 0x0000, 0x8000, CRC(e0e894b7) SHA1(d99eebded5db5fce1e072d08e642c0909bc7efdd)) // need verification
+	ROM_LOAD("tmm23256p_7953.ic2d", 0x0000, 0x8000, BAD_DUMP CRC(e0e894b7) SHA1(d99eebded5db5fce1e072d08e642c0909bc7efdd)) // need verification
 ROM_END
 
 void msx_state::mx64(machine_config &config)
@@ -7370,13 +7375,13 @@ void msx2_state::cpc300e(machine_config &config)
 
 ROM_START(cpc330k)
 	ROM_REGION(0x18000, "mainrom", 0)
-	ROM_LOAD("330kbios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d)) // need verification
+	ROM_LOAD("330kbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d)) // need verification
 
 	ROM_REGION(0x8000, "subrom", 0)
-	ROM_LOAD("330kext.rom",  0x0000, 0x8000, CRC(5d685cca) SHA1(97afbadd8fe34ab658cce8222a27cdbe19bcef39)) // need verification
+	ROM_LOAD("330kext.rom",  0x0000, 0x8000, BAD_DUMP CRC(5d685cca) SHA1(97afbadd8fe34ab658cce8222a27cdbe19bcef39)) // need verification
 
 	ROM_REGION(0x8000, "hangul", 0)
-	ROM_LOAD("330khan.rom", 0x0000, 0x4000, CRC(3d6dd335) SHA1(d2b058989a700ca772b9591f42c01ed0f45f74d6)) // need verification
+	ROM_LOAD("330khan.rom", 0x0000, 0x4000, BAD_DUMP CRC(3d6dd335) SHA1(d2b058989a700ca772b9591f42c01ed0f45f74d6)) // need verification
 ROM_END
 
 void msx2_state::cpc330k(machine_config &config)
@@ -7401,19 +7406,19 @@ void msx2_state::cpc330k(machine_config &config)
 
 ROM_START(cpc400)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("400bios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d)) // need verification
+	ROM_LOAD("400bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("400disk.rom", 0x0000, 0x4000, CRC(5fa517df) SHA1(914f6ccb25d78621186001f2f5e2aaa2d628cd0c)) // need verification
+	ROM_LOAD("400disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(5fa517df) SHA1(914f6ccb25d78621186001f2f5e2aaa2d628cd0c)) // need verification
 
 	ROM_REGION(0x8000, "subrom", 0)
-	ROM_LOAD("400ext.rom",  0x0000, 0x8000, CRC(2ba104a3) SHA1(b6d3649a6647fa9f6bd61efc317485a20901128f)) // need verification
+	ROM_LOAD("400ext.rom",  0x0000, 0x8000, BAD_DUMP CRC(2ba104a3) SHA1(b6d3649a6647fa9f6bd61efc317485a20901128f)) // need verification
 
 	ROM_REGION(0x8000, "hangul", 0)
-	ROM_LOAD("400han.rom", 0x0000, 0x8000, CRC(a8ead5e3) SHA1(87936f808423dddfd00629056d6807b4be1dc63e)) // need verification
+	ROM_LOAD("400han.rom", 0x0000, 0x8000, BAD_DUMP CRC(a8ead5e3) SHA1(87936f808423dddfd00629056d6807b4be1dc63e)) // need verification
 
 	ROM_REGION(0x20000, "kanji", 0)
-	ROM_LOAD("400kfn.rom", 0, 0x20000, CRC(b663c605) SHA1(965f4982790f1817bcbabbb38c8777183b231a55)) // need verification
+	ROM_LOAD("400kfn.rom", 0, 0x20000, BAD_DUMP CRC(b663c605) SHA1(965f4982790f1817bcbabbb38c8777183b231a55)) // need verification
 ROM_END
 
 void msx2_state::cpc400(machine_config &config)
@@ -7505,13 +7510,13 @@ void msx2_state::cpc61(machine_config &config)
 
 ROM_START(cpg120)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("cpg120bios.rom", 0x0000, 0x8000, CRC(b80c8e45) SHA1(310a02a9746bc062834e0cf2fabf7f3e0f7e829e)) // need verification
+	ROM_LOAD("cpg120bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(b80c8e45) SHA1(310a02a9746bc062834e0cf2fabf7f3e0f7e829e)) // need verification
 
 	ROM_REGION(0x8000, "subrom", 0)
-	ROM_LOAD("cpg120ext.rom", 0x0000, 0x8000, CRC(b3d740b4) SHA1(7121c3c5ee6e4931fceda14a06f4c0e3b8eda437)) // need verification
+	ROM_LOAD("cpg120ext.rom", 0x0000, 0x8000, BAD_DUMP CRC(b3d740b4) SHA1(7121c3c5ee6e4931fceda14a06f4c0e3b8eda437)) // need verification
 
 	ROM_REGION(0x4000, "music", 0)
-	ROM_LOAD("cpg128music.rom", 0x0000, 0x4000, CRC(73491999) SHA1(b9ee4f30a36e283a2b1b9a28a70ab9b9831570c6)) // need verification
+	ROM_LOAD("cpg128music.rom", 0x0000, 0x4000, BAD_DUMP CRC(73491999) SHA1(b9ee4f30a36e283a2b1b9a28a70ab9b9831570c6)) // need verification
 ROM_END
 
 void msx2_state::cpg120(machine_config &config)
@@ -7547,13 +7552,13 @@ void msx2_state::cpg120(machine_config &config)
 
 ROM_START(fpc900)
 	ROM_REGION(0x10000, "mainrom", 0)
-	ROM_LOAD("fpc900bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e)) // need verification
+	ROM_LOAD("fpc900bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("fpc900ext.rom", 0x0000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02)) // need verification
+	ROM_LOAD("fpc900ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("fpc900disk.rom", 0x0000, 0x4000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef)) // need verification
+	ROM_LOAD("fpc900disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef)) // need verification
 ROM_END
 
 void msx2_state::fpc900(machine_config &config)
@@ -7649,19 +7654,19 @@ void msx2_state::mbh3(machine_config &config)
 
 ROM_START(mbh70)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("mbh70bios.rom"    , 0x0000,   0x8000, CRC(a27c563d) SHA1(c1e46c00f1e38fc9e0ab487bf0513bd93ce61f3f)) // need verification
+	ROM_LOAD("mbh70bios.rom" , 0x0000, 0x8000, BAD_DUMP CRC(a27c563d) SHA1(c1e46c00f1e38fc9e0ab487bf0513bd93ce61f3f)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("mbh70ext.rom", 0x0000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // need verification
+	ROM_LOAD("mbh70ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("mbh70disk.rom", 0x0000, 0x4000, CRC(05661a3f) SHA1(e695fc0c917577a3183901a08ca9e5f9c60b8317)) // need verification
+	ROM_LOAD("mbh70disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(05661a3f) SHA1(e695fc0c917577a3183901a08ca9e5f9c60b8317)) // need verification
 
 	ROM_REGION(0x100000, "firmware", 0)
-	ROM_LOAD("mbh70halnote.rom", 0x0000, 0x100000, CRC(40313fec) SHA1(1af617bfd11b10a71936c606174a80019762ea71)) // need verification
+	ROM_LOAD("mbh70halnote.rom", 0x0000, 0x100000, BAD_DUMP CRC(40313fec) SHA1(1af617bfd11b10a71936c606174a80019762ea71)) // need verification
 
 	ROM_REGION(0x20000, "kanji", 0)
-	ROM_LOAD("mbh70kfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967)) // need verification
+	ROM_LOAD("mbh70kfn.rom", 0x0000, 0x20000, BAD_DUMP CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967)) // need verification
 ROM_END
 
 void msx2_state::mbh70(machine_config &config)
@@ -7690,20 +7695,20 @@ void msx2_state::mbh70(machine_config &config)
 
 ROM_START(kmc5000)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("kmc5000bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
+	ROM_LOAD("kmc5000bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("kmc5000ext.rom", 0x0000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344)) // need verification
+	ROM_LOAD("kmc5000ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	// FDC register contents at 3ff8-3fff
 	ROM_LOAD("kmc5000disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(e25cacca) SHA1(607cfca605eaf82e3efa33459d6583efb7ecc13b)) // need verification
 
 	ROM_REGION(0x8000, "kdr", 0)
-	ROM_LOAD("kmc5000kdr.rom", 0x0000, 0x8000, CRC(2dbea5ec) SHA1(ea35cc2cad9cfdf56cae224d8ee41579de37f000)) // need verification
+	ROM_LOAD("kmc5000kdr.rom", 0x0000, 0x8000, BAD_DUMP CRC(2dbea5ec) SHA1(ea35cc2cad9cfdf56cae224d8ee41579de37f000)) // need verification
 
 	ROM_REGION(0x20000, "kanji", 0)
-	ROM_LOAD("kmc5000kfn.rom", 0, 0x20000, CRC(c61ddc5d) SHA1(5e872d5853698731a0ed22fb72dbcdfd59cd19c3)) // need verification
+	ROM_LOAD("kmc5000kfn.rom", 0, 0x20000, BAD_DUMP CRC(c61ddc5d) SHA1(5e872d5853698731a0ed22fb72dbcdfd59cd19c3)) // need verification
 ROM_END
 
 void msx2_state::kmc5000(machine_config &config)
@@ -8707,13 +8712,13 @@ void msx2_state::nms8255(machine_config &config)
 
 ROM_START(nms8255f)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("nms8255fbios.rom", 0x0000, 0x8000, CRC(5cd35ced) SHA1(b034764e6a8978db60b1d652917f5e24a66a7925)) // need verification
+	ROM_LOAD("nms8255fbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(5cd35ced) SHA1(b034764e6a8978db60b1d652917f5e24a66a7925)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("nms8255fext.rom",  0x0000, 0x4000, CRC(781ba055) SHA1(fd4bcc81a8160a1dea06036c5f79d200f948f4d6)) // need verification
+	ROM_LOAD("nms8255fext.rom",  0x0000, 0x4000, BAD_DUMP CRC(781ba055) SHA1(fd4bcc81a8160a1dea06036c5f79d200f948f4d6)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("nms8255fdisk.rom", 0x0000, 0x4000, CRC(13b60725) SHA1(58ba1887e8fd21c912b6859cae6514bd874ffcca)) // need verification
+	ROM_LOAD("nms8255fdisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(13b60725) SHA1(58ba1887e8fd21c912b6859cae6514bd874ffcca)) // need verification
 ROM_END
 
 void msx2_state::nms8255f(machine_config &config)
@@ -8781,13 +8786,13 @@ void msx2_state::nms8260(machine_config &config)
 
 ROM_START(nms8280)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("8280bios.rom.ic119", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e)) // need verification
+	ROM_LOAD("8280bios.rom.ic119", 0x0000, 0x8000, BAD_DUMP CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("8280ext.rom.ic118",  0x0000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02)) // need verification
+	ROM_LOAD("8280ext.rom.ic118",  0x0000, 0x4000, BAD_DUMP CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("8280disk.rom.ic117", 0x0000, 0x4000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef)) // need verification
+	ROM_LOAD("8280disk.rom.ic117", 0x0000, 0x4000, BAD_DUMP CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef)) // need verification
 ROM_END
 
 void msx2_state::nms8280(machine_config &config)
@@ -8813,13 +8818,13 @@ void msx2_state::nms8280(machine_config &config)
 
 ROM_START(nms8280f)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("8280fbios.rom", 0x0000, 0x8000, CRC(5cd35ced) SHA1(b034764e6a8978db60b1d652917f5e24a66a7925)) // need verification
+	ROM_LOAD("8280fbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(5cd35ced) SHA1(b034764e6a8978db60b1d652917f5e24a66a7925)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("8280fext.rom",  0x0000, 0x4000, CRC(781ba055) SHA1(fd4bcc81a8160a1dea06036c5f79d200f948f4d6)) // need verification
+	ROM_LOAD("8280fext.rom",  0x0000, 0x4000, BAD_DUMP CRC(781ba055) SHA1(fd4bcc81a8160a1dea06036c5f79d200f948f4d6)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("8280fdisk.rom", 0x0000, 0x4000, CRC(13b60725) SHA1(58ba1887e8fd21c912b6859cae6514bd874ffcca)) // need verification
+	ROM_LOAD("8280fdisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(13b60725) SHA1(58ba1887e8fd21c912b6859cae6514bd874ffcca)) // need verification
 ROM_END
 
 void msx2_state::nms8280f(machine_config &config)
@@ -8845,10 +8850,10 @@ void msx2_state::nms8280f(machine_config &config)
 
 ROM_START(nms8280g)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("8280gbios.rom.ic119", 0x0000, 0x8000, CRC(8fa060e2) SHA1(b17d9bea0eb16a1aa2d0ccbd7c9488da9f57698e)) // need verification
+	ROM_LOAD("8280gbios.rom.ic119", 0x0000, 0x8000, BAD_DUMP CRC(8fa060e2) SHA1(b17d9bea0eb16a1aa2d0ccbd7c9488da9f57698e)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("8280gext.rom.ic118", 0x0000, 0x4000, CRC(41e36d03) SHA1(4ab7b2030d022f5486abaab22aaeaf8aa23e05f3)) // need verification
+	ROM_LOAD("8280gext.rom.ic118", 0x0000, 0x4000, BAD_DUMP CRC(41e36d03) SHA1(4ab7b2030d022f5486abaab22aaeaf8aa23e05f3)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	// FDC register contents at 3ff8-3fff
@@ -8965,15 +8970,15 @@ ROM_START(vg8235f)
 
 	ROM_REGION(0x8000, "mainrom", 0)
 	ROMX_LOAD("8235_39.u48", 0x0000, 0x8000, CRC(5cd35ced) SHA1(b034764e6a8978db60b1d652917f5e24a66a7925), ROM_BIOS(0))
-	ROMX_LOAD("8235_19.u48", 0x0000, 0x8000, CRC(c0577a50) SHA1(3926cdd91fa89657a811463e48cfbdb350676e51), ROM_BIOS(1)) // need verification
+	ROMX_LOAD("8235_19.u48", 0x0000, 0x8000, BAD_DUMP CRC(c0577a50) SHA1(3926cdd91fa89657a811463e48cfbdb350676e51), ROM_BIOS(1)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
 	ROMX_LOAD("8235_39.u49", 0x0000, 0x4000, CRC(781ba055) SHA1(fd4bcc81a8160a1dea06036c5f79d200f948f4d6), ROM_BIOS(0))
-	ROMX_LOAD("8235_19.u49", 0x0000, 0x4000, CRC(e235d5c8) SHA1(792e6b2814ab783d06c7576c1e3ccd6a9bbac34a), ROM_BIOS(1)) // need verification
+	ROMX_LOAD("8235_19.u49", 0x0000, 0x4000, BAD_DUMP CRC(e235d5c8) SHA1(792e6b2814ab783d06c7576c1e3ccd6a9bbac34a), ROM_BIOS(1)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	ROMX_LOAD("8235_39.u50", 0x0000, 0x4000, CRC(768549a9) SHA1(959060445e92eb980ddd9df3ef9cfefcae2de1d0), ROM_BIOS(0))
-	ROMX_LOAD("8235_19.u50", 0x0000, 0x4000, CRC(768549a9) SHA1(959060445e92eb980ddd9df3ef9cfefcae2de1d0), ROM_BIOS(1)) // need verification
+	ROMX_LOAD("8235_19.u50", 0x0000, 0x4000, BAD_DUMP CRC(768549a9) SHA1(959060445e92eb980ddd9df3ef9cfefcae2de1d0), ROM_BIOS(1)) // need verification
 ROM_END
 
 void msx2_state::vg8235f(machine_config &config)
@@ -9082,22 +9087,22 @@ void msx2_state::ucv102(machine_config &config)
 
 ROM_START(ax350)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("ax350bios.rom", 0x0000, 0x8000, CRC(ea306155) SHA1(35195ab67c289a0b470883464df66bc6ea5b00d3)) // need verification
+	ROM_LOAD("ax350bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ea306155) SHA1(35195ab67c289a0b470883464df66bc6ea5b00d3)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("ax350ext.rom", 0x0000, 0x4000, CRC(7c7540b7) SHA1(ebb76f9061e875365023523607db610f2eda1d26)) // need verification
+	ROM_LOAD("ax350ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(7c7540b7) SHA1(ebb76f9061e875365023523607db610f2eda1d26)) // need verification
 
 	ROM_REGION(0x8000, "arabic", 0)
-	ROM_LOAD("ax350arab.rom", 0x0000, 0x8000, CRC(c0d8fc85) SHA1(2c9600c6e0025fee10d249e97448ecaa37e38c42)) // need verification
+	ROM_LOAD("ax350arab.rom", 0x0000, 0x8000, BAD_DUMP CRC(c0d8fc85) SHA1(2c9600c6e0025fee10d249e97448ecaa37e38c42)) // need verification
 
 	ROM_REGION(0x8000, "swp", 0)
-	ROM_LOAD("ax350swp.rom", 0x0000, 0x8000, CRC(076f40fc) SHA1(4b4508131dca6d811694ae6379f41364c477de58)) // need verification
+	ROM_LOAD("ax350swp.rom", 0x0000, 0x8000, BAD_DUMP CRC(076f40fc) SHA1(4b4508131dca6d811694ae6379f41364c477de58)) // need verification
 
 	ROM_REGION(0x10000, "painter", 0)
-	ROM_LOAD("ax350paint.rom", 0x0000, 0x10000, CRC(18956e3a) SHA1(ace202e87337fbc54fea21e22c0b3af0abe6f4ae)) // need verification
+	ROM_LOAD("ax350paint.rom", 0x0000, 0x10000, BAD_DUMP CRC(18956e3a) SHA1(ace202e87337fbc54fea21e22c0b3af0abe6f4ae)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("ax350disk.rom", 0x0000, 0x4000, CRC(1e7d6512) SHA1(78cd7f847e77fd8cd51a647efb2725ba93f4c471)) // need verification
+	ROM_LOAD("ax350disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(1e7d6512) SHA1(78cd7f847e77fd8cd51a647efb2725ba93f4c471)) // need verification
 ROM_END
 
 void msx2_state::ax350(machine_config &config)
@@ -9322,10 +9327,10 @@ void msx2_state::ax500(machine_config &config)
 
 ROM_START(mpc2300)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("2300bios.rom", 0x0000, 0x8000, CRC(e7d08e29) SHA1(0f851ee7a1cf79819f61cc89e9948ee72a413802)) // need verification
+	ROM_LOAD("2300bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(e7d08e29) SHA1(0f851ee7a1cf79819f61cc89e9948ee72a413802)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("2300ext.rom", 0x0000, 0x4000, CRC(3d7dc718) SHA1(e1f834b28c3ee7c9f79fe6fbf2b23c8a0617892b)) // need verification
+	ROM_LOAD("2300ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(3d7dc718) SHA1(e1f834b28c3ee7c9f79fe6fbf2b23c8a0617892b)) // need verification
 ROM_END
 
 void msx2_state::mpc2300(machine_config &config)
@@ -9350,10 +9355,10 @@ void msx2_state::mpc2300(machine_config &config)
 
 ROM_START(mpc2500f)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("mpc2500fdbios.rom", 0x0000, 0x8000, CRC(e7d08e29) SHA1(0f851ee7a1cf79819f61cc89e9948ee72a413802)) // need verification
+	ROM_LOAD("mpc2500fdbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(e7d08e29) SHA1(0f851ee7a1cf79819f61cc89e9948ee72a413802)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("mpc2500fdext.rom",  0x0000, 0x4000, CRC(3d7dc718) SHA1(e1f834b28c3ee7c9f79fe6fbf2b23c8a0617892b)) // need verification
+	ROM_LOAD("mpc2500fdext.rom",  0x0000, 0x4000, BAD_DUMP CRC(3d7dc718) SHA1(e1f834b28c3ee7c9f79fe6fbf2b23c8a0617892b)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	// FDC register contents at 3ff8-3fff
@@ -9457,17 +9462,17 @@ void msx2_state::mpc25fs(machine_config &config)
 
 ROM_START(mpc27)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("mpc27bios.rom", 0x0000, 0x8000, CRC(ba81b3dd) SHA1(4ce41fcc1a603411ec4e99556409c442078f0ecf)) // need verification
+	ROM_LOAD("mpc27bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ba81b3dd) SHA1(4ce41fcc1a603411ec4e99556409c442078f0ecf)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("mpc27ext.rom", 0x0000, 0x4000, CRC(90ca25b5) SHA1(fd9fa78bac25aa3c0792425b21d14e364cf7eea4)) // need verificaiton
+	ROM_LOAD("mpc27ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(90ca25b5) SHA1(fd9fa78bac25aa3c0792425b21d14e364cf7eea4)) // need verificaiton
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	// FDC register contents at 3ff8-3fff
 	ROM_LOAD("mpc27disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(38454059) SHA1(58ac78bba29a06645ca8d6a94ef2ac68b743ad32)) // need verification
 
 	ROM_REGION(0x4000, "lpen", 0)
-	ROM_LOAD("mlp27.rom", 0x0000, 0x2000, CRC(8f9e6ba0) SHA1(c3a47480c9dd2235f40f9a53dab68e3c48adca01)) // need verification
+	ROM_LOAD("mlp27.rom", 0x0000, 0x2000, BAD_DUMP CRC(8f9e6ba0) SHA1(c3a47480c9dd2235f40f9a53dab68e3c48adca01)) // need verification
 	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
 
@@ -9550,10 +9555,10 @@ void msx2_state::phc23jb(machine_config &config)
 
 ROM_START(phc55fd2)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("phc55fd2bios.rom", 0x0000, 0x8000, CRC(ba81b3dd) SHA1(4ce41fcc1a603411ec4e99556409c442078f0ecf)) // need verification
+	ROM_LOAD("phc55fd2bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ba81b3dd) SHA1(4ce41fcc1a603411ec4e99556409c442078f0ecf)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("phc55fd2ext.rom", 0x0000, 0x4000, CRC(90ca25b5) SHA1(fd9fa78bac25aa3c0792425b21d14e364cf7eea4)) // need verification
+	ROM_LOAD("phc55fd2ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(90ca25b5) SHA1(fd9fa78bac25aa3c0792425b21d14e364cf7eea4)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	// FDC register contents at 3ff8-3fff
@@ -9630,16 +9635,16 @@ void msx2_state::phc77(machine_config &config)
 
 ROM_START(hotbit20)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hb2bios.rom", 0x0000, 0x8000, CRC(0160e8c9) SHA1(d0cfc35f22b150a1cb10decae4841dfe63b78251)) // need verification
+	ROM_LOAD("hb2bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(0160e8c9) SHA1(d0cfc35f22b150a1cb10decae4841dfe63b78251)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("hb2ext.rom", 0x0000, 0x4000, CRC(08ced880) SHA1(4f2a7e0172f0214f025f23845f6e053d0ffd28e8)) // need verification
+	ROM_LOAD("hb2ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(08ced880) SHA1(4f2a7e0172f0214f025f23845f6e053d0ffd28e8)) // need verification
 
 	ROM_REGION(0x4000, "xbasic", 0)
-	ROM_LOAD("xbasic2.rom", 0x0000, 0x4000, CRC(2825b1a0) SHA1(47370bec7ca1f0615a54eda548b07fbc0c7ef398)) // need verification
+	ROM_LOAD("xbasic2.rom", 0x0000, 0x4000, BAD_DUMP CRC(2825b1a0) SHA1(47370bec7ca1f0615a54eda548b07fbc0c7ef398)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("microsoldisk.rom", 0x0000, 0x4000, CRC(6704ef81) SHA1(a3028515ed829e900cc8deb403e17b09a38bf9b0)) // need verification
+	ROM_LOAD("microsoldisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(6704ef81) SHA1(a3028515ed829e900cc8deb403e17b09a38bf9b0)) // need verification
 ROM_END
 
 void msx2_state::hotbit20(machine_config &config)
@@ -9885,10 +9890,10 @@ void msx2_state::hbf500_2(machine_config &config)
 
 ROM_START(hbf500f)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hbf500fbios.rom", 0x0000, 0x8000, CRC(440dae3c) SHA1(fedd9b682d056ddd1e9b3d281723e12f859b2e69)) // need verification
+	ROM_LOAD("hbf500fbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(440dae3c) SHA1(fedd9b682d056ddd1e9b3d281723e12f859b2e69)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("hbf500fext.rom", 0x0000, 0x4000, CRC(e235d5c8) SHA1(792e6b2814ab783d06c7576c1e3ccd6a9bbac34a)) // need verification
+	ROM_LOAD("hbf500fext.rom", 0x0000, 0x4000, BAD_DUMP CRC(e235d5c8) SHA1(792e6b2814ab783d06c7576c1e3ccd6a9bbac34a)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	// FDC register contents at 3ff8-3fff
@@ -9959,7 +9964,7 @@ ROM_START(hbf700d)
 	//
 	// however according to the service manual these should be in the same rom chip
 	// concatenation of 3288894e1be6af705871499b23c85732dbc40993 and 12f2cc79b3d09723840bae774be48c0d721ec1c6
-	ROM_LOAD("700dext.ic6", 0x0000, 0x8000, CRC(2aba42dc) SHA1(9dee68aab6c921b0b20862a3f2f4e38ff8d155c0)) // to be verified with direct dump
+	ROM_LOAD("700dext.ic6", 0x0000, 0x8000, BAD_DUMP CRC(2aba42dc) SHA1(9dee68aab6c921b0b20862a3f2f4e38ff8d155c0)) // to be verified with direct dump
 ROM_END
 
 void msx2_state::hbf700d(machine_config &config)
@@ -9995,7 +10000,7 @@ ROM_START(hbf700f)
 	//
 	// however according to the service manual these should be in the same rom chip
 	// concatenation of 792e6b2814ab783d06c7576c1e3ccd6a9bbac34a and 12f2cc79b3d09723840bae774be48c0d721ec1c6
-	ROM_LOAD("700fext.ic6",  0x0000, 0x8000, CRC(463db23b) SHA1(2ab5be13b356692e75a5d76a23f8e4cfc094b3df)) // to be verified with direct dump
+	ROM_LOAD("700fext.ic6",  0x0000, 0x8000, BAD_DUMP CRC(463db23b) SHA1(2ab5be13b356692e75a5d76a23f8e4cfc094b3df)) // to be verified with direct dump
 ROM_END
 
 void msx2_state::hbf700f(machine_config &config)
@@ -10033,7 +10038,7 @@ ROM_START(hbf700p)
 	//
 	// however according to the service manual these should be in the same rom chip
 	// concatenation of 3288894e1be6af705871499b23c85732dbc40993 and 3376cf9dd2b1ac9b41bf6bf6598b33136e86f9d5
-	ROM_LOAD("700pext.ic6", 0x0000, 0x8000, CRC(63e1bffc) SHA1(496698a60432490dc1306c8cc1d4a6ded275261a)) // to be verified with direct dump
+	ROM_LOAD("700pext.ic6", 0x0000, 0x8000, BAD_DUMP CRC(63e1bffc) SHA1(496698a60432490dc1306c8cc1d4a6ded275261a)) // to be verified with direct dump
 ROM_END
 
 void msx2_state::hbf700p(machine_config &config)
@@ -10069,7 +10074,7 @@ ROM_START(hbf700s)
 	//
 	// however according to the service manual these should be in the same rom chip
 	// concatenation of 1e9a955943aeea9b1807ddf1250ba6436d8dd276 and 3376cf9dd2b1ac9b41bf6bf6598b33136e86f9d5
-	ROM_LOAD("700sext.ic6", 0x0000, 0x8000, CRC(28d1badf) SHA1(ae3ed88a2d7034178e08f7bdf5409f462bf67fc9)) // to be verified with direct dump
+	ROM_LOAD("700sext.ic6", 0x0000, 0x8000, BAD_DUMP CRC(28d1badf) SHA1(ae3ed88a2d7034178e08f7bdf5409f462bf67fc9)) // to be verified with direct dump
 ROM_END
 
 void msx2_state::hbf700s(machine_config &config)
@@ -10165,11 +10170,11 @@ ROM_START(hbf9p)
 	// ROM_LOAD("f9psub.rom", 0x0000, 0x4000, CRC(7c456c8b) SHA1(7b4a96402847decfc110ff9eda713bdcd218bd83))
 	// ROM_LOAD("f9pfirm2.rom", 0x0000, 0x4000, CRC(dea2cb50) SHA1(8cc1f7ceeef745bb34e80253971e137213671486))
 	// concatenation of 7b4a96402847decfc110ff9eda713bdcd218bd83 and 8cc1f7ceeef745bb34e80253971e137213671486
-	ROM_LOAD("f9pfirm1.ic12", 0x0000, 0x8000, CRC(524f67aa) SHA1(41a186afced50ca6312cb5b6c4adb684faca6232))
+	ROM_LOAD("f9pfirm1.ic12", 0x0000, 0x8000, BAD_DUMP CRC(524f67aa) SHA1(41a186afced50ca6312cb5b6c4adb684faca6232))
 
 	ROM_REGION(0x8000, "firmware", 0)
 	// like in HB-F9S, the halves should be swapped?
-	ROM_LOAD("f9pfirm2.rom.ic13", 0x0000, 0x8000, CRC(ea97069f) SHA1(2d1880d1f5a6944fcb1b198b997a3d90ecd1903d))
+	ROM_LOAD("f9pfirm2.rom.ic13", 0x0000, 0x8000, BAD_DUMP CRC(ea97069f) SHA1(2d1880d1f5a6944fcb1b198b997a3d90ecd1903d))
 ROM_END
 
 void msx2_state::hbf9p(machine_config &config)
@@ -10392,13 +10397,13 @@ void msx2_state::tpc310(machine_config &config)
 
 ROM_START(tpp311)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("311bios.rom", 0x0000, 0x8000, CRC(8cd3e845) SHA1(7bba23669b7abfb6a142f9e1735b847d6e4e8267)) // need verification
+	ROM_LOAD("311bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(8cd3e845) SHA1(7bba23669b7abfb6a142f9e1735b847d6e4e8267)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("311ext.rom", 0x0000, 0x4000, CRC(094a9e7a) SHA1(39dfc46260f99b670916b1e55f67a5d4136e6e54)) // need verification
+	ROM_LOAD("311ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(094a9e7a) SHA1(39dfc46260f99b670916b1e55f67a5d4136e6e54)) // need verification
 
 	ROM_REGION(0x8000, "logo", 0)
-	ROM_LOAD("311logo.rom", 0x0000, 0x8000, CRC(0e6ecb9f) SHA1(e45ddc5bf1a1e63756d11fb43fc50276ca35cab0)) // need verification
+	ROM_LOAD("311logo.rom", 0x0000, 0x8000, BAD_DUMP CRC(0e6ecb9f) SHA1(e45ddc5bf1a1e63756d11fb43fc50276ca35cab0)) // need verification
 ROM_END
 
 void msx2_state::tpp311(machine_config &config)
@@ -10424,16 +10429,16 @@ void msx2_state::tpp311(machine_config &config)
 
 ROM_START(tps312)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("312bios.rom", 0x0000, 0x8000, CRC(8cd3e845) SHA1(7bba23669b7abfb6a142f9e1735b847d6e4e8267)) // need verification
+	ROM_LOAD("312bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(8cd3e845) SHA1(7bba23669b7abfb6a142f9e1735b847d6e4e8267)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("312ext.rom", 0x0000, 0x4000, CRC(094a9e7a) SHA1(39dfc46260f99b670916b1e55f67a5d4136e6e54)) // need verification
+	ROM_LOAD("312ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(094a9e7a) SHA1(39dfc46260f99b670916b1e55f67a5d4136e6e54)) // need verification
 
 	ROM_REGION(0x8000, "plan", 0)
-	ROM_LOAD("312plan.rom", 0x0000, 0x8000, CRC(b3a6aaf6) SHA1(6de80e863cdd7856ab7aac4c238224a5352bda3b)) // need verification
+	ROM_LOAD("312plan.rom", 0x0000, 0x8000, BAD_DUMP CRC(b3a6aaf6) SHA1(6de80e863cdd7856ab7aac4c238224a5352bda3b)) // need verification
 
 	ROM_REGION(0x4000, "write", 0)
-	ROM_LOAD("312write.rom", 0x0000, 0x4000, CRC(63c6992f) SHA1(93682f5baba7697c40088e26f99ee065c78e83b8)) // need verification
+	ROM_LOAD("312write.rom", 0x0000, 0x4000, BAD_DUMP CRC(63c6992f) SHA1(93682f5baba7697c40088e26f99ee065c78e83b8)) // need verification
 ROM_END
 
 void msx2_state::tps312(machine_config &config)
@@ -10499,13 +10504,13 @@ void msx2_state::fstm1(machine_config &config)
 ROM_START(hx23)
 	// roms from hx23f, assumed to be the same for hx23 but need verification
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hx23bios.ic2", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
+	ROM_LOAD("hx23bios.ic2", 0x0000, 0x8000, BAD_DUMP CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
 
 	ROM_REGION(0x8000, "subjwp", 0)
-	ROM_LOAD("hx23subjwp.ic52", 0x0000, 0x8000, CRC(478016bf) SHA1(6ecf73a1dd55b363c2e68cc6245ece979aec1fc5)) // need verification
+	ROM_LOAD("hx23subjwp.ic52", 0x0000, 0x8000, BAD_DUMP CRC(478016bf) SHA1(6ecf73a1dd55b363c2e68cc6245ece979aec1fc5)) // need verification
 
 	ROM_REGION(0x8000, "rs232jwp", 0)
-	ROM_LOAD("hx23rs232jwp.ic3", 0x0000, 0x8000, CRC(60160d3b) SHA1(0958361ac9b19782cf7017b2e762b416e0203f37)) // need verification
+	ROM_LOAD("hx23rs232jwp.ic3", 0x0000, 0x8000, BAD_DUMP CRC(60160d3b) SHA1(0958361ac9b19782cf7017b2e762b416e0203f37)) // need verification
 ROM_END
 
 void msx2_state::hx23(machine_config &config)
@@ -10534,13 +10539,13 @@ void msx2_state::hx23(machine_config &config)
 
 ROM_START(hx23f)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hx23bios.ic2", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
+	ROM_LOAD("hx23bios.ic2", 0x0000, 0x8000, BAD_DUMP CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
 
 	ROM_REGION(0x8000, "subjwp", 0)
-	ROM_LOAD("hx23subjwp.ic52", 0x0000, 0x8000, CRC(478016bf) SHA1(6ecf73a1dd55b363c2e68cc6245ece979aec1fc5)) // need verification
+	ROM_LOAD("hx23subjwp.ic52", 0x0000, 0x8000, BAD_DUMP CRC(478016bf) SHA1(6ecf73a1dd55b363c2e68cc6245ece979aec1fc5)) // need verification
 
 	ROM_REGION(0x8000, "rs232jwp", 0)
-	ROM_LOAD("hx23rs232jwp.ic3", 0x0000, 0x8000, CRC(60160d3b) SHA1(0958361ac9b19782cf7017b2e762b416e0203f37)) // need verification
+	ROM_LOAD("hx23rs232jwp.ic3", 0x0000, 0x8000, BAD_DUMP CRC(60160d3b) SHA1(0958361ac9b19782cf7017b2e762b416e0203f37)) // need verification
 ROM_END
 
 void msx2_state::hx23f(machine_config &config)
@@ -10665,20 +10670,20 @@ void msx2_state::victhc80(machine_config &config)
 
 ROM_START(victhc90)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hc90bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
+	ROM_LOAD("hc90bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("hc90ext.rom", 0x0000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // need verification
+	ROM_LOAD("hc90ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	// FDC register contents at 3ff8-3fff
 	ROM_LOAD("hc90disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(11bca2ed) SHA1(a7a34671bddb48fa6c74182e2977f9129558ec32)) // need verification
 
 	ROM_REGION(0x4000, "firmware", 0)
-	ROM_LOAD("hc90firm.rom", 0x0000, 0x4000, CRC(53791d91) SHA1(caeffdd654394726c8c0824b21af7ff51c0b1031)) // need verification
+	ROM_LOAD("hc90firm.rom", 0x0000, 0x4000, BAD_DUMP CRC(53791d91) SHA1(caeffdd654394726c8c0824b21af7ff51c0b1031)) // need verification
 
 	ROM_REGION(0x20000, "kanji", 0)
-	ROM_LOAD("hc90kfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967)) // need verification
+	ROM_LOAD("hc90kfn.rom", 0x0000, 0x20000, BAD_DUMP CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967)) // need verification
 ROM_END
 
 void msx2_state::victhc90(machine_config &config)
@@ -10713,20 +10718,20 @@ void msx2_state::victhc90(machine_config &config)
 
 ROM_START(victhc95)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("hc95bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
+	ROM_LOAD("hc95bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("hc95ext.rom", 0x0000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // need verification
+	ROM_LOAD("hc95ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	// FDC register contents at 3ff8-3fff
 	ROM_LOAD("hc95disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(11bca2ed) SHA1(a7a34671bddb48fa6c74182e2977f9129558ec32)) // need verification
 
 	ROM_REGION(0x4000, "firmware", 0)
-	ROM_LOAD("hc95firm.rom", 0x0000, 0x4000, CRC(53791d91) SHA1(caeffdd654394726c8c0824b21af7ff51c0b1031)) // need verification
+	ROM_LOAD("hc95firm.rom", 0x0000, 0x4000, BAD_DUMP CRC(53791d91) SHA1(caeffdd654394726c8c0824b21af7ff51c0b1031)) // need verification
 
 	ROM_REGION(0x20000, "kanji", 0)
-	ROM_LOAD("hc95kfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967)) // need verification
+	ROM_LOAD("hc95kfn.rom", 0x0000, 0x20000, BAD_DUMP CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967)) // need verification
 ROM_END
 
 void msx2_state::victhc95(machine_config &config)
@@ -10827,10 +10832,10 @@ void msx2_state::cx7128(machine_config &config)
 
 ROM_START(cx7m128)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("cx7mbios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // needs verification
+	ROM_LOAD("cx7mbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // needs verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("cx7mext.rom", 0x0000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // needs verification
+	ROM_LOAD("cx7mext.rom", 0x0000, 0x4000, BAD_DUMP CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // needs verification
 
 	ROM_REGION(0x4000, "minicart", 0)
 	ROM_LOAD("yrm502.rom", 0x0000, 0x4000, CRC(51f7ddd1) SHA1(2a4b4a4657e3077df8a88f98210b76883d3702b1))
@@ -10944,16 +10949,16 @@ void msx2_state::yis604(machine_config &config)
 
 ROM_START(y805128)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("yis805128bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
+	ROM_LOAD("yis805128bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("yis805128ext.rom", 0x0000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344)) // need verification
+	ROM_LOAD("yis805128ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("yis805128disk.rom", 0x0000, 0x4000, CRC(ab94a273) SHA1(4b08a057e5863ade179dcf8bc9377e90940e6d61)) // need verification
+	ROM_LOAD("yis805128disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(ab94a273) SHA1(4b08a057e5863ade179dcf8bc9377e90940e6d61)) // need verification
 
 	ROM_REGION(0x20000, "kanji", 0)
-	ROM_LOAD("yis805128kfn.rom", 0x0000, 0x20000, CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799)) // need verification
+	ROM_LOAD("yis805128kfn.rom", 0x0000, 0x20000, BAD_DUMP CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799)) // need verification
 ROM_END
 
 void msx2_state::y805128(machine_config &config)
@@ -10984,16 +10989,16 @@ void msx2_state::y805128(machine_config &config)
 
 ROM_START(y805256)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("yis805256bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
+	ROM_LOAD("yis805256bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd)) // need verification
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("yis805256ext.rom", 0x0000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344)) // need verification
+	ROM_LOAD("yis805256ext.rom", 0x0000, 0x4000, BAD_DUMP CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("yis805256disk.rom", 0x0000, 0x4000, CRC(ab94a273) SHA1(4b08a057e5863ade179dcf8bc9377e90940e6d61)) // need verification
+	ROM_LOAD("yis805256disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(ab94a273) SHA1(4b08a057e5863ade179dcf8bc9377e90940e6d61)) // need verification
 
 	ROM_REGION(0x20000, "kanji", 0)
-	ROM_LOAD("yis805256kfn.rom", 0x0000, 0x20000, CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799)) // need verification
+	ROM_LOAD("yis805256kfn.rom", 0x0000, 0x20000, BAD_DUMP CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799)) // need verification
 ROM_END
 
 void msx2_state::y805256(machine_config &config)
