@@ -73,6 +73,8 @@ protected:
 	void mcu_p1_w(uint8_t data);
 	void mcu_p2_w(uint8_t data);
 
+	virtual const internal_layout &layout() const = 0;
+
 	keyboard_port_device *m_host;
 
 	required_ioport_array<16> m_rows;
@@ -88,6 +90,7 @@ class qx10_keyboard_hasci : public keyboard_device
 public:
 	qx10_keyboard_hasci(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ioport_constructor device_input_ports() const override;
+	virtual const internal_layout &layout() const override;
 };
 
 class qx10_keyboard_ascii : public keyboard_device
@@ -95,6 +98,7 @@ class qx10_keyboard_ascii : public keyboard_device
 public:
 	qx10_keyboard_ascii(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ioport_constructor device_input_ports() const override;
+	virtual const internal_layout &layout() const override;
 };
 
 

@@ -11,6 +11,8 @@
 #include "keyboard.h"
 #include "matrix.h"
 
+#include "qx10ascii.lh"
+#include "qx10hasci.lh"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -116,6 +118,8 @@ void keyboard_device::device_add_mconfig(machine_config &config)
 	mcu.bus_in_cb().set([this]() { return m_rows[m_row]->read(); });
 	mcu.t1_in_cb().set([this]() { return m_rxd; });
 	mcu.t0_in_cb().set([this]() { return m_clk_state; });
+
+	config.set_default_layout(layout());
 }
 
 void keyboard_device::device_start()
@@ -166,6 +170,11 @@ ioport_constructor qx10_keyboard_hasci::device_input_ports() const
 	return INPUT_PORTS_NAME(qx10_keyboard_hasci);
 }
 
+const internal_layout &qx10_keyboard_hasci::layout() const
+{
+	return layout_qx10hasci;
+}
+
 //**************************************************************************
 //  ASCII KEYBOARD DEVICE
 //**************************************************************************
@@ -180,6 +189,10 @@ ioport_constructor qx10_keyboard_ascii::device_input_ports() const
 	return INPUT_PORTS_NAME(qx10_keyboard_ascii);
 }
 
+const internal_layout &qx10_keyboard_ascii::layout() const
+{
+	return layout_qx10ascii;
+}
 
 void keyboard_devices(device_slot_interface &device)
 {

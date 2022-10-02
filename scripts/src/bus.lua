@@ -3923,6 +3923,15 @@ if (BUSES["EPSON_QX_KEYBOARD"]~=null) then
 		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/matrix.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/matrix.h",
 	}
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp", GEN_DIR .. "emu/layout/qx10ascii.lh" },
+		{ MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp", GEN_DIR .. "emu/layout/qx10hasci.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "qx10ascii"),
+		layoutbuildtask("emu/layout", "qx10hasci"),
+	}
 end
 
 ---------------------------------------------------
