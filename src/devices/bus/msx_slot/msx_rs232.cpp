@@ -99,10 +99,12 @@ void msx_slot_rs232_base_device::device_reset()
 void msx_slot_rs232_base_device::irq_mask_w(offs_t offset, uint8_t data)
 {
 	// According to MSX datapack:
-	// bit3 - timer interrupt from i8253 channel 2
-	// bit2 - sync character detect / break detect
-	// bit1 - transmit data ready
-	// bit0 - receive data ready
+	// 7654---- unused
+	// ----3--- timer interrupt from i8352 channel 2
+	// -----2-- sync character detect / break detect
+	// ------1- transmit data ready
+	// -------0 receive data ready
+	// but most rs232 interface only seem to support receive data ready irq
 	m_irq_mask = data;
 }
 
@@ -160,10 +162,11 @@ void msx_slot_rs232_device::device_start()
 
 uint8_t msx_slot_rs232_device::status_r(offs_t offset)
 {
-	// bit7 - CTS
-	// bit6 - 8253 channel 2 output
-	// bit1 - Ring indicator
-	// bit0 - Carrier detect
+	// 7------- CTS
+	// -6------ 8253 channel 2 output
+	// --5432-- unused
+	// ------1- ring indicator
+	// -------0 carrier detect
 
 	uint8_t result = 0x00;
 
@@ -212,9 +215,10 @@ void msx_slot_rs232_mitsubishi_device::device_start()
 
 uint8_t msx_slot_rs232_mitsubishi_device::status_r(offs_t offset)
 {
-	// bit7 - CTS
-	// bit6 - 8253 channel 2 output
-	// bit0 - Carrier detect
+	// 7------- CTS
+	// -6------ 8253 channel 2 output
+	// --54321- unused
+	// -------0 carrier detect
 
 	uint8_t result = 0x00;
 
@@ -260,11 +264,13 @@ void msx_slot_rs232_sony_device::device_start()
 
 uint8_t msx_slot_rs232_sony_device::status_r(offs_t offset)
 {
-	// bit7 - CTS
-	// bit6 - 8253 channel 2 output
-	// bit4 - ??
-	// bit1 - Ring indicator
-	// bit0 - Carrier detect
+	// 7------- CTS
+	// -6------ 8253 channel 2 output
+	// --5----- unused
+	// ---4---- ??
+	// ----32-- unused
+	// ------1- ring indicator
+	// -------0 carrier detect
 
 	uint8_t result = 0x00;
 
@@ -357,9 +363,10 @@ void msx_slot_rs232_svi738_device::device_start()
 
 uint8_t msx_slot_rs232_svi738_device::status_r(offs_t offset)
 {
-	// bit7 - CTS
-	// bit6 - 8253 channel 2 output
-	// bit0 - Carrier detect
+	// 7------- CTS
+	// -6------ 8253 channel 2 output
+	// --54321- unused
+	// -------0 carrier detect
 
 	uint8_t result = 0x00;
 
@@ -405,11 +412,13 @@ void msx_slot_rs232_toshiba_device::device_start()
 
 uint8_t msx_slot_rs232_toshiba_device::status_r(offs_t offset)
 {
-	// bit7 - CTS
-	// bit6 - 8253 channel 2 output
-	// bit3 - Switch detect
-	// bit1 - Ring indicator
-	// bit0 - Carrier detect
+	// 7------- CTS
+	// -6------ 8253 channel 2 output
+	// --54---- unused
+	// ----3--- switch detection
+	// -----2-- unused
+	// ------1- ring indicator
+	// -------0 carrier detect
 
 	uint8_t result = 0x00;
 
@@ -504,11 +513,13 @@ void msx_slot_rs232_toshiba_hx3x_device::set_bank()
 
 uint8_t msx_slot_rs232_toshiba_hx3x_device::status_r(offs_t offset)
 {
-	// bit7 - CTS
-	// bit6 - 8253 channel 2 output
-	// bit3 - Switch detect
-	// bit1 - Ring indicator
-	// bit0 - Carrier detect
+	// 7------- CTS
+	// -6------ 8253 channel 2 output
+	// --54---- unused
+	// ----3--- switch detection
+	// -----2-- unused
+	// ------1- ring indicator
+	// -------0 carrier detect
 
 	uint8_t result = 0x00;
 

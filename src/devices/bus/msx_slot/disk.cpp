@@ -175,6 +175,12 @@ void msx_slot_disk1_device::set_side_control(uint8_t data)
 
 void msx_slot_disk1_device::set_control(uint8_t data)
 {
+	// 7------- motor on (0 = on)
+	// -6------ in-use / LED (0 = on)
+	// --5432-- unused
+	// ------1- drive 1 select (0 = selected)
+	// -------0 drive 0 select (0 = selected)
+
 	uint8_t old_m_control = m_control;
 
 	m_control = data;
