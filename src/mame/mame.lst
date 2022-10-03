@@ -20628,6 +20628,9 @@ firebarr                        // (c) 1993 Irem (Japan)
 kftgoal                         // (c) 1994 Jaleco
 wpksoc                          // (c) 1995 Jaleco
 
+@source:irem/m119.cpp
+scumimon                        //
+
 @source:irem/m14.cpp
 ptrmj                           // M14 (c) 1979
 
@@ -41868,6 +41871,7 @@ timetrv                         // (c) 1991.10 Virtual Image Productions
 timetrv2                        // (c) 1991.10 Virtual Image Productions
 
 @source:tvgames/titan_soc.cpp
+colecofl
 megadri4
 megadri4a
 
@@ -43804,6 +43808,9 @@ zero2                           // bootleg
 
 @source:misc/winbingo.cpp
 wbingo06
+
+@source:sega/winclub.cpp
+wwmspot
 
 @source:midcoin/wink.cpp
 wink                            // (c) 1985 Midcoin
