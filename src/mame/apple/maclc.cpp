@@ -482,4 +482,4 @@ ROM_END
 COMP(1990, maclc,  0, 0, maclc,  maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
 COMP(1991, maclc2, 0, 0, maclc2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
 COMP(1991, macclas2, 0, 0, macclas2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
-COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING)
+COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
