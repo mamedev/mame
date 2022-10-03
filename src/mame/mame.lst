@@ -31959,6 +31959,9 @@ murogemb                        // ???
 murogmbl                        // ???
 slotunbl                        // ???
 
+@source:misc/musclem.cpp
+musclem                         // (c) 1997 Inter Geo
+
 @source:seibu/mustache.cpp
 mustache                        // (c) 1987 March
 mustachei                       // (c) 1987 IG SPA

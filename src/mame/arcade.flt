@@ -810,6 +810,7 @@ misc/multfish.cpp
 misc/multfish_boot.cpp
 misc/murogem.cpp
 misc/murogmbl.cpp
+misc/musclem.cpp
 misc/neomania.cpp
 misc/neoprint.cpp
 misc/news.cpp
