@@ -191,7 +191,6 @@ void musclem_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 void musclem_state::oki1_bank_w(uint16_t data)
 {
 	m_oki1->set_rom_bank(data & 3);
-	printf("BANK:%x\n", data);
 }
 
 
