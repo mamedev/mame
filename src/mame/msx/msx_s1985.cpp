@@ -57,11 +57,11 @@ uint8_t msx_s1985_device::switched_read(offs_t offset)
 		switch (offset)
 		{
 		case 0:
-			/// Manufacturer ID number register
+			// Manufacturer ID number register
 			return manufacturer_id ^ 0xff;
 
 		case 2:
-			/// Back-up RAM read
+			// Back-up RAM read
 			return m_backup_ram[m_backup_ram_address];
 
 		case 7:
@@ -76,7 +76,7 @@ uint8_t msx_s1985_device::switched_read(offs_t offset)
 		}
 
 		default:
-			printf("msx_s1985: unhandled read from offset %02x\n", offset);
+			logerror("msx_s1985: unhandled read from offset %02x\n", offset);
 			break;
 		}
 	}
@@ -89,7 +89,7 @@ void msx_s1985_device::switched_write(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		/// Manufacturer ID number register
+		// Manufacturer ID number register
 		m_selected = (data == manufacturer_id);
 	}
 	else if (m_selected)
@@ -97,12 +97,12 @@ void msx_s1985_device::switched_write(offs_t offset, uint8_t data)
 		switch (offset)
 		{
 		case 1:
-			/// Back-up RAM address latch
+			// Back-up RAM address latch
 			m_backup_ram_address = data & 0x0f;
 			break;
 
 		case 2:
-			/// Back-up RAM write
+			// Back-up RAM write
 			m_backup_ram[m_backup_ram_address] = data;
 			break;
 
@@ -118,7 +118,7 @@ void msx_s1985_device::switched_write(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			printf("msx_s1985: unhandled write %02x to offset %02x\n", data, offset);
+			logerror("msx_s1985: unhandled write %02x to offset %02x\n", data, offset);
 			break;
 		}
 	}

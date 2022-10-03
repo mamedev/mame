@@ -32,14 +32,22 @@ protected:
 	virtual void device_post_load() override;
 
 private:
+	static constexpr size_t RAM_SIZE = 0x2000;
+
 	required_memory_region m_rom_region;
 	uint32_t m_region_offset;
 	const uint8_t *m_rom;
-	uint8_t m_selected_bank2[4];
-	const uint8_t *m_bank_base2[4];
+	uint8_t m_selected_bank[6];
+	bool m_ram_active[6];
+	uint8_t m_control;
+	const uint8_t *m_bank_base[6];
+	std::vector<uint8_t> m_ram;
+	std::vector<uint8_t> m_empty_bank;
 
-	void map_bank();
+	void map_all_banks();
+	void map_bank(int i);
 };
+
 
 class msx_slot_fsa1fm_device : public device_t, public msx_internal_slot_interface
 {
@@ -69,11 +77,9 @@ private:
 	required_memory_region m_rom_region;
 	uint32_t m_region_offset;
 	const uint8_t *m_rom;
-	uint8_t m_selected_bank[3];
+	uint8_t m_selected_bank;
 	std::vector<uint8_t> m_sram;
-	const uint8_t *m_bank_base_0000;
-	const uint8_t *m_bank_base_4000;
-	const uint8_t *m_bank_base_8000;
+	const uint8_t *m_bank_base;
 
 	void map_bank();
 	void i8255_port_a_w(uint8_t data);

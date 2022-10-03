@@ -71,9 +71,7 @@
 **   - switch to switch between jp50on and jis layout
 **   - switcn to bypass firmware
 ** - fsa1fm:
-**   - Firmware not emulated
-**   - kanji12 not emulated
-**   - Modem not emulated
+**   - Firmware and modem partially
 ** - fsa1mk2: pause button
 ** - nms8260: HDD not emulated
 ** - phc77: builtin printer, switch to turn off firmware
@@ -594,6 +592,7 @@ PCB Layouts missing
 #include "machine/buffer.h"
 #include "machine/input_merger.h"
 #include "machine/wd_fdc.h"
+#include "msx_kanji12.h"
 #include "msx_matsushita.h"
 #include "msx_s1985.h"
 #include "msx_switched.h"
@@ -8054,6 +8053,9 @@ void msx2_state::fs4600f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0x80);   // 128KB Mapper RAM
 	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
+	msx_kanji12_device &kanji12(MSX_KANJI12(config, "kanji12", 0));
+	kanji12.set_rom_start("kanji12");
+
 	MSX_S1985(config, "s1985", 0);
 
 	msx_mb8877a(config);
@@ -8436,7 +8438,6 @@ ROM_START(fsa1fm)
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("a1fmkfn.rom", 0, 0x20000, CRC(c61ddc5d) SHA1(5e872d5853698731a0ed22fb72dbcdfd59cd19c3))
 
-	/* Matsushita 12 dots Kanji ROM must be emulated */
 	ROM_REGION(0x20000, "kanji12", 0)
 	ROM_LOAD("a1fmkf12.rom", 0, 0x20000, CRC(340d1ef7) SHA1(a7a23dc01314e88381eee88b4878b39931ab4818))
 ROM_END
@@ -8455,11 +8456,12 @@ void msx2_state::fsa1fm(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
-	/* Modem Mapper of FS-CM1/A1FM must be emulated */
 	add_internal_slot(config, MSX_SLOT_FSA1FM, "modem", 3, 1, 1, 1, "firmware");
 	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
-	/* Panasonic FS-A1FM Mapper must be emulated */
 	add_internal_slot(config, MSX_SLOT_FSA1FM2, "firmware", 3, 3, 0, 3, "firmware");
+
+	msx_kanji12_device &kanji12(MSX_KANJI12(config, "kanji12", 0));
+	kanji12.set_rom_start("kanji12");
 
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);

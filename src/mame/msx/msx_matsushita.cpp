@@ -110,35 +110,6 @@ uint8_t msx_matsushita_device::switched_read(offs_t offset)
 }
 
 
-/*
-  03 <- 10
-  04 <- fe
-  4x read 04 and store at CC46-CC49
-
-  03 <- 10
-  04 <- ce
-  4x read 04 and store at CC4A-CC4D
-
-  03 <- 10
-  04 <- fe
-  4x read 04 and store at CC4E-CC51
-
-
-  03 <- 10
-  04 <- fc
-  4x read 04 and store at CC46-CC49
-
-  03 <- 10
-  04 <- cc
-  4x read 04 and store at CC4A-CC4D
-
-  03 <- 10
-  04 <- fc
-  4x read 04 and store at CC4E-CC51
-
-*/
-
-
 void msx_matsushita_device::switched_write(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
