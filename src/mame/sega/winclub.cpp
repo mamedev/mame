@@ -36,7 +36,7 @@ PCMCIA PCB (Sammy AM3AEJ-01):
 
 #include "emu.h"
 
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh4.h"
 #include "sound/ymz770.h"
 
 #include "emupal.h"
@@ -69,7 +69,7 @@ uint32_t winclub_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void winclub_state::prg_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).rom().region("maincpu", 0);
+	map(0x00000000, 0x007fffff).rom().mirror(0xe0000000).region("pcmcia", 0);
 }
 
 static INPUT_PORTS_START( winclub ) // no dips on PCB
@@ -88,7 +88,7 @@ INPUT_PORTS_END
 void winclub_state::winclub(machine_config &config)
 {
 	// basic machine hardware
-	sh2_device &maincpu(SH2(config, "maincpu", 14'318'000)); // TODO: SH* based custom, unknown type and clock
+	sh3_device &maincpu(SH3LE(config, "maincpu", 14'318'000)); // TODO: SH* based custom, unknown type and clock
 	maincpu.set_addrmap(AS_PROGRAM, &winclub_state::prg_map);
 	// maincpu.set_vblank_int("screen", FUNC(winclub_state::irq2_line_hold));
 
@@ -114,7 +114,7 @@ ROM_START( wwmspot )
 	ROM_REGION(0x800000, "maincpu", 0)
 	ROM_LOAD( "tc58fvm6t2a.u41", 0x000000, 0x800000, CRC(1ad2bc45) SHA1(5fde1cce603e6566d20da811c9c8bcccb044d4ae) ) // empty. Code uploaded from PCMCIA? Or not used?
 
-	ROM_REGION(0x1000000, "pcmcia", 0)
+	ROM_REGION64_LE(0x1000000, "pcmcia", 0)
 	ROM_LOAD( "tc58fvm6t2a.u4", 0x000000, 0x800000, CRC(f94e24b2) SHA1(4f6d4ba05da935cd6bd2323bd5950029caad436f) )
 	ROM_LOAD( "tc58fvm6t2a.u3", 0x800000, 0x800000, CRC(3e115847) SHA1(09990946220c8f177200531e610a60488247c0a0) )
 
