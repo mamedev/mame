@@ -66,7 +66,6 @@
 **   - switch to switch between internal and external printer
 **   - switch to switch betweem jp50on and jis layout
 **   - internal printer
-** - fs4600: Kanji12 not emulated?; how to trigger usage of kanji12??
 ** - fs5500f1, fs5500f2:
 **   - switch to switch between jp50on and jis layout
 **   - switcn to bypass firmware
