@@ -5,10 +5,10 @@
 	Inter Geo Muscle Master hardware
 
     driver by Phil Bennett
- 
+
     Known bugs:
         * Music does not immediately play on stage 1 following 'Go!'
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -32,15 +32,14 @@ namespace {
 class musclem_state : public driver_device
 {
 public:
-	musclem_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	musclem_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_vram(*this, "vram%u", 0U),
 		m_spriteram(*this, "spriteram"),
-		m_oki1(*this, "oki1"),
-		m_oki2(*this, "oki2")
+		m_oki(*this, "oki%u", 1U)
 	{ }
 
 	void musclem(machine_config &config);
@@ -54,8 +53,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr_array<uint16_t, 3> m_vram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_device<okim6295_device> m_oki1;
-	required_device<okim6295_device> m_oki2;
+	required_device_array<okim6295_device, 2> m_oki;
 
 	uint16_t m_paletteram[0x400];
 	tilemap_t * m_tilemap[3];
@@ -88,7 +86,7 @@ void musclem_state::video_start()
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
-	
+
 	m_tilemap[0]->set_scrolldx(16, 0);
 	m_tilemap[2]->set_scrolldx(1, 0);
 
@@ -112,7 +110,7 @@ void musclem_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	for (uint32_t i = 0; i < 0x200; ++i)
 	{
 		uint16_t code = m_spriteram[0 + i];
-		
+
 		if (code == 0)
 			continue;
 
@@ -124,7 +122,7 @@ void musclem_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		// Handle wraparound
 		if (sx > 512 - 16)
-			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code, 0, 0, 0, sx - 512, sy, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, 0, 0, 0, sx - 512, sy, 0);
 	}
 }
 
@@ -158,13 +156,12 @@ void musclem_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 
 void musclem_state::oki1_bank_w(uint16_t data)
 {
-	m_oki1->set_rom_bank(data & 3);
+	m_oki[0]->set_rom_bank(data & 3);
 }
 
 
 void musclem_state::lamps_w(uint16_t data)
 {
-	
 	// ........ ....x... - Lamp 1 (active low)
 	// ........ ..x..... - Lamp 2 (active low)
 }
@@ -320,8 +317,8 @@ void musclem_state::musclem(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBBBBBGGGGGRRRRR, 0x400);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki1, XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
-	OKIM6295(config, m_oki2, XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki[0], XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki[1], XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -331,7 +328,7 @@ void musclem_state::musclem(machine_config &config)
  *  ROM definition(s)
  *
  *************************************/
- 
+
 ROM_START( musclem )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "u-71.bin",   0x000000, 0x20000, CRC(da0648ad) SHA1(e7de583d5e6de4e2f0d617527d168fe691243728) )
