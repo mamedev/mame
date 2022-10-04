@@ -196,8 +196,15 @@ void nws3410_state::nws3410_map(address_map &map)
 
 void nws3410_state::nws3410(machine_config &config)
 {
-	common(config);
+	R3000A(config, m_cpu, 20_MHz_XTAL, 65536, 65536);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 	m_cpu->set_addrmap(AS_PROGRAM, &nws3410_state::nws3410_map);
+
+	// Per the service manual, one or more NWA-029 4MB expansion kits can be used to increase from the base 8M up to 16M
+	RAM(config, m_ram);
+	m_ram->set_default_size("8M");
+	m_ram->set_extra_options("12M,16M");
+	common(config);
 }
 
 void news_r3k_base_state::machine_start()
@@ -254,6 +261,7 @@ void nws3260_state::nws3260_map(address_map &map)
 	map(0x10000000, 0x10000003).lw32([this](u32 data) { m_lcd_enable = bool(data); }, "lcd_enable_w");
 	map(0x10100000, 0x10100003).lw32([this](u32 data) { m_lcd_dim = BIT(data, 0); }, "lcd_dim_w");
 	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
+	map(0x1ff60000, 0x1ff6001b).lw8([this](offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
 }
 
 void news_r3k_base_state::cpu_map(address_map &map)
@@ -288,7 +296,7 @@ void news_r3k_base_state::cpu_map(address_map &map)
 	map(0x1fec0000, 0x1fec0003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 
 	map(0x1ff40000, 0x1ff407ff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write));
-	map(0x1ff60000, 0x1ff6001b).lw8([this](offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
+
 	map(0x1ff80000, 0x1ff80003).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 	map(0x1ffc0000, 0x1ffc3fff).lrw16(
 		[this](offs_t offset) { return m_net_ram[offset]; }, "net_ram_r",
@@ -453,15 +461,6 @@ static void news_scsi_devices(device_slot_interface &device)
 
 void news_r3k_base_state::common(machine_config &config)
 {
-	R3000A(config, m_cpu, 20_MHz_XTAL, 32768, 32768); // TODO: split to child devices
-	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
-
-	// 3 banks of 4x30-pin SIMMs with parity, first bank is soldered
-	RAM(config, m_ram);
-	m_ram->set_default_size("16M");
-	// TODO: confirm each bank supports 4x1M or 4x4M
-	m_ram->set_extra_options("4M,8M,12M,20M,24M,32M,36M,48M");
-
 	DMAC_0448(config, m_dma, 0);
 	m_dma->set_bus(m_cpu, 0);
 	m_dma->out_int_cb().set(FUNC(news_r3k_base_state::irq_w<DMA>));
@@ -537,8 +536,16 @@ void news_r3k_base_state::common(machine_config &config)
 
 void nws3260_state::nws3260(machine_config &config)
 {
-	common(config);
+	R3000A(config, m_cpu, 20_MHz_XTAL, 32768, 32768);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 	m_cpu->set_addrmap(AS_PROGRAM, &nws3260_state::nws3260_map);
+
+	// 3 banks of 4x30-pin SIMMs with parity, first bank is soldered
+	RAM(config, m_ram);
+	m_ram->set_default_size("16M");
+	// TODO: confirm each bank supports 4x1M or 4x4M
+	m_ram->set_extra_options("4M,8M,12M,20M,24M,32M,36M,48M");
+	common(config);
 
 	// Integrated LCD panel
 	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
@@ -575,7 +582,7 @@ ROM_END
 ROM_START(nws3410)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "nws3410", "NWS-3410 v2.0")
-	ROMX_LOAD("Sony_NWS-3410_MPU-12_v2_ROM.bin", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
+	ROMX_LOAD("Sony_NWS-3410_MPU-12_v2_ROM.bin", 0x00000, 0x20000, CRC(48a726c4) SHA1(5c6e9e6bccaaa3d63bc136355a436c17c49c9876), ROM_BIOS(0))
 
 	// TODO: real idrom
 	ROM_REGION32_BE(0x100, "idrom", 0)
