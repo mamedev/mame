@@ -2134,7 +2134,7 @@ void m68000_base_device::init_cpu_fscpu32(void)
 	m_cpu_type         = CPU_TYPE_FSCPU32;
 
 
-	init32(*m_program, *m_oprogram);
+	init16(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m_state_table      = m68ki_instruction_state_table[6];
 	m_cyc_instruction  = m68ki_cycles[6];

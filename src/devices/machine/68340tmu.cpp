@@ -318,6 +318,8 @@ void mc68340_timer_module_device::device_start()
 	m_tout_out_cb.resolve_safe();
 	m_tgate_in_cb.resolve_safe();
 	m_tin_in_cb.resolve_safe();
+
+	m_ir = 0x000f;
 }
 
 void mc68340_timer_module_device::device_reset()
