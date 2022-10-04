@@ -369,4 +369,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, musclem, 0, musclem, musclem, musclem_state, empty_init, ROT0, "Inter Geo", "Muscle Master", 0 )
+GAME( 1997, musclem, 0, musclem, musclem, musclem_state, empty_init, ROT0, "Inter Geo", "Muscle Master", MACHINE_SUPPORTS_SAVE )

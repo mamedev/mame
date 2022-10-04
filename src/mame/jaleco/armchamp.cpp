@@ -475,5 +475,5 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1988, armchamp, 0, armchamp, armchamp, armchamp_state, empty_init, ROT90, "Jaleco / Yuvo", "Arm Champs (Japan)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armchamp, 0, armchamp, armchamp, armchamp_state, empty_init, ROT90, "Jaleco / Yuvo", "Arm Champs (Japan)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 // An export version also exists
