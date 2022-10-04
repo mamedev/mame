@@ -14,9 +14,6 @@
 #include "atari400.h"
 #include "sound/pokey.h"
 
-#define VERBOSE_SERIAL  1
-#define VERBOSE_TIMERS  1
-
 
 /**************************************************************
  *
