@@ -37,9 +37,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram0(*this, "videoram0"),
-		m_videoram1(*this, "videoram1"),
-		m_videoram2(*this, "videoram2"),
+		m_vram(*this, "vram%u", 0U),
 		m_spriteram(*this, "spriteram"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2")
@@ -54,28 +52,19 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<uint16_t> m_videoram0;
-	required_shared_ptr<uint16_t> m_videoram1;
-	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr_array<uint16_t, 3> m_vram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;
 
 	uint16_t m_paletteram[0x400];
 	tilemap_t * m_tilemap[3];
-	
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(get_tile_info0);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
-	TILE_GET_INFO_MEMBER(get_tile_info3);
-	void videoram0_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void videoram1_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void videoram2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void videoram3_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void palette_w(offs_t offset, u16 data, u16 mem_mask);
+	template<int which> TILE_GET_INFO_MEMBER(get_tile_info);
+	template<int which> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	template<int base> void palette_w(offs_t offset, u16 data, u16 mem_mask);
 
 	void oki1_bank_w(uint16_t data);
 	void lamps_w(uint16_t data);
@@ -93,9 +82,9 @@ private:
 
 void musclem_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(musclem_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(musclem_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(musclem_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(musclem_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(musclem_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(musclem_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
@@ -131,7 +120,7 @@ void musclem_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		int16_t sx = (m_spriteram[0x400 + i] & 0x3ff);
 		sx -= 1;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code, 0, 0, 0, sx, sy, 0);
+		m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, 0, 0, 0, sx, sy, 0);
 
 		// Handle wraparound
 		if (sx > 512 - 16)
@@ -139,45 +128,24 @@ void musclem_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
-TILE_GET_INFO_MEMBER(musclem_state::get_tile_info0)
+template<int which>
+TILE_GET_INFO_MEMBER(musclem_state::get_tile_info)
 {
-	int data = m_videoram0[tile_index];
-	tileinfo.set(3, data, 0, 0);
+	int data = m_vram[which][tile_index];
+	tileinfo.set(which, data, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(musclem_state::get_tile_info1)
+template<int which>
+void musclem_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int data = m_videoram1[tile_index];
-	tileinfo.set(2, data, 0, 0);
+	m_vram[which][offset] = data;
+	m_tilemap[which]->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(musclem_state::get_tile_info2)
-{
-	int data = m_videoram2[tile_index];
-	tileinfo.set(1, data, 0, 0);
-}
-
-void musclem_state::videoram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	m_videoram0[offset] = data;
-	m_tilemap[0]->mark_tile_dirty(offset);
-}
-
-void musclem_state::videoram1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	m_videoram1[offset] = data;
-	m_tilemap[1]->mark_tile_dirty(offset);
-}
-
-void musclem_state::videoram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	m_videoram2[offset] = data;
-	m_tilemap[2]->mark_tile_dirty(offset);
-}
-
+template<int base>
 void musclem_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_palette->write16(offset, data, mem_mask);
+	m_palette->write16(base + offset, data, mem_mask);
 }
 
 
@@ -197,8 +165,8 @@ void musclem_state::oki1_bank_w(uint16_t data)
 void musclem_state::lamps_w(uint16_t data)
 {
 	
-	// ........ ....1... - Lamp 1 (active low)
-	// ........ ..1..... - Lamp 2 (active low)
+	// ........ ....x... - Lamp 1 (active low)
+	// ........ ..x..... - Lamp 2 (active low)
 }
 
 
@@ -289,14 +257,14 @@ void musclem_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x20ffff).ram();
-	map(0x800000, 0x8007ff).ram().w(FUNC(musclem_state::videoram0_w)).share("videoram0");
+	map(0x800000, 0x8007ff).ram().w(FUNC(musclem_state::vram_w<0>)).share("vram0");
 	map(0x840000, 0x840fff).ram().share("spriteram");
-	map(0x880000, 0x8807ff).ram().w(FUNC(musclem_state::videoram1_w)).share("videoram1");
-	map(0x8c0000, 0x8c07ff).ram().w(FUNC(musclem_state::videoram2_w)).share("videoram2");
-	map(0x900000, 0x9001ff).lw16(NAME([this](offs_t offset, u16 data, u16 mem_mask) { palette_w(offset, data, mem_mask); }));
-	map(0x900400, 0x9005ff).lw16(NAME([this](offs_t offset, u16 data, u16 mem_mask) { palette_w(0x100 + offset, data, mem_mask); }));
-	map(0x900800, 0x9009ff).lw16(NAME([this](offs_t offset, u16 data, u16 mem_mask) { palette_w(0x200 + offset, data, mem_mask); }));
-	map(0x900c00, 0x900dff).lw16(NAME([this](offs_t offset, u16 data, u16 mem_mask) { palette_w(0x300 + offset, data, mem_mask); }));
+	map(0x880000, 0x8807ff).ram().w(FUNC(musclem_state::vram_w<1>)).share("vram1");
+	map(0x8c0000, 0x8c07ff).ram().w(FUNC(musclem_state::vram_w<2>)).share("vram2");
+	map(0x900000, 0x9001ff).w(FUNC(musclem_state::palette_w<0>));
+	map(0x900400, 0x9005ff).w(FUNC(musclem_state::palette_w<0x100>));
+	map(0x900800, 0x9009ff).w(FUNC(musclem_state::palette_w<0x200>));
+	map(0x900c00, 0x900dff).w(FUNC(musclem_state::palette_w<0x300>));
 	map(0xc00000, 0xc00001).portr("DSW");
 	map(0xc00080, 0xc00081).lw16(NAME([this](u16 data) { m_tilemap[1]->set_scrollx(data); }));
 	map(0xc00082, 0xc00083).lw16(NAME([this](u16 data) { m_tilemap[1]->set_scrolly(data); }));
@@ -320,10 +288,10 @@ void musclem_state::main_map(address_map &map)
  *************************************/
 
 static GFXDECODE_START( gfx_musclem )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x8_raw, 0x100, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x8_raw, 0x300, 1 )
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x8_raw, 0x200, 1 )
-	GFXDECODE_ENTRY( "gfx4", 0, gfx_16x16x8_raw, 0x000, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x8_raw, 0x000, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x8_raw, 0x200, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x8_raw, 0x300, 1 )
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_16x16x8_raw, 0x100, 1 )
 GFXDECODE_END
 
 
@@ -370,22 +338,22 @@ ROM_START( musclem )
 	ROM_LOAD16_BYTE( "u-67.bin",   0x000001, 0x20000, CRC(77f4b6ad) SHA1(8de11378903d48f0c57c6dde3923d8c5fa614ccc) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "u-148.bin", 0x000000, 0x100000, CRC(97aa308a) SHA1(54b2f5a25dcd3c35330f384a9010fbf75a72b8d0) )
+	ROM_LOAD16_BYTE( "u-150.bin", 0x000001, 0x100000, CRC(0c7247bd) SHA1(cab4f83f56ac6567feb27c397d31116c213d0a86) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "u-129.bin", 0x000000, 0x100000, CRC(8268bba6) SHA1(bef3ee971ddf452346c6a7877e1aba577cdaf82c) )
+	ROM_LOAD16_BYTE( "u-130.bin", 0x000001, 0x100000, CRC(be4755e6) SHA1(66a7444bad5def32d44031680a4e8e2f8c1bdc81) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "u-134.bin", 0x000000, 0x080000, CRC(79c8f776) SHA1(830a3905fc4ae88af48946ffc9bc0d58a8906d81) )
+	ROM_LOAD16_BYTE( "u-135.bin", 0x000001, 0x080000, CRC(56b89595) SHA1(ea6efac73857189faa1aa46a31e480770b1b14c7) )
+
+	ROM_REGION( 0x200000, "gfx4", 0 )
 	ROM_LOAD32_BYTE( "u-21.bin", 0x000000, 0x80000, CRC(efc2ba0d) SHA1(a72e5943dc71870f7c7eec30015d38ab06ed1846) )
 	ROM_LOAD32_BYTE( "u-23.bin", 0x000001, 0x80000, CRC(a8f96912) SHA1(69bc5c7c9a391e8a4b5b260bf9f05ffd44b9cadc) )
 	ROM_LOAD32_BYTE( "u-25.bin", 0x000002, 0x80000, CRC(711563c0) SHA1(f0ddd102e5c6dc7286bbeac868c3f08012c54abd) )
 	ROM_LOAD32_BYTE( "u-27.bin", 0x000003, 0x80000, CRC(5d6026f3) SHA1(2afc247c7c6129c184c3ae2f98a39781183c99a5) )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "u-134.bin", 0x000000, 0x080000, CRC(79c8f776) SHA1(830a3905fc4ae88af48946ffc9bc0d58a8906d81) )
-	ROM_LOAD16_BYTE( "u-135.bin", 0x000001, 0x080000, CRC(56b89595) SHA1(ea6efac73857189faa1aa46a31e480770b1b14c7) )
-
-	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "u-129.bin", 0x000000, 0x100000, CRC(8268bba6) SHA1(bef3ee971ddf452346c6a7877e1aba577cdaf82c) )
-	ROM_LOAD16_BYTE( "u-130.bin", 0x000001, 0x100000, CRC(be4755e6) SHA1(66a7444bad5def32d44031680a4e8e2f8c1bdc81) )
-
-	ROM_REGION( 0x200000, "gfx4", 0 )
-	ROM_LOAD16_BYTE( "u-148.bin", 0x000000, 0x100000, CRC(97aa308a) SHA1(54b2f5a25dcd3c35330f384a9010fbf75a72b8d0) )
-	ROM_LOAD16_BYTE( "u-150.bin", 0x000001, 0x100000, CRC(0c7247bd) SHA1(cab4f83f56ac6567feb27c397d31116c213d0a86) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )
 	ROM_LOAD( "u-173.bin", 0x00000, 0x100000, CRC(d93bc7c2) SHA1(bfa3e3936e6fec4f94bfc0bf53cf8b04c085dc92) )
