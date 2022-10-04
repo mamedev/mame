@@ -174,6 +174,32 @@ protected:
 	bool m_lcd_dim = false;
 };
 
+class nws3410_state : public news_r3k_base_state
+{
+public:
+
+nws3410_state(machine_config const &mconfig, device_type type, char const *tag)
+		: news_r3k_base_state(mconfig, type, tag)
+	{
+	}
+
+	void nws3410(machine_config &config);
+
+protected:
+	void nws3410_map(address_map &map);
+};
+
+void nws3410_state::nws3410_map(address_map &map)
+{
+	cpu_map(map);
+}
+
+void nws3410_state::nws3410(machine_config &config)
+{
+	common(config);
+	m_cpu->set_addrmap(AS_PROGRAM, &nws3410_state::nws3410_map);
+}
+
 void news_r3k_base_state::machine_start()
 {
 	m_led.resolve();
@@ -224,6 +250,7 @@ void news_r3k_base_state::init_common()
 void nws3260_state::nws3260_map(address_map &map)
 {
 	cpu_map(map);
+	map(0x10000000, 0x101fffff).rom().region("krom", 0);
 	map(0x10000000, 0x10000003).lw32([this](u32 data) { m_lcd_enable = bool(data); }, "lcd_enable_w");
 	map(0x10100000, 0x10100003).lw32([this](u32 data) { m_lcd_dim = BIT(data, 0); }, "lcd_dim_w");
 	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
@@ -232,8 +259,6 @@ void nws3260_state::nws3260_map(address_map &map)
 void news_r3k_base_state::cpu_map(address_map &map)
 {
 	map.unmap_value_high();
-
-	map(0x10000000, 0x101fffff).rom().region("krom", 0);
 
 	map(0x18000000, 0x18ffffff).r(FUNC(news_r3k_base_state::bus_error));
 
@@ -547,14 +572,16 @@ ROM_START(nws3260)
 	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(17a3d9c6) SHA1(d300e6908210f540951211802c38ad7f8037aa15) BAD_DUMP)
 ROM_END
 
-/*
 ROM_START(nws3410)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "nws3410", "NWS-3410 v2.0A")
+	ROM_SYSTEM_BIOS(0, "nws3410", "NWS-3410 v2.0")
 	ROMX_LOAD("Sony_NWS-3410_MPU-12_v2_ROM.bin", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
+
+	// TODO: real idrom
+	ROM_REGION32_BE(0x100, "idrom", 0)
+	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(17a3d9c6) SHA1(d300e6908210f540951211802c38ad7f8037aa15) BAD_DUMP)
 ROM_END
-*/
 
 /*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT         COMPANY  FULLNAME    FLAGS */
 COMP(1991, nws3260, 0,      0,      nws3260, nws3260, nws3260_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
-// COMP(1991, nws3410, 0,      0,      nws3410, nws3260, news_r3k_base_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
+COMP(1991, nws3410, 0,      0,      nws3410, nws3260, nws3410_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
