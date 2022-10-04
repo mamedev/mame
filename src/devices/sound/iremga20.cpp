@@ -117,10 +117,11 @@ void iremga20_device::device_clock_changed()
 }
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void iremga20_device::rom_bank_updated()
+void iremga20_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
