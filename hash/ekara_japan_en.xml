@@ -17,7 +17,7 @@ license:CC0
 	 EN-1  Enka Collection - Volume 1
 	 EN-2  Enka Collection - Volume 2
 	*EN-3  Enka Collection - Volume 3
-	 EN-4  Enka Collection - Volume 4
+	*EN-4  Enka Collection - Volume 4
 
 	(more? what's the EN highest number?)
 
@@ -31,6 +31,18 @@ license:CC0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="en-3.u1" size="0x100000" crc="e3686ff4" sha1="e7e9a53a778739c406b2b226300d2f525cd9676b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="en4">
+		<description>Enka-shū Dai Yon-hen (Japan) (EN-4)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌集 第四篇" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="en-4.u1" size="0x100000" crc="4e9e00fd" sha1="4cc2b6e39a4ceb1c1753463dd6d559331d75848f"/>
 			</dataarea>
 		</part>
 	</software>
