@@ -66,7 +66,7 @@
       incorrectly reported for writes.
     * Due to the pipelining of writes, an interrupt may be accepted during
       an instruction which attempts to disable interrupts by setting the
-      IEMASK bit, which may be cleared insted when control reaches the next
+      IEMASK bit, which may be cleared instead when control reaches the next
       sequential instruction from a RETI. This sequencing glitch is
       documented in the MN187XX23 user's manual, along with a failsafe way
       of setting IEMASK, and similar workarounds in extant program code

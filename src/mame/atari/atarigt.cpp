@@ -1194,7 +1194,7 @@ ROM_START( tmek20 )
 ROM_END
 
 
-ROM_START( primrage ) // still shows 'version 2.3' on the title screen but build is newer than the primrage set
+ROM_START( primrage ) // still shows 'version 2.3' on the title screen but build is newer than the primrageo set
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 8*64k for 68000 code, differ from the primrageo set */
 	ROM_LOAD32_BYTE( "rage_136102-2044a_pgmuu.29l", 0x000000, 0x80000, CRC(85556b91) SHA1(5f4f5d0bf68bd17b7bff230b521a5dcfff414a50) )
 	ROM_LOAD32_BYTE( "rage_136102-2043a_pgmum.28l", 0x000001, 0x80000, CRC(4d3414d0) SHA1(b6465c0fbee4e67f74185e9ea048e40f4f443efa) )

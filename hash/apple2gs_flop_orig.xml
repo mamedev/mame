@@ -4041,7 +4041,7 @@ license:CC0
 	<software name="frltwrd">
 		<description>First Letters and Words (Version 1.0)</description>
 		<year>????</year>
-        <publisher>First Byte</publisher>
+		<publisher>First Byte</publisher>
 		<info name="release" value="2022-09-10"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- It requires a 768K Apple IIgs. -->
