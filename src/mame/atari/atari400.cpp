@@ -44,6 +44,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
+#include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "atarifdc.h"
@@ -2176,13 +2177,16 @@ void a400_state::atari_common_nodac(machine_config &config)
 	//m_pokey->oclk_w().set("sio", FUNC(a8sio_device::clock_out_w));
 	//m_pokey->sod_w().set("sio", FUNC(a8sio_device::data_out_w));
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a800_keyboard));
-	m_pokey->set_interrupt_callback(FUNC(a400_state::interrupt_cb));
+	m_pokey->irq_w().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void a400_state::atari_common(machine_config &config)
 {
 	atari_common_nodac(config);
+
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
+	m_pokey->irq_w().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
@@ -2203,6 +2207,8 @@ void a400_state::atari_common(machine_config &config)
 	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
 	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
 	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
+	m_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	a8sio_device &sio(A8SIO(config, "sio", nullptr));
 	//sio.clock_in().set("pokey", FUNC(pokey_device::bclk_w));
@@ -2400,7 +2406,6 @@ void a400_state::a5200(machine_config &config)
 	m_pokey->serin_r().set_constant(0);
 	m_pokey->serout_w().set_nop();
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a5200_keypads));
-	m_pokey->set_interrupt_callback(FUNC(a400_state::interrupt_cb));
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	ATARI_GTIA(config, m_gtia, 0);
