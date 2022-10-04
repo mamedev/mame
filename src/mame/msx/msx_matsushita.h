@@ -33,6 +33,8 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
+	static constexpr uint8_t MANUFACTURER_ID = 0x08;
+
 	required_ioport m_io_config;
 	devcb_write_line m_turbo_out_cb;
 	bool m_selected;

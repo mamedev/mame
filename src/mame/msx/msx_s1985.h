@@ -31,6 +31,7 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
+	static constexpr uint8_t MANUFACTURER_ID = 0xfe;
 	bool m_selected;
 	uint8_t m_backup_ram_address;
 	uint8_t m_backup_ram[0x10];

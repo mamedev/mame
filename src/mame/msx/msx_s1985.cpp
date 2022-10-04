@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "msx_s1985.h"
 
-const uint8_t manufacturer_id = 0xfe;
 
 DEFINE_DEVICE_TYPE(MSX_S1985, msx_s1985_device, "msx_s1985", "MSX-Engine S1985")
 
@@ -58,7 +57,7 @@ uint8_t msx_s1985_device::switched_read(offs_t offset)
 		{
 		case 0:
 			// Manufacturer ID number register
-			return manufacturer_id ^ 0xff;
+			return MANUFACTURER_ID ^ 0xff;
 
 		case 2:
 			// Back-up RAM read
@@ -90,7 +89,7 @@ void msx_s1985_device::switched_write(offs_t offset, uint8_t data)
 	if (offset == 0)
 	{
 		// Manufacturer ID number register
-		m_selected = (data == manufacturer_id);
+		m_selected = (data == MANUFACTURER_ID);
 	}
 	else if (m_selected)
 	{

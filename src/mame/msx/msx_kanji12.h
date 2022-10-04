@@ -28,6 +28,7 @@ protected:
 	virtual void device_start() override;
 
 private:
+	static constexpr uint8_t MANUFACTURER_ID = 0xf7;
 	required_memory_region m_rom_region;
 
 	bool m_selected;

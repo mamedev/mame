@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "msx_matsushita.h"
 
-const uint8_t manufacturer_id = 0x08;
 
 DEFINE_DEVICE_TYPE(MSX_MATSUSHITA, msx_matsushita_device, "msx_matsushita", "Matsushita switched device")
 
@@ -78,7 +77,7 @@ uint8_t msx_matsushita_device::switched_read(offs_t offset)
 		switch (offset)
 		{
 		case 0x00:
-			return manufacturer_id ^ 0xff;
+			return MANUFACTURER_ID ^ 0xff;
 
 		case 0x01:
 			return m_io_config->read();
@@ -114,7 +113,7 @@ void msx_matsushita_device::switched_write(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		m_selected = (data == manufacturer_id);
+		m_selected = (data == MANUFACTURER_ID);
 	}
 	else if (m_selected)
 	{

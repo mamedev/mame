@@ -27,9 +27,9 @@
 **
 ** Todo/known issues:
 ** - internal:
-**   - Redo the memory handling to get rid of most trampolines and code duplication between
+**   - Redo the memory handling to get rid of trampolines and code duplication between
 **     msx_slot and msx_cart (eg, kanji roms, disk interfaces)
-**   - move subslot register ownership and handling from the main emuation to the
+**   - move subslot register ownership and handling from the main emulation to the
 **     slot owners (the system itself or cartridge slot expanders)
 ** - general: - Add support for kana lock
 ** -          - Expansion slots not emulated
@@ -37,9 +37,6 @@
 **          existing kanji font roms may haven been dumped from inside a running machine. Are all other kanji font
 **          roms bad? We need more direct rom dumps to know for sure.
 ** - rs232 support:
-**   - svi738, svi738ar, svi738dk, svi738pl, svi738sp, svi738sw (working)
-**   - hx22 (working)
-**   - hx22i (working)
 **   - mlg3 (working, how does the rs232 switch work?)
 **   - mlg30_2 (working, how does the rs232 switch work?)
 **   - ucv102 (cannot test, floppy problems)
@@ -48,8 +45,7 @@
 **   - victhc90 (cannot test, system config not emulated)
 **   - victhc95 (cannot test, system config not emulated)
 **   - victhc95a (cannot test, system config not emulated)
-**   - y805256 (cannot test, rs232 rom has not been dumped)
-**   - optional for hx20, hx21, hx23, hx23f, hx32, hx33, hx34
+**   - y805256 (cannot test, rs232 rom has not been dumped?)
 ** - inputs:
 **     bruc100: Not all keypad keys hooked up yet
 **     fs4000: Is the keypad enter exactly the same as the normal enter key? There does not appear to be a separate mapping for it.

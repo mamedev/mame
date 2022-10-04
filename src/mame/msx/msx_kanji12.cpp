@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "msx_kanji12.h"
 
-const uint8_t manufacturer_id = 0xf7;
 
 DEFINE_DEVICE_TYPE(MSX_KANJI12, msx_kanji12_device, "msx_kanji12", "MSX Kanji12")
 
@@ -38,7 +37,7 @@ uint8_t msx_kanji12_device::switched_read(offs_t offset)
 		{
 		case 0:
 			// Manufacturer ID number register
-			return manufacturer_id ^ 0xff;
+			return MANUFACTURER_ID ^ 0xff;
 
 		case 9:
 			if (m_address < m_rom_region->bytes())
@@ -65,7 +64,7 @@ void msx_kanji12_device::switched_write(offs_t offset, uint8_t data)
 	if (offset == 0)
 	{
 		// Manufacturer ID number register
-		m_selected = (data == manufacturer_id);
+		m_selected = (data == MANUFACTURER_ID);
 	}
 	else if (m_selected)
 	{
