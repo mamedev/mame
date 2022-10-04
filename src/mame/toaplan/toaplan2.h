@@ -116,7 +116,7 @@ private:
 	optional_device<generic_latch_8_device> m_soundlatch; // tekipaki, batrider, bgaregga, batsugun
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_device<ticket_dispenser_device> m_hopper;
-	
+
 	optional_device<address_map_bank_device> m_dma_space;
 
 	optional_region_ptr<u8> m_z80_rom;
