@@ -205,6 +205,8 @@ void nws3410_state::nws3410(machine_config &config)
 	m_ram->set_default_size("8M");
 	m_ram->set_extra_options("12M,16M");
 	common(config);
+
+	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
 }
 
 void news_r3k_base_state::machine_start()
@@ -331,6 +333,29 @@ static INPUT_PORTS_START(nws3260)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(nws3410)
+	PORT_START("SW2")
+	PORT_DIPNAME(0x07000000, 0x02000000, "Console") PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(0x00000000, "Serial")
+	PORT_DIPSETTING(0x02000000, "NWB-252/NWB-253") // NWB-252 (color) or NWB-253 (monochrome) NWS-3400 series bitmap board
+	PORT_DIPSETTING(0x07000000, "NWB-514/NWB-251") // NWB-514 (monochrome) or NWB-251 (color) expansion framebuffer
+	PORT_DIPNAME(0x08000000, 0x00000000, "Boot Device") PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(0x00000000, "Disk")
+	PORT_DIPSETTING(0x08000000, "Network")
+	PORT_DIPNAME(0x10000000, 0x00000000, "Automatic Boot") PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(0x00000000, DEF_STR(Off))
+	PORT_DIPSETTING(0x10000000, DEF_STR(On))
+	PORT_DIPNAME(0x20000000, 0x00000000, "Diagnostic Mode") PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(0x00000000, DEF_STR(Off))
+	PORT_DIPSETTING(0x20000000, DEF_STR(On))
+	PORT_DIPNAME(0x40000000, 0x00000000, "RAM") PORT_DIPLOCATION("SW2:7") // Controls "No Memory Mode" for testing, forces monitor to use RTC RAM instead
+	PORT_DIPSETTING(0x00000000, "Enabled")
+	PORT_DIPSETTING(0x40000000, "Disabled")
+	PORT_DIPNAME(0x80000000, 0x00000000, "Console Baud") PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(0x00000000, "9600")
+	PORT_DIPSETTING(0x80000000, "1200")
 INPUT_PORTS_END
 
 u32 nws3260_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
@@ -591,4 +616,4 @@ ROM_END
 
 /*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT         COMPANY  FULLNAME    FLAGS */
 COMP(1991, nws3260, 0,      0,      nws3260, nws3260, nws3260_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
-COMP(1991, nws3410, 0,      0,      nws3410, nws3260, nws3410_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
+COMP(1991, nws3410, 0,      0,      nws3410, nws3410, nws3410_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
