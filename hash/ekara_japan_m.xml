@@ -113,7 +113,7 @@ license:CC0
 		<description>Artist Mini Volume 6 (Utada Hikaru) (Japan) (MC0010-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="アーティストミニ mini vol.6"/>
+		<info name="alt_title" value="アーティストミニ mini vol.6 (宇多田ヒカル)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0010-atm.u1" size="0x080000" crc="aae13f60" sha1="87ea122aebb467ebc4785482961160766db90fcd"/>
