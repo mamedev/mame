@@ -32,7 +32,7 @@ avi_write::~avi_write()
 	}
 }
 
-void avi_write::record(const char *name)
+void avi_write::record(std::string_view name)
 {
 	if (m_recording)
 	{
@@ -48,7 +48,7 @@ void avi_write::stop()
 	end_avi_recording();
 }
 
-void avi_write::begin_avi_recording(const char *name)
+void avi_write::begin_avi_recording(std::string_view name)
 {
 	// stop any existing recording
 	end_avi_recording();
@@ -81,7 +81,7 @@ void avi_write::begin_avi_recording(const char *name)
 
 	// create a new temporary movie file
 	emu_file tempfile(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	const std::error_condition filerr = (!name || !name[0] || !std::strcmp(name, OSDOPTVAL_AUTO))
+	const std::error_condition filerr = (name.empty() || name == OSDOPTVAL_AUTO)
 			? m_machine.video().open_next(tempfile, "avi")
 			: tempfile.open(name);
 
