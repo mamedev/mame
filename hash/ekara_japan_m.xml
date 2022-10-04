@@ -11,7 +11,7 @@ license:CC0
 
 	M-1  *MC0001-ATM  Artist Mini Volume 1 (Aya Matsuura)
 	M-2   MC0002-ATM  Artist Mini Volume 2 (untranslated artist)
-	M-3  *MC0003-ATM  Artist Mini Volume 3 (untranslated artist)
+	M-3  *MC0003-ATM  Artist Mini Volume 3 (Morning Musume)
 	M-4  *MC0004-ATM  Artist Mini Volume 4 (w-inds)
 	M-5  *MC0005-KSM  Kids Song Mini Volume 1 (TV Song)
 	M-6  *MC0006-KSM  Kids Song Mini Volume 2 (TV Hero)
@@ -50,10 +50,10 @@ license:CC0
 	</software>
 
 	<software name="mc0003">
-		<description>Artist Mini Volume 3 (Japan) (MC0003-ATM)</description>
+		<description>Artist Mini Volume 3 (Morning Musume) (Japan) (MC0003-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="アーティストミニ mini vol.3"/>
+		<info name="alt_title" value="アーティストミニ mini vol.3 (モーニング娘)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0003-atm.u1" size="0x080000" crc="d9778b40" sha1="55c875d0925c031320ccf7affe721bd07ef6175b"/>
@@ -160,6 +160,7 @@ license:CC0
 	<software name="mc0015">
 		<description>TV Pop Mini Vol.1 (Japan) (MC0015-TPM)</description>
 		<year>2003</year>
+		<info name="alt_title" value="TV POPミニ mini vol.1"/>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
