@@ -90,7 +90,7 @@ license:CC0
 		<description>TV Pop Junior Volume 1 (Japan) (GC0005-TPJ)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="TV POPジュニアvol.1"/>
+		<info name="alt_title" value="TV POPジュニアVol.1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0005-tpj.u1" size="0x100000" crc="b1fda1a4" sha1="a135226aa400c5a78060b08d5f64eb6a06c990e7"/>
