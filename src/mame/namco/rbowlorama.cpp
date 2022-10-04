@@ -161,8 +161,8 @@ ROM_START( rbowlorama )
 	ROM_LOAD("bor-2.1.1.00000.xpk", 0x00000, 0x2fd0000, CRC(eac46f62) SHA1(3b00baad15ab7662b3d4cd69c4d589f722f2e1f7))
 
 
-	DISK_REGION( "recovery211" )
-	DISK_IMAGE_READONLY( "bor2_2_1", 0, SHA1(2c9341b81e1cda94231fb8173b506178bf163f9c) ) // 2.1.1 recovery ISO image
+	DISK_REGION( "recovery221" )
+	DISK_IMAGE_READONLY( "bor2_2_1", 0, SHA1(2c9341b81e1cda94231fb8173b506178bf163f9c) ) // 2.2.1 recovery ISO image
 ROM_END
 
 } // Anonymous namespace
