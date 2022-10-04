@@ -50,4 +50,16 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- TODO: list songs -->
+	<software name="ekaraweb12b">
+		<description>e-kara Web cartridge 12M (used, with 12 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb4.bin" size="0x100000" crc="23df7749" sha1="cfd3f9f0b9f4713d560700c4e463d0e9d94c9447"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
