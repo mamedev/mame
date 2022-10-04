@@ -160,8 +160,8 @@ license:CC0
 	<software name="mc0015">
 		<description>TV Pop Mini Vol.1 (Japan) (MC0015-TPM)</description>
 		<year>2003</year>
-		<info name="alt_title" value="TV POPミニ mini vol.1"/>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPミニ mini vol.1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0015-tpm.u1" size="0x080000" crc="c0e87576" sha1="c239c22499591b85bdb2737d22417489a02ffb44"/>

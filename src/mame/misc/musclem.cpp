@@ -60,9 +60,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	template<int which> TILE_GET_INFO_MEMBER(get_tile_info);
-	template<int which> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	template<int base> void palette_w(offs_t offset, u16 data, u16 mem_mask);
+	template <int Which> TILE_GET_INFO_MEMBER(get_tile_info);
+	template <int Which> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	template <int Base> void palette_w(offs_t offset, u16 data, u16 mem_mask);
 
 	void oki1_bank_w(uint16_t data);
 	void lamps_w(uint16_t data);
@@ -126,24 +126,24 @@ void musclem_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
-template<int which>
+template <int Which>
 TILE_GET_INFO_MEMBER(musclem_state::get_tile_info)
 {
-	int data = m_vram[which][tile_index];
-	tileinfo.set(which, data, 0, 0);
+	int data = m_vram[Which][tile_index];
+	tileinfo.set(Which, data, 0, 0);
 }
 
-template<int which>
+template <int Which>
 void musclem_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_vram[which][offset] = data;
-	m_tilemap[which]->mark_tile_dirty(offset);
+	m_vram[Which][offset] = data;
+	m_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-template<int base>
+template <int Base>
 void musclem_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_palette->write16(base + offset, data, mem_mask);
+	m_palette->write16(Base + offset, data, mem_mask);
 }
 
 
