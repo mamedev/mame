@@ -6,7 +6,7 @@ Winner's Club - Mighty 8 Liner
 
 Many games in the series, only one dumped for now.
 
-Winner's Wheel - Magical Spot (2000)
+Winner's Wheel - Magical Spot (2005)
 https://www.youtube.com/watch?v=k3REoIx7m-I
 
 Hardware manufactured by Sammy
@@ -127,4 +127,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2005, wwmspot, 0, winclub, winclub, winclub_state, empty_init, ROT0, "Sega", "Winner's Wheel - Magical Spot", MACHINE_IS_SKELETON ) // year taken for instructions on cabinet (see YouTube video)
+GAME( 2005, wwmspot, 0, winclub, winclub, winclub_state, empty_init, ROT0, "Sega", "Winner's Wheel - Magical Spot", MACHINE_IS_SKELETON ) // year taken from instructions on cabinet (see YouTube video)
