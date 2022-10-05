@@ -42,6 +42,7 @@ class m119_state : public driver_device
 public:
 	m119_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -50,7 +51,9 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
+	void program_map(address_map &map);
+	
+	required_device<sh3_device> m_maincpu;
 };
 
 uint32_t m119_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -58,9 +61,20 @@ uint32_t m119_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-void m119_state::prg_map(address_map &map)
+void m119_state::program_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().region("maincpu", 0);
+	map(0x00400000, 0x0040ffff).ram(); // stack
+
+//	map(0x04000080, 0x04000083) address/data pairs, likely YMZ
+//	map(0x1000be01, 0x1000c1ff) filled as byte area
+//	map(0x1000c000, 0x1000ffff) ^
+//	0x18000096-0x18000097 writes before accessing byte area, banked view?
+//	0x180000b5 always 0xaa, paired with WTCSR $5a
+//  0x180000b4 r/w at PC=0x12b2 onward,
+//             then loops expecting an external event filling work RAM buffer $401110 PC=12e6,
+//             presumably for a thread dispatcher (observe R11 afterwards)
+
 }
 
 static INPUT_PORTS_START( m119 )
@@ -85,13 +99,14 @@ INPUT_PORTS_END
 void m119_state::m119(machine_config &config)
 {
 	// basic machine hardware
-	sh3be_device &maincpu(SH3BE(config, "maincpu", 60'000'000)); // HD6417708S, according to the datasheet operation frequency is 60 MHz. TODO: verify endianness
-	maincpu.set_addrmap(AS_PROGRAM, &m119_state::prg_map);
+	SH3LE(config, m_maincpu, 60'000'000); // HD6417708S, according to the datasheet operation frequency is 60 MHz.
+	m_maincpu->set_addrmap(AS_PROGRAM, &m119_state::program_map);
+//	m_maincpu->set_vblank_int("screen", FUNC(m119_state::irq2_line_hold));
 
 	// all wrong
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(m119_state::screen_update));
