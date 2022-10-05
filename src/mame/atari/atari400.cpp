@@ -2126,7 +2126,7 @@ void a400_state::a800xl_pia_pb_w(uint8_t data)
  *
  **************************************************************/
 
-// note: both screen setups are actually non-interlaced
+// note: both screen setups are actually non-interlaced, and always 240 lines
 void a400_state::config_ntsc_screen(machine_config &config)
 {
 	// 15.69975KHz x 59.9271 Hz
@@ -2137,7 +2137,7 @@ void a400_state::config_ntsc_screen(machine_config &config)
 void a400_state::config_pal_screen(machine_config &config)
 {
 	// 15.55655KHz x 49.86074 Hz, master clock rated at 14.18757 MHz
-	// TODO: must have bigger vertical overscan, confirm hsync
+	// TODO: confirm hsync
 	m_screen->set_raw(XTAL(3'546'800) * 4, 912, antic_device::MIN_X, antic_device::MAX_X, 312, antic_device::MIN_Y, antic_device::MAX_Y);
 	m_gtia->set_region(GTIA_PAL);
 }
