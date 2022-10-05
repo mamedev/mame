@@ -92,6 +92,7 @@ license:CC0
 		<description>Healing Air 1</description>
 		<year>2003</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ヒーリングエアー1"/>
 		<info name="serial" value="eM5"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
@@ -104,6 +105,7 @@ license:CC0
 		<description>Drama Mix 1</description>
 		<year>2003</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ドラマミックス1"/>
 		<info name="serial" value="eM6"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
@@ -155,6 +157,7 @@ license:CC0
 		<description>Anime Special - Pocket Monsters</description>
 		<year>2003</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="アニメスペシャル ポケットモンスター"/>
 		<info name="serial" value="eM10"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
@@ -193,6 +196,7 @@ license:CC0
 		<description>Minna no evio</description>
 		<year>2003</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="みんなのエヴィオ"/>
 		<info name="serial" value="eM17"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
