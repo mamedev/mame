@@ -23,6 +23,8 @@ public:
 	virtual void initialize_cartridge() { }
 	virtual void interface_pre_start() override { assert(m_exp != nullptr); }
 
+	void set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3);
+
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
 	virtual void write_cart(offs_t offset, uint8_t data) { }
@@ -46,6 +48,7 @@ public:
 	uint32_t get_rom_vlm5030_size() { return m_rom_vlm5030.size(); }
 	uint32_t get_ram_size() { return m_ram.size(); }
 	uint32_t get_sram_size() { return m_sram.size(); }
+	memory_view::memory_view_entry *get_page(int i) { return m_page[i]; }
 
 protected:
 	msx_cart_interface(const machine_config &mconfig, device_t &device);
@@ -54,6 +57,7 @@ protected:
 	std::vector<uint8_t> m_ram;
 	std::vector<uint8_t> m_rom_vlm5030;
 	std::vector<uint8_t> m_sram;
+	memory_view::memory_view_entry *m_page[4];
 
 private:
 	msx_slot_cartridge_device *m_exp;

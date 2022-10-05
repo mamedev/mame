@@ -82,6 +82,8 @@ msx_cart_interface::msx_cart_interface(const machine_config &mconfig, device_t &
 	: device_interface(device, "msxcart")
 	, m_exp(nullptr)
 {
+	for (int i = 0; i < 4; i++)
+		m_page[i] = nullptr;
 }
 
 void msx_cart_interface::rom_alloc(uint32_t size)
@@ -121,6 +123,14 @@ address_space &msx_cart_interface::memory_space() const
 address_space &msx_cart_interface::io_space() const
 {
 	return m_exp->io_space();
+}
+
+void msx_cart_interface::set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
+{
+	m_page[0] = page0;
+	m_page[1] = page1;
+	m_page[2] = page2;
+	m_page[3] = page3;
 }
 
 

@@ -652,6 +652,12 @@ public:
 		, m_io_mouse(*this, "MOUSE%u", 0U)
 		, m_io_key(*this, "KEY%u", 0U)
 		, m_leds(*this, "led%u", 1U)
+		, m_view_page0(*this, "view_0000")
+		, m_view_page1(*this, "view_4000")
+		, m_view_page2(*this, "view_8000")
+		, m_view_page3(*this, "view_c000")
+		, m_use_views(false)
+		, m_cartslot1(nullptr)
 		, m_psg_b(0)
 		, m_kanji_latch(0)
 		, m_empty_slot(mconfig, *this)
@@ -922,7 +928,9 @@ protected:
 	void psg_port_b_w(uint8_t data);
 
 	void msx_io_map(address_map &map);
+	void memory_map_old(address_map &map);
 	void memory_map(address_map &map);
+	void memory_map_canonv8(address_map &map);
 
 	required_device<z80_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;
@@ -946,6 +954,12 @@ protected:
 	msx_hw_def m_hw_def;
 	// This is here until more direct rom dumps from kanji font roms become available.
 	bool m_kanji_fsa1fx = false;
+	memory_view m_view_page0;
+	memory_view m_view_page1;
+	memory_view m_view_page2;
+	memory_view m_view_page3;
+	bool m_use_views;
+	msx_slot_cartridge_device *m_cartslot1;
 
 private:
 	void memory_map_all();
@@ -1194,6 +1208,28 @@ private:
 
 void msx_state::memory_map(address_map &map)
 {
+	map.unmap_value_high();
+
+	map(0x0000, 0x3fff).view(m_view_page0);
+	map(0x4000, 0x7fff).view(m_view_page1);
+	map(0x8000, 0xbfff).view(m_view_page2);
+	map(0xc000, 0xffff).view(m_view_page3);
+
+	// setup defaults
+	for (int i = 0; i < 4; i++)
+	{
+		m_view_page0[i](0x0000, 0x3fff).noprw();
+		m_view_page1[i](0x4000, 0x7fff).noprw();
+		m_view_page2[i](0x8000, 0xbfff).noprw();
+		m_view_page3[i](0xc000, 0xffff).noprw();
+	}
+
+	m_use_views = true;
+}
+
+
+void msx_state::memory_map_old(address_map &map)
+{
 	map(0x0000, 0xfffe).rw(FUNC(msx_state::mem_read), FUNC(msx_state::mem_write));
 	map(0xffff, 0xffff).rw(FUNC(msx_state::sec_slot_r), FUNC(msx_state::sec_slot_w));
 }
@@ -1298,6 +1334,14 @@ void msx_state::machine_reset()
 {
 	memory_reset();
 	memory_map_all();
+	m_primary_slot = 0;
+	if (m_use_views)
+	{
+		m_view_page0.select(0);
+		m_view_page1.select(0);
+		m_view_page2.select(0);
+		m_view_page3.select(0);
+	}
 }
 
 
@@ -1564,6 +1608,13 @@ void msx_state::ppi_port_a_w(uint8_t data)
 
 	LOG("write to primary slot select: %02x\n", m_primary_slot);
 	memory_map_all();
+	if (m_use_views)
+	{
+		m_view_page0.select((data >> 0) & 0x03);
+		m_view_page1.select((data >> 2) & 0x03);
+		m_view_page2.select((data >> 4) & 0x03);
+		m_view_page3.select((data >> 6) & 0x03);
+	}
 }
 
 void msx_state::ppi_port_c_w(uint8_t data)
@@ -1642,7 +1693,7 @@ void msx_state::memory_init()
 	}
 
 	if (count_populated_pages == 0) {
-		fatalerror("No msx slot layout defined for this system!\n");
+//		fatalerror("No msx slot layout defined for this system!\n");
 	}
 }
 
@@ -3234,7 +3285,7 @@ void msx_state::msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL x
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, xtal / cpu_divider);         // 3.579545 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::memory_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::memory_map_old);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
@@ -3453,7 +3504,7 @@ void msx2_state::turbor(AY8910Type &ay8910_type, machine_config &config)
 	msx2plus_base(ay8910_type, config);
 
 	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::memory_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::memory_map_old);
 	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2plus_io_map);
 
 	// Software lists
@@ -3542,12 +3593,23 @@ void msx_state::canonv8(machine_config &config)
 	// S3527
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);
+//	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
+//	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+//	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);
+	m_cartslot1 = &add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 
 	m_hw_def.has_printer_port(false);
 	msx1(TMS9118, YM2149, config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::memory_map_canonv8);
+}
+
+void msx_state::memory_map_canonv8(address_map &map)
+{
+	memory_map(map);
+	m_view_page0[0](0x0000, 0x3fff).rom().region("mainrom", 0);
+	m_view_page1[0](0x4000, 0x7fff).rom().region("mainrom", 0x4000);
+	m_cartslot1->install(&m_view_page0[1], &m_view_page1[1], &m_view_page2[1], &m_view_page3[1]);
+	m_view_page3[2](0xc000, 0xffff).ram();
 }
 
 /* MSX - Canon V-10 */

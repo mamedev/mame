@@ -26,6 +26,8 @@ public:
 private:
 	uint32_t m_start_address;
 	uint32_t m_end_address;
+
+	void install_memory();
 };
 
 #endif // MAME_BUS_MSX_CART_NOMAPPER_H

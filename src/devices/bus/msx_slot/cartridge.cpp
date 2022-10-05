@@ -46,6 +46,10 @@ msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconf
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_cartridge(nullptr)
+	, m_page0(nullptr)
+	, m_page1(nullptr)
+	, m_page2(nullptr)
+	, m_page3(nullptr)
 {
 }
 
@@ -95,18 +99,43 @@ void msx_slot_cartridge_device::device_resolve_objects()
 	m_irq_handler.resolve_safe();
 	m_cartridge = dynamic_cast<msx_cart_interface *>(get_card_device());
 	if (m_cartridge)
+	{
 		m_cartridge->m_exp = this;
+		m_cartridge->set_views(m_page0, m_page1, m_page2, m_page3);
+	}
+	printf("device_resolve_objects\n");
 }
 
 
 void msx_slot_cartridge_device::device_start()
 {
+	// This needs to be pushed into the cartridges/devices themelves. For now it's a temporary bridge between old and new
+	if (m_page0)
+	{
+		m_page0->install_readwrite_handler(0x0000, 0x3fff, read8sm_delegate(*this, FUNC(msx_slot_cartridge_device::read0)), write8sm_delegate(*this, FUNC(msx_slot_cartridge_device::write0)));
+	}
+	if (m_page1)
+	{
+		m_page1->install_readwrite_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(msx_slot_cartridge_device::read1)), write8sm_delegate(*this, FUNC(msx_slot_cartridge_device::write1)));
+	}
+	if (m_page2)
+	{
+		m_page2->install_readwrite_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(msx_slot_cartridge_device::read2)), write8sm_delegate(*this, FUNC(msx_slot_cartridge_device::write2)));
+	}
+	if (m_page3)
+	{
+		m_page3->install_readwrite_handler(0xc000, 0xffff, read8sm_delegate(*this, FUNC(msx_slot_cartridge_device::read3)), write8sm_delegate(*this, FUNC(msx_slot_cartridge_device::write3)));
+	}
+	if (m_cartridge)
+	{
+		printf("cartridge inserted\n");
+	}
 }
 
 
 image_init_result msx_slot_cartridge_device::call_load()
 {
-	if ( m_cartridge )
+	if (m_cartridge)
 	{
 		if (loaded_through_softlist())
 		{
@@ -114,7 +143,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 
 			// Allocate and copy rom contents
 			length = get_software_region_length("rom");
-			m_cartridge->rom_alloc( length );
+			m_cartridge->rom_alloc(length);
 			if (length > 0)
 			{
 				uint8_t *rom_base = m_cartridge->get_rom_base();
@@ -136,7 +165,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 
 			// Allocate sram
 			length = get_software_region_length("sram");
-			m_cartridge->sram_alloc( length );
+			m_cartridge->sram_alloc(length);
 		}
 		else
 		{
@@ -155,7 +184,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 				length_aligned = 0xc000;
 			else
 			{
-				while (length_aligned < length )
+				while (length_aligned < length)
 					length_aligned *= 2;
 			}
 
@@ -342,20 +371,103 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 
 uint8_t msx_slot_cartridge_device::read(offs_t offset)
 {
-	if ( m_cartridge )
+	if (m_cartridge)
 	{
 		return m_cartridge->read_cart(offset);
 	}
-	return 0xFF;
+	return 0xff;
 }
 
 
 void msx_slot_cartridge_device::write(offs_t offset, uint8_t data)
 {
-	if ( m_cartridge )
+	if (m_cartridge)
 	{
 		m_cartridge->write_cart(offset, data);
 	}
+}
+
+
+// Temporary trampolines between old and new
+uint8_t msx_slot_cartridge_device::read0(offs_t offset)
+{
+	if (m_cartridge)
+	{
+		printf("read0 %04x\n", offset);
+		return m_cartridge->read_cart(offset);
+	}
+	return 0xff;
+}
+
+uint8_t msx_slot_cartridge_device::read1(offs_t offset)
+{
+	if (m_cartridge)
+	{
+		printf("read1 %04x\n", offset);
+		return m_cartridge->read_cart(0x4000 + offset);
+	}
+	return 0xff;
+}
+
+uint8_t msx_slot_cartridge_device::read2(offs_t offset)
+{
+	if (m_cartridge)
+	{
+		printf("read2 %04x\n", offset);
+		return m_cartridge->read_cart(0x8000 + offset);
+	}
+	return 0xff;
+}
+
+uint8_t msx_slot_cartridge_device::read3(offs_t offset)
+{
+	if (m_cartridge)
+	{
+		printf("read3 %04x\n", offset);
+		return m_cartridge->read_cart(0xc000 + offset);
+	}
+	return 0xff;
+}
+
+void msx_slot_cartridge_device::write0(offs_t offset, uint8_t data)
+{
+	if (m_cartridge)
+	{
+		m_cartridge->write_cart(offset, data);
+	}
+}
+
+void msx_slot_cartridge_device::write1(offs_t offset, uint8_t data)
+{
+	if (m_cartridge)
+	{
+		m_cartridge->write_cart(0x4000 + offset, data);
+	}
+}
+
+void msx_slot_cartridge_device::write2(offs_t offset, uint8_t data)
+{
+	if (m_cartridge)
+	{
+		m_cartridge->write_cart(0x8000 + offset, data);
+	}
+}
+
+void msx_slot_cartridge_device::write3(offs_t offset, uint8_t data)
+{
+	if (m_cartridge)
+	{
+		m_cartridge->write_cart(0xc000 + offset, data);
+	}
+}
+
+void msx_slot_cartridge_device::install(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
+{
+	printf("cartridge install\n");
+	m_page0 = page0;
+	m_page1 = page1;
+	m_page2 = page2;
+	m_page3 = page3;
 }
 
 

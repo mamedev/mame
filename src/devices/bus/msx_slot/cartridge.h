@@ -25,6 +25,7 @@ public:
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
+	void install(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3);
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -49,8 +50,21 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
+	uint8_t read0(offs_t offset);
+	uint8_t read1(offs_t offset);
+	uint8_t read2(offs_t offset);
+	uint8_t read3(offs_t offset);
+	void write0(offs_t offset, uint8_t data);
+	void write1(offs_t offset, uint8_t data);
+	void write2(offs_t offset, uint8_t data);
+	void write3(offs_t offset, uint8_t data);
+
 	devcb_write_line m_irq_handler;
 	msx_cart_interface *m_cartridge;
+	memory_view::memory_view_entry *m_page0;
+	memory_view::memory_view_entry *m_page1;
+	memory_view::memory_view_entry *m_page2;
+	memory_view::memory_view_entry *m_page3;
 
 	static int get_cart_type(const uint8_t *rom, uint32_t length);
 };
