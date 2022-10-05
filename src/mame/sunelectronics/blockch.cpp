@@ -23,6 +23,8 @@ TODO:
   the PCB was purchased as Sun Electronics Block Challenger.
 - paddle/ball sprite drawing is guessed
 - video timing is wrong
+- 2nd irq timing is guessed (it's not vblank-out irq, that will cause strange
+  delays when the ball hits a brick)
 - the flyer photo shows a green screen, assumed to be an overlay on a B&W CRT
 - identify remaining switches
 - cocktail mode
@@ -127,14 +129,23 @@ u32 blockch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 	// draw paddle
 	int num_p = (m_inputs[3]->read() & 1) ? 1 : 2;
-	int py = m_inputs[4]->read();
-	int px[2] = { 44, 184 };
-	int plen = (m_vctrl & 4) ? 16 : 32;
+	const int px[2] = { 44, 184 };
+	int py, plen;
 
 	if (m_sound & 0x80)
 	{
 		py = 0;
 		plen = 256;
+	}
+	else
+	{
+		py = m_inputs[4]->read();
+		if (m_vctrl & 8)
+			plen = 8;
+		else if (m_vctrl & 4)
+			plen = 16;
+		else
+			plen = 32;
 	}
 
 	for (int y = py; y < (py + plen); y++)
@@ -161,7 +172,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(blockch_state::scanline)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 
 	// unknown irq
-	if (scanline == 32)
+	if (scanline == 64)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -186,8 +197,8 @@ void blockch_state::ppi1_c_w(u8 data)
 {
 	// d0: ball x hi
 	// d1: flip screen
-	// d2: shorter paddles
-	// d3: unused?
+	// d2: shorter paddles (10 points)
+	// d3: shorter paddles (hit the ceiling)
 	m_vctrl = data;
 }
 
@@ -225,9 +236,9 @@ static INPUT_PORTS_START( blockch )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x02, "7" )
 	PORT_DIPSETTING(    0x03, "9")
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 0_04" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Replay" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, "400" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
@@ -249,11 +260,10 @@ static INPUT_PORTS_START( blockch )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 1_10" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Barriers" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x30, 0x30, "Barriers" )
+	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, "500, 1500" )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Unknown 1_40" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )

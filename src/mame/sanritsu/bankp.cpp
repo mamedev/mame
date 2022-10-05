@@ -134,7 +134,7 @@ private:
 
 	uint8_t m_scroll_x = 0;
 	uint8_t m_priority = 0;
-	uint8_t m_pen_hi = 0;
+	uint8_t m_color_hi = 0;
 	uint8_t m_display_on = 0;
 	uint8_t m_nmi_mask = 0;
 
@@ -155,7 +155,7 @@ void bankp_state::machine_start()
 {
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_priority));
-	save_item(NAME(m_pen_hi));
+	save_item(NAME(m_color_hi));
 	save_item(NAME(m_display_on));
 	save_item(NAME(m_nmi_mask));
 }
@@ -259,10 +259,10 @@ void bankp_state::video_control_w(uint8_t data)
 	// bit 2 turns on display
 	m_display_on = BIT(data, 2);
 
-	// bit 3 controls pen high bit
-	if (m_pen_hi != BIT(data, 3))
+	// bit 3 controls color prom d4
+	if (m_color_hi != BIT(data, 3))
 	{
-		m_pen_hi = BIT(data, 3);
+		m_color_hi = BIT(data, 3);
 		machine().tilemap().mark_all_dirty();
 	}
 
@@ -278,7 +278,7 @@ void bankp_state::video_control_w(uint8_t data)
 TILE_GET_INFO_MEMBER(bankp_state::get_fg_tile_info)
 {
 	int const code = m_videoram[0][tile_index] + 256 * (m_colorram[0][tile_index] & 0x03);
-	int const color = (m_colorram[0][tile_index] >> 3) | (m_pen_hi << 5);
+	int const color = (m_colorram[0][tile_index] >> 3) | (m_color_hi << 5);
 	int const flags = (m_colorram[0][tile_index] & 0x04) ? TILE_FLIPX : 0;
 
 	tileinfo.set(0, code, color, flags);
@@ -288,7 +288,7 @@ TILE_GET_INFO_MEMBER(bankp_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(bankp_state::get_bg_tile_info)
 {
 	int const code = m_videoram[1][tile_index] + 256 * (m_colorram[1][tile_index] & 0x07);
-	int const color = (m_colorram[1][tile_index] >> 4) | (m_pen_hi << 4);
+	int const color = (m_colorram[1][tile_index] >> 4) | (m_color_hi << 4);
 	int const flags = (m_colorram[1][tile_index] & 0x08) ? TILE_FLIPX : 0;
 
 	tileinfo.set(1, code, color, flags);
