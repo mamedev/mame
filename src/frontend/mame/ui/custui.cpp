@@ -295,14 +295,14 @@ void menu_custom_ui::find_sysnames()
 			m_sysnames.end(),
 			[] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x, y); });
 
-	char const *const names = ui().options().system_names();
-	if (*names)
+	std::string const names = ui().options().system_names();
+	if (!names.empty())
 	{
 		auto const found = std::lower_bound(
 				std::next(m_sysnames.begin()),
 				m_sysnames.end(),
 				names,
-				[] (std::string const &x, char const *y) { return 0 > core_stricmp(x, y); });
+				[] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x, y); });
 		m_currsysnames = std::distance(m_sysnames.begin(), found);
 		if ((m_sysnames.end() == found) || core_stricmp(*found, names))
 			m_sysnames.emplace(found, names);

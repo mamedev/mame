@@ -17,6 +17,8 @@
 #include "osdfile.h"
 #include "modules/lib/osdobj_common.h"
 
+#include "path.h"
+
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
@@ -33,8 +35,7 @@ static bool prepare_effect_document(std::string &name, osd_options &options, rap
 		full_name = full_name + ".json";
 	}
 
-	std::string path = osd_subst_env(util::string_format("%s" PATH_SEPARATOR "effects" PATH_SEPARATOR, options.bgfx_path()));
-	path += full_name;
+	std::string const path = util::path_concat(options.bgfx_path(), "effects", full_name);
 
 	bx::FileReader reader;
 	if (!bx::open(&reader, path.c_str()))

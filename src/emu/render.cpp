@@ -2207,12 +2207,12 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	return result;
 }
 
-bool render_target::load_layout_file(device_t &device, util::xml::data_node const &rootnode, const char *searchpath, const char *dirname)
+bool render_target::load_layout_file(device_t &device, util::xml::data_node const &rootnode, std::string &&searchpath, const char *dirname)
 {
 	// parse and catch any errors
 	try
 	{
-		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
+		m_filelist.emplace_back(device, rootnode, std::move(searchpath), dirname);
 	}
 	catch (emu_fatalerror &err)
 	{

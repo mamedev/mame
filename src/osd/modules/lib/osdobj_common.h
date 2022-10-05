@@ -154,13 +154,13 @@ public:
 	const char *audio_effect(int index) const { return value(util::string_format("%s%d", OSDOPTION_AUDIO_EFFECT, index)); }
 
 	// BGFX specific options
-	const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }
+	std::string bgfx_path() const { return value_substituted(OSDOPTION_BGFX_PATH); }
 	const char *bgfx_backend() const { return value(OSDOPTION_BGFX_BACKEND); }
 	bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
 	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
 	const char *bgfx_lut() const { return value(OSDOPTION_BGFX_LUT); }
-	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
+	std::string bgfx_avi_name() const { return value_substituted(OSDOPTION_BGFX_AVI_NAME); }
 
 	// PortAudio options
 	const char *pa_api() const { return value(OSDOPTION_PA_API); }

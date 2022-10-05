@@ -92,7 +92,7 @@ public:
 
 	// keyboard mapping
 	bool keymap() const { return bool_value(SDLOPTION_KEYMAP); }
-	const char *keymap_file() const { return value(SDLOPTION_KEYMAP_FILE); }
+	std::string keymap_file() const { return value_substituted(SDLOPTION_KEYMAP_FILE); }
 
 	// joystick mapping
 	bool sixaxis() const { return bool_value(SDLOPTION_SIXAXIS); }

@@ -24,7 +24,7 @@
     hashfile_lookup
 -------------------------------------------------*/
 
-static bool read_hash_config(const char *hash_path, const util::hash_collection &hashes, const char *sysname, std::string &result)
+static bool read_hash_config(std::string_view hash_path, const util::hash_collection &hashes, const char *sysname, std::string &result)
 {
 	/* open a file */
 	emu_file file(hash_path, OPEN_FLAG_READ);
@@ -63,7 +63,7 @@ static bool read_hash_config(const char *hash_path, const util::hash_collection 
 }
 
 
-bool hashfile_extrainfo(const char *hash_path, const game_driver &driver, const util::hash_collection &hashes, std::string &result)
+bool hashfile_extrainfo(std::string_view hash_path, const game_driver &driver, const util::hash_collection &hashes, std::string &result)
 {
 	/* now read the hash file */
 	int drv = driver_list::find(driver);

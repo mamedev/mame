@@ -12,6 +12,7 @@
 #define MAME_LIB_UTIL_OPTIONS_H
 
 #include "strformat.h"
+#include "utilfwd.h"
 
 #include <algorithm>
 #include <exception>
@@ -43,7 +44,6 @@ const int OPTION_PRIORITY_MAXIMUM   = 255;          // maximum priority
 //**************************************************************************
 
 struct options_entry;
-namespace util { class core_file; }
 
 // exception thrown by core_options when an illegal request is made
 class options_exception : public std::exception
@@ -203,6 +203,7 @@ public:
 	bool bool_value(std::string_view option) const { return int_value(option) != 0; }
 	int int_value(std::string_view option) const;
 	float float_value(std::string_view option) const;
+	std::string value_substituted(std::string_view option) const;
 
 	// setting
 	void set_value(std::string_view name, std::string_view value, int priority);

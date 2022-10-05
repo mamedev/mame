@@ -13,10 +13,9 @@
 
 // MAMEOS headers
 #include "strconv.h"
-#include "unicode.h"
 
 // MAME headers
-#include "osdcore.h"
+#include "unicode.h"
 
 #include <cassert>
 #include <cstring>
@@ -160,12 +159,8 @@ DWORD create_path_recursive(TCHAR *path)
 //  osd_open
 //============================================================
 
-osd_file::error osd_file::open(std::string const &orig_path, uint32_t openflags, ptr &file, std::uint64_t &filesize)
+osd_file::error osd_file::open(std::string const &path, uint32_t openflags, ptr &file, std::uint64_t &filesize)
 {
-	std::string path;
-	try { path = osd_subst_env(orig_path); }
-	catch (...) { return std::errc::not_enough_memory; }
-
 	if (win_check_socket_path(path))
 		return win_open_socket(path, openflags, file, filesize);
 	else if (win_check_ptty_path(path))

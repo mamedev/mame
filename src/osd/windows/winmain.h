@@ -138,10 +138,10 @@ public:
 	const char *attach_window() const { return value(WINOPTION_ATTACH_WINDOW); }
 
 	// core post-processing options
-	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
+	std::string screen_post_fx_dir() const { return value_substituted(WINOPTION_HLSLPATH); }
 	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
 	bool d3d_hlsl_oversampling() const { return bool_value(WINOPTION_HLSL_OVERSAMPLING); }
-	const char *d3d_hlsl_write() const { return value(WINOPTION_HLSL_WRITE); }
+	std::string d3d_hlsl_write() const { return value_substituted(WINOPTION_HLSL_WRITE); }
 	int d3d_snap_width() const { return int_value(WINOPTION_HLSL_SNAP_WIDTH); }
 	int d3d_snap_height() const { return int_value(WINOPTION_HLSL_SNAP_HEIGHT); }
 	int screen_shadow_mask_tile_mode() const { return int_value(WINOPTION_SHADOW_MASK_TILE_MODE); }
@@ -216,9 +216,9 @@ public:
 	const char *screen_chroma_c() const { return value(WINOPTION_CHROMA_C); }
 	const char *screen_chroma_conversion_gain() const { return value(WINOPTION_CHROMA_CONVERSION_GAIN); }
 	const char *screen_chroma_y_gain() const { return value(WINOPTION_CHROMA_Y_GAIN); }
-	const char *screen_lut_texture() const { return value(WINOPTION_LUT_TEXTURE); }
+	std::string screen_lut_texture() const { return value_substituted(WINOPTION_LUT_TEXTURE); }
 	bool screen_lut_enable() const { return bool_value(WINOPTION_LUT_ENABLE); }
-	const char *ui_lut_texture() const { return value(WINOPTION_UI_LUT_TEXTURE); }
+	std::string ui_lut_texture() const { return value_substituted(WINOPTION_UI_LUT_TEXTURE); }
 	bool ui_lut_enable() const { return bool_value(WINOPTION_UI_LUT_ENABLE); }
 
 	// full screen options

@@ -83,29 +83,29 @@ public:
 	ui_options();
 
 	// Search path options
-	const char *history_path() const { return value(OPTION_HISTORY_PATH); }
-	const char *categoryini_path() const { return value(OPTION_CATEGORYINI_PATH); }
-	const char *cabinets_directory() const { return value(OPTION_CABINETS_PATH); }
-	const char *cpanels_directory() const { return value(OPTION_CPANELS_PATH); }
-	const char *pcbs_directory() const { return value(OPTION_PCBS_PATH); }
-	const char *flyers_directory() const { return value(OPTION_FLYERS_PATH); }
-	const char *titles_directory() const { return value(OPTION_TITLES_PATH); }
-	const char *ends_directory() const { return value(OPTION_ENDS_PATH); }
-	const char *marquees_directory() const { return value(OPTION_MARQUEES_PATH); }
-	const char *artprev_directory() const { return value(OPTION_ARTPREV_PATH); }
-	const char *bosses_directory() const { return value(OPTION_BOSSES_PATH); }
-	const char *logos_directory() const { return value(OPTION_LOGOS_PATH); }
-	const char *scores_directory() const { return value(OPTION_SCORES_PATH); }
-	const char *versus_directory() const { return value(OPTION_VERSUS_PATH); }
-	const char *gameover_directory() const { return value(OPTION_GAMEOVER_PATH); }
-	const char *howto_directory() const { return value(OPTION_HOWTO_PATH); }
-	const char *select_directory() const { return value(OPTION_SELECT_PATH); }
-	const char *icons_directory() const { return value(OPTION_ICONS_PATH); }
-	const char *covers_directory() const { return value(OPTION_COVER_PATH); }
-	const char *ui_path() const { return value(OPTION_UI_PATH); }
+	std::string history_path() const { return value_substituted(OPTION_HISTORY_PATH); }
+	std::string categoryini_path() const { return value_substituted(OPTION_CATEGORYINI_PATH); }
+	std::string cabinets_directory() const { return value_substituted(OPTION_CABINETS_PATH); }
+	std::string cpanels_directory() const { return value_substituted(OPTION_CPANELS_PATH); }
+	std::string pcbs_directory() const { return value_substituted(OPTION_PCBS_PATH); }
+	std::string flyers_directory() const { return value_substituted(OPTION_FLYERS_PATH); }
+	std::string titles_directory() const { return value_substituted(OPTION_TITLES_PATH); }
+	std::string ends_directory() const { return value_substituted(OPTION_ENDS_PATH); }
+	std::string marquees_directory() const { return value_substituted(OPTION_MARQUEES_PATH); }
+	std::string artprev_directory() const { return value_substituted(OPTION_ARTPREV_PATH); }
+	std::string bosses_directory() const { return value_substituted(OPTION_BOSSES_PATH); }
+	std::string logos_directory() const { return value_substituted(OPTION_LOGOS_PATH); }
+	std::string scores_directory() const { return value_substituted(OPTION_SCORES_PATH); }
+	std::string versus_directory() const { return value_substituted(OPTION_VERSUS_PATH); }
+	std::string gameover_directory() const { return value_substituted(OPTION_GAMEOVER_PATH); }
+	std::string howto_directory() const { return value_substituted(OPTION_HOWTO_PATH); }
+	std::string select_directory() const { return value_substituted(OPTION_SELECT_PATH); }
+	std::string icons_directory() const { return value_substituted(OPTION_ICONS_PATH); }
+	std::string covers_directory() const { return value_substituted(OPTION_COVER_PATH); }
+	std::string ui_path() const { return value_substituted(OPTION_UI_PATH); }
 
 	// Misc options
-	const char *system_names() const { return value(OPTION_SYSTEM_NAMES); }
+	std::string system_names() const { return value_substituted(OPTION_SYSTEM_NAMES); }
 	bool skip_warnings() const { return bool_value(OPTION_SKIP_WARNINGS); }
 	bool remember_last() const { return bool_value(OPTION_REMEMBER_LAST); }
 	bool enlarge_snaps() const { return bool_value(OPTION_ENLARGE_SNAPS); }

@@ -1094,11 +1094,11 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_first_reset(true)
 {
 	// get filename for WAV file or AVI file if specified
-	const char *wavfile = machine.options().wav_write();
-	const char *avifile = machine.options().avi_write();
+	std::string const wavfile = machine.options().wav_write();
+	std::string const avifile = machine.options().avi_write();
 
 	// handle -nosound and lower sample rate if not recording WAV or AVI
-	if (m_nosound_mode && wavfile[0] == 0 && avifile[0] == 0)
+	if (m_nosound_mode && wavfile.empty() && avifile.empty())
 		machine.m_sample_rate = 11025;
 
 	// count the mixers
@@ -1171,8 +1171,8 @@ bool sound_manager::start_recording(std::string_view filename)
 bool sound_manager::start_recording()
 {
 	// open the output WAV file if specified
-	char const *const filename = machine().options().wav_write();
-	return *filename ? start_recording(filename) : false;
+	std::string const filename = machine().options().wav_write();
+	return filename.empty() ? false : start_recording(filename);
 }
 
 

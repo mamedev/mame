@@ -590,9 +590,9 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		options->bloom_level6_weight = winoptions.screen_bloom_lvl6_weight();
 		options->bloom_level7_weight = winoptions.screen_bloom_lvl7_weight();
 		options->bloom_level8_weight = winoptions.screen_bloom_lvl8_weight();
-		strncpy(options->lut_texture, winoptions.screen_lut_texture(), sizeof(options->lut_texture));
+		strncpy(options->lut_texture, winoptions.screen_lut_texture().c_str(), sizeof(options->lut_texture));
 		options->lut_enable = winoptions.screen_lut_enable();
-		strncpy(options->ui_lut_texture, winoptions.ui_lut_texture(), sizeof(options->ui_lut_texture));
+		strncpy(options->ui_lut_texture, winoptions.ui_lut_texture().c_str(), sizeof(options->ui_lut_texture));
 		options->ui_lut_enable = winoptions.ui_lut_enable();
 
 		options->params_init = true;

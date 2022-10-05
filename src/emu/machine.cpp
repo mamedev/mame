@@ -220,13 +220,13 @@ void running_machine::start()
 	manager().load_cheatfiles(*this);
 
 	// start recording movie if specified
-	const char *filename = options().mng_write();
-	if (filename[0] != 0)
-		m_video->begin_recording(filename, movie_recording::format::MNG);
+	std::string filename = options().mng_write();
+	if (!filename.empty())
+		m_video->begin_recording(filename.c_str(), movie_recording::format::MNG);
 
 	filename = options().avi_write();
-	if (filename[0] != 0 && !m_video->is_recording())
-		m_video->begin_recording(filename, movie_recording::format::AVI);
+	if (!filename.empty() && !m_video->is_recording())
+		m_video->begin_recording(filename.c_str(), movie_recording::format::AVI);
 
 	// if we're coming in with a savegame request, process it now
 	const char *savegame = options().state();
@@ -877,7 +877,7 @@ void running_machine::handle_saveload()
 			u32 const openflags = (m_saveload_schedule == saveload_schedule::LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 			// open the file
-			emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
+			emu_file file(m_saveload_searchpath ? osd_subst_env(m_saveload_searchpath) : std::string(), openflags);
 			auto const filerr = file.open(m_saveload_pending_file);
 			if (!filerr)
 			{

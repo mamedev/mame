@@ -404,7 +404,7 @@ void renderer_bgfx::record()
 bool renderer_bgfx::init(running_machine &machine)
 {
 	osd_options &options = downcast<osd_options &>(machine.options());
-	const char *bgfx_path = options.bgfx_path();
+	const std::string bgfx_path = options.bgfx_path();
 
 	osd::directory::ptr directory = osd::directory::open(bgfx_path);
 	if (directory == nullptr)
@@ -428,7 +428,7 @@ bool renderer_bgfx::init(running_machine &machine)
 
 	if (!all_gui_valid || !all_screen_valid)
 	{
-		osd_printf_error("BGFX: Unable to load required shaders. Please update the %s folder or adjust your bgfx_path setting.\n", options.bgfx_path());
+		osd_printf_error("BGFX: Unable to load required shaders. Please update the %s folder or adjust your bgfx_path setting.\n", bgfx_path);
 		return true;
 	}
 

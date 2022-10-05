@@ -593,7 +593,7 @@ public:
 	using resolve_tags_delegate = delegate<void ()>;
 
 	// construction/destruction
-	layout_file(device_t &device, util::xml::data_node const &rootnode, char const *searchpath, char const *dirname);
+	layout_file(device_t &device, util::xml::data_node const &rootnode, std::string &&searchpath, char const *dirname);
 	~layout_file();
 
 	// getters

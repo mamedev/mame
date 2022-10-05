@@ -374,12 +374,10 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 		if (exclusive_input_pressed(iptkey, IPT_UI_SELECT, 0))
 		{
 			// try to remove the file
-			std::string const filename(util::string_format(
-						"%2$s%1$s%3$s%1$s%4$s.sta",
-						PATH_SEPARATOR,
-						machine().options().state_directory(),
+			std::string const filename(util::path_concat(
+						osd_subst_env(machine().options().state_directory()),
 						machine().get_statename(machine().options().state_name()),
-						m_confirm_delete->file_name()));
+						m_confirm_delete->file_name() + ".sta"));
 			std::error_condition const err(osd_file::remove(filename));
 			if (err)
 			{
@@ -486,9 +484,8 @@ const menu_load_save_state_base::file_entry &menu_load_save_state_base::file_ent
 std::string menu_load_save_state_base::state_directory() const
 {
 	const char *stateopt = machine().options().state_name();
-	return util::string_format("%s%s%s",
-			machine().options().state_directory(),
-			PATH_SEPARATOR,
+	return util::path_concat(
+			osd_subst_env(machine().options().state_directory()),
 			machine().get_statename(stateopt));
 }
 

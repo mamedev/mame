@@ -13,6 +13,8 @@
 #include "corefile.h"
 #include "corestr.h"
 
+#include "osdcore.h"
+
 #include <locale>
 #include <string>
 
@@ -997,6 +999,26 @@ float core_options::float_value(std::string_view option) const
 		return fval;
 	else
 		return 0.0f;
+}
+
+
+//-------------------------------------------------
+//  value_substituted - return the value of an
+//  option as a string with OSD environment
+//  variables substituted
+//-------------------------------------------------
+
+std::string core_options::value_substituted(std::string_view option) const
+{
+	auto const entry = get_entry(option);
+	const char *str = nullptr;
+	if (entry != nullptr)
+	{
+		// substitution only makes sense for string values
+		assert(entry->type() == option_type::STRING);
+		str = entry->value();
+	}
+	return str ? osd_subst_env(str) : std::string();
 }
 
 

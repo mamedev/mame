@@ -610,16 +610,16 @@ private:
 	util::ovectorstream m_buffer;
 	std::shared_ptr<NSVGrasterizer> const m_svg_rasterizer;
 	device_t &m_device;
-	char const *const m_search_path;
+	std::string const m_search_path;
 	char const *const m_directory_name;
 	layout_environment *const m_next = nullptr;
 	bool m_cached = false;
 
 public:
-	layout_environment(device_t &device, char const *searchpath, char const *dirname)
+	layout_environment(device_t &device, std::string &&searchpath, char const *dirname)
 		: m_svg_rasterizer(nsvgCreateRasterizer(), util::nsvg_deleter())
 		, m_device(device)
-		, m_search_path(searchpath)
+		, m_search_path(std::move(searchpath))
 		, m_directory_name(dirname)
 	{
 	}
@@ -636,7 +636,7 @@ public:
 	device_t &device() const { return m_device; }
 	running_machine &machine() const { return device().machine(); }
 	bool is_root_device() const { return &device() == &machine().root_device(); }
-	char const *search_path() const { return m_search_path; }
+	std::string const &search_path() const { return m_search_path; }
 	char const *directory_name() const { return m_directory_name; }
 	std::shared_ptr<NSVGrasterizer> const &svg_rasterizer() const { return m_svg_rasterizer; }
 
@@ -1678,7 +1678,7 @@ public:
 	image_component(environment &env, util::xml::data_node const &compnode)
 		: component(env, compnode)
 		, m_rasterizer(env.svg_rasterizer())
-		, m_searchpath(env.search_path() ? env.search_path() : "")
+		, m_searchpath(env.search_path())
 		, m_dirname(env.directory_name() ? env.directory_name() : "")
 		, m_imagefile(env.get_attribute_string(compnode, "file"))
 		, m_alphafile(env.get_attribute_string(compnode, "alphafile"))
@@ -3054,7 +3054,7 @@ public:
 	// construction/destruction
 	reel_component(environment &env, util::xml::data_node const &compnode)
 		: component(env, compnode)
-		, m_searchpath(env.search_path() ? env.search_path() : "")
+		, m_searchpath(env.search_path())
 		, m_dirname(env.directory_name() ? env.directory_name() : "")
 	{
 		osd_printf_warning("Warning: layout file contains deprecated reel component\n");
@@ -5217,7 +5217,7 @@ layout_view::visibility_toggle::visibility_toggle(std::string &&name, u32 mask)
 layout_file::layout_file(
 		device_t &device,
 		util::xml::data_node const &rootnode,
-		char const *searchpath,
+		std::string &&searchpath,
 		char const *dirname)
 	: m_device(device)
 	, m_elemmap()
@@ -5225,7 +5225,7 @@ layout_file::layout_file(
 {
 	try
 	{
-		environment env(device, searchpath, dirname);
+		environment env(device, std::move(searchpath), dirname);
 
 		// find the layout node
 		util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");

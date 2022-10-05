@@ -310,41 +310,41 @@ public:
 	bool write_config() const { return bool_value(OPTION_WRITECONFIG); }
 
 	// core search path options
-	const char *plugin_data_path() const { return value(OPTION_PLUGINDATAPATH); }
-	const char *media_path() const { return value(OPTION_MEDIAPATH); }
-	const char *hash_path() const { return value(OPTION_HASHPATH); }
-	const char *sample_path() const { return value(OPTION_SAMPLEPATH); }
-	const char *art_path() const { return value(OPTION_ARTPATH); }
-	const char *ctrlr_path() const { return value(OPTION_CTRLRPATH); }
-	const char *ini_path() const { return value(OPTION_INIPATH); }
-	const char *font_path() const { return value(OPTION_FONTPATH); }
-	const char *cheat_path() const { return value(OPTION_CHEATPATH); }
-	const char *crosshair_path() const { return value(OPTION_CROSSHAIRPATH); }
-	const char *plugins_path() const { return value(OPTION_PLUGINSPATH); }
-	const char *language_path() const { return value(OPTION_LANGUAGEPATH); }
-	const char *sw_path() const { return value(OPTION_SWPATH); }
+	std::string plugin_data_path() const { return value_substituted(OPTION_PLUGINDATAPATH); }
+	std::string media_path() const { return value_substituted(OPTION_MEDIAPATH); }
+	std::string hash_path() const { return value_substituted(OPTION_HASHPATH); }
+	std::string sample_path() const { return value_substituted(OPTION_SAMPLEPATH); }
+	std::string art_path() const { return value_substituted(OPTION_ARTPATH); }
+	std::string ctrlr_path() const { return value_substituted(OPTION_CTRLRPATH); }
+	std::string ini_path() const { return value_substituted(OPTION_INIPATH); }
+	std::string font_path() const { return value_substituted(OPTION_FONTPATH); }
+	std::string cheat_path() const { return value_substituted(OPTION_CHEATPATH); }
+	std::string crosshair_path() const { return value_substituted(OPTION_CROSSHAIRPATH); }
+	std::string plugins_path() const { return value_substituted(OPTION_PLUGINSPATH); }
+	std::string language_path() const { return value_substituted(OPTION_LANGUAGEPATH); }
+	std::string sw_path() const { return value_substituted(OPTION_SWPATH); }
 
 	// core directory options
-	const char *cfg_directory() const { return value(OPTION_CFG_DIRECTORY); }
-	const char *nvram_directory() const { return value(OPTION_NVRAM_DIRECTORY); }
-	const char *input_directory() const { return value(OPTION_INPUT_DIRECTORY); }
-	const char *state_directory() const { return value(OPTION_STATE_DIRECTORY); }
-	const char *snapshot_directory() const { return value(OPTION_SNAPSHOT_DIRECTORY); }
-	const char *diff_directory() const { return value(OPTION_DIFF_DIRECTORY); }
-	const char *comment_directory() const { return value(OPTION_COMMENT_DIRECTORY); }
-	const char *share_directory() const { return value(OPTION_SHARE_DIRECTORY); }
+	std::string cfg_directory() const { return value_substituted(OPTION_CFG_DIRECTORY); }
+	std::string nvram_directory() const { return value_substituted(OPTION_NVRAM_DIRECTORY); }
+	std::string input_directory() const { return value_substituted(OPTION_INPUT_DIRECTORY); }
+	const char *state_directory() const { return value(OPTION_STATE_DIRECTORY); } // must be const char * for running_machine::m_saveload_searchpath
+	std::string snapshot_directory() const { return value_substituted(OPTION_SNAPSHOT_DIRECTORY); }
+	std::string diff_directory() const { return value_substituted(OPTION_DIFF_DIRECTORY); }
+	std::string comment_directory() const { return value_substituted(OPTION_COMMENT_DIRECTORY); }
+	std::string share_directory() const { return value_substituted(OPTION_SHARE_DIRECTORY); }
 
 	// core state/playback options
 	const char *state() const { return value(OPTION_STATE); }
 	bool autosave() const { return bool_value(OPTION_AUTOSAVE); }
 	int rewind() const { return bool_value(OPTION_REWIND); }
 	int rewind_capacity() const { return int_value(OPTION_REWIND_CAPACITY); }
-	const char *playback() const { return value(OPTION_PLAYBACK); }
-	const char *record() const { return value(OPTION_RECORD); }
+	std::string playback() const { return value_substituted(OPTION_PLAYBACK); }
+	std::string record() const { return value_substituted(OPTION_RECORD); }
 	bool exit_after_playback() const { return bool_value(OPTION_EXIT_AFTER_PLAYBACK); }
-	const char *mng_write() const { return value(OPTION_MNGWRITE); }
-	const char *avi_write() const { return value(OPTION_AVIWRITE); }
-	const char *wav_write() const { return value(OPTION_WAVWRITE); }
+	std::string mng_write() const { return value_substituted(OPTION_MNGWRITE); }
+	std::string avi_write() const { return value_substituted(OPTION_AVIWRITE); }
+	std::string wav_write() const { return value_substituted(OPTION_WAVWRITE); }
 	const char *snap_name() const { return value(OPTION_SNAPNAME); }
 	const char *snap_size() const { return value(OPTION_SNAPSIZE); }
 	const char *snap_view() const { return value(OPTION_SNAPVIEW); }

@@ -854,10 +854,10 @@ private:
 		if (!machine.options().bool_value(SDLOPTION_KEYMAP))
 			return &default_table;
 
-		const char *const keymap_filename = downcast<sdl_options &>(machine.options()).keymap_file();
+		std::string const keymap_filename = downcast<sdl_options &>(machine.options()).keymap_file();
 		osd_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
 
-		FILE *const keymap_file = fopen(keymap_filename, "r");
+		FILE *const keymap_file = fopen(keymap_filename.c_str(), "r");
 		if (!keymap_file)
 		{
 			osd_printf_warning("Keymap: Unable to open keymap %s, using default\n", keymap_filename);

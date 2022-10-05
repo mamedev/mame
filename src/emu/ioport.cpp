@@ -2916,8 +2916,8 @@ bool ioport_manager::playback_read<bool>(bool &result)
 time_t ioport_manager::playback_init()
 {
 	// if no file, nothing to do
-	const char *filename = machine().options().playback();
-	if (filename[0] == 0)
+	std::string const filename = machine().options().playback();
+	if (filename.empty())
 		return 0;
 
 	// open the playback file
@@ -3087,8 +3087,8 @@ void ioport_manager::record_write<bool>(bool value)
 void ioport_manager::record_init()
 {
 	// if no file, nothing to do
-	const char *filename = machine().options().record();
-	if (filename[0] == 0)
+	std::string const filename = machine().options().record();
+	if (filename.empty())
 		return;
 
 	// open the record file
