@@ -590,7 +590,7 @@ void berzerk_state::audio_w(offs_t offset, uint8_t data)
 		case 0:
 			m_s14001a->data_w(data & 0x3f);
 
-			/* clock the chip -- via a 555 timer */
+			/* clock the chip via a 555 timer */
 			m_s14001a->start_w(1);
 			m_s14001a->start_w(0);
 
@@ -598,7 +598,7 @@ void berzerk_state::audio_w(offs_t offset, uint8_t data)
 
 		case 1:
 		{
-			/* volume */
+			/* volume - 0 appears to be inaudible */
 			m_s14001a->force_update();
 			m_s14001a->set_output_gain(0, (data >> 3 & 7) / 7.0);
 
@@ -633,7 +633,7 @@ uint8_t berzerk_state::audio_r(offs_t offset)
 	{
 	/* offset 4 reads from the S14001A */
 	case 4:
-		return (m_s14001a->busy_r()) ? 0xc0 : 0x40;
+		return (m_s14001a->busy_r()) ? 0x00 : 0x40;
 	/* offset 6 is open bus */
 	case 6:
 		logerror("attempted read from berzerk audio reg 6 (sfxctrl)!\n");

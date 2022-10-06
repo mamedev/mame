@@ -386,7 +386,8 @@ void renegade_state::adpcm_stop_w(uint8_t data)
 
 WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 {
-	if (!m_adpcm_playing || !state) return;
+	if (!m_adpcm_playing || !state)
+		return;
 
 	if (m_adpcm_pos >= m_adpcm_end)
 	{
