@@ -208,7 +208,7 @@ license:CC0
 	<!-- has eeprom -->
 	<software name="em18" supported="no">
 		<description>evio Challenge!</description>
-		<year>2003</year>
+		<year>2004</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="エヴィオチャレンジ!"/>
 		<info name="serial" value="eM18"/>
