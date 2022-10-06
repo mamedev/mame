@@ -57,6 +57,7 @@ public:
 		: atm_state(mconfig, type, tag)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_char_ram(*this, "char_ram")
+		, m_io_dos_view(*this, "io_dos_view")
 		, m_glukrs(*this, "glukrs")
 		, m_sdcard(*this, "sdcard")
 		, m_keyboard(*this, "pc_keyboard")
@@ -111,6 +112,7 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ram_device> m_char_ram;
+	memory_view m_io_dos_view;
 
 	required_device<glukrs_device> m_glukrs;
 	required_device<spi_sdcard_sdhc_device> m_sdcard;
@@ -147,6 +149,11 @@ void pentevo_state::atm_update_io()
 	if (BIT(m_port_bf_data, 0) || is_dos_active())
 	{
 		m_io_view.select(0);
+		if (m_beta_drive_selected && m_beta_drive_virtual == m_beta_drive_selected)
+			m_io_dos_view.disable();
+		else
+			m_io_dos_view.select(0);
+
 		m_glukrs->enable();
 	}
 	else
@@ -605,12 +612,14 @@ void pentevo_state::pentevo_io(address_map &map)
 
 	// PORTS: Shadow
 	map(0x0000, 0xffff).view(m_io_view);
-	m_io_view[0](0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
-	m_io_view[0](0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
-	m_io_view[0](0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
-	m_io_view[0](0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
-	m_io_view[0](0x00ff, 0x00ff).select(0xff00).r(m_beta, FUNC(beta_disk_device::state_r)).w(FUNC(pentevo_state::atm_port_ff_w));
+	m_io_view[0](0x0000, 0xffff).view(m_io_dos_view);
+	m_io_dos_view[0](0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	m_io_dos_view[0](0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
+	m_io_dos_view[0](0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
+	m_io_dos_view[0](0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
+	m_io_dos_view[0](0x00ff, 0x00ff).select(0xff00).r(m_beta, FUNC(beta_disk_device::state_r));
 
+	m_io_view[0](0x00ff, 0x00ff).select(0xff00).w(FUNC(pentevo_state::atm_port_ff_w));
 	m_io_view[0](0x0077, 0x0077).select(0xff00).lr8(NAME([]() { return 0xff; })).w(FUNC(pentevo_state::atm_port_77_w));
 	m_io_view[0](0x3ff7, 0x3ff7).select(0xc000).w(FUNC(pentevo_state::atm_port_f7_w));      // ATM
 	m_io_view[0](0x37f7, 0x37f7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_7f7_w)); // PENTEVO

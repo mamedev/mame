@@ -67,7 +67,7 @@ void atm_state::atm_update_memory()
 		}
 		else
 		{
-			if ((page & PEN_DOS7FFD_MASK) && !BIT(page, 1))
+			if (page & PEN_DOS7FFD_MASK)
 				page = (page & ~1) | is_dos_active();
 			LOGMEM("RO%s%X ", is_dos7ffd, page & rom_pages_mask);
 			m_bank_rom[bank]->set_entry(page & rom_pages_mask);
