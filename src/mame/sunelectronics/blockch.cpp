@@ -17,20 +17,24 @@ Hardware notes:
 TV Game 8080 hardware is pretty much the same, but on a completely different
 cheaper looking PCB. It has 13 switches instead of 15.
 
+To test score-related things: P1 BCD score LSB is in RAM 0x2056, MSB 0x2057.
+Every 480 points, the bricks get rebuilt. The game forcibly ends at 1920 points.
+
 TODO:
 - Is blockch really Block Challenger, or an older game on the same hardware?
   The flyer has more bricks, and has the score panel at the bottom. Although
   the PCB was purchased as Sun Electronics Block Challenger.
-- paddle/ball sprite drawing is guessed
+- verify tvgm8080 title, the only reference is from the instruction card which
+  said: TV.GAME -8080-
+- the flyer photo shows a green screen, assumed to be an overlay on a B&W CRT
 - video timing is wrong
 - 2nd irq timing is guessed (it's not vblank-out irq, that will cause strange
   delays when the ball hits a brick)
-- the flyer photo shows a green screen, assumed to be an overlay on a B&W CRT
+- paddle/ball sprite drawing is guessed
+- unknown bits in ppi1_c_r
 - identify remaining switches
 - cocktail mode
 - sound emulation
-- verify tvgm8080 title, the only reference is from the instruction card which
-  said: TV.GAME -8080-
 
 ******************************************************************************/
 
@@ -81,6 +85,7 @@ private:
 	void ppi1_a_w(u8 data);
 	void ppi1_b_w(u8 data);
 	void ppi1_c_w(u8 data);
+	u8 ppi1_c_r();
 
 	u8 m_sound = 0;
 	u8 m_ball_x = 0;
@@ -197,9 +202,20 @@ void blockch_state::ppi1_c_w(u8 data)
 {
 	// d0: ball x hi
 	// d1: flip screen
-	// d2: shorter paddles (10 points)
+	// d2: shorter paddles (8 points)
 	// d3: shorter paddles (hit the ceiling)
 	m_vctrl = data;
+}
+
+u8 blockch_state::ppi1_c_r()
+{
+	// d4: ? (game won't boot when 0)
+	// d5: ? (paddle collision problem when 1)
+	// d6: vblank?
+	// d7: upright/cocktail switch
+	u8 d6 = m_screen->vblank() ? 0x40 : 0;
+	u8 d7 = m_inputs[2]->read() & 0x80;
+	return d7 | d6 | 0x1f;
 }
 
 
@@ -238,7 +254,7 @@ static INPUT_PORTS_START( blockch )
 	PORT_DIPSETTING(    0x03, "9")
 	PORT_DIPNAME( 0x04, 0x04, "Replay" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, "400" )
+	PORT_DIPSETTING(    0x04, "399" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
@@ -260,27 +276,22 @@ static INPUT_PORTS_START( blockch )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_DIPNAME( 0x30, 0x30, "Barriers" )
-	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, "500, 1500" )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Obstacles" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 1_40" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "Barriers" )
+	PORT_DIPSETTING(    0x20, "481, 1441" ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x10)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Oil" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, "961" ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x10)
 	PORT_DIPNAME( 0x80, 0x80, "Unknown 1_80" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN.2")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 2_10" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) // game won't boot
-	PORT_DIPNAME( 0x20, 0x00, "Unknown 2_20" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) // paddle collision problem
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -303,7 +314,8 @@ static INPUT_PORTS_START( tvgm8080 )
 
 	PORT_MODIFY("IN.1")
 	PORT_DIPNAME( 0x40, 0x40, "Oil" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, "961" ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x10)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("IN.3")
@@ -334,7 +346,7 @@ void blockch_state::blockch(machine_config &config)
 	m_ppi[1]->out_pa_callback().set(FUNC(blockch_state::ppi1_a_w));
 	m_ppi[1]->out_pb_callback().set(FUNC(blockch_state::ppi1_b_w));
 	m_ppi[1]->out_pc_callback().set(FUNC(blockch_state::ppi1_c_w));
-	m_ppi[1]->in_pc_callback().set_ioport("IN.2");
+	m_ppi[1]->in_pc_callback().set(FUNC(blockch_state::ppi1_c_r));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
