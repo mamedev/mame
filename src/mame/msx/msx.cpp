@@ -656,8 +656,12 @@ public:
 		, m_view_page1(*this, "view_4000")
 		, m_view_page2(*this, "view_8000")
 		, m_view_page3(*this, "view_c000")
+		, m_view_exp_page0(*this, "exp_view_0000")
+		, m_view_exp_page1(*this, "exp_view_4000")
+		, m_view_exp_page2(*this, "exp_view_8000")
+		, m_view_exp_page3(*this, "exp_view_c000")
 		, m_use_views(false)
-		, m_cartslot1(nullptr)
+		, m_use_exp_views(false)
 		, m_psg_b(0)
 		, m_kanji_latch(0)
 		, m_empty_slot(mconfig, *this)
@@ -681,6 +685,8 @@ public:
 		m_mouse_stat[0] = m_mouse_stat[1] = 0;
 		m_empty_slot.set_memory_space(m_maincpu, AS_PROGRAM);
 		m_empty_slot.set_io_space(m_maincpu, AS_IO);
+		m_cartslot[0] = nullptr;
+		m_cartslot[1] = nullptr;
 	}
 
 	void ax150(machine_config &config);
@@ -689,8 +695,11 @@ public:
 	void bruc100(machine_config &config);
 	void bruc100a(machine_config &config);
 	void canonv8(machine_config &config);
+	void memory_map_canonv8(address_map &map);
 	void canonv10(machine_config &config);
+	void memory_map_canonv10(address_map &map);
 	void canonv20(machine_config &config);
+	void memory_map_canonv20(address_map &map);
 	void canonv20e(machine_config &config);
 	void canonv25(machine_config &config);
 	void cf1200(machine_config &config);
@@ -701,17 +710,25 @@ public:
 	void cf3000(machine_config &config);
 	void cf3300(machine_config &config);
 	void cpc50a(machine_config &config);
+	void memory_map_cpc50a(address_map &map);
 	void cpc50b(machine_config &config);
+	void memory_map_cpc50b(address_map &map);
 	void cpc51(machine_config &config);
+	void memory_map_cpc51(address_map &map);
 	void cpc88(machine_config &config);
+	void memory_map_cpc88(address_map &map);
 	void cx5f(machine_config &config);
 	void cx5f1(machine_config &config);
 	void cx5mu(machine_config &config);
 	void dgnmsx(machine_config &config);
+	void memory_map_dgnmsx(address_map &map);
 	void dpc100(machine_config &config);
+	void memory_map_dpc100(address_map &map);
 	void dpc180(machine_config &config);
+	void memory_map_dpc180(address_map &map);
 	void dpc200(machine_config &config);
 	void dpc200e(machine_config &config);
+	void memory_map_dpc200e(address_map &map);
 	void expert10(machine_config &config);
 	void expert11(machine_config &config);
 	void expert13(machine_config &config);
@@ -719,7 +736,9 @@ public:
 	void expertpl(machine_config &config);
 	void fmx(machine_config &config);
 	void fdpc200(machine_config &config);
+	void memory_map_fdpc200(address_map &map);
 	void fpc500(machine_config &config);
+	void memory_map_fpc500(address_map &map);
 	void fs1300(machine_config &config);
 	void fs4000(machine_config &config);
 	void fs4000a(machine_config &config);
@@ -783,11 +802,13 @@ public:
 	void mpc200(machine_config &config);
 	void mpc200sp(machine_config &config);
 	void mx10(machine_config &config);
+	void memory_map_mx10(address_map &map);
 	void mx15(machine_config &config);
 	void mx64(machine_config &config);
 	void mx101(machine_config &config);
 	void nms801(machine_config &config);
 	void perfect1(machine_config &config);
+	void memory_map_perfect1(address_map &map);
 	void phc2(machine_config &config);
 	void phc28(machine_config &config);
 	void phc28l(machine_config &config);
@@ -796,6 +817,7 @@ public:
 	void piopx7uk(machine_config &config);
 	void piopxv60(machine_config &config);
 	void pv7(machine_config &config);
+	void memory_map_pv7(address_map &map);
 	void pv16(machine_config &config);
 	void spc800(machine_config &config);
 	void svi728(machine_config &config);
@@ -814,7 +836,9 @@ public:
 
 protected:
 	template<typename AY8910Type> void msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL xtal, int cpu_divider);
+	template<typename AY8910Type, typename T, typename Ret, typename... Params> void msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL xtal, int cpu_divider, Ret (T::*func)(Params...));
 	template<typename VDPType, typename AY8910Type> void msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config);
+	template<typename VDPType, typename AY8910Type, typename T, typename Ret, typename... Params> void msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...));
 
 	void msx_fd1793(machine_config &config);
 	void msx_wd2793_force_ready(machine_config &config);
@@ -907,6 +931,18 @@ protected:
 		m_hw_def.has_cartslot(true);
 		return device;
 	}
+	template <int N>
+	auto &add_cartridge_slot(machine_config &config)
+	{
+		std::string tag = "cartslot";
+		tag += std::to_string(N);
+		m_cartslot[N - 1] = &add_cartridge_slot<N>(config, MSX_SLOT_CARTRIDGE, tag.c_str(), 3, 3, msx_cart, nullptr);
+		return m_cartslot[N - 1];
+	}
+	template <int Cartridge, int Slot>	void cartridge_slot();
+	template <int Slot, int Kb>	void ram();
+	void bios();
+	void bios_exp();
 
 	virtual void driver_start() override;
 	virtual void machine_start() override;
@@ -915,6 +951,8 @@ protected:
 
 	void sec_slot_w(uint8_t data);
 	uint8_t sec_slot_r();
+	void expanded_slot_w(offs_t offset, uint8_t data);
+	uint8_t expanded_slot_r(offs_t offset);
 	uint8_t kanji_r(offs_t offset);
 	void kanji_w(offs_t offset, uint8_t data);
 	void ppi_port_a_w(uint8_t data);
@@ -929,8 +967,8 @@ protected:
 
 	void msx_io_map(address_map &map);
 	void memory_map_old(address_map &map);
-	void memory_map(address_map &map);
-	void memory_map_canonv8(address_map &map);
+	void memory_map_base(address_map &map);
+	void memory_expand_slot(int slot);
 
 	required_device<z80_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;
@@ -958,8 +996,14 @@ protected:
 	memory_view m_view_page1;
 	memory_view m_view_page2;
 	memory_view m_view_page3;
+	// Machines usually have only 1 expanded slot
+	memory_view m_view_exp_page0;
+	memory_view m_view_exp_page1;
+	memory_view m_view_exp_page2;
+	memory_view m_view_exp_page3;
 	bool m_use_views;
-	msx_slot_cartridge_device *m_cartslot1;
+	bool m_use_exp_views;
+	msx_slot_cartridge_device *m_cartslot[2];
 
 private:
 	void memory_map_all();
@@ -984,6 +1028,7 @@ private:
 	msx_internal_slot_interface *m_current_page[4]{};
 	bool m_slot_expanded[4]{};
 	uint8_t m_primary_slot = 0;
+	uint8_t m_expanded_slot = 0;
 	uint8_t m_secondary_slot[4]{};
 	uint8_t m_port_c_old = 0;
 	uint8_t m_keylatch = 0;
@@ -1206,7 +1251,7 @@ private:
 };
 
 
-void msx_state::memory_map(address_map &map)
+void msx_state::memory_map_base(address_map &map)
 {
 	map.unmap_value_high();
 
@@ -1218,13 +1263,36 @@ void msx_state::memory_map(address_map &map)
 	// setup defaults
 	for (int i = 0; i < 4; i++)
 	{
-		m_view_page0[i](0x0000, 0x3fff).noprw();
-		m_view_page1[i](0x4000, 0x7fff).noprw();
-		m_view_page2[i](0x8000, 0xbfff).noprw();
-		m_view_page3[i](0xc000, 0xffff).noprw();
+		m_view_page0[i];
+		m_view_page1[i];
+		m_view_page2[i];
+		m_view_page3[i];
 	}
 
 	m_use_views = true;
+}
+
+
+void msx_state::memory_expand_slot(int slot)
+{
+	if (slot < 0 || slot > 3)
+	{
+		fatalerror("Invalid slot %d to expand\n", slot);
+	}
+
+	m_view_page0[slot](0x0000, 0x3fff).view(m_view_exp_page0);
+	m_view_page1[slot](0x4000, 0x7fff).view(m_view_exp_page1);
+	m_view_page2[slot](0x8000, 0xbfff).view(m_view_exp_page2);
+	m_view_page3[slot](0xc000, 0xffff).view(m_view_exp_page3);
+	m_view_page3[slot](0xffff, 0xffff).rw(FUNC(msx_state::expanded_slot_r), FUNC(msx_state::expanded_slot_w));
+	for (int i = 0; i < 4; i++)
+	{
+		m_view_exp_page0[i];
+		m_view_exp_page1[i];
+		m_view_exp_page2[i];
+		m_view_exp_page3[i];
+	}
+	m_use_exp_views = true;
 }
 
 
@@ -1335,12 +1403,20 @@ void msx_state::machine_reset()
 	memory_reset();
 	memory_map_all();
 	m_primary_slot = 0;
+	m_expanded_slot = 0;
 	if (m_use_views)
 	{
 		m_view_page0.select(0);
 		m_view_page1.select(0);
 		m_view_page2.select(0);
 		m_view_page3.select(0);
+		if (m_use_exp_views)
+		{
+			m_view_exp_page0.select(0);
+			m_view_exp_page1.select(0);
+			m_view_exp_page2.select(0);
+			m_view_exp_page3.select(0);
+		}
 	}
 }
 
@@ -1700,6 +1776,7 @@ void msx_state::memory_init()
 void msx_state::memory_reset()
 {
 	m_primary_slot = 0;
+	m_expanded_slot = 0;
 
 	for (auto & elem : m_secondary_slot)
 	{
@@ -1757,6 +1834,21 @@ uint8_t msx_state::sec_slot_r()
 	{
 		return m_current_page[3]->read(0xffff);
 	}
+}
+
+void msx_state::expanded_slot_w(offs_t offset, uint8_t data)
+{
+	m_expanded_slot = data;
+	LOG("write to expanded slot select: %02x\n", m_expanded_slot);
+	m_view_exp_page0.select((data >> 0) & 0x03);
+	m_view_exp_page1.select((data >> 2) & 0x03);
+	m_view_exp_page2.select((data >> 4) & 0x03);
+	m_view_exp_page3.select((data >> 6) & 0x03);
+}
+
+uint8_t msx_state::expanded_slot_r(offs_t offset)
+{
+	return ~m_expanded_slot;
 }
 
 uint8_t msx_state::kanji_r(offs_t offset)
@@ -3280,6 +3372,61 @@ void msx2_state::msx2_64kb_vram(machine_config &config)
 	m_v9938->set_vram_size(0x10000);
 }
 
+template<typename AY8910Type, typename T, typename Ret, typename... Params>
+void msx_state::msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL xtal, int cpu_divider, Ret (T::*func)(Params...))
+{
+	// basic machine hardware
+	Z80(config, m_maincpu, xtal / cpu_divider);         // 3.579545 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, func);
+	config.set_maximum_quantum(attotime::from_hz(60));
+
+	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(msx_state::ppi_port_a_w));
+	m_ppi->in_pb_callback().set(FUNC(msx_state::ppi_port_b_r));
+	m_ppi->out_pc_callback().set(FUNC(msx_state::ppi_port_c_w));
+
+	// Video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+
+	// sound hardware
+	SPEAKER(config, m_speaker).front_center();
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, m_speaker, 0.1);
+
+	ay8910_type(config, m_ay8910, xtal / cpu_divider / 2);
+	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910->port_a_read_callback().set(FUNC(msx2_state::psg_port_a_r));
+	m_ay8910->port_b_read_callback().set(FUNC(msx2_state::psg_port_b_r));
+	m_ay8910->port_a_write_callback().set(FUNC(msx2_state::psg_port_a_w));
+	m_ay8910->port_b_write_callback().set(FUNC(msx2_state::psg_port_b_w));
+	m_ay8910->add_route(ALL_OUTPUTS, m_speaker, 0.3);
+
+	if (m_hw_def.has_printer_port())
+	{
+		// printer
+		CENTRONICS(config, m_centronics, centronics_devices, "printer");
+		m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit1));
+
+		OUTPUT_LATCH(config, m_cent_data_out);
+		m_centronics->set_output_latch(*m_cent_data_out);
+		INPUT_BUFFER(config, m_cent_status_in);
+
+		OUTPUT_LATCH(config, m_cent_ctrl_out);
+		m_cent_ctrl_out->bit_handler<1>().set(m_centronics, FUNC(centronics_device::write_strobe));
+	}
+
+	if (m_hw_def.has_cassette())
+	{
+		// cassette
+		CASSETTE(config, m_cassette);
+		m_cassette->set_formats(fmsx_cassette_formats);
+		m_cassette->set_default_state(CASSETTE_PLAY);
+		m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.05);
+		m_cassette->set_interface("msx_cass");
+	}
+}
+
 template<typename AY8910Type>
 void msx_state::msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL xtal, int cpu_divider)
 {
@@ -3332,6 +3479,36 @@ void msx_state::msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL x
 		m_cassette->set_default_state(CASSETTE_PLAY);
 		m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.05);
 		m_cassette->set_interface("msx_cass");
+	}
+}
+
+template<typename VDPType, typename AY8910Type, typename T, typename Ret, typename... Params>
+void msx_state::msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...))
+{
+	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3, func);
+
+	m_maincpu->set_addrmap(AS_IO, &msx_state::msx_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(msx_state::msx_interrupt)); /* Needed for mouse updates */
+
+	vdp_type(config, m_tms9928a, 10.738635_MHz_XTAL);
+	m_tms9928a->set_screen(m_screen);
+	m_tms9928a->set_vram_size(0x4000);
+	m_tms9928a->int_callback().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
+
+	// Software lists
+	if (m_hw_def.has_cassette())
+	{
+		SOFTWARE_LIST(config, "cass_list").set_original("msx1_cass");
+	}
+
+	if (m_hw_def.has_cartslot())
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
+	}
+
+	if (m_hw_def.has_fdc())
+	{
+		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
 	}
 }
 
@@ -3529,6 +3706,39 @@ void msx2_state::turbor(AY8910Type &ay8910_type, machine_config &config)
 	}
 }
 
+template <int Cartridge, int Slot>
+void msx_state::cartridge_slot()
+{
+	m_cartslot[Cartridge - 1]->install(&m_view_page0[Slot], &m_view_page1[Slot], &m_view_page2[Slot], &m_view_page3[Slot]);
+}
+
+// Supported values: Slot: 0-3, Kb: 8, 16, 32, 48, 64
+template <int Slot, int Kb>
+void msx_state::ram()
+{
+	if (Kb > 48)
+		m_view_page0[Slot](0x0000, 0x3fff).ram();
+	if (Kb > 32)
+		m_view_page1[Slot](0x4000, 0x7fff).ram();
+	if (Kb > 16)
+		m_view_page2[Slot](0x8000, 0xbfff).ram();
+	if (Kb > 8)
+		m_view_page3[Slot](0xc000, 0xffff).ram();
+	if (Kb == 8)
+		m_view_page3[Slot](0xe000, 0xffff).ram();
+}
+
+void msx_state::bios()
+{
+	m_view_page0[0](0x0000, 0x3fff).rom().region("mainrom", 0);
+	m_view_page1[0](0x4000, 0x7fff).rom().region("mainrom", 0x4000);
+}
+
+void msx_state::bios_exp()
+{
+	m_view_exp_page0[0](0x0000, 0x3fff).rom().region("mainrom", 0);
+	m_view_exp_page1[0](0x4000, 0x7fff).rom().region("mainrom", 0x4000);
+}
 
 /***************************************************************************
 
@@ -3568,13 +3778,26 @@ void msx_state::perfect1(machine_config &config)
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 1, 1, 2, "firmware");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 2, 0, 4); // 64KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	// expansion slot in slot #2
+	add_cartridge_slot<1>(config);
 
-	msx1(TMS9129, AY8910, config);
+	msx1(TMS9129, AY8910, config, &msx_state::memory_map_perfect1);
+}
+
+void msx_state::memory_map_perfect1(address_map &map)
+{
+	memory_map_base(map);
+	memory_expand_slot(0);
+
+	// 0-0 BIOS
+	bios_exp();
+	// 0-1 firmware
+	m_view_exp_page1[1](0x4000, 0x7fff).rom().region("firmware", 0);
+	m_view_exp_page2[1](0x8000, 0xbfff).rom().region("firmware", 0x4000);
+	// 0-2 64KB RAM
+	ram<2, 64>();
+	// 1 - cartridge slot
+	cartridge_slot<1, 1>();
+	// 2 - expansion slot
 }
 
 /* MSX - Canon V-8 */
@@ -3593,23 +3816,21 @@ void msx_state::canonv8(machine_config &config)
 	// S3527
 	// No printer port
 
-//	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-//	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-//	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);
-	m_cartslot1 = &add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9118, YM2149, config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::memory_map_canonv8);
+	msx1(TMS9118, YM2149, config, &msx_state::memory_map_canonv8);
 }
 
 void msx_state::memory_map_canonv8(address_map &map)
 {
-	memory_map(map);
-	m_view_page0[0](0x0000, 0x3fff).rom().region("mainrom", 0);
-	m_view_page1[0](0x4000, 0x7fff).rom().region("mainrom", 0x4000);
-	m_cartslot1->install(&m_view_page0[1], &m_view_page1[1], &m_view_page2[1], &m_view_page3[1]);
-	m_view_page3[2](0xc000, 0xffff).ram();
+	memory_map_base(map);
+	// 0 - BIOS
+	bios();
+	// 1 - cartridge slot
+	cartridge_slot<1,1>();
+	// 2 - 16KB RAM
+	ram<2, 16>();
 }
 
 /* MSX - Canon V-10 */
@@ -3626,12 +3847,22 @@ void msx_state::canonv10(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   // 16KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config);
+	add_cartridge_slot<2>(config);
 
-	msx1(TMS9918A, YM2149, config);
+	msx1(TMS9918A, YM2149, config, &msx_state::memory_map_canonv10);
+}
+
+void msx_state::memory_map_canonv10(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS + 16KB RAM
+	bios();
+	ram<0, 16>();
+	// 1 - cartridge slot
+	cartridge_slot<1, 1>();
+	// 2 - cartridge slot
+	cartridge_slot<2, 2>();
 }
 
 /* MSX - Canon V-20 */
@@ -3650,12 +3881,23 @@ void msx_state::canonv20(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
+	add_cartridge_slot<1>(config);
+	add_cartridge_slot<2>(config);
 
-	msx1(TMS9918A, YM2149, config);
+	msx1(TMS9918A, YM2149, config, &msx_state::memory_map_canonv20);
+}
+
+void msx_state::memory_map_canonv20(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS
+	bios();
+	// 1 - cartridge slot
+	cartridge_slot<1, 1>();
+	// 2 - cartridge slot
+	cartridge_slot<2, 2>();
+	// 3 - 64KB RAM
+	ram<3, 64>();
 }
 
 /* MSX - Canon V-20E */
@@ -3674,12 +3916,10 @@ void msx_state::canonv20e(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
+	add_cartridge_slot<1>(config);
+	add_cartridge_slot<2>(config);
 
-	msx1(TMS9929A, YM2149, config);
+	msx1(TMS9929A, YM2149, config, &msx_state::memory_map_canonv20);
 }
 
 /* MSX - Canon V-20F */
@@ -3718,12 +3958,20 @@ void msx_state::mx10(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot for KB-10 to add a printer port and 2 more cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config);
 
 	m_hw_def.has_cassette(false).has_printer_port(false);
-	msx1(TMS9118, AY8910, config);
+	msx1(TMS9118, AY8910, config, &msx_state::memory_map_mx10);
+}
+
+void msx_state::memory_map_mx10(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS + 16KB RAM
+	bios();
+	ram<0, 16>();
+	// 1 - cartridge slot
+	cartridge_slot<1, 1>();
 }
 
 /* MSX - Casio MX-15 */
@@ -3741,12 +3989,10 @@ void msx_state::mx15(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot for KB-15 to add a printer port and 2 more cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9928A, AY8910, config);
+	msx1(TMS9928A, AY8910, config, &msx_state::memory_map_mx10);
 }
 
 /* MSX - Casio MX-101 */
@@ -3764,12 +4010,10 @@ void msx_state::mx101(machine_config &config)
 	// 1 Cartridge slots
 	// 1 Expansion slot for KB-10 to add a printer port and 2 more cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config);
 
 	m_hw_def.has_cassette(false).has_printer_port(false);
-	msx1(TMS9118, AY8910, config);
+	msx1(TMS9118, AY8910, config, &msx_state::memory_map_mx10);
 }
 
 /* MSX - Casio PV-7 */
@@ -3789,12 +4033,20 @@ void msx_state::pv7(machine_config &config)
 	// 1 Expansion slot for KB-7 to add a printer port, 2 more cartridge slots, and 8KB RAM
 	// Z80: uPD780C-1
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1).force_start_address(0xe000);   // 8KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9118, AY8910, config);
+	msx1(TMS9118, AY8910, config, &msx_state::memory_map_pv7);
+}
+
+void msx_state::memory_map_pv7(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS + 8KB RAM
+	bios();
+	ram<0, 8>();
+	// 1 - cartridge slot
+	cartridge_slot<1, 1>();
 }
 
 /* MSX - Casio PV-16 */
@@ -3813,12 +4065,10 @@ void msx_state::pv16(machine_config &config)
 	// No printer port
 	// 1 Expansion slot for KB-7 to add a printer port, 2 more cartridge slots, and 8KB RAM
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   // 16KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9118, AY8910, config);
+	msx1(TMS9118, AY8910, config, &msx_state::memory_map_mx10);
 }
 
 /* MSX - CE-TEC MPC-80, German version of Daewoo DPC-200, dump needed to verify */
@@ -3833,7 +4083,7 @@ ROM_START(cpc88)
 
 	ROM_REGION(0x4000, "hangul", 0)
 	ROM_LOAD("88han.rom",  0x0000, 0x2000, BAD_DUMP CRC(938db440) SHA1(d41676fde0a3047792f93c4a41509b8749e55e74)) // need verification
-	ROM_RELOAD(0x2000, 0x2000)
+	ROM_RELOAD(0x2000, 0x2000) // Are the contents really mirrored?
 ROM_END
 
 void msx_state::cpc88(machine_config &config)
@@ -3844,12 +4094,18 @@ void msx_state::cpc88(machine_config &config)
 	// 0 Cartridge slots
 	// Expansion slot allows addition of cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   // 64KB RAM 
-
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9928A, AY8910, config);
+	msx1(TMS9928A, AY8910, config, &msx_state::memory_map_cpc88);
+}
+
+void msx_state::memory_map_cpc88(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS + HANGUL
+	bios();
+	m_view_page2[0](0x8000, 0xbfff).rom().region("hangul", 0);
+	// 2 - 64KB RAM
+	ram<2, 64>();
 }
 
 /* MSX - Daewoo DPC-100 */
@@ -3871,13 +4127,22 @@ void msx_state::dpc100(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);   // 16KB RAM
-	// expansion slot is in slot #3
+	add_cartridge_slot<1>(config);
 
-	msx1(TMS9918A, AY8910, config);
+	msx1(TMS9918A, AY8910, config, &msx_state::memory_map_dpc100);
+}
+
+void msx_state::memory_map_dpc100(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS + HANGUL
+	bios();
+	m_view_page2[0](0x8000, 0xbfff).rom().region("hangul", 0);
+	// 1 - cartridge
+	cartridge_slot<1, 1>();
+	// 2 - 16KB RAM
+	ram<2, 16>();
+	// 3 - expansion slot
 }
 
 /* MSX - Daewoo DPC-180 */
@@ -3898,13 +4163,22 @@ void msx_state::dpc180(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   // 64KB RAM
-	// Expansion slot is in slot #3
+	add_cartridge_slot<1>(config);
 
-	msx1(TMS9918A, AY8910, config);
+	msx1(TMS9918A, AY8910, config, &msx_state::memory_map_dpc180);
+}
+
+void msx_state::memory_map_dpc180(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS + HANGUL
+	bios();
+	m_view_page2[0](0x8000, 0xbfff).rom().region("hangul", 0);
+	// 1 - cartridge
+	cartridge_slot<1, 1>();
+	// 2 - 64KB RAM
+	ram<2, 64>();
+	// 3 - expansion slot
 }
 
 /* MSX - Daewoo DPC-200 */
@@ -3926,13 +4200,9 @@ void msx_state::dpc200(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  // 64KB RAM
-	// Expansion slot is in slot #3
+	add_cartridge_slot<1>(config);
 
-	msx1(TMS9918A, AY8910, config);
+	msx1(TMS9918A, AY8910, config, &msx_state::memory_map_dpc180);
 }
 
 /* MSX - Daewoo DPC-200E (France) */
@@ -3949,12 +4219,21 @@ void msx_state::dpc200e(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	// Expansion slot is in slot #3
+	add_cartridge_slot<1>(config);
 
-	msx1(TMS9129, AY8910, config);
+	msx1(TMS9129, AY8910, config, &msx_state::memory_map_dpc200e);
+}
+
+void msx_state::memory_map_dpc200e(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS
+	bios();
+	// 1 - 64KB RAM
+	ram<1, 64>();
+	// 2 - cartridge
+	cartridge_slot<1, 2>();
+	// 3 - expansion slot
 }
 
 /* MSX - Daewoo Zemmix CPC-50 */
@@ -3979,13 +4258,22 @@ void msx_state::cpc50a(machine_config &config)
 	// No cassette port
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1).force_start_address(0xe000);  // 8KB RAM
+	add_cartridge_slot<1>(config);
 
 	m_hw_def.has_cassette(false)
 		.has_printer_port(false);
-	msx1(TMS9118, AY8910, config);
+	msx1(TMS9118, AY8910, config, &msx_state::memory_map_cpc50a);
+}
+
+void msx_state::memory_map_cpc50a(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS
+	bios();
+	// 1 - cartridge
+	cartridge_slot<1, 1>();
+	// 2 - 8KB RAM
+	ram<2, 8>();
 }
 
 /* MSX - Daewoo Zemmix CPC-50B */
@@ -4005,13 +4293,22 @@ void msx_state::cpc50b(machine_config &config)
 	// No cassette port
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);  // 16KB RAM
+	add_cartridge_slot<1>(config);
 
 	m_hw_def.has_cassette(false)
 		.has_printer_port(false);
-	msx1(TMS9118, AY8910, config);
+	msx1(TMS9118, AY8910, config, &msx_state::memory_map_cpc50b);
+}
+
+void msx_state::memory_map_cpc50b(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS
+	bios();
+	// 1 - cartridge
+	cartridge_slot<1, 1>();
+	// 2 - 16KB RAM
+	ram<2, 16>();
 }
 
 /* MSX - Daewoo Zemmix CPC-51 */
@@ -4033,13 +4330,22 @@ void msx_state::cpc51(machine_config &config)
 	// No cassette port
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  // 64KB RAM
+	add_cartridge_slot<1>(config);
 
 	m_hw_def.has_cassette(false)
 		.has_printer_port(false);
-	msx1(TMS9118, AY8910, config);
+	msx1(TMS9118, AY8910, config, &msx_state::memory_map_cpc51);
+}
+
+void msx_state::memory_map_cpc51(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS
+	bios();
+	// 1 - cartridge
+	cartridge_slot<1, 1>();
+	// 2 - 64KB RAM
+	ram<2, 64>();
 }
 
 /* MSX - Daewoo Zemmix DTX-1493FW */
@@ -4059,12 +4365,23 @@ void msx_state::dgnmsx(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  // 64KB RAM
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config);
+	add_cartridge_slot<2>(config);
 
-	msx1(TMS9129, AY8910, config);
+	msx1(TMS9129, AY8910, config, &msx_state::memory_map_dgnmsx);
+}
+
+void msx_state::memory_map_dgnmsx(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS
+	bios();
+	// 1 - cartridge
+	cartridge_slot<1, 1>();
+	// 2 - 64KB RAM
+	ram<2, 64>();
+	// 3 - cartridge
+	cartridge_slot<2, 3>();
 }
 
 /* MSX - Dynadata DPC-200 */
@@ -4088,12 +4405,21 @@ void msx_state::fdpc200(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	// Expansion slot
+	add_cartridge_slot<1>(config);
 
-	msx1(TMS9929A, AY8910, config);
+	msx1(TMS9929A, AY8910, config, &msx_state::memory_map_fdpc200);
+}
+
+void msx_state::memory_map_fdpc200(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS
+	bios();
+	// 1 - 64KB RAM
+	ram<1, 64>();
+	// 2 - cartridge
+	cartridge_slot<1, 2>();
+	// 3 - expansion
 }
 
 /* MSX - Fenner FPC-500 */
@@ -4111,12 +4437,23 @@ void msx_state::fpc500(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
+	add_cartridge_slot<1>(config);
+	add_cartridge_slot<2>(config);
 
-	msx1(TMS9929A, AY8910, config);
+	msx1(TMS9929A, AY8910, config, &msx_state::memory_map_fpc500);
+}
+
+void msx_state::memory_map_fpc500(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS
+	bios();
+	// 1 - cartridge
+	cartridge_slot<1, 1>();
+	// 2 - cartridge
+	cartridge_slot<2, 2>();
+	// 3 - 64KB RAM
+	ram<1, 64>();
 }
 
 /* MSX - Fenner SPC-800 */
@@ -4133,12 +4470,10 @@ void msx_state::fspc800(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
+	add_cartridge_slot<1>(config);
+	add_cartridge_slot<2>(config);
 
-	msx1(TMS9129, AY8910, config);
+	msx1(TMS9129, AY8910, config, &msx_state::memory_map_fpc500);
 }
 
 /* MSX - Frael Bruc 100-1 */
@@ -4160,7 +4495,7 @@ void bruc100_state::bruc100(machine_config &config)
 
 	add_internal_slot(config, MSX_SLOT_BRUC100, "firm", 0, 0, 0, 2, "mainrom");
 	// Expansion slot in slot 1
-	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);   // 64KB RAM
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);   // 64KB RAM
 
 	msx1(TMS9129, AY8910, config);
 	m_maincpu->set_addrmap(AS_IO, &bruc100_state::io_map);
@@ -4192,7 +4527,7 @@ void bruc100_state::bruc100a(machine_config &config)
 	// 1 Expansion slot
 
 	add_internal_slot(config, MSX_SLOT_BRUC100, "firm", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 1, 0, 0, 4).set_total_size(0x10000);   // 64KB RAM
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);   // 64KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	// Expansion slot in slot 3
 
