@@ -3914,6 +3914,8 @@ if (BUSES["EPSON_QX"]~=null) then
 		MAME_DIR .. "src/devices/bus/epson_qx/multifont.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/sound_card.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/sound_card.h",
 	}
 end
 
