@@ -460,9 +460,6 @@ u8 pentevo_state::nemo_ata_r(u8 cmd)
 
 void pentevo_state::nemo_ata_w(u8 cmd, u8 data)
 {
-	if (machine().side_effects_disabled())
-		return;
-
 	bool data_write = (cmd & 0x7) == 0;
 	if (data_write && !m_ata_data_hi_ready)
 	{
@@ -478,11 +475,8 @@ void pentevo_state::nemo_ata_w(u8 cmd, u8 data)
 
 void pentevo_state::spi_port_77_w(offs_t offset, u8 data)
 {
-	if (!machine().side_effects_disabled())
-	{
-		m_sdcard->spi_ss_w(BIT(data, 0));
-		m_zctl_cs = BIT(data, 1);
-	}
+	m_sdcard->spi_ss_w(BIT(data, 0));
+	m_zctl_cs = BIT(data, 1);
 }
 
 u8 pentevo_state::spi_port_57_r(offs_t offset)
@@ -491,30 +485,29 @@ u8 pentevo_state::spi_port_57_r(offs_t offset)
 		return 0xff;
 
 	u8 din = m_zctl_di;
-	spi_port_57_w(0, 0xff);
+	if (!machine().side_effects_disabled())
+		spi_port_57_w(0, 0xff);
+
 	return din;
 }
 
 void pentevo_state::spi_port_57_w(offs_t offset, u8 data)
 {
-	if (machine().side_effects_disabled() || m_zctl_cs)
-		return;
-
-	for (u8 m = 0x80; m; m >>= 1)
+	if (!m_zctl_cs)
 	{
-		m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
-		m_sdcard->spi_mosi_w(data & m ? 1 : 0);
-		m_sdcard->spi_clock_w(ASSERT_LINE); // 1-L W
+		for (u8 m = 0x80; m; m >>= 1)
+		{
+			m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
+			m_sdcard->spi_mosi_w(data & m ? 1 : 0);
+			m_sdcard->spi_clock_w(ASSERT_LINE); // 1-L W
+		}
 	}
 }
 
 void pentevo_state::spi_miso_w(u8 data)
 {
-	if (!machine().side_effects_disabled())
-	{
-		m_zctl_di <<= 1;
-		m_zctl_di |= data;
-	}
+	m_zctl_di <<= 1;
+	m_zctl_di |= data;
 }
 
 u8 pentevo_state::gluk_data_r(offs_t offset)

@@ -54,16 +54,11 @@ void atm_state::atm_update_memory()
 			if (page & PEN_DOS7FFD_MASK)
 				page = merge_ram_with_7ffd(page);
 			LOGMEM("RA%s%X ", is_dos7ffd, page & ram_pages_mask);
+			m_bank_ram[bank]->set_entry(page & ram_pages_mask);
 			if (page & PEN_WRDISBL_MASK)
-			{
-				m_bank_ram[bank]->set_entry(page & ram_pages_mask);
 				views[bank].get().select(1);
-			}
 			else
-			{
-				m_bank_ram[bank]->set_entry(page & ram_pages_mask);
 				views[bank].get().disable();
-			}
 		}
 		else
 		{
@@ -325,13 +320,10 @@ u8 atm_state::beta_disable_r(offs_t offset)
 
 u8 atm_state::ata_r(offs_t offset)
 {
-	if (machine().side_effects_disabled())
-		return 0xff;
-
 	u8 ata_offset = BIT(offset, 5, 3);
 	u16 data = m_ata->cs0_r(ata_offset);
 
-	if (!ata_offset)
+	if (!machine().side_effects_disabled() && !ata_offset)
 		m_ata_data_latch = data >> 8;
 
 	return data & 0xff;
@@ -339,9 +331,6 @@ u8 atm_state::ata_r(offs_t offset)
 
 void atm_state::ata_w(offs_t offset, u8 data)
 {
-	if (machine().side_effects_disabled())
-		return;
-
 	u8 ata_offset = BIT(offset, 5, 3);
 	u16 ata_data = data;
 	if (!ata_offset)
