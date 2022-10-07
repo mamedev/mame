@@ -706,15 +706,19 @@ void victor9k_state::victor9k(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(15_MHz_XTAL, 930, 0, 799, 422, 0, 399);
-	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
+ 	m_screen->set_color(rgb_t::green());
+ 	m_screen->set_refresh_hz(72);
+ 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200)); 
+ 	m_screen->set_size(800, 400);
+ 	m_screen->set_visarea(0, 799, 0, 399);
+ 	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
 	HD6845S(config, m_crtc, 15_MHz_XTAL ); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
-	//m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
+	m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
 	
 	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(victor9k_state::vert_w));
