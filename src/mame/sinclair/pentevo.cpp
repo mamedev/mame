@@ -519,7 +519,8 @@ void pentevo_state::spi_miso_w(u8 data)
 
 u8 pentevo_state::gluk_data_r(offs_t offset)
 {
-	if (m_glukrs->is_active()) {
+	if (m_glukrs->is_active())
+	{
 		if (m_gluk_ext == 2)
 			return m_keyboard->read();
 		else if (m_glukrs->address_r() == 0x0a)

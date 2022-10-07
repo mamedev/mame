@@ -296,7 +296,8 @@ u8 atm_state::beta_neutral_r(offs_t offset)
 
 u8 atm_state::beta_enable_r(offs_t offset)
 {
-	if (!machine().side_effects_disabled() && !m_beta->is_active()) {
+	if (!machine().side_effects_disabled() && !m_beta->is_active())
+	{
 		bool is_rom0 = !(atm_update_memory_get_page(0) & PEN_RAMNROM_MASK);
 		if (is_rom0 || !m_cpm_n)
 		{
@@ -310,7 +311,8 @@ u8 atm_state::beta_enable_r(offs_t offset)
 
 u8 atm_state::beta_disable_r(offs_t offset)
 {
-	if (!machine().side_effects_disabled() && m_beta->is_active()) {
+	if (!machine().side_effects_disabled() && m_beta->is_active())
+	{
 		if (m_cpm_n)
 		{
 			m_beta->disable();

@@ -116,7 +116,8 @@ u32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 {
 	rectangle scr = get_screen_area();
 	rectangle vis = screen.visible_area();
-	if (vis != scr) {
+	if (vis != scr)
+	{
 		rectangle bsides[4] = {
 			rectangle(vis.left(),      vis.right(),    vis.top(),        scr.top() - 1),
 			rectangle(vis.left(),      scr.left() - 1, scr.top(),        scr.bottom()),
