@@ -98,7 +98,7 @@
 ************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "st0016.h"

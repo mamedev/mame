@@ -40,6 +40,7 @@ public:
 	void twincobrw(machine_config &config);
 	void fsharkbt(machine_config &config);
 	void fshark(machine_config &config);
+	void fnshark(machine_config &config);
 
 	void init_twincobr();
 
@@ -145,6 +146,7 @@ protected:
 
 	void dsp_io_map(address_map &map);
 	void dsp_program_map(address_map &map);
+	void fnshark_sound_io_map(address_map &map);
 	void fsharkbt_i8741_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);

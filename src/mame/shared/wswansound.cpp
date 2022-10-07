@@ -96,7 +96,7 @@ void wswan_sound_device::device_clock_changed()
 	m_channel->set_sample_rate(clock() / clk_div);
 }
 
-void wswan_sound_device::rom_bank_updated()
+void wswan_sound_device::rom_bank_pre_change()
 {
 	m_channel->update();
 }

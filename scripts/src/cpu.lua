@@ -1874,6 +1874,14 @@ end
 --------------------------------------------------
 -- Motorola 68000 series
 --@src/devices/cpu/m68000/m68000.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/m68008.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/m68010.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/m68020.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/m68030.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/m68040.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/scc68070.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/fscpu32.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/mcf5206e.h,CPUS["M680X0"] = true
 --------------------------------------------------
 
 if CPUS["M680X0"] then
@@ -1882,9 +1890,27 @@ if CPUS["M680X0"] then
 		MAME_DIR .. "src/devices/cpu/m68000/m68kcpu.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.h",
-		MAME_DIR .. "src/devices/cpu/m68000/m68000.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kfpu.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kmmu.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68kcommon.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68008.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68008.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68010.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68010.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68020.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68020.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68030.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68030.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68040.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68040.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/scc68070.h",
+		MAME_DIR .. "src/devices/cpu/m68000/scc68070.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/fscpu32.h",
+		MAME_DIR .. "src/devices/cpu/m68000/fscpu32.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/mcf5206e.h",
+		MAME_DIR .. "src/devices/cpu/m68000/mcf5206e.cpp",
 	}
 end
 

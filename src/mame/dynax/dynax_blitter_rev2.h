@@ -45,9 +45,6 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
-	// device_rom_interface overrides
-	virtual void rom_bank_updated() override { }
-
 	// internal helpers
 	void plot_pixel(int x, int y, int pen);
 	u32 blitter_draw(u32 src, int pen, int x, int y);

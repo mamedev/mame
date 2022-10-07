@@ -19,7 +19,7 @@
 
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
@@ -319,4 +319,4 @@ ROM_END
 } // anonymous namespace
 
 COMP(1993, maclc3, 0, 0, maclc3, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC III", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
-COMP(1993, maclc520, 0, 0, maclc520, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC 520", MACHINE_NOT_WORKING)
+COMP(1993, maclc520, 0, 0, maclc520, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC 520", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)

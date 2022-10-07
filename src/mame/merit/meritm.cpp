@@ -1439,16 +1439,16 @@ ROM_START( pbst30a ) /* Dallas DS1204V security key attached to CRT-254 connecte
 	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
 ROM_END
 
-ROM_START( pitbossma ) /* Unprotected or patched??  The manual shows a DS1204 key for this set */
+ROM_START( pitbossmb ) /* Unprotected or patched??  The manual shows a DS1204 key for this set */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9243-00-01_u9-r0",  0x00000, 0x10000, CRC(55e14fb1) SHA1(ec29764d1b63360f64b82452e0db8054b99fcca0) ) /* 9243-00-01  R0 940616 */
-	ROM_LOAD( "9243-00-01_u10-r0", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) /* Could also be labeled 9234-00-01 U10-R0 */
+	ROM_LOAD( "9243-00-01_u10-r0", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) /* Could also be labeled 9234-00-01 U10-R0 or PBC U10 */
 	ROM_LOAD( "9243-00-01_u11-r0", 0x20000, 0x10000, CRC(47a9dfc7) SHA1(eca100003f5605bcf405f610a0458ccb67894d35) )
-	ROM_LOAD( "9243-00-01_u12-r0", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) /* Could also be labeled 9234-00-01 U12-R0 */
-	ROM_LOAD( "9243-00-01_u13-r0", 0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) /* Could also be labeled 9234-00-01 U13-R0 */
-	ROM_RELOAD(     0x50000, 0x10000) /* U14 is unused for this set */
+	ROM_LOAD( "9243-00-01_u12-r0", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) /* Could also be labeled 9234-00-01 U12-R0 or PBC U12 */
+	ROM_LOAD( "9243-00-01_u13-r0", 0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) /* Could also be labeled 9234-00-01 U13-R0 or PBC U13 */
+	ROM_RELOAD(                    0x50000, 0x10000) /* U14 is unused for this set */
 	ROM_LOAD( "9243-00-01_u15-r0", 0x60000, 0x10000, CRC(27034061) SHA1(cff6be592a4a3ab01c204b081470f224e6186c4d) )
-	ROM_RELOAD(     0x70000, 0x10000)
+	ROM_RELOAD(                    0x70000, 0x10000)
 
 	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
 	ROM_LOAD( "qs9243-00-01_u7-r0",  0x00000, 0x40000, CRC(35f4ca46) SHA1(87917b3017f505fae65d6bfa2c7d6fb503c2da6a) ) /* These 3 roms are on CRT-256 satellite PCB */
@@ -1495,14 +1495,34 @@ Description of Changes:
 */
 ROM_START( pitbossm ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9244-00 U1-RO1 C1994 MII */
 	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9244-00-01_u9-r0b",  0x00000, 0x10000, CRC(6d59f06f) SHA1(2ece522ead84d2d116972a9bc714dafa90b2a27b) ) /* 9244-00-01 R0B  941123 */
+	ROM_LOAD( "9244-00-01_u10-r0",  0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) /* Could also be labeled 9234-00-01 U10-R0 or PBC U10 */
+	ROM_LOAD( "9244-00-01_u11-r0b", 0x20000, 0x10000, CRC(3c1c8eb9) SHA1(a9685df6cc879ad7b665b82327f3d8410b7dded2) )
+	ROM_LOAD( "9244-00-01_u12-r0",  0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) /* Could also be labeled 9234-00-01 U12-R0 or PBC U12 */
+	ROM_LOAD( "9244-00-01_u13-r0",  0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) /* Could also be labeled 9234-00-01 U13-R0 or PBC U13 */
+	ROM_LOAD( "9244-00-01_u14-r0b", 0x50000, 0x10000, CRC(d5532ea0) SHA1(26f5289d6cf3d7ebcfe300a6599e3ff49bc8eee7) )
+	ROM_LOAD( "9244-00-01_u15-r0b", 0x60000, 0x10000, CRC(2109386c) SHA1(590dcff7543d71e0911f82f27626887fcf25f2b3) )
+	ROM_RELOAD(                     0x70000, 0x10000)
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9244-00_u1-r01_c1994_mii", 0x000000, 0x000022, BAD_DUMP CRC(0455e18b) SHA1(919b48c25888af0af34b2d0cf34370476a97b79e) )
+
+	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
+	ROM_LOAD( "qs9243-00-01_u7-r0",  0x00000, 0x40000, CRC(35f4ca46) SHA1(87917b3017f505fae65d6bfa2c7d6fb503c2da6a) ) /* These 3 roms are on CRT-256 satellite PCB */
+	ROM_LOAD( "qs9243-00-01_u6-r0",  0x40000, 0x40000, CRC(606f1656) SHA1(7f1e3a698a34d3c3b8f9f2cd8d5224b6c096e941) )
+	ROM_LOAD( "qs9243-00-01_u5-r0",  0x80000, 0x40000, CRC(590a1565) SHA1(b80ea967b6153847b2594e9c59bfe87559022b6c) )
+ROM_END
+
+ROM_START( pitbossma ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9244-00 U1-RO1 C1994 MII */
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9244-00-01_u9-r0",  0x00000, 0x10000, CRC(8317fea1) SHA1(eb84fdca7cd51883153561785571790d12d0d612) ) /* 9244-00-01 R0  940822 */
-	ROM_LOAD( "9244-00-01_u10-r0", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) /* Could also be labeled 9234-00-01 U10-R0 */
+	ROM_LOAD( "9244-00-01_u10-r0", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) /* Could also be labeled 9234-00-01 U10-R0 or PBC U10 */
 	ROM_LOAD( "9244-00-01_u11-r0", 0x20000, 0x10000, CRC(45223e0d) SHA1(45070e85d87aa67ecd6a1355212f1d24142fcbd0) )
-	ROM_LOAD( "9244-00-01_u12-r0", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) /* Could also be labeled 9234-00-01 U12-R0 */
-	ROM_LOAD( "9244-00-01_u13-r0", 0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) /* Could also be labeled 9234-00-01 U13-R0 */
+	ROM_LOAD( "9244-00-01_u12-r0", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) /* Could also be labeled 9234-00-01 U12-R0 or PBC U12 */
+	ROM_LOAD( "9244-00-01_u13-r0", 0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) /* Could also be labeled 9234-00-01 U13-R0 or PBC U13 */
 	ROM_LOAD( "9244-00-01_u14-r0", 0x50000, 0x10000, CRC(c0d18911) SHA1(def939c6bac1e3124197f3f783d06f3bef3d03e9) )
 	ROM_LOAD( "9244-00-01_u15-r0", 0x60000, 0x10000, CRC(740e3734) SHA1(6440d258af114f3820683b4e6fba5db6aea02231) )
-	ROM_RELOAD(     0x70000, 0x10000)
+	ROM_RELOAD(                    0x70000, 0x10000)
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
 	ROM_LOAD( "9244-00_u1-r01_c1994_mii", 0x000000, 0x000022, BAD_DUMP CRC(0455e18b) SHA1(919b48c25888af0af34b2d0cf34370476a97b79e) )
@@ -2435,8 +2455,9 @@ GAME( 1993, pbst30a,   pbst30,   crt250_crt252_crt258, pbst30,     meritm_state,
 /* CRT-250 + CRT-254 + CRT-256 */
 GAME( 1993, pbss330,   0,        crt250_questions,     pbss330,    meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, pbss330ca, pbss330,  crt250_questions,     pbss330,    meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-06, California version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, pitbossm,  0,        crt250_questions,     pitbossm,   meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, pitbossma, pitbossm, crt250_questions,     pitbossa,   meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, pitbossm,  0,        crt250_questions,     pitbossm,   meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megastar (9244-00-01 R0B)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, pitbossma, pitbossm, crt250_questions,     pitbossm,   meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megastar (9244-00-01 R0)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, pitbossmb, pitbossm, crt250_questions,     pitbossa,   meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megastar (9243-00-01 R0)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-260 NON-touchscreen based */
 GAME( 1996, realbrod,  0,        crt260, realbrod,    meritm_state, empty_init,    ROT0, "Merit", "The Real Broadway (9131-20-00 R0C)", MACHINE_IMPERFECT_GRAPHICS )

@@ -36,9 +36,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	// device_rom_interface overrides
-	virtual void rom_bank_updated() override;
-
 private:
 	// internal state
 	uint32_t m_sample_addr;

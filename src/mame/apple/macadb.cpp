@@ -202,8 +202,6 @@ macadb_device::macadb_device(const machine_config &mconfig, const char *tag, dev
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
 		m_keys(*this, "KEY%u", 0),
-		write_via_clock(*this),
-		write_via_data(*this),
 		write_adb_data(*this),
 		write_adb_irq(*this)
 {
@@ -216,8 +214,6 @@ ioport_constructor macadb_device::device_input_ports() const
 
 void macadb_device::device_start()
 {
-	write_via_clock.resolve_safe();
-	write_via_data.resolve_safe();
 	write_adb_data.resolve_safe();
 	write_adb_irq.resolve_safe();
 
@@ -237,13 +233,9 @@ void macadb_device::device_start()
 	save_item(NAME(m_adb_datasize));
 	save_item(NAME(m_adb_buffer));
 	save_item(NAME(m_adb_command));
-	save_item(NAME(m_adb_send));
-	save_item(NAME(m_adb_timer_ticks));
-	save_item(NAME(m_adb_extclock));
 	save_item(NAME(m_adb_direction));
 	save_item(NAME(m_adb_listenreg));
 	save_item(NAME(m_adb_listenaddr));
-	save_item(NAME(m_adb_last_talk));
 	save_item(NAME(m_adb_srq_switch));
 	save_item(NAME(m_adb_stream_ptr));
 	save_item(NAME(m_adb_linestate));
@@ -261,22 +253,6 @@ void macadb_device::device_start()
 	save_item(NAME(m_adb_currentkeys));
 	save_item(NAME(m_adb_modifiers));
 	save_item(NAME(m_adb_linein));
-}
-
-WRITE_LINE_MEMBER(macadb_device::adb_data_w)
-{
-	if (m_adb_timer_ticks > 0)
-	{
-		m_adb_command <<= 1;
-		if (state)
-		{
-			m_adb_command |= 1;
-		}
-		else
-		{
-			m_adb_command &= ~1;
-		}
-	}
 }
 
 /* *************************************************************************
@@ -511,14 +487,12 @@ void macadb_device::adb_talk()
 					case ADB_CMD_RESET:
 						LOGMASKED(LOG_TALK_LISTEN, "ADB RESET: reg %x address %x\n", reg, addr);
 						m_adb_direction = 0;
-						m_adb_send = 0;
 						break;
 
 					case ADB_CMD_FLUSH:
 						LOGMASKED(LOG_TALK_LISTEN, "ADB FLUSH: reg %x address %x\n", reg, addr);
 
 						m_adb_direction = 0;
-						m_adb_send = 0;
 						break;
 
 					default:    // reserved/unused
@@ -547,9 +521,6 @@ void macadb_device::adb_talk()
 
 			case 3: // talk
 				LOGMASKED(LOG_TALK_LISTEN, "ADB TALK: reg %x address %x (K %x M %x)\n", reg, addr, m_adb_keybaddr, m_adb_mouseaddr);
-
-				// keep track of what device the Mac last TALKed to
-				m_adb_last_talk = addr;
 
 				m_adb_direction = 0;    // output to Mac
 				if (addr == m_adb_mouseaddr)
@@ -688,11 +659,6 @@ void macadb_device::adb_talk()
 					LOGMASKED(LOG_TALK_LISTEN, "ADB: talking to unconnected device %d (K %d M %d)\n", addr, m_adb_keybaddr, m_adb_mouseaddr);
 					m_adb_buffer[0] = m_adb_buffer[1] = 0;
 					m_adb_datasize = 0;
-
-					if ((adb_pollkbd(0)) || (adb_pollmouse()))
-					{
-						m_adb_srqflag = true;
-					}
 				}
 				break;
 		}
@@ -839,53 +805,6 @@ TIMER_CALLBACK_MEMBER(macadb_device::mac_adb_tick)
 
 void macadb_device::adb_vblank()
 {
-	#if 0
-	if (m_adb_state == ADB_STATE_IDLE)
-	{
-		if (this->adb_pollmouse())
-		{
-			// if the mouse was the last TALK, we can just send the new data
-			// otherwise we need to pull SRQ
-			if (m_adb_last_talk == m_adb_mouseaddr)
-			{
-				// repeat last TALK to get updated data
-				m_adb_waiting_cmd = 1;
-				this->adb_talk();
-
-				m_adb_timer_ticks = 8;
-				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-			}
-			else
-			{
-				write_adb_irq(ASSERT_LINE);
-				m_adb_command = m_adb_send = 0;
-				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see the IRQ
-				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-				m_adb_srq_switch = 1;
-			}
-		}
-		else if (this->adb_pollkbd(0))
-		{
-			if (m_adb_last_talk == m_adb_keybaddr)
-			{
-				// repeat last TALK to get updated data
-				m_adb_waiting_cmd = 1;
-				this->adb_talk();
-
-				m_adb_timer_ticks = 8;
-				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-			}
-			else
-			{
-				write_adb_irq(ASSERT_LINE);
-				m_adb_command = m_adb_send = 0;
-				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see  the IRQ
-				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-				m_adb_srq_switch = 1;
-			}
-		}
-	}
-	#endif
 }
 
 void macadb_device::device_reset()
@@ -894,15 +813,11 @@ void macadb_device::device_reset()
 
 	m_adb_srq_switch = 0;
 	write_adb_irq(CLEAR_LINE);      // no interrupt
-	m_adb_timer_ticks = 0;
 	m_adb_command = 0;
-	m_adb_extclock = 0;
-	m_adb_send = 0;
 	m_adb_waiting_cmd = 0;
 	m_adb_srqflag = false;
 	m_adb_direction = 0;
 	m_adb_datasize = 0;
-	m_adb_last_talk = -1;
 
 	m_adb_linestate = 0;
 

@@ -20,7 +20,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void rom_bank_updated() override;
 private:
 	static constexpr unsigned SUPRNOVA_DECODE_BUFFER_SIZE = 0x2000;
 	int m_sprite_kludge_x = 0, m_sprite_kludge_y = 0;
