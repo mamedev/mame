@@ -11,10 +11,12 @@
 
 #pragma once
 
-#include "bus/epson_qx/option.h"
+#include "option.h"
+
 #include "machine/wd1000.h"
 
 namespace bus::epson_qx {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -44,6 +46,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(EPSON_QX_OPTION_CR1510, bus::epson_qx, cr1510_device)
-
 
 #endif // MAME_BUS_EPSON_QX_CR1510_H
