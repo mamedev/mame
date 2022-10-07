@@ -11,8 +11,9 @@
 
 #pragma once
 
+#include "option.h"
+
 #include "bus/ata/idehd.h"
-#include "bus/epson_qx/option.h"
 
 namespace bus::epson_qx {
 
@@ -53,6 +54,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(EPSON_QX_OPTION_IDE, bus::epson_qx, ide_device)
-
 
 #endif // MAME_BUS_EPSON_QX_IDE_H
