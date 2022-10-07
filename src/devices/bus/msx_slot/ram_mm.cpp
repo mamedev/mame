@@ -11,7 +11,10 @@ msx_slot_ram_mm_device::msx_slot_ram_mm_device(const machine_config &mconfig, co
 	, m_total_size(0)
 	, m_bank_mask(0)
 	, m_ramio_set_bits(0)
+	, m_rambank(*this, "mmbank%u", 0U)
 {
+	for (int i = 0; i < 4; i++)
+		m_page[i] = nullptr;
 }
 
 void msx_slot_ram_mm_device::device_start()
@@ -43,6 +46,11 @@ void msx_slot_ram_mm_device::device_start()
 	// Install IO read/write handlers
 	io_space().install_read_handler(0xfc, 0xff, read8sm_delegate(*this, FUNC(msx_slot_ram_mm_device::read_mapper_bank)));
 	io_space().install_write_handler(0xfc, 0xff, write8sm_delegate(*this, FUNC(msx_slot_ram_mm_device::write_mapper_bank)));
+	for (int i = 0; i < 4; i++)
+	{
+		m_rambank[i]->configure_entries(0, u32(m_bank_mask) + 1, m_ram.data(), 0x4000);
+		m_page[i]->install_readwrite_bank(0x4000 * i, (0x4000 * i) + 0x3fff, m_rambank[i]);
+	}
 }
 
 void msx_slot_ram_mm_device::device_post_load()
@@ -70,7 +78,8 @@ void msx_slot_ram_mm_device::write(offs_t offset, uint8_t data)
 
 uint8_t msx_slot_ram_mm_device::read_mapper_bank(offs_t offset)
 {
-	return m_bank_selected[offset & 3] | m_ramio_set_bits;
+	return m_rambank[offset & 3]->entry() | m_ramio_set_bits;
+//	return m_bank_selected[offset & 3] | m_ramio_set_bits;
 }
 
 void msx_slot_ram_mm_device::write_mapper_bank(offs_t offset, uint8_t data)
@@ -79,4 +88,13 @@ void msx_slot_ram_mm_device::write_mapper_bank(offs_t offset, uint8_t data)
 
 	m_bank_selected[offset] = data;
 	m_bank_base[offset] = &m_ram[0x4000 * (m_bank_selected[offset] & m_bank_mask)];
+	m_rambank[offset]->set_entry(data & m_bank_mask);
+}
+
+void msx_slot_ram_mm_device::install(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
+{
+	m_page[0] = page0;
+	m_page[1] = page1;
+	m_page[2] = page2;
+	m_page[3] = page3;
 }

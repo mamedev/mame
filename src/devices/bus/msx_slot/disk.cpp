@@ -55,6 +55,7 @@ msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device
 	, m_floppy2(nullptr)
 	, m_floppy3(nullptr)
 	, m_floppy(nullptr)
+	, m_page{ nullptr, nullptr, nullptr, nullptr}
 	, m_fdc_tag(nullptr)
 	, m_floppy0_tag(nullptr)
 	, m_floppy1_tag(nullptr)
@@ -307,6 +308,29 @@ void msx_slot_disk2_device::device_start()
 	msx_slot_wd_disk_device::device_start();
 
 	save_item(NAME(m_control));
+
+	m_page[1]->install_rom(0x4000, 0x7fff, m_rom);
+	m_page[1]->install_read_handler(0x7fb8, 0x7fb8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	m_page[1]->install_read_handler(0x7fb9, 0x7fb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	m_page[1]->install_read_handler(0x7fba, 0x7fba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	m_page[1]->install_read_handler(0x7fbb, 0x7fbb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	m_page[1]->install_read_handler(0x7fbc, 0x7fbc, read8smo_delegate(*this, FUNC(msx_slot_disk2_device::status_r)));
+	m_page[1]->install_write_handler(0x7fb8, 0x7fb8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	m_page[1]->install_write_handler(0x7fb9, 0x7fb9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	m_page[1]->install_write_handler(0x7fba, 0x7fba, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	m_page[1]->install_write_handler(0x7fbb, 0x7fbb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	m_page[1]->install_write_handler(0x7fbc, 0x7fbc, write8smo_delegate(*this, FUNC(msx_slot_disk2_device::set_control)));
+
+	m_page[2]->install_read_handler(0xbfb8, 0xbfb8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	m_page[2]->install_read_handler(0xbfb9, 0xbfb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	m_page[2]->install_read_handler(0xbfba, 0xbfba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	m_page[2]->install_read_handler(0xbfbb, 0xbfbb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	m_page[2]->install_read_handler(0xbfbc, 0xbfbc, read8smo_delegate(*this, FUNC(msx_slot_disk2_device::status_r)));
+	m_page[2]->install_write_handler(0xbfb8, 0xbfb8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	m_page[2]->install_write_handler(0xbfb9, 0xbfb9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	m_page[2]->install_write_handler(0xbfba, 0xbfba, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	m_page[2]->install_write_handler(0xbfbb, 0xbfbb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	m_page[2]->install_write_handler(0xbfbc, 0xbfbc, write8smo_delegate(*this, FUNC(msx_slot_disk2_device::set_control)));
 }
 
 
@@ -362,6 +386,10 @@ void msx_slot_disk2_device::set_control(uint8_t data)
 	}
 }
 
+uint8_t msx_slot_disk2_device::status_r()
+{
+	return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
+}
 
 uint8_t msx_slot_disk2_device::read(offs_t offset)
 {

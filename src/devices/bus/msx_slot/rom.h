@@ -25,7 +25,7 @@ protected:
 
 	required_memory_region m_rom_region;
 	uint32_t m_region_offset;
-	const uint8_t *m_rom;
+	uint8_t *m_rom;
 };
 
 DECLARE_DEVICE_TYPE(MSX_SLOT_ROM, msx_slot_rom_device)

@@ -13,6 +13,8 @@ public:
 	msx_slot_ram_mm_device &set_total_size(uint32_t total_size) { m_total_size = total_size; return *this; }
 	msx_slot_ram_mm_device &set_ramio_bits(uint8_t ramio_set_bits) { m_ramio_set_bits = ramio_set_bits; return *this; }
 
+	void install(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3);
+
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 
@@ -32,6 +34,8 @@ private:
 	uint8_t m_bank_selected[4];
 	uint8_t *m_bank_base[4];
 	uint8_t m_ramio_set_bits;
+	memory_view::memory_view_entry *m_page[4];
+	memory_bank_array_creator<4> m_rambank;
 };
 
 DECLARE_DEVICE_TYPE(MSX_SLOT_RAM_MM, msx_slot_ram_mm_device)
