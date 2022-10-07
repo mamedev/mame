@@ -825,7 +825,7 @@ u8 tsconf_state::beta_neutral_r(offs_t offset)
 
 u8 tsconf_state::beta_enable_r(offs_t offset)
 {
-	if (!(machine().side_effects_disabled()))
+	if (!machine().side_effects_disabled())
 	{
 		if (!W0_RAM && m_bank_rom[0]->entry() == 3)
 		{
@@ -841,7 +841,7 @@ u8 tsconf_state::beta_enable_r(offs_t offset)
 
 u8 tsconf_state::beta_disable_r(offs_t offset)
 {
-	if (!(machine().side_effects_disabled()))
+	if (!machine().side_effects_disabled())
 	{
 		if (m_beta->started() && m_beta->is_active())
 		{

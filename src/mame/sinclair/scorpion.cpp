@@ -135,7 +135,7 @@ u8 scorpion_state::beta_neutral_r(offs_t offset)
 
 u8 scorpion_state::beta_enable_r(offs_t offset)
 {
-	if (!(machine().side_effects_disabled()))
+	if (!machine().side_effects_disabled())
 	{
 		if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
 
@@ -150,7 +150,7 @@ u8 scorpion_state::beta_enable_r(offs_t offset)
 
 u8 scorpion_state::beta_disable_r(offs_t offset)
 {
-	if (!(machine().side_effects_disabled()))
+	if (!machine().side_effects_disabled())
 	{
 		if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
 
