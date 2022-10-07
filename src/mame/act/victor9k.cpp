@@ -714,7 +714,7 @@ void victor9k_state::victor9k(machine_config &config)
  	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
-	HD6845S(config, m_crtc, 15_MHz_XTAL ); // HD6845 == HD46505S
+	HD6845S(config, m_crtc, 15_MHz_XTAL / 10); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
@@ -753,7 +753,7 @@ void victor9k_state::victor9k(machine_config &config)
 	pit.set_clk<2>(100000);
 	pit.out_handler<2>().set(I8259A_TAG, FUNC(pic8259_device::ir2_w));
 
-	UPD7201(config, m_upd7201, XTAL(30'000'000)/30);
+	UPD7201(config, m_upd7201, 15_MHz_XTAL / 6);
 	m_upd7201->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_upd7201->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_upd7201->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
@@ -762,24 +762,24 @@ void victor9k_state::victor9k(machine_config &config)
 	m_upd7201->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 	m_upd7201->out_int_callback().set(I8259A_TAG, FUNC(pic8259_device::ir1_w));
 
-	MC6852(config, m_ssda, XTAL(30'000'000)/30);
+	MC6852(config, m_ssda, 15_MHz_XTAL / 15);
 	m_ssda->tx_data_callback().set(HC55516_TAG, FUNC(hc55516_device::digit_w));
 	m_ssda->sm_dtr_callback().set(FUNC(victor9k_state::ssda_sm_dtr_w));
 	m_ssda->irq_callback().set(FUNC(victor9k_state::ssda_irq_w));
 
-	MOS6522(config, m_via1, XTAL(30'000'000)/30);
+	MOS6522(config, m_via1, 15_MHz_XTAL / 15);
 	m_via1->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_via1->writepa_handler().set(FUNC(victor9k_state::via1_pa_w));
 	m_via1->writepb_handler().set(FUNC(victor9k_state::via1_pb_w));
 	m_via1->cb2_handler().set(FUNC(victor9k_state::codec_vol_w));
 	m_via1->irq_handler().set(FUNC(victor9k_state::via1_irq_w));
 
-	MOS6522(config, m_via2, XTAL(30'000'000)/30);
+	MOS6522(config, m_via2, 15_MHz_XTAL / 15);
 	m_via2->writepa_handler().set(FUNC(victor9k_state::via2_pa_w));
 	m_via2->writepb_handler().set(FUNC(victor9k_state::via2_pb_w));
 	m_via2->irq_handler().set(FUNC(victor9k_state::via2_irq_w));
 
-	MOS6522(config, m_via3, XTAL(30'000'000)/30);
+	MOS6522(config, m_via3, 15_MHz_XTAL / 15);
 	m_via3->writepb_handler().set(FUNC(victor9k_state::via3_pb_w));
 	m_via3->irq_handler().set(FUNC(victor9k_state::via3_irq_w));
 
