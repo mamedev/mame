@@ -6,11 +6,11 @@
  *
  *******************************************************************/
 #include "emu.h"
+#include "option.h"
 
 #include "cr1510.h"
 #include "ide.h"
 #include "multifont.h"
-#include "option.h"
 
 DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_BUS_SLOT, bus::epson_qx::option_slot_device, "epson_qx_option_slot", "QX-10 Option slot")
 DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_BUS, bus::epson_qx::option_bus_device, "epson_qx_option_bus", "QX-10 Option Bus")
