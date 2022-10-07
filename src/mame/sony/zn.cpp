@@ -1904,7 +1904,7 @@ void nbajamex_state::bank_map(address_map &map)
 	map(0xa00000, 0xffffff).bankr("rombank2");
 }
 
-void nbajamex_state::driver_init()
+void nbajamex_state::driver_start()
 {
 	m_sram = std::make_unique<uint8_t[]>(0x8000);
 	subdevice<nvram_device>("71256")->set_base(m_sram.get(), 0x8000);

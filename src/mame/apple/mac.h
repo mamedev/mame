@@ -18,6 +18,7 @@
 #include "machine/nscsi_bus.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "adbmodem.h"
 #include "egret.h"
 #include "macadb.h"
 #include "bus/nubus/nubus.h"
@@ -54,6 +55,7 @@ public:
 		m_via2(*this, "via6522_1"),
 		m_asc(*this, "asc"),
 		m_egret(*this, EGRET_TAG),
+		m_adbmodem(*this, "adbmodem"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_scc(*this, "scc"),
@@ -124,6 +126,7 @@ private:
 	optional_device<via6522_device> m_via2;
 	optional_device<asc_device> m_asc;
 	optional_device<egret_device> m_egret;
+	optional_device<adbmodem_device> m_adbmodem;
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<scc8530_legacy_device> m_scc;
@@ -286,7 +289,6 @@ private:
 	void set_scc_waitrequest(int waitrequest);
 	void mac_driver_init(model_t model);
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom);
-	offs_t mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
 #endif // MAME_INCLUDES_MAC_H

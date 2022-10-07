@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/mcf5206e.h"
 
 
 class adder5_state : public driver_device

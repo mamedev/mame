@@ -19,6 +19,7 @@ but the syntax has yet to be worked out. BAUD [0-9] is allowed but what is it do
 ************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
@@ -29,9 +30,12 @@ but the syntax has yet to be worked out. BAUD [0-9] is allowed but what is it do
 #include "sound/spkrdev.h"
 #include "video/mc6847.h"
 #include "bus/centronics/ctronics.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "utf8.h"
 
 
 class shine_state : public driver_device

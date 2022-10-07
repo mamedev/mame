@@ -188,7 +188,8 @@ private:
 		{
 			actual = std::size_t(limit - offset);
 			std::memmove(reinterpret_cast<std::uint8_t *>(m_storage.data()) + offset, buffer, actual);
-			m_size = limit;
+			if (limit > m_size)
+				m_size = limit;
 		}
 		else
 		{

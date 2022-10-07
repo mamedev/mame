@@ -77,7 +77,7 @@ void midtunit_video_device::debug_init()
 	}
 }
 
-void midtunit_video_device::debug_commands(const std::vector<std::string> &params)
+void midtunit_video_device::debug_commands(const std::vector<std::string_view> &params)
 {
 	if (params.size() < 1)
 		return;
@@ -88,7 +88,7 @@ void midtunit_video_device::debug_commands(const std::vector<std::string> &param
 		debug_help_command(params);
 }
 
-void midtunit_video_device::debug_help_command(const std::vector<std::string> &params)
+void midtunit_video_device::debug_help_command(const std::vector<std::string_view> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -97,7 +97,7 @@ void midtunit_video_device::debug_help_command(const std::vector<std::string> &p
 	con.printf("  midblit help -- this list\n");
 }
 
-void midtunit_video_device::debug_png_dma_command(const std::vector<std::string> &params)
+void midtunit_video_device::debug_png_dma_command(const std::vector<std::string_view> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -141,7 +141,7 @@ void midtunit_video_device::debug_png_dma_command(const std::vector<std::string>
 		return;
 	}
 
-	strncpy(m_log_path, params[2].c_str(), 2047);
+	m_log_path = params[2];
 
 	if (params.size() == 4)
 	{

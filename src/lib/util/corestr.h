@@ -25,7 +25,7 @@
 ***************************************************************************/
 
 /* since stricmp is not part of the standard, we use this instead */
-int core_stricmp(const char *s1, const char *s2);
+int core_stricmp(std::string_view s1, std::string_view s2);
 
 /* this macro prevents people from using stricmp directly */
 #undef stricmp
@@ -76,6 +76,9 @@ void strreplacechr(std::string& str, char ch, char newch);
 int strreplace(std::string &str, const std::string& search, const std::string& replace);
 
 namespace util {
+
+bool strequpper(std::string_view str, std::string_view ucstr);
+bool streqlower(std::string_view str, std::string_view lcstr);
 
 // based on Jaro-Winkler distance - returns value from 0.0 (totally dissimilar) to 1.0 (identical)
 double edit_distance(std::u32string_view lhs, std::u32string_view rhs);

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff
+// copyright-holders:Steve Ellenoff, David Haywood
 
-#ifndef MAME_CPU_AXC51_AXC51DASM_H
-#define MAME_CPU_AXC51_AXC51DASM_H
+#ifndef MAME_CPU_SFR_AXC51DASM_H
+#define MAME_CPU_SFR_AXC51DASM_H
 
 #pragma once
 

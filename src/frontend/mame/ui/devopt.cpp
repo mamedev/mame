@@ -15,6 +15,8 @@
 #include "romload.h"
 #include "screen.h"
 
+#include "utf8.h"
+
 
 namespace ui {
 

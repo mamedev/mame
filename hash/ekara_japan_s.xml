@@ -15,25 +15,25 @@ license:CC0
 	your performance
 
 	S-1  *SC0001-KTY  Karaoke Ehon Vol.1 Hello Kitty
-	S-2   SC0002-SAI  Saiten Cartridge Challenge Idol vol.1
+	S-2  *SC0002-SAI  Saiten Cartridge Challenge Idol vol.1
 	S-3  *SC0003-SAI  Kids' Challenge Vol.1
 	S-4  *SC0004-SAI  Saiten Cartridge Enka no Tatsujin
 	S-5  *SC0005-SAI  Saiten Cartridge Nesshō vol. 1
 	S-6  *SC0006-SAI  Saiten Cartridge Nesshō vol. 2
 	S-7  *SC0007-DCS  Saiten Cartridge Detective Conan Vol.1
-	S-8   SC0008-SAI  Saiten Cartridge Challenge Idol vol.2
+	S-8  *SC0008-SAI  Saiten Cartridge Challenge Idol vol.2
 	S-9  *SC0009-SAI  Saiten Cartridge Nesshō vol. 3
 	S-10 *SC0010-HKW  Hikawa Kiyoshi no Karaoke Dōjō
 	S-11  SC0011-     PostPet
 	S-12 *SC0012-SAI  Saiten Cartridge Challenge Idol vol.3
 	S-13  SC0013-     Saiten Cartridge Nesshō vol. 4
-	S-14  SC0014-     Saiten Cartridge Challenge Idol vol.4
+	S-14 *SC0014-SAI  Saiten Cartridge Challenge Idol vol.4
 	S-15 *SC0015-DCS  Saiten Cartridge Detective Conan Vol.2
 	S-16  SC0016-SAI  Saiten Cartridge Nesshō vol. 5
 	S-17  SC0017-     Kids' Challenge Vol.2
 	S-18 *SC0018-SAI  Saiten Cartridge Challenge Artist Vol.1 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki)
 	S-19 *SC0019-SAI  Saiten Cartridge Nesshō vol. 6
-	S-20  SC0020-     Saiten Cartridge Challenge Idol vol.5
+	S-20 *SC0020-SAI  Saiten Cartridge Challenge Idol vol.5
 	S-21 *SC0021-SAI  Saiten Cartridge Nesshō vol. 7
 	S-22 *SC0022-SAI  Saiten Cartridge Nesshō vol. 8
 
@@ -56,7 +56,18 @@ license:CC0
 		</part>
 	</software>
 
-
+	<software name="sc0002">
+		<description>Saiten Cartridge: Challenge Idol vol.1 (Japan) (SC0002-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.1"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0002-sai.u1" size="0x100000" crc="b6687799" sha1="a5350b06bf5a18e0fb84b03ac7257468c26a2019"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="sc0003">
 		<description>Kids' Challenge Vol.1 (Japan) (SC0003-SAI)</description>
 		<year>2001</year>
@@ -117,7 +128,19 @@ license:CC0
 		</part>
 	</software>
 
-
+	<!-- seems to crash when displaying score? unusual, maybe a bug in this cart when the score is 0? -->
+	<software name="sc0008">
+		<description>Saiten Cartridge: Challenge Idol vol.2 (Japan) (SC0008-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.2"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0008-sai.u1" size="0x100000" crc="5d887910" sha1="5e32cccd99ba7e19974c6a9462e13cb7f8543b2a"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="sc0009">
 		<description>Saiten Cartridge: Nesshō vol. 3 (Japan) (SC0009-SAI)</description>
 		<year>2001</year>
@@ -154,6 +177,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sc0014">
+		<description>Saiten Cartridge: Challenge Idol vol.4 (Japan) (SC0014-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.4"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0014-sai.u1" size="0x100000" crc="1c07e017" sha1="257d878578fcbf14d7c951bbe68fd25bee3c8db0"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sc0015">
 		<description>Saiten Cartridge: Detective Conan Vol.2 (Japan) (SC0015-DCS)</description>
@@ -188,6 +222,18 @@ license:CC0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0019-sai.u1" size="0x100000" crc="136c12e3" sha1="fabd2e83732fdbbd737fc55902a3b1612c73f929"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0020">
+		<description>Saiten Cartridge: Challenge Idol vol.5 (Japan) (SC0020-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.5"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0020-sai.u1" size="0x100000" crc="081cb211" sha1="daf08db6d342605a8efd797a43c859b9559d6f26"/>
 			</dataarea>
 		</part>
 	</software>

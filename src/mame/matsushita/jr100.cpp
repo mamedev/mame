@@ -54,15 +54,19 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "utf8.h"
 
 
 namespace {

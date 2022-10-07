@@ -84,7 +84,9 @@ Scanline 0 is the start of vblank.
 
 #include "emu.h"
 
+#include "adbmodem.h"
 #include "macrtc.h"
+#include "mactoolbox.h"
 
 #include "bus/mackbd/mackbd.h"
 #include "bus/macpds/hyperdrive.h"
@@ -133,6 +135,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via6522_0"),
+		m_adbmodem(*this, "adbmodem"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsibus"),
@@ -169,6 +172,7 @@ public:
 private:
 	required_device<m68000_device> m_maincpu;
 	required_device<via6522_device> m_via;
+	optional_device<adbmodem_device> m_adbmodem;
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	optional_device<nscsi_bus_device> m_scsibus;
@@ -807,7 +811,7 @@ uint8_t mac128_state::mac_via_in_b()
 
 uint8_t mac128_state::mac_via_in_b_se()
 {
-	int val = m_macadb->get_adb_state()<<4;
+	int val = 0;
 
 	if (!m_adb_irq_pending)
 	{
@@ -899,7 +903,7 @@ void mac128_state::mac_via_out_b_se(uint8_t data)
 
 	m_scsiirq_enable = (data & 0x40) ? 0 : 1;
 
-	m_macadb->mac_adb_newaction((data & 0x30) >> 4);
+	m_adbmodem->set_via_state((data & 0x30) >> 4);
 
 	m_rtc->ce_w((data & 0x04)>>2);
 	m_rtc->data_w(data & 0x01);
@@ -1113,6 +1117,7 @@ void mac128_state::mac512ke(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, C7M);        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
@@ -1252,17 +1257,21 @@ void mac128_state::macse(machine_config &config)
 		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 	});
 
+	ADBMODEM(config, m_adbmodem, C7M);
+	m_adbmodem->via_clock_callback().set(m_via, FUNC(via6522_device::write_cb1));
+	m_adbmodem->via_data_callback().set(m_via, FUNC(via6522_device::write_cb2));
+	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->irq_callback().set(FUNC(mac128_state::adb_irq_w));
+
 	MACADB(config, m_macadb, C7M);
-	m_macadb->via_clock_callback().set(m_via, FUNC(via6522_device::write_cb1));
-	m_macadb->via_data_callback().set(m_via, FUNC(via6522_device::write_cb2));
-	m_macadb->adb_irq_callback().set(FUNC(mac128_state::adb_irq_w));
+	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
 
 	R65NC22(config.replace(), m_via, C7M/10);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
 	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b_se));
 	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a_se));
 	m_via->writepb_handler().set(FUNC(mac128_state::mac_via_out_b_se));
-	m_via->cb2_handler().set(m_macadb, FUNC(macadb_device::adb_data_w));
+	m_via->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
 	m_via->irq_handler().set(FUNC(mac128_state::mac_via_irq));
 
 	/* internal ram */
@@ -1381,7 +1390,6 @@ ROM_START( mac128k )
 	// @U2E  342-0191-A  PAL16R4  BMU0
 	// @U1E  342-0251-A  PAL16R8  LAG
 	// @U1D  342-0254-A  PAL16R4A TSM
-
 ROM_END
 
 ROM_START( mac512k )

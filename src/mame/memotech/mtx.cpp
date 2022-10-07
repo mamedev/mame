@@ -29,6 +29,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 
 /***************************************************************************
     MEMORY MAPS

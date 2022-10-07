@@ -185,7 +185,7 @@ license:CC0
 	</software>
 
 	<software name="ps64" supported="no">
-		<description>PS-64 puhemoduli v1.0 (Fin)</description>
+		<description>PS-64 puhemoduli v1.0 (Finland)</description>
 		<year>1988</year>
 		<publisher>Koulun erityispalvelu</publisher>
 
@@ -201,7 +201,7 @@ license:CC0
 	</software>
 
 	<software name="ps64v2" cloneof="ps64" supported="no">
-		<description>PS-64 puhemoduli v2.0 (Fin)</description>
+		<description>PS-64 puhemoduli v2.0 (Finland)</description>
 		<year>1988</year>
 		<publisher>Koulun erityispalvelu</publisher>
 
@@ -217,7 +217,7 @@ license:CC0
 	</software>
 
 	<software name="pagefox">
-		<description>Pagefox (Ger)</description>
+		<description>Pagefox (Germany)</description>
 		<year>1987</year>
 		<publisher>Scanntronik</publisher>
 
@@ -236,7 +236,7 @@ license:CC0
 	</software>
 
 	<software name="pagefoxa" cloneof="pagefox">
-		<description>Pagefox (Alt)</description>
+		<description>Pagefox (alt)</description>
 		<year>1987</year>
 		<publisher>Scanntronik</publisher>
 
@@ -255,7 +255,7 @@ license:CC0
 	</software>
 
 	<software name="pagefoxfi" cloneof="pagefox">
-		<description>Pagefox (Fin)</description>
+		<description>Pagefox (Finland)</description>
 		<year>1987</year>
 		<publisher>Scanntronik</publisher>
 
@@ -294,7 +294,7 @@ license:CC0
 	</software>
 
 	<software name="easycalca" cloneof="easycalc">
-		<description>Easy Calc Result (Alt)</description>
+		<description>Easy Calc Result (alt)</description>
 		<year>1985</year>
 		<publisher>Handic Software</publisher>
 		<!--
@@ -364,7 +364,7 @@ license:CC0
 	</software>
 
 	<software name="multiscr" supported="no">
-		<description>Multiscreen (Aus)</description>
+		<description>Multiscreen (Australia)</description>
 		<year>1987</year>
 		<publisher>Multiscreen Pty</publisher>
 
@@ -497,7 +497,7 @@ license:CC0
 	</software>
 
 	<software name="btx" supported="no">
-		<description>Btx Decoder Modul (Ger)</description>
+		<description>Btx Decoder Modul (Germany)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<!--
@@ -514,7 +514,7 @@ license:CC0
 	</software>
 
 	<software name="btx2" supported="no">
-		<description>Btx Decoder Modul II v3.1 (Ger)</description>
+		<description>Btx Decoder Modul II v3.1 (Germany)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<!--
@@ -531,7 +531,7 @@ license:CC0
 	</software>
 
 	<software name="btx2v33" supported="no">
-		<description>Btx Decoder Modul II v3.3 (Ger)</description>
+		<description>Btx Decoder Modul II v3.3 (Germany)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<!--
@@ -729,7 +729,7 @@ license:CC0
 	</software>
 
 	<software name="turborom">
-		<description>Turbo ROM v.2 (Pol)</description>
+		<description>Turbo ROM v.2 (Poland)</description>
 		<year>1983</year>
 		<publisher>Turbo Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -742,7 +742,7 @@ license:CC0
 	</software>
 
 	<software name="turboroma" cloneof="turborom">
-		<description>Turbo ROM v.2 (Pol, Alt)</description>
+		<description>Turbo ROM v.2 (Poland, alt)</description>
 		<year>1983</year>
 		<publisher>Turbo Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -800,7 +800,7 @@ license:CC0
 	</software>
 
 	<software name="mach5_v1b2" cloneof="mach5">
-		<description>MACH 5 v.1B (Alt)</description>
+		<description>MACH 5 v.1B (alt)</description>
 		<year>1985</year>
 		<publisher>Access Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -1018,7 +1018,7 @@ license:CC0
 	</software>
 
 	<software name="hrdcpytb">
-		<description>Hardcopy+Turbo-Modul (Ger)</description>
+		<description>Hardcopy+Turbo-Modul (Germany)</description>
 		<year>1985</year>
 		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9505" />
@@ -1033,7 +1033,7 @@ license:CC0
 	</software>
 
 	<software name="spdtape">
-		<description>Speed-Tape (Ger)</description>
+		<description>Speed-Tape (Germany)</description>
 		<year>1985</year>
 		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9510" />
@@ -1048,7 +1048,7 @@ license:CC0
 	</software>
 
 	<software name="rexep256">
-		<description>Eprom Bank 256k (Ger)</description>
+		<description>Eprom Bank 256k (Germany)</description>
 		<year>198?</year>
 		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9513" />
@@ -1063,7 +1063,7 @@ license:CC0
 	</software>
 
 	<software name="ppm">
-		<description>Picture-Printer Modul (Ger)</description>
+		<description>Picture-Printer Modul (Germany)</description>
 		<year>1986</year>
 		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9545" />
@@ -1093,7 +1093,7 @@ license:CC0
 	</software>
 
 	<software name="goliath" supported="no">
-		<description>1MB Goliath Eprom-Cart (Ger)</description>
+		<description>1MB Goliath Eprom-Cart (Germany)</description>
 		<year>19??</year>
 		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9600" />
@@ -1110,7 +1110,7 @@ license:CC0
 	</software>
 
 	<software name="qkbyte2" supported="no">
-		<description>Quickbyte II (Ger)</description>
+		<description>Quickbyte II (Germany)</description>
 		<year>1986</year>
 		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9603" />
@@ -1140,7 +1140,7 @@ license:CC0
 	</software>
 
 	<software name="hardcopy">
-		<description>Hardcopy-Modul (Ger)</description>
+		<description>Hardcopy-Modul (Germany)</description>
 		<year>19??</year>
 		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9629" />
@@ -1259,7 +1259,7 @@ license:CC0
 	</software>
 
 	<software name="ep7x8">
-		<description>7x8K-EPROM-Bank (Ger)</description>
+		<description>7x8K-EPROM-Bank (Germany)</description>
 		<year>19??</year>
 		<publisher>Dela Elektronik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2000,7 +2000,7 @@ license:CC0
 	</software>
 
 	<software name="coccinel">
-		<description>Coccinelle cherche dessinateur (Fra)</description>
+		<description>Coccinelle cherche dessinateur (France)</description>
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2163,7 +2163,7 @@ license:CC0
 	</software>
 
 	<software name="digduga" cloneof="digdug">
-		<description>Dig Dug (Alt)</description>
+		<description>Dig Dug (alt)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3132,7 +3132,7 @@ license:CC0
 	</software>
 
 	<software name="pancho">
-		<description>Pancho (Fra)</description>
+		<description>Pancho (France)</description>
 		<year>1984</year>
 		<publisher>Romox</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3213,7 +3213,7 @@ license:CC0
 	</software>
 
 	<software name="pitfall2a" cloneof="pitfall2">
-		<description>Pitfall II: The Lost Caverns (Alt)</description>
+		<description>Pitfall II: The Lost Caverns (alt)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-007-04" />
@@ -3254,7 +3254,7 @@ license:CC0
 	</software>
 
 	<software name="pitstop1" cloneof="pitstop">
-		<description>Pitstop (Alt)</description>
+		<description>Pitstop (alt)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3321,7 +3321,7 @@ license:CC0
 	</software>
 
 	<software name="qbert1" cloneof="qbert">
-		<description>Q*bert (Alt)</description>
+		<description>Q*bert (alt)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="PB1550" />
@@ -3335,7 +3335,7 @@ license:CC0
 	</software>
 
 	<software name="qbert2" cloneof="qbert">
-		<description>Q*bert (Alt 2)</description>
+		<description>Q*bert (alt 2)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="PB1550" />
@@ -3376,7 +3376,7 @@ license:CC0
 	</software>
 
 	<software name="addsub23">
-		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 2./3. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 2./3. Schuljahr (Germany)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<info name="assy" value="OPC-1298A" />
@@ -3397,7 +3397,7 @@ license:CC0
 	</software>
 
 	<software name="addsub34">
-		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 3./4. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 3./4. Schuljahr (Germany)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3411,7 +3411,7 @@ license:CC0
 	</software>
 
 	<software name="geomet34">
-		<description>Der Rechenlöwe: Fit in Geometrie - 3./4. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Geometrie - 3./4. Schuljahr (Germany)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3425,7 +3425,7 @@ license:CC0
 	</software>
 
 	<software name="math1">
-		<description>Der Rechenlöwe: Fit in Mathematik - 1. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Mathematik - 1. Schuljahr (Germany)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<info name="assy" value="OPC-1298A" />
@@ -3446,7 +3446,7 @@ license:CC0
 	</software>
 
 	<software name="muldiv23">
-		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 2./3. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 2./3. Schuljahr (Germany)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3460,7 +3460,7 @@ license:CC0
 	</software>
 
 	<software name="muldiv34">
-		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 3./4. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 3./4. Schuljahr (Germany)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3474,7 +3474,7 @@ license:CC0
 	</software>
 
 	<software name="recht34">
-		<description>Der Rechtschreiblöwe: Fit in Rechtschreibung - 3./4. Schuljahr (Ger)</description>
+		<description>Der Rechtschreiblöwe: Fit in Rechtschreibung - 3./4. Schuljahr (Germany)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -4802,7 +4802,7 @@ license:CC0
 	</software>
 
 	<software name="deadtest">
-		<description>C64/C128/C128D Diagnostic Dead Test (Rev 781220)</description>
+		<description>C64/C128/C128D Diagnostic Dead Test (rev 781220)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -4815,7 +4815,7 @@ license:CC0
 	</software>
 
 	<software name="c64diag">
-		<description>C-64 Diagnostic (Rev 586220)</description>
+		<description>C-64 Diagnostic (rev 586220)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
@@ -4898,7 +4898,7 @@ license:CC0
 	</software>
 
 	<software name="c64dia41">
-		<description>C-64 Diagnostic (Rev 4.1.0)</description>
+		<description>C-64 Diagnostic (rev 4.1.0)</description>
 		<year>19??</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -4942,7 +4942,7 @@ license:CC0
 	</software>
 
 	<software name="c64statg" cloneof="c64stat">
-		<description>CBM 64 Stat (Ger)</description>
+		<description>CBM 64 Stat (Germany)</description>
 		<year>1982</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -4955,7 +4955,7 @@ license:CC0
 	</software>
 
 	<software name="muistio">
-		<description>Muistio 64 (Fin)</description>
+		<description>Muistio 64 (Finland)</description>
 		<year>19??</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -4968,7 +4968,7 @@ license:CC0
 	</software>
 
 	<software name="conraddb">
-		<description>Conrad Disk Booster (Ger)</description>
+		<description>Conrad Disk Booster (Germany)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5008,7 +5008,7 @@ license:CC0
 	</software>
 
 	<software name="delas4a" cloneof="delas4">
-		<description>Dela S/4-Modul (Alt)</description>
+		<description>Dela S/4-Modul (alt)</description>
 		<year>19??</year>
 		<publisher>Dela Elektronik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5144,7 +5144,7 @@ license:CC0
 	</software>
 
 	<software name="formatm">
-		<description>Format- und Hardcopymodul (Ger)</description>
+		<description>Format- und Hardcopymodul (Germany)</description>
 		<year>19??</year>
 		<publisher>Rex-Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5171,7 +5171,7 @@ license:CC0
 	</software>
 
 	<software name="happypac">
-		<description>Happy-Packer (Ger)</description>
+		<description>Happy-Packer (Germany)</description>
 		<year>1987</year>
 		<publisher>Peter Arndt</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5198,7 +5198,7 @@ license:CC0
 	</software>
 
 	<software name="hesmonp" cloneof="hesmon">
-		<description>HES Mon (Prototype)</description>
+		<description>HES Mon (prototype)</description>
 		<year>1983</year>
 		<publisher>HesWare</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5224,7 +5224,7 @@ license:CC0
 	</software>
 
 	<software name="heswrit1" cloneof="heswrite">
-		<description>HES Writer 64 (Alt)</description>
+		<description>HES Writer 64 (alt)</description>
 		<year>1982</year>
 		<publisher>HesWare</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5237,7 +5237,7 @@ license:CC0
 	</software>
 
 	<software name="hsback3">
-		<description>High Speed Sektor Backup v3.0 (Ger)</description>
+		<description>High Speed Sektor Backup v3.0 (Germany)</description>
 		<year>1987</year>
 		<publisher>Rossmoeller</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5264,7 +5264,7 @@ license:CC0
 	</software>
 
 	<software name="hypra3">
-		<description>Hypra-Disk-Modul II v3.0 (Ger)</description>
+		<description>Hypra-Disk-Modul II v3.0 (Germany)</description>
 		<year>19??</year>
 		<publisher>Rex-Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5364,7 +5364,7 @@ license:CC0
 	</software>
 
 	<software name="superhcm">
-		<description>Das Super Hard-Copy-Modul (Ger)</description>
+		<description>Das Super Hard-Copy-Modul (Germany)</description>
 		<year>1987</year>
 		<publisher>Schlumph</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5390,7 +5390,7 @@ license:CC0
 	</software>
 
 	<software name="systemm1">
-		<description>System-M1.0 (Ger)</description>
+		<description>System-M1.0 (Germany)</description>
 		<year>1983</year>
 		<publisher>Mousesoft</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5403,7 +5403,7 @@ license:CC0
 	</software>
 
 	<software name="teledata">
-		<description>Teledata (Swe)</description>
+		<description>Teledata (Sweden)</description>
 		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5457,7 +5457,7 @@ license:CC0
 	</software>
 
 	<software name="tysim64">
-		<description>Tysim 64 (Ger)</description>
+		<description>Tysim 64 (Germany)</description>
 		<year>1987</year>
 		<publisher>Kaudelka O.</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5470,7 +5470,7 @@ license:CC0
 	</software>
 
 	<software name="victxt64">
-		<description>Vic-Text 64 (Swe)</description>
+		<description>Vic-Text 64 (Sweden)</description>
 		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -5643,7 +5643,7 @@ license:CC0
 	</software>
 
 	<software name="cmiky2a" cloneof="ar4" supported="no">
-		<description>Captain Miky II (Alt)</description>
+		<description>Captain Miky II (alt)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5733,7 +5733,7 @@ license:CC0
 	</software>
 
 	<software name="acp53" cloneof="ar41" supported="no">
-		<description>Action Cartridge Plus 5 (Ger)</description>
+		<description>Action Cartridge Plus 5 (Germany)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5763,7 +5763,7 @@ license:CC0
 	</software>
 
 	<software name="acp6g" cloneof="ar41" supported="no">
-		<description>Action Cartridge Plus 6.0 (Ger)</description>
+		<description>Action Cartridge Plus 6.0 (Germany)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5994,7 +5994,7 @@ license:CC0
 	</software>
 
 	<software name="frzmach" supported="no">
-		<description>Freeze Machine (Aus) (v1)</description>
+		<description>Freeze Machine (Australia) (v1)</description>
 		<year>1987</year>
 		<publisher>Evesham Micros</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
@@ -6087,7 +6087,7 @@ license:CC0
 	</software>
 
 	<software name="finalint" cloneof="final" supported="no">
-		<description>The Final Cartridge (Proto)</description>
+		<description>The Final Cartridge (prototype)</description>
 		<year>198?</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
@@ -6200,7 +6200,7 @@ license:CC0
 	</software>
 
 	<software name="finalplsv1a" cloneof="finalpls" supported="no">
-		<description>Final Cartridge Plus (v1, Alt)</description>
+		<description>Final Cartridge Plus (v1, alt)</description>
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
@@ -6228,7 +6228,7 @@ license:CC0
 	</software>
 
 	<software name="final2pl">
-		<description>The Final Cartridge II (Pol)</description>
+		<description>The Final Cartridge II (Poland)</description>
 		<year>1986</year>
 		<publisher>Micro-Luc</publisher>
 		<part name="cart" interface="c64_cart">
@@ -6701,7 +6701,7 @@ license:CC0
 	</software>
 
 	<software name="fcc">
-		<description>The Final ChessCard (Eng, v0.9/v1.0)</description>
+		<description>The Final ChessCard (UK, v0.9/v1.0)</description>
 		<year>1989</year>
 		<publisher>Tasc</publisher>
 
@@ -6722,7 +6722,7 @@ license:CC0
 	</software>
 
 	<software name="fccg" cloneof="fcc">
-		<description>The Final ChessCard (Ger, v1.3/v1.5)</description>
+		<description>The Final ChessCard (Germany, v1.3/v1.5)</description>
 		<year>1990</year>
 		<publisher>Tasc</publisher>
 
@@ -6743,7 +6743,7 @@ license:CC0
 	</software>
 
 	<software name="fccgo" cloneof="fcc">
-		<description>The Final ChessCard (Ger, v0.9/v1.0)</description>
+		<description>The Final ChessCard (Germany, v0.9/v1.0)</description>
 		<year>1989</year>
 		<publisher>Tasc</publisher>
 
@@ -6952,7 +6952,7 @@ license:CC0
 
 	<software name="final1" supported="partial">
 		<!-- missing on/off and reset switch -->
-		<description>Final I (Pol)</description>
+		<description>Final I (Poland)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -6968,7 +6968,7 @@ license:CC0
 
 	<software name="futurbox" supported="partial">
 		<!-- missing reset switch -->
-		<description>Future Box I (Pol)</description>
+		<description>Future Box I (Poland)</description>
 		<year>1992</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -6984,7 +6984,7 @@ license:CC0
 
 	<software name="bb3d" supported="partial">
 		<!-- missing reset switch -->
-		<description>Black Box III (Pol)</description>
+		<description>Black Box III (Poland)</description>
 		<year>198?</year>
 		<publisher>Domainsoft</publisher>
 

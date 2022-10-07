@@ -72,7 +72,7 @@ public:
 	void cpu2_map(address_map &map);
 	void cpu3_map(address_map &map);
 
-	virtual void driver_init() override;
+	void driver_init();
 
 protected:
 	virtual void machine_start() override;

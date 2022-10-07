@@ -27,7 +27,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 	static int16_t decode_sample(int8_t data);
 	static int16_t sample_interpolate(int16_t smp1, int16_t smp2, uint16_t frac);

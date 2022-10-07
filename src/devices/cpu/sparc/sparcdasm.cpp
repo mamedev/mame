@@ -873,7 +873,7 @@ offs_t sparc_disassembler::dasm(std::ostream &stream, offs_t pc, uint32_t op) co
 		case 0x28:
 			return dasm_read_state_reg(stream, pc, op);
 		case 0x29:
-			if (m_version <= v8)
+			if (m_version < v9)
 			{
 				util::stream_format(stream, "%-*s%%psr,%s", m_op_field_width, "rd", REG_NAMES[RD]);
 				return 4 | SUPPORTED;
@@ -979,7 +979,7 @@ offs_t sparc_disassembler::dasm(std::ostream &stream, offs_t pc, uint32_t op) co
 			}
 			break;
 		case 0x33:
-			if (m_version <= v8)
+			if (m_version < v9)
 			{
 				if (RS1 == 0)
 				{
@@ -1152,9 +1152,9 @@ offs_t sparc_disassembler::dasm_read_state_reg(std::ostream &stream, offs_t pc, 
 		util::stream_format(stream, "%-*s%%y,%s", m_op_field_width, "rd", REG_NAMES[RD]);
 		return 4 | SUPPORTED;
 	}
-	else if ((m_version == v8) || ((m_version >= v9) && !USEIMM))
+	else if ((m_version == v8) || (m_version == sparclite) || ((m_version >= v9) && !USEIMM))
 	{
-		if (!USEIMM && (RS1 == 15) && (RD == 0))
+		if (!USEIMM && (RS1 == 15) && (RD == 0) && (m_version != sparclite))
 		{
 			util::stream_format(stream, "stbar");
 			return 4 | SUPPORTED;
@@ -1482,6 +1482,7 @@ offs_t sparc_disassembler::dasm_ldst(std::ostream &stream, offs_t pc, uint32_t o
 				util::stream_format(stream, "%-*s[", m_op_field_width, "ldx");
 				dasm_address(stream, op);
 				util::stream_format(stream, "],%%efsr");
+				return 4 | SUPPORTED;
 			}
 			break;
 		case 0x25: // Store floating-point state register
@@ -1548,8 +1549,8 @@ offs_t sparc_disassembler::dasm_ldst(std::ostream &stream, offs_t pc, uint32_t o
 			dasm_address(stream, op);
 			stream << ']';
 			return 4 | SUPPORTED;
-		case 0x26: // Store Floating-point deferred-trap Queue
-		case 0x36: // Store Coprocessor deferred-trap Queue
+		case 0x26: // Store Double Floating-point deferred-trap Queue
+		case 0x36: // Store Double Coprocessor deferred-trap Queue
 			util::stream_format(stream, "%-*s%%%cq,[", m_op_field_width, "std", (OP3 == 0x36) ? 'c' : 'f');
 			dasm_address(stream, op);
 			stream << ']';

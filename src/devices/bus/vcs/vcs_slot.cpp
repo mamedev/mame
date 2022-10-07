@@ -80,7 +80,7 @@ void device_vcs_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(":cart:rom").c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(":cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }

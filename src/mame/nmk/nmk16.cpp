@@ -7752,6 +7752,10 @@ ROM_START( sabotenb )
 
 	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "ic27.sb7",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "8.ic37",      0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // 82S135
+	ROM_LOAD( "9.ic51",      0x0100, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
 ROM_END
 
 ROM_START( sabotenba )
@@ -7773,6 +7777,10 @@ ROM_START( sabotenba )
 
 	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "ic27.sb7",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "8.ic37",      0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // 82S135
+	ROM_LOAD( "9.ic51",      0x0100, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
 ROM_END
 
 ROM_START( cactus )
@@ -7820,7 +7828,7 @@ ROM_START( bjtwin )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "8.bpr",      0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // unknown
-	ROM_LOAD( "9.bpr",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // unknown
+	ROM_LOAD( "9.bpr",      0x0100, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // unknown
 ROM_END
 
 ROM_START( bjtwina )
@@ -7845,7 +7853,7 @@ ROM_START( bjtwina )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "8.bpr",      0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // unknown
-	ROM_LOAD( "9.bpr",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // unknown
+	ROM_LOAD( "9.bpr",      0x0100, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // unknown
 ROM_END
 
 

@@ -22,6 +22,10 @@
     types include MSM2128-15RS and HM6116P-3). A third 4016-like RAM (usually
     SY2158A-2) is used for the row buffer, with A8-A10 tied to GND.
 
+    To initialize EAROM settings on the WY-50, hold down the G key while
+    booting. The equivalent procedure on the WY-75 uses 5 on the numeric
+    keypad instead.
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -218,11 +222,11 @@ void wy50_state::earom_w(u8 data)
 	// Bit 3 = EAROM C2
 	// Bit 4 = EAROM C1
 	// Bit 5 = UPCHAR/NORM
+	m_earom->data_w(BIT(data, 3) ? BIT(data, 0) : 1);
 	m_earom->clock_w(BIT(data, 1));
 	m_earom->c3_w(BIT(data, 2));
 	m_earom->c2_w(BIT(data, 3));
 	m_earom->c1_w(BIT(data, 4));
-	m_earom->data_w(BIT(data, 3) ? BIT(data, 0) : 0);
 	m_font2 = BIT(data, 5);
 }
 

@@ -66,8 +66,8 @@ protected:
 	void recalc_m2();
 	void recalc_m3();
 
-	inline void player_render(uint8_t gfx, int size, uint8_t color, uint8_t *dst);
-	inline void missile_render(uint8_t gfx, int size, uint8_t color, uint8_t *dst);
+	inline void player_render(uint8_t gfx, u8 size_index, uint8_t color, uint8_t *dst);
+	inline void missile_render(uint8_t gfx, u8 size_index, uint8_t color, uint8_t *dst);
 
 private:
 	/* reading registers */

@@ -15,9 +15,11 @@
 #include "fileio.h"
 #include "screen.h"
 #include "softlist_dev.h"
-#include "zippath.h"
 #include "hashfile.h"
 #include "clifront.h"
+
+#include "path.h"
+#include "zippath.h"
 
 #include <cctype>
 #include <stack>

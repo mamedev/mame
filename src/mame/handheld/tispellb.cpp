@@ -9,6 +9,7 @@
 
   The Spelling B was introduced together with the Speak & Spell. It is a
   handheld educational toy with booklet. Two revisions of the hardware exist.
+  The words/indexes from the documentation are the same for each version.
   (* indicates not dumped)
 
   1st revision:
@@ -16,7 +17,7 @@
   Spelling B (US), 1978
   - TMS0270 MCU TMC0272 (die label: 0272A T0270B)
   - TMS1980 MCU TMC1984 (die label: 1980A 84A)
-  - 8-digit cyan VFD display (seen with and without apostrophe)
+  - 8-digit cyan VFD (seen with and without apostrophe)
 
   Spelling ABC (UK), 1979: exact same hardware as US version
 
@@ -25,7 +26,7 @@
   Spelling B (US), 1979
   - TMS0270 MCU TMC0274
   - TMC0355 4KB VSM ROM CD2602
-  - 8-digit cyan VFD display
+  - 8-digit cyan VFD
   - 1-bit sound (indicated by a music note symbol on the top-right of the casing)
   - note: much rarer than the 1978 version, not much luck finding one on eBay
 
@@ -37,10 +38,11 @@
   Mr. Challenger (US), 1979
   - TMS0270 MCU TMC0273
   - TMC0355 4KB VSM ROM CD2601
-  - 8-digit cyan VFD display
+  - 8-digit cyan VFD
   - 1-bit sound
 
-  Letterlogic (UK), 1980: exact same hardware as US Mr. Challenger (stylized as "LETTERlogic")
+  Letterlogic (UK), 1980: exact same hardware as US Mr. Challenger
+  - note: stylized as "LETTERlogic", same for other language versions
 
   Letterlogic (France), 1980: different VSM
   - TMC0355 4KB VSM ROM CD2603*
@@ -87,7 +89,7 @@ private:
 
 	u8 main_read_k();
 	void main_write_o(u16 data);
-	void main_write_r(u16 data);
+	void main_write_r(u32 data);
 
 	u8 rev1_ctl_r();
 	void rev1_ctl_w(u8 data);
@@ -96,7 +98,7 @@ private:
 	void sub_write_r(u16 data);
 
 	void rev2_write_o(u16 data);
-	void rev2_write_r(u16 data);
+	void rev2_write_r(u32 data);
 
 	virtual void machine_start() override;
 };
@@ -147,7 +149,7 @@ void tispellb_state::main_write_o(u16 data)
 	update_display();
 }
 
-void tispellb_state::main_write_r(u16 data)
+void tispellb_state::main_write_r(u32 data)
 {
 	// R0-R6: input mux
 	// R0-R7: select digit
@@ -180,20 +182,23 @@ void tispellb_state::rev1_ctl_w(u8 data)
 
 u8 tispellb_state::sub_read_k()
 {
-	// sub K8421 <- main CTL3210
-	return m_rev1_ctl;
+	// sub K8421 <- main CTL3210 (does not use external CS)
+	if (m_r & 0x1000)
+		return m_sub_o | m_rev1_ctl;
+	else
+		return m_sub_o | (m_plate & 0xe) | (m_plate >> 6 & 1);
 }
 
 void tispellb_state::sub_write_o(u16 data)
 {
 	// sub O write data
-	m_sub_o = data;
+	m_sub_o = bitswap<4>(data,6,0,4,3);
 }
 
 u8 tispellb_state::rev1_ctl_r()
 {
 	// main CTL3210 <- sub O6043
-	return bitswap<4>(m_sub_o,6,0,4,3);
+	return m_sub_o;
 }
 
 void tispellb_state::sub_write_r(u16 data)
@@ -214,7 +219,7 @@ void tispellb_state::rev2_write_o(u16 data)
 	main_write_o(data & 0x6fff);
 }
 
-void tispellb_state::rev2_write_r(u16 data)
+void tispellb_state::rev2_write_r(u32 data)
 {
 	// R12: TMC0355 CS
 	// R4: TMC0355 M1
@@ -323,16 +328,16 @@ void tispellb_state::rev1(machine_config &config)
 {
 	// basic machine hardware
 	TMS0270(config, m_maincpu, 350000); // approximation
-	m_maincpu->k().set(FUNC(tispellb_state::main_read_k));
-	m_maincpu->o().set(FUNC(tispellb_state::main_write_o));
-	m_maincpu->r().set(FUNC(tispellb_state::main_write_r));
+	m_maincpu->read_k().set(FUNC(tispellb_state::main_read_k));
+	m_maincpu->write_o().set(FUNC(tispellb_state::main_write_o));
+	m_maincpu->write_r().set(FUNC(tispellb_state::main_write_r));
 	m_maincpu->read_ctl().set(FUNC(tispellb_state::rev1_ctl_r));
 	m_maincpu->write_ctl().set(FUNC(tispellb_state::rev1_ctl_w));
 
 	TMS1980(config, m_subcpu, 350000); // approximation
-	m_subcpu->k().set(FUNC(tispellb_state::sub_read_k));
-	m_subcpu->o().set(FUNC(tispellb_state::sub_write_o));
-	m_subcpu->r().set(FUNC(tispellb_state::sub_write_r));
+	m_subcpu->read_k().set(FUNC(tispellb_state::sub_read_k));
+	m_subcpu->write_o().set(FUNC(tispellb_state::sub_write_o));
+	m_subcpu->write_r().set(FUNC(tispellb_state::sub_write_r));
 
 	config.set_perfect_quantum(m_maincpu);
 
@@ -349,9 +354,9 @@ void tispellb_state::rev2(machine_config &config)
 {
 	// basic machine hardware
 	TMS0270(config, m_maincpu, 350000); // approximation
-	m_maincpu->k().set(FUNC(tispellb_state::main_read_k));
-	m_maincpu->o().set(FUNC(tispellb_state::rev2_write_o));
-	m_maincpu->r().set(FUNC(tispellb_state::rev2_write_r));
+	m_maincpu->read_k().set(FUNC(tispellb_state::main_read_k));
+	m_maincpu->write_o().set(FUNC(tispellb_state::rev2_write_o));
+	m_maincpu->write_r().set(FUNC(tispellb_state::rev2_write_r));
 	m_maincpu->read_ctl().set(m_tms6100, FUNC(tms6100_device::data_r));
 	m_maincpu->write_ctl().set(m_tms6100, FUNC(tms6100_device::add_w));
 

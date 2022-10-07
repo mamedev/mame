@@ -17,11 +17,13 @@
 #include "egret.h"
 #include "macadb.h"
 #include "macscsi.h"
+#include "mactoolbox.h"
 #include "v8.h"
 
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/applefdintf.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
@@ -298,6 +300,7 @@ void maclc_state::maclc_base(machine_config &config)
 {
 	M68020HMMU(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maclc_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	RAM(config, m_ram);
 
@@ -349,7 +352,6 @@ void maclc_state::maclc_base(machine_config &config)
 	m_v8->hmmu_enable_callback().set(FUNC(maclc_state::set_hmmu));
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 
 	EGRET(config, m_egret, EGRET_341S0850);
 	m_egret->reset_callback().set(FUNC(maclc_state::egret_reset_w));
@@ -387,6 +389,7 @@ void maclc_state::maclc2(machine_config &config)
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maclc_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M,10M");
@@ -399,6 +402,7 @@ void maclc_state::maccclas(machine_config &config)
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maccclassic_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	config.device_remove("egret");
 	config.device_remove("fdc");
@@ -431,6 +435,7 @@ void maclc_state::macclas2(machine_config &config)
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maclc_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	EAGLE(config.replace(), m_v8, C15M);
 	m_v8->set_maincpu_tag("maincpu");
@@ -477,4 +482,4 @@ ROM_END
 COMP(1990, maclc,  0, 0, maclc,  maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
 COMP(1991, maclc2, 0, 0, maclc2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
 COMP(1991, macclas2, 0, 0, macclas2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
-COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING)
+COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)

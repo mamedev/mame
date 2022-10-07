@@ -105,7 +105,7 @@
 #include "emu.h"
 
 #include "macrtc.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "cpu/m6502/m5074x.h"
 #include "machine/6522via.h"
 #include "machine/ram.h"
@@ -115,6 +115,7 @@
 #include "machine/z80scc.h"
 #include "macadb.h"
 #include "macscsi.h"
+#include "mactoolbox.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
@@ -219,7 +220,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
 	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_asc_interrupt = 0, m_last_taken_interrupt = 0;
 	int m_ca1_data = 0, m_via2_ca1_hack = 0;
 
@@ -892,6 +892,7 @@ void macpb030_state::macpb140(machine_config &config)
 {
 	M68030(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb140_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	M50753(config, m_pmu, 3.93216_MHz_XTAL);
 	m_pmu->read_p<2>().set(FUNC(macpb030_state::pmu_data_r));
@@ -916,7 +917,6 @@ void macpb030_state::macpb140(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
 
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
@@ -959,7 +959,6 @@ void macpb030_state::macpb140(machine_config &config)
 	m_via1->writepa_handler().set(FUNC(macpb030_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(macpb030_state::mac_via_out_b));
 	m_via1->irq_handler().set(FUNC(macpb030_state::via_irq_w));
-	m_via1->cb2_handler().set(FUNC(macpb030_state::via_cb2_w));
 
 	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(macpb030_state::mac_via2_in_a));
@@ -1009,6 +1008,7 @@ void macpb030_state::macpb160(machine_config &config)
 {
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb160_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	M50753(config, m_pmu, 3.93216_MHz_XTAL);
 	m_pmu->read_p<2>().set(FUNC(macpb030_state::pmu_data_r));
@@ -1031,7 +1031,6 @@ void macpb030_state::macpb160(machine_config &config)
 	PALETTE(config, m_palette, FUNC(macpb030_state::macgsc_palette), 16);
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
 
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
@@ -1074,7 +1073,6 @@ void macpb030_state::macpb160(machine_config &config)
 	m_via1->writepa_handler().set(FUNC(macpb030_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(macpb030_state::mac_via_out_b));
 	m_via1->irq_handler().set(FUNC(macpb030_state::via_irq_w));
-	m_via1->cb2_handler().set(FUNC(macpb030_state::via_cb2_w));
 
 	R65NC22(config, m_via2, C7M / 10);
 	m_via2->readpa_handler().set(FUNC(macpb030_state::mac_via2_in_a));

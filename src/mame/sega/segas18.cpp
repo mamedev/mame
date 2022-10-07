@@ -155,7 +155,7 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 
 TIMER_CALLBACK_MEMBER(segas18_state::initial_boost)
 {
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
+	machine().scheduler().perfect_quantum(attotime::from_msec(10));
 }
 
 void segas18_state::machine_start()

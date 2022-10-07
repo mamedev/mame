@@ -2,12 +2,12 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-        SED1520 LCD controller
-        SED1560 LCD controller
-        EPL43102 LCD controller
+    SED1520 LCD controller
+    SED1560 LCD controller
+    EPL43102 LCD controller
 
-        TODO:
-        - busy flag
+    TODO:
+    - busy flag
 
 ***************************************************************************/
 
@@ -225,17 +225,33 @@ uint8_t sed15xx_device_base::status_read()
 
 void sed15xx_device_base::data_write(uint8_t data)
 {
-	m_ddr[(m_page * m_page_size + m_column) % m_ddr_size] = data;
+	m_data = data;
+
+	// no RAM write when column address is invalid
 	if (m_column < m_page_size)
+	{
+		m_ddr[(m_page * m_page_size + m_column) % m_ddr_size] = data;
 		m_column++;
+	}
 }
 
 uint8_t sed15xx_device_base::data_read()
 {
 	uint8_t data = m_data;
-	m_data = m_ddr[(m_page * m_page_size + m_column) % m_ddr_size];
-	if (!machine().side_effects_disabled() && !m_modify_write && m_column < m_page_size)
-		m_column++;
+	if (machine().side_effects_disabled())
+		return data;
+
+	if (m_column < m_page_size)
+	{
+		m_data = m_ddr[(m_page * m_page_size + m_column) % m_ddr_size];
+		if (!m_modify_write)
+			m_column++;
+	}
+	else
+	{
+		// invalid column, not sure what happens with data latch
+		m_data = 0;
+	}
 
 	return data;
 }

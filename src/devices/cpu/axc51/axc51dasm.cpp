@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff
+// copyright-holders:Steve Ellenoff, David Haywood
 
 #include "emu.h"
 #include "axc51dasm.h"
@@ -150,7 +150,7 @@ std::string axc51_disassembler::get_bit_address( uint8_t arg ) const
 {
 	if(arg < 0x80)
 	{
-		//Bit address 0-7F can be referred to as 20.0, 20.1, to 20.7 for address 0, and 2f.0,2f.1 to 2f.7 for address 7f
+		//Bit address 0-7f can be referred to as 20.0, 20.1, to 20.7 for address 0, and 2f.0,2f.1 to 2f.7 for address 7f
 		return util::string_format("$%02X.%d", (arg >> 3) | 0x20, arg & 0x07);
 	}
 	else
@@ -1025,12 +1025,12 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 	{ 0x87, "PCON0" }, // Power Control 0
 	{ 0x88, "SDCON0" },
 	{ 0x89, "SDCON1" },
-	{ 0x8A, "SDCON2" },
-	{ 0x8B, "JPGCON4" },
-	{ 0x8C, "JPGCON3" },
-	{ 0x8D, "JPGCON2" },
-	{ 0x8E, "JPGCON1" },
-	{ 0x8F, "TRAP" },
+	{ 0x8a, "SDCON2" },
+	{ 0x8b, "JPGCON4" },
+	{ 0x8c, "JPGCON3" },
+	{ 0x8d, "JPGCON2" },
+	{ 0x8e, "JPGCON1" },
+	{ 0x8f, "TRAP" },
 	{ 0x90, "P1" },
 	{ 0x91, "SDBAUD" },
 	{ 0x92, "SDCPTR" },
@@ -1041,108 +1041,108 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 	{ 0x97, "PWKEN" }, // Port Wakeup Enable
 	{ 0x98, "PWKPND" }, //Port Wakeup Flag
 	{ 0x99, "PWKEDGE" }, // Port Wakeup Edge
-	{ 0x9A, "PIE0" }, // Port Digital Input Enable Control 0
-	{ 0x9B, "DBASE" }, // DRAM Base Address Register
-	{ 0x9C, "PCON1" }, // Power Control 1
-	{ 0x9D, "PIE1" }, // Port Digital Input Enable Control 1
-	{ 0x9E, "IRTDATA" }, // IRTCC Communication Data
-	{ 0x9F, "IRTCON" }, // IRTCC Control
-	{ 0xA0, "P2" },
-	{ 0xA1, "GP0" }, // (General Purpose Register 0)
-	{ 0xA2, "GP1" }, // (General Purpose Register 1)
-	{ 0xA3, "GP2" }, // (General Purpose Register 2)
-	{ 0xA4, "GP3" }, // (General Purpose Register 3)
-	{ 0xA5, "DACCON" }, // DAC Control Register
-	{ 0xA6, "DACLCH" }, // DAC Left Channel
-	{ 0xA7, "DACRCH" }, // DAC Right Channel
-	{ 0xA8, "IE0" }, // Interrupt Enable 0
-	{ 0xA9, "IE1" }, // Interrupt Enable 1
-	{ 0xAA, "KEY0" },
-	{ 0xAB, "KEY1" },
-	{ 0xAC, "TMR3CON" }, // Timer3 Control
-	{ 0xAD, "TMR3CNT" }, // Timer3 Counter
-	{ 0xAE, "TMR3PR" }, // Timer3 Period
-	{ 0xAF, "TMR3PSR" }, // Timer3 Pre-scalar
-	{ 0xB0, "P3" },
-	{ 0xB1, "GP4" }, // (General Purpose Register 4)
-	{ 0xB2, "GP5" }, // (General Purpose Register 5)
-	{ 0xB3, "GP6" }, // (General Purpose Register 6)
-	{ 0xB4, "P4" },
-	{ 0xB5, "GP7" }, // (General Purpose Register 7)
-	{ 0xB6, "LCDCON" }, // LCD Control Register (or C6?)
-	{ 0xB7, "PLLCON" }, // PLL Configuration
-	{ 0xB8, "IP0" }, // Interrupt Priority 0
-	{ 0xB9, "IP1" }, // Interrupt Priority 1
-	{ 0xBA, "P0DIR" },
-	{ 0xBB, "P1DIR" },
-	{ 0xBC, "P2DIR" },
-	{ 0xBD, "P3DIR" },
-	{ 0xBE, "P4DIR" },
-	{ 0xBF, "LVDCON" }, // LVD Control Register
-	{ 0xC0, "JPGCON0" },
-	{ 0xC1, "TMR2CON" }, // Timer2 Control
-	{ 0xC2, "JPGCON9" },
-	{ 0xC3, "JPGCON5" },
-	{ 0xC4, "JPGCON6" },
-	{ 0xC5, "JPGCON7" },
-	{ 0xC6, "JPGCON8" },
-	{ 0xC7, "LCDPR" }, // LCD CS Pulse Width Register
-	{ 0xC8, "LCDTCON" }, // LCD WR Pulse Timing Control Register
-	{ 0xC9, "USBCON0" },
-	{ 0xCA, "USBCON1" },
-	{ 0xCB, "USBCON2" },
-	{ 0xCC, "USBDATA" },
-	{ 0xCD, "USBADR" },
-	{ 0xCE, "illegal" },
-	{ 0xCF, "MICCON" }, // MIC Control
-	{ 0xD0, "PSW" }, // Processor Status Word
-	{ 0xD1, "PGCON" }, // Power Gate Control Register
-	{ 0xD2, "ADCCON" }, // SARADC Control
-	{ 0xD3, "PCON2" }, // Power Control 2
-	{ 0xD4, "ADCDATAL" }, // SARADC Buffer Low Byte Control
-	{ 0xD5, "ADCDATAH" }, // SARADC Buffer High Byte Control
-	{ 0xD6, "SPIDMAADDR" }, // SPI DMA Start Address
-	{ 0xD7, "SPIDMACNT" }, // SPI DMA counter
-	{ 0xD8, "SPICON" }, // SPI Control
-	{ 0xD9, "SPIBUF" }, // SPI Data Buffer
-	{ 0xDA, "SPIBAUD" }, // SPI Baud Rate
-	{ 0xDB, "CLKCON" }, // Clock Control
-	{ 0xDC, "CLKCON1" },
-	{ 0xDD, "USBDPDM" },
-	{ 0xDE, "LFSRPOLY0" },
-	{ 0xDF, "LFSRPOLY1" },
-	{ 0xE0, "ACC" },
-	{ 0xE1, "TMR1CON" }, // Timer1 Control
-	{ 0xE2, "UID0" },
-	{ 0xE3, "UID1" },
-	{ 0xE4, "UID2" },
-	{ 0xE5, "UID3" },
-	{ 0xE6, "ER00" }, // ER00 \- ER0 (16-bit)  Extended Registers (used by 16-bit opcodes)
-	{ 0xE7, "ER01" }, // ER01 /
-	{ 0xE8, "ER10" }, // ER10 \- ER1 (16-bit)
-	{ 0xE9, "ER11" }, // ER11 /
-	{ 0xEA, "ER20" }, // ER20 \- ER2 (16-bit)
-	{ 0xEB, "ER21" }, // ER21 /
-	{ 0xEC, "ER30" }, // ER30 \- ER3 (16-bit)
-	{ 0xED, "ER31" }, // ER31 /
-	{ 0xEE, "ER8" }, // ER8
-	{ 0xEF, "illegal" },
-	{ 0xF0, "B" },
-	{ 0xF1, "HUFFBUF" },
-	{ 0xF2, "HUFFSFT" },
-	{ 0xF3, "HUFFDCL" },
-	{ 0xF4, "HUFFDCH" },
-	{ 0xF5, "CRC" },
-	{ 0xF6, "LFSRFIFO" },
-	{ 0xF7, "WDTCON" }, // Watchdog Control
-	{ 0xF8, "TMR0CON" }, // Timer0 Control
-	{ 0xF9, "TMR0CNT" }, // Timer0 Counter
-	{ 0xFA, "TMR0PR" }, // Timer0 Period
-	{ 0xFB, "TMR0PSR" }, // Timer0 Pre-scalar
-	{ 0xFC, "UARTSTA" }, // UART Status
-	{ 0xFD, "UARTCON" }, // UART Control
-	{ 0xFE, "UARTBAUD" }, // UART Baud (low)
-	{ 0xFF, "UARTDATA" }, // UART Communication Data
+	{ 0x9a, "PIE0" }, // Port Digital Input Enable Control 0
+	{ 0x9b, "DBASE" }, // DRAM Base Address Register
+	{ 0x9c, "PCON1" }, // Power Control 1
+	{ 0x9d, "PIE1" }, // Port Digital Input Enable Control 1
+	{ 0x9e, "IRTDATA" }, // IRTCC Communication Data
+	{ 0x9f, "IRTCON" }, // IRTCC Control
+	{ 0xa0, "P2" },
+	{ 0xa1, "GP0" }, // (General Purpose Register 0)
+	{ 0xa2, "GP1" }, // (General Purpose Register 1)
+	{ 0xa3, "GP2" }, // (General Purpose Register 2)
+	{ 0xa4, "GP3" }, // (General Purpose Register 3)
+	{ 0xa5, "DACCON" }, // DAC Control Register
+	{ 0xa6, "DACLCH" }, // DAC Left Channel
+	{ 0xa7, "DACRCH" }, // DAC Right Channel
+	{ 0xa8, "IE0" }, // Interrupt Enable 0
+	{ 0xa9, "IE1" }, // Interrupt Enable 1
+	{ 0xaa, "KEY0" },
+	{ 0xab, "KEY1" },
+	{ 0xac, "TMR3CON" }, // Timer3 Control
+	{ 0xad, "TMR3CNT" }, // Timer3 Counter
+	{ 0xae, "TMR3PR" }, // Timer3 Period
+	{ 0xaf, "TMR3PSR" }, // Timer3 Pre-scalar
+	{ 0xb0, "P3" },
+	{ 0xb1, "GP4" }, // (General Purpose Register 4)
+	{ 0xb2, "GP5" }, // (General Purpose Register 5)
+	{ 0xb3, "GP6" }, // (General Purpose Register 6)
+	{ 0xb4, "P4" },
+	{ 0xb5, "GP7" }, // (General Purpose Register 7)
+	{ 0xb6, "LCDCON" }, // LCD Control Register (or C6?)
+	{ 0xb7, "PLLCON" }, // PLL Configuration
+	{ 0xb8, "IP0" }, // Interrupt Priority 0
+	{ 0xb9, "IP1" }, // Interrupt Priority 1
+	{ 0xba, "P0DIR" },
+	{ 0xbb, "P1DIR" },
+	{ 0xbc, "P2DIR" },
+	{ 0xbd, "P3DIR" },
+	{ 0xbe, "P4DIR" },
+	{ 0xbf, "LVDCON" }, // LVD Control Register
+	{ 0xc0, "JPGCON0" },
+	{ 0xc1, "TMR2CON" }, // Timer2 Control
+	{ 0xc2, "JPGCON9" },
+	{ 0xc3, "JPGCON5" },
+	{ 0xc4, "JPGCON6" },
+	{ 0xc5, "JPGCON7" },
+	{ 0xc6, "JPGCON8" },
+	{ 0xc7, "LCDPR" }, // LCD CS Pulse Width Register
+	{ 0xc8, "LCDTCON" }, // LCD WR Pulse Timing Control Register
+	{ 0xc9, "USBCON0" },
+	{ 0xca, "USBCON1" },
+	{ 0xcb, "USBCON2" },
+	{ 0xcc, "USBDATA" },
+	{ 0xcd, "USBADR" },
+	{ 0xce, "illegal" },
+	{ 0xcf, "MICCON" }, // MIC Control
+	{ 0xd0, "PSW" }, // Processor Status Word
+	{ 0xd1, "PGCON" }, // Power Gate Control Register
+	{ 0xd2, "ADCCON" }, // SARADC Control
+	{ 0xd3, "PCON2" }, // Power Control 2
+	{ 0xd4, "ADCDATAL" }, // SARADC Buffer Low Byte Control
+	{ 0xd5, "ADCDATAH" }, // SARADC Buffer High Byte Control
+	{ 0xd6, "SPIDMAADDR" }, // SPI DMA Start Address
+	{ 0xd7, "SPIDMACNT" }, // SPI DMA counter
+	{ 0xd8, "SPICON" }, // SPI Control
+	{ 0xd9, "SPIBUF" }, // SPI Data Buffer
+	{ 0xda, "SPIBAUD" }, // SPI Baud Rate
+	{ 0xdb, "CLKCON" }, // Clock Control
+	{ 0xdc, "CLKCON1" },
+	{ 0xdd, "USBDPDM" },
+	{ 0xde, "LFSRPOLY0" },
+	{ 0xdf, "LFSRPOLY1" },
+	{ 0xe0, "ACC" },
+	{ 0xe1, "TMR1CON" }, // Timer1 Control
+	{ 0xe2, "UID0" },
+	{ 0xe3, "UID1" },
+	{ 0xe4, "UID2" },
+	{ 0xe5, "UID3" },
+	{ 0xe6, "ER00" }, // ER00 \- ER0 (16-bit)  Extended Registers (used by 16-bit opcodes)
+	{ 0xe7, "ER01" }, // ER01 /
+	{ 0xe8, "ER10" }, // ER10 \- ER1 (16-bit)
+	{ 0xe9, "ER11" }, // ER11 /
+	{ 0xea, "ER20" }, // ER20 \- ER2 (16-bit)
+	{ 0xeb, "ER21" }, // ER21 /
+	{ 0xec, "ER30" }, // ER30 \- ER3 (16-bit)
+	{ 0xed, "ER31" }, // ER31 /
+	{ 0xee, "ER8" }, // ER8
+	{ 0xef, "illegal" },
+	{ 0xf0, "B" },
+	{ 0xf1, "HUFFBUF" },
+	{ 0xf2, "HUFFSFT" },
+	{ 0xf3, "HUFFDCL" },
+	{ 0xf4, "HUFFDCH" },
+	{ 0xf5, "CRC" },
+	{ 0xf6, "LFSRFIFO" },
+	{ 0xf7, "WDTCON" }, // Watchdog Control
+	{ 0xf8, "TMR0CON" }, // Timer0 Control
+	{ 0xf9, "TMR0CNT" }, // Timer0 Counter
+	{ 0xfa, "TMR0PR" }, // Timer0 Period
+	{ 0xfb, "TMR0PSR" }, // Timer0 Pre-scalar
+	{ 0xfc, "UARTSTA" }, // UART Status
+	{ 0xfd, "UARTCON" }, // UART Control
+	{ 0xfe, "UARTBAUD" }, // UART Baud (low)
+	{ 0xff, "UARTDATA" }, // UART Communication Data
 
 	// Upper Registers
 

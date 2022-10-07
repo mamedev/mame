@@ -45,7 +45,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual uint32_t palette_entries() const override { return m_entries; }
+	virtual uint32_t palette_entries() const noexcept override { return m_entries; }
 private:
 	std::vector<uint16_t> m_paletteram;
 	u32 m_entries = 0;

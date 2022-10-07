@@ -7,7 +7,7 @@ Skeleton driver for ITT Courier 9216 IBM 3179-compatible color display terminal.
 ************************************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "cpu/mcs48/mcs48.h"
 
 class itt9216_state : public driver_device

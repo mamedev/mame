@@ -1343,7 +1343,7 @@ void a2_video_device::init_palette()
 		set_pen_color(i, apple2_palette[i]);
 }
 
-uint32_t a2_video_device::palette_entries() const
+uint32_t a2_video_device::palette_entries() const noexcept
 {
 	return std::size(apple2_palette);
 }

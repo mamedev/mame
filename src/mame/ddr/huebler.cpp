@@ -39,6 +39,7 @@ Cassette considerations
 #include "huebler.h"
 #include "speaker.h"
 #include "screen.h"
+#include "utf8.h"
 
 /* Keyboard */
 

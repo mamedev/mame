@@ -616,10 +616,10 @@ void sc4_state::sc4_map(address_map &map)
 
 
 
-uint32_t sc4_adder4_state::adder4_mem_r(offs_t offset, uint32_t mem_mask)
+uint16_t sc4_adder4_state::adder4_mem_r(offs_t offset, uint16_t mem_mask)
 {
 	int pc = m_adder4cpu->pc();
-	int cs = m_adder4cpu->get_cs(offset * 4);
+	int cs = m_adder4cpu->get_cs(offset * 2);
 
 	switch ( cs )
 	{
@@ -627,7 +627,7 @@ uint32_t sc4_adder4_state::adder4_mem_r(offs_t offset, uint32_t mem_mask)
 			return m_adder4cpuregion[offset];
 
 		case 2:
-			offset &=0x3fff;
+			offset &=0x7fff;
 			return m_adder4ram[offset];
 
 		default:
@@ -639,10 +639,10 @@ uint32_t sc4_adder4_state::adder4_mem_r(offs_t offset, uint32_t mem_mask)
 	return 0x0000;
 }
 
-void sc4_adder4_state::adder4_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sc4_adder4_state::adder4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pc = m_adder4cpu->pc();
-	int cs = m_adder4cpu->get_cs(offset * 4);
+	int cs = m_adder4cpu->get_cs(offset * 2);
 
 	switch ( cs )
 	{
@@ -652,7 +652,7 @@ void sc4_adder4_state::adder4_mem_w(offs_t offset, uint32_t data, uint32_t mem_m
 			break;
 
 		case 2:
-			offset &=0x3fff;
+			offset &=0x7fff;
 			COMBINE_DATA(&m_adder4ram[offset]);
 			break;
 
@@ -1268,7 +1268,7 @@ void sc4_adder4_state::machine_start()
 {
 	sc4_state::machine_start();
 
-	m_adder4ram = make_unique_clear<uint32_t[]>(0x10000);
+	m_adder4ram = make_unique_clear<uint16_t[]>(0x8000);
 }
 
 void sc4_adder4_state::sc4_adder4(machine_config &config)
@@ -1836,8 +1836,7 @@ ROM_START( sc4hrolr ) // uses RTC on romcard
 
 	ROM_REGION( 0x100000, "gals", 0 )
 	ROM_LOAD( "75585129.ic1.bin", 0x0000, 0x000117, CRC(2454bb33) SHA1(610cde14caef3f2d02f0076b924e015077c3832b) ) /* protected gal16v8 on romcard */
-
-	ROM_END
+ROM_END
 
 ROM_START( ad4skill )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )

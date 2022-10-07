@@ -75,6 +75,11 @@ template<int Width, int AddrShift, typename READ> std::pair<typename emu::detail
 	return std::pair<uX, u16>(read_impl<READ>(offset, mem_mask), this->m_flags);
 }
 
+template<int Width, int AddrShift, typename READ> u16 handler_entry_read_delegate<Width, AddrShift, READ>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	return this->m_flags;
+}
+
 template<int Width, int AddrShift, typename READ> std::string handler_entry_read_delegate<Width, AddrShift, READ>::name() const
 {
 	return m_delegate.name();
@@ -151,6 +156,11 @@ template<int Width, int AddrShift, typename WRITE> u16 handler_entry_write_deleg
 	return this->m_flags;
 }
 
+template<int Width, int AddrShift, typename WRITE> u16 handler_entry_write_delegate<Width, AddrShift, WRITE>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	return this->m_flags;
+}
+
 template<int Width, int AddrShift, typename WRITE> std::string handler_entry_write_delegate<Width, AddrShift, WRITE>::name() const
 {
 	return m_delegate.name();
@@ -169,6 +179,11 @@ template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry
 	return std::pair<uX, u16>(m_port->read(), this->m_flags);
 }
 
+template<int Width, int AddrShift> u16 handler_entry_read_ioport<Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	return this->m_flags;
+}
+
 template<int Width, int AddrShift> std::string handler_entry_read_ioport<Width, AddrShift>::name() const
 {
 	return m_port->tag();
@@ -182,6 +197,11 @@ template<int Width, int AddrShift> void handler_entry_write_ioport<Width, AddrSh
 template<int Width, int AddrShift> u16 handler_entry_write_ioport<Width, AddrShift>::write_flags(offs_t offset, uX data, uX mem_mask) const
 {
 	m_port->write(data, mem_mask);
+	return this->m_flags;
+}
+
+template<int Width, int AddrShift> u16 handler_entry_write_ioport<Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
 	return this->m_flags;
 }
 

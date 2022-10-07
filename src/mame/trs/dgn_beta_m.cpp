@@ -822,14 +822,14 @@ offs_t dgn_beta_state::dgnbeta_dasm_override(std::ostream &stream, offs_t pc, co
 	return coco_state::os9_dasm_override(stream, pc, opcodes, params);
 }
 
-void dgn_beta_state::execute_beta_dat_log(const std::vector<std::string> &params)
+void dgn_beta_state::execute_beta_dat_log(const std::vector<std::string_view> &params)
 {
 	m_LogDatWrites = !m_LogDatWrites;
 
 	machine().debugger().console().printf("DAT register write info set : %d\n", m_LogDatWrites);
 }
 
-void dgn_beta_state::execute_beta_key_dump(const std::vector<std::string> &params)
+void dgn_beta_state::execute_beta_key_dump(const std::vector<std::string_view> &params)
 {
 	for (int idx = 0; idx < NoKeyrows; idx++)
 	{

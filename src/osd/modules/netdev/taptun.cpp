@@ -14,6 +14,7 @@
 #endif
 
 #include "emu.h"
+#include "dinetwork.h"
 #include "osdnet.h"
 #include "modules/osdmodule.h"
 #include "netdev_module.h"

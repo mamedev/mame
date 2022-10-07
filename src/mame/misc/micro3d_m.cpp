@@ -392,7 +392,7 @@ void micro3d_state::micro3d_reset_w(uint16_t data)
 void micro3d_state::host_drmath_int_w(uint16_t data)
 {
 	m_drmath->set_input_line(AM29000_INTR2, ASSERT_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+	machine().scheduler().perfect_quantum(attotime::from_usec(10));
 }
 
 

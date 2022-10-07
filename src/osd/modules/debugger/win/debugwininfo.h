@@ -15,6 +15,8 @@
 #include "debugbaseinfo.h"
 
 
+namespace osd::debugger::win {
+
 class debugwin_info : protected debugbase_info
 {
 public:
@@ -40,6 +42,7 @@ public:
 	void show() const { smart_show_window(m_wnd, true); }
 	void hide() const { smart_show_window(m_wnd, false); }
 	void set_foreground() const { SetForegroundWindow(m_wnd); }
+	void redraw();
 	void destroy();
 
 	virtual bool set_default_focus();
@@ -48,6 +51,9 @@ public:
 	virtual bool restore_field(HWND wnd) { return false; }
 
 	virtual bool handle_key(WPARAM wparam, LPARAM lparam);
+
+	void save_configuration(util::xml::data_node &parentnode);
+	virtual void restore_configuration_from_node(util::xml::data_node const &node);
 
 protected:
 	static DWORD const  DEBUG_WINDOW_STYLE = (WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN) & (~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX);
@@ -108,6 +114,10 @@ protected:
 
 		ID_CLEAR_LOG,
 
+		ID_SAVE_WINDOWS,
+		ID_LIGHT_BACKGROUND,
+		ID_DARK_BACKGROUND,
+
 		ID_DEVICE_OPTIONS   // always keep this at the end
 	};
 
@@ -125,6 +135,8 @@ protected:
 	void draw_border(HDC dc, RECT &bounds);
 	void draw_border(HDC dc, HWND child);
 
+	virtual void save_configuration_to_node(util::xml::data_node &node);
+
 	std::unique_ptr<debugview_info>    m_views[MAX_VIEWS];
 
 private:
@@ -141,12 +153,14 @@ private:
 	HWND            m_wnd;
 	WNDPROC const   m_handler;
 
-	uint32_t          m_minwidth, m_maxwidth;
-	uint32_t          m_minheight, m_maxheight;
+	uint32_t        m_minwidth, m_maxwidth;
+	uint32_t        m_minheight, m_maxheight;
 
-	uint16_t          m_ignore_char_lparam;
+	uint16_t        m_ignore_char_lparam;
 
 	static bool     s_window_class_registered;
 };
 
-#endif
+} // namespace osd::debugger::win
+
+#endif // MAME_DEBUGGER_WIN_DEBUGWININFO_H

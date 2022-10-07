@@ -63,6 +63,8 @@ protected:
 
 	virtual u8 pseudovia_r(offs_t offset);
 
+	DECLARE_WRITE_LINE_MEMBER(asc_irq);
+
 private:
 	devcb_write_line write_pb4, write_pb5, write_cb2, write_hdsel, write_hmmu_enable;
 	devcb_read_line read_pb3;

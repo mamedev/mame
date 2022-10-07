@@ -267,7 +267,7 @@ void vlm5030_device::device_post_load()
 	restore_state();
 }
 
-void vlm5030_device::rom_bank_updated()
+void vlm5030_device::rom_bank_pre_change()
 {
 	m_channel->update();
 }

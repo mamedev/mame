@@ -7,17 +7,23 @@
 //============================================================
 
 #include "emu.h"
+#include "debug_module.h"
+
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/points.h"
 #include "debug/textbuf.h"
-#include "debug_module.h"
 #include "debugger.h"
-#include "fileio.h"
+
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 
+#include "fileio.h"
+
 #include <cinttypes>
+
+
+namespace {
 
 //-------------------------------------------------------------------------
 #define MAX_PACKET_SIZE 16384
@@ -411,7 +417,7 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "m68000",     gdb_register_map_m68000 },
 	{ "z80",        gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
-	{ "n2a03",      gdb_register_map_m6502 },
+	{ "rp2a03",     gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
 	{ "score7",     gdb_register_map_score7 },
 };
@@ -495,6 +501,7 @@ public:
 	cmd_reply handle_P(const char *buf);
 	cmd_reply handle_q(const char *buf);
 	cmd_reply handle_s(const char *buf);
+	cmd_reply handle_T(const char *buf);
 	cmd_reply handle_z(const char *buf);
 	cmd_reply handle_Z(const char *buf);
 
@@ -643,7 +650,11 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 
 	if ( firststop && !m_initialized )
 	{
-		m_maincpu = m_machine->root_device().subdevice(":maincpu");
+		// find the "main" CPU, which is the first CPU (gdbstub doesn't have any notion of switching CPUs)
+		m_maincpu = device_interface_enumerator<cpu_device>(m_machine->root_device()).first();
+		if (!m_maincpu)
+			fatalerror("gdbstub: cannot find any CPUs\n");
+
 		const char *cpuname = m_maincpu->shortname();
 		auto it = gdb_register_maps.find(cpuname);
 		if ( it == gdb_register_maps.end() )
@@ -1097,6 +1108,17 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_s(const char *buf)
 }
 
 //-------------------------------------------------------------------------
+// Find out if the thread XX is alive.
+debug_gdbstub::cmd_reply debug_gdbstub::handle_T(const char *buf)
+{
+	if ( is_thread_id_ok(buf) )
+		return REPLY_OK;
+
+	// thread is dead
+	return REPLY_ENN;
+}
+
+//-------------------------------------------------------------------------
 static bool remove_breakpoint(device_debug *debug, uint64_t address, int /*kind*/)
 {
 	const debug_breakpoint *bp = debug->breakpoint_find(address);
@@ -1195,15 +1217,15 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_Z(const char *buf)
 			return REPLY_OK;
 		case 2:
 			// write watchpoint
-			debug->watchpoint_set(*m_address_space, read_or_write::WRITE, offset, kind, nullptr, nullptr);
+			debug->watchpoint_set(*m_address_space, read_or_write::WRITE, offset, kind);
 			return REPLY_OK;
 		case 3:
 			// read watchpoint
-			debug->watchpoint_set(*m_address_space, read_or_write::READ, offset, kind, nullptr, nullptr);
+			debug->watchpoint_set(*m_address_space, read_or_write::READ, offset, kind);
 			return REPLY_OK;
 		case 4:
 			// access watchpoint
-			debug->watchpoint_set(*m_address_space, read_or_write::READWRITE, offset, kind, nullptr, nullptr);
+			debug->watchpoint_set(*m_address_space, read_or_write::READWRITE, offset, kind);
 			return REPLY_OK;
 	}
 
@@ -1266,6 +1288,7 @@ void debug_gdbstub::handle_packet()
 		case 'P': reply = handle_P(buf); break;
 		case 'q': reply = handle_q(buf); break;
 		case 's': reply = handle_s(buf); break;
+		case 'T': reply = handle_T(buf); break;
 		case 'z': reply = handle_z(buf); break;
 		case 'Z': reply = handle_Z(buf); break;
 	}
@@ -1276,22 +1299,6 @@ void debug_gdbstub::handle_packet()
 	else if ( reply == REPLY_UNSUPPORTED )
 		send_reply("");
 }
-
-//-------------------------------------------------------------------------
-#define BYTESWAP_64(x) ((((x) << 56) & 0xFF00000000000000) \
-					  | (((x) << 40) & 0x00FF000000000000) \
-					  | (((x) << 24) & 0x0000FF0000000000) \
-					  | (((x) <<  8) & 0x000000FF00000000) \
-					  | (((x) >>  8) & 0x00000000FF000000) \
-					  | (((x) >> 24) & 0x0000000000FF0000) \
-					  | (((x) >> 40) & 0x000000000000FF00) \
-					  | (((x) >> 56) & 0x00000000000000FF))
-#define BYTESWAP_32(x) ((((x) << 24) & 0xFF000000) \
-					  | (((x) <<  8) & 0x00FF0000) \
-					  | (((x) >>  8) & 0x0000FF00) \
-					  | (((x) >> 24) & 0x000000FF))
-#define BYTESWAP_16(x) ((((x) <<  8) & 0xFF00) \
-					  | (((x) >>  8) & 0x00FF))
 
 //-------------------------------------------------------------------------
 std::string debug_gdbstub::get_register_string(int gdb_regnum)
@@ -1306,9 +1313,9 @@ std::string debug_gdbstub::get_register_string(int gdb_regnum)
 		value &= (1ULL << reg.gdb_bitsize) - 1;
 	if ( !m_is_be )
 	{
-		value = (reg.gdb_bitsize == 64) ? BYTESWAP_64(value)
-			  : (reg.gdb_bitsize == 32) ? BYTESWAP_32(value)
-			  : (reg.gdb_bitsize == 16) ? BYTESWAP_16(value)
+		value = (reg.gdb_bitsize == 64) ? swapendian_int64(value)
+			  : (reg.gdb_bitsize == 32) ? swapendian_int32(value)
+			  : (reg.gdb_bitsize == 16) ? swapendian_int16(value)
 			  :                           value;
 	}
 	return string_format(fmt, value);
@@ -1327,9 +1334,9 @@ bool debug_gdbstub::parse_register_string(uint64_t *pvalue, const char *buf, int
 		return false;
 	if ( !m_is_be )
 	{
-		value = (reg.gdb_bitsize == 64) ? BYTESWAP_64(value)
-			  : (reg.gdb_bitsize == 32) ? BYTESWAP_32(value)
-			  : (reg.gdb_bitsize == 16) ? BYTESWAP_16(value)
+		value = (reg.gdb_bitsize == 64) ? swapendian_int64(value)
+			  : (reg.gdb_bitsize == 32) ? swapendian_int32(value)
+			  : (reg.gdb_bitsize == 16) ? swapendian_int16(value)
 			  :                           value;
 	}
 	*pvalue = value;
@@ -1425,6 +1432,8 @@ void debug_gdbstub::handle_character(char ch)
 			break;
 	}
 }
+
+} // anonymous namespace
 
 //-------------------------------------------------------------------------
 MODULE_DEFINITION(DEBUG_GDBSTUB, debug_gdbstub)

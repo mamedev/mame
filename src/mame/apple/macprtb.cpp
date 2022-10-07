@@ -98,6 +98,7 @@
 #include "machine/z80scc.h"
 #include "macadb.h"
 #include "macscsi.h"
+#include "mactoolbox.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
@@ -506,6 +507,7 @@ void macportable_state::macprtb(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macportable_state::macprtb_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	M50753(config, m_pmu, 3.93216_MHz_XTAL);
 	m_pmu->read_p<2>().set(FUNC(macportable_state::pmu_data_r));
@@ -533,7 +535,6 @@ void macportable_state::macprtb(machine_config &config)
 	m_screen->set_screen_update(FUNC(macportable_state::screen_update));
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macportable_state::set_adb_line));
 
 	SWIM1(config, m_swim, C15M);

@@ -39,6 +39,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 #define PLA1_TAG        "u78"
 #define PLA2_TAG        "u88"
 #define MOS6567_TAG     "u23"

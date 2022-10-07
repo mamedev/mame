@@ -53,7 +53,7 @@ public:
 
 	void vaportra(machine_config &config);
 
-	virtual void driver_init() override;
+	void driver_init();
 
 protected:
 	virtual void machine_start() override;

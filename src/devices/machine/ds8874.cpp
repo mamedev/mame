@@ -39,6 +39,11 @@ void ds8874_device::device_start()
 	// resolve callbacks
 	m_write_output.resolve_safe();
 
+	// zerofill
+	m_data = 0;
+	m_cp = 0;
+	m_shift = 0xff;
+
 	// register for savestates
 	save_item(NAME(m_data));
 	save_item(NAME(m_cp));

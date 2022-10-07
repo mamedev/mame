@@ -841,7 +841,7 @@ TIMER_CALLBACK_MEMBER(williams_adpcm_sound_device::sync_command)
 	{
 		m_cpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		m_sound_int_state = 1;
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 	}
 }
 

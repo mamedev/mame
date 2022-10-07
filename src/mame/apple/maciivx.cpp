@@ -23,7 +23,7 @@
 #include "bus/nubus/nubus.h"
 #include "bus/nubus/cards.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/applefdintf.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
@@ -34,6 +34,7 @@
 #include "egret.h"
 #include "macadb.h"
 #include "macscsi.h"
+#include "mactoolbox.h"
 #include "vasp.h"
 
 #include "emupal.h"
@@ -335,7 +336,6 @@ void maciivx_state::maciiv_base(machine_config &config)
 	m_vasp->hdsel_callback().set(FUNC(maciivx_state::hdsel_w));
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
@@ -359,6 +359,7 @@ void maciivx_state::maciivx(machine_config &config)
 {
 	M68030(config, m_maincpu, C32M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maciivx_state::maciivx_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	maciiv_base(config);
 
@@ -382,6 +383,7 @@ void maciivx_state::maciivi(machine_config &config)
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maciivx_state::maciivi_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 }
 
 ROM_START(maciivx)

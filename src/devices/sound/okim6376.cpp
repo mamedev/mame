@@ -196,8 +196,9 @@ void okim6376_device::device_reset()
 }
 
 
-void okim6376_device::rom_bank_updated()
+void okim6376_device::rom_bank_pre_change()
 {
+	m_stream->update();
 }
 
 

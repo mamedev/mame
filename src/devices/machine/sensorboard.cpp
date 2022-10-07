@@ -228,12 +228,12 @@ bool sensorboard_device::nvram_write(util::write_stream &file)
 	return !file.write(m_curstate, sizeof(m_curstate), actual) && actual == sizeof(m_curstate);
 }
 
-bool sensorboard_device::nvram_can_write()
+bool sensorboard_device::nvram_can_write() const
 {
 	return nvram_on();
 }
 
-bool sensorboard_device::nvram_on()
+bool sensorboard_device::nvram_on() const
 {
 	return (m_inp_conf->read() & 3) ? bool(m_inp_conf->read() & 2) : m_nvram_auto;
 }

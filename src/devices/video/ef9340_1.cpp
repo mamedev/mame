@@ -42,6 +42,8 @@ ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag,
 	, m_write_exram(*this)
 	, m_read_exram(*this)
 {
+	m_offset_x = 0;
+	m_offset_y = 0;
 }
 
 

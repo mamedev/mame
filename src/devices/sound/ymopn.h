@@ -71,7 +71,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// ROM device overrides
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 private:
 	// ADPCM read/write callbacks

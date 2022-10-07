@@ -479,13 +479,13 @@ void nes_cart_slot_device::call_load_unif()
 	// SETUP steps 5/6: allocate pointers for PRG/VROM and load the data!
 	if (prg_size == 0x4000)
 	{
-		m_cart->prg_alloc(0x8000, tag());
+		m_cart->prg_alloc(0x8000);
 		memcpy(m_cart->get_prg_base(), &temp_prg[0], 0x4000);
 		memcpy(m_cart->get_prg_base() + 0x4000, m_cart->get_prg_base(), 0x4000);
 	}
 	else
 	{
-		m_cart->prg_alloc(prg_size, tag());
+		m_cart->prg_alloc(prg_size);
 		memcpy(m_cart->get_prg_base(), &temp_prg[0], prg_size);
 	}
 
@@ -494,7 +494,7 @@ void nes_cart_slot_device::call_load_unif()
 
 	if (vrom_size)
 	{
-		m_cart->vrom_alloc(vrom_size, tag());
+		m_cart->vrom_alloc(vrom_size);
 		memcpy(m_cart->get_vrom_base(), &temp_chr[0], vrom_size);
 	}
 

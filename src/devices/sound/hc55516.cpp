@@ -8,11 +8,13 @@
     Harris HC-55532 (sometimes labeled HCI-55532 or HC1-55532) [preliminary]
     Motorola MC-3417/MC-34115
     Motorola MC-3418
-    TODO: research HC-55536 and HC-55564 differences vs HC-55516 (better auto-zeroing, and removal of the encoder offset compensation DAC?)
 
-    Driver TODOs:
-    /src/mame/audio/exidy440.cpp has its own internal implementation of the MC3417 and MC3418, it should be using this file instead
-
+    TODO:
+    - see .h file
+    - research HC-55536 and HC-55564 differences vs HC-55516 (better auto-zeroing,
+      and removal of the encoder offset compensation DAC?)
+    - /src/mame/exidy/exidy440_a.cpp has its own internal implementation of the
+      MC3417 and MC3418, it should be using this file instead
 
 *****************************************************************************/
 
@@ -142,7 +144,8 @@ inline bool cvsd_device_base::is_active_clock_transition(bool clock_state)
 inline bool cvsd_device_base::current_clock_state()
 {
 	// keep track of the clock state given its previous state and the number of samples produced
-	// i.e. if we generated m_samples_generated samples, at a sample rate of SAMPLE_RATE, then are we on a positive or negative level of a squarewave at clock() hz? SAMPLE_RATE may not be an integer multiple of clock()
+	// i.e. if we generated m_samples_generated samples, at a sample rate of SAMPLE_RATE, then are we on a
+	// positive or negative level of a squarewave at clock() hz? SAMPLE_RATE may not be an integer multiple of clock()
 	//uint64_t fractions_of_second = (((uint64_t)m_samples_generated)<<32) / SAMPLE_RATE; // 32.32 bits of seconds passed so far
 	//uint32_t clock_edges_passed =  (fractions_of_second * clock() * 2)>>32
 	//return (((((uint64_t)m_samples_generated<<32) * clock() * 2 / SAMPLE_RATE)>>32) & 0x1)?true:false;

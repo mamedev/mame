@@ -575,7 +575,6 @@ void gtia_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case 12:
-		data &= 3;
 		m_w.sizem = data;
 		recalc_m0();
 		recalc_m1();
@@ -940,22 +939,29 @@ static const int    pf_prioindex[256] = {
 /*     */   0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000
 };
 
-inline void gtia_device::player_render(uint8_t gfx, int size, uint8_t color, uint8_t *dst)
+inline void gtia_device::player_render(uint8_t gfx, u8 size_index, uint8_t color, uint8_t *dst)
 {
 	// size is the number of bits in *dst to be filled: 1, 2 or 4
-	if (size == 3)
-		size = 2;
+	// x0 normal width
+	// 01 double width
+	// 11 quadruple width
+	// jmpmanjr sets all sizes to 10, still expecting it to be normal width
+	const u8 sizes[4] = { 1, 2, 1, 4 };
+	const int size = sizes[size_index & 3];
+
 	for (int i = 0; i < 8; i++)
 		if (BIT(gfx, 7 - i))
 			for (int s = 0; s < size; s++)
 				dst[i * size + s] |= color;
 }
 
-inline void gtia_device::missile_render(uint8_t gfx, int size, uint8_t color, uint8_t *dst)
+inline void gtia_device::missile_render(uint8_t gfx, u8 size_index, uint8_t color, uint8_t *dst)
 {
-	// size is the number of bits in *dst to be filled: 1, 2 or 4
-	if (size == 3)
-		size = 2;
+	// TODO: verify usage with missile 1-2-3 renders
+	// otherwise same as player width rendering
+	const u8 sizes[4] = { 1, 2, 1, 4 };
+	const int size = sizes[size_index & 3];
+
 	for (int i = 0; i < 2; i++)
 		if (BIT(gfx, 7 - i))
 			for (int s = 0; s < size; s++)
@@ -966,22 +972,22 @@ inline void gtia_device::missile_render(uint8_t gfx, int size, uint8_t color, ui
 void gtia_device::render(uint8_t *src, uint8_t *dst, uint8_t *prio, uint8_t *pmbits)
 {
 	if (m_h.grafp0)
-		player_render(m_h.grafp0, m_w.sizep0 + 1, GTIA_P0, &pmbits[m_w.hposp0]);
+		player_render(m_h.grafp0, m_w.sizep0, GTIA_P0, &pmbits[m_w.hposp0]);
 	if (m_h.grafp1)
-		player_render(m_h.grafp1, m_w.sizep1 + 1, GTIA_P1, &pmbits[m_w.hposp1]);
+		player_render(m_h.grafp1, m_w.sizep1, GTIA_P1, &pmbits[m_w.hposp1]);
 	if (m_h.grafp2)
-		player_render(m_h.grafp2, m_w.sizep2 + 1, GTIA_P2, &pmbits[m_w.hposp2]);
+		player_render(m_h.grafp2, m_w.sizep2, GTIA_P2, &pmbits[m_w.hposp2]);
 	if (m_h.grafp3)
-		player_render(m_h.grafp3, m_w.sizep3 + 1, GTIA_P3, &pmbits[m_w.hposp3]);
+		player_render(m_h.grafp3, m_w.sizep3, GTIA_P3, &pmbits[m_w.hposp3]);
 
 	if (m_h.grafm0)
-		missile_render(m_h.grafm0, m_w.sizem + 1, GTIA_M0, &pmbits[m_w.hposm0]);
+		missile_render(m_h.grafm0, (m_w.sizem >> 0) & 3, GTIA_M0, &pmbits[m_w.hposm0]);
 	if (m_h.grafm1)
-		missile_render(m_h.grafm1, m_w.sizem + 1, GTIA_M1, &pmbits[m_w.hposm1]);
+		missile_render(m_h.grafm1, (m_w.sizem >> 2) & 3, GTIA_M1, &pmbits[m_w.hposm1]);
 	if (m_h.grafm2)
-		missile_render(m_h.grafm2, m_w.sizem + 1, GTIA_M2, &pmbits[m_w.hposm2]);
+		missile_render(m_h.grafm2, (m_w.sizem >> 4) & 3, GTIA_M2, &pmbits[m_w.hposm2]);
 	if (m_h.grafm3)
-		missile_render(m_h.grafm3, m_w.sizem + 1, GTIA_M3, &pmbits[m_w.hposm3]);
+		missile_render(m_h.grafm3, (m_w.sizem >> 6) & 3, GTIA_M3, &pmbits[m_w.hposm3]);
 
 	for (int x = 0; x < GTIA_HWIDTH * 4; x++, src++, dst++)
 	{

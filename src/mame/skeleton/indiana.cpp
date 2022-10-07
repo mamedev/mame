@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "bus/isa/com.h"
 #include "bus/isa/fdc.h"
 #include "bus/isa/ide.h"
