@@ -17,6 +17,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z8/z8.h"
 #include "imagedev/floppy.h"
+#include "imagedev/harddriv.h"
 #include "machine/6850acia.h"
 #include "machine/am25s55x.h"
 #include "machine/am2901b.h"
@@ -56,6 +57,8 @@
 #define LOG_TDS             (1 << 17)
 #define LOG_TABLET          (1 << 18)
 #define LOG_COMMANDS        (1 << 19)
+#define LOG_HDD				(1 << 20)
+#define LOG_IRQ				(1 << 21)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_ADDR | \
 							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_TABLET | LOG_COMMANDS | LOG_OUTPUT_TIMING)
 
@@ -91,7 +94,9 @@ public:
 		, m_fddcpu(*this, "fddcpu")
 		, m_fdd_serial(*this, "fddserial")
 		, m_floppy0(*this, "0")
+		, m_hdd(*this, "hdd")
 		, m_floppy(nullptr)
+		, m_hdd_file(nullptr)
 		, m_output_cursor_region(*this, "output_timing_cursor")
 		, m_output_hlines_region(*this, "output_timing_hlines")
 		, m_output_hflags_region(*this, "output_timing_hflags")
@@ -119,7 +124,6 @@ public:
 		, m_tds_dips(*this, "TDSDIPS")
 		, m_pen_switches(*this, "PENSW")
 		, m_tablet_cpu(*this, "tablet")
-		, m_tablet_dips(*this, "TABDIP%u", 0U)
 		, m_pen_prox(*this, "PENPROX")
 		, m_pen_x(*this, "PENX")
 		, m_pen_y(*this, "PENY")
@@ -169,8 +173,13 @@ private:
 	TIMER_CALLBACK_MEMBER(req_a_w);
 	TIMER_CALLBACK_MEMBER(req_b_w);
 	TIMER_CALLBACK_MEMBER(cmd_done);
+	TIMER_CALLBACK_MEMBER(execute_hdd_command);
 
+	bool is_disk_group_fdd(int group_index);
+	bool is_disk_group_hdd(int group_index);
+	int get_heads_for_disk_group(int group_index);
 	void fdd_index_callback(floppy_image_device *floppy, int state);
+	void seek_fdd_to_cylinder();
 	uint8_t fdd_ctrl_r();
 	uint8_t fdd_cmd_r();
 	void fddcpu_p1_w(uint8_t data);
@@ -224,9 +233,13 @@ private:
 	required_device<am2910_device> m_diskseq;
 	required_memory_region m_diskseq_ucode;
 	required_memory_region m_diskseq_prom;
-
 	required_device<m6803_cpu_device> m_fddcpu;
 	required_device<rs232_port_device> m_fdd_serial;
+	required_device<floppy_connector> m_floppy0;
+	required_device<harddisk_image_device> m_hdd;
+
+	// Floppy Drive
+	floppy_image_device *m_floppy;
 	std::deque<int> m_fdd_debug_rx_bits;
 	uint32_t m_fdd_debug_rx_bit_count;
 	uint32_t m_fdd_debug_rx_byte_count;
@@ -237,13 +250,15 @@ private:
 	uint8_t m_fdd_side;
 	fdc_pll_t m_fdd_pll;
 
-	required_device<floppy_connector> m_floppy0;
-	floppy_image_device *m_floppy;
+	// Hard Disk
+	hard_disk_file *m_hdd_file;
 
+	// Timers
 	emu_timer *m_diskseq_complete_clk;
 	emu_timer *m_field_in_clk;
 	emu_timer *m_field_out_clk;
 	emu_timer *m_cmd_done_timer;
+	emu_timer *m_hdd_command_timer;
 
 	enum : size_t
 	{
@@ -285,6 +300,22 @@ private:
 		DSEQ_CTRLOUT_DISC_CLEAR     = (1 << 7), // S55
 	};
 
+	enum : uint16_t
+	{
+		DGROUP_TYPE_INVALID0		= 0,
+		DGROUP_TYPE_80MB_CDC		= 1,
+		DGROUP_TYPE_INVALID1		= 2,
+		DGROUP_TYPE_FLOPPY			= 3,
+		DGROUP_TYPE_INVALID2		= 4,
+		DGROUP_TYPE_330MB_FUJITSU	= 5,
+		DGROUP_TYPE_160MB_FUJITSU	= 6,
+		DGROUP_TYPE_NONE			= 7,
+
+		DGROUP_0_SHIFT				= 2,
+		DGROUP_1_SHIFT				= 7,
+		DGROUP_2_SHIFT				= 12
+	};
+
 	// Computer Card
 	uint8_t m_csr;
 	uint16_t m_sys_ctrl;
@@ -306,6 +337,9 @@ private:
 	uint8_t m_diskseq_ucode_latch[7];   // GG/GF/GE/GD/GC/GB/GA
 	uint8_t m_diskseq_cc_inputs[4];     // Inputs to FE/FD/FC/FB
 	bool m_diskseq_cyl_read_pending;
+	bool m_diskseq_cyl_write_pending;
+	bool m_diskseq_use_hdd_pending;
+	uint16_t m_diskseq_command_stride;
 
 	// Disc Data Buffer Card
 	uint16_t m_diskbuf_ram_addr;
@@ -441,7 +475,6 @@ private:
 
 	// Tablet
 	required_device<z8681_device> m_tablet_cpu;
-	required_ioport_array<2> m_tablet_dips;
 	required_ioport m_pen_prox;
 	required_ioport m_pen_x;
 	required_ioport m_pen_y;
@@ -668,58 +701,6 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_DIPSETTING(   0x00, "PAL")
 	PORT_BIT(0xa7, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("TABDIP0")
-	PORT_DIPNAME(0x01, 0x00, "Tablet SW1:1");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_DIPNAME(0x02, 0x00, "Tablet SW1:2");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x02, DEF_STR( On ))
-	PORT_DIPNAME(0x04, 0x00, "Tablet SW1:3");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x04, DEF_STR( On ))
-	PORT_DIPNAME(0x08, 0x00, "Tablet SW1:4");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x08, DEF_STR( On ))
-	PORT_DIPNAME(0x10, 0x00, "Tablet SW1:5");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x10, DEF_STR( On ))
-	PORT_DIPNAME(0x20, 0x00, "Tablet SW1:6");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x20, DEF_STR( On ))
-	PORT_DIPNAME(0x40, 0x00, "Tablet SW1:7");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x40, DEF_STR( On ))
-	PORT_DIPNAME(0x80, 0x00, "Tablet SW1:8");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x80, DEF_STR( On ))
-
-	PORT_START("TABDIP1")
-	PORT_DIPNAME(0x01, 0x00, "Tablet SW2:1");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_DIPNAME(0x02, 0x00, "Tablet SW2:2");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x02, DEF_STR( On ))
-	PORT_DIPNAME(0x04, 0x00, "Tablet SW2:3");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x04, DEF_STR( On ))
-	PORT_DIPNAME(0x08, 0x00, "Tablet SW2:4");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x08, DEF_STR( On ))
-	PORT_DIPNAME(0x10, 0x00, "Tablet SW2:5");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x10, DEF_STR( On ))
-	PORT_DIPNAME(0x20, 0x00, "Tablet SW2:6");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x20, DEF_STR( On ))
-	PORT_DIPNAME(0x40, 0x00, "Tablet SW2:7");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x40, DEF_STR( On ))
-	PORT_DIPNAME(0x80, 0x00, "Tablet SW2:8");
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x80, DEF_STR( On ))
-
 	PORT_START("BAUD")
 	PORT_DIPNAME(0x0f, 0x0e, "Baud Rate for Terminal")
 	PORT_DIPSETTING(   0x00, "50")
@@ -804,7 +785,6 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_DIPSETTING(    0x001c, "None" )
 	PORT_DIPSETTING(    0x0018, "160Mb Fujitsu" )
 	PORT_DIPSETTING(    0x0014, "330Mb Fujitsu" )
-	PORT_DIPSETTING(    0x0010, "80Mb Fujitsu" )
 	PORT_DIPSETTING(    0x000c, "Floppy Disc" )
 	PORT_DIPSETTING(    0x0008, "NTSC/Floppy/PAL/Conv" )
 	PORT_DIPSETTING(    0x0004, "80Mb CDC Removable" )
@@ -818,7 +798,6 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_DIPSETTING(    0x0380, "None" )
 	PORT_DIPSETTING(    0x0300, "160Mb Fujitsu" )
 	PORT_DIPSETTING(    0x0280, "330Mb Fujitsu" )
-	PORT_DIPSETTING(    0x0200, "80Mb Fujitsu" )
 	PORT_DIPSETTING(    0x0180, "Floppy Disc" )
 	PORT_DIPSETTING(    0x0100, "NTSC/Floppy/PAL/Conv" )
 	PORT_DIPSETTING(    0x0080, "80Mb CDC Removable" )
@@ -832,7 +811,6 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_DIPSETTING(    0x7000, "None" )
 	PORT_DIPSETTING(    0x6000, "160Mb Fujitsu" )
 	PORT_DIPSETTING(    0x5000, "330Mb Fujitsu" )
-	PORT_DIPSETTING(    0x4000, "80Mb Fujitsu" )
 	PORT_DIPSETTING(    0x3000, "Floppy Disc" )
 	PORT_DIPSETTING(    0x2000, "NTSC/Floppy/PAL/Conv" )
 	PORT_DIPSETTING(    0x1000, "80Mb CDC Removable" )
@@ -857,6 +835,9 @@ void dpb7000_state::machine_start()
 	m_cmd_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::cmd_done), this));
 	m_cmd_done_timer->adjust(attotime::never);
 
+	m_hdd_command_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::execute_hdd_command), this));
+	m_hdd_command_timer->adjust(attotime::never);
+
 	// Disc Sequencer Card
 	save_item(NAME(m_diskseq_cp));
 	save_item(NAME(m_diskseq_reset));
@@ -874,6 +855,9 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_diskseq_ucode_latch));
 	save_item(NAME(m_diskseq_cc_inputs));
 	save_item(NAME(m_diskseq_cyl_read_pending));
+	save_item(NAME(m_diskseq_cyl_write_pending));
+	save_item(NAME(m_diskseq_use_hdd_pending));
+	save_item(NAME(m_diskseq_command_stride));
 	m_diskseq_complete_clk = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::req_b_w), this));;
 	m_diskseq_complete_clk->adjust(attotime::never);
 
@@ -1046,6 +1030,8 @@ void dpb7000_state::machine_start()
 
 void dpb7000_state::machine_reset()
 {
+	m_cmd_done_timer->adjust(attotime::never);
+
 	// Computer Card
 	m_brg->stt_w(m_baud_dip->read());
 	m_csr = 0;
@@ -1056,8 +1042,8 @@ void dpb7000_state::machine_reset()
 		m_acia[i]->write_dcd(0);
 	}
 
-	m_field_in_clk->adjust(attotime::from_hz(59.94), 1, attotime::from_hz(59.94));
-	m_field_out_clk->adjust(attotime::from_hz(59.94) + attotime::from_hz(15734.0 / 1.0), 0, attotime::from_hz(59.94));
+	m_field_in_clk->adjust(attotime::from_hz(59.94), 0, attotime::from_hz(59.94));
+	m_field_out_clk->adjust(attotime::from_hz(59.94) + attotime::from_hz(15734.0 / 1.0), 1, attotime::from_hz(59.94));
 
 	// Disc Sequencer Card
 	m_diskseq_cp = 0;
@@ -1076,7 +1062,11 @@ void dpb7000_state::machine_reset()
 	memset(m_diskseq_ucode_latch, 0, 7);
 	memset(m_diskseq_cc_inputs, 0, 4);
 	m_diskseq_cyl_read_pending = false;
+	m_diskseq_cyl_write_pending = false;
+	m_diskseq_use_hdd_pending = false;
+	m_diskseq_command_stride = 1;
 	m_diskseq_complete_clk->adjust(attotime::never);
+	m_hdd_command_timer->adjust(attotime::never);
 
 	// Floppy Disc Controller Card
 	m_fdd_debug_rx_bits.clear();
@@ -1090,6 +1080,9 @@ void dpb7000_state::machine_reset()
 	m_fdd_pll.set_clock(attotime::from_hz(1000000));
 	m_fdd_pll.reset(machine().time());
 	m_floppy = nullptr;
+
+	// Hard Disc Handling
+	m_hdd_file = m_hdd->get_hard_disk_file();
 
 	// Disc Data Buffer Card
 	m_diskbuf_ram_addr = 0;
@@ -1453,29 +1446,37 @@ uint16_t dpb7000_state::cpu_ctrlbus_r()
 	switch (m_csr)
 	{
 	case 0:
-		LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Brush Address Card status: %04x\n", machine().describe_context(), m_brush_addr_func);
+		if (!machine().side_effects_disabled())
+			LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Brush Address Card status: %04x\n", machine().describe_context(), m_brush_addr_func);
 		ret = m_brush_addr_func;
 		break;
 	case 1:
-		LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Disk Sequencer Card status: %02x\n", machine().describe_context(), m_diskseq_status_out);
+		if (!machine().side_effects_disabled())
+		{
+			LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Disk Sequencer Card status: %02x\n", machine().describe_context(), m_diskseq_status_out);
+		}
 		ret = m_diskseq_status_out;
-		//req_b_w(0);
 		break;
 	case 7:
 		ret = m_diskbuf_ram[m_diskbuf_ram_addr];
-		LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Disc Data Buffer Card RAM read: %04x = %02x\n", machine().describe_context(), m_diskbuf_ram_addr, ret);
+		if (!machine().side_effects_disabled())
+			if (m_diskbuf_ram_addr == 0 || m_diskbuf_ram_addr >= 0x4a00)
+				LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Disc Data Buffer Card RAM read: %04x = %02x\n", machine().describe_context(), m_diskbuf_ram_addr, ret);
 		m_diskbuf_ram_addr++;
 		break;
 	case 12:
 		ret = m_config_sw34->read();
-		LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Config Switches 1/2: %04x\n", machine().describe_context(), ret);
+		if (!machine().side_effects_disabled())
+			LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Config Switches 1/2: %04x\n", machine().describe_context(), ret);
 		break;
 	case 14:
 		ret = m_config_sw12->read();
-		LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Config Switches 3/4: %04x\n", machine().describe_context(), ret);
+		if (!machine().side_effects_disabled())
+			LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Config Switches 3/4: %04x\n", machine().describe_context(), ret);
 		break;
 	default:
-		LOGMASKED(LOG_CTRLBUS | LOG_UNKNOWN, "%s: CPU read from Control Bus, unknown CSR %d\n", machine().describe_context(), m_csr);
+		if (!machine().side_effects_disabled())
+			LOGMASKED(LOG_CTRLBUS | LOG_UNKNOWN, "%s: CPU read from Control Bus, unknown CSR %d\n", machine().describe_context(), m_csr);
 		break;
 	}
 	return ret;
@@ -2040,50 +2041,24 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		break;
 	}
 
-	case 1: // Disk Sequencer Card, disc access
+	case 1: // Disk Sequencer Card, disk access
 	{
 		const uint8_t hi_nybble = data >> 12;
 		if (hi_nybble == 0)
 		{
-			uint16_t old_cyl = m_diskseq_cyl_from_cpu;
 			m_diskseq_cyl_from_cpu = data & 0x3ff;
-			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, Cylinder Number: %04x\n", machine().describe_context(), m_diskseq_cyl_from_cpu);
-			//printf("Cylinder %d\n", m_diskseq_cyl_from_cpu);
-			if (old_cyl != m_diskseq_cyl_from_cpu && m_diskseq_cyl_from_cpu < 78 && m_floppy != nullptr)
-			{
-				if (m_diskseq_cyl_from_cpu < old_cyl)
-				{
-					m_floppy->dir_w(1);
-					for (uint16_t i = m_diskseq_cyl_from_cpu; i < old_cyl; i++)
-					{
-						m_floppy->stp_w(1);
-						m_floppy->stp_w(0);
-						m_floppy->stp_w(1);
-					}
-				}
-				else
-				{
-					m_floppy->dir_w(0);
-					for (uint16_t i = old_cyl; i < m_diskseq_cyl_from_cpu; i++)
-					{
-						m_floppy->stp_w(1);
-						m_floppy->stp_w(0);
-						m_floppy->stp_w(1);
-					}
-				}
-				LOGMASKED(LOG_CTRLBUS, "%s: New floppy cylinder: %04x\n", machine().describe_context(), m_floppy->get_cyl());
-			}
+			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, Cylinder Number: %04x (%04x)\n", machine().describe_context(), m_diskseq_cyl_from_cpu, data);
 		}
 		else if (hi_nybble == 1)
 		{
 			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disc Data Buffer Card, Preset RAM Address: %04x\n", machine().describe_context(), data & 0xfff);
-			m_diskbuf_ram_addr = data & 0xfff;
+			m_diskbuf_ram_addr = (data & 0xfff) << 3;
 		}
 		else if (hi_nybble == 2)
 		{
 			m_diskseq_cmd_word_from_cpu = data & 0xfff;
 			m_diskseq_cmd = (data >> 8) & 0xf;
-			req_b_w(0); // Flag ourselves as in-use
+			int group = (int)(data >> 5) & 3;
 			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, Command: %x (%04x)\n", machine().describe_context(), (data >> 8) & 0xf, data);
 			LOGMASKED(LOG_CTRLBUS, "%s                                                    Head: %x\n", machine().describe_context(), data & 0xf);
 			LOGMASKED(LOG_CTRLBUS, "%s                                                   Drive: %x\n", machine().describe_context(), (data >> 5) & 7);
@@ -2094,67 +2069,153 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			case 9:
 			case 13:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: No command\n", machine().describe_context());
-				req_b_w(0);
+				//req_b_w(1);
 				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			case 0:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read track to buffer RAM\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
 				{
+					req_b_w(0); // Flag ourselves as in-use
 					m_diskseq_cyl_read_pending = true;
-					m_fdd_side = 0;
+					m_diskseq_command_stride = 1;
+					if (is_disk_group_fdd(group))
+					{
+						m_fdd_side = 0;
+						seek_fdd_to_cylinder();
+					}
+					else if (is_disk_group_hdd(group))
+					{
+						m_diskseq_use_hdd_pending = true;
+						m_hdd_command_timer->adjust(attotime::from_double((double)19200 / 1012000));
+					}
 				}
 				break;
 			case 2:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read track, stride 2, to buffer RAM\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
 				{
+					req_b_w(0); // Flag ourselves as in-use
 					m_diskseq_cyl_read_pending = true;
-					m_fdd_side = 0;
+					m_diskseq_command_stride = 2;
+					if (is_disk_group_fdd(group))
+					{
+						m_fdd_side = 0;
+						seek_fdd_to_cylinder();
+					}
+					else if (is_disk_group_hdd(group))
+					{
+						m_diskseq_use_hdd_pending = true;
+						m_hdd_command_timer->adjust(attotime::from_double((double)19200 / 1012000));
+					}
 				}
+				break;
+			case 3:
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Restore\n", machine().describe_context());
+				req_b_w(0); // Flag ourselves as in-use
+				m_diskseq_complete_clk->adjust(attotime::from_msec(27), 1); // 160/330M Fujitsu has an average seek time of 27ms; everything else is slower
+				m_diskseq_cyl_from_cpu = 0;
 				break;
 			case 4:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read Track\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
 				{
-					m_diskbuf_data_count = 0x2700;
+					req_b_w(0); // Flag ourselves as in-use
 					m_line_count = 0;
 					m_line_clock = 0;
+
 					m_diskseq_cyl_read_pending = true;
-					m_fdd_side = 0;
+					m_diskseq_command_stride = 1;
+					if (is_disk_group_fdd(group))
+					{
+						m_diskbuf_data_count = 0x2700;
+						m_fdd_side = 0;
+						seek_fdd_to_cylinder();
+					}
+					else if (is_disk_group_hdd(group))
+					{
+						m_diskbuf_data_count = 0x4b00;
+						m_diskseq_use_hdd_pending = true;
+						m_hdd_command_timer->adjust(attotime::from_double((double)19200 / 1012000));
+					}
 				}
 				break;
 			case 6:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Read Track\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
 				{
-					m_diskbuf_data_count = 0x2700;
+					req_b_w(0); // Flag ourselves as in-use
 					m_diskseq_cyl_read_pending = true;
-					m_fdd_side = 0;
+					m_diskseq_command_stride = 1;
+					if (is_disk_group_fdd(group))
+					{
+						m_diskbuf_data_count = 0x2700;
+						m_fdd_side = 0;
+						seek_fdd_to_cylinder();
+					}
+					else if (is_disk_group_hdd(group))
+					{
+						m_diskbuf_data_count = 0x4b00;
+						m_diskseq_use_hdd_pending = true;
+						m_hdd_command_timer->adjust(attotime::from_double((double)19200 / 1012000));
+					}
 				}
 				break;
 			case 8:
-				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track from Buffer RAM (not yet implemented)\n", machine().describe_context());
-				req_b_w(1);
-				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track from Buffer RAM\n", machine().describe_context());
+				if (!BIT(m_diskseq_status_out, 3))
+				{
+					req_b_w(0); // Flag ourselves as in-use
+					m_diskseq_cyl_write_pending = true;
+					m_diskseq_command_stride = 1;
+					if (is_disk_group_fdd(group))
+					{
+						m_diskbuf_data_count = 0x2700;
+						m_fdd_side = 0;
+						seek_fdd_to_cylinder();
+					}
+					else if (is_disk_group_hdd(group))
+					{
+						m_diskbuf_data_count = 0x4b00;
+						m_diskseq_use_hdd_pending = true;
+						m_hdd_command_timer->adjust(attotime::from_double((double)19200 / 1012000));
+					}
+				}
 				break;
 			case 10:
-				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track, stride 2, from Buffer RAM (not yet implemented)\n", machine().describe_context());
-				req_b_w(1);
-				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track, stride 2, from Buffer RAM\n", machine().describe_context());
+				if (!BIT(m_diskseq_status_out, 3))
+				{
+					req_b_w(0); // Flag ourselves as in-use
+					m_diskseq_cyl_write_pending = true;
+					m_diskseq_command_stride = 2;
+					if (is_disk_group_fdd(group))
+					{
+						m_diskbuf_data_count = 0x2700;
+						m_fdd_side = 0;
+						seek_fdd_to_cylinder();
+					}
+					else if (is_disk_group_hdd(group))
+					{
+						m_diskbuf_data_count = 0x4b00;
+						m_diskseq_use_hdd_pending = true;
+						m_hdd_command_timer->adjust(attotime::from_double((double)19200 / 1012000));
+					}
+				}
 				break;
 			case 12:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track (not yet implemented)\n", machine().describe_context());
-				req_b_w(1);
+				//req_b_w(1);
 				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			case 14:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Write Track (not yet implemented)\n", machine().describe_context());
-				req_b_w(1);
+				//req_b_w(1);
 				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			default:
 				LOGMASKED(LOG_CTRLBUS, "%s: Unknown Disk Sequencer Card command.\n", machine().describe_context());
+				req_b_w(0); // Flag ourselves as in-use
 				m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			}
@@ -2197,6 +2258,11 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		}
 		break;
 
+	case 7: // Disk Data Buffer RAM
+		if (m_diskbuf_ram_addr == 0 || m_diskbuf_ram_addr >= 0x4a00)
+			LOGMASKED(LOG_CTRLBUS, "%s: Disc Data Buffer Card RAM write: %04x = %04x\n", machine().describe_context(), m_diskbuf_ram_addr, data);
+		m_diskbuf_ram[m_diskbuf_ram_addr++] = (uint8_t)data;
+		break;
 	case 8: // Brush Store Card color latches
 		if (m_ca0)
 		{
@@ -2302,9 +2368,27 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 TIMER_CALLBACK_MEMBER(dpb7000_state::req_a_w)
 {
 	if (param)
+	{
 		m_sys_ctrl |= SYSCTRL_REQ_A_IN;
+	}
 	else
+	{
 		m_sys_ctrl &= ~SYSCTRL_REQ_A_IN;
+	}
+
+	update_req_irqs();
+}
+
+TIMER_CALLBACK_MEMBER(dpb7000_state::req_b_w)
+{
+	if (param)
+	{
+		m_sys_ctrl |= SYSCTRL_REQ_B_IN;
+	}
+	else
+	{
+		m_sys_ctrl &= ~SYSCTRL_REQ_B_IN;
+	}
 
 	update_req_irqs();
 }
@@ -2314,14 +2398,110 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::cmd_done)
 	m_brush_addr_func &= ~0x8000;
 }
 
-TIMER_CALLBACK_MEMBER(dpb7000_state::req_b_w)
+TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 {
-	if (param)
-		m_sys_ctrl |= SYSCTRL_REQ_B_IN;
-	else
-		m_sys_ctrl &= ~SYSCTRL_REQ_B_IN;
+	static const int s_sectors_per_track = 20480 / 256;
+	int group = (int)(m_diskseq_cmd_word_from_cpu >> 5) & 3;
+	int head_count = get_heads_for_disk_group(group);
+	int head_index = m_diskseq_cmd_word_from_cpu & 0xf;
+	int image_lba = s_sectors_per_track * head_count * (int)m_diskseq_cyl_from_cpu + s_sectors_per_track * head_index;
 
-	update_req_irqs();
+	if (m_hdd_file != nullptr)
+	{
+		if (m_diskseq_cyl_write_pending)
+		{
+			if (m_diskseq_command_stride != 1)
+			{
+				unsigned char sector_buffer[256];
+				for (int sector = 0; sector < 19200 / 256; sector++)
+				{
+					memcpy(sector_buffer, m_diskbuf_ram + sector * 256, 256);
+					for (int clear_idx = 0; clear_idx < 256; clear_idx += 2)
+					{
+						sector_buffer[clear_idx] = 0;
+					}
+					LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x, Stride 2 (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
+					m_hdd_file->write(image_lba, sector_buffer);
+					image_lba++;
+				}
+			}
+			else
+			{
+				for (int sector = 0; sector < 19200 / 256; sector++)
+				{
+					LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
+					m_hdd_file->write(image_lba, m_diskbuf_ram + sector * 256);
+					image_lba++;
+				}
+			}
+			m_diskseq_cyl_write_pending = false;
+		}
+		else if (m_diskseq_cyl_read_pending)
+		{
+			unsigned char sector_buffer[256];
+			if (m_diskseq_command_stride != 1)
+			{
+				for (int sector = 0; sector < 19200 / 256; sector++)
+				{
+					LOGMASKED(LOG_HDD, "Performing read of LBA %d: Cylinder %03x, head %x, command word %03x\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu);
+					m_hdd_file->read(image_lba, sector_buffer);
+					image_lba++;
+					for (int clear_idx = 0; clear_idx < 256; clear_idx += 2)
+					{
+						sector_buffer[clear_idx] = 0;
+					}
+					if (m_diskseq_cmd == 4 || m_diskseq_cmd == 6)
+					{
+						for (int i = 0; i < 256; i++)
+						{
+							process_byte_from_disc(sector_buffer[i]);
+						}
+					}
+					else
+					{
+						memcpy(m_diskbuf_ram + sector * 256, sector_buffer, 256);
+					}
+				}
+			}
+			else
+			{
+				int start_sector = BIT(m_diskseq_cmd, 2) ? 0 : (m_diskbuf_ram_addr >> 8);
+				int partial_bytes = m_diskbuf_ram_addr & 0x00ff;
+				if (partial_bytes && !BIT(m_diskseq_cmd, 2))
+				{
+					LOGMASKED(LOG_HDD, "Performing partial read of sector into disk buffer address %04x\n", m_diskbuf_ram_addr);
+					m_hdd_file->read(image_lba, sector_buffer);
+					memcpy(m_diskbuf_ram + m_diskbuf_ram_addr, sector_buffer + partial_bytes, 0x100 - partial_bytes);
+					m_diskbuf_ram_addr += 0x100;
+					m_diskbuf_ram_addr &= 0xff00;
+					image_lba += start_sector;
+				}
+
+				for (int sector = start_sector; sector < 19200 / 256; sector++)
+				{
+					LOGMASKED(LOG_HDD, "Performing read of LBA %d: Cylinder %03x, head %x, command word %03x\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu);
+					if (BIT(m_diskseq_cmd, 2))
+					{
+						m_hdd_file->read(image_lba, sector_buffer);
+						for (int i = 0; i < 256; i++)
+						{
+							process_byte_from_disc(sector_buffer[i]);
+						}
+					}
+					else
+					{
+						m_hdd_file->read(image_lba, m_diskbuf_ram + sector * 256);
+					}
+					image_lba++;
+				}
+			}
+			m_diskseq_cyl_read_pending = false;
+		}
+		m_diskseq_command_stride = 2;
+	}
+
+	m_diskseq_use_hdd_pending = false;
+	req_b_w(1);
 }
 
 uint16_t dpb7000_state::cpu_sysctrl_r()
@@ -2336,7 +2516,7 @@ uint16_t dpb7000_state::cpu_sysctrl_r()
 void dpb7000_state::cpu_sysctrl_w(uint16_t data)
 {
 	const uint16_t mask = (SYSCTRL_REQ_A_EN | SYSCTRL_REQ_B_EN);
-	LOGMASKED(LOG_SYS_CTRL, "%s: CPU to Control Bus write: %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_IRQ, "%s: CPU to Control Bus write: %04x\n", machine().describe_context(), data);
 	m_sys_ctrl &= ~mask;
 	m_sys_ctrl |= (data & mask);
 
@@ -2345,8 +2525,18 @@ void dpb7000_state::cpu_sysctrl_w(uint16_t data)
 
 void dpb7000_state::update_req_irqs()
 {
-	m_maincpu->set_input_line(5, (m_sys_ctrl & SYSCTRL_REQ_A_IN) && (m_sys_ctrl & SYSCTRL_REQ_A_EN) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(4, (m_sys_ctrl & SYSCTRL_REQ_B_IN) && (m_sys_ctrl & SYSCTRL_REQ_B_EN) ? ASSERT_LINE : CLEAR_LINE);
+	const bool take_irq_a = (m_sys_ctrl & SYSCTRL_REQ_A_IN) && (m_sys_ctrl & SYSCTRL_REQ_A_EN);
+	const bool take_irq_b = (m_sys_ctrl & SYSCTRL_REQ_B_IN) && (m_sys_ctrl & SYSCTRL_REQ_B_EN);
+	if (take_irq_a)
+	{
+		LOGMASKED(LOG_IRQ, "Flagging to take IRQ A\n");
+	}
+	m_maincpu->set_input_line(5, take_irq_a ? ASSERT_LINE : CLEAR_LINE);
+	if (take_irq_b)
+	{
+		LOGMASKED(LOG_IRQ, "Flagging to take IRQ B\n");
+	}
+	m_maincpu->set_input_line(4, take_irq_b ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t dpb7000_state::fdd_ctrl_r()
@@ -2377,7 +2567,7 @@ void dpb7000_state::process_sample()
 {
 	const uint16_t x = (m_bxlen_counter - m_bxlen);
 	const uint16_t y = (m_bylen_counter - m_bylen);
-	//printf("Processing sample %d,%d (%04x:%04x, %04x:%04x) LC:%d\n", x, y, m_bxlen_counter, m_bxlen, m_bylen_counter, m_bylen, m_line_count);
+	//printf("Processing sample %d,%d (%04x:%04x, %04x:%04x) LC:%d\n", x, y, m_bxlen_counter, m_bxlen, m_bylen_counter, m_bylen, m_line_count); fflush(stdout);
 	if ((m_brush_addr_func & 0x1e) == (2 << 1))
 	{
 		if (BIT(m_brush_addr_func, 7))
@@ -2402,6 +2592,9 @@ void dpb7000_state::process_sample()
 
 void dpb7000_state::process_byte_from_disc(uint8_t data_byte)
 {
+	if (!m_diskseq_cyl_read_pending)
+		return;
+
 	if (m_buffer_lum)
 	{
 		m_incoming_lum = data_byte;
@@ -2420,11 +2613,46 @@ void dpb7000_state::process_byte_from_disc(uint8_t data_byte)
 	}
 }
 
+bool dpb7000_state::is_disk_group_fdd(int group_index)
+{
+	static const uint16_t s_group_shifts[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
+	uint16_t val = (m_config_sw34->read() >> s_group_shifts[group_index]) & 7;
+	return val == DGROUP_TYPE_FLOPPY;
+}
+
+bool dpb7000_state::is_disk_group_hdd(int group_index)
+{
+	static const uint16_t s_group_shifts[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
+	uint16_t val = (m_config_sw34->read() >> s_group_shifts[group_index]) & 7;
+	return val == DGROUP_TYPE_80MB_CDC || val == DGROUP_TYPE_160MB_FUJITSU || val == DGROUP_TYPE_330MB_FUJITSU;
+}
+
+int dpb7000_state::get_heads_for_disk_group(int group_index)
+{
+	static const uint16_t s_group_shifts[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
+	uint16_t val = (m_config_sw34->read() >> s_group_shifts[group_index]) & 7;
+	switch (val)
+	{
+		case DGROUP_TYPE_FLOPPY:
+			return 1;
+		case DGROUP_TYPE_80MB_CDC:
+			return 5;
+		case DGROUP_TYPE_160MB_FUJITSU:
+			return 10;
+		case DGROUP_TYPE_330MB_FUJITSU:
+			return 16;
+		default:
+			return 0;
+	}
+}
+
 void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 {
+	if (m_diskseq_use_hdd_pending)
+		return;
+
 	if (!state && m_diskseq_cyl_read_pending && m_floppy && m_fdd_side < 2)
 	{
-		//printf("Cylinder read is pending, index just passed by, we have a floppy. Let's go.\n");
 		LOGMASKED(LOG_COMMANDS, "Reading cylinder from floppy\n");
 		m_fdd_pll.read_reset(machine().time());
 
@@ -2439,7 +2667,6 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 		uint16_t curr_window = 0;
 		uint16_t bit_idx = 0;
 
-		//printf("Side %d, not seen pregap, not in the track, no current bit, no current window, no bit index.\n", m_fdd_side);
 		attotime tm = machine().time();
 		attotime limit = machine().time() + attotime::from_ticks(1, 6); // One revolution at 360rpm on a Shugart SA850
 		do
@@ -2458,21 +2685,18 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 				if (!seen_pregap && curr_window == PREGAP_MARK)
 				{
 					seen_pregap = true;
-					//printf("\nFound pregap area.\n");
 					bit_idx = 0;
 					curr_window = 0;
 				}
 				else if (seen_pregap && !in_track && curr_window == SYNC_MARK)
 				{
 					in_track = true;
-					//printf("\nOh hi, mark.\n");
 					bit_idx = 0;
 					curr_window = 0;
 				}
 				else if (seen_pregap && in_track && bit_idx == 16)
 				{
 					uint8_t data_byte = (uint8_t)bitswap<16>((uint16_t)curr_window, 15, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 0);
-					//printf("%02x ", data_byte);
 					switch (m_diskseq_cmd)
 					{
 					case 4: // Read Track
@@ -2483,7 +2707,6 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 						{
 							curr_bit = -1;
 							m_fdd_side = 2;
-							//printf("\nThe whole world has betrayed me!\n");
 						}
 						else if (m_fdd_side == 0 && m_diskbuf_data_count == 0)
 						{
@@ -2491,13 +2714,11 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 							m_floppy->ss_w(1);
 							m_fdd_side++;
 							m_diskbuf_data_count = 0x2400;
-							//printf("\nCatch you on the flip side!\n");
 						}
 						else if (m_fdd_side == 1 && m_diskbuf_data_count == 0)
 						{
 							curr_bit = -1;
 							m_fdd_side++;
-							//printf("\nYou're my favorite customer.\n");
 						}
 						break;
 					case 0: // Read Track to Buffer RAM
@@ -2522,14 +2743,12 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 							curr_bit = -1;
 							m_floppy->ss_w(1);
 							m_fdd_side++;
-							//printf("\nCatch you on the flip side!\n");
 						}
 						else if(m_diskbuf_ram_addr >= 0x4B00 && m_fdd_side == 1)
 						{
 							// If we've read the side 1 portion of the cylinder, yield out, we're done
 							curr_bit = -1;
 							m_fdd_side++;
-							//printf("\nYou're my favorite customer.\n");
 						}
 						break;
 					}
@@ -2538,13 +2757,41 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 				}
 			}
 		} while (curr_bit != -1);
-		//printf("\n");
 	}
 
 	if (m_fdd_side == 2)
 	{
 		m_diskseq_cyl_read_pending = false;
 		req_b_w(1);
+	}
+}
+
+void dpb7000_state::seek_fdd_to_cylinder()
+{
+	uint16_t floppy_cyl = (uint16_t)m_floppy->get_cyl();
+	if (floppy_cyl != m_diskseq_cyl_from_cpu && m_diskseq_cyl_from_cpu < 78 && m_floppy != nullptr)
+	{
+		if (m_diskseq_cyl_from_cpu < floppy_cyl)
+		{
+			m_floppy->dir_w(1);
+			for (uint16_t i = m_diskseq_cyl_from_cpu; i < floppy_cyl; i++)
+			{
+				m_floppy->stp_w(1);
+				m_floppy->stp_w(0);
+				m_floppy->stp_w(1);
+			}
+		}
+		else
+		{
+			m_floppy->dir_w(0);
+			for (uint16_t i = floppy_cyl; i < m_diskseq_cyl_from_cpu; i++)
+			{
+				m_floppy->stp_w(1);
+				m_floppy->stp_w(0);
+				m_floppy->stp_w(1);
+			}
+		}
+		LOGMASKED(LOG_CTRLBUS, "%s: New floppy cylinder: %04x\n", machine().describe_context(), floppy_cyl);
 	}
 }
 
@@ -3315,6 +3562,9 @@ void dpb7000_state::dpb7000(machine_config &config)
 
 	config.set_perfect_quantum(m_fddcpu);
 
+	// Hard Disk
+	HARDDISK(config, "hdd", 0);
+
 	// Size Card
 	AM2901B(config, m_size_yl);
 	AM2901B(config, m_size_yh);
@@ -3483,7 +3733,7 @@ ROM_START( dpb7000 )
 	ROM_LOAD("pb-032-17425b-deb.bin", 0x000, 0x400, CRC(faeb44dd) SHA1(3eaf981245824332d216e97095bdc02ff04e4800))
 
 	ROM_REGION(0x400, "storeaddr_prom_proty", 0)
-	ROM_LOAD("pb-032-17425b-edb.bin", 0x000, 0x400, CRC(183bfdc0) SHA1(175b052948e4e4a9421d8913479e7531b7e5f03c))
+	ROM_LOAD("pb-032-17425b-edb.bin", 0x000, 0x400, CRC(83585876) SHA1(7c244adcd365f7b2ec347255100fa3597857905c))
 ROM_END
 
 } // anonymous namespace
