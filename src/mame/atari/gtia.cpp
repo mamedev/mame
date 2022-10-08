@@ -26,6 +26,8 @@
 #define GTIA_HWIDTH    48      /* total characters per line */
 #define GTIA_TRIGGER    0x04
 
+// bit 1 player DMA, bit 0 missile DMA
+// TODO: should block writing to grafp* / grafm register writes, enabling this will fail Acid800 "GTIA: address mirroring" test
 #define CHECK_GRACTL    0
 #define VERBOSE         0
 
@@ -386,7 +388,7 @@ void gtia_device::recalc_p0()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_PLAYER) == 0 ||
+		(BIT(m_w.gractl, 1) == 0) ||
 #endif
 		m_w.grafp0[m_h.vdelay_p0] == 0 || m_w.hposp0 >= 224 )
 	{
@@ -404,7 +406,7 @@ void gtia_device::recalc_p1()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_PLAYER) == 0 ||
+		(BIT(m_w.gractl, 1) == 0) ||
 #endif
 		m_w.grafp1[m_h.vdelay_p1] == 0 || m_w.hposp1 >= 224 )
 	{
@@ -422,7 +424,7 @@ void gtia_device::recalc_p2()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_PLAYER) == 0 ||
+		(BIT(m_w.gractl, 1) == 0) ||
 #endif
 		m_w.grafp2[m_h.vdelay_p2] == 0 || m_w.hposp2 >= 224 )
 	{
@@ -440,7 +442,7 @@ void gtia_device::recalc_p3()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_PLAYER) == 0 ||
+		(BIT(m_w.gractl, 1) == 0) ||
 #endif
 		m_w.grafp3[m_h.vdelay_p3] == 0 || m_w.hposp3 >= 224 )
 	{
@@ -458,7 +460,7 @@ void gtia_device::recalc_m0()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_MISSILE) == 0 ||
+		(BIT(m_w.gractl, 0) == 0) ||
 #endif
 		(m_w.grafm[m_h.vdelay_m0] & 0x03) == 0 || m_w.hposm0 >= 224 )
 	{
@@ -476,7 +478,7 @@ void gtia_device::recalc_m1()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_MISSILE) == 0 ||
+		(BIT(m_w.gractl, 0) == 0) ||
 #endif
 		(m_w.grafm[m_h.vdelay_m1] & 0x0c) == 0 || m_w.hposm1 >= 224 )
 	{
@@ -494,7 +496,7 @@ void gtia_device::recalc_m2()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_MISSILE) == 0 ||
+		(BIT(m_w.gractl, 0) == 0) ||
 #endif
 		(m_w.grafm[m_h.vdelay_m2] & 0x30) == 0 || m_w.hposm2 >= 224 )
 	{
@@ -512,7 +514,7 @@ void gtia_device::recalc_m3()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_MISSILE) == 0 ||
+		(BIT(m_w.gractl, 0) == 0) ||
 #endif
 		(m_w.grafm[m_h.vdelay_m3] & 0xc0) == 0 || m_w.hposm3 >= 224)
 	{
