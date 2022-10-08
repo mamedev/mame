@@ -4,6 +4,9 @@
 license:CC0
 -->
 <softwarelist name="advision" description="Entex Adventure Vision cartridges">
+
+<!-- Official -->
+
 	<software name="defender">
 		<description>Defender</description>
 		<year>1982</year>
@@ -55,4 +58,21 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+
+<!-- Homebrew -->
+
+	<software name="codered" supported="partial">
+		<!-- ref: https://www.m-e-g-a.org/research-education/research/adventure-vision/ -->
+		<description>Code Red</description>
+		<year>2013</year>
+		<publisher>Mega</publisher>
+
+		<part name="cart" interface="advision_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="code_red_final_looped.bin" size="0x1000" crc="6fa040cd" sha1="f0bd83a551944207931d0679ea2c1dc924312a63"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

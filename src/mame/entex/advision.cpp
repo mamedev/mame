@@ -7,12 +7,13 @@ Entex Adventure Vision, tabletop video game console
 Hardware notes:
 - INS8048-11 @ 11MHz (1KB internal ROM)
 - COP411 for the sound, 1-bit speaker with volume control
-- 4KB EPROM socket
+- molex socket for 4KB cartridges
 - 1KB external RAM (2*MM2114N)
 - 40 small rectangular red LEDs, a motor with a fast spinning mirror gives the
   illusion of a 150*40 screen (similar to Nintendo Virtual Boy)
 - 4-way joystick, 8 buttons (other than having buttons 2/4 swapped, left and
   right button panels are electronically the same)
+- expansion port (unused)
 
 The mirror is faked in MAME. On the real thing, the picture is not as stable.
 
