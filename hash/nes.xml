@@ -80938,6 +80938,25 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="creepyb">
+		<description>Creepy Brawlers</description>
+		<year>2017</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x40000">
+				<rom name="creepy brawlers (usa) (aftermarket).prg" size="0x40000" crc="114e8959" sha1="93127b42f0ebd76f1de3d64355403125606d9db2" />
+			</dataarea>
+			<dataarea name="chr" size="0x40000">
+				<rom name="creepy brawlers (usa) (aftermarket).chr" size="0x40000" crc="55afb7cf" sha1="61764329355281f725dafbfec3a5e1bb80efd139" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="0x2000">
+				<rom value="0x00" size="0x2000" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dushlan">
 		<description>Dúshlán</description>
 		<year>2016</year>
@@ -81020,6 +81039,52 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="haunt85">
+		<description>Haunted: Halloween '85</description>
+		<year>2016</year>
+		<publisher>Retrotainment Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bnrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x80000">
+				<rom name="haunted - halloween '85 (world) (aftermarket).prg" size="0x80000" crc="043e2545" sha1="d7fa0d2da67cc43036eb45e7efb01a4de68e54ea" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="haunt86">
+		<description>Haunted: Halloween '86 - The Curse of Possum Hollow</description>
+		<year>2017</year>
+		<publisher>Retrotainment Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x80000">
+				<rom name="haunted - halloween '86 (world) (aftermarket).prg" size="0x80000" crc="a7682169" sha1="c0b2995d09ee75386e34db79910df3f0d26f70d0" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="haunt86a" cloneof="haunt86">
+		<description>Haunted: Halloween '86 - The Curse of Possum Hollow (alt)</description>
+		<year>2017</year>
+		<publisher>Retrotainment Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x80000">
+				<rom name="haunted - halloween '86 (world) (aftermarket) (alt).prg" size="0x80000" crc="f401d3ee" sha1="871a477a63fdfb9dd051ccde5448bc84af633601" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
