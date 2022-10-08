@@ -661,6 +661,7 @@ public:
 		, m_view_exp_page3(*this, "exp_view_c000")
 		, m_use_views(false)
 		, m_use_exp_views(false)
+		, m_expanded(-1)
 		, m_psg_b(0)
 		, m_kanji_latch(0)
 		, m_empty_slot(mconfig, *this)
@@ -799,6 +800,7 @@ public:
 	void hx32(machine_config &config);
 	void hx51i(machine_config &config);
 	void jvchc7gb(machine_config &config);
+	void memory_map_jvchc7gb(address_map &map);
 	void mbh1(machine_config &config);
 	void memory_map_mbh1(address_map &map);
 	void mbh1e(machine_config &config);
@@ -978,14 +980,14 @@ protected:
 		return m_disk;
 	}
 
-	template <int Cartridge, int Slot> void cartridge_slot();
+	template <int Slot, int Cartridge> void cartridge_slot();
 	template <int Slot, int Kb> void ram();
-	template <int Subslot, int Kb> void ram_exp();
+	template <int Slot, int Subslot, int Kb> void ram();
 	template <int Slot> void ram_mm();
 	template <int Slot> void disk();
-	template <int Subslot> void disk_exp();
-	void bios();
-	void bios_exp();
+	template <int Slot, int Subslot> void disk();
+	template <int Slot> void bios();
+	template <int Slot, int Subslot> void bios();
 
 	virtual void driver_start() override;
 	virtual void machine_start() override;
@@ -1046,6 +1048,7 @@ protected:
 	memory_view m_view_exp_page3;
 	bool m_use_views;
 	bool m_use_exp_views;
+	int8_t m_expanded;
 	msx_slot_cartridge_device *m_cartslot[2];
 	msx_slot_ram_mm_device *m_ram_mm;
 	msx_slot_disk_device *m_disk;
@@ -1331,6 +1334,12 @@ void msx_state::memory_expand_slot(int slot)
 	{
 		fatalerror("Invalid slot %d to expand\n", slot);
 	}
+	if (m_use_exp_views && m_expanded >= 0 && m_expanded != slot)
+	{
+		fatalerror("There is already an expanded slot in the system");
+	}
+	if (m_use_exp_views)
+		return;
 
 	m_view_page0[slot](0x0000, 0x3fff).view(m_view_exp_page0);
 	m_view_page1[slot](0x4000, 0x7fff).view(m_view_exp_page1);
@@ -1345,6 +1354,7 @@ void msx_state::memory_expand_slot(int slot)
 		m_view_exp_page3[i];
 	}
 	m_use_exp_views = true;
+	m_expanded = slot;
 }
 
 
@@ -3767,7 +3777,7 @@ void msx2_state::turbor(AY8910Type &ay8910_type, machine_config &config)
 	}
 }
 
-template <int Cartridge, int Slot>
+template <int Slot, int Cartridge>
 void msx_state::cartridge_slot()
 {
 	if (Cartridge < 1 || Cartridge > 2)
@@ -3813,9 +3823,13 @@ void msx_state::disk()
 	m_disk->install(&m_view_page0[Slot], &m_view_page1[Slot], &m_view_page2[Slot], &m_view_page3[Slot]);
 }
 
-template <int Subslot>
-void msx_state::disk_exp()
+template <int Slot, int Subslot>
+void msx_state::disk()
 {
+	if (Slot < 0 || Slot >= 4)
+	{
+		fatalerror("Invalid slot %d for disk\n", Slot);
+	}
 	if (Subslot < 0 || Subslot >= 4)
 	{
 		fatalerror("Invalid subslot %d for disk\n", Subslot);
@@ -3824,6 +3838,7 @@ void msx_state::disk_exp()
 	{
 		fatalerror("Disk not defined\n");
 	}
+	memory_expand_slot(Slot);
 	m_disk->install(&m_view_exp_page0[Subslot], &m_view_exp_page1[Subslot], &m_view_exp_page2[Subslot], &m_view_exp_page3[Subslot]);
 }
 
@@ -3847,14 +3862,19 @@ void msx_state::ram()
 		m_view_page3[Slot](0xe000, 0xffff).ram();
 }
 
-// Supported values: Subslot: 0-3, Kb: 8, 16, 32, 48, 64
-template <int Subslot, int Kb>
-void msx_state::ram_exp()
+// Supported values: Slot: 0-3 Subslot: 0-3, Kb: 8, 16, 32, 48, 64
+template <int Slot, int Subslot, int Kb>
+void msx_state::ram()
 {
+	if (Slot < 0 || Slot >= 4)
+	{
+		fatalerror("Invalid slot %d for ram\n", Slot);
+	}
 	if (Subslot < 0 || Subslot >= 4)
 	{
 		fatalerror("Invalid subslot %d for ram\n", Subslot);
 	}
+	memory_expand_slot(Slot);
 	if (Kb > 48)
 		m_view_exp_page0[Subslot](0x0000, 0x3fff).ram();
 	if (Kb > 32)
@@ -3867,14 +3887,34 @@ void msx_state::ram_exp()
 		m_view_exp_page3[Subslot](0xe000, 0xffff).ram();
 }
 
+// The bios will always be present in slot 0, otherwise the system would not boot.
+// For consistency in configuration definitions we add the slot as template parameter.
+template <int Slot>
 void msx_state::bios()
 {
-	m_view_page0[0](0x0000, 0x3fff).rom().region("mainrom", 0);
-	m_view_page1[0](0x4000, 0x7fff).rom().region("mainrom", 0x4000);
+	if (Slot < 0 || Slot >= 4)
+	{
+		fatalerror("Invalid slot %d for ram\n", Slot);
+	}
+	m_view_page0[Slot](0x0000, 0x3fff).rom().region("mainrom", 0);
+	m_view_page1[Slot](0x4000, 0x7fff).rom().region("mainrom", 0x4000);
 }
 
-void msx_state::bios_exp()
+// In the case of an expanded slot 0 the bios will always be present in slot 0,
+// subslot 0, otherwise the system would not boot.
+// For consistency in configuration definitions we add the slot and subslot as template parameters.
+template <int Slot, int Subslot>
+void msx_state::bios()
 {
+	if (Slot < 0 || Slot >= 4)
+	{
+		fatalerror("Invalid slot %d for ram\n", Slot);
+	}
+	if (Subslot < 0 || Subslot >= 4)
+	{
+		fatalerror("Invalid subslot %d for ram\n", Subslot);
+	}
+	memory_expand_slot(Slot);
 	m_view_exp_page0[0](0x0000, 0x3fff).rom().region("mainrom", 0);
 	m_view_exp_page1[0](0x4000, 0x7fff).rom().region("mainrom", 0x4000);
 }
@@ -3925,10 +3965,9 @@ void msx_state::perfect1(machine_config &config)
 void msx_state::memory_map_perfect1(address_map &map)
 {
 	memory_map_base(map);
-	memory_expand_slot(0);
 
 	// 0-0 BIOS
-	bios_exp();
+	bios<0, 0>();
 	// 0-1 firmware
 	m_view_exp_page1[1](0x4000, 0x7fff).rom().region("firmware", 0);
 	m_view_exp_page2[1](0x8000, 0xbfff).rom().region("firmware", 0x4000);
@@ -3965,7 +4004,7 @@ void msx_state::memory_map_canonv8(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge slot
 	cartridge_slot<1,1>();
 	// 2 - 16KB RAM
@@ -3996,7 +4035,7 @@ void msx_state::memory_map_canonv10(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + 16KB RAM
-	bios();
+	bios<0>();
 	ram<0, 16>();
 	// 1 - cartridge slot
 	cartridge_slot<1, 1>();
@@ -4030,7 +4069,7 @@ void msx_state::memory_map_canonv20(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge slot
 	cartridge_slot<1, 1>();
 	// 2 - cartridge slot
@@ -4065,7 +4104,7 @@ void msx_state::memory_map_canonv20e(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge slot
 	cartridge_slot<1, 1>();
 	// 2 - cartridge slot
@@ -4120,7 +4159,7 @@ void msx_state::memory_map_mx10(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + 16KB RAM
-	bios();
+	bios<0>();
 	ram<0, 16>();
 	// 1 - cartridge slot
 	cartridge_slot<1, 1>();
@@ -4151,7 +4190,7 @@ void msx_state::memory_map_mx15(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + 16KB RAM
-	bios();
+	bios<0>();
 	ram<0, 16>();
 	// 1 - cartridge slot
 	cartridge_slot<1, 1>();
@@ -4182,7 +4221,7 @@ void msx_state::memory_map_mx101(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + 16KB RAM
-	bios();
+	bios<0>();
 	ram<0, 16>();
 	// 1 - cartridge slot
 	cartridge_slot<1, 1>();
@@ -4215,7 +4254,7 @@ void msx_state::memory_map_pv7(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + 8KB RAM
-	bios();
+	bios<0>();
 	ram<0, 8>();
 	// 1 - cartridge slot
 	cartridge_slot<1, 1>();
@@ -4247,7 +4286,7 @@ void msx_state::memory_map_pv16(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + 16KB RAM
-	bios();
+	bios<0>();
 	ram<0, 16>();
 	// 1 - cartridge slot
 	cartridge_slot<1, 1>();
@@ -4284,7 +4323,7 @@ void msx_state::memory_map_cpc88(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + HANGUL
-	bios();
+	bios<0>();
 	m_view_page2[0](0x8000, 0xbfff).rom().region("hangul", 0);
 	// 2 - 64KB RAM
 	ram<2, 64>();
@@ -4318,7 +4357,7 @@ void msx_state::memory_map_dpc100(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + HANGUL
-	bios();
+	bios<0>();
 	m_view_page2[0](0x8000, 0xbfff).rom().region("hangul", 0);
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
@@ -4354,7 +4393,7 @@ void msx_state::memory_map_dpc180(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + HANGUL
-	bios();
+	bios<0>();
 	m_view_page2[0](0x8000, 0xbfff).rom().region("hangul", 0);
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
@@ -4391,7 +4430,7 @@ void msx_state::memory_map_dpc200(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + HANGUL
-	bios();
+	bios<0>();
 	m_view_page2[0](0x8000, 0xbfff).rom().region("hangul", 0);
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
@@ -4423,11 +4462,11 @@ void msx_state::memory_map_dpc200e(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - 64KB RAM
 	ram<1, 64>();
 	// 2 - cartridge
-	cartridge_slot<1, 2>();
+	cartridge_slot<2, 1>();
 	// 3 - expansion slot
 }
 
@@ -4464,7 +4503,7 @@ void msx_state::memory_map_cpc50a(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - 8KB RAM
@@ -4499,7 +4538,7 @@ void msx_state::memory_map_cpc50b(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - 16KB RAM
@@ -4536,7 +4575,7 @@ void msx_state::memory_map_cpc51(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - 64KB RAM
@@ -4570,13 +4609,13 @@ void msx_state::memory_map_dgnmsx(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - 64KB RAM
 	ram<2, 64>();
 	// 3 - cartridge
-	cartridge_slot<2, 3>();
+	cartridge_slot<3, 2>();
 }
 
 /* MSX - Dynadata DPC-200 */
@@ -4609,11 +4648,11 @@ void msx_state::memory_map_fdpc200(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - 64KB RAM
 	ram<1, 64>();
 	// 2 - cartridge
-	cartridge_slot<1, 2>();
+	cartridge_slot<2, 1>();
 	// 3 - expansion
 }
 
@@ -4642,7 +4681,7 @@ void msx_state::memory_map_fpc500(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - cartridge
@@ -4675,7 +4714,7 @@ void msx_state::memory_map_fspc800(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - cartridge
@@ -4760,7 +4799,7 @@ void bruc100_state::memory_map_bruc100a(address_map &map)
 	// 1 - 64KB RAM
 	ram<1, 64>();
 	// 2 - cartridge
-	cartridge_slot<1, 2>();
+	cartridge_slot<2, 1>();
 	// 3 - expansion slot
 }
 
@@ -4790,11 +4829,11 @@ void msx_state::memory_map_fmx(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + 16KB RAM
-	bios();
+	bios<0>();
 	ram<0, 16>();
 	// 1 - expansion slot
 	// 2 - cartridge
-	cartridge_slot<1, 2>();
+	cartridge_slot<2, 1>();
 }
 
 /* MSX - General PCT-50 */
@@ -4831,7 +4870,7 @@ void msx_state::memory_map_gsfc80u(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + HANGUL
-	bios();
+	bios<0>();
 	m_view_page2[0](0x8000, 0xbfff).rom().region("hangul", 0);
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
@@ -4864,7 +4903,7 @@ void msx_state::memory_map_gsfc200(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - 64KB RAM
@@ -4901,7 +4940,7 @@ void msx_state::memory_map_gfc1080(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + HANGUL + PASOCALC
-	bios();
+	bios<0>();
 	m_view_page2[0](0x8000, 0xbfff).rom().region("hangul", 0);
 	m_view_page3[0](0xc000, 0xffff).rom().region("pasocalc", 0);
 	// 1 - cartridge
@@ -4938,7 +4977,7 @@ void msx_state::memory_map_gfc1080a(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + HANGUL
-	bios();
+	bios<0>();
 	m_view_page2[0](0x8000, 0xbfff).rom().region("hangul", 0);
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
@@ -4971,13 +5010,13 @@ void msx_state::memory_map_expert13(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - 64KB Mapper RAM
 	ram_mm<2>();
 	// 3 - cartridge
-	cartridge_slot<2, 3>();
+	cartridge_slot<3, 2>();
 }
 
 /* MSX - Gradiente Expert DDPlus */
@@ -5011,17 +5050,16 @@ void msx_state::expertdp(machine_config &config)
 void msx_state::memory_map_expertdp(address_map &map)
 {
 	memory_map_base(map);
-	memory_expand_slot(3);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - cartridge
 	cartridge_slot<2, 2>();
 	// 3-0 - 64KB RAM
-	ram_exp<0, 64>();
+	ram<3, 0, 64>();
 	// 3-3 - disk
-	disk_exp<3>();
+	disk<3, 3>();
 }
 
 /* MSX - Gradiente Expert Plus */
@@ -5050,15 +5088,14 @@ void msx_state::expertpl(machine_config &config)
 void msx_state::memory_map_expertpl(address_map &map)
 {
 	memory_map_base(map);
-	memory_expand_slot(3);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - cartridge
 	cartridge_slot<2, 2>();
 	// 3-0 - 64KB RAM
-	ram_exp<0, 64>();
+	ram<3, 0, 64>();
 	// 3-3 - DEMO
 	m_view_exp_page2[3](0x8000, 0xbfff).rom().region("demo", 0);
 }
@@ -5088,13 +5125,13 @@ void msx_state::memory_map_expert10(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - 64KB RAM
 	ram<2, 64>();
 	// 3 - cartridge, when no cartriddge is inserted the expansion slot is visible in this slot
-	cartridge_slot<2, 3>();
+	cartridge_slot<3, 2>();
 }
 
 /* MSX - Gradiente Expert XP-800 (1.1) / GPC-1 */
@@ -5119,13 +5156,13 @@ void msx_state::memory_map_expert11(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - 64KB RAM
 	ram<2, 64>();
 	// 3 - cartridge, when no cartriddge is inserted the expansion slot is visible in this slot
-	cartridge_slot<2, 3>();
+	cartridge_slot<3, 2>();
 }
 
 /* MSX - Hitachi MB-H1 */
@@ -5156,7 +5193,7 @@ void msx_state::memory_map_mbh1(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + 32KB RAM
-	bios();
+	bios<0>();
 	ram<0, 32>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
@@ -5190,7 +5227,7 @@ void msx_state::memory_map_mbh1e(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + 16KB RAM
-	bios();
+	bios<0>();
 	ram<0, 16>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
@@ -5226,7 +5263,7 @@ void msx_state::memory_map_mbh2(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - cartridge
@@ -5261,7 +5298,7 @@ void msx_state::memory_map_mbh25(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS + 32KB RAM
-	bios();
+	bios<0>();
 	ram<0, 32>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
@@ -5294,7 +5331,7 @@ void msx_state::memory_map_mbh50(address_map &map)
 {
 	memory_map_base(map);
 	// 0 - BIOS
-	bios();
+	bios<0>();
 	// 1 - cartridge
 	cartridge_slot<1, 1>();
 	// 2 - cartridge
@@ -5320,12 +5357,23 @@ void msx_state::jvchc7gb(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  // 64KB RAM
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config);
+	add_cartridge_slot<2>(config);
 
-	msx1(TMS9929A, AY8910, config);
+	msx1(TMS9929A, AY8910, config, &msx_state::memory_map_jvchc7gb);
+}
+
+void msx_state::memory_map_jvchc7gb(address_map &map)
+{
+	memory_map_base(map);
+	// 0 - BIOS
+	bios<0>();
+	// 1 - cartridge
+	cartridge_slot<1, 1>();
+	// 2 - 64KB RAM
+	ram<2, 64>();
+	// 3 - cartridge
+	cartridge_slot<3, 2>();
 }
 
 /* MSX - Jotan Holland Bingo */
