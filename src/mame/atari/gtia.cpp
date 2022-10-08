@@ -164,7 +164,7 @@ void gtia_device::device_start()
 	save_item(NAME(m_r.gtia1c));
 	save_item(NAME(m_r.gtia1d));
 	save_item(NAME(m_r.gtia1e));
-	save_item(NAME(m_r.cons));
+	save_item(NAME(m_r.consol));
 
 	save_item(NAME(m_w.hposp0));
 	save_item(NAME(m_w.hposp1));
@@ -197,7 +197,7 @@ void gtia_device::device_start()
 	save_item(NAME(m_w.vdelay));
 	save_item(NAME(m_w.gractl));
 	save_item(NAME(m_w.hitclr));
-	save_item(NAME(m_w.cons));
+	save_item(NAME(m_w.consol));
 
 	save_item(NAME(m_h.grafp0));
 	save_item(NAME(m_h.grafp1));
@@ -251,24 +251,36 @@ void gtia_device::device_reset()
 	m_lumpf1 = 0;
 
 	/* reset the GTIA read/write/helper registers */
-	for (int i = 0; i < 32; i++)
-		write(i, 0);
 
-	if (is_ntsc())
-		m_r.pal = 0xff;
-	else
-		m_r.pal = 0xf1;
-	m_r.gtia15 = 0xff;
-	m_r.gtia16 = 0xff;
-	m_r.gtia17 = 0xff;
-	m_r.gtia18 = 0xff;
-	m_r.gtia19 = 0xff;
-	m_r.gtia1a = 0xff;
-	m_r.gtia1b = 0xff;
-	m_r.gtia1c = 0xff;
-	m_r.gtia1d = 0xff;
-	m_r.gtia1e = 0xff;
-	m_r.cons = 0x07;     /* console keys */
+	// Altirra observed values on real HW
+	// initial state for w/o regs marked as undefined
+	const u8 cold_start_values[32] = {
+		// m*pf                 p*pf
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		// m*pl                 p*pl
+		0x0f, 0x0f, 0x0f, 0x0f, 0x0e, 0x0d, 0x0b, 0x07,
+		// trig*                <undefined>
+		0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00,
+		// <undefined>          <undefined>
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	};
+	for (int i = 0; i < 32; i++)
+		write(i, cold_start_values[i]);
+
+	m_r.pal = is_ntsc() ? 0x0f : 0x01;
+	m_r.gtia15 = 0x0f;
+	m_r.gtia16 = 0x0f;
+	m_r.gtia17 = 0x0f;
+	m_r.gtia18 = 0x0f;
+	m_r.gtia19 = 0x0f;
+	m_r.gtia1a = 0x0f;
+	m_r.gtia1b = 0x0f;
+	m_r.gtia1c = 0x0f;
+	m_r.gtia1d = 0x0f;
+	m_r.gtia1e = 0x0f;
+	/* set consol default dir with all lines r/o */
+	m_r.consol = 0x00;
+	m_w.consol = 0x00;
 	SETCOL_B(ILL, 0x3e);     /* bright red */
 	SETCOL_B(EOR, 0xff);     /* yellow */
 
@@ -355,10 +367,17 @@ uint8_t gtia_device::read(offs_t offset)
 		case 30: return m_r.gtia1e;
 
 		case 31:
-			m_r.cons = !m_read_cb.isnull() ? (m_read_cb(0) & 0x0f) : 0x00;
-			return m_r.cons;
+		{
+			// unconfirmed behaviour with reading lines unconnected,
+			// assume active low logic with read direction.
+			const u8 consol_read_dir = (~m_w.consol & 0xf);
+			const u8 res = !m_read_cb.isnull() ? m_read_cb(0) : 0x0f;
+			m_r.consol = res & consol_read_dir;
+			return m_r.consol;
+		}
 	}
-	return 0xff;
+	// unreachable
+	return 0x0f;
 }
 
 
@@ -875,11 +894,11 @@ void gtia_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case 31:    /* write console (speaker) */
-		if (data == m_w.cons)
+		if (data == m_w.consol)
 			break;
-		m_w.cons  = data;
+		m_w.consol = data & 0x0f;
 		if (!m_write_cb.isnull())
-			m_write_cb((offs_t)0, m_w.cons);
+			m_write_cb((offs_t)0, m_w.consol);
 		break;
 	}
 }
