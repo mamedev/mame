@@ -42,11 +42,32 @@
 //  ADDRESS MAPS
 //**************************************************************************
 
-void coco12_state::coco_mem(address_map &map)
+void agvision_state::agvision_mem(address_map &map)
 {
 	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
 }
 
+void agvision_state::agvision_ram(address_map &map)
+{
+	// mapped by configure_sam
+}
+
+void agvision_state::agvision_rom(address_map &map)
+{
+	// $A000-$BFFF
+	map(0x0000, 0x1fff).rom().region(MAINCPU_TAG, 0x2000).nopw();
+}
+
+void agvision_state::agvision_io(address_map &map)
+{
+	// $FF00-$FF1F
+	map(0x00, 0x03).mirror(0x1c).rw(PIA0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+}
+
+void coco12_state::coco_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
+}
 
 void coco12_state::coco_ram(address_map &map)
 {
@@ -465,6 +486,34 @@ DEVICE_INPUT_DEFAULTS_END
 //  machine_config
 //-------------------------------------------------
 
+void agvision_state::agvision(machine_config &config)
+{
+	this->set_clock(XTAL(14'318'181) / 16);
+
+	// basic machine hardware
+	MC6809E(config, m_maincpu, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &agvision_state::agvision_mem);
+
+	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
+	m_sam->set_addrmap(0, &agvision_state::agvision_ram);
+// 	m_sam->set_addrmap(1, &agvision_state::agvision_rom0);
+	m_sam->set_addrmap(2, &agvision_state::agvision_rom);
+// 	m_sam->set_addrmap(3, &agvision_state::agvision_rom2);
+	m_sam->set_addrmap(4, &agvision_state::agvision_io);
+// 	m_sam->set_addrmap(5, &agvision_state::agvision_io1);
+// 	m_sam->set_addrmap(6, &agvision_state::agvision_io2);
+// 	m_sam->set_addrmap(7, &agvision_state::agvision_ff60);
+
+	MC6847_NTSC(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
+	m_vdg->set_screen("screen");
+// 	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
+// 	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));
+	m_vdg->input_callback().set(FUNC(agvision_state::sam_read));
+
+	// internal ram
+	RAM(config, m_ram).set_default_size("4K");
+}
+
 void coco12_state::coco(machine_config &config)
 {
 	this->set_clock(XTAL(14'318'181) / 16);
@@ -650,9 +699,14 @@ void coco12_state::ms1600(machine_config &config)
 //  ROMS
 //**************************************************************************
 
+ROM_START(agvision)
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("avs11.rom", 0x2000, 0x0800, CRC(0) SHA1(0))
+ROM_END
+
 ROM_START(coco)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas10.rom",   0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539))
+	ROM_LOAD("bas10.rom", 0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539))
 ROM_END
 
 ROM_START(trsvidtx)
@@ -737,6 +791,7 @@ ROM_END
 //**************************************************************************
 
 //    YEAR   NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY                         FULLNAME                               FLAGS
+COMP( 1979,  agvision,  0,      0,      agvision,coco,    agvision_state, empty_init, "Tandy Radio Shack",           "AgVision",                            MACHINE_SUPPORTS_SAVE )
 COMP( 1980,  coco,      0,      0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer",                      MACHINE_SUPPORTS_SAVE )
 COMP( 1981,  trsvidtx,  coco,   0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Videotex",                            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 COMP( 1981,  cocoe,     coco,   0,      cocoe,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", MACHINE_SUPPORTS_SAVE )

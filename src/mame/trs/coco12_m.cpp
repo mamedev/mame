@@ -27,6 +27,14 @@ void coco12_state::device_start()
 //  configure_sam
 //-------------------------------------------------
 
+void agvision_state::configure_sam()
+{
+	offs_t ramsize = m_ram->size();
+	m_sam->space(0).install_ram(0, ramsize - 1, m_ram->pointer());
+	if (ramsize < 65536)
+		m_sam->space(0).nop_readwrite(ramsize, 0xffff);
+}
+
 void coco12_state::configure_sam()
 {
 	offs_t ramsize = m_ram->size();
@@ -62,6 +70,14 @@ WRITE_LINE_MEMBER( coco12_state::field_sync )
 //-------------------------------------------------
 //  sam_read
 //-------------------------------------------------
+
+uint8_t agvision_state::sam_read(offs_t offset)
+{
+	uint8_t data = m_sam->display_read(offset);
+	m_vdg->as_w(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);
+	m_vdg->inv_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
+	return data;
+}
 
 uint8_t coco12_state::sam_read(offs_t offset)
 {

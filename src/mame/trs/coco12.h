@@ -32,6 +32,41 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class agvision_state : public driver_device
+{
+public:
+	agvision_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, MAINCPU_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_pia_0(*this, PIA0_TAG)
+		, m_sam(*this, SAM_TAG)
+		, m_vdg(*this, VDG_TAG)
+		, m_keyboard(*this, "row%u", 0)
+	{}
+
+	void agvision(machine_config &config);
+	uint8_t sam_read(offs_t offset);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<pia6821_device> m_pia_0;
+	required_device<sam6883_device> m_sam;
+	required_device<mc6847_base_device> m_vdg;
+
+	// input ports
+	required_ioport_array<7> m_keyboard;
+
+	void agvision_mem(address_map &map);
+	void agvision_ram(address_map &map);
+	void agvision_rom(address_map &map);
+	void agvision_io(address_map &map);
+
+private:
+	void configure_sam(void);
+};
+
 class coco12_state : public coco_state
 {
 public:
