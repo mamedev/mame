@@ -30,8 +30,9 @@ control registers
 00e     bit 0 = enable ROM reading (active low). This only makes the chip output the
                 requested address: the ROM is actually read externally, not through
                 the chip's data bus.
-        bit 1 = unknown
-        bit 2 = unknown
+        bit 1 = enable tile X flip when tile color attribute bit 6 is set
+        bit 2 = enable tile Y flip when tile color attribute bit 7 is set
+        bits 3-7 = internal tests, shouldn't be used
 00f     unused
 
 */
@@ -228,6 +229,9 @@ u8 k051316_device::rom_r(offs_t offset)
 
 void k051316_device::ctrl_w(offs_t offset, u8 data)
 {
+	if ((offset == 0x0e) && (data != m_ctrlram[0x0e]))
+		m_tmap->mark_all_dirty();
+	
 	m_ctrlram[offset] = data;
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", machine().describe_context(), data, offset);
 }
@@ -250,6 +254,12 @@ TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
 	int color = m_ram[tile_index + 0x400];
 	int flags = 0;
 
+	if ((m_ctrlram[0x0e] & 0x02) && (color & 0x40))
+		flags |= TILE_FLIPX;
+	
+	if ((m_ctrlram[0x0e] & 0x04) && (color & 0x80))
+		flags |= TILE_FLIPY;
+		
 	m_k051316_cb(&code, &color, &flags);
 
 	tileinfo.set(0,
