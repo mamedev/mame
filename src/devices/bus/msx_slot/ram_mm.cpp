@@ -49,7 +49,7 @@ void msx_slot_ram_mm_device::device_start()
 	for (int i = 0; i < 4; i++)
 	{
 		m_rambank[i]->configure_entries(0, u32(m_bank_mask) + 1, m_ram.data(), 0x4000);
-		m_page[i]->install_readwrite_bank(0x4000 * i, (0x4000 * i) + 0x3fff, m_rambank[i]);
+		page(i)->install_readwrite_bank(0x4000 * i, (0x4000 * i) + 0x3fff, m_rambank[i]);
 	}
 }
 

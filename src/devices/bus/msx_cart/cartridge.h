@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_out);
 	address_space &memory_space() const;
 	address_space &io_space() const;
+	cpu_device &maincpu() const;
 
 	// ROM/RAM/SRAM management
 	// Mainly used by the cartridge slot when loading images

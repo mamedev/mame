@@ -46,10 +46,6 @@ msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconf
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_cartridge(nullptr)
-	, m_page0(nullptr)
-	, m_page1(nullptr)
-	, m_page2(nullptr)
-	, m_page3(nullptr)
 {
 }
 
@@ -101,31 +97,13 @@ void msx_slot_cartridge_device::device_resolve_objects()
 	if (m_cartridge)
 	{
 		m_cartridge->m_exp = this;
-		m_cartridge->set_views(m_page0, m_page1, m_page2, m_page3);
+		m_cartridge->set_views(page(0), page(1), page(2), page(3));
 	}
-	printf("device_resolve_objects\n");
 }
 
 
 void msx_slot_cartridge_device::device_start()
 {
-	// This needs to be pushed into the cartridges/devices themelves. For now it's a temporary bridge between old and new
-//	if (m_page0)
-//	{
-////		m_page0->install_readwrite_handler(0x0000, 0x3fff, read8sm_delegate(*this, FUNC(msx_slot_cartridge_device::read0)), write8sm_delegate(*this, FUNC(msx_slot_cartridge_device::write0)));
-//	}
-//	if (m_page1)
-//	{
-////		m_page1->install_readwrite_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(msx_slot_cartridge_device::read1)), write8sm_delegate(*this, FUNC(msx_slot_cartridge_device::write1)));
-//	}
-//	if (m_page2)
-//	{
-////		m_page2->install_readwrite_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(msx_slot_cartridge_device::read2)), write8sm_delegate(*this, FUNC(msx_slot_cartridge_device::write2)));
-//	}
-//	if (m_page3)
-//	{
-////		m_page3->install_readwrite_handler(0xc000, 0xffff, read8sm_delegate(*this, FUNC(msx_slot_cartridge_device::read3)), write8sm_delegate(*this, FUNC(msx_slot_cartridge_device::write3)));
-//	}
 	if (m_cartridge)
 	{
 		printf("cartridge inserted\n");
@@ -461,14 +439,13 @@ void msx_slot_cartridge_device::write3(offs_t offset, uint8_t data)
 	}
 }
 
-void msx_slot_cartridge_device::install(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
-{
-	printf("cartridge install\n");
-	m_page0 = page0;
-	m_page1 = page1;
-	m_page2 = page2;
-	m_page3 = page3;
-}
+//void msx_slot_cartridge_device::install(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
+//{
+//	m_page0 = page0;
+//	m_page1 = page1;
+//	m_page2 = page2;
+//	m_page3 = page3;
+//}
 
 
 

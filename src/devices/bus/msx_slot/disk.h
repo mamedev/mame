@@ -61,14 +61,6 @@ public:
 		m_floppy3_tag = floppy3_tag;
 	}
 
-	void install(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
-	{
-		m_page[0] = page0;
-		m_page[1] = page1;
-		m_page[2] = page2;
-		m_page[3] = page3;
-	}
-
 protected:
 	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -79,7 +71,6 @@ protected:
 	floppy_connector *m_floppy2;
 	floppy_connector *m_floppy3;
 	floppy_image_device *m_floppy;
-	memory_view::memory_view_entry *m_page[4];
 
 	const char *m_fdc_tag;
 	const char *m_floppy0_tag;
@@ -131,6 +122,9 @@ private:
 
 	void set_control(uint8_t data);
 	void set_side_control(uint8_t data);
+	uint8_t side_control_r();
+	uint8_t control_r();
+	uint8_t status_r();
 };
 
 

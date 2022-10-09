@@ -19,23 +19,19 @@ public:
 	// configuration helpers
 	void set_rom_start(const char *region, uint32_t offset) { m_rom_region.set_tag(region); m_region_offset = offset; }
 
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 private:
-	required_memory_region m_rom_region;
-	uint32_t m_region_offset;
-	const uint8_t *m_rom;
-	uint8_t m_bank_mask;
-	uint8_t m_selected_bank[4];
-	const uint8_t *m_bank_base[4];
+	static constexpr u8 BANKS = 0x80;
+	static constexpr u8 BANK_MASK = BANKS - 1;
 
-	void restore_banks();
+	required_memory_region m_rom_region;
+	memory_bank_array_creator<4> m_rombank;
+	u32 m_region_offset;
+
+	void mapper_write(offs_t offset, uint8_t data);
 };
 
 

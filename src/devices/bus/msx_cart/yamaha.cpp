@@ -79,7 +79,7 @@ void msx_cart_sfg05_device::device_add_mconfig(machine_config &config)
 }
 
 
-ROM_START( msx_sfg01 )
+ROM_START(msx_sfg01)
 	ROM_REGION(0x4000, "sfg", 0)
 	ROM_LOAD("sfg01.rom", 0x0, 0x4000, CRC(0995fb36) SHA1(434651305f92aa770a89e40b81125fb22d91603d)) // correct label is almost certainly "yamaha__ym2211-22702__48_18_89_b.ic104" though the datecode portion may vary between late 1983 and mid 1984
 ROM_END
@@ -87,11 +87,11 @@ ROM_END
 
 const tiny_rom_entry *msx_cart_sfg01_device::device_rom_region() const
 {
-	return ROM_NAME( msx_sfg01 );
+	return ROM_NAME(msx_sfg01);
 }
 
 
-ROM_START( msx_sfg05 )
+ROM_START(msx_sfg05)
 	ROM_REGION(0x8000, "sfg", 0)
 	// Version string starts at $02BD
 	ROM_SYSTEM_BIOS(0, "m5.01.011", "SFG05 (original) M5.01.011")
@@ -105,7 +105,7 @@ ROM_END
 
 const tiny_rom_entry *msx_cart_sfg05_device::device_rom_region() const
 {
-	return ROM_NAME( msx_sfg05 );
+	return ROM_NAME(msx_sfg05);
 }
 
 
@@ -114,9 +114,25 @@ void msx_cart_sfg_device::device_start()
 	// Set rom mask
 	m_rom_mask = m_region_sfg->bytes() - 1;
 
-	// This should probably moved up in the bus/slot hierarchy for the msx driver
-	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-	maincpu->set_irq_acknowledge_callback(*this, FUNC(msx_cart_sfg_device::irq_callback));
+	maincpu().set_irq_acknowledge_callback(*this, FUNC(msx_cart_sfg_device::irq_callback));
+
+	m_page[0]->install_rom(0x0000, 0x3fff, m_region_sfg->base());
+	if (m_region_sfg->bytes() == 0x8000)
+	{
+		m_page[1]->install_rom(0x4000, 0x7fff, m_region_sfg->base() + 0x4000);
+	}
+	else
+	{
+		m_page[1]->install_rom(0x4000, 0x7fff, m_region_sfg->base());
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_page[i]->install_read_handler(0x4000 * i + 0x3ff0, 0x4000 * i + 0x3ff1, read8sm_delegate(*m_ym2151, FUNC(ym_generic_device::read)));
+		m_page[i]->install_read_handler(0x4000 * i + 0x3ff2, 0x4000 * i + 0x3ff6, read8sm_delegate(*m_ym2148, FUNC(ym2148_device::read)));
+		m_page[i]->install_write_handler(0x4000 * i + 0x3ff0, 0x4000 * i + 0x3ff1, write8sm_delegate(*m_ym2151, FUNC(ym_generic_device::write)));
+		m_page[i]->install_write_handler(0x4000 * i + 0x3ff2, 0x4000 * i + 0x3ff6, write8sm_delegate(*m_ym2148, FUNC(ym2148_device::write)));
+	}
 }
 
 

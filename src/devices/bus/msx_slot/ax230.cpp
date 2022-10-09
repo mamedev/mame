@@ -17,13 +17,10 @@ msx_slot_ax230_device::msx_slot_ax230_device(const machine_config &mconfig, cons
 	: device_t(mconfig, MSX_SLOT_AX230, tag, owner, clock)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
+	, m_rombank(*this, "rombank%u", 0U)
 	, m_region_offset(0)
-	, m_rom(nullptr)
-	, m_selected_bank{ 0, 0, 0, 0 }
-	, m_bank_base{ nullptr, nullptr, nullptr, nullptr }
 {
 }
-
 
 void msx_slot_ax230_device::device_start()
 {
@@ -32,55 +29,29 @@ void msx_slot_ax230_device::device_start()
 	{
 		fatalerror("Memory region '%s' is too small for the AX230 firmware\n", m_rom_region.finder_tag());
 	}
+	if (!page(1) || !page(2))
+	{
+		fatalerror("Page views not setup\n");
+	}
 
-	m_rom = m_rom_region->base() + m_region_offset;
-	m_bank_mask = 0x7f;
-
-	save_item(NAME(m_selected_bank));
+	for (int i = 0; i < 4; i++)
+	{
+		m_rombank[i]->configure_entries(0, BANKS, m_rom_region->base() + m_region_offset, 0x2000); 
+	}
+	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
+	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
+	page(1)->install_write_handler(0x6000, 0x7fff, write8sm_delegate(*this, FUNC(msx_slot_ax230_device::mapper_write)));
+	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
+	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 }
-
 
 void msx_slot_ax230_device::device_reset()
 {
 	for (int i = 0; i < 4; i++)
-		m_selected_bank[i] = 0;
-
-	restore_banks();
+		m_rombank[i]->set_entry(0);
 }
 
-
-void msx_slot_ax230_device::device_post_load()
+void msx_slot_ax230_device::mapper_write(offs_t offset, u8 data)
 {
-	restore_banks();
-}
-
-
-void msx_slot_ax230_device::restore_banks()
-{
-	for (int i = 0; i < 4; i++)
-	{
-		m_bank_base[i] = m_rom + (m_selected_bank[i] & m_bank_mask) * 0x2000;
-	}
-}
-
-
-uint8_t msx_slot_ax230_device::read(offs_t offset)
-{
-	if (offset >= 0x4000 && offset < 0xc000)
-	{
-		return m_bank_base[(offset - 0x4000) >> 13][offset & 0x1fff];
-	}
-	return 0xff;
-}
-
-
-void msx_slot_ax230_device::write(offs_t offset, uint8_t data)
-{
-	if (offset >= 0x6000 && offset < 0x8000)
-	{
-		uint8_t bank = (offset / 0x800) & 0x03;
-
-		m_selected_bank[bank] = data;
-		m_bank_base[bank] = m_rom + (m_selected_bank[bank] & m_bank_mask) * 0x2000;
-	}
+	m_rombank[(offset / 0x800) & 0x03]->set_entry(data & BANK_MASK);
 }
