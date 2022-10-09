@@ -10,12 +10,16 @@ Hardware notes:
 - molex socket for 4KB cartridges
 - 1KB external RAM (2*MM2114N)
 - 40 small rectangular red LEDs, a motor with a fast spinning mirror gives the
-  illusion of a 150*40 screen (similar to Nintendo Virtual Boy)
+  illusion of a 150*40 screen
 - 4-way joystick, 8 buttons (other than having buttons 2/4 swapped, left and
   right button panels are electronically the same)
 - expansion port (unused)
 
-The mirror is faked in MAME. On the real thing, the picture is not as stable.
+The mirror rotates at around 7.5Hz, the motor speed is not controlled by software.
+There's a mirror on both sides so the display refreshes at around 15Hz. A similar
+technology was later used in the Nintendo Virtual Boy.
+
+The display is faked in MAME. On the real thing, the picture is not as stable.
 
 A game cartridge is basically an EPROM chip wearing a jacket, there is no
 dedicated cartridge slot as is common on other consoles. Only 4 games were
@@ -23,7 +27,7 @@ released in total.
 
 TODO:
 - EA banking is ugly, it can be turd-polished but the real issue is in mcs48
-- display refresh is actually 15Hz, but doing that will make MAME very sluggish
+- display refresh is actually ~15Hz, but doing that will make MAME very sluggish
 - Do the spinning mirror simulation differently? Right now it relies on the BIOS
   specifying a width of 150, and the official games work fine. But it should be
   possible to update the leds at a different rate. In fact, the homebrew demo
@@ -82,7 +86,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
-	void vh_update(int x);
+	void vh_update();
 
 	u8 ext_ram_r(offs_t offset);
 	void ext_ram_w(offs_t offset, u8 data);
@@ -98,15 +102,15 @@ private:
 
 	memory_region *m_cart_rom = nullptr;
 	std::vector<u8> m_ext_ram;
-	int m_rambank = 0;
+	u16 m_rambank = 0;
 
-	int m_video_enable = 0;
-	int m_video_bank = 0;
-	int m_video_hpos = 0;
+	u8 m_video_enable = 0;
+	u8 m_video_bank = 0;
+	u8 m_video_hpos = 0;
 	u8 m_led_latch[5] = { };
 	std::unique_ptr<u8 []> m_display;
 
-	int m_sound_cmd = 0;
+	u8 m_sound_cmd = 0;
 
 	void io_map(address_map &map);
 	void program_map(address_map &map);
@@ -137,9 +141,9 @@ u32 advision_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
-void advision_state::vh_update(int x)
+void advision_state::vh_update()
 {
-	u8 *dst = &m_display[x];
+	u8 *dst = &m_display[m_video_hpos];
 
 	for (int y = 4; y >= 0; y--)
 	{
@@ -149,22 +153,15 @@ void advision_state::vh_update(int x)
 		m_led_latch[y] = 0xff;
 		dst += 8 * 256;
 	}
+
+	if (++m_video_hpos == 0)
+		logerror("HPOS OVERFLOW\n");
 }
 
 void advision_state::av_control_w(u8 data)
 {
 	if ((m_video_enable == 0x00) && (data & 0x10))
-	{
-		vh_update(m_video_hpos);
-
-		m_video_hpos++;
-
-		if (m_video_hpos > 255)
-		{
-			m_video_hpos = 0;
-			logerror("HPOS OVERFLOW\n");
-		}
-	}
+		vh_update();
 
 	m_video_enable = data & 0x10;
 	m_video_bank = (data & 0xe0) >> 5;
