@@ -24211,4 +24211,765 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="autoduel">
+		<description>Autoduel</description>
+		<year>1985</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2022-09-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Autoduel" is a 1985 action game developed by Richard Garriott and Chuck Bueche, and distributed by Origin Systems. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234788">
+				<rom name="autoduel side a.woz" size="234788" crc="30bab310" sha1="2ba24828af2fa5cba208df14d44560e0cc4dd054"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234788">
+				<rom name="autoduel side b.woz" size="234788" crc="6c586f8d" sha1="985d1da266ee97daea7206b13f08fd39711b6fb5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bismarck">
+		<description>Bismarck: The North Sea Chase</description>
+		<year>1987</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2022-09-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Bismarck: The North Sea Chase" is a 1987 simulation game developed by Tony Stoddart, ported to the Apple II by Allen Adham, and distributed by Datasoft. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233553">
+				<rom name="bismarck- the north sea chase.woz" size="233553" crc="c17a9e53" sha1="bf529052b161149aa810289bf4e3213ec2c0d40c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chwrest">
+		<description>Championship Wrestling</description>
+		<year>1986</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2022-09-02"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Championship Wrestling" is a 1986 sports game developed by Lonnie D. Ropp, Richard A. Ditton, David Thiel, Jeffrey P. Lee, Timothy Skelly, and Elaine Hodgson, and distributed by Epyx. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234850">
+				<rom name="championship wrestling side a.woz" size="234850" crc="301235b9" sha1="633e5a7b9513e6191073b88dc5940c2e7648aa9d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234850">
+				<rom name="championship wrestling side b.woz" size="234850" crc="ed2eea6d" sha1="791806b15e1f4a287623aad808b09bfc8c6dcaf9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbabaskt">
+		<description>GBA Championship Basketball</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2022-09-02"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"GBA Championship Basketball" is a 1986 sports game developed by Troy London, Scott Orr, John Cutter, Mark Madland, and Craig Seastrom, and distributed by Activision. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234833">
+				<rom name="gba championship basketball.woz" size="234833" crc="97d6efea" sha1="5c4aee73e022a38761c5d370ed9fbd5501b27527"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moebius">
+		<description>Moebius</description>
+		<year>1985</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2022-09-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Moebius: The Orb of Celestial Harmony" is a 1985 action game developed by Greg Malone and distributed by Origin Systems. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234803">
+				<rom name="moebius side a.woz" size="234803" crc="77d01e55" sha1="3a256eb00dfd7db3bc86b9a8a6f37d9ac6508e56"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234803">
+				<rom name="moebius side b.woz" size="234803" crc="8718b501" sha1="adb068d1b804f5ddac323dc56d90cc8826d738f0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="234803">
+				<rom name="moebius side c.woz" size="234803" crc="1737fe44" sha1="87a67fb39fb342a1489be258ad46bc1f0509753e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="234803">
+				<rom name="moebius side d.woz" size="234803" crc="327673a2" sha1="6fb014fee91b704d783b49d1abb885cd263c9623"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgwinter">
+		<description>The Games: Winter Edition</description>
+		<year>1988</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2022-09-03"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"The Games: Winter Edition" is a 1988 collection of sports games distributed by Epyx. Credits: Edward Chu, Kevin Furry, Eric Knopp, Carl Mey, Scott Nelson, Kevin Norman, Edwin W. Reich Jr., Al Rubin, Chuck Sommerville, Steve A. Baker, Brooke W. Boering, Walter Horat, James Watcher, Susan Greene, Sheryl Knowles, Jenny Martin, Muffy McCosh, Matt Sarconi, Steve Snyder, Paul Vernon, Chris Ebert, Christopher Grigg, Bob Vieira. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A - Front"/>
+			<dataarea name="flop" size="235091">
+				<rom name="the games- winter edition disk a - front.woz" size="235091" crc="634f6457" sha1="a4b0ca06e469a1b19ad47876f94ce712c494b750"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A - Back"/>
+			<dataarea name="flop" size="235090">
+				<rom name="the games- winter edition disk a - back.woz" size="235090" crc="85dfb871" sha1="523d4ab42efccdcdf685e01fbe376aa49ff08d53"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B - Front"/>
+			<dataarea name="flop" size="241747">
+				<rom name="the games- winter edition disk b - front.woz" size="241747" crc="d3eaa693" sha1="fb9cfae013e8b39562218587218b0a4aa4380136"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B - Back"/>
+			<dataarea name="flop" size="241746">
+				<rom name="the games- winter edition disk b - back.woz" size="241746" crc="52be2bc8" sha1="2873557eb73c6873f43e9e4ac8e803e5f19a7294"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="240715">
+				<rom name="the games- winter edition disk c.woz" size="240715" crc="2504841a" sha1="fccbd849196558aa7c2ab2d59264f9af31c5b19a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sixgunsh">
+		<description>Six-Gun Shootout</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2022-09-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Six-Gun Shootout" is a 1985 strategy game distributed by Strategic Simulations, Inc. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241423">
+				<rom name="six-gun shootout.woz" size="241423" crc="2c9a94e1" sha1="9a9a6bbdcf104b316dcaeb5fba3f4cec6e41f948"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadgtbg">
+		<description>The Road to Gettysburg</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2022-09-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Road to Gettysburg" is a 1982 strategy game developed by Paul Murray and distributed by Strategic Simulations, Inc. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248095">
+				<rom name="the road to gettysburg.woz" size="248095" crc="e401ad48" sha1="43d5c9005cc820a43b3faf8cc48ac98aca0744a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtysburg">
+		<description>Gettysburg: The Turning Point (Version 1.2)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2022-09-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Gettysburg: The Turning Point" is a 1986 strategy game developed by David Landrey and Chuck Kroegel, and distributed by Strategic Simulations, Inc. This is version 1.2. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234818">
+				<rom name="gettysburg- the turning point v1.2 side a.woz" size="234818" crc="cce30de8" sha1="83ef10b30dc2eea1f47f9c6e5d0da555a7d97bef"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234818">
+				<rom name="gettysburg- the turning point v1.2 side b.woz" size="234818" crc="87dee9e8" sha1="bdc23502c510695d46cfecc730e28928fc02bea4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz31">
+		<description>Microzine 31</description>
+		<year>1989</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-09-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 31" is a 1989 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), Alissa Nordlicht (programmer), Alan R. Schwartz (programmer), Julia Watkins (programmer), Donald Way (programmer), John Ricco (contributing programmer), Amy E. McKinley (editorial director), Lisa Mandel (project editor), Lainee Cohen (contributing editor), Rose Trivisonno (contributing editor), Tara Framer (art director), Jenny Grant (assistant art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235151">
+				<rom name="microzine no. 31 - disk 1, side 1.woz" size="235151" crc="403db5de" sha1="1f4f7f845a56888fba5fd6d343a23275cef0332b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235151">
+				<rom name="microzine no. 31 - disk 1, side 2.woz" size="235151" crc="d4d80ab8" sha1="b77883c6fb338831c85a95ec18c0996d092a5f36"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235151">
+				<rom name="microzine no. 31 - disk 2, side 1.woz" size="235151" crc="be7a88f6" sha1="fe608a379bddee47b01a0a1e9dd77090ba768c79"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235151">
+				<rom name="microzine no. 31 - disk 2, side 2.woz" size="235151" crc="55933b58" sha1="660eacb0e6ff7a13dc2921e48c2b320fdbca8398"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz33">
+		<description>Microzine 33</description>
+		<year>1989</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-09-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 33" is a 1989 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), Alissa Ossip (programmer), Alan R. Schwartz (programmer), Julia Watkins (programmer), Donald Way (programmer), John Ricco (contributing programmer), Michael Sweet (contributing programmer), Amy E. McKinley (editorial director), Lisa Mandel (project editor), Lainee Cohen (contributing editor), Rose Trivisonno (contributing editor), Tara Framer (art director), Jenny Grant (assistant art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235256">
+				<rom name="microzine no. 33 (1989)(scholastic) - disk 1, side 1- microzine guide, historical hysterics.woz" size="235256" crc="b29a9761" sha1="68b8c3b83d914f94473b3b9588c0d2cc84f31731"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235235">
+				<rom name="microzine no. 33 (1989)(scholastic) - disk 1, side 2- planet, plan-it .woz" size="235235" crc="00511910" sha1="f6aeaaee83efa2737fdd8a484cda7845d13f09aa"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235227">
+				<rom name="microzine no. 33 (1989)(scholastic) - disk 2, side 1- word war.woz" size="235227" crc="ebf72965" sha1="394e44cfaeb5b604a799d6ba297ab0d22ed613d7"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235234">
+				<rom name="microzine no. 33 (1989)(scholastic) - disk 2, side 2- going to pieces.woz" size="235234" crc="a193b792" sha1="c60b88a6956915e2f9b1700d4343bb01d9f68bdb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz34">
+		<description>Microzine 34</description>
+		<year>1990</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-09-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 34" is a 1990 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), Alissa Ossip (programmer), Donald Way (programmer), Stuart Blavatnik (contributing programmer), Michael Sweet (contributing programmer), Amy E. McKinley (editorial director), Lisa Mandel (project editor), Lisa Feder-Feitel (contributing editor), Rose Trivisonno (contributing editor), Tara Framer (art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235181">
+				<rom name="microzine no. 34 (1990)(scholastic) - disk 1, side 1- microzine guide, the case of the missing rose.woz" size="235181" crc="78c046e2" sha1="c39078e97c1c1226cf368733d2df5268e73869f3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235152">
+				<rom name="microzine no. 34 (1990)(scholastic) - disk 1, side 2- secret sentences.woz" size="235152" crc="99c8db8a" sha1="40fdc70700d3cfe3870a51e78cb27a967de48fd4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235172">
+				<rom name="microzine no. 34 (1990)(scholastic) - disk 2, side 1- the mystery of the olympic imposters.woz" size="235172" crc="6d6c65ba" sha1="7763031e01b42163db8b1a54f92ab1aa1ce50fbc"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235165">
+				<rom name="microzine no. 34 (1990)(scholastic) - disk 2, side 2- fyi- a database of inventions.woz" size="235165" crc="c8073f03" sha1="ac5e394298ad1cd466acb07647efb42c2dab708e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz35">
+		<description>Microzine 35</description>
+		<year>1990</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-09-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 35" is a 1990 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), Alissa Ossip (programmer), Donald Way (programmer), Andrew Kaplan (contributing programmer), Michael Sweet (contributing programmer), Lisa Mandel (project editor), Marian Buck-Murray (associate editor), Rose Trivisonno (contributing editor), Maureen Stapleton (editorial assistant), Jessica Stonier (editorial assistant), Tara Framer (art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235199">
+				<rom name="microzine no. 35 (1990)(scholastic) - disk 1, side 1- microzine guide, grid block.woz" size="235199" crc="3b44825f" sha1="5a80bc2e6bdda78fefb7b1782d1aaec351051b06"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235187">
+				<rom name="microzine no. 35 (1990)(scholastic) - disk 1, side 2- what's missing?.woz" size="235187" crc="66c489df" sha1="9aee8cbc689cd52567207f9bb3fed3e5845b8f68"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235183">
+				<rom name="microzine no. 35 (1990)(scholastic) - disk 2, side 1- world agent.woz" size="235183" crc="21739734" sha1="613be3d876dc45ac394d2c849f7591aed865e895"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235187">
+				<rom name="microzine no. 35 (1990)(scholastic) - disk 2, side 2- let's graph it .woz" size="235187" crc="3a44de21" sha1="b0d5c42f52e1bc8d872c48af7edcb2b930f55e10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz36">
+		<description>Microzine 36</description>
+		<year>1990</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-09-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 36" is a 1990 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), Alissa Ossip (programmer), Donald Way (programmer), Stuart Blavatnik (contributing programmer), Lisa Mandel (project editor), Marian Buck-Murray (associate editor), Rose Trivisonno (contributing editor), Jessica Stonier (editorial assistant). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235140">
+				<rom name="microzine no. 36 (1990)(scholastic) - disk 1, side 1- microzine guide, the case of the crafty caper.woz" size="235140" crc="71939618" sha1="c6d53732b0af3c1acfb1934137da077ee0efec66"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235105">
+				<rom name="microzine no. 36 (1990)(scholastic) - disk 1, side 2- trap doors.woz" size="235105" crc="2b1f6ee0" sha1="c56ea893cbd15d660b82cafdd2ddde790fb06c3a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235123">
+				<rom name="microzine no. 36 (1990)(scholastic) - disk 2, side 1- dr. think and the idea factory.woz" size="235123" crc="953e1074" sha1="c48300bd1de2e511934f01d903e359778559a702"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235102">
+				<rom name="microzine no. 36 (1990)(scholastic) - disk 2, side 2- it fits.woz" size="235102" crc="42cdaaa0" sha1="0feaf327d1150204962f9219a7b0eef15da8b4fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz37">
+		<description>Microzine 37</description>
+		<year>1990</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-09-01"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Microzine No. 37" is a 1990 set of educational games and programs distributed by Scholastic. Credits: Stuart Blavatnick (programmer), Cary Hammer (programmer), Alissa Ossip (programmer), Donald Way (contributing programmer), Lisa Mandel (project editor), Marian Buck-Murray (associate editor), Nadine Browning (contributing editor), Laura Jeffers (contributing editor). It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235098">
+				<rom name="microzine no. 37 (1990)(scholastic) - disk 1, side 1- microzine guide, the case of the cutting caper.woz" size="235098" crc="0c46ac81" sha1="534963be25a92e12c4b84f2c519dacf6649c4710"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235061">
+				<rom name="microzine no. 37 (1990)(scholastic) - disk 1, side 2- math mall.woz" size="235061" crc="bb45e821" sha1="f0fcdeb2ad6fa3f7817560b2e5a113d1f2801aff"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235077">
+				<rom name="microzine no. 37 (1990)(scholastic) - disk 2, side 1- the race for independence.woz" size="235077" crc="9dc80a4d" sha1="6fcacac03ec59d9b121a4f5804a94abdfd074b1a"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235070">
+				<rom name="microzine no. 37 (1990)(scholastic) - disk 2, side 2- nutrition explorer.woz" size="235070" crc="f73ca6b1" sha1="3ebef62d966866aaa2708205e72de4b6b0971a33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz38">
+		<description>Microzine 38</description>
+		<year>1990</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-09-01"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Microzine No. 38" is a 1990 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (programmer), Alissa Ossip (programmer), Michael Repasy (programmer), Lisa Mandel (project editor), Marian Buck-Murray (associate editor), Nadine Browning (contributing editor), Laura Jeffers (contributing editor). It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235044">
+				<rom name="microzine no. 38 (1990)(scholastic) - disk 1, side 1- microzine guide, eskimo escapade.woz" size="235044" crc="a4068dd1" sha1="61fed3b019abb4fcbef5ea94fb47f1d2aaa2dd96"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235021">
+				<rom name="microzine no. 38 (1990)(scholastic) - disk 1, side 2- math mall.woz" size="235021" crc="90148490" sha1="c47457b786832f88f758eb08fa9a58f3ee58d8e8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235048">
+				<rom name="microzine no. 38 (1990)(scholastic) - disk 2, side 1- outer space adventures in government.woz" size="235048" crc="e894e2f2" sha1="e04dd9832fe8a88254aa53f57e4dc90e989d0ae6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235037">
+				<rom name="microzine no. 38 (1990)(scholastic) - disk 2, side 2- exploring simple machines.woz" size="235037" crc="e33bfb51" sha1="b260705f154b8b5312f38794481cc5c7b667b4df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz39">
+		<description>Microzine 39</description>
+		<year>1991</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-09-01"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Microzine No. 39" is a 1991 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (programmer), Michael Repasy (programmer), Lisa Mandel (project editor), Marian Buck-Murray (associate editor), Nadine Browning (contributing editor), Laura Jeffers (contributing editor). It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235032">
+				<rom name="microzine no. 39 (1991)(scholastic) - disk 1, side 1- microzine guide, the case of the baffled baker.woz" size="235032" crc="a3a68692" sha1="44ed270300dffc96a703deefac4686fc5efcdfaf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="234995">
+				<rom name="microzine no. 39 (1991)(scholastic) - disk 1, side 2- math mall.woz" size="234995" crc="d77633b9" sha1="0afa15aa93fa8aa372adf0494380ba0028f7fd6a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235021">
+				<rom name="microzine no. 39 (1991)(scholastic) - disk 2, side 1- the stars of the harlem renaissance.woz" size="235021" crc="eff99db3" sha1="fe60a9f0ad034d006d91752ff9e5c4b21fac175d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235012">
+				<rom name="microzine no. 39 (1991)(scholastic) - disk 2, side 2- exploring the earth's tilt.woz" size="235012" crc="96031b86" sha1="9e582cac2eaf4a1d52d7fe5ae61d6b3a3628aa11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="balnat35">
+		<description>The Balance of Nature (800K 3.5")</description>
+		<year>1984</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2022-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or //e or 48K ][+ with a compatible drive controller card. -->
+		<!--"The Balance in Nature" is a 1984 educational program developed by Barry Kasven, Gerard Camilleri, and Bill Kresse, and distributed by Focus Media. It requires an Apple IIgs, //c+, or //e or 48K ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296201">
+				<rom name="the balance in nature 800k.woz" size="1296201" crc="87b36588" sha1="e911ec604f5c4a5cd020578242c79911b7ec9615"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inswld35">
+		<description>The Insect World (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>Ventura Educational Systems</publisher>
+		<info name="release" value="2022-09-12"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K //e with a compatible drive controller card. -->
+		<!--"The Insect World" is a 1986 educational program developed and distributed by Ventura Educational Systems. It requires an Apple IIgs, //c+, or 64K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296157">
+				<rom name="the insect world 800k.woz" size="1296157" crc="44248718" sha1="3265719575498390f2d3de931de88594cbb5023a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scboxing">
+		<description>Sierra Championship Boxing</description>
+		<year>1985</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2022-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Sierra Championship Boxing" is a 1985 sportsgame developed and distributed by Sierra On-Line. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234766">
+				<rom name="sierra championship boxing.woz" size="234766" crc="7c1b1a8f" sha1="ae938d5bda40565cf8ca3f7b8373543a36f726f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotrsc">
+		<description>Robot Rascals</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2022-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Robot Rascals" is a 1986 strategy game developed by Dan Bunten, Alan Watson, Dave Warhol, Mark McElroy, and Mark Botner, and distributed by Electronic Arts. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228261">
+				<rom name="robot rascals.woz" size="228261" crc="c04c20ac" sha1="9070579b6fbf4ad9011a552c306879f66fe0c7ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv6b1">
+		<description>Copy II Plus (Version 6.0 Beta 1)</description>
+		<year>1985</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-09-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1985 disk utility developed and distributed by Central Point Software. This is version 6.0 beta 1. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234797">
+				<rom name="copy ii plus v6.0 beta 1.woz" size="234797" crc="3da249ae" sha1="19c4a0ee4d2612ce7980f3a59ebe0f9458bad928"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv6b2">
+		<description>Copy II Plus (Version 6.0 Beta 2)</description>
+		<year>1985</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-09-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1985 disk utility developed and distributed by Central Point Software. This is version 6.0 beta 2. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234797">
+				<rom name="copy ii plus v6.0 beta 2.woz" size="234797" crc="415212cd" sha1="20e93383ed5f0d2ce95844ababdff81006e51c66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thexd15">
+		<description>Thexder (Version 1.5)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2022-09-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Thexder" is a 1987 action game developed by Daron Stinnett and distributed by Sierra On-Line. This is version 1.5. It requires a 64K Apple ][+ or later. Double hi-res graphics require a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234784">
+				<rom name="thexder v1.5.woz" size="234784" crc="921ecd56" sha1="f571e7168f8554b6d114d3f14b6d1136a76cb205"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="canclmbr">
+		<description>Canyon Climber</description>
+		<year>1982</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2022-09-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Canyon Climber" is a 1982 action game developed by Brian Mountford and distributed by Datasoft. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="68374">
+				<rom name="canyon climber.woz" size="68374" crc="757bf5fb" sha1="dd92b0e71a66226b2865a507645ebd10e7fea2d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thefct35">
+		<description>The Factory (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>WINGS for learning</publisher>
+		<info name="release" value="2022-09-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card -->
+		<!--"The Factory: Strategies in Problem Solving" is an educational program developed by Marge Cappo and Mike Fish. This re-release on 3.5-inch disk is dated 1990 and is distributed by WINGS for learning. It requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329991">
+				<rom name="the factory 800k.woz" size="1329991" crc="617f952d" sha1="a131e093854b6adccd8737bc58c2272b5305e745"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcrescu">
+		<description>Space Rescue</description>
+		<year>1982</year>
+		<publisher>Level-10</publisher>
+		<info name="release" value="2022-09-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Space Rescue" is a 1982 action game developed by Rod Nelsen and distributed by Level-10. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234770">
+				<rom name="space rescue.woz" size="234770" crc="c42110a2" sha1="1300a5828f11630a6611fca57ff31710a63f4df6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rdgeni35">
+		<description>Reading General Interest: TEAM Series (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2022-09-10"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive and controller card. -->
+		<!--"Reading General Interest: TEAM Series" is an educational program designed by Jan Davidson, Julie Baumgartner, and J. M. Albanese; written by L. X. Savain and T. S. DeBry; and distributed by Davidson and Associates. This is version 1.0. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296274">
+				<rom name="reading general interest 800k.woz" size="1296274" crc="85cea307" sha1="57d754d286af6a467a3fe824959c8cfcd79304d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vocsch35">
+		<description>Vocabulary Science and Health: TEAM Series (800K 3.5")</description>
+		<year>1982</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2022-09-10"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive and controller card. -->
+		<!--"Vocabulary Science and Health: TEAM Series" is an educational program designed by Jan Davidson, L. House, F. Schwartz, and J. M. Albanese; written by Kevin R. Burley; and distributed by Davidson and Associates. This is version 1.0. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296273">
+				<rom name="vocabulary science and health 800k.woz" size="1296273" crc="26f62b7f" sha1="3aeaa6a076e7da6c0679ca11c37cf5c4fd4e8c2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="faywrd35">
+		<description>Fay: The Word Hunter (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>Didatech Software</publisher>
+		<info name="release" value="2022-09-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card. -->
+		<!--"Fay: The Word Hunter" is a 1991 educational program developed by Dave Vincent and Allan Forsberg, and distributed by Didatech Software. It requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296174">
+				<rom name="fay- the word hunter 800k.woz" size="1296174" crc="27a0bb82" sha1="299e38511e1f809c28f377d755ebec1aaf747686"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumblz35">
+		<description>Jumblezzz (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Mindplay</publisher>
+		<info name="release" value="2022-09-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card. -->
+		<!--"Jumblezzz" is a 1990 educational program developed by Methods and Solutions and distributed by Mindplay. It requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296146">
+				<rom name="jumblezzz 800k.woz" size="1296146" crc="2a75cc48" sha1="97256ce15f81da727488dd33fd53c52709c2442b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmusa35">
+		<description>Where in the USA is Carmen Sandiego? (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2022-09-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card. -->
+		<!--"Where in the USA is Carmen Sandiego" is a 1990 educational program developed by Ken Bull, Gene Portwood, and Lauren Elliot, and distributed by Broderbund Software. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296119">
+				<rom name="where in the usa is carmen sandiego 800k.woz" size="1296119" crc="c7075c63" sha1="bbc102ed01fb20393fecd3655d5bc0c523d57e50"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmtime35">
+		<description>Where in Time is Carmen Sandiego? (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2022-09-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card. -->
+		<!--"Where in Time is Carmen Sandiego" is a 1990 educational program developed by Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichting, Tom Rettig, and Claire Curtin, and distributed by Broderbund Software. This is version 1.1. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296281">
+				<rom name="where in time is carmen sandiego 800k.woz" size="1296281" crc="8d38e3cd" sha1="9b96556dcb289a7c3b36762b64372f2c4a747951"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famsci35">
+		<description>Famous Scientists (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-09-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or //e or 48K ][+ with a compatible drive controller card. -->
+		<!--"Famous Scientists" is a 1987 educational program developed and distributed by Hartley Courseware. It requires an Apple IIgs, //c+, or //e or 48K ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296210">
+				<rom name="famous scientists 800k.woz" size="1296210" crc="2fc0210b" sha1="99009fb8f64502960d81fd11f194c8c9330d08b2"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

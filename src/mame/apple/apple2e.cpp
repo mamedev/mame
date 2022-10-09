@@ -477,6 +477,7 @@ private:
 	int m_cec_bank;
 
 	u8 *m_aux_ptr, *m_aux_bank_ptr;
+	u16 m_aux_mask;
 
 	int m_inh_bank;
 
@@ -923,6 +924,7 @@ void apple2e_state::machine_start()
 	// and aux slot device if any
 	m_aux_ptr = nullptr;
 	m_aux_bank_ptr = nullptr;
+	m_aux_mask = 0xffff;
 	if (m_a2eauxslot)
 	{
 		m_auxslotdevice = m_a2eauxslot->get_a2eauxslot_card();
@@ -930,6 +932,7 @@ void apple2e_state::machine_start()
 		{
 			m_aux_ptr = m_auxslotdevice->get_vram_ptr();
 			m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
+			m_aux_mask =  m_auxslotdevice->get_auxbank_mask();
 		}
 	}
 	else    // IIc has 128K right on the motherboard
@@ -946,6 +949,7 @@ void apple2e_state::machine_start()
 	// setup video pointers
 	m_video->m_ram_ptr = m_ram_ptr;
 	m_video->m_aux_ptr = m_aux_ptr;
+	m_video->m_aux_mask = m_aux_mask;
 	m_video->m_char_ptr = memregion("gfx1")->base();
 	m_video->m_char_size = memregion("gfx1")->bytes();
 
@@ -3312,15 +3316,15 @@ u8 apple2e_state::lc_r(offs_t offset)
 			{
 				if (m_lcram2)
 				{
-					return m_aux_bank_ptr[(offset & 0xfff) + 0xd000];
+					return m_aux_bank_ptr[((offset & 0xfff) + 0xd000) & m_aux_mask];
 				}
 				else
 				{
-					return m_aux_bank_ptr[(offset & 0xfff) + 0xc000];
+					return m_aux_bank_ptr[((offset & 0xfff) + 0xc000) & m_aux_mask];
 				}
 			}
 
-			return m_aux_bank_ptr[(offset & 0x1fff) + 0xe000];
+			return m_aux_bank_ptr[((offset & 0x1fff) + 0xe000) & m_aux_mask];
 		}
 		else
 		{
@@ -3360,16 +3364,16 @@ void apple2e_state::lc_w(offs_t offset, u8 data)
 			{
 				if (m_lcram2)
 				{
-					m_aux_bank_ptr[(offset & 0xfff) + 0xd000] = data;
+					m_aux_bank_ptr[((offset & 0xfff) + 0xd000) & m_aux_mask] = data;
 				}
 				else
 				{
-					m_aux_bank_ptr[(offset & 0xfff) + 0xc000] = data;
+					m_aux_bank_ptr[((offset & 0xfff) + 0xc000) & m_aux_mask] = data;
 				}
 				return;
 			}
 
-			m_aux_bank_ptr[(offset & 0x1fff) + 0xe000] = data;
+			m_aux_bank_ptr[((offset & 0x1fff) + 0xe000) & m_aux_mask] = data;
 		}
 	}
 	else
@@ -3551,18 +3555,18 @@ u8 apple2e_state::cec8000_r(offs_t offset)
 	}
 }
 
-u8   apple2e_state::auxram0000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram0000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset] = data; } }
-u8   apple2e_state::auxram0200_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram0200_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x200] = data; } }
-u8   apple2e_state::auxram0400_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram0400_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x400] = data; } }
-u8   apple2e_state::auxram0800_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram0800_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x800] = data; } }
-u8   apple2e_state::auxram2000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram2000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x2000] = data; } }
-u8   apple2e_state::auxram4000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram4000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x4000] = data; } }
+u8   apple2e_state::auxram0000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset & m_aux_mask]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset & m_aux_mask] = data; } }
+u8   apple2e_state::auxram0200_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[(offset+0x200) & m_aux_mask]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0200_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[(offset+0x200) & m_aux_mask] = data; } }
+u8   apple2e_state::auxram0400_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[(offset+0x400) & m_aux_mask]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0400_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[(offset+0x400) & m_aux_mask] = data; } }
+u8   apple2e_state::auxram0800_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[(offset+0x800) & m_aux_mask]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0800_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[(offset+0x800) & m_aux_mask] = data; } }
+u8   apple2e_state::auxram2000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[(offset+0x2000) & m_aux_mask]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram2000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[(offset+0x2000) & m_aux_mask] = data; } }
+u8   apple2e_state::auxram4000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[(offset+0x4000) & m_aux_mask]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram4000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[(offset + 0x4000) & m_aux_mask] = data; } }
 
 void apple2e_state::base_map(address_map &map)
 {

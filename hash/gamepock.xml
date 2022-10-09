@@ -5,6 +5,8 @@ license:CC0
 -->
 <softwarelist name="gamepock" description="Epoch Game Pocket Computer cartridges">
 
+<!-- Official -->
+
 	<software name="astrobom">
 		<description>Astro Bomber</description>
 		<year>1984</year>
@@ -62,6 +64,21 @@ license:CC0
 		<part name="cart" interface="gamepock_cart">
 			<dataarea name="rom" size="0x2000">
 				<rom name="sokoban.bin" size="0x2000" crc="5d6f7819" sha1="61ef6483e8f9935dd8b6351fd2bdfda3af3899bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Homebrew -->
+
+	<software name="pokedemo">
+		<!-- ref: https://chrismcovell.com/GamePokekon/index.html -->
+		<description>1st Pokekon Demo</description>
+		<year>2010</year>
+		<publisher>Chris Covell</publisher>
+		<part name="cart" interface="gamepock_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="1st_pocket_computer_demo.bin" size="0x4000" crc="c008102c" sha1="8b204657dea60c9726b729a485378ac132f39d27"/>
 			</dataarea>
 		</part>
 	</software>

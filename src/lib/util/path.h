@@ -55,7 +55,7 @@ inline std::string &path_append(std::string &path, T &&next, U &&... more)
 		path.append(PATH_SEPARATOR);
 	path.append(std::forward<T>(next));
 	if constexpr (sizeof...(U))
-		return path_append(std::forward<U>(more)...);
+		return path_append(path, std::forward<U>(more)...);
 	else
 		return path;
 }

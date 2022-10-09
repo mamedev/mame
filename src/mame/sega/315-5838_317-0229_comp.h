@@ -39,8 +39,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void rom_bank_updated() override;
-
 private:
 	uint16_t source_word_r();
 

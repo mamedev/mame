@@ -45,9 +45,10 @@ void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::set_rom_bank
 	}
 
 	if (m_cur_bank != bank) {
+		rom_bank_pre_change();
 		m_cur_bank = bank;
 		m_bank->set_entry(bank);
-		rom_bank_updated();
+		rom_bank_post_change();
 	}
 }
 

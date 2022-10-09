@@ -2174,6 +2174,9 @@ paddle2                         // bootleg
 tetrsark                        // ??? (c) D.R.Korea
 tetrsark2                       // ??? (c) D.R.Korea
 
+@source:jaleco/armchamp.cpp
+armchamp                        // (c) 1988 Jaleco/Yuvo
+
 @source:nichibutsu/armedf.cpp
 armedf                          // (c) 1988
 armedff                         // (c) 1988 Fillmore license
@@ -2995,6 +2998,7 @@ roadriotb                       // 136089           (c) 1991
 
 @source:atari/atarigt.cpp
 primrage                        // 136102           (c) 1994
+primrageo                       // 136102           (c) 1994
 primrage20                      // 136102           (c) 1994
 tmek                            // 136100           (c) 1994
 tmek20                          // 136100           (c) 1994
@@ -3163,6 +3167,10 @@ mwskinst                        // (c) 2000 Midway
 @source:sinclair/atm.cpp
 atm                             //
 atmtb2                          //
+atmtb2plus                      //
+
+@source:sinclair/pentevo.cpp
+pentevo                         //
 
 @source:acorn/atom.cpp
 atom                            // 1979 Acorn Atom
@@ -10732,8 +10740,9 @@ cocolocob                       // 198?, Petaco S.A.
 codata                          //
 
 @source:misc/coinmstr.cpp
-jpcoin                          // (c) 19?? Coinmaster
-jpcoin2                         // (c) 19?? Coinmaster
+jpcoin                          // (c) 1985 Coinmaster
+jpcoin2                         // (c) 1990 Coinmaster
+jpjcoin                         // (c) 1988 unknown
 pokeroul                        // (c) 1990 Coinmaster
 quizmstr                        // (c) 1985 Coinmaster
 supnudg2                        // (c) 1989 Coinmaster
@@ -14593,10 +14602,11 @@ gal3                            // (c) 1992 (Arcade TV Game List - P.73, Right, 
 battles                         // bootleg
 battles2                        // bootleg
 bosco                           // (c) 1981
+bosco1                          // (c) 1981
+bosco1o                         // (c) 1981
+bosco3                          // (c) 1981
 boscomd                         // (c) 1981 Midway
 boscomdo                        // (c) 1981 Midway
-boscoo                          // (c) 1981
-boscoo2                         // (c) 1981
 digdug                          // (c) 1982
 digdug1                         // (c) 1982
 digdugat                        // 136007   (c) 1982 Atari
@@ -20623,6 +20633,9 @@ firebarr                        // (c) 1993 Irem (Japan)
 kftgoal                         // (c) 1994 Jaleco
 wpksoc                          // (c) 1995 Jaleco
 
+@source:irem/m119.cpp
+scumimon                        //
+
 @source:irem/m14.cpp
 ptrmj                           // M14 (c) 1979
 
@@ -23641,6 +23654,7 @@ pbst30a                         // (c) 1993 Merit
 pitboss2                        // (c) 1988 Merit
 pitbossm                        // (c) 1994 Merit
 pitbossma                       // (c) 1994 Merit
+pitbossmb                       // (c) 1994 Merit
 pitbosss                        // (c) 1990 Merit
 pitbosssa                       // (c) 1990 Merit
 pitbosssc                       // (c) 1992 Merit
@@ -31954,6 +31968,9 @@ murogemb                        // ???
 murogmbl                        // ???
 slotunbl                        // ???
 
+@source:misc/musclem.cpp
+musclem                         // (c) 1997 Inter Geo
+
 @source:seibu/mustache.cpp
 mustache                        // (c) 1987 March
 mustachei                       // (c) 1987 IG SPA
@@ -38701,6 +38718,7 @@ keroppi                         // (c) 1993 Sammy
 keroppij                        // (c) 1993 Sammy
 krzybowl                        // (c) 1994 American Sammy
 madshark                        // (c) 1993 Allumer
+madsharkbl                      // bootleg
 magspeed                        // (c) 1994 Allumer
 metafox                         // UP   (c) 1989 + Jordan, Romstar or Taito license (DSW)
 msgundam                        // (c) 1993 Banpresto
@@ -41860,6 +41878,7 @@ timetrv                         // (c) 1991.10 Virtual Image Productions
 timetrv2                        // (c) 1991.10 Virtual Image Productions
 
 @source:tvgames/titan_soc.cpp
+colecofl
 megadri4
 megadri4a
 
@@ -43695,6 +43714,7 @@ strxt_it                        //
 strxt_it_101                    //
 strxt_sp                        //
 strxt_uk                        //
+swtril30                        //
 swtril41                        //
 swtril43                        //
 t3new                           //
@@ -43796,6 +43816,9 @@ zero2                           // bootleg
 
 @source:misc/winbingo.cpp
 wbingo06
+
+@source:sega/winclub.cpp
+wwmspot
 
 @source:midcoin/wink.cpp
 wink                            // (c) 1985 Midcoin

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_SPECTRUM_H
-#define MAME_INCLUDES_SPECTRUM_H
+#ifndef MAME_SINCLAIR_SPECTRUM_H
+#define MAME_SINCLAIR_SPECTRUM_H
 
 #pragma once
 
@@ -220,4 +220,4 @@ INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec128 );
 INPUT_PORTS_EXTERN( spec_plus );
 
-#endif // MAME_INCLUDES_SPECTRUM_H
+#endif // MAME_SINCLAIR_SPECTRUM_H

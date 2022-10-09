@@ -1493,9 +1493,9 @@ private:
 	required_device<filter_volume_device> m_volume;
 	required_device<timer_device> m_tempo_timer;
 
-	virtual void write_o(u16 data);
-	virtual void write_r(u32 data);
-	virtual u8 read_k();
+	void write_o(u16 data);
+	void write_r(u32 data);
+	u8 read_k();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume = 0.0;
@@ -3080,9 +3080,9 @@ public:
 
 protected:
 	void update_display();
-	virtual void write_o(u16 data);
-	virtual void write_r(u32 data);
-	virtual u8 read_k();
+	void write_o(u16 data);
+	void write_r(u32 data);
+	u8 read_k();
 };
 
 // handlers
@@ -6159,9 +6159,9 @@ public:
 
 private:
 	void update_display();
-	virtual void write_r(u32 data);
-	virtual void write_o(u16 data);
-	virtual u8 read_k();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 // handlers
@@ -6285,9 +6285,9 @@ public:
 
 private:
 	void update_display();
-	virtual void write_r(u32 data);
-	virtual void write_o(u16 data);
-	virtual u8 read_k();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 // handlers
@@ -6414,9 +6414,9 @@ private:
 	void expander_w(offs_t offset, u8 data);
 
 	void update_display();
-	virtual void write_r(u32 data);
-	virtual void write_o(u16 data);
-	virtual u8 read_k();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 // handlers
@@ -10926,9 +10926,9 @@ private:
 	required_device<s14001a_device> m_speech;
 
 	void update_display();
-	virtual void write_r(u32 data);
-	virtual void write_o(u16 data);
-	virtual u8 read_k();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 // handlers
@@ -12570,10 +12570,10 @@ public:
 private:
 	required_device<tmc0999_device> m_ram;
 
-	virtual void update_display();
-	virtual void write_o(u16 data);
-	virtual void write_r(u32 data);
-	virtual u8 read_k();
+	void update_display();
+	void write_o(u16 data);
+	void write_r(u32 data);
+	u8 read_k();
 };
 
 // handlers
@@ -14475,8 +14475,8 @@ private:
 	void expander_w(offs_t offset, u8 data);
 
 	void update_display();
-	virtual void write_r(u32 data);
-	virtual void write_o(u16 data);
+	void write_r(u32 data);
+	void write_o(u16 data);
 };
 
 // handlers

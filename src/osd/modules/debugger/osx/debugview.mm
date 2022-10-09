@@ -52,7 +52,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 + (void)initialize {
 	// 10.15 and better get full adaptive Dark Mode support
-#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_15
+#if defined(MAC_OS_X_VERSION_10_15) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_15
 	DefaultForeground = [[NSColor textColor] retain];
 	ChangedForeground = [[NSColor systemRedColor] retain];
 	CommentForeground = [[NSColor systemGreenColor] retain];

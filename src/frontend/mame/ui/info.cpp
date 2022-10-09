@@ -142,7 +142,7 @@ void get_system_warnings(std::ostream &buf, running_machine &machine, machine_fl
 	if (flags & ::machine_flags::NOT_WORKING)
 		buf << _("\nTHIS SYSTEM DOESN'T WORK. The emulation for this system is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
 	if (flags & ::machine_flags::MECHANICAL)
-		buf << _("\nElements of this system cannot be emulated as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this system.\n");
+		buf << _("\nElements of this system cannot be emulated accurately as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this system.\n");
 
 	if ((flags & MACHINE_ERRORS) || ((machine.system().type.unemulated_features() | machine.system().type.imperfect_features()) & device_t::feature::PROTECTION))
 	{

@@ -1183,6 +1183,7 @@ uint8_t antic_device::read(offs_t offset)
 		data = m_r.antic09;
 		break;
 	case 10: /* WSYNC read */
+		// TODO: strobe signal, should happen on write only?
 		m_maincpu->spin_until_trigger(TRIGGER_HSYNC);
 		m_w.wsync = 1;
 		data = m_r.antic0a;
@@ -2007,7 +2008,7 @@ TIMER_CALLBACK_MEMBER( antic_device::line_done )
 TIMER_CALLBACK_MEMBER( antic_device::steal_cycles )
 {
 	LOG("           @cycle #%3d steal %d cycles\n", cycle(), m_steal_cycles);
-	m_line_done_timer->adjust(ANTIC_TIME_FROM_CYCLES(m_steal_cycles));
+	m_line_done_timer->adjust((attotime)screen().pixel_period() * (m_steal_cycles));
 	m_steal_cycles = 0;
 	m_maincpu->spin_until_trigger(TRIGGER_STEAL);
 }

@@ -646,7 +646,7 @@ void ymz280b_device::device_clock_changed()
 }
 
 
-void ymz280b_device::rom_bank_updated()
+void ymz280b_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
