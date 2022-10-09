@@ -620,7 +620,7 @@ void a400_state::a800xl_mem(address_map &map)
 
 void a400_state::a130xe_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a130xe_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
