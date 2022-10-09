@@ -58,11 +58,17 @@
 #define LOG_TABLET          (1 << 18)
 #define LOG_COMMANDS        (1 << 19)
 #define LOG_HDD				(1 << 20)
-#define LOG_IRQ				(1 << 21)
-#define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_ADDR | \
-							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_TABLET | LOG_COMMANDS | LOG_OUTPUT_TIMING)
+#define LOG_FDD				(1 << 21)
+#define LOG_DDB				(1 << 22)
+#define LOG_IRQ				(1 << 23)
+#define LOG_BRUSH_LATCH		(1 << 24)
+#define LOG_BRUSH_DRAWS		(1 << 25)
+#define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_BRUSH_ADDR | \
+							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_COMMANDS | LOG_OUTPUT_TIMING | \
+							 LOG_BRUSH_LATCH | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_DRAWS)
 
-#define VERBOSE             (LOG_CSR | LOG_CTRLBUS | LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_BRUSH_ADDR | LOG_COMMANDS | LOG_OUTPUT_TIMING)
+//#define VERBOSE             (LOG_CSR | LOG_CTRLBUS | LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_BRUSH_ADDR | LOG_COMMANDS | LOG_OUTPUT_TIMING)
+#define VERBOSE (LOG_ALL)
 #include "logmacro.h"
 
 namespace
@@ -107,16 +113,20 @@ public:
 		, m_output_hflags(nullptr)
 		, m_output_vlines(nullptr)
 		, m_output_vflags(nullptr)
+		, m_brushaddr_pal_region(*this, "brushaddr_pal")
+		, m_brushaddr_pal(nullptr)
 		, m_storeaddr_protx_region(*this, "storeaddr_prom_protx")
 		, m_storeaddr_proty_region(*this, "storeaddr_prom_proty")
 		, m_storeaddr_xlnib_region(*this, "storeaddr_prom_xlnib")
 		, m_storeaddr_xmnib_region(*this, "storeaddr_prom_xmnib")
 		, m_storeaddr_xhnib_region(*this, "storeaddr_prom_xhnib")
+		, m_storeaddr_pal_blank_region(*this, "storeaddr_pal_blank")
 		, m_storeaddr_protx(nullptr)
 		, m_storeaddr_proty(nullptr)
 		, m_storeaddr_xlnib(nullptr)
 		, m_storeaddr_xmnib(nullptr)
 		, m_storeaddr_xhnib(nullptr)
+		, m_storeaddr_pal_blank(nullptr)
 		, m_keybcpu(*this, "keybcpu")
 		, m_keybc_cols(*this, "KEYB_COL%u", 0U)
 		, m_tds_cpu(*this, "tds")
@@ -152,6 +162,8 @@ private:
 	virtual void machine_reset() override;
 
 	template <int StoreNum> uint32_t store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t ext_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t brush_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t combined_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
@@ -187,7 +199,7 @@ private:
 	void fddcpu_p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fddcpu_debug_rx);
 
-	void handle_command(uint16_t data);
+	bool handle_command(uint16_t data);
 	void store_address_w(uint8_t card, uint16_t data);
 	void combiner_reg_w(uint16_t data);
 
@@ -214,6 +226,7 @@ private:
 	void toggle_line_clock();
 	void process_sample();
 	void process_byte_from_disc(uint8_t data_byte);
+	uint8_t process_byte_to_disc();
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device_array<acia6850_device, 3> m_acia;
@@ -365,10 +378,13 @@ private:
 	uint8_t *m_output_vflags;
 
 	// Brush Address Card
+	required_memory_region m_brushaddr_pal_region;
+	uint8_t *m_brushaddr_pal;
 	uint8_t m_line_clock;
 	uint16_t m_line_count;
 	uint16_t m_line_length;
 	uint16_t m_brush_addr_func;
+	uint8_t m_brush_addr_cmd;
 	uint8_t m_bif;
 	uint8_t m_bixos;
 	uint8_t m_biyos;
@@ -404,11 +420,13 @@ private:
 	required_memory_region m_storeaddr_xlnib_region;
 	required_memory_region m_storeaddr_xmnib_region;
 	required_memory_region m_storeaddr_xhnib_region;
+	required_memory_region m_storeaddr_pal_blank_region;
 	uint8_t *m_storeaddr_protx;
 	uint8_t *m_storeaddr_proty;
 	uint8_t *m_storeaddr_xlnib;
 	uint8_t *m_storeaddr_xmnib;
 	uint8_t *m_storeaddr_xhnib;
+	uint8_t *m_storeaddr_pal_blank;
 
 	// Combiner Card
 	uint8_t m_cursor_y;
@@ -541,6 +559,8 @@ void dpb7000_state::main_map(address_map &map)
 	map(0x0006aa, 0x0006ab).nopw();
 	map(0xb00000, 0xb7ffff).rw(FUNC(dpb7000_state::bus_error_r), FUNC(dpb7000_state::bus_error_w));
 	map(0xb80000, 0xbfffff).ram();
+	//map(0xb00000, 0xbfffff).rw(FUNC(dpb7000_state::bus_error_r), FUNC(dpb7000_state::bus_error_w));
+	//map(0xfc0000, 0xffd3ff).ram();
 	map(0xffd000, 0xffd3ff).rw(FUNC(dpb7000_state::bus_error_r), FUNC(dpb7000_state::bus_error_w));
 	map(0xffe000, 0xffefff).ram().share("vduram").umask16(0x00ff);
 	map(0xfff801, 0xfff801).rw(m_crtc, FUNC(sy6545_1_device::status_r), FUNC(sy6545_1_device::address_w)).cswidth(16);
@@ -681,10 +701,10 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("PENX")
-	PORT_BIT( 0xffff, 3800, IPT_LIGHTGUN_X) PORT_NAME("Pen X") PORT_MINMAX(500, 4599) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.225, -0.145, 0)
+	PORT_BIT( 0xffff, 3800, IPT_LIGHTGUN_X) PORT_NAME("Pen X") PORT_MINMAX(500, 4599) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.385, -0.17, 0)
 
 	PORT_START("PENY")
-	PORT_BIT( 0xffff, 2048, IPT_LIGHTGUN_Y) PORT_NAME("Pen Y") PORT_MINMAX(1000, 4399) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.525, -0.33, 0)
+	PORT_BIT( 0xffff, 2048, IPT_LIGHTGUN_Y) PORT_NAME("Pen Y") PORT_MINMAX(1000, 4399) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.53, -0.26, 0)
 
 	PORT_START("PENPRESS")
 	PORT_BIT( 0xff, 0x02, IPT_PEDAL ) PORT_MINMAX(0x02,0xaf) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
@@ -741,7 +761,7 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Diagnostic Mode" )
 	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
@@ -893,6 +913,7 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_line_count));
 	save_item(NAME(m_line_length));
 	save_item(NAME(m_brush_addr_func));
+	save_item(NAME(m_brush_addr_cmd));
 	save_item(NAME(m_bif));
 	save_item(NAME(m_bixos));
 	save_item(NAME(m_biyos));
@@ -902,6 +923,18 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_bylen_counter));
 	save_item(NAME(m_brush_press_lum));
 	save_item(NAME(m_brush_press_chr));
+	m_brushaddr_pal = (uint8_t *)m_brushaddr_pal_region->base();
+
+	for (uint8_t i = 0; i < 0x80; i++)
+	{
+		const uint16_t addr = (i << 4) | 8;
+		const uint8_t val = m_brushaddr_pal[addr];
+		if (!BIT(val, 1))
+		{
+			printf("Address %03x has COPEN unset:    /PBUSY:%d   /NDR:%d   /DTX:%d   GO:%d   SEL:%d   RUN:%d   SEL8:%d\n",
+				addr, BIT(addr, 4), BIT(addr, 5), BIT(addr, 6), BIT(addr, 7), BIT(addr, 8), BIT(addr, 9), BIT(addr, 10));
+		}
+	}
 
 	// Frame Store Cards, 640x1024
 	for (int i = 0; i < 2; i++)
@@ -942,6 +975,7 @@ void dpb7000_state::machine_start()
 	m_storeaddr_xlnib = m_storeaddr_xlnib_region->base();
 	m_storeaddr_xmnib = m_storeaddr_xmnib_region->base();
 	m_storeaddr_xhnib = m_storeaddr_xhnib_region->base();
+	m_storeaddr_pal_blank = m_storeaddr_pal_blank_region->base();
 
 	// Combiner Card
 	save_item(NAME(m_cursor_y));
@@ -1035,7 +1069,7 @@ void dpb7000_state::machine_reset()
 	// Computer Card
 	m_brg->stt_w(m_baud_dip->read());
 	m_csr = 0;
-	m_sys_ctrl = SYSCTRL_REQ_B_IN;
+	m_sys_ctrl = 0;
 	for (int i = 0; i < 3; i++)
 	{
 		m_acia[i]->write_cts(0);
@@ -1102,6 +1136,7 @@ void dpb7000_state::machine_reset()
 	m_line_count = 0;
 	m_line_length = 0;
 	m_brush_addr_func = 0;
+	m_brush_addr_cmd = 0;
 	m_bif = 0;
 	m_bixos = 0;
 	m_biyos = 0;
@@ -1129,13 +1164,13 @@ void dpb7000_state::machine_reset()
 	memset(&m_brushstore_ext[0], 0, 0x10000);
 
 	// Store Address Card
-	memset(m_rhscr, 0, sizeof(uint16_t) * 2);
-	memset(m_rvscr, 0, sizeof(uint16_t) * 2);
-	memset(m_rzoom, 0, sizeof(uint16_t) * 2);
-	memset(m_fld_sel, 0, sizeof(uint16_t) * 2);
-	memset(m_window_enable, 0, sizeof(uint16_t) * 2);
-	memset(m_cxpos, 0, sizeof(uint16_t) * 2);
-	memset(m_cypos, 0, sizeof(uint16_t) * 2);
+	memset(m_rhscr, 0, sizeof(m_rhscr));
+	memset(m_rvscr, 0, sizeof(m_rvscr));
+	memset(m_rzoom, 0, sizeof(m_rzoom));
+	memset(m_fld_sel, 0, sizeof(m_fld_sel));
+	memset(m_window_enable, 0, sizeof(m_window_enable));
+	memset(m_cxpos, 0, sizeof(m_cxpos));
+	memset(m_cypos, 0, sizeof(m_cypos));
 	m_ca0 = 0;
 
 	// Combiner Card
@@ -1459,20 +1494,72 @@ uint16_t dpb7000_state::cpu_ctrlbus_r()
 		break;
 	case 7:
 		ret = m_diskbuf_ram[m_diskbuf_ram_addr];
-		if (!machine().side_effects_disabled())
-			if (m_diskbuf_ram_addr == 0 || m_diskbuf_ram_addr >= 0x4a00)
-				LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Disc Data Buffer Card RAM read: %04x = %02x\n", machine().describe_context(), m_diskbuf_ram_addr, ret);
+		LOGMASKED(LOG_DDB, "%s: CPU read from Control Bus, Disc Data Buffer Card RAM read: %04x = %02x\n", machine().describe_context(), m_diskbuf_ram_addr, ret);
 		m_diskbuf_ram_addr++;
 		break;
+	case 8:
+	{
+		if (m_brush_addr_cmd == 3) // Framestore Read
+		{
+			const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
+			const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
+
+			uint32_t pix_idx = y * 800 + x;
+			uint8_t &chr = m_ca0 ? m_bs_v_latch : m_bs_u_latch;
+			if (!BIT(m_brush_addr_func, 5))
+			{
+				if (BIT(m_brush_addr_func, 7))
+					m_bs_y_latch = m_framestore_lum[0][pix_idx];
+				if (BIT(m_brush_addr_func, 8))
+					chr = m_framestore_chr[0][pix_idx];
+				if (BIT(m_brush_addr_func, 9))
+					m_bs_y_latch = m_framestore_ext[0][pix_idx];
+			}
+			if (!BIT(m_brush_addr_func, 6))
+			{
+				if (BIT(m_brush_addr_func, 7))
+					m_bs_y_latch = m_framestore_lum[1][pix_idx];
+				if (BIT(m_brush_addr_func, 8))
+					chr = m_framestore_chr[1][pix_idx];
+				if (BIT(m_brush_addr_func, 9))
+					m_bs_y_latch = m_framestore_ext[1][pix_idx];
+			}
+
+			m_bxlen_counter++;
+			if (m_bxlen_counter == 0x1000)
+			{
+				m_bxlen_counter = m_bxlen;
+				m_bylen_counter++;
+				if (m_bylen_counter == 0x1000)
+				{
+					cmd_done(0);
+				}
+			}
+		}
+
+		uint16_t data = (uint16_t)m_bs_y_latch;
+		if (m_ca0)
+		{
+			data |= (uint16_t)m_bs_v_latch << 8;
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Brush Store Card color latches read (VY): %04x\n\n", machine().describe_context(), data);
+		}
+		else
+		{
+			data |= (uint16_t)m_bs_u_latch << 8;
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Brush Store Card color latches read (UY): %04x\n", machine().describe_context(), data);
+		}
+		m_ca0 = 1 - m_ca0;
+		return data;
+	}
 	case 12:
 		ret = m_config_sw34->read();
 		if (!machine().side_effects_disabled())
-			LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Config Switches 1/2: %04x\n", machine().describe_context(), ret);
+			LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Config Switches 3/4: %04x\n", machine().describe_context(), ret);
 		break;
 	case 14:
 		ret = m_config_sw12->read();
 		if (!machine().side_effects_disabled())
-			LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Config Switches 3/4: %04x\n", machine().describe_context(), ret);
+			LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Config Switches 1/2: %04x\n", machine().describe_context(), ret);
 		break;
 	default:
 		if (!machine().side_effects_disabled())
@@ -1489,10 +1576,14 @@ void dpb7000_state::store_address_w(uint8_t card, uint16_t data)
 	case 0:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set RHSCR: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
 		m_rhscr[card] = data & 0xfff;
+		if (card)
+			m_rhscr[0] = data & 0xfff;
 		break;
 	case 1:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set RVSCR: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
 		m_rvscr[card] = data & 0xfff;
+		if (card)
+			m_rvscr[0] = data & 0xfff;
 		break;
 	case 2:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set R ZOOM: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
@@ -1506,7 +1597,7 @@ void dpb7000_state::store_address_w(uint8_t card, uint16_t data)
 	case 4:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set CXPOS: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
 		m_cxpos[card] = data & 0xfff;
-		m_ca0 = data & 1;
+		//m_ca0 = data & 1;
 		break;
 	case 5:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set CYPOS: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
@@ -1590,11 +1681,10 @@ void dpb7000_state::combiner_reg_w(uint16_t data)
 	}
 }
 
-void dpb7000_state::handle_command(uint16_t data)
+bool dpb7000_state::handle_command(uint16_t data)
 {
-	//printf("handle_command %d, cxpos %d, cypos %d\n", (data >> 1) & 0xf, m_cxpos[1], m_cypos[1]);
-	const uint8_t command = (data >> 1) & 0xf;
-	switch (command)
+	//printf("handle_command %d, cxpos %d, cypos %d\n", m_brush_addr_cmd, m_cxpos[1], m_cypos[1]);
+	switch (m_brush_addr_cmd)
 	{
 	case 0: // Live Video
 		LOGMASKED(LOG_COMMANDS, "Unsupported command: Live Video\n");
@@ -1603,15 +1693,11 @@ void dpb7000_state::handle_command(uint16_t data)
 		LOGMASKED(LOG_COMMANDS, "Unsupported command: Brush Store Read\n");
 		break;
 	case 2: // Brush Store Write
+	case 3: // Framestore Read
+	case 4: // Framestore Write
 		m_bxlen_counter = m_bxlen;
 		m_bylen_counter = m_bylen;
-		break;
-	case 3: // Framestore Read
-		LOGMASKED(LOG_COMMANDS, "Unsupported command: Framestore Read\n");
-		break;
-	case 4: // Framestore Write
-		LOGMASKED(LOG_COMMANDS, "Unsupported command: Framestore Write\n");
-		break;
+		return false;
 	case 5: // Fast Wipe Video
 		LOGMASKED(LOG_COMMANDS, "Unsupported command: Fast Wipe Video\n");
 		break;
@@ -1650,51 +1736,61 @@ void dpb7000_state::handle_command(uint16_t data)
 	case 7: // Fast Wipe Framestore
 	case 8: // Draw
 	{
-		bool use_brush = (command == 8);
-		bool lum_en = BIT(data, 7);
-		bool chr_en = BIT(data, 8);
-		bool write_en[2] = { lum_en, chr_en };
+		const bool use_brush = (m_brush_addr_cmd == 8);
+		const bool lum_en = BIT(data, 7);
+		const bool chr_en = BIT(data, 8);
+		const bool ext_en = BIT(data, 9);
+		bool const write_en[2] = { lum_en, chr_en };
 
-		bool s1_disable = BIT(data, 5);
-		bool s2_disable = BIT(data, 6);
-		int ext_idx = (s1_disable ? 1 : 0);
+		const bool s1_disable = BIT(data, 5);
+		const bool s2_disable = BIT(data, 6);
 
-		uint16_t sel_1 = (uint16_t)s1_disable << 5;
-		uint16_t sel_2 = (uint16_t)s2_disable << 4;
-		uint16_t sel_ext = BIT(data, 9) << 6;
-		uint16_t fcs = BIT(data, 13);
-		uint16_t prom_addr = (fcs << 8) | (use_brush ? 0x80 : 0x00) | sel_ext | sel_1 | sel_2 | bitswap<4>(data, 1, 2, 3, 4);
-		uint8_t prom_data = m_brushproc_prom[prom_addr];
+		const uint16_t sel_1 = (uint16_t)s1_disable << 5;
+		const uint16_t sel_2 = (uint16_t)s2_disable << 4;
+		const uint16_t sel_ext = ext_en << 6;
+		const uint16_t fcs = BIT(data, 13);
 
-		bool brush_zero = BIT(~data, 12);
-		bool oe1 = BIT(prom_data, 0);
-		bool oe2 = BIT(prom_data, 1);
-		bool oe3 = BIT(prom_data, 2);
-		bool oe4 = BIT(prom_data, 7);
+		const uint16_t prom_addr = (fcs << 8) | (use_brush ? 0x80 : 0x00) | sel_ext | sel_1 | sel_2 | bitswap<4>(data, 1, 2, 3, 4);
+		const uint8_t prom_data = m_brushproc_prom[prom_addr];
 
-		bool use_s1_data = (oe3 == oe4);
-		bool use_s2_data = !oe4;
-		bool use_ext_data = !oe3;
-		bool mask_sel = BIT(prom_data, 3);
-		bool word_width = BIT(prom_data, 4);
-		bool use_k_data = BIT(~prom_data, 6);
-		bool brush_invert = BIT(~data, 11);
-		uint16_t pal_addr_extra = (BIT(prom_data, 5) << 8) | (brush_invert << 9);
+		const bool brush_zero = BIT(data, 12);
+		const bool oe1 = BIT(prom_data, 0);
+		const bool oe2 = BIT(prom_data, 1);
+		const bool oe3 = BIT(prom_data, 2);
+		const bool oe4 = BIT(prom_data, 7);
+
+		const bool use_s1_data = (oe3 == oe4);
+		const bool use_s2_data = !oe4;
+		const bool use_ext_data = !oe3;
+		const bool mask_sel = BIT(prom_data, 3);
+		const bool word_width = BIT(prom_data, 4);
+		const bool use_k_data = BIT(~prom_data, 6);
+		const bool brush_invert = BIT(~data, 11);
+		const uint16_t pal_addr_extra = (BIT(prom_data, 5) << 8) | (brush_invert << 9);
+
+		const uint16_t brushaddr_pal_addr = (uint16_t)bitswap<4>(data, 1, 2, 3, 4) | (1 << 4) | (1 << 5) | (0 << 7) | (BIT(data, 5) << 8) | (1 << 9) | (1 << 10);
+		const uint8_t brushaddr_pal_val = m_brushaddr_pal[brushaddr_pal_addr];
+
+		int ext_idx = BIT(brushaddr_pal_val, 1) ? 1 : 0;
 
 		uint8_t *store_1[2] = { &m_framestore_lum[0][0], &m_framestore_chr[0][0] };
 		uint8_t *store_2[2] = { &m_framestore_lum[1][0], &m_framestore_chr[1][0] };
-		uint8_t *store_ext[2] = { &m_framestore_ext[1][0], &m_framestore_ext[1][0] }; // TODO: unsure about this, check
 		uint8_t pressure[2] = { m_brush_press_lum, m_brush_press_chr };
 
 		uint16_t bxlen = m_bxlen;//(((m_bxlen << 3) | (m_bixos & 7)) >> (m_bif & 3)) & 0xfff;
 		uint16_t bylen = m_bylen;//(((m_bylen << 3) | (m_biyos & 7)) >> ((m_bif >> 2) & 3)) & 0xfff;
-		uint16_t width = 0x1000 - bxlen;
-		//printf("\nDrawing %dx%d brush at %d,%d (data %04x)\n", 0x1000 - m_bxlen, 0x1000 - m_bylen, m_cxpos[1], m_cypos[1], data);
-		if (data == 0x3991 || (!s2_disable && width < 50))
+		//uint16_t width = 0x1000 - bxlen;
+		//if (m_brush_addr_cmd == 8)
+		m_ca0 = 0;
+		//printf("\n%sing %dx%d brush at %d,%d (data %04x) (Store %d)\n", m_brush_addr_cmd == 8 ? "Draw" : "Wip", 0x1000 - m_bxlen, 0x1000 - m_bylen, m_cxpos[1], m_cypos[1], data, !s1_disable ? 1 : (!s2_disable ? 2 : 0));
+		LOGMASKED(LOG_BRUSH_DRAWS, "%sing %dx%d brush at %d,%d (Store %d)\n", m_brush_addr_cmd == 8 ? "Draw" : "Wip", 0x1000 - m_bxlen, 0x1000 - m_bylen, m_cxpos[1], m_cypos[1], !s1_disable ? 1 : (!s2_disable ? 2 : 0));
+		if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 		{
-			//printf("/S1:%d /S2:%d LUM:%d CHR:%d EXT:%d BZ:%d /BI:%d FCS:%d\n", s1_disable, s2_disable, lum_en, chr_en, BIT(data, 9), brush_zero, brush_invert, fcs);
-			//printf("PROMAddr:%03x PROMVal:%02x OE1:%d OE2:%d OE3:%d OE4:%d MSEL:%d 16BIT:%d\n", prom_addr, prom_data, oe1, oe2, oe3, oe4, mask_sel, word_width);
+			LOGMASKED(LOG_BRUSH_DRAWS, "    BAddrPALAddr:%03x BAddrPALVal:%02x ExtIdx:%d\n", brushaddr_pal_addr, brushaddr_pal_val, ext_idx);
+			LOGMASKED(LOG_BRUSH_DRAWS, "    /S1:%d /S2:%d LUM:%d CHR:%d EXT:%d BZ:%d /BI:%d FCS:%d\n", s1_disable, s2_disable, lum_en, chr_en, BIT(data, 9), brush_zero, brush_invert, fcs);
+			LOGMASKED(LOG_BRUSH_DRAWS, "    PROMAddr:%03x PROMVal:%02x OE1:%d OE2:%d OE3:%d OE4:%d MSEL:%d 16BIT:%d\n", prom_addr, prom_data, oe1, oe2, oe3, oe4, mask_sel, word_width);
 		}
+
 		for (uint16_t y = m_cypos[1], bly = bylen; bly != 0x1000; bly++, y = (y + 1) & 0xfff)
 		{
 			if (y >= 768)
@@ -1735,6 +1831,10 @@ void dpb7000_state::handle_command(uint16_t data)
 				uint8_t brush_values[2] = { m_bs_y_latch, fixed_chr };
 				uint8_t brush_ext = 0xff;
 
+				if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
+				{
+					LOGMASKED(LOG_BRUSH_DRAWS, "    Out x,y: %d,%d\n", x, y);
+				}
 				if (use_brush)
 				{
 					uint16_t bx = ((((blx - bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
@@ -1746,76 +1846,85 @@ void dpb7000_state::handle_command(uint16_t data)
 					brush_values[0] = fcs ? m_bs_y_latch : brush_lum;
 					brush_values[1] = fcs ? fixed_chr : brush_chr;
 
-					if (data == 0x3991 || (!s2_disable && width < 50))
+					if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 					{
-						//printf("    Brush pixel %d,%d (bl %03x,%03x) (blen %03x,%03x) (store %d,%d), Brush LCE %02x %02x %02x:\n", 0x1000 - blx, 0x1000 - bly, blx, bly, bxlen, bylen, bx, by, brush_values[0], brush_values[1], brush_ext);
+						LOGMASKED(LOG_BRUSH_DRAWS, "    Brush pixel %d,%d (bl %03x,%03x) (blen %03x,%03x) (store %d,%d), Brush LCE %02x %02x %02x:\n", 0x1000 - blx, 0x1000 - bly, blx, bly, bxlen, bylen, bx, by, brush_values[0], brush_values[1], brush_ext);
 					}
 				}
-				else if (data == 0x3991 || (!s2_disable && width < 50))
+				else if (s1_disable && !s2_disable && x == 22 && y == 8)
 				{
-					//printf("    Fixed brush value LCE %02x %02x %02x (YUV %02x %02x %02x)\n", brush_values[0], brush_values[1], brush_ext, m_bs_y_latch, m_bs_u_latch, m_bs_v_latch);
+					LOGMASKED(LOG_BRUSH_DRAWS, "    Fixed brush value LCE %02x %02x %02x (YUV %02x %02x %02x)\n\n", brush_values[0], brush_values[1], brush_ext, m_bs_y_latch, m_bs_u_latch, m_bs_v_latch);
 				}
 
 				for (int ch = 0; ch < 2; ch++)
 				{
 					uint8_t s1_data = store_1[ch][pix_idx];
 					uint8_t s2_data = store_2[ch][pix_idx];
-					uint8_t sext_data = store_ext[ext_idx][pix_idx];
+					//uint8_t sext_data = m_framestore_ext[!s2_disable ? 1 : 0][pix_idx];
+					uint8_t sext_data = m_framestore_ext[ext_idx][pix_idx];
 
 					uint8_t brush_data = brush_values[ch];
-					uint8_t brush_ext_data = (use_k_data && ch == 0) ? brush_ext : 0xff;
+					uint8_t brush_ext_data = use_k_data ? brush_ext : 0xff;
 					uint8_t other_data = 0x00;
 					uint8_t pressure_data = pressure[ch];
 					uint8_t press_product = (uint8_t)((brush_ext_data * pressure_data + 0x0080) >> 8);
+					if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
+					{
+						LOGMASKED(LOG_BRUSH_DRAWS, "        brush ext (%02x) * pressure (%02x) = %02x\n", brush_ext_data, pressure_data, press_product);
+					}
 
 					uint8_t mask_multiplicand = 0x00;
-					if (!brush_zero)
+					if (brush_zero)
 						mask_multiplicand = (mask_sel ? sext_data : 0xff);
 
 					uint8_t press_result = (uint8_t)((press_product * mask_multiplicand + 0x0080) >> 8);
-					uint16_t pal_addr = press_result | pal_addr_extra;
+					if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
+					{
+						LOGMASKED(LOG_BRUSH_DRAWS, "        press product (%02x) * mask multiplicand (%02x) = %02x\n\n", press_product, mask_multiplicand, press_result);
+					}
+					uint16_t pal_addr = (uint8_t)bitswap<8>(press_result, 0, 1, 2, 3, 4, 5, 6, 7) | pal_addr_extra;
 					uint16_t pal_data = m_brushproc_pal[pal_addr];
-					uint8_t pal_value = (uint8_t)bitswap<8>(pal_data, 0, 1, 2, 3, 4, 5, 6, 7);
+					uint8_t pal_value = (uint8_t)pal_data;
 					bool pal_sel = BIT(pal_data, 8);
 					bool pal_invert = BIT(pal_data, 9);
 
-					if (data == 0x3991 || (!s2_disable && width < 50))
+					if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 					{
-						//printf("\n        Brush %s data: %02x\n", ch ? "chr" : "lum", brush_data);
-						//printf("        Bext:%02x, PressDat:%02x, PressProd:%02x, MaskMult:%02x, PressRes:%02x, PALAddr:%03x, PALData:%03x, PALVal:%02x\n", brush_ext_data, pressure_data, press_product, mask_multiplicand, press_result, pal_addr, pal_data, pal_value);
-						//printf("        S1:%02x S2:%02x SE:%02x\n", s1_data, s2_data, sext_data);
+						LOGMASKED(LOG_BRUSH_DRAWS, "        Brush %s data: %02x\n", ch ? "chr" : "lum", brush_data);
+						LOGMASKED(LOG_BRUSH_DRAWS, "        Bext:%02x, PressDat:%02x, PressProd:%02x, MaskMult:%02x, PressRes:%02x, PALAddr:%03x, PALData:%03x, PALVal:%02x\n", brush_ext_data, pressure_data, press_product, mask_multiplicand, press_result, pal_addr, pal_data, pal_value);
+						LOGMASKED(LOG_BRUSH_DRAWS, "        S1:%02x S2:%02x SE:%02x\n", s1_data, s2_data, sext_data);
 					}
 
 					if (use_s1_data)
 					{
 						other_data = s1_data;
-						//if (data == 0x3991 || (!s2_disable && width < 50)) printf("        Using Store I for other data, %02x\n", other_data);
+						if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1) LOGMASKED(LOG_BRUSH_DRAWS, "        Using Store I for other data, %02x\n", other_data);
 					}
 					else if (use_s2_data)
 					{
 						other_data = s2_data;
-						//if (data == 0x3991 || (!s2_disable && width < 50)) printf("        Using Store II for other data, %02x\n", other_data);
+						if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1) LOGMASKED(LOG_BRUSH_DRAWS, "        Using Store II for other data, %02x\n", other_data);
 					}
 					else if (use_ext_data)
 					{
 						other_data = sext_data;
-						//if (data == 0x3991 || (!s2_disable && width < 50)) printf("        Using Stencil for other data, %02x\n", other_data);
+						if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1) LOGMASKED(LOG_BRUSH_DRAWS, "        Using Stencil for other data, %02x\n", other_data);
 					}
 
 					if (!oe1)
 					{
 						brush_data = s1_data;
-						//if (data == 0x3991 || (!s2_disable && width < 50)) printf("        Using Store I for brush data, %02x\n", other_data);
+						if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1) LOGMASKED(LOG_BRUSH_DRAWS, "        Using Store I for brush data, %02x\n", other_data);
 					}
 					else if (!oe2)
 					{
 						brush_data = s2_data;
-						//if (data == 0x3991 || (!s2_disable && width < 50)) printf("        Using Store II for brush data, %02x\n", other_data);
+						if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1) LOGMASKED(LOG_BRUSH_DRAWS, "        Using Store II for brush data, %02x\n", other_data);
 					}
 
-					if (data == 0x3991 || (!s2_disable && width < 50))
+					if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 					{
-						//printf("        Before-comp brush data %02x, other data %02x\n", brush_data, other_data);
+						LOGMASKED(LOG_BRUSH_DRAWS, "        Before-comp brush data %02x, other data %02x\n", brush_data, other_data);
 					}
 
 					uint8_t comp_a = brush_data;
@@ -1823,19 +1932,19 @@ void dpb7000_state::handle_command(uint16_t data)
 
 					uint8_t alu_out = 0x00;
 					bool final_add = false;
-					if(comp_a < comp_b)
+					if (comp_a < comp_b)
 					{
-						if (data == 0x3991 || (!s2_disable && width < 50))
+						if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 						{
-							//printf("        comp_a %02x < comp_b %02x, final ALU pass should subtract\n", comp_a, comp_b);
+							LOGMASKED(LOG_BRUSH_DRAWS, "        comp_a %02x < comp_b %02x, final ALU pass should subtract\n", comp_a, comp_b);
 						}
 						alu_out = other_data - brush_data;
 					}
 					else
 					{
-						if (data == 0x3991 || (!s2_disable && width < 50))
+						if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 						{
-							//printf("        comp_a %02x > comp_b %02x, final ALU pass should add, calculating %02x - %02x = %02x\n", comp_a, comp_b, comp_b, comp_a, comp_a - comp_b);
+							LOGMASKED(LOG_BRUSH_DRAWS, "        comp_a %02x > comp_b %02x, final ALU pass should add, calculating %02x - %02x = %02x\n", comp_a, comp_b, comp_a, comp_b, comp_a - comp_b);
 						}
 						alu_out = brush_data - other_data;
 						final_add = true;
@@ -1845,50 +1954,50 @@ void dpb7000_state::handle_command(uint16_t data)
 						brush_data = ~brush_data;
 
 					uint16_t out_product = (uint16_t)alu_out * (uint16_t)pal_value;
-					if (data == 0x3991 || (!s2_disable && width < 50))
+					if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 					{
-						//printf("        ALU out %02x, out product %04x (%02x * %02x), PALSel:%d, PALInv:%d\n", alu_out, out_product, alu_out, pal_value, pal_sel, pal_invert);
+						LOGMASKED(LOG_BRUSH_DRAWS, "        ALU out %02x, out product %04x (%02x * %02x), PALSel:%d, PALInv:%d\n", alu_out, out_product, alu_out, pal_value, pal_sel, pal_invert);
 					}
 					uint8_t final_msb = 0;
 					uint8_t final_lsb = 0;
 					if (!word_width)
 					{
-						uint8_t alu_a_val = (use_s2_data ? s2_data : s1_data);
-						uint8_t alu_b_val = (out_product + 0x0080) >> 8;
-						uint8_t final_alu_msb_out = (final_add ? (alu_a_val + alu_b_val) : (alu_a_val - alu_b_val));
+						uint16_t alu_a = (other_data << 8) | s2_data;
+						uint16_t alu_b = out_product;
+						uint16_t final_alu_out = (final_add ? (alu_a + alu_b) : (alu_a - alu_b));
 
-						final_msb = (pal_sel ? final_alu_msb_out : brush_data);
+						final_msb = (pal_sel ? (final_alu_out >> 8) : brush_data);
 						final_lsb = final_msb;
 
-						if (data == 0x3991 || (!s2_disable && width < 50))
+						if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 						{
 							if (final_add)
 							{
-								//printf("        8bpp, S1D %02x, S2D %02x, ALUA %02x, ALUB %02x, ALU final %02x+%02x=%02x, MSB %02x\n", s1_data, s2_data, alu_a_val, alu_b_val, alu_a_val, alu_b_val, final_alu_msb_out, final_msb);
+								LOGMASKED(LOG_BRUSH_DRAWS, "        8bpp, S1D %02x, S2D %02x, ALUA %04x, ALUB %04x, ALU final %04x + %04x = %04x, MSB %02x\n", s1_data, s2_data, alu_a, alu_b, alu_a, alu_b, final_alu_out, final_msb);
 							}
 							else
 							{
-								//printf("        8bpp, S1D %02x, S2D %02x, ALUA %02x, ALUB %02x, ALU final %02x-%02x=%02x, MSB %02x\n", s1_data, s2_data, alu_a_val, alu_b_val, alu_a_val, alu_b_val, final_alu_msb_out, final_msb);
+								LOGMASKED(LOG_BRUSH_DRAWS, "        8bpp, S1D %02x, S2D %02x, ALUA %04x, ALUB %04x, ALU final %04x - %04x = %04x, MSB %02x\n", s1_data, s2_data, alu_a, alu_b, alu_a, alu_b, final_alu_out, final_msb);
 							}
 						}
 					}
 					else
 					{
-						uint16_t alu_a = ((use_s2_data ? s2_data : s1_data) << 8) | s2_data;
+						uint16_t alu_a = (other_data << 8) | s2_data;
 						uint16_t alu_b = out_product;
 						uint16_t final_alu_out = (final_add ? (alu_a + alu_b) : (alu_a - alu_b));
 						final_msb = (pal_sel ? (final_alu_out >> 8) : brush_data);
 						final_lsb = (uint8_t)final_alu_out;
 
-						if (data == 0x3991 || (!s2_disable && width < 50))
+						if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 						{
 							if (final_add)
 							{
-								//printf("        16bpp, ALUA %04x, ALUB %04x, %04x+%04x=%04x, MSB %02x, LSB %02x\n", alu_a, alu_b, alu_a, alu_b, final_alu_out, final_msb, final_lsb);
+								LOGMASKED(LOG_BRUSH_DRAWS, "        16bpp, ALUA %04x, ALUB %04x, %04x+%04x=%04x, MSB %02x, LSB %02x\n", alu_a, alu_b, alu_a, alu_b, final_alu_out, final_msb, final_lsb);
 							}
 							else
 							{
-								//printf("        16bpp, ALUA %04x, ALUB %04x, %04x-%04x=%04x, MSB %02x, LSB %02x\n", alu_a, alu_b, alu_a, alu_b, final_alu_out, final_msb, final_lsb);
+								LOGMASKED(LOG_BRUSH_DRAWS, "        16bpp, ALUA %04x, ALUB %04x, %04x-%04x=%04x, MSB %02x, LSB %02x\n", alu_a, alu_b, alu_a, alu_b, final_alu_out, final_msb, final_lsb);
 							}
 						}
 					}
@@ -1897,91 +2006,46 @@ void dpb7000_state::handle_command(uint16_t data)
 					{
 						if (!s1_disable)
 						{
-							if (data == 0x3991 || (!s2_disable && width < 50))
+							if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 							{
-								//printf("        Storing %02x in Store 1 %s\n", final_msb, ch ? "chr" : "lum");
+								LOGMASKED(LOG_BRUSH_DRAWS, "        Storing %02x in Store 1 %s\n", final_msb, ch ? "chr" : "lum");
 							}
 							store_1[ch][pix_idx] = s2_disable ? final_lsb : final_msb;
 						}
 						if (!s2_disable)
 						{
 							store_2[ch][pix_idx] = final_lsb;
-							if (data == 0x3991 || (!s2_disable && width < 50))
+							if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 							{
-								//printf("        Storing %02x in Store 2 %s\n", final_lsb, ch ? "chr" : "lum");
+								LOGMASKED(LOG_BRUSH_DRAWS, "        Storing %02x in Store 2 %s\n", final_lsb, ch ? "chr" : "lum");
 							}
 						}
 					}
-					if (ch == 0 && BIT(data, 9))
+
+					if (ch == 0 && ext_en)
 					{
 						if (!s1_disable)
 						{
-							if (data == 0x3991 || (!s2_disable && width < 50))
+							if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 							{
-								//printf("        Storing %02x in EXT 1\n", final_msb);
+								LOGMASKED(LOG_BRUSH_DRAWS, "        Storing %02x in EXT 1\n", final_msb);
 							}
-							store_ext[0][pix_idx] = final_msb;
+							m_framestore_ext[0][pix_idx] = final_msb;
 						}
 						if (!s2_disable)
 						{
-							if (data == 0x3991 || (!s2_disable && width < 50))
+							if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 							{
-								//printf("        Storing %02x in EXT 1\n", final_lsb);
+								LOGMASKED(LOG_BRUSH_DRAWS, "        Storing %02x in EXT 2\n", final_lsb);
 							}
-							store_ext[1][pix_idx] = final_lsb;
+							m_framestore_ext[1][pix_idx] = final_lsb;
 						}
 					}
 				}
-
-				/*if (fixed_colour_select)
-				{
-					uint8_t y = m_bs_y_latch;
-					uint8_t u = m_bs_u_latch;
-					uint8_t v = m_bs_v_latch;
-					if (BIT(data, 12)) // Brush Zero
-					{
-						y = 0x00;
-						u = 0x80;
-						v = 0x80;
-					}
-
-					if (!BIT(data, 9))
-					{
-						uint16_t bx = ((((blx - bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
-						uint16_t by = ((((bly - bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
-
-						// TODO: Actual Brush Processor functionality
-						uint8_t brush_lum = m_brushstore_lum[by * 256 + bx];;
-						uint8_t brush_chr = m_brushstore_chr[by * 256 + bx];
-						if (brush_invert)
-						{
-							brush_lum = 0xff - brush_lum;
-							brush_chr = 0xff - brush_chr;
-						}
-
-						//uint16_t lum_prod = lum[x] *
-						//if (brush_zero)
-						//{
-						//}
-
-						uint16_t lum_sum = lum[x] + m_brushstore_lum[by * 256 + bx];
-						uint16_t chr_sum = chr[x] + m_brushstore_chr[by * 256 + bx];
-
-						y = lum_sum > 0xff ? 0xff : (uint16_t)lum_sum;
-						uint8_t chr_clamped = chr_sum > 0xff ? 0xff : (uint16_t)chr_sum;
-						if (m_cxpos[i] & 1)
-							v = chr_clamped;
-						else
-							u = chr_clamped;
-					}
-
-					lum[x] = y;
-					chr[x] = (m_cxpos[i] & 1) ? v : u;
-				}*/
 			}
 		}
-		//printf("\n");
-	}	break;
+		break;
+	}
 	case 9: // Draw with Stencil I
 		LOGMASKED(LOG_COMMANDS, "Unsupported command: Draw with Stencil I\n");
 		break;
@@ -1992,8 +2056,43 @@ void dpb7000_state::handle_command(uint16_t data)
 		LOGMASKED(LOG_COMMANDS, "Unsupported command: Copy to Framestore\n");
 		break;
 	case 12: // Copy to Brush Store
-		LOGMASKED(LOG_COMMANDS, "Unsupported command: Copy to Brush Store\n");
+	{
+		uint8_t *store_lum = !BIT(data, 5) ? &m_framestore_lum[0][0] : (!BIT(data, 6) ? &m_framestore_lum[1][0] : nullptr);
+		uint8_t *store_chr = !BIT(data, 5) ? &m_framestore_chr[0][0] : (!BIT(data, 6) ? &m_framestore_chr[1][0] : nullptr);
+		uint8_t *store_ext = !BIT(data, 5) ? &m_framestore_ext[0][0] : (!BIT(data, 6) ? &m_framestore_ext[1][0] : nullptr);
+		if (!BIT(data, 7))
+			store_lum = nullptr;
+		if (!BIT(data, 8))
+			store_chr = nullptr;
+		if (!BIT(data, 9))
+			store_ext = nullptr;
+
+		m_ca0 = 0;
+		for (uint32_t y = m_cypos[1], bly = m_bylen; bly != 0x1000; bly++, y = (y + 1) & 0xfff)
+		{
+			if (y >= 768)
+				continue;
+
+			const uint32_t line_idx = y * 800;
+			for (uint32_t x = m_cxpos[1], blx = m_bxlen; blx != 0x1000; blx++, x = (x + 1) & 0xfff)
+			{
+				if (x >= 800)
+					continue;
+
+				const uint32_t pix_idx = line_idx + x;
+				const uint16_t bx = ((((blx - m_bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
+				const uint16_t by = ((((bly - m_bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
+				const uint16_t uv_bx = ((x & 1) ? (bx | 1) : (bx & ~1));
+				if (store_lum)
+					m_brushstore_lum[by * 256 + bx] = store_lum[pix_idx];
+				if (store_chr)
+					m_brushstore_chr[by * 256 + uv_bx] = store_chr[pix_idx];
+				if (store_ext)
+					m_brushstore_ext[by * 256 + bx] = store_lum[pix_idx];
+			}
+		}
 		break;
+	}
 	case 13: // Paste with Stencil I
 		LOGMASKED(LOG_COMMANDS, "Unsupported command: Paste with Stencil I\n");
 		break;
@@ -2004,6 +2103,7 @@ void dpb7000_state::handle_command(uint16_t data)
 		LOGMASKED(LOG_COMMANDS, "Unsupported command: Copy to Framestore (Invert)\n");
 		break;
 	}
+	return true;
 }
 
 void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
@@ -2028,15 +2128,17 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		LOGMASKED(LOG_BRUSH_ADDR, "                KSEL:               %d\n", BIT(data, 9));
 		LOGMASKED(LOG_BRUSH_ADDR, "                DISCEN:             %d\n", BIT(data, 10));
 		LOGMASKED(LOG_BRUSH_ADDR, "                /KINV:              %d\n", BIT(data, 11));
-		LOGMASKED(LOG_BRUSH_ADDR, "                KZERO:              %d\n", BIT(data, 12));
+		LOGMASKED(LOG_BRUSH_ADDR, "                /KZERO:             %d\n", BIT(data, 12));
 		LOGMASKED(LOG_BRUSH_ADDR, "                FCS:                %d\n", BIT(data, 13));
 		LOGMASKED(LOG_BRUSH_ADDR, "                Go:                 %d\n", BIT(data, 0));
 		m_brush_addr_func = data & ~1;
 		if (BIT(data, 0))
 		{
 			m_brush_addr_func |= 0x8000;
-			m_cmd_done_timer->adjust(attotime::from_usec(500));
-			handle_command(data);
+			m_brush_addr_cmd = (data >> 1) & 0xf;
+			if (handle_command(data)) {
+				m_cmd_done_timer->adjust(attotime::from_usec(500));
+			}
 		}
 		break;
 	}
@@ -2048,6 +2150,10 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		{
 			m_diskseq_cyl_from_cpu = data & 0x3ff;
 			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, Cylinder Number: %04x (%04x)\n", machine().describe_context(), m_diskseq_cyl_from_cpu, data);
+			if (m_diskseq_cyl_from_cpu == 0)
+				m_diskseq_status_out |= 0x04;
+			else
+				m_diskseq_status_out &= ~0x04;
 		}
 		else if (hi_nybble == 1)
 		{
@@ -2069,8 +2175,6 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			case 9:
 			case 13:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: No command\n", machine().describe_context());
-				//req_b_w(1);
-				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
 				break;
 			case 0:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read track to buffer RAM\n", machine().describe_context());
@@ -2112,8 +2216,6 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 				break;
 			case 3:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Restore\n", machine().describe_context());
-				req_b_w(0); // Flag ourselves as in-use
-				m_diskseq_complete_clk->adjust(attotime::from_msec(27), 1); // 160/330M Fujitsu has an average seek time of 27ms; everything else is slower
 				m_diskseq_cyl_from_cpu = 0;
 				break;
 			case 4:
@@ -2205,18 +2307,38 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 				break;
 			case 12:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track (not yet implemented)\n", machine().describe_context());
-				//req_b_w(1);
-				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
+				if (!BIT(m_diskseq_status_out, 3) && is_disk_group_hdd(group))
+				{
+					req_b_w(0); // Flag ourselves as in-use
+
+					m_diskseq_cyl_write_pending = true;
+					m_diskseq_command_stride = 1;
+
+					m_diskbuf_data_count = 0x4b00;
+					m_diskseq_use_hdd_pending = true;
+					m_hdd_command_timer->adjust(attotime::from_double((double)19200 / 1012000));
+				}
 				break;
 			case 14:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Write Track (not yet implemented)\n", machine().describe_context());
-				//req_b_w(1);
-				//m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
+				if (!BIT(m_diskseq_status_out, 3) && is_disk_group_hdd(group))
+				{
+					req_b_w(0); // Flag ourselves as in-use
+					m_line_count = 0;
+					m_line_clock = 0;
+
+					m_diskseq_cyl_write_pending = true;
+					m_diskseq_command_stride = 1;
+
+					m_diskbuf_data_count = 0x4b00;
+					m_diskseq_use_hdd_pending = true;
+					m_hdd_command_timer->adjust(attotime::from_double((double)19200 / 1012000));
+				}
 				break;
 			default:
 				LOGMASKED(LOG_CTRLBUS, "%s: Unknown Disk Sequencer Card command.\n", machine().describe_context());
 				req_b_w(0); // Flag ourselves as in-use
-				m_diskseq_complete_clk->adjust(attotime::from_msec(1), 0);
+				m_diskseq_complete_clk->adjust(attotime::from_msec(1), 1);
 				break;
 			}
 		}
@@ -2259,22 +2381,58 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		break;
 
 	case 7: // Disk Data Buffer RAM
-		if (m_diskbuf_ram_addr == 0 || m_diskbuf_ram_addr >= 0x4a00)
-			LOGMASKED(LOG_CTRLBUS, "%s: Disc Data Buffer Card RAM write: %04x = %04x\n", machine().describe_context(), m_diskbuf_ram_addr, data);
+		LOGMASKED(LOG_DDB, "%s: Disc Data Buffer Card RAM write: %04x = %04x\n", machine().describe_context(), m_diskbuf_ram_addr, data);
 		m_diskbuf_ram[m_diskbuf_ram_addr++] = (uint8_t)data;
 		break;
 	case 8: // Brush Store Card color latches
+		m_bs_y_latch = (uint8_t)data;
 		if (m_ca0)
 		{
-			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Store Card color latches (VY): %04x\n\n", machine().describe_context(), data);
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Brush Store Card color latches (VY): %04x\n\n", machine().describe_context(), data);
 			m_bs_v_latch = (uint8_t)(data >> 8);
 		}
 		else
 		{
-			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Store Card color latches (UY): %04x\n", machine().describe_context(), data);
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Brush Store Card color latches (UY): %04x\n", machine().describe_context(), data);
 			m_bs_u_latch = (uint8_t)(data >> 8);
 		}
-		m_bs_y_latch = (uint8_t)data;
+		if (m_brush_addr_cmd == 4) // Framestore Write
+		{
+			const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
+			const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
+
+			uint32_t pix_idx = y * 800 + x;
+			const uint8_t chr = m_ca0 ? m_bs_v_latch : m_bs_u_latch;
+			if (!BIT(m_brush_addr_func, 5))
+			{
+				if (BIT(m_brush_addr_func, 7))
+					m_framestore_lum[0][pix_idx] = m_bs_y_latch;
+				if (BIT(m_brush_addr_func, 8))
+					m_framestore_chr[0][pix_idx] = chr;
+				if (BIT(m_brush_addr_func, 9))
+					m_framestore_ext[0][pix_idx] = m_bs_y_latch;
+			}
+			if (!BIT(m_brush_addr_func, 6))
+			{
+				if (BIT(m_brush_addr_func, 7))
+					m_framestore_lum[1][pix_idx] = m_bs_y_latch;
+				if (BIT(m_brush_addr_func, 8))
+					m_framestore_chr[1][pix_idx] = chr;
+				if (BIT(m_brush_addr_func, 9))
+					m_framestore_ext[1][pix_idx] = m_bs_y_latch;
+			}
+
+			m_bxlen_counter++;
+			if (m_bxlen_counter == 0x1000)
+			{
+				m_bxlen_counter = m_bxlen;
+				m_bylen_counter++;
+				if (m_bylen_counter == 0x1000)
+				{
+					cmd_done(0);
+				}
+			}
+		}
 		m_ca0 = 1 - m_ca0;
 		break;
 
@@ -2304,11 +2462,11 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			m_bylen_counter = data & 0xfff;
 			break;
 		case 6:
-			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: PLUM = %03x\n", machine().describe_context(), data & 0xff);
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Brush Address Card, Register Write: PLUM = %03x\n", machine().describe_context(), data & 0xff);
 			m_brush_press_lum = data & 0xff;
 			break;
 		case 7:
-			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: PCHR = %03x\n", machine().describe_context(), data & 0xff);
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Brush Address Card, Register Write: PCHR = %03x\n", machine().describe_context(), data & 0xff);
 			m_brush_press_chr = data & 0xff;
 			break;
 		default:
@@ -2367,16 +2525,24 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 TIMER_CALLBACK_MEMBER(dpb7000_state::req_a_w)
 {
-	if (param)
+	//if (machine().input().code_pressed(KEYCODE_LALT))
 	{
-		m_sys_ctrl |= SYSCTRL_REQ_A_IN;
+		if (param)
+		{
+			m_sys_ctrl |= SYSCTRL_REQ_A_IN;
+		}
+		else
+		{
+			m_sys_ctrl &= ~SYSCTRL_REQ_A_IN;
+		}
+
+		update_req_irqs();
 	}
-	else
+	/*else
 	{
 		m_sys_ctrl &= ~SYSCTRL_REQ_A_IN;
-	}
-
-	update_req_irqs();
+		update_req_irqs();
+	}*/
 }
 
 TIMER_CALLBACK_MEMBER(dpb7000_state::req_b_w)
@@ -2410,15 +2576,16 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 	{
 		if (m_diskseq_cyl_write_pending)
 		{
+			unsigned char sector_buffer[256];
 			if (m_diskseq_command_stride != 1)
 			{
-				unsigned char sector_buffer[256];
 				for (int sector = 0; sector < 19200 / 256; sector++)
 				{
+					m_hdd_file->read(image_lba, sector_buffer);
 					memcpy(sector_buffer, m_diskbuf_ram + sector * 256, 256);
-					for (int clear_idx = 0; clear_idx < 256; clear_idx += 2)
+					for (int stride_idx = 0; stride_idx < 256; stride_idx += 2)
 					{
-						sector_buffer[clear_idx] = 0;
+						sector_buffer[stride_idx] = m_diskbuf_ram[sector * 256 + stride_idx];
 					}
 					LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x, Stride 2 (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
 					m_hdd_file->write(image_lba, sector_buffer);
@@ -2430,7 +2597,19 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 				for (int sector = 0; sector < 19200 / 256; sector++)
 				{
 					LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
-					m_hdd_file->write(image_lba, m_diskbuf_ram + sector * 256);
+					if (m_diskseq_cmd == 12 || m_diskseq_cmd == 14)
+					{
+						for (int i = 0; i < 256; i += 2)
+						{
+							sector_buffer[i + 0] = process_byte_to_disc();
+							sector_buffer[i + 1] = process_byte_to_disc();
+						}
+						m_hdd_file->write(image_lba, sector_buffer);
+					}
+					else
+					{
+						m_hdd_file->write(image_lba, m_diskbuf_ram + sector * 256);
+					}
 					image_lba++;
 				}
 			}
@@ -2568,14 +2747,43 @@ void dpb7000_state::process_sample()
 	const uint16_t x = (m_bxlen_counter - m_bxlen);
 	const uint16_t y = (m_bylen_counter - m_bylen);
 	//printf("Processing sample %d,%d (%04x:%04x, %04x:%04x) LC:%d\n", x, y, m_bxlen_counter, m_bxlen, m_bylen_counter, m_bylen, m_line_count); fflush(stdout);
-	if ((m_brush_addr_func & 0x1e) == (2 << 1))
+	switch (m_brush_addr_cmd)
 	{
-		if (BIT(m_brush_addr_func, 7))
-			m_brushstore_lum[y * 256 + x] = m_incoming_lum;
-		if (BIT(m_brush_addr_func, 8))
-			m_brushstore_chr[y * 256 + x] = m_incoming_chr;
-		if (BIT(m_brush_addr_func, 9))
-			m_brushstore_ext[y * 256 + x] = m_incoming_lum;
+		case 2: // Brush Store Write
+			if (BIT(m_brush_addr_func, 7))
+				m_brushstore_lum[y * 256 + x] = m_incoming_lum;
+			if (BIT(m_brush_addr_func, 8))
+				m_brushstore_chr[y * 256 + x] = m_incoming_chr;
+			if (BIT(m_brush_addr_func, 9))
+				m_brushstore_ext[y * 256 + x] = m_incoming_lum;
+			break;
+
+		case 4: // Framestore Write
+		{
+			const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
+			const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
+
+			uint32_t pix_idx = y * 800 + x;
+			if (!BIT(m_brush_addr_func, 5))
+			{
+				if (BIT(m_brush_addr_func, 7))
+					m_framestore_lum[0][pix_idx] = m_incoming_lum;
+				if (BIT(m_brush_addr_func, 8))
+					m_framestore_chr[0][pix_idx] = m_incoming_chr;
+				if (BIT(m_brush_addr_func, 9))
+					m_framestore_ext[0][pix_idx] = m_incoming_lum;
+			}
+			if (!BIT(m_brush_addr_func, 6))
+			{
+				if (BIT(m_brush_addr_func, 7))
+					m_framestore_lum[1][pix_idx] = m_incoming_lum;
+				if (BIT(m_brush_addr_func, 8))
+					m_framestore_chr[1][pix_idx] = m_incoming_chr;
+				if (BIT(m_brush_addr_func, 9))
+					m_framestore_ext[1][pix_idx] = m_incoming_lum;
+			}
+			break;
+		}
 	}
 
 	m_bxlen_counter++;
@@ -2586,8 +2794,69 @@ void dpb7000_state::process_sample()
 		if (m_bylen_counter == 0x1000)
 		{
 			m_diskseq_cyl_read_pending = false;
+			cmd_done(0);
 		}
 	}
+}
+
+uint8_t dpb7000_state::process_byte_to_disc()
+{
+	if (!m_diskseq_cyl_write_pending)
+		return 0;
+
+	uint8_t lum = 0;
+	uint8_t chr = 0;
+	switch (m_brush_addr_cmd)
+	{
+		case 3: // Framestore Read
+		{
+			const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
+			const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
+
+			uint32_t pix_idx = y * 800 + x;
+			if (!BIT(m_brush_addr_func, 5))
+			{
+				if (BIT(m_brush_addr_func, 9))
+					lum = m_framestore_ext[0][pix_idx];
+				if (BIT(m_brush_addr_func, 8))
+					chr = m_framestore_chr[0][pix_idx];
+				if (BIT(m_brush_addr_func, 7))
+					lum = m_framestore_lum[0][pix_idx];
+			}
+			if (!BIT(m_brush_addr_func, 6))
+			{
+				if (BIT(m_brush_addr_func, 9))
+					lum = m_framestore_ext[1][pix_idx];
+				if (BIT(m_brush_addr_func, 8))
+					chr = m_framestore_chr[1][pix_idx];
+				if (BIT(m_brush_addr_func, 7))
+					lum = m_framestore_lum[1][pix_idx];
+			}
+			break;
+		}
+	}
+
+	m_bxlen_counter++;
+	if (m_bxlen_counter == 0x1000)
+	{
+		m_bxlen_counter = m_bxlen;
+		m_bylen_counter++;
+		if (m_bylen_counter == 0x1000)
+		{
+			m_diskseq_cyl_write_pending = false;
+			cmd_done(0);
+		}
+	}
+
+	const uint8_t ret = m_buffer_lum ? lum : chr;
+
+	m_buffer_lum = !m_buffer_lum;
+	m_line_length++;
+	if (m_line_length == 0x300)
+	{
+		advance_line_count();
+	}
+	return ret;
 }
 
 void dpb7000_state::process_byte_from_disc(uint8_t data_byte)
@@ -2791,7 +3060,7 @@ void dpb7000_state::seek_fdd_to_cylinder()
 				m_floppy->stp_w(1);
 			}
 		}
-		LOGMASKED(LOG_CTRLBUS, "%s: New floppy cylinder: %04x\n", machine().describe_context(), floppy_cyl);
+		LOGMASKED(LOG_FDD, "%s: New floppy cylinder: %04x\n", machine().describe_context(), floppy_cyl);
 	}
 }
 
@@ -2842,9 +3111,14 @@ void dpb7000_state::fddcpu_p1_w(uint8_t data)
 
 	// C5 D READY
 	if (BIT(m_fdd_port1, 7))
+	{
 		m_diskseq_status_out &= ~(1 << 3);
+		m_diskseq_status_out |= 0x04;
+	}
 	else
+	{
 		m_diskseq_status_out |= (1 << 3);
+	}
 }
 
 void dpb7000_state::fddcpu_p2_w(uint8_t data)
@@ -3238,53 +3512,74 @@ uint8_t dpb7000_state::tablet_rdl_r()
 
 uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const bool blank_1_q = true;
-	const bool blank_2_q = true;
 	const uint16_t upper_flag_addr = (uint16_t)((m_output_cpflags & 3) << 8);
 
 	int32_t y_addr[2] = { m_rvscr[0], m_rvscr[1] };
-	for (int32_t y = 0; y < 625; y++, y_addr[0]++, y_addr[1]++)
+	int32_t dest_y = 0;
+	bool seen_rvr = false;
+	bool started_scanout = false;
+	for (int32_t y = 0; y < 625; y++)
 	{
 		const uint8_t vlines = m_output_vlines[y + 0x18f] & 0x0f;
 
 		const uint8_t hlines = m_output_hlines[0xa0 + 70] & 0x0f;
 		const uint16_t flag_addr = (hlines & 0x0f) | ((vlines & 0x0f) << 4);
 		const uint8_t hflags = m_output_hflags[flag_addr | upper_flag_addr] & 0x0f;
-
 		const bool palette = BIT(hflags, 3);
-		const bool use_store1_matte = palette && (!blank_1_q || m_select_matte[0]);
-		const bool use_store2_matte = palette && (!blank_2_q || m_select_matte[1]);
-		const bool use_ext_store1_matte = !blank_1_q || !BIT(m_ext_store_flags, 0);
-		const bool use_ext_store2_matte = !blank_2_q || !BIT(m_ext_store_flags, 1);
+
+		if (!BIT(hflags, 1))
+		{
+			seen_rvr = true;
+			if (palette)
+			{
+				y_addr[0] = 0;
+				y_addr[1] = 0;
+			}
+			else
+			{
+				y_addr[0] = m_rvscr[0];
+				y_addr[1] = m_rvscr[1];
+			}
+		}
+		else if (!started_scanout && seen_rvr)
+		{
+			started_scanout = true;
+			dest_y = 0;
+		}
+
+		const bool blank_1 = BIT(~m_storeaddr_pal_blank[((y_addr[0] << 3) & 0x1800) | ((y_addr[1] << 2) & 0x3f0)], 0);
+		const bool blank_2 = BIT(~m_storeaddr_pal_blank[((y_addr[1] << 3) & 0x1800) | ((y_addr[2] << 2) & 0x3f0)], 0);
+		const bool use_store1_matte = !palette && (blank_1 || m_select_matte[0]);
+		const bool use_store2_matte = !palette && (blank_2 || m_select_matte[1]);
+		const bool use_ext_store1_matte = blank_1 || BIT(m_ext_store_flags, 0);
+		const bool use_ext_store2_matte = blank_2 || BIT(m_ext_store_flags, 1);
 		const bool invert_a = palette ? BIT(~m_ext_store_flags, 3) : BIT(m_ext_store_flags, 2);
 		const bool invert_b = !invert_a;
-		//const bool invert_ext = BIT(m_ext_store_flags, 4);
+		const uint8_t ext_src_invert = BIT(m_ext_store_flags, 4) ? 0xff : 0x00;
 		const uint8_t ext_a_mask = (invert_a ? 0xff : 0x00);
 		const uint8_t ext_b_mask = (invert_b ? 0xff : 0x00);
 
-		if (palette && !BIT(hflags, 1))
+		uint32_t *d = &bitmap.pix(dest_y);
+		int32_t x_addr[2] = { m_rhscr[0] & ~1, m_rhscr[1] & ~1 };
+		for (int32_t x = 0; x < 800; x++, x_addr[0] = (x_addr[0] + 1) % 800, x_addr[1] = (x_addr[1] + 1) % 800)
 		{
-			y_addr[0] = 0;
-			y_addr[1] = 0;
-		}
+			const int32_t read_x1 = x_addr[0];
+			const int32_t read_x2 = x_addr[1];
+			const int32_t read_y1 = y_addr[0];
+			const int32_t read_y2 = y_addr[1];
+			const uint8_t uv_sel1 = (x_addr[0] & 1);
+			const uint8_t uv_sel2 = (x_addr[1] & 1);
 
-		uint32_t *d = &bitmap.pix(y);
-		for (int32_t x = 0; x < 800; x++)
-		{
-			const uint8_t uv_sel = (x & 1);
-
-			int32_t read_y1 = (y_addr[0]);
-			int32_t read_y2 = (y_addr[1]);
-			const uint32_t pix_idx1 = (read_y1 * 800) + x;
-			const uint32_t pix_idx2 = (read_y2 * 800) + x;
+			const uint32_t pix_idx1 = (read_y1 * 800) + read_x1;
+			const uint32_t pix_idx2 = (read_y2 * 800) + read_x2;
 
 			const uint16_t lum1 = use_store1_matte ? m_matte_y[0] : m_framestore_lum[0][pix_idx1];
-			const uint16_t chr1 = use_store1_matte ? (uv_sel ? m_matte_v[0] : m_matte_u[0]) : m_framestore_chr[0][pix_idx1];
-			const uint16_t ext1 = use_ext_store1_matte ? m_matte_ext[0] : m_framestore_ext[0][pix_idx1];
+			const uint16_t chr1 = use_store1_matte ? (uv_sel1 ? m_matte_v[0] : m_matte_u[0]) : m_framestore_chr[0][pix_idx1];
+			const uint16_t ext1 = use_ext_store1_matte ? m_matte_ext[0] : (m_framestore_ext[0][pix_idx1] ^ ext_src_invert);
 
 			const uint16_t lum2 = use_store2_matte ? m_matte_y[1] : m_framestore_lum[1][pix_idx2];
-			const uint16_t chr2 = use_store2_matte ? (uv_sel ? m_matte_v[1] : m_matte_u[1]) : m_framestore_chr[1][pix_idx2];
-			const uint16_t ext2 = use_ext_store2_matte ? m_matte_ext[1] : m_framestore_ext[1][pix_idx2];
+			const uint16_t chr2 = use_store2_matte ? (uv_sel2 ? m_matte_v[1] : m_matte_u[1]) : m_framestore_chr[1][pix_idx2];
+			const uint16_t ext2 = use_ext_store2_matte ? m_matte_ext[1] : (m_framestore_ext[1][pix_idx2] ^ ext_src_invert);
 
 			const uint16_t ext_product = (ext1 * ext2) + 0x0080;
 			const uint8_t ext_a = (uint8_t)(ext_product >> 8) ^ ext_a_mask;
@@ -3298,17 +3593,23 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 			const uint8_t lum_sum = (uint8_t)(lum1_product + lum2_product);
 			const uint8_t chr_sum = (uint8_t)(chr1_product + chr2_product);
 
-			//uint32_t flag_color = 0;
-			//if (!BIT(hflags, 0))
-			//	flag_color |= 0x0000ff00;
-			//if (!BIT(hflags, 1))
-			//	flag_color |= 0x00ff0000;
-			//if (flag_color)
-			//	*d++ = 0xff000000 | flag_color;
-			//else
-				*d++ = (lum_sum << 8) | chr_sum;
+			*d++ = 0xff000000 | (lum_sum << 8) | chr_sum;
+		}
+
+		if (BIT(hflags, 1))
+		{
+			dest_y++;
+
+			y_addr[0]++;
+			if (y_addr[0] == 4096)
+				y_addr[0] = 0;
+
+			y_addr[1]++;
+			if (y_addr[1] == 4096)
+				y_addr[1] = 0;
 		}
 	}
+	//printf("\n");
 
 	const uint32_t cursor_rgb = m_yuv_lut[(m_cursor_u << 16) | (m_cursor_v << 8) | m_cursor_y];
 	uint16_t cursor_origin_y_counter = m_cursor_origin_y;
@@ -3325,14 +3626,6 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 		uint32_t *d = &bitmap.pix(dst_y);
 		for (int32_t x = 0; x < 800; x += 2)
 		{
-			//const uint8_t hlines = m_output_hlines[h & 0x3ff] & 0x0f;
-			//const uint16_t flag_addr = (hlines & 0x0f) | ((vlines & 0x0f) << 4);
-			//const uint8_t hflags = m_output_hflags[flag_addr | upper_flag_addr] & 0x0f;
-			//const uint8_t vflags = m_output_vflags[flag_addr];
-
-			//uint8_t r = (vflags & 0xf0) | (vflags >> 4);
-			//uint8_t b = (vflags & 0x0f) | (vflags << 4);
-			//uint8_t g = (hflags << 4) | hflags;
 			const uint32_t u = (d[x] << 16) & 0xff0000;
 			const uint32_t v = (d[x | 1] << 8) & 0x00ff00;
 			const uint32_t y0 = (d[x] >> 8) & 0x0000ff;
@@ -3426,36 +3719,51 @@ uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 
 	{
 		const uint8_t *src_lum = &m_framestore_lum[StoreNum][py * 800];
 		const uint8_t *src_chr = &m_framestore_chr[StoreNum][py * 800];
-		//const uint8_t *src_ext = &m_framestore_ext[StoreNum][py * 800];
 		uint32_t *dst = &bitmap.pix(py);
 		for (int px = 0; px < 800; px += 2)
 		{
-			//const uint8_t y = *src_ext++;
-			//*dst++ = 0xff000000 | (y << 16) | (y << 8) | y;
 			const uint32_t u = *src_chr++ << 16;
 			const uint32_t v = *src_chr++ << 8;
 			*dst++ = m_yuv_lut[u | v | *src_lum++];
 			*dst++ = m_yuv_lut[u | v | *src_lum++];
 		}
 	}
+	return 0;
+}
 
-	if (StoreNum == 0)
+uint32_t dpb7000_state::ext_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int py = 0; py < 768; py++)
 	{
-		for (int py = 512; py < 768; py++)
+		const uint8_t *src_ext1 = &m_framestore_ext[0][py * 800];
+		const uint8_t *src_ext2 = &m_framestore_ext[1][py * 800];
+		uint32_t *dst = &bitmap.pix(py);
+		for (int px = 0; px < 800; px++, src_ext1++, src_ext2++)
 		{
-			const uint8_t *src_lum = &m_brushstore_lum[(py - 512) * 256];
-			const uint8_t *src_chr = &m_brushstore_chr[(py - 512) * 256];
-			//const uint8_t *src_ext = &m_brushstore_ext[(py - 512) * 256];
-			uint32_t *dst = &bitmap.pix(py);
-			for (int px = 0; px < 256; px += 2)
-			{
-				//const uint8_t y = *src_ext++;
-				//*dst++ = 0xff000000 | (y << 16) | (y << 8) | y;
-				const uint32_t u = *src_chr++ << 16;
-				const uint32_t v = *src_chr++ << 8;
-				*dst++ = m_yuv_lut[u | v | *src_lum++];
-				*dst++ = m_yuv_lut[u | v | *src_lum++];
-			}
+			const uint16_t h = (uint8_t)px >> 4;
+			const uint16_t pal_blank_addr = ((h << 12) & 0xe000) | ((py << 3) & 0x1800) | (BIT(h, 0) << 10) | ((py << 2) & 0x3f0) | ((h >> 4) & 0xf);
+			const uint8_t blank_val = m_storeaddr_pal_blank[pal_blank_addr];
+			const uint32_t blank_color = ((blank_val & 3) != 3) ? 0x000000ff : 0;
+			*dst++ = 0xff000000 | (*src_ext1 << 16) | (*src_ext2 << 8) | blank_color;
+		}
+	}
+	return 0;
+}
+
+uint32_t dpb7000_state::brush_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < 256; y++)
+	{
+		const uint8_t *src_lum = &m_brushstore_lum[y * 256];
+		const uint8_t *src_chr = &m_brushstore_chr[y * 256];
+		const uint8_t *src_ext = &m_brushstore_ext[y * 256];
+		uint32_t *dst_lc = &bitmap.pix(y);
+		uint32_t *dst_ext = &bitmap.pix(y + 256);
+		for (int x = 0; x < 256; x++)
+		{
+			dst_lc[x] = (0xff << 24) | (src_lum[x] << 16) | (src_lum[x] << 8) | src_lum[x];
+			dst_lc[x + 256] = (0xff << 24) | (src_chr[x] << 16) | (src_chr[x] << 8) | src_chr[x];
+			dst_ext[x] = (0xff << 24) | (src_ext[x] << 16) | (src_ext[x] << 8) | src_ext[x];
 		}
 	}
 	return 0;
@@ -3478,6 +3786,7 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_acia[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
 	m_acia[0]->rts_handler().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
 	m_acia[0]->irq_handler().set_inputline(m_maincpu, 6);
+	m_acia[0]->set_logging(true);
 
 	ACIA6850(config, m_acia[1], 0);
 	m_acia[1]->txd_handler().set(m_tds_duart, FUNC(scn2681_device::rx_a_w));
@@ -3507,28 +3816,40 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_brg->ft_handler().append(m_acia[2], FUNC(acia6850_device::write_rxc));
 
 	screen_device &combined_screen(SCREEN(config, "combined_screen", SCREEN_TYPE_RASTER));
-	combined_screen.set_refresh_hz(60);
+	combined_screen.set_refresh_hz(50);
 	combined_screen.set_size(800, 625);
-	combined_screen.set_visarea(0, 799, 41, 616);
+	combined_screen.set_visarea(0, 709, 0, 574);
 	combined_screen.set_screen_update(FUNC(dpb7000_state::combined_screen_update));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(50);
 	screen.set_size(696, 276);
 	screen.set_visarea(56, 695, 36, 275);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	screen_device &store_screen1(SCREEN(config, "store_screen1", SCREEN_TYPE_RASTER));
-	store_screen1.set_refresh_hz(60);
+	store_screen1.set_refresh_hz(50);
 	store_screen1.set_size(800, 768);
 	store_screen1.set_visarea(0, 799, 0, 767);
 	store_screen1.set_screen_update(FUNC(dpb7000_state::store_screen_update<0>));
 
 	screen_device &store_screen2(SCREEN(config, "store_screen2", SCREEN_TYPE_RASTER));
-	store_screen2.set_refresh_hz(60);
+	store_screen2.set_refresh_hz(50);
 	store_screen2.set_size(800, 768);
 	store_screen2.set_visarea(0, 799, 0, 767);
 	store_screen2.set_screen_update(FUNC(dpb7000_state::store_screen_update<1>));
+
+	screen_device &ext_screen(SCREEN(config, "ext_screen", SCREEN_TYPE_RASTER));
+	ext_screen.set_refresh_hz(50);
+	ext_screen.set_size(800, 768);
+	ext_screen.set_visarea(0, 799, 0, 767);
+	ext_screen.set_screen_update(FUNC(dpb7000_state::ext_screen_update));
+
+	screen_device &brush_screen(SCREEN(config, "brush_screen", SCREEN_TYPE_RASTER));
+	brush_screen.set_refresh_hz(50);
+	brush_screen.set_size(512, 512);
+	brush_screen.set_visarea(0, 511, 0, 511);
+	brush_screen.set_screen_update(FUNC(dpb7000_state::brush_screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -3638,6 +3959,8 @@ ROM_START( dpb7000 )
 	ROMX_LOAD("01993c-kca-f705.bin", 0x60000, 0x10000, CRC(00bfbd62) SHA1(17a5f2cbc91cabf1113c7d6e26124b67e5ece848), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("01993c-jaa-3cc9.bin", 0x80001, 0x10000, CRC(9e477845) SHA1(b89e5d2b69a6043452a56685a1227df86c83a328), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("01993c-jca-0b41.bin", 0x80000, 0x10000, CRC(58e8f302) SHA1(b37953046d81027b069b7a7a1834cd8c94fd9dca), ROM_BIOS(1) | ROM_SKIP(1))
+	ROM_SYSTEM_BIOS( 2, "diags", "Diagnostics" )
+	ROMX_LOAD("cat7000_diagnostic_rom_merged.bin", 0x00000, 0x20000, CRC(666767d6) SHA1(1dad9747321302bca7e03728c63034070f9ebf13), ROM_BIOS(2) )
 
 	ROM_REGION(0x1000, "vduchar", 0)
 	ROM_LOAD("bw14char.ic1",  0x0000, 0x1000, BAD_DUMP CRC(f9dd68b5) SHA1(50132b759a6d84c22c387c39c0f57535cd380411))
@@ -3680,6 +4003,9 @@ ROM_START( dpb7000 )
 
 	ROM_REGION(0x2000, "tablet", 0)
 	ROM_LOAD("nmc27c64q.bin", 0x0000, 0x2000, CRC(a453928f) SHA1(f4a25298fb446f0046c6f9f3ce70e7169dcebd01))
+
+	ROM_REGION(0x800, "brushaddr_pal", 0)
+	ROM_LOAD("pb-029-17419a-bea.bin", 0x000, 0x800, CRC(12345678) SHA1(1234567812345678123456781234567812345678))
 
 	ROM_REGION(0x200, "brushproc_prom", 0)
 	ROM_LOAD("pb-02c-17593-baa.bin", 0x000, 0x200, CRC(6e31339f) SHA1(72a92d97412be19c884c3b854f7d9831435391a5))
