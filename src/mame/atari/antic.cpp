@@ -454,6 +454,9 @@ void antic_device::device_reset()
 
 	memset(m_cclock, 0, sizeof(m_cclock));
 	memset(m_pmbits, 0, sizeof(m_pmbits));
+
+	// TODO: we shouldn't need this variable but rather rely on screen().vpos()
+	m_scanline = 0;
 }
 
 
