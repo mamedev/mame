@@ -208,11 +208,12 @@ license:CC0
 	<!-- has eeprom -->
 	<software name="em18" supported="no">
 		<description>evio Challenge!</description>
-		<year>2003</year>
+		<year>2004</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="エヴィオチャレンジ!"/>
 		<info name="serial" value="eM18"/>
 		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc08_evio"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="evio_em18.bin" size="0x100000" crc="725a5720" sha1="062316f860cb6ca3c29d9c1e63ea4973b1eebcd8"/>
 			</dataarea>
