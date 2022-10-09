@@ -101,7 +101,7 @@ private:
 		uint8_t   gtia1c;     /* d01c nothing */
 		uint8_t   gtia1d;     /* d01d nothing */
 		uint8_t   gtia1e;     /* d01e nothing */
-		uint8_t   cons;       /* d01f console keys */
+		uint8_t   consol;     /* d01f console keys */
 	};
 
 	/* writing registers */
@@ -138,7 +138,7 @@ private:
 		uint8_t   vdelay;     /* d01c delay until vertical retrace */
 		uint8_t   gractl;     /* d01d graphics control */
 		uint8_t   hitclr;     /* d01e clear collisions */
-		uint8_t   cons;       /* d01f write console (speaker) */
+		uint8_t   consol;     /* d01f write console (speaker) */
 	};
 
 	/* helpers */

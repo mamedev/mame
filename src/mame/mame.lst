@@ -3167,6 +3167,10 @@ mwskinst                        // (c) 2000 Midway
 @source:sinclair/atm.cpp
 atm                             //
 atmtb2                          //
+atmtb2plus                      //
+
+@source:sinclair/pentevo.cpp
+pentevo                         //
 
 @source:acorn/atom.cpp
 atom                            // 1979 Acorn Atom
@@ -14598,10 +14602,11 @@ gal3                            // (c) 1992 (Arcade TV Game List - P.73, Right, 
 battles                         // bootleg
 battles2                        // bootleg
 bosco                           // (c) 1981
+bosco1                          // (c) 1981
+bosco1o                         // (c) 1981
+bosco3                          // (c) 1981
 boscomd                         // (c) 1981 Midway
 boscomdo                        // (c) 1981 Midway
-boscoo                          // (c) 1981
-boscoo2                         // (c) 1981
 digdug                          // (c) 1982
 digdug1                         // (c) 1982
 digdugat                        // 136007   (c) 1982 Atari
@@ -23649,6 +23654,7 @@ pbst30a                         // (c) 1993 Merit
 pitboss2                        // (c) 1988 Merit
 pitbossm                        // (c) 1994 Merit
 pitbossma                       // (c) 1994 Merit
+pitbossmb                       // (c) 1994 Merit
 pitbosss                        // (c) 1990 Merit
 pitbosssa                       // (c) 1990 Merit
 pitbosssc                       // (c) 1992 Merit
@@ -33916,6 +33922,7 @@ nova2001h                       // hack?
 nova2001u                       // UPL-83005 (c) [1983] + Universal license
 pkunwar                         // UPL-????? (c) 1985 (Arcade Game TV List - P.98, Left, 22 from top)
 pkunwarj                        // UPL-????? (c) 1985 (Arcade Game TV List - P.98, Left, 22 from top)
+pkunwarja                       //
 raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 raiders5ta                      //
@@ -38712,6 +38719,7 @@ keroppi                         // (c) 1993 Sammy
 keroppij                        // (c) 1993 Sammy
 krzybowl                        // (c) 1994 American Sammy
 madshark                        // (c) 1993 Allumer
+madsharkbl                      // bootleg
 magspeed                        // (c) 1994 Allumer
 metafox                         // UP   (c) 1989 + Jordan, Romstar or Taito license (DSW)
 msgundam                        // (c) 1993 Banpresto
@@ -43707,6 +43715,7 @@ strxt_it                        //
 strxt_it_101                    //
 strxt_sp                        //
 strxt_uk                        //
+swtril30                        //
 swtril41                        //
 swtril43                        //
 t3new                           //

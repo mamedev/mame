@@ -54,6 +54,8 @@ protected:
 	virtual void video_start() override;
 
 private:
+	static constexpr XTAL MASTER_CLOCK = 12_MHz_XTAL;
+
 	uint32_t screen_update_armchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_prg(address_map &map);
@@ -87,8 +89,6 @@ private:
 	uint8_t m_adpcm_byte = 0;
 	uint8_t m_msm5205_vclk_toggle = 0;
 	uint16_t m_paletteram[0x100] = { };
-
-	static constexpr XTAL MASTER_CLOCK = 12_MHz_XTAL;
 };
 
 
@@ -196,7 +196,7 @@ void armchamp_state::io1_w(uint8_t data)
 	// .xxx x... - Tile ROM bank
 	// x... .... - Speech ROM banking enable
 
-	m_rombank->set_entry(((data & 0x80) >> 5) | (data & 3));
+	m_rombank->set_entry(bitswap<3>(data, 7, 1, 0));
 
 	if ((m_io1 ^ data) & 0x78)
 	{
@@ -475,5 +475,5 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1988, armchamp, 0, armchamp, armchamp, armchamp_state, empty_init, ROT90, "Jaleco / Yuvo", "Arm Champs (Japan)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armchamp, 0, armchamp, armchamp, armchamp_state, empty_init, ROT90, "Jaleco / Yuvo", "Arm Champs (Japan)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 // An export version also exists

@@ -756,6 +756,7 @@ siemens/pg685.cpp
 sinclair/atm.cpp
 sinclair/elwro800.cpp
 sinclair/pentagon.cpp
+sinclair/pentevo.cpp
 sinclair/ql.cpp
 sinclair/scorpion.cpp
 sinclair/spec128.cpp

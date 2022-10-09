@@ -116,11 +116,11 @@ void ripple_counter_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  rom_bank_updated - called when the ROM bank
-//  is changed
+//  rom_bank_post_change - called after the ROM
+//  bank is changed
 //-------------------------------------------------
 
-void ripple_counter_device::rom_bank_updated()
+void ripple_counter_device::rom_bank_post_change()
 {
 	m_rom_out_cb(read_byte(m_count));
 }

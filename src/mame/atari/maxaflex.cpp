@@ -19,6 +19,7 @@
 #include "cpu/m6805/m68705.h"
 
 #include "machine/6821pia.h"
+#include "machine/input_merger.h"
 #include "machine/rescap.h"
 #include "machine/timer.h"
 
@@ -331,6 +332,8 @@ void maxaflex_state::maxaflex(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &maxaflex_state::a600xl_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(maxaflex_state::mf_interrupt), "screen", 0, 1);
 
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", m6502_device::IRQ_LINE);
+
 	M68705P3(config, m_mcu, 3579545);
 	m_mcu->porta_r().set(FUNC(maxaflex_state::mcu_porta_r));
 	m_mcu->porta_w().set(FUNC(maxaflex_state::mcu_porta_w));
@@ -349,6 +352,8 @@ void maxaflex_state::maxaflex(machine_config &config)
 	pia.readpb_handler().set(FUNC(maxaflex_state::pia_pb_r));
 	pia.writepb_handler().set(FUNC(maxaflex_state::pia_pb_w));
 	pia.cb2_handler().set(FUNC(maxaflex_state::pia_cb2_w));
+	pia.irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	pia.irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -366,7 +371,7 @@ void maxaflex_state::maxaflex(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
-	m_pokey->set_interrupt_callback(FUNC(maxaflex_state::interrupt_cb));
+	m_pokey->irq_w().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_pokey->set_output_rc(RES_K(1), CAP_U(0.0), 5.0);
 	m_pokey->add_route(ALL_OUTPUTS, "mono", 1.0);
 

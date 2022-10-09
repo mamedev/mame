@@ -38,7 +38,8 @@ public:
 	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
 	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
 
-	uint8_t *m_ram_ptr = nullptr, *m_aux_ptr = nullptr, *m_char_ptr = nullptr;
+	u8 *m_ram_ptr = nullptr, *m_aux_ptr = nullptr, *m_char_ptr = nullptr;
+	u16 m_aux_mask = 0xffff;
 	int m_char_size = 0;
 
 	int m_sysconfig = 0;

@@ -44,6 +44,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
+#include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "atarifdc.h"
@@ -619,7 +620,7 @@ void a400_state::a800xl_mem(address_map &map)
 
 void a400_state::a130xe_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a130xe_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
@@ -2125,7 +2126,7 @@ void a400_state::a800xl_pia_pb_w(uint8_t data)
  *
  **************************************************************/
 
-// note: both screen setups are actually non-interlaced
+// note: both screen setups are actually non-interlaced, and always 240 lines
 void a400_state::config_ntsc_screen(machine_config &config)
 {
 	// 15.69975KHz x 59.9271 Hz
@@ -2136,7 +2137,7 @@ void a400_state::config_ntsc_screen(machine_config &config)
 void a400_state::config_pal_screen(machine_config &config)
 {
 	// 15.55655KHz x 49.86074 Hz, master clock rated at 14.18757 MHz
-	// TODO: must have bigger vertical overscan, confirm hsync
+	// TODO: confirm hsync
 	m_screen->set_raw(XTAL(3'546'800) * 4, 912, antic_device::MIN_X, antic_device::MAX_X, 312, antic_device::MIN_Y, antic_device::MAX_Y);
 	m_gtia->set_region(GTIA_PAL);
 }
@@ -2176,13 +2177,16 @@ void a400_state::atari_common_nodac(machine_config &config)
 	//m_pokey->oclk_w().set("sio", FUNC(a8sio_device::clock_out_w));
 	//m_pokey->sod_w().set("sio", FUNC(a8sio_device::data_out_w));
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a800_keyboard));
-	m_pokey->set_interrupt_callback(FUNC(a400_state::interrupt_cb));
+	m_pokey->irq_w().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void a400_state::atari_common(machine_config &config)
 {
 	atari_common_nodac(config);
+
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
+	m_pokey->irq_w().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
@@ -2203,6 +2207,8 @@ void a400_state::atari_common(machine_config &config)
 	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
 	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
 	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
+	m_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	a8sio_device &sio(A8SIO(config, "sio", nullptr));
 	//sio.clock_in().set("pokey", FUNC(pokey_device::bclk_w));
@@ -2400,7 +2406,6 @@ void a400_state::a5200(machine_config &config)
 	m_pokey->serin_r().set_constant(0);
 	m_pokey->serout_w().set_nop();
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a5200_keypads));
-	m_pokey->set_interrupt_callback(FUNC(a400_state::interrupt_cb));
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	ATARI_GTIA(config, m_gtia, 0);

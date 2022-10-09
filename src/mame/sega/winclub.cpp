@@ -6,13 +6,13 @@ Winner's Club - Mighty 8 Liner
 
 Many games in the series, only one dumped for now.
 
-Winner's Wheel - Magical Spot (2000)
+Winner's Wheel - Magical Spot (2005)
 https://www.youtube.com/watch?v=k3REoIx7m-I
 
 Hardware manufactured by Sammy
 
 main PCB (Sammy AM3AEE-02):
-2x big Sammy customs with no other markings (1 believed to be an SH* core)
+2x big Sammy customs with no other markings (1 believed to be an SH-4 core)
 1x L14.318 XTAL
 1x CY37256VP150 CPLD
 2x 5212325FBPB60 128Mb SDRAMs
@@ -88,7 +88,7 @@ INPUT_PORTS_END
 void winclub_state::winclub(machine_config &config)
 {
 	// basic machine hardware
-	sh3_device &maincpu(SH3LE(config, "maincpu", 14'318'000)); // TODO: SH* based custom, unknown type and clock
+	sh4_device &maincpu(SH4LE(config, "maincpu", 14'318'000)); // TODO: SH-4 based custom, unknown type and clock
 	maincpu.set_addrmap(AS_PROGRAM, &winclub_state::prg_map);
 	// maincpu.set_vblank_int("screen", FUNC(winclub_state::irq2_line_hold));
 
@@ -127,4 +127,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2005, wwmspot, 0, winclub, winclub, winclub_state, empty_init, ROT0, "Sega", "Winner's Wheel - Magical Spot", MACHINE_IS_SKELETON ) // year taken for instructions on cabinet (see YouTube video)
+GAME( 2005, wwmspot, 0, winclub, winclub, winclub_state, empty_init, ROT0, "Sega", "Winner's Wheel - Magical Spot", MACHINE_IS_SKELETON ) // year taken from instructions on cabinet (see YouTube video)

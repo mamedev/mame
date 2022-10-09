@@ -5,8 +5,8 @@
  * includes/tsconfig.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_TSCONF_H
-#define MAME_INCLUDES_TSCONF_H
+#ifndef MAME_SINCLAIR_TSCONF_H
+#define MAME_SINCLAIR_TSCONF_H
 
 #pragma once
 
@@ -214,4 +214,4 @@ private:
 
 INPUT_PORTS_EXTERN(tsconf);
 
-#endif // MAME_INCLUDES_TSCONF_H
+#endif // MAME_SINCLAIR_TSCONF_H

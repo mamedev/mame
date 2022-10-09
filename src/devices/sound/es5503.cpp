@@ -77,10 +77,11 @@ TIMER_CALLBACK_MEMBER(es5503_device::delayed_stream_update)
 }
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void es5503_device::rom_bank_updated()
+void es5503_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
