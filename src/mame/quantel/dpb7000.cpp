@@ -3786,7 +3786,6 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_acia[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
 	m_acia[0]->rts_handler().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
 	m_acia[0]->irq_handler().set_inputline(m_maincpu, 6);
-	m_acia[0]->set_logging(true);
 
 	ACIA6850(config, m_acia[1], 0);
 	m_acia[1]->txd_handler().set(m_tds_duart, FUNC(scn2681_device::rx_a_w));
