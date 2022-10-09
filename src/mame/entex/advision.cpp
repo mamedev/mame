@@ -63,6 +63,13 @@ public:
 		, m_joy(*this, "JOY")
 	{ }
 
+	void advision(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<i8048_device> m_maincpu;
 	required_device<cop411_cpu_device> m_soundcpu;
 	required_device<dac_1bit_device> m_dac;
@@ -72,9 +79,6 @@ public:
 	required_device<generic_slot_device> m_cart;
 	required_memory_bank m_ea_bank;
 	required_ioport m_joy;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
@@ -104,7 +108,6 @@ public:
 
 	int m_sound_cmd = 0;
 
-	void advision(machine_config &config);
 	void io_map(address_map &map);
 	void program_map(address_map &map);
 };
