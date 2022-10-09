@@ -133,7 +133,7 @@
 	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
 	for (int i = 0; i < width; i++)                             \
 	{                                                           \
-		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		uint16_t ch = RDVIDEO(space,i) << 3;                    \
 		if (ch & 0x400)                                         \
 		{                                                       \
 			ch = RDCHGEN(space,(ch & 0x3f8) + m_w.chbasl);  \
@@ -456,7 +456,10 @@ void antic_device::device_reset()
 	memset(m_pmbits, 0, sizeof(m_pmbits));
 
 	// TODO: we shouldn't need this variable but rather rely on screen().vpos()
-	m_scanline = 0;
+	m_scanline  = 0;
+
+	m_chand     = 0xff;
+	m_chxor     = 0x00;
 }
 
 
