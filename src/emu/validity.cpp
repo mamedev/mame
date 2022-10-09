@@ -17,6 +17,7 @@
 #include "video/rgbutil.h"
 
 #include "corestr.h"
+#include "path.h"
 #include "unicode.h"
 
 #include <cctype>
@@ -320,6 +321,34 @@ void validate_inlines()
 		resultu8 = count_leading_ones_32(t);
 		if (resultu8 != i)
 			osd_printf_error("Error testing count_leading_ones_32 %08x=%02x (expected %02x)\n", t, resultu8, i);
+	}
+
+	u32 expected32 = testu32a << 1 | testu32a >> 31;
+	for (int i = -33; i <= 33; i++)
+	{
+		u32 resultu32r = rotr_32(testu32a, i);
+		u32 resultu32l = rotl_32(testu32a, -i);
+
+		if (resultu32r != expected32)
+			osd_printf_error("Error testing rotr_32 %08x, %d=%08x (expected %08x)\n", u32(testu32a), i, resultu32r, expected32);
+		if (resultu32l != expected32)
+			osd_printf_error("Error testing rotl_32 %08x, %d=%08x (expected %08x)\n", u32(testu32a), -i, resultu32l, expected32);
+
+		expected32 = expected32 >> 1 | expected32 << 31;
+	}
+
+	u64 expected64 = testu64a << 1 | testu64a >> 63;
+	for (int i = -65; i <= 65; i++)
+	{
+		u64 resultu64r = rotr_64(testu64a, i);
+		u64 resultu64l = rotl_64(testu64a, -i);
+
+		if (resultu64r != expected64)
+			osd_printf_error("Error testing rotr_64 %016x, %d=%016x (expected %016x)\n", u64(testu64a), i, resultu64r, expected64);
+		if (resultu64l != expected64)
+			osd_printf_error("Error testing rotl_64 %016x, %d=%016x (expected %016x)\n", u64(testu64a), -i, resultu64l, expected64);
+
+		expected64 = expected64 >> 1 | expected64 << 63;
 	}
 }
 
@@ -2082,7 +2111,6 @@ void validity_checker::validate_roms(device_t &root)
 		u32 current_length = 0;
 		int items_since_region = 1;
 		int last_bios = 0, max_bios = 0;
-		int total_files = 0;
 		std::unordered_map<std::string, int> bios_names;
 		std::unordered_map<std::string, std::string> bios_descs;
 		char const *defbios = nullptr;
@@ -2153,7 +2181,6 @@ void validity_checker::validate_roms(device_t &root)
 			{
 				// track the last filename we found
 				last_name = romp->name;
-				total_files++;
 				max_bios = std::max<int>(max_bios, ROM_GETBIOSFLAGS(romp));
 
 				// validate the name

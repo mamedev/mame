@@ -4,7 +4,7 @@
 
     srcclean.cpp
 
-    Basic source code cleanear.
+    Basic source code cleaner.
 
 ****************************************************************************/
 

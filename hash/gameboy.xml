@@ -80,7 +80,7 @@ license:CC0
 			<dataarea name="rom" size="0x10000">
 				<rom name="dmg-u4j-0.u1" size="0x10000" crc="cafe0d2b" sha1="76643f3f3481f7e515a24482779870862dd8b373" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -1085,7 +1085,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="aretha (japan).bin" size="0x20000" crc="1db65649" sha1="eab8f13d110634f4ee750ac93e4f25d91a85000f" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -1108,7 +1108,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-a4j-0.u1" size="0x40000" crc="086e4fc5" sha1="5634a05ea8e93af3dd0e41823576bf6295f8df1f" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -1362,7 +1362,7 @@ license:CC0
 			<dataarea name="rom" size="0x10000">
 				<rom name="dmg-ayj-0.u1" size="0x10000" crc="da90f5fc" sha1="dad3ec1a054cbd092eedfdb1d742b811c105181a" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -2713,7 +2713,8 @@ license:CC0
 			<feature name="pcb" value="DMG-M-BFAN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
-			<feature name="slot" value="rom_mbc1col" />
+			<feature name="slot" value="rom_mbc1" />
+			<feature name="banklowbits" value="4" />
 			<dataarea name="rom" size="0x100000">
 				<rom name="dmg-abcj-0.u1" size="0x100000" crc="509a6b73" sha1="385f8fafa53a83f8f65e1e619fe124bbf7db4a98" />
 			</dataarea>
@@ -3762,7 +3763,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="cave noire (japan).bin" size="0x20000" crc="44256a2f" sha1="6acdf05aac8e3792a98a199cb6e90180e95230cd" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -3807,7 +3808,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="chachamaru boukenki 3 - abyss no tou (japan).bin" size="0x20000" crc="9dfd4bc0" sha1="9a92ccc5758506a7ad07d251bf6c401fe33ad215" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -4055,7 +4056,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="chiki chiki machine mou race (japan).bin" size="0x20000" crc="7e40044a" sha1="45963623bc09e0a132867e1a78173b2c747c3b6f" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -4791,7 +4792,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-hdj-0.u1" size="0x20000" crc="c8f80d90" sha1="79e724619d21ebb3cd5de5438535a7ee25009de0" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -5117,7 +5118,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-awdj-1.u1" size="0x40000" crc="5b289ab4" sha1="a6e24e442de0541c3f5ec4d28650256c5d25f751" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -5140,7 +5141,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-awdj-0.u1" size="0x40000" crc="3f0aafec" sha1="80ccbf87dcd4d4e76f1f6a7a94e00ec2857e530a" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -5427,7 +5428,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-adrj-0.u1" size="0x40000" crc="dd4e588f" sha1="f19734b2cb19de0be2d9e80297f567806ce4cad5" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -5446,7 +5447,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="doraemon no game boy de asobouyo deluxe 10 (japan).bin" size="0x40000" crc="b368e717" sha1="7ad70061c8afbbe0890e3d50accd40b2a8cb9790" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -5867,7 +5868,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dragon ball z - gokuu hishouden (japan).bin" size="0x40000" crc="38da46d7" sha1="6bf8f3400bf323edecc2152c4a86f6b0cae628fe" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -5885,7 +5886,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dragon slayer - nemuri no oukan (japan).bin" size="0x20000" crc="10dcbdc3" sha1="ef58063d896533398288a4f07245f23efa3aee4a" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -6351,7 +6352,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-f1a-1.u1" size="0x20000" crc="ab83bd70" sha1="0256082f482af57e0472f5713a432a22bfa4d2fc" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -6369,7 +6370,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="f-1 race (world).bin" size="0x20000" crc="7e4febdf" sha1="96490be847aeeded0b635f45b05683a6defdf2e8" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -6623,7 +6624,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="fastest lap (japan, usa).bin" size="0x20000" crc="59285f0a" sha1="f1abe89a52e4f06e0479277d8681feaa09fcff2f" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -6821,7 +6822,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="final fantasy adventure (usa).bin" size="0x40000" crc="18c78b3a" sha1="8b93c55ee2660c60cf86dd70058f96ace98782c8" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -6871,7 +6872,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-sae-0.u1" size="0x20000" crc="8046148f" sha1="901dfc83c72e172d35a376835807fc788444a9bb" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -7875,7 +7876,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-aktj-0.u1" size="0x40000" crc="28e507b0" sha1="fa52c8f0bb31e25be829c7d4f52a7f4db1d5ef5b" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -7933,7 +7934,8 @@ license:CC0
 			<feature name="pcb" value="DMG-M-BFAN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
-			<feature name="slot" value="rom_mbc1col" />
+			<feature name="slot" value="rom_mbc1" />
+			<feature name="banklowbits" value="4" />
 			<dataarea name="rom" size="0x100000">
 				<rom name="dmg-ag3j-0.u1" size="0x100000" crc="b2eedd36" sha1="a9f953e2a3680078e51cb42fac44edf81991737b" />
 			</dataarea>
@@ -8295,7 +8297,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-goa-0.u1" size="0x20000" crc="6ed10383" sha1="2acee1a14ba611e73b0b7d6bce170107213fcc0c" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -9290,7 +9292,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-hej-0.u1" size="0x40000" crc="4f8a61bf" sha1="c12c60b0c0a2ee1aaded61020fa72b5b467459e1" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -10237,7 +10239,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="j.league big wave soccer (japan).bin" size="0x40000" crc="cdd02f22" sha1="00369c42d2c4be0506901b64f7d5424538574ce0" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -10583,7 +10585,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="jikuu senki mu (japan).bin" size="0x40000" crc="435c4697" sha1="799790fdf14c6202a44e5c9a18023fa4245243b8" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -10648,7 +10650,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="jinsei game (japan).bin" size="0x40000" crc="09f53d55" sha1="11f883c0f5f4b62d614fd8662ae56e62ab00450b" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -11320,7 +11322,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-kae-0.u1" size="0x20000" crc="0c042862" sha1="465614bb236c507a5709ecab95827a8be4e2e6b8" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -11515,7 +11517,7 @@ license:CC0
 			<dataarea name="rom" size = "131072">
 				<rom name="dmg-onj-1.u1" size="0x20000" crc="aaf6366c" sha1="298965bc2b99e49339618914114abfd0962560c1" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -11538,7 +11540,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-onj-0.u1" size="0x20000" crc="b7f48649" sha1="7c6c71b52c62b814945ee102054a7a3210b1ecf3" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -11620,7 +11622,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="kirby no pinball (japan).bin" size="0x40000" crc="8b44fb7d" sha1="678ca586f5a2e2fc894fb8e9f7b9efa54fabba44" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -11696,7 +11698,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-k9e-0.u1" size="0x40000" crc="31cb6526" sha1="06efdb138ff56cd9522dece44adadd3fae169c76" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -11930,7 +11932,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="konami golf (europe).bin" size="0x20000" crc="0fdc9fb1" sha1="59d13714f8477db50cf164254480dd25959ecd23" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -11962,7 +11964,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="konamic golf (japan).bin" size="0x20000" crc="c16d4db2" sha1="78d014f8feb88cc8b509172c1a6fa48aa5eed67c" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -12272,7 +12274,7 @@ license:CC0
 			<dataarea name="rom" size="0x10000">
 				<rom name="lazlos' leap (usa).bin" size="0x10000" crc="31fb404b" sha1="c111470fcdadf191cf843e50c8f3d3dbb995a5c5" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -12306,7 +12308,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-lgj-0.u1" size="0x20000" crc="fc20ebf0" sha1="7447b3faa1d15e80815cdace3c6c0691bc28aa90" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -12660,7 +12662,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="little master - raikuban no densetsu (japan).bin" size="0x20000" crc="31cd9670" sha1="7c83b3c6cd9571c422e66e64e522a0416fa477b2" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -12920,7 +12922,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="mach go go go (japan).bin" size="0x40000" crc="016d230b" sha1="baea8b49ce2402c5c094ddae0320a382c0d95d86" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -13013,7 +13015,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="magic knight rayearth 2nd. - the missing colors (japan).bin" size="0x40000" crc="00202dfa" sha1="afe76c2d6f796813f1803e8c542107bf0827f966" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -13103,7 +13105,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-saj-1.u1" size="0x20000" crc="1953820f" sha1="cbf480bc92bd98bae4fb79294b604d341fe58cbe" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -13125,7 +13127,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-saj-0.u1" size="0x20000" crc="131b09f2" sha1="7a8f770a34207fee324431c47836f1ab317863f9" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -13401,7 +13403,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-ajsd-0.u1" size="0x40000" crc="631e656f" sha1="eadc06e71ea4f04700e2ed1ef232b6e57cb48725" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -14466,7 +14468,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="mogu mogu gombo (japan).bin" size="0x40000" crc="85c984f2" sha1="a4524d11f2a86e28bc319335b5c05ea6550b26e1" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -14548,7 +14550,8 @@ license:CC0
 			<feature name="u3" value="U3 RAM [LH5268ANF-10PLL]" />
 			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
-			<feature name="slot" value="rom_mbc1col" />
+			<feature name="slot" value="rom_mbc1" />
+			<feature name="banklowbits" value="4" />
 			<dataarea name="rom" size="0x100000">
 				<rom name="dmg-amdj-0.u1" size="0x100000" crc="ad376905" sha1="cd7088d13f5b80f32c0fae95a57969f6f33a9a02" />
 			</dataarea>
@@ -14625,7 +14628,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="momotarou densetsu gaiden (japan).bin" size="0x40000" crc="ba5611ef" sha1="1a819534e7e29a17d5644ef190998cea781a69a6" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -14746,7 +14749,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="monster maker (japan).bin" size="0x20000" crc="725ee86c" sha1="70d99059ef780033cd0844ab724cb0c1b4b3c839" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -15014,7 +15017,8 @@ license:CC0
 		<info name="release" value="19980910" />
 		<info name="alt_title" value="モータルコンバット&amp;モータルコンバットII" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1col" />
+			<feature name="slot" value="rom_mbc1" />
+			<feature name="banklowbits" value="4" />
 			<dataarea name="rom" size="0x100000">
 				<rom name="mortal kombat i &amp; ii (japan).bin" size="0x100000" crc="b1a8dfd0" sha1="cf6ca53e1df526c73bab62743085257119865107" />
 			</dataarea>
@@ -15030,7 +15034,8 @@ license:CC0
 			<feature name="pcb" value="DMG-M-BFAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
-			<feature name="slot" value="rom_mbc1col" />
+			<feature name="slot" value="rom_mbc1" />
+			<feature name="banklowbits" value="4" />
 			<dataarea name="rom" size="0x100000">
 				<rom name="dmg-ak2p-0.u1" size="0x100000" crc="55300d0a" sha1="e337489255b33367ce26194fc4038346d3388bd9" />
 			</dataarea>
@@ -15200,7 +15205,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="mr. go no baken tekichuu jutsu (japan).bin" size="0x20000" crc="eadaf1e7" sha1="ddf49bdc73c9b50045396915767c7610eeb296b5" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -15335,7 +15340,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="mystic quest (europe).bin" size="0x40000" crc="57d95c92" sha1="3513310426c6ae88f9beb588f71c666e003273be" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -15349,7 +15354,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="mystic quest (france).bin" size="0x40000" crc="b6e134af" sha1="b52d82248849f1ead9bf22954b3cbf7bf8e02907" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -15369,7 +15374,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-ffd-0.u1" size="0x40000" crc="0351b9a6" sha1="7cb65cb314e3f26b92549ddc7f4fc275186c6170" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -15415,7 +15420,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="nada asatarou &amp; kojima takeo no jissen mahjong kyoushitsu (japan).bin" size="0x20000" crc="9d335162" sha1="20ba98670eb3bf18756f15e50b5fc65f58a15918" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -15834,7 +15839,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="nekojara monogatari (japan).bin" size="0x20000" crc="3d6d309b" sha1="f0f320b9170501c762e724e9b22d37cb4d15d0a9" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -16415,7 +16420,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="ninja taro (usa).bin" size="0x20000" crc="c53ebfbd" sha1="bd472ed88042e032a57041eb0a889da6aa3d1598" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -16429,7 +16434,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="ninja taro (usa) (beta).bin" size="0x20000" crc="61598b3d" sha1="d93b6718e9c8a2505f4da73b99f57866111948af" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -16443,7 +16448,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="ninja taro (prototype b).bin" size="0x20000" crc="f15b708a" sha1="602ba627007d37f7a2eb456102b3afa79d50ce2f" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -16847,7 +16852,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="otogibanashi taisen (japan).bin" size="0x40000" crc="98500521" sha1="49176ced7152d6d411db1aa77d7a131f46e7a081" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -17146,7 +17151,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="pachi-slot hisshou guide gb (japan).bin" size="0x20000" crc="6ee0f7b9" sha1="48564d29dd997878eb3165d7b40ac3fa8f287143" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -17224,7 +17229,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="pachinko cr daiku no gen-san gb (japan).bin" size="0x40000" crc="69a5e681" sha1="2fc86c0da3601e7b614290b30197aaae50ab510e" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -18148,7 +18153,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pockfam">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="pockfam" supported="partial">
 		<!--
 		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
@@ -18173,7 +18179,7 @@ license:CC0
 			<dataarea name="rom" size="0x80000">
 				<rom name="dmg-hfaj-0.u1" size="0x80000" crc="48993d4f" sha1="162b0ab1fcfcf9b7ac888f137fedc41264219cf9" />
 			</dataarea>
-			<dataarea name="ram" size="0x8000">
+			<dataarea name="nvram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
@@ -18229,7 +18235,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-akyj-0.u1" size="0x40000" crc="c034ece1" sha1="0506deffdf9fee21dda394e272c84fe8df2fbec0" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -19374,7 +19380,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-pij-0.u1" size="0x20000" crc="420881ae" sha1="cc6cbbcaabce4a63106da3c9b5e4a761511cae38" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000"> <!-- unconfirmed size -->
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -19391,7 +19397,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="pro yakyuu stadium '92 (japan).bin" size="0x40000" crc="71559ba0" sha1="7c89b508b71569776c50256da350652657027cf2" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -20760,7 +20766,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="rolan's curse ii (usa).bin" size="0x20000" crc="2754f360" sha1="7632e23853dd2579012489f75bd370473f0f2c46" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -20921,7 +20927,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="saint paradise - saikyou no senshi-tachi (japan).bin" size="0x40000" crc="d6fe3c56" sha1="e7cf9eabead0e5c0d3228871bb8219643e5bd7e0" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -21146,7 +21152,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-lhj-0.u1" size="0x20000" crc="c9dbba10" sha1="bc598168a70bbbc1b89b3de13086ec89e8ce9ded" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -21234,7 +21240,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="sd sengokuden 2 - tenka touitsu hen (japan).bin" size="0x40000" crc="5b7c6faa" sha1="4494a8a9f960c55b056b12d2d2760cc976e36e17" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -21256,7 +21262,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-d3j-0.u1" size="0x40000" crc="7c61426c" sha1="2cb0368452033029ef8b8d92698d95ed41114a73" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -21326,7 +21332,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-ffj-0.u1" size="0x40000" crc="d771c1b6" sha1="998a5e6df52dff24ae686e287eed06f125940194" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -21396,7 +21402,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="sengoku ninja-kun (japan).bin" size="0x20000" crc="6bae3a41" sha1="a60f4f815467298bd3928fe4aee0edd763ebe85d" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -21896,7 +21902,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="smartcom (europe) (unl).bin" size="0x40000" crc="1ef0abf1" sha1="a04bbf813bcd9b7e3af97d388ad77d25c1403831" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -22177,7 +22183,7 @@ license:CC0
 			<dataarea name="rom" size="0x10000">
 				<rom name="solitaire (japan).bin" size="0x10000" crc="1119484a" sha1="220f5b230559ae0c5742a31c59a90615c7fb8613" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -23342,7 +23348,8 @@ license:CC0
 			<feature name="pcb" value="DMG-M-BFAN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
-			<feature name="slot" value="rom_mbc1col" />
+			<feature name="slot" value="rom_mbc1" />
+			<feature name="banklowbits" value="4" />
 			<dataarea name="rom" size="0x100000">
 				<rom name="dmg-aldj-0.u1" size="0x100000" crc="7d1d8fdc" sha1="2c2a1c2de0c2a88bc0a73b44f04f2ca434573d68" />
 			</dataarea>
@@ -23671,7 +23678,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-mdj-0.u1" size="0x40000" crc="4ca6d91a" sha1="c142845225145f1ece8aa4cdfd207402146edfc0" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -23768,7 +23775,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="super robot taisen (japan).bin" size="0x20000" crc="7dd9d7d6" sha1="267d77866c798d33c973fff25d246fff584bf9a3" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -24555,7 +24562,7 @@ license:CC0
 			<dataarea name="rom" size="0x10000">
 				<rom name="tekichuu rush (japan).bin" size="0x10000" crc="7b903a6f" sha1="037b677a369fc892e08c268a8334d7f48b1fa05c" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -24590,7 +24597,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="tenchi o kurau (japan).bin" size="0x40000" crc="a9018354" sha1="312bc91b1b857cc7ec0cb8bc7cfa80bfe10d7b4b" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -25236,7 +25243,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="top rank tennis (usa).bin" size="0x40000" crc="3c4e29b4" sha1="2fa95dfe097b31fc1a94a5e864308b417bf832d4" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -25256,7 +25263,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-xtx-0.u1" size="0x40000" crc="d577d8e0" sha1="e628b00e7f88742c99cbb51fae4be0d0cfa77405" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -25273,7 +25280,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="torpedo range (japan).bin" size="0x20000" crc="1fb35885" sha1="4cd1702228d3d82abda1672f21b79446385a2c68" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -25288,7 +25295,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="torpedo range (usa).bin" size="0x20000" crc="ed9882a9" sha1="0aac562f0f62916839cffe472aa21e0cee6269f0" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -25851,7 +25858,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="ultima - runes of virtue (usa).bin" size="0x20000" crc="c44a0f1e" sha1="8d911cbbc6bd1518a85282def7f01d3add16e596" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -25866,7 +25873,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="ultima - runes of virtue ii (usa).bin" size="0x40000" crc="c449fbbf" sha1="99c4fbf832edb9b58960ec744ae784b55c7d63d2" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -25883,7 +25890,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="ultima - ushinawareta runes (japan).bin" size="0x20000" crc="d2f94181" sha1="3a1d88736e13436cde15029dadd951b0b1c637e5" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -25900,7 +25907,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="ultima - ushinawareta runes ii (japan).bin" size="0x40000" crc="796fd6a5" sha1="f83a209c29e324578e74fb1cc7b3c990dd5a67a9" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -25915,7 +25922,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="ultra golf (usa).bin" size="0x20000" crc="12de9bac" sha1="a20c0a995a91b20646564965705fad129474e9bf" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -25929,7 +25936,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="ultra golf (nov 20, 1991 prototype).bin" size="0x20000" crc="d9ddb091" sha1="b29e5da6f794a010d858f4398da85145f20d8c55" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -26118,7 +26125,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="urusei yatsura - miss tomobiki o saguse (japan).bin" size="0x40000" crc="56800c6b" sha1="f7ac15b9b38027ae473120748e9686c985a40e87" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -26206,7 +26213,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="velious ii - fukushuu no jashin (japan).bin" size="0x20000" crc="b55eb427" sha1="d0b009bef968da587148623f9727128ce1aa80e8" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -26374,7 +26381,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="wave race (usa, europe).bin" size="0x20000" crc="a6595506" sha1="87ecdfe518f1707429fdbdc21d12bbfe1ff52252" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -26536,7 +26543,7 @@ license:CC0
 			<dataarea name="rom" size="0x20000">
 				<rom name="winner's horse (japan).bin" size="0x20000" crc="14e91757" sha1="4d3a56c78ede434c55994b0452b74358fadf78fe" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -27016,7 +27023,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="dmg-ecj-0.u1" size="0x40000" crc="75e1d268" sha1="c72f0b494ceba72db244266cb29e4d2b4d514263" />
 			</dataarea>
-			<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x200">
 			</dataarea>
 		</part>
 	</software>
@@ -28036,7 +28043,8 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 
-	<software name="gboycam" supported="no">
+	<!-- unemulated M64282FP processing features, uses unemulated printer -->
+	<software name="gboycam" supported="partial">
 		<description>Game Boy Camera (Europe, USA)</description> <!-- MGB-006 -->
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -28057,7 +28065,8 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		</part>
 	</software>
 
-	<software name="pockcam" cloneof="gboycam" supported="no">
+	<!-- unemulated M64282FP processing features, uses unemulated printer -->
+	<software name="pockcam" cloneof="gboycam" supported="partial">
 		<description>Pocket Camera (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -28075,7 +28084,8 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		</part>
 	</software>
 
-	<software name="gboycamg" supported="no">
+	<!-- unemulated M64282FP processing features, uses unemulated printer -->
+	<software name="gboycamg" supported="partial">
 		<description>Game Boy Camera Gold (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

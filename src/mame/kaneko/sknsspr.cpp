@@ -45,11 +45,6 @@ void sknsspr_device::device_reset()
 	//printf("sknsspr_device::device_reset()\n");
 }
 
-void sknsspr_device::rom_bank_updated()
-{
-	//printf("sknsspr_device::rom_bank_updated()\n");
-}
-
 int sknsspr_device::skns_rle_decode ( int romoffset, int size )
 {
 	int decodeoffset = 0;

@@ -1100,7 +1100,7 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 WRITE_LINE_MEMBER(nes_vt02_vt03_soc_device::apu_irq)
 {
 	// TODO
-//  set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+//  set_input_line(RP2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t nes_vt02_vt03_soc_device::apu_read_mem(offs_t offset)
@@ -1126,7 +1126,7 @@ void nes_vt02_vt03_soc_device::do_pal_timings_and_ppu_replacement(machine_config
 {
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 
-	PPU_VT03PAL(config.replace(), m_ppu, N2A03_PAL_XTAL);
+	PPU_VT03PAL(config.replace(), m_ppu, RP2A03_PAL_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu->read_bg().set(FUNC(nes_vt02_vt03_soc_device::chr_r));
@@ -1143,7 +1143,7 @@ void nes_vt02_vt03_soc_device::do_pal_timings_and_ppu_replacement(machine_config
 
 void nes_vt02_vt03_soc_device::device_add_mconfig(machine_config &config)
 {
-	N2A03_CORE(config, m_maincpu, NTSC_APU_CLOCK); // Butterfly Catch in vgpocket confirms N2A03 core type, not 6502
+	RP2A03_CORE(config, m_maincpu, NTSC_APU_CLOCK); // Butterfly Catch in vgpocket confirms RP2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_device::nes_vt_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1154,7 +1154,7 @@ void nes_vt02_vt03_soc_device::device_add_mconfig(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(nes_vt02_vt03_soc_device::screen_update));
 
-	PPU_VT03(config, m_ppu, N2A03_NTSC_XTAL);
+	PPU_VT03(config, m_ppu, RP2A03_NTSC_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu->read_bg().set(FUNC(nes_vt02_vt03_soc_device::chr_r));
@@ -1185,6 +1185,6 @@ void nes_vt02_vt03_soc_scramble_device::device_add_mconfig(machine_config& confi
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 
-	N2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms N2A03 core type, not 6502
+	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms RP2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_scramble_device::nes_vt_map);
 }

@@ -735,10 +735,10 @@ void pioneer_ldv4200hle_device::device_reset()
 	// reset our state
 	m_vbi_fetch->adjust(attotime::never);
 
-	std::fill_n(m_cmd_buffer, 0, std::size(m_cmd_buffer));
+	std::fill_n(m_cmd_buffer, std::size(m_cmd_buffer), 0);
 	m_cmd_length = 0;
 	m_cmd_running = false;
-	std::fill_n(m_reply_buffer, 0, std::size(m_reply_buffer));
+	std::fill_n(m_reply_buffer, std::size(m_reply_buffer), 0);
 	m_reply_write_index = 0;
 	m_reply_read_index = 0;
 	m_replying = false;

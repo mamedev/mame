@@ -138,6 +138,7 @@ barcrest/mpu4mod2sw.cpp
 barcrest/mpu4mod4oki.cpp
 barcrest/mpu4mod4yam.cpp
 barcrest/mpu4plasma.cpp
+barcrest/mpu4redpoint.cpp
 barcrest/mpu4union.cpp
 barcrest/mpu4unsorted.cpp
 barcrest/mpu4vid.cpp
@@ -382,6 +383,7 @@ igt/splus.cpp
 igt/videopkr.cpp
 irem/m10.cpp
 irem/m107.cpp
+irem/m119.cpp
 irem/m14.cpp
 irem/m52.cpp
 irem/m57.cpp
@@ -405,6 +407,7 @@ itech/itech8.cpp
 jaleco/acommand.cpp
 jaleco/aeroboto.cpp
 jaleco/argus.cpp
+jaleco/armchamp.cpp
 jaleco/bestleag.cpp
 jaleco/bigstrkb.cpp
 jaleco/blueprnt.cpp
@@ -621,6 +624,7 @@ misc/acesp.cpp
 misc/age_candy.cpp
 misc/alinvade.cpp
 misc/amaticmg.cpp
+misc/amuzy.cpp
 misc/amerihok.cpp
 misc/ampoker2.cpp
 misc/amspdwy.cpp
@@ -807,6 +811,7 @@ misc/multfish.cpp
 misc/multfish_boot.cpp
 misc/murogem.cpp
 misc/murogmbl.cpp
+misc/musclem.cpp
 misc/neomania.cpp
 misc/neoprint.cpp
 misc/news.cpp
@@ -1254,6 +1259,7 @@ sega/timetrv.cpp
 sega/triforce.cpp
 sega/turbo.cpp
 sega/vicdual.cpp
+sega/winclub.cpp
 sega/y2.cpp
 sega/zaxxon.cpp
 seibu/airraid.cpp

@@ -2467,7 +2467,8 @@ license:CC0
 			<feature name="pcb" value="DMG-M-BFAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1-B]" />
-			<feature name="slot" value="rom_mbc1col" />
+			<feature name="slot" value="rom_mbc1" />
+			<feature name="banklowbits" value="4" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-b2ck-0.u1" size="1048576" crc="af2b426e" sha1="52451464a9f4dd5faefe4594954cbce03bff0d05"/>
 			</dataarea>
@@ -3398,7 +3399,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="commandm" supported="no">
+	<software name="commandm">
 		<!-- The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
 		<description>Command Master (Japan)</description>
 		<year>2000</year>
@@ -3413,7 +3414,7 @@ license:CC0
 			<feature name="u2" value="U2 16/32M MASK ROM" />
 			<feature name="u3" value="U3 2/4K EEPROM" />
 			<feature name="u4" value="U4 ADXL202" />
-			<feature name="slot" value="rom_mbc7" />
+			<feature name="slot" value="rom_mbc7_4k" />
 			<dataarea name="rom" size="2097152">
 				<rom name="cgb-kcej-0.u1" size="2097152" crc="d10b5645" sha1="f1d3a1ff7a76c49ce3e094ca994d488dbdadf9a2"/>
 			</dataarea>
@@ -10006,7 +10007,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kirbytlt" supported="no">
+	<software name="kirbytlt">
 		<!-- The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
 		<description>Kirby Tilt 'n' Tumble (USA)</description>
 		<year>2001</year>
@@ -10019,7 +10020,7 @@ license:CC0
 			<feature name="u2" value="U2 4/8M MASK ROM" />
 			<feature name="u3" value="U3 2/4K EEPROM" />
 			<feature name="u4" value="U4 ADXL202" />
-			<feature name="slot" value="rom_mbc7" />
+			<feature name="slot" value="rom_mbc7_2k" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-ktne-0.u1" size="1048576" crc="e541acf1" sha1="6ab8d666e2bebbb3fee7796c8968aab2ea21b8f9"/>
 			</dataarea>
@@ -10321,7 +10322,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="korokoro" cloneof="kirbytlt" supported="no">
+	<software name="korokoro" cloneof="kirbytlt">
 		<!-- The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
 		<description>Korokoro Kirby (Japan)</description>
 		<year>2000</year>
@@ -10336,7 +10337,7 @@ license:CC0
 			<feature name="u2" value="U2 4/8M MASK ROM" />
 			<feature name="u3" value="U3 2/4K EEPROM" />
 			<feature name="u4" value="U4 ADXL202" />
-			<feature name="slot" value="rom_mbc7" />
+			<feature name="slot" value="rom_mbc7_2k" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-kkkj-0.u1" size="1048576" crc="c0face3d" sha1="8dd46f6d34c831c910c4574f252fa47ce6f67261"/>
 			</dataarea>
@@ -14634,7 +14635,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- requires Flash storage and Mobile Adapter emulation -->
+	<!-- requires Mobile Adapter emulation -->
 	<software name="netdeget" supported="partial">
 		<description>Net de Get - Minigame @ 100 (Japan)</description>
 		<year>2001</year>
@@ -15690,7 +15691,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pockfam2">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="pockfam2" supported="partial">
 		<!-- The game cart has an integrated speaker and a replaceable battery (CR2025). -->
 		<description>Pocket Family GB2 (Japan)</description>
 		<year>1999</year>
@@ -15711,7 +15713,7 @@ license:CC0
 			<dataarea name="rom" size="2097152">
 				<rom name="cgb-hf2j-0.u1" size="2097152" crc="2a273244" sha1="fc88fcf5aab548936cd6617c4e2ea07b77ee43c8"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -15948,7 +15950,7 @@ license:CC0
 			<feature name="u3" value="U3 RAM [D431000AGW-70LL]" />
 			<feature name="u4" value="U4 MM1134 [6735]" />
 			<feature name="battery" value="CR2025" />
-			<feature name="slot" value="rom_mbc3" />
+			<feature name="slot" value="rom_mbc30" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
 				<rom name="cgb-bxtj-0.u1" size="2097152" crc="270c4ecc" sha1="95127b901bbce2407daf43cce9f45d4c27ef635d"/>
@@ -18486,7 +18488,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="robopsun">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="robopsun" supported="partial">
 		<!-- Notes: The game cart has its own speaker, IR interface and a replaceable battery. -->
 		<description>Robopon - Sun Version (USA)</description>
 		<year>2000</year>
@@ -18505,12 +18508,13 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="robopon - sun version (usa).bin" size="1048576" crc="32caef11" sha1="399c928a38a3901b7a1093bd61f5a4d8c05b9771"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="robopspc">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="robopspc" supported="partial">
 		<!-- Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		    multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
 		    port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
@@ -18535,12 +18539,13 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-h5uj-0.u1" size="1048576" crc="4aa209cd" sha1="79d1eda07e792497506ff1494e5222db2a52702f"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="robopmon">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="robopmon" supported="partial">
 		<!-- Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		    multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
 		    port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
@@ -18564,12 +18569,13 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-h3uj-0.u1" size="1048576" crc="87a29030" sha1="7d6424bfecfeb17aee9f779dcb9bac47114730cd"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="robopstr">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="robopstr" supported="partial">
 		<!-- Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		    multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
 		    port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
@@ -18593,12 +18599,13 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-hrcj-0.u1" size="1048576" crc="b28f32ac" sha1="27a96410b38e695d9b80ae861af3b472f0e84c60"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="robopsunj" cloneof="robopsun">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="robopsunj" cloneof="robopsun" supported="partial">
 		<description>Robot Ponkottsu - Sun Version (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -18613,7 +18620,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-hrej-0.u1" size="1048576" crc="cb0b8003" sha1="2f82dd4a1537111d14f11eb13c7ce6fc748e83fe"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -19861,7 +19868,7 @@ license:CC0
 			<dataarea name="rom" size="131072">
 				<rom name="shutokou racing, the (japan).bin" size="131072" crc="36e781cd" sha1="0f29818190ea9ce8c242b648ba64d50cc5408e5a"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="512">
 			</dataarea>
 		</part>
 	</software>
@@ -24785,10 +24792,9 @@ license:CC0
 		<description>ATV Racing &amp; Karate Joe (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="atv racing &amp; karate joe (europe) (unl).bin" size="524288" crc="a07b6e79" sha1="3701028d66564625933a3868340813e6d7c36b7b"/>
 			</dataarea>
@@ -24802,10 +24808,9 @@ license:CC0
 		<description>ATV Racing &amp; Karate Joe (Europe, alt)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="atv racing &amp; karate joe (europe) (alternate) (unl).bin" size="524288" crc="6908f4af" sha1="95287b440139e88d90700f892d1da60aaa4da778"/>
 			</dataarea>
@@ -24818,9 +24823,8 @@ license:CC0
 		<description>ATV Racing (Europe)</description>
 		<year>2001</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="atv racing (europe) (unl).bin" size="262144" crc="7987d5cd" sha1="b3c6c2970c3bfa95fb2eef10e2160f55f52d8e1a"/>
 			</dataarea>
@@ -24834,10 +24838,9 @@ license:CC0
 		<description>Full Time Soccer &amp; Hang Time Basketball (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="full time soccer &amp; hang time basketball (europe) (unl).bin" size="524288" crc="0634c196" sha1="aefb746984b3450b90bbfaa5de21a252685ddabb"/>
 			</dataarea>
@@ -24850,9 +24853,8 @@ license:CC0
 		<description>Full Time Soccer (Europe)</description>
 		<year>2000</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="full time soccer (europe) (unl).bin" size="262144" crc="b99beda2" sha1="a2b1268df08b583d033999b894638dadf32e37f4"/>
 			</dataarea>
@@ -24865,10 +24867,9 @@ license:CC0
 		<description>Hang Time Basketball (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="hang time basketball (europe) (unl).bin" size="262144" crc="3207b7d9" sha1="340201c045c020be6de3504fdecbce1ff07a2139"/>
 			</dataarea>
@@ -24882,10 +24883,9 @@ license:CC0
 		<description>Pocket Smash Out &amp; Race Time (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket smash out &amp; race time (europe) (unl).bin" size="524288" crc="0ad5b775" sha1="01f68a0a45408da9892b8cc0a4a9c688dcdd9618"/>
 			</dataarea>
@@ -24896,10 +24896,9 @@ license:CC0
 		<description>Pocket Smash Out (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="pocket smash out (europe) (unl).bin" size="262144" crc="cbd14276" sha1="0a721164053a8b2765ea9826a0958415701ca6f5"/>
 			</dataarea>
@@ -24913,10 +24912,9 @@ license:CC0
 		<description>Karate Joe (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="karate joe (europe) (unl).bin" size="262144" crc="b8a54e29" sha1="bc9e760dcc851a01240b49b28cde8fe5ab18df91"/>
 			</dataarea>
@@ -24927,9 +24925,8 @@ license:CC0
 		<description>Painter (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="painter (europe) (unl).bin" size="262144" crc="f4801f21" sha1="78db482d1d12b4556b6a5b995ce37a2435236a06"/>
 			</dataarea>
@@ -24940,10 +24937,9 @@ license:CC0
 		<description>Race Time (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="race time (europe) (unl).bin" size="262144" crc="599c867d" sha1="157f15e601dfb858630a53313b71e4ecd0bb13e1"/>
 			</dataarea>
@@ -24955,10 +24951,9 @@ license:CC0
 		<description>Space Invasion &amp; Karate Joe (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="space invasion &amp; karate joe (europe) (unl).bin" size="524288" crc="6a184c55" sha1="96918cbd3648b227eb43e5a9711d1a9939541bea"/>
 			</dataarea>
@@ -24972,10 +24967,9 @@ license:CC0
 		<description>Space Invasion &amp; Painter (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="space invasion &amp; painter (europe) (unl).bin" size="524288" crc="bd4c1065" sha1="a5bf26ed894576dada84f6925cc659980cf150a0"/>
 			</dataarea>
@@ -24989,10 +24983,9 @@ license:CC0
 		<description>Space Invasion (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="131072">
 				<rom name="space invasion (europe) (unl).bin" size="131072" crc="2b2d9868" sha1="bcf0940375a23bca6957eec2ab8e49af695aeb32"/>
 			</dataarea>
@@ -25084,7 +25077,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shero" supported="no">
+	<software name="shero">
 		<description>Street Hero (Taiwan)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25097,7 +25090,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="thundbmna" cloneof="thundbmn" supported="no">
+	<software name="thundbmna" cloneof="thundbmn">
 		<description>Thunder Blast Man (Europe)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25123,7 +25116,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_sac01" supported="no">
+	<software name="mc_sac01">
 		<description>4 in 1 + 8 in 1 (World, 4B-001)</description>
 		<year>20??</year>
 		<publisher>Sachen</publisher>
@@ -25135,7 +25128,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_sac02" supported="no">
+	<software name="mc_sac02">
 		<description>4 in 1 + 8 in 1 (World, 4B-002)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25148,7 +25141,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_sac05" supported="no">
+	<software name="mc_sac05">
 		<description>4 in 1 + 8 in 1 + 16 in 1 (World, 4B-005)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25161,7 +25154,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_sac07" supported="no">
+	<!-- missing HUD graphics in Ant Soldiers on GBC -->
+	<software name="mc_sac07" supported="partial">
 		<description>4 in 1 + 8 in 1 (World, 4B-007)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25174,7 +25168,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_6in1">
+	<!-- missing HUD graphics in Ant Soldiers on GBC -->
+	<software name="mc_6in1" supported="partial">
 		<description>Super 6 in 1 (Taiwan)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25199,7 +25194,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_31t" cloneof="mc_31" supported="no">
+	<!-- missing HUD graphics in Ant Soldiers on GBC -->
+	<software name="mc_31t" cloneof="mc_31" supported="partial">
 		<description>31 in 1 Mighty Mix (Taiwan)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25211,7 +25207,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_31" supported="no">
+	<!-- missing HUD graphics in Ant Soldiers on GBC -->
+	<software name="mc_31" supported="partial">
 		<description>31-in-1 Mighty Mix (Australia)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25934,14 +25931,15 @@ license:CC0
 
 <!-- Other Asian Pirate dumps to sort -->
 
-	<software name="188in1" supported="partial">
+	<software name="188in1">
 	<!-- This dump comes from the "GBCK003" board that's soldered inside some GB Boy Colour units -->
 		<description>Color GameBoy 188 in 1 (Hong Kong)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Use hard reset to return to game selection menu." />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="GBCK003" />
-			<feature name="slot" value="rom_188in1" />
+			<feature name="slot" value="rom_gbck003" />
 			<dataarea name="rom" size="8388608">
 				<rom name="m29w640ft.u2" size="8388608" crc="e4068d7d" sha1="e61ee50ed39fd5b5cc8bdcb96fe1c3cccdcfc76f" />
 			</dataarea>
@@ -26290,11 +26288,10 @@ license:CC0
 		<info name="alt_title" value="2003哈利波特2-消失的密室 ~ 2003 Harry Potter 2 - Xiao Shi De Mi Shi"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="2003 ha li bo te 2 - xiao shi de mi shi (unlicensed, chinese) [raw dump].bin" size="2097152" crc="1b3e1243" sha1="0829cbcab3ef5d03c94d5efe769f4f4a93ac47fa"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="2003 ha li bo te 2 - xiao shi de mi shi (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="1b3e1243" sha1="0829cbcab3ef5d03c94d5efe769f4f4a93ac47fa"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
+			<dataarea name="nvram" size="8192" />
 		</part>
 	</software>
 
@@ -26305,36 +26302,125 @@ license:CC0
 		<info name="alt_title" value="哈利小子IV, 2003哈利小子IV ~ 2003 Ha Li Xiao Zi IV (Cart)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="2003 ha li xiao zi iv (unlicensed, chinese) [raw dump].bin" size="2097152" crc="db3c8b95" sha1="0d230b20388f4396d6345b8eb59f54fc169ad8ee"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="2003 ha li xiao zi iv (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="db3c8b95" sha1="0d230b20388f4396d6345b8eb59f54fc169ad8ee"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="nuwang2k" supported="no"> <!-- requires protection emulation -->
+	<software name="nuwang2k">
 		<description>Nǚwáng Gédòu 2000 (Taiwan)</description>
 		<year>200?</year>
 		<publisher>Vast Fame</publisher>
 		<info name="alt_title" value="女王格鬥2000"/> <!-- translates to "Queen Fight 2000" -->
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" /> <!-- TODO: set properly when protection is emulated -->
-			<dataarea name="rom" size="2097152">
-				<rom name="Nv Wang Ge Dou 2000 (Unl) [C] [Raw].gbc" size="2097152" crc="e1668b49" sha1="37516139aa317a16440379c1dc00bdfc4c1e607a"/>
+			<feature name="slot" value="rom_vf001" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="nuwang gedou.gbc" size="0x200000" crc="e1668b49" sha1="37516139aa317a16440379c1dc00bdfc4c1e607a"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cjgedou" supported="no">
+	<software name="cjgedou">
 		<description>Chāojí Gédòu 2001 Alpha (Taiwan)</description>
 		<year>200?</year>
 		<publisher>Vast Fame</publisher>
 		<info name="alt_title" value="超級格鬥2001α"/> <!-- translates to "Super Fight 2001 Alpha" -->
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" /> <!-- TODO: set properly when protection is emulated -->
-			<dataarea name="rom" size="2097152">
-				<rom name="Chao Ji Ge Dou 2001 Alpha (Unl) [C] [Raw].gbc" size="2097152" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
+			<feature name="slot" value="rom_vf001" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="chaoju gedou 2001 alpha.gbc" size="0x200000" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- graphical hack of The Smurfs' Nightmare -->
+	<!-- has also been dumped with unused byte at 0xA3B86 having value 0x2A rather than 0x0A (probably bitrot) -->
+	<software name="kdgsdzp">
+		<description>Kǒudài Guàishòu - Dòngzuò Piān (China)</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="口袋怪獸-動作篇" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="HK0819" />
+			<feature name="slot" value="rom_newgbchk" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="koudai guaishou dongzuo pian.gbc" size="0x100000" crc="14355371" sha1="f398086d1f8cb435a632e5ea45fb19e980b0568d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- graphical hack of Kirby's Dream Land 2 -->
+	<software name="gsgogo2">
+		<description>Guàishòu Go! Go! Ⅱ (China)</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="怪獸 Go! Go! Ⅱ" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="HK0701" />
+			<feature name="slot" value="rom_newgbchk" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="guaishou go go ii.gbc" size="0x100000" crc="b0237467" sha1="8ed6f39a9973d634266806455ef845b6bdb5ab95" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000" />
+		</part>
+	</software>
+
+	<software name="vf12in1">
+		<description>Yín Bǎn Zhōngwén RPG Zhànlüè + Dòngzuò + Yìzhì 12 in 1</description>
+		<year>200?</year>
+		<publisher>Vast Fame</publisher>
+		<info name="alt_title" value="銀版中文RPG戰略+動作+益智12in1" />
+		<info name="usage" value="Use hard reset to return to game selection menu." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_slmulti" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="yin ban zhongwen rpg zhanlue dongzuo yizhi 12 in 1.gbc" size="0x800000" crc="dc3171ad" sha1="bfb93e7b4b523ef21c2b98ba9dcb15eb7d4f07e4" />
+			</dataarea>
+			<dataarea name="nvram" size="0x20000" />
+		</part>
+	</software>
+
+	<software name="vf18in1">
+		<description>Shǐshàng Chāoqiáng RPG + Gédòu + Yìzhì Bǎn Zǔhé Kǎ 18 in 1</description>
+		<year>200?</year>
+		<publisher>Vast Fame</publisher>
+		<info name="alt_title" value="史上超強RPG+格鬥+益智版組合卡18in1" />
+		<info name="usage" value="Use hard reset to return to game selection menu." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_slmulti" />
+			<dataarea name="rom" size="0x1000000">
+				<rom name="shishang chaoqiang rpg + gedou + yizhi ban zuhe ka 18 in 1.gbc" size="0x1000000" crc="28519ab1" sha1="b4c81c2b1d7f787ee92f38d45c86fe602c0aba22" />
+			</dataarea>
+			<dataarea name="nvram" size="0x20000" />
+		</part>
+	</software>
+
+	<software name="sl36in1">
+		<description>36 in 1 (SL36-0032)</description>
+		<year>200?</year>
+		<publisher>SL?</publisher>
+		<info name="usage" value="Use hard reset to return to game selection menu." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_slmulti" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="36 in 1 sl36-0032.gbc" size="0x400000" crc="f68d980a" sha1="63181a86fa4a653744e9c393aa9f113e981d9cc7" />
+			</dataarea>
+			<dataarea name="nvram" size="0x20000" />
+		</part>
+	</software>
+
+	<software name="jy145in1">
+		<description>New Super Color 145 in 1 (China)</description>
+		<year>200?</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Use hard reset to return to game selection menu." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_slmulti" />
+			<dataarea name="rom" size="0x1000000">
+				<rom name="new super color 145 in 1.gbc" size="0x1000000" crc="b087710c" sha1="cbeb1745d68163978a422a8d7260a6a0f2693b85" />
 			</dataarea>
 		</part>
 	</software>
@@ -26417,10 +26503,11 @@ license:CC0
 	<software name="pokesaphc" cloneof="pokesaph">
 	<!-- This dump is "unconfirmed", in the sense that later redumps have resulted in inconsistent reads (none working except this one) -->
 	<!-- 4MB rom with crc 3a08c8eb is taizou's cracked version running on base MBC5 -->
-		<description>Koudai Guaishou - Lanbaoshi (China)</description>
+		<description>Kǒudài Guàishòu - Lánbǎoshí (China)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
-		<info name="alt_title" value="口袋怪獸 - 藍寶石, 2003 口袋怪獸-藍寶石 (Cart)"/>
+		<info name="alt_title" value="口袋怪獸 - 藍寶石" />
+		<info name="alt_title" value="2003 口袋怪獸-藍寶石" /> <!-- on cartridge -->
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
 			<dataarea name="rom" size="2097152">
@@ -26729,10 +26816,10 @@ license:CC0
 		<info name="alt_title" value="真三國無雙2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="zhen san guo wu shuang 2 - shin sangokumusou 2 (chi)(unl) [raw dump].bin" size="2097152" crc="95c322c9" sha1="e6ab58d212de83cb18e9eadac4cee5d0f6e4e31f"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="zhen san guo wu shuang 2 - shin sangokumusou 2 (chi)(unl) [raw dump].bin" size="0x200000" crc="95c322c9" sha1="e6ab58d212de83cb18e9eadac4cee5d0f6e4e31f"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
@@ -26744,10 +26831,37 @@ license:CC0
 		<info name="alt_title" value="真三國無雙2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="2097152">
-				<rom name="shin san guo shi 2 (unl).bin" size="2097152" crc="33f56c90" sha1="a5111c11cf70c65341b373f484650caae3c4d29f"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="shin san guo shi 2 (unl).bin" size="0x200000" crc="33f56c90" sha1="a5111c11cf70c65341b373f484650caae3c4d29f"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jueduiwl">
+		<description>Juéduì Wǔlì (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="絕對武力" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="juedui wuli.gbc" size="0x200000" crc="f4d63a7e" sha1="f0b9f02335ee89aa6189e687e6e759d8c49bc2b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wxtxxqdz">
+		<!-- not sure how the hiragana の (no) in the title should be read - assuming it's a stylised 之 -->
+		<description>Wàixīng Tànxiǎn zhī Xīngqiú Dàzhàn (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="外星探險の星球大戰" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="waixing tanxian xingqiu dazhan.gbc" size="0x200000" crc="4e600093" sha1="32067be39f0bdc354c31a7a02f24ba00b61ae4f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26901,13 +27015,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="soulfalc" supported="no">
+	<software name="soulfalc">
 		<description>Gédòu Jiàn Shén - Soul Falchion (Taiwan)</description>
 		<year>2002</year>
 		<publisher>V.Fame</publisher>
 		<info name="alt_title" value="格鬥劍神 Soul Falchion"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" /> <!-- TODO: set properly when protection is emulated -->
+			<feature name="slot" value="rom_vf001" />
 			<dataarea name="rom" size="1048576">
 				<rom name="Ge Dou Jian Shen - Soul Falchion (Unl) [C] [Raw].gbc" size="1048576" crc="1b1c6f68" sha1="fd06c62b42878e8094e610b180c1848c785f67e9"/>
 			</dataarea>
@@ -27572,7 +27686,7 @@ license:CC0
 	used here repeated twice. we need to redump the standalone cart to confirm the size
 	but the 256KB version is definitely underdumped and misses sprite data
 	-->
-		<description>Super Mario 3 Special (China)</description>
+	<description>Super Mario 3 Special (China)</description>
 		<year>2000</year>
 		<publisher>Yong Yong</publisher>
 		<part name="cart" interface="gameboy_cart">

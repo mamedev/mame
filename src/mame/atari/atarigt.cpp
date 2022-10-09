@@ -8,7 +8,7 @@
 
     Games supported:
         * T-Mek (1994) [5 sets]
-        * Primal Rage (1994) [2 sets]
+        * Primal Rage (1994) [3 sets]
 
     Known bugs:
         * Protection not fully understood
@@ -56,7 +56,7 @@
 #include "emu.h"
 #include "atarigt.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/eeprompar.h"
 #include "speaker.h"
 
@@ -1194,7 +1194,93 @@ ROM_START( tmek20 )
 ROM_END
 
 
-ROM_START( primrage )
+ROM_START( primrage ) // still shows 'version 2.3' on the title screen but build is newer than the primrageo set
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 8*64k for 68000 code, differ from the primrageo set */
+	ROM_LOAD32_BYTE( "rage_136102-2044a_pgmuu.29l", 0x000000, 0x80000, CRC(85556b91) SHA1(5f4f5d0bf68bd17b7bff230b521a5dcfff414a50) )
+	ROM_LOAD32_BYTE( "rage_136102-2043a_pgmum.28l", 0x000001, 0x80000, CRC(4d3414d0) SHA1(b6465c0fbee4e67f74185e9ea048e40f4f443efa) )
+	ROM_LOAD32_BYTE( "rage_136102-2042a_pgmlm.26l", 0x000002, 0x80000, CRC(6b91e8ea) SHA1(c44642a0f59284e35ee20fbedc3934e96f15b37d) )
+	ROM_LOAD32_BYTE( "rage_136102-2041a_pgmll.24l", 0x000003, 0x80000, CRC(9958f715) SHA1(c5b8fb1ef6346563edca94db3f53737489069ebd) )
+
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM, same as the primrageo set */
+	ROM_LOAD32_BYTE( "rage_136102-1045b_dspsub.11a", 0x000000, 0x080000, CRC(0656435f) SHA1(f8e498171e754eb8703dad6b2351509bbb27e06b) )
+
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs, differ from the primrageo set */
+	ROM_LOAD32_WORD( "136102-0075_dspsub.11c",  0x400000, 0x200000, CRC(02448be6) SHA1(cc82ececfa739600136b330df90edcc07dff9296) )
+	ROM_LOAD32_WORD( "136102-0077_dspsub.11e",  0x400002, 0x200000, CRC(057aff9a) SHA1(5d654baafb8395c059613069592ec392d1096870) )
+
+	ROM_REGION( 0x300000, "gfx1", 0 ) // same as the primrageo set
+	ROM_LOAD( "rage_136102-0050a_pf0l.25n", 0x000000, 0x80000, CRC(66896e8f) SHA1(7675b24c15ca0608f11f2a7b8d70717adb10924c) ) /* playfield, planes 0-1 */
+	ROM_LOAD( "rage_136102-0051a_pf0m.27n", 0x100000, 0x80000, CRC(fb5b3e7b) SHA1(f43fe4b5c4bbea10da46b60c644f586fb391355d) ) /* playfield, planes 2-3 */
+	ROM_LOAD( "rage_136102-0052a_pf0h.28n", 0x200000, 0x80000, CRC(cbe38670) SHA1(0780e599007851f6d37cdd8c701d01cb1ae48b9d) ) /* playfield, planes 4-5 */
+
+	ROM_REGION( 0x020000, "gfx2", 0 ) // same as the primrageo set
+	ROM_LOAD( "rage_136102-1078a_alpha.22p", 0x000000, 0x20000, CRC(1d3260bf) SHA1(85d9db8499cbe180c8d52710f3cfe64453a530ff) ) /* alphanumerics */
+
+	ROM_REGION16_BE( 0x2000000, "rle", 0 ) // only first 2 dumped for this set, the rest's numbers match the primrageo set
+	ROM_LOAD16_BYTE( "136102-2100a_mol0.2v", 0x0000001, 0x080000, CRC(433d4925) SHA1(57e8ea9a8cb4319668f1f76e9042d9d30d130833) )
+	ROM_LOAD16_BYTE( "136102-2101a_moh0.2w", 0x0000000, 0x080000, CRC(78c7bb2b) SHA1(a09e95b2560d0810eb4cb2666ffec428e158c669) )
+	ROM_LOAD16_BYTE( "136102-0332.mol1.0", 0x0800001, 0x100000, CRC(610cfcb4) SHA1(bed1bd0d11c0a7cc48d020fc0acec34daf48c5ac) )
+	ROM_LOAD16_BYTE( "136102-0333.moh1.0", 0x0800000, 0x100000, CRC(3320448e) SHA1(aef42328bf72fca5c04bfed1ea41100bb5aafeaa) )
+	ROM_LOAD16_BYTE( "136102-0334.mol1.1", 0x0a00001, 0x100000, CRC(be3acb6f) SHA1(664cb4cd4d325577ab0cbe0cf48870a9f4706573) )
+	ROM_LOAD16_BYTE( "136102-0335.moh1.1", 0x0a00000, 0x100000, CRC(e4f6e87a) SHA1(2a3f8ff46b289c25cd4ca2a1369b14613f48e964) )
+	ROM_LOAD16_BYTE( "136102-0336.mol1.2", 0x0c00001, 0x100000, CRC(a78a8525) SHA1(69c3da4d45b0f09f5bdabcedd238b82efab48a70) )
+	ROM_LOAD16_BYTE( "136102-0337.moh1.2", 0x0c00000, 0x100000, CRC(73fdd050) SHA1(63c67187953d2dab93a260e548ef5965e7cba4e8) )
+	ROM_LOAD16_BYTE( "136102-0338.mol1.3", 0x0e00001, 0x100000, CRC(fa19cae6) SHA1(7d0560516971f32835329a17450c7561631a27d1) )
+	ROM_LOAD16_BYTE( "136102-0339.moh1.3", 0x0e00000, 0x100000, CRC(e0cd1393) SHA1(0de59d04165d64320512936c194db19cca6455fd) )
+	ROM_LOAD16_BYTE( "136102-0316.mol0.0", 0x1000001, 0x100000, CRC(9301c672) SHA1(a8971049c857ae283a95b257dd0d6aaff6d787cd) )
+	ROM_LOAD16_BYTE( "136102-0317.moh0.0", 0x1000000, 0x100000, CRC(9e3b831a) SHA1(b799e57bea9522cb83f9aa7ea38a17b1d8273b8d) )
+	ROM_LOAD16_BYTE( "136102-0318.mol0.1", 0x1200001, 0x100000, CRC(8523db5d) SHA1(f2476aa26b1a7cbe7510994d92eb209fda65593d) )
+	ROM_LOAD16_BYTE( "136102-0319.moh0.1", 0x1200000, 0x100000, CRC(42f22e4b) SHA1(2a1a6f0a7aca7b7b64bce0bd54eb4cb23a2336b1) )
+	ROM_LOAD16_BYTE( "136102-0320.mol0.2", 0x1400001, 0x100000, CRC(21369d13) SHA1(28e03595c098fd9bec6f7316180d17905a51a51b) )
+	ROM_LOAD16_BYTE( "136102-0321.moh0.2", 0x1400000, 0x100000, CRC(3b7d498a) SHA1(804e9e1567bf97e8dae3b9444428254ced8b60da) )
+	ROM_LOAD16_BYTE( "136102-0322.mol0.3", 0x1600001, 0x100000, CRC(05e9f407) SHA1(fa25a893d4cb805df02d7d12df4dbabefb3114a2) )
+	ROM_LOAD16_BYTE( "136102-0323.moh0.3", 0x1600000, 0x100000, CRC(603f3bb6) SHA1(d7c22dc900d9edc36d8f211df67a206d14637fab) )
+	ROM_LOAD16_BYTE( "136102-0324.mol0.4", 0x1800001, 0x100000, CRC(3c37769f) SHA1(ca0306a439949d2a0305cc0cf05808a58e84084c) )
+	ROM_LOAD16_BYTE( "136102-0325.moh0.4", 0x1800000, 0x100000, CRC(f43321e3) SHA1(8bb4dd4a5d5400b17052d50dca9078211dc6b861) )
+	ROM_LOAD16_BYTE( "136102-0326.mol0.5", 0x1a00001, 0x100000, CRC(63d4ccea) SHA1(340fced6998a8ae6fd285d8fe666f5f1e4b6bfaf) )
+	ROM_LOAD16_BYTE( "136102-0327.moh0.5", 0x1a00000, 0x100000, CRC(9f4806d5) SHA1(76e9f1a47e7fa45e834fa8739528f1e3c54b14dc) )
+	ROM_LOAD16_BYTE( "136102-0328.mol0.6", 0x1c00001, 0x100000, CRC(a08d73e1) SHA1(25a58777f15e9550111447b47a98762fd6bb498d) )
+	ROM_LOAD16_BYTE( "136102-0329.moh0.6", 0x1c00000, 0x100000, CRC(eff3d2cd) SHA1(8532568b5fd91d2b738947e9cd575a4eb2a03be2) )
+	ROM_LOAD16_BYTE( "136102-0330.mol0.7", 0x1e00001, 0x100000, CRC(7bf6bb8f) SHA1(f34bd8a9c7f95436a1c816badc59673cd2a6969a) )
+	ROM_LOAD16_BYTE( "136102-0331.moh0.7", 0x1e00000, 0x100000, CRC(c6a64dad) SHA1(ee54514463ab61cbaef70da064cf5de591e5861f) )
+
+	ROM_REGION( 0x0600, "proms", 0 ) /* N82S147AN, not dumped for this set but believed identical */
+	ROM_LOAD( "136094-0001a.13s", 0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )    /* microcode for growth renderer */
+	ROM_LOAD( "136094-0002a.14s", 0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
+	ROM_LOAD( "136094-0003a.15s", 0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+
+	ROM_REGION( 0x0012, "mainbd_pals", 0 )
+	ROM_LOAD( "136101-0021a.22a.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-15LP */
+	ROM_LOAD( "136101-1025b.22e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0013a.23e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-15LP */
+	ROM_LOAD( "136101-0018a.24e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0017a.25e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL22V10B-10LP */
+	ROM_LOAD( "136101-1220a.22u.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-10LP */
+	ROM_LOAD( "136094-0015a.17p.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136094-0007a.17s.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-1008a.13m.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0011a.11k.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-1022a.12k.bin", 0x0000, 0x0001, NO_DUMP) /* GAL22V10B-15LP */
+	ROM_LOAD( "136094-0014a.12s.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136094-0016a.11s.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0009a.10m.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0012a.9n.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0010b.8k.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0019a.7k.bin",  0x0000, 0x0001, NO_DUMP) /* GAL20V8B-25LP */
+	ROM_LOAD( "136101-0006a.1s.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-10LP */
+
+	ROM_REGION( 0x0002, "rombd_pals", 0 )
+	ROM_LOAD( "136102-0261a.bnkdec.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-15LP */
+	ROM_LOAD( "136102-0260a.romdec.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-10LP */
+
+	ROM_REGION( 0x0003, "sndbd_pals", 0 )
+	ROM_LOAD( "136101-0070a.9f.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136102-0071a.10f.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0073a.11f.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+ROM_END
+
+
+ROM_START( primrageo )
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "136102-1044b.29l", 0x000000, 0x80000, CRC(35c9c34b) SHA1(4bd1d35cc7c68574819afd648405eedb8db25b4c) )
 	ROM_LOAD32_BYTE( "136102-1043b.28l", 0x000001, 0x80000, CRC(86322829) SHA1(e0e72888def0931d078921f099bae6788738a291) )
@@ -1399,5 +1485,6 @@ GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek
 GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
 GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
 GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", MACHINE_NODEVICE_LAN )
-GAME( 1994, primrage,   0,        primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, primrage20, primrage, primrage20, primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, primrage,   0,        primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, newer build)", MACHINE_UNEMULATED_PROTECTION ) // OS: Jan 4 1995 18:25:40 Main: Jan 4 1995 18:28:24
+GAME( 1994, primrageo,  primrage, primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, older build)", MACHINE_UNEMULATED_PROTECTION ) // OS: Dec 6 1994 16:04:09 Main: Dec 7 1994 17:24:05
+GAME( 1994, primrage20, primrage, primrage20, primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION ) // OS: Aug 9 1994 17:05:40 Main: Aug 9 1994 17:05:02

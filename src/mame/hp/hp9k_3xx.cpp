@@ -60,7 +60,10 @@
 
 #include "emu.h"
 #include "logmacro.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 #include "machine/6840ptm.h"
 #include "bus/hp_dio/hp_dio.h"
 

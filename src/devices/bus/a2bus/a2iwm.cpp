@@ -16,6 +16,7 @@
 
 #include "machine/applefdintf.h"
 #include "formats/ap2_dsk.h"
+#include "formats/as_dsk.h"
 
 
 //**************************************************************************

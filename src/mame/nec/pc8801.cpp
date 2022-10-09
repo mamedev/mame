@@ -108,6 +108,8 @@
 
 #include "softlist_dev.h"
 
+#include "utf8.h"
+
 
 #define PC8801FH_OSC1   XTAL(28'636'363)
 #define PC8801FH_OSC2   XTAL(42'105'200)

@@ -136,6 +136,26 @@
 #define ROOTDIR_BLOCK           2
 #define BLOCK_SIZE              512
 
+static const uint8_t apple35_tracklen_800kb[80] =
+{
+	12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
+	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+	10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+	9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
+};
+
+static int apple35_sectors_per_track(floppy_image_legacy *image, int track)
+{
+	int sectors;
+
+	assert(track >= 0);
+	assert(track < std::size(apple35_tracklen_800kb));
+
+	sectors = apple35_tracklen_800kb[track];
+	return sectors;
+}
+
 struct prodos_diskinfo
 {
 	imgtoolerr_t (*load_block)(imgtool::image &image, int block, void *buffer);
@@ -2245,7 +2265,7 @@ void prodos_525_get_info(const imgtool_class *imgclass, uint32_t state, union im
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = prodos_diskimage_create_525; break;
 		case IMGTOOLINFO_PTR_FLOPPY_OPEN:                   info->open = prodos_diskimage_open_525; break;
-		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple2; break;
+	//	case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple2; break;
 
 		default:                                            generic_prodos_get_info(imgclass, state, info); break;
 	}
@@ -2263,7 +2283,7 @@ void prodos_35_get_info(const imgtool_class *imgclass, uint32_t state, union img
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = prodos_diskimage_create_35; break;
 		case IMGTOOLINFO_PTR_FLOPPY_OPEN:                   info->open = prodos_diskimage_open_35; break;
-		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple35_iigs; break;
+	//	case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple35_iigs; break;
 
 		default:                                            generic_prodos_get_info(imgclass, state, info); break;
 	}

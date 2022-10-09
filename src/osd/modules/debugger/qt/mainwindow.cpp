@@ -8,6 +8,8 @@
 #include "debug/dvdisasm.h"
 #include "debug/points.h"
 
+#include "util/xmlfile.h"
+
 #include <QtGui/QCloseEvent>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QDockWidget>
@@ -17,10 +19,13 @@
 #include <QtWidgets/QScrollBar>
 
 
+namespace osd::debugger::qt {
+
 MainWindow::MainWindow(running_machine &machine, QWidget *parent) :
 	WindowQt(machine, nullptr),
 	m_historyIndex(0),
-	m_inputHistory()
+	m_inputHistory(),
+	m_exiting(false)
 {
 	setGeometry(300, 300, 1000, 600);
 
@@ -68,6 +73,9 @@ MainWindow::MainWindow(running_machine &machine, QWidget *parent) :
 	QAction *rightActRaw = new QAction("Raw Opcodes", this);
 	QAction *rightActEncrypted = new QAction("Encrypted Opcodes", this);
 	QAction *rightActComments = new QAction("Comments", this);
+	rightActRaw->setData(int(DASM_RIGHTCOL_RAW));
+	rightActEncrypted->setData(int(DASM_RIGHTCOL_ENCRYPTED));
+	rightActComments->setData(int(DASM_RIGHTCOL_COMMENTS));
 	rightActRaw->setCheckable(true);
 	rightActEncrypted->setCheckable(true);
 	rightActComments->setCheckable(true);
@@ -146,13 +154,27 @@ void MainWindow::setProcessor(device_t *processor)
 }
 
 
+void MainWindow::saveConfigurationToNode(util::xml::data_node &node)
+{
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_CONSOLE);
+
+	debug_view_disasm &dasmview = *m_dasmFrame->view()->view<debug_view_disasm>();
+	node.set_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column());
+	node.set_attribute("qtwindowstate", saveState().toPercentEncoding().data());
+}
+
+
 // Used to intercept the user clicking 'X' in the upper corner
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-	debugActQuit();
-
-	// Insure the window doesn't disappear before we get a chance to save its parameters
-	event->ignore();
+	if (!m_exiting)
+	{
+		// Don't actually close the window - it will be brought back on user break
+		debugActRunAndHide();
+		event->ignore();
+	}
 }
 
 
@@ -205,10 +227,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 {
-	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
+	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
 	if (dasmView->cursor_visible() && (m_machine.debugger().console().get_visible_cpu() == dasmView->source()->device()))
 	{
-		offs_t const address = downcast<debug_view_disasm *>(dasmView)->selected_address();
+		offs_t const address = dasmView->selected_address();
 		device_debug *const cpuinfo = dasmView->source()->device()->debug();
 
 		// Find an existing breakpoint at this address
@@ -229,7 +251,7 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 
 void MainWindow::enableBreakpointAtCursor(bool changedTo)
 {
-	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
+	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
 	if (dasmView->cursor_visible() && (m_machine.debugger().console().get_visible_cpu() == dasmView->source()->device()))
 	{
 		offs_t const address = dasmView->selected_address();
@@ -252,10 +274,10 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 
 void MainWindow::runToCursor(bool changedTo)
 {
-	debug_view_disasm *dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
+	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
 	if (dasmView->cursor_visible() && (m_machine.debugger().console().get_visible_cpu() == dasmView->source()->device()))
 	{
-		offs_t address = downcast<debug_view_disasm*>(dasmView)->selected_address();
+		offs_t address = dasmView->selected_address();
 		std::string command = string_format("go 0x%X", address);
 		m_machine.debugger().console().execute_command(command, true);
 	}
@@ -264,15 +286,8 @@ void MainWindow::runToCursor(bool changedTo)
 
 void MainWindow::rightBarChanged(QAction *changedTo)
 {
-	debug_view_disasm *dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-
-	if (changedTo->text() == "Raw Opcodes")
-		dasmView->set_right_column(DASM_RIGHTCOL_RAW);
-	else if (changedTo->text() == "Encrypted Opcodes")
-		dasmView->set_right_column(DASM_RIGHTCOL_ENCRYPTED);
-	else if (changedTo->text() == "Comments")
-		dasmView->set_right_column(DASM_RIGHTCOL_COMMENTS);
-
+	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
+	dasmView->set_right_column(disasm_right_column(changedTo->data().toInt()));
 	m_dasmFrame->view()->viewport()->update();
 }
 
@@ -380,7 +395,7 @@ void MainWindow::unmountImage(bool changedTo)
 
 void MainWindow::dasmViewUpdated()
 {
-	debug_view_disasm *const dasmView = downcast<debug_view_disasm *>(m_dasmFrame->view()->view());
+	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
 	bool const haveCursor = dasmView->cursor_visible() && (m_machine.debugger().console().get_visible_cpu() == dasmView->source()->device());
 	bool haveBreakpoint = false;
 	bool breakpointEnabled = false;
@@ -469,38 +484,21 @@ void MainWindow::createImagesMenu()
 //=========================================================================
 //  MainWindowQtConfig
 //=========================================================================
-void MainWindowQtConfig::buildFromQWidget(QWidget* widget)
-{
-	WindowQtConfig::buildFromQWidget(widget);
-	MainWindow *window = dynamic_cast<MainWindow *>(widget);
-	m_windowState = window->saveState();
-
-	QActionGroup *rightBarGroup = window->findChild<QActionGroup*>("rightbargroup");
-	if (rightBarGroup->checkedAction()->text() == "Raw Opcodes")
-		m_rightBar = 0;
-	else if (rightBarGroup->checkedAction()->text() == "Encrypted Opcodes")
-		m_rightBar = 1;
-	else if (rightBarGroup->checkedAction()->text() == "Comments")
-		m_rightBar = 2;
-}
-
-
 void MainWindowQtConfig::applyToQWidget(QWidget *widget)
 {
 	WindowQtConfig::applyToQWidget(widget);
 	MainWindow *window = dynamic_cast<MainWindow *>(widget);
 	window->restoreState(m_windowState);
 
-	QActionGroup* rightBarGroup = window->findChild<QActionGroup*>("rightbargroup");
-	rightBarGroup->actions()[m_rightBar]->trigger();
-}
-
-
-void MainWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute_int("rightbar", m_rightBar);
-	node.set_attribute("qtwindowstate", m_windowState.toPercentEncoding().data());
+	QActionGroup *const rightBarGroup = window->findChild<QActionGroup*>("rightbargroup");
+	for (QAction *action : rightBarGroup->actions())
+	{
+		if (action->data().toInt() == m_rightBar)
+		{
+			action->trigger();
+			break;
+		}
+	}
 }
 
 
@@ -509,7 +507,7 @@ void MainWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 	WindowQtConfig::recoverFromXmlNode(node);
 	const char* state = node.get_attribute_string("qtwindowstate", "");
 	m_windowState = QByteArray::fromPercentEncoding(state);
-	m_rightBar = node.get_attribute_int("rightbar", m_rightBar);
+	m_rightBar = node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, m_rightBar);
 }
 
 DasmDockWidget::~DasmDockWidget()
@@ -519,3 +517,5 @@ DasmDockWidget::~DasmDockWidget()
 ProcessorDockWidget::~ProcessorDockWidget()
 {
 }
+
+} // namespace osd::debugger::qt

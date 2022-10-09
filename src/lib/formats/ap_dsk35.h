@@ -13,17 +13,6 @@
 #pragma once
 
 #include "flopimg.h"
-#include "flopimg_legacy.h"
-
-void sony_filltrack(uint8_t *buffer, size_t buffer_len, size_t *pos, uint8_t data);
-uint8_t sony_fetchtrack(const uint8_t *buffer, size_t buffer_len, size_t *pos);
-
-int apple35_sectors_per_track(floppy_image_legacy *image, int track);
-
-/**************************************************************************/
-
-LEGACY_FLOPPY_OPTIONS_EXTERN(apple35_mac);
-LEGACY_FLOPPY_OPTIONS_EXTERN(apple35_iigs);
 
 class dc42_format : public floppy_image_format_t
 {

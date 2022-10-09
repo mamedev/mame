@@ -14,22 +14,23 @@ OTHER:  EEPROM, Battery
 
  512 sprites, each made of N x M tiles. Tiles are 16x16x8 (16x32x8 in Stone Age)
 
-------------------------------------------------------------------------------------------------------------------------------
-Year + Game             PCB ID         CPU                Video          Chips                                      Notes
-------------------------------------------------------------------------------------------------------------------------------
-00  Show Hand           CHE-B50-4002A  MC68HC000FN12      ASTRO V01      pLSI1016-60LJ, ASTRO 0001B MCU? (28 pins)
-00  Wangpai Duijue      CHE-B50-4002A  MC68HC000FN12      ASTRO V01      pLSI1016,      MDT2020AP   MCU  (28 pins)
-01  Magic Bomb (NB4.5)  None           ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
-02  Skill Drop GA       None           JX-1689F1028N      ASTRO V02      pLSI1016-60LJ
-02? Keno 21             ?              ASTRO V102?        ASTRO V05      ASTRO F02?                                 not dumped
-03  Speed Drop          None           JX-1689HP          ASTRO V05      pLSI1016-60LJ
-04  Zoo                 M1.1           ASTRO V102PX-005?  ASTRO V06      ASTRO F02 2005-02-18                       Encrypted
-05  Dino Dino           T-3802A        ASTRO V102PX-010?  ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
-05  Stone Age           L1             ASTRO V102PX-012?  ASTRO V05(x2)  ASTRO F02 2004-09-04                       Encrypted
-05? Hacher (hack)       M1.2           ?                  ?              ASTRO F02 2005-02-18                       Encrypted
-06  Win Win Bingo       M1.2           ASTRO V102PX-006?  ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
-07? Western Venture     O (CS350P032)  ASTRO V102?        ASTRO V07      ASTRO F01 2007-06-03                       Encrypted
-------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Year + Game             PCB ID                    CPU                Video          Chips                                      Notes
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+00  Show Hand           CHE-B50-4002A             MC68HC000FN12      ASTRO V01      pLSI1016-60LJ, ASTRO 0001B MCU? (28 pins)
+00  Wangpai Duijue      CHE-B50-4002A             MC68HC000FN12      ASTRO V01      pLSI1016,      MDT2020AP   MCU  (28 pins)
+01  Magic Bomb (NB4.5)  None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+02  Skill Drop GA       None                      JX-1689F1028N      ASTRO V02      pLSI1016-60LJ
+02? Keno 21             ?                         ASTRO V102?        ASTRO V05      ASTRO F02?                                 not dumped
+03  Speed Drop          None                      JX-1689HP          ASTRO V05      pLSI1016-60LJ
+04  Zoo                 M1.1                      ASTRO V102PX-005?  ASTRO V06      ASTRO F02 2005-02-18                       Encrypted
+04  Magic Bomb (NB6.1)  J (CS350P001 + CS350P033) ASTRO V102PX-014?  ASTRO V07      ?,                                         Encrypted, select CGA / VGA via jumper
+05  Dino Dino           T-3802A                   ASTRO V102PX-010?  ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
+05  Stone Age           L1                        ASTRO V102PX-012?  ASTRO V05(x2)  ASTRO F02 2004-09-04                       Encrypted
+05? Hacher (hack)       M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
+06  Win Win Bingo       M1.2                      ASTRO V102PX-006?  ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
+07? Western Venture     O (CS350P032)             ASTRO V102?        ASTRO V07      ASTRO F01 2007-06-03                       Encrypted
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 - astoneag, magibomb, winbingo, etc.: to initialize EEPROM (and self test in some games), keep keyout (W) pressed during boot.
   Needs ticket (or reserve switch) and hopper lines to be 0 though (disconnected?).
@@ -54,6 +55,7 @@ TODO:
 - magibomba, westvent: need a redump of one of the program ROMs.
 - magibombd, hacher: need a redump of the sprite ROMs.
 - astoneag, dinodino, magibombd: exiting from test menu goes haywire (requires a soft-reset with F3).
+- magibombg: needs RE of the CPU code and correct EEPROM.
 
 *************************************************************************************************************/
 
@@ -278,12 +280,14 @@ public:
 	void hacher(machine_config &config);
 	void dinodino(machine_config &config);
 	void magibombd(machine_config &config);
+	void magibombg(machine_config &config);
 	void winbingo(machine_config &config);
 	void zoo(machine_config &config);
 
 	void init_dinodino();
 	void init_hacher();
 	void init_magibombd();
+	void init_magibombg();
 	void init_winbingo();
 	void init_winbingoa();
 	void init_zoo();
@@ -319,6 +323,7 @@ private:
 	void dinodino_map(address_map &map);
 	void hacher_map(address_map &map);
 	void magibombd_map(address_map &map);
+	void magibombg_map(address_map &map);
 	void winbingo_map(address_map &map);
 	void zoo_map(address_map &map);
 
@@ -795,6 +800,23 @@ void zoo_state::magibombd_map(address_map &map)
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
 
+void zoo_state::magibombg_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0xa00000, 0xa00fff).ram().share("spriteram");
+	map(0xa02000, 0xa02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
+	map(0xa04000, 0xa04001).portr("INPUTS");
+	map(0xa08001, 0xa08001).w(FUNC(zoo_state::eeprom_w));
+	map(0xa0a000, 0xa0a001).w(FUNC(zoo_state::magibomb_outputs_w));
+	map(0xa0e000, 0xa0e001).portr("EEPROM_IN");
+	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	map(0xc00000, 0xc03fff).ram().share("nvram"); // battery
+	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd80000, 0xd80000).w(FUNC(zoo_state::oki_bank_w));
+	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+//  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
+}
+
 void zoo_state::winbingo_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
@@ -1221,6 +1243,13 @@ void zoo_state::magibombd(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibombd_map);
 }
 
+void zoo_state::magibombg(machine_config &config)
+{
+	zoo(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibombg_map);
+	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
+}
+
 void zoo_state::winbingo(machine_config &config)
 {
 	zoo(config);
@@ -1626,6 +1655,25 @@ ROM_START( magibombf )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(a01e5ce7) SHA1(77213c0b426ca1806bb8a4c55e9e7f4f2db66962) ) // factory default
+ROM_END
+
+ROM_START( magibombg )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1 magic bomb nb.6.1.u20", 0x00000, 0x10000, CRC(8aaa14c3) SHA1(44ade91596b8cd907c7556f3c5f977e2c7b4029d) )
+	ROM_LOAD16_BYTE( "2 magic bomb nb.6.1.u19", 0x00001, 0x10000, CRC(d371c3ab) SHA1(3f63883ad2735a772e9dbc958346b692420667dc) )
+	ROM_FILL(                                   0x20000, 0x20000, 0xff )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // wasn't dumped, different from the Ver. A3.1 set!
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5 magic bomb", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u10", 0x00, 0x80, BAD_DUMP CRC(a01e5ce7) SHA1(77213c0b426ca1806bb8a4c55e9e7f4f2db66962)  ) // TODO: this is correct for magibombf, create good one
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", ROMREGION_ERASE00 )
+	ROM_LOAD( "magibombg_cpucode.key", 0x00, 0x02, NO_DUMP ) // TODO: RE correct one
 ROM_END
 
 /***************************************************************************
@@ -2185,6 +2233,22 @@ void zoo_state::init_magibombd()
 #endif
 }
 
+void zoo_state::init_magibombg()
+{
+	decrypt_rom(magibombd_table);
+#if 1
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	rom[0x00004/2] = 0x0000;
+	rom[0x00006/2] = 0x043e;
+
+	rom[0x00400/2] = 0x4e75; // overlay!?
+
+	rom[0x00f26/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+#endif
+}
+
 const zoo_state::decryption_info zoo_state::winbingo_table = {
 	{
 		{
@@ -2439,6 +2503,7 @@ GAMEL( 2004,  zoo,       0,        zoo,       magibombd, zoo_state,       init_z
 GAMEL( 2005,  dinodino,  0,        dinodino,  dinodino,  zoo_state,       init_dinodino,  ROT0, "Astro Corp.", "Dino Dino (Ver. A1.1, 01/13/2005)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_dinodino  ) // 13/01.2005 10:59
 GAMEL( 2005,  astoneag,  0,        astoneag,  astoneag,  astoneag_state,  init_astoneag,  ROT0, "Astro Corp.", "Stone Age (Astro, Ver. EN.03.A, 2005/02/21)",   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_astoneag  )
 GAMEL( 2005,  magibombd, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.D, 14/11/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 15/11/05 09:31. Undumped sprite ROM
+GAMEL( 2004,  magibombg, magibomb, magibombg, magibombd, zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. NB6.1, 26/04/04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 26/04/04. Undumped sprite ROM
 GAMEL( 2006,  winbingo,  0,        winbingo,  winbingo,  zoo_state,       init_winbingo,  ROT0, "Astro Corp.", "Win Win Bingo (Ver. GM.03.3, Feb 23 2006)",     MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_winbingo  ) // 15:47:48 Feb 23 2006
 GAMEL( 2006,  winbingoa, winbingo, winbingo,  winbingo,  zoo_state,       init_winbingoa, ROT0, "Astro Corp.", "Win Win Bingo (Ver. GM.05.1, May 11 2006)",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_winbingo  ) // 11:02:07 May 11 2006. Undumped sprite ROMs
 GAMEL( 2005,  hacher,    winbingo, hacher,    winbingo,  zoo_state,       init_hacher,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo EN.01.6)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS, layout_winbingo  ) // 14:25:46 Mar 10 2005. One bad sprite ROM

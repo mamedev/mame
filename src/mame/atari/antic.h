@@ -22,8 +22,8 @@ class antic_device : public device_t, public device_video_interface
 {
 private:
 	static constexpr unsigned   VBL_END             = 8;    // vblank ends in this scanline
-	static constexpr unsigned   VDATA_START         = 11;   // video display begins in this scanline
-	static constexpr unsigned   VDATA_END           = 244;  // video display ends in this scanline
+	static constexpr unsigned   VDATA_START         = 8;   // video display begins in this scanline
+	static constexpr unsigned   VDATA_END           = 248;  // video display ends in this scanline
 	static constexpr unsigned   VBL_START           = 248;  // vblank starts in this scanline
 
 public:
@@ -40,7 +40,7 @@ public:
 	static constexpr unsigned   MIN_X               = ((HWIDTH - 42) / 2) * 8;
 	static constexpr unsigned   MAX_X               = MIN_X + (42 * 8) - 1;
 	static constexpr unsigned   MIN_Y               = VDATA_START;
-	static constexpr unsigned   MAX_Y               = VDATA_END - 8 - 1;
+	static constexpr unsigned   MAX_Y               = VDATA_END - 1;
 
 	// construction/destruction
 	antic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

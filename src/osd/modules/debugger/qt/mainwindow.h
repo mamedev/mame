@@ -3,6 +3,8 @@
 #ifndef MAME_DEBUGGER_QT_MAINWINDOW_H
 #define MAME_DEBUGGER_QT_MAINWINDOW_H
 
+#pragma once
+
 #include "debuggerview.h"
 #include "windowqt.h"
 
@@ -14,6 +16,8 @@
 
 #include <vector>
 
+
+namespace osd::debugger::qt {
 
 class DasmDockWidget;
 class ProcessorDockWidget;
@@ -32,8 +36,11 @@ public:
 
 	void setProcessor(device_t *processor);
 
+	void setExiting() { m_exiting = true; }
 
 protected:
+	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
+
 	// Used to intercept the user clicking 'X' in the upper corner
 	void closeEvent(QCloseEvent *event);
 
@@ -53,12 +60,14 @@ private slots:
 
 	void dasmViewUpdated();
 
-	// Closing the main window actually exits the program
+	// Closing the main window hides the debugger and runs the emulated system
 	void debugActClose();
-
 
 private:
 	void createImagesMenu();
+
+	void addToHistory(const QString& command);
+	void executeCommand(bool withClear);
 
 	// Widgets and docks
 	QLineEdit *m_inputEdit;
@@ -74,8 +83,8 @@ private:
 	// Terminal history
 	int m_historyIndex;
 	std::vector<QString> m_inputHistory;
-	void addToHistory(const QString& command);
-	void executeCommand(bool withClear);
+
+	bool m_exiting;
 };
 
 
@@ -157,7 +166,7 @@ class MainWindowQtConfig : public WindowQtConfig
 {
 public:
 	MainWindowQtConfig() :
-		WindowQtConfig(WIN_TYPE_MAIN),
+		WindowQtConfig(WINDOW_TYPE_CONSOLE),
 		m_rightBar(0),
 		m_windowState()
 	{}
@@ -168,11 +177,10 @@ public:
 	int m_rightBar;
 	QByteArray m_windowState;
 
-	void buildFromQWidget(QWidget *widget);
 	void applyToQWidget(QWidget *widget);
-	void addToXmlDataNode(util::xml::data_node &node) const;
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_MAINWINDOW_H

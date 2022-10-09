@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "nes.h"
 
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/rp2a03.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -51,7 +51,7 @@ INPUT_PORTS_END
 void nes_state::nes(machine_config &config)
 {
 	// basic machine hardware
-	n2a03_device &maincpu(N2A03G(config, m_maincpu, NTSC_APU_CLOCK));
+	rp2a03_device &maincpu(RP2A03G(config, m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -126,9 +126,10 @@ void nes_state::famicomo(machine_config &config)
 	famicom(config);
 
 	// basic machine hardware
-	n2a03_device &maincpu(N2A03(config.replace(), m_maincpu, NTSC_APU_CLOCK));
+	rp2a03_device &maincpu(RP2A03(config.replace(), m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
+	// sound hardware
 	maincpu.add_route(ALL_OUTPUTS, "mono", 0.90);
 }
 
@@ -142,7 +143,7 @@ void nes_state::nespalc(machine_config &config)
 	// UMC 6538 and friends -- extends time for rendering dummy scanlines
 	PPU_PALC(config.replace(), m_ppu);
 	m_ppu->set_cpu_tag(m_maincpu);
-	m_ppu->int_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	m_cartslot->set_clock(PALC_APU_CLOCK);
 
@@ -261,13 +262,13 @@ MACHINE_RESET_MEMBER( nes_state, famitvc1 )
 
 void nes_state::famitvc1(machine_config &config)
 {
-	famicom(config);
+	famicomo(config); // has an RP2A03 like the original Famicom
 
 	MCFG_MACHINE_RESET_OVERRIDE( nes_state, famitvc1 )
 
 	PPU_2C03B(config.replace(), m_ppu);
 	m_ppu->set_cpu_tag(m_maincpu);
-	m_ppu->int_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	m_cartslot->set_must_be_loaded(false);
 }
@@ -282,7 +283,7 @@ MACHINE_START_MEMBER( nes_state, famitwin )
 	{
 		setup_disk(m_disk);
 
-		// replace the famicom disk ROM with the famicom twin one (until we modernize the floppy drive)
+		// replace the famicom disk ROM with the twin famicom one (until we modernize the floppy drive)
 		m_maincpu->space(AS_PROGRAM).install_rom(0xe000, 0xffff, memregion("maincpu")->base() + 0xe000);
 	}
 }
@@ -311,6 +312,15 @@ void nes_state::famitwin(machine_config &config)
 	NES_DISKSYS(config, "disk", NTSC_APU_CLOCK);
 }
 
+void nes_state::fctitler(machine_config &config)
+{
+	famicom(config);
+
+	// PPU is really RC2C05-99, but it can't be like the other 2C05s since they swap PPUCTRL and PPUMASK registers
+	PPU_2C03B(config.replace(), m_ppu);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
 
 
 ROM_START( nes )
@@ -347,17 +357,16 @@ ROM_START( famitwin )
 	ROM_LOAD( "rp2c33a-02.bin", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1) ) // "Famicom" logo instead of Nintendo logo
 ROM_END
 
-ROM_START( m82 )
-	ROM_REGION( 0x14000, "maincpu", 0 )  // Main RAM + program banks
-	// Banks to be mapped at 0xe000? More investigations needed...
-	ROM_LOAD( "m82_v1_0.bin", 0x10000, 0x4000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
-ROM_END
+ROM_START( fctitler )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 
-ROM_START( m82p )
-	// same as m82
-	ROM_REGION( 0x14000, "maincpu", 0 )  // Main RAM + program banks
-	// Banks to be mapped at 0xe000? More investigations needed...
-	ROM_LOAD( "m82_v1_0.bin", 0x10000, 0x4000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
+	// builtin has its own MMC1B1, 8K PRGRAM (battery backed), and 8K CHRRAM
+	// TODO: add switch that selects which boots: builtin vs cart
+	ROM_REGION( 0x80000, "builtin_prg", 0 )
+	ROM_LOAD( "x1252ce.prg", 0x00000, 0x80000, CRC(696712f9) SHA1(1b9475f569ea9943122676ce65165dc82d11ef38) )
+
+	ROM_REGION( 0xc0, "ppu:palette", 0 )
+	ROM_LOAD( "rp2c0x.pal", 0x00, 0xc0, CRC(48de65dc) SHA1(d10acafc8da9ff479c270ec01180cca61efe62f5) )
 ROM_END
 
 // see http://www.disgruntleddesigner.com/chrisc/drpcjr/index.html
@@ -406,17 +415,14 @@ ROM_END
 // Nintendo Entertainment System hardware
 CONS( 1985, nes,      0,       0,      nes,      nes,     nes_state, empty_init,   "Nintendo",      "Nintendo Entertainment System / Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1987, nespal,   nes,     0,      nespal,   nes,     nes_state, empty_init,   "Nintendo",      "Nintendo Entertainment System (PAL)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-// M82 Display Unit
-// supports up to twelve cartridge slots
-CONS( 198?, m82,      nes,     0,      nes,      nes,     nes_state, empty_init,   "Nintendo",      "M82 Display Unit (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, m82p,     nes,     0,      nespal,   nes,     nes_state, empty_init,   "Nintendo",      "M82 Display Unit (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Famicom hardware
 CONS( 1983, famicom,  0,       nes,    famicom,  famicom, nes_state, init_famicom, "Nintendo",      "Famicom",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1983, famicomo, famicom, 0,      famicomo, famicom, nes_state, init_famicom, "Nintendo",      "Famicom (earlier, with RP2A03)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1983, famitvc1, famicom, 0,      famitvc1, famicom, nes_state, init_famicom, "Sharp",         "My Computer Terebi C1",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1986, fds,      famicom, 0,      fds,      famicom, nes_state, init_famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1986, famitwin, famicom, 0,      famitwin, famicom, nes_state, init_famicom, "Sharp",         "Famicom Twin",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1986, famitwin, famicom, 0,      famitwin, famicom, nes_state, init_famicom, "Sharp",         "Twin Famicom",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1989, fctitler, famicom, 0,      fctitler, famicom, nes_state, init_famicom, "Sharp",         "Famicom Titler",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Clone hardware
 // Many knockoffs using derivatives of the UMC board design, later incorporated into single CMOS chips, were manufactured before and past the end of the Famicom's timeline.

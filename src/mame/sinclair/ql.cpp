@@ -76,7 +76,7 @@
 #include "bus/ql/exp.h"
 #include "bus/ql/rom.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/microdrv.h"
 #include "qimi.h"
@@ -88,6 +88,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "utf8.h"
 
 
 #define SCREEN_TAG  "screen"

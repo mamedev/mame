@@ -42,6 +42,7 @@ DECLARE_DEVICE_TYPE(PIC16C57, pic16c57_device)
 DECLARE_DEVICE_TYPE(PIC16C58, pic16c58_device)
 
 DECLARE_DEVICE_TYPE(PIC1650,  pic1650_device)
+DECLARE_DEVICE_TYPE(PIC1654S, pic1654s_device)
 DECLARE_DEVICE_TYPE(PIC1655,  pic1655_device)
 
 
@@ -268,6 +269,17 @@ public:
 	pic1650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class pic1654s_device : public pic16c5x_device
+{
+public:
+	// construction/destruction
+	pic1654s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// 1654S has a /8 clock divider instead of the typical /4
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 8 - 1) / 8; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 8); }
+};
 
 class pic1655_device : public pic16c5x_device
 {

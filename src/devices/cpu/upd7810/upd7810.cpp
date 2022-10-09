@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   upd7810.c
+ *   upd7810.cpp
  *   Portable uPD7810/11, 7810H/11H, 78C10/C11/C14 emulator V0.3
  *
  *  This work is based on the
@@ -12,20 +12,38 @@
  *   not to be confused with the later and incompatible 78K family, though
  *   its architectural influence is acknowledged.
  *
- * NS20030115:
+ * 2002-02-19 (PeT):
+ * - type selection/gamemaster support added
+ * - gamemaster init hack? added
+ * - ORAX added
+ * - jre negative fixed
+ * - prefixed opcodes skipping fixed
+ * - interrupts fixed and improved
+ * - sub(and related)/add/daa flags fixed
+ * - mvi ports,... fixed
+ * - rll, rlr, drll, drlr fixed
+ * - rets fixed
+ * - l0, l1 skipping fixed
+ * - calt fixed
+ *
+ * 2003-01-15 (NS):
  * - fixed INRW_wa()
  * - TODO: add 7807, differences are listed below.
- *       I only added support for these opcodes needed by homedata.c (yes, I am
- *       lazy):
- *       4C CE (MOV A,PT)
- *       48 AC (EXA)
- *       48 AD (EXR)
- *       48 AE (EXH)
- *       48 AF (EXX)
- *       50 xx (SKN bit)
- *       58 xx (SETB)
- *       5B xx (CLR)
- *       5D xx (SK bit)
+ *   I only added support for these opcodes needed by homedata.c (yes, I am lazy):
+ *   - 4C CE (MOV A,PT)
+ *   - 48 AC (EXA)
+ *   - 48 AD (EXR)
+ *   - 48 AE (EXH)
+ *   - 48 AF (EXX)
+ *   - 50 xx (SKN bit)
+ *   - 58 xx (SETB)
+ *   - 5B xx (CLR)
+ *   - 5D xx (SK bit)
+ *
+ * 2004-05-23 (Hau):
+ * - gta, gti, dgt fixed
+ * - working reg opcodes fixed
+ * - sio input fixed
  *
  * 2008-02-24 (Wilbert Pol):
  * - Added preliminary support for uPD7801
@@ -38,31 +56,9 @@
  *   implementation has not been tested and is probably incorrect.
  *
  *****************************************************************************/
-/* Hau around 23 May 2004
-  gta, gti, dgt fixed
-  working reg opcodes fixed
-  sio input fixed
---
-  PeT around 19 February 2002
-  type selection/gamemaster support added
-  gamemaster init hack? added
-  ORAX added
-  jre negativ fixed
-  prefixed opcodes skipping fixed
-  interrupts fixed and improved
-  sub(and related)/add/daa flags fixed
-  mvi ports,... fixed
-  rll, rlr, drll, drlr fixed
-  rets fixed
-  l0, l1 skipping fixed
-  calt fixed
-*/
-
 /*
 
 7807 DESCRIPTION
-
-
 
    PA0  1     64 Vcc
    PA1  2     63 Vdd
@@ -182,7 +178,6 @@ In asynchronous mode, you can
 - switch 7bit/8bit data
 - set parity ON/OFF and EVEN/ODD
 - set 1/2 stop bit
-
 
 
 
@@ -397,6 +392,18 @@ void upd7810_device::upd_internal_256_ram_map(address_map &map)
 	map(0xff00, 0xffff).ram();
 }
 
+void upd7810_device::upd_internal_4096_rom_128_ram_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0xff80, 0xffff).ram();
+}
+
+void upd7810_device::upd_internal_4096_rom_256_ram_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0xff00, 0xffff).ram();
+}
+
 upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_to_func(*this)
@@ -499,13 +506,13 @@ void upd78c05_device::configure_ops()
 	m_opXX = s_opXX_78c05;
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd78c05_device(mconfig, UPD78C05, tag, owner, clock)
+upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
+	: upd7810_device(mconfig, type, tag, owner, clock, internal_map)
 {
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(upd78c05_device::upd_internal_128_ram_map), this))
+upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd78c05_device(mconfig, UPD78C05, tag, owner, clock, address_map_constructor(FUNC(upd78c05_device::upd_internal_128_ram_map), this))
 {
 }
 
@@ -522,7 +529,7 @@ void upd78c06_device::configure_ops()
 }
 
 upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd78c05_device(mconfig, UPD78C06, tag, owner, clock)
+	: upd78c05_device(mconfig, UPD78C06, tag, owner, clock, address_map_constructor(FUNC(upd78c06_device::upd_internal_4096_rom_128_ram_map), this))
 {
 }
 
@@ -902,6 +909,15 @@ void upd7801_device::upd7810_take_irq()
 	}
 }
 
+void upd7810_device::upd7810_to_output_change(int state)
+{
+	TO = state & 1;
+	m_to_func(TO);
+
+	if (m_mcc & 0x10)
+		WP(UPD7810_PORTC, m_pc_out);
+}
+
 void upd7810_device::upd7810_co0_output_change()
 {
 	/* Output LV0 Content to CO0 */
@@ -912,6 +928,8 @@ void upd7810_device::upd7810_co0_output_change()
 		LV0 ^= 1;
 
 	m_co0_func(CO0);
+	if (m_mcc & 0x40)
+		WP(UPD7810_PORTC, m_pc_out);
 }
 void upd7810_device::upd7810_co1_output_change()
 {
@@ -923,6 +941,8 @@ void upd7810_device::upd7810_co1_output_change()
 		LV1 ^= 1;
 
 	m_co1_func(CO1);
+	if (m_mcc & 0x80)
+		WP(UPD7810_PORTC, m_pc_out);
 }
 
 void upd7810_device::upd7810_write_EOM()
@@ -977,6 +997,8 @@ void upd7810_device::upd7810_sio_output()
 	{
 		TXD = m_txs & 1;
 		m_txd_func(TXD);
+		if (m_mcc & 0x01)
+			WP(UPD7810_PORTC, m_pc_out);
 		m_txs >>= 1;
 		m_txcnt--;
 		if (0 == m_txcnt)
@@ -1272,8 +1294,7 @@ void upd7810_device::upd7810_handle_timer0(int cycles, int clkdiv)
 			/* timer F/F source is timer 0 ? */
 			if (0x00 == (TMM & 0x03))
 			{
-				TO ^= 1;
-				m_to_func(TO);
+				upd7810_to_output_change(TO ^ 1);
 			}
 			/* timer 1 chained with timer 0 ? */
 			if ((TMM & 0xe0) == 0x60)
@@ -1286,8 +1307,7 @@ void upd7810_device::upd7810_handle_timer0(int cycles, int clkdiv)
 					/* timer F/F source is timer 1 ? */
 					if (0x01 == (TMM & 0x03))
 					{
-						TO ^= 1;
-						m_to_func(TO);
+						upd7810_to_output_change(TO ^ 1);
 					}
 				}
 			}
@@ -1309,8 +1329,7 @@ void upd7810_device::upd7810_handle_timer1(int cycles, int clkdiv)
 			/* timer F/F source is timer 1 ? */
 			if (0x01 == (TMM & 0x03))
 			{
-				TO ^= 1;
-				m_to_func(TO);
+				upd7810_to_output_change(TO ^ 1);
 			}
 		}
 	}
@@ -1365,8 +1384,7 @@ void upd7810_device::handle_timers(int cycles)
 		OVCF += cycles;
 		while (OVCF >= 1)
 		{
-			TO ^= 1;
-			m_to_func(TO);
+			upd7810_to_output_change(TO ^ 1);
 			OVCF -= 1;
 		}
 	}
@@ -1531,8 +1549,7 @@ void upd7801_device::handle_timers(int cycles)
 			IRR |= INTFT0;
 
 			/* Reset the timer flip/fliop */
-			TO = 0;
-			m_to_func(TO);
+			upd7810_to_output_change(0);
 
 			/* Reload the timer */
 			m_ovc0 = 8 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
@@ -1545,16 +1562,14 @@ void upd78c05_device::handle_timers(int cycles)
 	if ( m_ovc0 ) {
 		m_ovc0 -= cycles;
 
-		if ( m_ovc0 <= 0 ) {
+		if ( m_ovc0 <= 0 )
+		{
 			IRR |= INTFT0;
-			if (0x00 == (TMM & 0x03)) {
-				TO ^= 1;
-				m_to_func(TO);
-			}
+			if (0x00 == (TMM & 0x03))
+				upd7810_to_output_change(TO ^ 1);
 
-			while ( m_ovc0 <= 0 ) {
+			while ( m_ovc0 <= 0 )
 				m_ovc0 += ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
-			}
 		}
 	}
 }
@@ -1621,10 +1636,16 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_eom));
 	save_item(NAME(m_sml));
 	save_item(NAME(m_smh));
+	save_item(NAME(m_panm));
 	save_item(NAME(m_anm));
 	save_item(NAME(m_mkl));
 	save_item(NAME(m_mkh));
 	save_item(NAME(m_zcm));
+	save_item(NAME(m_pa_in));
+	save_item(NAME(m_pb_in));
+	save_item(NAME(m_pc_in));
+	save_item(NAME(m_pd_in));
+	save_item(NAME(m_pf_in));
 	save_item(NAME(m_pa_out));
 	save_item(NAME(m_pb_out));
 	save_item(NAME(m_pc_out));
@@ -1645,14 +1666,28 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_co1));
 	save_item(NAME(m_irr));
 	save_item(NAME(m_itf));
-	save_item(NAME(m_ovc0));
-	save_item(NAME(m_ovc1));
-	save_item(NAME(m_ovcf));
-	save_item(NAME(m_ovcs));
-	save_item(NAME(m_edges));
 	save_item(NAME(m_nmi));
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
+
+	save_item(NAME(m_txs));
+	save_item(NAME(m_rxs));
+	save_item(NAME(m_txcnt));
+	save_item(NAME(m_rxcnt));
+	save_item(NAME(m_txbuf));
+	save_item(NAME(m_ovc0));
+	save_item(NAME(m_ovc1));
+	save_item(NAME(m_ovce));
+	save_item(NAME(m_ovcf));
+	save_item(NAME(m_ovcs));
+	save_item(NAME(m_edges));
+	save_item(NAME(m_adcnt));
+	save_item(NAME(m_adtot));
+	save_item(NAME(m_tmpcr));
+	save_item(NAME(m_shdone));
+	save_item(NAME(m_adout));
+	save_item(NAME(m_adin));
+	save_item(NAME(m_adrange));
 
 	set_icountptr(m_icount);
 }
@@ -1797,11 +1832,13 @@ void upd7810_device::device_reset()
 	MC = 0xff;
 	m_mm = 0;
 	MF = 0xff;
+	m_mt = 0;
 	TMM = 0xff;
 	ETMM = 0xff;
 	m_eom = 0;
 	m_sml = 0;
 	m_smh = 0;
+	PANM = 0xff;
 	m_anm = 0;
 	MKL = 0xFF;
 	MKH = 0xFF; // ??
@@ -1836,7 +1873,7 @@ void upd7810_device::device_reset()
 	m_itf = 0;
 	m_nmi = 0;
 	m_int1 = 0;
-	m_int2 = 1; /* physical (inverted) INT2 line state */
+	m_int2 = 1; // physical (inverted) INT2 line state
 
 	m_txs = 0;
 	m_rxs = 0;
@@ -1856,8 +1893,6 @@ void upd7810_device::device_reset()
 	m_adout = 0;
 	m_adin = 0;
 	m_adrange = 0;
-
-	PANM = 0xff;
 }
 
 void upd7801_device::device_reset()

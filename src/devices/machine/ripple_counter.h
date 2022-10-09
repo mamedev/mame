@@ -46,7 +46,7 @@ protected:
 
 	// device_rom_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_post_change() override;
 
 	TIMER_CALLBACK_MEMBER(advance_counter);
 

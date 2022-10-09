@@ -31,6 +31,7 @@
 
 #include "chd.h"
 #include "corestr.h"
+#include "path.h"
 #include "unzip.h"
 #include "xmlfile.h"
 

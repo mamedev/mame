@@ -5,8 +5,10 @@
  *
  */
 
-#ifndef DEBUG_MODULE_H_
-#define DEBUG_MODULE_H_
+#ifndef MAME_OSD_DEBUGGER_DEBUG_MODULE_H
+#define MAME_OSD_DEBUGGER_DEBUG_MODULE_H
+
+#pragma once
 
 #include "osdepend.h"
 #include "modules/osdmodule.h"
@@ -30,4 +32,4 @@ public:
 
 
 
-#endif /* DEBUG_MODULE_H_ */
+#endif // MAME_OSD_DEBUGGER_DEBUG_MODULE_H

@@ -28389,6 +28389,19 @@ Freezes at the start of any in-game mode
 		</part>
 	</software>
 
+	<software name="superspin">
+		<description>Super Spin (prototype)</description>
+		<year>1993</year>
+		<publisher>Zyrinx</publisher>
+		<info name="usage" value="At boot logo, hold A then press Start to get two player split screen mode"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="0x100000">
+				<rom name="u1" size="0x80000" crc="82f5a98f" sha1="72a84cdff9ffc304a125c0aa6530d78ab0905518" offset="0x000001" loadflag="load16_byte"/>
+				<rom name="u2" size="0x80000" crc="035ec3e6" sha1="96789fc4cca0a67da5e25ba3a8b5ff55a6eefadc" offset="0x000000" loadflag="load16_byte"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ssf2">
 		<description>Super Street Fighter II - The New Challengers (Euro)</description>
 		<year>1994</year>

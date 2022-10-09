@@ -17,15 +17,24 @@ Hardware notes:
 TV Game 8080 hardware is pretty much the same, but on a completely different
 cheaper looking PCB. It has 13 switches instead of 15.
 
+To test score-related things: P1 BCD score LSB is in RAM 0x2056, MSB 0x2057.
+Every 480 points, the bricks get rebuilt. The game forcibly ends at 1920 points.
+
 TODO:
-- missing paddle position read (or maybe ball vs paddle collision detection)
-- interrupts are wrong, it looks like it expects IN.2 0x40 to be low for a while before the 2nd irq
-- is mirror(0x08) on the PPIs correct? it reads from 0x1c what may be paddle related too
-- video timing is wrong
-- identify remaining switches
+- Is blockch really Block Challenger, or an older game on the same hardware?
+  The flyer has more bricks, and has the score panel at the bottom. Although
+  the PCB was purchased as Sun Electronics Block Challenger.
+- verify tvgm8080 title, the only reference is from the instruction card which
+  said: TV.GAME -8080-
 - the flyer photo shows a green screen, assumed to be an overlay on a B&W CRT
+- video timing is wrong
+- 2nd irq timing is guessed (it's not vblank-out irq, that will cause strange
+  delays when the ball hits a brick)
+- paddle/ball sprite drawing is guessed
+- unknown bits in ppi1_c_r
+- identify remaining switches
+- cocktail mode
 - sound emulation
-- verify tvgm8080 title, the only reference is from the instruction card which said: TV.GAME -8080-
 
 ******************************************************************************/
 
@@ -33,6 +42,7 @@ TODO:
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 
 #include "screen.h"
 
@@ -53,39 +63,42 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine configs
 	void blockch(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 
 private:
-	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device_array<i8255_device, 2> m_ppi;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u8> m_vram;
-	required_ioport_array<4> m_inputs;
+	required_ioport_array<5> m_inputs;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	void ppi0_c_w(u8 data);
 	void ppi1_a_w(u8 data);
 	void ppi1_b_w(u8 data);
 	void ppi1_c_w(u8 data);
+	u8 ppi1_c_r();
 
-	int m_ball_x = 0;
-	int m_ball_y = 0;
+	u8 m_sound = 0;
+	u8 m_ball_x = 0;
+	u8 m_ball_y = 0;
+	u8 m_vctrl = 0;
 };
 
 void blockch_state::machine_start()
 {
+	save_item(NAME(m_sound));
 	save_item(NAME(m_ball_x));
 	save_item(NAME(m_ball_y));
+	save_item(NAME(m_vctrl));
 }
 
 
@@ -96,6 +109,8 @@ void blockch_state::machine_start()
 
 u32 blockch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+
 	// 96x64 background
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -108,7 +123,8 @@ u32 blockch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	}
 
 	// draw ball sprite
-	int bx = 0x200 - m_ball_x - 2;
+	int bx = (m_vctrl << 8 & 0x100) | m_ball_x;
+	bx = 0x200 - bx - 2;
 	int by = 0x100 - m_ball_y;
 
 	for (int y = by; y < (by + 4); y++)
@@ -117,13 +133,29 @@ u32 blockch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 				bitmap.pix(y, x) = rgb_t::white();
 
 	// draw paddle
-	// TODO: preliminary
-	int py = m_inputs[3]->read();
-	int px[2] = { 186, 46 };
+	int num_p = (m_inputs[3]->read() & 1) ? 1 : 2;
+	const int px[2] = { 44, 184 };
+	int py, plen;
 
-	for (int y = py; y < (py + 20); y++)
-		for (int i = 0; i < 2; i++)
-			for (int x = px[i]; x < (px[i] + 2); x++)
+	if (m_sound & 0x80)
+	{
+		py = 0;
+		plen = 256;
+	}
+	else
+	{
+		py = m_inputs[4]->read();
+		if (m_vctrl & 8)
+			plen = 8;
+		else if (m_vctrl & 4)
+			plen = 16;
+		else
+			plen = 32;
+	}
+
+	for (int y = py; y < (py + plen); y++)
+		for (int i = 0; i < num_p; i++)
+			for (int x = px[i]; x < (px[i] + 4); x++)
 				if (cliprect.contains(x, y))
 					bitmap.pix(y, x) = rgb_t::white();
 
@@ -136,14 +168,24 @@ u32 blockch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
     I/O
 ******************************************************************************/
 
-WRITE_LINE_MEMBER(blockch_state::vblank_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(blockch_state::scanline)
 {
-	m_maincpu->set_input_line(0, HOLD_LINE);
+	int scanline = param;
+
+	// vblank irq
+	if (scanline == 248)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+
+	// unknown irq
+	if (scanline == 64)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 void blockch_state::ppi0_c_w(u8 data)
 {
-	// sound?
+	// sound/lamps?
+	// d7 also appears to be for hiding the paddles
+	m_sound = data;
 }
 
 void blockch_state::ppi1_a_w(u8 data)
@@ -153,12 +195,27 @@ void blockch_state::ppi1_a_w(u8 data)
 
 void blockch_state::ppi1_b_w(u8 data)
 {
-	m_ball_x = (m_ball_x & 0xf00) | data;
+	m_ball_x = data;
 }
 
 void blockch_state::ppi1_c_w(u8 data)
 {
-	m_ball_x = (m_ball_x & 0xff) | (data << 8 & 0xf00);
+	// d0: ball x hi
+	// d1: flip screen
+	// d2: shorter paddles (8 points)
+	// d3: shorter paddles (hit the ceiling)
+	m_vctrl = data;
+}
+
+u8 blockch_state::ppi1_c_r()
+{
+	// d4: ? (game won't boot when 0)
+	// d5: ? (paddle collision problem when 1)
+	// d6: vblank?
+	// d7: upright/cocktail switch
+	u8 d6 = m_screen->vblank() ? 0x40 : 0;
+	u8 d7 = m_inputs[2]->read() & 0x80;
+	return d7 | d6 | 0x1f;
 }
 
 
@@ -176,8 +233,10 @@ void blockch_state::main_map(address_map &map)
 
 void blockch_state::io_map(address_map &map)
 {
-	map(0x10, 0x13).mirror(0x08).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x14, 0x17).mirror(0x08).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x14, 0x17).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x18, 0x18).portr("IN.4");
+	map(0x1c, 0x1c).portr("IN.3");
 }
 
 
@@ -193,58 +252,74 @@ static INPUT_PORTS_START( blockch )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x02, "7" )
 	PORT_DIPSETTING(    0x03, "9")
-	PORT_DIPNAME( 0x04, 0x00, "Unknown 0_04" )
+	PORT_DIPNAME( 0x04, 0x04, "Replay" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, "399" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x00, "Unknown 0_10" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Unknown 0_20" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Unknown 0_40" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Unknown 0_80" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 0_10" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 0_20" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 0_40" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 0_80" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_DIPNAME( 0x10, 0x00, "Unknown 1_10" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Barriers" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x00, "Obstacles" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Unknown 1_40" )
+	PORT_DIPNAME( 0x20, 0x20, "Barriers" )
+	PORT_DIPSETTING(    0x20, "481, 1441" ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Oil" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Unknown 1_80" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, "961" ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x10)
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 1_80" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN.2")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 2_10" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Unknown 2_20" ) // collision related?
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_DIPNAME( 0x80, 0x00, "Unknown 2_80" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
 	PORT_START("IN.3")
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
+	PORT_DIPNAME( 0x01, 0x01, "Paddles" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 3_80" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN.4")
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0x00, 0xf0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tvgm8080 )
+	PORT_INCLUDE( blockch )
+
+	PORT_MODIFY("IN.1")
+	PORT_DIPNAME( 0x40, 0x40, "Oil" )
+	PORT_DIPSETTING(    0x40, "961" ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) ) PORT_CONDITION("IN.1", 0x10, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -255,10 +330,12 @@ INPUT_PORTS_END
 
 void blockch_state::blockch(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080A(config, m_maincpu, 18_MHz_XTAL/9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &blockch_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &blockch_state::io_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(blockch_state::scanline), "screen", 0, 1);
 
 	I8255(config, m_ppi[0]); // 0x92: A & B = input, C = output
 	m_ppi[0]->in_pa_callback().set_ioport("IN.0");
@@ -269,20 +346,19 @@ void blockch_state::blockch(machine_config &config)
 	m_ppi[1]->out_pa_callback().set(FUNC(blockch_state::ppi1_a_w));
 	m_ppi[1]->out_pb_callback().set(FUNC(blockch_state::ppi1_b_w));
 	m_ppi[1]->out_pc_callback().set(FUNC(blockch_state::ppi1_c_w));
-	m_ppi[1]->in_pc_callback().set_ioport("IN.2");
+	m_ppi[1]->in_pc_callback().set(FUNC(blockch_state::ppi1_c_r));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(512, 256);
-	m_screen->set_visarea(0, 384-1, 0, 256-1);
+	m_screen->set_visarea(4, 384-12-1, 4, 248-1);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(blockch_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(blockch_state::vblank_irq));
 
 	config.set_default_layout(layout_blockch);
 
-	/* sound hardware */
+	// sound hardware
 	// TODO: discrete?
 }
 
@@ -316,6 +392,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT   MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAME( 1978, blockch,  0,       blockch, blockch, blockch_state, empty_init, ROT270, "Sun Electronics / Gifu Tokki", "G.T. Block Challenger", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1978, tvgm8080, blockch, blockch, blockch, blockch_state, empty_init, ROT270, "bootleg?", "TV Game 8080", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+//    YEAR  NAME      PARENT   MACHINE  INPUT     CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
+GAME( 1978, blockch,  0,       blockch, blockch,  blockch_state, empty_init, ROT270, "Sun Electronics / Gifu Tokki", "G.T. Block Challenger", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1978, tvgm8080, blockch, blockch, tvgm8080, blockch_state, empty_init, ROT270, "bootleg?", "TV Game 8080", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )

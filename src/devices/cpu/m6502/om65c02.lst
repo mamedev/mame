@@ -775,9 +775,12 @@ wai_imp
 reset_c
 	read_arg(0xffff);
 	read_pc_noinc();
-	read(SP); dec_SP();
-	read(SP); dec_SP();
-	read(SP); dec_SP();
+	read(SP);
+	dec_SP();
+	read(SP);
+	dec_SP();
+	read(SP);
+	dec_SP();
 	P = (P | F_I) & ~F_D;
 	PC = read_arg(0xfffc);
 	PC = set_h(PC, read_arg(0xfffd));

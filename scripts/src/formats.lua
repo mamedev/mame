@@ -361,6 +361,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/as_dsk.h,FORMATS["AS_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "AS_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/as_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/as_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/atari_dsk.h,FORMATS["ATARI_DSK"] = true
 --------------------------------------------------
 

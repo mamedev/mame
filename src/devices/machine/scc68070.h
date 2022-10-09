@@ -26,7 +26,7 @@ TODO:
 
 #pragma once
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/scc68070.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

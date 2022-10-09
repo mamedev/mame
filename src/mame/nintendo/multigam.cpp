@@ -107,7 +107,7 @@ Eproms are 27512,27010,274001
 */
 
 #include "emu.h"
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/rp2a03.h"
 #include "video/ppu2c0x.h"
 #include "emupal.h"
 #include "screen.h"
@@ -147,7 +147,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_device<n2a03_device> m_maincpu;
+	required_device<rp2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_ioport m_p1;
 	required_ioport m_p2;
@@ -1184,7 +1184,7 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 void multigam_state::multigam(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03G(config, m_maincpu, NTSC_APU_CLOCK);
+	RP2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::multigam_map);
 
 	/* video hardware */

@@ -14,6 +14,8 @@
 #include "rendlay.h"
 #include "rendutil.h"
 
+#include "utf8.h"
+
 
 namespace ui {
 

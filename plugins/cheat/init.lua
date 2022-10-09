@@ -154,9 +154,10 @@ function cheat.startplugin()
 				end
 			end
 		end
+		local path = emu.subst_env(manager.machine.options.entries.cheatpath:value():match("([^;]+)"))
+		local filepath = path .. "/" .. cheatname .. "_hotkeys.json"
 		if #hotkeys > 0 then
 			local json = require("json")
-			local path = emu.subst_env(manager.machine.options.entries.cheatpath:value():match("([^;]+)"))
 			local attr = lfs.attributes(path)
 			if not attr then
 				lfs.mkdir(path)
@@ -165,7 +166,7 @@ function cheat.startplugin()
 			end
 			if cheatname:find("/", 1, true) then
 				local softpath = path .. "/" .. cheatname:match("([^/]+)")
-				local attr = lfs.attributes(softpath)
+				attr = lfs.attributes(softpath)
 				if not attr then
 					lfs.mkdir(softpath)
 				elseif attr.mode ~= "directory" then -- uhhh?
@@ -173,10 +174,20 @@ function cheat.startplugin()
 				end
 			end
 
-			local file = io.open(path .. "/" .. cheatname .. "_hotkeys.json", "w+")
+			local file = io.open(filepath, "w+")
 			if file then
 				file:write(json.stringify(hotkeys, {indent = true}))
 				file:close()
+			end
+		else
+			local attr = lfs.attributes(filepath)
+			if attr and (attr.mode == "file") then
+				local json = require("json")
+				local file = io.open(filepath, "w+")
+				if file then
+					file:write(json.stringify(hotkeys, {indent = true}))
+					file:close()
+				end
 			end
 		end
 	end

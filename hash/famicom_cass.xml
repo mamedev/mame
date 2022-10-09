@@ -260,6 +260,152 @@ tape by UglyJoe of famicomworld -->
 
 <!-- These are from various issues of マイコン (Micom) BASIC Magazine and were typed in and saved to tape by ozidual. -->
 
+	<software name="abunaipp">
+		<description>Abunai Penpen!</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="危ないPENPEN!" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="777119">
+				<rom name="dangerous penpen (tomokazu taniyama).wav" size="777119" crc="7b337314" sha1="aeb73e26a2ec421b1be435c3d3a8cf1f617ac0f0"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2805897">
+				<rom name="dangerous penpen bg (tomokazu taniyama).wav" size="2805897" crc="9b514231" sha1="563d77bf4b7f74f8fcb3d2cd1b5bd7d7331e8aae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitpan">
+		<description>Fruit Panic</description>
+		<year>1984</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="フルーツ・パニック" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="782095">
+				<rom name="fruit panic (kimura-kun).wav" size="782095" crc="e9f92878" sha1="253adb55a3be457ec587a9b7d77f9e4510dc4476"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2832197">
+				<rom name="fruit panic bg (kimura-kun).wav" size="2832197" crc="308a3ba6" sha1="320bba5ffcc9efed8d3d46cb4d822d98ce858e53"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="itazurak">
+		<description>Itazura Karasu</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="イタズラカラス" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="940834">
+				<rom name="mischievous crow (aoba).wav" size="940834" crc="9d002961" sha1="13ae3c4b2e41911bf9fcd084f503a11f6f750301"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2825150">
+				<rom name="mischievous crow bg (aoba).wav" size="2825150" crc="ccbb40e1" sha1="1eb35cd30128f8ab169d822b6e44c906946ff3d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kanihata">
+		<description>Kani-san no Hatahakobi</description>
+		<year>1984</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="カニさんの旗運び" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="976575">
+				<rom name="crab carry the flag (kazuyuki nishiyama).wav" size="976575" crc="a275e9eb" sha1="fc42a7b31494f989d9d95e6052d2ee54a241ab1c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2818617">
+				<rom name="crab carry the flag bg (kazuyuki nishiyama).wav" size="2818617" crc="528c19f7" sha1="c7ed17210da6b06958153feca69f6ba49f17cd0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stardust">
+		<description>Star Dust</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="969682">
+				<rom name="star dust (hisanori takeuchi).wav" size="969682" crc="0a191300" sha1="660e0d35704f196aa2782ecbcbf0c9a315b9faf5"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2815158">
+				<rom name="star dust bg (hisanori takeuchi).wav" size="2815158" crc="385f6917" sha1="110707fa408080470e625cacb0969d3748ffe60d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starsgo">
+		<description>Star Ship Go!!</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<info name="alt_title" value="スターシップゴー" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="997874">
+				<rom name="star ship go (gokudon).wav" size="997874" crc="9dd752dc" sha1="e57f97af7f10cf242ee07edaafccaebf835397ce"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2874261">
+				<rom name="star ship go bg (gokudon).wav" size="2874261" crc="7874d8a9" sha1="10e57a4e9b1ba9ede4e6a0fa16d6b7941a032887"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wargame">
+		<description>War Game</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<info name="alt_title" value="ウォーゲーム" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="977402">
+				<rom name="war game (junichi kato).wav" size="977402" crc="439fa15e" sha1="9b2b9f0165daebaf4a51f4a39500b29c863f9437"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2820349">
+				<rom name="war game bg (junichi kato).wav" size="2820349" crc="8f311782" sha1="b3ff05c3dbee022fd402651aa214639c6c75ff0c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="flies">
 		<description>Flies</description>
 		<year>1986</year>

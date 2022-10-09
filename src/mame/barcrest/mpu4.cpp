@@ -333,7 +333,10 @@ void mpu4_state::update_meters()
 	switch (m_reel_mux)
 	{
 	case STANDARD_REEL:
-		// Change nothing
+		if (m_hopper_type != TUBES)
+		{
+			data = (data & 0x0F); //Strip reel data from meter drives, leaving active elements
+		}
 		break;
 
 	case FIVE_REEL_5TO8:
@@ -709,39 +712,21 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 	{
 		m_ic4_input_b |=  0x80;
 	}
-	else
-	{
-		m_ic4_input_b &= ~0x80;
-	}
 
 	if (!m_reel_mux)
 	{
 		if ( m_optic_pattern & 0x01 ) m_ic4_input_b |=  0x40; /* reel A tab */
-		else                          m_ic4_input_b &= ~0x40;
 
 		if ( m_optic_pattern & 0x02 ) m_ic4_input_b |=  0x20; /* reel B tab */
-		else                          m_ic4_input_b &= ~0x20;
 
 		if ( m_optic_pattern & 0x04 ) m_ic4_input_b |=  0x10; /* reel C tab */
-		else                          m_ic4_input_b &= ~0x10;
 
 		if ( m_optic_pattern & 0x08 ) m_ic4_input_b |=  0x08; /* reel D tab */
-		else                          m_ic4_input_b &= ~0x08;
-
 	}
 	else
 	{
-		if (m_optic_pattern & (1<<m_active_reel))
-		{
-			m_ic4_input_b |=  0x08;
-		}
-		else
-		{
-			m_ic4_input_b &= ~0x08;
-		}
+		if (m_optic_pattern & (1<<m_active_reel)) m_ic4_input_b |=  0x08;
 	}
-	if ( m_signal_50hz )            m_ic4_input_b |=  0x04; /* 50 Hz */
-	else                            m_ic4_input_b &= ~0x04;
 
 	if ( m_overcurrent )
 	{
@@ -789,17 +774,38 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 			}
 		}
 	}
-	if (m_hopper == HOPPER_NONDUART_A)
+	if (m_hopper_type == HOPPER_NONDUART_A)
 	{
-/*      if (hopper1_active)
-        {
-            m_aux1_input |= 0x04;
-        }
-        else
-        {
-            m_aux1_input &= ~0x04;
-        }*/
+		if (m_hopper1->line_r() && m_hopper1_opto)
+		{
+			m_aux1_input |= 0x04;
+		}
+		else
+		{
+			m_aux1_input &= ~0x04;
+		}
 	}
+	else if (m_hopper_type == HOPPER_TWIN_HOPPER)
+	{
+		if (m_hopper1->line_r())
+		{
+			m_aux1_input |= 0x08;
+		}
+		else
+		{
+			m_aux1_input &= ~0x08;
+		}
+
+		if (m_hopper2->line_r())
+		{
+			m_aux1_input |= 0x04;
+		}
+		else
+		{
+			m_aux1_input &= ~0x04;
+		}
+	}
+
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
 
 
@@ -811,10 +817,9 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 void mpu4_state::pia_ic5_porta_w(uint8_t data)
 {
 	int i;
-	if (m_hopper == HOPPER_NONDUART_A)
+	if (m_hopper_type == HOPPER_NONDUART_A)
 	{
-		//opto line
-		//hopper1_drive_sensor(data&0x10);
+		m_hopper1_opto = (data & 0x10);
 	}
 
 	switch (m_lamp_extender)
@@ -884,10 +889,10 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 
 void mpu4_state::pia_ic5_portb_w(uint8_t data)
 {
-	if (m_hopper == HOPPER_NONDUART_B)
+	if (m_hopper_type == HOPPER_NONDUART_B)
 	{
-		//hopper1_drive_motor(data &0x01) motor
-		//hopper1_drive_sensor(data &0x08) opto
+		m_hopper1->motor_w(data & 0x01);
+		m_hopper1_opto = (data & 0x08);
 	}
 	if (m_led_extender == CARD_A)
 	{
@@ -910,16 +915,16 @@ void mpu4_state::pia_ic5_portb_w(uint8_t data)
 
 uint8_t mpu4_state::pia_ic5_portb_r()
 {
-	if (m_hopper == HOPPER_NONDUART_B)
-	{/*
-	    if (hopper1_active)
-	    {
-	        m_aux2_input |= 0x08;
-	    }
-	    else
-	    {
-	        m_aux2_input &= ~0x08;
-	    }*/
+	if (m_hopper_type == HOPPER_NONDUART_B)
+	{
+		if (m_hopper1->line_r() && m_hopper1_opto)
+		{
+			m_aux2_input |= 0x08;
+		}
+		else
+		{
+			m_aux2_input &= ~0x08;
+		}
 	}
 
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",machine().describe_context()));
@@ -1031,7 +1036,7 @@ void mpu4_state::pia_ic6_portb_w(uint8_t data)
 void mpu4_state::pia_ic6_porta_w(uint8_t data)
 {
 	LOG(("%s: IC6 PIA Write A %2x\n", machine().describe_context(),data));
-	if (m_mod_number <4)
+	if (m_ay8913.found())
 	{
 		m_ay_data = data;
 		update_ay(m_pia6);
@@ -1042,7 +1047,7 @@ void mpu4_state::pia_ic6_porta_w(uint8_t data)
 WRITE_LINE_MEMBER(mpu4_state::pia_ic6_ca2_w)
 {
 	LOG(("%s: IC6 PIA write CA2 %2x (AY8913 BC1)\n", machine().describe_context(),state));
-	if (m_mod_number <4)
+	if (m_ay8913.found())
 	{
 		if ( state ) m_ay8913_address |=  0x01;
 		else         m_ay8913_address &= ~0x01;
@@ -1054,7 +1059,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_ca2_w)
 WRITE_LINE_MEMBER(mpu4_state::pia_ic6_cb2_w)
 {
 	LOG(("%s: IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", machine().describe_context(),state));
-	if (m_mod_number <4)
+	if (m_ay8913.found())
 	{
 		if ( state ) m_ay8913_address |=  0x02;
 		else         m_ay8913_address &= ~0x02;
@@ -1085,13 +1090,19 @@ void mpu4_state::pia_ic7_porta_w(uint8_t data)
 
 void mpu4_state::pia_ic7_portb_w(uint8_t data)
 {
-	if (m_hopper == HOPPER_DUART_A)
+	if (m_hopper_type == HOPPER_DUART_A)
 	{
-		//duart write data
+		m_hopper1->motor_w(data & 0x10);
+		//opto line is DUART op BIT 4 (MR, channel B)
 	}
-	else if (m_hopper == HOPPER_NONDUART_A)
+	else if (m_hopper_type == HOPPER_NONDUART_A)
 	{
-		//hoppr1_drive_motor(data & 0x10);
+		m_hopper1->motor_w(data & 0x20);
+	}
+	else if (m_hopper_type == HOPPER_TWIN_HOPPER)
+	{
+		m_hopper1->motor_w(data & 0x20);
+		m_hopper2->motor_w(data & 0x40);
 	}
 
 	m_mmtr_data = data;
@@ -1156,13 +1167,20 @@ uint8_t mpu4_state::pia_ic8_porta_r()
 
 void mpu4_state::pia_ic8_portb_w(uint8_t data)
 {
-	if (m_hopper == HOPPER_DUART_B)
+	if (m_hopper_type == HOPPER_DUART_B)
 	{
-//      duart.drive_sensor(data & 0x04, data & 0x01, 0, 0);
+		m_hopper1->motor_w(data & 0x01);
+		m_hopper1_opto =  (data & 0x04);
+		data &= ~0x05; //remove Triacs from use
 	}
-	else if (m_hopper == HOPPER_DUART_C)
+	else if (m_hopper_type == HOPPER_DUART_C)
 	{
-//      duart.drive_sensor(data & 0x04, data & 0x01, data & 0x04, data & 0x02);
+		// Dual DUART hoppers share an opto line for some reason
+		m_hopper1->motor_w(data & 0x01);
+		m_hopper1_opto =  (data & 0x04);
+		m_hopper2->motor_w(data & 0x02);
+		m_hopper2_opto =  (data & 0x04);
+		data &= ~0x07; //remove Triacs from use
 	}
 	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", machine().describe_context(),data));
 	for (int i = 0; i < 8; i++)
@@ -1960,24 +1978,6 @@ INPUT_PORTS_END
 
 /* Common configurations */
 
-void mpu4_state::mpu4_ym2413_w(offs_t offset, uint8_t data)
-{
-	if (m_ym2413) m_ym2413->write(offset,data);
-}
-
-uint8_t mpu4_state::mpu4_ym2413_r(offs_t offset)
-{
-//  if (m_ym2413) return m_ym2413->read(offset);
-	return 0xff;
-}
-
-
-void mpu4_state::mpu4_install_mod4yam_space(address_space &space)
-{
-	space.install_read_handler(0x0880, 0x0882, read8sm_delegate(*this, FUNC(mpu4_state::mpu4_ym2413_r)));
-	space.install_write_handler(0x0880, 0x0881, write8sm_delegate(*this, FUNC(mpu4_state::mpu4_ym2413_w)));
-}
-
 void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 {
 	pia6821_device *const pia_ic4ss = subdevice<pia6821_device>("pia_ic4ss");
@@ -2005,17 +2005,6 @@ MACHINE_START_MEMBER(mpu4_state,mod2)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
-	m_mod_number=2;
-}
-
-MACHINE_START_MEMBER(mpu4_state,mpu4yam)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	mpu4_config_common();
-
-	m_link7a_connected=false;
-	m_mod_number=4;
-	mpu4_install_mod4yam_space(space);
 }
 
 MACHINE_START_MEMBER(mpu4_state,mpu4oki)
@@ -2024,171 +2013,17 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
-	m_mod_number=4;
 	mpu4_install_mod4oki_space(space);
 }
 
-//TODO: Replace with standard six reels once sets are sorted out - is really six_reel_std
-void mpu4_state::init_m4altreels()
+void mpu4_state::init_m4()
 {
-	m_reel_mux = SIX_REEL_1TO8;
-	m_reels = 6;
-	setup_rom_banks();
-}
-
-void mpu4_state::init_m4altreels_big()
-{
-	init_m4default_big();
-	m_reel_mux = SIX_REEL_1TO8;
-	m_reels = 6;
-}
-
-
-void mpu4_state::init_m4default_sextender()
-{
-	init_m4default();
-	use_m4_small_extender();
-}
-
-void mpu4_state::init_m4default_big_five_std()
-{
-	init_m4default_big();
-	use_m4_five_reel_std();
-}
-
-void mpu4_state::init_m4default_big_five_rev()
-{
-	init_m4default_big();
-	use_m4_five_reel_rev();
-}
-
-void mpu4_state::init_m4default_big_five_rev_lextender()
-{
-	init_m4default_big_five_rev();
-	use_m4_large_extender_b();
-}
-
-void mpu4_state::init_m4default_big_six()
-{
-	init_m4default_big();
-	use_m4_six_reel_std();
-}
-
-void mpu4_state::init_m4default_big_six_lextender()
-{
-	init_m4default_big_six();
-	use_m4_large_extender_b();
-}
-
-void mpu4_state::init_m4default_big_six_alt()
-{
-	init_m4default_big();
-	use_m4_six_reel_alt();
-}
-
-
-void mpu4_state::init_m4default_five_std()
-{
-	init_m4default();
-	use_m4_five_reel_std();
-}
-
-void mpu4_state::init_m4default_five_std_sextender()
-{
-	init_m4default_five_std();
-	use_m4_small_extender();
-}
-
-void mpu4_state::init_m4default_five_rev()
-{
-	init_m4default();
-	use_m4_five_reel_rev();
-}
-
-void mpu4_state::init_m4default_five_rev_lextender()
-{
-	init_m4default_five_rev();
-	use_m4_large_extender_b();
-}
-
-void mpu4_state::init_m4default_five_rev_sextender()
-{
-	init_m4default_five_rev();
-	use_m4_small_extender();
-}
-
-void mpu4_state::init_m4default_five_alt()
-{
-	init_m4default();
-	use_m4_five_reel_alt();
-}
-
-
-void mpu4_state::init_m4default_six()
-{
-	init_m4default();
-	use_m4_six_reel_std();
-}
-
-void mpu4_state::init_m4default_six_sextender()
-{
-	init_m4default_six();
-	use_m4_small_extender();
-}
-
-void mpu4_state::init_m4default_six_alt()
-{
-	init_m4default();
-	use_m4_six_reel_alt();
-}
-
-
-void mpu4_state::init_m4default_seven()
-{
-	init_m4default();
-	use_m4_seven_reel();
-}
-
-
-void mpu4_state::init_big_extenda()
-{
-	init_m4default_big();
-	m_lamp_extender = LARGE_CARD_A;
-}
-
-void mpu4_state::init_m4default_big_low()
-{
-	init_m4default_big();
-	m_default_to_low_bank = true;
-}
-
-void mpu4_state::init_m4default_alt()
-{
-	m_reel_mux = STANDARD_REEL;
-	m_reels = 8;
-	setup_rom_banks();
-
-	m_bwb_bank=0;
-}
-
-void mpu4_state::init_m4default()
-{
-	use_m4_standard_reels();
 	m_bwb_bank = 0;
 	setup_rom_banks();
 }
 
-void mpu4_state::init_m4default_lextender()
+void mpu4_state::init_m4big()
 {
-	init_m4default();
-	use_m4_large_extender_b();
-}
-
-
-void mpu4_state::init_m4default_big()
-{
-	use_m4_standard_reels();
-
 	int size = memregion("maincpu")->bytes();
 	if (size <= 0x10000)
 	{
@@ -2213,125 +2048,10 @@ void mpu4_state::init_m4default_big()
 	m_bank1->set_entry(m_numbanks);
 }
 
-void mpu4_state::init_m4default_big_lextender()
+void mpu4_state::init_m4big_low()
 {
-	init_m4default_big();
-	use_m4_large_extender_b();
-}
-
-
-// these are not 'init' functions in their own right, they can be called from init functions
-void mpu4_state::use_m4_standard_reels()
-{
-	m_reel_mux = STANDARD_REEL;
-	m_reels = 4;
-}
-
-void mpu4_state::use_m4_five_reel_std()
-{
-	m_reel_mux = FIVE_REEL_5TO8;
-	m_reels = 5;
-}
-
-void mpu4_state::use_m4_five_reel_rev()
-{
-	m_reel_mux = FIVE_REEL_8TO5;
-	m_reels = 5;
-}
-
-void mpu4_state::use_m4_five_reel_alt()
-{
-	m_reel_mux = FIVE_REEL_3TO6;
-	m_reels = 5;
-}
-
-void mpu4_state::use_m4_six_reel_std()
-{
-	m_reel_mux = SIX_REEL_1TO8;
-	m_reels = 6;
-}
-
-void mpu4_state::use_m4_six_reel_alt()
-{
-	m_reel_mux = SIX_REEL_5TO8;
-	m_reels = 6;
-}
-
-void mpu4_state::use_m4_seven_reel()
-{
-	m_reel_mux = SEVEN_REEL;
-	m_reels = 7;
-}
-
-void mpu4_state::use_m4_low_volt_alt()
-{
-	//Some games can't use the 50Hz circuit to check voltage issues, handle it here
-	m_low_volt_detect = false;
-}
-
-void mpu4_state::use_m4_small_extender()
-{
-	m_lamp_extender = SMALL_CARD;
-}
-
-void mpu4_state::use_m4_large_extender_b()
-{
-	m_lamp_extender = LARGE_CARD_B;
-}
-
-void mpu4_state::use_m4_large_extender_c()
-{
-	m_lamp_extender = LARGE_CARD_C;
-}
-
-void mpu4_state::use_m4_hopper_tubes()
-{
-	m_hopper = TUBES;
-}
-
-void mpu4_state::use_m4_hopper_duart_a()
-{
-	m_hopper = HOPPER_DUART_A;
-}
-
-void mpu4_state::use_m4_hopper_duart_b()
-{
-	m_hopper = HOPPER_DUART_B;
-}
-
-void mpu4_state::use_m4_hopper_duart_c()
-{
-	m_hopper = HOPPER_DUART_C;
-}
-
-void mpu4_state::use_m4_hopper_nonduart_a()
-{
-	m_hopper = HOPPER_NONDUART_A;
-}
-
-void mpu4_state::use_m4_hopper_nonduart_b()
-{
-	m_hopper = HOPPER_NONDUART_B;
-}
-
-void mpu4_state::use_m4_led_a()
-{
-	m_led_extender = CARD_A;
-}
-
-void mpu4_state::use_m4_led_b()
-{
-	m_led_extender = CARD_B;
-}
-
-void mpu4_state::use_m4_led_c()
-{
-	m_led_extender = CARD_C;
-}
-
-void mpu4_state::use_m4_led_simple()
-{
-	m_led_extender = SIMPLE_CARD;
+	init_m4big();
+	m_default_to_low_bank = true;
 }
 
 void mpu4_state::setup_rom_banks()
@@ -2392,6 +2112,174 @@ void mpu4_state::mpu4_memmap_bl_characteriser_blastbank(address_map &map)
 	mpu4_memmap(map);
 	map(0x0800, 0x081f).rw(m_characteriser_blastbank, FUNC(mpu4_characteriser_bl_blastbank::read), FUNC(mpu4_characteriser_bl_blastbank::write));
 }
+
+void mpu4_state::mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16_t start_index, int16_t end_index)
+{
+	for(uint8_t i=0; i != NumberOfReels; i++)
+	{
+		REEL(config, m_reel[i], BARCREST_48STEP_REEL, start_index, end_index, 0x00, 2);
+		m_reel[i]->optic_handler().set([this, i](int state) {
+										   if (state)
+											   m_optic_pattern |= (1 << i);
+										   else
+											   m_optic_pattern &= ~(1 << i);
+									   });
+	}
+}
+
+void mpu4_state::tr_r4(machine_config &config)
+{
+	m_reel_mux = STANDARD_REEL;
+	m_reels = 4;
+}
+
+void mpu4_state::tr_r5(machine_config &config)
+{
+	m_reel_mux = FIVE_REEL_5TO8;
+	m_reels = 5;
+}
+
+void mpu4_state::tr_r5r(machine_config &config)
+{
+	m_reel_mux = FIVE_REEL_8TO5;
+	m_reels = 5;
+}
+
+void mpu4_state::tr_r5a(machine_config &config)
+{
+	m_reel_mux = FIVE_REEL_3TO6;
+	m_reels = 5;
+}
+
+void mpu4_state::tr_r6(machine_config &config)
+{
+	m_reel_mux = SIX_REEL_1TO8;
+	m_reels = 6;
+}
+
+void mpu4_state::tr_r6a(machine_config &config)
+{
+	m_reel_mux = SIX_REEL_5TO8;
+	m_reels = 6;
+}
+
+void mpu4_state::tr_r7(machine_config &config)
+{
+	m_reel_mux = SEVEN_REEL;
+	m_reels = 7;
+}
+
+void mpu4_state::tr_r8(machine_config &config)
+{
+	m_reel_mux = STANDARD_REEL;
+	m_reels = 8;
+}
+
+void mpu4_state::tr_rt1(machine_config &config)
+{
+	mpu4_reels(config, m_reels, 1, 3);
+}
+
+void mpu4_state::tr_rt2(machine_config &config)
+{
+	mpu4_reels(config, m_reels, 4, 12);
+}
+
+void mpu4_state::tr_rt3(machine_config &config)
+{
+	mpu4_reels(config, m_reels, 96, 3);
+}
+
+void mpu4_state::tr_lps(machine_config &config)
+{
+	m_lamp_extender = SMALL_CARD;
+}
+
+void mpu4_state::tr_lpla(machine_config &config)
+{
+	m_lamp_extender = LARGE_CARD_A;
+}
+
+void mpu4_state::tr_lplb(machine_config &config)
+{
+	m_lamp_extender = LARGE_CARD_B;
+}
+
+void mpu4_state::tr_lplc(machine_config &config)
+{
+	m_lamp_extender = LARGE_CARD_C;
+}
+
+void mpu4_state::tr_lds(machine_config &config)
+{
+	m_led_extender = SIMPLE_CARD;
+}
+
+void mpu4_state::tr_lda(machine_config &config)
+{
+	m_led_extender = CARD_A;
+}
+
+void mpu4_state::tr_ldb(machine_config &config)
+{
+	m_led_extender = CARD_B;
+}
+
+void mpu4_state::tr_ldc(machine_config &config)
+{
+	m_led_extender = CARD_C;
+}
+
+void mpu4_state::tr_ht(machine_config &config)
+{
+	m_hopper_type = TUBES;
+}
+
+void mpu4_state::tr_hda(machine_config &config)
+{
+	m_hopper_type = HOPPER_DUART_A;
+}
+
+void mpu4_state::tr_hdb(machine_config &config)
+{
+	m_hopper_type = HOPPER_DUART_B;
+}
+
+void mpu4_state::tr_hdc(machine_config &config)
+{
+	m_hopper_type = HOPPER_DUART_C;
+}
+
+void mpu4_state::tr_hna(machine_config &config)
+{
+	m_hopper_type = HOPPER_NONDUART_A;
+}
+
+void mpu4_state::tr_hnb(machine_config &config)
+{
+	m_hopper_type = HOPPER_NONDUART_B;
+}
+
+void mpu4_state::tr_htw(machine_config &config)
+{
+	m_hopper_type = HOPPER_TWIN_HOPPER;
+}
+
+void mpu4_state::tr_over(machine_config &config)
+{
+	m_overcurrent_detect = true;
+}
+
+void mpu4_state::tr_p4l(machine_config &config)
+{
+	m_use_pia4_porta_leds = true;
+}
+
+void mpu4_state::tr_scardl(machine_config &config)
+{
+	m_use_simplecard_leds = true;
+}
+
 
 void mpu4_state::mpu4_common(machine_config &config)
 {
@@ -2463,6 +2351,8 @@ void mpu4_state::mpu4_common(machine_config &config)
 
 	BACTA_DATALOGGER(config, m_dataport, 0);
 	m_dataport->rxd_handler().set(FUNC(mpu4_state::dataport_rxd));
+
+	HOPPER(config, m_hopper1, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
 
 void mpu4_state::mpu4_common2(machine_config &config)
@@ -2514,7 +2404,7 @@ void mpu4_state::mpu4base(machine_config &config)
 
 ***********************************************************************************************/
 
-void mpu4_state::mod2(machine_config &config)
+void mpu4_state::mod2_f(machine_config &config)
 {
 	mpu4base(config);
 	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
@@ -2522,181 +2412,25 @@ void mpu4_state::mod2(machine_config &config)
 	m_ay8913->set_resistors_load(820, 0, 0);
 	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_reels<0, 6>(config);
 }
 
-void mpu4_state::mod2_no_bacta(machine_config &config)
+void mpu4_state::mod2_no_bacta_f(machine_config &config)
 {
-	mod2(config);
+	mod2_f(config);
 	config.device_remove("dataport");
 	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
 }
 
-void mpu4_state::mod2_7reel(machine_config &config)
+void mpu4_state::mod2_cheatchr_f(machine_config &config)
 {
-	mpu4base(config);
-	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
-	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
-	m_ay8913->set_resistors_load(820, 0, 0);
-	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_reels<0, 7>(config);
-}
-
-void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* table)
-{
-	mod2(config);
+	mod2_f(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod2_chr(machine_config &config)
-{
-	mod2(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-}
-
-void mpu4_state::mod2_cheatchr(machine_config &config)
-{
-	mod2_cheatchr_table(config, nullptr);
-}
-
-
-void mpu4_state::mod2_chr_blastbnk(machine_config &config)
-{
-	mod2(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bl_characteriser_blastbank);
-
-	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank, 0);
-}
-
-void mpu4_state::mod2_chr_copcash(machine_config &config)
-{
-	mod2(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bl_characteriser_blastbank);
-
-	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank, 0);
-	m_characteriser_blastbank->set_retxor(0x03);
-
-}
-
-
-// alt reel setup
-
-void mpu4_state::mod2_alt(machine_config &config)
-{
-	mpu4base(config);
-	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
-	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
-	m_ay8913->set_resistors_load(820, 0, 0);
-	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_reels<1, 6>(config);
-}
-
-void mpu4_state::mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table)
-{
-	mod2_alt(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod2_alt_cheatchr(machine_config &config)
-{
-	mod2_alt_cheatchr_table(config, nullptr);
-}
-
-/***********************************************************************************************
-
-  Configs for Mod4 with YM
-
-  TODO: mod4yam should eventually become a subclass
-
-***********************************************************************************************/
-
-void mpu4_state::add_ym2413(machine_config &config)
-{
-	YM2413(config, m_ym2413, XTAL(3'579'545)); // XTAL on sound board
-	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-void mpu4_state::mod4yam(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
-
-	mpu4_reels<0, 6>(config);
-
-	add_ym2413(config);
-}
-
-void mpu4_state::mod4yam_no_bacta(machine_config &config)
-{
-	mod4yam(config);
-	config.device_remove("dataport");
-	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
-}
-
-void mpu4_state::mod4yam_chr(machine_config &config)
-{
-	mod4yam(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-}
-
-void mpu4_state::mod4yam_cheatchr_table(machine_config& config, const uint8_t* table)
-{
-	mod4yam(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod4yam_cheatchr(machine_config &config)
-{
-	mod4yam_cheatchr_table(config, nullptr);
-}
-
-void mpu4_state::mod4yam_alt(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
-
-	mpu4_reels<1, 6>(config);
-
-	add_ym2413(config);
-}
-
-void mpu4_state::mod4yam_7reel(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
-
-	mpu4_reels<0, 7>(config);
-
-	add_ym2413(config);
+	m_characteriser->set_lamp_table(nullptr);
 }
 
 /***********************************************************************************************
@@ -2709,161 +2443,33 @@ void mpu4_state::mod4yam_7reel(machine_config &config)
 
 // standard reel setup
 
-void mpu4_state::mod4oki(machine_config &config)
+void mpu4_state::mod4oki_f(machine_config &config)
 {
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
-	mpu4_reels<0, 6>(config);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
-void mpu4_state::mod4oki_no_bacta(machine_config &config)
+void mpu4_state::mod4oki_no_bacta_f(machine_config &config)
 {
-	mod4oki(config);
+	mod4oki_f(config);
 	config.device_remove("dataport");
 	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
 }
 
-void mpu4_state::mod4oki_7reel(machine_config &config)
+void mpu4_state::mod4oki_cheatchr_f(machine_config &config)
 {
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
-
-	mpu4_common2(config);
-	mpu4_reels<0, 7>(config);
-
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-void mpu4_state::mod4oki_chr(machine_config &config)
-{
-	mod4oki(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-}
-
-
-void mpu4_state::mod4oki_cheatchr_table(machine_config &config, const uint8_t* table)
-{
-	mod4oki(config);
+	mod4oki_f(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod4oki_cheatchr(machine_config &config)
-{
-	mod4oki_cheatchr_table(config, nullptr);
-}
-
-
-
-
-// alt reel setup
-
-void mpu4_state::mod4oki_alt(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
-
-	mpu4_common2(config);
-	mpu4_reels<1, 6>(config);
-
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-
-
-void mpu4_state::mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table)
-{
-	mod4oki_alt(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod4oki_alt_cheatchr(machine_config &config)
-{
-	mod4oki_alt_cheatchr_table(config, nullptr);
-}
-
-
-// 5 reel setup
-
-void mpu4_state::mod4oki_5r(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
-
-	mpu4_common2(config);
-	mpu4_reels<0, 5>(config);
-
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-void mpu4_state::mod4oki_5r_chr(machine_config &config)
-{
-	mod4oki_5r(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-}
-
-void mpu4_state::mod4oki_5r_cheatchr_table(machine_config &config, const uint8_t* table)
-{
-	mod4oki_5r(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod4oki_5r_cheatchr(machine_config &config)
-{
-	mod4oki_5r_cheatchr_table(config, nullptr);
-}
-
-
-/***********************************************************************************************
-
-  Inits
-
-***********************************************************************************************/
-
-// TODO: move this to mpu4_characteriser_bootleg.cpp, it's for a single game that requires
-//       a different 'fixed' value depending on the address
-uint8_t mpu4_state::bootleg806_r(address_space &space, offs_t offset)
-{
-	return 0x6a;
-}
-
-void mpu4_state::init_m4default_806prot()
-{
-	init_m4default_sextender();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0806, 0x0806, read8m_delegate(*this, FUNC(mpu4_state::bootleg806_r)));
+	m_characteriser->set_lamp_table(nullptr);
 }

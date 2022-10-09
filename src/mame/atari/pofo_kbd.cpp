@@ -7,6 +7,8 @@
 
 #include "machine/keyboard.ipp"
 
+#include "utf8.h"
+
 DEFINE_DEVICE_TYPE(POFO_KEYBOARD, pofo_keyboard_device, "pofo_keyboard", "Atari Portfolio keyboard");
 
 pofo_keyboard_device::pofo_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

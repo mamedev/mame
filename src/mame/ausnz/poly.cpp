@@ -34,6 +34,7 @@
 #include "poly.h"
 #include "formats/flex_dsk.h"
 #include "softlist_dev.h"
+#include "utf8.h"
 
 
 void poly_state::poly_bank(address_map &map)

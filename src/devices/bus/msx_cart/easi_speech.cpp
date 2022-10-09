@@ -6,12 +6,7 @@ Easi-Speech cartridge (R.Amy, 1987)
 
 The program adds a hook to 0xfd29, usage appears to be something like this:
 defusr0=&hfd29
-x=usr0("hello")
-
-TODO:
-- Speech doesn't work. At boot, it's supposed to say "M S X easy speech".
-  Maybe ald_w data is scrambled a bit? The expected usage in notes above
-  also does not work.
+a$=usr0("hello")
 
 ******************************************************************************/
 
@@ -47,9 +42,12 @@ void msx_cart_easispeech_device::device_add_mconfig(machine_config &config)
 
 uint8_t msx_cart_easispeech_device::read_cart(offs_t offset)
 {
+	// standard ROM
 	if (offset >= 0x4000 && offset < 0x8000)
 		return get_rom_base()[offset & 0x1fff];
-	if (offset >= 0x8000 && offset < 0xc000)
+
+	// d7: SP0256 LRQ
+	if (offset == 0x8000)
 		return m_speech->lrq_r() << 7;
 
 	return 0xff;
@@ -57,6 +55,7 @@ uint8_t msx_cart_easispeech_device::read_cart(offs_t offset)
 
 void msx_cart_easispeech_device::write_cart(offs_t offset, uint8_t data)
 {
-	if (offset >= 0x8000 && offset < 0xc000)
-		m_speech->ald_w(data >> 2);
+	// d2-d7: SP0256 A
+	if (offset == 0x8000)
+		m_speech->ald_w(bitswap<6>(data,3,5,7,6,4,2));
 }

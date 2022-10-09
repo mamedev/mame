@@ -79,6 +79,7 @@ To Do / Status:
 #include "machine/input_merger.h"
 #include "formats/td0_dsk.h"
 #include "softlist_dev.h"
+#include "utf8.h"
 
 namespace {
 

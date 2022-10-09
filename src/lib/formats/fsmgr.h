@@ -288,10 +288,21 @@ class unformatted_floppy_creator;
 class manager_t {
 public:
 	struct floppy_enumerator {
+		floppy_enumerator(u32 form_factor, const std::vector<u32> &variants);
 		virtual ~floppy_enumerator() = default;
 
-		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) = 0;
+		void add(const floppy_image_format_t &type, u32 form_factor, u32 variant, u32 image_size, const char *name, const char *description);
 		virtual void add_raw(const char *name, u32 key, const char *description) = 0;
+
+		u32 form_factor() const { return m_form_factor; }
+		const std::vector<u32> &variants() const { return m_variants; }
+
+	protected:
+		virtual void add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) = 0;
+
+	private:
+		u32                         m_form_factor;
+		const std::vector<u32> &    m_variants;
 	};
 
 	struct hd_enumerator {
@@ -312,7 +323,7 @@ public:
 	virtual const char *name() const = 0;
 	virtual const char *description() const = 0;
 
-	virtual void enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const;
+	virtual void enumerate_f(floppy_enumerator &fe) const;
 	virtual void enumerate_h(hd_enumerator &he) const;
 	virtual void enumerate_c(cdrom_enumerator &ce) const;
 
@@ -331,11 +342,11 @@ public:
 	// Create a filesystem object from a block device
 	virtual std::unique_ptr<filesystem_t> mount(fsblk_t &blockdev) const = 0;
 
-protected:
-	manager_t() = default;
-
 	static bool has(u32 form_factor, const std::vector<u32> &variants, u32 ff, u32 variant);
 	static bool has_variant(const std::vector<u32> &variants, u32 variant);
+
+protected:
+	manager_t() = default;
 };
 
 } // namespace fs

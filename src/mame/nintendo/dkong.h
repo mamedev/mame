@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/rp2a03.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/eepromser.h"
 #include "machine/i8257.h"
@@ -108,8 +108,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_eeprom(*this, "eeprom")
-		, m_dev_n2a03a(*this, "n2a03a")
-		, m_dev_n2a03b(*this, "n2a03b")
+		, m_dev_rp2a03a(*this, "rp2a03a")
+		, m_dev_rp2a03b(*this, "rp2a03b")
 		, m_dev_vp2(*this, "virtual_p2")
 		, m_dev_6h(*this, "ls259.6h")
 		, m_ls175_3d(*this, "ls175.3d")
@@ -181,8 +181,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<mcs48_cpu_device> m_soundcpu;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<n2a03_device> m_dev_n2a03a; /* dkong3 */
-	optional_device<n2a03_device> m_dev_n2a03b; /* dkong3 */
+	optional_device<rp2a03_device> m_dev_rp2a03a; /* dkong3 */
+	optional_device<rp2a03_device> m_dev_rp2a03b; /* dkong3 */
 	optional_device<latch8_device> m_dev_vp2;   /* dkong2, virtual port 2 */
 	optional_device<latch8_device> m_dev_6h;    /* dkong2 */
 	optional_device<latch8_device> m_ls175_3d;  /* dkong2b_audio */

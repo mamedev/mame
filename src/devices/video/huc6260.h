@@ -44,7 +44,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual uint32_t palette_entries() const override { return PALETTE_SIZE; }
+	virtual uint32_t palette_entries() const noexcept override { return PALETTE_SIZE; }
 
 	TIMER_CALLBACK_MEMBER(update_events);
 

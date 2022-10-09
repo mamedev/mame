@@ -14,6 +14,7 @@
 
 #include "corefile.h"
 #include "ioprocs.h"
+#include "path.h"
 #include "unzip.h"
 
 #include <cassert>

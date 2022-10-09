@@ -14,6 +14,9 @@
 #include "debug/debugcpu.h"
 #include "debugger.h"
 
+
+namespace {
+
 class debug_none : public osd_module, public debug_module
 {
 public:
@@ -49,5 +52,7 @@ void debug_none::wait_for_debugger(device_t &device, bool firststop)
 void debug_none::debugger_update()
 {
 }
+
+} // anonymous namespace
 
 MODULE_DEFINITION(DEBUG_NONE, debug_none)
