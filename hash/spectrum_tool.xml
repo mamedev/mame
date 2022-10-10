@@ -65,7 +65,7 @@ license:CC0
 		<description>Tact Meter v1.0</description>
 		<year>2006</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Strunov V. V." />
+		<info name="developer" value="Strunov V. V."/>
 		<part name="tactstest" interface="spectrum_cass">
 			<dataarea name="cass" size="2622">
 				<rom name="TactsTest.tap" size="2622" crc="1012357e" sha1="51c852bacccfbfc4699012e55edb957d24f9d9c6"/>
