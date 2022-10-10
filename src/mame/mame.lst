@@ -12529,6 +12529,9 @@ digilog400                      //
 @source:skeleton/digijet.cpp
 digijet                         //
 
+@source:skeleton/digitech_gsp5.cpp
+gsp5                            //
+
 @source:skeleton/dim68k.cpp
 dim68k                          //
 
