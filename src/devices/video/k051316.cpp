@@ -115,6 +115,9 @@ k051316_device::k051316_device(const machine_config &mconfig, const char *tag, d
 	, m_pixels_per_byte(2) // 4bpp layout is default
 	, m_layermask(0)
 	, m_k051316_cb(*this)
+	, m_readout_enabled(true)
+	, m_flipx_enabled(false)
+	, m_flipy_enabled(false)
 {
 }
 
@@ -178,6 +181,9 @@ void k051316_device::device_start()
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ctrlram));
 	save_item(NAME(m_wrap));
+	save_item(NAME(m_readout_enabled));
+	save_item(NAME(m_flipx_enabled));
+	save_item(NAME(m_flipy_enabled));
 
 }
 
@@ -210,7 +216,7 @@ u8 k051316_device::rom_r(offs_t offset)
 {
 	assert (m_zoom_rom.found());
 
-	if ((m_ctrlram[0x0e] & 0x01) == 0)
+	if (m_readout_enabled)
 	{
 		int addr = offset + (m_ctrlram[0x0c] << 11) + (m_ctrlram[0x0d] << 19);
 		addr /= m_pixels_per_byte;
@@ -229,10 +235,17 @@ u8 k051316_device::rom_r(offs_t offset)
 
 void k051316_device::ctrl_w(offs_t offset, u8 data)
 {
-	if ((offset == 0x0e) && (data != m_ctrlram[0x0e]))
-		m_tmap->mark_all_dirty();
+	if (offset == 0x0e)
+	{
+		m_readout_enabled = ~BIT(data, 0);
+		m_flipx_enabled = BIT(data, 1);
+		m_flipy_enabled = BIT(data, 2);
+		if ((data & 0x06) != (m_ctrlram[0x0e] & 0x06))
+			m_tmap->mark_all_dirty();
+	}
 	
 	m_ctrlram[offset] = data;
+	
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", machine().describe_context(), data, offset);
 }
 
@@ -252,15 +265,15 @@ TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
 {
 	int code = m_ram[tile_index];
 	int color = m_ram[tile_index + 0x400];
-	int flags = 0;
+	u8 flags = 0;
 
-	if ((m_ctrlram[0x0e] & 0x02) && (color & 0x40))
+	if (m_flipx_enabled && (color & 0x40))
 		flags |= TILE_FLIPX;
 	
-	if ((m_ctrlram[0x0e] & 0x04) && (color & 0x80))
+	if (m_flipy_enabled && (color & 0x80))
 		flags |= TILE_FLIPY;
 		
-	m_k051316_cb(&code, &color, &flags);
+	m_k051316_cb(&code, &color);
 
 	tileinfo.set(0,
 							code,

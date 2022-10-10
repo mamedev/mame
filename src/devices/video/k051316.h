@@ -8,13 +8,13 @@
 #include "tilemap.h"
 
 
-#define K051316_CB_MEMBER(_name)   void _name(int *code, int *color, int *flags)
+#define K051316_CB_MEMBER(_name)   void _name(int *code, int *color)
 
 
 class k051316_device : public device_t, public device_gfx_interface
 {
 public:
-	using zoom_delegate = device_delegate<void (int *code, int *color, int *flags)>;
+	using zoom_delegate = device_delegate<void (int *code, int *color)>;
 
 	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -45,7 +45,6 @@ public:
 	The callback must put:
 	- in code the resulting tile number
 	- in color the resulting color index
-	- if necessary, put flags for the TileMap code in the tile_info
 	  structure (e.g. TILE_FLIPX)
 	*/
 
@@ -77,6 +76,9 @@ private:
 	int m_pixels_per_byte;
 	int m_layermask;
 	zoom_delegate m_k051316_cb;
+	bool m_readout_enabled;
+	bool m_flipx_enabled;
+	bool m_flipy_enabled;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };
