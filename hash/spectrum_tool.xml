@@ -7,8 +7,8 @@ license:CC0
 
 	<software name="floatspy">
 		<description>Floating Bus Test v0.33</description>
-		<year>Ramsoft</year>
-		<publisher>2002</publisher>
+		<year>2002</year>
+		<publisher>Ramsoft</publisher>
 		<part name="floatspy" interface="spectrum_cass">
 			<dataarea name="cass" size="5782">
 				<rom name="floatspy.tap" size="5782" crc="2a4e5f1e" sha1="9b61d5055e3021a130f6ee960b9dabdb8accd13a"/>
