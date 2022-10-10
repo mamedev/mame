@@ -3,12 +3,13 @@
 <!--
 license:CC0
 -->
-<softwarelist name="spectrum_tool" description="Sinclair ZX Spectrum - Tools and Utilites">
+<softwarelist name="spectrum_tool" description="Sinclair ZX Spectrum - Tools and Utilities">
 
 	<software name="floatspy">
 		<description>Floating Bus Test v0.33</description>
 		<year>2002</year>
-		<publisher>Ramsoft</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ramsoft"/>
 		<part name="floatspy" interface="spectrum_cass">
 			<dataarea name="cass" size="5782">
 				<rom name="floatspy.tap" size="5782" crc="2a4e5f1e" sha1="9b61d5055e3021a130f6ee960b9dabdb8accd13a"/>
@@ -19,7 +20,7 @@ license:CC0
 	<software name="fpga48all">
 		<description>FPGA 48k</description>
 		<year>20??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="fpga48all" interface="spectrum_cass">
 			<dataarea name="cass" size="15245">
 				<rom name="FPGA48all.tap" size="15245" crc="06d0f1c7" sha1="2dc35ef01a841e139cfc93a142d2a0c3bf851d0f"/>
@@ -28,9 +29,9 @@ license:CC0
 	</software>
 
 	<software name="fusetest">
-		<description>Fuse test</description>
+		<description>Fuse Test</description>
 		<year>20??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="fusetest" interface="spectrum_cass">
 			<dataarea name="cass" size="2411">
 				<rom name="fusetest.tap" size="2411" crc="a7d5177a" sha1="fe0e27a6843328e4cf1212f0ad511d97eca5db4f"/>
@@ -41,7 +42,7 @@ license:CC0
 	<software name="inttest">
 		<description>Test INT v1.10</description>
 		<year>1995</year>
-		<publisher>Good Boy</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="inttest" interface="spectrum_cass">
 			<dataarea name="cass" size="9521">
 				<rom name="IntTest.tap" size="9521" crc="b47c794c" sha1="38eca63ef4f3ae3fc170ac2523aee4c659ed176b"/>
@@ -52,7 +53,7 @@ license:CC0
 	<software name="scroll17">
 		<description>Scroll 17</description>
 		<year>2017</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="scroll17" interface="spectrum_cass">
 			<dataarea name="cass" size="9168">
 				<rom name="scroll17.tap" size="9168" crc="65e4c06d" sha1="44089e9c03f357871e5293f83203771d04fd7b73"/>
@@ -63,7 +64,8 @@ license:CC0
 	<software name="tactstest">
 		<description>Tact Meter v1.0</description>
 		<year>2006</year>
-		<publisher>Strunov / Good Boy</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Strunov V. V." />
 		<part name="tactstest" interface="spectrum_cass">
 			<dataarea name="cass" size="2622">
 				<rom name="TactsTest.tap" size="2622" crc="1012357e" sha1="51c852bacccfbfc4699012e55edb957d24f9d9c6"/>
@@ -74,13 +76,13 @@ license:CC0
 	<software name="timingtest">
 		<description>Timing Tests v1.0</description>
 		<year>20??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="128klate" interface="spectrum_snapshot">
 			<dataarea name="cass" size="12929">
 				<rom name="Timing_Tests-128k_v1.0late.z80" size="12929" crc="fcf480d9" sha1="a702847f6074d856ce3dc4b35b5013afc49f3ae9"/>
 			</dataarea>
 		</part>
-		<part name="128k" interface="spectrum_snapshot">
+		<part name="128kearly" interface="spectrum_snapshot">
 			<dataarea name="dump" size="12929">
 				<rom name="Timing_Tests-128k_v1.0.z80" size="12929" crc="222477d2" sha1="b2d75dc03eab4a1b7a5cd22e857e625d4d2bd43f"/>
 			</dataarea>
@@ -95,7 +97,7 @@ license:CC0
 	<software name="ulatest">
 		<description>ULA Test</description>
 		<year>20??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="ula128" interface="spectrum_cass">
 			<dataarea name="cass" size="16338">
 				<rom name="ula128.tap" size="16338" crc="2a558f0d" sha1="c19a7eaf6045cadbba919a359956e7f927131164"/>
@@ -116,7 +118,10 @@ license:CC0
 	<software name="ulatest3">
 		<description>ULA Test 3</description>
 		<year>20??</year>
-		<publisher>Jan Bobrowski / CDS / BA</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Jan Bobrowski"/>
+		<info name="developer" value="CDS"/>
+		<info name="developer" value="BA"/>
 		<part name="ulatest3_all" interface="spectrum_cass">
 			<dataarea name="cass" size="1912">
 				<rom name="ulatest3_all.tap" size="1912" crc="063cb19a" sha1="6ae079812bead67b3fd9c90f2e25a5ad7d9daea4"/>
@@ -125,9 +130,10 @@ license:CC0
 	</software>
 
 	<software name="z80test12">
-		<description>Zilog Z80 CPU test suite v1.2</description>
+		<description>Zilog Z80 CPU Test Suite v1.2</description>
 		<year>2022</year>
-		<publisher>Patrik Rak</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Patrik Rak"/>
 		<part name="z80ccfscr" interface="spectrum_cass">
 			<dataarea name="cass" size="127">
 				<rom name="z80ccfscr.tap" size="127" crc="98c8333a" sha1="b4a29a3165b670416b72519a67eb6f7df7dbab58"/>
