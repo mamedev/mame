@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="spectrum_tool" description="System Tools and Utilites for ZX-Spectrum">
+<softwarelist name="spectrum_tool" description="Sinclair ZX Spectrum - Tools and Utilites">
 
 	<software name="floatspy">
 		<description>Floating Bus Test v0.33</description>
