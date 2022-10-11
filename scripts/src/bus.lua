@@ -1801,6 +1801,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/msx_slot/ax230.cpp",
 		MAME_DIR .. "src/devices/bus/msx_slot/ax230.h",
+		MAME_DIR .. "src/devices/bus/msx_slot/bruc100.cpp",
+		MAME_DIR .. "src/devices/bus/msx_slot/bruc100.h",
 		MAME_DIR .. "src/devices/bus/msx_slot/bunsetsu.cpp",
 		MAME_DIR .. "src/devices/bus/msx_slot/bunsetsu.h",
 		MAME_DIR .. "src/devices/bus/msx_slot/cartridge.cpp",
