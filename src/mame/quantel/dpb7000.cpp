@@ -68,7 +68,7 @@
 							 LOG_BRUSH_LATCH | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_DRAWS)
 
 //#define VERBOSE             (LOG_CSR | LOG_CTRLBUS | LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_BRUSH_ADDR | LOG_COMMANDS | LOG_OUTPUT_TIMING)
-#define VERBOSE (LOG_ALL)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 namespace
@@ -140,12 +140,20 @@ public:
 		, m_pen_press(*this, "PENPRESS")
 		, m_filter_signalprom(*this, "filter_signalprom")
 		, m_filter_multprom(*this, "filter_multprom")
+		, m_filter_yl(*this, "filter_de")
+		, m_filter_yh(*this, "filter_df")
+		, m_filter_xl(*this, "filter_dg")
+		, m_filter_xh(*this, "filter_dh")
 		, m_filter_signal(nullptr)
 		, m_filter_mult(nullptr)
-		, m_size_yl(*this, "filter_de")
-		, m_size_yh(*this, "filter_df")
-		, m_size_xl(*this, "filter_dg")
-		, m_size_xh(*this, "filter_dh")
+		, m_size_ge(*this, "size_ge")
+		, m_size_gf(*this, "size_gf")
+		, m_size_gg(*this, "size_gg")
+		, m_size_gh(*this, "size_gh")
+		, m_size_de(*this, "size_de")
+		, m_size_df(*this, "size_df")
+		, m_size_dg(*this, "size_dg")
+		, m_size_dh(*this, "size_dh")
 		, m_brushproc_prom_region(*this, "brushproc_prom")
 		, m_brushproc_pal_region(*this, "brushproc_pal")
 		, m_brushproc_prom(nullptr)
@@ -526,6 +534,10 @@ private:
 	// Filter Card
 	required_memory_region m_filter_signalprom;
 	required_memory_region m_filter_multprom;
+	required_device<am2901b_device> m_filter_yl;
+	required_device<am2901b_device> m_filter_yh;
+	required_device<am2901b_device> m_filter_xl;
+	required_device<am2901b_device> m_filter_xh;
 	uint8_t *m_filter_signal;
 	uint8_t *m_filter_mult;
 	uint8_t m_filter_acbc[16];
@@ -535,11 +547,14 @@ private:
 	bool m_buffer_lum;
 
 	// Size Card
-	required_device<am2901b_device> m_size_yl;
-	required_device<am2901b_device> m_size_yh;
-	required_device<am2901b_device> m_size_xl;
-	required_device<am2901b_device> m_size_xh;
-
+	required_device<am2901b_device> m_size_ge;
+	required_device<am2901b_device> m_size_gf;
+	required_device<am2901b_device> m_size_gg;
+	required_device<am2901b_device> m_size_gh;
+	required_device<am2901b_device> m_size_de;
+	required_device<am2901b_device> m_size_df;
+	required_device<am2901b_device> m_size_dg;
+	required_device<am2901b_device> m_size_dh;
 	uint8_t m_size_h;
 	uint8_t m_size_v;
 
@@ -924,17 +939,6 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_brush_press_lum));
 	save_item(NAME(m_brush_press_chr));
 	m_brushaddr_pal = (uint8_t *)m_brushaddr_pal_region->base();
-
-	for (uint8_t i = 0; i < 0x80; i++)
-	{
-		const uint16_t addr = (i << 4) | 8;
-		const uint8_t val = m_brushaddr_pal[addr];
-		if (!BIT(val, 1))
-		{
-			printf("Address %03x has COPEN unset:    /PBUSY:%d   /NDR:%d   /DTX:%d   GO:%d   SEL:%d   RUN:%d   SEL8:%d\n",
-				addr, BIT(addr, 4), BIT(addr, 5), BIT(addr, 6), BIT(addr, 7), BIT(addr, 8), BIT(addr, 9), BIT(addr, 10));
-		}
-	}
 
 	// Frame Store Cards, 640x1024
 	for (int i = 0; i < 2; i++)
@@ -2217,6 +2221,8 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			case 3:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Restore\n", machine().describe_context());
 				m_diskseq_cyl_from_cpu = 0;
+				req_b_w(0); // Flag ourselves as in-use
+				m_diskseq_complete_clk->adjust(attotime::from_msec(1), 1);
 				break;
 			case 4:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read Track\n", machine().describe_context());
@@ -2306,7 +2312,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 				}
 				break;
 			case 12:
-				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track (not yet implemented)\n", machine().describe_context());
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3) && is_disk_group_hdd(group))
 				{
 					req_b_w(0); // Flag ourselves as in-use
@@ -2320,7 +2326,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 				}
 				break;
 			case 14:
-				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Write Track (not yet implemented)\n", machine().describe_context());
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Write Track\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3) && is_disk_group_hdd(group))
 				{
 					req_b_w(0); // Flag ourselves as in-use
@@ -2364,6 +2370,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		else
 		{
 			LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card Y6 (Coefficients): %04x\n", machine().describe_context(), data & 0x7fff);
+
 		}
 		break;
 
@@ -3885,11 +3892,21 @@ void dpb7000_state::dpb7000(machine_config &config)
 	// Hard Disk
 	HARDDISK(config, "hdd", 0);
 
+	// Filter Card
+	AM2901B(config, m_filter_yl);
+	AM2901B(config, m_filter_yh);
+	AM2901B(config, m_filter_xl);
+	AM2901B(config, m_filter_xh);
+
 	// Size Card
-	AM2901B(config, m_size_yl);
-	AM2901B(config, m_size_yh);
-	AM2901B(config, m_size_xl);
-	AM2901B(config, m_size_xh);
+	AM2901B(config, m_size_ge);
+	AM2901B(config, m_size_gf);
+	AM2901B(config, m_size_gg);
+	AM2901B(config, m_size_gh);
+	AM2901B(config, m_size_de);
+	AM2901B(config, m_size_df);
+	AM2901B(config, m_size_dg);
+	AM2901B(config, m_size_dh);
 
 	// Keyboard
 	I8039(config, m_keybcpu, 4.608_MHz_XTAL);
