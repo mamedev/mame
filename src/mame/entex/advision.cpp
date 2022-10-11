@@ -2,12 +2,12 @@
 // copyright-holders:Dan Boris, hap
 /*******************************************************************************
 
-Entex Adventure Vision, tabletop video game console
+Entex Adventure Vision, tabletop game console
 
 Hardware notes:
 - INS8048-11 @ 11MHz (1KB internal ROM)
 - COP411 for the sound, 1-bit speaker with volume control
-- molex socket for 4KB cartridges
+- Molex socket for 4KB cartridges
 - 1KB external RAM (2*MM2114N)
 - 40 small rectangular red LEDs, a motor with a fast spinning mirror gives the
   illusion of a 150*40 screen
@@ -19,7 +19,8 @@ A game cartridge is basically an EPROM chip wearing a jacket, there is no
 dedicated cartridge slot as is common on other consoles. Only 4 games were
 released in total.
 
-The mirror rotates at around 7Hz, the motor speed is not controlled by software.
+The mirror rotates at around 7Hz, the motor speed is not controlled by software,
+and it differs a bit per console. This can be adjusted after enabling -cheat.
 There's a mirror on both sides so the display refreshes at around 14Hz. A similar
 technology was later used in the Nintendo Virtual Boy.
 
@@ -27,6 +28,9 @@ The display is faked in MAME. On the real thing, the picture is not as stable. T
 width of 150 is specified by the BIOS, but it's possible to update the leds at a
 different rate, hence MAME configures a larger screen. In fact, the homebrew demo
 Code Red doesn't use the BIOS for it, and runs at 50*40 to save some RAM.
+
+It's recommended to leave bilinear filtering on (it's the default for most of
+MAME's video backends).
 
 TODO:
 - EA banking is ugly, it can be turd-polished but the real issue is in mcs48
@@ -72,6 +76,7 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_ea_bank(*this, "ea_bank")
 		, m_joy(*this, "JOY")
+		, m_conf(*this, "CONF")
 	{ }
 
 	void advision(machine_config &config);
@@ -92,6 +97,7 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_memory_bank m_ea_bank;
 	required_ioport m_joy;
+	required_ioport m_conf;
 
 	void io_map(address_map &map);
 	void program_map(address_map &map);
@@ -137,6 +143,8 @@ private:
 
 u32 advision_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	bool hint_enable = bool(m_conf->read() & 1);
+
 	for (int y = 0; y < 40; y++)
 	{
 		u8 *src = &m_display[y * DISPLAY_WIDTH];
@@ -148,17 +156,11 @@ u32 advision_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 			if (cliprect.contains(dx, dy))
 			{
-				u8 red = 0xff;
+				u8 red = src[x] ? 0xff : 0;
 
-				if (src[x] == 0)
-				{
-					// do some horizontal interpolation
-					int prev = 0;
-					for (int i = 1; i < 5; i++)
-						prev += ((x - i) < 0) ? 0 : src[x - i];
-
-					red = (prev * 0xff) / 4;
-				}
+				// do some horizontal interpolation
+				if (hint_enable && red == 0 && dx > 0)
+					red = (bitmap.pix(dy, dx - 1) >> 16 & 0xff) * 0.75;
 
 				u8 green = red / 16;
 				u8 blue = red / 12;
@@ -177,8 +179,9 @@ void advision_state::av_control_w(u8 data)
 	m_video_bank = data >> 5 & 7;
 
 	// disable led outputs (there is some delay before it takes effect)
+	// see for example codered twister and anime girl, gaps between the 'pixels' should be visible but minimal
 	if (m_video_bank == 0)
-		m_led_off->adjust(attotime::from_usec(50));
+		m_led_off->adjust(attotime::from_usec(39));
 
 	// P24 rising edge: transfer led latches to outputs
 	if (!m_video_strobe && bool(data & 0x10))
@@ -348,6 +351,11 @@ static INPUT_PORTS_START( advision )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x01, 0x01, "H Interpolation" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -414,7 +422,7 @@ void advision_state::advision(machine_config &config)
 	m_maincpu->p2_out_cb().set(FUNC(advision_state::av_control_w));
 	m_maincpu->t1_in_cb().set(FUNC(advision_state::vsync_r));
 
-	COP411(config, m_soundcpu, 210000); // COP411L-KCN/N, R11=82k, C8=56pF
+	COP411(config, m_soundcpu, 200000); // COP411L-KCN/N, R11=82k, C8=56pF
 	m_soundcpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, false);
 	m_soundcpu->read_l().set(FUNC(advision_state::sound_cmd_r));
 	m_soundcpu->write_g().set(FUNC(advision_state::sound_g_w));
