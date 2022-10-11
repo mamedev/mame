@@ -72,7 +72,7 @@ Short name
     info panel is visible on the right, and showing the **Software List Info**
     in the **Infos** tab.  For example the short name for Macintosh System
     Software 6.0.3 is ``sys603`` and the short name of the software list it
-    belongs to is ``mac_flop``.  Software list short names match their file
+    belongs to is ``mac_flop_misc``.  Software list short names match their file
     names (for example the Sega Mega Drive/Genesis cartridge software list is
     called **megadriv.xml** and its short name is ``megadriv``).  You can also
     see the short names software lists, software items and parts by finding the

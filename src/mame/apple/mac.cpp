@@ -637,7 +637,12 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+    /* Set up the softlists: clean cracks priority, originals second, others last */
+    // We don't have a clean cracks softlist yet,
+    // so let's leave this here for later and make the Originals list the default.
+	//SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_misc").set_compatible("mac_flop_misc");
 }
 
 void mac_state::maciihmu(machine_config &config)
@@ -710,7 +715,12 @@ void mac_state::maciifx(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,16M,32M,64M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+    /* Set up the softlists: clean cracks priority, originals second, others last */
+    // We don't have a clean cracks softlist yet,
+    // so let's leave this here for later and make the Originals list the default.
+	//SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_misc").set_compatible("mac_flop_misc");
 
 	add_nubus(config);
 	nubus_device &nubus(*subdevice<nubus_device>("nubus"));
@@ -791,8 +801,12 @@ void mac_state::macse30(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,16M,32M,48M,64M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
-}
+    /* Set up the softlists: clean cracks priority, originals second, others last */
+    // We don't have a clean cracks softlist yet,
+    // so let's leave this here for later and make the Originals list the default.
+	//SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_misc").set_compatible("mac_flop_misc");}
 
 void mac_state::maciici(machine_config &config)
 {
@@ -834,8 +848,13 @@ void mac_state::maciisi(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
-
+    /* Set up the softlists: clean cracks priority, originals second, others last */
+    // We don't have a clean cracks softlist yet,
+    // so let's leave this here for later and make the Originals list the default.
+	//SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_misc").set_compatible("mac_flop_misc");
+    
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 	m_screen->set_size(640, 870);

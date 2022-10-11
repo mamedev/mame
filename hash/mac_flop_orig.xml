@@ -1,0 +1,465 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+-->
+<softwarelist name="mac_flop_orig" description="Macintosh 400K/800K Original disk images">
+
+	<software name="loderun">
+		<description>Lode Runner (Version 1.0)</description>
+		<year>1984</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"Lode Runner" is a 1984 action game developed by Doug Smith, ported to Macintosh by Glenn Axworthy, and distributed by Broderbund Software. This is version 1.0. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649040">
+				<rom name="lode runner.moof" size="649040" crc="9e654df4" sha1="20f9af71734b7d4553f3083453b3caedd88c8fb5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="balpw103">
+		<description>Balance of Power (Version 1.03)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"Balance of Power" is a 1985 simulation game developed by Chris Crawford and distributed by Mindscape. This is version 1.03. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649019">
+				<rom name="balance of power.moof" size="649019" crc="b82b5b63" sha1="d32ed4cfc23eff11ff4fa411588cfe50929a5c4f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shangv10">
+		<description>Shanghai (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"Shanghai" is a 1986 board game developed by Brodie Lockard and distributed by Activision. This is version 1.0. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649000">
+				<rom name="shanghai.moof" size="649000" crc="5a7651ef" sha1="e5d694e6ec50ac9c05ed6da800f5d7e7bcf28092" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyfox">
+		<description>Skyfox</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"Skyfox" is a 1986 action game developed by Ray E. Tobey, ported to Macintosh by Dynamix, and distributed by Electronic Arts. It self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649004">
+				<rom name="skyfox.moof" size="649004" crc="b5d51ef9" sha1="4341627ad2b3ddb186e6416b5cb05cb3cf2c9b9c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apshaitr">
+		<description>Temple of Apshai Trilogy (Version 1985-09-30)</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"Temple of Apshai Trilogy" is a 1985 roleplaying game redesigned by Stephen Landrum, ported to Macintosh by Westwood, and distributed by Epyx. This version is dated 1985-09-30 according to file metadata. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648997">
+				<rom name="temple of apshai trilogy.moof" size="648997" crc="0000232e" sha1="65548e24fb8be102120f24d50a6a0205b07af624" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsurge15">
+		<description>The Surgeon (Version 1.5)</description>
+		<year>1985</year>
+		<publisher>ISM</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 512Ke, Mac Plus -->
+		<!--"The Surgeon" is a 1985 simulation game developed by Winchell Chung and distributed by ISM. This is version 1.5. It self-boots and runs on Mac 512Ke and Mac Plus.&lt;div&gt;&lt;br /&gt;&lt;/div&gt;&lt;div&gt;&lt;i&gt;Note: this game does not pass its protection check in the in-browser emulator. It works if you download the disk image and run MAME locally. We are debugging the problem. &lt;/i&gt;&lt;/div&gt;-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648966">
+				<rom name="the surgeon v1.5.moof" size="648966" crc="1d3b1e95" sha1="5768a47e4b0d4ca6c54d47fb840627e5bfa49e24" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvite">
+		<description>Uninvited</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"Uninvited" is a 1986 adventure game developed by Craig Erickson, Jay Zipnick, Billy Wolfe, Terry Schulenburg, Mark Waterman, Darin Adler, David Marsh, Todd Squires, Tod Zipnick, Steve Hays, and Waldemar Horwat, and distributed by Mindscape. It self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="649150">
+				<rom name="uninvited disk 1.moof" size="649150" crc="fd19dc18" sha1="ceff741f276fd83ef7ad5f0e746194589e1205b3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="649150">
+				<rom name="uninvited disk 2.moof" size="649150" crc="04c6f91e" sha1="d70db8a9e11db1243703c87b711be37147530bff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kquest110">
+		<description>King's Quest (Version 1.10)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"King's Quest" is a 1987 adventure game developed by Roberta Williams, Charles Tingley, Ken MacNeill, Arthur Abraham, Doug MacNeill, Greg Rowland, Jeff Stephenson, Sol Ackerman, Chris Iden, and Mark Langbehn, and distributed by Sierra On-Line. This is version 1.10. It self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="665533">
+				<rom name="king's quest v1.10 disk 1.moof" size="665533" crc="4884bd0b" sha1="842f2c0d83c0d46901e1009b2f41a01037509468" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="665533">
+				<rom name="king's quest v1.10 disk 2.moof" size="665533" crc="279a3d96" sha1="702279c674bf05f41a38383e53d275fb3166c473" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smshracq">
+		<description>Smash Hit Racquetball (Version 1.01)</description>
+		<year>1986</year>
+		<publisher>Primera Software</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"Smash Hit Racquetball" is a 1986 sports game developed by Gregory Simons (design) and Mei-Ying Dell'Aquila (animation), and distributed by Primera Software. This is version 1.01. It self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649035">
+				<rom name="smash hit racquetball.moof" size="649035" crc="234df5da" sha1="39115a4dbec93cbee3baf5f71f79629be21464ed" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artowar">
+		<description>The Ancient Art of War</description>
+		<year>1985</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"The Ancient Art of War" is a 1985 strategy game developed by Dave Murry and Barry Murry, and distributed by Broderbund Software. It self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648491">
+				<rom name="the ancient art of war.moof" size="648491" crc="8ead3a62" sha1="8d5e290b5a665b762ccf5fca078c1c5bef7e4716" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hacker2">
+		<description>Hacker II</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus, Mac Classic -->
+		<!--"Hacker II" is a 1986 strategy game developed and distributed by Activision. It self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648965">
+				<rom name="hacker ii.moof" size="648965" crc="94e65b01" sha1="fd8b81073e11ffddb5c946294e996d43f952d19c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ijonesra">
+		<description>Indiana Jones and the Revenge of the Ancients</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"Indiana Jones and the Revenge of the Ancients" is a 1987 adventure game developed by Angelsoft and distributed by Mindscape. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649023">
+				<rom name="indiana jones and the revenge of the ancients.moof" size="649023" crc="b5f1554f" sha1="bef7aafc1f397a29a273f8cdf4f6581fdd0f18c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo2">
+		<description>Rambo: First Blood Part II</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"Rambo: First Blood Part II" is a 1985 adventure game developed by Angelsoft and distributed by Mindscape. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="657204">
+				<rom name="rambo.moof" size="657204" crc="159c43b7" sha1="8eb4001ae30943afdc14c57d5f707deaee12df58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oneonone">
+		<description>One on One</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"One on One" is a 1985 sports game developed by Eric Hammond (original version), Bob Studer (Mac version), Jaime Cummins (Mac version), John Botteri (Mac version), Matthew Sarconi (artwork), Greg Johnson (artwork), David Porter (sound), and Randy Jongens (muttering), and distributed by Electronic Arts. It self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649161">
+				<rom name="one on one.moof" size="649161" crc="867690de" sha1="96e7c4d6414441219f2b2e0a713aa133736ae86c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingames851024">
+		<description>Winter Games (Version 1985-10-24)</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"Winter Games" is a 1985 sports game developed by Action Games and distributed by Epyx. This is the earliest known revision, dated 1985-10-24 according to file metadata. At least one later revision exists. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649009">
+				<rom name="winter games.moof" size="649009" crc="6cfe6f32" sha1="4b1412edd7dc5b9c4f5794442efccb4f7b226c4a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingames851031">
+		<description>Winter Games (Version 1985-10-31)</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"Winter Games" is a 1985 sports game developed by Action Games and distributed by Epyx. This revision is dated 1985-10-31 according to file metadata. At least one earlier revision exists. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648986">
+				<rom name="winter games rev. 2.moof" size="648986" crc="3b0c69a9" sha1="e8b733ed794b6ae8ee3bb25b71d177c3b89292a1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stkobaya">
+		<description>Star Trek: The Kobayashi Alternative (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>Simon and Schuster</publisher>
+		<info name="release" value="2022-09-28"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"Star Trek: The Kobayashi Alternative" is a 1985 adventure game developed by Larry Rosenblatt, Mark Sutton-Smith, Alain Benzaken, and Diane Duane, ported to the Macintosh by Beck-Tech, and distributed by Simon and Schuster. This is version 1.0. It self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649065">
+				<rom name="star trek- the kobayashi alternative.moof" size="649065" crc="b0a20dad" sha1="1118fa143ccfffc98f01c46e712c81594c9da048" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macattk">
+		<description>Mac Attack</description>
+		<year>1984</year>
+		<publisher>Miles Computing</publisher>
+		<info name="release" value="2022-09-29"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"Mac Attack" is a 1984 action game developed by Tim Hays and distributed by Miles Computing. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648972">
+				<rom name="mac attack.moof" size="648972" crc="d1766425" sha1="4cdcc8508317bae4d91e907b7c42b0e76765bd8b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatov13">
+		<description>GATO (Version 1.3)</description>
+		<year>1985</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="release" value="2022-09-29"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"GATO" is a 1985 simulation game developed by Bill Scott, James Rhodes, Sean Hill, and Mark Dunn, ported to the Macintosh by MindBender, and distributed by Spectrum Holobyte. This is version 1.3. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="641368">
+				<rom name="gato v1.3.moof" size="641368" crc="5fffebb8" sha1="fb57fa04198cc1c7d54773a1b9391c782cdaa7bd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drkcas10">
+		<description>Dark Castle (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>Silicon Beach Software</publisher>
+		<info name="release" value="2022-09-29"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"Dark Castle" is a 1986 action game developed by Jonathan Gay (programming), Mark Stephen Pierce (design and graphics), Eric Zocher (Real Sound), and Dick Noel (voice characterizations), and distributed by Silicon Beach Software. This is version 1.0. It self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="649028">
+				<rom name="dark castle v1.0 - disk 1.moof" size="649028" crc="05b645ca" sha1="d563bd2d81985ec5416dc806475d1ab49dfa7d49" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="649028">
+				<rom name="dark castle v1.0 - disk 2.moof" size="649028" crc="6c970e1b" sha1="c6f9c8359c36231c3ad772a41701abeb0a0bfbc8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oidsv14">
+		<description>Oids (Version 1.4)</description>
+		<year>1992</year>
+		<publisher>FTL Games</publisher>
+		<info name="release" value="2022-10-01"/>
+        <info name="usage" value="This is not bootable and will need to be inserted after booting the OS"/>
+		<!-- Compatibility: Mac Plus or later 68K Mac (color supported on Mac II or later) -->
+		<!--"Oids" is a 1992 action game developed by Dan Hewitt, Kirk A. Baker, and Joe Holt, and distributed by FTL Games. This is version 1.4. It can be played in black and white, 2-bit or 4-bit color. It runs on a Mac Plus or later 68K Mac (color support requires a Mac II or later).-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1337832">
+				<rom name="oids v1.4.moof" size="1337832" crc="363a503e" sha1="6396e0c506bd5140839c0e397311839f1321b4de" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macwars">
+		<description>MacWars</description>
+		<year>1985</year>
+		<publisher>Miles Computing</publisher>
+		<info name="release" value="2022-10-01"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"MacWars" is a 1985 action game developed by Tim Hays and distributed by Miles Computing. It self-boots and runs on a Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="647451">
+				<rom name="macwars.moof" size="647451" crc="f5116302" sha1="b5f793dcd2f846e81d4787f5a636be76d50fdd52" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shdwgate">
+		<description>Shadowgate</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2022-10-05"/>
+		<!-- Compatibility: Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"Shadowgate" is a 1985 adventure game developed by ICOM Simulations (Dave Feldman, David Marsh, Terry Schulenburg, Karl Roelofs, Jay Zipnick, Todd Squires, Darin Adler, Tod Zipnick, Waldemar Horwat, Steve Hays) and distributed by Mindscape. It self-boots and runs on a Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="649107">
+				<rom name="shadowgate disk 1.moof" size="649107" crc="4bdbe269" sha1="b9b6cdf07a31c969952b426babbffbbd197a28e3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="649133">
+				<rom name="shadowgate disk 2.moof" size="649133" crc="20dc5e8e" sha1="f1f4d68682caf1f44e8ca3bc68a40eefe498f36a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="7ctygold">
+		<description>Seven Cities of Gold</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2022-10-05"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"Seven Cities of Gold" is a 1986 strategy game originally developed by Ozark Softscape, ported to the Macintosh by Randy Jongens and David Porter, and distributed by Electronic Arts. It self-boots and runs on a Mac 512K, Mac 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649059">
+				<rom name="seven cities of gold.moof" size="649059" crc="b983b91f" sha1="a099917cd525457e38e801b3270e703a7514d525" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enchscep">
+		<description>Enchanted Scepters</description>
+		<year>1984</year>
+		<publisher>Silicon Beach Software</publisher>
+		<info name="release" value="2022-10-05"/>
+		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, Mac II -->
+		<!--"Enchanted Scepters" is a 1984 adventure game by William C. Appleton (programming), Eric Zocher (sound), Martin E. Funderlic (artwork), Charlie Jackson (game design), and distributed by Silicon Beach Software. It self-boots and runs on a Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="657333">
+				<rom name="enchanted scepters.moof" size="657333" crc="1f1e63d6" sha1="d71e0128d408f584c5a91b19d1853ab7a8140d91" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beydrkcs">
+		<description>Beyond Dark Castle</description>
+		<year>1987</year>
+		<publisher>Silicon Beach Software</publisher>
+		<info name="release" value="2022-10-05"/>
+		<!-- Compatibility: Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, Mac II -->
+		<!--"Beyond Dark Castle" is a 1987 action game developed by Jonathan Gay (programming), Mark Stephen Pierce (design and graphics), Eric Zocher (Real Sound), and Dick Noel (voice characterizations), and distributed by Silicon Beach Software. It self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296302">
+				<rom name="beyond dark castle - disk 1.moof" size="1296302" crc="07ac3121" sha1="859fbf0a4eebb76be543828d7d6f2bb26cd451d8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296302">
+				<rom name="beyond dark castle - disk 2.moof" size="1296302" crc="ca612749" sha1="d1975c829818d1199c0b7961a98080d3ad576b8e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoid">
+		<description>Arkanoid (Version 1.00)</description>
+		<year>1988</year>
+		<publisher>Taito</publisher>
+		<info name="release" value="2022-10-07"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
+		<!--"Arkanoid" is a 1988 action game developed by Rick Ross (programming), Chris Chirogene (programming), Torben Larsen (graphics), Bob Hires (graphics), and Mike Bazzell (graphics), distributed by Taito. This is version 1.00. It self-boots and runs on Mac 512K, 512Ke, and Mac Plus.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329014">
+				<rom name="arkanoid v1.00.moof" size="1329014" crc="5a3f69e3" sha1="679ae58f761561a15c36233cf56162f19da2dbc1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chesms2k102">
+		<description>The Chessmaster 2000 (Version 1.02)</description>
+		<year>1986</year>
+		<publisher>The Software Toolworks</publisher>
+		<info name="release" value="2022-10-07"/>
+		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
+		<!--"The Chessmaster 2000" is a 1986 board game developed by Thomas A. Roden and distributed by The Software Toolworks. This is version 1.02. It self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="642376">
+				<rom name="the chessmaster 2000 v1.02.moof" size="642376" crc="b7d7d52e" sha1="37a0118ac4d0d791de06121e6abf0f3e8d5df73c" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
