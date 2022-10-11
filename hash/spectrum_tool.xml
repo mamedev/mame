@@ -75,7 +75,7 @@ license:CC0
 
 	<software name="timingtest">
 		<description>Timing Tests v1.0</description>
-		<year>20??</year>
+		<year>2015</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="128klate" interface="spectrum_snapshot">
 			<dataarea name="cass" size="12929">
