@@ -1265,10 +1265,16 @@ Hangs after few frames of gameplay
 		<description>Bomb Jake</description>
 		<year>2009</year>
 		<publisher>GR8 Software</publisher>
-		<!-- TODO: Doesn't even get recognized, is following note supposed to be a QA? -->
-		<info name="usage" value="Plays music only in PAL" />
+		<notes><![CDATA[
+Loading screen is very off, [ANTIC] timing sensitive (downclock maincpu to 50% to have something recognizable)
+Title screen has more timing glitches
+Starting a game randomly crashes
+Cuts off top portion of screen
+]]></notes>
+		<info name="usage" value="Use PAL version for BGM, NTSC is silent" />
+		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_corina" />
+			<feature name="slot" value="a800_corina_sram" />
 			<dataarea name="rom" size="532480">
 				<rom name="bomb jake.rom" size="532480" crc="8e89ca50" sha1="b3bca012eb2207e97dffcd5946b163b8a6f50d71"/>
 			</dataarea>
@@ -1594,7 +1600,7 @@ This cartridge was presented at a trade show by Atari as a demo and is possibly 
 http://www.atariage.com/forums/topic/194283-checkbook-cartridge-cxl8001/
 ]]></notes>
 		<info name="serial" value="CXL8001" />
-		<info name="usage" value="Requires a special boot disk, currently unavailable." />
+		<info name="usage" value="Requires a special boot disk, undumped" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -3206,7 +3212,7 @@ Playfield has offset vertical lines in two rows
 		<year>1983</year>
 		<publisher>Koala</publisher>
 		<info name="serial" value="AT00315-001" />
-		<info name="usage" value="Unsupported Koala pad and Koala light pen devices"/>
+		<info name="usage" value="Requires Koala pad and Koala light pen devices"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<feature name="peripheral" value="koala_pad,koala_pen" />
@@ -5669,10 +5675,10 @@ Glitchy first line of text on title screen
 	</software>
 
 	<software name="target" supported="no">
-		<description>Target Electronic Banking</description>
+		<description>Target Electronic Banking (v.0115)</description>
 		<year>1986</year>
 		<publisher>COVIDEA</publisher>
-		<info name="usage" value="Modem required (and a working Chemical Bank service, obviously inactive for decades)" />
+		<info name="usage" value="Requires dial-up modem and a working Chemical Bank service, obviously inactive for decades" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -5731,7 +5737,7 @@ Fails PORT test
 		</part>
 	</software>
 
-	<software name="designer" supported="no">
+	<software name="designer" supported="partial">
 		<description>The Designer's Pencil</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
@@ -6383,6 +6389,10 @@ Has phantom blocks starting from level 2 (which [GTIA] collides)
 		<description>Yie Another Kung-Fu</description>
 		<year>2011</year>
 		<publisher>GR8 Software</publisher>
+		<notes><![CDATA[
+Title screen is very off, [ANTIC] timing sensitive
+Crashes once you start a game
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_corina" />
 			<dataarea name="rom" size="1056768">
@@ -6430,10 +6440,13 @@ Has phantom blocks starting from level 2 (which [GTIA] collides)
 		</part>
 	</software>
 
-	<software name="zybex">
+	<software name="zybex" supported="partial">
 		<description>Zybex</description>
 		<year>1999</year>
 		<publisher>Video 61 / Williams</publisher>
+		<notes><![CDATA[
+Garbage row strip at bottom of screen
+]]></notes>
 		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />

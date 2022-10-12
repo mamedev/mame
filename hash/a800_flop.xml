@@ -29,6 +29,9 @@ license:CC0
 		<description>S.A.M.</description>
 		<year>1982</year>
 		<publisher>Don't Ask</publisher>
+		<notes><![CDATA[
+Doesn't boot
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="sam.atr" size="92176" crc="a5895d13" sha1="da2118f26dd46b0435ba6a486f17069734bad812"/>
@@ -36,10 +39,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ulysses" supported="no">
+	<software name="ulysses">
 		<description>Ulysses and the Golden Fleece</description>
 		<year>1986</year>
 		<publisher>Sierra On-Line</publisher>
+		<!-- was marked unsupported (for side B screen automatically moving without waiting user input?), assume fixed. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Ulysses And The Golden Fleece [Rel. 1] [Side A].atr" size="92176" crc="e16b8dc8" sha1="4e55312b5259c96138f48703fcaa58a6edd0d922"/>
@@ -79,10 +83,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="countdwn">
+	<software name="countdwn" supported="no">
 		<description>Countdown</description>
 		<year>1984</year>
 		<publisher>Synapse</publisher>
+		<notes><![CDATA[
+a800: cannot set charges, player ammo doesn't draw properly
+a800xl: crashes often on boot (reset multiple times will make it to eventually work)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Countdown.atr" size="92176" crc="0471796a" sha1="d02b8ad67b2f1f27b340e6fa94aa0c9bc03d2ad7"/>
@@ -90,10 +98,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="silents">
+	<software name="silents" supported="partial">
 		<description>Silent Service</description>
 		<year>1985</year>
 		<publisher>Microprose</publisher>
+		<notes><![CDATA[
+a800xl: crashes on boot
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Silent Service.atr" size="92176" crc="bda9ac46" sha1="312c76e40f0941749e3909afd4a7d7a83f398210"/>
@@ -101,10 +112,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="templtri">
-		<description>Temple Of Apshai Triology</description>
+	<software name="templtri" supported="partial">
+		<description>Temple Of Apshai Trilogy</description>
 		<year>1985</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+Unsupported character save to disk
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Temple of Apshai Trilogy (The).atr" size="92176" crc="a5cdca88" sha1="e9955303ba855beeafb0e5bf9b5b683d0fbb8701"/>
@@ -365,14 +379,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="elktrgld" supported="no">
+	<software name="elktrgld" supported="partial">
 		<!-- Flippy disk, c64 version on side A -->
 		<!-- Supposedly a PAL release, tested to have too much overscan on real HW -->
 		<description>Elektra Glide</description>
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<notes><![CDATA[
-Crashes at start of any track, executes invalid code which leads to different [kil] locations (observe PC=738), seldomly can be run but with severe GFX glitches
+[ANTIC] playfield is offset one line on mountain strip
 ]]></notes>
 		<info name="serial" value="64712" />
 
