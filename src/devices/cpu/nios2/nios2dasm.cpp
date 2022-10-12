@@ -4,9 +4,9 @@
 
     Altera Nios II disassembler
 
-    This FPGA-embedded processor architecture differs vastly from the
-    original Nios ISA, which uses 16-bit instruction words and existed in
-    both 16-bit and 32-bit versions.
+    This FPGA-embedded 32-bit RISC processor architecture differs vastly
+    from the original Nios ISA, which uses 16-bit instruction words and
+    existed in both 16-bit and 32-bit flavors.
 
     Hardware support for multiply and divide instructions is optional. The
     mulxss, mulxsu and mulxuu instructions require the fast 32 x 32-bit
@@ -49,9 +49,10 @@ const char *const s_reg_names[32] =
 	"ra"    // r31 = return address (call/ret)
 };
 
-const char *const s_ctlreg_names[6] =
+const char *const s_ctlreg_names[16] =
 {
-	"status", "estatus", "bstatus", "ienable", "ipending", "cpuid"
+	"status", "estatus", "bstatus", "ienable", "ipending", "cpuid", "ctl6", "exception",
+	"pteaddr", "tlbacc", "tlbmisc", "ctl11", "badaddr", "config", "mpubase", "mpuacc"
 };
 
 } // anonymous namespace
@@ -258,11 +259,15 @@ offs_t nios2_disassembler::dasm_rtype(std::ostream &stream, u32 inst) const
 offs_t nios2_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	u32 inst = opcodes.r32(pc);
-	switch (BIT(inst, 0, 6))
+	switch (BIT(inst, 0, 6)) // OP field
 	{
 	case 0x00:
-		util::stream_format(stream, "%-8s0x%08x", "call", u32(pc + (inst >> 4)));
+		util::stream_format(stream, "%-8s0x%08x", "call", (pc & 0xf0000000) | (inst >> 4));
 		return 4 | STEP_OVER | SUPPORTED;
+
+	case 0x01:
+		util::stream_format(stream, "%-8s0x%08x", "jmpi", (pc & 0xf0000000) | (inst >> 4)); // added in 2007
+		return 4 | SUPPORTED;
 
 	case 0x03: case 0x23:
 		util::stream_format(stream, "%-8s%s, ", BIT(inst, 5) ? "ldbuio" : "ldbu", s_reg_names[BIT(inst, 22, 5)]);
@@ -352,10 +357,13 @@ offs_t nios2_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			util::stream_format(stream, "%-8s%s, 0x%04x", BIT(inst, 5) ? "movhi" : "movui", s_reg_names[BIT(inst, 22, 5)], BIT(inst, 6, 16));
 			if (BIT(inst, 5))
 			{
-				// Look ahead to interpret movia sequence (movhi followed by addi to and of same register)
+				// Look ahead to interpret movia sequence (movhi followed by addi to and of same register) and similar movhi/ori sequence
 				u32 nextinst = opcodes.r32(pc + 4);
-				if ((nextinst & 0xffc0003f) == (inst & 0x07c00000) * 0x21 + 0x00000004)
-					util::stream_format(stream, " ; =%%hiadj(0x%08x)", u32((BIT(inst, 6, 16) << 16) + s32(s16(BIT(nextinst, 6, 16)))));
+				if ((nextinst & 0xffc0002f) == (inst & 0x07c00000) * 0x21 + 0x00000004)
+				{
+					u16 nextimm16 = BIT(nextinst, 6, 16);
+					util::stream_format(stream, " ; =%%hi%s(0x%08x)", BIT(nextinst, 4) ? "" : "adj", u32((BIT(inst, 6, 16) << 16) + (BIT(nextinst, 4) ? nextimm16 : s32(s16(nextimm16)))));
+				}
 			}
 		}
 		else
