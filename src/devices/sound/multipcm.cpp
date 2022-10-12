@@ -24,8 +24,8 @@
  * The first 3 bytes are the offset into the file (big endian). (0, 1, 2).
  * Bit 23 is unknown.
  * Bit 22 is the sample format flag: 0 for 8-bit linear, 1 for 12-bit linear.
- * Bit 21 is used by the MU5 on some samples for as-yet unknown purposes.
- * The next 2 are the loop start point, in samples (big endian) (3, 4)
+ * Bit 21 is used by the MU5 on some samples for as-yet unknown purposes. (YMW-258-F has 22 address pins.)
+ * The next 2 bytes are the loop start point, in samples (big endian) (3, 4)
  * The next 2 are the 2's complement negation of of the total number of samples (big endian) (5, 6)
  * The next byte is LFO freq + depth (copied to reg 6 ?) (7, 8)
  * The next 3 are envelope params (Attack, Decay1 and 2, sustain level, release, Key Rate Scaling) (9, 10, 11)
