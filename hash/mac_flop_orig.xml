@@ -10,7 +10,6 @@ license:CC0
 		<description>Lode Runner (Version 1.0)</description>
 		<year>1984</year>
 		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"Lode Runner" is a 1984 action game developed by Doug Smith, ported to Macintosh by Glenn Axworthy, and distributed by Broderbund Software. This is version 1.0. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
@@ -25,7 +24,6 @@ license:CC0
 		<description>Balance of Power (Version 1.03)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"Balance of Power" is a 1985 simulation game developed by Chris Crawford and distributed by Mindscape. This is version 1.03. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -40,7 +38,6 @@ license:CC0
 		<description>Shanghai (Version 1.0)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"Shanghai" is a 1986 board game developed by Brodie Lockard and distributed by Activision. This is version 1.0. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
@@ -55,7 +52,6 @@ license:CC0
 		<description>Skyfox</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"Skyfox" is a 1986 action game developed by Ray E. Tobey, ported to Macintosh by Dynamix, and distributed by Electronic Arts. It self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
@@ -70,7 +66,6 @@ license:CC0
 		<description>Temple of Apshai Trilogy (Version 1985-09-30)</description>
 		<year>1985</year>
 		<publisher>Epyx</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"Temple of Apshai Trilogy" is a 1985 roleplaying game redesigned by Stephen Landrum, ported to Macintosh by Westwood, and distributed by Epyx. This version is dated 1985-09-30 according to file metadata. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -85,7 +80,6 @@ license:CC0
 		<description>The Surgeon (Version 1.5)</description>
 		<year>1985</year>
 		<publisher>ISM</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 512Ke, Mac Plus -->
 		<!--"The Surgeon" is a 1985 simulation game developed by Winchell Chung and distributed by ISM. This is version 1.5. It self-boots and runs on Mac 512Ke and Mac Plus.&lt;div&gt;&lt;br /&gt;&lt;/div&gt;&lt;div&gt;&lt;i&gt;Note: this game does not pass its protection check in the in-browser emulator. It works if you download the disk image and run MAME locally. We are debugging the problem. &lt;/i&gt;&lt;/div&gt;-->
 
@@ -100,7 +94,6 @@ license:CC0
 		<description>Uninvited</description>
 		<year>1986</year>
 		<publisher>Mindscape</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"Uninvited" is a 1986 adventure game developed by Craig Erickson, Jay Zipnick, Billy Wolfe, Terry Schulenburg, Mark Waterman, Darin Adler, David Marsh, Todd Squires, Tod Zipnick, Steve Hays, and Waldemar Horwat, and distributed by Mindscape. It self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
@@ -122,7 +115,6 @@ license:CC0
 		<description>King's Quest (Version 1.10)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"King's Quest" is a 1987 adventure game developed by Roberta Williams, Charles Tingley, Ken MacNeill, Arthur Abraham, Doug MacNeill, Greg Rowland, Jeff Stephenson, Sol Ackerman, Chris Iden, and Mark Langbehn, and distributed by Sierra On-Line. This is version 1.10. It self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
@@ -144,7 +136,6 @@ license:CC0
 		<description>Smash Hit Racquetball (Version 1.01)</description>
 		<year>1986</year>
 		<publisher>Primera Software</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"Smash Hit Racquetball" is a 1986 sports game developed by Gregory Simons (design) and Mei-Ying Dell'Aquila (animation), and distributed by Primera Software. This is version 1.01. It self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -159,7 +150,6 @@ license:CC0
 		<description>The Ancient Art of War</description>
 		<year>1985</year>
 		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"The Ancient Art of War" is a 1985 strategy game developed by Dave Murry and Barry Murry, and distributed by Broderbund Software. It self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -174,7 +164,6 @@ license:CC0
 		<description>Hacker II</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus, Mac Classic -->
 		<!--"Hacker II" is a 1986 strategy game developed and distributed by Activision. It self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, and Mac Classic.-->
 
@@ -189,7 +178,6 @@ license:CC0
 		<description>Indiana Jones and the Revenge of the Ancients</description>
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"Indiana Jones and the Revenge of the Ancients" is a 1987 adventure game developed by Angelsoft and distributed by Mindscape. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
@@ -204,7 +192,6 @@ license:CC0
 		<description>Rambo: First Blood Part II</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"Rambo: First Blood Part II" is a 1985 adventure game developed by Angelsoft and distributed by Mindscape. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
@@ -219,7 +206,6 @@ license:CC0
 		<description>One on One</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"One on One" is a 1985 sports game developed by Eric Hammond (original version), Bob Studer (Mac version), Jaime Cummins (Mac version), John Botteri (Mac version), Matthew Sarconi (artwork), Greg Johnson (artwork), David Porter (sound), and Randy Jongens (muttering), and distributed by Electronic Arts. It self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -234,7 +220,6 @@ license:CC0
 		<description>Winter Games (Version 1985-10-24)</description>
 		<year>1985</year>
 		<publisher>Epyx</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"Winter Games" is a 1985 sports game developed by Action Games and distributed by Epyx. This is the earliest known revision, dated 1985-10-24 according to file metadata. At least one later revision exists. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -249,7 +234,6 @@ license:CC0
 		<description>Winter Games (Version 1985-10-31)</description>
 		<year>1985</year>
 		<publisher>Epyx</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"Winter Games" is a 1985 sports game developed by Action Games and distributed by Epyx. This revision is dated 1985-10-31 according to file metadata. At least one earlier revision exists. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -264,7 +248,6 @@ license:CC0
 		<description>Star Trek: The Kobayashi Alternative (Version 1.0)</description>
 		<year>1985</year>
 		<publisher>Simon and Schuster</publisher>
-		<info name="release" value="2022-09-28"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"Star Trek: The Kobayashi Alternative" is a 1985 adventure game developed by Larry Rosenblatt, Mark Sutton-Smith, Alain Benzaken, and Diane Duane, ported to the Macintosh by Beck-Tech, and distributed by Simon and Schuster. This is version 1.0. It self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -279,7 +262,6 @@ license:CC0
 		<description>Mac Attack</description>
 		<year>1984</year>
 		<publisher>Miles Computing</publisher>
-		<info name="release" value="2022-09-29"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"Mac Attack" is a 1984 action game developed by Tim Hays and distributed by Miles Computing. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -294,7 +276,6 @@ license:CC0
 		<description>GATO (Version 1.3)</description>
 		<year>1985</year>
 		<publisher>Spectrum Holobyte</publisher>
-		<info name="release" value="2022-09-29"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"GATO" is a 1985 simulation game developed by Bill Scott, James Rhodes, Sean Hill, and Mark Dunn, ported to the Macintosh by MindBender, and distributed by Spectrum Holobyte. This is version 1.3. It self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
@@ -309,7 +290,6 @@ license:CC0
 		<description>Dark Castle (Version 1.0)</description>
 		<year>1986</year>
 		<publisher>Silicon Beach Software</publisher>
-		<info name="release" value="2022-09-29"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"Dark Castle" is a 1986 action game developed by Jonathan Gay (programming), Mark Stephen Pierce (design and graphics), Eric Zocher (Real Sound), and Dick Noel (voice characterizations), and distributed by Silicon Beach Software. This is version 1.0. It self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -331,8 +311,7 @@ license:CC0
 		<description>Oids (Version 1.4)</description>
 		<year>1992</year>
 		<publisher>FTL Games</publisher>
-		<info name="release" value="2022-10-01"/>
-        <info name="usage" value="This is not bootable and will need to be inserted after booting the OS"/>
+		<info name="usage" value="This is not bootable and will need to be inserted after booting the OS"/>
 		<!-- Compatibility: Mac Plus or later 68K Mac (color supported on Mac II or later) -->
 		<!--"Oids" is a 1992 action game developed by Dan Hewitt, Kirk A. Baker, and Joe Holt, and distributed by FTL Games. This is version 1.4. It can be played in black and white, 2-bit or 4-bit color. It runs on a Mac Plus or later 68K Mac (color support requires a Mac II or later).-->
 
@@ -347,7 +326,6 @@ license:CC0
 		<description>MacWars</description>
 		<year>1985</year>
 		<publisher>Miles Computing</publisher>
-		<info name="release" value="2022-10-01"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"MacWars" is a 1985 action game developed by Tim Hays and distributed by Miles Computing. It self-boots and runs on a Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
@@ -362,7 +340,6 @@ license:CC0
 		<description>Shadowgate</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
-		<info name="release" value="2022-10-05"/>
 		<!-- Compatibility: Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"Shadowgate" is a 1985 adventure game developed by ICOM Simulations (Dave Feldman, David Marsh, Terry Schulenburg, Karl Roelofs, Jay Zipnick, Todd Squires, Darin Adler, Tod Zipnick, Waldemar Horwat, Steve Hays) and distributed by Mindscape. It self-boots and runs on a Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
@@ -384,7 +361,6 @@ license:CC0
 		<description>Seven Cities of Gold</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="release" value="2022-10-05"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"Seven Cities of Gold" is a 1986 strategy game originally developed by Ozark Softscape, ported to the Macintosh by Randy Jongens and David Porter, and distributed by Electronic Arts. It self-boots and runs on a Mac 512K, Mac 512Ke, and Mac Plus.-->
 
@@ -399,7 +375,6 @@ license:CC0
 		<description>Enchanted Scepters</description>
 		<year>1984</year>
 		<publisher>Silicon Beach Software</publisher>
-		<info name="release" value="2022-10-05"/>
 		<!-- Compatibility: Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, Mac II -->
 		<!--"Enchanted Scepters" is a 1984 adventure game by William C. Appleton (programming), Eric Zocher (sound), Martin E. Funderlic (artwork), Charlie Jackson (game design), and distributed by Silicon Beach Software. It self-boots and runs on a Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II.-->
 
@@ -414,7 +389,6 @@ license:CC0
 		<description>Beyond Dark Castle</description>
 		<year>1987</year>
 		<publisher>Silicon Beach Software</publisher>
-		<info name="release" value="2022-10-05"/>
 		<!-- Compatibility: Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, Mac II -->
 		<!--"Beyond Dark Castle" is a 1987 action game developed by Jonathan Gay (programming), Mark Stephen Pierce (design and graphics), Eric Zocher (Real Sound), and Dick Noel (voice characterizations), and distributed by Silicon Beach Software. It self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II.-->
 
@@ -436,7 +410,6 @@ license:CC0
 		<description>Arkanoid (Version 1.00)</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
-		<info name="release" value="2022-10-07"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus -->
 		<!--"Arkanoid" is a 1988 action game developed by Rick Ross (programming), Chris Chirogene (programming), Torben Larsen (graphics), Bob Hires (graphics), and Mike Bazzell (graphics), distributed by Taito. This is version 1.00. It self-boots and runs on Mac 512K, 512Ke, and Mac Plus.-->
 
@@ -451,7 +424,6 @@ license:CC0
 		<description>The Chessmaster 2000 (Version 1.02)</description>
 		<year>1986</year>
 		<publisher>The Software Toolworks</publisher>
-		<info name="release" value="2022-10-07"/>
 		<!-- Compatibility: Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic -->
 		<!--"The Chessmaster 2000" is a 1986 board game developed by Thomas A. Roden and distributed by The Software Toolworks. This is version 1.02. It self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.-->
 
