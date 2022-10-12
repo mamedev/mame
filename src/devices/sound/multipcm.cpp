@@ -22,8 +22,9 @@
  * This sample format might be derived from the one used by the older YM7138 'GEW6' chip.
  *
  * The first 3 bytes are the offset into the file (big endian). (0, 1, 2).
- * Bit 23 is the sample format flag: 0 for 8-bit linear, 1 for 12-bit linear.
- * Bits 21 and 22 are used by the MU5 on some samples for as-yet unknown purposes.
+ * Bit 23 is unknown.
+ * Bit 22 is the sample format flag: 0 for 8-bit linear, 1 for 12-bit linear.
+ * Bit 21 is used by the MU5 on some samples for as-yet unknown purposes.
  * The next 2 are the loop start point, in samples (big endian) (3, 4)
  * The next 2 are the 2's complement negation of of the total number of samples (big endian) (5, 6)
  * The next byte is LFO freq + depth (copied to reg 6 ?) (7, 8)
@@ -698,7 +699,7 @@ void multipcm_device::sound_stream_update(sound_stream &stream, std::vector<read
 				int32_t csample = 0;
 				int32_t fpart = slot.m_offset & ((1 << TL_SHIFT) - 1);
 
-				if (slot.m_format & 8)  // 12-bit linear
+				if (slot.m_format & 4)  // 12-bit linear
 				{
 					offs_t adr = slot.m_base + (spos >> 2) * 6;
 					switch (spos & 3)
