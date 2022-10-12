@@ -356,13 +356,14 @@ void maxaflex_state::maxaflex(machine_config &config)
 	pia.irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
-	screen.set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-	screen.set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
-	screen.set_screen_update("antic", FUNC(antic_device::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	config_ntsc_screen(config);
+	//screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	//screen.set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
+	//screen.set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+	//screen.set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(maxaflex_state::atari_palette), 256);
 	config.set_default_layout(layout_maxaflex);
