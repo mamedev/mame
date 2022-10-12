@@ -119,7 +119,9 @@ license:CC0
 		<description>ULA Test 3</description>
 		<year>20??</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Jan Bobrowski / CDS / BA"/>
+		<info name="developer" value="Jan Bobrowski"/>
+		<info name="developer" value="CDS"/>
+		<info name="developer" value="BA"/>
 		<part name="ulatest3_all" interface="spectrum_cass">
 			<dataarea name="cass" size="1912">
 				<rom name="ulatest3_all.tap" size="1912" crc="063cb19a" sha1="6ae079812bead67b3fd9c90f2e25a5ad7d9daea4"/>
