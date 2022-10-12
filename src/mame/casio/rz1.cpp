@@ -23,12 +23,13 @@
 
     TODO:
     - Metronome
-    - MIDI
     - Make audio input generic (core support needed)
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 #include "cpu/upd7810/upd7811.h"
 #include "formats/trs_cas.h"
 #include "imagedev/cassette.h"
@@ -67,7 +68,8 @@ public:
 		m_led_pattern(*this, "led_pattern"),
 		m_led_startstop(*this, "led_startstop"),
 		m_port_a(0),
-		m_port_b(0xff)
+		m_port_b(0xff),
+		m_midi_rx(1)
 	{ }
 
 	void rz1(machine_config &config);
@@ -112,6 +114,7 @@ private:
 
 	uint8_t m_port_a;
 	uint8_t m_port_b;
+	int m_midi_rx;
 };
 
 
@@ -388,6 +391,7 @@ void rz1_state::machine_start()
 
 void rz1_state::machine_reset()
 {
+	m_midi_rx = 1;
 }
 
 
@@ -404,6 +408,8 @@ void rz1_state::rz1(machine_config &config)
 	m_maincpu->pb_out_cb().set(FUNC(rz1_state::port_b_w));
 	m_maincpu->pc_in_cb().set(FUNC(rz1_state::port_c_r));
 	m_maincpu->pc_out_cb().set(FUNC(rz1_state::port_c_w));
+	m_maincpu->rxd_func().set([this]() { return m_midi_rx; });
+	m_maincpu->txd_func().set("mdout", FUNC(midi_port_device::write_txd));
 	m_maincpu->an0_func().set(FUNC(rz1_state::analog_r));
 	m_maincpu->an1_func().set(FUNC(rz1_state::analog_r));
 	m_maincpu->an2_func().set(FUNC(rz1_state::analog_r));
@@ -442,6 +448,15 @@ void rz1_state::rz1(machine_config &config)
 	UPD934G(config, m_pg[1], 1280000);
 	m_pg[1]->data_callback().set(FUNC(rz1_state::upd934g_b_data_r));
 	m_pg[1]->add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	// midi
+	midi_port_device &mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
+	mdin.rxd_handler().set([this](int state) { m_midi_rx = state; });
+	mdin.rxd_handler().append("mdthru", FUNC(midi_port_device::write_txd));
+
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+
+	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
 
 	// mt (magnetic tape)
 	CASSETTE(config, m_cassette);
