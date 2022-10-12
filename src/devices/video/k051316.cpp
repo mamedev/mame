@@ -193,7 +193,7 @@ void k051316_device::device_start()
 
 void k051316_device::device_reset()
 {
-	memset(m_ctrlram, 0, 0x10);
+	memset(m_ctrlram, 0, 0x0e);
 }
 
 /*****************************************************************************
@@ -237,14 +237,13 @@ void k051316_device::ctrl_w(offs_t offset, u8 data)
 {
 	if (offset == 0x0e)
 	{
-		m_readout_enabled = ~BIT(data, 0);
+		m_readout_enabled = !BIT(data, 0);
+		if ((m_flipx_enabled != BIT(data, 1)) || (m_flipy_enabled != BIT(data, 2)))
+			m_tmap->mark_all_dirty();
 		m_flipx_enabled = BIT(data, 1);
 		m_flipy_enabled = BIT(data, 2);
-		if ((data & 0x06) != (m_ctrlram[0x0e] & 0x06))
-			m_tmap->mark_all_dirty();
-	}
-	
-	m_ctrlram[offset] = data;
+	} else if (offset < 0x0e)
+		m_ctrlram[offset] = data;
 	
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", machine().describe_context(), data, offset);
 }
@@ -306,7 +305,7 @@ void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, con
 			flags, priority);
 
 #if 0
-	popmessage("%02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x",
+	popmessage("%02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x",
 			m_ctrlram[0x00],
 			m_ctrlram[0x01],
 			m_ctrlram[0x02],
@@ -320,8 +319,6 @@ void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, con
 			m_ctrlram[0x0a],
 			m_ctrlram[0x0b],
 			m_ctrlram[0x0c], /* bank for ROM testing */
-			m_ctrlram[0x0d],
-			m_ctrlram[0x0e], /* 0 = test ROMs */
-			m_ctrlram[0x0f]);
+			m_ctrlram[0x0d]);
 #endif
 }
