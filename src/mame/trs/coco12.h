@@ -32,7 +32,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-
 class coco12_state : public coco_state
 {
 public:

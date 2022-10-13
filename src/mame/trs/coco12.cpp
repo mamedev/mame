@@ -47,6 +47,7 @@ void coco12_state::coco_mem(address_map &map)
 	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
 }
 
+
 void coco12_state::coco_ram(address_map &map)
 {
 	// mapped by configure_sam
@@ -276,8 +277,6 @@ INPUT_PORTS_END
 
 
 
-
-
 //-------------------------------------------------
 //  INPUT_PORTS( coco )
 //-------------------------------------------------
@@ -465,7 +464,6 @@ DEVICE_INPUT_DEFAULTS_END
 //-------------------------------------------------
 //  machine_config
 //-------------------------------------------------
-
 
 void coco12_state::coco(machine_config &config)
 {

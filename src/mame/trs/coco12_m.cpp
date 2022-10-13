@@ -23,7 +23,6 @@ void coco12_state::device_start()
 }
 
 
-
 //-------------------------------------------------
 //  configure_sam
 //-------------------------------------------------
@@ -48,7 +47,6 @@ WRITE_LINE_MEMBER( coco12_state::horizontal_sync )
 }
 
 
-
 //-------------------------------------------------
 //  field_sync
 //-------------------------------------------------
@@ -57,7 +55,6 @@ WRITE_LINE_MEMBER( coco12_state::field_sync )
 {
 	pia_0().cb1_w(state);
 }
-
 
 
 //-------------------------------------------------
@@ -71,7 +68,6 @@ uint8_t coco12_state::sam_read(offs_t offset)
 	m_vdg->inv_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
 	return data;
 }
-
 
 
 //-------------------------------------------------
