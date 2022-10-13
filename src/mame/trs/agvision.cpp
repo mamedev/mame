@@ -96,6 +96,7 @@ protected:
 	void agvision_rom(address_map &map);
 	void agvision_static_ram(address_map &map);
 	void agvision_io(address_map &map);
+	void agvision_boot(address_map &map);
     void ff20_write(offs_t offset, uint8_t data);
 	uint8_t pia0_pa_r();
 
@@ -204,11 +205,10 @@ void agvision_state::agvision(machine_config &config)
 	m_pia_0->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER).set_raw(3.579545_MHz_XTAL * 2, 456, 0, 320, 262, 0, 240);
 
 	MC6847_NTSC(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
 	m_vdg->set_screen(m_screen);
- 	//m_vdg->hsync_wr_callback().set(FUNC(agvision_state::horizontal_sync));
  	m_vdg->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_vdg->input_callback().set(FUNC(agvision_state::sam_read));
 
@@ -216,9 +216,10 @@ void agvision_state::agvision(machine_config &config)
 	m_sam->set_addrmap(2, &agvision_state::agvision_rom);			// ROM at $A000
  	m_sam->set_addrmap(3, &agvision_state::agvision_static_ram);	// RAM at $C000
 	m_sam->set_addrmap(4, &agvision_state::agvision_io);			//  IO at $FF00
+	m_sam->set_addrmap(7, &agvision_state::agvision_boot);			//  IO at $FF60
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
-	m_rs232->dcd_handler().set(PIA0_TAG, FUNC(pia6821_device::cb2_w));
+	m_rs232->dcd_handler().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
 	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(modem));
 
 	// internal ram
@@ -253,6 +254,11 @@ void agvision_state::agvision_io(address_map &map)
 	map(0x1c, 0x1f).rw(PIA0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
 
+void agvision_state::agvision_boot(address_map &map)
+{
+	// $FF60-$FFEF
+	map(0x60, 0x7f).nopw(); // SAM Registers
+}
 //-------------------------------------------------
 //  sam_read
 //-------------------------------------------------
