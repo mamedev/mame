@@ -37,8 +37,6 @@
 
 ***************************************************************************/
 
-
-//#include "coco.h"
 #include "emu.h"
 
 #include "cpu/m6809/m6809.h"
@@ -49,10 +47,9 @@
 #include "video/mc6847.h"
 #include "bus/rs232/rs232.h"
 
-
-//**************************************************************************
+//-------------------------------------------------
 //  MACROS / CONSTANTS
-//**************************************************************************
+//-------------------------------------------------
 
 #define MAINCPU_TAG     "maincpu"
 #define PIA0_TAG        "pia0"
@@ -61,9 +58,9 @@
 #define SAM_TAG         "sam"
 #define VDG_TAG         "vdg"
 
-//**************************************************************************
+//-------------------------------------------------
 //  TYPE DEFINITIONS
-//**************************************************************************
+//-------------------------------------------------
 
 class agvision_state : public driver_device
 {
@@ -93,24 +90,24 @@ protected:
 	required_device<sam6883_device> m_sam;
 	required_device<mc6847_base_device> m_vdg;
 	required_device<rs232_port_device> m_rs232;
-	// input ports
 	required_ioport_array<7> m_keyboard;
 
 	void agvision_mem(address_map &map);
-	void agvision_ram(address_map &map);
 	void agvision_rom(address_map &map);
 	void agvision_static_ram(address_map &map);
 	void agvision_io(address_map &map);
     void ff20_write(offs_t offset, uint8_t data);
-    DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
 	uint8_t pia0_pa_r();
 
 private:
 	void configure_sam(void);
 };
 
+//-------------------------------------------------
+//  INPUT_PORTS( agvision )
+//-------------------------------------------------
 
-static INPUT_PORTS_START( agvision_keyboard )
+static INPUT_PORTS_START( agvision )
 	PORT_START("row0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
@@ -147,29 +144,29 @@ static INPUT_PORTS_START( agvision_keyboard )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UP") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN), 10)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(LEFT), 8)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT), 9)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(LEFT), 8) PORT_CHAR('[')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT), 9) PORT_CHAR(']')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 
 	PORT_START("row4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!') PORT_CHAR('|')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#') PORT_CHAR('~')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'') PORT_CHAR('^')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 
 	PORT_START("row5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(') PORT_CHAR('[')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')') PORT_CHAR(']')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<') PORT_CHAR('{')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=') PORT_CHAR('_')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>') PORT_CHAR('}')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?') PORT_CHAR('\\')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_START("row6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
@@ -177,14 +174,6 @@ static INPUT_PORTS_START( agvision_keyboard )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
 	PORT_BIT(0x78, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-INPUT_PORTS_END
-
-//-------------------------------------------------
-//  INPUT_PORTS( agvision )
-//-------------------------------------------------
-
-static INPUT_PORTS_START( agvision )
-	PORT_INCLUDE( agvision_keyboard )
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -210,20 +199,20 @@ void agvision_state::agvision(machine_config &config)
 	MC6809E(config, m_maincpu, DERIVED_CLOCK(1, 1));
 	m_maincpu->set_addrmap(AS_PROGRAM, &agvision_state::agvision_mem);
 
+	PIA6821(config, m_pia_0, 0);
+    m_pia_0->readpa_handler().set(FUNC(agvision_state::pia0_pa_r));
+	m_pia_0->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
 	MC6847_NTSC(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
 	m_vdg->set_screen(m_screen);
- 	m_vdg->hsync_wr_callback().set(FUNC(agvision_state::horizontal_sync));
+ 	//m_vdg->hsync_wr_callback().set(FUNC(agvision_state::horizontal_sync));
+ 	m_vdg->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_vdg->input_callback().set(FUNC(agvision_state::sam_read));
 
-	PIA6821(config, m_pia_0, 0);
-    m_pia_0->readpa_handler().set(FUNC(agvision_state::pia0_pa_r));
-	m_pia_0->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
-
 	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
-	m_sam->set_addrmap(0, &agvision_state::agvision_ram);			// Potentially 64K
 	m_sam->set_addrmap(2, &agvision_state::agvision_rom);			// ROM at $A000
  	m_sam->set_addrmap(3, &agvision_state::agvision_static_ram);	// RAM at $C000
 	m_sam->set_addrmap(4, &agvision_state::agvision_io);			//  IO at $FF00
@@ -245,15 +234,10 @@ void agvision_state::agvision_mem(address_map &map)
 	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
 }
 
-void agvision_state::agvision_ram(address_map &map)
-{
-	// mapped by configure_sam
-}
-
 void agvision_state::agvision_rom(address_map &map)
 {
 	// $A000-$BFFF
-	map(0x0000, 0x1fff).rom().region(MAINCPU_TAG, 0x2000).nopw();
+	map(0x0000, 0x07ff).rom().region(MAINCPU_TAG, 0x0000).nopw().mirror(0x1800);
 }
 
 void agvision_state::agvision_static_ram(address_map &map)
@@ -292,7 +276,6 @@ void agvision_state::ff20_write(offs_t offset, uint8_t data)
 	m_vdg->gm1_w(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
 	m_vdg->gm2_w(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 	m_vdg->ag_w(data & 0x01 ? ASSERT_LINE : CLEAR_LINE);
-
 }
 
 //-------------------------------------------------
@@ -319,14 +302,6 @@ void agvision_state::device_start()
 	configure_sam();
 }
 
-//-------------------------------------------------
-//  horizontal_sync
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( agvision_state::horizontal_sync )
-{
-	m_pia_0->ca1_w(state);
-}
 
 uint8_t agvision_state::pia0_pa_r()
 {
@@ -354,11 +329,15 @@ uint8_t agvision_state::pia0_pa_r()
 //**************************************************************************
 
 ROM_START(agvision)
-	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("avs11.rom", 0x2000, 0x0800, CRC(5b11b13e) SHA1(896e68f90ed57e0921887e717fc92eda067a210d))
-	ROM_RELOAD(0x2800, 0x0800)
-	ROM_RELOAD(0x3000, 0x0800)
-	ROM_RELOAD(0x3800, 0x0800)
+	ROM_REGION(0xa000,MAINCPU_TAG,0)
+	ROM_LOAD("8041716-1.1-agvision.u13", 0x0000, 0x0800, CRC(5b11b13e) SHA1(896e68f90ed57e0921887e717fc92eda067a210d))
 ROM_END
 
-COMP( 1979, agvision, 0, 0, agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "AgVision", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+ROM_START(trsvidtx)
+	ROM_REGION(0xa000,MAINCPU_TAG,0)
+	ROM_LOAD("8041716-1.1-videotex.u13", 0x0000, 0x0800, CRC(821a59bb) SHA1(e3643f27fcf8287c0bc0f66b21554dc988ded9c1))
+ROM_END
+
+//    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     CLASS           INIT        COMPANY              FULLNAME    FLAGS
+COMP( 1979, agvision, 0,     0,     agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "AgVision", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, trsvidtx, 0,     0,     agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "Videotex", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
