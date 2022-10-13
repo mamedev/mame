@@ -145,6 +145,7 @@ barcrest/mpu4vid.cpp
 barcrest/mpu5sw.cpp
 bfm/bfcobra.cpp
 bfm/bfm_ad5sw.cpp
+bfm/bfm_blackbox.cpp
 bfm/bfm_sc1.cpp
 bfm/bfm_sc2.cpp
 bfm/bfm_sc4.cpp
