@@ -396,10 +396,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="810diag">
+	<software name="810diag" supported="no">
 		<description>810 Diagnostic Cartridge</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Align test never completes, burn-in test requires a test disk and writing to floppy
+]]></notes>
 		<info name="serial" value="FD100006" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -448,13 +451,10 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="abracada" supported="no">
+	<software name="abracada" supported="yes">
 		<description>Abracadabra</description>
 		<year>1983</year>
 		<publisher>TG Software</publisher>
-		<notes><![CDATA[
-Walls randomly stop updating, throwing player in unwinnable situations
-]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -529,13 +529,10 @@ Walls randomly stop updating, throwing player in unwinnable situations
 		</part>
 	</software>
 
-	<software name="advcrtor" supported="no">
+	<software name="advcrtor" supported="yes">
 		<description>Adventure Creator</description>
 		<year>1984</year>
 		<publisher>Spinnaker</publisher>
-		<notes><![CDATA[
-Status bar doesn't show energy GFX text properly [raster trick]
-]]></notes>
 		<info name="serial" value="ADV-AT" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -550,7 +547,7 @@ Status bar doesn't show energy GFX text properly [raster trick]
 		<year>1984</year>
 		<publisher>Spinnaker</publisher>
 		<notes><![CDATA[
-Doesn't complete first animation after selecting the left tunnel
+Doesn't complete first animation after selecting the left tunnel, [ANTIC] timing?
 ]]></notes>
 		<info name="developer" value="Joyce Hakansson Associates, Inc" />
 		<info name="serial" value="ALF-AT" />
@@ -1015,13 +1012,10 @@ a certain time, and this isn't currently emulated.
 		</part>
 	</software>
 
-	<software name="atlantis" supported="partial">
+	<software name="atlantis">
 		<description>Atlantis</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
-		<notes><![CDATA[
-Player "sprite playfield" is vertically offset one pixel.
-]]></notes>
 		<info name="serial" value="720125-1A" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -1057,11 +1051,12 @@ Player "sprite playfield" is vertically offset one pixel.
 		</part>
 	</software>
 
-	<software name="agraphcs">
+	<software name="agraphcs" supported="no">
 		<description>AtariGraphics</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8054" />
+		<info name="usage" value="Requires light pen" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<feature name="peripheral" value="cx75_pen" /> <!-- Uses the Atari CX75 light pen device -->
@@ -1204,13 +1199,10 @@ Player "sprite playfield" is vertically offset one pixel.
 		</part>
 	</software>
 
-	<software name="berzerk" supported="partial">
+	<software name="berzerk">
 		<description>Berzerk (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<notes><![CDATA[
-Glitches out when player dies or completes a stage.
-]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -1246,13 +1238,10 @@ Glitches out when player dies or completes a stage.
 		</part>
 	</software>
 
-	<software name="blaster" supported="no">
+	<software name="blaster">
 		<description>Blaster (Prototype)</description>
 		<year>1984</year>
 		<publisher>Williams</publisher>
-		<notes><![CDATA[
-Hangs after few frames of gameplay
-]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -1271,7 +1260,7 @@ Title screen has more timing glitches
 Starting a game randomly crashes
 Cuts off top portion of screen
 ]]></notes>
-		<info name="usage" value="Use PAL version for BGM, NTSC is silent" />
+		<info name="usage" value="Use PAL system for BGM during gameplay, NTSC has SFX only. Doesn't work in plain a400/a800" />
 		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_corina_sram" />
@@ -1294,13 +1283,10 @@ Cuts off top portion of screen
 		</part>
 	</software>
 
-	<software name="bldrbmbs" supported="no">
+	<software name="bldrbmbs">
 		<description>Boulders and Bombs</description>
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
-		<notes><![CDATA[
-Glitchy player sprites
-]]></notes>
 		<info name="serial" value="4L-2540" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -1327,12 +1313,12 @@ Black screen with note stuck
 
 	<software name="bbsba" cloneof="bbsb" supported="no">
 		<description>Bounty Bob Strikes Back! (Alt)</description>
-			<!-- Identical to the image contained in Bill Hogue's emulator. http://www.bigfivesoftware.com/Emulator/emulator.htm. -->
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
 		<notes><![CDATA[
 Black screen with note stuck
 ]]></notes>
+		<!-- Identical to the image contained in Bill Hogue's emulator. http://www.bigfivesoftware.com/Emulator/emulator.htm. -->
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_bbsb" />
 			<dataarea name="rom" size="40960">
@@ -1531,13 +1517,13 @@ Black screen with note stuck
 		</part>
 	</software>
 
-	<software name="cstlkeys" supported="no">
+	<software name="cstlkeys">
 		<description>Castles and Keys</description>
 		<year>1983</year>
 		<publisher>Romox</publisher>
 		<notes><![CDATA[
-Glitchy topmost playfield row
-Game sometimes crashes (timer keeps running on death without respawning player)
+Game grants a timer of 99:xx if player dies with a timer of 00:29 or less, btanb
+Game seldomly crashes (timer keeps running on death without respawning player), assume fixed or btanb
 ]]></notes>
 		<info name="serial" value="ECPC-13023" />
 		<part name="cart" interface="a8bit_cart">
@@ -1859,14 +1845,11 @@ It was meant to help point a satellite dish in the right direction to receive TV
 		</part>
 	</software>
 
-	<software name="crystalr" supported="partial">
+	<software name="crystalr">
 		<description>Crystal Raiders (Reproduction)</description>
 		<!-- Re-package & Re-release of Mastertronic 1986 release. -->
 		<year>2001</year>
 		<publisher>Video 61 / Mastertronic</publisher>
-		<notes><![CDATA[
-Cuts off top/bottom text areas
-]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -2006,7 +1989,7 @@ One line off on playfield (enemy colors, player shape)
 		<year>198?</year>
 		<publisher>Adventure International</publisher>
 		<notes><![CDATA[
-Bottom GFX text box doesn't mask properly
+Bottom GFX text box doesn't mask properly, also flickers
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -2185,7 +2168,6 @@ Continously prints "BOOT ERROR"
 		<publisher>Video 61</publisher>
 		<notes><![CDATA[
 Glitchy title screen the first time around (fixes after one playthrough)
-Doesn't survive a soft reset
 ]]></notes>
 		<info name="developer" value="Williams" />
 		<part name="cart" interface="a8bit_cart">
@@ -2303,7 +2285,7 @@ Requires unhandled (and undumped?) cassette lesson tapes
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
 		<notes><![CDATA[
-Offset GFXs on several enemies
+Offset GFXs on several enemies [GTIA] mixing
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -2331,7 +2313,7 @@ Offset GFXs on several enemies
 		<year>1984</year>
 		<publisher>Tigervision</publisher>
 		<notes><![CDATA[
-Sprites gets stuck on title screen after a playthough
+Sprites gets stuck on title screen after a playthough [GTIA] GRACTL
 ]]></notes>
 		<info name="serial" value="7-012-468" />
 		<part name="cart" interface="a8bit_cart">
@@ -2436,13 +2418,10 @@ Sprites gets stuck on title screen after a playthough
 		</part>
 	</software>
 
-	<software name="fvoyage" supported="partial">
+	<software name="fvoyage" supported="yes">
 		<description>Fantastic Voyage</description>
 		<year>1982</year>
 		<publisher>Sirius</publisher>
-		<notes><![CDATA[
-Offset GFX rightmost score digit
-]]></notes>
 		<info name="serial" value="33008" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -2457,7 +2436,8 @@ Offset GFX rightmost score digit
 		<year>1982</year>
 		<publisher>Sirius</publisher>
 		<notes><![CDATA[
-Extreme video flickering, glitchy score display
+Video flickers, timing sensitive
+Glitchy score display
 ]]></notes>
 		<info name="serial" value="33003" />
 		<part name="cart" interface="a8bit_cart">
@@ -2541,7 +2521,7 @@ Offset score digits
 		<year>1983</year>
 		<publisher>Romox</publisher>
 		<notes><![CDATA[
-Row strip glitch on top of sun GFX playfield
+Dubious collision detections, btanb?
 ]]></notes>
 		<info name="serial" value="ECPC-11023" />
 		<part name="cart" interface="a8bit_cart">
@@ -2608,7 +2588,7 @@ Row strip glitch on top of sun GFX playfield
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<notes><![CDATA[
-Video stutters
+Playfield stutters
 ]]></notes>
 		<info name="serial" value="1110" />
 		<part name="cart" interface="a8bit_cart">
@@ -2624,7 +2604,7 @@ Video stutters
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<notes><![CDATA[
-Video stutters
+Playfield stutters
 ]]></notes>
 		<info name="serial" value="1290" />
 		<part name="cart" interface="a8bit_cart">
@@ -2653,7 +2633,8 @@ Video stutters
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Cannot start a game
+Player missile is vertically offset when idle
+Some enemies never collides with player bullets
 ]]></notes>
 		<info name="serial" value="CXL4024" />
 		<part name="cart" interface="a8bit_cart">
@@ -2745,14 +2726,10 @@ Cannot start a game
 		</part>
 	</software>
 
-	<software name="batlband" supported="partial">
+	<software name="batlband">
 		<description>Halftime Battlin' Bands</description>
 		<year>1984</year>
 		<publisher>CBS Software</publisher>
-		<!-- TODO: verify gameplay -->
-		<notes><![CDATA[
-Glitchy topmost row (faces) for dancers strip
-]]></notes>
 		<info name="serial" value="4L-9848" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -2946,7 +2923,7 @@ Glitchy topmost row (faces) for dancers strip
 		<publisher>Video 61 / Williams</publisher>
 		<notes><![CDATA[
 Text boxes don't fill properly (bottom row is black instead of violet)
-Works in PAL only, hangs on a garbled text screen on NTSC (btanb?)
+Hangs on boot if [keyboard] caps lock is enabled
 ]]></notes>
 		<sharedfeat name="compatibility" value="XL/XE"/>
 
@@ -3114,7 +3091,7 @@ Glitchy ship sprite on respawn animation
 		<year>1982</year>
 		<publisher>CBS Software / K-Byte</publisher>
 		<notes><![CDATA[
-Reads start pressed at soon as it boots, i.e. booting to "number of players" screen instead of title screen
+Reads joystick trigger pressed at soon as it boots, i.e. booting to "number of players" screen instead of title screen, fixes after first play [GTIA] latch trigger
 ]]></notes>
 		<info name="serial" value="M8790" />
 		<part name="cart" interface="a8bit_cart">
@@ -3227,7 +3204,7 @@ Playfield has offset vertical lines in two rows
 		<year>1984</year>
 		<publisher>Imagic</publisher>
 		<notes><![CDATA[
-Hardlocks MAME in non-XL machines, boots in XL
+a400/a800: Hardlocks MAME
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -3412,7 +3389,7 @@ Hangs on green screen, looping on [PIO porta] read/writes, expects tablet comms 
 		<year>1982</year>
 		<publisher>Romox / 20th Century Fox</publisher>
 		<notes><![CDATA[
-Extreme screen flickering
+Offset sprites on specific rows [GTIA] mixing
 ]]></notes>
 		<info name="serial" value="ECPC-01033" />
 		<part name="cart" interface="a8bit_cart">
@@ -3473,10 +3450,16 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega1" supported="partial">
+	<!-- TODO: mega* carts untested beyond if they boots -->
+
+	<software name="mega1" supported="no">
 		<description>Mega Cartridge 01 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Hardball: doesn't boot
+Riveraid: doesn't boot
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3485,10 +3468,13 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega2" supported="partial">
+	<software name="mega2" supported="no">
 		<description>Mega Cartridge 02 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Rambo: doesn't boot
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3497,11 +3483,15 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega3" supported="partial">
+	<software name="mega3" supported="no">
 		<description>Mega Cartridge 03 (Spa, Pirate)</description>
-		<!-- The last game (Hot Lips) doesn't run. Possible Bad dump. -->
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Pitstop: doesn't boot
+Mash: punts to memo pad
+Hot Lips: doesn't boot, possibly bad dump (crashes in Altirra too)
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3514,6 +3504,10 @@ Extreme screen flickering
 		<description>Mega Cartridge 04 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Empire Strik: doesn't boot
+Rally Spedway: black screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3522,10 +3516,14 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega5" supported="partial">
+	<software name="mega5" supported="no">
 		<description>Mega Cartridge 05 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Crystal Raider: doesn't boot
+Keystone Kapers: doesn't boot
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3534,10 +3532,13 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega6" supported="partial">
+	<software name="mega6" supported="no">
 		<description>Mega Cartridge 06 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Outlaw: doesn't display any sprite
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3546,10 +3547,15 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega7" supported="partial">
+	<software name="mega7" supported="no">
 		<description>Mega Cartridge 07 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Cavmarte.2: glitchy title screen, [ANTIC] GFX mode 9, same as cvrnmars
+Crystal Raider: hardlocks MAME
+Space Invaders: doesn't boot
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3562,6 +3568,10 @@ Extreme screen flickering
 		<description>Mega Cartridge 08 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Choplifter: black screen
+Cavmarte.1: glitchy title screen, [ANTIC] GFX mode 9, same as cvrnmars
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3570,10 +3580,15 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega9" supported="partial">
+	<software name="mega9" supported="no">
 		<description>Mega Cartridge 09 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Ball Blaster: doesn't boot
+Sargon II: doesn't boot
+The Empire Strikes B.: doesn't boot
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3582,10 +3597,15 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega10" supported="partial">
+	<software name="mega10" supported="no">
 		<description>Mega Cartridge 10 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Space Inv: offset bullets when traversing bases layer
+River Raid: black screen
+Cavmarte.1: glitchy title screen, [ANTIC] GFX mode 9, same as cvrnmars
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3598,6 +3618,11 @@ Extreme screen flickering
 		<description>Mega Cartridge 11 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Despatch: detects extra bogus collision detection on manholes when hitting walls (verify)
+Pitstop: black screen
+Kaboom: black screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3606,23 +3631,30 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega12" supported="partial">
+	<software name="mega12" supported="no">
 		<description>Mega Cartridge 12 (Spa, Pirate)</description>
-		<!-- The last game (Rescue on Fractalus) doesn't run. Possible Bad dump. -->
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Rally Speedway: doesn't boot
+Rescue on Fractalus: doesn't boot, possibly bad dump
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
-				<rom name="mega cartridge 12.rom" size="65536" crc="1014548a" sha1="7bd519d68cee4ba74b3ec405561347ea09691fc1"/>
+				<rom name="mega cartridge 12.rom" size="65536" crc="1014548a" sha1="7bd519d68cee4ba74b3ec405561347ea09691fc1" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mega13" supported="partial">
+	<software name="mega13" supported="no">
 		<description>Mega Cartridge 13 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Pitfall!.: punts to memo pad
+Wargames: black screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3631,10 +3663,14 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega14" supported="partial">
+	<software name="mega14" supported="no">
 		<description>Mega Cartridge 14 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Pitstop: black screen
+Star Raiders: draws glitchy [GTIA] sprites
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3643,10 +3679,15 @@ Extreme screen flickering
 		</part>
 	</software>
 
-	<software name="mega15" supported="partial">
+	<software name="mega15" supported="no">
 		<description>Mega Cartridge 15 (Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Flak Arreglado: doesn't boot
+Cavmarte.2: glitchy title screen, [ANTIC] GFX mode 9, same as cvrnmars
+Keystone Kapers: doesn't boot with stuck note
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3675,7 +3716,7 @@ Cut off top screen portion
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
 		<notes><![CDATA[
-Unresponsive inputs
+Unresponsive inputs [GTIA] latch trigger
 ]]></notes>
 		<info name="serial" value="THB12009" />
 		<part name="cart" interface="a8bit_cart">
@@ -3711,13 +3752,10 @@ Unresponsive inputs
 		</part>
 	</software>
 
-	<software name="mileage" supported="partial">
+	<software name="mileage">
 		<description>Math Mileage</description>
 		<year>1984</year>
 		<publisher>CBS Software</publisher>
-		<notes><![CDATA[
-Cut off top screen portion (noticeable on stage debriefing)
-]]></notes>
 		<info name="serial" value="75010" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -3751,13 +3789,10 @@ Cut off top screen portion (noticeable on stage debriefing)
 		</part>
 	</software>
 
-	<software name="matrhorn" supported="partial">
+	<software name="matrhorn">
 		<description>Matterhorn</description>
 		<year>1984</year>
 		<publisher>Tigervision</publisher>
-		<notes><![CDATA[
-Glitchy row for background where trees and rocks lies
-]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -3812,7 +3847,7 @@ Glitchy row for background where trees and rocks lies
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<notes><![CDATA[
-Row strip glitch on top of screen
+Enemy playfield has strip glitch on topmost row
 ]]></notes>
 		<info name="serial" value="CZ-003-04" />
 		<part name="cart" interface="a8bit_cart">
@@ -4388,7 +4423,7 @@ Row strip glitch on top of screen
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<notes><![CDATA[
-Wrong score display, shows letters rather than digits
+Activision logo glitches out on vertical scrolls
 ]]></notes>
 		<info name="serial" value="CA-011-04" />
 		<part name="cart" interface="a8bit_cart">
@@ -4478,13 +4513,10 @@ Wrong score display, shows letters rather than digits
 		</part>
 	</software>
 
-	<software name="popeye" supported="partial">
+	<software name="popeye">
 		<description>Popeye (USA)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<notes><![CDATA[
-Sometimes playfield glitches out when starting a game
-]]></notes>
 		<info name="serial" value="1150" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4494,13 +4526,10 @@ Sometimes playfield glitches out when starting a game
 		</part>
 	</software>
 
-	<software name="popeyee" cloneof="popeye" supported="partial">
+	<software name="popeyee" cloneof="popeye">
 		<description>Popeye (Euro)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<notes><![CDATA[
-Sometimes playfield glitches out when starting a game
-]]></notes>
 		<info name="serial" value="1150" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4539,7 +4568,7 @@ Sometimes playfield glitches out when starting a game
 		<year>1983</year>
 		<publisher>Romox / 20th Century Fox</publisher>
 		<notes><![CDATA[
-Highway stage has offset rows (player sprite cuts off)
+Highway stage has offset rows (player sprite cuts off) [GTIA] mixing
 ]]></notes>
 		<info name="serial" value="ECPC-02033" />
 		<part name="cart" interface="a8bit_cart">
@@ -4568,7 +4597,7 @@ Highway stage has offset rows (player sprite cuts off)
 		<year>2001</year>
 		<publisher>Video 61 / Adventure International</publisher>
 		<notes><![CDATA[
-Offset rows (player sprite cuts off)
+Offset rows (player sprite cuts off) [GTIA] mixing
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4611,10 +4640,16 @@ Attract mode has glitchy text
 		</part>
 	</software>
 
-	<software name="prisma1" supported="partial">
+	<!-- TODO: prisma* carts untested -->
+	<!-- (cfr. mega* collection, they all crashes in one way or another) -->
+
+	<software name="prisma1" supported="no">
 		<description>Prisma 1 (Spa, Pirate)</description>
 		<year>199?</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+No game in list boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4623,10 +4658,13 @@ Attract mode has glitchy text
 		</part>
 	</software>
 
-	<software name="prisma2" supported="partial">
+	<software name="prisma2" supported="no">
 		<description>Prisma 2 (Spa, Pirate)</description>
 		<year>199?</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+No game in list boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4635,11 +4673,14 @@ Attract mode has glitchy text
 		</part>
 	</software>
 
-	<software name="prisma3" supported="partial">
+	<software name="prisma3" supported="no">
 		<description>Prisma 3 (Spa, Pirate)</description>
 		<!-- The last game (Crystal Raider) doesn't run. Possible Bad dump. -->
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+No game in list boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4648,7 +4689,7 @@ Attract mode has glitchy text
 		</part>
 	</software>
 
-	<software name="prisma4" supported="partial">
+	<software name="prisma4" supported="no">
 		<description>Prisma 4 (Spa, Pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
@@ -4660,7 +4701,7 @@ Attract mode has glitchy text
 		</part>
 	</software>
 
-	<software name="prisma5" supported="partial">
+	<software name="prisma5" supported="no">
 		<description>Prisma 5 (Spa, Pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
@@ -4672,7 +4713,7 @@ Attract mode has glitchy text
 		</part>
 	</software>
 
-	<software name="prisma6" supported="partial">
+	<software name="prisma6" supported="no">
 		<description>Prisma 6 (Spa, Pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
@@ -4684,7 +4725,7 @@ Attract mode has glitchy text
 		</part>
 	</software>
 
-	<software name="prismas" supported="partial">
+	<software name="prismas" supported="no">
 		<description>Prisma Super 15-2 (Spa, Pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
@@ -4733,7 +4774,7 @@ Requires dial up modem
 		<year>1982</year>
 		<publisher>Synapse</publisher>
 		<notes><![CDATA[
-Doesn't draw game over "the end" screen properly
+Doesn't draw game over "the end" screen properly, [ANTIC] vertical scroll?
 ]]></notes>
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
@@ -4867,7 +4908,7 @@ Doesn't draw game over "the end" screen properly
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
 		<notes><![CDATA[
-Cannot start a game
+Cannot start a game, cfr. kpatrol (have to hold trigger pressed at boot then release to start) [GTIA] latch trigger
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4889,11 +4930,14 @@ Cannot start a game
 		</part>
 	</software>
 
-	<software name="seafox" supported="partial">
+	<software name="seafox" supported="no">
 		<description>Seafox</description>
 		<!-- MCMLXXXIII on attract -->
 		<year>1982</year>
 		<publisher>Brøderbund</publisher>
+		<notes><![CDATA[
+Doesn't display bottom text bar
+]]></notes>
 		<info name="serial" value="ATCART193" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4976,10 +5020,13 @@ Score bar glitches out when player dies
 		</part>
 	</software>
 
-	<software name="sistema">
+	<software name="sistema" supported="no">
 		<description>Sistema Controlado por Computadora</description>
 		<year>1992</year>
 		<publisher>ZZ Top Soft</publisher>
+		<notes><![CDATA[
+Crashes on boot, same as prisma* and mega* entries
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -5056,7 +5103,7 @@ Score bar glitches out when player dies
 		<year>1982</year>
 		<publisher>Thorn EMI</publisher>
 		<notes><![CDATA[
-Unresponsive inputs
+Unresponsive inputs [GTIA] latch trigger
 ]]></notes>
 		<info name="serial" value="THB12003" />
 		<part name="cart" interface="a8bit_cart">
@@ -5296,7 +5343,10 @@ Glitched rows, glitched gear GFX
 		<publisher>Display Systems International</publisher>
 		<notes><![CDATA[
 Black screen
+Requires Atari CX-77 Touch Tablet
+https://forums.atariage.com/topic/146490-spectraview-1-and-2-info/
 ]]></notes>
+		<!-- TODO: confirm compatibility with a800xl only -->
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
@@ -5353,7 +5403,7 @@ Broken map GFX
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Doesn't mask sprites on top/bottom of screen
+Doesn't mask sprites on top/bottom of screen [GTIA] GRACTL
 ]]></notes>
 		<info name="serial" value="011-03" />
 		<info name="usage" value="2 joysticks required to play." />
@@ -5709,7 +5759,9 @@ Throws a "RS232 ERROR: 130", hangs
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, expects [POKEY] IRQST bit 3 to go high (expecting a serial in-progress)
+"LINE INTERFACE ERROR"
+Requires [NVRAM] to be 1-filled otherwise it will give invalid config
+Requires dial-up modem
 ]]></notes>
 		<info name="serial" value="CXL4016" />
 		<sharedfeat name="compatibility" value="OSb"/>
@@ -6202,7 +6254,7 @@ a400/a800: crashes at boot (should be compatible, boots with a800xl)
 		<year>1982</year>
 		<publisher>Romox</publisher>
 		<notes><![CDATA[
-Screen becomes garbled randomly during gameplay (depends on key pressed?)
+a400/a800: Screen becomes garbled randomly during gameplay (depends on key pressed? doesn't seem to happen on a800xl)
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -6374,7 +6426,7 @@ During gameplay touching to bottom left or right corners causes vblank desyncs
 		<year>1982</year>
 		<publisher>Sirius</publisher>
 		<notes><![CDATA[
-Has phantom blocks starting from level 2 (which [GTIA] collides)
+Has phantom blocks starting from level 2, which [GTIA] collides too
 ]]></notes>
 		<info name="serial" value="33002" />
 		<part name="cart" interface="a8bit_cart">
@@ -6391,8 +6443,10 @@ Has phantom blocks starting from level 2 (which [GTIA] collides)
 		<publisher>GR8 Software</publisher>
 		<notes><![CDATA[
 Title screen is very off, [ANTIC] timing sensitive
-Crashes once you start a game
+a800xl: crashes once you start a game
+a800xlp: during gameplay it alternates between gameplay render and wide sprite outlines, also player attacks doesn't connect, [GTIA] collision
 ]]></notes>
+		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_corina" />
 			<dataarea name="rom" size="1056768">
