@@ -461,7 +461,9 @@ uint8_t a400_state::a130xe_low_r(offs_t offset)
 		if (!(m_mmu & 0x80) && offset >= 0x5000 && offset < 0x5800)
 			return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
 		if (!(m_mmu & 0x10))
-			return m_ram->pointer()[offset + 0x10000 + (m_ext_bank * 0x4000)];
+		{
+			return m_ram->pointer()[(offset & 0x3fff) + 0x10000 + (m_ext_bank * 0x4000)];
+		}
 		else
 			return m_ram->pointer()[offset];
 	}
@@ -493,7 +495,7 @@ void a400_state::a130xe_low_w(offs_t offset, uint8_t data)
 		if (!(m_mmu & 0x80) && offset >= 0x5000 && offset < 0x5800)
 			return;
 		if (!(m_mmu & 0x10))
-			m_ram->pointer()[offset + 0x10000 + (m_ext_bank * 0x4000)] = data;
+			m_ram->pointer()[(offset & 0x3fff) + 0x10000 + (m_ext_bank * 0x4000)] = data;
 		else
 			m_ram->pointer()[offset] = data;
 	}

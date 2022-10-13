@@ -759,11 +759,15 @@ Glitched out title screen, uses [ANTIC] GFX mode 9
 		</part>
 	</software>
 
-	<!-- Requires 128K RAM -->
-	<software name="t34" supported="no"> <!-- fails to load due to insufficient RAM -->
+	<software name="t34" supported="partial">
 		<description>T-34: The Battle</description>
 		<year>1994</year>
 		<publisher>A.N.G. Software</publisher>
+		<notes><![CDATA[
+a800xl: cannot setup RAM higher than 64KB
+a130xe: scrolling is jerky when shooting in gameplay
+]]></notes>
+		<info name="usage" value="Requires 128KB of RAM"/>
 		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="133136">
