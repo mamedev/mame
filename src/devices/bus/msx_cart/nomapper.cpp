@@ -33,10 +33,9 @@ void msx_cart_nomapper_device::install_memory()
 	{
 		if (start_address < (i + 1) * 0x4000 && start_address < m_end_address)
 		{
-			if (get_page(i))
+			if (page(i))
 			{
-				printf("installing %04x, to %04x\n", start_address, std::min<uint32_t>(start_address + 0x3fff, m_end_address - 1));
-				get_page(i)->install_rom(start_address, std::min<uint32_t>(start_address + 0x3fff, m_end_address - 1), get_rom_base() + rom_offset);
+				page(i)->install_rom(start_address, std::min<uint32_t>(start_address + 0x3fff, m_end_address - 1), get_rom_base() + rom_offset);
 			}
 			rom_offset += 0x4000;
 			start_address += 0x4000;
@@ -106,16 +105,7 @@ void msx_cart_nomapper_device::initialize_cartridge()
 			break;
 	}
 
-	m_end_address = std::min<uint32_t>(m_start_address + size, 0x10000);
-	install_memory();
-}
+	m_end_address = std::min<u32>(m_start_address + size, 0x10000);
 
-uint8_t msx_cart_nomapper_device::read_cart(offs_t offset)
-{
-	if (offset >= m_start_address && offset < m_end_address)
-	{
-		printf("read_cart %04x\n", offset);
-		return get_rom_base()[offset - m_start_address];
-	}
-	return 0xff;
+	install_memory();
 }

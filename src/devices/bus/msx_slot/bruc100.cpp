@@ -30,11 +30,8 @@ void msx_slot_bruc100_device::device_start()
 	{
 		fatalerror("Memory region '%s' is too small for the BRUC100 firmware\n", m_rom_region.finder_tag());
 	}
-
-	if (!page(0) || !page(1))
-	{
-		fatalerror("Page view not setup\n");
-	}
+	page_setup(0);
+	page_setup(1);
 
 	m_rom = m_rom_region->base() + m_region_offset;
 

@@ -21,7 +21,14 @@ msx_slot_bunsetsu_device::msx_slot_bunsetsu_device(const machine_config &mconfig
 
 void msx_slot_bunsetsu_device::device_start()
 {
+	msx_slot_rom_device::device_start();
+
+	page_setup(2);
+
 	save_item(NAME(m_bunsetsu_address));
+
+	page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_slot_bunsetsu_device::buns_read)));
+	page(2)->install_write_handler(0xbffc, 0xbffe, write8sm_delegate(*this, FUNC(msx_slot_bunsetsu_device::buns_write)));
 }
 
 
@@ -31,29 +38,29 @@ void msx_slot_bunsetsu_device::device_reset()
 }
 
 
-uint8_t msx_slot_bunsetsu_device::read(offs_t offset)
+u8 msx_slot_bunsetsu_device::buns_read()
 {
-	if (offset == 0xbfff)
-	{
-		return m_bunsetsu_region[m_bunsetsu_address++ & 0x1ffff];
-	}
-	return msx_slot_rom_device::read(offset);
+	u8 data = m_bunsetsu_region[m_bunsetsu_address & 0x1ffff];
+
+	if (!machine().side_effects_disabled())
+		m_bunsetsu_address++;
+
+	return data;
 }
 
-
-void msx_slot_bunsetsu_device::write(offs_t offset, uint8_t data)
+void msx_slot_bunsetsu_device::buns_write(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
-		case 0xbffc:
+		case 0:
 			m_bunsetsu_address = (m_bunsetsu_address & 0xffff00) | data;
 			break;
 
-		case 0xbffd:
+		case 1:
 			m_bunsetsu_address = (m_bunsetsu_address & 0xff00ff) | (data << 8);
 			break;
 
-		case 0xbffe:
+		case 2:
 			m_bunsetsu_address = (m_bunsetsu_address & 0x00ffff) | (data << 16);
 			break;
 	}

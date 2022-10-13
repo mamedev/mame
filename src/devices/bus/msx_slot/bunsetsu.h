@@ -20,16 +20,16 @@ public:
 	// configuration helpers
 	void set_bunsetsu_region_tag(const char *tag) { m_bunsetsu_region.set_tag(tag); }
 
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
 	required_region_ptr<uint8_t> m_bunsetsu_region;
-	uint32_t m_bunsetsu_address;
+	u32 m_bunsetsu_address;
+
+	u8 buns_read();
+	void buns_write(offs_t offset, u8 data);
 };
 
 

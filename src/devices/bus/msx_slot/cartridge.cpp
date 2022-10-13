@@ -104,10 +104,8 @@ void msx_slot_cartridge_device::device_resolve_objects()
 
 void msx_slot_cartridge_device::device_start()
 {
-	if (m_cartridge)
-	{
-		printf("cartridge inserted\n");
-	}
+	for (int i = 0; i < 4; i++)
+		page_setup(i);
 }
 
 
@@ -139,7 +137,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 
 			// Allocate ram
 			length = get_software_region_length("ram");
-			m_cartridge->ram_alloc( length );
+			m_cartridge->ram_alloc(length);
 
 			// Allocate sram
 			length = get_software_region_length("sram");

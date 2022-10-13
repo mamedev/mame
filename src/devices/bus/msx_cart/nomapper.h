@@ -21,8 +21,6 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-
 private:
 	uint32_t m_start_address;
 	uint32_t m_end_address;

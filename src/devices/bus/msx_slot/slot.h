@@ -38,6 +38,10 @@ public:
 	address_space &io_space() const { return *m_io_space; }
 	cpu_device &maincpu() const { return *m_maincpu; }
 	memory_view::memory_view_entry *page(int i) { return m_page[i]; }
+	void page_setup(int i) {
+		if (!m_page[i])
+			fatalerror("Page %i view not setup\n", i);
+	}
 
 protected:
 	required_address_space m_mem_space;

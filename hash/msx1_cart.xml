@@ -669,12 +669,12 @@ Xyzolog - Electric Software
 		</part>
 	</software>
 
-	<!-- Code seems to work but it does not display text -->
-	<software name="msxwritj" supported="partial">
+	<software name="msxwritj">
 		<description>Japanese MSX-Write (Jpn)</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="日本語MSX-Write" />
+		<info name="usage" value="To display texts this needs to run on a machine with kanji support or have an external kanji cartridge mounted." />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX WRITE 900178B" />
 			<feature name="slot" value="msxwrite" />

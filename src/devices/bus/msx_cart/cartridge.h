@@ -49,7 +49,7 @@ public:
 	uint32_t get_rom_vlm5030_size() { return m_rom_vlm5030.size(); }
 	uint32_t get_ram_size() { return m_ram.size(); }
 	uint32_t get_sram_size() { return m_sram.size(); }
-	memory_view::memory_view_entry *get_page(int i) { return m_page[i]; }
+	memory_view::memory_view_entry *page(int i) { return m_page[i]; }
 
 protected:
 	msx_cart_interface(const machine_config &mconfig, device_t &device);

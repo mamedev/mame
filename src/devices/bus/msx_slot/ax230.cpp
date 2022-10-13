@@ -29,10 +29,8 @@ void msx_slot_ax230_device::device_start()
 	{
 		fatalerror("Memory region '%s' is too small for the AX230 firmware\n", m_rom_region.finder_tag());
 	}
-	if (!page(1) || !page(2))
-	{
-		fatalerror("Page views not setup\n");
-	}
+	page_setup(0);
+	page_setup(1);
 
 	for (int i = 0; i < 4; i++)
 	{
