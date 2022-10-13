@@ -15,7 +15,6 @@
 //  device_start
 //-------------------------------------------------
 
-
 void coco12_state::device_start()
 {
 	coco_state::device_start();
@@ -35,7 +34,6 @@ void coco12_state::configure_sam()
 	if (ramsize < 65536)
 		m_sam->space(0).nop_readwrite(ramsize, 0xffff);
 }
-
 
 
 //-------------------------------------------------
