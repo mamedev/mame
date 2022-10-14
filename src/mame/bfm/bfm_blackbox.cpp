@@ -409,9 +409,9 @@ void blackbox_em_21up_state::out_lamps1_beeper_w(offs_t offset, uint8_t data)
 		case 6: 
 		{
 			if(state && !m_beeper_on)
-				m_samples->play(fruit_samples_device::SAMPLE_BEEP);
+				m_beep_sample->start_raw(0, m_beep_sample_data, 477, 48000, true);
 			else if(!state)
-				m_samples->stop(fruit_samples_device::SAMPLE_BEEP);
+				m_beep_sample->stop(0);
 			m_beeper_on = state;
 		} break;
 		default: m_lamps[bit] = state; break;
@@ -1137,6 +1137,12 @@ void blackbox_em_21up_state::blackbox_em_21up(machine_config &config)
 	blackbox_em(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_21up_state::blackbox_em_21up_map);
+
+	SPEAKER(config, "mono").front_center();
+
+	SAMPLES(config, m_beep_sample);
+	m_beep_sample->set_channels(1);
+	m_beep_sample->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void blackbox_em_opto_sndgen_state::blackbox_em_opto_sndgen(machine_config &config)
@@ -1293,13 +1299,23 @@ ROM_START( bb_gspin )
 	ROM_LOAD( "gspin.ic3", 0x7800, 0x800, CRC(503aa869) SHA1(9e4d9be27e014603d2d2206e17e2ec0adafb91c1) )
 ROM_END
 
+void blackbox_em_21up_state::init_21up()
+{
+	for(int s = 0; s < 477; s++)
+	{
+		double wave = sin((2 * M_PI * 3500.0 * (double)s) / 48000.0);
+		double mod = sin((2 * M_PI * 50.0 * (double)s) / 48000.0);
+		m_beep_sample_data[s] = 32767 * wave * mod;
+	}
+}
+
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_SUPPORTS_SAVE
 #define GAME_FLAGS_NOSOUND MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_SUPPORTS_SAVE|MACHINE_NO_SOUND
 
 // AWP
 GAMEL(1981,  bb_nudcl,  0,         blackbox_em,             bb_nudcl,  blackbox_em_state, empty_init, ROT0, "BFM", u8"Nudge Climber (Bellfruit) (Black Box) (5p Stake, £1 Jackpot, all cash)", GAME_FLAGS, layout_bb_nudcl ) // Not the original release
-GAMEL(1979,  bb_21up,   0,         blackbox_em_21up,        bb_21up,   blackbox_em_21up_state, empty_init, ROT0, "BFM", u8"21 Up (Bellfruit) (Black Box) (5p Stake, £1 Jackpot)", GAME_FLAGS|MACHINE_IMPERFECT_SOUND, layout_bb_21up )
-GAMEL(1981,  bb_21upa,  bb_21up,   blackbox_em_21up,        bb_21up2,  blackbox_em_21up_state, empty_init, ROT0, "BFM", u8"21 Up (Bellfruit) (Black Box) (10p Stake, £2 Jackpot)", GAME_FLAGS|MACHINE_IMPERFECT_SOUND, layout_bb_21up )
+GAMEL(1979,  bb_21up,   0,         blackbox_em_21up,        bb_21up,   blackbox_em_21up_state, init_21up, ROT0, "BFM", u8"21 Up (Bellfruit) (Black Box) (5p Stake, £1 Jackpot)", GAME_FLAGS|MACHINE_IMPERFECT_SOUND, layout_bb_21up )
+GAMEL(1981,  bb_21upa,  bb_21up,   blackbox_em_21up,        bb_21up2,  blackbox_em_21up_state, init_21up, ROT0, "BFM", u8"21 Up (Bellfruit) (Black Box) (10p Stake, £2 Jackpot)", GAME_FLAGS|MACHINE_IMPERFECT_SOUND, layout_bb_21up )
 GAMEL(1979,  bb_bellt,  0,         blackbox_em_bellt,       bb_bellt,  blackbox_em_state, empty_init, ROT0, "BFM", u8"Bell Trail (Bellfruit) (Black Box) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_bb_bellt )
 GAMEL(1982,  bb_nudgm,  0,         blackbox_em_admc,        bb_nudgm,  blackbox_em_admc_state, empty_init, ROT0, "ADM ", u8"The Nudge Machine (ADMC) (Black Box) (5p Stake, £1/£2 Jackpot)", GAME_FLAGS_NOSOUND, layout_bb_nudgm )
 GAMEL(1980,  bb_upndn,  0,         blackbox_em_opto_sndgen, bb_upndn,  blackbox_em_opto_sndgen_state, empty_init, ROT0, "BFM", u8"Upstairs 'N' Downstairs (Bellfruit) (Black Box) (5p Stake, £1 Jackpot)", GAME_FLAGS|MACHINE_IMPERFECT_SOUND, layout_bb_upndn )

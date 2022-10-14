@@ -145,10 +145,13 @@ class blackbox_em_21up_state : public blackbox_em_state
 {
 public:
 	blackbox_em_21up_state(const machine_config &mconfig, device_type type, const char *tag) :
-			blackbox_em_state(mconfig, type, tag)
+			blackbox_em_state(mconfig, type, tag),
+			m_beep_sample(*this, "beep_sample")
 	{ }
 
 	void blackbox_em_21up(machine_config &config);
+
+	void init_21up();
 
 private:
 	void out_lamps1_beeper_w(offs_t offset, uint8_t data); OUT_READ(out_lamps1_beeper);
@@ -156,6 +159,9 @@ private:
 	void blackbox_em_21up_map(address_map &map);
 
 	bool m_beeper_on;
+	int16_t m_beep_sample_data[477];
+
+	required_device<samples_device> m_beep_sample;
 };
 
 class blackbox_em_admc_state : public blackbox_em_state

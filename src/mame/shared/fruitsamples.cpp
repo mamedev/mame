@@ -20,7 +20,6 @@ const char *const fruit_sample_names[fruit_samples_device::SAMPLE_END + 2] =
 	"payout",        // 0
 	"meter",         // 1
 	"buzzer",        // 2
-	"beep",          // 3
 	nullptr
 };
 
@@ -28,8 +27,7 @@ const fruit_samples_device::sample_params params[fruit_samples_device::SAMPLE_EN
 {
 	{ 0, 0, false }, // SAMPLE_PAYOUT
 	{ 1, 1, false }, // SAMPLE_METER
-	{ 2, 2, false }, // SAMPLE_BUZZER
-	{ 3, 2, true }   // SAMPLE_BEEP
+	{ 2, 2, false } // SAMPLE_BUZZER
 };
 
 } // anonymous namespace
