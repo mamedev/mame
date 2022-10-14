@@ -43,7 +43,30 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
 #include <iostream>
+
+//**************************************************************************
+//  LOGGING
+//**************************************************************************
+
+#define LOG_CONF      (1 << 1U)
+#define LOG_KEYBOARD  (1 << 2U)
+#define LOG_DISPLAY   (1 << 3U)
+
+//#define VERBOSE (LOG_CONF|LOG_DISPLAY|LOG_KEYBOARD)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGCONF(...)     LOGMASKED(LOG_CONF,  __VA_ARGS__)
+#define LOGKEYBOARD(...) LOGMASKED(LOG_KEYBOARD,  __VA_ARGS__)
+#define LOGDISPLAY(...)  LOGMASKED(LOG_DISPLAY,  __VA_ARGS__)
+
+
+//**************************************************************************
+//  MACROS
+//**************************************************************************
 
 #define I8088_TAG       "8l"
 #define I8253_TAG       "13h"
@@ -62,23 +85,8 @@
 #define SCREEN_TAG      "screen"
 #define KB_TAG          "kb"
 
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
 
-#define LOG_CONF      (1 << 1U)
-#define LOG_KEYBOARD  (1 << 2U)
-#define LOG_DISPLAY   (1 << 3U)
-
-//#define VERBOSE (LOG_CONF|LOG_DISPLAY|LOG_KEYBOARD)
-//#define LOG_OUTPUT_STREAM std::cout
-
-#include "logmacro.h"
-
-#define LOGCONF(...)     LOGMASKED(LOG_CONF,  __VA_ARGS__)
-#define LOGKEYBOARD(...) LOGMASKED(LOG_KEYBOARD,  __VA_ARGS__)
-#define LOGDISPLAY(...)  LOGMASKED(LOG_DISPLAY,  __VA_ARGS__)
-
+namespace {
 
 class victor9k_state : public driver_device
 {
@@ -837,6 +845,7 @@ ROM_START( victor9k )
 	ROMX_LOAD( "v9000 univ. ff f3f7 39fe.8j", 0x1000, 0x1000, CRC(496c7467) SHA1(eccf428f62ef94ab85f4a43ba59ae6a066244a66), ROM_BIOS(1) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************
