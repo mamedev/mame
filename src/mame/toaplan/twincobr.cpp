@@ -840,10 +840,10 @@ ROM_END
 
 ROM_START( ktiger )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // Main 68K code
-	ROM_LOAD16_BYTE( "b30_01.7j",   0x00000, 0x10000, CRC(07f64d13) SHA1(864ce0f9369c40c3ae792fc4ab2444a168214749) )
-	ROM_LOAD16_BYTE( "b30_03.7h",   0x00001, 0x10000, CRC(41be6978) SHA1(4784804b738a332c7f24a43bcbb7a1e607365735) )
-	ROM_LOAD16_BYTE( "b30_02_a.8j", 0x20000, 0x08000, CRC(321e2be6) SHA1(03b2c530326d1859b66829b49555d862be235643) )
-	ROM_LOAD16_BYTE( "b30_04_a.8h", 0x20001, 0x08000, CRC(c3f960ff) SHA1(cbebf576d677cc02f4d0f22dcc226e898d4832c6) )
+	ROM_LOAD16_BYTE( "b30_01.7j", 0x00000, 0x10000, CRC(07f64d13) SHA1(864ce0f9369c40c3ae792fc4ab2444a168214749) )
+	ROM_LOAD16_BYTE( "b30_03.7h", 0x00001, 0x10000, CRC(41be6978) SHA1(4784804b738a332c7f24a43bcbb7a1e607365735) )
+	ROM_LOAD16_BYTE( "b30_02.8j", 0x20000, 0x08000, CRC(321e2be6) SHA1(03b2c530326d1859b66829b49555d862be235643) )
+	ROM_LOAD16_BYTE( "b30_04.8h", 0x20001, 0x08000, CRC(c3f960ff) SHA1(cbebf576d677cc02f4d0f22dcc226e898d4832c6) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    // Sound Z80 code
 	ROM_LOAD( "b30_05.4f", 0x0000, 0x8000, CRC(1a8f1e10) SHA1(0c37a7a50b2523506ad77ac03ae752eb94092ff6) )
@@ -1470,7 +1470,7 @@ GAME( 1987, fnshark,   fshark,   fshark,    hishouza,  twincobr_state, init_twin
 GAME( 1987, skysharkb, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Sky Shark (bootleg)",                   0 )
 GAME( 1987, twincobr,  0,        twincobrw, twincobr,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Twin Cobra (World)",                    0 )
 GAME( 1987, twincobru, twincobr, twincobrw, twincobru, twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Twin Cobra (US)",                       0 )
-GAME( 1989, ktiger,    twincobr, twincobr,  ktiger,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan, set 1)",         0 )
-GAME( 1987, ktigera,   twincobr, twincobr,  ktiger,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan, set 2)",         0 )
+GAME( 1989, ktiger,    twincobr, twincobr,  ktiger,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan, newer)",         0 )
+GAME( 1987, ktigera,   twincobr, twincobr,  ktiger,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan, older)",         0 )
 GAME( 1991, gulfwar2,  0,        twincobr,  gulfwar2,  twincobr_state, init_twincobr, ROT270, "Comad",                                                 "Gulf War II (set 1)",                   0 )
 GAME( 1991, gulfwar2a, gulfwar2, twincobr,  gulfwar2,  twincobr_state, init_twincobr, ROT270, "Comad",                                                 "Gulf War II (set 2)",                   0 )
