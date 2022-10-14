@@ -92,11 +92,10 @@ protected:
 	void fdes2100d_map(address_map &map);
 
 	// I/O handlers
+	void update_lcd();
 	virtual void control_w(offs_t offset, u8 data);
 	virtual void lcd_w(offs_t offset, u8 data);
 	virtual u8 input_r(offs_t offset);
-
-	virtual u8 lcd_mask(bool pol) { return pol ? 0 : 0xff; }
 
 	u8 m_select = 0;
 	u32 m_lcd_data = 0;
@@ -136,7 +135,6 @@ private:
 
 	// I/O handlers, slightly different (control_w is d0 instead of d7)
 	virtual void control_w(offs_t offset, u8 data) override { desdis_state::control_w(offset, data << 7); }
-	virtual u8 lcd_mask(bool pol) override { return desdis_state::lcd_mask(!pol); }
 };
 
 void desmas_state::init_fdes2265()
@@ -161,10 +159,18 @@ void desmas_state::init_fdes2265()
     I/O
 ******************************************************************************/
 
+// TTL/generic
+
+void desdis_state::update_lcd()
+{
+	u8 mask = (m_select & 8) ? 0 : 0xff;
+	for (int i = 0; i < 4; i++)
+		m_display->write_row(i+2, (m_lcd_data >> (8*i) & 0xff) ^ mask);
+}
+
 void desdis_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: 74259
-	u8 prev = m_select;
 	u8 mask = 1 << offset;
 	m_select = (m_select & ~mask) | ((data & 0x80) ? mask : 0);
 
@@ -183,12 +189,8 @@ void desdis_state::control_w(offs_t offset, u8 data)
 	if (m_rombank != nullptr)
 		m_rombank->set_entry(m_select >> 2 & 1);
 
-	// 74259 Q3: lcd polarity (update at any edge)
-	if ((prev ^ m_select) & 8)
-	{
-		for (int i = 0; i < 4; i++)
-			m_display->write_row(i+2, (m_lcd_data >> (8*i) & 0xff) ^ lcd_mask(m_select & 8));
-	}
+	// 74259 Q3: lcd polarity
+	update_lcd();
 }
 
 void desdis_state::lcd_w(offs_t offset, u8 data)
@@ -200,6 +202,8 @@ void desdis_state::lcd_w(offs_t offset, u8 data)
 		m_lcd_data = (m_lcd_data & ~mask) | ((data >> i & 1) ? 0 : mask);
 		mask <<= 8;
 	}
+
+	update_lcd();
 }
 
 u8 desdis_state::input_r(offs_t offset)
