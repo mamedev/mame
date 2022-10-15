@@ -3335,16 +3335,16 @@ static INPUT_PORTS_START( h8analog )
 	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
 
 	PORT_START("ADC3")
-	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM ) // rear right sensor pot (rapidrvr)
 
 	PORT_START("ADC4")
-	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM ) // rear left sensor pot (rapidrvr)
 
 	PORT_START("ADC5")
-	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM ) // front right sensor pot (rapidrvr)
 
 	PORT_START("ADC6")
-	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM ) // front left sensor pot (rapidrvr)
 
 	PORT_START("ADC7")
 	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
@@ -3405,20 +3405,8 @@ static INPUT_PORTS_START( rapidrvr )
 
 	PORT_MODIFY("ADC1")
 	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Pitch")
-#if 0	
-	PORT_MODIFY("ADC3")
-	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Rear Right Sensor")
 
-	PORT_MODIFY("ADC4")
-	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Rear Left Sensor")
-
-	PORT_MODIFY("ADC5")
-	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Front Right Sensor")
-
-	PORT_MODIFY("ADC6")
-	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Front Left Sensor")
-#endif
-INPUT_PORTS_END
+	INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( rapidrvrp )
@@ -4583,13 +4571,11 @@ ROM_START( aking )
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code. Hacked firmware to change the JVS ID to 'FCA-1' */
 	ROM_LOAD( "asc3_io-c1.ic14", 0x000000, 0x020000, BAD_DUMP CRC(b6627a0e) SHA1(92343d527f4a62773c4495b9a04e7e16b9d6fb96) )
 
-#if 0
 	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code 
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
 
 	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
 	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
-#endif
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "ag1mtah.2j",  0x0000000, 0x800000, CRC(f2d8ca9d) SHA1(8158d13d74f2aae7c0d1238619ce1ad3a17d8047) )
@@ -4637,13 +4623,11 @@ ROM_START( 500gp )
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code. Hacked firmware to change the JVS ID to 'FCA-1' */
 	ROM_LOAD( "asc3_io-c1.ic14", 0x000000, 0x020000, BAD_DUMP CRC(b6627a0e) SHA1(92343d527f4a62773c4495b9a04e7e16b9d6fb96) )
 
-#if 0
 	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code 
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
 
 	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
 	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
-#endif
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000000, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )
