@@ -452,8 +452,8 @@ VIDEO_START_MEMBER(cclimber_state,cclimber)
 	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::cclimber_get_bs_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bs_tilemap->set_scroll_cols(1);
 	m_bs_tilemap->set_scroll_rows(1);
-	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
-	m_bs_tilemap->set_transmask(1, 0x0f, 0);  /* all 4 pens are transparent */
+	m_bs_tilemap->set_transmask(0, 0x01, 0); // pen 0 is transparent
+	m_bs_tilemap->set_transmask(1, 0x0f, 0); // all 4 pens are transparent
 
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));
@@ -469,8 +469,8 @@ VIDEO_START_MEMBER(cclimber_state,swimmer)
 	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::cclimber_get_bs_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bs_tilemap->set_scroll_cols(1);
 	m_bs_tilemap->set_scroll_rows(1);
-	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
-	m_bs_tilemap->set_transmask(1, 0xff, 0);  /* all 8 pens are transparent */
+	m_bs_tilemap->set_transmask(0, 0x01, 0); // pen 0 is transparent
+	m_bs_tilemap->set_transmask(1, 0xff, 0); // all 8 pens are transparent
 
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));
@@ -490,8 +490,8 @@ VIDEO_START_MEMBER(cclimber_state,toprollr)
 	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::toprollr_get_bs_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bs_tilemap->set_scroll_cols(1);
 	m_bs_tilemap->set_scroll_rows(1);
-	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
-	m_bs_tilemap->set_transmask(1, 0x0f, 0);  /* all 4 pens are transparent */
+	m_bs_tilemap->set_transmask(0, 0x01, 0); // pen 0 is transparent
+	m_bs_tilemap->set_transmask(1, 0x0f, 0); // all 4 pens are transparent
 
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));
@@ -778,6 +778,7 @@ uint32_t cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_in
 	rectangle scroll_area_clip = cliprect;
 	scroll_area_clip.min_x = (m_flip_x ? 3 : 5) * 8;
 	scroll_area_clip.max_x = (m_flip_x ? 27 : 29) * 8 - 1;
+	scroll_area_clip &= cliprect;
 
 	bitmap.fill(CCLIMBER_BG_PEN, cliprect);
 

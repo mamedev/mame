@@ -1024,6 +1024,8 @@ if (BUSES["CBMIEC"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbmiec/fd2000.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/interpod.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/interpod.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/mps1200.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/mps1200.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/serialbox.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/serialbox.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/vic1515.cpp",
@@ -2578,8 +2580,6 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/a2cffa.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2corvus.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2corvus.h",
-		MAME_DIR .. "src/devices/bus/a2bus/a2diskii.cpp",
-		MAME_DIR .. "src/devices/bus/a2bus/a2diskii.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskiing.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskiing.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2dx1.cpp",
@@ -3132,6 +3132,8 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/powerpad.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/rob.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/rob.h",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/sharpcass.cpp",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/sharpcass.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/snesadapter.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/snesadapter.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/suborkey.cpp",
@@ -3680,19 +3682,51 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/gameboy/gb_slot.h,BUSES["GAMEBOY"] = true
+--@src/devices/bus/gameboy/slot.h,BUSES["GAMEBOY"] = true
 ---------------------------------------------------
 
 if (BUSES["GAMEBOY"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/gameboy/camera.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/camera.h",
+		MAME_DIR .. "src/devices/bus/gameboy/cartbase.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/cartbase.h",
+		MAME_DIR .. "src/devices/bus/gameboy/cartbase.ipp",
+		MAME_DIR .. "src/devices/bus/gameboy/cartheader.h",
 		MAME_DIR .. "src/devices/bus/gameboy/carts.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/carts.h",
+		MAME_DIR .. "src/devices/bus/gameboy/gbck003.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/gbck003.h",
+		MAME_DIR .. "src/devices/bus/gameboy/gbslot.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/gbslot.h",
+		MAME_DIR .. "src/devices/bus/gameboy/gbxfile.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/gbxfile.h",
+		MAME_DIR .. "src/devices/bus/gameboy/huc1.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/huc1.h",
+		MAME_DIR .. "src/devices/bus/gameboy/huc3.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/huc3.h",
 		MAME_DIR .. "src/devices/bus/gameboy/mbc.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/mbc.h",
-		MAME_DIR .. "src/devices/bus/gameboy/gb_slot.cpp",
-		MAME_DIR .. "src/devices/bus/gameboy/gb_slot.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc2.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc2.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc3.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc3.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc6.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc6.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc7.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc7.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mdslot.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mdslot.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mmm01.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mmm01.h",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.h",
+		MAME_DIR .. "src/devices/bus/gameboy/slmulti.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/slmulti.h",
+		MAME_DIR .. "src/devices/bus/gameboy/slot.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/slot.h",
+		MAME_DIR .. "src/devices/bus/gameboy/tama5.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/tama5.h",
 	}
 end
 
@@ -3872,10 +3906,39 @@ end
 ---------------------------------------------------
 if (BUSES["EPSON_QX"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/cr1510.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/cr1510.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/ide.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/ide.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/multifont.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/multifont.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/sound_card.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/sound_card.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/epson_qx/keyboard/keyboard.h,BUSES["EPSON_QX_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["EPSON_QX_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/matrix.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/matrix.h",
+	}
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp", GEN_DIR .. "emu/layout/qx10ascii.lh" },
+		{ MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp", GEN_DIR .. "emu/layout/qx10hasci.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "qx10ascii"),
+		layoutbuildtask("emu/layout", "qx10hasci"),
 	}
 end
 
@@ -4946,3 +5009,18 @@ if (BUSES["PC8801"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc8801/jmbx1.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/mtu130/board.h,BUSES["MTU130"] = true
+---------------------------------------------------
+
+if (BUSES["MTU130"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/mtu130/board.cpp",
+		MAME_DIR .. "src/devices/bus/mtu130/board.h",
+		MAME_DIR .. "src/devices/bus/mtu130/datamover.cpp",
+		MAME_DIR .. "src/devices/bus/mtu130/datamover.h",
+	}
+ end
+

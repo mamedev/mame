@@ -196,10 +196,11 @@ void bsmt2000_device::sound_stream_update(sound_stream &stream, std::vector<read
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void bsmt2000_device::rom_bank_updated()
+void bsmt2000_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
@@ -236,7 +237,7 @@ void bsmt2000_device::write_data(uint16_t data)
 	m_deferred_data_write->adjust(attotime::zero, data);
 
 	// boost the interleave on a write so that the caller detects the status more accurately
-	machine().scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(10));
+	machine().scheduler().add_quantum(attotime::from_usec(1), attotime::from_usec(10));
 }
 
 

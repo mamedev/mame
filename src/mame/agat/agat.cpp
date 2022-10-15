@@ -73,7 +73,7 @@
 #include "agat7.h"
 #include "agat9.h"
 
-#include "bus/a2bus/a2diskii.h"
+#include "bus/a2bus/a2diskiing.h"
 #include "bus/a2bus/agat7langcard.h"
 #include "bus/a2bus/agat7ports.h"
 #include "bus/a2bus/agat7ram.h"
@@ -1219,7 +1219,7 @@ static void agat7_cards(device_slot_interface &device)
 static void agat9_cards(device_slot_interface &device)
 {
 //  device.option_add("a9ram", A2BUS_AGAT9RAM); // Agat-9 128K RAM Card -- decimal 3.089.170
-	device.option_add("diskii", A2BUS_DISKII);  /* Disk II Controller Card */
+	device.option_add("diskiing", A2BUS_DISKIING);  /* Disk II Controller Card */
 	device.option_add("a9fdc140", A2BUS_AGAT9_FDC); // Disk II clone -- decimal 3.089.173 (reworked for agat9)
 	device.option_add("a9fdchle", A2BUS_AGAT840K_HLE); // 840K floppy controller -- decimal 7.104.351 or 3.089.023?
 	device.option_add("a9fdc", A2BUS_AGAT_FDC); // 840K floppy controller LLE

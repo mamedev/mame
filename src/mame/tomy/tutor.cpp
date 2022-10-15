@@ -182,6 +182,8 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 
 namespace {
 

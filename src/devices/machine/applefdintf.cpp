@@ -5,6 +5,7 @@
 #include "applefdintf.h"
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
+#include "formats/as_dsk.h"
 #include "formats/pc_dsk.h"
 #include "formats/fs_prodos.h"
 
@@ -30,6 +31,7 @@ void applefdintf_device::formats_35(format_registration &fr)
 	fr.add_pc_formats();
 	fr.add(FLOPPY_DC42_FORMAT);
 	fr.add(FLOPPY_WOZ_FORMAT);
+	fr.add(FLOPPY_MOOF_FORMAT);
 	fr.add(FLOPPY_APPLE_GCR_FORMAT);
 	fr.add(FLOPPY_APPLE_2MG_FORMAT);
 

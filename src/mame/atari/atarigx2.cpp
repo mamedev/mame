@@ -28,7 +28,7 @@
 #include "emu.h"
 #include "atarigx2.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/eeprompar.h"
 #include "emupal.h"
 #include "speaker.h"

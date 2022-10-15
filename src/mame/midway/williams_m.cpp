@@ -338,7 +338,7 @@ u8 mayday_state::protection_r(offs_t offset)
 	/* These are compared against $a193 and $a194, respectively. Thus, to prevent  */
 	/* the protection from resetting the machine, we just return $a193 for $a190,  */
 	/* and $a194 for $a191. */
-	return m_protection[offset + 3];
+	return m_videoram[0xa193 + offset];
 }
 
 
@@ -422,22 +422,9 @@ TIMER_CALLBACK_MEMBER(blaster_state::deferred_snd_cmd_w)
 }
 
 
-void blaster_state::snd_cmd_w(u8 data)
+void blaster_state::blaster_snd_cmd_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(blaster_state::deferred_snd_cmd_w),this), data);
-}
-
-
-
-/*************************************
- *
- *  Lotto Fun-specific routines
- *
- *************************************/
-
-WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
-{
-	machine().bookkeeping().coin_lockout_global_w(state & 1); /* bit 5 of PIC control port A */
 }
 
 

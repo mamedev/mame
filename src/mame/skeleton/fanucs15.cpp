@@ -306,6 +306,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/i86/i286.h"
 
 class fanucs15_state : public driver_device

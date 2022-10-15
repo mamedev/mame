@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "config.h"
 
+#include "xmlfile.h"
+
 
 //**************************************************************************
 //  BOOKKEEPING MANAGER

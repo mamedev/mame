@@ -10,11 +10,14 @@
 
 #include "emu.h"
 
-#include "speaker.h"
-#include "emuopts.h"
-#include "osdepend.h"
 #include "config.h"
+#include "emuopts.h"
+#include "speaker.h"
+
 #include "wavwrite.h"
+#include "xmlfile.h"
+
+#include "osdepend.h"
 
 
 //**************************************************************************
@@ -1380,6 +1383,10 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
+	// master volume attenuation
+	if (util::xml::data_node const *node = parentnode->get_child("attenuation"))
+		set_attenuation(std::clamp(int(node->get_attribute_int("value", 0)), -32, 0));
+
 	// iterate over channel nodes
 	for (util::xml::data_node const *channelnode = parentnode->get_child("channel"); channelnode != nullptr; channelnode = channelnode->get_next_sibling("channel"))
 	{
@@ -1405,6 +1412,13 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 	// we only save system-specific configuration
 	if (cfg_type != config_type::SYSTEM)
 		return;
+
+	// master volume attenuation
+	if (m_attenuation != machine().options().volume())
+	{
+		if (util::xml::data_node *const node = parentnode->add_child("attenuation", nullptr))
+			node->set_attribute_int("value", m_attenuation);
+	}
 
 	// iterate over mixer channels
 	for (int mixernum = 0; ; mixernum++)

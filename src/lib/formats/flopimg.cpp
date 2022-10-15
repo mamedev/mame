@@ -1298,7 +1298,7 @@ const floppy_image_format_t::desc_e floppy_image_format_t::amiga_22[] = {
 	{ END }
 };
 
-std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track, int head, int cell_size, floppy_image *image, int subtrack)
+std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track, int head, int cell_size, floppy_image *image, int subtrack, int *max_delta)
 {
 	std::vector<bool> trackbuf;
 	std::vector<uint32_t> &tbuf = image->get_buffer(track, head, subtrack);
@@ -1330,6 +1330,8 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 		bool next_is_first;
 
 	public:
+		int min_delta, max_delta;
+
 		pll(const std::vector<uint32_t> &_tbuf, int cell_size) : tbuf(_tbuf) {
 			period = cell_size;
 			period_adjust_base = period * 0.05;
@@ -1338,6 +1340,8 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 			max_period = int(cell_size*1.25);
 			phase_adjust = 0;
 			freq_hist = 0;
+			min_delta = 0;
+			max_delta = 0;
 
 			// Try to go back 16 flux changes from the end of the track, or at most at the start
 			int flux_to_step = 16;
@@ -1379,6 +1383,10 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 				bit = true;
 
 				int delta = edge - (next - period/2);
+				if(delta < min_delta)
+					min_delta = delta;
+				if(delta > max_delta)
+					max_delta = delta;
 
 				phase_adjust = 0.65*delta;
 
@@ -1452,6 +1460,12 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 		trackbuf.push_back(r.first);
 	}
 
+	if(max_delta) {
+		*max_delta = -cpll.min_delta;
+		if(*max_delta < cpll.max_delta)
+			*max_delta = cpll.max_delta;
+	}
+		
 	return trackbuf;
 }
 

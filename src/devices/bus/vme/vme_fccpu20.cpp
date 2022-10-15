@@ -185,7 +185,7 @@
 #include "emu.h"
 #include "vme_fccpu20.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "bus/rs232/rs232.h"
 #include "machine/68230pit.h"
 #include "machine/68153bim.h"

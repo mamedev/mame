@@ -23,8 +23,9 @@
     BTANB:
         * umk3 Scorpion's "Get Over Here" sample gets cut off, ROM dumps confirmed good
 
-    NOTE: There is known to exist (currently not dumped) a Wrestlemania PCB with the following labels:
-          Wrestlemania 1.0 U63 #8549    &    Wrestlemania 1.0 U54 #40C7
+    NOTE: There is known to exist a Wrestlemania PCB with the following labels:
+          Wrestlemania 1.0 U63 #B549    &    Wrestlemania 1.0 U54 #40C7
+          These checksums match the version 1.1 dump.
 
 ***************************************************************************
 

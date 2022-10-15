@@ -197,7 +197,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual u32 palette_entries() const override { return BT459_PIXEL_COLORS + BT459_OVERLAY_COLORS + BT459_CURSOR_COLORS; }
+	virtual u32 palette_entries() const noexcept override { return BT459_PIXEL_COLORS + BT459_OVERLAY_COLORS + BT459_CURSOR_COLORS; }
 
 private:
 	// helper functions

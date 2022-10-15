@@ -25,7 +25,7 @@
 ***************************************************************************/
 
 /* since stricmp is not part of the standard, we use this instead */
-int core_stricmp(const char *s1, const char *s2);
+int core_stricmp(std::string_view s1, std::string_view s2);
 
 /* this macro prevents people from using stricmp directly */
 #undef stricmp

@@ -25,8 +25,8 @@ add_imm
 
 add_zpg
 	TMP = read_pc();
-	TMP = read(TMP);
-	do_add(TMP);
+	TMP2 = read(TMP);
+	do_add(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -36,8 +36,8 @@ add_zpg
 add_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(uint8_t(TMP+X));
-	do_add(TMP);
+	TMP2 = read(uint8_t(TMP+X));
+	do_add(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -435,9 +435,12 @@ twa_imp
 reset_r
 	read_pc();
 	read_pc_noinc();
-	read(SP); dec_SP();
-	read(SP); dec_SP();
-	read(SP); dec_SP();
+	read(SP);
+	dec_SP();
+	read(SP);
+	dec_SP();
+	read(SP);
+	dec_SP();
 	P = (P | F_I) & ~F_D;
 	PC = read_arg(0xfffe);
 	PC = set_h(PC, read_arg(0xffff));

@@ -7,8 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m3745x.h"
+#include "cpu/m6502/m50734.h"
 #include "machine/nvram.h"
+#include "video/hd44780.h"
+#include "emupal.h"
+#include "screen.h"
 
 class kawai_r100_state : public driver_device
 {
@@ -16,24 +19,84 @@ public:
 	kawai_r100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_lcdc(*this, "lcdc")
 	{
 	}
 
 	void r100(machine_config &config);
 
-private:
-	void main_map(address_map &map);
-	//void data_map(address_map &map);
+protected:
+	virtual void machine_start() override;
 
-	required_device<m740_device> m_maincpu;
+private:
+	HD44780_PIXEL_UPDATE(pixel_update);
+
+	void p0_w(u8 data);
+	void p1_w(u8 data);
+	void p2_w(u8 data);
+	void p3_w(u8 data);
+	u8 sensor_lsi_r(offs_t offset);
+	void buffer_w(u8 data);
+
+	void main_map(address_map &map);
+	void data_map(address_map &map);
+
+	required_device<m50734_device> m_maincpu;
+	required_device<hd44780_device> m_lcdc;
 };
 
+
+void kawai_r100_state::machine_start()
+{
+	m_lcdc->rw_w(0); // write only
+}
+
+HD44780_PIXEL_UPDATE(kawai_r100_state::pixel_update)
+{
+	if (x < 5 && y < 8 && line < 2 && pos < 16)
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
+}
+
+void kawai_r100_state::p0_w(u8 data)
+{
+	m_lcdc->rs_w(BIT(data, 3));
+	m_lcdc->e_w(BIT(data, 4));
+}
+
+void kawai_r100_state::p1_w(u8 data)
+{
+}
+
+void kawai_r100_state::p2_w(u8 data)
+{
+}
+
+void kawai_r100_state::p3_w(u8 data)
+{
+}
+
+u8 kawai_r100_state::sensor_lsi_r(offs_t offset)
+{
+	return 0;
+}
+
+void kawai_r100_state::buffer_w(u8 data)
+{
+}
 
 void kawai_r100_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram1");
 	map(0x2000, 0x3fff).ram().share("nvram2");
+	map(0x4100, 0x41ff).r(FUNC(kawai_r100_state::sensor_lsi_r));
+	map(0x4200, 0x4200).mirror(0xff).w(m_lcdc, FUNC(hd44780_device::db_w));
+	map(0x4300, 0x4300).mirror(0xff).w(FUNC(kawai_r100_state::buffer_w));
 	map(0x4400, 0xffff).rom().region("program", 0x4400);
+}
+
+void kawai_r100_state::data_map(address_map &map)
+{
+	// TODO: 0x0000-0x1fff and 0x2000-0x3fff mapped to cartridge slot
 }
 
 
@@ -42,14 +105,36 @@ INPUT_PORTS_END
 
 void kawai_r100_state::r100(machine_config &config)
 {
-	M37450(config, m_maincpu, 16_MHz_XTAL / 2); // FIXME: M50734SP
+	M50734(config, m_maincpu, 16_MHz_XTAL / 2); // M50734SP
 	m_maincpu->set_addrmap(AS_PROGRAM, &kawai_r100_state::main_map);
-	//m_maincpu->set_addrmap(AS_DATA, &kawai_r100_state::data_map);
+	m_maincpu->set_addrmap(AS_DATA, &kawai_r100_state::data_map);
+	m_maincpu->set_p0_3state(0x20);
+	m_maincpu->set_p3_3state(0x02);
+	m_maincpu->p0_out_cb().set(FUNC(kawai_r100_state::p0_w));
+	m_maincpu->p1_out_cb().set(FUNC(kawai_r100_state::p1_w));
+	m_maincpu->p2_out_cb().set(FUNC(kawai_r100_state::p2_w));
+	m_maincpu->p3_out_cb().set(FUNC(kawai_r100_state::p3_w));
+	m_maincpu->p4_in_cb().set_constant(0x0f);
 
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0); // MB8464-15LL-SK + battery
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // MB8464-15LL-SK + battery
 
 	//M60009_AGU_DGU(config, "pcm", 5_MHz_XTAL);
+
+	// LCD unit
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 8*2);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
+	m_lcdc->set_pixel_update_cb(FUNC(kawai_r100_state::pixel_update));
 }
 
 ROM_START(r100)

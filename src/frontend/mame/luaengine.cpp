@@ -1475,6 +1475,13 @@ void lua_engine::initialize()
 	dipalette_type.set_function("set_shadow_factor", &device_palette_interface::set_shadow_factor);
 	dipalette_type.set_function("set_highlight_factor", &device_palette_interface::set_highlight_factor);
 	dipalette_type.set_function("set_shadow_mode", &device_palette_interface::set_shadow_mode);
+	dipalette_type["palette"] = sol::property(
+			[] (device_palette_interface &pal)
+			{
+				return pal.palette()
+					? std::optional<palette_wrapper>(std::in_place, *pal.palette())
+					: std::optional<palette_wrapper>();
+			});
 	dipalette_type["entries"] = sol::property(&device_palette_interface::entries);
 	dipalette_type["indirect_entries"] = sol::property(&device_palette_interface::indirect_entries);
 	dipalette_type["black_pen"] = sol::property(&device_palette_interface::black_pen);
@@ -1488,7 +1495,8 @@ void lua_engine::initialize()
 			"screen_dev",
 			sol::no_constructor,
 			sol::base_classes, sol::bases<device_t>());
-	screen_dev_type["draw_box"] =
+	screen_dev_type.set_function(
+			"draw_box",
 			[] (screen_device &sdev, float x1, float y1, float x2, float y2, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
 			{
 				float const sc_width(sdev.visible_area().width());
@@ -1503,8 +1511,9 @@ void lua_engine::initialize()
 				if (!bgcolor)
 					bgcolor = ui.colors().background_color();
 				ui.draw_outlined_box(sdev.container(), x1, y1, x2, y2, *fgcolor, *bgcolor);
-			};
-	screen_dev_type["draw_line"] =
+			});
+	screen_dev_type.set_function(
+			"draw_line",
 			[] (screen_device &sdev, float x1, float y1, float x2, float y2, std::optional<uint32_t> color)
 			{
 				float const sc_width(sdev.visible_area().width());
@@ -1516,8 +1525,9 @@ void lua_engine::initialize()
 				if (!color)
 					color = mame_machine_manager::instance()->ui().colors().text_color();
 				sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(*color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			};
-	screen_dev_type["draw_text"] =
+			});
+	screen_dev_type.set_function(
+			"draw_text",
 			[this] (screen_device &sdev, sol::object xobj, float y, char const *msg, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
 			{
 				float const sc_width(sdev.visible_area().width());
@@ -1555,78 +1565,80 @@ void lua_engine::initialize()
 						x, y, (1.0f - x),
 						justify, ui::text_layout::word_wrapping::WORD,
 						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor);
-			};
-	screen_dev_type["orientation"] =
-		[] (screen_device &sdev)
-		{
-			uint32_t flags = sdev.orientation();
-			int rotation_angle = 0;
-			switch (flags)
+			});
+	screen_dev_type.set_function(
+			"orientation",
+			[] (screen_device &sdev)
 			{
-			case ORIENTATION_SWAP_XY:
-			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X:
-				rotation_angle = 90;
-				flags ^= ORIENTATION_FLIP_X;
-				break;
-			case ORIENTATION_FLIP_Y:
-			case ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
-				rotation_angle = 180;
-				flags ^= ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;
-				break;
-			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y:
-			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
-				rotation_angle = 270;
-				flags ^= ORIENTATION_FLIP_Y;
-				break;
-			}
-			return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
-		};
+				uint32_t flags = sdev.orientation();
+				int rotation_angle = 0;
+				switch (flags)
+				{
+				case ORIENTATION_SWAP_XY:
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X:
+					rotation_angle = 90;
+					flags ^= ORIENTATION_FLIP_X;
+					break;
+				case ORIENTATION_FLIP_Y:
+				case ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+					rotation_angle = 180;
+					flags ^= ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;
+					break;
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y:
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+					rotation_angle = 270;
+					flags ^= ORIENTATION_FLIP_Y;
+					break;
+				}
+				return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
+			});
 	screen_dev_type["time_until_pos"] = sol::overload(
 			[] (screen_device &sdev, int vpos) { return sdev.time_until_pos(vpos).as_double(); },
 			[] (screen_device &sdev, int vpos, int hpos) { return sdev.time_until_pos(vpos, hpos).as_double(); });
-	screen_dev_type["time_until_vblank_start"] = &screen_device::time_until_vblank_start;
-	screen_dev_type["time_until_vblank_end"] = &screen_device::time_until_vblank_end;
-	screen_dev_type["snapshot"] =
-		[this] (screen_device &sdev, char const *filename) -> sol::object
-		{
-			// FIXME: this shouldn't be a member of the screen device
-			// the screen is only used as a hint when configured for native snapshots and may be ignored
-			std::string snapstr;
-			bool is_absolute_path = false;
-			if (filename)
+	screen_dev_type.set_function("time_until_vblank_start", &screen_device::time_until_vblank_start);
+	screen_dev_type.set_function("time_until_vblank_end", &screen_device::time_until_vblank_end);
+	screen_dev_type.set_function(
+			"snapshot",
+			[this] (screen_device &sdev, char const *filename) -> sol::object
 			{
-				// a filename was specified; if it isn't absolute post-process it
-				snapstr = process_snapshot_filename(machine(), filename);
-				is_absolute_path = osd_is_absolute_path(snapstr);
-			}
+				// FIXME: this shouldn't be a member of the screen device
+				// the screen is only used as a hint when configured for native snapshots and may be ignored
+				std::string snapstr;
+				bool is_absolute_path = false;
+				if (filename)
+				{
+					// a filename was specified; if it isn't absolute post-process it
+					snapstr = process_snapshot_filename(machine(), filename);
+					is_absolute_path = osd_is_absolute_path(snapstr);
+				}
 
-			// open the file
-			emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			std::error_condition filerr;
-			if (!snapstr.empty())
-				filerr = file.open(snapstr);
-			else
-				filerr = machine().video().open_next(file, "png");
-			if (filerr)
-				return sol::make_object(sol(), filerr);
+				// open the file
+				emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				std::error_condition filerr;
+				if (!snapstr.empty())
+					filerr = file.open(snapstr);
+				else
+					filerr = machine().video().open_next(file, "png");
+				if (filerr)
+					return sol::make_object(sol(), filerr);
 
-			// and save the snapshot
-			machine().video().save_snapshot(&sdev, file);
-			return sol::lua_nil;
-		};
-	screen_dev_type["pixel"] = [] (screen_device &sdev, s32 x, s32 y) { return sdev.pixel(x, y); };
-	screen_dev_type["pixels"] =
-		[] (screen_device &sdev, sol::this_state s)
-		{
-			// TODO: would be better if this could return a tuple of (buffer, width, height)
-			const rectangle &visarea = sdev.visible_area();
-			luaL_Buffer buff;
-			int size = visarea.height() * visarea.width() * 4;
-			u32 *ptr = (u32 *)luaL_buffinitsize(s, &buff, size);
-			sdev.pixels(ptr);
-			luaL_pushresultsize(&buff, size);
-			return sol::make_reference(s, sol::stack_reference(s, -1));
-		};
+				// and save the snapshot
+				machine().video().save_snapshot(&sdev, file);
+				return sol::lua_nil;
+			});
+	screen_dev_type.set_function("pixel", &screen_device::pixel);
+	screen_dev_type.set_function(
+			"pixels",
+			[] (screen_device &sdev, sol::this_state s)
+			{
+				const rectangle &visarea = sdev.visible_area();
+				luaL_Buffer buff;
+				int size = visarea.height() * visarea.width() * 4;
+				u32 *const ptr = reinterpret_cast<u32 *>(luaL_buffinitsize(s, &buff, size));
+				sdev.pixels(ptr);
+				luaL_pushresultsize(&buff, size);
+				return std::make_tuple(sol::make_reference(s, sol::stack_reference(s, -1)), visarea.width(), visarea.height());
+			});
 	screen_dev_type["screen_type"] = sol::property(&screen_device::screen_type);
 	screen_dev_type["width"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().width(); });
 	screen_dev_type["height"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().height(); });

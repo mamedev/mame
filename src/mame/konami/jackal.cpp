@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
-// thanks-to:Kenneth Lin (original driver author)
+// copyright-holders: Curt Coder
+// thanks-to: Kenneth Lin (original driver author)
+
 /***************************************************************************
 
   jackal.cpp
+  Konami GX631 PCB
 
 Notes:
 - This game uses two 005885 gfx chip in parallel. The unique thing about it is
@@ -14,10 +16,6 @@ Notes:
   necessarily mean anything.
 
 TODO:
-- running the sound CPU at the nominal clock rate, music stops working at the
-  beginning of the game. This is kludged by overclocking the sound CPU. This
-  looks like a CPU communication timing issue however fiddling with the
-  interleave factor has no effect.
 - create a K005885 device shared with other drivers.
 
 
@@ -71,15 +69,273 @@ Address          Dir Data     Description
 ***************************************************************************/
 
 #include "emu.h"
-#include "jackal.h"
+
 #include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+// configurable logging
+#define LOG_RAMBANK     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_RAMBANK)
+
+#include "logmacro.h"
+
+#define LOGRAMBANK(...)     LOGMASKED(LOG_RAMBANK,     __VA_ARGS__)
+
+
+namespace {
+
+class jackal_state : public driver_device
+{
+public:
+	jackal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoctrl(*this, "videoctrl"),
+		m_videoram(*this, "videoram%u", 0U),
+		m_scrollram(*this, "scrollram%u", 0U, 0x40U, ENDIANNESS_BIG),
+		m_mainbank(*this, "mainbank"),
+		m_videoview(*this, "videoview"),
+		m_spritebank(*this, "spritebank"),
+		m_spriteram(*this, "spriteram%u", 0U, 0x1000U, ENDIANNESS_BIG),
+		m_scrollbank(*this, "scrollbank"),
+		m_dials(*this, "DIAL%u", 0U),
+		m_maincpu(*this, "maincpu"),
+		m_slavecpu(*this, "slave"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+	{ }
+
+	void jackal(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoctrl;
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	memory_share_array_creator<uint8_t, 2> m_scrollram;
+	required_memory_bank m_mainbank;
+	memory_view m_videoview;
+	required_memory_bank m_spritebank;
+	memory_share_array_creator<uint8_t, 2> m_spriteram;
+	required_memory_bank m_scrollbank;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	// misc
+	uint8_t m_irq_enable = 0;
+	optional_ioport_array<2> m_dials;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_slavecpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	uint8_t rotary_r(offs_t offset);
+	void flipscreen_w(uint8_t data);
+	void rambank_w(uint8_t data);
+	template <uint8_t Which> void voram_w(offs_t offset, uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int bank);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
+	void slave_map(address_map &map);
+};
+
+
+// video
+
+void jackal_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint16_t const ctabentry = i | 0x100;
+		palette.set_pen_indirect(i, ctabentry);
+	}
+
+	for (int i = 0x100; i < 0x200; i++)
+	{
+		uint16_t const ctabentry = color_prom[i - 0x100] & 0x0f;
+		palette.set_pen_indirect(i, ctabentry);
+	}
+
+	for (int i = 0x200; i < 0x300; i++)
+	{
+		uint16_t const ctabentry = (color_prom[i - 0x100] & 0x0f) | 0x10;
+		palette.set_pen_indirect(i, ctabentry);
+	}
+}
+
+TILE_GET_INFO_MEMBER(jackal_state::get_bg_tile_info)
+{
+	int const attr = m_videoram[0][tile_index];
+	int const code = m_videoram[0][0x400 + tile_index] + ((attr & 0xc0) << 2) + ((attr & 0x30) << 6);
+	int const color = 0; //attr & 0x0f;
+	int const flags = ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
+
+	tileinfo.set(0, code, color, flags);
+}
+
+void jackal_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackal_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_spritebank->configure_entry(0, m_spriteram[0]);
+	m_spritebank->configure_entry(1, m_spriteram[1]);
+
+	m_scrollbank->configure_entry(0, m_scrollram[0]);
+	m_scrollbank->configure_entry(1, m_scrollram[1]);
+}
+
+void jackal_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->set_scroll_rows(1);
+	m_bg_tilemap->set_scroll_cols(1);
+
+	m_bg_tilemap->set_scrolly(0, m_videoctrl[0]);
+	m_bg_tilemap->set_scrollx(0, m_videoctrl[1]);
+
+	if (m_videoctrl[2] & 0x02)
+	{
+		if (m_videoctrl[2] & 0x08)
+		{
+			m_bg_tilemap->set_scroll_rows(32);
+
+			for (int i = 0; i < 32; i++)
+				m_bg_tilemap->set_scrollx(i, m_scrollram[0][i]);
+		}
+
+		if (m_videoctrl[2] & 0x04)
+		{
+			m_bg_tilemap->set_scroll_cols(32);
+
+			for (int i = 0; i < 32; i++)
+				m_bg_tilemap->set_scrolly(i, m_scrollram[0][i]);
+		}
+	}
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+}
+
+#define DRAW_SPRITE(bank, code, sx, sy)  m_gfxdecode->gfx(bank)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
+
+void jackal_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int bank)
+{
+	for (int offs = 0; offs < length; offs += 5)
+	{
+		int const sn1 = sram[offs];
+		int const sn2 = sram[offs + 1];
+		int sy  = sram[offs + 2];
+		int sx  = sram[offs + 3];
+		int const attr = sram[offs + 4];
+		int flipx = attr & 0x20;
+		int flipy = attr & 0x40;
+		int const color = ((sn2 & 0xf0) >> 4);
+
+		if (attr & 0x01)
+			sx = sx - 256;
+		if (sy > 0xf0)
+			sy = sy - 256;
+
+		if (flip_screen())
+		{
+			sx = 240 - sx;
+			sy = 240 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		if (attr & 0xc)    // half-size sprite
+		{
+			int const spritenum = sn1 * 4 + ((sn2 & (8 + 4)) >> 2) + ((sn2 & (2 + 1)) << 10);
+			int mod = -8;
+
+			if (flip_screen())
+			{
+				sx += 8;
+				sy -= 8;
+				mod = 8;
+			}
+
+			if ((attr & 0x0c) == 0x0c)
+			{
+				if (flip_screen()) sy += 16;
+				DRAW_SPRITE(bank + 1, spritenum, sx, sy)
+			}
+
+			if ((attr & 0x0c) == 0x08)
+			{
+				sy += 8;
+				DRAW_SPRITE(bank + 1, spritenum, sx, sy)
+				DRAW_SPRITE(bank + 1, spritenum - 2, sx, sy + mod)
+			}
+
+			if ((attr & 0x0c) == 0x04)
+			{
+				DRAW_SPRITE(bank + 1, spritenum, sx, sy)
+				DRAW_SPRITE(bank + 1, spritenum + 1, sx + mod, sy)
+			}
+		}
+		else
+		{
+			int const spritenum = sn1 + ((sn2 & 0x03) << 8);
+
+			if (attr & 0x10)
+			{
+				if (flip_screen())
+				{
+					sx -= 16;
+					sy -= 16;
+				}
+
+				DRAW_SPRITE(bank, spritenum, flipx ? sx + 16 : sx, flipy ? sy + 16 : sy)
+				DRAW_SPRITE(bank, spritenum + 1, flipx ? sx : sx + 16, flipy ? sy + 16 : sy)
+				DRAW_SPRITE(bank, spritenum + 2, flipx ? sx + 16 : sx, flipy ? sy : sy + 16)
+				DRAW_SPRITE(bank, spritenum + 3, flipx ? sx : sx + 16, flipy ? sy : sy + 16)
+			}
+			else
+			{
+				DRAW_SPRITE(bank, spritenum, sx, sy)
+			}
+		}
+	}
+}
+
+void jackal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	draw_sprites_region(bitmap, cliprect, &m_spriteram[1][BIT(m_videoctrl[0x03], 3) * 0x800], 0x0f5, 3);
+	draw_sprites_region(bitmap, cliprect, &m_spriteram[0][BIT(m_videoctrl[0x03], 3) * 0x800], 0x500, 1);
+}
+
+uint32_t jackal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	draw_background(screen, bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -101,11 +357,11 @@ void jackal_state::flipscreen_w(uint8_t data)
 void jackal_state::rambank_w(uint8_t data)
 {
 	if (data & 0x04)
-		popmessage("rambank_w %02x", data);
+		LOGRAMBANK("rambank_w %02x", data);
 
 	// all revisions flips the coin counter bit between 1 -> 0 five times, causing the bookkeeping to report 5 coins inserted.
 	// most likely solution in HW is a f/f that disables coin counters when any of the other bits are enabled.
-	if((data & 0xfc) == 0)
+	if ((data & 0xfc) == 0)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 		machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -276,11 +532,11 @@ static const gfx_layout spritelayout8 =
 };
 
 static GFXDECODE_START( gfx_jackal )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,        0,  1 )    // colors 256-511 without lookup
-	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  0x100, 16 )    // colors   0- 15 with lookup
-	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout8, 0x100, 16 )    // to handle 8x8 sprites
-	GFXDECODE_ENTRY( "gfx1", 0x60000, spritelayout,  0x200, 16 )    // colors  16- 31 with lookup
-	GFXDECODE_ENTRY( "gfx1", 0x60000, spritelayout8, 0x200, 16 )    // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "gfx", 0x00000, charlayout,        0,  1 )    // colors 256-511 without lookup
+	GFXDECODE_ENTRY( "gfx", 0x20000, spritelayout,  0x100, 16 )    // colors   0- 15 with lookup
+	GFXDECODE_ENTRY( "gfx", 0x20000, spritelayout8, 0x100, 16 )    // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "gfx", 0x60000, spritelayout,  0x200, 16 )    // colors  16- 31 with lookup
+	GFXDECODE_ENTRY( "gfx", 0x60000, spritelayout8, 0x200, 16 )    // to handle 8x8 sprites
 GFXDECODE_END
 
 /*************************************
@@ -321,10 +577,10 @@ void jackal_state::machine_reset()
 void jackal_state::jackal(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, 18.432_MHz_XTAL / 12); // verified on pcb
+	MC6809E(config, m_maincpu, 18.432_MHz_XTAL / 12); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &jackal_state::main_map);
 
-	MC6809E(config, m_slavecpu, 18.432_MHz_XTAL / 12); // verified on pcb
+	MC6809E(config, m_slavecpu, 18.432_MHz_XTAL / 12); // verified on PCB
 	m_slavecpu->set_addrmap(AS_PROGRAM, &jackal_state::slave_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -350,7 +606,7 @@ void jackal_state::jackal(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50); // verified on pcb
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50); // verified on PCB
 }
 
 /*************************************
@@ -367,7 +623,7 @@ ROM_START( jackal ) // 8-Way Joystick: You can only shoot in one direction regar
 	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "631_t01.11d", 0x0000, 0x8000, CRC(b189af6a) SHA1(f7df996c394fdd6f2ce128a8df38d7838f7ec6d6) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "631t04.7h",  0x00000, 0x20000, CRC(457f42f0) SHA1(08413a13d128875dddcf4f6ad302363096bf1d41) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631t05.8h",  0x00001, 0x20000, CRC(732b3fc1) SHA1(7e89650b9e5e2b7ae82f8c55ac9995740f6fdfe1) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631t06.12h", 0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) ) // Silkscreened MASK1M
@@ -386,7 +642,7 @@ ROM_START( jackalr ) // Rotary Joystick: Shot direction is controlled via the ro
 	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "631_q01.11d", 0x0000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "631t04.7h",  0x00000, 0x20000, CRC(457f42f0) SHA1(08413a13d128875dddcf4f6ad302363096bf1d41) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631t05.8h",  0x00001, 0x20000, CRC(732b3fc1) SHA1(7e89650b9e5e2b7ae82f8c55ac9995740f6fdfe1) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631t06.12h", 0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) ) // Silkscreened MASK1M
@@ -414,7 +670,7 @@ ROM_START( topgunr ) // 8-Way Joystick:  You can only shoot in one direction reg
 	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "631_t01.11d", 0x0000, 0x8000, CRC(b189af6a) SHA1(f7df996c394fdd6f2ce128a8df38d7838f7ec6d6) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "631u04.7h",  0x00000, 0x20000, CRC(50122a12) SHA1(c9e0132a3a40d9d28685c867c70231947d8a9cb7) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631u05.8h",  0x00001, 0x20000, CRC(6943b1a4) SHA1(40de2b434600ea4c8fb42e6b21be2c3705a55d67) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631u06.12h", 0x40000, 0x20000, CRC(37dbbdb0) SHA1(f94db780d69e7dd40231a75629af79469d957378) ) // Silkscreened MASK1M
@@ -433,7 +689,7 @@ ROM_START( jackalj ) // 8-Way Joystick: You can only shoot in the direction you'
 	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "631_t01.11d", 0x0000, 0x8000, CRC(b189af6a) SHA1(f7df996c394fdd6f2ce128a8df38d7838f7ec6d6) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "631t04.7h",  0x00000, 0x20000, CRC(457f42f0) SHA1(08413a13d128875dddcf4f6ad302363096bf1d41) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631t05.8h",  0x00001, 0x20000, CRC(732b3fc1) SHA1(7e89650b9e5e2b7ae82f8c55ac9995740f6fdfe1) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631t06.12h", 0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) ) // Silkscreened MASK1M
@@ -453,7 +709,7 @@ ROM_START( jackalbl ) // This is based on jackalr. Was dumped from 2 different P
 	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "epr-a-1.bin", 0x0000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) ) // also found labeled "1.19"
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "gfx", 0 )
 	// same data, different layout
 	ROM_LOAD16_WORD_SWAP( "epr-a-17.bin", 0x00000, 0x08000, CRC(a96720b6) SHA1(d3c2a1848fa9d9d1232e58e412bdd69032fe2c83) ) // also found labeled "17.5"
 	ROM_LOAD16_WORD_SWAP( "epr-a-18.bin", 0x08000, 0x08000, CRC(932d0ecb) SHA1(20bf789f45c5b3ba90012e1a945523236578a014) ) // also found labeled "18.6"
@@ -496,7 +752,7 @@ ROM_START( topgunbl ) // Rotary Joystick: Shot direction is controlled via the R
 	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "t-1.c14", 0x0000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) ) // == 631_q01.11d
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "gfx", 0 )
 	// same data, different layout
 	ROM_LOAD16_WORD_SWAP( "t-17.n12", 0x00000, 0x08000, CRC(e8875110) SHA1(73f4c47ab039dce8c285bf222253084c860c95bf) )
 	ROM_LOAD16_WORD_SWAP( "t-18.n13", 0x08000, 0x08000, CRC(cf14471d) SHA1(896aa8d7c93f837f6661d30bd0d6e19d16669107) )
@@ -520,6 +776,8 @@ ROM_START( topgunbl ) // Rotary Joystick: Shot direction is controlled via the R
 	ROM_LOAD( "631r09.bpr", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 ROM_END
 
+} // anonymous namespace
+
 
 /*************************************
  *
@@ -527,9 +785,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
-GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
-GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
-GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
-GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
-GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )
+GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        MACHINE_SUPPORTS_SAVE )

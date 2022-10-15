@@ -50,4 +50,28 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- this one has some songs programmed into it:
+	     さくらんぼ                  大塚愛              Sakuranbo                                  Ōtsuka Ai
+	     花                          ORANGE RANGE        Hana                                       Orange Range
+	     ロコローション              ORANGE RANGE        Locolotion                                 Orange Range
+	     solitude～真実のサヨナラ～  KinKi Kids          Solitude - Shinjitsu no Sayonara           KinKi Kids
+	     薄荷キャンディー            KinKi Kids          Hakka Candy                                KinKi Kids
+	     ボクの背中には羽根がある    KinKi Kids          Boku no Senaka ni wa Hane ga Aru           KinKi Kids
+	     愛の温度℃                   ぴちぴちピッチ      Ai no Ondo °C                              Pichi Pichi Pitch
+	     世界で一番早く朝が来る場所  ぴちぴちピッチ      Sekai de Ichiban Hayaku Asa ga Kuru Basho  Pichi Pichi Pitch
+	     YUME日和                    島谷ひとみ          Yume Biyori                                Shimatani Hitomi
+	     LOVE LOVE LOVE              DREAMS COME TRUE    Love Love Love                             Dreams Come True
+	     キラリ☆セーラードリーム     小枝(さえ)          Kirari ☆ Sailor Dream                      Koeda (Sae)
+	     夏祭り                      Whiteberry          Natsu Matsuri                              Whiteberry -->
+	<software name="ekaraweb12b">
+		<description>e-kara Web cartridge 12M (used, with 12 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb4.bin" size="0x100000" crc="23df7749" sha1="cfd3f9f0b9f4713d560700c4e463d0e9d94c9447"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

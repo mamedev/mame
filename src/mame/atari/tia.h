@@ -61,7 +61,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return TIA_PALETTE_LENGTH; }
+	virtual uint32_t palette_entries() const noexcept override { return TIA_PALETTE_LENGTH; }
 
 	void extend_palette();
 	virtual void init_palette() = 0;

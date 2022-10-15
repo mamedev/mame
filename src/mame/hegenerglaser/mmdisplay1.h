@@ -34,9 +34,9 @@ private:
 
 	void update_lcd();
 
-	int m_strobe = 0;
-	u8 m_digit_idx = 0;
-	u8 m_digit_data[4] = { 0, 0, 0, 0 };
+	int m_strobe;
+	u8 m_digit_idx;
+	u8 m_digit_data[4];
 };
 
 

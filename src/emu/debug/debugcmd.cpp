@@ -3964,7 +3964,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 			mode |= std::ios_base::trunc;
 
 		f = std::make_unique<std::ofstream>(filename.c_str(), mode);
-		if (!f)
+		if (f->fail())
 		{
 			m_console.printf("Error opening file '%s'\n", params[0]);
 			return;
@@ -3972,8 +3972,9 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 	}
 
 	// do it
+	bool const on(f);
 	cpu->debug()->trace(std::move(f), trace_over, detect_loops, logerror, action);
-	if (f)
+	if (on)
 		m_console.printf("Tracing CPU '%s' to file %s\n", cpu->tag(), filename);
 	else
 		m_console.printf("Stopped tracing on CPU '%s'\n", cpu->tag());

@@ -50,7 +50,6 @@
 //**************************************************************************
 
 #define POKEY_KEYBOARD_CB_MEMBER(_name) uint8_t _name(uint8_t k543210)
-#define POKEY_INTERRUPT_CB_MEMBER(_name) void _name(int mask)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -131,14 +130,12 @@ public:
 	auto allpot_r() { return m_allpot_r_cb.bind(); }
 	auto serin_r() { return m_serin_r_cb.bind(); }
 	auto serout_w() { return m_serout_w_cb.bind(); }
+	auto irq_w() { return m_irq_w_cb.bind(); }
 
 	/* k543210 = k5 ... k0 returns bit0: kr1, bit1: kr2 */
 	/* all are, in contrast to actual hardware, ACTIVE_HIGH */
 	typedef device_delegate<uint8_t (uint8_t k543210)> kb_cb_delegate;
 	template <typename... T> void set_keyboard_callback(T &&... args) { m_keyboard_r.set(std::forward<T>(args)...); }
-
-	typedef device_delegate<void (int mask)> int_cb_delegate;
-	template <typename... T> void set_interrupt_callback(T &&... args) { m_irq_f.set(std::forward<T>(args)...); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -279,9 +276,9 @@ private:
 	devcb_read8 m_allpot_r_cb;
 	devcb_read8 m_serin_r_cb;
 	devcb_write8 m_serout_w_cb;
+	devcb_write_line m_irq_w_cb;
 
 	kb_cb_delegate m_keyboard_r;
-	int_cb_delegate m_irq_f;
 
 	uint8_t m_POTx[8];        /* POTx   (R/D200-D207) */
 	uint8_t m_AUDCTL;         /* AUDCTL (W/D208) */

@@ -315,11 +315,11 @@ void starwars_state::starwars(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(m_riot, FUNC(riot6532_device::pa7_w));
-	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); });
+	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	GENERIC_LATCH_8(config, m_mainlatch);
 	m_mainlatch->data_pending_callback().set(m_riot, FUNC(riot6532_device::pa6_w));
-	m_mainlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); });
+	m_mainlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 }
 
 

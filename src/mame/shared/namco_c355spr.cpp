@@ -560,7 +560,6 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8 
 	temp_bitmap.fill(0xffff, cliprect);
 	for (int no = 0; no < 2; no++)
 	{
-		int i = 0;
 		c355_sprite *sprite_ptr = m_spritelist[no].get();
 
 		while (sprite_ptr != m_sprite_end[no])
@@ -602,7 +601,6 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8 
 					}
 				}
 			}
-			i++;
 			sprite_ptr++;
 		}
 	}

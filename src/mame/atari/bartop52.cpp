@@ -161,7 +161,7 @@ void bartop52_state::a5200(machine_config &config)
 	m_pokey->pot_r<2>().set_ioport("analog_2");
 	m_pokey->pot_r<3>().set_ioport("analog_3");
 	m_pokey->set_keyboard_callback(FUNC(bartop52_state::a5200_keypads));
-	m_pokey->set_interrupt_callback(FUNC(bartop52_state::interrupt_cb));
+	m_pokey->irq_w().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pokey->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 

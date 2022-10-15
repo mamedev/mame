@@ -399,7 +399,7 @@ uint16_t dectalk_state::dsp_outfifo_r (  )
 #ifdef USE_LOOSE_TIMING_OUTPUT
 	// if outfifo count is less than two, boost the interleave to prevent running the fifo out
 	if (m_outfifo_count < 2)
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().perfect_quantum(attotime::from_usec(25));
 #endif
 #ifdef VERBOSE
 	if (m_outfifo_count == 0) logerror("output fifo is EMPTY! repeating previous sample!\n");
@@ -508,7 +508,7 @@ void dectalk_state::nvram_store(offs_t offset, uint8_t data) // store to X2212 N
 void dectalk_state::m68k_infifo_w(uint16_t data)// 68k write to the speech input fifo
 {
 #ifdef USE_LOOSE_TIMING
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().perfect_quantum(attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, m_infifo_head_ptr, m_infifo_tail_ptr);
@@ -542,7 +542,7 @@ uint16_t dectalk_state::m68k_spcflags_r()// 68k read from the speech flags
 void dectalk_state::m68k_spcflags_w(uint16_t data)// 68k write to the speech flags (only 3 bits do anything)
 {
 #ifdef USE_LOOSE_TIMING
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().perfect_quantum(attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
@@ -687,7 +687,7 @@ uint16_t dectalk_state::m68k_tlc_dtmf_r()// dtmf chip read
 void dectalk_state::spc_latch_outfifo_error_stats(uint16_t data)// latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
 {
 #ifdef USE_LOOSE_TIMING
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().perfect_quantum(attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_DSP
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);

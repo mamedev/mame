@@ -52,7 +52,7 @@ no nmi
 the above series is opcode compatible (including illegal opcodes)
 
 
-n2a03 (some arcades, NES)
+rp2a03 (some arcades, NES)
 -------------------------
 (nintendo variant)
 NMOS based!

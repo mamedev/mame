@@ -3553,6 +3553,21 @@ ROM_START(swtril41)
 	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
+ROM_START(swtril30)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("swcpu.300", 0x00000, 0x20000, CRC(b90d2682) SHA1(a29a0d7c2e0adbad721556e6d5aefa47105a233f))
+	ROM_RELOAD(0x20000, 0x20000)
+	ROM_RELOAD(0x40000, 0x20000)
+	ROM_RELOAD(0x60000, 0x20000)
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("swsedspa.300", 0x00000, 0x80000, CRC(7b9817d1) SHA1(fbca577df6867f5feaab677714cf5e56702c8ba9))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("sw0219.u7", 0x0000, 0x10000, CRC(cd7c84d9) SHA1(55b0208089933e4a30f0eb87b123dd178383ed43))
+	ROM_REGION(0x1000000, "bsmt", 0 )
+	ROM_LOAD("sw0211.u17", 0x000000, 0x80000, CRC(6863e7f6) SHA1(99f1e0170fbbb91a0eb7a796ab3bf757cb1b23ce))
+	ROM_LOAD("sw0211.u21", 0x080000, 0x80000, CRC(6be68450) SHA1(d24652f74b109e47eb5d3d02e04f63c99e92c590))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Starship Troopers
 /-------------------------------------------------------------------*/
@@ -9371,6 +9386,7 @@ GAME(1997, spacejmg,     spacejam, whitestar,  whitestar, whitestar_state, empty
 GAME(1997, spacejmi,     spacejam, whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",  "Space Jam (CPU 3.00, display I3.00, Italy)",                                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1997, swtril43,     0,        whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",  "Star Wars Trilogy (CPU 4.03, display A4.00)",                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1997, swtril41,     swtril43, whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",  "Star Wars Trilogy (CPU 4.01, display A4.00)",                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1997, swtril30,     swtril43, whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",  "Star Wars Trilogy (CPU 3.00, display A3.00)",                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1997, startrp,      0,        whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",  "Starship Troopers (CPU 2.01, display A2.00)",                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1997, startrp2,     startrp,  whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",  "Starship Troopers (CPU 2.00, display A2.00)",                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(2000, strikext,     0,        whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern", "Striker Xtreme (CPU 1.02, display A1.03)",                                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

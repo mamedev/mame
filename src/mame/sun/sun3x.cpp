@@ -131,7 +131,7 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsihd.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
 #include "imagedev/floppy.h"

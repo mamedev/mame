@@ -54,7 +54,7 @@ protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual u32 palette_entries() const override;
+	virtual u32 palette_entries() const noexcept override;
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -160,7 +160,7 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	void regs_map(address_map &map);
-	virtual u32 palette_entries() const override;
+	virtual u32 palette_entries() const noexcept override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_config_complete() override;

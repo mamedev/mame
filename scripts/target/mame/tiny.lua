@@ -163,8 +163,6 @@ files{
 	MAME_DIR .. "src/mame/gaelco/gaelco_v.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelcrpt.cpp",
 	MAME_DIR .. "src/mame/gaelco/wrally.cpp",
-	MAME_DIR .. "src/mame/gaelco/wrally.h",
-	MAME_DIR .. "src/mame/gaelco/wrally_v.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco_wrally_sprites.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco_wrally_sprites.h",
 	MAME_DIR .. "src/mame/gaelco/gaelco_ds5002fp.cpp",

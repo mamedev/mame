@@ -264,7 +264,7 @@ int library::module_compare(const imgtool_module *m1, const imgtool_module *m2, 
 		rc = strcmp(m1->name.c_str(), m2->name.c_str());
 		break;
 	case sort_type::DESCRIPTION:
-		rc = core_stricmp(m1->description.c_str(), m2->description.c_str());
+		rc = core_stricmp(m1->description, m2->description);
 		break;
 	}
 	return rc;

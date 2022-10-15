@@ -70,7 +70,7 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "sound/k054539.h"
 
 #include "screen.h"

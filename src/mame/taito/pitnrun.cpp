@@ -491,7 +491,7 @@ TIMER_CALLBACK_MEMBER(pitnrun_mcu_state::mcu_real_data_w)
 void pitnrun_mcu_state::mcu_data_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_mcu_state::mcu_real_data_w), this), data);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
+	machine().scheduler().perfect_quantum(attotime::from_usec(5));
 }
 
 uint8_t pitnrun_mcu_state::mcu_status_r()

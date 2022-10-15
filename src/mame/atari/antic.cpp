@@ -133,7 +133,7 @@
 	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
 	for (int i = 0; i < width; i++)                             \
 	{                                                           \
-		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		uint16_t ch = RDVIDEO(space,i) << 3;                    \
 		if (ch & 0x400)                                         \
 		{                                                       \
 			ch = RDCHGEN(space,(ch & 0x3f8) + m_w.chbasl);  \
@@ -454,6 +454,12 @@ void antic_device::device_reset()
 
 	memset(m_cclock, 0, sizeof(m_cclock));
 	memset(m_pmbits, 0, sizeof(m_pmbits));
+
+	// TODO: we shouldn't need this variable but rather rely on screen().vpos()
+	m_scanline  = 0;
+
+	m_chand     = 0xff;
+	m_chxor     = 0x00;
 }
 
 
@@ -1183,8 +1189,12 @@ uint8_t antic_device::read(offs_t offset)
 		data = m_r.antic09;
 		break;
 	case 10: /* WSYNC read */
-		m_maincpu->spin_until_trigger(TRIGGER_HSYNC);
-		m_w.wsync = 1;
+		// TODO: strobe signal, should happen on write only?
+		if (!machine().side_effects_disabled())
+		{
+			m_maincpu->spin_until_trigger(TRIGGER_HSYNC);
+			m_w.wsync = 1;
+		}
 		data = m_r.antic0a;
 		break;
 	case 11: /* vert counter (scanline / 2) */
@@ -2007,7 +2017,7 @@ TIMER_CALLBACK_MEMBER( antic_device::line_done )
 TIMER_CALLBACK_MEMBER( antic_device::steal_cycles )
 {
 	LOG("           @cycle #%3d steal %d cycles\n", cycle(), m_steal_cycles);
-	m_line_done_timer->adjust(ANTIC_TIME_FROM_CYCLES(m_steal_cycles));
+	m_line_done_timer->adjust((attotime)screen().pixel_period() * (m_steal_cycles));
 	m_steal_cycles = 0;
 	m_maincpu->spin_until_trigger(TRIGGER_STEAL);
 }
@@ -2362,12 +2372,16 @@ void antic_device::generic_interrupt(int button_count)
 		m_render2 = 0;
 		m_render3 = 0;
 
-		/* if the CPU want's to be interrupted at vertical blank... */
+		// At scanline 248 vblank status is always held without caring about the mask reg
+		// (cfr. anteater PC=a10a), while DLI always goes low.
+		m_r.nmist |= VBL_NMI;
+		m_r.nmist &= ~DLI_NMI;
+
+		/* if the CPU wants to be interrupted at vertical blank... */
 		if( m_w.nmien & VBL_NMI )
 		{
 			LOG("           cause VBL NMI\n");
 			/* set the VBL NMI status bit */
-			m_r.nmist |= VBL_NMI;
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}

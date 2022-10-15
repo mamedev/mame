@@ -85,7 +85,6 @@ public:
 	void ladybug(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void ladybug_palette(palette_device &palette) const;
 	u32 screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -211,15 +210,6 @@ void ladybug_state::ladybug_palette(palette_device &palette) const
 
 		ctabentry = bitswap<4>((color_prom[i] >> 4) & 0x0f, 0,1,2,3);
 		palette.set_pen_indirect(i + 0x40, ctabentry);
-	}
-}
-
-WRITE_LINE_MEMBER(ladybug_state::flipscreen_w)
-{
-	if (flip_screen() != state)
-	{
-		flip_screen_set(state);
-		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -703,7 +693,7 @@ void ladybug_state::ladybug(machine_config &config)
 	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag("gfxdecode");
 
 	ls259_device &videolatch(LS259(config, "videolatch")); // L5 on video board or H3 on single board
-	videolatch.q_out_cb<0>().set(FUNC(ladybug_state::flipscreen_w)); // no other outputs used
+	videolatch.q_out_cb<0>().set(FUNC(ladybug_state::flip_screen_set)); // no other outputs used
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
