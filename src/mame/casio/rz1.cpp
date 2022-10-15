@@ -58,11 +58,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hd44780(*this, "hd44780"),
-		m_pg{ {*this, "upd934g_c"}, {*this, "upd934g_b"} },
+		m_pg(*this, "pg%u", 0U),
 		m_cassette(*this, "cassette"),
 		m_linein(*this, "linein"),
-		m_samples{ {*this, "samples_a"}, {*this, "samples_b"} },
-		m_keys(*this, "kc%u", 0),
+		m_samples(*this, "samples%u", 0U),
+		m_keys(*this, "kc%u", 0U),
+		m_foot(*this, "foot"),
 		m_led_sampling(*this, "led_sampling"),
 		m_led_song(*this, "led_song"),
 		m_led_pattern(*this, "led_pattern"),
@@ -81,11 +82,12 @@ protected:
 private:
 	required_device<upd7811_device> m_maincpu;
 	required_device<hd44780_device> m_hd44780;
-	required_device<upd934g_device> m_pg[2];
+	required_device_array<upd934g_device, 2> m_pg;
 	required_device<cassette_image_device> m_cassette;
 	required_device<cassette_image_device> m_linein;
-	required_memory_region m_samples[2];
+	required_memory_region_array<2> m_samples;
 	required_ioport_array<8> m_keys;
+	required_ioport m_foot;
 
 	output_finder<> m_led_sampling;
 	output_finder<> m_led_song;
@@ -211,6 +213,9 @@ static INPUT_PORTS_START( rz1 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xe2\x96\xb3 (YES)") PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xe2\x96\xbd (NO)")  PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("foot")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Foot Switch")        PORT_CODE(KEYCODE_SPACE)
 INPUT_PORTS_END
 
 
@@ -358,12 +363,13 @@ uint8_t rz1_state::port_c_r()
 	// ---4----  change-over signal for sampling ram
 	// ----3---  cassette data in
 	// -----2--  control signal for percussion generator c
-	// ------1-  midi in
-	// -------0  midi out
+	// ------1-  midi in (handled elsewhere: cpu rxd)
+	// -------0  midi out (handled elsewhere: cpu txd)
 
 	uint8_t data = 0;
 
 	data |= (m_cassette->input() > 0 ? 0 : 1) << 3;
+	data |= m_foot->read() << 7;
 
 	return data;
 }
@@ -387,6 +393,7 @@ void rz1_state::machine_start()
 	// register for save states
 	save_item(NAME(m_port_a));
 	save_item(NAME(m_port_b));
+	save_item(NAME(m_midi_rx));
 }
 
 void rz1_state::machine_reset()
@@ -487,11 +494,11 @@ ROM_START( rz1 )
 	ROM_LOAD("program.bin", 0x0000, 0x4000, CRC(b44b2652) SHA1(b77f8daece9adb177b6ce1ef518fc3238b8c0a9c))
 
 	// Toms 1~3, Kick, Snare, Rimshot, Closed Hi-Hat, Open Hi-Hat and Metronome Click
-	ROM_REGION(0x8000, "samples_a", 0)
+	ROM_REGION(0x8000, "samples0", 0)
 	ROM_LOAD("sound_a.cm5", 0x0000, 0x8000, CRC(c643ff24) SHA1(e886314d22a9a5473bfa2cb237ecafcf0daedfc1))
 
 	// Clap, Ride, Cowbell and Crash
-	ROM_REGION(0x8000, "samples_b", 0)
+	ROM_REGION(0x8000, "samples1", 0)
 	ROM_LOAD("sound_b.cm6", 0x0000, 0x8000, CRC(ee5b703e) SHA1(cbf2e92c68901f236678d704e9e695a5c84ff49e))
 ROM_END
 
