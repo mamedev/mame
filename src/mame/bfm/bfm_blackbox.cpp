@@ -21,17 +21,30 @@
 
 	TODO:
 	- Add stepper games
+	- ACIA datalogger, currently no games use it
 	- Layouts
 	- Sound could be more accurate with more circuit information
 
 **********************************************************************/
 
 #include "emu.h"
-#include "bfm_blackbox.h"
 
+#include "fruitsamples.h"
+
+#include "cpu/m6800/m6800.h"
+#include "cpu/tms1000/tms1000.h"
+
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/em_reel.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+#include "sound/beep.h"
+#include "sound/spkrdev.h"
 
 #include "speaker.h"
+
+namespace {
 
 #include "bfm_blackbox.lh"
 #include "bb_21up.lh"
@@ -47,18 +60,313 @@
 #include "bb_spinu.lh"
 #include "bb_upndn.lh"
 
+class blackbox_base_state : public driver_device
+{
+public:
+	DECLARE_READ_LINE_MEMBER(in_perc_r);
+	DECLARE_READ_LINE_MEMBER(chute_r) { return m_50p_chute; }
+	DECLARE_INPUT_CHANGED_MEMBER(chute_inserted);
+
+protected:
+	blackbox_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_nmi_timer(*this, "nmi"),
+		m_irq_timer(*this, "irq"),
+		m_chute_timer(*this, "chute_timer"),
+		m_pia(*this, "pia"),
+		m_acia(*this, "acia"),
+		m_in_1800(*this, "IN1800"),
+		m_in_1800_en(*this, "IN1800_%u", 1U),
+		m_in_2000(*this, "IN2000"),
+		m_in_perc(*this, "PERCENTAGE"),
+		m_lamps(*this, "lamp%u", 0U),
+		m_digits(*this, "digit%u", 0U),
+		m_test_led(*this, "test%u", 1U),
+		m_samples(*this, "samples"),
+		m_nvram(*this, "nvram", 0x40, ENDIANNESS_BIG)
+	{ }
+
+	void blackbox_base(machine_config &config);
+
+	virtual void machine_start() override;
+
+	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w) {} // Prevent CB2 write spam
+
+	void pia_porta_w(uint8_t data);
+	uint8_t pia_portb_r();
+	void pia_portb_w(uint8_t data);
+	uint8_t in_1800_r(offs_t offset);
+	uint8_t in_2000_r(offs_t offset);
+	void out_triacs1_w(offs_t offset, uint8_t data);
+	void out_meters_w(offs_t offset, uint8_t data);
+	template <unsigned Offset> void out_lamps_w(offs_t offset, uint8_t data);
+	void out_misc_w(offs_t offset, uint8_t data);
+	template <unsigned Digit> void out_disp_w(offs_t offset, uint8_t data);
+	uint8_t out_triacs1_r(offs_t offset) { out_triacs1_w(offset, 0); return 0; }
+	uint8_t out_meters_r(offs_t offset) { out_meters_w(offset, 0); return 0; }
+	template <unsigned Offset> uint8_t out_lamps_r(offs_t offset) { out_lamps_w<Offset>(offset, 0); return 0; }
+	uint8_t out_misc_r(offs_t offset) { out_misc_w(offset, 0); return 0; }
+	template <unsigned Digit> uint8_t out_disp_r(offs_t offset) { out_disp_w<Digit>(offset, 0); return 0; }
+	void payout_w(uint8_t payout, uint8_t enable, bool state);
+
+	void blackbox_base_map(address_map &map);
+
+	uint8_t m_out_data;
+	uint8_t m_input_en[6];
+	bool m_payouts[2][2];
+	bool m_payout_state[2];
+	bool m_50p_chute;
+	uint8_t m_nvram_data;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi) { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
+	TIMER_DEVICE_CALLBACK_MEMBER(irq) { m_maincpu->pulse_input_line(M6800_IRQ_LINE, attotime::from_usec(2500)); }
+	TIMER_DEVICE_CALLBACK_MEMBER(toggle_50p_chute);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_nmi_timer;
+	required_device<timer_device> m_irq_timer;
+	required_device<timer_device> m_chute_timer;
+	required_device<pia6821_device> m_pia;
+	required_device<acia6850_device> m_acia;
+	required_ioport m_in_1800;
+	required_ioport_array<6> m_in_1800_en;
+	required_ioport m_in_2000;
+	required_ioport m_in_perc;
+	output_finder<52> m_lamps;
+	output_finder<4> m_digits;
+	output_finder<2> m_test_led;
+	required_device<fruit_samples_device> m_samples;
+
+	memory_share_creator<uint8_t> m_nvram;
+};
+
+class blackbox_em_base_state : public blackbox_base_state
+{
+protected:
+	blackbox_em_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+			blackbox_base_state(mconfig, type, tag),
+			m_reels(*this, "emreel%u", 1U)
+	{ }
+
+	void add_em_reels(machine_config &config, int symbols, attotime speed);
+
+	void out_triacs2_w(offs_t offset, uint8_t data);
+	uint8_t out_triacs2_r(offs_t offset) { out_triacs2_w(offset, 0); return 0; }
+
+	required_device_array<em_reel_device, 4> m_reels;
+};
+
+class blackbox_em_state : public blackbox_em_base_state
+{
+public:
+	blackbox_em_state(const machine_config &mconfig, device_type type, const char *tag) :
+			blackbox_em_base_state(mconfig, type, tag),
+			m_in_extra(*this, "EXTRA")
+	{ }
+
+	void blackbox_em(machine_config &config);
+	void blackbox_em_bellt(machine_config &config);
+
+	DECLARE_READ_LINE_MEMBER(in_extra_r);
+
+protected:
+	uint8_t in_2000_r(offs_t offset);
+	void out_lamps2_buzzer_w(offs_t offset, uint8_t data);
+	void out_bellt_in_select_w(offs_t offset, uint8_t data);
+	uint8_t out_lamps2_buzzer_r(offs_t offset) { out_lamps2_buzzer_w(offset, 0); return 0; }
+	uint8_t out_bellt_in_select_r(offs_t offset) { out_bellt_in_select_w(offset, 0); return 0; }
+
+	void blackbox_em_map(address_map &map);
+	void blackbox_em_bellt_map(address_map &map);
+
+	bool m_in_extra_select[8];
+
+	optional_ioport m_in_extra;
+};
+
+class blackbox_em_21up_state : public blackbox_em_state
+{
+public:
+	blackbox_em_21up_state(const machine_config &mconfig, device_type type, const char *tag) :
+			blackbox_em_state(mconfig, type, tag),
+			m_beep_sample(*this, "beep_sample")
+	{ }
+
+	void blackbox_em_21up(machine_config &config);
+
+	void init_21up();
+
+private:
+	void out_lamps1_beeper_w(offs_t offset, uint8_t data);
+	uint8_t out_lamps1_beeper_r(offs_t offset) { out_lamps1_beeper_w(offset, 0); return 0; }
+
+	void blackbox_em_21up_map(address_map &map);
+
+	bool m_beeper_on;
+	int16_t m_beep_sample_data[477];
+
+	required_device<samples_device> m_beep_sample;
+};
+
+class blackbox_em_admc_state : public blackbox_em_state
+{
+public:
+	blackbox_em_admc_state(const machine_config &mconfig, device_type type, const char *tag) :
+			blackbox_em_state(mconfig, type, tag)
+	{ }
+
+	void blackbox_em_admc(machine_config &config);
+
+private:
+	void out_triacs2_w(offs_t offset, uint8_t data);
+	void out_lamps_480_w(offs_t offset, uint8_t data);
+	void out_sound_l_w(offs_t offset, uint8_t data);
+	void out_sound_h_w(offs_t offset, uint8_t data);
+	void out_prot_clock_w(offs_t offset, uint8_t data) { m_prot_index++; }
+	uint8_t out_triacs2_r(offs_t offset) { out_triacs2_w(offset, 0); return 0; }
+	uint8_t out_lamps_480_r(offs_t offset) { out_lamps_480_w(offset, 0); return 0; }
+	uint8_t out_sound_l_r(offs_t offset) { out_sound_l_w(offset, 0); return 0; }
+	uint8_t out_sound_h_r(offs_t offset) { out_sound_h_w(offset, 0); return 0; }
+	uint8_t out_prot_clock_r(offs_t offset) { out_prot_clock_w(offset, 0); return 0; }
+	uint8_t prot_r();
+	void prot_reset_w(uint8_t data) { m_prot_index = 0; }
+
+	void blackbox_em_admc_map(address_map &map);
+
+	uint8_t m_prot_index;
+	uint8_t m_sound_value;
+};
+
+class blackbox_em_opto_state : public blackbox_em_base_state
+{
+public:
+	blackbox_em_opto_state(const machine_config &mconfig, device_type type, const char *tag) :
+			blackbox_em_base_state(mconfig, type, tag)
+	{ }
+
+	template <unsigned Reel> DECLARE_READ_LINE_MEMBER(symbol_opto_r) { return m_reels[Reel]->read_bfm_symbol_opto(); }
+	template <unsigned Reel> DECLARE_READ_LINE_MEMBER(reel_opto_r) { return m_reels[Reel]->read_bfm_reel_opto(); }
+
+protected:
+	void out_meters_w(offs_t offset, uint8_t data);
+	uint8_t out_meters_r(offs_t offset) { out_meters_w(offset, 0); return 0; }
+
+	void blackbox_em_opto_map(address_map &map);
+};
+
+class blackbox_em_opto_sndgen_state : public blackbox_em_opto_state
+{
+public:
+	blackbox_em_opto_sndgen_state(const machine_config &mconfig, device_type type, const char *tag) :
+			blackbox_em_opto_state(mconfig, type, tag),
+			m_beep(*this, "beep")
+	{ }
+
+	void blackbox_em_opto_sndgen(machine_config &config);
+
+private:
+	void out_tone_w(offs_t offset, uint8_t data);
+	void out_mute_w(offs_t offset, uint8_t data);
+	uint8_t out_tone_r(offs_t offset) { out_tone_w(offset, 0); return 0; }
+	uint8_t out_mute_r(offs_t offset) { out_mute_w(offset, 0); return 0; }
+
+	void blackbox_em_opto_sndgen_map(address_map &map);
+
+	required_device<beep_device> m_beep;
+};
+
+class blackbox_em_opto_aux_state : public blackbox_em_opto_state
+{
+public:
+	blackbox_em_opto_aux_state(const machine_config &mconfig, device_type type, const char *tag) :
+			blackbox_em_opto_state(mconfig, type, tag),
+			m_beep(*this, "beep")
+	{ }
+
+	void blackbox_em_opto_aux_base(machine_config &config);
+	void blackbox_em_opto_aux(machine_config &config);
+
+protected:
+	void out_tone_w(offs_t offset, uint8_t data);
+	uint8_t out_tone_r(offs_t offset) { out_tone_w(offset, 0); return 0; }
+
+	void blackbox_em_opto_aux_map(address_map &map);
+
+	required_device<beep_device> m_beep;
+};
+
+class blackbox_em_opto_music_state : public blackbox_em_opto_state
+{
+public:
+	blackbox_em_opto_music_state(const machine_config &mconfig, device_type type, const char *tag) :
+			blackbox_em_opto_state(mconfig, type, tag),
+			m_tms1000(*this, "tms1000"),
+			m_tempo_timer(*this, "tempo"),
+			m_speaker(*this, "speaker")
+	{ }
+
+	void blackbox_em_opto_music(machine_config &config);
+
+private:
+	void out_music_480_w(offs_t offset, uint8_t data);
+	void out_music_500_w(offs_t offset, uint8_t data);
+	uint8_t out_music_480_r(offs_t offset) { out_music_480_w(offset, 0); return 0; }
+	uint8_t out_music_500_r(offs_t offset) { out_music_500_w(offset, 0); return 0; }
+	uint8_t tms1000_k_r();
+	void tms1000_r_w(uint32_t data);
+	void tms1000_o_w(uint16_t data);
+
+	void blackbox_em_opto_music_map(address_map &map);
+
+	uint8_t m_k_cols;
+	uint8_t m_r_bits;
+	uint8_t m_r_select;
+	uint8_t m_tempo;
+	uint32_t m_prev_r;
+
+	required_device<tms1k_base_device> m_tms1000;
+	required_device<timer_device> m_tempo_timer;
+	required_device<speaker_sound_device> m_speaker;
+};
+
+class blackbox_em_opto_club_state : public blackbox_em_opto_aux_state
+{
+public:
+	blackbox_em_opto_club_state(const machine_config &mconfig, device_type type, const char *tag) :
+			blackbox_em_opto_aux_state(mconfig, type, tag)
+	{ }
+
+	void blackbox_em_opto_club(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+
+	void out_triacs1_w(offs_t offset, uint8_t data);
+	void out_triacs2_w(offs_t offset, uint8_t data);
+	void out_meters_w(offs_t offset, uint8_t data);
+	uint8_t out_triacs1_r(offs_t offset) { out_triacs1_w(offset, 0); return 0; }
+	uint8_t out_triacs2_r(offs_t offset) { out_triacs2_w(offset, 0); return 0; }
+	uint8_t out_meters_r(offs_t offset) { out_meters_w(offset, 0); return 0; }
+	void update_payout(uint8_t payout);
+
+	void blackbox_em_opto_club_map(address_map &map);
+
+	bool m_payout_en[2];
+};
+
 void blackbox_base_state::blackbox_base_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x007f).ram().share("ram"); // 6802 internal RAM
+	map(0x0800, 0x0801).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x1000, 0x1003).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1800, 0x1807).r(FUNC(blackbox_base_state::in_1800_r)).nopw();
 	map(0x2000, 0x2007).r(FUNC(blackbox_base_state::in_2000_r)).nopw();
-	map(0x2800, 0x2fff).OUTPUT(blackbox_base_state::out_triacs1);
-	map(0x3800, 0x3fff).OUTPUT(blackbox_base_state::out_meters);
-	map(0x4000, 0x47ff).OUTPUT_T(blackbox_base_state::out_lamps, 0);
-	map(0x4800, 0x50ff).OUTPUT_T(blackbox_base_state::out_lamps, 8);
-	map(0x5000, 0x57ff).OUTPUT(blackbox_base_state::out_misc);
+	map(0x2800, 0x2fff).rw(FUNC(blackbox_base_state::out_triacs1_r), FUNC(blackbox_base_state::out_triacs1_w));
+	map(0x3800, 0x3fff).rw(FUNC(blackbox_base_state::out_meters_r), FUNC(blackbox_base_state::out_meters_w));
+	map(0x4000, 0x47ff).rw(FUNC(blackbox_base_state::out_lamps_r<0>), FUNC(blackbox_base_state::out_lamps_w<0>));
+	map(0x4800, 0x50ff).rw(FUNC(blackbox_base_state::out_lamps_r<8>), FUNC(blackbox_base_state::out_lamps_w<8>));
+	map(0x5000, 0x57ff).rw(FUNC(blackbox_base_state::out_misc_r), FUNC(blackbox_base_state::out_misc_w));
 	map(0x6000, 0x7fff).rom();
 }
 
@@ -67,42 +375,41 @@ void blackbox_em_state::blackbox_em_map(address_map &map)
 	blackbox_base_map(map);
 
 	map(0x2000, 0x2007).r(FUNC(blackbox_em_state::in_2000_r));
-	map(0x3000, 0x37ff).OUTPUT(blackbox_em_state::out_triacs2);
-	map(0x4800, 0x4fff).OUTPUT(blackbox_em_state::out_lamps2_buzzer);
+	map(0x3000, 0x37ff).rw(FUNC(blackbox_em_state::out_triacs2_r), FUNC(blackbox_em_state::out_triacs2_w));
+	map(0x4800, 0x4fff).rw(FUNC(blackbox_em_state::out_lamps2_buzzer_r), FUNC(blackbox_em_state::out_lamps2_buzzer_w));
 }
 
 void blackbox_em_state::blackbox_em_bellt_map(address_map &map)
 {
 	blackbox_em_map(map);
 
-	map(0x0480, 0x04ff).OUTPUT(blackbox_em_state::out_bellt_in_select);
-	map(0x0500, 0x057f).OUTPUT_T(blackbox_em_state::out_lamps, 34);
-	map(0x0580, 0x05ff).OUTPUT_T(blackbox_em_state::out_lamps, 26);
-	map(0x0600, 0x067f).OUTPUT_T(blackbox_em_state::out_lamps, 18);
+	map(0x0480, 0x04ff).rw(FUNC(blackbox_em_state::out_bellt_in_select_r), FUNC(blackbox_em_state::out_bellt_in_select_w));
+	map(0x0500, 0x057f).rw(FUNC(blackbox_em_state::out_lamps_r<34>), FUNC(blackbox_em_state::out_lamps_w<34>));
+	map(0x0580, 0x05ff).rw(FUNC(blackbox_em_state::out_lamps_r<26>), FUNC(blackbox_em_state::out_lamps_w<26>));
+	map(0x0600, 0x067f).rw(FUNC(blackbox_em_state::out_lamps_r<18>), FUNC(blackbox_em_state::out_lamps_w<18>));
 }
 
 void blackbox_em_21up_state::blackbox_em_21up_map(address_map &map)
 {
 	blackbox_em_map(map);
 
-	map(0x0580, 0x05ff).OUTPUT_T(blackbox_em_21up_state::out_disp, 0);
-	map(0x0600, 0x067f).OUTPUT_T(blackbox_em_21up_state::out_disp, 1);
-	map(0x4000, 0x47ff).OUTPUT(blackbox_em_21up_state::out_lamps1_beeper);
+	map(0x0580, 0x05ff).rw(FUNC(blackbox_em_21up_state::out_disp_r<0>), FUNC(blackbox_em_21up_state::out_disp_w<0>));
+	map(0x0600, 0x067f).rw(FUNC(blackbox_em_21up_state::out_disp_r<1>), FUNC(blackbox_em_21up_state::out_disp_w<1>));
+	map(0x4000, 0x47ff).rw(FUNC(blackbox_em_21up_state::out_lamps1_beeper_r), FUNC(blackbox_em_21up_state::out_lamps1_beeper_w));
 }
 
 void blackbox_em_admc_state::blackbox_em_admc_map(address_map &map)
 {
 	blackbox_em_map(map);
 
-	map(0x0200, 0x027f).OUTPUT(blackbox_em_admc_state::out_prot_clock);
-	map(0x0380, 0x03ff).OUTPUT(blackbox_em_admc_state::out_sound_l);
-	map(0x0400, 0x047f).OUTPUT(blackbox_em_admc_state::out_sound_h);
-	map(0x0480, 0x04ff).OUTPUT(blackbox_em_admc_state::out_lamps_480);
-	map(0x0500, 0x057f).OUTPUT_T(blackbox_em_admc_state::out_lamps, 34);
-	map(0x0580, 0x05ff).OUTPUT_T(blackbox_em_admc_state::out_lamps, 26);
-	map(0x0600, 0x067f).OUTPUT_T(blackbox_em_admc_state::out_lamps, 18);
-	map(0x0800, 0x0800).nopw(); // Writes 3, then 2 here on startup
-	map(0x3000, 0x37ff).OUTPUT(blackbox_em_admc_state::out_triacs2);
+	map(0x0200, 0x027f).rw(FUNC(blackbox_em_admc_state::out_prot_clock_r), FUNC(blackbox_em_admc_state::out_prot_clock_w));
+	map(0x0380, 0x03ff).rw(FUNC(blackbox_em_admc_state::out_sound_l_r), FUNC(blackbox_em_admc_state::out_sound_l_w));
+	map(0x0400, 0x047f).rw(FUNC(blackbox_em_admc_state::out_sound_h_r), FUNC(blackbox_em_admc_state::out_sound_h_w));
+	map(0x0480, 0x04ff).rw(FUNC(blackbox_em_admc_state::out_lamps_480_r), FUNC(blackbox_em_admc_state::out_lamps_480_w));
+	map(0x0500, 0x057f).rw(FUNC(blackbox_em_admc_state::out_lamps_r<34>), FUNC(blackbox_em_admc_state::out_lamps_w<34>));
+	map(0x0580, 0x05ff).rw(FUNC(blackbox_em_admc_state::out_lamps_r<26>), FUNC(blackbox_em_admc_state::out_lamps_w<26>));
+	map(0x0600, 0x067f).rw(FUNC(blackbox_em_admc_state::out_lamps_r<18>), FUNC(blackbox_em_admc_state::out_lamps_w<18>));
+	map(0x3000, 0x37ff).rw(FUNC(blackbox_em_admc_state::out_triacs2_r), FUNC(blackbox_em_admc_state::out_triacs2_w));
 	map(0x6400, 0x6400).r(FUNC(blackbox_em_admc_state::prot_r));
 	map(0x6800, 0x6800).w(FUNC(blackbox_em_admc_state::prot_reset_w));
 }
@@ -111,54 +418,54 @@ void blackbox_em_opto_state::blackbox_em_opto_map(address_map &map)
 {
 	blackbox_base_map(map);
 
-	map(0x0580, 0x05ff).OUTPUT_T(blackbox_em_opto_state::out_disp, 0);
-	map(0x0600, 0x067f).OUTPUT_T(blackbox_em_opto_state::out_disp, 1);
-	map(0x3000, 0x37ff).OUTPUT(blackbox_em_opto_state::out_triacs2);
-	map(0x3800, 0x3fff).OUTPUT(blackbox_em_opto_state::out_meters);
+	map(0x0580, 0x05ff).rw(FUNC(blackbox_em_opto_state::out_disp_r<0>), FUNC(blackbox_em_opto_state::out_disp_w<0>));
+	map(0x0600, 0x067f).rw(FUNC(blackbox_em_opto_state::out_disp_r<1>), FUNC(blackbox_em_opto_state::out_disp_w<1>));
+	map(0x3000, 0x37ff).rw(FUNC(blackbox_em_opto_state::out_triacs2_r), FUNC(blackbox_em_opto_state::out_triacs2_w));
+	map(0x3800, 0x3fff).rw(FUNC(blackbox_em_opto_state::out_meters_r), FUNC(blackbox_em_opto_state::out_meters_w));
 }
 
 void blackbox_em_opto_sndgen_state::blackbox_em_opto_sndgen_map(address_map &map)
 {
 	blackbox_em_opto_map(map);
 
-	map(0x0480, 0x04ff).OUTPUT(blackbox_em_opto_sndgen_state::out_tone);
-	map(0x0500, 0x057f).OUTPUT(blackbox_em_opto_sndgen_state::out_mute);
+	map(0x0480, 0x04ff).rw(FUNC(blackbox_em_opto_sndgen_state::out_tone_r), FUNC(blackbox_em_opto_sndgen_state::out_tone_w));
+	map(0x0500, 0x057f).rw(FUNC(blackbox_em_opto_sndgen_state::out_mute_r), FUNC(blackbox_em_opto_sndgen_state::out_mute_w));
 }
 
 void blackbox_em_opto_aux_state::blackbox_em_opto_aux_map(address_map &map)
 {
 	blackbox_em_opto_map(map);
 
-	map(0x0400, 0x047f).OUTPUT_T(blackbox_em_opto_aux_state::out_lamps, 26); // MFME lamps 40-47
-	map(0x0480, 0x04ff).OUTPUT_T(blackbox_em_opto_aux_state::out_lamps, 18); // MFME lamps 32-39
-	map(0x0500, 0x057f).OUTPUT(blackbox_em_opto_aux_state::out_tone);
+	map(0x0400, 0x047f).rw(FUNC(blackbox_em_opto_aux_state::out_lamps_r<26>), FUNC(blackbox_em_opto_aux_state::out_lamps_w<26>)); // MFME lamps 40-47
+	map(0x0480, 0x04ff).rw(FUNC(blackbox_em_opto_aux_state::out_lamps_r<18>), FUNC(blackbox_em_opto_aux_state::out_lamps_w<18>)); // MFME lamps 32-39
+	map(0x0500, 0x057f).rw(FUNC(blackbox_em_opto_aux_state::out_tone_r), FUNC(blackbox_em_opto_aux_state::out_tone_w));
 }
 
 void blackbox_em_opto_music_state::blackbox_em_opto_music_map(address_map &map)
 {
 	blackbox_em_opto_map(map);
 
-	map(0x0400, 0x047f).OUTPUT_T(blackbox_em_opto_music_state::out_lamps, 18);
-	map(0x0480, 0x04ff).OUTPUT(blackbox_em_opto_music_state::out_music_480);
-	map(0x0500, 0x057f).OUTPUT(blackbox_em_opto_music_state::out_music_500);
+	map(0x0400, 0x047f).rw(FUNC(blackbox_em_opto_music_state::out_lamps_r<18>), FUNC(blackbox_em_opto_music_state::out_lamps_w<18>));
+	map(0x0480, 0x04ff).rw(FUNC(blackbox_em_opto_music_state::out_music_480_r), FUNC(blackbox_em_opto_music_state::out_music_480_w));
+	map(0x0500, 0x057f).rw(FUNC(blackbox_em_opto_music_state::out_music_500_r), FUNC(blackbox_em_opto_music_state::out_music_500_w));
 }
 
 void blackbox_em_opto_club_state::blackbox_em_opto_club_map(address_map &map)
 {
 	blackbox_em_opto_map(map);
 
-	map(0x0200, 0x027f).OUTPUT_T(blackbox_em_opto_club_state::out_lamps, 42);
-	map(0x0280, 0x03ff).OUTPUT_T(blackbox_em_opto_club_state::out_lamps, 26);
-	map(0x0300, 0x037f).OUTPUT_T(blackbox_em_opto_club_state::out_lamps, 18);
-	map(0x0380, 0x03ff).OUTPUT(blackbox_em_opto_club_state::out_tone);
-	map(0x0400, 0x047f).OUTPUT_T(blackbox_em_opto_club_state::out_lamps, 34);
-	map(0x0480, 0x04ff).OUTPUT_T(blackbox_em_opto_club_state::out_disp, 0);
-	map(0x0500, 0x057f).OUTPUT_T(blackbox_em_opto_club_state::out_disp, 1);
-	map(0x0580, 0x05ff).OUTPUT_T(blackbox_em_opto_club_state::out_disp, 2);
-	map(0x0600, 0x067f).OUTPUT_T(blackbox_em_opto_club_state::out_disp, 3);
-	map(0x2800, 0x2fff).OUTPUT(blackbox_em_opto_club_state::out_triacs1);
-	map(0x3000, 0x37ff).OUTPUT(blackbox_em_opto_club_state::out_triacs2);
-	map(0x3800, 0x3fff).OUTPUT(blackbox_em_opto_club_state::out_meters);
+	map(0x0200, 0x027f).rw(FUNC(blackbox_em_opto_club_state::out_lamps_r<42>), FUNC(blackbox_em_opto_club_state::out_lamps_w<42>));
+	map(0x0280, 0x03ff).rw(FUNC(blackbox_em_opto_club_state::out_lamps_r<26>), FUNC(blackbox_em_opto_club_state::out_lamps_w<26>));
+	map(0x0300, 0x037f).rw(FUNC(blackbox_em_opto_club_state::out_lamps_r<18>), FUNC(blackbox_em_opto_club_state::out_lamps_w<18>));
+	map(0x0380, 0x03ff).rw(FUNC(blackbox_em_opto_club_state::out_tone_r), FUNC(blackbox_em_opto_club_state::out_tone_w));
+	map(0x0400, 0x047f).rw(FUNC(blackbox_em_opto_club_state::out_lamps_r<34>), FUNC(blackbox_em_opto_club_state::out_lamps_w<34>));
+	map(0x0480, 0x04ff).rw(FUNC(blackbox_em_opto_club_state::out_disp_r<0>), FUNC(blackbox_em_opto_club_state::out_disp_w<0>));
+	map(0x0500, 0x057f).rw(FUNC(blackbox_em_opto_club_state::out_disp_r<1>), FUNC(blackbox_em_opto_club_state::out_disp_w<1>));
+	map(0x0580, 0x05ff).rw(FUNC(blackbox_em_opto_club_state::out_disp_r<2>), FUNC(blackbox_em_opto_club_state::out_disp_w<2>));
+	map(0x0600, 0x067f).rw(FUNC(blackbox_em_opto_club_state::out_disp_r<3>), FUNC(blackbox_em_opto_club_state::out_disp_w<3>));
+	map(0x2800, 0x2fff).rw(FUNC(blackbox_em_opto_club_state::out_triacs1_r), FUNC(blackbox_em_opto_club_state::out_triacs1_w));
+	map(0x3000, 0x37ff).rw(FUNC(blackbox_em_opto_club_state::out_triacs2_r), FUNC(blackbox_em_opto_club_state::out_triacs2_w));
+	map(0x3800, 0x3fff).rw(FUNC(blackbox_em_opto_club_state::out_meters_r), FUNC(blackbox_em_opto_club_state::out_meters_w));
 }
 
 void blackbox_base_state::pia_porta_w(uint8_t data)
@@ -213,21 +520,21 @@ READ_LINE_MEMBER(blackbox_base_state::in_perc_r)
 	   but some later games have 3 possible positions, and use two
 	   of the input select bits to read it. */
 	uint8_t perc_sw = m_in_perc->read();
-	if(perc_sw == 0 && m_input_en[3]) return true; // Low
-	if(perc_sw == 1 && m_input_en[5]) return true; // High
+	if(perc_sw == 0 && m_input_en[3]) return 1; // Low
+	if(perc_sw == 1 && m_input_en[5]) return 1; // High
 	// Medium is implied when the others are off
 
 	// Check if switch is set high on 2-position games
-	if(perc_sw == 1 && !m_input_en[3] && !m_input_en[5]) return true;
+	if(perc_sw == 1 && !m_input_en[3] && !m_input_en[5]) return 1;
 
-	return false;
+	return 0;
 }
 
 READ_LINE_MEMBER(blackbox_em_state::in_extra_r) 
 {
 	for(int i = 0; i < 8; i++) 
-		if(m_in_extra_select[i] && BIT(m_in_extra->read(), i)) return true;
-	return false;
+		if(m_in_extra_select[i] && BIT(m_in_extra->read(), i)) return 1;
+	return 0;
 }
 
 INPUT_CHANGED_MEMBER( blackbox_base_state::chute_inserted )
@@ -1062,7 +1369,7 @@ void blackbox_base_state::machine_start()
 	m_50p_chute = false;
 
 	// bb_upndn & bb_reelg won't properly read nudge down buttons on the first go if RAM starts out as 0's??
-	for(int i = 0; i < 0x80; i++) m_ram[i] = 0x1; 
+	for(int i = 0; i < 0x80; i++) m_maincpu->space(AS_PROGRAM).write_byte(i, 0xff);
 }
 
 void blackbox_em_opto_club_state::machine_start()
@@ -1075,15 +1382,14 @@ void blackbox_em_opto_club_state::machine_start()
 
 void blackbox_base_state::blackbox_base(machine_config &config)
 {
-	//M6802(config, m_maincpu, 4_MHz_XTAL);
-	M6800(config, m_maincpu, 4_MHz_XTAL / 4); // Use 6800 to get access to the RAM, explained in machine_start
+	M6802(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_base_state::blackbox_base_map);
 
-	TIMER(config, "nmi").configure_periodic(FUNC(blackbox_base_state::nmi), attotime::from_hz(100)); // From AC zero crossing detector
-	TIMER(config, "irq").configure_periodic(FUNC(blackbox_base_state::irq), attotime::from_msec(80)); // 555 timer circuit
-	subdevice<timer_device>("nmi")->set_start_delay(attotime::from_msec(1)); // Don't take interrupts at reset time
-	subdevice<timer_device>("irq")->set_start_delay(attotime::from_msec(1));
-	TIMER(config, "chute_timer").configure_generic(FUNC(blackbox_base_state::toggle_50p_chute));
+	TIMER(config, m_nmi_timer).configure_periodic(FUNC(blackbox_base_state::nmi), attotime::from_hz(100)); // From AC zero crossing detector
+	TIMER(config, m_irq_timer).configure_periodic(FUNC(blackbox_base_state::irq), attotime::from_msec(80)); // 555 timer circuit
+	m_nmi_timer->set_start_delay(attotime::from_msec(1)); // Don't take interrupts at reset time
+	m_irq_timer->set_start_delay(attotime::from_msec(1));
+	TIMER(config, m_chute_timer).configure_generic(FUNC(blackbox_base_state::toggle_50p_chute));
 
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set(FUNC(blackbox_base_state::pia_porta_w));
@@ -1091,29 +1397,20 @@ void blackbox_base_state::blackbox_base(machine_config &config)
 	m_pia->writepb_handler().set(FUNC(blackbox_base_state::pia_portb_w));
 	m_pia->cb2_handler().set(FUNC(blackbox_base_state::pia_cb2_w));
 
+	ACIA6850(config, m_acia, 0);
+
 	FRUIT_SAMPLES(config, m_samples);
 }
 
-void blackbox_em_base_state::blackbox_em_base_20symbol(machine_config &config)
+void blackbox_em_base_state::add_em_reels(machine_config &config, int symbols, attotime speed)
 {
-	EM_REEL(config, m_reels[0], 20, attotime::from_usec(2750));
-	EM_REEL(config, m_reels[1], 20, attotime::from_usec(2750));
-	EM_REEL(config, m_reels[2], 20, attotime::from_usec(2750));
-	EM_REEL(config, m_reels[3], 20, attotime::from_usec(2750));
-}
-
-void blackbox_em_base_state::blackbox_em_base_24symbol(machine_config &config)
-{
-	EM_REEL(config, m_reels[0], 24, attotime::from_usec(3000));
-	EM_REEL(config, m_reels[1], 24, attotime::from_usec(3000));
-	EM_REEL(config, m_reels[2], 24, attotime::from_usec(3000));
-	EM_REEL(config, m_reels[3], 24, attotime::from_usec(3000));
+	for(int i = 0; i < 4; i++) EM_REEL(config, m_reels[i], symbols, speed);
 }
 
 void blackbox_em_state::blackbox_em(machine_config &config)
 {
 	blackbox_base(config);
-	blackbox_em_base_20symbol(config);
+	add_em_reels(config, 20, attotime::from_usec(2750));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_state::blackbox_em_map);
 }
@@ -1148,7 +1445,7 @@ void blackbox_em_21up_state::blackbox_em_21up(machine_config &config)
 void blackbox_em_opto_sndgen_state::blackbox_em_opto_sndgen(machine_config &config)
 {
 	blackbox_base(config);
-	blackbox_em_base_20symbol(config);
+	add_em_reels(config, 20, attotime::from_usec(2750));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_sndgen_state::blackbox_em_opto_sndgen_map);
 
@@ -1167,7 +1464,7 @@ void blackbox_em_opto_aux_state::blackbox_em_opto_aux_base(machine_config &confi
 void blackbox_em_opto_aux_state::blackbox_em_opto_aux(machine_config &config)
 {
 	blackbox_em_opto_aux_base(config);
-	blackbox_em_base_20symbol(config);
+	add_em_reels(config, 20, attotime::from_usec(2750));
 	
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_aux_state::blackbox_em_opto_aux_map);
 }
@@ -1175,7 +1472,7 @@ void blackbox_em_opto_aux_state::blackbox_em_opto_aux(machine_config &config)
 void blackbox_em_opto_music_state::blackbox_em_opto_music(machine_config &config)
 {
 	blackbox_base(config);
-	blackbox_em_base_20symbol(config);
+	add_em_reels(config, 20, attotime::from_usec(2750));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_music_state::blackbox_em_opto_music_map);
 	TMS1000(config, m_tms1000, 452000); // R and C unknown, pitch matches a real machine
@@ -1194,7 +1491,7 @@ void blackbox_em_opto_music_state::blackbox_em_opto_music(machine_config &config
 void blackbox_em_opto_club_state::blackbox_em_opto_club(machine_config &config)
 {
 	blackbox_em_opto_aux_base(config);
-	blackbox_em_base_24symbol(config);
+	add_em_reels(config, 24, attotime::from_usec(3000));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_club_state::blackbox_em_opto_club_map);
 
@@ -1308,6 +1605,8 @@ void blackbox_em_21up_state::init_21up()
 		m_beep_sample_data[s] = 32767 * wave * mod;
 	}
 }
+
+} // anonymous namespace
 
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_SUPPORTS_SAVE
 #define GAME_FLAGS_NOSOUND MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_SUPPORTS_SAVE|MACHINE_NO_SOUND

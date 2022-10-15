@@ -48,6 +48,7 @@ public:
 	mpu1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_nmi_timer(*this, "nmi"),
 		m_pia1(*this, "pia1"),
 		m_pia2(*this, "pia2"),
 		m_lamps(*this, "lamp%u", 0U),
@@ -91,6 +92,7 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_nmi_timer;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	output_finder<13> m_lamps;
@@ -323,8 +325,8 @@ void mpu1_state::mpu1(machine_config &config)
 	                                        I've set a stable 1 MHz clock here, which is also the case on MPU2. */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu1_state::mpu1_map);
 
-	TIMER(config, "nmi").configure_periodic(FUNC(mpu1_state::nmi), attotime::from_hz(100)); // From AC zero crossing detector
-	subdevice<timer_device>("nmi")->set_start_delay(attotime::from_msec(1)); // Don't go to NMI at reset time
+	TIMER(config, m_nmi_timer).configure_periodic(FUNC(mpu1_state::nmi), attotime::from_hz(100)); // From AC zero crossing detector
+	m_nmi_timer->set_start_delay(attotime::from_msec(1)); // Don't go to NMI at reset time
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set_ioport("IN");
