@@ -3,19 +3,21 @@
 
 /* Field Combat (c)1985 Jaleco
 
-    TS 2004.10.22.
-    - fixed sprite issues
-    - added backgrounds and terrain info (external ROMs)
+TS 2004.10.22.
+- fixed sprite issues
+- added backgrounds and terrain info (external ROMs)
 
-    (press buttons 1+2 at the same time, to release 'army' ;)
+(press buttons 1+2 at the same time, to release 'army' ;)
 
-    todo:
-        - fix colours (sprites , bg)
-*/
+TODO:
+- fix colours (sprites, bg), not much PCB footage online
+  sprites: player char and soldiers are correct, explosions probably also ok,
+  a lot of other sprite colors still look bad
+  bg: 16 levels, each has a different color. 1st level should be green bg,
+  with black at the bottom part
 
-/*
 
-Field Combat (c)1985 Jaleco
+PCB Notes:
 
 From a working board.
 
@@ -26,8 +28,6 @@ Other: Unmarked 24 pin near ROMs 2 & 3
 RAM: 6116 (x3)
 
 X-TAL: 20 MHz
-
-inputs + notes by stephh
 
 */
 
@@ -41,16 +41,6 @@ inputs + notes by stephh
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
-
-
-// configurable logging
-#define LOG_PALETTEBANK     (1U << 1)
-
-//#define VERBOSE (LOG_GENERAL | LOG_PALETTEBANK)
-
-#include "logmacro.h"
-
-#define LOGPALETTEBANK(...)     LOGMASKED(LOG_PALETTEBANK,     __VA_ARGS__)
 
 
 namespace {
@@ -94,7 +84,6 @@ private:
 	tilemap_t *m_bgmap = nullptr;
 	u8 m_cocktail_flip = 0U;
 	u8 m_char_palette = 0U;
-	u8 m_sprite_palette = 0U;
 	u8 m_char_bank = 0U;
 
 	// misc
@@ -152,10 +141,8 @@ static constexpr int VISIBLE_Y_MAX = 30 * 8;
 
 TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 {
-	//int palno = (tile_index - (tile_index / 32 * 16) * 32 * 16) / 32;
-
 	const int tileno = m_bgdata_rom[tile_index];
-	const int palno = 0x18; //m_terrain_rom[tile_index] >> 3;
+	const int palno = (tile_index >> 5 & 0xf) ^ 7;
 	tileinfo.set(2, tileno, palno, 0);
 }
 
@@ -213,14 +200,14 @@ void fcombat_state::fcombat_palette(palette_device &palette) const
 	// fg chars/sprites
 	for (int i = 0; i < 0x200; i++)
 	{
-		const u8 ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
+		const u8 ctabentry = (color_prom[(i & 0x1c0) | bitswap<6>(i,1,0,5,4,3,2)] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	// bg chars (this is not the full story... there are four layers mixed using another PROM)
+	// bg chars
 	for (int i = 0x200; i < 0x300; i++)
 	{
-		const u8 ctabentry = color_prom[i] & 0x0f;
+		const u8 ctabentry = color_prom[(i & 0x3c0) | bitswap<6>(i,1,0,5,4,3,2)] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -257,9 +244,7 @@ void fcombat_state::videoreg_w(u8 data)
 
 	// bits 4-5 unused
 
-	// bits 6-7 sprite lookup table bank
-	m_sprite_palette = 0; //(data & 0xc0) >> 6;
-	LOGPALETTEBANK("sprite palette bank: %02x", data);
+	// bits 6-7 ?
 }
 
 
@@ -279,7 +264,7 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		const int flags = m_spriteram[i + 0];
 		int y = m_spriteram[i + 1] ^ 255;
 		int code = m_spriteram[i + 2] + ((flags & 0x20) << 3);
-		int x = m_spriteram[i + 3] * 2 + 72;
+		int x = m_spriteram[i + 3] * 2 + (flags & 0x01) + 72;
 
 		int xflip = flags & 0x80;
 		int yflip = flags & 0x40;
@@ -287,7 +272,7 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		const bool wide = flags & 0x08;
 		int code2 = code;
 
-		const int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (m_sprite_palette * 16);
+		const int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (code >> 4 & 0x10);
 		gfx_element *gfx = m_gfxdecode->gfx(1);
 
 		if (m_cocktail_flip)
@@ -564,7 +549,6 @@ void fcombat_state::machine_start()
 {
 	save_item(NAME(m_cocktail_flip));
 	save_item(NAME(m_char_palette));
-	save_item(NAME(m_sprite_palette));
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_fcombat_sh));
 	save_item(NAME(m_fcombat_sv));
@@ -576,7 +560,6 @@ void fcombat_state::machine_reset()
 {
 	m_cocktail_flip = 0;
 	m_char_palette = 0;
-	m_sprite_palette = 0;
 	m_char_bank = 0;
 	m_fcombat_sh = 0;
 	m_fcombat_sv = 0;
@@ -607,11 +590,9 @@ void fcombat_state::fcombat(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2149(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12); // TODO: should this and the following be CPU_CLOCK / 2?
-
-	YM2149(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
-
-	YM2149(config, "ay3", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	YM2149(config, "ay1", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay2", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay3", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 /*************************************
@@ -736,8 +717,8 @@ ROM_START( fcombat )
 	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "fcprom_a.c2",  0x0000, 0x0020, CRC(7ac480f0) SHA1(f491fe4da19d8c037e3733a5836de35cc438907e) ) // palette
 	ROM_LOAD( "fcprom_d.k12", 0x0020, 0x0100, CRC(9a348250) SHA1(faf8db4c42adee07795d06bea20704f8c51090ff) ) // fg char lookup table
-	ROM_LOAD( "fcprom_b.c4",  0x0120, 0x0100, CRC(ac9049f6) SHA1(57aa5b5df3e181bad76149745a422c3dd1edad49) ) // sprite lookup table
-	ROM_LOAD( "fcprom_c.a9",  0x0220, 0x0100, CRC(768ac120) SHA1(ceede1d6cbeae08da96ef52bdca2718a839d88ab) ) // bg char mixer
+	ROM_LOAD( "fcprom_c.a9",  0x0120, 0x0100, CRC(768ac120) SHA1(ceede1d6cbeae08da96ef52bdca2718a839d88ab) ) // sprite lookup table
+	ROM_LOAD( "fcprom_b.c4",  0x0220, 0x0100, CRC(ac9049f6) SHA1(57aa5b5df3e181bad76149745a422c3dd1edad49) ) // bg char lookup table
 ROM_END
 
 } // anonymous namespace
