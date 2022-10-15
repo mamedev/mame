@@ -117,7 +117,7 @@ a800xl: crashes on boot
 		<year>1985</year>
 		<publisher>Epyx</publisher>
 		<notes><![CDATA[
-Unsupported character save to disk
+Unsupported character save to [disk]
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
@@ -137,10 +137,13 @@ Unsupported character save to disk
 		</part>
 	</software>
 
-	<software name="shamus2">
+	<software name="shamus2" supported="partial">
 		<description>Shamus: Case II</description>
 		<year>1983</year>
 		<publisher>Synapse</publisher>
+		<notes><![CDATA[
+Runs too fast, [ANTIC] timings
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Shamus - Case II.atr" size="92176" crc="2b6696c6" sha1="f3079c19f54ae5dc6fc9de6ca80341e9a2527c05"/>
@@ -148,10 +151,14 @@ Unsupported character save to disk
 		</part>
 	</software>
 
-	<software name="wkarate">
-		<description>World Karate Championship</description>
+	<software name="wkarate" supported="partial">
+		<!-- "Cracked by Kilroy (P) N.A.P.O." briefly appears on boot -->
+		<description>World Karate Championship (cracked)</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+a800xl: randomly doesn't boot (soft reset multiple times will eventually make it to start)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="133136">
 				<rom name="World Karate Championship (v4).atr" size="133136" crc="a89bf1e6" sha1="97fbaf575d9f9ddbecd1528c7d5090d2fdac6f3e"/>
@@ -170,10 +177,13 @@ Unsupported character save to disk
 		</part>
 	</software>
 
-	<software name="cloderun">
+	<software name="cloderun" supported="no">
 		<description>Championship Lode Runner</description>
 		<year>1985</year>
 		<publisher>Broderbund</publisher>
+		<notes><![CDATA[
+Garbled GFXs
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Championship Lode Runner.atr" size="92176" crc="53e02689" sha1="dc92e8616fa2e00432b388df97d508c1a0b6db3c"/>
@@ -181,10 +191,15 @@ Unsupported character save to disk
 		</part>
 	</software>
 
-	<software name="marsmis2">
+	<software name="marsmis2" supported="partial">
 		<description>Mars Mission II</description>
 		<year>1981</year>
 		<publisher>Antic</publisher>
+		<notes><![CDATA[
+glitchy title screen, [ANTIC] GFX mode 9, same as a800:cvrnmars
+Clearing a stage will have some dots in the text GFX
+a800xl: doesn't boot (btanb?)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Mars Mission II.atr" size="92176" crc="59694595" sha1="4b2ad8bdcbbd4c8f5aef154e55bf4950b15798f3"/>
@@ -204,7 +219,8 @@ Unsupported character save to disk
 	</software>
 
 	<software name="brucelee">
-		<description>Bruce Lee</description>
+		<!-- "CRACKED BY GEORGE!" -->
+		<description>Bruce Lee (cracked)</description>
 		<year>1984</year>
 		<publisher>Datasoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -247,10 +263,13 @@ Unsupported character save to disk
 		</part>
 	</software>
 
-	<software name="spyvspy">
+	<software name="spyvspy" supported="no">
 		<description>Spy Vs Spy</description>
 		<year>1984</year>
 		<publisher>First Star</publisher>
+		<notes><![CDATA[
+Often crashes at the end of an attract game sequence, which in turn desyncs
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Spy Vs Spy (1984)(First Star).atr" size="92176" crc="91940f40" sha1="d57d8ecbb0b14987c8fc64b27fe1511779c62f4d"/>
@@ -270,7 +289,8 @@ Unsupported character save to disk
 	</software>
 
 	<software name="spyvspyi">
-		<description>Spy Vs Spy - The Island Caper</description>
+		<!-- "CRACKED BY CAPTAIN WIZARD (P) 1986 N.A.P.O" during attract -->
+		<description>Spy Vs Spy - The Island Caper (cracked)</description>
 		<year>1985</year>
 		<publisher>First Star Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -291,7 +311,9 @@ Unsupported character save to disk
 		</part>
 	</software>
 
-	<software name="montzump">
+	<!-- Looks more polished than retail version, with title screen etc. -->
+	<!-- except it's missing content (cfr. file sizes) and unwinnable. -->
+	<software name="montzump" cloneof="montzuma">
 		<description>Montezuma's Revenge! (Prototype)</description>
 		<year>1983</year>
 		<publisher>Utopia Software</publisher>
@@ -302,10 +324,13 @@ Unsupported character save to disk
 		</part>
 	</software>
 
-	<software name="mrrobot">
+	<software name="mrrobot" supported="partial">
 		<description>Mr. Robot and his Robot Factory</description>
 		<year>1983</year>
 		<publisher>Datamost</publisher>
+		<notes><![CDATA[
+Random black screen after title screen, particularly on soft resets
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="mr robot and his robot factory.atr" size="92176" crc="36f3bdb0" sha1="8bb1f04783e883bb20aec5b83e3493632d9dd0bd"/>
@@ -313,10 +338,14 @@ Unsupported character save to disk
 		</part>
 	</software>
 
-	<software name="castwolf" supported="partial">
+	<software name="castwolf" supported="no">
 		<description>Castle Wolfenstein</description>
 		<year>1983</year>
 		<publisher>Muse Software</publisher>
+		<notes><![CDATA[
+Castle GFX doesn't draw on title screen, uses [ANTIC] GFX mode F
+Should prompt for a "press space key" when player dies or get captured but never happens
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="castle wolfenstein.atr" size="92176" crc="7745cd05" sha1="03ba4218d20f260f3e17c7ce540c952cd071bdf5"/>
@@ -769,6 +798,7 @@ a130xe: scrolling is jerky when shooting in gameplay
 ]]></notes>
 		<info name="usage" value="Requires 128KB of RAM"/>
 		<sharedfeat name="compatibility" value="XL/XE"/>
+		<!-- dual sided single floppy according to game -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="133136">
 				<rom name="t-34 - the battle (1994)(a.n.g. software)(nl)(fw)(side a).atr" size="133136" crc="4c276dc4" sha1="7720e199b7061852668979feb1a67aa042eac76c"/>  <!-- Verified -->
