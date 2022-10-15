@@ -163,7 +163,8 @@ private:
 	std::unique_ptr<uint32_t[]>  m_cclk_expand;       /* shared buffer for the following: */
 	uint32_t  *m_pf_21;             /* 1cclk 2 color txt 2,3 */
 	uint32_t  *m_pf_x10b;           /* 1cclk 4 color txt 4,5, gfx D,E */
-	uint32_t  *m_pf_3210b2;         /* 1cclk 5 color txt 6,7, gfx 9,B,C */
+	uint32_t  *m_pf_3210b;          /* 1cclk 5 color txt 6,7, gfx B,C */
+	uint32_t  *m_pf_3210b2;         /* 1cclk 5 color gfx 9 */
 	uint32_t  *m_pf_210b4;          /* 4cclk 4 color gfx 8 */
 	uint32_t  *m_pf_210b2;          /* 2cclk 4 color gfx A */
 	uint32_t  *m_pf_1b;             /* 1cclk hires gfx F */
@@ -173,7 +174,8 @@ private:
 	std::unique_ptr<uint8_t[]>   m_used_colors;       /* shared buffer for the following: */
 	uint8_t   *m_uc_21;             /* used colors for txt (2,3) */
 	uint8_t   *m_uc_x10b;           /* used colors for txt 4,5, gfx D,E */
-	uint8_t   *m_uc_3210b2;         /* used colors for txt 6,7, gfx 9,B,C */
+	uint8_t   *m_uc_3210b;          /* used colors for txt 6,7, gfx B,C */
+	uint8_t   *m_uc_3210b2;         /* used colors for gfx 9 */
 	uint8_t   *m_uc_210b4;          /* used colors for gfx 8 */
 	uint8_t   *m_uc_210b2;          /* used colors for gfx A */
 	uint8_t   *m_uc_1b;             /* used colors for gfx F */
