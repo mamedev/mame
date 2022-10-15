@@ -393,7 +393,7 @@ void antic_device::device_start()
 	save_item(NAME(m_cclock));
 	save_item(NAME(m_pmbits));
 
-	save_pointer(NAME(m_cclk_expand), 21 * 256);
+	save_pointer(NAME(m_cclk_expand), 37 * 256);
 
 	/* timers */
 	m_cycle_steal_timer = timer_alloc(FUNC(antic_device::steal_cycles), this);
