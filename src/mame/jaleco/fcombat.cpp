@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders: Tomasz Slanina
+// copyright-holders: David Haywood, Tomasz Slanina
 
 /* Field Combat (c)1985 Jaleco
+
+Hardware has similarities with Exerion
 
 TS 2004.10.22.
 - fixed sprite issues
@@ -139,14 +141,6 @@ static constexpr int VISIBLE_Y_MIN =  2 * 8;
 static constexpr int VISIBLE_Y_MAX = 30 * 8;
 
 
-TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
-{
-	const int tileno = m_bgdata_rom[tile_index];
-	const int palno = (tile_index >> 5 & 0xf) ^ 7;
-	tileinfo.set(2, tileno, palno, 0);
-}
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -222,6 +216,13 @@ void fcombat_state::fcombat_palette(palette_device &palette) const
 void fcombat_state::video_start()
 {
 	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fcombat_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
+}
+
+TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
+{
+	const int tileno = m_bgdata_rom[tile_index];
+	const int palno = (tile_index >> 5 & 0xf) ^ 7;
+	tileinfo.set(2, tileno, palno, 0);
 }
 
 
@@ -470,7 +471,7 @@ static INPUT_PORTS_START( fcombat )
 	PORT_DIPSETTING(    0x08, "20000" )
 	PORT_DIPSETTING(    0x10, "30000" )
 	PORT_DIPSETTING(    0x18, "40000" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
@@ -482,10 +483,11 @@ static INPUT_PORTS_START( fcombat )
 
 	PORT_START("DSW1")      // dip switches/VBLANK (0xe200)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )      // related to vblank
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
@@ -592,6 +594,7 @@ void fcombat_state::fcombat(machine_config &config)
 	YM2149(config, "ay3", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+
 /*************************************
  *
  *  Driver initialization
@@ -612,6 +615,7 @@ void fcombat_state::init_fcombat()
 	/* decode the characters
 	   the bits in the ROM are ordered: n8-n7 n6 n5 n4-v2 v1 v0 n3-n2 n1 n0 h2
 	   we want them ordered like this:  n8-n7 n6 n5 n4-n3 n2 n1 n0-v2 v1 v0 h2 */
+
 	for (u32 oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		u32 newaddr = ((oldaddr     ) & 0x1f00) |       // keep n8-n4
