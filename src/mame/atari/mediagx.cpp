@@ -223,6 +223,9 @@ private:
 	void mediagx_map(address_map &map);
 	void ramdac_map(address_map &map);
 
+	// TODO remove once done with debugging...
+	void update_debug_controls();
+
 	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask)
 	{
 		//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
@@ -252,7 +255,7 @@ private:
 	required_device<palette_device> m_palette;
 	uint8_t m_pal[768];
 
-	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
+	optional_ioport_array<11> m_ports;   // but parallel_pointer takes values 0 -> 23
 
 	uint32_t m_disp_ctrl_reg[256/4]{};
 	int m_frame_width = 0;
@@ -660,20 +663,95 @@ uint16_t mk_parport_outval(uint8_t v) {
 	return v2 << 8;
 }
 
-//#define READ_0x1_TEST 1
+// #define READ_0x1_TEST 1
 // #define READ_0x18_TEST 1
 // #define READ_0x2_TEST 1
 // #define READ_0x3_TEST 1
 // #define READ_0x4_TEST 1
-// #define READ_0x5_TEST 1 
+// #define READ_0x5_TEST 1  // gone...
 // #define READ_0x6_TEST 1
 //#define READ_0xFF_TEST 1
 
 // for the very end, as if all were switched on, overrides all values as well
 //#define READ_BLANKET_TEST 1
 
+// used for controlling 0xFF stuff
 bool lock = false;
 int parallelPointMark = 10;
+int parPointerOutVal = 0x5;
+
+// used for controlling other read stuff
+bool lock2 = false;
+int readSectionPointer = 0;
+uint32_t readSectionNames[7] = {0x10,0x18,0x20,0x30,0x40,0x50,0x60};
+uint32_t readSectionValues[7] = {0,0,0,0,0,0,0};
+
+void mediagx_state::update_debug_controls() {
+	// Have to move thse controls to something else, since the current setup is kinda odd.
+	// MODIFYING LOGIC START
+	uint32_t mp3 = m_ports[3].read_safe(0);
+	if(mp3 == 0x1 && !lock) {
+		// bump 'down' & lock
+		parallelPointMark--;
+		printf("Mark down to %d\n", parallelPointMark);
+		lock = true;
+		
+	} else if(mp3 == 0x2 && !lock) {
+		// bump 'up' & lock
+		parallelPointMark++;
+		printf("Mark up to %d\n", parallelPointMark);
+		lock = true;
+
+	} else if(mp3 == 0x4 && !lock) {
+		// bump par pointer out val up
+		parPointerOutVal++;
+		printf("ParPointer outval up to %08x\n", parPointerOutVal);
+		lock = true;
+
+	} else if(mp3 == 0x8 && !lock) {
+		// bump par pointer out val DOWN
+		parPointerOutVal--;
+		printf("ParPointer outval down to %08x\n", parPointerOutVal);
+		lock = true;
+
+	} else if(mp3 == 0) {
+		// unlock
+		lock = false;
+
+	}
+
+	// allow controlling other things with the 'joystick controls'
+	uint32_t mp4 = m_ports[4].read_safe(0);
+	if(mp4 == 0x1 && !lock2) {
+		readSectionPointer = readSectionPointer == 6 ? 6 : readSectionPointer+1;
+		printf("Read Section Pointer UP to %08x\n", readSectionNames[readSectionPointer]);
+		lock2 = true;
+
+	} else if(mp4 == 0x2 && !lock2) {
+		readSectionPointer = readSectionPointer == 0 ? 0 : readSectionPointer-1;
+		printf("Read Section Pointer DOWN to %08x\n", readSectionNames[readSectionPointer]);
+		lock2 = true;
+
+	} else if(mp4 == 0x4 && !lock2) {
+		readSectionValues[readSectionPointer]--;
+		printf("Read Section Value at %08x DOWN to %08x\n", readSectionNames[readSectionPointer], readSectionValues[readSectionPointer]);
+		lock2 = true;
+
+	} else if(mp4 == 0x8 && !lock2) {
+		readSectionValues[readSectionPointer]++;
+		printf("Read Section Value at %08x UP to %08x\n", readSectionNames[readSectionPointer], readSectionValues[readSectionPointer]);
+		lock2 = true;
+
+	} else if(mp4 == 0) {
+		lock2 = false;
+
+	}
+
+	// MODIFYING LOGIC STOP
+}
+
+// bool triggerLocked = false;
+// uint8 lockedVal = 0;
 
 // Reads from the parallel port, seems to hit what we're looking for?
 // 'offset' seems to be nearly constant in this case
@@ -682,21 +760,8 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
-	uint32_t mp00 = m_ports[0].read_safe(0);
-	if(mp00 == 0x4 && !lock) {
-		// bump 'down' & lock
-		parallelPointMark--;
-		printf("Mark down to %d\n", parallelPointMark);
-		lock = true;
-	} else if(mp00 == 0x8 && !lock) {
-		// bump 'up' & lock
-		parallelPointMark++;
-		printf("Mark up to %d\n", parallelPointMark);
-		lock = true;
-	} else if(mp00 == 0) {
-		// unlock
-		lock = false;
-	}
+	// TODO, updates debug controls that override how later controls works
+	update_debug_controls();
 
 	// ACCESSING_BITS_8_15 is a synonym for the following
 	// ((mem_mask & 0x0000ff00U) != 0)
@@ -709,7 +774,7 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 		//uint8_t nibble = m_parallel_latched;
 		//r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
 
-		logerror("%08X:parallel_port_r()\n", m_maincpu->pc());
+		//logerror("%08X:parallel_port_r()\n", m_maincpu->pc());
 
 		uint32_t mp0 = 0;
 		uint8_t upperReg = m_parport_control_reg >> 4;
@@ -719,180 +784,128 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// not really, was just testing here too
 			#ifdef READ_0x1_TEST
 			mp0 = m_ports[0].read_safe(0);
-			r |= mk_parport_outval(mp0 >> 8);
-
+			r = mk_parport_outval(mp0 >> 8);
 			#else
-			r |= mk_parport_outval(0);
-
+			r = mk_parport_outval(0);
 			#endif
 
+			// TODO Try section value
+			if(readSectionValues[0] != 0) { r = mk_parport_outval(readSectionValues[0]); }
+
 		} else if(m_parport_control_reg == 0x18) {
-			// Reset internal pointer to 0
-			// read from port 0
-			//r |= m_ports[0]->read() << 8;
 			// Check for F2 to open the system menu
 			// TEST MODE switch, only works here on 0x18
 			mp0 = m_ports[0].read_safe(0);
 
 			#ifdef READ_0x18_TEST
-			r |= mk_parport_outval(mp0 >> 0x8);
+			r = mk_parport_outval(mp0 >> 0x8);
 
 			#else
 
 			if(mp0 & 1) {
 				// accounts for inverted upper bit
-				r |= 0x9000;
+				r = 0x9000;
 			} else {
-
 				// default response...must be retained unless all cases are handled
-				r |= mk_parport_outval(0);
+				r = mk_parport_outval(0);
 			}
-
-			#endif
-
 			// don't really think this part helps, but keeping just in case...(historical)
 			// else {
 			// 	r |= mk_parport_outval(mp0 >> 8);
 			// }
 
-			// testing w/ certain 0xFF modes changing things up
-			//uint8_t nibble = m_parallel_latched;
-			//r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
+			#endif
+
+			// TODO Try section value
+			if(readSectionValues[1] != 0) { r = mk_parport_outval(readSectionValues[1]); }
 
 		} else if(upperReg == 0x2) {
-			// TODO OLD
-			// read from port 1
-			//r |= m_ports[1]->read() << 8;
-
+			// Obs: this value fluctuates on the low-bit, not sure what it does yet...
 			#ifdef READ_0x2_TEST
 			mp0 = m_ports[0].read_safe(0);
 			r |= mk_parport_outval(mp0 >> 0x8);
 			#else
-			// default response...must be retained unless all cases are handled
-			r |= mk_parport_outval(0);
+			// July 17th, 2022. BILL control is 'on' when this is on...may also be TEST and TILT
+			// TILT, TEST, X, BILL... 3rd option is unused, and BILL is inverted by the way
+			uint8_t mp2 = m_ports[2].read_safe(0);
+			r = mk_parport_outval(mp2);
 			#endif
+
+			// TODO Try section value
+			if(readSectionValues[2] != 0) { r = mk_parport_outval(readSectionValues[2]); }
 
 		} else if(upperReg == 0x3) {
-			// TODO OLD
-			// read from port 2
-			//r |= m_ports[2]->read() << 8;
+			// COINS
+			// Obs: this value flucuates on the low-bit, not sure what it does yet...
+
+			mp0 = m_ports[0].read_safe(0);
 
 			#ifdef READ_0x3_TEST
-			mp0 = m_ports[0].read_safe(0);
-			r |= mk_parport_outval(mp0 >> 0x8);
-
+			r = mk_parport_outval(mp0 >> 0x8);
 			#else
-			// default response...must be retained unless all cases are handled
-			r |= mk_parport_outval(0);
-
+			// Appears to be coins, which are a nibble up, and negated inversely
+			// This toggles the appropriate coin switches 1-4, but does not actually cause a credit to show up starngely.
+			// Instead we rely on 0x6 to actually put coins in, and this to toggle the switch correctly...strange stuff
+			r = mk_parport_outval((mp0 & 0xf0) >> 4 ^ 0xe);
 			#endif
+
+			// TODO Try section value
+			if(readSectionValues[3] != 0) { r = mk_parport_outval(readSectionValues[3]); }
 
 		} else if(upperReg == 0x4) {
-			// TODO coin counters coming back on this...but interestingly not needed to update coins
-			// (fixed) this leads to Coin Duplication...but fixed w/ mark below
-			// VOLUME OR Gun trigger controls UP/DOWN somewhere on this somehow...very interesting
-			// 		vol value moves on its own w/out doing anything
-			/*
-			- ???? Volume Up / Down
-			- ???? Guncon shoot (unlikely) ???
-			It's very likely to be the 1st, unlikely, but possible, to be the 2nd
-			*/
-			mp0 = m_ports[0].read_safe(0);
-
+			// SVC (service credits 1 + 2), and Audio controls
+			uint32_t mp1 = m_ports[1].read_safe(0);
 
 			#ifdef READ_0x4_TEST
-			// test value regardless of the 
-			r = mk_parport_outval(mp0 >> 0x8);
-
+			r = mk_parport_outval(mp1 >> 0x8);
 			#else
-
-			// to avoid coin duplication
-			if (mp0 & 0x100 && !(mp0 & 0x400)) {
-				mp0 ^= 0x100;
-			}
-
-			// NOTE: it seems that volume change works like so:
-			// (+) Nothing pressed (i.e. 0x0) results in volume Up
-			// ( ) 4 pressed results in nothing pressed, no volume change
-			// (-) 3 + 4 pressed results in volume down
-			// TODO: maybe adjust this so key '4' is pressed at all times here.
-
-			r |= mk_parport_outval(mp0 >> 0x8);
-
+			// Service Credits 1 + 2, along with Volume controls.
+			// Bit 4 has to be inverted (0x8), active low, done in inputs already
+			r = mk_parport_outval(mp1);
 			#endif
+
+			// TODO Try section value
+			if(readSectionValues[4] != 0) { r = mk_parport_outval(readSectionValues[4]); }
 
 		} else if(upperReg == 0x5) {
 			// > START BUTTONS!
 			// TODO Can control watchdogged outputs here I think, kickers,
-
-			// was messing around w/ reading from port 2
-			//r |= m_ports[2]->read() << 8;
-			
-			// (fixed) Adding this in causes duplicate coin insertions and the like, but keeping it for now just in case it's doing something else too (it is, volume stuff)
-			// Volume Menu Select button? (i.e. impacts whether we can select a menu option or not, along with 0xF)
-			// 		> INTERESTING, since his should just be the start button, signals this is important in another way here maybe
-			//		> i.e., this may be a guncon or P1/P2 start helper, or even a controller
-			/*
-			- P1 Start Button
-			- ??? P2 Start Button somewhere here as well
-			*/
+			// P1 - P4 start buttons
+			// All start buttons lead to guncon movements being registered, but in a different fashion?
 			mp0 = m_ports[0].read_safe(0);
-
-			#ifdef READ_0x5_TEST
-			// TODO, running this test gives us direct 1 + 2 start button control mapping, interesting
 			r = mk_parport_outval(mp0 >> 0x8);
 
-			#else
-
-			// to avoid coin duplication
-			// but no coin duplication, how does this work now?
-			if (mp0 & 0x100 && !(mp0 & 0x400)) {
-				mp0 ^= 0x100;
-			}
-
-			r |= mk_parport_outval(mp0 >> 0x8);
-
-			#endif
+			// TODO Try section value
+			if(readSectionValues[5] != 0) { r = mk_parport_outval(readSectionValues[5]); }
 
 		} else if(m_parport_control_reg == 0x60) {
-			// TODO Reset watchdogs?
-
-			// this might be nice to try down here?
-			// uint8_t nibble = m_parallel_latched;
+			// Reset watchdogs?
 
 			// r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
 			// this code here is not important, or at least that seems to be the case
-			//r |= mk_parport_outval(mp0 >> 0x8);
 
 			// coins & coin tracker only tripped together under 0x60
 			mp0 = m_ports[0].read_safe(0);
 
 			#ifdef READ_0x6_TEST
 			r = mk_parport_outval(mp0 >> 0x8);
-
 			#else
-
 			// keeping 0xf0 as the bitmask pushes the coin insertion to keys 5-8, which is desirable
 			if(mp0 & 0xf0) {
-			
-			// this changes coin insertion to show up on 1-5, but it doesn't block the mode interestingly enough
-			// would need to use it w/ 'mp0 >> 0x8' read below, instead of 0x1 read
-			// if(mp0) {
+				// this changes coin insertion to show up on 1-5, but it doesn't block the mode interestingly enough
 				// drop a coin in
-				r |= mk_parport_outval(0x1);
-
-				// for testing...
-				// r |= mk_parport_outval(mp0 >> 0x8);
+				// This actually inserts a coin, but does not toggle the 'coin' switch
+				r = mk_parport_outval(0x1);
 			}
 
 			#endif
 
+			// TODO Try section value
+			if(readSectionValues[6] != 0) { r = mk_parport_outval(readSectionValues[6]); }
+
 		} else if(upperReg == 0xF) {
 			// TODO Internal pointer advance?
 			mp0 = m_ports[0].read_safe(0);
-
-			// i suspect this is the culprit...nope, not the case
-			//r |= mk_parport_outval(mp0 >> 0x8);
 
 			#ifdef READ_0xFF_TEST
 			// test value regardless of the par pointer state 
@@ -910,24 +923,28 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// Combination of keys [1] and [3] held will lead this to do 'something', but only for the following range of 10-12, 9 too?
 			
 			// only need the one 'f' since we're just getting a nibble back I believe...not a lot of info, but yeah that's kinda how it works.
-			if(mp0 & 0xf00 && m_parallel_pointer == parallelPointMark) {
+
+			// July 30th, Note, m_parallel_pointer ranges from 0x1 -> 0x17 (1 - 23)
+			// Oct. 13th, 2022: Removed this from IF below:: mp0 & 0xf00 && 
+			// TODO this mp0 & 0xf00 removal makes coin insertion a double tap?
+			// TODO also removes 'debug' menu feature
+			// (mp0 & 0xf00) && 
+			if (m_parallel_pointer == parallelPointMark) {
 				// Range of 10 is very important, w/out it, and w/out the below, a number of components (like volume menu access & start button pressing) don't work
 				// there's a lot at play here
 				/*
 				- Allows volume menu select
 				- Allows P1 Start Button to be pressed (likely P2 start as well)
-
 				Upper controls are co-dependent on this here as well...interesting
 				*/
-				//printf("%08x\n", mp0 >> 0x8);
 				// TODO disabled for just a moment...
 				//r |= mk_parport_outval(mp0 >> 0x8); // was 0x5
 
 				// ENABLES P2 Start as well as P1 start and allows some basic controls as such
 				// TODO, was 0x5, but fixing this is NOT correct...trying other things here
-				r |= mk_parport_outval(0x5);
+				r = mk_parport_outval(parPointerOutVal);
 
-				// P2 START is TRIGGERED here when 0x5 is set, in fact so is P1 (when (mp0 & 0xf00 && m_parallel_pointer == 10) === true)
+				// P2 START is TRIGGERED here when 0x5 is set, in fact so is P1 (when (mp0 & 0xf00 && m_parallel_pointer == 10) == true)
 				/*
 				r |= mk_parport_outval(0x5);
 				...
@@ -935,17 +952,206 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 				2 + 3 = P2 start
 				...
 				during the game
-				1 + 3 = Fire special weapon, weird...seems to by cycling still
+				1 + 3 = Fire special weapon, weird...seems to be cycling still
 				*/
+			} else {
+				// @montymxb Using this fixes most of the 'extra' switches being closed unnecessarily, which is great!
+				// July 17th, 2022, no longer causes problems with coins showing up. Might disregard the point below then VVV.
+				r = mk_parport_outval(0);
+			}
+
+
+			if (m_parallel_pointer == 11) {
+				// TRIGGERS (1 & 2)
+				// 0x1 = P1 Trigger
+				// 0x2 = P2 Trigger
+				uint8_t mp7 = m_ports[7].read_safe(0);
+				r = mk_parport_outval(mp7);
+				// TODO remove this and restore the 2 lines above
+				// r = mk_parport_outval(rand() % 2);
+
+			} else if (m_parallel_pointer == 2) {
+				// EXTRA CASE FOR MENU NAVIGATION
+				// TODO @montymxb Oct. 3rd, 2022, see below..
+				// TODO hack, using volume controls to drive P1UP / P1DN to make navigation easier
+				// Though the above was controlling analog gun controls, appears to be not the case
+				uint8_t mp1 = m_ports[1].read_safe(0);
+				r = mk_parport_outval((mp1 >> 2) ^ 0x2);
+
+			}
+
+			int16_t mp5;
+			int8_t mp6;
+
+			//bool triggerPulled = m_ports[7].read_safe(0) & 0x1;
+
+			// JGun Analog Controls
+			switch (m_parallel_pointer) {
+				case 12:
+					// P1 control select (but P2 as well?)
+					// 0x1 allows P1 gun (but P2 already works...hmmm)
+					// 0x2, nothing?
+					// 0x4, nothing?
+					// 0x8, nothing?
+					r = mk_parport_outval(0x1);
+					break;
+				case 13:
+					// P1, Y (LOW)
+					// 0x1 = 1 
+					// 0x2 = 2
+					// 0x4 = 4
+					// 0x8 = 8
+					// convert mouse Y
+					mp6 = int(float(m_ports[6].read_safe(0)) / 255.0 * 248.0);
+					mp6 = 124 - mp6;
+					r = mk_parport_outval(mp6 & 0xf);
+					break;
+				case 14:
+					// P1, Y, (HIGH)
+					// 0x1 = 16
+					// 0x2 = 32
+					// 0x4 = -64 (using this inverted approach, needs to be fixed?)
+					// 0x8 = +128
+					mp6 = int(float(m_ports[6].read_safe(0)) / 255.0 * 248.0);
+					mp6 = 124 - mp6;
+					if (mp6 >= 0 && mp6 < 64) {
+						// 2/4
+						r = mk_parport_outval(((mp6 >> 4) & 0x3));
+
+					} else if (mp6 <= -64) {
+						// 4/4
+						r = mk_parport_outval(((mp6 >> 4) & 0x3) | 0x8);
+
+					} else if (mp6 < 0) {
+						// 3/4
+						r = mk_parport_outval(((mp6 >> 4) & 0x3) | 0x4);
+
+					} else if (mp6 >= 64) {
+						// 1/4
+						r = mk_parport_outval(((mp6 >> 4) & 0x3) | 12);
+
+					}
+					break;
+				case 15:
+					// P1, Y (single high bit)
+					// 0x1 = -256
+					// 0x2 = ???
+					// 0x4 = ???
+					// 0x8 = ???
+					mp6 = int(float(m_ports[6].read_safe(0)) / 255.0 * 248.0);
+					// mp6 = 124 - mp6;
+					if (mp6 >= 0 || mp6 <= -64) {
+						r = mk_parport_outval(0x1);
+					}
+					break;
+				case 16:
+					// P1 X (LOW)
+					// 0x1 sets 0x2 as 1, otherwise 0x4 is 1? ** important to set
+					// 0x2 == 1
+					// 0x4 == 2
+					// 0x8 == 4
+					//r = mk_parport_outval(0x1);
+					// mp5 = m_ports[5].read_safe(0);
+					// r = mk_parport_outval(((mp5 & 0x7) << 1) | 0x1);
+
+					// TODO will need this for 6 bit versus 7 bit number?
+					// 32 vs 64...okay
+
+					mp5 = int(float(m_ports[5].read_safe(0)) / 255.0 * 768.0) % 256;
+					// r = mk_parport_outval(((mp5 & 0xe)) | 0x1);
+					r = mk_parport_outval(mp5 & 0xf);
+
+
+					// // r = mk_parport_outval(((mp5 & 0x7) >> 1) & 1);
+					// if (mp5 < 64) {
+					// 	r = mk_parport_outval((mp5 & 0x3) << 2);
+					// } else if (mp5 < 296) {
+					// 	r = mk_parport_outval(0x1 | (mp5 & 0x7) << 1);
+					// } else {
+					// 	r = mk_parport_outval((mp5 & 0x3) << 2);
+					// }
+					// r = mk_parport_outval(rand() % 16);
+					break;
+				case 17:
+					// P1 X (Low + High)
+					// 0x1 == 8
+					// 0x2 == 16
+					// 0x4 == 32
+					// 0x8 == 63 ** (not 64 for some reason?)
+
+					// mp5 = int(float(m_ports[5].read_safe(0)) / 255.0 * 720.0) % 120;
+					// if (mp5 < 64) {
+					// 	r = mk_parport_outval((mp5 & 0b111100) >> 2);
+					// } else if (mp5 < 296) {
+					// 	r = mk_parport_outval((mp5 & 0b11110) >> 1);
+					// } else {
+					// 	r = mk_parport_outval((mp5 & 0b111100) >> 2);
+					// }
+					// r = mk_parport_outval(((mp5 & 0x78) >> 3));
+
+					mp5 = int(float(m_ports[5].read_safe(0)) / 255.0 * 768.0) % 256;
+					r = mk_parport_outval((mp5 >> 4) & 0xf);
+
+					// r = mk_parport_outval(rand() % 16);
+					break;
+				case 18:
+					// P1, X (HH)
+					// 0x1 = 2nd 3rd
+					// 0x2 = last 3rd
+					// 0x4 nothing..
+					// 0x8 nothing..
+
+					mp5 = int(float(m_ports[5].read_safe(0)) / 255.0 * 384.0);
+					if (mp5 > 256) {
+						r = mk_parport_outval(0x2);
+					} else if (mp5 > 128) {
+						r = mk_parport_outval(0x1);
+					}
+					break;
+				case 19:
+					// P2, Y (low 4 bits)
+					// 0x1 = -1
+					// 0x2 = -2
+					// 0x4 = -4
+					// 0x8 = -8?
+					//r = mk_parport_outval(0x8);
+					break;
+				case 20:
+					// P2, Y (high 4 bits)
+					// 0x1 = -16
+					// 0x2 = -32
+					// 0x4 = -64
+					// 0x8 = -128
+					// r = mk_parport_outval(0x8);
+					break;
+				case 21:
+					// P2, Y (high single bit)
+					// 0x1 = -256
+					// 0x2 = ??? (nothing)
+					// 0x4 = ??? (nothing)
+					// 0x8 = ??? (nothing)
+					// r = mk_parport_outval(0x8);
+					break;
+				case 22:
+					// ??????
+					// 0x1 = ??? (nothing)
+					// 0x2 = ??? (nothing)
+					// 0x4 = ??? (nothing)
+					// 0x8 = ??? (nothing)
+					// r = mk_parport_outval(0x8);
+					break;
+				case 23:
+					// ??????
+					// 0x1 = ??? (nothing)
+					// 0x2 = ??? (nothing)
+					// 0x4 = ??? (nothing)
+					// 0x8 = ??? (nothing)
+					// r = mk_parport_outval(0x8);
+					break;
 			}
 
 			#endif 
 
-			// @montymxb, June 5th, 2022
-			// TODO Having this extra default response for 0xFF commands causes coins not to work...possibly other parts as well, but not sure why
-			//else {
-			// 	r |= mk_parport_outval(0);
-			// }
 
 		} else if(upperReg == 0x0) {
 			// TODO some empty data written on start
@@ -974,12 +1180,12 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 		// TODO trying some random bouncing on controls too
 		//r |= ((rand() % 0x100)) ^ 0x0b0000;
 		// standard ctrl read, return what was set before
-		r |= (m_parport & 0xff0000) ^ 0x0b0000;
+		r = (m_parport & 0xff0000) ^ 0x0b0000;
 
 	} else if(ACCESSING_BITS_0_7) {
 		// Reading DATA
 		// only happens on boot, just return what was written to the parport before, if anything
-		r |= m_parport & 0xff;
+		r = m_parport & 0xff;
 
 	}
 
@@ -1016,7 +1222,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 		        7x..ff = advance pointer
 		*/
 
-		logerror("%08X:", m_maincpu->pc());
+		//logerror("%08X:", m_maincpu->pc());
 
 		// Using the parallel pointer, we read in some data, probably w/ no offset.
 		// THEN, we take that same data, and shift if right by 4 * (the remainder of 3 on the parallel pointer)
@@ -1325,12 +1531,11 @@ GFXDECODE_END
 static INPUT_PORTS_START(mediagx)
 	PORT_START("IN0")
 	// activates the debug service menu
-	PORT_SERVICE_NO_TOGGLE( 0x001, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
-	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
-	// TODO NO volume up button! Just volume down???
-	//PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_VOLUME_UP)
+	PORT_SERVICE_NO_TOGGLE( 0x1, IP_ACTIVE_HIGH )
+	// removed the following, to put all 4 on a separate port
+	// PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	// PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
+	// PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
 
 	/*
 	- CREDIT
@@ -1348,11 +1553,95 @@ static INPUT_PORTS_START(mediagx)
 	- JGUN 2 ?
 	*/
 
+	/*
+	July 30th, recommended layout in the future
+
+	INPUT 0:
+	- Coin 1
+	- Coin 2
+	- Coin 3
+	- Coin 4
+
+	INPUT 1:
+	- Tilt
+	- Test (not sure if I've ever hit this before actually?)
+	- XXXX
+	- Bill
+
+	INPUT 2:
+	- SVC 	(service credit 1)
+	- SVC2  (service credit 2)
+	- VOL -
+	- VOL +
+
+	INPUT 3:
+	- P1ST
+	- P2ST
+	- P3ST
+	- P4ST
+
+	INPUT 4:
+	- P1UP
+	- P1DN
+	- P1LT
+	- P1RT
+
+	INPUT 5:
+	- P1A1
+	- P1A2
+	- P1A3
+	- P1A4
+
+	INPUT 6:
+	- P2UP
+	- P2DN
+	- P2LT
+	- P2RT
+
+	INPUT 7:
+	- P2A1
+	- P2A2
+	- P2A3
+	- P2A4
+
+	INPUT 8:
+	- P3UP
+	- P3DN
+	- P3LT
+	- P3RT
+
+	INPUT 9:
+	- P3A1
+	- P3A2
+	- P3A3
+	- P3A4
+
+	INPUT 10:
+	- P4UP
+	- P4DN
+	- P4LT
+	- P4RT
+
+	INPUT 11:
+	- P4A1
+	- P4A2
+	- P4A3
+	- P4A4
+
+	INPUT 12:
+	- P1 TRIG
+	- P2 TRIG
+	- XXXX
+	- XXXX
+	*/
+
+	// Coins
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_COIN4 )
 
+	// Start buttons
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x400, IP_ACTIVE_HIGH, IPT_START3 )
@@ -1361,19 +1650,17 @@ static INPUT_PORTS_START(mediagx)
 	// 'Light' Gun X & Y idea pulled from Carnevil's implementation using the Seattle Driver
 	PORT_START("JGUN0_X") //fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
-
 	PORT_START("JGUN0_Y") //fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	// PORT_START("JGUN1_X") //fake analog X
-	// PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
-	//
-	// PORT_START("JGUN1_Y") //fake analog Y
-	// PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_START("JGUN1_X") //fake analog X
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_START("JGUN1_Y") //fake analog Y
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("FAKE") // fake switches
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
-	//PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
+	PORT_START("JGUN") // fake switches
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
 
 	/*
 	EXAMPLE from redclash.cpp driver for DIPs,
@@ -1403,47 +1690,61 @@ static INPUT_PORTS_START(mediagx)
 	PORT_DIPSETTING(    0x40, "7" )
 	*/
 
+	// Service 1 + 2 & Volume controls
 	PORT_START("IN1")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_SERVICE2 )
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
+	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 
+	// Tilt, Test, UNUSED, Bill
 	PORT_START("IN2")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT(0x1, IP_ACTIVE_HIGH, IPT_TILT);
+	PORT_BIT(0x2, IP_ACTIVE_HIGH, IPT_SERVICE); // is this 'test' switch service mode?
+	PORT_BIT(0x4, IP_ACTIVE_HIGH, IPT_UNUSED); // unused
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_BILL1);
 
+	// ZX CV, for debugging
 	PORT_START("IN3")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON8 )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON8 )
 
+	// BN M, for debugging
 	PORT_START("IN4")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON10 )
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON11 )
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON12 )
 
+	// JGun0 X
 	PORT_START("IN5")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
+	// JGun0 Y
 	PORT_START("IN6")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
+	
+	// JGun Triggers
 	PORT_START("IN7")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
 
+	// TODO, as needed we can extend a couple more ports for JGun1 x & y
 	PORT_START("IN8")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
 
-	// TODO what's withe 'p' button? why can't we pause/resume the game as normal?
+	// JGun1 X
+	PORT_START("IN9")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	// JGun1 Y
+	PORT_START("IN10")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
 INPUT_PORTS_END
 
 void mediagx_state::machine_start()
