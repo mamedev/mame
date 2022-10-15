@@ -12529,6 +12529,9 @@ digilog400                      //
 @source:skeleton/digijet.cpp
 digijet                         //
 
+@source:skeleton/digitech_gsp5.cpp
+gsp5                            //
+
 @source:skeleton/dim68k.cpp
 dim68k                          //
 
@@ -14064,6 +14067,7 @@ damesc                          //
 @source:fidelity/desdis.cpp
 fdes2000d                       //
 fdes2100d                       //
+fdes2100da                      //
 fdes2265                        //
 fdes2265a                       //
 fdes2325                        //
@@ -20787,6 +20791,7 @@ dynablst                        // (c) 1991 Irem (World)
 dynablstb                       // bootleg
 dynablstb2                      // bootleg
 dynablstb3                      // bootleg
+dynablstb4                      // bootleg
 gussun                          // (c) 1993 Irem (Japan)
 hasamu                          // (c) 1991 Irem (Japan)
 matchit2                        // (c) 1993 Tamtex
@@ -32618,6 +32623,7 @@ clubkcyc                        // 2003.?? Club Kart Cycraft Edition (Rev A)
 clubkcyco                       // 2003.?? Club Kart Cycraft Edition
 clubkprz                        // 2003.?? Club Kart Prize
 clubkpzb                        // 2004.01.23 Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
+clubkpzbp                       // 2004.?? Club Kart Prize Ver. B (prototype)
 clubkrt                         // 2001.06 Club Kart: European Session (Rev D)
 clubkrta                        // 2001.?? Club Kart: European Session (Rev A)
 clubkrtc                        // 2001.?? Club Kart: European Session (Rev C)
@@ -33763,6 +33769,7 @@ airattck                        // (c) 1996 Comad
 airattcka                       // (c) 1996 Comad
 arcadian                        // (c) 1994 NMK
 bigbang                         // UPL-93091 (c) 1993 NMK
+bigbanga                        // UPL-93091 (c) 1993 NMK
 bioship                         // UPL-90062 (c) 1990 UPL + American Sammy license
 bjtwin                          // UPL-93087 (c) 1993 NMK
 bjtwina                         // UPL-93087 (c) 1993 NMK
@@ -42582,7 +42589,8 @@ gulfwar2                        // (c) 1991 Comad
 gulfwar2a                       //
 hishouza                        // B02 / TP-007 (c) 1987 Taito Corporation (Japan)
 hishouzab                       // bootleg
-ktiger                          // B30 / TP-011 (c) 1987 Taito Corporation (Japan)
+ktiger                          // B30 / TP-011 (c) 1989 Taito Corporation (Japan)
+ktigera                         // B30 / TP-011 (c) 1987 Taito Corporation (Japan)
 skyshark                        // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
 skysharka                       // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
 skysharkb                       // bootleg
@@ -44465,6 +44473,7 @@ mu100b                          // 1998 MU-100B
 @source:yamaha/ympsr16.cpp
 psr16                           // 1988 PSR-16
 psr36                           // 1988 PSR-36
+pss480                          // 1988 PSS-480
 pss680                          // 1988 PSS-680
 
 @source:yamaha/ympsr40.cpp

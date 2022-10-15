@@ -2220,4 +2220,16 @@ if opt_tool(FORMATS, "FS_COCO_OS9") then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/lib/formats/fs_isis.h,FORMATS["FS_ISIS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_ISIS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_isis.cpp",
+		MAME_DIR.. "src/lib/formats/fs_isis.h",
+	}
+end
+
 end

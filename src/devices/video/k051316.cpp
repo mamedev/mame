@@ -30,8 +30,9 @@ control registers
 00e     bit 0 = enable ROM reading (active low). This only makes the chip output the
                 requested address: the ROM is actually read externally, not through
                 the chip's data bus.
-        bit 1 = unknown
-        bit 2 = unknown
+        bit 1 = enable tile X flip when tile color attribute bit 6 is set
+        bit 2 = enable tile Y flip when tile color attribute bit 7 is set
+        bits 3-7 = internal tests, shouldn't be used
 00f     unused
 
 */
@@ -39,6 +40,7 @@ control registers
 #include "emu.h"
 #include "k051316.h"
 
+#include <algorithm>
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -104,7 +106,7 @@ GFXDECODE_MEMBER( k051316_device::gfxinfo4_ram )
 GFXDECODE_END
 
 
-k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, K051316, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, m_zoom_rom(*this, DEVICE_SELF)
@@ -114,6 +116,9 @@ k051316_device::k051316_device(const machine_config &mconfig, const char *tag, d
 	, m_pixels_per_byte(2) // 4bpp layout is default
 	, m_layermask(0)
 	, m_k051316_cb(*this)
+	, m_readout_enabled(true)
+	, m_flipx_enabled(false)
+	, m_flipy_enabled(false)
 {
 }
 
@@ -172,11 +177,16 @@ void k051316_device::device_start()
 		m_tmap->map_pens_to_layer(0, m_layermask, m_layermask, TILEMAP_PIXEL_LAYER0);
 	}
 	else
+	{
 		m_tmap->set_transparent_pen(0);
+	}
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ctrlram));
 	save_item(NAME(m_wrap));
+	save_item(NAME(m_readout_enabled));
+	save_item(NAME(m_flipx_enabled));
+	save_item(NAME(m_flipy_enabled));
 
 }
 
@@ -186,7 +196,7 @@ void k051316_device::device_start()
 
 void k051316_device::device_reset()
 {
-	memset(m_ctrlram, 0, 0x10);
+	std::fill(std::begin(m_ctrlram), std::end(m_ctrlram), 0);
 }
 
 /*****************************************************************************
@@ -207,9 +217,9 @@ void k051316_device::write(offs_t offset, u8 data)
 
 u8 k051316_device::rom_r(offs_t offset)
 {
-	assert (m_zoom_rom.found());
+	assert(m_zoom_rom.found());
 
-	if ((m_ctrlram[0x0e] & 0x01) == 0)
+	if (m_readout_enabled)
 	{
 		int addr = offset + (m_ctrlram[0x0c] << 11) + (m_ctrlram[0x0d] << 19);
 		addr /= m_pixels_per_byte;
@@ -228,12 +238,22 @@ u8 k051316_device::rom_r(offs_t offset)
 
 void k051316_device::ctrl_w(offs_t offset, u8 data)
 {
-	m_ctrlram[offset] = data;
+	if (offset == 0x0e)
+	{
+		m_readout_enabled = !BIT(data, 0);
+		if ((m_flipx_enabled != BIT(data, 1)) || (m_flipy_enabled != BIT(data, 2)))
+			m_tmap->mark_all_dirty();
+		m_flipx_enabled = BIT(data, 1);
+		m_flipy_enabled = BIT(data, 2);
+	}
+	else if (offset < 0x0e)
+		m_ctrlram[offset] = data;
+	
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", machine().describe_context(), data, offset);
 }
 
 // some games (ajax, rollerg, ultraman, etc.) have external logic that can enable or disable wraparound dynamically
-void k051316_device::wraparound_enable( int status )
+void k051316_device::wraparound_enable(int status)
 {
 	m_wrap = status;
 }
@@ -248,9 +268,15 @@ TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
 {
 	int code = m_ram[tile_index];
 	int color = m_ram[tile_index + 0x400];
-	int flags = 0;
+	u8 flags = 0;
 
-	m_k051316_cb(&code, &color, &flags);
+	if (m_flipx_enabled && (color & 0x40))
+		flags |= TILE_FLIPX;
+	
+	if (m_flipy_enabled && (color & 0x80))
+		flags |= TILE_FLIPY;
+		
+	m_k051316_cb(&code, &color);
 
 	tileinfo.set(0,
 							code,
@@ -259,9 +285,9 @@ TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
 }
 
 
-void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority )
+void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u32 priority )
 {
-	uint32_t startx, starty;
+	u32 startx, starty;
 	int incxx, incxy, incyx, incyy;
 
 	startx = 256 * ((int16_t)(256 * m_ctrlram[0x00] + m_ctrlram[0x01]));
@@ -283,7 +309,7 @@ void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, con
 			flags, priority);
 
 #if 0
-	popmessage("%02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x",
+	popmessage("%02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x",
 			m_ctrlram[0x00],
 			m_ctrlram[0x01],
 			m_ctrlram[0x02],
@@ -297,8 +323,6 @@ void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, con
 			m_ctrlram[0x0a],
 			m_ctrlram[0x0b],
 			m_ctrlram[0x0c], /* bank for ROM testing */
-			m_ctrlram[0x0d],
-			m_ctrlram[0x0e], /* 0 = test ROMs */
-			m_ctrlram[0x0f]);
+			m_ctrlram[0x0d]);
 #endif
 }

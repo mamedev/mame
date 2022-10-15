@@ -121,6 +121,7 @@ using util::BIT;
 #include "cpu/msm65x2/msm65x2d.h"
 #include "cpu/nanoprocessor/nanoprocessor_dasm.h"
 #include "cpu/nec/necdasm.h"
+#include "cpu/nios2/nios2dasm.h"
 #include "cpu/ns32000/ns32000dasm.h"
 #include "cpu/nuon/nuondasm.h"
 #include "cpu/pace/pacedasm.h"
@@ -533,6 +534,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "msm65x2",         le,  0, []() -> util::disasm_interface * { return new msm65x2_disassembler; } },
 	{ "nanoprocessor",   le,  0, []() -> util::disasm_interface * { return new hp_nanoprocessor_disassembler; } },
 	{ "nec",             le,  0, []() -> util::disasm_interface * { return new nec_disassembler(&nec_unidasm); } },
+	{ "nios2",           le,  0, []() -> util::disasm_interface * { return new nios2_disassembler; } },
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
 	{ "nuon",            be,  0, []() -> util::disasm_interface * { return new nuon_disassembler; } },
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },

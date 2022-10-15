@@ -701,6 +701,9 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 	case gbxfile::TYPE_MBC5:
 		result = slotoptions::GB_MBC5;
 		break;
+	case gbxfile::TYPE_MBC6:
+		result = slotoptions::GB_MBC6;
+		break;
 	case gbxfile::TYPE_MBC7:
 		{
 			// need to probe for EEPROM size

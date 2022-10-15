@@ -822,6 +822,7 @@ skeleton/digiblast.cpp
 skeleton/digijet.cpp
 skeleton/digilog320.cpp
 skeleton/digilog400.cpp
+skeleton/digitech_gsp5.cpp
 skeleton/dim68k.cpp
 skeleton/dm7000.cpp
 skeleton/dmv.cpp
