@@ -15,6 +15,7 @@ TODO:
   a lot of other sprite colors still look bad
   bg: 16 levels, each has a different color. 1st level should be green bg,
   with black at the bottom part
+- cocktail mode doesn't work right
 
 
 PCB Notes:
@@ -54,7 +55,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_bgdata_rom(*this, "bgdata"),
 		m_terrain_rom(*this, "terrain_info"),
-		m_io_in(*this, "IN%u", 0U),
+		m_inputs(*this, "IN%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -77,8 +78,7 @@ private:
 	required_shared_ptr<u8> m_spriteram;
 	required_region_ptr<u8> m_bgdata_rom;
 	required_region_ptr<u8> m_terrain_rom;
-
-	required_ioport_array<2> m_io_in;
+	required_ioport_array<3> m_inputs;
 
 	// video-related
 	tilemap_t *m_bgmap = nullptr;
@@ -252,23 +252,21 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	// draw background
 	m_bgmap->set_scrolly(0, m_fcombat_sh);
-	m_bgmap->set_scrollx(0, m_fcombat_sv - 24);
+	m_bgmap->set_scrollx(0, m_fcombat_sv - 8);
 
 	m_bgmap->mark_all_dirty();
 	m_bgmap->draw(screen, bitmap, cliprect, 0, 0);
-	//draw_background(bitmap, cliprect);
 
 	// draw sprites
 	for (int i = 0; i < m_spriteram.bytes(); i += 4)
 	{
 		const int flags = m_spriteram[i + 0];
-		int y = m_spriteram[i + 1] ^ 255;
+		int y = 256 - m_spriteram[i + 1];
 		int code = m_spriteram[i + 2] + ((flags & 0x20) << 3);
-		int x = m_spriteram[i + 3] * 2 + (flags & 0x01) + 72;
+		int x = m_spriteram[i + 3] * 2 + (flags & 0x01) + 56;
 
 		int xflip = flags & 0x80;
 		int yflip = flags & 0x40;
-		const bool doubled = false;// flags & 0x10;
 		const bool wide = flags & 0x08;
 		int code2 = code;
 
@@ -303,8 +301,6 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		}
 
 		gfx->transpen(bitmap, cliprect, code, color, xflip, yflip, x, y, 0);
-
-		if (doubled) i += 4;
 	}
 
 	// draw the visible text layer
@@ -351,7 +347,8 @@ u8 fcombat_state::protection_r()
 u8 fcombat_state::port01_r()
 {
 	// the cocktail flip bit muxes between ports 0 and 1
-	return m_io_in[m_cocktail_flip ? 1 : 0]->read();
+	u8 start = m_inputs[0]->read() & 0xc0;
+	return (m_inputs[(m_cocktail_flip & 1) + 1]->read() & 0x3f) | start;
 }
 
 
@@ -440,25 +437,25 @@ void fcombat_state::audio_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( fcombat )
-	PORT_START("IN0")      // player 1 inputs (muxed on 0xe000)
+	PORT_START("IN0")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("IN1")      // player 1 inputs (muxed on 0xe000)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN1")      // player 2 inputs (muxed on 0xe000)
+	PORT_START("IN2")      // player 2 inputs (muxed on 0xe000)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW0")      // dip switches (0xe100)
 	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )
