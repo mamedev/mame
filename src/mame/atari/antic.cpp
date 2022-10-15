@@ -354,19 +354,6 @@ void antic_device::device_start()
 	m_pf_gtia2    = &m_cclk_expand[35 * 256];
 	m_pf_gtia3    = &m_cclk_expand[36 * 256];
 
-	m_used_colors = make_unique_clear<uint8_t[]>(37 * 256);
-
-	m_uc_21       = &m_used_colors[ 0 * 256];
-	m_uc_x10b     = &m_used_colors[ 1 * 256];
-	m_uc_3210b    = &m_used_colors[ 3 * 256];
-	m_uc_3210b2   = &m_used_colors[11 * 256];
-	m_uc_210b4    = &m_used_colors[27 * 256];
-	m_uc_210b2    = &m_used_colors[31 * 256];
-	m_uc_1b       = &m_used_colors[33 * 256];
-	m_uc_g1       = &m_used_colors[34 * 256];
-	m_uc_g2       = &m_used_colors[34 * 256];
-	m_uc_g3       = &m_used_colors[36 * 256];
-
 	LOG("atari cclk_init\n");
 	cclk_init();
 
@@ -407,7 +394,6 @@ void antic_device::device_start()
 	save_item(NAME(m_pmbits));
 
 	save_pointer(NAME(m_cclk_expand), 21 * 256);
-	save_pointer(NAME(m_used_colors), 21 * 256);
 
 	/* timers */
 	m_cycle_steal_timer = timer_alloc(FUNC(antic_device::steal_cycles), this);
@@ -1095,128 +1081,6 @@ void antic_device::cclk_init()
 		*dst++ = GT3+(i&15);
 		*dst++ = GT3+(i&15);
 
-	}
-
-	/* setup used color tables */
-	for( i = 0; i < 256; i++ )
-	{
-		/* used colors in text modes 2,3 */
-		m_uc_21[i] = (i) ? PF2 | PF1 : PF2;
-
-		/* used colors in text modes 4,5 and graphics modes D,E */
-		switch( i & 0x03 )
-		{
-			case 0x01: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
-			case 0x02: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
-			case 0x03: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
-		}
-		switch( i & 0x0c )
-		{
-			case 0x04: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
-			case 0x08: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
-			case 0x0c: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
-		}
-		switch( i & 0x30 )
-		{
-			case 0x10: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
-			case 0x20: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
-			case 0x30: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
-		}
-		switch( i & 0xc0 )
-		{
-			case 0x40: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
-			case 0x80: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
-			case 0xc0: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
-		}
-
-		/* used colors in text modes 6,7 and graphics modes 9,B,C */
-		if( i )
-		{
-			m_uc_3210b[0x000+i*2] |= PF0;
-			m_uc_3210b[0x200+i*2] |= PF1;
-			m_uc_3210b[0x400+i*2] |= PF2;
-			m_uc_3210b[0x600+i*2] |= PF3;
-			m_uc_3210b2[0x000+i*4] |= PF0;
-			m_uc_3210b2[0x400+i*4] |= PF1;
-			m_uc_3210b2[0x800+i*4] |= PF2;
-			m_uc_3210b2[0xc00+i*4] |= PF3;
-		}
-
-		/* used colors in graphics mode 8 */
-		switch( i & 0x03 )
-		{
-			case 0x01: m_uc_210b4[i*4] |= PF0; break;
-			case 0x02: m_uc_210b4[i*4] |= PF1; break;
-			case 0x03: m_uc_210b4[i*4] |= PF2; break;
-		}
-		switch( i & 0x0c )
-		{
-			case 0x04: m_uc_210b4[i*4] |= PF0; break;
-			case 0x08: m_uc_210b4[i*4] |= PF1; break;
-			case 0x0c: m_uc_210b4[i*4] |= PF2; break;
-		}
-		switch( i & 0x30 )
-		{
-			case 0x10: m_uc_210b4[i*4] |= PF0; break;
-			case 0x20: m_uc_210b4[i*4] |= PF1; break;
-			case 0x30: m_uc_210b4[i*4] |= PF2; break;
-		}
-		switch( i & 0xc0 )
-		{
-			case 0x40: m_uc_210b4[i*4] |= PF0; break;
-			case 0x80: m_uc_210b4[i*4] |= PF1; break;
-			case 0xc0: m_uc_210b4[i*4] |= PF2; break;
-		}
-
-		/* used colors in graphics mode A */
-		switch( i & 0x03 )
-		{
-			case 0x01: m_uc_210b2[i*2] |= PF0; break;
-			case 0x02: m_uc_210b2[i*2] |= PF1; break;
-			case 0x03: m_uc_210b2[i*2] |= PF2; break;
-		}
-		switch( i & 0x0c )
-		{
-			case 0x04: m_uc_210b2[i*2] |= PF0; break;
-			case 0x08: m_uc_210b2[i*2] |= PF1; break;
-			case 0x0c: m_uc_210b2[i*2] |= PF2; break;
-		}
-		switch( i & 0x30 )
-		{
-			case 0x10: m_uc_210b2[i*2] |= PF0; break;
-			case 0x20: m_uc_210b2[i*2] |= PF1; break;
-			case 0x30: m_uc_210b2[i*2] |= PF2; break;
-		}
-		switch( i & 0xc0 )
-		{
-			case 0x40: m_uc_210b2[i*2] |= PF0; break;
-			case 0x80: m_uc_210b2[i*2] |= PF1; break;
-			case 0xc0: m_uc_210b2[i*2] |= PF2; break;
-		}
-
-		/* used colors in graphics mode F */
-		if( i )
-			m_uc_1b[i] |= PF1;
-
-		/* used colors in GTIA graphics modes */
-		/* GTIA 1 is 16 different luminances with hue of colbk */
-		m_uc_g1[i] = 0x00;
-		/* GTIA 2 is all 9 colors (8..15 is colbk) */
-		switch( i & 0x0f )
-		{
-			case 0x00: m_uc_g2[i] = 0x10; break;
-			case 0x01: m_uc_g2[i] = 0x20; break;
-			case 0x02: m_uc_g2[i] = 0x40; break;
-			case 0x03: m_uc_g2[i] = 0x80; break;
-			case 0x04: m_uc_g2[i] = 0x01; break;
-			case 0x05: m_uc_g2[i] = 0x02; break;
-			case 0x06: m_uc_g2[i] = 0x04; break;
-			case 0x07: m_uc_g2[i] = 0x08; break;
-			default:   m_uc_g2[i] = 0x00;
-		}
-
-		/* GTIA 3 is 16 different hues with luminance of colbk */
-		m_uc_g3[i] = 0x00;
 	}
 }
 
