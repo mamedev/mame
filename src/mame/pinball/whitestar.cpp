@@ -373,7 +373,7 @@ ROM_START(apollo13)
 	ROM_LOAD("apollo13.u36", 0x100000, 0x80000, CRC(cede5e0f) SHA1(fa3b5820ed58e57b3c6185d91e9aea28aebc28d7))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(apollo13_d4)
@@ -395,7 +395,7 @@ ROM_START(apollo13_d4)
 	ROM_LOAD("apollo13.u36", 0x100000, 0x80000, CRC(cede5e0f) SHA1(fa3b5820ed58e57b3c6185d91e9aea28aebc28d7))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(apollo13_20)
@@ -417,7 +417,7 @@ ROM_START(apollo13_20)
 	ROM_LOAD("apollo13.u36", 0x100000, 0x80000, CRC(cede5e0f) SHA1(fa3b5820ed58e57b3c6185d91e9aea28aebc28d7))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(apollo13_10)
@@ -439,7 +439,7 @@ ROM_START(apollo13_10)
 	ROM_LOAD("apollo13.u36", 0x100000, 0x80000, CRC(cede5e0f) SHA1(fa3b5820ed58e57b3c6185d91e9aea28aebc28d7))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -465,7 +465,7 @@ ROM_START(aust301)
 	ROM_LOAD_SND_8M("apsndu37.100", 0x180000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -491,7 +491,7 @@ ROM_START(aust300)
 	ROM_LOAD_SND_8M("apsndu37.100", 0x180000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -517,7 +517,7 @@ ROM_START(aust201)
 	ROM_LOAD_SND_8M("apsndu37.100", 0x180000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -543,7 +543,7 @@ ROM_START(austin)
 	ROM_LOAD_SND_8M("apsndu37.100", 0x180000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(austnew)
@@ -570,7 +570,7 @@ ROM_START(austnew)
 	ROM_LOAD_SND_8M("apsndu37.100", 0x180000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(austinf)
@@ -593,7 +593,7 @@ ROM_START(austinf)
 	ROM_LOAD_SND_8M("apsndu37.100", 0x180000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(austing)
@@ -616,7 +616,7 @@ ROM_START(austing)
 	ROM_LOAD_SND_8M("apsndu37.100", 0x180000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(austini)
@@ -639,7 +639,7 @@ ROM_START(austini)
 	ROM_LOAD_SND_8M("apsndu37.100", 0x180000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -665,7 +665,7 @@ ROM_START(godzillp)
 	ROM_LOAD("gdzu37.100", 0x180000, 0x80000, CRC(2c1acb14) SHA1(4d710e09f5500da937932b4b01d862abb4a89e5a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(godzillp_100)
@@ -688,7 +688,7 @@ ROM_START(godzillp_100)
 	ROM_LOAD("gdzu37.100", 0x180000, 0x80000, CRC(2c1acb14) SHA1(4d710e09f5500da937932b4b01d862abb4a89e5a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(godzillp_090)
@@ -711,7 +711,7 @@ ROM_START(godzillp_090)
 	ROM_LOAD("gdzu37.090", 0x180000, 0x80000, CRC(1410ae6b) SHA1(28d025403fd60b1bb132cffcc14be21be48d808c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -735,7 +735,7 @@ ROM_START(gldneye)
 	ROM_LOAD("bondu21.bin", 0x080000, 0x80000, CRC(5be0f205) SHA1(aaef8f6ee6c8d5ebf08f90368061288adf850a18))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gldneye_402)
@@ -756,7 +756,7 @@ ROM_START(gldneye_402)
 	ROM_LOAD("bondu21.bin", 0x080000, 0x80000, CRC(5be0f205) SHA1(aaef8f6ee6c8d5ebf08f90368061288adf850a18))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -781,7 +781,7 @@ ROM_START(goldcue)
 	ROM_LOAD("gc_sound.u36", 0x100000, 0x80000, CRC(81f27955) SHA1(eba4250898f6de96111232e49d965b78fc6ee2e2))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -807,7 +807,7 @@ ROM_START(harl_a13)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_u13)
@@ -830,7 +830,7 @@ ROM_START(harl_u13)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_a10)
@@ -853,7 +853,7 @@ ROM_START(harl_a10)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_f13)
@@ -876,7 +876,7 @@ ROM_START(harl_f13)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_g13)
@@ -899,7 +899,7 @@ ROM_START(harl_g13)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_i13)
@@ -922,7 +922,7 @@ ROM_START(harl_i13)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_l13)
@@ -945,7 +945,7 @@ ROM_START(harl_l13)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_a30)
@@ -968,7 +968,7 @@ ROM_START(harl_a30)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_f30)
@@ -991,7 +991,7 @@ ROM_START(harl_f30)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_g30)
@@ -1014,7 +1014,7 @@ ROM_START(harl_g30)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_i30)
@@ -1037,7 +1037,7 @@ ROM_START(harl_i30)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_l30)
@@ -1060,7 +1060,7 @@ ROM_START(harl_l30)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_a18)
@@ -1083,7 +1083,7 @@ ROM_START(harl_a18)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_f18)
@@ -1106,7 +1106,7 @@ ROM_START(harl_f18)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_g18)
@@ -1129,7 +1129,7 @@ ROM_START(harl_g18)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_i18)
@@ -1152,7 +1152,7 @@ ROM_START(harl_i18)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_l18)
@@ -1175,7 +1175,7 @@ ROM_START(harl_l18)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_a40)
@@ -1198,7 +1198,7 @@ ROM_START(harl_a40)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_f40)
@@ -1221,7 +1221,7 @@ ROM_START(harl_f40)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_g40)
@@ -1244,7 +1244,7 @@ ROM_START(harl_g40)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_i40)
@@ -1267,7 +1267,7 @@ ROM_START(harl_i40)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(harl_l40)
@@ -1290,7 +1290,7 @@ ROM_START(harl_l40)
 	ROM_LOAD("hdvc4.u37", 0x180000, 0x080000, CRC(a1bc39f6) SHA1(25af40cb3d8f774e1e37cbef9166e41753440460))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1316,7 +1316,7 @@ ROM_START(hirolcas)
 	ROM_LOAD_SND_8M("hrsndu37.100", 0x180000, CRC(d4d23c00) SHA1(c574dc4553bff693d9216229ce38a55f69e7368a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(hirolcas_210)
@@ -1339,7 +1339,7 @@ ROM_START(hirolcas_210)
 	ROM_LOAD_SND_8M("hrsndu37.100", 0x180000, CRC(d4d23c00) SHA1(c574dc4553bff693d9216229ce38a55f69e7368a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(hironew)
@@ -1366,7 +1366,7 @@ ROM_START(hironew)
 	ROM_LOAD("hrsndu37.100", 0x300000, 0x100000, CRC(d4d23c00) SHA1(c574dc4553bff693d9216229ce38a55f69e7368a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(hirolcat)
@@ -1389,7 +1389,7 @@ ROM_START(hirolcat)
 	ROM_LOAD_SND_8M("hrsndu37.100", 0x180000, CRC(d4d23c00) SHA1(c574dc4553bff693d9216229ce38a55f69e7368a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(hirol_fr)
@@ -1412,7 +1412,7 @@ ROM_START(hirol_fr)
 	ROM_LOAD_SND_8M("hrsndu37.100", 0x180000, CRC(d4d23c00) SHA1(c574dc4553bff693d9216229ce38a55f69e7368a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(hirol_gr)
@@ -1435,7 +1435,7 @@ ROM_START(hirol_gr)
 	ROM_LOAD_SND_8M("hrsndu37.100", 0x180000, CRC(d4d23c00) SHA1(c574dc4553bff693d9216229ce38a55f69e7368a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(hirol_gr_210)
@@ -1458,7 +1458,7 @@ ROM_START(hirol_gr_210)
 	ROM_LOAD_SND_8M("hrsndu37.100", 0x180000, CRC(d4d23c00) SHA1(c574dc4553bff693d9216229ce38a55f69e7368a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(hirol_it)
@@ -1481,7 +1481,7 @@ ROM_START(hirol_it)
 	ROM_LOAD_SND_8M("hrsndu37.100", 0x180000, CRC(d4d23c00) SHA1(c574dc4553bff693d9216229ce38a55f69e7368a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1505,7 +1505,7 @@ ROM_START(id4)
 	ROM_LOAD("id4sdu21.400", 0x080000, 0x80000, CRC(f384a9ab) SHA1(06bd607e7efd761017a7b605e0294a34e4c6255c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(id4f)
@@ -1526,7 +1526,7 @@ ROM_START(id4f)
 	ROM_LOAD("id4sdu21.400", 0x080000, 0x80000, CRC(f384a9ab) SHA1(06bd607e7efd761017a7b605e0294a34e4c6255c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(id4_201)
@@ -1547,7 +1547,7 @@ ROM_START(id4_201)
 	ROM_LOAD("id4sdu21.400", 0x080000, 0x80000, CRC(f384a9ab) SHA1(06bd607e7efd761017a7b605e0294a34e4c6255c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(id4f_201)
@@ -1568,7 +1568,7 @@ ROM_START(id4f_201)
 	ROM_LOAD("id4sdu21.400", 0x080000, 0x80000, CRC(f384a9ab) SHA1(06bd607e7efd761017a7b605e0294a34e4c6255c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1598,7 +1598,7 @@ ROM_START(lostspc)
 	ROM_LOAD("lisu37.100", 0x180000, 0x80000, CRC(f9430c59) SHA1(f0f7169e63fc12d29fe39cd24dd67c5fb17779f7))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lostspcf)
@@ -1621,7 +1621,7 @@ ROM_START(lostspcf)
 	ROM_LOAD("lisu37.100", 0x180000, 0x80000, CRC(f9430c59) SHA1(f0f7169e63fc12d29fe39cd24dd67c5fb17779f7))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lostspcg)
@@ -1644,7 +1644,7 @@ ROM_START(lostspcg)
 	ROM_LOAD("lisu37.100", 0x180000, 0x80000, CRC(f9430c59) SHA1(f0f7169e63fc12d29fe39cd24dd67c5fb17779f7))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lostspc_d1)
@@ -1667,7 +1667,7 @@ ROM_START(lostspc_d1)
 	ROM_LOAD("lisu37.100", 0x180000, 0x80000, CRC(f9430c59) SHA1(f0f7169e63fc12d29fe39cd24dd67c5fb17779f7))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1696,7 +1696,7 @@ ROM_START(monopolp)
 	ROM_LOAD_SND_8M("mnsndu36.100", 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1721,7 +1721,7 @@ ROM_START(monop303)
 	ROM_LOAD_SND_8M("mnsndu36.100", 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1746,7 +1746,7 @@ ROM_START(monop301)
 	ROM_LOAD_SND_8M("mnsndu36.100", 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1771,7 +1771,7 @@ ROM_START(monop251)
 	ROM_LOAD_SND_8M("mnsndu36.100", 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1796,7 +1796,7 @@ ROM_START(monop233)
 	ROM_LOAD_SND_8M("mnsndu36.100", 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1825,7 +1825,7 @@ ROM_START(mononew)
 	ROM_LOAD("mnsndu36.100", 0x200000, 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1850,7 +1850,7 @@ ROM_START(monopolf)
 	ROM_LOAD_SND_8M("mnsndu36.100", 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1875,7 +1875,7 @@ ROM_START(monopolg)
 	ROM_LOAD_SND_8M("mnsndu36.100", 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1900,7 +1900,7 @@ ROM_START(monopoli)
 	ROM_LOAD_SND_8M("mnsndu36.100", 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1925,7 +1925,7 @@ ROM_START(monopoll)
 	ROM_LOAD_SND_8M("mnsndu36.100", 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1951,7 +1951,7 @@ ROM_START(nfl)
 	ROM_LOAD_SND_8M("nfl_v100.u37", 0x180000, CRC(375d5a99) SHA1(4b49c58968da645bd0ad60ed16744974b863164e))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 
@@ -1978,7 +1978,7 @@ ROM_START(playboys)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboys_401)
@@ -2001,7 +2001,7 @@ ROM_START(playboys_401)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboys_303)
@@ -2024,7 +2024,7 @@ ROM_START(playboys_303)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboys_300)
@@ -2047,7 +2047,7 @@ ROM_START(playboys_300)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboys_203)
@@ -2070,7 +2070,7 @@ ROM_START(playboys_203)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playnew)
@@ -2097,7 +2097,7 @@ ROM_START(playnew)
 	ROM_LOAD("pbsndu37.100", 0x300000, 0x100000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyf)
@@ -2120,7 +2120,7 @@ ROM_START(playboyf)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyf_401)
@@ -2143,7 +2143,7 @@ ROM_START(playboyf_401)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyf_303)
@@ -2166,7 +2166,7 @@ ROM_START(playboyf_303)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyf_300)
@@ -2189,7 +2189,7 @@ ROM_START(playboyf_300)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyf_203)
@@ -2212,7 +2212,7 @@ ROM_START(playboyf_203)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyg)
@@ -2235,7 +2235,7 @@ ROM_START(playboyg)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyg_401)
@@ -2258,7 +2258,7 @@ ROM_START(playboyg_401)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyg_303)
@@ -2281,7 +2281,7 @@ ROM_START(playboyg_303)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyg_300)
@@ -2304,7 +2304,7 @@ ROM_START(playboyg_300)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyg_203)
@@ -2327,7 +2327,7 @@ ROM_START(playboyg_203)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyi)
@@ -2350,7 +2350,7 @@ ROM_START(playboyi)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyi_401)
@@ -2372,7 +2372,7 @@ ROM_START(playboyi_401)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyi_303)
@@ -2395,7 +2395,7 @@ ROM_START(playboyi_303)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyi_300)
@@ -2418,7 +2418,7 @@ ROM_START(playboyi_300)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyi_203)
@@ -2441,7 +2441,7 @@ ROM_START(playboyi_203)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyl)
@@ -2464,7 +2464,7 @@ ROM_START(playboyl)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyl_401)
@@ -2487,7 +2487,7 @@ ROM_START(playboyl_401)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyl_303)
@@ -2510,7 +2510,7 @@ ROM_START(playboyl_303)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyl_300)
@@ -2533,7 +2533,7 @@ ROM_START(playboyl_300)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyl_203)
@@ -2556,7 +2556,7 @@ ROM_START(playboyl_203)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboys_302)
@@ -2579,7 +2579,7 @@ ROM_START(playboys_302)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyl_302)
@@ -2602,7 +2602,7 @@ ROM_START(playboyl_302)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyg_302)
@@ -2625,7 +2625,7 @@ ROM_START(playboyg_302)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyf_302)
@@ -2648,7 +2648,7 @@ ROM_START(playboyf_302)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(playboyi_302)
@@ -2671,7 +2671,7 @@ ROM_START(playboyi_302)
 	ROM_LOAD_SND_8M("pbsndu37.100", 0x300000, CRC(6642524a) SHA1(9d0c0be5887cf4510c11243ee47b11c08cbae17c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -2696,7 +2696,7 @@ ROM_START(rctycn)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycn_701)
@@ -2718,7 +2718,7 @@ ROM_START(rctycn_701)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycn_600)
@@ -2740,7 +2740,7 @@ ROM_START(rctycn_600)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycn_400)
@@ -2762,7 +2762,7 @@ ROM_START(rctycn_400)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctnew)
@@ -2788,7 +2788,7 @@ ROM_START(rctnew)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycng)
@@ -2810,7 +2810,7 @@ ROM_START(rctycng)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycng_701)
@@ -2832,7 +2832,7 @@ ROM_START(rctycng_701)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycng_400)
@@ -2854,7 +2854,7 @@ ROM_START(rctycng_400)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycnf)
@@ -2876,7 +2876,7 @@ ROM_START(rctycnf)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycnf_701)
@@ -2898,7 +2898,7 @@ ROM_START(rctycnf_701)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycnf_600)
@@ -2920,7 +2920,7 @@ ROM_START(rctycnf_600)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycnf_400)
@@ -2942,7 +2942,7 @@ ROM_START(rctycnf_400)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycni)
@@ -2964,7 +2964,7 @@ ROM_START(rctycni)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycni_701)
@@ -2986,7 +2986,7 @@ ROM_START(rctycni_701)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycni_600)
@@ -3008,7 +3008,7 @@ ROM_START(rctycni_600)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycni_400)
@@ -3030,7 +3030,7 @@ ROM_START(rctycni_400)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycnl)
@@ -3052,7 +3052,7 @@ ROM_START(rctycnl)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycnl_701)
@@ -3074,7 +3074,7 @@ ROM_START(rctycnl_701)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycnl_600)
@@ -3096,7 +3096,7 @@ ROM_START(rctycnl_600)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rctycnl_400)
@@ -3118,7 +3118,7 @@ ROM_START(rctycnl_400)
 	ROM_LOAD_SND_8M("rcsndu36.100", 0x100000, CRC(05c8bac9) SHA1(0771a393d5361c9a35d42a18b6c6a105b7752e03))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -3143,7 +3143,7 @@ ROM_START(shrkysht)
 	ROM_LOAD_SND_8M("sssndu36.100", 0x100000, CRC(d22fcfa3) SHA1(3fa407f72ecc64f9d00b92122c4e4d85022e4202))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(shrknew)
@@ -3169,7 +3169,7 @@ ROM_START(shrknew)
 	ROM_LOAD("sssndu36.100", 0x200000, 0x100000, CRC(d22fcfa3) SHA1(3fa407f72ecc64f9d00b92122c4e4d85022e4202))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(shrkygr)
@@ -3191,7 +3191,7 @@ ROM_START(shrkygr)
 	ROM_LOAD_SND_8M("sssndu36.100", 0x100000, CRC(d22fcfa3) SHA1(3fa407f72ecc64f9d00b92122c4e4d85022e4202))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(shrkyfr)
@@ -3213,7 +3213,7 @@ ROM_START(shrkyfr)
 	ROM_LOAD_SND_8M("sssndu36.100", 0x100000, CRC(d22fcfa3) SHA1(3fa407f72ecc64f9d00b92122c4e4d85022e4202))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(shrkyit)
@@ -3235,7 +3235,7 @@ ROM_START(shrkyit)
 	ROM_LOAD_SND_8M("sssndu36.100", 0x100000, CRC(d22fcfa3) SHA1(3fa407f72ecc64f9d00b92122c4e4d85022e4202))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(shrky_207)
@@ -3257,7 +3257,7 @@ ROM_START(shrky_207)
 	ROM_LOAD_SND_8M("sssndu36.100", 0x100000, CRC(d22fcfa3) SHA1(3fa407f72ecc64f9d00b92122c4e4d85022e4202))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(shrkygr_207)
@@ -3279,7 +3279,7 @@ ROM_START(shrkygr_207)
 	ROM_LOAD_SND_8M("sssndu36.100", 0x100000, CRC(d22fcfa3) SHA1(3fa407f72ecc64f9d00b92122c4e4d85022e4202))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(shrkyfr_207)
@@ -3298,7 +3298,7 @@ ROM_START(shrkyfr_207)
 	ROM_LOAD_SND_8M("sssndu36.100", 0x100000, CRC(d22fcfa3) SHA1(3fa407f72ecc64f9d00b92122c4e4d85022e4202))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(shrkyit_207)
@@ -3320,7 +3320,7 @@ ROM_START(shrkyit_207)
 	ROM_LOAD_SND_8M("sssndu36.100", 0x100000, CRC(d22fcfa3) SHA1(3fa407f72ecc64f9d00b92122c4e4d85022e4202))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -3346,7 +3346,7 @@ ROM_START(sprk_103)
 	ROM_LOAD_SND_8M("spku37.100", 0x180000, CRC(7d8f6bcb) SHA1(579cfef19cf9b5c91151ae833bc6c21734589849))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sprk_096)
@@ -3369,7 +3369,7 @@ ROM_START(sprk_096)
 	ROM_LOAD_SND_8M("spku37.090", 0x180000, CRC(0c01b0c7) SHA1(76b5af50514d110b49721e6916dd16b3e3a2f5fa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sprk_090)
@@ -3392,7 +3392,7 @@ ROM_START(sprk_090)
 	ROM_LOAD_SND_8M("spku37.090", 0x180000, CRC(0c01b0c7) SHA1(76b5af50514d110b49721e6916dd16b3e3a2f5fa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -3417,7 +3417,7 @@ ROM_START(spacejam)
 	ROM_LOAD("spcjam.u36", 0x100000, 0x80000, CRC(7f61143c) SHA1(40695d1d14695d3e4991ed39f4a354c16227975e))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(spacejam_200)
@@ -3439,7 +3439,7 @@ ROM_START(spacejam_200)
 	ROM_LOAD("spcjam.u36", 0x100000, 0x80000, CRC(7f61143c) SHA1(40695d1d14695d3e4991ed39f4a354c16227975e))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(spacejmg)
@@ -3461,7 +3461,7 @@ ROM_START(spacejmg)
 	ROM_LOAD("spcjamg.u36", 0x100000, 0x80000, CRC(7d11e1eb) SHA1(96d4635b1edf8a22947a5cd529ce9025cf7d0c71))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(spacejmf)
@@ -3483,7 +3483,7 @@ ROM_START(spacejmf)
 	ROM_LOAD("spcjamf.u36", 0x100000, 0x80000, CRC(7d11e1eb) SHA1(96d4635b1edf8a22947a5cd529ce9025cf7d0c71))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(spacejmi)
@@ -3505,7 +3505,7 @@ ROM_START(spacejmi)
 	ROM_LOAD("spcjami.u36", 0x100000, 0x80000, CRC(7d11e1eb) SHA1(96d4635b1edf8a22947a5cd529ce9025cf7d0c71))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -3529,7 +3529,7 @@ ROM_START(swtril43)
 	ROM_LOAD("sw0211.u21", 0x080000, 0x80000, CRC(6be68450) SHA1(d24652f74b109e47eb5d3d02e04f63c99e92c590))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(swtril41)
@@ -3550,7 +3550,7 @@ ROM_START(swtril41)
 	ROM_LOAD("sw0211.u21", 0x080000, 0x80000, CRC(6be68450) SHA1(d24652f74b109e47eb5d3d02e04f63c99e92c590))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(swtril30)
@@ -3590,7 +3590,7 @@ ROM_START(startrp)
 	ROM_LOAD("u36_95a7.040", 0x100000, 0x80000, CRC(c1e4ca6a) SHA1(487de78ebf1ee8cc721f2ef7b1bd42d2f7b27456))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(startrp2)
@@ -3612,7 +3612,7 @@ ROM_START(startrp2)
 	ROM_LOAD("u36_95a7.040", 0x100000, 0x80000, CRC(c1e4ca6a) SHA1(487de78ebf1ee8cc721f2ef7b1bd42d2f7b27456))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -3638,7 +3638,7 @@ ROM_START(strikext)
 	ROM_LOAD_SND_8M("sxsnda.u37", 0x180000, CRC(4c08c33c) SHA1(36bfad0c59fd228db76a6ff36698edd929c11336))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(strikext_100)
@@ -3661,7 +3661,7 @@ ROM_START(strikext_100)
 	ROM_LOAD_SND_8M("sxsnda.u37", 0x180000, CRC(4c08c33c) SHA1(36bfad0c59fd228db76a6ff36698edd929c11336))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(strknew)
@@ -3688,7 +3688,7 @@ ROM_START(strknew)
 	ROM_LOAD("sxsnda.u37", 0x300000, 0x100000, CRC(4c08c33c) SHA1(36bfad0c59fd228db76a6ff36698edd929c11336))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(strxt_uk)
@@ -3711,7 +3711,7 @@ ROM_START(strxt_uk)
 	ROM_LOAD_SND_8M("sxsnda.u37", 0x180000, CRC(4c08c33c) SHA1(36bfad0c59fd228db76a6ff36698edd929c11336))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(strxt_gr)
@@ -3734,7 +3734,7 @@ ROM_START(strxt_gr)
 	ROM_LOAD_SND_8M("sxsndg.u37", 0x180000, CRC(82260f4b) SHA1(6c2eba67762bcdd01e7b0c1b8b03b91b778444d4))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(strxt_fr)
@@ -3757,7 +3757,7 @@ ROM_START(strxt_fr)
 	ROM_LOAD_SND_8M("sxsndf.u37", 0x180000, CRC(67c0f1de) SHA1(46867403d4b13d18c4ebcc5b042faf3aca165ffb))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(strxt_it)
@@ -3780,7 +3780,7 @@ ROM_START(strxt_it)
 	ROM_LOAD_SND_8M("sxsndi.u37", 0x180000, CRC(4427e364) SHA1(7046b65086aafc4c14793d7036bc5130fe1e7dbc))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(strxt_it_101)
@@ -3803,7 +3803,7 @@ ROM_START(strxt_it_101)
 	ROM_LOAD_SND_8M("sxsndi.u37", 0x180000, CRC(4427e364) SHA1(7046b65086aafc4c14793d7036bc5130fe1e7dbc))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(strxt_sp)
@@ -3826,7 +3826,7 @@ ROM_START(strxt_sp)
 	ROM_LOAD_SND_8M("sxsndl.u37", 0x180000, CRC(0e53f2a0) SHA1(7b89989ff87c25618d6f1c6479efd45b57f850fb))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -3852,7 +3852,7 @@ ROM_START(term3)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(term3_205)
@@ -3875,7 +3875,7 @@ ROM_START(term3_205)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(t3new)
@@ -3902,7 +3902,7 @@ ROM_START(t3new)
 	ROM_LOAD("t3100.u37", 0x300000, 0x100000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 
 ROM_END
 
@@ -3926,7 +3926,7 @@ ROM_START(term3g)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(term3l)
@@ -3995,7 +3995,7 @@ ROM_START(term3f)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(term3f_205)
@@ -4018,7 +4018,7 @@ ROM_START(term3f_205)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(term3i)
@@ -4041,7 +4041,7 @@ ROM_START(term3i)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(term3i_205)
@@ -4064,7 +4064,7 @@ ROM_START(term3i_205)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(term3_301)
@@ -4087,7 +4087,7 @@ ROM_START(term3_301)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(term3l_301)
@@ -4110,7 +4110,7 @@ ROM_START(term3l_301)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(term3f_301)
@@ -4133,7 +4133,7 @@ ROM_START(term3f_301)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(term3g_301)
@@ -4156,7 +4156,7 @@ ROM_START(term3g_301)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(term3i_301)
@@ -4179,7 +4179,7 @@ ROM_START(term3i_301)
 	ROM_LOAD_SND_8M("t3100.u37", 0x180000, CRC(3efb0c19) SHA1(6894295eef05891d64c7274512ba27f2b63ca3ec))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -4207,7 +4207,7 @@ ROM_START(jplstw22)
 	ROM_LOAD("jp2_u21.bin", 0x080000, 0x80000, CRC(c670a997) SHA1(1576e11ec3669f61ff16188de31b9ef3a067c473))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(jplstw20)
@@ -4228,7 +4228,7 @@ ROM_START(jplstw20)
 	ROM_LOAD("jp2_u21.bin", 0x080000, 0x80000, CRC(c670a997) SHA1(1576e11ec3669f61ff16188de31b9ef3a067c473))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -4254,7 +4254,7 @@ ROM_START(simpprty)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprty_400)
@@ -4277,7 +4277,7 @@ ROM_START(simpprty_400)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprty_204)
@@ -4300,7 +4300,7 @@ ROM_START(simpprty_204)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpnew)
@@ -4327,7 +4327,7 @@ ROM_START(simpnew)
 	ROM_LOAD("spp100.u37", 0x300000, 0x100000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprtg)
@@ -4350,7 +4350,7 @@ ROM_START(simpprtg)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprtg_400)
@@ -4373,7 +4373,7 @@ ROM_START(simpprtg_400)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprtl)
@@ -4396,7 +4396,7 @@ ROM_START(simpprtl)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprtl_400)
@@ -4419,7 +4419,7 @@ ROM_START(simpprtl_400)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprtl_204)
@@ -4442,7 +4442,7 @@ ROM_START(simpprtl_204)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprtf)
@@ -4465,7 +4465,7 @@ ROM_START(simpprtf)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprtf_400)
@@ -4488,7 +4488,7 @@ ROM_START(simpprtf_400)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprtf_204)
@@ -4511,7 +4511,7 @@ ROM_START(simpprtf_204)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprti)
@@ -4534,7 +4534,7 @@ ROM_START(simpprti)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprti_400)
@@ -4557,7 +4557,7 @@ ROM_START(simpprti_400)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprti_204)
@@ -4580,7 +4580,7 @@ ROM_START(simpprti_204)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprty_300)
@@ -4603,7 +4603,7 @@ ROM_START(simpprty_300)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprtl_300)
@@ -4626,7 +4626,7 @@ ROM_START(simpprtl_300)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprtf_300)
@@ -4649,7 +4649,7 @@ ROM_START(simpprtf_300)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(simpprti_300)
@@ -4672,7 +4672,7 @@ ROM_START(simpprti_300)
 	ROM_LOAD_SND_8M("spp100.u37", 0x180000, CRC(0738e1fc) SHA1(268462c06e5c1f286e5faaee1c0815448cc2eafa))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -4696,7 +4696,7 @@ ROM_START(xfilesp)
 	ROM_LOAD("xfsndu21.c40", 0x080000, 0x80000, CRC(b56a5ca6) SHA1(5fa23a8bb57e45aca159882226e603d9a6be078b))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(xfilespf)
@@ -4717,7 +4717,7 @@ ROM_START(xfilespf)
 	ROM_LOAD("xfsndu21.c40", 0x080000, 0x80000, CRC(b56a5ca6) SHA1(5fa23a8bb57e45aca159882226e603d9a6be078b))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(xfiles2)
@@ -4738,7 +4738,7 @@ ROM_START(xfiles2)
 	ROM_LOAD("xfsndu21.c40", 0x080000, 0x80000, CRC(b56a5ca6) SHA1(5fa23a8bb57e45aca159882226e603d9a6be078b))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(xfiles20)
@@ -4759,7 +4759,7 @@ ROM_START(xfiles20)
 	ROM_LOAD("xfsndu21.c40", 0x080000, 0x80000, CRC(b56a5ca6) SHA1(5fa23a8bb57e45aca159882226e603d9a6be078b))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -4783,7 +4783,7 @@ ROM_START(twst_405)
 	ROM_LOAD("twstsnd.u21", 0x080000, 0x80000, CRC(c3eae590) SHA1(bda3e0a725339069c49c4282676a07b4e0e8d2eb))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(twst_404)
@@ -4804,7 +4804,7 @@ ROM_START(twst_404)
 	ROM_LOAD("twstsnd.u21", 0x080000, 0x80000, CRC(c3eae590) SHA1(bda3e0a725339069c49c4282676a07b4e0e8d2eb))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(twst_300)
@@ -4825,7 +4825,7 @@ ROM_START(twst_300)
 	ROM_LOAD("twstsnd.u21", 0x080000, 0x80000, CRC(c3eae590) SHA1(bda3e0a725339069c49c4282676a07b4e0e8d2eb))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -4851,7 +4851,7 @@ ROM_START(viprsega)
 	ROM_LOAD("vpru37.dat", 0x180000, 0x80000, CRC(0bf23e0e) SHA1(b5724ed6cfe791320a8cf208cc20a2d3f0db85c8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(viprsega_102)
@@ -4874,7 +4874,7 @@ ROM_START(viprsega_102)
 	ROM_LOAD("vpru37.dat", 0x180000, 0x80000, CRC(0bf23e0e) SHA1(b5724ed6cfe791320a8cf208cc20a2d3f0db85c8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------
@@ -4898,7 +4898,7 @@ ROM_START(ctchzdlx)
 	ROM_LOAD("ctcdxu21.bin", 0x080000, 0x80000, CRC(84dd40ac) SHA1(c9327b95f1730a3aa741540c28078f214af214b8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -4922,7 +4922,7 @@ ROM_START(wackadoo)
 	ROM_LOAD("wacku21.bin", 0x080000, 0x80000, CRC(a3207296) SHA1(19af8ebab298a353fe42fc297b61182d8f772347))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -4946,7 +4946,7 @@ ROM_START(titanic)
 	ROM_LOAD("titau21.100", 0x080000, 0x80000, CRC(76ca05f8) SHA1(3e1c56fe37393c345111665fd8ab730d53cb6970))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -4969,7 +4969,7 @@ ROM_START(monopred)
 	ROM_LOAD_SND_8M("monopred.u17", 0x000000, CRC(467dca62) SHA1(c727748b6b0b39ead19ce98bddd89fd05fb62d00))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -4999,7 +4999,7 @@ ROM_START(elvisp)
 	ROM_LOAD("elvis.u37", 0x300000, 0x100000, CRC(88ba0966) SHA1(43ea198c9fcdc1c396d4180308042c6c08311829))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisp4)
@@ -5026,7 +5026,7 @@ ROM_START(elvisp4)
 	ROM_LOAD("elvis.u37", 0x300000, 0x100000, CRC(88ba0966) SHA1(43ea198c9fcdc1c396d4180308042c6c08311829))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisp303)
@@ -5053,7 +5053,7 @@ ROM_START(elvisp303)
 	ROM_LOAD("elvis.u37", 0x300000, 0x100000, CRC(88ba0966) SHA1(43ea198c9fcdc1c396d4180308042c6c08311829))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisp302)
@@ -5080,7 +5080,7 @@ ROM_START(elvisp302)
 	ROM_LOAD("elvis.u37", 0x300000, 0x100000, CRC(88ba0966) SHA1(43ea198c9fcdc1c396d4180308042c6c08311829))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisl)
@@ -5107,7 +5107,7 @@ ROM_START(elvisl)
 	ROM_LOAD("elvisl.u37", 0x300000, 0x100000, CRC(bed26746) SHA1(385cb77ec7599b12a4b021c53b42b8e9b9fb08a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisl4)
@@ -5134,7 +5134,7 @@ ROM_START(elvisl4)
 	ROM_LOAD("elvisl.u37", 0x300000, 0x100000, CRC(bed26746) SHA1(385cb77ec7599b12a4b021c53b42b8e9b9fb08a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisl303)
@@ -5161,7 +5161,7 @@ ROM_START(elvisl303)
 	ROM_LOAD("elvisl.u37", 0x300000, 0x100000, CRC(bed26746) SHA1(385cb77ec7599b12a4b021c53b42b8e9b9fb08a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisl302)
@@ -5188,7 +5188,7 @@ ROM_START(elvisl302)
 	ROM_LOAD("elvisl.u37", 0x300000, 0x100000, CRC(bed26746) SHA1(385cb77ec7599b12a4b021c53b42b8e9b9fb08a8))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisg)
@@ -5215,7 +5215,7 @@ ROM_START(elvisg)
 	ROM_LOAD("elvisg.u37", 0x300000, 0x100000, CRC(f6d7a2a0) SHA1(54c160a298c7ead1fe0404bce51bc16211da82cf))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisg4)
@@ -5242,7 +5242,7 @@ ROM_START(elvisg4)
 	ROM_LOAD("elvisg.u37", 0x300000, 0x100000, CRC(f6d7a2a0) SHA1(54c160a298c7ead1fe0404bce51bc16211da82cf))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisg303)
@@ -5269,7 +5269,7 @@ ROM_START(elvisg303)
 	ROM_LOAD("elvisg.u37", 0x300000, 0x100000, CRC(f6d7a2a0) SHA1(54c160a298c7ead1fe0404bce51bc16211da82cf))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisg302)
@@ -5296,7 +5296,7 @@ ROM_START(elvisg302)
 	ROM_LOAD("elvisg.u37", 0x300000, 0x100000, CRC(f6d7a2a0) SHA1(54c160a298c7ead1fe0404bce51bc16211da82cf))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisf)
@@ -5323,7 +5323,7 @@ ROM_START(elvisf)
 	ROM_LOAD("elvisf.u37", 0x300000, 0x100000, CRC(aa265440) SHA1(36b13ef0be4203936d9816e521098e72d6b4e4c1))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisf4)
@@ -5350,7 +5350,7 @@ ROM_START(elvisf4)
 	ROM_LOAD("elvisf.u37", 0x300000, 0x100000, CRC(aa265440) SHA1(36b13ef0be4203936d9816e521098e72d6b4e4c1))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisf303)
@@ -5377,7 +5377,7 @@ ROM_START(elvisf303)
 	ROM_LOAD("elvisf.u37", 0x300000, 0x100000, CRC(aa265440) SHA1(36b13ef0be4203936d9816e521098e72d6b4e4c1))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisf302)
@@ -5404,7 +5404,7 @@ ROM_START(elvisf302)
 	ROM_LOAD("elvisf.u37", 0x300000, 0x100000, CRC(aa265440) SHA1(36b13ef0be4203936d9816e521098e72d6b4e4c1))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisi)
@@ -5431,7 +5431,7 @@ ROM_START(elvisi)
 	ROM_LOAD("elvisi.u37", 0x300000, 0x100000, CRC(990fd624) SHA1(d5e104485dc8dd7386d8f3e7d99dc6cf7bf91568))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisi4)
@@ -5458,7 +5458,7 @@ ROM_START(elvisi4)
 	ROM_LOAD("elvisi.u37", 0x300000, 0x100000, CRC(990fd624) SHA1(d5e104485dc8dd7386d8f3e7d99dc6cf7bf91568))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisi303)
@@ -5485,7 +5485,7 @@ ROM_START(elvisi303)
 	ROM_LOAD("elvisi.u37", 0x300000, 0x100000, CRC(990fd624) SHA1(d5e104485dc8dd7386d8f3e7d99dc6cf7bf91568))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(elvisi302)
@@ -5512,7 +5512,7 @@ ROM_START(elvisi302)
 	ROM_LOAD("elvisi.u37", 0x300000, 0x100000, CRC(990fd624) SHA1(d5e104485dc8dd7386d8f3e7d99dc6cf7bf91568))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -5542,7 +5542,7 @@ ROM_START(gprix)
 	ROM_LOAD("gpsnda.u37", 0x300000, 0x100000, CRC(caf4c3f3) SHA1(ebdbaccf951ef6525f0fafa7e23d8140ef6b84e5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprix_400)
@@ -5569,7 +5569,7 @@ ROM_START(gprix_400)
 	ROM_LOAD("gpsnda.u37", 0x300000, 0x100000, CRC(caf4c3f3) SHA1(ebdbaccf951ef6525f0fafa7e23d8140ef6b84e5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprix_352)
@@ -5596,7 +5596,7 @@ ROM_START(gprix_352)
 	ROM_LOAD("gpsnda.u37", 0x300000, 0x100000, CRC(caf4c3f3) SHA1(ebdbaccf951ef6525f0fafa7e23d8140ef6b84e5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprix_350)
@@ -5623,7 +5623,7 @@ ROM_START(gprix_350)
 	ROM_LOAD("gpsnda.u37", 0x300000, 0x100000, CRC(caf4c3f3) SHA1(ebdbaccf951ef6525f0fafa7e23d8140ef6b84e5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprix_340)
@@ -5650,7 +5650,7 @@ ROM_START(gprix_340)
 	ROM_LOAD("gpsnda.u37", 0x300000, 0x100000, CRC(caf4c3f3) SHA1(ebdbaccf951ef6525f0fafa7e23d8140ef6b84e5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprix_301)
@@ -5677,7 +5677,7 @@ ROM_START(gprix_301)
 	ROM_LOAD("gpsnda.u37", 0x300000, 0x100000, CRC(caf4c3f3) SHA1(ebdbaccf951ef6525f0fafa7e23d8140ef6b84e5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixg)
@@ -5704,7 +5704,7 @@ ROM_START(gprixg)
 	ROM_LOAD("gpsndg.u37", 0x300000, 0x100000, CRC(e4a6ae7f) SHA1(4a4cd973f90c13ced07459c8f457314c8280dd6a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixg_400)
@@ -5731,7 +5731,7 @@ ROM_START(gprixg_400)
 	ROM_LOAD("gpsndg.u37", 0x300000, 0x100000, CRC(e4a6ae7f) SHA1(4a4cd973f90c13ced07459c8f457314c8280dd6a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixg_352)
@@ -5758,7 +5758,7 @@ ROM_START(gprixg_352)
 	ROM_LOAD("gpsndg.u37", 0x300000, 0x100000, CRC(e4a6ae7f) SHA1(4a4cd973f90c13ced07459c8f457314c8280dd6a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixg_350)
@@ -5785,7 +5785,7 @@ ROM_START(gprixg_350)
 	ROM_LOAD("gpsndg.u37", 0x300000, 0x100000, CRC(e4a6ae7f) SHA1(4a4cd973f90c13ced07459c8f457314c8280dd6a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixg_340)
@@ -5812,7 +5812,7 @@ ROM_START(gprixg_340)
 	ROM_LOAD("gpsndg.u37", 0x300000, 0x100000, CRC(e4a6ae7f) SHA1(4a4cd973f90c13ced07459c8f457314c8280dd6a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixg_301)
@@ -5839,7 +5839,7 @@ ROM_START(gprixg_301)
 	ROM_LOAD("gpsndg.u37", 0x300000, 0x100000, CRC(e4a6ae7f) SHA1(4a4cd973f90c13ced07459c8f457314c8280dd6a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixl)
@@ -5866,7 +5866,7 @@ ROM_START(gprixl)
 	ROM_LOAD("gpsndl.u37", 0x300000, 0x100000, CRC(db16b68a) SHA1(815fdcd4ae01c6264133389ce3194da572e1c232))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixl_400)
@@ -5893,7 +5893,7 @@ ROM_START(gprixl_400)
 	ROM_LOAD("gpsndl.u37", 0x300000, 0x100000, CRC(db16b68a) SHA1(815fdcd4ae01c6264133389ce3194da572e1c232))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixl_352)
@@ -5920,7 +5920,7 @@ ROM_START(gprixl_352)
 	ROM_LOAD("gpsndl.u37", 0x300000, 0x100000, CRC(db16b68a) SHA1(815fdcd4ae01c6264133389ce3194da572e1c232))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixl_350)
@@ -5947,7 +5947,7 @@ ROM_START(gprixl_350)
 	ROM_LOAD("gpsndl.u37", 0x300000, 0x100000, CRC(db16b68a) SHA1(815fdcd4ae01c6264133389ce3194da572e1c232))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixl_340)
@@ -5974,7 +5974,7 @@ ROM_START(gprixl_340)
 	ROM_LOAD("gpsndl.u37", 0x300000, 0x100000, CRC(db16b68a) SHA1(815fdcd4ae01c6264133389ce3194da572e1c232))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixl_301)
@@ -6001,7 +6001,7 @@ ROM_START(gprixl_301)
 	ROM_LOAD("gpsndl.u37", 0x300000, 0x100000, CRC(db16b68a) SHA1(815fdcd4ae01c6264133389ce3194da572e1c232))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixf)
@@ -6028,7 +6028,7 @@ ROM_START(gprixf)
 	ROM_LOAD("gpsndf.u37", 0x300000, 0x100000, CRC(e6d96767) SHA1(a471d51796edad71eb21aadc4a26bb1529a0b9cc))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixf_400)
@@ -6055,7 +6055,7 @@ ROM_START(gprixf_400)
 	ROM_LOAD("gpsndf.u37", 0x300000, 0x100000, CRC(e6d96767) SHA1(a471d51796edad71eb21aadc4a26bb1529a0b9cc))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixf_352)
@@ -6082,7 +6082,7 @@ ROM_START(gprixf_352)
 	ROM_LOAD("gpsndf.u37", 0x300000, 0x100000, CRC(e6d96767) SHA1(a471d51796edad71eb21aadc4a26bb1529a0b9cc))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixf_350)
@@ -6109,7 +6109,7 @@ ROM_START(gprixf_350)
 	ROM_LOAD("gpsndf.u37", 0x300000, 0x100000, CRC(e6d96767) SHA1(a471d51796edad71eb21aadc4a26bb1529a0b9cc))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixf_340)
@@ -6136,7 +6136,7 @@ ROM_START(gprixf_340)
 	ROM_LOAD("gpsndf.u37", 0x300000, 0x100000, CRC(e6d96767) SHA1(a471d51796edad71eb21aadc4a26bb1529a0b9cc))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixf_301)
@@ -6163,7 +6163,7 @@ ROM_START(gprixf_301)
 	ROM_LOAD("gpsndf.u37", 0x300000, 0x100000, CRC(e6d96767) SHA1(a471d51796edad71eb21aadc4a26bb1529a0b9cc))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixi)
@@ -6190,7 +6190,7 @@ ROM_START(gprixi)
 	ROM_LOAD("gpsndi.u37", 0x300000, 0x100000, CRC(a76c6682) SHA1(6d319a8f07c10fe392fc0b8e177cc6abbce0b536))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixi_400)
@@ -6217,7 +6217,7 @@ ROM_START(gprixi_400)
 	ROM_LOAD("gpsndi.u37", 0x300000, 0x100000, CRC(a76c6682) SHA1(6d319a8f07c10fe392fc0b8e177cc6abbce0b536))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixi_352)
@@ -6244,7 +6244,7 @@ ROM_START(gprixi_352)
 	ROM_LOAD("gpsndi.u37", 0x300000, 0x100000, CRC(a76c6682) SHA1(6d319a8f07c10fe392fc0b8e177cc6abbce0b536))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixi_350)
@@ -6271,7 +6271,7 @@ ROM_START(gprixi_350)
 	ROM_LOAD("gpsndi.u37", 0x300000, 0x100000, CRC(a76c6682) SHA1(6d319a8f07c10fe392fc0b8e177cc6abbce0b536))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixi_340)
@@ -6298,7 +6298,7 @@ ROM_START(gprixi_340)
 	ROM_LOAD("gpsndi.u37", 0x300000, 0x100000, CRC(a76c6682) SHA1(6d319a8f07c10fe392fc0b8e177cc6abbce0b536))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(gprixi_301)
@@ -6325,7 +6325,7 @@ ROM_START(gprixi_301)
 	ROM_LOAD("gpsndi.u37", 0x300000, 0x100000, CRC(a76c6682) SHA1(6d319a8f07c10fe392fc0b8e177cc6abbce0b536))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -6355,7 +6355,7 @@ ROM_START(nascar)
 	ROM_LOAD("nassnd.u37", 0x300000, 0x100000, CRC(458ba148) SHA1(594fd9b48aa48ab7b3df921e689b1acba2b09d79))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascar_400)
@@ -6382,7 +6382,7 @@ ROM_START(nascar_400)
 	ROM_LOAD("nassnd.u37", 0x300000, 0x100000, CRC(458ba148) SHA1(594fd9b48aa48ab7b3df921e689b1acba2b09d79))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascar_352)
@@ -6409,7 +6409,7 @@ ROM_START(nascar_352)
 	ROM_LOAD("nassnd.u37", 0x300000, 0x100000, CRC(458ba148) SHA1(594fd9b48aa48ab7b3df921e689b1acba2b09d79))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascar_350)
@@ -6436,7 +6436,7 @@ ROM_START(nascar_350)
 	ROM_LOAD("nassnd.u37", 0x300000, 0x100000, CRC(458ba148) SHA1(594fd9b48aa48ab7b3df921e689b1acba2b09d79))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascar_340)
@@ -6463,7 +6463,7 @@ ROM_START(nascar_340)
 	ROM_LOAD("nassnd.u37", 0x300000, 0x100000, CRC(458ba148) SHA1(594fd9b48aa48ab7b3df921e689b1acba2b09d79))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascar_301)
@@ -6490,7 +6490,7 @@ ROM_START(nascar_301)
 	ROM_LOAD("nassnd.u37", 0x300000, 0x100000, CRC(458ba148) SHA1(594fd9b48aa48ab7b3df921e689b1acba2b09d79))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(dalejr)
@@ -6517,7 +6517,7 @@ ROM_START(dalejr)
 	ROM_LOAD("nassnd.u37", 0x300000, 0x100000, CRC(458ba148) SHA1(594fd9b48aa48ab7b3df921e689b1acba2b09d79))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascarl)
@@ -6544,7 +6544,7 @@ ROM_START(nascarl)
 	ROM_LOAD("nassndl.u37", 0x300000, 0x100000, CRC(63f084ab) SHA1(519807bf6e868df6f756ad30af2f6636804f167c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascarl_400)
@@ -6571,7 +6571,7 @@ ROM_START(nascarl_400)
 	ROM_LOAD("nassndl.u37", 0x300000, 0x100000, CRC(63f084ab) SHA1(519807bf6e868df6f756ad30af2f6636804f167c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascarl_352)
@@ -6598,7 +6598,7 @@ ROM_START(nascarl_352)
 	ROM_LOAD("nassndl.u37", 0x300000, 0x100000, CRC(63f084ab) SHA1(519807bf6e868df6f756ad30af2f6636804f167c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascarl_350)
@@ -6625,7 +6625,7 @@ ROM_START(nascarl_350)
 	ROM_LOAD("nassndl.u37", 0x300000, 0x100000, CRC(63f084ab) SHA1(519807bf6e868df6f756ad30af2f6636804f167c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascarl_340)
@@ -6652,7 +6652,7 @@ ROM_START(nascarl_340)
 	ROM_LOAD("nassndl.u37", 0x300000, 0x100000, CRC(63f084ab) SHA1(519807bf6e868df6f756ad30af2f6636804f167c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(nascarl_301)
@@ -6679,7 +6679,7 @@ ROM_START(nascarl_301)
 	ROM_LOAD("nassndl.u37", 0x300000, 0x100000, CRC(63f084ab) SHA1(519807bf6e868df6f756ad30af2f6636804f167c))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -6709,7 +6709,7 @@ ROM_START(ripleys)
 	ROM_LOAD("ripsnd.u37", 0x300000, 0x100000, CRC(01b9f20e) SHA1(cffb6a0136d7d17ab4450b3bfd97632d8b669d39))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rip310)
@@ -6736,7 +6736,7 @@ ROM_START(rip310)
 	ROM_LOAD("ripsnd.u37", 0x300000, 0x100000, CRC(01b9f20e) SHA1(cffb6a0136d7d17ab4450b3bfd97632d8b669d39))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rip302)
@@ -6762,7 +6762,7 @@ ROM_START(rip302)
 	ROM_LOAD("ripsnd.u37", 0x300000, 0x100000, CRC(01b9f20e) SHA1(cffb6a0136d7d17ab4450b3bfd97632d8b669d39))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rip301)
@@ -6789,7 +6789,7 @@ ROM_START(rip301)
 	ROM_LOAD("ripsnd.u37", 0x300000, 0x100000, CRC(01b9f20e) SHA1(cffb6a0136d7d17ab4450b3bfd97632d8b669d39))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(rip300)
@@ -6816,7 +6816,7 @@ ROM_START(rip300)
 	ROM_LOAD("ripsnd.u37", 0x300000, 0x100000, CRC(01b9f20e) SHA1(cffb6a0136d7d17ab4450b3bfd97632d8b669d39))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripleysf)
@@ -6843,7 +6843,7 @@ ROM_START(ripleysf)
 	ROM_LOAD("ripsndf.u37", 0x300000, 0x100000, CRC(5c858958) SHA1(f4a9833b8aee033ed381e3bdf9f801b935d6186a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripf310)
@@ -6870,7 +6870,7 @@ ROM_START(ripf310)
 	ROM_LOAD("ripsndf.u37", 0x300000, 0x100000, CRC(5c858958) SHA1(f4a9833b8aee033ed381e3bdf9f801b935d6186a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripf302)
@@ -6897,7 +6897,7 @@ ROM_START(ripf302)
 	ROM_LOAD("ripsndf.u37", 0x300000, 0x100000, CRC(5c858958) SHA1(f4a9833b8aee033ed381e3bdf9f801b935d6186a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripf301)
@@ -6923,7 +6923,7 @@ ROM_START(ripf301)
 	ROM_LOAD("ripsndf.u37", 0x300000, 0x100000, CRC(5c858958) SHA1(f4a9833b8aee033ed381e3bdf9f801b935d6186a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripf300)
@@ -6950,7 +6950,7 @@ ROM_START(ripf300)
 	ROM_LOAD("ripsndf.u37", 0x300000, 0x100000, CRC(5c858958) SHA1(f4a9833b8aee033ed381e3bdf9f801b935d6186a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripleysg)
@@ -6977,7 +6977,7 @@ ROM_START(ripleysg)
 	ROM_LOAD("ripsndg.u37", 0x300000, 0x100000, CRC(2167617b) SHA1(62b55a39e2677eec9d56b10e8cc3e5d7c0d3bea5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripg310)
@@ -7004,7 +7004,7 @@ ROM_START(ripg310)
 	ROM_LOAD("ripsndg.u37", 0x300000, 0x100000, CRC(2167617b) SHA1(62b55a39e2677eec9d56b10e8cc3e5d7c0d3bea5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripg302)
@@ -7031,7 +7031,7 @@ ROM_START(ripg302)
 	ROM_LOAD("ripsndg.u37", 0x300000, 0x100000, CRC(2167617b) SHA1(62b55a39e2677eec9d56b10e8cc3e5d7c0d3bea5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripg301)
@@ -7058,7 +7058,7 @@ ROM_START(ripg301)
 	ROM_LOAD("ripsndg.u37", 0x300000, 0x100000, CRC(2167617b) SHA1(62b55a39e2677eec9d56b10e8cc3e5d7c0d3bea5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripg300)
@@ -7085,7 +7085,7 @@ ROM_START(ripg300)
 	ROM_LOAD("ripsndg.u37", 0x300000, 0x100000, CRC(2167617b) SHA1(62b55a39e2677eec9d56b10e8cc3e5d7c0d3bea5))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripleysi)
@@ -7112,7 +7112,7 @@ ROM_START(ripleysi)
 	ROM_LOAD("ripsndi.u37", 0x300000, 0x100000, CRC(7933c102) SHA1(f736ee86d7c67dab82c634d125d73a2453249706))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripi310)
@@ -7139,7 +7139,7 @@ ROM_START(ripi310)
 	ROM_LOAD("ripsndi.u37", 0x300000, 0x100000, CRC(7933c102) SHA1(f736ee86d7c67dab82c634d125d73a2453249706))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripi302)
@@ -7166,7 +7166,7 @@ ROM_START(ripi302)
 	ROM_LOAD("ripsndi.u37", 0x300000, 0x100000, CRC(7933c102) SHA1(f736ee86d7c67dab82c634d125d73a2453249706))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripi301)
@@ -7193,7 +7193,7 @@ ROM_START(ripi301)
 	ROM_LOAD("ripsndi.u37", 0x300000, 0x100000, CRC(7933c102) SHA1(f736ee86d7c67dab82c634d125d73a2453249706))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripi300)
@@ -7220,7 +7220,7 @@ ROM_START(ripi300)
 	ROM_LOAD("ripsndi.u37", 0x300000, 0x100000, CRC(7933c102) SHA1(f736ee86d7c67dab82c634d125d73a2453249706))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripleysl)
@@ -7247,7 +7247,7 @@ ROM_START(ripleysl)
 	ROM_LOAD("ripsndl.u37", 0x300000, 0x100000, CRC(2a58f491) SHA1(1c33f419420b3165ef18598560007ef612b24814))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripl310)
@@ -7274,7 +7274,7 @@ ROM_START(ripl310)
 	ROM_LOAD("ripsndl.u37", 0x300000, 0x100000, CRC(2a58f491) SHA1(1c33f419420b3165ef18598560007ef612b24814))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripl302)
@@ -7301,7 +7301,7 @@ ROM_START(ripl302)
 	ROM_LOAD("ripsndl.u37", 0x300000, 0x100000, CRC(2a58f491) SHA1(1c33f419420b3165ef18598560007ef612b24814))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripl301)
@@ -7328,7 +7328,7 @@ ROM_START(ripl301)
 	ROM_LOAD("ripsndl.u37", 0x300000, 0x100000, CRC(2a58f491) SHA1(1c33f419420b3165ef18598560007ef612b24814))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(ripl300)
@@ -7355,7 +7355,7 @@ ROM_START(ripl300)
 	ROM_LOAD("ripsndl.u37", 0x300000, 0x100000, CRC(2a58f491) SHA1(1c33f419420b3165ef18598560007ef612b24814))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 
@@ -7386,7 +7386,7 @@ ROM_START(lotr)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr9)
@@ -7413,7 +7413,7 @@ ROM_START(lotr9)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr8)
@@ -7440,7 +7440,7 @@ ROM_START(lotr8)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr7)
@@ -7467,7 +7467,7 @@ ROM_START(lotr7)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr6)
@@ -7494,7 +7494,7 @@ ROM_START(lotr6)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr501)
@@ -7521,7 +7521,7 @@ ROM_START(lotr501)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr5)
@@ -7548,7 +7548,7 @@ ROM_START(lotr5)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr410)
@@ -7575,7 +7575,7 @@ ROM_START(lotr410)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr401)
@@ -7602,7 +7602,7 @@ ROM_START(lotr401)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr3)
@@ -7629,7 +7629,7 @@ ROM_START(lotr3)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_sp)
@@ -7656,7 +7656,7 @@ ROM_START(lotr_sp)
 	ROM_LOAD("lotrlu37.100", 0x300000, 0x100000, CRC(61f21c6d) SHA1(3e9781b4981bd18cdb8c59c55b9942de6ae286db))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_sp9)
@@ -7683,7 +7683,7 @@ ROM_START(lotr_sp9)
 	ROM_LOAD("lotrlu37.100", 0x300000, 0x100000, CRC(61f21c6d) SHA1(3e9781b4981bd18cdb8c59c55b9942de6ae286db))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_sp8)
@@ -7710,7 +7710,7 @@ ROM_START(lotr_sp8)
 	ROM_LOAD("lotrlu37.100", 0x300000, 0x100000, CRC(61f21c6d) SHA1(3e9781b4981bd18cdb8c59c55b9942de6ae286db))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_sp7)
@@ -7737,7 +7737,7 @@ ROM_START(lotr_sp7)
 	ROM_LOAD("lotrlu37.100", 0x300000, 0x100000, CRC(61f21c6d) SHA1(3e9781b4981bd18cdb8c59c55b9942de6ae286db))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_sp6)
@@ -7764,7 +7764,7 @@ ROM_START(lotr_sp6)
 	ROM_LOAD("lotrlu37.100", 0x300000, 0x100000, CRC(61f21c6d) SHA1(3e9781b4981bd18cdb8c59c55b9942de6ae286db))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_sp501)
@@ -7791,7 +7791,7 @@ ROM_START(lotr_sp501)
 	ROM_LOAD("lotrlu37.100", 0x300000, 0x100000, CRC(61f21c6d) SHA1(3e9781b4981bd18cdb8c59c55b9942de6ae286db))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_sp5)
@@ -7818,7 +7818,7 @@ ROM_START(lotr_sp5)
 	ROM_LOAD("lotrlu37.100", 0x300000, 0x100000, CRC(61f21c6d) SHA1(3e9781b4981bd18cdb8c59c55b9942de6ae286db))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_sp401)
@@ -7845,7 +7845,7 @@ ROM_START(lotr_sp401)
 	ROM_LOAD("lotrlu37.100", 0x300000, 0x100000, CRC(61f21c6d) SHA1(3e9781b4981bd18cdb8c59c55b9942de6ae286db))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 
@@ -7873,7 +7873,7 @@ ROM_START(lotr_gr)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_gr9)
@@ -7900,7 +7900,7 @@ ROM_START(lotr_gr9)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_gr8)
@@ -7927,7 +7927,7 @@ ROM_START(lotr_gr8)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_gr7)
@@ -7954,7 +7954,7 @@ ROM_START(lotr_gr7)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_gr6)
@@ -7981,7 +7981,7 @@ ROM_START(lotr_gr6)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_gr501)
@@ -8008,7 +8008,7 @@ ROM_START(lotr_gr501)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_gr5)
@@ -8035,7 +8035,7 @@ ROM_START(lotr_gr5)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_gr410)
@@ -8062,7 +8062,7 @@ ROM_START(lotr_gr410)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_gr401)
@@ -8089,7 +8089,7 @@ ROM_START(lotr_gr401)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_fr)
@@ -8116,7 +8116,7 @@ ROM_START(lotr_fr)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_fr9)
@@ -8143,7 +8143,7 @@ ROM_START(lotr_fr9)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_fr8)
@@ -8170,7 +8170,7 @@ ROM_START(lotr_fr8)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_fr7)
@@ -8197,7 +8197,7 @@ ROM_START(lotr_fr7)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_fr6)
@@ -8224,7 +8224,7 @@ ROM_START(lotr_fr6)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_fr501)
@@ -8251,7 +8251,7 @@ ROM_START(lotr_fr501)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_fr5)
@@ -8278,7 +8278,7 @@ ROM_START(lotr_fr5)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_fr410)
@@ -8305,7 +8305,7 @@ ROM_START(lotr_fr410)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_fr401)
@@ -8332,7 +8332,7 @@ ROM_START(lotr_fr401)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_it)
@@ -8359,7 +8359,7 @@ ROM_START(lotr_it)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_it9)
@@ -8386,7 +8386,7 @@ ROM_START(lotr_it9)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_it8)
@@ -8413,7 +8413,7 @@ ROM_START(lotr_it8)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_it7)
@@ -8440,7 +8440,7 @@ ROM_START(lotr_it7)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_it6)
@@ -8467,7 +8467,7 @@ ROM_START(lotr_it6)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_it501)
@@ -8494,7 +8494,7 @@ ROM_START(lotr_it501)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_it5)
@@ -8521,7 +8521,7 @@ ROM_START(lotr_it5)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_it410)
@@ -8548,7 +8548,7 @@ ROM_START(lotr_it410)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_it401)
@@ -8575,7 +8575,7 @@ ROM_START(lotr_it401)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(lotr_le)
@@ -8602,7 +8602,7 @@ ROM_START(lotr_le)
 	ROM_LOAD("lotr-u37.100", 0x300000, 0x100000, CRC(8e637a6f) SHA1(8087744ce36fc143381d49a312c98cf38b2f9854))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -8632,7 +8632,7 @@ ROM_START(sopranos)
 	ROM_LOAD("sopsnda.u37", 0x300000, 0x100000, CRC(4b67fe8a) SHA1(b980b9705b4a41a0524b3b0095d6398bdbed609f))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranos_400)
@@ -8659,7 +8659,7 @@ ROM_START(sopranos_400)
 	ROM_LOAD("sopsnda.u37", 0x300000, 0x100000, CRC(06a2a6e1) SHA1(fdbe622223724ac2b4c5183c43d3e635654864bf)) // sldh
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranos_300)
@@ -8686,7 +8686,7 @@ ROM_START(sopranos_300)
 	ROM_LOAD("sopsnda.u37", 0x300000, 0x100000, CRC(06a2a6e1) SHA1(fdbe622223724ac2b4c5183c43d3e635654864bf)) // sldh
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranos_204)
@@ -8713,7 +8713,7 @@ ROM_START(sopranos_204)
 	ROM_LOAD("sopsnd1.u37", 0x300000, 0x100000, CRC(06a2a6e1) SHA1(fdbe622223724ac2b4c5183c43d3e635654864bf))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranog)
@@ -8740,7 +8740,7 @@ ROM_START(sopranog)
 	ROM_LOAD("sopsndg.u37", 0x300000, 0x100000, CRC(2405df73) SHA1(b8074610d9d87d3f1c0244ef0f450c766aac8a20))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranog_400)
@@ -8767,7 +8767,7 @@ ROM_START(sopranog_400)
 	ROM_LOAD("sopsndg.u37", 0x300000, 0x100000, CRC(2405df73) SHA1(b8074610d9d87d3f1c0244ef0f450c766aac8a20))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranog_300)
@@ -8794,7 +8794,7 @@ ROM_START(sopranog_300)
 	ROM_LOAD("sopsndg.u37", 0x300000, 0x100000, CRC(2405df73) SHA1(b8074610d9d87d3f1c0244ef0f450c766aac8a20))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranog_107)
@@ -8821,7 +8821,7 @@ ROM_START(sopranog_107)
 	ROM_LOAD("sopsndg.u37", 0x300000, 0x100000, CRC(2405df73) SHA1(b8074610d9d87d3f1c0244ef0f450c766aac8a20))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 
@@ -8849,7 +8849,7 @@ ROM_START(sopranof)
 	ROM_LOAD("sopsndf.u37", 0x300000, 0x100000, CRC(2b4a9130) SHA1(eed9c84c932bb86954226b0d51461c5094ebe02e))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranof_400)
@@ -8876,7 +8876,7 @@ ROM_START(sopranof_400)
 	ROM_LOAD("sopsndf.u37", 0x300000, 0x100000, CRC(2b4a9130) SHA1(eed9c84c932bb86954226b0d51461c5094ebe02e))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranof_300)
@@ -8903,7 +8903,7 @@ ROM_START(sopranof_300)
 	ROM_LOAD("sopsndf.u37", 0x300000, 0x100000, CRC(2b4a9130) SHA1(eed9c84c932bb86954226b0d51461c5094ebe02e))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranof_107)
@@ -8930,7 +8930,7 @@ ROM_START(sopranof_107)
 	ROM_LOAD("sopsndf.u37", 0x300000, 0x100000, CRC(2b4a9130) SHA1(eed9c84c932bb86954226b0d51461c5094ebe02e))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranol)
@@ -8957,7 +8957,7 @@ ROM_START(sopranol)
 	ROM_LOAD("sopsndl.u37", 0x300000, 0x100000, CRC(cfe814fb) SHA1(51b6b10dda4640f8569e610b41c77e3657eabff2))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranol_400)
@@ -8984,7 +8984,7 @@ ROM_START(sopranol_400)
 	ROM_LOAD("sopsndl.u37", 0x300000, 0x100000, CRC(cfe814fb) SHA1(51b6b10dda4640f8569e610b41c77e3657eabff2))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranol_300)
@@ -9011,7 +9011,7 @@ ROM_START(sopranol_300)
 	ROM_LOAD("sopsndl.u37", 0x300000, 0x100000, CRC(cfe814fb) SHA1(51b6b10dda4640f8569e610b41c77e3657eabff2))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranol_107)
@@ -9038,7 +9038,7 @@ ROM_START(sopranol_107)
 	ROM_LOAD("sopsndl.u37", 0x300000, 0x100000, CRC(cfe814fb) SHA1(51b6b10dda4640f8569e610b41c77e3657eabff2))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 
@@ -9066,7 +9066,7 @@ ROM_START(sopranoi)
 	ROM_LOAD("sopsndi.u37", 0x300000, 0x100000, CRC(b34c0a5f) SHA1(b84979d6eef7d23e6dd5410993d83fba2121bc6a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranoi_400)
@@ -9093,7 +9093,7 @@ ROM_START(sopranoi_400)
 	ROM_LOAD("sopsndi.u37", 0x300000, 0x100000, CRC(b34c0a5f) SHA1(b84979d6eef7d23e6dd5410993d83fba2121bc6a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranoi_300)
@@ -9120,7 +9120,7 @@ ROM_START(sopranoi_300)
 	ROM_LOAD("sopsndi.u37", 0x300000, 0x100000, CRC(b34c0a5f) SHA1(b84979d6eef7d23e6dd5410993d83fba2121bc6a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 ROM_START(sopranoi_107)
@@ -9147,7 +9147,7 @@ ROM_START(sopranoi_107)
 	ROM_LOAD("sopsndi.u37", 0x300000, 0x100000, CRC(b34c0a5f) SHA1(b84979d6eef7d23e6dd5410993d83fba2121bc6a))
 
 	ROM_REGION(0x117, "plds", 0 )
-	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Display PLD, dumped from a Terminator 3 Spain machine, may be different on others
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
 } // Anonymous namespace
