@@ -14,17 +14,16 @@ with: PAC2 BACKUP DATA. We only store the raw sram contents.
 DEFINE_DEVICE_TYPE(MSX_CART_FMPAC, msx_cart_fmpac_device, "msx_cart_fmpac", "MSX Cartridge - FM-PAC")
 
 
-msx_cart_fmpac_device::msx_cart_fmpac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_fmpac_device::msx_cart_fmpac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_FMPAC, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_ym2413(*this, "ym2413")
-	, m_selected_bank(0)
-	, m_bank_base(nullptr)
+	, m_rombank(*this, "rombank")
+	, m_view(*this, "view")
 	, m_sram_active(false)
 	, m_opll_active(false)
-	, m_1ffe(0)
-	, m_1fff(0)
-	, m_7ff6(0)
+	, m_sram_unlock{0, 0}
+	, m_control(0)
 {
 }
 
@@ -39,130 +38,87 @@ void msx_cart_fmpac_device::device_add_mconfig(machine_config &config)
 
 void msx_cart_fmpac_device::device_start()
 {
-	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_sram_active));
 	save_item(NAME(m_opll_active));
-	save_item(NAME(m_1ffe));
-	save_item(NAME(m_1fff));
-	save_item(NAME(m_7ff6));
+	save_item(NAME(m_sram_unlock));
+	save_item(NAME(m_control));
 
 	// Install IO read/write handlers
 	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
 }
 
-
-void msx_cart_fmpac_device::device_post_load()
-{
-	restore_banks();
-}
-
-
-void msx_cart_fmpac_device::restore_banks()
-{
-	m_bank_base = get_rom_base() + ( m_selected_bank & 0x03 ) * 0x4000;
-}
-
-
 void msx_cart_fmpac_device::device_reset()
 {
-	m_selected_bank = 0;
 	m_sram_active = false;
 	m_opll_active = false;
-	m_1ffe = 0;
-	m_1fff = 0;
-	m_7ff6 = 0;
-}
+	m_sram_unlock[0] = 0;
+	m_sram_unlock[1] = 0;
+	m_control = 0;
+	m_view.select(0);
+	m_rombank->set_entry(0);
 
+}
 
 void msx_cart_fmpac_device::initialize_cartridge()
 {
-	if ( get_rom_size() != 0x10000 )
+	if (get_rom_size() != 0x10000)
 	{
 		fatalerror("fmpac: Invalid ROM size\n");
 	}
-
-	if ( get_sram_size() != 0x2000 )
+	if (get_sram_size() != 0x2000)
 	{
 		fatalerror("fmpac: Invalid SRAM size\n");
 	}
 
-	restore_banks();
+	m_rombank->configure_entries(0, 4, get_rom_base(), 0x4000);
+
+	page(1)->install_view(0x4000, 0x7fff, m_view);
+	m_view[0].install_read_bank(0x4000, 0x7fff, m_rombank);
+	m_view[0].install_write_handler(0x5ffe, 0x5fff, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::sram_unlock)));
+	m_view[0].install_write_handler(0x7ff4, 0x7ff5, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
+	m_view[0].install_read_handler(0x7ff6, 0x7ff6, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_r)));
+	m_view[0].install_write_handler(0x7ff6, 0x7ff6, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_w)));
+	m_view[0].install_read_handler(0x7ff7, 0x7ff7, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_r)));
+	m_view[0].install_write_handler(0x7ff7, 0x7ff7, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_w)));
+
+	m_view[1].install_ram(0x4000, 0x5fff, get_sram_base());
+	m_view[1].install_write_handler(0x5ffe, 0x5fff, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::sram_unlock)));
+	m_view[1].install_write_handler(0x7ff4, 0x7ff5, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
+	m_view[1].install_read_handler(0x7ff6, 0x7ff6, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_r)));
+	m_view[1].install_write_handler(0x7ff6, 0x7ff6, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_w)));
+	m_view[1].install_read_handler(0x7ff7, 0x7ff7, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_r)));
+	m_view[1].install_write_handler(0x7ff7, 0x7ff7, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_w)));
 }
 
-
-uint8_t msx_cart_fmpac_device::read_cart(offs_t offset)
+void msx_cart_fmpac_device::sram_unlock(offs_t offset, u8 data)
 {
-	if (offset >= 0x4000 && offset < 0x8000)
-	{
-		if (offset == 0x7ff6)
-		{
-			return m_7ff6;
-		}
-		if (offset == 0x7ff7)
-		{
-			return m_selected_bank & 0x03;
-		}
-		if (m_sram_active)
-		{
-			if (offset & 0x2000)
-			{
-				return 0xff;
-			}
-			return get_sram_base()[offset & 0x1fff];
-		}
-		else
-		{
-			return m_bank_base[offset & 0x3fff];
-		}
-	}
-	return 0xff;
+	m_sram_unlock[offset] = data;
+	m_sram_active = m_sram_unlock[0] == 0x4d && m_sram_unlock[1] == 0x69;
+	m_view.select(m_sram_active ? 1 : 0);
 }
 
-
-void msx_cart_fmpac_device::write_cart(offs_t offset, uint8_t data)
+u8 msx_cart_fmpac_device::control_r()
 {
-	if (offset >= 0x4000 && offset < 0x6000)
-	{
-		if (m_sram_active)
-		{
-			get_sram_base()[offset & 0x1fff] = data;
-		}
-		if (offset == 0x5ffe)
-		{
-			m_1ffe = data;
-		}
-		if (offset == 0x5fff)
-		{
-			m_1fff = data;
-		}
-		m_sram_active = (m_1ffe == 0x4d) && (m_1fff == 0x69);
-	}
-
-	switch (offset)
-	{
-		case 0x7ff4:
-		case 0x7ff5:
-			if (m_opll_active)
-			{
-				m_ym2413->write(offset & 1, data);
-			}
-			break;
-
-		case 0x7ff6:
-			m_7ff6 = data & 0x11;
-			m_opll_active = (m_7ff6 & 0x01);
-			break;
-
-		case 0x7ff7:
-			m_selected_bank = data;
-			restore_banks();
-			break;
-	}
-
+	return m_control;
 }
 
+void msx_cart_fmpac_device::control_w(u8 data)
+{
+	m_control = data & 0x11;
+	m_opll_active = BIT(data, 0);
+}
 
-void msx_cart_fmpac_device::write_ym2413(offs_t offset, uint8_t data)
+u8 msx_cart_fmpac_device::bank_r()
+{
+	return m_rombank->entry();
+}
+
+void msx_cart_fmpac_device::bank_w(u8 data)
+{
+	m_rombank->set_entry(data);
+}
+
+void msx_cart_fmpac_device::write_ym2413(offs_t offset, u8 data)
 {
 	if (m_opll_active)
 	{

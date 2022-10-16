@@ -14,7 +14,7 @@ DECLARE_DEVICE_TYPE(MSX_CART_HXM200, msx_cart_kanji_hxm200_device)
 class msx_cart_kanji_hxm200_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_kanji_hxm200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_kanji_hxm200_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
@@ -24,11 +24,11 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	uint8_t kanji_r(offs_t offset);
+	u8 kanji_r(offs_t offset);
 	void kanji_w(offs_t offset, uint8_t data);
 
 	required_memory_region m_region_kanji;
-	uint32_t m_kanji_address = 0;
+	u32 m_kanji_address = 0;
 };
 
 

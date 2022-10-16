@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(MSX_CART_NOMAPPER, msx_cart_nomapper_device, "msx_cart_nomapper", "MSX Cartridge - ROM")
 
 
-msx_cart_nomapper_device::msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_nomapper_device::msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_NOMAPPER, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_start_address(0)
@@ -15,14 +15,10 @@ msx_cart_nomapper_device::msx_cart_nomapper_device(const machine_config &mconfig
 {
 }
 
-void msx_cart_nomapper_device::device_start()
-{
-}
-
 void msx_cart_nomapper_device::install_memory()
 {
-	uint32_t start_address = m_start_address;
-	uint32_t rom_offset = 0;
+	u32 start_address = m_start_address;
+	u32 rom_offset = 0;
 
 	if (m_start_address != 0x0000 && m_start_address != 0x4000 && m_start_address != 0x8000 && m_start_address != 0xc000)
 	{
@@ -45,16 +41,15 @@ void msx_cart_nomapper_device::install_memory()
 
 void msx_cart_nomapper_device::initialize_cartridge()
 {
-	uint32_t size = get_rom_size();
-	uint8_t *rom = get_rom_base();
+	u32 size = get_rom_size();
+	u8 *rom = get_rom_base();
 
-	// determine start address
-	// default to $4000
+	// determine start address, default to 0x4000
 	m_start_address = 0x4000;
 
 	switch (size)
 	{
-		/* 8KB/16KB */
+		// 8KB/16KB
 		case 0x2000: case 0x4000:
 		{
 			uint16_t start = rom[3] << 8 | rom[2];
@@ -75,7 +70,7 @@ void msx_cart_nomapper_device::initialize_cartridge()
 			break;
 		}
 
-		/* 32KB */
+		// 32KB
 		case 0x8000:
 			// take default, check when no "AB" at $0000, but "AB" at $4000
 			if (rom[0] != 'A' && rom[1] != 'B' && rom[0x4000] == 'A' && rom[0x4001] == 'B')
@@ -89,7 +84,7 @@ void msx_cart_nomapper_device::initialize_cartridge()
 
 			break;
 
-		/* 48KB */
+		// 48KB
 		case 0xc000:
 			// "AB" at $0000, but no "AB" at $4000, not "AB": $0000
 			if (rom[0] == 'A' && rom[1] == 'B' && rom[0x4000] != 'A' && rom[0x4001] != 'B')
@@ -99,7 +94,7 @@ void msx_cart_nomapper_device::initialize_cartridge()
 
 			break;
 
-		/* 64KB */
+		// 64KB
 		default:
 			m_start_address = 0;
 			break;

@@ -7,75 +7,23 @@
 DEFINE_DEVICE_TYPE(MSX_CART_HALNOTE, msx_cart_halnote_device, "msx_cart_halnote", "MSX Cartridge - Halnote")
 
 
-msx_cart_halnote_device::msx_cart_halnote_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_halnote_device::msx_cart_halnote_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_HALNOTE, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
-	, m_selected_bank{ 0, 0, 0, 0, 0, 0, 0, 0 }
-	, m_bank_base{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }
+	, m_rombank(*this, "rombank%u", 0U)
+	, m_view0(*this, "view0")
+	, m_view1(*this, "view1")
 {
 }
-
-
-void msx_cart_halnote_device::device_start()
-{
-	save_item(NAME(m_selected_bank));
-}
-
-
-void msx_cart_halnote_device::device_post_load()
-{
-	restore_banks();
-}
-
-
-void msx_cart_halnote_device::map_bank(int bank)
-{
-	if (bank < 2)
-	{
-		return;
-	}
-
-	// Special banks
-	if (bank == 6 || bank == 7)
-	{
-		m_bank_base[bank] = get_rom_base() + 0x80000 + (m_selected_bank[bank] * 0x800);
-		return;
-	}
-
-	m_bank_base[bank] = get_rom_base() + ((m_selected_bank[bank] * 0x2000) & 0xFFFFF);
-	if (bank == 2)
-	{
-		if (m_selected_bank[bank] & 0x80)
-		{
-			m_bank_base[0] = get_sram_base();
-			m_bank_base[1] = get_sram_base() + 0x2000;
-		}
-		else
-		{
-			m_bank_base[0] = nullptr;
-			m_bank_base[1] = nullptr;
-		}
-	}
-}
-
-
-void msx_cart_halnote_device::restore_banks()
-{
-	for (int i = 0; i < 8; i++)
-	{
-		map_bank(i);
-	}
-}
-
 
 void msx_cart_halnote_device::device_reset()
 {
-	for (auto & elem : m_selected_bank)
-	{
-		elem = 0;
-	}
-}
+	for (int i = 0; i < 6; i++)
+		m_rombank[i]->set_entry(0);
 
+	m_view0.disable();
+	m_view1.select(0);
+}
 
 void msx_cart_halnote_device::initialize_cartridge()
 {
@@ -83,78 +31,68 @@ void msx_cart_halnote_device::initialize_cartridge()
 	{
 		fatalerror("halnote: Invalid ROM size\n");
 	}
+	if (get_sram_size() != 0x4000)
+	{
+		fatalerror("halnote: Invalid SRAM size\n");
+	}
 
-	restore_banks();
+	for (int i = 0; i < 4; i++)
+	{
+		m_rombank[i]->configure_entries(0, 0x80, get_rom_base(), 0x2000);
+	}
+	m_rombank[4]->configure_entries(0, 0x100, get_rom_base() + 0x80000, 0x800);
+	m_rombank[5]->configure_entries(0, 0x100, get_rom_base() + 0x80000, 0x800);
+
+	page(0)->install_view(0x0000, 0x3fff, m_view0);
+	m_view0[0];
+	m_view0[1].install_ram(0x0000, 0x3fff, get_sram_base());
+	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
+	page(1)->install_write_handler(0x4fff, 0x4fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank0_w)));
+	page(1)->install_view(0x6000, 0x7fff, m_view1);
+	m_view1[0].install_read_bank(0x6000, 0x7fff, m_rombank[1]);
+	m_view1[0].install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank1_w)));
+	m_view1[0].install_write_handler(0x77ff, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank4_w)));
+	m_view1[0].install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank5_w)));
+	m_view1[1].install_read_bank(0x6000, 0x6fff, m_rombank[1]);
+	m_view1[1].install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank1_w)));
+	m_view1[1].install_read_bank(0x7000, 0x77ff, m_rombank[4]);
+	m_view1[1].install_write_handler(0x77ff, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank4_w)));
+	m_view1[1].install_read_bank(0x7800, 0x7fff, m_rombank[5]);
+	m_view1[1].install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank5_w)));
+	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
+	page(2)->install_write_handler(0x8fff, 0x8fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank2_w)));
+	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
+	page(2)->install_write_handler(0xafff, 0xafff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank3_w)));
 }
 
-
-uint8_t msx_cart_halnote_device::read_cart(offs_t offset)
+void msx_cart_halnote_device::bank0_w(u8 data)
 {
-	if (offset >= 0xc000)
-	{
-		return 0xFF;
-	}
-
-	if ((offset & 0xf000) == 0x7000 && (m_selected_bank[3] & 0x80))
-	{
-		return m_bank_base[6 + ((offset >> 11) & 0x01)][offset & 0x7ff];
-	}
-
-	const uint8_t *mem = m_bank_base[offset >> 13];
-
-	if (mem)
-	{
-		return mem[offset & 0x1fff];
-	}
-	return 0xff;
+	m_rombank[0]->set_entry(data & 0x7f);
+	m_view0.select(BIT(data, 7) ? 1 : 0);
 }
 
-
-void msx_cart_halnote_device::write_cart(offs_t offset, uint8_t data)
+void msx_cart_halnote_device::bank1_w(u8 data)
 {
-	if (offset < 0x4000)
-	{
-		if (m_bank_base[0] != nullptr)
-		{
-			m_sram[offset & 0x3fff] = data;
-			return;
-		}
-	}
+	m_rombank[1]->set_entry(data & 0x7f);
+}
 
-	switch (offset)
-	{
-		case 0x4FFF:
-			m_selected_bank[2] = data;
-			map_bank(2);
-			break;
+void msx_cart_halnote_device::bank2_w(u8 data)
+{
+	m_rombank[2]->set_entry(data & 0x7f);
+}
 
-		case 0x6FFF:     // 6000-7FFF
-			m_selected_bank[3] = data;
-			map_bank(3);
-			break;
+void msx_cart_halnote_device::bank3_w(u8 data)
+{
+	m_rombank[3]->set_entry(data & 0x7f);
+	m_view1.select(BIT(data, 7) ? 1 : 0);
+}
 
-		case 0x77FF:
-			m_selected_bank[6] = data;
-			map_bank(6);
-			break;
+void msx_cart_halnote_device::bank4_w(u8 data)
+{
+	m_rombank[4]->set_entry(data);
+}
 
-		case 0x7FFF:
-			m_selected_bank[7] = data;
-			map_bank(7);
-			break;
-
-		case 0x8FFF:
-			m_selected_bank[4] = data;
-			map_bank(4);
-			break;
-
-		case 0xAFFF:
-			m_selected_bank[5] = data;
-			map_bank(5);
-			break;
-
-		default:
-			logerror("msx_cart_halnote_device: Unhandled write %02x to %04x\n", data, offset);
-			break;
-	}
+void msx_cart_halnote_device::bank5_w(u8 data)
+{
+	m_rombank[5]->set_entry(data);
 }

@@ -15,7 +15,7 @@ DECLARE_DEVICE_TYPE(MSX_CART_MOONSOUND, msx_cart_moonsound_device)
 class msx_cart_moonsound_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_moonsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_moonsound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
@@ -27,12 +27,9 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	void write_ymf278b_fm(offs_t offset, uint8_t data);
-	uint8_t read_ymf278b_fm(offs_t offset);
-	void write_ymf278b_pcm(offs_t offset, uint8_t data);
-	uint8_t read_ymf278b_pcm(offs_t offset);
-	uint8_t read_c0();
-
+	void write_ymf278b_pcm(offs_t offset, u8 data);
+	u8 read_ymf278b_pcm(offs_t offset);
+	u8 read_c0();
 	void ymf278b_map(address_map &map);
 
 	required_device<ymf278b_device> m_ymf278b;

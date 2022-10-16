@@ -22,7 +22,7 @@ TODO:
 DEFINE_DEVICE_TYPE(MSX_CART_HXM200, msx_cart_kanji_hxm200_device, "hx_m200", "Toshiba HX-M200 Cartridge")
 
 
-msx_cart_kanji_hxm200_device::msx_cart_kanji_hxm200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_kanji_hxm200_device::msx_cart_kanji_hxm200_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_HXM200, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_region_kanji(*this, "kanji")
@@ -58,12 +58,10 @@ void msx_cart_kanji_hxm200_device::device_reset()
 }
 
 
-uint8_t msx_cart_kanji_hxm200_device::kanji_r(offs_t offset)
+u8 msx_cart_kanji_hxm200_device::kanji_r(offs_t offset)
 {
-	uint8_t result = 0xff;
-
-	uint32_t latch = m_kanji_address;
-	result = m_region_kanji->as_u8(latch);
+	u32 latch = m_kanji_address;
+	u8 result = m_region_kanji->as_u8(latch);
 
 	if (!machine().side_effects_disabled())
 	{
@@ -72,7 +70,7 @@ uint8_t msx_cart_kanji_hxm200_device::kanji_r(offs_t offset)
 	return result;
 }
 
-void msx_cart_kanji_hxm200_device::kanji_w(offs_t offset, uint8_t data)
+void msx_cart_kanji_hxm200_device::kanji_w(offs_t offset, u8 data)
 {
 	if (offset)
 		m_kanji_address = (m_kanji_address & 0x007e0) | ((data & 0x3f) << 11);

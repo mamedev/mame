@@ -3,41 +3,25 @@
 #include "emu.h"
 #include "msxdos2.h"
 
+// This is the bare minimum to get a msx-dos 2 rom working in a system
+// TODO:
+// - Add subslots for regular rom and kanji driver rom
+// - Add support for 128KB and 256KB memory mapper versions
+
 DEFINE_DEVICE_TYPE(MSX_CART_MSXDOS2, msx_cart_msxdos2_device, "msx_cart_msxdos2", "MSX Cartridge - MSXDOS2")
 
 
-msx_cart_msxdos2_device::msx_cart_msxdos2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_msxdos2_device::msx_cart_msxdos2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_MSXDOS2, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
-	, m_selected_bank(0)
-	, m_bank_base(nullptr)
+	, m_rombank(*this, "rombank")
 {
 }
-
-
-void msx_cart_msxdos2_device::device_start()
-{
-	save_item(NAME(m_selected_bank));
-}
-
-
-void msx_cart_msxdos2_device::device_post_load()
-{
-	restore_banks();
-}
-
-
-void msx_cart_msxdos2_device::restore_banks()
-{
-	m_bank_base = get_rom_base() + ( m_selected_bank & 0x03 ) * 0x4000;
-}
-
 
 void msx_cart_msxdos2_device::device_reset()
 {
-	m_selected_bank = 0;
+	m_rombank->set_entry(1);
 }
-
 
 void msx_cart_msxdos2_device::initialize_cartridge()
 {
@@ -46,26 +30,13 @@ void msx_cart_msxdos2_device::initialize_cartridge()
 		fatalerror("msxdos2: Invalid ROM size\n");
 	}
 
-	restore_banks();
+	m_rombank->configure_entries(0, 4, get_rom_base(), 0x4000);
+
+	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank);
+	page(1)->install_write_handler(0x7ffe, 0x7ffe, write8smo_delegate(*this, FUNC(msx_cart_msxdos2_device::bank_w)));
 }
 
-
-uint8_t msx_cart_msxdos2_device::read_cart(offs_t offset)
+void msx_cart_msxdos2_device::bank_w(u8 data)
 {
-	if (offset >= 0x4000 && offset < 0x8000)
-	{
-		return m_bank_base[offset & 0x3fff];
-	}
-
-	return 0xff;
-}
-
-
-void msx_cart_msxdos2_device::write_cart(offs_t offset, uint8_t data)
-{
-	if (offset == 0x6000)
-	{
-		m_selected_bank = data;
-		restore_banks();
-	}
+	m_rombank->set_entry(data & 0x03);
 }

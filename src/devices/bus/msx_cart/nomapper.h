@@ -17,7 +17,7 @@ public:
 	msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 
 	virtual void initialize_cartridge() override;
 

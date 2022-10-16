@@ -13,7 +13,7 @@ msx_audio_kb_port_interface::msx_audio_kb_port_interface(machine_config const &m
 }
 
 
-msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_AUDIO_KBDC_PORT, tag, owner, clock)
 	, device_single_card_slot_interface<msx_audio_kb_port_interface>(mconfig, *this)
 	, m_keyboard(nullptr)
@@ -27,14 +27,14 @@ void msx_audio_kbdc_port_device::device_start()
 }
 
 
-void msx_audio_kbdc_port_device::write(uint8_t data)
+void msx_audio_kbdc_port_device::write(u8 data)
 {
 	if (m_keyboard)
 		m_keyboard->write(data);
 }
 
 
-uint8_t msx_audio_kbdc_port_device::read()
+u8 msx_audio_kbdc_port_device::read()
 {
 	if (m_keyboard)
 		return m_keyboard->read();
@@ -50,7 +50,7 @@ DECLARE_DEVICE_TYPE(MSX_AUDIO_KB_NMS1160, msx_nms1160_device)
 class msx_hxmu901_device : public device_t, public msx_audio_kb_port_interface
 {
 public:
-	msx_hxmu901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	msx_hxmu901_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, MSX_AUDIO_KB_HXMU901, tag, owner, clock)
 		, msx_audio_kb_port_interface(mconfig, *this)
 		, m_row(0)
@@ -60,9 +60,9 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual uint8_t read() override
+	virtual u8 read() override
 	{
-		uint8_t result = 0xff;
+		u8 result = 0xff;
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -74,7 +74,7 @@ public:
 		return result;
 	}
 
-	virtual void write(uint8_t data) override
+	virtual void write(u8 data) override
 	{
 		m_row = data;
 	}
@@ -88,7 +88,7 @@ private:
 };
 
 
-static INPUT_PORTS_START( hxmu901)
+static INPUT_PORTS_START(hxmu901)
 	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C#1")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D1")
@@ -173,14 +173,14 @@ INPUT_PORTS_END
 
 ioport_constructor msx_hxmu901_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( hxmu901 );
+	return INPUT_PORTS_NAME(hxmu901);
 }
 
 
 class msx_nms1160_device : public device_t, public msx_audio_kb_port_interface
 {
 public:
-	msx_nms1160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	msx_nms1160_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, MSX_AUDIO_KB_NMS1160, tag, owner, clock)
 		, msx_audio_kb_port_interface(mconfig, *this)
 		, m_row(0)
@@ -190,9 +190,9 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual uint8_t read() override
+	virtual u8 read() override
 	{
-		uint8_t result = 0xff;
+		u8 result = 0xff;
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -204,7 +204,7 @@ public:
 		return result;
 	}
 
-	virtual void write(uint8_t data) override
+	virtual void write(u8 data) override
 	{
 		logerror("msx_nms1160::write %02x\n", data);
 		m_row = data;
@@ -219,7 +219,7 @@ private:
 };
 
 
-static INPUT_PORTS_START( nms1160 )
+static INPUT_PORTS_START(nms1160)
 	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C1")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C#1")
@@ -302,7 +302,7 @@ INPUT_PORTS_END
 
 ioport_constructor msx_nms1160_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( nms1160 );
+	return INPUT_PORTS_NAME(nms1160);
 }
 
 

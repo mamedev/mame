@@ -15,35 +15,33 @@ DECLARE_DEVICE_TYPE(MSX_CART_FMPAC, msx_cart_fmpac_device)
 class msx_cart_fmpac_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_fmpac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_fmpac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
-
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void restore_banks();
-
 private:
-	void write_ym2413(offs_t offset, uint8_t data);
+	void write_ym2413(offs_t offset, u8 data);
+	void sram_unlock(offs_t offset, u8 data);
+	u8 control_r();
+	void control_w(u8 data);
+	u8 bank_r();
+	void bank_w(u8 data);
 
 	required_device<ym2413_device> m_ym2413;
+	memory_bank_creator m_rombank;
+	memory_view m_view;
 
-	uint8_t m_selected_bank;
-	uint8_t *m_bank_base;
 	bool m_sram_active;
 	bool m_opll_active;
-	uint8_t m_1ffe;
-	uint8_t m_1fff;
-	uint8_t m_7ff6;
+	u8 m_sram_unlock[2];
+	u8 m_control;
 };
 
 
