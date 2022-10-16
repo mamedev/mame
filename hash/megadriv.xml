@@ -1078,7 +1078,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<description>Bloodshot (Europe)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
-		<info name="alt_title" value="Battle Frenzy"/>
+		<info name="alt_title" value="Battle Frenzy (Germany)"/>
 		<info name="serial" value="T-88126-50"/>
 		<sharedfeat name="compatibility" value="PAL,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
@@ -7535,9 +7535,10 @@ Unsupported [Sega Mouse] peripheral
 
 <!-- Only Euro is confirmed -->
 	<software name="sonic3d">
-		<description>Sonic 3D - Flickies' Island (Europe) ~ Sonic 3D Blast (USA, Korea)</description>
+		<description>Sonic 3D - Flickies' Island (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="Sonic 3D Blast (USA, Korea)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A"/>
 			<feature name="ic1" value="MPR-19101-MX"/>
@@ -7553,9 +7554,10 @@ Unsupported [Sega Mouse] peripheral
 
 <!-- Only Euro and Korea are confirmed -->
 	<software name="soniccmp">
-		<description>Sonic Compilation (Europe) ~ Sonic Classics (USA, Korea)</description>
+		<description>Sonic Compilation (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="Sonic Classics (USA, Korea)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-7147A"/>
 			<feature name="ic1" value="MPR-19693-MX"/>
