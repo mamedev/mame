@@ -39,6 +39,7 @@ X-TAL: 20 MHz
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -74,7 +75,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<u8> m_videoram;
 	required_shared_ptr<u8> m_spriteram;
 	required_region_ptr<u8> m_bgdata_rom;
@@ -132,9 +133,6 @@ static constexpr int VTOTAL        = 256;
 static constexpr int VBEND         = 16;
 static constexpr int VBSTART       = 240;
 
-static constexpr int BACKGROUND_X_START      = 32;
-static constexpr int BACKGROUND_X_START_FLIP = 72;
-
 static constexpr int VISIBLE_X_MIN = 12 * 8;
 static constexpr int VISIBLE_X_MAX = 52 * 8;
 static constexpr int VISIBLE_Y_MIN =  2 * 8;
@@ -161,6 +159,15 @@ static constexpr int VISIBLE_Y_MAX = 30 * 8;
 void fcombat_state::fcombat_palette(palette_device &palette) const
 {
 	const u8 *color_prom = memregion("proms")->base();
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
+	compute_resistor_weights(0, 255, -1.0,
+			3, &resistances_rg[0], rweights, 0, 0,
+			3, &resistances_rg[0], gweights, 0, 0,
+			2, &resistances_b[0],  bweights, 0, 0);
 
 	// create a lookup table for the palette
 	for (int i = 0; i < 0x20; i++)
@@ -171,19 +178,18 @@ void fcombat_state::fcombat_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		const u8 r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		const u8 g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		const u8 b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -276,10 +282,8 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		if ((code & 0x108) == 0x108)
 		{
-			if (m_sprite_bank & 1)
-				code += 0x100;
-			if (m_sprite_bank & 2)
-				code ^= 0x08;
+			static constexpr int mask[4] = { 0x308, 0x300, 0x08, 0x00 };
+			code ^= mask[m_sprite_bank];
 		}
 
 		int code2 = code;
@@ -363,7 +367,7 @@ u8 fcombat_state::port01_r()
 }
 
 
-//bg scrolls
+// bg scrolls
 
 void fcombat_state::e900_w(u8 data)
 {
@@ -527,8 +531,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-
-/* 16 x 16 sprites -- requires reorganizing characters in init_fcombat() */
+// 16 x 16 sprites -- requires reorganizing characters in init_fcombat()
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -539,7 +542,6 @@ static const gfx_layout spritelayout =
 	{ STEP16(0,4*8) },
 	64*8
 };
-
 
 static GFXDECODE_START( gfx_fcombat )
 	GFXDECODE_ENTRY( "fgtiles", 0, charlayout,         0, 64 )
@@ -677,7 +679,6 @@ void fcombat_state::init_fcombat()
 		memcpy(&dst[oldaddr * 32 * 8 * 2], &src[oldaddr * 32 * 8], 32 * 8);
 		memcpy(&dst[oldaddr * 32 * 8 * 2 + 32 * 8], &src[oldaddr * 32 * 8 + 0x2000], 32 * 8);
 	}
-
 
 	src = &temp[0];
 	dst = memregion("terrain_info")->base();
