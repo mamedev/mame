@@ -3126,7 +3126,7 @@ msgstr "Programm ist ein Klon von: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:650
 msgid "Software is parent"
-msgstr "Programm ist Ursprungs-Programm"
+msgstr "Programm ist übergeordnetes Programm"
 
 #: src/frontend/mame/ui/selmenu.cpp:655
 msgid "Supported: No"
