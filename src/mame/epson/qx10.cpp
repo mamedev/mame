@@ -35,6 +35,7 @@
 #include "emu.h"
 
 #include "bus/centronics/ctronics.h"
+#include "bus/epson_qx/keyboard/keyboard.h"
 #include "bus/epson_qx/option.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
@@ -45,7 +46,6 @@
 #include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "qx10kbd.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80sio.h"
@@ -171,7 +171,7 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
-	required_device<rs232_port_device> m_kbd;
+	required_device<bus::epson_qx::keyboard::keyboard_port_device> m_kbd;
 	required_device<centronics_device> m_centronics;
 	required_device<bus::epson_qx::option_bus_device> m_bus;
 	required_device<speaker_sound_device>   m_speaker;
@@ -640,6 +640,7 @@ WRITE_LINE_MEMBER(qx10_state::keyboard_irq)
 WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
 {
 	// clock keyboard too
+	m_kbd->clk_w(state);
 	m_scc->rxca_w(state);
 	m_scc->txca_w(state);
 }
@@ -897,11 +898,6 @@ void qx10_state::upd7220_map(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w)).mirror(0x30000);
 }
 
-static void keyboard(device_slot_interface &device)
-{
-	device.option_add("qx10", QX10_KEYBOARD);
-}
-
 void qx10_state::qx10(machine_config &config)
 {
 	/* basic machine hardware */
@@ -960,7 +956,7 @@ void qx10_state::qx10(machine_config &config)
 
 	UPD7201(config, m_scc, MAIN_CLK/4); // channel b clock set by pit2 channel 2
 	// Channel A: Keyboard
-	m_scc->out_txda_callback().set(m_kbd, FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set(m_kbd, FUNC(bus::epson_qx::keyboard::keyboard_port_device::rxd_w));
 	// Channel B: RS232
 	m_scc->out_txdb_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtrb_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
@@ -1006,8 +1002,8 @@ void qx10_state::qx10(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_scc, FUNC(upd7201_device::rxb_w));
 
-	RS232_PORT(config, m_kbd, keyboard, "qx10");
-	m_kbd->rxd_handler().set(m_scc, FUNC(upd7201_device::rxa_w));
+	EPSON_QX_KEYBOARD_PORT(config, m_kbd, bus::epson_qx::keyboard::keyboard_devices, "qx10_hasci");
+	m_kbd->txd_handler().set(m_scc, FUNC(upd7201_device::rxa_w));
 
 	output_latch_device &prndata(OUTPUT_LATCH(config, "prndata"));
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);

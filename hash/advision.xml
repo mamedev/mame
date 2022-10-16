@@ -62,7 +62,7 @@ license:CC0
 
 <!-- Homebrew -->
 
-	<software name="codered" supported="partial">
+	<software name="codered">
 		<!-- ref: https://www.m-e-g-a.org/research-education/research/adventure-vision/ -->
 		<description>Code Red</description>
 		<year>2013</year>

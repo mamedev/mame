@@ -6,7 +6,9 @@
 
     These are based on the YM3420AD or YM3420BF "CPU and FM Tone Generator",
     a 65C02-based SoC which includes 256 bytes of internal RAM, 16 KB of
-    internal ROM (enabled only on PSR-36?), a MIDI UART and a DAC.
+    internal ROM (enabled only on PSR-36?), a MIDI UART and a DAC. It is
+    paired with the YM3419AD (XE193A00) or YM3419BF (XF026A00) RYP7 rhythm
+    generator, which has its own external ROM.
 
 *******************************************************************************/
 
@@ -111,7 +113,7 @@ INPUT_PORTS_END
 
 void yamaha_psr16_state::psr16(machine_config &config)
 {
-	M65C02(config, m_maincpu, 2'000'000);
+	M65C02(config, m_maincpu, 5.5_MHz_XTAL / 4); // XTAL value from PSS-480; internal divider guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &yamaha_psr16_state::psr16_map);
 }
 
@@ -149,16 +151,25 @@ ROM_START(psr36)
 	ROM_LOAD("yamaha_xe137b0_4881-7554.bin", 0x00000, 0x20000, CRC(6fe1382e) SHA1(82320d0a6c14825d790c0d67263786f767b7c318)) // 28-pin mask ROM (drum samples)
 ROM_END
 
+ROM_START(pss480)
+	ROM_REGION(0x40000, "program", 0)
+	ROM_LOAD("xe418c0-077.ic4", 0x00000, 0x40000, CRC(1e9a1933) SHA1(c0015cbb34f50ac5687db9def679117e4b2bad32)) // uPD23C2001C (DIP32 5V 2Mbit)
+
+	ROM_REGION(0x20000, "waves", 0)
+	ROM_LOAD("xe402a0-611.ic3", 0x00000, 0x20000, CRC(e0f6f612) SHA1(1307a69233da31d19750c33dfb46a216c0be9c08)) // uPD23C1000C (DIP28 5V 1Mbit) (location has holes for a 32-pin ROM)
+ROM_END
+
 ROM_START(pss680)
 	ROM_REGION(0x40000, "program", 0)
-	ROM_LOAD("yamaha_xe416d0-093.bin", 0x00000, 0x40000, CRC(150d1392) SHA1(d578324cfae73cd5f6c628eb3044be07684bc5d0)) // 32-pin mask ROM
+	ROM_LOAD("xe416d0-093.ic4", 0x00000, 0x40000, CRC(150d1392) SHA1(d578324cfae73cd5f6c628eb3044be07684bc5d0)) // 32-pin mask ROM
 
 	ROM_REGION(0x40000, "waves", 0)
-	ROM_LOAD("yamaha_xe405b0-070.bin", 0x00000, 0x40000, CRC(53336c52) SHA1(6bcad44fc93cfa5cd603cf24adfd736a911d3509)) // 32-pin mask ROM
+	ROM_LOAD("xe405b0-070.ic3", 0x00000, 0x40000, CRC(53336c52) SHA1(6bcad44fc93cfa5cd603cf24adfd736a911d3509)) // 32-pin mask ROM
 ROM_END
 
 } // anonymous namespace
 
 SYST(1988, psr16,  0, 0, psr16,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-16",  MACHINE_IS_SKELETON)
 SYST(1988, psr36,  0, 0, psr36,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-36",  MACHINE_IS_SKELETON)
+SYST(1988, pss480, 0, 0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-480 / PSS-580", MACHINE_IS_SKELETON)
 SYST(1988, pss680, 0, 0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-680", MACHINE_IS_SKELETON)

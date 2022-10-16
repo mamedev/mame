@@ -1,21 +1,26 @@
 // license:BSD-3-Clause
-// copyright-holders: Tomasz Slanina
+// copyright-holders: David Haywood, Tomasz Slanina
 
 /* Field Combat (c)1985 Jaleco
 
-    TS 2004.10.22.
-    - fixed sprite issues
-    - added backgrounds and terrain info (external ROMs)
+Hardware has similarities with Exerion
 
-    (press buttons 1+2 at the same time, to release 'army' ;)
+TS 2004.10.22.
+- fixed sprite issues
+- added backgrounds and terrain info (external ROMs)
 
-    todo:
-        - fix colours (sprites , bg)
-*/
+(press buttons 1+2 at the same time, to release 'army' ;)
 
-/*
+TODO:
+- fix colours (sprites, bg), not many PCB references online
+  sprites: player char and soldiers are correct, explosions probably also ok,
+  a lot of other sprite colors still look bad
+  bg: 16 levels, each has a different color. 1st level should be green bg,
+  with black at the bottom part
+- cocktail mode doesn't work right
 
-Field Combat (c)1985 Jaleco
+
+PCB Notes:
 
 From a working board.
 
@@ -26,8 +31,6 @@ Other: Unmarked 24 pin near ROMs 2 & 3
 RAM: 6116 (x3)
 
 X-TAL: 20 MHz
-
-inputs + notes by stephh
 
 */
 
@@ -43,16 +46,6 @@ inputs + notes by stephh
 #include "tilemap.h"
 
 
-// configurable logging
-#define LOG_PALETTEBANK     (1U << 1)
-
-//#define VERBOSE (LOG_GENERAL | LOG_PALETTEBANK)
-
-#include "logmacro.h"
-
-#define LOGPALETTEBANK(...)     LOGMASKED(LOG_PALETTEBANK,     __VA_ARGS__)
-
-
 namespace {
 
 class fcombat_state : public driver_device
@@ -64,7 +57,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_bgdata_rom(*this, "bgdata"),
 		m_terrain_rom(*this, "terrain_info"),
-		m_io_in(*this, "IN%u", 0U),
+		m_inputs(*this, "IN%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -87,14 +80,12 @@ private:
 	required_shared_ptr<u8> m_spriteram;
 	required_region_ptr<u8> m_bgdata_rom;
 	required_region_ptr<u8> m_terrain_rom;
-
-	required_ioport_array<2> m_io_in;
+	required_ioport_array<3> m_inputs;
 
 	// video-related
 	tilemap_t *m_bgmap = nullptr;
 	u8 m_cocktail_flip = 0U;
 	u8 m_char_palette = 0U;
-	u8 m_sprite_palette = 0U;
 	u8 m_char_bank = 0U;
 
 	// misc
@@ -150,16 +141,6 @@ static constexpr int VISIBLE_Y_MIN =  2 * 8;
 static constexpr int VISIBLE_Y_MAX = 30 * 8;
 
 
-TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
-{
-	//int palno = (tile_index - (tile_index / 32 * 16) * 32 * 16) / 32;
-
-	const int tileno = m_bgdata_rom[tile_index];
-	const int palno = 0x18; //m_terrain_rom[tile_index] >> 3;
-	tileinfo.set(2, tileno, palno, 0);
-}
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -213,14 +194,14 @@ void fcombat_state::fcombat_palette(palette_device &palette) const
 	// fg chars/sprites
 	for (int i = 0; i < 0x200; i++)
 	{
-		const u8 ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
+		const u8 ctabentry = (color_prom[(i & 0x1c0) | bitswap<6>(i,1,0,5,4,3,2)] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	// bg chars (this is not the full story... there are four layers mixed using another PROM)
+	// bg chars
 	for (int i = 0x200; i < 0x300; i++)
 	{
-		const u8 ctabentry = color_prom[i] & 0x0f;
+		const u8 ctabentry = color_prom[(i & 0x3c0) | bitswap<6>(i,1,0,5,4,3,2)] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -235,6 +216,13 @@ void fcombat_state::fcombat_palette(palette_device &palette) const
 void fcombat_state::video_start()
 {
 	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fcombat_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
+}
+
+TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
+{
+	const int tileno = m_bgdata_rom[tile_index];
+	const int palno = (tile_index >> 5 & 0xf) ^ 7;
+	tileinfo.set(2, tileno, palno, 0);
 }
 
 
@@ -257,9 +245,7 @@ void fcombat_state::videoreg_w(u8 data)
 
 	// bits 4-5 unused
 
-	// bits 6-7 sprite lookup table bank
-	m_sprite_palette = 0; //(data & 0xc0) >> 6;
-	LOGPALETTEBANK("sprite palette bank: %02x", data);
+	// bits 6-7 ?
 }
 
 
@@ -267,27 +253,25 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	// draw background
 	m_bgmap->set_scrolly(0, m_fcombat_sh);
-	m_bgmap->set_scrollx(0, m_fcombat_sv - 24);
+	m_bgmap->set_scrollx(0, m_fcombat_sv - 8);
 
 	m_bgmap->mark_all_dirty();
 	m_bgmap->draw(screen, bitmap, cliprect, 0, 0);
-	//draw_background(bitmap, cliprect);
 
 	// draw sprites
 	for (int i = 0; i < m_spriteram.bytes(); i += 4)
 	{
 		const int flags = m_spriteram[i + 0];
-		int y = m_spriteram[i + 1] ^ 255;
+		int y = 256 - m_spriteram[i + 1];
 		int code = m_spriteram[i + 2] + ((flags & 0x20) << 3);
-		int x = m_spriteram[i + 3] * 2 + 72;
+		int x = m_spriteram[i + 3] * 2 + (flags & 0x01) + 56;
 
 		int xflip = flags & 0x80;
 		int yflip = flags & 0x40;
-		const bool doubled = false;// flags & 0x10;
 		const bool wide = flags & 0x08;
 		int code2 = code;
 
-		const int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (m_sprite_palette * 16);
+		const int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (code >> 4 & 0x10);
 		gfx_element *gfx = m_gfxdecode->gfx(1);
 
 		if (m_cocktail_flip)
@@ -318,8 +302,6 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		}
 
 		gfx->transpen(bitmap, cliprect, code, color, xflip, yflip, x, y, 0);
-
-		if (doubled) i += 4;
 	}
 
 	// draw the visible text layer
@@ -366,7 +348,8 @@ u8 fcombat_state::protection_r()
 u8 fcombat_state::port01_r()
 {
 	// the cocktail flip bit muxes between ports 0 and 1
-	return m_io_in[m_cocktail_flip ? 1 : 0]->read();
+	u8 start = m_inputs[0]->read() & 0xc0;
+	return (m_inputs[(m_cocktail_flip & 1) + 1]->read() & 0x3f) | start;
 }
 
 
@@ -410,6 +393,7 @@ u8 fcombat_state::e300_r()
 
 void fcombat_state::ee00_w(u8 data)
 {
+	// related to protection ? - doesn't seem to have any effect
 }
 
 void fcombat_state::main_map(address_map &map)
@@ -422,14 +406,14 @@ void fcombat_state::main_map(address_map &map)
 	map(0xe100, 0xe100).portr("DSW0");
 	map(0xe200, 0xe200).portr("DSW1");
 	map(0xe300, 0xe300).r(FUNC(fcombat_state::e300_r));
-	map(0xe400, 0xe400).r(FUNC(fcombat_state::protection_r)); // protection?
-	map(0xe800, 0xe800).w(FUNC(fcombat_state::videoreg_w));   // at least bit 0 for flip screen and joystick input multiplexer
+	map(0xe400, 0xe400).r(FUNC(fcombat_state::protection_r));
+	map(0xe800, 0xe800).w(FUNC(fcombat_state::videoreg_w));
 	map(0xe900, 0xe900).w(FUNC(fcombat_state::e900_w));
 	map(0xea00, 0xea00).w(FUNC(fcombat_state::ea00_w));
 	map(0xeb00, 0xeb00).w(FUNC(fcombat_state::eb00_w));
 	map(0xec00, 0xec00).w(FUNC(fcombat_state::ec00_w));
 	map(0xed00, 0xed00).w(FUNC(fcombat_state::ed00_w));
-	map(0xee00, 0xee00).w(FUNC(fcombat_state::ee00_w));   // related to protection ? - doesn't seem to have any effect
+	map(0xee00, 0xee00).w(FUNC(fcombat_state::ee00_w));
 	map(0xef00, 0xef00).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -455,25 +439,25 @@ void fcombat_state::audio_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( fcombat )
-	PORT_START("IN0")      // player 1 inputs (muxed on 0xe000)
+	PORT_START("IN0")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("IN1")      // player 1 inputs (muxed on 0xe000)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN1")      // player 2 inputs (muxed on 0xe000)
+	PORT_START("IN2")      // player 2 inputs (muxed on 0xe000)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW0")      // dip switches (0xe100)
 	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )
@@ -488,7 +472,7 @@ static INPUT_PORTS_START( fcombat )
 	PORT_DIPSETTING(    0x08, "20000" )
 	PORT_DIPSETTING(    0x10, "30000" )
 	PORT_DIPSETTING(    0x18, "40000" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
@@ -500,10 +484,11 @@ static INPUT_PORTS_START( fcombat )
 
 	PORT_START("DSW1")      // dip switches/VBLANK (0xe200)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )      // related to vblank
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
@@ -564,7 +549,6 @@ void fcombat_state::machine_start()
 {
 	save_item(NAME(m_cocktail_flip));
 	save_item(NAME(m_char_palette));
-	save_item(NAME(m_sprite_palette));
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_fcombat_sh));
 	save_item(NAME(m_fcombat_sv));
@@ -576,7 +560,6 @@ void fcombat_state::machine_reset()
 {
 	m_cocktail_flip = 0;
 	m_char_palette = 0;
-	m_sprite_palette = 0;
 	m_char_bank = 0;
 	m_fcombat_sh = 0;
 	m_fcombat_sv = 0;
@@ -607,12 +590,11 @@ void fcombat_state::fcombat(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2149(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12); // TODO: should this and the following be CPU_CLOCK / 2?
-
-	YM2149(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
-
-	YM2149(config, "ay3", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	YM2149(config, "ay1", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay2", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay3", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
+
 
 /*************************************
  *
@@ -634,6 +616,7 @@ void fcombat_state::init_fcombat()
 	/* decode the characters
 	   the bits in the ROM are ordered: n8-n7 n6 n5 n4-v2 v1 v0 n3-n2 n1 n0 h2
 	   we want them ordered like this:  n8-n7 n6 n5 n4-n3 n2 n1 n0-v2 v1 v0 h2 */
+
 	for (u32 oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		u32 newaddr = ((oldaddr     ) & 0x1f00) |       // keep n8-n4
@@ -736,8 +719,8 @@ ROM_START( fcombat )
 	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "fcprom_a.c2",  0x0000, 0x0020, CRC(7ac480f0) SHA1(f491fe4da19d8c037e3733a5836de35cc438907e) ) // palette
 	ROM_LOAD( "fcprom_d.k12", 0x0020, 0x0100, CRC(9a348250) SHA1(faf8db4c42adee07795d06bea20704f8c51090ff) ) // fg char lookup table
-	ROM_LOAD( "fcprom_b.c4",  0x0120, 0x0100, CRC(ac9049f6) SHA1(57aa5b5df3e181bad76149745a422c3dd1edad49) ) // sprite lookup table
-	ROM_LOAD( "fcprom_c.a9",  0x0220, 0x0100, CRC(768ac120) SHA1(ceede1d6cbeae08da96ef52bdca2718a839d88ab) ) // bg char mixer
+	ROM_LOAD( "fcprom_c.a9",  0x0120, 0x0100, CRC(768ac120) SHA1(ceede1d6cbeae08da96ef52bdca2718a839d88ab) ) // sprite lookup table
+	ROM_LOAD( "fcprom_b.c4",  0x0220, 0x0100, CRC(ac9049f6) SHA1(57aa5b5df3e181bad76149745a422c3dd1edad49) ) // bg char lookup table
 ROM_END
 
 } // anonymous namespace

@@ -620,7 +620,7 @@ void a400_state::a800xl_mem(address_map &map)
 
 void a400_state::a130xe_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a130xe_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
@@ -835,7 +835,7 @@ static INPUT_PORTS_START( atari_keyboard )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Lowr  Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')

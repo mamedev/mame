@@ -984,6 +984,11 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 
 	case SEROUT_C:
 		LOG("%s: POKEY SEROUT $%02x\n", machine().describe_context(), data);
+		// TODO: convert to real serial comms, fix timings
+		// SEROC (1) serial out in progress (0) serial out complete
+		// in progress status is necessary for a800 telelnk2 to boot
+		m_IRQST &= ~IRQ_SEROC;
+
 		m_serout_w_cb(offset, data);
 		m_SKSTAT |= SK_SEROUT;
 		/*

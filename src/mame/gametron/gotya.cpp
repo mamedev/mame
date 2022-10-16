@@ -7,20 +7,19 @@
 
 TODO: Emulated sound
 
-      Hitachi HD38880BP
-              HD38882PA06
+Epson 7910 for the main melody
+Hitachi HD38880BP and HD38882PA06 for voice
 
-      I think HD38880 is a CPU/MCU, because the game just sends it a sound command (0-0x1a)
+I think HD38880 is a CPU/MCU, because the game just sends it a sound command (0-0x1a)
 
-      couriersud:
-         The chips above are speech synthesis chips. HD38880 is the main chip
-         whereas HD38882 is an eprom interface. PARCOR based.
-         http://www.freepatentsonline.com/4435832.html
-         Datasheet lists no parcor coefficients
+couriersud:
+   The chips above are speech synthesis chips. HD38880 is the main chip
+   whereas HD38882 is an eprom interface. PARCOR based.
+   http://www.freepatentsonline.com/4435832.html
+   Datasheet lists no parcor coefficients
 
-****************************************************************************/
+*****************************************************************************
 
-/****************************************************************************
  About GotYa (from the board owner)
 
  I believe it is a prototype for several reasons.
@@ -34,7 +33,8 @@ TODO: Emulated sound
  so despite the fact that 'gotya' might look like it's a bootleg of thehand,
  it's more likely just a prototype / alternate version, it's hard to tell
 
- ----
+----
+
 According to Andrew Welburn:
 
 'The Hand' is the original game, GAT licensed it for US manufacture.
@@ -56,6 +56,7 @@ still there in Got-Ya but with the company name scrubbed out.
 All in all, Got-Ya should NOT be marked as a prototype in MAME, it's a
 US territory license hack of another game 'The Hand'. Nothing about it
 says prototype, and the original base game is 'The Hand'.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -246,12 +247,11 @@ void gotya_state::draw_status_row(bitmap_ind16 &bitmap, const rectangle &cliprec
 		else
 			sy = 31 - row;
 
-
 		m_gfxdecode->gfx(0)->opaque(bitmap, cliprect,
-									m_videoram[1][row * 32 + col],
-									m_videoram[1][row * 32 + col + 0x10] & 0x0f,
-									flip_screen_x(), flip_screen_y(),
-									8 * sx, 8 * sy);
+				m_videoram[1][row * 32 + col],
+				m_videoram[1][row * 32 + col + 0x10] & 0x0f,
+				flip_screen_x(), flip_screen_y(),
+				8 * sx, 8 * sy);
 	}
 }
 
@@ -267,11 +267,10 @@ void gotya_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (flip_screen())
 			sy = 240 - sy;
 
-
 		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-										code, color,
-										flip_screen_x(), flip_screen_y(),
-										sx, sy, 0);
+				code, color,
+				flip_screen_x(), flip_screen_y(),
+				sx, sy, 0);
 	}
 }
 
@@ -297,41 +296,76 @@ uint32_t gotya_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 // audio
 
-	struct gotya_sample
-	{
-		int8_t sound_command;
-		uint8_t channel;
-		uint8_t looping;
-	};
+static const char *const sample_names[] =
+{                                               // Address triggered at
+	"*thehand",
+	"01",   // game start tune              // 075f
+	"02",   // coin in                      // 0074
+	"03",   // eat dot                      // 0e45
+	"05",   // eat dollar sign              // 0e45
 
+	"06",   // door open                    // 19e1
+	"07",   // door close                   // 1965
 
-	static const struct gotya_sample gotya_samples[] =
-	{
-		{ 0x01, 0, 0 },
-		{ 0x02, 1, 0 },
-		{ 0x03, 2, 0 },
-		{ 0x05, 2, 0 },
-		{ 0x06, 3, 0 },
-		{ 0x07, 3, 0 },
-		{ 0x08, 0, 1 },
-		{ 0x0a, 0, 0 },
-		{ 0x0b, 0, 0 },
+	"08",   // theme song                   // 0821
+	//"09"                                  // 1569
 
-	// all the speech can go to one channel?
+	// one of these two is played after eating the last dot
+	"0a",   // piccolo                      // 17af
+	"0b",   // tune                         // 17af
 
-		{ 0x10, 3, 0 },
-		{ 0x11, 3, 0 },
-		{ 0x12, 0, 0 },     // this should stop the main tune
-		{ 0x13, 3, 0 },
-		{ 0x14, 3, 0 },
-		{ 0x15, 3, 0 },
-		{ 0x16, 3, 0 },
-		{ 0x17, 3, 0 },
-		{ 0x18, 3, 0 },
-		{ 0x19, 3, 0 },
-		{ 0x1a, 3, 0 },
-		{   -1, 0, 0 }      // end of array
-	};
+	//"0f"                                  // 08ee
+	"10",   // 'We're even. Bye Bye!'       // 162a
+	"11",   // 'You got me!'                // 1657
+	"12",   // 'You have lost out'          // 085e
+
+	"13",   // 'Rock'                       // 14de
+	"14",   // 'Scissors'                   // 14f3
+	"15",   // 'Paper'                      // 1508
+
+	// one of these is played when going by the girl between levels
+	"16",   // 'Very good!'                 // 194a
+	"17",   // 'Wonderful!'                 // 194a
+	"18",   // 'Come on!'                   // 194a
+	"19",   // 'I love you!'                // 194a
+	"1a",   // 'See you again!'             // 194a
+	nullptr
+};
+
+struct gotya_sample
+{
+	int8_t sound_command;
+	uint8_t channel;
+	uint8_t looping;
+};
+
+// all the speech can go to one channel?
+
+static const struct gotya_sample gotya_samples[] =
+{
+	{ 0x01, 0, 0 },
+	{ 0x02, 1, 0 },
+	{ 0x03, 2, 0 },
+	{ 0x05, 2, 0 },
+	{ 0x06, 3, 0 },
+	{ 0x07, 3, 0 },
+	{ 0x08, 0, 1 },
+	{ 0x0a, 0, 0 },
+	{ 0x0b, 0, 0 },
+
+	{ 0x10, 3, 0 },
+	{ 0x11, 3, 0 },
+	{ 0x12, 0, 0 }, // this should stop the main tune
+	{ 0x13, 3, 0 },
+	{ 0x14, 3, 0 },
+	{ 0x15, 3, 0 },
+	{ 0x16, 3, 0 },
+	{ 0x17, 3, 0 },
+	{ 0x18, 3, 0 },
+	{ 0x19, 3, 0 },
+	{ 0x1a, 3, 0 },
+	{   -1, 0, 0 }  // end of array
+};
 
 void gotya_state::soundlatch_w(uint8_t data)
 {
@@ -387,20 +421,20 @@ void gotya_state::prg_map(address_map &map)
 
 static INPUT_PORTS_START( gotya )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Paper") PORT_PLAYER(1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Scissors") PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Rock") PORT_PLAYER(1)
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_DIPNAME( 0x10, 0x10, "Sound Test" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -459,42 +493,6 @@ static GFXDECODE_START( gfx_gotya )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
-
-static const char *const sample_names[] =
-{                                               // Address triggered at
-	"*thehand",
-	"01",   // game start tune              // 075f
-	"02",   // coin in                      // 0074
-	"03",   // eat dot                      // 0e45
-	"05",   // eat dollar sign              // 0e45
-
-	"06",   // door open                    // 19e1
-	"07",   // door close                   // 1965
-
-	"08",   // theme song                   // 0821
-	//"09"                                  // 1569
-
-	// one of these two is played after eating the last dot
-	"0a",   // piccolo                      // 17af
-	"0b",   // tune                         // 17af
-
-	//"0f"                                  // 08ee
-	"10",   // 'We're even. Bye Bye!'       // 162a
-	"11",   // 'You got me!'                // 1657
-	"12",   // 'You have lost out'          // 085e
-
-	"13",   // 'Rock'                       // 14de
-	"14",   // 'Scissors'                   // 14f3
-	"15",   // 'Paper'                      // 1508
-
-	// one of these is played when going by the girl between levels
-	"16",   // 'Very good!'                 // 194a
-	"17",   // 'Wonderful!'                 // 194a
-	"18",   // 'Come on!'                   // 194a
-	"19",   // 'I love you!'                // 194a
-	"1a",   // 'See you again!'             // 194a
-	nullptr
-};
 
 void gotya_state::machine_start()
 {
@@ -603,5 +601,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, thehand, 0,       gotya, gotya, gotya_state, empty_init, ROT270, "T.I.C.",      "The Hand",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, gotya,   thehand, gotya, gotya, gotya_state, empty_init, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, thehand, 0,       gotya, gotya, gotya_state, empty_init, ROT270, "T.I.C.", "The Hand", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, gotya,   thehand, gotya, gotya, gotya_state, empty_init, ROT270, "T.I.C. (Game-A-Tron license)", "Got-Ya (12/24/1981)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
