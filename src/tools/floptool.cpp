@@ -227,8 +227,39 @@ static int flopconvert(int argc, char *argv[])
 	return 0;
 }
 
+static fs::meta_data extract_meta_data(int &argc, char *argv[])
+{
+	fs::meta_data result;
+
+	int new_argc = 0;
+	for (int i = 0; i < argc; i++)
+	{
+		std::optional<fs::meta_name> attrname;
+		if (argv[i][0] == '-' && i < argc - 1)
+			attrname = fs::meta_data::from_entry_name(&argv[i][1]);
+
+		if (attrname)
+		{
+			// we found a metadata variable; set it
+			result.set(*attrname, argv[i + 1]);
+			i++;
+		}
+		else
+		{
+			// we didn't; update argv
+			argv[new_argc++] = argv[i];
+		}
+	}
+
+	// we're done; update the argument count
+	argc = new_argc;
+	return result;
+}
+
 static int flopcreate(int argc, char *argv[])
 {
+	fs::meta_data meta = extract_meta_data(argc, argv);
+
 	if(argc!=5) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
 		display_usage(argv[0]);
@@ -255,7 +286,6 @@ static int flopcreate(int argc, char *argv[])
 		return 1;
 	}
 
-	fs::meta_data meta;
 	image_handler ih;
 	ih.set_on_disk_path(argv[4]);
 
@@ -281,7 +311,7 @@ static void dir_scan(fs::filesystem_t *fs, u32 depth, const std::vector<std::str
 				if(!c.m_meta.has(m.m_name))
 					continue;
 				size_t slot = nmap.find(m.m_name)->second;
-				std::string val = c.m_meta.get(m.m_name).to_string();
+				std::string val = c.m_meta.get(m.m_name).as_string();
 				if(slot == 0)
 					val = head + "dir  " + val;
 				entries[id][slot] = val;
@@ -296,7 +326,7 @@ static void dir_scan(fs::filesystem_t *fs, u32 depth, const std::vector<std::str
 				if(!c.m_meta.has(m.m_name))
 					continue;
 				size_t slot = nmap.find(m.m_name)->second;
-				std::string val = c.m_meta.get(m.m_name).to_string();
+				std::string val = c.m_meta.get(m.m_name).as_string();
 				if(slot == 0)
 					val = head + "file " + val;
 				entries[id][slot] = val;
@@ -318,7 +348,7 @@ static int generic_dir(image_handler &ih)
 	if(!vmeta.empty()) {
 		std::string vinf = "Volume:";
 		for(const auto &e : vmetad)
-			vinf += util::string_format(" %s=%s", fs::meta_data::entry_name(e.m_name), vmeta.get(e.m_name).to_string());
+			vinf += util::string_format(" %s=%s", fs::meta_data::entry_name(e.m_name), vmeta.get(e.m_name).as_string());
 		printf("%s\n\n", vinf.c_str());
 	}
 
