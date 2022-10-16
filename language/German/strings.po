@@ -1321,7 +1321,7 @@ msgstr "Nicht BIOS"
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Parents"
-msgstr "Übergeordnete Systeme"
+msgstr "Übergeordnete"
 
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
@@ -1396,7 +1396,7 @@ msgstr "Favoriten"
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Parents"
-msgstr "Übergeordnete Systeme"
+msgstr "Übergeordnete"
 
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
@@ -3078,7 +3078,7 @@ msgstr "Spielstände"
 #: src/frontend/mame/ui/selmenu.cpp:91
 msgctxt "selmenu-artwork"
 msgid "Select"
-msgstr "Auswahl"
+msgstr "Charakterauswahl"
 
 #: src/frontend/mame/ui/selmenu.cpp:92
 msgctxt "selmenu-artwork"
@@ -3142,7 +3142,7 @@ msgstr "Unterstützt: Ja"
 
 #: src/frontend/mame/ui/selmenu.cpp:681
 msgid "System is parent"
-msgstr "System ist übergeordnetes System"
+msgstr "System ist ein übergeordnetes System"
 
 #: src/frontend/mame/ui/selmenu.cpp:683 src/frontend/mame/ui/selmenu.cpp:685
 #, c-format
@@ -3234,7 +3234,7 @@ msgstr "System ist ein Klon von\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2888
 msgid "System is Parent\t\n"
-msgstr "System ist übergeordnetes System\t\n"
+msgstr "System ist ein übergeordnetes System\t\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2892
 msgid "Analog Controls\tYes\n"
