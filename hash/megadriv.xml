@@ -1075,9 +1075,10 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 
 <!-- Only Euro confirmed -->
 	<software name="bloodsht">
-		<description>Bloodshot (Europe) ~ Battle Frenzy (Germany)</description>
+		<description>Bloodshot (Europe)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
+		<info name="alt_title" value="Battle Frenzy"/>
 		<info name="serial" value="T-88126-50"/>
 		<sharedfeat name="compatibility" value="PAL,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
