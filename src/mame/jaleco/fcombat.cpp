@@ -12,7 +12,7 @@ TS 2004.10.22.
 (press buttons 1+2 at the same time, to release 'army' ;)
 
 TODO:
-- fix colours (sprites, bg), not much PCB footage online
+- fix colours (sprites, bg), not many PCB references online
   sprites: player char and soldiers are correct, explosions probably also ok,
   a lot of other sprite colors still look bad
   bg: 16 levels, each has a different color. 1st level should be green bg,
@@ -393,6 +393,7 @@ u8 fcombat_state::e300_r()
 
 void fcombat_state::ee00_w(u8 data)
 {
+	// related to protection ? - doesn't seem to have any effect
 }
 
 void fcombat_state::main_map(address_map &map)
@@ -405,14 +406,14 @@ void fcombat_state::main_map(address_map &map)
 	map(0xe100, 0xe100).portr("DSW0");
 	map(0xe200, 0xe200).portr("DSW1");
 	map(0xe300, 0xe300).r(FUNC(fcombat_state::e300_r));
-	map(0xe400, 0xe400).r(FUNC(fcombat_state::protection_r)); // protection?
-	map(0xe800, 0xe800).w(FUNC(fcombat_state::videoreg_w));   // at least bit 0 for flip screen and joystick input multiplexer
+	map(0xe400, 0xe400).r(FUNC(fcombat_state::protection_r));
+	map(0xe800, 0xe800).w(FUNC(fcombat_state::videoreg_w));
 	map(0xe900, 0xe900).w(FUNC(fcombat_state::e900_w));
 	map(0xea00, 0xea00).w(FUNC(fcombat_state::ea00_w));
 	map(0xeb00, 0xeb00).w(FUNC(fcombat_state::eb00_w));
 	map(0xec00, 0xec00).w(FUNC(fcombat_state::ec00_w));
 	map(0xed00, 0xed00).w(FUNC(fcombat_state::ed00_w));
-	map(0xee00, 0xee00).w(FUNC(fcombat_state::ee00_w));   // related to protection ? - doesn't seem to have any effect
+	map(0xee00, 0xee00).w(FUNC(fcombat_state::ee00_w));
 	map(0xef00, 0xef00).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 

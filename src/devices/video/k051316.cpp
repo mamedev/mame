@@ -171,6 +171,8 @@ void k051316_device::device_start()
 	m_ram.resize(0x800);
 	memset(&m_ram[0], 0, 0x800);
 
+	std::fill(std::begin(m_ctrlram), std::end(m_ctrlram), 0);
+
 	if (m_layermask)
 	{
 		m_tmap->map_pens_to_layer(0, 0, 0, TILEMAP_PIXEL_LAYER1);
@@ -190,14 +192,6 @@ void k051316_device::device_start()
 
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void k051316_device::device_reset()
-{
-	std::fill(std::begin(m_ctrlram), std::end(m_ctrlram), 0);
-}
 
 /*****************************************************************************
     DEVICE HANDLERS
@@ -241,14 +235,19 @@ void k051316_device::ctrl_w(offs_t offset, u8 data)
 	if (offset == 0x0e)
 	{
 		m_readout_enabled = !BIT(data, 0);
-		if ((m_flipx_enabled != BIT(data, 1)) || (m_flipy_enabled != BIT(data, 2)))
+
+		bool flipx = bool(BIT(data, 1));
+		bool flipy = bool(BIT(data, 2));
+		if (m_flipx_enabled != flipx || m_flipy_enabled != flipy)
+		{
+			m_flipx_enabled = flipx;
+			m_flipy_enabled = flipy;
 			m_tmap->mark_all_dirty();
-		m_flipx_enabled = BIT(data, 1);
-		m_flipy_enabled = BIT(data, 2);
+		}
 	}
 	else if (offset < 0x0e)
 		m_ctrlram[offset] = data;
-	
+
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", machine().describe_context(), data, offset);
 }
 
@@ -272,16 +271,16 @@ TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
 
 	if (m_flipx_enabled && (color & 0x40))
 		flags |= TILE_FLIPX;
-	
+
 	if (m_flipy_enabled && (color & 0x80))
 		flags |= TILE_FLIPY;
-		
+
 	m_k051316_cb(&code, &color);
 
 	tileinfo.set(0,
-							code,
-							color,
-							flags);
+			code,
+			color,
+			flags);
 }
 
 
@@ -322,7 +321,7 @@ void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, con
 			m_ctrlram[0x09],
 			m_ctrlram[0x0a],
 			m_ctrlram[0x0b],
-			m_ctrlram[0x0c], /* bank for ROM testing */
+			m_ctrlram[0x0c], // bank for ROM testing
 			m_ctrlram[0x0d]);
 #endif
 }
