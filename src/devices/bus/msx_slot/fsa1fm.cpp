@@ -84,7 +84,7 @@ void msx_slot_fsa1fm2_device::device_start()
 	page(1)->install_write_handler(0x6800, 0x6800, write8smo_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_w<3>)));
 	page(1)->install_write_handler(0x6c00, 0x6c00, write8smo_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_w<1>)));
 	page(1)->install_write_handler(0x7000, 0x7000, write8smo_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_w<4>)));
-	page(1)->install_write_handler(0x7800, 0x7800, write8smo_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_w<4>)));
+	page(1)->install_write_handler(0x7800, 0x7800, write8smo_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_w<5>)));
 	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*this, FUNC(msx_slot_fsa1fm2_device::control_w)));
 
 	page(2)->install_view(0x8000, 0x9fff, m_view4);
