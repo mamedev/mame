@@ -315,9 +315,8 @@ private:
 	uint8_t txt_scrl_r(offs_t offset);
 	void txt_scrl_w(offs_t offset, uint8_t data);
 
-	// TODO: make this virtual
-	// (necessary for H98 high-reso mode, PC9821-E02, SVGA binds)
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	// (virtual is necessary for H98 high-reso mode, PC9821-E02, SVGA binds)
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t m_font_line = 0;
 	std::unique_ptr<uint16_t[]> m_tvram;
