@@ -271,7 +271,7 @@ msgstr "[Dateimanager verwenden]"
 #: src/frontend/mame/ui/selsoft.cpp:708
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr "%1$s %2$s ( %3$d / %4$d Programm-Pakete )"
+msgstr "%1$s %2$s ( %3$d / %4$d Software-Pakete )"
 
 #: src/frontend/mame/ui/selsoft.cpp:709
 #, c-format
@@ -3122,11 +3122,11 @@ msgstr "%1$s, %2$s"
 #: src/frontend/mame/ui/selmenu.cpp:648
 #, c-format
 msgid "Software is clone of: %1$s"
-msgstr "Programm ist ein Klon von: %1$s"
+msgstr "Software ist ein Klon von: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:650
 msgid "Software is parent"
-msgstr "Programm ist übergeordnetes Programm"
+msgstr "Software ist übergeordnete Software"
 
 #: src/frontend/mame/ui/selmenu.cpp:655
 msgid "Supported: No"
