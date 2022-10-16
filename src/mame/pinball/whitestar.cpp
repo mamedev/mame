@@ -9152,7 +9152,7 @@ ROM_END
 
 } // Anonymous namespace
 
-/* Display ROM versions country/languaje codes:
+/* Display ROM versions country/language codes:
      A = America (USA and UK)
      F = France
      G = Germany
