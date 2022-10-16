@@ -1296,12 +1296,12 @@ Cuts off top portion of screen
 		</part>
 	</software>
 
-	<software name="bbsb" supported="no">
+	<software name="bbsb" supported="partial">
 		<description>Bounty Bob Strikes Back!</description>
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
 		<notes><![CDATA[
-Black screen with note stuck
+Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_bbsb" />
@@ -1311,12 +1311,12 @@ Black screen with note stuck
 		</part>
 	</software>
 
-	<software name="bbsba" cloneof="bbsb" supported="no">
+	<software name="bbsba" cloneof="bbsb" supported="partial">
 		<description>Bounty Bob Strikes Back! (Alt)</description>
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
 		<notes><![CDATA[
-Black screen with note stuck
+Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 ]]></notes>
 		<!-- Identical to the image contained in Bill Hogue's emulator. http://www.bigfivesoftware.com/Emulator/emulator.htm. -->
 		<part name="cart" interface="a8bit_cart">

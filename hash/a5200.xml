@@ -269,10 +269,13 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="bbsb">
+	<software name="bbsb" supported="partial">
 		<description>Bounty Bob Strikes Back!</description>
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
+		<notes><![CDATA[
+Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200_bbsb" />
 			<dataarea name="rom" size="40960">

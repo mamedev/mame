@@ -891,8 +891,8 @@ Tested with marsmis2, fails
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
-Prints "STEREO NOT DETECTED" on main menu (optional sound board?)
 Draws few garbage text chars when trying to enter a password in main menu
+Prints "STEREO NOT DETECTED" on main menu, refers to unofficial [POKEY] extra chip add to $d280-$d2ff range
 ]]></notes>
 		<info name="usage" value="Hold OPTION key during boot to disable BASIC" />
 		<sharedfeat name="compatibility" value="XL/XE"/>

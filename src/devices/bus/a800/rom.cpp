@@ -259,6 +259,14 @@ uint8_t a800_rom_device::read_80xx(offs_t offset)
 
 uint8_t a800_rom_bbsb_device::read_80xx(offs_t offset)
 {
+	if ((offset & 0x2000) == 0 && !machine().side_effects_disabled())
+	{
+		uint16_t addr = offset & 0xfff;
+
+		if (addr >= 0xff6 && addr <= 0xff9)
+			m_banks[BIT(offset, 12)] = (addr - 0xff6);
+	}
+
 	if (offset < 0x1000)
 		return m_rom[(offset & 0xfff) + (m_banks[0] * 0x1000) + 0];
 	else if (offset < 0x2000)
@@ -545,6 +553,13 @@ uint8_t a5200_rom_2chips_device::read_80xx(offs_t offset)
 
 uint8_t a5200_rom_bbsb_device::read_80xx(offs_t offset)
 {
+	if ((offset & 0xe000) == 0 && !machine().side_effects_disabled())
+	{
+		uint16_t addr = offset & 0xfff;
+		if (addr >= 0xff6 && addr <= 0xff9)
+			m_banks[BIT(offset, 12)] = (addr - 0xff6);
+	}
+
 	if (offset < 0x1000)
 		return m_rom[(offset & 0xfff) + (m_banks[0] * 0x1000) + 0x2000];
 	else if (offset < 0x2000)
