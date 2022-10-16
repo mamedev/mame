@@ -19,6 +19,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 #include "tx81z.lh"
 
 class ymtx81z_state : public driver_device

@@ -15,6 +15,8 @@
 #include "debugbaseinfo.h"
 
 
+namespace osd::debugger::win {
+
 class debugwin_info : protected debugbase_info
 {
 public:
@@ -158,5 +160,7 @@ private:
 
 	static bool     s_window_class_registered;
 };
+
+} // namespace osd::debugger::win
 
 #endif // MAME_DEBUGGER_WIN_DEBUGWININFO_H

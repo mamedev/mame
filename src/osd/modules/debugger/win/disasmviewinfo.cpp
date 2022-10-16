@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  disasmviewinfo.c - Win32 debug window handling
+//  disasmviewinfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -11,6 +11,8 @@
 
 #include "util/xmlfile.h"
 
+
+namespace osd::debugger::win {
 
 disasmview_info::disasmview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent) :
 	debugview_info(debugger, owner, parent, DVT_DISASSEMBLY)
@@ -56,7 +58,7 @@ void disasmview_info::set_right_column(disasm_right_column contents)
 void disasmview_info::restore_configuration_from_node(util::xml::data_node const &node)
 {
 	debug_view_disasm &dasmview(*view<debug_view_disasm>());
-	dasmview.set_right_column(disasm_right_column(node.get_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column())));
+	dasmview.set_right_column(disasm_right_column(node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column())));
 
 	debugview_info::restore_configuration_from_node(node);
 }
@@ -67,5 +69,7 @@ void disasmview_info::save_configuration_to_node(util::xml::data_node &node)
 	debugview_info::save_configuration_to_node(node);
 
 	debug_view_disasm &dasmview(*view<debug_view_disasm>());
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column());
+	node.set_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column());
 }
+
+} // namespace osd::debugger::win

@@ -551,6 +551,8 @@ nintendo/n64.cpp
 nintendo/nds.cpp
 nintendo/nes.cpp
 nintendo/nes_clone.cpp
+nintendo/nes_m8.cpp
+nintendo/nes_m82.cpp
 nintendo/nes_sh6578.cpp
 nintendo/nes_vt02_vt03.cpp
 nintendo/nes_vt09.cpp
@@ -754,6 +756,7 @@ siemens/pg685.cpp
 sinclair/atm.cpp
 sinclair/elwro800.cpp
 sinclair/pentagon.cpp
+sinclair/pentevo.cpp
 sinclair/ql.cpp
 sinclair/scorpion.cpp
 sinclair/spec128.cpp
@@ -819,6 +822,7 @@ skeleton/digiblast.cpp
 skeleton/digijet.cpp
 skeleton/digilog320.cpp
 skeleton/digilog400.cpp
+skeleton/digitech_gsp5.cpp
 skeleton/dim68k.cpp
 skeleton/dm7000.cpp
 skeleton/dmv.cpp

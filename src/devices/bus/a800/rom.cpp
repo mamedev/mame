@@ -434,11 +434,11 @@ uint8_t a5200_rom_2chips_device::read_80xx(offs_t offset)
 uint8_t a5200_rom_bbsb_device::read_80xx(offs_t offset)
 {
 	if (offset < 0x1000)
-		return m_rom[(offset & 0xfff) + (m_banks[0] * 0x1000) + 0];
+		return m_rom[(offset & 0xfff) + (m_banks[0] * 0x1000) + 0x2000];
 	else if (offset < 0x2000)
-		return m_rom[(offset & 0xfff) + (m_banks[1] * 0x1000) + 0x4000];
+		return m_rom[(offset & 0xfff) + (m_banks[1] * 0x1000) + 0x6000];
 	else if (offset >= 0x4000)
-		return m_rom[(offset & 0x1fff) + 0x8000];
+		return m_rom[(offset & 0x1fff) + 0x0000];
 	else
 		return 0;
 }

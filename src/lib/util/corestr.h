@@ -49,8 +49,8 @@ int core_strnicmp(const char *s1, const char *s2, size_t n);
 
 
 /* additional string compare helper (up to 16 characters at the moment) */
-int core_strwildcmp(const char *sp1, const char *sp2);
-bool core_iswildstr(const char *sp);
+int core_strwildcmp(std::string_view s1, std::string_view s2);
+bool core_iswildstr(std::string_view s);
 
 /* trim functions */
 template <typename TPred>

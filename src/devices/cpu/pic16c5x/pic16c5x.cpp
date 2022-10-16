@@ -85,6 +85,7 @@ DEFINE_DEVICE_TYPE(PIC16C57, pic16c57_device, "pic16c57", "Microchip PIC16C57")
 DEFINE_DEVICE_TYPE(PIC16C58, pic16c58_device, "pic16c58", "Microchip PIC16C58")
 
 DEFINE_DEVICE_TYPE(PIC1650,  pic1650_device,  "pic1650",  "GI PIC1650")
+DEFINE_DEVICE_TYPE(PIC1654S, pic1654s_device, "pic1654s", "GI PIC1654S")
 DEFINE_DEVICE_TYPE(PIC1655,  pic1655_device,  "pic1655",  "GI PIC1655")
 
 
@@ -173,6 +174,11 @@ pic16c58_device::pic16c58_device(const machine_config &mconfig, const char *tag,
 
 pic1650_device::pic1650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c5x_device(mconfig, PIC1650, tag, owner, clock, 9, 5, 0x1650)
+{
+}
+
+pic1654s_device::pic1654s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pic16c5x_device(mconfig, PIC1654S, tag, owner, clock, 9, 5, 0x1654)
 {
 }
 
@@ -368,7 +374,7 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory *
 		case 4:     data = (FSR | uint8_t(~m_picRAMmask));
 					break;
 		case 5:     /* read port A */
-					if (m_picmodel == 0x1650) {
+					if ((m_picmodel == 0x1650) || (m_picmodel == 0x1654)) {
 						data = m_read_a(PIC16C5x_PORTA, 0xff) & PORTA;
 					}
 					else if (m_picmodel == 0x1655) {
@@ -382,7 +388,7 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory *
 					}
 					break;
 		case 6:     /* read port B */
-					if (m_picmodel == 0x1650) {
+					if ((m_picmodel == 0x1650) || (m_picmodel == 0x1654)) {
 						data = m_read_b(PIC16C5x_PORTB, 0xff) & PORTB;
 					}
 					else if (m_picmodel != 0x1655) { /* B is output-only on 1655 */
@@ -446,7 +452,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 		case 4:     FSR = (data | uint8_t(~m_picRAMmask));
 					break;
 		case 5:     /* write port A */
-					if (m_picmodel == 0x1650) {
+					if ((m_picmodel == 0x1650) || (m_picmodel == 0x1654)) {
 						m_write_a(PIC16C5x_PORTA, data, 0xff);
 					}
 					else if (m_picmodel != 0x1655) { /* A is input-only on 1655 */
@@ -456,7 +462,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 					PORTA = data;
 					break;
 		case 6:     /* write port B */
-					if (m_picmodel == 0x1650 || m_picmodel == 0x1655) {
+					if (m_picmodel == 0x1650 || m_picmodel == 0x1654 || m_picmodel == 0x1655) {
 						m_write_b(PIC16C5x_PORTB, data, 0xff);
 					}
 					else {
@@ -1191,7 +1197,7 @@ void pic16c5x_device::execute_run()
 			m_PC++;
 			PCL++;
 
-			if (m_picmodel == 0x1650 || m_picmodel == 0x1655 || (m_opcode.w.l & 0xff0) != 0x000) { /* Do all opcodes except the 00? ones */
+			if (m_picmodel == 0x1650 || m_picmodel == 0x1654 || m_picmodel == 0x1655 || (m_opcode.w.l & 0xff0) != 0x000) { /* Do all opcodes except the 00? ones */
 				m_inst_cycles = s_opcode_main[((m_opcode.w.l >> 4) & 0xff)].cycles;
 				(this->*s_opcode_main[((m_opcode.w.l >> 4) & 0xff)].function)();
 			}

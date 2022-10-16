@@ -42,6 +42,8 @@
 #include <wrl/client.h>
 
 
+namespace osd::debugger::win {
+
 namespace {
 
 class comdlg_filter_helper
@@ -531,7 +533,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 void consolewin_info::save_configuration_to_node(util::xml::data_node &node)
 {
 	disasmbasewin_info::save_configuration_to_node(node);
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_CONSOLE);
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_CONSOLE);
 }
 
 
@@ -628,3 +630,5 @@ bool consolewin_info::get_softlist_info(device_image_interface &device)
 
 	return passes_tests;
 }
+
+} // namespace osd::debugger::win

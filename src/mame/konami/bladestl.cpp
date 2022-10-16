@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia
+// copyright-holders: Manuel Abadia
+
 /***************************************************************************
 
     Blades of Steel (GX797) (c) 1987 Konami
@@ -29,25 +30,167 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "bladestl.h"
+
+#include "k007342.h"
+#include "k007420.h"
+#include "k051733.h"
 #include "konamipt.h"
 
-#include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/flt_rc.h"
+#include "sound/upd7759.h"
 #include "sound/ymopn.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
-{
-	int scanline = param;
+namespace {
 
-	if(scanline == 240 && m_k007342->is_int_enabled()) // vblank-out irq
+class bladestl_state : public driver_device
+{
+public:
+	bladestl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k007342(*this, "k007342"),
+		m_k007420(*this, "k007420"),
+		m_upd7759(*this, "upd"),
+		m_filter(*this, "filter%u", 1U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_soundlatch(*this, "soundlatch"),
+		m_trackball(*this, "TRACKBALL.%u", 0),
+		m_lamps(*this, "lamp%u", 0U),
+		m_rombank(*this, "rombank")
+	{ }
+
+	void bladestl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k007342_device> m_k007342;
+	required_device<k007420_device> m_k007420;
+	required_device<upd7759_device> m_upd7759;
+	required_device_array<filter_rc_device, 3> m_filter;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	// I/O
+	required_ioport_array<4> m_trackball;
+	output_finder<2> m_lamps;
+
+	// memory pointers
+	required_memory_bank m_rombank;
+
+	// video-related
+	uint16_t m_spritebank = 0;
+
+	// misc
+	uint8_t m_last_track[4]{};
+
+	uint8_t trackball_r(offs_t offset);
+	void bankswitch_w(uint8_t data);
+	void port_b_w(uint8_t data);
+	uint8_t speech_busy_r();
+	void speech_ctrl_w(uint8_t data);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	K007342_CALLBACK_MEMBER(tile_callback);
+	K007420_CALLBACK_MEMBER(sprite_callback);
+
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+void bladestl_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	// characters use pens 0x00-0x1f, no look-up table
+	for (int i = 0; i < 0x20; i++)
+		palette.set_pen_indirect(i, i);
+
+	// sprites use pens 0x20-0x2f
+	for (int i = 0x20; i < 0x120; i++)
+	{
+		uint8_t const ctabentry = (color_prom[i - 0x20] & 0x0f) | 0x20;
+		palette.set_pen_indirect(i, ctabentry);
+	}
+}
+
+
+
+/***************************************************************************
+
+  Callback for the K007342
+
+***************************************************************************/
+
+K007342_CALLBACK_MEMBER(bladestl_state::tile_callback)
+{
+	*code |= ((*color & 0x0f) << 8) | ((*color & 0x40) << 6);
+	*color = layer;
+}
+
+/***************************************************************************
+
+  Callback for the K007420
+
+***************************************************************************/
+
+K007420_CALLBACK_MEMBER(bladestl_state::sprite_callback)
+{
+	*code |= ((*color & 0xc0) << 2) + m_spritebank;
+	*code = (*code << 2) | ((*color & 0x30) >> 4);
+	*color = 0 + (*color & 0x0f);
+}
+
+
+/***************************************************************************
+
+  Screen Refresh
+
+***************************************************************************/
+
+uint32_t bladestl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_k007342->tilemap_update();
+
+	m_k007342->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
+	m_k007420->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(1));
+	m_k007342->tilemap_draw(screen, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE, 0);
+	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 0 ,0);
+	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 1 ,0);
+	return 0;
+}
+
+
+// machine
+
+TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::scanline)
+{
+	int const scanline = param;
+
+	if (scanline == 240 && m_k007342->is_int_enabled()) // vblank-out irq
 		m_maincpu->set_input_line(HD6309_FIRQ_LINE, HOLD_LINE);
 
-	if(scanline == 0) // vblank-in or timer irq
+	if (scanline == 0) // vblank-in or timer irq
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -59,54 +202,54 @@ TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
 
 uint8_t bladestl_state::trackball_r(offs_t offset)
 {
-	int curr = m_trackball[offset]->read();
-	int delta = (curr - m_last_track[offset]) & 0xff;
+	int const curr = m_trackball[offset]->read();
+	int const delta = (curr - m_last_track[offset]) & 0xff;
 	m_last_track[offset] = curr;
 
 	return (delta & 0x80) | (curr >> 1);
 }
 
-void bladestl_state::bladestl_bankswitch_w(uint8_t data)
+void bladestl_state::bankswitch_w(uint8_t data)
 {
-	/* bits 0 & 1 = coin counters */
+	// bits 0 & 1 = coin counters
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
-	/* bits 2 & 3 = lamps */
+	// bits 2 & 3 = lamps
 	m_lamps[0] = BIT(data, 2);
 	m_lamps[1] = BIT(data, 3);
 
-	/* bit 4 = relay (???) */
+	// bit 4 = relay (???)
 
-	/* bits 5-6 = bank number */
+	// bits 5-6 = bank number
 	m_rombank->set_entry((data & 0x60) >> 5);
 
-	/* bit 7 = select sprite bank */
+	// bit 7 = select sprite bank
 	m_spritebank = (data & 0x80) << 3;
 
 }
 
-void bladestl_state::bladestl_port_B_w(uint8_t data)
+void bladestl_state::port_b_w(uint8_t data)
 {
 	// bits 3-5 = ROM bank select
 	m_upd7759->set_rom_bank((data & 0x38) >> 3);
 
 	// bit 2 = SSG-C rc filter enable
-	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); // YM2203-SSG-C
 
 	// bit 1 = SSG-B rc filter enable
-	m_filter2->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); // YM2203-SSG-B
 
 	// bit 0 = SSG-A rc filter enable
-	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); // YM2203-SSG-A
 }
 
-uint8_t bladestl_state::bladestl_speech_busy_r()
+uint8_t bladestl_state::speech_busy_r()
 {
 	return m_upd7759->busy_r() ? 1 : 0;
 }
 
-void bladestl_state::bladestl_speech_ctrl_w(uint8_t data)
+void bladestl_state::speech_ctrl_w(uint8_t data)
 {
 	m_upd7759->reset_w(data & 1);
 	m_upd7759->start_w(data & 2);
@@ -120,33 +263,33 @@ void bladestl_state::bladestl_speech_ctrl_w(uint8_t data)
 
 void bladestl_state::main_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(m_k007342, FUNC(k007342_device::read), FUNC(k007342_device::write));    /* Color RAM + Video RAM */
-	map(0x2000, 0x21ff).rw(m_k007420, FUNC(k007420_device::read), FUNC(k007420_device::write));    /* Sprite RAM */
-	map(0x2200, 0x23ff).rw(m_k007342, FUNC(k007342_device::scroll_r), FUNC(k007342_device::scroll_w));  /* Scroll RAM */
-	map(0x2400, 0x245f).ram().w("palette", FUNC(palette_device::write_indirect)).share("palette");  /* palette */
-	map(0x2600, 0x2607).w(m_k007342, FUNC(k007342_device::vreg_w));          /* Video Registers */
-	map(0x2e00, 0x2e00).portr("COINSW");             /* DIPSW #3, coinsw, startsw */
-	map(0x2e01, 0x2e01).portr("P1");                 /* 1P controls */
-	map(0x2e02, 0x2e02).portr("P2");                 /* 2P controls */
-	map(0x2e03, 0x2e03).portr("DSW2");               /* DISPW #2 */
-	map(0x2e40, 0x2e40).portr("DSW1");               /* DIPSW #1 */
-	map(0x2e80, 0x2e80).w("soundlatch", FUNC(generic_latch_8_device::write)); /* cause interrupt on audio CPU */
+	map(0x0000, 0x1fff).rw(m_k007342, FUNC(k007342_device::read), FUNC(k007342_device::write));    // Color RAM + Video RAM
+	map(0x2000, 0x21ff).rw(m_k007420, FUNC(k007420_device::read), FUNC(k007420_device::write));    // Sprite RAM
+	map(0x2200, 0x23ff).rw(m_k007342, FUNC(k007342_device::scroll_r), FUNC(k007342_device::scroll_w));  // Scroll RAM
+	map(0x2400, 0x245f).ram().w("palette", FUNC(palette_device::write_indirect)).share("palette");
+	map(0x2600, 0x2607).w(m_k007342, FUNC(k007342_device::vreg_w));
+	map(0x2e00, 0x2e00).portr("COINSW");             // DIPSW #3, coinsw, startsw
+	map(0x2e01, 0x2e01).portr("P1");
+	map(0x2e02, 0x2e02).portr("P2");
+	map(0x2e03, 0x2e03).portr("DSW2");
+	map(0x2e40, 0x2e40).portr("DSW1");
+	map(0x2e80, 0x2e80).w("soundlatch", FUNC(generic_latch_8_device::write)); // cause interrupt on audio CPU
 	map(0x2ec0, 0x2ec0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x2f00, 0x2f03).r(FUNC(bladestl_state::trackball_r));               /* Trackballs */
-	map(0x2f40, 0x2f40).w(FUNC(bladestl_state::bladestl_bankswitch_w));    /* bankswitch control */
-	map(0x2f80, 0x2f9f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));    /* Protection: 051733 */
-	map(0x2fc0, 0x2fc0).nopw();                        /* ??? */
-	map(0x4000, 0x5fff).ram();                             /* Work RAM */
-	map(0x6000, 0x7fff).bankr("rombank");              /* banked ROM */
+	map(0x2f00, 0x2f03).r(FUNC(bladestl_state::trackball_r));
+	map(0x2f40, 0x2f40).w(FUNC(bladestl_state::bankswitch_w));
+	map(0x2f80, 0x2f9f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));    // Protection
+	map(0x2fc0, 0x2fc0).nopw();                        // ???
+	map(0x4000, 0x5fff).ram();                         // Work RAM
+	map(0x6000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0xffff).rom();
 }
 
 void bladestl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x1001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));    /* YM2203 */
-	map(0x3000, 0x3000).w(FUNC(bladestl_state::bladestl_speech_ctrl_w));   /* UPD7759 */
-	map(0x4000, 0x4000).r(FUNC(bladestl_state::bladestl_speech_busy_r));    /* UPD7759 */
+	map(0x1000, 0x1001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x3000, 0x3000).w(FUNC(bladestl_state::speech_ctrl_w));   // UPD7759
+	map(0x4000, 0x4000).r(FUNC(bladestl_state::speech_busy_r));   // UPD7759
 	map(0x5000, 0x5000).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
@@ -221,11 +364,11 @@ static INPUT_PORTS_START( bladestl_track ) // Joystick inputs are still read in 
 	PORT_INCLUDE( bladestl_joy )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )    /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )    /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )    // Listed as "Unused"
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )    // Listed as "Unused"
 
 	PORT_MODIFY("P1")
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:4" )    /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:4" )    // Listed as "Unused"
 
 	PORT_MODIFY("TRACKBALL.0")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_PLAYER(1)
@@ -250,29 +393,18 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,            /* 8 x 8 characters */
-	0x40000/32,     /* 8192 characters */
-	4,              /* 4bpp */
-	{ 0, 1, 2, 3 }, /* the four bitplanes are packed in one nibble */
+	8,8,            // 8 x 8 characters
+	0x40000/32,     // 8192 characters
+	4,              // 4bpp
+	{ 0, 1, 2, 3 }, // the four bitplanes are packed in one nibble
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8            /* every character takes 32 consecutive bytes */
-};
-
-static const gfx_layout spritelayout =
-{
-	8,8,            /* 8*8 sprites */
-	0x40000/32,     /* 8192 sprites */
-	4,              /* 4 bpp */
-	{ 0, 1, 2, 3 }, /* the four bitplanes are packed in one nibble */
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8            /* every sprite takes 32 consecutive bytes */
+	32*8            // every character takes 32 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_bladestl )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0,  2 ) /* colors 00..31 */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 32, 16 ) /* colors 32..47 but using lookup table */
+	GFXDECODE_ENTRY( "tiles",   0, charlayout,            0,  2 ) // colors 00..31
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 32, 16 ) // colors 32..47 but using lookup table
 GFXDECODE_END
 
 
@@ -293,11 +425,9 @@ void bladestl_state::machine_start()
 
 void bladestl_state::machine_reset()
 {
-	int i;
-
 	m_spritebank = 0;
 
-	for (i = 0; i < 4 ; i++)
+	for (int i = 0; i < 4 ; i++)
 		m_last_track[i] = 0;
 
 	m_soundlatch->acknowledge_w();
@@ -305,10 +435,10 @@ void bladestl_state::machine_reset()
 
 void bladestl_state::bladestl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // divider not verified (from 007342 custom)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bladestl_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(bladestl_state::bladestl_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(bladestl_state::scanline), "screen", 0, 1);
 
 	MC6809E(config, m_audiocpu, XTAL(24'000'000) / 16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bladestl_state::sound_map);
@@ -317,31 +447,31 @@ void bladestl_state::bladestl(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(bladestl_state::screen_update_bladestl));
+	screen.set_screen_update(FUNC(bladestl_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_bladestl);
-	PALETTE(config, "palette", FUNC(bladestl_state::bladestl_palette)).set_format(palette_device::xBGR_555, 32 + 16*16, 32+16);
+	PALETTE(config, "palette", FUNC(bladestl_state::palette)).set_format(palette_device::xBGR_555, 32 + 16*16, 32+16);
 
 	K007342(config, m_k007342, 0);
 	m_k007342->set_gfxnum(0);
-	m_k007342->set_tile_callback(FUNC(bladestl_state::bladestl_tile_callback));
+	m_k007342->set_tile_callback(FUNC(bladestl_state::tile_callback));
 	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
 	K007420(config, m_k007420, 0);
 	m_k007420->set_bank_limit(0x3ff);
-	m_k007420->set_sprite_callback(FUNC(bladestl_state::bladestl_sprite_callback));
+	m_k007420->set_sprite_callback(FUNC(bladestl_state::sprite_callback));
 	m_k007420->set_palette_tag("palette");
 
 	K051733(config, "k051733", 0);
 
-	/* sound hardware */
+	// sound hardware
 	/* the initialization order is important, the port callbacks being
 	   called at initialization time */
 	SPEAKER(config, "mono").front_center();
@@ -354,15 +484,15 @@ void bladestl_state::bladestl(machine_config &config)
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(24'000'000) / 8));
 	ymsnd.port_a_write_callback().set(m_upd7759, FUNC(upd775x_device::port_w));
-	ymsnd.port_b_write_callback().set(FUNC(bladestl_state::bladestl_port_B_w));
+	ymsnd.port_b_write_callback().set(FUNC(bladestl_state::port_b_w));
 	ymsnd.add_route(0, "filter1", 0.45);
 	ymsnd.add_route(1, "filter2", 0.45);
 	ymsnd.add_route(2, "filter3", 0.45);
 	ymsnd.add_route(3, "mono", 0.45);
 
-	FILTER_RC(config, m_filter1).add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter2).add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter3).add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter[0]).add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter[1]).add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter[2]).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -373,67 +503,69 @@ void bladestl_state::bladestl(machine_config &config)
  *************************************/
 
 ROM_START( bladestl )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "797-t01.19c", 0x00000, 0x10000, CRC(89d7185d) SHA1(0d2f346d9515cab0389106c0e227fb0bd84a2c9c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "797-c02.12d", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )   /* tiles */
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )   /* sprites */
+	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "797a07.16i", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) /* sprites lookup table, 63S141N BPROM */
+	ROM_LOAD( "797a07.16i", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) // sprites lookup table, 63S141N BPROM
 
-	ROM_REGION( 0xc0000, "upd", 0 ) /* uPD7759 data (chip 1) */
+	ROM_REGION( 0xc0000, "upd", 0 )
 	ROM_LOAD( "797a03.11a", 0x00000, 0x80000, CRC(9ee1a542) SHA1(c9a142a326875a50f03e49e83a84af8bb423a467) )
 	ROM_LOAD( "797a04.9a",  0x80000, 0x40000, CRC(9ac8ea4e) SHA1(9f81eff970c9e8aea6f67d8a7d89805fae044ae1) )
 ROM_END
 
 ROM_START( bladestll )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "797-l01.19c", 0x00000, 0x10000, CRC(1ab14c40) SHA1(c566e31a666b467d75f5fc9fa427986c3ebc705c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "797-c02.12d", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )   /* tiles */
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )   /* sprites */
+	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "797a07.16i", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) /* sprites lookup table, 63S141N BPROM */
+	ROM_LOAD( "797a07.16i", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) // sprites lookup table, 63S141N BPROM
 
-	ROM_REGION( 0xc0000, "upd", 0 ) /* uPD7759 data (chip 1) */
+	ROM_REGION( 0xc0000, "upd", 0 )
 	ROM_LOAD( "797a03.11a", 0x00000, 0x80000, CRC(9ee1a542) SHA1(c9a142a326875a50f03e49e83a84af8bb423a467) )
 	ROM_LOAD( "797a04.9a",  0x80000, 0x40000, CRC(9ac8ea4e) SHA1(9f81eff970c9e8aea6f67d8a7d89805fae044ae1) )
 ROM_END
 
 ROM_START( bladestle )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "797-e01.19c", 0x00000, 0x10000, CRC(f8472e95) SHA1(8b6caa905fb1642300dd9da508871b00429872c3) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "797-c02.12d", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )   /* tiles */
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )   /* sprites */
+	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "797a07.16i", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) /* sprites lookup table, 63S141N BPROM */
+	ROM_LOAD( "797a07.16i", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) // sprites lookup table, 63S141N BPROM
 
-	ROM_REGION( 0xc0000, "upd", 0 ) /* uPD7759 data (chip 1) */
+	ROM_REGION( 0xc0000, "upd", 0 )
 	ROM_LOAD( "797a03.11a", 0x00000, 0x80000, CRC(9ee1a542) SHA1(c9a142a326875a50f03e49e83a84af8bb423a467) )
 	ROM_LOAD( "797a04.9a",  0x80000, 0x40000, CRC(9ac8ea4e) SHA1(9f81eff970c9e8aea6f67d8a7d89805fae044ae1) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************
@@ -442,6 +574,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version T, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version T, Joystick)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )

@@ -498,7 +498,7 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 			/* Unrecognized opcode */
 			break;
 		case 0xF:   /* RL8 */
-			i3 = ((m_acl.si << 8) & 0xffffff00) | ((m_acl.si >> 24) & 0xff);
+			i3 = rotl_32(m_acl.si, 8);
 			m_alu = i3;
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );

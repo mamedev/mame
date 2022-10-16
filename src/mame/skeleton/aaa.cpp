@@ -7,13 +7,17 @@ Skeleton driver for Ann Arbor Ambassador terminal.
 ************************************************************************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/input_merger.h"
 #include "machine/scn_pci.h"
 #include "machine/nvram.h"
+
 #include "screen.h"
+
+#include "utf8.h"
 
 class aaa_state : public driver_device
 {

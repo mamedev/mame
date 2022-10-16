@@ -394,6 +394,7 @@ Notes:
 
 #include "cpu/m6800/m6801.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32031/tms32031.h"
 #include "machine/input_merger.h"

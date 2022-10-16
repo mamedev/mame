@@ -5,6 +5,7 @@
 #include "applefdintf.h"
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
+#include "formats/as_dsk.h"
 #include "formats/pc_dsk.h"
 #include "formats/fs_prodos.h"
 

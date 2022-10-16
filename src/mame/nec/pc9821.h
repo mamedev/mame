@@ -30,6 +30,9 @@ protected:
 
 	DECLARE_MACHINE_START(pc9821);
 	DECLARE_MACHINE_RESET(pc9821);
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
 private:
 	required_shared_ptr<uint32_t> m_ext_gvram;
 
@@ -56,7 +59,8 @@ private:
 
 	void pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	UPD7220_DISPLAY_PIXELS_MEMBER( pegc_display_pixels );
+
+//  UPD7220_DISPLAY_PIXELS_MEMBER( pegc_display_pixels );
 };
 
 // MATE A

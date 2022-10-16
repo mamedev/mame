@@ -56,7 +56,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual uint32_t palette_entries() const override { return 16; }
+	virtual uint32_t palette_entries() const noexcept override { return 16; }
 
 private:
 	inline pen_t shift_mode_0();
@@ -118,7 +118,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual uint32_t palette_entries() const override { return 512; }
+	virtual uint32_t palette_entries() const noexcept override { return 512; }
 
 private:
 	// shifter state

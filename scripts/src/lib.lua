@@ -124,6 +124,7 @@ end
 		MAME_DIR .. "src/lib/util/unzip.cpp",
 		MAME_DIR .. "src/lib/util/unzip.h",
 		MAME_DIR .. "src/lib/util/un7z.cpp",
+		MAME_DIR .. "src/lib/util/utf8.h",
 		MAME_DIR .. "src/lib/util/utilfwd.h",
 		MAME_DIR .. "src/lib/util/vbiparse.cpp",
 		MAME_DIR .. "src/lib/util/vbiparse.h",

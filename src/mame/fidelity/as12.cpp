@@ -273,7 +273,7 @@ void as12_state::felega(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( feleg ) // model 6085
+ROM_START( feleg ) // model 6085, serial 613623xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("feleg.8000", 0x8000, 0x2000, CRC(e9df31e8) SHA1(31c52bb8f75580c82093eb950959c1bc294189a8) ) // TMM2764, no label
 	ROM_LOAD("feleg.c000", 0xc000, 0x1000, CRC(bed9c84b) SHA1(c12f39765b054d2ad81f747e698715ad4246806d) ) // "

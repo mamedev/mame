@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  memorywininfo.c - Win32 debug window handling
+//  memorywininfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -17,6 +17,8 @@
 
 #include "winutf8.h"
 
+
+namespace osd::debugger::win {
 
 memorywin_info::memorywin_info(debugger_windows_interface &debugger) :
 	editwin_info(debugger, false, "Memory", nullptr),
@@ -394,13 +396,13 @@ void memorywin_info::update_caption()
 
 void memorywin_info::restore_configuration_from_node(util::xml::data_node const &node)
 {
-	m_views[0]->set_source_index(node.get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REGION, m_views[0]->source_index()));
+	m_views[0]->set_source_index(node.get_attribute_int(ATTR_WINDOW_MEMORY_REGION, m_views[0]->source_index()));
 	int const cursource = m_views[0]->source_index();
 	if (0 <= cursource)
 		SendMessage(m_combownd, CB_SETCURSEL, cursource, 0);
 	update_caption();
 
-	util::xml::data_node const *const expr = node.get_child(osd::debugger::NODE_WINDOW_EXPRESSION);
+	util::xml::data_node const *const expr = node.get_child(NODE_WINDOW_EXPRESSION);
 	if (expr && expr->get_value())
 	{
 		set_editwnd_text(expr->get_value());
@@ -417,8 +419,10 @@ void memorywin_info::save_configuration_to_node(util::xml::data_node &node)
 {
 	editwin_info::save_configuration_to_node(node);
 
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_MEMORY_VIEWER);
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REGION, m_views[0]->source_index());
-	node.add_child(osd::debugger::NODE_WINDOW_EXPRESSION, downcast<memoryview_info *>(m_views[0].get())->expression());
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_MEMORY_VIEWER);
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_REGION, m_views[0]->source_index());
+	node.add_child(NODE_WINDOW_EXPRESSION, downcast<memoryview_info *>(m_views[0].get())->expression());
 	m_views[0]->save_configuration_to_node(node);
 }
+
+} // namespace osd::debugger::win

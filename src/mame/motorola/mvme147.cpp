@@ -153,7 +153,7 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "bus/vme/vme.h"
 #include "bus/vme/vme_mvme350.h"
 #include "machine/z80scc.h"

@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "apple3.h"
 #include "formats/ap2_dsk.h"
+#include "formats/as_dsk.h"
 
 #include "bus/a2bus/cards.h"
 
@@ -28,6 +29,8 @@
 
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "utf8.h"
 
 void apple3_state::apple3_map(address_map &map)
 {

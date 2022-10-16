@@ -343,9 +343,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( megadriv_dgunl_1player )
 	PORT_INCLUDE( megadriv_radica_3button )
 
-	PORT_MODIFY("PAD1") // the unit only has 2 buttons, A and C, strings are changed to remove references to C, even if behavior in Pac-Mania still exists and differs between them
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) // disable 'C'
-	//PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED ) // disable 'A'
+	// the unit only has 2 buttons, A and B, strings are changed to remove references to C, even if behavior in Pac-Mania still exists and differs between them
+	// however, Pac-Man still has a test mode which requires holding A+C on startup
+	PORT_START("DEBUG")
+	PORT_CONFNAME( 0x01, 0x00, "Enable Button C" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+
+	PORT_MODIFY("PAD1")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED  )                PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
 
 	PORT_MODIFY("PAD2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )

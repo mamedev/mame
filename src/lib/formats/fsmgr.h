@@ -301,8 +301,8 @@ public:
 		virtual void add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) = 0;
 
 	private:
-		u32							m_form_factor;
-		const std::vector<u32> &	m_variants;
+		u32                         m_form_factor;
+		const std::vector<u32> &    m_variants;
 	};
 
 	struct hd_enumerator {

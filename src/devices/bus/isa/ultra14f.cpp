@@ -10,7 +10,7 @@
 #include "ultra14f.h"
 
 #include "bus/nscsi/devices.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
 

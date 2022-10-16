@@ -653,11 +653,11 @@ public:
 		, m_adder4cpu(*this, "adder4")
 	{ }
 
-	required_region_ptr<uint32_t> m_adder4cpuregion;
-	std::unique_ptr<uint32_t[]> m_adder4ram{};
+	required_region_ptr<uint16_t> m_adder4cpuregion;
+	std::unique_ptr<uint16_t[]> m_adder4ram{};
 
-	uint32_t adder4_mem_r(offs_t offset, uint32_t mem_mask = ~0);
-	void adder4_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t adder4_mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void adder4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	virtual void machine_start() override;
 
 	// devices

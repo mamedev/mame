@@ -265,6 +265,9 @@ void slmulti_device::device_reset()
 {
 	mbc_ram_device_base<mbc_dual_uniform_device_base>::device_reset();
 
+	// TODO: proper reset state
+	m_high_page_rom = 1U;
+
 	m_view_ram.disable();
 
 	set_bank_rom_low(m_base_page_rom & ~m_page_mask_rom);
@@ -373,6 +376,7 @@ void slmulti_device::do_config_cmd(u8 data)
 		break;
 
 	case 0xbb:
+		// TODO: can this cause RAM to be enabled if 0x0a was previously written to 0x0000-0x1fff?
 		m_enable_ram = BIT(data, 5);
 		m_base_page_ram = BIT(data, 0, 4);
 		m_page_mask_ram = BIT(data, 4) ? 0x00 : 0x03;
@@ -383,6 +387,8 @@ void slmulti_device::do_config_cmd(u8 data)
 				m_base_page_ram,
 				m_page_mask_ram);
 		update_bank_ram();
+		if (!m_enable_ram)
+			m_view_ram.disable();
 		break;
 
 	default:

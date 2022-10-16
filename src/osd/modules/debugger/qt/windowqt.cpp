@@ -17,6 +17,9 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 
+
+namespace osd::debugger::qt {
+
 bool WindowQt::s_refreshAll = false;
 bool WindowQt::s_hideAll = false;
 
@@ -245,7 +248,7 @@ void WindowQt::debugActQuit()
 
 void WindowQt::saveConfiguration(util::xml::data_node &parentnode)
 {
-	util::xml::data_node *const node = parentnode.add_child(osd::debugger::NODE_WINDOW, nullptr);
+	util::xml::data_node *const node = parentnode.add_child(NODE_WINDOW, nullptr);
 	if (node)
 		saveConfigurationToNode(*node);
 }
@@ -253,10 +256,10 @@ void WindowQt::saveConfiguration(util::xml::data_node &parentnode)
 
 void WindowQt::saveConfigurationToNode(util::xml::data_node &node)
 {
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_POSITION_X, geometry().topLeft().x());
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_POSITION_Y, geometry().topLeft().y());
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_WIDTH, size().width());
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_HEIGHT, size().height());
+	node.set_attribute_int(ATTR_WINDOW_POSITION_X, geometry().topLeft().x());
+	node.set_attribute_int(ATTR_WINDOW_POSITION_Y, geometry().topLeft().y());
+	node.set_attribute_int(ATTR_WINDOW_WIDTH, size().width());
+	node.set_attribute_int(ATTR_WINDOW_HEIGHT, size().height());
 }
 
 
@@ -272,9 +275,11 @@ void WindowQtConfig::applyToQWidget(QWidget *widget)
 
 void WindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
-	m_size.setX(node.get_attribute_int(osd::debugger::ATTR_WINDOW_WIDTH, m_size.x()));
-	m_size.setY(node.get_attribute_int(osd::debugger::ATTR_WINDOW_HEIGHT, m_size.y()));
-	m_position.setX(node.get_attribute_int(osd::debugger::ATTR_WINDOW_POSITION_X, m_position.x()));
-	m_position.setY(node.get_attribute_int(osd::debugger::ATTR_WINDOW_POSITION_Y, m_position.y()));
-	m_type = node.get_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, m_type);
+	m_size.setX(node.get_attribute_int(ATTR_WINDOW_WIDTH, m_size.x()));
+	m_size.setY(node.get_attribute_int(ATTR_WINDOW_HEIGHT, m_size.y()));
+	m_position.setX(node.get_attribute_int(ATTR_WINDOW_POSITION_X, m_position.x()));
+	m_position.setY(node.get_attribute_int(ATTR_WINDOW_POSITION_Y, m_position.y()));
+	m_type = node.get_attribute_int(ATTR_WINDOW_TYPE, m_type);
 }
+
+} // namespace osd::debugger::qt

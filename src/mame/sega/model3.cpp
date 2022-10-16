@@ -5934,12 +5934,10 @@ ROM_START( magtruck )   /* Step 2.1, Sega game ID# is 833-13601-01 (Export), ROM
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 
-	// Marked as BAD_DUMP because a single instruction appears to be faulty (a bit is flipped) requiring a patch in the SuperModel emulator to run
-	// It is possible only one of these is faulty, but at a minimum these 4 should be redumped, and ideally the whole set should be checked.
-	ROM_LOAD64_WORD_SWAP( "epr-21435.17",  0x000006, 0x200000, BAD_DUMP CRC(9b169446) SHA1(285cbe5afd439d83c50f0499a878f71b8e5b94e5) )
-	ROM_LOAD64_WORD_SWAP( "epr-21433.18",  0x000004, 0x200000, BAD_DUMP CRC(60aa9d76) SHA1(b27741568a4fd0494b2254e468faea569e2d9fef) )
-	ROM_LOAD64_WORD_SWAP( "epr-21436.19",  0x000002, 0x200000, BAD_DUMP CRC(22bcbca3) SHA1(fe9c46ad5b01f9f8d19854e59e229d07c0649e8c) )
-	ROM_LOAD64_WORD_SWAP( "epr-21434.20",  0x000000, 0x200000, BAD_DUMP CRC(e028d7ca) SHA1(7e5d1cef6d9ef767f07320e9c099004e081f52dd) )
+	ROM_LOAD64_WORD_SWAP( "epr-21435.17",  0x000006, 0x200000, CRC(9b169446) SHA1(285cbe5afd439d83c50f0499a878f71b8e5b94e5) )
+	ROM_LOAD64_WORD_SWAP( "epr-21433.18",  0x000004, 0x200000, CRC(b3b124fa) SHA1(cb7fcfa0cd64180c07cb351c84140c654b008705) )
+	ROM_LOAD64_WORD_SWAP( "epr-21436.19",  0x000002, 0x200000, CRC(22bcbca3) SHA1(fe9c46ad5b01f9f8d19854e59e229d07c0649e8c) )
+	ROM_LOAD64_WORD_SWAP( "epr-21434.20",  0x000000, 0x200000, CRC(18f8626a) SHA1(4e087381b7eaf850aa86e7d7f92bdcc7edc0ed57) )
 
 	// CROM0
 	ROM_LOAD64_WORD_SWAP( "mpr-21423.1",   0x800006, 0x400000, CRC(4ee0060a) SHA1(61e155ea382f2c79ece78eeba12129645ea260f1) )
@@ -5968,13 +5966,13 @@ ROM_START( magtruck )   /* Step 2.1, Sega game ID# is 833-13601-01 (Export), ROM
 	ROM_LOAD_VROM( "mpr-21422.41",  0x00000c, 0x400000, CRC(feca77a5) SHA1(e475a96fa3d2efae65f29266ff2322cc23392ac8) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "epr-21438.21", 0x000000, 0x080000, CRC(6815af9e) SHA1(f956b5c5519a94cc60e31a2bd391949109908239) )
+	ROM_LOAD16_WORD_SWAP( "epr-21438.21", 0x000000, 0x080000, CRC(6815af9e) SHA1(f956b5c5519a94cc60e31a2bd391949109908239) ) // Japan - epr-21437 
 
 	ROM_REGION16_BE( 0x1000000, "samples", 0 )   /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21427.22", 0x000000, 0x400000, CRC(884566f6) SHA1(02b7243890e25ccb364a7ad3e8d61f8defeaf039) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21428.24", 0x400000, 0x400000, CRC(162d1e43) SHA1(0221e5126459d9277d75c7560a251381cea72b37) )
-	ROM_LOAD16_WORD_SWAP( "mpr-21431.23", 0x800000, 0x400000, CRC(0ef8f7bb) SHA1(748949b2730dc002b76947d67d7ee3663b96b700) )
-	ROM_LOAD16_WORD_SWAP( "mpr-21432.25", 0xc00000, 0x400000, CRC(59c0f6df) SHA1(ab1c6fbcb1244c2b56b6967018fceb82d8c5414c) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21431.23", 0x800000, 0x400000, CRC(0ef8f7bb) SHA1(748949b2730dc002b76947d67d7ee3663b96b700) ) // Japan - mpr-21429
+	ROM_LOAD16_WORD_SWAP( "mpr-21432.25", 0xc00000, 0x400000, CRC(59c0f6df) SHA1(ab1c6fbcb1244c2b56b6967018fceb82d8c5414c) ) // Japan - mpr-21430
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -6835,7 +6833,7 @@ GAME( 1998, swtrilgya,  swtrilgy, model3_21_5881, swtrilgy, model3_state, init_s
 GAME( 1998, swtrilgyp,  swtrilgy, model3_21,      swtrilgy, model3_state, init_swtrilgp, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (location test, 16.09.98)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Australia, Korea, Export
 GAME( 1998, spikeout,          0, model3_21_5881, model3,   model3_state, init_spikeout, ROT0, "Sega", "Spikeout (Export, Revision C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, spikeofe,          0, model3_21_5881, model3,   model3_state, init_spikeofe, ROT0, "Sega", "Spikeout Final Edition (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, magtruck,          0, model3_21_5881, eca,      model3_state, init_magtruck, ROT0, "Sega", "Magical Truck Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, magtruck,          0, model3_21_5881, eca,      model3_state, init_magtruck, ROT0, "Sega", "Magical Truck Adventure (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, eca,               0, model3_21_5881, eca,      model3_state, init_eca,      ROT0, "Sega", "Emergency Call Ambulance (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ecaj,            eca, model3_21_5881, eca,      model3_state, init_eca,      ROT0, "Sega", "Emergency Call Ambulance (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ecau,            eca, model3_21_5881, eca,      model3_state, init_eca,      ROT0, "Sega", "Emergency Call Ambulance (USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

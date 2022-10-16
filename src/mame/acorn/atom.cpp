@@ -122,6 +122,7 @@ Hardware:   PPIA 8255
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+#include "utf8.h"
 
 /***************************************************************************
     PARAMETERS

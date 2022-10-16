@@ -61,6 +61,40 @@ meta_type meta_value::type() const
 	return *result;
 }
 
+util::arbitrary_datetime meta_value::as_date() const
+{
+	util::arbitrary_datetime result = { 0, };
+
+	std::visit(
+		overloaded
+		{
+			[&result](const std::string &s)
+			{
+				sscanf(s.c_str(), "%d-%d-%d %d:%d:%d", &result.year, &result.month, &result.day_of_month, &result.hour, &result.minute, &result.second);
+			},
+			[&result](const util::arbitrary_datetime &dt) { result = dt; },
+			[](std::uint64_t) { /* nonsensical */ },
+			[](bool) { /* nonsensical */ }
+		}, value);
+
+	return result;
+}
+
+bool meta_value::as_flag() const
+{
+	bool result = false;
+
+	std::visit(
+		overloaded
+		{
+			[&result](const std::string &s) { result = !s.empty() && s != "f"; },
+			[&result](bool b) { result = b; },
+			[](std::uint64_t) { /* nonsensical */ },
+			[](const util::arbitrary_datetime &) { /* nonsensical */ }
+		}, value);
+	return result;
+}
+
 std::string meta_value::as_string() const
 {
 	std::string result;
@@ -76,39 +110,6 @@ std::string meta_value::as_string() const
 						val.hour, val.minute, val.second);
 				} },
 			value);
-	return result;
-}
-
-util::arbitrary_datetime meta_value::as_date() const
-{
-	util::arbitrary_datetime result = { 0, };
-
-	std::visit(overloaded
-	{
-		[&result](const std::string &s)
-		{
-			sscanf(s.c_str(), "%d-%d-%d %d:%d:%d", &result.year, &result.month, &result.day_of_month, &result.hour, &result.minute, &result.second);
-		},
-		[&result](const util::arbitrary_datetime &dt)	{ result = dt; },
-		[](std::uint64_t)							{ /* nonsensical */ },
-		[](bool)									{ /* nonsensical */ }
-	}, value);
-
-	return result;
-
-}
-
-bool meta_value::as_flag() const
-{
-	bool result = false;
-
-	std::visit(overloaded
-	{
-		[&result](const std::string &s)				{ result = !s.empty() && s != "f"; },
-		[&result](bool b)							{ result = b; },
-		[](std::uint64_t)							{ /* nonsensical */ },
-		[](const util::arbitrary_datetime &)		{ /* nonsensical */ }
-	}, value);
 	return result;
 }
 

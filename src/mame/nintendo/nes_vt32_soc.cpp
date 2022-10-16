@@ -29,7 +29,7 @@ void nes_vt32_soc_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 
-	M6502_VTSCR(config.replace(), m_maincpu, NTSC_APU_CLOCK); // are these later chips N2A03 core, or 6502 core derived?
+	M6502_VTSCR(config.replace(), m_maincpu, NTSC_APU_CLOCK); // are these later chips RP2A03 core, or 6502 core derived?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt32_soc_device::nes_vt_fp_map);
 }
 

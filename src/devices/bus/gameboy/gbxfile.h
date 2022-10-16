@@ -61,6 +61,7 @@ enum : u32
 	TYPE_MBC2       = 0x4d424332,   // 'MBC2'
 	TYPE_MBC3       = 0x4d424333,   // 'MBC3'
 	TYPE_MBC5       = 0x4d424335,   // 'MBC5'
+	TYPE_MBC6       = 0x4d424336,   // 'MBC6'
 	TYPE_MBC7       = 0x4d424337,   // 'MBC7'
 	TYPE_MMM01      = 0x4d4d4d31,   // 'MMM1'
 	TYPE_NEWGBCHK   = 0x4e47484b,   // 'NGHK'

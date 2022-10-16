@@ -321,9 +321,6 @@ public:
 	color_equation const &tex1_equation() const { return m_tex1_equation; }
 
 private:
-	// internal helpers
-	static constexpr u32 rotate(u32 value, int count) { return (value << count) | (value >> (32 - count)); }
-
 	// internal state
 	u32 m_generic;      // 4 bits
 	u32 m_fbzcp;        // 30 bits

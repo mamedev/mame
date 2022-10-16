@@ -1763,8 +1763,8 @@ GAMEL( 2000, fashion,   brasil,   fashion,  fashion, highvdeo_state, empty_init,
 GAMEL( 2000, grancapi,  0,        grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",             "Gran Capitan (Version 3)",                        MACHINE_NOT_WORKING, layout_fashion )
 GAMEL( 2000, cuncino,   0,        grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",             "Capitan Uncino (High Video, version 2)",          MACHINE_NOT_WORKING, layout_fashion )
 GAMEL( 200?, newtiger,  0,        newtiger, brasil,  highvdeo_state, empty_init, ROT0, "High Video",             "New Tiger",                                       MACHINE_NOT_WORKING, layout_fashion ) // slightly differently protected
-GAMEL( 200?, zoomania,  0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Zoomania (Version 10.04, set 1)",                 MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 200?, zoomaniaa, zoomania, zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Zoomania (Version 10.04, set 2)",                 MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 200?, saladue,   0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Sala Due (Version 3.04)",                         MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 200?, saladuea,  saladue,  zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Sala Due (Version 1.04)",                         MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 200?, bingopd,   0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Paradise (Industrias Brasilerias, Version 1.04)", MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, zoomania,  0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasileiras", "Zoomania (Version 10.04, set 1)",                 MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, zoomaniaa, zoomania, zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasileiras", "Zoomania (Version 10.04, set 2)",                 MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, saladue,   0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasileiras", "Sala Due (Version 3.04)",                         MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, saladuea,  saladue,  zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasileiras", "Sala Due (Version 1.04)",                         MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, bingopd,   0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasileiras", "Paradise (Industrias Brasileiras, Version 1.04)", MACHINE_NOT_WORKING, layout_fashion )

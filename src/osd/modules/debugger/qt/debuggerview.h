@@ -11,6 +11,8 @@
 #include <QtWidgets/QMenu>
 
 
+namespace osd::debugger::qt {
+
 class DebuggerView : public QAbstractScrollArea
 {
 	Q_OBJECT
@@ -52,5 +54,7 @@ private:
 
 	bool m_preferBottom;
 };
+
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_DEBUGGERVIEW_H

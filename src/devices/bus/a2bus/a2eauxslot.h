@@ -108,11 +108,12 @@ public:
 	// construction/destruction
 	virtual ~device_a2eauxslot_card_interface();
 
-	virtual uint8_t read_auxram(uint16_t offset) { printf("a2eauxslot: unhandled auxram read @ %04x\n", offset); return 0xff; }
-	virtual void write_auxram(uint16_t offset, uint8_t data) { printf("a2eauxslot: unhandled auxram write %02x @ %04x\n", data, offset); }
-	virtual void write_c07x(uint8_t offset, uint8_t data) {}
-	virtual uint8_t *get_vram_ptr() = 0;
-	virtual uint8_t *get_auxbank_ptr() = 0;
+	virtual u8 read_auxram(u16 offset) { printf("a2eauxslot: unhandled auxram read @ %04x\n", offset); return 0xff; }
+	virtual void write_auxram(u16 offset, u8 data) { printf("a2eauxslot: unhandled auxram write %02x @ %04x\n", data, offset); }
+	virtual void write_c07x(u8 offset, u8 data) {}
+	virtual u8 *get_vram_ptr() = 0;
+	virtual u8 *get_auxbank_ptr() = 0;
+	virtual u16 get_auxbank_mask() = 0;
 	virtual bool allow_dhr() { return true; }
 
 	device_a2eauxslot_card_interface *next() const { return m_next; }

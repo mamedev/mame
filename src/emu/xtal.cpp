@@ -123,6 +123,7 @@ const double XTAL::known_xtals[] = {
 	  5'185'000, /* 5.185_MHz_XTAL         Intel INTELLEC® 4 */
 	  5'370'000, /* 5.37_MHz_XTAL          HP 95LX */
 	  5'460'000, /* 5.46_MHz_XTAL          ec1840 and ec1841 keyboard */
+	  5'500'000, /* 5.5_MHz_XTAL           Yamaha PSS-480 */
 	  5'529'600, /* 5.5296_MHz_XTAL        Kontron PSI98 keyboard */
 	  5'626'000, /* 5.626_MHz_XTAL         RCA CDP1869 PAL dot clock */
 	  5'659'200, /* 5.6592_MHz_XTAL        Digilog 320 dot clock */

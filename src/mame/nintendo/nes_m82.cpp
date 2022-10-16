@@ -20,7 +20,7 @@
 #include "emu.h"
 
 #include "bus/nes_ctrl/ctrl.h"
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/rp2a03.h"
 #include "video/ppu2c0x.h"
 
 #include "screen.h"
@@ -51,7 +51,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<n2a03_device> m_maincpu;
+	required_device<rp2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_device<screen_device> m_screen;
 	optional_device_array<nes_control_port_device, 5> m_ctrl;
@@ -195,12 +195,12 @@ void m82_state::machine_reset()
 void m82_state::nes_m82(machine_config &config)
 {
 	// basic machine hardware
-	N2A03G(config, m_maincpu, NTSC_APU_CLOCK);
+	RP2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m82_state::m82_map);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(N2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
+	m_screen->set_raw(RP2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	m_screen->set_screen_update(m_ppu, FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C02(config, m_ppu);
@@ -232,4 +232,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986, m82,  0,       nes_m82, nes_m82, m82_state, empty_init,  ROT0, "Nintendo", "M82 Game Selectable Working Product Display",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 1986, m82,  0,   0,   nes_m82, nes_m82, m82_state, empty_init, "Nintendo", "M82 Game Selectable Working Product Display",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

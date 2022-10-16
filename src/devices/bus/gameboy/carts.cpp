@@ -15,6 +15,7 @@
 #include "huc3.h"
 #include "mbc.h"
 #include "mbc2.h"
+#include "mbc3.h"
 #include "mbc6.h"
 #include "mbc7.h"
 #include "mmm01.h"
@@ -80,7 +81,7 @@ void gameboy_cartridges(device_slot_interface &device)
 	device.option_add_internal(slotoptions::GB_MBC1,            GB_ROM_MBC1);
 	device.option_add_internal(slotoptions::GB_MBC2,            GB_ROM_MBC2);
 	device.option_add_internal(slotoptions::GB_MBC3,            GB_ROM_MBC3);
-	device.option_add_internal(slotoptions::GB_MBC30,           GB_ROM_MBC3); // MBC3 and MBC30 treated as the same thing for now
+	device.option_add_internal(slotoptions::GB_MBC30,           GB_ROM_MBC30);
 	device.option_add_internal(slotoptions::GB_MBC5,            GB_ROM_MBC5);
 	device.option_add_internal(slotoptions::GB_MBC6,            GB_ROM_MBC6);
 	device.option_add_internal(slotoptions::GB_MBC7_2K,         GB_ROM_MBC7_2K);

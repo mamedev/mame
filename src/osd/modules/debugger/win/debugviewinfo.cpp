@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  debugview.c - Win32 debug window handling
+//  debugviewinfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -24,6 +24,8 @@
 
 #include <mmsystem.h>
 
+
+namespace osd::debugger::win {
 
 // debugger view styles
 #define DEBUG_VIEW_STYLE    WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN
@@ -303,23 +305,23 @@ void debugview_info::restore_configuration_from_node(util::xml::data_node const 
 {
 	if (m_view->cursor_supported())
 	{
-		util::xml::data_node const *const selection = node.get_child(osd::debugger::NODE_WINDOW_SELECTION);
+		util::xml::data_node const *const selection = node.get_child(NODE_WINDOW_SELECTION);
 		if (selection)
 		{
 			debug_view_xy pos = m_view->cursor_position();
-			m_view->set_cursor_visible(0 != selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_VISIBLE, m_view->cursor_visible() ? 1 : 0));
-			selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_X, pos.x);
-			selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_Y, pos.y);
+			m_view->set_cursor_visible(0 != selection->get_attribute_int(ATTR_SELECTION_CURSOR_VISIBLE, m_view->cursor_visible() ? 1 : 0));
+			selection->get_attribute_int(ATTR_SELECTION_CURSOR_X, pos.x);
+			selection->get_attribute_int(ATTR_SELECTION_CURSOR_Y, pos.y);
 			m_view->set_cursor_position(pos);
 		}
 	}
 
-	util::xml::data_node const *const scroll = node.get_child(osd::debugger::NODE_WINDOW_SCROLL);
+	util::xml::data_node const *const scroll = node.get_child(NODE_WINDOW_SCROLL);
 	if (scroll)
 	{
 		debug_view_xy origin = m_view->visible_position();
-		origin.x = scroll->get_attribute_int(osd::debugger::ATTR_SCROLL_ORIGIN_X, origin.x * metrics().debug_font_width()) / metrics().debug_font_width();
-		origin.y = scroll->get_attribute_int(osd::debugger::ATTR_SCROLL_ORIGIN_Y, origin.y * metrics().debug_font_height()) / metrics().debug_font_height();
+		origin.x = scroll->get_attribute_int(ATTR_SCROLL_ORIGIN_X, origin.x * metrics().debug_font_width()) / metrics().debug_font_width();
+		origin.y = scroll->get_attribute_int(ATTR_SCROLL_ORIGIN_Y, origin.y * metrics().debug_font_height()) / metrics().debug_font_height();
 		m_view->set_visible_position(origin);
 	}
 }
@@ -329,22 +331,22 @@ void debugview_info::save_configuration_to_node(util::xml::data_node &node)
 {
 	if (m_view->cursor_supported())
 	{
-		util::xml::data_node *const selection = node.add_child(osd::debugger::NODE_WINDOW_SELECTION, nullptr);
+		util::xml::data_node *const selection = node.add_child(NODE_WINDOW_SELECTION, nullptr);
 		if (selection)
 		{
 			debug_view_xy const pos = m_view->cursor_position();
-			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_VISIBLE, m_view->cursor_visible() ? 1 : 0);
-			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_X, pos.x);
-			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_Y, pos.y);
+			selection->set_attribute_int(ATTR_SELECTION_CURSOR_VISIBLE, m_view->cursor_visible() ? 1 : 0);
+			selection->set_attribute_int(ATTR_SELECTION_CURSOR_X, pos.x);
+			selection->set_attribute_int(ATTR_SELECTION_CURSOR_Y, pos.y);
 		}
 	}
 
-	util::xml::data_node *const scroll = node.add_child(osd::debugger::NODE_WINDOW_SCROLL, nullptr);
+	util::xml::data_node *const scroll = node.add_child(NODE_WINDOW_SCROLL, nullptr);
 	if (scroll)
 	{
 		debug_view_xy const origin = m_view->visible_position();
-		scroll->set_attribute_int(osd::debugger::ATTR_SCROLL_ORIGIN_X, origin.x * metrics().debug_font_width());
-		scroll->set_attribute_int(osd::debugger::ATTR_SCROLL_ORIGIN_Y, origin.y * metrics().debug_font_height());
+		scroll->set_attribute_int(ATTR_SCROLL_ORIGIN_X, origin.x * metrics().debug_font_width());
+		scroll->set_attribute_int(ATTR_SCROLL_ORIGIN_Y, origin.y * metrics().debug_font_height());
 	}
 }
 
@@ -1074,3 +1076,5 @@ void debugview_info::register_window_class()
 		s_window_class_registered = true;
 	}
 }
+
+} // namespace osd::debugger::win

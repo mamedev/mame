@@ -26816,10 +26816,10 @@ license:CC0
 		<info name="alt_title" value="真三國無雙2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="zhen san guo wu shuang 2 - shin sangokumusou 2 (chi)(unl) [raw dump].bin" size="2097152" crc="95c322c9" sha1="e6ab58d212de83cb18e9eadac4cee5d0f6e4e31f"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="zhen san guo wu shuang 2 - shin sangokumusou 2 (chi)(unl) [raw dump].bin" size="0x200000" crc="95c322c9" sha1="e6ab58d212de83cb18e9eadac4cee5d0f6e4e31f"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
@@ -26831,10 +26831,37 @@ license:CC0
 		<info name="alt_title" value="真三國無雙2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="2097152">
-				<rom name="shin san guo shi 2 (unl).bin" size="2097152" crc="33f56c90" sha1="a5111c11cf70c65341b373f484650caae3c4d29f"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="shin san guo shi 2 (unl).bin" size="0x200000" crc="33f56c90" sha1="a5111c11cf70c65341b373f484650caae3c4d29f"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jueduiwl">
+		<description>Juéduì Wǔlì (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="絕對武力" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="juedui wuli.gbc" size="0x200000" crc="f4d63a7e" sha1="f0b9f02335ee89aa6189e687e6e759d8c49bc2b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wxtxxqdz">
+		<!-- not sure how the hiragana の (no) in the title should be read - assuming it's a stylised 之 -->
+		<description>Wàixīng Tànxiǎn zhī Xīngqiú Dàzhàn (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="外星探險の星球大戰" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="waixing tanxian xingqiu dazhan.gbc" size="0x200000" crc="4e600093" sha1="32067be39f0bdc354c31a7a02f24ba00b61ae4f1"/>
 			</dataarea>
 		</part>
 	</software>

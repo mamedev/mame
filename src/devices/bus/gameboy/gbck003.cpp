@@ -166,6 +166,8 @@ void gbck003_device::device_reset()
 
 	// TODO: proper reset state
 	m_bank_setting[1] = 1U;
+
+	set_bank_rom_high(bank_rom_entry_high());
 }
 
 

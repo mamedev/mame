@@ -42,6 +42,7 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+#include "utf8.h"
 
 WRITE_LINE_MEMBER( pc8001_base_state::crtc_reverse_w )
 {

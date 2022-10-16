@@ -18,7 +18,7 @@ public:
 	virtual void device_reset() override;
 
 	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return 4096 + 16; }
+	virtual u32 palette_entries() const noexcept override { return 4096 + 16; }
 
 	u8 reg_r(offs_t offset);
 	void reg_w(offs_t offset, u8 data);
