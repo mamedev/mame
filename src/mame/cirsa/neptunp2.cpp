@@ -355,11 +355,11 @@ ROM_START( perlacrb )
 	ROM_LOAD( "s-437_otp.u15", 0x100000, 0x100000, CRC(23cc1ab1) SHA1(d1fddb8c742a356703993cee35dc3f5d6ee3d6ea) )
 
 	ROM_REGION( 0x8000400, "gfx", 0 )
-      // SIMM 0, "Window B", not present
-      // SIMM 1, "Window A", dated 15/May/2008
+	// SIMM 0, "Window B", not present
+	// SIMM 1, "Window A", dated 15/May/2008
 	ROM_LOAD( "la_perla_del_caribe_bq_graf.-es_w1-1-2_v_g-1f019.u1",  0x0000000, 0x2000100, CRC(1e613ecf) SHA1(7036855b29f796a936aac5084acd6a49bc614dd8) )
 	ROM_LOAD( "la_perla_del_caribe_bq_graf.-es_w1-1-2_v_g-1f019.u2",  0x2000100, 0x2000100, CRC(229c83e3) SHA1(647c11b55ded105ec21bc57aad7b65575966ff9c) )
-      // SIMM 2, "Background B", not present
+	// SIMM 2, "Background B", not present
 	// SIMM 3, "Background A", dated 15/May/2008
 	ROM_LOAD( "la_perla_del_caribe_bq_graf.-es_bg1-2-2_v_g-3f019.u1", 0x4000200, 0x2000100, CRC(2dd9db7f) SHA1(a6fc4ebaf536933bc901699c21d65ad1eb7baaad) )
 	ROM_LOAD( "la_perla_del_caribe_bq_graf.-es_bg1-2-2_v_g-3f019.u2", 0x6000300, 0x2000100, CRC(c391c42c) SHA1(a3416f6ed0de7898cf7205fc88499cc27eb9471d) )
