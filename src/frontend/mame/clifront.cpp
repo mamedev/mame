@@ -300,7 +300,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 		// reason for failure, offer some suggestions
 		if (m_result == EMU_ERR_NO_SUCH_SYSTEM
 			&& !m_options.attempted_system_name().empty()
-			&& !core_iswildstr(m_options.attempted_system_name().c_str())
+			&& !core_iswildstr(m_options.attempted_system_name())
 			&& mame_options::system(m_options) == nullptr)
 		{
 			// get the top 16 approximate matches
@@ -911,7 +911,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 //-------------------------------------------------
 void cli_frontend::verifyroms(const std::vector<std::string> &args)
 {
-	bool const iswild((1U != args.size()) || core_iswildstr(args[0].c_str()));
+	bool const iswild((1U != args.size()) || core_iswildstr(args[0]));
 	std::vector<bool> matched(args.size(), false);
 	unsigned matchcount = 0;
 	auto const included = [&args, &matched, &matchcount] (char const *name) -> bool
@@ -926,7 +926,7 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 		auto it = matched.begin();
 		for (std::string const &pat : args)
 		{
-			if (!core_strwildcmp(pat.c_str(), name))
+			if (!core_strwildcmp(pat, name))
 			{
 				++matchcount;
 				result = true;
@@ -1395,7 +1395,7 @@ void cli_frontend::getsoftlist(const std::vector<std::string> &args)
 			{
 				for (software_list_device &swlistdev : software_list_device_enumerator(root))
 				{
-					if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
+					if (core_strwildcmp(gamename, swlistdev.list_name()) == 0 && list_map.insert(swlistdev.list_name()).second)
 					{
 						if (!swlistdev.get_info().empty())
 						{
@@ -1440,7 +1440,7 @@ void cli_frontend::verifysoftlist(const std::vector<std::string> &args)
 	{
 		for (software_list_device &swlistdev : software_list_device_enumerator(drivlist.config()->root_device()))
 		{
-			if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
+			if (core_strwildcmp(gamename, swlistdev.list_name()) == 0 && list_map.insert(swlistdev.list_name()).second)
 			{
 				if (!swlistdev.get_info().empty())
 				{
@@ -1536,7 +1536,7 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 template <typename T, typename U> void cli_frontend::apply_action(const std::vector<std::string> &args, T &&drvact, U &&devact)
 
 {
-	bool const iswild((1U != args.size()) || core_iswildstr(args[0].c_str()));
+	bool const iswild((1U != args.size()) || core_iswildstr(args[0]));
 	std::vector<bool> matched(args.size(), false);
 	auto const included = [&args, &matched] (char const *name) -> bool
 	{
@@ -1547,7 +1547,7 @@ template <typename T, typename U> void cli_frontend::apply_action(const std::vec
 		auto it = matched.begin();
 		for (std::string const &pat : args)
 		{
-			if (!core_strwildcmp(pat.c_str(), name))
+			if (!core_strwildcmp(pat, name))
 			{
 				result = true;
 				*it = true;
