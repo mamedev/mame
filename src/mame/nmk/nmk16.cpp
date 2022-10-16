@@ -7575,6 +7575,34 @@ ROM_START( bigbang )
 	ROM_LOAD( "10.bpr", 0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) )  // unknown
 ROM_END
 
+ROM_START( bigbanga )
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
+	ROM_LOAD16_WORD_SWAP( "3.u117",      0x00000, 0x80000, CRC(c79966d1) SHA1(6f73b1e379254d8261eac27525f0960378895938) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
+	ROM_LOAD( "5.bin",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) // banked
+
+	ROM_REGION( 0x020000, "fgtile", 0 )
+	ROM_LOAD( "1.bin",    0x000000, 0x020000, CRC(d488aafa) SHA1(4d05e7ca075b638dd90ae4c9f224817a8a3ae9f3) )    // 8x8 tiles
+
+	ROM_REGION( 0x200000, "bgtile", 0 )
+	ROM_LOAD( "ww930914.2", 0x000000, 0x200000, CRC(f968c65d) SHA1(fd6d21bba53f945b1597d7d0735bc62dd44d5498) )  // 16x16 tiles
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  // Sprites
+	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
+
+	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
+
+	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // unknown
+	ROM_LOAD( "10.bpr", 0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) )  // unknown
+ROM_END
+
 /*
 
 Rapid Hero (NMK, 1994)
@@ -7752,6 +7780,10 @@ ROM_START( sabotenb )
 
 	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "ic27.sb7",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "8.ic37",      0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // 82S135
+	ROM_LOAD( "9.ic51",      0x0100, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
 ROM_END
 
 ROM_START( sabotenba )
@@ -7773,6 +7805,10 @@ ROM_START( sabotenba )
 
 	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "ic27.sb7",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "8.ic37",      0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // 82S135
+	ROM_LOAD( "9.ic51",      0x0100, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
 ROM_END
 
 ROM_START( cactus )
@@ -7820,7 +7856,7 @@ ROM_START( bjtwin )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "8.bpr",      0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // unknown
-	ROM_LOAD( "9.bpr",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // unknown
+	ROM_LOAD( "9.bpr",      0x0100, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // unknown
 ROM_END
 
 ROM_START( bjtwina )
@@ -7845,7 +7881,7 @@ ROM_START( bjtwina )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "8.bpr",      0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // unknown
-	ROM_LOAD( "9.bpr",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // unknown
+	ROM_LOAD( "9.bpr",      0x0100, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // unknown
 ROM_END
 
 
@@ -9222,7 +9258,8 @@ GAME( 1993, macross2k,  macross2, macross2,     macross2,     nmk16_state, init_
 
 GAME( 1993, tdragon2,   0,        tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
 GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bigbanga,   tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 2)", MACHINE_NO_COCKTAIL )
 GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // based on 1st Oct. 1993 set, needs emulation of the mechanism used to simulate the missing YM2203' IRQs
 
 GAME( 1994, arcadian,   0,        raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen

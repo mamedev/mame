@@ -49539,4 +49539,49 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lcljscgco">
+		<description>Living Chess Library: Jeremy Silman's Complete Guide to Chess Openings (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Enlightenment, Inc.</publisher>
+		<info name="release" value="2022-09-19"/>
+		<!--"Living Chess Library: Jeremy Silman's Complete Guide to Chess Openings" is a 1985 educational program developed by Jeremy Silman and distributed by Enlightenment, Inc. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="jeremy silman's complete guide to chess openings (4am crack) side 1.dsk" size="143360" crc="94a05631" sha1="83e69e3378f3256ee40be2942eb140b76c145e1e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="jeremy silman's complete guide to chess openings (4am crack) side 2.dsk" size="143360" crc="0e69fdc6" sha1="af8d1af3d022acdb5f3006c429d02ee36cf67984"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="jeremy silman's complete guide to chess openings (4am crack) side 3.dsk" size="143360" crc="4576d19d" sha1="96d33e99e1c2f2518c5534cffc9e495f9f087a72"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="jeremy silman's complete guide to chess openings (4am crack) side 4.dsk" size="143360" crc="2b38e2fa" sha1="526fe6157ada80490567a2a0f8aa9822b1701ddd"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side 5"/>
+			<dataarea name="flop" size="143360">
+				<rom name="jeremy silman's complete guide to chess openings (4am crack) side 5.dsk" size="143360" crc="c21708f6" sha1="f73c21e48ea438f6c310497bdfe3cb9939083878"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Side 6"/>
+			<dataarea name="flop" size="143360">
+				<rom name="jeremy silman's complete guide to chess openings (4am crack) side 6.dsk" size="143360" crc="1d13e3fe" sha1="0cba513fef08b03f42b220a419d9832b3e50fa7c"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

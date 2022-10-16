@@ -303,7 +303,7 @@ void scsp_device::device_clock_changed()
 	m_stream->set_sample_rate(clock() / 512);
 }
 
-void scsp_device::rom_bank_updated()
+void scsp_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

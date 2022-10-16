@@ -105,7 +105,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual void palette_init() = 0;
-	virtual u32 palette_entries() const override { return 16 + 256; }
+	virtual u32 palette_entries() const noexcept override { return 16 + 256; }
 
 	TIMER_CALLBACK_MEMBER(update_line);
 

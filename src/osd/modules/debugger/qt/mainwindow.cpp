@@ -19,10 +19,13 @@
 #include <QtWidgets/QScrollBar>
 
 
+namespace osd::debugger::qt {
+
 MainWindow::MainWindow(running_machine &machine, QWidget *parent) :
 	WindowQt(machine, nullptr),
 	m_historyIndex(0),
-	m_inputHistory()
+	m_inputHistory(),
+	m_exiting(false)
 {
 	setGeometry(300, 300, 1000, 600);
 
@@ -70,6 +73,9 @@ MainWindow::MainWindow(running_machine &machine, QWidget *parent) :
 	QAction *rightActRaw = new QAction("Raw Opcodes", this);
 	QAction *rightActEncrypted = new QAction("Encrypted Opcodes", this);
 	QAction *rightActComments = new QAction("Comments", this);
+	rightActRaw->setData(int(DASM_RIGHTCOL_RAW));
+	rightActEncrypted->setData(int(DASM_RIGHTCOL_ENCRYPTED));
+	rightActComments->setData(int(DASM_RIGHTCOL_COMMENTS));
 	rightActRaw->setCheckable(true);
 	rightActEncrypted->setCheckable(true);
 	rightActComments->setCheckable(true);
@@ -152,10 +158,10 @@ void MainWindow::saveConfigurationToNode(util::xml::data_node &node)
 {
 	WindowQt::saveConfigurationToNode(node);
 
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_CONSOLE);
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_CONSOLE);
 
 	debug_view_disasm &dasmview = *m_dasmFrame->view()->view<debug_view_disasm>();
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column());
+	node.set_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column());
 	node.set_attribute("qtwindowstate", saveState().toPercentEncoding().data());
 }
 
@@ -163,10 +169,12 @@ void MainWindow::saveConfigurationToNode(util::xml::data_node &node)
 // Used to intercept the user clicking 'X' in the upper corner
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-	debugActQuit();
-
-	// Insure the window doesn't disappear before we get a chance to save its parameters
-	event->ignore();
+	if (!m_exiting)
+	{
+		// Don't actually close the window - it will be brought back on user break
+		debugActRunAndHide();
+		event->ignore();
+	}
 }
 
 
@@ -279,14 +287,7 @@ void MainWindow::runToCursor(bool changedTo)
 void MainWindow::rightBarChanged(QAction *changedTo)
 {
 	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
-
-	if (changedTo->text() == "Raw Opcodes")
-		dasmView->set_right_column(DASM_RIGHTCOL_RAW);
-	else if (changedTo->text() == "Encrypted Opcodes")
-		dasmView->set_right_column(DASM_RIGHTCOL_ENCRYPTED);
-	else if (changedTo->text() == "Comments")
-		dasmView->set_right_column(DASM_RIGHTCOL_COMMENTS);
-
+	dasmView->set_right_column(disasm_right_column(changedTo->data().toInt()));
 	m_dasmFrame->view()->viewport()->update();
 }
 
@@ -489,8 +490,15 @@ void MainWindowQtConfig::applyToQWidget(QWidget *widget)
 	MainWindow *window = dynamic_cast<MainWindow *>(widget);
 	window->restoreState(m_windowState);
 
-	QActionGroup* rightBarGroup = window->findChild<QActionGroup*>("rightbargroup");
-	rightBarGroup->actions()[m_rightBar - 1]->trigger();
+	QActionGroup *const rightBarGroup = window->findChild<QActionGroup*>("rightbargroup");
+	for (QAction *action : rightBarGroup->actions())
+	{
+		if (action->data().toInt() == m_rightBar)
+		{
+			action->trigger();
+			break;
+		}
+	}
 }
 
 
@@ -499,7 +507,7 @@ void MainWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 	WindowQtConfig::recoverFromXmlNode(node);
 	const char* state = node.get_attribute_string("qtwindowstate", "");
 	m_windowState = QByteArray::fromPercentEncoding(state);
-	m_rightBar = node.get_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, m_rightBar);
+	m_rightBar = node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, m_rightBar);
 }
 
 DasmDockWidget::~DasmDockWidget()
@@ -509,3 +517,5 @@ DasmDockWidget::~DasmDockWidget()
 ProcessorDockWidget::~ProcessorDockWidget()
 {
 }
+
+} // namespace osd::debugger::qt

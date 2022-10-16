@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Phil Stroffolino, Uki,Stephane Humbert
+// copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Phil Stroffolino, Uki, Stephane Humbert
 /******************************************************************************
 
 UPL "orthogonal palette" hardware
@@ -25,7 +25,7 @@ Game                      Board
 ------------------------  ---------
 Nova 2001                 UPL-83005
 Ninjakun Majou no Bouken  UPL-84003
-Penguin Kun Wars          UPL-?????
+Penguin Kun Wars          UPL-85003
 Raiders5                  UPL-85004
 
 Hardware Overview:
@@ -138,7 +138,6 @@ e000 - e7ff        R/W      Work RAM
  *  Ninjakun 0xA000 Read / Write Handlers
  *
  *************************************/
-
 
 CUSTOM_INPUT_MEMBER(nova2001_state::ninjakun_io_A002_ctrl_r)
 {
@@ -580,6 +579,7 @@ static INPUT_PORTS_START( raiders5ta )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Graphics layouts
@@ -599,20 +599,20 @@ static const gfx_layout layout8x8_part =
 
 
 static GFXDECODE_START( gfx_nova2001 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 )    // sprites
-	GFXDECODE_ENTRY( "gfx1", 0x0000, layout8x8_part,                     0x000, 16 )    // fg tiles (using only 1/4th of the ROM space)
-	GFXDECODE_ENTRY( "gfx1", 0x4000, layout8x8_part,                     0x100, 16 )    // bg tiles (using only 1/4th of the ROM space)
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0x0000, layout8x8_part,                     0x000, 16 ) // fg tiles (using only 1/4th of the ROM space)
+	GFXDECODE_ENTRY( "gfx1", 0x4000, layout8x8_part,                     0x100, 16 ) // bg tiles (using only 1/4th of the ROM space)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ninjakun )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x200, 16 )    // sprites
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x000, 16 )    // fg tiles
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,               0x100, 16 )    // bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x200, 16 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x000, 16 ) // fg tiles
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,               0x100, 16 ) // bg tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_pkunwar )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 )    // sprites
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x100, 16 )    // bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x100, 16 ) // bg tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_raiders5 )
@@ -792,17 +792,17 @@ void nova2001_state::raiders5(machine_config &config)
 
 ROM_START( nova2001 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.6c",         0x0000, 0x2000, CRC(368cffc0) SHA1(b756c0542d5b86640af62639bdd0d32f6e364dd3) )
-	ROM_LOAD( "2.6d",         0x2000, 0x2000, CRC(bc4e442b) SHA1(6e1dca5dde442db95403377bf49aaad2a337813e) )
-	ROM_LOAD( "3.6f",         0x4000, 0x2000, CRC(b2849038) SHA1(b56c7c03ef7c677cc6df0280a485f9cda3435b23) )
-	ROM_LOAD( "4.6g",         0x6000, 0x1000, CRC(6b5bb12d) SHA1(74aee3d08a7ee1f98eaec4a4b3062aa9d17948ec) )
-	ROM_RELOAD(               0x7000, 0x1000 )  // half size ROM, mirrored
+	ROM_LOAD( "1.6c", 0x0000, 0x2000, CRC(368cffc0) SHA1(b756c0542d5b86640af62639bdd0d32f6e364dd3) )
+	ROM_LOAD( "2.6d", 0x2000, 0x2000, CRC(bc4e442b) SHA1(6e1dca5dde442db95403377bf49aaad2a337813e) )
+	ROM_LOAD( "3.6f", 0x4000, 0x2000, CRC(b2849038) SHA1(b56c7c03ef7c677cc6df0280a485f9cda3435b23) )
+	ROM_LOAD( "4.6g", 0x6000, 0x1000, CRC(6b5bb12d) SHA1(74aee3d08a7ee1f98eaec4a4b3062aa9d17948ec) )
+	ROM_RELOAD(       0x7000, 0x1000 ) // half size ROM, mirrored
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "5.12s",        0x0000, 0x2000, CRC(54198941) SHA1(fe762a0bbcf10b13ece87ded2ea730257cfbe7d3) )
-	ROM_LOAD16_BYTE( "6.12p",        0x0001, 0x2000, CRC(cbd90dca) SHA1(7eacde832f5783f4389fb98d6bf6b26dd494665d) )
-	ROM_LOAD16_BYTE( "7.12n",        0x4000, 0x2000, CRC(9ebd8806) SHA1(26b6caa0d0a7ae52a182070ecc7bc696c12038b3) )
-	ROM_LOAD16_BYTE( "8.12l",        0x4001, 0x2000, CRC(d1b18389) SHA1(2d808fee774f1bb4cec42e23cfef36b54eee0efa) )
+	ROM_LOAD16_BYTE( "5.12s", 0x0000, 0x2000, CRC(54198941) SHA1(fe762a0bbcf10b13ece87ded2ea730257cfbe7d3) )
+	ROM_LOAD16_BYTE( "6.12p", 0x0001, 0x2000, CRC(cbd90dca) SHA1(7eacde832f5783f4389fb98d6bf6b26dd494665d) )
+	ROM_LOAD16_BYTE( "7.12n", 0x4000, 0x2000, CRC(9ebd8806) SHA1(26b6caa0d0a7ae52a182070ecc7bc696c12038b3) )
+	ROM_LOAD16_BYTE( "8.12l", 0x4001, 0x2000, CRC(d1b18389) SHA1(2d808fee774f1bb4cec42e23cfef36b54eee0efa) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "nova2001.clr", 0x0000, 0x0020, CRC(a2fac5cd) SHA1(ad14aa2be57722d1f48b47171fe72f96091423b6) )
@@ -812,17 +812,17 @@ ROM_START( nova2001h )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	// roms 1 and 2 had green stickers, but looks like an unofficial mod, bytes have been added in empty space to fix game checksum after mods were made to code.
 	// one of the mods fixes the game resetting if the coin input is held down for too short / long of a period, the purpose of the other is unknown.
-	ROM_LOAD( "1,green.6c",         0x0000, 0x2000, CRC(1a8731b3) SHA1(a865d1cb070686dfa19e0da887c599455692a860) )
-	ROM_LOAD( "2,green.6d",         0x2000, 0x2000, CRC(bc4e442b) SHA1(6e1dca5dde442db95403377bf49aaad2a337813e) ) // not actually modified?
+	ROM_LOAD( "1_green.6c",   0x0000, 0x2000, CRC(1a8731b3) SHA1(a865d1cb070686dfa19e0da887c599455692a860) )
+	ROM_LOAD( "2_green.6d",   0x2000, 0x2000, CRC(bc4e442b) SHA1(6e1dca5dde442db95403377bf49aaad2a337813e) ) // not actually modified?
 	ROM_LOAD( "3.6f",         0x4000, 0x2000, CRC(b2849038) SHA1(b56c7c03ef7c677cc6df0280a485f9cda3435b23) )
 	ROM_LOAD( "4.6g",         0x6000, 0x1000, CRC(6b5bb12d) SHA1(74aee3d08a7ee1f98eaec4a4b3062aa9d17948ec) )
-	ROM_RELOAD(               0x7000, 0x1000 )  // half size ROM, mirrored
+	ROM_RELOAD(               0x7000, 0x1000 ) // half size ROM, mirrored
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "5.12s",        0x0000, 0x2000, CRC(54198941) SHA1(fe762a0bbcf10b13ece87ded2ea730257cfbe7d3) )
-	ROM_LOAD16_BYTE( "6.12p",        0x0001, 0x2000, CRC(cbd90dca) SHA1(7eacde832f5783f4389fb98d6bf6b26dd494665d) )
-	ROM_LOAD16_BYTE( "7.12n",        0x4000, 0x2000, CRC(9ebd8806) SHA1(26b6caa0d0a7ae52a182070ecc7bc696c12038b3) )
-	ROM_LOAD16_BYTE( "8.12l",        0x4001, 0x2000, CRC(d1b18389) SHA1(2d808fee774f1bb4cec42e23cfef36b54eee0efa) )
+	ROM_LOAD16_BYTE( "5.12s", 0x0000, 0x2000, CRC(54198941) SHA1(fe762a0bbcf10b13ece87ded2ea730257cfbe7d3) )
+	ROM_LOAD16_BYTE( "6.12p", 0x0001, 0x2000, CRC(cbd90dca) SHA1(7eacde832f5783f4389fb98d6bf6b26dd494665d) )
+	ROM_LOAD16_BYTE( "7.12n", 0x4000, 0x2000, CRC(9ebd8806) SHA1(26b6caa0d0a7ae52a182070ecc7bc696c12038b3) )
+	ROM_LOAD16_BYTE( "8.12l", 0x4001, 0x2000, CRC(d1b18389) SHA1(2d808fee774f1bb4cec42e23cfef36b54eee0efa) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "nova2001.clr", 0x0000, 0x0020, CRC(a2fac5cd) SHA1(ad14aa2be57722d1f48b47171fe72f96091423b6) )
@@ -830,17 +830,17 @@ ROM_END
 
 ROM_START( nova2001u )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "nova2001.1",   0x0000, 0x2000, CRC(b79461bd) SHA1(7fac3313bc76612f66a6518450d0fed32fe70c45) )
-	ROM_LOAD( "nova2001.2",   0x2000, 0x2000, CRC(fab87144) SHA1(506703f9d96443839f864ef5bde1a71120f54384) )
-	ROM_LOAD( "3.6f",         0x4000, 0x2000, CRC(b2849038) SHA1(b56c7c03ef7c677cc6df0280a485f9cda3435b23) )
-	ROM_LOAD( "4.6g",         0x6000, 0x1000, CRC(6b5bb12d) SHA1(74aee3d08a7ee1f98eaec4a4b3062aa9d17948ec) )
-	ROM_RELOAD(               0x7000, 0x1000 )  // half size ROM, mirrored
+	ROM_LOAD( "nova2001.1", 0x0000, 0x2000, CRC(b79461bd) SHA1(7fac3313bc76612f66a6518450d0fed32fe70c45) )
+	ROM_LOAD( "nova2001.2", 0x2000, 0x2000, CRC(fab87144) SHA1(506703f9d96443839f864ef5bde1a71120f54384) )
+	ROM_LOAD( "3.6f",       0x4000, 0x2000, CRC(b2849038) SHA1(b56c7c03ef7c677cc6df0280a485f9cda3435b23) )
+	ROM_LOAD( "4.6g",       0x6000, 0x1000, CRC(6b5bb12d) SHA1(74aee3d08a7ee1f98eaec4a4b3062aa9d17948ec) )
+	ROM_RELOAD(             0x7000, 0x1000 ) // half size ROM, mirrored
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "nova2001.5",   0x0000, 0x2000, CRC(8ea576e8) SHA1(d8dbcfd43aafe25afad7f947a80737cdc55b23d7) )
-	ROM_LOAD16_BYTE( "nova2001.6",   0x0001, 0x2000, CRC(0c61656c) SHA1(41c480799798c95543b5a805694e68282b9f563a) )
-	ROM_LOAD16_BYTE( "7.12n",        0x4000, 0x2000, CRC(9ebd8806) SHA1(26b6caa0d0a7ae52a182070ecc7bc696c12038b3) )
-	ROM_LOAD16_BYTE( "8.12l",        0x4001, 0x2000, CRC(d1b18389) SHA1(2d808fee774f1bb4cec42e23cfef36b54eee0efa) )
+	ROM_LOAD16_BYTE( "nova2001.5", 0x0000, 0x2000, CRC(8ea576e8) SHA1(d8dbcfd43aafe25afad7f947a80737cdc55b23d7) )
+	ROM_LOAD16_BYTE( "nova2001.6", 0x0001, 0x2000, CRC(0c61656c) SHA1(41c480799798c95543b5a805694e68282b9f563a) )
+	ROM_LOAD16_BYTE( "7.12n",      0x4000, 0x2000, CRC(9ebd8806) SHA1(26b6caa0d0a7ae52a182070ecc7bc696c12038b3) )
+	ROM_LOAD16_BYTE( "8.12l",      0x4001, 0x2000, CRC(d1b18389) SHA1(2d808fee774f1bb4cec42e23cfef36b54eee0efa) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "nova2001.clr", 0x0000, 0x0020, CRC(a2fac5cd) SHA1(ad14aa2be57722d1f48b47171fe72f96091423b6) )
@@ -848,10 +848,10 @@ ROM_END
 
 ROM_START( ninjakun ) /* Original Board? */
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "ninja-1.7a",  0x0000, 0x02000, CRC(1c1dc141) SHA1(423d3ed35e73a8d5bfce075a889b0322b207bd0d) )
-	ROM_LOAD( "ninja-2.7b",  0x2000, 0x02000, CRC(39cc7d37) SHA1(7f0d0e1e92cb6a57f15eb7fc51a67112f1c5fc8e) )
-	ROM_LOAD( "ninja-3.7d",  0x4000, 0x02000, CRC(d542bfe3) SHA1(3814d8f5b1acda21438fff4f71670fa653dc7b30) )
-	ROM_LOAD( "ninja-4.7e",  0x6000, 0x02000, CRC(a57385c6) SHA1(77925a281e64889bfe967c3d42a388529aaf7eb6) )
+	ROM_LOAD( "ninja-1.7a", 0x0000, 0x02000, CRC(1c1dc141) SHA1(423d3ed35e73a8d5bfce075a889b0322b207bd0d) )
+	ROM_LOAD( "ninja-2.7b", 0x2000, 0x02000, CRC(39cc7d37) SHA1(7f0d0e1e92cb6a57f15eb7fc51a67112f1c5fc8e) )
+	ROM_LOAD( "ninja-3.7d", 0x4000, 0x02000, CRC(d542bfe3) SHA1(3814d8f5b1acda21438fff4f71670fa653dc7b30) )
+	ROM_LOAD( "ninja-4.7e", 0x6000, 0x02000, CRC(a57385c6) SHA1(77925a281e64889bfe967c3d42a388529aaf7eb6) )
 
 	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "ninja-5.7h",  0x0000, 0x02000, CRC(164a42c4) SHA1(16b434b33b76b878514f67c23315d4c6da7bfc9e) )
@@ -875,7 +875,7 @@ ROM_START( pkunwar )
 	ROM_LOAD( "pkwar.02r",    0x4000, 0x4000, CRC(abc1f661) SHA1(c4bf4a345efd4271617de9f334303d81c6885aa5) )
 	ROM_LOAD( "pkwar.03r",    0xe000, 0x2000, CRC(56faebea) SHA1(dd0406c723a08f5d1120655857a115ab8c2d2a11) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )    // (need lineswapping)
+	ROM_REGION( 0x10000, "gfx1", 0 ) // (need lineswapping)
 	ROM_LOAD( "pkwar.01y",    0x0000, 0x4000, CRC(428d3b92) SHA1(7fe11e8d785fe829d34e512f233bb9ccc70cd431) )
 	ROM_LOAD( "pkwar.02y",    0x4000, 0x4000, CRC(ce1da7bc) SHA1(a2357b61703a689ce63aec7dd44702b119894f8e) )
 	ROM_LOAD( "pkwar.03y",    0x8000, 0x4000, CRC(63204400) SHA1(1ba87ad3425c51150cb65408f04ee0147ef332d3) )
@@ -891,7 +891,7 @@ ROM_START( pkunwarj )
 	ROM_LOAD( "pgunwar.5",    0x4000, 0x4000, CRC(0092e49e) SHA1(7945361036f7679e4f4bb6b94f60f3ca09c077dc) )
 	ROM_LOAD( "pkwar.03r",    0xe000, 0x2000, CRC(56faebea) SHA1(dd0406c723a08f5d1120655857a115ab8c2d2a11) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )    // (need lineswapping)
+	ROM_REGION( 0x10000, "gfx1", 0 ) // (need lineswapping)
 	ROM_LOAD( "pkwar.01y",    0x0000, 0x4000, CRC(428d3b92) SHA1(7fe11e8d785fe829d34e512f233bb9ccc70cd431) )
 	ROM_LOAD( "pkwar.02y",    0x4000, 0x4000, CRC(ce1da7bc) SHA1(a2357b61703a689ce63aec7dd44702b119894f8e) )
 	ROM_LOAD( "pgunwar.2",    0x8000, 0x4000, CRC(a2a43443) SHA1(4e10569886d364eb2539928ea81dc1565b60b590) )
@@ -901,53 +901,69 @@ ROM_START( pkunwarj )
 	ROM_LOAD( "pkwar.col",    0x0000, 0x0020, CRC(af0fc5e2) SHA1(480908bf893211b580ae19cfb40dc35ad1bbc343) )
 ROM_END
 
+ROM_START( pkunwarja )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "peng_wars_1_red.7a", 0x0000, 0x4000, CRC(9dfdf1b2) SHA1(10ade29129de846f0f6110957d179d192220e71c) )
+	ROM_LOAD( "peng_wars_2_red.7b", 0x4000, 0x4000, CRC(bc286b8c) SHA1(a034f11952bc0b278eb46c508fc41d34948fb29c) )
+	ROM_LOAD( "3_red.5b",           0xe000, 0x2000, CRC(56faebea) SHA1(dd0406c723a08f5d1120655857a115ab8c2d2a11) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 ) // (need lineswapping)
+	ROM_LOAD( "1_yellow.7h", 0x0000, 0x4000, CRC(428d3b92) SHA1(7fe11e8d785fe829d34e512f233bb9ccc70cd431) )
+	ROM_LOAD( "2_yellow.7k", 0x4000, 0x4000, CRC(ce1da7bc) SHA1(a2357b61703a689ce63aec7dd44702b119894f8e) )
+	ROM_LOAD( "3_yellow.7l", 0x8000, 0x4000, CRC(a2a43443) SHA1(4e10569886d364eb2539928ea81dc1565b60b590) )
+	ROM_LOAD( "4_yellow.7m", 0xc000, 0x4000, CRC(061dfca8) SHA1(0a2dd8fc790d607195ca18dfc55575c2b9ddc58a) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "tbp18s030n.1f", 0x0000, 0x0020, CRC(af0fc5e2) SHA1(480908bf893211b580ae19cfb40dc35ad1bbc343) )
+ROM_END
+
 ROM_START( raiders5 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "raiders5.1", 0x0000,  0x4000, CRC(47cea11f) SHA1(0499e6627ad9c16775fdc59f2ff56dfdfc23490a) )
-	ROM_LOAD( "raiders5.2", 0x4000,  0x4000, CRC(eb2ff410) SHA1(5c995b66b6301cd3cd58efd173481deaa036f842) )
+	ROM_LOAD( "raiders5.1", 0x0000, 0x4000, CRC(47cea11f) SHA1(0499e6627ad9c16775fdc59f2ff56dfdfc23490a) )
+	ROM_LOAD( "raiders5.2", 0x4000, 0x4000, CRC(eb2ff410) SHA1(5c995b66b6301cd3cd58efd173481deaa036f842) )
 
 	ROM_REGION( 0x4000, "sub", 0 )
 	ROM_COPY( "maincpu", 0x4000, 0x0000, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
-	ROM_LOAD( "raiders3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
-	ROM_LOAD( "raiders4.11g", 0x4000,  0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
+	ROM_LOAD( "raiders3.11f", 0x0000, 0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
+	ROM_LOAD( "raiders4.11g", 0x4000, 0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 ) // (need lineswapping)
-	ROM_LOAD( "raiders5.11n", 0x0000,  0x4000, CRC(c0895090) SHA1(a3a1ae57ed66bc095ea9bfb26470290f67aab1fe) )
+	ROM_LOAD( "raiders5.11n", 0x0000, 0x4000, CRC(c0895090) SHA1(a3a1ae57ed66bc095ea9bfb26470290f67aab1fe) )
 ROM_END
 
 ROM_START( raiders5t )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "raiders1.4c", 0x0000,  0x4000, CRC(4e2d5679) SHA1(a1c1603ba98814a83b92ad024ca4422aea872111) )
-	ROM_LOAD( "raiders2.4d", 0x4000,  0x4000, CRC(c8604be1) SHA1(6d23f26174bb9b2f7db3a5fa6b39674fe237135b) )
+	ROM_LOAD( "raiders1.4c", 0x0000, 0x4000, CRC(4e2d5679) SHA1(a1c1603ba98814a83b92ad024ca4422aea872111) )
+	ROM_LOAD( "raiders2.4d", 0x4000, 0x4000, CRC(c8604be1) SHA1(6d23f26174bb9b2f7db3a5fa6b39674fe237135b) )
 
 	ROM_REGION( 0x4000, "sub", 0 )
 	ROM_COPY( "maincpu", 0x4000, 0x0000, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
-	ROM_LOAD( "raiders3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
-	ROM_LOAD( "raiders4.11g", 0x4000,  0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
+	ROM_LOAD( "raiders3.11f", 0x0000, 0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
+	ROM_LOAD( "raiders4.11g", 0x4000, 0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 ) // (need lineswapping)
-	ROM_LOAD( "raiders5.11n", 0x0000,  0x4000, CRC(c0895090) SHA1(a3a1ae57ed66bc095ea9bfb26470290f67aab1fe) )
+	ROM_LOAD( "raiders5.11n", 0x0000, 0x4000, CRC(c0895090) SHA1(a3a1ae57ed66bc095ea9bfb26470290f67aab1fe) )
 ROM_END
 
 ROM_START( raiders5ta ) // found in Italy, no UPL markings on the PCB? possibly bootleg or locally manufactured with legitimate alt code revision?
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "1.4c", 0x0000,  0x4000, CRC(e6264952) SHA1(c66fe6186ec5611073cac9c154eaf7e064dce1fc) )
-	ROM_LOAD( "2.4d", 0x4000,  0x4000, CRC(06f7c5b0) SHA1(1697c1fc0f37ac75d9df91962187e8eb69c0b9df) )
+	ROM_LOAD( "1.4c", 0x0000, 0x4000, CRC(e6264952) SHA1(c66fe6186ec5611073cac9c154eaf7e064dce1fc) )
+	ROM_LOAD( "2.4d", 0x4000, 0x4000, CRC(06f7c5b0) SHA1(1697c1fc0f37ac75d9df91962187e8eb69c0b9df) )
 
 	ROM_REGION( 0x4000, "sub", 0 )
 	ROM_COPY( "maincpu", 0x4000, 0x0000, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
-	ROM_LOAD( "3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
-	ROM_LOAD( "4.11g", 0x4000,  0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
+	ROM_LOAD( "3.11f", 0x0000, 0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
+	ROM_LOAD( "4.11g", 0x4000, 0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 ) // (need lineswapping)
 	// single byte different in unused area at 2fff ee -> 2e, possibly bitrot although more than a single bit changed
-	ROM_LOAD( "5.11n", 0x0000,  0x4000, CRC(fb532e4d) SHA1(44da82aafe53884681abf414cb3d7b913d5542c7) )
+	ROM_LOAD( "5.11n", 0x0000, 0x4000, CRC(fb532e4d) SHA1(44da82aafe53884681abf414cb3d7b913d5542c7) )
 ROM_END
 
 
@@ -977,19 +993,13 @@ This code is overly generic because it is used for several games in ninjakd2.cpp
 void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
 {
 	const int length = memregion(region)->bytes();
-
 	u8* const src = memregion(region)->base();
-
 	std::vector<u8> temp(length);
-
 	const int mask = (1 << (bit + 1)) - 1;
 
-	int sa;
-
-	for (sa = 0; sa < length; sa++)
+	for (int sa = 0; sa < length; sa++)
 	{
 		const int da = (sa & ~mask) | ((sa << 1) & mask) | ((sa >> bit) & 1);
-
 		temp[da] = src[sa];
 	}
 
@@ -1025,13 +1035,17 @@ void nova2001_state::init_raiders5()
 
 // many of these don't explicitly state Japan, eg. Nova 2001 could easily be used anywhere.
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, nova2001,  0,        nova2001, nova2001,  nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001h, nova2001, nova2001, nova2001,  nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001u, nova2001, nova2001, nova2001,  nova2001_state, empty_init,    ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ninjakun,  0,        ninjakun, ninjakun,  nova2001_state, empty_init,    ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,   nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,   nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5,  0,        raiders5, raiders5,  nova2001_state, init_raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5t, raiders5, raiders5, raiders5,  nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5ta,raiders5, raiders5, raiders5ta,nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan, set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,      CLASS,          INIT,          SCREEN, COMPANY, FULLNAME, FLAGS
+GAME( 1983, nova2001,  0,        nova2001, nova2001,   nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001h, nova2001, nova2001, nova2001,   nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001u, nova2001, nova2001, nova2001,   nova2001_state, empty_init,    ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1984, ninjakun,  0,        ninjakun, ninjakun,   nova2001_state, empty_init,    ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,    nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,    nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwarja, pkunwar,  pkunwar,  pkunwar,    nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1985, raiders5,  0,        raiders5, raiders5,   nova2001_state, init_raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5t, raiders5, raiders5, raiders5,   nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5ta,raiders5, raiders5, raiders5ta, nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan, set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )

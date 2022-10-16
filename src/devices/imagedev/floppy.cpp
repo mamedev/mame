@@ -318,7 +318,13 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
-void floppy_image_device::fs_enum::add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description)
+floppy_image_device::fs_enum::fs_enum(floppy_image_device *fid)
+	: fs::manager_t::floppy_enumerator(fid->form_factor, fid->variants)
+	, m_fid(fid)
+{
+}
+
+void floppy_image_device::fs_enum::add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description)
 {
 	m_fid->m_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
 }
@@ -346,7 +352,7 @@ void floppy_image_device::register_formats()
 	for(const fs::manager_t *fmt : fr.m_fs)
 	{
 		fse.m_manager = fmt;
-		fmt->enumerate_f(fse, form_factor, variants);
+		fmt->enumerate_f(fse);
 		m_fs_managers.push_back(fmt);
 	}
 }

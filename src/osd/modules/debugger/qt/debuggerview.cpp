@@ -16,6 +16,9 @@
 #define horizontalAdvance width
 #endif
 
+
+namespace osd::debugger::qt {
+
 DebuggerView::DebuggerView(
 		debug_view_type type,
 		running_machine &machine,
@@ -374,3 +377,5 @@ void DebuggerView::debuggerViewUpdate(debug_view &debugView, void *osdPrivate)
 	dView->update();
 	emit dView->updated();
 }
+
+} // namespace osd::debugger::qt

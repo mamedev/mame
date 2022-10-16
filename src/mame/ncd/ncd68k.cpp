@@ -58,6 +58,7 @@
 
 // processors
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/m6805/m68705.h"
 
 // devices

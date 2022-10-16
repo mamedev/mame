@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  debugwininfo.c - Win32 debug window handling
+//  debugwininfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -25,6 +25,8 @@
 
 #include <cstring>
 
+
+namespace osd::debugger::win {
 
 bool debugwin_info::s_window_class_registered = false;
 
@@ -264,7 +266,7 @@ bool debugwin_info::handle_key(WPARAM wparam, LPARAM lparam)
 
 void debugwin_info::save_configuration(util::xml::data_node &parentnode)
 {
-	util::xml::data_node *const node = parentnode.add_child(osd::debugger::NODE_WINDOW, nullptr);
+	util::xml::data_node *const node = parentnode.add_child(NODE_WINDOW, nullptr);
 	if (node)
 		save_configuration_to_node(*node);
 }
@@ -282,10 +284,10 @@ void debugwin_info::restore_configuration_from_node(util::xml::data_node const &
 
 	// get saved size and adjust for window chrome
 	RECT desired;
-	desired.left = node.get_attribute_int(osd::debugger::ATTR_WINDOW_POSITION_X, origin.x);
-	desired.top = node.get_attribute_int(osd::debugger::ATTR_WINDOW_POSITION_Y, origin.y);
-	desired.right = desired.left + node.get_attribute_int(osd::debugger::ATTR_WINDOW_WIDTH, bounds.right);
-	desired.bottom = desired.top + node.get_attribute_int(osd::debugger::ATTR_WINDOW_HEIGHT, bounds.bottom);
+	desired.left = node.get_attribute_int(ATTR_WINDOW_POSITION_X, origin.x);
+	desired.top = node.get_attribute_int(ATTR_WINDOW_POSITION_Y, origin.y);
+	desired.right = desired.left + node.get_attribute_int(ATTR_WINDOW_WIDTH, bounds.right);
+	desired.bottom = desired.top + node.get_attribute_int(ATTR_WINDOW_HEIGHT, bounds.bottom);
 	// TODO: sanity checks...
 	if (!AdjustWindowRectEx(&desired, DEBUG_WINDOW_STYLE, GetMenu(window()) ? TRUE : FALSE, DEBUG_WINDOW_STYLE_EX))
 		return;
@@ -494,10 +496,10 @@ void debugwin_info::save_configuration_to_node(util::xml::data_node &node)
 	origin.y = 0;
 	if (GetClientRect(window(), &bounds) && ClientToScreen(window(), &origin))
 	{
-		node.set_attribute_int(osd::debugger::ATTR_WINDOW_POSITION_X, origin.x);
-		node.set_attribute_int(osd::debugger::ATTR_WINDOW_POSITION_Y, origin.y);
-		node.set_attribute_int(osd::debugger::ATTR_WINDOW_WIDTH, bounds.right);
-		node.set_attribute_int(osd::debugger::ATTR_WINDOW_HEIGHT, bounds.bottom);
+		node.set_attribute_int(ATTR_WINDOW_POSITION_X, origin.x);
+		node.set_attribute_int(ATTR_WINDOW_POSITION_Y, origin.y);
+		node.set_attribute_int(ATTR_WINDOW_WIDTH, bounds.right);
+		node.set_attribute_int(ATTR_WINDOW_HEIGHT, bounds.bottom);
 	}
 }
 
@@ -730,3 +732,5 @@ void debugwin_info::register_window_class()
 		s_window_class_registered = true;
 	}
 }
+
+} // namespace osd::debugger::win

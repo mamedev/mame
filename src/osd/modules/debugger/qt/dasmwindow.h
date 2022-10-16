@@ -12,6 +12,8 @@
 #include <QtWidgets/QLineEdit>
 
 
+namespace osd::debugger::qt {
+
 //============================================================
 //  The Disassembly Window.
 //============================================================
@@ -60,7 +62,7 @@ class DasmWindowQtConfig : public WindowQtConfig
 {
 public:
 	DasmWindowQtConfig() :
-		WindowQtConfig(osd::debugger::WINDOW_TYPE_DISASSEMBLY_VIEWER),
+		WindowQtConfig(WINDOW_TYPE_DISASSEMBLY_VIEWER),
 		m_cpu(0),
 		m_rightBar(0)
 	{
@@ -76,5 +78,6 @@ public:
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_DASMWINDOW_H

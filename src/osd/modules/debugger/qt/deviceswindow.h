@@ -10,6 +10,8 @@
 #include <QtWidgets/QTreeView>
 
 
+namespace osd::debugger::qt {
+
 //============================================================
 //  The model for the treeview
 //============================================================
@@ -68,7 +70,7 @@ class DevicesWindowQtConfig : public WindowQtConfig
 {
 public:
 	DevicesWindowQtConfig() :
-		WindowQtConfig(osd::debugger::WINDOW_TYPE_DEVICES_VIEWER)
+		WindowQtConfig(WINDOW_TYPE_DEVICES_VIEWER)
 	{
 	}
 
@@ -80,5 +82,6 @@ public:
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_DEVICESWINDOW_H

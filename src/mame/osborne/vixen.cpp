@@ -70,6 +70,7 @@ Notes:
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+#include "utf8.h"
 
 
 namespace {

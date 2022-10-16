@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  logwininfo.c - Win32 debug window handling
+//  logwininfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -14,6 +14,8 @@
 
 #include "util/xmlfile.h"
 
+
+namespace osd::debugger::win {
 
 logwin_info::logwin_info(debugger_windows_interface &debugger) :
 	debugwin_info(debugger, false, std::string("Errorlog: ").append(debugger.machine().system().type.fullname()).append(" [").append(debugger.machine().system().name).append("]").c_str(), nullptr)
@@ -70,5 +72,7 @@ bool logwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 void logwin_info::save_configuration_to_node(util::xml::data_node &node)
 {
 	debugwin_info::save_configuration_to_node(node);
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_ERROR_LOG_VIEWER);
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_ERROR_LOG_VIEWER);
 }
+
+} // namespace osd::debugger::win

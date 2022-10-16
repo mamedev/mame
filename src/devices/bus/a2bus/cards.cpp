@@ -18,7 +18,6 @@
 #include "a2arcadebd.h"
 #include "a2cffa.h"
 #include "a2corvus.h"
-#include "a2diskii.h"
 #include "a2diskiing.h"
 #include "a2dx1.h"
 #include "a2echoii.h"
@@ -80,7 +79,6 @@ void apple2_slot0_cards(device_slot_interface &device)
 
 void apple2_cards(device_slot_interface &device)
 {
-	device.option_add("diskii", A2BUS_DISKII);                 // Disk II Controller Card
 	device.option_add("diskiing", A2BUS_DISKIING);             // Disk II Controller Card, cycle-accurate version
 	device.option_add("diskiing13", A2BUS_DISKIING13);         // Disk II Controller Card, cycle-accurate version
 	device.option_add("diskiiiwm", A2BUS_IWM_CARD);            // IWM Disk II Controller Card
@@ -148,7 +146,6 @@ void apple2_cards(device_slot_interface &device)
 
 void apple2e_cards(device_slot_interface &device)
 {
-	device.option_add("diskii", A2BUS_DISKII);                 // Disk II Controller Card
 	device.option_add("diskiing", A2BUS_DISKIING);             // Disk II Controller Card, cycle-accurate version
 	device.option_add("diskiing13", A2BUS_DISKIING13);         // Disk II Controller Card, cycle-accurate version
 	device.option_add("diskiiiwm", A2BUS_IWM_CARD);            // IWM Disk II Controller Card

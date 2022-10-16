@@ -8,7 +8,7 @@
 #include "bus/abcbus/abcbus.h"
 #include "bus/abckb/abckb.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "formats/abc1600_dsk.h"
 #include "imagedev/floppy.h"
 #include "abc1600mac.h"

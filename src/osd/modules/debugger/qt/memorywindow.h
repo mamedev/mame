@@ -11,6 +11,9 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLineEdit>
 
+
+namespace osd::debugger::qt {
+
 class DebuggerMemView;
 
 
@@ -41,7 +44,6 @@ private slots:
 private:
 	void populateComboBox();
 	void setToCurrentCpu();
-	QAction *dataFormatMenuItem(const QString &itemName);
 
 	// Widgets
 	QLineEdit *m_inputEdit;
@@ -82,7 +84,7 @@ class MemoryWindowQtConfig : public WindowQtConfig
 {
 public:
 	MemoryWindowQtConfig() :
-		WindowQtConfig(osd::debugger::WINDOW_TYPE_MEMORY_VIEWER),
+		WindowQtConfig(WINDOW_TYPE_MEMORY_VIEWER),
 		m_reverse(0),
 		m_addressMode(0),
 		m_addressRadix(0),
@@ -104,5 +106,6 @@ public:
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_MEMORYWINDOW_H

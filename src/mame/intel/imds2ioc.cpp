@@ -9,6 +9,8 @@
 #include "imds2ioc.h"
 #include "screen.h"
 #include "speaker.h"
+#include "formats/img_dsk.h"
+#include "formats/fs_isis.h"
 
 // Main oscillator of IOC board: 22.032 MHz
 #define IOC_XTAL_Y2     22.032_MHz_XTAL
@@ -546,6 +548,13 @@ static void imds2_floppies(device_slot_interface &device)
 	device.option_add("8sssd", FLOPPY_8_SSSD);
 }
 
+static void imds2_floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_IMG_FORMAT);
+	fr.add(fs::ISIS);
+}
+
 void imds2ioc_device::device_add_mconfig(machine_config &config)
 {
 	I8080A(config, m_ioccpu, IOC_XTAL_Y2 / 18);     // 2.448 MHz but running at 50% (due to wait states & DMA usage of bus)
@@ -608,7 +617,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 
 	I8271(config, m_iocfdc, IOC_XTAL_Y1 / 2);
 	m_iocfdc->drq_wr_callback().set(m_iocdma, FUNC(i8257_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, "iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "iocfdc:0", imds2_floppies, "8sssd", imds2_floppy_formats, true);
 
 	I8041A(config, m_iocpio, IOC_XTAL_Y3);
 	m_iocpio->p1_in_cb().set(FUNC(imds2ioc_device::pio_port_p1_r));

@@ -102,7 +102,7 @@ uint32_t arm7_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 			// LSL (0,31)   = Result shifted, least significant bit is in carry out
 			*pCarry = k ? (rm & (1 << (32 - k))) : (GET_CPSR & C_MASK);
 			}
-			return k ? LSL(rm, k) : rm;
+			return k ? (rm << k) : rm;
 		}
 
 	case 1:                         /* LSR */
@@ -122,7 +122,7 @@ uint32_t arm7_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		{
 			if (pCarry)
 				*pCarry = (rm & (1 << (k - 1)));
-			return LSR(rm, k);
+			return rm >> k;
 		}
 
 	case 2:                     /* ASR */
@@ -136,9 +136,9 @@ uint32_t arm7_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		else
 		{
 			if (rm & SIGN_BIT)
-				return LSR(rm, k) | (0xffffffffu << (32 - k));
+				return (rm >> k) | (0xffffffffu << (32 - k));
 			else
-				return LSR(rm, k);
+				return rm >> k;
 		}
 
 	case 3:                     /* ROR and RRX */
@@ -149,7 +149,7 @@ uint32_t arm7_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 			{
 				if (pCarry)
 					*pCarry = rm & (1 << (k - 1));
-				return ROR(rm, k);
+				return rotr_32(rm, k);
 			}
 			else
 			{
@@ -163,7 +163,7 @@ uint32_t arm7_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 			/* RRX */
 			if (pCarry)
 				*pCarry = (rm & 1);
-			return LSR(rm, 1) | ((GET_CPSR & C_MASK) << 2);
+			return (rm >> 1) | ((GET_CPSR & C_MASK) << 2);
 		}
 	}
 
@@ -857,7 +857,7 @@ void arm7_cpu_device::HandlePSRTransfer(uint32_t insn)
 			// Value can be specified for a Right Rotate, 2x the value specified.
 			int by = (insn & INSN_OP2_ROTATE) >> INSN_OP2_ROTATE_SHIFT;
 			if (by)
-				val = ROR(insn & INSN_OP2_IMM, by << 1);
+				val = rotr_32(insn & INSN_OP2_IMM, by << 1);
 			else
 				val = insn & INSN_OP2_IMM;
 		}
@@ -967,7 +967,7 @@ void arm7_cpu_device::HandleALU(uint32_t insn)
 		by = (insn & INSN_OP2_ROTATE) >> INSN_OP2_ROTATE_SHIFT;
 		if (by)
 		{
-			op2 = ROR(insn & INSN_OP2_IMM, by << 1);
+			op2 = rotr_32(insn & INSN_OP2_IMM, by << 1);
 			sc = op2 & SIGN_BIT;
 		}
 		else

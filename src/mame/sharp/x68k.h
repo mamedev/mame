@@ -14,6 +14,7 @@
 #pragma once
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "imagedev/floppy.h"
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"

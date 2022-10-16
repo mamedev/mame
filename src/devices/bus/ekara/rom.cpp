@@ -14,6 +14,7 @@ DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24C08_EPITCH,     ekara_rom_i2c_24c08_epitch_de
 DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC04,    ekara_rom_i2c_24lc04_device,  "ekara_rom_i2c_24lc04",   "EKARA Cartridge with I2C 24LC04")
 DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC02,    ekara_rom_i2c_24lc02_device,  "ekara_rom_i2c_24lc02",   "EKARA Cartridge with I2C 24LC02")
 DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC02_GC0010,    ekara_rom_i2c_24lc02_gc0010_device,  "ekara_rom_i2c_24lc02_gc0010",   "EKARA Cartridge with I2C 24LC02 (GC0010 direct access)")
+DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC08_EVIO,    ekara_rom_i2c_24lc08_evio_device,  "ekara_rom_i2c_24lc08_evio",   "EKARA Cartridge with I2C 24LC08 (evio direct access)")
 
 
 ekara_rom_plain_device::ekara_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
@@ -56,7 +57,17 @@ ekara_rom_i2c_24lc02_device::ekara_rom_i2c_24lc02_device(const machine_config &m
 }
 
 ekara_rom_i2c_24lc02_gc0010_device::ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ekara_rom_i2c_base_device(mconfig, EKARA_ROM_I2C_24LC02_GC0010, tag, owner, clock)
+	ekara_rom_i2c_24lc02_gc0010_device(mconfig, EKARA_ROM_I2C_24LC02_GC0010, tag, owner, clock)
+{
+}
+
+ekara_rom_i2c_24lc02_gc0010_device::ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	ekara_rom_i2c_base_device(mconfig, type, tag, owner, clock)
+{
+}
+
+ekara_rom_i2c_24lc08_evio_device::ekara_rom_i2c_24lc08_evio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ekara_rom_i2c_24lc02_gc0010_device(mconfig, EKARA_ROM_I2C_24LC08_EVIO, tag, owner, clock)
 {
 }
 
@@ -210,6 +221,11 @@ void ekara_rom_i2c_24lc02_gc0010_device::device_add_mconfig(machine_config &conf
 }
 
 
+void ekara_rom_i2c_24lc08_evio_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C08(config, "i2cmem", 0);
+}
+
 /*-------------------------------------------------
  slot interface
  -------------------------------------------------*/
@@ -221,5 +237,5 @@ void ekara_cart(device_slot_interface &device)
 	device.option_add_internal("rom_24lc04",  EKARA_ROM_I2C_24LC04);
 	device.option_add_internal("rom_24lc02",  EKARA_ROM_I2C_24LC02);
 	device.option_add_internal("rom_24lc02_gc0010",  EKARA_ROM_I2C_24LC02_GC0010);
-
+	device.option_add_internal("rom_24lc08_evio",  EKARA_ROM_I2C_24LC08_EVIO);
 }

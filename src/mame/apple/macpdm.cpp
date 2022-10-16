@@ -1141,7 +1141,6 @@ void macpdm_state::macpdm(machine_config &config)
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
 

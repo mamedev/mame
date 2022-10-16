@@ -17,6 +17,8 @@
 #include <vector>
 
 
+namespace osd::debugger::qt {
+
 class DasmDockWidget;
 class ProcessorDockWidget;
 
@@ -33,6 +35,8 @@ public:
 	virtual ~MainWindow();
 
 	void setProcessor(device_t *processor);
+
+	void setExiting() { m_exiting = true; }
 
 protected:
 	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
@@ -56,12 +60,14 @@ private slots:
 
 	void dasmViewUpdated();
 
-	// Closing the main window actually exits the program
+	// Closing the main window hides the debugger and runs the emulated system
 	void debugActClose();
-
 
 private:
 	void createImagesMenu();
+
+	void addToHistory(const QString& command);
+	void executeCommand(bool withClear);
 
 	// Widgets and docks
 	QLineEdit *m_inputEdit;
@@ -77,8 +83,8 @@ private:
 	// Terminal history
 	int m_historyIndex;
 	std::vector<QString> m_inputHistory;
-	void addToHistory(const QString& command);
-	void executeCommand(bool withClear);
+
+	bool m_exiting;
 };
 
 
@@ -160,7 +166,7 @@ class MainWindowQtConfig : public WindowQtConfig
 {
 public:
 	MainWindowQtConfig() :
-		WindowQtConfig(osd::debugger::WINDOW_TYPE_CONSOLE),
+		WindowQtConfig(WINDOW_TYPE_CONSOLE),
 		m_rightBar(0),
 		m_windowState()
 	{}
@@ -175,5 +181,6 @@ public:
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_MAINWINDOW_H

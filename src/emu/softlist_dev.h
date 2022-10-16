@@ -121,7 +121,7 @@ public:
 	const std::list<software_info> &get_info() { if (!m_parsed) parse(); return m_infolist; }
 
 	// operations
-	const software_info *find(const std::string &look_for);
+	const software_info *find(std::string_view look_for);
 	void find_approx_matches(std::string_view name, int matches, const software_info **list, const char *interface);
 	void release();
 	software_compatibility is_compatible(const software_part &part) const;

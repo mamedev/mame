@@ -22,6 +22,8 @@
 #endif
 
 
+namespace osd::debugger::win {
+
 class debugview_info;
 class debugwin_info;
 class ui_metrics;
@@ -52,4 +54,6 @@ public:
 	virtual void hide_all() = 0;
 };
 
-#endif
+} // namespace osd::debugger::win
+
+#endif // MAME_DEBUGGER_WIN_DEBUGWIN_H

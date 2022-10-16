@@ -7,6 +7,9 @@
 
 #include "windowqt.h"
 
+
+namespace osd::debugger::qt {
+
 //============================================================
 //  The Device Information Window.
 //============================================================
@@ -41,7 +44,7 @@ public:
 	std::string m_device_tag;
 
 	DeviceInformationWindowQtConfig() :
-		WindowQtConfig(osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER)
+		WindowQtConfig(WINDOW_TYPE_DEVICE_INFO_VIEWER)
 	{
 	}
 
@@ -51,5 +54,6 @@ public:
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_DEVICEINFORMATIONWINDOW_H

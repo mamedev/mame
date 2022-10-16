@@ -17,6 +17,8 @@
 #include "debug/dvdisasm.h"
 
 
+namespace osd::debugger::win {
+
 class disasmview_info : public debugview_info
 {
 public:
@@ -33,5 +35,7 @@ public:
 	virtual void restore_configuration_from_node(util::xml::data_node const &node) override;
 	virtual void save_configuration_to_node(util::xml::data_node &node) override;
 };
+
+} // namespace osd::debugger::win
 
 #endif // MAME_DEBUGGER_WIN_DISASMVIEWINFO_H

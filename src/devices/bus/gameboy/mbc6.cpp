@@ -103,7 +103,8 @@ private:
 	void install_ram() ATTR_COLD;
 
 	required_device<intelfsh8_device> m_flash;
-	memory_view m_view_rom[2];
+	memory_view m_view_rom_low;
+	memory_view m_view_rom_high;
 	memory_view m_view_ram;
 	memory_bank_array_creator<2> m_bank_rom;
 	memory_bank_array_creator<2> m_bank_ram;
@@ -126,7 +127,8 @@ mbc6_device::mbc6_device(
 	device_t(mconfig, GB_ROM_MBC6, tag, owner, clock),
 	device_gb_cart_interface(mconfig, *this),
 	m_flash(*this, "flash"),
-	m_view_rom{ { *this, "romlow" }, { *this, "romhigh" } },
+	m_view_rom_low(*this, "romlow"),
+	m_view_rom_high(*this, "romhigh" ),
 	m_view_ram(*this, "ram"),
 	m_bank_rom(*this, { "romlow", "romhigh" }),
 	m_bank_ram(*this, { "ramlow", "ramhigh" }),
@@ -148,8 +150,8 @@ image_init_result mbc6_device::load(std::string &message)
 		return image_init_result::FAIL;
 
 	// install views for ROM/flash and RAM
-	cart_space()->install_view(0x4000, 0x5fff, m_view_rom[0]);
-	cart_space()->install_view(0x6000, 0x7fff, m_view_rom[1]);
+	cart_space()->install_view(0x4000, 0x5fff, m_view_rom_low);
+	cart_space()->install_view(0x6000, 0x7fff, m_view_rom_high);
 	cart_space()->install_view(0xa000, 0xbfff, m_view_ram);
 
 	// set up ROM and RAM as appropriate
@@ -180,11 +182,11 @@ image_init_result mbc6_device::load(std::string &message)
 			write8sm_delegate(*this, FUNC(mbc6_device::select_flash)));
 
 	// install Flash handlers
-	m_view_rom[0][1].install_readwrite_handler(
+	m_view_rom_low[1].install_readwrite_handler(
 			0x4000, 0x5fff,
 			read8sm_delegate(*this, FUNC(mbc6_device::read_flash<0>)),
 			write8sm_delegate(*this, FUNC(mbc6_device::write_flash<0>)));
-	m_view_rom[1][1].install_readwrite_handler(
+	m_view_rom_high[1].install_readwrite_handler(
 			0x6000, 0x7fff,
 			read8sm_delegate(*this, FUNC(mbc6_device::read_flash<1>)),
 			write8sm_delegate(*this, FUNC(mbc6_device::write_flash<1>)));
@@ -227,8 +229,8 @@ void mbc6_device::device_reset()
 	m_flash_enable = 0U;
 	m_flash_writable = 0U;
 
-	m_view_rom[0].select(0);
-	m_view_rom[1].select(0);
+	m_view_rom_low.select(0);
+	m_view_rom_high.select(0);
 	m_view_ram.disable();
 
 	if (m_bank_mask_rom)
@@ -270,6 +272,7 @@ void mbc6_device::write_flash(offs_t offset, u8 data)
 void mbc6_device::bank_switch_rom(offs_t offset, u8 data)
 {
 	auto const bank(BIT(offset, 12));
+	memory_view &view(bank ? m_view_rom_high : m_view_rom_low);
 	m_bank_sel_rom[bank] = data;
 
 	if (!m_flash_select[bank])
@@ -280,11 +283,11 @@ void mbc6_device::bank_switch_rom(offs_t offset, u8 data)
 					"%s: ROM bank %s unmapped\n",
 					machine().describe_context(),
 					bank ? "high" : "low");
-			m_view_rom[bank].disable(); // is there a chip select for a second program ROM?
+			view.disable(); // is there a chip select for a second program ROM?
 		}
 		else
 		{
-			m_view_rom[bank].select(0);
+			view.select(0);
 		}
 	}
 
@@ -304,6 +307,7 @@ void mbc6_device::bank_switch_rom(offs_t offset, u8 data)
 void mbc6_device::select_flash(offs_t offset, u8 data)
 {
 	auto const bank(BIT(offset, 12));
+	memory_view &view(bank ? m_view_rom_high : m_view_rom_low);
 	m_flash_select[bank] = BIT(data, 3);
 	if (m_flash_select[bank])
 	{
@@ -313,9 +317,9 @@ void mbc6_device::select_flash(offs_t offset, u8 data)
 				bank ? "high" : "low",
 				m_flash_enable ? "enabled" : "disabled");
 		if (m_flash_enable)
-			m_view_rom[bank].select(1);
+			view.select(1);
 		else
-			m_view_rom[bank].disable();
+			view.disable();
 	}
 	else if (BIT(m_bank_sel_rom[bank], 7))
 	{
@@ -323,7 +327,7 @@ void mbc6_device::select_flash(offs_t offset, u8 data)
 				"%s: ROM bank %s unmapped\n",
 				machine().describe_context(),
 				bank ? "high" : "low");
-		m_view_rom[bank].disable(); // is there a chip select for a second program ROM?
+		view.disable(); // is there a chip select for a second program ROM?
 	}
 	else
 	{
@@ -331,7 +335,7 @@ void mbc6_device::select_flash(offs_t offset, u8 data)
 				"%s: ROM bank %s selected\n",
 				machine().describe_context(),
 				bank ? "high" : "low");
-		m_view_rom[bank].select(0);
+		view.select(0);
 	}
 
 	// game writes 0xc6 when selecting ROM during boot - what do the other bits do?
@@ -372,17 +376,17 @@ void mbc6_device::enable_flash(u8 data)
 		{
 			LOG("%s: Flash enabled\n", machine().describe_context());
 			if (m_flash_select[0])
-				m_view_rom[0].select(1);
+				m_view_rom_low.select(1);
 			if (m_flash_select[1])
-				m_view_rom[1].select(1);
+				m_view_rom_high.select(1);
 		}
 		else
 		{
 			LOG("%s: Flash disabled\n", machine().describe_context());
 			if (m_flash_select[0])
-				m_view_rom[0].disable();
+				m_view_rom_low.disable();
 			if (m_flash_select[1])
-				m_view_rom[1].disable();
+				m_view_rom_high.disable();
 		}
 
 		if (data & ~0x01)
@@ -484,8 +488,8 @@ void mbc6_device::install_rom()
 	if (!rombytes)
 	{
 		// just avoid fatal errors
-		m_view_rom[0][0];
-		m_view_rom[1][0];
+		m_view_rom_low[0];
+		m_view_rom_high[0];
 		m_bank_mask_rom = 0U;
 	}
 	else if (PAGE_ROM_SIZE >= rombytes)
@@ -507,8 +511,8 @@ void mbc6_device::install_rom()
 							end,
 							mirror);
 					cart_space()->install_rom(begin, end, 0x2000 | mirror, &base[src]);
-					m_view_rom[0][0].install_rom(0x4000 | begin, 0x4000 | end, mirror, &base[src]);
-					m_view_rom[1][0].install_rom(0x6000 | begin, 0x6000 | end, mirror, &base[src]);
+					m_view_rom_low[0].install_rom(0x4000 | begin, 0x4000 | end, mirror, &base[src]);
+					m_view_rom_high[0].install_rom(0x6000 | begin, 0x6000 | end, mirror, &base[src]);
 				});
 		m_bank_mask_rom = 0U;
 	}
@@ -533,8 +537,8 @@ void mbc6_device::install_rom()
 					m_bank_rom[0]->configure_entry(entry, &base[page * PAGE_ROM_SIZE]);
 					m_bank_rom[1]->configure_entry(entry, &base[page * PAGE_ROM_SIZE]);
 				});
-		m_view_rom[0][0].install_read_bank(0x4000, 0x5fff, m_bank_rom[0]);
-		m_view_rom[1][0].install_read_bank(0x6000, 0x7fff, m_bank_rom[1]);
+		m_view_rom_low[0].install_read_bank(0x4000, 0x5fff, m_bank_rom[0]);
+		m_view_rom_high[0].install_read_bank(0x6000, 0x7fff, m_bank_rom[1]);
 	}
 }
 

@@ -8,7 +8,7 @@
         2014/01/07 Skeleton driver.
 
 The Bandai Super Vision 8000 contains:
-- NEC D78C (Z80)
+- NEC D780C (Z80)
 - AY-3-8910
 - AMI S68047P (6847 variant)
 - NEC D8255C
@@ -376,7 +376,7 @@ uint8_t sv8000_state::mc6847_videoram_r(offs_t offset)
 void sv8000_state::sv8000(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
+	Z80(config, m_maincpu, XTAL(10'738'635)/3/2);  /* Not verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sv8000_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &sv8000_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sv8000_state::irq0_line_hold));

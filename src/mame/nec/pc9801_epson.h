@@ -22,13 +22,20 @@ public:
 	{
 	}
 
+	void pc286vs(machine_config &config);
 	void pc386m(machine_config &config);
 	void pc486mu(machine_config &config);
 	void pc486se(machine_config &config);
 
 protected:
+	void config_base_epson(machine_config &config);
+
 	void pc386m_ipl_bank(address_map &map);
 
+	void epson_base_io(address_map &map);
+
+	void pc286vs_io(address_map &map);
+	void pc286vs_map(address_map &map);
 	void pc386m_io(address_map &map);
 	void pc386m_map(address_map &map);
 	void pc486se_io(address_map &map);

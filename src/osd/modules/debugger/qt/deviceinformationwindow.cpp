@@ -10,6 +10,8 @@
 #include <QtWidgets/QVBoxLayout>
 
 
+namespace osd::debugger::qt {
+
 DeviceInformationWindow::DeviceInformationWindow(running_machine &machine, device_t *device, QWidget *parent) :
 	WindowQt(machine, nullptr),
 	m_device(device)
@@ -34,9 +36,9 @@ void DeviceInformationWindow::saveConfigurationToNode(util::xml::data_node &node
 {
 	WindowQt::saveConfigurationToNode(node);
 
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER);
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_DEVICE_INFO_VIEWER);
 
-	node.set_attribute(osd::debugger::ATTR_WINDOW_DEVICE_TAG, m_device->tag());
+	node.set_attribute(ATTR_WINDOW_DEVICE_TAG, m_device->tag());
 }
 
 
@@ -128,5 +130,7 @@ void DeviceInformationWindowQtConfig::applyToQWidget(QWidget *widget)
 void DeviceInformationWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_device_tag = node.get_attribute_string(osd::debugger::ATTR_WINDOW_DEVICE_TAG, ":");
+	m_device_tag = node.get_attribute_string(ATTR_WINDOW_DEVICE_TAG, ":");
 }
+
+} // namespace osd::debugger::qt

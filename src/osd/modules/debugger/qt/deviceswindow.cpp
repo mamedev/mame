@@ -8,6 +8,8 @@
 #include "util/xmlfile.h"
 
 
+namespace osd::debugger::qt {
+
 DevicesWindowModel::DevicesWindowModel(running_machine &machine, QObject *parent) :
 	m_machine(machine)
 {
@@ -160,7 +162,7 @@ void DevicesWindow::saveConfigurationToNode(util::xml::data_node &node)
 {
 	WindowQt::saveConfigurationToNode(node);
 
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_DEVICES_VIEWER);
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_DEVICES_VIEWER);
 }
 
 
@@ -180,3 +182,5 @@ void DevicesWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
 }
+
+} // namespace osd::debugger::qt

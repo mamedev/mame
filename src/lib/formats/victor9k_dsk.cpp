@@ -36,10 +36,10 @@
     7           71-79       63-74       12          149.6        401
     8           unused      75-79       11          144.0        417
 
-    * The documentation for the Victor lists Zone 4 as ending with Track 48 
-    on side 1 and track 40 on side two. This is incorrect. The above table 
-    reflects disks analyzed from various machines and matches the assembly 
-    code in the floppy driver. Various written documents contain this 
+    * The documentation for the Victor lists Zone 4 as ending with Track 48
+    on side 1 and track 40 on side two. This is incorrect. The above table
+    reflects disks analyzed from various machines and matches the assembly
+    code in the floppy driver. Various written documents contain this
     documentation bug.
 
     Interleave factor 3
@@ -152,16 +152,16 @@ int victor9k_format::find_size(util::random_read &io, uint32_t form_factor)
 {
 	return find_size(io);
 }
-	
-int victor9k_format::identify(floppy_image *image)  
+
+int victor9k_format::identify(floppy_image *image)
 {
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if(f.variant == image->get_variant())
 			return i;
 	}
- 	
- 	return -1;
+
+	return -1;
 }
 
 
@@ -210,7 +210,7 @@ void victor9k_format::log_boot_sector(uint8_t *data)
 	//Disk type - flags
 	osd_printf_verbose("%s sided\n", (data[32]) ? "Double" : "Single");
 
-    //Sector Interleave
+	//Sector Interleave
 	osd_printf_verbose("Sector Interleave: %02x\n", data[33]);
 
 	// Disc type
@@ -296,7 +296,7 @@ bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const st
 
 	const format &f = formats[type];
 
-	osd_printf_verbose("Type: %d Head Count: %d Sector Count: %d\n", type, 
+	osd_printf_verbose("Type: %d Head Count: %d Sector Count: %d\n", type,
 		f.head_count, f.sector_count);
 
 	uint64_t size;
@@ -314,7 +314,7 @@ bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const st
 
 	int track_offset = 0;
 
-	osd_printf_verbose("load Heads: %01d Tracks: %02d Sectors/track head[1]track[1]: %02d\n ", 
+	osd_printf_verbose("load Heads: %01d Tracks: %02d Sectors/track head[1]track[1]: %02d\n ",
 		f.head_count, f.track_count, sectors_per_track[1][1]);
 
 	for (int head = 0; head < f.head_count; head++) {
@@ -432,7 +432,7 @@ const int victor9k_format::speed_zone[2][80] =
 		1, 1, 1, 1, 1, 1, 1, 1,
 		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-		4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 
+		4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 		5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 		6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
 		7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
@@ -457,7 +457,7 @@ bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32
 
 	const format &f = formats[type];
 
-	osd_printf_verbose("save Heads: %01d Tracks: %02d Sectors/track head[1]track[1]: %02d\n ", 
+	osd_printf_verbose("save Heads: %01d Tracks: %02d Sectors/track head[1]track[1]: %02d\n ",
 		f.head_count, f.track_count, sectors_per_track[1][1]);
 	for(int head=0; head < f.head_count; head++) {
 		for(int track=0; track < f.track_count; track++) {
@@ -466,7 +466,7 @@ bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32
 			uint8_t sectdata[40*512];
 			desc_s sectors[40];
 			int offset = get_image_offset(f, head, track);
-			osd_printf_verbose(">>type: %s, head: %d, track: %d, sector_count: %d, offset: %d, track_size: %d\n", 
+			osd_printf_verbose(">>type: %s, head: %d, track: %d, sector_count: %d, offset: %d, track_size: %d\n",
 				f.sector_base_size, head, track, sector_count, offset, track_size);
 
 			build_sector_description(f, sectdata, 0, sectors, sector_count);
@@ -481,7 +481,7 @@ bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32
 
 void victor9k_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count)
 {
-	
+
 	// Extract the sectors
 	auto bitstream = generate_bitstream_from_track(track, head, cell_size[speed_zone[head][track]], image);
 	auto sectors = extract_sectors_from_bitstream_victor_gcr5(bitstream);
@@ -492,11 +492,11 @@ void victor9k_format::extract_sectors(floppy_image *image, const format &f, desc
 			sectors.push_back(sector);
 		}
 	}
- 
+
 	for(int i=0; i<sector_count; i++) {
 		desc_s &ds = sdesc[i];
 		const auto &data = sectors[ds.sector_id];
-		osd_printf_verbose("Head: %01d TracK: %02d Total Sectors: %02d Current Sector: %02d ", 
+		osd_printf_verbose("Head: %01d TracK: %02d Total Sectors: %02d Current Sector: %02d ",
 			head, track, sector_count, i);
 		if(data.empty()) {
 			memset((uint8_t *)ds.data, 0, ds.size);

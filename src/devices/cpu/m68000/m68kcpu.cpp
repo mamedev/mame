@@ -25,7 +25,7 @@ static const char copyright_notice[] =
 /* ======================================================================== */
 
 #include "emu.h"
-#include "m68000.h"
+#include "m68kcommon.h"
 #include "m68kdasm.h"
 
 // Generated data
@@ -1415,7 +1415,7 @@ void m68000_base_device::init32(address_space &space, address_space &ospace)
 
 		case 3:
 			m_program32.write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address + 1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			m_program32.write_dword(address + 1, rotl_32(data, 8), 0xffffff00U);
 			break;
 		}
 	};
@@ -1585,7 +1585,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 					return;
 			}
 			m_program32.write_dword(address0 - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			m_program32.write_dword(address1, rotl_32(data, 8), 0xffffff00U);
 			break;
 		}
 		}
@@ -2134,7 +2134,7 @@ void m68000_base_device::init_cpu_fscpu32(void)
 	m_cpu_type         = CPU_TYPE_FSCPU32;
 
 
-	init32(*m_program, *m_oprogram);
+	init16(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m_state_table      = m68ki_instruction_state_table[6];
 	m_cyc_instruction  = m68ki_cycles[6];
@@ -2182,91 +2182,6 @@ void m68000_base_device::init_cpu_coldfire(void)
 std::unique_ptr<util::disasm_interface> m68000_base_device::create_disassembler()
 {
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
-}
-
-std::unique_ptr<util::disasm_interface> m68000_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
-}
-
-std::unique_ptr<util::disasm_interface> m68008_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
-}
-
-std::unique_ptr<util::disasm_interface> m68008fn_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
-}
-
-std::unique_ptr<util::disasm_interface> m68010_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68010);
-}
-
-std::unique_ptr<util::disasm_interface> m68ec020_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
-}
-
-std::unique_ptr<util::disasm_interface> m68020_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
-}
-
-std::unique_ptr<util::disasm_interface> m68020fpu_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
-}
-
-std::unique_ptr<util::disasm_interface> m68020pmmu_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
-}
-
-std::unique_ptr<util::disasm_interface> m68020hmmu_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
-}
-
-std::unique_ptr<util::disasm_interface> m68ec030_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68030);
-}
-
-std::unique_ptr<util::disasm_interface> m68030_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68030);
-}
-
-std::unique_ptr<util::disasm_interface> m68ec040_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68040);
-}
-
-std::unique_ptr<util::disasm_interface> m68lc040_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68040);
-}
-
-std::unique_ptr<util::disasm_interface> m68040_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68040);
-}
-
-std::unique_ptr<util::disasm_interface> scc68070_base_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
-}
-
-std::unique_ptr<util::disasm_interface> fscpu32_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68340);
-}
-
-std::unique_ptr<util::disasm_interface> mcf5206e_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_COLDFIRE);
 }
 
 
@@ -2580,270 +2495,6 @@ device_memory_interface::space_config_vector m68000_base_device::memory_space_co
 			return space_config_vector {
 				std::make_pair(AS_PROGRAM, &m_program_config)
 			};
-}
-
-
-
-DEFINE_DEVICE_TYPE(M68000,      m68000_device,      "m68000",       "Motorola MC68000")
-DEFINE_DEVICE_TYPE(M68008,      m68008_device,      "m68008",       "Motorola MC68008") // 48-pin plastic or ceramic DIP
-DEFINE_DEVICE_TYPE(M68008FN,    m68008fn_device,    "m68008fn",     "Motorola MC68008FN") // 52-pin PLCC
-DEFINE_DEVICE_TYPE(M68010,      m68010_device,      "m68010",       "Motorola MC68010")
-DEFINE_DEVICE_TYPE(M68EC020,    m68ec020_device,    "m68ec020",     "Motorola MC68EC020")
-DEFINE_DEVICE_TYPE(M68020,      m68020_device,      "m68020",       "Motorola MC68020")
-DEFINE_DEVICE_TYPE(M68020FPU,   m68020fpu_device,   "m68020fpu",    "Motorola MC68020FPU")
-DEFINE_DEVICE_TYPE(M68020PMMU,  m68020pmmu_device,  "m68020pmmu",   "Motorola MC68020PMMU")
-DEFINE_DEVICE_TYPE(M68020HMMU,  m68020hmmu_device,  "m68020hmmu",   "Motorola MC68020HMMU")
-DEFINE_DEVICE_TYPE(M68EC030,    m68ec030_device,    "m68ec030",     "Motorola MC68EC030")
-DEFINE_DEVICE_TYPE(M68030,      m68030_device,      "m68030",       "Motorola MC68030")
-DEFINE_DEVICE_TYPE(M68EC040,    m68ec040_device,    "m68ec040",     "Motorola MC68EC040")
-DEFINE_DEVICE_TYPE(M68LC040,    m68lc040_device,    "m68lc040",     "Motorola MC68LC040")
-DEFINE_DEVICE_TYPE(M68040,      m68040_device,      "m68040",       "Motorola MC68040")
-DEFINE_DEVICE_TYPE(FSCPU32,     fscpu32_device,     "fscpu32",      "Freescale CPU32 Core")
-DEFINE_DEVICE_TYPE(MCF5206E,    mcf5206e_device,    "mcf5206e",     "Freescale MCF5206E")
-
-m68000_device::m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_device(mconfig, M68000, tag, owner, clock)
-{
-}
-
-m68000_device::m68000_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, type, 16,24)
-{
-}
-
-void m68000_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68000();
-}
-
-m68000_device::m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
-										const device_type type, u32 prg_data_width, u32 prg_address_bits, address_map_constructor internal_map)
-	: m68000_base_device(mconfig, tag, owner, clock, type, prg_data_width, prg_address_bits, internal_map)
-{
-}
-
-
-
-
-
-
-/* m68008_device */
-
-m68008_device::m68008_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68008, 8,20)
-{
-}
-
-void m68008_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68008();
-}
-
-
-m68008fn_device::m68008fn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68008FN, 8,22)
-{
-}
-
-void m68008fn_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68008();
-}
-
-
-
-m68010_device::m68010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68010, 16,24)
-{
-}
-
-void m68010_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68010();
-}
-
-
-
-m68020_device::m68020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68020, 32,32)
-{
-}
-
-void m68020_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68020();
-}
-
-
-m68020fpu_device::m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68020FPU, 32,32)
-{
-}
-
-void m68020fpu_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68020fpu();
-}
-
-// 68020 with 68851 PMMU
-m68020pmmu_device::m68020pmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68020PMMU, 32,32)
-{
-}
-
-void m68020pmmu_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68020pmmu();
-}
-
-bool m68020hmmu_device::memory_translate(int space, int intention, offs_t &address)
-{
-	/* only applies to the program address space and only does something if the MMU's enabled */
-	{
-		if ((space == AS_PROGRAM) && (m_hmmu_enabled))
-		{
-			address = hmmu_translate_addr(address);
-		}
-	}
-	return true;
-}
-
-
-// 68020 with Apple HMMU & 68881 FPU
-//      case CPUINFO_FCT_TRANSLATE: info->translate = CPU_TRANSLATE_NAME(m68khmmu);     break;
-m68020hmmu_device::m68020hmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68020HMMU, 32,32)
-{
-}
-
-void m68020hmmu_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68020hmmu();
-}
-
-
-m68ec020_device::m68ec020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68EC020, 32,24)
-{
-}
-
-void m68ec020_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68ec020();
-}
-
-m68030_device::m68030_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68030, 32,32)
-{
-}
-
-void m68030_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68030();
-}
-
-m68ec030_device::m68ec030_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68EC030, 32,32)
-{
-}
-
-void m68ec030_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68ec030();
-}
-
-m68040_device::m68040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68040, 32,32)
-{
-}
-
-
-void m68040_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68040();
-}
-
-
-
-m68ec040_device::m68ec040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68EC040, 32,32)
-{
-}
-
-void m68ec040_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68ec040();
-}
-
-
-
-m68lc040_device::m68lc040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68LC040, 32,32)
-{
-}
-
-void m68lc040_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68lc040();
-}
-
-
-scc68070_base_device::scc68070_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
-						const device_type type, address_map_constructor internal_map)
-	: m68000_base_device(mconfig, tag, owner, clock, type, 16,32, internal_map)
-{
-}
-
-void scc68070_base_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_scc68070();
-}
-
-
-fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, FSCPU32, 32,32)
-{
-}
-
-fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
-										const device_type type, u32 prg_data_width, u32 prg_address_bits, address_map_constructor internal_map)
-	: m68000_base_device(mconfig, tag, owner, clock, type, prg_data_width, prg_address_bits, internal_map)
-{
-}
-
-
-void fscpu32_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_fscpu32();
-}
-
-
-
-mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, MCF5206E, 32,32)
-{
-}
-
-void mcf5206e_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_coldfire();
 }
 
 void m68000_base_device::m68ki_set_one(unsigned short opcode, u16 state, const opcode_handler_struct &s)

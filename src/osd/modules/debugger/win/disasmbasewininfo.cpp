@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  disasmbasewininfo.c - Win32 debug window handling
+//  disasmbasewininfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -19,6 +19,8 @@
 
 //#include "winutf8.h"
 
+
+namespace osd::debugger::win {
 
 disasmbasewin_info::disasmbasewin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler) :
 	editwin_info(debugger, is_main_console, title, handler)
@@ -277,3 +279,5 @@ void disasmbasewin_info::save_configuration_to_node(util::xml::data_node &node)
 	editwin_info::save_configuration_to_node(node);
 	m_views[0]->save_configuration_to_node(node);
 }
+
+} // namespace osd::debugger::win

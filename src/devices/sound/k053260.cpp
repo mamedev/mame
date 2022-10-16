@@ -158,10 +158,11 @@ void k053260_device::device_reset()
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void k053260_device::rom_bank_updated()
+void k053260_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

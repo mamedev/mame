@@ -1241,7 +1241,7 @@ license:CC0
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gragon knight ii (scd)(jpn)" sha1="4036165a03b9ebf9a150afff437b5e92996fcb78"/>
+				<disk name="dragon knight ii (scd)(jpn)" sha1="4036165a03b9ebf9a150afff437b5e92996fcb78"/>
 			</diskarea>
 		</part>
 	</software>

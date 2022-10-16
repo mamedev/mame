@@ -97,6 +97,8 @@
 #include "formats/basicdsk.h"
 #include "formats/cd90_640_dsk.h"
 
+#include "utf8.h"
+
 
 /**************************** common *******************************/
 

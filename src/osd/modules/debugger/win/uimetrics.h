@@ -17,6 +17,8 @@
 #include <utility>
 
 
+namespace osd::debugger::win {
+
 class ui_metrics
 {
 public:
@@ -73,5 +75,7 @@ private:
 
 	static COLORREF const s_themes[][COLOR_COUNT];
 };
+
+} // namespace osd::debugger::win
 
 #endif // MAME_DEBUGGER_WIN_UIMETRICS_H

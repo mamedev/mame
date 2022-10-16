@@ -22,22 +22,22 @@ public:
 	void mpu5(machine_config &config);
 
 private:
-	uint32_t mpu5_mem_r(offs_t offset, uint32_t mem_mask = ~0);
-	void mpu5_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t mpu5_mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mpu5_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint32_t asic_r32(offs_t offset, uint32_t mem_mask = ~0);
+	uint16_t asic_r16(offs_t offset, uint16_t mem_mask = ~0);
 	uint8_t asic_r8(offs_t offset);
-	void asic_w32(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void asic_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void asic_w8(offs_t offset, uint8_t data);
 
-	uint32_t pic_r(offs_t offset);
-	void pic_w(offs_t offset, uint32_t data);
+	uint16_t pic_r(offs_t offset);
+	void pic_w(offs_t offset, uint16_t data);
 
 	virtual void machine_start() override;
 	void mpu5_map(address_map &map);
 
-	uint32_t* m_cpuregion = nullptr;
-	std::unique_ptr<uint32_t[]> m_mainram;
+	uint16_t* m_cpuregion = nullptr;
+	std::unique_ptr<uint16_t[]> m_mainram;
 
 	uint8_t m_led_strobe_temp = 0;
 	uint8_t m_led_strobe = 0;

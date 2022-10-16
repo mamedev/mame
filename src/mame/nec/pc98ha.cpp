@@ -21,7 +21,8 @@
           everything else ugh;
         - EMS fails at boot, it's never ever really checked;
         - MSDOS cannot detect EMS properly, is there a flag somewhere?
-        - JEIDA memory card interface;
+        - JEIDA memory card interface (68pin cfr. "Super Daisenryaku HA",
+          most likely same as NeoGeo JEIDA 3.0 memory cards);
         - optional docking station (for floppy device only or can mount other stuff too?);
 
 **************************************************************************************************/
