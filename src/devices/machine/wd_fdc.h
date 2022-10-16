@@ -111,6 +111,7 @@ protected:
 	int delay_register_commit;
 	int delay_command_commit;
 	bool spinup_on_interrupt;
+	bool extended_ddam;
 
 	static constexpr int fd179x_step_times[4] = {  6000, 12000, 20000, 30000 };
 	static constexpr int fd176x_step_times[4] = { 12000, 24000, 40000, 60000 };
