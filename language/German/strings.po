@@ -696,18 +696,19 @@ msgid "Wait Vertical Sync"
 msgstr "Warten auf vertikalen Synchronisationsimpuls"
 
 #: src/frontend/mame/ui/menu.cpp:364 src/frontend/mame/ui/menu.cpp:722
-#: src/frontend/mame/ui/videoopt.cpp:169 src/frontend/mame/ui/inputtoggle.cpp:96
-#: src/frontend/mame/ui/custui.cpp:480 src/frontend/mame/ui/analogipt.cpp:478
-#: plugins/cheatfind/init.lua:766 plugins/cheatfind/init.lua:777
-#: plugins/cheat/init.lua:679
+#: src/frontend/mame/ui/videoopt.cpp:169
+#: src/frontend/mame/ui/inputtoggle.cpp:96 src/frontend/mame/ui/custui.cpp:480
+#: src/frontend/mame/ui/analogipt.cpp:478 plugins/cheatfind/init.lua:766
+#: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:679
 msgid "On"
 msgstr "An"
 
 #: src/frontend/mame/ui/menu.cpp:364 src/frontend/mame/ui/menu.cpp:725
-#: src/frontend/mame/ui/videoopt.cpp:185 src/frontend/mame/ui/inputtoggle.cpp:91
-#: src/frontend/mame/ui/custui.cpp:480 src/frontend/mame/ui/analogipt.cpp:478
-#: plugins/cheatfind/init.lua:763 plugins/cheatfind/init.lua:774
-#: plugins/cheat/init.lua:682 plugins/cheat/init.lua:691
+#: src/frontend/mame/ui/videoopt.cpp:185
+#: src/frontend/mame/ui/inputtoggle.cpp:91 src/frontend/mame/ui/custui.cpp:480
+#: src/frontend/mame/ui/analogipt.cpp:478 plugins/cheatfind/init.lua:763
+#: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:682
+#: plugins/cheat/init.lua:691
 msgid "Off"
 msgstr "Aus"
 
@@ -715,7 +716,8 @@ msgstr "Aus"
 msgid "Auto"
 msgstr "Auto"
 
-#: src/frontend/mame/ui/menu.cpp:1233 src/frontend/mame/ui/simpleselgame.cpp:283
+#: src/frontend/mame/ui/menu.cpp:1233
+#: src/frontend/mame/ui/simpleselgame.cpp:283
 #: src/frontend/mame/ui/selmenu.cpp:1248
 msgid "Return to Previous Menu"
 msgstr "Zurück zum vorherigen Menü"
@@ -724,15 +726,17 @@ msgstr "Zurück zum vorherigen Menü"
 msgid "File Manager"
 msgstr "Dateimanager"
 
-#: src/frontend/mame/ui/filemngr.cpp:140 src/frontend/mame/ui/confswitch.cpp:119
-#: src/frontend/mame/ui/inputmap.cpp:580 src/frontend/mame/ui/inputtoggle.cpp:75
+#: src/frontend/mame/ui/filemngr.cpp:140
+#: src/frontend/mame/ui/confswitch.cpp:119
+#: src/frontend/mame/ui/inputmap.cpp:580
+#: src/frontend/mame/ui/inputtoggle.cpp:75
 #: src/frontend/mame/ui/analogipt.cpp:363
 #, c-format
 msgid "[root%1$s]"
 msgstr "[Wurzel%1$s]"
 
-#: src/frontend/mame/ui/filemngr.cpp:154 src/frontend/mame/ui/confswitch.cpp:170
-#: src/frontend/mame/ui/slotopt.cpp:204
+#: src/frontend/mame/ui/filemngr.cpp:154
+#:  src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:204
 msgid "Reset System"
 msgstr "System zurücksetzen"
 
@@ -885,8 +889,8 @@ msgstr "WAN"
 
 #: src/frontend/mame/ui/info.cpp:70
 msgid ""
-"One or more ROMs/disk images for this system are incorrect. The system may not "
-"run correctly.\n"
+"One or more ROMs/disk images for this system are incorrect. The system may "
+"not run correctly.\n"
 msgstr ""
 "Ein oder mehrere ROMs/Disk-Images für dieses System sind inkorrekt. Das System "
 "läuft möglicherweise nicht richtig.\n"
@@ -901,7 +905,8 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:88
 msgid ""
-"One or more ROMs/disk images for this system have not been correctly dumped.\n"
+"One or more ROMs/disk images for this system have not been correctly "
+"dumped.\n"
 msgstr ""
 "Ein oder mehrere ROMs/Disk-Images für dieses System wurden nicht korrekt "
 "ausgelesen.\n"
@@ -931,7 +936,7 @@ msgstr "Die Bildschirmdrehung im Cocktailmodus wird nicht unterstützt.\n"
 
 #: src/frontend/mame/ui/info.cpp:135
 msgid "This system requires external artwork files.\n"
-msgstr "Dieses System erfordert externe Grafikdateien.\n"
+msgstr "Dieses System erfordert externe Illustrationsdateien.\n"
 
 #: src/frontend/mame/ui/info.cpp:137
 msgid ""
@@ -943,8 +948,8 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:139
 msgid ""
-"This system has no sound hardware, MAME will produce no sounds, this is expected "
-"behaviour.\n"
+"This system has no sound hardware, MAME will produce no sounds, this is "
+"expected behaviour.\n"
 msgstr ""
 "Dieses System hat keine Sound-Hardware, MAME wird keine Sounds produzieren, dies "
 "ist das erwartete Verhalten.\n"
@@ -953,8 +958,8 @@ msgstr ""
 msgid ""
 "\n"
 "THIS SYSTEM DOESN'T WORK. The emulation for this system is not yet complete. "
-"There is nothing you can do to fix this problem except wait for the developers to "
-"improve the emulation.\n"
+"There is nothing you can do to fix this problem except wait for the "
+"developers to improve the emulation.\n"
 msgstr ""
 "\n"
 "DIESES SYSTEM FUNKTIONIERT NICHT. Die Emulation für dieses System ist noch nicht "
@@ -964,9 +969,9 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:145
 msgid ""
 "\n"
-"Elements of this system cannot be emulated accurately as they require physical "
-"interaction or consist of mechanical devices. It is not possible to fully "
-"experience this system.\n"
+"Elements of this system cannot be emulated accurately as they require "
+"physical interaction or consist of mechanical devices. It is not possible to "
+"fully experience this system.\n"
 msgstr ""
 "\n"
 "Elemente dieses Systems können nicht genau emuliert werden, da sie physische "
@@ -1159,7 +1164,8 @@ msgid "Emulated"
 msgstr "Emuliert"
 
 #: src/frontend/mame/ui/keyboard.cpp:60 src/frontend/mame/ui/confswitch.cpp:117
-#: src/frontend/mame/ui/inputmap.cpp:578 src/frontend/mame/ui/inputtoggle.cpp:73
+#: src/frontend/mame/ui/inputmap.cpp:578
+#: src/frontend/mame/ui/inputtoggle.cpp:73
 #: src/frontend/mame/ui/analogipt.cpp:361
 #, c-format
 msgid "%1$s [root%2$s]"
@@ -1315,7 +1321,7 @@ msgstr "Nicht BIOS"
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Parents"
-msgstr "Eltern"
+msgstr "Übergeordnete Systeme"
 
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
@@ -1390,7 +1396,7 @@ msgstr "Favoriten"
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Parents"
-msgstr "Eltern"
+msgstr "Übergeordnete Systeme"
 
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
@@ -2016,18 +2022,19 @@ msgstr ""
 msgid "Configure Options"
 msgstr "Optionen konfigurieren"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:279 src/frontend/mame/ui/selmenu.cpp:1248
+#: src/frontend/mame/ui/simpleselgame.cpp:279
+#: src/frontend/mame/ui/selmenu.cpp:1248
 msgid "Exit"
 msgstr "Verlassen"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:304
 #, c-format
 msgid ""
-"No system ROMs found. Please check the rompath setting specified in the %1$s.ini "
-"file.\n"
+"No system ROMs found. Please check the rompath setting specified in the %1$s."
+"ini file.\n"
 "\n"
-"If this is your first time using %2$s, please see the %2$s.pdf file in the docs "
-"folder for information on setting up and using %2$s."
+"If this is your first time using %2$s, please see the %2$s.pdf file in the "
+"docs folder for information on setting up and using %2$s."
 msgstr ""
 "Keine System ROMs gefunden. Bitte prüfen Sie die Einstellung zum Ordner für ROMs "
 "in der %1$s.ini Datei.\n"
@@ -2060,43 +2067,53 @@ msgstr "%1$s, %2$-.100s"
 msgid "Driver: %1$s"
 msgstr "Treiber: %1$s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:364 src/frontend/mame/ui/selmenu.cpp:690
+#: src/frontend/mame/ui/simpleselgame.cpp:364
+#: src/frontend/mame/ui/selmenu.cpp:690
 msgid "Overall: NOT WORKING"
 msgstr "Insgesamt: FUNKTIONIERT NICHT"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:366 src/frontend/mame/ui/selmenu.cpp:692
+#: src/frontend/mame/ui/simpleselgame.cpp:366
+#: src/frontend/mame/ui/selmenu.cpp:692
 msgid "Overall: Unemulated Protection"
 msgstr "Insgesamt: Nicht emulierter Kopierschutz"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:368 src/frontend/mame/ui/selmenu.cpp:694
+#: src/frontend/mame/ui/simpleselgame.cpp:368
+#: src/frontend/mame/ui/selmenu.cpp:694
 msgid "Overall: Working"
 msgstr "Insgesamt: Funktioniert"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:372 src/frontend/mame/ui/selmenu.cpp:698
+#: src/frontend/mame/ui/simpleselgame.cpp:372
+#: src/frontend/mame/ui/selmenu.cpp:698
 msgid "Graphics: Unimplemented, "
 msgstr "Grafik: Nicht implementiert, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:374 src/frontend/mame/ui/selmenu.cpp:700
+#: src/frontend/mame/ui/simpleselgame.cpp:374
+#: src/frontend/mame/ui/selmenu.cpp:700
 msgid "Graphics: Imperfect, "
 msgstr "Grafik: Fehlerhaft, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:376 src/frontend/mame/ui/selmenu.cpp:702
+#: src/frontend/mame/ui/simpleselgame.cpp:376
+#: src/frontend/mame/ui/selmenu.cpp:702
 msgid "Graphics: OK, "
 msgstr "Grafik: OK, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:379 src/frontend/mame/ui/selmenu.cpp:705
+#: src/frontend/mame/ui/simpleselgame.cpp:379
+#: src/frontend/mame/ui/selmenu.cpp:705
 msgid "Sound: None"
 msgstr "Sound: Keine"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:381 src/frontend/mame/ui/selmenu.cpp:707
+#: src/frontend/mame/ui/simpleselgame.cpp:381
+#: src/frontend/mame/ui/selmenu.cpp:707
 msgid "Sound: Unimplemented"
 msgstr "Sound: Nicht implementiert"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:383 src/frontend/mame/ui/selmenu.cpp:709
+#: src/frontend/mame/ui/simpleselgame.cpp:383
+#: src/frontend/mame/ui/selmenu.cpp:709
 msgid "Sound: Imperfect"
 msgstr "Sound: Fehlerhaft"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:385 src/frontend/mame/ui/selmenu.cpp:711
+#: src/frontend/mame/ui/simpleselgame.cpp:385
+#: src/frontend/mame/ui/selmenu.cpp:711
 msgid "Sound: OK"
 msgstr "Sound: OK"
 
@@ -2249,7 +2266,7 @@ msgstr "Vorschau Illustrationen"
 #: src/frontend/mame/ui/dirmenu.cpp:69
 msgctxt "path-option"
 msgid "Select"
-msgstr "Auswahl"
+msgstr "Charakterauswahl"
 
 #: src/frontend/mame/ui/dirmenu.cpp:70
 msgctxt "path-option"
@@ -2426,7 +2443,7 @@ msgstr " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr " %1$d×%2$d Herkunft (%3$d %4$d)"
+msgstr " %1$d×%2$d Ursprungspunkt (%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:442
 msgid "System Settings"
@@ -2588,7 +2605,7 @@ msgstr "Beispieltext - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/frontend/mame/ui/custui.cpp:546
 msgid "UI Colors"
-msgstr "Benutzeroberfläche-Farben"
+msgstr "Farben für Benutzeroberfläche"
 
 #: src/frontend/mame/ui/custui.cpp:609
 msgctxt "color-option"
@@ -2648,7 +2665,7 @@ msgstr "Schieberegler-Farbe"
 #: src/frontend/mame/ui/custui.cpp:620
 msgctxt "color-option"
 msgid "Graphics viewer background"
-msgstr "Hintergrund Grafikanzeige"
+msgstr "Hintergrund für Grafikanzeige"
 
 #: src/frontend/mame/ui/custui.cpp:621
 msgctxt "color-option"
@@ -2677,7 +2694,7 @@ msgstr "Standardfarben wiederherstellen"
 #: src/frontend/mame/ui/custui.cpp:640
 #, c-format
 msgid "Double-click or press %1$s to change color"
-msgstr "Doppelklick oder Drücke %1$s um Farbe zu ändern"
+msgstr "Doppelklick oder Drücken Sie %1$s um die Farbe zu ändern"
 
 #: src/frontend/mame/ui/custui.cpp:648
 msgid "Menu Preview"
@@ -2810,12 +2827,12 @@ msgstr "Revision: %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:60
 msgid "Analog Input Adjustments"
-msgstr "Anpassungen analoge EIngaben"
+msgstr "Anpassungen für analoge Eingaben"
 
 #: src/frontend/mame/ui/analogipt.cpp:92
 #, c-format
 msgid "Press %s to show menu"
-msgstr "Drücke %s um das Menü anzuzeigen"
+msgstr "Drücken Sie %s um das Menü anzuzeigen"
 
 #: src/frontend/mame/ui/analogipt.cpp:372
 #, c-format
@@ -2825,12 +2842,12 @@ msgstr "%1$s Geschwindigkeit erhöhen/verringern"
 #: src/frontend/mame/ui/analogipt.cpp:377
 #, c-format
 msgid "%1$s Auto-centering Speed"
-msgstr "%1$s Auto-Zentrierungs-Geschwindigkeit"
+msgstr "%1$s Geschwindigkeit für automatische Zentrierung"
 
 #: src/frontend/mame/ui/analogipt.cpp:382
 #, c-format
 msgid "%1$s Reverse"
-msgstr "%1$s Gegenteil"
+msgstr "%1$s Umkehren"
 
 #: src/frontend/mame/ui/analogipt.cpp:387
 #, c-format
@@ -3001,7 +3018,7 @@ msgstr "Gehäuse"
 #: src/frontend/mame/ui/selmenu.cpp:79
 msgctxt "selmenu-artwork"
 msgid "Control Panel"
-msgstr "Bedienpanel"
+msgstr "Bedientafel"
 
 #: src/frontend/mame/ui/selmenu.cpp:80
 msgctxt "selmenu-artwork"
@@ -3147,8 +3164,8 @@ msgstr "Informationen"
 
 #: src/frontend/mame/ui/selmenu.cpp:2538
 msgid ""
-"Required ROM/disk images for the selected system are missing or incorrect. Please "
-"acquire the correct files or select a different system.\n"
+"Required ROM/disk images for the selected system are missing or incorrect. "
+"Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
 "Benötigte ROM/CHD-Abbilder für das gewählte System fehlen oder sind inkorrekt.\n"
@@ -3277,11 +3294,11 @@ msgstr "Sound\tOK\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2924
 msgid "Capture\tUnimplemented\n"
-msgstr "Eingabegerät\tNicht implementiert\n"
+msgstr "Aufzeichnungsgerät\tNicht implementiert\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2926
 msgid "Capture\tImperfect\n"
-msgstr "Eingabegerät\tFehlerhaft\n"
+msgstr "Auszeichnungsgerät\tFehlerhaft\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2929
 msgid "Camera\tUnimplemented\n"
@@ -4006,7 +4023,7 @@ msgstr "%p Start"
 #, c-format
 msgctxt "input-name"
 msgid "%p Select"
-msgstr "%p Auswahl"
+msgstr "%p Select"
 
 #: src/emu/inpttype.ipp:56 src/emu/inpttype.ipp:174 src/emu/inpttype.ipp:255
 #: src/emu/inpttype.ipp:322
@@ -4274,12 +4291,12 @@ msgstr "%p Hanafuda Nein"
 #: src/emu/inpttype.ipp:103
 msgctxt "input-name"
 msgid "Key In"
-msgstr "Eingabe"
+msgstr "Schlüsselschalter Guthaben Eingabe"
 
 #: src/emu/inpttype.ipp:104
 msgctxt "input-name"
 msgid "Key Out"
-msgstr "Ausgabe"
+msgstr "Schlüsselschalter Guthaben Ausgabe"
 
 #: src/emu/inpttype.ipp:105 src/emu/inpttype.ipp:606
 msgctxt "input-name"
@@ -4906,102 +4923,102 @@ msgstr "Drehscheibe V 10"
 #: src/emu/inpttype.ipp:742
 msgctxt "input-name"
 msgid "Track X"
-msgstr "Bahn X"
+msgstr "Trackball X"
 
 #: src/emu/inpttype.ipp:743
 msgctxt "input-name"
 msgid "Track X 2"
-msgstr "Bahn X 2"
+msgstr "Trackball X 2"
 
 #: src/emu/inpttype.ipp:744
 msgctxt "input-name"
 msgid "Track X 3"
-msgstr "Bahn X 3"
+msgstr "Trackball X 3"
 
 #: src/emu/inpttype.ipp:745
 msgctxt "input-name"
 msgid "Track X 4"
-msgstr "Bahn X 4"
+msgstr "Trackball X 4"
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
 msgid "Track X 5"
-msgstr "Bahn X 5"
+msgstr "Trackball X 5"
 
 #: src/emu/inpttype.ipp:747
 msgctxt "input-name"
 msgid "Track X 6"
-msgstr "Bahn X 6"
+msgstr "Trackball X 6"
 
 #: src/emu/inpttype.ipp:748
 msgctxt "input-name"
 msgid "Track X 7"
-msgstr "Bahn X 7"
+msgstr "Trackball X 7"
 
 #: src/emu/inpttype.ipp:749
 msgctxt "input-name"
 msgid "Track X 8"
-msgstr "Bahn X 8"
+msgstr "Trackball X 8"
 
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
 msgid "Track X 9"
-msgstr "Bahn X 9"
+msgstr "Trackball X 9"
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
 msgid "Track X 10"
-msgstr "Bahn X 10"
+msgstr "Trackball X 10"
 
 #: src/emu/inpttype.ipp:756
 msgctxt "input-name"
 msgid "Track Y"
-msgstr "Bahn Y"
+msgstr "Trackball Y"
 
 #: src/emu/inpttype.ipp:757
 msgctxt "input-name"
 msgid "Track Y 2"
-msgstr "Bahn Y 2"
+msgstr "Trackball Y 2"
 
 #: src/emu/inpttype.ipp:758
 msgctxt "input-name"
 msgid "Track Y 3"
-msgstr "Bahn Y 3"
+msgstr "Trackball Y 3"
 
 #: src/emu/inpttype.ipp:759
 msgctxt "input-name"
 msgid "Track Y 4"
-msgstr "Bahn Y 4"
+msgstr "Trackball Y 4"
 
 #: src/emu/inpttype.ipp:760
 msgctxt "input-name"
 msgid "Track Y 5"
-msgstr "Bahn Y 5"
+msgstr "Trackball Y 5"
 
 #: src/emu/inpttype.ipp:761
 msgctxt "input-name"
 msgid "Track Y 6"
-msgstr "Bahn Y 6"
+msgstr "Trackball Y 6"
 
 #: src/emu/inpttype.ipp:762
 msgctxt "input-name"
 msgid "Track Y 7"
-msgstr "Bahn Y 7"
+msgstr "Trackball Y 7"
 
 #: src/emu/inpttype.ipp:763
 msgctxt "input-name"
 msgid "Track Y 8"
-msgstr "Bahn Y 8"
+msgstr "Trackball Y 8"
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
 msgid "Track Y 9"
-msgstr "Bahn Y 9"
+msgstr "Trackball Y 9"
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
 msgid "Track Y 10"
-msgstr "Bahn Y 10"
+msgstr "Trackball Y 10"
 
 #: src/emu/inpttype.ipp:770
 msgctxt "input-name"
@@ -5748,8 +5765,8 @@ msgstr "CPU oder RAM"
 #: plugins/cheatfind/init.lua:501
 msgid "Changes to this only take effect when \"Start new search\" is selected"
 msgstr ""
-"Änderungen hieran werden erst wirksam nachdem \"Neue Suche starten\" ausgewählt "
-"wurde"
+"Änderungen hieran werden erst wirksam nachdem \"Neue Suche starten\" "
+"ausgewählt wurde"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Automatic"
@@ -5889,16 +5906,16 @@ msgstr "Teste/Schreibe Poke Wert"
 
 #: plugins/cheatfind/init.lua:747
 msgid ""
-"Use this if you want to poke the Slot 1 value (eg. You started with something but "
-"lost it)"
+"Use this if you want to poke the Slot 1 value (eg. You started with "
+"something but lost it)"
 msgstr ""
 "Verwende dies, wenn Du den Platz 1 Wert poken möchtest (z.B. Du hast mit etwas "
 "begonnen, es aber verloren)"
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
-"Use this if you want to poke the Last Slot value (eg. You started without an item "
-"but finally got it)"
+"Use this if you want to poke the Last Slot value (eg. You started without an "
+"item but finally got it)"
 msgstr ""
 "Verwende dies, wenn Du den Wert aus dem letzten Platz poken möchtest (z.B. Du "
 "hast ohne eine Sache begonnen, Sie aber schlussendlich gefunden)"
@@ -6013,7 +6030,8 @@ msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
 msgstr "[keine Dauerfeuer-Knöpfe]"
 
-#: plugins/autofire/autofire_menu.lua:109 plugins/autofire/autofire_menu.lua:263
+#: plugins/autofire/autofire_menu.lua:109
+#: plugins/autofire/autofire_menu.lua:263
 msgctxt "plugin-autofire"
 msgid "Add autofire button"
 msgstr "Dauerfeuerknopf hinzufügen"
@@ -6023,7 +6041,8 @@ msgctxt "plugin-autofire"
 msgid "n/a"
 msgstr "nicht verfügbar"
 
-#: plugins/autofire/autofire_menu.lua:152 plugins/autofire/autofire_menu.lua:154
+#: plugins/autofire/autofire_menu.lua:152
+#: plugins/autofire/autofire_menu.lua:154
 msgctxt "plugin-autofire"
 msgid "[not set]"
 msgstr "[nicht gesetzt]"
