@@ -128,13 +128,12 @@ void msx_slot_tc8566_disk_device::device_start()
 
 
 
-msx_slot_disk1_device::msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk1_device::msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK1, tag, owner, clock)
 	, m_side_control(0)
 	, m_control(0)
 {
 }
-
 
 void msx_slot_disk1_device::device_start()
 {
@@ -158,6 +157,8 @@ void msx_slot_disk1_device::device_start()
 	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk1_device::set_side_control)));
 	page(1)->install_write_handler(0x7ffd, 0x7ffd, write8smo_delegate(*this, FUNC(msx_slot_disk1_device::set_control)));
 
+	// TODO No idea why, but without this the other handlers do not get recognized
+	page(2)->install_rom(0xbff8,0xbff8, m_rom);
 	page(2)->install_read_handler(0xbff8, 0xbff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(2)->install_read_handler(0xbff9, 0xbff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -173,12 +174,10 @@ void msx_slot_disk1_device::device_start()
 	page(2)->install_write_handler(0xbffd, 0xbffd, write8smo_delegate(*this, FUNC(msx_slot_disk1_device::set_control)));
 }
 
-
 void msx_slot_disk1_device::device_reset()
 {
 	m_fdc->dden_w(false);
 }
-
 
 void msx_slot_disk1_device::device_post_load()
 {
@@ -190,8 +189,7 @@ void msx_slot_disk1_device::device_post_load()
 	set_control(data);
 }
 
-
-void msx_slot_disk1_device::set_side_control(uint8_t data)
+void msx_slot_disk1_device::set_side_control(u8 data)
 {
 	m_side_control = data;
 
@@ -201,8 +199,7 @@ void msx_slot_disk1_device::set_side_control(uint8_t data)
 	}
 }
 
-
-void msx_slot_disk1_device::set_control(uint8_t data)
+void msx_slot_disk1_device::set_control(u8 data)
 {
 	// 7------- motor on (0 = on)
 	// -6------ in-use / LED (0 = on)
@@ -210,7 +207,7 @@ void msx_slot_disk1_device::set_control(uint8_t data)
 	// ------1- drive 1 select (0 = selected)
 	// -------0 drive 0 select (0 = selected)
 
-	uint8_t old_m_control = m_control;
+	u8 old_m_control = m_control;
 
 	m_control = data;
 
@@ -239,112 +236,31 @@ void msx_slot_disk1_device::set_control(uint8_t data)
 	m_fdc->set_floppy(m_floppy);
 
 	if ((old_m_control ^ m_control) & 0x40)
-	{
 		m_led =  BIT(~m_control, 6);
-	}
 }
 
-uint8_t msx_slot_disk1_device::side_control_r()
+u8 msx_slot_disk1_device::side_control_r()
 {
 	return 0xfe | (m_side_control & 0x01);
 
 }
 
-uint8_t msx_slot_disk1_device::control_r()
+u8 msx_slot_disk1_device::control_r()
 {
-	return ( m_control & 0x83 ) | 0x78;
+	return (m_control & 0x83) | 0x78;
 }
 
-uint8_t msx_slot_disk1_device::status_r()
+u8 msx_slot_disk1_device::status_r()
 {
 	return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
 }
 
-uint8_t msx_slot_disk1_device::read(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0x7ff8:
-	case 0xbff8:
-		return m_fdc->status_r();
 
-	case 0x7ff9:
-	case 0xbff9:
-		return m_fdc->track_r();
-
-	case 0x7ffa:
-	case 0xbffa:
-		return m_fdc->sector_r();
-
-	case 0x7ffb:
-	case 0xbffb:
-		return m_fdc->data_r();
-
-	case 0x7ffc:
-	case 0xbffc:
-		return 0xfe | (m_side_control & 0x01);
-
-	case 0x7ffd:
-	case 0xbffd:
-		return ( m_control & 0x83 ) | 0x78;
-
-	case 0x7fff:
-	case 0xbfff:
-		return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
-	}
-
-	return msx_slot_rom_device::read(offset);
-}
-
-
-void msx_slot_disk1_device::write(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-	case 0x7ff8:
-	case 0xbff8:
-		m_fdc->cmd_w(data);
-		break;
-
-	case 0x7ff9:
-	case 0xbff9:
-		m_fdc->track_w(data);
-		break;
-
-	case 0x7ffa:
-	case 0xbffa:
-		m_fdc->sector_w(data);
-		break;
-
-	case 0x7ffb:
-	case 0xbffb:
-		m_fdc->data_w(data);
-		break;
-
-	case 0x7ffc:
-	case 0xbffc:
-		set_side_control(data);
-		break;
-
-	case 0x7ffd:
-	case 0xbffd:
-		set_control(data);
-		break;
-
-	default:
-		logerror("msx_slot_disk1_device::write: Unmapped write writing %02x to %04x\n", data, offset);
-		break;
-
-	}
-}
-
-
-msx_slot_disk2_device::msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk2_device::msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK2, tag, owner, clock)
 	, m_control(0)
 {
 }
-
 
 void msx_slot_disk2_device::device_start()
 {
@@ -364,6 +280,8 @@ void msx_slot_disk2_device::device_start()
 	page(1)->install_write_handler(0x7fbb, 0x7fbb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
 	page(1)->install_write_handler(0x7fbc, 0x7fbc, write8smo_delegate(*this, FUNC(msx_slot_disk2_device::set_control)));
 
+	// TODO No idea why, but without this the other handlers do not get recognized
+	page(2)->install_rom(0xbfb8,0xbfb8, m_rom);
 	page(2)->install_read_handler(0xbfb8, 0xbfb8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(2)->install_read_handler(0xbfb9, 0xbfb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(2)->install_read_handler(0xbfba, 0xbfba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -376,12 +294,10 @@ void msx_slot_disk2_device::device_start()
 	page(2)->install_write_handler(0xbfbc, 0xbfbc, write8smo_delegate(*this, FUNC(msx_slot_disk2_device::set_control)));
 }
 
-
 void msx_slot_disk2_device::device_reset()
 {
 	m_fdc->dden_w(false);
 }
-
 
 void msx_slot_disk2_device::device_post_load()
 {
@@ -393,10 +309,9 @@ void msx_slot_disk2_device::device_post_load()
 	set_control(data);
 }
 
-
-void msx_slot_disk2_device::set_control(uint8_t data)
+void msx_slot_disk2_device::set_control(u8 data)
 {
-	uint8_t old_m_control = m_control;
+	u8 old_m_control = m_control;
 
 	m_control = data;
 
@@ -424,79 +339,14 @@ void msx_slot_disk2_device::set_control(uint8_t data)
 	m_fdc->set_floppy(m_floppy);
 
 	if ((old_m_control ^ m_control) & 0x40)
-	{
 		m_led = BIT(~m_control, 6);
-	}
 }
 
-uint8_t msx_slot_disk2_device::status_r()
+u8 msx_slot_disk2_device::status_r()
 {
 	return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
 }
 
-uint8_t msx_slot_disk2_device::read(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0x7fb8:
-	case 0xbfb8:
-		return m_fdc->status_r();
-
-	case 0x7fb9:
-	case 0xbfb9:
-		return m_fdc->track_r();
-
-	case 0x7fba:
-	case 0xbfba:
-		return m_fdc->sector_r();
-
-	case 0x7fbb:
-	case 0xbfbb:
-		return m_fdc->data_r();
-
-	case 0x7fbc:
-	case 0xbfbc:
-		return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
-	}
-
-	return msx_slot_rom_device::read(offset);
-}
-
-
-void msx_slot_disk2_device::write(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-	case 0x7fb8:
-	case 0xbfb8:
-		m_fdc->cmd_w(data);
-		break;
-
-	case 0x7fb9:
-	case 0xbfb9:
-		m_fdc->track_w(data);
-		break;
-
-	case 0x7fba:
-	case 0xbfba:
-		m_fdc->sector_w(data);
-		break;
-
-	case 0x7fbb:
-	case 0xbfbb:
-		m_fdc->data_w(data);
-		break;
-
-	case 0x7fbc:
-	case 0xbfbc:
-		set_control(data);
-		break;
-
-	default:
-		logerror("msx_slot_disk2_device::write: Unmapped write writing %02x to %04x\n", data, offset);
-		break;
-	}
-}
 
 
 msx_slot_disk8_device::msx_slot_disk8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -511,6 +361,31 @@ void msx_slot_disk8_device::device_start()
 	msx_slot_wd_disk_device::device_start();
 
 	save_item(NAME(m_control));
+
+	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_read_handler(0x7f80, 0x7f80, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7f81, 0x7f81, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7f82, 0x7f82, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7f83, 0x7f83, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7f84, 0x7f84, read8smo_delegate(*this, FUNC(msx_slot_disk8_device::status_r)));
+	page(1)->install_write_handler(0x7f80, 0x7f80, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7f81, 0x7f81, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7f82, 0x7f82, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7f83, 0x7f83, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7f84, 0x7f84, write8smo_delegate(*this, FUNC(msx_slot_disk8_device::set_control)));
+
+	// TODO No idea why, but without this the other handlers do not get recognized
+	page(2)->install_rom(0xbf80,0xbf80, m_rom);
+	page(2)->install_read_handler(0xbf80, 0xbf80, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(2)->install_read_handler(0xbf81, 0xbf81, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(2)->install_read_handler(0xbf82, 0xbf82, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(2)->install_read_handler(0xbf83, 0xbf83, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(2)->install_read_handler(0xbf84, 0xbf84, read8smo_delegate(*this, FUNC(msx_slot_disk8_device::status_r)));
+	page(2)->install_write_handler(0xbf80, 0xbf80, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(2)->install_write_handler(0xbf81, 0xbf81, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(2)->install_write_handler(0xbf82, 0xbf82, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(2)->install_write_handler(0xbf83, 0xbf83, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(2)->install_write_handler(0xbf84, 0xbf84, write8smo_delegate(*this, FUNC(msx_slot_disk8_device::set_control)));
 }
 
 
@@ -531,7 +406,7 @@ void msx_slot_disk8_device::device_post_load()
 }
 
 
-void msx_slot_disk8_device::set_control(uint8_t data)
+void msx_slot_disk8_device::set_control(u8 data)
 {
 	uint8_t old_m_control = m_control;
 
@@ -566,6 +441,10 @@ void msx_slot_disk8_device::set_control(uint8_t data)
 	}
 }
 
+u8 msx_slot_disk8_device::status_r()
+{
+	return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
+}
 
 uint8_t msx_slot_disk8_device::read(offs_t offset)
 {
@@ -636,53 +515,29 @@ void msx_slot_disk8_device::write(offs_t offset, uint8_t data)
 
 
 
-msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK3, tag, owner, clock)
 {
 }
 
-
-void msx_slot_disk3_device::write(offs_t offset, uint8_t data)
+void msx_slot_disk3_device::device_start()
 {
-	switch (offset)
-	{
-	case 0x7ff8:   // CR0 : 0 - 0 - MEN1 - MEN0 - 0 - -FRST - 0 - DSA
-	case 0xbff8:
-		m_fdc->dor_w(data);
-		break;
+	msx_slot_tc8566_disk_device::device_start();
 
-	case 0x7ff9:   // CR1 : 0 - 0 - C4E - C4 - SBME - SBM - TCE - FDCTC
-	case 0xbff9:
-		m_fdc->cr1_w(data);
-		break;
-
-	case 0x7ffb:   // Data Register
-	case 0xbffb:
-		m_fdc->fifo_w(data);
-		break;
-
-	default:
-		logerror("msx_slot_disk3_device::write: Unmapped write writing %02x to %04x\n", data, offset);
-		break;
-	}
+	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
+	// TODO No idea why, but without this the other handlers do not get recognized
+	page(2)->install_rom(0xbffa,0xbffa, m_rom);
+	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
+	page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
+	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
+	page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
+	page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 }
-
-
-uint8_t msx_slot_disk3_device::read(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0x7ffa:   // Status Register
-	case 0xbffa:
-		return m_fdc->msr_r();
-	case 0x7ffb:   // Data Register
-	case 0xbffb:
-		return m_fdc->fifo_r();
-	}
-
-	return msx_slot_rom_device::read(offset);
-}
-
 
 
 
@@ -692,59 +547,27 @@ msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, cons
 {
 }
 
-
-void msx_slot_disk4_device::write(offs_t offset, uint8_t data)
+void msx_slot_disk4_device::device_start()
 {
-	switch (offset)
-	{
-	case 0x7ff1:   // FDD : x - x - MC1 - MC0 - x - x - x - x
-		break;
+	msx_slot_tc8566_disk_device::device_start();
 
-	case 0x7ff2:   // CR0 : 0 - 0 - MEN1 - MEN0 - 0 - -FRST - 0 - DSA
-		m_fdc->dor_w(data);
-		break;
-
-	case 0x7ff3:   // CR1 : 0 - 0 - C4E - C4 - SBME - SBM - TCE - FDCTC
-		m_fdc->cr1_w(data);
-		break;
-
-	case 0x7ff5:   // Data Register
-		m_fdc->fifo_w(data);
-		break;
-
-	default:
-		logerror("msx_slot_disk4_device::write: Unmapped write writing %02x to %04x\n", data, offset);
-		break;
-	}
-}
-
-
-uint8_t msx_slot_disk4_device::read(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0x7ff1:   // FDD : x - x - MC1 - MC0 - x - x - x - x
-		logerror("msx_slot_disk4_device::write: Unmapped read from Media Change register\n");
-		break;
-
-	case 0x7ff4:   // Status Register
-		return m_fdc->msr_r();
-	case 0x7ff5:   // Data Register
-		return m_fdc->fifo_r();
-	}
-
-	return msx_slot_rom_device::read(offset);
+	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	// 0x7ff1 media change register
+	page(1)->install_write_handler(0x7ff2, 0x7ff2, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
+	page(1)->install_write_handler(0x7ff3, 0x7ff3, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
+	page(1)->install_read_handler(0x7ff4, 0x7ff4, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
+	page(1)->install_read_handler(0x7ff5, 0x7ff5, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
+	page(1)->install_write_handler(0x7ff5, 0x7ff5, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 }
 
 
 
 
-msx_slot_disk5_device::msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk5_device::msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK5, tag, owner, clock)
 	, m_control(0)
 {
 }
-
 
 void msx_slot_disk5_device::device_start()
 {
@@ -752,25 +575,32 @@ void msx_slot_disk5_device::device_start()
 
 	save_item(NAME(m_control));
 
-	// Install IO read/write handlers
-	io_space().install_write_handler(0xd0, 0xd4, write8sm_delegate(*this, FUNC(msx_slot_disk5_device::io_write)));
-	io_space().install_read_handler(0xd0, 0xd4, read8sm_delegate(*this, FUNC(msx_slot_disk5_device::io_read)));
-}
+	page(1)->install_rom(0x4000, 0x7fff, m_rom);
 
+	// Install IO read/write handlers
+	io_space().install_write_handler(0xd0, 0xd0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	io_space().install_write_handler(0xd1, 0xd1, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	io_space().install_write_handler(0xd2, 0xd2, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	io_space().install_write_handler(0xd3, 0xd3, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	io_space().install_write_handler(0xd4, 0xd4, write8smo_delegate(*this, FUNC(msx_slot_disk5_device::control_w)));
+	io_space().install_read_handler(0xd0, 0xd0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	io_space().install_read_handler(0xd1, 0xd1, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	io_space().install_read_handler(0xd2, 0xd2, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	io_space().install_read_handler(0xd3, 0xd3, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	io_space().install_read_handler(0xd4, 0xd4, read8smo_delegate(*this, FUNC(msx_slot_disk5_device::status_r)));
+}
 
 void msx_slot_disk5_device::device_reset()
 {
 	m_fdc->dden_w(false);
 }
 
-
 void msx_slot_disk5_device::device_post_load()
 {
-	set_control(m_control);
+	control_w(m_control);
 }
 
-
-void msx_slot_disk5_device::set_control(uint8_t control)
+void msx_slot_disk5_device::control_w(u8 control)
 {
 	m_control = control;
 
@@ -806,55 +636,9 @@ void msx_slot_disk5_device::set_control(uint8_t control)
 	m_fdc->set_floppy(m_floppy);
 }
 
-
-uint8_t msx_slot_disk5_device::io_read(offs_t offset)
+u8 msx_slot_disk5_device::status_r()
 {
-	switch (offset)
-	{
-	case 0x00:
-		return m_fdc->status_r();
-
-	case 0x01:
-		return m_fdc->track_r();
-
-	case 0x02:
-		return m_fdc->sector_r();
-
-	case 0x03:
-		return m_fdc->data_r();
-
-	case 0x04:
-		return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
-	}
-
-	return 0xff;
-}
-
-
-void msx_slot_disk5_device::io_write(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-	case 0x00:
-		m_fdc->cmd_w(data);
-		break;
-
-	case 0x01:
-		m_fdc->track_w(data);
-		break;
-
-	case 0x02:
-		m_fdc->sector_w(data);
-		break;
-
-	case 0x03:
-		m_fdc->data_w(data);
-		break;
-
-	case 0x04:
-		set_control(data);
-		break;
-	}
+	return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
 }
 
 
@@ -875,6 +659,23 @@ void msx_slot_disk6_device::device_start()
 	save_item(NAME(m_side_motor));
 	save_item(NAME(m_drive_select0));
 	save_item(NAME(m_drive_select1));
+
+	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_read_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_device::side_motor_r)));
+	page(1)->install_read_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_device::select0_r)));
+	page(1)->install_read_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_device::select1_r)));
+	page(1)->install_read_handler(0x7ff7, 0x7ff7, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_device::status_r)));
+	page(1)->install_write_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_device::side_motor_w)));
+	page(1)->install_write_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_device::select0_w)));
+	page(1)->install_write_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_device::select1_w)));
 }
 
 
@@ -926,111 +727,58 @@ void msx_slot_disk6_device::set_side_motor()
 }
 
 
-uint8_t msx_slot_disk6_device::read(offs_t offset)
+u8 msx_slot_disk6_device::side_motor_r()
 {
-	switch (offset)
-	{
-	case 0x7ff0:   // status
-	case 0x7ff8:
-		return m_fdc->status_r();
-
-	case 0x7ff1:   // track
-	case 0x7ff9:
-		return m_fdc->track_r();
-
-	case 0x7ff2:   // sector
-	case 0x7ffa:
-		return m_fdc->sector_r();
-
-	case 0x7ff3:   // data
-	case 0x7ffb:
-		return m_fdc->data_r();
-
-	case 0x7ff4:
-	case 0x7ffc:
-		// bit 0 = side control
-		// bit 1 = motor control
-		return 0xfc | m_side_motor;
-		break;
-
-	// This reads back a 1 in bit 0 if drive0 is present and selected
-	case 0x7ff5:
-	case 0x7ffd:
-		return 0xfe | m_drive_select0;
-
-	// This reads back a 1 in bit 0 if drive1 is present and selected
-	case 0x7ff6:
-	case 0x7ffe:
-		return 0xfe | m_drive_select1;
-
-	case 0x7ff7:
-	case 0x7fff:
-		return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
-	}
-
-	return msx_slot_rom_device::read(offset);
+	// bit 0 = side control
+	// bit 1 = motor control
+	return 0xfc | m_side_motor;
 }
 
-
-void msx_slot_disk6_device::write(offs_t offset, uint8_t data)
+u8 msx_slot_disk6_device::select0_r()
 {
-	switch (offset)
-	{
-	case 0x7ff0:   // cmd
-	case 0x7ff8:
-		m_fdc->cmd_w(data);
-		break;
+	// This reads back a 1 in bit 0 if drive0 is present and selected
+	return 0xfe | m_drive_select0;
+}
 
-	case 0x7ff1:   // track
-	case 0x7ff9:
-		m_fdc->track_w(data);
-		break;
+u8 msx_slot_disk6_device::select1_r()
+{
+	// This reads back a 1 in bit 0 if drive1 is present and selected
+	return 0xfe | m_drive_select1;
+}
 
-	case 0x7ff2:   // sector
-	case 0x7ffa:
-		m_fdc->sector_w(data);
-		break;
+u8 msx_slot_disk6_device::status_r()
+{
+	return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
+}
 
-	case 0x7ff3:   // data
-	case 0x7ffb:
-		m_fdc->data_w(data);
-		break;
-
+void msx_slot_disk6_device::side_motor_w(u8 data)
+{
 	// Side and motor control
 	// bit 0 = side select
 	// bit 1 = motor on/off
-	case 0x7ff4:
-	case 0x7ffc:
-		m_side_motor = data;
-		set_side_motor();
-		break;
+	m_side_motor = data;
+	set_side_motor();
+}
 
+void msx_slot_disk6_device::select0_w(u8 data)
+{
 	// bit 0 - select drive 0
-	case 0x7ff5:
-	case 0x7ffd:
-		m_drive_select0 = data;
-		select_drive();
-		break;
+	m_drive_select0 = data;
+	select_drive();
+}
 
+void msx_slot_disk6_device::select1_w(u8 data)
+{
 	// bit 1 - select drive 1
-	case 0x7ff6:
-	case 0x7ffe:
-		m_drive_select1 = data;
-		select_drive();
-		break;
-
-	default:
-		logerror("msx_slot_disk6_device::write: Unmapped write writing %02x to %04x\n", data, offset);
-		break;
-	}
+	m_drive_select1 = data;
+	select_drive();
 }
 
 
-msx_slot_disk7_device::msx_slot_disk7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+
+msx_slot_disk7_device::msx_slot_disk7_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK7, tag, owner, clock)
 	, m_drive_side_motor(0)
-	, m_drive_select0(0)
-	, m_drive_select1(0)
 {
 }
 
@@ -1040,27 +788,45 @@ void msx_slot_disk7_device::device_start()
 	msx_slot_wd_disk_device::device_start();
 
 	save_item(NAME(m_drive_side_motor));
-	save_item(NAME(m_drive_select0));
-	save_item(NAME(m_drive_select1));
-}
 
+	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, read8smo_delegate(*this, FUNC(msx_slot_disk7_device::status_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ffa, 0x7ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk7_device::side_motor_w)));
+
+	// TODO No idea why, but without this the other handlers do not get recognized
+	page(2)->install_rom(0xbff8, 0xbff8, m_rom);
+	page(2)->install_read_handler(0xbff8, 0xbff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(2)->install_read_handler(0xbff9, 0xbff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(2)->install_read_handler(0xbffc, 0xbffc, read8smo_delegate(*this, FUNC(msx_slot_disk7_device::status_r)));
+	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(2)->install_write_handler(0xbffa, 0xbffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(2)->install_write_handler(0xbffc, 0xbffc, write8smo_delegate(*this, FUNC(msx_slot_disk7_device::side_motor_w)));
+}
 
 void msx_slot_disk7_device::device_reset()
 {
 	m_fdc->dden_w(false);
 }
 
-
 void msx_slot_disk7_device::device_post_load()
 {
 	select_drive();
 }
 
-
 void msx_slot_disk7_device::select_drive()
 {
-	m_drive_select0 = 0;
-	m_drive_select1 = 0;
 	m_floppy = nullptr;
 
 	switch (m_drive_side_motor & 0x03)
@@ -1076,7 +842,6 @@ void msx_slot_disk7_device::select_drive()
 	m_fdc->set_floppy(m_floppy);
 }
 
-
 void msx_slot_disk7_device::set_drive_side_motor()
 {
 	select_drive();
@@ -1088,119 +853,71 @@ void msx_slot_disk7_device::set_drive_side_motor()
 	}
 }
 
-
-uint8_t msx_slot_disk7_device::read(offs_t offset)
+void msx_slot_disk7_device::side_motor_w(u8 data)
 {
-	switch (offset)
-	{
-	case 0x7ff8:   // status
-	case 0xbff8:
-		return m_fdc->status_r();
-
-	case 0x7ff9:   // track
-	case 0xbff9:
-		return m_fdc->track_r();
-
-	case 0x7ffa:   // sector
-	case 0xbffa:
-		return m_fdc->sector_r();
-
-	case 0x7ffb:   // data
-	case 0xbffb:
-		return m_fdc->data_r();
-
-	case 0x7ffc:   // drive status
-	case 0xbffc:
-		return (m_drive_side_motor & 0x0f)
-			| (m_floppy && m_floppy->dskchg_r() ? 0x00 : 0x10)
-			| (m_floppy && m_floppy->ready_r() ? 0x00 : 0x20)
-			| (m_fdc->intrq_r() ? 0x40 : 0x00)
-			| (m_fdc->drq_r() ? 0x80 : 0x00)
-		;
-	}
-
-	return msx_slot_rom_device::read(offset);
-}
-
-
-void msx_slot_disk7_device::write(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-	case 0x7ff8:   // command
-	case 0xbff8:
-		m_fdc->cmd_w(data);
-		break;
-
-	case 0x7ff9:   // track
-	case 0xbff9:
-		m_fdc->track_w(data);
-		break;
-
-	case 0x7ffa:   // sector
-	case 0xbffa:
-		m_fdc->sector_w(data);
-		break;
-
-	case 0x7ffb:   // data
-	case 0xbffb:
-		m_fdc->data_w(data);
-		break;
-
 	// Drive, side and motor control
 	// bit 0,1 = drive select
 	// bit 2 = side select
 	// bit 3 = motor on/off
-	case 0x7ffc:
-	case 0xbffc:
-		m_drive_side_motor = data;
-		set_drive_side_motor();
-		break;
+	m_drive_side_motor = data;
+	set_drive_side_motor();
+}
 
-	default:
-		logerror("msx_slot_disk7_device::write: Unmapped write writing %02x to %04x\n", data, offset);
-		break;
-	}
+u8 msx_slot_disk7_device::status_r()
+{
+	return (m_drive_side_motor & 0x0f)
+		| (m_floppy && m_floppy->dskchg_r() ? 0x00 : 0x10)
+		| (m_floppy && m_floppy->ready_r() ? 0x00 : 0x20)
+		| (m_fdc->intrq_r() ? 0x40 : 0x00)
+		| (m_fdc->drq_r() ? 0x80 : 0x00);
 }
 
 
 
 
-msx_slot_disk9_device::msx_slot_disk9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk9_device::msx_slot_disk9_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK9, tag, owner, clock)
 	, m_control(0)
 {
 }
-
 
 void msx_slot_disk9_device::device_start()
 {
 	msx_slot_wd_disk_device::device_start();
 
 	save_item(NAME(m_control));
-}
 
+	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, read8smo_delegate(*this, FUNC(msx_slot_disk9_device::status_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ffa, 0x7ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk9_device::control_w)));
+}
 
 void msx_slot_disk9_device::device_reset()
 {
 	m_fdc->dden_w(false);
 }
 
-
 void msx_slot_disk9_device::device_post_load()
 {
-	uint8_t data = m_control;
+	u8 data = m_control;
 
 	// To make sure the FDD busy led status gets set correctly
 	m_control ^= 0x40;
 
-	set_control(data);
+	control_w(data);
 }
 
-
-void msx_slot_disk9_device::set_control(uint8_t data)
+void msx_slot_disk9_device::control_w(u8 data)
 {
-	uint8_t old_m_control = m_control;
+	u8 old_m_control = m_control;
 
 	m_control = data;
 
@@ -1233,84 +950,44 @@ void msx_slot_disk9_device::set_control(uint8_t data)
 	}
 }
 
-
-uint8_t msx_slot_disk9_device::read(offs_t offset)
+u8 msx_slot_disk9_device::status_r()
 {
-	switch (offset)
-	{
-	case 0x7ff8:
-		return m_fdc->status_r();
-
-	case 0x7ff9:
-		return m_fdc->track_r();
-
-	case 0x7ffa:
-		return m_fdc->sector_r();
-
-	case 0x7ffb:
-		return m_fdc->data_r();
-
-	case 0x7ffc:
-		return 0x3f | (m_fdc->intrq_r() ? 0x80 : 0) | (m_fdc->drq_r() ? 0x40 : 0);
-	}
-
-	return msx_slot_rom_device::read(offset);
-}
-
-
-void msx_slot_disk9_device::write(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-	case 0x7ff8:
-		m_fdc->cmd_w(data);
-		break;
-
-	case 0x7ff9:
-		m_fdc->track_w(data);
-		break;
-
-	case 0x7ffa:
-		m_fdc->sector_w(data);
-		break;
-
-	case 0x7ffb:
-		m_fdc->data_w(data);
-		break;
-
-	case 0x7ffc:
-		set_control(data);
-		break;
-
-	default:
-		logerror("msx_slot_disk9_device::write: Unmapped write writing %02x to %04x\n", data, offset);
-		break;
-	}
+	return 0x3f | (m_fdc->intrq_r() ? 0x80 : 0) | (m_fdc->drq_r() ? 0x40 : 0);
 }
 
 
 
 
-msx_slot_disk10_device::msx_slot_disk10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk10_device::msx_slot_disk10_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK10, tag, owner, clock)
 	, m_control(0)
 {
 }
-
 
 void msx_slot_disk10_device::device_start()
 {
 	msx_slot_wd_disk_device::device_start();
 
 	save_item(NAME(m_control));
-}
 
+	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, read8smo_delegate(*this, FUNC(msx_slot_disk10_device::status_r)));
+	// TODO 0x7ffd return system control/status
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ffa, 0x7ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk10_device::control_w)));
+}
 
 void msx_slot_disk10_device::device_reset()
 {
 	m_fdc->dden_w(false);
 }
-
 
 void msx_slot_disk10_device::device_post_load()
 {
@@ -1319,13 +996,12 @@ void msx_slot_disk10_device::device_post_load()
 	// To make sure the FDD busy led status gets set correctly
 	m_control ^= 0x40;
 
-	set_control(data);
+	control_w(data);
 }
 
-
-void msx_slot_disk10_device::set_control(uint8_t data)
+void msx_slot_disk10_device::control_w(u8 data)
 {
-	uint8_t old_m_control = m_control;
+	u8 old_m_control = m_control;
 
 	m_control = data;
 
@@ -1352,77 +1028,24 @@ void msx_slot_disk10_device::set_control(uint8_t data)
 	}
 }
 
-
-uint8_t msx_slot_disk10_device::read(offs_t offset)
+u8 msx_slot_disk10_device::status_r()
 {
-	switch (offset)
-	{
-	case 0x7ff8:
-		return m_fdc->status_r();
-
-	case 0x7ff9:
-		return m_fdc->track_r();
-
-	case 0x7ffa:
-		return m_fdc->sector_r();
-
-	case 0x7ffb:
-		return m_fdc->data_r();
-
-	case 0x7ffc:
-		return 0x23
-			| (m_control & 0x04)
-			| ((m_control & 0x08) ^ 0x08)
-			| ((m_floppy && m_floppy->mon_r()) ? 0 : 0x10)
-			| (m_fdc->drq_r() ? 0x40 : 0)
-			| (m_fdc->intrq_r() ? 0x80 : 0);
-		
-//	case 0x7ffd: // TODO return system control/status
-	}
-
-	return msx_slot_rom_device::read(offset);
-}
-
-
-void msx_slot_disk10_device::write(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-	case 0x7ff8:
-		m_fdc->cmd_w(data);
-		break;
-
-	case 0x7ff9:
-		m_fdc->track_w(data);
-		break;
-
-	case 0x7ffa:
-		m_fdc->sector_w(data);
-		break;
-
-	case 0x7ffb:
-		m_fdc->data_w(data);
-		break;
-
-	case 0x7ffc:
-		set_control(data);
-		break;
-
-	default:
-		logerror("msx_slot_disk10_device::write: Unmapped write writing %02x to %04x\n", data, offset);
-		break;
-	}
+	return 0x23
+		| (m_control & 0x04)
+		| ((m_control & 0x08) ^ 0x08)
+		| ((m_floppy && m_floppy->mon_r()) ? 0 : 0x10)
+		| (m_fdc->drq_r() ? 0x40 : 0)
+		| (m_fdc->intrq_r() ? 0x80 : 0);
 }
 
 
 
-msx_slot_disk11_device::msx_slot_disk11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk11_device::msx_slot_disk11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK11, tag, owner, clock)
 	, m_side_control(0)
 	, m_control(0)
 {
 }
-
 
 void msx_slot_disk11_device::device_start()
 {
@@ -1430,14 +1053,43 @@ void msx_slot_disk11_device::device_start()
 
 	save_item(NAME(m_side_control));
 	save_item(NAME(m_control));
-}
 
+	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, read8smo_delegate(*this, FUNC(msx_slot_disk11_device::side_control_r)));
+	page(1)->install_read_handler(0x7ffd, 0x7ffd, read8smo_delegate(*this, FUNC(msx_slot_disk11_device::control_r)));
+	page(1)->install_read_handler(0x7fff, 0x7fff, read8smo_delegate(*this, FUNC(msx_slot_disk11_device::status_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ffa, 0x7ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk11_device::side_control_w)));
+	page(1)->install_write_handler(0x7ffd, 0x7ffd, write8smo_delegate(*this, FUNC(msx_slot_disk11_device::control_w)));
+
+	// TODO No idea why, but without this the other handlers do not get recognized
+	page(2)->install_rom(0xbff8, 0xbff8, m_rom);
+	page(2)->install_read_handler(0xbff8, 0xbff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(2)->install_read_handler(0xbff9, 0xbff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(2)->install_read_handler(0xbffc, 0xbffc, read8smo_delegate(*this, FUNC(msx_slot_disk11_device::side_control_r)));
+	page(2)->install_read_handler(0xbffd, 0xbffd, read8smo_delegate(*this, FUNC(msx_slot_disk11_device::control_r)));
+	page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_slot_disk11_device::status_r)));
+	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(2)->install_write_handler(0xbffa, 0xbffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(2)->install_write_handler(0xbffc, 0xbffc, write8smo_delegate(*this, FUNC(msx_slot_disk11_device::side_control_w)));
+	page(2)->install_write_handler(0xbffd, 0xbffd, write8smo_delegate(*this, FUNC(msx_slot_disk11_device::control_w)));
+}
 
 void msx_slot_disk11_device::device_reset()
 {
 	m_fdc->dden_w(false);
 }
-
 
 void msx_slot_disk11_device::device_post_load()
 {
@@ -1446,11 +1098,10 @@ void msx_slot_disk11_device::device_post_load()
 	// To make sure the FDD busy led status gets set correctly
 	m_control ^= 0x40;
 
-	set_control(data);
+	control_w(data);
 }
 
-
-void msx_slot_disk11_device::set_side_control(uint8_t data)
+void msx_slot_disk11_device::side_control_w(u8 data)
 {
 	m_side_control = data;
 
@@ -1458,8 +1109,7 @@ void msx_slot_disk11_device::set_side_control(uint8_t data)
 		m_floppy->ss_w(BIT(m_side_control, 0));
 }
 
-
-void msx_slot_disk11_device::set_control(uint8_t data)
+void msx_slot_disk11_device::control_w(u8 data)
 {
 	uint8_t old_m_control = m_control;
 
@@ -1491,81 +1141,18 @@ void msx_slot_disk11_device::set_control(uint8_t data)
 	}
 }
 
-
-uint8_t msx_slot_disk11_device::read(offs_t offset)
+u8 msx_slot_disk11_device::side_control_r()
 {
-	switch (offset)
-	{
-	case 0x7ff8:
-	case 0xbff8:
-		return m_fdc->status_r();
-
-	case 0x7ff9:
-	case 0xbff9:
-		return m_fdc->track_r();
-
-	case 0x7ffa:
-	case 0xbffa:
-		return m_fdc->sector_r();
-
-	case 0x7ffb:
-	case 0xbffb:
-		return m_fdc->data_r();
-
-	case 0x7ffc:
-	case 0xbffc:
-		return 0xfe | (m_side_control & 0x01);
-
-	case 0x7ffd:
-	case 0xbffd:
-		return (m_control & 0x83) | 0x78;
-
-	case 0x7fff:
-	case 0xbfff:
-		// bit 4 is checked during reading (ready check?)
-		return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
-	}
-
-	return msx_slot_rom_device::read(offset);
+	return 0xfe | (m_side_control & 0x01);
 }
 
-
-void msx_slot_disk11_device::write(offs_t offset, uint8_t data)
+u8 msx_slot_disk11_device::control_r()
 {
-	switch (offset)
-	{
-	case 0x7ff8:
-	case 0xbff8:
-		m_fdc->cmd_w(data);
-		break;
+	return (m_control & 0x83) | 0x78;
+}
 
-	case 0x7ff9:
-	case 0xbff9:
-		m_fdc->track_w(data);
-		break;
-
-	case 0x7ffa:
-	case 0xbffa:
-		m_fdc->sector_w(data);
-		break;
-
-	case 0x7ffb:
-	case 0xbffb:
-		m_fdc->data_w(data);
-		break;
-
-	case 0x7ffc:
-	case 0xbffc:
-		set_side_control(data);
-		break;
-
-	case 0x7ffd:
-	case 0xbffd:
-		set_control(data);
-		break;
-
-	default:
-		logerror("msx_slot_disk11_device::write: Unmapped write writing %02x to %04x\n", data, offset);
-		break;
-	}
+u8 msx_slot_disk11_device::status_r()
+{
+	// bit 4 is checked during reading (ready check?)
+	return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
 }
