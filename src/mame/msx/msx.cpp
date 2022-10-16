@@ -11222,7 +11222,7 @@ void msx2_state::y805128(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_DISK11, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK11, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 	// Default: SKW-05
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);

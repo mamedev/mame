@@ -13,7 +13,7 @@
 DEFINE_DEVICE_TYPE(MSX_SLOT_BRUC100, msx_slot_bruc100_device, "msx_slot_bruc100", "MSX Internal BRUC100")
 
 
-msx_slot_bruc100_device::msx_slot_bruc100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_bruc100_device::msx_slot_bruc100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_SLOT_BRUC100, tag, owner, clock)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
@@ -48,7 +48,7 @@ void msx_slot_bruc100_device::device_reset()
 	m_rombank[1]->set_entry(0);
 }
 
-void msx_slot_bruc100_device::select_bank(uint8_t bank)
+void msx_slot_bruc100_device::select_bank(u8 bank)
 {
 	m_rombank[0]->set_entry(bank);
 	m_rombank[1]->set_entry(bank);

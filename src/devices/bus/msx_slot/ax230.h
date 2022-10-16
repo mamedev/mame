@@ -14,10 +14,10 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_AX230, msx_slot_ax230_device)
 class msx_slot_ax230_device : public device_t, public msx_internal_slot_interface
 {
 public:
-	msx_slot_ax230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_ax230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
-	void set_rom_start(const char *region, uint32_t offset) { m_rom_region.set_tag(region); m_region_offset = offset; }
+	void set_rom_start(const char *region, u32 offset) { m_rom_region.set_tag(region); m_region_offset = offset; }
 
 protected:
 	virtual void device_start() override;
@@ -27,11 +27,11 @@ private:
 	static constexpr u8 BANKS = 0x80;
 	static constexpr u8 BANK_MASK = BANKS - 1;
 
+	void mapper_write(offs_t offset, uint8_t data);
+
 	required_memory_region m_rom_region;
 	memory_bank_array_creator<4> m_rombank;
 	u32 m_region_offset;
-
-	void mapper_write(offs_t offset, uint8_t data);
 };
 
 

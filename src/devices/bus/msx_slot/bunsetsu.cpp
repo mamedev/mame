@@ -11,13 +11,12 @@
 DEFINE_DEVICE_TYPE(MSX_SLOT_BUNSETSU, msx_slot_bunsetsu_device, "msx_slot_bunsetsu", "MSX Internal BUNSETSU")
 
 
-msx_slot_bunsetsu_device::msx_slot_bunsetsu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_bunsetsu_device::msx_slot_bunsetsu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rom_device(mconfig, MSX_SLOT_BUNSETSU, tag, owner, clock)
 	, m_bunsetsu_region(*this, finder_base::DUMMY_TAG)
 	, m_bunsetsu_address(0)
 {
 }
-
 
 void msx_slot_bunsetsu_device::device_start()
 {
@@ -31,12 +30,10 @@ void msx_slot_bunsetsu_device::device_start()
 	page(2)->install_write_handler(0xbffc, 0xbffe, write8sm_delegate(*this, FUNC(msx_slot_bunsetsu_device::buns_write)));
 }
 
-
 void msx_slot_bunsetsu_device::device_reset()
 {
 	m_bunsetsu_address = 0;
 }
-
 
 u8 msx_slot_bunsetsu_device::buns_read()
 {

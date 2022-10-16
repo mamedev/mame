@@ -25,10 +25,6 @@ public:
 
 	void set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3);
 
-	// reading and writing
-	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
-	virtual void write_cart(offs_t offset, uint8_t data) { }
-
 	DECLARE_WRITE_LINE_MEMBER(irq_out);
 	address_space &memory_space() const;
 	address_space &io_space() const;

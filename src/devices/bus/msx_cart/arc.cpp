@@ -14,20 +14,19 @@ msx_cart_arc_device::msx_cart_arc_device(const machine_config &mconfig, const ch
 {
 }
 
-
 void msx_cart_arc_device::device_start()
 {
+	save_item(NAME(m_7f));
+
 	// Install IO read/write handlers
 	io_space().install_write_handler(0x7f, 0x7f, write8smo_delegate(*this, FUNC(msx_cart_arc_device::io_7f_w)));
 	io_space().install_read_handler(0x7f, 0x7f, read8smo_delegate(*this, FUNC(msx_cart_arc_device::io_7f_r)));
 }
 
-
 void msx_cart_arc_device::device_reset()
 {
 	m_7f = 0;
 }
-
 
 void msx_cart_arc_device::initialize_cartridge()
 {
@@ -35,29 +34,18 @@ void msx_cart_arc_device::initialize_cartridge()
 	{
 		fatalerror("arc: Invalid ROM size\n");
 	}
+
+	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(2)->install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
 }
 
-
-uint8_t msx_cart_arc_device::read_cart(offs_t offset)
-{
-	if (offset >= 0x4000 && offset < 0xc000)
-	{
-		return get_rom_base()[offset - 0x4000];
-	}
-	return 0xff;
-}
-
-
-void msx_cart_arc_device::io_7f_w(uint8_t data)
+void msx_cart_arc_device::io_7f_w(u8 data)
 {
 	if (data == 0x35)
-	{
 		m_7f++;
-	}
 }
 
-
-uint8_t msx_cart_arc_device::io_7f_r()
+u8 msx_cart_arc_device::io_7f_r()
 {
 	return ((m_7f & 0x03) == 0x03) ? 0xda : 0xff;
 }

@@ -13,7 +13,7 @@
 DEFINE_DEVICE_TYPE(MSX_SLOT_AX230, msx_slot_ax230_device, "msx_slot_ax230", "MSX Internal AX230")
 
 
-msx_slot_ax230_device::msx_slot_ax230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_ax230_device::msx_slot_ax230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_SLOT_AX230, tag, owner, clock)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
