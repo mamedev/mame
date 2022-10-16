@@ -975,7 +975,7 @@ std::optional<emu_options::software_options> emu_options::evaluate_single_softwa
 		software_identifier_stack.pop();
 
 		// find this software, and bail if we can't find it
-		const software_info *swinfo = current_swlistdev->find(std::string(current_software_name));
+		const software_info *swinfo = current_swlistdev->find(current_software_name);
 		if (!swinfo)
 			return { };
 
@@ -1018,7 +1018,7 @@ std::optional<emu_options::software_options> emu_options::evaluate_single_softwa
 						{
 							if (requirement_list_name.empty() || swdev.list_name() == requirement_list_name)
 							{
-								if (swdev.find(std::string(requirement_software_name)))
+								if (swdev.find(requirement_software_name))
 								{
 									requirement_swdev = &swdev;
 									requirement_swdevs_found++;
