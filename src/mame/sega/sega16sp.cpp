@@ -1155,10 +1155,10 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				int x;
 
 				data[7] = addr;
-				for (x = xpos; (xdelta > 0 && x <= cliprect.max_x) || (xdelta < 0 && x >= cliprect.min_x); )
+				for (x = xpos; (xdelta > 0 && x <= cliprect.max_x) || (xdelta < 0 && x >= cliprect.min_x);)
 				{
 					uint32_t pixels = spritedata[data[7]];
-					if( flip )
+					if (flip)
 					{
 						data[7]--;
 					}
@@ -1178,7 +1178,7 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 					bool last_data = (pixels & 0x0f00'0000) == 0x0f00'0000;
 
 					// draw eight pixels
-					for( int k=0; k<8; k++ )
+					for (int k=0; k<8; k++)
 					{
 						int pix = pixels & 0xf;
 						while (xacc < 0x200)
