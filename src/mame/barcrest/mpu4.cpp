@@ -179,7 +179,7 @@ IRQ line connected to CPU
  0F00-0F03 |R/W| D D D D D D D D | PIA6821 IC8
            |   |                 |
            |   |                 | port A
-           |   |                 |
+           |   |       	          |
            |   |                 |        PA0-PA7 INPUT  multiplexed inputs data
            |   |                 |
            |   |                 |        CA1     INPUT, not connected
@@ -663,6 +663,7 @@ TIMER_CALLBACK_MEMBER(mpu4_state::update_ic24)
 WRITE_LINE_MEMBER(mpu4_state::dataport_rxd)
 {
 	m_pia4->cb1_w(state);
+	m_serial_output=state;
 	LOG_IC3(("Dataport RX %x\n",state));
 }
 
@@ -708,7 +709,7 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 {
 	m_ic4_input_b = 0x00;
 
-	if (m_pia5->ca2_output())
+	if (m_serial_output)
 	{
 		m_ic4_input_b |=  0x80;
 	}
@@ -726,6 +727,14 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 	else
 	{
 		if (m_optic_pattern & (1<<m_active_reel)) m_ic4_input_b |=  0x08;
+	}
+
+	if (m_low_volt_detect)
+	{
+		if ( m_signal_50hz )
+		{
+			m_ic4_input_b |= 0x04;
+		}
 	}
 
 	if ( m_overcurrent )
@@ -2421,7 +2430,9 @@ void mpu4_state::mod2_no_bacta_f(machine_config &config)
 {
 	mod2_f(config);
 	config.device_remove("dataport");
-	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
+	m_pia5->ca2_handler().set(FUNC(mpu4_state::dataport_rxd));
+
+
 }
 
 void mpu4_state::mod2_cheatchr_f(machine_config &config)
@@ -2462,7 +2473,7 @@ void mpu4_state::mod4oki_no_bacta_f(machine_config &config)
 {
 	mod4oki_f(config);
 	config.device_remove("dataport");
-	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
+	m_pia5->ca2_handler().set(FUNC(mpu4_state::dataport_rxd));
 }
 
 void mpu4_state::mod4oki_cheatchr_f(machine_config &config)

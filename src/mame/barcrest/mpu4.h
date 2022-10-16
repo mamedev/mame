@@ -531,6 +531,8 @@ protected:
 	int m_t1 = 0;
 	int m_t3l = 0;
 	int m_t3h = 0;
+	int m_serial_output = 0;
+
 	uint8_t m_numbanks = 0;
 
 	bool m_link7a_connected = false;
