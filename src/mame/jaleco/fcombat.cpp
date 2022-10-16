@@ -24,9 +24,10 @@ PCB Notes:
 
 From a working board.
 
+Label: FC8524
 CPU: Z80 (running at 3.332 MHz measured at pin 6)
 Sound: Z80 (running at 3.332 MHz measured at pin 6), YM2149 (x3)
-Other: Unmarked 24 pin near ROMs 2 & 3
+Other: Unmarked 24 pin near ROMs 2 & 3 (maybe same protection chip as dday?)
 
 RAM: 6116 (x3)
 
