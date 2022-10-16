@@ -2083,7 +2083,6 @@ void mpu4_state::mpu4_memmap(address_map &map)
 //  map(0x0800, 0x081f) // optional protection device lives here, see other maps
 	map(0x0850, 0x0850).rw(FUNC(mpu4_state::bankswitch_r), FUNC(mpu4_state::bankswitch_w));    /* write bank (rom page select) */
 	map(0x08e0, 0x08ef).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)); //Runs hoppers
-	map(0x08ed, 0x08ed).r(FUNC(mpu4_state::hack_duart_r)); // hack until the hopper is hooked up to the duart in games wanting that setup (eg m4ready)
 	map(0x0900, 0x0907).rw(m_6840ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));/* PTM6840 IC2 */
 	map(0x0a00, 0x0a03).rw(m_pia3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC3 */
 	map(0x0b00, 0x0b03).rw(m_pia4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC4 */
@@ -2238,16 +2237,20 @@ void mpu4_state::tr_ht(machine_config &config)
 void mpu4_state::tr_hda(machine_config &config)
 {
 	m_hopper_type = HOPPER_DUART_A;
+	m_hopper1->dispense_handler().set("duart68681", FUNC(mc68681_device::ip5_w));
 }
 
 void mpu4_state::tr_hdb(machine_config &config)
 {
 	m_hopper_type = HOPPER_DUART_B;
+	m_hopper1->dispense_handler().set("duart68681", FUNC(mc68681_device::ip5_w));
 }
 
 void mpu4_state::tr_hdc(machine_config &config)
 {
 	m_hopper_type = HOPPER_DUART_C;
+	m_hopper1->dispense_handler().set("duart68681", FUNC(mc68681_device::ip5_w));
+	m_hopper2->dispense_handler().set("duart68681", FUNC(mc68681_device::ip6_w));
 }
 
 void mpu4_state::tr_hna(machine_config &config)
