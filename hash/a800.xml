@@ -1534,14 +1534,11 @@ Game seldomly crashes (timer keeps running on death without respawning player), 
 		</part>
 	</software>
 
-	<software name="cvrnmars" supported="partial">
+	<software name="cvrnmars">
 		<description>Caverns of Mars</description>
 		<!-- Re-released in 1987 for the XEGS. -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
-		<notes><![CDATA[
-Glitchy title screen, sets [ANTIC] GFX mode 9
-]]></notes>
 		<info name="serial" value="RX8021" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -3552,7 +3549,6 @@ Outlaw: doesn't display any sprite
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Cavmarte.2: glitchy title screen, [ANTIC] GFX mode 9, same as cvrnmars
 Crystal Raider: hardlocks MAME
 Space Invaders: doesn't boot
 ]]></notes>
@@ -3570,7 +3566,6 @@ Space Invaders: doesn't boot
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
 Choplifter: black screen
-Cavmarte.1: glitchy title screen, [ANTIC] GFX mode 9, same as cvrnmars
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3604,7 +3599,6 @@ The Empire Strikes B.: doesn't boot
 		<notes><![CDATA[
 Space Inv: offset bullets when traversing bases layer
 River Raid: black screen
-Cavmarte.1: glitchy title screen, [ANTIC] GFX mode 9, same as cvrnmars
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3685,7 +3679,6 @@ Star Raiders: draws glitchy [GTIA] sprites
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
 Flak Arreglado: doesn't boot
-Cavmarte.2: glitchy title screen, [ANTIC] GFX mode 9, same as cvrnmars
 Keystone Kapers: doesn't boot with stuck note
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
