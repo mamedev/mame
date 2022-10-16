@@ -71,7 +71,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
@@ -84,9 +83,10 @@ private:
 
 	// video-related
 	tilemap_t *m_bgmap = nullptr;
-	u8 m_cocktail_flip = 0U;
-	u8 m_char_palette = 0U;
-	u8 m_char_bank = 0U;
+	u8 m_cocktail_flip = 0;
+	u8 m_char_palette = 0;
+	u8 m_char_bank = 0;
+	u8 m_sprite_bank = 0;
 
 	// misc
 	u8 m_fcombat_sh = 0;
@@ -234,18 +234,19 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 void fcombat_state::videoreg_w(u8 data)
 {
-	// bit 0 = flip screen and joystick input multiplexer
+	// bit 0: flip screen and joystick input multiplexer
 	m_cocktail_flip = data & 1;
 
-	// bits 1-2 char lookup table bank
+	// bits 1-2: char lookup table bank
 	m_char_palette = (data & 0x06) >> 1;
 
-	// bits 3 char bank
+	// bit 3: char bank
 	m_char_bank = (data & 0x08) >> 3;
 
-	// bits 4-5 unused
+	// bits 4-5: unused
 
-	// bits 6-7 ?
+	// bits 6-7: heli sprite block bank
+	m_sprite_bank = data >> 6 & 3;
 }
 
 
@@ -269,10 +270,19 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		int xflip = flags & 0x80;
 		int yflip = flags & 0x40;
 		const bool wide = flags & 0x08;
-		int code2 = code;
 
 		const int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (code >> 4 & 0x10);
 		gfx_element *gfx = m_gfxdecode->gfx(1);
+
+		if ((code & 0x108) == 0x108)
+		{
+			if (m_sprite_bank & 1)
+				code += 0x100;
+			if (m_sprite_bank & 2)
+				code ^= 0x08;
+		}
+
+		int code2 = code;
 
 		if (m_cocktail_flip)
 		{
@@ -550,21 +560,11 @@ void fcombat_state::machine_start()
 	save_item(NAME(m_cocktail_flip));
 	save_item(NAME(m_char_palette));
 	save_item(NAME(m_char_bank));
+	save_item(NAME(m_sprite_bank));
 	save_item(NAME(m_fcombat_sh));
 	save_item(NAME(m_fcombat_sv));
 	save_item(NAME(m_tx));
 	save_item(NAME(m_ty));
-}
-
-void fcombat_state::machine_reset()
-{
-	m_cocktail_flip = 0;
-	m_char_palette = 0;
-	m_char_bank = 0;
-	m_fcombat_sh = 0;
-	m_fcombat_sv = 0;
-	m_tx = 0;
-	m_ty = 0;
 }
 
 void fcombat_state::fcombat(machine_config &config)
