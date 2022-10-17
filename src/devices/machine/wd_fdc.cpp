@@ -1926,9 +1926,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 						0xbf84;
 
 					if(extended_ddam) {
-						if(cur_live.data_reg & 1)
+						if(!(cur_live.data_reg & 1))
 							status |= S_DDM;
-						if(cur_live.data_reg & 2)
+						if(!(cur_live.data_reg & 2))
 							status |= S_DDM << 1;
 					} else if((cur_live.data_reg & 0xfe) == 0xf8)
 						status |= S_DDM;
