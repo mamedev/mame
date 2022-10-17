@@ -35,9 +35,11 @@ jobs:
           - compiler: gcc
             cc: gcc
             cxx: g++
+            subtarget: mame
           - compiler: clang
             cc: clang
             cxx: clang++
+            subtarget: tiny
     steps:
     - uses: msys2/setup-msys2@v2
       with:
@@ -50,11 +52,12 @@ jobs:
         OVERRIDE_AR: "llvm-ar"
         OVERRIDE_CC: ${{ matrix.cc }}
         OVERRIDE_CXX: ${{ matrix.cxx }}
+        SUBTARGET: ${{ matrix.subtarget }}
         TOOLS: 1
       run: make -j2
     - name: Validate
-      run: ./mame -validate
+      run: ./mame* -validate
     - uses: actions/upload-artifact@master
       with:
         name: mame-windows-${{ matrix.compiler }}-${{ github.sha }}
-        path: mame.exe
+        path: mame*.exe
