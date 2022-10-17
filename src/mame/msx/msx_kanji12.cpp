@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(MSX_KANJI12, msx_kanji12_device, "msx_kanji12", "MSX Kanji12")
 
-msx_kanji12_device::msx_kanji12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_kanji12_device::msx_kanji12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_KANJI12, tag, owner, clock)
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_selected(false)
@@ -29,7 +29,7 @@ void msx_kanji12_device::device_start()
 }
 
 
-uint8_t msx_kanji12_device::switched_read(offs_t offset)
+u8 msx_kanji12_device::switched_read(offs_t offset)
 {
 	if (m_selected)
 	{
@@ -59,7 +59,7 @@ uint8_t msx_kanji12_device::switched_read(offs_t offset)
 }
 
 
-void msx_kanji12_device::switched_write(offs_t offset, uint8_t data)
+void msx_kanji12_device::switched_write(offs_t offset, u8 data)
 {
 	if (offset == 0)
 	{

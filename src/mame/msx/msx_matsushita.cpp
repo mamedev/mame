@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(MSX_MATSUSHITA, msx_matsushita_device, "msx_matsushita", "Matsushita switched device")
 
-msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_MATSUSHITA, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_io_config(*this, "CONFIG")
@@ -19,21 +19,18 @@ msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, cons
 {
 }
 
-
-static INPUT_PORTS_START( matsushita )
+static INPUT_PORTS_START(matsushita)
 	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x80, 0x00, "Firmware switch")
-	PORT_CONFSETTING( 0x00, "On" )
-	PORT_CONFSETTING( 0x80, "Off" )
+	PORT_CONFNAME(0x80, 0x00, "Firmware switch")
+	PORT_CONFSETTING(0x00, "On")
+	PORT_CONFSETTING(0x80, "Off")
 	PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-
 ioport_constructor msx_matsushita_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( matsushita );
+	return INPUT_PORTS_NAME(matsushita);
 }
-
 
 void msx_matsushita_device::device_start()
 {
@@ -49,12 +46,10 @@ void msx_matsushita_device::device_start()
 	save_item(NAME(m_pattern));
 }
 
-
 void msx_matsushita_device::nvram_default()
 {
-	memset(&m_sram[0], 0x00, m_sram.size());
+	std::fill_n(m_sram.data(), m_sram.size(), 0);
 }
-
 
 bool msx_matsushita_device::nvram_read(util::read_stream &file)
 {
@@ -62,15 +57,13 @@ bool msx_matsushita_device::nvram_read(util::read_stream &file)
 	return !file.read(&m_sram[0], m_sram.size(), actual) && actual == m_sram.size();
 }
 
-
 bool msx_matsushita_device::nvram_write(util::write_stream &file)
 {
 	size_t actual;
 	return !file.write(&m_sram[0], m_sram.size(), actual) && actual == m_sram.size();
 }
 
-
-uint8_t msx_matsushita_device::switched_read(offs_t offset)
+u8 msx_matsushita_device::switched_read(offs_t offset)
 {
 	if (m_selected)
 	{
@@ -84,7 +77,7 @@ uint8_t msx_matsushita_device::switched_read(offs_t offset)
 
 		case 0x03:
 		{
-			uint8_t result = (((m_pattern & 0x80) ? m_nibble1 : m_nibble2) << 4) | ((m_pattern & 0x40) ? m_nibble1 : m_nibble2);
+			u8 result = ((BIT(m_pattern, 7) ? m_nibble1 : m_nibble2) << 4) | (BIT(m_pattern, 6) ? m_nibble1 : m_nibble2);
 
 			if (!machine().side_effects_disabled())
 				m_pattern = (m_pattern << 2) | (m_pattern >> 6);
@@ -109,7 +102,7 @@ uint8_t msx_matsushita_device::switched_read(offs_t offset)
 }
 
 
-void msx_matsushita_device::switched_write(offs_t offset, uint8_t data)
+void msx_matsushita_device::switched_write(offs_t offset, u8 data)
 {
 	if (offset == 0)
 	{

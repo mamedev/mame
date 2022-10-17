@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(MSX_S1985, msx_s1985_device, "msx_s1985", "MSX-Engine S1985")
 
-msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_S1985, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_selected(false)
@@ -31,7 +31,7 @@ void msx_s1985_device::device_start()
 
 void msx_s1985_device::nvram_default()
 {
-	memset(m_backup_ram, 0xff, sizeof(m_backup_ram));
+	std::fill(std::begin(m_backup_ram), std::end(m_backup_ram), 0xff);
 }
 
 
@@ -49,7 +49,7 @@ bool msx_s1985_device::nvram_write(util::write_stream &file)
 }
 
 
-uint8_t msx_s1985_device::switched_read(offs_t offset)
+u8 msx_s1985_device::switched_read(offs_t offset)
 {
 	if (m_selected)
 	{
@@ -66,9 +66,9 @@ uint8_t msx_s1985_device::switched_read(offs_t offset)
 		case 7:
 		{
 			// Pattern and foreground/background color read
-			uint8_t data = (m_pattern & 0x80) ? m_color2 : m_color1;
+			u8 data = BIT(m_pattern, 7) ? m_color2 : m_color1;
 
-			if(!machine().side_effects_disabled())
+			if (!machine().side_effects_disabled())
 				m_pattern = (m_pattern << 1) | (m_pattern >> 7);
 
 			return data;
@@ -84,7 +84,7 @@ uint8_t msx_s1985_device::switched_read(offs_t offset)
 }
 
 
-void msx_s1985_device::switched_write(offs_t offset, uint8_t data)
+void msx_s1985_device::switched_write(offs_t offset, u8 data)
 {
 	if (offset == 0)
 	{

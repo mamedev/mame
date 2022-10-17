@@ -14,27 +14,27 @@ class msx_kanji12_device : public device_t,
 	public msx_switched_interface
 {
 public:
-	msx_kanji12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_kanji12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
 	void set_rom_start(const char *region) { m_rom_region.set_tag(region); }
 
 	// msx_switched_interface overrides
-	virtual uint8_t switched_read(offs_t offset) override;
-	virtual void switched_write(offs_t offset, uint8_t data) override;
+	virtual u8 switched_read(offs_t offset) override;
+	virtual void switched_write(offs_t offset, u8 data) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
-	static constexpr uint8_t MANUFACTURER_ID = 0xf7;
+	static constexpr u8 MANUFACTURER_ID = 0xf7;
 	required_memory_region m_rom_region;
 
 	bool m_selected;
-	uint8_t m_row;
-	uint8_t m_col;
-	uint32_t m_address;
+	u8 m_row;
+	u8 m_col;
+	u32 m_address;
 };
 
 #endif // MAME_MACHINE_MSX_KANJI12_H
