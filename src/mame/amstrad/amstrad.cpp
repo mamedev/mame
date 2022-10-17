@@ -111,6 +111,7 @@ Some bugs left :
 #include "machine/ram.h"
 #include "softlist.h"
 #include "speaker.h"
+#include "utf8.h"
 
 #define MANUFACTURER_NAME 0x07
 #define TV_REFRESH_RATE 0x10

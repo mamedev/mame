@@ -1104,5 +1104,5 @@ void airrace_state::machine_reset()
  *
  *************************************/
 
-GAME( 1984, laststar, 0, atarisy4, atarisy4, atarisy4_state, init_laststar, ROT0, "Atari Games", "The Last Starfighter (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )
-GAME( 1985, airrace,  0, airrace,  atarisy4, airrace_state,  init_airrace,  ROT0, "Atari Games", "Air Race (prototype)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )
+GAME( 1984, laststar, 0, atarisy4, atarisy4, atarisy4_state, init_laststar, ROT0, "Atari Games", "The Last Starfighter (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )
+GAME( 1985, airrace,  0, airrace,  atarisy4, airrace_state,  init_airrace,  ROT0, "Atari Games", "Air Race (prototype)",             MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )

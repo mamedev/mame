@@ -199,7 +199,7 @@ cd32: cursor is uncontrollable, [joytest] reset counter
 
 	<software name="lngranch" supported="no">
 		<!-- https://hol.abime.net/5792 -->
-		<description>A Long, Hard Day at the Ranch (Eng, Spa)</description>
+		<description>A Long, Hard Day at the Ranch (UK, Spain)</description>
 		<year>1991</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<notes><![CDATA[
@@ -794,7 +794,7 @@ cd32: Extreme Violence has GFX scrolling corruption when gameplay screen isn't v
 	</software>
 
 	<software name="deukomp1" supported="no">
-		<description>Deutschland Kompakt (Ger)</description>
+		<description>Deutschland Kompakt (Germany)</description>
 		<year>1991</year>
 		<!-- MSPI -->
 		<publisher>M&amp;T Software Partner International</publisher>
@@ -850,7 +850,7 @@ cd32: boot OK
 	<software name="dunep" supported="no">
 		<!-- No mention neither on HoL nor Lemon Amiga -->
 		<!-- Is it truly a prototype? -->
-		<description>Dune (Prototype?)</description>
+		<description>Dune (prototype?)</description>
 		<year>1992</year>
 		<publisher>Virgin Multimedia</publisher>
 		<notes><![CDATA[
@@ -997,7 +997,7 @@ cd32: has serious GFX pitch corruption when booted, [Copper] or [Blitter]
 
 	<!-- Gamers' Delight -->
 	<software name="gamerdel" supported="no">
-		<description>Gamers' Delight (Eng, Ger)</description>
+		<description>Gamers' Delight (UK, Germany)</description>
 		<year>1994</year>
 		<publisher>GTI - Schatztruhe</publisher>
 		<notes><![CDATA[
@@ -1246,7 +1246,7 @@ cd32: inputs doesn't work, should require digit presses on a CDTV input device
 
 	<!-- Language TV - English -->
 	<software name="langtv" supported="no">
-		<description>Language TV - English (Fra)</description>
+		<description>Language TV - English (France)</description>
 		<year>1991</year>
 		<publisher>Jériko</publisher>
 		<notes><![CDATA[
@@ -1582,7 +1582,7 @@ cd32: disc 2 throws an AMOS software failure #8000000A at boot
 	</software>
 
 	<software name="raffles" supported="no">
-		<description>Raffles (Swe)</description>
+		<description>Raffles (Sweden)</description>
 		<year>1991</year>
 		<publisher>Edge</publisher>
 		<notes><![CDATA[
@@ -1736,7 +1736,7 @@ cd32: boot OK
 	</software>
 
 	<software name="snoopy" supported="no">
-		<description>Snoopy - The Case of the Missing Blanket (Swe)</description>
+		<description>Snoopy - The Case of the Missing Blanket (Sweden)</description>
 		<year>1991</year>
 		<publisher>Edge</publisher>
 		<notes><![CDATA[
@@ -1944,7 +1944,7 @@ cd32: boot OK, glitchy scroll up/down when artwork description is called when ch
 
 	<!-- Curse of RA, The -->
 	<software name="cursera" supported="no">
-		<description>The Curse of Ra (Ger)</description>
+		<description>The Curse of Ra (Germany)</description>
 		<year>1992</year>
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
@@ -2363,7 +2363,7 @@ cd32: black screen with unmapped accesses (reads DSKDAT R too)
 
 	<!-- Turrican -->
 	<software name="turricana" cloneof="turrican" supported="no">
-		<description>Turrican (Ger, alt)</description>
+		<description>Turrican (Germany, alt)</description>
 		<year>1992</year>
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
@@ -2400,7 +2400,7 @@ cd32: black screen with unmapped accesses (reads DSKDAT R too)
 
 	<!-- Turrican 2 CDTV -->
 	<software name="turricn2a" cloneof="turricn2" supported="no">
-		<description>Turrican II: The Final Fight (Ger, alt)</description>
+		<description>Turrican II: The Final Fight (Germany, alt)</description>
 		<year>1991</year>
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
@@ -2474,7 +2474,7 @@ cd32: black screen with BGM playing
 
 	<software name="willbdg1" supported="no">
 		<!-- https://hol.abime.net/5801 -->
-		<description>Will Bridge 1 - Introduction to Bidding (Eng)</description>
+		<description>Will Bridge 1 - Introduction to Bidding (UK)</description>
 		<year>1991</year>
 		<publisher>Will Bridge</publisher>
 		<notes><![CDATA[
@@ -2489,7 +2489,7 @@ cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical
 	</software>
 
 	<software name="willbdg1f" cloneof="willbdg1" supported="no">
-		<description>Will Bridge 1 - Initiation aux Encheres (Fra)</description>
+		<description>Will Bridge 1 - Initiation aux Encheres (France)</description>
 		<year>1991</year>
 		<publisher>Will Bridge</publisher>
 		<notes><![CDATA[
@@ -2508,7 +2508,7 @@ cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical
 
 	<software name="willbdg2" supported="no">
 		<!-- https://hol.abime.net/4346 -->
-		<description>Will Bridge 2 - Intermediate (Eng)</description>
+		<description>Will Bridge 2 - Intermediate (UK)</description>
 		<year>1991</year>
 		<publisher>Will Bridge</publisher>
 		<notes><![CDATA[
@@ -2525,7 +2525,7 @@ cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical
 	<!-- <software name="willbdg3f" cloneof="willbdg3" supported="no"> -->
 	<software name="willbdg3f" supported="no">
 		<!-- https://hol.abime.net/5803 -->
-		<description>Will Bridge 3 - Standard (Fra)</description>
+		<description>Will Bridge 3 - Standard (France)</description>
 		<year>1991</year>
 		<publisher>Will Bridge</publisher>
 		<notes><![CDATA[
@@ -2541,7 +2541,7 @@ cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical
 
 	<software name="willbdg4" supported="no">
 		<!-- https://hol.abime.net/1716 -->
-		<description>Will Bridge 4 - Competition (Eng)</description>
+		<description>Will Bridge 4 - Competition (UK)</description>
 		<year>1991</year>
 		<publisher>Will Bridge</publisher>
 		<notes><![CDATA[
@@ -2559,7 +2559,7 @@ cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical
 	<software name="willbdg5f" supported="no">
 		<!-- https://hol.abime.net/4346 -->
 		<!-- "Advanced Competition" -->
-		<description>Will Bridge 5 - Haute Competition (Fra)</description>
+		<description>Will Bridge 5 - Haute Competition (France)</description>
 		<year>1991</year>
 		<publisher>Will Bridge</publisher>
 		<notes><![CDATA[
@@ -2630,13 +2630,14 @@ cd32: hangs at ReadySoft logo
 	<!-- Xenon2Megablast -->
 	<software name="xenon2" supported="no">
 		<!-- Also has "wnazennjn" language option, which is a pseudo-Polish joke -->
-		<description>Xenon 2 - Megablast (Eng, Fra, Ger, Ita)</description>
+		<description>Xenon 2 - Megablast (Euro)</description>
 		<year>1992</year>
 		<publisher>Image Works</publisher>
 		<notes><![CDATA[
 cd32: boot OK
 ]]></notes>
 		<info name="developer" value="The Assembly Line"/>
+		<info name="language" value="English/French/German/Italian" />
 		<info name="sku" value="CDT-3523"/>
 		<info name="disc_matrix" value="EXNON 2 CDTV (V) : MASTERED BY NIMBUS"/>
 		<!-- Barcode Sticker: Xenon II CDTV CD1X-XEN7 5 020026 900998 -->

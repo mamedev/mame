@@ -117,7 +117,12 @@ Notes:
 
 TODO:
 -----
-- third CPU
+- Third CPU. According to schematics, it's a doorway for the sprite RAM. The
+  main cpu actually doesn't have full access to sprite RAM. But instead, 0x9800
+  to 0x9fff is a latch to the 3rd cpu. CPU3 reads 0x200 bytes from maincpu, and
+  then passes it through (unmodified) presumedly to the sprite chip. It looks
+  very much like hardware protection. And it's easy to circumvent in MAME by
+  pretending the maincpu directly writes to sprite RAM.
 - docastle schematics say that maincpu(and cpu3) interrupt comes from the 6845
   CURSOR pin. The cursor is configured at scanline 0, and causes the games to
   update the next video frame during active display. What is the culprit here?
@@ -151,6 +156,14 @@ TODO:
 - bad communication in idsoccer
 - adpcm status in idsoccer
 - real values for the adpcm interface in idsoccer
+- bad adpcm sound in attract mode for idsoccer clones (once you get them to boot up)
+- idsoccer clones lock up MAME after writing junk to CRTC. Workaround:
+  idsoccera/idsoccert: maincpu bp 1120 -> pc=1123 -> run
+  asoccer: maincpu bp 1120 -> pc=1135 -> run
+  Or simply ROM_FILL(0x247, 1, 0x23 or 0x35 instead of 0x20) on the slave cpu (not
+  guaranteed that a permanent ROM hack like this won't break anything).
+  This 0x1120 is a return address written to the stack after communicating with
+  the slave CPU. Maybe protection. See MT05419.
 
 
 2008-08
@@ -250,9 +263,8 @@ void docastle_state::docastle_map3(address_map &map)
 {
 	map(0x0000, 0x00ff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0x8008).r(FUNC(docastle_state::docastle_shared1_r));    // ???
-	map(0xc003, 0xc003).noprw(); // EP according to schematics
-	map(0xc432, 0xc435).noprw(); // ???
+	map(0x8000, 0x8000).nopr(); // latch from maincpu
+	map(0xc000, 0xc7ff).noprw(); // sprite chip?
 }
 
 void docastle_state::docastle_io_map(address_map &map)

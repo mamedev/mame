@@ -31,6 +31,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+#include "utf8.h"
 
 #define I8080_TAG   "ua2"
 #define TMS5501_TAG "ud2"

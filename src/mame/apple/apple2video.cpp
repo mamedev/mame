@@ -2,7 +2,8 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-  video/apple2.cpp
+	apple2video.cpp
+	Apple II series video emulation
 
 ***************************************************************************/
 
@@ -14,7 +15,6 @@
 #include "screen.h"
 
 /***************************************************************************/
-
 
 #define BLACK   0
 #define DKRED   1
@@ -741,7 +741,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				/* calculate address */
 				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
 
-				plot_text_character<true, invert, flip>(bitmap, col * 14, row, 1, aux_page[address],
+				plot_text_character<true, invert, flip>(bitmap, col * 14, row, 1, aux_page[address & m_aux_mask],
 									fg, bg);
 				plot_text_character<true, invert, flip>(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address],
 									fg, bg);
@@ -1343,7 +1343,7 @@ void a2_video_device::init_palette()
 		set_pen_color(i, apple2_palette[i]);
 }
 
-uint32_t a2_video_device::palette_entries() const
+uint32_t a2_video_device::palette_entries() const noexcept
 {
 	return std::size(apple2_palette);
 }

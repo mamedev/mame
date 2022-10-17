@@ -22,7 +22,7 @@
 
 // ======================> ef9364_device
 
-class ef9364_device :   public device_t,
+class ef9364_device : public device_t,
 						public device_memory_interface,
 						public device_video_interface
 {
@@ -53,6 +53,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void char_latch_w(uint8_t data);
 	void command_w(uint8_t cmd);
+
+	uint8_t videoram_r(offs_t offset) { return m_textram->read_byte(offset); }
+	void videoram_w(offs_t offset, uint8_t data) { m_textram->write_byte(offset, data); }
 
 protected:
 	// device-level overrides
@@ -94,7 +97,6 @@ private:
 	int   cursor_state;
 
 	uint32_t clock_freq;
-	bitmap_rgb32 m_screen_out;
 
 	required_device<palette_device> m_palette;
 };

@@ -261,6 +261,11 @@ void spi_sdcard_device::do_command()
 			send_data(5, SD_STATE_IDLE);
 			break;
 
+		case 9: // CMD9 - SEND_CSD
+			m_data[0] = 0x00; // TODO
+			send_data(1, SD_STATE_STBY);
+			break;
+
 		case 10: // CMD10 - SEND_CID
 			m_data[0] = 0x00; // initial R1 response
 			m_data[1] = 0xff; // throwaway byte before data transfer
@@ -295,6 +300,11 @@ void spi_sdcard_device::do_command()
 		case 12: // CMD12 - STOP_TRANSMISSION
 			m_data[0] = 0;
 			send_data(1, m_state == SD_STATE_RCV ? SD_STATE_PRG : SD_STATE_TRAN);
+			break;
+
+		case 13: // CMD13 - SEND_STATUS
+			m_data[0] = 0; // TODO
+			send_data(1, SD_STATE_STBY);
 			break;
 
 		case 16: // CMD16 - SET_BLOCKLEN
@@ -404,6 +414,12 @@ void spi_sdcard_device::do_command()
 			m_data[3] = 0;
 			m_data[4] = 0;
 			send_data(5, SD_STATE_DATA);
+			break;
+
+		case 59: // CMD59 - CRC_ON_OFF
+			m_data[0] = 0;
+			// TODO CRC 1-on, 0-off
+			send_data(1, SD_STATE_STBY);
 			break;
 
 		default:

@@ -483,7 +483,7 @@ impl::impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<
 	, m_starting_sector(starting_sector)
 	, m_sector_count(sector_count)
 	, m_reserved_sector_count(reserved_sector_count)
-	, m_bytes_per_sector(boot_sector_block.r16l(11))
+	, m_bytes_per_sector(m_boot_sector_block.r16l(11))
 	, m_bits_per_fat_entry(bits_per_fat_entry)
 {
 }
@@ -804,16 +804,12 @@ const char *fs::pc_fat_image::description() const
 //  pc_fat_image::enumerate_f
 //-------------------------------------------------
 
-void pc_fat_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void pc_fat_image::enumerate_f(floppy_enumerator &fe) const
 {
-	if (has(form_factor, variants, floppy_image::FF_35, floppy_image::DSSD))
-		fe.add(FLOPPY_PC_FORMAT, 368640, "pc_fat_dssd", "PC FAT 3.5\" dual-sided single density");
-	if (has(form_factor, variants, floppy_image::FF_35, floppy_image::DSDD))
-		fe.add(FLOPPY_PC_FORMAT, 737280, "pc_fat_dsdd", "PC FAT 3.5\" dual-sided double density");
-	if (has(form_factor, variants, floppy_image::FF_35, floppy_image::DSHD))
-		fe.add(FLOPPY_PC_FORMAT, 1474560, "pc_fat_dshd", "PC FAT 3.5\" dual-sided high density");
-	if (has(form_factor, variants, floppy_image::FF_35, floppy_image::DSED))
-		fe.add(FLOPPY_PC_FORMAT, 2949120, "pc_fat_dsed", "PC FAT 3.5\" dual-sided extra density");
+	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_35, floppy_image::DSSD, 368640, "pc_fat_dssd", "PC FAT 3.5\" dual-sided single density");
+	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_35, floppy_image::DSDD, 737280, "pc_fat_dsdd", "PC FAT 3.5\" dual-sided double density");
+	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_35, floppy_image::DSHD, 1474560, "pc_fat_dshd", "PC FAT 3.5\" dual-sided high density");
+	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_35, floppy_image::DSED, 2949120, "pc_fat_dsed", "PC FAT 3.5\" dual-sided extra density");
 }
 
 

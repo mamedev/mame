@@ -821,8 +821,6 @@ void psychic5_state::bombsa(machine_config &config)
 
 ***************************************************************************/
 
-
-
 ROM_START( psychic5j )
 	ROM_REGION( 0x20000, "maincpu", 0 )                     /* Main CPU */
 	ROM_LOAD( "p5d",          0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )

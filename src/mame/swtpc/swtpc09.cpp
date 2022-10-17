@@ -665,7 +665,10 @@ void swtpc09_state::swtpc09o(machine_config &config)
 /* ROM definition */
 ROM_START( swtpc09 )
 	ROM_REGION( 0x100000, "bankdev", 0 )
-	ROM_LOAD ( "sbugh1-8.bin", 0xff800, 0x0800, CRC(10a045a7) SHA1(de547b77653951c7424a069520d52c5b0432e98d) )
+	ROM_SYSTEM_BIOS(0, "sbug19", "S-BUG 1.9")
+	ROMX_LOAD("sbugh1-9.bin", 0xff800, 0x0800, CRC(4a23c2d0) SHA1(da52ce76ac8b848d6c9580bd5ada4864eeb21e58), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "sbug18", "S-BUG 1.8")
+	ROMX_LOAD("sbugh1-8.bin", 0xff800, 0x0800, CRC(10a045a7) SHA1(de547b77653951c7424a069520d52c5b0432e98d), ROM_BIOS(1))
 ROM_END
 
 ROM_START( swtpc09i )

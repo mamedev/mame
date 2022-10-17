@@ -492,13 +492,6 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 	{
 		m_egret->set_via_data(state & 1);
 	}
-	else
-	{
-		if (m_macadb)
-		{
-			m_macadb->adb_data_w(state);
-		}
-	}
 }
 
 /* *************************************************************************
@@ -577,8 +570,6 @@ uint8_t mac_state::mac_via_in_b()
 
 	if (ADB_IS_BITBANG_CLASS)
 	{
-		val |= m_macadb->get_adb_state()<<4;
-
 		if (!m_adb_irq_pending)
 		{
 			val |= 0x08;
@@ -602,8 +593,6 @@ uint8_t mac_state::mac_via_in_b_ii()
 
 	if (ADB_IS_BITBANG_CLASS)
 	{
-		val |= m_macadb->get_adb_state()<<4;
-
 		if (!m_adb_irq_pending)
 		{
 			val |= 0x08;
@@ -655,7 +644,7 @@ void mac_state::mac_via_out_b_bbadb(uint8_t data)
 		}
 	}
 
-	m_macadb->mac_adb_newaction((data & 0x30) >> 4);
+	m_adbmodem->set_via_state((data & 0x30) >> 4);
 
 	m_rtc->ce_w((data & 0x04)>>2);
 	m_rtc->data_w(data & 0x01);

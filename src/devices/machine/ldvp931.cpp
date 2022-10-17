@@ -134,7 +134,7 @@ uint8_t philips_22vp931_device::data_r()
 	}
 
 	// also boost interleave for 4 scanlines to ensure proper communications
-	machine().scheduler().boost_interleave(attotime::zero, screen().scan_period() * 4);
+	machine().scheduler().perfect_quantum(screen().scan_period() * 4);
 	return m_tocontroller;
 }
 
@@ -528,7 +528,7 @@ void philips_22vp931_device::i8049_to_controller_w(uint8_t data)
 		m_data_ready(*this, true);
 
 	// also boost interleave for 4 scanlines to ensure proper communications
-	machine().scheduler().boost_interleave(attotime::zero, screen().scan_period() * 4);
+	machine().scheduler().perfect_quantum(screen().scan_period() * 4);
 }
 
 

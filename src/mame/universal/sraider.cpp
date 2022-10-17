@@ -59,7 +59,6 @@ protected:
 	u8 rnd_r();
 	virtual void io_w(u8 data);
 	void mrsdyna_palette(palette_device &palette) const;
-	DECLARE_WRITE_LINE_MEMBER(update_stars);
 
 	virtual void machine_start() override;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -95,7 +94,6 @@ public:
 protected:
 	virtual void io_w(u8 data) override;
 	void sraider_palette(palette_device &palette) const;
-	DECLARE_WRITE_LINE_MEMBER(update_stars);
 	TILE_GET_INFO_MEMBER(get_grid_tile_info);
 
 	tilemap_t *m_grid_tilemap = nullptr;
@@ -238,12 +236,6 @@ void sraider_state::video_start()
 	m_grid_tilemap->set_transparent_pen(0);
 }
 
-WRITE_LINE_MEMBER(sraider_state::update_stars)
-{
-	if (!state)
-		m_stars->update_state();
-}
-
 u32 mrsdyna_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// clear the bg bitmap
@@ -310,20 +302,14 @@ u32 sraider_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void mrsdyna_state::io_w(u8 data)
 {
-	// bit7 = flip
-	// bit6 = grid red
-	// bit5 = grid green
-	// bit4 = grid blue
+	// bit012 = stars speed/dir (not used for mrsdyna)
 	// bit3 = enable stars (not used for mrsdyna)
-	// bit210 = stars speed/dir (not used for mrsdyna)
-
-	if (flip_screen() != (data & 0x80))
-	{
-		flip_screen_set(data & 0x80);
-		machine().tilemap().mark_all_dirty();
-	}
-
+	// bit4 = grid blue
+	// bit5 = grid green
+	// bit6 = grid red
+	// bit7 = flip
 	m_grid_color = data & 0x70;
+	flip_screen_set(data & 0x80);
 }
 
 void sraider_state::io_w(u8 data)
@@ -678,7 +664,7 @@ void sraider_state::sraider(machine_config &config)
 	PALETTE(config.replace(), m_palette, FUNC(sraider_state::sraider_palette), 4*8 + 4*16 + 32 + 2, 32 + 32 + 1);
 
 	ZEROHOUR_STARS(config, m_stars).has_va_bit(false);
-	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(sraider_state::update_stars));
+	subdevice<screen_device>("screen")->screen_vblank().set(m_stars, FUNC(zerohour_stars_device::update_state));
 }
 
 

@@ -8,7 +8,7 @@
 #include "vme.h"
 
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/68153bim.h"
 #include "machine/68230pit.h"
 #include "machine/68561mpcc.h"

@@ -2,9 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mamedasm.c
-
-    Generic MAME disassembler.
+    Universal disassembler.
 
 ****************************************************************************/
 
@@ -123,6 +121,7 @@ using util::BIT;
 #include "cpu/msm65x2/msm65x2d.h"
 #include "cpu/nanoprocessor/nanoprocessor_dasm.h"
 #include "cpu/nec/necdasm.h"
+#include "cpu/nios2/nios2dasm.h"
 #include "cpu/ns32000/ns32000dasm.h"
 #include "cpu/nuon/nuondasm.h"
 #include "cpu/pace/pacedasm.h"
@@ -389,7 +388,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "arc",             be,  0, []() -> util::disasm_interface * { return new arc_disassembler; } },
 	{ "arcompact",       le,  0, []() -> util::disasm_interface * { return new arcompact_disassembler; } },
 	{ "arm",             le,  0, []() -> util::disasm_interface * { return new arm_disassembler; } },
-	{ "arm_be",          be,  0, []() -> util::disasm_interface * { return new arm_disassembler; } },
 	{ "arm7",            le,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = false; return new arm7_disassembler(&arm7_unidasm); } },
 	{ "arm7_be",         be,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = false; return new arm7_disassembler(&arm7_unidasm); } },
 	{ "arm7thumb",       le,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = true; return new arm7_disassembler(&arm7_unidasm); } },
@@ -435,6 +433,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "f2mc16",          le,  0, []() -> util::disasm_interface * { return new f2mc16_disassembler; } },
 	{ "f8",              be,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
 	{ "fr",              be,  0, []() -> util::disasm_interface * { return new fr_disassembler; } },
+	{ "fscpu32",         be,  0, []() -> util::disasm_interface * { return new m68k_disassembler(m68k_disassembler::TYPE_CPU32); } },
 	{ "g65816",          le,  0, []() -> util::disasm_interface * { return new g65816_disassembler(&g65816_unidasm); } },
 	{ "gigatron",        be, -1, []() -> util::disasm_interface * { return new gigatron_disassembler; } },
 	{ "gt913",           be,  0, []() -> util::disasm_interface * { return new gt913_disassembler; } },
@@ -509,7 +508,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "m6805",           be,  0, []() -> util::disasm_interface * { return new m6805_disassembler; } },
 	{ "m6808",           be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(6808); } },
 	{ "m6809",           be,  0, []() -> util::disasm_interface * { return new m6809_disassembler; } },
-	{ "m68340",          be,  0, []() -> util::disasm_interface * { return new m68k_disassembler(m68k_disassembler::TYPE_68340); } },
 	{ "m68hc05",         be,  0, []() -> util::disasm_interface * { return new m68hc05_disassembler; } },
 	{ "m740",            le,  0, []() -> util::disasm_interface * { return new m740_disassembler(&m740_unidasm); } },
 	{ "mb86233",         le, -2, []() -> util::disasm_interface * { return new mb86233_disassembler; } },
@@ -536,6 +534,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "msm65x2",         le,  0, []() -> util::disasm_interface * { return new msm65x2_disassembler; } },
 	{ "nanoprocessor",   le,  0, []() -> util::disasm_interface * { return new hp_nanoprocessor_disassembler; } },
 	{ "nec",             le,  0, []() -> util::disasm_interface * { return new nec_disassembler(&nec_unidasm); } },
+	{ "nios2",           le,  0, []() -> util::disasm_interface * { return new nios2_disassembler; } },
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
 	{ "nuon",            be,  0, []() -> util::disasm_interface * { return new nuon_disassembler; } },
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },
@@ -1479,7 +1478,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	if(is_octal) {
 		switch(granularity) {
 		case 1:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1493,7 +1492,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 2:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1507,7 +1506,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 4:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1521,7 +1520,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 8:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1537,7 +1536,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	} else {
 		switch(granularity) {
 		case 1:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1551,7 +1550,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 2:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1565,7 +1564,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 4:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1579,7 +1578,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 8:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)

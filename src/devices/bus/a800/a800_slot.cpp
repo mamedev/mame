@@ -102,11 +102,12 @@ void device_a800_cart_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 //  ****_cart_slot_device - constructor
 //-------------------------------------------------
-a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_cartrom_image_interface(mconfig, *this),
-	device_single_card_slot_interface<device_a800_cart_interface>(mconfig, *this),
-	m_cart(nullptr), m_type(0)
+a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_cartrom_image_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_a800_cart_interface>(mconfig, *this)
+	, m_cart(nullptr)
+	, m_type(0)
 {
 }
 
@@ -153,8 +154,6 @@ void a800_cart_slot_device::device_start()
 	m_cart = get_card_device();
 }
 
-
-
 /*-------------------------------------------------
  call load
  -------------------------------------------------*/
@@ -191,6 +190,7 @@ static const a800_slot slot_list[] =
 	{ A800_TELELINK2, "a800_tlink2" },
 	{ A800_MICROCALC, "a800_sitsa" },
 	{ A800_CORINA,    "a800_corina" },
+	{ A800_CORINA_SRAM, "a800_corina_sram" },
 	{ A800_8K_RIGHT,  "a800_8k_right" },
 	{ A5200_4K,       "a5200" },
 	{ A5200_8K,       "a5200" },
@@ -276,6 +276,12 @@ image_init_result a800_cart_slot_device::call_load()
 		}
 		if (m_type == A800_TELELINK2)
 			m_cart->nvram_alloc(0x100);
+		if (m_type == A800_CORINA || m_type == A800_CORINA_SRAM)
+			m_cart->nvram_alloc(0x2000);
+		if (m_type == A800_CORINA)
+			m_cart->ram_alloc(0x4000);
+		if (m_type == A800_CORINA_SRAM)
+			m_cart->ram_alloc(0x80000);
 
 		logerror("%s loaded cartridge '%s' size %dK\n", machine().system().name, filename(), len/1024);
 	}

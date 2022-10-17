@@ -250,7 +250,7 @@ void software_list_device::display_matches(const machine_config &config, const c
 //  from an intermediate point
 //-------------------------------------------------
 
-const software_info *software_list_device::find(const std::string &look_for)
+const software_info *software_list_device::find(std::string_view look_for)
 {
 	// empty search returns nothing
 	if (look_for.empty())
@@ -265,8 +265,8 @@ const software_info *software_list_device::find(const std::string &look_for)
 			info_list.end(),
 			[&look_for, iswild] (const software_info &info)
 			{
-				const char *shortname = info.shortname().c_str();
-				return (iswild && core_strwildcmp(look_for.c_str(), shortname) == 0)
+				std::string_view shortname = info.shortname();
+				return (iswild && core_strwildcmp(look_for, shortname) == 0)
 						|| util::streqlower(look_for, shortname);
 			});
 

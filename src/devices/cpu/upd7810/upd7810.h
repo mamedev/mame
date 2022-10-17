@@ -86,7 +86,8 @@ public:
 protected:
 	void upd_internal_128_ram_map(address_map &map);
 	void upd_internal_256_ram_map(address_map &map);
-	void upd_internal_4096_rom_map(address_map &map);
+	void upd_internal_4096_rom_128_ram_map(address_map &map);
+	void upd_internal_4096_rom_256_ram_map(address_map &map);
 
 	// flags
 	enum
@@ -161,6 +162,7 @@ protected:
 	void upd7810_handle_timer0(int cycles, int clkdiv);
 	void upd7810_handle_timer1(int cycles, int clkdiv);
 
+	void upd7810_to_output_change(int state);
 	void upd7810_co0_output_change();
 	void upd7810_co1_output_change();
 
@@ -1333,14 +1335,6 @@ protected:
 	void STAX_H_xx();
 	void JR();
 	void CALT_7801();
-	void DCR_A_7801();
-	void DCR_B_7801();
-	void DCR_C_7801();
-	void DCRW_wa_7801();
-	void INR_A_7801();
-	void INR_B_7801();
-	void INR_C_7801();
-	void INRW_wa_7801();
 	void IN();
 	void OUT();
 	void MOV_A_S();
@@ -1406,7 +1400,7 @@ public:
 	upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

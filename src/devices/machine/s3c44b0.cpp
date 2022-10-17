@@ -914,12 +914,6 @@ void s3c44b0_device::check_pending_irq()
 	temp = (m_irq.regs.intpnd & ~m_irq.regs.intmsk) & m_irq.regs.intmod;
 	if (temp != 0)
 	{
-		uint32_t int_type = 0;
-		while ((temp & 1) == 0)
-		{
-			int_type++;
-			temp = temp >> 1;
-		}
 		if (m_irq.line_fiq != ASSERT_LINE)
 		{
 			m_cpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
@@ -945,17 +939,8 @@ void s3c44b0_device::request_irq(uint32_t int_type)
 
 void s3c44b0_device::check_pending_eint()
 {
-	uint32_t temp = m_gpio.regs.extintpnd;
-	if (temp != 0)
-	{
-		uint32_t int_type = 0;
-		while ((temp & 1) == 0)
-		{
-			int_type++;
-			temp = temp >> 1;
-		}
+	if (m_gpio.regs.extintpnd != 0)
 		request_irq(S3C44B0_INT_EINT4_7);
-	}
 }
 
 void s3c44b0_device::request_eint(uint32_t number)

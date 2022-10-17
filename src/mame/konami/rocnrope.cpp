@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Chris Hardy
+// copyright-holders: Chris Hardy
+
 /***************************************************************************
 
     Roc'n Rope (c) 1983 Konami
@@ -9,17 +10,197 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "rocnrope.h"
+
+#include "konami1.h"
 #include "konamipt.h"
 #include "timeplt_a.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"
-#include "konami1.h"
 #include "machine/watchdog.h"
+#include "video/resnet.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
+
+class rocnrope_state : public driver_device
+{
+public:
+	rocnrope_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_spriteram(*this, "spriteram_%u", 0U),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_vectors(*this, "vectors")
+	{ }
+
+	void rocnrope(machine_config &config);
+
+	void init_rocnrope();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	// memory pointers
+	required_shared_ptr_array<uint8_t,2 > m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_vectors;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_irq_mask = 0;
+
+	void interrupt_vector_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Roc'n Rope has one 32x8 palette PROM and two 256x4 lookup table PROMs
+  (one for characters, one for sprites).
+  The palette PROM is connected to the RGB output this way:
+
+  bit 7 -- 220 ohm resistor  -- BLUE
+        -- 470 ohm resistor  -- BLUE
+        -- 220 ohm resistor  -- GREEN
+        -- 470 ohm resistor  -- GREEN
+        -- 1  kohm resistor  -- GREEN
+        -- 220 ohm resistor  -- RED
+        -- 470 ohm resistor  -- RED
+  bit 0 -- 1  kohm resistor  -- RED
+
+***************************************************************************/
+
+void rocnrope_state::palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
+	compute_resistor_weights(0, 255, -1.0,
+			3, &resistances_rg[0], rweights, 1000, 0,
+			3, &resistances_rg[0], gweights, 1000, 0,
+			2, &resistances_b[0],  bweights, 1000, 0);
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(bweights, bit0, bit1);
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// color_prom now points to the beginning of the lookup table
+	color_prom += 0x20;
+
+	// sprites and characters
+	for (int i = 0; i < 0x200; i++)
+	{
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
+		palette.set_pen_indirect(i, ctabentry);
+	}
+}
+
+void rocnrope_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void rocnrope_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(rocnrope_state::get_bg_tile_info)
+{
+	int const attr = m_colorram[tile_index];
+	int const code = m_videoram[tile_index] + 2 * (attr & 0x80);
+	int const color = attr & 0x0f;
+	int const flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
+
+	tileinfo.set(1, code, color, flags);
+}
+
+void rocnrope_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rocnrope_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+void rocnrope_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram[0].bytes() - 2; offs >= 0; offs -= 2)
+	{
+		int const color = m_spriteram[1][offs] & 0x0f;
+
+		m_gfxdecode->gfx(0)->transmask(bitmap, cliprect,
+				m_spriteram[0][offs + 1],
+				color,
+				m_spriteram[1][offs] & 0x40, ~m_spriteram[1][offs] & 0x80,
+				240 - m_spriteram[0][offs], m_spriteram[1][offs + 1],
+				m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0));
+	}
+}
+
+uint32_t rocnrope_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+
+// machine
 
 void rocnrope_state::machine_start()
 {
@@ -191,8 +372,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_rocnrope )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, charlayout,   16*16, 16 )
 GFXDECODE_END
 
 
@@ -216,7 +397,7 @@ void rocnrope_state::rocnrope(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rocnrope_state::main_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // B2
-	mainlatch.q_out_cb<0>().set(FUNC(rocnrope_state::flip_screen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(rocnrope_state::flip_screen_set)).invert();
 	mainlatch.q_out_cb<1>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w));
 	mainlatch.q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w));
 	mainlatch.q_out_cb<3>().set(FUNC(rocnrope_state::coin_counter_w<0>));
@@ -267,13 +448,13 @@ ROM_START( rocnrope )
 	ROM_LOAD( "rnr_7a.snd",   0x0000, 0x1000, CRC(75d2c4e2) SHA1(b701019b4e7b06b268be660ce7958b5367318c27) )
 	ROM_LOAD( "rnr_8a.snd",   0x1000, 0x1000, CRC(ca4325ae) SHA1(34ac035c0c2ed6bcafde1491d976bb9e9d2a2a7d) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_REGION( 0x8000, "sprites", 0 )
 	ROM_LOAD( "rnr_a11.vid",  0x0000, 0x2000, CRC(afdaba5e) SHA1(27c090cb1c3767c997daeedbe1ba24786f9e78f1) )
 	ROM_LOAD( "rnr_a12.vid",  0x2000, 0x2000, CRC(054cafeb) SHA1(4c3cd850b347217af3dd5c9bb84bcff7b30689bd) )
 	ROM_LOAD( "rnr_a9.vid",   0x4000, 0x2000, CRC(9d2166b2) SHA1(42d2b05360e58b1b2b3ad06c98eb46d9da2b1c21) )
 	ROM_LOAD( "rnr_a10.vid",  0x6000, 0x2000, CRC(aff6e22f) SHA1(476d67821519feddc9f9c8537b46e6eede790035) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "rnr_h12.vid",  0x0000, 0x2000, CRC(e2114539) SHA1(0ea19ae4d7c2da14f23c81abb8e2c931785b2715) )
 	ROM_LOAD( "rnr_h11.vid",  0x2000, 0x2000, CRC(169a8f3f) SHA1(182c7c9b9849ebb57b3ff7c0b629f2f8e2efa9ba) )
 
@@ -282,7 +463,7 @@ ROM_START( rocnrope )
 	ROM_LOAD( "b16_prom.bin", 0x0020, 0x0100, CRC(750a9677) SHA1(7a5b4aed5f87180850657b8852bb3f3138d58b5b) )
 	ROM_LOAD( "rocnrope.pr3", 0x0120, 0x0100, CRC(b5c75a27) SHA1(923d6ccf015fd7458494416cc05426cc922a9238) )
 
-	ROM_REGION( 0x0001, "pal_cpuvidbd", 0 ) // PAL located on the cpu/video board
+	ROM_REGION( 0x0001, "pal_cpuvidbd", 0 ) // PAL located on the CPU/video board
 	ROM_LOAD( "h100.6g",      0x0000, 0x0001, NO_DUMP ) // 20 Pin chip.  Appears to be a PAL.  Schematics obfuscated.
 ROM_END
 
@@ -298,13 +479,13 @@ ROM_START( rocnropek )
 	ROM_LOAD( "rnr_7a.snd",   0x0000, 0x1000, CRC(75d2c4e2) SHA1(b701019b4e7b06b268be660ce7958b5367318c27) )
 	ROM_LOAD( "rnr_8a.snd",   0x1000, 0x1000, CRC(ca4325ae) SHA1(34ac035c0c2ed6bcafde1491d976bb9e9d2a2a7d) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_REGION( 0x8000, "sprites", 0 )
 	ROM_LOAD( "rnr_a11.vid",  0x0000, 0x2000, CRC(afdaba5e) SHA1(27c090cb1c3767c997daeedbe1ba24786f9e78f1) )
 	ROM_LOAD( "rnr_a12.vid",  0x2000, 0x2000, CRC(054cafeb) SHA1(4c3cd850b347217af3dd5c9bb84bcff7b30689bd) )
 	ROM_LOAD( "rnr_a9.vid",   0x4000, 0x2000, CRC(9d2166b2) SHA1(42d2b05360e58b1b2b3ad06c98eb46d9da2b1c21) )
 	ROM_LOAD( "rnr_a10.vid",  0x6000, 0x2000, CRC(aff6e22f) SHA1(476d67821519feddc9f9c8537b46e6eede790035) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "rnr_h12.vid",  0x0000, 0x2000, CRC(e2114539) SHA1(0ea19ae4d7c2da14f23c81abb8e2c931785b2715) )
 	ROM_LOAD( "rnr_h11.vid",  0x2000, 0x2000, CRC(169a8f3f) SHA1(182c7c9b9849ebb57b3ff7c0b629f2f8e2efa9ba) )
 
@@ -313,7 +494,7 @@ ROM_START( rocnropek )
 	ROM_LOAD( "b16_prom.bin", 0x0020, 0x0100, CRC(750a9677) SHA1(7a5b4aed5f87180850657b8852bb3f3138d58b5b) )
 	ROM_LOAD( "rocnrope.pr3", 0x0120, 0x0100, CRC(b5c75a27) SHA1(923d6ccf015fd7458494416cc05426cc922a9238) )
 
-	ROM_REGION( 0x0001, "pal_cpuvidbd", 0 ) // PAL located on the cpu/video board
+	ROM_REGION( 0x0001, "pal_cpuvidbd", 0 ) // PAL located on the CPU/video board
 	ROM_LOAD( "h100.6g",      0x0000, 0x0001, NO_DUMP ) // 20 Pin chip.  Appears to be a PAL.  Schematics obfuscated.
 ROM_END
 
@@ -346,13 +527,13 @@ ROM_START( ropeman )
 	ROM_LOAD( "r12.7a",           0x0000, 0x1000, CRC(75d2c4e2) SHA1(b701019b4e7b06b268be660ce7958b5367318c27) )
 	ROM_LOAD( "r13.8a",           0x1000, 0x1000, CRC(ca4325ae) SHA1(34ac035c0c2ed6bcafde1491d976bb9e9d2a2a7d) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_REGION( 0x8000, "sprites", 0 )
 	ROM_LOAD( "r10.11a",          0x0000, 0x2000, CRC(afdaba5e) SHA1(27c090cb1c3767c997daeedbe1ba24786f9e78f1) )
 	ROM_LOAD( "r11.12a",          0x2000, 0x2000, CRC(054cafeb) SHA1(4c3cd850b347217af3dd5c9bb84bcff7b30689bd) )
 	ROM_LOAD( "r8.9a",            0x4000, 0x2000, CRC(9d2166b2) SHA1(42d2b05360e58b1b2b3ad06c98eb46d9da2b1c21) )
 	ROM_LOAD( "r9.10a",           0x6000, 0x2000, CRC(aff6e22f) SHA1(476d67821519feddc9f9c8537b46e6eede790035) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "r7.12j",           0x0000, 0x2000, CRC(cd8ac4bf) SHA1(22bfd9ac0188bec6a1e8daa8ab915af1a5de7bd7) )
 	ROM_LOAD( "r6.11j",           0x2000, 0x2000, CRC(35891835) SHA1(9dc6795e336c61b5349cf7bf69a3dc9438ae9336) )
 
@@ -361,7 +542,7 @@ ROM_START( ropeman )
 	ROM_LOAD( "2.16b",            0x0020, 0x0100, CRC(750a9677) SHA1(7a5b4aed5f87180850657b8852bb3f3138d58b5b) ) // TBP24S10N
 	ROM_LOAD( "3.16g",            0x0120, 0x0100, CRC(b5c75a27) SHA1(923d6ccf015fd7458494416cc05426cc922a9238) ) // TBP24S10N
 
-	ROM_REGION( 0x002c, "pal_cpuvidbd", 0 ) // MMI PAL10L8 located on the cpu/video board
+	ROM_REGION( 0x002c, "pal_cpuvidbd", 0 ) // MMI PAL10L8 located on the CPU/video board
 	ROM_LOAD( "pal10l8.6g",       0x0000, 0x002c, CRC(82e98da9) SHA1(a49cb9713c6553969de75dc60fc7981d8aa8a4d6) )
 
 	ROM_REGION( 0x01D6, "pals_daughterbd", 0 ) // N82S153's located on the daughterboard of the cpu/video board
@@ -378,8 +559,10 @@ ROM_END
 
 void rocnrope_state::init_rocnrope()
 {
-	memregion("maincpu")->base()[0x703d] = 0x98^0x22; // HACK: fix one instruction
+	memregion("maincpu")->base()[0x703d] = 0x98 ^ 0x22; // HACK: fix one instruction
 }
+
+} // anonymous namespace
 
 
 /*************************************
@@ -388,6 +571,6 @@ void rocnrope_state::init_rocnrope()
  *
  *************************************/
 
-GAME( 1983, rocnrope,  0,        rocnrope, rocnrope, rocnrope_state, init_rocnrope, ROT270, "Konami", "Roc'n Rope", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, rocnrope_state, empty_init,    ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ropeman,   rocnrope, rocnrope, rocnrope, rocnrope_state, init_rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rocnrope,  0,        rocnrope, rocnrope, rocnrope_state, init_rocnrope, ROT270, "Konami",                  "Roc'n Rope",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, rocnrope_state, empty_init,    ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ropeman,   rocnrope, rocnrope, rocnrope, rocnrope_state, init_rocnrope, ROT270, "bootleg",                 "Ropeman (bootleg of Roc'n Rope)", MACHINE_SUPPORTS_SAVE )

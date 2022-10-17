@@ -2,9 +2,9 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-        SED1520 LCD controller
-        SED1560 LCD controller
-        EPL43102 LCD controller
+    SED1520 LCD controller
+    SED1560 LCD controller
+    EPL43102 LCD controller
 
 ***************************************************************************/
 
@@ -25,10 +25,9 @@
 
 // ======================> sed15xx_device_base
 
-class sed15xx_device_base :  public device_t
+class sed15xx_device_base : public device_t
 {
 public:
-
 	// device interface
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
@@ -67,7 +66,7 @@ protected:
 
 // ======================> sed1520_device
 
-class sed1520_device :  public sed15xx_device_base
+class sed1520_device : public sed15xx_device_base
 {
 public:
 	typedef device_delegate<uint32_t (bitmap_ind16 &bitmap, const rectangle &cliprect, bool lcd_on, uint8_t *dram, uint8_t start_line, uint8_t adc, uint8_t duty)> sed1520_update_delegate;
@@ -98,7 +97,7 @@ private:
 
 // ======================> sed1560_device
 
-class sed1560_device :  public sed15xx_device_base
+class sed1560_device : public sed15xx_device_base
 {
 public:
 	typedef device_delegate<uint32_t (bitmap_ind16 &bitmap, const rectangle &cliprect, bool lcd_on, uint8_t *dram, uint8_t start_line, uint8_t adc, uint8_t duty, bool reverse, bool fill, uint8_t contrast, bool line_inv, uint8_t line_inv_num)> sed1560_update_delegate;

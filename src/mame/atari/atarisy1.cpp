@@ -195,7 +195,7 @@ RoadBlasters (aka Future Vette):005*
 
 #include "emu.h"
 #include "atarisy1.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
@@ -778,6 +778,7 @@ void atarisy1_state::atarisy1(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
+	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	GENERIC_LATCH_8(config, m_mainlatch);
 	m_mainlatch->data_pending_callback().set_inputline(m_maincpu, M68K_IRQ_6);

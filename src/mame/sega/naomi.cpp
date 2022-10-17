@@ -278,6 +278,7 @@ Game                                          on cart    IC22#   # of SOP56  IC3
 ----------------------------------------------------------------------------------------------------------------------------------
 Club Kart (2003, prototype, set 1)              no cart  *       21 (64Mb)   present  315-6206  not present   * flash-PCB
 Club Kart (2003, prototype, set 2)              no cart  *       21 (64Mb)   present  315-6206  present       * flash-PCB
+Club Kart Prize Version B (prototype)         840-0129C**031216  21*(64Mb)   present  315-6206  present       ** Cart case probably borrowed from other game version, ROM board have labels "840-0137C-P" "KART VER-B", * - only flash ROMs 2-17 contain game data.
 Crackin' DJ part 2                            840-0068C  23674   20 (64Mb)   present  315-6206  317-0311-COM  PCB have label 840-0068B-01 837-14124, requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
 Crazy Taxi                                    840-0002C  ?       13 (64Mb)   ?        315-6206  ?             not dumped, likely same as regular 171-7919A cart
 Derby Owners Club World Edition (Rev T)       840-0088C  22336T  14 (64Mb)   present  315-6206  not present
@@ -300,6 +301,7 @@ The King of Route 66 (Rev A)                  840-0087C  23819A  20 (64Mb)   pre
 The Maze of the Kings (prototype)               no cart  *       21 (64Mb)   present  315-6206  FRI           * flash-PCB, not dumped but known to exist
 Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM  requires 837-13844 JVS IO
 Virtua Athletics / Virtua Athlete (prototype)   no cart  none    21*(64Mb)   present  315-6206  present       * only first 14 flash roms contain game data, have Japan text label "Overseas sales (NA & EU)"
+Virtua Golf / Dynamic Golf (prototype)      not present  *       21*(64Mb)   present  315-6206  present       * instead of EPROM have tiny PCB with 2 flashroms on it, only first 11 flash roms contain game data
 Virtua NBA (prototype)                          no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua NBA (prototype, 15.11)                   no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
@@ -8023,6 +8025,31 @@ ROM_END
 
 /* prototype cartridges for games released on GD-ROM */
 
+ROM_START( dygolfp )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("rom0.ic22",   0x00000000, 0x00400000, CRC(2f391fdf) SHA1(cdcc42cbe450897162d0a0e3186caf4ce2b7711d) )
+	ROM_LOAD("rom1.ic1s",   0x00800000, 0x00800000, CRC(2c683edd) SHA1(9a281bfb917b11ff0035a7ad341a4e410502adb9) )
+	ROM_LOAD("rom2.ic2s",   0x01000000, 0x00800000, CRC(1795e6f4) SHA1(8ddbb8d062b3e7b20b64c32977be402706a7689e) )
+	ROM_LOAD("rom3.ic3s",   0x01800000, 0x00800000, CRC(9b45cc32) SHA1(bf0cefed34ef3a04b1a80fe9c39b2674342f7271) )
+	ROM_LOAD("rom4.ic4s",   0x02000000, 0x00800000, CRC(2c5a570a) SHA1(c2732d411c42950add995537b4497e56b478c7e9) )
+	ROM_LOAD("rom5.ic5s",   0x02800000, 0x00800000, CRC(48cc544e) SHA1(6a0beafa0f77ab093108b0d230e44505665fdd97) )
+	ROM_LOAD("rom6.ic6s",   0x03000000, 0x00800000, CRC(e12db83b) SHA1(98c963949f4869f58cee1c7c6a21d4c29bd37ddc) )
+	ROM_LOAD("rom7.ic7s",   0x03800000, 0x00800000, CRC(36c313a6) SHA1(b2ffa974c9651bfddafcca96e51b0323926eb6bc) )
+	ROM_LOAD("rom8.ic8s",   0x04000000, 0x00800000, CRC(9868d078) SHA1(e462885405b114cfacf481a5dd887aeef44d91c6) )
+	ROM_LOAD("rom9.ic9s",   0x04800000, 0x00800000, CRC(032cca1a) SHA1(5e9887915e75fe3548bc73f60c9bdc1981f7b5c9) )
+	ROM_LOAD("rom10.ic10s", 0x05000000, 0x00800000, CRC(6d094477) SHA1(29f1144646053060fa0dcedf6206037915b6fbfe) )
+	ROM_LOAD("rom11.ic11s", 0x05800000, 0x00800000, CRC(6c803ca0) SHA1(2965d8e0b0a96b0a79525012a030c34678cc285e) )
+	// ic 12-21 populated, empty
+
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.ic37",   0x000000, 0x000084, CRC(40711000) SHA1(ac44d55b5e0a43f90b542285339ce07c69c8929d) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 populated, not used
+ROM_END
+
 ROM_START( puyofevp )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -9760,6 +9787,37 @@ ROM_START( clubkpzb )
 	ROM_PARAMETER( ":rom_board:key", "997681fe")
 ROM_END
 
+// 171-7885A type flash ROM board
+ROM_START( clubkpzbp )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xa000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "rom0.ic22",   0x0000000, 0x400000, CRC(e958f9e0) SHA1(6534810a688af382b0c85d0b1fd7d37e5caf0dfe) )
+
+	ROM_LOAD( "rom2.ic2s",   0x1000000, 0x800000, CRC(d4ef582c) SHA1(2f29f0cfcae75cc18e38b1c0092d4639af8dd718) )
+	ROM_LOAD( "rom3.ic3s",   0x1800000, 0x800000, CRC(6302239e) SHA1(5d7242b9ff2614a23581014bc8b2614be8ef69af) )
+	ROM_LOAD( "rom4.ic4s",   0x2000000, 0x800000, CRC(4f5e9426) SHA1(aa5e723bc365e8a6f9151f22c657fd55bd5220c8) )
+	ROM_LOAD( "rom5.ic5s",   0x2800000, 0x800000, CRC(7bb189ea) SHA1(f865ba5578fd32da9e23fa4ad6ae9b86357bfcee) )
+	ROM_LOAD( "rom6.ic6s",   0x3000000, 0x800000, CRC(5a256041) SHA1(83252ef918cdde98d240c82b678467d0e6664686) )
+	ROM_LOAD( "rom7.ic7s",   0x3800000, 0x800000, CRC(82bc57c3) SHA1(d5c96dd7e0ca4d0ee0c685268af6adc85082df76) )
+	ROM_LOAD( "rom8.ic8s",   0x4000000, 0x800000, CRC(71d7259a) SHA1(9759e8d350a230f78610934880a56a070cbc022d) )
+	ROM_LOAD( "rom9.ic9s",   0x4800000, 0x800000, CRC(98663de6) SHA1(2e0ece6ed6484d83c3822238b30777f9f4c7e036) )
+	ROM_LOAD( "rom10.ic10s", 0x5000000, 0x800000, CRC(0786f88e) SHA1(cf666ed7dfa8739f06dc2931faa028ec0d77ad15) )
+	ROM_LOAD( "rom11.ic11s", 0x5800000, 0x800000, CRC(259b7dd5) SHA1(a58efc1f7c9cb8c0af9c6ce974b6a81122809b42) )
+	ROM_LOAD( "rom12.ic12s", 0x6000000, 0x800000, CRC(f2de41b8) SHA1(aa087e5b30ed369ecac07f4a534fda55dc511a3a) )
+	ROM_LOAD( "rom13.ic13s", 0x6800000, 0x800000, CRC(2e00966e) SHA1(22613d31bcabbb8168ad60a2a0f9dedabfefaa61) )
+	ROM_LOAD( "rom14.ic14s", 0x7000000, 0x800000, CRC(c428e593) SHA1(9e1dd2f2f4548b8c29b3c674a3e282c62c682709) )
+	ROM_LOAD( "rom15.ic15s", 0x7800000, 0x800000, CRC(c196ac29) SHA1(6e9ff5691c3dee586e932ee4074cf45f202deb66) )
+	ROM_LOAD( "rom16.ic16s", 0x8000000, 0x800000, CRC(538827ca) SHA1(7f60f45d4cde01ea33beb6c93994ecbcf0f8abb5) )
+	ROM_LOAD( "rom17.ic17s", 0x8800000, 0x800000, CRC(fbff0538) SHA1(6a60e104d7c31f2bacaeac2bd27dbbbf7c421c0c) )
+
+	ROM_REGION( 0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin", 0x000000, 0x000084, CRC(a47383f9) SHA1(a0503b79139517e8ba82755b867c06844feef6ce) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 populated, unused
+ROM_END
+
 ROM_START( clubk2k3 )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -10779,6 +10837,7 @@ void naomi_state::init_hotd2()
 // 0xxx Star Horse 2002 (whole set)
 
 /* Cartridge prototypes of games released on GD-ROM */
+/* none */ GAME( 2001, dygolfp,   dygolf,   naomim2, naomi, naomi_state, init_naomi, ROT0, "Sega", "Virtua Golf / Dynamic Golf (prototype)", GAME_FLAGS )
 /* none */ GAME( 2003, puyofevp,  puyofev,  naomim1, naomi, naomi_state, init_naomi, ROT0, "Sega", "Puyo Puyo Fever (prototype ver 0.01)", GAME_FLAGS )
 /* none */ GAME( 2001, vathletep, vathlete, naomim2, naomi, naomi_state, init_naomi, ROT0, "Sega", "Virtua Athletics / Virtua Athlete (prototype)", GAME_FLAGS )
 
@@ -10797,6 +10856,7 @@ void naomi_state::init_hotd2()
 /* 0106 */ GAME( 2002, vf4evoct, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Virtua Fighter 4: Evolution (World)", GAME_FLAGS ) // not for Japan
 /* 0129 */ GAME( 2003, clubkprz, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart Prize (Export, Japan, Rev A)", GAME_FLAGS )
 /* 0137 */ GAME( 2004, clubkpzb, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart Prize Version B (Export, Japan)", GAME_FLAGS )
+/* 0137P*/ GAME( 2004, clubkpzbp,clubkpzb,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart Prize Version B (prototype)", GAME_FLAGS )
 /* 0139 */ GAME( 2003, clubk2k3, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, Rev A)", GAME_FLAGS )
 /* none */ GAME( 2003, clubk2kp, clubk2k3,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, prototype, set 1)", GAME_FLAGS )
 /* none */ GAME( 2003, clubk2kpa,clubk2k3,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, prototype, set 2)", GAME_FLAGS )

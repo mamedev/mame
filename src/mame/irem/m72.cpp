@@ -222,8 +222,8 @@ MACHINE_START_MEMBER(m72_state,kengo)
 
 TIMER_CALLBACK_MEMBER(m72_state::synch_callback)
 {
-	//machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(8000000));
-	machine().scheduler().boost_interleave(attotime::from_hz(MASTER_CLOCK/4/12), attotime::from_seconds(25));
+	//machine().scheduler().perfect_quantum(attotime::from_usec(8000000));
+	machine().scheduler().add_quantum(attotime::from_hz(MASTER_CLOCK/4/12), attotime::from_seconds(25));
 }
 
 void m72_state::machine_reset()

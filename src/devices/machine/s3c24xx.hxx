@@ -1155,12 +1155,6 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 	temp = (m_irq.regs.srcpnd & ~m_irq.regs.intmsk) & m_irq.regs.intmod;
 	if (temp != 0)
 	{
-		uint32_t int_type = 0;
-		while ((temp & 1) == 0)
-		{
-			int_type++;
-			temp = temp >> 1;
-		}
 		if (m_irq.line_fiq != ASSERT_LINE)
 		{
 			LOGMASKED(LOG_IRQS, "asserting FIQ line\n");

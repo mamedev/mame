@@ -18,6 +18,8 @@
 
 #include "psion5.h"
 
+#include "utf8.h"
+
 #define LOG_UNKNOWNS        (1 << 0)
 #define LOG_IRQ             (1 << 1)
 #define LOG_DISPLAY         (1 << 2)

@@ -20,6 +20,7 @@
 #include "softlist_dev.h"
 
 #include "corestr.h"
+#include "path.h"
 
 #include <algorithm>
 #include <cstring>
@@ -532,7 +533,7 @@ void favorite_manager::update_sorted()
 
 					int cmp;
 
-					cmp = core_stricmp(lhs.longname.c_str(), rhs.longname.c_str());
+					cmp = core_stricmp(lhs.longname, rhs.longname);
 					if (0 > cmp)
 						return true;
 					else if (0 < cmp)

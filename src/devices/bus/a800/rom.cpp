@@ -25,6 +25,8 @@ DEFINE_DEVICE_TYPE(A800_ROM_EXPRESS,   a800_rom_express_device,   "a800_express"
 DEFINE_DEVICE_TYPE(A800_ROM_TURBO,     a800_rom_turbo_device,     "a800_turbo",    "Atari 800 64K ROM Carts Turbosoft")
 DEFINE_DEVICE_TYPE(A800_ROM_TELELINK2, a800_rom_telelink2_device, "a800_tlink2",   "Atari 800 64K ROM Cart Telelink II")
 DEFINE_DEVICE_TYPE(A800_ROM_MICROCALC, a800_rom_microcalc_device, "a800_sitsa",    "Atari 800 64K ROM Carts SITSA MicroCalc")
+DEFINE_DEVICE_TYPE(A800_ROM_CORINA,    a800_rom_corina_device,    "a800_corina",   "Atari 800 ROM Carts Corina 1MB Flash ROM")
+DEFINE_DEVICE_TYPE(A800_ROM_CORINA_SRAM, a800_rom_corina_sram_device,    "a800_corina_sram",   "Atari 800 ROM Carts Corina 512KB Flash ROM + 512KB RAM")
 DEFINE_DEVICE_TYPE(XEGS_ROM,           xegs_rom_device,           "a800_xegs",     "Atari XEGS 64K ROM Carts")
 DEFINE_DEVICE_TYPE(A5200_ROM_2CHIPS,   a5200_rom_2chips_device,   "a5200_16k2c",   "Atari 5200 ROM Cart 16K in 2 Chips")
 DEFINE_DEVICE_TYPE(A5200_ROM_BBSB,     a5200_rom_bbsb_device,     "a5200_bbsb",    "Atari 5200 ROM Cart BBSB")
@@ -89,6 +91,22 @@ a800_rom_microcalc_device::a800_rom_microcalc_device(const machine_config &mconf
 {
 }
 
+a800_rom_corina_device::a800_rom_corina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, type, tag, owner, clock)
+	, m_rom_bank(0)
+	, m_view_select(0)
+{
+}
+
+a800_rom_corina_device::a800_rom_corina_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, A800_ROM_CORINA, tag, owner, clock)
+{
+}
+
+a800_rom_corina_sram_device::a800_rom_corina_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_corina_device(mconfig, A800_ROM_CORINA_SRAM, tag, owner, clock)
+{
+}
 
 a5200_rom_2chips_device::a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, A5200_ROM_2CHIPS, tag, owner, clock)
@@ -180,6 +198,19 @@ void a800_rom_microcalc_device::device_reset()
 }
 
 
+void a800_rom_corina_device::device_start()
+{
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_view_select));
+}
+
+void a800_rom_corina_device::device_reset()
+{
+	m_rom_bank = 0;
+	m_view_select = 0;
+}
+
+
 void a5200_rom_bbsb_device::device_start()
 {
 	save_item(NAME(m_banks));
@@ -228,6 +259,14 @@ uint8_t a800_rom_device::read_80xx(offs_t offset)
 
 uint8_t a800_rom_bbsb_device::read_80xx(offs_t offset)
 {
+	if ((offset & 0x2000) == 0 && !machine().side_effects_disabled())
+	{
+		uint16_t addr = offset & 0xfff;
+
+		if (addr >= 0xff6 && addr <= 0xff9)
+			m_banks[BIT(offset, 12)] = (addr - 0xff6);
+	}
+
 	if (offset < 0x1000)
 		return m_rom[(offset & 0xfff) + (m_banks[0] * 0x1000) + 0];
 	else if (offset < 0x2000)
@@ -384,6 +423,87 @@ void a800_rom_microcalc_device::write_d5xx(offs_t offset, uint8_t data)
 	m_bank = data;
 }
 
+/*-------------------------------------------------
+
+ Corina
+
+ Comes in two configs:
+ - 1MB Flash ROM (yakungfu)
+ - 512KB Flash ROM + 512KB SRAM (bombjake)
+
+ Both contains 8KB NVRAM
+ -------------------------------------------------*/
+
+uint8_t a800_rom_corina_device::read_view_1(offs_t offset)
+{
+	return m_rom[(offset & 0x3fff) + (m_rom_bank * 0x4000) + 0x80000];
+}
+
+void a800_rom_corina_device::write_view_1(offs_t offset, u8 data)
+{
+}
+
+uint8_t a800_rom_corina_sram_device::read_view_1(offs_t offset)
+{
+	return m_ram[(offset & 0x3fff) + (m_rom_bank * 0x4000)];
+}
+
+void a800_rom_corina_sram_device::write_view_1(offs_t offset, u8 data)
+{
+	m_ram[(offset & 0x3fff) + (m_rom_bank * 0x4000)] = data;
+}
+
+uint8_t a800_rom_corina_device::read_80xx(offs_t offset)
+{
+	switch( m_view_select )
+	{
+		case 0:
+			return m_rom[(offset & 0x3fff) + (m_rom_bank * 0x4000)];
+		case 1:
+			return read_view_1(offset);
+		case 2:
+			return m_nvram[offset & 0x1fff];
+	}
+
+	logerror("view select R=3 [%04x]\n", offset);
+	return 0xff;
+}
+
+void a800_rom_corina_device::write_80xx(offs_t offset, uint8_t data)
+{
+	switch( m_view_select )
+	{
+		case 1:
+			write_view_1(offset, data);
+			return;
+		case 2:
+			m_nvram[offset & 0x1fff] = data;
+			return;
+	}
+	// view 0: flash ROM commands?
+	// TODO: identify
+	logerror("view select W=%d [%04x, %02x] -> %02x\n", m_view_select, offset, m_rom_bank, data);
+}
+
+/*
+ * 0--- ---- enable Corina window
+ * 1--- ---- disable Corina and select main unit 8000-bfff window instead
+ * -xx- ---- view select
+ * -00- ---- first half of ROM
+ * -01- ---- second half of ROM or RAM (^ depending on PCB config)
+ * -10- ---- NVRAM
+ * -11- ---- <reserved>
+ * ---x xxxx ROM/RAM lower bank value,
+ *           ignored if view select is not in ROM/RAM mode
+ *           or Corina window is disabled
+ */
+void a800_rom_corina_device::write_d5xx(offs_t offset, uint8_t data)
+{
+	m_rom_bank = data & 0x1f;
+	m_view_select = (data & 0x60) >> 5;
+	// TODO: bit 7, currently handled in a400_state
+}
+
 
 
 // Atari 5200
@@ -433,12 +553,19 @@ uint8_t a5200_rom_2chips_device::read_80xx(offs_t offset)
 
 uint8_t a5200_rom_bbsb_device::read_80xx(offs_t offset)
 {
+	if ((offset & 0xe000) == 0 && !machine().side_effects_disabled())
+	{
+		uint16_t addr = offset & 0xfff;
+		if (addr >= 0xff6 && addr <= 0xff9)
+			m_banks[BIT(offset, 12)] = (addr - 0xff6);
+	}
+
 	if (offset < 0x1000)
-		return m_rom[(offset & 0xfff) + (m_banks[0] * 0x1000) + 0];
+		return m_rom[(offset & 0xfff) + (m_banks[0] * 0x1000) + 0x2000];
 	else if (offset < 0x2000)
-		return m_rom[(offset & 0xfff) + (m_banks[1] * 0x1000) + 0x4000];
+		return m_rom[(offset & 0xfff) + (m_banks[1] * 0x1000) + 0x6000];
 	else if (offset >= 0x4000)
-		return m_rom[(offset & 0x1fff) + 0x8000];
+		return m_rom[(offset & 0x1fff) + 0x0000];
 	else
 		return 0;
 }

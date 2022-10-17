@@ -44,6 +44,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
+#include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "atarifdc.h"
@@ -256,8 +257,8 @@ public:
 		m_pia(*this, "pia"),
 		m_dac(*this, "dac"),
 		m_region_maincpu(*this, "maincpu"),
-		m_cart(*this, "cartleft"),
-		m_cart2(*this, "cartright")
+		m_cartleft(*this, "cartleft"),
+		m_cartright(*this, "cartright")
 	{ }
 
 	void atari_common_nodac(machine_config &config);
@@ -274,6 +275,9 @@ public:
 	void a600xl(machine_config &config);
 	void xegs(machine_config &config);
 	void a400(machine_config &config);
+
+protected:
+
 
 private:
 	DECLARE_MACHINE_START(a400);
@@ -299,6 +303,9 @@ private:
 	void special_write_8000(offs_t offset, uint8_t data);
 	uint8_t special_read_a000(offs_t offset);
 	void special_write_a000(offs_t offset, uint8_t data);
+	uint8_t read_corina_overlay(offs_t offset);
+	void write_corina_overlay(offs_t offset, uint8_t data);
+	void write_corina_d5xx(offs_t offset, uint8_t data);
 
 	uint8_t a600xl_low_r(offs_t offset);
 	uint8_t a1200xl_low_r(offs_t offset);
@@ -328,8 +335,8 @@ private:
 	optional_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
-	optional_device<a800_cart_slot_device> m_cart;
-	optional_device<a800_cart_slot_device> m_cart2;
+	optional_device<a800_cart_slot_device> m_cartleft;
+	optional_device<a800_cart_slot_device> m_cartright;
 
 	int m_cart_disabled, m_cart_helper;
 	int m_last_offs;
@@ -454,7 +461,9 @@ uint8_t a400_state::a130xe_low_r(offs_t offset)
 		if (!(m_mmu & 0x80) && offset >= 0x5000 && offset < 0x5800)
 			return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
 		if (!(m_mmu & 0x10))
-			return m_ram->pointer()[offset + 0x10000 + (m_ext_bank * 0x4000)];
+		{
+			return m_ram->pointer()[(offset & 0x3fff) + 0x10000 + (m_ext_bank * 0x4000)];
+		}
 		else
 			return m_ram->pointer()[offset];
 	}
@@ -486,7 +495,7 @@ void a400_state::a130xe_low_w(offs_t offset, uint8_t data)
 		if (!(m_mmu & 0x80) && offset >= 0x5000 && offset < 0x5800)
 			return;
 		if (!(m_mmu & 0x10))
-			m_ram->pointer()[offset + 0x10000 + (m_ext_bank * 0x4000)] = data;
+			m_ram->pointer()[(offset & 0x3fff) + 0x10000 + (m_ext_bank * 0x4000)] = data;
 		else
 			m_ram->pointer()[offset] = data;
 	}
@@ -615,7 +624,7 @@ void a400_state::a800xl_mem(address_map &map)
 
 void a400_state::a130xe_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a130xe_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
@@ -830,7 +839,7 @@ static INPUT_PORTS_START( atari_keyboard )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Lowr  Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
@@ -1776,12 +1785,12 @@ void a400_state::setup_ram(int bank, uint32_t size)
 	}
 }
 
-
 // these handle cart enable/disable without calling setup_ram thousands of times
+// TODO: this should really live in a800_slot file
 uint8_t a400_state::special_read_8000(offs_t offset)
 {
 	if (!m_cart_disabled)
-		return m_cart->read_80xx(offset);
+		return m_cartleft->read_80xx(offset);
 	else
 	{
 		offset += 0x8000;
@@ -1805,7 +1814,7 @@ void a400_state::special_write_8000(offs_t offset, uint8_t data)
 uint8_t a400_state::special_read_a000(offs_t offset)
 {
 	if (!m_cart_disabled)
-		return m_cart->read_80xx(offset);
+		return m_cartleft->read_80xx(offset);
 	else
 	{
 		offset += 0xa000;
@@ -1834,11 +1843,41 @@ uint8_t a400_state::read_d5xx(offs_t offset)
 	return 0xff;
 }
 
+uint8_t a400_state::read_corina_overlay(offs_t offset)
+{
+	if (!m_cart_disabled)
+		return m_cartleft->read_80xx(offset);
+	offset += 0x8000;
+	if (m_ram->size() < offset)
+		return 0;
+	else
+		return m_ram->pointer()[offset];
+}
+
+void a400_state::write_corina_overlay(offs_t offset, uint8_t data)
+{
+	if (!m_cart_disabled)
+	{
+		m_cartleft->write_80xx(offset, data);
+		return;
+	}
+
+	offset += 0x8000;
+	if (m_ram->size() >= offset)
+		m_ram->pointer()[offset] = data;
+}
+
+void a400_state::write_corina_d5xx(offs_t offset, uint8_t data)
+{
+	m_cart_disabled = BIT(data, 7);
+	m_cartleft->write_d5xx(offset, data);
+}
+
 void a400_state::disable_cart(offs_t offset, uint8_t data)
 {
-	if (m_cart->exists())
+	if (m_cartleft->exists())
 	{
-		switch (m_cart->get_cart_type())
+		switch (m_cartleft->get_cart_type())
 		{
 		case A800_PHOENIX:
 		case A800_BLIZZARD:
@@ -1863,7 +1902,7 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 				{
 					// we enter here only if we are writing to a different offset than last time
 					m_last_offs = offset & 0x7;
-					m_cart->write_d5xx(offset, data);
+					m_cartleft->write_d5xx(offset, data);
 				}
 			}
 			break;
@@ -1880,13 +1919,13 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 				{
 					// we enter here only if we are writing to a different offset than last time
 					m_last_offs = offset & 0x0f;
-					m_cart->write_d5xx(offset & 0x0f, data);
+					m_cartleft->write_d5xx(offset & 0x0f, data);
 				}
 			}
 			break;
 		case A800_SPARTADOS:
 			// writes with offset & 8 are also used to enable/disable the subcart, so they go through!
-			m_cart->write_d5xx(offset, data);
+			m_cartleft->write_d5xx(offset, data);
 			break;
 		case A800_OSSM091:
 		case A800_OSS8K:
@@ -1895,7 +1934,7 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 			else
 			{
 				m_cart_disabled = 0;
-				m_cart->write_d5xx(offset, data);
+				m_cartleft->write_d5xx(offset, data);
 			}
 			break;
 		case A800_MICROCALC:
@@ -1905,7 +1944,7 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 			else
 			{
 				m_cart_disabled = 0;
-				m_cart->write_d5xx(offset, m_cart_helper);
+				m_cartleft->write_d5xx(offset, m_cart_helper);
 			}
 			break;
 		default:
@@ -1988,6 +2027,15 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_d5xx)));
 			break;
+		case A800_CORINA:
+		case A800_CORINA_SRAM:
+			//m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
+			//m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xbfff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_80xx)));
+			//m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd500, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_d5xx)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::read_corina_overlay)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xbfff, write8sm_delegate(*this, FUNC(a400_state::write_corina_overlay)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd500, write8sm_delegate(*this, FUNC(a400_state::write_corina_d5xx)));
+			break;
 		case A5200_4K:
 		case A5200_8K:
 		case A5200_16K:
@@ -2039,7 +2087,7 @@ MACHINE_START_MEMBER( a400_state, a400 )
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
 	setup_ram(2, m_ram->size());
-	setup_cart(m_cart);
+	setup_cart(m_cartleft);
 
 	save_item(NAME(m_cart_disabled));
 	save_item(NAME(m_cart_helper));
@@ -2052,8 +2100,8 @@ MACHINE_START_MEMBER( a400_state, a800 )
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
 	setup_ram(2, m_ram->size());
-	setup_cart(m_cart);
-	setup_cart(m_cart2);
+	setup_cart(m_cartleft);
+	setup_cart(m_cartright);
 
 	save_item(NAME(m_cart_disabled));
 	save_item(NAME(m_cart_helper));
@@ -2064,7 +2112,7 @@ MACHINE_START_MEMBER( a400_state, a800xl )
 {
 	m_mmu = 0xfd;
 	m_ext_bank = 0x03;  // only used by a130xe
-	setup_cart(m_cart);
+	setup_cart(m_cartleft);
 
 	save_item(NAME(m_cart_disabled));
 	save_item(NAME(m_cart_helper));
@@ -2076,7 +2124,7 @@ MACHINE_START_MEMBER( a400_state, a800xl )
 
 MACHINE_START_MEMBER( a400_state, a5200 )
 {
-	setup_cart(m_cart);
+	setup_cart(m_cartleft);
 
 	save_item(NAME(m_cart_disabled));
 	save_item(NAME(m_cart_helper));
@@ -2121,6 +2169,21 @@ void a400_state::a800xl_pia_pb_w(uint8_t data)
  *
  **************************************************************/
 
+// note: both screen setups are actually non-interlaced, and always 240 lines
+void atari_common_state::config_ntsc_screen(machine_config &config)
+{
+	// 15.69975KHz x 59.9271 Hz
+	m_screen->set_raw(XTAL(14'318'181), 912, antic_device::MIN_X, antic_device::MAX_X, 262, antic_device::MIN_Y, antic_device::MAX_Y);
+	m_gtia->set_region(GTIA_NTSC);
+}
+
+void atari_common_state::config_pal_screen(machine_config &config)
+{
+	// 15.55655KHz x 49.86074 Hz, master clock rated at 14.18757 MHz
+	// TODO: confirm hsync
+	m_screen->set_raw(XTAL(3'546'800) * 4, 912, antic_device::MIN_X, antic_device::MAX_X, 312, antic_device::MIN_Y, antic_device::MAX_Y);
+	m_gtia->set_region(GTIA_PAL);
+}
 
 void a400_state::atari_common_nodac(machine_config &config)
 {
@@ -2131,10 +2194,13 @@ void a400_state::atari_common_nodac(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1));
-	m_screen->set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
+	//m_screen->set_raw(XTAL(1'797'100), 912, antic_device::MIN_X, antic_device::MAX_X, 262, antic_device::MIN_Y, antic_device::MAX_Y);
+	// TODO: 312 for PAL
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1));
+	//m_screen->set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
 	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
 	m_screen->set_palette("palette");
+//	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	PALETTE(config, "palette", FUNC(a400_state::a400_palette), std::size(atari_colors) / 3);
 
@@ -2154,13 +2220,16 @@ void a400_state::atari_common_nodac(machine_config &config)
 	//m_pokey->oclk_w().set("sio", FUNC(a8sio_device::clock_out_w));
 	//m_pokey->sod_w().set("sio", FUNC(a8sio_device::data_out_w));
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a800_keyboard));
-	m_pokey->set_interrupt_callback(FUNC(a400_state::interrupt_cb));
+	m_pokey->irq_w().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void a400_state::atari_common(machine_config &config)
 {
 	atari_common_nodac(config);
+
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
+	m_pokey->irq_w().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
@@ -2181,6 +2250,8 @@ void a400_state::atari_common(machine_config &config)
 	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
 	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
 	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
+	m_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	a8sio_device &sio(A8SIO(config, "sio", nullptr));
 	//sio.clock_in().set("pokey", FUNC(pokey_device::bclk_w));
@@ -2190,7 +2261,7 @@ void a400_state::atari_common(machine_config &config)
 
 	ATARI_FDC(config, "fdc", 0);
 
-	A800_CART_SLOT(config, "cartleft", a800_left, nullptr);
+	A800_CART_SLOT(config, m_cartleft, a800_left, nullptr);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("a800_flop");
@@ -2209,10 +2280,11 @@ void a400_state::a400(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
-	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+	config_ntsc_screen(config);
+//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-	m_gtia->set_region(GTIA_NTSC);
+//	m_gtia->set_region(GTIA_NTSC);
 }
 
 // memory map A400 + PAL screen
@@ -2225,10 +2297,11 @@ void a400_state::a400pal(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
-	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
+	config_pal_screen(config);
+//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-	m_gtia->set_region(GTIA_PAL);
+//	m_gtia->set_region(GTIA_PAL);
 }
 
 // memory map A800 + NTSC screen + Right cartslot
@@ -2241,12 +2314,13 @@ void a400_state::a800(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
-	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+	config_ntsc_screen(config);
+//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-	m_gtia->set_region(GTIA_NTSC);
+//	m_gtia->set_region(GTIA_NTSC);
 
-	A800_CART_SLOT(config, "cartright", a800_right, nullptr);
+	A800_CART_SLOT(config, m_cartright, a800_right, nullptr);
 }
 
 
@@ -2260,12 +2334,13 @@ void a400_state::a800pal(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
-	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
+	config_pal_screen(config);
+//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-	m_gtia->set_region(GTIA_PAL);
+//	m_gtia->set_region(GTIA_PAL);
 
-	A800_CART_SLOT(config, "cartright", a800_right, nullptr);
+	A800_CART_SLOT(config, m_cartright, a800_right, nullptr);
 }
 
 
@@ -2281,10 +2356,12 @@ void a400_state::a600xl(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
-	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+	config_ntsc_screen(config);
 
-	m_gtia->set_region(GTIA_NTSC);
+//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+
+//	m_gtia->set_region(GTIA_NTSC);
 
 	m_ram->set_default_size("16K");
 }
@@ -2303,10 +2380,12 @@ void a400_state::a800xl(machine_config &config)
 
 	m_ram->set_default_size("64K");
 
-	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+	config_ntsc_screen(config);
 
-	m_gtia->set_region(GTIA_NTSC);
+//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+
+//	m_gtia->set_region(GTIA_NTSC);
 }
 
 
@@ -2317,10 +2396,11 @@ void a400_state::a800xlpal(machine_config &config)
 
 	m_maincpu->set_clock(1773000);
 
-	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
+	config_pal_screen(config);
+//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-	m_gtia->set_region(GTIA_PAL);
+//	m_gtia->set_region(GTIA_PAL);
 
 	m_pokey->set_clock(1773000);
 }
@@ -2354,7 +2434,7 @@ void a400_state::xegs(machine_config &config)
 	config.device_remove("cartleft");
 	config.device_remove("cart_list");
 
-	XEGS_CART_SLOT(config, "cartleft", xegs_carts, nullptr);
+	XEGS_CART_SLOT(config, m_cartleft, xegs_carts, nullptr);
 }
 
 // memory map A5200, different ports, less RAM
@@ -2369,21 +2449,21 @@ void a400_state::a5200(machine_config &config)
 	m_pokey->serin_r().set_constant(0);
 	m_pokey->serout_w().set_nop();
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a5200_keypads));
-	m_pokey->set_interrupt_callback(FUNC(a400_state::interrupt_cb));
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	ATARI_GTIA(config, m_gtia, 0);
-	m_gtia->set_region(GTIA_NTSC);
+//	m_gtia->set_region(GTIA_NTSC);
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 
-	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+	config_ntsc_screen(config);
+//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-	A5200_CART_SLOT(config, "cartleft", a5200_carts, nullptr);
+	A5200_CART_SLOT(config, m_cartleft, a5200_carts, nullptr);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("a5200");

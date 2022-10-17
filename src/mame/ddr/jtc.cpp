@@ -28,6 +28,7 @@ To Do:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "utf8.h"
 
 #define UB8830D_TAG     "ub8830d"
 #define CENTRONICS_TAG  "centronics"

@@ -75,22 +75,23 @@ void ladybug_video_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 
 		while (0 < i)
 		{
+			i -= 4;
+
 			/*
 			 abccdddd eeeeeeee fffghhhh iiiiiiii
 
-			 a enable?
-			 b size (0 = 8x8, 1 = 16x16)
-			 cc flip
-			 dddd y offset
-			 eeeeeeee sprite code (shift right 2 bits for 16x16 sprites)
-			 fff unknown
-			 g sprite bank
-			 hhhh color
-			 iiiiiiii x position
+			 a: enable?
+			 b: size (0 = 8x8, 1 = 16x16)
+			 c: flip
+			 d: fine-y (coarse-y is from offset)
+			 e: sprite code (shift right 2 bits for 16x16 sprites)
+			 f: unknown
+			 g: sprite bank
+			 h: color
+			 i: x position
 			*/
-			i -= 4;
-			bool const enable(m_spr_ram[offs + i] & 0x80);
-			if (enable)
+
+			if (m_spr_ram[offs + i] & 0x80)
 			{
 				bool const big(m_spr_ram[offs + i] & 0x40);
 				bool const xflip(m_spr_ram[offs + i] & 0x20);
@@ -99,6 +100,7 @@ void ladybug_video_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 				int const color(m_spr_ram[offs + i + 2] & 0x0f);
 				int const xpos(m_spr_ram[offs + i + 3]);
 				int const ypos((offs >> 2) | (m_spr_ram[offs + i] & 0x0f));
+
 				if (big) // 16x16
 					m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code >> 2, color, xflip, yflip, xpos, ypos - 8, 0);
 				else // 8x8

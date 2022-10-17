@@ -65,9 +65,10 @@ void zerohour_stars_device::set_enable(bool on)
 }
 
 // This sets up which starfield to draw and the offset, to be called from screen_vblank_*()
-void zerohour_stars_device::update_state()
+void zerohour_stars_device::update_state(int state)
 {
-	if (m_enable)
+	// end of vblank
+	if (!state && m_enable)
 	{
 		m_count = m_count ? 0 : 1;
 		if (!m_count)

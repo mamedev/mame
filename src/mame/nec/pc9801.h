@@ -315,9 +315,8 @@ private:
 	uint8_t txt_scrl_r(offs_t offset);
 	void txt_scrl_w(offs_t offset, uint8_t data);
 
-	// TODO: make this virtual
-	// (necessary for H98 high-reso mode, PC9821-E02, SVGA binds)
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	// (virtual is necessary for H98 high-reso mode, PC9821-E02, SVGA binds)
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t m_font_line = 0;
 	std::unique_ptr<uint16_t[]> m_tvram;
@@ -372,6 +371,8 @@ public:
 	void pc9801ux(machine_config &config);
 	void pc9801vx(machine_config &config);
 	void pc9801rs(machine_config &config);
+	void pc9801dx(machine_config &config);
+	void pc9801fs(machine_config &config);
 
 	void init_pc9801vm_kanji();
 
@@ -380,6 +381,8 @@ protected:
 
 	void pc9801rs_io(address_map &map);
 	void pc9801rs_map(address_map &map);
+	void pc9801ux_io(address_map &map);
+	void pc9801ux_map(address_map &map);
 
 	uint16_t grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -426,9 +429,6 @@ private:
 	optional_device_array<ata_interface_device, 2> m_ide;
 //  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
-
-	void pc9801ux_io(address_map &map);
-	void pc9801ux_map(address_map &map);
 
 	uint32_t a20_286(bool state);
 

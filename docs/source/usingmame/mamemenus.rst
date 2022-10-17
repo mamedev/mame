@@ -267,8 +267,8 @@ your current settings.  Recognised input devices depend on the
 enabled or disabled using the :ref:`mouse <mame-commandline-nomouse>`,
 :ref:`lightgun <mame-commandline-nolightgun>` and :ref:`joystick
 <mame-commandline-nojoystick>` options.  You can reach the Input Devices menu by
-selecting **Input Devices** from the :ref:`main menu <menus-main>` or the
-General Settings menu.
+selecting **Input Devices** from the :ref:`Input Settings menu
+<menus-inputopts>` or the General Settings menu.
 
 Input devices are grouped by device class (for example keyboards or light guns).
 You can move between device classes using the **Next Group** and **Previous
@@ -280,4 +280,7 @@ each control is displayed on the left and its current state is shown on the
 right.  When an analog axis control is highlighted, its state is also shown in
 graphical form below the menu.  Digital control states are either zero
 (inactive) or one (active).  Analog axis input states range from -65,536 to
-65,536 with the neutral position at zero.
+65,536 with the neutral position at zero.  You can also select **Copy Device
+ID** to copy the device’s ID to the clipboard.  This is useful for setting up
+:ref:`stable controller IDs <devicemap>` in :ref:`controller configuration files
+<ctrlrcfg>`.

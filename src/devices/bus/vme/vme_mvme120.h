@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "bus/vme/vme.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"

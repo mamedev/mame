@@ -363,7 +363,7 @@ void segas16a_state::n7751_control_w(uint8_t data)
 	//
 	m_n7751->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 	m_n7751->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 
@@ -452,7 +452,7 @@ void segas16a_state::mcu_control_w(uint8_t data)
 
 	// apply an extra boost if the main CPU is just waking up
 	if ((m_mcu_control ^ data) & 0x40)
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+		machine().scheduler().perfect_quantum(attotime::from_usec(10));
 
 	// remember the remaining bits, which control read/write access to main CPU space
 	m_mcu_control = data;
@@ -593,7 +593,7 @@ WRITE_LINE_MEMBER(segas16a_state::i8751_main_cpu_vblank_w)
 
 		// boost interleave to ensure that the MCU can break the M68000 out of a STOP
 		if (state)
-			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+			machine().scheduler().perfect_quantum(attotime::from_usec(100));
 	}
 }
 
@@ -644,7 +644,7 @@ TIMER_CALLBACK_MEMBER(segas16a_state::i8751_sync)
 	if (!m_i8751_vblank_hook.isnull())
 		m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
 	else if (m_mcu != nullptr)
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
+		machine().scheduler().perfect_quantum(attotime::from_msec(10));
 }
 
 TIMER_CALLBACK_MEMBER(segas16a_state::ppi_sync)

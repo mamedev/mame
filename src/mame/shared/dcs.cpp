@@ -1479,7 +1479,7 @@ int dcs_audio_device::control_r()
 {
 	/* only boost for DCS2 boards */
 	if (!m_auto_ack && !m_transfer.hle_enabled)
-		machine().scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
+		machine().scheduler().add_quantum(attotime::from_nsec(500), attotime::from_usec(5));
 	if ( /* m_rev == REV_DSC1 || */ m_rev == REV_DCS1P5) // == 1 check breaks mk3
 		return IS_OUTPUT_FULL() ? 0x80 : 0x00;
 	return m_latch_control;
@@ -1539,7 +1539,7 @@ void dcs_audio_device::dcs_delayed_data_w(uint16_t data)
 		logerror("%s:dcs_data_w(%04X)\n", machine().describe_context(), data);
 
 	/* boost the interleave temporarily */
-	machine().scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
+	machine().scheduler().add_quantum(attotime::from_nsec(500), attotime::from_usec(5));
 
 	/* set the IRQ line on the ADSP */
 	m_cpu->set_input_line(ADSP2105_IRQ2, ASSERT_LINE);

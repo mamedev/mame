@@ -48,6 +48,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -590,10 +592,12 @@ ROM_START( popper )
 	ROM_LOAD("p.m4", 0x20, 0x20, CRC(384de5c1) SHA1(892c89a01c11671c5708113b4e4c27b84be37ea6))
 ROM_END
 
+} // anonymous namespace
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1983, popper, 0,      popper,  popper, popper_state, empty_init, ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY                     FULLNAME  FLAGS
+GAME( 1983, popper, 0,      popper,  popper, popper_state, empty_init, ROT90,    "Omori Electric Co., Ltd.", "Popper", MACHINE_SUPPORTS_SAVE )

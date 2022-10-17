@@ -86,7 +86,7 @@ protected:
 
 	virtual void machine_start() override;
 private:
-	required_memory_bank_array<4> m_ems_banks;
+	optional_memory_bank_array<4> m_ems_banks;
 	memory_view m_ext_view;
 	required_memory_bank m_ramdrv_bank;
 	required_device<upd4991a_device> m_rtc_pio;
@@ -99,6 +99,24 @@ private:
 	u8 memcard_status_1_r(offs_t offset);
 	u8 memcard_status_2_r(offs_t offset);
 	u8 m_ext_view_sel = 0;
+};
+
+class bungo_mini5sx_state : public pc98ha_state
+{
+public:
+	bungo_mini5sx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc98ha_state(mconfig, type, tag)
+	{
+	}
+
+	void mini5sx_config(machine_config &config);
+
+protected:
+	void mini5sx_map(address_map &map);
+	void mini5sx_io(address_map &map);
+
+//  virtual void machine_start() override;
+private:
 };
 
 #endif // MAME_INCLUDES_PC9801_EPSON_H

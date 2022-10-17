@@ -2,23 +2,21 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    samples.c
-
     Sound device for sample playback.
 
 ****************************************************************************
 
-    Playback of pre-recorded samples. Used for high-level simulation of
-    discrete sound circuits where proper low-level simulation isn't
-    available.  Also used for tape loops and similar.
+Playback of pre-recorded samples. Used for high-level simulation of discrete
+sound circuits where proper low-level simulation isn't available. Also used
+for tape loops and similar.
 
-    Current limitations
-      - Only supports single channel samples!
-
-    Considerations
-      - Maybe this should be part of the presentation layer
-        (artwork etc.) with samples specified in .lay files instead of
-        in drivers?
+TODO:
+- Only supports single channel samples!
+- When mame.ini samplerate is close to the loaded sample(s) samplerate,
+  (eg. 48000, with 44100Hz samples), things can sound quite bad. This is
+  more an issue in sound.cpp resampler, not this device.
+- Maybe this should be part of the presentation layer (artwork etc.)
+  with samples specified in .lay files instead of in drivers?
 
 ***************************************************************************/
 

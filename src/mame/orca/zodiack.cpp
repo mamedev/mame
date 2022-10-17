@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Zsolt Vasvari
+// copyright-holders: Zsolt Vasvari
+
 /***************************************************************************
 
 Zodiack/Dogfight (c) 1983 Orca
@@ -26,7 +27,7 @@ Notes:
 TODO:
 - improve video emulation (especially moguchan colors)
 - where do the sound related irqs come from exactly?
-- can eventually be merged with espial.c
+- can eventually be merged with orca/espial.cpp
 
 ============================================================================
 
@@ -87,22 +88,67 @@ Notes:
       ALL PROMs MMI 6331
 
 Bounty2:
-- First 0x100 bytes of the first rom contains a screen that appears if the protection fails.
+- First 0x100 bytes of the first ROM contain a screen that appears if the protection fails.
 - The PCB uses a large CPU epoxy module marked "CPU PACKII". A battery can be spotted through the epoxy.
 - If you copy the first 0x100 bytes from "bounty" then the game works.
 - Therefore, it can be surmised that the epoxy blob contains a static ram or similar with
-  the first 256 bytes of the real game's rom, for as long as the battery lasts.
+  the first 256 bytes of the real game's ROM, for as long as the battery lasts.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "zodiack.h"
 
+#include "orca40c.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "orca40c.h"
+
 #include "speaker.h"
 
+
+namespace {
+
+class zodiack_state : public driver_device
+{
+public:
+	zodiack_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
+			m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void zodiack(machine_config &config);
+	void percuss(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void nmi_mask_w(uint8_t data);
+	void sound_nmi_enable_w(uint8_t data);
+	void master_soundlatch_w(uint8_t data);
+	void control_w(uint8_t data);
+
+	// devices
+	required_device<z80_device> m_maincpu;
+	required_device<z80_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	// state
+	uint8_t m_main_nmi_enabled = 0;
+	uint8_t m_sound_nmi_enabled = 0;
+
+	INTERRUPT_GEN_MEMBER(sound_nmi_gen);
+	DECLARE_WRITE_LINE_MEMBER(vblank_main_nmi_w);
+
+	void io_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
 
 void zodiack_state::nmi_mask_w(uint8_t data)
 {
@@ -120,7 +166,7 @@ WRITE_LINE_MEMBER(zodiack_state::vblank_main_nmi_w)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
+INTERRUPT_GEN_MEMBER(zodiack_state::sound_nmi_gen)
 {
 	if (m_sound_nmi_enabled)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -135,10 +181,10 @@ void zodiack_state::master_soundlatch_w(uint8_t data)
 
 void zodiack_state::control_w(uint8_t data)
 {
-	/* Bit 0-1 - coin counters */
+	// Bit 0-1 - coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);
-	/* Bit 2 - ???? */
+	// Bit 2 - ????
 }
 
 
@@ -151,7 +197,7 @@ void zodiack_state::main_map(address_map &map)
 	map(0x6083, 0x6083).portr("IN0");
 	map(0x6084, 0x6084).portr("IN1");
 	map(0x6090, 0x6090).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(zodiack_state::master_soundlatch_w));
-	map(0x7000, 0x7000).nopr().w("watchdog", FUNC(watchdog_timer_device::reset_w));  /* NOP??? */
+	map(0x7000, 0x7000).nopr().w("watchdog", FUNC(watchdog_timer_device::reset_w));  // NOP???
 	map(0x7100, 0x7100).w(FUNC(zodiack_state::nmi_mask_w));
 	map(0x7200, 0x7200).w("videopcb", FUNC(orca_ovg_40c_device::flipscreen_w));
 	map(0x9000, 0x903f).ram().w("videopcb", FUNC(orca_ovg_40c_device::attributes_w)).share("videopcb:attributeram");
@@ -180,7 +226,7 @@ void zodiack_state::io_map(address_map &map)
 
 
 static INPUT_PORTS_START( zodiack )
-	PORT_START("DSW0")      /* never read in this game */
+	PORT_START("DSW0")      // never read in this game
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -204,7 +250,7 @@ static INPUT_PORTS_START( zodiack )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8") /* Manual shows this one as Service Mode */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8") // Manual shows this one as Service Mode
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -249,10 +295,10 @@ static INPUT_PORTS_START( dogfight )
 	PORT_DIPSETTING(    0x18, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )  /* most likely unused */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )  // most likely unused
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  /* most likely unused */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  // most likely unused
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -347,8 +393,8 @@ static INPUT_PORTS_START( moguchan )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_COCKTAIL      /* these are read, but are they */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )                   /* ever used? */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_COCKTAIL      // these are read, but are they
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )                   // ever used?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 INPUT_PORTS_END
 
@@ -506,15 +552,15 @@ void zodiack_state::machine_reset()
 
 void zodiack_state::zodiack(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(18'432'000) / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zodiack_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(zodiack_state::irq0_line_hold), attotime::from_hz(1*60)); // sound related - unknown source, timing is guessed
+	m_maincpu->set_periodic_int(FUNC(zodiack_state::irq0_line_hold), attotime::from_hz(1 * 60)); // sound related - unknown source, timing is guessed
 
-	Z80(config, m_audiocpu, XTAL(18'432'000)/6);
+	Z80(config, m_audiocpu, XTAL(18'432'000) / 6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zodiack_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &zodiack_state::io_map);
-	m_audiocpu->set_periodic_int(FUNC(zodiack_state::zodiack_sound_nmi_gen), attotime::from_hz(8*60)); // sound tempo - unknown source, timing is guessed
+	m_audiocpu->set_periodic_int(FUNC(zodiack_state::sound_nmi_gen), attotime::from_hz(8 * 60)); // sound tempo - unknown source, timing is guessed
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -523,12 +569,12 @@ void zodiack_state::zodiack(machine_config &config)
 	orca_ovg_40c_device &videopcb(ORCA_OVG_40C(config, "videopcb", 0));
 	videopcb.set_screen("screen");
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "aysnd", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "aysnd", XTAL(18'432'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void zodiack_state::percuss(machine_config &config)
@@ -665,6 +711,8 @@ ROM_START( bounty2 ) // The PCB uses a large CPU epoxy module marked "CPU PACKII
 	ROM_LOAD( "mb7051.2a",   0x0000, 0x0020, CRC(0de11a46) SHA1(3bc81571832dd78b29654e86479815ee5f97a4d3) )
 	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1983, zodiack,  0,      zodiack, zodiack,  zodiack_state, empty_init, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */

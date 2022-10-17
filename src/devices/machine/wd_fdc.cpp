@@ -148,6 +148,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	force_ready = false;
 	disable_motor_control = false;
 	spinup_on_interrupt = false;
+	extended_ddam = false;
 	hlt = true; // assume tied to VCC
 }
 
@@ -1924,7 +1925,12 @@ void wd_fdc_device_base::live_run(attotime limit)
 						cur_live.shift_reg == 0xf56e ? 0xafa5 :
 						0xbf84;
 
-					if((cur_live.data_reg & 0xfe) == 0xf8)
+					if(extended_ddam) {
+						if(!(cur_live.data_reg & 1))
+							status |= S_DDM;
+						if(!(cur_live.data_reg & 2))
+							status |= S_DDM << 1;
+					} else if((cur_live.data_reg & 0xfe) == 0xf8)
 						status |= S_DDM;
 
 					cur_live.data_separator_phase = false;
@@ -2194,7 +2200,11 @@ void wd_fdc_device_base::live_run(attotime limit)
 						live_write_fm(0x00);
 					else if(cur_live.byte_counter < 7) {
 						cur_live.crc = 0xffff;
-						live_write_raw(command & 1 ? 0xf56a : 0xf56f);
+						if(extended_ddam) {
+							static const uint16_t dam[4] = { 0xf56f, 0xf56e, 0xf56b, 0xf56a };
+							live_write_raw(dam[command & 3]);
+						} else
+							live_write_raw(command & 1 ? 0xf56a : 0xf56f);
 					} else if(cur_live.byte_counter < sector_size + 7-1) {
 						if(drq) {
 							status |= S_LOST;
@@ -2701,6 +2711,7 @@ fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, dev
 	motor_control = false;
 	ready_hooked = true;
 	spinup_on_interrupt = true; // ZX-Spectrum Beta-disk V2 require this, or ReadSector command should set HLD before RDY check
+	extended_ddam = true;
 }
 
 int fd1771_device::calc_sector_size(uint8_t size, uint8_t command) const

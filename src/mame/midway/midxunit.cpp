@@ -375,10 +375,10 @@ ROM_START( revx )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u65.u65",  0x0c00002, 0x80000, CRC(6eee3e71) SHA1(0ef22732e0e2bb5207559decd43f90d1e338ad7b) )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u66.u66",  0x0c00003, 0x80000, CRC(b43d6fff) SHA1(87584e7aeea9d52a43023d40c359591ff6342e84) )
 
-	ROM_LOAD32_BYTE( "revx.u51",  0x0e00000, 0x80000, CRC(9960ac7c) SHA1(441322f061d627ca7573f612f370a85794681d0f) ) // labels needs to be verified, so far was observed only reprogrammed P5 ROMs
-	ROM_LOAD32_BYTE( "revx.u52",  0x0e00001, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
-	ROM_LOAD32_BYTE( "revx.u53",  0x0e00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
-	ROM_LOAD32_BYTE( "revx.u54",  0x0e00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u51.u51",  0x0e00000, 0x80000, CRC(9960ac7c) SHA1(441322f061d627ca7573f612f370a85794681d0f) ) // labels needs to be verified, so far was observed only reprogrammed P5 ROMs
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u52.u52",  0x0e00001, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u53.u53",  0x0e00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u54.u54",  0x0e00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
 
 	ROM_REGION( 0x600, "plds", 0 )
 	ROM_LOAD( "a-17722.u1",   0x000, 0x117, CRC(054de7a3) SHA1(bb7abaec50ed704c03b44d5d54296898f7c80d38) )

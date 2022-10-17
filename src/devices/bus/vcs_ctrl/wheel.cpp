@@ -73,5 +73,5 @@ uint8_t vcs_wheel_device::vcs_joy_r()
 {
 	static const uint8_t driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
 
-	return m_joy->read() | driving_lookup[ ( m_wheel->read() & 0x18 ) >> 3 ];
+	return m_joy->read() | driving_lookup[BIT(m_wheel->read(), 3, 2)];
 }

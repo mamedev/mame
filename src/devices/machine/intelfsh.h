@@ -34,6 +34,7 @@ public:
 		FLASH_SHARP_LH28F016S,
 		FLASH_SHARP_LH28F016S_16BIT,
 		FLASH_INTEL_E28F008SA,
+		FLASH_MACRONIX_29F008TC,
 		FLASH_MACRONIX_29L001MC,
 		FLASH_MACRONIX_29LV160TMC,
 		FLASH_PANASONIC_MN63F805MNP,
@@ -81,27 +82,27 @@ protected:
 	optional_memory_region   m_region;
 
 	// configuration state
-	uint32_t                   m_type;
-	int32_t                    m_size;
-	uint8_t                    m_bits;
-	uint32_t                   m_addrmask;
-	uint16_t                   m_device_id;
-	uint8_t                    m_maker_id;
+	uint32_t                 m_type;
+	int32_t                  m_size;
+	uint8_t                  m_bits;
+	uint32_t                 m_addrmask;
+	uint16_t                 m_device_id;
+	uint8_t                  m_maker_id;
 	bool                     m_sector_is_4k;
 	bool                     m_sector_is_16k;
 	bool                     m_top_boot_sector;
 	bool                     m_bot_boot_sector;
-	uint8_t                    m_page_size;
+	uint8_t                  m_page_size;
 
 	// internal state
 	std::unique_ptr<uint8_t[]> m_data;
-	uint8_t                    m_status;
-	int32_t                    m_erase_sector;
-	int32_t                    m_flash_mode;
+	uint8_t                  m_status;
+	int32_t                  m_erase_sector;
+	int32_t                  m_flash_mode;
 	bool                     m_flash_master_lock;
 	emu_timer *              m_timer;
-	int32_t                    m_bank;
-	uint8_t                    m_byte_count;
+	int32_t                  m_bank;
+	uint8_t                  m_byte_count;
 };
 
 
@@ -244,6 +245,12 @@ class intel_e28f008sa_device : public intelfsh8_device
 {
 public:
 	intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class macronix_29f008tc_device : public intelfsh8_device
+{
+public:
+	macronix_29f008tc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class macronix_29l001mc_device : public intelfsh8_device
@@ -392,6 +399,7 @@ DECLARE_DEVICE_TYPE(FUJITSU_29DL164BD,     fujitsu_29dl164bd_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29LV002TC,     fujitsu_29lv002tc_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29LV800B,      fujitsu_29lv800b_device)
 DECLARE_DEVICE_TYPE(INTEL_E28F400B,        intel_e28f400b_device)
+DECLARE_DEVICE_TYPE(MACRONIX_29F008TC,     macronix_29f008tc_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29L001MC,     macronix_29l001mc_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29LV160TMC,   macronix_29lv160tmc_device)
 DECLARE_DEVICE_TYPE(TMS_29F040,            tms_29f040_device)

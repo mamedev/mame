@@ -6,28 +6,31 @@ Zero Hour / Red Clash
 
 runs on hardware similar to Lady Bug
 
-driver by inkling
+initial driver by inkling
 
 Notes:
 - In the Tehkan set (redclashta) the ship doesn't move during attract mode.
   Earlier version? Gameplay is different too.
 
 TODO:
-- Some graphical problems in both games
 - redclash supports more background layer effects: white+mixed with other colors
   scrolling at the same speed as the stars, it's used in canyon parts and during the
   big ufo explosion
-- According to video reference(could only find 1), redclash player bullets should be
-  4*2px red on the 1st half of the screen and 8*2px yellow on the 2nd half, zerohour
-  bullets are correct though(always 8*2px magenta)
-- Sound (analog, schematics available for Zero Hour), redclash sound is not the same
-- redclash beeper frequency range should be higher, but it doesn't really matter
-  since it can't be solved with a simple multiply calculation. Besides, anything more
-  than right now and ears will be destroyed, so maybe the sound is softer(filtered)
+- redclash canyon level, a gap sometimes appears on the right side, maybe BTANB
+- replace samples with netlist audio (schematics available for zerohour)
+- zerohour should play a beep when an orange asteroid is shot (not sure if it's
+  worth simulating this, netlist would auto solve this problem)
+- does redclash have more triggered sounds? according to a pcb video, it only
+  has the player shot sound, no explosions (not counting the beeper)
+- redclash beeper frequency range should be higher, but it can't be solved with a
+  simple multiply calculation. Besides, anything more than right now and ears will
+  be destroyed, so maybe the sound is softer(filtered)
 
 BTANB:
 - redclash gameplay tempo is erratic (many slowdowns)
 - redclash beeper sound stops abruptly at the canyon parts
+- other than the pitch being inaccurate (see TODO), redclash beeper really does
+  sound like garbage, the only time it sounds pleasing is during the boss fight
 
 ***************************************************************************/
 
@@ -37,6 +40,8 @@ BTANB:
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/clock.h"
+#include "machine/timer.h"
+#include "sound/dac.h"
 #include "sound/spkrdev.h"
 #include "sound/samples.h"
 #include "video/resnet.h"
@@ -76,14 +81,11 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(update_stars);
 	void videoram_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	void star_reset_w(u8 data);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(star_w);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sample_w);
-	virtual DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
 
 	void palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -101,20 +103,25 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<zerohour_stars_device> m_stars;
-	optional_device<samples_device> m_samples;
+	required_device<samples_device> m_samples;
 
 	tilemap_t *m_fg_tilemap = nullptr;
 	int m_sound_on = 0;
+	int m_sample_asteroid = 0;
 	int m_gfxbank = 0; // redclash only
+
+private:
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sample_w);
 };
 
-// redclash, adds background layer
+// redclash, adds background layer, one extra sound channel
 class redclash_state : public zerohour_state
 {
 public:
 	redclash_state(const machine_config &mconfig, device_type type, const char *tag)
 		: zerohour_state(mconfig, type, tag)
 		, m_beep_clock(*this, "beep_clock")
+		, m_beep_trigger(*this, "beep_trigger")
 		, m_beep(*this, "beep")
 	{ }
 
@@ -123,19 +130,24 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(sound_enable_w) override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
 	void background_w(u8 data);
-	void beeper_w(u8 data);
+	void beep_freq_w(u8 data) { m_beep_freq = data; }
+	DECLARE_WRITE_LINE_MEMBER(sample_w);
+	DECLARE_WRITE_LINE_MEMBER(beep_trigger_w);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beep_clock->set_period(attotime::never); }
 
 	void redclash_map(address_map &map);
 
 	required_device<clock_device> m_beep_clock;
+	required_device<timer_device> m_beep_trigger;
 	required_device<speaker_sound_device> m_beep;
 
 	u8 m_background = 0;
+	u8 m_beep_freq = 0;
 };
 
 void zerohour_state::init_zerohour()
@@ -155,6 +167,7 @@ void zerohour_state::init_zerohour()
 void zerohour_state::machine_start()
 {
 	save_item(NAME(m_sound_on));
+	save_item(NAME(m_sample_asteroid));
 }
 
 void redclash_state::machine_start()
@@ -162,6 +175,7 @@ void redclash_state::machine_start()
 	zerohour_state::machine_start();
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_background));
+	save_item(NAME(m_beep_freq));
 }
 
 
@@ -274,11 +288,6 @@ void redclash_state::background_w(u8 data)
 	m_background = data;
 }
 
-WRITE_LINE_MEMBER(zerohour_state::flipscreen_w)
-{
-	flip_screen_set(state);
-}
-
 template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::star_w)
 {
 	m_stars->set_speed(state ? 1 << N : 0, 1U << N);
@@ -287,12 +296,6 @@ template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::star_w)
 void zerohour_state::star_reset_w(u8 data)
 {
 	m_stars->set_enable(true);
-}
-
-WRITE_LINE_MEMBER(zerohour_state::update_stars)
-{
-	if (!state)
-		m_stars->update_state();
 }
 
 
@@ -327,11 +330,22 @@ void zerohour_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			i -= 4;
 
+			/*
+			 e-sssyyy iiiiiiii --c--ccc xxxxxxxx
+
+			 e: enable?
+			 i: code (some bits unused for large sprites)
+			 s: size (0x20 only applies to size 16x16)
+			 c: color
+			 x: x position
+			 y: fine-y (coarse-y is from offset)
+			*/
+
 			if (m_spriteram[offs + i] & 0x80)
 			{
-				int color = bitswap<4>(m_spriteram[offs + i + 2], 5,2,1,0);
 				int sx = m_spriteram[offs + i + 3];
 				int sy = offs / 4 + (m_spriteram[offs + i] & 0x07) - 16;
+				int color = bitswap<4>(m_spriteram[offs + i + 2], 5,2,1,0);
 				int bank = 0, code = 0;
 
 				switch ((m_spriteram[offs + i] & 0x18) >> 3)
@@ -344,8 +358,8 @@ void zerohour_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 					case 2: // 16x16
 						if (m_spriteram[offs + i] & 0x20) // zero hour spaceships
 						{
-							code = ((m_spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
 							bank = 4 + ((m_spriteram[offs + i + 1] & 0x02) >> 1);
+							code = ((m_spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
 						}
 						else
 						{
@@ -382,6 +396,10 @@ void zerohour_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int sx = 8 * offs + 8;
 		int sy = 0xff - m_videoram[offs + 0x20];
 
+		// width and color are from the same bitfield
+		int width = 8 - (m_videoram[offs] >> 5 & 6);
+		int color = (m_videoram[offs] >> 3 & 0x10) | 5;
+
 		if (flip_screen())
 			sx = 264 - sx;
 
@@ -389,10 +407,10 @@ void zerohour_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprec
 		sx -= fine_x;
 
 		for (int y = 0; y < 2; y++)
-			for (int x = 0; x < 8; x++)
+			for (int x = 0; x < width; x++)
 			{
 				if (cliprect.contains(sx + x, sy - y))
-					bitmap.pix(sy - y, sx + x) = 0x3f;
+					bitmap.pix(sy - y, sx + x) = color;
 			}
 
 	}
@@ -434,17 +452,23 @@ u32 redclash_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 static const char *const zerohour_sample_names[] =
 {
 	"*zerohour",
-	"zh0",
-	"zh1",
-	"zh2",
-	"zh3",
-	"zh4",
-	"zh5",
-	"zh6",
-	"zh7",
-	"zh8",
-	"zh9",
-	"zh10",
+	"shoot",
+	"asteroid_hit_1",
+	"asteroid_hit_2",
+	"enemy_descend",
+	"shield_hit",
+	"player_dies",
+	"enemy_fire",
+	"bonus_warn",
+	"thrust",
+	"coin",
+	nullptr
+};
+
+static const char *const redclash_sample_names[] =
+{
+	"*redclash",
+	"shoot",
 	nullptr
 };
 
@@ -455,27 +479,52 @@ WRITE_LINE_MEMBER(zerohour_state::sound_enable_w)
 	m_sound_on = state;
 }
 
-WRITE_LINE_MEMBER(redclash_state::sound_enable_w)
-{
-	zerohour_state::sound_enable_w(state);
-	if (!state)
-		beeper_w(0);
-}
-
 template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::sample_w)
 {
+	int sample = N;
+
+	// asteroid hit sample alternates on each trigger
+	if (state && N == 1)
+	{
+		sample += m_sample_asteroid & 1;
+		m_sample_asteroid ^= 1;
+	}
+
+	// trigger 2 appears to be a modifier for asteroid hit, white noise is masked with pulse wave
+	if (N == 2)
+	{
+		// TODO
+		return;
+	}
+
 	if (m_sound_on && state)
-		m_samples->start(N, N);
+		m_samples->start(N, sample);
+
+	// thrust sound is level-triggered
 	else if (N == 8)
 		m_samples->stop(N);
 }
 
-void redclash_state::beeper_w(u8 data)
+WRITE_LINE_MEMBER(redclash_state::sample_w)
 {
-	// beeper frequency (0xff is off), preliminary
-	bool on = m_sound_on && (data != 0xff);
-	m_beep_clock->set_period(attotime::from_hz(on ? data * 8 : 0));
+	// only one sample
+	if (m_sound_on && state)
+		m_samples->start(0, 0);
 }
+
+WRITE_LINE_MEMBER(redclash_state::beep_trigger_w)
+{
+	if (state)
+	{
+		// enable beeper (timeout duration is guessed)
+		m_beep_trigger->adjust(attotime::from_msec(100));
+
+		// beeper frequency (0xff is off), preliminary
+		u16 freq = (m_beep_freq != 0xff) ? (m_beep_freq * 8 + 32) : 0;
+		m_beep_clock->set_period(attotime::from_hz(freq));
+	}
+}
+
 
 
 /***************************************************************************
@@ -502,7 +551,7 @@ void redclash_state::redclash_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x3000).w(FUNC(redclash_state::background_w));
-	map(0x3800, 0x3800).w(FUNC(redclash_state::beeper_w));
+	map(0x3800, 0x3800).w(FUNC(redclash_state::beep_freq_w));
 	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::videoram_w)).share(m_videoram);
 	map(0x4800, 0x4800).portr("IN0");
 	map(0x4801, 0x4801).portr("IN1");
@@ -761,13 +810,13 @@ void zerohour_state::base(machine_config &config)
 	m_outlatch[1]->q_out_cb<0>().set(FUNC(zerohour_state::star_w<0>));
 	m_outlatch[1]->q_out_cb<5>().set(FUNC(zerohour_state::star_w<1>));
 	m_outlatch[1]->q_out_cb<6>().set(FUNC(zerohour_state::star_w<2>));
-	m_outlatch[1]->q_out_cb<7>().set(FUNC(zerohour_state::flipscreen_w));
+	m_outlatch[1]->q_out_cb<7>().set(FUNC(zerohour_state::flip_screen_set));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(9.828_MHz_XTAL / 2, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(zerohour_state::screen_update));
-	screen.screen_vblank().set(FUNC(zerohour_state::update_stars));
+	screen.screen_vblank().set(m_stars, FUNC(zerohour_stars_device::update_state));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zerohour);
@@ -792,13 +841,14 @@ void zerohour_state::zerohour(machine_config &config)
 
 	m_outlatch[1]->q_out_cb<1>().set(FUNC(zerohour_state::sample_w<8>));
 	m_outlatch[1]->q_out_cb<2>().set(FUNC(zerohour_state::sound_enable_w));
-	m_outlatch[1]->q_out_cb<3>().set(FUNC(zerohour_state::sample_w<9>));
-	m_outlatch[1]->q_out_cb<4>().set(FUNC(zerohour_state::sample_w<10>));
+	m_outlatch[1]->q_out_cb<3>().set("dac", FUNC(dac_1bit_device::write));
+	m_outlatch[1]->q_out_cb<4>().set(FUNC(zerohour_state::sample_w<9>));
 
 	SPEAKER(config, "mono").front_center();
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	SAMPLES(config, m_samples);
-	m_samples->set_channels(11);
+	m_samples->set_channels(10);
 	m_samples->set_samples_names(zerohour_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
@@ -813,14 +863,23 @@ void redclash_state::redclash(machine_config &config)
 	m_stars->has_va_bit(false);
 
 	// sound hardware
+	m_outlatch[0]->q_out_cb<0>().set(FUNC(redclash_state::sample_w));
+	m_outlatch[0]->q_out_cb<4>().set(FUNC(redclash_state::beep_trigger_w));
 	m_outlatch[1]->q_out_cb<2>().set(FUNC(redclash_state::sound_enable_w));
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_beep).add_route(ALL_OUTPUTS, "mono", 0.5);
+	SPEAKER_SOUND(config, m_beep).add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	CLOCK(config, m_beep_clock, 0);
 	m_beep_clock->signal_handler().set(m_beep, FUNC(speaker_sound_device::level_w));
-	m_beep_clock->set_duty_cycle(0.25);
+	m_beep_clock->set_duty_cycle(0.2);
+
+	TIMER(config, "beep_trigger").configure_generic(FUNC(redclash_state::beeper_off));
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(redclash_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -994,7 +1053,7 @@ ROM_START( redclashs )
 	ROM_LOAD( "2.9c",        0x2000, 0x1000, CRC(b60e5ada) SHA1(37440f382c5e8852d804fa9837c36cc1e9d94d1d) )
 
 	ROM_REGION(0x0800, "gfx1", 0 )
-	ROM_LOAD( "6.a12",        0x0000, 0x0800, CRC(da9bbcc2) SHA1(4cbe03c7f5e99cc2f124e0089ea3c392156b5d92) )
+	ROM_LOAD( "6.a12",       0x0000, 0x0800, CRC(da9bbcc2) SHA1(4cbe03c7f5e99cc2f124e0089ea3c392156b5d92) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "4.3e",        0x0000, 0x0800, CRC(483a1293) SHA1(e7812475c7509389bcf8fee35598e9894428eb37) )
@@ -1020,9 +1079,9 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT           SCREEN  COMPANY                        FULLNAME                     FLAGS
-GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (bootleg)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, redclash,   0,        redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redclasht,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

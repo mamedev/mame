@@ -113,14 +113,10 @@ void ef9364_device::device_start()
 	palette[0] = rgb_t(0, 0, 0);
 	palette[1] = rgb_t(255, 255, 255);
 
-	m_screen_out.allocate( bitplane_xres, screen().height() );
-
 	cursor_cnt = 0;
 	cursor_state = 0;
 
 	save_item(NAME(m_border));
-
-	save_item(NAME(m_screen_out));
 }
 
 //-------------------------------------------------
@@ -142,8 +138,6 @@ void ef9364_device::device_reset()
 	}
 
 	memset(m_border, 0, sizeof(m_border));
-
-	m_screen_out.fill(0);
 
 	set_video_mode();
 }
@@ -178,32 +172,32 @@ void ef9364_device::draw_border(uint16_t line)
 }
 
 //-------------------------------------------------
-// screen_update: Framebuffer video ouput
+// screen_update: Framebuffer video output
 //-------------------------------------------------
 
 uint32_t ef9364_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for( int r = 0 ; r < NB_OF_ROWS ; r++ )
 	{
-		for( int y = 0 ; y < 8 ; y++ )
+		for( int y = 0 ; y < 12 ; y++ )
 		{
 			for( int x = 0 ; x < NB_OF_COLUMNS * 8 ; x++ )
 			{
-				if( ( ( x >> 3 ) != x_curs_pos )   ||  ( r != y_curs_pos ) || !cursor_state)
+				if( ( ( x >> 3 ) != x_curs_pos ) || ( r != y_curs_pos ) || !cursor_state)
 				{
 					unsigned char c = m_textram->read_byte( ( r * NB_OF_COLUMNS ) + ( x>>3 ) );
-
-					if( BIT(m_charset[((c<<3) + y) & (m_charset.length() - 1)], 7 - (x & 7)) )
-						m_screen_out.pix((r*12)+y, x) = palette[1];
+					int ra = (y & 8) ? 0 : y;
+					if( BIT(m_charset[((c<<3) + ra) & (m_charset.length() - 1)], 7 - (x & 7)) )
+						bitmap.pix((r*12)+y, x) = palette[1];
 					else
-						m_screen_out.pix((r*12)+y, x) = palette[0];
+						bitmap.pix((r*12)+y, x) = palette[0];
 				}
 				else
 				{
 					if(y != 7)
-						m_screen_out.pix((r*12)+y, x) = palette[0];
+						bitmap.pix((r*12)+y, x) = palette[0];
 					else
-						m_screen_out.pix((r*12)+y, x) = palette[1];
+						bitmap.pix((r*12)+y, x) = palette[1];
 				}
 			}
 		}
@@ -213,7 +207,6 @@ uint32_t ef9364_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	if(!cursor_cnt)
 		cursor_state ^= 1;
 
-	copybitmap(bitmap, m_screen_out, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -244,7 +237,7 @@ void ef9364_device::command_w(uint8_t cmd)
 
 	switch( cmd&7 )
 	{
-		case 0x0: // Page Erase & Cursor home
+		case 0x0: // Page erase and cursor home
 			for( y=0 ; y < NB_OF_ROWS ; y++ )
 			{
 				for( x=0 ; x < NB_OF_COLUMNS ; x++ )
@@ -254,15 +247,15 @@ void ef9364_device::command_w(uint8_t cmd)
 			}
 			x_curs_pos = 0;
 			y_curs_pos = 0;
-		break;
+			break;
 
-		case 0x1: // Erase to end of the line and return cursor
+		case 0x1: // Erase to end of line and return cursor
 			for( ; x_curs_pos < NB_OF_COLUMNS ; x_curs_pos++ )
 			{
 				m_textram->write_byte ( y_curs_pos * NB_OF_COLUMNS + x_curs_pos , erase_char );
 			}
 			x_curs_pos = 0;
-		break;
+			break;
 
 		case 0x2: // Line feed
 			y_curs_pos++;
@@ -284,30 +277,29 @@ void ef9364_device::command_w(uint8_t cmd)
 
 				y_curs_pos = NB_OF_ROWS - 1;
 			}
-		break;
+			break;
 
-		case 0x3: // Nop
-
-		break;
+		case 0x3: // No operation
+			break;
 
 		case 0x4: // Cursor left
 			if(x_curs_pos)
 				x_curs_pos--;
-		break;
+			break;
 
-		case 0x5: // Erasure of cursor Line.
+		case 0x5: // Erasure of cursor line
 			for( x = 0 ; x < NB_OF_COLUMNS ; x++ )
 			{
 				m_textram->write_byte ( y_curs_pos * NB_OF_COLUMNS + x , erase_char );
 			}
-		break;
+			break;
 
 		case 0x6: // Cursor up
 			if(y_curs_pos)
 				y_curs_pos--;
-		break;
+			break;
 
-		case 0x7: // Write char
+		case 0x7: // Normal character
 			if(cmd&0x8)
 				m_textram->write_byte ( y_curs_pos * NB_OF_COLUMNS + x_curs_pos , char_latch );
 
@@ -335,8 +327,7 @@ void ef9364_device::command_w(uint8_t cmd)
 					y_curs_pos = NB_OF_ROWS - 1;
 				}
 			}
-		break;
-
+			break;
 	}
 }
 

@@ -242,8 +242,8 @@ uint32_t nubus_image_device::image_r()
 void nubus_image_device::image_super_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *image = (uint32_t*)m_image->m_data.get();
-	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
-	mem_mask = ((mem_mask & 0xff) << 24) | ((mem_mask & 0xff00) << 8) | ((mem_mask & 0xff0000) >> 8) | ((mem_mask & 0xff000000) >> 24);
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
 
 	COMBINE_DATA(&image[offset]);
 }
@@ -251,13 +251,12 @@ void nubus_image_device::image_super_w(offs_t offset, uint32_t data, uint32_t me
 uint32_t nubus_image_device::image_super_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *image = (uint32_t*)m_image->m_data.get();
-	uint32_t data = image[offset];
-	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+	return swapendian_int32(image[offset]);
 }
 
 void nubus_image_device::file_cmd_w(uint32_t data)
 {
-//  data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+//  data = swapendian_int32(data);
 	filectx.curcmd = data;
 	switch (data) {
 	case kFileCmdGetDir:

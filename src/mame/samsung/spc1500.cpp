@@ -239,6 +239,8 @@ TODO:
 
 #include "formats/spc1000_cas.h"
 
+#include "utf8.h"
+
 
 namespace {
 

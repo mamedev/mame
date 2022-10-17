@@ -2,12 +2,12 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-        Hitachi HD44780 LCD controller
+    Hitachi HD44780 LCD controller
 
-        TODO:
-        - dump internal CGROM
-        - emulate osc pin, determine video timings and busy flag duration from it,
-          and if possible, remove m_busy_factor
+    TODO:
+    - dump internal CGROM
+    - emulate osc pin, determine video timings and busy flag duration from it,
+      and if possible, remove m_busy_factor
 
 ***************************************************************************/
 

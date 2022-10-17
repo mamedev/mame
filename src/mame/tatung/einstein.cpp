@@ -18,6 +18,8 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
@@ -33,6 +35,7 @@
 #include "video/tms9928a.h"
 #include "video/v9938.h"
 #include "sound/ay8910.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -78,6 +81,7 @@ public:
 		m_psg(*this, IC_I030),
 		m_centronics(*this, "centronics"),
 		m_strobe_timer(*this, "strobe"),
+		m_rom2(*this, "rom2"),
 		m_bios(*this, "bios"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
@@ -158,6 +162,7 @@ private:
 	required_device<ay8910_device> m_psg;
 	required_device<centronics_device> m_centronics;
 	required_device<timer_device> m_strobe_timer;
+	optional_device<generic_slot_device> m_rom2;
 	required_memory_region m_bios;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -470,6 +475,12 @@ void einstein_state::machine_start()
 
 void einstein_state::machine_reset()
 {
+	// 2nd rom socket
+	if (m_rom2.found() && m_rom2->exists())
+	{
+		memcpy(m_bios->base() + 0x4000, m_rom2->get_rom_base(), m_rom2->get_rom_size());
+	}
+
 	// rom enabled on reset
 	m_rom_enabled = 1;
 	m_bank1->set_entry(m_rom_enabled);
@@ -958,13 +969,6 @@ void einstein_state::einstein(machine_config &config)
 	FLOPPY_CONNECTOR(config, IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_original("einstein").set_filter("TC01");
-
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "com", attotime::from_seconds(2)));
-	quickload.set_load_callback(FUNC(einstein_state::quickload_cb));
-	quickload.set_interface("einstein_quik");
-
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -977,6 +981,17 @@ void einstein_state::einstein(machine_config &config)
 
 	/* user port */
 	EINSTEIN_USERPORT(config, "user").bstb_handler().set(IC_I063, FUNC(z80pio_device::strobe_b));
+
+	/* 2nd rom socket I024 */
+	GENERIC_SOCKET(config, m_rom2, generic_linear_slot, "einstein_rom", "bin,rom");
+
+	/* software lists */
+	SOFTWARE_LIST(config, "disk_list").set_original("einstein").set_filter("TC01");
+	SOFTWARE_LIST(config, "rom_list").set_original("einstein_rom");
+
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "com", attotime::from_seconds(2)));
+	quickload.set_load_callback(FUNC(einstein_state::quickload_cb));
+	quickload.set_interface("einstein_quik");
 }
 
 void einstein_state::einst256(machine_config &config)
@@ -991,6 +1006,7 @@ void einstein_state::einst256(machine_config &config)
 	config.device_remove(IC_I042 ":3");
 	config.device_remove("pipe");
 	config.device_remove("user");
+	config.device_remove("rom2");
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &einstein_state::einst256_io);
