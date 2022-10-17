@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, David Haywood
 /***************************************************************************
 
    Taito F3 Video emulation - Bryan McPhail, mish@tendril.co.uk
