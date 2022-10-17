@@ -71,12 +71,13 @@ license:CC0
 		<description>5 Plus One: Pack 10 - The Blues Brothers (compilation)</description>
 		<year>1994</year>
 		<publisher>Prism Leisure Corporation PLC</publisher>
-		<notes><![CDATA[CD-ROM includes
+		<notes><![CDATA[
+CD-ROM includes
 Complete Game: "The Blues Brothers"
 Demo/Shareware: "Bodycount", "Zone 66", "Save Our Pizzas", "Dangerous Dave", "Casino Slots"
 ]]></notes>
 		<info name="region" value="Europe" />
-		<info name="usage" value="DOS" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -92,12 +93,13 @@ Demo/Shareware: "Bodycount", "Zone 66", "Save Our Pizzas", "Dangerous Dave", "Ca
 		<description>5 Plus One: Pack 25 - TV Sports Football (compilation)</description>
 		<year>1994</year>
 		<publisher>Prism Leisure Corporation PLC</publisher>
-		<notes><![CDATA[CD-ROM includes
+		<notes><![CDATA[
+CD-ROM includes
 Complete Game: "TV Sports Football"
 Demo/Shareware: "Ranger Fox", "Monster Bash", "Onesimus", "Turoid", "Peristroka"
 ]]></notes>
 		<info name="region" value="Europe" />
-		<info name="usage" value="DOS" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -114,12 +116,13 @@ Demo/Shareware: "Ranger Fox", "Monster Bash", "Onesimus", "Turoid", "Peristroka"
 		<description>5 Plus One: Pack 34 - Super Tetris (compilation)</description>
 		<year>1996</year>
 		<publisher>Prism Leisure Corporation PLC</publisher>
-		<notes><![CDATA[CD-ROM includes
+		<notes><![CDATA[
+CD-ROM includes
 Complete Game: "Super Tetris"
 Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Miner"
 ]]></notes>
 		<info name="region" value="Europe" />
-		<info name="usage" value="DOS" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -203,9 +206,15 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 	<!-- disc label: Actionpack5 -->
 	<!-- Multi-5 language support: English, French, German, Italian, Spanish -->
 	<software name="actatari">
-		<description>Activision's Atari 2600 Action Pack (Megapak 8) (Multi 5)</description>
+		<description>Activision's Atari 2600 Action Pack (Megapak 8 release)</description>
 		<year>1997</year>
 		<publisher>Megamedia</publisher>
+		<notes><![CDATA[
+CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "Fishing Derby", "Freeway", "Frostbite", "Grand Prix",
+				 "H.E.R.O.", "Kaboom!", "Pitfall!", "River Raid", "Seaquest", "Sky Jinks", "Spider Fighter"
+]]></notes>
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="Europe" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -304,7 +313,7 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 
 	<!-- DOS -->
 	<software name="aftlifeu">
-		<description>Afterlife (US v1.1)</description>
+		<description>Afterlife (USA, v1.1)</description>
 		<year>1996</year>
 		<publisher>LucasArts</publisher>
 		<info name="version" value="1.1" />
@@ -452,7 +461,7 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		    L384 9614 05921024 B51103-30 M1S4
 		    IFPI6100
 		-->
-		<description>Alien Odyssey (US)</description>
+		<description>Alien Odyssey (USA)</description>
 		<year>1995</year>
 		<publisher>Philips / Argonaut Software LTD</publisher>
 
@@ -975,7 +984,7 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<notes>CD-ROM includes: "Cadaver", "Cadaver: The Payoff", "Gods", "Magic Pockets", "Speedball 2", "Xenon 2"</notes>
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<info name="usage" value="DOS" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -992,6 +1001,10 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<year>1994</year>
 		<publisher>Interplay</publisher>
 		<info name="developer" value="Blizzard Entertainment" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Blackhawk (Europe) (En,Fr,De)" sha1="7031e0b00ade177a62d0df78c3f2f69fbc3e4e33" />
@@ -1954,7 +1967,7 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<notes>CD-ROM includes: "Another World", "Cruise for a Corpse", "Flashback", "Future Wars", "Operation Stealth"</notes>
 		<info name="language" value="English/German" />
 		<info name="region" value="Europe" />
-		<info name="usage" value="DOS" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2263,9 +2276,10 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<year>1995</year>
 		<publisher>Kixx XL</publisher>
 		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<info name="usage" value="DOS" />
 		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
 		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2282,9 +2296,10 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<year>1994</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
 		<info name="region" value="Germany" />
-		<info name="usage" value="DOS" />
 		<info name="version" value="1.0" />
+		<sharedfeat name="platform" value="DOS" />
 		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2301,9 +2316,10 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<year>1994</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
 		<info name="region" value="Germany" />
-		<info name="usage" value="DOS" />
 		<info name="version" value="Shareware Version 1.1" />
+		<sharedfeat name="platform" value="DOS" />
 		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2320,9 +2336,10 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<year>1997</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
 		<info name="region" value="Spain" />
-		<info name="usage" value="DOS" />
 		<info name="version" value="1.0" />
+		<sharedfeat name="platform" value="DOS" />
 		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2339,9 +2356,10 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<year>1995</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<info name="usage" value="DOS" />
 		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
 		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2358,9 +2376,10 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<year>1995</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<info name="usage" value="DOS" />
 		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
 		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2377,9 +2396,10 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<year>1995</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<info name="usage" value="DOS" />
 		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
 		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2396,9 +2416,10 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<year>1997</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Moonlite Software" />
-		<info name="usage" value="DOS" />
+		<info name="language" value="English" />
 		<info name="region" value="USA" />
 		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
 		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2421,26 +2442,33 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 CD-ROM 1: "Catacomb 3-D", "Commander Keen: Invasion of the Vorticons", "Commander Keen: Goodbye Galaxy", "Commander Keen: Aliens Ate My Babysitter!", "Commander Keen: Keen Dreams",
 		  "Dangerous Dave", "Hover Tank 3D", "Rescue Rover", "Rescue Rover 2", "Shadow Knights", "Slordax: The Unknown Enemy", "Spear of Destiny", "The Catacomb", "Wolfenstein 3D"
 CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "The Ultimate DOOM"
+CD-ROM 3: "Quake"
+CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D"
 ]]></notes>
-		<info name="usage" value="Windows 95" />
+		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Vintage"/>
 			<diskarea name="cdrom">
 				<disk name="id Anthology (USA) (Disc 1) (Vintage)" sha1="f2e0dcc8252d0b11cc770452f6513fc1d2653452" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="DOOM"/>
 			<diskarea name="cdrom">
 				<disk name="id Anthology (USA) (Disc 2) (Doom) (Rev 1)" sha1="0cc44f09c53368ac0a5360db9b16d5d1ddf4380b" />
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Quake"/>
 			<diskarea name="cdrom">
 				<disk name="id Anthology (USA) (Disc 3) (Quake)" status="nodump" />
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="Mac"/>
 			<diskarea name="cdrom">
 				<disk name="id Anthology (USA) (Disc 4) (Mac)" status="nodump" />
 			</diskarea>
@@ -3354,9 +3382,10 @@ CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "
 		<description>Zool: Ninja of the "Nth" Dimension</description>
 		<year>1996</year>
 		<publisher>Gremlin Interactive</publisher>
+		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<info name="usage" value="DOS" />
 		<info name="version" value="24/02/94" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3372,8 +3401,9 @@ CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "
 		<description>Zool 2</description>
 		<year>1994</year>
 		<publisher>Gremlin Interactive</publisher>
+		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<info name="usage" value="DOS" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
