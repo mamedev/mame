@@ -179,7 +179,7 @@ IRQ line connected to CPU
  0F00-0F03 |R/W| D D D D D D D D | PIA6821 IC8
            |   |                 |
            |   |                 | port A
-           |   |       	         |
+           |   |                 |
            |   |                 |        PA0-PA7 INPUT  multiplexed inputs data
            |   |                 |
            |   |                 |        CA1     INPUT, not connected
