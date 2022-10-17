@@ -13,19 +13,18 @@
 DEFINE_DEVICE_TYPE(MSX_SLOT_MSX_WRITE, msx_slot_msx_write_device, "msx_slot_msx_write", "MSX Internal MSX-Write")
 
 
-msx_slot_msx_write_device::msx_slot_msx_write_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_msx_write_device::msx_slot_msx_write_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_SLOT_MSX_WRITE, tag, owner, clock)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_switch_port(*this, "SWITCH")
+	, m_rombank(*this, "rombank%u", 0U)
+	, m_view1(*this, "view1")
+	, m_view2(*this, "view2")
 	, m_region_offset(0)
-	, m_rom(nullptr)
-	, m_bank_base_4000(nullptr)
-	, m_bank_base_8000(nullptr)
 	, m_enabled(true)
 {
 }
-
 
 static INPUT_PORTS_START(msx_write)
 	PORT_START("SWITCH")
@@ -33,7 +32,6 @@ static INPUT_PORTS_START(msx_write)
 	PORT_CONFSETTING(0x00, "disabled")
 	PORT_CONFSETTING(0x01, "enabled")
 INPUT_PORTS_END
-
 
 ioport_constructor msx_slot_msx_write_device::device_input_ports() const
 {
@@ -48,63 +46,33 @@ void msx_slot_msx_write_device::device_start()
 		fatalerror("Memory region '%s' is not the correct size for the MSX-Write firmware\n", m_rom_region.finder_tag());
 	}
 
-	m_rom = m_rom_region->base() + m_region_offset;
+	m_rombank[0]->configure_entries(0, 0x20, m_rom_region->base() + m_region_offset, 0x4000);
+	m_rombank[1]->configure_entries(0, 0x20, m_rom_region->base() + m_region_offset, 0x4000);
 
-	save_item(NAME(m_selected_bank));
+	page(1)->install_view(0x4000, 0x7fff, m_view1);
+	m_view1[0].install_read_bank(0x4000, 0x7fff, m_rombank[0]);
+	m_view1[0].install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_slot_msx_write_device::bank_w<0>)));
+	m_view1[0].install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_slot_msx_write_device::bank_w<1>)));
+	m_view1[1];
 
-	map_bank();
+	page(2)->install_view(0x8000, 0xbfff, m_view2);
+	m_view2[0].install_read_bank(0x8000, 0xbfff, m_rombank[1]);
+	m_view2[1];
 }
-
 
 void msx_slot_msx_write_device::device_reset()
 {
-	m_selected_bank[0] = 0x00;
-	m_selected_bank[1] = 0x01;
-
 	m_enabled = BIT(m_switch_port->read(), 0);
 
-	map_bank();
+	m_rombank[0]->set_entry(0);
+	m_rombank[1]->set_entry(1);
+
+	m_view1.select(m_enabled ? 0 : 1);
+	m_view2.select(m_enabled ? 0 : 1);
 }
 
-
-void msx_slot_msx_write_device::device_post_load()
+template <int Bank>
+void msx_slot_msx_write_device::bank_w(u8 data)
 {
-	map_bank();
-}
-
-
-void msx_slot_msx_write_device::map_bank()
-{
-	m_bank_base_4000 = m_rom + m_selected_bank[0] * 0x4000;
-	m_bank_base_8000 = m_rom + m_selected_bank[1] * 0x4000;
-}
-
-
-uint8_t msx_slot_msx_write_device::read(offs_t offset)
-{
-	if (!m_enabled)
-		return 0xff;
-	if (offset < 0x8000)
-		return m_bank_base_4000[offset & 0x3fff];
-	if (offset < 0xc000)
-		return m_bank_base_8000[offset & 0x3fff];
-	return 0xff;
-}
-
-
-void msx_slot_msx_write_device::write(offs_t offset, uint8_t data)
-{
-	if (!m_enabled)
-		return;
-	logerror("write %04x : %02x\n", offset, data);
-	if (offset == 0x6fff)
-	{
-		m_selected_bank[0] = data & 0x1f;
-		map_bank();
-	}
-	if (offset == 0x7fff)
-	{
-		m_selected_bank[1] = data & 0x1f;
-		map_bank();
-	}
+	m_rombank[Bank]->set_entry(data & 0x1f);
 }

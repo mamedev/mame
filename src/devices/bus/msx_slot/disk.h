@@ -233,9 +233,6 @@ class msx_slot_disk8_device : public msx_slot_wd_disk_device
 public:
 	msx_slot_disk8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

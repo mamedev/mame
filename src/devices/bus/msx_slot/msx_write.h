@@ -15,31 +15,26 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_MSX_WRITE, msx_slot_msx_write_device)
 class msx_slot_msx_write_device : public device_t, public msx_internal_slot_interface
 {
 public:
-	msx_slot_msx_write_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_msx_write_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
-	void set_rom_start(const char *region, uint32_t offset) { m_rom_region.set_tag(region); m_region_offset = offset; }
-
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
+	void set_rom_start(const char *region, u32 offset) { m_rom_region.set_tag(region); m_region_offset = offset; }
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	template <int Bank> void bank_w(u8 data);
+
 	required_memory_region m_rom_region;
 	required_ioport m_switch_port;
-	uint32_t m_region_offset;
-	const uint8_t *m_rom;
-	uint8_t m_selected_bank[2];
-	const uint8_t *m_bank_base_4000;
-	const uint8_t *m_bank_base_8000;
+	memory_bank_array_creator<2> m_rombank;
+	memory_view m_view1;
+	memory_view m_view2;
+	u32 m_region_offset;
 	bool m_enabled;
-
-	void map_bank();
 };
 
 

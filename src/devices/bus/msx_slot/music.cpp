@@ -7,13 +7,12 @@
 DEFINE_DEVICE_TYPE(MSX_SLOT_MUSIC, msx_slot_music_device, "msx_slot_music", "MSX Internal MSX-MUSIC")
 
 
-msx_slot_music_device::msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_music_device::msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rom_device(mconfig, MSX_SLOT_MUSIC, tag, owner, clock)
 	, m_ym2413(nullptr)
 	, m_ym2413_tag(nullptr)
 {
 }
-
 
 void msx_slot_music_device::device_start()
 {
@@ -32,17 +31,5 @@ void msx_slot_music_device::device_start()
 	}
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(*this, FUNC(msx_slot_music_device::write_ym2413)));
-}
-
-
-uint8_t msx_slot_music_device::read(offs_t offset)
-{
-	return msx_slot_rom_device::read(offset);
-}
-
-
-void msx_slot_music_device::write_ym2413(offs_t offset, uint8_t data)
-{
-	m_ym2413->write(offset & 1, data);
+	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(*m_ym2413, FUNC(ym2413_device::write)));
 }

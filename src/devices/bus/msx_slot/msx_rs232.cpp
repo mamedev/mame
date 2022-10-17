@@ -29,7 +29,7 @@ static INPUT_PORTS_START(msx_rs232_enable_switch)
 INPUT_PORTS_END
 
 
-msx_slot_rs232_base_device::msx_slot_rs232_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_rs232_base_device::msx_slot_rs232_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rom_device(mconfig, type, tag, owner, clock)
 	, m_i8251(*this, "i8251")
 	, m_i8253(*this, "i8253")
@@ -96,7 +96,7 @@ void msx_slot_rs232_base_device::device_reset()
 	m_rxrdy = false;
 }
 
-void msx_slot_rs232_base_device::irq_mask_w(offs_t offset, uint8_t data)
+void msx_slot_rs232_base_device::irq_mask_w(offs_t offset, u8 data)
 {
 	// According to MSX datapack:
 	// 7654---- unused
@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER(msx_slot_rs232_base_device::txrdy_w)
 
 
 
-msx_slot_rs232_device::msx_slot_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_rs232_device::msx_slot_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rs232_base_device(mconfig, MSX_SLOT_RS232, tag, owner, clock)
 {
 }
@@ -160,7 +160,7 @@ void msx_slot_rs232_device::device_start()
 	io_space().install_readwrite_handler(0x84, 0x87, read8sm_delegate(*m_i8253, FUNC(pit8253_device::read)), write8sm_delegate(*m_i8253, FUNC(pit8253_device::write)));
 }
 
-uint8_t msx_slot_rs232_device::status_r(offs_t offset)
+u8 msx_slot_rs232_device::status_r(offs_t offset)
 {
 	// 7------- CTS
 	// -6------ 8253 channel 2 output
@@ -168,7 +168,7 @@ uint8_t msx_slot_rs232_device::status_r(offs_t offset)
 	// ------1- ring indicator
 	// -------0 carrier detect
 
-	uint8_t result = 0x00;
+	u8 result = 0x00;
 
 	if (m_cts)
 		result |= 0x80;
@@ -192,7 +192,7 @@ void msx_slot_rs232_device::update_irq_state()
 
 
 
-msx_slot_rs232_mitsubishi_device::msx_slot_rs232_mitsubishi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_rs232_mitsubishi_device::msx_slot_rs232_mitsubishi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rs232_base_device(mconfig, MSX_SLOT_RS232_MITSUBISHI, tag, owner, clock)
 	, m_switch_port(*this, "SWITCH")
 {
@@ -213,7 +213,7 @@ void msx_slot_rs232_mitsubishi_device::device_start()
 	io_space().install_readwrite_handler(0x84, 0x87, read8sm_delegate(*m_i8253, FUNC(pit8253_device::read)), write8sm_delegate(*m_i8253, FUNC(pit8253_device::write)));
 }
 
-uint8_t msx_slot_rs232_mitsubishi_device::status_r(offs_t offset)
+u8 msx_slot_rs232_mitsubishi_device::status_r(offs_t offset)
 {
 	// 7------- CTS
 	// -6------ 8253 channel 2 output
@@ -242,7 +242,7 @@ void msx_slot_rs232_mitsubishi_device::update_irq_state()
 
 
 
-msx_slot_rs232_sony_device::msx_slot_rs232_sony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_rs232_sony_device::msx_slot_rs232_sony_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rs232_base_device(mconfig, MSX_SLOT_RS232_SONY, tag, owner, clock)
 	, m_switch_port(*this, "SWITCH")
 {
@@ -260,9 +260,19 @@ void msx_slot_rs232_sony_device::device_start()
 	m_ram.resize(RAM_SIZE);
 	save_item(NAME(m_ram));
 
+	page(0)->install_ram(0x2000, 0x27ff, m_ram.data());
+	page(1)->install_ram(0x6000, 0x67ff, m_ram.data());
+	page(2)->install_ram(0xa000, 0xa7ff, m_ram.data());
+	page(2)->install_read_handler(0xbff8, 0xbff9, read8sm_delegate(*m_i8251, FUNC(i8251_device::read)));
+	page(2)->install_write_handler(0xbff8, 0xbff9, write8sm_delegate(*m_i8251, FUNC(i8251_device::write)));
+	page(2)->install_read_handler(0xbffa, 0xbffa, read8sm_delegate(*this, FUNC(msx_slot_rs232_sony_device::status_r)));
+	page(2)->install_write_handler(0xbffa, 0xbffa, write8sm_delegate(*this, FUNC(msx_slot_rs232_sony_device::irq_mask_w)));
+	page(2)->install_read_handler(0xbffc, 0xbfff, read8sm_delegate(*m_i8253, FUNC(pit8253_device::read)));
+	page(2)->install_write_handler(0xbffc, 0xbfff, write8sm_delegate(*m_i8253, FUNC(pit8253_device::write)));
+	page(3)->install_ram(0xe000, 0xe7ff, m_ram.data());
 }
 
-uint8_t msx_slot_rs232_sony_device::status_r(offs_t offset)
+u8 msx_slot_rs232_sony_device::status_r(offs_t offset)
 {
 	// 7------- CTS
 	// -6------ 8253 channel 2 output
@@ -272,7 +282,7 @@ uint8_t msx_slot_rs232_sony_device::status_r(offs_t offset)
 	// ------1- ring indicator
 	// -------0 carrier detect
 
-	uint8_t result = 0x00;
+	u8 result = 0x00;
 
 	if (m_cts)
 		result |= 0x80;
@@ -295,58 +305,9 @@ void msx_slot_rs232_sony_device::update_irq_state()
 		m_irq_handler(m_rxrdy);
 }
 
-uint8_t msx_slot_rs232_sony_device::read(offs_t offset)
-{
-	if ((offset & 0x3800) == 0x2000)
-	{
-		return m_ram[offset & 0x07ff];
-	}
-
-	switch (offset)
-	{
-	case 0xbff8:
-	case 0xbff9:
-		return m_i8251->read(offset);
-	case 0xbffa:
-		return status_r(offset);
-	case 0xbffc:
-	case 0xbffd:
-	case 0xbffe:
-	case 0xbfff:
-		return m_i8253->read(offset);
-	}
-	return msx_slot_rs232_base_device::read(offset);
-}
-
-void msx_slot_rs232_sony_device::write(offs_t offset, uint8_t data)
-{
-	if ((offset & 0x3800) == 0x2000)
-	{
-		m_ram[offset & 0x07ff] = data;
-		return;
-	}
-
-	switch (offset)
-	{
-	case 0xbff8:
-	case 0xbff9:
-		m_i8251->write(offset, data);
-		break;
-	case 0xbffa:
-		irq_mask_w(offset, data);
-		break;
-	case 0xbffc:
-	case 0xbffd:
-	case 0xbffe:
-	case 0xbfff:
-		m_i8253->write(offset, data);
-		break;
-	}
-}
 
 
-
-msx_slot_rs232_svi738_device::msx_slot_rs232_svi738_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_rs232_svi738_device::msx_slot_rs232_svi738_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rs232_base_device(mconfig, MSX_SLOT_RS232_SVI738, tag, owner, clock)
 {
 }
@@ -361,14 +322,14 @@ void msx_slot_rs232_svi738_device::device_start()
 	io_space().install_readwrite_handler(0x84, 0x87, read8sm_delegate(*m_i8253, FUNC(pit8253_device::read)), write8sm_delegate(*m_i8253, FUNC(pit8253_device::write)));
 }
 
-uint8_t msx_slot_rs232_svi738_device::status_r(offs_t offset)
+u8 msx_slot_rs232_svi738_device::status_r(offs_t offset)
 {
 	// 7------- CTS
 	// -6------ 8253 channel 2 output
 	// --54321- unused
 	// -------0 carrier detect
 
-	uint8_t result = 0x00;
+	u8 result = 0x00;
 
 	if (m_cts)
 		result |= 0x80;
@@ -389,7 +350,7 @@ void msx_slot_rs232_svi738_device::update_irq_state()
 
 
 
-msx_slot_rs232_toshiba_device::msx_slot_rs232_toshiba_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_rs232_toshiba_device::msx_slot_rs232_toshiba_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rs232_base_device(mconfig, MSX_SLOT_RS232_TOSHIBA, tag, owner, clock)
 	, m_switch_port(*this, "SWITCH")
 {
@@ -410,7 +371,7 @@ void msx_slot_rs232_toshiba_device::device_start()
 	io_space().install_readwrite_handler(0x84, 0x87, read8sm_delegate(*m_i8253, FUNC(pit8253_device::read)), write8sm_delegate(*m_i8253, FUNC(pit8253_device::write)));
 }
 
-uint8_t msx_slot_rs232_toshiba_device::status_r(offs_t offset)
+u8 msx_slot_rs232_toshiba_device::status_r(offs_t offset)
 {
 	// 7------- CTS
 	// -6------ 8253 channel 2 output
@@ -420,7 +381,7 @@ uint8_t msx_slot_rs232_toshiba_device::status_r(offs_t offset)
 	// ------1- ring indicator
 	// -------0 carrier detect
 
-	uint8_t result = 0x00;
+	u8 result = 0x00;
 
 	if (m_cts)
 		result |= 0x80;
@@ -448,11 +409,13 @@ void msx_slot_rs232_toshiba_device::update_irq_state()
 
 
 
-msx_slot_rs232_toshiba_hx3x_device::msx_slot_rs232_toshiba_hx3x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_rs232_toshiba_hx3x_device::msx_slot_rs232_toshiba_hx3x_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rs232_base_device(mconfig, MSX_SLOT_RS232_TOSHIBA_HX3X, tag, owner, clock)
 	, m_switch_port(*this, "SWITCH")
 	, m_copy_port(*this, "COPY")
 	, m_nvram(*this, "nvram")
+	, m_rombank(*this, "rombank")
+	, m_view(*this, "view")
 {
 }
 
@@ -475,7 +438,6 @@ void msx_slot_rs232_toshiba_hx3x_device::device_add_mconfig(machine_config &conf
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 }
 
-
 void msx_slot_rs232_toshiba_hx3x_device::device_start()
 {
 	msx_slot_rs232_base_device::device_start();
@@ -497,21 +459,25 @@ void msx_slot_rs232_toshiba_hx3x_device::device_start()
 
 	save_item(NAME(m_bank_reg));
 
+	m_rombank->configure_entries(0, 4, m_rom_region->base() + m_region_offset + 0x4000, 0x4000);
+
+	page(1)->install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_slot_rs232_toshiba_hx3x_device::bank_w)));
+	page(1)->install_read_handler(0x7fff, 0x7fff, read8smo_delegate(*this, FUNC(msx_slot_rs232_toshiba_hx3x_device::bank_r)));
+	page(2)->install_view(0x8000, 0xbfff, m_view);
+	m_view[0].install_read_bank(0x8000, 0xbfff, m_rombank);
+	m_view[1].install_ram(0x8000, 0x87ff, 0x3800, m_sram.data());
+}
+
+void msx_slot_rs232_toshiba_hx3x_device::device_reset()
+{
+	msx_slot_rs232_base_device::device_reset();
+
 	m_bank_reg = 0;
-	m_bank_base_8000 = m_rom + 0x4000;
+	m_view.select(0);
+	m_rombank->set_entry(0);
 }
 
-void msx_slot_rs232_toshiba_hx3x_device::device_post_load()
-{
-	set_bank();
-}
-
-void msx_slot_rs232_toshiba_hx3x_device::set_bank()
-{
-	m_bank_base_8000 = m_rom + 0x4000 + (0x4000 * (m_bank_reg & 0x03));
-}
-
-uint8_t msx_slot_rs232_toshiba_hx3x_device::status_r(offs_t offset)
+u8 msx_slot_rs232_toshiba_hx3x_device::status_r(offs_t offset)
 {
 	// 7------- CTS
 	// -6------ 8253 channel 2 output
@@ -521,7 +487,7 @@ uint8_t msx_slot_rs232_toshiba_hx3x_device::status_r(offs_t offset)
 	// ------1- ring indicator
 	// -------0 carrier detect
 
-	uint8_t result = 0x00;
+	u8 result = 0x00;
 
 	if (m_cts)
 		result |= 0x80;
@@ -547,32 +513,14 @@ void msx_slot_rs232_toshiba_hx3x_device::update_irq_state()
 		m_irq_handler(m_rxrdy);
 }
 
-void msx_slot_rs232_toshiba_hx3x_device::write(offs_t offset, uint8_t data)
+u8 msx_slot_rs232_toshiba_hx3x_device::bank_r()
 {
-	if (offset == 0x7fff)
-	{
-		m_bank_reg = data & 0x7f;
-		set_bank();
-	}
-	if (offset >= 0x8000 && (m_bank_reg & 0x60) == 0x60)
-	{
-		m_sram[offset & (SRAM_SIZE - 1)] = data;
-		return;
-	}
-	msx_slot_rs232_base_device::write(offset, data);
+	return (m_copy_port->read() & 0x80) | m_bank_reg;
 }
 
-uint8_t msx_slot_rs232_toshiba_hx3x_device::read(offs_t offset)
+void msx_slot_rs232_toshiba_hx3x_device::bank_w(u8 data)
 {
-	if (offset == 0x7fff)
-	{
-		return (m_copy_port->read() & 0x80) | m_bank_reg;
-	}
-	if (offset >= 0x8000)
-	{
-		if ((m_bank_reg & 0x60) == 0x60)
-			return m_sram[offset & (SRAM_SIZE - 1)];
-		return m_bank_base_8000[offset & 0x3fff];
-	}
-	return msx_slot_rs232_base_device::read(offset);
+	m_bank_reg = data & 0x7f;
+	m_rombank->set_entry(data & 0x03);
+	m_view.select(((data & 0x60) == 0x60) ? 1 : 0);
 }
