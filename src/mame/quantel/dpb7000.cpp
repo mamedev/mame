@@ -68,7 +68,7 @@
 							 LOG_BRUSH_LATCH | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_DRAWS)
 
 //#define VERBOSE             (LOG_CSR | LOG_CTRLBUS | LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_BRUSH_ADDR | LOG_COMMANDS | LOG_OUTPUT_TIMING)
-#define VERBOSE (0)
+#define VERBOSE (LOG_ALL)
 #include "logmacro.h"
 
 namespace
@@ -540,8 +540,8 @@ private:
 	required_device<am2901b_device> m_filter_xh;
 	uint8_t *m_filter_signal;
 	uint8_t *m_filter_mult;
-	uint8_t m_filter_acbc[16];
-	uint8_t m_filter_abbb[16];
+	int8_t m_filter_x_coeffs[12];
+	int8_t m_filter_y_coeffs[8];
 	uint8_t m_incoming_lum;
 	uint8_t m_incoming_chr;
 	bool m_buffer_lum;
@@ -555,8 +555,18 @@ private:
 	required_device<am2901b_device> m_size_df;
 	required_device<am2901b_device> m_size_dg;
 	required_device<am2901b_device> m_size_dh;
-	uint8_t m_size_h;
-	uint8_t m_size_v;
+	uint32_t m_size_dsx_ddx;
+	uint32_t m_size_dsy_ddx;
+	uint32_t m_size_dsx_ddy;
+	uint32_t m_size_dsy_ddy;
+	uint8_t m_size_frac_origin_sx_dx;
+	uint8_t m_size_frac_origin_sy_dx;
+	uint8_t m_size_frac_origin_sx_dy;
+	uint8_t m_size_frac_origin_sy_dy;
+	int16_t m_size_dxdx_counter;
+	int16_t m_size_dydy_counter;
+	uint16_t m_size_dest_x;
+	uint16_t m_size_dest_y;
 
 	// Brush Processor Card
 	required_memory_region m_brushproc_prom_region;
@@ -629,9 +639,9 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_START("KEYB_COL0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 ) \xe2\x80\x93") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 ( \xe2\x80\x94") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
@@ -639,9 +649,9 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_START("KEYB_COL1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \' @") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'') PORT_CHAR('@')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \xe2\x80\x99 \xe2\x80\x98") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 & \xc2\xbb") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
@@ -649,60 +659,60 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_START("KEYB_COL2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 % >") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%') PORT_CHAR('>')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $ <") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$') PORT_CHAR('<')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 
 	PORT_START("KEYB_COL3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". : >") PORT_CODE(KEYCODE_STOP) PORT_CHAR ('.') PORT_CHAR(':') PORT_CHAR('>')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\" = #") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\"') PORT_CHAR('=')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". : \xc3\xa6") PORT_CODE(KEYCODE_STOP) PORT_CHAR ('.') PORT_CHAR(':')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc2\xb9 = ~") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('=')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('d')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('-')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // 0x16 - arrow key?
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xef\xac\x82 + \xc3\x86") PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
 
 	PORT_START("KEYB_COL4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('\\')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 \xc2\xa3 \xc2\xab") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 \" _") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"') PORT_CHAR('_')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 \"") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 
 	PORT_START("KEYB_COL5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!') PORT_CHAR('#')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED) // 0x1b - arrow key?
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", ;") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEYB_COL6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^') PORT_CHAR('|')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('~')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // 0x1a - arrow key?
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('\x19') PORT_CHAR('*')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("` ` " A_RING) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xea\x9e\x88 \xcb\x86 \xc3\xb8") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/ ? \xc5\x93") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xcc\xa4 \xc2\xa8 \xc3\x98") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('~')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\x9f \xc2\xb8 " a_RING) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc2\xb4 \xc2\xb4 ~") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xef\xac\x81 * \xc5\x92") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('*')
 
 	PORT_START("KEYB_COL7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // 0x0b
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED) // 0x09
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) // 0x7f
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR('\x08') // 0x08
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED) // 0x7f
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) //PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\x0d')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\x0d')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // PORT_NAME("Carriage Return") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR('\x0d')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("PENSW")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Pen Button 1") PORT_CODE(MOUSECODE_BUTTON1)
@@ -993,14 +1003,24 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_matte_v));
 
 	// Size Card
-	save_item(NAME(m_size_h));
-	save_item(NAME(m_size_v));
+	save_item(NAME(m_size_dsx_ddx));
+	save_item(NAME(m_size_dsy_ddx));
+	save_item(NAME(m_size_dsx_ddy));
+	save_item(NAME(m_size_dsy_ddy));
+	save_item(NAME(m_size_frac_origin_sx_dx));
+	save_item(NAME(m_size_frac_origin_sy_dx));
+	save_item(NAME(m_size_frac_origin_sx_dy));
+	save_item(NAME(m_size_frac_origin_sy_dy));
+	save_item(NAME(m_size_dxdx_counter));
+	save_item(NAME(m_size_dydy_counter));
+	save_item(NAME(m_size_dest_x));
+	save_item(NAME(m_size_dest_y));
 
 	// Filter Card
 	m_filter_signal = m_filter_signalprom->base();
 	m_filter_mult = m_filter_multprom->base();
-	save_item(NAME(m_filter_acbc));
-	save_item(NAME(m_filter_abbb));
+	save_item(NAME(m_filter_x_coeffs));
+	save_item(NAME(m_filter_y_coeffs));
 	save_item(NAME(m_incoming_lum));
 	save_item(NAME(m_incoming_chr));
 	save_item(NAME(m_buffer_lum));
@@ -1189,15 +1209,25 @@ void dpb7000_state::machine_reset()
 	memset(m_matte_v, 0, 2);
 
 	// Filter Card
-	memset(m_filter_acbc, 0, 16);
-	memset(m_filter_abbb, 0, 16);
+	memset(m_filter_x_coeffs, 0, sizeof(m_filter_x_coeffs));
+	memset(m_filter_y_coeffs, 0, sizeof(m_filter_y_coeffs));
 	m_incoming_lum = 0;
 	m_incoming_chr = 0;
 	m_buffer_lum = true;
 
 	// Size Card
-	m_size_h = 0;
-	m_size_v = 0;
+	m_size_dsx_ddx = 0;
+	m_size_dsy_ddx = 0;
+	m_size_dsx_ddy = 0;
+	m_size_dsy_ddy = 0;
+	m_size_frac_origin_sx_dx = 0;
+	m_size_frac_origin_sy_dx = 0;
+	m_size_frac_origin_sx_dy = 0;
+	m_size_frac_origin_sy_dy = 0;
+	m_size_dxdx_counter = 0;
+	m_size_dydy_counter = 0;
+	m_size_dest_x = 0;
+	m_size_dest_y = 0;
 
 	// Keyboard
 	m_keybc_latched_bit = 1;
@@ -1580,14 +1610,20 @@ void dpb7000_state::store_address_w(uint8_t card, uint16_t data)
 	case 0:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set RHSCR: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
 		m_rhscr[card] = data & 0xfff;
-		if (card)
-			m_rhscr[0] = data & 0xfff;
+		if (!card)
+		{
+			LOGMASKED(LOG_STORE_ADDR, "%s: Setting Store Address Card 2 RHSCR also: %03x\n", machine().describe_context(), data & 0xfff);
+			m_rhscr[1] = data & 0xfff;
+		}
 		break;
 	case 1:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set RVSCR: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
 		m_rvscr[card] = data & 0xfff;
-		if (card)
-			m_rvscr[0] = data & 0xfff;
+		if (!card)
+		{
+			LOGMASKED(LOG_STORE_ADDR, "%s: Setting Store Address Card 2 RVSCR also: %03x\n", machine().describe_context(), data & 0xfff);
+			m_rvscr[1] = data & 0xfff;
+		}
 		break;
 	case 2:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set R ZOOM: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
@@ -2074,25 +2110,25 @@ bool dpb7000_state::handle_command(uint16_t data)
 		m_ca0 = 0;
 		for (uint32_t y = m_cypos[1], bly = m_bylen; bly != 0x1000; bly++, y = (y + 1) & 0xfff)
 		{
-			if (y >= 768)
+			if (y >= 256)
 				continue;
 
 			const uint32_t line_idx = y * 800;
 			for (uint32_t x = m_cxpos[1], blx = m_bxlen; blx != 0x1000; blx++, x = (x + 1) & 0xfff)
 			{
-				if (x >= 800)
+				if (x >= 256)
 					continue;
 
 				const uint32_t pix_idx = line_idx + x;
-				const uint16_t bx = ((((blx - m_bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
-				const uint16_t by = ((((bly - m_bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
+				const uint16_t bx = x;//((((blx - m_bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
+				const uint16_t by = y;//((((bly - m_bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
 				const uint16_t uv_bx = ((x & 1) ? (bx | 1) : (bx & ~1));
 				if (store_lum)
 					m_brushstore_lum[by * 256 + bx] = store_lum[pix_idx];
 				if (store_chr)
 					m_brushstore_chr[by * 256 + uv_bx] = store_chr[pix_idx];
 				if (store_ext)
-					m_brushstore_ext[by * 256 + bx] = store_lum[pix_idx];
+					m_brushstore_ext[by * 256 + bx] = store_ext[pix_idx];
 			}
 		}
 		break;
@@ -2180,6 +2216,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			case 13:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: No command\n", machine().describe_context());
 				break;
+
 			case 0:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read track to buffer RAM\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
@@ -2199,6 +2236,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 					}
 				}
 				break;
+
 			case 2:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read track, stride 2, to buffer RAM\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
@@ -2218,12 +2256,14 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 					}
 				}
 				break;
+
 			case 3:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Restore\n", machine().describe_context());
 				m_diskseq_cyl_from_cpu = 0;
 				req_b_w(0); // Flag ourselves as in-use
 				m_diskseq_complete_clk->adjust(attotime::from_msec(1), 1);
 				break;
+
 			case 4:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read Track\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
@@ -2248,10 +2288,16 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 					}
 				}
 				break;
+
 			case 6:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Read Track\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
 				{
+					m_size_dxdx_counter = 0;
+					m_size_dydy_counter = 0;
+					m_size_dest_x = m_cxpos[1];
+					m_size_dest_y = m_cypos[1];
+
 					req_b_w(0); // Flag ourselves as in-use
 					m_diskseq_cyl_read_pending = true;
 					m_diskseq_command_stride = 1;
@@ -2269,6 +2315,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 					}
 				}
 				break;
+
 			case 8:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track from Buffer RAM\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
@@ -2290,6 +2337,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 					}
 				}
 				break;
+
 			case 10:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track, stride 2, from Buffer RAM\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
@@ -2311,6 +2359,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 					}
 				}
 				break;
+
 			case 12:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3) && is_disk_group_hdd(group))
@@ -2325,6 +2374,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 					m_hdd_command_timer->adjust(attotime::from_double((double)19200 / 1012000));
 				}
 				break;
+
 			case 14:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Write Track\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3) && is_disk_group_hdd(group))
@@ -2341,6 +2391,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 					m_hdd_command_timer->adjust(attotime::from_double((double)19200 / 1012000));
 				}
 				break;
+
 			default:
 				LOGMASKED(LOG_CTRLBUS, "%s: Unknown Disk Sequencer Card command.\n", machine().describe_context());
 				req_b_w(0); // Flag ourselves as in-use
@@ -2369,21 +2420,116 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		}
 		else
 		{
-			LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card Y6 (Coefficients): %04x\n", machine().describe_context(), data & 0x7fff);
-
+			switch (data & 0x3300)
+			{
+			case 0x1000: // Change in source X per change in dest X, MSB
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card delta source X per delta dest X, MSB: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_dsx_ddx &= 0x00ff;
+				m_size_dsx_ddx |= (data & 0x00ff) << 8;
+				break;
+			case 0x0000: // Change in source X per change in dest X, LSB
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card delta source X per delta dest X, LSB: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_dsx_ddx &= 0xff00;
+				m_size_dsx_ddx |= data & 0x00ff;
+				break;
+			case 0x3000: // Change in source Y per change in dest X, MSB
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card delta source Y per delta dest X, MSB: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_dsy_ddx &= 0x00ff;
+				m_size_dsy_ddx |= (data & 0x00ff) << 8;
+				break;
+			case 0x2000: // Change in source Y per change in dest X, LSB
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card delta source Y per delta dest X, LSB: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_dsy_ddx &= 0xff00;
+				m_size_dsy_ddx |= data & 0x00ff;
+				break;
+			case 0x1100: // Change in source X per change in dest Y, MSB
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card delta source X per delta dest Y, MSB: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_dsx_ddy &= 0x00ff;
+				m_size_dsx_ddy |= (data & 0x00ff) << 8;
+				break;
+			case 0x0100: // Change in source X per change in dest Y, LSB
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card delta source X per delta dest Y, LSB: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_dsx_ddy &= 0xff00;
+				m_size_dsx_ddy |= data & 0x00ff;
+				break;
+			case 0x3100: // Change in source Y per change in dest Y, MSB
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card delta source Y per delta dest Y, MSB: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_dsy_ddy &= 0x00ff;
+				m_size_dsy_ddy |= (data & 0x00ff) << 8;
+				break;
+			case 0x2100: // Change in source Y per change in dest Y, LSB
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card delta source Y per delta dest Y, LSB: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_dsy_ddy &= 0xff00;
+				m_size_dsy_ddy |= data & 0x00ff;
+				break;
+			case 0x1300: // Origin, source X / dest X
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card origin, source X / dest X: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_frac_origin_sx_dx = data & 0x00ff;
+				break;
+			case 0x0300: // Origin, source X / dest Y
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card origin, source X / dest Y: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_frac_origin_sx_dy = data & 0x00ff;
+				break;
+			case 0x3300: // Origin, source Y / dest X
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card origin, source Y / dest X: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_frac_origin_sy_dx = data & 0x00ff;
+				break;
+			case 0x2300: // Origin, source Y / dest Y
+				LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card origin, source Y / dest Y: %02x (%04x)\n", machine().describe_context(), data & 0xff, data);
+				m_size_frac_origin_sy_dy = data & 0x00ff;
+				break;
+			}
 		}
 		break;
 
 	case 5: // Filter Card
 		if (BIT(data, 15))
 		{
-			LOGMASKED(LOG_CTRLBUS | LOG_FILTER_CARD, "%s: Coefficient(?) RAM B: Index %x = %02x\n", machine().describe_context(), (data >> 8) & 0xf, data & 0xff);
-			m_filter_abbb[(data >> 8) & 0xf] = data & 0xff;
+			static const char *const coeff_names[8] = { "Y-3", "Y-2", "Y-1", "Y (LSB)", "Y (MSB)", "Y+1", "Y+2", "Y+3" };
+			const uint16_t coeff_idx = ((data >> 8) & 0xf) - 2;
+			switch ((data >> 8) & 0xf)
+			{
+			case 2: // Y-3
+			case 3: // Y-2
+			case 4: // Y-1
+			case 5: // Y (LSB)
+			case 6: // Y (MSB)
+			case 7: // Y+1
+			case 8: // Y+2
+			case 9: // Y+3
+				LOGMASKED(LOG_CTRLBUS | LOG_FILTER_CARD, "%s: Filter Card %s Coefficient Write: %02x\n", machine().describe_context(), coeff_names[coeff_idx], data & 0xff);
+				m_filter_y_coeffs[coeff_idx] = data & 0xff;
+				break;
+			default: // Ignored
+				LOGMASKED(LOG_CTRLBUS | LOG_FILTER_CARD, "%s: Filter Card Coefficient (ignored Y) Write: %04x\n", machine().describe_context(), data);
+				break;
+			}
 		}
 		else
 		{
-			LOGMASKED(LOG_CTRLBUS | LOG_FILTER_CARD, "%s: Coefficient(?) RAM C: Index %x = %02x\n", machine().describe_context(), (data >> 8) & 0xf, data & 0xff);
-			m_filter_acbc[(data >> 8) & 0xf] = data & 0xff;
+			static const char *const coeff_names[12] = { "X-5", "X-4", "X-3", "X-2", "X-1", "X (LSB)", "X (MSB)", "X+1", "X+2", "X+3", "X+4", "X+5" };
+			const uint16_t coeff_idx = ((data >> 8) & 0xf) - 1;
+			switch ((data >> 8) & 0xf)
+			{
+			case 1: // X-5
+			case 2: // X-4
+			case 3: // X-3
+			case 4: // X-2
+			case 5: // X-1
+			case 6: // X (LSB)
+			case 7: // X (MSB)
+			case 8: // X+1
+			case 9: // X+2
+			case 10: // X+3
+			case 11: // X+4
+			case 12: // X+5
+				LOGMASKED(LOG_CTRLBUS | LOG_FILTER_CARD, "%s: Filter Card %s Coefficient Write: %02x\n", machine().describe_context(), coeff_names[coeff_idx], data & 0xff);
+				m_filter_x_coeffs[coeff_idx] = data & 0xff;
+				break;
+			default: // Ignored
+				LOGMASKED(LOG_CTRLBUS | LOG_FILTER_CARD, "%s: Filter Card Coefficient (ignored X) Write: %04x\n", machine().describe_context(), data);
+				break;
+			}
 		}
 		break;
 
@@ -2391,6 +2537,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		LOGMASKED(LOG_DDB, "%s: Disc Data Buffer Card RAM write: %04x = %04x\n", machine().describe_context(), m_diskbuf_ram_addr, data);
 		m_diskbuf_ram[m_diskbuf_ram_addr++] = (uint8_t)data;
 		break;
+
 	case 8: // Brush Store Card color latches
 		m_bs_y_latch = (uint8_t)data;
 		if (m_ca0)
@@ -2524,6 +2671,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		m_diskseq_reset = true;
 		m_diskseq_halt = true;
 		break;
+
 	default:
 		LOGMASKED(LOG_CTRLBUS | LOG_UNKNOWN, "%s: CPU write to Control Bus, unknown CSR %d: %04x\n", machine().describe_context(), m_csr, data);
 		break;
@@ -2584,24 +2732,30 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 		if (m_diskseq_cyl_write_pending)
 		{
 			unsigned char sector_buffer[256];
+			int start_sector = m_diskbuf_ram_addr >> 8;
+			//image_lba += start_sector;
+			uint16_t ram_addr = m_diskbuf_ram_addr;
+			//uint16_t buffer_offset = ram_addr & 0x00ff;
 			if (m_diskseq_command_stride != 1)
 			{
-				for (int sector = 0; sector < 19200 / 256; sector++)
+				for (int sector = start_sector; sector < 19200 / 256; sector++)
 				{
 					m_hdd_file->read(image_lba, sector_buffer);
-					memcpy(sector_buffer, m_diskbuf_ram + sector * 256, 256);
+					//memcpy(sector_buffer, m_diskbuf_ram + buffer_offset + sector * 256, 256 - buffer_offset);
 					for (int stride_idx = 0; stride_idx < 256; stride_idx += 2)
 					{
-						sector_buffer[stride_idx] = m_diskbuf_ram[sector * 256 + stride_idx];
+						sector_buffer[stride_idx] = m_diskbuf_ram[ram_addr];
+						ram_addr += 2;
 					}
 					LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x, Stride 2 (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
 					m_hdd_file->write(image_lba, sector_buffer);
 					image_lba++;
+					//buffer_offset = 0;
 				}
 			}
 			else
 			{
-				for (int sector = 0; sector < 19200 / 256; sector++)
+				for (int sector = start_sector; sector < 19200 / 256; sector++)
 				{
 					LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
 					if (m_diskseq_cmd == 12 || m_diskseq_cmd == 14)
@@ -2751,53 +2905,83 @@ void dpb7000_state::toggle_line_clock()
 
 void dpb7000_state::process_sample()
 {
-	const uint16_t x = (m_bxlen_counter - m_bxlen);
-	const uint16_t y = (m_bylen_counter - m_bylen);
-	//printf("Processing sample %d,%d (%04x:%04x, %04x:%04x) LC:%d\n", x, y, m_bxlen_counter, m_bxlen, m_bylen_counter, m_bylen, m_line_count); fflush(stdout);
-	switch (m_brush_addr_cmd)
+	const uint16_t x = m_size_dest_x;
+	const uint16_t y = m_size_dest_y;
+
+	//m_size_dsx_ddx = 0x100;
+	//m_size_dsy_ddy = 0x100;
+
+	//if (m_size_dsx_ddx != 0x100) printf("Processing sample %d,%d (%04x:%04x, %04x:%04x) LC:%d dxdx:%06x, dydy:%06x\n", x, y, m_bxlen_counter, m_bxlen, m_bylen_counter, m_bylen, m_line_count, m_size_dxdx_counter, m_size_dydy_counter);
+	bool process_sample = m_size_dxdx_counter <= 0 && m_size_dydy_counter <= 0;
+	if (process_sample)
 	{
-		case 2: // Brush Store Write
-			if (BIT(m_brush_addr_func, 7))
-				m_brushstore_lum[y * 256 + x] = m_incoming_lum;
-			if (BIT(m_brush_addr_func, 8))
-				m_brushstore_chr[y * 256 + x] = m_incoming_chr;
-			if (BIT(m_brush_addr_func, 9))
-				m_brushstore_ext[y * 256 + x] = m_incoming_lum;
-			break;
-
-		case 4: // Framestore Write
+		switch (m_brush_addr_cmd)
 		{
-			const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
-			const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
+			case 2: // Brush Store Write
+				if (BIT(m_brush_addr_func, 7))
+					m_brushstore_lum[y * 256 + x] = m_incoming_lum;
+				if (BIT(m_brush_addr_func, 8))
+					m_brushstore_chr[y * 256 + x] = m_incoming_chr;
+				if (BIT(m_brush_addr_func, 9))
+					m_brushstore_ext[y * 256 + x] = m_incoming_lum;
+				break;
 
-			uint32_t pix_idx = y * 800 + x;
-			if (!BIT(m_brush_addr_func, 5))
+			case 4: // Framestore Write
 			{
-				if (BIT(m_brush_addr_func, 7))
-					m_framestore_lum[0][pix_idx] = m_incoming_lum;
-				if (BIT(m_brush_addr_func, 8))
-					m_framestore_chr[0][pix_idx] = m_incoming_chr;
-				if (BIT(m_brush_addr_func, 9))
-					m_framestore_ext[0][pix_idx] = m_incoming_lum;
+				//if (m_size_dsx_ddx != 0x100) printf("Writing sample at %d,%d\n", x, y);
+				if (m_size_dsx_ddx != 0x100) printf("%02x ", m_incoming_lum);
+				uint32_t pix_idx = y * 800 + x;
+				if (!BIT(m_brush_addr_func, 5))
+				{
+					if (BIT(m_brush_addr_func, 7))
+						m_framestore_lum[0][pix_idx] = m_incoming_lum;
+					if (BIT(m_brush_addr_func, 8))
+						m_framestore_chr[0][pix_idx] = m_incoming_chr;
+					if (BIT(m_brush_addr_func, 9))
+						m_framestore_ext[0][pix_idx] = m_incoming_lum;
+				}
+				if (!BIT(m_brush_addr_func, 6))
+				{
+					if (BIT(m_brush_addr_func, 7))
+						m_framestore_lum[1][pix_idx] = m_incoming_lum;
+					if (BIT(m_brush_addr_func, 8))
+						m_framestore_chr[1][pix_idx] = m_incoming_chr;
+					if (BIT(m_brush_addr_func, 9))
+						m_framestore_ext[1][pix_idx] = m_incoming_lum;
+				}
+				break;
 			}
-			if (!BIT(m_brush_addr_func, 6))
-			{
-				if (BIT(m_brush_addr_func, 7))
-					m_framestore_lum[1][pix_idx] = m_incoming_lum;
-				if (BIT(m_brush_addr_func, 8))
-					m_framestore_chr[1][pix_idx] = m_incoming_chr;
-				if (BIT(m_brush_addr_func, 9))
-					m_framestore_ext[1][pix_idx] = m_incoming_lum;
-			}
-			break;
 		}
 	}
+
+	if (m_size_dxdx_counter <= 0)
+	{
+		m_size_dxdx_counter += 0x100;//(int16_t)(m_size_dsx_ddx & 0x7fff);
+		m_size_dest_x++;
+	}
+	m_size_dxdx_counter -= 0x100;
 
 	m_bxlen_counter++;
 	if (m_bxlen_counter == 0x1000)
 	{
+		//if (m_size_dsx_ddx != 0x100) printf("Advancing to next line due to bxlen counter elapsing\n");
 		m_bxlen_counter = m_bxlen;
 		m_bylen_counter++;
+
+		if (m_size_dydy_counter <= 0)
+		{
+			m_size_dydy_counter += 0x100;//(int16_t)(m_size_dsy_ddy & 0x7fff);
+			m_size_dest_y++;
+			//if (m_size_dsx_ddx != 0x100) printf("dydy counter is <= 0, resetting dydy counter to %04x, dxdx counter to 0, dest X to %d, dest Y to %d\n", m_size_dydy_counter, m_size_dest_x, m_size_dest_y);
+			if (m_size_dsx_ddx != 0x100) printf("\n");
+		}
+		m_size_dydy_counter -= 0x100;
+
+		m_size_dxdx_counter = 0;
+		m_size_dest_x = m_cxpos[1];
+
+		//if (m_size_dsx_ddx != 0x100) printf("At end of line, dydy counter is now %04x\n", m_size_dydy_counter);
+
 		if (m_bylen_counter == 0x1000)
 		{
 			m_diskseq_cyl_read_pending = false;
@@ -3554,17 +3738,21 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 			dest_y = 0;
 		}
 
-		const bool blank_1 = BIT(~m_storeaddr_pal_blank[((y_addr[0] << 3) & 0x1800) | ((y_addr[1] << 2) & 0x3f0)], 0);
-		const bool blank_2 = BIT(~m_storeaddr_pal_blank[((y_addr[1] << 3) & 0x1800) | ((y_addr[2] << 2) & 0x3f0)], 0);
-		const bool use_store1_matte = !palette && (blank_1 || m_select_matte[0]);
-		const bool use_store2_matte = !palette && (blank_2 || m_select_matte[1]);
-		const bool use_ext_store1_matte = blank_1 || BIT(m_ext_store_flags, 0);
-		const bool use_ext_store2_matte = blank_2 || BIT(m_ext_store_flags, 1);
+		const bool blank_1_q = true;//BIT(m_storeaddr_pal_blank[((y_addr[0] << 3) & 0x1800) | ((y_addr[0] << 2) & 0x3f0)], 0);
+		const bool blank_2_q = true;//BIT(m_storeaddr_pal_blank[((y_addr[1] << 3) & 0x1800) | ((y_addr[1] << 2) & 0x3f0)], 0);
+		const bool use_store1_matte = !palette && (!blank_1_q || m_select_matte[0]);
+		const bool use_store2_matte = !palette && (!blank_2_q || m_select_matte[1]);
+		const bool use_ext_store1_matte = !(blank_1_q && !BIT(m_ext_store_flags, 0));
+		const bool use_ext_store2_matte = !(blank_2_q && !BIT(m_ext_store_flags, 1));
 		const bool invert_a = palette ? BIT(~m_ext_store_flags, 3) : BIT(m_ext_store_flags, 2);
 		const bool invert_b = !invert_a;
 		const uint8_t ext_src_invert = BIT(m_ext_store_flags, 4) ? 0xff : 0x00;
 		const uint8_t ext_a_mask = (invert_a ? 0xff : 0x00);
 		const uint8_t ext_b_mask = (invert_b ? 0xff : 0x00);
+
+		if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("Y %3d: RVR %d, Palette %d, DY %3d, Addr[0] %4d, Addr[1] %4d, ESF %d%d%d%d%d", y, BIT(hflags, 1), palette, dest_y, y_addr[0], y_addr[1], BIT(m_ext_store_flags, 4), BIT(m_ext_store_flags, 3), BIT(m_ext_store_flags, 2), BIT(m_ext_store_flags, 1), BIT(m_ext_store_flags, 0));
+		if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("    /B1 %d, /B2 %d, S1M %d, S2M %d, 1M %d, 2M %d, E1M %d, E2M %d", blank_1_q, blank_2_q, m_select_matte[0], m_select_matte[1], use_store1_matte, use_store2_matte, use_ext_store1_matte, use_ext_store2_matte);
+		if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("    A Mask: %02x, B Mask: %02x\n", ext_a_mask, ext_b_mask);
 
 		uint32_t *d = &bitmap.pix(dest_y);
 		int32_t x_addr[2] = { m_rhscr[0] & ~1, m_rhscr[1] & ~1 };
