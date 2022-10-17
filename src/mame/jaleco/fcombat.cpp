@@ -13,10 +13,12 @@ TS 2004.10.22.
 
 TODO:
 - fix colours (sprites, bg), not many PCB references online
-  sprites: player char and soldiers are correct, explosions probably also ok,
-  a lot of other sprite colors still look bad
-  bg: 16 levels, each has a different color. 1st level should be green bg,
-  with black at the bottom part
+  sprites: maybe they are correct? player ufo is ok, soldiers are ok,
+  explosions probably ok, helicopters ok, kidnapper ufo ok
+  bg: 16 levels, each has a different color, from photos:
+  - 1st level: green,black?,?,?
+  - 8th level(visible at bottom of 1st level): black,darkred,grey,white
+  More levels on the flyer, but might not be the final version of the game.
 - cocktail mode doesn't work right
 
 
@@ -272,7 +274,7 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		const int flags = m_spriteram[i + 0];
 		int y = 256 - m_spriteram[i + 1];
 		int code = m_spriteram[i + 2] + ((flags & 0x20) << 3);
-		int x = m_spriteram[i + 3] * 2 + (flags & 0x01) + 56;
+		int x = m_spriteram[i + 3] * 2 + (flags & 0x01) + 52;
 
 		int xflip = flags & 0x80;
 		int yflip = flags & 0x40;
