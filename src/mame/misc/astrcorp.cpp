@@ -2117,8 +2117,8 @@ void magibomb_state::init_magibomb()
 
 	// decrypt data
 	std::copy_n(rom, size, &tmp[0]);
-	for (u32 i = 1; i < size; i += 2)
-		tmp[i] = bitswap<8>(rom[i], 6, 7, 5, 0, 4, 1, 3, 2);
+	for (u32 i = 0; i < size; i += 2)
+		tmp[i+1] = bitswap<8>(rom[i+1], 6, 7, 5, 0, 4, 1, 3, 2);
 
 	// descramble addresses
 	for (u32 i = 0; i < size; i++)
