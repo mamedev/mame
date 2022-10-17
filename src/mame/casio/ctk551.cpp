@@ -191,6 +191,8 @@ public:
 	void init_ap10();
 	void init_gz70sp();
 
+	TIMER_CALLBACK_MEMBER(nmi_clear) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
+
 	DECLARE_CUSTOM_INPUT_MEMBER(lcd_r)     { return m_lcdc->db_r() >> 4; }
 	DECLARE_WRITE_LINE_MEMBER(lcd_w)
 	{
@@ -243,6 +245,8 @@ private:
 	required_device<gt913_device> m_maincpu;
 	optional_device<hd44780_device> m_lcdc;
 
+	emu_timer* m_nmi_timer = nullptr;
+
 	optional_ioport_array<4> m_inputs;
 
 	output_finder<64, 8, 5> m_outputs;
@@ -267,7 +271,17 @@ INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
 
 INPUT_CHANGED_MEMBER(ctk551_state::power_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	if (newval)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_nmi_timer->adjust(attotime::never);
+	}
+	else
+	{
+		// give the CPU enough time to switch NMI to active-high so it fires again
+		// otherwise, releasing the power button too quickly may be ignored
+		m_nmi_timer->adjust(attotime::from_msec(100));
+	}
 }
 
 INPUT_CHANGED_MEMBER(ctk551_state::switch_power_w)
@@ -403,6 +417,8 @@ void ctk551_state::driver_start()
 	m_led_console.resolve();
 	m_led_power.resolve();
 	m_outputs.resolve();
+
+	m_nmi_timer = timer_alloc(FUNC(ctk551_state::nmi_clear), this);
 
 	m_input_sel = 0xf;
 
@@ -1048,7 +1064,7 @@ void ctk551_state::init_gz70sp()
 
 // models with MACHINE_IMPERFECT_SOUND are missing DSP emulation
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME          FLAGS
-SYST( 1995, ap10,    0,      0,      ap10,    ap10,   ctk551_state, init_ap10,   "Casio", "Celviano AP-10", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND)
+SYST( 1995, ap10,    0,      0,      ap10,    ap10,   ctk551_state, init_ap10,   "Casio", "Celviano AP-10", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
 SYST( 1996, gz70sp,  0,      0,      gz70sp,  gz70sp, ctk551_state, init_gz70sp, "Casio", "GZ-70SP",        MACHINE_SUPPORTS_SAVE )
-SYST( 1997, ctk601,  0,      0,      ctk601,  ctk601, ctk551_state, empty_init,  "Casio", "CTK-601",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
+SYST( 1997, ctk601,  0,      0,      ctk601,  ctk601, ctk551_state, empty_init,  "Casio", "CTK-601",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 SYST( 2000, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init,  "Casio", "CTK-551",        MACHINE_SUPPORTS_SAVE )
