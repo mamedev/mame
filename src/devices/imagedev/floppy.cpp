@@ -1707,10 +1707,11 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 		{
 			idx = m_spin_playback_sample;
 			sampleend = m_sample[idx].data.size();
-			m_spin_samplepos++;
 			if (m_spin_samplepos < sampleend)
 				out = m_sample[idx].data[m_spin_samplepos];
-			else
+			m_spin_samplepos++;
+
+			if (m_spin_samplepos >= sampleend)
 			{
 				// Motor sample has completed
 				switch (m_spin_playback_sample)
@@ -1783,10 +1784,11 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 				sampleend = m_sample[idx].data.size();
 
 				// Mix it into the stream value
-				m_step_samplepos++;
 				if (m_step_samplepos < sampleend)
 					out += m_sample[idx].data[m_step_samplepos];
-				else
+				m_step_samplepos++;
+
+				if (m_step_samplepos >= sampleend)
 				{
 					// Step sample done
 					m_step_samplepos = 0;
