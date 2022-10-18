@@ -479,8 +479,6 @@ uint8_t mpu4_state::bankswitch_r()
 
 void mpu4_state::bankset_w(uint8_t data)
 {
-	//logerror("bankset_w %02x\n", data);
-
 	m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
 	m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
 }
