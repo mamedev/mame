@@ -26,11 +26,7 @@
 **
 **
 ** Todo/known issues:
-** - internal:
-**   - Redo the memory handling to get rid of trampolines and code duplication between
-**     msx_slot and msx_cart (eg, kanji roms, disk interfaces)
-**   - move subslot register ownership and handling from the main emulation to the
-**     slot owners (the system itself or cartridge slot expanders)
+** - Get rid of trampolines and code duplication between msx_slot and msx_cart (eg, kanji roms, disk interfaces)
 ** - general: - Add support for kana lock
 ** -          - Expansion slots not emulated
 ** - kanji: The direct rom dump from FS-A1FX shows that the kanji font roms are accessed slightly differently. Most
@@ -51,6 +47,7 @@
 **     fs4000: Is the keypad enter exactly the same as the normal enter key? There does not appear to be a separate mapping for it.
 **     piopx7: The keyboard responds like a regular international keyboard, not a japanese keyboard.
 **     svi728/svi728es: How are the keypad keys mapped?
+** - ax230: Some builtin games show bad graphics, example: Press 5 in main firmware screen and schoose the first game
 ** - piopx7/piopx7uk/piopxv60: Pioneer System Remote (home entertainment/Laserdisc control) not implemented
 ** - spc800: How to test operation of the han rom?
 ** - mbh1, mbh1e, mbh2, mbh25: speed controller
@@ -12081,7 +12078,7 @@ COMP(1986, ax150,      0,        0,     ax150,      msx,      msx_state, empty_i
 COMP(1986, ax170,      0,        0,     ax170,      msx,      msx_state, empty_init, "Sakhr", "AX-170 (Arabic) (MSX1)", 0)
 COMP(1986, ax200,      0,        0,     ax200,      msx,      msx1_v9938_state, empty_init, "Sakhr", "AX-200 (Arabic/English) (MSX1)", 0)
 COMP(1986, ax200m,     ax200,    0,     ax200m,     msx,      msx1_v9938_state, empty_init, "Sakhr", "AX-200M (Arabic/English) (MSX1)", 0)
-COMP(1986, ax230,      0,        0,     ax230,      msx,      msx_state, empty_init, "Sakhr", "AX-230 (Arabic) (MSX1)", 0)
+COMP(1986, ax230,      0,        0,     ax230,      msx,      msx_state, empty_init, "Sakhr", "AX-230 (Arabic) (MSX1)", MACHINE_IMPERFECT_GRAPHICS)
 COMP(1984, spc800,     0,        0,     spc800,     msxkr,    msx_state, empty_init, "Samsung", "SPC-800 (Korea) (MSX1)", 0)
 COMP(1983, mpc10,      0,        0,     mpc10,      msxjp,    msx_state, empty_init, "Sanyo", "MPC-10 / Wavy10 (Japan) (MSX1)", 0)
 COMP(1985, mpc64,      0,        0,     mpc64,      msxde,    msx_state, empty_init, "Sanyo", "MPC-64 (Germany) (MSX1)", 0)

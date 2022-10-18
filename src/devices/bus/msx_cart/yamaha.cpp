@@ -120,10 +120,11 @@ void msx_cart_sfg_device::device_start()
 
 	for (int i = 0; i < 4; i++)
 	{
+		// These addresses deliberately overlap
+		page(i)->install_read_handler(0x4000 * i + 0x3ff0, 0x4000 * i + 0x3ff6, read8sm_delegate(*m_ym2148, FUNC(ym2148_device::read)));
 		page(i)->install_read_handler(0x4000 * i + 0x3ff0, 0x4000 * i + 0x3ff1, read8sm_delegate(*m_ym2151, FUNC(ym_generic_device::read)));
-		page(i)->install_read_handler(0x4000 * i + 0x3ff2, 0x4000 * i + 0x3ff6, read8sm_delegate(*m_ym2148, FUNC(ym2148_device::read)));
+		page(i)->install_write_handler(0x4000 * i + 0x3ff0, 0x4000 * i + 0x3ff6, write8sm_delegate(*m_ym2148, FUNC(ym2148_device::write)));
 		page(i)->install_write_handler(0x4000 * i + 0x3ff0, 0x4000 * i + 0x3ff1, write8sm_delegate(*m_ym2151, FUNC(ym_generic_device::write)));
-		page(i)->install_write_handler(0x4000 * i + 0x3ff2, 0x4000 * i + 0x3ff6, write8sm_delegate(*m_ym2148, FUNC(ym2148_device::write)));
 	}
 }
 
