@@ -709,10 +709,7 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 {
 	m_ic4_input_b = 0x00;
 
-	if (m_serial_output)
-	{
-		m_ic4_input_b |=  0x80;
-	}
+	if (m_serial_output) m_ic4_input_b |=  0x80;
 
 	if (!m_reel_mux)
 	{
@@ -731,21 +728,12 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 
 	if (m_low_volt_detect)
 	{
-		if ( m_signal_50hz )
-		{
-			m_ic4_input_b |= 0x04;
-		}
+		if ( m_signal_50hz ) m_ic4_input_b |= 0x04;
 	}
 
-	if ( m_overcurrent )
-	{
-		m_ic4_input_b |= 0x02;
-	}
+	if ( m_overcurrent ) m_ic4_input_b |= 0x02;
 
-	if ( m_undercurrent )
-	{
-		m_ic4_input_b |= 0x01;
-	}
+	if ( m_undercurrent ) m_ic4_input_b |= 0x01;
 
 	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",machine().describe_context(),m_ic4_input_b));
 	return m_ic4_input_b;
@@ -2431,8 +2419,6 @@ void mpu4_state::mod2_no_bacta_f(machine_config &config)
 	mod2_f(config);
 	config.device_remove("dataport");
 	m_pia5->ca2_handler().set(FUNC(mpu4_state::dataport_rxd));
-
-
 }
 
 void mpu4_state::mod2_cheatchr_f(machine_config &config)
