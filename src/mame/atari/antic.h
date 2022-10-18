@@ -109,7 +109,6 @@ private:
 
 	required_device<gtia_device> m_gtia;
 	required_device<cpu_device> m_maincpu;
-	optional_ioport m_djoy_b;
 	optional_ioport m_artifacts;
 
 	uint32_t m_tv_artifacts;

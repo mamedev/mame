@@ -2239,6 +2239,7 @@ void a400_state::atari_common(machine_config &config)
 	ATARI_GTIA(config, m_gtia, 0);
 	m_gtia->read_callback().set_ioport("console");
 	m_gtia->write_callback().set(FUNC(a400_state::gtia_cb));
+	m_gtia->trigger_callback().set_ioport("djoy_b");
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
@@ -2453,6 +2454,7 @@ void a400_state::a5200(machine_config &config)
 
 	ATARI_GTIA(config, m_gtia, 0);
 //	m_gtia->set_region(GTIA_NTSC);
+	m_gtia->trigger_callback().set_ioport("djoy_b");
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);

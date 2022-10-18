@@ -343,6 +343,7 @@ void maxaflex_state::maxaflex(machine_config &config)
 	ATARI_GTIA(config, m_gtia, 0);
 	m_gtia->set_region(GTIA_NTSC);
 	m_gtia->read_callback().set_ioport("console");
+	m_gtia->trigger_callback().set_ioport("djoy_b");
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);

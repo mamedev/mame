@@ -125,6 +125,7 @@ gtia_device::gtia_device(const machine_config &mconfig, const char *tag, device_
 	, m_region(GTIA_NTSC)
 	, m_read_cb(*this)
 	, m_write_cb(*this)
+	, m_trigger_cb(*this)
 {
 }
 
@@ -137,6 +138,7 @@ void gtia_device::device_start()
 {
 	m_read_cb.resolve();
 	m_write_cb.resolve();
+	m_trigger_cb.resolve_safe(0xf);
 
 	save_item(NAME(m_r.m0pf));
 	save_item(NAME(m_r.m1pf));
@@ -302,8 +304,10 @@ int gtia_device::is_ntsc()
 	return m_region == GTIA_NTSC;
 }
 
-void gtia_device::button_interrupt(int button_count, uint8_t button_port)
+void gtia_device::button_interrupt(int button_count)
 {
+	uint8_t button_port = m_trigger_cb();
+
 	/* specify buttons relevant to this Atari variant */
 	for (int i = 0; i < button_count; i++)
 	{
