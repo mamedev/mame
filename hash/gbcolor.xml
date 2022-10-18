@@ -1505,7 +1505,7 @@ license:CC0
 	</software>
 
 	<software name="barbieoci" cloneof="barbieoc">
-		<description>Barbie - Avventure nell'Oceano (Italia)</description>
+		<description>Barbie - Avventure nell'Oceano (Italy)</description>
 		<year>1999</year>
 		<publisher>Mattel Media</publisher>
 		<info name="serial" value="DMG-ADYI-ITA"/>
@@ -4942,7 +4942,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbz">
+	<software name="dbz" supported="no">
 		<description>Dragon Ball Z - Legendary Super Warriors (Europe)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -4973,7 +4973,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzj" cloneof="dbz">
+	<software name="dbzj" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Densetsu no Chou Senshi-tachi (Japan)</description>
 		<year>2002</year>
 		<publisher>Banpresto</publisher>
@@ -5023,7 +5023,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzf" cloneof="dbz">
+	<software name="dbzf" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Les Guerriers Légendaires (France)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -5054,7 +5054,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzg" cloneof="dbz">
+	<software name="dbzg" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -5136,7 +5136,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzi" cloneof="dbz">
+	<software name="dbzi" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - I Leggendari Super Guerrieri (Italy)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -5173,7 +5173,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzs" cloneof="dbz">
+	<software name="dbzs" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Guerreros de Leyenda (Spain)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -5219,7 +5219,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzu" cloneof="dbz">
+	<software name="dbzu" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Legendary Super Warriors (USA)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -16384,7 +16384,7 @@ license:CC0
 	</software>
 
 	<software name="pokecrysi" cloneof="pokecrys">
-		<description>Pokémon - Versione Cristallo (Italia)</description>
+		<description>Pokémon - Versione Cristallo (Italy)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTI-ITA"/>
@@ -16494,7 +16494,7 @@ license:CC0
 	</software>
 
 	<software name="pokegoldi" cloneof="pokegold">
-		<description>Pokémon - Versione Oro (Italia)</description>
+		<description>Pokémon - Versione Oro (Italy)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AAUI-ITA"/>
@@ -16592,7 +16592,7 @@ license:CC0
 	</software>
 
 	<software name="pokesilvi" cloneof="pokesilv">
-		<description>Pokémon - Versione Argento (Italia)</description>
+		<description>Pokémon - Versione Argento (Italy)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AAXI-ITA"/>
@@ -24512,7 +24512,7 @@ license:CC0
 	</software>
 
 	<software name="yugiddsi" cloneof="yugidds">
-		<description>Yu-Gi-Oh! - Racconti Oscuri (Italia)</description>
+		<description>Yu-Gi-Oh! - Racconti Oscuri (Italy)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BY3I-ITA"/>
