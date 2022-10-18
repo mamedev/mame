@@ -10456,7 +10456,7 @@ license:CC0
 		<description>Jeep Jamboree (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
-		<info name="alt_title" value="Jeep Jamboree - Off Road Adventure (Box)" />
+		<info name="alt_title" value="Jeep Jamboree - Off Road Adventure (box)" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x20000">
