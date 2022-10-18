@@ -512,7 +512,7 @@ uint8_t a800xl_state::a1200xl_low_r(offs_t offset)
 //	if (!(m_mmu & 0x01))  // 0xc000-0xcfff
 //		return m_ram->pointer()[offset];
 //	else
-		return m_region_maincpu->base()[offset];
+	return m_region_maincpu->base()[offset];
 }
 
 void a800xl_state::a1200xl_low_w(offs_t offset, uint8_t data)
