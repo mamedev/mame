@@ -261,12 +261,8 @@ public:
 		m_cartright(*this, "cartright")
 	{ }
 
-	void atari_common_nodac(machine_config &config);
-	void atari_common(machine_config &config);
 	void a800pal(machine_config &config);
 	void a400pal(machine_config &config);
-	void a5200(machine_config &config);
-	void a5200a(machine_config &config);
 	void a800(machine_config &config);
 	void a1200xl(machine_config &config);
 	void a800xlpal(machine_config &config);
@@ -277,13 +273,13 @@ public:
 	void a400(machine_config &config);
 
 protected:
-
+	void atari_common_nodac(machine_config &config);
+	void atari_common(machine_config &config);
 
 private:
 	DECLARE_MACHINE_START(a400);
 	DECLARE_MACHINE_START(a800);
 	DECLARE_MACHINE_START(a800xl);
-	DECLARE_MACHINE_START(a5200);
 	void a400_palette(palette_device &palette) const;
 
 	DECLARE_MACHINE_RESET(a400);
@@ -320,16 +316,15 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(a400_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
 
 	void a1200xl_mem(address_map &map);
 	void a130xe_mem(address_map &map);
 	void a400_mem(address_map &map);
-	void a5200_mem(address_map &map);
 	void a600xl_mem(address_map &map);
 	void a800xl_mem(address_map &map);
 	void xegs_mem(address_map &map);
 
+protected:
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
 	optional_device<pia6821_device> m_pia;
@@ -344,6 +339,24 @@ private:
 
 	void setup_ram(int bank, uint32_t size);
 	void setup_cart(a800_cart_slot_device *slot);
+};
+
+class a5200_state : public a400_state
+{
+public:
+	a5200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		a400_state(mconfig, type, tag)
+	{ }
+
+	void a5200(machine_config &config);
+	void a5200a(machine_config &config);
+
+private:
+	DECLARE_MACHINE_START(a5200);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
+
+	void a5200_mem(address_map &map);
 };
 
 
@@ -648,7 +661,7 @@ void a400_state::xegs_mem(address_map &map)
 }
 
 
-void a400_state::a5200_mem(address_map &map)
+void a5200_state::a5200_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
 	map(0x4000, 0xbfff).noprw(); // ROM installed at machine start
@@ -715,10 +728,6 @@ static INPUT_PORTS_START( atari_digital_joystick2 )
 	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(2)
 	PORT_BIT(0x04, 0x04, IPT_UNUSED)
 	PORT_BIT(0x08, 0x08, IPT_UNUSED)
-	PORT_BIT(0x10, 0x10, IPT_BUTTON2) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(1)
-	PORT_BIT(0x20, 0x20, IPT_BUTTON2) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(2)
-	PORT_BIT(0x40, 0x40, IPT_UNUSED)
-	PORT_BIT(0x80, 0x80, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -749,10 +758,6 @@ static INPUT_PORTS_START( atari_digital_joystick4 )
 	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(2)
 	PORT_BIT(0x04, 0x04, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(3)
 	PORT_BIT(0x08, 0x08, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(4)
-	PORT_BIT(0x10, 0x10, IPT_BUTTON2) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(1)
-	PORT_BIT(0x20, 0x20, IPT_BUTTON2) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(2)
-	PORT_BIT(0x40, 0x40, IPT_BUTTON2) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(3)
-	PORT_BIT(0x80, 0x80, IPT_BUTTON2) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(4)
 INPUT_PORTS_END
 
 
@@ -2071,7 +2076,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a800xl_interrupt )
 	m_antic->generic_interrupt(2);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a5200_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER( a5200_state::a5200_interrupt )
 {
 	m_antic->generic_interrupt(4);
 }
@@ -2122,7 +2127,7 @@ MACHINE_START_MEMBER( a400_state, a800xl )
 }
 
 
-MACHINE_START_MEMBER( a400_state, a5200 )
+MACHINE_START_MEMBER( a5200_state, a5200 )
 {
 	setup_cart(m_cartleft);
 
@@ -2439,17 +2444,17 @@ void a400_state::xegs(machine_config &config)
 }
 
 // memory map A5200, different ports, less RAM
-void a400_state::a5200(machine_config &config)
+void a5200_state::a5200(machine_config &config)
 {
 	atari_common_nodac(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a5200_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a5200_interrupt), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a5200_state::a5200_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a5200_state::a5200_interrupt), "screen", 0, 1);
 
 	// Not used but exposed via expansion port
 	m_pokey->serin_r().set_constant(0);
 	m_pokey->serout_w().set_nop();
-	m_pokey->set_keyboard_callback(FUNC(a400_state::a5200_keypads));
+	m_pokey->set_keyboard_callback(FUNC(a5200_state::a5200_keypads));
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	ATARI_GTIA(config, m_gtia, 0);
@@ -2459,7 +2464,7 @@ void a400_state::a5200(machine_config &config)
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
 
-	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
+	MCFG_MACHINE_START_OVERRIDE( a5200_state, a5200 )
 
 	config_ntsc_screen(config);
 //	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
@@ -2496,7 +2501,7 @@ From Analog Computing Magazine, issue 16 (1984-02):
   changes, but none affects the machine's operation from the
   programmer's view.
 */
-void a400_state::a5200a(machine_config &config)
+void a5200_state::a5200a(machine_config &config)
 {
 	a5200(config);
 
@@ -2639,5 +2644,5 @@ COMP( 1986, a130xe,  a800xl, 0,      a130xe,    a800xl, a400_state, empty_init, 
 COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
 COMP( 1987, xegs,    0,      0,      xegs,      a800xl, a400_state, empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
 
-CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a400_state, empty_init, "Atari", "Atari 5200",           0)
-CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a, a400_state, empty_init, "Atari", "Atari 5200 (2-port)",  0)
+CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a5200_state, empty_init, "Atari", "Atari 5200",           0)
+CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a, a5200_state, empty_init, "Atari", "Atari 5200 (2-port)",  0)
