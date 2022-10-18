@@ -114,7 +114,7 @@ void electron_expansion_slot_device::expbus_w(offs_t offset, uint8_t data)
 #include "romboxp.h"
 #include "sidewndr.h"
 #include "m2105.h"
-//#include "voxbox.h"
+#include "voxbox.h"
 
 
 void electron_expansion_devices(device_slot_interface &device)
@@ -136,5 +136,5 @@ void electron_expansion_devices(device_slot_interface &device)
 	device.option_add("romboxp", ELECTRON_ROMBOXP);
 	device.option_add("sidewndr", ELECTRON_SIDEWNDR);
 	device.option_add("m2105", ELECTRON_M2105);
-	//device.option_add("voxbox", ELECTRON_VOXBOX);
+	device.option_add("voxbox", ELECTRON_VOXBOX);
 }
