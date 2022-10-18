@@ -251,43 +251,32 @@
 class a400_state : public atari_common_state
 {
 public:
-	a400_state(const machine_config &mconfig, device_type type, const char *tag) :
-		atari_common_state(mconfig, type, tag),
-		m_ram(*this, RAM_TAG),
-		m_pia(*this, "pia"),
-		m_dac(*this, "dac"),
-		m_region_maincpu(*this, "maincpu"),
-		m_cartleft(*this, "cartleft"),
-		m_cartright(*this, "cartright")
+	a400_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atari_common_state(mconfig, type, tag)
+		, m_ram(*this, RAM_TAG)
+		, m_pia(*this, "pia")
+		, m_dac(*this, "dac")
+		, m_region_maincpu(*this, "maincpu")
+		, m_cartleft(*this, "cartleft")
 	{ }
 
-	void a800pal(machine_config &config);
-	void a400pal(machine_config &config);
-	void a800(machine_config &config);
-	void a1200xl(machine_config &config);
-	void a800xlpal(machine_config &config);
-	void a130xe(machine_config &config);
-	void a800xl(machine_config &config);
-	void a600xl(machine_config &config);
-	void xegs(machine_config &config);
 	void a400(machine_config &config);
+	void a400pal(machine_config &config);
 
 protected:
 	void atari_common_nodac(machine_config &config);
 	void atari_common(machine_config &config);
 
+	void a400_mem(address_map &map);
+	TIMER_DEVICE_CALLBACK_MEMBER(a400_interrupt);
+
 private:
 	DECLARE_MACHINE_START(a400);
-	DECLARE_MACHINE_START(a800);
-	DECLARE_MACHINE_START(a800xl);
 	void a400_palette(palette_device &palette) const;
 
 	DECLARE_MACHINE_RESET(a400);
 
 	void gtia_cb(uint8_t data);
-
-	void a600xl_pia_pb_w(uint8_t data);
-	void a800xl_pia_pb_w(uint8_t data);
 
 	uint8_t read_d5xx(offs_t offset);    // at least one cart type can enable/disable roms when reading
 	void disable_cart(offs_t offset, uint8_t data);
@@ -303,35 +292,13 @@ private:
 	void write_corina_overlay(offs_t offset, uint8_t data);
 	void write_corina_d5xx(offs_t offset, uint8_t data);
 
-	uint8_t a600xl_low_r(offs_t offset);
-	uint8_t a1200xl_low_r(offs_t offset);
-	uint8_t a800xl_low_r(offs_t offset);
-	void a800xl_low_w(offs_t offset, uint8_t data);
-	uint8_t a800xl_high_r(offs_t offset);
-	void a800xl_high_w(offs_t offset, uint8_t data);
-	uint8_t a130xe_low_r(offs_t offset);
-	void a130xe_low_w(offs_t offset, uint8_t data);
-	uint8_t xegs_low_r(offs_t offset);
-	void xegs_low_w(offs_t offset, uint8_t data);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(a400_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
-
-	void a1200xl_mem(address_map &map);
-	void a130xe_mem(address_map &map);
-	void a400_mem(address_map &map);
-	void a600xl_mem(address_map &map);
-	void a800xl_mem(address_map &map);
-	void xegs_mem(address_map &map);
-
 protected:
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
 	optional_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
-	optional_device<a800_cart_slot_device> m_cartleft;
-	optional_device<a800_cart_slot_device> m_cartright;
+	required_device<a800_cart_slot_device> m_cartleft;
 
 	int m_cart_disabled, m_cart_helper;
 	int m_last_offs;
@@ -340,6 +307,97 @@ protected:
 	void setup_ram(int bank, uint32_t size);
 	void setup_cart(a800_cart_slot_device *slot);
 };
+
+class a800_state : public a400_state
+{
+public:
+	a800_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a400_state(mconfig, type, tag)
+		, m_cartright(*this, "cartright")
+	{ }
+	
+	void a800(machine_config &config);
+	void a800pal(machine_config &config);
+
+private:
+	required_device<a800_cart_slot_device> m_cartright;
+
+	DECLARE_MACHINE_START(a800);
+};
+
+class a800xl_state : public a400_state
+{
+public:
+	a800xl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a400_state(mconfig, type, tag)
+	{ }
+
+	void a800xl(machine_config &config);
+	void a800xlpal(machine_config &config);
+	void a600xl(machine_config &config);
+	void a1200xl(machine_config &config);
+
+protected:
+	DECLARE_MACHINE_START(a800xl);
+
+	void a600xl_pia_pb_w(uint8_t data);
+	void a800xl_pia_pb_w(uint8_t data);
+	void a1200xl_pia_pb_w(uint8_t data);
+
+	uint8_t a800xl_low_r(offs_t offset);
+	void a800xl_low_w(offs_t offset, uint8_t data);
+	uint8_t a800xl_high_r(offs_t offset);
+	void a800xl_high_w(offs_t offset, uint8_t data);
+	
+	uint8_t a1200xl_low_r(offs_t offset);
+	void a1200xl_low_w(offs_t offset, uint8_t data);
+	uint8_t a1200xl_high_r(offs_t offset);
+	void a1200xl_high_w(offs_t offset, uint8_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
+private:
+	void a600xl_mem(address_map &map);
+	void a800xl_mem(address_map &map);
+	void a1200xl_mem(address_map &map);
+
+	uint8_t a600xl_low_r(offs_t offset);
+
+};
+
+class a130xe_state : public a800xl_state
+{
+public:
+	a130xe_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a800xl_state(mconfig, type, tag)
+	{ }
+
+	void a130xe(machine_config &config);
+
+private:
+	uint8_t a130xe_low_r(offs_t offset);
+	void a130xe_low_w(offs_t offset, uint8_t data);
+
+	void a130xe_mem(address_map &map);
+
+};
+
+class xegs_state : public a800xl_state
+{
+public:
+	xegs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a800xl_state(mconfig, type, tag)
+	{ }
+
+	void xegs(machine_config &config);
+
+private:
+	uint8_t xegs_low_r(offs_t offset);
+	void xegs_low_w(offs_t offset, uint8_t data);
+
+	void xegs_mem(address_map &map);
+};
+
+
 
 class a5200_state : public a400_state
 {
@@ -367,7 +425,7 @@ private:
  *
  **************************************************************/
 
-uint8_t a400_state::a600xl_low_r(offs_t offset)
+uint8_t a800xl_state::a600xl_low_r(offs_t offset)
 {
 	if (m_mmu & 0x80)
 		return 0xff;
@@ -375,30 +433,7 @@ uint8_t a400_state::a600xl_low_r(offs_t offset)
 		return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
 }
 
-
-uint8_t a400_state::a1200xl_low_r(offs_t offset)
-{
-	if (offset < 0x5000)    // 0x0000-0x4fff
-		return m_ram->pointer()[offset];
-	else if (offset < 0x5800)   // 0x5000-0x57ff
-	{
-		if (m_mmu & 0x80)
-			return m_ram->pointer()[offset];
-		else
-			return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
-	}
-	else if (offset < 0xc000)   // 0x5800-0xbfff
-		return m_ram->pointer()[offset];
-	else    // 0xc000-0xcfff
-	{
-		if (!(m_mmu & 0x01))
-			return m_ram->pointer()[offset];
-		else
-			return m_region_maincpu->base()[offset];
-	}
-}
-
-uint8_t a400_state::a800xl_low_r(offs_t offset)
+uint8_t a800xl_state::a800xl_low_r(offs_t offset)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		return m_ram->pointer()[offset];
@@ -427,7 +462,7 @@ uint8_t a400_state::a800xl_low_r(offs_t offset)
 	}
 }
 
-void a400_state::a800xl_low_w(offs_t offset, uint8_t data)
+void a800xl_state::a800xl_low_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		m_ram->pointer()[offset] = data;
@@ -450,7 +485,43 @@ void a400_state::a800xl_low_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t a400_state::a800xl_high_r(offs_t offset)
+// same as a800xl except no built-in basic (just maps RAM there)
+uint8_t a800xl_state::a1200xl_low_r(offs_t offset)
+{
+	if (offset < 0x5000)    // 0x0000-0x4fff
+		return m_ram->pointer()[offset];
+	else if (offset < 0x5800)   // 0x5000-0x57ff
+	{
+		//if (m_mmu & 0x80)
+			return m_ram->pointer()[offset];
+		//else
+		//	return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
+	}
+	else if (offset < 0xc000) // 0x5800-0xbfff
+		return m_ram->pointer()[offset];
+
+//	if (!(m_mmu & 0x01))  // 0xc000-0xcfff
+//		return m_ram->pointer()[offset];
+//	else
+		return m_region_maincpu->base()[offset];
+}
+
+void a800xl_state::a1200xl_low_w(offs_t offset, uint8_t data)
+{
+	if (offset < 0x5000)    // 0x0000-0x4fff
+		m_ram->pointer()[offset] = data;
+	else if (offset < 0x5800)   // 0x5000-0x57ff
+	{
+		//if (m_mmu & 0x80)
+			m_ram->pointer()[offset] = data;
+	}
+	else if (offset < 0xc000) // 0x5800-0xbfff
+		m_ram->pointer()[offset] = data;
+//	else if (!(m_mmu & 0x01)) // 0xc000-0xcfff
+//		m_ram->pointer()[offset] = data;
+}
+
+uint8_t a800xl_state::a800xl_high_r(offs_t offset)
 {
 	if (m_mmu & 0x01)
 		return m_region_maincpu->base()[0xd800 + offset];
@@ -458,13 +529,27 @@ uint8_t a400_state::a800xl_high_r(offs_t offset)
 		return m_ram->pointer()[0xd800 + offset];
 }
 
-void a400_state::a800xl_high_w(offs_t offset, uint8_t data)
+void a800xl_state::a800xl_high_w(offs_t offset, uint8_t data)
 {
 	if (!(m_mmu & 0x01))
 		m_ram->pointer()[0xd800 + offset] = data;
 }
 
-uint8_t a400_state::a130xe_low_r(offs_t offset)
+uint8_t a800xl_state::a1200xl_high_r(offs_t offset)
+{
+	if (m_mmu & 0x01)
+		return m_region_maincpu->base()[0xd800 + offset];
+	else
+		return m_ram->pointer()[0xd800 + offset];
+}
+
+void a800xl_state::a1200xl_high_w(offs_t offset, uint8_t data)
+{
+	if (!(m_mmu & 0x01))
+		m_ram->pointer()[0xd800 + offset] = data;
+}
+
+uint8_t a130xe_state::a130xe_low_r(offs_t offset)
 {
 	if (offset < 0x4000)    // 0x0000-0x3fff
 		return m_ram->pointer()[offset];
@@ -498,7 +583,7 @@ uint8_t a400_state::a130xe_low_r(offs_t offset)
 	}
 }
 
-void a400_state::a130xe_low_w(offs_t offset, uint8_t data)
+void a130xe_state::a130xe_low_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x4000)    // 0x0000-0x3fff
 		m_ram->pointer()[offset] = data;
@@ -526,7 +611,7 @@ void a400_state::a130xe_low_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t a400_state::xegs_low_r(offs_t offset)
+uint8_t xegs_state::xegs_low_r(offs_t offset)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		return m_ram->pointer()[offset];
@@ -552,7 +637,7 @@ uint8_t a400_state::xegs_low_r(offs_t offset)
 	}
 }
 
-void a400_state::xegs_low_w(offs_t offset, uint8_t data)
+void xegs_state::xegs_low_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		m_ram->pointer()[offset] = data;
@@ -593,10 +678,10 @@ void a400_state::a400_mem(address_map &map)
 }
 
 
-void a400_state::a600xl_mem(address_map &map)
+void a800xl_state::a600xl_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x5000, 0x57ff).r(FUNC(a400_state::a600xl_low_r));    // self test or NOP
+	map(0x5000, 0x57ff).r(FUNC(a800xl_state::a600xl_low_r));    // self test or NOP
 	map(0xa000, 0xbfff).rom(); // BASIC
 	map(0xc000, 0xcfff).rom(); // OS
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
@@ -609,55 +694,55 @@ void a400_state::a600xl_mem(address_map &map)
 }
 
 
-void a400_state::a1200xl_mem(address_map &map)
+void a800xl_state::a1200xl_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a400_state::a1200xl_low_r), FUNC(a400_state::xegs_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a800xl_state::a1200xl_low_r), FUNC(a800xl_state::a1200xl_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a800xl_state::a1200xl_high_r), FUNC(a800xl_state::a1200xl_high_w));
 }
 
 
-void a400_state::a800xl_mem(address_map &map)
+void a800xl_state::a800xl_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a400_state::a800xl_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a800xl_state::a800xl_low_r), FUNC(a800xl_state::a800xl_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a800xl_state::a800xl_high_r), FUNC(a800xl_state::a800xl_high_w));
 }
 
 
-void a400_state::a130xe_mem(address_map &map)
+void a130xe_state::a130xe_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a130xe_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a130xe_state::a130xe_low_r), FUNC(a130xe_state::a130xe_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a130xe_state::a800xl_high_r), FUNC(a130xe_state::a800xl_high_w));
 }
 
 
-void a400_state::xegs_mem(address_map &map)
+void xegs_state::xegs_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a400_state::xegs_low_r), FUNC(a400_state::xegs_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(xegs_state::xegs_low_r), FUNC(xegs_state::xegs_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(xegs_state::a800xl_high_r), FUNC(xegs_state::a800xl_high_w));
 }
 
 
@@ -2071,7 +2156,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a400_interrupt )
 	m_antic->generic_interrupt(4);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a800xl_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER( a800xl_state::a800xl_interrupt )
 {
 	m_antic->generic_interrupt(2);
 }
@@ -2100,7 +2185,7 @@ MACHINE_START_MEMBER( a400_state, a400 )
 }
 
 
-MACHINE_START_MEMBER( a400_state, a800 )
+MACHINE_START_MEMBER( a800_state, a800 )
 {
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
@@ -2113,7 +2198,7 @@ MACHINE_START_MEMBER( a400_state, a800 )
 	save_item(NAME(m_last_offs));
 }
 
-MACHINE_START_MEMBER( a400_state, a800xl )
+MACHINE_START_MEMBER( a800xl_state, a800xl )
 {
 	m_mmu = 0xfd;
 	m_ext_bank = 0x03;  // only used by a130xe
@@ -2154,17 +2239,27 @@ void a400_state::gtia_cb(uint8_t data)
  *
  **************************************************************/
 
-void a400_state::a600xl_pia_pb_w(uint8_t data)
+// TODO: virtual, make sure direction bits are honored
+void a800xl_state::a600xl_pia_pb_w(uint8_t data)
 {
 	m_mmu = data;
 }
 
-void a400_state::a800xl_pia_pb_w(uint8_t data)
+void a800xl_state::a800xl_pia_pb_w(uint8_t data)
 {
 	if (m_pia->port_b_z_mask() != 0xff)
 	{
 		m_mmu = data;
 		m_ext_bank = (m_mmu & 0x0c) >> 2;
+	}
+}
+
+void a800xl_state::a1200xl_pia_pb_w(uint8_t data)
+{
+	// FIXME: BIOS jumps from PC=0xc550, expecting ROM to be still enabled at PC=0xe40C
+	if (m_pia->port_b_z_mask() != 0xff)
+	{
+		m_mmu = data;
 	}
 }
 
@@ -2311,14 +2406,14 @@ void a400_state::a400pal(machine_config &config)
 }
 
 // memory map A800 + NTSC screen + Right cartslot
-void a400_state::a800(machine_config &config)
+void a800_state::a800(machine_config &config)
 {
 	atari_common(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a400_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a800_state::a400_interrupt), "screen", 0, 1);
 
-	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
+	MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
 
 	config_ntsc_screen(config);
 //	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
@@ -2331,14 +2426,14 @@ void a400_state::a800(machine_config &config)
 
 
 // memory map A800 + PAL screen + Right cartslot
-void a400_state::a800pal(machine_config &config)
+void a800_state::a800pal(machine_config &config)
 {
 	atari_common(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a400_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a800_state::a400_interrupt), "screen", 0, 1);
 
-	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
+	MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
 
 	config_pal_screen(config);
 //	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
@@ -2351,16 +2446,16 @@ void a400_state::a800pal(machine_config &config)
 
 
 // memory map A600XL (same as 800XL but less RAM) + NTSC screen + MMU via PIA portB
-void a400_state::a600xl(machine_config &config)
+void a800xl_state::a600xl(machine_config &config)
 {
 	atari_common(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a600xl_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a800xl_interrupt), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a800xl_state::a600xl_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a800xl_state::a800xl_interrupt), "screen", 0, 1);
 
-	m_pia->writepb_handler().set(FUNC(a400_state::a600xl_pia_pb_w));
+	m_pia->writepb_handler().set(FUNC(a800xl_state::a600xl_pia_pb_w));
 
-	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
+	MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
 
 	config_ntsc_screen(config);
 
@@ -2373,16 +2468,16 @@ void a400_state::a600xl(machine_config &config)
 }
 
 // memory map A800XL + NTSC screen + MMU via PIA portB
-void a400_state::a800xl(machine_config &config)
+void a800xl_state::a800xl(machine_config &config)
 {
 	atari_common(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a800xl_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a800xl_interrupt), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a800xl_state::a800xl_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a800xl_state::a800xl_interrupt), "screen", 0, 1);
 
-	m_pia->writepb_handler().set(FUNC(a400_state::a800xl_pia_pb_w));
+	m_pia->writepb_handler().set(FUNC(a800xl_state::a800xl_pia_pb_w));
 
-	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
+	MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
 
 	m_ram->set_default_size("64K");
 
@@ -2396,7 +2491,7 @@ void a400_state::a800xl(machine_config &config)
 
 
 // memory map A800XL + PAL screen + MMU via PIA portB
-void a400_state::a800xlpal(machine_config &config)
+void a800xl_state::a800xlpal(machine_config &config)
 {
 	a800xl(config);
 
@@ -2413,29 +2508,30 @@ void a400_state::a800xlpal(machine_config &config)
 
 
 // memory map A1200XL+ MMU via PIA portB
-void a400_state::a1200xl(machine_config &config)
+void a800xl_state::a1200xl(machine_config &config)
 {
 	a800xl(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a1200xl_mem);
-	m_pia->writepb_handler().set(FUNC(a400_state::a800xl_pia_pb_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &a800xl_state::a1200xl_mem);
+	// TODO: LEDs on bits 2-3, specific on this variant
+	m_pia->writepb_handler().set(FUNC(a800xl_state::a1200xl_pia_pb_w));
 }
 
 // memory map A130XE (extra RAM only partially emulated)
-void a400_state::a130xe(machine_config &config)
+void a130xe_state::a130xe(machine_config &config)
 {
 	a800xl(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a130xe_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a130xe_state::a130xe_mem);
 	m_ram->set_default_size("128K");
 }
 
 // memory map XEGS, only XEGS bankswitch supported
-void a400_state::xegs(machine_config &config)
+void xegs_state::xegs(machine_config &config)
 {
 	a800xl(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::xegs_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xegs_state::xegs_mem);
 
 	config.device_remove("cartleft");
 	config.device_remove("cart_list");
@@ -2630,19 +2726,19 @@ ROM_END
  **************************************************************/
 
 /*     YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS       INIT        COMPANY  FULLNAME */
-COMP( 1979, a400,    0,      0,      a400,      a800,   a400_state, empty_init, "Atari", "Atari 400 (NTSC)",     0)
-COMP( 1979, a400pal, a400,   0,      a400pal,   a800,   a400_state, empty_init, "Atari", "Atari 400 (PAL)",      0)
-COMP( 1979, a800,    0,      0,      a800,      a800,   a400_state, empty_init, "Atari", "Atari 800 (NTSC)",     0)
-COMP( 1979, a800pal, a800,   0,      a800pal,   a800,   a400_state, empty_init, "Atari", "Atari 800 (PAL)",      0)
-COMP( 1982, a1200xl, a800,   0,      a1200xl,   a800xl, a400_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
-COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800xl, a400_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
-COMP( 1983, a800xl,  0,      0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800xl, a400_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1986, a65xe,   a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1986, a65xea,  a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
-COMP( 1986, a130xe,  a800xl, 0,      a130xe,    a800xl, a400_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
-COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1987, xegs,    0,      0,      xegs,      a800xl, a400_state, empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
+COMP( 1979, a400,    0,      0,      a400,      a800,   a400_state,   empty_init, "Atari", "Atari 400 (NTSC)",     0)
+COMP( 1979, a400pal, a400,   0,      a400pal,   a800,   a400_state,   empty_init, "Atari", "Atari 400 (PAL)",      0)
+COMP( 1979, a800,    0,      0,      a800,      a800,   a800_state,   empty_init, "Atari", "Atari 800 (NTSC)",     0)
+COMP( 1979, a800pal, a800,   0,      a800pal,   a800,   a800_state,   empty_init, "Atari", "Atari 800 (PAL)",      0)
+COMP( 1982, a1200xl, a800,   0,      a1200xl,   a800xl, a800xl_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
+COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800xl, a800xl_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
+COMP( 1983, a800xl,  0,      0,      a800xl,    a800xl, a800xl_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800xl, a800xl_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1986, a65xe,   a800xl, 0,      a800xl,    a800xl, a800xl_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1986, a65xea,  a800xl, 0,      a800xl,    a800xl, a800xl_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
+COMP( 1986, a130xe,  a800xl, 0,      a130xe,    a800xl, a130xe_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
+COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800xl, a800xl_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1987, xegs,    0,      0,      xegs,      a800xl, xegs_state,   empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
 
-CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a5200_state, empty_init, "Atari", "Atari 5200",           0)
-CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a, a5200_state, empty_init, "Atari", "Atari 5200 (2-port)",  0)
+CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a5200_state,  empty_init, "Atari", "Atari 5200",           0)
+CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a, a5200_state,  empty_init, "Atari", "Atari 5200 (2-port)",  0)
