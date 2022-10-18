@@ -272,11 +272,12 @@ protected:
 	void a400_mem(address_map &map);
 	TIMER_DEVICE_CALLBACK_MEMBER(a400_interrupt);
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_MACHINE_START(a400);
 	void a400_palette(palette_device &palette) const;
 
-	DECLARE_MACHINE_RESET(a400);
 
 	void gtia_cb(uint8_t data);
 
@@ -328,10 +329,11 @@ public:
 	void a800(machine_config &config);
 	void a800pal(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<a800_cart_slot_device> m_cartright;
-
-	DECLARE_MACHINE_START(a800);
 };
 
 class a800xl_state : public a400_state
@@ -347,7 +349,7 @@ public:
 	void a1200xl(machine_config &config);
 
 protected:
-	DECLARE_MACHINE_START(a800xl);
+	virtual void machine_start() override;
 
 	void a600xl_pia_pb_w(uint8_t data);
 	void a800xl_pia_pb_w(uint8_t data);
@@ -419,7 +421,7 @@ public:
 	void a5200a(machine_config &config);
 
 private:
-	DECLARE_MACHINE_START(a5200);
+	virtual void machine_start() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
 
@@ -2076,13 +2078,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( a5200_state::a5200_interrupt )
 	m_antic->generic_interrupt(4);
 }
 
-MACHINE_RESET_MEMBER( a400_state, a400 )
+void a400_state::machine_reset()
 {
 	m_pokey->write(15, 0);
 }
 
 
-MACHINE_START_MEMBER( a400_state, a400 )
+void a400_state::machine_start()
 {
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
@@ -2095,7 +2097,7 @@ MACHINE_START_MEMBER( a400_state, a400 )
 }
 
 
-MACHINE_START_MEMBER( a800_state, a800 )
+void a800_state::machine_start()
 {
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
@@ -2108,7 +2110,7 @@ MACHINE_START_MEMBER( a800_state, a800 )
 	save_item(NAME(m_last_offs));
 }
 
-MACHINE_START_MEMBER( a800xl_state, a800xl )
+void a800xl_state::machine_start()
 {
 	m_mmu = 0xfd;
 	m_ext_bank = 0x03;  // only used by a130xe
@@ -2122,7 +2124,7 @@ MACHINE_START_MEMBER( a800xl_state, a800xl )
 }
 
 
-MACHINE_START_MEMBER( a5200_state, a5200 )
+void a5200_state::machine_start()
 {
 	setup_cart(m_cartleft);
 
@@ -2231,7 +2233,7 @@ void a400_state::atari_common_nodac(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, pokey_device::FREQ_17_EXACT);
 
-	MCFG_MACHINE_RESET_OVERRIDE( a400_state, a400 )
+//	MCFG_MACHINE_RESET_OVERRIDE( a400_state, a400 )
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2327,7 +2329,7 @@ void a400_state::a400(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
 
-	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
+//8	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	config_ntsc_screen(config);
 //	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
@@ -2344,7 +2346,7 @@ void a400_state::a400pal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
 
-	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
+//	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	config_pal_screen(config);
 //	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
@@ -2361,7 +2363,7 @@ void a800_state::a800(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a800_state::a400_interrupt), "screen", 0, 1);
 
-	MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
+//	MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
 
 	config_ntsc_screen(config);
 //	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
@@ -2381,7 +2383,7 @@ void a800_state::a800pal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a800_state::a400_interrupt), "screen", 0, 1);
 
-	MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
+//	MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
 
 	config_pal_screen(config);
 //	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
@@ -2409,7 +2411,7 @@ void a800xl_state::a600xl(machine_config &config)
 	m_pia->readpb_handler().set_constant(0x83);
 	m_pia->writepb_handler().set(FUNC(a800xl_state::a600xl_pia_pb_w));
 
-	MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
+//	MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
 
 	config_ntsc_screen(config);
 
@@ -2440,7 +2442,7 @@ void a800xl_state::a800xl(machine_config &config)
 	m_pia->readpb_handler().set_constant(0x83);
 	m_pia->writepb_handler().set(FUNC(a800xl_state::a800xl_pia_pb_w));
 
-	MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
+//	MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
 
 	m_ram->set_default_size("64K");
 
@@ -2534,7 +2536,7 @@ void a5200_state::a5200(machine_config &config)
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
 
-	MCFG_MACHINE_START_OVERRIDE( a5200_state, a5200 )
+//	MCFG_MACHINE_START_OVERRIDE( a5200_state, a5200 )
 
 	config_ntsc_screen(config);
 //	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
