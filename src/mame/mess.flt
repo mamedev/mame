@@ -524,6 +524,7 @@ ncd/ncd88k.cpp
 ncd/ncdmips.cpp
 ncd/ncdppc.cpp
 nec/apc.cpp
+nec/bungo.cpp
 nec/ews4800.cpp
 nec/pc100.cpp
 nec/pc6001.cpp

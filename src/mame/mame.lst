@@ -9720,6 +9720,9 @@ buggychlt                       // A22 (c) 1984 Taito Corporation + Tefri licens
 wmbullet                        //
 wmbulletf                       //
 
+@source:nec/bungo.cpp
+mini5sx                         // 1991
+
 @source:skeleton/busicom.cpp
 busicom                         //
 
@@ -34601,7 +34604,6 @@ pc88va                          //
 pc88va2                         //
 
 @source:nec/pc98ha.cpp
-mini5sx                         // 1991
 pc98lt                          // 1989
 pc98ha                          // 1990
 

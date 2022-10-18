@@ -2946,7 +2946,7 @@ COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, init_pc9
 // DP "DP NOTE" ("Document Processor", based off various flavours of N5820 & 9821NOTE combo)
 // DP-70F (based off N5820-70FA & 9821ap2)
 // DP-70S (Document Filing Server)
-// Mini 5
+// Mini 5 -> cfr. bungo.cpp
 // Mini 7
 // JX series
 // ...

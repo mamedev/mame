@@ -24,18 +24,6 @@
         - JEIDA memory card interface (68pin cfr. "Super Daisenryaku HA",
           most likely same as NeoGeo JEIDA 3.0 memory cards);
         - optional docking station (for floppy device only or can mount other stuff too?);
-    - mini5sx specifics:
-        - almost likely don't really belong here, will be split at a later date;
-        - needs list of components, no documentation available from the net except for specs here:
-          https://museum.ipsj.or.jp/en/computer/word/0058.html
-        - GFX ROM handling all wrong;
-        - Garbled message tells user to reset machine and hold SHIFT+MENU while having the
-          auxiliary disk in
-          https://www.leadedsolder.com/2022/10/15/pwp50sx-nec-mini5-psu-repair-pickup.html
-          NB: MENU key doesn't exist with current PC98 keyboard device, also note that the usual
-          I/O at $41-$43 is not polled (either expects an irq or perhaps they relocated)
-        - Verify what exactly the handwritten “Function 2 + F2 = Floppy.” printed on aux disk
-          means.
 
 **************************************************************************************************/
 
@@ -274,29 +262,6 @@ void pc98ha_state::ha_io(address_map &map)
 	map(0x5f8e, 0x5f8e).r(FUNC(pc98ha_state::memcard_status_2_r));
 }
 
-/************************************
- *
- * 文豪 / "Bungo"
- *
- ***********************************/
-
-void bungo_mini5sx_state::mini5sx_map(address_map &map)
-{
-	ha_map(map);
-
-	// TODO: not right, checks 0xce000 first (dictionary?) then draws with 0xc0000-0xc0fff
-	// bank numbers definitely don't come from the same I/O addresses
-	map(0xc0000, 0xc3fff).bankr("kanji_bank");
-	map(0xcc000, 0xcffff).bankr("dict_bank");
-
-	// not accessed at current stage, enable log for now
-	map(0xd0000, 0xeffff).unmaprw();
-}
-
-void bungo_mini5sx_state::mini5sx_io(address_map &map)
-{
-	ha_io(map);
-}
 
 static INPUT_PORTS_START( pc98lt )
 	PORT_START("SYSB")
@@ -449,7 +414,7 @@ static void pc9801_floppies(device_slot_interface &device)
 {
 //  device.option_add("525dd", FLOPPY_525_DD);
 	device.option_add("525hd", FLOPPY_525_HD);
-	device.option_add("35hd", FLOPPY_35_HD);
+//	device.option_add("35hd", FLOPPY_35_HD);
 }
 
 void pc98lt_state::lt_config(machine_config &config)
@@ -518,22 +483,6 @@ void pc98ha_state::ha_config(machine_config &config)
 	UPD4991A(config, m_rtc_pio, 32'768);
 }
 
-void bungo_mini5sx_state::mini5sx_config(machine_config &config)
-{
-	ha_config(config);
-	const XTAL xtal = XTAL(16'000'000);
-	V50(config.replace(), m_maincpu, xtal); // TODO: V33
-	m_maincpu->set_addrmap(AS_PROGRAM, &bungo_mini5sx_state::mini5sx_map);
-	m_maincpu->set_addrmap(AS_IO, &bungo_mini5sx_state::mini5sx_io);
-	m_maincpu->set_tclk(xtal / 4);
-//  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
-	SOFTWARE_LIST(config, "disk_list").set_original("bungo_flop");
-
-	FLOPPY_CONNECTOR(config.replace(), "upd765:0", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config.replace(), "upd765:1", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
-}
-
 // all ROMs in both sets needs at least chip renaming, and I haven't seen a single PCB pic from the net.
 // dict.rom and ramdrv.bin definitely won't fit an even ROM size regardless,
 // also backup.bin may not be factory default.
@@ -576,35 +525,6 @@ ROM_START( pc98ha )
 	ROM_LOAD( "ramdrv.bin",   0x000000, 0x160000, BAD_DUMP CRC(f2cec994) SHA1(c986ad6d8f810ac0a9657c1af26b6fec712d56ed) )
 ROM_END
 
-ROM_START( mini5sx )
-	ROM_REGION16_LE( 0x100000, "biosrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "upd23c4001eacz-048.ic16", 0x000000, 0x080000, CRC(c7ce7ad6) SHA1(1f8616c1c5f817030decda539b9561fab2eef327) )
-	ROM_LOAD16_BYTE( "upd23c4001eacz-049.ic19", 0x000001, 0x080000, CRC(09740f3e) SHA1(18ece5fd79392fe86c85007192ca0702728b004d) )
-
-	ROM_REGION16_LE( 0x10000, "ipl", ROMREGION_ERASEFF )
-	ROM_COPY( "biosrom", 0x70000, 0x00000, 0x10000 )
-
-	// TODO: none of these is actually provided in dump, verify
-	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD( "kanji.rom",    0x000000, 0x040000, BAD_DUMP CRC(4be5ff2f) SHA1(261d28419a2ddebe3177a282952806d7bb036b40) )
-
-	ROM_REGION16_LE( 0x40000, "backup", ROMREGION_ERASEFF )
-	ROM_LOAD( "backup.bin",   0x000000, 0x040000, BAD_DUMP CRC(3c5b2a99) SHA1(f8e2f5a4c7601d4e81d5e9c83621107ed3f5a29a) )
-
-	ROM_REGION( 0x100000, "dict", ROMREGION_ERASEFF )
-	ROM_LOAD( "dict.rom",     0x000000, 0x0c0000, BAD_DUMP CRC(6dc8493c) SHA1(3e04cdc3403a814969b6590cd78e239e72677fe5) )
-
-	ROM_REGION( 0x100000, "romdrv", ROMREGION_ERASEFF )
-	ROM_COPY( "biosrom", 0x00000, 0x00000, 0x100000 )
-
-	// $00 filled with odd size
-	ROM_REGION( 0x200000, "ramdrv", ROMREGION_ERASEFF )
-	ROM_LOAD( "ramdrv.bin",   0x000000, 0x160000, BAD_DUMP CRC(f2cec994) SHA1(c986ad6d8f810ac0a9657c1af26b6fec712d56ed) )
-ROM_END
 
 COMP( 1989, pc98lt,      0,        0, lt_config,         pc98lt,   pc98lt_state,        empty_init,   "NEC",   "PC-98LT", MACHINE_NOT_WORKING )
 COMP( 1990, pc98ha,      0,        0, ha_config,         pc98ha,   pc98ha_state,        empty_init,   "NEC",   "PC-98HA (Handy98)", MACHINE_NOT_WORKING )
-
-// 文豪 / "Bungo" laptop section
-// NB: may eventually require own driver instead
-COMP( 1991, mini5sx,     0,        0, mini5sx_config,    pc98ha,   bungo_mini5sx_state, empty_init,   "NEC",   "Bungo mini 5SX", MACHINE_NOT_WORKING )
