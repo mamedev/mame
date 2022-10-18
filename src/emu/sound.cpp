@@ -761,6 +761,9 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 	}
 	g_profiler.stop();
 
+	if (!m_output_view[outputnum].valid())
+		m_output_view[outputnum] = empty_view(start, end);
+
 	// return the requested view
 	return read_stream_view(m_output_view[outputnum], start);
 }
