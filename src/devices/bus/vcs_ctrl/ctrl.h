@@ -113,5 +113,6 @@ inline void device_vcs_control_port_interface::trigger_w(int state)
 DECLARE_DEVICE_TYPE(VCS_CONTROL_PORT, vcs_control_port_device)
 
 void vcs_control_port_devices(device_slot_interface &device);
+void a800_control_port_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_CVS_CTRL_CTRL_H

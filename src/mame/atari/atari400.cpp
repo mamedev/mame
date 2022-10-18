@@ -54,6 +54,7 @@
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"
 #include "bus/a800/a8sio.h"
+#include "bus/vcs_ctrl/ctrl.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -258,7 +259,8 @@ public:
 		m_dac(*this, "dac"),
 		m_region_maincpu(*this, "maincpu"),
 		m_cartleft(*this, "cartleft"),
-		m_cartright(*this, "cartright")
+		m_cartright(*this, "cartright"),
+		m_ctrl(*this, "ctrl%u", 1U)
 	{ }
 
 	void a800pal(machine_config &config);
@@ -285,6 +287,12 @@ private:
 	DECLARE_MACHINE_RESET(a400);
 
 	void gtia_cb(uint8_t data);
+
+	uint8_t djoy_0_1_r();
+	void djoy_0_1_w(uint8_t data);
+	uint8_t djoy_2_3_r();
+	void djoy_2_3_w(uint8_t data);
+	uint8_t djoy_b_r();
 
 	void a600xl_pia_pb_w(uint8_t data);
 	void a800xl_pia_pb_w(uint8_t data);
@@ -332,6 +340,7 @@ protected:
 	required_memory_region m_region_maincpu;
 	optional_device<a800_cart_slot_device> m_cartleft;
 	optional_device<a800_cart_slot_device> m_cartright;
+	optional_device_array<vcs_control_port_device, 4> m_ctrl;
 
 	int m_cart_disabled, m_cart_helper;
 	int m_last_offs;
@@ -702,66 +711,6 @@ INPUT_PORTS_END
 
 
 
-static INPUT_PORTS_START( atari_digital_joystick2 )
-	PORT_START("djoy_0_1")
-	PORT_BIT(0x01, 0x01, IPT_JOYSTICK_UP)    PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)    PORT_PLAYER(1)
-	PORT_BIT(0x02, 0x02, IPT_JOYSTICK_DOWN)  PORT_CODE(KEYCODE_2_PAD) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1)
-	PORT_BIT(0x04, 0x04, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(1)
-	PORT_BIT(0x08, 0x08, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1)
-	PORT_BIT(0x10, 0x10, IPT_JOYSTICK_UP)    PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)    PORT_PLAYER(2)
-	PORT_BIT(0x20, 0x20, IPT_JOYSTICK_DOWN)  PORT_CODE(KEYCODE_2_PAD) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(2)
-	PORT_BIT(0x40, 0x40, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(2)
-	PORT_BIT(0x80, 0x80, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2)
-
-	PORT_START("djoy_2_3")
-	PORT_BIT(0x01, 0x01, IPT_UNUSED)
-	PORT_BIT(0x02, 0x02, IPT_UNUSED)
-	PORT_BIT(0x04, 0x04, IPT_UNUSED)
-	PORT_BIT(0x08, 0x08, IPT_UNUSED)
-	PORT_BIT(0x10, 0x10, IPT_UNUSED)
-	PORT_BIT(0x20, 0x20, IPT_UNUSED)
-	PORT_BIT(0x40, 0x40, IPT_UNUSED)
-	PORT_BIT(0x80, 0x80, IPT_UNUSED)
-
-	PORT_START("djoy_b")
-	PORT_BIT(0x01, 0x01, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x04, 0x04, IPT_UNUSED)
-	PORT_BIT(0x08, 0x08, IPT_UNUSED)
-INPUT_PORTS_END
-
-
-
-static INPUT_PORTS_START( atari_digital_joystick4 )
-	PORT_START("djoy_0_1")
-	PORT_BIT(0x01, 0x01, IPT_JOYSTICK_UP)    PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)    PORT_PLAYER(1)
-	PORT_BIT(0x02, 0x02, IPT_JOYSTICK_DOWN)  PORT_CODE(KEYCODE_2_PAD) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1)
-	PORT_BIT(0x04, 0x04, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(1)
-	PORT_BIT(0x08, 0x08, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1)
-	PORT_BIT(0x10, 0x10, IPT_JOYSTICK_UP)    PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)    PORT_PLAYER(2)
-	PORT_BIT(0x20, 0x20, IPT_JOYSTICK_DOWN)  PORT_CODE(KEYCODE_2_PAD) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(2)
-	PORT_BIT(0x40, 0x40, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(2)
-	PORT_BIT(0x80, 0x80, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2)
-
-	PORT_START("djoy_2_3")
-	PORT_BIT(0x01, 0x01, IPT_JOYSTICK_UP)    PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)    PORT_PLAYER(3)
-	PORT_BIT(0x02, 0x02, IPT_JOYSTICK_DOWN)  PORT_CODE(KEYCODE_2_PAD) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(3)
-	PORT_BIT(0x04, 0x04, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(3)
-	PORT_BIT(0x08, 0x08, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(3)
-	PORT_BIT(0x10, 0x10, IPT_JOYSTICK_UP)    PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)    PORT_PLAYER(4)
-	PORT_BIT(0x20, 0x20, IPT_JOYSTICK_DOWN)  PORT_CODE(KEYCODE_2_PAD) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(4)
-	PORT_BIT(0x40, 0x40, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(4)
-	PORT_BIT(0x80, 0x80, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(4)
-
-	PORT_START("djoy_b")
-	PORT_BIT(0x01, 0x01, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x04, 0x04, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(3)
-	PORT_BIT(0x08, 0x08, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(4)
-INPUT_PORTS_END
-
-
-
 /* 2009-04 FP:
 Small note about natural keyboard support: currently,
 - "Break" is mapped to 'F1'
@@ -855,50 +804,11 @@ static INPUT_PORTS_START( atari_keyboard )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( atari_analog_paddles )
-	PORT_START("analog_0")
-	PORT_BIT(0xff, 0x74, IPT_PADDLE) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_START("analog_1")
-	PORT_BIT(0xff, 0x74, IPT_PADDLE) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_PLAYER(2) PORT_REVERSE
-
-	PORT_START("analog_2")
-	PORT_BIT(0xff, 0x74, IPT_PADDLE) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_PLAYER(3) PORT_REVERSE
-
-	PORT_START("analog_3")
-	PORT_BIT(0xff, 0x74, IPT_PADDLE) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_PLAYER(4) PORT_REVERSE
-
-	PORT_START("analog_4")
-	PORT_BIT(0xff, 0x74, IPT_PADDLE) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_REVERSE /* PORT_PLAYER(5) */
-
-	PORT_START("analog_5")
-	PORT_BIT(0xff, 0x74, IPT_PADDLE) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_REVERSE /* PORT_PLAYER(6) */
-
-	PORT_START("analog_6")
-	PORT_BIT(0xff, 0x74, IPT_PADDLE) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_REVERSE /* PORT_PLAYER(7) */
-
-	PORT_START("analog_7")
-	PORT_BIT(0xff, 0x74, IPT_PADDLE) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_REVERSE /* PORT_PLAYER(8) */
-INPUT_PORTS_END
-
-
 
 static INPUT_PORTS_START( a800 )
 	PORT_INCLUDE( atari_artifacting )
 	PORT_INCLUDE( atari_console )
-	PORT_INCLUDE( atari_digital_joystick4 )
 	PORT_INCLUDE( atari_keyboard )
-	PORT_INCLUDE( atari_analog_paddles )
-INPUT_PORTS_END
-
-
-
-static INPUT_PORTS_START( a800xl )
-	PORT_INCLUDE( atari_artifacting )
-	PORT_INCLUDE( atari_console )
-	PORT_INCLUDE( atari_digital_joystick2 )
-	PORT_INCLUDE( atari_keyboard )
-	PORT_INCLUDE( atari_analog_paddles )
 INPUT_PORTS_END
 
 
@@ -2154,6 +2064,37 @@ void a400_state::gtia_cb(uint8_t data)
  *
  **************************************************************/
 
+uint8_t a400_state::djoy_0_1_r()
+{
+	return (m_ctrl[0]->read_joy() & 0x0f) | (m_ctrl[1]->read_joy() & 0x0f) << 4;
+}
+
+void a400_state::djoy_0_1_w(uint8_t data)
+{
+	m_ctrl[0]->joy_w(data & 0x0f);
+	m_ctrl[1]->joy_w(data >> 4);
+}
+
+uint8_t a400_state::djoy_2_3_r()
+{
+	return (m_ctrl[2]->read_joy() & 0x0f) | (m_ctrl[3]->read_joy() & 0x0f) << 4;
+}
+
+void a400_state::djoy_2_3_w(uint8_t data)
+{
+	m_ctrl[2]->joy_w(data & 0x0f);
+	m_ctrl[3]->joy_w(data >> 4);
+}
+
+uint8_t a400_state::djoy_b_r()
+{
+	uint8_t b = 0;
+	for (int i = 0; i < 4; i++)
+		if (!m_ctrl[i].found() || BIT(m_ctrl[i]->read_joy(), 5))
+			b |= 1 << i;
+	return b;
+}
+
 void a400_state::a600xl_pia_pb_w(uint8_t data)
 {
 	m_mmu = data;
@@ -2212,14 +2153,6 @@ void a400_state::atari_common_nodac(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
-	m_pokey->pot_r<0>().set_ioport("analog_0");
-	m_pokey->pot_r<1>().set_ioport("analog_1");
-	m_pokey->pot_r<2>().set_ioport("analog_2");
-	m_pokey->pot_r<3>().set_ioport("analog_3");
-	m_pokey->pot_r<4>().set_ioport("analog_4");
-	m_pokey->pot_r<5>().set_ioport("analog_5");
-	m_pokey->pot_r<6>().set_ioport("analog_6");
-	m_pokey->pot_r<7>().set_ioport("analog_7");
 	m_pokey->serin_r().set("fdc", FUNC(atari_fdc_device::serin_r));
 	m_pokey->serout_w().set("fdc", FUNC(atari_fdc_device::serout_w));
 	//m_pokey->oclk_w().set("sio", FUNC(a8sio_device::clock_out_w));
@@ -2235,6 +2168,14 @@ void a400_state::atari_common(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pokey->irq_w().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_pokey->pot_r<0>().set(m_ctrl[0], FUNC(vcs_control_port_device::read_pot_y));
+	m_pokey->pot_r<1>().set(m_ctrl[0], FUNC(vcs_control_port_device::read_pot_x));
+	m_pokey->pot_r<2>().set(m_ctrl[1], FUNC(vcs_control_port_device::read_pot_y));
+	m_pokey->pot_r<3>().set(m_ctrl[1], FUNC(vcs_control_port_device::read_pot_x));
+	m_pokey->pot_r<4>().set(m_ctrl[2], FUNC(vcs_control_port_device::read_pot_y));
+	m_pokey->pot_r<5>().set(m_ctrl[2], FUNC(vcs_control_port_device::read_pot_x));
+	m_pokey->pot_r<6>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_y));
+	m_pokey->pot_r<7>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_x));
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
@@ -2244,15 +2185,17 @@ void a400_state::atari_common(machine_config &config)
 	ATARI_GTIA(config, m_gtia, 0);
 	m_gtia->read_callback().set_ioport("console");
 	m_gtia->write_callback().set(FUNC(a400_state::gtia_cb));
-	m_gtia->trigger_callback().set_ioport("djoy_b");
+	m_gtia->trigger_callback().set(FUNC(a400_state::djoy_b_r));
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
 
 	/* devices */
 	PIA6821(config, m_pia, 0);
-	m_pia->readpa_handler().set_ioport("djoy_0_1");
-	m_pia->readpb_handler().set_ioport("djoy_2_3");
+	m_pia->readpa_handler().set(FUNC(a400_state::djoy_0_1_r));
+	m_pia->writepa_handler().set(FUNC(a400_state::djoy_0_1_w));
+	m_pia->readpb_handler().set(FUNC(a400_state::djoy_2_3_r));
+	m_pia->writepb_handler().set(FUNC(a400_state::djoy_2_3_w));
 	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
 	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
 	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
@@ -2274,6 +2217,11 @@ void a400_state::atari_common(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("a800");
 	SOFTWARE_LIST(config, "cass_list").set_original("a800_cass");
 	SOFTWARE_LIST(config, "xegs_list").set_original("xegs");
+
+	VCS_CONTROL_PORT(config, m_ctrl[0], a800_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, m_ctrl[1], a800_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, m_ctrl[2], a800_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, m_ctrl[3], a800_control_port_devices, "joy");
 }
 
 // memory map A400 + NTSC screen
@@ -2358,6 +2306,12 @@ void a400_state::a600xl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a600xl_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a800xl_interrupt), "screen", 0, 1);
 
+	m_pokey->pot_r<4>().set_constant(0xff);
+	m_pokey->pot_r<5>().set_constant(0xff);
+	m_pokey->pot_r<6>().set_constant(0xff);
+	m_pokey->pot_r<7>().set_constant(0xff);
+
+	m_pia->readpb_handler().set_constant(0x83);
 	m_pia->writepb_handler().set(FUNC(a400_state::a600xl_pia_pb_w));
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
@@ -2370,6 +2324,9 @@ void a400_state::a600xl(machine_config &config)
 //	m_gtia->set_region(GTIA_NTSC);
 
 	m_ram->set_default_size("16K");
+
+	config.device_remove("ctrl3");
+	config.device_remove("ctrl4");
 }
 
 // memory map A800XL + NTSC screen + MMU via PIA portB
@@ -2380,6 +2337,12 @@ void a400_state::a800xl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a800xl_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a800xl_interrupt), "screen", 0, 1);
 
+	m_pokey->pot_r<4>().set_constant(0xff);
+	m_pokey->pot_r<5>().set_constant(0xff);
+	m_pokey->pot_r<6>().set_constant(0xff);
+	m_pokey->pot_r<7>().set_constant(0xff);
+
+	m_pia->readpb_handler().set_constant(0x83);
 	m_pia->writepb_handler().set(FUNC(a400_state::a800xl_pia_pb_w));
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
@@ -2392,6 +2355,9 @@ void a400_state::a800xl(machine_config &config)
 //	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
 //	m_gtia->set_region(GTIA_NTSC);
+
+	config.device_remove("ctrl3");
+	config.device_remove("ctrl4");
 }
 
 
@@ -2454,6 +2420,14 @@ void a5200_state::a5200(machine_config &config)
 	// Not used but exposed via expansion port
 	m_pokey->serin_r().set_constant(0);
 	m_pokey->serout_w().set_nop();
+	m_pokey->pot_r<0>().set_ioport("analog_0");
+	m_pokey->pot_r<1>().set_ioport("analog_1");
+	m_pokey->pot_r<2>().set_ioport("analog_2");
+	m_pokey->pot_r<3>().set_ioport("analog_3");
+	m_pokey->pot_r<4>().set_ioport("analog_4");
+	m_pokey->pot_r<5>().set_ioport("analog_5");
+	m_pokey->pot_r<6>().set_ioport("analog_6");
+	m_pokey->pot_r<7>().set_ioport("analog_7");
 	m_pokey->set_keyboard_callback(FUNC(a5200_state::a5200_keypads));
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
@@ -2634,15 +2608,15 @@ COMP( 1979, a400,    0,      0,      a400,      a800,   a400_state, empty_init, 
 COMP( 1979, a400pal, a400,   0,      a400pal,   a800,   a400_state, empty_init, "Atari", "Atari 400 (PAL)",      0)
 COMP( 1979, a800,    0,      0,      a800,      a800,   a400_state, empty_init, "Atari", "Atari 800 (NTSC)",     0)
 COMP( 1979, a800pal, a800,   0,      a800pal,   a800,   a400_state, empty_init, "Atari", "Atari 800 (PAL)",      0)
-COMP( 1982, a1200xl, a800,   0,      a1200xl,   a800xl, a400_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
-COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800xl, a400_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
-COMP( 1983, a800xl,  0,      0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800xl, a400_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1986, a65xe,   a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1986, a65xea,  a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
-COMP( 1986, a130xe,  a800xl, 0,      a130xe,    a800xl, a400_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
-COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1987, xegs,    0,      0,      xegs,      a800xl, a400_state, empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
+COMP( 1982, a1200xl, a800,   0,      a1200xl,   a800,   a400_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
+COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800,   a400_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
+COMP( 1983, a800xl,  0,      0,      a800xl,    a800,   a400_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800,   a400_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1986, a65xe,   a800xl, 0,      a800xl,    a800,   a400_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1986, a65xea,  a800xl, 0,      a800xl,    a800,   a400_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
+COMP( 1986, a130xe,  a800xl, 0,      a130xe,    a800,   a400_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
+COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800,   a400_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1987, xegs,    0,      0,      xegs,      a800,   a400_state, empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
 
 CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a5200_state, empty_init, "Atari", "Atari 5200",           0)
 CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a, a5200_state, empty_init, "Atari", "Atari 5200 (2-port)",  0)
