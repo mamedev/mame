@@ -456,10 +456,10 @@ uint8_t a800xl_state::a800xl_low_r(offs_t offset)
 		return m_ram->pointer()[offset];
 	else if (offset < 0x5800)   // 0x5000-0x57ff
 	{
-		if (m_mmu & 0x80)
-			return m_ram->pointer()[offset];
-		else
+		if ((m_mmu & 0x81) == 0x01)
 			return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
+		else
+			return m_ram->pointer()[offset];
 	}
 	else if (offset < 0xa000)   // 0x5800-0x9fff
 		return m_ram->pointer()[offset];
@@ -485,7 +485,7 @@ void a800xl_state::a800xl_low_w(offs_t offset, uint8_t data)
 		m_ram->pointer()[offset] = data;
 	else if (offset < 0x5800)   // 0x5000-0x57ff
 	{
-		if (m_mmu & 0x80)
+		if ((m_mmu & 0x81) != 0x01)
 			m_ram->pointer()[offset] = data;
 	}
 	else if (offset < 0xa000)   // 0x5800-0x7fff
@@ -509,10 +509,10 @@ uint8_t a800xl_state::a1200xl_low_r(offs_t offset)
 		return m_ram->pointer()[offset];
 	else if (offset < 0x5800)   // 0x5000-0x57ff
 	{
-		//if (m_mmu & 0x80)
+		if ((m_mmu & 0x81) == 0x01)
+			return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
+		else
 			return m_ram->pointer()[offset];
-		//else
-		//	return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
 	}
 	else if (offset < 0xc000) // 0x5800-0xbfff
 		return m_ram->pointer()[offset];
@@ -529,7 +529,7 @@ void a800xl_state::a1200xl_low_w(offs_t offset, uint8_t data)
 		m_ram->pointer()[offset] = data;
 	else if (offset < 0x5800)   // 0x5000-0x57ff
 	{
-		//if (m_mmu & 0x80)
+		if ((m_mmu & 0x81) != 0x01)
 			m_ram->pointer()[offset] = data;
 	}
 	else if (offset < 0xc000) // 0x5800-0xbfff
@@ -573,7 +573,7 @@ uint8_t a130xe_state::a130xe_low_r(offs_t offset)
 	else if (offset < 0x8000)   // 0x4000-0x7fff
 	{
 		// NOTE: ANTIC accesses to extra RAM are not supported yet!
-		if (!(m_mmu & 0x80) && offset >= 0x5000 && offset < 0x5800)
+		if (((m_mmu & 0x81) == 0x01) && offset >= 0x5000 && offset < 0x5800)
 			return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
 		if (!(m_mmu & 0x10))
 		{
@@ -607,7 +607,7 @@ void a130xe_state::a130xe_low_w(offs_t offset, uint8_t data)
 	else if (offset < 0x8000)   // 0x4000-0x7fff
 	{
 		// NOTE: ANTIC accesses to extra RAM are not supported yet!
-		if (!(m_mmu & 0x80) && offset >= 0x5000 && offset < 0x5800)
+		if (((m_mmu & 0x81) == 0x01) && offset >= 0x5000 && offset < 0x5800)
 			return;
 		if (!(m_mmu & 0x10))
 			m_ram->pointer()[(offset & 0x3fff) + 0x10000 + (m_ext_bank * 0x4000)] = data;
@@ -2214,10 +2214,10 @@ void a800xl_state::a800xl_pia_pb_w(uint8_t data)
 		m_mmu = data;
 	}
 }
-
+// TODO: LEDs on bits 2-3, specific to this variant only
 void a800xl_state::a1200xl_pia_pb_w(uint8_t data)
 {
-	// FIXME: BIOS jumps from PC=0xc550, expecting ROM to be still enabled at PC=0xe40C
+	// FIXME: BIOS jumps from PC=0xc550, expecting ROM to be still enabled at PC=0xe40c
 	if (m_pia->port_b_z_mask() != 0xff)
 	{
 		m_mmu = data;
@@ -2510,7 +2510,6 @@ void a800xl_state::a1200xl(machine_config &config)
 	a800xl(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &a800xl_state::a1200xl_mem);
-	// TODO: LEDs on bits 2-3, specific on this variant
 	m_pia->writepb_handler().set(FUNC(a800xl_state::a1200xl_pia_pb_w));
 }
 
