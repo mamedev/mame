@@ -333,7 +333,6 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			gfx->transpen(bitmap, cliprect, code2 + 16, color, xflip, yflip, x, y + gfx->height(), 0);
 			gfx->transpen(bitmap, cliprect, code2 + 16 * 2, color, xflip, yflip, x, y + 2 * gfx->height(), 0);
 			gfx->transpen(bitmap, cliprect, code2 + 16 * 3, color, xflip, yflip, x, y + 3 * gfx->height(), 0);
-
 		}
 
 		gfx->transpen(bitmap, cliprect, code, color, xflip, yflip, x, y, 0);
