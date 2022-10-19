@@ -1587,6 +1587,7 @@ license:CC0
 		<description>Disney's Atlantis - The Lost Empire (Europe, USA)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English" />
 		<info name="serial" value="AGB-ATLE-USA, AGB-ATLP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
@@ -2112,6 +2113,7 @@ license:CC0
 		<description>Banjo-Kazooie - Grunty's Revenge (Europe, USA)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English" />
 		<info name="serial" value="AGB-BKZE-USA, AGB-BKZP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-20" />
@@ -4010,6 +4012,7 @@ license:CC0
 		<description>Breath of Fire (Europe, English / French / German)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
+		<info name="language" value="English,French,German"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
@@ -4019,9 +4022,10 @@ license:CC0
 	</software>
 
 	<software name="bof">
-		<description>Breath of Fire (Europe)</description>
+		<description>Breath of Fire (Europe, English)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-ABFP"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_sram" />
@@ -4110,6 +4114,7 @@ license:CC0
 		<description>Britney's Dance Beat (Europe, English / German)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,German"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="britney's dance beat (europe) (en,de).bin" size="8388608" crc="cfe69825" sha1="b7d2bbac630cfd921f65dea256fcc3db27b0bf5d"/>
@@ -4121,6 +4126,7 @@ license:CC0
 		<description>Britney's Dance Beat (Europe, English / French)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="britney's dance beat (europe) (en,fr).bin" size="8388608" crc="021cda8e" sha1="3bc3394648db1cb36cf6ff7e636dd04bbd8f5a43"/>
@@ -4132,6 +4138,7 @@ license:CC0
 		<description>Britney's Dance Beat (Europe)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-ABYP"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
@@ -4144,6 +4151,7 @@ license:CC0
 		<description>Britney's Dance Beat (USA)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-ABYE-USA"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
@@ -4210,6 +4218,7 @@ license:CC0
 		<description>Disney's Brother Bear (Europe, French / German / Italian / Spanish / Dutch / Danish / Swedish)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German,Italian,Spanish,Dutch,Danish,Swedish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -4219,9 +4228,10 @@ license:CC0
 	</software>
 
 	<software name="brobear">
-		<description>Disney's Brother Bear (Europe)</description>
+		<description>Disney's Brother Bear (Europe, English)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-BBRP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-20" />
@@ -4994,6 +5004,7 @@ license:CC0
 		<description>Catz (Europe, English / French / German / Italian)</description>
 		<year>2006</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,French,German,Italian"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
@@ -6208,6 +6219,7 @@ license:CC0
 		<description>Creatures (Europe, English / Italian / Spanish)</description>
 		<year>2001</year>
 		<publisher>SWING! Entertainment</publisher>
+		<info name="language" value="English,Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
@@ -6220,6 +6232,7 @@ license:CC0
 		<description>Creatures (Europe, English / French / German)</description>
 		<year>2001</year>
 		<publisher>SWING! Entertainment</publisher>
+		<info name="language" value="English,French,German"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
@@ -6620,6 +6633,7 @@ license:CC0
 		<description>Danny Phantom - The Ultimate Enemy (Europe, English / German / Spanish)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,German,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
@@ -6632,6 +6646,7 @@ license:CC0
 		<description>Danny Phantom - The Ultimate Enemy (Europe, English / French / Dutch)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,Dutch"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
@@ -7747,9 +7762,10 @@ license:CC0
 	</software>
 
 	<software name="dogz">
-		<description>Dogz (Europe)</description>
+		<description>Dogz (Europe, English)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-B82P"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
@@ -7775,6 +7791,7 @@ license:CC0
 		<description>Dogz (Europe, English / French / German / Italian)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,French,German,Italian"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
@@ -7823,9 +7840,10 @@ license:CC0
 	</software>
 
 	<software name="dogz2">
-		<description>Dogz 2 (Europe)</description>
+		<description>Dogz 2 (Europe, English)</description>
 		<year>2007</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-BIMP"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
@@ -7839,6 +7857,7 @@ license:CC0
 		<description>Dogz 2 (Europe, English / French / German / Italian)</description>
 		<year>2007</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,French,German,Italian"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
@@ -10755,9 +10774,10 @@ license:CC0
 	</software>
 
 	<software name="fant4">
-		<description>Fantastic 4 (Europe)</description>
+		<description>Fantastic 4 (Europe, English)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="English"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
@@ -10770,6 +10790,7 @@ license:CC0
 		<description>Fantastic 4 (Europe, French / German / Dutch / Spanish)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="French,German,Dutch,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
@@ -11441,6 +11462,7 @@ license:CC0
 		<description>Finding Nemo - The Continuing Adventures (Europe, English / Italian / Spanish / Danish / Swedish)</description>
 		<year>2004</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,Italian,Spanish,Danish,Swedish"/>
 		<info name="serial" value="AGB-BZIX-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-40" />
@@ -11455,6 +11477,7 @@ license:CC0
 		<description>Finding Nemo - The Continuing Adventures (Europe, French / German / Dutch)</description>
 		<year>2004</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="French,German,Dutch"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="finding nemo - the continuing adventures (europe) (fr,de,nl).bin" size="4194304" crc="1e8cefe9" sha1="3fdb20833be10287930621a5ceb941330bf24e27"/>
@@ -11477,6 +11500,7 @@ license:CC0
 		<description>Fire Emblem (Europe, English / French / German)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
+		<info name="language" value="English,French,German"/>
 		<info name="serial" value="AGB-AE7X-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-Y11-01" />
@@ -11494,6 +11518,7 @@ license:CC0
 		<description>Fire Emblem (Europe, English / Italian / Spanish)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
+		<info name="language" value="English,Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
@@ -14595,9 +14620,10 @@ license:CC0
 	</software>
 
 	<software name="hpotphis">
-		<description>Harry Potter and the Philosopher's Stone (Europe) ~ Harry Potter and the Sorcerer's Stone (USA)</description>
+		<description>Harry Potter and the Philosopher's Stone (Europe)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="Harry Potter and the Sorcerer's Stone (USA)"/>
 		<info name="serial" value="AGB-AHRE-USA, AGB-AHRP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
@@ -14826,9 +14852,10 @@ license:CC0
 	</software>
 
 	<software name="hellokhp">
-		<description>Hello Kitty - Happy Party Pals (Europe)</description>
+		<description>Hello Kitty - Happy Party Pals (Europe, English)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-B86P"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
@@ -14841,6 +14868,7 @@ license:CC0
 		<description>Hello Kitty - Happy Party Pals (Europe, English / French / German / Spanish)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="hello kitty - happy party pals (europe) (en,fr,de,es).bin" size="4194304" crc="1a080c10" sha1="0a5d1652f05943fa2c6116d9de07b92038be8570"/>
@@ -15312,9 +15340,10 @@ license:CC0
 	</software>
 
 	<software name="hotpot">
-		<description>Hot Potato! (Europe)</description>
+		<description>Hot Potato! (Europe, English)</description>
 		<year>2001</year>
 		<publisher>BAM! Entertainment</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-AHPP"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
@@ -15328,6 +15357,7 @@ license:CC0
 		<description>Hot Potato! (Europe, English / French / German)</description>
 		<year>2001</year>
 		<publisher>BAM! Entertainment</publisher>
+		<info name="language" value="English,French,German"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
@@ -15862,6 +15892,7 @@ license:CC0
 		<description>The Incredibles - Rise of the Underminer (Europe, English / French / German / Italian / Dutch / Spanish / Portuguese)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German,Italian,Dutch,Spanish,Portuguese"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="incredibles, the - rise of the underminer (europe) (en,fr,de,es,it,nl,pt).bin" size="8388608" crc="096f98b6" sha1="0798223e4906584080042081ac50070be378e82a"/>
@@ -17382,6 +17413,7 @@ license:CC0
 		<description>King Kong - The Official Game of the Movie (Europe, English / French / German / Spanish / Italian / Dutch)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,French,German,Italian,Dutch,Spanish"/>
 		<info name="serial" value="AGB-BKQP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
@@ -17395,6 +17427,7 @@ license:CC0
 		<description>King Kong - The Official Game of the Movie (Europe, English / Swedish / Norwegian / Danish / Finnish)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,Swedish,Norwegian,Danish,Finnish"/>
 		<info name="serial" value="AGB-BKQX-SCN"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
@@ -18880,9 +18913,10 @@ license:CC0
 	</software>
 
 	<software name="legosocr">
-		<description>LEGO Football Mania (Europe) ~ LEGO Soccer Mania (USA)</description>
+		<description>LEGO Football Mania (Europe)</description>
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="LEGO Soccer Mania (USA)"/>
 		<info name="serial" value="AGB-ALSE-USA, AGB-ALSP"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
@@ -19634,9 +19668,10 @@ license:CC0
 	</software>
 
 	<software name="madagscr">
-		<description>Madagascar (Europe)</description>
+		<description>Madagascar (Europe, English)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="English"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -19649,6 +19684,7 @@ license:CC0
 		<description>Madagascar (Europe, French / German / Portuguese)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="French,German,Portuguese"/>
 		<info name="serial" value="AGB-BGZX-EUR (80763.133.EU)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-20" />
@@ -19726,9 +19762,10 @@ license:CC0
 	</software>
 
 	<software name="madagopp">
-		<description>Madagascar - Operation Penguin (Europe)</description>
+		<description>Madagascar - Operation Penguin (Europe, English)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-BM7P-EUR, AGB-BM7P-UKV (81205.133.UK)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
@@ -19757,6 +19794,7 @@ license:CC0
 		<description>Madagascar - Operation Penguin (Europe, French / German)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="French,German"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -19769,6 +19807,7 @@ license:CC0
 		<description>Madagascar - Operation Penguin (Europe, Italian / Dutch)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="Italian,Dutch"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -22833,6 +22872,7 @@ license:CC0
 		<description>Monster House (Europe, English / French / German / Spanish)</description>
 		<year>2006</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -22842,9 +22882,10 @@ license:CC0
 	</software>
 
 	<software name="mnsthous">
-		<description>Monster House (Europe)</description>
+		<description>Monster House (Europe, English)</description>
 		<year>2006</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-BQ7P"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
@@ -23057,6 +23098,7 @@ license:CC0
 		<description>Monsters, Inc. (Europe, English / French / Italian)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,Italian"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="monsters, inc. (europe) (en,fr,it).bin" size="4194304" crc="d2c53ab8" sha1="7d77f57a86858e23cdf23bb383dd5f486b116a84"/>
@@ -23068,6 +23110,7 @@ license:CC0
 		<description>Monsters, Inc. (Europe, English / Spanish / Dutch)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,Spanish,Dutch"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="monsters, inc. (europe) (en,es,nl).bin" size="4194304" crc="d13177e0" sha1="36645b8de074f0b27dbe61528e70ae3af28fb3b9"/>
@@ -24695,6 +24738,7 @@ license:CC0
 		<description>Open Season (Europe, English / French / German / Italian / Spanish / Scandinavia)</description>
 		<year>2006</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,French,German,Italian,Spanish,Swedish,Norwegian,Danish,Finnish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -24707,6 +24751,7 @@ license:CC0
 		<description>Open Season (Europe, English / French / Spanish / Dutch)</description>
 		<year>2006</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,French,Spanish,Dutch"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -27271,6 +27316,7 @@ license:CC0
 		<description>Power Rangers S.P.D. (Europe, English / French / German)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="power rangers s.p.d. (europe) (en,fr,de).bin" size="4194304" crc="cb59cf7d" sha1="f10a8c31d8874fa65d5676786591893682dce942"/>
@@ -27282,6 +27328,7 @@ license:CC0
 		<description>Power Rangers S.P.D. (Europe, English / Italian / Spanish)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="power rangers s.p.d. (europe) (en,es,it).bin" size="4194304" crc="dca64f27" sha1="3099cb26cae98cccc264d168ac8d47fc134cbf36"/>
@@ -27871,6 +27918,7 @@ license:CC0
 		<description>Ratatouille (Europe, English / Italian / Danish / Norwegian / Swedish)</description>
 		<year>2007</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,Italian,Danish,Norwegian,Swedish"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="ratatouille (europe) (en,it,sv,no,da).bin" size="8388608" crc="82f9c596" sha1="a5c4a636979c06670a81428c778ff76ed2c65eee"/>
@@ -27882,6 +27930,7 @@ license:CC0
 		<description>Ratatouille (Europe, French / German / Dutch)</description>
 		<year>2007</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="French,German,Dutch"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="ratatouille (europe) (fr,de,nl).bin" size="8388608" crc="5c48c362" sha1="c9069887763173c76ec7b4852cb02098354c76ee"/>
@@ -27893,6 +27942,7 @@ license:CC0
 		<description>Ratatouille (Europe, Spanish / Portuguese)</description>
 		<year>2007</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="Spanish,Portuguese"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="ratatouille (europe) (es,pt).bin" size="8388608" crc="7a80b515" sha1="b76ff3727e614ea9ffbae7221b496fb65d32b26e"/>
@@ -29448,6 +29498,7 @@ license:CC0
 		<description>Scooby-Doo 2 - Monsters Unleashed (Europe, English / French / German / Italian / Spanish)</description>
 		<year>2004</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German,Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="scooby-doo 2 - monsters unleashed (europe) (en,fr,de,es,it).bin" size="8388608" crc="7bdab2cf" sha1="c3da5a04d11cab4e377b1b32c81109d6ea6fd39a"/>
@@ -29485,6 +29536,7 @@ license:CC0
 		<description>Scooby-Doo and the Cyber Chase (Europe, English / French / German)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German"/>
 		<info name="serial" value="AGB-ASDX-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
@@ -29528,6 +29580,7 @@ license:CC0
 		<description>Scooby-Doo! - Unmasked (Europe, English / French)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="scooby-doo - unmasked (europe) (en,fr).bin" size="8388608" crc="d21b8344" sha1="58870a50438e2c58626d16225354c9f6bec75b98"/>
@@ -29608,9 +29661,10 @@ license:CC0
 	</software>
 
 	<software name="scrbscrm">
-		<description>Scrabble Scramble! (Europe)</description>
+		<description>Scrabble Scramble! (Europe, English)</description>
 		<year>2005</year>
 		<publisher>Zoo Digital Publishing</publisher>
+		<info name="language" value="English"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -29624,6 +29678,7 @@ license:CC0
 		<description>Scrabble Scramble! (Europe, English / French / German / Italian / Dutch / Spanish)</description>
 		<year>2005</year>
 		<publisher>Zoo Digital Publishing</publisher>
+		<info name="language" value="English,French,German,Italian,Dutch,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="scrabble scramble (europe) (en,fr,de,es,it,nl).bin" size="4194304" crc="e8eb2e3a" sha1="97040955445c32f0872bbcda18dcab8dc0a7c8c1"/>
@@ -31099,6 +31154,7 @@ license:CC0
 		<description>The Simpsons - Road Rage (Europe, English / French / German / Italian / Spanish)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German,Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="simpsons, the - road rage (europe) (en,fr,de,es,it).bin" size="8388608" crc="44548b33" sha1="7de6cbc559af86dd3c39a80ef89fd4cabe6c0044"/>
@@ -31169,6 +31225,7 @@ license:CC0
 		<description>The Sims 2 - Pets (Europe, English / French / German / Italian / Spanish / Dutch)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="language" value="English,French,German,Italian,Spanish,Dutch"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="33554432">
@@ -31981,6 +32038,7 @@ license:CC0
 		<description>Spider-Man 2 (Europe, English / French / German / Spanish)</description>
 		<year>2004</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="English,French,German,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
@@ -34186,6 +34244,7 @@ license:CC0
 		<description>Surf's Up (Europe, English / French / German / Italian / Spanish)</description>
 		<year>2007</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,French,German,Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -34198,6 +34257,7 @@ license:CC0
 		<description>Surf's Up (Europe, English / French / Spanish)</description>
 		<year>2007</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,French,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -34250,9 +34310,10 @@ license:CC0
 	</software>
 
 	<software name="swmana">
-		<description>Sword of Mana (Europe)</description>
+		<description>Sword of Mana (Europe, English)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-AVSP"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_flash_512" />
@@ -34266,6 +34327,7 @@ license:CC0
 		<description>Sword of Mana (Europe, French / German)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
+		<info name="language" value="French,German"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="16777216">
@@ -34278,6 +34340,7 @@ license:CC0
 		<description>Sword of Mana (Europe, Italian / Spanish)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
+		<info name="language" value="Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="16777216">
@@ -34404,6 +34467,7 @@ license:CC0
 		<description>Tak - The Great Juju Challenge (Europe, English / French / German / Dutch)</description>
 		<year>2006</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German,Dutch"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -34442,6 +34506,7 @@ license:CC0
 		<description>Tak and the Power of Juju (Europe, English / French / German)</description>
 		<year>2004</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German"/>
 		<info name="serial" value="AGB-BJUP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-20" />
@@ -34458,6 +34523,7 @@ license:CC0
 		<description>Tak and the Power of Juju (Europe, Italian / Spanish)</description>
 		<year>2004</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -34979,6 +35045,7 @@ license:CC0
 		<description>Tetris Worlds (Europe, English / Italian / Spanish)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tetris worlds (europe) (en,es,it).bin" size="4194304" crc="4a834fc2" sha1="2de4d4c3d239b2e56ad4cc3000bb1ad2fdddd987"/>
@@ -34990,6 +35057,7 @@ license:CC0
 		<description>Tetris Worlds (Europe, English / French / German / Dutch)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English,French,German,Dutch"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tetris worlds (europe) (en,fr,de,nl).bin" size="4194304" crc="ad97eb3f" sha1="4a1297b44208366a178cc1f2541f5ea8386f6f3e"/>
@@ -35201,6 +35269,7 @@ license:CC0
 		<description>Tiger Woods PGA Tour Golf (Europe, English / French / German / Italian / Spanish)</description>
 		<year>2002</year>
 		<publisher>Digital Worldwide</publisher>
+		<info name="language" value="English,French,German,Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -35663,9 +35732,10 @@ license:CC0
 	</software>
 
 	<software name="thawkask">
-		<description>Tony Hawk's American Sk8land (Europe)</description>
+		<description>Tony Hawk's American Sk8land (Europe, English)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-BH9P"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
@@ -35679,6 +35749,7 @@ license:CC0
 		<description>Tony Hawk's American Sk8land (Europe, French / German / Italian / Spanish)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="French,German,Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
@@ -36283,9 +36354,10 @@ license:CC0
 	</software>
 
 	<software name="trollz">
-		<description>Trollz - Hair Affair! (Europe)</description>
+		<description>Trollz - Hair Affair! (Europe, English)</description>
 		<year>2006</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-BT6P"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
@@ -36299,6 +36371,7 @@ license:CC0
 		<description>Trollz - Hair Affair! (Europe, English / German / Italian)</description>
 		<year>2006</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,German,Italian"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -36311,6 +36384,7 @@ license:CC0
 		<description>Trollz - Hair Affair! (Europe, English / French / Spanish)</description>
 		<year>2006</year>
 		<publisher>Ubisoft</publisher>
+		<info name="language" value="English,French,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -36749,9 +36823,10 @@ license:CC0
 	</software>
 
 	<software name="ultspidm">
-		<description>Ultimate Spider-Man (Europe)</description>
+		<description>Ultimate Spider-Man (Europe, English)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-BULP-UKV (80899.133.UK)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
@@ -36768,6 +36843,7 @@ license:CC0
 		<description>Ultimate Spider-Man (Europe, French / German / Italian / Spanish)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
+		<info name="language" value="French,German,Italian,Spanish"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
@@ -40005,9 +40081,10 @@ license:CC0
 	</software>
 
 	<software name="2nemoinc">
-		<description>2 Games in 1: Finding Nemo + The Incredibles (Europe)</description>
+		<description>2 Games in 1: Finding Nemo + The Incredibles (Europe, English)</description>
 		<year>2007</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="AGB-BINP-EUR, AGB-BINP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
@@ -40022,6 +40099,7 @@ license:CC0
 		<description>2 Games in 1: Finding Nemo + The Incredibles (Europe, French / Dutch)</description>
 		<year>2007</year>
 		<publisher>THQ</publisher>
+		<info name="language" value="French,Dutch"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="2 games in 1 - finding nemo + the incredibles (europe) (fr,nl).bin" size="16777216" crc="2d4d69fa" sha1="2a02888c0f14fe35881ec175a8bc7220e78f2559"/>
