@@ -76,7 +76,6 @@ private:
 	memory_view m_view3;
 	u8 m_bank_mask;
 	u8 m_sram_select_mask;
-
 };
 
 
@@ -116,10 +115,10 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	memory_bank_array_creator<2> m_rombank;
 	void mapper_write_6000(u8 data);
 	void mapper_write_7000(u8 data);
 
+	memory_bank_array_creator<2> m_rombank;
 	u8 m_bank_mask;
 };
 

@@ -22,8 +22,6 @@ void msx_slot_bunsetsu_device::device_start()
 {
 	msx_slot_rom_device::device_start();
 
-	page_setup(2);
-
 	save_item(NAME(m_bunsetsu_address));
 
 	page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_slot_bunsetsu_device::buns_read)));

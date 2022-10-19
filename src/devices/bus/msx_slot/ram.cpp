@@ -21,7 +21,6 @@ void msx_slot_ram_device::device_start()
 	u32 start_address = m_start_address;
 	for (int i = m_start_address >> 14; i < 4 && i * 0x4000 < m_end_address; i++)
 	{
-		page_setup(i);
 		page(i)->install_ram(start_address, std::min<u32>((i + 1) * 0x4000, m_end_address) - 1, ram);
 		start_address += 0x4000;
 		ram += 0x4000;

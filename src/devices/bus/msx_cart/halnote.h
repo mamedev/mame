@@ -24,7 +24,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	static const u8 BANK_MASK = (0x100000 / 0x2000) - 1;
+	static constexpr u8 BANK_MASK = (0x100000 / 0x2000) - 1;
 
 	void bank0_w(u8 data);
 	void bank1_w(u8 data);

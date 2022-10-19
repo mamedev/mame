@@ -26,21 +26,19 @@ msx_cart_kanji_hxm200_device::msx_cart_kanji_hxm200_device(const machine_config 
 	: device_t(mconfig, MSX_CART_HXM200, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_region_kanji(*this, "kanji")
+	, m_kanji_address(0)
 {
 }
-
 
 ROM_START(msx_cart_hxm200)
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("hx_m200.rom", 0x0000, 0x20000, BAD_DUMP CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967))
 ROM_END
 
-
 const tiny_rom_entry *msx_cart_kanji_hxm200_device::device_rom_region() const
 {
 	return ROM_NAME(msx_cart_hxm200);
 }
-
 
 void msx_cart_kanji_hxm200_device::device_start()
 {
@@ -51,12 +49,10 @@ void msx_cart_kanji_hxm200_device::device_start()
 	save_item(NAME(m_kanji_address));
 }
 
-
 void msx_cart_kanji_hxm200_device::device_reset()
 {
 	m_kanji_address = 0;
 }
-
 
 u8 msx_cart_kanji_hxm200_device::kanji_r(offs_t offset)
 {

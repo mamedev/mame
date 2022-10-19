@@ -25,10 +25,10 @@ protected:
 
 private:
 	u8 kanji_r(offs_t offset);
-	void kanji_w(offs_t offset, uint8_t data);
+	void kanji_w(offs_t offset, u8 data);
 
 	required_memory_region m_region_kanji;
-	u32 m_kanji_address = 0;
+	u32 m_kanji_address;
 };
 
 

@@ -119,10 +119,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	static const u8 VIEW_READ = 0;
-	static const u8 VIEW_RAM = 1;
-	static const u8 VIEW_INVALID = 2;
-	static const u8 VIEW_SCC = 4;
+	static constexpr u8 VIEW_READ = 0;
+	static constexpr u8 VIEW_RAM = 1;
+	static constexpr u8 VIEW_INVALID = 2;
+	static constexpr u8 VIEW_SCC = 4;
 
 	template <int Bank> void bank_w(u8 data);
 	template <int Bank> void switch_bank();

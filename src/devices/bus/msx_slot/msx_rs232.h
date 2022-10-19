@@ -90,7 +90,7 @@ protected:
 	virtual uint8_t status_r(offs_t offset) override;
 	virtual void update_irq_state() override;
 
-	static constexpr u32 RAM_SIZE = 0x800;
+	static constexpr size_t RAM_SIZE = 0x800;
 
 	required_ioport m_switch_port;
 	std::vector<u8> m_ram;

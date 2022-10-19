@@ -24,7 +24,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	static const u32 BANK_SIZE = 0x2000;
+	static constexpr size_t BANK_SIZE = 0x2000;
 
 	u8 read(offs_t offset);
 	u8 read2(offs_t offset);

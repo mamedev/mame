@@ -29,7 +29,6 @@ private:
 	required_memory_region m_rom_region;
 	memory_bank_array_creator<2> m_rombank;
 	u32 m_region_offset;
-	u8 *m_rom;
 };
 
 
