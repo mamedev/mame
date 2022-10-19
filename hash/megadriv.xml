@@ -64,7 +64,7 @@ TODO:
 - Phantasy Star (serial G-4534, pstarjmd) is actually a SMS cart in MD shell,
   which works in the MD thanks to VDP compatibility mode.
   The dump needs to be ported from sms.xml and a specific cart slot override needs to be added here.
-- Identify the <unlicensed> games, in particular the "(Chi)" releases which most likely are actually Taiwanese.
+- Identify the <unlicensed> games, in particular the "(China)" releases which most likely are actually Taiwanese.
 
 Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
@@ -10066,7 +10066,7 @@ but dumps still have to be confirmed.
 -->
 
 	<software name="13mahjan" supported="yes">
-		<description>13 Ma Jiang - 98 Mei Shao Nu (Taiwan)</description>
+		<description>Shísān Zhāng Májiàng  - 98 Měi Shàonǚ (Taiwan)</description>
 		<year>1998</year>
 		<publisher>BBD</publisher>
 		<info name="alt_title" value="十三張麻將 98'美少女"/>
@@ -10100,7 +10100,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="16mj">
-		<description>Shi Liu Zhang Ma Jiang (China)</description>
+		<description>Shíliù Zhāng Májiàng (China)</description>
 		<year>199?</year>
 		<publisher>City Man</publisher>
 		<info name="alt_title" value="十六張麻將"/>
@@ -10112,7 +10112,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="16mj2">
-		<description>Shi Liu Zhang Ma Jiang II (China)</description>
+		<description>Shíliù Zhāng Májiàng II (China)</description>
 		<year>199?</year>
 		<publisher>City Man</publisher>
 		<info name="serial" value="GM-95003"/>
@@ -10481,7 +10481,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 	</software>
 
 	<software name="adveboy">
-		<description>Adventurous Boy - Mao Xian Xiao Zi (Taiwan)</description>
+		<description>Adventurous Boy - Màoxiǎn Xiǎozi (Taiwan)</description>
 		<year>199?</year>
 		<publisher>Gamtec</publisher>
 		<info name="alt_title" value="冒險小子"/>
@@ -10861,7 +10861,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 	</software>
 
 	<software name="aqlian">
-		<description>A Q Lian Huan Pao (Taiwan)</description>
+		<description>Ā Q Liánhuán Pào (Taiwan)</description>
 		<year>1995</year>
 		<publisher>C&amp;E</publisher>
 		<info name="alt_title" value="阿Q連環泡"/>
@@ -11468,7 +11468,7 @@ No sound (btanb?)
 	</software>
 
 	<software name="baoxiao">
-		<description>Bao Xiao San Guo (China)</description>
+		<description>Bàoxiào Sānguó (China)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="爆笑三国"/>
@@ -11565,7 +11565,7 @@ No sound (btanb?)
 	</software>
 
 	<software name="barver">
-		<description>Barver Battle Saga - Tai Kong Zhan Shi - Mo Fa Zhan Shi (Taiwan)</description>
+		<description>Barver Battle Saga - Tàikōng Zhànshì - Mófǎ Zhànshì (Taiwan)</description>
 		<year>1996</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<notes><![CDATA[
@@ -11705,7 +11705,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 	</software>
 
 	<software name="btlchess">
-		<description>Zhan Qi - Chinese Battle Chess (Taiwan)</description>
+		<description>Zhàn Qí - Chinese Battle Chess (Taiwan)</description>
 		<year>199?</year>
 		<publisher>Creaton Softech</publisher>
 		<info name="alt_title" value="戦棊 - Chinese Battle Chess"/>
@@ -12931,7 +12931,7 @@ No [VDP] sprites
 	</software>
 
 	<software name="cjfuweng">
-		<description>Chao Ji Da Fu Weng (Taiwan)</description>
+		<description>Chāojí Dà Fùwēng (Taiwan)</description>
 		<!-- 1994 or 1995 -->
 		<year>1994?</year>
 		<publisher>Gametec</publisher>
@@ -13088,7 +13088,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="chinesec">
-		<description>Zhong Guo Xiang Qi - Chinese Chess (Taiwan)</description>
+		<description>Zhōngguó Xiàngqí - Chinese Chess (Taiwan)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="中國象棋"/>
@@ -16307,7 +16307,7 @@ Crashes after EA logo, requires better [VDP] irq handling
 	</software>
 
 	<software name="fengkuan">
-		<description>Feng Kuang Tao Hua Yuan (Taiwan)</description>
+		<description>Fēngkuáng Táohuāyuán (Taiwan)</description>
 		<year>199?</year>
 		<publisher>Creaton Softech</publisher>
 		<notes><![CDATA[
@@ -16323,7 +16323,7 @@ https://segaretro.org/Feng_Kuang_Tao_Hua_Yuan
 	</software>
 
 	<software name="fengkuan1" cloneof="fengkuan">
-		<description>Feng Kuang Tao Hua Yuan (Taiwan, unprotected)</description>
+		<description>Fēngkuáng Táohuāyuán (Taiwan, unprotected)</description>
 		<year>199?</year>
 		<publisher>Creaton Softech</publisher>
 		<info name="alt_title" value="瘋狂桃花源"/>
@@ -19322,7 +19322,7 @@ Unsupported [Sega Mouse] peripheral
 	</software>
 
 	<software name="maqiao">
-		<description>Ma Qiao E Mo Ta - Devilish Mahjong Tower (Taiwan)</description>
+		<description>Máquè Èmó Tǎ - Devilish Mahjong Tower (Taiwan)</description>
 		<year>1994</year>
 		<publisher>C&amp;E</publisher>
 		<notes><![CDATA[
@@ -20022,7 +20022,7 @@ Black screen
 	</software>
 
 	<software name="menghu" supported="no">
-		<description>Meng Huan Shui Guo Pan - 777 Casino (Taiwan)</description>
+		<description>Mènghuàn Shuǐguǒ Pán - 777 Casino (Taiwan)</description>
 		<!-- Definitely not earlier than '94 -->
 		<year>1996?</year>
 		<publisher>City Man</publisher>
@@ -25259,7 +25259,7 @@ Red screen
 	</software>
 
 	<software name="sanguo5">
-		<description>San Guo Zhi V (Taiwan)</description>
+		<description>Sānguózhì V (Taiwan)</description>
 		<!-- "after '96" -->
 		<year>199?</year>
 		<publisher>SKOB</publisher>
@@ -25569,7 +25569,7 @@ Black screen, requires better [VDP] irq handling
 	</software>
 
 	<software name="shijie">
-		<description>Jin Guan Jun Xiong Di Xiang - Shi Jie Zhi Bang Zheng Ba Zhan (Taiwan)</description>
+		<description>Jīn Guànjūn Xiōngdì Xiàng - Shìjiè Zhí Bàng Zhēngbà Zhàn (Taiwan)</description>
 		<year>1994</year>
 		<publisher>C&amp;E</publisher>
 		<notes><![CDATA[
@@ -25880,7 +25880,7 @@ https://segaretro.org/Shi_Jie_Zhi_Bang_Zheng_Ba_Zhan:_World_Pro_Baseball_94
 
 <!-- undumped original '96 release by Kin Tec known to exist -->
 	<software name="shuihu">
-		<description>Shui Hu - Feng Yun Zhuan (Taiwan)</description>
+		<description>Shuǐhǔ - Fēngyún Chuán (Taiwan)</description>
 		<year>1999</year>
 		<publisher>Never Ending Soft Team</publisher>
 		<notes><![CDATA[
@@ -25906,7 +25906,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 	</software>
 
 	<software name="shuihuzh">
-		<description>Shui Hu Zhuan (China)</description>
+		<description>Shuǐhǔ Zhuàn (China)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
 		<info name="alt_title" value="水滸傳"/>
@@ -28698,7 +28698,7 @@ Freezes at the start of any in-game mode
 	</software>
 
 	<software name="taiwan">
-		<description>Taiwan Daheng (China)</description>
+		<description>Táiwān Dàhēng (China)</description>
 		<year>1994</year>
 		<publisher>C&amp;E</publisher>
 		<info name="alt_title" value="台灣大亨"/>
@@ -29859,7 +29859,7 @@ No BGMs
 	</software>
 
 	<software name="tunshi">
-		<description>Tun Shi Tian Di III (China, Simple Chinese)</description>
+		<description>Tūnshí Tiāndì III (China, Simplified Chinese)</description>
 		<year>1997</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="吞食天地III"/>
@@ -29871,7 +29871,7 @@ No BGMs
 	</software>
 
 	<software name="tunshi1" cloneof="tunshi">
-		<description>Tun Shi Tian Di III (China)</description>
+		<description>Tūnshí Tiāndì III (China)</description>
 		<year>199?</year>
 		<publisher>SKOB</publisher>
 		<info name="alt_title" value="吞食天地III"/>
@@ -32137,7 +32137,7 @@ Black screen
 	</software>
 
 	<software name="wukongc" cloneof="wukong">
-		<description>Wu Kong Wai Zhuan (China)</description>
+		<description>Wùkōng Wàizhuàn (China)</description>
 		<year>1996</year>
 		<publisher>Ming</publisher>
 		<info name="serial" value="GM-95701"/>
@@ -32153,7 +32153,7 @@ Black screen
 	</software>
 
 	<software name="wukongc1" cloneof="wukong">
-		<description>Wu Kong Wai Zhuan (China, unprotected)</description>
+		<description>Wùkōng Wàizhuàn (China, unprotected)</description>
 		<year>1996</year>
 		<publisher>Ming</publisher>
 		<info name="serial" value="GM-95701"/>
@@ -32467,7 +32467,7 @@ Black screen
 	</software>
 
 	<software name="xiaomo">
-		<description>Xiao Monv - Magic Girl (Taiwan)</description>
+		<description>Xiǎo Mónǚ - Magic Girl (Taiwan)</description>
 		<year>1993</year>
 		<publisher>Gamtec</publisher>
 		<info name="alt_title" value="小魔女"/>
@@ -32491,7 +32491,7 @@ Black screen
 	</software>
 
 	<software name="xinqig" cloneof="beggarp">
-		<description>Xin Qi Gai Wang Zi (China)</description>
+		<description>Xīn Qǐgài Wángzǐ (China)</description>
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
 		<info name="alt_title" value="新乞丐王子"/>
@@ -32504,7 +32504,7 @@ Black screen
 	</software>
 
 	<software name="xinqig1" cloneof="beggarp">
-		<description>Xin Qi Gai Wang Zi (China, alt)</description>
+		<description>Xīn Qǐgài Wángzǐ (China, alt)</description>
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
 		<info name="alt_title" value="新乞丐王子"/>
@@ -32517,11 +32517,13 @@ Black screen
 	</software>
 
 	<software name="yasech">
-		<description>Ya Se Chuan Shuo (China)</description>
+		<description>Yàsè Chuánshuō (China)</description>
 		<year>1995</year>
 		<publisher>Ming</publisher>
 		<info name="serial" value="GM-95403"/>
-		<info name="alt_title" value="亚瑟传说 / 帝國王朝 (亞瑟傳說篇) ~ Di Guo Wang Chao (Ya Se Chuan Shuo Pian) [Box]"/>
+		<info name="alt_title" value="亚瑟传说"/>
+		<info name="alt_title" value="帝國王朝 (亞瑟傳說篇) (box)"/>
+		<info name="alt_title" value="Dìguó Wángcháo  (Yàsè Chuánshuō Piān) (box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_yasech"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
