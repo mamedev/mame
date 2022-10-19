@@ -40,7 +40,6 @@ public:
 	maxaflex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atari_common_state(mconfig, type, tag)
 		, m_mcu(*this, "mcu")
-		, m_pokey(*this, "pokey")
 		, m_speaker(*this, "speaker")
 		, m_region_maincpu(*this, "maincpu")
 		, m_dsw(*this, "dsw")
@@ -80,7 +79,6 @@ private:
 	uint8_t m_portc_out;
 
 	required_device<m68705p3_device> m_mcu;
-	required_device<pokey_device> m_pokey;
 	required_device<speaker_sound_device> m_speaker;
 	required_region_ptr<uint8_t> m_region_maincpu;
 	required_ioport m_dsw;
@@ -211,7 +209,7 @@ void maxaflex_state::a600xl_mem(address_map &map)
 	map(0xc000, 0xcfff).rom(); /* OS */
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
-	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xd200, 0xd2ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
