@@ -278,7 +278,6 @@ protected:
 private:
 	void a400_palette(palette_device &palette) const;
 
-
 	void gtia_cb(uint8_t data);
 
 	uint8_t djoy_0_1_r();
@@ -312,7 +311,7 @@ protected:
 
 	int m_cart_disabled, m_cart_helper;
 	int m_last_offs;
-	uint8_t m_mmu, m_ext_bank;
+	uint8_t m_mmu;
 
 	void setup_ram(int bank, uint32_t size);
 	void setup_cart(a800_cart_slot_device *slot);
@@ -350,6 +349,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void a600xl_pia_pb_w(uint8_t data);
 	void a800xl_pia_pb_w(uint8_t data);
@@ -385,11 +385,17 @@ public:
 	void a130xe(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	uint8_t a130xe_low_r(offs_t offset);
 	void a130xe_low_w(offs_t offset, uint8_t data);
 
 	void a130xe_mem(address_map &map);
 
+	void a130xe_pia_pb_w(uint8_t data);
+
+	uint8_t m_ext_bank;
 };
 
 class xegs_state : public a800xl_state
@@ -2078,12 +2084,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( a5200_state::a5200_interrupt )
 	m_antic->generic_interrupt(4);
 }
 
-void a400_state::machine_reset()
-{
-	m_pokey->write(15, 0);
-}
-
-
 void a400_state::machine_start()
 {
 	setup_ram(0, m_ram->size());
@@ -2112,17 +2112,19 @@ void a800_state::machine_start()
 
 void a800xl_state::machine_start()
 {
-	m_mmu = 0xfd;
-	m_ext_bank = 0x03;  // only used by a130xe
 	setup_cart(m_cartleft);
 
 	save_item(NAME(m_cart_disabled));
 	save_item(NAME(m_cart_helper));
 	save_item(NAME(m_last_offs));
 	save_item(NAME(m_mmu));
-	save_item(NAME(m_ext_bank));
 }
 
+void a130xe_state::machine_start()
+{
+	a800xl_state::machine_start();
+	save_item(NAME(m_ext_bank));
+}
 
 void a5200_state::machine_start()
 {
@@ -2131,6 +2133,23 @@ void a5200_state::machine_start()
 	save_item(NAME(m_cart_disabled));
 	save_item(NAME(m_cart_helper));
 	save_item(NAME(m_last_offs));
+}
+
+void a400_state::machine_reset()
+{
+	m_pokey->write(15, 0);
+}
+
+void a800xl_state::machine_reset()
+{
+	a400_state::machine_reset();
+	m_mmu = 0xfd;
+}
+
+void a130xe_state::machine_reset()
+{
+	a800xl_state::machine_reset();
+	m_ext_bank = 0x03;
 }
 
 
@@ -2193,7 +2212,6 @@ void a800xl_state::a800xl_pia_pb_w(uint8_t data)
 	if (m_pia->port_b_z_mask() != 0xff)
 	{
 		m_mmu = data;
-		m_ext_bank = (m_mmu & 0x0c) >> 2;
 	}
 }
 
@@ -2203,6 +2221,15 @@ void a800xl_state::a1200xl_pia_pb_w(uint8_t data)
 	if (m_pia->port_b_z_mask() != 0xff)
 	{
 		m_mmu = data;
+	}
+}
+
+void a130xe_state::a130xe_pia_pb_w(uint8_t data)
+{
+	if (m_pia->port_b_z_mask() != 0xff)
+	{
+		m_mmu = data;
+		m_ext_bank = (m_mmu & 0x0c) >> 2;
 	}
 }
 
@@ -2360,6 +2387,7 @@ void a800_state::a800(machine_config &config)
 {
 	atari_common(config);
 
+	// TODO: should honor right cart internally
 	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a800_state::a400_interrupt), "screen", 0, 1);
 
@@ -2380,6 +2408,7 @@ void a800_state::a800pal(machine_config &config)
 {
 	atari_common(config);
 
+	// TODO: should honor right cart internally
 	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a800_state::a400_interrupt), "screen", 0, 1);
 
@@ -2491,6 +2520,8 @@ void a130xe_state::a130xe(machine_config &config)
 	a800xl(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &a130xe_state::a130xe_mem);
+	m_pia->writepb_handler().set(FUNC(a130xe_state::a130xe_pia_pb_w));
+
 	m_ram->set_default_size("128K");
 }
 
