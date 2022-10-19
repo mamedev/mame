@@ -79,6 +79,7 @@ public:
 
 	void agvision(machine_config &config);
 	uint8_t sam_read(offs_t offset);
+	DECLARE_INPUT_CHANGED_MEMBER(cd_changed);
 
 protected:
 	virtual void device_start() override;
@@ -175,6 +176,10 @@ static INPUT_PORTS_START( agvision )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
 	PORT_BIT(0x78, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+
+	PORT_START("cd")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CD") PORT_CODE(KEYCODE_TILDE) PORT_CHANGED_MEMBER(DEVICE_SELF, agvision_state, agvision_state::cd_changed, 0)
+	// PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -203,6 +208,7 @@ void agvision_state::agvision(machine_config &config)
 	PIA6821(config, m_pia_0, 0);
     m_pia_0->readpa_handler().set(FUNC(agvision_state::pia0_pa_r));
 	m_pia_0->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+	// m_pia_0->readcb1_handler().set_ioport("cd");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER).set_raw(3.579545_MHz_XTAL * 2, 456, 0, 320, 262, 0, 240);
@@ -219,8 +225,9 @@ void agvision_state::agvision(machine_config &config)
 	m_sam->set_addrmap(7, &agvision_state::agvision_boot);			//  IO at $FF60
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
-	m_rs232->dcd_handler().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
+//	m_rs232->dcd_handler().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
 	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(modem));
+
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("16K").set_extra_options("39K,4K");;
@@ -244,7 +251,7 @@ void agvision_state::agvision_rom(address_map &map)
 void agvision_state::agvision_static_ram(address_map &map)
 {
 	// $C000-$FEFF
-	map(0x0000, 0x7f).ram();
+	map(0x0000, 0x0080).ram();
 }
 
 void agvision_state::agvision_io(address_map &map)
@@ -259,6 +266,7 @@ void agvision_state::agvision_boot(address_map &map)
 	// $FF60-$FFEF
 	map(0x60, 0x7f).nopw(); // SAM Registers
 }
+
 //-------------------------------------------------
 //  sam_read
 //-------------------------------------------------
@@ -308,7 +316,6 @@ void agvision_state::device_start()
 	configure_sam();
 }
 
-
 uint8_t agvision_state::pia0_pa_r()
 {
 	uint8_t pia0_pb = m_pia_0->b_output();
@@ -328,6 +335,15 @@ uint8_t agvision_state::pia0_pa_r()
 	pia0_pa |= (m_rs232->rxd_r() ? 0x80 : 0);
 
 	return pia0_pa;
+}
+
+//-------------------------------------------------
+//  cd_changed
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER(agvision_state::cd_changed)
+{
+	m_pia_0->cb1_w(ioport("cd")->read());
 }
 
 //**************************************************************************
