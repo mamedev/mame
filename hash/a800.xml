@@ -4896,13 +4896,11 @@ Doesn't draw game over "the end" screen properly, [ANTIC] vertical scroll?
 		</part>
 	</software>
 
-	<software name="satan" supported="no">
+	<software name="satan">
 		<description>Satan's Hollow (Unreleased)</description>
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
-		<notes><![CDATA[
-Cannot start a game, cfr. kpatrol (have to hold trigger pressed at boot then release to start) [GTIA] latch trigger
-]]></notes>
+		<info name="usage" value="Supports Booster-Grip Joystick Adaptor" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
