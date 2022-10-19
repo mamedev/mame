@@ -571,7 +571,7 @@ license:CC0
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="link: seuss 4-6 1 puzzler 90b3.1" size="0x2000" crc="6485a603" sha1="96652d5e5592de62474c094b507f43924ffa06d1" />
+				<rom name="link seuss 4-6 1 puzzler 90b3.1" size="0x2000" crc="6485a603" sha1="96652d5e5592de62474c094b507f43924ffa06d1" /> <!-- original label: LINK: Seuss 4/6 1 Puzzler 90B3 -->
 			</dataarea>
 		</part>
 	</software>
