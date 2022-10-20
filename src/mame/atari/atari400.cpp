@@ -6,6 +6,24 @@
 
     Juergen Buchmueller, June 1998
 
+    TODO (generic):
+    - modernize memory maps;
+    - modernize cart handling;
+    - a1200xl: boots to self-test ROM the first time around, fixes on
+      soft reset;
+    - a1200xl: requires reading TRIG3 high for detecting a cart inserted,
+      depends on above;
+    - add cassette support;
+    - add floppy .atx support;
+    - Investigate supported RAM sizes and OS versions in different models;
+    - Fix various keyboard differences;
+    - Freddy emulation for 800XLF?
+    - Add support for proto boards and expansions (a1400xl, C/PM board, etc.)
+    - a130xe: support extended bank readback for Antic;
+    - eventually support unofficial mod for dual Pokey,
+      either make it a specific franken-machine with a130xe as base or use
+      slots.
+
     2009-05 FP changes:
      Factored out MESS specific code from MAME
      Added skeleton support for other XL/XE machines (VERY preliminary):
@@ -16,17 +34,6 @@
      Added proper dumps and labels, thanks to Freddy Offenga researches (a few
      are still marked BAD_DUMP while waiting for crc confirmation, since they
      have been obtained by splitting whole dumps)
-
-     To Do:
-     - Find out why a600xl and a800xl don't work (xe machines should then follow)
-     - Investigate supported RAM sizes and OS versions in different models
-     - Implement differences between various models (currently most of the
-      XL/XE are exactly an a800xl, but this will change as soon as emulation
-      starts to work)
-     - Fix various keyboard differences
-     - Freddy emulation for 800XLF?
-     - Add support for proto boards and expansions (a1400xl, C/PM board, etc.)
-     - Clean up the whole driver + cart + floppy structure
 
     2013-11-06 Robert Tuccitto:
     Updated Palette per 'CGIA D020577' and 'GTIA C014805', including
@@ -349,7 +356,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void a800xl_pia_pb_w(uint8_t data);
+	virtual void pia_portb_w(uint8_t data);
 
 	uint8_t a800xl_low_r(offs_t offset);
 	void a800xl_low_w(offs_t offset, uint8_t data);
@@ -371,7 +378,7 @@ public:
 	void a600xl(machine_config &config);
 
 private:
-	void a600xl_pia_pb_w(uint8_t data);
+	virtual void pia_portb_w(uint8_t data) override;
 	void a600xl_mem(address_map &map);
 
 	uint8_t a600xl_low_r(offs_t offset);
@@ -388,7 +395,7 @@ public:
 
 private:
 	void a1200xl_mem(address_map &map);
-	void a1200xl_pia_pb_w(uint8_t data);
+	virtual void pia_portb_w(uint8_t data) override;
 
 	uint8_t a1200xl_low_r(offs_t offset);
 	void a1200xl_low_w(offs_t offset, uint8_t data);
@@ -414,7 +421,7 @@ private:
 
 	void a130xe_mem(address_map &map);
 
-	void a130xe_pia_pb_w(uint8_t data);
+	virtual void pia_portb_w(uint8_t data) override;
 
 	uint8_t m_ext_bank;
 };
@@ -2222,30 +2229,46 @@ uint8_t a400_state::djoy_b_r()
 	return b;
 }
 
-// TODO: virtual, make sure direction bits are honored
-void a600xl_state::a600xl_pia_pb_w(uint8_t data)
+// TODO: make sure direction bits are honored for all these portb defs.
+/*
+ * x--- ---- (1) 0x5000-0x57ff self-test ROM enabled if kernel ROM enabled (0) RAM or NOP
+ * ---- --x- (1) 0xa000-0xbfff BASIC ROM enabled (0) disabled
+ * ---- ---x (1) 0xd800-0xffff kernel ROM enable (0) RAM
+ */
+void a800xl_state::pia_portb_w(uint8_t data)
+{
+	if (m_pia->port_b_z_mask() != 0xff)
+	{
+		m_mmu = data;
+	}
+}
+
+// TODO: a600xl_state shouldn't really virtualize this (same as a800xl portb), investigate
+void a600xl_state::pia_portb_w(uint8_t data)
 {
 	m_mmu = data;
 }
 
-void a800xl_state::a800xl_pia_pb_w(uint8_t data)
+/*
+ * same as a800xl plus:
+ * ---- xx-- LED states (specific for this variant only)
+ */
+void a1200xl_state::pia_portb_w(uint8_t data)
 {
-	if (m_pia->port_b_z_mask() != 0xff)
-	{
-		m_mmu = data;
-	}
-}
-// TODO: LEDs on bits 2-3, specific to this variant only
-void a1200xl_state::a1200xl_pia_pb_w(uint8_t data)
-{
-	// FIXME: BIOS jumps from PC=0xc550, expecting ROM to be still enabled at PC=0xe40c
-	if (m_pia->port_b_z_mask() != 0xff)
-	{
-		m_mmu = data;
-	}
+	const u8 dir = m_pia->port_b_z_mask();
+
+	// BIOS jumps from PC=0xc550, expecting ROM to be still enabled at PC=0xe40c
+	// it expects the dir to work properly.
+	m_mmu = (data & ~dir) | (m_mmu & dir);
 }
 
-void a130xe_state::a130xe_pia_pb_w(uint8_t data)
+/*
+ * same as a800xl plus:
+ * --x- ---- ANTIC extended memory access enable
+ * ---x ---- CPU extended memory access enable
+ * ---- xx-- 0x4000-0x7fff extended RAM bank select
+ */
+void a130xe_state::pia_portb_w(uint8_t data)
 {
 	if (m_pia->port_b_z_mask() != 0xff)
 	{
@@ -2446,6 +2469,7 @@ void a800_state::a800pal(machine_config &config)
 
 
 // memory map A600XL (same as 800XL but less RAM) + NTSC screen + MMU via PIA portB
+// TODO: countercheck this config, should better inherit a800xl config instead
 void a600xl_state::a600xl(machine_config &config)
 {
 	atari_common(config);
@@ -2459,7 +2483,7 @@ void a600xl_state::a600xl(machine_config &config)
 	m_pokey->pot_r<7>().set_constant(0xff);
 
 	m_pia->readpb_handler().set_constant(0x83);
-	m_pia->writepb_handler().set(FUNC(a600xl_state::a600xl_pia_pb_w));
+	m_pia->writepb_handler().set(FUNC(a600xl_state::pia_portb_w));
 
 //  MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
 
@@ -2490,7 +2514,7 @@ void a800xl_state::a800xl(machine_config &config)
 	m_pokey->pot_r<7>().set_constant(0xff);
 
 	m_pia->readpb_handler().set_constant(0x83);
-	m_pia->writepb_handler().set(FUNC(a800xl_state::a800xl_pia_pb_w));
+	m_pia->writepb_handler().set(FUNC(a800xl_state::pia_portb_w));
 
 //  MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
 
@@ -2531,7 +2555,7 @@ void a1200xl_state::a1200xl(machine_config &config)
 	a800xl(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &a1200xl_state::a1200xl_mem);
-	m_pia->writepb_handler().set(FUNC(a1200xl_state::a1200xl_pia_pb_w));
+//  m_pia->writepb_handler().set(FUNC(a1200xl_state::a1200xl_pia_pb_w));
 }
 
 // memory map A130XE (extra RAM only partially emulated)
@@ -2540,7 +2564,7 @@ void a130xe_state::a130xe(machine_config &config)
 	a800xl(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &a130xe_state::a130xe_mem);
-	m_pia->writepb_handler().set(FUNC(a130xe_state::a130xe_pia_pb_w));
+//  m_pia->writepb_handler().set(FUNC(a130xe_state::a130xe_pia_pb_w));
 
 	m_ram->set_default_size("128K");
 }

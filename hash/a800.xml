@@ -2194,7 +2194,8 @@ Glitchy title screen the first time around (fixes after one playthrough)
 		<year>1999</year>
 		<publisher>Video 61 / GMG</publisher>
 		<notes><![CDATA[
-Cannot start a game (requires mouse?)
+Invisible mouse pointer on title screen, uses [GTIA] PRIOR multicolor + [ANTIC] missile DMA not enabled while sprite DMA is
+Very glitchy on gameplay, sprite eventually disappears, timing?
 Doesn't survive a soft reset
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
