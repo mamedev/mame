@@ -9720,6 +9720,9 @@ buggychlt                       // A22 (c) 1984 Taito Corporation + Tefri licens
 wmbullet                        //
 wmbulletf                       //
 
+@source:nec/bungo.cpp
+mini5sx                         // 1991
+
 @source:skeleton/busicom.cpp
 busicom                         //
 
@@ -11677,6 +11680,7 @@ megatrix
 
 @source:casio/ctk551.cpp
 ap10                            //
+ctk530                          //
 ctk551                          //
 ctk601                          //
 gz70sp                          //
@@ -12529,6 +12533,9 @@ digilog400                      //
 @source:skeleton/digijet.cpp
 digijet                         //
 
+@source:skeleton/digitech_gsp5.cpp
+gsp5                            //
+
 @source:skeleton/dim68k.cpp
 dim68k                          //
 
@@ -12557,6 +12564,7 @@ djboyua                         // (c) 1990 Kaneko (USA, American Sammy license)
 bm1stmix                        // GQ753 (c) 1997 (Japan)
 bm2ndmix                        // GX853 (c) 1998 (Japan)
 bm2ndmxa                        // GX853 (c) 1998 (Japan)
+bm3rdeaa                        // GX853 (c) 1998 (Europe)
 bm3rdmix                        // GX853 (c) 1998 (Japan)
 bm4thmix                        // GX847 (c) 1999 (Japan)
 bs4thmix                        // GX847 (c) 1999 (Korea)
@@ -14064,6 +14072,7 @@ damesc                          //
 @source:fidelity/desdis.cpp
 fdes2000d                       //
 fdes2100d                       //
+fdes2100da                      //
 fdes2265                        //
 fdes2265a                       //
 fdes2325                        //
@@ -16366,6 +16375,7 @@ gunbustru                       // D27 (c) 1992 Taito America Corporation (US)
 gundealr                        // (c) 1990 Dooyong
 gundealra                       // (c) 1990 Dooyong
 gundealrbl                      // bootleg
+gundealrbl2                     // bootleg
 gundealrt                       // (c) 1990 Tecmo
 wiseguy                         // (c) 1990 Dooyong
 yamyam                          // (c) 1990 Dooyong
@@ -20787,6 +20797,7 @@ dynablst                        // (c) 1991 Irem (World)
 dynablstb                       // bootleg
 dynablstb2                      // bootleg
 dynablstb3                      // bootleg
+dynablstb4                      // bootleg
 gussun                          // (c) 1993 Irem (Japan)
 hasamu                          // (c) 1991 Irem (Japan)
 matchit2                        // (c) 1993 Tamtex
@@ -32618,6 +32629,7 @@ clubkcyc                        // 2003.?? Club Kart Cycraft Edition (Rev A)
 clubkcyco                       // 2003.?? Club Kart Cycraft Edition
 clubkprz                        // 2003.?? Club Kart Prize
 clubkpzb                        // 2004.01.23 Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
+clubkpzbp                       // 2004.?? Club Kart Prize Ver. B (prototype)
 clubkrt                         // 2001.06 Club Kart: European Session (Rev D)
 clubkrta                        // 2001.?? Club Kart: European Session (Rev A)
 clubkrtc                        // 2001.?? Club Kart: European Session (Rev C)
@@ -33763,6 +33775,7 @@ airattck                        // (c) 1996 Comad
 airattcka                       // (c) 1996 Comad
 arcadian                        // (c) 1994 NMK
 bigbang                         // UPL-93091 (c) 1993 NMK
+bigbanga                        // UPL-93091 (c) 1993 NMK
 bioship                         // UPL-90062 (c) 1990 UPL + American Sammy license
 bjtwin                          // UPL-93087 (c) 1993 NMK
 bjtwina                         // UPL-93087 (c) 1993 NMK
@@ -34598,8 +34611,11 @@ pc98lt                          // 1989
 pc98ha                          // 1990
 
 @source:nec/pc9801.cpp
+pc9801                          // 1982
 pc9801bx2                       // 1993
+pc9801dx                        // 1990
 pc9801f                         // 1983
+pc9801fs                        // 1992
 pc9801rs                        // 1989
 pc9801rx                        // 1988
 pc9801us                        // 1992
@@ -34609,6 +34625,7 @@ pc9801vm11                      // 1985
 pc9801vx                        // 1986
 
 @source:nec/pc9801_epson.cpp
+pc286vs                         // 1989
 pc386m                          // 1990
 pc486se                         // 1993
 pc486mu                         // 1994
@@ -42582,7 +42599,8 @@ gulfwar2                        // (c) 1991 Comad
 gulfwar2a                       //
 hishouza                        // B02 / TP-007 (c) 1987 Taito Corporation (Japan)
 hishouzab                       // bootleg
-ktiger                          // B30 / TP-011 (c) 1987 Taito Corporation (Japan)
+ktiger                          // B30 / TP-011 (c) 1989 Taito Corporation (Japan)
+ktigera                         // B30 / TP-011 (c) 1987 Taito Corporation (Japan)
 skyshark                        // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
 skysharka                       // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
 skysharkb                       // bootleg
@@ -44465,6 +44483,7 @@ mu100b                          // 1998 MU-100B
 @source:yamaha/ympsr16.cpp
 psr16                           // 1988 PSR-16
 psr36                           // 1988 PSR-36
+pss480                          // 1988 PSS-480
 pss680                          // 1988 PSS-680
 
 @source:yamaha/ympsr40.cpp

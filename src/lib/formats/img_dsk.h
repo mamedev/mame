@@ -4,7 +4,7 @@
 
     img_dsk.h
 
-    "IMG" disk format for SSDD Intel MDS-II 8" disks
+    "IMG" disk format for SSDD & SSSD Intel MDS-II 8" disks
 
 *********************************************************************/
 #ifndef MAME_FORMATS_IMG_DSK_H
@@ -23,6 +23,7 @@ public:
 	static constexpr unsigned TRACKS = 77;
 	static constexpr unsigned HEADS = 1;
 	static constexpr unsigned SECTORS = 52;
+	static constexpr unsigned SECTORS_FM = 26;
 	static constexpr unsigned SECTOR_SIZE = 128;
 
 	img_format();
@@ -36,7 +37,7 @@ public:
 	virtual bool supports_save() const override;
 
 private:
-	static std::vector<uint8_t> interleaved_sectors(unsigned il_factor);
+	static std::vector<uint8_t> interleaved_sectors(unsigned sects, unsigned il_factor);
 	static void write_mmfm_bit(std::vector<uint32_t> &buffer , bool data_bit , bool clock_bit , uint16_t &crc);
 	static void write_mmfm_byte(std::vector<uint32_t> &buffer , uint8_t data , uint16_t &crc , uint8_t clock = 0);
 	static void write_sync(std::vector<uint32_t> &buffer);

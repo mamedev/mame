@@ -24,7 +24,111 @@ TODO
   but it should really copy stuff from the extra ROM.
 - Ninja Emaki has minor protection issues, see NB1414M4 simulation for more info.
 
-***************************************************************************/
+
+Ninja Emaki (US) / Youma Ninpou Chou (Japan), Nichibutsu, 1986
+Hardware info by Guru
+
+Note this also covers the bootleg board which has a near identical PCB layout
+but without the custom chips. The bootleg re-implements whatever the custom
+chips do using common logic.
+
+Top board
+---------
+
+YN-1(1510)
+|-----------------------------------|
+|11.18F    7.18D                    |
+|                                   |-|
+|10.16F    6.16D                    | |
+|                 |--|              | |
+|9.15F     5.15D  |1 |              | |
+|                 |4 |              | |
+|8.13F            |1 |              | |
+|                 |4 |              |-|
+|                 |M |              |
+|  PAL.10F        |4 |              |
+|                 |--|              |
+|                TMM2015            |
+|J                                  |
+|A    MB7114.8E                     |-|
+|M    MB7114.7E                     | |
+|M    MB7114.6E                     | |
+|A        4.7D                      | |
+|         6264    Z80B              | |
+|         3.4D                      | |
+|DSW2     2.3D                      |-|
+|DSW1     1.1D       PAL.1B    12MHz|
+|-----------------------------------|
+Notes:
+     Z80B - Clock 6.000MHz [12/2]
+  TMM2015 - Toshiba TMM2015 2kB x8-bit SRAM (character RAM)
+     6264 - Hitachi HM6264 8kB x8-bit SRAM (Z80 main program RAM)
+   DSW1/2 - 8-position DIP switch
+   1414M4 - Nichibutsu 1414M4 custom chip
+     1.1D - 27256 32kB x8-bit EPROM \
+     2.3D - 27128 16kB x8-bit EPROM | (Z80 main program)
+     3.4D - 27256 32kB x8-bit EPROM /
+     4.7D - 27256 32kB x8-bit EPROM (characters)
+    5.15D - 27128 16kB x8-bit EPROM (text layer data for custom 1414M4 chip)
+    6.16D - 27128 16kB x8-bit EPROM \
+    7.18D - 27128 16kB x8-bit EPROM / (background tile maps)
+    8.13F \
+    9.15F |
+   10.16F | 27256 32kB x8-bit EPROM (tiles)
+   11.18F /
+MB7114.6E - Fujitsu MB7114 256byte x4-bit Bi-polar PROM (red color PROM)
+MB7114.7E - Fujitsu MB7114 256byte x4-bit Bi-polar PROM (green color PROM)
+MB7114.8E - Fujitsu MB7114 256byte x4-bit Bi-polar PROM (blue color PROM)
+    HSync - 15.6242kHz
+    VSync - 59.40776Hz
+
+Bottom board
+------------
+
+YN-2(1510)
+|-----------------------------------|
+|MB3730  YM3014 YM3526          8MHz|
+|VOL                    6116        |-|
+| MB3614                13.15B      | |
+|   MB3614              12.14B      | |
+|                 Z80A              | |
+|PAL.12F                            | |
+|            2148                   | |
+|            2148                   |-|
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|                           1411M1  |
+|                                   |-|
+|            2148   2148            | |
+|            2148   2148            | |
+|MB7114.7F                          | |
+|17.6F                              | |
+|16.4F                              | |
+|15.3F    MB7114.2D                 |-|
+|14.1F                         22MHz|<--21.400Mhz on bootleg
+|-----------------------------------|
+Notes:
+     Z80A - Clock 4.000MHz [8/2] (sound CPU)
+   YM3526 - Yamaha YM3526 FM Operator Type-L (OPL) Sound Generator. Clock input 4.000MHz [8/2]
+   YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter. Clock input 1.000MHz [8/2/4 from YM3526 pin 23]
+   MB3730 - Fujitsu MB3730 Audio Power Amplifier (NEC UPC1182 on bootleg)
+   MB3614 - Fujitsu MB3614 Quad Operational Amplifier. Compatible with HA17324 & LM324
+     2148 - 1kB x4-bit SRAM (sprite RAM)
+     6116 - 2kB x8-bit SRAM (Z80 sound program RAM)
+   1411M1 - Nichibutsu 1411M1XBA custom chip
+   13.15B - 27256 32kB x8-bit EPROM \
+   12.14B - 27128 16kB x8-bit EPROM / (Z80 sound program)
+    14.1F \
+    15.3F | 27256 16kB x8-bit EPROM (sprites)
+    16.4F |
+    17.6F /
+MB7114.7F - Fujitsu MB7114 256 x4-bit Bi-polar PROM (sprite palette bank)
+MB7114.2D - Fujitsu MB7114 256 x4-bit Bi-polar PROM (sprite look-up table)
+
+*******************************************************************************/
+
 
 #include "emu.h"
 #include "galivan.h"
@@ -449,8 +553,8 @@ void galivan_state::galivan(machine_config &config)
 
 	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // YM3014 DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // YM3014 DAC
 }
 
 void dangarj_state::dangarj(machine_config &config)
@@ -493,8 +597,8 @@ void galivan_state::ninjemak(machine_config &config)
 
 	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.8);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // YM3014 DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // YM3014 DAC
 }
 
 void galivan_state::youmab(machine_config &config)

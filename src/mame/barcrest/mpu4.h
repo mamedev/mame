@@ -421,29 +421,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
 
 
-	//The DUART hoppers connect via the standard IP
-	//Hopper 1 opto connects to IP5, hopper 2 to IP6
-	//TODO: Configure this correctly via lines
-	uint8_t hack_duart_r()
-	{
-		if (m_hack_duart_fixed_low)
-		{
-			return 0x00;
-		}
-		else
-		{
-			int duart_data = 0;
-			if (m_hopper1->line_r() && m_hopper1_opto)
-			{
-				duart_data |= 0x10;
-			}
-			if (m_hopper2->line_r() && m_hopper2_opto)
-			{
-				duart_data |= 0x20;
-			}
-			return duart_data;
-		}
-	}
 	uint8_t bootleg806_r(address_space &space, offs_t offset);
 
 	required_device<cpu_device> m_maincpu;

@@ -524,6 +524,7 @@ ncd/ncd88k.cpp
 ncd/ncdmips.cpp
 ncd/ncdppc.cpp
 nec/apc.cpp
+nec/bungo.cpp
 nec/ews4800.cpp
 nec/pc100.cpp
 nec/pc6001.cpp
@@ -822,6 +823,7 @@ skeleton/digiblast.cpp
 skeleton/digijet.cpp
 skeleton/digilog320.cpp
 skeleton/digilog400.cpp
+skeleton/digitech_gsp5.cpp
 skeleton/dim68k.cpp
 skeleton/dm7000.cpp
 skeleton/dmv.cpp

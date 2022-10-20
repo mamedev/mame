@@ -131,9 +131,6 @@ namespace {
 static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 
-#define CONTROL1_TAG    "joyport1"
-#define CONTROL2_TAG    "joyport2"
-
 class a2600_base_state : public driver_device
 {
 protected:
@@ -143,8 +140,8 @@ protected:
 		m_tia(*this, "tia_video"),
 		m_maincpu(*this, "maincpu"),
 		m_riot(*this, "riot"),
-		m_joy1(*this, CONTROL1_TAG),
-		m_joy2(*this, CONTROL2_TAG),
+		m_joy1(*this, "joyport1"),
+		m_joy2(*this, "joyport2"),
 		m_screen(*this, "screen"),
 		m_xtal(xtal)
 	{ }
@@ -655,8 +652,8 @@ void a2600_base_state::a2600_base_ntsc(machine_config &config)
 	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
 
-	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
-	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 }
 
 
@@ -697,8 +694,8 @@ void a2600_base_state::a2600_base_pal(machine_config &config)
 	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
 
-	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
-	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 }
 
 

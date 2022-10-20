@@ -1270,6 +1270,8 @@ void upd7810_device::upd7810_sio_input()
 				m_rxcnt = 12;
 				break;
 			}
+
+			m_rxcnt--; // reduce by one since we already received the start bit at this point
 		}
 		else
 		/* TSK bit set ? */
@@ -1443,32 +1445,24 @@ void upd7810_device::handle_timers(int cycles)
 	}
 
 	/**** SIO ****/
-	switch (SMH & 0x03)
+	// we only handle "internal clock" serial mode here
+	if (((SMH & 0x03) == 0x01) || ((SMH & 0x03) == 0x02))
 	{
-	case 0x00:      /* interval timer F/F */
-		break;
-	case 0x01:      /* internal clock divided by 384 */
+		const int divider[] = { 0, 384, 24, 0 };
+		const int prescale[] = { 1, 1, 16, 64 };
+		const int interval = divider[SMH & 0x03] / 3 * prescale[SML & 0x03];
+
 		OVCS += cycles;
-		while (OVCS >= 384/3)
+
+		while (OVCS >= interval / 2)
 		{
-			OVCS -= 384/3;
+			OVCS -= (interval / 2);
+
 			if (0 == (EDGES ^= 1))
-				upd7810_sio_input();
+				upd7810_sio_input(); // rising edge
 			else
-				upd7810_sio_output();
+				upd7810_sio_output(); // falling edge
 		}
-		break;
-	case 0x02:      /* internal clock divided by 24 */
-		OVCS += cycles;
-		while (OVCS >= 24/3)
-		{
-			OVCS -= 24/3;
-			if (0 == (EDGES ^= 1))
-				upd7810_sio_input();
-			else
-				upd7810_sio_output();
-		}
-		break;
 	}
 
 	/**** ADC ****/

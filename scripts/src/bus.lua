@@ -1242,6 +1242,8 @@ if (BUSES["ELECTRON"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/romboxp.h",
 		MAME_DIR .. "src/devices/bus/electron/sidewndr.cpp",
 		MAME_DIR .. "src/devices/bus/electron/sidewndr.h",
+		MAME_DIR .. "src/devices/bus/electron/voxbox.cpp",
+		MAME_DIR .. "src/devices/bus/electron/voxbox.h",
 		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
 		MAME_DIR .. "src/devices/bus/electron/m2105.h",
 	}
@@ -3914,6 +3916,31 @@ if (BUSES["EPSON_QX"]~=null) then
 		MAME_DIR .. "src/devices/bus/epson_qx/multifont.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/sound_card.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/sound_card.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/epson_qx/keyboard/keyboard.h,BUSES["EPSON_QX_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["EPSON_QX_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/matrix.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/matrix.h",
+	}
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp", GEN_DIR .. "emu/layout/qx10ascii.lh" },
+		{ MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp", GEN_DIR .. "emu/layout/qx10hasci.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "qx10ascii"),
+		layoutbuildtask("emu/layout", "qx10hasci"),
 	}
 end
 

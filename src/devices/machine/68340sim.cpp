@@ -375,20 +375,6 @@ void m68340_cpu_device::m68340_internal_sim_cs_w(offs_t offset, uint16_t data, u
 {
 	LOG("%s\n", FUNCNAME);
 
-	auto combine_data32 = [&](uint32_t *varptr)
-	{
-		uint32_t data32 = data;
-		uint32_t mem_mask32 = mem_mask;
-
-		if(!BIT(offset,0))
-		{
-			data32 <<= 16;
-			mem_mask32 <<= 16;
-		}
-
-		*varptr = (*varptr & ~mem_mask32) | (data32 & mem_mask32);
-	};
-
 	offset += m68340_sim::REG_AM_CS0>>1;
 
 	if (BIT(offset, 1))
@@ -420,6 +406,21 @@ void m68340_cpu_device::m68340_internal_sim_cs_w(offs_t offset, uint16_t data, u
 
 	assert(m_m68340SIM);
 	m68340_sim &sim = *m_m68340SIM;
+
+	auto const combine_data32 =
+			[&offset, &data, &mem_mask] (uint32_t *varptr)
+			{
+				uint32_t data32 = data;
+				uint32_t mem_mask32 = mem_mask;
+
+				if (!BIT(offset,0))
+				{
+					data32 <<= 16;
+					mem_mask32 <<= 16;
+				}
+
+				*varptr = (*varptr & ~mem_mask32) | (data32 & mem_mask32);
+			};
 
 	switch ((offset << 1) & ~3)
 	{

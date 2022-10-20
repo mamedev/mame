@@ -720,6 +720,10 @@
 #include "fs_fat.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_ISIS
+#include "fs_isis.h"
+#endif
+
 void mame_formats_full_list(mame_formats_enumerator &en)
 {
 	en.category("Generic");
@@ -1079,6 +1083,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Intel");
 #ifdef HAS_FORMATS_IMG_DSK
 	en.add(FLOPPY_IMG_FORMAT); // img_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_ISIS
+	en.add(fs::ISIS);
 #endif
 
 	en.category("IQ151");
