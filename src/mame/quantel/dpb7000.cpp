@@ -63,12 +63,14 @@
 #define LOG_IRQ				(1 << 23)
 #define LOG_BRUSH_LATCH		(1 << 24)
 #define LOG_BRUSH_DRAWS		(1 << 25)
+#define LOG_BRUSH_WRITES    (1 << 26)
+#define LOG_STORE_READS     (1 << 27)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_BRUSH_ADDR | \
 							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_COMMANDS | LOG_OUTPUT_TIMING | \
-							 LOG_BRUSH_LATCH | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_DRAWS)
+							 LOG_BRUSH_LATCH | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_DRAWS | LOG_BRUSH_WRITES | LOG_STORE_READS)
 
 //#define VERBOSE             (LOG_CSR | LOG_CTRLBUS | LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_BRUSH_ADDR | LOG_COMMANDS | LOG_OUTPUT_TIMING)
-#define VERBOSE (LOG_ALL)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 namespace
@@ -670,7 +672,7 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". : \xc3\xa6") PORT_CODE(KEYCODE_STOP) PORT_CHAR ('.') PORT_CHAR(':')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc2\xb9 = ~") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('=')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('d')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", ;") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('-')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xef\xac\x82 + \xc3\x86") PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
@@ -691,8 +693,7 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!') PORT_CHAR('#')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", ;") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEYB_COL6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("` ` " A_RING) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
@@ -705,12 +706,10 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xef\xac\x81 * \xc5\x92") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('*')
 
 	PORT_START("KEYB_COL7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) // 0x7f
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR('\x08') // 0x08
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\x0d')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -1636,12 +1635,14 @@ void dpb7000_state::store_address_w(uint8_t card, uint16_t data)
 		break;
 	case 4:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set CXPOS: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
-		m_cxpos[card] = data & 0xfff;
+		m_cxpos[0] = data & 0xfff;
+		m_cxpos[1] = data & 0xfff;
 		//m_ca0 = data & 1;
 		break;
 	case 5:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set CYPOS: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
-		m_cypos[card] = data & 0xfff;
+		m_cypos[0] = data & 0xfff;
+		m_cypos[1] = data & 0xfff;
 		break;
 	default:
 		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, unknown register: %04x\n", machine().describe_context(), card + 1, data);
@@ -1882,9 +1883,9 @@ bool dpb7000_state::handle_command(uint16_t data)
 					uint16_t uv_bx = ((x & 1) ? (bx | 1) : (bx & ~1));
 					uint8_t brush_lum = m_brushstore_lum[by * 256 + bx];
 					uint8_t brush_chr = m_brushstore_chr[by * 256 + uv_bx];
-					brush_ext = m_brushstore_ext[by * 256 + bx];
-					brush_values[0] = fcs ? m_bs_y_latch : brush_lum;
-					brush_values[1] = fcs ? fixed_chr : brush_chr;
+					brush_ext = ext_en ? m_brushstore_ext[by * 256 + bx] : brush_lum;
+					brush_values[0] = (fcs || !lum_en) ? m_bs_y_latch : brush_lum;
+					brush_values[1] = (fcs || !chr_en) ? fixed_chr : brush_chr;
 
 					if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 					{
@@ -2100,7 +2101,7 @@ bool dpb7000_state::handle_command(uint16_t data)
 		uint8_t *store_lum = !BIT(data, 5) ? &m_framestore_lum[0][0] : (!BIT(data, 6) ? &m_framestore_lum[1][0] : nullptr);
 		uint8_t *store_chr = !BIT(data, 5) ? &m_framestore_chr[0][0] : (!BIT(data, 6) ? &m_framestore_chr[1][0] : nullptr);
 		uint8_t *store_ext = !BIT(data, 5) ? &m_framestore_ext[0][0] : (!BIT(data, 6) ? &m_framestore_ext[1][0] : nullptr);
-		if (!BIT(data, 7))
+		if (!BIT(data, 7) || true)
 			store_lum = nullptr;
 		if (!BIT(data, 8))
 			store_chr = nullptr;
@@ -2295,8 +2296,8 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 				{
 					m_size_dxdx_counter = 0;
 					m_size_dydy_counter = 0;
-					m_size_dest_x = m_cxpos[1];
-					m_size_dest_y = m_cypos[1];
+					m_size_dest_x = (m_brush_addr_cmd != 2) ? m_cxpos[1] : 0;
+					m_size_dest_y = (m_brush_addr_cmd != 2) ? m_cypos[1] : 0;
 
 					req_b_w(0); // Flag ourselves as in-use
 					m_diskseq_cyl_read_pending = true;
@@ -2552,28 +2553,50 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		}
 		if (m_brush_addr_cmd == 4) // Framestore Write
 		{
-			const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
-			const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
-
-			uint32_t pix_idx = y * 800 + x;
 			const uint8_t chr = m_ca0 ? m_bs_v_latch : m_bs_u_latch;
 			if (!BIT(m_brush_addr_func, 5))
 			{
+				const uint16_t x = m_cxpos[0] + (m_bxlen_counter - m_bxlen);
+				const uint16_t y = m_cypos[0] + (m_bylen_counter - m_bylen);
+				uint32_t pix_idx = y * 800 + x;
+
 				if (BIT(m_brush_addr_func, 7))
+				{
+					LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Writing %02x to Store 1 luma at %d,%d\n", machine().describe_context(), m_bs_y_latch, x, y);
 					m_framestore_lum[0][pix_idx] = m_bs_y_latch;
+				}
 				if (BIT(m_brush_addr_func, 8))
+				{
+					LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Writing %02x to Store 1 chroma at %d,%d\n", machine().describe_context(), chr, x, y);
 					m_framestore_chr[0][pix_idx] = chr;
+				}
 				if (BIT(m_brush_addr_func, 9))
+				{
+					LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Writing %02x to Store 1 stencil at %d,%d\n", machine().describe_context(), m_bs_y_latch, x, y);
 					m_framestore_ext[0][pix_idx] = m_bs_y_latch;
+				}
 			}
 			if (!BIT(m_brush_addr_func, 6))
 			{
+				const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
+				const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
+				uint32_t pix_idx = y * 800 + x;
+
 				if (BIT(m_brush_addr_func, 7))
+				{
+					LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Writing %02x to Store 2 luma at %d,%d\n", machine().describe_context(), m_bs_y_latch, x, y);
 					m_framestore_lum[1][pix_idx] = m_bs_y_latch;
+				}
 				if (BIT(m_brush_addr_func, 8))
+				{
+					LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Writing %02x to Store 2 chroma at %d,%d\n", machine().describe_context(), chr, x, y);
 					m_framestore_chr[1][pix_idx] = chr;
+				}
 				if (BIT(m_brush_addr_func, 9))
+				{
+					LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Writing %02x to Store 2 stencil at %d,%d\n", machine().describe_context(), m_bs_y_latch, x, y);
 					m_framestore_ext[1][pix_idx] = m_bs_y_latch;
+				}
 			}
 
 			m_bxlen_counter++;
@@ -2733,15 +2756,12 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 		{
 			unsigned char sector_buffer[256];
 			int start_sector = m_diskbuf_ram_addr >> 8;
-			//image_lba += start_sector;
 			uint16_t ram_addr = m_diskbuf_ram_addr;
-			//uint16_t buffer_offset = ram_addr & 0x00ff;
 			if (m_diskseq_command_stride != 1)
 			{
-				for (int sector = start_sector; sector < 19200 / 256; sector++)
+				for (int sector = start_sector; sector < 19200 / 256; sector++, image_lba++)
 				{
 					m_hdd_file->read(image_lba, sector_buffer);
-					//memcpy(sector_buffer, m_diskbuf_ram + buffer_offset + sector * 256, 256 - buffer_offset);
 					for (int stride_idx = 0; stride_idx < 256; stride_idx += 2)
 					{
 						sector_buffer[stride_idx] = m_diskbuf_ram[ram_addr];
@@ -2749,17 +2769,15 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 					}
 					LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x, Stride 2 (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
 					m_hdd_file->write(image_lba, sector_buffer);
-					image_lba++;
-					//buffer_offset = 0;
 				}
 			}
 			else
 			{
-				for (int sector = start_sector; sector < 19200 / 256; sector++)
+				if (m_diskseq_cmd == 12 || m_diskseq_cmd == 14)
 				{
-					LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
-					if (m_diskseq_cmd == 12 || m_diskseq_cmd == 14)
+					for (int sector = 0; sector < 19200 / 256; sector++, image_lba++)
 					{
+						LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu);
 						for (int i = 0; i < 256; i += 2)
 						{
 							sector_buffer[i + 0] = process_byte_to_disc();
@@ -2767,11 +2785,14 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 						}
 						m_hdd_file->write(image_lba, sector_buffer);
 					}
-					else
+				}
+				else
+				{
+					for (int sector = start_sector; sector < 19200 / 256; sector++, image_lba++)
 					{
+						LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
 						m_hdd_file->write(image_lba, m_diskbuf_ram + sector * 256);
 					}
-					image_lba++;
 				}
 			}
 			m_diskseq_cyl_write_pending = false;
@@ -2781,11 +2802,10 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 			unsigned char sector_buffer[256];
 			if (m_diskseq_command_stride != 1)
 			{
-				for (int sector = 0; sector < 19200 / 256; sector++)
+				for (int sector = 0; sector < 19200 / 256; sector++, image_lba++)
 				{
 					LOGMASKED(LOG_HDD, "Performing read of LBA %d: Cylinder %03x, head %x, command word %03x\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu);
 					m_hdd_file->read(image_lba, sector_buffer);
-					image_lba++;
 					for (int clear_idx = 0; clear_idx < 256; clear_idx += 2)
 					{
 						sector_buffer[clear_idx] = 0;
@@ -2817,7 +2837,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 					image_lba += start_sector;
 				}
 
-				for (int sector = start_sector; sector < 19200 / 256; sector++)
+				for (int sector = start_sector; sector < 19200 / 256; sector++, image_lba++)
 				{
 					LOGMASKED(LOG_HDD, "Performing read of LBA %d: Cylinder %03x, head %x, command word %03x\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu);
 					if (BIT(m_diskseq_cmd, 2))
@@ -2832,7 +2852,6 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 					{
 						m_hdd_file->read(image_lba, m_diskbuf_ram + sector * 256);
 					}
-					image_lba++;
 				}
 			}
 			m_diskseq_cyl_read_pending = false;
@@ -2918,6 +2937,7 @@ void dpb7000_state::process_sample()
 		switch (m_brush_addr_cmd)
 		{
 			case 2: // Brush Store Write
+				LOGMASKED(LOG_BRUSH_WRITES, "Processing %02x,%02x into Brush Store L/C/E at %d, %d\n", m_incoming_lum, m_incoming_chr, x, y);
 				if (BIT(m_brush_addr_func, 7))
 					m_brushstore_lum[y * 256 + x] = m_incoming_lum;
 				if (BIT(m_brush_addr_func, 8))
@@ -2928,8 +2948,6 @@ void dpb7000_state::process_sample()
 
 			case 4: // Framestore Write
 			{
-				//if (m_size_dsx_ddx != 0x100) printf("Writing sample at %d,%d\n", x, y);
-				if (m_size_dsx_ddx != 0x100) printf("%02x ", m_incoming_lum);
 				uint32_t pix_idx = y * 800 + x;
 				if (!BIT(m_brush_addr_func, 5))
 				{
@@ -2973,12 +2991,11 @@ void dpb7000_state::process_sample()
 			m_size_dydy_counter += 0x100;//(int16_t)(m_size_dsy_ddy & 0x7fff);
 			m_size_dest_y++;
 			//if (m_size_dsx_ddx != 0x100) printf("dydy counter is <= 0, resetting dydy counter to %04x, dxdx counter to 0, dest X to %d, dest Y to %d\n", m_size_dydy_counter, m_size_dest_x, m_size_dest_y);
-			if (m_size_dsx_ddx != 0x100) printf("\n");
 		}
 		m_size_dydy_counter -= 0x100;
 
 		m_size_dxdx_counter = 0;
-		m_size_dest_x = m_cxpos[1];
+		m_size_dest_x = (m_brush_addr_cmd != 2) ? m_cxpos[1] : 0;
 
 		//if (m_size_dsx_ddx != 0x100) printf("At end of line, dydy counter is now %04x\n", m_size_dydy_counter);
 
@@ -3001,51 +3018,81 @@ uint8_t dpb7000_state::process_byte_to_disc()
 	{
 		case 3: // Framestore Read
 		{
-			const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
-			const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
-
-			uint32_t pix_idx = y * 800 + x;
 			if (!BIT(m_brush_addr_func, 5))
 			{
+				const uint16_t x = m_cxpos[0] + (m_bxlen_counter - m_bxlen);
+				const uint16_t y = m_cypos[0] + (m_bylen_counter - m_bylen);
+				uint32_t pix_idx = y * 800 + x;
+
 				if (BIT(m_brush_addr_func, 9))
+				{
 					lum = m_framestore_ext[0][pix_idx];
+					LOGMASKED(LOG_STORE_READS, "Reading %02x from Store 1 Stencil at %d, %d to disk [%03x %03x]\n", lum, x, y, m_bxlen_counter, m_bylen_counter);
+				}
 				if (BIT(m_brush_addr_func, 8))
+				{
 					chr = m_framestore_chr[0][pix_idx];
+					LOGMASKED(LOG_STORE_READS, "Reading %02x from Store 1 Chroma at %d, %d to disk [%03x %03x]\n", chr, x, y, m_bxlen_counter, m_bylen_counter);
+				}
 				if (BIT(m_brush_addr_func, 7))
+				{
 					lum = m_framestore_lum[0][pix_idx];
+					LOGMASKED(LOG_STORE_READS, "Reading %02x from Store 1 Luma at %d, %d to disk [%03x %03x]\n", lum, x, y, m_bxlen_counter, m_bylen_counter);
+				}
 			}
+
 			if (!BIT(m_brush_addr_func, 6))
 			{
+				const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
+				const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
+				uint32_t pix_idx = y * 800 + x;
+
 				if (BIT(m_brush_addr_func, 9))
+				{
 					lum = m_framestore_ext[1][pix_idx];
+					LOGMASKED(LOG_STORE_READS, "Reading %02x from Store 2 Stencil at %d, %d to disk [%03x %03x]\n", lum, x, y, m_bxlen_counter, m_bylen_counter);
+				}
 				if (BIT(m_brush_addr_func, 8))
+				{
 					chr = m_framestore_chr[1][pix_idx];
+					LOGMASKED(LOG_STORE_READS, "Reading %02x from Store 2 Chroma at %d, %d to disk [%03x %03x]\n", chr, x, y, m_bxlen_counter, m_bylen_counter);
+				}
 				if (BIT(m_brush_addr_func, 7))
+				{
 					lum = m_framestore_lum[1][pix_idx];
+					LOGMASKED(LOG_STORE_READS, "Reading %02x from Store 2 Luma at %d, %d to disk [%03x %03x]\n", lum, x, y, m_bxlen_counter, m_bylen_counter);
+				}
 			}
 			break;
-		}
-	}
-
-	m_bxlen_counter++;
-	if (m_bxlen_counter == 0x1000)
-	{
-		m_bxlen_counter = m_bxlen;
-		m_bylen_counter++;
-		if (m_bylen_counter == 0x1000)
-		{
-			m_diskseq_cyl_write_pending = false;
-			cmd_done(0);
 		}
 	}
 
 	const uint8_t ret = m_buffer_lum ? lum : chr;
 
 	m_buffer_lum = !m_buffer_lum;
-	m_line_length++;
-	if (m_line_length == 0x300)
+	if (m_buffer_lum)
 	{
-		advance_line_count();
+		m_line_length++;
+		if (m_line_length == 0x300)
+		{
+			advance_line_count();
+		}
+
+		m_bxlen_counter++;
+		if (m_bxlen_counter == 0x1000)
+		{
+			m_bxlen_counter = m_bxlen;
+			m_bylen_counter++;
+			if (m_bylen_counter == 0x1000)
+			{
+				if (m_brush_addr_cmd == 3)
+				{
+					LOGMASKED(LOG_STORE_READS, "Done with Store Read command\n");
+				}
+				m_diskseq_cyl_write_pending = false;
+				cmd_done(0);
+			}
+		}
 	}
 	return ret;
 }
@@ -3750,9 +3797,9 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 		const uint8_t ext_a_mask = (invert_a ? 0xff : 0x00);
 		const uint8_t ext_b_mask = (invert_b ? 0xff : 0x00);
 
-		if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("Y %3d: RVR %d, Palette %d, DY %3d, Addr[0] %4d, Addr[1] %4d, ESF %d%d%d%d%d", y, BIT(hflags, 1), palette, dest_y, y_addr[0], y_addr[1], BIT(m_ext_store_flags, 4), BIT(m_ext_store_flags, 3), BIT(m_ext_store_flags, 2), BIT(m_ext_store_flags, 1), BIT(m_ext_store_flags, 0));
-		if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("    /B1 %d, /B2 %d, S1M %d, S2M %d, 1M %d, 2M %d, E1M %d, E2M %d", blank_1_q, blank_2_q, m_select_matte[0], m_select_matte[1], use_store1_matte, use_store2_matte, use_ext_store1_matte, use_ext_store2_matte);
-		if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("    A Mask: %02x, B Mask: %02x\n", ext_a_mask, ext_b_mask);
+		//if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("Y %3d: RVR %d, Palette %d, DY %3d, Addr[0] %4d, Addr[1] %4d, ESF %d%d%d%d%d", y, BIT(hflags, 1), palette, dest_y, y_addr[0], y_addr[1], BIT(m_ext_store_flags, 4), BIT(m_ext_store_flags, 3), BIT(m_ext_store_flags, 2), BIT(m_ext_store_flags, 1), BIT(m_ext_store_flags, 0));
+		//if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("    /B1 %d, /B2 %d, S1M %d, S2M %d, 1M %d, 2M %d, E1M %d, E2M %d", blank_1_q, blank_2_q, m_select_matte[0], m_select_matte[1], use_store1_matte, use_store2_matte, use_ext_store1_matte, use_ext_store2_matte);
+		//if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("    A Mask: %02x, B Mask: %02x\n", ext_a_mask, ext_b_mask);
 
 		uint32_t *d = &bitmap.pix(dest_y);
 		int32_t x_addr[2] = { m_rhscr[0] & ~1, m_rhscr[1] & ~1 };
@@ -3804,7 +3851,6 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 				y_addr[1] = 0;
 		}
 	}
-	//printf("\n");
 
 	const uint32_t cursor_rgb = m_yuv_lut[(m_cursor_u << 16) | (m_cursor_v << 8) | m_cursor_y];
 	uint16_t cursor_origin_y_counter = m_cursor_origin_y;
@@ -4209,7 +4255,7 @@ ROM_START( dpb7000 )
 	ROM_LOAD("nmc27c64q.bin", 0x0000, 0x2000, CRC(a453928f) SHA1(f4a25298fb446f0046c6f9f3ce70e7169dcebd01))
 
 	ROM_REGION(0x800, "brushaddr_pal", 0)
-	ROM_LOAD("pb-029-17419a-bea.bin", 0x000, 0x800, CRC(12345678) SHA1(1234567812345678123456781234567812345678))
+	ROM_LOAD("pb-029-17419a-bea.bin", 0x000, 0x800, CRC(d30015c3) SHA1(fb5856df3ace452dfb1c1882b2adb6562e3a6800))
 
 	ROM_REGION(0x200, "brushproc_prom", 0)
 	ROM_LOAD("pb-02c-17593-baa.bin", 0x000, 0x200, CRC(6e31339f) SHA1(72a92d97412be19c884c3b854f7d9831435391a5))
