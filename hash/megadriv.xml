@@ -32533,7 +32533,7 @@ Black screen
 	</software>
 
 	<software name="yangji">
-		<description>Yi Men Ying Lie - Yang Jia Jiang (China)</description>
+		<description>Yīmén Yīngliè - Yángjiā Jiāng (China)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="一門英烈 楊家將"/>
@@ -32709,7 +32709,7 @@ Black screen
 	</software>
 
 	<software name="zhuogu" supported="no">
-		<description>Zhuo Gui Da Shi - Ghost Hunter (Taiwan)</description>
+		<description>Zhuā Guǐ Dàshī - Ghost Hunter (Taiwan)</description>
 		<year>1994</year>
 		<publisher>Senchi Technology</publisher>
 		<notes><![CDATA[
@@ -33079,7 +33079,7 @@ Crashes during attract or in character select, copy protection
 	</software>
 
 	<software name="huanle">
-		<description>Huan Le Tao Qi Shu - Smart Mouse (Taiwan)</description>
+		<description>Huānlè Táoqì Shǔ - Smart Mouse (Taiwan)</description>
 		<year>199?</year>
 		<publisher>Ming</publisher>
 		<info name="serial" value="GM-95401"/>
@@ -33131,7 +33131,7 @@ Crashes during attract or in character select, copy protection
 	</software>
 
 	<software name="supmagic">
-		<description>Ling Huan Dao Shi - Super Magician (China)</description>
+		<description>Líng Huàn Dàoshi - Super Magician (China)</description>
 		<year>199?</year>
 		<publisher>Ming</publisher>
 		<info name="serial" value="GM-95402"/>
@@ -33171,7 +33171,7 @@ Crashes during attract or in character select, copy protection
 	</software>
 
 	<software name="majianqr">
-		<description>Ji Ma Jiang Zhi - Ma Jiang Qing Ren (China)</description>
+		<description>Jī Májiàng - Zhī Májiàng Qíngrén (China)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="姬麻將之 麻將情人"/>
@@ -33184,7 +33184,7 @@ Crashes during attract or in character select, copy protection
 	</software>
 
 	<software name="majianqra" cloneof="majianqr">
-		<description>Ma Jiang Qing Ren - Ji Ma Jiang Zhi (China, alt)</description>
+		<description>Jī Májiàng - Zhī Májiàng Qíngrén (China, alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="姬麻將之 麻將情人"/>
@@ -33331,7 +33331,7 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 	</software>
 
 	<software name="mhpoker">
-		<description>Du Shen Zhi Meng Huan Puke (Taiwan)</description>
+		<description>Dǔ Shén Zhī Mènghuàn Pūkè (Taiwan)</description>
 		<year>1995</year>
 		<publisher>Creaton Softech</publisher>
 		<info name="alt_title" value="赌神之梦幻扑克"/>
@@ -33380,7 +33380,7 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 	</software>
 
 	<software name="redcliff">
-		<description>San Guo Yan Yi - Huo Shao Chi Bi (Taiwan)</description>
+		<description>Sānguó Yǎnyì - Huǒshāo Chìbì (Taiwan)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="三國演義 火燒赤壁"/>
@@ -33393,7 +33393,7 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 	</software>
 
 	<software name="redcliffa" cloneof="redcliff">
-		<description>San Guo Yan Yi - Huo Shao Chi Bi (Taiwan, hacked out protection?)</description>
+		<description>Sānguó Yǎnyì - Huǒshāo Chìbì (Taiwan, hacked out protection?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="三國演義 火燒赤壁"/>
@@ -33482,7 +33482,7 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 	</software>
 
 	<software name="suppoker">
-		<description>Chaoji Puke (Taiwan)</description>
+		<description>Chāojí Pūkè (Taiwan)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="超級撲克 ~ Super Poker"/>
@@ -33495,7 +33495,7 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 	</software>
 
 	<software name="cjmjclub">
-		<description>Chaoji Majiang Club (Taiwan)</description>
+		<description>Chāojí Májiàng Club (Taiwan)</description>
 		<year>1995</year>
 		<publisher>Creaton Softech</publisher>
 		<info name="alt_title" value="超級麻將 ~ Super Majong Club"/>
