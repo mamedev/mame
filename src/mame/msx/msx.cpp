@@ -35,7 +35,6 @@
 ** - rs232 support:
 **   - mlg3 (working, how does the rs232 switch work?)
 **   - mlg30_2 (working, how does the rs232 switch work?)
-**   - ucv102 (cannot test, floppy problems)
 **   - hbg900ap (not working, switch for terminal/moden operation)
 **   - hbg900p (not working)
 **   - victhc90 (cannot test, system config not emulated)
@@ -47,7 +46,7 @@
 **     fs4000: Is the keypad enter exactly the same as the normal enter key? There does not appear to be a separate mapping for it.
 **     piopx7: The keyboard responds like a regular international keyboard, not a japanese keyboard.
 **     svi728/svi728es: How are the keypad keys mapped?
-** - ax230: Some builtin games show bad graphics, example: Press 5 in main firmware screen and schoose the first game
+** - ax230: Some builtin games show bad graphics, example: Press 5 in main firmware screen and choose the first game
 ** - piopx7/piopx7uk/piopxv60: Pioneer System Remote (home entertainment/Laserdisc control) not implemented
 ** - spc800: How to test operation of the han rom?
 ** - mbh1, mbh1e, mbh2, mbh25: speed controller
@@ -63,7 +62,7 @@
 **   - switch to switch between jp50on and jis layout
 **   - switcn to bypass firmware
 ** - fsa1fm:
-**   - Firmware and modem partially
+**   - Firmware and modem partially emulated
 ** - fsa1mk2: pause button
 ** - nms8260: HDD not emulated
 ** - phc77: builtin printer, switch to turn off firmware
@@ -91,7 +90,6 @@
 ** - cpc51/cpc61: Remove keyboard and add a keyboard connector
 ** - mbh3: touch pad not emulated
 ** - mbh70: Verify firmware operation
-** - ucv102: Will not boot without a floppy in the drive
 ** - y805*: Floppy support broken
 ** - y8805128r2/e: Firmware not working
 ** - cpg120: Remove ports
@@ -839,6 +837,7 @@ protected:
 	template<typename VDPType, typename AY8910Type> void msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config);
 	template<typename VDPType, typename AY8910Type, typename T, typename Ret, typename... Params> void msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...));
 
+	void msx_fd1793_force_ready(machine_config &config);
 	void msx_fd1793(machine_config &config);
 	void msx_wd2793_force_ready(machine_config &config);
 	void msx_wd2793(machine_config &config);
@@ -3281,10 +3280,16 @@ static void msx_floppies(device_slot_interface &device)
 	device.option_add("35ssdd", FLOPPY_35_SSDD);
 }
 
-void msx_state::msx_fd1793(machine_config &config)
+void msx_state::msx_fd1793_force_ready(machine_config &config)
 {
 	fd1793_device& fdc(FD1793(config, "fdc", 4_MHz_XTAL / 4));
 	fdc.set_force_ready(true);
+	m_hw_def.has_fdc(true);
+}
+
+void msx_state::msx_fd1793(machine_config &config)
+{
+	FD1793(config, "fdc", 4_MHz_XTAL / 4);
 	m_hw_def.has_fdc(true);
 }
 
@@ -6427,7 +6432,7 @@ void msx1_v9938_state::svi738(machine_config &config)
 	add_internal_slot_irq<2>(config, MSX_SLOT_RS232_SVI738, "rs232", 3, 0, 1, 1, "rs232rom");
 	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
-	msx_fd1793(config);
+	msx_fd1793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx1_v9938_pal(AY8910, config);
 }
@@ -9287,10 +9292,11 @@ void msx2_state::vg8240(machine_config &config)
 
 ROM_START(ucv102)
 	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("uc-v102bios.rom", 0x0000, 0x8000, CRC(a27c563d) SHA1(c1e46c00f1e38fc9e0ab487bf0513bd93ce61f3f))
+	// Machine is not supposed to display the MSX logo on startup
+	ROM_LOAD("uc-v102bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(a27c563d) SHA1(c1e46c00f1e38fc9e0ab487bf0513bd93ce61f3f))
 
 	ROM_REGION(0x4000, "subrom", 0)
-	ROM_LOAD("uc-v102sub.rom", 0x0000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
+	ROM_LOAD("uc-v102sub.rom", 0x0000, 0x4000, BAD_DUMP CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 
 	ROM_REGION(0x4000, "rs232", ROMREGION_ERASEFF)
 	ROM_LOAD("uc-v102rs232.rom", 0x0000, 0x2000, CRC(7c6790fc) SHA1(a4f19371fd09b73f2776cb637b0e9cbd8415f8eb))
@@ -9324,6 +9330,7 @@ void msx2_state::ucv102(machine_config &config)
 
 	msx_fd1793(config); // Mitsubishi MSW1793
 	msx_1_35_dd_drive(config);
+	m_hw_def.has_cassette(false);
 	msx2(YM2149, config);
 }
 
@@ -12197,7 +12204,7 @@ COMP(1986, vg8230,     0,        0,     vg8230,     msx,      msx2_state, empty_
 COMP(1986, vg8235,     0,        0,     vg8235,     msx,      msx2_state, empty_init, "Philips", "VG-8235 (Europe) (MSX2)", 0)
 COMP(1986, vg8235f,    vg8235,   0,     vg8235f,    msxfr,    msx2_state, empty_init, "Philips", "VG-8235F (France) (MSX2)", 0)
 COMP(1986, vg8240,     0,        0,     vg8240,     msx,      msx2_state, empty_init, "Philips", "VG-8240 (Prototype) (MSX2)", 0)
-COMP(1987, ucv102,     0,        0,     ucv102,     msx2jp,   msx2_state, empty_init, "Pioneer", "UC-V102 (Japan) (MSX2)", MACHINE_NOT_WORKING) // won't boot without a floppy
+COMP(1987, ucv102,     0,        0,     ucv102,     msx2jp,   msx2_state, empty_init, "Pioneer", "UC-V102 (Japan) (MSX2)", 0)
 COMP(1987, ax350,      ax350ii,  0,     ax350,      msx,      msx2_state, empty_init, "Sakhr", "AX-350 (Arabic) (MSX2)", 0)
 COMP(1987, ax350ii,    0,        0,     ax350ii,    msx,      msx2_state, empty_init, "Sakhr", "AX-350 II (Arabic) (MSX2)", 0)
 COMP(1987, ax350iif,   ax350ii,  0,     ax350iif,   msxfr,    msx2_state, empty_init, "Sakhr", "AX-350 II F (Arabic) (MSX2)", 0)
