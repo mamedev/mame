@@ -324,7 +324,7 @@ public:
 		: a400_state(mconfig, type, tag)
 		, m_cartright(*this, "cartright")
 	{ }
-	
+
 	void a800(machine_config &config);
 	void a800pal(machine_config &config);
 
@@ -344,35 +344,56 @@ public:
 
 	void a800xl(machine_config &config);
 	void a800xlpal(machine_config &config);
-	void a600xl(machine_config &config);
-	void a1200xl(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void a600xl_pia_pb_w(uint8_t data);
 	void a800xl_pia_pb_w(uint8_t data);
-	void a1200xl_pia_pb_w(uint8_t data);
 
 	uint8_t a800xl_low_r(offs_t offset);
 	void a800xl_low_w(offs_t offset, uint8_t data);
 	uint8_t a800xl_high_r(offs_t offset);
 	void a800xl_high_w(offs_t offset, uint8_t data);
-	
+
+	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
+	void a800xl_mem(address_map &map);
+private:
+};
+
+class a600xl_state : public a800xl_state
+{
+public:
+	a600xl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a800xl_state(mconfig, type, tag)
+	{ }
+
+	void a600xl(machine_config &config);
+
+private:
+	void a600xl_pia_pb_w(uint8_t data);
+	void a600xl_mem(address_map &map);
+
+	uint8_t a600xl_low_r(offs_t offset);
+};
+
+class a1200xl_state : public a800xl_state
+{
+public:
+	a1200xl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a800xl_state(mconfig, type, tag)
+	{ }
+
+	void a1200xl(machine_config &config);
+
+private:
+	void a1200xl_mem(address_map &map);
+	void a1200xl_pia_pb_w(uint8_t data);
+
 	uint8_t a1200xl_low_r(offs_t offset);
 	void a1200xl_low_w(offs_t offset, uint8_t data);
 	uint8_t a1200xl_high_r(offs_t offset);
 	void a1200xl_high_w(offs_t offset, uint8_t data);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
-private:
-	void a600xl_mem(address_map &map);
-	void a800xl_mem(address_map &map);
-	void a1200xl_mem(address_map &map);
-
-	uint8_t a600xl_low_r(offs_t offset);
-
 };
 
 class a130xe_state : public a800xl_state
@@ -442,7 +463,7 @@ private:
  *
  **************************************************************/
 
-uint8_t a800xl_state::a600xl_low_r(offs_t offset)
+uint8_t a600xl_state::a600xl_low_r(offs_t offset)
 {
 	if (m_mmu & 0x80)
 		return 0xff;
@@ -503,7 +524,7 @@ void a800xl_state::a800xl_low_w(offs_t offset, uint8_t data)
 }
 
 // same as a800xl except no built-in basic (just maps RAM there)
-uint8_t a800xl_state::a1200xl_low_r(offs_t offset)
+uint8_t a1200xl_state::a1200xl_low_r(offs_t offset)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		return m_ram->pointer()[offset];
@@ -517,13 +538,13 @@ uint8_t a800xl_state::a1200xl_low_r(offs_t offset)
 	else if (offset < 0xc000) // 0x5800-0xbfff
 		return m_ram->pointer()[offset];
 
-//	if (!(m_mmu & 0x01))  // 0xc000-0xcfff
-//		return m_ram->pointer()[offset];
-//	else
+//  if (!(m_mmu & 0x01))  // 0xc000-0xcfff
+//      return m_ram->pointer()[offset];
+//  else
 	return m_region_maincpu->base()[offset];
 }
 
-void a800xl_state::a1200xl_low_w(offs_t offset, uint8_t data)
+void a1200xl_state::a1200xl_low_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		m_ram->pointer()[offset] = data;
@@ -534,8 +555,8 @@ void a800xl_state::a1200xl_low_w(offs_t offset, uint8_t data)
 	}
 	else if (offset < 0xc000) // 0x5800-0xbfff
 		m_ram->pointer()[offset] = data;
-//	else if (!(m_mmu & 0x01)) // 0xc000-0xcfff
-//		m_ram->pointer()[offset] = data;
+//  else if (!(m_mmu & 0x01)) // 0xc000-0xcfff
+//      m_ram->pointer()[offset] = data;
 }
 
 uint8_t a800xl_state::a800xl_high_r(offs_t offset)
@@ -552,7 +573,7 @@ void a800xl_state::a800xl_high_w(offs_t offset, uint8_t data)
 		m_ram->pointer()[0xd800 + offset] = data;
 }
 
-uint8_t a800xl_state::a1200xl_high_r(offs_t offset)
+uint8_t a1200xl_state::a1200xl_high_r(offs_t offset)
 {
 	if (m_mmu & 0x01)
 		return m_region_maincpu->base()[0xd800 + offset];
@@ -560,7 +581,7 @@ uint8_t a800xl_state::a1200xl_high_r(offs_t offset)
 		return m_ram->pointer()[0xd800 + offset];
 }
 
-void a800xl_state::a1200xl_high_w(offs_t offset, uint8_t data)
+void a1200xl_state::a1200xl_high_w(offs_t offset, uint8_t data)
 {
 	if (!(m_mmu & 0x01))
 		m_ram->pointer()[0xd800 + offset] = data;
@@ -695,10 +716,10 @@ void a400_state::a400_mem(address_map &map)
 }
 
 
-void a800xl_state::a600xl_mem(address_map &map)
+void a600xl_state::a600xl_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x5000, 0x57ff).r(FUNC(a800xl_state::a600xl_low_r));    // self test or NOP
+	map(0x5000, 0x57ff).r(FUNC(a600xl_state::a600xl_low_r));    // self test or NOP
 	map(0xa000, 0xbfff).rom(); // BASIC
 	map(0xc000, 0xcfff).rom(); // OS
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
@@ -711,16 +732,16 @@ void a800xl_state::a600xl_mem(address_map &map)
 }
 
 
-void a800xl_state::a1200xl_mem(address_map &map)
+void a1200xl_state::a1200xl_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a800xl_state::a1200xl_low_r), FUNC(a800xl_state::a1200xl_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a1200xl_state::a1200xl_low_r), FUNC(a1200xl_state::a1200xl_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(FUNC(a800xl_state::a1200xl_high_r), FUNC(a800xl_state::a1200xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a1200xl_state::a1200xl_high_r), FUNC(a1200xl_state::a1200xl_high_w));
 }
 
 
@@ -2202,7 +2223,7 @@ uint8_t a400_state::djoy_b_r()
 }
 
 // TODO: virtual, make sure direction bits are honored
-void a800xl_state::a600xl_pia_pb_w(uint8_t data)
+void a600xl_state::a600xl_pia_pb_w(uint8_t data)
 {
 	m_mmu = data;
 }
@@ -2215,7 +2236,7 @@ void a800xl_state::a800xl_pia_pb_w(uint8_t data)
 	}
 }
 // TODO: LEDs on bits 2-3, specific to this variant only
-void a800xl_state::a1200xl_pia_pb_w(uint8_t data)
+void a1200xl_state::a1200xl_pia_pb_w(uint8_t data)
 {
 	// FIXME: BIOS jumps from PC=0xc550, expecting ROM to be still enabled at PC=0xe40c
 	if (m_pia->port_b_z_mask() != 0xff)
@@ -2260,7 +2281,7 @@ void a400_state::atari_common_nodac(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, pokey_device::FREQ_17_EXACT);
 
-//	MCFG_MACHINE_RESET_OVERRIDE( a400_state, a400 )
+//  MCFG_MACHINE_RESET_OVERRIDE( a400_state, a400 )
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2270,7 +2291,7 @@ void a400_state::atari_common_nodac(machine_config &config)
 	//m_screen->set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
 	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
 	m_screen->set_palette("palette");
-//	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+//  m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	PALETTE(config, "palette", FUNC(a400_state::a400_palette), std::size(atari_colors) / 3);
 
@@ -2356,13 +2377,13 @@ void a400_state::a400(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
 
-//8	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
+//8 MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	config_ntsc_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-//	m_gtia->set_region(GTIA_NTSC);
+//  m_gtia->set_region(GTIA_NTSC);
 }
 
 // memory map A400 + PAL screen
@@ -2373,13 +2394,13 @@ void a400_state::a400pal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
 
-//	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
+//  MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	config_pal_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-//	m_gtia->set_region(GTIA_PAL);
+//  m_gtia->set_region(GTIA_PAL);
 }
 
 // memory map A800 + NTSC screen + Right cartslot
@@ -2391,13 +2412,13 @@ void a800_state::a800(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a800_state::a400_interrupt), "screen", 0, 1);
 
-//	MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
+//  MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
 
 	config_ntsc_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-//	m_gtia->set_region(GTIA_NTSC);
+//  m_gtia->set_region(GTIA_NTSC);
 
 	A800_CART_SLOT(config, m_cartright, a800_right, nullptr);
 }
@@ -2412,25 +2433,25 @@ void a800_state::a800pal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a800_state::a400_interrupt), "screen", 0, 1);
 
-//	MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
+//  MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
 
 	config_pal_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-//	m_gtia->set_region(GTIA_PAL);
+//  m_gtia->set_region(GTIA_PAL);
 
 	A800_CART_SLOT(config, m_cartright, a800_right, nullptr);
 }
 
 
 // memory map A600XL (same as 800XL but less RAM) + NTSC screen + MMU via PIA portB
-void a800xl_state::a600xl(machine_config &config)
+void a600xl_state::a600xl(machine_config &config)
 {
 	atari_common(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a800xl_state::a600xl_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(a800xl_state::a800xl_interrupt), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a600xl_state::a600xl_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a600xl_state::a800xl_interrupt), "screen", 0, 1);
 
 	m_pokey->pot_r<4>().set_constant(0xff);
 	m_pokey->pot_r<5>().set_constant(0xff);
@@ -2438,16 +2459,16 @@ void a800xl_state::a600xl(machine_config &config)
 	m_pokey->pot_r<7>().set_constant(0xff);
 
 	m_pia->readpb_handler().set_constant(0x83);
-	m_pia->writepb_handler().set(FUNC(a800xl_state::a600xl_pia_pb_w));
+	m_pia->writepb_handler().set(FUNC(a600xl_state::a600xl_pia_pb_w));
 
-//	MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
+//  MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
 
 	config_ntsc_screen(config);
 
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-//	m_gtia->set_region(GTIA_NTSC);
+//  m_gtia->set_region(GTIA_NTSC);
 
 	m_ram->set_default_size("16K");
 
@@ -2471,16 +2492,16 @@ void a800xl_state::a800xl(machine_config &config)
 	m_pia->readpb_handler().set_constant(0x83);
 	m_pia->writepb_handler().set(FUNC(a800xl_state::a800xl_pia_pb_w));
 
-//	MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
+//  MCFG_MACHINE_START_OVERRIDE( a800xl_state, a800xl )
 
 	m_ram->set_default_size("64K");
 
 	config_ntsc_screen(config);
 
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-//	m_gtia->set_region(GTIA_NTSC);
+//  m_gtia->set_region(GTIA_NTSC);
 
 	config.device_remove("ctrl3");
 	config.device_remove("ctrl4");
@@ -2495,22 +2516,22 @@ void a800xl_state::a800xlpal(machine_config &config)
 	m_maincpu->set_clock(1773000);
 
 	config_pal_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-//	m_gtia->set_region(GTIA_PAL);
+//  m_gtia->set_region(GTIA_PAL);
 
 	m_pokey->set_clock(1773000);
 }
 
 
 // memory map A1200XL+ MMU via PIA portB
-void a800xl_state::a1200xl(machine_config &config)
+void a1200xl_state::a1200xl(machine_config &config)
 {
 	a800xl(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a800xl_state::a1200xl_mem);
-	m_pia->writepb_handler().set(FUNC(a800xl_state::a1200xl_pia_pb_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &a1200xl_state::a1200xl_mem);
+	m_pia->writepb_handler().set(FUNC(a1200xl_state::a1200xl_pia_pb_w));
 }
 
 // memory map A130XE (extra RAM only partially emulated)
@@ -2560,17 +2581,17 @@ void a5200_state::a5200(machine_config &config)
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	ATARI_GTIA(config, m_gtia, 0);
-//	m_gtia->set_region(GTIA_NTSC);
+//  m_gtia->set_region(GTIA_NTSC);
 	m_gtia->trigger_callback().set_ioport("djoy_b");
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
 
-//	MCFG_MACHINE_START_OVERRIDE( a5200_state, a5200 )
+//  MCFG_MACHINE_START_OVERRIDE( a5200_state, a5200 )
 
 	config_ntsc_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
 	A5200_CART_SLOT(config, m_cartleft, a5200_carts, nullptr);
 
@@ -2736,8 +2757,8 @@ COMP( 1979, a400,    0,      0,      a400,      a800,   a400_state,   empty_init
 COMP( 1979, a400pal, a400,   0,      a400pal,   a800,   a400_state,   empty_init, "Atari", "Atari 400 (PAL)",      0)
 COMP( 1979, a800,    0,      0,      a800,      a800,   a800_state,   empty_init, "Atari", "Atari 800 (NTSC)",     0)
 COMP( 1979, a800pal, a800,   0,      a800pal,   a800,   a800_state,   empty_init, "Atari", "Atari 800 (PAL)",      0)
-COMP( 1982, a1200xl, a800,   0,      a1200xl,   a800,   a800xl_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
-COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
+COMP( 1982, a1200xl, a800,   0,      a1200xl,   a800,   a1200xl_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
+COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800,   a600xl_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
 COMP( 1983, a800xl,  0,      0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
 COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
 COMP( 1986, a65xe,   a800xl, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
