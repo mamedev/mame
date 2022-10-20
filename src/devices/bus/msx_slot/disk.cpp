@@ -142,7 +142,7 @@ void msx_slot_disk1_device::device_start()
 	save_item(NAME(m_side_control));
 	save_item(NAME(m_control));
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -158,7 +158,7 @@ void msx_slot_disk1_device::device_start()
 	page(1)->install_write_handler(0x7ffd, 0x7ffd, write8smo_delegate(*this, FUNC(msx_slot_disk1_device::set_control)));
 
 	// TODO No idea why, but without this the other handlers do not get recognized
-	page(2)->install_rom(0xbff8,0xbff8, m_rom);
+	page(2)->install_rom(0xbff8,0xbff8, rom_base());
 	page(2)->install_read_handler(0xbff8, 0xbff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(2)->install_read_handler(0xbff9, 0xbff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -268,7 +268,7 @@ void msx_slot_disk2_device::device_start()
 
 	save_item(NAME(m_control));
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7fb8, 0x7fb8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(1)->install_read_handler(0x7fb9, 0x7fb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(1)->install_read_handler(0x7fba, 0x7fba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -281,7 +281,7 @@ void msx_slot_disk2_device::device_start()
 	page(1)->install_write_handler(0x7fbc, 0x7fbc, write8smo_delegate(*this, FUNC(msx_slot_disk2_device::set_control)));
 
 	// TODO No idea why, but without this the other handlers do not get recognized
-	page(2)->install_rom(0xbfb8,0xbfb8, m_rom);
+	page(2)->install_rom(0xbfb8,0xbfb8, rom_base());
 	page(2)->install_read_handler(0xbfb8, 0xbfb8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(2)->install_read_handler(0xbfb9, 0xbfb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(2)->install_read_handler(0xbfba, 0xbfba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -362,7 +362,7 @@ void msx_slot_disk8_device::device_start()
 
 	save_item(NAME(m_control));
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7f80, 0x7f80, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(1)->install_read_handler(0x7f81, 0x7f81, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(1)->install_read_handler(0x7f82, 0x7f82, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -375,7 +375,7 @@ void msx_slot_disk8_device::device_start()
 	page(1)->install_write_handler(0x7f84, 0x7f84, write8smo_delegate(*this, FUNC(msx_slot_disk8_device::set_control)));
 
 	// TODO No idea why, but without this the other handlers do not get recognized
-	page(2)->install_rom(0xbf80,0xbf80, m_rom);
+	page(2)->install_rom(0xbf80,0xbf80, rom_base());
 	page(2)->install_read_handler(0xbf80, 0xbf80, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(2)->install_read_handler(0xbf81, 0xbf81, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(2)->install_read_handler(0xbf82, 0xbf82, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -460,14 +460,14 @@ void msx_slot_disk3_device::device_start()
 {
 	msx_slot_tc8566_disk_device::device_start();
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
 	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
 	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
 	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
 	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 	// TODO No idea why, but without this the other handlers do not get recognized
-	page(2)->install_rom(0xbffa,0xbffa, m_rom);
+	page(2)->install_rom(0xbffa,0xbffa, rom_base());
 	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
 	page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
 	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
@@ -487,7 +487,7 @@ void msx_slot_disk4_device::device_start()
 {
 	msx_slot_tc8566_disk_device::device_start();
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	// 0x7ff1 media change register
 	page(1)->install_write_handler(0x7ff2, 0x7ff2, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
 	page(1)->install_write_handler(0x7ff3, 0x7ff3, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
@@ -511,7 +511,7 @@ void msx_slot_disk5_device::device_start()
 
 	save_item(NAME(m_control));
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 
 	// Install IO read/write handlers
 	io_space().install_write_handler(0xd0, 0xd0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
@@ -596,7 +596,7 @@ void msx_slot_disk6_device::device_start()
 	save_item(NAME(m_drive_select0));
 	save_item(NAME(m_drive_select1));
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(1)->install_read_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(1)->install_read_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -725,7 +725,7 @@ void msx_slot_disk7_device::device_start()
 
 	save_item(NAME(m_drive_side_motor));
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -738,7 +738,7 @@ void msx_slot_disk7_device::device_start()
 	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk7_device::side_motor_w)));
 
 	// TODO No idea why, but without this the other handlers do not get recognized
-	page(2)->install_rom(0xbff8, 0xbff8, m_rom);
+	page(2)->install_rom(0xbff8, 0xbff8, rom_base());
 	page(2)->install_read_handler(0xbff8, 0xbff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(2)->install_read_handler(0xbff9, 0xbff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -823,7 +823,7 @@ void msx_slot_disk9_device::device_start()
 
 	save_item(NAME(m_control));
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -906,7 +906,7 @@ void msx_slot_disk10_device::device_start()
 
 	save_item(NAME(m_control));
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -990,7 +990,7 @@ void msx_slot_disk11_device::device_start()
 	save_item(NAME(m_side_control));
 	save_item(NAME(m_control));
 
-	page(1)->install_rom(0x4000, 0x7fff, m_rom);
+	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -1006,7 +1006,7 @@ void msx_slot_disk11_device::device_start()
 	page(1)->install_write_handler(0x7ffd, 0x7ffd, write8smo_delegate(*this, FUNC(msx_slot_disk11_device::control_w)));
 
 	// TODO No idea why, but without this the other handlers do not get recognized
-	page(2)->install_rom(0xbff8, 0xbff8, m_rom);
+	page(2)->install_rom(0xbff8, 0xbff8, rom_base());
 	page(2)->install_read_handler(0xbff8, 0xbff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(2)->install_read_handler(0xbff9, 0xbff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));

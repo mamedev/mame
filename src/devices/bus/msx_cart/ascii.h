@@ -28,6 +28,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	static constexpr size_t BANK_SIZE = 0x2000;
+
 	void mapper_write(offs_t offset, u8 data);
 
 	memory_bank_array_creator<4> m_rombank;
@@ -48,8 +50,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void mapper_write_6000(offs_t offset, u8 data);
-	void mapper_write_7000(offs_t offset, u8 data);
+	static constexpr size_t BANK_SIZE = 0x4000;
+
+	template <int Bank> void bank_w(u8 data);
 
 	memory_bank_array_creator<2> m_rombank;
 	u8 m_bank_mask;
@@ -65,10 +68,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 	virtual void device_reset() override;
 
 private:
+	static constexpr size_t BANK_SIZE = 0x2000;
+
 	void mapper_write(offs_t offset, u8 data);
 
 	memory_bank_array_creator<4> m_rombank;
@@ -92,6 +97,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	static constexpr size_t BANK_SIZE = 0x4000;
+
 	void mapper_write_6000(u8 data);
 	void mapper_write_7000(u8 data);
 
@@ -115,8 +122,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void mapper_write_6000(u8 data);
-	void mapper_write_7000(u8 data);
+	static constexpr size_t BANK_SIZE = 0x4000;
+
+	template <int Bank> void bank_w(u8 data);
 
 	memory_bank_array_creator<2> m_rombank;
 	u8 m_bank_mask;

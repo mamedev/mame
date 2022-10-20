@@ -28,13 +28,9 @@ void msx_cart_ascii8_device::device_reset()
 void msx_cart_ascii8_device::initialize_cartridge()
 {
 	u32 size = get_rom_size();
-	u16 banks = size / 0x2000;
+	u16 banks = size / BANK_SIZE;
 
-	if (size > 256 * 0x2000)
-	{
-		fatalerror("ascii8: ROM is too big\n");
-	}
-	if (size != banks * 0x2000 || (~(banks - 1) % banks))
+	if (size > 256 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		fatalerror("ascii8: Invalid ROM size\n");
 	}
@@ -42,7 +38,7 @@ void msx_cart_ascii8_device::initialize_cartridge()
 	m_bank_mask = banks - 1;
 
 	for (int i = 0; i < 4; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), 0x2000); 
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE); 
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
@@ -76,13 +72,9 @@ void msx_cart_ascii16_device::device_reset()
 void msx_cart_ascii16_device::initialize_cartridge()
 {
 	u32 size = get_rom_size();
-	u16 banks = size / 0x4000;
+	u16 banks = size / BANK_SIZE;
 
-	if (size > 256 * 0x4000)
-	{
-		fatalerror("ascii16: ROM is too big\n");
-	}
-	if (size != banks * 0x4000 || (~(banks - 1) % banks))
+	if (size > 256 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		fatalerror("ascii16: Invalid ROM size\n");
 	}
@@ -90,22 +82,18 @@ void msx_cart_ascii16_device::initialize_cartridge()
 	m_bank_mask = banks - 1;
 
 	for (int i = 0; i < 2; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), 0x4000); 
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE); 
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	page(1)->install_write_handler(0x6000, 0x67ff, write8sm_delegate(*this, FUNC(msx_cart_ascii16_device::mapper_write_6000)));
-	page(1)->install_write_handler(0x7000, 0x77ff, write8sm_delegate(*this, FUNC(msx_cart_ascii16_device::mapper_write_7000)));
+	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<0>)));
+	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 }
 
-void msx_cart_ascii16_device::mapper_write_6000(offs_t offset, u8 data)
+template <int Bank>
+void msx_cart_ascii16_device::bank_w(u8 data)
 {
-	m_rombank[0]->set_entry(data & m_bank_mask);
-}
-
-void msx_cart_ascii16_device::mapper_write_7000(offs_t offset, u8 data)
-{
-	m_rombank[1]->set_entry(data & m_bank_mask);
+	m_rombank[Bank]->set_entry(data & m_bank_mask);
 }
 
 
@@ -123,10 +111,6 @@ msx_cart_ascii8_sram_device::msx_cart_ascii8_sram_device(const machine_config &m
 {
 }
 
-void msx_cart_ascii8_sram_device::device_start()
-{
-}
-
 void msx_cart_ascii8_sram_device::device_reset()
 {
 	for (int i = 0; i < 4; i++)
@@ -138,13 +122,9 @@ void msx_cart_ascii8_sram_device::device_reset()
 void msx_cart_ascii8_sram_device::initialize_cartridge()
 {
 	u32 size = get_rom_size();
-	u16 banks = size / 0x2000;
+	u16 banks = size / BANK_SIZE;
 
-	if (size > 128 * 0x2000)
-	{
-		fatalerror("ascii8_sram: ROM is too big\n");
-	}
-	if (size != banks * 0x2000 || (~(banks - 1) % banks))
+	if (size > 128 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		fatalerror("ascii8_sram: Invalid ROM size\n");
 	}
@@ -158,7 +138,7 @@ void msx_cart_ascii8_sram_device::initialize_cartridge()
 	m_sram_select_mask = banks;
 
 	for (int i = 0; i < 4; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), 0x2000); 
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE); 
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
@@ -219,13 +199,9 @@ void msx_cart_ascii16_sram_device::device_reset()
 void msx_cart_ascii16_sram_device::initialize_cartridge()
 {
 	u32 size = get_rom_size();
-	u16 banks = size / 0x4000;
+	u16 banks = size / BANK_SIZE;
 
-	if (size > 128 * 0x4000)
-	{
-		fatalerror("ascii16_sram: ROM is too big\n");
-	}
-	if (size != banks * 0x4000 || (~(banks - 1) % banks))
+	if (size > 128 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		fatalerror("ascii16_sram: Invalid ROM size\n");
 	}
@@ -238,7 +214,7 @@ void msx_cart_ascii16_sram_device::initialize_cartridge()
 	m_sram_select_mask = banks;
 
 	for (int i = 0; i < 2; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), 0x4000);
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
 	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_sram_device::mapper_write_6000)));
@@ -286,13 +262,9 @@ void msx_cart_msxwrite_device::device_reset()
 void msx_cart_msxwrite_device::initialize_cartridge()
 {
 	u32 size = get_rom_size();
-	u16 banks = size / 0x4000;
+	u16 banks = size / BANK_SIZE;
 
-	if (size > 256 * 0x4000)
-	{
-		fatalerror("msxwrite: ROM is too big\n");
-	}
-	if (size != banks * 0x4000 || (~(banks - 1) % banks))
+	if (size > 256 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		fatalerror("msxwrite: Invalid ROM size\n");
 	}
@@ -300,22 +272,18 @@ void msx_cart_msxwrite_device::initialize_cartridge()
 	m_bank_mask = banks - 1;
 
 	for (int i = 0; i < 2; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), 0x4000); 
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE); 
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
 	// The rom writes to 6fff and 7fff for banking, unknown whether
 	// other locations also trigger banking.
-	page(1)->install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_msxwrite_device::mapper_write_6000)));
-	page(1)->install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_msxwrite_device::mapper_write_7000)));
+	page(1)->install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_msxwrite_device::bank_w<0>)));
+	page(1)->install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_msxwrite_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 }
 
-void msx_cart_msxwrite_device::mapper_write_6000(u8 data)
+template <int Bank>
+void msx_cart_msxwrite_device::bank_w(u8 data)
 {
-	m_rombank[0]->set_entry(data & m_bank_mask);
-}
-
-void msx_cart_msxwrite_device::mapper_write_7000(u8 data)
-{
-	m_rombank[1]->set_entry(data & m_bank_mask);
+	m_rombank[Bank]->set_entry(data & m_bank_mask);
 }
