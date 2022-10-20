@@ -34,10 +34,12 @@ starfirea       // (c) 1979 Exidy
 fireone         // (c) 1979 Exidy
 starfir2        // (c) 1979 Exidy
 
+@source:exidy/vertigo.cpp
+topgunnr        // (c) 1986
+
 @source:exidy/victory.cpp
 victory         // (c) 1982
 victorba        // (c) 1982
-topgunnr        // (c) 1986
 
 @source:gaelco/wrally.cpp
 wrally          // (c) 1993 - Ref 930705
@@ -57,7 +59,7 @@ looping         // (c) 1982 Video Games GMBH
 @source:misc/supertnk.cpp
 supertnk        // (c) 1981 VIDEO GAMES GmbH, W.-GERMANY
 
-@source:misc/goldnpkr.cpp:
+@source:misc/goldnpkr.cpp
 witchgme        // (c) 1991 Video Klein
 witchjol        // (c) 1994 Video Klein
 wldwitch        // (c) 2001 Video Klein
