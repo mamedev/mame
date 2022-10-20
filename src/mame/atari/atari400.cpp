@@ -283,6 +283,24 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	// TODO: these two should really be inside ram_device instead
+	template <unsigned start_base> uint8_t ram_r(address_space &space, offs_t offset) {
+		const offs_t memory_offset = start_base + offset;
+
+		if (memory_offset < m_ram->size())
+			return m_ram->pointer()[memory_offset];
+
+		// TODO: floating bus
+		return space.unmap();
+	}
+
+	template <unsigned start_base> void ram_w(offs_t offset, uint8_t data) {
+		const offs_t memory_offset = start_base + offset;
+
+		if (memory_offset < m_ram->size())
+			m_ram->pointer()[memory_offset] = data;
+	}
+
 private:
 	void a400_palette(palette_device &palette) const;
 
@@ -321,8 +339,9 @@ protected:
 	int m_last_offs;
 	uint8_t m_mmu;
 
-	void setup_ram(int bank, uint32_t size);
 	void setup_cart(a800_cart_slot_device *slot);
+
+	void hw_iomap(address_map &map);
 };
 
 class a800_state : public a400_state
@@ -341,6 +360,8 @@ protected:
 
 private:
 	required_device<a800_cart_slot_device> m_cartright;
+
+	void a800_mem(address_map &map);
 };
 
 class a800xl_state : public a400_state
@@ -366,22 +387,7 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
 	void a800xl_mem(address_map &map);
 
-	// TODO: these two should really be inside ram_device instead
-	template <unsigned start_base> uint8_t ram_r(offs_t offset) {
-		const offs_t memory_offset = start_base + offset;
 
-		if (memory_offset < m_ram->size())
-			return m_ram->pointer()[memory_offset];
-
-		return 0xff;
-	}
-
-	template <unsigned start_base> void ram_w(offs_t offset, uint8_t data) {
-		const offs_t memory_offset = start_base + offset;
-
-		if (memory_offset < m_ram->size())
-			m_ram->pointer()[memory_offset] = data;
-	}
 
 	memory_view m_kernel_view;
 
@@ -701,19 +707,34 @@ void xegs_state::xegs_low_w(offs_t offset, uint8_t data)
 // TODO: better memory map inheritance
 // TODO: transparent support for cart window
 // TODO: transparent support for cart CCTL at 0xd500
-// TODO: transparent support for PBI (XL) / ECI (XE series), at 0xd1xx, 0xd6xx, 0xd7xx
+// TODO: transparent support for PBI (XL) / ECI (XE series), at 0xd1xx, 0xd6xx, 0xd7xx + ROM at 0xd800-0xdfff
 
+void a400_state::hw_iomap(address_map &map)
+{
+	map(0x0000, 0x00ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0x0100, 0x01ff).noprw();
+	map(0x0200, 0x02ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x0300, 0x03ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0x0400, 0x04ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0x0500, 0x05ff).noprw();
+	map(0x0600, 0x07ff).noprw();
+}
+
+// a400/a800 explicitly expects floating bus for unmapped ranges, will punt with value_low()
 void a400_state::a400_mem(address_map &map)
 {
-	map(0x0000, 0xbfff).noprw(); // RAM installed at runtime
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).rw(FUNC(a400_state::ram_r<0x0000>), FUNC(a400_state::ram_w<0x0000>));
 	map(0xc000, 0xcfff).rom();
-	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
-	map(0xd100, 0xd1ff).noprw();
-	map(0xd200, 0xd2ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
-	map(0xd500, 0xd7ff).noprw();
+	map(0xd000, 0xd7ff).m(*this, FUNC(a400_state::hw_iomap));
 	map(0xd800, 0xffff).rom();
+}
+
+void a800_state::a800_mem(address_map &map)
+{
+	a400_mem(map);
+	// TODO: stub for right cart handling, to be eventually honored internally
+	// ...
 }
 
 
@@ -1802,29 +1823,6 @@ LIGHT-ORANGE
  *
  **************************************************************/
 
-void a400_state::setup_ram(int bank, uint32_t size)
-{
-	offs_t ram_top;
-
-	switch (bank)
-	{
-	case 0: // 0x0000-0x7fff
-		ram_top = std::min(size, uint32_t(0x8000)) - 1;
-		m_maincpu->space(AS_PROGRAM).install_ram(0x0000, ram_top, m_ram->pointer());
-		break;
-	case 1: // 0x8000-0x9fff
-		ram_top = std::min(size, uint32_t(0xa000)) - 1;
-		if (ram_top > 0x8000)
-			m_maincpu->space(AS_PROGRAM).install_ram(0x8000, ram_top, m_ram->pointer() + 0x8000);
-		break;
-	case 2: // 0xa000-0xbfff
-		ram_top = std::min(size, uint32_t(0xc000)) - 1;
-		if (ram_top > 0xa000)
-			m_maincpu->space(AS_PROGRAM).install_ram(0xa000, ram_top, m_ram->pointer() + 0xa000);
-		break;
-	}
-}
-
 // these handle cart enable/disable without calling setup_ram thousands of times
 // TODO: this should really live in a800_slot file
 uint8_t a400_state::special_read_8000(offs_t offset)
@@ -2118,9 +2116,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( a5200_state::a5200_interrupt )
 
 void a400_state::machine_start()
 {
-	setup_ram(0, m_ram->size());
-	setup_ram(1, m_ram->size());
-	setup_ram(2, m_ram->size());
 	setup_cart(m_cartleft);
 
 	save_item(NAME(m_cart_disabled));
@@ -2131,9 +2126,6 @@ void a400_state::machine_start()
 
 void a800_state::machine_start()
 {
-	setup_ram(0, m_ram->size());
-	setup_ram(1, m_ram->size());
-	setup_ram(2, m_ram->size());
 	setup_cart(m_cartleft);
 	setup_cart(m_cartright);
 
@@ -2419,30 +2411,21 @@ void a400_state::a400(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
 
-//8 MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
-
 	config_ntsc_screen(config);
-//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-//  m_gtia->set_region(GTIA_NTSC);
+	// TODO: confirm all of the official config
+	// 4KB was the release model,
+	// shouldn't be possible to reach 48K but added as convenience for now.
+	RAM(config.replace(), m_ram).set_default_size("16K");
+	m_ram->set_extra_options("4K,48K");
 }
 
 // memory map A400 + PAL screen
 void a400_state::a400pal(machine_config &config)
 {
-	atari_common(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
-
-//  MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
+	a400(config);
 
 	config_pal_screen(config);
-//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
-
-//  m_gtia->set_region(GTIA_PAL);
 }
 
 // memory map A800 + NTSC screen + Right cartslot
@@ -2450,40 +2433,26 @@ void a800_state::a800(machine_config &config)
 {
 	atari_common(config);
 
-	// TODO: should honor right cart internally
-	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a400_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a800_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a800_state::a400_interrupt), "screen", 0, 1);
 
-//  MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
-
 	config_ntsc_screen(config);
-//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
-
-//  m_gtia->set_region(GTIA_NTSC);
 
 	A800_CART_SLOT(config, m_cartright, a800_right, nullptr);
+
+	// TODO: confirm all of the official config
+	// 8K release model, 48K possible here?
+	RAM(config.replace(), m_ram).set_default_size("16K");
+	m_ram->set_extra_options("8K,48K");
 }
 
 
 // memory map A800 + PAL screen + Right cartslot
 void a800_state::a800pal(machine_config &config)
 {
-	atari_common(config);
-
-	// TODO: should honor right cart internally
-	m_maincpu->set_addrmap(AS_PROGRAM, &a800_state::a400_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(a800_state::a400_interrupt), "screen", 0, 1);
-
-//  MCFG_MACHINE_START_OVERRIDE( a800_state, a800 )
+	a800(config);
 
 	config_pal_screen(config);
-//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
-
-//  m_gtia->set_region(GTIA_PAL);
-
-	A800_CART_SLOT(config, m_cartright, a800_right, nullptr);
 }
 
 
