@@ -36,10 +36,12 @@ jobs:
             cc: gcc
             cxx: g++
             subtarget: mame
+            executable: mame
           - compiler: clang
             cc: clang
             cxx: clang++
             subtarget: tiny
+            executable: mametiny
     steps:
     - uses: msys2/setup-msys2@v2
       with:
@@ -48,16 +50,19 @@ jobs:
     - name: Build
       env:
         MINGW64: "/mingw64"
-        ARCHOPTS: "-fuse-ld=lld"
         OVERRIDE_AR: "llvm-ar"
         OVERRIDE_CC: ${{ matrix.cc }}
         OVERRIDE_CXX: ${{ matrix.cxx }}
+        ARCHOPTS: "-fuse-ld=lld"
         SUBTARGET: ${{ matrix.subtarget }}
         TOOLS: 1
       run: make -j2
     - name: Validate
-      run: ./mame* -validate
+      run: ./${{ matrix.executable }}.exe -validate
     - uses: actions/upload-artifact@master
       with:
-        name: mame-windows-${{ matrix.compiler }}-${{ github.sha }}
-        path: mame*.exe
+        name: ${{ matrix.executable }}-windows-${{ matrix.compiler }}-${{ github.sha }}
+        path: |
+          ${{ matrix.executable }}.exe
+          chdman.exe
+          unidasm.exe
