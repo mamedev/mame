@@ -11685,6 +11685,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Game will not run on initial boot if SRAM is filled with 0x00 -->
 	<software name="famijmp2">
 		<description>Famicom Jump II - Saikyou no 7-nin (Japan)</description>
 		<year>1991</year>
@@ -11704,7 +11705,7 @@ license:CC0
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+				<rom value="0xff" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
