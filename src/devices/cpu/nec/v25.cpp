@@ -457,7 +457,7 @@ void v25_common_device::external_int()
 			}
 		}
 	}
-	else if (pending & INT_IRQ)
+	else if (m_IF && (pending & INT_IRQ))
 	{
 		/* the actual vector is retrieved after pushing flags */
 		/* and clearing the IF */
@@ -782,12 +782,7 @@ void v25_common_device::execute_run()
 		/* Dispatch IRQ */
 		m_prev_ip = m_ip;
 		if (m_no_interrupt==0 && (m_pending_irq & m_unmasked_irq))
-		{
-			if (m_pending_irq & NMI_IRQ)
-				external_int();
-			else if (m_IF)
-				external_int();
-		}
+			external_int();
 
 		/* No interrupt allowed between last instruction and this one */
 		if (m_no_interrupt)
