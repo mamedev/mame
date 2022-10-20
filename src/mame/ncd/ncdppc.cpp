@@ -45,29 +45,8 @@ private:
 
 	uint32_t unk_r();
 	void tty_w(uint32_t data);
-
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 };
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-#define ENABLE_VERBOSE_LOG (0)
-
-inline void ATTR_PRINTF(3,4) ncd_ppc_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-#if ENABLE_VERBOSE_LOG
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror("%s: %s", machine().describe_context(), buf);
-	}
-#endif
-}
 
 void ncd_ppc_state::machine_reset()
 {
