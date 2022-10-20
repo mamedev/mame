@@ -744,12 +744,7 @@ void a600xl_state::a600xl_mem(address_map &map)
 	map(0x5000, 0x57ff).r(FUNC(a600xl_state::a600xl_low_r));    // self test or NOP
 	map(0xa000, 0xbfff).rom(); // BASIC
 	map(0xc000, 0xcfff).rom(); // OS
-	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
-	map(0xd100, 0xd1ff).noprw();
-	map(0xd200, 0xd2ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
-	map(0xd500, 0xd7ff).noprw();
+	map(0xd000, 0xd7ff).m(*this, FUNC(a600xl_state::hw_iomap));
 	map(0xd800, 0xffff).view(m_kernel_view);
 	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(a600xl_state::ram_r<0xd800>), FUNC(a600xl_state::ram_w<0xd800>));
 	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);
@@ -759,12 +754,7 @@ void a600xl_state::a600xl_mem(address_map &map)
 void a1200xl_state::a1200xl_mem(address_map &map)
 {
 	map(0x0000, 0xcfff).rw(FUNC(a1200xl_state::a1200xl_low_r), FUNC(a1200xl_state::a1200xl_low_w));
-	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
-	map(0xd100, 0xd1ff).noprw();
-	map(0xd200, 0xd2ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
-	map(0xd500, 0xd7ff).noprw();
+	map(0xd000, 0xd7ff).m(*this, FUNC(a1200xl_state::hw_iomap));
 	map(0xd800, 0xffff).view(m_kernel_view);
 	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(a1200xl_state::ram_r<0xd800>), FUNC(a1200xl_state::ram_w<0xd800>));
 	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);
@@ -774,12 +764,7 @@ void a1200xl_state::a1200xl_mem(address_map &map)
 void a800xl_state::a800xl_mem(address_map &map)
 {
 	map(0x0000, 0xcfff).rw(FUNC(a800xl_state::a800xl_low_r), FUNC(a800xl_state::a800xl_low_w));
-	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
-	map(0xd100, 0xd1ff).noprw();
-	map(0xd200, 0xd2ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
-	map(0xd500, 0xd7ff).noprw();
+	map(0xd000, 0xd7ff).m(*this, FUNC(a800xl_state::hw_iomap));
 	map(0xd800, 0xffff).view(m_kernel_view);
 	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(a800xl_state::ram_r<0xd800>), FUNC(a800xl_state::ram_w<0xd800>));
 	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);
@@ -789,12 +774,7 @@ void a800xl_state::a800xl_mem(address_map &map)
 void a130xe_state::a130xe_mem(address_map &map)
 {
 	map(0x0000, 0xcfff).rw(FUNC(a130xe_state::a130xe_low_r), FUNC(a130xe_state::a130xe_low_w));
-	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
-	map(0xd100, 0xd1ff).noprw();
-	map(0xd200, 0xd2ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
-	map(0xd500, 0xd7ff).noprw();
+	map(0xd000, 0xd7ff).m(*this, FUNC(a130xe_state::hw_iomap));
 	map(0xd800, 0xffff).view(m_kernel_view);
 	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(a130xe_state::ram_r<0xd800>), FUNC(a130xe_state::ram_w<0xd800>));
 	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);
@@ -804,12 +784,7 @@ void a130xe_state::a130xe_mem(address_map &map)
 void xegs_state::xegs_mem(address_map &map)
 {
 	map(0x0000, 0xcfff).rw(FUNC(xegs_state::xegs_low_r), FUNC(xegs_state::xegs_low_w));
-	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
-	map(0xd100, 0xd1ff).noprw();
-	map(0xd200, 0xd2ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
-	map(0xd500, 0xd7ff).noprw();
+	map(0xd000, 0xd7ff).m(*this, FUNC(xegs_state::hw_iomap));
 	map(0xd800, 0xffff).view(m_kernel_view);
 	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(xegs_state::ram_r<0xd800>), FUNC(xegs_state::ram_w<0xd800>));
 	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);

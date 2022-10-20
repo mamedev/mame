@@ -542,12 +542,13 @@ Align test never completes, burn-in test requires a test disk and writing to flo
 		</part>
 	</software>
 
-	<software name="alfclrcv" supported="no">
+	<software name="alfclrcv" supported="partial">
 		<description>Alf in the Color Caves</description>
 		<year>1984</year>
 		<publisher>Spinnaker</publisher>
 		<notes><![CDATA[
-Doesn't complete first animation after selecting the left tunnel, [ANTIC] timing?
+a800: Doesn't complete first animation after selecting left tunnel during gameplay, [cart] handling (override right slot map?)
+Draws with solid orange at bottom of screen after selecting left tunnel, should be black [ANTIC]
 ]]></notes>
 		<info name="developer" value="Joyce Hakansson Associates, Inc" />
 		<info name="serial" value="ALF-AT" />
