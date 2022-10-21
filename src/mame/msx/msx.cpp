@@ -852,138 +852,123 @@ protected:
 
 	// configuration helpers
 	template <typename T, typename U>
-	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages)
+	auto &add_base_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages)
 	{
 		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
 		device.set_memory_space(m_maincpu, AS_PROGRAM);
 		device.set_io_space(m_maincpu, AS_IO);
 		device.set_maincpu(m_maincpu);
+		m_internal_slots.push_back(std::make_tuple(prim, expanded, sec, page, numpages, &device));
+		return device;
+	}
+	template <typename T, typename U>
+	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages)
+	{
+		auto &device = add_base_slot(config, type, tag, prim, expanded, sec, page, numpages);
 		device.set_start_address(page * 0x4000);
 		device.set_size(numpages * 0x4000);
-		m_internal_slots.push_back(std::make_tuple(prim, true, sec, page, numpages, &device));
 		return device;
+	}
+	template <typename T, typename U>
+	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages)
+	{
+		return add_internal_slot(config, type, tag, prim, true, sec, page, numpages);
 	}
 	template <typename T, typename U>
 	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 page, u8 numpages)
 	{
-		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.set_start_address(page * 0x4000);
-		device.set_size(numpages * 0x4000);
-		m_internal_slots.push_back(std::make_tuple(prim, false, 0, page, numpages, &device));
+		return add_internal_slot(config, type, tag, prim, false, 0, page, numpages);
+	}
+	template <typename T, typename U>
+	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	{
+		auto &device = add_internal_slot(config, type, tag, prim, expanded, sec, page, numpages);
+		device.set_rom_start(region, offset);
 		return device;
 	}
 	template <typename T, typename U>
 	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
-		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.set_start_address(page * 0x4000);
-		device.set_size(numpages * 0x4000);
-		device.set_rom_start(region, offset);
-		m_internal_slots.push_back(std::make_tuple(prim, true, sec, page, numpages, &device));
-		return device;
+		return add_internal_slot(config, type, tag, prim, true, sec, page, numpages, region, offset);
 	}
 	template <typename T, typename U>
 	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
-		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.set_start_address(page * 0x4000);
-		device.set_size(numpages * 0x4000);
-		device.set_rom_start(region, offset);
-		m_internal_slots.push_back(std::make_tuple(prim, false, 0, page, numpages, &device));
+		return add_internal_slot(config, type, tag, prim, false, 0, page, numpages, region, offset);
+	}
+	template <typename T, typename U>
+	auto &add_internal_disk(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	{
+		auto &device = add_internal_slot(config, type, tag, prim, true, sec, page, numpages, region, offset);
+		m_hw_def.has_fdc(true);
+		return device;
+	}
+	template <typename T, typename U>
+	auto &add_internal_disk(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	{
+		return add_internal_disk(config, type, tag, prim, true, sec, page, numpages, region, offset);
+	}
+	template <typename T, typename U>
+	auto &add_internal_disk(machine_config &config, T &&type, U &&tag, u8 prim, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	{
+		return add_internal_disk(config, type, tag, prim, false, 0, page, numpages, region, offset);
+	}
+	template <int N, typename T, typename U>
+	auto &add_internal_slot_irq(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	{
+		auto &device = add_internal_slot(config, type, tag, prim, expanded, sec, page, numpages, region, offset);
+		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
 		return device;
 	}
 	template <int N, typename T, typename U>
 	auto &add_internal_slot_irq(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
-		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.set_start_address(page * 0x4000);
-		device.set_size(numpages * 0x4000);
-		device.set_rom_start(region, offset);
-		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		m_internal_slots.push_back(std::make_tuple(prim, true, sec, page, numpages, &device));
-		return device;
+		return add_internal_slot_irq<N>(config, type, tag, prim, true, sec, page, numpages, region, offset);
 	}
 	template <int N, typename T, typename U>
 	auto &add_internal_slot_irq(machine_config &config, T &&type, U &&tag, u8 prim, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
-		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.set_start_address(page * 0x4000);
-		device.set_size(numpages * 0x4000);
-		device.set_rom_start(region, offset);
-		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		m_internal_slots.push_back(std::make_tuple(prim, false, 0, page, numpages, &device));
-		return device;
+		return add_internal_slot_irq<N>(config, type, tag, prim, false, 0, page, numpages, region, offset);
 	}
 	template <int N, typename T, typename U>
 	auto &add_internal_slot_irq_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
-		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.set_start_address(page * 0x4000);
+		auto &device = add_internal_slot_irq<N>(config, type, tag, prim, sec, page, numpages, region, offset);
 		device.set_size(0x4000);
-		device.set_rom_start(region, offset);
-		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		m_internal_slots.push_back(std::make_tuple(prim, true, sec, page, numpages, &device));
 		return device;
 	}
 	template <typename T, typename U>
-	auto &add_internal_slot_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	auto &add_internal_disk_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
 		// Memory mapped FDC registers are also accessible through page 2
-		auto &device(type(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.set_start_address(page * 0x4000);
+		auto &device = add_internal_disk(config, type, tag, prim, expanded, sec, page, numpages, region, offset);
 		device.set_size(0x4000);
-		device.set_rom_start(region, offset);
-		m_internal_slots.push_back(std::make_tuple(prim, true, sec, page, numpages, &device));
 		return device;
 	}
 	template <typename T, typename U>
-	auto &add_internal_slot_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	auto &add_internal_disk_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
-		// Memory mapped FDC registers are also accessible through page 2
-		auto &device(type(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.set_start_address(page * 0x4000);
-		device.set_size(0x4000);
-		device.set_rom_start(region, offset);
-		m_internal_slots.push_back(std::make_tuple(prim, false, 0, page, numpages, &device));
-		return device;
+		return add_internal_disk_mirrored(config, type, tag, prim, true, sec, page, numpages, region, offset);
+	}
+	template <typename T, typename U>
+	auto &add_internal_disk_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	{
+		return add_internal_disk_mirrored(config, type, tag, prim, false, 0, page, numpages, region, offset);
 	}
 	template <int N, typename T, typename U, typename V>
 	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, V &&intf, const char *deft)
 	{
-		auto &device(type(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
+		auto &device = add_base_slot(config, type, tag, prim, expanded, sec, 0, 4);
+//		auto &device(type(config, std::forward<U>(tag), 0U));
+//		device.set_memory_space(m_maincpu, AS_PROGRAM);
+//		device.set_io_space(m_maincpu, AS_IO);
+//		device.set_maincpu(m_maincpu);
 		device.option_reset();
 		intf(device);
 		device.set_default_option(deft);
 		device.set_fixed(false);
 		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		m_internal_slots.push_back(std::make_tuple(prim, expanded, sec, 0, 4, &device));
+//		m_internal_slots.push_back(std::make_tuple(prim, expanded, sec, 0, 4, &device));
 		m_hw_def.has_cartslot(true);
 		return device;
 	}
@@ -3283,13 +3268,11 @@ void msx_state::msx_fd1793_force_ready(machine_config &config)
 {
 	fd1793_device& fdc(FD1793(config, "fdc", 4_MHz_XTAL / 4));
 	fdc.set_force_ready(true);
-	m_hw_def.has_fdc(true);
 }
 
 void msx_state::msx_fd1793(machine_config &config)
 {
 	FD1793(config, "fdc", 4_MHz_XTAL / 4);
-	m_hw_def.has_fdc(true);
 }
 
 void msx_state::msx_wd2793_force_ready(machine_config &config)
@@ -3299,13 +3282,11 @@ void msx_state::msx_wd2793_force_ready(machine_config &config)
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
 	wd2793_device& fdc(WD2793(config, "fdc", 4_MHz_XTAL / 4));
 	fdc.set_force_ready(true);
-	m_hw_def.has_fdc(true);
 }
 
 void msx_state::msx_wd2793(machine_config &config)
 {
 	WD2793(config, "fdc", 4_MHz_XTAL / 4);
-	m_hw_def.has_fdc(true);
 }
 
 void msx_state::msx_mb8877a(machine_config & config)
@@ -3315,20 +3296,17 @@ void msx_state::msx_mb8877a(machine_config & config)
 	// -DDEN - pulled low
 	mb8877_device& fdc(MB8877(config, "fdc", 4_MHz_XTAL / 4));
 	fdc.set_force_ready(true);
-	m_hw_def.has_fdc(true);
 }
 
 void msx_state::msx_tc8566af(machine_config &config)
 {
 	TC8566AF(config, "fdc", 16'000'000);
-	m_hw_def.has_fdc(true);
 }
 
 void msx_state::msx_microsol(machine_config &config)
 {
 	wd2793_device& fdc(WD2793(config, "fdc", 4_MHz_XTAL / 4));
 	fdc.set_force_ready(true);
-	m_hw_def.has_fdc(true);
 }
 
 void msx_state::msx_1_35_ssdd_drive(machine_config &config)
@@ -4570,7 +4548,7 @@ void msx_state::expertdp(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "diskrom", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "diskrom", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
@@ -5064,7 +5042,7 @@ void msx_state::cf3300(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "diskrom", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "diskrom", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_mb8877a(config);
 	msx_1_35_ssdd_drive(config);
@@ -6362,7 +6340,7 @@ void msx_state::hb701fd(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1"); // Is this correct??
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1"); // Is this correct??
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
@@ -6429,7 +6407,7 @@ void msx1_v9938_state::svi738(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 4);  // 64KB RAM
 	add_cartridge_slot<1>(config, 2);
 	add_internal_slot_irq<2>(config, MSX_SLOT_RS232_SVI738, "rs232", 3, 0, 1, 1, "rs232rom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_fd1793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
@@ -7542,7 +7520,7 @@ void msx2_state::canonv30f(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom"); // EXT
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK7, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1"); // DISK
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK7, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1"); // DISK
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 
 	msx_mb8877a(config);
@@ -7678,7 +7656,7 @@ void msx2_state::cpc400(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 0, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0x80);   // 128KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 3, 0, 2, "subrom");
 	add_cartridge_slot<1>(config, 1);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "disk", 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	// Expansion slot in slot #3
 
 	msx_mb8877a(config);
@@ -7715,7 +7693,7 @@ void msx2_state::cpc400s(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 3, 0, 1, "mainrom", 0xc000);
 	add_internal_slot(config, MSX_SLOT_ROM, "hangul2", 0, 3, 1, 1, "hangul");
 	add_cartridge_slot<1>(config, 1);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 2, 1, 2, "mainrom", 0x8000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "disk", 2, 1, 2, "mainrom", 0x8000).set_tags("fdc", "fdc:0", "fdc:1");
 	// Expansion slot in slot #3
 
 	msx_mb8877a(config);
@@ -7818,7 +7796,7 @@ void msx2_state::fpc900(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x40000); // 256KB? Mapper RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
@@ -7853,7 +7831,7 @@ void msx2_state::expert20(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 1, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "xbasic", 1, 1, 1, 1, "xbasic");
-	add_internal_slot(config, MSX_SLOT_DISK5, "disk", 1, 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1", "fdc:2", "fdc:3");
+	add_internal_disk(config, MSX_SLOT_DISK5, "disk", 1, 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1", "fdc:2", "fdc:3");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 0, 4).set_total_size(0x20000).set_ramio_bits(0x80);   // 128KB Mapper RAM
 	add_cartridge_slot<2>(config, 3);
 
@@ -7926,7 +7904,7 @@ void msx2_state::mbh70(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -7969,7 +7947,7 @@ void msx2_state::kmc5000(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	MSX_S1985(config, "s1985", 0);
 
@@ -8044,7 +8022,7 @@ void msx2_state::mlg3(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_cartridge_slot<3>(config, 3, 1);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
 	add_internal_slot_irq<4>(config, MSX_SLOT_RS232_MITSUBISHI, "rs232", 3, 3, 1, 1, "rs232");
@@ -8117,7 +8095,7 @@ void msx2_state::mlg30(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_cartridge_slot<3>(config, 3, 1);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   // 128KB Mapper RAM
 	add_cartridge_slot<4>(config, 3, 3);
@@ -8159,7 +8137,7 @@ void msx2_state::mlg30_2(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_cartridge_slot<3>(config, 3, 1);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   // 128KB Mapper RAM
 	add_internal_slot_irq<4>(config, MSX_SLOT_RS232_MITSUBISHI, "rs232", 3, 3, 1, 1, "rs232");
@@ -8297,7 +8275,7 @@ void msx2_state::fs4600f(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_FS4600, "firmware", 3, 1, 0, 4, "firmware");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0x80);   // 128KB Mapper RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_kanji12_device &kanji12(MSX_KANJI12(config, "kanji12", 0));
 	kanji12.set_rom_start("kanji12");
@@ -8375,7 +8353,7 @@ void msx2_state::fs4700f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "wordpro2", 3, 1, 0, 3, "wordpro2");
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr2", 3, 1, 3, 1, "kdr2");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	MSX_S1985(config, "s1985", 0);
 
@@ -8426,7 +8404,7 @@ void msx2_state::fs5000f2(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 0, 1, 2, "kdr");
 	add_internal_slot(config, MSX_SLOT_ROM, "rtcrom", 3, 1, 1, 2, "setup");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0x80);   // 128KB Mapper RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	MSX_S1985(config, "s1985", 0);
 
@@ -8511,7 +8489,7 @@ void msx2_state::fs5500f1(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 0, 1, 2, "kdr");
 	add_internal_slot(config, MSX_SLOT_ROM, "impose", 3, 1, 1, 2, "impose");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	MSX_MATSUSHITA(config, "matsushita", 0);
 
@@ -8564,7 +8542,7 @@ void msx2_state::fs5500f2(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 0, 1, 2, "kdr");
 	add_internal_slot(config, MSX_SLOT_ROM, "impose", 3, 1, 1, 2, "impose");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	MSX_MATSUSHITA(config, "matsushita", 0);
 
@@ -8653,7 +8631,7 @@ void msx2_state::fsa1f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "mainrom", 0x10000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "cockpit", 3, 3, 1, 2, "mainrom", 0x18000);
 
 	MSX_S1985(config, "s1985", 0);
@@ -8703,7 +8681,7 @@ void msx2_state::fsa1fm(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_FSA1FM, "modem", 3, 1, 1, 1, "firmware");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_FSA1FM2, "firmware", 3, 3, 0, 3, "firmware");
 
 	msx_kanji12_device &kanji12(MSX_KANJI12(config, "kanji12", 0));
@@ -8818,7 +8796,7 @@ void msx2_state::nms8245(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "mainrom", 0x8000);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 	// Disk rom is not mirrored, but FDC registers are
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
@@ -8844,7 +8822,7 @@ void msx2_state::nms8245f(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 0, 0, 1, "maincpu", 0x18000);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "maincpu", 0x1c000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "maincpu", 0x1c000).set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
@@ -8886,7 +8864,7 @@ void msx2_state::nms8250(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom3", 3, 0, 3, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 	// ROM is not mirrored but the FDC registers are in all pages
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
@@ -8949,7 +8927,7 @@ void msx2_state::nms8255(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom3", 3, 0, 3, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 	// ROM is not mirrored but the FDC registers are in all pages
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
@@ -8981,7 +8959,7 @@ void msx2_state::nms8255f(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
@@ -9023,7 +9001,7 @@ void msx2_state::nms8260(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom3", 3, 0, 3, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 	// ROM is not mirrored but the FDC registers are in all pages
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	// There is actually only an FDC inside with a floppy controller to attach an external floppy drive
 	msx_wd2793_force_ready(config);
@@ -9055,7 +9033,7 @@ void msx2_state::nms8280(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
@@ -9087,7 +9065,7 @@ void msx2_state::nms8280f(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
@@ -9120,7 +9098,7 @@ void msx2_state::nms8280g(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
@@ -9152,7 +9130,7 @@ void msx2_state::vg8230(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);   // 64KB RAM
-	add_internal_slot(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
@@ -9203,7 +9181,7 @@ void msx2_state::vg8235(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 	// Only the FDC registers are mirrored
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
@@ -9242,7 +9220,7 @@ void msx2_state::vg8235f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 	// Only the FDC registers are mirrored
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
@@ -9274,7 +9252,7 @@ void msx2_state::vg8240(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);   // 64KB RAM
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
@@ -9323,7 +9301,7 @@ void msx2_state::ucv102(machine_config &config)
 	// Expansion slot 1 connects to slots 2-1 and 3-1 (2x 50 pin)
 	// Expansion slot 2 connects to slots 2-2 and 3-2 (2x 50 pin)
 	// Expansion slot 3 connects to slots 2-3 and 3-3 (2x 50 pin)
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	MSX_S1985(config, "s1985", 0);
 
@@ -9369,7 +9347,7 @@ void msx2_state::ax350(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "painter", 0, 3, 0, 4, "painter");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -9416,7 +9394,7 @@ void msx2_state::ax350ii(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	// mirroring not confirmed
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK8, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK8, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -9463,7 +9441,7 @@ void msx2_state::ax350iif(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	// mirroring not confirmed
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK8, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK8, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -9513,7 +9491,7 @@ void msx2_state::ax370(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "painter", 3, 1, 0, 4, "painter");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 3, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 
@@ -9561,7 +9539,7 @@ void msx2_state::ax500(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK8, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK8, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "painter", 3, 1, 0, 4, "painter");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x40000).set_ramio_bits(0xf8);   // 256KB Mapper RAM
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
@@ -9625,7 +9603,7 @@ void msx2_state::mpc2500f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 2, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000);   // 64KB?? Mapper RAM
 
 	msx_wd2793_force_ready(config);
@@ -9662,7 +9640,7 @@ void msx2_state::mpc25fd(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom_mirror2", 2, 3, 2, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom_mirror3", 2, 3, 3, 1, "subrom");
 	// Mirrored in all 4 pages (only rom or also registers?)
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);   // 64KB RAM
 
 	msx_wd2793_force_ready(config);
@@ -9699,7 +9677,7 @@ void msx2_state::mpc25fs(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom_mirror2", 2, 3, 2, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom_mirror3", 2, 3, 3, 1, "subrom");
 	// Mirrored in all 4 pages (only rom or also registers?)
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);   // 64KB RAM
 
 	msx_wd2793_force_ready(config);
@@ -9737,7 +9715,7 @@ void msx2_state::mpc27(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x20000);   // 128KB?? RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "lpen", 3, 3, 1, 1, "lpen");
 
 	msx_wd2793_force_ready(config);
@@ -9827,7 +9805,7 @@ void msx2_state::phc55fd2(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x20000);   // 128KB RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	MSX_S1985(config, "s1985", 0);
 
@@ -9869,7 +9847,7 @@ void msx2_state::phc77(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_MSX_WRITE, "msxwrite", 2, 1, 2, "msxwrite");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_DISK9, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK9, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_cartridge_slot<2>(config, 3, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 3, 0, 4);   // 64KB RAM
 
@@ -9906,7 +9884,7 @@ void msx2_state::hotbit20(machine_config &config)
 	add_cartridge_slot<1>(config, 1, 0);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 1, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "xbasic", 1, 1, 1, 1, "xbasic");
-	add_internal_slot(config, MSX_SLOT_DISK5, "disk", 1, 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1", "fdc:2", "fdc:3");
+	add_internal_disk(config, MSX_SLOT_DISK5, "disk", 1, 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1", "fdc:2", "fdc:3");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0x80);   // 128KB Mapper RAM
 	add_cartridge_slot<2>(config, 3);
 
@@ -10025,7 +10003,7 @@ void msx2_state::hbf1xd(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 3, 0, 4);   // 64KB RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -10090,7 +10068,7 @@ void msx2_state::hbf500(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram1", 0, 0, 2, 2);   // 32KB RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 0, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 0, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 0, 2, 0, 2);   // 32KB RAM
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
@@ -10127,7 +10105,7 @@ void msx2_state::hbf500_2(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);   // 64KB RAM
 
 	msx_wd2793_force_ready(config);
@@ -10159,7 +10137,7 @@ void msx2_state::hbf500f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram1", 0, 0, 2, 2);   // 32KB RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 0, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 0, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 0, 2, 0, 2);   // 32KB RAM
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
@@ -10189,7 +10167,7 @@ void msx2_state::hbf500p(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram1", 0, 0, 2, 2);   // 32KB RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "mainrom", 0x8000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 0, 1, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 0, 1, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 0, 2, 0, 2);   // 32KB RAM
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
@@ -10226,7 +10204,7 @@ void msx2_state::hbf700d(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	add_internal_slot(config, MSX_SLOT_DISK1, "disk", 3, 0, 0, 2, "extrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK1, "disk", 3, 0, 0, 2, "extrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 3, 0, 4).set_total_size(0x40000).set_ramio_bits(0x80);   // 256KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -10262,7 +10240,7 @@ void msx2_state::hbf700f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	add_internal_slot(config, MSX_SLOT_DISK1, "disk", 3, 0, 0, 2, "extrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK1, "disk", 3, 0, 0, 2, "extrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 3, 0, 4).set_total_size(0x40000).set_ramio_bits(0x80);   // 256KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -10300,7 +10278,7 @@ void msx2_state::hbf700p(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	add_internal_slot(config, MSX_SLOT_DISK1, "disk", 3, 0, 0, 2, "extrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK1, "disk", 3, 0, 0, 2, "extrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 3, 0, 4).set_total_size(0x40000).set_ramio_bits(0x80);   // 256KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -10336,7 +10314,7 @@ void msx2_state::hbf700s(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	add_internal_slot(config, MSX_SLOT_DISK1, "disk", 3, 0, 0, 2, "extrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK1, "disk", 3, 0, 0, 2, "extrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 3, 0, 4).set_total_size(0x40000).set_ramio_bits(0x80);   // 256KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -10379,7 +10357,7 @@ void msx2_state::hbf900(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 1, 0, 4).set_total_size(0x40000).set_ramio_bits(0x80);   // 256KB Mapper RAM
-	add_internal_slot(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 1, "firmware");
 
 	MSX_S1985(config, "s1985", 0);
@@ -10542,7 +10520,7 @@ void msx2_state::hbg900ap(machine_config &config)
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 0, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 0, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot_irq_mirrored<3>(config, MSX_SLOT_RS232_SONY, "rs232", 0, 2, 1, 2, "rs232");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 3, 1, 1, "firmware");
 	add_cartridge_slot<1>(config, 1);
@@ -10586,7 +10564,7 @@ void msx2_state::hbg900p(machine_config &config)
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "diskrom", 0, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "diskrom", 0, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot_irq_mirrored<3>(config, MSX_SLOT_RS232_SONY, "rs232", 0, 2, 1, 2, "rs232");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 3, 1, 1, "firmware");
 	add_cartridge_slot<1>(config, 1);
@@ -10877,7 +10855,7 @@ void msx2_state::hx34(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x8000);
-	add_internal_slot(config, MSX_SLOT_DISK6, "disk", 3, 2, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK6, "disk", 3, 2, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RS232_TOSHIBA_HX3X, "firmware", 3, 3, 1, 2, "mainrom", 0xc000);
 
 	msx_wd2793(config);
@@ -10949,7 +10927,7 @@ void msx2_state::victhc90(machine_config &config)
 	add_internal_slot_irq<2>(config, MSX_SLOT_RS232, "firmware", 0, 1, 1, 1, "firmware");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 0, 2, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
 	add_cartridge_slot<1>(config, 1);
-	add_internal_slot(config, MSX_SLOT_DISK10, "disk", 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK10, "disk", 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
@@ -10999,7 +10977,7 @@ void msx2_state::victhc95(machine_config &config)
 	// 96 pin expansion bus in slot #0-3
 	add_cartridge_slot<1>(config, 1);
 	// 96 pin expansion bus in slot #2
-	add_internal_slot(config, MSX_SLOT_DISK10, "disk", 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK10, "disk", 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_mb8877a(config);
 	msx_2_35_dd_drive(config);
@@ -11041,7 +11019,7 @@ void msx2_state::victhc95a(machine_config &config)
 	// 96 pin expansion bus in slot #0-3
 	add_cartridge_slot<1>(config, 1);
 	// 96 pin expansion bus in slot #2
-	add_internal_slot(config, MSX_SLOT_DISK10, "disk", 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK10, "disk", 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_mb8877a(config);
 	msx_2_35_dd_drive(config);
@@ -11224,7 +11202,7 @@ void msx2_state::y805128(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK11, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK11, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 	// Default: SKW-05
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
@@ -11265,7 +11243,7 @@ void msx2_state::y805256(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x40000); // 256KB Mapper RAM
 	// Default: SKW-05
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
@@ -11309,7 +11287,7 @@ void msx2_state::y805128r2(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 0, 0, 4, "firmware");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 	// This is actually the module slot
 	add_internal_slot(config, MSX_SLOT_ROM, "network", 3, 3, 0, 2, "network", 0x00000);
@@ -11370,7 +11348,7 @@ void msx2_state::expert3i(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 1, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_MUSIC, "music", 1, 1, 1, 1, "music").set_ym2413_tag("ym2413");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 1, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 1, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "ide", 1, 3, 0, 4, "ide");         /* IDE hardware needs to be emulated */
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 4).set_total_size(0x40000);       // 256KB?? Mapper RAM
 	add_cartridge_slot<2>(config, 3);
@@ -11414,7 +11392,7 @@ void msx2_state::expert3t(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 1, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_MUSIC, "music", 1, 1, 1, 1, "music").set_ym2413_tag("ym2413");
 	add_internal_slot(config, MSX_SLOT_ROM, "turbo", 1, 2, 1, 1, "turbo");          /* Turbo hardware needs to be emulated */
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 1, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 1, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 4).set_total_size(0x40000);       // 256KB Mapper RAM
 	add_cartridge_slot<2>(config, 3);
 
@@ -11456,7 +11434,7 @@ void msx2_state::expertac(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM??
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "asm", 3, 1, 1, 1, "asm");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "xbasic", 3, 3, 1, 1, "xbasic");
 
 	msx_wd2793_force_ready(config);
@@ -11493,7 +11471,7 @@ void msx2_state::expertdx(machine_config &config)
 	add_cartridge_slot<1>(config, 1, 0);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 1, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "xbasic", 1, 2, 1, 1, "xbasic");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 1, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK3, "disk", 1, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM??
 	add_cartridge_slot<2>(config, 3);
 	/* Kanji? */
@@ -11531,7 +11509,7 @@ void msx2_state::fsa1fx(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "maincpu", 0x38000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0x28000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "maincpu", 0x3c000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "maincpu", 0x3c000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 2, "maincpu", 0x20000);
 
 	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
@@ -11588,7 +11566,7 @@ void msx2_state::fsa1wsx(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_PANASONIC08, "firmware", 3, 3, 0, 4, "firmware");
 
 	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
@@ -11646,7 +11624,7 @@ void msx2_state::fsa1wx(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_PANASONIC08, "firmware", 3, 3, 0, 4, "firmware");
 
 	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
@@ -11754,7 +11732,7 @@ void msx2_state::phc70fd(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x18000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "mainrom", 0x8000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "mainrom", 0x1c000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "mainrom", 0x1c000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "mainrom", 0x00000).set_ym2413_tag("ym2413");
 	add_internal_slot(config, MSX_SLOT_ROM, "basickun", 3, 3, 2, 1, "mainrom", 0x04000);
 
@@ -11806,7 +11784,7 @@ void msx2_state::phc70fd2(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "msxmusic").set_ym2413_tag("ym2413");
 	add_internal_slot(config, MSX_SLOT_ROM, "basickun", 3, 3, 2, 1, "basickun");
 
@@ -11850,7 +11828,7 @@ void msx2_state::hbf1xdj(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "mainrom", 0x10000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "mainrom", 0x18000).set_ym2413_tag("ym2413");
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
@@ -11895,7 +11873,7 @@ void msx2_state::hbf1xv(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "mainrom", 0x10000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 2, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "mainrom", 0x18000).set_ym2413_tag("ym2413");
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
@@ -11945,7 +11923,7 @@ void msx2_state::fsa1gt(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x20000);   // 128KB?? Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 1, 0, 1, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0x1c000);
-	add_internal_slot(config, MSX_SLOT_DISK4, "dos", 3, 2, 1, 3, "maincpu", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK4, "dos", 3, 2, 1, 3, "maincpu", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "firm", 3, 3, 0, 4, "maincpu", 0x6c000);
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
@@ -11991,7 +11969,7 @@ void msx2_state::fsa1st(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x20000);   // 128KB?? Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 1, 0, 1, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0x1c000);
-	add_internal_slot(config, MSX_SLOT_DISK4, "dos", 3, 2, 1, 3, "maincpu", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_disk(config, MSX_SLOT_DISK4, "dos", 3, 2, 1, 3, "maincpu", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "firm", 3, 3, 0, 4, "maincpu", 0x6c000);
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
