@@ -972,7 +972,7 @@ protected:
 		return device;
 	}
 	template <int N, typename T, typename U, typename V>
-	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, V &&intf, const char *deft)
+	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, V &&intf, const char *deft)
 	{
 		auto &device(type(config, std::forward<U>(tag), 0U));
 		device.set_memory_space(m_maincpu, AS_PROGRAM);
@@ -983,69 +983,33 @@ protected:
 		device.set_default_option(deft);
 		device.set_fixed(false);
 		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		m_internal_slots.push_back(std::make_tuple(prim, true, sec, 0, 4, &device));
+		m_internal_slots.push_back(std::make_tuple(prim, expanded, sec, 0, 4, &device));
 		m_hw_def.has_cartslot(true);
 		return device;
 	}
 	template <int N, typename T, typename U, typename V>
+	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, V &&intf, const char *deft)
+	{
+		return add_cartridge_slot<N>(config, type, tag, prim, true, sec, intf, deft);
+	}
+	template <int N, typename T, typename U, typename V>
 	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, V &&intf, const char *deft)
 	{
-		auto &device(type(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.option_reset();
-		intf(device);
-		device.set_default_option(deft);
-		device.set_fixed(false);
-		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		m_internal_slots.push_back(std::make_tuple(prim, false, 0, 0, 4, &device));
-		m_hw_def.has_cartslot(true);
-		return device;
+		return add_cartridge_slot<N>(config, type, tag, prim, false, 0, intf, deft);
 	}
 	template <int N>
 	auto &add_cartridge_slot(machine_config &config, u8 prim, u8 sec)
 	{
 		std::string tag = "cartslot";
 		tag += std::to_string(N);
-		auto &device(MSX_SLOT_CARTRIDGE(config, tag.c_str(), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.option_reset();
-		msx_cart(device);
-		device.set_default_option(nullptr);
-		device.set_fixed(false);
-		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		m_internal_slots.push_back(std::make_tuple(prim, true, sec, 0, 4, &device));
-		m_hw_def.has_cartslot(true);
-		return device;
+		return add_cartridge_slot<N>(config, MSX_SLOT_CARTRIDGE, tag.c_str(), prim, true, sec, msx_cart, nullptr);
 	}
 	template <int N>
 	auto &add_cartridge_slot(machine_config &config, u8 prim)
 	{
 		std::string tag = "cartslot";
 		tag += std::to_string(N);
-		auto &device(MSX_SLOT_CARTRIDGE(config, tag.c_str(), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		device.option_reset();
-		msx_cart(device);
-		device.set_default_option(nullptr);
-		device.set_fixed(false);
-		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		m_internal_slots.push_back(std::make_tuple(prim, false, 0, 0, 4, &device));
-		m_hw_def.has_cartslot(true);
-		return device;
-	}
-	template <int N>
-	auto &add_cartridge_slot(machine_config &config)
-	{
-		std::string tag = "cartslot";
-		tag += std::to_string(N);
-		m_cartslot[N - 1] = &add_cartridge_slot<N>(config, MSX_SLOT_CARTRIDGE, tag.c_str(), 3, 3, msx_cart, nullptr);
-		return m_cartslot[N - 1];
+		return add_cartridge_slot<N>(config, MSX_SLOT_CARTRIDGE, tag.c_str(), prim, false, 0, msx_cart, nullptr);
 	}
 	virtual void driver_start() override;
 	virtual void machine_start() override;
