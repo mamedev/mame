@@ -959,16 +959,11 @@ protected:
 	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, V &&intf, const char *deft)
 	{
 		auto &device = add_base_slot(config, type, tag, prim, expanded, sec, 0, 4);
-//		auto &device(type(config, std::forward<U>(tag), 0U));
-//		device.set_memory_space(m_maincpu, AS_PROGRAM);
-//		device.set_io_space(m_maincpu, AS_IO);
-//		device.set_maincpu(m_maincpu);
 		device.option_reset();
 		intf(device);
 		device.set_default_option(deft);
 		device.set_fixed(false);
 		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-//		m_internal_slots.push_back(std::make_tuple(prim, expanded, sec, 0, 4, &device));
 		m_hw_def.has_cartslot(true);
 		return device;
 	}
