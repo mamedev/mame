@@ -1932,7 +1932,6 @@ void m72_state::m81_hharry(machine_config &config)
 void m72_state::m81_xmultipl(machine_config &config)
 {
 	m81_hharry(config);
-	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::xmultipl_map);
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,xmultipl) // different offsets
@@ -1940,7 +1939,7 @@ void m72_state::m81_xmultipl(machine_config &config)
 
 void m72_state::m81_dbreed(machine_config &config)
 {
-	m81_xmultipl(config);
+	m81_hharry(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::dbreed_map);
 }
 
