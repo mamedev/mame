@@ -737,57 +737,66 @@ void a800_state::a800_mem(address_map &map)
 	// ...
 }
 
+// from a800xl onward HW I/O map punches thru kernel view,
+// for simplicity we just delay mapping former.
 
+void a800xl_state::a800xl_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).rw(FUNC(a800xl_state::a800xl_low_r), FUNC(a800xl_state::a800xl_low_w));
+	map(0xc000, 0xffff).view(m_kernel_view);
+	m_kernel_view[0](0xc000, 0xffff).rw(FUNC(a800xl_state::ram_r<0xc000>), FUNC(a800xl_state::ram_w<0xc000>));
+	m_kernel_view[1](0xc000, 0xffff).rom().region("maincpu", 0xc000);
+	map(0xd000, 0xd7ff).m(*this, FUNC(a800xl_state::hw_iomap));
+}
+
+// TODO: convert to RAM device
 void a600xl_state::a600xl_mem(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x3fff).ram();
 	map(0x5000, 0x57ff).r(FUNC(a600xl_state::a600xl_low_r));    // self test or NOP
 	map(0xa000, 0xbfff).rom(); // BASIC
 	map(0xc000, 0xcfff).rom(); // OS
-	map(0xd000, 0xd7ff).m(*this, FUNC(a600xl_state::hw_iomap));
 	map(0xd800, 0xffff).view(m_kernel_view);
-	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(a600xl_state::ram_r<0xd800>), FUNC(a600xl_state::ram_w<0xd800>));
+//	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(a600xl_state::ram_r<0xd800>), FUNC(a600xl_state::ram_w<0xd800>));
+	m_kernel_view[0](0xd800, 0xffff).unmaprw();
 	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);
+	map(0xd000, 0xd7ff).m(*this, FUNC(a600xl_state::hw_iomap));
 }
 
 
 void a1200xl_state::a1200xl_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a1200xl_state::a1200xl_low_r), FUNC(a1200xl_state::a1200xl_low_w));
+	map.unmap_value_high();
+
+	map(0x0000, 0xbfff).rw(FUNC(a1200xl_state::a1200xl_low_r), FUNC(a1200xl_state::a1200xl_low_w));
+	map(0xc000, 0xffff).view(m_kernel_view);
+	m_kernel_view[0](0xc000, 0xffff).rw(FUNC(a1200xl_state::ram_r<0xc000>), FUNC(a1200xl_state::ram_w<0xc000>));
+	m_kernel_view[1](0xc000, 0xffff).rom().region("maincpu", 0xc000);
 	map(0xd000, 0xd7ff).m(*this, FUNC(a1200xl_state::hw_iomap));
-	map(0xd800, 0xffff).view(m_kernel_view);
-	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(a1200xl_state::ram_r<0xd800>), FUNC(a1200xl_state::ram_w<0xd800>));
-	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);
-}
-
-
-void a800xl_state::a800xl_mem(address_map &map)
-{
-	map(0x0000, 0xcfff).rw(FUNC(a800xl_state::a800xl_low_r), FUNC(a800xl_state::a800xl_low_w));
-	map(0xd000, 0xd7ff).m(*this, FUNC(a800xl_state::hw_iomap));
-	map(0xd800, 0xffff).view(m_kernel_view);
-	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(a800xl_state::ram_r<0xd800>), FUNC(a800xl_state::ram_w<0xd800>));
-	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);
 }
 
 
 void a130xe_state::a130xe_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(a130xe_state::a130xe_low_r), FUNC(a130xe_state::a130xe_low_w));
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).rw(FUNC(a130xe_state::a130xe_low_r), FUNC(a130xe_state::a130xe_low_w));
+	map(0xc000, 0xffff).view(m_kernel_view);
+	m_kernel_view[0](0xc000, 0xffff).rw(FUNC(a130xe_state::ram_r<0xc000>), FUNC(a130xe_state::ram_w<0xc000>));
+	m_kernel_view[1](0xc000, 0xffff).rom().region("maincpu", 0xc000);
 	map(0xd000, 0xd7ff).m(*this, FUNC(a130xe_state::hw_iomap));
-	map(0xd800, 0xffff).view(m_kernel_view);
-	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(a130xe_state::ram_r<0xd800>), FUNC(a130xe_state::ram_w<0xd800>));
-	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);
 }
 
 
 void xegs_state::xegs_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(FUNC(xegs_state::xegs_low_r), FUNC(xegs_state::xegs_low_w));
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).rw(FUNC(xegs_state::xegs_low_r), FUNC(xegs_state::xegs_low_w));
+	map(0xc000, 0xffff).view(m_kernel_view);
+	m_kernel_view[0](0xc000, 0xffff).rw(FUNC(xegs_state::ram_r<0xc000>), FUNC(xegs_state::ram_w<0xc000>));
+	m_kernel_view[1](0xc000, 0xffff).rom().region("maincpu", 0xc000);
 	map(0xd000, 0xd7ff).m(*this, FUNC(xegs_state::hw_iomap));
-	map(0xd800, 0xffff).view(m_kernel_view);
-	m_kernel_view[0](0xd800, 0xffff).rw(FUNC(xegs_state::ram_r<0xd800>), FUNC(xegs_state::ram_w<0xd800>));
-	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);
 }
 
 
