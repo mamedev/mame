@@ -1683,6 +1683,15 @@ bool wd_fdc_device_base::read_one_bit(const attotime &limit)
 	return false;
 }
 
+void wd_fdc_device_base::extract_data_reg()
+{
+	cur_live.data_reg = 0;
+	for (int bit = 0; bit < 8; bit++) {
+		if (cur_live.shift_reg & (1<<(bit*2)))
+			cur_live.data_reg |= (1<<bit);
+	}
+}
+
 bool wd_fdc_device_base::write_one_bit(const attotime &limit)
 {
 	bool bit = cur_live.shift_reg & 0x8000;
@@ -1925,6 +1934,8 @@ void wd_fdc_device_base::live_run(attotime limit)
 						cur_live.shift_reg == 0xf56e ? 0xafa5 :
 						0xbf84;
 
+					extract_data_reg();
+
 					if(extended_ddam) {
 						if(!(cur_live.data_reg & 1))
 							status |= S_DDM;
@@ -2033,7 +2044,10 @@ void wd_fdc_device_base::live_run(attotime limit)
 				// FM resyncs
 				&& !(dden && (cur_live.shift_reg == 0xf57e      // FM IDAM
 							|| cur_live.shift_reg == 0xf56f     // FM DAM
-							|| cur_live.shift_reg == 0xf56a))   // FM DDAM
+							|| cur_live.shift_reg == 0xf56a     // FM DDAM
+							|| cur_live.shift_reg == 0xf56b     // FM DDAM
+							|| cur_live.shift_reg == 0xf56e     // FM DDAM
+							|| cur_live.shift_reg == 0xf56f))   // FM DDAM
 				)
 				break;
 
@@ -2054,6 +2068,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			cur_live.bit_counter = 0;
 
 			if(output_byte) {
+				extract_data_reg();
 				live_delay(READ_TRACK_DATA_BYTE);
 				return;
 			}

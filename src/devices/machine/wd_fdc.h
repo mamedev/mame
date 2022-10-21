@@ -357,7 +357,7 @@ private:
 	void live_run(attotime limit = attotime::never);
 	bool read_one_bit(const attotime &limit);
 	bool write_one_bit(const attotime &limit);
-
+	void extract_data_reg();
 	void live_write_raw(uint16_t raw);
 	void live_write_mfm(uint8_t mfm);
 	void live_write_fm(uint8_t fm);
