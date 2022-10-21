@@ -102,6 +102,7 @@
 
 #include "emu.h"
 #include "disk.h"
+#include "formats/dmk_dsk.h"
 #include "formats/msx_dsk.h"
 #include "softlist_dev.h"
 
@@ -115,6 +116,7 @@ void msx_cart_disk_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_MSX_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
 }
 
 

@@ -33,11 +33,14 @@ set on 7FFDH bit 2 always to 0 (some use it as disk change reset)
 
 #include "emu.h"
 #include "disk.h"
+#include "formats/dmk_dsk.h"
+#include "formats/msx_dsk.h"
 
 
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK1, msx_slot_disk1_device, "msx_slot_disk1", "MSX Internal floppy type 1")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK2, msx_slot_disk2_device, "msx_slot_disk2", "MSX Internal floppy type 2")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK3, msx_slot_disk3_device, "msx_slot_disk3", "MSX Internal floppy type 3")
+DEFINE_DEVICE_TYPE(MSX_SLOT_DISK3_2_DRIVES, msx_slot_disk3_2_drives_device, "msx_slot_disk3_2_drives", "MSX Internal floppy type 3 - 2 Drives")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK4, msx_slot_disk4_device, "msx_slot_disk4", "MSX Internal floppy type 4")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK5, msx_slot_disk5_device, "msx_slot_disk5", "MSX Internal floppy type 5")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK6, msx_slot_disk6_device, "msx_slot_disk6", "MSX Internal floppy type 6")
@@ -46,6 +49,20 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_DISK8, msx_slot_disk8_device, "msx_slot_disk8", "MSX
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK9, msx_slot_disk9_device, "msx_slot_disk9", "MSX Internal floppy type 9")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK10, msx_slot_disk10_device, "msx_slot_disk10", "MSX Internal floppy type 10")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK11, msx_slot_disk11_device, "msx_slot_disk11", "MSX Internal floppy type 11")
+
+
+static void msx_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35ssdd", FLOPPY_35_SSDD);
+}
+
+void msx_slot_disk_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MSX_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 
 msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -67,11 +84,6 @@ msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device
 void msx_slot_disk_device::device_start()
 {
 	msx_slot_rom_device::device_start();
-
-	if (m_fdc_tag == nullptr)
-	{
-		fatalerror("msx_slot_disk_device: no FDC tag specified\n");
-	}
 
 	m_floppy0 = m_floppy0_tag ? owner()->subdevice<floppy_connector>(m_floppy0_tag) : nullptr;
 	m_floppy1 = m_floppy1_tag ? owner()->subdevice<floppy_connector>(m_floppy1_tag) : nullptr;
@@ -97,6 +109,11 @@ void msx_slot_wd_disk_device::device_start()
 {
 	msx_slot_disk_device::device_start();
 
+	if (m_fdc_tag == nullptr)
+	{
+		fatalerror("msx_slot_wd_disk_device: no FDC tag specified\n");
+	}
+
 	m_led.resolve();
 	m_fdc = owner()->subdevice<wd_fdc_analog_device_base>(m_fdc_tag);
 
@@ -109,21 +126,21 @@ void msx_slot_wd_disk_device::device_start()
 
 msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
-	, m_fdc(nullptr)
+	, m_fdc(*this, "fdc")
 {
 }
 
+void msx_slot_tc8566_disk_device::device_add_mconfig(machine_config &config)
+{
+	TC8566AF(config, m_fdc, 16'000'000);
+
+	// Double sided 3.5" floppy drive
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+}
 
 void msx_slot_tc8566_disk_device::device_start()
 {
 	msx_slot_disk_device::device_start();
-
-	m_fdc = owner()->subdevice<tc8566af_device>(m_fdc_tag);
-
-	if (m_fdc == nullptr)
-	{
-		fatalerror("msx_slot_tc8566_disk_device: Unable to find FDC with tag '%s'\n", m_fdc_tag);
-	}
 }
 
 
@@ -456,6 +473,11 @@ msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, cons
 {
 }
 
+msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: msx_slot_tc8566_disk_device(mconfig, type, tag, owner, clock)
+{
+}
+
 void msx_slot_disk3_device::device_start()
 {
 	msx_slot_tc8566_disk_device::device_start();
@@ -474,6 +496,21 @@ void msx_slot_disk3_device::device_start()
 	page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
 	page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 }
+
+
+msx_slot_disk3_2_drives_device::msx_slot_disk3_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: msx_slot_disk3_device(mconfig, MSX_SLOT_DISK3_2_DRIVES, tag, owner, clock)
+{
+}
+
+void msx_slot_disk3_2_drives_device::device_add_mconfig(machine_config &config)
+{
+	msx_slot_disk3_device::device_add_mconfig(config);
+		
+	FLOPPY_CONNECTOR(config, "fdc:1", msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+}
+
+
 
 
 

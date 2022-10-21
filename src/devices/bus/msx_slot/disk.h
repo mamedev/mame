@@ -18,6 +18,7 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1, msx_slot_disk1_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK2, msx_slot_disk2_device)
 /* TC8566 accessed through 7ff8-7fff */
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK3, msx_slot_disk3_device)
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK3_2_DRIVES, msx_slot_disk3_2_drives_device)
 /* TC8566 accessed through 7ff0-7ff7 (used in Turob-R, untested) */
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK4, msx_slot_disk4_device)
 /* WD FDC accessed through i/o ports 0xd0-0xd4 */
@@ -64,6 +65,7 @@ public:
 protected:
 	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	static void floppy_formats(format_registration &fr);
 	virtual void device_start() override;
 
 	floppy_connector *m_floppy0;
@@ -98,8 +100,9 @@ protected:
 	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
-	tc8566af_device *m_fdc;
+	required_device<tc8566af_device> m_fdc;
 };
 
 
@@ -149,7 +152,19 @@ public:
 	msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	msx_slot_disk3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override;
+};
+
+
+class msx_slot_disk3_2_drives_device : public msx_slot_disk3_device
+{
+public:
+	msx_slot_disk3_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
