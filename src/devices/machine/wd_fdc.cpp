@@ -1683,13 +1683,12 @@ bool wd_fdc_device_base::read_one_bit(const attotime &limit)
 	return false;
 }
 
-void wd_fdc_device_base::extract_data_reg()
+void wd_fdc_device_base::reset_data_sync()
 {
-	cur_live.data_reg = 0;
-	for (int bit = 0; bit < 8; bit++) {
-		if (cur_live.shift_reg & (1<<(bit*2)))
-			cur_live.data_reg |= (1<<bit);
-	}
+	cur_live.data_separator_phase = false;
+	cur_live.bit_counter = 0;
+
+	cur_live.data_reg = bitswap<8>(cur_live.shift_reg, 14, 12, 10, 8, 6, 4, 2, 0);
 }
 
 bool wd_fdc_device_base::write_one_bit(const attotime &limit)
@@ -1934,7 +1933,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 						cur_live.shift_reg == 0xf56e ? 0xafa5 :
 						0xbf84;
 
-					extract_data_reg();
+					reset_data_sync();
 
 					if(extended_ddam) {
 						if(!(cur_live.data_reg & 1))
@@ -1944,8 +1943,6 @@ void wd_fdc_device_base::live_run(attotime limit)
 					} else if((cur_live.data_reg & 0xfe) == 0xf8)
 						status |= S_DDM;
 
-					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 0;
 					cur_live.state = READ_SECTOR_DATA;
 				}
 			}
@@ -2064,11 +2061,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 			// MZ: TI99 "DISkASSEMBLER" copy protection requires a threshold of 8
 			bool output_byte = cur_live.bit_counter > 8;
 
-			cur_live.data_separator_phase = false;
-			cur_live.bit_counter = 0;
+			reset_data_sync();
 
 			if(output_byte) {
-				extract_data_reg();
 				live_delay(READ_TRACK_DATA_BYTE);
 				return;
 			}
