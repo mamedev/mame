@@ -594,7 +594,7 @@ void a130xe_state::a130xe_mem(address_map &map)
 	// TODO: map cart space overlays
 	map(0x8000, 0x9fff).rw(FUNC(a130xe_state::ram_r<0x8000>), FUNC(a130xe_state::ram_w<0x8000>));
 	map(0xa000, 0xbfff).view(m_basic_view);
-	m_basic_view[0](0xa000, 0xbfff).rw(FUNC(a800xl_state::ram_r<0xa000>), FUNC(a800xl_state::ram_w<0xa000>));
+	m_basic_view[0](0xa000, 0xbfff).rw(FUNC(a130xe_state::ram_r<0xa000>), FUNC(a130xe_state::ram_w<0xa000>));
 	m_basic_view[1](0xa000, 0xbfff).rom().region("maincpu", 0xa000);
 	map(0xc000, 0xffff).view(m_kernel_view);
 	m_kernel_view[0](0xc000, 0xffff).rw(FUNC(a130xe_state::ram_r<0xc000>), FUNC(a130xe_state::ram_w<0xc000>));
