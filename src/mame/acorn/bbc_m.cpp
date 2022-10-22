@@ -967,7 +967,7 @@ WRITE_LINE_MEMBER(bbc_state::lpstb_w)
 int bbc_state::get_analogue_input(int channel_number)
 {
 	if (m_analog)
-		return ((0xff - m_analog->ch_r(channel_number)) << 8);
+		return m_analog->ch_r(channel_number) << 8;
 	else
 		return 0xff;
 }
