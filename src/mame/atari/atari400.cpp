@@ -52,6 +52,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
+#include "machine/bankdev.h"
 #include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -441,7 +442,6 @@ public:
 	void a130xe(machine_config &config);
 
 private:
-	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void a130xe_mem(address_map &map);
@@ -449,7 +449,10 @@ private:
 	virtual void portb_cb(uint8_t data) override;
 
 	memory_view m_ext_view;
-	required_memory_bank m_ext_bank;
+	required_device<address_map_bank_device> m_ext_bank;
+
+	void extram_map(address_map &map);
+
 };
 
 class xegs_state : public a800xl_state
@@ -472,8 +475,6 @@ private:
 
 	void xegs_mem(address_map &map);
 };
-
-
 
 class a5200_state : public a400_state
 {
@@ -573,7 +574,14 @@ void a800xl_state::a800xl_mem(address_map &map)
 	m_basic_view[1](0xa000, 0xbfff).rom().region("maincpu", 0xa000);
 }
 
-// TODO: have to repeat everything in order to avoid "Fatal error: A memory_view can be present in only one address map." happening for selftest_view ...
+// selftest ROM has still priority over regular a130xe extended RAM
+// cfr. a130xe MMU test in Acid800
+void a130xe_state::extram_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).mirror(0x10000).rw(FUNC(a130xe_state::ram_r<0x10000>), FUNC(a130xe_state::ram_w<0x10000>));
+	map(0x11000, 0x117ff).mirror(0x0c000).rom().region("maincpu", 0xd000).unmapw();
+}
+
 void a130xe_state::a130xe_mem(address_map &map)
 {
 	map.unmap_value_high();
@@ -582,7 +590,7 @@ void a130xe_state::a130xe_mem(address_map &map)
 	m_ext_view[0](0x4000, 0x7fff).view(m_selftest_view);
 	selftest_map(m_selftest_view[0], false);
 	selftest_map(m_selftest_view[1], true);
-	m_ext_view[1](0x4000, 0x7fff).bankrw(m_ext_bank);
+	m_ext_view[1](0x4000, 0x7fff).m(m_ext_bank, FUNC(address_map_bank_device::amap8));
 	map(0x8000, 0x9fff).rw(FUNC(a130xe_state::ram_r<0x8000>), FUNC(a130xe_state::ram_w<0x8000>));
 	map(0xa000, 0xbfff).view(m_basic_view);
 	m_basic_view[0](0xa000, 0xbfff).rw(FUNC(a130xe_state::ram_r<0xa000>), FUNC(a130xe_state::ram_w<0xa000>));
@@ -1968,12 +1976,6 @@ void xegs_state::machine_start()
 	m_bank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x2000);
 }
 
-void a130xe_state::machine_start()
-{
-	a1200xl_state::machine_start();
-	m_ext_bank->configure_entries(0, 4, m_ram->pointer() + 0x10000, 0x4000);
-}
-
 void a400_state::machine_reset()
 {
 	m_pokey->write(15, 0);
@@ -2003,7 +2005,7 @@ void a130xe_state::machine_reset()
 {
 	a800xl_state::machine_reset();
 	m_ext_view.select(0);
-	m_ext_bank->set_entry(3);
+	m_ext_bank->set_bank(3);
 }
 
 
@@ -2129,7 +2131,8 @@ void a130xe_state::portb_cb(uint8_t data)
 	if (!BIT(data, 4))
 	{
 		m_ext_view.select(1);
-		m_ext_bank->set_entry((data & 0xc) >> 2);
+		const bool selftest_enabled = (data & 0x81) == 0x01;
+		m_ext_bank->set_bank((data & 0xc) >> 2 | (selftest_enabled << 2));
 	}
 	else
 		m_ext_view.select(0);
@@ -2381,6 +2384,8 @@ void a130xe_state::a130xe(machine_config &config)
 
 	// minimum RAM 128KB, further sizes with optional modules
 	m_ram->set_default_size("128K");
+
+	ADDRESS_MAP_BANK(config, m_ext_bank).set_map(&a130xe_state::extram_map).set_options(ENDIANNESS_LITTLE, 8, 16 + 1, 0x4000);
 }
 
 // memory map XEGS
@@ -2434,8 +2439,8 @@ void a5200_state::a5200(machine_config &config)
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("a5200");
 
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("16K");
+	// not installable like at all?
+	//config.device_remove("ram");
 }
 
 /*
