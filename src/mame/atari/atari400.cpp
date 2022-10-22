@@ -20,8 +20,7 @@
       soft reset;
     - a1200xl: requires reading TRIG3 high for detecting a cart inserted,
       depends on above;
-    - a600xl, a1200xl: specifically fails MMU test in Acid800 (other machines
-      all passes)
+    - a600xl, a800xl, a1200xl: crashes on MMU test in Acid800;
     - eventually support unofficial mod for dual Pokey,
       either make it a specific franken-machine with a130xe as base or use
       slots.
@@ -381,7 +380,6 @@ protected:
 	void atari_xl_common(machine_config &config);
 
 	void a1200xl_mem(address_map &map);
-	virtual void pia_portb_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -391,9 +389,13 @@ protected:
 	memory_view m_kernel_view;
 	memory_view m_selftest_view;
 
-	uint8_t m_mmu;
+	virtual void portb_cb(uint8_t data);
 
 	void selftest_map(memory_view::memory_view_entry &block, bool is_rom_mapping);
+private:
+	void pia_portb_w(uint8_t data);
+
+	uint8_t m_mmu;
 };
 
 class a800xl_state : public a1200xl_state
@@ -410,7 +412,7 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	virtual void pia_portb_w(uint8_t data) override;
+	virtual void portb_cb(uint8_t data) override;
 
 	void a800xl_mem(address_map &map);
 
@@ -427,7 +429,7 @@ public:
 	void a600xl(machine_config &config);
 
 private:
-	virtual void pia_portb_w(uint8_t data) override;
+	virtual void portb_cb(uint8_t data) override;
 	void a600xl_mem(address_map &map);
 };
 
@@ -448,7 +450,7 @@ private:
 
 	void a130xe_mem(address_map &map);
 
-	virtual void pia_portb_w(uint8_t data) override;
+	virtual void portb_cb(uint8_t data) override;
 
 	memory_view m_ext_view;
 	required_memory_bank m_ext_bank;
@@ -468,7 +470,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void pia_portb_w(uint8_t data) override;
+	virtual void portb_cb(uint8_t data) override;
 
 	required_memory_bank m_bank;
 
@@ -558,7 +560,6 @@ void a1200xl_state::a1200xl_mem(address_map &map)
 	map(0x4000, 0x7fff).view(m_selftest_view);
 	selftest_map(m_selftest_view[0], false);
 	selftest_map(m_selftest_view[1], true);
-	// TODO: map cart space overlays
 	map(0x8000, 0x9fff).rw(FUNC(a1200xl_state::ram_r<0x8000>), FUNC(a1200xl_state::ram_w<0x8000>));
 	map(0xa000, 0xbfff).rw(FUNC(a1200xl_state::ram_r<0xa000>), FUNC(a1200xl_state::ram_w<0xa000>));
 	map(0xc000, 0xffff).view(m_kernel_view);
@@ -604,7 +605,6 @@ void a130xe_state::a130xe_mem(address_map &map)
 	selftest_map(m_selftest_view[0], false);
 	selftest_map(m_selftest_view[1], true);
 	m_ext_view[1](0x4000, 0x7fff).bankrw(m_ext_bank);
-	// TODO: map cart space overlays
 	map(0x8000, 0x9fff).rw(FUNC(a130xe_state::ram_r<0x8000>), FUNC(a130xe_state::ram_w<0x8000>));
 	map(0xa000, 0xbfff).view(m_basic_view);
 	m_basic_view[0](0xa000, 0xbfff).rw(FUNC(a130xe_state::ram_r<0xa000>), FUNC(a130xe_state::ram_w<0xa000>));
@@ -2077,49 +2077,49 @@ uint8_t a400_state::djoy_b_r()
 	return b;
 }
 
-// TODO: make sure direction bits are honored for all these portb defs.
+void a1200xl_state::pia_portb_w(uint8_t data)
+{
+	const u8 dir = m_pia->port_b_z_mask();
+
+	// On a1200xl BIOS jumps from PC=0xc550, expecting ROM to be still
+	// enabled at PC=0xe40c, expecting the dir to work properly.
+	const u8 new_mmu = (data & ~dir) | (m_mmu & dir);
+
+	if (m_mmu != new_mmu)
+	{
+		m_mmu = new_mmu;
+		portb_cb(m_mmu);
+	}
+}
+
 /*
  * x--- ---- /DRE (1) 0x5000-0x57ff self-test ROM enabled if also kernel ROM enabled
  *                (0) RAM or NOP
  * ---- --x- /BAE (0) 0xa000-0xbfff BASIC ROM enabled (1) disabled
  * ---- ---x /OSE (1) 0xd800-0xffff kernel ROM enable (0) RAM
  */
-void a800xl_state::pia_portb_w(uint8_t data)
+void a800xl_state::portb_cb(uint8_t data)
 {
-	if (m_pia->port_b_z_mask() != 0xff)
-	{
-		m_mmu = data;
-		m_kernel_view.select(BIT(m_mmu, 0));
-		m_basic_view.select(!BIT(m_mmu, 1));
-		m_selftest_view.select((m_mmu & 0x81) == 0x01);
-	}
+	m_kernel_view.select(BIT(data, 0));
+	m_basic_view.select(!BIT(data, 1));
+	m_selftest_view.select((data & 0x81) == 0x01);
 }
 
 // TODO: a600xl_state shouldn't really virtualize this (same as a800xl portb), investigate
-void a600xl_state::pia_portb_w(uint8_t data)
+void a600xl_state::portb_cb(uint8_t data)
 {
-	const u8 dir = m_pia->port_b_z_mask();
-
-	m_mmu = (data & ~dir) | (m_mmu & dir);
-	m_kernel_view.select(BIT(m_mmu, 0));
-	m_basic_view.select(!BIT(m_mmu, 1));
-	m_selftest_view.select((m_mmu & 0x81) == 0x01);
+	a800xl_state::portb_cb(data);
 }
 
 /*
  * same as a800xl plus:
  * ---- xx-- LED states (specific for this variant only)
+ * Note: basic ROM not present so bit 1 doesn't do anything
  */
-void a1200xl_state::pia_portb_w(uint8_t data)
+void a1200xl_state::portb_cb(uint8_t data)
 {
-	const u8 dir = m_pia->port_b_z_mask();
-
-	// BIOS jumps from PC=0xc550, expecting ROM to be still enabled at PC=0xe40c
-	// it expects the dir to work properly.
-	m_mmu = (data & ~dir) | (m_mmu & dir);
-
-	m_kernel_view.select(BIT(m_mmu, 0));
-	m_selftest_view.select((m_mmu & 0x81) == 0x01);
+	m_kernel_view.select(BIT(data, 0));
+	m_selftest_view.select((data & 0x81) == 0x01);
 }
 
 /*
@@ -2127,25 +2127,22 @@ void a1200xl_state::pia_portb_w(uint8_t data)
  * -x-- ---- (0) enables Missile Command ROM at 0xa000-0xbfff, ignored if BASIC ROM bit 1 also 0
  *           (BASIC has higher priority)
  *
- * To access Missile Command, hold select while booting the machine
+ * To access Missile Command with a keyboard connected
+ * hold console SELECT switch while booting the machine
  */
-void xegs_state::pia_portb_w(uint8_t data)
+void xegs_state::portb_cb(uint8_t data)
 {
-	if (m_pia->port_b_z_mask() != 0xff)
+	m_kernel_view.select(BIT(data, 0));
+	const bool game_rom = !BIT(data, 6);
+	const bool basic_rom = !BIT(data, 1);
+	if (game_rom || basic_rom)
 	{
-		m_mmu = data;
-		m_kernel_view.select(BIT(m_mmu, 0));
-		const bool game_rom = !BIT(m_mmu, 6);
-		const bool basic_rom = !BIT(m_mmu, 1);
-		if (game_rom || basic_rom)
-		{
-			m_basic_view.select(1);
-			m_bank->set_entry(basic_rom);
-		}
-		else
-			m_basic_view.select(0);
-		m_selftest_view.select((m_mmu & 0x81) == 0x01);
+		m_basic_view.select(1);
+		m_bank->set_entry(basic_rom);
 	}
+	else
+		m_basic_view.select(0);
+	m_selftest_view.select((data & 0x81) == 0x01);
 }
 
 /*
@@ -2154,22 +2151,16 @@ void xegs_state::pia_portb_w(uint8_t data)
  * ---x ---- CPU extended memory access enable
  * ---- xx-- 0x4000-0x7fff extended RAM bank select
  */
-void a130xe_state::pia_portb_w(uint8_t data)
+void a130xe_state::portb_cb(uint8_t data)
 {
-	if (m_pia->port_b_z_mask() != 0xff)
+	a800xl_state::portb_cb(data);
+	if (!BIT(data, 4))
 	{
-		m_mmu = data;
-		m_kernel_view.select(BIT(m_mmu, 0));
-		m_basic_view.select(!BIT(m_mmu, 1));
-		m_selftest_view.select((m_mmu & 0x81) == 0x01);
-		if (!BIT(m_mmu, 4))
-		{
-			m_ext_view.select(1);
-			m_ext_bank->set_entry((data & 0xc) >> 2);
-		}
-		else
-			m_ext_view.select(0);
+		m_ext_view.select(1);
+		m_ext_bank->set_entry((data & 0xc) >> 2);
 	}
+	else
+		m_ext_view.select(0);
 }
 
 // TODO: propagate portb to RAMBO XL and COMPY sub-devices for a800xl and onward
@@ -2413,7 +2404,7 @@ void a800xl_state::a800xlpal(machine_config &config)
 	m_pokey->set_clock(1773000);
 }
 
-// memory map A130XE (extra RAM only partially emulated)
+// memory map A130XE
 void a130xe_state::a130xe(machine_config &config)
 {
 	a800xl(config);
@@ -2421,10 +2412,11 @@ void a130xe_state::a130xe(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a130xe_state::a130xe_mem);
 //  m_pia->writepb_handler().set(FUNC(a130xe_state::a130xe_pia_pb_w));
 
+	// minimum RAM 128KB, further sizes with optional modules
 	m_ram->set_default_size("128K");
 }
 
-// memory map XEGS, only XEGS bankswitch supported
+// memory map XEGS
 void xegs_state::xegs(machine_config &config)
 {
 	a800xl(config);
@@ -2463,17 +2455,12 @@ void a5200_state::a5200(machine_config &config)
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	ATARI_GTIA(config, m_gtia, 0);
-//  m_gtia->set_region(GTIA_NTSC);
 	m_gtia->trigger_callback().set_ioport("djoy_b");
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
 
-//  MCFG_MACHINE_START_OVERRIDE( a5200_state, a5200 )
-
 	config_ntsc_screen(config);
-//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
 	A5200_CART_SLOT(config, m_cartleft, a5200_carts, nullptr);
 

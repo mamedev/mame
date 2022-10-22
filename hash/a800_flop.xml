@@ -405,13 +405,11 @@ Runs too fast
 		</part>
 	</software>
 
-	<software name="jumpman" supported="partial">
+	<software name="jumpman">
 		<description>Jumpman</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
-		<notes><![CDATA[
-a800xl: detects a [cart] inserted, punts there
-]]></notes>
+		<info name="usage" value="Hold OPTION key during boot to disable BASIC" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="jumpman.atr" size="92176" crc="290a9e56" sha1="96c411a65cfd0b45ac68603021793701d27244b9"/>
@@ -427,10 +425,10 @@ a800xl: detects a [cart] inserted, punts there
 		<publisher>Mastertronic</publisher>
 		<notes><![CDATA[
 [ANTIC] playfield is offset one line on mountain strip
-a800xl: black screen during loading, fixes randomly with soft resets
 ]]></notes>
 		<info name="serial" value="64712" />
 
+		<info name="usage" value="Hold OPTION key during boot to disable BASIC" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92160">
 				<rom name="elektraglide.xfd" size="92160" crc="96185b1c" sha1="fb9825a432b83a2a7e623a2f617d0fa11de08158"/>
