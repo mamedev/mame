@@ -855,7 +855,8 @@ static INPUT_PORTS_START( hotchase )
 
 	// dips and defaults verified with US manual
 	PORT_START("DSW2")  /* $140015.b */
-	PORT_DIPNAME( 0x01, 0x00, "Speed Unit" )
+	// defaults to imperial unit for (undumped) US version
+	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
 	PORT_DIPSETTING(    0x01, "KM" )
 	PORT_DIPSETTING(    0x00, "M.P.H." )
 	PORT_DIPNAME( 0x02, 0x02, "Motor Control" )
