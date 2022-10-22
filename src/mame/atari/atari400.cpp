@@ -502,7 +502,8 @@ private:
  **************************************************************/
 
 // TODO: better memory map inheritance
-// TODO: transparent support for cart window
+// TODO: transparent support for cart window & cart rd5 line (active_high) for enable/disable
+// (applies to 0xa000-0xbfff only?)
 // TODO: transparent support for cart CCTL at 0xd500
 // TODO: transparent support for PBI (XL) / ECI (XE series), at 0xd1xx, 0xd6xx, 0xd7xx + ROM at 0xd800-0xdfff
 
