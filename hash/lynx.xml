@@ -29,7 +29,7 @@ Known undumped prototypes:
 -->
 <softwarelist name="lynx" description="Atari Lynx cartridges">
 	<software name="apb">
-		<description>A.P.B. (Euro, USA)</description>
+		<description>A.P.B. (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2042" />
@@ -54,7 +54,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="awesomeg">
-		<description>Awesome Golf (Euro, USA)</description>
+		<description>Awesome Golf (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2049" />
@@ -67,7 +67,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="bbheroes">
-		<description>Baseball Heroes (Euro, USA)</description>
+		<description>Baseball Heroes (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2050" />
@@ -80,7 +80,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="bsktbrwl">
-		<description>Basketbrawl (Euro, USA)</description>
+		<description>Basketbrawl (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2034" />
@@ -93,7 +93,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="batmanrn">
-		<description>Batman Returns (Euro, USA)</description>
+		<description>Batman Returns (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2101" />
@@ -106,7 +106,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="bwheels">
-		<description>Battle Wheels (Euro, USA)</description>
+		<description>Battle Wheels (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Beyond Games</publisher>
 		<info name="serial" value="PT5006" />
@@ -119,7 +119,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="bzone2k">
-		<description>Battlezone 2000 (Euro, USA)</description>
+		<description>Battlezone 2000 (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2088" />
@@ -132,7 +132,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="billted">
-		<description>Bill &amp; Ted's Excellent Adventure (Euro, USA)</description>
+		<description>Bill &amp; Ted's Excellent Adventure (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2068" />
@@ -145,7 +145,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="blockout">
-		<description>Block Out (Euro, USA)</description>
+		<description>Block Out (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2056" />
@@ -171,7 +171,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="bluelght">
-		<description>Blue Lightning (Euro, USA)</description>
+		<description>Blue Lightning (Europe, USA)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2020" />
@@ -184,7 +184,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="bubtroub">
-		<description>Bubble Trouble (Euro, USA)</description>
+		<description>Bubble Trouble (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Telegames</publisher>
 		<info name="serial" value="LX216" />
@@ -210,7 +210,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="calgames">
-		<description>California Games (Euro, USA)</description>
+		<description>California Games (Europe, USA)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2025" />
@@ -236,7 +236,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="chekflag">
-		<description>Checkered Flag (Euro, USA)</description>
+		<description>Checkered Flag (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2053" />
@@ -249,7 +249,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="chipchal">
-		<description>Chip's Challenge (Euro, USA)</description>
+		<description>Chip's Challenge (Europe, USA)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2028" />
@@ -262,7 +262,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="cmines2">
-		<description>Crystal Mines II (Euro, USA)</description>
+		<description>Crystal Mines II (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2105" />
@@ -275,7 +275,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="cmines2bt" cloneof="cmines2">
-		<description>Crystal Mines II - Buried Treasure (Euro, USA)</description>
+		<description>Crystal Mines II - Buried Treasure (Europe, USA)</description>
 		<year>2003</year>
 		<publisher>Songbird Productions</publisher>
 		<info name="serial" value="CF2008" />
@@ -313,7 +313,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="dstrike">
-		<description>Desert Strike - Return to the Gulf (Euro, USA)</description>
+		<description>Desert Strike - Return to the Gulf (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<info name="serial" value="L071" />
@@ -326,7 +326,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="dinolymp">
-		<description>Dinolympics (Euro, USA)</description>
+		<description>Dinolympics (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2089" />
@@ -339,7 +339,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="dirtylar">
-		<description>Dirty Larry - Renegade Cop (Euro, USA)</description>
+		<description>Dirty Larry - Renegade Cop (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2077" />
@@ -352,7 +352,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="ddragon">
-		<description>Double Dragon (Euro, USA)</description>
+		<description>Double Dragon (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<info name="serial" value="L070" />
@@ -365,7 +365,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="dracula">
-		<description>Dracula the Undead (Euro, USA)</description>
+		<description>Dracula the Undead (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2087" />
@@ -378,7 +378,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="electroc">
-		<description>Electrocop (Euro, USA)</description>
+		<description>Electrocop (Europe, USA)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2021" />
@@ -391,7 +391,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="eurosocc">
-		<description>European Soccer Challenge (Euro, USA)</description>
+		<description>European Soccer Challenge (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<info name="serial" value="LX106" />
@@ -429,7 +429,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="fatbobby">
-		<description>Fat Bobby (Euro, USA)</description>
+		<description>Fat Bobby (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -441,7 +441,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="fidelity">
-		<description>The Fidelity Ultimate Chess Challenge (Euro, USA)</description>
+		<description>The Fidelity Ultimate Chess Challenge (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Telegames</publisher>
 		<info name="serial" value="LX101" />
@@ -480,7 +480,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="gatezend">
-		<description>Gates of Zendocon (Euro, USA)</description>
+		<description>Gates of Zendocon (Europe, USA)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2023" />
@@ -493,7 +493,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="gauntlet">
-		<description>Gauntlet - The Third Encounter (Euro, USA)</description>
+		<description>Gauntlet - The Third Encounter (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2024" />
@@ -520,7 +520,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="gordo106">
-		<description>Gordo 106 - The Mutated Lab Monkey (Euro, USA)</description>
+		<description>Gordo 106 - The Mutated Lab Monkey (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2106" />
@@ -559,7 +559,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="harddriv">
-		<description>Hard Drivin' (Euro, USA)</description>
+		<description>Hard Drivin' (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2044" />
@@ -572,7 +572,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="hockey">
-		<description>Hockey (Euro, USA)</description>
+		<description>Hockey (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2052" />
@@ -585,7 +585,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="hydra">
-		<description>Hydra (Euro, USA)</description>
+		<description>Hydra (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2073" />
@@ -598,7 +598,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="ishido">
-		<description>Ishido - The Way of Stones (Euro, USA)</description>
+		<description>Ishido - The Way of Stones (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2065" />
@@ -611,7 +611,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="connors">
-		<description>Jimmy Connors' Tennis (Euro, USA)</description>
+		<description>Jimmy Connors' Tennis (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2085" />
@@ -624,7 +624,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="joust">
-		<description>Joust (Euro, USA)</description>
+		<description>Joust (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Williams Entertainment</publisher>
 		<info name="serial" value="PT5005" />
@@ -637,7 +637,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="klax">
-		<description>Klax (Euro, USA)</description>
+		<description>Klax (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2031" />
@@ -664,7 +664,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="krazyace">
-		<description>Krazy Ace - Miniature Golf (Euro, USA)</description>
+		<description>Krazy Ace - Miniature Golf (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<info name="serial" value="L204" />
@@ -677,7 +677,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="kungfood">
-		<description>Kung Food (Euro, USA)</description>
+		<description>Kung Food (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2076" />
@@ -690,7 +690,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="lemmings">
-		<description>Lemmings (Euro, USA)</description>
+		<description>Lemmings (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2080" />
@@ -703,7 +703,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="lexis">
-		<description>Lexis (Euro, USA)</description>
+		<description>Lexis (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>Songbird Productions</publisher>
 		<info name="serial" value="CF2003" />
@@ -743,7 +743,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="lcasino">
-		<description>Lynx Casino (Euro, USA)</description>
+		<description>Lynx Casino (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2061" />
@@ -756,7 +756,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="malibu">
-		<description>Malibu Bikini Volleyball (Euro, USA)</description>
+		<description>Malibu Bikini Volleyball (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2086" />
@@ -769,7 +769,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="marlboro">
-		<description>Marlboro Go! (Euro, prototype)</description>
+		<description>Marlboro Go! (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Digital Image</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -794,7 +794,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="megapak">
-		<description>MegaPak 1 (Euro, USA)</description>
+		<description>MegaPak 1 (Europe, USA)</description>
 		<year>2007</year>
 		<publisher>Songbird Productions</publisher>
 		<info name="serial" value="CF2010" />
@@ -807,7 +807,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="mspacman">
-		<description>Ms. Pac-Man (Euro, USA)</description>
+		<description>Ms. Pac-Man (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2057" />
@@ -820,7 +820,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="nflfoot">
-		<description>NFL Football (Euro, USA)</description>
+		<description>NFL Football (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2045" />
@@ -834,7 +834,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="ngaiden">
-		<description>Ninja Gaiden (Euro, USA)</description>
+		<description>Ninja Gaiden (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2039" />
@@ -847,7 +847,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="ngaiden3">
-		<description>Ninja Gaiden III - The Ancient Ship of Doom (Euro, USA)</description>
+		<description>Ninja Gaiden III - The Ancient Ship of Doom (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2092" />
@@ -873,7 +873,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="pacland">
-		<description>Pac-Land (Euro, USA)</description>
+		<description>Pac-Land (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2059" />
@@ -886,7 +886,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="paperboy">
-		<description>Paperboy (Euro, USA)</description>
+		<description>Paperboy (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2041" />
@@ -899,7 +899,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="pinballj">
-		<description>Pinball Jam (Euro, USA)</description>
+		<description>Pinball Jam (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2055" />
@@ -912,7 +912,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="pitfight">
-		<description>Pit-Fighter - The Ultimate Competition (Euro, USA)</description>
+		<description>Pit-Fighter - The Ultimate Competition (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2070" />
@@ -976,7 +976,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="powfactr">
-		<description>Power Factor (Euro, USA)</description>
+		<description>Power Factor (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2109" />
@@ -989,7 +989,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="qix">
-		<description>Qix (Euro, USA)</description>
+		<description>Qix (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Telegames</publisher>
 		<info name="serial" value="LX102" />
@@ -1028,7 +1028,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="rampage">
-		<description>Rampage (Euro, USA)</description>
+		<description>Rampage (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2022" />
@@ -1041,7 +1041,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="rampart">
-		<description>Rampart (Euro, USA)</description>
+		<description>Rampart (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2102" />
@@ -1079,7 +1079,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="roadblst">
-		<description>RoadBlasters (Euro, USA)</description>
+		<description>RoadBlasters (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2036" />
@@ -1092,7 +1092,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="robosqua">
-		<description>Robo-Squash (Euro, USA)</description>
+		<description>Robo-Squash (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2035" />
@@ -1105,7 +1105,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="robotron">
-		<description>Robotron: 2084 (Euro, USA)</description>
+		<description>Robotron: 2084 (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Williams Entertainment</publisher>
 		<info name="serial" value="PT5003" />
@@ -1143,7 +1143,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="rygar">
-		<description>Rygar - Legendary Warrior (Euro, USA)</description>
+		<description>Rygar - Legendary Warrior (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2043" />
@@ -1156,7 +1156,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="stunrun">
-		<description>S.T.U.N. Runner (Euro, USA)</description>
+		<description>S.T.U.N. Runner (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2060" />
@@ -1169,7 +1169,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="scrapdog">
-		<description>Scrapyard Dog (Euro, USA)</description>
+		<description>Scrapyard Dog (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2048" />
@@ -1182,7 +1182,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="beast">
-		<description>Shadow of the Beast (Euro, USA)</description>
+		<description>Shadow of the Beast (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2081" />
@@ -1195,7 +1195,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="shanghai">
-		<description>Shanghai (Euro, USA)</description>
+		<description>Shanghai (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2063" />
@@ -1221,7 +1221,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="steeltal">
-		<description>Steel Talons (Euro, USA)</description>
+		<description>Steel Talons (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2104" />
@@ -1234,7 +1234,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="supaster">
-		<description>Super Asteroids - Missile Command (Euro, USA)</description>
+		<description>Super Asteroids - Missile Command (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2093" />
@@ -1247,7 +1247,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="superoff">
-		<description>Super Off-Road (Euro, USA)</description>
+		<description>Super Off-Road (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<info name="serial" value="LX105" />
@@ -1260,7 +1260,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="supskwek">
-		<description>Super Skweek (Euro, USA)</description>
+		<description>Super Skweek (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2100" />
@@ -1273,7 +1273,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="switchb2">
-		<description>Switchblade II (Euro, USA)</description>
+		<description>Switchblade II (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2094" />
@@ -1286,7 +1286,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="slimew">
-		<description>Todd's Adventures in Slime World (Euro, USA)</description>
+		<description>Todd's Adventures in Slime World (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2029" />
@@ -1299,7 +1299,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="toki">
-		<description>Toki (Euro, USA)</description>
+		<description>Toki (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2066" />
@@ -1312,7 +1312,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="tcyberbl">
-		<description>Tournament Cyberball 2072 (Euro, USA)</description>
+		<description>Tournament Cyberball 2072 (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2038" />
@@ -1325,7 +1325,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="turbosub">
-		<description>Turbo Sub (Euro, USA)</description>
+		<description>Turbo Sub (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2047" />
@@ -1338,7 +1338,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="viking">
-		<description>Viking Child (Euro, USA)</description>
+		<description>Viking Child (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2064" />
@@ -1364,7 +1364,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="warbirds">
-		<description>Warbirds (Euro, USA)</description>
+		<description>Warbirds (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2032" />
@@ -1390,7 +1390,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="wcsoccer">
-		<description>World Class Soccer (Euro, USA)</description>
+		<description>World Class Soccer (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2037" />
@@ -1403,7 +1403,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="xenophob">
-		<description>Xenophobe (Euro, USA)</description>
+		<description>Xenophobe (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2026" />
@@ -1416,7 +1416,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="xybots">
-		<description>Xybots (Euro, USA)</description>
+		<description>Xybots (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2062" />
@@ -1453,7 +1453,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="zarlor">
-		<description>Zarlor Mercenary (Euro, USA)</description>
+		<description>Zarlor Mercenary (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2030" />
