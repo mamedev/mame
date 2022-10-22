@@ -393,7 +393,7 @@ protected:
 
 	uint8_t m_mmu;
 
-//  void selftest_map(address_map &map);
+	void selftest_map(memory_view::memory_view_entry &block, bool is_rom_mapping);
 };
 
 class a800xl_state : public a1200xl_state
@@ -535,6 +535,18 @@ void a800_state::a800_mem(address_map &map)
 	// ...
 }
 
+// XL specifics
+
+void a1200xl_state::selftest_map(memory_view::memory_view_entry &block, bool is_rom_mapping)
+{
+	block(0x4000, 0x4fff).rw(FUNC(a1200xl_state::ram_r<0x4000>), FUNC(a1200xl_state::ram_w<0x4000>));
+	if (is_rom_mapping)
+		block(0x5000, 0x57ff).rom().region("maincpu", 0xd000);
+	else
+		block(0x5000, 0x57ff).rw(FUNC(a1200xl_state::ram_r<0x5000>), FUNC(a1200xl_state::ram_w<0x5000>));
+	block(0x5800, 0x7fff).rw(FUNC(a1200xl_state::ram_r<0x5800>), FUNC(a1200xl_state::ram_w<0x5800>));
+}
+
 // from a800xl onward HW I/O map punches thru kernel view,
 // for simplicity we just delay mapping former.
 
@@ -543,11 +555,9 @@ void a1200xl_state::a1200xl_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rw(FUNC(a1200xl_state::ram_r<0x0000>), FUNC(a1200xl_state::ram_w<0x0000>));
-	map(0x4000, 0x4fff).rw(FUNC(a1200xl_state::ram_r<0x4000>), FUNC(a1200xl_state::ram_w<0x4000>));
-	map(0x5000, 0x57ff).view(m_selftest_view);
-	m_selftest_view[0](0x5000, 0x57ff).rw(FUNC(a1200xl_state::ram_r<0x5000>), FUNC(a1200xl_state::ram_w<0x5000>));
-	m_selftest_view[1](0x5000, 0x57ff).rom().region("maincpu", 0xd000);
-	map(0x5800, 0x7fff).rw(FUNC(a1200xl_state::ram_r<0x5800>), FUNC(a1200xl_state::ram_w<0x5800>));
+	map(0x4000, 0x7fff).view(m_selftest_view);
+	selftest_map(m_selftest_view[0], false);
+	selftest_map(m_selftest_view[1], true);
 	// TODO: map cart space overlays
 	map(0x8000, 0x9fff).rw(FUNC(a1200xl_state::ram_r<0x8000>), FUNC(a1200xl_state::ram_w<0x8000>));
 	map(0xa000, 0xbfff).rw(FUNC(a1200xl_state::ram_r<0xa000>), FUNC(a1200xl_state::ram_w<0xa000>));
@@ -590,11 +600,9 @@ void a130xe_state::a130xe_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rw(FUNC(a130xe_state::ram_r<0x0000>), FUNC(a130xe_state::ram_w<0x0000>));
 	map(0x4000, 0x7fff).view(m_ext_view);
-	m_ext_view[0](0x4000, 0x4fff).rw(FUNC(a130xe_state::ram_r<0x4000>), FUNC(a130xe_state::ram_w<0x4000>));
-	m_ext_view[0](0x5000, 0x57ff).view(m_selftest_view);
-	m_selftest_view[0](0x5000, 0x57ff).rw(FUNC(a130xe_state::ram_r<0x5000>), FUNC(a130xe_state::ram_w<0x5000>));
-	m_selftest_view[1](0x5000, 0x57ff).rom().region("maincpu", 0xd000);
-	m_ext_view[0](0x5800, 0x7fff).rw(FUNC(a130xe_state::ram_r<0x5800>), FUNC(a130xe_state::ram_w<0x5800>));
+	m_ext_view[0](0x4000, 0x7fff).view(m_selftest_view);
+	selftest_map(m_selftest_view[0], false);
+	selftest_map(m_selftest_view[1], true);
 	m_ext_view[1](0x4000, 0x7fff).bankrw(m_ext_bank);
 	// TODO: map cart space overlays
 	map(0x8000, 0x9fff).rw(FUNC(a130xe_state::ram_r<0x8000>), FUNC(a130xe_state::ram_w<0x8000>));
