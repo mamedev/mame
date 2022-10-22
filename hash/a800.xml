@@ -1251,6 +1251,7 @@ a certain time, and this isn't currently emulated.
 		</part>
 	</software>
 
+	<!-- An actual "Bomb Jack" version known to exist in .xex format, requiring 320KB RAM (!) -->
 	<software name="bombjake" supported="no">
 		<description>Bomb Jake</description>
 		<year>2009</year>
@@ -1260,6 +1261,7 @@ Loading screen is very off, [ANTIC] timing sensitive (downclock maincpu to 50% t
 Title screen has more timing glitches
 Starting a game randomly crashes
 Cuts off top portion of screen
+Hi-score table gets garbled after first attract cycle
 ]]></notes>
 		<info name="usage" value="Use PAL system for BGM during gameplay, NTSC has SFX only. Doesn't work in plain a400/a800" />
 		<sharedfeat name="compatibility" value="XL/XE"/>
