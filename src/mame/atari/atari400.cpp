@@ -393,7 +393,7 @@ protected:
 
 	uint8_t m_mmu;
 
-//	void selftest_map(address_map &map);
+//  void selftest_map(address_map &map);
 };
 
 class a800xl_state : public a1200xl_state
@@ -768,7 +768,36 @@ static INPUT_PORTS_START( a800 )
 	PORT_INCLUDE( atari_keyboard )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( a1200xl )
+	PORT_INCLUDE( a800 )
 
+	// option jumpers, available on a1200xl only
+	// J1 causes a self-test if installed
+	// J2 to J4 are unused by BIOS but may eventually be read by SW ...
+	PORT_START("J1")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_CONFNAME( 0x80, 0x80, "Enable self-test check (J1)" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( No ) )
+
+	PORT_START("J2")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_CONFNAME( 0x80, 0x80, "Unused (J2)" )
+	PORT_CONFSETTING(    0x80, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("J3")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_CONFNAME( 0x80, 0x80, "Unused (J3)" )
+	PORT_CONFSETTING(    0x80, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("J4")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_CONFNAME( 0x80, 0x80, "Unused (J4)" )
+	PORT_CONFSETTING(    0x80, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( a5200 )
 	PORT_INCLUDE( atari_artifacting )
@@ -2309,7 +2338,6 @@ void a1200xl_state::atari_xl_common(machine_config &config)
 {
 	atari_common(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &a1200xl_state::a1200xl_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a1200xl_state::xl_interrupt), "screen", 0, 1);
 
 	m_pokey->pot_r<4>().set_constant(0xff);
@@ -2331,6 +2359,13 @@ void a1200xl_state::atari_xl_common(machine_config &config)
 void a1200xl_state::a1200xl(machine_config &config)
 {
 	atari_xl_common(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &a1200xl_state::a1200xl_mem);
+
+	m_pokey->pot_r<4>().set_ioport("J1");
+	m_pokey->pot_r<5>().set_ioport("J2");
+	m_pokey->pot_r<6>().set_ioport("J3");
+	m_pokey->pot_r<7>().set_ioport("J4");
 	// TODO: console LEDs for this model only
 }
 
@@ -2595,7 +2630,7 @@ COMP( 1979, a400,    0,      0,      a400,      a800,   a400_state,   empty_init
 COMP( 1979, a400pal, a400,   0,      a400pal,   a800,   a400_state,   empty_init, "Atari", "Atari 400 (PAL)",      0)
 COMP( 1979, a800,    0,      0,      a800,      a800,   a800_state,   empty_init, "Atari", "Atari 800 (NTSC)",     0)
 COMP( 1979, a800pal, a800,   0,      a800pal,   a800,   a800_state,   empty_init, "Atari", "Atari 800 (PAL)",      0)
-COMP( 1982, a1200xl, a800,   0,      a1200xl,   a800,   a1200xl_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
+COMP( 1982, a1200xl, a800,   0,      a1200xl,   a1200xl,a1200xl_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
 COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800,   a600xl_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
 COMP( 1983, a800xl,  0,      0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
 COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
