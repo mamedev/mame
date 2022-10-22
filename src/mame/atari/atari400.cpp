@@ -427,10 +427,6 @@ public:
 	{ }
 
 	void a600xl(machine_config &config);
-
-private:
-	virtual void portb_cb(uint8_t data) override;
-	void a600xl_mem(address_map &map);
 };
 
 class a130xe_state : public a800xl_state
@@ -575,24 +571,6 @@ void a800xl_state::a800xl_mem(address_map &map)
 	map(0xa000, 0xbfff).view(m_basic_view);
 	m_basic_view[0](0xa000, 0xbfff).rw(FUNC(a800xl_state::ram_r<0xa000>), FUNC(a800xl_state::ram_w<0xa000>));
 	m_basic_view[1](0xa000, 0xbfff).rom().region("maincpu", 0xa000);
-}
-
-// TODO: convert to RAM device
-void a600xl_state::a600xl_mem(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x3fff).ram();
-	map(0x5000, 0x57ff).view(m_selftest_view);
-	m_selftest_view[0](0x5000, 0x57ff).noprw();
-	m_selftest_view[1](0x5000, 0x57ff).rom().region("maincpu", 0xd000);
-	map(0xa000, 0xbfff).view(m_basic_view);
-	m_basic_view[0](0xa000, 0xbfff).noprw();
-	m_basic_view[1](0xa000, 0xbfff).rom().region("maincpu", 0xa000);
-	map(0xc000, 0xffff).view(m_kernel_view);
-//  m_kernel_view[0](0xc000, 0xffff).rw(FUNC(a600xl_state::ram_r<0xc000>), FUNC(a600xl_state::ram_w<0xc000>));
-	m_kernel_view[0](0xc000, 0xffff).noprw();
-	m_kernel_view[1](0xc000, 0xffff).rom().region("maincpu", 0xc000);
-	map(0xd000, 0xd7ff).m(*this, FUNC(a600xl_state::hw_iomap));
 }
 
 // TODO: have to repeat everything in order to avoid "Fatal error: A memory_view can be present in only one address map." happening for selftest_view ...
@@ -2105,12 +2083,6 @@ void a800xl_state::portb_cb(uint8_t data)
 	m_selftest_view.select((data & 0x81) == 0x01);
 }
 
-// TODO: a600xl_state shouldn't really virtualize this (same as a800xl portb), investigate
-void a600xl_state::portb_cb(uint8_t data)
-{
-	a800xl_state::portb_cb(data);
-}
-
 /*
  * same as a800xl plus:
  * ---- xx-- LED states (specific for this variant only)
@@ -2369,14 +2341,6 @@ void a1200xl_state::a1200xl(machine_config &config)
 	// TODO: console LEDs for this model only
 }
 
-// memory map A600XL (same as 800XL but less RAM) + NTSC screen + MMU via PIA portB
-void a600xl_state::a600xl(machine_config &config)
-{
-	atari_xl_common(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &a600xl_state::a600xl_mem);
-}
-
 // memory map A800XL + NTSC screen + MMU via PIA portB
 void a800xl_state::a800xl(machine_config &config)
 {
@@ -2387,6 +2351,14 @@ void a800xl_state::a800xl(machine_config &config)
 	m_ram->set_default_size("64K");
 }
 
+// memory map A600XL (same as 800XL but less RAM) + NTSC screen + MMU via PIA portB
+void a600xl_state::a600xl(machine_config &config)
+{
+	a800xl(config);
+
+	m_ram->set_default_size("16K");
+	m_ram->set_extra_options("32K,48K,64K");
+}
 
 // memory map A800XL + PAL screen + MMU via PIA portB
 void a800xl_state::a800xlpal(machine_config &config)
@@ -2396,10 +2368,6 @@ void a800xl_state::a800xlpal(machine_config &config)
 	m_maincpu->set_clock(1773000);
 
 	config_pal_screen(config);
-//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
-
-//  m_gtia->set_region(GTIA_PAL);
 
 	m_pokey->set_clock(1773000);
 }
@@ -2410,7 +2378,6 @@ void a130xe_state::a130xe(machine_config &config)
 	a800xl(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &a130xe_state::a130xe_mem);
-//  m_pia->writepb_handler().set(FUNC(a130xe_state::a130xe_pia_pb_w));
 
 	// minimum RAM 128KB, further sizes with optional modules
 	m_ram->set_default_size("128K");
