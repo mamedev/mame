@@ -260,7 +260,9 @@ void msx_slot_rs232_sony_device::device_start()
 	m_ram.resize(RAM_SIZE);
 	save_item(NAME(m_ram));
 
+	// TODO unmap rom from page 0
 	page(0)->install_ram(0x2000, 0x27ff, m_ram.data());
+	page(1)->install_rom(0x4000, 0x5fff, m_rom_region->base() + m_region_offset);
 	page(1)->install_ram(0x6000, 0x67ff, m_ram.data());
 	page(2)->install_ram(0xa000, 0xa7ff, m_ram.data());
 	page(2)->install_read_handler(0xbff8, 0xbff9, read8sm_delegate(*m_i8251, FUNC(i8251_device::read)));
