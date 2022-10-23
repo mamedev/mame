@@ -12,12 +12,8 @@ TS 2004.10.22.
 (press buttons 1+2 at the same time, to release 'army' ;)
 
 TODO:
-- fix colours (sprites, bg), not many PCB references online
-  sprites: player char and soldiers are correct, explosions probably also ok,
-  a lot of other sprite colors still look bad
-  bg: 16 levels, each has a different color. 1st level should be green bg,
-  with black at the bottom part
-- cocktail mode doesn't work right
+- verify sprite colors, not many PCB references online, but comparing with
+  the small amount of photos that are there, they match
 
 
 PCB Notes:
@@ -85,6 +81,7 @@ private:
 
 	// video-related
 	tilemap_t *m_bgmap = nullptr;
+	tilemap_t *m_fgmap = nullptr;
 	u8 m_cocktail_flip = 0;
 	u8 m_char_palette = 0;
 	u8 m_char_bank = 0;
@@ -111,7 +108,9 @@ private:
 	u8 e300_r();
 	void ee00_w(u8 data);
 	void videoreg_w(u8 data);
+	void videoram_w(offs_t offset, u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void fcombat_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void audio_map(address_map &map);
@@ -129,15 +128,10 @@ static constexpr XTAL PIXEL_CLOCK  = MASTER_CLOCK / 3;
 static constexpr int HCOUNT_START  = 0x58;
 static constexpr int HTOTAL        = 512 - HCOUNT_START;
 static constexpr int HBEND         = 12 * 8;  // ??
-static constexpr int HBSTART       = 52 * 8;  //
+static constexpr int HBSTART       = 52 * 8;  // ??
 static constexpr int VTOTAL        = 256;
 static constexpr int VBEND         = 16;
 static constexpr int VBSTART       = 240;
-
-static constexpr int VISIBLE_X_MIN = 12 * 8;
-static constexpr int VISIBLE_X_MAX = 52 * 8;
-static constexpr int VISIBLE_Y_MIN =  2 * 8;
-static constexpr int VISIBLE_Y_MAX = 30 * 8;
 
 
 /***************************************************************************
@@ -222,14 +216,32 @@ void fcombat_state::fcombat_palette(palette_device &palette) const
 
 void fcombat_state::video_start()
 {
+	m_fgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fcombat_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fgmap->set_transparent_pen(0);
+
 	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fcombat_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
 }
 
 TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 {
 	const int tileno = m_bgdata_rom[tile_index];
-	const int palno = (tile_index >> 5 & 0xf) ^ 7;
+	const int palno = (tileno >> 2 & 3) | (tileno >> 4 & 0xc);
+
 	tileinfo.set(2, tileno, palno, 0);
+}
+
+TILE_GET_INFO_MEMBER(fcombat_state::get_fg_tile_info)
+{
+	const int tileno = m_videoram[tile_index] | (m_char_bank << 8);
+	const int palno = (tileno >> 4 & 0xf) | (m_char_palette << 4);
+
+	tileinfo.set(0, tileno, palno, 0);
+}
+
+void fcombat_state::videoram_w(offs_t offset, u8 data)
+{
+	m_videoram[offset] = data;
+	m_fgmap->mark_tile_dirty(offset);
 }
 
 
@@ -243,12 +255,18 @@ void fcombat_state::videoreg_w(u8 data)
 {
 	// bit 0: flip screen and joystick input multiplexer
 	m_cocktail_flip = data & 1;
+	flip_screen_set(m_cocktail_flip);
 
 	// bits 1-2: char lookup table bank
-	m_char_palette = (data & 0x06) >> 1;
-
 	// bit 3: char bank
-	m_char_bank = (data & 0x08) >> 3;
+	u8 char_pal = (data & 0x06) >> 1;
+	u8 char_bank = (data & 0x08) >> 3;
+	if (m_char_palette != char_pal || m_char_bank != char_bank)
+	{
+		m_char_palette = char_pal;
+		m_char_bank = char_bank;
+		m_fgmap->mark_all_dirty();
+	}
 
 	// bits 4-5: unused
 
@@ -261,10 +279,12 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	// draw background
 	m_bgmap->set_scrolly(0, m_fcombat_sh);
-	m_bgmap->set_scrollx(0, m_fcombat_sv - 8);
+	if (m_cocktail_flip)
+		m_bgmap->set_scrollx(0, m_fcombat_sv + 8 - 2);
+	else
+		m_bgmap->set_scrollx(0, m_fcombat_sv - 8);
 
-	m_bgmap->mark_all_dirty();
-	m_bgmap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bgmap->draw(screen, bitmap, cliprect);
 
 	// draw sprites
 	for (int i = 0; i < m_spriteram.bytes(); i += 4)
@@ -272,7 +292,7 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		const int flags = m_spriteram[i + 0];
 		int y = 256 - m_spriteram[i + 1];
 		int code = m_spriteram[i + 2] + ((flags & 0x20) << 3);
-		int x = m_spriteram[i + 3] * 2 + (flags & 0x01) + 56;
+		int x = m_spriteram[i + 3] * 2 + (flags & 0x01) + 52;
 
 		int xflip = flags & 0x80;
 		int yflip = flags & 0x40;
@@ -291,8 +311,8 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		if (m_cocktail_flip)
 		{
-			x = 64 * 8 - gfx->width() - x;
-			y = 32 * 8 - gfx->height() - y;
+			x = 64 * 8 - gfx->width() - x + 2;
+			y = 32 * 8 - gfx->height() - y + 2;
 			if (wide) y -= gfx->height();
 			xflip = !xflip;
 			yflip = !yflip;
@@ -313,25 +333,14 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			gfx->transpen(bitmap, cliprect, code2 + 16, color, xflip, yflip, x, y + gfx->height(), 0);
 			gfx->transpen(bitmap, cliprect, code2 + 16 * 2, color, xflip, yflip, x, y + 2 * gfx->height(), 0);
 			gfx->transpen(bitmap, cliprect, code2 + 16 * 3, color, xflip, yflip, x, y + 3 * gfx->height(), 0);
-
 		}
 
 		gfx->transpen(bitmap, cliprect, code, color, xflip, yflip, x, y, 0);
 	}
 
-	// draw the visible text layer
-	for (int sy = VISIBLE_Y_MIN / 8; sy < VISIBLE_Y_MAX / 8; sy++)
-		for (int sx = VISIBLE_X_MIN / 8; sx < VISIBLE_X_MAX / 8; sx++)
-		{
-			const int x = m_cocktail_flip ? (63 * 8 - 8 * sx) : 8 * sx;
-			const int y = m_cocktail_flip ? (31 * 8 - 8 * sy) : 8 * sy;
+	// draw text layer
+	m_fgmap->draw(screen, bitmap, cliprect);
 
-			const int offs = sx + sy * 64;
-			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
-				m_videoram[offs] + 256 * m_char_bank,
-				((m_videoram[offs] & 0xf0) >> 4) + m_char_palette * 16,
-				m_cocktail_flip, m_cocktail_flip, x, y, 0);
-		}
 	return 0;
 }
 
@@ -415,7 +424,7 @@ void fcombat_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd7ff).ram().share(m_videoram);
+	map(0xd000, 0xd7ff).ram().share(m_videoram).w(FUNC(fcombat_state::videoram_w));
 	map(0xd800, 0xd8ff).ram().share(m_spriteram);
 	map(0xe000, 0xe000).r(FUNC(fcombat_state::port01_r));
 	map(0xe100, 0xe100).portr("DSW0");
@@ -459,20 +468,20 @@ static INPUT_PORTS_START( fcombat )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN1")      // player 1 inputs (muxed on 0xe000)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN2")      // player 2 inputs (muxed on 0xe000)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW0")      // dip switches (0xe100)
 	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )
@@ -728,4 +737,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, fcombat, 0, fcombat, fcombat, fcombat_state, init_fcombat, ROT90, "Jaleco", "Field Combat", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, fcombat, 0, fcombat, fcombat, fcombat_state, init_fcombat, ROT90, "Jaleco", "Field Combat", MACHINE_SUPPORTS_SAVE )

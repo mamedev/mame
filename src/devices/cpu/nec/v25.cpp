@@ -451,7 +451,10 @@ void v25_common_device::external_int()
 				m_IRQS = vector;
 				m_ISPR |= (1 << i);
 				if (m_bankswitch_irq & source)
+				{
+					debugger_exception_hook(vector);
 					nec_bankswitch(i);
+				}
 				else
 					nec_interrupt(vector, source);
 			}

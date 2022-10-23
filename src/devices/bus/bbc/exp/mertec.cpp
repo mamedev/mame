@@ -106,7 +106,7 @@ void bbc_mertec_device::device_start()
 
 int bbc_mertec_device::get_analogue_input(int channel_number)
 {
-	return ((0xff - m_analog->ch_r(channel_number)) << 8);
+	return m_analog->ch_r(channel_number) << 8;
 }
 
 void bbc_mertec_device::upd7002_eoc(int data)

@@ -40,7 +40,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- Developers: Sega -->
 	<software name="aaharima">
-		<description>Aa Harimanada (Jpn)</description>
+		<description>Aa Harimanada (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3327"/>
@@ -71,7 +71,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Euro, USA)</description>
+		<description>The Adventures of Batman &amp; Robin (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2552, 2552-50"/>
@@ -172,7 +172,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- Developers: Sega -->
 	<software name="aerialasj" cloneof="aerialas">
-		<description>Aerial Assault (Jpn, v1)</description>
+		<description>Aerial Assault (Japan, v1)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3219"/>
@@ -188,7 +188,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="aerialastw">
-		<description>Aerial Assault (Tw, SMS mode)</description>
+		<description>Aerial Assault (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-11"/>
@@ -219,7 +219,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- Developers: SIMS -->
 	<software name="aladdinj" cloneof="aladdin">
-		<description>Disney's Aladdin (Jpn)</description>
+		<description>Disney's Aladdin (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3336"/>
@@ -234,7 +234,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- "Disney's Aladdin (prototype, 19940124)" shares the same hashes as release version -->
 	<software name="aladdin">
-		<description>Disney's Aladdin (Euro, USA, Bra)</description>
+		<description>Disney's Aladdin (Europe, USA, Brazil)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2525, 077.120"/>
@@ -282,7 +282,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="alexkidd">
-		<description>Alex Kidd in Miracle World (Tw, SMS mode)</description>
+		<description>Alex Kidd in Miracle World (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-10"/>
@@ -296,7 +296,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="alien3">
-		<description>Alien³ (Euro, USA)</description>
+		<description>Alien³ (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81048, T-81048-50"/>
@@ -308,7 +308,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="alien3j" cloneof="alien3">
-		<description>Alien³ (Jpn)</description>
+		<description>Alien³ (Japan)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81047"/>
@@ -323,7 +323,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- Developers: Sega / SIMS -->
 	<software name="aliensynj" cloneof="aliensyn">
-		<description>Alien Syndrome (Jpn)</description>
+		<description>Alien Syndrome (Japan)</description>
 		<year>1992</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44037"/>
@@ -337,7 +337,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="aliensyn">
-		<description>Alien Syndrome (Euro, USA)</description>
+		<description>Alien Syndrome (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2324"/>
@@ -396,7 +396,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="arena">
-		<description>Arena (Euro, USA)</description>
+		<description>Arena (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2565, 2565-50"/>
@@ -408,7 +408,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="argosnj">
-		<description>Argos no Juujiken (Tw, SMS mode)</description>
+		<description>Argos no Juujiken (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-02"/>
@@ -422,7 +422,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="ariel">
-		<description>Disney's Ariel the Little Mermaid (Euro, USA)</description>
+		<description>Disney's Ariel the Little Mermaid (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2411"/>
@@ -438,7 +438,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- Developers: Sega -->
 	<software name="arliel" cloneof="crystalw">
-		<description>Arliel - Crystal Densetsu (Jpn)</description>
+		<description>Arliel - Crystal Densetsu (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3403"/>
@@ -461,7 +461,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="astergre">
-		<description>Astérix and the Great Rescue (Euro)</description>
+		<description>Astérix and the Great Rescue (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2520"/>
@@ -543,7 +543,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="astermis">
-		<description>Asterix and the Secret Mission (Euro)</description>
+		<description>Asterix and the Secret Mission (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2513"/>
@@ -555,7 +555,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="axbattlr">
-		<description>Ax Battler - A Legend of Golden Axe (Euro, USA, v2.4)</description>
+		<description>Ax Battler - A Legend of Golden Axe (Europe, USA, v2.4)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2513"/>
@@ -567,7 +567,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="axbattlrp" cloneof="axbattlr">
-		<description>Ax Battler - A Legend of Golden Axe (Euro, USA, prototype v2.0)</description>
+		<description>Ax Battler - A Legend of Golden Axe (Europe, USA, prototype v2.0)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -579,7 +579,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- Developers: Aspect -->
 	<software name="axbattlrj" cloneof="axbattlr">
-		<description>Ax Battler - Golden Axe Densetsu (Jpn, v1.5)</description>
+		<description>Ax Battler - Golden Axe Densetsu (Japan, v1.5)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3306"/>
@@ -594,7 +594,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- Developers: Sega -->
 	<software name="smgp2j" cloneof="smgp2">
-		<description>Ayrton Senna's Super Monaco GP II (Jpn)</description>
+		<description>Ayrton Senna's Super Monaco GP II (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3312, G-3337 (Meisaku Collection)"/>
@@ -611,7 +611,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="smgp2">
-		<description>Ayrton Senna's Super Monaco GP II (Euro, USA)</description>
+		<description>Ayrton Senna's Super Monaco GP II (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2423"/>
@@ -626,7 +626,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="smgp2p" cloneof="smgp2">
-		<description>Ayrton Senna's Super Monaco GP II (Euro, USA, prototype)</description>
+		<description>Ayrton Senna's Super Monaco GP II (Europe, USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -638,7 +638,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- Alt. Title: Baku Baku (Box) -->
 	<software name="bakubaku">
-		<description>Baku Baku Animal (Euro)</description>
+		<description>Baku Baku Animal (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2451-50"/>
@@ -664,7 +664,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- Developers: Sega AM3 / SIMS / Minato Giken -->
 	<software name="bakubakuj" cloneof="bakubaku">
-		<description>Baku Baku Animal - Sekai Shiikugakari Senshu-ken (Jpn)</description>
+		<description>Baku Baku Animal - Sekai Shiikugakari Senshu-ken (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3378"/>
@@ -739,7 +739,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="batterup">
-		<description>Batter Up (Euro, USA)</description>
+		<description>Batter Up (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -750,7 +750,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="bship">
-		<description>Battleship (Euro, USA)</description>
+		<description>Battleship (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -762,7 +762,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 
 	<!-- Developers: Rare -->
 	<software name="btoads">
-		<description>Battletoads (Euro, Jpn)</description>
+		<description>Battletoads (Europe, Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3311 (JPN), T-97018, 2436"/>
@@ -787,7 +787,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 	</software>
 
 	<software name="beavis">
-		<description>Beavis and Butt-head (Euro, USA)</description>
+		<description>Beavis and Butt-head (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Viacom New Media</publisher>
 		<info name="serial" value="T-139018, T-139018-50"/>
@@ -1015,7 +1015,7 @@ a certain item) -->
 
 	<!-- Developers: Kaneko / Inter State -->
 	<software name="berlin">
-		<description>Berlin no Kabe - The Berlin Wall (Jpn)</description>
+		<description>Berlin no Kabe - The Berlin Wall (Japan)</description>
 		<year>1991</year>
 		<publisher>Kaneko</publisher>
 		<info name="serial" value="T-33017"/>
@@ -1029,7 +1029,7 @@ a certain item) -->
 	</software>
 
 	<software name="sailorms">
-		<description>Bishoujo Senshi Sailor Moon S (Jpn)</description>
+		<description>Bishoujo Senshi Sailor Moon S (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133017"/>
@@ -1046,7 +1046,7 @@ a certain item) -->
 	</software>
 
 	<software name="blackblt">
-		<description>Black Belt (Tw, SMS mode)</description>
+		<description>Black Belt (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-19"/>
@@ -1060,7 +1060,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkers">
-		<description>Disney's Bonkers Wax Up! (Euro, USA)</description>
+		<description>Disney's Bonkers Wax Up! (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2536, 2536-50"/>
@@ -1215,7 +1215,7 @@ a certain item) -->
 	</software>
 
 	<software name="dracula">
-		<description>Bram Stoker's Dracula (Euro)</description>
+		<description>Bram Stoker's Dracula (Europe)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93018-50"/>
@@ -1252,7 +1252,7 @@ a certain item) -->
 	</software>
 
 	<software name="bublbobl">
-		<description>Bubble Bobble (Euro, USA)</description>
+		<description>Bubble Bobble (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Taito</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1274,7 +1274,7 @@ a certain item) -->
 	</software>
 
 	<software name="bugsbun">
-		<description>Bugs Bunny in Double Trouble (Euro, USA)</description>
+		<description>Bugs Bunny in Double Trouble (Europe, USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2569, 7766-50"/>
@@ -1289,7 +1289,7 @@ a certain item) -->
 	</software>
 
 	<software name="bam">
-		<description>Bust-A-Move (Euro, USA)</description>
+		<description>Bust-A-Move (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1301,7 +1301,7 @@ a certain item) -->
 
 	<!-- Developers: ??? -->
 	<software name="busterb">
-		<description>Buster Ball (Jpn)</description>
+		<description>Buster Ball (Japan)</description>
 		<year>1992</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-53027"/>
@@ -1316,7 +1316,7 @@ a certain item) -->
 
 	<!-- Developers: SIMS -->
 	<software name="busterf">
-		<description>Buster Fight (Jpn)</description>
+		<description>Buster Fight (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3341"/>
@@ -1342,7 +1342,7 @@ a certain item) -->
 	</software>
 
 	<software name="captaven">
-		<description>Captain America and the Avengers (Euro, USA)</description>
+		<description>Captain America and the Avengers (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1353,7 +1353,7 @@ a certain item) -->
 	</software>
 
 	<software name="carlicen">
-		<description>Car Licence (Jpn)</description>
+		<description>Car Licence (Japan)</description>
 		<year>1995</year>
 		<publisher>Mitsubishi Chemical</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1376,7 +1376,7 @@ a certain item) -->
 	</software>
 
 	<software name="castlill">
-		<description>Castle of Illusion Starring Mickey Mouse (Euro, USA, SMS mode)</description>
+		<description>Castle of Illusion Starring Mickey Mouse (Europe, USA, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2401"/>
@@ -1405,7 +1405,7 @@ a certain item) -->
 	</software>
 
 	<software name="chakan">
-		<description>Chakan (Euro, USA)</description>
+		<description>Chakan (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2414"/>
@@ -1417,7 +1417,7 @@ a certain item) -->
 	</software>
 
 	<software name="champhck">
-		<description>Championship Hockey (Euro)</description>
+		<description>Championship Hockey (Europe)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1428,7 +1428,7 @@ a certain item) -->
 	</software>
 
 	<software name="chessmst">
-		<description>The Chessmaster (Euro, USA)</description>
+		<description>The Chessmaster (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2317"/>
@@ -1440,7 +1440,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicago">
-		<description>Chicago Syndicate (USA, Bra)</description>
+		<description>Chicago Syndicate (USA, Brazil)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2535, 077.260"/>
@@ -1770,7 +1770,7 @@ a certain item) -->
 	</software>
 
 	<software name="chukrck2">
-		<description>Chuck Rock II - Son of Chuck (Euro)</description>
+		<description>Chuck Rock II - Son of Chuck (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1792,7 +1792,7 @@ a certain item) -->
 	</software>
 
 	<software name="cj">
-		<description>CJ Elephant Fugitive (Euro)</description>
+		<description>CJ Elephant Fugitive (Europe)</description>
 		<year>1991</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1839,7 +1839,7 @@ a certain item) -->
 	</software>
 
 	<software name="cocakid">
-		<description>Coca Cola Kid (Jpn)</description>
+		<description>Coca Cola Kid (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3350"/>
@@ -1857,7 +1857,7 @@ a certain item) -->
 
 	<!-- Developers: Sega -->
 	<software name="columnsj1" cloneof="columns">
-		<description>Columns (Jpn, older)</description>
+		<description>Columns (Japan, older)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3101, G-3104 (Meisaku Collection)"/>
@@ -1871,7 +1871,7 @@ a certain item) -->
 	</software>
 
 	<software name="columnsj" cloneof="columns">
-		<description>Columns (Jpn)</description>
+		<description>Columns (Japan)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3101, G-3104 (Meisaku Collection)"/>
@@ -1885,7 +1885,7 @@ a certain item) -->
 	</software>
 
 	<software name="columns">
-		<description>Columns (Euro, USA, Bra)</description>
+		<description>Columns (Europe, USA, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2201, 012.070"/>
@@ -1900,7 +1900,7 @@ a certain item) -->
 	</software>
 
 	<software name="coolspot">
-		<description>Cool Spot (Euro)</description>
+		<description>Cool Spot (Europe)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70108-50"/>
@@ -1924,7 +1924,7 @@ a certain item) -->
 	</software>
 
 	<software name="cosmic">
-		<description>Cosmic Spacehead (Euro)</description>
+		<description>Cosmic Spacehead (Europe)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="T-120028-50"/>
@@ -1938,7 +1938,7 @@ a certain item) -->
 
 	<!-- Developers: Minato Giken -->
 	<software name="crayon">
-		<description>Crayon Shin-chan - Taiketsu! Kantamu Panic!! (Jpn)</description>
+		<description>Crayon Shin-chan - Taiketsu! Kantamu Panic!! (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133047"/>
@@ -1955,7 +1955,7 @@ a certain item) -->
 	</software>
 
 	<software name="crazyfac">
-		<description>Crazy Faces (Euro, prototype)</description>
+		<description>Crazy Faces (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1966,7 +1966,7 @@ a certain item) -->
 	</software>
 
 	<software name="crystalw">
-		<description>Crystal Warriors (Euro, USA)</description>
+		<description>Crystal Warriors (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2502"/>
@@ -1987,7 +1987,7 @@ a certain item) -->
 	</software>
 
 	<software name="cutthr">
-		<description>Cutthroat Island (Euro, USA)</description>
+		<description>Cutthroat Island (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2009,7 +2009,7 @@ a certain item) -->
 	</software>
 
 	<software name="cybers">
-		<description>The Cyber Shinobi (Tw, SMS mode)</description>
+		<description>The Cyber Shinobi (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-33"/>
@@ -2023,7 +2023,7 @@ a certain item) -->
 	</software>
 
 	<software name="daffy">
-		<description>Daffy Duck in Hollywood (Euro)</description>
+		<description>Daffy Duck in Hollywood (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2550"/>
@@ -2057,7 +2057,7 @@ a certain item) -->
 	</software>
 
 	<software name="deepduck">
-		<description>Deep Duck Trouble Starring Donald Duck (Euro, USA)</description>
+		<description>Deep Duck Trouble Starring Donald Duck (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2514, 1205"/>
@@ -2069,7 +2069,7 @@ a certain item) -->
 	</software>
 
 	<software name="defoasis">
-		<description>Defenders of Oasis (Euro, USA)</description>
+		<description>Defenders of Oasis (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2503"/>
@@ -2084,7 +2084,7 @@ a certain item) -->
 	</software>
 
 	<software name="defoasisp" cloneof="defoasis">
-		<description>Defenders of Oasis (Euro, USA, prototype)</description>
+		<description>Defenders of Oasis (Europe, USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2098,7 +2098,7 @@ a certain item) -->
 	</software>
 
 	<software name="desert">
-		<description>Desert Speedtrap Starring Road Runner and Wile E. Coyote (Euro)</description>
+		<description>Desert Speedtrap Starring Road Runner and Wile E. Coyote (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2442"/>
@@ -2131,7 +2131,7 @@ a certain item) -->
 	</software>
 
 	<software name="dstrike">
-		<description>Desert Strike (Euro)</description>
+		<description>Desert Strike (Europe)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2153,7 +2153,7 @@ a certain item) -->
 	</software>
 
 	<software name="devilish">
-		<description>Devilish (Euro, Bra)</description>
+		<description>Devilish (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2321, 015.340"/>
@@ -2166,7 +2166,7 @@ a certain item) -->
 
 	<!-- Developers: Opera House -->
 	<software name="devilishj" cloneof="devilish">
-		<description>Devilish (Jpn)</description>
+		<description>Devilish (Japan)</description>
 		<year>1991</year>
 		<publisher>Genki</publisher>
 		<info name="serial" value="T-28017"/>
@@ -2191,7 +2191,7 @@ a certain item) -->
 	</software>
 
 	<software name="dinobash">
-		<description>Dinobasher Starring Bignose the Caveman (Euro, prototype)</description>
+		<description>Dinobasher Starring Bignose the Caveman (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2203,7 +2203,7 @@ a certain item) -->
 	</software>
 
 	<software name="dokidoki">
-		<description>Doki Doki Penguin Land - Uchuu Daibouken (Tw, SMS mode)</description>
+		<description>Doki Doki Penguin Land - Uchuu Daibouken (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-03"/>
@@ -2218,7 +2218,7 @@ a certain item) -->
 
 	<!-- Developers: Aspect -->
 	<software name="donald42" cloneof="deepduck">
-		<description>Donald Duck no 4-Tsu no Hihou (Jpn)</description>
+		<description>Donald Duck no 4-Tsu no Hihou (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3332"/>
@@ -2233,7 +2233,7 @@ a certain item) -->
 
 	<!-- Developers: Sega -->
 	<software name="donaldld" cloneof="luckydim">
-		<description>Donald Duck no Lucky Dime (Jpn)</description>
+		<description>Donald Duck no Lucky Dime (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3309"/>
@@ -2247,7 +2247,7 @@ a certain item) -->
 	</software>
 
 	<software name="donaldmw">
-		<description>Donald no Magical World (Jpn)</description>
+		<description>Donald no Magical World (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3340"/>
@@ -2261,7 +2261,7 @@ a certain item) -->
 	</software>
 
 	<software name="doraemon">
-		<description>Doraemon - Waku Waku Pocket Paradise (Jpn)</description>
+		<description>Doraemon - Waku Waku Pocket Paradise (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3383"/>
@@ -2275,7 +2275,7 @@ a certain item) -->
 	</software>
 
 	<software name="ddragonp" cloneof="ddragon">
-		<description>Double Dragon (Euro, USA, prototype)</description>
+		<description>Double Dragon (Europe, USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2288,7 +2288,7 @@ a certain item) -->
 	</software>
 
 	<software name="ddragon">
-		<description>Double Dragon (Euro, USA)</description>
+		<description>Double Dragon (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70038, T-70038-50"/>
@@ -2302,7 +2302,7 @@ a certain item) -->
 	</software>
 
 	<software name="ddragontw">
-		<description>Double Dragon (Tw, SMS mode)</description>
+		<description>Double Dragon (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-02"/>
@@ -2316,7 +2316,7 @@ a certain item) -->
 	</software>
 
 	<software name="drrobotn">
-		<description>Dr. Robotnik's Mean Bean Machine (Euro, USA)</description>
+		<description>Dr. Robotnik's Mean Bean Machine (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2446"/>
@@ -2342,7 +2342,7 @@ a certain item) -->
 	</software>
 
 	<software name="dragon">
-		<description>Dragon - The Bruce Lee Story (Euro)</description>
+		<description>Dragon - The Bruce Lee Story (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70148-50"/>
@@ -2377,7 +2377,7 @@ a certain item) -->
 	</software>
 
 	<software name="dcrystal">
-		<description>Dragon Crystal (Euro, USA)</description>
+		<description>Dragon Crystal (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2305"/>
@@ -2392,7 +2392,7 @@ a certain item) -->
 	</software>
 
 	<software name="dcrystalj" cloneof="dcrystal">
-		<description>Dragon Crystal - Tsurani no Meikyuu (Jpn)</description>
+		<description>Dragon Crystal - Tsurani no Meikyuu (Japan)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3206"/>
@@ -2406,7 +2406,7 @@ a certain item) -->
 	</software>
 
 	<software name="dropzone">
-		<description>Dropzone (Euro)</description>
+		<description>Dropzone (Europe)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<info name="alt_title" value="Archer Maclean's Dropzone (Box)"/>
@@ -2426,7 +2426,7 @@ a certain item) -->
 	</software>
 
 	<software name="dunkkids">
-		<description>Dunk Kids (Jpn)</description>
+		<description>Dunk Kids (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3352"/>
@@ -2443,7 +2443,7 @@ a certain item) -->
 	</software>
 
 	<software name="dheadj" cloneof="dhead">
-		<description>Dynamite Headdy (Jpn)</description>
+		<description>Dynamite Headdy (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3355"/>
@@ -2457,7 +2457,7 @@ a certain item) -->
 	</software>
 
 	<software name="dhead">
-		<description>Dynamite Headdy (Euro, USA)</description>
+		<description>Dynamite Headdy (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2544"/>
@@ -2513,7 +2513,7 @@ a certain item) -->
 	</software>
 
 	<software name="ejim">
-		<description>Earthworm Jim (Euro)</description>
+		<description>Earthworm Jim (Europe)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70178-50"/>
@@ -2537,7 +2537,7 @@ a certain item) -->
 	</software>
 
 	<software name="eccoj" cloneof="ecco">
-		<description>Ecco the Dolphin (Jpn)</description>
+		<description>Ecco the Dolphin (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3344"/>
@@ -2554,7 +2554,7 @@ a certain item) -->
 	</software>
 
 	<software name="ecco">
-		<description>Ecco the Dolphin (Euro, USA)</description>
+		<description>Ecco the Dolphin (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2516"/>
@@ -2592,7 +2592,7 @@ a certain item) -->
 	</software>
 
 	<software name="ecco2j" cloneof="ecco2">
-		<description>Ecco the Dolphin II (Jpn)</description>
+		<description>Ecco the Dolphin II (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3362"/>
@@ -2606,7 +2606,7 @@ a certain item) -->
 	</software>
 
 	<software name="ecco2">
-		<description>Ecco II - The Tides of Time (Euro, USA)</description>
+		<description>Ecco II - The Tides of Time (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2541, 2541-50, 02541F"/>
@@ -2618,7 +2618,7 @@ a certain item) -->
 	</software>
 
 	<software name="ernieeg">
-		<description>Ernie Els Golf (Euro)</description>
+		<description>Ernie Els Golf (Europe)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="T-120098-50"/>
@@ -2633,7 +2633,7 @@ a certain item) -->
 	</software>
 
 	<software name="eternleg">
-		<description>Eternal Legend - Eien no Densetsu (Jpn)</description>
+		<description>Eternal Legend - Eien no Densetsu (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3402, G-3412 (Meisaku Collection)"/>
@@ -2650,7 +2650,7 @@ a certain item) -->
 	</software>
 
 	<software name="evander">
-		<description>Evander Holyfield Boxing (Euro, USA)</description>
+		<description>Evander Holyfield Boxing (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2419, 2419-50"/>
@@ -2665,7 +2665,7 @@ a certain item) -->
 	</software>
 
 	<software name="excdizzy">
-		<description>The Excellent Dizzy Collection (Euro, SMS mode)</description>
+		<description>The Excellent Dizzy Collection (Europe, SMS mode)</description>
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2691,7 +2691,7 @@ a certain item) -->
 	</software>
 
 	<software name="f15se">
-		<description>F-15 Strike Eagle (Euro, USA)</description>
+		<description>F-15 Strike Eagle (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
 		<info name="serial" value="T-104018, T-104018-50"/>
@@ -2703,7 +2703,7 @@ a certain item) -->
 	</software>
 
 	<software name="f1">
-		<description>F1 (Euro, USA)</description>
+		<description>F1 (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88058 301063-0161, T-88058-50"/>
@@ -2715,7 +2715,7 @@ a certain item) -->
 	</software>
 
 	<software name="f1wce">
-		<description>F1 World Championship Edition (Euro)</description>
+		<description>F1 World Championship Edition (Europe)</description>
 		<year>1995</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2726,7 +2726,7 @@ a certain item) -->
 	</software>
 
 	<software name="faceball">
-		<description>Faceball 2000 (Jpn)</description>
+		<description>Faceball 2000 (Japan)</description>
 		<year>1993</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-53037"/>
@@ -2740,7 +2740,7 @@ a certain item) -->
 	</software>
 
 	<software name="factoryp">
-		<description>Factory Panic (Euro, Bra)</description>
+		<description>Factory Panic (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2308"/>
@@ -2755,7 +2755,7 @@ a certain item) -->
 	</software>
 
 	<software name="fantdizz">
-		<description>Fantastic Dizzy (Euro, SMS mode)</description>
+		<description>Fantastic Dizzy (Europe, SMS mode)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2768,7 +2768,7 @@ a certain item) -->
 	</software>
 
 	<software name="fantzone">
-		<description>Fantasy Zone Gear (Euro, Jpn)</description>
+		<description>Fantasy Zone Gear (Europe, Japan)</description>
 		<year>1991</year>
 		<publisher>Sanritsu</publisher>
 		<info name="serial" value="T-44017 (JPN), G-3225 (JPN, Meisaku Collection)"/>
@@ -2794,7 +2794,7 @@ a certain item) -->
 	</software>
 
 	<software name="fatfursp">
-		<description>Fatal Fury Special (Euro)</description>
+		<description>Fatal Fury Special (Europe)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="2582-50"/>
@@ -2818,7 +2818,7 @@ a certain item) -->
 	</software>
 
 	<software name="fifaj" cloneof="fifa">
-		<description>FIFA International Soccer (Jpn)</description>
+		<description>FIFA International Soccer (Japan)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="T-106017"/>
@@ -2832,7 +2832,7 @@ a certain item) -->
 	</software>
 
 	<software name="fifa">
-		<description>FIFA International Soccer (Euro, USA)</description>
+		<description>FIFA International Soccer (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-50018, T-50018-50"/>
@@ -2844,7 +2844,7 @@ a certain item) -->
 	</software>
 
 	<software name="fifa96">
-		<description>FIFA Soccer 96 (Euro, USA)</description>
+		<description>FIFA Soccer 96 (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="T-100108, T-100108-50"/>
@@ -2856,7 +2856,7 @@ a certain item) -->
 	</software>
 
 	<software name="finalbb">
-		<description>Final Bubble Bobble (Tw, SMS mode)</description>
+		<description>Final Bubble Bobble (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-01"/>
@@ -2887,7 +2887,7 @@ a certain item) -->
 	</software>
 
 	<software name="forgottn">
-		<description>Forgotten Worlds (Tw, SMS mode)</description>
+		<description>Forgotten Worlds (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-46"/>
@@ -2913,7 +2913,7 @@ a certain item) -->
 	</software>
 
 	<software name="fray">
-		<description>Fray - Shugyou Hen (Jpn)</description>
+		<description>Fray - Shugyou Hen (Japan)</description>
 		<year>1991</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-52037"/>
@@ -2927,7 +2927,7 @@ a certain item) -->
 	</software>
 
 	<software name="fredcoupj" cloneof="fredcoup">
-		<description>Fred Couples' Golf (Jpn)</description>
+		<description>Fred Couples' Golf (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3358"/>
@@ -2964,7 +2964,7 @@ a certain item) -->
 	</software>
 
 	<software name="slamdunk">
-		<description>From TV Animation - Slam Dunk - Shouri e no Starting 5 (Jpn)</description>
+		<description>From TV Animation - Slam Dunk - Shouri e no Starting 5 (Japan)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133037"/>
@@ -2978,7 +2978,7 @@ a certain item) -->
 	</software>
 
 	<software name="glocj" cloneof="gloc">
-		<description>G-LOC Air Battle (Jpn, v1)</description>
+		<description>G-LOC Air Battle (Japan, v1)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3204"/>
@@ -2992,7 +2992,7 @@ a certain item) -->
 	</software>
 
 	<software name="glocj1" cloneof="gloc">
-		<description>G-LOC Air Battle (Jpn, v0)</description>
+		<description>G-LOC Air Battle (Japan, v0)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3204"/>
@@ -3006,7 +3006,7 @@ a certain item) -->
 	</software>
 
 	<software name="gloc">
-		<description>G-LOC Air Battle (Euro, USA, Bra)</description>
+		<description>G-LOC Air Battle (Europe, USA, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2301, 012.120"/>
@@ -3018,7 +3018,7 @@ a certain item) -->
 	</software>
 
 	<software name="galaga91" cloneof="galaga2">
-		<description>Galaga '91 (Jpn)</description>
+		<description>Galaga '91 (Japan)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14057"/>
@@ -3032,7 +3032,7 @@ a certain item) -->
 	</software>
 
 	<software name="galaga2">
-		<description>Galaga 2 (Euro)</description>
+		<description>Galaga 2 (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2322"/>
@@ -3044,7 +3044,7 @@ a certain item) -->
 	</software>
 
 	<software name="gamble">
-		<description>Gamble Panic (Jpn)</description>
+		<description>Gamble Panic (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3364"/>
@@ -3058,7 +3058,7 @@ a certain item) -->
 	</software>
 
 	<software name="gambler">
-		<description>Gambler Jikochuushinha (Jpn)</description>
+		<description>Gambler Jikochuushinha (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3339"/>
@@ -3072,7 +3072,7 @@ a certain item) -->
 	</software>
 
 	<software name="ggorby" cloneof="factoryp">
-		<description>Ganbare Gorby! (Jpn)</description>
+		<description>Ganbare Gorby! (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3210"/>
@@ -3086,7 +3086,7 @@ a certain item) -->
 	</software>
 
 	<software name="garfield">
-		<description>Garfield - Caught in the Act (Euro, USA)</description>
+		<description>Garfield - Caught in the Act (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2560, 2560-50"/>
@@ -3102,7 +3102,7 @@ a certain item) -->
 	</software>
 
 	<software name="garousp" cloneof="fatfursp">
-		<description>Garou Densetsu Special (Jpn)</description>
+		<description>Garou Densetsu Special (Japan)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="T-103017"/>
@@ -3117,7 +3117,7 @@ a certain item) -->
 	</software>
 
 	<software name="gearstad" cloneof="batterup">
-		<description>Gear Stadium (Jpn)</description>
+		<description>Gear Stadium (Japan)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14037"/>
@@ -3131,7 +3131,7 @@ a certain item) -->
 	</software>
 
 	<software name="gearstah">
-		<description>Gear Stadium Heiseiban (Jpn)</description>
+		<description>Gear Stadium Heiseiban (Japan)</description>
 		<year>1995</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14077"/>
@@ -3157,7 +3157,7 @@ a certain item) -->
 	</software>
 
 	<software name="georgeko">
-		<description>George Foreman's KO Boxing (Euro, USA)</description>
+		<description>George Foreman's KO Boxing (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="T-81038, T-81038-50"/>
@@ -3169,7 +3169,7 @@ a certain item) -->
 	</software>
 
 	<software name="ggaleste">
-		<description>GG Aleste (Jpn)</description>
+		<description>GG Aleste (Japan)</description>
 		<year>1991</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66017"/>
@@ -3183,7 +3183,7 @@ a certain item) -->
 	</software>
 
 	<software name="ggdora">
-		<description>GG Doraemon - Noranosuke no Yabou (Jpn)</description>
+		<description>GG Doraemon - Noranosuke no Yabou (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3326"/>
@@ -3197,7 +3197,7 @@ a certain item) -->
 	</software>
 
 	<software name="ggport">
-		<description>GG Portrait - Pai Chen (Jpn)</description>
+		<description>GG Portrait - Pai Chen (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3387"/>
@@ -3211,7 +3211,7 @@ a certain item) -->
 	</software>
 
 	<software name="ggport1">
-		<description>GG Portrait - Yuuki Akira (Jpn)</description>
+		<description>GG Portrait - Yuuki Akira (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3386"/>
@@ -3225,7 +3225,7 @@ a certain item) -->
 	</software>
 
 	<software name="shinobij" cloneof="shinobi">
-		<description>The GG Shinobi (Jpn)</description>
+		<description>The GG Shinobi (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3302"/>
@@ -3240,7 +3240,7 @@ a certain item) -->
 
 	<!-- Alt. Title: Shinobi (Box) -->
 	<software name="shinobi">
-		<description>The GG Shinobi (Euro, USA)</description>
+		<description>The GG Shinobi (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2402"/>
@@ -3252,7 +3252,7 @@ a certain item) -->
 	</software>
 
 	<software name="godzilla">
-		<description>Godzilla - Kaijuu Daishingeki (Jpn)</description>
+		<description>Godzilla - Kaijuu Daishingeki (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3430"/>
@@ -3269,7 +3269,7 @@ a certain item) -->
 	</software>
 
 	<software name="gpriderj" cloneof="gprider">
-		<description>GP Rider (Jpn)</description>
+		<description>GP Rider (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3347"/>
@@ -3297,7 +3297,7 @@ a certain item) -->
 	</software>
 
 	<software name="gprider">
-		<description>GP Rider (Euro, USA)</description>
+		<description>GP Rider (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2528"/>
@@ -3312,7 +3312,7 @@ a certain item) -->
 	</software>
 
 	<software name="greatbsk">
-		<description>Great Basketball (Tw, SMS mode)</description>
+		<description>Great Basketball (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-17"/>
@@ -3326,7 +3326,7 @@ a certain item) -->
 	</software>
 
 	<software name="greendog">
-		<description>Greendog (Euro, USA)</description>
+		<description>Greendog (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3337,7 +3337,7 @@ a certain item) -->
 	</software>
 
 	<software name="griffin">
-		<description>Griffin (Jpn)</description>
+		<description>Griffin (Japan)</description>
 		<year>1991</year>
 		<publisher>Riot</publisher>
 		<info name="serial" value="T-49017"/>
@@ -3351,7 +3351,7 @@ a certain item) -->
 	</software>
 
 	<software name="gunstar">
-		<description>Gunstar Heroes (Jpn)</description>
+		<description>Gunstar Heroes (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3349"/>
@@ -3368,7 +3368,7 @@ a certain item) -->
 	</software>
 
 	<software name="halleywj" cloneof="halleyw">
-		<description>Halley Wars (Jpn)</description>
+		<description>Halley Wars (Japan)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11027"/>
@@ -3382,7 +3382,7 @@ a certain item) -->
 	</software>
 
 	<software name="halleyw">
-		<description>Halley Wars (Euro, USA, Bra)</description>
+		<description>Halley Wars (Europe, USA, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2318, 013.500"/>
@@ -3394,7 +3394,7 @@ a certain item) -->
 	</software>
 
 	<software name="headbust">
-		<description>Head Buster (Jpn)</description>
+		<description>Head Buster (Japan)</description>
 		<year>1991</year>
 		<publisher>Masaya</publisher>
 		<info name="serial" value="T-25017"/>
@@ -3408,7 +3408,7 @@ a certain item) -->
 	</software>
 
 	<software name="heavyw">
-		<description>Heavy Weight Champ (Jpn)</description>
+		<description>Heavy Weight Champ (Japan)</description>
 		<year>1991</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44027"/>
@@ -3422,7 +3422,7 @@ a certain item) -->
 	</software>
 
 	<software name="hokuto" cloneof="blackblt">
-		<description>Hokuto no Ken (Tw, SMS mode)</description>
+		<description>Hokuto no Ken (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-04"/>
@@ -3436,7 +3436,7 @@ a certain item) -->
 	</software>
 
 	<software name="homea">
-		<description>Home Alone (Euro, USA)</description>
+		<description>Home Alone (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2410"/>
@@ -3448,7 +3448,7 @@ a certain item) -->
 	</software>
 
 	<software name="ddanpei">
-		<description>Honoo no Toukyuuji - Dodge Danpei (Jpn)</description>
+		<description>Honoo no Toukyuuji - Dodge Danpei (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3220"/>
@@ -3462,7 +3462,7 @@ a certain item) -->
 	</software>
 
 	<software name="hook">
-		<description>Hook (Euro)</description>
+		<description>Hook (Europe)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3484,7 +3484,7 @@ a certain item) -->
 	</software>
 
 	<software name="hurrican">
-		<description>Hurricanes (Euro)</description>
+		<description>Hurricanes (Europe)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="79138-50"/>
@@ -3499,7 +3499,7 @@ a certain item) -->
 	</software>
 
 	<software name="hyokkohj">
-		<description>Hyokkori Hyoutan-jima - Hyoutan-jima no Daikoukai (Jpn)</description>
+		<description>Hyokkori Hyoutan-jima - Hyoutan-jima no Daikoukai (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3218"/>
@@ -3516,7 +3516,7 @@ a certain item) -->
 	</software>
 
 	<software name="hypyak92">
-		<description>Hyper Pro Yakyuu '92 (Jpn)</description>
+		<description>Hyper Pro Yakyuu '92 (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3217"/>
@@ -3534,7 +3534,7 @@ a certain item) -->
 
 	<software name="ichirgg">
 		<!-- Note: Yes! The title screen is grammatically incorrect! Engrish Masterpiece! -->
-		<description>Puzzlle &amp; Action Ichidant~R GG (Jpn)</description>
+		<description>Puzzlle &amp; Action Ichidant~R GG (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3359"/>
@@ -3548,7 +3548,7 @@ a certain item) -->
 	</software>
 
 	<software name="wakevamp" cloneof="mastdark">
-		<description>In the Wake of Vampire (Jpn)</description>
+		<description>In the Wake of Vampire (Japan)</description>
 		<year>1992</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44047"/>
@@ -3580,7 +3580,7 @@ a certain item) -->
 	</software>
 
 	<software name="hulk">
-		<description>The Incredible Hulk (Euro, USA)</description>
+		<description>The Incredible Hulk (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79078, 79078-50"/>
@@ -3592,7 +3592,7 @@ a certain item) -->
 	</software>
 
 	<software name="indycrus">
-		<description>Indiana Jones and the Last Crusade (Euro, USA)</description>
+		<description>Indiana Jones and the Last Crusade (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="79028-50"/>
@@ -3615,7 +3615,7 @@ a certain item) -->
 	</software>
 
 	<software name="ironman">
-		<description>Iron Man X-O Manowar in Heavy Metal (Euro, USA)</description>
+		<description>Iron Man X-O Manowar in Heavy Metal (Europe, USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3626,7 +3626,7 @@ a certain item) -->
 	</software>
 
 	<software name="itchy">
-		<description>The Itchy &amp; Scratchy Game (Euro, USA)</description>
+		<description>The Itchy &amp; Scratchy Game (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81218, T-81218-50"/>
@@ -3638,7 +3638,7 @@ a certain item) -->
 	</software>
 
 	<software name="jleagu94">
-		<description>J.League GG Pro Striker '94 (Jpn)</description>
+		<description>J.League GG Pro Striker '94 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3417"/>
@@ -3661,7 +3661,7 @@ a certain item) -->
 	</software>
 
 	<software name="jleague">
-		<description>J.League Soccer - Dream Eleven (Jpn)</description>
+		<description>J.League Soccer - Dream Eleven (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3431"/>
@@ -3675,7 +3675,7 @@ a certain item) -->
 	</software>
 
 	<software name="jb007">
-		<description>James Bond 007 - The Duel (Euro)</description>
+		<description>James Bond 007 - The Duel (Europe)</description>
 		<year>1993</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88038-50"/>
@@ -3688,7 +3688,7 @@ a certain item) -->
 
 	<!-- Alt. Title: James Pond 3 - Operation Starfi5h (Box) -->
 	<software name="jpond3">
-		<description>James Pond 3 - Operation Starfish (Euro)</description>
+		<description>James Pond 3 - Operation Starfish (Europe)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79158-50"/>
@@ -3700,7 +3700,7 @@ a certain item) -->
 	</software>
 
 	<software name="robocod">
-		<description>James Pond II - Codename RoboCod (Euro)</description>
+		<description>James Pond II - Codename RoboCod (Europe)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="79068-50"/>
@@ -3762,7 +3762,7 @@ a certain item) -->
 	</software>
 
 	<software name="jeopards">
-		<description>Jeopardy! - Sports Edition (Euro, USA)</description>
+		<description>Jeopardy! - Sports Edition (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3773,7 +3773,7 @@ a certain item) -->
 	</software>
 
 	<software name="joemontj" cloneof="joemont">
-		<description>Joe Montana's Football (Jpn)</description>
+		<description>Joe Montana's Football (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3305"/>
@@ -3790,7 +3790,7 @@ a certain item) -->
 	</software>
 
 	<software name="joemont">
-		<description>Joe Montana's Football (Euro, USA)</description>
+		<description>Joe Montana's Football (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2403"/>
@@ -3802,7 +3802,7 @@ a certain item) -->
 	</software>
 
 	<software name="striderr">
-		<description>Journey from Darkness - Strider Returns (Euro, USA)</description>
+		<description>Journey from Darkness - Strider Returns (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79048, 79048, 79048-50"/>
@@ -3814,7 +3814,7 @@ a certain item) -->
 	</software>
 
 	<software name="jdredd">
-		<description>Judge Dredd (Euro, USA)</description>
+		<description>Judge Dredd (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81228, T-81228-50"/>
@@ -3826,7 +3826,7 @@ a certain item) -->
 	</software>
 
 	<software name="junctionj" cloneof="junction">
-		<description>Junction (Jpn)</description>
+		<description>Junction (Japan)</description>
 		<year>1991</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22017"/>
@@ -3852,7 +3852,7 @@ a certain item) -->
 
 	<!-- Alt. Titles: Le Livre de la Jungle (Fra Box), Das Dschungelbuch (Ger Box) -->
 	<software name="jungle">
-		<description>The Jungle Book (Euro)</description>
+		<description>The Jungle Book (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70118-50, T-70118-09, T-70118-18"/>
@@ -3887,7 +3887,7 @@ a certain item) -->
 	</software>
 
 	<software name="jparkj" cloneof="jpark">
-		<description>Jurassic Park (Jpn)</description>
+		<description>Jurassic Park (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3229"/>
@@ -3901,7 +3901,7 @@ a certain item) -->
 	</software>
 
 	<software name="jpark">
-		<description>Jurassic Park (Euro, USA)</description>
+		<description>Jurassic Park (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2511"/>
@@ -3916,7 +3916,7 @@ a certain item) -->
 	</software>
 
 	<software name="sainttal">
-		<description>Kaitou Saint Tale (Jpn)</description>
+		<description>Kaitou Saint Tale (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3382"/>
@@ -3930,7 +3930,7 @@ a certain item) -->
 	</software>
 
 	<software name="kawasaki">
-		<description>Kawasaki Superbike Challenge (Euro)</description>
+		<description>Kawasaki Superbike Challenge (Europe)</description>
 		<year>1995</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88098, T-88118-50"/>
@@ -3953,7 +3953,7 @@ a certain item) -->
 	</software>
 
 	<software name="yaiba">
-		<description>Kenyuu Densetsu Yaiba (Jpn)</description>
+		<description>Kenyuu Densetsu Yaiba (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3346"/>
@@ -3967,7 +3967,7 @@ a certain item) -->
 	</software>
 
 	<software name="kickrush" cloneof="tengenwc">
-		<description>Kick &amp; Rush (Jpn)</description>
+		<description>Kick &amp; Rush (Japan)</description>
 		<year>1993</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44057"/>
@@ -3981,7 +3981,7 @@ a certain item) -->
 	</software>
 
 	<software name="kineticc">
-		<description>Kinetic Connection (Jpn)</description>
+		<description>Kinetic Connection (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3401"/>
@@ -4002,7 +4002,7 @@ a certain item) -->
 	</software>
 
 	<software name="zenki">
-		<description>Kishin Douji Zenki (Jpn)</description>
+		<description>Kishin Douji Zenki (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3373"/>
@@ -4019,7 +4019,7 @@ a certain item) -->
 	</software>
 
 	<software name="klax">
-		<description>Klax (Euro, USA)</description>
+		<description>Klax (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="301040-0161, T-48048-50"/>
@@ -4034,7 +4034,7 @@ a certain item) -->
 	</software>
 
 	<software name="krustyfh">
-		<description>Krusty's Fun House (Euro, USA)</description>
+		<description>Krusty's Fun House (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="T-81078, T-81078-50"/>
@@ -4049,7 +4049,7 @@ a certain item) -->
 	</software>
 
 	<software name="kungfuk">
-		<description>Kung Fu Kid (Tw, SMS mode)</description>
+		<description>Kung Fu Kid (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 401-21"/>
@@ -4063,7 +4063,7 @@ a certain item) -->
 	</software>
 
 	<software name="kunichan">
-		<description>Kuni-chan no Game Tengoku (Jpn)</description>
+		<description>Kuni-chan no Game Tengoku (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3303"/>
@@ -4077,7 +4077,7 @@ a certain item) -->
 	</software>
 
 	<software name="kunichn2">
-		<description>Kuni-chan no Game Tengoku Part 2 (Jpn)</description>
+		<description>Kuni-chan no Game Tengoku Part 2 (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3322"/>
@@ -4091,7 +4091,7 @@ a certain item) -->
 	</software>
 
 	<software name="landill">
-		<description>Land of Illusion Starring Mickey Mouse (Euro, USA)</description>
+		<description>Land of Illusion Starring Mickey Mouse (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2509"/>
@@ -4118,7 +4118,7 @@ a certain item) -->
 	</software>
 
 	<software name="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Euro, USA)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2533, 2533-50"/>
@@ -4221,7 +4221,7 @@ a certain item) -->
 	</software>
 
 	<software name="lemming2">
-		<description>Lemmings 2 - The Tribes (Euro, prototype)</description>
+		<description>Lemmings 2 - The Tribes (Europe, prototype)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4232,7 +4232,7 @@ a certain item) -->
 	</software>
 
 	<software name="lionking">
-		<description>The Lion King (Euro)</description>
+		<description>The Lion King (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70158"/>
@@ -4248,7 +4248,7 @@ a certain item) -->
 
 	<!-- Developers: Syrox Developments -->
 	<software name="lionkingj" cloneof="lionking">
-		<description>The Lion King (Jpn)</description>
+		<description>The Lion King (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3363"/>
@@ -4376,7 +4376,7 @@ a certain item) -->
 	</software>
 
 	<software name="lordswrd">
-		<description>Lord of Sword (Tw, SMS mode)</description>
+		<description>Lord of Sword (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-05"/>
@@ -4406,7 +4406,7 @@ a certain item) -->
 	</software>
 
 	<software name="luckydim">
-		<description>The Lucky Dime Caper (Euro, USA)</description>
+		<description>The Lucky Dime Caper (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2404"/>
@@ -4421,7 +4421,7 @@ a certain item) -->
 	</software>
 
 	<software name="lunar">
-		<description>Lunar - Sanposuru Gakuen (Jpn)</description>
+		<description>Lunar - Sanposuru Gakuen (Japan)</description>
 		<year>1996</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45017"/>
@@ -4450,7 +4450,7 @@ a certain item) -->
 	</software>
 
 	<software name="madden96">
-		<description>Madden NFL '96 (Euro, USA)</description>
+		<description>Madden NFL '96 (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="T-100118, T-100118-50"/>
@@ -4462,7 +4462,7 @@ a certain item) -->
 	</software>
 
 	<software name="madouma">
-		<description>Madou Monogatari A - Dokidoki Vacation (Jpn)</description>
+		<description>Madou Monogatari A - Dokidoki Vacation (Japan)</description>
 		<year>1995</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66047"/>
@@ -4479,7 +4479,7 @@ a certain item) -->
 	</software>
 
 	<software name="madoum1">
-		<description>Madou Monogatari I - 3-Tsu no Madoukyuu (Jpn)</description>
+		<description>Madou Monogatari I - 3-Tsu no Madoukyuu (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3410"/>
@@ -4496,7 +4496,7 @@ a certain item) -->
 	</software>
 
 	<software name="madoum2">
-		<description>Madou Monogatari II - Arle 16-Sai (Jpn)</description>
+		<description>Madou Monogatari II - Arle 16-Sai (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3419"/>
@@ -4519,7 +4519,7 @@ a certain item) -->
 	</software>
 
 	<software name="madoum3">
-		<description>Madou Monogatari III - Kyuukyoku Joou-sama (Jpn, v1)</description>
+		<description>Madou Monogatari III - Kyuukyoku Joou-sama (Japan, v1)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3424"/>
@@ -4536,7 +4536,7 @@ a certain item) -->
 	</software>
 
 	<software name="madoum3a" cloneof="madoum3">
-		<description>Madou Monogatari III - Kyuukyoku Joou-sama (Jpn, v0)</description>
+		<description>Madou Monogatari III - Kyuukyoku Joou-sama (Japan, v0)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3424"/>
@@ -4553,7 +4553,7 @@ a certain item) -->
 	</software>
 
 	<software name="rayearth">
-		<description>Magic Knight Rayearth (Jpn)</description>
+		<description>Magic Knight Rayearth (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3423"/>
@@ -4576,7 +4576,7 @@ a certain item) -->
 	</software>
 
 	<software name="rayeart2">
-		<description>Magic Knight Rayearth 2 - Making of Magic Knight (Jpn)</description>
+		<description>Magic Knight Rayearth 2 - Making of Magic Knight (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3429"/>
@@ -4616,7 +4616,7 @@ a certain item) -->
 	</software>
 
 	<software name="mtaruru">
-		<description>Magical Taruruuto-kun (Jpn)</description>
+		<description>Magical Taruruuto-kun (Japan)</description>
 		<year>1991</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="T-65017"/>
@@ -4643,7 +4643,7 @@ a certain item) -->
 	</software>
 
 	<software name="mappy">
-		<description>Mappy (Jpn)</description>
+		<description>Mappy (Japan)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14027"/>
@@ -4657,7 +4657,7 @@ a certain item) -->
 	</software>
 
 	<software name="marble">
-		<description>Marble Madness (Euro, USA)</description>
+		<description>Marble Madness (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="T-48058, T-48058-50"/>
@@ -4669,7 +4669,7 @@ a certain item) -->
 	</software>
 
 	<software name="marko">
-		<description>Marko's Magic Football (Euro)</description>
+		<description>Marko's Magic Football (Europe)</description>
 		<year>1993</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88078-50"/>
@@ -4681,7 +4681,7 @@ a certain item) -->
 	</software>
 
 	<software name="mastdark">
-		<description>Master of Darkness (Euro)</description>
+		<description>Master of Darkness (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2437"/>
@@ -4693,7 +4693,7 @@ a certain item) -->
 	</software>
 
 	<software name="megaman">
-		<description>Mega Man (Euro, USA)</description>
+		<description>Mega Man (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4704,7 +4704,7 @@ a certain item) -->
 	</software>
 
 	<software name="lastbibl">
-		<description>Megami Tensei Gaiden - Last Bible (Jpn)</description>
+		<description>Megami Tensei Gaiden - Last Bible (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3418"/>
@@ -4721,7 +4721,7 @@ a certain item) -->
 	</software>
 
 	<software name="lastbibs">
-		<description>Megami Tensei Gaiden - Last Bible S (Jpn)</description>
+		<description>Megami Tensei Gaiden - Last Bible S (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3427"/>
@@ -4738,7 +4738,7 @@ a certain item) -->
 	</software>
 
 	<software name="mickmack">
-		<description>Mick &amp; Mack as the Global Gladiators (Euro, USA)</description>
+		<description>Mick &amp; Mack as the Global Gladiators (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70058, T-70058-50"/>
@@ -4750,7 +4750,7 @@ a certain item) -->
 	</software>
 
 	<software name="legndillj" cloneof="legndill">
-		<description>Mickey Mouse Densetsu no Oukoku - Legend of Illusion (Jpn)</description>
+		<description>Mickey Mouse Densetsu no Oukoku - Legend of Illusion (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3360"/>
@@ -4764,7 +4764,7 @@ a certain item) -->
 	</software>
 
 	<software name="castlillj" cloneof="castlill">
-		<description>Mickey Mouse no Castle Illusion (Jpn, SMS mode)</description>
+		<description>Mickey Mouse no Castle Illusion (Japan, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3301"/>
@@ -4779,7 +4779,7 @@ a certain item) -->
 	</software>
 
 	<software name="landillj" cloneof="landill">
-		<description>Mickey Mouse no Mahou no Crystal (Jpn)</description>
+		<description>Mickey Mouse no Mahou no Crystal (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3323"/>
@@ -4793,7 +4793,7 @@ a certain item) -->
 	</software>
 
 	<software name="mickeyuc">
-		<description>Mickey's Ultimate Challenge (Euro, USA)</description>
+		<description>Mickey's Ultimate Challenge (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4804,7 +4804,7 @@ a certain item) -->
 	</software>
 
 	<software name="micromac" supported="partial">
-		<description>Micro Machines (Euro)</description>
+		<description>Micro Machines (Europe)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4828,7 +4828,7 @@ a certain item) -->
 	</software>
 
 	<software name="micromc2" supported="partial">
-		<description>Micro Machines 2 - Turbo Tournament (Euro)</description>
+		<description>Micro Machines 2 - Turbo Tournament (Europe)</description>
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="T-120108-50"/>
@@ -4852,7 +4852,7 @@ a certain item) -->
 	</software>
 
 	<software name="mmpr">
-		<description>Mighty Morphin Power Rangers (Euro, USA)</description>
+		<description>Mighty Morphin Power Rangers (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2548, 2548-50"/>
@@ -4875,7 +4875,7 @@ a certain item) -->
 	</software>
 
 	<software name="mmprtm">
-		<description>Mighty Morphin Power Rangers - The Movie (Euro, USA)</description>
+		<description>Mighty Morphin Power Rangers - The Movie (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2564, 2564-50"/>
@@ -4899,7 +4899,7 @@ a certain item) -->
 	</software>
 
 	<software name="moldoran">
-		<description>Moldorian - Hikari to Yami no Sister (Jpn)</description>
+		<description>Moldorian - Hikari to Yami no Sister (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3422"/>
@@ -4916,7 +4916,7 @@ a certain item) -->
 	</software>
 
 	<software name="monstwar">
-		<description>Monster Truck Wars (Euro, USA)</description>
+		<description>Monster Truck Wars (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81288, T-81288-50"/>
@@ -4931,7 +4931,7 @@ a certain item) -->
 	</software>
 
 	<software name="mworld2" cloneof="wboydtrp">
-		<description>Monster World II - Dragon no Wana (Jpn)</description>
+		<description>Monster World II - Dragon no Wana (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3308"/>
@@ -4945,7 +4945,7 @@ a certain item) -->
 	</software>
 
 	<software name="mkj" cloneof="mk">
-		<description>Mortal Kombat (Jpn, v3.3)</description>
+		<description>Mortal Kombat (Japan, v3.3)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81017"/>
@@ -4959,7 +4959,7 @@ a certain item) -->
 	</software>
 
 	<software name="mk">
-		<description>Mortal Kombat (Euro, USA, v2.6)</description>
+		<description>Mortal Kombat (Europe, USA, v2.6)</description>
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81198, T-81198-50"/>
@@ -4985,7 +4985,7 @@ a certain item) -->
 	</software>
 
 	<software name="mk3">
-		<description>Mortal Kombat 3 (Euro)</description>
+		<description>Mortal Kombat 3 (Europe)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5022,7 +5022,7 @@ a certain item) -->
 	</software>
 
 	<software name="nazopuyo">
-		<description>Nazo Puyo (Jpn, v1)</description>
+		<description>Nazo Puyo (Japan, v1)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3224"/>
@@ -5034,7 +5034,7 @@ a certain item) -->
 	</software>
 
 	<software name="nazopuyo1" cloneof="nazopuyo">
-		<description>Nazo Puyo (Jpn, v0)</description>
+		<description>Nazo Puyo (Japan, v0)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5045,7 +5045,7 @@ a certain item) -->
 	</software>
 
 	<software name="nazpuyo2">
-		<description>Nazo Puyo 2 (Jpn)</description>
+		<description>Nazo Puyo 2 (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3413"/>
@@ -5062,7 +5062,7 @@ a certain item) -->
 	</software>
 
 	<software name="nazpyoarp" cloneof="nazpyoar">
-		<description>Nazo Puyo Arle no Roux (Jpn, prototype)</description>
+		<description>Nazo Puyo Arle no Roux (Japan, prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5073,7 +5073,7 @@ a certain item) -->
 	</software>
 
 	<software name="nazpyoar">
-		<description>Nazo Puyo Arle no Roux (Jpn)</description>
+		<description>Nazo Puyo Arle no Roux (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3357"/>
@@ -5432,7 +5432,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbajamj" cloneof="nbajam">
-		<description>NBA Jam (Jpn)</description>
+		<description>NBA Jam (Japan)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81037"/>
@@ -5457,7 +5457,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbajam1" cloneof="nbajam">
-		<description>NBA Jam (Euro, USA)</description>
+		<description>NBA Jam (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81248"/>
@@ -5489,7 +5489,7 @@ a certain item) -->
 	</software>
 
 	<software name="nekodais">
-		<description>Pet Club Neko Daisuki! (Jpn)</description>
+		<description>Pet Club Neko Daisuki! (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3434"/>
@@ -5661,7 +5661,7 @@ a certain item) -->
 	</software>
 
 	<software name="nflqb96">
-		<description>NFL Quarterback Club '96 (Euro, USA)</description>
+		<description>NFL Quarterback Club '96 (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5885,7 +5885,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhl">
-		<description>NHL Hockey (Euro, USA)</description>
+		<description>NHL Hockey (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-50048, T-50048-50"/>
@@ -5900,7 +5900,7 @@ a certain item) -->
 	</software>
 
 	<software name="ngaidenj" cloneof="ngaiden">
-		<description>Ninja Gaiden (Jpn)</description>
+		<description>Ninja Gaiden (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3215"/>
@@ -5914,7 +5914,7 @@ a certain item) -->
 	</software>
 
 	<software name="ngaiden">
-		<description>Ninja Gaiden (Euro, USA)</description>
+		<description>Ninja Gaiden (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2312"/>
@@ -5926,7 +5926,7 @@ a certain item) -->
 	</software>
 
 	<software name="ninku">
-		<description>Ninku (Jpn)</description>
+		<description>Ninku (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3370"/>
@@ -5943,7 +5943,7 @@ a certain item) -->
 	</software>
 
 	<software name="ninku2">
-		<description>Ninku 2 - Tenkuuryuu e no Michi (Jpn)</description>
+		<description>Ninku 2 - Tenkuuryuu e no Michi (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3376"/>
@@ -5960,7 +5960,7 @@ a certain item) -->
 	</software>
 
 	<software name="ninkug">
-		<description>Ninku Gaiden - Hiroyuki Daikatsugeki (Jpn)</description>
+		<description>Ninku Gaiden - Hiroyuki Daikatsugeki (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3377"/>
@@ -5977,7 +5977,7 @@ a certain item) -->
 	</software>
 
 	<software name="nomowsb" cloneof="wsb95">
-		<description>Nomo's World Series Baseball (Jpn)</description>
+		<description>Nomo's World Series Baseball (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3442"/>
@@ -6009,7 +6009,7 @@ a certain item) -->
 	</software>
 
 	<software name="olympgld">
-		<description>Olympic Gold (Euro, v1, SMS mode)</description>
+		<description>Olympic Gold (Europe, v1, SMS mode)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="79018-50, 79018-05, 79018-18"/>
@@ -6025,7 +6025,7 @@ a certain item) -->
 	</software>
 
 	<software name="olympglda" cloneof="olympgld">
-		<description>Olympic Gold (Jpn, USA, v0, SMS mode)</description>
+		<description>Olympic Gold (Japan, USA, v0, SMS mode)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="G-3316 (JPN), T-79018"/>
@@ -6040,7 +6040,7 @@ a certain item) -->
 	</software>
 
 	<software name="ottifant">
-		<description>The Ottifants (Euro)</description>
+		<description>The Ottifants (Europe)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2444"/>
@@ -6052,7 +6052,7 @@ a certain item) -->
 	</software>
 
 	<software name="outrunj" cloneof="outrun">
-		<description>Out Run (Jpn)</description>
+		<description>Out Run (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3213, G-3222 (Meisaku Collection)"/>
@@ -6066,7 +6066,7 @@ a certain item) -->
 	</software>
 
 	<software name="outrun">
-		<description>Out Run (Euro)</description>
+		<description>Out Run (Europe)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2310"/>
@@ -6078,7 +6078,7 @@ a certain item) -->
 	</software>
 
 	<software name="outrneur">
-		<description>Out Run Europa (Euro, Bra, SMS mode)</description>
+		<description>Out Run Europa (Europe, Brazil, SMS mode)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79038-50, 016.870"/>
@@ -6104,7 +6104,7 @@ a certain item) -->
 	</software>
 
 	<software name="pacattak">
-		<description>Pac-Attack (Euro, USA)</description>
+		<description>Pac-Attack (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6126,7 +6126,7 @@ a certain item) -->
 	</software>
 
 	<software name="pacmanj" cloneof="pacman">
-		<description>Pac-Man (Jpn)</description>
+		<description>Pac-Man (Japan)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14017"/>
@@ -6155,7 +6155,7 @@ a certain item) -->
 	</software>
 
 	<software name="panzer">
-		<description>Panzer Dragoon Mini (Jpn)</description>
+		<description>Panzer Dragoon Mini (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3384"/>
@@ -6169,7 +6169,7 @@ a certain item) -->
 	</software>
 
 	<software name="paperboy">
-		<description>Paperboy (Euro, USA)</description>
+		<description>Paperboy (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="301029-0161, T-48028-50"/>
@@ -6181,7 +6181,7 @@ a certain item) -->
 	</software>
 
 	<software name="paperboytw">
-		<description>Paperboy (Tw, SMS mode)</description>
+		<description>Paperboy (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-23"/>
@@ -6195,7 +6195,7 @@ a certain item) -->
 	</software>
 
 	<software name="paperbo2">
-		<description>Paperboy II (Euro, USA)</description>
+		<description>Paperboy II (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6217,7 +6217,7 @@ a certain item) -->
 	</software>
 
 	<software name="pengoj" cloneof="pengo">
-		<description>Pengo (Jpn)</description>
+		<description>Pengo (Japan)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3102"/>
@@ -6231,7 +6231,7 @@ a certain item) -->
 	</software>
 
 	<software name="pengo">
-		<description>Pengo (Euro, USA)</description>
+		<description>Pengo (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2202"/>
@@ -6246,7 +6246,7 @@ a certain item) -->
 	</software>
 
 	<software name="inudais">
-		<description>Pet Club Inu Daisuki! (Jpn)</description>
+		<description>Pet Club Inu Daisuki! (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3436"/>
@@ -6263,7 +6263,7 @@ a certain item) -->
 	</software>
 
 	<software name="sampras">
-		<description>Pete Sampras Tennis (Euro)</description>
+		<description>Pete Sampras Tennis (Europe)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6275,7 +6275,7 @@ a certain item) -->
 	</software>
 
 	<software name="pga96">
-		<description>PGA Tour 96 (Euro, USA)</description>
+		<description>PGA Tour 96 (Europe, USA)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="T-100078, T-100078-50"/>
@@ -6298,7 +6298,7 @@ a certain item) -->
 	</software>
 
 	<software name="pgatourt">
-		<description>PGA Tour Golf (Euro, USA)</description>
+		<description>PGA Tour Golf (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="T-48138 301045-0161, T-48138-50 301045-0161"/>
@@ -6313,7 +6313,7 @@ a certain item) -->
 	</software>
 
 	<software name="pgatour2">
-		<description>PGA Tour Golf II (Euro, USA)</description>
+		<description>PGA Tour Golf II (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6327,7 +6327,7 @@ a certain item) -->
 	</software>
 
 	<software name="pstaradv">
-		<description>Phantasy Star Adventure (Jpn)</description>
+		<description>Phantasy Star Adventure (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3216"/>
@@ -6341,7 +6341,7 @@ a certain item) -->
 	</software>
 
 	<software name="pstargdn">
-		<description>Phantasy Star Gaiden (Jpn)</description>
+		<description>Phantasy Star Gaiden (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3405"/>
@@ -6358,7 +6358,7 @@ a certain item) -->
 	</software>
 
 	<software name="phantom">
-		<description>Phantom 2040 (Euro, USA)</description>
+		<description>Phantom 2040 (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<info name="serial" value="T-139028, T-139028-50"/>
@@ -6382,7 +6382,7 @@ a certain item) -->
 	</software>
 
 	<software name="pocketj">
-		<description>Pocket Jansou (Jpn)</description>
+		<description>Pocket Jansou (Japan)</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14067"/>
@@ -6457,7 +6457,7 @@ a certain item) -->
 
 <!-- This only works on a Jpn gamegear! -->
 	<software name="popbreak">
-		<description>Pop Breaker (Jpn)</description>
+		<description>Pop Breaker (Japan)</description>
 		<year>1991</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-52017"/>
@@ -6471,7 +6471,7 @@ a certain item) -->
 	</software>
 
 	<software name="popeye">
-		<description>Popeye no Beach Volleyball (Jpn)</description>
+		<description>Popeye no Beach Volleyball (Japan)</description>
 		<year>1994</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="T-154017"/>
@@ -6485,7 +6485,7 @@ a certain item) -->
 	</software>
 
 	<software name="pdrive">
-		<description>Power Drive (Euro)</description>
+		<description>Power Drive (Europe)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6496,7 +6496,7 @@ a certain item) -->
 	</software>
 
 	<software name="pstrike2">
-		<description>Power Strike II (Euro) ~ GG Aleste II (Jpn)</description>
+		<description>Power Strike II (Europe) ~ GG Aleste II (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3330 (JPN), 2443"/>
@@ -6510,7 +6510,7 @@ a certain item) -->
 	</software>
 
 	<software name="predatr2">
-		<description>Predator 2 (Euro, USA, SMS mode)</description>
+		<description>Predator 2 (Europe, USA, SMS mode)</description>
 		<year>1992</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81068, T-81068-50"/>
@@ -6523,7 +6523,7 @@ a certain item) -->
 	</software>
 
 	<software name="primal">
-		<description>Primal Rage (Euro, USA)</description>
+		<description>Primal Rage (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Time Warner Interactive</publisher>
 		<info name="serial" value="301108-0161 T-48218, T-48218-50"/>
@@ -6538,7 +6538,7 @@ a certain item) -->
 	</software>
 
 	<software name="ppersia">
-		<description>Prince of Persia (Euro, SMS mode)</description>
+		<description>Prince of Persia (Europe, SMS mode)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88018-50"/>
@@ -6551,7 +6551,7 @@ a certain item) -->
 	</software>
 
 	<software name="ppersiatw" cloneof="ppersia">
-		<description>Prince of Persia (Tw, SMS mode)</description>
+		<description>Prince of Persia (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-15"/>
@@ -6578,7 +6578,7 @@ a certain item) -->
 	</software>
 
 	<software name="proyak91">
-		<description>The Pro Yakyuu '91 (Jpn)</description>
+		<description>The Pro Yakyuu '91 (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3207"/>
@@ -6592,7 +6592,7 @@ a certain item) -->
 	</software>
 
 	<software name="proyak94">
-		<description>Pro Yakyuu GG League '94 (Jpn)</description>
+		<description>Pro Yakyuu GG League '94 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3353"/>
@@ -6607,7 +6607,7 @@ a certain item) -->
 	</software>
 
 	<software name="proyakgg">
-		<description>Pro Yakyuu GG League (Jpn)</description>
+		<description>Pro Yakyuu GG League (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3407"/>
@@ -6626,7 +6626,7 @@ a certain item) -->
 	</software>
 
 	<software name="psychicwj" cloneof="psychicw">
-		<description>Psychic World (Jpn)</description>
+		<description>Psychic World (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3203"/>
@@ -6640,7 +6640,7 @@ a certain item) -->
 	</software>
 
 	<software name="psychicw">
-		<description>Psychic World (Euro, USA, Bra)</description>
+		<description>Psychic World (Europe, USA, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2306, 012.090"/>
@@ -6652,7 +6652,7 @@ a certain item) -->
 	</software>
 
 	<software name="puttputtj" cloneof="puttputt">
-		<description>Putt &amp; Putter (Jpn)</description>
+		<description>Putt &amp; Putter (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3209"/>
@@ -6666,7 +6666,7 @@ a certain item) -->
 	</software>
 
 	<software name="puttputt">
-		<description>Putt &amp; Putter (Euro, USA, Bra)</description>
+		<description>Putt &amp; Putter (Europe, USA, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2307, 013.450"/>
@@ -6678,7 +6678,7 @@ a certain item) -->
 	</software>
 
 	<software name="puyopuyo">
-		<description>Puyo Puyo (Jpn)</description>
+		<description>Puyo Puyo (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3324"/>
@@ -6695,7 +6695,7 @@ a certain item) -->
 	</software>
 
 	<software name="puyopuy2">
-		<description>Puyo Puyo 2 (Jpn)</description>
+		<description>Puyo Puyo 2 (Japan)</description>
 		<year>1994</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66037"/>
@@ -6712,7 +6712,7 @@ a certain item) -->
 	</software>
 
 	<software name="tantr">
-		<description>Puzzle &amp; Action Tant~R (Jpn)</description>
+		<description>Puzzle &amp; Action Tant~R (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3345"/>
@@ -6729,7 +6729,7 @@ a certain item) -->
 	</software>
 
 	<software name="pbobble" cloneof="bam">
-		<description>Puzzle Bobble (Jpn)</description>
+		<description>Puzzle Bobble (Japan)</description>
 		<year>1996</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11047"/>
@@ -6743,7 +6743,7 @@ a certain item) -->
 	</software>
 
 	<software name="quartet">
-		<description>Quartet (Tw, SMS mode)</description>
+		<description>Quartet (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-28"/>
@@ -6757,7 +6757,7 @@ a certain item) -->
 	</software>
 
 	<software name="shavnyak">
-		<description>Quest for the Shaven Yak Starring Ren Hoëk &amp; Stimpy (Euro, USA)</description>
+		<description>Quest for the Shaven Yak Starring Ren Hoëk &amp; Stimpy (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2519"/>
@@ -6769,7 +6769,7 @@ a certain item) -->
 	</software>
 
 	<software name="quizgear">
-		<description>The Quiz Gear Fight!! (Jpn)</description>
+		<description>The Quiz Gear Fight!! (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3367"/>
@@ -6813,7 +6813,7 @@ a certain item) -->
 	</software>
 
 	<software name="rastan">
-		<description>Rastan Saga (Jpn, SMS mode)</description>
+		<description>Rastan Saga (Japan, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11037"/>
@@ -6829,7 +6829,7 @@ a certain item) -->
 
 	<!-- Alt. Title: Wonderboy (Bra Box?) -->
 	<software name="revenged" cloneof="wboy">
-		<description>Revenge of Drancon (USA, Bra)</description>
+		<description>Revenge of Drancon (USA, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2302, 012.080"/>
@@ -6841,7 +6841,7 @@ a certain item) -->
 	</software>
 
 	<software name="riddickj" cloneof="riddick">
-		<description>Riddick Bowe Boxing (Jpn)</description>
+		<description>Riddick Bowe Boxing (Japan)</description>
 		<year>1994</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22027"/>
@@ -6867,7 +6867,7 @@ a certain item) -->
 	</software>
 
 	<software name="riserobo">
-		<description>Rise of the Robots (Euro, USA)</description>
+		<description>Rise of the Robots (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Time Warner Interactive / Absolute Entertainment</publisher>
 		<info name="serial" value="T-48208"/>
@@ -6949,7 +6949,7 @@ a certain item) -->
 	</software>
 
 	<software name="roadrash">
-		<description>Road Rash (Euro)</description>
+		<description>Road Rash (Europe)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="79108-50"/>
@@ -6987,7 +6987,7 @@ a certain item) -->
 	</software>
 
 	<software name="roboterm">
-		<description>RoboCop versus The Terminator (Euro, USA)</description>
+		<description>RoboCop versus The Terminator (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70128-50"/>
@@ -7003,7 +7003,7 @@ a certain item) -->
 	</software>
 
 	<software name="royalstn">
-		<description>Royal Stone - Hirakareshi Toki no Tobira (Jpn)</description>
+		<description>Royal Stone - Hirakareshi Toki no Tobira (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3425"/>
@@ -7020,7 +7020,7 @@ a certain item) -->
 	</software>
 
 	<software name="rtype">
-		<description>R-Type (Tw, SMS mode)</description>
+		<description>R-Type (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 401-01"/>
@@ -7034,7 +7034,7 @@ a certain item) -->
 	</software>
 
 	<software name="ryukyu" cloneof="solitarp">
-		<description>Ryuukyuu (Jpn)</description>
+		<description>Ryuukyuu (Japan)</description>
 		<year>1991</year>
 		<publisher>Face</publisher>
 		<info name="serial" value="T-54017"/>
@@ -7051,7 +7051,7 @@ a certain item) -->
 	</software>
 
 	<software name="sslucifr">
-		<description>S.S. Lucifer - Man Overboard! (Euro)</description>
+		<description>S.S. Lucifer - Man Overboard! (Europe)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="T-120088"/>
@@ -7076,7 +7076,7 @@ a certain item) -->
 	</software>
 
 	<software name="samspir" cloneof="samsho">
-		<description>Samurai Spirits (Jpn)</description>
+		<description>Samurai Spirits (Japan)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="T-146027"/>
@@ -7090,7 +7090,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspirits">
-		<description>Scramble Spirits (Tw, SMS mode)</description>
+		<description>Scramble Spirits (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-09"/>
@@ -7115,7 +7115,7 @@ a certain item) -->
 	</software>
 
 	<software name="scratchgj" cloneof="scratchg">
-		<description>Scratch Golf (Jpn)</description>
+		<description>Scratch Golf (Japan)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="T-23017"/>
@@ -7132,7 +7132,7 @@ a certain item) -->
 	</software>
 
 	<software name="sdgundam">
-		<description>SD Gundam - Winner's History (Jpn)</description>
+		<description>SD Gundam - Winner's History (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133027"/>
@@ -7149,7 +7149,7 @@ a certain item) -->
 	</software>
 
 	<software name="secret">
-		<description>Secret Command (Tw, SMS mode)</description>
+		<description>Secret Command (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-07"/>
@@ -7163,7 +7163,7 @@ a certain item) -->
 	</software>
 
 	<software name="sega4in1">
-		<description>Sega Game Pack 4 in 1 (Euro)</description>
+		<description>Sega Game Pack 4 in 1 (Europe)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7181,7 +7181,7 @@ a certain item) -->
 	</software>
 
 	<software name="sega4in1p" cloneof="sega4in1">
-		<description>Sega Game Pack 4 in 1 (Euro, prototype)</description>
+		<description>Sega Game Pack 4 in 1 (Europe, prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7192,7 +7192,7 @@ a certain item) -->
 	</software>
 
 	<software name="seishun">
-		<description>Seishun Scandal (Tw, SMS mode)</description>
+		<description>Seishun Scandal (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 256-06"/>
@@ -7206,7 +7206,7 @@ a certain item) -->
 	</software>
 
 	<software name="sensible">
-		<description>Sensible Soccer (Euro)</description>
+		<description>Sensible Soccer (Europe)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93068-50"/>
@@ -7218,7 +7218,7 @@ a certain item) -->
 	</software>
 
 	<software name="shadam" cloneof="defoasis">
-		<description>Shadam Crusader - Harukanaru Oukoku (Jpn)</description>
+		<description>Shadam Crusader - Harukanaru Oukoku (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3404"/>
@@ -7235,7 +7235,7 @@ a certain item) -->
 	</software>
 
 	<software name="shdancer">
-		<description>Shadow Dancer (Tw, SMS mode)</description>
+		<description>Shadow Dancer (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 401-06"/>
@@ -7249,7 +7249,7 @@ a certain item) -->
 	</software>
 
 	<software name="beast">
-		<description>Shadow of the Beast (Tw, SMS mode)</description>
+		<description>Shadow of the Beast (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-47"/>
@@ -7263,7 +7263,7 @@ a certain item) -->
 	</software>
 
 	<software name="shangh2a" cloneof="shangh2">
-		<description>Shanghai II (Jpn, v0)</description>
+		<description>Shanghai II (Japan, v0)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-15017"/>
@@ -7277,7 +7277,7 @@ a certain item) -->
 	</software>
 
 	<software name="shangh2">
-		<description>Shanghai II (Jpn, v1)</description>
+		<description>Shanghai II (Japan, v1)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-15037 (Meisaku Collection)"/>
@@ -7294,7 +7294,7 @@ a certain item) -->
 	</software>
 
 	<software name="shaqfu">
-		<description>Shaq Fu (Euro, USA)</description>
+		<description>Shaq Fu (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7305,7 +7305,7 @@ a certain item) -->
 	</software>
 
 	<software name="shikinjo">
-		<description>Shikinjou (Jpn)</description>
+		<description>Shikinjou (Japan)</description>
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-15027"/>
@@ -7319,7 +7319,7 @@ a certain item) -->
 	</software>
 
 	<software name="shinfrcg">
-		<description>Shining Force Gaiden - Ensei, Jashin no Kuni e (Jpn)</description>
+		<description>Shining Force Gaiden - Ensei, Jashin no Kuni e (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3406, G-3411 (Meisaku Collection)"/>
@@ -7336,7 +7336,7 @@ a certain item) -->
 	</software>
 
 	<software name="shinfrgf">
-		<description>Shining Force Gaiden - Final Conflict (Jpn)</description>
+		<description>Shining Force Gaiden - Final Conflict (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3428"/>
@@ -7353,7 +7353,7 @@ a certain item) -->
 	</software>
 
 	<software name="shinfrc2">
-		<description>Shining Force II - The Sword of Hajya (Euro, USA)</description>
+		<description>Shining Force II - The Sword of Hajya (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2524"/>
@@ -7369,7 +7369,7 @@ a certain item) -->
 	</software>
 
 	<software name="shinfrg2" cloneof="shinfrc2">
-		<description>Shining Force Gaiden II - Jashin no Kakusei (Jpn)</description>
+		<description>Shining Force Gaiden II - Jashin no Kakusei (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3409"/>
@@ -7484,7 +7484,7 @@ a certain item) -->
 	</software>
 
 	<software name="bartvssm">
-		<description>The Simpsons - Bart vs. The Space Mutants (Euro, USA)</description>
+		<description>The Simpsons - Bart vs. The Space Mutants (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="T-81018, T-81018-50"/>
@@ -7517,7 +7517,7 @@ a certain item) -->
 
 	<!-- Developers: Loriciel -->
 	<software name="skweek" cloneof="slider">
-		<description>Skweek (Jpn)</description>
+		<description>Skweek (Japan)</description>
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
 		<info name="serial" value="T-60017"/>
@@ -7531,7 +7531,7 @@ a certain item) -->
 	</software>
 
 	<software name="slider">
-		<description>Slider (Euro, USA)</description>
+		<description>Slider (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2315"/>
@@ -7543,7 +7543,7 @@ a certain item) -->
 	</software>
 
 	<software name="smurfs">
-		<description>The Smurfs (Euro)</description>
+		<description>The Smurfs (Europe)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="T-151018-50"/>
@@ -7556,7 +7556,7 @@ a certain item) -->
 
 	<!-- Alt. Titles: The Smurfs Travel the World (Euro Box), Les Schtroumpfs Autour du Monde (Fra Box), Die Schlümpfe Reisen um die Welt (Ger Box) -->
 	<software name="smurfs2">
-		<description>The Smurfs 2 (Euro)</description>
+		<description>The Smurfs 2 (Europe)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="T-151028-50"/>
@@ -7580,7 +7580,7 @@ a certain item) -->
 	</software>
 
 	<software name="solitarp">
-		<description>Solitaire Poker (Euro, USA)</description>
+		<description>Solitaire Poker (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2316"/>
@@ -7592,7 +7592,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonictls" cloneof="sonicc">
-		<description>Sonic &amp; Tails (Jpn)</description>
+		<description>Sonic &amp; Tails (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3331"/>
@@ -7606,7 +7606,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonictlss" cloneof="sonicc">
-		<description>Sonic &amp; Tails (Jpn, Jitsuenyou Sample)</description>
+		<description>Sonic &amp; Tails (Japan, Jitsuenyou Sample)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="ソニック&amp;テイルス 実演用 サンプル"/>
@@ -7618,7 +7618,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonictl2" cloneof="sonictri">
-		<description>Sonic &amp; Tails 2 (Jpn)</description>
+		<description>Sonic &amp; Tails 2 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3356"/>
@@ -7632,7 +7632,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicbls">
-		<description>Sonic Blast (Euro, USA) ~ G Sonic (Jpn)</description>
+		<description>Sonic Blast (Europe, USA) ~ G Sonic (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3385 (JPN), 2573, 2573-50"/>
@@ -7716,7 +7716,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicc">
-		<description>Sonic the Hedgehog Chaos (Euro, USA, Bra)</description>
+		<description>Sonic the Hedgehog Chaos (Europe, USA, Brazil)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2515, 1204, 077080"/>
@@ -7732,7 +7732,7 @@ a certain item) -->
 
 	<!-- Notes: Sega Europe labels; internal version not ideal for reference -->
 	<software name="sonicc517" cloneof="sonicc">
-		<description>Sonic the Hedgehog Chaos (Euro, prototype 19930517)</description>
+		<description>Sonic the Hedgehog Chaos (Europe, prototype 19930517)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7746,7 +7746,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicdrs" cloneof="sonicdr">
-		<description>Sonic Drift (Jpn, Demo Sample)</description>
+		<description>Sonic Drift (Japan, demo sample)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7759,7 +7759,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicdr">
-		<description>Sonic Drift (Jpn)</description>
+		<description>Sonic Drift (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3415"/>
@@ -7775,7 +7775,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicdr2">
-		<description>Sonic Drift 2 (Jpn, USA)</description>
+		<description>Sonic Drift 2 (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3366 (JPN), 2562"/>
@@ -7810,7 +7810,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspin">
-		<description>Sonic Spinball (Euro, USA)</description>
+		<description>Sonic Spinball (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2526, 1200"/>
@@ -8042,7 +8042,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicj" cloneof="sonic">
-		<description>Sonic The Hedgehog (Jpn, USA, v0)</description>
+		<description>Sonic The Hedgehog (Japan, USA, v0)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3307 (JPN), 2408"/>
@@ -8056,7 +8056,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonic">
-		<description>Sonic The Hedgehog (Euro, Jpn, v1)</description>
+		<description>Sonic The Hedgehog (Europe, Japan, v1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3307 (JPN), G-3334 (JPN, Meisaku Collection), 2408"/>
@@ -8135,7 +8135,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonictri">
-		<description>Sonic The Hedgehog - Triple Trouble (Euro, USA)</description>
+		<description>Sonic The Hedgehog - Triple Trouble (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2530, 2530-50"/>
@@ -8161,7 +8161,7 @@ a certain item) -->
 	</software>
 
 	<software name="sokoban">
-		<description>Soukoban (Jpn)</description>
+		<description>Soukoban (Japan)</description>
 		<year>1990</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-53017"/>
@@ -8193,7 +8193,7 @@ a certain item) -->
 
 	<software name="cheese">
 		<!-- The same dump has also been released as proto build 19950217 and 19950224 (which means that the code has not changed at all in the last weeks of development) -->
-		<description>Cheese Cat-astrophe Starring Speedy Gonzales (Euro)</description>
+		<description>Cheese Cat-astrophe Starring Speedy Gonzales (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2523, 2523-50"/>
@@ -8205,7 +8205,7 @@ a certain item) -->
 	</software>
 
 	<software name="spidermn">
-		<description>Spider-Man - Return of the Sinister Six (Euro, USA)</description>
+		<description>Spider-Man - Return of the Sinister Six (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="T-81128, T-81128-50"/>
@@ -8229,7 +8229,7 @@ a certain item) -->
 	</software>
 
 	<software name="spidking">
-		<description>Spider-Man vs. The Kingpin (Euro, USA)</description>
+		<description>Spider-Man vs. The Kingpin (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="T-81028, T-81028-50"/>
@@ -8241,7 +8241,7 @@ a certain item) -->
 	</software>
 
 	<software name="spirou">
-		<description>Spirou (Euro, prototype)</description>
+		<description>Spirou (Europe, prototype)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8252,7 +8252,7 @@ a certain item) -->
 	</software>
 
 	<software name="sportill">
-		<description>Sports Illustrated Championship Football &amp; Baseball (Euro, USA)</description>
+		<description>Sports Illustrated Championship Football &amp; Baseball (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8409,7 +8409,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvce">
-		<description>Sports Trivia - Championship Edition (Euro, USA)</description>
+		<description>Sports Trivia - Championship Edition (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8697,7 +8697,7 @@ a certain item) -->
 	</software>
 
 	<software name="stgbeyn">
-		<description>Star Trek Generations - Beyond the Nexus (Euro, USA)</description>
+		<description>Star Trek Generations - Beyond the Nexus (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Absolute Entertainment</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8708,7 +8708,7 @@ a certain item) -->
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars (Euro)</description>
+		<description>Star Wars (Europe)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79098-50"/>
@@ -8772,7 +8772,7 @@ a certain item) -->
 
 	<!-- Developers: Sega AM7 (CS2) / JSH -->
 	<software name="sor">
-		<description>Streets of Rage (World) ~ Bare Knuckle (Jpn)</description>
+		<description>Streets of Rage (World) ~ Bare Knuckle (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3313 (JPN), 2417"/>
@@ -8787,7 +8787,7 @@ a certain item) -->
 
 	<!-- Developers: Ancient / H.I.C. / Shout! Designworks / JSH -->
 	<software name="sor2">
-		<description>Streets of Rage II (World) ~ Bare Knuckle II - Shitou e no Chingonka (Jpn)</description>
+		<description>Streets of Rage II (World) ~ Bare Knuckle II - Shitou e no Chingonka (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3328 (JPN), 2517"/>
@@ -8816,7 +8816,7 @@ a certain item) -->
 	</software>
 
 	<software name="strider">
-		<description>Strider (Tw, SMS mode)</description>
+		<description>Strider (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 401-02"/>
@@ -8830,7 +8830,7 @@ a certain item) -->
 	</software>
 
 	<software name="striker">
-		<description>Striker (Euro)</description>
+		<description>Striker (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2551-50"/>
@@ -8842,7 +8842,7 @@ a certain item) -->
 	</software>
 
 	<software name="submarin">
-		<description>Submarine Attack (Tw, SMS mode)</description>
+		<description>Submarine Attack (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-31"/>
@@ -8868,7 +8868,7 @@ a certain item) -->
 	</software>
 
 	<software name="supercolj" cloneof="supercol">
-		<description>Super Columns (Jpn)</description>
+		<description>Super Columns (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3226"/>
@@ -8885,7 +8885,7 @@ a certain item) -->
 	</software>
 
 	<software name="supercol">
-		<description>Super Columns (Euro, USA)</description>
+		<description>Super Columns (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2449, 2449-50"/>
@@ -8985,7 +8985,7 @@ a certain item) -->
 	</software>
 
 	<software name="supgolfj" cloneof="supgolf">
-		<description>Super Golf (Jpn)</description>
+		<description>Super Golf (Japan)</description>
 		<year>1991</year>
 		<publisher>Sigma Enterprises</publisher>
 		<info name="serial" value="T-26017, T-26027"/>
@@ -8999,7 +8999,7 @@ a certain item) -->
 	</software>
 
 	<software name="skickoff">
-		<description>Super Kick Off (Euro, SMS mode)</description>
+		<description>Super Kick Off (Europe, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2415"/>
@@ -9012,7 +9012,7 @@ a certain item) -->
 	</software>
 
 	<software name="smomo3">
-		<description>Super Momotarou Dentetsu III (Jpn)</description>
+		<description>Super Momotarou Dentetsu III (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-143017"/>
@@ -9031,7 +9031,7 @@ a certain item) -->
 	</software>
 
 	<software name="smgpj" cloneof="smgp">
-		<description>Super Monaco GP (Jpn)</description>
+		<description>Super Monaco GP (Japan)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3201"/>
@@ -9045,7 +9045,7 @@ a certain item) -->
 	</software>
 
 	<software name="smgp">
-		<description>Super Monaco GP (Euro, USA, Bra)</description>
+		<description>Super Monaco GP (Europe, USA, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2304, 012.140"/>
@@ -9060,7 +9060,7 @@ a certain item) -->
 	</software>
 
 	<software name="superoff">
-		<description>Super Off Road (Euro, USA)</description>
+		<description>Super Off Road (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70018, T-70018-50"/>
@@ -9083,7 +9083,7 @@ a certain item) -->
 	</software>
 
 	<software name="suprjedi">
-		<description>Super Star Wars: Return of the Jedi (Euro, USA)</description>
+		<description>Super Star Wars: Return of the Jedi (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="T-100088, T-100088-50"/>
@@ -9110,7 +9110,7 @@ a certain item) -->
 	</software>
 
 	<software name="ssinv">
-		<description>Super Space Invaders (Euro, USA)</description>
+		<description>Super Space Invaders (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-48078 301052-0161, T-88028-50"/>
@@ -9134,7 +9134,7 @@ a certain item) -->
 	</software>
 
 	<software name="superman">
-		<description>Superman - The Man of Steel (Euro)</description>
+		<description>Superman - The Man of Steel (Europe)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70068"/>
@@ -9149,7 +9149,7 @@ a certain item) -->
 	</software>
 
 	<software name="supermanp" cloneof="superman">
-		<description>Superman - The Man of Steel (Euro, prototype)</description>
+		<description>Superman - The Man of Steel (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9160,7 +9160,7 @@ a certain item) -->
 	</software>
 
 	<software name="surfninj">
-		<description>Surf Ninjas (USA, Bra)</description>
+		<description>Surf Ninjas (USA, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2510"/>
@@ -9172,7 +9172,7 @@ a certain item) -->
 	</software>
 
 	<software name="sylvan">
-		<description>Sylvan Tale (Jpn)</description>
+		<description>Sylvan Tale (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3426"/>
@@ -9189,7 +9189,7 @@ a certain item) -->
 	</software>
 
 	<software name="t2ag">
-		<description>T2 - The Arcade Game (Euro, USA)</description>
+		<description>T2 - The Arcade Game (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81088, T-81088-50"/>
@@ -9201,7 +9201,7 @@ a certain item) -->
 	</software>
 
 	<software name="t2agj" cloneof="t2ag">
-		<description>T2 - The Arcade Game (Jpn)</description>
+		<description>T2 - The Arcade Game (Japan)</description>
 		<year>1993</year>
 		<publisher>Acclaim</publisher>
 		<info name="serial" value="T-81027"/>
@@ -9230,7 +9230,7 @@ a certain item) -->
 	</software>
 
 	<software name="tailskyp">
-		<description>Tails no Skypatrol (Jpn)</description>
+		<description>Tails no Skypatrol (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3368"/>
@@ -9244,7 +9244,7 @@ a certain item) -->
 	</software>
 
 	<software name="taisnmj">
-		<description>Taisen Mahjong HaoPai (Jpn)</description>
+		<description>Taisen Mahjong HaoPai (Japan)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3202, G-3223 (Meisaku Collection)"/>
@@ -9258,7 +9258,7 @@ a certain item) -->
 	</software>
 
 	<software name="taisnmj2">
-		<description>Taisen Mahjong HaoPai 2 (Jpn)</description>
+		<description>Taisen Mahjong HaoPai 2 (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3335"/>
@@ -9272,7 +9272,7 @@ a certain item) -->
 	</software>
 
 	<software name="daisenrg">
-		<description>Taisen-gata Daisenryaku G (Jpn)</description>
+		<description>Taisen-gata Daisenryaku G (Japan)</description>
 		<year>1991</year>
 		<publisher>SystemSoft</publisher>
 		<info name="serial" value="T-51017, T-51027 (Meisaku Collection)"/>
@@ -9296,7 +9296,7 @@ a certain item) -->
 	</software>
 
 	<software name="chasehqj" cloneof="chasehq">
-		<description>Taito Chase H.Q. (Jpn, SMS mode)</description>
+		<description>Taito Chase H.Q. (Japan, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11017"/>
@@ -9324,7 +9324,7 @@ a certain item) -->
 	</software>
 
 	<software name="talespin">
-		<description>Tale Spin (Euro, USA)</description>
+		<description>Tale Spin (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2412"/>
@@ -9336,7 +9336,7 @@ a certain item) -->
 	</software>
 
 	<software name="tamalymp">
-		<description>Tama &amp; Friends Sanchoume Kouen - Tamalympic (Jpn)</description>
+		<description>Tama &amp; Friends Sanchoume Kouen - Tamalympic (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3361"/>
@@ -9350,7 +9350,7 @@ a certain item) -->
 	</software>
 
 	<software name="tarot">
-		<description>Tarot no Yakata (Jpn)</description>
+		<description>Tarot no Yakata (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3208"/>
@@ -9364,7 +9364,7 @@ a certain item) -->
 	</software>
 
 	<software name="tarzan">
-		<description>Tarzan - Lord of the Jungle (Euro)</description>
+		<description>Tarzan - Lord of the Jungle (Europe)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="T-83098-50"/>
@@ -9376,7 +9376,7 @@ a certain item) -->
 	</software>
 
 	<software name="proyaktl">
-		<description>Tatakae! Pro Yakyuu Twin League (Jpn)</description>
+		<description>Tatakae! Pro Yakyuu Twin League (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3371"/>
@@ -9390,7 +9390,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmars">
-		<description>Taz in Escape from Mars (Euro, USA)</description>
+		<description>Taz in Escape from Mars (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2538, 2538-50"/>
@@ -9556,7 +9556,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmania">
-		<description>Taz-Mania - The Search for the Lost Seabirds (Euro, USA)</description>
+		<description>Taz-Mania - The Search for the Lost Seabirds (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2413"/>
@@ -9687,7 +9687,7 @@ a certain item) -->
 	</software>
 
 	<software name="tengenwc">
-		<description>Tengen World Cup Soccer (Euro, USA)</description>
+		<description>Tengen World Cup Soccer (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="T-48118, T-48118-50"/>
@@ -9713,7 +9713,7 @@ a certain item) -->
 	</software>
 
 	<software name="term2">
-		<description>Terminator 2 - Judgment Day (Euro, USA)</description>
+		<description>Terminator 2 - Judgment Day (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="T-81148, T-81148-50"/>
@@ -9725,7 +9725,7 @@ a certain item) -->
 	</software>
 
 	<software name="termntr">
-		<description>The Terminator (Euro, USA)</description>
+		<description>The Terminator (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70048, T-70048-50"/>
@@ -9737,7 +9737,7 @@ a certain item) -->
 	</software>
 
 	<software name="tesserae">
-		<description>Tesserae (Euro, USA)</description>
+		<description>Tesserae (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9748,7 +9748,7 @@ a certain item) -->
 	</software>
 
 	<software name="tblade">
-		<description>Thunder Blade (Tw, SMS mode)</description>
+		<description>Thunder Blade (Taiwan, SMS mode)</description>
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-03"/>
@@ -9762,7 +9762,7 @@ a certain item) -->
 	</software>
 
 	<software name="tintin">
-		<description>Tintin in Tibet (Euro)</description>
+		<description>Tintin in Tibet (Europe)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="T-151038-50"/>
@@ -9775,7 +9775,7 @@ a certain item) -->
 
 	<!-- Developers: SIMS -->
 	<software name="tomjermvj" cloneof="tomjermv">
-		<description>Tom and Jerry - The Movie (Jpn)</description>
+		<description>Tom and Jerry - The Movie (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3319"/>
@@ -9801,7 +9801,7 @@ a certain item) -->
 	</software>
 
 	<software name="torarete">
-		<description>Torarete Tamaru ka!? (Jpn)</description>
+		<description>Torarete Tamaru ka!? (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3348"/>
@@ -9832,7 +9832,7 @@ a certain item) -->
 	</software>
 
 	<software name="ultsoccr">
-		<description>Ultimate Soccer (Euro, Jpn, Bra)</description>
+		<description>Ultimate Soccer (Europe, Japan, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3333 (JPN), 075.300"/>
@@ -9849,7 +9849,7 @@ a certain item) -->
 	</software>
 
 	<software name="ustrike">
-		<description>Urban Strike (Euro, USA)</description>
+		<description>Urban Strike (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9872,7 +9872,7 @@ a certain item) -->
 	</software>
 
 	<software name="vfa">
-		<description>Virtua Fighter Animation (Euro, USA)</description>
+		<description>Virtua Fighter Animation (Europe, USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2570"/>
@@ -9888,7 +9888,7 @@ a certain item) -->
 	</software>
 
 	<software name="vfmini" cloneof="vfa">
-		<description>Virtua Fighter Mini (Jpn)</description>
+		<description>Virtua Fighter Mini (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3380"/>
@@ -9906,7 +9906,7 @@ a certain item) -->
 	</software>
 
 	<software name="vrtroop">
-		<description>VR Troopers (Euro, USA)</description>
+		<description>VR Troopers (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2559, 2559-50"/>
@@ -9918,7 +9918,7 @@ a certain item) -->
 	</software>
 
 	<software name="wagyan">
-		<description>Wagyan Land (Jpn)</description>
+		<description>Wagyan Land (Japan)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14047"/>
@@ -9935,7 +9935,7 @@ a certain item) -->
 	</software>
 
 	<software name="wagyana" cloneof="wagyan">
-		<description>Wagyan Land (Jpn, Alt)</description>
+		<description>Wagyan Land (Japan, Alt)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14047"/>
@@ -9989,7 +9989,7 @@ a certain item) -->
 	</software>
 
 	<software name="wintolj" cloneof="wintol">
-		<description>Winter Olympics - Lillehammer '94 (Jpn)</description>
+		<description>Winter Olympics - Lillehammer '94 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3342"/>
@@ -10006,7 +10006,7 @@ a certain item) -->
 	</software>
 
 	<software name="wintol">
-		<description>Winter Olympics - Lillehammer '94 (Euro, USA)</description>
+		<description>Winter Olympics - Lillehammer '94 (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79088"/>
@@ -10021,7 +10021,7 @@ a certain item) -->
 	</software>
 
 	<software name="wizard">
-		<description>Wizard Pinball (Euro)</description>
+		<description>Wizard Pinball (Europe)</description>
 		<year>1995</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10032,7 +10032,7 @@ a certain item) -->
 	</software>
 
 	<software name="wolfchld">
-		<description>Wolfchild (Euro)</description>
+		<description>Wolfchild (Europe)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70078-50"/>
@@ -10047,7 +10047,7 @@ a certain item) -->
 	</software>
 
 	<software name="wboy">
-		<description>Wonder Boy (Euro)</description>
+		<description>Wonder Boy (Europe)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10061,7 +10061,7 @@ a certain item) -->
 	</software>
 
 	<software name="wboyj" cloneof="wboy">
-		<description>Wonder Boy (Jpn)</description>
+		<description>Wonder Boy (Japan)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3205"/>
@@ -10075,7 +10075,7 @@ a certain item) -->
 	</software>
 
 	<software name="wboydtrp">
-		<description>Wonder Boy - The Dragon's Trap (Euro)</description>
+		<description>Wonder Boy - The Dragon's Trap (Europe)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10089,7 +10089,7 @@ a certain item) -->
 	</software>
 
 	<software name="wboydtrpp" cloneof="wboydtrp">
-		<description>Wonder Boy III - The Dragon's Trap (Euro, prototype)</description>
+		<description>Wonder Boy III - The Dragon's Trap (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10100,7 +10100,7 @@ a certain item) -->
 	</software>
 
 	<software name="woodypop">
-		<description>Woody Pop (Euro, USA, v1.1)</description>
+		<description>Woody Pop (Europe, USA, v1.1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10114,7 +10114,7 @@ a certain item) -->
 	</software>
 
 	<software name="woodypop1" cloneof="woodypop">
-		<description>Woody Pop (Euro, USA)</description>
+		<description>Woody Pop (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10125,7 +10125,7 @@ a certain item) -->
 	</software>
 
 	<software name="wclead">
-		<description>World Class Leader Board (Euro, USA)</description>
+		<description>World Class Leader Board (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2406, 2406-50"/>
@@ -10140,7 +10140,7 @@ a certain item) -->
 	</software>
 
 	<software name="wcup94">
-		<description>World Cup USA 94 (Euro, USA)</description>
+		<description>World Cup USA 94 (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79128, 79128-50, 79128-09, 79128-18"/>
@@ -10152,7 +10152,7 @@ a certain item) -->
 	</software>
 
 	<software name="wderby">
-		<description>World Derby (Jpn)</description>
+		<description>World Derby (Japan)</description>
 		<year>1994</year>
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-68017"/>
@@ -10268,7 +10268,7 @@ a certain item) -->
 	</software>
 
 	<software name="wwfraw">
-		<description>WWF Raw (Euro, USA)</description>
+		<description>WWF Raw (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81258, T-81258-50"/>
@@ -10280,7 +10280,7 @@ a certain item) -->
 	</software>
 
 	<software name="wwfsteel">
-		<description>WWF Wrestlemania Steel Cage Challenge (Euro, SMS mode)</description>
+		<description>WWF Wrestlemania Steel Cage Challenge (Europe, SMS mode)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10304,7 +10304,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmengl">
-		<description>X-Men - Gamemaster's Legacy (Euro, USA)</description>
+		<description>X-Men - Gamemaster's Legacy (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2531, 2531-50"/>
@@ -10349,7 +10349,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmenmojo">
-		<description>X-Men - Mojo World (Euro, USA)</description>
+		<description>X-Men - Mojo World (Europe, USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10437,7 +10437,7 @@ a certain item) -->
 	</software>
 
 	<software name="xtermin">
-		<description>X-Terminator v2.1 for Game Gear (USA, Euro)</description>
+		<description>X-Terminator v2.1 for Game Gear (USA, Europe)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10451,7 +10451,7 @@ a certain item) -->
 	</software>
 
 	<software name="xterminj" cloneof="xtermin">
-		<description>X-Terminator v2.1J for Game Gear (Jpn)</description>
+		<description>X-Terminator v2.1J for Game Gear (Japan)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10476,7 +10476,7 @@ a certain item) -->
 	</software>
 
 	<software name="yuyu">
-		<description>Yu Yu Hakusho - Horobishimono no Gyakushuu (Jpn)</description>
+		<description>Yu Yu Hakusho - Horobishimono no Gyakushuu (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3343"/>
@@ -10493,7 +10493,7 @@ a certain item) -->
 	</software>
 
 	<software name="yuyu2">
-		<description>Yu Yu Hakusho 2 - Gekitou! Nanakyou no Tatakai (Jpn)</description>
+		<description>Yu Yu Hakusho 2 - Gekitou! Nanakyou no Tatakai (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3354"/>
@@ -10510,7 +10510,7 @@ a certain item) -->
 	</software>
 
 	<software name="zangear">
-		<description>Zan Gear (Jpn)</description>
+		<description>Zan Gear (Japan)</description>
 		<year>1990</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32017"/>
@@ -10524,7 +10524,7 @@ a certain item) -->
 	</software>
 
 	<software name="zool">
-		<description>Zool (Euro)</description>
+		<description>Zool (Europe)</description>
 		<year>1994</year>
 		<publisher>Gremlin</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10535,7 +10535,7 @@ a certain item) -->
 	</software>
 
 	<software name="zoolj" cloneof="zool">
-		<description>Zool no Yume Bouken (Jpn)</description>
+		<description>Zool no Yume Bouken (Japan)</description>
 		<year>1994</year>
 		<publisher>Infocom</publisher>
 		<info name="serial" value="T-149017"/>

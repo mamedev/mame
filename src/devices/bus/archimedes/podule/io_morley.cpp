@@ -318,7 +318,7 @@ void arc_io_morley_device::device_reset()
 
 int arc_io_morley_device::get_analogue_input(int channel_number)
 {
-	return (0xff - m_analog->ch_r(channel_number)) << 8;
+	return m_analog->ch_r(channel_number) << 8;
 }
 
 void arc_io_morley_device::upd7002_eoc(int state)

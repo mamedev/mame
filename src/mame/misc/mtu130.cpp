@@ -828,10 +828,10 @@ ROM_START(mtu130)
 	ROM_LOAD("6301.u55", 0, 0x100, CRC(1541eb91) SHA1(78ab124865dc6ffd646abd2fcab5b881edd619c1))
 
 	ROM_REGION(0x100, "id", 0) // 4-bit prom, only first 16 nibbles reachable, rest all f
-    // address 1     unused f
-    // address 2-6   vendor 00102
-    // address 7-b   group  00000
-    // address c-f,0 user   00175 (used by BASIC 1.5 for system-locking)
+	// address 1     unused f
+	// address 2-6   vendor 00102
+	// address 7-b   group  00000
+	// address c-f,0 user   00175 (used by BASIC 1.5 for system-locking)
 
 	ROM_LOAD("6301.u24", 0, 0x100, CRC(7ebc5451) SHA1(402bd7bf343d995bc9c857fe4f3a23e0a8e7bd1c))
 ROM_END

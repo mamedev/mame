@@ -70,7 +70,7 @@ uint32_t as_format::crc32r(const uint8_t *data, uint32_t size)
 bool as_format::load_bitstream_track(const std::vector<uint8_t> &img, floppy_image *image, int head, int track, int subtrack, uint8_t idx, uint32_t off_trks, bool may_be_short, bool set_variant)
 {
 	uint32_t trks_off = off_trks + (idx * 8);
-	
+
 	uint32_t track_size = r32(img, trks_off + 4);
 	if (track_size == 0)
 		return false;
@@ -80,14 +80,14 @@ bool as_format::load_bitstream_track(const std::vector<uint8_t> &img, floppy_ima
 	// With 5.25 floppies the end-of-track may be missing
 	// if unformatted.  Accept track length down to 95% of
 	// 51090, otherwise pad it
-	
+
 	bool short_track = may_be_short && track_size < 48535;
 
 	if(short_track) {
 		std::vector<uint8_t> buffer(6387, 0);
 		memcpy(buffer.data(), &img[boff], (track_size + 7) / 8);
 		generate_track_from_bitstream(track, head, buffer.data(), 51090, image, subtrack, 0xffff);
-		
+
 	} else
 		generate_track_from_bitstream(track, head, &img[boff], track_size, image, subtrack, 0xffff);
 
@@ -432,7 +432,7 @@ bool woz_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 
 	} else {
 		for(unsigned int i=0; i != 160; i++) {
-			tracks[i] = analyze_for_save(image, i & 1, i >> 1, 0, i / (2*16));				
+			tracks[i] = analyze_for_save(image, i & 1, i >> 1, 0, i / (2*16));
 			if((i & 1) && tracks[i].track_size)
 				twosided = true;
 		}
@@ -593,7 +593,7 @@ bool moof_format::save(util::random_read_write &io, const std::vector<uint32_t> 
 
 	} else {
 		for(unsigned int i=0; i != 160; i++) {
-			tracks[i] = analyze_for_save(image, i & 1, i >> 1, 0, i / (2*16));				
+			tracks[i] = analyze_for_save(image, i & 1, i >> 1, 0, i / (2*16));
 			if((i & 1) && tracks[i].track_size)
 				twosided = true;
 		}

@@ -20,8 +20,6 @@
     DEVICE INTERFACE
 *****************************************************************************/
 
-
-
 DEFINE_DEVICE_TYPE(JALECO_BLEND, jaleco_blend_device, "jaleco_blend", "Jaleco Blending Device")
 
 jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -96,8 +94,8 @@ rgb_t jaleco_blend_device::func(rgb_t dest, rgb_t addMe, u8 alpha)
 
 template<class BitmapClass>
 void jaleco_blend_device::drawgfx_common(palette_device &palette,BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color)
+		u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+		u8 transparent_color)
 {
 	/* Start drawing */
 	const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
@@ -163,10 +161,15 @@ void jaleco_blend_device::drawgfx_common(palette_device &palette,BitmapClass &de
 }
 
 void jaleco_blend_device::drawgfx(palette_device &palette,bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color)
-{ jaleco_blend_device::drawgfx_common(palette,dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }
+		u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+		u8 transparent_color)
+{
+	jaleco_blend_device::drawgfx_common(palette,dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color);
+}
+
 void jaleco_blend_device::drawgfx(palette_device &palette,bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color)
-{ jaleco_blend_device::drawgfx_common(palette,dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }
+		u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+		u8 transparent_color)
+{
+	jaleco_blend_device::drawgfx_common(palette,dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color);
+}

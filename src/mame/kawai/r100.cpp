@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "mb63h158.h"
 #include "cpu/m6502/m50734.h"
 #include "machine/nvram.h"
 #include "video/hd44780.h"
@@ -35,7 +36,6 @@ private:
 	void p1_w(u8 data);
 	void p2_w(u8 data);
 	void p3_w(u8 data);
-	u8 sensor_lsi_r(offs_t offset);
 	void buffer_w(u8 data);
 
 	void main_map(address_map &map);
@@ -75,11 +75,6 @@ void kawai_r100_state::p3_w(u8 data)
 {
 }
 
-u8 kawai_r100_state::sensor_lsi_r(offs_t offset)
-{
-	return 0;
-}
-
 void kawai_r100_state::buffer_w(u8 data)
 {
 }
@@ -88,7 +83,7 @@ void kawai_r100_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram1");
 	map(0x2000, 0x3fff).ram().share("nvram2");
-	map(0x4100, 0x41ff).r(FUNC(kawai_r100_state::sensor_lsi_r));
+	map(0x4100, 0x41ff).r("sensor", FUNC(mb63h158_device::read));
 	map(0x4200, 0x4200).mirror(0xff).w(m_lcdc, FUNC(hd44780_device::db_w));
 	map(0x4300, 0x4300).mirror(0xff).w(FUNC(kawai_r100_state::buffer_w));
 	map(0x4400, 0xffff).rom().region("program", 0x4400);
@@ -118,6 +113,8 @@ void kawai_r100_state::r100(machine_config &config)
 
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0); // MB8464-15LL-SK + battery
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // MB8464-15LL-SK + battery
+
+	MB63H158(config, "sensor", 16_MHz_XTAL / 4);
 
 	//M60009_AGU_DGU(config, "pcm", 5_MHz_XTAL);
 
