@@ -399,9 +399,9 @@ void msx_cart_konami_sound_device::switch_bank()
 {
 	u8 view = VIEW_READ;
 	if ((m_selected_bank[Bank] & 0x0f) >= m_min_rambank && (m_selected_bank[Bank] & 0x0f) <= m_max_rambank)
-		view |= VIEW_INVALID;
-	else
 		m_rambank[Bank]->set_entry(m_selected_bank[Bank] & 0x07);
+	else
+		view |= VIEW_INVALID;
 	if (BIT(m_control, 4))
 		view |= VIEW_RAM;
 	else
