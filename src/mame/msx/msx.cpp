@@ -8852,7 +8852,7 @@ void msx2_state::nms8260(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom3", 3, 0, 3, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 	// There is actually only an FDC inside with a floppy controller to attach an external floppy drive
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793, "disk", 3, 3, 1, 2, "diskrom");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_0, "disk", 3, 3, 1, 2, "diskrom");
 
 	msx2_pal(YM2149, config);
 }

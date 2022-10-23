@@ -15,11 +15,12 @@
 /* WD FDC accessed through 7ffx */
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_FD1793, msx_slot_disk1_fd1793_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_MB8877, msx_slot_disk1_mb8877_device)
-DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_N, msx_slot_disk1_wd2793_n_device) /* No force ready */
-DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_N_2_DRIVES, msx_slot_disk1_wd2793_n_2_drives_device) /* No force ready */
-DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793, msx_slot_disk1_wd2793_device) /* Force ready */
-DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_SS, msx_slot_disk1_wd2793_ss_device) /* Force ready */
-DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_2_DRIVES, msx_slot_disk1_wd2793_2_drives_device) /* Force ready */
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_N, msx_slot_disk1_wd2793_n_device)
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_N_2_DRIVES, msx_slot_disk1_wd2793_n_2_drives_device)
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793, msx_slot_disk1_wd2793_device)
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_0, msx_slot_disk1_wd2793_0_device) // No drives, for nms8260
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_SS, msx_slot_disk1_wd2793_ss_device)
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_2_DRIVES, msx_slot_disk1_wd2793_2_drives_device)
 /* WD FDC accessed through 7fbx */
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK2_FD1793_SS, msx_slot_disk2_fd1793_ss_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK2_MB8877, msx_slot_disk2_mb8877_device)
@@ -53,11 +54,20 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_DISK11_WD2793, msx_slot_disk11_wd2793_device)
 class msx_slot_disk_device : public msx_slot_rom_device
 {
 protected:
+	static constexpr int NO_DRIVES = 0;
+	static constexpr int DRIVES_1 = 1;
+	static constexpr int DRIVES_2 = 2;
+	static constexpr int DRIVES_3 = 3;
+	static constexpr int DRIVES_4 = 4;
+	static constexpr bool DS = true;
+	static constexpr bool SS = false;
+
 	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	static void floppy_formats(format_registration &fr);
+	void add_drive_mconfig(machine_config &config, int nr_of_drives, bool double_sided);
 
-	required_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	optional_device<floppy_connector> m_floppy2;
 	optional_device<floppy_connector> m_floppy3;
@@ -68,9 +78,13 @@ protected:
 class msx_slot_wd_disk_device : public msx_slot_disk_device
 {
 protected:
+	static constexpr bool FORCE_READY = true;
+	static constexpr bool NO_FORCE_READY = false;
+
 	msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
+	template <typename FDCType> void add_mconfig(machine_config &config, FDCType &&type, bool force_ready, int nr_of_drives, bool double_sided);
 
 	required_device<wd_fdc_analog_device_base> m_fdc;
 	output_finder<> m_led;
@@ -82,8 +96,7 @@ class msx_slot_tc8566_disk_device : public msx_slot_disk_device
 protected:
 	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	void add_mconfig(machine_config &config, int nr_of_drives);
 
 	required_device<tc8566af_device> m_fdc;
 };
@@ -148,6 +161,15 @@ class msx_slot_disk1_wd2793_device : public msx_slot_disk1_base_device
 {
 public:
 	msx_slot_disk1_wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+class msx_slot_disk1_wd2793_0_device : public msx_slot_disk1_base_device
+{
+public:
+	msx_slot_disk1_wd2793_0_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -250,6 +272,7 @@ public:
 
 protected:
 	msx_slot_disk3_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 };
 
@@ -270,6 +293,7 @@ public:
 	msx_slot_disk4_tc8566_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 };
 

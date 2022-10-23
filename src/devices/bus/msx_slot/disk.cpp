@@ -42,6 +42,7 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_DISK1_MB8877,            msx_slot_disk1_mb8877_devic
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_N,          msx_slot_disk1_wd2793_n_device,          "msx_slot_disk1_wd2793_n",          "MSX Internal floppy type 1 - WD2793 no force ready - 1 DSDD Drive")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_N_2_DRIVES, msx_slot_disk1_wd2793_n_2_drives_device, "msx_slot_disk1_wd2793_n_2_drives", "MSX Internal floppy type 1 - WD2793 no force ready - 2 DSDD Drives")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793,            msx_slot_disk1_wd2793_device,            "msx_slot_disk1_wd2793",            "MSX Internal floppy type 1 - WD2793 - 1 DSDD Drive")
+DEFINE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_0,          msx_slot_disk1_wd2793_0_device,          "msx_slot_disk1_wd2793_0",          "MSX Internal floppy type 1 - WD2793 - No drive")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_SS,         msx_slot_disk1_wd2793_ss_device,         "msx_slot_disk1_wd2793_ss",         "MSX Internal floppy type 1 - WD2793 - 1 SSDD Drive")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_2_DRIVES,   msx_slot_disk1_wd2793_2_drives_device,   "msx_slot_disk1_wd2793_2_drives",   "MSX Internal floppy type 1 - WD2793 - 2 DSDD Drives")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK2_FD1793_SS,         msx_slot_disk2_fd1793_ss_device,         "msx_slot_disk2_fd1793_ss",         "MSX Internal floppy type 2 - FD1793 - 1 SSDD Drive")
@@ -88,6 +89,19 @@ msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device
 {
 }
 
+void msx_slot_disk_device::add_drive_mconfig(machine_config &config, int nr_of_drives, bool double_sided)
+{
+	if (nr_of_drives > NO_DRIVES)
+		FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+	if (nr_of_drives > DRIVES_1)
+		FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+	if (nr_of_drives > DRIVES_2)
+		FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+	if (nr_of_drives > DRIVES_3)
+		FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+}
+
+
 
 msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
@@ -96,12 +110,20 @@ msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, 
 {
 }
 
-
 void msx_slot_wd_disk_device::device_start()
 {
 	msx_slot_disk_device::device_start();
 	m_led.resolve();
 }
+
+template <typename FDCType>
+void msx_slot_wd_disk_device::add_mconfig(machine_config &config, FDCType &&type, bool force_ready, int nr_of_drives, bool double_sided)
+{
+	std::forward<FDCType>(type)(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->set_force_ready(force_ready);
+	add_drive_mconfig(config, nr_of_drives, double_sided);
+}
+
 
 
 msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -110,17 +132,11 @@ msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &m
 {
 }
 
-void msx_slot_tc8566_disk_device::device_add_mconfig(machine_config &config)
+void msx_slot_tc8566_disk_device::add_mconfig(machine_config &config, int nr_of_drives)
 {
 	TC8566AF(config, m_fdc, 16'000'000);
 
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
-}
-
-void msx_slot_tc8566_disk_device::device_start()
-{
-	msx_slot_disk_device::device_start();
+	add_drive_mconfig(config, nr_of_drives, DS);
 }
 
 
@@ -242,7 +258,6 @@ void msx_slot_disk1_base_device::set_control(u8 data)
 u8 msx_slot_disk1_base_device::side_control_r()
 {
 	return 0xfe | (m_side_control & 0x01);
-
 }
 
 u8 msx_slot_disk1_base_device::control_r()
@@ -263,10 +278,7 @@ msx_slot_disk1_fd1793_device::msx_slot_disk1_fd1793_device(const machine_config 
 
 void msx_slot_disk1_fd1793_device::device_add_mconfig(machine_config &config)
 {
-	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, FD1793, NO_FORCE_READY, DRIVES_1, DS);
 }
 
 
@@ -277,11 +289,7 @@ msx_slot_disk1_mb8877_device::msx_slot_disk1_mb8877_device(const machine_config 
 
 void msx_slot_disk1_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
 }
 
 
@@ -292,10 +300,7 @@ msx_slot_disk1_wd2793_n_device::msx_slot_disk1_wd2793_n_device(const machine_con
 
 void msx_slot_disk1_wd2793_n_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_1, DS);
 }
 
 
@@ -306,11 +311,7 @@ msx_slot_disk1_wd2793_n_2_drives_device::msx_slot_disk1_wd2793_n_2_drives_device
 
 void msx_slot_disk1_wd2793_n_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_2, DS);
 }
 
 
@@ -321,11 +322,18 @@ msx_slot_disk1_wd2793_device::msx_slot_disk1_wd2793_device(const machine_config 
 
 void msx_slot_disk1_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
+	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
+}
 
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+
+msx_slot_disk1_wd2793_0_device::msx_slot_disk1_wd2793_0_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_0, tag, owner, clock)
+{
+}
+
+void msx_slot_disk1_wd2793_0_device::device_add_mconfig(machine_config &config)
+{
+	add_mconfig(config, WD2793, FORCE_READY, NO_DRIVES, DS);
 }
 
 
@@ -336,11 +344,7 @@ msx_slot_disk1_wd2793_ss_device::msx_slot_disk1_wd2793_ss_device(const machine_c
 
 void msx_slot_disk1_wd2793_ss_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Single sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35ssdd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, SS);
 }
 
 
@@ -351,12 +355,7 @@ msx_slot_disk1_wd2793_2_drives_device::msx_slot_disk1_wd2793_2_drives_device(con
 
 void msx_slot_disk1_wd2793_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, FORCE_READY, DRIVES_2, DS);
 }
 
 
@@ -461,11 +460,7 @@ msx_slot_disk2_fd1793_ss_device::msx_slot_disk2_fd1793_ss_device(const machine_c
 
 void msx_slot_disk2_fd1793_ss_device::device_add_mconfig(machine_config &config)
 {
-	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Single sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35ssdd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, FD1793, FORCE_READY, DRIVES_1, SS);
 }
 
 
@@ -476,11 +471,7 @@ msx_slot_disk2_mb8877_device::msx_slot_disk2_mb8877_device(const machine_config 
 
 void msx_slot_disk2_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
 }
 
 
@@ -491,11 +482,7 @@ msx_slot_disk2_mb8877_ss_device::msx_slot_disk2_mb8877_ss_device(const machine_c
 
 void msx_slot_disk2_mb8877_ss_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Single sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35ssdd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, SS);
 }
 
 
@@ -506,12 +493,7 @@ msx_slot_disk2_mb8877_2_drives_device::msx_slot_disk2_mb8877_2_drives_device(con
 
 void msx_slot_disk2_mb8877_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, MB8877, FORCE_READY, DRIVES_2, DS);
 }
 
 
@@ -522,11 +504,7 @@ msx_slot_disk2_wd2793_device::msx_slot_disk2_wd2793_device(const machine_config 
 
 void msx_slot_disk2_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
 }
 
 
@@ -537,12 +515,7 @@ msx_slot_disk2_wd2793_2_drives_device::msx_slot_disk2_wd2793_2_drives_device(con
 
 void msx_slot_disk2_wd2793_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, FORCE_READY, DRIVES_2, DS);
 }
 
 
@@ -558,6 +531,11 @@ msx_slot_disk3_tc8566_device::msx_slot_disk3_tc8566_device(const machine_config 
 msx_slot_disk3_tc8566_device::msx_slot_disk3_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_tc8566_disk_device(mconfig, type, tag, owner, clock)
 {
+}
+
+void msx_slot_disk3_tc8566_device::device_add_mconfig(machine_config &config)
+{
+	add_mconfig(config, DRIVES_1);
 }
 
 void msx_slot_disk3_tc8566_device::device_start()
@@ -587,9 +565,7 @@ msx_slot_disk3_tc8566_2_drives_device::msx_slot_disk3_tc8566_2_drives_device(con
 
 void msx_slot_disk3_tc8566_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	msx_slot_disk3_tc8566_device::device_add_mconfig(config);
-		
-	FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, DRIVES_2);
 }
 
 
@@ -615,6 +591,11 @@ void msx_slot_disk4_tc8566_device::device_start()
 	page(1)->install_write_handler(0x7ff5, 0x7ff5, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 }
 
+void msx_slot_disk4_tc8566_device::device_add_mconfig(machine_config &config)
+{
+	add_mconfig(config, DRIVES_1);
+}
+
 
 
 
@@ -626,11 +607,7 @@ msx_slot_disk5_wd2793_device::msx_slot_disk5_wd2793_device(const machine_config 
 
 void msx_slot_disk5_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
 }
 
 void msx_slot_disk5_wd2793_device::device_start()
@@ -717,10 +694,7 @@ msx_slot_disk6_wd2793_n_device::msx_slot_disk6_wd2793_n_device(const machine_con
 
 void msx_slot_disk6_wd2793_n_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_1, DS);
 }
 
 void msx_slot_disk6_wd2793_n_device::device_start()
@@ -850,11 +824,7 @@ msx_slot_disk7_mb8877_device::msx_slot_disk7_mb8877_device(const machine_config 
 
 void msx_slot_disk7_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
 }
 
 void msx_slot_disk7_mb8877_device::device_start()
@@ -961,11 +931,7 @@ msx_slot_disk8_mb8877_device::msx_slot_disk8_mb8877_device(const machine_config 
 
 void msx_slot_disk8_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
 }
 
 void msx_slot_disk8_mb8877_device::device_start()
@@ -1066,12 +1032,7 @@ msx_slot_disk8_wd2793_2_drives_device::msx_slot_disk8_wd2793_2_drives_device(con
 
 void msx_slot_disk8_wd2793_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, FORCE_READY, DRIVES_2, DS);
 }
 
 
@@ -1085,10 +1046,7 @@ msx_slot_disk9_wd2793_n_device::msx_slot_disk9_wd2793_n_device(const machine_con
 
 void msx_slot_disk9_wd2793_n_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_1, DS);
 }
 
 void msx_slot_disk9_wd2793_n_device::device_start()
@@ -1181,11 +1139,7 @@ msx_slot_disk10_mb8877_device::msx_slot_disk10_mb8877_device(const machine_confi
 
 void msx_slot_disk10_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
 }
 
 void msx_slot_disk10_mb8877_device::device_start()
@@ -1270,9 +1224,7 @@ msx_slot_disk10_mb8877_2_drives_device::msx_slot_disk10_mb8877_2_drives_device(c
 
 void msx_slot_disk10_mb8877_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	msx_slot_disk10_mb8877_device::device_add_mconfig(config);
-		
-	FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, MB8877, FORCE_READY, DRIVES_2, DS);
 }
 
 
@@ -1286,11 +1238,7 @@ msx_slot_disk11_wd2793_device::msx_slot_disk11_wd2793_device(const machine_confi
 
 void msx_slot_disk11_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->set_force_ready(true);
-
-	// Double sided 3.5" floppy drive
-	FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, "35dd", msx_slot_disk_device::floppy_formats);
+	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
 }
 
 void msx_slot_disk11_wd2793_device::device_start()
