@@ -23806,6 +23806,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sscrabblp" cloneof="sscrabbl">
+		<description>Super Scrabble (USA, prototype)</description>
+		<year>1991?</year>
+		<publisher>Milton Bradley</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="scrabble.bin" size="0x20000" crc="10ecadbf" sha1="9deab55c1074c0182bac775b9e984afa170f57b0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ssnakey" cloneof="wildsnak">
 		<description>Super Snakey (Japan)</description>
 		<year>1994</year>

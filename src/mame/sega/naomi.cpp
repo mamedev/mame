@@ -648,7 +648,7 @@ Notes:
   IC8-IC15  - S29GL512N FlashROM (TSOP56), 512Mb. Not all positions are populated
       IC16  - R3112N431A Low voltage detector with output delay (SOT-23-5)
       JP1   - JUMPER ROM board Bank: 1-2 = Master, 2-3 = Slave
-      JP2   - JUMPER IC7 EPROM: 1-2 = Enabled, 2-3 = Disabled
+      JP2   - JUMPER IC7 EPROM: 1-2 = Disabled, 2-3 = Enabled
    CN1/2/3  - connectors joining to main board
       CN4   - 6 legs connector for ISP programming
 

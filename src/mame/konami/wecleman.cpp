@@ -853,28 +853,30 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wecleman_state, hotchase_sound_status_r)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	// dips and defaults verified with US manual
 	PORT_START("DSW2")  /* $140015.b */
+	// defaults to imperial unit for (undumped) US version
 	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
 	PORT_DIPSETTING(    0x01, "KM" )
 	PORT_DIPSETTING(    0x00, "M.P.H." )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )   // single (wheel related)
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Unknown 2-3&4" ) // Most likely Difficulty
-	PORT_DIPSETTING(    0x18, "0" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x08, "8" )
-	PORT_DIPSETTING(    0x00, "c" )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-5" )   // single
+	PORT_DIPNAME( 0x02, 0x02, "Motor Control" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) ) // Wec Mini Spin. Upright
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )  // Wec Spin Type
+	PORT_DIPNAME( 0x04, 0x00, "Driving Technique" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "High Technique Required" )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x20, 0x20, "Steering and Seat Vibration" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* wheel <-> brake ; accel -> start */
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )   // single (wheel<->brake)
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Steering Wheel Specifications" )
+	PORT_DIPSETTING(    0x40, "Potentiometer" ) // Wec Chequered Flag Type
+	PORT_DIPSETTING(    0x00, "Optical Sensor" ) // Konami GT Type
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
