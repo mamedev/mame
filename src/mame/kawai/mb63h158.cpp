@@ -40,5 +40,5 @@ void mb63h158_device::device_reset()
 u8 mb63h158_device::read(offs_t offset)
 {
 	// TODO
-	return 0;	
+	return 0;
 }

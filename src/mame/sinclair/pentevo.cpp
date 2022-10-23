@@ -20,12 +20,12 @@ Hardware (ZX Evolution):
 
 Refs:
 ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
-		Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
-		Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
+        Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
+        Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
 
 TODO:
-	* Keyboard enabled
-	* zx 16c
+    * Keyboard enabled
+    * zx 16c
 
 *******************************************************************************************/
 
@@ -532,7 +532,7 @@ void pentevo_state::gluk_data_w(offs_t offset, u8 data)
 {
 	if (!m_glukrs->is_active())
 		return;
-	
+
 	u8 addr = m_glukrs->address_r();
 	if (addr >= 0xf0 && addr <= 0xf0)
 	{

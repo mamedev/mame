@@ -11,8 +11,8 @@ license:CC0
 	evio Media cart listing
 
 	* = dumped
-                                            Cartridge Colour
-											
+	                                        Cartridge Colour
+
 	*eM1    - evio Selection 01               (translucent red)
 	*eM2    - evio Selection 02               (translucent red)
 	*eM3    - Anime Mix 1                     (yellow)
@@ -48,7 +48,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="em2" supported="no">
 		<description>evio Selection 02</description>
 		<year>2003</year>
@@ -112,8 +112,8 @@ license:CC0
 				<rom name="evio_em06.bin" size="0x080000" crc="7f67ff20" sha1="e94685b112c03615d6b27c21460a69c2b69c3419"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="em7" supported="no">
 		<description>Pure Kiss 1</description>
 		<year>2003</year>
@@ -164,7 +164,7 @@ license:CC0
 				<rom name="evio_em10.bin" size="0x080000" crc="573d49ef" sha1="e2d528a2aa149d8ccbadf0c75ed5f75ca0e6bf9b"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="em15" supported="no">
 		<description>evio Selection 04</description>
@@ -177,8 +177,8 @@ license:CC0
 				<rom name="evio_em15.bin" size="0x080000" crc="d3a12cc2" sha1="29fff4c9c6aedd156c9c9b3f3773c05916c6d5d6"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="em16" supported="no">
 		<description>Chisako Takashima Selection</description>
 		<year>2003</year>
@@ -191,7 +191,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="em17" supported="no">
 		<description>Minna no evio</description>
 		<year>2003</year>
@@ -203,8 +203,8 @@ license:CC0
 				<rom name="evio_em17.bin" size="0x080000" crc="5e41cde0" sha1="bee48cf8f41f715c5ba762c243cbfdd8bafeb3b5"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<!-- has eeprom -->
 	<software name="em18" supported="no">
 		<description>evio Challenge!</description>

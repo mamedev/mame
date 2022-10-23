@@ -2146,7 +2146,7 @@ void a400_state::atari_common_nodac(machine_config &config)
 	//m_screen->set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
 	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
 	m_screen->set_palette("palette");
-//	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+//  m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	PALETTE(config, "palette", FUNC(a400_state::a400_palette), std::size(atari_colors) / 3);
 
@@ -2235,10 +2235,10 @@ void a400_state::a400(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	config_ntsc_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-//	m_gtia->set_region(GTIA_NTSC);
+//  m_gtia->set_region(GTIA_NTSC);
 }
 
 // memory map A400 + PAL screen
@@ -2252,10 +2252,10 @@ void a400_state::a400pal(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	config_pal_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-//	m_gtia->set_region(GTIA_PAL);
+//  m_gtia->set_region(GTIA_PAL);
 }
 
 // memory map A800 + NTSC screen + Right cartslot
@@ -2269,10 +2269,10 @@ void a400_state::a800(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
 	config_ntsc_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-//	m_gtia->set_region(GTIA_NTSC);
+//  m_gtia->set_region(GTIA_NTSC);
 
 	A800_CART_SLOT(config, m_cartright, a800_right, nullptr);
 }
@@ -2289,10 +2289,10 @@ void a400_state::a800pal(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
 	config_pal_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-//	m_gtia->set_region(GTIA_PAL);
+//  m_gtia->set_region(GTIA_PAL);
 
 	A800_CART_SLOT(config, m_cartright, a800_right, nullptr);
 }
@@ -2318,10 +2318,10 @@ void a400_state::a600xl(machine_config &config)
 
 	config_ntsc_screen(config);
 
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-//	m_gtia->set_region(GTIA_NTSC);
+//  m_gtia->set_region(GTIA_NTSC);
 
 	m_ram->set_default_size("16K");
 
@@ -2351,10 +2351,10 @@ void a400_state::a800xl(machine_config &config)
 
 	config_ntsc_screen(config);
 
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-//	m_gtia->set_region(GTIA_NTSC);
+//  m_gtia->set_region(GTIA_NTSC);
 
 	config.device_remove("ctrl3");
 	config.device_remove("ctrl4");
@@ -2369,10 +2369,10 @@ void a400_state::a800xlpal(machine_config &config)
 	m_maincpu->set_clock(1773000);
 
 	config_pal_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-//	m_gtia->set_region(GTIA_PAL);
+//  m_gtia->set_region(GTIA_PAL);
 
 	m_pokey->set_clock(1773000);
 }
@@ -2432,7 +2432,7 @@ void a5200_state::a5200(machine_config &config)
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	ATARI_GTIA(config, m_gtia, 0);
-//	m_gtia->set_region(GTIA_NTSC);
+//  m_gtia->set_region(GTIA_NTSC);
 	m_gtia->trigger_callback().set_ioport("djoy_b");
 
 	ATARI_ANTIC(config, m_antic, 0);
@@ -2441,8 +2441,8 @@ void a5200_state::a5200(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE( a5200_state, a5200 )
 
 	config_ntsc_screen(config);
-//	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-//	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+//  m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+//  m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
 	A5200_CART_SLOT(config, m_cartleft, a5200_carts, nullptr);
 
