@@ -453,8 +453,8 @@ void snesb_state::tmntmwb_map(address_map &map)
 
 	map(0x7103cd, 0x7103ce).r(FUNC(snesb_state::tmntmwb_7103cd_r));
 	map(0x7065f0, 0x7065f1).r(FUNC(snesb_state::tmntmwb_7065f0_r));
-	map(0x7132cc, 0x7132cd).r(FUNC(snesb_state::tmntmwb_7132cc_r)); 
-	map(0x7010f1, 0x7010f2).r(FUNC(snesb_state::tmntmwb_7010f1_r)); 
+	map(0x7132cc, 0x7132cd).r(FUNC(snesb_state::tmntmwb_7132cc_r));
+	map(0x7010f1, 0x7010f2).r(FUNC(snesb_state::tmntmwb_7010f1_r));
 
 	map(0x781000, 0x7810ff).ram().share(m_shared_ram[0]);
 }

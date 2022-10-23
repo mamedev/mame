@@ -57,7 +57,6 @@ $842f = lives
     18 |
     19 /
 
-
 */
 
 #include "emu.h"
@@ -91,8 +90,12 @@ public:
 	void init_ddayjlc();
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 
-private:
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
+private:
 	void prot_w(offs_t offset, uint8_t data);
 	void char_bank_w(uint8_t data);
 	void bgvram_w(offs_t offset, uint8_t data);
@@ -113,10 +116,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_mainram;
@@ -148,12 +147,12 @@ private:
 	void draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
+
 /********************************
  *
  * Video section
  *
  *******************************/
-
 
 TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
 {
@@ -552,15 +551,13 @@ void ddayjlc_state::machine_start()
 
 void ddayjlc_state::machine_reset()
 {
-	int i;
-
 	m_char_bank = 0;
 	m_bgadr = 0;
 	m_sound_nmi_enable = false;
 	m_main_nmi_enable = false;
 	m_prot_addr = 0;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_e00x_l[i] = 0;
 		m_e00x_d[i][0] = 0;
@@ -719,55 +716,16 @@ ROM_END
 
 void ddayjlc_state::init_ddayjlc()
 {
-#define repack(n)\
-		dst[newadr+0+n] = src[oldaddr+0+n];\
-		dst[newadr+1+n] = src[oldaddr+1+n];\
-		dst[newadr+2+n] = src[oldaddr+2+n];\
-		dst[newadr+3+n] = src[oldaddr+3+n];\
-		dst[newadr+4+n] = src[oldaddr+4+n];\
-		dst[newadr+5+n] = src[oldaddr+5+n];\
-		dst[newadr+6+n] = src[oldaddr+6+n];\
-		dst[newadr+7+n] = src[oldaddr+7+n];\
-		dst[newadr+8+n] = src[oldaddr+0+0x2000+n];\
-		dst[newadr+9+n] = src[oldaddr+1+0x2000+n];\
-		dst[newadr+10+n] = src[oldaddr+2+0x2000+n];\
-		dst[newadr+11+n] = src[oldaddr+3+0x2000+n];\
-		dst[newadr+12+n] = src[oldaddr+4+0x2000+n];\
-		dst[newadr+13+n] = src[oldaddr+5+0x2000+n];\
-		dst[newadr+14+n] = src[oldaddr+6+0x2000+n];\
-		dst[newadr+15+n] = src[oldaddr+7+0x2000+n];\
-		dst[newadr+16+n] = src[oldaddr+0+8+n];\
-		dst[newadr+17+n] = src[oldaddr+1+8+n];\
-		dst[newadr+18+n] = src[oldaddr+2+8+n];\
-		dst[newadr+19+n] = src[oldaddr+3+8+n];\
-		dst[newadr+20+n] = src[oldaddr+4+8+n];\
-		dst[newadr+21+n] = src[oldaddr+5+8+n];\
-		dst[newadr+22+n] = src[oldaddr+6+8+n];\
-		dst[newadr+23+n] = src[oldaddr+7+8+n];\
-		dst[newadr+24+n] = src[oldaddr+0+0x2008+n];\
-		dst[newadr+25+n] = src[oldaddr+1+0x2008+n];\
-		dst[newadr+26+n] = src[oldaddr+2+0x2008+n];\
-		dst[newadr+27+n] = src[oldaddr+3+0x2008+n];\
-		dst[newadr+28+n] = src[oldaddr+4+0x2008+n];\
-		dst[newadr+29+n] = src[oldaddr+5+0x2008+n];\
-		dst[newadr+30+n] = src[oldaddr+6+0x2008+n];\
-		dst[newadr+31+n] = src[oldaddr+7+0x2008+n];
+	std::vector<uint8_t> temp(0x10000);
+	uint8_t *src = &temp[0];
+	uint8_t *dst = memregion("gfx1")->base();
+	uint32_t length = memregion("gfx1")->bytes();
+	memcpy(src, dst, length);
 
+	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		std::vector<uint8_t> temp(0x10000);
-		uint8_t *src = &temp[0];
-		uint8_t *dst = memregion("gfx1")->base();
-		uint32_t length = memregion("gfx1")->bytes();
-		memcpy(src, dst, length);
-		uint32_t newadr = 0;
-		uint32_t oldaddr = 0;
-		for (uint32_t j = 0; j < length / 2; j += 32)
-		{
-			repack(0);
-			repack(0x4000)
-			newadr += 32;
-			oldaddr += 16;
-		}
+		uint32_t newadr = (oldaddr & 0x4007) | (oldaddr >> 10 & 0x8) | (oldaddr << 1 & 0x3ff0);
+		dst[newadr] = src[oldaddr];
 	}
 
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x4000);

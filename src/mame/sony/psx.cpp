@@ -51,7 +51,6 @@ public:
 
 private:
 	std::vector<uint8_t> m_exe_buffer;
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void psxexe_conv32(uint32_t *uint32);
 	int load_psxexe(std::vector<uint8_t> buffer);
 	void cpe_set_register(int r, int v);
@@ -72,21 +71,6 @@ private:
 	required_device<psxcd_device> m_psxcd;
 };
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-inline void ATTR_PRINTF(3,4)  psx1_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine().describe_context(), buf );
-	}
-}
 
 void psx1_state::psxexe_conv32(uint32_t *uint32)
 {

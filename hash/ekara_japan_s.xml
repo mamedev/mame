@@ -67,7 +67,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sc0003">
 		<description>Kids' Challenge Vol.1 (Japan) (SC0003-SAI)</description>
 		<year>2001</year>
@@ -128,7 +128,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- seems to crash when displaying score? unusual, maybe a bug in this cart when the score is 0? -->
+	<!-- this crashes on the scoring screen, the same occurs on real hardware, could be bitrot or a broken revision -->
 	<software name="sc0008">
 		<description>Saiten Cartridge: Challenge Idol vol.2 (Japan) (SC0008-SAI)</description>
 		<year>2001</year>
@@ -136,11 +136,11 @@ license:CC0
 		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.2"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0008-sai.u1" size="0x100000" crc="5d887910" sha1="5e32cccd99ba7e19974c6a9462e13cb7f8543b2a"/>
+				<rom name="sc0008-sai.u1" size="0x100000" crc="5d887910" sha1="5e32cccd99ba7e19974c6a9462e13cb7f8543b2a" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sc0009">
 		<description>Saiten Cartridge: Nesshō vol. 3 (Japan) (SC0009-SAI)</description>
 		<year>2001</year>

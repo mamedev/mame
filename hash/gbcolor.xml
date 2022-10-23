@@ -545,6 +545,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="aitdnnp" cloneof="aitdnn">
+		<description>Alone in the Dark - The New Nightmare (Europe, prototype)</description>
+		<year>2001</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="alone in the dark (prototype).bin" size="0x400000" crc="7c101475" sha1="120e2dd012cfe47a7e37cc91fcbbce92494bdf2a"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aitdnnu" cloneof="aitdnn">
 		<description>Alone in the Dark - The New Nightmare (USA)</description>
 		<year>2001</year>
@@ -1490,7 +1505,7 @@ license:CC0
 	</software>
 
 	<software name="barbieoci" cloneof="barbieoc">
-		<description>Barbie - Avventure nell'Oceano (Italia)</description>
+		<description>Barbie - Avventure nell'Oceano (Italy)</description>
 		<year>1999</year>
 		<publisher>Mattel Media</publisher>
 		<info name="serial" value="DMG-ADYI-ITA"/>
@@ -4927,7 +4942,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbz">
+	<software name="dbz" supported="no">
 		<description>Dragon Ball Z - Legendary Super Warriors (Europe)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -4943,7 +4958,22 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzj" cloneof="dbz">
+	<software name="dbzp" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Legendary Super Warriors (Europe, prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (english prototype - all features unlocked).bin" size="0x200000" crc="4ec4f8ed" sha1="073eb096c0454032d8632549ad4c60adc5b8cf9a"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzj" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Densetsu no Chou Senshi-tachi (Japan)</description>
 		<year>2002</year>
 		<publisher>Banpresto</publisher>
@@ -4961,7 +4991,39 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzf" cloneof="dbz">
+	<software name="dbzjp" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Densetsu no Chou Senshi-tachi (Japan, prototype, cheats enabled)</description>
+		<year>2002</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="ドラゴンボールZ伝説の超戦士たち"/>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (japanese prototype - cheat).bin" size="0x200000" crc="fb942e08" sha1="075f4a1498d0b5f98f76984aca52ca1f03b1f85d"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzjp1" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Densetsu no Chou Senshi-tachi (Japan, prototype)</description>
+		<year>2002</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="ドラゴンボールZ伝説の超戦士たち"/>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (japanese prototype).bin" size="0x200000" crc="3f511f57" sha1="45f5a6fa7eff38b1bb8786472d0eeadf58f692a8"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzf" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Les Guerriers Légendaires (France)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -4977,7 +5039,22 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzg" cloneof="dbz">
+	<software name="dbzfp" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Les Guerriers Légendaires (France, prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (french prototype).bin" size="0x200000" crc="f4041d28" sha1="72e25b25b9f2516879648e0051bb8ad8d4069003"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzg" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -4999,8 +5076,68 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzi" cloneof="dbz">
-		<description>Dragon Ball Z - I Leggendari Super Guerrieri (Italia)</description>
+	<software name="dbzgp" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany, prototype, all features unlocked)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (german prototype - all features unlocked).bin" size="0x200000" crc="f646bd3b" sha1="08a947763c36f4ad64f51c388da863d5852540a1"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzgp1" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany, prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (german prototype).bin" size="0x200000" crc="72acbcb4" sha1="4b22b1949aed367036a84e0e7d36dd0a57bdd11f"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzgp2" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany, prototype, 20020411)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (german prototype - 11 04 02 no cheat).bin" size="0x200000" crc="2353bbe4" sha1="b93c142b6da94c7d69956011ccbda9f22e5fae9f"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzgp3" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany, prototype, 20020320)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (german prototype - 1 3 20 03 02).bin" size="0x200000" crc="276f7895" sha1="3e2ba8228b0e804f2e581af5cc1e4bb95a8c9354"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzi" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - I Leggendari Super Guerrieri (Italy)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="CGB-BBZI-ITA"/>
@@ -5021,7 +5158,22 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzs" cloneof="dbz">
+	<software name="dbzip" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - I Leggendari Super Guerrieri (Italy, prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (italian prototype - all features unlocked).bin" size="0x200000" crc="35790637" sha1="621571759c021b564339efdc969d9bcef4c908dc"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzs" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Guerreros de Leyenda (Spain)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -5037,7 +5189,37 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzu" cloneof="dbz">
+	<software name="dbzsp" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Guerreros de Leyenda (Spain, prototype, all features unlocked)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (spanish prototype - all features unlocked).bin" size="0x200000" crc="d7654e34" sha1="ac3b5f50578210a29ce08e7e89d456cfc16b5ae9"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzsp1" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Guerreros de Leyenda (Spain, prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (spanish prototype).bin" size="0x200000" crc="f017924f" sha1="ad8235817bec5165a16478301cbfa7fa7d090ecf"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzu" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Legendary Super Warriors (USA)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -16202,7 +16384,7 @@ license:CC0
 	</software>
 
 	<software name="pokecrysi" cloneof="pokecrys">
-		<description>Pokémon - Versione Cristallo (Italia)</description>
+		<description>Pokémon - Versione Cristallo (Italy)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTI-ITA"/>
@@ -16312,7 +16494,7 @@ license:CC0
 	</software>
 
 	<software name="pokegoldi" cloneof="pokegold">
-		<description>Pokémon - Versione Oro (Italia)</description>
+		<description>Pokémon - Versione Oro (Italy)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AAUI-ITA"/>
@@ -16410,7 +16592,7 @@ license:CC0
 	</software>
 
 	<software name="pokesilvi" cloneof="pokesilv">
-		<description>Pokémon - Versione Argento (Italia)</description>
+		<description>Pokémon - Versione Argento (Italy)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AAXI-ITA"/>
@@ -24330,7 +24512,7 @@ license:CC0
 	</software>
 
 	<software name="yugiddsi" cloneof="yugidds">
-		<description>Yu-Gi-Oh! - Racconti Oscuri (Italia)</description>
+		<description>Yu-Gi-Oh! - Racconti Oscuri (Italy)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BY3I-ITA"/>

@@ -303,7 +303,6 @@ antic_device::antic_device(const machine_config &mconfig, const char *tag, devic
 	device_video_interface(mconfig, *this),
 	m_gtia(*this, finder_base::DUMMY_TAG),
 	m_maincpu(*this, ":maincpu"),
-	m_djoy_b(*this, ":djoy_b"),
 	m_artifacts(*this, ":artifacts"),
 	m_tv_artifacts(0),
 	m_render1(0),
@@ -2303,7 +2302,7 @@ void antic_device::generic_interrupt(int button_count)
 	if( m_scanline == VBL_START )
 	{
 		/* specify buttons relevant to this Atari variant */
-		m_gtia->button_interrupt(button_count, m_djoy_b.read_safe(0));
+		m_gtia->button_interrupt(button_count);
 
 		/* do nothing new for the rest of the frame */
 		m_modelines = screen().height() - VBL_START;

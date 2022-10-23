@@ -9720,6 +9720,9 @@ buggychlt                       // A22 (c) 1984 Taito Corporation + Tefri licens
 wmbullet                        //
 wmbulletf                       //
 
+@source:nec/bungo.cpp
+mini5sx                         // 1991
+
 @source:skeleton/busicom.cpp
 busicom                         //
 
@@ -11677,6 +11680,7 @@ megatrix
 
 @source:casio/ctk551.cpp
 ap10                            //
+ctk530                          //
 ctk551                          //
 ctk601                          //
 gz70sp                          //
@@ -12560,6 +12564,7 @@ djboyua                         // (c) 1990 Kaneko (USA, American Sammy license)
 bm1stmix                        // GQ753 (c) 1997 (Japan)
 bm2ndmix                        // GX853 (c) 1998 (Japan)
 bm2ndmxa                        // GX853 (c) 1998 (Japan)
+bm3rdeaa                        // GX853 (c) 1998 (Europe)
 bm3rdmix                        // GX853 (c) 1998 (Japan)
 bm4thmix                        // GX847 (c) 1999 (Japan)
 bs4thmix                        // GX847 (c) 1999 (Korea)
@@ -16370,6 +16375,7 @@ gunbustru                       // D27 (c) 1992 Taito America Corporation (US)
 gundealr                        // (c) 1990 Dooyong
 gundealra                       // (c) 1990 Dooyong
 gundealrbl                      // bootleg
+gundealrbl2                     // bootleg
 gundealrt                       // (c) 1990 Tecmo
 wiseguy                         // (c) 1990 Dooyong
 yamyam                          // (c) 1990 Dooyong
@@ -19569,30 +19575,30 @@ wndrplnt                        // (c) 1987 Data East Corporation (Japan)
 @source:misc/kas89.cpp
 kas89                           // 1989, SFC S.R.L.
 
-@source:kawai/kawai_acr20.cpp
+@source:kawai/acr20.cpp
 acr20                           //
 
-@source:kawai/kawai_k1.cpp
+@source:kawai/k1.cpp
 k1                              //
 k1m                             //
 k1r                             //
 k1rii                           //
 
-@source:kawai/kawai_k4.cpp
+@source:kawai/k4.cpp
 k4                              //
 k4r                             //
 
-@source:kawai/kawai_k5.cpp
+@source:kawai/k5.cpp
 k5                              //
 k5m                             //
 
-@source:kawai/kawai_ksp10.cpp
+@source:kawai/ksp10.cpp
 ksp10                           //
 
-@source:kawai/kawai_r100.cpp
+@source:kawai/r100.cpp
 r100                            //
 
-@source:kawai/kawai_sx240.cpp
+@source:kawai/sx240.cpp
 sx240                           //
 
 @source:kaypro/kaypro.cpp
@@ -34605,8 +34611,11 @@ pc98lt                          // 1989
 pc98ha                          // 1990
 
 @source:nec/pc9801.cpp
+pc9801                          // 1982
 pc9801bx2                       // 1993
+pc9801dx                        // 1990
 pc9801f                         // 1983
+pc9801fs                        // 1992
 pc9801rs                        // 1989
 pc9801rx                        // 1988
 pc9801us                        // 1992
@@ -34616,6 +34625,7 @@ pc9801vm11                      // 1985
 pc9801vx                        // 1986
 
 @source:nec/pc9801_epson.cpp
+pc286vs                         // 1989
 pc386m                          // 1990
 pc486se                         // 1993
 pc486mu                         // 1994
@@ -35556,6 +35566,7 @@ svgtw                           //
 theglad                         // (c) 2003 The Gladiator
 theglad100                      //
 theglad101                      //
+theglad104                      //
 thegladpcb                      //
 thegladpcba                     //
 

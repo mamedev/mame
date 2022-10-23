@@ -55,7 +55,9 @@ uint32_t truesys_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void truesys_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).rom().region("maincpu", 0); // also mirrored at 0x00800000, 0x01000000, 0x01800000, etc.?
+	map(0x00000000, 0x0000001f).rom().region("maincpu", 0);
+	map(0x00000020, 0x007fffff).ram();
+	map(0x00800000, 0x0087ffff).rom().region("maincpu", 0);
 }
 
 
