@@ -320,7 +320,9 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/rescap.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "sound/ymopl.h"
 #include "speaker.h"
 
@@ -1115,10 +1117,21 @@ void armedf_state::sound_config(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5);  // 4mhz
+	// Note: Component locations here come from the common terra force/sky robo
+	// /takakae! big fighter sound pcb; the locations and components are not
+	// yet verified for other sound pcbs.
+	// The 3 mixing resistors for YM, DAC1 and DAC2 are all identical (1K).
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R17, R16, nothing(infinite resistance), wire(short), C82, C68
+	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R15, R10, nothing(infinite resistance), wire(short), C81, C60
+	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R13, R9, nothing(infinite resistance), wire(short), C66, C61
+	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
+	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.333); // or YM3526?
+
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.333); // SIP R2R DAC @ G11-1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.333); // SIP R2R DAC @ G11-2 with 74HC374P latch
 }
 
 void armedf_state::terraf(machine_config &config)
@@ -1159,10 +1172,21 @@ void armedf_state::terrafjb(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5);      // 4mhz
+	// Note: Component locations here come from the common terra force/sky robo
+	// /takakae! big fighter sound pcb; the locations and components are not
+	// yet verified for other sound pcbs.
+	// The 3 mixing resistors for YM, DAC1 and DAC2 are all identical (1K).
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R17, R16, nothing(infinite resistance), wire(short), C82, C68
+	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R15, R10, nothing(infinite resistance), wire(short), C81, C60
+	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R13, R9, nothing(infinite resistance), wire(short), C66, C61
+	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
+	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.333); // or YM3526?
+
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.333); // SIP R2R DAC @ G11-1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.333); // SIP R2R DAC @ G11-2 with 74HC374P latch
 }
 
 void armedf_state::terrafb(machine_config &config)
@@ -1207,10 +1231,21 @@ void armedf_state::armedf(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5);      // 4mhz
+	// Note: Component locations here come from the common terra force/sky robo
+	// /takakae! big fighter sound pcb; the locations and components are not
+	// yet verified for other sound pcbs.
+	// The 3 mixing resistors for YM, DAC1 and DAC2 are all identical (1K).
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R17, R16, nothing(infinite resistance), wire(short), C82, C68
+	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R15, R10, nothing(infinite resistance), wire(short), C81, C60
+	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R13, R9, nothing(infinite resistance), wire(short), C66, C61
+	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.333); // or YM3526?
+
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.333); // SIP R2R DAC @ G11-1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.333); // SIP R2R DAC @ G11-2 with 74HC374P latch
 }
 
 void armedf_state::cclimbr2(machine_config &config)
@@ -1234,10 +1269,21 @@ void armedf_state::cclimbr2(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5); // or YM3526?
+	// Note: Component locations here come from the common terra force/sky robo
+	// /takakae! big fighter sound pcb; the locations and components are not
+	// yet verified for other sound pcbs.
+	// The 3 mixing resistors for YM, DAC1 and DAC2 are all identical (1K).
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R17, R16, nothing(infinite resistance), wire(short), C82, C68
+	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R15, R10, nothing(infinite resistance), wire(short), C81, C60
+	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R13, R9, nothing(infinite resistance), wire(short), C66, C61
+	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
+	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.333); // or YM3526?
+
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.333); // SIP R2R DAC @ G11-1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.333); // SIP R2R DAC @ G11-2 with 74HC374P latch
 }
 
 void armedf_state::legion_common(machine_config &config)

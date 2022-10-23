@@ -8,6 +8,7 @@
 #include "nb1414m4.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "sound/flt_biquad.h"
 #include "screen.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -25,6 +26,9 @@ public:
 		, m_palette(*this, "palette")
 		, m_spriteram(*this, "spriteram")
 		, m_soundlatch(*this, "soundlatch")
+		, m_dacfilter1(*this, "dacfilter1")
+		, m_dacfilter2(*this, "dacfilter2")
+		, m_ymfilter(*this, "ymfilter")
 		, m_text_videoram(*this, "text_videoram", 0x1000, ENDIANNESS_BIG)
 		, m_spr_pal_clut(*this, "spr_pal_clut")
 		, m_fg_videoram(*this, "fg_videoram")
@@ -64,6 +68,9 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<filter_biquad_device> m_dacfilter1;
+	optional_device<filter_biquad_device> m_dacfilter2;
+	optional_device<filter_biquad_device> m_ymfilter;
 
 	// memory pointers
 	memory_share_creator<u8> m_text_videoram;

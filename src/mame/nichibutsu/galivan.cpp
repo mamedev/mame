@@ -134,7 +134,9 @@ MB7114.2D - Fujitsu MB7114 256 x4-bit Bi-polar PROM (sprite look-up table)
 #include "galivan.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/rescap.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "sound/ymopl.h"
 #include "speaker.h"
 
@@ -551,10 +553,25 @@ void galivan_state::galivan(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	// Note: The galivan filters are identical to the later Nichibutsu filters(armedf.cpp)
+	// with the sole exception of the mixing resistors and component locations.
+	// Mixing resistors:
+	// Yamaha - 1kohm = 0.6597 of total
+	// DAC1 - 4.7kohm = 0.1404 of total
+	// DAC2 - 3.3kohm = 0.1999 of total
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // YM3014 DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // YM3014 DAC
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R15, R14, nothing(infinite resistance), wire(short), C9, C11
+	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R11, R10, nothing(infinite resistance), wire(short), C7, C17
+	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R13, R12, nothing(infinite resistance), wire(short), C8, C18
+	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, m_ymfilter, 0.6597);
+
+	// note the two dac channel volume mix values might be backwards, we need a pcb reference recording!
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.1404); // SIP R2R DAC @ RA1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.1999); // SIP R2R DAC @ RA2 with 74HC374P latch
 }
 
 void dangarj_state::dangarj(machine_config &config)
@@ -595,10 +612,25 @@ void galivan_state::ninjemak(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.8);
+	// Note: The galivan filters are identical to the later Nichibutsu filters(armedf.cpp)
+	// with the sole exception of the mixing resistors and component locations.
+	// Mixing resistors:
+	// Yamaha - 1kohm = 0.6597 of total
+	// DAC1 - 4.7kohm = 0.1404 of total
+	// DAC2 - 3.3kohm = 0.1999 of total
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // YM3014 DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // YM3014 DAC
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R15, R14, nothing(infinite resistance), wire(short), C9, C11
+	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R11, R10, nothing(infinite resistance), wire(short), C7, C17
+	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R13, R12, nothing(infinite resistance), wire(short), C8, C18
+	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, m_ymfilter, 0.6597);
+
+	// note the two dac channel volume mix values might be backwards, we need a pcb reference recording!
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.1404); // SIP R2R DAC @ RA1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.1999); // SIP R2R DAC @ RA2 with 74HC374P latch
 }
 
 void galivan_state::youmab(machine_config &config)
@@ -1266,7 +1298,7 @@ void galivan_state::init_youmab()
 GAME( 1985, galivan,  0,        galivan,  galivan,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Cosmo Police Galivan (12/26/1985)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, galivan2, galivan,  galivan,  galivan,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Cosmo Police Galivan (12/16/1985)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, galivan3, galivan,  galivan,  galivan,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Cosmo Police Galivan (12/11/1985)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangar,   0,        galivan,  dangar,   galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (4/07/1987)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dangar,   0,        galivan,  dangar,   galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (4/07/1987)", MACHINE_SUPPORTS_SAVE ) // GV-1412-I and GV-1412-II pcbs
 GAME( 1986, dangara,  dangar,   galivan,  dangar2,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (12/1/1986)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangarj,  dangar,   dangarj,  dangar2,  dangarj_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (9/26/1986, Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (9/26/1986, bootleg set 1)", MACHINE_SUPPORTS_SAVE ) // checks protection like dangarj but check readback is patched at 0x9d58 (also checks i/o port 0xc0?)
