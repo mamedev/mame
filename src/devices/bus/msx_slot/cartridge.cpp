@@ -140,6 +140,15 @@ image_init_result msx_slot_cartridge_device::call_load()
 			// Allocate sram
 			length = get_software_region_length("sram");
 			m_cartridge->sram_alloc(length);
+
+			// Allocate and copy kanji rom contents
+			length = get_software_region_length("kanji");
+			m_cartridge->kanji_alloc(length);
+			if (length > 0)
+			{
+				u8 *rom_base = m_cartridge->get_kanji_base();
+				memcpy(rom_base, get_software_region("kanji"), length);
+			}
 		}
 		else
 		{

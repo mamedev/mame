@@ -8,7 +8,6 @@ DEFINE_DEVICE_TYPE(MSX_CART_ASCII8,       msx_cart_ascii8_device,       "msx_car
 DEFINE_DEVICE_TYPE(MSX_CART_ASCII16,      msx_cart_ascii16_device,      "msx_cart_ascii16",      "MSX Cartridge - ASCII16")
 DEFINE_DEVICE_TYPE(MSX_CART_ASCII8_SRAM,  msx_cart_ascii8_sram_device,  "msx_cart_ascii8_sram",  "MSX Cartridge - ASCII8 w/SRAM")
 DEFINE_DEVICE_TYPE(MSX_CART_ASCII16_SRAM, msx_cart_ascii16_sram_device, "msx_cart_ascii16_sram", "MSX Cartridge - ASCII16 w/SRAM")
-DEFINE_DEVICE_TYPE(MSX_CART_MSXWRITE,     msx_cart_msxwrite_device,     "msx_cart_msxwrite",     "MSX Cartridge - MSXWRITE")
 
 
 msx_cart_ascii8_device::msx_cart_ascii8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -240,50 +239,4 @@ void msx_cart_ascii16_sram_device::mapper_write_7000(u8 data)
 		m_view.select(0);
 		m_rombank[1]->set_entry(data & m_bank_mask);
 	}
-}
-
-
-
-
-msx_cart_msxwrite_device::msx_cart_msxwrite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_MSXWRITE, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_bank_mask(0)
-{
-}
-
-void msx_cart_msxwrite_device::device_reset()
-{
-	m_rombank[0]->set_entry(0);
-	m_rombank[1]->set_entry(0);
-}
-
-void msx_cart_msxwrite_device::initialize_cartridge()
-{
-	u32 size = get_rom_size();
-	u16 banks = size / BANK_SIZE;
-
-	if (size > 256 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
-	{
-		fatalerror("msxwrite: Invalid ROM size\n");
-	}
-
-	m_bank_mask = banks - 1;
-
-	for (int i = 0; i < 2; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE); 
-
-	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	// The rom writes to 6fff and 7fff for banking, unknown whether
-	// other locations also trigger banking.
-	page(1)->install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_msxwrite_device::bank_w<0>)));
-	page(1)->install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_msxwrite_device::bank_w<1>)));
-	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
-}
-
-template <int Bank>
-void msx_cart_msxwrite_device::bank_w(u8 data)
-{
-	m_rombank[Bank]->set_entry(data & m_bank_mask);
 }

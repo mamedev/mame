@@ -12,7 +12,6 @@ DECLARE_DEVICE_TYPE(MSX_CART_ASCII8,       msx_cart_ascii8_device)
 DECLARE_DEVICE_TYPE(MSX_CART_ASCII16,      msx_cart_ascii16_device)
 DECLARE_DEVICE_TYPE(MSX_CART_ASCII8_SRAM,  msx_cart_ascii8_sram_device)
 DECLARE_DEVICE_TYPE(MSX_CART_ASCII16_SRAM, msx_cart_ascii16_sram_device)
-DECLARE_DEVICE_TYPE(MSX_CART_MSXWRITE,     msx_cart_msxwrite_device)
 
 
 class msx_cart_ascii8_device : public device_t, public msx_cart_interface
@@ -108,26 +107,5 @@ private:
 	u8 m_sram_select_mask;
 };
 
-
-class msx_cart_msxwrite_device : public device_t, public msx_cart_interface
-{
-public:
-	msx_cart_msxwrite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	virtual void initialize_cartridge() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override { }
-	virtual void device_reset() override;
-
-private:
-	static constexpr size_t BANK_SIZE = 0x4000;
-
-	template <int Bank> void bank_w(u8 data);
-
-	memory_bank_array_creator<2> m_rombank;
-	u8 m_bank_mask;
-};
 
 #endif // MAME_BUS_MSX_CART_ASCII_H
