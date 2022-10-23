@@ -35,22 +35,22 @@ license:CC0
 	<group name="digits">
 		<bounds x="0" y="0" width="9" height="1" />
 
-		<element name="digit9" ref="digit"><bounds x="0" y="0" width="1" height="1" /></element>
-		<element name="digit8" ref="digit"><bounds x="2" y="0" width="1" height="1" /></element>
-		<element name="digit1" ref="digit"><bounds x="6" y="0" width="1" height="1" /></element>
-		<element name="digit0" ref="digit"><bounds x="8" y="0" width="1" height="1" /></element>
+		<element name="digit0" ref="digit"><bounds x="0" y="0" width="1" height="1" /></element>
+		<element name="digit1" ref="digit"><bounds x="2" y="0" width="1" height="1" /></element>
+		<element name="digit2" ref="digit"><bounds x="6" y="0" width="1" height="1" /></element>
+		<element name="digit3" ref="digit"><bounds x="8" y="0" width="1" height="1" /></element>
 	</group>
 
 
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="2.5" right="10.5" top="0" bottom="11" />
+		<bounds left="2.5" right="9.5" top="-0.25" bottom="10.25" />
 
 		<!-- score panel leds -->
 		<group ref="digits"><bounds x="3.25" y="3.5" width="0.45" height="3" /><orientation rotate="270" /></group>
 		<element name="0.8" ref="led"><bounds x="2.975" y="7" width="1" height="1" /></element>
-		<element name="1.8" ref="led"><bounds x="2.975" y="2" width="1" height="1" /></element>
+		<element name="3.9" ref="led"><bounds x="2.975" y="2" width="1" height="1" /></element>
 
 		<!-- playfield leds -->
 		<element name="7.0" ref="led"><bounds x="5" y="9" width="1" height="1" /></element>
@@ -62,6 +62,7 @@ license:CC0
 		<element name="7.6" ref="led"><bounds x="5" y="3" width="1" height="1" /></element>
 		<element name="7.7" ref="led"><bounds x="5" y="2" width="1" height="1" /></element>
 		<element name="7.8" ref="led"><bounds x="5" y="1" width="1" height="1" /></element>
+		<element name="7.9" ref="led"><bounds x="5" y="0" width="1" height="1" /></element>
 
 		<element name="6.0" ref="led"><bounds x="6" y="9" width="1" height="1" /></element>
 		<element name="6.1" ref="led"><bounds x="6" y="8" width="1" height="1" /></element>
@@ -72,8 +73,8 @@ license:CC0
 		<element name="6.6" ref="led"><bounds x="6" y="3" width="1" height="1" /></element>
 		<element name="6.7" ref="led"><bounds x="6" y="2" width="1" height="1" /></element>
 		<element name="6.8" ref="led"><bounds x="6" y="1" width="1" height="1" /></element>
+		<element name="6.9" ref="led"><bounds x="6" y="0" width="1" height="1" /></element>
 
-		<element name="9.8" ref="led"><bounds x="7" y="9.75" width="1" height="1" /></element>
 		<element name="5.0" ref="led"><bounds x="7" y="9" width="1" height="1" /></element>
 		<element name="5.1" ref="led"><bounds x="7" y="8" width="1" height="1" /></element>
 		<element name="5.2" ref="led"><bounds x="7" y="7" width="1" height="1" /></element>
@@ -83,7 +84,7 @@ license:CC0
 		<element name="5.6" ref="led"><bounds x="7" y="3" width="1" height="1" /></element>
 		<element name="5.7" ref="led"><bounds x="7" y="2" width="1" height="1" /></element>
 		<element name="5.8" ref="led"><bounds x="7" y="1" width="1" height="1" /></element>
-		<element name="8.8" ref="led"><bounds x="7" y="0.25" width="1" height="1" /></element>
+		<element name="5.9" ref="led"><bounds x="7" y="0" width="1" height="1" /></element>
 
 		<element name="4.0" ref="led"><bounds x="8" y="9" width="1" height="1" /></element>
 		<element name="4.1" ref="led"><bounds x="8" y="8" width="1" height="1" /></element>
@@ -94,16 +95,7 @@ license:CC0
 		<element name="4.6" ref="led"><bounds x="8" y="3" width="1" height="1" /></element>
 		<element name="4.7" ref="led"><bounds x="8" y="2" width="1" height="1" /></element>
 		<element name="4.8" ref="led"><bounds x="8" y="1" width="1" height="1" /></element>
-
-		<element name="3.0" ref="led"><bounds x="9" y="9" width="1" height="1" /></element>
-		<element name="3.1" ref="led"><bounds x="9" y="8" width="1" height="1" /></element>
-		<element name="3.2" ref="led"><bounds x="9" y="7" width="1" height="1" /></element>
-		<element name="3.3" ref="led"><bounds x="9" y="6" width="1" height="1" /></element>
-		<element name="3.4" ref="led"><bounds x="9" y="5" width="1" height="1" /></element>
-		<element name="3.5" ref="led"><bounds x="9" y="4" width="1" height="1" /></element>
-		<element name="3.6" ref="led"><bounds x="9" y="3" width="1" height="1" /></element>
-		<element name="3.7" ref="led"><bounds x="9" y="2" width="1" height="1" /></element>
-		<element name="3.8" ref="led"><bounds x="9" y="1" width="1" height="1" /></element>
+		<element name="4.9" ref="led"><bounds x="8" y="0" width="1" height="1" /></element>
 
 	</view>
 </mamelayout>
