@@ -127,16 +127,16 @@ uint8_t m68340_cpu_device::int_ack(offs_t offset)
 
 /* 68340 specifics - MOVE */
 
-uint32_t m68340_cpu_device::m68340_internal_base_r(offs_t offset, uint32_t mem_mask)
+uint16_t m68340_cpu_device::m68340_internal_base_r(offs_t offset, uint16_t mem_mask)
 {
 	if (!machine().side_effects_disabled())
-		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_r %08x, (%08x)\n", m_ppc, offset*4,mem_mask);
-	return m_m68340_base;
+		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_r %08x, (%08x)\n", m_ppc, offset*2,mem_mask);
+	return ((!BIT(offset, 0) ? (m_m68340_base >> 16): m_m68340_base)) & 0xffff;
 }
 
-void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x)\n", m_ppc, offset*4,data,mem_mask);
+	LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x)\n", m_ppc, offset*2,data,mem_mask);
 
 	// other conditions?
 	if (m_dfc==0x7)
@@ -153,8 +153,16 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint32_t data, uin
 
 		}
 
-		COMBINE_DATA(&m_m68340_base);
-		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x) (m_m68340_base write)\n", pc(), offset*4,data,mem_mask);
+		uint32_t data32 = data;
+		uint32_t mem_mask32 = mem_mask;
+		if (!BIT(offset,0))
+		{
+			data32 <<= 16;
+			mem_mask32 <<= 16;
+		}
+
+		m_m68340_base = (m_m68340_base & ~mem_mask32) | (data32 & mem_mask32);
+		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x) (m_m68340_base write)\n", pc(), offset*2,data,mem_mask);
 
 		// map new modules
 		if (m_m68340_base & 1)
@@ -168,8 +176,8 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint32_t data, uin
 					read8sm_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_ports_r)),
 					write8sm_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_ports_w)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x040, base + 0x05f,
-					read32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_r)),
-					write32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_w)));
+					read16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_r)),
+					write16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_w)));
 			m_internal->install_readwrite_handler(base + 0x600, base + 0x63f,
 					read16s_delegate(*m_timer[0], FUNC(mc68340_timer_module_device::read)),
 					write16s_delegate(*m_timer[0], FUNC(mc68340_timer_module_device::write)),0xffffffff);
@@ -180,13 +188,13 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint32_t data, uin
 					read8sm_delegate(*m_serial, FUNC(mc68340_serial_module_device::read)),
 					write8sm_delegate(*m_serial, FUNC(mc68340_serial_module_device::write)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x780, base + 0x7bf,
-					read32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_r)),
-					write32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_w)));
+					read16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_r)),
+					write16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_w)));
 		}
 	}
 	else
 	{
-		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc(), offset*4,data,mem_mask);
+		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc(), offset*2,data,mem_mask);
 	}
 }
 
@@ -214,7 +222,7 @@ void m68340_cpu_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: fscpu32_device(mconfig, tag, owner, clock, M68340, 32,32, address_map_constructor(FUNC(m68340_cpu_device::m68340_internal_map), this))
+	: fscpu32_device(mconfig, tag, owner, clock, M68340, address_map_constructor(FUNC(m68340_cpu_device::m68340_internal_map), this))
 	, m_serial(*this, "serial")
 	, m_timer(*this, "timer%u", 1U)
 	, m_clock_mode(0)

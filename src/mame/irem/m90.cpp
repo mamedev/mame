@@ -1052,6 +1052,26 @@ ROM_START( dynablstb3 )
 	/* the samples are in the Z80 ROM in this bootleg */
 ROM_END
 
+ROM_START( dynablstb4 ) // almost identical to dynablstb, only a small routine added at 0xff30
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2", 0x00001, 0x20000, CRC(e89027cf) SHA1(6ca9880c0664d02b940bd47ece2dda16d534a0ed) )
+	ROM_LOAD16_BYTE( "3", 0x00000, 0x20000, CRC(d123a2e2) SHA1(595433880046ac04825b2e12a9b6f02bb5e2b50d) )
+	ROM_COPY( "maincpu",  0x3fff0, 0xffff0, 0x10 )  // start vector
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "1", 0x0000, 0x10000, CRC(e693c32f) SHA1(b6f228d26318718eedae765de9479706a3e4c38d) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "7", 0x000000, 0x40000, CRC(695d2019) SHA1(3537e9fb0e7dc13d6113b4af71cba3c73392335a) )
+	ROM_LOAD( "6", 0x040000, 0x40000, CRC(4c7c8bbc) SHA1(31ab5557d96c4184a9c02ed1c309f3070d148e25) )
+	ROM_LOAD( "5", 0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
+	ROM_LOAD( "4", 0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
+
+	ROM_REGION( 0x20000, "m72", ROMREGION_ERASE00 ) // samples
+	// the samples are in the Z80 ROM in this bootleg
+ROM_END
+
+
 /*
 New Dyna Blaster Global Quest
 Irem, 1992
@@ -1333,21 +1353,22 @@ void m90_state::init_bomblord()
 
 
 
-GAME( 1991, hasamu,    0,        hasamu,   hasamu,   m90_state, empty_init,    ROT0, "Irem", "Hasamu (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, dynablst,  0,        bombrman, dynablst, m90_state, empty_init,    ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bombrman,  dynablst, bombrman, bombrman, m90_state, empty_init,    ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, atompunk,  dynablst, bombrman, atompunk, m90_state, empty_init,    ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dynablstb, dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dynablstb2,dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dynablstb3,dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // PCB has Playmark labels
-GAME( 1991, dicegame,  0,        dicegame, dicegame, m90_state, empty_init,    ROT0, "bootleg (Tuning)", "Dice - The Dice Game!", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // German bootleg of Irem Dice Dice Dice
-GAME( 1992, bbmanw,    0,        bbmanw,   bbmanw,   m90_state, empty_init,    ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bbmanwj,   bbmanw,   bbmanw,   bbmanwj,  m90_state, empty_init,    ROT0, "Irem", "Bomber Man World (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bbmanwja,  bbmanw,   bbmanwj,  bbmanwj,  m90_state, empty_init,    ROT0, "Irem", "Bomber Man World (Japan, revised sound hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, newapunk,  bbmanw,   bbmanw,   newapunk, m90_state, empty_init,    ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bomblord,  bbmanw,   bomblord, bbmanw,   m90_state, init_bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quizf1,    0,        quizf1,   quizf1,   m90_state, init_quizf1,   ROT0, "Irem", "Quiz F1 1-2 Finish (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, riskchal,  0,        riskchal, riskchal, m90_state, empty_init,    ROT0, "Irem", "Risky Challenge", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gussun,    riskchal, riskchal, riskchal, m90_state, empty_init,    ROT0, "Irem", "Gussun Oyoyo (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, matchit2,  0,        matchit2, matchit2, m90_state, empty_init,    ROT0, "Tamtex", "Match It II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shisen2,   matchit2, matchit2, shisen2,  m90_state, empty_init,    ROT0, "Tamtex", "Shisensho II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hasamu,     0,        hasamu,   hasamu,   m90_state, empty_init,    ROT0, "Irem", "Hasamu (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, dynablst,   0,        bombrman, dynablst, m90_state, empty_init,    ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bombrman,   dynablst, bombrman, bombrman, m90_state, empty_init,    ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, atompunk,   dynablst, bombrman, atompunk, m90_state, empty_init,    ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dynablstb,  dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dynablstb2, dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dynablstb3, dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // PCB has Playmark labels
+GAME( 1992, dynablstb4, dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // slightly offset sprites
+GAME( 1991, dicegame,   0,        dicegame, dicegame, m90_state, empty_init,    ROT0, "bootleg (Tuning)", "Dice - The Dice Game!", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // German bootleg of Irem Dice Dice Dice
+GAME( 1992, bbmanw,     0,        bbmanw,   bbmanw,   m90_state, empty_init,    ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bbmanwj,    bbmanw,   bbmanw,   bbmanwj,  m90_state, empty_init,    ROT0, "Irem", "Bomber Man World (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bbmanwja,   bbmanw,   bbmanwj,  bbmanwj,  m90_state, empty_init,    ROT0, "Irem", "Bomber Man World (Japan, revised sound hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, newapunk,   bbmanw,   bbmanw,   newapunk, m90_state, empty_init,    ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bomblord,   bbmanw,   bomblord, bbmanw,   m90_state, init_bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quizf1,     0,        quizf1,   quizf1,   m90_state, init_quizf1,   ROT0, "Irem", "Quiz F1 1-2 Finish (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, riskchal,   0,        riskchal, riskchal, m90_state, empty_init,    ROT0, "Irem", "Risky Challenge", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gussun,     riskchal, riskchal, riskchal, m90_state, empty_init,    ROT0, "Irem", "Gussun Oyoyo (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, matchit2,   0,        matchit2, matchit2, m90_state, empty_init,    ROT0, "Tamtex", "Match It II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shisen2,    matchit2, matchit2, shisen2,  m90_state, empty_init,    ROT0, "Tamtex", "Shisensho II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

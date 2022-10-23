@@ -397,7 +397,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 					selected_entry = entry;
 
 				// do we have to select this file?
-				if (!core_stricmp(m_current_file.c_str(), dirent->name))
+				if (!core_stricmp(m_current_file, dirent->name))
 					selected_entry = entry;
 			}
 		}

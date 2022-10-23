@@ -100,15 +100,6 @@ private:
 void facit4440_state::earom_latch_w(u8 data)
 {
 	// SN74LS174 latch + SN7406 inverter
-
-	// Prevent outputs from interfering with data reads
-	if (!BIT(data, 2))
-		data &= 0xfc;
-
-	// FIXME: clock must be written first here due to data/control setup time
-	m_earom[0]->clock_w(BIT(data, 5));
-	m_earom[1]->clock_w(BIT(data, 5));
-
 	m_earom[0]->data_w(BIT(data, 0));
 	m_earom[1]->data_w(BIT(data, 1));
 
@@ -117,6 +108,7 @@ void facit4440_state::earom_latch_w(u8 data)
 		earom->c2_w(BIT(data, 2));
 		earom->c1_w(BIT(data, 3));
 		earom->c3_w(BIT(data, 4));
+		earom->clock_w(BIT(data, 5));
 	}
 }
 

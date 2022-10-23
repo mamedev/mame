@@ -101,4 +101,4 @@ private:
 	u8 m_ext_view_sel = 0;
 };
 
-#endif // MAME_INCLUDES_PC9801_EPSON_H
+#endif // MAME_INCLUDES_PC98HA_H

@@ -1154,56 +1154,47 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				int xacc = 0;
 				int x;
 
-				// non-flipped case
-				if (!flip)
+				data[7] = addr;
+				for (x = xpos; (xdelta > 0 && x <= cliprect.max_x) || (xdelta < 0 && x >= cliprect.min_x);)
 				{
-					// start at the word before because we preincrement below
-					data[7] = addr - 1;
-					for (x = xpos; (xdelta > 0 && x <= cliprect.max_x) || (xdelta < 0 && x >= cliprect.min_x); )
+					uint32_t pixels = spritedata[data[7]];
+					if (flip)
 					{
-						uint32_t pixels = spritedata[++data[7]];
-
-						// draw four pixels
-						int pix;
-						pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 24) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 20) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 16) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 12) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  8) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  4) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-
-						// stop if the second-to-last pixel in the group was 0xf
-						if ((pixels & 0x000000f0) == 0x000000f0)
-							break;
+						data[7]--;
 					}
-				}
-
-				// flipped case
-				else
-				{
-					// start at the word after because we predecrement below
-					data[7] = addr + 1;
-					for (x = xpos; (xdelta > 0 && x <= cliprect.max_x) || (xdelta < 0 && x >= cliprect.min_x); )
+					else
 					{
-						uint32_t pixels = spritedata[--data[7]];
-
-						// draw four pixels
-						int pix;
-						pix = (pixels >>  0) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  4) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >>  8) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 12) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 16) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 20) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 24) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-						pix = (pixels >> 28) & 0xf; while (xacc < 0x200) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; xacc += hzoom; } xacc -= 0x200;
-
-						// stop if the second-to-last pixel in the group was 0xf
-						if ((pixels & 0x0f000000) == 0x0f000000)
-							break;
+						data[7]++;
+						pixels =
+							(( pixels << 28) & 0xf0000000) |
+							(( pixels << 20) & 0x0f000000) |
+							(( pixels << 12) & 0x00f00000) |
+							(( pixels <<  4) & 0x000f0000) |
+							(( pixels >>  4) & 0x0000f000) |
+							(( pixels >> 12) & 0x00000f00) |
+							(( pixels >> 20) & 0x000000f0) |
+							(( pixels >> 28) & 0x0000000f);
 					}
+					bool last_data = (pixels & 0x0f00'0000) == 0x0f00'0000;
+
+					// draw eight pixels
+					for (int k=0; k<8; k++)
+					{
+						int pix = pixels & 0xf;
+						while (xacc < 0x200)
+						{
+							if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15)
+								dest[x] = colpri | pix;
+							x += xdelta;
+							xacc += hzoom;
+						}
+						xacc -= 0x200;
+						pixels>>=4;
+					}
+
+					// stop if the second-to-last pixel in the group was 0xf
+					if (last_data)
+						break;
 				}
 
 				// update bounds

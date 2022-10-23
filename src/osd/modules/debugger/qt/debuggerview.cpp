@@ -16,6 +16,9 @@
 #define horizontalAdvance width
 #endif
 
+
+namespace osd::debugger::qt {
+
 DebuggerView::DebuggerView(
 		debug_view_type type,
 		running_machine &machine,
@@ -50,6 +53,19 @@ DebuggerView::~DebuggerView()
 	if (m_view)
 		m_machine.debug_view().free_view(*m_view);
 }
+
+
+int DebuggerView::sourceIndex() const
+{
+	if (m_view)
+	{
+		debug_view_source const *const source = m_view->source();
+		if (source)
+			return m_view->source_index(*source);
+	}
+	return -1;
+}
+
 
 void DebuggerView::paintEvent(QPaintEvent *event)
 {
@@ -361,3 +377,5 @@ void DebuggerView::debuggerViewUpdate(debug_view &debugView, void *osdPrivate)
 	dView->update();
 	emit dView->updated();
 }
+
+} // namespace osd::debugger::qt

@@ -2703,6 +2703,25 @@ ROM_START( soulclbrjb )
 	ROM_LOAD( "soc1wave0.2",         0x0000000, 0x800000, CRC(c100618d) SHA1(b87f88ee42ad9c5affa674e5f816d902143fed99) )
 ROM_END
 
+ROM_START( soulclbraa )
+	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "soc12vera.2l",  0x0000000, 0x200000, CRC(ceadcc9a) SHA1(68cd3d15f28178fcea8aada6067b7060edfb2913) )
+	ROM_LOAD16_BYTE( "soc12vera.2p",  0x0000001, 0x200000, CRC(65a74cf0) SHA1(1129c078925bd02f4e9cef64cd7761968be53537) )
+
+	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD(        "soc1rom0.7",   0x0000000, 0x800000, CRC(cdc47b55) SHA1(315ea6b819de5c4883aa400f1b9f4172637757bf) )
+	ROM_LOAD(        "soc1rom1.8",   0x0800000, 0x800000, CRC(30d2dd5a) SHA1(1c0c467ba339e0241efb8d5c3b025a046b2ca676) )
+	ROM_LOAD(        "soc1rom2.9",   0x1000000, 0x800000, CRC(dbb93955) SHA1(624cd8ad94e8ae53206f798bff81784afe95e5f1) )
+	ROM_LOAD(        "soc1fl3.6",    0x1800000, 0x400000, CRC(24d94c38) SHA1(0f9b9ab11dd4e02086d7b9104ce2f5d4e93cd696) )
+	ROM_LOAD(        "soc1fl4.5",    0x1c00000, 0x400000, CRC(6212090e) SHA1(ed5e50771180935a0c2e760e7369673098722201) )
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "soc1vera.11s", 0x0000000, 0x080000, CRC(52aa206a) SHA1(5abe9d6f800fa1b9623aa08b16e9b959b840e50b) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "soc1wave0.2",         0x0000000, 0x800000, CRC(c100618d) SHA1(b87f88ee42ad9c5affa674e5f816d902143fed99) )
+ROM_END
+
 ROM_START( soulclbrja )
 	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "soc1vera.2l",  0x0000000, 0x200000, CRC(37e0a203) SHA1(3915b5e530c8e70a07aa8ccedeb66633ae5f670e) )
@@ -3347,6 +3366,7 @@ GAME( 1998, soulclbr,  0,        coh700,   namcos12,  namcos12_state,          i
 GAME( 1998, soulclbrwb,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.B)", 0 )
 GAME( 1998, soulclbruc,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.C)", 0 )
 GAME( 1998, soulclbrub,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.B)", 0 ) /* KC020 */
+GAME( 1998, soulclbraa,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Asia, SOC12/VER.A2)", 0 ) /* KC020 */
 GAME( 1998, soulclbrjc,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.C)", 0 ) /* KC020 */
 GAME( 1998, soulclbrjb,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.B)", 0 ) /* KC020 */
 GAME( 1998, soulclbrja,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.A2)", 0 ) /* KC020 */

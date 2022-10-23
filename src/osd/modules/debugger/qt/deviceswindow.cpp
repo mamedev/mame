@@ -2,7 +2,13 @@
 // copyright-holders:Andrew Gardner
 #include "emu.h"
 #include "deviceswindow.h"
+
 #include "deviceinformationwindow.h"
+
+#include "util/xmlfile.h"
+
+
+namespace osd::debugger::qt {
 
 DevicesWindowModel::DevicesWindowModel(running_machine &machine, QObject *parent) :
 	m_machine(machine)
@@ -152,16 +158,18 @@ void DevicesWindow::activated(const QModelIndex &index)
 }
 
 
+void DevicesWindow::saveConfigurationToNode(util::xml::data_node &node)
+{
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_DEVICES_VIEWER);
+}
+
+
 
 //=========================================================================
 //  DevicesWindowQtConfig
 //=========================================================================
-void DevicesWindowQtConfig::buildFromQWidget(QWidget *widget)
-{
-	WindowQtConfig::buildFromQWidget(widget);
-	//  DevicesWindow *window = dynamic_cast<DevicesWindow *>(widget);
-}
-
 
 void DevicesWindowQtConfig::applyToQWidget(QWidget *widget)
 {
@@ -170,13 +178,9 @@ void DevicesWindowQtConfig::applyToQWidget(QWidget *widget)
 }
 
 
-void DevicesWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-}
-
-
 void DevicesWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
 }
+
+} // namespace osd::debugger::qt

@@ -119,7 +119,6 @@ K05324X_CB_MEMBER(rollerg_state::sprite_callback)
 
 K051316_CB_MEMBER(rollerg_state::zoom_callback)
 {
-	*flags = TILE_FLIPYX((*color & 0xc0) >> 6);
 	*code |= ((*color & 0x0f) << 8);
 	*color = ((*color & 0x30) >> 4);
 }

@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders: Nicola Salmoria
-
 /***************************************************************************
 
     Bank Panic / Combat Hawk hardware
@@ -59,13 +58,10 @@
           315-5073         - PAL16L4 (protected)
           315-5074         - PAL10L8 (read OK)
 
-
-
 ---------------------------------------------------
 
     Bank Panic memory map (preliminary)
     Similar to Appoooh
-
 
     0000-dfff ROM
     e000-e7ff RAM
@@ -86,11 +82,7 @@
     01  SN76496 #2
     02  SN76496 #3
     05  horizontal scroll
-    07  bit 0-1 = at least one of these two controls the playfield priority
-        bit 2-3 = ?
-        bit 4 = NMI enable
-        bit 5 = flip screen
-        bit 6-7 = ?
+    07  video control
 
 ***************************************************************************/
 
@@ -122,6 +114,7 @@ public:
 	void bankp(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -138,38 +131,47 @@ private:
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
+
 	uint8_t m_scroll_x = 0;
 	uint8_t m_priority = 0;
-
+	uint8_t m_color_hi = 0;
+	uint8_t m_display_on = 0;
 	uint8_t m_nmi_mask = 0;
 
 	void scroll_w(uint8_t data);
 	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void colorram_w(offs_t offset, uint8_t data);
-	void out_w(uint8_t data);
+	void video_control_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 };
 
+void bankp_state::machine_start()
+{
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_priority));
+	save_item(NAME(m_color_hi));
+	save_item(NAME(m_display_on));
+	save_item(NAME(m_nmi_mask));
+}
 
-// video
+void bankp_state::machine_reset()
+{
+	video_control_w(0);
+}
+
 
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
 
-  Bank Panic has a 32x8 palette PROM (I'm not sure whether the second 16
-  bytes are used - they contain the same colors as the first 16 with only
-  one different) and two 256x4 lookup table PROMs (one for charset #1, one
-  for charset #2 - only the first 128 nibbles seem to be used).
-
-  I don't know for sure how the palette PROM is connected to the RGB output,
-  but it's probably the usual:
+  Bank Panic has a 32x8 palette PROM and two 256x4 lookup table PROMs (one
+  for charset #1, one for charset #2 - only the first 128 nibbles are used).
 
   bit 7 -- 220 ohm resistor  -- BLUE
         -- 470 ohm resistor  -- BLUE
@@ -212,19 +214,22 @@ void bankp_state::palette(palette_device &palette) const
 	}
 
 	// color_prom now points to the beginning of the lookup table
+	for (int i = 0; i < 0x100; i++)
+	{
+		// lookup tables are 256x4, but A7 is GND
+		int index = (i << 1 & 0x100) | (i & 0x7f);
 
-	// charset #1 lookup table
-	for (int i = 0; i < m_gfxdecode->gfx(0)->colors() * m_gfxdecode->gfx(0)->granularity(); i++)
-		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i, *color_prom++ & 0x0f);
-
-	color_prom += 128;  // skip the bottom half of the PROM - seems to be not used
-
-	// charset #2 lookup table
-	for (int i = 0; i < m_gfxdecode->gfx(1)->colors() * m_gfxdecode->gfx(1)->granularity(); i++)
-		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i, *color_prom++ & 0x0f);
-
-	// the bottom half of the PROM seems to be not used
+		palette.set_pen_indirect(index, color_prom[index] & 0xf);
+		palette.set_pen_indirect(index | 0x80, (color_prom[index] & 0xf) | 0x10);
+	}
 }
+
+
+/*************************************
+ *
+ *  Tilemaps
+ *
+ *************************************/
 
 void bankp_state::scroll_w(uint8_t data)
 {
@@ -245,58 +250,75 @@ void bankp_state::colorram_w(offs_t offset, uint8_t data)
 	Which ? m_bg_tilemap->mark_tile_dirty(offset) : m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void bankp_state::out_w(uint8_t data)
+void bankp_state::video_control_w(uint8_t data)
 {
 	// bits 0-1 are playfield priority
 	// TODO: understand how this works
 	m_priority = data & 0x03;
 
-	// bits 2-3 unknown (2 is used)
+	// bit 2 turns on display
+	m_display_on = BIT(data, 2);
 
-	// bit 4 controls NMI
-	m_nmi_mask = (data & 0x10) >> 4;
+	// bit 3 controls color prom d4
+	if (m_color_hi != BIT(data, 3))
+	{
+		m_color_hi = BIT(data, 3);
+		machine().tilemap().mark_all_dirty();
+	}
+
+	// bit 4 enables vblank NMI
+	m_nmi_mask = BIT(data, 4);
 
 	// bit 5 controls screen flip
-	flip_screen_set(data & 0x20);
+	flip_screen_set(BIT(data, 5));
 
-	// bits 6-7 unknown
+	// bits 6-7 N/C
+}
+
+TILE_GET_INFO_MEMBER(bankp_state::get_fg_tile_info)
+{
+	int const code = m_videoram[0][tile_index] + 256 * (m_colorram[0][tile_index] & 0x03);
+	int const color = (m_colorram[0][tile_index] >> 3) | (m_color_hi << 5);
+	int const flags = (m_colorram[0][tile_index] & 0x04) ? TILE_FLIPX : 0;
+
+	tileinfo.set(0, code, color, flags);
+	tileinfo.group = color & 0x1f;
 }
 
 TILE_GET_INFO_MEMBER(bankp_state::get_bg_tile_info)
 {
 	int const code = m_videoram[1][tile_index] + 256 * (m_colorram[1][tile_index] & 0x07);
-	int const color = m_colorram[1][tile_index] >> 4;
+	int const color = (m_colorram[1][tile_index] >> 4) | (m_color_hi << 4);
 	int const flags = (m_colorram[1][tile_index] & 0x08) ? TILE_FLIPX : 0;
 
 	tileinfo.set(1, code, color, flags);
-	tileinfo.group = color;
-}
-
-TILE_GET_INFO_MEMBER(bankp_state::get_fg_tile_info)
-{
-	int const code = m_videoram[0][tile_index] + 256 * ((m_colorram[0][tile_index] & 3) >> 0);
-	int const color = m_colorram[0][tile_index] >> 3;
-	int const flags = (m_colorram[0][tile_index] & 0x04) ? TILE_FLIPX : 0;
-
-	tileinfo.set(0, code, color, flags);
-	tileinfo.group = color;
+	tileinfo.group = color & 0xf;
 }
 
 void bankp_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bankp_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bankp_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bankp_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(1), 0);
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
-
-	save_item(NAME(m_scroll_x));
-	save_item(NAME(m_priority));
-	save_item(NAME(m_nmi_mask));
+	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(1), 0);
 }
+
+
+/*************************************
+ *
+ *  Screen update
+ *
+ *************************************/
 
 uint32_t bankp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	if (!m_display_on)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+
 	if (flip_screen())
 	{
 		m_fg_tilemap->set_scrollx(0, 240 - m_scroll_x);
@@ -308,32 +330,30 @@ uint32_t bankp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		m_bg_tilemap->set_scrollx(0, 0);
 	}
 
-
 	// only one bit matters?
 	switch (m_priority)
 	{
 	case 0: // combat hawk uses this
-		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE);
+		m_fg_tilemap->draw(screen, bitmap, cliprect);
 		break;
 	case 1:
-		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE);
+		m_fg_tilemap->draw(screen, bitmap, cliprect);
 		break;
 	case 2:
-		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE);
+		m_bg_tilemap->draw(screen, bitmap, cliprect);
 		break;
 	case 3:
-		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // just a guess
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE); // just a guess
+		m_bg_tilemap->draw(screen, bitmap, cliprect);
 		break;
 	}
+
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -359,7 +379,7 @@ void bankp_state::io_map(address_map &map)
 	map(0x02, 0x02).portr("IN2").w("sn3", FUNC(sn76489_device::write));
 	map(0x04, 0x04).portr("DSW1");
 	map(0x05, 0x05).w(FUNC(bankp_state::scroll_w));
-	map(0x07, 0x07).w(FUNC(bankp_state::out_w));
+	map(0x07, 0x07).w(FUNC(bankp_state::video_control_w));
 }
 
 
@@ -397,12 +417,12 @@ static INPUT_PORTS_START( bankp )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, "Coin Switch 1" )                  PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, "Coin Switch 1" )             PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x00, "Coin Switch 2" )                    PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Coin Switch 2" )             PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:4")
@@ -487,9 +507,10 @@ static const gfx_layout charlayout2 =
 };
 
 static GFXDECODE_START( gfx_bankp )
-	GFXDECODE_ENTRY( "fgtiles", 0, charlayout,      0, 32 )
-	GFXDECODE_ENTRY( "bgtiles", 0, charlayout2,  32*4, 16 )
+	GFXDECODE_ENTRY( "fgtiles", 0, charlayout,  0,    64 )
+	GFXDECODE_ENTRY( "bgtiles", 0, charlayout2, 64*4, 32 )
 GFXDECODE_END
+
 
 /*************************************
  *
@@ -497,14 +518,7 @@ GFXDECODE_END
  *
  *************************************/
 
-void bankp_state::machine_reset()
-{
-	m_scroll_x = 0;
-	m_priority = 0;
-	m_nmi_mask = 0;
-}
-
-INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
+INTERRUPT_GEN_MEMBER(bankp_state::vblank_interrupt)
 {
 	if (m_nmi_mask)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -519,20 +533,19 @@ void bankp_state::bankp(machine_config &config)
 	// --> VTOTAL should be OK, HTOTAL not 100% certain
 	static constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 3;
 
-	static constexpr int HTOTAL  =      330;
-	static constexpr int HBEND   =      0 + 3 * 8;
-	static constexpr int HBSTART =      224 + 3 * 8;
+	static constexpr int HTOTAL  = 330;
+	static constexpr int HBEND   = 0 + 3 * 8;
+	static constexpr int HBSTART = 224 + 3 * 8;
 
-	static constexpr int VTOTAL  =      256;
-	static constexpr int VBEND   =      0 + 2 * 8;
-	static constexpr int VBSTART =      224 + 2 * 8;
+	static constexpr int VTOTAL  = 256;
+	static constexpr int VBEND   = 0 + 2 * 8;
+	static constexpr int VBSTART = 224 + 2 * 8;
 
 	// basic machine hardware
 	Z80(config, m_maincpu, MASTER_CLOCK / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bankp_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &bankp_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(bankp_state::vblank_irq));
-
+	m_maincpu->set_vblank_int("screen", FUNC(bankp_state::vblank_interrupt));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -541,18 +554,15 @@ void bankp_state::bankp(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bankp);
-	PALETTE(config, m_palette, FUNC(bankp_state::palette), 32 * 4 + 16 * 8, 32);
+	PALETTE(config, m_palette, FUNC(bankp_state::palette), 512, 32);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SN76489(config, "sn1", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
-
 	SN76489(config, "sn2", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
-
 	SN76489(config, "sn3", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
-
 
 
 /*************************************
@@ -581,9 +591,9 @@ ROM_START( bankp )
 	ROM_LOAD( "epr-6167.5i",  0xa000, 0x2000, CRC(3fa337e1) SHA1(5fdc45436be27cceb5157bd6201c30e3de28fd7b) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pr-6177.8a",   0x0000, 0x020, CRC(eb70c5ae) SHA1(13613dad6c14004278f777d6f3f62712a2a85773) )     // palette
-	ROM_LOAD( "pr-6178.6f",   0x0020, 0x100, CRC(0acca001) SHA1(54c354d825a24a9085867b114a2cd6835baebe55) )     // fgtiles lookup table
-	ROM_LOAD( "pr-6179.5a",   0x0120, 0x100, CRC(e53bafdb) SHA1(7a414f6db5476dd7d0217e5b846ed931381eda02) )     // bgtiles lookup table
+	ROM_LOAD( "pr-6177.8a",   0x0000, 0x020, CRC(eb70c5ae) SHA1(13613dad6c14004278f777d6f3f62712a2a85773) ) // palette
+	ROM_LOAD( "pr-6178.6f",   0x0020, 0x100, CRC(0acca001) SHA1(54c354d825a24a9085867b114a2cd6835baebe55) ) // fgtiles lookup table
+	ROM_LOAD( "pr-6179.5a",   0x0120, 0x100, CRC(e53bafdb) SHA1(7a414f6db5476dd7d0217e5b846ed931381eda02) ) // bgtiles lookup table
 
 	ROM_REGION( 0x025c, "user1", 0 )
 	ROM_LOAD( "315-5074.2c.bin",   0x0000, 0x025b, CRC(2e57bbba) SHA1(c3e45e8a972342779442e50872a2f5f2d61e9c0a) )
@@ -611,9 +621,9 @@ ROM_START( combh )
 	ROM_LOAD( "epr-10912.5i",  0xa000, 0x2000, CRC(cbe22738) SHA1(2dbdb593882ec66e783411f02941ce822e1c62a1) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pr-10900.8a",   0x0000, 0x020, CRC(f95fcd66) SHA1(ed7bf6691a942f344b0230310876a63a68606922) )    // palette
-	ROM_LOAD( "pr-10901.6f",   0x0020, 0x100, CRC(6fd981c8) SHA1(0bd2e7b72fd5e055224a675108e2e706cd6f6e5a) )    // bgtiles lookup table
-	ROM_LOAD( "pr-10902.5a",   0x0120, 0x100, CRC(84d6bded) SHA1(67d9c4c7d7c84eb54ec655a4cf1768ca0cbb047d) )    // fgtiles lookup table
+	ROM_LOAD( "pr-10900.8a",   0x0000, 0x020, CRC(f95fcd66) SHA1(ed7bf6691a942f344b0230310876a63a68606922) ) // palette
+	ROM_LOAD( "pr-10901.6f",   0x0020, 0x100, CRC(6fd981c8) SHA1(0bd2e7b72fd5e055224a675108e2e706cd6f6e5a) ) // fgtiles lookup table
+	ROM_LOAD( "pr-10902.5a",   0x0120, 0x100, CRC(84d6bded) SHA1(67d9c4c7d7c84eb54ec655a4cf1768ca0cbb047d) ) // bgtiles lookup table
 
 	ROM_REGION( 0x025c, "user1", 0 )
 	ROM_LOAD( "315-5074.2c.bin",   0x0000, 0x025b, CRC(2e57bbba) SHA1(c3e45e8a972342779442e50872a2f5f2d61e9c0a) )

@@ -180,12 +180,10 @@ void decwriter_state::la120_NVR_w(offs_t offset, uint8_t data)
 	m_nvm->c3_w(BIT(offset, 10));
 	m_nvm->c2_w(BIT(offset, 9));
 	m_nvm->c1_w(BIT(offset, 8));
-
-	// FIXME: clock line shouldn't be inverted relative to C1-C3, but accesses only seems to work this way
-	m_nvm->clock_w(!BIT(offset, 0));
+	m_nvm->clock_w(BIT(offset, 0));
 
 	// C2 is used to disable pullup on data line
-	m_nvm->data_w(!BIT(offset, 9) ? 0 : !BIT(data, 7));
+	m_nvm->data_w(BIT(offset, 9) ? !BIT(data, 7) : 1);
 }
 
 /* todo: fully reverse engineer DC305 ASIC */

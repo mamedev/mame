@@ -10,6 +10,7 @@
 #include "emuopts.h"
 
 #include "corestr.h"
+#include "path.h"
 #include "zippath.h"
 
 

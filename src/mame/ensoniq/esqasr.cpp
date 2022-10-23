@@ -40,6 +40,7 @@
 #include "emu.h"
 
 #include "cpu/es5510/es5510.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/68340.h"
 #include "esqvfd.h"
 #include "machine/upd765.h"

@@ -10,7 +10,7 @@
 
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"

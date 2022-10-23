@@ -1106,12 +1106,18 @@ ROM_END
 /* This set appears to be an intermediate version between the 'II' (cosmica) version and the early cosmica1 version; It still has the (C) 1979 titlescreen
   (which was removed on the II version since it may have came out in 1980?), and on all tms2708 eproms on a special rom daughterboard called "7910-V3";
   one possible reason is that 2708 eproms became cheaper than tms2516s for a time, so production was switched to them for a while between the early and II versions? */
+  /* Note that universal had stickers (white numbers on a red background)
+  on the window of each 2708 or mb8516 EPROM, but the actual numbers are
+  struck through with a marker and often do not correspond in any way to the
+  data on the EPROMS. Different boards have been observed with the numbers
+  non-contiguous, repeating, and inconsistent between the boards.
+  Only the stamped or written letters actually matter and correspond to the
+  data on said EPROM chip.*/
 ROM_START( cosmica2a )
 /* ROMs a-1 and b-2 match ii-1 from cosmica
    ROMs c-3 and d-4 are unique
    ROMs e-5 and f-6 match ii-3 from cosmica
-   ROM g-7 probably SHOULD match first half of ii-4 from cosmica (and the current 'bad dump' g-7 ROM does) but the sum16 from mameinfo doesn't match. since the game works fine I (LN) suspect the sum on mameinfo was wrong.
-   ROM h-8 matches 2nd half of ii-4 from cosmica
+   ROMs g-7 and h-8 match ii-4 from cosmica
    ROMs i-9 and j-0 are unique
  */
 	ROM_REGION( 0x10000, "maincpu", 0 ) // All located on 7910-V3 sub PCB
@@ -1121,14 +1127,14 @@ ROM_START( cosmica2a )
 	ROM_LOAD( "d-4.d4",      0x0c00, 0x0400, CRC(168e38da) SHA1(63c5f8346861aa7c70ad58a05977c7af413cbfaf) ) // TMS2708 - sum16 9148
 	ROM_LOAD( "e-5.e4",      0x1000, 0x0400, CRC(80cc1fb8) SHA1(a301b236e372574ad3790aef72957cea249f18dc) ) // TMS2708 - sum16 afe2
 	ROM_LOAD( "f-6.d5",      0x1400, 0x0400, CRC(0dc464f7) SHA1(9ad68fd100bd3021202c3831477c8715b4b8f6b8) ) // TMS2708 - sum16 b403
-	ROM_LOAD( "g-7.e5",      0x1800, 0x0400, BAD_DUMP CRC(d5381c54) SHA1(57c170d02aa6d41f7cd4542e084af95ba3fcff7d) ) // TMS2708 - bad? sum16 should be d1aa according to mameinfo; is afda, but works fine...
+	ROM_LOAD( "g-7.e5",      0x1800, 0x0400, CRC(d5381c54) SHA1(57c170d02aa6d41f7cd4542e084af95ba3fcff7d) ) // TMS2708 - sum16 afda, verified from PCB (mameinfo and some other sets state the sum16 is d1aa. was d1aa a bad dump?)
 	ROM_LOAD( "h-8.d6",      0x1c00, 0x0400, CRC(2175fe6f) SHA1(930c70f5d1509f82581bbf760033eb97c34cfce6) ) // TMS2708 - sum16 a096
 	ROM_LOAD( "i-9.e6",      0x2000, 0x0400, CRC(3bb57720) SHA1(2d1edcad57767a4fa2c7713726ed0cb1203f6fbc) ) // TMS2708 - sum16 9b55
 	ROM_LOAD( "j-0.d7",      0x2400, 0x0400, CRC(4ff70f45) SHA1(791499be62a7b91bde75e7a7ab6c546f5fb63027) ) // TMS2708 - sum16 7c3c
 
-	ROM_REGION( 0x1000, "gfx1", 0 ) // sprites, on mainboard (note: the locations of these two MIGHT be switched around)
-	ROM_LOAD( "k-8.n2",      0x0000, 0x0800, CRC(aa6c6079) SHA1(af4ab73e9e1c189290b26bf42adb511d5a347df9) ) // Fujitsu MB8516 - sum16 4d9c
-	ROM_LOAD( "l-7.n1",      0x0800, 0x0800, CRC(431e866c) SHA1(b007cd3cc856360a0247bd78bb49d173f5cef321) ) // Fujitsu MB8516 - sum16 bb6b
+	ROM_REGION( 0x1000, "gfx1", 0 ) // sprites, on mainboard
+	ROM_LOAD( "l-8.n2",      0x0000, 0x0800, CRC(aa6c6079) SHA1(af4ab73e9e1c189290b26bf42adb511d5a347df9) ) // Fujitsu MB8516 - sum16 4d9c
+	ROM_LOAD( "k-7.n1",      0x0800, 0x0800, CRC(431e866c) SHA1(b007cd3cc856360a0247bd78bb49d173f5cef321) ) // Fujitsu MB8516 - sum16 bb6b
 
 	ROM_REGION( 0x0020, "proms", 0 )// on mainboard
 	ROM_LOAD( "u7910.d9",    0x0000, 0x0020, CRC(dfb60f19) SHA1(d510327ff3492f098659c551f7245835f61a2959) ) // MMI 6331-1 - sum16 0706

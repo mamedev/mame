@@ -54,10 +54,6 @@ void sega_315_5838_comp_device::device_reset()
 	m_abort = false;
 }
 
-void sega_315_5838_comp_device::rom_bank_updated()
-{
-}
-
 /**************************
 *
 * Decathlete

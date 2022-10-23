@@ -3931,4 +3931,143 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="spacea2">
+		<description>Space Ace II: Borf's Revenge</description>
+		<year>2022</year>
+		<publisher>Brutal Deluxe Software</publisher>
+		<info name="release" value="2022-8-30"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
+		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Space Ace 2 disk #1 and double click the SpaceAce2 icon to begin the game. -->
+		<!--  To install Space Ace 2 on a hard drive, create a SpaceAce2 folder on your hard drive and copy the content of the 8 disks into it. To run Space Ace 2 from your hard drive, double click on the SpaceAce2 directory icon on your hard drive then double click on the SpaceAce2 Icon. -->
+		<!--  System Requirements: Apple IIgs ROM 01/3 with 1 MB RAM, one 3.5" disk drive, System 5.0.4 -->
+		<!--  Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce2_D1.po" size="819200" crc="e2bb3930" sha1="33af425601b5810c09be67356a7c951c17eca603"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce2_D2.po" size="819200" crc="995ebadf" sha1="3430a95ae3442e62ffd091f9403d94b78a3069f6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce2_D3.po" size="819200" crc="a566c1e9" sha1="c03b0e5638c0ee230e0750a11e1867125fcfd09c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce2_D4.po" size="819200" crc="271bc9b5" sha1="f61f7041854add81a232da1590e114219d0fa9e5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce2_D5.po" size="819200" crc="7b996043" sha1="5ab2a6fbd2e3231475ba033f7789dbdb5b9f228c"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce2_D6.po" size="819200" crc="682d5b92" sha1="cea792693bfcd052f0f6b1c7cb726a3894d49251"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce2_D7.po" size="819200" crc="75ee0bb9" sha1="cefbdbb025ef8846e7b3522b2eb185a951f25f22"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce2_D8.po" size="819200" crc="d908f4f6" sha1="62c2f14f6dd683dce38542f34f36ee437af920b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemmings">
+		<description>LemminGS</description>
+		<year>1996</year>
+		<publisher>Brutal Deluxe Software</publisher>
+		<info name="release" value="1996"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
+		<!--  GS/OS Compatible, Hard drive installable. -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="LemminGS1.po" size="819200" crc="6a80c9b4" sha1="5753a09d88c51558ebab523aa5358132615b4614"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="LemminGS2.po" size="819200" crc="f5461e78" sha1="9a069abf9e9f511fd2abad500a237014cfcea3d9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="LemminGS3.po" size="819200" crc="18303b46" sha1="0327ea6286b18104dcb7dfc59e888a07e06c77d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthbpl11">
+		<description>Math Blaster Plus! (Version 1.1)</description>
+		<year>1989</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2022-09-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM1 or later. -->
+		<!--"Math Blaster Plus!" is an educational program designed by Jan Davidson and Cathy Johnson, developed by C.K. Haun, and distributed by Davidson and Associates. This is version 1.1. It requires a 512K Apple IIgs ROM1 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296196">
+				<rom name="math blaster plus iigs.woz" size="1296196" crc="35b57e45" sha1="1f98ce4e9ecb1cc0ae2a94709aecd9d6367f6ac8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frltwrd">
+		<description>First Letters and Words (Version 1.0)</description>
+		<year>????</year>
+		<publisher>First Byte</publisher>
+		<info name="release" value="2022-09-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"First Letters and Words" is an educational program developed and distributed by First Byte. This is version 1.0. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328918">
+				<rom name="first letters and words iigs.woz" size="1328918" crc="151447a3" sha1="b9fc33e0088cbef7aad7647ee4475d1841ab1a24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frshapes">
+		<description>First Shapes (Version 1.0)</description>
+		<year>????</year>
+		<publisher>First Byte</publisher>
+		<info name="release" value="2022-09-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"First Shapes" is an educational program developed and distributed by First Byte. This is version 1.0. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328907">
+				<rom name="first shapes iigs.woz" size="1328907" crc="3b89aba9" sha1="9698b857684446bfb3f43b8e2d263f4b8a687f1e"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

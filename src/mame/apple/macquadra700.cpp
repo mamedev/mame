@@ -11,6 +11,7 @@
 
 #include "emu.h"
 
+#include "adbmodem.h"
 #include "macadb.h"
 #include "macrtc.h"
 #include "mactoolbox.h"
@@ -18,7 +19,7 @@
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68040.h"
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
 #include "machine/dp83932c.h"
@@ -53,6 +54,7 @@ public:
 		m_via1(*this, "via1"),
 		m_via2(*this, "via2"),
 		m_macadb(*this, "macadb"),
+		m_adbmodem(*this, "adbmodem"),
 		m_ram(*this, RAM_TAG),
 		m_swim(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
@@ -78,7 +80,8 @@ public:
 private:
 	required_device<m68040_device> m_maincpu;
 	required_device<via6522_device> m_via1, m_via2;
-	optional_device<macadb_device> m_macadb;
+	required_device<macadb_device> m_macadb;
+	required_device<adbmodem_device> m_adbmodem;
 	required_device<ram_device> m_ram;
 	required_device<applefdintf_device> m_swim;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -157,7 +160,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
 	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_last_taken_interrupt = 0;
 
 	uint32_t rom_switch_r(offs_t offset);
@@ -821,8 +823,7 @@ uint8_t macquadra_state::mac_via_in_a()
 
 uint8_t macquadra_state::mac_via_in_b()
 {
-	int val = m_macadb->get_adb_state()<<4;
-	val |= m_rtc->data_r();
+	int val = m_rtc->data_r();
 
 	if (!m_adb_irq_pending)
 	{
@@ -850,7 +851,7 @@ void macquadra_state::mac_via_out_a(uint8_t data)
 void macquadra_state::mac_via_out_b(uint8_t data)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
-	m_macadb->mac_adb_newaction((data & 0x30) >> 4);
+	m_adbmodem->set_via_state((data & 0x30) >> 4);
 
 	m_rtc->ce_w((data & 0x04)>>2);
 	m_rtc->data_w(data & 0x01);
@@ -976,7 +977,6 @@ void macquadra_state::macqd700(machine_config &config)
 	m_via1->writepa_handler().set(FUNC(macquadra_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(macquadra_state::mac_via_out_b));
 	m_via1->irq_handler().set(FUNC(macquadra_state::mac_via_irq));
-	m_via1->cb2_handler().set(FUNC(macquadra_state::via_cb2_w));
 
 	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(macquadra_state::mac_via2_in_a));
@@ -985,10 +985,16 @@ void macquadra_state::macqd700(machine_config &config)
 	m_via2->writepb_handler().set(FUNC(macquadra_state::mac_via2_out_b));
 	m_via2->irq_handler().set(FUNC(macquadra_state::mac_via2_irq));
 
+	ADBMODEM(config, m_adbmodem, C7M);
+	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->irq_callback().set(FUNC(macquadra_state::adb_irq_w));
+	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
+	config.set_maximum_quantum(attotime::from_hz(1000000));
+
 	MACADB(config, m_macadb, C15M);
-	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->adb_irq_callback().set(FUNC(macquadra_state::adb_irq_w));
+	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

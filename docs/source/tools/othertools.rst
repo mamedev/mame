@@ -44,11 +44,17 @@ ldresample
 
 This tool recompresses video data for laserdisc and VHS dumps. Most users will not need to work with this.
 
-
 ldverify
 --------
 
 This tool is used for comparing laserdisc or VHS CHD images with the source AVI. Most users will not need to work with this.
+
+
+romcmp
+------
+
+This tool is used to perform basic data comparisons and integrity checks on binary dumps. With the -h switch, it can also be used to calculate hash functions. Most users will not need to work with this.
+
 
 unidasm
 -------

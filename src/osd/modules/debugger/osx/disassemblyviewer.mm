@@ -232,15 +232,15 @@
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
-	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_DISASSEMBLY_VIEWER);
-	node->set_attribute_int("cpu", [dasmView selectedSubviewIndex]);
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_DISASSEMBLY_VIEWER);
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_CPU, [dasmView selectedSubviewIndex]);
 	[dasmView saveConfigurationToNode:node];
 }
 
 
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	[super restoreConfigurationFromNode:node];
-	int const region = node->get_attribute_int("cpu", [dasmView selectedSubviewIndex]);
+	int const region = node->get_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_CPU, [dasmView selectedSubviewIndex]);
 	[dasmView selectSubviewAtIndex:region];
 	[window setTitle:[NSString stringWithFormat:@"Disassembly: %@", [dasmView selectedSubviewName]]];
 	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[dasmView selectedSubviewIndex]]];

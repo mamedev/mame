@@ -120,7 +120,7 @@ void gt913_sound_device::sound_stream_update(sound_stream& stream, std::vector<r
 	}
 }
 
-void gt913_sound_device::rom_bank_updated()
+void gt913_sound_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

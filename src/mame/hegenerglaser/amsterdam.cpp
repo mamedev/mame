@@ -15,6 +15,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "mmboard.h"
 #include "sound/dac.h"
 #include "mmdisplay1.h"

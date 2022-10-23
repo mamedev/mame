@@ -64,6 +64,17 @@
       contents of locations about to be written to may show misleading
       values. Likewise, PCs at which watchpoint hits occur may be
       incorrectly reported for writes.
+    * Due to the pipelining of writes, an interrupt may be accepted during
+      an instruction which attempts to disable interrupts by setting the
+      IEMASK bit, which may be cleared instead when control reaches the next
+      sequential instruction from a RETI. This sequencing glitch is
+      documented in the MN187XX23 user's manual, along with a failsafe way
+      of setting IEMASK, and similar workarounds in extant program code
+      suggest it is likewise present in the MN1880 series.
+    * The optional MMU, which expands the memory spaces in certain models
+      which contain neither internal ROM nor RAM, has been emulated only
+      to the extent required by psr500, though it likely has a few other
+      features and quirks.
 
 ***************************************************************************/
 
@@ -73,13 +84,15 @@
 
 // device type definitions
 DEFINE_DEVICE_TYPE(MN1880, mn1880_device, "mn1880", "Panasonic MN1880")
+DEFINE_DEVICE_TYPE(MN18801A, mn18801a_device, "mn18801a", "Panasonic MN18801A")
 
 ALLOW_SAVE_TYPE(mn1880_device::microstate)
 
-mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data_map)
+mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_mmu, address_map_constructor data_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, data_map)
+	, m_program_config("program", ENDIANNESS_BIG, 8, has_mmu ? 21 : 16, 0, 16, 14)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, has_mmu ? 21 : 16, 0, 16, 14, data_map)
+	, m_has_mmu(has_mmu)
 	, m_cpum(0)
 	, m_ustate(microstate::UNKNOWN)
 	, m_da(0)
@@ -89,11 +102,18 @@ mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, co
 	, m_icount(0)
 	, m_if(0)
 	, m_irq(0)
+	, m_mmu_bank{0, 0, 0, 0}
+	, m_mmu_enable(0)
 {
 }
 
 mn1880_device::mn1880_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mn1880_device(mconfig, MN1880, tag, owner, clock, address_map_constructor(FUNC(mn1880_device::internal_data_map), this))
+	: mn1880_device(mconfig, MN1880, tag, owner, clock, false, address_map_constructor(FUNC(mn1880_device::internal_data_map), this))
+{
+}
+
+mn18801a_device::mn18801a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mn1880_device(mconfig, MN18801A, tag, owner, clock, true, address_map_constructor(FUNC(mn18801a_device::internal_data_map), this))
 {
 }
 
@@ -131,11 +151,36 @@ void mn1880_device::cpum_w(u8 data)
 	m_cpum = (data & 0xef) | (m_cpum & 0x10);
 }
 
+u8 mn1880_device::mmu_bank_r(offs_t offset)
+{
+	return m_mmu_bank[offset];
+}
+
+void mn1880_device::mmu_bank_w(offs_t offset, u8 data)
+{
+	m_mmu_bank[offset] = data & 0x7f;
+}
+
+u8 mn1880_device::mmu_enable_r()
+{
+	return m_mmu_enable;
+}
+
+void mn1880_device::mmu_enable_w(u8 data)
+{
+	m_mmu_enable = data & 0xc0;
+}
+
 void mn1880_device::internal_data_map(address_map &map)
 {
 	map(0x0012, 0x0012).rw(FUNC(mn1880_device::ie0_r), FUNC(mn1880_device::ie0_w));
 	map(0x0015, 0x0015).rw(FUNC(mn1880_device::ie1_r), FUNC(mn1880_device::ie1_w));
 	map(0x0016, 0x0016).rw(FUNC(mn1880_device::cpum_r), FUNC(mn1880_device::cpum_w));
+	if (m_has_mmu)
+	{
+		map(0x0040, 0x0043).rw(FUNC(mn1880_device::mmu_bank_r), FUNC(mn1880_device::mmu_bank_w));
+		map(0x0044, 0x0044).rw(FUNC(mn1880_device::mmu_enable_r), FUNC(mn1880_device::mmu_enable_w));
+	}
 }
 
 std::unique_ptr<util::disasm_interface> mn1880_device::create_disassembler()
@@ -258,6 +303,11 @@ void mn1880_device::device_start()
 	save_item(NAME(m_tmp1));
 	save_item(NAME(m_tmp2));
 	save_item(NAME(m_output_queue_state));
+	if (m_has_mmu)
+	{
+		save_item(NAME(m_mmu_bank));
+		save_item(NAME(m_mmu_enable));
+	}
 }
 
 void mn1880_device::device_reset()
@@ -285,6 +335,24 @@ void mn1880_device::device_reset()
 	m_cpum = 0x0c;
 	m_ustate = microstate::NEXT;
 	m_output_queue_state = 0xff;
+
+	m_mmu_enable = 0;
+}
+
+bool mn1880_device::memory_translate(int spacenum, int intention, offs_t &address)
+{
+	switch (spacenum)
+	{
+	case AS_PROGRAM:
+		address = mmu_psen_translate(address);
+		break;
+
+	case AS_DATA:
+		address = mmu_data_translate(address);
+		break;
+	}
+
+	return true;
 }
 
 const mn1880_device::microstate mn1880_device::s_decode_map[256] =
@@ -502,7 +570,7 @@ void mn1880_device::execute_run()
 			}
 		}
 
-		u8 input = m_cache.read_byte(cpu.ip);
+		u8 input = m_cache.read_byte(mmu_psen_translate(cpu.ip));
 		switch (m_ustate)
 		{
 		case microstate::NEXT:
@@ -515,7 +583,7 @@ void mn1880_device::execute_run()
 			{
 				if (output_queued())
 				{
-					m_data.write_byte(m_da, m_tmp1 & 0x00ff);
+					m_data.write_byte(mmu_data_translate(m_da), m_tmp1 & 0x00ff);
 					m_output_queue_state = 0xff;
 				}
 				if (m_irq != 0)
@@ -546,7 +614,7 @@ void mn1880_device::execute_run()
 		case microstate::CLRSET_1:
 			if (BIT(cpu.fs, 5))
 				m_da |= cpu.xp & 0xff00;
-			m_tmp1 = m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			if (BIT(cpu.ir, 3))
 				m_tmp1 |= 1 << (cpu.ir & 0x07);
 			else
@@ -558,7 +626,7 @@ void mn1880_device::execute_run()
 			++cpu.ip;
 			if (BIT(cpu.fs, 5))
 				m_da |= cpu.xp & 0xff00;
-			m_tmp1 = m_data.read_byte(m_da) & (1 << (cpu.ir & 0x07));
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da)) & (1 << (cpu.ir & 0x07));
 			m_tmp2 = cpu.ip + s8(input);
 			m_ustate = microstate::CMPBF1_3;
 			break;
@@ -584,21 +652,21 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOVL34_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_tmp2 = m_da + 1;
 			m_da = cpu.xp;
 			m_ustate = microstate::MOVL34_3;
 			break;
 
 		case microstate::MOVL34_3:
-			m_data.write_byte(m_da, m_tmp1);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
 			m_da = m_tmp2;
 			++cpu.xp;
 			m_ustate = microstate::MOVL34_4;
 			break;
 
 		case microstate::MOVL34_4:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = cpu.xp;
 			if ((cpu.fs & 0x1f) != 0)
 				++cpu.xp;
@@ -615,20 +683,20 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOVL35_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = m_tmp2;
 			++cpu.yp;
 			m_ustate = microstate::MOVL35_3;
 			break;
 
 		case microstate::MOVL35_3:
-			m_data.write_byte(m_da, m_tmp1);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
 			m_da = cpu.yp;
 			m_ustate = microstate::MOVL35_4;
 			break;
 
 		case microstate::MOVL35_4:
-			m_tmp1 = m_data.read_byte(cpu.yp);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = m_tmp2 + 1;
 			set_output_queued();
 			next_instruction(input);
@@ -641,7 +709,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOV36_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = cpu.xp;
 			if ((cpu.fs & 0x1f) != 0)
 				++cpu.xp;
@@ -652,7 +720,7 @@ void mn1880_device::execute_run()
 		case microstate::MOV37_1:
 			++cpu.ip;
 			m_da = cpu.yp;
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = input;
 			if (BIT(cpu.fs, 5))
 				m_da |= cpu.yp & 0xff00;
@@ -666,13 +734,13 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOVL38_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			++m_da;
 			m_ustate = microstate::MOVL38_3;
 			break;
 
 		case microstate::MOVL38_3:
-			m_tmp1 |= m_data.read_byte(m_da) << 8;
+			m_tmp1 |= m_data.read_byte(mmu_data_translate(m_da)) << 8;
 			m_ustate = microstate::MOVL31_2; // TODO: output queue
 			break;
 
@@ -690,7 +758,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOVL39_3:
-			m_data.write_byte(m_da, m_tmp1 & 0x00ff);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1 & 0x00ff);
 			++m_da;
 			m_tmp1 >>= 8;
 			set_output_queued();
@@ -709,7 +777,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ASL_2:
-			m_tmp1 = m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			cpu.fs = (m_tmp1 & 0x80) | (cpu.fs & 0x7f);
 			m_tmp1 <<= 1;
 			set_output_queued();
@@ -728,7 +796,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ASR_2:
-			m_tmp1 = cpu.asrc(m_data.read_byte(m_da)); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.asrc(m_data.read_byte(mmu_data_translate(m_da))); // TODO: read latch instead of terminal
 			set_output_queued();
 			next_instruction(input);
 			break;
@@ -771,7 +839,7 @@ void mn1880_device::execute_run()
 
 		case microstate::CMPM44_2:
 			++cpu.ip;
-			m_tmp1 &= m_data.read_byte(m_da);
+			m_tmp1 &= m_data.read_byte(mmu_data_translate(m_da));
 			m_tmp2 = input;
 			m_ustate = microstate::CMPM44_3;
 			break;
@@ -794,7 +862,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::CMPM50_1:
-			m_tmp2 = m_data.read_byte(cpu.yp);
+			m_tmp2 = m_data.read_byte(mmu_data_translate(cpu.yp));
 			m_tmp1 = m_da & 0x00ff;
 			m_da = cpu.xp;
 			m_ustate = microstate::CMPM50_2;
@@ -806,7 +874,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::CMPM50_3:
-			m_tmp1 &= m_data.read_byte(m_da);
+			m_tmp1 &= m_data.read_byte(mmu_data_translate(m_da));
 			m_ustate = microstate::CMPM44_3;
 			break;
 
@@ -820,7 +888,7 @@ void mn1880_device::execute_run()
 
 		case microstate::CMPM52_2:
 			++cpu.ip;
-			m_tmp2 = m_data.read_byte(m_da);
+			m_tmp2 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = input;
 			if (BIT(cpu.fs, 5))
 				m_da |= cpu.xp & 0xff00;
@@ -843,7 +911,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::XCH4_2:
-			m_tmp1 = m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			m_tmp1 = (m_tmp1 << 4) | (m_tmp1 >> 4);
 			set_output_queued();
 			next_instruction(input);
@@ -899,7 +967,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ROL_2:
-			m_tmp1 = cpu.rolc(m_data.read_byte(m_da)); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.rolc(m_data.read_byte(mmu_data_translate(m_da))); // TODO: read latch instead of terminal
 			set_output_queued();
 			next_instruction(input);
 			break;
@@ -920,7 +988,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ROR_2:
-			m_tmp1 = cpu.rorc(m_data.read_byte(m_da)); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.rorc(m_data.read_byte(mmu_data_translate(m_da))); // TODO: read latch instead of terminal
 			set_output_queued();
 			next_instruction(input);
 			break;
@@ -931,19 +999,19 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::DIV51_2:
-			m_tmp2 = m_data.read_byte(m_da);
+			m_tmp2 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = cpu.xp;
 			m_ustate = microstate::DIV51_3;
 			break;
 
 		case microstate::DIV51_3:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			++m_da;
 			m_ustate = microstate::DIV51_4;
 			break;
 
 		case microstate::DIV51_4:
-			m_tmp1 |= m_data.read_byte(m_da) << 8;
+			m_tmp1 |= m_data.read_byte(mmu_data_translate(m_da)) << 8;
 			--m_da;
 			m_ustate = microstate::DIV51_5;
 			break;
@@ -978,7 +1046,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::DIV51_10:
-			m_data.write_byte(m_da, m_tmp1 & 0x00ff);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1 & 0x00ff);
 			++m_da;
 			cpu.xp = m_da;
 			set_output_queued();
@@ -992,7 +1060,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOVDA_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			++cpu.ip;
 			m_da = input;
 			m_ustate = microstate::MOVDA_3;
@@ -1012,7 +1080,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOV55_1:
-			m_data.write_byte(cpu.xp, m_da & 0x00ff);
+			m_data.write_byte(mmu_data_translate(cpu.xp), m_da & 0x00ff);
 			if ((cpu.fs & 0x1f) != 0)
 				++cpu.xp;
 			next_instruction(input);
@@ -1026,7 +1094,7 @@ void mn1880_device::execute_run()
 			{
 				if (BIT(cpu.fs, 5))
 					m_da |= cpu.yp & 0xff00;
-				m_tmp1 = m_data.read_byte(m_da);
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			}
 			m_da = input;
 			if (BIT(cpu.fs, 5))
@@ -1035,7 +1103,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOV56_2:
-			m_data.write_byte(m_da, m_tmp1);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
 			next_instruction(input);
 			break;
 
@@ -1057,7 +1125,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::XCH58_2:
-			m_tmp1 = m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			if (BIT(cpu.ir, 1))
 			{
 				std::swap(m_da, m_tmp2);
@@ -1075,12 +1143,12 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::XCH58_3:
-			m_tmp1 |= u16(m_data.read_byte(m_da)) << 8; // TODO: read latch instead of terminal
+			m_tmp1 |= u16(m_data.read_byte(mmu_data_translate(m_da))) << 8; // TODO: read latch instead of terminal
 			m_ustate = microstate::XCH58_4;
 			break;
 
 		case microstate::XCH58_4:
-			m_data.write_byte(m_da, m_tmp1 & 0x00ff);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1 & 0x00ff);
 			m_tmp1 >>= 8;
 			m_da = m_tmp2;
 			set_output_queued();
@@ -1093,13 +1161,13 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MUL59_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			++m_da;
 			m_ustate = microstate::MUL59_3;
 			break;
 
 		case microstate::MUL59_3:
-			m_tmp2 = m_data.read_byte(m_da);
+			m_tmp2 = m_data.read_byte(mmu_data_translate(m_da));
 			m_ustate = microstate::MUL59_4;
 			break;
 
@@ -1123,7 +1191,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MUL59_8:
-			m_data.write_byte(m_da, m_tmp1 & 0x00ff);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1 & 0x00ff);
 			m_da = cpu.xp;
 			if ((cpu.fs & 0x1f) != 0)
 				++cpu.xp;
@@ -1139,14 +1207,14 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOVL5C_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = cpu.xp;
 			++cpu.xp;
 			m_ustate = microstate::MOVL5C_3;
 			break;
 
 		case microstate::MOVL5C_3:
-			m_data.write_byte(m_da, m_tmp1);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
 			m_da = cpu.yp;
 			if ((cpu.fs & 0x1f) != 0)
 				++cpu.yp;
@@ -1155,14 +1223,14 @@ void mn1880_device::execute_run()
 
 		case microstate::MOVL5D_1:
 			++cpu.ip;
-			m_data.write_byte(cpu.xp, m_da & 0x00ff);
+			m_data.write_byte(mmu_data_translate(cpu.xp), m_da & 0x00ff);
 			++cpu.xp;
 			m_tmp1 = input;
 			m_ustate = microstate::MOVL5D_2;
 			break;
 
 		case microstate::MOVL5D_2:
-			m_data.write_byte(cpu.xp, m_tmp1);
+			m_data.write_byte(mmu_data_translate(cpu.xp), m_tmp1);
 			++cpu.xp;
 			next_instruction(input);
 			break;
@@ -1178,20 +1246,20 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOVL5E_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			std::swap(m_da, m_tmp2);
 			m_ustate = microstate::MOVL5E_3;
 			break;
 
 		case microstate::MOVL5E_3:
-			m_data.write_byte(m_da, m_tmp1);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
 			std::swap(m_da, m_tmp2);
 			++m_da;
 			m_ustate = microstate::MOVL5E_4;
 			break;
 
 		case microstate::MOVL5E_4:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = m_tmp2 + 1;
 			set_output_queued();
 			next_instruction(input);
@@ -1208,7 +1276,7 @@ void mn1880_device::execute_run()
 
 		case microstate::MOVL5F_2:
 			++cpu.ip;
-			m_data.write_byte(m_da, m_tmp1);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
 			m_tmp1 = input;
 			++m_da;
 			m_ustate = microstate::MOV56_2;
@@ -1236,7 +1304,7 @@ void mn1880_device::execute_run()
 
 		case microstate::CMP_2:
 			if (!BIT(cpu.ir, 0))
-				m_tmp1 = m_data.read_byte(m_da);
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (BIT(cpu.ir, 1))
 			{
 				++cpu.ip;
@@ -1256,7 +1324,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::CMP_3:
-			(void)cpu.subcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4));
+			(void)cpu.subcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4));
 			m_ustate = microstate::NOP_1; // TODO: output queue (but just what is the output?)
 			break;
 
@@ -1282,7 +1350,7 @@ void mn1880_device::execute_run()
 
 		case microstate::AND_2:
 			if (!BIT(cpu.ir, 0))
-				m_tmp1 = m_data.read_byte(m_da);
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (BIT(cpu.ir, 1))
 			{
 				++cpu.ip;
@@ -1300,7 +1368,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::AND_3:
-			m_tmp1 &= m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			m_tmp1 &= m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			if (u8(m_tmp1) == 0)
 				cpu.fs |= 0x40;
 			else
@@ -1331,7 +1399,7 @@ void mn1880_device::execute_run()
 
 		case microstate::XOR_2:
 			if (!BIT(cpu.ir, 0))
-				m_tmp1 = m_data.read_byte(m_da);
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (BIT(cpu.ir, 1))
 			{
 				++cpu.ip;
@@ -1349,7 +1417,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::XOR_3:
-			m_tmp1 ^= m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			m_tmp1 ^= m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			if (u8(m_tmp1) == 0)
 				cpu.fs |= 0x40;
 			else
@@ -1380,7 +1448,7 @@ void mn1880_device::execute_run()
 
 		case microstate::OR_2:
 			if (!BIT(cpu.ir, 0))
-				m_tmp1 = m_data.read_byte(m_da);
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (BIT(cpu.ir, 1))
 			{
 				++cpu.ip;
@@ -1398,7 +1466,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::OR_3:
-			m_tmp1 |= m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			m_tmp1 |= m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			if (u8(m_tmp1) == 0)
 				cpu.fs |= 0x40;
 			else
@@ -1429,7 +1497,7 @@ void mn1880_device::execute_run()
 
 		case microstate::SUBC_2:
 			if (!BIT(cpu.ir, 0))
-				m_tmp1 = m_data.read_byte(m_da);
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (BIT(cpu.ir, 1))
 			{
 				++cpu.ip;
@@ -1447,7 +1515,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::SUBC_3:
-			m_tmp1 = cpu.subcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4)); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.subcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4)); // TODO: read latch instead of terminal
 			set_output_queued();
 			next_instruction(input);
 			break;
@@ -1474,7 +1542,7 @@ void mn1880_device::execute_run()
 
 		case microstate::SUBD_2:
 			if (!BIT(cpu.ir, 0))
-				m_tmp1 = m_data.read_byte(m_da);
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (BIT(cpu.ir, 1))
 			{
 				++cpu.ip;
@@ -1492,7 +1560,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::SUBD_3:
-			m_tmp1 = cpu.subdcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7)); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.subdcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7)); // TODO: read latch instead of terminal
 			set_output_queued();
 			next_instruction(input);
 			break;
@@ -1533,7 +1601,7 @@ void mn1880_device::execute_run()
 
 		case microstate::ADDC_2:
 			if (!BIT(cpu.ir, 0))
-				m_tmp1 = m_data.read_byte(m_da);
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (BIT(cpu.ir, 1))
 			{
 				++cpu.ip;
@@ -1551,7 +1619,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ADDC_3:
-			m_tmp1 = cpu.addcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4)); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.addcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4)); // TODO: read latch instead of terminal
 			set_output_queued();
 			next_instruction(input);
 			break;
@@ -1578,7 +1646,7 @@ void mn1880_device::execute_run()
 
 		case microstate::ADDD_2:
 			if (!BIT(cpu.ir, 0))
-				m_tmp1 = m_data.read_byte(m_da);
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (BIT(cpu.ir, 1))
 			{
 				++cpu.ip;
@@ -1596,7 +1664,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ADDD_3:
-			m_tmp1 = cpu.adddcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7)); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.adddcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7)); // TODO: read latch instead of terminal
 			m_ustate = microstate::ADDD_4;
 			break;
 
@@ -1632,7 +1700,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::CMPL_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_tmp2 = m_da;
 			if (BIT(cpu.ir, 1))
 			{
@@ -1649,14 +1717,14 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::CMPL_3:
-			(void)cpu.subcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4));
+			(void)cpu.subcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4));
 			std::swap(m_da, m_tmp2);
 			++m_da;
 			m_ustate = microstate::CMPL_4;
 			break;
 
 		case microstate::CMPL_4:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (!BIT(cpu.ir, 1))
 				cpu.yp = m_da + 1;
 			m_da = m_tmp2 + 1;
@@ -1664,7 +1732,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::CMPL_5:
-			(void)cpu.subcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), true);
+			(void)cpu.subcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7), true);
 			if (!BIT(cpu.ir, 1))
 				cpu.xp = m_da + 1;
 			m_ustate = microstate::NOP_1; // TODO: output queue (if any...)
@@ -1698,7 +1766,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::SUBCL_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_tmp2 = m_da;
 			if (BIT(cpu.ir, 1))
 			{
@@ -1713,19 +1781,19 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::SUBCL_3:
-			m_tmp1 = cpu.subcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4)); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.subcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4)); // TODO: read latch instead of terminal
 			++m_tmp2;
 			m_ustate = microstate::SUBCL_4;
 			break;
 
 		case microstate::SUBCL_4:
-			m_data.write_byte(m_da, m_tmp1);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
 			std::swap(m_da, m_tmp2);
 			m_ustate = microstate::SUBCL_5;
 			break;
 
 		case microstate::SUBCL_5:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (!BIT(cpu.ir, 1))
 				cpu.yp = m_da + 1;
 			m_da = m_tmp2 + 1;
@@ -1733,7 +1801,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::SUBCL_6:
-			m_tmp1 = cpu.subcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), true); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.subcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7), true); // TODO: read latch instead of terminal
 			if (!BIT(cpu.ir, 1))
 				cpu.xp = m_da + 1;
 			set_output_queued();
@@ -1752,7 +1820,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ADDCL_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_tmp2 = m_da;
 			if (BIT(cpu.ir, 1))
 			{
@@ -1767,19 +1835,19 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ADDCL_3:
-			m_tmp1 = cpu.addcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4)); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.addcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4)); // TODO: read latch instead of terminal
 			++m_tmp2;
 			m_ustate = microstate::ADDCL_4;
 			break;
 
 		case microstate::ADDCL_4:
-			m_data.write_byte(m_da, m_tmp1);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
 			std::swap(m_da, m_tmp2);
 			m_ustate = microstate::ADDCL_5;
 			break;
 
 		case microstate::ADDCL_5:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			if (!BIT(cpu.ir, 1))
 				cpu.yp = m_da + 1;
 			m_da = m_tmp2 + 1;
@@ -1787,7 +1855,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ADDCL_6:
-			m_tmp1 = cpu.addcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), true); // TODO: read latch instead of terminal
+			m_tmp1 = cpu.addcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7), true); // TODO: read latch instead of terminal
 			if (!BIT(cpu.ir, 1))
 				cpu.xp = m_da + 1;
 			set_output_queued();
@@ -1803,7 +1871,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::CALL90_2:
-			m_data.write_byte(m_da, m_tmp2 >> 8);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp2 >> 8);
 			--m_da;
 			cpu.branch(m_tmp1);
 			m_ustate = microstate::CALL_3;
@@ -1820,7 +1888,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::POPFS_2:
-			cpu.fs = m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			cpu.fs = m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			cpu.sp = m_da + 1;
 			m_ustate = microstate::NOP_1; // TODO: output queue (only FS?)
 			break;
@@ -1831,13 +1899,13 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::POPB4_2:
-			(BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) = m_data.read_byte(m_da);
+			(BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) = m_data.read_byte(mmu_data_translate(m_da));
 			++m_da;
 			m_ustate = microstate::POPB4_3;
 			break;
 
 		case microstate::POPB4_3:
-			(BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) |= m_data.read_byte(m_da) << 8;
+			(BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) |= m_data.read_byte(mmu_data_translate(m_da)) << 8;
 			cpu.sp = m_da + 1;
 			m_ustate = microstate::NOP_1; // TODO: output queue (only XP/YP?)
 			break;
@@ -1852,7 +1920,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::POPB5_2:
-			m_tmp1 = m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			cpu.sp = m_da + 1;
 			m_da = m_tmp2;
 			set_output_queued();
@@ -1880,13 +1948,13 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::PUSHBC_2:
-			m_data.write_byte(m_da, m_tmp1 >> 8);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1 >> 8);
 			--m_da;
 			m_ustate = microstate::PUSHBC_3;
 			break;
 
 		case microstate::PUSHBC_3:
-			m_data.write_byte(m_da, m_tmp1 & 0x00ff);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1 & 0x00ff);
 			cpu.sp = m_da;
 			m_ustate = microstate::NOP_1; // TODO: output queue (only SP?)
 			break;
@@ -1900,13 +1968,13 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::PUSHBD_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = cpu.sp - 1;
 			m_ustate = microstate::PUSHBD_3;
 			break;
 
 		case microstate::PUSHBD_3:
-			m_data.write_byte(m_da, m_tmp1 & 0x00ff);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1 & 0x00ff);
 			cpu.sp = m_da;
 			m_ustate = microstate::NOP_1; // TODO: output queue (only SP?)
 			break;
@@ -1943,13 +2011,13 @@ void mn1880_device::execute_run()
 		case microstate::XCHC5_1:
 			if (BIT(cpu.fs, 5))
 				m_da |= (BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) & 0xff00;
-			m_tmp2 = m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			m_tmp2 = m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			m_tmp1 = (BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) & 0x00ff;
 			m_ustate = microstate::XCHC5_2;
 			break;
 
 		case microstate::XCHC5_2:
-			m_data.write_byte(m_da, m_tmp1);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
 			setl(BIT(cpu.ir, 1) ? cpu.yp : cpu.xp, m_tmp2);
 			next_instruction(input);
 			break;
@@ -1959,13 +2027,13 @@ void mn1880_device::execute_run()
 			{
 				if (BIT(cpu.ir, 5))
 					m_da |= cpu.yp & 0xff00;
-				setl(cpu.yp, m_data.read_byte(m_da));
+				setl(cpu.yp, m_data.read_byte(mmu_data_translate(m_da)));
 			}
 			else
 			{
 				if (BIT(cpu.ir, 5))
 					m_da |= cpu.xp & 0xff00;
-				setl(cpu.xp, m_data.read_byte(m_da));
+				setl(cpu.xp, m_data.read_byte(mmu_data_translate(m_da)));
 			}
 			next_instruction(input);
 			break;
@@ -1977,7 +2045,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOVCD_2:
-			setl(BIT(cpu.ir, 1) ? cpu.yp : cpu.xp, m_data.read_byte(m_da));
+			setl(BIT(cpu.ir, 1) ? cpu.yp : cpu.xp, m_data.read_byte(mmu_data_translate(m_da)));
 			next_instruction(input); // TODO: output queue
 			break;
 
@@ -1988,7 +2056,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MULC9_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_ustate = microstate::MULC9_3;
 			break;
 
@@ -2003,7 +2071,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::CMPD0_2:
-			(void)cpu.subcz((BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) & 0x00ff, m_data.read_byte(m_da), false, false);
+			(void)cpu.subcz((BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) & 0x00ff, m_data.read_byte(mmu_data_translate(m_da)), false, false);
 			m_ustate = microstate::CMPD1_2;
 			break;
 
@@ -2072,7 +2140,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::LOOP_2:
-			m_tmp1 = m_data.read_byte(m_da) - 1; // TODO: read latch instead of terminal
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da)) - 1; // TODO: read latch instead of terminal
 			if (m_tmp1 != 0)
 				cpu.branch(m_tmp2);
 			else
@@ -2105,7 +2173,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ADDRE8_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = m_tmp2;
 			if (BIT(cpu.fs, 5))
 				m_da |= cpu.xp & 0x00ff;
@@ -2114,9 +2182,9 @@ void mn1880_device::execute_run()
 
 		case microstate::ADDRE8_3:
 			if (BIT(cpu.ir, 1))
-				setl(cpu.yp, cpu.addcz(cpu.yp & 0x00ff, m_data.read_byte(m_da), false, false));
+				setl(cpu.yp, cpu.addcz(cpu.yp & 0x00ff, m_data.read_byte(mmu_data_translate(m_da)), false, false));
 			else
-				setl(cpu.xp, cpu.addcz(cpu.xp & 0x00ff, m_data.read_byte(m_da), false, false));
+				setl(cpu.xp, cpu.addcz(cpu.xp & 0x00ff, m_data.read_byte(mmu_data_translate(m_da)), false, false));
 			m_ustate = microstate::NOP_1; // TODO: output queue (XPl only?)
 			break;
 
@@ -2130,7 +2198,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::ADDRE9_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_ustate = microstate::ADDRE9_3;
 			break;
 
@@ -2153,7 +2221,7 @@ void mn1880_device::execute_run()
 
 		case microstate::CMPBF0_1:
 			++cpu.ip;
-			m_tmp1 = m_data.read_byte(cpu.xp) ^ (m_da & 0x00ff);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(cpu.xp)) ^ (m_da & 0x00ff);
 			m_tmp2 = cpu.ip + s8(input);
 			m_ustate = microstate::CMPBF1_3;
 			break;
@@ -2169,7 +2237,7 @@ void mn1880_device::execute_run()
 
 		case microstate::CMPBF1_2:
 			++cpu.ip;
-			m_tmp1 ^= m_data.read_byte(m_da);
+			m_tmp1 ^= m_data.read_byte(mmu_data_translate(m_da));
 			m_tmp2 = cpu.ip + s8(input);
 			m_ustate = microstate::CMPBF1_3;
 			break;
@@ -2191,7 +2259,7 @@ void mn1880_device::execute_run()
 
 		case microstate::MOV1_2:
 			++cpu.ip;
-			m_tmp1 &= m_data.read_byte(m_da);
+			m_tmp1 &= m_data.read_byte(mmu_data_translate(m_da));
 			m_da = input;
 			if (BIT(cpu.fs, 5))
 				m_da |= cpu.xp & 0xff00;
@@ -2207,13 +2275,13 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOV1_4:
-			m_tmp1 |= m_data.read_byte(m_da); // TODO: read latch instead of terminal
+			m_tmp1 |= m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			set_output_queued();
 			next_instruction(input);
 			break;
 
 		case microstate::MOV1N_4:
-			m_tmp1 = m_data.read_byte(m_da) & ~m_tmp1; // TODO: read latch instead of terminal
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da)) & ~m_tmp1; // TODO: read latch instead of terminal
 			set_output_queued();
 			next_instruction(input);
 			break;
@@ -2235,13 +2303,13 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::RET_2:
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			++m_da;
 			m_ustate = microstate::RET_3;
 			break;
 
 		case microstate::RET_3:
-			cpu.branch(u16(m_data.read_byte(m_da)) << 8 | m_tmp1);
+			cpu.branch(u16(m_data.read_byte(mmu_data_translate(m_da))) << 8 | m_tmp1);
 			cpu.sp = m_da + 1;
 			m_ustate = microstate::BR_2;
 			break;
@@ -2252,20 +2320,20 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::RETI_2:
-			cpu.fs = m_data.read_byte(m_da);
+			cpu.fs = m_data.read_byte(mmu_data_translate(m_da));
 			++m_da;
 			m_ustate = microstate::RETI_3;
 			break;
 
 		case microstate::RETI_3:
 			cpu.iemask = false;
-			m_tmp1 = m_data.read_byte(m_da);
+			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			++m_da;
 			m_ustate = microstate::RETI_4;
 			break;
 
 		case microstate::RETI_4:
-			cpu.ip = u16(m_data.read_byte(m_da)) << 8 | m_tmp1;
+			cpu.ip = u16(m_data.read_byte(mmu_data_translate(m_da))) << 8 | m_tmp1;
 			if ((cpu.fs & 0x1f) != 0)
 			{
 				++m_da;
@@ -2279,7 +2347,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::RETI_5:
-			cpu.ir = m_data.read_byte(m_da);
+			cpu.ir = m_data.read_byte(mmu_data_translate(m_da));
 			cpu.sp = m_da + 1;
 			m_ustate = microstate::NEXT;
 			swap_cpus();
@@ -2303,14 +2371,14 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::CALL_2:
-			m_data.write_byte(m_da, m_tmp2 >> 8);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp2 >> 8);
 			--m_da;
 			cpu.branch(m_tmp1 << 8 | input);
 			m_ustate = microstate::CALL_3;
 			break;
 
 		case microstate::CALL_3:
-			m_data.write_byte(m_da, m_tmp2 & 0x00ff);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp2 & 0x00ff);
 			cpu.sp = m_da;
 			next_instruction(input);
 			break;
@@ -2380,13 +2448,13 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::PI_2:
-			m_data.write_byte(m_da, m_tmp1);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
 			--m_da;
 			m_ustate = microstate::PI_3;
 			break;
 
 		case microstate::PI_3:
-			m_data.write_byte(m_da, m_tmp2 >> 8);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp2 >> 8);
 			--m_da;
 			m_tmp1 = u16(input) << 8;
 			++cpu.ip;
@@ -2394,7 +2462,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::PI_4:
-			m_data.write_byte(m_da, m_tmp2 & 0x00ff);
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp2 & 0x00ff);
 			--m_da;
 			m_tmp2 = cpu.fs;
 			cpu.branch(m_tmp1 | input); // FS repeat bits are cleared here

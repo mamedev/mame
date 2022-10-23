@@ -267,8 +267,8 @@ your current settings.  Recognised input devices depend on the
 enabled or disabled using the :ref:`mouse <mame-commandline-nomouse>`,
 :ref:`lightgun <mame-commandline-nolightgun>` and :ref:`joystick
 <mame-commandline-nojoystick>` options.  You can reach the Input Devices menu by
-selecting **Input Devices** from the :ref:`main menu <menus-main>` or the
-General Settings menu.
+selecting **Input Devices** from the :ref:`Input Settings menu
+<menus-inputopts>` or the General Settings menu.
 
 Input devices are grouped by device class (for example keyboards or light guns).
 You can move between device classes using the **Next Group** and **Previous

@@ -57,8 +57,10 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/m6502/n2a03.h"
+
+#include "cpu/m6502/rp2a03.h"
 #include "video/ppu2c0x.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -84,7 +86,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<n2a03_device> m_maincpu;
+	required_device<rp2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
 	required_memory_bank_array<4> m_nt_page;
@@ -250,7 +252,7 @@ void cham24_state::machine_reset()
 void cham24_state::cham24(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03G(config, m_maincpu, NTSC_APU_CLOCK);
+	RP2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cham24_state::cham24_map);
 
 	/* video hardware */

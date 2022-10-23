@@ -53,6 +53,8 @@
 #include "formats/dfi_dsk.h"
 #include "formats/ipf_dsk.h"
 
+#include "utf8.h"
+
 
 //**************************************************************************
 //  CONSTANTS / MACROS

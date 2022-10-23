@@ -1781,7 +1781,7 @@ void ymf271_device::device_clock_changed()
 	calculate_clock_correction();
 }
 
-void ymf271_device::rom_bank_updated()
+void ymf271_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

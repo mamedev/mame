@@ -20,6 +20,7 @@
 
 #include "corestr.h"
 #include "opresolv.h"
+#include "path.h"
 #include "zippath.h"
 
 #include <algorithm>

@@ -95,16 +95,7 @@ void es8712_device::device_reset()
 
 
 //-------------------------------------------------
-//  rom_bank_updated - nothing for now
-//-------------------------------------------------
-
-void es8712_device::rom_bank_updated()
-{
-}
-
-
-//-------------------------------------------------
-//   state save support for MAME
+//  state save support for MAME
 //-------------------------------------------------
 
 void es8712_device::es8712_state_save_register()

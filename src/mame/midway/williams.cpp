@@ -65,7 +65,7 @@
 
     CBFF watchdog
 
-    CC00-CFFF 1K X 4 CMOS ram battery backed up (8 bits on Sinistar)
+    CC00-CFFF 1K X 4 CMOS ram battery backed up (8 bits on Bubbles)
 
 ****************************************************************************
 
@@ -552,7 +552,7 @@ void mayday_state::main_map(address_map &map)
  *
  *************************************/
 
-void williams_state::base_map(address_map &map)
+void williams_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).ram().share("videoram");
 	map(0x0000, 0x8fff).bankr("mainbank");
@@ -577,25 +577,12 @@ void williams_state::base_map(address_map &map)
 
 void sinistar_state::main_map(address_map &map)
 {
-	base_map(map);
-	map(0xc900, 0xc9ff).w(FUNC(sinistar_state::vram_select_w));
+	williams_state::main_map(map);
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom();
 }
 
 
-/*************************************
- *
- *  Bubbles memory handlers
- *
- *************************************/
-
-void bubbles_state::main_map(address_map &map)
-{
-	base_map(map);
-	// bubbles has a full 8-bit-wide CMOS
-	map(0xcc00, 0xcfff).w(FUNC(bubbles_state::cmos_w)).share("nvram");
-}
 
 /*************************************
  *
@@ -605,7 +592,7 @@ void bubbles_state::main_map(address_map &map)
 
 void spdball_state::main_map(address_map &map)
 {
-	base_map(map);
+	williams_state::main_map(map);
 	// install extra input handlers
 	map(0xc800, 0xc800).portr("AN0");
 	map(0xc801, 0xc801).portr("AN1");
@@ -678,7 +665,6 @@ void williams2_state::bank8000_map(address_map &map)
 	map(0x0800, 0x0fff).ram().w(FUNC(williams2_state::paletteram_w)).share("paletteram");
 }
 
-
 // mysticm and inferno: D000-DFFF is RAM
 void williams_d000_ram_state::d000_map(address_map &map)
 {
@@ -686,7 +672,6 @@ void williams_d000_ram_state::d000_map(address_map &map)
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom();
 }
-
 
 // tshoot and joust2: D000-DFFF is ROM
 void williams_d000_rom_state::d000_map(address_map &map)
@@ -705,7 +690,7 @@ void williams_d000_rom_state::d000_map(address_map &map)
 
 void defender_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();     // internal RAM
+	map(0x0000, 0x007f).ram(); // internal RAM
 	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xb000, 0xffff).rom();
 }
@@ -713,8 +698,8 @@ void defender_state::sound_map(address_map &map)
 
 void williams_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();     // internal RAM
-	map(0x0080, 0x00ff).ram();     // MC6810 RAM
+	map(0x0000, 0x007f).ram(); // internal RAM
+	map(0x0080, 0x00ff).ram(); // MC6810 RAM
 	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xb000, 0xffff).rom();
 }
@@ -722,8 +707,8 @@ void williams_state::sound_map(address_map &map)
 /* Same as above, but for second sound board */
 void blaster_state::sound2_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();     // internal RAM
-	map(0x0080, 0x00ff).ram();     // MC6810 RAM
+	map(0x0000, 0x007f).ram(); // internal RAM
+	map(0x0080, 0x00ff).ram(); // MC6810 RAM
 	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia[3], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xb000, 0xffff).rom();
 }
@@ -738,8 +723,8 @@ void blaster_state::sound2_map(address_map &map)
 
 void williams2_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();     // internal RAM
-	map(0x0080, 0x00ff).ram();     // MC6810 RAM
+	map(0x0000, 0x007f).ram(); // internal RAM
+	map(0x0080, 0x00ff).ram(); // MC6810 RAM
 	map(0x2000, 0x2003).mirror(0x1ffc).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xe000, 0xffff).rom();
 }
@@ -860,10 +845,10 @@ static INPUT_PORTS_START( colony7 )
 	PORT_DIPSETTING(    0x02, "30k/50k" )       PORT_CONDITION("IN2",0x01,NOTEQUALS,0x01)
 	PORT_DIPSETTING(    0x00, "30k/50k" )       PORT_CONDITION("IN2",0x01,EQUALS,0x01)
 	PORT_DIPSETTING(    0x02, "40k/70k" )       PORT_CONDITION("IN2",0x01,EQUALS,0x01)
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ))       // documented as unused
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown )) // documented as unused
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ))       // documented as unused
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown )) // documented as unused
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -1055,6 +1040,28 @@ static INPUT_PORTS_START( bubbles )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( conquest )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Fire")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Thrust")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(conquest_state, dial1_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(conquest_state, dial0_r)
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DIAL")
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(16) PORT_REVERSE
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( splat )
 	PORT_START("IN0")
 	// 0x0f muxed from INP1/INP2
@@ -1122,10 +1129,10 @@ static INPUT_PORTS_START( sinistar )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("49WAYX")    // converted by port_0_49way_r()
+	PORT_START("49WAYX") // converted by port_0_49way_r()
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYY")    // converted by port_0_49way_r()
+	PORT_START("49WAYY") // converted by port_0_49way_r()
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -1184,10 +1191,10 @@ static INPUT_PORTS_START( blaster )
 	PORT_START("INP2")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("49WAYX")    // converted by port_0_49way_r()
+	PORT_START("49WAYX") // converted by port_0_49way_r()
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYY")    // converted by port_0_49way_r()
+	PORT_START("49WAYY") // converted by port_0_49way_r()
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -1210,10 +1217,10 @@ static INPUT_PORTS_START( blastkit )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("49WAYX")    // converted by port_0_49way_r()
+	PORT_START("49WAYX") // converted by port_0_49way_r()
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYY")    // converted by port_0_49way_r()
+	PORT_START("49WAYY") // converted by port_0_49way_r()
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
 	PORT_START("IN3")
@@ -1262,16 +1269,16 @@ static INPUT_PORTS_START( spdball )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START("AN0")       // analog
+	PORT_START("AN0") // analog
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("AN1")       // analog
+	PORT_START("AN1") // analog
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
 
-	PORT_START("AN2")       // analog
+	PORT_START("AN2") // analog
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("AN3")       // analog
+	PORT_START("AN3") // analog
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -1533,7 +1540,7 @@ void williams_state::williams_base(machine_config &config)
 {
 	// basic machine hardware
 	MC6809E(config, m_maincpu, MASTER_CLOCK/3/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::base_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::main_map);
 
 	M6808(config, m_soundcpu, SOUND_CLOCK); // internal clock divider of 4, effective frequency is 894.886kHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &williams_state::sound_map);
@@ -1581,55 +1588,46 @@ void williams_state::williams_base(machine_config &config)
 	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 }
 
-
-void defender_state::defender(machine_config &config)
-{
-	williams_base(config);
-
-	// basic machine hardware
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &defender_state::main_map);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &defender_state::sound_map);
-
-	ADDRESS_MAP_BANK(config, m_bankc000).set_map(&defender_state::bankc000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
-
-	m_screen->set_visarea(12, 304-1, 7, 247-1);
-
-	m_blitter_config = WILLIAMS_BLITTER_NONE;
-	m_blitter_clip_address = 0x0000;
-}
-
-
-void defender_state::jin(machine_config &config)  // needs a different screen size or the credit text is clipped
-{
-	defender(config);
-	// basic machine hardware
-	m_screen->set_visarea(0, 315, 7, 247-1);
-}
-
-
-void williams_state::stargate(machine_config &config)
+void williams_state::williams_b0(machine_config &config)
 {
 	williams_base(config);
 	m_blitter_config = WILLIAMS_BLITTER_NONE;
 	m_blitter_clip_address = 0x0000;
 }
 
-
-void williams_state::robotron(machine_config &config)
+void williams_state::williams_b1(machine_config &config)
 {
 	williams_base(config);
 	m_blitter_config = WILLIAMS_BLITTER_SC1;
 	m_blitter_clip_address = 0xc000;
 }
 
-
-void williams_muxed_state::williams_muxed(machine_config &config)
+void williams_state::williams_b2(machine_config &config)
 {
 	williams_base(config);
+	m_blitter_config = WILLIAMS_BLITTER_SC2;
+	m_blitter_clip_address = 0xc000;
+}
 
-	// basic machine hardware
 
+void defender_state::defender(machine_config &config)
+{
+	williams_b0(config);
+
+	ADDRESS_MAP_BANK(config, m_bankc000).set_map(&defender_state::bankc000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
+	m_screen->set_visarea(12, 304-1, 7, 247-1);
+}
+
+void defender_state::jin(machine_config &config)
+{
+	defender(config);
+	// needs a different screen size or the credit text is clipped
+	m_screen->set_visarea(0, 315, 7, 247-1);
+}
+
+
+void wms_muxed_state::williams_muxed(machine_config &config)
+{
 	// pia
 	m_pia[0]->readpa_handler().set_ioport("IN0").mask(0x30);
 	m_pia[0]->readpa_handler().append("mux_0", FUNC(ls157_device::output_r)).mask(0x0f);
@@ -1648,66 +1646,44 @@ void williams_muxed_state::williams_muxed(machine_config &config)
 	m_mux1->b_in_callback().set_ioport("INP1A");
 }
 
-
-void williams_muxed_state::joust(machine_config &config)
+void wms_muxed_state::joust(machine_config &config)
 {
+	williams_b1(config);
 	williams_muxed(config);
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
 }
 
-
-void williams_muxed_state::splat(machine_config &config)
+void wms_muxed_state::splat(machine_config &config)
 {
+	williams_b2(config);
 	williams_muxed(config);
-	m_blitter_config = WILLIAMS_BLITTER_SC2;
-	m_blitter_clip_address = 0xc000;
 }
 
 
 void spdball_state::spdball(machine_config &config)
 {
-	williams_base(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &spdball_state::main_map);
+	williams_b1(config);
 
 	// pia
 	PIA6821(config, m_pia[3], 0);
 	m_pia[3]->readpa_handler().set_ioport("IN3");
 	m_pia[3]->readpb_handler().set_ioport("IN4");
-
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
 }
-
 
 void williams_state::lottofun(machine_config &config)
 {
-	williams_base(config);
-
-	// basic machine hardware
+	williams_b1(config);
 
 	// pia
 	m_pia[0]->writepa_handler().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7);
-	m_pia[0]->ca2_handler().set(FUNC(williams_state::lottofun_coin_lock_w));
+	m_pia[0]->ca2_handler().set([this](int state) { machine().bookkeeping().coin_lockout_global_w(state); });
 
 	TICKET_DISPENSER(config, "ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
-
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
 }
-
 
 void sinistar_state::sinistar(machine_config &config)
 {
-	williams_base(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &sinistar_state::main_map);
-
-	// sound hardware
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+	williams_b1(config);
+	m_blitter_clip_address = 0x7400;
 
 	// pia
 	m_pia[0]->readpa_handler().set(FUNC(williams_state::port_0_49way_r));
@@ -1715,28 +1691,13 @@ void sinistar_state::sinistar(machine_config &config)
 	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
 	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
 
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0x7400;
+	// sound hardware
+	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
 }
-
-
-void bubbles_state::bubbles(machine_config &config)  // has a full 8-bit NVRAM equipped
-{
-	williams_base(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &bubbles_state::main_map);
-
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
-}
-
 
 void playball_state::playball(machine_config &config)
 {
-	williams_base(config);
-
-	// basic machine hardware
+	williams_b1(config);
 
 	// video hardware
 	m_screen->set_visarea(6, 298-1, 8, 240-1);
@@ -1745,22 +1706,15 @@ void playball_state::playball(machine_config &config)
 	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
 
 	// pia
-	m_pia[1]->writepb_handler().set(FUNC(playball_state::snd_cmd_w));
-
 	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
 	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
-
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
 }
 
 
 void blaster_state::blastkit(machine_config &config)
 {
-	williams_base(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &blaster_state::main_map);
+	williams_b2(config);
+	m_blitter_clip_address = 0x9700;
 
 	// video hardware
 	m_screen->set_screen_update(FUNC(blaster_state::screen_update));
@@ -1770,15 +1724,10 @@ void blaster_state::blastkit(machine_config &config)
 	m_pia[0]->cb2_handler().set("mux_a", FUNC(ls157_x2_device::select_w));
 
 	// All multiplexers on Blaster interface board are really LS257 with OC tied to GND (which is equivalent to LS157)
-
 	LS157_X2(config, m_muxa, 0);
 	m_muxa->a_in_callback().set_ioport("IN3");
 	m_muxa->b_in_callback().set(FUNC(williams_state::port_0_49way_r));
-
-	m_blitter_config = WILLIAMS_BLITTER_SC2;
-	m_blitter_clip_address = 0x9700;
 }
-
 
 void blaster_state::blaster(machine_config &config)
 {
@@ -1804,8 +1753,7 @@ void blaster_state::blaster(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline(m_soundcpu_b, M6808_IRQ_LINE);
 
-	m_pia[1]->writepb_handler().set(FUNC(blaster_state::snd_cmd_w));
-
+	m_pia[1]->writepb_handler().set(FUNC(blaster_state::blaster_snd_cmd_w));
 	m_pia[2]->writepa_handler().set("ldac", FUNC(dac_byte_interface::data_w));
 
 	PIA6821(config, m_pia[3], 0);
@@ -1916,7 +1864,6 @@ void mysticm_state::mysticm(machine_config &config)
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<2>));
 }
 
-
 void tshoot_state::tshoot(machine_config &config)
 {
 	williams2_base(config);
@@ -1941,7 +1888,6 @@ void tshoot_state::tshoot(machine_config &config)
 	m_mux->b_in_callback().set_ioport("INP2");
 }
 
-
 void joust2_state::joust2(machine_config &config)
 {
 	williams2_base(config);
@@ -1964,7 +1910,8 @@ void joust2_state::joust2(machine_config &config)
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	// these (and ca2 above) are educated guesses, as we have no schematics for joust 2's pcb which has the 20 pin system 11 bg sound connector on it; inferno, which we have schematics to, lacks this connector. All of pia[1] ca2, pia[2] cb1, and pia[2] cb2 are unconnected/grounded on inferno.
+	// these (and ca2 above) are educated guesses, as we have no schematics for joust 2's pcb which has the 20 pin system 11 bg sound connector on it;
+	// inferno, which we have schematics to, lacks this connector. All of pia[1] ca2, pia[2] cb1, and pia[2] cb2 are unconnected/grounded on inferno.
 	m_bg->cb2_cb().set(m_pia[2], FUNC(pia6821_device::cb1_w));
 	m_pia[2]->cb2_handler().set(m_bg, FUNC(s11_obg_device::resetq_w)); // inverted?
 
@@ -2400,6 +2347,30 @@ ROM_END
 
 /*
 
+Conquest: early prototype by Vid Kidz for Williams.
+Despite concept similarities, it's not an early version of Sinistar.
+
+ROM files were reconstructed from June 1982 source code, not dumped from EPROMs.
+It appears to use the sound ROM from Defender.
+
+*/
+ROM_START( conquest )
+	ROM_REGION( 0x19000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "conquest_b.bin", 0x0e000, 0x1000, CRC(9aab5516) SHA1(a71ce8f24fd7ffda8800d1af8c164085b0e2ec0a) )
+	ROM_RELOAD(                 0x0f000, 0x1000 )
+	ROM_LOAD( "conquest_a.bin", 0x10000, 0x4000, CRC(a384f4a2) SHA1(819df35281216b8be2ba066602fc7d19a860e69e) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "video_sound_rom_1.ic12", 0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "decoder.2",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) )
+	ROM_LOAD( "decoder.3",   0x0200, 0x0200, CRC(c3f45f70) SHA1(d19036cbc46b130548873597b44b8b70758f25c4) )
+ROM_END
+
+
+/*
+
 Stargate ROM labels are in this format:
 
 +--------------------+
@@ -2485,6 +2456,7 @@ ROM_START( stargate ) /* "B" ROMs labeled 3002-13 through 3002-24, identical dat
 	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
 	ROM_LOAD( "decoder_rom_5.3c", 0x0200, 0x0200, CRC(f921c5fe) SHA1(9cebb8bb935315101d248140d1b4503993ebdf8a) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09695
 ROM_END
+
 
 /*
 
@@ -2914,6 +2886,7 @@ ROM_START( joustr ) /* Solid red labels */
 	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
+
 /*
 
 Bubbles ROM labels are in this format:
@@ -3125,6 +3098,7 @@ ROM_END
 
 
 /*
+
 Sinistar
 
 Multiple different ROM boards are known to exist:
@@ -3730,7 +3704,7 @@ ROM_END
  *
  *************************************/
 
-void defndjeu_state::driver_start()
+void defender_state::init_defndjeu()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -3740,13 +3714,7 @@ void defndjeu_state::driver_start()
 }
 
 
-void mayday_state::driver_start()
-{
-	m_protection = m_videoram + 0xa190;
-}
-
-
-void williams_muxed_state::init_alienar()
+void wms_muxed_state::init_alienar()
 {
 	m_maincpu->space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
 }
@@ -3760,82 +3728,83 @@ void williams_muxed_state::init_alienar()
  *************************************/
 
 // Defender hardware games
-GAME( 1980, defender,   0,        defender,       defender, defender_state,       empty_init,    ROT0,   "Williams",                             "Defender (Red label)",               MACHINE_SUPPORTS_SAVE ) // developers left Williams in 1981 and formed Vid Kidz
-GAME( 1980, defenderg,  defender, defender,       defender, defender_state,       empty_init,    ROT0,   "Williams",                             "Defender (Green label)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderb,  defender, defender,       defender, defender_state,       empty_init,    ROT0,   "Williams",                             "Defender (Blue label)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderw,  defender, defender,       defender, defender_state,       empty_init,    ROT0,   "Williams",                             "Defender (White label)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderj,  defender, defender,       defender, defender_state,       empty_init,    ROT0,   "Williams (Taito Corporation license)", "T.T Defender",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defndjeu,   defender, defender,       defender, defndjeu_state,       empty_init,    ROT0,   "bootleg (Jeutel)",                     "Defender (bootleg)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tornado1,   defender, defender,       defender, defndjeu_state,       empty_init,    ROT0,   "bootleg (Jeutel)",                     "Tornado (set 1, Defender bootleg)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tornado2,   defender, defender,       defender, defndjeu_state,       empty_init,    ROT0,   "bootleg (Jeutel)",                     "Tornado (set 2, Defender bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?
-GAME( 1980, zero,       defender, defender,       defender, defndjeu_state,       empty_init,    ROT0,   "bootleg (Jeutel)",                     "Zero (set 1, Defender bootleg)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zero2,      defender, defender,       defender, defndjeu_state,       empty_init,    ROT0,   "bootleg (Amtec)",                      "Zero (set 2, Defender bootleg)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defcmnd,    defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg",                              "Defense Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, defence,    defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, defenseb,   defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg",                              "Defense (Defender bootleg)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1981, startrkd,   defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg",                              "Star Trek (Defender bootleg)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1980, attackf,    defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg (Famaresa)",                   "Attack (Defender bootleg)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1981, galwars2,   defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg (Sonic)",                      "Galaxy Wars II (Defender bootleg)",  MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega S.A., only displays Sonic on title screen
+GAME( 1980, defender,   0,        defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Red label)",               MACHINE_SUPPORTS_SAVE ) // developers left Williams in 1981 and formed Vid Kidz
+GAME( 1980, defenderg,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Green label)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderb,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Blue label)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderw,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (White label)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderj,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams (Taito Corporation license)", "T.T Defender",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defndjeu,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Defender (bootleg)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tornado1,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (set 1, Defender bootleg)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tornado2,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (set 2, Defender bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?
+GAME( 1980, zero,       defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Zero (set 1, Defender bootleg)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zero2,      defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Amtec)",                      "Zero (set 2, Defender bootleg)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defcmnd,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, defence,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, defenseb,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense (Defender bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, startrkd,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Star Trek (Defender bootleg)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1980, attackf,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Famaresa)",                   "Attack (Defender bootleg)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galwars2,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Sonic)",                      "Galaxy Wars II (Defender bootleg)",  MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega S.A., only displays Sonic on title screen
 
-GAME( 1980, mayday,     0,        defender,       mayday,   mayday_state,         empty_init,    ROT0,   "Hoei",                 "Mayday (set 1)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
-GAME( 1980, maydaya,    mayday,   defender,       mayday,   mayday_state,         empty_init,    ROT0,   "Hoei",                 "Mayday (set 2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "protection_r" function
-GAME( 1980, maydayb,    mayday,   defender,       mayday,   mayday_state,         empty_init,    ROT0,   "Hoei",                 "Mayday (set 3)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // /
-GAME( 1980, batlzone,   mayday,   defender,       mayday,   mayday_state,         empty_init,    ROT0,   "bootleg (Video Game)", "Battle Zone (bootleg of Mayday)", MACHINE_SUPPORTS_SAVE ) // the bootleg may or may not use the same protection chip, or some hack around it.
+GAME( 1980, mayday,     0,        defender,       mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 1)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
+GAME( 1980, maydaya,    mayday,   defender,       mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "protection_r" function
+GAME( 1980, maydayb,    mayday,   defender,       mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 3)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // /
+GAME( 1980, batlzone,   mayday,   defender,       mayday,   mayday_state,    empty_init,    ROT0,   "bootleg (Video Game)", "Battle Zone (bootleg of Mayday)", MACHINE_SUPPORTS_SAVE ) // the bootleg may or may not use the same protection chip, or some hack around it.
 
-GAME( 1981, colony7,    0,        defender,       colony7,  defender_state,       empty_init,    ROT270, "Taito", "Colony 7 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, colony7a,   colony7,  defender,       colony7,  defender_state,       empty_init,    ROT270, "Taito", "Colony 7 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, colony7,    0,        defender,       colony7,  defender_state,  empty_init,    ROT270, "Taito", "Colony 7 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, colony7a,   colony7,  defender,       colony7,  defender_state,  empty_init,    ROT270, "Taito", "Colony 7 (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, jin,        0,        jin,            jin,      defender_state,       empty_init,    ROT90,  "Falcon", "Jin", MACHINE_SUPPORTS_SAVE )
-
+GAME( 1982, jin,        0,        jin,            jin,      defender_state,  empty_init,    ROT90,  "Falcon", "Jin", MACHINE_SUPPORTS_SAVE )
 
 
 // Standard Williams hardware
-GAME( 1981, stargate,   0,        stargate,       stargate, williams_state,       empty_init,    ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, stargate,   0,        williams_b0,    stargate, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, robotron,   0,        robotron,       robotron, williams_state,       empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Solid Blue label)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, robotronyo, robotron, robotron,       robotron, williams_state,       empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, robotronun, robotron, robotron,       robotron, williams_state,       empty_init,    ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, conquest,   0,        williams_b1,    conquest, conquest_state,  empty_init,    ROT270, "Williams / Vid Kidz", "Conquest (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
 
-// the 3 below are all noteworthy hacks of the Solid BLue set
-GAME( 1987, robotron87, robotron, robotron,       robotron, williams_state,       empty_init,    ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
-GAME( 2012, robotron12, robotron, robotron,       robotron, williams_state,       empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
-GAME( 2015, robotrontd, robotron, robotron,       robotron, williams_state,       empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
+GAME( 1982, robotron,   0,        williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Solid Blue label)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronyo, robotron, williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronun, robotron, williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, joust,      0,        joust,          joust,    williams_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, joustr,     joust,    joust,          joust,    williams_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jousty,     joust,    joust,          joust,    williams_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Yellow label)", MACHINE_SUPPORTS_SAVE )
+// the 3 below are all noteworthy hacks of the Solid Blue set
+GAME( 1987, robotron87, robotron, williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
+GAME( 2012, robotron12, robotron, williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
+GAME( 2015, robotrontd, robotron, williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
 
-GAME( 1982, bubbles,    0,        bubbles,        bubbles,  bubbles_state,        empty_init,    ROT0,   "Williams", "Bubbles", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bubblesr,   bubbles,  bubbles,        bubbles,  bubbles_state,        empty_init,    ROT0,   "Williams", "Bubbles (Solid Red label)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bubblesp,   bubbles,  bubbles,        bubbles,  bubbles_state,        empty_init,    ROT0,   "Williams", "Bubbles (prototype version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joust,      0,        joust,          joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joustr,     joust,    joust,          joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jousty,     joust,    joust,          joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Yellow label)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, splat,      0,        splat,          splat,    williams_muxed_state, empty_init,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubbles,    0,        williams_b1,    bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubblesr,   bubbles,  williams_b1,    bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles (Solid Red label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubblesp,   bubbles,  williams_b1,    bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles (prototype)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, sinistar,   0,        sinistar,       sinistar, sinistar_state,       empty_init,    ROT270, "Williams", "Sinistar (revision 3)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistar2,  sinistar, sinistar,       sinistar, sinistar_state,       empty_init,    ROT270, "Williams", "Sinistar (revision 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistarp,  sinistar, sinistar,       sinistar, sinistar_state,       empty_init,    ROT270, "Williams", "Sinistar (AMOA-82 prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, splat,      0,        splat,          splat,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, playball,   0,        playball,       playball, playball_state,       empty_init,    ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistar,   0,        sinistar,       sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 3)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistar2,  sinistar, sinistar,       sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistarp,  sinistar, sinistar,       sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (AMOA-82 prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, blaster,    0,        blaster,        blaster,  blaster_state,        empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster",                  MACHINE_SUPPORTS_SAVE ) // 20 levels - stereo sound
-GAME( 1983, blastero,   blaster,  blaster,        blaster,  blaster_state,        empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (location test)",  MACHINE_SUPPORTS_SAVE ) // 30 levels - stereo sound
-GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,        empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // 20 levels - mono sound
+GAME( 1983, playball,   0,        playball,       playball, playball_state,  empty_init,    ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, spdball,    0,        spdball,        spdball,  spdball_state,        empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, blaster,    0,        blaster,        blaster,  blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster",                  MACHINE_SUPPORTS_SAVE ) // 20 levels - stereo sound
+GAME( 1983, blastero,   blaster,  blaster,        blaster,  blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (location test)",  MACHINE_SUPPORTS_SAVE ) // 30 levels - stereo sound
+GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // 20 levels - mono sound
 
-GAME( 1985, alienar,    0,        joust,          alienar,  williams_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1985, alienaru,   alienar,  joust,          alienar,  williams_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdball,    0,        spdball,        spdball,  spdball_state,   empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state,       empty_init,    ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienar,    0,        joust,          alienar,  wms_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienaru,   alienar,  joust,          alienar,  wms_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state,  empty_init,    ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
 
 
 // 2nd Generation Williams hardware with tilemaps
-GAME( 1983, mysticm,    0,        mysticm,        mysticm, mysticm_state,         empty_init,    ROT0,   "Williams", "Mystic Marathon",             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE)
-GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, mysticm_state,         empty_init,    ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
+GAME( 1983, mysticm,    0,        mysticm,        mysticm, mysticm_state,    empty_init,    ROT0,   "Williams", "Mystic Marathon",             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, mysticm_state,    empty_init,    ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
 
-GAME( 1984, tshoot,     0,        tshoot,         tshoot,  tshoot_state,          empty_init,    ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tshoot,     0,        tshoot,         tshoot,  tshoot_state,     empty_init,    ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, inferno,    0,        inferno,        inferno, inferno_state,         empty_init,    ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, inferno,    0,        inferno,        inferno, inferno_state,    empty_init,    ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, joust2,     0,        joust2,         joust2,  joust2_state,          empty_init,    ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, joust2r1,   joust2,   joust2,         joust2,  joust2_state,          empty_init,    ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, joust2,     0,        joust2,         joust2,  joust2_state,     empty_init,    ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, joust2r1,   joust2,   joust2,         joust2,  joust2_state,     empty_init,    ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 1)", MACHINE_SUPPORTS_SAVE )

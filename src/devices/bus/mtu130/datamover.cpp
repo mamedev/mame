@@ -3,6 +3,7 @@
 
 // Datamover - 68K-based extension board
 
+#include "emu.h"
 #include "datamover.h"
 
 DEFINE_DEVICE_TYPE(MTU130_DATAMOVER0, mtu130_datamover0_device, "datamover0", "Datamover")

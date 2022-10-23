@@ -16,9 +16,9 @@
 
 #include "formats/imageutl.h"
 
-#include "corefile.h"
 #include "corestr.h"
 #include "opresolv.h"
+#include "path.h"
 
 #include <cstdarg>
 #include <cstdio>

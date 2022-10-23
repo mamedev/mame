@@ -4,7 +4,7 @@
 
   MAME/MESS NES APU CORE
 
-  Based on the Nofrendo/Nosefart NES N2A03 sound emulation core written by
+  Based on the Nofrendo/Nosefart NES RP2A03 sound emulation core written by
   Matthew Conte (matt@conte.com) and redesigned for use in MAME/MESS by
   Who Wants to Know? (wwtk@mail.com)
 
@@ -45,7 +45,7 @@
 #include "emu.h"
 #include "nes_apu.h"
 
-DEFINE_DEVICE_TYPE(NES_APU,  nesapu_device,  "nesapu",  "N2A0X APU")
+DEFINE_DEVICE_TYPE(NES_APU,  nesapu_device,  "nesapu",  "RP2A0X APU")
 DEFINE_DEVICE_TYPE(APU_2A03, apu2a03_device, "apu2a03", "RP2A03 APU")
 
 nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)

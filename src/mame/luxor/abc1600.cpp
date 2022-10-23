@@ -34,7 +34,7 @@
 
     TODO:
 
-    - loadsys1 core dump
+    - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!

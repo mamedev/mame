@@ -29,6 +29,8 @@
 #include "romload.h"
 #include "uiinput.h"
 
+#include "path.h"
+
 #include <algorithm>
 #include <cstring>
 #include <fstream>

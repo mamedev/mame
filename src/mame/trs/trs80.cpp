@@ -157,6 +157,7 @@ ht1080z    works
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "softlist_dev.h"
+#include "utf8.h"
 
 
 void trs80_state::trs80_mem(address_map &map)

@@ -43,7 +43,8 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/am9513.h"
 #include "machine/bankdev.h"

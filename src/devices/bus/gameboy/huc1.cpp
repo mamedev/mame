@@ -2,18 +2,18 @@
 // copyright-holders:Vas Crabb
 /***************************************************************************
 
- Hudson Soft HuC-1 Memory Controller
+ Hudson Soft HuC1 Memory Controller
 
  Provides ROM and RAM banking and infrared I/O.  Supports up to 1 MiB ROM
  (64 16 KiB pages) and up to 32 KiB static RAM (4 8 KiB pages).  If RAM bank
  lines are used for coarse ROM banking, up to 4 MiB ROM (256 16 KiB pages)
  can be supported.
 
- The HuC-1 controller appears to only respond to A15-A13 and D6-D0, i.e.
+ The HuC1 controller appears to only respond to A15-A13 and D6-D0, i.e.
  addresses are effectively masked with 0xE000 and data is effectively masked
  with 0x3F.
 
- The HuC-1 controller doesn't support disabling cartridge RAM without
+ The HuC1 controller doesn't support disabling cartridge RAM without
  selecting infrared I/O.  However, some games still write 0x00 or 0x0A to
  the infrared/RAM select register as if it behaved like the Nintendo MBC
  series RAM enable register.  Some games write to the 0x6000-0x7FFF range,
@@ -189,4 +189,4 @@ void huc1_device::write_ir(u8 data)
 } // namespace bus::gameboy
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_HUC1, device_gb_cart_interface, bus::gameboy::huc1_device, "gb_rom_huc1", "Game Boy Hudson Soft HuC-1 Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_HUC1, device_gb_cart_interface, bus::gameboy::huc1_device, "gb_rom_huc1", "Game Boy Hudson Soft HuC1 Cartridge")

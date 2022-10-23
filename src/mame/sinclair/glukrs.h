@@ -15,12 +15,12 @@ class glukrs_device : public device_t,
 public:
 	glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32'768);
 
-	void enable() { m_glukrs_active = true; };
-	void disable() { m_glukrs_active = false; };
-	bool is_active() { return m_glukrs_active; };
+	void enable() { m_glukrs_active = true; }
+	void disable() { m_glukrs_active = false; }
+	bool is_active() { return m_glukrs_active; }
 	u8 address_r() { return m_glukrs_active ? m_address : 0xff; }
-	void address_w(u8 address) { if (m_glukrs_active) m_address = address; };
-	u8 data_r() { return m_glukrs_active ? m_cmos[m_address] : 0xff; };
+	void address_w(u8 address) { if (m_glukrs_active) m_address = address; }
+	u8 data_r() { return m_glukrs_active ? m_cmos[m_address] : 0xff; }
 	void data_w(u8 data) { if (m_glukrs_active) { m_cmos[m_address] = data; } }
 
 	TIMER_CALLBACK_MEMBER(timer_callback);

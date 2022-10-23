@@ -40,11 +40,11 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
-//  rom_bank_updated - refresh the stream if the
+//  rom_bank_pre_change - refresh the stream if the
 //  ROM banking changes
 //-------------------------------------------------
 
-void y8950_device::rom_bank_updated()
+void y8950_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
@@ -131,11 +131,11 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  rom_bank_updated - refresh the stream if the
+//  rom_bank_pre_change - refresh the stream if the
 //  ROM banking changes
 //-------------------------------------------------
 
-void ymf278b_device::rom_bank_updated()
+void ymf278b_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

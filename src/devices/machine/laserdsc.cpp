@@ -16,6 +16,7 @@
 #include "romload.h"
 
 #include "chd.h"
+#include "xmlfile.h"
 
 
 

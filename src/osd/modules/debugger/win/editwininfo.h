@@ -18,6 +18,8 @@
 #include <string>
 
 
+namespace osd::debugger::win {
+
 class editwin_info : public debugwin_info
 {
 public:
@@ -55,4 +57,6 @@ private:
 	int                     m_last_history;
 };
 
-#endif
+} // namespace osd::debugger::win
+
+#endif // MAME_DEBUGGER_WIN_EDITWININFO_H

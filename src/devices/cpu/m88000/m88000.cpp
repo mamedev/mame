@@ -615,7 +615,7 @@ void mc88100_device::execute(u32 const inst)
 			{
 				unsigned const offset = inst & 31;
 
-				m_r[D] = (m_r[S1] << (32 - offset)) | (m_r[S1] >> offset);
+				m_r[D] = rotr_32(m_r[S1], offset);
 			}
 			break;
 
@@ -988,11 +988,7 @@ void mc88100_device::execute(u32 const inst)
 			}
 			break;
 		case 0x540: // rot: rotate (register)
-			{
-				unsigned const offset = m_r[S2] & 31;
-
-				m_r[D] = (m_r[S1] << (32 - offset)) | (m_r[S1] >> offset);
-			}
+			m_r[D] = rotr_32(m_r[S1], m_r[S2]);
 			break;
 		case 0x740: // ff1: find first bit set
 			{

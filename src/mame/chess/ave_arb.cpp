@@ -16,24 +16,29 @@ The electronic magnetic chessboard is the first of its kind. AVE later licensed
 it to Fidelity (see fidelity/elite.cpp).
 ARB is a romless system, the program ROM is on a cartridge.
 
-Known chess modules (*denotes not dumped yet):
-- Sargon 2.5
-- *Grand Master Series 3
-- *Grand Master Series 3.5
+Known chess modules:
+- Grand Master Series 3
 - Grand Master Series 4.0
+- Sargon 2.5
+- Sargon 3.5 (unofficial)
 
 Other games:
 - Avelan (checkers)
 
-Newer modules included button label stickers for OPTIONS, Verify, Take Back, Clear.
+Sandy Electronic renamed GMS 3 and GMS 4.0 to "3000 GMS" and "4,0 - 50 S".
+Sargon 3.5 was an unofficial module published by them. It was also a free EPROM
+upgrade for their customers who were unhappy with GMS 3.
 
-Around 2012, Steve Braid(aka Trilobyte/Steve UK) started manufacturing ARB V2 boards
-without a module slot. CPU and VIA were replaced with new WDC 14MHz-rated chips,
-running at 16MHz.
+GMS 4.0 included button label stickers for OPTIONS, Verify, Take Back, Clear.
+
+Around 2012, Steve Braid(aka Trilobyte/Steve UK) started manufacturing ARB V2
+boards without a module slot. CPU and VIA were replaced with new WDC 14MHz-rated
+chips, running at 16MHz.
 
 TODO:
-- verify gms40 module memory layout
-- gms40 and avelan rom labels
+- remove install_ram workaround when emumem bug is fixed, see:
+  https://github.com/mamedev/mame/commit/75caceb1c143757d10f874b0c2ebf0427f4dfc9f#commitcomment-84413054
+- avelan, gms3, gms4, sargon35 rom labels
 
 ******************************************************************************/
 
@@ -78,7 +83,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(halt_button) { m_maincpu->set_input_line(M6502_NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE); update_reset(); }
 	void update_reset();
 
-	// machine configs
 	void arb(machine_config &config);
 	void v2(machine_config &config);
 
@@ -96,20 +100,14 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
-	// address maps
 	void main_map(address_map &map);
 	void v2_map(address_map &map);
 
-	// sensorboard
 	void init_board(int state);
 	bool m_altboard = false;
 
-	// cartridge
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	u8 cartridge_r(offs_t offset);
-	u32 m_cart_mask;
 
-	// I/O handlers
 	void update_display();
 	void leds_w(u8 data);
 	void control_w(u8 data);
@@ -169,23 +167,20 @@ void arb_state::init_board(int state)
 DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
-	m_cart_mask = ((1 << (31 - count_leading_zeros_32(size))) - 1) & 0x7fff;
-
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	// extra ram (optional)
 	if (image.get_feature("ram"))
-		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0x1000, m_extram);
+	{
+		//m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0x1000, m_extram);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0, m_extram);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x1800, 0x1fff, 0, m_extram);
+	}
 
 	m_altboard = bool(image.get_feature("altboard"));
 
 	return image_init_result::PASS;
-}
-
-u8 arb_state::cartridge_r(offs_t offset)
-{
-	return m_cart->read_rom(offset & m_cart_mask);
 }
 
 
@@ -246,7 +241,7 @@ u8 arb_state::input_r()
 void arb_state::main_map(address_map &map)
 {
 	// external slot is A0-A14, potential bus conflict with RAM/VIA
-	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(arb_state::cartridge_r));
+	map(0x0000, 0x7fff).mirror(0x8000).r(m_cart, FUNC(generic_slot_device::read_rom));
 	map(0x0000, 0x07ff).mirror(0x1000).ram().share("nvram");
 	map(0x8000, 0x800f).mirror(0x1ff0).m(m_via, FUNC(via6522_device::map));
 }
@@ -332,7 +327,7 @@ void arb_state::arb(machine_config &config)
 	m_via->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb");
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "arb");
 	m_cart->set_device_load(FUNC(arb_state::cart_load));
 	m_cart->set_must_be_loaded(true);
 

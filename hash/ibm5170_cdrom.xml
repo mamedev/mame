@@ -917,6 +917,21 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Source: redump.org/disc/33449/ -->
+	<!-- <rom name="Blackhawk (Europe) (En,Fr,De).cue" size="95" crc="daf74d25" sha1="5b069e6a4c2f673f4462b1d92f771429565de5d3"/> -->
+	<!-- <rom name="Blackhawk (Europe) (En,Fr,De).bin" size="6218688" crc="8fe67eb5" sha1="0bee0c935c00ec7564610ad365288c6a32bf1664"/> -->
+	<software name="blackhawk">
+		<description>Blackhawk (Europe)</description>
+		<year>1994</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Blizzard Entertainment" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Blackhawk (Europe) (En,Fr,De)" sha1="7031e0b00ade177a62d0df78c3f2f69fbc3e4e33" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 95, Direct X 5.0 -->
 	<!-- Pentium class 90 MHz -->
 	<!-- TODO: ESC menu briefly appears then goes back into game mode (btanb due of 486 CPU used?) -->
@@ -2411,6 +2426,20 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Source: redump.org/disc/31951/ -->
+	<!-- <rom name="Network Q RAC Rally (USA).cue" size="91" crc="4d252589" sha1="c22a126dfeb6e46c88a4098e6c9aeb0089c1c945"/> -->
+	<!-- <rom name="Network Q RAC Rally (USA).bin" size="14824656" crc="2d2a7c4f" sha1="e6b1be6d3a9cb276d4909c97befc938af11cf67f"/> -->
+	<software name="qracrally">
+		<description>Network Q RAC Rally (USA)</description>
+		<year>1996</year>
+		<publisher>Europress Software</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Network Q RAC Rally (USA)" sha1="953ab84ace809f851ba536bf66df86618c9add29" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.1/95 -->
 	<!-- Simulmondo is credited when you finish the game -->
 	<software name="noiangi">
@@ -2774,6 +2803,20 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="stg" sha1="553a04c67860c49d2c5fa1da983c4bc3ab5267fd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: redump.org/disc/31189/ -->
+	<!-- <rom name="Supaplex (Europe).cue" size="83" crc="f269e8fe" sha1="69b054d67351fe37d5ad3c640ce0c74f416ae8ee"/> -->
+	<!-- <rom name="Supaplex (Europe).bin" size="13199424" crc="403367aa" sha1="7ee29b80716176fdd8aa587a300dd137448d6a0d"/> -->
+	<software name="supaplex">
+		<description>Supaplex (Europe)</description>
+		<year>1995</year>
+		<publisher>Action Sixteen</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Supaplex (Europe)" sha1="24aae2c6eb6aed18550a8d86803c1e122c26bf12" />
 			</diskarea>
 		</part>
 	</software>

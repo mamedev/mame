@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Allard van der Bas
+// copyright-holders: Allard van der Bas
+
 /***************************************************************************
 
     Mikie memory map (preliminary)
+    GX469
 
     driver by Allard van der Bas
 
@@ -39,26 +41,235 @@ Stephh's notes (based on the games M6809 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "mikie.h"
+
 #include "konamipt.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
+#include "video/resnet.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-#define MIKIE_TIMER_RATE 512
+namespace {
 
-#define XTAL    14318180
-#define OSC     18432000
-#define CLK     XTAL/4
+class mikie_state : public driver_device
+{
+public:
+	mikie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+	{ }
 
+	void mikie(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_palettebank = 0;
+
+	uint8_t m_irq_mask = 0;
+
+	uint8_t sh_timer_r();
+	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
+	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void palettebank_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Mikie has three 256x4 palette PROMs (one per gun) and two 256x4 lookup
+  table PROMs (one for characters, one for sprites).
+  I don't know for sure how the palette PROMs are connected to the RGB
+  output, but it's probably the usual:
+
+  bit 3 -- 220 ohm resistor  -- RED/GREEN/BLUE
+        -- 470 ohm resistor  -- RED/GREEN/BLUE
+        -- 1  kohm resistor  -- RED/GREEN/BLUE
+  bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
+
+***************************************************************************/
+
+void mikie_state::palette(palette_device &palette) const
+{
+	uint8_t const *color_prom = memregion("proms")->base();
+	static constexpr int resistances[4] = { 2200, 1000, 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[4], gweights[4], bweights[4];
+	compute_resistor_weights(0, 255, -1.0,
+			4, resistances, rweights, 470, 0,
+			4, resistances, gweights, 470, 0,
+			4, resistances, bweights, 470, 0);
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
+	{
+		int bit0, bit1, bit2, bit3;
+
+		// red component
+		bit0 = BIT(color_prom[i + 0x000], 0);
+		bit1 = BIT(color_prom[i + 0x000], 1);
+		bit2 = BIT(color_prom[i + 0x000], 2);
+		bit3 = BIT(color_prom[i + 0x000], 3);
+		int const r = combine_weights(rweights, bit0, bit1, bit2, bit3);
+
+		// green component
+		bit0 = BIT(color_prom[i + 0x100], 0);
+		bit1 = BIT(color_prom[i + 0x100], 1);
+		bit2 = BIT(color_prom[i + 0x100], 2);
+		bit3 = BIT(color_prom[i + 0x100], 3);
+		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
+
+		// blue component
+		bit0 = BIT(color_prom[i + 0x200], 0);
+		bit1 = BIT(color_prom[i + 0x200], 1);
+		bit2 = BIT(color_prom[i + 0x200], 2);
+		bit3 = BIT(color_prom[i + 0x200], 3);
+		int const b = combine_weights(bweights, bit0, bit1, bit2, bit3);
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// color_prom now points to the beginning of the lookup table,
+	color_prom += 0x300;
+
+	// characters use colors 0x10-0x1f of each 0x20 color bank, while sprites use colors 0-0x0f
+	for (int i = 0; i < 0x200; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			uint8_t const ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
+			m_palette->set_pen_indirect(((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
+		}
+	}
+}
+
+void mikie_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void mikie_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void mikie_state::palettebank_w(uint8_t data)
+{
+	if (m_palettebank != (data & 0x07))
+	{
+		m_palettebank = data & 0x07;
+		machine().tilemap().mark_all_dirty();
+	}
+}
+
+WRITE_LINE_MEMBER(mikie_state::flipscreen_w)
+{
+	flip_screen_set(state);
+	machine().tilemap().mark_all_dirty();
+}
+
+TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)
+{
+	int const code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x20) << 3);
+	int const color = (m_colorram[tile_index] & 0x0f) + 16 * m_palettebank;
+	int const flags = ((m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
+	if (m_colorram[tile_index] & 0x10)
+		tileinfo.category = 1;
+	else
+		tileinfo.category = 0;
+
+	tileinfo.set(0, code, color, flags);
+}
+
+void mikie_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mikie_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+void mikie_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	{
+		int const gfxbank = (m_spriteram[offs + 2] & 0x40) ? 2 : 1;
+		int const code = (m_spriteram[offs + 2] & 0x3f) + ((m_spriteram[offs + 2] & 0x80) >> 1) + ((m_spriteram[offs] & 0x40) << 1);
+		int const color = (m_spriteram[offs] & 0x0f) + 16 * m_palettebank;
+		int const sx = m_spriteram[offs + 3];
+		int sy = 244 - m_spriteram[offs + 1];
+		int const flipx = ~m_spriteram[offs] & 0x10;
+		int flipy = m_spriteram[offs] & 0x20;
+
+		if (flip_screen())
+		{
+			sy = 242 - sy;
+			flipy = !flipy;
+		}
+
+
+		m_gfxdecode->gfx(gfxbank)->transpen(bitmap, cliprect,
+		code, color,
+		flipx, flipy,
+		sx, sy, 0);
+	}
+}
+
+uint32_t mikie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+	draw_sprites(bitmap, cliprect);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+	return 0;
+}
+
+// machine
 
 /*************************************
  *
@@ -66,9 +277,11 @@ Stephh's notes (based on the games M6809 code and some tests) :
  *
  *************************************/
 
-uint8_t mikie_state::mikie_sh_timer_r()
+uint8_t mikie_state::sh_timer_r()
 {
-	int clock = m_audiocpu->total_cycles() / MIKIE_TIMER_RATE;
+	static constexpr int MIKIE_TIMER_RATE = 512;
+
+	int const clock = m_audiocpu->total_cycles() / MIKIE_TIMER_RATE;
 
 	return clock;
 }
@@ -82,14 +295,10 @@ WRITE_LINE_MEMBER(mikie_state::sh_irqtrigger_w)
 	}
 }
 
-WRITE_LINE_MEMBER(mikie_state::coin_counter_1_w)
+template <uint8_t Which>
+WRITE_LINE_MEMBER(mikie_state::coin_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-WRITE_LINE_MEMBER(mikie_state::coin_counter_2_w)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
+	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
 WRITE_LINE_MEMBER(mikie_state::irq_mask_w)
@@ -105,12 +314,12 @@ WRITE_LINE_MEMBER(mikie_state::irq_mask_w)
  *
  *************************************/
 
-void mikie_state::mikie_map(address_map &map)
+void mikie_state::main_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();
 	map(0x2000, 0x2007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x2100, 0x2100).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x2200, 0x2200).w(FUNC(mikie_state::mikie_palettebank_w));
+	map(0x2200, 0x2200).w(FUNC(mikie_state::palettebank_w));
 	map(0x2300, 0x2300).nopw();    // ???
 	map(0x2400, 0x2400).portr("SYSTEM").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x2401, 0x2401).portr("P1");
@@ -118,11 +327,11 @@ void mikie_state::mikie_map(address_map &map)
 	map(0x2403, 0x2403).portr("DSW3");
 	map(0x2500, 0x2500).portr("DSW1");
 	map(0x2501, 0x2501).portr("DSW2");
-	map(0x2800, 0x288f).ram().share("spriteram");
+	map(0x2800, 0x288f).ram().share(m_spriteram);
 	map(0x2890, 0x37ff).ram();
-	map(0x3800, 0x3bff).ram().w(FUNC(mikie_state::mikie_colorram_w)).share("colorram");
-	map(0x3c00, 0x3fff).ram().w(FUNC(mikie_state::mikie_videoram_w)).share("videoram");
-	map(0x4000, 0x5fff).rom(); // Machine checks for extra rom
+	map(0x3800, 0x3bff).ram().w(FUNC(mikie_state::colorram_w)).share(m_colorram);
+	map(0x3c00, 0x3fff).ram().w(FUNC(mikie_state::videoram_w)).share(m_videoram);
+	map(0x4000, 0x5fff).rom(); // Machine checks for extra ROM
 	map(0x6000, 0xffff).rom();
 }
 
@@ -135,7 +344,7 @@ void mikie_state::sound_map(address_map &map)
 	map(0x8002, 0x8002).w("sn1", FUNC(sn76489a_device::write)); // trigger read of latch
 	map(0x8003, 0x8003).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8004, 0x8004).w("sn2", FUNC(sn76489a_device::write)); // trigger read of latch
-	map(0x8005, 0x8005).r(FUNC(mikie_state::mikie_sh_timer_r));
+	map(0x8005, 0x8005).r(FUNC(mikie_state::sh_timer_r));
 	map(0x8079, 0x8079).nopw();    // ???
 	map(0xa003, 0xa003).nopw();    // ???
 }
@@ -146,7 +355,7 @@ void mikie_state::sound_map(address_map &map)
  *
  *************************************/
 
-/* verified from M6809 code */
+// verified from M6809 code
 static INPUT_PORTS_START( mikie )
 	PORT_START("SYSTEM")
 	KONAMI8_SYSTEM_UNK
@@ -159,7 +368,7 @@ static INPUT_PORTS_START( mikie )
 
 	PORT_START("DSW1")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
-	/* "No Coin B" = coins produce sound, but no effect on coin counter */
+	// "No Coin B" = coins produce sound, but no effect on coin counter
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
@@ -184,7 +393,7 @@ static INPUT_PORTS_START( mikie )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/* DSW3 is not mounted on PCB nor listed in manual */
+	// DSW3 is not mounted on PCB nor listed in manual
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -204,17 +413,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 }, /* the bitplanes are packed */
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*4*8, 1*4*8, 2*4*8, 3*4*8, 4*4*8, 5*4*8, 6*4*8, 7*4*8 },
-	8*4*8     /* every char takes 32 consecutive bytes */
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,       /* 16*16 sprites */
@@ -229,9 +427,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_mikie )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,         0, 16*8 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout, 16*8*16, 16*8 )
-	GFXDECODE_ENTRY( "gfx2", 0x0001, spritelayout, 16*8*16, 16*8 )
+	GFXDECODE_ENTRY( "tiles",   0x0000, gfx_8x8x4_packed_msb,       0, 16*8 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, spritelayout,         16*8*16, 16*8 )
+	GFXDECODE_ENTRY( "sprites", 0x0001, spritelayout,         16*8*16, 16*8 )
 GFXDECODE_END
 
 
@@ -260,16 +458,20 @@ WRITE_LINE_MEMBER(mikie_state::vblank_irq)
 
 void mikie_state::mikie(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, OSC/12); // 9A (surface scratched)
-	m_maincpu->set_addrmap(AS_PROGRAM, &mikie_state::mikie_map);
+	static constexpr XTAL AUDIO_XTAL = XTAL(14'318'181);
+	static constexpr XTAL OSC = XTAL(18'432'000);
+	static constexpr XTAL CLK = AUDIO_XTAL / 4;
+
+	// basic machine hardware
+	MC6809E(config, m_maincpu, OSC / 12); // 9A (surface scratched)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mikie_state::main_map);
 
 	Z80(config, m_audiocpu, CLK); // 4E (surface scratched)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mikie_state::sound_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 6I
-	mainlatch.q_out_cb<0>().set(FUNC(mikie_state::coin_counter_1_w)); // COIN1
-	mainlatch.q_out_cb<1>().set(FUNC(mikie_state::coin_counter_2_w)); // COIN2
+	mainlatch.q_out_cb<0>().set(FUNC(mikie_state::coin_counter_w<0>)); // COIN1
+	mainlatch.q_out_cb<1>().set(FUNC(mikie_state::coin_counter_w<1>)); // COIN2
 	mainlatch.q_out_cb<2>().set(FUNC(mikie_state::sh_irqtrigger_w)); // SOUNDON
 	mainlatch.q_out_cb<3>().set_nop(); // END (not used?)
 	mainlatch.q_out_cb<6>().set(FUNC(mikie_state::flipscreen_w)); // FLIP
@@ -277,25 +479,25 @@ void mikie_state::mikie(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60.59);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(mikie_state::screen_update_mikie));
+	screen.set_screen_update(FUNC(mikie_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(mikie_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mikie);
-	PALETTE(config, m_palette, FUNC(mikie_state::mikie_palette), 16*8*16+16*8*16, 256);
+	PALETTE(config, m_palette, FUNC(mikie_state::palette), 16*8*16+16*8*16, 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	SN76489A(config, "sn1", XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.60);
+	SN76489A(config, "sn1", AUDIO_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.60);
 
 	SN76489A(config, "sn2", CLK).add_route(ALL_OUTPUTS, "mono", 0.60);
 }
@@ -315,10 +517,10 @@ ROM_START( mikie )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "n10.6e",  0x0000, 0x2000, CRC(2cf9d670) SHA1(b324b92aff70d7878160128611dd5fdec6949659) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "o11.8i",  0x0000, 0x4000, CRC(3c82aaf3) SHA1(c84256ac5fd5e40b197651c56e303c69aae72950) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "001.f1",  0x0000, 0x4000, CRC(a2ba0df5) SHA1(873d49c1c2efbb222d1bf63396729d4b7d9477c3) )
 	ROM_LOAD( "003.f3",  0x4000, 0x4000, CRC(9775ab32) SHA1(0271567c5f5a6bb2eaffb9d5dc2af6b8142dc8a9) )
 	ROM_LOAD( "005.h1",  0x8000, 0x4000, CRC(ba44aeef) SHA1(410bfd9146242254a920092e280af87586709527) )
@@ -341,10 +543,10 @@ ROM_START( mikiej )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "n10.6e",  0x0000, 0x2000, CRC(2cf9d670) SHA1(b324b92aff70d7878160128611dd5fdec6949659) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "q11.8i",  0x0000, 0x4000, CRC(c48b269b) SHA1(d7fcfa44fcda90f1a7df6c974210716ae82c47a3) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "q01.f1",  0x0000, 0x4000, CRC(31551987) SHA1(b6cbdb8b511d99b27546a6c4d01f2948d5ad3a42) )
 	ROM_LOAD( "q03.f3",  0x4000, 0x4000, CRC(34414df0) SHA1(0189deac6f19de386b4e49cfe6322b212e74264a) )
 	ROM_LOAD( "q05.h1",  0x8000, 0x4000, CRC(f9e1ebb1) SHA1(c88c1fc22f21b3e7d558c47de2716dac01fdd621) )
@@ -367,10 +569,10 @@ ROM_START( mikiek )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "n10.6e",  0x0000, 0x2000, CRC(2cf9d670) SHA1(b324b92aff70d7878160128611dd5fdec6949659) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "q11.8i",  0x0000, 0x4000, CRC(29286fce) SHA1(699706cf7300c98352e355f81ba40635b4380d7a) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "q01.f1",  0x0000, 0x4000, CRC(31551987) SHA1(b6cbdb8b511d99b27546a6c4d01f2948d5ad3a42) )
 	ROM_LOAD( "q03.f3",  0x4000, 0x4000, CRC(707cc98e) SHA1(850c973053f3ae8a93e7c630d69298f25708941e) )
 	ROM_LOAD( "q05.h1",  0x8000, 0x4000, CRC(f9e1ebb1) SHA1(c88c1fc22f21b3e7d558c47de2716dac01fdd621) )
@@ -393,10 +595,10 @@ ROM_START( mikiehs )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "h10.6e",  0x0000, 0x2000, CRC(4ed887d2) SHA1(953218a3b41019e2e52932dd3522741812c46c75) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "l11.8i",  0x0000, 0x4000, CRC(5ba9d86b) SHA1(2246795dd68a62efb2c70a9177ee97a58ccb2566) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "i01.f1",  0x0000, 0x4000, CRC(0c0cab5f) SHA1(c3eb4c3a432e86f4664329a0de5583cb5de7b6f5) )
 	ROM_LOAD( "i03.f3",  0x4000, 0x4000, CRC(694da32f) SHA1(02bd83d77f42822e42e48977856dfa0e3abfcab0) )
 	ROM_LOAD( "i05.h1",  0x8000, 0x4000, CRC(00e357e1) SHA1(d5b46709083d74950d0deedecb4fd631d0e74afb) )
@@ -409,6 +611,9 @@ ROM_START( mikiehs )
 	ROM_LOAD( "d22.12h", 0x0300, 0x0100, CRC(872be05c) SHA1(1525303589d7ed909bc6e2827fbaa2c16ad4030b) ) // character lookup table
 	ROM_LOAD( "d18.f9",  0x0400, 0x0100, CRC(7396b374) SHA1(fedcc421a61d6623dc9c41b0a3e164efeb50ec7c) ) // sprite lookup table
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

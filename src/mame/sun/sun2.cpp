@@ -120,7 +120,7 @@ How the architecture works:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/ram.h"
 #include "machine/am9513.h"
 #include "machine/i82586.h"

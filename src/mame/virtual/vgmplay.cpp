@@ -11,7 +11,7 @@
 #include "imagedev/snapquik.h"
 
 #include "cpu/h6280/h6280.h"
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/rp2a03.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/sh/sh2.h"
 #include "sound/ay8910.h"
@@ -500,7 +500,7 @@ private:
 	required_device<sega_32x_ntsc_device> m_sega32x;
 	required_device_array<ay8910_device, 2> m_ay8910;
 	required_device_array<gameboy_sound_device, 2> m_dmg;
-	required_device_array<n2a03_device, 2> m_nescpu;
+	required_device_array<rp2a03_device, 2> m_nescpu;
 	required_device_array<multipcm_device, 2> m_multipcm;
 	required_device_array<upd7759_device, 2> m_upd7759;
 	required_device_array<okim6258_device, 2> m_okim6258;
@@ -3845,13 +3845,13 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_dmg[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
 	m_dmg[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
-	N2A03G(config, m_nescpu[0], 0);
+	RP2A03G(config, m_nescpu[0], 0);
 	m_nescpu[0]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<0>);
 	m_nescpu[0]->set_disable();
 	m_nescpu[0]->add_route(ALL_OUTPUTS, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
 	m_nescpu[0]->add_route(ALL_OUTPUTS, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
-	N2A03G(config, m_nescpu[1], 0);
+	RP2A03G(config, m_nescpu[1], 0);
 	m_nescpu[1]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<1>);
 	m_nescpu[1]->set_disable();
 	m_nescpu[1]->add_route(ALL_OUTPUTS, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);

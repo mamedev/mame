@@ -18,6 +18,7 @@
 #include "machine/nscsi_bus.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "adbmodem.h"
 #include "egret.h"
 #include "macadb.h"
 #include "bus/nubus/nubus.h"
@@ -54,6 +55,7 @@ public:
 		m_via2(*this, "via6522_1"),
 		m_asc(*this, "asc"),
 		m_egret(*this, EGRET_TAG),
+		m_adbmodem(*this, "adbmodem"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_scc(*this, "scc"),
@@ -124,6 +126,7 @@ private:
 	optional_device<via6522_device> m_via2;
 	optional_device<asc_device> m_asc;
 	optional_device<egret_device> m_egret;
+	optional_device<adbmodem_device> m_adbmodem;
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<scc8530_legacy_device> m_scc;

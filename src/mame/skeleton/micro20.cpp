@@ -11,7 +11,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/mc68681.h"
 #include "machine/msm58321.h"
 #include "machine/timer.h"

@@ -3617,6 +3617,28 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="climber5">
+		<description>Climber 5 (NTSC)</description>
+		<year>2004</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="climber5_ntsc.bin" size="0x1000" crc="a85ce2db" sha1="eaa765ccefbcf25a2cbf501fc63acfa990274e2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="climber5e" cloneof="climber5">
+		<description>Climber 5 (PAL)</description>
+		<year>2004</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="climber5_pal.bin" size="0x1000" crc="a0554707" sha1="7f7fe51511d657c22f164f93befd66c845083627"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="coconuts">
 		<description>Coco Nuts</description>
 		<year>1982</year>
@@ -7307,6 +7329,28 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="gunfight">
+		<description>Gunfight (NTSC)</description>
+		<year>2001</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="gunntsc.bin" size="0x1000" crc="c3d655ad" sha1="45f3f98735798e19427a9100a9000d97917b932f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunfighte" cloneof="gunfight">
+		<description>Gunfight (PAL)</description>
+		<year>2001</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="gunpal.bin" size="0x1000" crc="869e43ca" sha1="7ac6356224cc718ee5731d1ce14aea6fb2335439"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gyruss">
 		<description>Gyruss</description>
 		<year>1984</year>
@@ -7891,6 +7935,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
 				<rom name="james bond 007 (james bond agent 007) (1983) (parker brothers, joe gaucher, louis marbel) (pb5110).bin" size="8192" crc="34d3ffc8" sha1="2bbc124cead9aa49b364268735dad8cb1eb6594f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jammed">
+		<description>Jammed</description>
+		<year>2001</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="jammed.bin" size="0x1000" crc="caff296a" sha1="eb6065c0864262bda7938863d1e21883de944f29"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9079,6 +9134,34 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="marauder (1982) (tigervision, rorke weigandt - teldec) (7-005) (pal).bin" size="4096" crc="5c008825" sha1="df02bb5418722fa5b8c1f112f717652a7f087d8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marble">
+		<description>Marble Craze (NTSC)</description>
+		<year>2002</year>
+		<publisher>Xype / AtariAge</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f4" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="mc_ntsc_7_26_3.bin" size="0x8000" crc="e521497f" sha1="c3488902a8caf07625917e089e214047c5628cb2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marblee" cloneof="marble">
+		<description>Marble Craze (PAL)</description>
+		<year>2002</year>
+		<publisher>Xype / AtariAge</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f4" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="mc_pal_4_28_3.bin" size="0x8000" crc="ae1cfdbc" sha1="e9d0bddbf24732a47a2da68b1f9f8767a6d5379c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10943,6 +11026,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="oystron">
+		<description>Oystron</description>
+		<year>1997</year>
+		<publisher>Xype / AtariAge</publisher>
+		<info name="usage" value="Set right difficulty switch to A for NTSC, to B for PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="oystron.bin" size="0x1000" crc="8155dccf" sha1="412e8a2438379878ee4de5c6bf4e5a9ee2707c8b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="packong">
 		<description>Pac Kong (PAL) (Goliath)</description>
 		<year>1983</year>
@@ -12190,6 +12285,28 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
 				<rom name="q-bert's qubes (1984) (parker brothers, todd marshall) (pb5550).bin" size="8192" crc="d9f499c5" sha1="a61be3702437b5d16e19c0d2cd92393515d42f23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qb">
+		<description>Qb (NTSC)</description>
+		<year>2001</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="qb215ntsc.bin" size="0x1000" crc="0da0d447" sha1="020ca09f12d823ae478f45546d2de1751e648b50"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbe" cloneof="qb">
+		<description>Qb (PAL)</description>
+		<year>2001</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="qb215pal.bin" size="0x1000" crc="06d7cebe" sha1="87466657b6573ae2a1395a75d6c8c1b8a8e63f4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13698,6 +13815,28 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="seawolf">
+		<description>Seawolf (NTSC)</description>
+		<year>2004</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="seantsc.bin" size="0x1000" crc="b157a5c3" sha1="861e890ed69d134cf9b5685878a2b4ae36e19f5e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seawolfe" cloneof="seawolf">
+		<description>Seawolf (PAL)</description>
+		<year>2004</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="seapal.bin" size="0x1000" crc="c9452b1b" sha1="754b15ccc05a175478160e7cd1c21e2f9f3adfe9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="seawolf3">
 		<description>Seawolf 3 (PAL) (prototype 19810323)</description>
 		<year>1983</year>
@@ -14563,6 +14702,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="spaceins">
+		<description>Space Instigators</description>
+		<year>2002</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8sw" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="sp-dl.bin" size="0x2000" crc="e10b1cf9" sha1="162087c9010d335185d7dede8e29f83c5760dc25"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spaceinv">
 		<description>Space Invaders</description>
 		<year>1980</year>
@@ -15314,6 +15465,30 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="stampede (unknown) (pal).bin" size="2048" crc="0732e6de" sha1="4d7f86ac4a82f66d6657bfb50d2e07b349812429"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfire">
+		<description>Star Fire (NTSC)</description>
+		<year>2003</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="starntsc.bin" size="0x2000" crc="07d45188" sha1="290bb13c753b13e09dadada919adac944fcb707e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfiree" cloneof="starfire">
+		<description>Star Fire (PAL)</description>
+		<year>2003</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="starpal.bin" size="0x2000" crc="d7dfdfdf" sha1="e68eedbb8d657e8556fe7461c4db3a8777102a31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16530,6 +16705,20 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="synthcart">
+		<description>Synthcart</description>
+		<year>2002</year>
+		<publisher>AtariAge</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="snthcart.bin" size="0x2000" crc="5ddd1eba" sha1="c24256c1d51246281a400fb03fc4ca465bd092dd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tacscan">
 		<description>Tac-Scan</description>
 		<year>1982</year>
@@ -16893,6 +17082,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="testcart">
+		<description>Testcart</description>
+		<year>2001</year>
+		<publisher>AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="testcart.bin" size="0x1000" crc="6c4c86c3" sha1="07cc9f952038ca759b5459a0d1eb2c15f3d49d80"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="texascm">
 		<description>The Texas Chainsaw Massacre</description>
 		<year>1983</year>
@@ -16922,6 +17122,30 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="threshold (1982) (tigervision, warren schwader - teldec) (7-003) (pal).bin" size="4096" crc="b9c25858" sha1="318c403d3582ed0a90b551bc1816998cf99e66e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thrustpe">
+		<description>Thrust+ - Platinum Edition</description>
+		<year>2003</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f6" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="thrust v1.26 (pd).bin" size="0x4000" crc="70b25fb7" sha1="79e9d3a3e9bd8a8a9e4c7242c16cdfcccb1de1a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thrustdc" cloneof="thrustpe">
+		<description>Thrust+ - D.C. Edition</description>
+		<year>2002</year>
+		<publisher>Xype / AtariAge</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f6" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="thrust.bin" size="0x4000" crc="c6ba1bc6" sha1="09608cfaa7c6e9638f12a1cff9dd5036c9effa43"/>
 			</dataarea>
 		</part>
 	</software>

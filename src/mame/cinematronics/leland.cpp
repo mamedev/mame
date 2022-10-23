@@ -37,6 +37,146 @@
 
 ****************************************************************************
 
+Ivan 'Ironman' Stewart's Super Off-Road, Leland, 1989
+Hardware info by Guru
+---------------------
+
+Most of these Cinematronics/Leland games use the same main board with different game-specific top boards.
+
+Top PCB (for Off-Road)
+-------
+
+PCA # 81-18002-2
+PART # 80-18002-01
+|-\         /-----------------------------------|
+|  \-------/        AD7524       LM324   J8     |
+|                   AD7524  AD7533      LM324 J7|
+|                   AD7524       J9 LM324       |
+|                   AD7524              LM339   |
+|                   AD7524              LM339   |
+|                   AD7524                    J6|
+|                                    U75 U82    |
+| U9          16MHz     U44    76C88 U74 U81    |
+|            80186      U43    76C88            |
+| U8                    U42           ADC0820 J5|
+| U7                           U59              |
+| U6                   71054   U58              |
+| U5     U15   U27     71054   U57            J4|
+| U4     U14   U26             U56              |
+| U3     U13   U25                              |
+| U2     U12   U24             U55      U68   J3|
+| Z80(2)76C88  76C88           U54      Z80(1)  |
+|  J1               BATT       DS1221    J2     |
+|-----------------------------------------------|
+Notes:
+      80186 - Siemens SAB80186-1-N x86 CPU. Clock input 16MHz, runs at 8MHz with an internal /2 divider.
+        Z80 - Master(1) & Slave(2) Zilog Z0840006 CPU. Clock input 6.000MHz [both, 12/2]
+      76C88 - Goldstar GM76C88-10 8kBx8-bit SRAM, equivalent to 6264 etc
+       BATT - 3.6V AA Lithium Battery. Connected to the 2x 76C88 SRAMs just above U59. Used to hold the book-keeping data and high scores.
+              Not required/essential for normal operation.
+      71054 - NEC D71054 Programmable Timer. Compatible with Intel 8254
+     J1, J2 - 40 pin flat cable joining to bottom board
+         J3 - 10 pin connector (not used?)
+         J4 - 10 pin connector (not used?)
+         J5 - 12 pin connector for 3x foot pedals
+         J6 - 10 pin connector for 3x steering wheels
+         J7 - 10 pin connector for power output to bottom board. 5V also flows through the J1 & J2 cables.
+         J8 - 10 pin connector for DC power input
+         J9 - 2 pin connector for audio output from top board to bottom board
+     DS1221 - Dallas DS1221 Non-Volatile Controller / Battery Management IC
+      LM324 - ST Microelectronics LM324 Quad Operational Amplifier
+      LM339 - Samsung LM339 Quad Differential Comparator
+     AD7524 - Maxim AD7524 8-bit Multiplying D/A Converter. 6 chips: channel 0 U46 to channel 5 U51
+     AD7533 - Maxim AD7533 10-bit Multiplying D/A Converter
+    ADC0820 - Signetics ADC0820 8-bit A/D Converter
+    U56-U59 - 27C512 program ROMs for master Z80
+      U2-U8 - 27C512 program ROMs for slave Z80. U2 & U3 are empty but are used on the Track-Pak upgrade.
+    U24-U27 - 27C512 program ROMs for 80186 CPU
+    U12-U15 - 27C512 program ROMs for 80186 CPU
+         U9 - PAL20L10 labelled '38-01'
+        U42 - PAL16R6 labelled '37-01'
+        U43 - PAL16R4 labelled '36-01'
+        U44 - PAL16L8 labelled '35-01'
+        U54 - PAL16L8 labelled '41-02'
+        U55 - PLHS18P8 labelled '39-01'
+        U68 - PLHS18P8 labelled '40-01'
+        U74 - PAL16R6 labelled '19-01'
+        U75 - PAL16R6 labelled '18-01'
+        U82 - PAL16R6 labelled '21-01'
+        U81 - Socket not populated
+
+
+Bottom board
+------------
+
+CINEMATRONICS INC
+PCB 80-10000-01 REV A
+LELAND CORP 1985 MADE IN USA
+PCB: 80-10000-01
+ASSY: 81-12170-12
+|----------------------------------------------------------|
+|   P1         2148                   P2             7815  |
+|              2148                     LM324    TDA2002 P3|
+|                                         VOL              |
+|                                 8912                  SW1|
+| 6116  LS461  4464 4464        X 8910   6116              |
+| 6116  LS461                            6116            P4|
+|                               U85             93C46.U120 |
+|        U21   4464 4464               U96                 |
+|                                                        P5|
+|        U19   LS461 LS461                                 |
+|                                    U95          LS154    |
+|        U17   U43                   U94                 P6|
+|              U42                   U93                   |
+|        U16         LS461                                 |
+| U3                          U70  U92                     |
+|          U27 U40 JP2        U69  U91  U101               |
+| JP1      U26                U68  U90  JP3                |
+|  U1    14.31818MHz          U67  U89   U99      12MHz    |
+|----------------------------------------------------------|
+Notes:
+      U3 - 27C64 EPROM (first part of slave Z80 program)
+  U1/U99 - 40 pin flat cable joining to top board
+ U67-U70 - 27C128 EPROM (graphics). U68 & U70 not populated
+ U89-U92 - 27C128 EPROM (graphics). U89 & U91 not populated
+ U93-U95 - 27C256 EPROM (graphics)
+ JP1/1/2 - Jumpers all set to 1-2
+   LS461 - 74LS461 Octal Counter. These are said to be PALs programmed as LS461 but some appears to be actual LS461 logic chips.
+   LS154 - 74LS154 4-Line to 16-Line Decoder/Demultiplexer
+    6116 - 2kBx8-bit SRAM. Chips near P1 are for the slave Z80 program RAM. Chips near P2 are for the master Z80 program RAM.
+    U101 - Empty socket
+    4464 - 4464 64kBx4-bit DRAM (graphics RAM)
+    2148 - 1kBx4-bit SRAM (color RAM)
+    8910 - AY-3-8910 Programmable Sound Generator
+    8912 - AY-3-8912 Programmable Sound Generator (not populated). The 8910 does not use the extra features so either this or the 8910 can be used.
+       X - 2 wires connected to pins 5 & 6 of the not-populated 8912 chip and joining to J9 on the top board
+   LM324 - ST Microelectronics LM324 Quad Operational Amplifier
+     VOL - Volume Pot
+    7815 - ST L7815 Voltage Regulator
+ TDA2002 - ST TDA2002 Audio Power Amplifier
+     SW1 - Reset Switch
+      P1 - 10 pin connector for R,G,B and separate H & V sync outputs
+      P2 - 2 pin connector for audio output to speakers
+      P3 - 10 pin connector for power input from top board
+      P4 - 10 pin connector for coin/service
+      P5 - 10 pin connector for nitro buttons
+      P6 - 10 pin connector (not used?)
+     U96 - PAL16L8 labelled '01-01'
+     U85 - PAL16L8 labelled '02-22'
+     U16 - PAL16L8 labelled '03-01'
+     U17 - PAL16L8 labelled '04-01'
+     U21 - PAL20X10 labelled '05-01'
+     U19 - PAL20X10 labelled '06-01'
+     U43 - PAL16R8 labelled '07-01'
+     U42 - PAL16R4 labelled '08-01'
+     U40 - PAL16R8 labelled '09-01'
+     U26 - PAL16R8 labelled '10-01'
+     U27 - PAL16R8 labelled '11-01'
+   HSync - 16.8822kHz \
+   VSync - 65.9459Hz  / Yes really.... not a typo ;-)
+
+****************************************************************************
+
     To enter service mode in most games, press 1P start and then press
     the service coin.
 

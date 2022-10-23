@@ -58,7 +58,7 @@ vcs_keypad_device::vcs_keypad_device(const machine_config &mconfig, const char *
 	device_t(mconfig, VCS_KEYPAD, tag, owner, clock),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_keypad(*this, "KEYPAD"),
-	m_column(0)
+	m_row(0)
 {
 }
 
@@ -69,8 +69,7 @@ vcs_keypad_device::vcs_keypad_device(const machine_config &mconfig, const char *
 
 void vcs_keypad_device::device_start()
 {
-	m_column = 0;
-	save_item(NAME(m_column));
+	save_item(NAME(m_row));
 }
 
 
@@ -78,64 +77,26 @@ void vcs_keypad_device::device_start()
 //  vcs_joy_w - joystick write
 //-------------------------------------------------
 
-uint8_t vcs_keypad_device::vcs_joy_r()
+void vcs_keypad_device::vcs_joy_w(uint8_t data)
 {
-	for ( int i = 0; i < 4; i++ )
-	{
-		if ( ! ( ( m_column >> i ) & 0x01 ) )
-		{
-			if ( ( m_keypad->read() >> 3*i ) & 0x04 )
-			{
-				return 0xff;
-			}
-			else
-			{
-				return 0;
-			}
-		}
-	}
-	return 0xff;
+	m_row = data & 0x0f;
 }
 
-void vcs_keypad_device::vcs_joy_w( uint8_t data )
+uint8_t vcs_keypad_device::read_keys(uint8_t col)
 {
-	m_column = data & 0x0F;
-}
+	uint8_t val = 0;
 
-uint8_t vcs_keypad_device::vcs_pot_x_r()
-{
-	for ( int i = 0; i < 4; i++ )
+	for (int row = 0; row < 4; row++)
 	{
-		if ( ! ( ( m_column >> i ) & 0x01 ) )
+		if (!BIT(m_row, row))
 		{
-			if ( ( m_keypad->read() >> 3*i ) & 0x01 )
+			if (!BIT(m_keypad->read(), 3*row + col))
 			{
-				return 0;
+				val = 0xff;
 			}
-			else
-			{
-				return 0xff;
-			}
+			break;
 		}
 	}
-	return 0;
-}
 
-uint8_t vcs_keypad_device::vcs_pot_y_r()
-{
-	for ( int i = 0; i < 4; i++ )
-	{
-		if ( ! ( ( m_column >> i ) & 0x01 ) )
-		{
-			if ( ( m_keypad->read() >> 3*i ) & 0x02 )
-			{
-				return 0;
-			}
-			else
-			{
-				return 0xff;
-			}
-		}
-	}
-	return 0;
+	return val;
 }

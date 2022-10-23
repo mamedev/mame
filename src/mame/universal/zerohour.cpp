@@ -6,7 +6,7 @@ Zero Hour / Red Clash
 
 runs on hardware similar to Lady Bug
 
-driver by inkling
+initial driver by inkling
 
 Notes:
 - In the Tehkan set (redclashta) the ship doesn't move during attract mode.
@@ -40,6 +40,7 @@ BTANB:
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/clock.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/spkrdev.h"
 #include "sound/samples.h"
@@ -84,8 +85,7 @@ protected:
 	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	void star_reset_w(u8 data);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(star_w);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sample_w);
-	virtual DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
 
 	void palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -109,6 +109,9 @@ protected:
 	int m_sound_on = 0;
 	int m_sample_asteroid = 0;
 	int m_gfxbank = 0; // redclash only
+
+private:
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sample_w);
 };
 
 // redclash, adds background layer, one extra sound channel
@@ -118,6 +121,7 @@ public:
 	redclash_state(const machine_config &mconfig, device_type type, const char *tag)
 		: zerohour_state(mconfig, type, tag)
 		, m_beep_clock(*this, "beep_clock")
+		, m_beep_trigger(*this, "beep_trigger")
 		, m_beep(*this, "beep")
 	{ }
 
@@ -126,20 +130,24 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(sound_enable_w) override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
 	void background_w(u8 data);
-	void beeper_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(redclash_sample_w);
+	void beep_freq_w(u8 data) { m_beep_freq = data; }
+	DECLARE_WRITE_LINE_MEMBER(sample_w);
+	DECLARE_WRITE_LINE_MEMBER(beep_trigger_w);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beep_clock->set_period(attotime::never); }
 
 	void redclash_map(address_map &map);
 
 	required_device<clock_device> m_beep_clock;
+	required_device<timer_device> m_beep_trigger;
 	required_device<speaker_sound_device> m_beep;
 
 	u8 m_background = 0;
+	u8 m_beep_freq = 0;
 };
 
 void zerohour_state::init_zerohour()
@@ -167,6 +175,7 @@ void redclash_state::machine_start()
 	zerohour_state::machine_start();
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_background));
+	save_item(NAME(m_beep_freq));
 }
 
 
@@ -470,13 +479,6 @@ WRITE_LINE_MEMBER(zerohour_state::sound_enable_w)
 	m_sound_on = state;
 }
 
-WRITE_LINE_MEMBER(redclash_state::sound_enable_w)
-{
-	zerohour_state::sound_enable_w(state);
-	if (!state)
-		beeper_w(0);
-}
-
 template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::sample_w)
 {
 	int sample = N;
@@ -503,18 +505,24 @@ template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::sample_w)
 		m_samples->stop(N);
 }
 
-WRITE_LINE_MEMBER(redclash_state::redclash_sample_w)
+WRITE_LINE_MEMBER(redclash_state::sample_w)
 {
 	// only one sample
 	if (m_sound_on && state)
 		m_samples->start(0, 0);
 }
 
-void redclash_state::beeper_w(u8 data)
+WRITE_LINE_MEMBER(redclash_state::beep_trigger_w)
 {
-	// beeper frequency (0xff is off), preliminary
-	bool on = m_sound_on && (data != 0xff);
-	m_beep_clock->set_period(attotime::from_hz(on ? (data * 8 + 32) : 0));
+	if (state)
+	{
+		// enable beeper (timeout duration is guessed)
+		m_beep_trigger->adjust(attotime::from_msec(100));
+
+		// beeper frequency (0xff is off), preliminary
+		u16 freq = (m_beep_freq != 0xff) ? (m_beep_freq * 8 + 32) : 0;
+		m_beep_clock->set_period(attotime::from_hz(freq));
+	}
 }
 
 
@@ -543,7 +551,7 @@ void redclash_state::redclash_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x3000).w(FUNC(redclash_state::background_w));
-	map(0x3800, 0x3800).w(FUNC(redclash_state::beeper_w));
+	map(0x3800, 0x3800).w(FUNC(redclash_state::beep_freq_w));
 	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::videoram_w)).share(m_videoram);
 	map(0x4800, 0x4800).portr("IN0");
 	map(0x4801, 0x4801).portr("IN1");
@@ -855,7 +863,8 @@ void redclash_state::redclash(machine_config &config)
 	m_stars->has_va_bit(false);
 
 	// sound hardware
-	m_outlatch[0]->q_out_cb<0>().set(FUNC(redclash_state::redclash_sample_w));
+	m_outlatch[0]->q_out_cb<0>().set(FUNC(redclash_state::sample_w));
+	m_outlatch[0]->q_out_cb<4>().set(FUNC(redclash_state::beep_trigger_w));
 	m_outlatch[1]->q_out_cb<2>().set(FUNC(redclash_state::sound_enable_w));
 
 	SPEAKER(config, "mono").front_center();
@@ -864,6 +873,8 @@ void redclash_state::redclash(machine_config &config)
 	CLOCK(config, m_beep_clock, 0);
 	m_beep_clock->signal_handler().set(m_beep, FUNC(speaker_sound_device::level_w));
 	m_beep_clock->set_duty_cycle(0.2);
+
+	TIMER(config, "beep_trigger").configure_generic(FUNC(redclash_state::beeper_off));
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);

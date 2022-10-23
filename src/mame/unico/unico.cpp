@@ -28,6 +28,7 @@ Year + Game         PCB             Notes
 #include "unico.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"

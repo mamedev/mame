@@ -289,6 +289,7 @@ gamepark/gp32.cpp
 gridcomp/gridcomp.cpp
 grundy/newbrain.cpp
 h01x/h01x.cpp
+handheld/gmaster.cpp
 handheld/hh_cop400.cpp
 handheld/hh_cops1.cpp
 handheld/hh_hmcs40.cpp
@@ -309,7 +310,6 @@ handheld/talkingfb.cpp
 handheld/tispeak.cpp
 handheld/tispellb.cpp
 handheld/wildfire.cpp
-hartung/gmaster.cpp
 hds/hds200.cpp
 heathkit/et3400.cpp
 heathkit/h19.cpp
@@ -415,13 +415,13 @@ intel/sdk86.cpp
 intergraph/interpro.cpp
 interton/vc4000.cpp
 isc/compucolor.cpp
-kawai/kawai_acr20.cpp
-kawai/kawai_k1.cpp
-kawai/kawai_k4.cpp
-kawai/kawai_k5.cpp
-kawai/kawai_ksp10.cpp
-kawai/kawai_r100.cpp
-kawai/kawai_sx240.cpp
+kawai/acr20.cpp
+kawai/k1.cpp
+kawai/k4.cpp
+kawai/k5.cpp
+kawai/ksp10.cpp
+kawai/r100.cpp
+kawai/sx240.cpp
 kaypro/kaypro.cpp
 koei/pasogo.cpp
 kontron/kdt6.cpp
@@ -524,6 +524,7 @@ ncd/ncd88k.cpp
 ncd/ncdmips.cpp
 ncd/ncdppc.cpp
 nec/apc.cpp
+nec/bungo.cpp
 nec/ews4800.cpp
 nec/pc100.cpp
 nec/pc6001.cpp
@@ -551,6 +552,8 @@ nintendo/n64.cpp
 nintendo/nds.cpp
 nintendo/nes.cpp
 nintendo/nes_clone.cpp
+nintendo/nes_m8.cpp
+nintendo/nes_m82.cpp
 nintendo/nes_sh6578.cpp
 nintendo/nes_vt02_vt03.cpp
 nintendo/nes_vt09.cpp
@@ -754,6 +757,7 @@ siemens/pg685.cpp
 sinclair/atm.cpp
 sinclair/elwro800.cpp
 sinclair/pentagon.cpp
+sinclair/pentevo.cpp
 sinclair/ql.cpp
 sinclair/scorpion.cpp
 sinclair/spec128.cpp
@@ -815,9 +819,11 @@ skeleton/design.cpp
 skeleton/diablo1300.cpp
 skeleton/didact.cpp
 skeleton/digel804.cpp
+skeleton/digiblast.cpp
 skeleton/digijet.cpp
 skeleton/digilog320.cpp
 skeleton/digilog400.cpp
+skeleton/digitech_gsp5.cpp
 skeleton/dim68k.cpp
 skeleton/dm7000.cpp
 skeleton/dmv.cpp
@@ -1258,6 +1264,7 @@ yamaha/ymmu80.cpp
 yamaha/ympsr16.cpp
 yamaha/ympsr340.cpp
 yamaha/ympsr40.cpp
+yamaha/ympsr400.cpp
 yamaha/ympsr60.cpp
 yamaha/ymqy70.cpp
 yamaha/ymrx15.cpp

@@ -127,7 +127,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
-	virtual void rom_bank_updated() override { }
 };
 
 DECLARE_DEVICE_TYPE(SEI80BU, sei80bu_device)

@@ -66,6 +66,8 @@ For Model III:
 #include "emupal.h"
 #include "softlist_dev.h"
 
+#include "utf8.h"
+
 class meritum_state : public trs80_state
 {
 public:

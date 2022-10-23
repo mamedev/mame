@@ -72,7 +72,7 @@
 #include "tc0100scn.h"
 #include "tc0480scp.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"

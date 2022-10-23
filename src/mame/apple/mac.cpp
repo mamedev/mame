@@ -20,7 +20,8 @@
 
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/applepic.h"
 #include "machine/iwm.h"
@@ -554,18 +555,6 @@ void mac_state::add_via2(machine_config &config)
 	m_via2->irq_handler().set(FUNC(mac_state::mac_via2_irq));
 }
 
-void mac_state::add_egret(machine_config &config, int type)
-{
-	EGRET(config, m_egret, type);
-	m_egret->reset_callback().set(FUNC(mac_state::egret_reset_w));
-	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
-	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->set_mcu_mode(true);
-	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
-	config.set_perfect_quantum(m_maincpu);
-}
-
 void mac_state::add_asc(machine_config &config, asc_device::asc_type type)
 {
 	SPEAKER(config, "lspeaker").front_left();
@@ -633,10 +622,16 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 	add_via1_adb(config, true);
 	add_via2(config);
 
+	ADBMODEM(config, m_adbmodem, C7M);
+	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->irq_callback().set(FUNC(mac_state::adb_irq_w));
+	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
+	config.set_perfect_quantum(m_maincpu);
+
 	MACADB(config, m_macadb, C15M);
-	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
+	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
@@ -781,10 +776,16 @@ void mac_state::macse30(machine_config &config)
 	add_via1_adb(config, false);
 	add_via2(config);
 
+	ADBMODEM(config, m_adbmodem, C7M);
+	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->irq_callback().set(FUNC(mac_state::adb_irq_w));
+	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
+	config.set_perfect_quantum(m_maincpu);
+
 	MACADB(config, m_macadb, C15M);
-	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
+	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
@@ -816,11 +817,24 @@ void mac_state::maciici(machine_config &config)
 
 void mac_state::maciisi(machine_config &config)
 {
-	macii(config, false, asc_device::asc_type::ASC, false, true, true, 1);
-
 	M68030(config, m_maincpu, 20000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+
+	PALETTE(config, m_palette).set_entries(256);
+
+	add_asc(config, asc_device::asc_type::ASC);
+	add_base_devices(config, true, 1);
+	add_scsi(config, true);
+
+	add_via1_adb(config, true);
+	add_via2(config);
+
+	RAM(config, m_ram);
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("8M,32M,64M,96M,128M");
+
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
@@ -833,9 +847,16 @@ void mac_state::maciisi(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,8M,16M,32M,48M,64M,128M");
 
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_egadb));
+	MACADB(config, m_macadb, C15M);
 
-	add_egret(config, EGRET_344S0100);
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_egadb));
+	EGRET(config, m_egret, EGRET_344S0100);
+	m_egret->reset_callback().set(FUNC(mac_state::egret_reset_w));
+	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
+	config.set_perfect_quantum(m_maincpu);
 }
 
 static INPUT_PORTS_START( macadb )

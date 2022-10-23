@@ -3561,7 +3561,6 @@ by a motor. The arm probably has a 5k potentiometer connected to it to give feed
 hardware about the position of the mechanical arm.
 The opponents get progressively harder and harder, it's almost impossible to beat the final
 few opponents unless you have a few friends handy to swing on the arm ;-))
-Arm Champs II appears to be a simple ROM upgrade on Arm Champs hardware.
 The hardware appears to be similar to Jaleco's 'Grand Prix Star' etc, using many of
 the same custom IC's, and even some of the same ROMs.
 
@@ -3890,23 +3889,23 @@ void captflag_state::init_captflag()
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, Europe?)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
-GAMEL( 1989, bigrunu,   bigrun,   bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, US?)",     MACHINE_NODEVICE_LAN, layout_cischeat )
+GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state,  init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, Europe?)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1989, bigrunu,   bigrun,   bigrun,   bigrun,   cischeat_state,  init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, US?)",     MACHINE_NODEVICE_LAN, layout_cischeat )
 
-GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
+GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state,  init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
 
-GAMEL( 1992, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 4.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAMEL( 1991, f1gpstar3, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 3.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAMEL( 1991, f1gpstar2, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 2.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1992, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state,  init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 4.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstar3, f1gpstar, f1gpstar, f1gpstar, cischeat_state,  init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 3.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstar2, f1gpstar, f1gpstar, f1gpstar, cischeat_state,  init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 2.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 
-GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.7)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.6)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.7)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.6)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 
-GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,  init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
+GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,   init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
 
-GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state,  init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 
-GAME(  1993, captflag,  0,        captflag, captflag, captflag_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",                   MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1993, captflag,  0,        captflag, captflag, captflag_state,  init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",                   MACHINE_IMPERFECT_GRAPHICS )
 
-GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                            MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state,  empty_init,    ROT270, "Jaleco", "Scud Hammer",                            MACHINE_IMPERFECT_GRAPHICS )

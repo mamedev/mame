@@ -42,9 +42,12 @@ void msx_cart_easispeech_device::device_add_mconfig(machine_config &config)
 
 uint8_t msx_cart_easispeech_device::read_cart(offs_t offset)
 {
-	if (offset >= 0x4000 && offset < 0x6000)
+	// standard ROM
+	if (offset >= 0x4000 && offset < 0x8000)
 		return get_rom_base()[offset & 0x1fff];
-	if (offset >= 0x8000 && offset < 0xa000)
+
+	// d7: SP0256 LRQ
+	if (offset == 0x8000)
 		return m_speech->lrq_r() << 7;
 
 	return 0xff;
@@ -52,6 +55,7 @@ uint8_t msx_cart_easispeech_device::read_cart(offs_t offset)
 
 void msx_cart_easispeech_device::write_cart(offs_t offset, uint8_t data)
 {
-	if (offset >= 0x8000 && offset < 0xa000)
+	// d2-d7: SP0256 A
+	if (offset == 0x8000)
 		m_speech->ald_w(bitswap<6>(data,3,5,7,6,4,2));
 }

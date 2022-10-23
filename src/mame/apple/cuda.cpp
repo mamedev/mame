@@ -433,6 +433,25 @@ void cuda_device::device_start()
 	if (rom)
 	{
 		memcpy(rom, rom+rom_offset, 0x1100);
+
+		// HACK: there's as-yet undiagnosed weirdness in the 6805 program where the ADB
+		// autopoll timer never reaches zero and polling never occurs.  This patches
+		// the idle loop so polling runs.
+		// in 2.40:
+		// 101B: tst autopoll_timer (0x90)
+		// 101D: bne adb_poll_loop
+		// 101F: brset 7, flags, run_auto_poll
+
+		switch (rom_offset)
+		{
+			case CUDA_341S0060:
+				rom[0x101d-0xf00] = 0x27;   // patch for 2.40 (BNE to BEQ)
+				break;
+
+			case CUDA_341S0788:
+				rom[0x1035-0xf00] = 0x27;   // patch for 2.37 (BNE to BEQ)
+				break;
+		}
 	}
 }
 

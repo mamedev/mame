@@ -100,20 +100,4 @@ public:
 } // namespace util
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/* ----- filename utilities ----- */
-
-// extract the base part of a filename (remove extensions and paths)
-std::string_view core_filename_extract_base(std::string_view name, bool strip_extension = false) noexcept;
-
-// extracts the file extension from a filename
-std::string_view core_filename_extract_extension(std::string_view filename, bool strip_period = false) noexcept;
-
-// true if the given filename ends with a particular extension
-bool core_filename_ends_with(std::string_view filename, std::string_view extension) noexcept;
-
-
 #endif // MAME_LIB_UTIL_COREFILE_H

@@ -1557,25 +1557,19 @@ void asap_device::ashl_c0()
 
 void asap_device::rotl()
 {
-	uint32_t src1 = SRC1VAL;
-	uint32_t src2 = SRC2VAL & 31;
-	DSTVAL = (src1 << src2) | (src1 >> (32 - src2));
+	DSTVAL = rotl_32(SRC1VAL, SRC2VAL);
 }
 
 void asap_device::rotl_c()
 {
-	uint32_t src1 = SRC1VAL;
-	uint32_t src2 = SRC2VAL & 31;
-	uint32_t dst = (src1 << src2) | (src1 >> (32 - src2));
+	uint32_t dst = rotl_32(SRC1VAL, SRC2VAL);
 	SET_ZN(dst);
 	DSTVAL = dst;
 }
 
 void asap_device::rotl_c0()
 {
-	uint32_t src1 = SRC1VAL;
-	uint32_t src2 = SRC2VAL & 31;
-	uint32_t dst = (src1 << src2) | (src1 >> (32 - src2));
+	uint32_t dst = rotl_32(SRC1VAL, SRC2VAL);
 	SET_ZN(dst);
 }
 

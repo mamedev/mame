@@ -1400,7 +1400,7 @@ ROM_START( cobrata )
 	ROM_LOAD( "cbr1verb_spr.ic002", 0x800000, 0x040000, CRC(65aaadcf) SHA1(5cc642f71bef3b5e44db5e999e8abccca7fdaa4c) )
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "cbr1-ha", 0, SHA1(a20d4ace91a2f2caab0804ebdf62c87ab267239b) )
+	DISK_IMAGE_READONLY( "cbr1-ha", 0, SHA1(aaaa389c6c0779c2177d2742b00f24ebe7039937) )
 ROM_END
 
 ROM_START( rrvac )

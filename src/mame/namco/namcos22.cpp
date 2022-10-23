@@ -1083,7 +1083,7 @@ Notes:
 #include "emu.h"
 #include "namcos22.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/tms32025/tms32025.h"
 #include "speaker.h"
 

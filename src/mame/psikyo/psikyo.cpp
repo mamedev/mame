@@ -82,7 +82,7 @@ This was pointed out by Bart Puype
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/lz8420m.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
@@ -1191,7 +1191,7 @@ void psikyo_state::s1945(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
+	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL)); // YMF268-K instead on some PCBs
 	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 

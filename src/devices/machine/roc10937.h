@@ -42,6 +42,7 @@ protected:
 	int m_duty;
 	int m_disp;
 	int m_sclk;
+	int m_por;
 	uint8_t m_cursor;
 	uint32_t m_chars[16];
 

@@ -545,6 +545,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="aitdnnp" cloneof="aitdnn">
+		<description>Alone in the Dark - The New Nightmare (Europe, prototype)</description>
+		<year>2001</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="alone in the dark (prototype).bin" size="0x400000" crc="7c101475" sha1="120e2dd012cfe47a7e37cc91fcbbce92494bdf2a"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aitdnnu" cloneof="aitdnn">
 		<description>Alone in the Dark - The New Nightmare (USA)</description>
 		<year>2001</year>
@@ -1490,7 +1505,7 @@ license:CC0
 	</software>
 
 	<software name="barbieoci" cloneof="barbieoc">
-		<description>Barbie - Avventure nell'Oceano (Italia)</description>
+		<description>Barbie - Avventure nell'Oceano (Italy)</description>
 		<year>1999</year>
 		<publisher>Mattel Media</publisher>
 		<info name="serial" value="DMG-ADYI-ITA"/>
@@ -4927,7 +4942,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbz">
+	<software name="dbz" supported="no">
 		<description>Dragon Ball Z - Legendary Super Warriors (Europe)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -4943,7 +4958,22 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzj" cloneof="dbz">
+	<software name="dbzp" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Legendary Super Warriors (Europe, prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (english prototype - all features unlocked).bin" size="0x200000" crc="4ec4f8ed" sha1="073eb096c0454032d8632549ad4c60adc5b8cf9a"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzj" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Densetsu no Chou Senshi-tachi (Japan)</description>
 		<year>2002</year>
 		<publisher>Banpresto</publisher>
@@ -4961,7 +4991,39 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzf" cloneof="dbz">
+	<software name="dbzjp" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Densetsu no Chou Senshi-tachi (Japan, prototype, cheats enabled)</description>
+		<year>2002</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="ドラゴンボールZ伝説の超戦士たち"/>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (japanese prototype - cheat).bin" size="0x200000" crc="fb942e08" sha1="075f4a1498d0b5f98f76984aca52ca1f03b1f85d"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzjp1" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Densetsu no Chou Senshi-tachi (Japan, prototype)</description>
+		<year>2002</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="ドラゴンボールZ伝説の超戦士たち"/>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (japanese prototype).bin" size="0x200000" crc="3f511f57" sha1="45f5a6fa7eff38b1bb8786472d0eeadf58f692a8"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzf" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Les Guerriers Légendaires (France)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -4977,7 +5039,22 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzg" cloneof="dbz">
+	<software name="dbzfp" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Les Guerriers Légendaires (France, prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (french prototype).bin" size="0x200000" crc="f4041d28" sha1="72e25b25b9f2516879648e0051bb8ad8d4069003"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzg" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -4999,8 +5076,68 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzi" cloneof="dbz">
-		<description>Dragon Ball Z - I Leggendari Super Guerrieri (Italia)</description>
+	<software name="dbzgp" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany, prototype, all features unlocked)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (german prototype - all features unlocked).bin" size="0x200000" crc="f646bd3b" sha1="08a947763c36f4ad64f51c388da863d5852540a1"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzgp1" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany, prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (german prototype).bin" size="0x200000" crc="72acbcb4" sha1="4b22b1949aed367036a84e0e7d36dd0a57bdd11f"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzgp2" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany, prototype, 20020411)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (german prototype - 11 04 02 no cheat).bin" size="0x200000" crc="2353bbe4" sha1="b93c142b6da94c7d69956011ccbda9f22e5fae9f"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzgp3" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Legendäre Superkämpfer (Germany, prototype, 20020320)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (german prototype - 1 3 20 03 02).bin" size="0x200000" crc="276f7895" sha1="3e2ba8228b0e804f2e581af5cc1e4bb95a8c9354"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzi" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - I Leggendari Super Guerrieri (Italy)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="CGB-BBZI-ITA"/>
@@ -5021,7 +5158,22 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzs" cloneof="dbz">
+	<software name="dbzip" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - I Leggendari Super Guerrieri (Italy, prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (italian prototype - all features unlocked).bin" size="0x200000" crc="35790637" sha1="621571759c021b564339efdc969d9bcef4c908dc"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzs" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Guerreros de Leyenda (Spain)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -5037,7 +5189,37 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dbzu" cloneof="dbz">
+	<software name="dbzsp" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Guerreros de Leyenda (Spain, prototype, all features unlocked)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (spanish prototype - all features unlocked).bin" size="0x200000" crc="d7654e34" sha1="ac3b5f50578210a29ce08e7e89d456cfc16b5ae9"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzsp1" cloneof="dbz" supported="no">
+		<description>Dragon Ball Z - Guerreros de Leyenda (Spain, prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z - legendary super warriors (spanish prototype).bin" size="0x200000" crc="f017924f" sha1="ad8235817bec5165a16478301cbfa7fa7d090ecf"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzu" cloneof="dbz" supported="no">
 		<description>Dragon Ball Z - Legendary Super Warriors (USA)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -16202,7 +16384,7 @@ license:CC0
 	</software>
 
 	<software name="pokecrysi" cloneof="pokecrys">
-		<description>Pokémon - Versione Cristallo (Italia)</description>
+		<description>Pokémon - Versione Cristallo (Italy)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTI-ITA"/>
@@ -16312,7 +16494,7 @@ license:CC0
 	</software>
 
 	<software name="pokegoldi" cloneof="pokegold">
-		<description>Pokémon - Versione Oro (Italia)</description>
+		<description>Pokémon - Versione Oro (Italy)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AAUI-ITA"/>
@@ -16410,7 +16592,7 @@ license:CC0
 	</software>
 
 	<software name="pokesilvi" cloneof="pokesilv">
-		<description>Pokémon - Versione Argento (Italia)</description>
+		<description>Pokémon - Versione Argento (Italy)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AAXI-ITA"/>
@@ -24330,7 +24512,7 @@ license:CC0
 	</software>
 
 	<software name="yugiddsi" cloneof="yugidds">
-		<description>Yu-Gi-Oh! - Racconti Oscuri (Italia)</description>
+		<description>Yu-Gi-Oh! - Racconti Oscuri (Italy)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BY3I-ITA"/>
@@ -24794,7 +24976,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="atv racing &amp; karate joe (europe) (unl).bin" size="524288" crc="a07b6e79" sha1="3701028d66564625933a3868340813e6d7c36b7b"/>
 			</dataarea>
@@ -24810,7 +24992,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="atv racing &amp; karate joe (europe) (alternate) (unl).bin" size="524288" crc="6908f4af" sha1="95287b440139e88d90700f892d1da60aaa4da778"/>
 			</dataarea>
@@ -24824,7 +25006,7 @@ license:CC0
 		<year>2001</year>
 		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="atv racing (europe) (unl).bin" size="262144" crc="7987d5cd" sha1="b3c6c2970c3bfa95fb2eef10e2160f55f52d8e1a"/>
 			</dataarea>
@@ -24840,7 +25022,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="full time soccer &amp; hang time basketball (europe) (unl).bin" size="524288" crc="0634c196" sha1="aefb746984b3450b90bbfaa5de21a252685ddabb"/>
 			</dataarea>
@@ -24854,7 +25036,7 @@ license:CC0
 		<year>2000</year>
 		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="full time soccer (europe) (unl).bin" size="262144" crc="b99beda2" sha1="a2b1268df08b583d033999b894638dadf32e37f4"/>
 			</dataarea>
@@ -24869,7 +25051,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="hang time basketball (europe) (unl).bin" size="262144" crc="3207b7d9" sha1="340201c045c020be6de3504fdecbce1ff07a2139"/>
 			</dataarea>
@@ -24885,7 +25067,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket smash out &amp; race time (europe) (unl).bin" size="524288" crc="0ad5b775" sha1="01f68a0a45408da9892b8cc0a4a9c688dcdd9618"/>
 			</dataarea>
@@ -24898,7 +25080,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="pocket smash out (europe) (unl).bin" size="262144" crc="cbd14276" sha1="0a721164053a8b2765ea9826a0958415701ca6f5"/>
 			</dataarea>
@@ -24914,7 +25096,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="karate joe (europe) (unl).bin" size="262144" crc="b8a54e29" sha1="bc9e760dcc851a01240b49b28cde8fe5ab18df91"/>
 			</dataarea>
@@ -24926,7 +25108,7 @@ license:CC0
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="painter (europe) (unl).bin" size="262144" crc="f4801f21" sha1="78db482d1d12b4556b6a5b995ce37a2435236a06"/>
 			</dataarea>
@@ -24939,7 +25121,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="race time (europe) (unl).bin" size="262144" crc="599c867d" sha1="157f15e601dfb858630a53313b71e4ecd0bb13e1"/>
 			</dataarea>
@@ -24953,7 +25135,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="space invasion &amp; karate joe (europe) (unl).bin" size="524288" crc="6a184c55" sha1="96918cbd3648b227eb43e5a9711d1a9939541bea"/>
 			</dataarea>
@@ -24969,7 +25151,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="space invasion &amp; painter (europe) (unl).bin" size="524288" crc="bd4c1065" sha1="a5bf26ed894576dada84f6925cc659980cf150a0"/>
 			</dataarea>
@@ -24985,7 +25167,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="131072">
 				<rom name="space invasion (europe) (unl).bin" size="131072" crc="2b2d9868" sha1="bcf0940375a23bca6957eec2ab8e49af695aeb32"/>
 			</dataarea>
@@ -25931,11 +26113,12 @@ license:CC0
 
 <!-- Other Asian Pirate dumps to sort -->
 
-	<software name="188in1" supported="partial">
+	<software name="188in1">
 	<!-- This dump comes from the "GBCK003" board that's soldered inside some GB Boy Colour units -->
 		<description>Color GameBoy 188 in 1 (Hong Kong)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Use hard reset to return to game selection menu." />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="GBCK003" />
 			<feature name="slot" value="rom_gbck003" />
@@ -26287,11 +26470,10 @@ license:CC0
 		<info name="alt_title" value="2003哈利波特2-消失的密室 ~ 2003 Harry Potter 2 - Xiao Shi De Mi Shi"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="2003 ha li bo te 2 - xiao shi de mi shi (unlicensed, chinese) [raw dump].bin" size="2097152" crc="1b3e1243" sha1="0829cbcab3ef5d03c94d5efe769f4f4a93ac47fa"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="2003 ha li bo te 2 - xiao shi de mi shi (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="1b3e1243" sha1="0829cbcab3ef5d03c94d5efe769f4f4a93ac47fa"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
+			<dataarea name="nvram" size="8192" />
 		</part>
 	</software>
 
@@ -26302,8 +26484,8 @@ license:CC0
 		<info name="alt_title" value="哈利小子IV, 2003哈利小子IV ~ 2003 Ha Li Xiao Zi IV (Cart)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="2003 ha li xiao zi iv (unlicensed, chinese) [raw dump].bin" size="2097152" crc="db3c8b95" sha1="0d230b20388f4396d6345b8eb59f54fc169ad8ee"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="2003 ha li xiao zi iv (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="db3c8b95" sha1="0d230b20388f4396d6345b8eb59f54fc169ad8ee"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -26317,8 +26499,8 @@ license:CC0
 		<info name="alt_title" value="女王格鬥2000"/> <!-- translates to "Queen Fight 2000" -->
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_vf001" />
-			<dataarea name="rom" size="2097152">
-				<rom name="Nv Wang Ge Dou 2000 (Unl) [C] [Raw].gbc" size="2097152" crc="e1668b49" sha1="37516139aa317a16440379c1dc00bdfc4c1e607a"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="nuwang gedou.gbc" size="0x200000" crc="e1668b49" sha1="37516139aa317a16440379c1dc00bdfc4c1e607a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26330,8 +26512,97 @@ license:CC0
 		<info name="alt_title" value="超級格鬥2001α"/> <!-- translates to "Super Fight 2001 Alpha" -->
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_vf001" />
-			<dataarea name="rom" size="2097152">
-				<rom name="Chao Ji Ge Dou 2001 Alpha (Unl) [C] [Raw].gbc" size="2097152" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="chaoju gedou 2001 alpha.gbc" size="0x200000" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- graphical hack of The Smurfs' Nightmare -->
+	<!-- has also been dumped with unused byte at 0xA3B86 having value 0x2A rather than 0x0A (probably bitrot) -->
+	<software name="kdgsdzp">
+		<description>Kǒudài Guàishòu - Dòngzuò Piān (China)</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="口袋怪獸-動作篇" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="HK0819" />
+			<feature name="slot" value="rom_newgbchk" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="koudai guaishou dongzuo pian.gbc" size="0x100000" crc="14355371" sha1="f398086d1f8cb435a632e5ea45fb19e980b0568d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- graphical hack of Kirby's Dream Land 2 -->
+	<software name="gsgogo2">
+		<description>Guàishòu Go! Go! Ⅱ (China)</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="怪獸 Go! Go! Ⅱ" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="HK0701" />
+			<feature name="slot" value="rom_newgbchk" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="guaishou go go ii.gbc" size="0x100000" crc="b0237467" sha1="8ed6f39a9973d634266806455ef845b6bdb5ab95" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000" />
+		</part>
+	</software>
+
+	<software name="vf12in1">
+		<description>Yín Bǎn Zhōngwén RPG Zhànlüè + Dòngzuò + Yìzhì 12 in 1</description>
+		<year>200?</year>
+		<publisher>Vast Fame</publisher>
+		<info name="alt_title" value="銀版中文RPG戰略+動作+益智12in1" />
+		<info name="usage" value="Use hard reset to return to game selection menu." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_slmulti" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="yin ban zhongwen rpg zhanlue dongzuo yizhi 12 in 1.gbc" size="0x800000" crc="dc3171ad" sha1="bfb93e7b4b523ef21c2b98ba9dcb15eb7d4f07e4" />
+			</dataarea>
+			<dataarea name="nvram" size="0x20000" />
+		</part>
+	</software>
+
+	<software name="vf18in1">
+		<description>Shǐshàng Chāoqiáng RPG + Gédòu + Yìzhì Bǎn Zǔhé Kǎ 18 in 1</description>
+		<year>200?</year>
+		<publisher>Vast Fame</publisher>
+		<info name="alt_title" value="史上超強RPG+格鬥+益智版組合卡18in1" />
+		<info name="usage" value="Use hard reset to return to game selection menu." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_slmulti" />
+			<dataarea name="rom" size="0x1000000">
+				<rom name="shishang chaoqiang rpg + gedou + yizhi ban zuhe ka 18 in 1.gbc" size="0x1000000" crc="28519ab1" sha1="b4c81c2b1d7f787ee92f38d45c86fe602c0aba22" />
+			</dataarea>
+			<dataarea name="nvram" size="0x20000" />
+		</part>
+	</software>
+
+	<software name="sl36in1">
+		<description>36 in 1 (SL36-0032)</description>
+		<year>200?</year>
+		<publisher>SL?</publisher>
+		<info name="usage" value="Use hard reset to return to game selection menu." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_slmulti" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="36 in 1 sl36-0032.gbc" size="0x400000" crc="f68d980a" sha1="63181a86fa4a653744e9c393aa9f113e981d9cc7" />
+			</dataarea>
+			<dataarea name="nvram" size="0x20000" />
+		</part>
+	</software>
+
+	<software name="jy145in1">
+		<description>New Super Color 145 in 1 (China)</description>
+		<year>200?</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Use hard reset to return to game selection menu." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_slmulti" />
+			<dataarea name="rom" size="0x1000000">
+				<rom name="new super color 145 in 1.gbc" size="0x1000000" crc="b087710c" sha1="cbeb1745d68163978a422a8d7260a6a0f2693b85" />
 			</dataarea>
 		</part>
 	</software>
@@ -26414,10 +26685,11 @@ license:CC0
 	<software name="pokesaphc" cloneof="pokesaph">
 	<!-- This dump is "unconfirmed", in the sense that later redumps have resulted in inconsistent reads (none working except this one) -->
 	<!-- 4MB rom with crc 3a08c8eb is taizou's cracked version running on base MBC5 -->
-		<description>Koudai Guaishou - Lanbaoshi (China)</description>
+		<description>Kǒudài Guàishòu - Lánbǎoshí (China)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
-		<info name="alt_title" value="口袋怪獸 - 藍寶石, 2003 口袋怪獸-藍寶石 (Cart)"/>
+		<info name="alt_title" value="口袋怪獸 - 藍寶石" />
+		<info name="alt_title" value="2003 口袋怪獸-藍寶石" /> <!-- on cartridge -->
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
 			<dataarea name="rom" size="2097152">
@@ -26726,10 +26998,10 @@ license:CC0
 		<info name="alt_title" value="真三國無雙2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="zhen san guo wu shuang 2 - shin sangokumusou 2 (chi)(unl) [raw dump].bin" size="2097152" crc="95c322c9" sha1="e6ab58d212de83cb18e9eadac4cee5d0f6e4e31f"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="zhen san guo wu shuang 2 - shin sangokumusou 2 (chi)(unl) [raw dump].bin" size="0x200000" crc="95c322c9" sha1="e6ab58d212de83cb18e9eadac4cee5d0f6e4e31f"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
@@ -26741,10 +27013,37 @@ license:CC0
 		<info name="alt_title" value="真三國無雙2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="2097152">
-				<rom name="shin san guo shi 2 (unl).bin" size="2097152" crc="33f56c90" sha1="a5111c11cf70c65341b373f484650caae3c4d29f"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="shin san guo shi 2 (unl).bin" size="0x200000" crc="33f56c90" sha1="a5111c11cf70c65341b373f484650caae3c4d29f"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jueduiwl">
+		<description>Juéduì Wǔlì (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="絕對武力" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="juedui wuli.gbc" size="0x200000" crc="f4d63a7e" sha1="f0b9f02335ee89aa6189e687e6e759d8c49bc2b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wxtxxqdz">
+		<!-- not sure how the hiragana の (no) in the title should be read - assuming it's a stylised 之 -->
+		<description>Wàixīng Tànxiǎn zhī Xīngqiú Dàzhàn (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="外星探險の星球大戰" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="waixing tanxian xingqiu dazhan.gbc" size="0x200000" crc="4e600093" sha1="32067be39f0bdc354c31a7a02f24ba00b61ae4f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27569,7 +27868,7 @@ license:CC0
 	used here repeated twice. we need to redump the standalone cart to confirm the size
 	but the 256KB version is definitely underdumped and misses sprite data
 	-->
-		<description>Super Mario 3 Special (China)</description>
+	<description>Super Mario 3 Special (China)</description>
 		<year>2000</year>
 		<publisher>Yong Yong</publisher>
 		<part name="cart" interface="gameboy_cart">

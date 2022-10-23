@@ -26,7 +26,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return TC0110PCR_RAM_SIZE; }
+	virtual u32 palette_entries() const noexcept override { return TC0110PCR_RAM_SIZE; }
 
 private:
 	static const unsigned TC0110PCR_RAM_SIZE = 0x2000 / 2;

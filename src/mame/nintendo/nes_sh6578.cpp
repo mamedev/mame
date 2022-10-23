@@ -602,12 +602,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(nes_sh6578_state::timer_expired)
 }
 
 
-// from n2a03.h verify that it actually uses these
-#define N2A03_NTSC_XTAL           XTAL(21'477'272)
-#define N2A03_PAL_XTAL            XTAL(26'601'712)
-#define NTSC_APU_CLOCK      (N2A03_NTSC_XTAL/12) /* 1.7897726666... MHz */
-#define PAL_APU_CLOCK       (N2A03_PAL_XTAL/16) /* 1.662607 MHz */
-#define PALC_APU_CLOCK      (N2A03_PAL_XTAL/15) /* 1.77344746666... MHz */
+// from rp2a03.h verify that it actually uses these
+#define RP2A03_NTSC_XTAL           XTAL(21'477'272)
+#define RP2A03_PAL_XTAL            XTAL(26'601'712)
+#define NTSC_APU_CLOCK      (RP2A03_NTSC_XTAL/12) /* 1.7897726666... MHz */
+#define PAL_APU_CLOCK       (RP2A03_PAL_XTAL/16) /* 1.662607 MHz */
+#define PALC_APU_CLOCK      (RP2A03_PAL_XTAL/15) /* 1.77344746666... MHz */
 
 uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
@@ -617,12 +617,12 @@ uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bi
 void nes_sh6578_state::nes_sh6578(machine_config& config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, NTSC_APU_CLOCK); // regular M6502 core, not N2A03?
+	M6502(config, m_maincpu, NTSC_APU_CLOCK); // regular M6502 core, not RP2A03?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_sh6578_state::nes_sh6578_map);
 
 	ADDRESS_MAP_BANK(config, m_fullrom).set_map(&nes_sh6578_state::rom_map).set_options(ENDIANNESS_NATIVE, 8, 20, 0x100000);
 
-	PPU_SH6578(config, m_ppu, N2A03_NTSC_XTAL);
+	PPU_SH6578(config, m_ppu, RP2A03_NTSC_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
@@ -654,7 +654,7 @@ void nes_sh6578_state::nes_sh6578_pal(machine_config& config)
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 	m_apu->set_clock(PALC_APU_CLOCK);
 
-	PPU_SH6578PAL(config.replace(), m_ppu, N2A03_PAL_XTAL);
+	PPU_SH6578PAL(config.replace(), m_ppu, RP2A03_PAL_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 

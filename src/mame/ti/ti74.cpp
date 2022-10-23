@@ -80,6 +80,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "utf8.h"
+
 #include "ti74.lh"
 #include "ti95.lh"
 

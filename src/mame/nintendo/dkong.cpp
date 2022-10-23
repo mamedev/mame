@@ -732,13 +732,13 @@ void dkong_state::dkong3_2a03_reset_w(uint8_t data)
 {
 	if (data & 1)
 	{
-		m_dev_n2a03a->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		m_dev_n2a03b->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dev_rp2a03a->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dev_rp2a03b->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		m_dev_n2a03a->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		m_dev_n2a03b->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_dev_rp2a03a->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_dev_rp2a03b->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -1797,8 +1797,8 @@ void dkong_state::dkong3(machine_config &config)
 	m_screen->set_screen_update(FUNC(dkong_state::screen_update_dkong));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(dkong_state::vblank_irq));
-	m_screen->screen_vblank().append_inputline(m_dev_n2a03a, INPUT_LINE_NMI);
-	m_screen->screen_vblank().append_inputline(m_dev_n2a03b, INPUT_LINE_NMI);
+	m_screen->screen_vblank().append_inputline(m_dev_rp2a03a, INPUT_LINE_NMI);
+	m_screen->screen_vblank().append_inputline(m_dev_rp2a03b, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dkong);
 	PALETTE(config, m_palette, FUNC(dkong_state::dkong3_palette), DK3_PALETTE_LENGTH);
@@ -2905,10 +2905,10 @@ ROM_START( dkong3 )
 	ROM_LOAD( "dk3c.7d",      0x4000, 0x2000, CRC(d22e2921) SHA1(59a4a1a36aaca19ee0a7255d832df9d042ba34fb) )
 	ROM_LOAD( "dk3c.7e",      0x8000, 0x2000, CRC(615f14b7) SHA1(145674073e95d97c9131b6f2b03303eadb57ca78) )
 
-	ROM_REGION( 0x10000, "n2a03a", 0 )  /* sound #1 */
+	ROM_REGION( 0x10000, "rp2a03a", 0 )  /* sound #1 */
 	ROM_LOAD( "dk3c.5l",      0xe000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
 
-	ROM_REGION( 0x10000, "n2a03b", 0 )  /* sound #2 */
+	ROM_REGION( 0x10000, "rp2a03b", 0 )  /* sound #2 */
 	ROM_LOAD( "dk3c.6h",      0xe000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -2938,10 +2938,10 @@ ROM_START( dkong3j )
 	ROM_LOAD( "dk3c.7d",      0x4000, 0x2000, CRC(d22e2921) SHA1(59a4a1a36aaca19ee0a7255d832df9d042ba34fb) )
 	ROM_LOAD( "dk3cj.7e",     0x8000, 0x2000, CRC(25b5be23) SHA1(43cf2a676922e60d9d637777a7721ab7582129fc) )
 
-	ROM_REGION( 0x10000, "n2a03a", 0 )  /* sound #1 */
+	ROM_REGION( 0x10000, "rp2a03a", 0 )  /* sound #1 */
 	ROM_LOAD( "dk3c.5l",      0xe000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
 
-	ROM_REGION( 0x10000, "n2a03b", 0 )  /* sound #2 */
+	ROM_REGION( 0x10000, "rp2a03b", 0 )  /* sound #2 */
 	ROM_LOAD( "dk3c.6h",      0xe000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -3008,10 +3008,10 @@ ROM_START( dkong3hs )
 	ROM_REGION( 0x10000, "braze", 0 )
 	ROM_LOAD( "dk3_10a.bin", 0x0000, 0x10000, CRC(0008652b) SHA1(f1d90bb18373a6f24634b6d2cd766a28d07ab9f4) ) /* Version 1.0a */
 
-	ROM_REGION( 0x10000, "n2a03a", 0 )  /* sound #1 */
+	ROM_REGION( 0x10000, "rp2a03a", 0 )  /* sound #1 */
 	ROM_LOAD( "dk3c.5l",      0xe000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
 
-	ROM_REGION( 0x10000, "n2a03b", 0 )  /* sound #2 */
+	ROM_REGION( 0x10000, "rp2a03b", 0 )  /* sound #2 */
 	ROM_LOAD( "dk3c.6h",      0xe000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )

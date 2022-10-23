@@ -494,7 +494,7 @@ void lua_engine::initialize_input(sol::table &emu)
 			[this] (input_device &dev)
 			{
 				sol::table result = sol().create_table();
-				for (input_item_id id = ITEM_ID_FIRST_VALID; id < dev.maxitem(); id++)
+				for (input_item_id id = ITEM_ID_FIRST_VALID; id <= dev.maxitem(); id++)
 				{
 					input_device_item *item = dev.item(id);
 					if (item)

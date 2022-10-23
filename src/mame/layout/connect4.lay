@@ -789,10 +789,10 @@ license:CC0
 		<element name="lamp121" ref="pass" state="0">
 			<bounds x="40" y="140" width="28" height="14"/>
 		</element>
-		<element name="lamp123" ref="select" state="0">
+		<element name="lamp120" ref="select" state="0">
 			<bounds x="0" y="90" width="28" height="14"/>
 		</element>
-		<element name="lamp120" ref="drop" state="0">
+		<element name="lamp123" ref="drop" state="0">
 			<bounds x="30" y="90" width="28" height="14"/>
 		</element>
 

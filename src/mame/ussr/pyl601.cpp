@@ -50,6 +50,8 @@ The BASIC
 
 #include "formats/pyldin_dsk.h"
 
+#include "utf8.h"
+
 
 class pyl601_state : public driver_device
 {

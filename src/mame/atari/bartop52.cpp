@@ -137,16 +137,15 @@ void bartop52_state::a5200(machine_config &config)
 
 	ATARI_GTIA(config, m_gtia, 0);
 	m_gtia->set_region(GTIA_NTSC);
+	m_gtia->trigger_callback().set_ioport("djoy_b");
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1));
-	m_screen->set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
-	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+	config_ntsc_screen(config);
+
 	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
 	m_screen->set_palette("palette");
 
@@ -161,7 +160,7 @@ void bartop52_state::a5200(machine_config &config)
 	m_pokey->pot_r<2>().set_ioport("analog_2");
 	m_pokey->pot_r<3>().set_ioport("analog_3");
 	m_pokey->set_keyboard_callback(FUNC(bartop52_state::a5200_keypads));
-	m_pokey->set_interrupt_callback(FUNC(bartop52_state::interrupt_cb));
+	m_pokey->irq_w().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pokey->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 

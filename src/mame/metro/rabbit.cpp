@@ -80,7 +80,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
 #include "sound/i5000.h"
 #include "emupal.h"

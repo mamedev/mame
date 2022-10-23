@@ -14,6 +14,8 @@
 #include "emuopts.h"
 #include "inputdev.h"
 
+#include "path.h"
+
 
 namespace ui {
 

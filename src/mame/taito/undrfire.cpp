@@ -194,7 +194,7 @@ Board contains only 29 ROMs and not much else.
 #include "undrfire.h"
 #include "taito_en.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "taitoio.h"

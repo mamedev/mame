@@ -17,6 +17,7 @@
 #include "ui/ui.h"
 #include "ui/utils.h"
 
+#include "path.h"
 #include "zippath.h"
 
 #include <cstring>

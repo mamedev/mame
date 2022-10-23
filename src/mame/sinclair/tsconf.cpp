@@ -2,21 +2,7 @@
 // copyright-holders:Andrei I. Holub
 /***************************************************************************
 
-TS-Configuration (ZX Evolution) machine driver.
-Implementation: Revision C / 5-bit VDAC
-
-Hobby computer ZX Evolution is Spectrum-compatible with extensions.
-
-Hardware (ZX Evolution):
-- Z80 3.5 MHz (classic mode)/ 7 MHz (turbo mode without CPU wait circles)/ 14 MHz (mega turbo with CPU wait circles);
-- 4 Mb RAM, 512Kb ROM;
-- MiniITX board (172x170mm), 2 ZXBUS slots, power ATX or +5,+12V;
-- Based on fpga (Altera EP1K50);
-- Peripheral MCU ATMEGA128;
-- PS/2 keyboard and mouse support;
-- Floppy (WDC1793) Beta-disk compatible interface, IDE (one channel, up to 2 devices on master/slave mode), SD(HC) card, RS232;
-- Sound: AY, Beeper, Covox (PWM);
-- Real-time clock.
+see: pentevo.cpp
 
 Features (TS-Configuration):
 - Resolutions: 360x288, 320x240, 320x200, 256x192
@@ -36,16 +22,12 @@ Features (TS-Configuration):
 - DRAM-to-Device, Device-to-DRAM and DRAM-to-DRAM DMA Controller
 
 Refs:
-ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
-        Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
-        Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
 TsConf: https://github.com/tslabs/zx-evo/blob/master/pentevo/docs/TSconf/tsconf_en.md
         https://github.com/tslabs/zx-evo/raw/master/pentevo/docs/TSconf/TSconf.xls
 FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
     ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
 
 HowTo:
-# Use ts-bios.rom above. You also need tr-dos roms which simpliest(?) to get from pentagon.
 # Create SD image "wc.img"
 # Copy WC files from archive https://github.com/tslabs/zx-evo/blob/master/pentevo/soft/WC/wc.zip
 # Tech Demos (currently *.spg only): http://prods.tslabs.info/index.php?t=4
@@ -66,6 +48,7 @@ TODO:
 
 #include "emu.h"
 #include "tsconf.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
@@ -310,4 +293,4 @@ ROM_START(tsconf)
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
-COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution TS-Configuration",    0)
+COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   0)

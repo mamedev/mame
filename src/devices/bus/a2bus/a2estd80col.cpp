@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    a2estd80col.c
+    a2estd80col.cpp
 
     Apple IIe Standard 80 Column Card (2K of RAM, no double-hi-res)
 
@@ -10,11 +10,6 @@
 
 #include "emu.h"
 #include "a2estd80col.h"
-
-
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -50,30 +45,27 @@ void a2eaux_std80col_device::device_reset()
 {
 }
 
-uint8_t a2eaux_std80col_device::read_auxram(uint16_t offset)
+u8 a2eaux_std80col_device::read_auxram(uint16_t offset)
 {
-	if (offset < 0x800)
-	{
-		return m_ram[offset];
-	}
-
-	return 0xff;
+	return m_ram[offset & 0x3ff];
 }
 
-void a2eaux_std80col_device::write_auxram(uint16_t offset, uint8_t data)
+void a2eaux_std80col_device::write_auxram(uint16_t offset, u8 data)
 {
-	if (offset < 0x800)
-	{
-		m_ram[offset] = data;
-	}
+	m_ram[offset & 0x3ff] = data;
 }
 
-uint8_t *a2eaux_std80col_device::get_vram_ptr()
+u8 *a2eaux_std80col_device::get_vram_ptr()
 {
 	return &m_ram[0];
 }
 
-uint8_t *a2eaux_std80col_device::get_auxbank_ptr()
+u8 *a2eaux_std80col_device::get_auxbank_ptr()
 {
 	return &m_ram[0];
+}
+
+u16 a2eaux_std80col_device::get_auxbank_mask()
+{
+	return 0x3ff;
 }

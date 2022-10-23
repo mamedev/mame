@@ -65,7 +65,7 @@
 #include "emu.h"
 
 #include "cpu/dsp56156/dsp56156.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k054321.h"

@@ -1466,7 +1466,7 @@ void hyperstone_device::hyperstone_shl()
 
 	uint32_t n    = m_core->local_regs[src_code & 0x3f] & 0x1f;
 	uint32_t base = m_core->local_regs[dst_code & 0x3f]; /* registers offset by frame pointer */
-	uint64_t mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
+	uint32_t mask = n ? 0xffffffff << (32 - n) : 0;
 
 	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
 
@@ -1491,14 +1491,7 @@ void hyperstone_device::hyperstone_testlz()
 
 	const uint32_t fp = GET_FP;
 	const uint32_t sreg = m_core->local_regs[(SRC_CODE + fp) & 0x3f];
-	uint32_t zeros = 0;
-	for (uint32_t mask = 0x80000000; mask != 0; mask >>= 1 )
-	{
-		if (sreg & mask)
-			break;
-		else
-			zeros++;
-	}
+	const uint32_t zeros = count_leading_zeros_32(sreg);
 
 	m_core->local_regs[(DST_CODE + fp) & 0x3f] = zeros;
 
@@ -1520,8 +1513,7 @@ void hyperstone_device::hyperstone_rol()
 	const uint32_t mask = (uint32_t)(0xffffffff00000000ULL >> n);
 #endif
 
-	if (n)
-		val = (val << n) | (val >> (32 - n));
+	val = rotl_32(val, n);
 
 #ifdef MISSIONCRAFT_FLAGS
 	SR &= ~(V_MASK | Z_MASK | C_MASK | N_MASK);
@@ -2076,7 +2068,7 @@ void hyperstone_device::hyperstone_shli()
 		SR |= (val & (0x80000000 >> (n - 1))) ? 1 : 0;
 	}
 
-	uint64_t mask = ((1U << (32 - n)) - 1) ^ 0xffffffff;
+	uint32_t mask = n ? 0xffffffff << (32 - n) : 0;
 	uint32_t val2 = val << n;
 
 	if (((val & mask) && (!(val2 & 0x80000000))) || (((val & mask) ^ mask) && (val2 & 0x80000000)))
@@ -2218,11 +2210,6 @@ void hyperstone_device::hyperstone_mul()
 		m_core->icount -= 5 << m_core->clck_scale;
 	else
 		m_core->icount -= 3 << m_core->clck_scale;
-}
-
-static inline int32_t mul_16x16(int16_t halfd, int16_t halfs)
-{
-	return (int32_t)halfd * (int32_t)halfs;
 }
 
 void hyperstone_device::hyperstone_extend()

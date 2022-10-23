@@ -23,7 +23,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return m_palette_colors + m_overlay_colors; }
+	virtual u32 palette_entries() const noexcept override { return m_palette_colors + m_overlay_colors; }
 
 	// read/write handlers
 	u8 address_r();

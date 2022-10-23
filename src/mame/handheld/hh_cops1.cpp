@@ -25,6 +25,8 @@ TODO:
 
 #include "speaker.h"
 
+#include "utf8.h"
+
 // internal artwork
 #include "cambrp.lh"
 #include "mbaskb.lh"

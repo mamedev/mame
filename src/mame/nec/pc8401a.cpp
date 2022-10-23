@@ -35,6 +35,8 @@
 
 #include "bus/rs232/rs232.h"
 
+#include "utf8.h"
+
 /* Fake Keyboard */
 
 void pc8401a_state::scan_keyboard()

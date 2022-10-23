@@ -89,16 +89,14 @@ public:
 		m_hack_duart_fixed_low = true;
 	}
 
-	void bwboki(machine_config &config);
-
-	template<const uint32_t* Key> void bwboki_chr_cheat(machine_config &config)
+	void bwboki_f(machine_config &config);
+	template<const uint32_t* Key> void bwboki_chr_cheat_f(machine_config &config);
+	template<const uint32_t* Key, typename... T>
+	auto bwboki_chr_cheat(T... traits)
 	{
-		bwboki(config);
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4bwb_machines_state::mpu4_memmap_characteriser_bwb);
-		MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
-		m_characteriser_bwb->set_common_key(Key[0] & 0xff);
-		m_characteriser_bwb->set_other_key(Key[1]);
+		return trait_wrapper(this, &mpu4bwb_machines_state::bwboki_chr_cheat_f<Key>, traits...);
 	}
+
 
 protected:
 
@@ -122,20 +120,27 @@ MACHINE_START_MEMBER(mpu4bwb_machines_state,mpu4bwb)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
-	m_mod_number=4;
 	mpu4_install_mod4bwb_space(space);
 }
 
-void mpu4bwb_machines_state::bwboki(machine_config &config)
+void mpu4bwb_machines_state::bwboki_f(machine_config &config)
 {
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4bwb_machines_state,mpu4bwb)
 	mpu4_common2(config);
-	mpu4_reels<4, 5>(config);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+template<const uint32_t* Key> void mpu4bwb_machines_state::bwboki_chr_cheat_f(machine_config &config)
+{
+	bwboki_f(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4bwb_machines_state::mpu4_memmap_characteriser_bwb);
+	MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
+	m_characteriser_bwb->set_common_key(Key[0] & 0xff);
+	m_characteriser_bwb->set_other_key(Key[1]);
 }
 
 void mpu4bwb_machines_state::mpu4_memmap_characteriser_bwb(address_map &map)
@@ -243,6 +248,8 @@ INPUT_PORTS_END
 
 } // anonymous namespace
 
+using namespace mpu4_traits;
+
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 
@@ -268,10 +275,10 @@ static const uint32_t m4abra_keys[2] = { 0x11, 0x192703 };
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 
-GAME_CUSTOM( 199?, m4abra,       0,      bwboki_chr_cheat<m4abra_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "nn_sj___.4_0", 0x0000, 0x040000, CRC(48437d29) SHA1(72a2e9337fc0a004c382931f3af856253c44ed61), "BWB",u8"Abracadabra (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4abra__a,    m4abra, bwboki_chr_cheat<m4abra_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "nn_sja__.4_0", 0x0000, 0x040000, CRC(766cd4ae) SHA1(4d630b967ede615d325f524c2e4c92c7e7a60886), "BWB",u8"Abracadabra (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 2)" )
-GAME_CUSTOM( 199?, m4abra__b,    m4abra, bwboki_chr_cheat<m4abra_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "nn_sjb__.4_0", 0x0000, 0x040000, CRC(ca77a68a) SHA1(e753c065d299038bae4c451e647b9bcda36421d9), "BWB",u8"Abracadabra (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 3)" ) // Datapak
-GAME_CUSTOM( 199?, m4abra__c,    m4abra, bwboki_chr_cheat<m4abra_keys>, mpu4impcoin_jackpot15_20p_90pc, init_m4default_big, "nn_sjk__.4_0", 0x0000, 0x040000, CRC(19018556) SHA1(6df993939e70a24621d4e732d0670d64fac1cf56), "BWB",u8"Abracadabra (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 4)" ) // % key
+GAME_CUSTOM( 199?, m4abra,       0,      bwboki_chr_cheat<m4abra_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "nn_sj___.4_0", 0x0000, 0x040000, CRC(48437d29) SHA1(72a2e9337fc0a004c382931f3af856253c44ed61), "BWB",u8"Abracadabra (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4abra__a,    m4abra, bwboki_chr_cheat<m4abra_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "nn_sja__.4_0", 0x0000, 0x040000, CRC(766cd4ae) SHA1(4d630b967ede615d325f524c2e4c92c7e7a60886), "BWB",u8"Abracadabra (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 2)" )
+GAME_CUSTOM( 199?, m4abra__b,    m4abra, bwboki_chr_cheat<m4abra_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "nn_sjb__.4_0", 0x0000, 0x040000, CRC(ca77a68a) SHA1(e753c065d299038bae4c451e647b9bcda36421d9), "BWB",u8"Abracadabra (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 3)" ) // Datapak
+GAME_CUSTOM( 199?, m4abra__c,    m4abra, bwboki_chr_cheat<m4abra_keys>(R5, RT3), mpu4impcoin_jackpot15_20p_90pc, init_m4big, "nn_sjk__.4_0", 0x0000, 0x040000, CRC(19018556) SHA1(6df993939e70a24621d4e732d0670d64fac1cf56), "BWB",u8"Abracadabra (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 4)" ) // % key
 
 
 /*****************************************************************************************************************************************************************************
@@ -296,7 +303,7 @@ static const uint32_t m4bigmt_keys[2] = { 0x10, 0x241215 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BIGMT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4bigmt_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4bigmt_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bigmt,     0,          "bigm1320",     0x0000, 0x010000, CRC(a5085347) SHA1(93a7f7656e53461270e04190ff538959d6c917c1), "BWB","The Big Match (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bigmt__a,  m4bigmt,    "tb_20___.7_1", 0x0000, 0x010000, CRC(22fae0f0) SHA1(a875adccf96fbbff69f5fe76720514767cdcae66), "BWB","The Big Match (BWB) (MPU4) (set 2)" )
@@ -325,7 +332,7 @@ static const uint32_t m4bingbl_keys[2] = { 0x10, 0x322214 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BINGBL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4bingbl_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4bingbl_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bingbl,       0,          "bb_20a__.8_1", 0x0000, 0x010000, CRC(10f29ba3) SHA1(739b413f35676834ebafeb121c6059759586ec72), "BWB","Bingo Belle (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bingbl__a,    m4bingbl,   "bb_20bg_.8_1", 0x0000, 0x010000, CRC(9969c9ce) SHA1(8c754335e7ff75bc46f02095c2c7d57df046db47), "BWB","Bingo Belle (BWB) (MPU4) (set 2)" )
@@ -356,7 +363,7 @@ static const uint32_t m4bingbs_keys[2] = { 0x10, 0x322214 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BINGBS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4bingbs_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4bingbs_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bingbs,       0,          "bp_20a__.2_1", 0x0000, 0x010000, CRC(ca005003) SHA1(271ff0dbee529ca15c79c9aa1047efa8993ea073), "BWB","Bingo Belle Showcase (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bingbs__a,    m4bingbs,   "bp_20bg_.2_1", 0x0000, 0x010000, CRC(1b59c32f) SHA1(0c7df33f921639bfedbddd969dcbcd62e38ff912), "BWB","Bingo Belle Showcase (BWB) (MPU4) (set 2)" )
@@ -387,7 +394,7 @@ static const uint32_t m4bingcl_keys[2] = { 0x03, 0x072114 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BINGCL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4bingcl_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4bingcl_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bingcl,       0,          "bc_xe___.2_1", 0x0000, 0x010000, CRC(3abbc215) SHA1(b5e59b30c07c4ffef69c5729f1a28d7ee55636bd), "BWB","Bingo Club (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bingcl__a,    m4bingcl,   "bc_xe_b_.2_1", 0x0000, 0x010000, CRC(3e11c5c0) SHA1(2d9bc987fed040664f211bb9d13984b6cba5e25f), "BWB","Bingo Club (BWB) (MPU4) (set 2)" )
@@ -416,7 +423,7 @@ static const uint32_t m4blsbys_g_keys[2] = { 0x36, 0x010e20 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BLSBYS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4blsbys_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big_five_std, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4blsbys_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4blsbys,       0,          "bbprog.bin",   0x0000, 0x020000, CRC(c262cfda) SHA1(f004895e0dd3f8420683927915554e19e41bd20b), "BWB","Blues Boys (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4blsbys__a,    m4blsbys,   "bf_20a__.3_1", 0x0000, 0x020000, CRC(fca7764f) SHA1(a88378247b6710d6122c515c31c39c5cd9678ce2), "BWB","Blues Boys (BWB) (MPU4) (set 2)" )
@@ -451,7 +458,7 @@ GAME_CUSTOM( 199?, m4blsbys__8,    m4blsbys,   "bs_25a_c.2_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BLSBYS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4blsbys_g_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big_five_std, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4blsbys_g_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4blsbys__g,    m4blsbys,   "bs_05___.3v1", 0x0000, 0x020000, CRC(26e8eb95) SHA1(7d8dbca127e1867714cbeb9d699b2173de724eb2), "BWB","Blues Boys (BWB) (MPU4) (set 26)" )
 GAME_CUSTOM( 199?, m4blsbys__h,    m4blsbys,   "bs_05__c.3v1", 0x0000, 0x020000, CRC(12e51237) SHA1(68235cf5f36862a26d5d44464041dabb01b9f95c), "BWB","Blues Boys (BWB) (MPU4) (set 27)" )
@@ -495,21 +502,21 @@ static const uint32_t m4csoc_keys[2] = { 0x11, 0x101230 };
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 
-GAME_CUSTOM( 199?, m4csoc,       0,      bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big ,"sg_sj___.1_0", 0x0000, 0x040000, CRC(f21cd1aa) SHA1(dc010a315a8d738ad9e5e384197499e08a8d5ef6), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £10/£15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4csoc__a,    m4csoc, bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big ,"sg_sj___.2_0", 0x0000, 0x040000, CRC(5513f2a3) SHA1(e9e59461a007be02beae6cd1610b8582d367c15e), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £10/£15 jackpot) (set 2)" )
-GAME_CUSTOM( 199?, m4csoc__b,    m4csoc, bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big ,"sg_sj_d_.2_0", 0x0000, 0x040000, CRC(b0058d0f) SHA1(635c4f729c27c5cb4356f62dcc13127043ea0e5c), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £10/£15 jackpot) (set 3)" ) // Datapak
+GAME_CUSTOM( 199?, m4csoc,       0,      bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big ,"sg_sj___.1_0", 0x0000, 0x040000, CRC(f21cd1aa) SHA1(dc010a315a8d738ad9e5e384197499e08a8d5ef6), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £10/£15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4csoc__a,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big ,"sg_sj___.2_0", 0x0000, 0x040000, CRC(5513f2a3) SHA1(e9e59461a007be02beae6cd1610b8582d367c15e), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £10/£15 jackpot) (set 2)" )
+GAME_CUSTOM( 199?, m4csoc__b,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big ,"sg_sj_d_.2_0", 0x0000, 0x040000, CRC(b0058d0f) SHA1(635c4f729c27c5cb4356f62dcc13127043ea0e5c), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £10/£15 jackpot) (set 3)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4csoc__c,    m4csoc, bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big ,"so_sj___.b_0", 0x0000, 0x040000, CRC(65d5bb2d) SHA1(61c6896d97ed79e2f31b37b9d8998980ceac4fc5), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4csoc__d,    m4csoc, bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big ,"so_sj_d_.b_0", 0x0000, 0x040000, CRC(5e79ba34) SHA1(cb8c689319b5f94ce0385b3b7846a49589358ccc), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4csoc__e,    m4csoc, bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big ,"so_sjs__.b_0", 0x0000, 0x040000, CRC(2f50675e) SHA1(baed8e3a455ec5bfa810e64dc4c66996d6746bbc), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 3)" ) // Datapak
-GAME_CUSTOM( 199?, m4csoc__f,    m4csoc, bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big ,"ch_socc.5",    0x0000, 0x040000, CRC(1b2ea78d) SHA1(209534ccd537c0ca9d02301830a52ebc29b93cb7), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 4)" )
+GAME_CUSTOM( 199?, m4csoc__c,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big ,"so_sj___.b_0", 0x0000, 0x040000, CRC(65d5bb2d) SHA1(61c6896d97ed79e2f31b37b9d8998980ceac4fc5), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4csoc__d,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big ,"so_sj_d_.b_0", 0x0000, 0x040000, CRC(5e79ba34) SHA1(cb8c689319b5f94ce0385b3b7846a49589358ccc), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4csoc__e,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big ,"so_sjs__.b_0", 0x0000, 0x040000, CRC(2f50675e) SHA1(baed8e3a455ec5bfa810e64dc4c66996d6746bbc), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 3)" ) // Datapak
+GAME_CUSTOM( 199?, m4csoc__f,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big ,"ch_socc.5",    0x0000, 0x040000, CRC(1b2ea78d) SHA1(209534ccd537c0ca9d02301830a52ebc29b93cb7), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 4)" )
 //
-GAME_CUSTOM( 199?, m4csoc__g,    m4csoc, bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot5_5p,   init_m4default_big ,"so_vc___.c_0", 0x0000, 0x040000, CRC(d683b202) SHA1(95803008a50229bc85ed177b587fdf05cb152df3), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10p stake / £5 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4csoc__h,    m4csoc, bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot5_5p,   init_m4default_big ,"so_vc_d_.c_0", 0x0000, 0x040000, CRC(ed2fb31b) SHA1(de72d8abbb4a22125ed312e6ccfcab6b3e591ec2), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10p stake / £5 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4csoc__g,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,   init_m4big ,"so_vc___.c_0", 0x0000, 0x040000, CRC(d683b202) SHA1(95803008a50229bc85ed177b587fdf05cb152df3), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10p stake / £5 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4csoc__h,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,   init_m4big ,"so_vc_d_.c_0", 0x0000, 0x040000, CRC(ed2fb31b) SHA1(de72d8abbb4a22125ed312e6ccfcab6b3e591ec2), "BWB",u8"Championship Soccer (BWB) (MPU4) (5/10p stake / £5 jackpot) (set 2)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4csoc__i,    m4csoc, bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big ,"ch_socc",      0x0000, 0x040000, CRC(ea9af5bd) SHA1(99319995ee886196ddd540bf37960a4e5b9d4f34), "BWB",u8"Championship Soccer (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot)" )
+GAME_CUSTOM( 199?, m4csoc__i,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big ,"ch_socc",      0x0000, 0x040000, CRC(ea9af5bd) SHA1(99319995ee886196ddd540bf37960a4e5b9d4f34), "BWB",u8"Championship Soccer (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot)" )
 //
-GAME_CUSTOM( 199?, m4csoc__j,    m4csoc, bwboki_chr_cheat<m4csoc_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big ,"chsoc8ac",     0x0000, 0x040000, CRC(8e0471ba) SHA1(3b7e6edbb3490e99af148c0cfe8d39c13c282880), "hack",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £8 jackpot, 20/25/30p stake / £15 jackpot) (hack)" ) // BWB string at the start of the demo has been blanked out
+GAME_CUSTOM( 199?, m4csoc__j,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big ,"chsoc8ac",     0x0000, 0x040000, CRC(8e0471ba) SHA1(3b7e6edbb3490e99af148c0cfe8d39c13c282880), "hack",u8"Championship Soccer (BWB) (MPU4) (5/10/20/25/30p stake / £8 jackpot, 20/25/30p stake / £15 jackpot) (hack)" ) // BWB string at the start of the demo has been blanked out
 
 
 /*****************************************************************************************************************************************************************************
@@ -533,7 +540,7 @@ static const uint32_t m4cpfinl_keys[2] = { 0x10, 0x241215 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CPFINL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4cpfinl_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4cpfinl_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4cpfinl,       0,          "cu_10___.5_1", 0x0000, 0x010000, CRC(47a85443) SHA1(d308b9a6dcb0200f72d5c5b380907d2d55f3e40d), "BWB","Cup Final (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4cpfinl__a,    m4cpfinl,   "cu_10_b_.5_1", 0x0000, 0x010000, CRC(2583f410) SHA1(447a2316e3c3da6f835699602834f7ca5bafbdf9), "BWB","Cup Final (BWB) (MPU4) (set 2)" )
@@ -569,7 +576,7 @@ static const uint32_t m4danced_keys[2] = { 0x10, 0x3b240d };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DANCED_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4danced_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4danced_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4danced,       0,          "dd_22bg_.2_1", 0x0000, 0x020000, CRC(f79525a1) SHA1(babfbf8beae423626057235bcad5eae18531160e), "BWB","Dancing Diamonds (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4danced__a,    m4danced,   "dd_22bg_.4_1", 0x0000, 0x020000, CRC(e50ffa46) SHA1(b42d806422f85573bcbe284b4192f393e3e57306), "BWB","Dancing Diamonds (BWB) (MPU4) (set 2)" )
@@ -617,7 +624,7 @@ static const uint32_t m4daytn_keys[2] = { 0x13, 0x1f1e23 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DAYTN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4daytn_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4daytn_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4daytn,     0,          "da_78___.1_0", 0x0000, 0x040000, CRC(50beafdd) SHA1(0ef6dd4fc9c8cda596fd383e47b9c7976b5d15f0), "BWB","Daytona (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4daytn__a,  m4daytn,    "da_78_d_.1_0", 0x0000, 0x040000, CRC(d55d3f9a) SHA1(a145379237947601f2ecb84138c113b71842cd34), "BWB","Daytona (BWB) (MPU4) (set 2)" )
@@ -658,7 +665,7 @@ static const uint32_t m4excal_keys[2] = { 0xff, 0xffffffff };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4EXCAL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4excal_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4excal_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4excal,     0,          "ex_05a__.6_1", 0x0000, 0x020000, CRC(317fa289) SHA1(8a0e83a764e2a04285367e0f7ebb814fedc81400), "BWB","Excalibur (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4excal__a,  m4excal,    "ex_20a_6.6_1", 0x0000, 0x020000, CRC(284937c8) SHA1(3be8bf21ab0ff97f67ce170cee48cd08ea325571), "BWB","Excalibur (BWB) (MPU4) (set 2)" )
@@ -695,13 +702,13 @@ static const uint32_t m4exotic_keys[2] = { 0x34, 0x3f0e26 };
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // don't require stake/jp set
-GAME_CUSTOM( 199?, m4exotic,       0,        bwboki_chr_cheat<m4exotic_keys>, mpu4_impcoin,              init_m4default_big, "eo_49bm_.2_0", 0x0000, 0x020000, CRC(c748c4ca) SHA1(7d0d498f9edd792ed861c8bf9cf1bb03698d144d), "BWB",u8"Exotic Fruits (BWB) (MPU4) (30p stake / £15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4exotic__a,    m4exotic, bwboki_chr_cheat<m4exotic_keys>, mpu4_impcoin,              init_m4default_big, "eo_49bmd.2_0", 0x0000, 0x020000, CRC(98436c04) SHA1(1db7c95f7a0297aa3da7f1ce27c790ffa1fa4ebe), "BWB",u8"Exotic Fruits (BWB) (MPU4) (30p stake / £15 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4exotic__b,    m4exotic, bwboki_chr_cheat<m4exotic_keys>, mpu4_impcoin,              init_m4default_big, "eo_49bmd.2g0", 0x0000, 0x020000, CRC(425a0152) SHA1(6a235c613f52c4b8985a589f89542eebd3574fde), "BWB",u8"Exotic Fruits (BWB) (MPU4) (30p stake / £15 jackpot) (set 3)" ) // Datapak
-GAME_CUSTOM( 199?, m4exotic__c,    m4exotic, bwboki_chr_cheat<m4exotic_keys>, mpu4_impcoin,              init_m4default_big, "eo_49bg_.2_0", 0x0000, 0x020000, CRC(c3bf2286) SHA1(74090fd0a103a6c311d426f4aae8e7af8b1d3bc0), "BWB",u8"Exotic Fruits (BWB) (MPU4) (30p stake / £15 jackpot) (set 4)" ) // Datapak
+GAME_CUSTOM( 199?, m4exotic,       0,        bwboki_chr_cheat<m4exotic_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "eo_49bm_.2_0", 0x0000, 0x020000, CRC(c748c4ca) SHA1(7d0d498f9edd792ed861c8bf9cf1bb03698d144d), "BWB",u8"Exotic Fruits (BWB) (MPU4) (30p stake / £15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4exotic__a,    m4exotic, bwboki_chr_cheat<m4exotic_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "eo_49bmd.2_0", 0x0000, 0x020000, CRC(98436c04) SHA1(1db7c95f7a0297aa3da7f1ce27c790ffa1fa4ebe), "BWB",u8"Exotic Fruits (BWB) (MPU4) (30p stake / £15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4exotic__b,    m4exotic, bwboki_chr_cheat<m4exotic_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "eo_49bmd.2g0", 0x0000, 0x020000, CRC(425a0152) SHA1(6a235c613f52c4b8985a589f89542eebd3574fde), "BWB",u8"Exotic Fruits (BWB) (MPU4) (30p stake / £15 jackpot) (set 3)" ) // Datapak
+GAME_CUSTOM( 199?, m4exotic__c,    m4exotic, bwboki_chr_cheat<m4exotic_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "eo_49bg_.2_0", 0x0000, 0x020000, CRC(c3bf2286) SHA1(74090fd0a103a6c311d426f4aae8e7af8b1d3bc0), "BWB",u8"Exotic Fruits (BWB) (MPU4) (30p stake / £15 jackpot) (set 4)" ) // Datapak
 // require stake/jp set
-GAME_CUSTOM( 199?, m4exotic__d,    m4exotic, bwboki_chr_cheat<m4exotic_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "eo_s9bt_.2g0", 0x0000, 0x020000, CRC(c527d333) SHA1(083d7be95d73d259fe8ec1d87a3a41089a4c44df), "BWB",u8"Exotic Fruits (BWB) (MPU4) (20/25/30p stake / £15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4exotic__e,    m4exotic, bwboki_chr_cheat<m4exotic_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "eo_sja__.2_0", 0x0000, 0x020000, CRC(5ca9557f) SHA1(5fa42c56c67b505272d358a54ebe911fdb0b905e), "BWB",u8"Exotic Fruits (BWB) (MPU4) (20/25/30p stake / £15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4exotic__d,    m4exotic, bwboki_chr_cheat<m4exotic_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "eo_s9bt_.2g0", 0x0000, 0x020000, CRC(c527d333) SHA1(083d7be95d73d259fe8ec1d87a3a41089a4c44df), "BWB",u8"Exotic Fruits (BWB) (MPU4) (20/25/30p stake / £15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4exotic__e,    m4exotic, bwboki_chr_cheat<m4exotic_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "eo_sja__.2_0", 0x0000, 0x020000, CRC(5ca9557f) SHA1(5fa42c56c67b505272d358a54ebe911fdb0b905e), "BWB",u8"Exotic Fruits (BWB) (MPU4) (20/25/30p stake / £15 jackpot) (set 2)" ) // Datapak
 
 
 /*****************************************************************************************************************************************************************************
@@ -728,18 +735,18 @@ static const uint32_t m4firice_keys[2] = { 0x11, 0x162413 };
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // allows you to boot with 50p stake, but still shows '20p'
-GAME_CUSTOM( 199?, m4firice,       0,        bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot8tkn_20p, init_m4default_big,  "fi_20__d.5_0", 0x0000, 0x040000, CRC(ab46574c) SHA1(d233b137f8f42b9b644b34a627fbcc5b662e8ae1), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4firice__a,    m4firice, bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot8tkn_20p, init_m4default_big,  "fi_20_bd.5_0", 0x0000, 0x040000, CRC(9b2bc052) SHA1(34b970659218fde097238b852dadedcb928f69fd), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4firice__b,    m4firice, bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot8tkn_20p, init_m4default_big,  "fi_20_dd.5_0", 0x0000, 0x040000, CRC(2bbc9855) SHA1(84d51eeadc01ac74d630a05b933343f01f04b2af), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 3)" ) // Datapak
-GAME_CUSTOM( 199?, m4firice__c,    m4firice, bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot8tkn_20p, init_m4default_big,  "fi_20_kd.5_0", 0x0000, 0x040000, CRC(529b43b1) SHA1(80d4d928918fdc869b1693e21a5c25045e5c9449), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 4)" ) // % key
-GAME_CUSTOM( 199?, m4firice__d,    m4firice, bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot8tkn_20p, init_m4default_big,  "fi_20a_d.5_0", 0x0000, 0x040000, CRC(8d6ce79d) SHA1(05954ed4b34af73c065b6203a50da9af7d8373fe), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 5)" )
-GAME_CUSTOM( 199?, m4firice__e,    m4firice, bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot8tkn_20p, init_m4default_big,  "fi_20s_d.5_0", 0x0000, 0x040000, CRC(d0aa53af) SHA1(f71801344c17a759ec4eb8958377bbcf4b4cae65), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 6)" ) // Datapak
+GAME_CUSTOM( 199?, m4firice,       0,        bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p, init_m4big,  "fi_20__d.5_0", 0x0000, 0x040000, CRC(ab46574c) SHA1(d233b137f8f42b9b644b34a627fbcc5b662e8ae1), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4firice__a,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p, init_m4big,  "fi_20_bd.5_0", 0x0000, 0x040000, CRC(9b2bc052) SHA1(34b970659218fde097238b852dadedcb928f69fd), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4firice__b,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p, init_m4big,  "fi_20_dd.5_0", 0x0000, 0x040000, CRC(2bbc9855) SHA1(84d51eeadc01ac74d630a05b933343f01f04b2af), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 3)" ) // Datapak
+GAME_CUSTOM( 199?, m4firice__c,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p, init_m4big,  "fi_20_kd.5_0", 0x0000, 0x040000, CRC(529b43b1) SHA1(80d4d928918fdc869b1693e21a5c25045e5c9449), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 4)" ) // % key
+GAME_CUSTOM( 199?, m4firice__d,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p, init_m4big,  "fi_20a_d.5_0", 0x0000, 0x040000, CRC(8d6ce79d) SHA1(05954ed4b34af73c065b6203a50da9af7d8373fe), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 5)" )
+GAME_CUSTOM( 199?, m4firice__e,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p, init_m4big,  "fi_20s_d.5_0", 0x0000, 0x040000, CRC(d0aa53af) SHA1(f71801344c17a759ec4eb8958377bbcf4b4cae65), "BWB",u8"Fire & Ice (BWB) (MPU4) (20p stake / £8 token jackpot) (set 6)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4firice__f,    m4firice, bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot10_20p,   init_m4default_big,  "fi_sj___.e_0", 0x0000, 0x040000, CRC(7f12e37a) SHA1(fb09ff782f66972b8bdeff105c5f3d1f9f676809), "BWB",u8"Fire & Ice (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4firice__g,    m4firice, bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot10_20p,   init_m4default_big,  "fi_sj_b_.e_0", 0x0000, 0x040000, CRC(5aef48d2) SHA1(73f410951a737f75f3e7c14e704eca9c26cfa750), "BWB",u8"Fire & Ice (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4firice__h,    m4firice, bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot10_20p,   init_m4default_big,  "fi_sj_d_.e_0", 0x0000, 0x040000, CRC(61822af2) SHA1(8c721229a5ce9f491cbc638b8c5fa5c0c3032700), "BWB",u8"Fire & Ice (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 3)" ) // Datapak
-GAME_CUSTOM( 199?, m4firice__i,    m4firice, bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot10_20p,   init_m4default_big,  "fi_sj_k_.e_0", 0x0000, 0x040000, CRC(2b57036b) SHA1(60cec130770ff643af1148f16a3afe3b102e94e2), "BWB",u8"Fire & Ice (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 4)" ) // % key
-GAME_CUSTOM( 199?, m4firice__j,    m4firice, bwboki_chr_cheat<m4firice_keys>, mpu4impcoin_jackpot10_20p,   init_m4default_big,  "fi_sja__.e_0", 0x0000, 0x040000, CRC(da5e0eff) SHA1(9f5ddce366786bdf898c9410be417c8028cebeb4), "BWB",u8"Fire & Ice (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 5)" )
+GAME_CUSTOM( 199?, m4firice__f,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot10_20p,   init_m4big,  "fi_sj___.e_0", 0x0000, 0x040000, CRC(7f12e37a) SHA1(fb09ff782f66972b8bdeff105c5f3d1f9f676809), "BWB",u8"Fire & Ice (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4firice__g,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot10_20p,   init_m4big,  "fi_sj_b_.e_0", 0x0000, 0x040000, CRC(5aef48d2) SHA1(73f410951a737f75f3e7c14e704eca9c26cfa750), "BWB",u8"Fire & Ice (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4firice__h,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot10_20p,   init_m4big,  "fi_sj_d_.e_0", 0x0000, 0x040000, CRC(61822af2) SHA1(8c721229a5ce9f491cbc638b8c5fa5c0c3032700), "BWB",u8"Fire & Ice (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 3)" ) // Datapak
+GAME_CUSTOM( 199?, m4firice__i,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot10_20p,   init_m4big,  "fi_sj_k_.e_0", 0x0000, 0x040000, CRC(2b57036b) SHA1(60cec130770ff643af1148f16a3afe3b102e94e2), "BWB",u8"Fire & Ice (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 4)" ) // % key
+GAME_CUSTOM( 199?, m4firice__j,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5, RT3), mpu4impcoin_jackpot10_20p,   init_m4big,  "fi_sja__.e_0", 0x0000, 0x040000, CRC(da5e0eff) SHA1(9f5ddce366786bdf898c9410be417c8028cebeb4), "BWB",u8"Fire & Ice (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 5)" )
 
 /*****************************************************************************************************************************************************************************
 *
@@ -762,7 +769,7 @@ static const uint32_t m4harle_keys[2] = { 0x10, 0x220525 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4HARLE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4harle_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4harle_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4harle,     0,          "hq_20a__.1_1", 0x0000, 0x010000, CRC(b8ae3025) SHA1(94a449eff103bf6ba1fc6e85b03061b9ce658ae0), "BWB","Harlequin (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4harle__a,  m4harle,    "hq_20bg_.1_1", 0x0000, 0x010000, CRC(31356248) SHA1(d8791b1c861ed4388660bbe78f2589db7f1e779e), "BWB","Harlequin (BWB) (MPU4) (set 2)" )
@@ -815,18 +822,18 @@ static const uint32_t m4hvhel_keys[2] = { 0x11, 0x3f0b26 };
 	ROM_END \
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4hvhel,     0,       bwboki_chr_cheat<m4hvhel_keys>, mpu4impcoin_jackpot8tkn_20p, init_m4default_big,   "hh_20__d.2_0",     0x0000, 0x040000, CRC(801de788) SHA1(417b985714d8f0ebed93b65a3f865e03474ce9e5), "BWB", u8"Heaven & Hell (BWB) (MPU4) (20p stake / £8 token jackpot, set 1)" )
-GAME_CUSTOM( 199?, m4hvhel__a,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>, mpu4impcoin_jackpot8tkn_20p, init_m4default_big,   "hh_20a_d.2_0",     0x0000, 0x040000, CRC(ea4e7876) SHA1(5bf711c2bdff50fe745edefa0eebf719824d9e5b), "BWB", u8"Heaven & Hell (BWB) (MPU4) (20p stake / £8 token jackpot, set 2)" )
-GAME_CUSTOM( 199?, m4hvhel__b,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>, mpu4impcoin_jackpot8tkn_20p, init_m4default_big,   "hh_20s_d.2_0",     0x0000, 0x040000, CRC(a519a441) SHA1(f3c19d316c82d1ebbcfdabb6d4eaa6cfa369d287), "BWB", u8"Heaven & Hell (BWB) (MPU4) (20p stake / £8 token jackpot, set 3)" ) // Datapak
+GAME_CUSTOM( 199?, m4hvhel,     0,       bwboki_chr_cheat<m4hvhel_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p, init_m4big,   "hh_20__d.2_0",     0x0000, 0x040000, CRC(801de788) SHA1(417b985714d8f0ebed93b65a3f865e03474ce9e5), "BWB", u8"Heaven & Hell (BWB) (MPU4) (20p stake / £8 token jackpot, set 1)" )
+GAME_CUSTOM( 199?, m4hvhel__a,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p, init_m4big,   "hh_20a_d.2_0",     0x0000, 0x040000, CRC(ea4e7876) SHA1(5bf711c2bdff50fe745edefa0eebf719824d9e5b), "BWB", u8"Heaven & Hell (BWB) (MPU4) (20p stake / £8 token jackpot, set 2)" )
+GAME_CUSTOM( 199?, m4hvhel__b,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p, init_m4big,   "hh_20s_d.2_0",     0x0000, 0x040000, CRC(a519a441) SHA1(f3c19d316c82d1ebbcfdabb6d4eaa6cfa369d287), "BWB", u8"Heaven & Hell (BWB) (MPU4) (20p stake / £8 token jackpot, set 3)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4hvhel__c,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>, mpu4impcoin_jackpot10_20p,   init_m4default_big,   "hh_sj___",         0x0000, 0x040000, CRC(04577b99) SHA1(48689c3a96bc42ad64dc4d363dad38c967f0cdcc), "BWB", u8"Heaven & Hell (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot)" )
+GAME_CUSTOM( 199?, m4hvhel__c,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>(R5, RT3), mpu4impcoin_jackpot10_20p,   init_m4big,   "hh_sj___",         0x0000, 0x040000, CRC(04577b99) SHA1(48689c3a96bc42ad64dc4d363dad38c967f0cdcc), "BWB", u8"Heaven & Hell (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot)" )
 //
-GAME_CUSTOM( 199?, m4hvhel__d,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>, mpu4impcoin_jackpot15_20p,   init_m4default_big,   "hh_sj___.f_0",     0x0000, 0x040000, CRC(8ab33720) SHA1(0c9283a20c3f008baa8ce027d1266e4ef49ca56b), "BWB", u8"Heaven & Hell (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4hvhel__e,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>, mpu4impcoin_jackpot15_20p,   init_m4default_big,   "hh_sjs__.f_0",     0x0000, 0x040000, CRC(8854763d) SHA1(323bd76a014e52e3b12427998b0e2851463246c8), "BWB", u8"Heaven & Hell (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4hvhel__f,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>, mpu4impcoin_jackpot15_20p,   init_m4default_big,   "h_hell._pound5",   0x0000, 0x040000, CRC(cd59c0d0) SHA1(8caad9043a277fa39a3ad2d5ec3388c121e7f697), "BWB", u8"Heaven & Hell (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 3)" )
+GAME_CUSTOM( 199?, m4hvhel__d,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,   init_m4big,   "hh_sj___.f_0",     0x0000, 0x040000, CRC(8ab33720) SHA1(0c9283a20c3f008baa8ce027d1266e4ef49ca56b), "BWB", u8"Heaven & Hell (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4hvhel__e,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,   init_m4big,   "hh_sjs__.f_0",     0x0000, 0x040000, CRC(8854763d) SHA1(323bd76a014e52e3b12427998b0e2851463246c8), "BWB", u8"Heaven & Hell (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4hvhel__f,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,   init_m4big,   "h_hell._pound5",   0x0000, 0x040000, CRC(cd59c0d0) SHA1(8caad9043a277fa39a3ad2d5ec3388c121e7f697), "BWB", u8"Heaven & Hell (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 3)" )
 //
-GAME_CUSTOM( 199?, m4hvhel__g,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>, mpu4impcoin_jackpot5_5p,     init_m4default_big,   "hh_vc___.g_0",     0x0000, 0x040000, CRC(db338fb7) SHA1(e7e92293374721e7360493e9ef189991dad0a1ee), "BWB", u8"Heaven & Hell (BWB) (MPU4) (5/10p stake / £5 jackpot, set 1)" )
-GAME_CUSTOM( 199?, m4hvhel__h,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>, mpu4impcoin_jackpot5_5p,     init_m4default_big,   "hh_vc_d_.g_0",     0x0000, 0x040000, CRC(292468bd) SHA1(f9b19f57a49c1afd670c68b7acd85d4141adfce1), "BWB", u8"Heaven & Hell (BWB) (MPU4) (5/10p stake / £5 jackpot, set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4hvhel__g,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,     init_m4big,   "hh_vc___.g_0",     0x0000, 0x040000, CRC(db338fb7) SHA1(e7e92293374721e7360493e9ef189991dad0a1ee), "BWB", u8"Heaven & Hell (BWB) (MPU4) (5/10p stake / £5 jackpot, set 1)" )
+GAME_CUSTOM( 199?, m4hvhel__h,  m4hvhel, bwboki_chr_cheat<m4hvhel_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,     init_m4big,   "hh_vc_d_.g_0",     0x0000, 0x040000, CRC(292468bd) SHA1(f9b19f57a49c1afd670c68b7acd85d4141adfce1), "BWB", u8"Heaven & Hell (BWB) (MPU4) (5/10p stake / £5 jackpot, set 2)" ) // Datapak
 
 
 /*****************************************************************************************************************************************************************************
@@ -858,14 +865,14 @@ static const uint32_t m4indycr_keys[2] = { 0x13, 0x102233 };
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 
-GAME_CUSTOM( 199?, m4indycr,       0,        bwboki_chr_cheat<m4indycr_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "ic_sj___.1_0", 0x0000, 0x040000, CRC(4dea0d17) SHA1(4fa19896dbb5e8f21ac7e74efc56de5cadd5bf54), u8"BWB","Indy Cars (BWB) (MPU4) (20/25/30p stake / £5/£15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4indycr__a,    m4indycr, bwboki_chr_cheat<m4indycr_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "ic_sj_b_.1_0", 0x0000, 0x040000, CRC(4bc0cb73) SHA1(d4c048ba9578add0104f0c529f20356c3502ea71), u8"BWB","Indy Cars (BWB) (MPU4) (20/25/30p stake / £5/£15 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4indycr__b,    m4indycr, bwboki_chr_cheat<m4indycr_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "ic_sj_d_.1_0", 0x0000, 0x040000, CRC(165ad977) SHA1(daa444e0d128859832094d3b07026483cd3466ce), u8"BWB","Indy Cars (BWB) (MPU4) (20/25/30p stake / £5/£15 jackpot) (set 3)" ) // Datapak
-GAME_CUSTOM( 199?, m4indycr__c,    m4indycr, bwboki_chr_cheat<m4indycr_keys>, mpu4impcoin_jackpot15_20p_90pc, init_m4default_big,  "ic_sj_k_.1_0", 0x0000, 0x040000, CRC(857fda64) SHA1(3eb230ea1adf9acb4cf83422c4bb1cde40756310), u8"BWB","Indy Cars (BWB) (MPU4) (20/25/30p stake / £5/£15 jackpot) (set 4)" ) // % key
-GAME_CUSTOM( 199?, m4indycr__d,    m4indycr, bwboki_chr_cheat<m4indycr_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "ic_sjs__.1_0", 0x0000, 0x040000, CRC(6310b904) SHA1(0f2cd7ed83f77423bcfb2a71144fab2047dfea13), u8"BWB","Indy Cars (BWB) (MPU4) (20/25/30p stake / £5/£15 jackpot) (set 5)" ) // Datapak
+GAME_CUSTOM( 199?, m4indycr,       0,        bwboki_chr_cheat<m4indycr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "ic_sj___.1_0", 0x0000, 0x040000, CRC(4dea0d17) SHA1(4fa19896dbb5e8f21ac7e74efc56de5cadd5bf54), u8"BWB","Indy Cars (BWB) (MPU4) (20/25/30p stake / £5/£15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4indycr__a,    m4indycr, bwboki_chr_cheat<m4indycr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "ic_sj_b_.1_0", 0x0000, 0x040000, CRC(4bc0cb73) SHA1(d4c048ba9578add0104f0c529f20356c3502ea71), u8"BWB","Indy Cars (BWB) (MPU4) (20/25/30p stake / £5/£15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4indycr__b,    m4indycr, bwboki_chr_cheat<m4indycr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "ic_sj_d_.1_0", 0x0000, 0x040000, CRC(165ad977) SHA1(daa444e0d128859832094d3b07026483cd3466ce), u8"BWB","Indy Cars (BWB) (MPU4) (20/25/30p stake / £5/£15 jackpot) (set 3)" ) // Datapak
+GAME_CUSTOM( 199?, m4indycr__c,    m4indycr, bwboki_chr_cheat<m4indycr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p_90pc, init_m4big,  "ic_sj_k_.1_0", 0x0000, 0x040000, CRC(857fda64) SHA1(3eb230ea1adf9acb4cf83422c4bb1cde40756310), u8"BWB","Indy Cars (BWB) (MPU4) (20/25/30p stake / £5/£15 jackpot) (set 4)" ) // % key
+GAME_CUSTOM( 199?, m4indycr__d,    m4indycr, bwboki_chr_cheat<m4indycr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "ic_sjs__.1_0", 0x0000, 0x040000, CRC(6310b904) SHA1(0f2cd7ed83f77423bcfb2a71144fab2047dfea13), u8"BWB","Indy Cars (BWB) (MPU4) (20/25/30p stake / £5/£15 jackpot) (set 5)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4indycr__e,    m4indycr, bwboki_chr_cheat<m4indycr_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "ic_sj___.2_0", 0x0000, 0x040000, CRC(6d0ddf54) SHA1(0985aa9fddb71a499d266c12893aabbab8755319), u8"BWB","Indy Cars (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4indycr__f,    m4indycr, bwboki_chr_cheat<m4indycr_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "ic_sj_d_.2_0", 0x0000, 0x040000, CRC(36bd0b34) SHA1(306d6e6536a4137353f9b895e64c7e9a5c79561a), u8"BWB","Indy Cars (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4indycr__e,    m4indycr, bwboki_chr_cheat<m4indycr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "ic_sj___.2_0", 0x0000, 0x040000, CRC(6d0ddf54) SHA1(0985aa9fddb71a499d266c12893aabbab8755319), u8"BWB","Indy Cars (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4indycr__f,    m4indycr, bwboki_chr_cheat<m4indycr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "ic_sj_d_.2_0", 0x0000, 0x040000, CRC(36bd0b34) SHA1(306d6e6536a4137353f9b895e64c7e9a5c79561a), u8"BWB","Indy Cars (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 2)" ) // Datapak
 
 /*****************************************************************************************************************************************************************************
 *
@@ -890,12 +897,12 @@ static const uint32_t m4jakjok_keys[2] = { 0x11, 0x103218 };
 	ROM_END \
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 2000, m4jakjok,       0,        bwboki_chr_cheat<m4jakjok_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "jj_sj___.6_0", 0x0000, 0x040000, CRC(7bc45b0e) SHA1(f30fef8fccdac04859f1ff93198a497eff723020), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 6) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot)" )
+GAME_CUSTOM( 2000, m4jakjok,       0,        bwboki_chr_cheat<m4jakjok_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "jj_sj___.6_0", 0x0000, 0x040000, CRC(7bc45b0e) SHA1(f30fef8fccdac04859f1ff93198a497eff723020), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 6) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot)" )
 //
-GAME_CUSTOM( 1998, m4jakjok__a,    m4jakjok, bwboki_chr_cheat<m4jakjok_keys>, mpu4impcoin_jackpot15_20p_90pc, init_m4default_big,  "jj_sj_k_.3_0", 0x0000, 0x040000, CRC(c33dd82f) SHA1(c1f3f6ca1c45503b7f71e897e5c27368f5efb439), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 3) (20/25/30p stake / £5/£15 jackpot)" ) // % key
-GAME_CUSTOM( 2000, m4jakjok__b,    m4jakjok, bwboki_chr_cheat<m4jakjok_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "jj_sjs__.6_0", 0x0000, 0x040000, CRC(4bcac6f5) SHA1(7dc07a7a61a6ba044020d6c2496143168c103a70), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 6) (20/25/30p stake / £5/£15 jackpot)" ) // Datapak
+GAME_CUSTOM( 1998, m4jakjok__a,    m4jakjok, bwboki_chr_cheat<m4jakjok_keys>(R5, RT3), mpu4impcoin_jackpot15_20p_90pc, init_m4big,  "jj_sj_k_.3_0", 0x0000, 0x040000, CRC(c33dd82f) SHA1(c1f3f6ca1c45503b7f71e897e5c27368f5efb439), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 3) (20/25/30p stake / £5/£15 jackpot)" ) // % key
+GAME_CUSTOM( 2000, m4jakjok__b,    m4jakjok, bwboki_chr_cheat<m4jakjok_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "jj_sjs__.6_0", 0x0000, 0x040000, CRC(4bcac6f5) SHA1(7dc07a7a61a6ba044020d6c2496143168c103a70), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 6) (20/25/30p stake / £5/£15 jackpot)" ) // Datapak
 //
-GAME_CUSTOM( 2000, m4jakjok__c,    m4jakjok, bwboki_chr_cheat<m4jakjok_keys>, mpu4impcoin_jackpot5_5p,        init_m4default_big,  "jj_vc___.7_0", 0x0000, 0x040000, CRC(4cdca8da) SHA1(ee7448b12380416a3bea2713ed5feca7473be8aa), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 7) (5/10p stake / £5 jackpot)" )
+GAME_CUSTOM( 2000, m4jakjok__c,    m4jakjok, bwboki_chr_cheat<m4jakjok_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,        init_m4big,  "jj_vc___.7_0", 0x0000, 0x040000, CRC(4cdca8da) SHA1(ee7448b12380416a3bea2713ed5feca7473be8aa), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 7) (5/10p stake / £5 jackpot)" )
 
 #define M4JAKJOKA_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -912,7 +919,7 @@ GAME_CUSTOM( 2000, m4jakjok__c,    m4jakjok, bwboki_chr_cheat<m4jakjok_keys>, mp
 	ROM_END \
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 1998, m4jakjoka, m4jakjok, bwboki_chr_cheat<m4jakjok_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big,  "j_joker", 0x0000, 0x040000, CRC(4f0c7ab8) SHA1(af962863ee55f6c2752bbe8a997e3b2102e42431), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 2) (20/25/30p stake / £5/£15 jackpot)" )
+GAME_CUSTOM( 1998, m4jakjoka, m4jakjok, bwboki_chr_cheat<m4jakjok_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big,  "j_joker", 0x0000, 0x040000, CRC(4f0c7ab8) SHA1(af962863ee55f6c2752bbe8a997e3b2102e42431), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 2) (20/25/30p stake / £5/£15 jackpot)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -935,7 +942,7 @@ static const uint32_t m4jflash_keys[2] = { 0x10, 0x3c3801 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JFLASH_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4jflash_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4jflash_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4jflash,       0,          "jf_25__c.2_1", 0x0000, 0x020000, CRC(4d5f1a12) SHA1(c25b6d899b74231da505bde7b671be001bdcea5d), "BWB","Jumping Jack Flash (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4jflash__a,    m4jflash,   "jf_25a_c.2_1", 0x0000, 0x020000, CRC(76722e15) SHA1(4bd107049ad98b848cdaba3a1318373bbd06ab9f), "BWB","Jumping Jack Flash (BWB) (MPU4) (set 2)" )
@@ -969,7 +976,7 @@ static const uint32_t m4ln7_keys[2] = { 0x10, 0x050107 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LN7_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4ln7_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4ln7_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4ln7,     0,      "l7_20a__.1_1", 0x0000, 0x010000, CRC(bfe82d2a) SHA1(4477d737a2326602a355758d8fc06220312fc085), "BWB","Lucky Number 7 (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4ln7__a,  m4ln7,  "l7_20s__.1_1", 0x0000, 0x010000, CRC(0037cd57) SHA1(b5882027269cf71878a73009bc3e40d9fcfac60d), "BWB","Lucky Number 7 (BWB) (MPU4) (set 2)" )
@@ -998,7 +1005,7 @@ static const uint32_t m4madmon_keys[2] = { 0x10, 0x351f3a };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MADMON_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4madmon_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4madmon_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4madmon,       0,          "mm_20a__.7_1", 0x0000, 0x020000, CRC(7df66388) SHA1(4e5bcbcb2fb08b23989c83f11751400f666bbdc2), "BWB","Mad Money (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4madmon__a,    m4madmon,   "mm_20b__.7_1", 0x0000, 0x020000, CRC(7f592e44) SHA1(05e78347cd09d1e58f0a50a724e0563490ec5185), "BWB","Mad Money (BWB) (MPU4) (set 2)" )
@@ -1034,7 +1041,7 @@ static const uint32_t m4madmnc_keys[2] = { 0x10, 0x351f3a };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MADMNC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4madmnc_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4madmnc_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4madmnc,       0,          "cm_25__c.3_1", 0x0000, 0x020000, CRC(3d9ff5fe) SHA1(b918bb15251514f50a669216c7d00ecf23e64d1b), "BWB","Mad Money Classic (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4madmnc__a,    m4madmnc,   "cm_25_bc.3_1", 0x0000, 0x020000, CRC(65a7b870) SHA1(58b910d7e002164cbbe1aa32c5e17dfe7cfb507d), "BWB","Mad Money Classic (BWB) (MPU4) (set 2)" )
@@ -1086,13 +1093,13 @@ static const uint32_t m4mmm_keys[2] = { 0x11, 0x320926 };
 	ROM_END \
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4mmm,     0,     bwboki_chr_cheat<m4mmm_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "mu_sj___.3_0", 0x0000, 0x040000, CRC(abdf9d1c) SHA1(e8c6a056025b44e4ec995b42b2720e6366a97283), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4mmm__a,  m4mmm, bwboki_chr_cheat<m4mmm_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "mu_sja__.3_0", 0x0000, 0x040000, CRC(3d2a9ea4) SHA1(f2ec904c8cef84affaad603edf26a864bd34be29), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 2)" )
-GAME_CUSTOM( 199?, m4mmm__b,  m4mmm, bwboki_chr_cheat<m4mmm_keys>, mpu4impcoin_jackpot15_20p_90pc, init_m4default_big, "mu_sjk__.3_0", 0x0000, 0x040000, CRC(34e4f8ba) SHA1(606d607faeb43190f5167aa3d10c55d9986b7e58), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 3)" ) // % key
-GAME_CUSTOM( 199?, m4mmm__c,  m4mmm, bwboki_chr_cheat<m4mmm_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "mu_sjs__.3_0", 0x0000, 0x040000, CRC(26fb12b3) SHA1(d341181be75c87b44e4066653225911ce3460ed8), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 4)" ) // Datapak
-GAME_CUSTOM( 199?, m4mmm__d,  m4mmm, bwboki_chr_cheat<m4mmm_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "mu_ssj__.2_0", 0x0000, 0x040000, CRC(935b6602) SHA1(d5fa5688895fe3c2ae3ad7dbbc35d9b12574c93d), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 5)" )
-GAME_CUSTOM( 199?, m4mmm__e,  m4mmm, bwboki_chr_cheat<m4mmm_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "mu_ssja_.2_0", 0x0000, 0x040000, CRC(ff97814c) SHA1(8d9d74e6b0096cdc3226cfa91d7b653855600d5a), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 6)" )
-GAME_CUSTOM( 199?, m4mmm__f,  m4mmm, bwboki_chr_cheat<m4mmm_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "mu_ssjb_.2_0", 0x0000, 0x040000, CRC(5728973a) SHA1(2cd9c866fcc33150fb8d456f741ac809e0bd2b15), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 7)" ) // Datapak
+GAME_CUSTOM( 199?, m4mmm,     0,     bwboki_chr_cheat<m4mmm_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "mu_sj___.3_0", 0x0000, 0x040000, CRC(abdf9d1c) SHA1(e8c6a056025b44e4ec995b42b2720e6366a97283), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4mmm__a,  m4mmm, bwboki_chr_cheat<m4mmm_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "mu_sja__.3_0", 0x0000, 0x040000, CRC(3d2a9ea4) SHA1(f2ec904c8cef84affaad603edf26a864bd34be29), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 2)" )
+GAME_CUSTOM( 199?, m4mmm__b,  m4mmm, bwboki_chr_cheat<m4mmm_keys>(R5, RT3), mpu4impcoin_jackpot15_20p_90pc, init_m4big, "mu_sjk__.3_0", 0x0000, 0x040000, CRC(34e4f8ba) SHA1(606d607faeb43190f5167aa3d10c55d9986b7e58), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 3)" ) // % key
+GAME_CUSTOM( 199?, m4mmm__c,  m4mmm, bwboki_chr_cheat<m4mmm_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "mu_sjs__.3_0", 0x0000, 0x040000, CRC(26fb12b3) SHA1(d341181be75c87b44e4066653225911ce3460ed8), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 4)" ) // Datapak
+GAME_CUSTOM( 199?, m4mmm__d,  m4mmm, bwboki_chr_cheat<m4mmm_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "mu_ssj__.2_0", 0x0000, 0x040000, CRC(935b6602) SHA1(d5fa5688895fe3c2ae3ad7dbbc35d9b12574c93d), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 5)" )
+GAME_CUSTOM( 199?, m4mmm__e,  m4mmm, bwboki_chr_cheat<m4mmm_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "mu_ssja_.2_0", 0x0000, 0x040000, CRC(ff97814c) SHA1(8d9d74e6b0096cdc3226cfa91d7b653855600d5a), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 6)" )
+GAME_CUSTOM( 199?, m4mmm__f,  m4mmm, bwboki_chr_cheat<m4mmm_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "mu_ssjb_.2_0", 0x0000, 0x040000, CRC(5728973a) SHA1(2cd9c866fcc33150fb8d456f741ac809e0bd2b15), "BWB",u8"Money Mummy Money (BWB) (MPU4) (20/25/30p stake / £10/£15 jackpot) (set 7)" ) // Datapak
 
 
 /*****************************************************************************************************************************************************************************
@@ -1116,7 +1123,7 @@ static const uint32_t m4orland_keys[2] = { 0x10, 0x2c081f };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ORLAND_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4orland_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big_low ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4orland_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big_low ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4orland,       0,          "or 05a v2-1,27c010",   0x0000, 0x020000, CRC(a33c22ee) SHA1(3598a2940f05622405fdef16426f3f5f30dfef29), "BWB","Orlando Magic (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4orland__a,    m4orland,   "or_05a__.1_1",         0x0000, 0x020000, CRC(3e7fe3ac) SHA1(9f4c0d5b7ba10726376b0654c8ddbc62b62c9eed), "BWB","Orlando Magic (BWB) (MPU4) (set 2)" )
@@ -1149,7 +1156,7 @@ static const uint32_t m4pzbing_keys[2] = { 0x10, 0x141531 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PZBING_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4pzbing_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4pzbing_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4pzbing,       0,          "pb_20a__.4_1", 0x0000, 0x010000, CRC(52aa92e5) SHA1(3dc20e521677e829967e1d689c9905fb96aee639), "BWB","Prize Bingo (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4pzbing__a,    m4pzbing,   "pb_20ad_.4_1", 0x0000, 0x010000, CRC(f6bd6ad0) SHA1(092cb895c576ed2e995b62aba21851af6fb90959), "BWB","Prize Bingo (BWB) (MPU4) (set 2)" )
@@ -1180,7 +1187,7 @@ static const uint32_t m4quidin_keys[2] = { 0x10, 0x050107 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4QUIDIN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4quidin_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4quidin_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4quidin,       0,          "qi_20a__.3_1", 0x0000, 0x010000, CRC(88873c45) SHA1(70fa65402dbbe716a089497a8ccb06e0ba2aac6d), "BWB","Quids In (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4quidin__a,    m4quidin,   "qi_20s__.3_1", 0x0000, 0x010000, CRC(3758dc38) SHA1(d22a379975e948d465e13233a796e0fb07e3c04f), "BWB","Quids In (BWB) (MPU4) (set 2)" )
@@ -1207,7 +1214,7 @@ static const uint32_t m4quidis_keys[2] = { 0x10, 0x050107 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4QUIDIS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4quidis_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4quidis_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4quidis,       0,          "pq_20a__.3_1", 0x0000, 0x010000, CRC(7eb762a1) SHA1(4546a7bf43f8ab6eb9713348e3f919de7532eed2), "BWB","Quids In Showcase (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4quidis__a,    m4quidis,   "pq_20s__.3_1", 0x0000, 0x010000, CRC(71360992) SHA1(0b64f27f0edfdebca41552181ff0f2b5491ec308), "BWB","Quids In Showcase (BWB) (MPU4) (set 2)" )
@@ -1237,7 +1244,7 @@ static const uint32_t m4rackem_keys[2] = { 0x11, 0x13222f };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RACKEM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4rackem_keys>, mpu4impcoin_jackpot15_20p, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4rackem_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 1999, m4rackem,       0,          "re_sj___.3_0", 0x0000, 0x040000, CRC(2f463d2f) SHA1(3410cc8a6d097a4edfcb4c57c237d1d514b507ba), "BWB",u8"Rack Em Up (BWB) (MPU4) (ver. 3) (20/25/30p stake / £5/£15 jackpot)" )
 GAME_CUSTOM( 1999, m4rackem__a,    m4rackem,   "re_sj___.2_0", 0x0000, 0x040000, CRC(e36d3f86) SHA1(a5f522c86482517b8dc735b1012f8f7668c2f18d), "BWB",u8"Rack Em Up (BWB) (MPU4) (ver. 2) (20/25/30p stake / £5/£15 jackpot) (set 1)" )
@@ -1266,7 +1273,7 @@ static const uint32_t m4rbgold_keys[2] = { 0x10, 0x2d371b };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RBGOLD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4rbgold_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4rbgold_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4rbgold,       0,          "rb_20a_p.2a1", 0x0000, 0x010000, CRC(d7e6e514) SHA1(25645b69e86335622df43113908ed88a21f27e30), "BWB","Rainbow Gold (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rbgold__a,    m4rbgold,   "rb_20a_p.2f1", 0x0000, 0x010000, CRC(62af6db6) SHA1(0dcb679c05f090f8dab7228009a700c31f0179d8), "BWB","Rainbow Gold (BWB) (MPU4) (set 2)" )
@@ -1313,12 +1320,12 @@ static const uint32_t m4rhfev_keys[2] = { 0x11, 0x3f0e27 };
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 
-GAME_CUSTOM( 1999, m4rhfev,     0,       bwboki_chr_cheat<m4rhfev_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "rt_sj___.7_0", 0x0000, 0x040000, CRC(3dd895ef) SHA1(433ecc268956c94c51dbccefd006b72e0ad8567b), "BWB",u8"Red Hot Fever (BWB) (MPU4) (ver. 7) (20/25/30p stake / £5/£10/£15 jackpot) (set 1)" )
-GAME_CUSTOM( 1999, m4rhfev__a,  m4rhfev, bwboki_chr_cheat<m4rhfev_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "rt_sja__.7_0", 0x0000, 0x040000, CRC(0ab59402) SHA1(485b4d2efd8f99085ed6ce5b7e07ede001c982c4), "BWB",u8"Red Hot Fever (BWB) (MPU4) (ver. 7) (20/25/30p stake / £5/£10/£15 jackpot) (set 2)" )
-GAME_CUSTOM( 1999, m4rhfev__b,  m4rhfev, bwboki_chr_cheat<m4rhfev_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "rt_sjs__.7_0", 0x0000, 0x040000, CRC(1a8feafb) SHA1(83151f63b7ebe1c538f9334e9c3d6889d0730144), "BWB",u8"Red Hot Fever (BWB) (MPU4) (ver. 7) (20/25/30p stake / £5/£10/£15 jackpot) (set 3)" ) // Datapak
+GAME_CUSTOM( 1999, m4rhfev,     0,       bwboki_chr_cheat<m4rhfev_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "rt_sj___.7_0", 0x0000, 0x040000, CRC(3dd895ef) SHA1(433ecc268956c94c51dbccefd006b72e0ad8567b), "BWB",u8"Red Hot Fever (BWB) (MPU4) (ver. 7) (20/25/30p stake / £5/£10/£15 jackpot) (set 1)" )
+GAME_CUSTOM( 1999, m4rhfev__a,  m4rhfev, bwboki_chr_cheat<m4rhfev_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "rt_sja__.7_0", 0x0000, 0x040000, CRC(0ab59402) SHA1(485b4d2efd8f99085ed6ce5b7e07ede001c982c4), "BWB",u8"Red Hot Fever (BWB) (MPU4) (ver. 7) (20/25/30p stake / £5/£10/£15 jackpot) (set 2)" )
+GAME_CUSTOM( 1999, m4rhfev__b,  m4rhfev, bwboki_chr_cheat<m4rhfev_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "rt_sjs__.7_0", 0x0000, 0x040000, CRC(1a8feafb) SHA1(83151f63b7ebe1c538f9334e9c3d6889d0730144), "BWB",u8"Red Hot Fever (BWB) (MPU4) (ver. 7) (20/25/30p stake / £5/£10/£15 jackpot) (set 3)" ) // Datapak
 //
-GAME_CUSTOM( 1999, m4rhfev__c,  m4rhfev, bwboki_chr_cheat<m4rhfev_keys>, mpu4impcoin_jackpot5_5p,   init_m4default_big, "rt_vc___.1_0", 0x0000, 0x040000, CRC(2a8df147) SHA1(df0e7021e9d169575a1297f9851b5a64e20d1a40), "BWB",u8"Red Hot Fever (BWB) (MPU4) (ver. 1) (5/10p stake / £5/£8 jackpot) (set 1)" )
-GAME_CUSTOM( 1999, m4rhfev__d,  m4rhfev, bwboki_chr_cheat<m4rhfev_keys>, mpu4impcoin_jackpot5_5p,   init_m4default_big, "rt_vc_d_.1_0", 0x0000, 0x040000, CRC(7adef22b) SHA1(d6a584581745c0ce64f646ef0b49cb68343990d0), "BWB",u8"Red Hot Fever (BWB) (MPU4) (ver. 1) (5/10p stake / £5/£8 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 1999, m4rhfev__c,  m4rhfev, bwboki_chr_cheat<m4rhfev_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,   init_m4big, "rt_vc___.1_0", 0x0000, 0x040000, CRC(2a8df147) SHA1(df0e7021e9d169575a1297f9851b5a64e20d1a40), "BWB",u8"Red Hot Fever (BWB) (MPU4) (ver. 1) (5/10p stake / £5/£8 jackpot) (set 1)" )
+GAME_CUSTOM( 1999, m4rhfev__d,  m4rhfev, bwboki_chr_cheat<m4rhfev_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,   init_m4big, "rt_vc_d_.1_0", 0x0000, 0x040000, CRC(7adef22b) SHA1(d6a584581745c0ce64f646ef0b49cb68343990d0), "BWB",u8"Red Hot Fever (BWB) (MPU4) (ver. 1) (5/10p stake / £5/£8 jackpot) (set 2)" ) // Datapak
 
 
 /*****************************************************************************************************************************************************************************
@@ -1343,7 +1350,7 @@ static const uint32_t m4sinbd_keys[2] = { 0x10, 0x0c253d };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SINBD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbd_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbd_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sinbd,     0,          "sd_20__c.1_1",         0x0000, 0x020000, CRC(28cd336e) SHA1(45bdf5403c04b7d3a3645b6b44ac3d12e6463a55), "BWB","Sinbad (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sinbd__a,  m4sinbd,    "sd_20a__.4_1",         0x0000, 0x020000, CRC(12b8f629) SHA1(c8540ecb217cf0615d7a8d080136926646ca8497), "BWB","Sinbad (BWB) (MPU4) (set 2)" )
@@ -1393,12 +1400,12 @@ static const uint32_t m4sky_keys[2] = { 0x11, 0x1f2d3b };
 	ROM_END \
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4sky,     0,     bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "sk_s____.3_1", 0x0000, 0x040000, CRC(749af008) SHA1(036514f2bcb84193cfa84313f0617f3196aea73e), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake / £8 token/£10/£15 jackpot)" )
+GAME_CUSTOM( 199?, m4sky,     0,     bwboki_chr_cheat<m4sky_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "sk_s____.3_1", 0x0000, 0x040000, CRC(749af008) SHA1(036514f2bcb84193cfa84313f0617f3196aea73e), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake / £8 token/£10/£15 jackpot)" )
 // unusual 1.8 hopper error on sets below
-GAME_CUSTOM( 199?, m4sky__a,  m4sky, bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_jackpot15_20p_90pc, init_m4default_big, "sk_sj___.5_0", 0x0000, 0x040000, CRC(45ae0423) SHA1(94d5b3d4aacb69a18ff3f45681eb5f7fba7657e8), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 1)" ) // % key
-GAME_CUSTOM( 199?, m4sky__b,  m4sky, bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_jackpot15_20p_90pc, init_m4default_big, "sk_sj_k_.5_0", 0x0000, 0x040000, CRC(e1bab980) SHA1(1c8b127809422ab0baf1875ca907f18269a0cc17), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 2)" ) // % key
-GAME_CUSTOM( 199?, m4sky__c,  m4sky, bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "sk_sja__.5_0", 0x0000, 0x040000, CRC(b2a16ef7) SHA1(9012dcc320e8af8fef53e0dc91d3bcd6cbafa5ee), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 3)" )
-GAME_CUSTOM( 199?, m4sky__d,  m4sky, bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "sk_sjs__.5_0", 0x0000, 0x040000, CRC(d176431f) SHA1(8ca90ef61486fc5a5b6527f913cd05b42ceabe3e), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 4)" ) // Datapak
+GAME_CUSTOM( 199?, m4sky__a,  m4sky, bwboki_chr_cheat<m4sky_keys>(R5, RT3), mpu4impcoin_jackpot15_20p_90pc, init_m4big, "sk_sj___.5_0", 0x0000, 0x040000, CRC(45ae0423) SHA1(94d5b3d4aacb69a18ff3f45681eb5f7fba7657e8), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 1)" ) // % key
+GAME_CUSTOM( 199?, m4sky__b,  m4sky, bwboki_chr_cheat<m4sky_keys>(R5, RT3), mpu4impcoin_jackpot15_20p_90pc, init_m4big, "sk_sj_k_.5_0", 0x0000, 0x040000, CRC(e1bab980) SHA1(1c8b127809422ab0baf1875ca907f18269a0cc17), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 2)" ) // % key
+GAME_CUSTOM( 199?, m4sky__c,  m4sky, bwboki_chr_cheat<m4sky_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "sk_sja__.5_0", 0x0000, 0x040000, CRC(b2a16ef7) SHA1(9012dcc320e8af8fef53e0dc91d3bcd6cbafa5ee), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 3)" )
+GAME_CUSTOM( 199?, m4sky__d,  m4sky, bwboki_chr_cheat<m4sky_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "sk_sjs__.5_0", 0x0000, 0x040000, CRC(d176431f) SHA1(8ca90ef61486fc5a5b6527f913cd05b42ceabe3e), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 4)" ) // Datapak
 
 
 /*****************************************************************************************************************************************************************************
@@ -1423,7 +1430,7 @@ static const uint32_t m4souls_keys[2] = { 0x10, 0x3e2f0b };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SOULS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4souls_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4souls_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4souls,     0,          "ss_06a__.4_1", 0x0000, 0x020000, CRC(00390a21) SHA1(d31d1307301fa4e8cf0ce3677e68a4c1723e4404), "BWB","Soul Sister (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4souls__a,  m4souls,    "ss_16a__.4_1", 0x0000, 0x020000, CRC(b9ab9612) SHA1(ad30916a0f2cc745741c99d23c23192ae4088daf), "BWB","Soul Sister (BWB) (MPU4) (set 2)" )
@@ -1454,7 +1461,7 @@ static const uint32_t m4spinbt_keys[2] = { 0x45, 0x250603 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SPINBT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4spinbt_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4spinbt_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4spinbt,       0,          "sn_37ad_.5_0", 0x0000, 0x040000, CRC(42d6faaa) SHA1(3789e85981b33ffae7c50ccca3278ae62974972d), "BWB","Spin The Bottle (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4spinbt__a,    m4spinbt,   "sn_37b__.5_0", 0x0000, 0x040000, CRC(3a259a6f) SHA1(1acabb9e725ae1374b87808c4b3d06a329c824d0), "BWB","Spin The Bottle (BWB) (MPU4) (set 2)" )
@@ -1487,18 +1494,18 @@ static const uint32_t m4starst_keys[2] = { 0x11, 0x3f0a26 };
 	ROM_END \
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4starst,       0,        bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot8tkn_20p,      init_m4default_big, "sr_20__d.3_0", 0x0000, 0x040000, CRC(98f6619b) SHA1(fc0a568e6695c9ad0fda7bc6703c752af26a7777), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20p stake / £8 token jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4starst__a,    m4starst, bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot8tkn_20p,      init_m4default_big, "sr_20_bd.3_0", 0x0000, 0x040000, CRC(ff8209de) SHA1(41a4c20c89b3a04612ad6298276472b888915c89), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20p stake / £8 token jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4starst__b,    m4starst, bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot8tkn_20p_90pc, init_m4default_big, "sr_20_kd.3_0", 0x0000, 0x040000, CRC(4c9a53d5) SHA1(43ebf6c06db58de9c3934e2dbba0d8126f3e2dda), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20p stake / £8 token jackpot) (set 3)" ) // % key
-GAME_CUSTOM( 199?, m4starst__c,    m4starst, bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot8tkn_20p,      init_m4default_big, "sr_20a_d.3_0", 0x0000, 0x040000, CRC(e9eebb4c) SHA1(60d8010140d9debe8f12d7f810de223d9abd02a4), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20p stake / £8 token jackpot) (set 4)" )
-GAME_CUSTOM( 199?, m4starst__d,    m4starst, bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot8tkn_20p,      init_m4default_big, "sr_20s_d.3_0", 0x0000, 0x040000, CRC(725b50e6) SHA1(3efde346022e37b09df08b8188ac76dcdfac8a4e), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20p stake / £8 token jackpot) (set 5)" ) // Datapak
+GAME_CUSTOM( 199?, m4starst,       0,        bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p,      init_m4big, "sr_20__d.3_0", 0x0000, 0x040000, CRC(98f6619b) SHA1(fc0a568e6695c9ad0fda7bc6703c752af26a7777), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20p stake / £8 token jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4starst__a,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p,      init_m4big, "sr_20_bd.3_0", 0x0000, 0x040000, CRC(ff8209de) SHA1(41a4c20c89b3a04612ad6298276472b888915c89), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20p stake / £8 token jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4starst__b,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p_90pc, init_m4big, "sr_20_kd.3_0", 0x0000, 0x040000, CRC(4c9a53d5) SHA1(43ebf6c06db58de9c3934e2dbba0d8126f3e2dda), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20p stake / £8 token jackpot) (set 3)" ) // % key
+GAME_CUSTOM( 199?, m4starst__c,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p,      init_m4big, "sr_20a_d.3_0", 0x0000, 0x040000, CRC(e9eebb4c) SHA1(60d8010140d9debe8f12d7f810de223d9abd02a4), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20p stake / £8 token jackpot) (set 4)" )
+GAME_CUSTOM( 199?, m4starst__d,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot8tkn_20p,      init_m4big, "sr_20s_d.3_0", 0x0000, 0x040000, CRC(725b50e6) SHA1(3efde346022e37b09df08b8188ac76dcdfac8a4e), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20p stake / £8 token jackpot) (set 5)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4starst__e,    m4starst, bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "sr_sj___.5_0", 0x0000, 0x040000, CRC(7964bd86) SHA1(7078de5a61b52dedb776993643f7edd8a2c863c3), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4starst__f,    m4starst, bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "sr_sj_b_.5_0", 0x0000, 0x040000, CRC(4ee1f95b) SHA1(1e3d52afd19a9489608d5446ef2118561c6411b0), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4starst__g,    m4starst, bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "sr_sj_d_.5_0", 0x0000, 0x040000, CRC(b4d78711) SHA1(c864c944b3fa74aa1fed22afe656a37413b024ce), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 3)" ) // Datapak
-GAME_CUSTOM( 199?, m4starst__h,    m4starst, bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot15_20p_90pc, init_m4default_big,  "sr_sj_k_.5_0", 0x0000, 0x040000, CRC(c7681e28) SHA1(a8c1c75df33c85301257147c97d6af8808dad0d2), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 4)" ) // % key
-GAME_CUSTOM( 199?, m4starst__i,    m4starst, bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "sr_sja__.5_0", 0x0000, 0x040000, CRC(aa86c4f2) SHA1(e90fd91f1d14b89714e3fb8236ac9e8a641e4c71), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 5)" )
-GAME_CUSTOM( 199?, m4starst__j,    m4starst, bwboki_chr_cheat<m4starst_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big,  "sr_sjs__.5_0", 0x0000, 0x040000, CRC(89e405e4) SHA1(5aa9053e08c27570731f65502c7fb31f0ea0a678), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 6)" ) // Datapak
+GAME_CUSTOM( 199?, m4starst__e,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "sr_sj___.5_0", 0x0000, 0x040000, CRC(7964bd86) SHA1(7078de5a61b52dedb776993643f7edd8a2c863c3), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4starst__f,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "sr_sj_b_.5_0", 0x0000, 0x040000, CRC(4ee1f95b) SHA1(1e3d52afd19a9489608d5446ef2118561c6411b0), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4starst__g,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "sr_sj_d_.5_0", 0x0000, 0x040000, CRC(b4d78711) SHA1(c864c944b3fa74aa1fed22afe656a37413b024ce), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 3)" ) // Datapak
+GAME_CUSTOM( 199?, m4starst__h,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot15_20p_90pc, init_m4big,  "sr_sj_k_.5_0", 0x0000, 0x040000, CRC(c7681e28) SHA1(a8c1c75df33c85301257147c97d6af8808dad0d2), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 4)" ) // % key
+GAME_CUSTOM( 199?, m4starst__i,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "sr_sja__.5_0", 0x0000, 0x040000, CRC(aa86c4f2) SHA1(e90fd91f1d14b89714e3fb8236ac9e8a641e4c71), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 5)" )
+GAME_CUSTOM( 199?, m4starst__j,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big,  "sr_sjs__.5_0", 0x0000, 0x040000, CRC(89e405e4) SHA1(5aa9053e08c27570731f65502c7fb31f0ea0a678), "BWB",u8"Stars & Stripes (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 6)" ) // Datapak
 
 
 /*****************************************************************************************************************************************************************************
@@ -1524,13 +1531,13 @@ static const uint32_t m4supleg_keys[2] = { 0x11, 0x310926 };
 	ROM_END \
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4supleg,       0,        bwboki_chr_cheat<m4supleg_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "sl_sj.hex",    0x0000, 0x040000, CRC(254835f7) SHA1(2fafaa3da747edd27d393ad106008e898e465283), "BWB",u8"Super League (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4supleg__a,    m4supleg, bwboki_chr_cheat<m4supleg_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "sl_sjs.hex",   0x0000, 0x040000, CRC(98942cd3) SHA1(858fde0a350159d089c6a0e0cc2e2eed6ab2092c), "BWB",u8"Super League (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4supleg,       0,        bwboki_chr_cheat<m4supleg_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "sl_sj.hex",    0x0000, 0x040000, CRC(254835f7) SHA1(2fafaa3da747edd27d393ad106008e898e465283), "BWB",u8"Super League (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4supleg__a,    m4supleg, bwboki_chr_cheat<m4supleg_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "sl_sjs.hex",   0x0000, 0x040000, CRC(98942cd3) SHA1(858fde0a350159d089c6a0e0cc2e2eed6ab2092c), "BWB",u8"Super League (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 2)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4supleg__b,    m4supleg, bwboki_chr_cheat<m4supleg_keys>, mpu4impcoin_jackpot5_5p,   init_m4default_big, "sl_vc.hex",    0x0000, 0x040000, CRC(1940d117) SHA1(ae7338483ac39e9e1973dde5eb837443512630dd), "BWB",u8"Super League (BWB) (MPU4) (5/10p stake / £5 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4supleg__c,    m4supleg, bwboki_chr_cheat<m4supleg_keys>, mpu4impcoin_jackpot5_5p,   init_m4default_big, "sl_vcd.hex",   0x0000, 0x040000, CRC(7aab16d1) SHA1(6da4e0d9883a48937d00bfc5929b3557de51f60e), "BWB",u8"Super League (BWB) (MPU4) (5/10p stake / £5 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4supleg__b,    m4supleg, bwboki_chr_cheat<m4supleg_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,   init_m4big, "sl_vc.hex",    0x0000, 0x040000, CRC(1940d117) SHA1(ae7338483ac39e9e1973dde5eb837443512630dd), "BWB",u8"Super League (BWB) (MPU4) (5/10p stake / £5 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4supleg__c,    m4supleg, bwboki_chr_cheat<m4supleg_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,   init_m4big, "sl_vcd.hex",   0x0000, 0x040000, CRC(7aab16d1) SHA1(6da4e0d9883a48937d00bfc5929b3557de51f60e), "BWB",u8"Super League (BWB) (MPU4) (5/10p stake / £5 jackpot) (set 2)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4supleg__d,    m4supleg, bwboki_chr_cheat<m4supleg_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "sls.hex",      0x0000, 0x040000, CRC(5ad6dbb9) SHA1(ff6f9dcf14df22c7bb2b949fcd5c70f31d4c1928), "BWB",u8"Super League (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot)" )
+GAME_CUSTOM( 199?, m4supleg__d,    m4supleg, bwboki_chr_cheat<m4supleg_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "sls.hex",      0x0000, 0x040000, CRC(5ad6dbb9) SHA1(ff6f9dcf14df22c7bb2b949fcd5c70f31d4c1928), "BWB",u8"Super League (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot)" )
 
 #define M4SUPLEGW_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -1547,7 +1554,7 @@ GAME_CUSTOM( 199?, m4supleg__d,    m4supleg, bwboki_chr_cheat<m4supleg_keys>, mp
 	ROM_END \
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4suplegw, m4supleg, bwboki_chr_cheat<m4supleg_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "s_leag._pound5", 0x0000, 0x040000, CRC(4c6bd78e) SHA1(f67793a2a16adacc8d92b57050f02cffa50a1283), "BWB",u8"Super League (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 3)" ) // maybe a Whitbread set, but not shown in attract
+GAME_CUSTOM( 199?, m4suplegw, m4supleg, bwboki_chr_cheat<m4supleg_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "s_leag._pound5", 0x0000, 0x040000, CRC(4c6bd78e) SHA1(f67793a2a16adacc8d92b57050f02cffa50a1283), "BWB",u8"Super League (BWB) (MPU4) (5/10/20/25/30p stake / £5 jackpot, 20/25/30p stake / £15 jackpot) (set 3)" ) // maybe a Whitbread set, but not shown in attract
 
 
 /*****************************************************************************************************************************************************************************
@@ -1570,7 +1577,7 @@ static const uint32_t m4supscr_keys[2] = { 0x11, 0x101231 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SUPSCR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4supscr_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4supscr_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4supscr,       0,          "sm_78___.6_0",         0x0000, 0x040000, CRC(e7022c44) SHA1(da3a5b9954f7e50dce73aeb9c46bd4631c8350d5), "BWB","Super Soccer (ver. 6) (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4supscr__a,    m4supscr,   "sm_78_d_.6_0",         0x0000, 0x040000, CRC(4dbe6a87) SHA1(fe2ce1fca7105afbf459ee6558744f8fee417169), "BWB","Super Soccer (ver. 6) (BWB) (MPU4) (set 2)" )
@@ -1609,7 +1616,7 @@ static const uint32_t m4sure_keys[2] = {0x10, 0x281215};
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SURE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4sure_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sure_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sure,       0,      "su_xf___.3_1", 0x0000, 0x010000, CRC(f85dae5c) SHA1(4c761c355fb6651f1e0cb041342f8a2ff510dfd2), "BWB","Sure Thing (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sure__a,    m4sure, "su_xf_b_.3_1", 0x0000, 0x010000, CRC(9a760e0f) SHA1(fdacdae0e2322daa004b2385616dd34626814d42), "BWB","Sure Thing (BWB) (MPU4) (set 2)" )
@@ -1638,7 +1645,7 @@ static const uint32_t m4trex_keys[2] = {0x10, 0x112231};
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TREX_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4trex_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4trex_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4trex,       0,      "tr_20a__.2_1", 0x0000, 0x010000, CRC(21150b8e) SHA1(1531bc6fdb8b787fed6f4f98c6463313c55efc3c), "BWB","T-Rex (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4trex__a,    m4trex, "tr_20a_p.2_1", 0x0000, 0x010000, CRC(ec1b35bc) SHA1(944959c6d1f8e9b0bb33c659b7c515cb7585fed0), "BWB","T-Rex (BWB) (MPU4) (set 2)" )
@@ -1674,7 +1681,7 @@ static const uint32_t m4tutbwb_keys[2] = { 0x01, 0x163428 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TUTBWB_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4tutbwb_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4tutbwb_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4 ,ROT0,company,title,GAME_FLAGS )
 
 // these were in with the regular Barcrest / Bwb Tutti Fruity sets, but this looks like something different, maybe a Bwn original with the same name?
 // it has a 0x3f fill near the vectors etc. which is typically associated with Bwb originals.
@@ -1715,15 +1722,15 @@ static const uint32_t m4volcan_keys[2] = { 0x11, 0x3f0d26 };
 	ROM_END \
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4volcan,       0,        bwboki_chr_cheat<m4volcan_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "vo_sj___.5_0",         0x0000, 0x040000, CRC(78096ebf) SHA1(96915bc2eca00fbd82fab8b3f62e697da118acdd), "BWB",u8"Volcano (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4volcan__a,    m4volcan, bwboki_chr_cheat<m4volcan_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "vo_sj_d_.5_0",         0x0000, 0x040000, CRC(87e0347d) SHA1(be5d5b90739fa8ac10f6504290aa58fcf147f323), "BWB",u8"Volcano (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4volcan__b,    m4volcan, bwboki_chr_cheat<m4volcan_keys>, mpu4impcoin_jackpot15_20p_90pc, init_m4default_big, "vo_sj_k_.5_0",         0x0000, 0x040000, CRC(8604d102) SHA1(34c7df0257ba02ace4a74ffd5b0eed11eea0c333), "BWB",u8"Volcano (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 3)" ) // % key
-GAME_CUSTOM( 199?, m4volcan__c,    m4volcan, bwboki_chr_cheat<m4volcan_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "vo_sja__.5_0",         0x0000, 0x040000, CRC(d73bade2) SHA1(7e02493ec0710f109ae45e523ef3d7d275aaefab), "BWB",u8"Volcano (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 4)" )
-GAME_CUSTOM( 199?, m4volcan__d,    m4volcan, bwboki_chr_cheat<m4volcan_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "vo_sjs__.5_0",         0x0000, 0x040000, CRC(51eff796) SHA1(d0efb1eb4be176906726a438fcffb50cf5ddd217), "BWB",u8"Volcano (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 5)" ) // Datapak
+GAME_CUSTOM( 199?, m4volcan,       0,        bwboki_chr_cheat<m4volcan_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "vo_sj___.5_0",         0x0000, 0x040000, CRC(78096ebf) SHA1(96915bc2eca00fbd82fab8b3f62e697da118acdd), "BWB",u8"Volcano (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4volcan__a,    m4volcan, bwboki_chr_cheat<m4volcan_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "vo_sj_d_.5_0",         0x0000, 0x040000, CRC(87e0347d) SHA1(be5d5b90739fa8ac10f6504290aa58fcf147f323), "BWB",u8"Volcano (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4volcan__b,    m4volcan, bwboki_chr_cheat<m4volcan_keys>(R5, RT3), mpu4impcoin_jackpot15_20p_90pc, init_m4big, "vo_sj_k_.5_0",         0x0000, 0x040000, CRC(8604d102) SHA1(34c7df0257ba02ace4a74ffd5b0eed11eea0c333), "BWB",u8"Volcano (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 3)" ) // % key
+GAME_CUSTOM( 199?, m4volcan__c,    m4volcan, bwboki_chr_cheat<m4volcan_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "vo_sja__.5_0",         0x0000, 0x040000, CRC(d73bade2) SHA1(7e02493ec0710f109ae45e523ef3d7d275aaefab), "BWB",u8"Volcano (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 4)" )
+GAME_CUSTOM( 199?, m4volcan__d,    m4volcan, bwboki_chr_cheat<m4volcan_keys>(R5, RT3), mpu4impcoin_jackpot15_20p,      init_m4big, "vo_sjs__.5_0",         0x0000, 0x040000, CRC(51eff796) SHA1(d0efb1eb4be176906726a438fcffb50cf5ddd217), "BWB",u8"Volcano (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 5)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4volcan__e,    m4volcan, bwboki_chr_cheat<m4volcan_keys>, mpu4impcoin_jackpot5_5p,        init_m4default_big, "vo_vc___.2_0",         0x0000, 0x040000, CRC(24a9e5d6) SHA1(dd4223c3b5c024eb9d56bb45426e327b49f78dde), "BWB",u8"Volcano (BWB) (MPU4) (5/10p stake / £5/£8 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4volcan__f,    m4volcan, bwboki_chr_cheat<m4volcan_keys>, mpu4impcoin_jackpot5_5p,        init_m4default_big, "vo_vc_d_.2_0",         0x0000, 0x040000, CRC(7f7341b6) SHA1(23d46ca0eed1e942b2a0d33d6ada2434ded5819b), "BWB",u8"Volcano (BWB) (MPU4) (5/10p stake / £5/£8 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4volcan__g,    m4volcan, bwboki_chr_cheat<m4volcan_keys>, mpu4impcoin_jackpot5_5p,        init_m4default_big, "volcano_bwb_2-0.bin",  0x0000, 0x040000, CRC(20688684) SHA1(fe533341417a3a0b16f485351cb635f4e7d823db), "BWB",u8"Volcano (BWB) (MPU4) (5/10p stake / £5/£8 jackpot) (set 3)" )
+GAME_CUSTOM( 199?, m4volcan__e,    m4volcan, bwboki_chr_cheat<m4volcan_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,        init_m4big, "vo_vc___.2_0",         0x0000, 0x040000, CRC(24a9e5d6) SHA1(dd4223c3b5c024eb9d56bb45426e327b49f78dde), "BWB",u8"Volcano (BWB) (MPU4) (5/10p stake / £5/£8 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4volcan__f,    m4volcan, bwboki_chr_cheat<m4volcan_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,        init_m4big, "vo_vc_d_.2_0",         0x0000, 0x040000, CRC(7f7341b6) SHA1(23d46ca0eed1e942b2a0d33d6ada2434ded5819b), "BWB",u8"Volcano (BWB) (MPU4) (5/10p stake / £5/£8 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4volcan__g,    m4volcan, bwboki_chr_cheat<m4volcan_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,        init_m4big, "volcano_bwb_2-0.bin",  0x0000, 0x040000, CRC(20688684) SHA1(fe533341417a3a0b16f485351cb635f4e7d823db), "BWB",u8"Volcano (BWB) (MPU4) (5/10p stake / £5/£8 jackpot) (set 3)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -1750,12 +1757,12 @@ static const uint32_t m4vdexpr_keys[2] = { 0x11, 0x3f0d27 };
 	ROM_END \
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4vdexpr,       0,        bwboki_chr_cheat<m4vdexpr_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "vd_sj___.2_0", 0x0000, 0x040000, CRC(03efd2a5) SHA1(4fc3695c24335aef11ba168f660fb519d8c9d473), "BWB","Voodoo Express (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4vdexpr__a,    m4vdexpr, bwboki_chr_cheat<m4vdexpr_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "vd_sj_d_.2_0", 0x0000, 0x040000, CRC(5073b98e) SHA1(66b020b8c096e78e1c9694f1cbc139e97314ab48), "BWB","Voodoo Express (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4vdexpr__b,    m4vdexpr, bwboki_chr_cheat<m4vdexpr_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "vd_sja__.2_0", 0x0000, 0x040000, CRC(c53dbf48) SHA1(ceee2de3ea8cb511540d90b87bc67bec3309de35), "BWB","Voodoo Express (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 3)" )
-GAME_CUSTOM( 199?, m4vdexpr__c,    m4vdexpr, bwboki_chr_cheat<m4vdexpr_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "vd_sjs__.2_0", 0x0000, 0x040000, CRC(036157b3) SHA1(b575751006c3ee59bf0404fa0e177fee9ef9c5db), "BWB","Voodoo Express (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 4)" ) // Datapak
+GAME_CUSTOM( 199?, m4vdexpr,       0,        bwboki_chr_cheat<m4vdexpr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "vd_sj___.2_0", 0x0000, 0x040000, CRC(03efd2a5) SHA1(4fc3695c24335aef11ba168f660fb519d8c9d473), "BWB","Voodoo Express (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4vdexpr__a,    m4vdexpr, bwboki_chr_cheat<m4vdexpr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "vd_sj_d_.2_0", 0x0000, 0x040000, CRC(5073b98e) SHA1(66b020b8c096e78e1c9694f1cbc139e97314ab48), "BWB","Voodoo Express (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4vdexpr__b,    m4vdexpr, bwboki_chr_cheat<m4vdexpr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "vd_sja__.2_0", 0x0000, 0x040000, CRC(c53dbf48) SHA1(ceee2de3ea8cb511540d90b87bc67bec3309de35), "BWB","Voodoo Express (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 3)" )
+GAME_CUSTOM( 199?, m4vdexpr__c,    m4vdexpr, bwboki_chr_cheat<m4vdexpr_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "vd_sjs__.2_0", 0x0000, 0x040000, CRC(036157b3) SHA1(b575751006c3ee59bf0404fa0e177fee9ef9c5db), "BWB","Voodoo Express (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot) (set 4)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4vdexpr__d,    m4vdexpr, bwboki_chr_cheat<m4vdexpr_keys>, mpu4impcoin_jackpot5_5p,   init_m4default_big, "vd_vc___.1_0", 0x0000, 0x040000, CRC(6326e14a) SHA1(3dbfbb1cfb60dc10c6972aa2fda89c8e3c3107ea), "BWB","Voodoo Express (BWB) (MPU4) (5/10p stake / £5/£8 jackpot)" )
+GAME_CUSTOM( 199?, m4vdexpr__d,    m4vdexpr, bwboki_chr_cheat<m4vdexpr_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,   init_m4big, "vd_vc___.1_0", 0x0000, 0x040000, CRC(6326e14a) SHA1(3dbfbb1cfb60dc10c6972aa2fda89c8e3c3107ea), "BWB","Voodoo Express (BWB) (MPU4) (5/10p stake / £5/£8 jackpot)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -1780,24 +1787,24 @@ static const uint32_t m4xch_keys[2] = { 0x42, 0x3f0c26 };
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // these don't require stake/jp to be set
-GAME_CUSTOM( 199?, m4xch,     0,     bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin,              init_m4default_big, "ec_25b__.b_0", 0x0000, 0x020000, CRC(cec9e836) SHA1(460ec38566d7608e51b62f1ffebc18a395002ed4), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £10 jackpot)" )
+GAME_CUSTOM( 199?, m4xch,     0,     bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "ec_25b__.b_0", 0x0000, 0x020000, CRC(cec9e836) SHA1(460ec38566d7608e51b62f1ffebc18a395002ed4), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £10 jackpot)" )
 //
-GAME_CUSTOM( 199?, m4xch__a,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin,              init_m4default_big, "ec_36bg_.bv0", 0x0000, 0x020000, CRC(c5d1523a) SHA1(813916008d7e7576e4594a6eb79a76c514470f31), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £8 jackpot) (set 1)" ) // Datapak
-GAME_CUSTOM( 199?, m4xch__b,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin,              init_m4default_big, "ec_36bgn.bv0", 0x0000, 0x020000, CRC(4be33ee1) SHA1(888009e09c59f30649eac3238e0b70dec258cb3c), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £8 jackpot) (set 2)" )
+GAME_CUSTOM( 199?, m4xch__a,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "ec_36bg_.bv0", 0x0000, 0x020000, CRC(c5d1523a) SHA1(813916008d7e7576e4594a6eb79a76c514470f31), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £8 jackpot) (set 1)" ) // Datapak
+GAME_CUSTOM( 199?, m4xch__b,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "ec_36bgn.bv0", 0x0000, 0x020000, CRC(4be33ee1) SHA1(888009e09c59f30649eac3238e0b70dec258cb3c), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £8 jackpot) (set 2)" )
 //
-GAME_CUSTOM( 199?, m4xch__c,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin,              init_m4default_big, "ec_39b__.b_0", 0x0000, 0x020000, CRC(e5d5961d) SHA1(ac3916cba91a13d1e0820982a1cefabd378647c9), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4xch__d,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin,              init_m4default_big, "ec_39bg_.b_0", 0x0000, 0x020000, CRC(49b2be01) SHA1(dbf808d0949a9658d23e57e7eaaa520891a4f0e0), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £15 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4xch__e,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin,              init_m4default_big, "ec_39bm_.b_0", 0x0000, 0x020000, CRC(29c86cf0) SHA1(384a475d34ad5d15b68d019c3771aba471f89b4d), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £15 jackpot) (set 3)" )
+GAME_CUSTOM( 199?, m4xch__c,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "ec_39b__.b_0", 0x0000, 0x020000, CRC(e5d5961d) SHA1(ac3916cba91a13d1e0820982a1cefabd378647c9), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4xch__d,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "ec_39bg_.b_0", 0x0000, 0x020000, CRC(49b2be01) SHA1(dbf808d0949a9658d23e57e7eaaa520891a4f0e0), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4xch__e,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "ec_39bm_.b_0", 0x0000, 0x020000, CRC(29c86cf0) SHA1(384a475d34ad5d15b68d019c3771aba471f89b4d), "BWB",u8"X-change (BWB) (MPU4) (25p stake / £15 jackpot) (set 3)" )
 //
-GAME_CUSTOM( 199?, m4xch__f,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin,              init_m4default_big, "ec_49bd_.b_0", 0x0000, 0x020000, CRC(02854189) SHA1(beab97ccd9889cfdb24e1fb6fb373bf9fd114eab), "BWB",u8"X-change (BWB) (MPU4) (30p stake / £15 jackpot) (set 1)" ) // Datapak
-GAME_CUSTOM( 199?, m4xch__g,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin,              init_m4default_big, "ec_49bmd.b_0", 0x0000, 0x020000, CRC(2a5578e3) SHA1(d8f100bc83721b6b0f365be7a962249af79d6162), "BWB",u8"X-change (BWB) (MPU4) (30p stake / £15 jackpot) (set 2)" )
+GAME_CUSTOM( 199?, m4xch__f,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "ec_49bd_.b_0", 0x0000, 0x020000, CRC(02854189) SHA1(beab97ccd9889cfdb24e1fb6fb373bf9fd114eab), "BWB",u8"X-change (BWB) (MPU4) (30p stake / £15 jackpot) (set 1)" ) // Datapak
+GAME_CUSTOM( 199?, m4xch__g,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4_impcoin,              init_m4big, "ec_49bmd.b_0", 0x0000, 0x020000, CRC(2a5578e3) SHA1(d8f100bc83721b6b0f365be7a962249af79d6162), "BWB",u8"X-change (BWB) (MPU4) (30p stake / £15 jackpot) (set 2)" )
 //
-GAME_CUSTOM( 199?, m4xch__h,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "ec_s9bt_.b_0", 0x0000, 0x020000, CRC(7e0a27d1) SHA1(d4a23a6c358e38a1a66a06b82af85c844f684830), "BWB",u8"X-change (BWB) (MPU4) (20/25/30p stake / £15 jackpot)" )
+GAME_CUSTOM( 199?, m4xch__h,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "ec_s9bt_.b_0", 0x0000, 0x020000, CRC(7e0a27d1) SHA1(d4a23a6c358e38a1a66a06b82af85c844f684830), "BWB",u8"X-change (BWB) (MPU4) (20/25/30p stake / £15 jackpot)" )
 //
-GAME_CUSTOM( 199?, m4xch__i,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "ec_sja__.a_0", 0x0000, 0x020000, CRC(1f923f89) SHA1(84486287d55591c7e81c59a10e8cc722ec21e8f9), "BWB",u8"X-change (BWB) (MPU4) (10/20/25/30p stake / £5/£8/£10 jackpot, 20/25/30p stake / £15 jackpot) (set 1)" ) // 10p stake not valid with £15 jackpot
-GAME_CUSTOM( 199?, m4xch__j,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big, "ec_sja__.b_0", 0x0000, 0x020000, CRC(16d7b8bb) SHA1(be8ab98a64aa976e25cb302b68323c6781034f2b), "BWB",u8"X-change (BWB) (MPU4) (10/20/25/30p stake / £5/£8/£10 jackpot, 20/25/30p stake / £15 jackpot) (set 2)" )
+GAME_CUSTOM( 199?, m4xch__i,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "ec_sja__.a_0", 0x0000, 0x020000, CRC(1f923f89) SHA1(84486287d55591c7e81c59a10e8cc722ec21e8f9), "BWB",u8"X-change (BWB) (MPU4) (10/20/25/30p stake / £5/£8/£10 jackpot, 20/25/30p stake / £15 jackpot) (set 1)" ) // 10p stake not valid with £15 jackpot
+GAME_CUSTOM( 199?, m4xch__j,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "ec_sja__.b_0", 0x0000, 0x020000, CRC(16d7b8bb) SHA1(be8ab98a64aa976e25cb302b68323c6781034f2b), "BWB",u8"X-change (BWB) (MPU4) (10/20/25/30p stake / £5/£8/£10 jackpot, 20/25/30p stake / £15 jackpot) (set 2)" )
 // probably just a bad dump (half size) very close to the first half of ec_sja__.a_0
-GAME_CUSTOM( 199?, m4xch__k,  m4xch, bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin,              init_m4default,     "xchange.bin",  0x0000, 0x010000, CRC(c96cd014) SHA1(6e32d10c18b6b34dbcb21e75925a77e810ffe892), "BWB",u8"X-change (BWB) (MPU4) (unknown set, bad?)" )
+GAME_CUSTOM( 199?, m4xch__k,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4_impcoin,              init_m4,     "xchange.bin",  0x0000, 0x010000, CRC(c96cd014) SHA1(6e32d10c18b6b34dbcb21e75925a77e810ffe892), "BWB",u8"X-change (BWB) (MPU4) (unknown set, bad?)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -1822,15 +1829,15 @@ static const uint32_t m4xs_keys[2] = { 0x34, 0x3f0e26 };
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // these sets don't require stake/jp set
-GAME_CUSTOM( 199?, m4xs,       0,    bwboki_chr_cheat<m4xs_keys>, mpu4_impcoin,              init_m4default_big ,  "es_39b__.3_0", 0x0000, 0x020000, CRC(ba478372) SHA1(c13f9cc4261e91119aa694ec3ac81d94d9f32d22), "BWB",u8"X-s (BWB) (MPU4) (25p stake / £15 jackpot) (set 1)" )
-GAME_CUSTOM( 199?, m4xs__a,    m4xs, bwboki_chr_cheat<m4xs_keys>, mpu4_impcoin,              init_m4default_big ,  "es_39bg_.3_0", 0x0000, 0x020000, CRC(b689f14f) SHA1(0c3253e1f747a979f55d53fe637fc61cf50e01a3), "BWB",u8"X-s (BWB) (MPU4) (25p stake / £15 jackpot) (set 2)" ) // Datapak
-GAME_CUSTOM( 199?, m4xs__b,    m4xs, bwboki_chr_cheat<m4xs_keys>, mpu4_impcoin,              init_m4default_big ,  "es_39bm_.3_0", 0x0000, 0x020000, CRC(934f5d1e) SHA1(1ffd462d561d4a16f2392cc90a139499b74a234a), "BWB",u8"X-s (BWB) (MPU4) (25p stake / £15 jackpot) (set 3)" )
-GAME_CUSTOM( 199?, m4xs__c,    m4xs, bwboki_chr_cheat<m4xs_keys>, mpu4_impcoin,              init_m4default_big ,  "es_39bmd.3_0", 0x0000, 0x020000, CRC(cf663dcc) SHA1(620e65528687eb5fd6fd879e305e8b7da9b95253), "BWB",u8"X-s (BWB) (MPU4) (25p stake / £15 jackpot) (set 4)" ) // Datapak
+GAME_CUSTOM( 199?, m4xs,       0,    bwboki_chr_cheat<m4xs_keys>(R5, RT3), mpu4_impcoin,              init_m4big ,  "es_39b__.3_0", 0x0000, 0x020000, CRC(ba478372) SHA1(c13f9cc4261e91119aa694ec3ac81d94d9f32d22), "BWB",u8"X-s (BWB) (MPU4) (25p stake / £15 jackpot) (set 1)" )
+GAME_CUSTOM( 199?, m4xs__a,    m4xs, bwboki_chr_cheat<m4xs_keys>(R5, RT3), mpu4_impcoin,              init_m4big ,  "es_39bg_.3_0", 0x0000, 0x020000, CRC(b689f14f) SHA1(0c3253e1f747a979f55d53fe637fc61cf50e01a3), "BWB",u8"X-s (BWB) (MPU4) (25p stake / £15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4xs__b,    m4xs, bwboki_chr_cheat<m4xs_keys>(R5, RT3), mpu4_impcoin,              init_m4big ,  "es_39bm_.3_0", 0x0000, 0x020000, CRC(934f5d1e) SHA1(1ffd462d561d4a16f2392cc90a139499b74a234a), "BWB",u8"X-s (BWB) (MPU4) (25p stake / £15 jackpot) (set 3)" )
+GAME_CUSTOM( 199?, m4xs__c,    m4xs, bwboki_chr_cheat<m4xs_keys>(R5, RT3), mpu4_impcoin,              init_m4big ,  "es_39bmd.3_0", 0x0000, 0x020000, CRC(cf663dcc) SHA1(620e65528687eb5fd6fd879e305e8b7da9b95253), "BWB",u8"X-s (BWB) (MPU4) (25p stake / £15 jackpot) (set 4)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4xs__d,    m4xs, bwboki_chr_cheat<m4xs_keys>, mpu4_impcoin,              init_m4default_big ,  "es_49bg_.3_0", 0x0000, 0x020000, CRC(b76f1d7d) SHA1(9b43a9e847db3d4024f978b6f996534b8d52368b), "BWB",u8"X-s (BWB) (MPU4) (30p stake / £15 jackpot) (set 1)" ) // Datapak
-GAME_CUSTOM( 199?, m4xs__e,    m4xs, bwboki_chr_cheat<m4xs_keys>, mpu4_impcoin,              init_m4default_big ,  "es_49bmd.3_0", 0x0000, 0x020000, CRC(1150e499) SHA1(25d2c37e5287f73d2b11608c50f21072422850f0), "BWB",u8"X-s (BWB) (MPU4) (30p stake / £15 jackpot) (set 2)" ) // Datapak
+GAME_CUSTOM( 199?, m4xs__d,    m4xs, bwboki_chr_cheat<m4xs_keys>(R5, RT3), mpu4_impcoin,              init_m4big ,  "es_49bg_.3_0", 0x0000, 0x020000, CRC(b76f1d7d) SHA1(9b43a9e847db3d4024f978b6f996534b8d52368b), "BWB",u8"X-s (BWB) (MPU4) (30p stake / £15 jackpot) (set 1)" ) // Datapak
+GAME_CUSTOM( 199?, m4xs__e,    m4xs, bwboki_chr_cheat<m4xs_keys>(R5, RT3), mpu4_impcoin,              init_m4big ,  "es_49bmd.3_0", 0x0000, 0x020000, CRC(1150e499) SHA1(25d2c37e5287f73d2b11608c50f21072422850f0), "BWB",u8"X-s (BWB) (MPU4) (30p stake / £15 jackpot) (set 2)" ) // Datapak
 // requires stake/jp
-GAME_CUSTOM( 199?, m4xs__f,    m4xs, bwboki_chr_cheat<m4xs_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big ,  "es_sja__.3_0", 0x0000, 0x020000, CRC(5909092d) SHA1(64df6ad5ba5ac74592b525af2f4cab8a092a5766), "BWB",u8"X-s (BWB) (MPU4) (20/25/30p stake / £15 jackpot)" )
+GAME_CUSTOM( 199?, m4xs__f,    m4xs, bwboki_chr_cheat<m4xs_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big ,  "es_sja__.3_0", 0x0000, 0x020000, CRC(5909092d) SHA1(64df6ad5ba5ac74592b525af2f4cab8a092a5766), "BWB",u8"X-s (BWB) (MPU4) (20/25/30p stake / £15 jackpot)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -1855,11 +1862,11 @@ static const uint32_t m4xtrm_keys[2] = { 0x36, 0x301210 };
 	GAME( year, setname, parent, machine, inputs, mpu4bwb_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // state/jp needed
-GAME_CUSTOM( 199?, m4xtrm,       0,      bwboki_chr_cheat<m4xtrm_keys>, mpu4impcoin_jackpot15_20p, init_m4default_big , "et_sja__.2_0", 0x0000, 0x020000, CRC(8ee2602b) SHA1(b9a779b900ac71ec842dd7eb1643f7a2f1cb6a38), "BWB",u8"X-treme (BWB) (MPU4) (20/25/30p stake / £8/£15 jackpot)" )
+GAME_CUSTOM( 199?, m4xtrm,       0,      bwboki_chr_cheat<m4xtrm_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big , "et_sja__.2_0", 0x0000, 0x020000, CRC(8ee2602b) SHA1(b9a779b900ac71ec842dd7eb1643f7a2f1cb6a38), "BWB",u8"X-treme (BWB) (MPU4) (20/25/30p stake / £8/£15 jackpot)" )
 // no stake/jp needed on sets below
-GAME_CUSTOM( 199?, m4xtrm__a,    m4xtrm, bwboki_chr_cheat<m4xtrm_keys>, mpu4_impcoin,              init_m4default_big , "et_49bg_.2_0", 0x0000, 0x020000, CRC(f858d927) SHA1(e7ab84c8898a95075a41fb0249e4b103d60e7d85), "BWB",u8"X-treme (BWB) (MPU4) (30p stake / £15 jackpot)" ) // Datapak
+GAME_CUSTOM( 199?, m4xtrm__a,    m4xtrm, bwboki_chr_cheat<m4xtrm_keys>(R5, RT3), mpu4_impcoin,              init_m4big , "et_49bg_.2_0", 0x0000, 0x020000, CRC(f858d927) SHA1(e7ab84c8898a95075a41fb0249e4b103d60e7d85), "BWB",u8"X-treme (BWB) (MPU4) (30p stake / £15 jackpot)" ) // Datapak
 //
-GAME_CUSTOM( 199?, m4xtrm__b,    m4xtrm, bwboki_chr_cheat<m4xtrm_keys>, mpu4_impcoin,              init_m4default_big , "et_39bg_.2_0", 0x0000, 0x020000, CRC(db1a3c3c) SHA1(081c934ebfc0a9dfa195bb20f51e025e53d9c4b9), "BWB",u8"X-treme (BWB) (MPU4) (25p stake / £15 jackpot)" ) // Datapak
+GAME_CUSTOM( 199?, m4xtrm__b,    m4xtrm, bwboki_chr_cheat<m4xtrm_keys>(R5, RT3), mpu4_impcoin,              init_m4big , "et_39bg_.2_0", 0x0000, 0x020000, CRC(db1a3c3c) SHA1(081c934ebfc0a9dfa195bb20f51e025e53d9c4b9), "BWB",u8"X-treme (BWB) (MPU4) (25p stake / £15 jackpot)" ) // Datapak
 
 
 /*****************************************************************************************************************************************************************************
@@ -1894,7 +1901,7 @@ static const uint32_t m4bluesn_keys[2] = { 0x23, 0x1b0b36 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BLUESN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4bluesn_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4bluesn_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bluesn,   m4blsbys,   "bluesboys.bin", 0x0000, 0x020000, CRC(c1395649) SHA1(3cd0eed1f966f5391fe5de496dc747385ebfb556), "BWB","Blues Boys (Nova) (MPU4)" )
 
@@ -1919,7 +1926,7 @@ static const uint32_t m4cfinln_keys[2] = { 0x10, 0x213623 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CFINLN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4cfinln_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4cfinln_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4cfinln,       m4cpfinl,   "cfd_7_1.bin",  0x0000, 0x020000, CRC(e42ec2aa) SHA1(6495448c1d11ce0ab9ad794bc3a0981432e22945), "BWB","Cup Final (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4cfinln__a,    m4cpfinl,   "cfd_d0.bin",   0x0000, 0x020000, CRC(179fcf13) SHA1(abd18ed28118ba0a62ab321a9d963105946d5eef), "BWB","Cup Final (Nova) (MPU4) (set 2)" )
@@ -1945,7 +1952,7 @@ static const uint32_t m4wcnov_keys[2] = { 0x19, 0x0f2029 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4WCNOV_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4wcnov_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4wcnov_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4wcnov,     0,  "wcdsxh__.5_0", 0x0000, 0x080000, CRC(a82d11de) SHA1(ece14fd5f56da8cc788c53d5c1404275e9000b65), "BWB","World Cup (Nova) (MPU4)" )
 
@@ -1970,7 +1977,7 @@ static const uint32_t m4excaln_keys[2] = { 0x10, 0x010e20 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4EXCALN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4excaln_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4excaln_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4excaln,   m4excal,    "exdsx___.6_0", 0x0000, 0x080000, CRC(fcdc703c) SHA1(927870723106aebbb2b492ce9bfebe4aa25d0325), "BWB","Excalibur (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4excaln__a,m4excal,    "exdsx_e_.6_0", 0x0000, 0x080000, CRC(f6421feb) SHA1(5b3cf7fa4bf9711097ed1c9d2d5689329d73193d), "BWB","Excalibur (Nova) (MPU4) (set 2)" )
@@ -1996,7 +2003,7 @@ static const uint32_t m4olygn_keys[2] = { 0x19, 0x0f2029};
 		ROM_LOAD( name, offset, length, hash ) \
 		M4OLYGN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4olygn_keys>, mpu4_invimpcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4olygn_keys>(R5, RT3), mpu4_invimpcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4olygn,     0,          "ogdsx___.8_0", 0x0000, 0x040000, CRC(b51a2538) SHA1(d54f37dc14c44ab66e6d6ba6e2df8bc9ed003054), "BWB","Olympic Gold (German) (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4olygn__a,  m4olygn,    "ogdsxe__.8_0", 0x0000, 0x040000, CRC(13aa70aa) SHA1(3878c181ec07e24060935bec96e5128e6e4baf31), "BWB","Olympic Gold (German) (Nova) (MPU4) (set 2)" )
@@ -2022,7 +2029,7 @@ static const uint32_t m4ftladn_keys[2] = { 0x05, 0x200f03 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4FTLADN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4ftladn_keys>, mpu4_invimpcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4ftladn_keys>(R5, RT3), mpu4_invimpcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4ftladn,   0,      "fidse___.5_0", 0x00000, 0x20000, CRC(62347bbf) SHA1(2b1cd5adda831a8c74c9484ee1b616259d3e3981), "BWB","Find the Lady (Nova) (MPU4)" )
 
@@ -2050,7 +2057,7 @@ static const uint32_t m4sinbdn__b_keys[2] = { 0x10, 0x3e2f0b };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SINBDN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbdn_keys>, mpu4_invimpcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbdn_keys>(R5, RT3), mpu4_invimpcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sinbdn,       0,          "sbds3___.a_1", 0x0000, 0x020000, CRC(9bff0e40) SHA1(f8a1263a58f828554e9df77ed0db78e627666fb5), "BWB","Sinbad (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sinbdn__e,    m4sinbdn,   "sbds3__l.9_0", 0x0000, 0x040000, CRC(e425375a) SHA1(d2bdd8e768fc7764054eff574360f3cfb5f4f66d), "BWB","Sinbad (Nova) (MPU4) (set 6)" )
@@ -2062,7 +2069,7 @@ GAME_CUSTOM( 199?, m4sinbdn__e,    m4sinbdn,   "sbds3__l.9_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SINBDN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbdn__a_keys>, mpu4_invimpcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbdn__a_keys>(R5, RT3), mpu4_invimpcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sinbdn__a,    m4sinbdn,   "sbds3___.7w1", 0x0000, 0x020000, CRC(23bc9ce0) SHA1(f750de2b781bc902c65de7109e10a5fc2d4e1c61), "BWB","Sinbad (Nova) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4sinbdn__f,    m4sinbdn,   "sbds3__l.aw0", 0x0000, 0x040000, CRC(c484ef9d) SHA1(62f6644b83dd6abaf80809217edf6a8230a89268), "BWB","Sinbad (Nova) (MPU4) (set 7)" )
@@ -2074,7 +2081,7 @@ GAME_CUSTOM( 199?, m4sinbdn__f,    m4sinbdn,   "sbds3__l.aw0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SINBDN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbdn__b_keys>, mpu4_invimpcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbdn__b_keys>(R5, RT3), mpu4_invimpcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sinbdn__b,    m4sinbdn,   "sxdsx___.2_0", 0x0000, 0x040000, CRC(4e1f98b5) SHA1(3e16e7a0cdccc9eb1a1bb6f9a0332c4582483eee), "BWB","Sinbad (Nova) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4sinbdn__c,    m4sinbdn,   "sdd__.3_0",    0x0000, 0x040000, CRC(100098c1) SHA1(b125855c49325972f620463e32fdf124222e27d2), "BWB","Sinbad (Nova) (MPU4) (set 4)" )

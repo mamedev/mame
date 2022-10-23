@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, hap
+// copyright-holders:Aaron Giles, Curt Coder, hap
 /***************************************************************************
 
     plaparse.cpp
 
-    Simple parser for Berkeley standard PLA files into raw fusemaps.
-    It supports no more than one output matrix, and is limited to
-    keywords: i, o, p, phase, e
+    Parser for Berkeley standard (aka Espresso) PLA files into raw fusemaps.
+    It supports no more than one output matrix, and is limited to keywords:
+    i, o, p, phase, e
 
 ***************************************************************************/
 
@@ -35,10 +35,10 @@
 
 struct parse_info
 {
-	uint32_t  inputs;     /* number of input columns */
-	uint32_t  outputs;    /* number of output columns */
-	uint32_t  terms;      /* number of terms */
-	uint32_t  xorval[JED_MAX_FUSES/64];   /* output polarity */
+	uint32_t  inputs;     // number of input columns
+	uint32_t  outputs;    // number of output columns
+	uint32_t  terms;      // number of terms
+	uint32_t  xorval[JED_MAX_FUSES/64];   // output polarity
 	uint32_t  xorptr;
 };
 
@@ -105,47 +105,40 @@ static bool process_terms(jed_data *data, util::random_read &src, uint8_t ch, pa
 	uint32_t curoutput = 0;
 	bool outputs = false;
 
-	// symbols for 0, 1, dont_care, no_meaning
-	// PLA format documentation also describes them as simply 0, 1, 2, 3
-	static const char symbols[] = { "01-~" };
-
 	while (ch != '.' && ch != '#')
 	{
 		if (!outputs)
 		{
 			// and-matrix
-			if (strrchr(symbols, ch))
-				curinput++;
-
 			switch (ch)
 			{
 			case '0':
+				curinput++;
 				jed_set_fuse(data, data->numfuses++, 0);
 				jed_set_fuse(data, data->numfuses++, 1);
-
 				if (LOG_PARSE) printf("01");
 				break;
 
 			case '1':
+				curinput++;
 				jed_set_fuse(data, data->numfuses++, 1);
 				jed_set_fuse(data, data->numfuses++, 0);
-
 				if (LOG_PARSE) printf("10");
 				break;
 
 			// anything goes
 			case '-':
+				curinput++;
 				jed_set_fuse(data, data->numfuses++, 1);
 				jed_set_fuse(data, data->numfuses++, 1);
-
 				if (LOG_PARSE) printf("11");
 				break;
 
 			// this product term is inhibited
 			case '~':
+				curinput++;
 				jed_set_fuse(data, data->numfuses++, 0);
 				jed_set_fuse(data, data->numfuses++, 0);
-
 				if (LOG_PARSE) printf("00");
 				break;
 
@@ -164,20 +157,23 @@ static bool process_terms(jed_data *data, util::random_read &src, uint8_t ch, pa
 		else
 		{
 			// or-matrix
-			if (strrchr(symbols, ch))
+			switch (ch)
 			{
+			case '1':
 				curoutput++;
-				if (ch == '1')
-				{
-					jed_set_fuse(data, data->numfuses++, 0);
-					if (LOG_PARSE) printf("0");
-				}
-				else
-				{
-					// write 1 for anything else
-					jed_set_fuse(data, data->numfuses++, 1);
-					if (LOG_PARSE) printf("1");
-				}
+				jed_set_fuse(data, data->numfuses++, 0);
+				if (LOG_PARSE) printf("0");
+				break;
+
+			// write 1 for anything else
+			case '0': case '-': case '~':
+				curoutput++;
+				jed_set_fuse(data, data->numfuses++, 1);
+				if (LOG_PARSE) printf("1");
+				break;
+
+			default:
+				break;
 			}
 		}
 

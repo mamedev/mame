@@ -149,6 +149,7 @@ REF. 970429
 #include "gaelco3d.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "emupal.h"
 
 #include "speaker.h"

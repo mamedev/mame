@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dan Boris
+// copyright-holders: Dan Boris
 /***************************************************************************
 
     Sun Electronics Arabian hardware
@@ -45,17 +45,453 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "arabian.h"
 
+#include "cpu/mb88xx/mb88xx.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-/* constants */
-#define MAIN_OSC        XTAL(12'000'000)
+namespace {
 
+class arabian_state : public driver_device
+{
+public:
+	arabian_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_custom_cpu_ram(*this, "custom_cpu_ram"),
+		m_blitter(*this, "blitter"),
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
+		m_palette(*this, "palette"),
+		m_com(*this, "COM%u", 0U)
+	{ }
+
+	void arabian(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr<uint8_t> m_custom_cpu_ram;
+	required_shared_ptr<uint8_t> m_blitter;
+
+	std::unique_ptr<uint8_t[]> m_main_bitmap{};
+	std::unique_ptr<uint8_t[]> m_converted_gfx{};
+
+	// video-related
+	uint8_t m_video_control = 0U;
+	uint8_t m_flip_screen = 0U;
+
+	// MCU
+	uint8_t m_mcu_port_o = 0U;
+	uint8_t m_mcu_port_p = 0U;
+	uint8_t m_mcu_port_r[4]{};
+
+	static constexpr int BITMAP_WIDTH = 256;
+	static constexpr int BITMAP_HEIGHT = 256;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mb8841_cpu_device> m_mcu;
+	required_device<palette_device> m_palette;
+
+	required_ioport_array<6> m_com;
+
+	uint8_t mcu_port_r0_r();
+	uint8_t mcu_port_r1_r();
+	uint8_t mcu_port_r2_r();
+	uint8_t mcu_port_r3_r();
+	void mcu_port_r0_w(uint8_t data);
+	void mcu_port_r1_w(uint8_t data);
+	void mcu_port_r2_w(uint8_t data);
+	void mcu_port_r3_w(uint8_t data);
+	uint8_t mcu_portk_r();
+	void mcu_port_o_w(uint8_t data);
+	void mcu_port_p_w(uint8_t data);
+	void blitter_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void ay8910_porta_w(uint8_t data);
+	void ay8910_portb_w(uint8_t data);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void blit_area(uint8_t plane, uint16_t src, uint8_t x, uint8_t y, uint8_t sx, uint8_t sy);
+
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
+};
+
+
+// video
+
+/*************************************
+ *
+ *  Color PROM conversion
+ *
+ *************************************/
+
+void arabian_state::palette(palette_device &palette) const
+{
+	// there are 13 color table bits
+	for (int i = 0; i < (1 << 13); i++)
+	{
+		int const ena = BIT(i, 12);
+		int const enb = BIT(i, 11);
+		int const abhf = BIT(~i, 10);
+		int const aghf = BIT(~i, 9);
+		int const arhf = BIT(~i, 8);
+		int const az = BIT(i, 7);
+		int const ar = BIT(i, 6);
+		int const ag = BIT(i, 5);
+		int const ab = BIT(i, 4);
+		int const bz = BIT(i, 3);
+		int const br = BIT(i, 2);
+		int const bg = BIT(i, 1);
+		int const bb = BIT(i, 0);
+
+		int const planea = (az | ar | ag | ab) & ena;
+
+		/*-------------------------------------------------------------------------
+		    red derivation:
+
+		    ROUT.1200   = !IC192.11
+		                = !(!(!IC117.11 | !IC118.12))
+		                = !IC117.11 | !IC118.12
+		                = !(IC99.8 ^ IC119.6) | !(!(!BLNK & IC119.11 & BR))
+		                = !((!ARHF & !BLNK & AR & AZ) ^ !(AR & !BLNK)) | (!BLNK & IC119.11 & BR)
+		                = !BLNK & (!((!ARHF & AR & AZ) ^ !AR) | (IC119.11 & BR))
+		                = !BLNK & ((!(!ARHF & AR & AZ) ^ AR) | (BR & !(AZ | AR | AG | AB)))
+
+		    ROUT.1800   = !IC192.3
+		                = !(!(!IC119.6 | !IC118.12))
+		                = !IC119.6 | !IC118.12
+		                = !(!(AR & !BLNK) | !(!(!BLNK & IC119.11 & BZ)))
+		                = (AR & !BLNK) | (!BLNK & IC119.11 & BZ)
+		                = !BLNK & (AR | (BZ & !(AZ | AR | AG | AB)))
+
+		    RENA        = IC116.6
+		                = !IC192.11 | !IC192.3
+		                = ROUT.1200 | ROUT.1800
+
+		    red.hi   = planea ? ar : bz;
+		    red.lo   = planea ? ((!arhf & az) ? 0 : ar) : br;
+		    red.base = (red.hi | red.lo)
+		-------------------------------------------------------------------------*/
+
+		int const rhi = planea ? ar : enb ? bz : 0;
+		int const rlo = planea ? (((!arhf) & az) ? 0 : ar) : enb ? br : 0;
+
+		/*-------------------------------------------------------------------------
+		    green derivation:
+
+		    GOUT.750    = !IC192.8
+		                = !(!(!IC119.8 | !IC120.8))
+		                = !IC119.8 | !IC120.8
+		                = !(!(AG & !BLNK)) | !(!(!BLNK & IC119.11 & BB))
+		                = (AG & !BLNK) | (!BLNK & IC119.11 & BB)
+		                = !BLNK & (AG | (IC119.11 & BB))
+		                = !BLNK & (AG | (BB & !(AZ | AR | AG | AB)))
+
+		    GOUT.1200   = !IC192.6
+		                = !(!(!IC117.3 | !IC118.6))
+		                = !IC117.3 | !IC118.6
+		                = !(IC99.6 ^ IC119.8) | !(!(!BLNK & IC119.11 & BG))
+		                = !((!AGHF & !BLNK & AG & AZ) ^ !(AG & !BLNK)) | (!BLNK & IC119.11 & BG)
+		                = !BLNK & (!((!AGHF & AG & AZ) ^ !AG) | (IC119.11 & BG))
+		                = !BLNK & ((!(!AGHF & AG & AZ) ^ AG) | (BG & !(AZ | AR | AG | AB)))
+
+		    GENA        = IC116.8
+		                = !IC192.8 | !IC192.6
+		                = GOUT.750 | GOUT.1200
+
+		    grn.hi   = planea ? ag : bb;
+		    grn.lo   = planea ? ((!aghf & az) ? 0 : ag) : bg;
+		    grn.base = (grn.hi | grn.lo)
+		-------------------------------------------------------------------------*/
+
+		int const ghi = planea ? ag : enb ? bb : 0;
+		int const glo = planea ? (((!aghf) & az) ? 0 : ag) : enb ? bg : 0;
+
+		/*-------------------------------------------------------------------------
+		    blue derivation:
+
+		    BOUT.1200   = !IC117.6
+		                = !IC119.3
+		                = !(!(AB & !BLNK))
+		                = !BLNK & AB
+
+		    BENA        = !IC117.8
+		                = !(IC189.6 ^ IC119.3)
+		                = !((!ABHF & !BLNK & AB & AZ) ^ !(AB & !BLNK))
+		                = (!(!ABHF & !BLNK & AB & AZ) ^ (AB & !BLNK))
+		                = !BLNK & (!(!ABHF & AB & AZ) ^ AB)
+
+		    blu.hi   = ab;
+		    blu.base = ((!abhf & az) ? 0 : ab);
+		-------------------------------------------------------------------------*/
+
+		int const bhi = ab;
+		int const bbase = ((!abhf) & az) ? 0 : ab;
+
+		/* convert an RGB color -
+		   there are effectively 6 bits of color: 2 red, 2 green, 2 blue */
+		int const r = ( rhi * (int)(((153.0 * 192) / 255) + 0.5)) +
+					  ( rlo * int(((102.0 * 192) / 255) + 0.5)) +
+					  ((rhi | rlo) ? 63 : 0);
+
+		int const g = ( ghi * (int)(((156.0 * 192) / 255) + 0.5)) +
+					  ( glo * int((( 99.0 * 192) / 255) + 0.5)) +
+					  ((ghi | glo) ? 63 : 0);
+
+		int const b = (bhi * 192) + (bbase * 63);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
+void arabian_state::video_start()
+{
+	uint8_t *gfxbase = memregion("gfx1")->base();
+
+	/* allocate a common bitmap to use for both planes
+	   plane A (top plane with motion objects) is in the upper 4 bits
+	   plane B (bottom plane with playfield) is in the lower 4 bits */
+	m_main_bitmap = std::make_unique<uint8_t[]>(BITMAP_WIDTH * BITMAP_HEIGHT);
+
+	// allocate memory for the converted graphics data
+	m_converted_gfx = std::make_unique<uint8_t[]>(0x8000 * 2);
+
+	/*--------------------------------------------------
+	    transform graphics data into more usable format
+	    which is coded like this:
+
+	      byte adr+0x4000  byte adr
+	      DCBA DCBA        DCBA DCBA
+
+	    D-bits of pixel 4
+	    C-bits of pixel 3
+	    B-bits of pixel 2
+	    A-bits of pixel 1
+
+	    after conversion :
+
+	      byte adr+0x4000  byte adr
+	      DDDD CCCC        BBBB AAAA
+	--------------------------------------------------*/
+
+	for (int offs = 0; offs < 0x4000; offs++)
+	{
+		int v1 = gfxbase[offs + 0x0000];
+		int v2 = gfxbase[offs + 0x4000];
+
+		int const p1 = (v1 & 0x01) | ((v1 & 0x10) >> 3) | ((v2 & 0x01) << 2) | ((v2 & 0x10) >> 1);
+		v1 >>= 1;
+		v2 >>= 1;
+		int const p2 = (v1 & 0x01) | ((v1 & 0x10) >> 3) | ((v2 & 0x01) << 2) | ((v2 & 0x10) >> 1);
+		v1 >>= 1;
+		v2 >>= 1;
+		int const p3 = (v1 & 0x01) | ((v1 & 0x10) >> 3) | ((v2 & 0x01) << 2) | ((v2 & 0x10) >> 1);
+		v1 >>= 1;
+		v2 >>= 1;
+		int const p4 = (v1 & 0x01) | ((v1 & 0x10) >> 3) | ((v2 & 0x01) << 2) | ((v2 & 0x10) >> 1);
+
+		m_converted_gfx[offs * 4 + 3] = p1;
+		m_converted_gfx[offs * 4 + 2] = p2;
+		m_converted_gfx[offs * 4 + 1] = p3;
+		m_converted_gfx[offs * 4 + 0] = p4;
+	}
+
+	save_pointer(NAME(m_main_bitmap), BITMAP_WIDTH * BITMAP_HEIGHT);
+	save_pointer(NAME(m_converted_gfx), 0x8000 * 2);
+	save_item(NAME(m_video_control));
+	save_item(NAME(m_flip_screen));
+}
+
+
+
+/*************************************
+ *
+ *  DMA blitter simulation
+ *
+ *************************************/
+
+void arabian_state::blit_area(uint8_t plane, uint16_t src, uint8_t x, uint8_t y, uint8_t sx, uint8_t sy)
+{
+	uint8_t *srcdata = &m_converted_gfx[src * 4];
+
+	// loop over X, then Y
+	for (int i = 0; i <= sx; i++, x += 4)
+		for (int j = 0; j <= sy; j++)
+		{
+			uint8_t const p1 = *srcdata++;
+			uint8_t const p2 = *srcdata++;
+			uint8_t const p3 = *srcdata++;
+			uint8_t const p4 = *srcdata++;
+
+			// get a pointer to the bitmap
+			uint8_t *base = &m_main_bitmap[((y + j) & 0xff) * BITMAP_WIDTH + (x & 0xff)];
+
+			// bit 0 means write to upper plane (upper 4 bits of our bitmap)
+			if (plane & 0x01)
+			{
+				if (p4 != 8) base[0] = (base[0] & ~0xf0) | (p4 << 4);
+				if (p3 != 8) base[1] = (base[1] & ~0xf0) | (p3 << 4);
+				if (p2 != 8) base[2] = (base[2] & ~0xf0) | (p2 << 4);
+				if (p1 != 8) base[3] = (base[3] & ~0xf0) | (p1 << 4);
+			}
+
+			// bit 2 means write to lower plane (lower 4 bits of our bitmap)
+			if (plane & 0x04)
+			{
+				if (p4 != 8) base[0] = (base[0] & ~0x0f) | p4;
+				if (p3 != 8) base[1] = (base[1] & ~0x0f) | p3;
+				if (p2 != 8) base[2] = (base[2] & ~0x0f) | p2;
+				if (p1 != 8) base[3] = (base[3] & ~0x0f) | p1;
+			}
+		}
+}
+
+
+
+/*************************************
+ *
+ *  DMA blitter parameters
+ *
+ *************************************/
+
+void arabian_state::blitter_w(offs_t offset, uint8_t data)
+{
+	// write the data
+	m_blitter[offset] = data;
+
+	// watch for a write to offset 6 -- that triggers the blit
+	if (offset == 6)
+	{
+		// extract the data
+		int const plane = m_blitter[0];
+		int const src   = m_blitter[1] | (m_blitter[2] << 8);
+		int const x     = m_blitter[4] << 2;
+		int const y     = m_blitter[3];
+		int const sx    = m_blitter[6];
+		int const sy    = m_blitter[5];
+
+		// blit it
+		blit_area(plane, src, x, y, sx, sy);
+	}
+}
+
+
+
+/*************************************
+ *
+ *  VRAM direct I/O
+ *
+ *************************************/
+
+void arabian_state::videoram_w(offs_t offset, uint8_t data)
+{
+	// determine X/Y
+	uint8_t const x = (offset >> 8) << 2;
+	uint8_t const y = offset & 0xff;
+
+	// get a pointer to the pixels
+	uint8_t *base = &m_main_bitmap[y * BITMAP_WIDTH + x];
+
+	/* the data is written as 4 2-bit values, as follows:
+
+	        bit 7 = pixel 3, upper bit
+	        bit 6 = pixel 2, upper bit
+	        bit 5 = pixel 1, upper bit
+	        bit 4 = pixel 0, upper bit
+	        bit 3 = pixel 3, lower bit
+	        bit 2 = pixel 2, lower bit
+	        bit 1 = pixel 1, lower bit
+	        bit 0 = pixel 0, lower bit
+	*/
+
+	// enable writes to AZ/AR
+	if (m_blitter[0] & 0x08)
+	{
+		base[0] = (base[0] & ~0x03) | ((data & 0x10) >> 3) | ((data & 0x01) >> 0);
+		base[1] = (base[1] & ~0x03) | ((data & 0x20) >> 4) | ((data & 0x02) >> 1);
+		base[2] = (base[2] & ~0x03) | ((data & 0x40) >> 5) | ((data & 0x04) >> 2);
+		base[3] = (base[3] & ~0x03) | ((data & 0x80) >> 6) | ((data & 0x08) >> 3);
+	}
+
+	// enable writes to AG/AB
+	if (m_blitter[0] & 0x04)
+	{
+		base[0] = (base[0] & ~0x0c) | ((data & 0x10) >> 1) | ((data & 0x01) << 2);
+		base[1] = (base[1] & ~0x0c) | ((data & 0x20) >> 2) | ((data & 0x02) << 1);
+		base[2] = (base[2] & ~0x0c) | ((data & 0x40) >> 3) | ((data & 0x04) << 0);
+		base[3] = (base[3] & ~0x0c) | ((data & 0x80) >> 4) | ((data & 0x08) >> 1);
+	}
+
+	// enable writes to BZ/BR
+	if (m_blitter[0] & 0x02)
+	{
+		base[0] = (base[0] & ~0x30) | ((data & 0x10) << 1) | ((data & 0x01) << 4);
+		base[1] = (base[1] & ~0x30) | ((data & 0x20) << 0) | ((data & 0x02) << 3);
+		base[2] = (base[2] & ~0x30) | ((data & 0x40) >> 1) | ((data & 0x04) << 2);
+		base[3] = (base[3] & ~0x30) | ((data & 0x80) >> 2) | ((data & 0x08) << 1);
+	}
+
+	// enable writes to BG/BB
+	if (m_blitter[0] & 0x01)
+	{
+		base[0] = (base[0] & ~0xc0) | ((data & 0x10) << 3) | ((data & 0x01) << 6);
+		base[1] = (base[1] & ~0xc0) | ((data & 0x20) << 2) | ((data & 0x02) << 5);
+		base[2] = (base[2] & ~0xc0) | ((data & 0x40) << 1) | ((data & 0x04) << 4);
+		base[3] = (base[3] & ~0xc0) | ((data & 0x80) << 0) | ((data & 0x08) << 3);
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Core video refresh
+ *
+ *************************************/
+
+uint32_t arabian_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const pen_t *pens = &m_palette->pen((m_video_control >> 3) << 8);
+
+	// render the screen from the bitmap
+	for (int y = 0; y < BITMAP_HEIGHT; y++)
+	{
+		// non-flipped case
+		if (!m_flip_screen)
+			draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &m_main_bitmap[y * BITMAP_WIDTH], pens);
+
+		// flipped case
+		else
+		{
+			uint8_t scanline[BITMAP_WIDTH];
+			for (int x = 0; x < BITMAP_WIDTH; x++)
+				scanline[BITMAP_WIDTH - 1 - x] = m_main_bitmap[y * BITMAP_WIDTH + x];
+			draw_scanline8(bitmap, 0, BITMAP_HEIGHT - 1 - y, BITMAP_WIDTH, scanline, pens);
+		}
+	}
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -88,7 +524,7 @@ void arabian_state::ay8910_portb_w(uint8_t data)
 	m_mcu->set_input_line(MB88_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
 	m_mcu->set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 
-	/* clock the coin counters */
+	// clock the coin counters
 	machine().bookkeeping().coin_counter_w(1, ~data & 0x02);
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x01);
 }
@@ -105,7 +541,7 @@ uint8_t arabian_state::mcu_port_r0_r()
 {
 	uint8_t val = m_mcu_port_r[0];
 
-	/* RAM mode is enabled */
+	// RAM mode is enabled
 	val |= 4;
 
 	return val;
@@ -170,15 +606,13 @@ uint8_t arabian_state::mcu_portk_r()
 	}
 	else
 	{
-		static const char *const comnames[] = { "COM0", "COM1", "COM2", "COM3", "COM4", "COM5" };
 		uint8_t sel = ((m_mcu_port_r[2] << 4) | m_mcu_port_r[1]) & 0x3f;
-		int i;
 
-		for (i = 0; i < 6; ++i)
+		for (int i = 0; i < 6; ++i)
 		{
 			if (~sel & (1 << i))
 			{
-				val = ioport(comnames[i])->read();
+				val = m_com[i]->read();
 				break;
 			}
 		}
@@ -213,11 +647,11 @@ void arabian_state::mcu_port_p_w(uint8_t data)
 void arabian_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).w(FUNC(arabian_state::arabian_videoram_w));
+	map(0x8000, 0xbfff).w(FUNC(arabian_state::videoram_w));
 	map(0xc000, 0xc000).mirror(0x01ff).portr("IN0");
 	map(0xc200, 0xc200).mirror(0x01ff).portr("DSW1");
-	map(0xd000, 0xd7ff).mirror(0x0800).ram().share("custom_cpu_ram");
-	map(0xe000, 0xe007).mirror(0x0ff8).w(FUNC(arabian_state::arabian_blitter_w)).share("blitter");
+	map(0xd000, 0xd7ff).mirror(0x0800).ram().share(m_custom_cpu_ram);
+	map(0xe000, 0xe007).mirror(0x0ff8).w(FUNC(arabian_state::blitter_w)).share(m_blitter);
 }
 
 
@@ -246,7 +680,7 @@ static INPUT_PORTS_START( arabian )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )                    /* also adds 1 credit */
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )                    // also adds 1 credit
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -259,9 +693,9 @@ static INPUT_PORTS_START( arabian )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:!4")    /* Carry Bowls to Next Life */
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )             /* not reset "ARABIAN" letters */
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )             /* reset "ARABIAN" letters */
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:!4")    // Carry Bowls to Next Life
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )             // not reset "ARABIAN" letters
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )             // reset "ARABIAN" letters
 	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:!5,!6,!7,!8")
 	PORT_DIPSETTING(    0x10, "A 2/1 B 2/1" )
 	PORT_DIPSETTING(    0x20, "A 2/1 B 1/3" )
@@ -284,7 +718,7 @@ static INPUT_PORTS_START( arabian )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )  /* IN3 : "AUX-S" */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )  // IN3 : "AUX-S"
 
 	PORT_START("COM1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -294,9 +728,9 @@ static INPUT_PORTS_START( arabian )
 
 	PORT_START("COM2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN9 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN10 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN11 */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // IN9
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // IN10
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // IN11
 
 	PORT_START("COM3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -306,9 +740,9 @@ static INPUT_PORTS_START( arabian )
 
 	PORT_START("COM4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN17 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN18 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN19 */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // IN17
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // IN18
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // IN19
 
 	PORT_START("COM5")
 	PORT_DIPNAME( 0x01, 0x01, "Coin Counters" )             PORT_DIPLOCATION("SW2:!1")
@@ -318,7 +752,7 @@ static INPUT_PORTS_START( arabian )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:!3,!4")
-	PORT_DIPSETTING(    0x0c, "30k 70k 40k+" )              /* last bonus life at 870k : max. 22 bonus lives */
+	PORT_DIPSETTING(    0x0c, "30k 70k 40k+" )              // last bonus life at 870k : max. 22 bonus lives
 	PORT_DIPSETTING(    0x04, "20k only" )
 	PORT_DIPSETTING(    0x08, "40k only" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
@@ -329,7 +763,7 @@ static INPUT_PORTS_START( arabiana )
 
 	PORT_MODIFY("COM5")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:!3,!4")
-	PORT_DIPSETTING(    0x0c, "20k 50k 150k 100k+" )        /* last bonus life at 850k : max. 10 bonus lives */
+	PORT_DIPSETTING(    0x0c, "20k 50k 150k 100k+" )        // last bonus life at 850k : max. 10 bonus lives
 	PORT_DIPSETTING(    0x04, "20k only" )
 	PORT_DIPSETTING(    0x08, "40k only" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
@@ -356,13 +790,15 @@ void arabian_state::machine_reset()
 
 void arabian_state::arabian(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_OSC/4);
+	static constexpr XTAL MAIN_OSC = XTAL(12'000'000);
+
+	// basic machine hardware
+	Z80(config, m_maincpu, MAIN_OSC / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &arabian_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &arabian_state::main_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(arabian_state::irq0_line_hold));
 
-	MB8841(config, m_mcu, MAIN_OSC/3/2);
+	MB8841(config, m_mcu, MAIN_OSC / 3 / 2);
 	m_mcu->read_k().set(FUNC(arabian_state::mcu_portk_r));
 	m_mcu->write_o().set(FUNC(arabian_state::mcu_port_o_w));
 	m_mcu->write_p().set(FUNC(arabian_state::mcu_port_p_w));
@@ -377,21 +813,21 @@ void arabian_state::arabian(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 11, 244);
-	screen.set_screen_update(FUNC(arabian_state::screen_update_arabian));
+	screen.set_screen_update(FUNC(arabian_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(arabian_state::arabian_palette), 256 * 32);
+	PALETTE(config, m_palette, FUNC(arabian_state::palette), 256 * 32);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", MAIN_OSC/4/2));
+	ay8910_device &aysnd(AY8910(config, "aysnd", MAIN_OSC / 4 / 2));
 	aysnd.port_a_write_callback().set(FUNC(arabian_state::ay8910_porta_w));
 	aysnd.port_b_write_callback().set(FUNC(arabian_state::ay8910_portb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -440,6 +876,7 @@ ROM_START( arabiana )
 	ROM_LOAD( "sun-8212.ic3", 0x000, 0x800, CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

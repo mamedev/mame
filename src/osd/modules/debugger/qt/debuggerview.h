@@ -3,11 +3,15 @@
 #ifndef MAME_DEBUGGER_QT_DEBUGGERVIEW_H
 #define MAME_DEBUGGER_QT_DEBUGGERVIEW_H
 
+#pragma once
+
 #include "debug/debugvw.h"
 
 #include <QtWidgets/QAbstractScrollArea>
 #include <QtWidgets/QMenu>
 
+
+namespace osd::debugger::qt {
 
 class DebuggerView : public QAbstractScrollArea
 {
@@ -22,6 +26,8 @@ public:
 	// Setters and accessors
 	void setPreferBottom(bool pb) { m_preferBottom = pb; }
 	debug_view *view() { return m_view; }
+	template <typename T> T *view() { return downcast<T *>(m_view); }
+	int sourceIndex() const;
 
 signals:
 	void updated();
@@ -48,5 +54,7 @@ private:
 
 	bool m_preferBottom;
 };
+
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_DEBUGGERVIEW_H

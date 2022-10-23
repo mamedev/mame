@@ -114,6 +114,8 @@ To Do / Status:
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 #include "softlist_dev.h"
+#include "utf8.h"
+
 #define MASTER_XTAL 12164800
 
 

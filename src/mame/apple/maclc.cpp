@@ -22,7 +22,8 @@
 
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/applefdintf.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
@@ -351,7 +352,6 @@ void maclc_state::maclc_base(machine_config &config)
 	m_v8->hmmu_enable_callback().set(FUNC(maclc_state::set_hmmu));
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 
 	EGRET(config, m_egret, EGRET_341S0850);
 	m_egret->reset_callback().set(FUNC(maclc_state::egret_reset_w));
@@ -482,4 +482,4 @@ ROM_END
 COMP(1990, maclc,  0, 0, maclc,  maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
 COMP(1991, maclc2, 0, 0, maclc2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
 COMP(1991, macclas2, 0, 0, macclas2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
-COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING)
+COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)

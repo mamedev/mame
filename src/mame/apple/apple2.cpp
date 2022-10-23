@@ -59,7 +59,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "formats/ap2_dsk.h"
+#include "utf8.h"
 
 
 namespace {

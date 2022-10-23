@@ -38,6 +38,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 #include "formats/oric_dsk.h"
 #include "formats/oric_tap.h"
 

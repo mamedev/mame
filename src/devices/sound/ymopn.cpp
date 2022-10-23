@@ -98,11 +98,11 @@ const tiny_rom_entry *ym2608_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  rom_bank_updated - refresh the stream if the
+//  rom_bank_pre_change - refresh the stream if the
 //  ROM banking changes
 //-------------------------------------------------
 
-void ym2608_device::rom_bank_updated()
+void ym2608_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

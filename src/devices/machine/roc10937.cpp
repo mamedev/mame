@@ -146,6 +146,10 @@ void rocvfd_device::device_start()
 	m_brightness = std::make_unique<output_finder<1> >(*this, "vfdduty%u", unsigned(m_port_val));
 	m_brightness->resolve();
 
+	m_sclk = 0;
+	m_data = 0;
+	m_por = 1;
+
 	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_size));
 	save_item(NAME(m_shift_count));
@@ -155,6 +159,7 @@ void rocvfd_device::device_start()
 	save_item(NAME(m_count));
 	save_item(NAME(m_sclk));
 	save_item(NAME(m_data));
+	save_item(NAME(m_por));
 	save_item(NAME(m_duty));
 	save_item(NAME(m_disp));
 }
@@ -169,8 +174,6 @@ void rocvfd_device::device_reset()
 	m_count=0;
 	m_duty=31;
 	m_disp = 0;
-	m_sclk = 0;
-	m_data = 0;
 
 	std::fill(std::begin(m_chars), std::end(m_chars), 0);
 	std::fill(std::begin(*m_outputs), std::end(*m_outputs), 0);
@@ -214,6 +217,7 @@ WRITE_LINE_MEMBER( rocvfd_device::por )
 	{
 		reset();
 	}
+	m_por = state;
 }
 
 
@@ -222,7 +226,7 @@ void rocvfd_device::shift_clock(int state)
 	if (m_sclk != state)
 	{
 		//Clock data on FALLING edge
-		if (!m_sclk)
+		if (!m_sclk && m_por)
 		{
 			m_shift_data <<= 1;
 

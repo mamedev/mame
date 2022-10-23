@@ -28,15 +28,15 @@ public:
 	// construction/destruction
 	vcs_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	// device_vcs_control_port_interface overrides
+	virtual uint8_t vcs_joy_r() override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	// device_vcs_control_port_interface overrides
-	virtual uint8_t vcs_joy_r() override;
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_ioport m_joy;

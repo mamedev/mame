@@ -33,7 +33,7 @@
 
 #include "emu.h"
 
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/rp2a03.h"
 #include "cpu/z80/z80.h"
 #include "video/ppu2c0x.h"
 
@@ -56,7 +56,7 @@ public:
 	void smb3bl(machine_config &config);
 
 private:
-	required_device<n2a03_device> m_maincpu;
+	required_device<rp2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
 	void nes_cpu_map(address_map &map);
@@ -116,7 +116,7 @@ INPUT_PORTS_END
 
 void nes_arcade_bl_state::smb3bl(machine_config &config)
 {
-	N2A03G(config, m_maincpu, 3.579545_MHz_XTAL / 2); // TODO: verify divider
+	RP2A03G(config, m_maincpu, 3.579545_MHz_XTAL / 2); // TODO: verify divider, really RP2A03E
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_arcade_bl_state::nes_cpu_map);
 
 	z80_device &timercpu(Z80(config, "timercpu", 3.579545_MHz_XTAL));

@@ -28,10 +28,6 @@ void swp20_device::device_reset()
 	m_keyoff = 0;
 }
 
-void swp20_device::rom_bank_updated()
-{
-}
-
 void swp20_device::map(address_map &map)
 {
 	map(0x00, 0x3f).rw(FUNC(swp20_device::snd_r), FUNC(swp20_device::snd_w));

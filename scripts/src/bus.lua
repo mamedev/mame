@@ -1242,6 +1242,8 @@ if (BUSES["ELECTRON"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/romboxp.h",
 		MAME_DIR .. "src/devices/bus/electron/sidewndr.cpp",
 		MAME_DIR .. "src/devices/bus/electron/sidewndr.h",
+		MAME_DIR .. "src/devices/bus/electron/voxbox.cpp",
+		MAME_DIR .. "src/devices/bus/electron/voxbox.h",
 		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
 		MAME_DIR .. "src/devices/bus/electron/m2105.h",
 	}
@@ -2580,8 +2582,6 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/a2cffa.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2corvus.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2corvus.h",
-		MAME_DIR .. "src/devices/bus/a2bus/a2diskii.cpp",
-		MAME_DIR .. "src/devices/bus/a2bus/a2diskii.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskiing.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskiing.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2dx1.cpp",
@@ -3697,6 +3697,8 @@ if (BUSES["GAMEBOY"]~=null) then
 		MAME_DIR .. "src/devices/bus/gameboy/cartheader.h",
 		MAME_DIR .. "src/devices/bus/gameboy/carts.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/carts.h",
+		MAME_DIR .. "src/devices/bus/gameboy/gbck003.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/gbck003.h",
 		MAME_DIR .. "src/devices/bus/gameboy/gbslot.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/gbslot.h",
 		MAME_DIR .. "src/devices/bus/gameboy/gbxfile.cpp",
@@ -3709,6 +3711,8 @@ if (BUSES["GAMEBOY"]~=null) then
 		MAME_DIR .. "src/devices/bus/gameboy/mbc.h",
 		MAME_DIR .. "src/devices/bus/gameboy/mbc2.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/mbc2.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc3.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc3.h",
 		MAME_DIR .. "src/devices/bus/gameboy/mbc6.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/mbc6.h",
 		MAME_DIR .. "src/devices/bus/gameboy/mbc7.cpp",
@@ -3719,6 +3723,8 @@ if (BUSES["GAMEBOY"]~=null) then
 		MAME_DIR .. "src/devices/bus/gameboy/mmm01.h",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.h",
+		MAME_DIR .. "src/devices/bus/gameboy/slmulti.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/slmulti.h",
 		MAME_DIR .. "src/devices/bus/gameboy/slot.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/slot.h",
 		MAME_DIR .. "src/devices/bus/gameboy/tama5.cpp",
@@ -3902,10 +3908,39 @@ end
 ---------------------------------------------------
 if (BUSES["EPSON_QX"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/cr1510.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/cr1510.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/ide.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/ide.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/multifont.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/multifont.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/sound_card.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/sound_card.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/epson_qx/keyboard/keyboard.h,BUSES["EPSON_QX_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["EPSON_QX_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/matrix.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/keyboard/matrix.h",
+	}
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp", GEN_DIR .. "emu/layout/qx10ascii.lh" },
+		{ MAME_DIR .. "src/devices/bus/epson_qx/keyboard/keyboard.cpp", GEN_DIR .. "emu/layout/qx10hasci.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "qx10ascii"),
+		layoutbuildtask("emu/layout", "qx10hasci"),
 	}
 end
 

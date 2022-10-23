@@ -6,11 +6,12 @@
 
     "IMG" disk format
 
-    This format is just a raw image of every sector on SSDD 8" floppy
-    disks as used in Intel MDS-II systems.
+    This format is just a raw image of every sector on SSDD & SSSD 8"
+    floppy disks as used in Intel MDS-II systems.
     Files with this format have no header/trailer and are exactly
     512512 bytes in size (52 sectors, 1 head, 77 tracks,
-    128 bytes per sector).
+    128 bytes per sector) for SSDD format or 256256 bytes (26 sectors,
+    1 head, 77 tracks, 128 bytes per sector) for SSSD format
 
 *********************************************************************/
 
@@ -26,7 +27,8 @@
 #define VERBOSE 0
 #define LOG(...)  do { if (VERBOSE) osd_printf_info(__VA_ARGS__); } while (false)
 
-constexpr unsigned CELL_SIZE    = 1200; // Bit cell size (1 µs)
+constexpr unsigned CELL_SIZE    = 1200; // Bit cell size of MMFM format (1 µs)
+constexpr unsigned CELL_SIZE_FM = 2400; // Bit cell size of FM format (2 µs)
 constexpr uint8_t  INDEX_AM     = 0x0c; // Index address mark
 constexpr uint8_t  ID_AM        = 0x0e; // ID address mark
 constexpr uint8_t  DATA_AM      = 0x0b; // Data address mark
@@ -35,8 +37,10 @@ constexpr unsigned PREIDX_GAP   = 45;   // Size of pre-index gap
 constexpr unsigned SYNC_00_LEN  = 18;   // 00's in sync (gaps 1, 2, 3)
 constexpr unsigned SYNC_FF_LEN  = 10;   // FF's in sync (gaps 1, 2, 3)
 constexpr int ID_DATA_OFFSET    = 35 * 16;  // Nominal distance (in cells) between ID & DATA AM
-// Size of image file
+// Size of image file (SSDD)
 constexpr unsigned IMG_IMAGE_SIZE = img_format::TRACKS * img_format::HEADS * img_format::SECTORS * img_format::SECTOR_SIZE;
+// Size of image file (SSSD)
+constexpr unsigned IMG_IMAGE_SIZE_FM = img_format::TRACKS * img_format::HEADS * img_format::SECTORS_FM * img_format::SECTOR_SIZE;
 constexpr uint16_t CRC_POLY     = 0x1021;   // CRC-CCITT
 
 img_format::img_format()
@@ -51,7 +55,7 @@ int img_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	}
 
 	if (((form_factor == floppy_image::FF_8) || (form_factor == floppy_image::FF_UNKNOWN)) &&
-		size == IMG_IMAGE_SIZE) {
+		(size == IMG_IMAGE_SIZE || size == IMG_IMAGE_SIZE_FM)) {
 		return FIFID_SIZE;
 	} else {
 		return 0;
@@ -61,10 +65,11 @@ int img_format::identify(util::random_read &io, uint32_t form_factor, const std:
 bool img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
-	if (io.length(size) || (size != IMG_IMAGE_SIZE)) {
+	if (io.length(size) || (size != IMG_IMAGE_SIZE && size != IMG_IMAGE_SIZE_FM)) {
 		return false;
 	}
-	image->set_variant(floppy_image::SSDD);
+	bool is_dd = size == IMG_IMAGE_SIZE;
+	image->set_variant(is_dd ? floppy_image::SSDD : floppy_image::SSSD);
 
 	// Suck in the whole image
 	std::vector<uint8_t> image_data(size);
@@ -72,50 +77,95 @@ bool img_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	io.read_at(0, image_data.data(), size, actual);
 
 	for (unsigned cyl = 0; cyl < TRACKS; cyl++) {
-		std::vector<uint32_t> track_data;
+		if (is_dd) {
+			// SSDD (MMFM)
+			std::vector<uint32_t> track_data;
 
-		write_gap(track_data, 0 , PREIDX_GAP);
-		uint16_t crc = 0;
-		write_mmfm_byte(track_data , INDEX_AM , crc, AM_CLOCK);
+			write_gap(track_data, 0 , PREIDX_GAP);
+			uint16_t crc = 0;
+			write_mmfm_byte(track_data , INDEX_AM , crc, AM_CLOCK);
 
-		// Compute interleave factor and skew for current track
-		unsigned il_factor;
-		unsigned skew;
-		if (cyl == 0) {
-			il_factor = 1;
-			skew = 51;
-		} else if (cyl == 1) {
-			il_factor = 4;
-			skew = 48;
+			// Compute interleave factor and skew for current track
+			unsigned il_factor;
+			unsigned skew;
+			if (cyl == 0) {
+				il_factor = 1;
+				skew = 51;
+			} else if (cyl == 1) {
+				il_factor = 4;
+				skew = 48;
+			} else {
+				il_factor = 5;
+				skew = (47 + 45 * (cyl - 2)) % 52;
+			}
+			std::vector<uint8_t> sector_list = interleaved_sectors(SECTORS, il_factor);
+
+			for (unsigned sector = 0; sector < SECTORS; sector++) {
+				unsigned real_sector = sector_list[ (sector + skew) % SECTORS ];
+				unsigned offset_in_image = (real_sector - 1 + cyl * SECTORS) * SECTOR_SIZE;
+				write_sector(track_data , cyl , real_sector , &image_data[ offset_in_image ]);
+			}
+			fill_with_gap4(track_data);
+			generate_track_from_levels(cyl , 0 , track_data , 0 , image);
 		} else {
-			il_factor = 5;
-			skew = (47 + 45 * (cyl - 2)) % 52;
+			// SSSD (FM)
+			// Compute interleave factor and skew for current track
+			unsigned il_factor;
+			unsigned skew;
+			if (cyl == 0) {
+				il_factor = 1;
+				skew = 25;
+			} else if (cyl == 1) {
+				il_factor = 12;
+				skew = 14;
+			} else {
+				il_factor = 6;
+				skew = (20 + 21 * (cyl - 2)) % 26;
+			}
+			std::vector<uint8_t> sector_list = interleaved_sectors(SECTORS_FM, il_factor);
+			desc_pc_sector sects[ SECTORS_FM ];
+			for (unsigned sector = 0; sector < SECTORS_FM; sector++) {
+				unsigned real_sector = sector_list[ (sector + skew) % SECTORS_FM ];
+				unsigned offset_in_image = (real_sector - 1 + cyl * SECTORS_FM) * SECTOR_SIZE;
+				sects[ sector ].actual_size = SECTOR_SIZE;
+				sects[ sector ].track = cyl;
+				sects[ sector ].head = 0;
+				sects[ sector ].size = 0;
+				sects[ sector ].sector = real_sector;
+				sects[ sector ].bad_crc = false;
+				sects[ sector ].deleted = false;
+				sects[ sector ].data = image_data.data() + offset_in_image;
+			}
+			build_pc_track_fm(cyl, 0, image, 83333, SECTORS_FM, sects, 33, 46, 32, 11);
 		}
-		std::vector<uint8_t> sector_list = interleaved_sectors(il_factor);
-
-		for (unsigned sector = 0; sector < SECTORS; sector++) {
-			unsigned real_sector = sector_list[ (sector + skew) % SECTORS ];
-			unsigned offset_in_image = (real_sector - 1 + cyl * SECTORS) * SECTOR_SIZE;
-			write_sector(track_data , cyl , real_sector , &image_data[ offset_in_image ]);
-		}
-		fill_with_gap4(track_data);
-		generate_track_from_levels(cyl , 0 , track_data , 0 , image);
 	}
 	return true;
 }
 
 bool img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
+	bool is_dd = image->get_variant() == floppy_image::SSDD;
+
 	for (int cyl = 0; cyl < TRACKS; cyl++) {
-		auto bitstream = generate_bitstream_from_track(cyl , 0 , CELL_SIZE , image , 0);
-		int pos = 0;
-		unsigned track_no , sector_no;
-		uint8_t sector_data[ SECTOR_SIZE ];
-		while (get_next_sector(bitstream , pos , track_no , sector_no , sector_data)) {
-			if (track_no == cyl && sector_no >= 1 && sector_no <= SECTORS) {
-				unsigned offset_in_image = (cyl * SECTORS + sector_no - 1) * SECTOR_SIZE;
+		if (is_dd) {
+			auto bitstream = generate_bitstream_from_track(cyl , 0 , CELL_SIZE , image , 0);
+			int pos = 0;
+			unsigned track_no , sector_no;
+			uint8_t sector_data[ SECTOR_SIZE ];
+			while (get_next_sector(bitstream , pos , track_no , sector_no , sector_data)) {
+				if (track_no == cyl && sector_no >= 1 && sector_no <= SECTORS) {
+					unsigned offset_in_image = (cyl * SECTORS + sector_no - 1) * SECTOR_SIZE;
+					size_t actual;
+					io.write_at(offset_in_image, sector_data, SECTOR_SIZE, actual);
+				}
+			}
+		} else {
+			auto bitstream = generate_bitstream_from_track(cyl , 0 , CELL_SIZE_FM , image , 0);
+			auto sects = extract_sectors_from_bitstream_fm_pc(bitstream);
+			for (unsigned s = 1; s <= SECTORS_FM; s++) {
+				unsigned offset_in_image = (cyl * SECTORS_FM + s - 1) * SECTOR_SIZE;
 				size_t actual;
-				io.write_at(offset_in_image, sector_data, SECTOR_SIZE, actual);
+				io.write_at(offset_in_image, sects[ s ].data(), SECTOR_SIZE, actual);
 			}
 		}
 	}
@@ -142,20 +192,20 @@ bool img_format::supports_save() const
 	return true;
 }
 
-std::vector<uint8_t> img_format::interleaved_sectors(unsigned il_factor)
+std::vector<uint8_t> img_format::interleaved_sectors(unsigned sects, unsigned il_factor)
 {
-	std::vector<uint8_t> out(SECTORS);
+	std::vector<uint8_t> out(sects);
 	unsigned idx = 0;
-	for (unsigned s = 0; s < SECTORS; s++) {
+	for (unsigned s = 0; s < sects; s++) {
 		while (out[ idx ] != 0) {
-			if (++idx >= SECTORS) {
+			if (++idx >= sects) {
 				idx = 0;
 			}
 		}
 		out[ idx ] = s + 1;
 		idx += il_factor;
-		if (idx >= SECTORS) {
-			idx -= SECTORS;
+		if (idx >= sects) {
+			idx -= sects;
 		}
 	}
 	return out;

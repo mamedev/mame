@@ -14362,6 +14362,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dreamjean">
+		<description>I Dream of Jeannie</description>
+		<year>1996</year>
+		<publisher>Trendmasters</publisher>
+		<info name="usage" value="Windows 3.x required"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="I Dream of Jeannie [Trendmasters] [1996] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8944c5d0" sha1="04d9a1359065db2fc93d013ff051788933c1c1c8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="extremis">
 		<description>In Extremis</description>
 		<year>1994</year>
@@ -17588,6 +17600,37 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Operation Body Count [Capstone] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="a1aa7cc6" sha1="fb359ceb2f075d3a7acbc700b5c5d30b4d10b876"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opcrusad">
+		<description>Operation Crusader</description>
+		<year>1994</year>
+		<publisher>The Avalon Hill Game Company</publisher>
+		<info name="developer" value="Atomic Games" />
+		<info name="version" value="1.1"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Operation Crusader [Avalon Hill] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="3ba760f4" sha1="ec3911f95e1b4cebf30764da9952ef76d8828f06"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Operation Crusader [Avalon Hill] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="79f1c60f" sha1="98a2341e847bb162115d2b883a6b8b0a323dfe8e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opharrier">
+		<description>Operation Harrier (Kixx release)</description>
+		<year>1993</year>
+		<publisher>Kixx</publisher>
+		<info name="developer" value="Creative Materials" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A/B" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Operation Harrier [1993] [Kixx] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="76136c6f" sha1="04feec4f4940b79c56f244ec939d182142346421"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21861,7 +21904,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Future Publishing</publisher>
 		<notes><![CDATA[
-Disk 2 includes: "Player Manager 2 (demo)""
+Disk 2 includes: "Player Manager 2 (demo)"
 Disk 3 includes: "Media8or 2 (shareware)"
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -22386,7 +22429,55 @@ Walking Fingers [David Geffen]: Let your fingers do the walking in this handy mi
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Bad dump: Modified root file -->
 			<dataarea name="flop" size="737280">
-				<rom name="Personal Computer World 1994-04 [VNU] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="72867707" sha1="b51dedbc660fe88012fd5d4a0749e72296eef279"  status="baddump"/>
+				<rom name="Personal Computer World 1994-04 [VNU] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="72867707" sha1="b51dedbc660fe88012fd5d4a0749e72296eef279" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcw9406">
+		<description>Personal Computer World (1994-06 - June 1994)</description>
+		<year>1994</year>
+		<publisher>VNU Business Publications</publisher>
+		<notes><![CDATA[Cover Disk includes:
+Programmer's File Editor: A multi-featured, multi-file programming editor for Windows 3.1.
+Win Crabs: Invade someone's desktop with roving crabs. An amusing desktop curio.
+Dropper: Drop programs AND data files where you like. Add extra drag and drop facilities to your Windows desktop.
+Win Life: Study the way primitive organisms may develop. Run a implementation of the classic simulation.
+Speaker Driver: Play WAV files on your ordinary PC speaker. Play Windows 3.1 sounds through your PC's internal speaker.
+Waxman 1.2w: Play chess with yourself, a friend or the PC.
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Personal Computer World 1994-06 [VNU] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3dde9df3" sha1="6c88acc7ac27ef5d9d0e1d0bec3caced09f1cbbb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bad dump: Modified ROOT and OEM id -->
+	<software name="pcw9411">
+		<description>Personal Computer World (1994-11 - November 1994)</description>
+		<year>1994</year>
+		<publisher>VNU Business Publications</publisher>
+		<notes>Cover Disk includes: "World Rally Fever (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Personal Computer World 1994-11 [VNU] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="53122bb9" sha1="edbb532dd935541049b1891c7b4ac76022d4036c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bad dump: Modified ROOT and OEM id -->
+	<software name="pcw9705">
+		<description>Personal Computer World (1997-05 - May 1997)</description>
+		<year>1997</year>
+		<publisher>VNU Business Publications</publisher>
+		<notes><![CDATA[Cover Disk includes:
+Free the music! v1.01: Not a keyboard in sight, but you can explore all the MIDI features of your computer by pointing with your mouse. Guaranteed to give you hours of fun!
+Bombs: An amusing little desktop game.
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Personal Computer World 1997-05 [VNU] [1997] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="ea3909f6" sha1="c121c7afafdfda79a9d742bd4f9b4c6ecffb6aa7" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

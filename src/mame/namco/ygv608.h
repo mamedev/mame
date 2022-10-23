@@ -103,7 +103,7 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual uint32_t palette_entries() const override { return 256; }
+	virtual uint32_t palette_entries() const noexcept override { return 256; }
 
 	TIMER_CALLBACK_MEMBER(update_vblank_flag);
 	TIMER_CALLBACK_MEMBER(update_raster_flag);

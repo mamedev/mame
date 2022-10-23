@@ -7,17 +7,23 @@
 //============================================================
 
 #include "emu.h"
+#include "debug_module.h"
+
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/points.h"
 #include "debug/textbuf.h"
-#include "debug_module.h"
 #include "debugger.h"
-#include "fileio.h"
+
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 
+#include "fileio.h"
+
 #include <cinttypes>
+
+
+namespace {
 
 //-------------------------------------------------------------------------
 #define MAX_PACKET_SIZE 16384
@@ -411,7 +417,7 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "m68000",     gdb_register_map_m68000 },
 	{ "z80",        gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
-	{ "n2a03",      gdb_register_map_m6502 },
+	{ "rp2a03",     gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
 	{ "score7",     gdb_register_map_score7 },
 };
@@ -1295,22 +1301,6 @@ void debug_gdbstub::handle_packet()
 }
 
 //-------------------------------------------------------------------------
-#define BYTESWAP_64(x) ((((x) << 56) & 0xFF00000000000000) \
-					  | (((x) << 40) & 0x00FF000000000000) \
-					  | (((x) << 24) & 0x0000FF0000000000) \
-					  | (((x) <<  8) & 0x000000FF00000000) \
-					  | (((x) >>  8) & 0x00000000FF000000) \
-					  | (((x) >> 24) & 0x0000000000FF0000) \
-					  | (((x) >> 40) & 0x000000000000FF00) \
-					  | (((x) >> 56) & 0x00000000000000FF))
-#define BYTESWAP_32(x) ((((x) << 24) & 0xFF000000) \
-					  | (((x) <<  8) & 0x00FF0000) \
-					  | (((x) >>  8) & 0x0000FF00) \
-					  | (((x) >> 24) & 0x000000FF))
-#define BYTESWAP_16(x) ((((x) <<  8) & 0xFF00) \
-					  | (((x) >>  8) & 0x00FF))
-
-//-------------------------------------------------------------------------
 std::string debug_gdbstub::get_register_string(int gdb_regnum)
 {
 	const gdb_register &reg = m_gdb_registers[gdb_regnum];
@@ -1323,9 +1313,9 @@ std::string debug_gdbstub::get_register_string(int gdb_regnum)
 		value &= (1ULL << reg.gdb_bitsize) - 1;
 	if ( !m_is_be )
 	{
-		value = (reg.gdb_bitsize == 64) ? BYTESWAP_64(value)
-			  : (reg.gdb_bitsize == 32) ? BYTESWAP_32(value)
-			  : (reg.gdb_bitsize == 16) ? BYTESWAP_16(value)
+		value = (reg.gdb_bitsize == 64) ? swapendian_int64(value)
+			  : (reg.gdb_bitsize == 32) ? swapendian_int32(value)
+			  : (reg.gdb_bitsize == 16) ? swapendian_int16(value)
 			  :                           value;
 	}
 	return string_format(fmt, value);
@@ -1344,9 +1334,9 @@ bool debug_gdbstub::parse_register_string(uint64_t *pvalue, const char *buf, int
 		return false;
 	if ( !m_is_be )
 	{
-		value = (reg.gdb_bitsize == 64) ? BYTESWAP_64(value)
-			  : (reg.gdb_bitsize == 32) ? BYTESWAP_32(value)
-			  : (reg.gdb_bitsize == 16) ? BYTESWAP_16(value)
+		value = (reg.gdb_bitsize == 64) ? swapendian_int64(value)
+			  : (reg.gdb_bitsize == 32) ? swapendian_int32(value)
+			  : (reg.gdb_bitsize == 16) ? swapendian_int16(value)
 			  :                           value;
 	}
 	*pvalue = value;
@@ -1442,6 +1432,8 @@ void debug_gdbstub::handle_character(char ch)
 			break;
 	}
 }
+
+} // anonymous namespace
 
 //-------------------------------------------------------------------------
 MODULE_DEFINITION(DEBUG_GDBSTUB, debug_gdbstub)

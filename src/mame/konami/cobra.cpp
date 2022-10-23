@@ -2878,7 +2878,6 @@ void cobra_renderer::gfx_fifo_exec()
 			}
 			default:
 			{
-				int k = 0;
 				int c = 0;
 				printf("gfxfifo_exec: unknown command %08X %08X\n", w1, w2);
 
@@ -2903,7 +2902,6 @@ void cobra_renderer::gfx_fifo_exec()
 						printf("\n");
 						c = 0;
 					}
-					k++;
 				};
 				cobra->logerror("\n");
 			}

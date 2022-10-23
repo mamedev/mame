@@ -112,14 +112,14 @@ class bfm_swp_state : public driver_device
 public:
 	bfm_swp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_cpuregion(*this, "maincpu")
 	{ }
 
-	uint32_t* m_cpuregion = nullptr;
-	std::unique_ptr<uint32_t[]> m_mainram;
+	std::unique_ptr<uint16_t[]> m_mainram;
 
-	uint32_t bfm_swp_mem_r(offs_t offset, uint32_t mem_mask = ~0);
-	void bfm_swp_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t bfm_swp_mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void bfm_swp_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -133,24 +133,22 @@ protected:
 
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
+	required_region_ptr<uint16_t> m_cpuregion;
 
 	virtual void machine_start() override;
 };
 
-uint32_t bfm_swp_state::bfm_swp_mem_r(offs_t offset, uint32_t mem_mask)
+uint16_t bfm_swp_state::bfm_swp_mem_r(offs_t offset, uint16_t mem_mask)
 {
 	int pc = m_maincpu->pc();
-	int cs = m_maincpu->get_cs(offset * 4);
+	int cs = m_maincpu->get_cs(offset * 2);
 
 	switch ( cs )
 	{
 		case 1:
-			if (offset<0x100000/4)
-				return m_cpuregion[offset];
-			[[fallthrough]]; // FIXME: really?
+			return m_cpuregion[offset & 0xfffff];
 		case 2:
-			offset&=0x3fff;
-			return m_mainram[offset];
+			return m_mainram[offset & 0x1fff];
 
 		default:
 			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
@@ -159,10 +157,10 @@ uint32_t bfm_swp_state::bfm_swp_mem_r(offs_t offset, uint32_t mem_mask)
 	return 0x0000;
 }
 
-void bfm_swp_state::bfm_swp_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void bfm_swp_state::bfm_swp_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pc = m_maincpu->pc();
-	int cs = m_maincpu->get_cs(offset * 4);
+	int cs = m_maincpu->get_cs(offset * 2);
 
 	switch ( cs )
 	{
@@ -170,8 +168,7 @@ void bfm_swp_state::bfm_swp_mem_w(offs_t offset, uint32_t data, uint32_t mem_mas
 			logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
 			[[fallthrough]];
 		case 2:
-			offset&=0x3fff;
-			COMBINE_DATA(&m_mainram[offset]);
+			COMBINE_DATA(&m_mainram[offset & 0x1fff]);
 	}
 
 }
@@ -182,7 +179,6 @@ void bfm_swp_state::bfm_swp_mem_w(offs_t offset, uint32_t data, uint32_t mem_mas
 void bfm_swp_state::bfm_swp_map(address_map &map)
 {
 	map(0x00000000, 0xffffffff).rw(FUNC(bfm_swp_state::bfm_swp_mem_r), FUNC(bfm_swp_state::bfm_swp_mem_w));
-	map(0x00000000, 0x000fffff).rom();
 }
 
 
@@ -192,9 +188,7 @@ INPUT_PORTS_END
 
 void bfm_swp_state::machine_start()
 {
-	m_cpuregion = (uint32_t*)memregion( "maincpu" )->base();
-	m_mainram = make_unique_clear<uint32_t[]>(0x10000);
-
+	m_mainram = make_unique_clear<uint16_t[]>((1024 * 16) / 2);
 }
 
 

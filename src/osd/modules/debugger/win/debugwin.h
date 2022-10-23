@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "../xmlconfig.h"
+
 // standard windows headers
 #include <windows.h>
 #include <windowsx.h>
@@ -19,6 +21,8 @@
 #include <zmouse.h>
 #endif
 
+
+namespace osd::debugger::win {
 
 class debugview_info;
 class debugwin_info;
@@ -33,6 +37,9 @@ public:
 	virtual running_machine &machine() const = 0;
 
 	virtual ui_metrics &metrics() const = 0;
+	virtual void set_color_theme(int index) = 0;
+	virtual bool get_save_window_arrangement() const = 0;
+	virtual void set_save_window_arrangement(bool save) = 0;
 
 	virtual bool const &waiting_for_debugger() const = 0;
 	virtual bool seq_pressed() const = 0;
@@ -47,4 +54,6 @@ public:
 	virtual void hide_all() = 0;
 };
 
-#endif
+} // namespace osd::debugger::win
+
+#endif // MAME_DEBUGGER_WIN_DEBUGWIN_H

@@ -29,7 +29,7 @@ public:
 	};
 
 protected:
-	mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data_map);
+	mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_mmu, address_map_constructor data_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -45,9 +45,12 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	void internal_data_map(address_map &map);
 
 private:
 	struct cpu_registers
@@ -181,6 +184,9 @@ private:
 	bool output_queued() const { return m_output_queue_state != 0xff; }
 	void set_output_queued() { m_output_queue_state = BIT(m_cpum, 4); }
 
+	offs_t mmu_psen_translate(u16 addr) const { return BIT(m_mmu_enable, 6) && BIT(addr + 0x4000, 15) ? u32(m_mmu_bank[BIT(addr, 15)]) << 14 | (addr & 0x3fff) : addr; }
+	offs_t mmu_data_translate(u16 addr) const { return BIT(m_mmu_enable, 7) && BIT(addr + 0x4000, 15) ? u32(m_mmu_bank[BIT(addr, 15) + 2]) << 14 | (addr & 0x3fff) : addr; }
+
 	u8 ie0_r();
 	void ie0_w(u8 data);
 	u8 ie1_r();
@@ -188,7 +194,10 @@ private:
 	u8 cpum_r();
 	void cpum_w(u8 data);
 
-	void internal_data_map(address_map &map);
+	u8 mmu_bank_r(offs_t offset);
+	void mmu_bank_w(offs_t offset, u8 data);
+	u8 mmu_enable_r();
+	void mmu_enable_w(u8 data);
 
 	void swap_cpus();
 	void next_instruction(u8 input);
@@ -202,6 +211,7 @@ private:
 	address_space_config m_data_config;
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	const bool m_has_mmu;
 
 	// execution state
 	cpu_registers m_cpu[2];
@@ -216,8 +226,19 @@ private:
 	// interrupt state
 	u16 m_if;
 	u16 m_irq;
+
+	// MMU state
+	u8 m_mmu_bank[4];
+	u8 m_mmu_enable;
+};
+
+class mn18801a_device : public mn1880_device
+{
+public:
+	mn18801a_device(const machine_config &config, const char *tag, device_t *owner, u32 clock);
 };
 
 DECLARE_DEVICE_TYPE(MN1880, mn1880_device)
+DECLARE_DEVICE_TYPE(MN18801A, mn18801a_device)
 
 #endif // MAME_CPU_MN1880_MN1880_H

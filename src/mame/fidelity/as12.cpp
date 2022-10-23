@@ -5,13 +5,25 @@
 
 Fidelity Elegance Chess Challenger (AS12/6085)
 
-Hardware notes:
-- R65C02P4 CPU @ 3/3.57/4MHz
-- 3*8KB ROM(TMM2764), 2*2KB RAM(HM6116)
+Hardware notes (AS12):
 - PCB label 510-1084B01
+- R65C02P3 @ 3/3.57MHz (apparently the first few had a 3MHz CPU)
+- 2*8KB ROM + 1*4KB ROM, 2*2KB RAM(HM6116+TMM2016)
+
+Hardware notes (6085):
+- PCB label 510-1084B01
+- R65C02P4 @ 4MHz
+- 3*8KB ROM(TMM2764), 2*2KB RAM(HM6116+TMM2016)
 
 This is on the SC12B board, with enough modifications to support more leds and
 magnetic chess board sensors. See sc12.cpp for a more technical description.
+
+The first RAM chip is low-power, and battery-backed with a capacitor. This is
+also mentioned in the manual. Maybe it does not apply to older PCBs.
+
+TODO:
+- is the initial AS12 3MHz version the same ROM as felega1? When it's configured
+  at 3MHz and the CPU divider set to 2, the pace is the same as fscc12a.
 
 ******************************************************************************/
 
@@ -22,6 +34,7 @@ magnetic chess board sensors. See sc12.cpp for a more technical description.
 #include "bus/generic/slot.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
+#include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
@@ -163,7 +176,8 @@ u8 as12_state::input_r(offs_t offset)
 void as12_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).ram();
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0fff).ram();
 	map(0x1800, 0x1807).w(FUNC(as12_state::led_w)).nopr();
 	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(as12_state::control_w));
@@ -194,9 +208,9 @@ static INPUT_PORTS_START( feleg )
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, switch_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "3MHz" )
-	PORT_CONFSETTING(    0x01, "3.57MHz" )
-	PORT_CONFSETTING(    0x02, "4MHz" )
+	PORT_CONFSETTING(    0x00, "3MHz (original)" )
+	PORT_CONFSETTING(    0x01, "3.57MHz (AS12)" )
+	PORT_CONFSETTING(    0x02, "4MHz (6085)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( felega )
@@ -204,9 +218,9 @@ static INPUT_PORTS_START( felega )
 
 	PORT_MODIFY("FAKE") // default to 3.57MHz
 	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, switch_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "3MHz" )
-	PORT_CONFSETTING(    0x01, "3.57MHz" )
-	PORT_CONFSETTING(    0x02, "4MHz" )
+	PORT_CONFSETTING(    0x00, "3MHz (original)" )
+	PORT_CONFSETTING(    0x01, "3.57MHz (AS12)" )
+	PORT_CONFSETTING(    0x02, "4MHz (6085)" )
 INPUT_PORTS_END
 
 
@@ -217,7 +231,7 @@ INPUT_PORTS_END
 
 void as12_state::feleg(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config, m_maincpu, 4_MHz_XTAL); // R65C02P4
 	m_maincpu->set_addrmap(AS_PROGRAM, &as12_state::main_map);
 
@@ -225,19 +239,22 @@ void as12_state::feleg(machine_config &config)
 	irq_clock.set_pulse_width(attotime::from_usec(17)); // active for 17us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	config.set_default_layout(layout_fidel_as12);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc");
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
@@ -246,8 +263,8 @@ void as12_state::felega(machine_config &config)
 {
 	feleg(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_clock(3.579545_MHz_XTAL);
+	// basic machine hardware
+	m_maincpu->set_clock(3.579545_MHz_XTAL); // R65C02P3
 }
 
 
@@ -256,7 +273,7 @@ void as12_state::felega(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( feleg ) // model 6085
+ROM_START( feleg ) // model 6085, serial 613623xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("feleg.8000", 0x8000, 0x2000, CRC(e9df31e8) SHA1(31c52bb8f75580c82093eb950959c1bc294189a8) ) // TMM2764, no label
 	ROM_LOAD("feleg.c000", 0xc000, 0x1000, CRC(bed9c84b) SHA1(c12f39765b054d2ad81f747e698715ad4246806d) ) // "
@@ -264,11 +281,18 @@ ROM_START( feleg ) // model 6085
 	ROM_LOAD("feleg.e000", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "
 ROM_END
 
-ROM_START( felega ) // model AS12
+ROM_START( felega ) // model AS12, serial 427921xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("blue.8000",   0x8000, 0x2000, CRC(2e07e657) SHA1(3238f21bdbf2277851e5a32e18c043e654123f00) ) // M5L2764K-2
-	ROM_LOAD("yellow.c000", 0xc000, 0x1000, CRC(fcc48302) SHA1(f60d34229721e8659e9f81c267177daec7723d8f) ) // TMS2732AJL-45
-	ROM_LOAD("black.e000",  0xe000, 0x2000, CRC(9142121b) SHA1(264380e7ad36b7b1867658e1af387624d2a72630) ) // TMS2764JL-25
+	ROM_LOAD("blue.8000",  0x8000, 0x2000, CRC(2e07e657) SHA1(3238f21bdbf2277851e5a32e18c043e654123f00) ) // M5L2764K-2
+	ROM_LOAD("green.c000", 0xc000, 0x1000, CRC(fcc48302) SHA1(f60d34229721e8659e9f81c267177daec7723d8f) ) // TMS2732AJL-45
+	ROM_LOAD("black.e000", 0xe000, 0x2000, CRC(b7c55d19) SHA1(45df961c2c3a1e9c8ec79efb7a1a82500425df2f) ) // TMS2764JL-25
+ROM_END
+
+ROM_START( felega1 ) // model AS12, serial 427917xx
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("blue.8000",  0x8000, 0x2000, CRC(2e07e657) SHA1(3238f21bdbf2277851e5a32e18c043e654123f00) ) // M5L2764K-2
+	ROM_LOAD("green.c000", 0xc000, 0x1000, CRC(fcc48302) SHA1(f60d34229721e8659e9f81c267177daec7723d8f) ) // TMS2732AJL-45
+	ROM_LOAD("black.e000", 0xe000, 0x2000, CRC(9142121b) SHA1(264380e7ad36b7b1867658e1af387624d2a72630) ) // TMS2764JL-25
 ROM_END
 
 } // anonymous namespace
@@ -279,6 +303,7 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME    PARENT  CMP  MACHINE  INPUT    STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, feleg,  0,       0,  feleg,   feleg,   as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1985, felega, feleg,   0,  felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+//    YEAR  NAME     PARENT  CMP  MACHINE  INPUT    STATE       INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1986, feleg,   0,       0,  feleg,   feleg,   as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, felega,  feleg,   0,  felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, felega1, feleg,   0,  felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )

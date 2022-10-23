@@ -101,8 +101,10 @@ u8 pentagon_state::beta_neutral_r(offs_t offset)
 
 u8 pentagon_state::beta_enable_r(offs_t offset)
 {
-	if (!(machine().side_effects_disabled())) {
-		if (m_bank_rom[0]->entry() == 1) {
+	if (!machine().side_effects_disabled())
+	{
+		if (m_bank_rom[0]->entry() == 1)
+		{
 			m_beta->enable();
 			m_bank_rom[0]->set_entry(3);
 		}
@@ -112,8 +114,10 @@ u8 pentagon_state::beta_enable_r(offs_t offset)
 
 u8 pentagon_state::beta_disable_r(offs_t offset)
 {
-	if (!(machine().side_effects_disabled())) {
-		if (m_beta->is_active()) {
+	if (!machine().side_effects_disabled())
+	{
+		if (m_beta->is_active())
+		{
 			m_beta->disable();
 			m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
 		}

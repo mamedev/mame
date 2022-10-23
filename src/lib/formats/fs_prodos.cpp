@@ -86,12 +86,10 @@ const u8 prodos_impl::boot[512] = {
 	0xf0, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-void prodos_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void prodos_image::enumerate_f(floppy_enumerator &fe) const
 {
-	if(has(form_factor, variants, floppy_image::FF_35, floppy_image::DSDD))
-		fe.add(FLOPPY_APPLE_GCR_FORMAT, 819200, "prodos_800k", "Apple ProDOS 800K");
-	if(has(form_factor, variants, floppy_image::FF_35, floppy_image::SSDD))
-		fe.add(FLOPPY_APPLE_GCR_FORMAT, 409600, "prodos_400k", "Apple ProDOS 400K");
+	fe.add(FLOPPY_APPLE_GCR_FORMAT, floppy_image::FF_35, floppy_image::DSDD, 819200, "prodos_800k", "Apple ProDOS 800K");
+	fe.add(FLOPPY_APPLE_GCR_FORMAT, floppy_image::FF_35, floppy_image::SSDD, 409600, "prodos_400k", "Apple ProDOS 400K");
 }
 
 std::unique_ptr<filesystem_t> prodos_image::mount(fsblk_t &blockdev) const

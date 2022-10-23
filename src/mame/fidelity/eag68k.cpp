@@ -10,7 +10,7 @@ Excel 68000 I/O is very similar to EAG, so it's handled in this driver as well
 
 TODO:
 - unemulated waitstates with DTACK
-- EAG USART is not emulated
+- EAG USART is not emulated, conflict with input2_r?
 - V10 CPU emulation is too slow, MAME 68040 opcode timing is same as 68030 but in
   reality it is much faster, same goes for V11 of course (see note below)
 - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
@@ -77,7 +77,7 @@ to be compatible with EAG though and will load fine with an adapter.
 The USART allows for a serial connection between the chess computer and another
 device, for example a PC. Fidelity released a DOS tool called EAGLINK which
 featured PC printer support, complete I/O control, detailed information while
-the program is 'thinking', etc.
+the program is 'thinking', etc. It can be enabled with POP3 H3.
 
 Memory map: (of what is known)
 -----------
@@ -168,6 +168,9 @@ B0000x-xxxxxx: see V7, -800000
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 #include "machine/clock.h"
 #include "machine/gen_latch.h"
 #include "machine/ram.h"

@@ -11,7 +11,7 @@
 
     TODO:
     - see .h file
-	- research HC-55536 and HC-55564 differences vs HC-55516 (better auto-zeroing,
+    - research HC-55536 and HC-55564 differences vs HC-55516 (better auto-zeroing,
       and removal of the encoder offset compensation DAC?)
     - /src/mame/exidy/exidy440_a.cpp has its own internal implementation of the
       MC3417 and MC3418, it should be using this file instead

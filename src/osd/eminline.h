@@ -51,6 +51,19 @@
 ***************************************************************************/
 
 /*-------------------------------------------------
+    mul_16x16 - perform a signed 16 bit x 16 bit
+    multiply and return the full 32 bit result
+-------------------------------------------------*/
+
+#ifndef mul_16x16
+constexpr int32_t mul_16x16(int16_t a, int16_t b)
+{
+	return int32_t(a) * int32_t(b);
+}
+#endif
+
+
+/*-------------------------------------------------
     mul_32x32 - perform a signed 32 bit x 32 bit
     multiply and return the full 64 bit result
 -------------------------------------------------*/
@@ -470,6 +483,74 @@ inline unsigned population_count_64(uint64_t val)
 		return population_count_32(uint32_t(val)) + population_count_32(uint32_t(val >> 32));
 	}
 #endif
+}
+#endif
+
+
+/*-------------------------------------------------
+    rotl_32 - circularly shift a 32-bit value left
+    by the specified number of bits (modulo 32)
+-------------------------------------------------*/
+
+#ifndef rotl_32
+constexpr uint32_t rotl_32(uint32_t val, int shift)
+{
+	shift &= 31;
+	if (shift)
+		return val << shift | val >> (32 - shift);
+	else
+		return val;
+}
+#endif
+
+
+/*-------------------------------------------------
+    rotr_32 - circularly shift a 32-bit value right
+    by the specified number of bits (modulo 32)
+-------------------------------------------------*/
+
+#ifndef rotr_32
+constexpr uint32_t rotr_32(uint32_t val, int shift)
+{
+	shift &= 31;
+	if (shift)
+		return val >> shift | val << (32 - shift);
+	else
+		return val;
+}
+#endif
+
+
+/*-------------------------------------------------
+    rotl_64 - circularly shift a 64-bit value left
+    by the specified number of bits (modulo 64)
+-------------------------------------------------*/
+
+#ifndef rotl_64
+constexpr uint64_t rotl_64(uint64_t val, int shift)
+{
+	shift &= 63;
+	if (shift)
+		return val << shift | val >> (64 - shift);
+	else
+		return val;
+}
+#endif
+
+
+/*-------------------------------------------------
+    rotr_64 - circularly shift a 64-bit value right
+    by the specified number of bits (modulo 64)
+-------------------------------------------------*/
+
+#ifndef rotr_64
+constexpr uint64_t rotr_64(uint64_t val, int shift)
+{
+	shift &= 63;
+	if (shift)
+		return val >> shift | val << (64 - shift);
+	else
+		return val;
 }
 #endif
 

@@ -31,34 +31,6 @@
  Regular ROM aliasing rules apply.
 
 
- MBC3 Mapper
- ===========
-
- The MBC3 mapper cartridges can include a RTC chip.
-
- 0000-1FFF - Writing to this area enables (value 0x0A) or disables (not 0x0A) the
-             SRAM and RTC registers.
- 2000-3FFF - Writing to this area selects the ROM bank to appear at 4000-7FFF.
-             Bits 6-0 are used  to select the bank number. If a value of
-             0bX0000000 is written then this is automatically changed into
-             0bX0000001 by the mapper.
- 4000-5FFF - Writing to this area selects the RAM bank or the RTC register to
-             read.
-             XXXX00bb - Select RAM bank bb.
-             XXXX1rrr - Select RTC register rrr. Accepted values for rrr are:
-                        000 - Seconds (0x00-0x3B)
-                        001 - Minutes (0x00-0x3B)
-                        010 - Hours (0x00-0x17)
-                        011 - Bits 7-0 of the day counter
-                        100 - bit 0 - Bit 8 of the day counter
-                              bit 6 - Halt RTC timer ( 0 = timer active, 1 = halted)
-                              bit 7 - Day counter overflow flag
- 6000-7FFF - Writing 0x00 followed by 0x01 latches the RTC data. This latching
-             method is used for reading the RTC registers.
-
- Regular ROM aliasing rules apply.
-
-
  MBC5 Mapper
  ===========
 
@@ -73,13 +45,10 @@
 
 
  TODO:
- * What does MBC3 do with the RAM bank outputs when RTC is selected?
- * How do MBC3 invalid second/minute/hour values roll over?
- * For convenience, MBC3 and MBC30 are emulated as one device for now.
-  - MBC3 only has 2 RAM bank outputs, but it will allow 3 like MBC30 here.
-  - MBC30 supposedly has 8 ROM bank outputs, but the one game using it only needs 7.
  * MBC5 logo spoofing class implements several strategies.  It's likely not all carts using it use all
    the strategies.  Strategies implemented by each cartridge should be identified.
+ * HK0701 and HK0819 seem to differ in that HK0819 fully decodes ROM addresses while HK0701 mirrors - we
+   should probably emulated the difference at some point.
  * Digimon 2 mapper doesn't work
 
  ***********************************************************************************************************/
@@ -93,8 +62,6 @@
 #include "gbxfile.h"
 
 #include "bus/generic/slot.h"
-
-#include "dirtc.h"
 
 #include "corestr.h"
 
@@ -186,12 +153,7 @@ protected:
 		set_bank_ram(data & m_bank_lines[1]);
 	}
 
-	auto &view_aux(unsigned entry) { return m_view_ram[entry + 1]; }
-	void set_view_aux(unsigned entry) { m_view_ram.select(entry + 1); }
-
 private:
-	static inline constexpr unsigned PAGE_RAM_SIZE = 0x2000;
-
 	memory_view m_view_ram;
 
 	u16 m_bank_lines[2];
@@ -560,508 +522,6 @@ private:
 		// assume anything else uses a different (presumably more conventional) scheme
 		return false;
 	}
-};
-
-
-
-//**************************************************************************
-//  MBC3 (max 8 MiB ROM, max 32 KiB SRAM, RTC)
-//**************************************************************************
-
-class mbc3_device : public rom_mbc_device_base, public device_rtc_interface, public device_nvram_interface
-{
-public:
-	mbc3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-		rom_mbc_device_base(mconfig, GB_ROM_MBC3, tag, owner, clock),
-		device_rtc_interface(mconfig, *this),
-		device_nvram_interface(mconfig, *this),
-		m_timer_rtc(nullptr),
-		m_machine_seconds(0),
-		m_has_rtc_xtal(false),
-		m_has_battery(false),
-		m_rtc_enable(0U),
-		m_rtc_select(0U),
-		m_rtc_latch(0U)
-	{
-	}
-
-	virtual image_init_result load(std::string &message) override ATTR_COLD
-	{
-		// check for RTC oscillator and backup battery
-		if (loaded_through_softlist())
-		{
-			// there's a feature tag indicating presence or absence of RTC crystal
-			char const *const rtcfeature(get_feature("rtc"));
-			if (rtcfeature)
-			{
-				// explicitly specified in software list
-				if (util::streqlower(rtcfeature, "yes") || util::streqlower(rtcfeature, "true"))
-				{
-					logerror("Real-time clock crystal present\n");
-					m_has_rtc_xtal = true;
-				}
-				else if (util::streqlower(rtcfeature, "no") || util::streqlower(rtcfeature, "false"))
-				{
-					logerror("No real-time clock crystal present\n");
-					m_has_rtc_xtal = false;
-				}
-				else
-				{
-					message = "Invalid 'rtc' feature value (must be yes or no)";
-					return image_init_result::FAIL;
-				}
-			}
-			else
-			{
-				logerror("No 'rtc' feature found, assuming no real-time clock crystal present\n");
-				m_has_rtc_xtal = false;
-			}
-
-			// if there's an NVRAM region, there must be a backup battery
-			if (cart_nvram_region())
-			{
-				logerror("Found 'nvram' region, backup battery must be present\n");
-				m_has_battery = true;
-			}
-			else
-			{
-				logerror("No 'nvram' region found, assuming no backup battery present\n");
-				m_has_battery = true;
-			}
-		}
-		else
-		{
-			gbxfile::leader_1_0 leader;
-			u8 const *extra;
-			u32 extralen;
-			if (gbxfile::get_data(gbx_footer_region(), leader, extra, extralen))
-			{
-				m_has_rtc_xtal = bool(leader.rtc);
-				m_has_battery = bool(leader.batt);
-				logerror(
-						"GBX format image specifies %sreal-time clock crystal present, %sbackup battery present\n",
-						m_has_rtc_xtal ? "" : "no ",
-						m_has_battery ? "" : "no ");
-			}
-			else
-			{
-				// try probing the header
-				memory_region *const romregion(cart_rom_region());
-				if (romregion && (romregion->bytes() > cartheader::OFFSET_TYPE))
-				{
-					u8 const carttype((&romregion->as_u8())[cartheader::OFFSET_TYPE]);
-					switch (carttype)
-					{
-					case cartheader::TYPE_MBC3_RTC_BATT:
-					case cartheader::TYPE_MBC3_RTC_RAM_BATT:
-						m_has_rtc_xtal = true;
-						m_has_battery = true;
-						break;
-					case cartheader::TYPE_MBC3:
-						m_has_rtc_xtal = false;
-						m_has_battery = false;
-						break;
-					case cartheader::TYPE_MBC3_RAM:
-					case cartheader::TYPE_MBC3_RAM_BATT:
-						m_has_rtc_xtal = false;
-						m_has_battery = true;
-						break;
-					default:
-						osd_printf_warning(
-								"[%s] Unrecognized cartridge type 0x%02X in header, assuming no real-time clock crystal or backup battery present\n",
-								tag(),
-								carttype);
-						m_has_rtc_xtal = false;
-						m_has_battery = false;
-					}
-					logerror(
-							"Cartridge type 0x%02X in header, %sreal-time clock crystal present, %sbackup battery present\n",
-							carttype,
-							m_has_rtc_xtal ? "" : "no ",
-							m_has_battery ? "" : "no ");
-				}
-			}
-		}
-
-		// set up ROM and RAM
-		if (!install_memory(message, 3, 7))
-			return image_init_result::FAIL;
-
-		// install bank switching handlers
-		cart_space()->install_write_handler(
-				0x0000, 0x1fff,
-				write8smo_delegate(*this, FUNC(mbc3_device::enable_ram_rtc)));
-		cart_space()->install_write_handler(
-				0x2000, 0x3fff,
-				write8smo_delegate(*this, FUNC(mbc3_device::bank_switch_fine)));
-		cart_space()->install_write_handler(
-				0x4000, 0x5fff,
-				write8smo_delegate(*this, FUNC(mbc3_device::select_ram_rtc)));
-		cart_space()->install_write_handler(
-				0x6000, 0x7fff,
-				write8smo_delegate(*this, FUNC(mbc3_device::latch_rtc)));
-
-		// install real-time clock handlers
-		view_aux(0).install_read_handler(
-				0xa000, 0xbfff,
-				read8mo_delegate(*this, FUNC(mbc3_device::read_rtc)));
-		view_aux(0).install_write_handler(
-				0xa000, 0xbfff,
-				write8smo_delegate(*this, FUNC(mbc3_device::write_rtc)));
-
-		// if real-time clock crystal is present, start it ticking
-		if (m_has_rtc_xtal)
-		{
-			logerror("Real-time clock crystal present, starting timer\n");
-			m_timer_rtc->adjust(attotime(1, 0), 0, attotime(1, 0));
-		}
-
-		// all good
-		return image_init_result::PASS;
-	};
-
-protected:
-	virtual void device_start() override ATTR_COLD
-	{
-		rom_mbc_device_base::device_start();
-
-		m_timer_rtc = timer_alloc(FUNC(mbc3_device::rtc_advance_seconds), this);
-
-		save_item(NAME(m_rtc_regs));
-		save_item(NAME(m_rtc_enable));
-		save_item(NAME(m_rtc_select));
-		save_item(NAME(m_rtc_latch));
-	}
-
-	virtual void device_reset() override ATTR_COLD
-	{
-		rom_mbc_device_base::device_reset();
-
-		m_rtc_enable = 0U;
-		m_rtc_select = 0U;
-		m_rtc_latch = 0U;
-
-		set_bank_rom_coarse(0);
-		set_bank_rom_fine(1);
-		set_ram_enable(false);
-		set_bank_ram(0);
-	}
-
-	virtual void rtc_clock_updated(
-			int year,
-			int month,
-			int day,
-			int day_of_week,
-			int hour,
-			int minute,
-			int second) override ATTR_COLD
-	{
-		if (!m_has_rtc_xtal && !m_has_battery)
-		{
-			logerror("No real-time clock crystal or no battery present, not updating for elapsed time\n");
-		}
-		else if (std::numeric_limits<s64>::min() == m_machine_seconds)
-		{
-			logerror("Failed to load machine time from previous session, not updating for elapsed time\n");
-		}
-		else if (BIT(m_rtc_regs[0][4], 6))
-		{
-			logerror("Real-time clock halted, not updating for elapsed time\n");
-		}
-		else
-		{
-			// do a simple seconds elapsed since last run calculation
-			system_time current;
-			machine().current_datetime(current);
-			s64 delta(std::make_signed_t<decltype(current.time)>(current.time) - m_machine_seconds);
-			logerror("Previous session time, %d current time %d, delta %d\n", current.time, m_machine_seconds, delta);
-			if (0 > delta)
-			{
-				// This happens if the user runs the emulation faster
-				// than real time, exits, and then starts again without
-				// waiting for the difference between emulated and real
-				// time to elapse.
-				logerror("Previous session ended in the future, not updating for elapsed time\n");
-			}
-			else
-			{
-				logerror(
-						"Time before applying delta %u %02u:%02u:%02u%s\n",
-						(u16(BIT(m_rtc_regs[0][4], 0)) << 8) | m_rtc_regs[0][3],
-						m_rtc_regs[0][2],
-						m_rtc_regs[0][1],
-						m_rtc_regs[0][0],
-						BIT(m_rtc_regs[0][4], 7) ? " (overflow)" : "");
-
-				// annoyingly, we can get two rollovers if we started with an invalid value
-				unsigned seconds(delta % 60);
-				delta /= 60;
-				if (60 <= m_rtc_regs[0][0])
-				{
-					m_rtc_regs[0][0] = 0U;
-					--seconds;
-					++delta;
-				}
-				if (60 <= (m_rtc_regs[0][0] + seconds))
-					++delta;
-				m_rtc_regs[0][0] = (m_rtc_regs[0][0] + seconds) % 60;
-
-				// minutes is the same
-				unsigned minutes(delta % 60);
-				delta /= 60;
-				if (60 <= m_rtc_regs[0][1])
-				{
-					m_rtc_regs[0][1] = 0U;
-					--minutes;
-					++delta;
-				}
-				if (60 <= (m_rtc_regs[0][1] + minutes))
-					++delta;
-				m_rtc_regs[0][1] = (m_rtc_regs[0][1] + minutes) % 60;
-
-				// hours just has a different rollover point
-				unsigned hours(delta % 24);
-				delta /= 24;
-				if (24 <= m_rtc_regs[0][2])
-				{
-					m_rtc_regs[0][2] = 0U;
-					--hours;
-					++delta;
-				}
-				if (24 <= (m_rtc_regs[0][2] + hours))
-					++delta;
-				m_rtc_regs[0][2] = (m_rtc_regs[0][2] + hours) % 24;
-
-				// days has simple binary rollover
-				unsigned days(delta % 256);
-				if (256 <= (m_rtc_regs[0][3] + days))
-					++delta;
-				m_rtc_regs[0][3] += days;
-
-				// set overflow flag if appropriate
-				if ((1 < delta) || (BIT(m_rtc_regs[0][4], 0) && delta))
-					m_rtc_regs[0][4] |= 0x80;
-				m_rtc_regs[0][4] ^= BIT(delta, 0);
-
-				logerror(
-						"Time after applying delta %u %02u:%02u:%02u%s\n",
-						(u16(BIT(m_rtc_regs[0][4], 0)) << 8) | m_rtc_regs[0][3],
-						m_rtc_regs[0][2],
-						m_rtc_regs[0][1],
-						m_rtc_regs[0][0],
-						BIT(m_rtc_regs[0][4], 7) ? " (overflow)" : "");
-			}
-		}
-	}
-
-	virtual void nvram_default() override ATTR_COLD
-	{
-		// TODO: proper cold RTC state
-		m_machine_seconds = std::numeric_limits<s64>::min();
-		for (unsigned i = 0U; std::size(m_rtc_regs[0]) > i; ++i)
-			m_rtc_regs[0][i] = RTC_MASK[i];
-	}
-
-	virtual bool nvram_read(util::read_stream &file) override ATTR_COLD
-	{
-		if (m_has_battery)
-		{
-			// read previous machine time (seconds since epoch) and RTC registers
-			u64 seconds;
-			std::size_t actual;
-			if (file.read(&seconds, sizeof(seconds), actual) || (sizeof(seconds) != actual))
-				return false;
-			m_machine_seconds = big_endianize_int64(seconds);
-
-			if (file.read(&m_rtc_regs[0][0], sizeof(m_rtc_regs[0]), actual) || (sizeof(m_rtc_regs[0]) != actual))
-				return false;
-		}
-		else
-		{
-			logerror("No battery present, not loading real-time clock register contents\n");
-		}
-		return true;
-	}
-
-	virtual bool nvram_write(util::write_stream &file) override ATTR_COLD
-	{
-		// save current machine time as seconds since epoch and RTC registers
-		system_time current;
-		machine().current_datetime(current);
-		u64 const seconds(big_endianize_int64(s64(std::make_signed_t<decltype(current.time)>(current.time))));
-		std::size_t written;
-		if (file.write(&seconds, sizeof(seconds), written) || (sizeof(seconds) != written))
-			return false;
-		if (file.write(&m_rtc_regs[0][0], sizeof(m_rtc_regs[0]), written) || (sizeof(m_rtc_regs[0]) != written))
-			return false;
-		return true;
-	}
-
-	virtual bool nvram_can_write() const override ATTR_COLD
-	{
-		return m_has_battery;
-	}
-
-private:
-	static inline constexpr u8 RTC_MASK[]{ 0x3f, 0x3f, 0x1f, 0xff, 0xc1 };
-	static inline constexpr u8 RTC_ROLLOVER[]{ 0x3c, 0x3c, 0x18, 0x00, 0x00 };
-
-	TIMER_CALLBACK_MEMBER(rtc_advance_seconds)
-	{
-		if (BIT(m_rtc_regs[0][4], 6))
-			return;
-
-		if (rtc_increment(0))
-			return;
-		if (rtc_increment(1))
-			return;
-		if (rtc_increment(2))
-			return;
-		if (++m_rtc_regs[0][3])
-			return;
-
-		if (BIT(m_rtc_regs[0][4], 0))
-		{
-			LOG("Day counter overflow");
-			m_rtc_regs[0][4] |= 0x80;
-		}
-		m_rtc_regs[0][4] ^= 0x01;
-	}
-
-	void enable_ram_rtc(u8 data)
-	{
-		m_rtc_enable = (0x0a == (data & 0x0f)) ? 1U : 0U;
-		if (!m_rtc_enable)
-		{
-			set_ram_enable(false);
-		}
-		else if (BIT(m_rtc_select, 3))
-		{
-			LOG(
-					"%s: RTC register %u enabled\n",
-					machine().describe_context(),
-					m_rtc_select & 0x07);
-			set_view_aux(0);
-		}
-		else
-		{
-			set_ram_enable(true);
-		}
-	}
-
-	void bank_switch_fine(u8 data)
-	{
-		data &= 0x7f;
-		set_bank_rom_fine(data ? data : 1);
-	}
-
-	void select_ram_rtc(u8 data)
-	{
-		// TODO: what happens with the RAM bank outputs when the RTC is selected?
-		// TODO: what happens for 4-7?
-		// TODO: is the high nybble ignored altogether?
-		bank_switch_coarse(data & 0x07);
-		m_rtc_select = data;
-		if (m_rtc_enable)
-		{
-			if (BIT(data, 3))
-			{
-				LOG(
-						"%s: RTC register %u enabled\n",
-						machine().describe_context(),
-						data & 0x07);
-				set_view_aux(0);
-			}
-			else
-			{
-				set_ram_enable(true);
-			}
-		}
-	}
-
-	void latch_rtc(u8 data)
-	{
-		// FIXME: does it just check the least significant bit, or does it look for 0x00 and 0x01?
-		LOG("Latch RTC 0x%02X -> 0x%02X\n", m_rtc_latch, data);
-		if (!BIT(m_rtc_latch, 0) && BIT(data, 0))
-		{
-			LOG("%s: Latching RTC registers\n", machine().describe_context());
-			std::copy(std::begin(m_rtc_regs[0]), std::end(m_rtc_regs[0]), std::begin(m_rtc_regs[1]));
-		}
-		m_rtc_latch = data;
-	}
-
-	u8 read_rtc(address_space &space)
-	{
-		u8 const reg(m_rtc_select & 0x07);
-		if (std::size(m_rtc_regs[1]) > reg)
-		{
-			LOG(
-					"%s: Read RTC register %u = 0x%02X\n",
-					machine().describe_context(),
-					reg,
-					m_rtc_regs[1][reg]);
-			return m_rtc_regs[1][reg];
-		}
-		else
-		{
-			LOG(
-					"%s: Read invalid RTC register %u\n",
-					machine().describe_context(),
-					reg);
-			return space.unmap();
-		}
-	}
-
-	void write_rtc(u8 data)
-	{
-		u8 const reg(m_rtc_select & 0x07);
-		if (std::size(m_rtc_regs[0]) > reg)
-		{
-			LOG(
-					"%s: Write RTC register %u = 0x%02X\n",
-					machine().describe_context(),
-					reg,
-					data);
-			if (4U == reg)
-			{
-				// TODO: are bits 5-1 physically present, and if not, what do they read as?
-				// TODO: how does halting the RTC interact with the prescaler?
-				data &= 0xc1;
-				m_rtc_regs[0][reg] = data;
-			}
-			else
-			{
-				m_rtc_regs[0][reg] = data;
-			}
-		}
-		else
-		{
-			LOG(
-					"%s: Write invalid RTC register %u = 0x%02X\n",
-					machine().describe_context(),
-					reg,
-					data);
-		}
-	}
-
-	u8 rtc_increment(unsigned index)
-	{
-		m_rtc_regs[0][index] = (m_rtc_regs[0][index] + 1) & RTC_MASK[index];
-		if (RTC_ROLLOVER[index] == (m_rtc_regs[0][index] & RTC_ROLLOVER[index]))
-			m_rtc_regs[0][index] = 0U;
-		return m_rtc_regs[0][index];
-	}
-
-	emu_timer *m_timer_rtc;
-	s64 m_machine_seconds;
-	bool m_has_rtc_xtal;
-	bool m_has_battery;
-
-	u8 m_rtc_regs[2][5];
-	u8 m_rtc_enable;
-	u8 m_rtc_select;
-	u8 m_rtc_latch;
 };
 
 
@@ -1454,6 +914,119 @@ public:
 
 
 //**************************************************************************
+//  New Game Boy Color cartridges with HK0701 and HK0819 boards
+//**************************************************************************
+
+class ngbchk_device : public rom_mbc_device_base
+{
+public:
+	ngbchk_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+		rom_mbc_device_base(mconfig, GB_ROM_NEWGBCHK, tag, owner, clock),
+		m_view_prot(*this, "protection")
+	{
+	}
+
+	virtual image_init_result load(std::string &message) override ATTR_COLD
+	{
+		// TODO: ROM addresses seem to be fully decoded with HK0819 (rather than mirroring)
+
+		// set up ROM and RAM
+		// TODO: how many RAM bank outputs are actually present?
+		if (!install_memory(message, 2, 7))
+			return image_init_result::FAIL;
+
+		// install handlers
+		cart_space()->install_write_handler(
+				0x0000, 0x1fff,
+				write8smo_delegate(*this, FUNC(ngbchk_device::enable_ram)));
+		cart_space()->install_write_handler(
+				0x2000, 0x3fff,
+				write8smo_delegate(*this, FUNC(ngbchk_device::bank_switch_fine)));
+		cart_space()->install_write_handler(
+				0x4000, 0x5fff,
+				write8smo_delegate(*this, FUNC(ngbchk_device::bank_switch_coarse)));
+
+		// install protection over the top of high ROM bank
+		cart_space()->install_view(
+				0x4000, 0x7fff,
+				m_view_prot);
+		m_view_prot[0].install_read_handler(
+				0x4000, 0x4fff, 0x0ff0, 0x0000, 0x0000,
+				read8sm_delegate(*this, FUNC(ngbchk_device::protection)));
+		m_view_prot[0].unmap_read(0x5000, 0x7fff);
+
+		// all good
+		return image_init_result::PASS;
+	}
+
+protected:
+	virtual void device_reset() override ATTR_COLD
+	{
+		rom_mbc_device_base::device_reset();
+
+		// TODO: proper reset state
+		set_bank_rom_coarse(0);
+		set_bank_rom_fine(0);
+		set_ram_enable(false);
+
+		m_view_prot.disable();
+	}
+
+private:
+	void enable_ram(u8 data)
+	{
+		// TODO: how many bits are checked?
+		set_ram_enable(0x0a == data);
+	}
+
+	void bank_switch_fine(u8 data)
+	{
+		set_bank_rom_fine(data & 0x7f);
+		LOG(
+				"%s: Protection read %s\n",
+				machine().describe_context(),
+				BIT(data, 7) ? "enabled" : "disabled");
+		if (BIT(data, 7))
+			m_view_prot.select(0);
+		else
+			m_view_prot.disable();
+	}
+
+	u8 protection(offs_t offset)
+	{
+		offset >>= 4;
+		switch (offset & 0x007)
+		{
+		default: // just to shut up dumb compilers
+		case 0x000:
+			return offset;
+		case 0x001:
+			return offset ^ 0xaa;
+		case 0x002:
+			return offset ^ 0x55;
+		case 0x003:
+			return (offset >> 1) | (offset << 7);
+		case 0x004:
+			return (offset << 1) | (offset >> 7);
+		case 0x05:
+			return bitswap<8>(offset, 0, 1, 2, 3, 4, 5, 6, 7);
+		case 0x06:
+			return
+					(bitswap<4>(offset | (offset >> 1), 6, 4, 2, 0) << 4) |
+					bitswap<4>(offset & (offset >> 1), 6, 4, 2, 0);
+		case 0x07:
+			return
+					(bitswap<4>(offset ^ (~offset >> 1), 6, 4, 2, 0) << 4) |
+					bitswap<4>(offset ^ (offset >> 1), 6, 4, 2, 0);
+		}
+	}
+
+	memory_view m_view_prot;
+};
+
+
+
+//**************************************************************************
 //  Fast Fame VF001 MBC5 variant with protection
 //**************************************************************************
 
@@ -1781,10 +1354,10 @@ private:
 
 // device type definition
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC1,     device_gb_cart_interface, bus::gameboy::mbc1_device,        "gb_rom_mbc1",     "Game Boy MBC1 Cartridge")
-DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC3,     device_gb_cart_interface, bus::gameboy::mbc3_device,        "gb_rom_mbc3",     "Game Boy MBC3/MBC30 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC5,     device_gb_cart_interface, bus::gameboy::mbc5_device,        "gb_rom_mbc5",     "Game Boy MBC5 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_SINTAX,   device_gb_cart_interface, bus::gameboy::sintax_device,      "gb_rom_sintax",   "Game Boy Sintax MBC5 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_CHONGWU,  device_gb_cart_interface, bus::gameboy::chongwu_device,     "gb_rom_chongwu",  "Game Boy Chongwu Xiao Jingling Pokemon Pikecho Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_LICHENG,  device_gb_cart_interface, bus::gameboy::licheng_device,     "gb_rom_licheng",  "Game Boy Li Cheng MBC5 Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_NEWGBCHK, device_gb_cart_interface, bus::gameboy::ngbchk_device,      "gb_rom_ngbchk",   "Game Boy HK0701/HK0819 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_VF001,    device_gb_cart_interface, bus::gameboy::vf001_device,       "gb_rom_vf001",    "Game Boy Vast Fame VF001 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_DIGIMON,  device_gb_cart_interface, bus::gameboy::digimon_device,     "gb_rom_digimon",  "Game Boy Digimon 2 Cartridge")
