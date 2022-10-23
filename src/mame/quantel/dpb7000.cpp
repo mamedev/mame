@@ -32,8 +32,6 @@
 #include "screen.h"
 #include "emupal.h"
 
-#include "dpb7000.lh"
-
 #include <algorithm>
 #include <deque>
 
@@ -67,7 +65,7 @@
 #define LOG_STORE_READS     (1 << 27)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_BRUSH_ADDR | \
 							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_COMMANDS | LOG_OUTPUT_TIMING | \
-							 LOG_BRUSH_LATCH | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_DRAWS | LOG_BRUSH_WRITES | LOG_STORE_READS)
+							 LOG_BRUSH_LATCH | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_WRITES | LOG_STORE_READS)
 
 //#define VERBOSE             (LOG_CSR | LOG_CTRLBUS | LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_BRUSH_ADDR | LOG_COMMANDS | LOG_OUTPUT_TIMING)
 #define VERBOSE (0)
@@ -96,9 +94,6 @@ public:
 		, m_auto_start(*this, "AUTOSTART")
 		, m_config_sw12(*this, "CONFIGSW12")
 		, m_config_sw34(*this, "CONFIGSW34")
-		, m_diskseq(*this, "diskseq")
-		, m_diskseq_ucode(*this, "diskseq_ucode")
-		, m_diskseq_prom(*this, "diskseq_prom")
 		, m_fddcpu(*this, "fddcpu")
 		, m_fdd_serial(*this, "fddserial")
 		, m_floppy0(*this, "0")
@@ -140,22 +135,6 @@ public:
 		, m_pen_x(*this, "PENX")
 		, m_pen_y(*this, "PENY")
 		, m_pen_press(*this, "PENPRESS")
-		, m_filter_signalprom(*this, "filter_signalprom")
-		, m_filter_multprom(*this, "filter_multprom")
-		, m_filter_yl(*this, "filter_de")
-		, m_filter_yh(*this, "filter_df")
-		, m_filter_xl(*this, "filter_dg")
-		, m_filter_xh(*this, "filter_dh")
-		, m_filter_signal(nullptr)
-		, m_filter_mult(nullptr)
-		, m_size_ge(*this, "size_ge")
-		, m_size_gf(*this, "size_gf")
-		, m_size_gg(*this, "size_gg")
-		, m_size_gh(*this, "size_gh")
-		, m_size_de(*this, "size_de")
-		, m_size_df(*this, "size_df")
-		, m_size_dg(*this, "size_dg")
-		, m_size_dh(*this, "size_dh")
 		, m_brushproc_prom_region(*this, "brushproc_prom")
 		, m_brushproc_pal_region(*this, "brushproc_pal")
 		, m_brushproc_prom(nullptr)
@@ -171,9 +150,9 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	template <int StoreNum> uint32_t store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t ext_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t brush_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	template <int StoreNum> uint32_t store_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t stencil_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t brush_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t combined_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
@@ -229,9 +208,6 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr_changed);
 
-	void diskseq_y_w(uint16_t data);
-	//void diskseq_tick();
-
 	void advance_line_count();
 	void toggle_line_clock();
 	void process_sample();
@@ -253,9 +229,6 @@ private:
 	required_ioport m_config_sw12;
 	required_ioport m_config_sw34;
 
-	required_device<am2910_device> m_diskseq;
-	required_memory_region m_diskseq_ucode;
-	required_memory_region m_diskseq_prom;
 	required_device<m6803_cpu_device> m_fddcpu;
 	required_device<rs232_port_device> m_fdd_serial;
 	required_device<floppy_connector> m_floppy0;
@@ -294,35 +267,6 @@ private:
 		FRAMESTORE_COUNT
 	};
 
-	enum : uint8_t
-	{
-		DSEQ_STATUS_READY_BIT           = 0,    // C5
-		DSEQ_STATUS_FAULT_BIT           = 1,    // C6
-		DSEQ_STATUS_ONCYL_BIT           = 2,    // C7
-		DSEQ_STATUS_SKERR_BIT           = 3,    // C8
-		DSEQ_STATUS_INDEX_BIT           = 4,    // C9
-		DSEQ_STATUS_SECTOR_BIT          = 5,    // C10
-		DSEQ_STATUS_AMFND_BIT           = 6,    // C11
-		DSEQ_STATUS_WTPROT_BIT          = 7,    // C12
-		DSEQ_STATUS_SELECTED_BIT        = 8,    // C13
-		DSEQ_STATUS_SEEKEND_BIT         = 9,    // C14
-		DSEQ_STATUS_SYNC_DET_BIT        = 10,   // C15
-		DSEQ_STATUS_RAM_ADDR_OVFLO_BIT  = 11,   // C16
-
-		DSEQ_CTRLOUT_CK_SEL_1       = (1 << 0), // S40
-		DSEQ_CTRLOUT_CK_SEL_0       = (1 << 1), // S41
-		DSEQ_CTRLOUT_ADDR_W_PERMIT  = (1 << 2), // S42
-		DSEQ_CTRLOUT_ZERO_RAM       = (1 << 3), // S43
-		DSEQ_CTRLOUT_WRITE_RAM      = (1 << 4), // S44
-		DSEQ_CTRLOUT_WORD_READ_RAM  = (1 << 5), // S45
-		DSEQ_CTRLOUT_WRITE_SYNC     = (1 << 6), // S46
-		DSEQ_CTRLOUT_SYNC_DET_EN    = (1 << 7), // S47
-
-		DSEQ_CTRLOUT_WRITE_ZERO     = (1 << 5), // S53
-		DSEQ_CTRLOUT_LINE_CK        = (1 << 6), // S54
-		DSEQ_CTRLOUT_DISC_CLEAR     = (1 << 7), // S55
-	};
-
 	enum : uint16_t
 	{
 		DGROUP_TYPE_INVALID0		= 0,
@@ -344,21 +288,11 @@ private:
 	uint16_t m_sys_ctrl;
 
 	// Disc Sequencer Card
-	int m_diskseq_cp;
-	bool m_diskseq_reset;
-	bool m_diskseq_halt;
-	uint8_t m_diskseq_line_cnt;         // EF/EE
-	uint8_t m_diskseq_ed_cnt;           // ED
-	uint8_t m_diskseq_head_cnt;         // EC
 	uint16_t m_diskseq_cyl_from_cpu;    // AE/BH
 	uint16_t m_diskseq_cmd_word_from_cpu; // DD/CC
 	uint8_t m_diskseq_cmd;
-	uint8_t m_diskseq_cyl_to_ctrl;
 	uint8_t m_diskseq_cmd_to_ctrl;
-	uint8_t m_diskseq_status_in;        // CG
-	uint8_t m_diskseq_status_out;       // BC
-	uint8_t m_diskseq_ucode_latch[7];   // GG/GF/GE/GD/GC/GB/GA
-	uint8_t m_diskseq_cc_inputs[4];     // Inputs to FE/FD/FC/FB
+	uint8_t m_diskseq_status;       // BC
 	bool m_diskseq_cyl_read_pending;
 	bool m_diskseq_cyl_write_pending;
 	bool m_diskseq_use_hdd_pending;
@@ -534,14 +468,6 @@ private:
 	emu_timer *m_tablet_hle_timer;
 
 	// Filter Card
-	required_memory_region m_filter_signalprom;
-	required_memory_region m_filter_multprom;
-	required_device<am2901b_device> m_filter_yl;
-	required_device<am2901b_device> m_filter_yh;
-	required_device<am2901b_device> m_filter_xl;
-	required_device<am2901b_device> m_filter_xh;
-	uint8_t *m_filter_signal;
-	uint8_t *m_filter_mult;
 	int8_t m_filter_x_coeffs[12];
 	int8_t m_filter_y_coeffs[8];
 	uint8_t m_incoming_lum;
@@ -549,14 +475,6 @@ private:
 	bool m_buffer_lum;
 
 	// Size Card
-	required_device<am2901b_device> m_size_ge;
-	required_device<am2901b_device> m_size_gf;
-	required_device<am2901b_device> m_size_gg;
-	required_device<am2901b_device> m_size_gh;
-	required_device<am2901b_device> m_size_de;
-	required_device<am2901b_device> m_size_df;
-	required_device<am2901b_device> m_size_dg;
-	required_device<am2901b_device> m_size_dh;
 	uint32_t m_size_dsx_ddx;
 	uint32_t m_size_dsy_ddx;
 	uint32_t m_size_dsx_ddy;
@@ -883,21 +801,11 @@ void dpb7000_state::machine_start()
 	m_hdd_command_timer->adjust(attotime::never);
 
 	// Disc Sequencer Card
-	save_item(NAME(m_diskseq_cp));
-	save_item(NAME(m_diskseq_reset));
-	save_item(NAME(m_diskseq_halt));
-	save_item(NAME(m_diskseq_line_cnt));
-	save_item(NAME(m_diskseq_ed_cnt));
-	save_item(NAME(m_diskseq_head_cnt));
 	save_item(NAME(m_diskseq_cyl_from_cpu));
 	save_item(NAME(m_diskseq_cmd_word_from_cpu));
 	save_item(NAME(m_diskseq_cmd));
-	save_item(NAME(m_diskseq_cyl_to_ctrl));
 	save_item(NAME(m_diskseq_cmd_to_ctrl));
-	save_item(NAME(m_diskseq_status_in));
-	save_item(NAME(m_diskseq_status_out));
-	save_item(NAME(m_diskseq_ucode_latch));
-	save_item(NAME(m_diskseq_cc_inputs));
+	save_item(NAME(m_diskseq_status));
 	save_item(NAME(m_diskseq_cyl_read_pending));
 	save_item(NAME(m_diskseq_cyl_write_pending));
 	save_item(NAME(m_diskseq_use_hdd_pending));
@@ -1016,8 +924,6 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_size_dest_y));
 
 	// Filter Card
-	m_filter_signal = m_filter_signalprom->base();
-	m_filter_mult = m_filter_multprom->base();
 	save_item(NAME(m_filter_x_coeffs));
 	save_item(NAME(m_filter_y_coeffs));
 	save_item(NAME(m_incoming_lum));
@@ -1103,21 +1009,11 @@ void dpb7000_state::machine_reset()
 	m_field_out_clk->adjust(attotime::from_hz(59.94) + attotime::from_hz(15734.0 / 1.0), 1, attotime::from_hz(59.94));
 
 	// Disc Sequencer Card
-	m_diskseq_cp = 0;
-	m_diskseq_reset = false;
-	m_diskseq_halt = true;
-	m_diskseq_line_cnt = 0;
-	m_diskseq_ed_cnt = 0;
-	m_diskseq_head_cnt = 0;
 	m_diskseq_cyl_from_cpu = 0;
 	m_diskseq_cmd_word_from_cpu = 0;
 	m_diskseq_cmd = 0;
-	m_diskseq_cyl_to_ctrl = 0;
 	m_diskseq_cmd_to_ctrl = 0;
-	m_diskseq_status_in = 0;
-	m_diskseq_status_out = 0xf9;
-	memset(m_diskseq_ucode_latch, 0, 7);
-	memset(m_diskseq_cc_inputs, 0, 4);
+	m_diskseq_status = 0xf9;
 	m_diskseq_cyl_read_pending = false;
 	m_diskseq_cyl_write_pending = false;
 	m_diskseq_use_hdd_pending = false;
@@ -1297,184 +1193,6 @@ MC6845_ON_UPDATE_ADDR_CHANGED(dpb7000_state::crtc_addr_changed)
 {
 }
 
-// NOTE: This function is not used, but is retained in the event we wish for low-level disk sequencer emulation.
-void dpb7000_state::diskseq_y_w(uint16_t data)
-{
-	uint8_t old_prom_latch[7];
-	memcpy(old_prom_latch, m_diskseq_ucode_latch, 7);
-
-	const uint8_t *ucode_prom = m_diskseq_ucode->base();
-	for (int i = 0; i < 7; i++)
-	{
-		m_diskseq_ucode_latch[i] = ucode_prom[data | (i << 8)];
-	}
-
-	if (m_diskseq_halt)
-	{
-		m_diskseq->i_w(0);
-	}
-	else
-	{
-		m_diskseq->i_w(m_diskseq_ucode_latch[1] & 0x0f);
-	}
-	m_diskseq->d_w(m_diskseq_ucode_latch[0]);
-
-	if (!BIT(old_prom_latch[2], 1) && BIT(m_diskseq_ucode_latch[2], 1)) // S17: Line Counter Clock
-		m_diskseq_line_cnt++;
-	if (BIT(m_diskseq_ucode_latch[2], 2)) // S18: Line Counter Reset
-		m_diskseq_line_cnt = 0;
-
-	if (!BIT(old_prom_latch[2], 3) && BIT(m_diskseq_ucode_latch[2], 3)) // S19: ED Counter Clock
-		m_diskseq_ed_cnt++;
-	if (BIT(m_diskseq_ucode_latch[2], 4)) // S20: ED Counter Reset
-		m_diskseq_ed_cnt = 0;
-
-	if (!BIT(old_prom_latch[2], 5) && BIT(m_diskseq_ucode_latch[2], 5)) // S21: Auto-Head Clock
-		m_diskseq_head_cnt++;
-	if (BIT(m_diskseq_ucode_latch[2], 6)) // S22: Auto-Head Reset
-		m_diskseq_head_cnt = 0;
-
-	memset(m_diskseq_cc_inputs, 0, 4);
-	m_diskseq_cc_inputs[0] |= m_diskseq_prom->base()[m_diskseq_line_cnt & 0x1f] & 3;
-	m_diskseq_cc_inputs[0] |= BIT(m_diskseq_ed_cnt, 2) << 2;
-	m_diskseq_cc_inputs[0] |= BIT(m_diskseq_head_cnt, 0) << 3;
-	m_diskseq_cc_inputs[0] |= BIT(~m_diskseq_status_in, DSEQ_STATUS_READY_BIT) << 5;
-	m_diskseq_cc_inputs[0] |= BIT(m_diskseq_status_in, DSEQ_STATUS_FAULT_BIT) << 6;
-	m_diskseq_cc_inputs[0] |= BIT(m_diskseq_status_in, DSEQ_STATUS_ONCYL_BIT) << 7;
-
-	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_SKERR_BIT);
-	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_INDEX_BIT) << 1;
-	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_SECTOR_BIT) << 2;
-	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_AMFND_BIT) << 3;
-	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_WTPROT_BIT) << 4;
-	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_SELECTED_BIT) << 5;
-	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_SEEKEND_BIT) << 6;
-	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_SYNC_DET_BIT) << 7;
-
-	m_diskseq_cc_inputs[2] |= BIT(m_diskseq_status_in, DSEQ_STATUS_RAM_ADDR_OVFLO_BIT);
-	// C17..C19 tied low
-	m_diskseq_cc_inputs[2] |= ~(m_diskseq_cmd_word_from_cpu & 0xf) << 4;
-
-	m_diskseq_cc_inputs[3] = ~(m_diskseq_cmd_word_from_cpu >> 4) & 0xff;
-
-	// S15, S16: Select which bank of 8 lines is treated as /CC input to Am2910
-	const uint8_t fx_bank_sel = (BIT(m_diskseq_ucode_latch[2], 0) << 1) | BIT(m_diskseq_ucode_latch[1], 7);
-
-	// S12, S13, S14: Select which bit from the bank is treated as /CC input to Am2910
-	const uint8_t fx_bit_sel = (BIT(m_diskseq_ucode_latch[1], 6) << 2) | (BIT(m_diskseq_ucode_latch[1], 5) << 1) | BIT(m_diskseq_ucode_latch[1], 4);
-
-	const int cc = BIT(m_diskseq_cc_inputs[fx_bank_sel], fx_bit_sel) ? 1 : 0;
-	if (!m_diskseq_halt)
-	{
-#if (VERBOSE & (LOG_UCODE | LOG_MORE_UCODE))
-		char debug_buf[1024];
-		int buf_idx = 0;
-
-		buf_idx += sprintf(debug_buf + buf_idx, "%02x: %02x%02x%02x%02x%02x%02x%02x ", data,
-			m_diskseq_ucode_latch[6], m_diskseq_ucode_latch[5], m_diskseq_ucode_latch[4], m_diskseq_ucode_latch[3],
-			m_diskseq_ucode_latch[2], m_diskseq_ucode_latch[1], m_diskseq_ucode_latch[0]);
-
-		switch (m_diskseq_ucode_latch[1] & 0x0f)
-		{
-			case  0: buf_idx += sprintf(debug_buf + buf_idx, "JZ      ; "); break;
-			case  1: buf_idx += sprintf(debug_buf + buf_idx, "CJS  %02x ; ", m_diskseq_ucode_latch[0]); break;
-			case  2: buf_idx += sprintf(debug_buf + buf_idx, "JMAP    ; "); break;
-			case  3: buf_idx += sprintf(debug_buf + buf_idx, "CJP  %02x ; ", m_diskseq_ucode_latch[0]); break;
-			case  4: buf_idx += sprintf(debug_buf + buf_idx, "PUSH %02x ; ", m_diskseq_ucode_latch[0]); break;
-			case  5: buf_idx += sprintf(debug_buf + buf_idx, "JSRP %02x ; ", m_diskseq_ucode_latch[0]); break;
-			case  6: buf_idx += sprintf(debug_buf + buf_idx, "CJV  %02x ; ", m_diskseq_ucode_latch[0]); break;
-			case  7: buf_idx += sprintf(debug_buf + buf_idx, "JRP  %02x ; ", m_diskseq_ucode_latch[0]); break;
-			case  8: buf_idx += sprintf(debug_buf + buf_idx, "RFCT    ; "); break;
-			case  9: buf_idx += sprintf(debug_buf + buf_idx, "RPCT    ; "); break;
-			case 10: buf_idx += sprintf(debug_buf + buf_idx, "CRTN    ; "); break;
-			case 11: buf_idx += sprintf(debug_buf + buf_idx, "CJPP %02x ; ", m_diskseq_ucode_latch[0]); break;
-			case 12: buf_idx += sprintf(debug_buf + buf_idx, "LDCT %02x ; ", m_diskseq_ucode_latch[0]); break;
-			case 13: buf_idx += sprintf(debug_buf + buf_idx, "LOOP    ; "); break;
-			case 14: buf_idx += sprintf(debug_buf + buf_idx, "CONT    ; "); break;
-			case 15: buf_idx += sprintf(debug_buf + buf_idx, "TWB  %02x ; ", m_diskseq_ucode_latch[0]); break;
-		}
-
-#if LOG_MORE_UCODE
-		buf_idx += sprintf(debug_buf + buf_idx, "CCSel:%2d, CCx:%02x%02x%02x%02x, CC:%d, ", fx_bank_sel * 8 + fx_bit_sel, m_diskseq_cc_inputs[3], m_diskseq_cc_inputs[2], m_diskseq_cc_inputs[1], m_diskseq_cc_inputs[0], cc);
-		buf_idx += sprintf(debug_buf + buf_idx, "FCyl:%d, FHD:%d, FCmd:%d, FSel:%d", BIT(m_diskseq_ucode_latch[2], 7), BIT(m_diskseq_ucode_latch[4], 2), BIT(m_diskseq_ucode_latch[4], 4), BIT(m_diskseq_ucode_latch[4], 5));
-#endif
-		LOGMASKED(LOG_UCODE, "%s\n", debug_buf);
-#endif
-	}
-	m_diskseq->cc_w(cc);
-
-	// S25: End of sequencer program
-	if (BIT(m_diskseq_ucode_latch[3], 1))
-	{
-		m_diskseq_halt = true;
-		req_b_w(1);
-	}
-
-	// S23: FCYL TAG
-	// S26, S28..S34: Command word to push onto bus cable
-	// S35: FHD TAG
-	// S36: FCMD TAG
-	// S37: FSEL TAG
-	// S38: N/C
-	// S39: N/C from PROM, contains D INDEX status bit
-	// S40: CK SEL 0
-	// S41: CK SEL 1
-	// S42: ADDR W. PERMIT
-	// S43: ZERO RAM
-	// S44: WRITE RAM
-	// S45: WORD READ RAM
-	// S46: WRITE SYNC
-	// S47: SYNC DET EN
-	// S48: CPU Status Byte D0
-	// S49: CPU Status Byte D1
-	// S50: CPU Status Byte D2
-	// C5 (D READY): CPU Status Byte D3
-	// C12 (D WTPROT): CPU Status Byte D4
-	// ED Bit 0: CPU Status Byte D5
-	// ED Bit 1: CPU Status Byte D6
-	// C6 (D FAULT): CPU Status Byte D7
-
-	if (BIT(m_diskseq_ucode_latch[3], 3)) // S27: Push command word from S26, S28..S34 onto bus cable
-	{
-		uint8_t disk_cmd = BIT(m_diskseq_ucode_latch[4], 2);
-		disk_cmd |= BIT(m_diskseq_ucode_latch[4], 1) << 1;
-		disk_cmd |= BIT(m_diskseq_ucode_latch[4], 0) << 4;
-		disk_cmd |= BIT(m_diskseq_ucode_latch[3], 7) << 5;
-		disk_cmd |= BIT(m_diskseq_ucode_latch[3], 6) << 6;
-		disk_cmd |= BIT(m_diskseq_ucode_latch[3], 5) << 7;
-		disk_cmd |= BIT(m_diskseq_ucode_latch[3], 4) << 8;
-		m_diskseq_cmd_to_ctrl = disk_cmd;
-		m_fdd_ctrl |= 0x10;
-	}
-
-	if (BIT(m_diskseq_ucode_latch[3], 0)) // S24: Push cylinder number onto the bus cable
-	{
-		m_diskseq_cyl_to_ctrl = m_diskseq_cyl_from_cpu;
-		m_fdd_ctrl |= 0x40;
-	}
-
-	if (BIT(m_diskseq_ucode_latch[6], 4))
-	{
-		m_diskseq_status_out = m_diskseq_ucode_latch[6] & 7;
-		m_diskseq_status_out |= BIT(m_diskseq_status_in, DSEQ_STATUS_READY_BIT) << 3;
-		m_diskseq_status_out |= BIT(m_diskseq_status_in, DSEQ_STATUS_WTPROT_BIT) << 4;
-		m_diskseq_status_out |= (m_diskseq_ed_cnt & 3) << 5;
-		m_diskseq_status_out |= 0x80;//BIT(m_diskseq_status_in, DSEQ_STATUS_FAULT_BIT) << 7;
-	}
-}
-
-// NOTE: This function is not used, but is retained in the event we wish for low-level disk sequencer emulation.
-/*void dpb7000_state::diskseq_tick()
-{
-	m_diskseq_cp = (m_diskseq_cp ? 0 : 1);
-	m_diskseq->cp_w(m_diskseq_cp);
-
-	if (m_diskseq_cp && m_diskseq_reset)
-	{
-		m_diskseq_reset = false;
-	}
-}*/
-
 uint16_t dpb7000_state::bus_error_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
@@ -1521,9 +1239,9 @@ uint16_t dpb7000_state::cpu_ctrlbus_r()
 	case 1:
 		if (!machine().side_effects_disabled())
 		{
-			LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Disk Sequencer Card status: %02x\n", machine().describe_context(), m_diskseq_status_out);
+			LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Disk Sequencer Card status: %02x\n", machine().describe_context(), m_diskseq_status);
 		}
-		ret = m_diskseq_status_out;
+		ret = m_diskseq_status;
 		break;
 	case 7:
 		ret = m_diskbuf_ram[m_diskbuf_ram_addr];
@@ -2192,9 +1910,9 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			m_diskseq_cyl_from_cpu = data & 0x3ff;
 			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, Cylinder Number: %04x (%04x)\n", machine().describe_context(), m_diskseq_cyl_from_cpu, data);
 			if (m_diskseq_cyl_from_cpu == 0)
-				m_diskseq_status_out |= 0x04;
+				m_diskseq_status |= 0x04;
 			else
-				m_diskseq_status_out &= ~0x04;
+				m_diskseq_status &= ~0x04;
 		}
 		else if (hi_nybble == 1)
 		{
@@ -2220,7 +1938,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 			case 0:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read track to buffer RAM\n", machine().describe_context());
-				if (!BIT(m_diskseq_status_out, 3))
+				if (!BIT(m_diskseq_status, 3))
 				{
 					req_b_w(0); // Flag ourselves as in-use
 					m_diskseq_cyl_read_pending = true;
@@ -2240,7 +1958,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 			case 2:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read track, stride 2, to buffer RAM\n", machine().describe_context());
-				if (!BIT(m_diskseq_status_out, 3))
+				if (!BIT(m_diskseq_status, 3))
 				{
 					req_b_w(0); // Flag ourselves as in-use
 					m_diskseq_cyl_read_pending = true;
@@ -2267,7 +1985,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 			case 4:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read Track\n", machine().describe_context());
-				if (!BIT(m_diskseq_status_out, 3))
+				if (!BIT(m_diskseq_status, 3))
 				{
 					req_b_w(0); // Flag ourselves as in-use
 					m_line_count = 0;
@@ -2292,7 +2010,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 			case 6:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Read Track\n", machine().describe_context());
-				if (!BIT(m_diskseq_status_out, 3))
+				if (!BIT(m_diskseq_status, 3))
 				{
 					m_size_dxdx_counter = 0;
 					m_size_dydy_counter = 0;
@@ -2319,7 +2037,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 			case 8:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track from Buffer RAM\n", machine().describe_context());
-				if (!BIT(m_diskseq_status_out, 3))
+				if (!BIT(m_diskseq_status, 3))
 				{
 					req_b_w(0); // Flag ourselves as in-use
 					m_diskseq_cyl_write_pending = true;
@@ -2341,7 +2059,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 			case 10:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track, stride 2, from Buffer RAM\n", machine().describe_context());
-				if (!BIT(m_diskseq_status_out, 3))
+				if (!BIT(m_diskseq_status, 3))
 				{
 					req_b_w(0); // Flag ourselves as in-use
 					m_diskseq_cyl_write_pending = true;
@@ -2363,7 +2081,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 			case 12:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track\n", machine().describe_context());
-				if (!BIT(m_diskseq_status_out, 3) && is_disk_group_hdd(group))
+				if (!BIT(m_diskseq_status, 3) && is_disk_group_hdd(group))
 				{
 					req_b_w(0); // Flag ourselves as in-use
 
@@ -2378,7 +2096,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 			case 14:
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Write Track\n", machine().describe_context());
-				if (!BIT(m_diskseq_status_out, 3) && is_disk_group_hdd(group))
+				if (!BIT(m_diskseq_status, 3) && is_disk_group_hdd(group))
 				{
 					req_b_w(0); // Flag ourselves as in-use
 					m_line_count = 0;
@@ -2691,8 +2409,6 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 	case 15: // Disk Sequencer Card, panic reset
 		LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, panic reset\n", machine().describe_context());
-		m_diskseq_reset = true;
-		m_diskseq_halt = true;
 		break;
 
 	default:
@@ -3350,12 +3066,12 @@ void dpb7000_state::fddcpu_p1_w(uint8_t data)
 	// C5 D READY
 	if (BIT(m_fdd_port1, 7))
 	{
-		m_diskseq_status_out &= ~(1 << 3);
-		m_diskseq_status_out |= 0x04;
+		m_diskseq_status &= ~(1 << 3);
+		m_diskseq_status |= 0x04;
 	}
 	else
 	{
-		m_diskseq_status_out |= (1 << 3);
+		m_diskseq_status |= (1 << 3);
 	}
 }
 
@@ -3752,8 +3468,10 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 {
 	const uint16_t upper_flag_addr = (uint16_t)((m_output_cpflags & 3) << 8);
 
+	// TODO: Implement the Store Address Card in a more accurate manner, and implement framestore scan-out and flag handling accordingly.
 	int32_t y_addr[2] = { m_rvscr[0], m_rvscr[1] };
 	int32_t dest_y = 0;
+	uint8_t matte_chr[2][2] = { { m_matte_u[0], m_matte_v[0] }, { m_matte_u[1], m_matte_v[1] } };
 	bool seen_rvr = false;
 	bool started_scanout = false;
 	for (int32_t y = 0; y < 625; y++)
@@ -3785,8 +3503,12 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 			dest_y = 0;
 		}
 
-		const bool blank_1_q = true;//BIT(m_storeaddr_pal_blank[((y_addr[0] << 3) & 0x1800) | ((y_addr[0] << 2) & 0x3f0)], 0);
-		const bool blank_2_q = true;//BIT(m_storeaddr_pal_blank[((y_addr[1] << 3) & 0x1800) | ((y_addr[1] << 2) & 0x3f0)], 0);
+		// TODO: Enabling the blanking PAL causes strangeness when bringing up either the menu or the palette.
+		// Most likely scenario is that assuming a horizontal coordinate of 0 coming into the PAL puts us in a blanking region.
+		//const bool blank_1_q = BIT(m_storeaddr_pal_blank[((y_addr[0] << 3) & 0x1800) | ((y_addr[0] << 2) & 0x3f0)], 0);
+		//const bool blank_2_q = BIT(m_storeaddr_pal_blank[((y_addr[1] << 3) & 0x1800) | ((y_addr[1] << 2) & 0x3f0)], 0);
+		const bool blank_1_q = true;
+		const bool blank_2_q = true;
 		const bool use_store1_matte = !palette && (!blank_1_q || m_select_matte[0]);
 		const bool use_store2_matte = !palette && (!blank_2_q || m_select_matte[1]);
 		const bool use_ext_store1_matte = !(blank_1_q && !BIT(m_ext_store_flags, 0));
@@ -3797,43 +3519,38 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 		const uint8_t ext_a_mask = (invert_a ? 0xff : 0x00);
 		const uint8_t ext_b_mask = (invert_b ? 0xff : 0x00);
 
-		//if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("Y %3d: RVR %d, Palette %d, DY %3d, Addr[0] %4d, Addr[1] %4d, ESF %d%d%d%d%d", y, BIT(hflags, 1), palette, dest_y, y_addr[0], y_addr[1], BIT(m_ext_store_flags, 4), BIT(m_ext_store_flags, 3), BIT(m_ext_store_flags, 2), BIT(m_ext_store_flags, 1), BIT(m_ext_store_flags, 0));
-		//if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("    /B1 %d, /B2 %d, S1M %d, S2M %d, 1M %d, 2M %d, E1M %d, E2M %d", blank_1_q, blank_2_q, m_select_matte[0], m_select_matte[1], use_store1_matte, use_store2_matte, use_ext_store1_matte, use_ext_store2_matte);
-		//if (machine().input().code_pressed(KEYCODE_RCONTROL)) printf("    A Mask: %02x, B Mask: %02x\n", ext_a_mask, ext_b_mask);
+		const int32_t y_line1 = y_addr[0] * 800;
+		const int32_t y_line2 = y_addr[1] * 800;
 
 		uint32_t *d = &bitmap.pix(dest_y);
 		int32_t x_addr[2] = { m_rhscr[0] & ~1, m_rhscr[1] & ~1 };
 		for (int32_t x = 0; x < 800; x++, x_addr[0] = (x_addr[0] + 1) % 800, x_addr[1] = (x_addr[1] + 1) % 800)
 		{
-			const int32_t read_x1 = x_addr[0];
-			const int32_t read_x2 = x_addr[1];
-			const int32_t read_y1 = y_addr[0];
-			const int32_t read_y2 = y_addr[1];
-			const uint8_t uv_sel1 = (x_addr[0] & 1);
-			const uint8_t uv_sel2 = (x_addr[1] & 1);
+			const uint8_t uv_sel1 = x_addr[0] & 1;
+			const uint8_t uv_sel2 = x_addr[1] & 1;
 
-			const uint32_t pix_idx1 = (read_y1 * 800) + read_x1;
-			const uint32_t pix_idx2 = (read_y2 * 800) + read_x2;
+			const uint32_t pix_idx1 = y_line1 + x_addr[0];
+			const uint32_t pix_idx2 = y_line2 + x_addr[1];
 
 			const uint16_t lum1 = use_store1_matte ? m_matte_y[0] : m_framestore_lum[0][pix_idx1];
-			const uint16_t chr1 = use_store1_matte ? (uv_sel1 ? m_matte_v[0] : m_matte_u[0]) : m_framestore_chr[0][pix_idx1];
+			const uint16_t chr1 = use_store1_matte ? matte_chr[0][uv_sel1] : m_framestore_chr[0][pix_idx1];
 			const uint16_t ext1 = use_ext_store1_matte ? m_matte_ext[0] : (m_framestore_ext[0][pix_idx1] ^ ext_src_invert);
 
 			const uint16_t lum2 = use_store2_matte ? m_matte_y[1] : m_framestore_lum[1][pix_idx2];
-			const uint16_t chr2 = use_store2_matte ? (uv_sel2 ? m_matte_v[1] : m_matte_u[1]) : m_framestore_chr[1][pix_idx2];
+			const uint16_t chr2 = use_store2_matte ? matte_chr[0][uv_sel2] : m_framestore_chr[1][pix_idx2];
 			const uint16_t ext2 = use_ext_store2_matte ? m_matte_ext[1] : (m_framestore_ext[1][pix_idx2] ^ ext_src_invert);
 
-			const uint16_t ext_product = (ext1 * ext2) + 0x0080;
-			const uint8_t ext_a = (uint8_t)(ext_product >> 8) ^ ext_a_mask;
-			const uint8_t ext_b = (uint8_t)(ext_product >> 8) ^ ext_b_mask;
+			const uint8_t ext_product = (uint8_t)(((ext1 * ext2) + 0x0080) >> 8);
+			const uint8_t ext_a = ext_product ^ ext_a_mask;
+			const uint8_t ext_b = ext_product ^ ext_b_mask;
 
 			const uint16_t lum1_product = ((lum1 * ext_a) + 0x0080) >> 8;
 			const uint16_t lum2_product = ((lum2 * ext_b) + 0x0080) >> 8;
 			const uint16_t chr1_product = ((chr1 * ext_a) + 0x0080) >> 8;
 			const uint16_t chr2_product = ((chr2 * ext_b) + 0x0080) >> 8;
 
-			const uint8_t lum_sum = (uint8_t)(lum1_product + lum2_product);
-			const uint8_t chr_sum = (uint8_t)(chr1_product + chr2_product);
+			const uint8_t lum_sum = (uint8_t)std::min<uint16_t>(lum1_product + lum2_product, 255);
+			const uint8_t chr_sum = (uint8_t)std::min<uint16_t>(chr1_product + chr2_product, 255);
 
 			*d++ = 0xff000000 | (lum_sum << 8) | chr_sum;
 		}
@@ -3857,7 +3574,6 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 	uint16_t cursor_y_size = m_cursor_size_y;
 	uint16_t cursor_y_index = 0;
 
-	//for (uint16_t vert = 0xd8f; vert < 0x1000; vert++, dst_y++)
 	for (int32_t dst_y = 0; dst_y < 625; dst_y++)
 	{
 		uint16_t cursor_origin_x_counter = m_cursor_origin_x;
@@ -3954,57 +3670,66 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 }
 
 template <int StoreNum>
-uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t dpb7000_state::store_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int py = 0; py < 768; py++)
+	if (0)
 	{
-		const uint8_t *src_lum = &m_framestore_lum[StoreNum][py * 800];
-		const uint8_t *src_chr = &m_framestore_chr[StoreNum][py * 800];
-		uint32_t *dst = &bitmap.pix(py);
-		for (int px = 0; px < 800; px += 2)
+		for (int py = 0; py < 768; py++)
 		{
-			const uint32_t u = *src_chr++ << 16;
-			const uint32_t v = *src_chr++ << 8;
-			*dst++ = m_yuv_lut[u | v | *src_lum++];
-			*dst++ = m_yuv_lut[u | v | *src_lum++];
+			const uint8_t *src_lum = &m_framestore_lum[StoreNum][py * 800];
+			const uint8_t *src_chr = &m_framestore_chr[StoreNum][py * 800];
+			uint32_t *dst = &bitmap.pix(py);
+			for (int px = 0; px < 800; px += 2)
+			{
+				const uint32_t u = *src_chr++ << 16;
+				const uint32_t v = *src_chr++ << 8;
+				*dst++ = m_yuv_lut[u | v | *src_lum++];
+				*dst++ = m_yuv_lut[u | v | *src_lum++];
+			}
 		}
 	}
 	return 0;
 }
 
-uint32_t dpb7000_state::ext_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t dpb7000_state::stencil_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int py = 0; py < 768; py++)
+	if (0)
 	{
-		const uint8_t *src_ext1 = &m_framestore_ext[0][py * 800];
-		const uint8_t *src_ext2 = &m_framestore_ext[1][py * 800];
-		uint32_t *dst = &bitmap.pix(py);
-		for (int px = 0; px < 800; px++, src_ext1++, src_ext2++)
+		for (int py = 0; py < 768; py++)
 		{
-			const uint16_t h = (uint8_t)px >> 4;
-			const uint16_t pal_blank_addr = ((h << 12) & 0xe000) | ((py << 3) & 0x1800) | (BIT(h, 0) << 10) | ((py << 2) & 0x3f0) | ((h >> 4) & 0xf);
-			const uint8_t blank_val = m_storeaddr_pal_blank[pal_blank_addr];
-			const uint32_t blank_color = ((blank_val & 3) != 3) ? 0x000000ff : 0;
-			*dst++ = 0xff000000 | (*src_ext1 << 16) | (*src_ext2 << 8) | blank_color;
+			const uint8_t *src_ext1 = &m_framestore_ext[0][py * 800];
+			const uint8_t *src_ext2 = &m_framestore_ext[1][py * 800];
+			uint32_t *dst = &bitmap.pix(py);
+			for (int px = 0; px < 800; px++, src_ext1++, src_ext2++)
+			{
+				const uint16_t h = (uint8_t)px >> 4;
+				const uint16_t pal_blank_addr = ((h << 12) & 0xe000) | ((py << 3) & 0x1800) | (BIT(h, 0) << 10) | ((py << 2) & 0x3f0) | ((h >> 4) & 0xf);
+				const uint8_t blank_val = m_storeaddr_pal_blank[pal_blank_addr];
+				const uint32_t blank_color = ((blank_val & 3) != 3) ? 0x000000ff : 0;
+				*dst++ = 0xff000000 | (*src_ext1 << 16) | (*src_ext2 << 8) | blank_color;
+			}
 		}
 	}
 	return 0;
 }
 
-uint32_t dpb7000_state::brush_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t dpb7000_state::brush_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 256; y++)
+	if (0)
 	{
-		const uint8_t *src_lum = &m_brushstore_lum[y * 256];
-		const uint8_t *src_chr = &m_brushstore_chr[y * 256];
-		const uint8_t *src_ext = &m_brushstore_ext[y * 256];
-		uint32_t *dst_lc = &bitmap.pix(y);
-		uint32_t *dst_ext = &bitmap.pix(y + 256);
-		for (int x = 0; x < 256; x++)
+		for (int y = 0; y < 256; y++)
 		{
-			dst_lc[x] = (0xff << 24) | (src_lum[x] << 16) | (src_lum[x] << 8) | src_lum[x];
-			dst_lc[x + 256] = (0xff << 24) | (src_chr[x] << 16) | (src_chr[x] << 8) | src_chr[x];
-			dst_ext[x] = (0xff << 24) | (src_ext[x] << 16) | (src_ext[x] << 8) | src_ext[x];
+			const uint8_t *src_lum = &m_brushstore_lum[y * 256];
+			const uint8_t *src_chr = &m_brushstore_chr[y * 256];
+			const uint8_t *src_ext = &m_brushstore_ext[y * 256];
+			uint32_t *dst_lc = &bitmap.pix(y);
+			uint32_t *dst_ext = &bitmap.pix(y + 256);
+			for (int x = 0; x < 256; x++)
+			{
+				dst_lc[x] = (0xff << 24) | (src_lum[x] << 16) | (src_lum[x] << 8) | src_lum[x];
+				dst_lc[x + 256] = (0xff << 24) | (src_chr[x] << 16) | (src_chr[x] << 8) | src_chr[x];
+				dst_ext[x] = (0xff << 24) | (src_ext[x] << 16) | (src_ext[x] << 8) | src_ext[x];
+			}
 		}
 	}
 	return 0;
@@ -4067,29 +3792,32 @@ void dpb7000_state::dpb7000(machine_config &config)
 	screen.set_visarea(56, 695, 36, 275);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	screen_device &store_screen1(SCREEN(config, "store_screen1", SCREEN_TYPE_RASTER));
-	store_screen1.set_refresh_hz(50);
-	store_screen1.set_size(800, 768);
-	store_screen1.set_visarea(0, 799, 0, 767);
-	store_screen1.set_screen_update(FUNC(dpb7000_state::store_screen_update<0>));
+	if (0)
+	{
+		screen_device &store_screen1(SCREEN(config, "store_screen1", SCREEN_TYPE_RASTER));
+		store_screen1.set_refresh_hz(50);
+		store_screen1.set_size(800, 768);
+		store_screen1.set_visarea(0, 799, 0, 767);
+		store_screen1.set_screen_update(FUNC(dpb7000_state::store_debug_screen_update<0>));
 
-	screen_device &store_screen2(SCREEN(config, "store_screen2", SCREEN_TYPE_RASTER));
-	store_screen2.set_refresh_hz(50);
-	store_screen2.set_size(800, 768);
-	store_screen2.set_visarea(0, 799, 0, 767);
-	store_screen2.set_screen_update(FUNC(dpb7000_state::store_screen_update<1>));
+		screen_device &store_screen2(SCREEN(config, "store_screen2", SCREEN_TYPE_RASTER));
+		store_screen2.set_refresh_hz(50);
+		store_screen2.set_size(800, 768);
+		store_screen2.set_visarea(0, 799, 0, 767);
+		store_screen2.set_screen_update(FUNC(dpb7000_state::store_debug_screen_update<1>));
 
-	screen_device &ext_screen(SCREEN(config, "ext_screen", SCREEN_TYPE_RASTER));
-	ext_screen.set_refresh_hz(50);
-	ext_screen.set_size(800, 768);
-	ext_screen.set_visarea(0, 799, 0, 767);
-	ext_screen.set_screen_update(FUNC(dpb7000_state::ext_screen_update));
+		screen_device &ext_screen(SCREEN(config, "ext_screen", SCREEN_TYPE_RASTER));
+		ext_screen.set_refresh_hz(50);
+		ext_screen.set_size(800, 768);
+		ext_screen.set_visarea(0, 799, 0, 767);
+		ext_screen.set_screen_update(FUNC(dpb7000_state::stencil_debug_screen_update));
 
-	screen_device &brush_screen(SCREEN(config, "brush_screen", SCREEN_TYPE_RASTER));
-	brush_screen.set_refresh_hz(50);
-	brush_screen.set_size(512, 512);
-	brush_screen.set_visarea(0, 511, 0, 511);
-	brush_screen.set_screen_update(FUNC(dpb7000_state::brush_screen_update));
+		screen_device &brush_screen(SCREEN(config, "brush_screen", SCREEN_TYPE_RASTER));
+		brush_screen.set_refresh_hz(50);
+		brush_screen.set_size(512, 512);
+		brush_screen.set_visarea(0, 511, 0, 511);
+		brush_screen.set_screen_update(FUNC(dpb7000_state::brush_debug_screen_update));
+	}
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -4101,13 +3829,6 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_update_row_callback(FUNC(dpb7000_state::crtc_update_row));
 	m_crtc->set_on_update_addr_change_callback(FUNC(dpb7000_state::crtc_addr_changed));
-
-	// Disc Sequencer Card
-	AM2910(config, m_diskseq, 0); // We drive the clock manually from the driver
-	m_diskseq->ci_w(1);
-	m_diskseq->rld_w(1);
-	m_diskseq->ccen_w(0);
-	m_diskseq->y().set(FUNC(dpb7000_state::diskseq_y_w));
 
 	// Floppy Disc Unit
 	M6803(config, m_fddcpu, 4.9152_MHz_XTAL);
@@ -4125,22 +3846,6 @@ void dpb7000_state::dpb7000(machine_config &config)
 
 	// Hard Disk
 	HARDDISK(config, "hdd", 0);
-
-	// Filter Card
-	AM2901B(config, m_filter_yl);
-	AM2901B(config, m_filter_yh);
-	AM2901B(config, m_filter_xl);
-	AM2901B(config, m_filter_xh);
-
-	// Size Card
-	AM2901B(config, m_size_ge);
-	AM2901B(config, m_size_gf);
-	AM2901B(config, m_size_gg);
-	AM2901B(config, m_size_gh);
-	AM2901B(config, m_size_de);
-	AM2901B(config, m_size_df);
-	AM2901B(config, m_size_dg);
-	AM2901B(config, m_size_dh);
 
 	// Keyboard
 	I8039(config, m_keybcpu, 4.608_MHz_XTAL);
@@ -4175,8 +3880,6 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_tablet_cpu->p2_out_cb().set(FUNC(dpb7000_state::tablet_p2_w));
 	m_tablet_cpu->p3_in_cb().set(FUNC(dpb7000_state::tablet_p3_r));
 	m_tablet_cpu->p3_out_cb().set(FUNC(dpb7000_state::tablet_p3_w));
-
-	config.set_default_layout(layout_dpb7000);
 }
 
 ROM_START( dpb7000 )
