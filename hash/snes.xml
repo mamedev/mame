@@ -36557,6 +36557,19 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="bingbingp" cloneof="bingbing">
+		<description>Bing Bing! Bingo (Japan, prototype)</description>
+		<year>1993</year>
+		<publisher>KSS</publisher>
+		<info name="alt_title" value="ビンビン!ビンゴ" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="bingbingbingo.sfc" size="0x100000" crc="7d2c4855" sha1="090e21abcf63fce10cbc7d4659a62cfaec930295" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="biometal">
 		<description>BioMetal (Europe)</description>
 		<year>1993</year>
@@ -38639,6 +38652,22 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="ogrebatljp" cloneof="ogrebatl">
+		<!-- Notes: Differs with JP release only in internal header -->
+		<description>Densetsu no Ogre Battle - The March of the Black Queen (Japan, prototype)</description>
+		<year>1993</year>
+		<publisher>Quest</publisher>
+		<info name="alt_title" value="伝説のオウガバトル" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x180000">
+				<rom name="ogrebattle.sfc" size="0x180000" crc="fe6b2885" sha1="6757be35ddbe9051644925eff7a3596530f50a3e" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="derbyjo2" supported="partial">
 		<description>Derby Jockey 2 (Japan)</description>
 		<year>1995</year>
@@ -39621,18 +39650,33 @@ List of unclassified roms
 	</software>
 
 	<software name="dualorbs">
-		<description>Dual Orb - Seirei Tama Densetsu (Japan)</description>
+		<description>Dual Orb - Seireiju Densetsu (Japan)</description>
 		<year>1993</year>
 		<publisher>I'Max</publisher>
 		<info name="serial" value="SHVC-DX" />
 		<info name="release" value="19930416" />
-		<info name="alt_title" value="デュアルオーブ聖霊珠伝説" />
+		<info name="alt_title" value="デュアルオーブ・聖霊珠伝説" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
 				<rom name="dual orb - seirei tama densetsu (japan).sfc" size="1572864" crc="9d7bd920" sha1="25fe4c1af89a7d09ffefab7d568d15865f153467" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dualorbsp" cloneof="dualorbs">
+		<description>Dual Orb - Seireiju Densetsu (Japan, prototype)</description>
+		<year>1993</year>
+		<publisher>I'Max</publisher>
+		<info name="alt_title" value="デュアルオーブ・聖霊珠伝説" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x180000">
+				<rom name="dualorb.sfc" size="0x180000" crc="a2c6d5fe" sha1="83017526e17377b493416154b44cf496ffa3ccd2" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
@@ -39926,6 +39970,21 @@ List of unclassified roms
 				<rom name="eien no filerna (japan).sfc" size="1572864" crc="41e9cd70" sha1="a37d9ba5acf84c732120c4cf2b3edd4a59fb146b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elfariap" cloneof="elfaria">
+		<description>Elfaria - The Isle of the Blest (Japan, prototype)</description>
+		<year>1993</year>
+		<publisher>Hudson</publisher>
+		<info name="alt_title" value="エルファリア" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x180000">
+				<rom name="elfaria.sfc" size="0x180000" crc="2c0bf77b" sha1="832d3938eb0b22264ebc19f88fa699cef43ee249" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
@@ -44172,6 +44231,21 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="illvaniap" cloneof="illvania" supported="no">
+		<description>Illvanian no Shiro (Japan, prototype, 19940823)</description>
+		<year>1994</year>
+		<publisher>Clary</publisher>
+		<info name="alt_title" value="イルバニアンの城" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="ruinsofillvanian.sfc" size="0x200000" crc="5f693504" sha1="006c75233f5ea1a4f3fdfb4ed656f0e3e595c799" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="imperium">
 		<description>Imperium (USA)</description>
 		<year>1992</year>
@@ -46099,6 +46173,38 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="dokapon4p" cloneof="dokapon4">
+		<description>Kessen! Dokapon Oukoku IV - Densetsu no Yuusha-tachi (Japan, prototype, Ver 07.431)</description>
+		<year>1993</year>
+		<publisher>Asmik</publisher>
+		<info name="alt_title" value="決戦!ドカポン王国IV ～伝説の勇者たち～" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="dokaponland4-v07.431.sfc" size="0x100000" crc="19bba16c" sha1="56c8eb1b4a7835c8bd2b225015db3b918a64572b" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokapon4p1" cloneof="dokapon4">
+		<description>Kessen! Dokapon Oukoku IV - Densetsu no Yuusha-tachi (Japan, prototype, Ver 07.315)</description>
+		<year>1993</year>
+		<publisher>Asmik</publisher>
+		<info name="alt_title" value="決戦!ドカポン王国IV ～伝説の勇者たち～" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="dokaponland4-v07.315.sfc" size="0x100000" crc="aea31aab" sha1="95421d65b8174da0ae5e7e33666a0cc978f20901" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="keeganpm">
 		<description>Kevin Keegan's Player Manager (Europe)</description>
 		<year>1993</year>
@@ -46939,6 +47045,19 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="kunioodep" cloneof="kunioode">
+		<description>Kunio no Oden (Japan, prototype)</description>
+		<year>1994</year>
+		<publisher>Technos Japan</publisher>
+		<info name="alt_title" value="くにおのおでん" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="kunionooden.sfc" size="0x80000" crc="cd93a39c" sha1="51dbaee3a74fc4e91990dff2fa02fc0309934449" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kuniodb">
 		<description>Kunio-kun no Dodge Ball Da yo Zenin Shuugou! (Japan)</description>
 		<year>1993</year>
@@ -47219,6 +47338,21 @@ List of unclassified roms
 				<rom name="last battle, the (japan).sfc" size="2097152" crc="200ec9c8" sha1="2474c7aa8451d51784a3b852b9806495b4147cfb" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastbatlp" cloneof="lastbatl">
+		<description>The Last Battle (Japan, prototype)</description>
+		<year>1994</year>
+		<publisher>Teichiku</publisher>
+		<info name="alt_title" value="ザ・ラストバトル" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="thelastbattle.sfc" size="0x200000" crc="7abf5579" sha1="ff62732b82f49cd5588b8390f679653be3afff60" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
@@ -49240,6 +49374,22 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 			<dataarea name="addon" size="10240">
 				<rom name="dsp1.bin" size="10240" crc="2838f9f5" sha1="0a03ccb1fd2bea91151c745a4d1f217ae784f889" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andrindyp" cloneof="andrindy">
+		<description>Michael Andretti's IndyCar Challenge (USA, prototype)</description>
+		<year>1995</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
+			<feature name="slot" value="hirom_dsp" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="michaelandretti'sindycarchallenge.sfc" size="0x100000" crc="2ca01b6c" sha1="5af0bcac60ab78f9a54ff360309a2a0f259edaea" />
+			</dataarea>
+			<dataarea name="addon" size="10240">
+				<rom name="dsp1.bin" size="0x2800" crc="2838f9f5" sha1="0a03ccb1fd2bea91151c745a4d1f217ae784f889" />
 			</dataarea>
 		</part>
 	</software>
@@ -51348,6 +51498,19 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nosferatu (japan).sfc" size="2097152" crc="2c5df175" sha1="5b8efdb03542c112d66d5ef017637e8a8aafe89e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nosferatjp" cloneof="nosferat">
+		<description>Nosferatu (Japan, prototype)</description>
+		<year>1994</year>
+		<publisher>Seta</publisher>
+		<info name="alt_title" value="ノスフェラトゥ" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="nosferatu.sfc" size="0x200000" crc="e7aade48" sha1="117deba17dddc5bc8e59a678b82516d546942a65" />
 			</dataarea>
 		</part>
 	</software>
@@ -60216,6 +60379,21 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="snazopuyp" cloneof="snazopuy">
+		<description>Super Nazo Puyo - Rulue no Roux (Japan, prototype)</description>
+		<year>1995</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="す~ぱ~なぞぷよ ルルーのルー" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="supernazopuyo.sfc" size="0x100000" crc="748d1412" sha1="783e9405989722667a4bc98df129ec5b8ffe5d1b" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="snazopu2">
 		<description>Super Nazo Puyo Tsuu - Rulue no Tetsuwan Hanjouki (Japan)</description>
 		<year>1996</year>
@@ -62454,6 +62632,20 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="tetrisbtp" cloneof="tetrisbt">
+		<description>Tetris Battle Gaiden (Japan, prototype)</description>
+		<year>1993</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<info name="alt_title" value="テトリス 武闘外伝" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="tetrisbattlegaiden.sfc" size="0x100000" crc="de5a3efc" sha1="1bc1e6bc0c2ea4339c15f27888e9ddbb77c0fc43" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tetrisfl" cloneof="tetris2">
 		<description>Tetris Flash (Japan)</description>
 		<year>1994</year>
@@ -63962,7 +64154,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 	<software name="ultrabb2">
 		<description>Ultra Baseball Jitsumei Ban 2 (Japan)</description>
-		<year>1995</year>
+		<year>1994</year>
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="SHVC-ABJJ-JPN" />
 		<info name="release" value="19941222" />
@@ -63973,6 +64165,21 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 				<rom name="ultra baseball jitsumei ban 2 (japan).sfc" size="1048576" crc="0b108549" sha1="39d716b70698fd4790a0ad97983a83e28c16adec" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultrabb2p" cloneof="ultrabb2">
+		<description>Ultra Baseball Jitsumei Ban 2 (Japan, prototype)</description>
+		<year>1994</year>
+		<publisher>Culture Brain</publisher>
+		<info name="alt_title" value="ウルトラベースボール 実名版2" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="ultrabaseballjitsumeiban2.sfc" size="0x100000" crc="a76144a2" sha1="dba0c6585315ed6e92cfabfeec03495010612634" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
