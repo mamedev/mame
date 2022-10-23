@@ -36,17 +36,13 @@ void msx_cart_hfox_device::initialize_cartridge()
 	m_rombank[1]->configure_entries(0, 4, get_rom_base() + 0x4000, 0x8000);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	page(1)->install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(msx_cart_hfox_device::bank0_w)));
-	page(1)->install_write_handler(0x7000, 0x7000, write8smo_delegate(*this, FUNC(msx_cart_hfox_device::bank1_w)));
+	page(1)->install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(msx_cart_hfox_device::bank_w<0>)));
+	page(1)->install_write_handler(0x7000, 0x7000, write8smo_delegate(*this, FUNC(msx_cart_hfox_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 }
 
-void msx_cart_hfox_device::bank0_w(u8 data)
+template <int Bank>
+void msx_cart_hfox_device::bank_w(u8 data)
 {
-	m_rombank[0]->set_entry(data & m_bank_mask);
-}
-
-void msx_cart_hfox_device::bank1_w(u8 data)
-{
-	m_rombank[1]->set_entry(data & m_bank_mask);
+	m_rombank[Bank]->set_entry(data & m_bank_mask);
 }

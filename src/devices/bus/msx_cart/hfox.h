@@ -22,8 +22,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void bank0_w(u8 data);
-	void bank1_w(u8 data);
+	template <int Bank> void bank_w(u8 data);
 
 	memory_bank_array_creator<2> m_rombank;
 
