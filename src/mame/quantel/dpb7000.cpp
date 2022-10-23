@@ -4,7 +4,19 @@
 
     DPB-7001 (c) 1981 Quantel
 
-    Skeleton Driver
+	Known issues/possible improvements:
+	- Disk Sequencer Card is currently implemented via HLE.
+	- Tablet is currently implemented via HLE.
+	- Blanking PAL is currently disabled, which results in on-screen
+	  garbage when scrolling.
+	- Size Card and Filter Card functionality is not yet implemented.
+	- Video input functionality is not yet implemented.
+	- There are numerous Brush Processor Card functions that are not yet
+	  implemented.
+
+	To create a hard disk image compatible with the "330Mb Fujitsu" DIP
+	setting:
+	- chdman createhd -o [output name] -chs 1024,16,80 -ss 256 -c none
 
 ***************************************************************************/
 
