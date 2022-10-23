@@ -44,6 +44,8 @@
 #include "screen.h"
 #include "emupal.h"
 
+#include "utf8.h"
+
 #include <algorithm>
 #include <deque>
 
