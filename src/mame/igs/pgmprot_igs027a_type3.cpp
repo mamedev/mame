@@ -160,6 +160,7 @@ void pgm_arm_type3_state::machine_reset()
 	if (!strcmp(machine().system().name, "theglad")) base = 0x3316;
 	if (!strcmp(machine().system().name, "theglad100")) base = 0x3316;
 	if (!strcmp(machine().system().name, "theglad101")) base = 0x3316;
+	if (!strcmp(machine().system().name, "theglad104")) base = 0x3316;
 	if (!strcmp(machine().system().name, "happy6")) base = 0x3586;
 	if (!strcmp(machine().system().name, "happy6101")) base = 0x3586;
 	if (!strcmp(machine().system().name, "happy6100hk")) base = 0x3586;

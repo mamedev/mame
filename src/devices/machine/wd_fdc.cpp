@@ -1683,6 +1683,14 @@ bool wd_fdc_device_base::read_one_bit(const attotime &limit)
 	return false;
 }
 
+void wd_fdc_device_base::reset_data_sync()
+{
+	cur_live.data_separator_phase = false;
+	cur_live.bit_counter = 0;
+
+	cur_live.data_reg = bitswap<8>(cur_live.shift_reg, 14, 12, 10, 8, 6, 4, 2, 0);
+}
+
 bool wd_fdc_device_base::write_one_bit(const attotime &limit)
 {
 	bool bit = cur_live.shift_reg & 0x8000;
@@ -1779,15 +1787,13 @@ void wd_fdc_device_base::live_run(attotime limit)
 
 			if(!dden && cur_live.shift_reg == 0x4489) {
 				cur_live.crc = 0x443b;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
+				reset_data_sync();
 				cur_live.state = READ_HEADER_BLOCK_HEADER;
 			}
 
 			if(dden && cur_live.shift_reg == 0xf57e) {
 				cur_live.crc = 0xef21;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
+				reset_data_sync();
 				if(main_state == READ_ID)
 					cur_live.state = READ_ID_BLOCK_TO_DMA;
 				else
@@ -1907,8 +1913,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 
 				if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg == 0x4489) {
 					cur_live.crc = 0x443b;
-					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 0;
+					reset_data_sync();
 					cur_live.state = READ_DATA_BLOCK_HEADER;
 				}
 			} else {
@@ -1925,6 +1930,8 @@ void wd_fdc_device_base::live_run(attotime limit)
 						cur_live.shift_reg == 0xf56e ? 0xafa5 :
 						0xbf84;
 
+					reset_data_sync();
+
 					if(extended_ddam) {
 						if(!(cur_live.data_reg & 1))
 							status |= S_DDM;
@@ -1933,8 +1940,6 @@ void wd_fdc_device_base::live_run(attotime limit)
 					} else if((cur_live.data_reg & 0xfe) == 0xf8)
 						status |= S_DDM;
 
-					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 0;
 					cur_live.state = READ_SECTOR_DATA;
 				}
 			}
@@ -2033,7 +2038,10 @@ void wd_fdc_device_base::live_run(attotime limit)
 				// FM resyncs
 				&& !(dden && (cur_live.shift_reg == 0xf57e      // FM IDAM
 							|| cur_live.shift_reg == 0xf56f     // FM DAM
-							|| cur_live.shift_reg == 0xf56a))   // FM DDAM
+							|| cur_live.shift_reg == 0xf56a     // FM DDAM
+							|| cur_live.shift_reg == 0xf56b     // FM DDAM
+							|| cur_live.shift_reg == 0xf56e     // FM DDAM
+							|| cur_live.shift_reg == 0xf56f))   // FM DDAM
 				)
 				break;
 
@@ -2050,8 +2058,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			// MZ: TI99 "DISkASSEMBLER" copy protection requires a threshold of 8
 			bool output_byte = cur_live.bit_counter > 8;
 
-			cur_live.data_separator_phase = false;
-			cur_live.bit_counter = 0;
+			reset_data_sync();
 
 			if(output_byte) {
 				live_delay(READ_TRACK_DATA_BYTE);

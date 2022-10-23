@@ -152,7 +152,7 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint16_t data, uin
 			m_internal->unmap_readwrite(base + 0x780, base + 0x7bf);
 
 		}
-		
+
 		uint32_t data32 = data;
 		uint32_t mem_mask32 = mem_mask;
 		if (!BIT(offset,0))

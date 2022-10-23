@@ -1548,7 +1548,7 @@ ROM_START( bm3rdeaa )
 	ROM_LOAD16_BYTE( "825eaa10.27d", 0x100001, 0x80000, CRC(345ee6e5) SHA1(ce5d05b26900ed09fb3996a60edaf332e3acd720) )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
-	DISK_IMAGE( "825jab11", 0, SHA1(cb2c5d680e3426a5eea12f0a1abf65e90351e2c1) )  /* ver 1.01 JA */
+	DISK_IMAGE( "825jab11", 0, SHA1(f506a83d43aeed87a7a32c3f7312d2a2b7d60d91) )  /* ver 1.01 JA */
 ROM_END
 
 ROM_START( bmcompmx )

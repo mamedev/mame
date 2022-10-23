@@ -522,8 +522,17 @@ static INPUT_PORTS_START( twincobru )
 	TOAPLAN_COINAGE_JAPAN_LOC(SW1)  // Table at 0x0c20 (COIN1 AND COIN2) in CPU1
 INPUT_PORTS_END
 
-// Verified from M68000 and Z80 code
 static INPUT_PORTS_START( ktiger )
+	PORT_INCLUDE( twincobru )
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x01, 0x00, "Invulnerability" ) PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+INPUT_PORTS_END
+
+// Verified from M68000 and Z80 code
+static INPUT_PORTS_START( ktigera )
 	PORT_INCLUDE( twincobru )
 
 	PORT_MODIFY("DSWA")
@@ -1476,18 +1485,18 @@ void twincobr_state::init_twincobr()
 }
 
 
-GAME( 1987, fshark,    0,        fshark,    fshark,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Flying Shark (World)",                  0 )
-GAME( 1987, skyshark,  fshark,   fshark,    skyshark,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Sky Shark (US, set 1)",                 0 )
-GAME( 1987, skysharka, fshark,   fshark,    skyshark,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Sky Shark (US, set 2)",                 0 )
-GAME( 1987, hishouza,  fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Hishou Zame (Japan)",                   0 )
-GAME( 1987, fsharkb,   fshark,   fshark,    fshark,    twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flying Shark (World, bootleg)",         0 )
-GAME( 1987, hishouzab, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Hishou Zame (Japan, bootleg)",          0 )
-GAME( 1987, fsharkbt,  fshark,   fsharkbt,  skyshark,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flying Shark (bootleg with 8741)",      0 )
-GAME( 1987, fnshark,   fshark,   fnshark,   hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flyin' Shark (bootleg of Hishou Zame)", 0 )
-GAME( 1987, skysharkb, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Sky Shark (bootleg)",                   0 )
-GAME( 1987, twincobr,  0,        twincobrw, twincobr,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Twin Cobra (World)",                    0 )
-GAME( 1987, twincobru, twincobr, twincobrw, twincobru, twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Twin Cobra (US)",                       0 )
-GAME( 1989, ktiger,    twincobr, twincobr,  ktiger,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan, newer)",         0 )
-GAME( 1987, ktigera,   twincobr, twincobr,  ktiger,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan, older)",         0 )
-GAME( 1991, gulfwar2,  0,        twincobr,  gulfwar2,  twincobr_state, init_twincobr, ROT270, "Comad",                                                 "Gulf War II (set 1)",                   0 )
-GAME( 1991, gulfwar2a, gulfwar2, twincobr,  gulfwar2,  twincobr_state, init_twincobr, ROT270, "Comad",                                                 "Gulf War II (set 2)",                   0 )
+GAME( 1987, fshark,    0,        fshark,    fshark,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Flying Shark (World)",                         0 )
+GAME( 1987, skyshark,  fshark,   fshark,    skyshark,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Sky Shark (US, set 1)",                        0 )
+GAME( 1987, skysharka, fshark,   fshark,    skyshark,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Sky Shark (US, set 2)",                        0 )
+GAME( 1987, hishouza,  fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Hishou Zame (Japan)",                          0 )
+GAME( 1987, fsharkb,   fshark,   fshark,    fshark,    twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flying Shark (World, bootleg)",                0 )
+GAME( 1987, hishouzab, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Hishou Zame (Japan, bootleg)",                 0 )
+GAME( 1987, fsharkbt,  fshark,   fsharkbt,  skyshark,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flying Shark (bootleg with 8741)",             0 )
+GAME( 1987, fnshark,   fshark,   fnshark,   hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flyin' Shark (bootleg of Hishou Zame)",        0 )
+GAME( 1987, skysharkb, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Sky Shark (bootleg)",                          0 )
+GAME( 1987, twincobr,  0,        twincobrw, twincobr,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Twin Cobra (World)",                           0 )
+GAME( 1987, twincobru, twincobr, twincobrw, twincobru, twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Twin Cobra (US)",                              0 )
+GAME( 1989, ktiger,    twincobr, twincobr,  ktiger,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan, 2 player cooperative)", 0 )
+GAME( 1987, ktigera,   twincobr, twincobr,  ktigera,   twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan, 2 player alternate)",   0 )
+GAME( 1991, gulfwar2,  0,        twincobr,  gulfwar2,  twincobr_state, init_twincobr, ROT270, "Comad",                                                 "Gulf War II (set 1)",                          0 )
+GAME( 1991, gulfwar2a, gulfwar2, twincobr,  gulfwar2,  twincobr_state, init_twincobr, ROT270, "Comad",                                                 "Gulf War II (set 2)",                          0 )

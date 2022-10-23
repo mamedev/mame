@@ -105,7 +105,7 @@ public:
 		set_senses(motor_sense, status_sense, true);
 	}
 	hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	
+
 private:
 
 };
