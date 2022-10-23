@@ -150,7 +150,7 @@ protected:
 	required_device<nvram_device> m_nvram;
 	memory_bank_creator m_rombank;
 	memory_view m_view;
-	std::vector<uint8_t> m_sram;
+	std::vector<u8> m_sram;
 	u8 m_bank_reg;
 };
 

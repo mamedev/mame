@@ -54,10 +54,10 @@ void msx_cart_holy_quran_device::initialize_cartridge()
 	m_view1[0].install_read_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(msx_cart_holy_quran_device::read)));
 	m_view1[1].install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	m_view1[1].install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	m_view1[1].install_write_handler(0x5000, 0x5000, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank0_w)));
-	m_view1[1].install_write_handler(0x5400, 0x5400, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank1_w)));
-	m_view1[1].install_write_handler(0x5800, 0x5800, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank2_w)));
-	m_view1[1].install_write_handler(0x5c00, 0x5c00, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank3_w)));
+	m_view1[1].install_write_handler(0x5000, 0x5000, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<0>)));
+	m_view1[1].install_write_handler(0x5400, 0x5400, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<1>)));
+	m_view1[1].install_write_handler(0x5800, 0x5800, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<2>)));
+	m_view1[1].install_write_handler(0x5c00, 0x5c00, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<3>)));
 
 	page(2)->install_view(0x8000, 0xbfff, m_view2);
 	m_view2[0].install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(msx_cart_holy_quran_device::read2)));
@@ -99,22 +99,8 @@ u8 msx_cart_holy_quran_device::read2(offs_t offset)
 	return data;
 }
 
-void msx_cart_holy_quran_device::bank0_w(u8 data)
+template <int Bank>
+void msx_cart_holy_quran_device::bank_w(u8 data)
 {
-	m_rombank[0]->set_entry(data & m_bank_mask);
-}
-
-void msx_cart_holy_quran_device::bank1_w(u8 data)
-{
-	m_rombank[1]->set_entry(data & m_bank_mask);
-}
-
-void msx_cart_holy_quran_device::bank2_w(u8 data)
-{
-	m_rombank[2]->set_entry(data & m_bank_mask);
-}
-
-void msx_cart_holy_quran_device::bank3_w(u8 data)
-{
-	m_rombank[3]->set_entry(data & m_bank_mask);
+	m_rombank[Bank]->set_entry(data & m_bank_mask);
 }

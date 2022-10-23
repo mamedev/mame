@@ -28,10 +28,7 @@ private:
 
 	u8 read(offs_t offset);
 	u8 read2(offs_t offset);
-	void bank0_w(u8 data);
-	void bank1_w(u8 data);
-	void bank2_w(u8 data);
-	void bank3_w(u8 data);
+	template <int Bank> void bank_w(u8 data);
 
 	memory_bank_array_creator<4> m_rombank;
 	memory_view m_view1;

@@ -5,7 +5,7 @@
 TODO:
 - Verify real contents of the kanji roms. The current dumps seem to have
   been read from inside a running MSX machine. The content retrieved that
-  way may not be how they are actually stored in the actual rom.
+  way may not be how they are stored in the rom.
 
 **********************************************************************************/
 
