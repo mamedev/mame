@@ -4081,7 +4081,7 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819272">
-				<rom name="canalmeutre.2mg" size="819272" crc="83bf5893" sha1="b290a27378598987896bae6af60587274afa5134"/>
+				<rom name="canalmeurtre.2mg" size="819272" crc="b5c3cf6d" sha1="be8b75f6352d4e77146e75a911f4b8bbc54f5480"/>
 			</dataarea>
 		</part>
 	</software>
