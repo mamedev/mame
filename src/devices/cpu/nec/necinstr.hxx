@@ -379,7 +379,7 @@ OP( 0x8c, i_mov_wsreg ) { GetModRM;
 		default:   logerror("%06x: MOV Sreg - Invalid register\n",PC());
 	}
 }
-OP( 0x8d, i_lea       ) { uint16_t ModRM = fetch(); (void)(this->*s_GetEA[ModRM])(); RegWord(ModRM)=m_EO;  CLKS(4,4,2); }
+OP( 0x8d, i_lea       ) { uint16_t ModRM = fetch(); if (ModRM >= 0xc0) logerror("LDEA invalid mode %Xh\n", ModRM); else { (void)(this->*s_GetEA[ModRM])(); RegWord(ModRM)=m_EO; }  CLKS(4,4,2); }
 OP( 0x8e, i_mov_sregw ) { uint16_t src; GetModRM; src = GetRMWord(ModRM); CLKR(15,15,7,15,11,5,2,m_EA);
 	switch (ModRM & 0x38) {
 		case 0x00: Sreg(DS1) = src; break; /* mov es,ew */

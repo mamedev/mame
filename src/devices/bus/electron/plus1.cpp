@@ -71,27 +71,7 @@ ROM_END
 //  INPUT_PORTS( plus1 )
 //-------------------------------------------------
 
-static INPUT_PORTS_START( plus1 )
-	PORT_START("JOY1")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_CENTERDELTA(100) PORT_MINMAX(0x00, 0xff) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_START("JOY2")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_CENTERDELTA(100) PORT_MINMAX(0x00, 0xff) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_START("JOY3")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_CENTERDELTA(100) PORT_MINMAX(0x00, 0xff) PORT_PLAYER(2) PORT_REVERSE
-
-	PORT_START("JOY4")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_CENTERDELTA(100) PORT_MINMAX(0x00, 0xff) PORT_PLAYER(2) PORT_REVERSE
-
-	PORT_START("BUTTONS")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( ap6 )
-	PORT_INCLUDE(plus1)
-
 	PORT_START("LINKS")
 	PORT_CONFNAME(0x01, 0x01, "J1 ROM 13")
 	PORT_CONFSETTING(0x00, "Disabled")
@@ -107,11 +87,6 @@ INPUT_PORTS_END
 //-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
-
-ioport_constructor electron_plus1_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( plus1 );
-}
 
 ioport_constructor electron_ap6_device::device_input_ports() const
 {
@@ -133,12 +108,13 @@ void electron_plus1_device::device_add_mconfig(machine_config &config)
 	m_centronics->set_output_latch(latch);
 
 	/* adc */
+	BBC_ANALOGUE_SLOT(config, m_analogue, bbc_analogue_devices, "acornjoy");
 	ADC0844(config, m_adc);
 	m_adc->intr_callback().set([this](int state) { m_adc_ready = !state; });
-	m_adc->ch1_callback().set_ioport("JOY1");
-	m_adc->ch2_callback().set_ioport("JOY2");
-	m_adc->ch3_callback().set_ioport("JOY3");
-	m_adc->ch4_callback().set_ioport("JOY4");
+	m_adc->ch1_callback().set([this]() { return m_analogue->ch_r(0); });
+	m_adc->ch2_callback().set([this]() { return m_analogue->ch_r(1); });
+	m_adc->ch3_callback().set([this]() { return m_analogue->ch_r(2); });
+	m_adc->ch4_callback().set([this]() { return m_analogue->ch_r(3); });
 
 	/* cartridges */
 	ELECTRON_CARTSLOT(config, m_cart_sk1, DERIVED_CLOCK(1, 1), electron_cart, nullptr);
@@ -204,9 +180,8 @@ electron_plus1_device::electron_plus1_device(const machine_config &mconfig, devi
 	, m_cart_sk2(*this, "cart_sk2")
 	, m_centronics(*this, "centronics")
 	, m_cent_data_out(*this, "cent_data_out")
+	, m_analogue(*this, "analogue")
 	, m_adc(*this, "adc")
-	, m_joy(*this, "JOY%u", 1)
-	, m_buttons(*this, "BUTTONS")
 	, m_romsel(0)
 	, m_centronics_busy(0)
 	, m_adc_ready(0)
@@ -305,7 +280,7 @@ uint8_t electron_plus1_device::expbus_r(offs_t offset)
 				//         b6: ADC conversion end
 				//         b5: Fire Button 1
 				//         b4: Fire Button 2
-				data &= (m_centronics_busy << 7) | (m_adc_ready << 6) | m_buttons->read() | 0x0f;
+				data &= (m_centronics_busy << 7) | (m_adc_ready << 6) | m_analogue->pb_r() | 0x0f;
 			}
 			break;
 

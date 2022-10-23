@@ -552,6 +552,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="drseussp" cloneof="drseuss">
+		<description>Dr. Seuss's Fix-Up the Mix-Up Puzzle (prototype, rev r)</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="jigsaw 10 6-7 1 5274 e052.1" size="0x2000" crc="e63951b3" sha1="528b441c516211c884925a7e11c30b6cb5f85ecb" offset="0x0000" />
+				<rom name="jigsaw 10 6-7 2 8dde e052.2" size="0x2000" crc="b0ecd4a4" sha1="c77cb81424d585acc41dd1120e81ca7adc0e555b" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The label says the checksum is 90B3 but the dump's checksum is 90A3. Possible bit rot or just an error on the label? -->
+	<software name="drseussp1" cloneof="drseuss">
+		<description>Dr. Seuss's Fix-Up the Mix-Up Puzzle Graphics Demo</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="link seuss 4-6 1 puzzler 90b3.1" size="0x2000" crc="6485a603" sha1="96652d5e5592de62474c094b507f43924ffa06d1" /> <!-- original label: LINK: Seuss 4/6 1 Puzzler 90B3 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="evolutio">
 		<!-- Evolution (1983)(Coleco).bin -->
 		<description>Evolution</description>

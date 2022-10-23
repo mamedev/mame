@@ -388,7 +388,7 @@ void info_xml_creator::output(std::ostream &out, const std::vector<std::string> 
 			auto it = matched.begin();
 			for (const std::string &pat : patterns)
 			{
-				if (!core_strwildcmp(pat.c_str(), shortname))
+				if (!core_strwildcmp(pat, shortname))
 				{
 					// this driver matches the pattern - tell the caller
 					result = true;
@@ -397,7 +397,7 @@ void info_xml_creator::output(std::ostream &out, const std::vector<std::string> 
 					if (!*it)
 					{
 						*it = true;
-						if (!core_iswildstr(pat.c_str()))
+						if (!core_iswildstr(pat))
 						{
 							exact_matches++;
 

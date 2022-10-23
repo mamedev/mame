@@ -20,15 +20,28 @@ DEFINE_DEVICE_TYPE(VCS_PADDLES, vcs_paddles_device, "vcs_paddles", "Atari / CBM 
 
 static INPUT_PORTS_START( vcs_paddles )
 	PORT_START("JOY")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // pin 3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // pin 4
 	PORT_BIT( 0xf3, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("POTX")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(1) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(1) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255) PORT_REVERSE // pin 5
 
 	PORT_START("POTY")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(2) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(2) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255) PORT_REVERSE // pin 9
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vcs_paddles_reversed )
+	PORT_START("JOY")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // pin 3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // pin 4
+	PORT_BIT( 0xf3, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("POTX")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(2) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255) PORT_REVERSE // pin 5
+
+	PORT_START("POTY")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(1) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255) PORT_REVERSE // pin 9
 INPUT_PORTS_END
 
 
@@ -38,7 +51,10 @@ INPUT_PORTS_END
 
 ioport_constructor vcs_paddles_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( vcs_paddles );
+	if (m_reverse_players)
+		return INPUT_PORTS_NAME( vcs_paddles_reversed );
+	else
+		return INPUT_PORTS_NAME( vcs_paddles );
 }
 
 
@@ -56,7 +72,8 @@ vcs_paddles_device::vcs_paddles_device(const machine_config &mconfig, const char
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
 	m_potx(*this, "POTX"),
-	m_poty(*this, "POTY")
+	m_poty(*this, "POTY"),
+	m_reverse_players(false)
 {
 }
 

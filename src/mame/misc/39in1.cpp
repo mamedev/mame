@@ -105,27 +105,10 @@ private:
 	void _39in1_map(address_map &map);
 	void base_map(address_map &map);
 
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
-
 	void decrypt(uint8_t xor00, uint8_t xor02, uint8_t xor04, uint8_t xor08, uint8_t xor10, uint8_t xor20, uint8_t xor40, uint8_t xor80, uint8_t bit7, uint8_t bit6, uint8_t bit5, uint8_t bit4, uint8_t bit3, uint8_t bit2, uint8_t bit1, uint8_t bit0);
 	void further_decrypt(uint8_t xor400, uint8_t xor800, uint8_t xor1000, uint8_t xor2000, uint8_t xor4000, uint8_t xor8000);
 };
 
-
-#define VERBOSE_LEVEL (0)
-
-inline void ATTR_PRINTF(3,4) _39in1_state::verboselog(int n_level, const char *s_fmt, ... )
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror("%s: %s", machine().describe_context(), buf);
-	}
-}
 
 uint32_t _39in1_state::eeprom_r()
 {

@@ -646,10 +646,10 @@ license:CC0
 
 	Disk labels (guessed):
 	  1pcxu04p
-      |||||||| unknown
-      |||||||  unknown
-      ||||||   unknown
-      |||||    country (U = UK, A = American, I = International)
+	  |||||||| unknown
+	  |||||||  unknown
+	  ||||||   unknown
+	  |||||    country (U = UK, A = American, I = International)
 	  ||||     system (PCX = Apricot PC/Xi, PCXCO = Apricot PC/Xi with colour option)
 	  |        disk number in set
 

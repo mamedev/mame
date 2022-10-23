@@ -106,7 +106,7 @@ void mos6532_new_device::io_w(offs_t offset, uint8_t data)
 	if (offset == 0x1c || offset == 0x1d || offset == 0x1e || offset == 0x1f) timer_on_w(offset&3, data);
 
 	if (offset == 0x04 || offset == 0x05 || offset == 0x06 || offset == 0x07) edge_w(data);
-	if (offset == 0x0c || offset == 0x0d || offset == 0xea || offset == 0x0f) edge_w(data);
+	if (offset == 0x0c || offset == 0x0d || offset == 0x0e || offset == 0x0f) edge_w(data);
 }
 
 
