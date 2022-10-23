@@ -41,15 +41,18 @@ void msx_cart_ascii8_device::initialize_cartridge()
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	page(1)->install_write_handler(0x6000, 0x7fff, write8sm_delegate(*this, FUNC(msx_cart_ascii8_device::mapper_write)));
+	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<0>)));
+	page(1)->install_write_handler(0x6800, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<1>)));
+	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<2>)));
+	page(1)->install_write_handler(0x7800, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<3>)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 }
 
-void msx_cart_ascii8_device::mapper_write(offs_t offset, u8 data)
+template <int Bank>
+void msx_cart_ascii8_device::bank_w(u8 data)
 {
-	u8 bank = (offset / 0x800) & 0x03;
-	m_rombank[bank]->set_entry(data & m_bank_mask);
+	m_rombank[Bank]->set_entry(data & m_bank_mask);
 }
 
 

@@ -29,7 +29,7 @@ protected:
 private:
 	static constexpr size_t BANK_SIZE = 0x2000;
 
-	void mapper_write(offs_t offset, u8 data);
+	template <int Bank> void bank_w(u8 data);
 
 	memory_bank_array_creator<4> m_rombank;
 	u8 m_bank_mask;

@@ -103,7 +103,7 @@
 ************************************************************************
 
 This following list is probably incomplete. Corrections are welcome.
-Entries marked with * still need to be processed.
+Entries marked with * are missing.
 
 *Ascii MSXPLAYer 2003
 *Ascii One Chip MSX
@@ -121,7 +121,6 @@ Casio MX-10 - MSX1 - mx10
 Casio MX-15 - MSX1 - mx15
 Casio MX-101 - MSX1 - mx101
 Casio PV-7 - MSX1 - pv7
-*Casio PV-7 + KB-7
 Casio PV-16 - MSX1 - pv16
 Ciel Expert 3 IDE - MSX2+ - expert3i
 Ciel Expert 3 Turbo = MSX2+ - expert3t
@@ -662,8 +661,6 @@ public:
 		, m_view_slot3_page1(*this, "view3_1")
 		, m_view_slot3_page2(*this, "view3_2")
 		, m_view_slot3_page3(*this, "view3_3")
-		, m_use_exp_views(false)
-		, m_expanded(-1)
 		, m_psg_b(0)
 		, m_kanji_latch(0)
 		, m_slot_expanded{false, false, false, false}
@@ -1042,8 +1039,6 @@ protected:
 	memory_view m_view_slot3_page2;
 	memory_view m_view_slot3_page3;
 	memory_view *m_exp_view[4][4];
-	bool m_use_exp_views;
-	int8_t m_expanded;
 	msx_slot_cartridge_device *m_cartslot[2];
 	msx_internal_slot_interface *m_generic_internal;
 	std::vector<std::tuple<int, bool, int, int, int, msx_internal_slot_interface *>> m_internal_slots;
@@ -1302,6 +1297,7 @@ void msx_state::memory_expand_slot(int slot)
 	m_view_page3[slot](0xffff, 0xffff).rw(FUNC(msx_state::expanded_slot_r), FUNC(msx_state::expanded_slot_w));
 	for (int i = 0; i < 4; i++)
 	{
+		// Ensure that the views will exist
 		(*m_exp_view[slot][0])[i];
 		(*m_exp_view[slot][1])[i];
 		(*m_exp_view[slot][2])[i];
