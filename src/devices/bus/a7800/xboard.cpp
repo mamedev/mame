@@ -125,7 +125,7 @@ void a78_xm_device::device_add_mconfig(machine_config &config)
 	POKEY(config, m_pokey, DERIVED_CLOCK(1, 1));
 	m_pokey->add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
 
-	YM2151(config, m_ym, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
+	YM2151(config, m_ym, DERIVED_CLOCK(2, 1)).add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
 }
 
 
