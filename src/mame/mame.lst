@@ -20589,6 +20589,9 @@ luckybale                       // (c) 1996 Sielcon Games
 @source:omron/luna_68k.cpp
 luna                            // Omron Luna
 
+@source:omron/luna_88k.cpp
+luna88k2                        // Omron Luna 88K²
+
 @source:tecmo/lvcards.cpp
 lvcards                         // (c) 1985 Tehkan
 lvcardsa                        // (c) 1985 Tehkan
