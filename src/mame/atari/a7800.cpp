@@ -314,14 +314,14 @@ uint8_t a7800_state::bios_or_cart_r(offs_t offset)
 
 void a7800_state::a7800_mem(address_map &map)
 {
+	map(0x0000, 0x01ff).mirror(0x2000).ram(); // 0x40-0xff, 0x140-0x1ff are mirrors of second 6116 chip
 	map(0x0000, 0x001f).mirror(0x300).rw(FUNC(a7800_state::tia_r), FUNC(a7800_state::tia_w));
 	map(0x0020, 0x003f).mirror(0x300).rw(m_maria, FUNC(atari_maria_device::read), FUNC(atari_maria_device::write));
-	map(0x0040, 0x00ff).bankrw("zpmirror"); // mirror of 0x2040-0x20ff, for zero page
-	map(0x0140, 0x01ff).bankrw("spmirror"); // mirror of 0x2140-0x21ff, for stack page
 	map(0x0280, 0x029f).mirror(0x160).m("riot", FUNC(mos6532_new_device::io_map));
 	map(0x0480, 0x04ff).mirror(0x100).m("riot", FUNC(mos6532_new_device::ram_map));
-	map(0x1800, 0x1fff).ram().share("6116_1");
-	map(0x2000, 0x27ff).ram().share("6116_2");
+	map(0x1800, 0x1fff).ram();
+	map(0x2200, 0x27ff).ram(); // 0x2000-0x21ff, installed in mirror above
+
 								// According to the official Software Guide, the RAM at 0x2000 is
 								// repeatedly mirrored up to 0x3fff, but this is evidently incorrect
 								// because the High Score Cartridge maps ROM at 0x3000-0x3fff
@@ -1342,11 +1342,6 @@ void a7800_state::machine_start()
 	save_item(NAME(m_ctrl_lock));
 	save_item(NAME(m_ctrl_reg));
 	save_item(NAME(m_maria_flag));
-
-	// set up RAM mirrors
-	uint8_t *ram = reinterpret_cast<uint8_t *>(memshare("6116_2")->ptr());
-	membank("zpmirror")->set_base(ram + 0x0040);
-	membank("spmirror")->set_base(ram + 0x0140);
 
 	// install additional handlers, if needed
 	if (m_cart->exists())
