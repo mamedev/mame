@@ -83,18 +83,6 @@ void device_a800_cart_interface::ram_alloc(uint32_t size)
 }
 
 
-//-------------------------------------------------
-//  ram_alloc - alloc the space for the on-cart RAM
-//-------------------------------------------------
-
-void device_a800_cart_interface::nvram_alloc(uint32_t size)
-{
-	m_nvram.resize(size);
-	device().save_item(NAME(m_nvram));
-}
-
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -274,10 +262,10 @@ image_init_result a800_cart_slot_device::call_load()
 			m_cart->rom_alloc(len);
 			fread(m_cart->get_rom_base(), len);
 		}
-		if (m_type == A800_TELELINK2)
-			m_cart->nvram_alloc(0x100);
-		if (m_type == A800_CORINA || m_type == A800_CORINA_SRAM)
-			m_cart->nvram_alloc(0x2000);
+		//if (m_type == A800_TELELINK2)
+		//	m_cart->nvram_alloc(0x100);
+		//if (m_type == A800_CORINA || m_type == A800_CORINA_SRAM)
+		//	m_cart->nvram_alloc(0x2000);
 		if (m_type == A800_CORINA)
 			m_cart->ram_alloc(0x4000);
 		if (m_type == A800_CORINA_SRAM)

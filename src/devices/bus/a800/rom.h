@@ -6,6 +6,7 @@
 #pragma once
 
 #include "a800_slot.h"
+#include "machine/nvram.h"
 
 
 // ======================> a800_rom_device
@@ -137,6 +138,13 @@ public:
 	virtual void write_80xx(offs_t offset, uint8_t data) override;
 	virtual uint8_t read_d5xx(offs_t offset) override;
 	virtual void write_d5xx(offs_t offset, uint8_t data) override;
+
+private:
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	required_device<nvram_device> m_nvram;
+	std::unique_ptr<uint8_t[]> m_nvram_ptr;
 };
 
 
@@ -176,10 +184,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	std::unique_ptr<uint8_t[]> m_nvram_ptr;
 
 	virtual uint8_t read_view_1(offs_t offset);
 	virtual void write_view_1(offs_t offset, u8 data);
 
+	required_device<nvram_device> m_nvram;
 	u8 m_rom_bank;
 	u8 m_view_select;
 };

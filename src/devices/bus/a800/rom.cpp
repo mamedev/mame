@@ -78,33 +78,9 @@ a800_rom_turbo_device::a800_rom_turbo_device(const machine_config &mconfig, cons
 {
 }
 
-
-a800_rom_telelink2_device::a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_TELELINK2, tag, owner, clock)
-{
-}
-
-
 a800_rom_microcalc_device::a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, A800_ROM_MICROCALC, tag, owner, clock)
 	, m_bank(0)
-{
-}
-
-a800_rom_corina_device::a800_rom_corina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, type, tag, owner, clock)
-	, m_rom_bank(0)
-	, m_view_select(0)
-{
-}
-
-a800_rom_corina_device::a800_rom_corina_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_CORINA, tag, owner, clock)
-{
-}
-
-a800_rom_corina_sram_device::a800_rom_corina_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_corina_device(mconfig, A800_ROM_CORINA_SRAM, tag, owner, clock)
 {
 }
 
@@ -196,20 +172,6 @@ void a800_rom_microcalc_device::device_reset()
 {
 	m_bank = 0;
 }
-
-
-void a800_rom_corina_device::device_start()
-{
-	save_item(NAME(m_rom_bank));
-	save_item(NAME(m_view_select));
-}
-
-void a800_rom_corina_device::device_reset()
-{
-	m_rom_bank = 0;
-	m_view_select = 0;
-}
-
 
 void a5200_rom_bbsb_device::device_start()
 {
@@ -378,19 +340,41 @@ void a800_rom_turbo_device::write_d5xx(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
+a800_rom_telelink2_device::a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, A800_ROM_TELELINK2, tag, owner, clock)
+	, m_nvram(*this, "nvram")
+{
+}
+
+void a800_rom_telelink2_device::device_add_mconfig(machine_config &config)
+{
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+}
+
+
+void a800_rom_telelink2_device::device_start()
+{
+	const u32 nvram_size = 0x100;
+
+	m_nvram_ptr = std::make_unique<uint8_t[]>(nvram_size);
+	m_nvram->set_base(m_nvram_ptr.get(), nvram_size);
+
+	save_pointer(NAME(m_nvram_ptr), nvram_size);
+}
+
 uint8_t a800_rom_telelink2_device::read_80xx(offs_t offset)
 {
 	if (offset >= 0x2000)
 		return m_rom[offset & 0x1fff];
 	if (offset >= 0x1000 && offset < 0x1100)
-		return m_nvram[offset & 0xff];
+		return m_nvram_ptr[offset & 0xff];
 
 	return 0xff;
 }
 
 void a800_rom_telelink2_device::write_80xx(offs_t offset, uint8_t data)
 {
-	m_nvram[offset & 0xff] = data | 0xf0;   // low 4bits only
+	m_nvram_ptr[offset & 0xff] = data | 0xf0;   // low 4bits only
 }
 
 uint8_t a800_rom_telelink2_device::read_d5xx(offs_t offset)
@@ -427,12 +411,53 @@ void a800_rom_microcalc_device::write_d5xx(offs_t offset, uint8_t data)
 
  Corina
 
- Comes in two configs:
+ Known configs:
  - 1MB Flash ROM (yakungfu)
  - 512KB Flash ROM + 512KB SRAM (bombjake)
 
  Both contains 8KB NVRAM
  -------------------------------------------------*/
+
+a800_rom_corina_device::a800_rom_corina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, type, tag, owner, clock)
+	, m_nvram(*this, "nvram")
+	, m_rom_bank(0)
+	, m_view_select(0)
+{
+}
+
+a800_rom_corina_device::a800_rom_corina_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_corina_device(mconfig, A800_ROM_CORINA, tag, owner, clock)
+{
+}
+
+a800_rom_corina_sram_device::a800_rom_corina_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_corina_device(mconfig, A800_ROM_CORINA_SRAM, tag, owner, clock)
+{
+}
+
+void a800_rom_corina_device::device_add_mconfig(machine_config &config)
+{
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+}
+
+void a800_rom_corina_device::device_start()
+{
+	const u32 nvram_size = 0x2000;
+	m_nvram_ptr = std::make_unique<uint8_t[]>(nvram_size);
+	m_nvram->set_base(m_nvram_ptr.get(), nvram_size);
+
+	save_pointer(NAME(m_nvram_ptr), nvram_size);
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_view_select));
+}
+
+void a800_rom_corina_device::device_reset()
+{
+	m_rom_bank = 0;
+	m_view_select = 0;
+}
+
 
 uint8_t a800_rom_corina_device::read_view_1(offs_t offset)
 {
@@ -462,7 +487,7 @@ uint8_t a800_rom_corina_device::read_80xx(offs_t offset)
 		case 1:
 			return read_view_1(offset);
 		case 2:
-			return m_nvram[offset & 0x1fff];
+			return m_nvram_ptr[offset & 0x1fff];
 	}
 
 	logerror("view select R=3 [%04x]\n", offset);
@@ -477,7 +502,7 @@ void a800_rom_corina_device::write_80xx(offs_t offset, uint8_t data)
 			write_view_1(offset, data);
 			return;
 		case 2:
-			m_nvram[offset & 0x1fff] = data;
+			m_nvram_ptr[offset & 0x1fff] = data;
 			return;
 	}
 	// view 0: flash ROM commands?

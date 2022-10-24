@@ -61,13 +61,10 @@ public:
 
 	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
-	void nvram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint8_t* get_ram_base() { return &m_ram[0]; }
-	uint8_t* get_nvram_base() { return &m_nvram[0]; }
 	uint32_t get_rom_size() { return m_rom_size; }
 	uint32_t get_ram_size() { return m_ram.size(); }
-	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 protected:
 	device_a800_cart_interface(const machine_config &mconfig, device_t &device);
@@ -76,7 +73,6 @@ protected:
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
 	std::vector<uint8_t> m_ram;
-	std::vector<uint8_t> m_nvram; // HiScore cart can save scores!
 	// helpers
 	int m_bank_mask;
 };
