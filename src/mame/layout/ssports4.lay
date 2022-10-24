@@ -48,9 +48,9 @@ license:CC0
 		<bounds left="2.5" right="10.5" top="0" bottom="11" />
 
 		<!-- score panel leds -->
-		<group ref="digits"><bounds x="3.25" y="3.5" width="0.45" height="3" /><orientation rotate="270" /></group>
-		<element name="0.8" ref="led"><bounds x="2.975" y="7" width="1" height="1" /></element>
-		<element name="1.8" ref="led"><bounds x="2.975" y="2" width="1" height="1" /></element>
+		<group ref="digits"><bounds x="3.25" y="4" width="0.45" height="3" /><orientation rotate="270" /></group>
+		<element name="0.8" ref="led"><bounds x="2.975" y="7.5" width="1" height="1" /></element>
+		<element name="1.8" ref="led"><bounds x="2.975" y="2.5" width="1" height="1" /></element>
 
 		<!-- playfield leds -->
 		<element name="7.0" ref="led"><bounds x="5" y="9" width="1" height="1" /></element>
