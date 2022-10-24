@@ -143,7 +143,7 @@ private:
 
 u32 advision_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bool hint_enable = bool(m_conf->read() & 1);
+	const bool hint_enable = bool(m_conf->read() & 1);
 
 	for (int y = 0; y < 40; y++)
 	{
@@ -180,7 +180,7 @@ void advision_state::av_control_w(u8 data)
 
 	// disable led outputs (there is some delay before it takes effect)
 	// see for example codered twister and anime girl, gaps between the 'pixels' should be visible but minimal
-	if (m_video_bank == 0)
+	if (m_video_bank == 0 && !m_led_off->enabled())
 		m_led_off->adjust(attotime::from_usec(39));
 
 	// P24 rising edge: transfer led latches to outputs

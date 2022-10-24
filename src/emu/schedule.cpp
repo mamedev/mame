@@ -142,9 +142,8 @@ void emu_timer::adjust(attotime start_delay, s32 param, const attotime &period) 
 	if (m_scheduler->m_callback_timer == this)
 		m_scheduler->m_callback_timer_modified = true;
 
-	// compute the time of the next firing and insert into the list
+	// set callback parameter
 	m_param = param;
-	m_enabled = true;
 
 	// clamp negative times to 0
 	if (start_delay.seconds() < 0)
@@ -153,6 +152,7 @@ void emu_timer::adjust(attotime start_delay, s32 param, const attotime &period) 
 	// set the start and expire times
 	m_start = m_scheduler->time();
 	m_expire = m_start + start_delay;
+	m_enabled = !m_expire.is_never();
 	m_period = period;
 
 	// remove and re-insert the timer in its new order
