@@ -346,9 +346,9 @@ ROM_START(gamekin3)
 	ROM_LOAD("gm220.bin", 0x00000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
 ROM_END
 
-CONS( 2003, gameking, 0, 0, gameking1, gameking, gameking_state, init_gameking, "TimeTop", "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, gameking, 0, 0, gameking1, gameking, gameking_state, init_gameking, "TimeTop", "GameKing GM-218", MACHINE_IMPERFECT_SOUND )
 // the GameKing 2 (GM-219) is probably identical HW
 
-CONS( 2003, gamekin3, 0, 0, gameking3, gameking3, gameking_state, init_gameking, "TimeTop", "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, gamekin3, 0, 0, gameking3, gameking3, gameking_state, init_gameking, "TimeTop", "GameKing 3",     MACHINE_IMPERFECT_SOUND )
 // gameking 3: similiar cartridges, accepts gameking cartridges, gameking3 cartridges not working on gameking (illegal cartridge scroller)
 // my gameking bios backup solution might work on it
