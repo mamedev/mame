@@ -1241,7 +1241,7 @@ u16 sega315_5313_device::get_hposition()
 	{
 		attotime time_elapsed_since_megadriv_scanline_timer;
 
-		time_elapsed_since_megadriv_scanline_timer = m_megadriv_scanline_timer->time_elapsed();
+		time_elapsed_since_megadriv_scanline_timer = m_megadriv_scanline_timer->elapsed();
 
 		if (time_elapsed_since_megadriv_scanline_timer.attoseconds() < (ATTOSECONDS_PER_SECOND/get_framerate() /double(m_total_scanlines)))
 		{

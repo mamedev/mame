@@ -778,7 +778,7 @@ void captflag_state::motor_move(int side, uint16_t data)
 
 	timer_device &dev((side == RIGHT) ? *m_motor_right : *m_motor_left);
 
-//  bool busy = !(dev.time_left() == attotime::never);
+//  bool busy = !(dev.remaining() == attotime::never);
 	bool busy = false;
 
 	if (data & 0x0010)
@@ -838,7 +838,7 @@ template <int N>
 READ_LINE_MEMBER(captflag_state::motor_busy_r)
 {
 //  timer_device & dev = ((side == RIGHT) ? m_motor_right : m_motor_left);
-//  return (dev.time_left() == attotime::never) ? 0 : 1;
+//  return (dev.remaining() == attotime::never) ? 0 : 1;
 	return 0;
 }
 

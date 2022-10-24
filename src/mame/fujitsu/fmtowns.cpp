@@ -334,10 +334,10 @@ uint8_t towns_state::towns_system_r(offs_t offset)
 			if(LOG_SYS) logerror("SYS: port 0x25 read\n");
 			return 0x00;
 /*      case 0x06:
-            count = (m_towns_freerun_counter->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(1))).as_double();
+            count = (m_towns_freerun_counter->elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(1))).as_double();
             return count & 0xff;
         case 0x07:
-            count = (m_towns_freerun_counter->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(1))).as_double();
+            count = (m_towns_freerun_counter->elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(1))).as_double();
             return (count >> 8) & 0xff;
 */      case 0x06:
 			//if(LOG_SYS) logerror("SYS: (0x26) timer read\n");
