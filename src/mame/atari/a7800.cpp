@@ -97,27 +97,29 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/a7800/a78_carts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/timer.h"
-#include "sound/tiaintf.h"
-#include "sound/tiasound.h"
 #include "machine/mos6530n.h"
-#include "maria.h"
-#include "bus/a7800/a78_carts.h"
+#include "sound/tiaintf.h"
+
 #include "emupal.h"
+#include "maria.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-
-#define A7800_NTSC_Y1   XTAL(14'318'181)
-#define CLK_PAL 1773447
 
 
 class a7800_state : public driver_device
 {
 public:
-	a7800_state(const machine_config &mconfig, device_type type, const char *tag) :
+	void a7800_ntsc(machine_config &config);
+
+protected:
+	a7800_state(const machine_config &mconfig, device_type type, const char *tag, int xtal) :
 		driver_device(mconfig, type, tag),
+		m_xtal(xtal),
 		m_maincpu(*this, "maincpu"),
 		m_tia(*this, "tia"),
 		m_maria(*this, "maria"),
@@ -131,9 +133,6 @@ public:
 	{
 	}
 
-	void a7800_ntsc(machine_config &config);
-
-protected:
 	uint8_t bios_or_cart_r(offs_t offset);
 	uint8_t tia_r(offs_t offset);
 	void tia_w(offs_t offset, uint8_t data);
@@ -157,6 +156,7 @@ protected:
 	int m_p1_one_button;
 	int m_p2_one_button;
 	int m_bios_enabled;
+	const int m_xtal;
 
 	emu_timer *m_dma_start_timer = nullptr;
 
@@ -175,14 +175,22 @@ protected:
 class a7800_ntsc_state : public a7800_state
 {
 public:
-	using a7800_state::a7800_state;
+	a7800_ntsc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		a7800_state(mconfig, type, tag, 14'318'180) // XTAL from schematics
+	{
+	}
+
 	void init_a7800_ntsc();
 };
 
 class a7800_pal_state : public a7800_state
 {
 public:
-	using a7800_state::a7800_state;
+	a7800_pal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		a7800_state(mconfig, type, tag, 14'187'576) // XTAL from hardware tests
+	{
+	}
+
 	void init_a7800_pal();
 	void a7800_pal(machine_config &config);
 
@@ -1383,13 +1391,13 @@ void a7800_state::machine_reset()
 void a7800_state::a7800_ntsc(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, A7800_NTSC_Y1/8); /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
+	M6502(config, m_maincpu, m_xtal/8); /* NTSC 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &a7800_state::a7800_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a7800_state::interrupt), "screen", 0, 1);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(7159090, 454, 0, 320, 263, 27, 27 + 192 + 32);
+	m_screen->set_raw(m_xtal/2, 454, 0, 320, 263, 27, 27 + 192 + 32);
 	m_screen->set_screen_update(m_maria, FUNC(atari_maria_device::screen_update));
 	m_screen->set_palette("palette");
 
@@ -1401,15 +1409,15 @@ void a7800_state::a7800_ntsc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	TIA(config, m_tia, 31400).add_route(ALL_OUTPUTS, "mono", 1.00);
+	TIA(config, m_tia, m_xtal/4/114).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
-	MOS6532_NEW(config, m_riot, A7800_NTSC_Y1/8);
+	MOS6532_NEW(config, m_riot, m_xtal/8);
 	m_riot->pa_rd_callback().set(FUNC(a7800_state::riot_joystick_r));
 	m_riot->pb_rd_callback().set(FUNC(a7800_state::riot_console_button_r));
 	m_riot->pb_wr_callback().set(FUNC(a7800_state::riot_button_pullup_w));
 
-	A78_CART_SLOT(config, m_cart, A7800_NTSC_Y1/8, a7800_cart, nullptr);
+	A78_CART_SLOT(config, m_cart, m_xtal/8, a7800_cart, nullptr);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("a7800").set_filter("NTSC");
@@ -1420,16 +1428,9 @@ void a7800_pal_state::a7800_pal(machine_config &config)
 	a7800_ntsc(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(CLK_PAL);
-
-	m_screen->set_raw(7093788, 454, 0, 320, 313, 35, 35 + 228 + 32);
+	m_screen->set_raw(m_xtal/2, 454, 0, 320, 313, 35, 35 + 228 + 32);
 
 	subdevice<palette_device>("palette")->set_init(FUNC(a7800_pal_state::a7800p_palette));
-
-	/* devices */
-	m_riot->set_clock(CLK_PAL);
-
-	m_cart->set_clock(CLK_PAL);
 
 	/* software lists */
 	subdevice<software_list_device>("cart_list")->set_filter("PAL");
