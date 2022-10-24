@@ -121,6 +121,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_tia(*this, "tia"),
 		m_maria(*this, "maria"),
+		m_riot(*this, "riot"),
 		m_io_joysticks(*this, "joysticks"),
 		m_io_buttons(*this, "buttons"),
 		m_io_console_buttons(*this, "console_buttons"),
@@ -162,6 +163,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
 	required_device<atari_maria_device> m_maria;
+	required_device<mos6532_new_device> m_riot;
 	required_ioport m_io_joysticks;
 	required_ioport m_io_buttons;
 	required_ioport m_io_console_buttons;
@@ -1388,7 +1390,7 @@ void a7800_state::a7800_ntsc(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(7159090, 454, 0, 320, 263, 27, 27 + 192 + 32);
-	m_screen->set_screen_update("maria", FUNC(atari_maria_device::screen_update));
+	m_screen->set_screen_update(m_maria, FUNC(atari_maria_device::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(a7800_state::a7800_palette), std::size(a7800_colors));
@@ -1399,15 +1401,15 @@ void a7800_state::a7800_ntsc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	TIA(config, "tia", 31400).add_route(ALL_OUTPUTS, "mono", 1.00);
+	TIA(config, m_tia, 31400).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
-	mos6532_new_device &riot(MOS6532_NEW(config, "riot", A7800_NTSC_Y1/8));
-	riot.pa_rd_callback().set(FUNC(a7800_state::riot_joystick_r));
-	riot.pb_rd_callback().set(FUNC(a7800_state::riot_console_button_r));
-	riot.pb_wr_callback().set(FUNC(a7800_state::riot_button_pullup_w));
+	MOS6532_NEW(config, m_riot, A7800_NTSC_Y1/8);
+	m_riot->pa_rd_callback().set(FUNC(a7800_state::riot_joystick_r));
+	m_riot->pb_rd_callback().set(FUNC(a7800_state::riot_console_button_r));
+	m_riot->pb_wr_callback().set(FUNC(a7800_state::riot_button_pullup_w));
 
-	A78_CART_SLOT(config, "cartslot", a7800_cart, nullptr);
+	A78_CART_SLOT(config, m_cart, A7800_NTSC_Y1/8, a7800_cart, nullptr);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("a7800").set_filter("NTSC");
@@ -1425,7 +1427,9 @@ void a7800_pal_state::a7800_pal(machine_config &config)
 	subdevice<palette_device>("palette")->set_init(FUNC(a7800_pal_state::a7800p_palette));
 
 	/* devices */
-	subdevice<mos6532_new_device>("riot")->set_clock(CLK_PAL);
+	m_riot->set_clock(CLK_PAL);
+
+	m_cart->set_clock(CLK_PAL);
 
 	/* software lists */
 	subdevice<software_list_device>("cart_list")->set_filter("PAL");
