@@ -20,6 +20,7 @@
 #include "corestr.h"
 
 #include <algorithm>
+#include <cstdarg>
 #include <set>
 
 
@@ -389,7 +390,7 @@ void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios
 		// if we got neither an empty string nor 'default' then warn the user
 		if (!found)
 		{
-			m_errorstring.append(util::string_format("%s: invalid BIOS \"%s\", reverting to default\n", device.tag(), specbios));
+			util::stream_format(m_errorstream, "%s: invalid BIOS \"%s\", reverting to default\n", device.tag(), specbios);
 			m_warnings++;
 		}
 	}
@@ -460,27 +461,27 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, const std::vec
 
 	const bool is_chd_error(is_chd && chderr != std::errc::no_such_file_or_directory);
 	if (is_chd_error)
-		m_errorstring.append(string_format("%s CHD ERROR: %s\n", name, chderr.message()));
+		util::stream_format(m_errorstream, "%s CHD ERROR: %s\n", name, chderr.message());
 
 	if (ROM_ISOPTIONAL(romp))
 	{
 		// optional files are okay
 		if (!is_chd_error)
-			m_errorstring.append(string_format("OPTIONAL %s NOT FOUND%s\n", name, tried));
+			util::stream_format(m_errorstream, "OPTIONAL %s NOT FOUND%s\n", name, tried);
 		m_warnings++;
 	}
 	else if (util::hash_collection(romp->hashdata()).flag(util::hash_collection::FLAG_NO_DUMP))
 	{
 		// no good dumps are okay
 		if (!is_chd_error)
-			m_errorstring.append(string_format("%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", name, tried));
+			util::stream_format(m_errorstream, "%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", name, tried);
 		m_knownbad++;
 	}
 	else
 	{
 		// anything else is bad
 		if (!is_chd_error)
-			m_errorstring.append(string_format("%s NOT FOUND%s\n", name, tried));
+			util::stream_format(m_errorstream, "%s NOT FOUND%s\n", name, tried);
 		m_errors++;
 	}
 }
@@ -494,8 +495,8 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, const std::vec
 
 void rom_load_manager::dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes)
 {
-	m_errorstring.append(string_format("    EXPECTED: %s\n", hashes.macro_string()));
-	m_errorstring.append(string_format("       FOUND: %s\n", acthashes.macro_string()));
+	util::stream_format(m_errorstream, "    EXPECTED: %s\n", hashes.macro_string());
+	util::stream_format(m_errorstream, "       FOUND: %s\n", acthashes.macro_string());
 }
 
 
@@ -514,14 +515,14 @@ void rom_load_manager::verify_length_and_hash(emu_file *file, std::string_view n
 	u64 const actlength = file->size();
 	if (explength != actlength)
 	{
-		m_errorstring.append(string_format("%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength));
+		util::stream_format(m_errorstream, "%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength);
 		m_warnings++;
 	}
 
 	if (hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 	{
 		// If there is no good dump known, write it
-		m_errorstring.append(string_format("%s NO GOOD DUMP KNOWN\n", name));
+		util::stream_format(m_errorstream, "%s NO GOOD DUMP KNOWN\n", name);
 		m_knownbad++;
 	}
 	else
@@ -534,14 +535,14 @@ void rom_load_manager::verify_length_and_hash(emu_file *file, std::string_view n
 			util::hash_collection const &all_acthashes = (acthashes.hash_types() == util::hash_collection::HASH_TYPES_ALL)
 					? acthashes
 					: file->hashes(util::hash_collection::HASH_TYPES_ALL);
-			m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", name));
+			util::stream_format(m_errorstream, "%s WRONG CHECKSUMS:\n", name);
 			dump_wrong_and_correct_checksums(hashes, all_acthashes);
 			m_warnings++;
 		}
 		else if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 		{
 			// If it matches, but it is actually a bad dump, write it
-			m_errorstring.append(string_format("%s ROM NEEDS REDUMP\n", name));
+			util::stream_format(m_errorstream, "%s ROM NEEDS REDUMP\n", name);
 			m_knownbad++;
 		}
 	}
@@ -580,15 +581,15 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	if (m_errors != 0)
 	{
 		/* create the error message and exit fatally */
-		osd_printf_error("%s", m_errorstring);
+		osd_printf_error("%s", m_errorstream.str());
 		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
 	}
 
 	/* if we had warnings, output them, but continue */
 	if ((m_warnings) || (m_knownbad))
 	{
-		m_errorstring.append("WARNING: the machine might not run correctly.");
-		osd_printf_warning("%s\n", m_errorstring);
+		m_errorstream << "WARNING: the machine might not run correctly.";
+		osd_printf_warning("%s\n", m_errorstream.str());
 	}
 }
 
@@ -1091,13 +1092,13 @@ void rom_load_manager::process_disk_entries(std::initializer_list<std::reference
 			const util::hash_collection hashes(romp->hashdata());
 			if (hashes != acthashes)
 			{
-				m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", filename));
+				util::stream_format(m_errorstream, "%s WRONG CHECKSUMS:\n", filename);
 				dump_wrong_and_correct_checksums(hashes, acthashes);
 				m_warnings++;
 			}
 			else if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 			{
-				m_errorstring.append(string_format("%s CHD NEEDS REDUMP\n", filename));
+				util::stream_format(m_errorstream, "%s CHD NEEDS REDUMP\n", filename);
 				m_knownbad++;
 			}
 
@@ -1108,7 +1109,7 @@ void rom_load_manager::process_disk_entries(std::initializer_list<std::reference
 				err = open_disk_diff(machine().options(), romp, chd->orig_chd(), chd->diff_chd());
 				if (err)
 				{
-					m_errorstring.append(string_format("%s DIFF CHD ERROR: %s\n", filename, err.message()));
+					util::stream_format(m_errorstream, "%s DIFF CHD ERROR: %s\n", filename, err.message());
 					m_errors++;
 					chd = nullptr;
 					continue;
@@ -1216,8 +1217,8 @@ void rom_load_manager::normalize_flags_for_device(std::string_view rgntag, u8 &w
 
 void rom_load_manager::load_software_part_region(device_t &device, software_list_device &swlist, std::string_view swname, const rom_entry *start_region)
 {
-	m_errorstring.clear();
-	m_softwarningstring.clear();
+	m_errorstream.str("");
+	m_softwarningstream.str("");
 
 	m_romstotal = 0;
 	m_romstotalsize = 0;
@@ -1232,13 +1233,15 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		// TODO: list supported clones like we do for machines?
 		if (swinfo->supported() == software_support::PARTIALLY_SUPPORTED)
 		{
-			m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name()));
-			m_softwarningstring.append(string_format("Support for software %s (in list %s) is only partial\n", swname, swlist.list_name()));
+			util::stream_format(m_errorstream, "WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+			util::stream_format(m_softwarningstream, "Support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+			m_software_warnings++;
 		}
 		else if (swinfo->supported() == software_support::UNSUPPORTED)
 		{
-			m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name()));
-			m_softwarningstring.append(string_format("Support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name()));
+			util::stream_format(m_errorstream, "WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+			util::stream_format(m_softwarningstream, "Support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+			m_software_warnings++;
 		}
 
 		// walk the chain of parents and add them to the search path
@@ -1427,6 +1430,7 @@ void rom_load_manager::process_region_list()
 rom_load_manager::rom_load_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_warnings(0)
+	, m_software_warnings(0)
 	, m_knownbad(0)
 	, m_errors(0)
 	, m_romsloaded(0)
@@ -1435,8 +1439,6 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 	, m_romstotalsize(0)
 	, m_chd_list()
 	, m_region(nullptr)
-	, m_errorstring()
-	, m_softwarningstring()
 {
 	// figure out which BIOS we are using
 	std::map<std::string_view, std::string> card_bios;
