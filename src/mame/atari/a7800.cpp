@@ -130,7 +130,7 @@ public:
 	}
 
 protected:
-	void a7800_common(machine_config &config, const uint32_t clock);
+	void a7800_common(machine_config &config, uint32_t clock);
 
 	uint8_t bios_or_cart_r(offs_t offset);
 	uint8_t tia_r(offs_t offset);
@@ -308,11 +308,10 @@ void a7800_state::a7800_mem(address_map &map)
 	map(0x0000, 0x01ff).mirror(0x2000).ram(); // 0x40-0xff, 0x140-0x1ff are mirrors of second 6116 chip
 	map(0x0000, 0x001f).mirror(0x300).rw(FUNC(a7800_state::tia_r), FUNC(a7800_state::tia_w));
 	map(0x0020, 0x003f).mirror(0x300).rw(m_maria, FUNC(atari_maria_device::read), FUNC(atari_maria_device::write));
-	map(0x0280, 0x029f).mirror(0x160).m("riot", FUNC(mos6532_new_device::io_map));
-	map(0x0480, 0x04ff).mirror(0x100).m("riot", FUNC(mos6532_new_device::ram_map));
+	map(0x0280, 0x029f).mirror(0x160).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x0480, 0x04ff).mirror(0x100).m(m_riot, FUNC(mos6532_new_device::ram_map));
 	map(0x1800, 0x1fff).ram();
-	map(0x2200, 0x27ff).ram(); // 0x2000-0x21ff, installed in mirror above
-
+	map(0x2200, 0x27ff).ram();  // 0x2000-0x21ff, installed in mirror above
 								// According to the official Software Guide, the RAM at 0x2000 is
 								// repeatedly mirrored up to 0x3fff, but this is evidently incorrect
 								// because the High Score Cartridge maps ROM at 0x3000-0x3fff
@@ -1374,7 +1373,7 @@ void a7800_state::machine_reset()
 	m_bios_enabled = 0;
 }
 
-void a7800_state::a7800_common(machine_config &config, const uint32_t clock)
+void a7800_state::a7800_common(machine_config &config, uint32_t clock)
 {
 	// basic machine hardware
 	M6502(config, m_maincpu, clock/8); // NTSC 1.79 MHz, PAL 1.77 MHz (switches to 1.19 MHz on TIA or RIOT access)
