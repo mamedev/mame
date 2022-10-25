@@ -564,6 +564,7 @@ void mtu130_state::map(address_map &map)
 	map(0x0be00, 0x0bfff).view(m_io_view);                          // I/O dynamically overrides part of the main ram
 	m_io_view[1](0x0be00, 0x0bfff).unmaprw();                       // Fully mask out the ram when active
 	m_io_view[1](0x0bfc3, 0x0bfc3).r(FUNC(mtu130_state::id_r));
+	m_io_view[1](0x0bfc3, 0x0bfc3).w(FUNC(mtu130_state::id_reset_w));
 	m_io_view[1](0x0bfc5, 0x0bfc5).w(FUNC(mtu130_state::keyboard_col_clear_w));
 	m_io_view[1](0x0bfc7, 0x0bfc7).w(FUNC(mtu130_state::id_reset_w));
 	m_io_view[1](0x0bfc8, 0x0bfcb).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
