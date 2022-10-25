@@ -17,6 +17,8 @@
 #include "emu.h"
 #include "nds.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL   (0)
 
 // Measured value from GBATEK.  Actual crystal unknown.
