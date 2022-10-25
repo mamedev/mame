@@ -6,6 +6,8 @@
  *
  * Sources:
  *   - https://github.com/robohack/ucb-csrg-bsd/blob/master/sys/news3400/
+ *   - https://www.mmcc.it/resources/docs/NWS-3410_3460_ServiceManual_MMCC.PDF
+ *   - https://www.mmcc.it/resources/docs/Sony_NEWS_NWS-3260_ROM_Monitor_User_Guide_r2.pdf
  *
  * TODO:
  *   - lcd controller
@@ -189,24 +191,14 @@ protected:
 	void nws3410_map(address_map &map);
 };
 
-void nws3410_state::nws3410_map(address_map &map)
+void nws3260_state::machine_start()
 {
-	cpu_map(map);
-}
+	news_r3k_base_state::machine_start();
 
-void nws3410_state::nws3410(machine_config &config)
-{
-	R3000A(config, m_cpu, 20_MHz_XTAL, 65536, 65536);
-	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
-	m_cpu->set_addrmap(AS_PROGRAM, &nws3410_state::nws3410_map);
-
-	// Per the service manual, one or more NWA-029 4MB expansion kits can be used to increase from the base 8M up to 16M
-	RAM(config, m_ram);
-	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("12M,16M");
-	common(config);
-
-	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
+	save_item(NAME(m_lcd_enable));
+	save_item(NAME(m_lcd_dim));
+	m_lcd_enable = false;
+	m_lcd_dim = false;
 }
 
 void news_r3k_base_state::machine_start()
@@ -228,16 +220,6 @@ void news_r3k_base_state::machine_start()
 
 	m_inten = 0;
 	m_intst = 0;
-}
-
-void nws3260_state::machine_start()
-{
-	news_r3k_base_state::machine_start();
-
-	save_item(NAME(m_lcd_enable));
-	save_item(NAME(m_lcd_dim));
-	m_lcd_enable = false;
-	m_lcd_dim = false;
 }
 
 void news_r3k_base_state::machine_reset()
@@ -264,6 +246,11 @@ void nws3260_state::nws3260_map(address_map &map)
 	map(0x10100000, 0x10100003).lw32([this](u32 data) { m_lcd_dim = BIT(data, 0); }, "lcd_dim_w");
 	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
 	map(0x1ff60000, 0x1ff6001b).lw8([this](offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
+}
+
+void nws3410_state::nws3410_map(address_map &map)
+{
+	cpu_map(map);
 }
 
 void news_r3k_base_state::cpu_map(address_map &map)
@@ -578,6 +565,21 @@ void nws3260_state::nws3260(machine_config &config)
 	m_lcd->set_screen_update(FUNC(nws3260_state::screen_update));
 }
 
+void nws3410_state::nws3410(machine_config &config)
+{
+	R3000A(config, m_cpu, 20_MHz_XTAL, 65536, 65536);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
+	m_cpu->set_addrmap(AS_PROGRAM, &nws3410_state::nws3410_map);
+
+	// Per the service manual, one or more NWA-029 4MB expansion kits can be used to increase from the base 8M up to 16M
+	RAM(config, m_ram);
+	m_ram->set_default_size("8M");
+	m_ram->set_extra_options("12M,16M");
+	common(config);
+
+	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
+}
+
 ROM_START(nws3260)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "nws3260", "NWS-3260 v2.0A")
@@ -607,7 +609,7 @@ ROM_END
 ROM_START(nws3410)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "nws3410", "NWS-3410 v2.0")
-	ROMX_LOAD("Sony_NWS-3410_MPU-12_v2_ROM.bin", 0x00000, 0x20000, CRC(48a726c4) SHA1(5c6e9e6bccaaa3d63bc136355a436c17c49c9876), ROM_BIOS(0))
+	ROMX_LOAD("sony_nws-3410_mpu-12_v2_rom.bin", 0x00000, 0x20000, CRC(48a726c4) SHA1(5c6e9e6bccaaa3d63bc136355a436c17c49c9876), ROM_BIOS(0))
 
 	// TODO: real idrom
 	ROM_REGION32_BE(0x100, "idrom", 0)
