@@ -114,12 +114,8 @@
 class a7800_state : public driver_device
 {
 public:
-	void a7800_ntsc(machine_config &config);
-
-protected:
-	a7800_state(const machine_config &mconfig, device_type type, const char *tag, int xtal) :
+	a7800_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_xtal(xtal),
 		m_maincpu(*this, "maincpu"),
 		m_tia(*this, "tia"),
 		m_maria(*this, "maria"),
@@ -133,10 +129,13 @@ protected:
 	{
 	}
 
+protected:
+	void a7800_common(machine_config &config, const uint32_t clock);
+
 	uint8_t bios_or_cart_r(offs_t offset);
 	uint8_t tia_r(offs_t offset);
 	void tia_w(offs_t offset, uint8_t data);
-	void a7800_palette(palette_device &palette) const;
+	virtual void a7800_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(maria_startdma);
 	uint8_t riot_joystick_r();
@@ -156,7 +155,6 @@ protected:
 	int m_p1_one_button;
 	int m_p2_one_button;
 	int m_bios_enabled;
-	const int m_xtal;
 
 	emu_timer *m_dma_start_timer = nullptr;
 
@@ -175,27 +173,20 @@ protected:
 class a7800_ntsc_state : public a7800_state
 {
 public:
-	a7800_ntsc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		a7800_state(mconfig, type, tag, 14'318'180) // XTAL from schematics
-	{
-	}
-
+	using a7800_state::a7800_state;
 	void init_a7800_ntsc();
+	void a7800_ntsc(machine_config &config);
 };
 
 class a7800_pal_state : public a7800_state
 {
 public:
-	a7800_pal_state(const machine_config &mconfig, device_type type, const char *tag) :
-		a7800_state(mconfig, type, tag, 14'187'576) // XTAL from hardware tests
-	{
-	}
-
+	using a7800_state::a7800_state;
 	void init_a7800_pal();
 	void a7800_pal(machine_config &config);
 
 protected:
-	void a7800p_palette(palette_device &palette) const;
+	virtual void a7800_palette(palette_device &palette) const override;
 };
 
 
@@ -1324,7 +1315,7 @@ void a7800_state::a7800_palette(palette_device &palette) const
 }
 
 
-void a7800_pal_state::a7800p_palette(palette_device &palette) const
+void a7800_pal_state::a7800_palette(palette_device &palette) const
 {
 	palette.set_pen_colors(0, a7800p_colors);
 }
@@ -1383,16 +1374,15 @@ void a7800_state::machine_reset()
 	m_bios_enabled = 0;
 }
 
-void a7800_state::a7800_ntsc(machine_config &config)
+void a7800_state::a7800_common(machine_config &config, const uint32_t clock)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, m_xtal/8); /* NTSC 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
+	// basic machine hardware
+	M6502(config, m_maincpu, clock/8); // NTSC 1.79 MHz, PAL 1.77 MHz (switches to 1.19 MHz on TIA or RIOT access)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a7800_state::a7800_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a7800_state::interrupt), "screen", 0, 1);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(m_xtal/2, 454, 0, 320, 263, 27, 27 + 192 + 32);
 	m_screen->set_screen_update(m_maria, FUNC(atari_maria_device::screen_update));
 	m_screen->set_palette("palette");
 
@@ -1402,33 +1392,39 @@ void a7800_state::a7800_ntsc(machine_config &config)
 	m_maria->set_dmacpu_tag(m_maincpu);
 	m_maria->set_screen_tag(m_screen);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	TIA(config, m_tia, m_xtal/4/114).add_route(ALL_OUTPUTS, "mono", 1.00);
+	TIA(config, m_tia, clock/4/114).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	/* devices */
-	MOS6532_NEW(config, m_riot, m_xtal/8);
+	// devices
+	MOS6532_NEW(config, m_riot, clock/8);
 	m_riot->pa_rd_callback().set(FUNC(a7800_state::riot_joystick_r));
 	m_riot->pb_rd_callback().set(FUNC(a7800_state::riot_console_button_r));
 	m_riot->pb_wr_callback().set(FUNC(a7800_state::riot_button_pullup_w));
 
-	A78_CART_SLOT(config, m_cart, m_xtal/8, a7800_cart, nullptr);
+	A78_CART_SLOT(config, m_cart, clock/8, a7800_cart, nullptr);
+}
 
-	/* software lists */
+void a7800_ntsc_state::a7800_ntsc(machine_config &config)
+{
+	a7800_common(config, 14'318'180); // from schematics
+
+	// basic machine hardware
+	m_screen->set_raw(14'318'180/2, 454, 0, 320, 263, 27, 27 + 192 + 32);
+
+	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("a7800").set_filter("NTSC");
 }
 
 void a7800_pal_state::a7800_pal(machine_config &config)
 {
-	a7800_ntsc(config);
+	a7800_common(config, 14'187'576); // from hardware tests (and label?)
 
-	/* basic machine hardware */
-	m_screen->set_raw(m_xtal/2, 454, 0, 320, 313, 35, 35 + 228 + 32);
+	// basic machine hardware
+	m_screen->set_raw(14'187'576/2, 454, 0, 320, 313, 35, 35 + 228 + 32);
 
-	subdevice<palette_device>("palette")->set_init(FUNC(a7800_pal_state::a7800p_palette));
-
-	/* software lists */
-	subdevice<software_list_device>("cart_list")->set_filter("PAL");
+	// software lists
+	SOFTWARE_LIST(config, "cart_list").set_original("a7800").set_filter("PAL");
 }
 
 
