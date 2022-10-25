@@ -1231,7 +1231,7 @@ static INPUT_PORTS_START( grudge )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( grudgep )
-	PORT_INCLUDE( sentetst )
+	PORT_INCLUDE( grudge )
 
 	PORT_MODIFY("SWH")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("H1:8") // default to "ON" because Coin mode is buggy on this revision of the prototype
