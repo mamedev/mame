@@ -180,7 +180,7 @@ void advision_state::av_control_w(u8 data)
 
 	// disable led outputs (there is some delay before it takes effect)
 	// see for example codered twister and anime girl, gaps between the 'pixels' should be visible but minimal
-	if (m_video_bank == 0 && !m_led_off->enabled())
+	if (m_video_bank == 0 && !m_led_off->running())
 		m_led_off->adjust(attotime::from_usec(39));
 
 	// P24 rising edge: transfer led latches to outputs
@@ -239,7 +239,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(advision_state::led_off)
 READ_LINE_MEMBER(advision_state::vsync_r)
 {
 	// T1: mirror sync pulse (half rotation)
-	return (m_mirror_sync->enabled()) ? 0 : 1;
+	return (m_mirror_sync->running()) ? 0 : 1;
 }
 
 

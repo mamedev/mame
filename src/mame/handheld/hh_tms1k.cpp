@@ -1560,7 +1560,7 @@ u8 cchime_state::read_k()
 	inp |= m_inputs[2]->read() << 1 & 4;
 
 	// K8: tempo knob state
-	if (m_tempo_timer->enabled())
+	if (m_tempo_timer->running())
 		inp |= 8;
 
 	return inp;
@@ -5490,7 +5490,7 @@ u8 mmarvin_state::read_k()
 {
 	// K1-K4: multiplexed inputs
 	// K8: speed knob state
-	return (read_inputs(4) & 7) | (m_speed_timer->enabled() ? 0 : 8);
+	return (read_inputs(4) & 7) | (m_speed_timer->running() ? 0 : 8);
 }
 
 // config
