@@ -42716,6 +42716,9 @@ uts20                           //
 @source:att/unixpc.cpp
 3b1                             // 3B1 "Unix PC"
 
+@source:sega/unkhockey.cpp
+unkhockey
+
 @source:misc/unkhorse.cpp
 unkhorse                        //
 
