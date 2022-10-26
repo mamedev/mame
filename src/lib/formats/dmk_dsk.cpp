@@ -17,7 +17,6 @@ TODO:
 
 #include "ioprocs.h"
 
-
 dmk_format::dmk_format()
 {
 }
@@ -117,35 +116,38 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	const bool is_sd = (header[4] & 0x40) ? true : false;
 	//const int raw_track_size = 2 * 8 * ( track_size - 0x80 );
 
-// Must see: if any MFM sectors present, must be DD
-// is_sd really controls the stride
+	auto variant = floppy_image::SSDD;
 	if (is_sd)
 	{
 		if (heads == 2)
 		{
-			image->set_variant(floppy_image::DSSD);
+			variant = floppy_image::DSSD;
 		}
 		else
 		{
-			image->set_variant(floppy_image::SSSD);
+			variant = floppy_image::SSSD;
 		}
 	}
 	else
 	{
 		if (heads == 2)
 		{
-			image->set_variant(floppy_image::DSDD);
+			variant = floppy_image::DSDD;
 		}
 		else
 		{
-			image->set_variant(floppy_image::SSDD);
+			variant = floppy_image::SSDD;
 		}
 	}
+	image->set_variant(variant);
+
+	int fm_stride = is_sd ? 1 : 2;
 
 	for (int track = 0; track < tracks; track++)
 	{
 		for (int head = 0; head < heads; head++)
 		{
+			int fm_loss = 0;
 			std::vector<uint8_t> track_data(track_size);
 			std::vector<uint32_t> raw_track_data;
 			int iam_location = -1;
@@ -169,7 +171,6 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			bool is_mfm = (track_data[track_header_offset + 1] & 0x80) ? true : false;
 			track_header_offset += 2;
 
-			// track_offset >= 0x83 is for '-3' indexing at to get past the 128 bytes of index info
 			int max_idam = -1;
 			while ( track_offset != 0 && track_offset >= 0x83 && track_offset < track_size && track_header_offset < 0x80 )
 			{
@@ -181,10 +182,8 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				int mark_offset = sector_is_mfm[sector_index] ? 3 : 0;
 				idam_location[sector_index] = track_offset - mark_offset;
 
-				// TODO: stride has to modify the search window
-				int stride = is_mfm ? 1 : 2;//STRIDE
-				// Scan for DAM location (PNP: scan original worked backwards, seems wrong)
-				//for (int i = track_offset + 53; i > track_offset + 10; i--)
+				int stride = is_mfm ? 1 : fm_stride;
+				// Scan for DAM location
 				for (int i = track_offset + 10*stride; i < track_offset + 53*stride; i++)
 				{
 					if ((track_data[i] >= 0xf8 && track_data[i] <= 0xfb))
@@ -204,7 +203,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 			if (max_idam >= 0 && max_idam < 63)
 			{
-				// Prevent encoding frame switching at end of disk.
+				// Prevent encoding from switching at end of disk.
 				sector_is_mfm[max_idam + 1] = sector_is_mfm[max_idam];
 			}
 
@@ -234,7 +233,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					offset += 3;
 				}
 
-				// If "close" to idam consider switching encoding
+				// If close to idam, switch encoding
 				if (offset + 8 >= idam_location[idam_index])
 				{
 					bool new_enc = sector_is_mfm[idam_index];
@@ -244,7 +243,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					}
 				}
 				if (offset == idam_location[idam_index]
-					|| (!enc_mfm && offset + 1 == idam_location[idam_index])	//STRIDE
+					|| (!enc_mfm && offset - fm_stride + 1 == idam_location[idam_index])
 					)
 				{
 					if (enc_mfm)
@@ -253,17 +252,21 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 						raw_w(raw_track_data, 16, 0x4489);
 						raw_w(raw_track_data, 16, 0x4489);
 						offset += 3;
+						if (fm_stride == 1)
+						{
+							fm_loss += 3;
+						}
 					}
 					else
 					{
 						raw_w(raw_track_data, 32, wide_fm(0xf57e));
-						offset += 2;	//STRIDE
+						offset += fm_stride;
 					}
 					idam_index += 1;
 				}
 
 				if (offset == dam_location[dam_index]
-					|| (!enc_mfm && offset + 1 == dam_location[dam_index])	//STRIDE
+					|| (!enc_mfm && offset - fm_stride + 1 == dam_location[dam_index])
 					)
 				{
 					if (enc_mfm)
@@ -272,17 +275,13 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 						raw_w(raw_track_data, 16, 0x4489);
 						raw_w(raw_track_data, 16, 0x4489);
 						offset += 3;
+						if (fm_stride == 1)
+						{
+							fm_loss += 3;
+						}
 					}
 					else
 					{
-/*
-6a 6b 6e 6f
-01 01 01 01
-10 10 10 10
-10 10 11 11
-10 11 10 11
- 8  9  a  b
-*/
 						uint16_t dam;
 						switch (track_data[offset])
 						{
@@ -293,20 +292,43 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 							case 0xf8: dam = 0xf56a; break;
 						}
 						raw_w(raw_track_data, 32, wide_fm(dam));
-						offset += 2;	//STRIDE
+						offset += fm_stride;
 					}
 					dam_index += 1;
 				}
 
 				if (enc_mfm)
+				{
+					if (fm_stride == 1)
+					{
+						fm_loss++;
+					}
 					mfm_w(raw_track_data, 8, track_data[offset]);
+				}
 				else
 					raw_w(raw_track_data, 32, data_to_wide_fm(track_data[offset]));
 
 	
-				//STRIDE TODO: brutal hack, proper stride handling is complicated
 				if (!enc_mfm)
-					offset++;
+					offset += fm_stride - 1;
+			}
+
+			if (fm_loss != 0)
+			{
+				if (enc_mfm)
+				{
+					for (int jj = 0; jj < fm_loss; jj++)
+					{
+						mfm_w(raw_track_data, 8, 0x4e);
+					}
+				}
+				else
+				{
+					for (int jj = 0; jj < fm_loss/2; jj++)
+					{
+						raw_w(raw_track_data, 32, data_to_wide_fm(0xff));
+					}
+				}
 			}
 
 			generate_track_from_levels(track, head, raw_track_data, 0, image);
