@@ -2010,18 +2010,18 @@ ROM_START( bosco ) // 23209611 (23209631) main PCB + 23169612 (23169632) sub PCB
 	ROM_REGION( 0x1000, "gfx2", 0 )
 	ROM_LOAD( "bos1_13.5e",   0x0000, 0x1000, CRC(e869219c) SHA1(425614cd0642743a82ef9c1aada29774a92203ea) )
 
-	ROM_REGION( 0x0100, "gfx3", 0 ) // not dumped for this set, but label matches
-	ROM_LOAD( "bos1-4.2r",    0x0000, 0x0100, BAD_DUMP CRC(9b69b543) SHA1(47af3f67e50794e839b74fe61197af2228084efd) )    /* dots */
+	ROM_REGION( 0x0100, "gfx3", 0 )
+	ROM_LOAD( "bos1-4.2r",    0x0000, 0x0100, CRC(9b69b543) SHA1(47af3f67e50794e839b74fe61197af2228084efd) )    /* dots */
 
-	ROM_REGION( 0x0260, "proms", 0 ) // not dumped for this set, but labels match
-	ROM_LOAD( "bos1-6.6b",    0x0000, 0x0020, BAD_DUMP CRC(d2b96fb0) SHA1(54c100ec9d173d7dd48a453ebed5f625053cb6e0) )    /* palette */
-	ROM_LOAD( "bos1-5.4m",    0x0020, 0x0100, BAD_DUMP CRC(4e15d59c) SHA1(3542ead6421d169c3569e121ec2be304e108787c) )    /* lookup table */
-	ROM_LOAD( "bos1-3.2d",    0x0120, 0x0020, BAD_DUMP CRC(b88d5ba9) SHA1(7b97a38a540b7ca4b7d9ae338ec38b9b1a337846) )    /* video layout (not used) */
-	ROM_LOAD( "bos1-7.7h",    0x0140, 0x0020, BAD_DUMP CRC(87d61353) SHA1(c7493e52662c921625676a4a4e8cf4371bd938b7) )    /* video timing (not used) */
+	ROM_REGION( 0x0260, "proms", 0 )
+	ROM_LOAD( "bos1-6.6b",    0x0000, 0x0020, CRC(d2b96fb0) SHA1(54c100ec9d173d7dd48a453ebed5f625053cb6e0) )    /* palette */
+	ROM_LOAD( "bos1-5.4m",    0x0020, 0x0100, CRC(4e15d59c) SHA1(3542ead6421d169c3569e121ec2be304e108787c) )    /* lookup table */
+	ROM_LOAD( "bos1-3.2d",    0x0120, 0x0020, CRC(b88d5ba9) SHA1(7b97a38a540b7ca4b7d9ae338ec38b9b1a337846) )    /* video layout (not used) */
+	ROM_LOAD( "bos1-7.7h",    0x0140, 0x0020, CRC(87d61353) SHA1(c7493e52662c921625676a4a4e8cf4371bd938b7) )    /* video timing (not used) */
 
-	ROM_REGION( 0x0200, "namco", 0 ) // not dumped for this set, but labels match
-	ROM_LOAD( "bos1-1.1d",    0x0000, 0x0100, BAD_DUMP CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
-	ROM_LOAD( "bos1-2.5c",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+	ROM_REGION( 0x0200, "namco", 0 )
+	ROM_LOAD( "bos1-1.1d",    0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
+	ROM_LOAD( "bos1-2.5c",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
 
 	ROM_REGION( 0x3000, "52xx", 0 ) /* ROMs for digitised speech */
 	ROM_LOAD( "bos1_9.5n",    0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
