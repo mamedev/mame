@@ -57,12 +57,6 @@ xegs_rom_device::xegs_rom_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-a800_rom_express_device::a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_EXPRESS, tag, owner, clock)
-	, m_bank(0)
-{
-}
-
 
 a800_rom_turbo_device::a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, A800_ROM_TURBO, tag, owner, clock)
@@ -120,17 +114,6 @@ void xegs_rom_device::device_reset()
 {
 	m_bank = 0;
 }
-
-void a800_rom_express_device::device_start()
-{
-	save_item(NAME(m_bank));
-}
-
-void a800_rom_express_device::device_reset()
-{
-	m_bank = 0;
-}
-
 
 void a800_rom_turbo_device::device_start()
 {
@@ -261,9 +244,14 @@ void xegs_rom_device::write_d5xx(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_WILLIAMS, tag, owner, clock)
+a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, type, tag, owner, clock)
 	, m_bank(0)
+{
+}
+
+a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_williams_device(mconfig, A800_ROM_WILLIAMS, tag, owner, clock)
 {
 }
 
@@ -334,16 +322,26 @@ void a800_rom_williams_device::rom_bank_w(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-uint8_t a800_rom_express_device::read_80xx(offs_t offset)
+a800_rom_express_device::a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_williams_device(mconfig, A800_ROM_EXPRESS, tag, owner, clock)
 {
-	return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
 }
 
-void a800_rom_express_device::write_d5xx(offs_t offset, uint8_t data)
+uint8_t a800_rom_express_device::rom_bank_r(offs_t offset)
 {
-	m_bank = (offset ^ 0x07) & 0x0f;
+	if(!machine().side_effects_disabled())
+	{
+		rd5_w(1);
+		m_bank = ((offset ^ 0x7) & 0x07);
+	}
+	return 0xff;
 }
 
+void a800_rom_express_device::rom_bank_w(offs_t offset, uint8_t data)
+{
+	rd5_w(1);
+	m_bank = ((offset ^ 0x7) & 0x07);
+}
 
 /*-------------------------------------------------
 

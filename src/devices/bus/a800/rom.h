@@ -55,6 +55,7 @@ class a800_rom_williams_device : public a800_rom_device
 {
 public:
 	// construction/destruction
+	a800_rom_williams_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void cart_map(address_map &map) override;
@@ -68,31 +69,24 @@ protected:
 	int m_bank;
 
 private:
-	uint8_t read(offs_t offset);
 	uint8_t disable_rom_r(offs_t offset);
 	void disable_rom_w(offs_t offset, uint8_t data);
-	uint8_t rom_bank_r(offs_t offset);
-	void rom_bank_w(offs_t offset, uint8_t data);
+	virtual uint8_t rom_bank_r(offs_t offset);
+	virtual void rom_bank_w(offs_t offset, uint8_t data);
 };
 
 
 // ======================> a800_rom_express_device
 
-class a800_rom_express_device : public a800_rom_device
+class a800_rom_express_device : public a800_rom_williams_device
 {
 public:
 	// construction/destruction
 	a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t read_80xx(offs_t offset) override;
-	virtual void write_d5xx(offs_t offset, uint8_t data) override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	int m_bank;
+private:
+	virtual uint8_t rom_bank_r(offs_t offset) override;
+	virtual void rom_bank_w(offs_t offset, uint8_t data) override;
 };
 
 

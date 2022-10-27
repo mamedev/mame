@@ -1783,7 +1783,6 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 			break;
 		case A800_OSS034M:
 		case A800_OSS043M:
-		case A800_EXPRESS:
 		case A800_DIAMOND:
 		//case A800_WILLIAMS:
 			// use m_cart_disabled & m_last_offs to avoid continuous remapping of
@@ -1886,10 +1885,6 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 		case A800_PHOENIX:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
-			break;
-		case A800_EXPRESS:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd570, 0xd57f, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
 			break;
 		case A800_DIAMOND:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
