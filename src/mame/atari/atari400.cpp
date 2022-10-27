@@ -1908,13 +1908,6 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd500, 0xd5ff, read8sm_delegate(*this, FUNC(a400_state::read_d5xx)), write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
 			break;
-		case A800_TELELINK2:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0x90ff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_80xx)));
-			m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd501, 0xd501, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_d5xx)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd502, 0xd502, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_d5xx)));
-			break;
 		case A800_XEGS:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);

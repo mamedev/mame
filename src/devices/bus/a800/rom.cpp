@@ -367,7 +367,6 @@ void a800_rom_turbo_device::write_d5xx(offs_t offset, uint8_t data)
 
  Telelink II
 
-
  -------------------------------------------------*/
 
 a800_rom_telelink2_device::a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -392,31 +391,32 @@ void a800_rom_telelink2_device::device_start()
 	save_pointer(NAME(m_nvram_ptr), nvram_size);
 }
 
-uint8_t a800_rom_telelink2_device::read_80xx(offs_t offset)
+void a800_rom_telelink2_device::device_reset()
 {
-	if (offset >= 0x2000)
-		return m_rom[offset & 0x1fff];
-	if (offset >= 0x1000 && offset < 0x1100)
-		return m_nvram_ptr[offset & 0xff];
-
-	return 0xff;
+	// TODO: rd4 is likely disabled at startup then enabled somehow
+	rd4_w(1);
+	rd5_w(1);
 }
 
-void a800_rom_telelink2_device::write_80xx(offs_t offset, uint8_t data)
+
+void a800_rom_telelink2_device::cart_map(address_map &map)
 {
-	m_nvram_ptr[offset & 0xff] = data | 0xf0;   // low 4bits only
+	// 4-bit NVRAM
+	map(0x1000, 0x10ff).lrw8(
+		NAME([this](offs_t offset) { return m_nvram_ptr[offset & 0xff]; }),
+		NAME([this](offs_t offset, u8 data) { m_nvram_ptr[offset & 0xff] = data | 0xf0; })
+	);
+	map(0x2000, 0x3fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[offset & 0x1fff]; })
+	);
 }
 
-uint8_t a800_rom_telelink2_device::read_d5xx(offs_t offset)
+void a800_rom_telelink2_device::cctl_map(address_map &map)
 {
-	// this should affect NVRAM enable / save
-	return 0xff;
+//	map(0x01, 0x01) read before reading NVRAM, value discarded
+//	map(0x02, 0x02) written before writing NVRAM when changing stored information
 }
 
-void a800_rom_telelink2_device::write_d5xx(offs_t offset, uint8_t data)
-{
-	// this should affect NVRAM enable / save
-}
 
 
 
