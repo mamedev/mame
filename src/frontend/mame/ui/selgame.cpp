@@ -423,13 +423,19 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 								cloneof = false;
 						}
 
-						item_append(elem.description, cloneof ? FLAG_INVERT : 0, (void *)&info);
+						item_append(info.devicetype.empty() ? elem.description : info.longname,
+								 cloneof ? FLAG_INVERT : 0,
+								 (void *)&info);
 					}
 					else
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
 							old_item_selected = curitem;
-						item_append(elem.description, info.devicetype, info.parentname.empty() ? 0 : FLAG_INVERT, (void *)&info);
+
+						item_append(info.devicetype.empty() ? elem.description : info.longname,
+								info.devicetype,
+								info.parentname.empty() ? 0 : FLAG_INVERT,
+								(void *)&info);
 					}
 					curitem++;
 				});
