@@ -19,6 +19,7 @@ public:
 	armedf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_extra(*this, "extra")
 		, m_nb1414m4(*this, "nb1414m4")
 		, m_screen(*this, "screen")
@@ -57,10 +58,15 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_config(machine_config &config, int hchar_start, int vstart, int vend);
+	void sound_config_common(machine_config &config);
 	void sound_config(machine_config &config);
+	void sound_config_3812(machine_config &config);
+	void sound_config_legion(machine_config &config);
+	void sound_config_legion_3812(machine_config &config);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_extra;
 	optional_device<nb1414m4_device> m_nb1414m4;
 	required_device<screen_device> m_screen;

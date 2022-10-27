@@ -38,6 +38,7 @@ public:
 		, m_rombank(*this, "rombank")
 	{ }
 
+	void galivan_common(machine_config &config);
 	void galivan(machine_config &config);
 	void ninjemak(machine_config &config);
 	void youmab(machine_config &config);
