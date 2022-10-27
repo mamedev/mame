@@ -275,6 +275,7 @@ void a800_rom_williams_device::device_start()
 void a800_rom_williams_device::device_reset()
 {
 	m_bank = 0;
+	rd4_w(0);
 	rd5_w(1);
 }
 
@@ -287,8 +288,8 @@ void a800_rom_williams_device::cart_map(address_map &map)
 
 void a800_rom_williams_device::cctl_map(address_map &map)
 {
-	map(0x00, 0x07).rw(FUNC(a800_rom_williams_device::rom_bank_r), FUNC(a800_rom_williams_device::rom_bank_w));
-	map(0x08, 0x0f).rw(FUNC(a800_rom_williams_device::disable_rom_r), FUNC(a800_rom_williams_device::disable_rom_w));
+	map(0x00, 0x07).mirror(0xf0).rw(FUNC(a800_rom_williams_device::rom_bank_r), FUNC(a800_rom_williams_device::rom_bank_w));
+	map(0x08, 0x0f).mirror(0xf0).rw(FUNC(a800_rom_williams_device::disable_rom_r), FUNC(a800_rom_williams_device::disable_rom_w));
 }
 
 uint8_t a800_rom_williams_device::disable_rom_r(offs_t offset)
