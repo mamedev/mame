@@ -8574,6 +8574,11 @@ static GFXDECODE_START( gfx_pkrmast )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout, 128+64, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_cmfb55 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout, 128+64, 16 )
+	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 )
+GFXDECODE_END
 
 static const gfx_layout cm97_layout =
 {
@@ -9021,6 +9026,12 @@ void cmaster_state::cmasterc(machine_config &config)
 {
 	cm(config);
 	m_gfxdecode->set_info(gfx_cmasterc);
+}
+
+void cmaster_state::cmfb55(machine_config &config)
+{
+	cm(config);
+	m_gfxdecode->set_info(gfx_cmfb55);
 }
 
 void cmaster_state::cm97(machine_config &config)
@@ -11811,6 +11822,33 @@ ROM_START( tonypok )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( cmfb55 ) // uses same GFX as pkrmast
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cherry master dyna plus v9.0. jackpot 9000.n3", 0x3000, 0x1000, CRC(875bc881) SHA1(c4b59442f6c55e37672d9b80712125042408d541) )
+	ROM_CONTINUE(                                              0x6000, 0x1000)
+	ROM_CONTINUE(                                              0x4000, 0x1000)
+	ROM_CONTINUE(                                              0x1000, 0x1000)
+	ROM_CONTINUE(                                              0x0000, 0x1000)
+	ROM_CONTINUE(                                              0x2000, 0x1000)
+	ROM_CONTINUE(                                              0x7000, 0x1000)
+	ROM_CONTINUE(                                              0x5000, 0x1000)
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "cherry master f-3.f3", 0x00000,  0x20000, CRC(ed0dfbfe) SHA1(c3a5b68e821461b161293eaec1515e2b0f26c4f9) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) // reels
+	ROM_LOAD( "cherry master h-3.3h", 0x00000,  0x10000, CRC(4c42f829) SHA1(110f7b7cd186d0e56ae822709ad42db70a3d0788) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "c.m.89-005-8.j6",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x10000, "proms", 0 )
+	ROM_LOAD( "cherry master n-5.n5", 0x00000, 0x10000, CRC(2ae7f151) SHA1(b41ec09fddf51895dfcca461d9b0ddb1cdb72506) ) // this uses a big ROM containing the data for the usual PROMs
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_COPY( "proms", 0x1000, 0x0000, 0x0100 )
 ROM_END
 
 // the program roms on these are scrambled
@@ -19856,6 +19894,7 @@ GAMEL( 1991, cmasterk,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,
 GAMEL( 199?, super7,    cmaster,  super7,   cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb ) // bad palette, no reels, decryption might be missing something, too
 GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 GAMEL( 199?, ll3,       cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
+GAMEL( 199?, cmfb55,    cmaster,  cmfb55,   cmaster,  cmaster_state,  empty_init,     ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    MACHINE_NOT_WORKING, layout_cmv4 ) // wrong palette, inputs not done
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
