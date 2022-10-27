@@ -268,6 +268,8 @@ public:
 		, m_dac(*this, "dac")
 		, m_region_maincpu(*this, "maincpu")
 		, m_cartleft(*this, "cartleft")
+		, m_cart_rd4_view(*this, "cart_rd4_view")
+		, m_cart_rd5_view(*this, "cart_rd5_view")
 		, m_ctrl(*this, "ctrl%u", 1U)
 	{ }
 
@@ -330,20 +332,28 @@ private:
 	void write_corina_d5xx(offs_t offset, uint8_t data);
 
 protected:
-	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	optional_device<ram_device> m_ram;
 	optional_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
 	required_device<a800_cart_slot_device> m_cartleft;
+	memory_view m_cart_rd4_view, m_cart_rd5_view;
 	optional_device_array<vcs_control_port_device, 4> m_ctrl;
 
+	void hw_iomap(address_map &map);
+
+	bool m_cart_rd4_enabled, m_cart_rd5_enabled;
+	DECLARE_WRITE_LINE_MEMBER( cart_rd4_w );
+	DECLARE_WRITE_LINE_MEMBER( cart_rd5_w );
+
+	virtual void area_8000_map(address_map &map);
+	virtual void area_a000_map(address_map &map);
+
+	// TODO: remove all of this
 	int m_cart_disabled, m_cart_helper;
 	int m_last_offs;
 
 	void setup_cart(a800_cart_slot_device *slot);
-
-	void hw_iomap(address_map &map);
 };
 
 class a800_state : public a400_state
@@ -416,6 +426,8 @@ protected:
 	virtual void portb_cb(uint8_t data) override;
 
 	void a800xl_mem(address_map &map);
+
+	virtual void area_a000_map(address_map &map) override;
 
 	memory_view m_basic_view;
 };
@@ -513,15 +525,32 @@ void a400_state::hw_iomap(address_map &map)
 	map(0x0200, 0x02ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x0300, 0x03ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0x0400, 0x04ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
-	map(0x0500, 0x05ff).noprw();
+	map(0x0500, 0x05ff).rw(m_cartleft, FUNC(a800_cart_slot_device::read_cctl), FUNC(a800_cart_slot_device::write_cctl));
 	map(0x0600, 0x07ff).noprw();
 }
+
+void a400_state::area_8000_map(address_map &map)
+{
+	map(0x8000, 0x9fff).view(m_cart_rd4_view);
+	m_cart_rd4_view[0](0x8000, 0x9fff).rw(FUNC(a400_state::ram_r<0x8000>), FUNC(a400_state::ram_w<0x8000>));
+	m_cart_rd4_view[1](0x8000, 0x9fff).rw(m_cartleft, FUNC(a800_cart_slot_device::read_cart<0>), FUNC(a800_cart_slot_device::write_cart<0>));
+}
+
+void a400_state::area_a000_map(address_map &map)
+{
+	map(0xa000, 0xbfff).view(m_cart_rd5_view);
+	m_cart_rd5_view[0](0xa000, 0xbfff).rw(FUNC(a400_state::ram_r<0xa000>), FUNC(a400_state::ram_w<0xa000>));
+	m_cart_rd5_view[1](0xa000, 0xbfff).rw(m_cartleft, FUNC(a800_cart_slot_device::read_cart<1>), FUNC(a800_cart_slot_device::write_cart<1>));
+}
+
 
 // a400/a800 explicitly expects floating bus for unmapped ranges, will punt with value_low()
 void a400_state::a400_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xbfff).rw(FUNC(a400_state::ram_r<0x0000>), FUNC(a400_state::ram_w<0x0000>));
+	map(0x0000, 0x7fff).rw(FUNC(a400_state::ram_r<0x0000>), FUNC(a400_state::ram_w<0x0000>));
+	area_8000_map(map);
+	area_a000_map(map);
 	map(0xc000, 0xcfff).rom();
 	map(0xd000, 0xd7ff).m(*this, FUNC(a400_state::hw_iomap));
 	map(0xd800, 0xffff).rom();
@@ -557,21 +586,36 @@ void a1200xl_state::a1200xl_mem(address_map &map)
 	map(0x4000, 0x7fff).view(m_selftest_view);
 	selftest_map(m_selftest_view[0], false);
 	selftest_map(m_selftest_view[1], true);
-	map(0x8000, 0x9fff).rw(FUNC(a1200xl_state::ram_r<0x8000>), FUNC(a1200xl_state::ram_w<0x8000>));
-	map(0xa000, 0xbfff).rw(FUNC(a1200xl_state::ram_r<0xa000>), FUNC(a1200xl_state::ram_w<0xa000>));
+	area_8000_map(map);
+	area_a000_map(map);
 	map(0xc000, 0xffff).view(m_kernel_view);
 	m_kernel_view[0](0xc000, 0xffff).rw(FUNC(a1200xl_state::ram_r<0xc000>), FUNC(a1200xl_state::ram_w<0xc000>));
 	m_kernel_view[1](0xc000, 0xffff).rom().region("maincpu", 0xc000);
 	map(0xd000, 0xd7ff).m(*this, FUNC(a1200xl_state::hw_iomap));
 }
 
+void a800xl_state::area_a000_map(address_map &map)
+{
+	map(0xa000, 0xbfff).view(m_cart_rd5_view);
+	m_cart_rd5_view[0](0xa000, 0xbfff).view(m_basic_view);
+	m_basic_view[0](0xa000, 0xbfff).rw(FUNC(a800xl_state::ram_r<0xa000>), FUNC(a800xl_state::ram_w<0xa000>));
+	m_basic_view[1](0xa000, 0xbfff).rom().region("maincpu", 0xa000);
+	m_cart_rd5_view[1](0xa000, 0xbfff).rw(m_cartleft, FUNC(a800_cart_slot_device::read_cart<1>), FUNC(a800_cart_slot_device::write_cart<1>));
+}
+
 void a800xl_state::a800xl_mem(address_map &map)
 {
 	map.unmap_value_high();
-	a1200xl_mem(map);
-	map(0xa000, 0xbfff).view(m_basic_view);
-	m_basic_view[0](0xa000, 0xbfff).rw(FUNC(a800xl_state::ram_r<0xa000>), FUNC(a800xl_state::ram_w<0xa000>));
-	m_basic_view[1](0xa000, 0xbfff).rom().region("maincpu", 0xa000);
+	map(0x0000, 0x3fff).rw(FUNC(a800xl_state::ram_r<0x0000>), FUNC(a800xl_state::ram_w<0x0000>));
+	map(0x4000, 0x7fff).view(m_selftest_view);
+	selftest_map(m_selftest_view[0], false);
+	selftest_map(m_selftest_view[1], true);
+	area_8000_map(map);
+	area_a000_map(map);
+	map(0xc000, 0xffff).view(m_kernel_view);
+	m_kernel_view[0](0xc000, 0xffff).rw(FUNC(a800xl_state::ram_r<0xc000>), FUNC(a800xl_state::ram_w<0xc000>));
+	m_kernel_view[1](0xc000, 0xffff).rom().region("maincpu", 0xc000);
+	map(0xd000, 0xd7ff).m(*this, FUNC(a800xl_state::hw_iomap));
 }
 
 // selftest ROM has still priority over regular a130xe extended RAM
@@ -591,10 +635,8 @@ void a130xe_state::a130xe_mem(address_map &map)
 	selftest_map(m_selftest_view[0], false);
 	selftest_map(m_selftest_view[1], true);
 	m_ext_view[1](0x4000, 0x7fff).m(m_ext_bank, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0x9fff).rw(FUNC(a130xe_state::ram_r<0x8000>), FUNC(a130xe_state::ram_w<0x8000>));
-	map(0xa000, 0xbfff).view(m_basic_view);
-	m_basic_view[0](0xa000, 0xbfff).rw(FUNC(a130xe_state::ram_r<0xa000>), FUNC(a130xe_state::ram_w<0xa000>));
-	m_basic_view[1](0xa000, 0xbfff).rom().region("maincpu", 0xa000);
+	area_8000_map(map);
+	area_a000_map(map);
 	map(0xc000, 0xffff).view(m_kernel_view);
 	m_kernel_view[0](0xc000, 0xffff).rw(FUNC(a130xe_state::ram_r<0xc000>), FUNC(a130xe_state::ram_w<0xc000>));
 	m_kernel_view[1](0xc000, 0xffff).rom().region("maincpu", 0xc000);
@@ -1658,6 +1700,18 @@ LIGHT-ORANGE
  *
  **************************************************************/
 
+WRITE_LINE_MEMBER( a400_state::cart_rd4_w )
+{
+	m_cart_rd4_enabled = state;
+	m_cart_rd4_view.select(m_cart_rd4_enabled);
+}
+
+WRITE_LINE_MEMBER( a400_state::cart_rd5_w )
+{
+	m_cart_rd5_enabled = state;
+	m_cart_rd5_view.select(m_cart_rd5_enabled);
+}
+
 // these handle cart enable/disable without calling setup_ram thousands of times
 // TODO: this should really live in a800_slot file
 uint8_t a400_state::special_read_8000(offs_t offset)
@@ -1716,36 +1770,6 @@ uint8_t a400_state::read_d5xx(offs_t offset)
 	return 0xff;
 }
 
-uint8_t a400_state::read_corina_overlay(offs_t offset)
-{
-	if (!m_cart_disabled)
-		return m_cartleft->read_80xx(offset);
-	offset += 0x8000;
-	if (m_ram->size() < offset)
-		return 0;
-	else
-		return m_ram->pointer()[offset];
-}
-
-void a400_state::write_corina_overlay(offs_t offset, uint8_t data)
-{
-	if (!m_cart_disabled)
-	{
-		m_cartleft->write_80xx(offset, data);
-		return;
-	}
-
-	offset += 0x8000;
-	if (m_ram->size() >= offset)
-		m_ram->pointer()[offset] = data;
-}
-
-void a400_state::write_corina_d5xx(offs_t offset, uint8_t data)
-{
-	m_cart_disabled = BIT(data, 7);
-	m_cartleft->write_d5xx(offset, data);
-}
-
 void a400_state::disable_cart(offs_t offset, uint8_t data)
 {
 	if (m_cartleft->exists())
@@ -1761,7 +1785,7 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 		case A800_OSS043M:
 		case A800_EXPRESS:
 		case A800_DIAMOND:
-		case A800_WILLIAMS:
+		//case A800_WILLIAMS:
 			// use m_cart_disabled & m_last_offs to avoid continuous remapping of
 			// the memory space in some games (e.g. dropzone)
 			if (offset & 0x8 && !m_cart_disabled)
@@ -1871,10 +1895,6 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5d0, 0xd5df, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
 			break;
-		case A800_WILLIAMS:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd50f, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
-			break;
 		case A800_SPARTADOS:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5e0, 0xd5ef, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
@@ -1900,15 +1920,7 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_d5xx)));
 			break;
-		case A800_CORINA:
-		case A800_CORINA_SRAM:
-			//m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-			//m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xbfff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_80xx)));
-			//m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd500, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_d5xx)));
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::read_corina_overlay)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xbfff, write8sm_delegate(*this, FUNC(a400_state::write_corina_overlay)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd500, write8sm_delegate(*this, FUNC(a400_state::write_corina_d5xx)));
-			break;
+
 		case A5200_4K:
 		case A5200_8K:
 		case A5200_16K:
@@ -1953,6 +1965,8 @@ void a400_state::machine_start()
 {
 	setup_cart(m_cartleft);
 
+	save_item(NAME(m_cart_rd4_enabled));
+	save_item(NAME(m_cart_rd5_enabled));
 	save_item(NAME(m_cart_disabled));
 	save_item(NAME(m_cart_helper));
 	save_item(NAME(m_last_offs));
@@ -1979,6 +1993,11 @@ void xegs_state::machine_start()
 void a400_state::machine_reset()
 {
 	m_pokey->write(15, 0);
+
+//	m_cart_rd4_enabled = m_cartleft->exists();
+//	m_cart_rd5_enabled = m_cartleft->exists();
+//	m_cart_rd4_view.select(m_cart_rd4_enabled);
+//	m_cart_rd5_view.select(m_cart_rd5_enabled);
 }
 
 void a1200xl_state::machine_reset()
@@ -2136,6 +2155,10 @@ void a130xe_state::portb_cb(uint8_t data)
 	}
 	else
 		m_ext_view.select(0);
+
+	// dirty check for ANTIC extended memory access, to be removed out of this branch ...
+	if ((!BIT(data, 5) && BIT(data, 4)) || (!BIT(data, 4) && BIT(data, 5)))
+		popmessage("ANTIC extended memory access, implement me %02x", data & 0x18);
 }
 
 // TODO: propagate portb to RAMBO XL and COMPY sub-devices for a800xl and onward
@@ -2243,6 +2266,8 @@ void a400_state::atari_common(machine_config &config)
 	ATARI_FDC(config, "fdc", 0);
 
 	A800_CART_SLOT(config, m_cartleft, a800_left, nullptr);
+	m_cartleft->rd4_callback().set(FUNC(a400_state::cart_rd4_w));
+	m_cartleft->rd5_callback().set(FUNC(a400_state::cart_rd5_w));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("a800_flop");

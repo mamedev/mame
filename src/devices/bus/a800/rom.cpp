@@ -57,14 +57,6 @@ xegs_rom_device::xegs_rom_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-
-a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_WILLIAMS, tag, owner, clock)
-	, m_bank(0)
-{
-}
-
-
 a800_rom_express_device::a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, A800_ROM_EXPRESS, tag, owner, clock)
 	, m_bank(0)
@@ -128,18 +120,6 @@ void xegs_rom_device::device_reset()
 {
 	m_bank = 0;
 }
-
-
-void a800_rom_williams_device::device_start()
-{
-	save_item(NAME(m_bank));
-}
-
-void a800_rom_williams_device::device_reset()
-{
-	m_bank = 0;
-}
-
 
 void a800_rom_express_device::device_start()
 {
@@ -281,13 +261,62 @@ void xegs_rom_device::write_d5xx(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-uint8_t a800_rom_williams_device::read_80xx(offs_t offset)
+a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, A800_ROM_WILLIAMS, tag, owner, clock)
+	, m_bank(0)
 {
-	return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
 }
 
-void a800_rom_williams_device::write_d5xx(offs_t offset, uint8_t data)
+void a800_rom_williams_device::device_start()
 {
+	save_item(NAME(m_bank));
+}
+
+void a800_rom_williams_device::device_reset()
+{
+	m_bank = 0;
+	rd5_w(1);
+}
+
+void a800_rom_williams_device::cart_map(address_map &map)
+{
+	map(0x2000, 0x3fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)]; })
+	);
+}
+
+void a800_rom_williams_device::cctl_map(address_map &map)
+{
+	map(0x00, 0x07).rw(FUNC(a800_rom_williams_device::rom_bank_r), FUNC(a800_rom_williams_device::rom_bank_w));
+	map(0x08, 0x0f).rw(FUNC(a800_rom_williams_device::disable_rom_r), FUNC(a800_rom_williams_device::disable_rom_w));
+}
+
+uint8_t a800_rom_williams_device::disable_rom_r(offs_t offset)
+{
+	if(!machine().side_effects_disabled())
+		rd5_w(0);
+
+	return 0xff;
+}
+
+void a800_rom_williams_device::disable_rom_w(offs_t offset, uint8_t data)
+{
+	rd5_w(0);
+}
+
+uint8_t a800_rom_williams_device::rom_bank_r(offs_t offset)
+{
+	if(!machine().side_effects_disabled())
+	{
+		rd5_w(1);
+		m_bank = (offset & 0x07);
+	}
+	return 0xff;
+}
+
+void a800_rom_williams_device::rom_bank_w(offs_t offset, uint8_t data)
+{
+	rd5_w(1);
 	m_bank = (offset & 0x07);
 }
 
@@ -421,8 +450,8 @@ void a800_rom_microcalc_device::write_d5xx(offs_t offset, uint8_t data)
 a800_rom_corina_device::a800_rom_corina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, type, tag, owner, clock)
 	, m_nvram(*this, "nvram")
+	, m_view(*this, "corina_view")
 	, m_rom_bank(0)
-	, m_view_select(0)
 {
 }
 
@@ -449,15 +478,35 @@ void a800_rom_corina_device::device_start()
 
 	save_pointer(NAME(m_nvram_ptr), nvram_size);
 	save_item(NAME(m_rom_bank));
-	save_item(NAME(m_view_select));
 }
 
 void a800_rom_corina_device::device_reset()
 {
 	m_rom_bank = 0;
-	m_view_select = 0;
+	m_view.select(0);
+	rd_both_w(1);
 }
 
+void a800_rom_corina_device::cart_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).view(m_view);
+	// TODO: spam writes during loading, flash commands?
+	m_view[0](0x0000, 0x3fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & 0x3fff) + (m_rom_bank * 0x4000)]; })
+	);
+	m_view[1](0x0000, 0x3fff).rw(FUNC(a800_rom_corina_device::read_view_1), FUNC(a800_rom_corina_device::write_view_1));
+	m_view[2](0x0000, 0x3fff).lrw8(
+		NAME([this](offs_t offset) { return m_nvram_ptr[offset & 0x1fff]; }),
+		NAME([this](offs_t offset, uint8_t data) { m_nvram_ptr[offset & 0x1fff] = data; })
+	);
+	m_view[3](0x0000, 0x3fff).unmaprw();
+}
+
+void a800_rom_corina_device::cctl_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(a800_rom_corina_device::ctrl_w));
+}
 
 uint8_t a800_rom_corina_device::read_view_1(offs_t offset)
 {
@@ -478,38 +527,6 @@ void a800_rom_corina_sram_device::write_view_1(offs_t offset, u8 data)
 	m_ram[(offset & 0x3fff) + (m_rom_bank * 0x4000)] = data;
 }
 
-uint8_t a800_rom_corina_device::read_80xx(offs_t offset)
-{
-	switch( m_view_select )
-	{
-		case 0:
-			return m_rom[(offset & 0x3fff) + (m_rom_bank * 0x4000)];
-		case 1:
-			return read_view_1(offset);
-		case 2:
-			return m_nvram_ptr[offset & 0x1fff];
-	}
-
-	logerror("view select R=3 [%04x]\n", offset);
-	return 0xff;
-}
-
-void a800_rom_corina_device::write_80xx(offs_t offset, uint8_t data)
-{
-	switch( m_view_select )
-	{
-		case 1:
-			write_view_1(offset, data);
-			return;
-		case 2:
-			m_nvram_ptr[offset & 0x1fff] = data;
-			return;
-	}
-	// view 0: flash ROM commands?
-	// TODO: identify
-	logerror("view select W=%d [%04x, %02x] -> %02x\n", m_view_select, offset, m_rom_bank, data);
-}
-
 /*
  * 0--- ---- enable Corina window
  * 1--- ---- disable Corina and select main unit 8000-bfff window instead
@@ -522,11 +539,11 @@ void a800_rom_corina_device::write_80xx(offs_t offset, uint8_t data)
  *           ignored if view select is not in ROM/RAM mode
  *           or Corina window is disabled
  */
-void a800_rom_corina_device::write_d5xx(offs_t offset, uint8_t data)
+void a800_rom_corina_device::ctrl_w(offs_t offset, uint8_t data)
 {
 	m_rom_bank = data & 0x1f;
-	m_view_select = (data & 0x60) >> 5;
-	// TODO: bit 7, currently handled in a400_state
+	m_view.select((data & 0x60) >> 5);
+	rd_both_w(!BIT(data, 7));
 }
 
 

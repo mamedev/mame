@@ -45,6 +45,8 @@ enum
 };
 
 
+class a800_cart_slot_device;
+
 // ======================> device_a800_cart_interface
 
 class device_a800_cart_interface : public device_interface
@@ -53,7 +55,10 @@ public:
 	// construction/destruction
 	virtual ~device_a800_cart_interface();
 
-	// memory accessor
+	virtual void cart_map(address_map &map);
+	virtual void cctl_map(address_map &map);
+
+	// TODO: remove me
 	virtual uint8_t read_80xx(offs_t offset) { return 0xff; }
 	virtual uint8_t read_d5xx(offs_t offset) { return 0xff; }
 	virtual void write_80xx(offs_t offset, uint8_t data) {}
@@ -69,21 +74,36 @@ public:
 protected:
 	device_a800_cart_interface(const machine_config &mconfig, device_t &device);
 
+	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
+	a800_cart_slot_device *m_slot;
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
 	std::vector<uint8_t> m_ram;
 	// helpers
 	int m_bank_mask;
+
+	DECLARE_WRITE_LINE_MEMBER( rd4_w );
+	DECLARE_WRITE_LINE_MEMBER( rd5_w );
+	DECLARE_WRITE_LINE_MEMBER( rd_both_w );
+
+	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
+	virtual void write_cart(offs_t offset, uint8_t data) { }
+	virtual uint8_t read_cctl(offs_t offset) { return 0xff; }
+	virtual void write_cctl(offs_t offset, uint8_t data) { }
 };
 
 
 // ======================> a800_cart_slot_device
 
 class a800_cart_slot_device : public device_t,
+								public device_memory_interface,
 								public device_cartrom_image_interface,
 								public device_single_card_slot_interface<device_a800_cart_interface>
 {
+	friend class device_a800_cart_interface;
 public:
 	// construction/destruction
 	template <typename T>
@@ -112,8 +132,15 @@ public:
 	int get_cart_type() { return m_type; }
 	int identify_cart_type(const uint8_t *header) const;
 	bool has_cart() { return m_cart != nullptr; }
+	auto rd4_callback() { return m_rd4_cb.bind(); }
+	auto rd5_callback() { return m_rd5_cb.bind(); }
 
-	// reading and writing
+	template <unsigned Bank> uint8_t read_cart(offs_t offset);
+	template <unsigned Bank> void write_cart(offs_t offset, uint8_t data);
+	uint8_t read_cctl(offs_t offset);
+	void write_cctl(offs_t offset, uint8_t data);
+
+	// TODO: remove me
 	uint8_t read_80xx(offs_t offset);
 	uint8_t read_d5xx(offs_t offset);
 	void write_80xx(offs_t offset, uint8_t data);
@@ -124,10 +151,22 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_resolve_objects() override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	device_a800_cart_interface*       m_cart;
 	int m_type;
+
+	devcb_write_line m_rd4_cb;
+	devcb_write_line m_rd5_cb;
+
+	address_space_config m_space_mem_config;
+	address_space_config m_space_io_config;
+
+	address_space *m_space_mem;
+	address_space *m_space_io;
+
 };
 
 

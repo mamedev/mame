@@ -39,12 +39,13 @@ DEFINE_DEVICE_TYPE(XEGS_CART_SLOT,  xegs_cart_slot_device,  "xegs_cart_slot",  "
 //  device_vcs_cart_interface - constructor
 //-------------------------------------------------
 
-device_a800_cart_interface::device_a800_cart_interface (const machine_config &mconfig, device_t &device) :
-	device_interface(device, "a800cart"),
-	m_rom(nullptr),
-	m_rom_size(0),
-	m_bank_mask(0)
+device_a800_cart_interface::device_a800_cart_interface (const machine_config &mconfig, device_t &device)
+	: device_interface(device, "a800cart")
+	, m_rom(nullptr)
+	, m_rom_size(0)
+	, m_bank_mask(0)
 {
+	m_slot = dynamic_cast<a800_cart_slot_device *>(device.owner());
 }
 
 
@@ -82,6 +83,34 @@ void device_a800_cart_interface::ram_alloc(uint32_t size)
 	device().save_item(NAME(m_ram));
 }
 
+void device_a800_cart_interface::interface_pre_start()
+{
+	if (!m_slot->started())
+		throw device_missing_dependencies();
+}
+
+void device_a800_cart_interface::interface_post_start()
+{
+	m_slot->m_space_mem->install_device(0x0000, 0x3fff, *this, &device_a800_cart_interface::cart_map);
+	m_slot->m_space_io->install_device(0x0000, 0x00ff, *this, &device_a800_cart_interface::cctl_map);
+
+}
+
+void device_a800_cart_interface::cart_map(address_map &map)
+{
+	map(0x0000, 0x3fff).unmaprw();
+}
+
+void device_a800_cart_interface::cctl_map(address_map &map)
+{
+	map(0x0000, 0x00ff).unmaprw();
+}
+
+WRITE_LINE_MEMBER( device_a800_cart_interface::rd4_w ) { m_slot->m_rd4_cb(state); }
+WRITE_LINE_MEMBER( device_a800_cart_interface::rd5_w ) { m_slot->m_rd5_cb(state); }
+// helper to call both lines at same time, for anything banking on the full range.
+WRITE_LINE_MEMBER( device_a800_cart_interface::rd_both_w ) { rd4_w(state); rd5_w(state); }
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -92,10 +121,15 @@ void device_a800_cart_interface::ram_alloc(uint32_t size)
 //-------------------------------------------------
 a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_a800_cart_interface>(mconfig, *this)
 	, m_cart(nullptr)
 	, m_type(0)
+	, m_rd4_cb(*this)
+	, m_rd5_cb(*this)
+	, m_space_mem_config("cart_mem", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor())
+	, m_space_io_config("cart_io", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor())
 {
 }
 
@@ -140,6 +174,14 @@ xegs_cart_slot_device::~xegs_cart_slot_device()
 void a800_cart_slot_device::device_start()
 {
 	m_cart = get_card_device();
+	m_space_io = &space(AS_IO);
+	m_space_mem = &space(AS_PROGRAM);
+}
+
+void a800_cart_slot_device::device_resolve_objects()
+{
+	m_rd4_cb.resolve_safe();
+	m_rd5_cb.resolve_safe();
 }
 
 /*-------------------------------------------------
@@ -262,10 +304,7 @@ image_init_result a800_cart_slot_device::call_load()
 			m_cart->rom_alloc(len);
 			fread(m_cart->get_rom_base(), len);
 		}
-		//if (m_type == A800_TELELINK2)
-		//	m_cart->nvram_alloc(0x100);
-		//if (m_type == A800_CORINA || m_type == A800_CORINA_SRAM)
-		//	m_cart->nvram_alloc(0x2000);
+		// TODO: remove these
 		if (m_type == A800_CORINA)
 			m_cart->ram_alloc(0x4000);
 		if (m_type == A800_CORINA_SRAM)
@@ -489,6 +528,40 @@ std::string xegs_cart_slot_device::get_default_card_software(get_default_card_so
 /*-------------------------------------------------
  read
  -------------------------------------------------*/
+
+device_memory_interface::space_config_vector a800_cart_slot_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(AS_PROGRAM, &m_space_mem_config),
+		std::make_pair(AS_IO, &m_space_io_config)
+	};
+}
+
+template <unsigned Bank> uint8_t a800_cart_slot_device::read_cart(offs_t offset)
+{
+	return m_space_mem->read_byte(offset | Bank << 13);
+}
+
+template <unsigned Bank> void a800_cart_slot_device::write_cart(offs_t offset, uint8_t data)
+{
+	return m_space_mem->write_byte(offset | Bank << 13, data);
+}
+
+// Instantiate maps
+template uint8_t a800_cart_slot_device::read_cart<0>(offs_t offset);
+template uint8_t a800_cart_slot_device::read_cart<1>(offs_t offset);
+template void a800_cart_slot_device::write_cart<0>(offs_t offset, uint8_t data);
+template void a800_cart_slot_device::write_cart<1>(offs_t offset, uint8_t data);
+
+uint8_t a800_cart_slot_device::read_cctl(offs_t offset)
+{
+	return m_space_io->read_byte(offset);
+}
+
+void a800_cart_slot_device::write_cctl(offs_t offset, uint8_t data)
+{
+	m_space_io->write_byte(offset, data);
+}
 
 uint8_t a800_cart_slot_device::read_80xx(offs_t offset)
 {

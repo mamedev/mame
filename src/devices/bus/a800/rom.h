@@ -57,8 +57,8 @@ public:
 	// construction/destruction
 	a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t read_80xx(offs_t offset) override;
-	virtual void write_d5xx(offs_t offset, uint8_t data) override;
+	virtual void cart_map(address_map &map) override;
+	virtual void cctl_map(address_map &map) override;
 
 protected:
 	// device-level overrides
@@ -66,6 +66,13 @@ protected:
 	virtual void device_reset() override;
 
 	int m_bank;
+
+private:
+	uint8_t read(offs_t offset);
+	uint8_t disable_rom_r(offs_t offset);
+	void disable_rom_w(offs_t offset, uint8_t data);
+	uint8_t rom_bank_r(offs_t offset);
+	void rom_bank_w(offs_t offset, uint8_t data);
 };
 
 
@@ -176,9 +183,8 @@ public:
 	a800_rom_corina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	a800_rom_corina_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t read_80xx(offs_t offset) override;
-	virtual void write_80xx(offs_t offset, uint8_t data) override;
-	virtual void write_d5xx(offs_t offset, uint8_t data) override;
+	virtual void cart_map(address_map &map) override;
+	virtual void cctl_map(address_map &map) override;
 
 protected:
 	// device-level overrides
@@ -191,9 +197,11 @@ protected:
 	virtual uint8_t read_view_1(offs_t offset);
 	virtual void write_view_1(offs_t offset, u8 data);
 
+	void ctrl_w(offs_t offset, u8 data);
+
 	required_device<nvram_device> m_nvram;
+	memory_view m_view;
 	u8 m_rom_bank;
-	u8 m_view_select;
 };
 
 class a800_rom_corina_sram_device : public a800_rom_corina_device
