@@ -1042,8 +1042,10 @@ a certain time, and this isn't currently emulated.
 		</part>
 	</software>
 
+	<!-- US release of Matrix: Gridrunner 2, sequel of gridrunr -->
+	<!-- Not to be confused with the European '84 release of Attack of the Mutant Camels, different game but still developed by Jeff Minter -->
 	<software name="mtntcmls">
-		<description>Attack of the Mutant Camels</description>
+		<description>Attack of the Mutant Camels (US)</description>
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C518" />
@@ -6011,6 +6013,8 @@ Has garbage row strip on top of active playfield during hammer throw event
 		</part>
 	</software>
 
+	<!-- TODO: turboc* cartridges not extensively tested -->
+
 	<software name="turboc1" supported="no">
 		<description>Turbo Cartridge C1 (Spa, Pirate)</description>
 		<year>19??</year>
@@ -6160,6 +6164,9 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<description>Turbo Cartridge D7 (Spa, Pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo128" />
 			<dataarea name="rom" size="131072">
