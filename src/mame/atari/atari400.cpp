@@ -1802,23 +1802,6 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 				}
 			}
 			break;
-		case A800_TURBO64:
-		case A800_TURBO128:
-			if (offset & 0x10 && !m_cart_disabled)
-				m_cart_disabled = 1;
-			else if (!(offset & 0x10))
-			{
-				if (m_cart_disabled)
-					m_cart_disabled = 0;
-
-				if ((offset & 0x0f) != m_last_offs)
-				{
-					// we enter here only if we are writing to a different offset than last time
-					m_last_offs = offset & 0x0f;
-					m_cartleft->write_d5xx(offset & 0x0f, data);
-				}
-			}
-			break;
 		case A800_SPARTADOS:
 			// writes with offset & 8 are also used to enable/disable the subcart, so they go through!
 			m_cartleft->write_d5xx(offset, data);
@@ -1880,8 +1863,8 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 		case A800_OSS043M:
 		case A800_OSSM091:
 		case A800_OSS8K:
-		case A800_TURBO64:
-		case A800_TURBO128:
+//		case A800_TURBO64:
+//		case A800_TURBO128:
 		case A800_PHOENIX:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));

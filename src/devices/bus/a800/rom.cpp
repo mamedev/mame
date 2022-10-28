@@ -58,12 +58,6 @@ xegs_rom_device::xegs_rom_device(const machine_config &mconfig, const char *tag,
 }
 
 
-a800_rom_turbo_device::a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_TURBO, tag, owner, clock)
-	, m_bank(0)
-{
-}
-
 a800_rom_microcalc_device::a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, A800_ROM_MICROCALC, tag, owner, clock)
 	, m_bank(0)
@@ -114,17 +108,6 @@ void xegs_rom_device::device_reset()
 {
 	m_bank = 0;
 }
-
-void a800_rom_turbo_device::device_start()
-{
-	save_item(NAME(m_bank));
-}
-
-void a800_rom_turbo_device::device_reset()
-{
-	m_bank = 0;
-}
-
 
 void a800_rom_microcalc_device::device_start()
 {
@@ -262,6 +245,8 @@ void a800_rom_williams_device::device_start()
 
 void a800_rom_williams_device::device_reset()
 {
+	// turboc1 (at least) reads ROM window without setting bank first,
+	// any non-zero value will make it to punt
 	m_bank = 0;
 	rd4_w(0);
 	rd5_w(1);
@@ -293,12 +278,13 @@ void a800_rom_williams_device::disable_rom_w(offs_t offset, uint8_t data)
 	rd5_w(0);
 }
 
+// m_bank_mask necessary for turbo128 carts
 uint8_t a800_rom_williams_device::rom_bank_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 	{
 		rd5_w(1);
-		m_bank = (offset & 0x07);
+		m_bank = (offset & m_bank_mask);
 	}
 	return 0xff;
 }
@@ -306,7 +292,7 @@ uint8_t a800_rom_williams_device::rom_bank_r(offs_t offset)
 void a800_rom_williams_device::rom_bank_w(offs_t offset, uint8_t data)
 {
 	rd5_w(1);
-	m_bank = (offset & 0x07);
+	m_bank = (offset & m_bank_mask);
 }
 
 /*-------------------------------------------------
@@ -332,7 +318,7 @@ uint8_t a800_rom_express_device::rom_bank_r(offs_t offset)
 	if(!machine().side_effects_disabled())
 	{
 		rd5_w(1);
-		m_bank = ((offset ^ 0x7) & 0x07);
+		m_bank = ((offset ^ m_bank_mask) & m_bank_mask);
 	}
 	return 0xff;
 }
@@ -340,30 +326,34 @@ uint8_t a800_rom_express_device::rom_bank_r(offs_t offset)
 void a800_rom_express_device::rom_bank_w(offs_t offset, uint8_t data)
 {
 	rd5_w(1);
-	m_bank = ((offset ^ 0x7) & 0x07);
+	m_bank = ((offset ^ m_bank_mask) & m_bank_mask);
 }
 
 /*-------------------------------------------------
 
  Turbosoft 64K / 128K
 
+ Same as Williams cart but with CCTL A3 moved to A4
 
  -------------------------------------------------*/
 
-uint8_t a800_rom_turbo_device::read_80xx(offs_t offset)
+a800_rom_turbo_device::a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_williams_device(mconfig, A800_ROM_TURBO, tag, owner, clock)
 {
-	return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
 }
 
-void a800_rom_turbo_device::write_d5xx(offs_t offset, uint8_t data)
+void a800_rom_turbo_device::cctl_map(address_map &map)
 {
-	m_bank = offset & m_bank_mask;
+	map(0x00, 0x0f).mirror(0xe0).rw(FUNC(a800_rom_turbo_device::rom_bank_r), FUNC(a800_rom_turbo_device::rom_bank_w));
+	map(0x10, 0x1f).mirror(0xe0).rw(FUNC(a800_rom_turbo_device::disable_rom_r), FUNC(a800_rom_turbo_device::disable_rom_w));
 }
-
 
 /*-------------------------------------------------
 
  Telelink II
+
+ 4-bit NVRAM (unknown type) and other stuff not
+ known at current stage.
 
  -------------------------------------------------*/
 
@@ -377,7 +367,6 @@ void a800_rom_telelink2_device::device_add_mconfig(machine_config &config)
 {
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 }
-
 
 void a800_rom_telelink2_device::device_start()
 {
