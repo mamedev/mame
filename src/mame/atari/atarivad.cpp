@@ -308,7 +308,7 @@ void atari_vad_device::internal_control_write(offs_t offset, uint16_t newword)
 
 		// set the scanline interrupt here
 		case 0x03:
-			if (oldword != newword || !m_scanline_int_timer->enabled())
+			if (oldword != newword || !m_scanline_int_timer->running())
 				m_scanline_int_timer->adjust(screen().time_until_pos(newword & 0x1ff));
 			break;
 

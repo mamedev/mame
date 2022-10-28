@@ -289,6 +289,7 @@ gamepark/gp32.cpp
 gridcomp/gridcomp.cpp
 grundy/newbrain.cpp
 h01x/h01x.cpp
+handheld/gameking.cpp
 handheld/gmaster.cpp
 handheld/hh_cop400.cpp
 handheld/hh_cops1.cpp
@@ -415,13 +416,13 @@ intel/sdk86.cpp
 intergraph/interpro.cpp
 interton/vc4000.cpp
 isc/compucolor.cpp
-kawai/kawai_acr20.cpp
-kawai/kawai_k1.cpp
-kawai/kawai_k4.cpp
-kawai/kawai_k5.cpp
-kawai/kawai_ksp10.cpp
-kawai/kawai_r100.cpp
-kawai/kawai_sx240.cpp
+kawai/acr20.cpp
+kawai/k1.cpp
+kawai/k4.cpp
+kawai/k5.cpp
+kawai/ksp10.cpp
+kawai/r100.cpp
+kawai/sx240.cpp
 kaypro/kaypro.cpp
 koei/pasogo.cpp
 kontron/kdt6.cpp
@@ -524,6 +525,7 @@ ncd/ncd88k.cpp
 ncd/ncdmips.cpp
 ncd/ncdppc.cpp
 nec/apc.cpp
+nec/bungo.cpp
 nec/ews4800.cpp
 nec/pc100.cpp
 nec/pc6001.cpp
@@ -587,6 +589,7 @@ olympiaint/peoplepc.cpp
 omnibyte/msbc1.cpp
 omnibyte/ob68k1a.cpp
 omron/luna_68k.cpp
+omron/luna_88k.cpp
 openuni/hektor.cpp
 osborne/osbexec.cpp
 osborne/osborne1.cpp
@@ -843,7 +846,6 @@ skeleton/fk1.cpp
 skeleton/freedom120.cpp
 skeleton/fs3216.cpp
 skeleton/ft68m.cpp
-skeleton/gameking.cpp
 skeleton/gem_rp.cpp
 skeleton/gimix.cpp
 skeleton/gm1000.cpp

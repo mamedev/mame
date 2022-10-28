@@ -52,7 +52,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void program_map(address_map &map);
-	
+
 	required_device<sh3_device> m_maincpu;
 };
 
@@ -66,11 +66,11 @@ void m119_state::program_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom().region("maincpu", 0);
 	map(0x00400000, 0x0040ffff).ram(); // stack
 
-//	map(0x04000080, 0x04000083) address/data pairs, likely YMZ
-//	map(0x1000be01, 0x1000c1ff) filled as byte area
-//	map(0x1000c000, 0x1000ffff) ^
-//	0x18000096-0x18000097 writes before accessing byte area, banked view?
-//	0x180000b5 always 0xaa, paired with WTCSR $5a
+//  map(0x04000080, 0x04000083) address/data pairs, likely YMZ
+//  map(0x1000be01, 0x1000c1ff) filled as byte area
+//  map(0x1000c000, 0x1000ffff) ^
+//  0x18000096-0x18000097 writes before accessing byte area, banked view?
+//  0x180000b5 always 0xaa, paired with WTCSR $5a
 //  0x180000b4 r/w at PC=0x12b2 onward,
 //             then loops expecting an external event filling work RAM buffer $401110 PC=12e6,
 //             presumably for a thread dispatcher (observe R11 afterwards)
@@ -101,7 +101,7 @@ void m119_state::m119(machine_config &config)
 	// basic machine hardware
 	SH3LE(config, m_maincpu, 60'000'000); // HD6417708S, according to the datasheet operation frequency is 60 MHz.
 	m_maincpu->set_addrmap(AS_PROGRAM, &m119_state::program_map);
-//	m_maincpu->set_vblank_int("screen", FUNC(m119_state::irq2_line_hold));
+//  m_maincpu->set_vblank_int("screen", FUNC(m119_state::irq2_line_hold));
 
 	// all wrong
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

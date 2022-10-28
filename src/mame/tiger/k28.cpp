@@ -184,7 +184,7 @@ u8 k28_state::mcu_p1_r()
 			data |= m_inputs[i]->read();
 
 			// force press on-button at boot
-			if (i == 5 && m_onbutton_timer->enabled())
+			if (i == 5 && m_onbutton_timer->running())
 				data |= 1;
 		}
 

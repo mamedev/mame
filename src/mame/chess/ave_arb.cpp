@@ -36,8 +36,6 @@ boards without a module slot. CPU and VIA were replaced with new WDC 14MHz-rated
 chips, running at 16MHz.
 
 TODO:
-- remove install_ram workaround when emumem bug is fixed, see:
-  https://github.com/mamedev/mame/commit/75caceb1c143757d10f874b0c2ebf0427f4dfc9f#commitcomment-84413054
 - avelan, gms3, gms4, sargon35 rom labels
 
 ******************************************************************************/
@@ -172,11 +170,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 
 	// extra ram (optional)
 	if (image.get_feature("ram"))
-	{
-		//m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0x1000, m_extram);
-		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0, m_extram);
-		m_maincpu->space(AS_PROGRAM).install_ram(0x1800, 0x1fff, 0, m_extram);
-	}
+		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0x1000, m_extram);
 
 	m_altboard = bool(image.get_feature("altboard"));
 

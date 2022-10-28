@@ -40,7 +40,6 @@ public:
 	maxaflex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atari_common_state(mconfig, type, tag)
 		, m_mcu(*this, "mcu")
-		, m_pokey(*this, "pokey")
 		, m_speaker(*this, "speaker")
 		, m_region_maincpu(*this, "maincpu")
 		, m_dsw(*this, "dsw")
@@ -80,7 +79,6 @@ private:
 	uint8_t m_portc_out;
 
 	required_device<m68705p3_device> m_mcu;
-	required_device<pokey_device> m_pokey;
 	required_device<speaker_sound_device> m_speaker;
 	required_region_ptr<uint8_t> m_region_maincpu;
 	required_ioport m_dsw;
@@ -211,7 +209,7 @@ void maxaflex_state::a600xl_mem(address_map &map)
 	map(0xc000, 0xcfff).rom(); /* OS */
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
-	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xd200, 0xd2ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
@@ -253,10 +251,6 @@ static INPUT_PORTS_START( a600xl )
 	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_PLAYER(2)
 	PORT_BIT(0x04, 0x04, IPT_BUTTON1) PORT_PLAYER(3)
 	PORT_BIT(0x08, 0x08, IPT_BUTTON1) PORT_PLAYER(4)
-	PORT_BIT(0x10, 0x10, IPT_BUTTON2) PORT_PLAYER(1)
-	PORT_BIT(0x20, 0x20, IPT_BUTTON2) PORT_PLAYER(2)
-	PORT_BIT(0x40, 0x40, IPT_BUTTON2) PORT_PLAYER(3)
-	PORT_BIT(0x80, 0x80, IPT_BUTTON2) PORT_PLAYER(4)
 
 	/* Max-A-Flex specific ports */
 	PORT_START("coin")
@@ -343,6 +337,7 @@ void maxaflex_state::maxaflex(machine_config &config)
 	ATARI_GTIA(config, m_gtia, 0);
 	m_gtia->set_region(GTIA_NTSC);
 	m_gtia->read_callback().set_ioport("console");
+	m_gtia->trigger_callback().set_ioport("djoy_b");
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
@@ -356,13 +351,14 @@ void maxaflex_state::maxaflex(machine_config &config)
 	pia.irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
-	screen.set_refresh_hz(antic_device::FRAME_RATE_60HZ);
-	screen.set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
-	screen.set_screen_update("antic", FUNC(antic_device::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	config_ntsc_screen(config);
+	//screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	//screen.set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
+	//screen.set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+	//screen.set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(maxaflex_state::atari_palette), 256);
 	config.set_default_layout(layout_maxaflex);

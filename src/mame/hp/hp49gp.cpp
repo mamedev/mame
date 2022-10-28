@@ -11,6 +11,8 @@
 #include "machine/s3c2410.h"
 #include "screen.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL ( 0 )
 
 struct lcd_spi_t

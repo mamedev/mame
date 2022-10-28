@@ -61,6 +61,9 @@ protected:
 	optional_ioport_array<4> m_keypad;
 	optional_ioport m_djoy_b;
 	optional_ioport m_fake;
+
+	void config_ntsc_screen(machine_config &config);
+	void config_pal_screen(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_ATARI400_H

@@ -230,7 +230,7 @@ uint32_t midvunit_state::tms32031_control_r(offs_t offset)
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		int32_t result = (m_timer[which]->time_elapsed() * m_timer_rate).as_double();
+		int32_t result = (m_timer[which]->elapsed() * m_timer_rate).as_double();
 //      logerror("%06X:tms32031_control_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 		return result;
 	}

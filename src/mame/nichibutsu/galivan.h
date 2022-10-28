@@ -13,6 +13,7 @@
 #include "nb1412m2.h"
 #include "nb1414m4.h"
 #include "machine/gen_latch.h"
+#include "sound/flt_biquad.h"
 #include "video/bufsprite.h"
 #include "screen.h"
 #include "emupal.h"
@@ -31,9 +32,13 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
+		, m_dacfilter1(*this, "dacfilter1")
+		, m_dacfilter2(*this, "dacfilter2")
+		, m_ymfilter(*this, "ymfilter")
 		, m_rombank(*this, "rombank")
 	{ }
 
+	void galivan_common(machine_config &config);
 	void galivan(machine_config &config);
 	void ninjemak(machine_config &config);
 	void youmab(machine_config &config);
@@ -98,6 +103,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<filter_biquad_device> m_dacfilter1;
+	required_device<filter_biquad_device> m_dacfilter2;
+	required_device<filter_biquad_device> m_ymfilter;
 	memory_bank_creator m_rombank;
 
 	void galivan_map(address_map &map);

@@ -689,7 +689,7 @@ void mc6845_device::update_counters()
 {
 	m_character_counter = attotime_to_cclks(m_line_timer->elapsed());
 
-	if (m_hsync_off_timer->enabled())
+	if (m_hsync_off_timer->running())
 	{
 		m_hsync_width_counter = attotime_to_cclks(m_hsync_off_timer->elapsed());
 	}
@@ -1560,7 +1560,7 @@ void mc6845_device::device_reset()
 
 	m_out_vsync_cb(false);
 
-	if (!m_line_timer->enabled())
+	if (!m_line_timer->running())
 		m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
 
 	m_light_pen_latched = false;

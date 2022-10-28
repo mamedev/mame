@@ -165,7 +165,7 @@ Beef Drop (2006)
 Beef Drop VE (2007)               Missing
 B*nQ (2007)
 Combat 1990 (2005)                Missing
-FailSafe (NTSC only?) (2010)      Missing
+FailSafe (2010)
 Hangly-Man (2006)
 Jr Pac-Man (2009)
 Kessel Attack                     Missing
@@ -178,7 +178,7 @@ Santa Simon (2006)
 Space Duel (2007)
 Space Invaders (2008)
 Star Wars (2007)
-Super Pacman (2008)               Missing
+Super Pacman (2008)
 Wasp (2009)
 
 Notes:
@@ -302,7 +302,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="astdelux" cloneof="asteroid">
+	<software name="astdeluxu" cloneof="astdelux">
 		<description>Asteroids Deluxe (NTSC)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -316,7 +316,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="astdeluxp" cloneof="asteroid">
+	<software name="astdelux">
 		<description>Asteroids Deluxe (PAL)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -326,6 +326,34 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="asteroids deluxe (pal).bin" size="32768" crc="ab72ea89" sha1="341c7be2823e69e95a61567cb79042c140278c4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrob">
+		<description>Astro Blaster (NTSC)</description>
+		<year>2014</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0xc000">
+				<rom name="astro blaster (20140201).bin" size="0xc000" crc="ff6dd806" sha1="51de38c2e1543d57f0b94edc58c2bb72dfb8b8d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrof">
+		<description>Astro Fighter (NTSC)</description>
+		<year>2015</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="astro fighter (20150726).bin" size="0x8000" crc="d18640f0" sha1="f76de283a1ac539157b9a97870e70addaedaa55d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -818,6 +846,34 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 			<feature name="slot" value="a78_abs" />
 			<dataarea name="rom" size="65536">
 				<rom name="f18horeu.bin" size="65536" crc="e5d714b0" sha1="673d912b2f9ab7a43f95e0e90bd80249b360fe0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="failsafeu" cloneof="failsafe">
+		<description>FailSafe (NTSC)</description>
+		<year>2010</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0xc000">
+				<rom name="failsafe (ntsc) (20100227).bin" size="0xc000" crc="67ebf1ed" sha1="e3221e285adaee30f36b60e85a35b63cb4d63292"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="failsafe">
+		<description>FailSafe (PAL)</description>
+		<year>2010</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0xc000">
+				<rom name="failsafe (pal) (20100227).bin" size="0xc000" crc="56ac5864" sha1="2d810a0e521e06ce560fe42f9e1c15d759071d4d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1440,6 +1496,34 @@ Saarna for debugging the problem)
 		</part>
 	</software>
 
+	<software name="meteorshu" cloneof="meteorsh">
+		<description>Meteor Shower (NTSC)</description>
+		<year>2012</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="meteor shower (ntsc) (20120218).bin" size="0x4000" crc="1a6b1e88" sha1="fe49cc7b92b3f1d44c91b4f645ee8348ebe7e017"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteorsh">
+		<description>Meteor Shower (PAL)</description>
+		<year>2012</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="meteor shower (pal) (20120218).bin" size="0x4000" crc="ea240bf3" sha1="5e06ce4a823407234e9c784ba51bbe6edd7ae7cf"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mia" supported="partial">
 		<description>Missing In Action (prototype)</description>
 		<!-- 5 Chips total 4 x 27256, 1 x 27128) -->
@@ -1478,6 +1562,34 @@ Saarna for debugging the problem)
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="midmuteu.bin" size="131072" crc="7ca6d521" sha1="85f0e0556df65c0732f71ab3f2bbde3615355f72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mooncrstu" cloneof="mooncrst">
+		<description>Moon Cresta (NTSC)</description>
+		<year>2011</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="moon cresta (ntsc) (20111113).bin" size="0x8000" crc="1e85a87f" sha1="b94a015d2d77d5854bba6c3abfe6141f1af446c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mooncrst">
+		<description>Moon Cresta (PAL)</description>
+		<year>2011</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="moon cresta (pal) (20111113).bin" size="0x8000" crc="80ac3695" sha1="916ed56c5b4fe93f7371200a91b6f208894af445"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2094,6 +2206,34 @@ almost nothing like the prototype.
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="suprhueu.bin" size="49152" crc="6b27ea2c" sha1="469e03ee1e22ef0978c8095a38d662d34a413723"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superpacu" cloneof="superpac">
+		<description>Super Pac-Man (NTSC)</description>
+		<year>2008</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="super pac-man (ntsc) (20081010).bin" size="0x8000" crc="415a28ad" sha1="e1c51fa453b8dc600e5d7f46df1443b99a1507d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superpac">
+		<description>Super Pac-Man (PAL)</description>
+		<year>2008</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="super pac-man (pal) (20081010).bin" size="0x8000" crc="e920a2dc" sha1="58375542cb3c2ecf2e2800d280c2d56a58804e77"/>
 			</dataarea>
 		</part>
 	</software>

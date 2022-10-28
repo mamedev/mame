@@ -4,20 +4,11 @@
 #include "psxcd.h"
 #include "debugger.h"
 
-#define VERBOSE_LEVEL ( 0 )
+#define LOG_CMD  (1 << 1)
+#define LOG_MISC (1 << 2)
 
-static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		device.logerror( "%s: %s", device.machine().describe_context(), buf );
-	}
-}
+#define VERBOSE ( 0 )
+#include "logmacro.h"
 
 enum cdrom_events
 {
@@ -265,14 +256,14 @@ uint8_t psxcd_device::read(offs_t offset)
 			break;
 	}
 
-	verboselog(*this, 2, "psxcd: read byte %08x = %02x\n",offset,ret);
+	LOGMASKED(LOG_MISC, "%s: read byte %08x = %02x\n", machine().describe_context(), offset, ret);
 
 	return ret;
 }
 
 void psxcd_device::write(offs_t offset, uint8_t data)
 {
-	verboselog(*this, 2, "psxcd: write byte %08x = %02x\n",offset,data);
+	LOGMASKED(LOG_MISC, "%s: write byte %08x = %02x\n", machine().describe_context(), offset, data);
 
 	switch ((offset & 3) | ((m_regs.sr & 3) << 4))
 	{
@@ -341,12 +332,13 @@ void psxcd_device::write(offs_t offset, uint8_t data)
 						m_transcurr = 12;
 						break;
 				}
-#if (VERBOSE_LEVEL > 0)
-				char str[1024];
-				for (int i=0; i<12; i++)
-					sprintf(&str[i*4], "%02x  ", m_transbuf[i+12]);
-				verboselog(*this, 1, "psxcd: request data=%s\n",str);
-#endif
+				if (VERBOSE & LOG_CMD)
+				{
+					char str[1024];
+					for (int i=0; i<12; i++)
+						sprintf(&str[i*4], "%02x  ", m_transbuf[i+12]);
+					LOGMASKED(LOG_CMD, "%s: request data=%s\n", machine().describe_context(), str);
+				}
 			}
 			else if (!(data & 0x80))
 			{
@@ -375,7 +367,7 @@ void psxcd_device::write(offs_t offset, uint8_t data)
 						m_regs.sr |= 0x20;
 						m_regs.ir = res_queue->res;
 					}
-					verboselog(*this, 1, "psxcd: nextres\n");
+					LOGMASKED(LOG_CMD, "%s: nextres\n", machine().describe_context());
 				}
 			}
 			if (data & 0x40)
@@ -437,7 +429,7 @@ void psxcd_device::write_command(uint8_t byte)
 
 void psxcd_device::cdcmd_sync()
 {
-	verboselog(*this, 1, "psxcd: sync\n");
+	LOGMASKED(LOG_CMD, "%s: sync\n", machine().describe_context());
 
 	stop_read();
 	send_result(INTR_ACKNOWLEDGE);
@@ -445,7 +437,7 @@ void psxcd_device::cdcmd_sync()
 
 void psxcd_device::cdcmd_nop()
 {
-	verboselog(*this, 1, "psxcd: nop\n");
+	LOGMASKED(LOG_CMD, "%s: nop\n", machine().describe_context());
 
 	if (!open)
 		status &= ~STATUS_SHELLOPEN;
@@ -455,7 +447,7 @@ void psxcd_device::cdcmd_nop()
 
 void psxcd_device::cdcmd_setloc()
 {
-	verboselog(*this, 1, "psxcd: setloc %08x:%08x:%08x\n", cmdbuf[0], cmdbuf[1], cmdbuf[2]);
+	LOGMASKED(LOG_CMD, "%s: setloc %08x:%08x:%08x\n", machine().describe_context(), cmdbuf[0], cmdbuf[1], cmdbuf[2]);
 
 	stop_read();
 
@@ -468,7 +460,7 @@ void psxcd_device::cdcmd_setloc()
 	if ((l.b[M]>0) || (l.b[S]>=2))
 		loc.w=l.w;
 	else
-		verboselog(*this, 0, "psxcd: setloc out of range: %02d:%02d:%02d\n",l.b[M],l.b[S],l.b[F]);
+		logerror("%s: setloc out of range: %02d:%02d:%02d\n", machine().describe_context(), l.b[M], l.b[S], l.b[F]);
 
 	send_result(INTR_COMPLETE);
 }
@@ -482,7 +474,7 @@ void psxcd_device::cdcmd_play()
 	if (!curpos.w)
 		curpos.b[S] = 2;
 
-	verboselog(*this, 1, "psxcd: play %02x %02x %02x => %d\n", decimal_to_bcd(loc.b[M]), decimal_to_bcd(loc.b[S]), decimal_to_bcd(loc.b[F]), msf_to_lba_ps(loc.w));
+	LOGMASKED(LOG_CMD, "%s: play %02x %02x %02x => %d\n", machine().describe_context(), decimal_to_bcd(loc.b[M]), decimal_to_bcd(loc.b[S]), decimal_to_bcd(loc.b[F]), msf_to_lba_ps(loc.w));
 
 	stop_read();
 	start_play();
@@ -491,19 +483,19 @@ void psxcd_device::cdcmd_play()
 
 void psxcd_device::cdcmd_forward()
 {
-	verboselog(*this, 1, "psxcd: forward\n");
+	LOGMASKED(LOG_CMD, "%s: forward\n", machine().describe_context());
 }
 
 void psxcd_device::cdcmd_backward()
 {
-	verboselog(*this, 1, "psxcd: backward\n");
+	LOGMASKED(LOG_CMD, "%s: backward\n", machine().describe_context());
 }
 
 void psxcd_device::cdcmd_readn()
 {
 	if (!open)
 	{
-		verboselog(*this, 1, "psxcd: readn\n");
+		LOGMASKED(LOG_CMD, "%s: readn\n", machine().describe_context());
 
 		curpos.w=loc.w;
 
@@ -518,7 +510,7 @@ void psxcd_device::cdcmd_readn()
 
 void psxcd_device::cdcmd_standby()
 {
-	verboselog(*this, 1, "psxcd: standby\n");
+	LOGMASKED(LOG_CMD, "%s: standby\n", machine().describe_context());
 
 	stop_read();
 	send_result(INTR_ACKNOWLEDGE);
@@ -526,7 +518,7 @@ void psxcd_device::cdcmd_standby()
 
 void psxcd_device::cdcmd_stop()
 {
-	verboselog(*this, 1, "psxcd: stop\n");
+	LOGMASKED(LOG_CMD, "%s: stop\n", machine().describe_context());
 
 	stop_read();
 	send_result(INTR_ACKNOWLEDGE);
@@ -534,7 +526,7 @@ void psxcd_device::cdcmd_stop()
 
 void psxcd_device::cdcmd_pause()
 {
-	verboselog(*this, 1, "psxcd: pause\n");
+	LOGMASKED(LOG_CMD, "%s: pause\n", machine().describe_context());
 
 	stop_read();
 
@@ -543,7 +535,7 @@ void psxcd_device::cdcmd_pause()
 
 void psxcd_device::cdcmd_init()
 {
-	verboselog(*this, 1, "psxcd: init\n");
+	LOGMASKED(LOG_CMD, "%s: init\n", machine().describe_context());
 
 	stop_read();
 	mode=0;
@@ -554,7 +546,7 @@ void psxcd_device::cdcmd_init()
 
 void psxcd_device::cdcmd_mute()
 {
-	verboselog(*this, 1, "psxcd: mute\n");
+	LOGMASKED(LOG_CMD, "%s: mute\n", machine().describe_context());
 
 	m_mute = true;
 	send_result(INTR_COMPLETE);
@@ -562,7 +554,7 @@ void psxcd_device::cdcmd_mute()
 
 void psxcd_device::cdcmd_demute()
 {
-	verboselog(*this, 1, "psxcd: demute\n");
+	LOGMASKED(LOG_CMD, "%s: demute\n", machine().describe_context());
 
 	m_mute = false;
 	send_result(INTR_COMPLETE);
@@ -570,7 +562,7 @@ void psxcd_device::cdcmd_demute()
 
 void psxcd_device::cdcmd_setfilter()
 {
-	verboselog(*this, 1, "psxcd: setfilter %08x,%08x\n",cmdbuf[0],cmdbuf[1]);
+	LOGMASKED(LOG_CMD, "%s: setfilter %08x,%08x\n", machine().describe_context(), cmdbuf[0], cmdbuf[1]);
 
 	filter_file=cmdbuf[0];
 	filter_channel=cmdbuf[1];
@@ -580,7 +572,7 @@ void psxcd_device::cdcmd_setfilter()
 
 void psxcd_device::cdcmd_setmode()
 {
-	verboselog(*this, 1, "psxcd: setmode %08x\n",cmdbuf[0]);
+	LOGMASKED(LOG_CMD, "%s: setmode %08x\n", machine().describe_context(), cmdbuf[0]);
 
 	mode=cmdbuf[0];
 	send_result(INTR_COMPLETE);
@@ -598,7 +590,7 @@ void psxcd_device::cdcmd_getparam()
 		0
 	};
 
-	verboselog(*this, 1, "psxcd: getparam [%02x %02x %02x %02x %02x %02x]\n",
+	LOGMASKED(LOG_CMD, "%s: getparam [%02x %02x %02x %02x %02x %02x]\n", machine().describe_context(),
 								data[0], data[1], data[2], data[3], data[4], data[5]);
 
 	send_result(INTR_COMPLETE, data, 6);
@@ -625,7 +617,7 @@ uint32_t psxcd_device::sub_loc(CDPOS src1, CDPOS src2)
 
 void psxcd_device::cdcmd_getlocl()
 {
-	verboselog(*this, 1, "psxcd: getlocl [%02x %02x %02x %02x %02x %02x %02x %02x]\n",
+	LOGMASKED(LOG_CMD, "%s: getlocl [%02x %02x %02x %02x %02x %02x %02x %02x]\n", machine().describe_context(),
 							lastsechdr[0], lastsechdr[1], lastsechdr[2], lastsechdr[3],
 							lastsechdr[4], lastsechdr[5], lastsechdr[6], lastsechdr[7]);
 
@@ -651,7 +643,7 @@ void psxcd_device::cdcmd_getlocp()
 		decimal_to_bcd(loc.b[F])  // aframe
 	};
 
-	verboselog(*this, 1, "psxcd: getlocp [%02x %02x %02x %02x %02x %02x %02x %02x]\n",
+	LOGMASKED(LOG_CMD, "%s: getlocp [%02x %02x %02x %02x %02x %02x %02x %02x]\n", machine().describe_context(),
 						data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 
 	send_result(INTR_COMPLETE, data, 8);
@@ -659,7 +651,7 @@ void psxcd_device::cdcmd_getlocp()
 
 void psxcd_device::cdcmd_gettn()
 {
-	verboselog(*this, 1, "psxcd: gettn\n");
+	LOGMASKED(LOG_CMD, "%s: gettn\n", machine().describe_context());
 
 
 	if (!open)
@@ -698,7 +690,7 @@ void psxcd_device::cdcmd_gettd()
 			decimal_to_bcd(trkstart.b[S])
 		};
 
-		verboselog(*this, 1, "psxcd: gettd %02x [%02x %02x %02x]\n", cmdbuf[0], data[0], data[1], data[2]);
+		LOGMASKED(LOG_CMD, "%s: gettd %02x [%02x %02x %02x]\n", machine().describe_context(), cmdbuf[0], data[0], data[1], data[2]);
 
 		send_result(INTR_ACKNOWLEDGE, data, 3);
 	}
@@ -710,7 +702,7 @@ void psxcd_device::cdcmd_gettd()
 
 void psxcd_device::cdcmd_seekl()
 {
-	verboselog(*this, 1, "psxcd: seekl [%02d:%02d:%02d]\n", loc.b[M], loc.b[S], loc.b[F]);
+	LOGMASKED(LOG_CMD, "%s: seekl [%02d:%02d:%02d]\n", machine().describe_context(), loc.b[M], loc.b[S], loc.b[F]);
 
 	curpos.w = loc.w;
 
@@ -719,7 +711,7 @@ void psxcd_device::cdcmd_seekl()
 
 void psxcd_device::cdcmd_seekp()
 {
-	verboselog(*this, 1, "psxcd: seekp\n");
+	LOGMASKED(LOG_CMD, "%s: seekp\n", machine().describe_context());
 
 	curpos.w = loc.w;
 
@@ -728,7 +720,7 @@ void psxcd_device::cdcmd_seekp()
 
 void psxcd_device::cdcmd_test()
 {
-	verboselog(*this, 1, "psxcd: test %02x\n", cmdbuf[0]);
+	LOGMASKED(LOG_CMD, "%s: test %02x\n", machine().describe_context(), cmdbuf[0]);
 
 	switch (cmdbuf[0])
 	{
@@ -747,7 +739,7 @@ void psxcd_device::cdcmd_test()
 		}
 
 		default:
-			verboselog(*this, 0, "psxcd: unimplemented test cmd %02x\n", cmdbuf[0]);
+			logerror("%s: unimplemented test cmd %02x\n", machine().describe_context(), cmdbuf[0]);
 			cmd_complete(prepare_result(INTR_DISKERROR, nullptr, 0, 0x10));
 			break;
 	}
@@ -755,7 +747,7 @@ void psxcd_device::cdcmd_test()
 
 void psxcd_device::cdcmd_id()
 {
-	verboselog(*this, 1, "psxcd: id\n");
+	LOGMASKED(LOG_CMD, "%s: id\n", machine().describe_context());
 
 	if (!open)
 	{
@@ -791,7 +783,7 @@ void psxcd_device::cdcmd_reads()
 {
 	if (!open)
 	{
-		verboselog(*this, 1, "psxcd: reads\n");
+		LOGMASKED(LOG_CMD, "%s: reads\n", machine().describe_context());
 
 		curpos.w=loc.w;
 
@@ -806,12 +798,12 @@ void psxcd_device::cdcmd_reads()
 
 void psxcd_device::cdcmd_reset()
 {
-	verboselog(*this, 1, "psxcd: reset\n");
+	LOGMASKED(LOG_CMD, "%s: reset\n", machine().describe_context());
 }
 
 void psxcd_device::cdcmd_readtoc()
 {
-	verboselog(*this, 1, "psxcd: readtoc\n");
+	LOGMASKED(LOG_CMD, "%s: readtoc\n", machine().describe_context());
 
 	send_result(INTR_COMPLETE);
 	send_result(INTR_ACKNOWLEDGE, nullptr, 0, default_irq_delay * 3); // ?
@@ -819,7 +811,7 @@ void psxcd_device::cdcmd_readtoc()
 
 void psxcd_device::cdcmd_unknown12()
 {
-	verboselog(*this, 1, "psxcd: unknown 12\n");
+	LOGMASKED(LOG_CMD, "%s: unknown 12\n", machine().describe_context());
 	// set session? readt?
 	if (cmdbuf[0] == 1)
 		send_result(INTR_COMPLETE);
@@ -844,7 +836,7 @@ void psxcd_device::cdcmd_illegal1d()
 
 void psxcd_device::illegalcmd(uint8_t cmd)
 {
-	verboselog(*this, 0, "psxcd: unimplemented cd command %02x\n", cmd);
+	logerror("%s: unimplemented cd command %02x\n", machine().describe_context(), cmd);
 
 	send_result(INTR_DISKERROR, nullptr, 0, 0x40);
 }
@@ -853,7 +845,7 @@ void psxcd_device::cmd_complete(command_result *res)
 {
 	command_result *rf;
 
-	verboselog(*this, 1, "psxcd: irq [%d]\n", res->res);
+	LOGMASKED(LOG_CMD, "%s: irq [%d]\n", machine().describe_context(), res->res);
 
 	if (res_queue)
 	{
@@ -926,7 +918,7 @@ void psxcd_device::send_result(uint8_t res, uint8_t *data, int sz, int delay, ui
 void psxcd_device::start_dma(uint8_t *mainram, uint32_t size)
 {
 	uint32_t sector_size;
-	verboselog(*this, 1, "psxcd: start dma %d bytes at %d\n", size, m_transcurr);
+	LOGMASKED(LOG_CMD, "%s: start dma %d bytes at %d\n", machine().describe_context(), size, m_transcurr);
 
 	if (!m_dmaload)
 		return;
@@ -972,7 +964,7 @@ void psxcd_device::read_sector()
 			subheader *sub = (subheader *)(buf + 16);
 			memcpy(lastsechdr, buf + 12, 8);
 
-			verboselog(*this, 2, "psxcd: subheader file=%02x chan=%02x submode=%02x coding=%02x [%02x%02x%02x%02x]\n",
+			LOGMASKED(LOG_MISC, "%s: subheader file=%02x chan=%02x submode=%02x coding=%02x [%02x%02x%02x%02x]\n", machine().describe_context(),
 						sub->file, sub->channel, sub->submode, sub->coding, buf[0xc], buf[0xd], buf[0xe], buf[0xf]);
 
 			if ((mode & MODE_ADPCM) && (sub->submode & SUBMODE_AUDIO))
@@ -1025,7 +1017,7 @@ void psxcd_device::read_sector()
 		}
 		else
 		{
-			verboselog(*this, 1, "psxcd: autopause xa\n");
+			LOGMASKED(LOG_CMD, "%s: autopause xa\n", machine().describe_context());
 
 			cmd_complete(prepare_result(INTR_DATAEND));
 			stop_read();
@@ -1077,7 +1069,7 @@ void psxcd_device::play_sector()
 		{
 			if (sector >= autopause_sector)
 			{
-				verboselog(*this, 1, "psxcd: autopause cdda\n");
+				LOGMASKED(LOG_CMD, "%s: autopause cdda\n", machine().describe_context());
 
 				stop_read();
 				cmd_complete(prepare_result(INTR_DATAEND));
@@ -1157,7 +1149,7 @@ void psxcd_device::start_play()
 	uint8_t track = m_cdrom_handle->get_track(msf_to_lba_ps(curpos.w) + 150);
 
 	if (m_cdrom_handle->get_track_type(track) != cdrom_file::CD_TRACK_AUDIO)
-		verboselog(*this, 0, "psxcd: playing data track\n");
+		logerror("%s: playing data track\n", machine().describe_context());
 
 	status |= STATUS_PLAYING;
 
@@ -1182,7 +1174,7 @@ void psxcd_device::start_play()
 void psxcd_device::stop_read()
 {
 	if (status & (STATUS_READING | STATUS_PLAYING))
-		verboselog(*this, 1, "psxcd: stop read\n");
+		LOGMASKED(LOG_CMD, "%s: stop read\n", machine().describe_context());
 
 	status &= ~(STATUS_READING | STATUS_PLAYING);
 
@@ -1203,7 +1195,7 @@ TIMER_CALLBACK_MEMBER(psxcd_device::handle_event)
 	int tid = param >> 2;
 	if (!m_timerinuse[tid])
 	{
-		verboselog(*this, 0, "psxcd: timer fired for free event\n");
+		logerror("%s: timer fired for free event\n", machine().describe_context());
 		return;
 	}
 
@@ -1211,7 +1203,7 @@ TIMER_CALLBACK_MEMBER(psxcd_device::handle_event)
 	switch (param & 3)
 	{
 		case EVENT_CMD_COMPLETE:
-			verboselog(*this, 1, "psxcd: event cmd complete\n");
+			LOGMASKED(LOG_CMD, "%s: event cmd complete\n", machine().describe_context());
 			cmd_complete(m_results[tid]);
 			break;
 

@@ -114,7 +114,7 @@ u32 model2_state::timers_r(offs_t offset)
 	if (m_timerrun[offset])
 	{
 		// get elapsed time, convert to units of 25 MHz
-		u32 cur = (m_timers[offset]->time_elapsed() * 25000000).as_double();
+		u32 cur = (m_timers[offset]->elapsed() * 25000000).as_double();
 
 		// subtract units from starting value
 		m_timervals[offset] = m_timerorig[offset] - cur;

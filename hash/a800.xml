@@ -119,7 +119,7 @@ Compiled by K1W1
 
         8k OSS = Not much is known about this mapping scheme. It is only used in the "The Writers Tool" cartridge.
 
-    - Corina cartidge designed by GR8 Software
+    - Corina cartridge designed by GR8 Software
 
   * Copy Protection - Some cartridges were produced that utilised a form of copy protection by writing data back to the ROM area in memory. There are many versions of
     these ROM's available that have been altered to circumvent this protection. This collection where possible has used original unaltered ROM's, those that have been
@@ -396,10 +396,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="810diag">
+	<software name="810diag" supported="no">
 		<description>810 Diagnostic Cartridge</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Align test never completes, burn-in test requires a test disk and writing to floppy
+]]></notes>
 		<info name="serial" value="FD100006" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -448,7 +451,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="abracada">
+	<software name="abracada" supported="yes">
 		<description>Abracadabra</description>
 		<year>1983</year>
 		<publisher>TG Software</publisher>
@@ -526,7 +529,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="advcrtor">
+	<software name="advcrtor" supported="yes">
 		<description>Adventure Creator</description>
 		<year>1984</year>
 		<publisher>Spinnaker</publisher>
@@ -539,10 +542,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="alfclrcv">
+	<software name="alfclrcv" supported="partial">
 		<description>Alf in the Color Caves</description>
 		<year>1984</year>
 		<publisher>Spinnaker</publisher>
+		<notes><![CDATA[
+a800: Doesn't complete first animation after selecting left tunnel during gameplay, [cart] handling (override right slot map?)
+Draws with solid orange at bottom of screen after selecting left tunnel, should be black [ANTIC]
+]]></notes>
 		<info name="developer" value="Joyce Hakansson Associates, Inc" />
 		<info name="serial" value="ALF-AT" />
 		<part name="cart" interface="a8bit_cart">
@@ -553,10 +560,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="alight">
-		<description>Atarilab Light Module</description>
+	<software name="alight" supported="no">
+		<description>AtariLab Light Module</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Unsupported [AtariLab] module
+]]></notes>
 		<info name="serial" value="AED80014" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -566,10 +576,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="atemp">
+	<software name="atemp" supported="no">
 		<description>Atarilab Temperature Module</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Unsupported [AtariLab] module
+]]></notes>
 		<info name="serial" value="AED80013" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -643,6 +656,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="anteater">
+		<!-- "Ant-Eater" on title screen, "Ant Eater" on box art -->
 		<description>Ant Eater</description>
 		<year>1982</year>
 		<publisher>Romox</publisher>
@@ -668,10 +682,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="arex">
+	<software name="arex" supported="partial">
 		<description>Arex (Pirate)</description>
 		<year>1983</year>
 		<publisher>Adventure International</publisher>
+		<notes><![CDATA[
+Title screen has masking artifact and wrong color (should be green) on mode select GFX
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -709,13 +726,15 @@ Compiled by K1W1
 
 	<software name="ast2k" supported="no">
 		<description>AST 2000</description>
-		<!-- AST 2000 was two cartridges in one - it contained an AST Utility cartridge, and a cartridge for Turbo 2000 (another turbo system popular in Poland).
-		     The "AST 2000" contained a 16KB ROM and a two-position switch, which allowed to choose between one of two 8KB banks. So in reality this image is
-		     composed of two 8KB images. This ROM can be split in half and of the halves mounted as a Phoenix 8KB cartridge. Unfortunately, the second half
-		     (Turbo 2000) won't work in the emulator - the real cartridge contained a capacitor that automatically switched off the cartridge from memory after
-		     a certain time, and this isn't currently emulated. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+AST 2000 was two cartridges in one - it contained an AST Utility cartridge, and a cartridge for Turbo 2000 (another turbo system popular in Poland).
+The "AST 2000" contained a 16KB ROM and a two-position switch, which allowed to choose between one of two 8KB banks. So in reality this image is
+composed of two 8KB images. This ROM can be split in half and of the halves mounted as a Phoenix 8KB cartridge. Unfortunately, the second half
+(Turbo 2000) won't work in the emulator - the real cartridge contained a capacitor that automatically switched off the cartridge from memory after
+a certain time, and this isn't currently emulated.
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="N/A" />
 			<dataarea name="rom" size="16384">
@@ -724,7 +743,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="ast1">
+	<software name="ast1" supported="no">
 		<description>AST (Atari Super Turbo) for Atari XC12</description>
 		<!-- Turbo Tape utility for Atari XC12 Tape Recorders. -->
 		<year>1988</year>
@@ -770,6 +789,7 @@ Compiled by K1W1
 		<year>1982</year>
 		<publisher>Exidy</publisher>
 		<info name="developer" value="First Star" />
+		<info name="usage" value="Compatible with XL machines only"/>
 		<sharedfeat name="compatibility" value="XL"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -1032,11 +1052,12 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="agraphcs">
+	<software name="agraphcs" supported="no">
 		<description>AtariGraphics</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8054" />
+		<info name="usage" value="Requires light pen" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<feature name="peripheral" value="cx75_pen" /> <!-- Uses the Atari CX75 light pen device -->
@@ -1163,7 +1184,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="bearjamf">
+	<software name="bearjamf" supported="no">
 		<description>BearJam (Fixed)</description>
 		<!-- This ROM has been fixed to load on the A800 but will not play without device attached. -->
 		<year>1983</year>
@@ -1230,13 +1251,22 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<!-- An actual "Bomb Jack" version known to exist in .xex format, requiring 320KB RAM (!) -->
 	<software name="bombjake" supported="no">
 		<description>Bomb Jake</description>
 		<year>2009</year>
 		<publisher>GR8 Software</publisher>
-		<info name="usage" value="Plays music only in PAL" />
+		<notes><![CDATA[
+Loading screen is very off, [ANTIC] timing sensitive (downclock maincpu to 50% to have something recognizable)
+Title screen has more timing glitches
+Starting a game randomly crashes
+Cuts off top portion of screen
+Hi-score table gets garbled after first attract cycle
+]]></notes>
+		<info name="usage" value="Use PAL system for BGM during gameplay, NTSC has SFX only. Doesn't work in plain a400/a800" />
+		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_corina" />
+			<feature name="slot" value="a800_corina_sram" />
 			<dataarea name="rom" size="532480">
 				<rom name="bomb jake.rom" size="532480" crc="8e89ca50" sha1="b3bca012eb2207e97dffcd5946b163b8a6f50d71"/>
 			</dataarea>
@@ -1269,10 +1299,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="bbsb">
+	<software name="bbsb" supported="partial">
 		<description>Bounty Bob Strikes Back!</description>
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
+		<notes><![CDATA[
+Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_bbsb" />
 			<dataarea name="rom" size="40960">
@@ -1281,11 +1314,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="bbsba" cloneof="bbsb">
+	<software name="bbsba" cloneof="bbsb" supported="partial">
 		<description>Bounty Bob Strikes Back! (Alt)</description>
-			<!-- Identical to the image contained in Bill Hogue's emulator. http://www.bigfivesoftware.com/Emulator/emulator.htm. -->
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
+		<notes><![CDATA[
+Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
+]]></notes>
+		<!-- Identical to the image contained in Bill Hogue's emulator. http://www.bigfivesoftware.com/Emulator/emulator.htm. -->
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_bbsb" />
 			<dataarea name="rom" size="40960">
@@ -1488,6 +1524,10 @@ Compiled by K1W1
 		<description>Castles and Keys</description>
 		<year>1983</year>
 		<publisher>Romox</publisher>
+		<notes><![CDATA[
+Game grants a timer of 99:xx if player dies with a timer of 00:29 or less, btanb
+Game seldomly crashes (timer keeps running on death without respawning player), assume fixed or btanb
+]]></notes>
 		<info name="serial" value="ECPC-13023" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -1497,7 +1537,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="cvrnmars" supported="partial">
+	<software name="cvrnmars">
 		<description>Caverns of Mars</description>
 		<!-- Re-released in 1987 for the XEGS. -->
 		<year>1982</year>
@@ -1537,14 +1577,16 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="checkbk">
+	<software name="checkbk" supported="no">
 		<description>Checkbook (Prototype)</description>
-		<!-- This cartridge was presented at a trade show by Atari as a demo and is possibly a one-off cartridge.
-		     More information can be found at http://www.atariage.com/forums/topic/194283-checkbook-cartridge-cxl8001/ -->
 		<year>1980</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+This cartridge was presented at a trade show by Atari as a demo and is possibly a one-off cartridge.
+http://www.atariage.com/forums/topic/194283-checkbook-cartridge-cxl8001/
+]]></notes>
 		<info name="serial" value="CXL8001" />
-		<info name="usage" value="Requires a special boot disk, currently unavailable." />
+		<info name="usage" value="Requires a special boot disk, undumped" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -1696,12 +1738,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="comptrac">
+	<software name="comptrac" supported="no">
 		<description>Computrac 4000-8000</description>
-		<!-- The cartridge was sold as a package that included a proprietary interface and a robotic device for aiming a satellite dish, as well as an -->
-		<!-- Atari 400 computer. It was meant to help point a satellite dish in the right direction to receive TV signals.                             -->
 		<year>1983</year>
 		<publisher>Computrac</publisher>
+		<notes><![CDATA[
+The cartridge was sold as a package that included a proprietary interface and a robotic device for aiming a satellite dish, as well as an Atari 400 computer.
+It was meant to help point a satellite dish in the right direction to receive TV signals.
+]]></notes>
 		<info name="developer" value="IDSI" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -1741,6 +1785,8 @@ Compiled by K1W1
 		<description>Conquest of the Crown</description>
 		<year>1994</year>
 		<publisher>Lindasoft</publisher>
+		<!-- Apparently bundled with "Conquista la Corona" board game -->
+		<!-- TODO: confirm it works on XL only -->
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -1850,10 +1896,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="decathln">
+	<software name="decathln" supported="partial">
 		<description>Decathlon</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+One line off on title screen GFX top portion
+]]></notes>
 		<info name="serial" value="CC-008-04" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -1868,6 +1917,7 @@ Compiled by K1W1
 		<!-- Re-released in 1986 (RX8025) -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<!-- TODO: black screen on non-XL machine -->
 		<info name="serial" value="CXL4025" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -1904,10 +1954,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="dxinvadr">
+	<software name="dxinvadr" supported="partial">
 		<description>Deluxe Invaders</description>
 		<year>1983</year>
 		<publisher>Roklan</publisher>
+		<notes><![CDATA[
+One line off on playfield (enemy colors, player shape)
+]]></notes>
 		<info name="serial" value="09-01101" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -1931,23 +1984,29 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="destiny">
+	<software name="destiny" supported="partial">
 		<description>Destiny: The Cruiser (Prototype)</description>
 		<year>198?</year>
 		<publisher>Adventure International</publisher>
+		<notes><![CDATA[
+Bottom GFX text box doesn't mask properly, also flickers
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="destiny - the cruiser (proto).rom" size="16384" crc="0c847bb3" sha1="42ce8d92159e798f74ec9816017c464339f719a1"/>
 			</dataarea>
 		</part>
-
 	</software>
+
 	<software name="diamond3" supported="no">
 		<description>Diamond Graphic OS v3.0</description>
 		<!-- This file was released by the developer to the public domain with the file name "diamond2.rom". He explained in a Usenet post that it is in fact version 3. -->
 		<year>1989</year>
 		<publisher>Reeve Software</publisher>
+		<notes><![CDATA[
+Continously prints "BOOT ERROR"
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_diamond" />
 			<dataarea name="rom" size="65536">
@@ -1983,10 +2042,11 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="diamonde" cloneof="diamond3" supported="partial">
+	<software name="diamonde" cloneof="diamond3" supported="no">
 		<description>Diamond Graphic OS v1.0 (Earlier Release)</description>
 		<year>1988</year>
 		<publisher>Reeve Software</publisher>
+		<info name="usage" value="Requires mouse"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_diamond" />
 			<dataarea name="rom" size="65536">
@@ -2063,10 +2123,11 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="daccess">
+	<software name="daccess" supported="no">
 		<description>Direct Access</description>
 		<year>1984</year>
 		<publisher>Citibank</publisher>
+		<info name="usage" value="Requires dial-up modem"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -2075,11 +2136,12 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="daccessa" cloneof="daccess">
+	<software name="daccessa" cloneof="daccess" supported="no">
 		<description>Direct Access (Alt)</description>
 		<!-- Cartridge dated 12/24/84. -->
 		<year>1984</year>
 		<publisher>Citibank</publisher>
+		<info name="usage" value="Requires dial-up modem"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -2100,10 +2162,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="dropzone">
+	<software name="dropzone" supported="partial">
 		<description>Dropzone</description>
 		<year>20??</year>
 		<publisher>Video 61</publisher>
+		<notes><![CDATA[
+Glitchy title screen the first time around (fixes after one playthrough)
+]]></notes>
 		<info name="developer" value="Williams" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -2126,11 +2191,16 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="dynakill">
+	<software name="dynakill" supported="no">
 		<description>DynaKillers (Reproduction)</description>
 		<!-- Re-package & Re-release of GMG's 1997 release. -->
 		<year>1999</year>
 		<publisher>Video 61 / GMG</publisher>
+		<notes><![CDATA[
+Invisible mouse pointer on title screen, uses [GTIA] PRIOR multicolor + [ANTIC] missile DMA not enabled while sprite DMA is
+Very glitchy on gameplay, sprite eventually disappears, timing?
+Doesn't survive a soft reset
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -2179,10 +2249,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="edusys">
+	<software name="edusys" supported="no">
 		<description>Educational System Master Cartridge</description>
 		<year>1979</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Requires unhandled (and undumped?) cassette lesson tapes
+]]></notes>
 		<info name="serial" value="CXL4001" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -2192,10 +2265,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="edusysd" cloneof="edusys">
+	<software name="edusysd" cloneof="edusys" supported="no">
 		<description>Educational System Master Cartridge (Re-Badged)</description>
 		<year>1983</year>
 		<publisher>Dorsett Educational Systems</publisher>
+		<notes><![CDATA[
+Requires unhandled (and undumped?) cassette lesson tapes
+]]></notes>
 		<info name="serial" value="D4001" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -2205,10 +2281,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="embargo">
+	<software name="embargo" supported="no">
 		<description>Embargo</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
+		<notes><![CDATA[
+Offset GFXs on several enemies [GTIA] mixing
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -2230,10 +2309,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="espial">
+	<software name="espial" supported="partial">
 		<description>Espial</description>
 		<year>1984</year>
 		<publisher>Tigervision</publisher>
+		<notes><![CDATA[
+Sprites gets stuck on title screen after a playthough [GTIA] GRACTL
+]]></notes>
 		<info name="serial" value="7-012-468" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -2255,7 +2337,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="expando1">
+	<software name="expando1" supported="no">
 		<description>Expando-Vision 1 - Weight Control and Exercise</description>
 		<year>1983</year>
 		<publisher>Stimultech</publisher>
@@ -2268,7 +2350,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="expando2">
+	<software name="expando2" supported="no">
 		<description>Expando-Vision 2 - Control Smoking and Calm Nerves</description>
 		<year>1983</year>
 		<publisher>Stimultech</publisher>
@@ -2281,7 +2363,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="expando3">
+	<software name="expando3" supported="no">
 		<description>Expando-Vision 3 - Stress Control and Positive Thinking</description>
 		<year>1983</year>
 		<publisher>Stimultech</publisher>
@@ -2294,7 +2376,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="expando4">
+	<software name="expando4" supported="no">
 		<description>Expando-Vision 4 - Control Drinking and Responsibility</description>
 		<year>1983</year>
 		<publisher>Stimultech</publisher>
@@ -2307,10 +2389,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="express">
+	<software name="express" supported="no">
 		<description>Express! v1.12</description>
 		<year>1989</year>
 		<publisher>Orion Micro Systems</publisher>
+		<notes><![CDATA[
+"Unable to locate R:handler"
+]]></notes>
+		<info name="usage" value="Requires dial-up modem"/>
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_express" />
@@ -2333,7 +2419,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="fvoyage">
+	<software name="fvoyage" supported="yes">
 		<description>Fantastic Voyage</description>
 		<year>1982</year>
 		<publisher>Sirius</publisher>
@@ -2346,10 +2432,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="fasteddy">
+	<software name="fasteddy" supported="no">
 		<description>Fast Eddie</description>
 		<year>1982</year>
 		<publisher>Sirius</publisher>
+		<notes><![CDATA[
+Video flickers, timing sensitive
+Glitchy score display
+]]></notes>
 		<info name="serial" value="33003" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -2398,10 +2488,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="finalorb">
+	<software name="finalorb" supported="partial">
 		<description>Final Orbit</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
+		<notes><![CDATA[
+Glitchy player playfield area
+Offset score digits
+]]></notes>
 		<info name="serial" value="3300?" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -2423,10 +2517,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="flapper">
+	<software name="flapper" supported="partial">
 		<description>Flapper</description>
 		<year>1983</year>
 		<publisher>Romox</publisher>
+		<notes><![CDATA[
+Dubious collision detections, btanb?
+]]></notes>
 		<info name="serial" value="ECPC-11023" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -2450,7 +2547,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="fortapoc">
-		<description>Fort Apoalypse</description>
+		<description>Fort Apocalypse</description>
 		<year>1982</year>
 		<publisher>Synapse</publisher>
 		<sharedfeat name="compatibility" value="OSb"/>
@@ -2487,10 +2584,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="frogger">
+	<software name="frogger" supported="partial">
 		<description>Frogger</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<notes><![CDATA[
+Playfield stutters
+]]></notes>
 		<info name="serial" value="1110" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -2500,10 +2600,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="frogger2">
+	<software name="frogger2" supported="partial">
 		<description>Frogger II - Threedeep!</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
+		<notes><![CDATA[
+Playfield stutters
+]]></notes>
 		<info name="serial" value="1290" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -2525,11 +2628,15 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="galaxian">
+	<software name="galaxian" supported="no">
 		<description>Galaxian</description>
 		<!-- Re-released in 1986 (RX8024) -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Player missile is vertically offset when idle
+Some enemies never collides with player bullets
+]]></notes>
 		<info name="serial" value="CXL4024" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -2571,6 +2678,7 @@ Compiled by K1W1
 		<year>1981</year>
 		<publisher>Roklan</publisher>
 		<info name="serial" value="09-01102" />
+		<!-- TODO: doesn't work on XL? -->
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -2644,7 +2752,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="hamtor">
+	<software name="hamtor" supported="no">
 		<description>Hamsoft / Amtor v1.2</description>
 		<year>1984</year>
 		<publisher>Kantronics</publisher>
@@ -2657,7 +2765,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="hamsoft" cloneof="hamtor">
+	<software name="hamsoft" cloneof="hamtor" supported="no">
 		<description>Hamsoft</description>
 		<year>1982</year>
 		<publisher>Kantronics</publisher>
@@ -2670,10 +2778,12 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="hamtext">
+	<software name="hamtext" supported="no">
 		<description>Ham Text v1.1</description>
 		<year>198?</year>
 		<publisher>Kantronics</publisher>
+		<!-- TODO: definitely needs a Kantronics i/f, verify if regular is enough or explicitly needs II -->
+		<info name="usage" value="Kantronics interface required" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -2682,10 +2792,11 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="homebase">
+	<software name="homebase" supported="no">
 		<description>Homebase Electronic Banking</description>
 		<year>1982</year>
 		<publisher>Citibank</publisher>
+		<info name="usage" value="Requires dial-up modem"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -2806,10 +2917,17 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="jinks">
+	<software name="jinks" supported="partial">
 		<description>Jinks</description>
+		<!-- TODO: '91 Rainbow Arts according to title screen -->
 		<year>20??</year>
 		<publisher>Video 61 / Williams</publisher>
+		<notes><![CDATA[
+Text boxes don't fill properly (bottom row is black instead of violet)
+Hangs on boot if [keyboard] caps lock is enabled
+]]></notes>
+		<sharedfeat name="compatibility" value="XL/XE"/>
+
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -2909,10 +3027,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="kritterc">
+	<software name="kritterc" supported="partial">
 		<description>K-Razy Kritters (Re-Badged)</description>
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
+		<notes><![CDATA[
+Glitchy ship sprite on respawn animation
+]]></notes>
 		<info name="serial" value="M8788" />
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
@@ -2923,10 +3044,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="kritterk" cloneof="kritterc">
+	<software name="kritterk" cloneof="kritterc" supported="partial">
 		<description>K-Razy Kritters</description>
 		<year>1981</year>
 		<publisher>K-Byte</publisher>
+		<notes><![CDATA[
+Glitchy ship sprite on respawn animation
+]]></notes>
 		<info name="serial" value="ATR1001" />
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
@@ -2963,10 +3087,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="kpatrol">
+	<software name="kpatrol" supported="partial">
 		<description>K-Star Patrol</description>
 		<year>1982</year>
 		<publisher>CBS Software / K-Byte</publisher>
+		<notes><![CDATA[
+Reads joystick trigger pressed at soon as it boots, i.e. booting to "number of players" screen instead of title screen, fixes after first play [GTIA] latch trigger
+]]></notes>
 		<info name="serial" value="M8790" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -2980,6 +3107,7 @@ Compiled by K1W1
 		<description>Kaboom!</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
+		<info name="usage" value="Requires paddle input"/>
 		<info name="serial" value="CZ-002-04" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -3015,10 +3143,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="kickback">
+	<software name="kickback" supported="partial">
 		<description>Kickback</description>
 		<year>1982</year>
 		<publisher>Thorn EMI</publisher>
+		<notes><![CDATA[
+Playfield has offset vertical lines in two rows
+]]></notes>
 		<info name="serial" value="THB12004" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -3054,14 +3185,15 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="kpainter">
+	<software name="kpainter" supported="no">
 		<description>Koala Painter</description>
 		<year>1983</year>
 		<publisher>Koala</publisher>
 		<info name="serial" value="AT00315-001" />
+		<info name="usage" value="Requires Koala pad and Koala light pen devices"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
-			<feature name="peripheral" value="koala_pad,koala_pen" /> <!-- Works with Koala pad &amp; Koala light pen devices -->
+			<feature name="peripheral" value="koala_pad,koala_pen" />
 			<dataarea name="rom" size="16384">
 				<rom name="koala painter.rom" size="16384" crc="4835333a" sha1="d3d00bad005ba488fa734bf365c52c49d245c7b9"/> <!-- Verified -->
 			</dataarea>
@@ -3072,6 +3204,9 @@ Compiled by K1W1
 		<description>Laser Gates (Pirate)</description>
 		<year>1984</year>
 		<publisher>Imagic</publisher>
+		<notes><![CDATA[
+a400/a800: Hardlocks MAME
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -3093,10 +3228,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="llpaint">
+	<software name="llpaint" supported="no">
 		<description>Leo's 'Lectric Paintbrush</description>
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
+		<notes><![CDATA[
+Hangs on green screen, looping on [PIO porta] read/writes, expects tablet comms to properly work
+]]></notes>
 		<info name="serial" value="10011A-3" />
 		<info name="usage" value="Chalkboard Inc.'s Powerpad Tablet required" />
 		<sharedfeat name="compatibility" value="OSb"/>
@@ -3108,7 +3246,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="llpaintf" cloneof="llpaint">
+	<software name="llpaintf" cloneof="llpaint" supported="no">
 		<description>Leo's 'Lectric Paintbrush (Fixed)</description>
 		<!-- This ROM has been fixed to run on the A800 but will not play without device attached. -->
 		<year>1983</year>
@@ -3164,10 +3302,11 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="lettrtut">
+	<software name="lettrtut" supported="no">
 		<description>Letter Tutor (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
+		<info name="usage" value="Requires light pen" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<feature name="peripheral" value="cx75_pen" /> <!-- Works with the Atari CX75 light pen device -->
@@ -3215,7 +3354,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="logcmstr">
+	<software name="logcmstr" supported="no">
 		<description>LogicMaster</description>
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
@@ -3230,7 +3369,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="logcmstrf" cloneof="logcmstr">
+	<software name="logcmstrf" cloneof="logcmstr" supported="no">
 		<description>LogicMaster (Fixed)</description>
 		<!-- This ROM has been fixed to load on the A800 but will not play without device attached. -->
 		<year>1983</year>
@@ -3246,10 +3385,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mash">
+	<software name="mash" supported="no">
 		<description>M*A*S*H</description>
 		<year>1982</year>
 		<publisher>Romox / 20th Century Fox</publisher>
+		<notes><![CDATA[
+Offset sprites on specific rows [GTIA] mixing
+]]></notes>
 		<info name="serial" value="ECPC-01033" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -3309,10 +3451,16 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega1" supported="partial">
+	<!-- TODO: mega* carts untested beyond if they boots -->
+
+	<software name="mega1" supported="no">
 		<description>Mega Cartridge 01 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Hardball: doesn't boot
+Riveraid: doesn't boot
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3321,10 +3469,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega2" supported="partial">
+	<software name="mega2" supported="no">
 		<description>Mega Cartridge 02 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Rambo: doesn't boot
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3333,11 +3484,15 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega3" supported="partial">
+	<software name="mega3" supported="no">
 		<description>Mega Cartridge 03 (Spa, Pirate)</description>
-		<!-- The last game (Hot Lips) doesn't run. Possible Bad dump. -->
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Pitstop: doesn't boot
+Mash: punts to memo pad
+Hot Lips: doesn't boot, possibly bad dump (crashes in Altirra too)
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3350,6 +3505,10 @@ Compiled by K1W1
 		<description>Mega Cartridge 04 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Empire Strik: doesn't boot
+Rally Spedway: black screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3358,10 +3517,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega5" supported="partial">
+	<software name="mega5" supported="no">
 		<description>Mega Cartridge 05 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Crystal Raider: doesn't boot
+Keystone Kapers: doesn't boot
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3370,10 +3533,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega6" supported="partial">
+	<software name="mega6" supported="no">
 		<description>Mega Cartridge 06 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Outlaw: doesn't display any sprite
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3382,10 +3548,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega7" supported="partial">
+	<software name="mega7" supported="no">
 		<description>Mega Cartridge 07 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Crystal Raider: hardlocks MAME
+Space Invaders: doesn't boot
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3398,6 +3568,9 @@ Compiled by K1W1
 		<description>Mega Cartridge 08 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Choplifter: black screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3406,10 +3579,15 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega9" supported="partial">
+	<software name="mega9" supported="no">
 		<description>Mega Cartridge 09 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Ball Blaster: doesn't boot
+Sargon II: doesn't boot
+The Empire Strikes B.: doesn't boot
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3418,10 +3596,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega10" supported="partial">
+	<software name="mega10" supported="no">
 		<description>Mega Cartridge 10 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Space Inv: offset bullets when traversing bases layer
+River Raid: black screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3434,6 +3616,11 @@ Compiled by K1W1
 		<description>Mega Cartridge 11 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Despatch: detects extra bogus collision detection on manholes when hitting walls (verify)
+Pitstop: black screen
+Kaboom: black screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3442,23 +3629,30 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega12" supported="partial">
+	<software name="mega12" supported="no">
 		<description>Mega Cartridge 12 (Spa, Pirate)</description>
-		<!-- The last game (Rescue on Fractalus) doesn't run. Possible Bad dump. -->
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Rally Speedway: doesn't boot
+Rescue on Fractalus: doesn't boot, possibly bad dump
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
-				<rom name="mega cartridge 12.rom" size="65536" crc="1014548a" sha1="7bd519d68cee4ba74b3ec405561347ea09691fc1"/>
+				<rom name="mega cartridge 12.rom" size="65536" crc="1014548a" sha1="7bd519d68cee4ba74b3ec405561347ea09691fc1" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mega13" supported="partial">
+	<software name="mega13" supported="no">
 		<description>Mega Cartridge 13 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Pitfall!.: punts to memo pad
+Wargames: black screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3467,10 +3661,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega14" supported="partial">
+	<software name="mega14" supported="no">
 		<description>Mega Cartridge 14 (Spa, Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Pitstop: black screen
+Star Raiders: draws glitchy [GTIA] sprites
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3479,10 +3677,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mega15" supported="partial">
+	<software name="mega15" supported="no">
 		<description>Mega Cartridge 15 (Pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
+		<notes><![CDATA[
+Flak Arreglado: doesn't boot
+Keystone Kapers: doesn't boot with stuck note
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3491,10 +3693,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="meteor">
+	<software name="meteor" supported="partial">
 		<description>Meteor (Pirate)</description>
 		<year>198?</year>
 		<publisher>Germ-Soft</publisher>
+		<notes><![CDATA[
+Cut off top screen portion
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -3503,10 +3708,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="hockey">
+	<software name="hockey" supported="no">
 		<description>Major League Hockey</description>
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
+		<notes><![CDATA[
+Unresponsive inputs [GTIA] latch trigger
+]]></notes>
 		<info name="serial" value="THB12009" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -3594,6 +3802,7 @@ Compiled by K1W1
 		<description>McDonald's Pac-Mac (Beta 2)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- TODO: confirm not working on XL -->
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -3607,6 +3816,7 @@ Compiled by K1W1
 		<description>McDonald's Pac-Mac (Beta 1)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- TODO: confirm not working on XL -->
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -3616,7 +3826,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="pmodem">
+	<software name="pmodem" supported="no">
 		<description>Pocket Modem Software v2.08</description>
 		<year>1984</year>
 		<publisher>BOT Engineering</publisher>
@@ -3629,10 +3839,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="megmania">
+	<software name="megmania" supported="partial">
 		<description>MegaMania</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Enemy playfield has strip glitch on topmost row
+]]></notes>
 		<info name="serial" value="CZ-003-04" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -3703,7 +3916,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="microill">
+	<software name="microill" supported="no">
 		<description>MicroIllustrator</description>
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
@@ -3718,7 +3931,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="maestro">
+	<software name="maestro" supported="no">
 		<description>MicroMaestro</description>
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
@@ -3733,7 +3946,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="maestrof" cloneof="maestro">
+	<software name="maestrof" cloneof="maestro" supported="no">
 		<description>MicroMaestro (Fixed)</description>
 		<!-- This ROM has been fixed to load on the A800 but will not play without device attached. -->
 		<year>1983</year>
@@ -3844,6 +4057,7 @@ Compiled by K1W1
 		<description>Monster Maze</description>
 		<year>1982</year>
 		<publisher>Epyx</publisher>
+		<!-- TODO: confirm not working on XL -->
 		<info name="serial" value="564R" />
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
@@ -3985,7 +4199,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="fischa">
+	<software name="fischa" cloneof="micfiler">
 		<description>Multi Fischa (Mex)</description>
 		<year>1985</year>
 		<publisher>Grupo SITSA</publisher>
@@ -4201,10 +4415,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="pitfall2">
+	<software name="pitfall2" supported="partial">
 		<description>Pitfall II - Lost Caverns</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Activision logo glitches out on vertical scrolls
+]]></notes>
 		<info name="serial" value="CA-011-04" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4218,6 +4435,7 @@ Compiled by K1W1
 		<description>Pitstop</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
+		<!-- TODO: confirm it doesn't work on XL -->
 		<info name="serial" value="604R" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4342,10 +4560,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="porkys">
+	<software name="porkys" supported="partial">
 		<description>Porky's</description>
 		<year>1983</year>
 		<publisher>Romox / 20th Century Fox</publisher>
+		<notes><![CDATA[
+Highway stage has offset rows (player sprite cuts off) [GTIA] mixing
+]]></notes>
 		<info name="serial" value="ECPC-02033" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4367,11 +4588,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="preppie">
+	<software name="preppie" supported="partial">
 		<description>Preppie (Reproduction)</description>
 		<!-- Re-package & Re-release of Adventure International 1982 release. -->
 		<year>2001</year>
 		<publisher>Video 61 / Adventure International</publisher>
+		<notes><![CDATA[
+Offset rows (player sprite cuts off) [GTIA] mixing
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -4380,11 +4604,15 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="prevue">
+	<software name="prevue" supported="no">
 		<description>Prevue (Rev. 06)</description>
 		<!-- Part of the EPG Jr. on-line cable TV guide system -->
 		<year>1991</year>
 		<publisher>Prevue Networks</publisher>
+		<notes><![CDATA[
+Plenty of frame glitches
+Needs comms for EPG
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -4393,10 +4621,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="princess">
+	<software name="princess" supported="no">
 		<description>Princess and the Frog</description>
 		<year>1982</year>
 		<publisher>Romox</publisher>
+		<notes><![CDATA[
+Offset rows on playfield
+Attract mode has glitchy text
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -4405,10 +4637,16 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="prisma1" supported="partial">
+	<!-- TODO: prisma* carts untested -->
+	<!-- (cfr. mega* collection, they all crashes in one way or another) -->
+
+	<software name="prisma1" supported="no">
 		<description>Prisma 1 (Spa, Pirate)</description>
 		<year>199?</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+No game in list boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4417,10 +4655,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="prisma2" supported="partial">
+	<software name="prisma2" supported="no">
 		<description>Prisma 2 (Spa, Pirate)</description>
 		<year>199?</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+No game in list boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4429,11 +4670,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="prisma3" supported="partial">
+	<software name="prisma3" supported="no">
 		<description>Prisma 3 (Spa, Pirate)</description>
 		<!-- The last game (Crystal Raider) doesn't run. Possible Bad dump. -->
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+No game in list boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4442,7 +4686,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="prisma4" supported="partial">
+	<software name="prisma4" supported="no">
 		<description>Prisma 4 (Spa, Pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
@@ -4454,7 +4698,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="prisma5" supported="partial">
+	<software name="prisma5" supported="no">
 		<description>Prisma 5 (Spa, Pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
@@ -4466,7 +4710,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="prisma6" supported="partial">
+	<software name="prisma6" supported="no">
 		<description>Prisma 6 (Spa, Pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
@@ -4478,7 +4722,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="prismas" supported="partial">
+	<software name="prismas" supported="no">
 		<description>Prisma Super 15-2 (Spa, Pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
@@ -4490,10 +4734,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="pronto">
+	<software name="pronto" supported="no">
 		<description>Pronto - Electronic Banking and Information Service</description>
 		<year>1985</year>
 		<publisher>Pronto</publisher>
+		<notes><![CDATA[
+Requires dial up modem
+]]></notes>
 		<info name="serial" value="22680" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4503,10 +4750,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="prontoa" cloneof="pronto">
+	<software name="prontoa" cloneof="pronto" supported="no">
 		<description>Pronto - The Home Information System</description>
 		<year>1983</year>
 		<publisher>Pronto</publisher>
+		<notes><![CDATA[
+Requires dial up modem
+]]></notes>
 		<info name="serial" value="22680" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4516,10 +4766,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="protctr2">
+	<software name="protctr2" supported="partial">
 		<description>Protector II</description>
 		<year>1982</year>
 		<publisher>Synapse</publisher>
+		<notes><![CDATA[
+Doesn't draw game over "the end" screen properly, [ANTIC] vertical scroll?
+]]></notes>
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4651,6 +4904,7 @@ Compiled by K1W1
 		<description>Satan's Hollow (Unreleased)</description>
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
+		<info name="usage" value="Supports Booster-Grip Joystick Adaptor" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -4671,10 +4925,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="seafox">
-		<description>Sea Fox</description>
+	<software name="seafox" supported="no">
+		<description>Seafox</description>
+		<!-- MCMLXXXIII on attract -->
 		<year>1982</year>
 		<publisher>Brøderbund</publisher>
+		<notes><![CDATA[
+Doesn't display bottom text bar
+]]></notes>
 		<info name="serial" value="ATCART193" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4684,10 +4942,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="seahorse">
+	<software name="seahorse" supported="partial">
 		<description>Sea Horse Hide 'n Seek</description>
 		<year>1984</year>
 		<publisher>CBS Software</publisher>
+		<notes><![CDATA[
+Glitchy line on middle of screen
+]]></notes>
 		<info name="serial" value="4L-9890" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4724,10 +4985,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="shamus">
+	<software name="shamus" supported="partial">
 		<description>Shamus</description>
 		<year>1982</year>
 		<publisher>Synapse</publisher>
+		<notes><![CDATA[
+Line above score bar
+Score bar glitches out when player dies
+]]></notes>
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -4750,10 +5015,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="sistema">
+	<software name="sistema" supported="no">
 		<description>Sistema Controlado por Computadora</description>
 		<year>1992</year>
 		<publisher>ZZ Top Soft</publisher>
+		<notes><![CDATA[
+Crashes on boot, same as prisma* and mega* entries
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4800,10 +5068,11 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="smart50">
+	<software name="smart50" supported="no">
 		<description>Smart Terminal v5.0</description>
 		<year>1983</year>
 		<publisher>MPP</publisher>
+		<!-- Requires dial-up modem -->
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -4812,7 +5081,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="smart41" cloneof="smart50">
+	<software name="smart41" cloneof="smart50" supported="no">
 		<description>Smart Terminal v4.1</description>
 		<year>1983</year>
 		<publisher>MPP</publisher>
@@ -4824,10 +5093,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="soccer">
+	<software name="soccer" supported="no">
 		<description>Soccer</description>
 		<year>1982</year>
 		<publisher>Thorn EMI</publisher>
+		<notes><![CDATA[
+Unresponsive inputs [GTIA] latch trigger
+]]></notes>
 		<info name="serial" value="THB12003" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -4864,10 +5136,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="shuttle">
+	<software name="shuttle" supported="partial">
 		<description>Space Shuttle - A Journey Into Space</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Glitched rows, glitched gear GFX
+]]></notes>
 		<info name="serial" value="CA-012-04" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -5057,10 +5332,16 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="spectra2">
+	<software name="spectra2" supported="no">
 		<description>Spectraview II</description>
 		<year>198?</year>
 		<publisher>Display Systems International</publisher>
+		<notes><![CDATA[
+Black screen
+Requires Atari CX-77 Touch Tablet
+https://forums.atariage.com/topic/146490-spectraview-1-and-2-info/
+]]></notes>
+		<!-- TODO: confirm compatibility with a800xl only -->
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
@@ -5083,10 +5364,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="spidcity">
+	<software name="spidcity" supported="no">
 		<description>Spider City</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
+		<notes><![CDATA[
+Broken map GFX
+]]></notes>
 		<info name="serial" value="33015" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -5109,12 +5393,16 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="spyhunt">
+	<software name="spyhunt" supported="partial">
 		<description>Spy Hunter</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Doesn't mask sprites on top/bottom of screen [GTIA] GRACTL
+]]></notes>
 		<info name="serial" value="011-03" />
 		<info name="usage" value="2 joysticks required to play." />
+		<info name="developer" value="Syndein Systems" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -5230,6 +5518,7 @@ Compiled by K1W1
 		<description>Starion</description>
 		<year>1983</year>
 		<publisher>Romox</publisher>
+		<!-- TODO: looks buggy with infinite lives and can indefinitely keep dying on respawn (btanb?) -->
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -5238,10 +5527,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="storymac">
+	<software name="storymac" supported="no">
 		<description>Story Machine</description>
 		<year>1983</year>
 		<publisher>Spinnaker</publisher>
+		<notes><![CDATA[
+Glitched text and graphics displays
+]]></notes>
 		<info name="serial" value="SMC-AT" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -5270,6 +5562,7 @@ Compiled by K1W1
 		<year>1979</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CXL4006" />
+		<info name="usage" value="Requires paddle input" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -5278,7 +5571,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="sprcart">
+	<software name="sprcart" supported="no">
 		<description>Super Cartridge</description>
 		<year>199?</year>
 		<publisher>Unerring Master</publisher>
@@ -5304,10 +5597,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="eburner">
+	<software name="eburner" supported="no">
 		<description>Super E-Burner</description>
 		<year>1992</year>
 		<publisher>CSS</publisher>
+		<notes><![CDATA[
+EPROM dumper, throws disk error #130 when trying to read, presumably accesses extra HW
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -5328,7 +5624,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="ssketch">
+	<software name="ssketch" supported="no">
 		<description>Super Sketch Graphics Master</description>
 		<year>1984</year>
 		<publisher>PPI</publisher>
@@ -5382,10 +5678,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="supermn3">
+	<software name="supermn3" supported="partial">
 		<description>Superman III (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Glitchy first line of text on title screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -5411,6 +5710,7 @@ Compiled by K1W1
 		<description>Tamlilan (Hebrew Text Editor)</description>
 		<year>19??</year>
 		<publisher>Aram</publisher>
+		<!-- TODO: language barrier, doesn't really seem usable? -->
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -5419,11 +5719,11 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="target">
-		<description>Target Electronic Banking</description>
+	<software name="target" supported="no">
+		<description>Target Electronic Banking (v.0115)</description>
 		<year>1986</year>
 		<publisher>COVIDEA</publisher>
-		<info name="usage" value="Modem required (and a working Chemical Bank service, obviously inactive for decades)" />
+		<info name="usage" value="Requires dial-up modem and a working Chemical Bank service, obviously inactive for decades" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -5432,10 +5732,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="telelnk1">
+	<software name="telelnk1" supported="no">
 		<description>Telelink I</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Throws a "RS232 ERROR: 130", hangs
+]]></notes>
 		<info name="serial" value="CXL4015" />
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
@@ -5446,10 +5749,15 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="telelnk2">
+	<software name="telelnk2" supported="no">
 		<description>Telelink II</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+"LINE INTERFACE ERROR"
+Requires [NVRAM] to be 1-filled otherwise it will give invalid config
+Requires dial-up modem
+]]></notes>
 		<info name="serial" value="CXL4016" />
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
@@ -5460,10 +5768,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="test65">
+	<software name="test65" supported="no">
 		<description>Test Atari 65-130XE R.2</description>
 		<year>1986</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Throws a "SYSTEM ERROR CODE=01" at boot, "[ANTIC] horizontal or vertical sync error" according to service manual, bypass with bp a141,1,{pc=0xa177;g}
+Fails PORT test
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -5472,10 +5784,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="designer">
+	<software name="designer" supported="partial">
 		<description>The Designer's Pencil</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+File saving unsupported [disk] or [tape]
+]]></notes>
 		<info name="serial" value="CC-102-04" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -5522,10 +5837,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="phone">
+	<software name="phone" supported="no">
 		<description>The Learning Phone</description>
 		<year>1985</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Requires PLATO dial-up modem connection
+]]></notes>
 		<info name="serial" value="RX8080" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -5541,6 +5859,7 @@ Compiled by K1W1
 		<year>1984</year>
 		<publisher>Eastern House</publisher>
 		<info name="usage" value="You must type 'X=USR(32768)' from the BASIC prompt to initialize it." />
+		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k_right" />
 			<dataarea name="rom" size="8192">
@@ -5554,6 +5873,7 @@ Compiled by K1W1
 		<!-- This cartridge could only be used in the A800 Right Cartridge Slot. -->
 		<year>1983</year>
 		<publisher>Eastern House</publisher>
+		<info name="usage" value="Needs an Atari BASIC inserted in Left Slot"/>
 		<sharedfeat name="compatibility" value="Right Slot"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k_right" />
@@ -5568,6 +5888,7 @@ Compiled by K1W1
 		<!-- This cartridge could only be used in the A800 Right Cartridge Slot. -->
 		<year>1983</year>
 		<publisher>Eastern House</publisher>
+		<info name="usage" value="Needs an Atari BASIC inserted in Left Slot"/>
 		<sharedfeat name="compatibility" value="Right Slot"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k_right" />
@@ -5582,6 +5903,7 @@ Compiled by K1W1
 		<!-- This cartridge could only be used in the A800 Right Cartridge Slot. -->
 		<year>1981</year>
 		<publisher>Eastern House</publisher>
+		<info name="usage" value="Needs an Atari BASIC inserted in Left Slot"/>
 		<sharedfeat name="compatibility" value="Right Slot"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k_right" />
@@ -5593,9 +5915,11 @@ Compiled by K1W1
 
 	<software name="writerd" supported="no">
 		<description>The Writer's Tool (Dongle)</description>
-		<!-- This cartridge requires the Writer's Tool disk software. It's basic function appears to be as a copy protection dongle for the disk software. -->
 		<year>1985</year>
 		<publisher>OSS</publisher>
+		<notes><![CDATA[
+This cartridge requires the Writer's Tool disk software. It's basic function appears to be as a copy protection dongle for the disk software.
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss8k" />
 			<dataarea name="rom" size="8192">
@@ -5629,11 +5953,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="trackfld">
-		<description>Track and Field</description>
+	<software name="trackfld" supported="partial">
 		<!-- When run in PAL the title screen says "Los Angeles 1984 Games". -->
+		<description>Track &amp; Field</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Has garbage row strip on top of active playfield during hammer throw event
+]]></notes>
 		<info name="serial" value="RX8069" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -5861,7 +6188,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="turbosys">
+	<software name="turbosys" supported="no">
 		<description>Turbo System</description>
 		<year>1993</year>
 		<publisher>Dadok</publisher>
@@ -5873,10 +6200,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="turmoil">
+	<software name="turmoil" supported="partial">
 		<description>Turmoil</description>
 		<year>1982</year>
 		<publisher>Sirius</publisher>
+		<notes><![CDATA[
+Cuts off score text at bottom
+]]></notes>
 		<info name="serial" value="33005" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -5886,10 +6216,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="trion">
+	<software name="trion" supported="partial">
 		<description>Trion</description>
 		<year>1983</year>
 		<publisher>Romox / London Software</publisher>
+		<notes><![CDATA[
+a400/a800: crashes at boot (should be compatible, boots with a800xl)
+]]></notes>
 		<info name="serial" value="ECPC-02213" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -5911,10 +6244,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="typo">
+	<software name="typo" supported="no">
 		<description>Typo</description>
 		<year>1982</year>
 		<publisher>Romox</publisher>
+		<notes><![CDATA[
+a400/a800: Screen becomes garbled randomly during gameplay (depends on key pressed? doesn't seem to happen on a800xl)
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -5949,10 +6285,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="upndown">
+	<software name="upndown" supported="no">
 		<description>Up 'n Down</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Flickering enemy sprites
+]]></notes>
 		<info name="serial" value="009-03" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -5987,7 +6326,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="viscopy3">
+	<software name="viscopy3" supported="no">
 		<description>VisiCopy III</description>
 		<year>1993</year>
 		<publisher>JRC</publisher>
@@ -6025,7 +6364,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="weltraum">
+	<software name="weltraum" cloneof="cosmiclf">
 		<description>Weltraumkolonie (Ger)</description>
 		<year>1984</year>
 		<publisher>Spinnaker / Ravensburger</publisher>
@@ -6037,10 +6376,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="whizkid">
+	<software name="whizkid" supported="no">
 		<description>Whiz Kid</description>
 		<year>1983</year>
 		<publisher>Romox</publisher>
+		<notes><![CDATA[
+During gameplay touching to bottom left or right corners causes vblank desyncs
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -6065,6 +6407,7 @@ Compiled by K1W1
 		<description>Wizard of Wor</description>
 		<year>1983</year>
 		<publisher>Roklan</publisher>
+		<info name="usage" value="Uses port 2 for single player"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -6073,10 +6416,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="wormwar">
+	<software name="wormwar" supported="no">
 		<description>Worm War 1</description>
 		<year>1982</year>
 		<publisher>Sirius</publisher>
+		<notes><![CDATA[
+Has phantom blocks starting from level 2, which [GTIA] collides too
+]]></notes>
 		<info name="serial" value="33002" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -6090,6 +6436,12 @@ Compiled by K1W1
 		<description>Yie Another Kung-Fu</description>
 		<year>2011</year>
 		<publisher>GR8 Software</publisher>
+		<notes><![CDATA[
+Title screen is very off, [ANTIC] timing sensitive
+a800xl: crashes once you start a game
+a800xlp: during gameplay it alternates between gameplay render and wide sprite outlines, also player attacks doesn't connect, [GTIA] collision
+]]></notes>
+		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_corina" />
 			<dataarea name="rom" size="1056768">
@@ -6137,10 +6489,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="zybex">
+	<software name="zybex" supported="partial">
 		<description>Zybex</description>
 		<year>1999</year>
 		<publisher>Video 61 / Williams</publisher>
+		<notes><![CDATA[
+Garbage row strip at bottom of screen
+]]></notes>
 		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -6149,5 +6504,4 @@ Compiled by K1W1
 			</dataarea>
 		</part>
 	</software>
-
 </softwarelist>

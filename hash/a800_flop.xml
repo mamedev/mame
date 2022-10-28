@@ -8,7 +8,8 @@ license:CC0
 
     note: many 'original' floppy images are in .atx format, whereas cracked / unprotected ones are .atr format
           .atx is unsupported, although apparently has been reverse engineered (insert info link here)
-          There are also images in .xex format?
+    There are also images in .xex format, which are raw executable files and
+    needs to be loaded thru a DOS loader or an SD card cartridge, for all purposes they won't fit here.
 
 -->
 
@@ -29,6 +30,9 @@ license:CC0
 		<description>S.A.M.</description>
 		<year>1982</year>
 		<publisher>Don't Ask</publisher>
+		<notes><![CDATA[
+Doesn't boot
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="sam.atr" size="92176" crc="a5895d13" sha1="da2118f26dd46b0435ba6a486f17069734bad812"/>
@@ -36,10 +40,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ulysses" supported="no">
+	<software name="ulysses">
 		<description>Ulysses and the Golden Fleece</description>
 		<year>1986</year>
 		<publisher>Sierra On-Line</publisher>
+		<!-- was marked unsupported (for side B screen automatically moving without waiting user input?), assume fixed. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Ulysses And The Golden Fleece [Rel. 1] [Side A].atr" size="92176" crc="e16b8dc8" sha1="4e55312b5259c96138f48703fcaa58a6edd0d922"/>
@@ -79,10 +84,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="countdwn">
+	<software name="countdwn" supported="no">
 		<description>Countdown</description>
 		<year>1984</year>
 		<publisher>Synapse</publisher>
+		<notes><![CDATA[
+a800: cannot set charges, player ammo doesn't draw properly
+a800xl: crashes often on boot (reset multiple times will make it to eventually work)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Countdown.atr" size="92176" crc="0471796a" sha1="d02b8ad67b2f1f27b340e6fa94aa0c9bc03d2ad7"/>
@@ -90,10 +99,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="silents">
+	<software name="silents" supported="partial">
 		<description>Silent Service</description>
 		<year>1985</year>
 		<publisher>Microprose</publisher>
+		<notes><![CDATA[
+a800xl: crashes on boot
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Silent Service.atr" size="92176" crc="bda9ac46" sha1="312c76e40f0941749e3909afd4a7d7a83f398210"/>
@@ -101,10 +113,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="templtri">
-		<description>Temple Of Apshai Triology</description>
+	<software name="templtri" supported="partial">
+		<description>Temple Of Apshai Trilogy</description>
 		<year>1985</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+Unsupported character save to [disk]
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Temple of Apshai Trilogy (The).atr" size="92176" crc="a5cdca88" sha1="e9955303ba855beeafb0e5bf9b5b683d0fbb8701"/>
@@ -123,10 +138,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shamus2">
+	<software name="shamus2" supported="partial">
 		<description>Shamus: Case II</description>
 		<year>1983</year>
 		<publisher>Synapse</publisher>
+		<notes><![CDATA[
+Runs too fast, [ANTIC] timings
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Shamus - Case II.atr" size="92176" crc="2b6696c6" sha1="f3079c19f54ae5dc6fc9de6ca80341e9a2527c05"/>
@@ -134,10 +152,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wkarate">
-		<description>World Karate Championship</description>
+	<software name="wkarate" supported="partial">
+		<!-- "Cracked by Kilroy (P) N.A.P.O." briefly appears on boot -->
+		<description>World Karate Championship (cracked)</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+a800xl: randomly doesn't boot (soft reset multiple times will eventually make it to start)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="133136">
 				<rom name="World Karate Championship (v4).atr" size="133136" crc="a89bf1e6" sha1="97fbaf575d9f9ddbecd1528c7d5090d2fdac6f3e"/>
@@ -156,10 +178,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cloderun">
+	<software name="cloderun" supported="no">
 		<description>Championship Lode Runner</description>
 		<year>1985</year>
 		<publisher>Broderbund</publisher>
+		<notes><![CDATA[
+Garbled GFXs
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Championship Lode Runner.atr" size="92176" crc="53e02689" sha1="dc92e8616fa2e00432b388df97d508c1a0b6db3c"/>
@@ -167,10 +192,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="marsmis2">
+	<software name="marsmis2" supported="partial">
 		<description>Mars Mission II</description>
 		<year>1981</year>
 		<publisher>Antic</publisher>
+		<notes><![CDATA[
+Clearing a stage will have some dots in the text GFX
+a800xl: doesn't boot (btanb?)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Mars Mission II.atr" size="92176" crc="59694595" sha1="4b2ad8bdcbbd4c8f5aef154e55bf4950b15798f3"/>
@@ -190,7 +219,8 @@ license:CC0
 	</software>
 
 	<software name="brucelee">
-		<description>Bruce Lee</description>
+		<!-- "CRACKED BY GEORGE!" -->
+		<description>Bruce Lee (cracked)</description>
 		<year>1984</year>
 		<publisher>Datasoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -233,10 +263,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="spyvspy">
+	<software name="spyvspy" supported="no">
 		<description>Spy Vs Spy</description>
 		<year>1984</year>
 		<publisher>First Star</publisher>
+		<notes><![CDATA[
+Often crashes at the end of an attract game sequence, which in turn desyncs
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="Spy Vs Spy (1984)(First Star).atr" size="92176" crc="91940f40" sha1="d57d8ecbb0b14987c8fc64b27fe1511779c62f4d"/>
@@ -256,7 +289,8 @@ license:CC0
 	</software>
 
 	<software name="spyvspyi">
-		<description>Spy Vs Spy - The Island Caper</description>
+		<!-- "CRACKED BY CAPTAIN WIZARD (P) 1986 N.A.P.O" during attract -->
+		<description>Spy Vs Spy - The Island Caper (cracked)</description>
 		<year>1985</year>
 		<publisher>First Star Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -277,7 +311,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="montzump">
+	<!-- Looks more polished than retail version, with title screen etc. -->
+	<!-- except it's missing content (cfr. file sizes) and unwinnable. -->
+	<software name="montzump" cloneof="montzuma">
 		<description>Montezuma's Revenge! (Prototype)</description>
 		<year>1983</year>
 		<publisher>Utopia Software</publisher>
@@ -288,10 +324,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mrrobot">
+	<software name="mrrobot" supported="partial">
 		<description>Mr. Robot and his Robot Factory</description>
 		<year>1983</year>
 		<publisher>Datamost</publisher>
+		<notes><![CDATA[
+Random black screen after title screen, particularly on soft resets
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="mr robot and his robot factory.atr" size="92176" crc="36f3bdb0" sha1="8bb1f04783e883bb20aec5b83e3493632d9dd0bd"/>
@@ -299,10 +338,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="castwolf" supported="partial">
+	<software name="castwolf" supported="no">
 		<description>Castle Wolfenstein</description>
 		<year>1983</year>
 		<publisher>Muse Software</publisher>
+		<notes><![CDATA[
+Castle GFX doesn't draw on title screen, uses [ANTIC] GFX mode F
+Should prompt for a "press space key" when player dies or get captured but never happens, hangs
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="castle wolfenstein.atr" size="92176" crc="7745cd05" sha1="03ba4218d20f260f3e17c7ce540c952cd071bdf5"/>
@@ -310,10 +353,15 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bcastwlf">
+	<software name="bcastwlf" supported="no">
 		<description>Beyond Castle Wolfenstein</description>
 		<year>1984</year>
 		<publisher>Muse Software</publisher>
+		<notes><![CDATA[
+Punts to prompt when "SAVING THE GAME" (CTRL+C), unsupported [disk] save
+Bunker is always fixed, no RNG?
+]]></notes>
+		<info name="usage" value="Requires a minimum of 48KB RAM" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="beyond castle wolfenstein.atr" size="92176" crc="78ef8db7" sha1="a0916bd0dde1b748834411c96cb2ae058b38f3c2"/>
@@ -343,10 +391,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="alleycat">
+	<software name="alleycat" supported="partial">
 		<description>Alley Cat</description>
 		<year>1983</year>
 		<publisher>Synapse</publisher>
+		<notes><![CDATA[
+Runs too fast
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65552">
 				<rom name="alleycat.atr" size="65552" crc="12e2eb0d" sha1="a99e131f024e5df10316860b6d174a16aadc8651"/>
@@ -358,6 +409,7 @@ license:CC0
 		<description>Jumpman</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
+		<info name="usage" value="Hold OPTION key during boot to disable BASIC, requires 32K RAM as minimum" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="jumpman.atr" size="92176" crc="290a9e56" sha1="96c411a65cfd0b45ac68603021793701d27244b9"/>
@@ -365,13 +417,18 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="elktrgld" supported="no"> <!-- title screen works but crashes at start of any track -->
+	<software name="elktrgld" supported="partial">
 		<!-- Flippy disk, c64 version on side A -->
+		<!-- Supposedly a PAL release, tested to have too much overscan on real HW -->
 		<description>Elektra Glide</description>
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
+		<notes><![CDATA[
+[ANTIC] playfield is offset one line on mountain strip
+]]></notes>
 		<info name="serial" value="64712" />
 
+		<info name="usage" value="Hold OPTION key during boot to disable BASIC" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92160">
 				<rom name="elektraglide.xfd" size="92160" crc="96185b1c" sha1="fb9825a432b83a2a7e623a2f617d0fa11de08158"/>
@@ -379,12 +436,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="koalapnt">
+	<software name="koalapnt" supported="no">
 		<!-- Flippy disk, c64 version on side A -->
 		<description>KoalaPainter (Light Pen)</description>
 		<year>1984</year>
 		<publisher>Koala Technologies</publisher>
 		<info name="serial" value="00626-001" />
+		<info name="usage" value="Requires light pen"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92160">
@@ -421,10 +479,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="croschck" supported="no"> <!-- randomly freezes up on player's turn screen -->
+	<software name="croschck" supported="no">
 		<description>Crosscheck</description>
 		<year>1986</year>
 		<publisher>Datasoft</publisher>
+		<notes><![CDATA[
+Throws [disk] read errors on soft reset, hangs if you press start
+Randomly freezes up on player's turn screen (cannot reproduce, assume fixed)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="crosscheck (1986)(datasoft)(us).atr" size="92176" crc="b4cef936" sha1="1bb9efe6ce4829388f933ae85dd0836749ca9e55"/>  <!-- Verified -->
@@ -461,7 +523,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cvrnmars" supported="partial">
+	<software name="cvrnmars">
 		<description>Caverns of Mars</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
@@ -472,7 +534,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dandydgn" supported="partial">
+	<!-- was supported="partial" with no note, assume for glitchy bottom bar (fixed) -->
+	<software name="dandydgn">
 		<description>Dandy Dungeon</description>
 		<year>1985</year>
 		<publisher>Antic</publisher>
@@ -505,9 +568,11 @@ license:CC0
 	</software>
 
 	<software name="essex">
+		<!-- Prints a "8-28-85" date if you fail copy protection check, release date? -->
 		<description>Essex</description>
 		<year>1985</year>
 		<publisher>Synapse Software</publisher>
+		<info name="usage" value="Sports manual copy protection"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="essex (1985)(synapse software)(us)(disk 1 of 2 side a)(disk 1, side 1).atr" size="92176" crc="551e10de" sha1="9bd38275b73a9f5b814dc7375ee7139693bc179b"/> <!-- Verified -->
@@ -545,6 +610,7 @@ license:CC0
 		<description>Galahad and the Holy Grail</description>
 		<year>1982</year>
 		<publisher>Atari Program Exchange</publisher>
+		<!-- TODO: verify collision detection -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="galahad and the holy grail (1982)(apx)(us).atr" size="92176" crc="d575a0bb" sha1="9f03ddbd745919e93113daed1117a59751f22ae5"/> <!-- Verified -->
@@ -567,6 +633,10 @@ license:CC0
 		<description>L.A. SWAT + Panther</description>
 		<year>1988</year>
 		<publisher>Mastertronic</publisher>
+		<notes><![CDATA[
+Ghost player sprite appears for a brief second at center of screen
+Doesn't mask bottom part, with enemy sprite repeated (and moving) [GTIA] GRACTL
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="l.a. swat + panther (1988)(mastertronic)(us).atr" size="92176" crc="6c4752f6" sha1="df6a82e8946d7100620c3947d9e7e106f513fa26"/> <!-- Verified -->
@@ -590,10 +660,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="phantas">
+	<software name="phantas" supported="no">
 		<description>Phantasie</description>
 		<year>1987</year>
 		<publisher>SSI</publisher>
+		<notes><![CDATA[
+Throws a "drive not ready" when exiting town, pressing any key just black screen
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 1 of 2 side a)(disk 1).atr" size="92176" crc="4f6d019f" sha1="d1ddaaac1ec56b6080cf3f28e43a6d021e6089c2"/> <!-- Verified -->
@@ -604,9 +677,10 @@ license:CC0
 				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 1 of 2 side b)(disk 2).atr" size="92176" crc="d49b5aa8" sha1="fe5adccc9876e1b9568009fb5850f58449199385"/> <!-- Verified -->
 			</dataarea>
 		</part>
+		<!-- baddump: non-factory save -->
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 2 of 2 side a)(disk 3)[m].atr" size="92176" crc="2be4ac66" sha1="c31cae2144e7eed0695d9453f6407994dc1a6d6a"/> <!-- has user save data on disk -->
+				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 2 of 2 side a)(disk 3)[m].atr" size="92176" crc="2be4ac66" sha1="c31cae2144e7eed0695d9453f6407994dc1a6d6a" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
@@ -617,7 +691,8 @@ license:CC0
 	</software>
 
 	<software name="phobos">
-		<description>Phobos v1.1</description>
+		<description>Phobos (v1.1)</description>
+		<!-- MCMLXXXII on title screen -->
 		<year>1983</year>
 		<publisher>Atari Program Exchange</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -671,10 +746,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="saracen">
+	<software name="saracen" supported="partial">
 		<description>Saracen</description>
 		<year>1987</year>
 		<publisher>Datasoft</publisher>
+		<notes><![CDATA[
+a800xl: doesn't boot
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="saracen (1987)(datasoft)(us)(side a).atr" size="92176" crc="512b4ab7" sha1="3b91a79a49c699ea458a85fe81612a55e494c1ec"/> <!-- Verified -->
@@ -687,10 +765,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shatalli">
+	<software name="shatalli" supported="partial">
 		<description>Chronicles of Osgorth: The Shattered Alliance</description>
 		<year>1981</year>
 		<publisher>SSI</publisher>
+		<notes><![CDATA[
+Unsupported [disk] saves
+]]></notes>
 		<sharedfeat name="requirement" value="a800:basicb"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
@@ -711,10 +792,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="spellbrk">
+	<software name="spellbrk" supported="partial">
 		<description>Spellbreaker</description>
 		<year>1985</year>
 		<publisher>Infocom</publisher>
+		<notes><![CDATA[
+a800xl: doesn't boot
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="spellbreaker rel 63 (1985-09-16)(infocom)(us)(side a).atr" size="92176" crc="c8d46edd" sha1="5f7aef1cff9ba58f4a2178c967e2c9b49fce9e34"/> <!-- Verified -->
@@ -727,10 +811,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="spitfr40" supported="no"> <!-- joystick/keyboard inputs mostly not responsive -->
+	<software name="spitfr40" supported="no">
 		<description>Spitfire 40</description>
 		<year>1986</year>
 		<publisher>Avalon Hill</publisher>
+		<notes><![CDATA[
+Unresponsive joystick/keyboard inputs, pressing down on joystick just returns to main menu
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="spitfire 40 (1986)(avalon hill)(us).atr" size="92176" crc="875a404f" sha1="49e6c560d38137944c1cd9bc6c5f37a012045a84"/> <!-- Verified -->
@@ -738,12 +825,17 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Requires 128K RAM -->
-	<software name="t34" supported="no"> <!-- fails to load due to insufficient RAM -->
+	<software name="t34" supported="partial">
 		<description>T-34: The Battle</description>
 		<year>1994</year>
 		<publisher>A.N.G. Software</publisher>
+		<notes><![CDATA[
+a800xl: cannot setup RAM higher than 64KB
+a130xe: scrolling is jerky when shooting in gameplay
+]]></notes>
+		<info name="usage" value="Requires 128KB of RAM"/>
 		<sharedfeat name="compatibility" value="XL/XE"/>
+		<!-- dual sided single floppy according to game -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="133136">
 				<rom name="t-34 - the battle (1994)(a.n.g. software)(nl)(fw)(side a).atr" size="133136" crc="4c276dc4" sha1="7720e199b7061852668979feb1a67aa042eac76c"/>  <!-- Verified -->
@@ -757,10 +849,15 @@ license:CC0
 	</software>
 
 	<!-- Atari Translator allows disks that only work on earlier 400/800 systems to load on later XL/XE machines -->
-	<software name="transltr"> <!-- runs but needs testing -->
+	<software name="transltr" supported="no">
 		<description>Atari Translator (USA)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		 <!-- runs but needs testing -->
+		 <notes><![CDATA[
+Detects a cartridge present even if it's not
+Tested with marsmis2, fails
+]]></notes>
 		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
@@ -774,11 +871,14 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Only works on PAL, use the a800xlp driver. You must hold the OPTION key (default: F3) when booting to disable BASIC. Game freezes otherwise. -->
-	<software name="turbican" supported="partial"> <!-- Prior comments are probably BTANB. However, seems glitchy even on a800xlp. -->
+	<software name="turbican" supported="partial">
 		<description>Turbican</description>
 		<year>1993</year>
 		<publisher>ASF s.c.</publisher>
+		<notes><![CDATA[
+1st demo mode screen draws offset background colors [GTIA]
+]]></notes>
+		<info name="usage" value="Works best on a800xlp. Hold OPTION key during boot to disable BASIC otherwise game freezes when starting a game"/>
 		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="133136">
@@ -787,10 +887,16 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="yoomp" supported="no"> <!-- black screen after loading screens -->
-		<description>Yoomp!</description>
+	<!-- v.1.0 also known to exist (in .xex format -->
+	<software name="yoomp" supported="partial">
+		<description>Yoomp! (v.1.1)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Draws few garbage text chars when trying to enter a password in main menu
+Prints "STEREO NOT DETECTED" on main menu, refers to unofficial [POKEY] extra chip add to $d280-$d2ff range
+]]></notes>
+		<info name="usage" value="Hold OPTION key during boot to disable BASIC" />
 		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
@@ -799,10 +905,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="zybex">
+	<software name="zybex" supported="partial">
 		<description>Zybex (Ned)</description>
 		<year>1994</year>
 		<publisher>A.N.G. Software</publisher>
+		<notes><![CDATA[
+Garbage row strip at bottom of screen
+]]></notes>
+		<info name="usage" value="Hold OPTION key during boot to disable BASIC" />
 		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
@@ -868,11 +978,13 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- http://www.mr-atari.com/Mr.Atari/LiteDOS/ -->
-	<software name="litedosse"> <!-- runs but needs testing -->
+	<software name="litedosse">
 		<description>Atari LiteDOS-SE</description>
 		<year>2022</year>
-		<publisher>Mr.Atari</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Mr.Atari"/>
+		<!-- http://www.mr-atari.com/Mr.Atari/LiteDOS/ -->
+		<!-- TODO: runs but needs testing, particularly with .xex format -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="LiteDOS-SE (build 2022-01-14).atr" size="92176" crc="779dbfae" sha1="5cbbe75cf0489213d87e2c7cdaf2f8bfc802cf56"/>

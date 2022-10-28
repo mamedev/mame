@@ -16,11 +16,11 @@ public:
 	rgb_t func(rgb_t dest, rgb_t addMe);
 	rgb_t func(rgb_t dest, rgb_t addMe, u8 alpha);
 	void drawgfx(palette_device &palette,bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color);
+			u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+			u8 transparent_color);
 	void drawgfx(palette_device &palette,bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color);
+			u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+			u8 transparent_color);
 
 protected:
 	// device-level overrides
@@ -30,8 +30,8 @@ protected:
 private:
 	template<class BitmapClass>
 	void drawgfx_common(palette_device &palette,BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color);
+			u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+			u8 transparent_color);
 };
 
 DECLARE_DEVICE_TYPE(JALECO_BLEND, jaleco_blend_device)

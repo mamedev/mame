@@ -935,8 +935,10 @@ ROM_START(spectrum)
 	ROMX_LOAD("diagrom.v51",0x0000,0x4000, CRC(83034df6) SHA1(e57b2c8a8e3563ea02a20eecd1d4cb6be9f9c2df), ROM_BIOS(27))
 	ROM_SYSTEM_BIOS(28, "diagv56", "DiagROM v1.56")
 	ROMX_LOAD("diagrom.v56",0x0000,0x4000, CRC(0ed22f7a) SHA1(37caf0bbc2d023ca5afaa12b3856ac90dbc83c51), ROM_BIOS(28))
-	ROM_SYSTEM_BIOS(29, "alford37", "Brian Alford's Test ROM v0.37")
-	ROMX_LOAD("testromv037.bin", 0x0000,0x4000, CRC(a7ea3d1c) SHA1(f699b73abfb1ab53c063ac02ac6283705864c734), ROM_BIOS(29))
+	ROM_SYSTEM_BIOS(29, "diagv59", "DiagROM v1.59")
+	ROMX_LOAD("diagrom.v59",0x0000,0x4000, CRC(90e2ca5a) SHA1(dac1f877cbfdd516a8bf6336d8eff5902bd06438), ROM_BIOS(29))
+	ROM_SYSTEM_BIOS(30, "alford37", "Brian Alford's Test ROM v0.37")
+	ROMX_LOAD("testromv037.bin", 0x0000,0x4000, CRC(a7ea3d1c) SHA1(f699b73abfb1ab53c063ac02ac6283705864c734), ROM_BIOS(30))
 ROM_END
 
 ROM_START(specide)

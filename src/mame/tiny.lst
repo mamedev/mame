@@ -9,11 +9,17 @@
 
 ******************************************************************************/
 
-robby           // (c) 1981 Bally Midway
-gridlee         // [1983 Videa] prototype - no copyright notice
-alienar         // (c) 1985 Duncan Brown
-
+@source:exidy/carpolo.cpp
 carpolo         // (c) 1977 Exidy
+
+@source:exidy/circus.cpp
+circus          // (c) 1977 Exidy
+circuso         // (c) 1977 Exidy
+robotbwl        // (c) 197? Exidy
+crash           // (c) 1979 Exidy
+ripcord         // (c) 1979 Exidy
+
+@source:exidy/exidy.cpp
 sidetrac        // (c) 1979 Exidy
 targ            // (c) 1980 Exidy
 spectar         // (c) 1980 Exidy
@@ -21,22 +27,39 @@ teetert         // (c) 1982 Exidy
 hardhat         // (c) 1982
 fax             // (c) 1983
 fax2            // (c) 1983
-circus          // (c) 1977 Exidy
-circuso         // (c) 1977 Exidy
-robotbwl        // (c) 197? Exidy
-crash           // (c) 1979 Exidy
-ripcord         // (c) 1979 Exidy
+
+@source:exidy/starfire.cpp
 starfire        // (c) 1979 Exidy
 starfirea       // (c) 1979 Exidy
 fireone         // (c) 1979 Exidy
 starfir2        // (c) 1979 Exidy
-victory         // (c) 1982
-victorba        // (c) 1982
+
+@source:exidy/vertigo.cpp
 topgunnr        // (c) 1986
 
+@source:exidy/victory.cpp
+victory         // (c) 1982
+victorba        // (c) 1982
+
+@source:gaelco/wrally.cpp
+wrally          // (c) 1993 - Ref 930705
+
+@source:midway/astrocde.cpp
+robby           // (c) 1981 Bally Midway
+
+@source:midway/gridlee.cpp
+gridlee         // [1983 Videa] prototype - no copyright notice
+
+@source:midway/williams.cpp
+alienar         // (c) 1985 Duncan Brown
+
+@source:venture/looping.cpp
 looping         // (c) 1982 Video Games GMBH
+
+@source:misc/supertnk.cpp
 supertnk        // (c) 1981 VIDEO GAMES GmbH, W.-GERMANY
 
+@source:misc/goldnpkr.cpp
 witchgme        // (c) 1991 Video Klein
 witchjol        // (c) 1994 Video Klein
 wldwitch        // (c) 2001 Video Klein
@@ -70,5 +93,3 @@ wstrikea        // (c) 1992 Video Klein
 wtchjack        // (c) 1996 Video Klein
 wtchjacka       // (c) 1996 Video Klein
 wtchjackb       // (c) 1996 Video Klein
-
-wrally          // (c) 1993 - Ref 930705

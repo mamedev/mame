@@ -148,6 +148,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	force_ready = false;
 	disable_motor_control = false;
 	spinup_on_interrupt = false;
+	extended_ddam = false;
 	hlt = true; // assume tied to VCC
 }
 
@@ -354,7 +355,9 @@ void wd_fdc_device_base::command_end()
 	motor_timeout = 0;
 
 	if(!drq && (status & S_BUSY)) {
-		status &= ~S_BUSY;
+		if (!t_cmd->enabled()) {
+			status &= ~S_BUSY;
+		}
 		intrq = true;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
@@ -1682,6 +1685,14 @@ bool wd_fdc_device_base::read_one_bit(const attotime &limit)
 	return false;
 }
 
+void wd_fdc_device_base::reset_data_sync()
+{
+	cur_live.data_separator_phase = false;
+	cur_live.bit_counter = 0;
+
+	cur_live.data_reg = bitswap<8>(cur_live.shift_reg, 14, 12, 10, 8, 6, 4, 2, 0);
+}
+
 bool wd_fdc_device_base::write_one_bit(const attotime &limit)
 {
 	bool bit = cur_live.shift_reg & 0x8000;
@@ -1778,15 +1789,13 @@ void wd_fdc_device_base::live_run(attotime limit)
 
 			if(!dden && cur_live.shift_reg == 0x4489) {
 				cur_live.crc = 0x443b;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
+				reset_data_sync();
 				cur_live.state = READ_HEADER_BLOCK_HEADER;
 			}
 
 			if(dden && cur_live.shift_reg == 0xf57e) {
 				cur_live.crc = 0xef21;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
+				reset_data_sync();
 				if(main_state == READ_ID)
 					cur_live.state = READ_ID_BLOCK_TO_DMA;
 				else
@@ -1906,8 +1915,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 
 				if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg == 0x4489) {
 					cur_live.crc = 0x443b;
-					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 0;
+					reset_data_sync();
 					cur_live.state = READ_DATA_BLOCK_HEADER;
 				}
 			} else {
@@ -1924,11 +1932,16 @@ void wd_fdc_device_base::live_run(attotime limit)
 						cur_live.shift_reg == 0xf56e ? 0xafa5 :
 						0xbf84;
 
-					if((cur_live.data_reg & 0xfe) == 0xf8)
+					reset_data_sync();
+
+					if(extended_ddam) {
+						if(!(cur_live.data_reg & 1))
+							status |= S_DDM;
+						if(!(cur_live.data_reg & 2))
+							status |= S_DDM << 1;
+					} else if((cur_live.data_reg & 0xfe) == 0xf8)
 						status |= S_DDM;
 
-					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 0;
 					cur_live.state = READ_SECTOR_DATA;
 				}
 			}
@@ -2027,7 +2040,10 @@ void wd_fdc_device_base::live_run(attotime limit)
 				// FM resyncs
 				&& !(dden && (cur_live.shift_reg == 0xf57e      // FM IDAM
 							|| cur_live.shift_reg == 0xf56f     // FM DAM
-							|| cur_live.shift_reg == 0xf56a))   // FM DDAM
+							|| cur_live.shift_reg == 0xf56a     // FM DDAM
+							|| cur_live.shift_reg == 0xf56b     // FM DDAM
+							|| cur_live.shift_reg == 0xf56e     // FM DDAM
+							|| cur_live.shift_reg == 0xf56f))   // FM DDAM
 				)
 				break;
 
@@ -2044,8 +2060,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			// MZ: TI99 "DISkASSEMBLER" copy protection requires a threshold of 8
 			bool output_byte = cur_live.bit_counter > 8;
 
-			cur_live.data_separator_phase = false;
-			cur_live.bit_counter = 0;
+			reset_data_sync();
 
 			if(output_byte) {
 				live_delay(READ_TRACK_DATA_BYTE);
@@ -2194,7 +2209,11 @@ void wd_fdc_device_base::live_run(attotime limit)
 						live_write_fm(0x00);
 					else if(cur_live.byte_counter < 7) {
 						cur_live.crc = 0xffff;
-						live_write_raw(command & 1 ? 0xf56a : 0xf56f);
+						if(extended_ddam) {
+							static const uint16_t dam[4] = { 0xf56f, 0xf56e, 0xf56b, 0xf56a };
+							live_write_raw(dam[command & 3]);
+						} else
+							live_write_raw(command & 1 ? 0xf56a : 0xf56f);
 					} else if(cur_live.byte_counter < sector_size + 7-1) {
 						if(drq) {
 							status |= S_LOST;
@@ -2701,6 +2720,7 @@ fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, dev
 	motor_control = false;
 	ready_hooked = true;
 	spinup_on_interrupt = true; // ZX-Spectrum Beta-disk V2 require this, or ReadSector command should set HLD before RDY check
+	extended_ddam = true;
 }
 
 int fd1771_device::calc_sector_size(uint8_t size, uint8_t command) const

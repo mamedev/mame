@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "mb63h158.h"
 #include "cpu/upd78k/upd78k3.h"
 #include "machine/nvram.h"
 
@@ -20,19 +21,27 @@ public:
 	}
 
 	void k1(machine_config &config);
+	void k1m(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void k1_map(address_map &map);
+	void k1m_map(address_map &map);
 
 	required_device<upd78310_device> m_mpu;
 };
 
 
-void kawai_k1_state::mem_map(address_map &map)
+void kawai_k1_state::k1m_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("coderom", 0);
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).ram().share("toneram");
+}
+
+void kawai_k1_state::k1_map(address_map &map)
+{
+	k1m_map(map);
+	map(0xf000, 0xf0ff).mirror(0x700).r("sensor", FUNC(mb63h158_device::read));
 }
 
 
@@ -42,9 +51,19 @@ INPUT_PORTS_END
 void kawai_k1_state::k1(machine_config &config)
 {
 	UPD78310(config, m_mpu, 12_MHz_XTAL); // µPD78310G-36
-	m_mpu->set_addrmap(AS_PROGRAM, &kawai_k1_state::mem_map);
+	m_mpu->set_addrmap(AS_PROGRAM, &kawai_k1_state::k1_map);
 
 	NVRAM(config, "toneram", nvram_device::DEFAULT_ALL_0); // LC3564PL-12 + battery
+
+	MB63H158(config, "sensor", 7.2_MHz_XTAL);
+}
+
+void kawai_k1_state::k1m(machine_config &config)
+{
+	k1(config);
+
+	m_mpu->set_addrmap(AS_PROGRAM, &kawai_k1_state::k1m_map);
+	config.device_remove("sensor");
 }
 
 ROM_START(k1)
@@ -87,8 +106,8 @@ ROM_START(k1rii)
 	ROM_LOAD("p106.bin", 0x00000, 0x80000, NO_DUMP)
 ROM_END
 
-SYST(1988, k1,  0,  0, k1, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1 Digital Multi-Dimensional Synthesizer",         MACHINE_IS_SKELETON)
-SYST(1988, k1m, k1, 0, k1, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1m Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)
-SYST(1988, k1r, k1, 0, k1, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1r Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)
+SYST(1988, k1,  0,  0, k1,  k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1 Digital Multi-Dimensional Synthesizer",         MACHINE_IS_SKELETON)
+SYST(1988, k1m, k1, 0, k1m, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1m Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)
+SYST(1988, k1r, k1, 0, k1m, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1r Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)
 
-SYST(1989, k1rii, 0, 0, k1, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1rII Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)
+SYST(1989, k1rii, 0, 0, k1m, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1rII Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)

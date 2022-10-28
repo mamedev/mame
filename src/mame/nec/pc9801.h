@@ -381,6 +381,8 @@ protected:
 
 	void pc9801rs_io(address_map &map);
 	void pc9801rs_map(address_map &map);
+	void pc9801ux_io(address_map &map);
+	void pc9801ux_map(address_map &map);
 
 	uint16_t grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -427,9 +429,6 @@ private:
 	optional_device_array<ata_interface_device, 2> m_ide;
 //  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
-
-	void pc9801ux_io(address_map &map);
-	void pc9801ux_map(address_map &map);
 
 	uint32_t a20_286(bool state);
 

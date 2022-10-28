@@ -20,12 +20,12 @@ Hardware (ZX Evolution):
 
 Refs:
 ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
-		Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
-		Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
+        Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
+        Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
 
 TODO:
-	* Keyboard enabled
-	* zx 16c
+    * Keyboard enabled
+    * zx 16c
 
 *******************************************************************************************/
 
@@ -532,7 +532,7 @@ void pentevo_state::gluk_data_w(offs_t offset, u8 data)
 {
 	if (!m_glukrs->is_active())
 		return;
-	
+
 	u8 addr = m_glukrs->address_r();
 	if (addr >= 0xf0 && addr <= 0xf0)
 	{
@@ -748,12 +748,12 @@ void pentevo_state::pentevo(machine_config &config)
 
 ROM_START( pentevo )
 	ROM_REGION(0x090000, "maincpu", ROMREGION_ERASEFF)
-	ROM_DEFAULT_BIOS("v0.59.02fe_tr503")
+	ROM_DEFAULT_BIOS("v0.59.04")
 
 	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2From%2Fzxevo_fe.rom&rev=1012&peg=1021
-	ROM_SYSTEM_BIOS(0, "v0.59.02fe_tr503", "Reset Service v0.59.02 (FE), TR-DOS v5.03")
-	ROMX_LOAD( "zxevo_05902fe_trd503.rom", 0x010000, 0x80000, CRC(f7f29dd8) SHA1(dfbcce980cf6244a9491aedf68ebb372677b0593), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "v0.59.02fe", "Reset Service v0.59.02 (FE), NEO-DOS v0.53")
+	ROM_SYSTEM_BIOS(0, "v0.59.04", "ERS v0.59.04, NEO-DOS v0.53")
+	ROMX_LOAD( "zxevo_05904.rom", 0x010000, 0x80000, CRC(8cae52eb) SHA1(992a0dc17fc7283bbfad5c5ebe254cab68bf0d9a), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v0.59.02fe", "ERS v0.59.02 (FE), NEO-DOS v0.53")
 	ROMX_LOAD( "zxevo_05902fe.rom", 0x010000, 0x80000, CRC(df144c82) SHA1(e48b8a95576e0123764ff8cc34d9373dc95159bf), ROM_BIOS(1))
 
 	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2Fcfgs%2Fstandalone_base_trdemu%2Ftrunk%2Fzxevo_fw.bin&rev=994&peg=1021

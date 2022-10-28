@@ -322,6 +322,8 @@ Pin 22 Solder Side - Gun 2 Trigger
 #include "screen.h"
 #include "speaker.h"
 
+#include <cstdarg>
+
 #define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
 #define VERBOSE_LEVEL ( 0 )
 

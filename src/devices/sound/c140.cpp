@@ -540,13 +540,13 @@ void c140_device::c140_w(offs_t offset, u8 data)
 		if (BIT(data, 0))
 		{
 			// kyukaidk and marvlandj want the first interrupt to happen immediately
-			if (!m_int1_timer->enabled())
+			if (!m_int1_timer->running())
 				m_int1_callback(ASSERT_LINE);
 		}
 		else
 		{
 			m_int1_callback(CLEAR_LINE);
-			m_int1_timer->enable(false);
+			m_int1_timer->adjust(attotime::never);
 		}
 	}
 }

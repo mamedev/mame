@@ -66,7 +66,7 @@ void asterix_state::sound_arm_nmi_w(uint8_t data)
 
 void asterix_state::z80_nmi_w(int state)
 {
-	if (state && !m_nmi_blocked->enabled())
+	if (state && !m_nmi_blocked->running())
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
