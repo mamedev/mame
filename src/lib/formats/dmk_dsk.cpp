@@ -8,7 +8,6 @@
 
 TODO:
 - Add write/format support.
-- Add single density support.
 - Check support on other drivers besides msx.
 
 *********************************************************************/
@@ -82,7 +81,7 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 }
 
 
-static uint32_t wide_fm(uint32_t val)
+uint32_t dmk_format::wide_fm(uint32_t val)
 {
 	uint32_t res = 0;
 	for (int i = 15; i >= 0; i--) {
@@ -91,7 +90,8 @@ static uint32_t wide_fm(uint32_t val)
 	}
 	return res;
 }
-static uint32_t data_to_wide_fm(uint8_t val)
+
+uint32_t dmk_format::data_to_wide_fm(uint8_t val)
 {
 	uint16_t res = 0;
 	for (int i = 7; i >= 0; i--) {
@@ -207,7 +207,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sector_is_mfm[max_idam + 1] = sector_is_mfm[max_idam];
 			}
 
-			// TODO: FM equivalent
+			// TODO: FM equivalent is FC clocked with D7 should be f77a
 			// Find IAM location
 			for(int i = idam_location[0] - 1; i >= 3; i--)
 			{
