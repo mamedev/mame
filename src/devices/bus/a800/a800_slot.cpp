@@ -65,6 +65,8 @@ void device_a800_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
+		// TODO: shouldn't really load from fixed tag
+		// (particularly inconvenient for stuff like flash ROM hookups)
 		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 

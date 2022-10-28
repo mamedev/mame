@@ -1842,10 +1842,11 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 	{
 		switch (slot->get_cart_type())
 		{
-		case A800_8K:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-			m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-			break;
+			// TODO: unimplemented in slot
+		//case A800_8K:
+		//	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
+		//	m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
+		//	break;
 		case A800_8K_RIGHT:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x9fff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0x9fff);

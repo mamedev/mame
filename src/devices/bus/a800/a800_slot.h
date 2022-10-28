@@ -88,11 +88,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( rd4_w );
 	DECLARE_WRITE_LINE_MEMBER( rd5_w );
 	DECLARE_WRITE_LINE_MEMBER( rd_both_w );
-
-	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
-	virtual void write_cart(offs_t offset, uint8_t data) { }
-	virtual uint8_t read_cctl(offs_t offset) { return 0xff; }
-	virtual void write_cctl(offs_t offset, uint8_t data) { }
 };
 
 

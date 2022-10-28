@@ -313,6 +313,8 @@ a800_rom_express_device::a800_rom_express_device(const machine_config &mconfig, 
 {
 }
 
+// TODO: Altirra suggests they also removed mirroring?
+
 uint8_t a800_rom_express_device::rom_bank_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())

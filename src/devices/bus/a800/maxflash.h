@@ -1,0 +1,57 @@
+// license: BSD-3-Clause
+// copyright-holders: Angelo Salese
+
+#ifndef MAME_BUS_A800_MAXFLASH_H
+#define MAME_BUS_A800_MAXFLASH_H
+
+#pragma once
+
+#include "rom.h"
+#include "machine/intelfsh.h"
+
+class a800_maxflash_1mb_device : public a800_rom_device
+{
+public:
+	// construction/destruction
+	a800_maxflash_1mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a800_maxflash_1mb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void cart_map(address_map &map) override;
+	virtual void cctl_map(address_map &map) override;
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_resolve_objects() override;
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	required_device<intelfsh8_device> m_flash;
+
+	uint8_t disable_rom_r(offs_t offset);
+	void disable_rom_w(offs_t offset, uint8_t data);
+	uint8_t rom_bank_r(offs_t offset);
+	void rom_bank_w(offs_t offset, uint8_t data);
+
+private:
+	int m_bank;
+};
+
+class a800_maxflash_8mb_device : public a800_maxflash_1mb_device
+{
+public:
+	a800_maxflash_8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void cctl_map(address_map &map) override;
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+// device type declaration
+DECLARE_DEVICE_TYPE(A800_MAXFLASH_1MB, a800_maxflash_1mb_device)
+DECLARE_DEVICE_TYPE(A800_MAXFLASH_8MB, a800_maxflash_8mb_device)
+
+#endif // MAME_BUS_A800_MAXFLASH_H
