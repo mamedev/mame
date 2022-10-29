@@ -2130,7 +2130,7 @@ void a130xe_state::portb_cb(uint8_t data)
 
 	// dirty check for ANTIC extended memory access, to be removed out of this branch ...
 	if ((!BIT(data, 5) && BIT(data, 4)) || (!BIT(data, 4) && BIT(data, 5)))
-		popmessage("ANTIC extended memory access, implement me %02x", data & 0x18);
+		popmessage("ANTIC extended memory access, implement me %02x", data & 0x30);
 }
 
 // TODO: propagate portb to RAMBO XL and COMPY sub-devices for a800xl and onward

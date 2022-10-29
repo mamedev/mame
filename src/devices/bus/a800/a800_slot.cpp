@@ -223,6 +223,7 @@ static const a800_slot slot_list[] =
 	{ A800_MICROCALC, "a800_sitsa" },
 	{ A800_CORINA,    "a800_corina" },
 	{ A800_CORINA_SRAM, "a800_corina_sram" },
+	{ ATARIMAX_MAXFLASH_8MB, "maxflash_8mb" },
 	{ A800_8K_RIGHT,  "a800_8k_right" },
 	{ A5200_4K,       "a5200" },
 	{ A5200_8K,       "a5200" },
@@ -379,6 +380,9 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 			break;
 		case 40:
 			type = A800_BLIZZARD;
+			break;
+		case 42:
+			type = ATARIMAX_MAXFLASH_8MB;
 			break;
 		case 44:
 			type = A800_OSS8K;
