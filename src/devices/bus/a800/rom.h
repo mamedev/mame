@@ -48,22 +48,6 @@ protected:
 	int m_banks[2];
 };
 
-// ======================> a800_rom_blizzard_device
-
-class a800_rom_blizzard_device : public a800_rom_device
-{
-public:
-	// construction/destruction
-	a800_rom_blizzard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read_80xx(offs_t offset) override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-};
-
 // ======================> a800_rom_telelink2_device
 
 class a800_rom_telelink2_device : public a800_rom_device

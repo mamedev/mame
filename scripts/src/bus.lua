@@ -57,6 +57,8 @@ if (BUSES["A800"]~=null) then
 		MAME_DIR .. "src/devices/bus/a800/maxflash.h",
 		MAME_DIR .. "src/devices/bus/a800/oss.cpp",
 		MAME_DIR .. "src/devices/bus/a800/oss.h",
+		MAME_DIR .. "src/devices/bus/a800/phoenix.cpp",
+		MAME_DIR .. "src/devices/bus/a800/phoenix.h",
 		MAME_DIR .. "src/devices/bus/a800/rtime8.cpp",
 		MAME_DIR .. "src/devices/bus/a800/rtime8.h",
 		MAME_DIR .. "src/devices/bus/a800/sic.cpp",

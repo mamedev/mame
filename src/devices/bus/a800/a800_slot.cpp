@@ -211,6 +211,7 @@ static const a800_slot slot_list[] =
 	{ A800_OSSM091,   "a800_ossm091" },
 	{ A800_OSS8K,     "a800_oss8k" },
 	{ A800_PHOENIX,   "a800_phoenix" },
+	{ A800_BLIZZARD,  "a800_blizzard" },
 	{ A800_XEGS,      "xegs" },
 	{ A800_BBSB,      "a800_bbsb" },
 	{ A800_DIAMOND,   "a800_diamond" },

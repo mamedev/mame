@@ -1402,10 +1402,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="turboblz">
+	<software name="turboblz" supported="no">
 		<description>Turbo Blizzard</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
@@ -1415,10 +1418,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="cturbo2k">
+	<software name="cturbo2k" supported="no">
 		<description>Cartridge Turbo 2000 v3.16</description>
 		<year>199?</year>
 		<publisher>Info-Cell</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Pawel Mironczuk" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1429,10 +1435,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="turbo2k">
+	<software name="turbo2k" supported="no">
 		<description>Cartridge dla Turbo 2000 v1.0</description>
 		<year>1991</year>
 		<publisher>DOMAIN SOFT</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Tomasz Rolewski" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1443,10 +1452,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="turbo2ka" cloneof="turbo2k">
+	<software name="turbo2ka" cloneof="turbo2k" supported="no">
 		<description>Cartridge dla Turbo 2000 v1.0 (Alt)</description>
 		<year>1991</year>
 		<publisher>DOMAIN SOFT</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Tomasz Rolewski" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1457,10 +1469,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="turbo2k1">
+	<software name="turbo2k1" supported="no">
 		<description>Cartridge Systemowy Turbo 2000 (v.1)</description>
 		<year>1991</year>
 		<publisher>ROBOsoft</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Tomasz Rolewski" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1471,10 +1486,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="turbo2k2" cloneof="turbo2k1">
+	<software name="turbo2k2" cloneof="turbo2k1" supported="no">
 		<description>Cartridge Systemowy Turbo 2000 (v.2)</description>
 		<year>1991</year>
 		<publisher>ROBOsoft</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Tomasz Rolewski" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1485,10 +1503,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="jturbo2k">
+	<software name="jturbo2k" supported="no">
 		<description>Cartridge System Turbo 2000 (JK Soft)</description>
 		<year>1991</year>
 		<publisher>JK Soft</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Bartek Selinger" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1499,10 +1520,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="sturbo2k">
+	<software name="sturbo2k" supported="no">
 		<description>Cartridge System Turbo 2000</description>
 		<year>1991</year>
 		<publisher>Bartek Selinger</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
@@ -5625,6 +5649,9 @@ Glitched text and graphics displays
 		<description>Super Cartridge</description>
 		<year>199?</year>
 		<publisher>Unerring Master</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="usage" value="Requires the Atari Super Turbo hardware modification (or compatible ATT, UM) installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />

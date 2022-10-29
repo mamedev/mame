@@ -13,6 +13,7 @@
 #include "sic.h"
 #include "sparta.h"
 #include "rtime8.h"
+#include "phoenix.h"
 #include "williams.h"
 
 static void a800_left(device_slot_interface &device)
@@ -20,7 +21,8 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_8k",       A800_ROM);
 	device.option_add_internal("a800_8k_right", A800_ROM);
 	device.option_add_internal("a800_16k",      A800_ROM);
-	device.option_add_internal("a800_phoenix",  A800_ROM);  // not really emulated at this stage
+	device.option_add_internal("a800_phoenix",  A800_ROM_PHOENIX);
+	device.option_add_internal("a800_blizzard", A800_ROM_BLIZZARD_16KB);
 	device.option_add_internal("a800_bbsb",     A800_ROM_BBSB);
 	device.option_add_internal("a800_oss8k",    A800_ROM_OSS8K);
 	device.option_add_internal("a800_oss034m",  A800_ROM_OSS34);
@@ -29,8 +31,7 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_williams", A800_ROM_WILLIAMS);
 	device.option_add_internal("a800_diamond",  A800_ROM_DIAMOND);
 	device.option_add_internal("a800_express",  A800_ROM_EXPRESS);
-	device.option_add_internal("a800_sparta",   A800_ROM_SPARTADOS);    // this is a passthru cart with unemulated (atm) subslot
-	device.option_add_internal("a800_blizzard", A800_ROM);
+	device.option_add_internal("a800_sparta",   A800_ROM_SPARTADOS);
 	device.option_add_internal("a800_turbo64",  A800_ROM_TURBO);
 	device.option_add_internal("a800_turbo128", A800_ROM_TURBO);
 	device.option_add_internal("a800_tlink2",   A800_ROM_TELELINK2);
