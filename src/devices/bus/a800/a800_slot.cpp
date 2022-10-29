@@ -336,6 +336,7 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 {
 	int type = A800_8K;
 
+	// TODO: applies to .car extension only, have 10 bytes extra header on top
 	// check CART format
 	if (strncmp((const char *)header, "CART", 4))
 		fatalerror("Invalid header detected!\n");
@@ -395,6 +396,9 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 			break;
 		case 52:
 			type = A800_MICROCALC;
+			break;
+		case 55:
+			osd_printf_error("Cart type SIC! currently unsupported\n");
 			break;
 			// Atari 5200 CART files
 		case 4:
