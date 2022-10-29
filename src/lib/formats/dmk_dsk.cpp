@@ -161,9 +161,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			{
 				mark_location[i] = -1;
 				mark_value[i] = 0xfe;
-				// TODO: really should be based on base encoding FM/MFM
-				// Because: blank track case
-				mark_is_mfm[i] = true;
+				mark_is_mfm[i] = is_sd ? false : true;	// Use default encoding
 			}
 			int mark_count = 0;
 
@@ -177,7 +175,6 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			{
 				// Assume 3 bytes before IDAM pointers are the start of IDAM indicators
 				int mark_offset = idam_is_mfm ? 3 : 0;
-				//TODO: "IAM" scan/check
 				mark_location[mark_count] = track_offset - mark_offset;
 				mark_value[mark_count] = 0xfe;
 				mark_is_mfm[mark_count] = idam_is_mfm;
@@ -212,14 +209,13 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				mark_is_mfm[mark_count] = mark_is_mfm[mark_count - 1];
 			}
 
-			// TODO: FM equivalent is FC clocked with D7 should be f77a
 			// Find IAM location
 			for(int i = mark_location[0] - 1; i >= 3; i--)
 			{
 				// It's usually 3 bytes but several dumped tracks seem to contain only 2 bytes
-				if (track_data[i] == 0xfc && track_data[i-1] == 0xc2 && track_data[i-2] == 0xc2)
+				if (track_data[i] == 0xfc && (is_sd || (track_data[i-1] == 0xc2 && track_data[i-2] == 0xc2)))
 				{
-					iam_location = i - 3;
+					iam_location = i - (is_sd ? 0 : 3);
 					break;
 				}
 			}
@@ -228,14 +224,21 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			bool enc_mfm = mark_is_mfm[curr_mark];
 			for (int offset = 0x80; offset < track_size; offset++)
 			{
-				//TODO: roll FC in as another mark
 				if (offset == iam_location)
 				{
-					// Write IAM
-					raw_w(raw_track_data, 16, 0x5224);
-					raw_w(raw_track_data, 16, 0x5224);
-					raw_w(raw_track_data, 16, 0x5224);
-					offset += 3;
+					if (!is_sd)
+					{
+						// Write IAM
+						raw_w(raw_track_data, 16, 0x5224);
+						raw_w(raw_track_data, 16, 0x5224);
+						raw_w(raw_track_data, 16, 0x5224);
+						offset += 3;
+					}
+					else
+					{
+						raw_w(raw_track_data, 32, wide_fm(0xff7a));	// FC clocked with D7
+						offset += fm_stride;
+					}
 				}
 
 				// If close to mark, switch encoding
@@ -253,7 +256,6 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				{
 					if (enc_mfm)
 					{
-						//TODO: IAM 0xfc case
 						raw_w(raw_track_data, 16, 0x4489);
 						raw_w(raw_track_data, 16, 0x4489);
 						raw_w(raw_track_data, 16, 0x4489);
@@ -274,7 +276,6 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 							case 0xf9: mark = 0xf56b; break;
 							case 0xf8: mark = 0xf56a; break;
 							case 0xfe: mark = 0xf57e; break;
-							//TODO: IAM 0xfc
 						}
 						raw_w(raw_track_data, 32, wide_fm(mark));
 						offset += fm_stride;
