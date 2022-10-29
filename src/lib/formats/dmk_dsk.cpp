@@ -114,7 +114,6 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	const int track_size = ( header[3] << 8 ) | header[2];
 	const int heads = (header[4] & 0x10) ? 1 : 2;
 	const bool is_sd = (header[4] & 0x40) ? true : false;
-	//const int raw_track_size = 2 * 8 * ( track_size - 0x80 );
 
 	auto variant = floppy_image::SSDD;
 	if (is_sd)
@@ -150,66 +149,72 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			int fm_loss = 0;
 			std::vector<uint8_t> track_data(track_size);
 			std::vector<uint32_t> raw_track_data;
+			int mark_location[64*2+1];
+			uint8_t mark_value[64*2+1];
+			bool mark_is_mfm[64*2+1];
 			int iam_location = -1;
-			int idam_location[64];
-			int dam_location[64];
-			bool sector_is_mfm[64];
 
 			// Read track
 			io.read_at(header_size + (heads * track + head) * track_size, &track_data[0], track_size, actual);
 
-			for (int i = 0; i < 64; i++)
+			for (int i = 0; i < 64*2+1; i++)
 			{
-				idam_location[i] = -1;
-				dam_location[i] = -1;
-				sector_is_mfm[i] = true;
+				mark_location[i] = -1;
+				mark_value[i] = 0xfe;
+				// TODO: really should be based on base encoding FM/MFM
+				// Because: blank track case
+				mark_is_mfm[i] = true;
 			}
+			int mark_count = 0;
 
-			// Find IDAM locations
+			// Find IDAM/DAM locations
 			uint16_t track_header_offset = 0;
 			uint16_t track_offset = ( ( track_data[track_header_offset + 1] << 8 ) | track_data[track_header_offset] ) & 0x3fff;
-			bool is_mfm = (track_data[track_header_offset + 1] & 0x80) ? true : false;
+			bool idam_is_mfm = (track_data[track_header_offset + 1] & 0x80) ? true : false;
 			track_header_offset += 2;
 
-			int max_idam = -1;
 			while ( track_offset != 0 && track_offset >= 0x83 && track_offset < track_size && track_header_offset < 0x80 )
 			{
-				int sector_index = (track_header_offset/2) - 1;
-				sector_is_mfm[sector_index] = is_mfm;
-				max_idam = sector_index;
-
 				// Assume 3 bytes before IDAM pointers are the start of IDAM indicators
-				int mark_offset = sector_is_mfm[sector_index] ? 3 : 0;
-				idam_location[sector_index] = track_offset - mark_offset;
+				int mark_offset = idam_is_mfm ? 3 : 0;
+				//TODO: "IAM" scan/check
+				mark_location[mark_count] = track_offset - mark_offset;
+				mark_value[mark_count] = 0xfe;
+				mark_is_mfm[mark_count] = idam_is_mfm;
+				mark_count++;
 
-				int stride = is_mfm ? 1 : fm_stride;
+				int stride = idam_is_mfm ? 1 : fm_stride;
 				// Scan for DAM location
 				for (int i = track_offset + 10*stride; i < track_offset + 53*stride; i++)
 				{
 					if ((track_data[i] >= 0xf8 && track_data[i] <= 0xfb))
 					{
-						if (!sector_is_mfm[sector_index] || (track_data[i-1] == 0xa1 && track_data[i-2] == 0xa1))
+						if (!idam_is_mfm || (track_data[i-1] == 0xa1 && track_data[i-2] == 0xa1))
 						{
-							dam_location[sector_index] = i - mark_offset;
+							mark_location[mark_count] = i - mark_offset;
+							mark_value[mark_count] = track_data[i];
+							mark_is_mfm[mark_count] = idam_is_mfm;
+							mark_count++;
+
 							break;
 						}
 					}
 				}
 
-				is_mfm = (track_data[track_header_offset + 1] & 0x80) ? true : false;
+				idam_is_mfm = (track_data[track_header_offset + 1] & 0x80) ? true : false;
 				track_offset = ( ( track_data[track_header_offset + 1] << 8 ) | track_data[track_header_offset] ) & 0x3fff;
 				track_header_offset += 2;
 			}
 
-			if (max_idam >= 0 && max_idam < 63)
+			// Prevent encoding from switching after last sector
+			if (mark_count > 0)
 			{
-				// Prevent encoding from switching at end of disk.
-				sector_is_mfm[max_idam + 1] = sector_is_mfm[max_idam];
+				mark_is_mfm[mark_count] = mark_is_mfm[mark_count - 1];
 			}
 
 			// TODO: FM equivalent is FC clocked with D7 should be f77a
 			// Find IAM location
-			for(int i = idam_location[0] - 1; i >= 3; i--)
+			for(int i = mark_location[0] - 1; i >= 3; i--)
 			{
 				// It's usually 3 bytes but several dumped tracks seem to contain only 2 bytes
 				if (track_data[i] == 0xfc && track_data[i-1] == 0xc2 && track_data[i-2] == 0xc2)
@@ -219,11 +224,11 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				}
 			}
 
-			bool enc_mfm = sector_is_mfm[0];
-			int idam_index = 0;
-			int dam_index = 0;
+			int curr_mark = 0;
+			bool enc_mfm = mark_is_mfm[curr_mark];
 			for (int offset = 0x80; offset < track_size; offset++)
 			{
+				//TODO: roll FC in as another mark
 				if (offset == iam_location)
 				{
 					// Write IAM
@@ -233,21 +238,22 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					offset += 3;
 				}
 
-				// If close to idam, switch encoding
-				if (offset + 8 >= idam_location[idam_index])
+				// If close to mark, switch encoding
+				if (offset + 8 >= mark_location[curr_mark])
 				{
-					bool new_enc = sector_is_mfm[idam_index];
+					bool new_enc = mark_is_mfm[curr_mark];
 					if (new_enc != enc_mfm)
 					{
 						enc_mfm = new_enc;
 					}
 				}
-				if (offset == idam_location[idam_index]
-					|| (!enc_mfm && offset - fm_stride + 1 == idam_location[idam_index])
+				if (offset == mark_location[curr_mark]
+					|| (!enc_mfm && offset - fm_stride + 1 == mark_location[curr_mark])
 					)
 				{
 					if (enc_mfm)
 					{
+						//TODO: IAM 0xfc case
 						raw_w(raw_track_data, 16, 0x4489);
 						raw_w(raw_track_data, 16, 0x4489);
 						raw_w(raw_track_data, 16, 0x4489);
@@ -259,42 +265,21 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					}
 					else
 					{
-						raw_w(raw_track_data, 32, wide_fm(0xf57e));
-						offset += fm_stride;
-					}
-					idam_index += 1;
-				}
-
-				if (offset == dam_location[dam_index]
-					|| (!enc_mfm && offset - fm_stride + 1 == dam_location[dam_index])
-					)
-				{
-					if (enc_mfm)
-					{
-						raw_w(raw_track_data, 16, 0x4489);
-						raw_w(raw_track_data, 16, 0x4489);
-						raw_w(raw_track_data, 16, 0x4489);
-						offset += 3;
-						if (fm_stride == 1)
-						{
-							fm_loss += 3;
-						}
-					}
-					else
-					{
-						uint16_t dam;
-						switch (track_data[offset])
+						uint16_t mark;
+						switch (mark_value[curr_mark])
 						{
 							default:
-							case 0xfb: dam = 0xf56f; break;
-							case 0xfa: dam = 0xf56e; break;
-							case 0xf9: dam = 0xf56b; break;
-							case 0xf8: dam = 0xf56a; break;
+							case 0xfb: mark = 0xf56f; break;
+							case 0xfa: mark = 0xf56e; break;
+							case 0xf9: mark = 0xf56b; break;
+							case 0xf8: mark = 0xf56a; break;
+							case 0xfe: mark = 0xf57e; break;
+							//TODO: IAM 0xfc
 						}
-						raw_w(raw_track_data, 32, wide_fm(dam));
+						raw_w(raw_track_data, 32, wide_fm(mark));
 						offset += fm_stride;
 					}
-					dam_index += 1;
+					curr_mark++;
 				}
 
 				if (enc_mfm)
