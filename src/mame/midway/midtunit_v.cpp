@@ -14,7 +14,6 @@
 #include "midtview.ipp"
 
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 
 #include "emuopts.h" // Used by PNG logging
@@ -115,7 +114,7 @@ void midtunit_video_device::debug_png_dma_command(const std::vector<std::string_
 
 	bool old_state = m_log_png;
 	bool new_state = false;
-	if (!machine().debugger().commands().validate_boolean_parameter(params[1], new_state))
+	if (!con.validate_boolean_parameter(params[1], new_state))
 		return;
 
 	if (!new_state)
@@ -145,7 +144,7 @@ void midtunit_video_device::debug_png_dma_command(const std::vector<std::string_
 
 	if (params.size() == 4)
 	{
-		if (!machine().debugger().commands().validate_boolean_parameter(params[3], m_log_json))
+		if (!con.validate_boolean_parameter(params[3], m_log_json))
 			return;
 	}
 

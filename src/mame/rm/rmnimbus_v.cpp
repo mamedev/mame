@@ -32,7 +32,6 @@
 #include "rmnimbus.h"
 
 #include "debugger.h"
-#include "debug/debugcmd.h"
 #include "debug/debugcon.h"
 
 #include <functional>
@@ -629,7 +628,7 @@ void rmnimbus_state::video_debug(const std::vector<std::string_view> &params)
 	if (params.size() > 0)
 	{
 		uint64_t temp;
-		if (!machine().debugger().commands().validate_number_parameter(params[0], temp))
+		if (!machine().debugger().console().validate_number_parameter(params[0], temp))
 			return;
 		m_debug_video = temp;
 	}

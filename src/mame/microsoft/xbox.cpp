@@ -17,9 +17,6 @@
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/idehd.h"
 
-#include "debug/debugcmd.h"
-#include "debug/debugcon.h"
-#include "debugger.h"
 #include "speaker.h"
 
 #include "bitmap.h"

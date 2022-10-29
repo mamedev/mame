@@ -227,7 +227,6 @@ Notes:
 #include "sound/ymz280b.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 #include "romload.h"
 #include "screen.h"
@@ -1553,7 +1552,7 @@ void konamim2_state::dump_task_command(const std::vector<std::string_view> &para
 	if (params.size() < 1)
 		return;
 
-	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
+	if (!con.validate_number_parameter(params[1], addr))
 		return;
 
 	address = (offs_t)addr;
