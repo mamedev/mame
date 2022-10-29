@@ -355,7 +355,7 @@ void wd_fdc_device_base::command_end()
 	motor_timeout = 0;
 
 	if(!drq && (status & S_BUSY)) {
-		if (!t_cmd->enabled()) {
+		if (!t_cmd->running()) {
 			status &= ~S_BUSY;
 		}
 		intrq = true;
