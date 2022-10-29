@@ -3155,16 +3155,16 @@ void coolridr_state::machine_start()
 	int count = 0;
 	for (int i=0;i<size/2/10;i++)
 	{
-		m_rearranged_16bit_gfx[count+0] = ((compressed[i+((0x0400000/2)*0)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*0)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+1] = ((compressed[i+((0x0400000/2)*1)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*1)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+2] = ((compressed[i+((0x0400000/2)*2)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*2)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+3] = ((compressed[i+((0x0400000/2)*3)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*3)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+4] = ((compressed[i+((0x0400000/2)*4)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*4)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+5] = ((compressed[i+((0x0400000/2)*5)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*5)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+6] = ((compressed[i+((0x0400000/2)*6)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*6)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+7] = ((compressed[i+((0x0400000/2)*7)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*7)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+8] = ((compressed[i+((0x0400000/2)*8)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*8)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+9] = ((compressed[i+((0x0400000/2)*9)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*9)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+0] = swapendian_int16(compressed[i+((0x0400000/2)*0)]);
+		m_rearranged_16bit_gfx[count+1] = swapendian_int16(compressed[i+((0x0400000/2)*1)]);
+		m_rearranged_16bit_gfx[count+2] = swapendian_int16(compressed[i+((0x0400000/2)*2)]);
+		m_rearranged_16bit_gfx[count+3] = swapendian_int16(compressed[i+((0x0400000/2)*3)]);
+		m_rearranged_16bit_gfx[count+4] = swapendian_int16(compressed[i+((0x0400000/2)*4)]);
+		m_rearranged_16bit_gfx[count+5] = swapendian_int16(compressed[i+((0x0400000/2)*5)]);
+		m_rearranged_16bit_gfx[count+6] = swapendian_int16(compressed[i+((0x0400000/2)*6)]);
+		m_rearranged_16bit_gfx[count+7] = swapendian_int16(compressed[i+((0x0400000/2)*7)]);
+		m_rearranged_16bit_gfx[count+8] = swapendian_int16(compressed[i+((0x0400000/2)*8)]);
+		m_rearranged_16bit_gfx[count+9] = swapendian_int16(compressed[i+((0x0400000/2)*9)]);
 		count+=10;
 	}
 
