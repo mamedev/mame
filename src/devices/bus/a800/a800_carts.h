@@ -13,6 +13,7 @@
 #include "sic.h"
 #include "sparta.h"
 #include "rtime8.h"
+#include "williams.h"
 
 static void a800_left(device_slot_interface &device)
 {
@@ -26,7 +27,7 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_oss043m",  A800_ROM_OSS43);
 	device.option_add_internal("a800_ossm091",  A800_ROM_OSS91);
 	device.option_add_internal("a800_williams", A800_ROM_WILLIAMS);
-	device.option_add_internal("a800_diamond",  A800_ROM_EXPRESS);
+	device.option_add_internal("a800_diamond",  A800_ROM_DIAMOND);
 	device.option_add_internal("a800_express",  A800_ROM_EXPRESS);
 	device.option_add_internal("a800_sparta",   A800_ROM_SPARTADOS);    // this is a passthru cart with unemulated (atm) subslot
 	device.option_add_internal("a800_blizzard", A800_ROM);

@@ -63,6 +63,8 @@ if (BUSES["A800"]~=null) then
 		MAME_DIR .. "src/devices/bus/a800/sic.h",
 		MAME_DIR .. "src/devices/bus/a800/sparta.cpp",
 		MAME_DIR .. "src/devices/bus/a800/sparta.h",
+		MAME_DIR .. "src/devices/bus/a800/williams.cpp",
+		MAME_DIR .. "src/devices/bus/a800/williams.h",
 	}
 end
 

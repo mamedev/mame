@@ -369,6 +369,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<a800_cart_slot_device> m_cartright;
@@ -512,10 +513,6 @@ private:
  *
  **************************************************************/
 
-// TODO: better memory map inheritance
-// TODO: transparent support for cart window & cart rd5 line (active_high) for enable/disable
-// (applies to 0xa000-0xbfff only?)
-// TODO: transparent support for cart CCTL at 0xd500
 // TODO: transparent support for PBI (XL) / ECI (XE series), at 0xd1xx, 0xd6xx, 0xd7xx + ROM at 0xd800-0xdfff
 
 void a400_state::hw_iomap(address_map &map)
@@ -1967,10 +1964,26 @@ void a400_state::machine_reset()
 {
 	m_pokey->write(15, 0);
 
-//	m_cart_rd4_enabled = m_cartleft->exists();
-//	m_cart_rd5_enabled = m_cartleft->exists();
-//	m_cart_rd4_view.select(m_cart_rd4_enabled);
-//	m_cart_rd5_view.select(m_cart_rd5_enabled);
+	// TODO: stub reset state
+	if (!m_cartleft->exists())
+	{
+		m_cart_rd4_enabled = false;
+		m_cart_rd5_enabled = false;
+		m_cart_rd4_view.select(0);
+		m_cart_rd5_view.select(0);
+	}
+}
+
+void a800_state::machine_reset()
+{
+	a400_state::machine_reset();
+
+	// TODO: stub reset state, verify if any can be run stand-alone
+	if (!m_cartright->exists())
+	{
+		m_cart_rd4_enabled = false;
+		m_cart_rd4_view.select(0);
+	}
 }
 
 void a1200xl_state::machine_reset()

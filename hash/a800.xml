@@ -2042,6 +2042,10 @@ Continously prints "BOOT ERROR"
 		<description>Diamond Graphic OS v1.0</description>
 		<year>1989</year>
 		<publisher>Reeve Software</publisher>
+		<notes><![CDATA[
+Unresponsive with mouse, doesn't key repeat with joy option, can't go up/down
+Ugly to look at without [ANTIC] television artifacts
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_diamond" />
 			<dataarea name="rom" size="65536">
@@ -2054,7 +2058,11 @@ Continously prints "BOOT ERROR"
 		<description>Diamond Graphic OS v1.0 (Earlier Release)</description>
 		<year>1988</year>
 		<publisher>Reeve Software</publisher>
-		<info name="usage" value="Requires mouse"/>
+		<notes><![CDATA[
+Unresponsive with mouse, doesn't key repeat with joy option, can't go up/down
+Ugly to look at without [ANTIC] television artifacts
+]]></notes>
+		<info name="usage" value="Requires mouse in port 2"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_diamond" />
 			<dataarea name="rom" size="65536">
