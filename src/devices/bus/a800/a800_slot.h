@@ -13,6 +13,7 @@
  ***************************************************************************/
 
 /* PCB */
+// TODO: make this enum to actually follow up the .car specs, not the other way around
 enum
 {
 	A800_8K = 0,
@@ -36,7 +37,11 @@ enum
 	A800_MICROCALC,
 	A800_CORINA,
 	A800_CORINA_SRAM,
+	ATARIMAX_MAXFLASH_1MB,
 	ATARIMAX_MAXFLASH_8MB,
+	SIC_128KB,
+	SIC_256KB,
+	SIC_512KB,
 	A5200_4K,
 	A5200_8K,
 	A5200_16K,

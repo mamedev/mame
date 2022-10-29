@@ -9,9 +9,10 @@
 #include "rom.h"
 #include "corina.h"
 #include "maxflash.h"
-#include "rtime8.h"
 #include "oss.h"
+#include "sic.h"
 #include "sparta.h"
+#include "rtime8.h"
 
 static void a800_left(device_slot_interface &device)
 {
@@ -39,6 +40,9 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("xegs",          XEGS_ROM);
 	device.option_add(         "maxflash_1mb",  A800_MAXFLASH_1MB);
 	device.option_add(         "maxflash_8mb",  A800_MAXFLASH_8MB);
+	device.option_add(         "sic_128kb",     A800_SIC_128KB);
+	device.option_add(         "sic_256kb",     A800_SIC_256KB);
+	device.option_add(         "sic_512kb",     A800_SIC_512KB);
 }
 
 static void a800_right(device_slot_interface &device)

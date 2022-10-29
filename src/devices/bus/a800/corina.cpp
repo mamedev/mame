@@ -1,15 +1,20 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
-/*-------------------------------------------------
+/**************************************************************************************************
 
- Corina
+Corina
 
- Known configs:
- - 1MB Flash ROM (yakungfu)
- - 512KB Flash ROM + 512KB SRAM (bombjake)
+Known configs:
+- 1MB Flash ROM (yakungfu)
+- 512KB Flash ROM + 512KB SRAM (bombjake)
 
- Both contains 8KB NVRAM
- -------------------------------------------------*/
+Both contains 8KB NVRAM
+
+TODO:
+- Pinpoint and convert to flash interface;
+- Unknown behaviour when accessing the "reserved" view;
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "corina.h"

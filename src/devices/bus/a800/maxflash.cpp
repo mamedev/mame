@@ -23,16 +23,13 @@ a800_maxflash_1mb_device::a800_maxflash_1mb_device(const machine_config &mconfig
 void a800_maxflash_1mb_device::device_add_mconfig(machine_config &config)
 {
 	AMD_29F010(config, m_flash);
+
+	// TODO: alt config with Micron M29F010B ($20/$20)
 }
 
 void a800_maxflash_1mb_device::device_start()
 {
 	save_item(NAME(m_bank));
-}
-
-void a800_maxflash_1mb_device::device_resolve_objects()
-{
-	a800_rom_device::device_resolve_objects();
 }
 
 void a800_maxflash_1mb_device::device_reset()
@@ -104,7 +101,10 @@ void a800_maxflash_8mb_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: AMD_29F040B according to Altirra?
 	// AMD_29F040 doesn't match 0x100000 size requirement, 'B is still 4 megabits?
+	// replace it with a suitable flash device for now
 	INTEL_E28F008SA(config, m_flash);
+
+	// TODO: alt config with Bright BM29F040 ($ad/$40)
 }
 
 

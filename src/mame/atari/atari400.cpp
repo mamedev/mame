@@ -1834,6 +1834,7 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 
 void a400_state::setup_cart(a800_cart_slot_device *slot)
 {
+	return;
 	m_cart_disabled = 0;
 	m_last_offs = -1;
 

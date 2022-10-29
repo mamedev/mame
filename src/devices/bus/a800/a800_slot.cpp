@@ -71,6 +71,7 @@ void device_a800_cart_interface::rom_alloc(uint32_t size)
 		m_rom_size = size;
 
 		// setup other helpers
+		// TODO: unusable for SIC! and any other mapping that maps over 0x4000 rather than 0x2000
 		m_bank_mask = (size / 0x2000) - 1;  // code for XEGS carts makes use of this to simplify banking
 	}
 }
@@ -223,6 +224,10 @@ static const a800_slot slot_list[] =
 	{ A800_MICROCALC, "a800_sitsa" },
 	{ A800_CORINA,    "a800_corina" },
 	{ A800_CORINA_SRAM, "a800_corina_sram" },
+	{ SIC_128KB,      "sic_128kb" },
+	{ SIC_256KB,      "sic_256kb" },
+	{ SIC_512KB,      "sic_512kb" },
+	{ ATARIMAX_MAXFLASH_1MB, "maxflash_1mb" },
 	{ ATARIMAX_MAXFLASH_8MB, "maxflash_8mb" },
 	{ A800_8K_RIGHT,  "a800_8k_right" },
 	{ A5200_4K,       "a5200" },
@@ -336,7 +341,9 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 {
 	int type = A800_8K;
 
-	// TODO: applies to .car extension only, have 10 bytes extra header on top
+	// TODO: canonically applies to .car extension only, have 10 bytes extra header on top
+	// https://github.com/dmlloyd/atari800/blob/master/DOC/cart.txt
+
 	// check CART format
 	if (strncmp((const char *)header, "CART", 4))
 		fatalerror("Invalid header detected!\n");
@@ -382,6 +389,9 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 		case 40:
 			type = A800_BLIZZARD;
 			break;
+		case 41:
+			type = ATARIMAX_MAXFLASH_1MB;
+			break;
 		case 42:
 			type = ATARIMAX_MAXFLASH_8MB;
 			break;
@@ -397,10 +407,16 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 		case 52:
 			type = A800_MICROCALC;
 			break;
-		case 55:
-			osd_printf_error("Cart type SIC! currently unsupported\n");
+		case 54:
+			type = SIC_128KB;
 			break;
-			// Atari 5200 CART files
+		case 55:
+			type = SIC_256KB;
+			break;
+		case 56:
+			type = SIC_512KB;
+			break;
+		// Atari 5200 CART files
 		case 4:
 			type = A5200_32K;
 			break;

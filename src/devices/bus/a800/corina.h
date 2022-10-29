@@ -50,4 +50,7 @@ protected:
 	virtual void write_view_1(offs_t offset, u8 data) override;
 };
 
+DECLARE_DEVICE_TYPE(A800_ROM_CORINA,      a800_rom_corina_device)
+DECLARE_DEVICE_TYPE(A800_ROM_CORINA_SRAM, a800_rom_corina_sram_device)
+
 #endif // MAME_BUS_A800_CORINA_H
