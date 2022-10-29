@@ -88,8 +88,6 @@
 namespace
 {
 
-static const uint16_t temp_pen_reads[4] = { 573, 840, 1320, 1360 };
-
 class dpb7000_state : public driver_device
 {
 public:
@@ -114,30 +112,18 @@ public:
 		, m_hdd(*this, "hdd")
 		, m_floppy(nullptr)
 		, m_hdd_file(nullptr)
-		, m_output_cursor_region(*this, "output_timing_cursor")
-		, m_output_hlines_region(*this, "output_timing_hlines")
-		, m_output_hflags_region(*this, "output_timing_hflags")
-		, m_output_vlines_region(*this, "output_timing_vlines")
-		, m_output_vflags_region(*this, "output_timing_vflags")
-		, m_output_cursor(nullptr)
-		, m_output_hlines(nullptr)
-		, m_output_hflags(nullptr)
-		, m_output_vlines(nullptr)
-		, m_output_vflags(nullptr)
-		, m_brushaddr_pal_region(*this, "brushaddr_pal")
-		, m_brushaddr_pal(nullptr)
-		, m_storeaddr_protx_region(*this, "storeaddr_prom_protx")
-		, m_storeaddr_proty_region(*this, "storeaddr_prom_proty")
-		, m_storeaddr_xlnib_region(*this, "storeaddr_prom_xlnib")
-		, m_storeaddr_xmnib_region(*this, "storeaddr_prom_xmnib")
-		, m_storeaddr_xhnib_region(*this, "storeaddr_prom_xhnib")
-		, m_storeaddr_pal_blank_region(*this, "storeaddr_pal_blank")
-		, m_storeaddr_protx(nullptr)
-		, m_storeaddr_proty(nullptr)
-		, m_storeaddr_xlnib(nullptr)
-		, m_storeaddr_xmnib(nullptr)
-		, m_storeaddr_xhnib(nullptr)
-		, m_storeaddr_pal_blank(nullptr)
+		, m_output_cursor(*this, "output_timing_cursor")
+		, m_output_hlines(*this, "output_timing_hlines")
+		, m_output_hflags(*this, "output_timing_hflags")
+		, m_output_vlines(*this, "output_timing_vlines")
+		, m_output_vflags(*this, "output_timing_vflags")
+		, m_brushaddr_pal(*this, "brushaddr_pal")
+		, m_storeaddr_protx(*this, "storeaddr_prom_protx")
+		, m_storeaddr_proty(*this, "storeaddr_prom_proty")
+		, m_storeaddr_xlnib(*this, "storeaddr_prom_xlnib")
+		, m_storeaddr_xmnib(*this, "storeaddr_prom_xmnib")
+		, m_storeaddr_xhnib(*this, "storeaddr_prom_xhnib")
+		, m_storeaddr_pal_blank(*this, "storeaddr_pal_blank")
 		, m_keybcpu(*this, "keybcpu")
 		, m_keybc_cols(*this, "KEYB_COL%u", 0U)
 		, m_tds_cpu(*this, "tds")
@@ -149,10 +135,8 @@ public:
 		, m_pen_x(*this, "PENX")
 		, m_pen_y(*this, "PENY")
 		, m_pen_press(*this, "PENPRESS")
-		, m_brushproc_prom_region(*this, "brushproc_prom")
-		, m_brushproc_pal_region(*this, "brushproc_pal")
-		, m_brushproc_prom(nullptr)
-		, m_brushproc_pal(nullptr)
+		, m_brushproc_prom(*this, "brushproc_prom")
+		, m_brushproc_pal(*this, "brushproc_pal")
 	{
 	}
 
@@ -236,7 +220,7 @@ private:
 	required_device<sy6545_1_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_vdu_ram;
-	required_memory_region m_vdu_char_rom;
+	required_region_ptr<uint8_t> m_vdu_char_rom;
 	required_ioport m_baud_dip;
 	required_ioport m_auto_start;
 
@@ -324,20 +308,14 @@ private:
 	uint16_t m_cursor_size_y;
 	uint8_t m_output_csflags;
 	uint8_t m_output_cpflags;
-	required_memory_region m_output_cursor_region;
-	required_memory_region m_output_hlines_region;
-	required_memory_region m_output_hflags_region;
-	required_memory_region m_output_vlines_region;
-	required_memory_region m_output_vflags_region;
-	uint8_t *m_output_cursor;
-	uint8_t *m_output_hlines;
-	uint8_t *m_output_hflags;
-	uint8_t *m_output_vlines;
-	uint8_t *m_output_vflags;
+	required_region_ptr<uint8_t> m_output_cursor;
+	required_region_ptr<uint8_t> m_output_hlines;
+	required_region_ptr<uint8_t> m_output_hflags;
+	required_region_ptr<uint8_t> m_output_vlines;
+	required_region_ptr<uint8_t> m_output_vflags;
 
 	// Brush Address Card
-	required_memory_region m_brushaddr_pal_region;
-	uint8_t *m_brushaddr_pal;
+	required_region_ptr<uint8_t> m_brushaddr_pal;
 	uint8_t m_line_clock;
 	uint16_t m_line_count;
 	uint16_t m_line_length;
@@ -373,18 +351,12 @@ private:
 	uint16_t m_cxpos[2];
 	uint16_t m_cypos[2];
 	uint16_t m_ca0;
-	required_memory_region m_storeaddr_protx_region;
-	required_memory_region m_storeaddr_proty_region;
-	required_memory_region m_storeaddr_xlnib_region;
-	required_memory_region m_storeaddr_xmnib_region;
-	required_memory_region m_storeaddr_xhnib_region;
-	required_memory_region m_storeaddr_pal_blank_region;
-	uint8_t *m_storeaddr_protx;
-	uint8_t *m_storeaddr_proty;
-	uint8_t *m_storeaddr_xlnib;
-	uint8_t *m_storeaddr_xmnib;
-	uint8_t *m_storeaddr_xhnib;
-	uint8_t *m_storeaddr_pal_blank;
+	required_region_ptr<uint8_t> m_storeaddr_protx;
+	required_region_ptr<uint8_t> m_storeaddr_proty;
+	required_region_ptr<uint8_t> m_storeaddr_xlnib;
+	required_region_ptr<uint8_t> m_storeaddr_xmnib;
+	required_region_ptr<uint8_t> m_storeaddr_xhnib;
+	required_region_ptr<uint8_t> m_storeaddr_pal_blank;
 
 	// Combiner Card
 	uint8_t m_cursor_y;
@@ -503,10 +475,8 @@ private:
 	uint16_t m_size_dest_y;
 
 	// Brush Processor Card
-	required_memory_region m_brushproc_prom_region;
-	required_memory_region m_brushproc_pal_region;
-	uint8_t *m_brushproc_prom;
-	uint16_t *m_brushproc_pal;
+	required_region_ptr<uint8_t> m_brushproc_prom;
+	required_region_ptr<uint16_t> m_brushproc_pal;
 
 	// Utility
 	std::unique_ptr<uint32_t[]> m_yuv_lut;
@@ -573,9 +543,9 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_START("KEYB_COL0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 ) \xe2\x80\x93") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"9  )  \u2013") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 ( \xe2\x80\x94") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"8  (  \u2014") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
@@ -583,9 +553,9 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_START("KEYB_COL1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \xe2\x80\x99 \xe2\x80\x98") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"7  \u2019  \u2018") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 & \xc2\xbb") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"6  &  \u00bb") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
@@ -593,29 +563,29 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_START("KEYB_COL2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 % >") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%') PORT_CHAR('>')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5  %  >") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%') PORT_CHAR('>')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $ <") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$') PORT_CHAR('<')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4  $  <") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$') PORT_CHAR('<')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 
 	PORT_START("KEYB_COL3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". : \xc3\xa6") PORT_CODE(KEYCODE_STOP) PORT_CHAR ('.') PORT_CHAR(':')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc2\xb9 = ~") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('=')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", ;") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8".  :  \u00e6") PORT_CODE(KEYCODE_STOP) PORT_CHAR ('.') PORT_CHAR(':')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u00b9 = ~") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('=')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8",  ;") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('-')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xef\xac\x82 + \xc3\x86") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\ufb02  +  \u00c6") PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
 
 	PORT_START("KEYB_COL4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 \xc2\xa3 \xc2\xab") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"3  \u00a3  \u00ab") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 \"") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2  \"") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
@@ -628,14 +598,14 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEYB_COL6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("` ` " A_RING) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("`  `  " A_RING) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xea\x9e\x88 \xcb\x86 \xc3\xb8") PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/ ? \xc5\x93") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xcc\xa4 \xc2\xa8 \xc3\x98") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('~')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\x9f \xc2\xb8 " a_RING) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc2\xb4 \xc2\xb4 ~") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xef\xac\x81 * \xc5\x92") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('*')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\ua788  \u02c6  \u00f8") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"/ ?  \u0153") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u0324  \u00a8  \u00d8") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('~')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u00df  \u00b8  " a_RING) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u00b4  \u00b4  ~") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\ufb01  *  \u03d2") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('*')
 
 	PORT_START("KEYB_COL7")
 	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -848,11 +818,6 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_cursor_size_y));
 	save_item(NAME(m_output_csflags));
 	save_item(NAME(m_output_cpflags));
-	m_output_cursor = m_output_cursor_region->base();
-	m_output_hlines = m_output_hlines_region->base();
-	m_output_hflags = m_output_hflags_region->base();
-	m_output_vlines = m_output_vlines_region->base();
-	m_output_vflags = m_output_vflags_region->base();
 
 	// Brush Address Card
 	save_item(NAME(m_line_clock));
@@ -869,7 +834,6 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_bylen_counter));
 	save_item(NAME(m_brush_press_lum));
 	save_item(NAME(m_brush_press_chr));
-	m_brushaddr_pal = (uint8_t *)m_brushaddr_pal_region->base();
 
 	// Frame Store Cards, 640x1024
 	for (int i = 0; i < 2; i++)
@@ -905,12 +869,6 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_cxpos));
 	save_item(NAME(m_cypos));
 	save_item(NAME(m_ca0));
-	m_storeaddr_protx = m_storeaddr_protx_region->base();
-	m_storeaddr_proty = m_storeaddr_proty_region->base();
-	m_storeaddr_xlnib = m_storeaddr_xlnib_region->base();
-	m_storeaddr_xmnib = m_storeaddr_xmnib_region->base();
-	m_storeaddr_xhnib = m_storeaddr_xhnib_region->base();
-	m_storeaddr_pal_blank = m_storeaddr_pal_blank_region->base();
 
 	// Combiner Card
 	save_item(NAME(m_cursor_y));
@@ -999,10 +957,6 @@ void dpb7000_state::machine_start()
 			}
 		}
 	}
-
-	// Brush Processor Card
-	m_brushproc_prom = m_brushproc_prom_region->base();
-	m_brushproc_pal = (uint16_t *)m_brushproc_pal_region->base();
 }
 
 void dpb7000_state::machine_reset()
@@ -1178,13 +1132,12 @@ void dpb7000_state::machine_reset()
 MC6845_UPDATE_ROW(dpb7000_state::crtc_update_row)
 {
 	const pen_t *const pen = m_palette->pens();
-	const uint8_t *const char_rom = m_vdu_char_rom->base();
 
 	for (int column = 0; column < x_count; column++)
 	{
 		uint8_t code = (uint8_t)m_vdu_ram[((ma + column) & 0x7ff)];
 		uint16_t addr = code << 4 | (ra & 0x0f);
-		uint8_t data = char_rom[addr & 0xfff];
+		uint8_t data = m_vdu_char_rom[addr & 0xfff];
 
 		if (column == cursor_x)
 		{
@@ -1885,7 +1838,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 	{
 	case 0: // Brush Address Card, function select
 	{
-		static const char* const s_func_names[16] =
+		static const char* const func_names[16] =
 		{
 			"Live Video",           "Brush Store Read",     "Brush Store Write",        "Framestore Read",
 			"Framestore Write",     "Fast Wipe Video",      "Fast Wipe Brush Store",    "Fast Wipe Framestore",
@@ -1893,7 +1846,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			"Copy to Brush Store",  "Paste with Stencil I", "Paste with Stencil II",    "Copy to same Framestore (Invert)"
 		};
 		LOGMASKED(LOG_BRUSH_ADDR, "%s: Brush Address Card, Function Select: %04x\n", machine().describe_context(), data);
-		LOGMASKED(LOG_BRUSH_ADDR, "                Function:           %s\n", s_func_names[(data >> 1) & 0xf]);
+		LOGMASKED(LOG_BRUSH_ADDR, "                Function:           %s\n", func_names[(data >> 1) & 0xf]);
 		LOGMASKED(LOG_BRUSH_ADDR, "                /S1:                %d\n", BIT(data, 5));
 		LOGMASKED(LOG_BRUSH_ADDR, "                /S2:                %d\n", BIT(data, 6));
 		LOGMASKED(LOG_BRUSH_ADDR, "                LUMEN:              %d\n", BIT(data, 7));
@@ -2474,11 +2427,11 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::cmd_done)
 
 TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 {
-	static const int s_sectors_per_track = 20480 / 256;
+	constexpr int SECTORS_PER_TRACK = 20480 / 256;
 	int group = (int)(m_diskseq_cmd_word_from_cpu >> 5) & 3;
 	int head_count = get_heads_for_disk_group(group);
 	int head_index = m_diskseq_cmd_word_from_cpu & 0xf;
-	int image_lba = s_sectors_per_track * head_count * (int)m_diskseq_cyl_from_cpu + s_sectors_per_track * head_index;
+	int image_lba = SECTORS_PER_TRACK * head_count * (int)m_diskseq_cyl_from_cpu + SECTORS_PER_TRACK * head_index;
 
 	if (m_hdd_file != nullptr)
 	{
@@ -2852,22 +2805,22 @@ void dpb7000_state::process_byte_from_disc(uint8_t data_byte)
 
 bool dpb7000_state::is_disk_group_fdd(int group_index)
 {
-	static const uint16_t s_group_shifts[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
-	uint16_t val = (m_config_sw34->read() >> s_group_shifts[group_index]) & 7;
+	constexpr uint16_t GROUP_SHIFTS[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
+	uint16_t val = (m_config_sw34->read() >> GROUP_SHIFTS[group_index]) & 7;
 	return val == DGROUP_TYPE_FLOPPY;
 }
 
 bool dpb7000_state::is_disk_group_hdd(int group_index)
 {
-	static const uint16_t s_group_shifts[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
-	uint16_t val = (m_config_sw34->read() >> s_group_shifts[group_index]) & 7;
+	constexpr uint16_t GROUP_SHIFTS[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
+	uint16_t val = (m_config_sw34->read() >> GROUP_SHIFTS[group_index]) & 7;
 	return val == DGROUP_TYPE_80MB_CDC || val == DGROUP_TYPE_160MB_FUJITSU || val == DGROUP_TYPE_330MB_FUJITSU;
 }
 
 int dpb7000_state::get_heads_for_disk_group(int group_index)
 {
-	static const uint16_t s_group_shifts[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
-	uint16_t val = (m_config_sw34->read() >> s_group_shifts[group_index]) & 7;
+	constexpr uint16_t GROUP_SHIFTS[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
+	uint16_t val = (m_config_sw34->read() >> GROUP_SHIFTS[group_index]) & 7;
 	switch (val)
 	{
 		case DGROUP_TYPE_FLOPPY:
@@ -2893,8 +2846,8 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 		LOGMASKED(LOG_COMMANDS, "Reading cylinder from floppy\n");
 		m_fdd_pll.read_reset(machine().time());
 
-		static const uint16_t PREGAP_MARK = 0xaaaa;
-		static const uint16_t SYNC_MARK = 0x9125;
+		constexpr uint16_t PREGAP_MARK = 0xaaaa;
+		constexpr uint16_t SYNC_MARK = 0x9125;
 
 		m_floppy->ss_w(m_fdd_side);
 
@@ -3409,7 +3362,7 @@ void dpb7000_state::tablet_p2_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 		{
 			if (m_tablet_state == 1)
 			{
-				m_tablet_irq_timer->adjust(attotime::from_ticks(temp_pen_reads[3 - m_tablet_mux], 1200000), 1);
+				m_tablet_irq_timer->adjust(attotime::from_ticks(1, 1200000), 1);
 				LOGMASKED(LOG_TABLET, "Setting up IRQ timer for read (continuous)\n");
 			}
 		}
@@ -3460,8 +3413,7 @@ void dpb7000_state::tablet_p3_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 
 uint8_t dpb7000_state::tablet_rdh_r()
 {
-	//m_tablet_counter_latch = temp_pen_reads[3 - m_tablet_mux];
-	uint8_t data = /*((~m_pen_switches->read() & 0x0f) << 4) |*/ (m_tablet_counter_latch >> 8);
+	uint8_t data = (m_tablet_counter_latch >> 8);
 	LOGMASKED(LOG_TABLET, "%s: Tablet RDH Read (Mux %d): %02x\n", machine().describe_context(), m_tablet_mux, data);
 	return data;
 }
@@ -3471,7 +3423,7 @@ uint8_t dpb7000_state::tablet_rdl_r()
 	//if (m_tablet_mux == 3)
 		//m_tablet_state = 0;
 
-	m_tablet_counter_latch = rand() & 0xfff;//temp_pen_reads[m_tablet_mux];
+	m_tablet_counter_latch = rand() & 0xfff;
 	LOGMASKED(LOG_TABLET, "%s: Random latch: %04x\n", machine().describe_context(), m_tablet_counter_latch);
 	uint8_t data = (uint8_t)m_tablet_counter_latch;
 	LOGMASKED(LOG_TABLET, "%s: Tablet RDL Read (Mux %d): %02x\n", machine().describe_context(), m_tablet_mux, data);
