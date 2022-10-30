@@ -750,8 +750,11 @@ void mediagx_state::update_debug_controls() {
 	// MODIFYING LOGIC STOP
 }
 
-// bool triggerLocked = false;
-// uint8 lockedVal = 0;
+uint8_t previous_parport_state = 0;
+
+// used to control whether 2-bits for P2 X should be read
+// same value usually triggers system menu, so have to track 'when' this is okay to read due to overlap
+bool shouldReadP2X_HighBits = false;
 
 // Reads from the parallel port, seems to hit what we're looking for?
 // 'offset' seems to be nearly constant in this case
@@ -802,17 +805,33 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 
 			#else
 
-			if(mp0 & 1) {
-				// accounts for inverted upper bit
-				r = 0x9000;
+			// high 2-bits of P2X (controls thirds of X access)
+			int16_t p2x = m_ports[9].read_safe(0) * 3;
+			if ((previous_parport_state >> 4) == 0xF) {
+
+				if(mp0 & 1) {
+					// allow opening the System Menu (TEST)
+					r = mk_parport_outval(2);
+
+				} else if (p2x > 512 && shouldReadP2X_HighBits) {
+					// P2X 3/3, only when we're allowed to read this (always a bit after a 0x5 has been seen)
+					r = mk_parport_outval(2);
+
+				} else if (p2x > 256) {
+					// P2X 2/3
+					r = mk_parport_outval(1);
+
+				} else {
+					// regular response
+					r = mk_parport_outval(0);
+				}
+
+				// clear this flag
+				shouldReadP2X_HighBits = false;
+
 			} else {
-				// default response...must be retained unless all cases are handled
 				r = mk_parport_outval(0);
 			}
-			// don't really think this part helps, but keeping just in case...(historical)
-			// else {
-			// 	r |= mk_parport_outval(mp0 >> 8);
-			// }
 
 			#endif
 
@@ -878,6 +897,10 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// TODO Try section value
 			if(readSectionValues[5] != 0) { r = mk_parport_outval(readSectionValues[5]); }
 
+			// set flag that next time control reg is 0x18,
+			// we should read P2 X high bits
+			shouldReadP2X_HighBits = true;
+
 		} else if(m_parport_control_reg == 0x60) {
 			// Reset watchdogs?
 
@@ -924,69 +947,85 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			
 			// only need the one 'f' since we're just getting a nibble back I believe...not a lot of info, but yeah that's kinda how it works.
 
+			// Oct. 30th, 2022, Old code here, can remove as needed
 			// July 30th, Note, m_parallel_pointer ranges from 0x1 -> 0x17 (1 - 23)
 			// Oct. 13th, 2022: Removed this from IF below:: mp0 & 0xf00 && 
 			// TODO this mp0 & 0xf00 removal makes coin insertion a double tap?
 			// TODO also removes 'debug' menu feature
 			// (mp0 & 0xf00) && 
-			if (m_parallel_pointer == parallelPointMark) {
-				// Range of 10 is very important, w/out it, and w/out the below, a number of components (like volume menu access & start button pressing) don't work
-				// there's a lot at play here
-				/*
-				- Allows volume menu select
-				- Allows P1 Start Button to be pressed (likely P2 start as well)
-				Upper controls are co-dependent on this here as well...interesting
-				*/
-				// TODO disabled for just a moment...
-				//r |= mk_parport_outval(mp0 >> 0x8); // was 0x5
-
-				// ENABLES P2 Start as well as P1 start and allows some basic controls as such
-				// TODO, was 0x5, but fixing this is NOT correct...trying other things here
-				r = mk_parport_outval(parPointerOutVal);
-
-				// P2 START is TRIGGERED here when 0x5 is set, in fact so is P1 (when (mp0 & 0xf00 && m_parallel_pointer == 10) == true)
-				/*
-				r |= mk_parport_outval(0x5);
-				...
-				1 + 3 = P1 start
-				2 + 3 = P2 start
-				...
-				during the game
-				1 + 3 = Fire special weapon, weird...seems to be cycling still
-				*/
-			} else {
-				// @montymxb Using this fixes most of the 'extra' switches being closed unnecessarily, which is great!
-				// July 17th, 2022, no longer causes problems with coins showing up. Might disregard the point below then VVV.
-				r = mk_parport_outval(0);
-			}
+			// if (m_parallel_pointer == parallelPointMark) {
+			// 	// ....
+			// } else {
+			// }
 
 
-			if (m_parallel_pointer == 11) {
-				// TRIGGERS (1 & 2)
-				// 0x1 = P1 Trigger
-				// 0x2 = P2 Trigger
-				uint8_t mp7 = m_ports[7].read_safe(0);
-				r = mk_parport_outval(mp7);
-				// TODO remove this and restore the 2 lines above
-				// r = mk_parport_outval(rand() % 2);
-
-			} else if (m_parallel_pointer == 2) {
-				// EXTRA CASE FOR MENU NAVIGATION
-				// TODO @montymxb Oct. 3rd, 2022, see below..
-				// TODO hack, using volume controls to drive P1UP / P1DN to make navigation easier
-				// Though the above was controlling analog gun controls, appears to be not the case
-				uint8_t mp1 = m_ports[1].read_safe(0);
-				r = mk_parport_outval((mp1 >> 2) ^ 0x2);
-
-			}
+			// @montymxb Using this fixes most of the 'extra' switches being closed unnecessarily, which is great!
+			// July 17th, 2022, no longer causes problems with coins showing up. Might disregard the point below then VVV.
+			r = mk_parport_outval(0);
 
 			int16_t mp5;
-			int8_t mp6;
+			int8_t mp6; // TODO needs to be converted to 16-bit
+			int16_t p2y;
+			int16_t p2x;
+
+			uint8_t mpGen;
 
 			//bool triggerPulled = m_ports[7].read_safe(0) & 0x1;
 
 			// JGun Analog Controls
 			switch (m_parallel_pointer) {
+				case 2:
+					// EXTRA CASE FOR MENU NAVIGATION
+					// TODO @montymxb Oct. 3rd, 2022, see below..
+					// TODO hack, using volume controls to drive P1UP / P1DN to make navigation easier
+					// Though the above was controlling analog gun controls, appears to be not the case
+					mpGen = m_ports[1].read_safe(0);
+					r = mk_parport_outval((mpGen >> 2) ^ 0x2);
+					break;
+				case 10:
+					// July 30th, Note, m_parallel_pointer ranges from 0x1 -> 0x17 (1 - 23)
+					// Oct. 13th, 2022: Removed this from IF below:: mp0 & 0xf00 && 
+					// TODO this mp0 & 0xf00 removal makes coin insertion a double tap?
+					// TODO also removes 'debug' menu feature
+					// (mp0 & 0xf00) && 
+					// Oct. 30th, 2022: NO LONGER REMOVES DEBUG FEATURE?
+
+					// Range of 10 is very important, w/out it, and w/out the below, a number of components (like volume menu access & start button pressing) don't work
+					// there's a lot at play here
+					/*
+					- Allows volume menu select
+					- Allows P1 Start Button to be pressed (likely P2 start as well)
+					Upper controls are co-dependent on this here as well...interesting
+					*/
+					// TODO disabled for just a moment...
+					//r |= mk_parport_outval(mp0 >> 0x8); // was 0x5
+
+					// ENABLES P2 Start as well as P1 start and allows some basic controls as such
+					// TODO, was 0x5, but fixing this is NOT correct...trying other things here
+					if (mp0 & 0xf00) {
+						r = mk_parport_outval(parPointerOutVal);
+					}
+
+					// P2 START is TRIGGERED here when 0x5 is set, in fact so is P1 (when (mp0 & 0xf00 && m_parallel_pointer == 10) == true)
+					/*
+					r |= mk_parport_outval(0x5);
+					...
+					1 + 3 = P1 start
+					2 + 3 = P2 start
+					...
+					during the game
+					1 + 3 = Fire special weapon, weird...seems to be cycling still
+					*/
+					break;
+				case 11:
+					// TRIGGERS (1 & 2)
+					// 0x1 = P1 Trigger
+					// 0x2 = P2 Trigger
+					// TODO @montymxb Oct. 30th, 2022: Muzzle 'flash' shows up sporadically when shooting, random values of even 0/1 will trigger it as well.
+					// Seems to be connected to some other state machine? Unsure how.
+					mpGen = m_ports[7].read_safe(0);
+					r = mk_parport_outval(mpGen);
+					break;
 				case 12:
 					// P1 control select (but P2 as well?)
 					// 0x1 allows P1 gun (but P2 already works...hmmm)
@@ -1054,11 +1093,7 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					// mp5 = m_ports[5].read_safe(0);
 					// r = mk_parport_outval(((mp5 & 0x7) << 1) | 0x1);
 
-					// TODO will need this for 6 bit versus 7 bit number?
-					// 32 vs 64...okay
-
 					mp5 = int(float(m_ports[5].read_safe(0)) / 255.0 * 768.0) % 256;
-					// r = mk_parport_outval(((mp5 & 0xe)) | 0x1);
 					r = mk_parport_outval(mp5 & 0xf);
 
 
@@ -1110,19 +1145,13 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					break;
 				case 19:
 					// P2, Y (low 4 bits)
-					// 0x1 = -1
-					// 0x2 = -2
-					// 0x4 = -4
-					// 0x8 = -8?
-					//r = mk_parport_outval(0x8);
+					p2y = 256 - m_ports[10].read_safe(0);
+					r = mk_parport_outval(p2y & 0xf);
 					break;
 				case 20:
 					// P2, Y (high 4 bits)
-					// 0x1 = -16
-					// 0x2 = -32
-					// 0x4 = -64
-					// 0x8 = -128
-					// r = mk_parport_outval(0x8);
+					p2y = 256 - m_ports[10].read_safe(0);
+					r = mk_parport_outval((p2y >> 4) & 0xf);
 					break;
 				case 21:
 					// P2, Y (high single bit)
@@ -1130,23 +1159,25 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					// 0x2 = ??? (nothing)
 					// 0x4 = ??? (nothing)
 					// 0x8 = ??? (nothing)
-					// r = mk_parport_outval(0x8);
+					r = mk_parport_outval(0x1);
 					break;
 				case 22:
-					// ??????
-					// 0x1 = ??? (nothing)
-					// 0x2 = ??? (nothing)
-					// 0x4 = ??? (nothing)
-					// 0x8 = ??? (nothing)
-					// r = mk_parport_outval(0x8);
+					// P2, X (lower nibble)
+					// 0x1 = 1
+					// 0x2 = 2
+					// 0x4 = 4
+					// 0x8 = 8
+					p2x = m_ports[9].read_safe(0) * 3 % 256;
+					r = mk_parport_outval(p2x & 0xf);
 					break;
 				case 23:
-					// ??????
-					// 0x1 = ??? (nothing)
-					// 0x2 = ??? (nothing)
-					// 0x4 = ??? (nothing)
-					// 0x8 = ??? (nothing)
-					// r = mk_parport_outval(0x8);
+					// P2, X (upper nibble)
+					// 0x1 = 16
+					// 0x2 = 32
+					// 0x4 = 64
+					// 0x8 = 128
+					p2x = m_ports[9].read_safe(0) * 3 % 256;
+					r = mk_parport_outval((p2x >> 4) & 0xf);
 					break;
 			}
 
@@ -1168,6 +1199,10 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 		r = mk_parport_outval(mp0 >> 8);
 
 		#endif
+		
+		// record prior control register state for parport 
+		// (used to help with distinguishing Sys Menu cmd from P2X high 2-bit inputs)
+		previous_parport_state = m_parport_control_reg;
 
 	}
 	else if (ACCESSING_BITS_16_23)
@@ -1663,6 +1698,7 @@ static INPUT_PORTS_START(mediagx)
 	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
 
 	/*
+	TODO remove these DIP examples, unless I plan to use them
 	EXAMPLE from redclash.cpp driver for DIPs,
 	...since I found a couple of them floating around in mem that I can map
 	PORT_START("DSW1")
@@ -1720,11 +1756,11 @@ static INPUT_PORTS_START(mediagx)
 
 	// JGun0 X
 	PORT_START("IN5")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
 	// JGun0 Y
 	PORT_START("IN6")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 	
 	// JGun Triggers
 	PORT_START("IN7")
@@ -1739,11 +1775,11 @@ static INPUT_PORTS_START(mediagx)
 
 	// JGun1 X
 	PORT_START("IN9")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	// JGun1 Y
 	PORT_START("IN10")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
