@@ -10,10 +10,11 @@
 #include "corina.h"
 #include "maxflash.h"
 #include "oss.h"
+#include "phoenix.h"
+#include "rtime8.h"
 #include "sic.h"
 #include "sparta.h"
-#include "rtime8.h"
-#include "phoenix.h"
+#include "telelink2.h"
 #include "williams.h"
 
 static void a800_left(device_slot_interface &device)

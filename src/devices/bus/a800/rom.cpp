@@ -20,7 +20,6 @@
 
 DEFINE_DEVICE_TYPE(A800_ROM,           a800_rom_device,           "a800_rom",      "Atari 800 ROM Carts")
 DEFINE_DEVICE_TYPE(A800_ROM_BBSB,      a800_rom_bbsb_device,      "a800_bbsb",     "Atari 800 ROM Carts BBSB")
-DEFINE_DEVICE_TYPE(A800_ROM_TELELINK2, a800_rom_telelink2_device, "a800_tlink2",   "Atari 800 64K ROM Cart Telelink II")
 DEFINE_DEVICE_TYPE(A800_ROM_MICROCALC, a800_rom_microcalc_device, "a800_sitsa",    "Atari 800 64K ROM Carts SITSA MicroCalc")
 DEFINE_DEVICE_TYPE(XEGS_ROM,           xegs_rom_device,           "a800_xegs",     "Atari XEGS 64K ROM Carts")
 DEFINE_DEVICE_TYPE(A5200_ROM_2CHIPS,   a5200_rom_2chips_device,   "a5200_16k2c",   "Atari 5200 ROM Cart 16K in 2 Chips")
@@ -207,65 +206,6 @@ void xegs_rom_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	m_bank = data & m_bank_mask;
 }
-
-/*-------------------------------------------------
-
- Telelink II
-
- 4-bit NVRAM (unknown type) and other stuff not
- known at current stage.
-
- -------------------------------------------------*/
-
-a800_rom_telelink2_device::a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_TELELINK2, tag, owner, clock)
-	, m_nvram(*this, "nvram")
-{
-}
-
-void a800_rom_telelink2_device::device_add_mconfig(machine_config &config)
-{
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-}
-
-void a800_rom_telelink2_device::device_start()
-{
-	const u32 nvram_size = 0x100;
-
-	m_nvram_ptr = std::make_unique<uint8_t[]>(nvram_size);
-	m_nvram->set_base(m_nvram_ptr.get(), nvram_size);
-
-	save_pointer(NAME(m_nvram_ptr), nvram_size);
-}
-
-void a800_rom_telelink2_device::device_reset()
-{
-	// TODO: rd4 is likely disabled at startup then enabled somehow
-	rd4_w(1);
-	rd5_w(1);
-}
-
-
-void a800_rom_telelink2_device::cart_map(address_map &map)
-{
-	// 4-bit NVRAM
-	map(0x1000, 0x10ff).lrw8(
-		NAME([this](offs_t offset) { return m_nvram_ptr[offset & 0xff]; }),
-		NAME([this](offs_t offset, u8 data) { m_nvram_ptr[offset & 0xff] = data | 0xf0; })
-	);
-	map(0x2000, 0x3fff).lr8(
-		NAME([this](offs_t offset) { return m_rom[offset & 0x1fff]; })
-	);
-}
-
-void a800_rom_telelink2_device::cctl_map(address_map &map)
-{
-//	map(0x01, 0x01) read before reading NVRAM, value discarded
-//	map(0x02, 0x02) written before writing NVRAM when changing stored information
-}
-
-
-
 
 /*-------------------------------------------------
 
