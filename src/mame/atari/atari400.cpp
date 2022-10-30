@@ -1813,7 +1813,7 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 				m_cartleft->write_d5xx(offset, data);
 			}
 			break;
-		case A800_MICROCALC:
+		/*case A800_MICROCALC:
 			m_cart_helper = (m_cart_helper + 1) % 5;
 			if (m_cart_helper == 4)
 				m_cart_disabled = 1;
@@ -1822,7 +1822,7 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 				m_cart_disabled = 0;
 				m_cartleft->write_d5xx(offset, m_cart_helper);
 			}
-			break;
+			break;*/
 		default:
 			break;
 		}
@@ -1880,11 +1880,11 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_8000)), write8sm_delegate(*this, FUNC(a400_state::special_write_8000)));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
 			break;
-		case A800_MICROCALC:
+/*		case A800_MICROCALC:
 			// this can also disable ROM when reading in 0xd500-0xd5ff
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd500, 0xd5ff, read8sm_delegate(*this, FUNC(a400_state::read_d5xx)), write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
-			break;
+			break;*/
 		case A800_XEGS:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);

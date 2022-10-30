@@ -26,4 +26,6 @@ private:
 	std::unique_ptr<uint8_t[]> m_nvram_ptr;
 };
 
+DECLARE_DEVICE_TYPE(A800_ROM_TELELINK2,   a800_rom_telelink2_device)
+
 #endif // MAME_BUS_A800_TELELINK2_H

@@ -3955,7 +3955,7 @@ Enemy playfield has strip glitch on topmost row
 		<year>19??</year>
 		<publisher>Grupo SITSA</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sitsa" />
+			<feature name="slot" value="a800_ultracart" />
 			<dataarea name="rom" size="32768">
 				<rom name="microcalc v2.2.rom" size="32768" crc="44507065" sha1="ac2e0ddac58fba9d0f8a01c26ee857b769c62a98"/>
 			</dataarea>

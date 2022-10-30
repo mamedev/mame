@@ -14,7 +14,6 @@
 //-------------------------------------------------
 
 DEFINE_DEVICE_TYPE(A800_ROM,           a800_rom_device,           "a800_rom",      "Atari 800 ROM Carts")
-DEFINE_DEVICE_TYPE(A800_ROM_MICROCALC, a800_rom_microcalc_device, "a800_sitsa",    "Atari 800 64K ROM Carts SITSA MicroCalc")
 DEFINE_DEVICE_TYPE(XEGS_ROM,           xegs_rom_device,           "a800_xegs",     "Atari XEGS 64K ROM Carts")
 DEFINE_DEVICE_TYPE(A5200_ROM_2CHIPS,   a5200_rom_2chips_device,   "a5200_16k2c",   "Atari 5200 ROM Cart 16K in 2 Chips")
 DEFINE_DEVICE_TYPE(A5200_ROM_BBSB,     a5200_rom_bbsb_device,     "a5200_bbsb",    "Atari 5200 ROM Cart BBSB")
@@ -38,12 +37,6 @@ xegs_rom_device::xegs_rom_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-
-a800_rom_microcalc_device::a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_MICROCALC, tag, owner, clock)
-	, m_bank(0)
-{
-}
 
 a5200_rom_2chips_device::a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, A5200_ROM_2CHIPS, tag, owner, clock)
@@ -74,16 +67,6 @@ void xegs_rom_device::device_start()
 }
 
 void xegs_rom_device::device_reset()
-{
-	m_bank = 0;
-}
-
-void a800_rom_microcalc_device::device_start()
-{
-	save_item(NAME(m_bank));
-}
-
-void a800_rom_microcalc_device::device_reset()
 {
 	m_bank = 0;
 }
@@ -140,23 +123,6 @@ uint8_t xegs_rom_device::read_80xx(offs_t offset)
 void xegs_rom_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	m_bank = data & m_bank_mask;
-}
-
-/*-------------------------------------------------
-
- SITSA Microcalc
-
-
- -------------------------------------------------*/
-
-uint8_t a800_rom_microcalc_device::read_80xx(offs_t offset)
-{
-	return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
-}
-
-void a800_rom_microcalc_device::write_d5xx(offs_t offset, uint8_t data)
-{
-	m_bank = data;
 }
 
 // Atari 5200

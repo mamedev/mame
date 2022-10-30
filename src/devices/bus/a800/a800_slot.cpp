@@ -226,7 +226,7 @@ static const a800_slot slot_list[] =
 	{ A800_TURBO128,  "a800_turbo128" },
 	{ A800_BLIZZARD,  "a800_blizzard" },
 	{ A800_TELELINK2, "a800_tlink2" },
-	{ A800_MICROCALC, "a800_sitsa" },
+	{ A800_ULTRACART, "a800_ultracart" },
 	{ A800_CORINA,    "a800_corina" },
 	{ A800_CORINA_SRAM, "a800_corina_sram" },
 	{ SIC_128KB,      "sic_128kb" },
@@ -410,7 +410,7 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 			type = A800_TURBO128;
 			break;
 		case 52:
-			type = A800_MICROCALC;
+			type = A800_ULTRACART;
 			break;
 		case 54:
 			type = SIC_128KB;

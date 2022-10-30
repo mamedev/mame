@@ -29,24 +29,6 @@ protected:
 	virtual void device_reset() override;
 };
 
-// ======================> a800_rom_microcalc_device
-
-class a800_rom_microcalc_device : public a800_rom_device
-{
-public:
-	// construction/destruction
-	a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read_80xx(offs_t offset) override;
-	virtual void write_d5xx(offs_t offset, uint8_t data) override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	int m_bank;
-};
 
 // ======================> xegs_rom_device
 
@@ -103,8 +85,6 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(A800_ROM,             a800_rom_device)
-DECLARE_DEVICE_TYPE(A800_ROM_TELELINK2,   a800_rom_telelink2_device)
-DECLARE_DEVICE_TYPE(A800_ROM_MICROCALC,   a800_rom_microcalc_device)
 DECLARE_DEVICE_TYPE(XEGS_ROM,             xegs_rom_device)
 DECLARE_DEVICE_TYPE(A5200_ROM_2CHIPS,     a5200_rom_2chips_device)
 DECLARE_DEVICE_TYPE(A5200_ROM_BBSB,       a5200_rom_bbsb_device)

@@ -10,7 +10,8 @@ TODO:
 - Reset button optionally located on cart allows it to be rearmed;
 - Blizzard 32KB scheme has additional ROM bank: maps to $a000-$bfff then any access to CCTL
   bankswitch to the next index, eventually disarms RD5 after bank 3.
-  Needs a dump to checkout.
+  Needs a dump to checkout, and it sounds more suited to derive from ultracart scheme rather
+  than this.
 
 Note:
 - "Blizzard 4KB" note from .car specs suggests being a Phoenix in disguise,
