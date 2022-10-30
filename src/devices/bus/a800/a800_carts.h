@@ -7,6 +7,7 @@
 
 
 #include "rom.h"
+#include "atrax.h"
 #include "bbsb.h"
 #include "corina.h"
 #include "maxflash.h"
@@ -40,10 +41,14 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_turbo128", A800_ROM_TURBO);
 	device.option_add_internal("a800_tlink2",   A800_ROM_TELELINK2);
 	device.option_add_internal("a800_ultracart", A800_ROM_ULTRACART);
+	device.option_add_internal("a800_atrax",    A800_ROM_ATRAX);
+	device.option_add_internal("xegs",          XEGS_ROM);
+	// non-ROM types
+	device.option_add(         "rtime8",        A800_RTIME8);
+//	device.option_add(         "veronica",      A800_VERONICA);
+	// flash carts
 	device.option_add_internal("a800_corina",   A800_ROM_CORINA);
 	device.option_add_internal("a800_corina_sram", A800_ROM_CORINA_SRAM);
-	device.option_add(         "rtime8",        A800_RTIME8); // not a ROM cartridge
-	device.option_add_internal("xegs",          XEGS_ROM);
 	device.option_add(         "maxflash_1mb",  A800_MAXFLASH_1MB);
 	device.option_add(         "maxflash_8mb",  A800_MAXFLASH_8MB);
 	device.option_add(         "sic_128kb",     A800_SIC_128KB);
