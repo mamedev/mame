@@ -1152,7 +1152,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode) & 0x1f;
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, (t2<<t1)|(t2>>(32-t1)));
+				set_ri(opcode, rotl_32(t2, t1));
 				break;
 
 			case 0xe: // shli

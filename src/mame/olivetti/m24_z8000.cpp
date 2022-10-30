@@ -99,34 +99,30 @@ const uint8_t m24_z8000_device::pmem_table[16][4] =
 
 uint16_t m24_z8000_device::pmem_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret;
-	uint8_t hostseg;
 	offset <<= 1;
 	if(!m_z8000_mem)
 		return memregion(subtag("z8000").c_str())->as_u16(offset >> 1);
 
-	hostseg = pmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
+	uint8_t hostseg = pmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
 	if(hostseg == 255)
 		return 0;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
 		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0); // move A6/A7 so CGA framebuffer appears linear
-	ret = m_maincpu->space(AS_PROGRAM).read_word(offset, (mem_mask << 8) | (mem_mask >> 8));
-	return (ret << 8) | (ret >> 8);
+	uint16_t ret = m_maincpu->space(AS_PROGRAM).read_word(offset, swapendian_int16(mem_mask));
+	return swapendian_int16(ret);
 }
 
 void m24_z8000_device::pmem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint8_t hostseg;
-	data = (data << 8) | (data >> 8);
 	offset <<= 1;
-	hostseg = pmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
+	uint8_t hostseg = pmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
 	if(hostseg == 255)
 		return;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
 		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
-	m_maincpu->space(AS_PROGRAM).write_word(offset, data, (mem_mask << 8) | (mem_mask >> 8));
+	m_maincpu->space(AS_PROGRAM).write_word(offset, swapendian_int16(data), swapendian_int16(mem_mask));
 }
 
 const uint8_t m24_z8000_device::dmem_table[16][4] =
@@ -137,43 +133,38 @@ const uint8_t m24_z8000_device::dmem_table[16][4] =
 
 uint16_t m24_z8000_device::dmem_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret;
-	uint8_t hostseg;
 	offset <<= 1;
-	hostseg = dmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
+	uint8_t hostseg = dmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
 	if(hostseg == 255)
 		return 0;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
 		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
-	ret = m_maincpu->space(AS_PROGRAM).read_word(offset, (mem_mask << 8) | (mem_mask >> 8));
-	return (ret << 8) | (ret >> 8);
+	uint16_t ret = m_maincpu->space(AS_PROGRAM).read_word(offset, swapendian_int16(mem_mask));
+	return swapendian_int16(ret);
 }
 
 void m24_z8000_device::dmem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint8_t hostseg;
-	data = (data << 8) | (data >> 8);
 	offset <<= 1;
-	hostseg = dmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
+	uint8_t hostseg = dmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
 	if(hostseg == 255)
 		return;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
 		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
-	m_maincpu->space(AS_PROGRAM).write_word(offset, data, (mem_mask << 8) | (mem_mask >> 8));
+	m_maincpu->space(AS_PROGRAM).write_word(offset, swapendian_int16(data), swapendian_int16(mem_mask));
 }
 
 uint16_t m24_z8000_device::i86_io_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret = m_maincpu->space(AS_IO).read_word(offset << 1, (mem_mask << 8) | (mem_mask >> 8));
-	return (ret << 8) | (ret >> 8);
+	uint16_t ret = m_maincpu->space(AS_IO).read_word(offset << 1, swapendian_int16(mem_mask));
+	return swapendian_int16(ret);
 }
 
 void m24_z8000_device::i86_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	data = (data << 8) | (data >> 8);
-	m_maincpu->space(AS_IO).write_word(offset << 1, data, (mem_mask << 8) | (mem_mask >> 8));
+	m_maincpu->space(AS_IO).write_word(offset << 1, swapendian_int16(data), swapendian_int16(mem_mask));
 }
 
 void m24_z8000_device::irqctl_w(uint8_t data)

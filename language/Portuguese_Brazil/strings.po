@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: MAME 0.245\n"
+"Project-Id-Version: MAME 0.249\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-16 02:30+1100\n"
-"PO-Revision-Date: 2022-07-09 13:21-0300\n"
+"PO-Revision-Date: 2022-10-27 20:16-0300\n"
 "Last-Translator: Felipe <felipefplzx@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.1\n"
+"X-Generator: Poedit 3.2\n"
 "X-Language: pt_BR\n"
 "X-Source-Language: C\n"
 
@@ -279,7 +279,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d pacotes do software )"
 #: src/frontend/mame/ui/selsoft.cpp:709
 #, c-format
 msgid "%1$s - select software"
-msgstr ""
+msgstr "%1$s - selecionar software"
 
 #: src/frontend/mame/ui/selsoft.cpp:714 src/frontend/mame/ui/selgame.cpp:1074
 #, c-format
@@ -976,6 +976,10 @@ msgid ""
 "physical interaction or consist of mechanical devices. It is not possible to "
 "fully experience this system.\n"
 msgstr ""
+"\n"
+"Os elementos deste sistema não podem ser emulados precisamente pois eles "
+"requerem interação física ou consistem de dispositivos mecânicos. Não é "
+"possível experimentar este sistema na totalidade.\n"
 
 #: src/frontend/mame/ui/info.cpp:167
 #, c-format
@@ -1883,17 +1887,17 @@ msgstr "%1$s (%2$s %3$d)"
 #: src/frontend/mame/ui/inputdevices.cpp:88
 msgctxt "menu-inputdev"
 msgid "Copy Device ID"
-msgstr ""
+msgstr "Copiar a ID do dispositivo"
 
 #: src/frontend/mame/ui/inputdevices.cpp:122
 msgctxt "menu-inputdev"
 msgid "Copied device ID to clipboard"
-msgstr ""
+msgstr "Copiou a ID do dispositivo pra área de transferência"
 
 #: src/frontend/mame/ui/inputdevices.cpp:124
 msgctxt "menu-inputdev"
 msgid "Error copying device ID to clipboard"
-msgstr ""
+msgstr "Erro ao copiar a ID do dispositivo pra área de transferência"
 
 #: src/frontend/mame/ui/inputdevices.cpp:162
 msgctxt "menu-inputdev"
@@ -2180,7 +2184,7 @@ msgstr "Traduções da IU"
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgctxt "path-option"
 msgid "Software Lists"
-msgstr ""
+msgstr "Listas de Softwares"
 
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgctxt "path-option"
@@ -6522,18 +6526,3 @@ msgid ""
 msgstr ""
 "Insira a combinação ou pressione %s pra cancelar\n"
 "%s"
-
-#~ msgid ""
-#~ "\n"
-#~ "Elements of this system cannot be emulated as they require physical "
-#~ "interaction or consist of mechanical devices. It is not possible to fully "
-#~ "experience this system.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Os elementos deste sistema não podem ser emulados pois eles requerem "
-#~ "interação física ou consistem de dispositivos mecânicos. Não é possível "
-#~ "experimentar este sistema na totalidade.\n"
-
-#, c-format
-#~ msgid "System: \"%1$s\" software list "
-#~ msgstr "Sistema: lista dos conteúdos \"%1$s\" "

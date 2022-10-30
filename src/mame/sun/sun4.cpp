@@ -432,7 +432,6 @@
 #include "machine/z80scc.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 #include "screen.h"
 

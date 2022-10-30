@@ -1347,14 +1347,14 @@ void sh_common_execution::ROTCR(uint32_t n)
 void sh_common_execution::ROTL(uint32_t n)
 {
 	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | ((m_sh2_state->r[n] >> 31) & SH_T);
-	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->r[n] >> 31);
+	m_sh2_state->r[n] = rotl_32(m_sh2_state->r[n], 1);
 }
 
 /*  ROTR    Rn */
 void sh_common_execution::ROTR(uint32_t n)
 {
 	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | (m_sh2_state->r[n] & SH_T);
-	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 1) | (m_sh2_state->r[n] << 31);
+	m_sh2_state->r[n] = rotr_32(m_sh2_state->r[n], 1);
 }
 
 /*  RTS */
