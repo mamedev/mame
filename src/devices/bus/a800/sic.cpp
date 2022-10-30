@@ -60,7 +60,7 @@ void a800_sic_128kb_device::device_reset()
 // so that 0x8000 maps to 0 and 0xa000 to 0x2000
 u8 a800_sic_128kb_device::read(offs_t offset)
 {
-	return m_flash->read((offset & 0x3fff) | (m_bank * 0x4000)); 
+	return m_flash->read((offset & 0x3fff) | (m_bank * 0x4000));
 }
 
 void a800_sic_128kb_device::write(offs_t offset, u8 data)

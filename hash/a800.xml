@@ -732,14 +732,11 @@ Title screen has masking artifact and wrong color (should be green) on mode sele
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-AST 2000 was two cartridges in one - it contained an AST Utility cartridge, and a cartridge for Turbo 2000 (another turbo system popular in Poland).
-The "AST 2000" contained a 16KB ROM and a two-position switch, which allowed to choose between one of two 8KB banks. So in reality this image is
-composed of two 8KB images. This ROM can be split in half and of the halves mounted as a Phoenix 8KB cartridge. Unfortunately, the second half
-(Turbo 2000) won't work in the emulator - the real cartridge contained a capacitor that automatically switched off the cartridge from memory after
-a certain time, and this isn't currently emulated.
+Unemulated [cassette] interface
+https://forums.atariage.com/topic/169199-mess-a800-cartridge-software-list/#comment-2136371
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="N/A" />
+			<feature name="slot" value="a800_phoenix_ast2k" />
 			<dataarea name="rom" size="16384">
 				<rom name="ast 2000.rom" size="16384" crc="e9da4eaa" sha1="7590ef4519ff33a80bb9a19a1dc903c44edcbc69"/>
 			</dataarea>

@@ -61,6 +61,6 @@ void a800_rom_telelink2_device::cart_map(address_map &map)
 
 void a800_rom_telelink2_device::cctl_map(address_map &map)
 {
-//	map(0x01, 0x01) read before reading NVRAM, value discarded
-//	map(0x02, 0x02) written before writing NVRAM when changing stored information
+//  map(0x01, 0x01) read before reading NVRAM, value discarded
+//  map(0x02, 0x02) written before writing NVRAM when changing stored information
 }

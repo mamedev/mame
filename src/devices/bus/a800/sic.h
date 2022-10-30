@@ -26,16 +26,16 @@ protected:
 
 	required_device<intelfsh8_device> m_flash;
 
-//	uint8_t disable_rom_r(offs_t offset);
-//	void disable_rom_w(offs_t offset, uint8_t data);
-//	uint8_t rom_bank_r(offs_t offset);
-//	void rom_bank_w(offs_t offset, uint8_t data);
+//  uint8_t disable_rom_r(offs_t offset);
+//  void disable_rom_w(offs_t offset, uint8_t data);
+//  uint8_t rom_bank_r(offs_t offset);
+//  void rom_bank_w(offs_t offset, uint8_t data);
 
 private:
 	int m_bank;
 	bool m_write_protect;
 	int m_bank_mask;
-	
+
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 

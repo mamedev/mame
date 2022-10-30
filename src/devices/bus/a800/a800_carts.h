@@ -26,6 +26,7 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_16k",      A800_ROM);
 	device.option_add_internal("a800_phoenix",  A800_ROM_PHOENIX);
 	device.option_add_internal("a800_blizzard", A800_ROM_BLIZZARD_16KB);
+	device.option_add_internal("a800_phoenix_ast2k", A800_ROM_PHOENIX_AST2K);
 	device.option_add_internal("a800_bbsb",     A800_ROM_BBSB);
 	device.option_add_internal("a800_oss8k",    A800_ROM_OSS8K);
 	device.option_add_internal("a800_oss034m",  A800_ROM_OSS34);

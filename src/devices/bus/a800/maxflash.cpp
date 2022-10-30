@@ -47,7 +47,7 @@ void a800_maxflash_1mb_device::cart_map(address_map &map)
 {
 	map(0x2000, 0x3fff).lrw8(
 		NAME([this](offs_t offset) {
-			return m_flash->read((offset & 0x1fff) + (m_bank * 0x2000)); 
+			return m_flash->read((offset & 0x1fff) + (m_bank * 0x2000));
 		}),
 		NAME([this](offs_t offset, u8 data) {
 			m_flash->write((offset & 0x1fff) + (m_bank * 0x2000), data);

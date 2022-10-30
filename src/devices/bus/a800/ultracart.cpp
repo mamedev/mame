@@ -5,7 +5,7 @@
 Ultracart ROM scheme
 
 Observed in SITSA MicroCalc SW (Altirra calls it this way),
-PCB label pic has clear "ULTRACART" with an unreadable sub-title from available pic 
+PCB label pic has clear "ULTRACART" with an unreadable sub-title from available pic
 ("PIGNY MEXICO"?)
 Sports extra SN74LS169BN (synchronous 4-bit up/down binary counter), any access to CCTL
 bankswitch to the next index, disarms RD5 after bank 3, re-enables from bank 0 if accessed again.

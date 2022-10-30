@@ -40,10 +40,29 @@ protected:
 	virtual void disable_rom_w(offs_t offset, u8 data) override;
 };
 
+class a800_rom_phoenix_ast2k_device : public a800_rom_phoenix_device
+{
+	public:
+	a800_rom_phoenix_ast2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void cart_map(address_map &map) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
+
+private:
+	required_ioport m_dsw;
+	u32 m_rom_select;
+
+	emu_timer *m_rd5_disarm_timer;
+
+	TIMER_CALLBACK_MEMBER(rd5_disarm_cb);
+};
 
 DECLARE_DEVICE_TYPE(A800_ROM_PHOENIX,         a800_rom_phoenix_device)
 DECLARE_DEVICE_TYPE(A800_ROM_BLIZZARD_16KB,   a800_rom_blizzard_16kb_device)
-
+DECLARE_DEVICE_TYPE(A800_ROM_PHOENIX_AST2K,   a800_rom_phoenix_ast2k_device)
 
 #endif // MAME_BUS_A800_PHOENIX_H
