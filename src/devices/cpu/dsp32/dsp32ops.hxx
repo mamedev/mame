@@ -2445,7 +2445,7 @@ void dsp32c_device::d5_int24(uint32_t op)
 	int zpi = (op >> 0) & 0x7f;
 	if (!(DAUC & 0x10)) val = floor(val + 0.5);
 	else val = ceil(val - 0.5);
-	int32_t res = std::clamp<int32_t>(val, -0x800000, 0x7fffff);
+	int32_t res = int32_t(std::clamp<double>(val, -0x800000, 0x7fffff));
 	if (zpi != 7)
 		dau_write_pi_4bytes(zpi, res);
 	dau_set_val_noflags((op >> 21) & 3, dsp_to_double(res << 8));
