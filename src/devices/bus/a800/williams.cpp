@@ -17,7 +17,7 @@ Williams cart scheme and variants
 
 DEFINE_DEVICE_TYPE(A800_ROM_WILLIAMS,  a800_rom_williams_device,  "a800_williams", "Atari 800 64K ROM Carts Williams")
 DEFINE_DEVICE_TYPE(A800_ROM_EXPRESS,   a800_rom_express_device,   "a800_express",  "Atari 800 64K ROM Carts Express")
-DEFINE_DEVICE_TYPE(A800_ROM_DIAMOND,   a800_rom_diamond_device,   "a800_express",  "Atari 800 64K ROM Carts Diamond")
+DEFINE_DEVICE_TYPE(A800_ROM_DIAMOND,   a800_rom_diamond_device,   "a800_diamond",  "Atari 800 64K ROM Carts Diamond")
 DEFINE_DEVICE_TYPE(A800_ROM_TURBO,     a800_rom_turbo_device,     "a800_turbo",    "Atari 800 64K ROM Carts Turbosoft")
 
 a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
