@@ -7,6 +7,7 @@
 
 
 #include "rom.h"
+#include "bbsb.h"
 #include "corina.h"
 #include "maxflash.h"
 #include "oss.h"

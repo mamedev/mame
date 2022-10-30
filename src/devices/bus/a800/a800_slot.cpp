@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(XEGS_CART_SLOT,  xegs_cart_slot_device,  "xegs_cart_slot",  "
 
 
 //-------------------------------------------------
-//  device_vcs_cart_interface - constructor
+//  device_a800_cart_interface - constructor
 //-------------------------------------------------
 
 device_a800_cart_interface::device_a800_cart_interface (const machine_config &mconfig, device_t &device)
@@ -48,6 +48,7 @@ device_a800_cart_interface::device_a800_cart_interface (const machine_config &mc
 	m_slot = dynamic_cast<a800_cart_slot_device *>(device.owner());
 }
 
+// TODO: separate a5200 to own interface
 
 //-------------------------------------------------
 //  ~device_a800_cart_interface  - destructor
@@ -122,6 +123,9 @@ WRITE_LINE_MEMBER( device_a800_cart_interface::rd_both_w ) { rd4_w(state); rd5_w
 //-------------------------------------------------
 //  ****_cart_slot_device - constructor
 //-------------------------------------------------
+
+// TODO: make an extra constructor exposing num of address lines for cart_mem
+// (necessary for a5200 carts)
 a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)

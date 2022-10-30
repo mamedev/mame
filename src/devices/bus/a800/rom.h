@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli, Angelo Salese
+
 #ifndef MAME_BUS_A800_ROM_H
 #define MAME_BUS_A800_ROM_H
 
@@ -27,27 +28,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
-
-
-// ======================> a800_rom_bbsb_device
-
-class a800_rom_bbsb_device : public a800_rom_device
-{
-public:
-	// construction/destruction
-	a800_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read_80xx(offs_t offset) override;
-	virtual void write_80xx(offs_t offset, uint8_t data) override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	int m_banks[2];
-};
-
 
 // ======================> a800_rom_microcalc_device
 
@@ -123,7 +103,6 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(A800_ROM,             a800_rom_device)
-DECLARE_DEVICE_TYPE(A800_ROM_BBSB,        a800_rom_bbsb_device)
 DECLARE_DEVICE_TYPE(A800_ROM_TELELINK2,   a800_rom_telelink2_device)
 DECLARE_DEVICE_TYPE(A800_ROM_MICROCALC,   a800_rom_microcalc_device)
 DECLARE_DEVICE_TYPE(XEGS_ROM,             xegs_rom_device)
