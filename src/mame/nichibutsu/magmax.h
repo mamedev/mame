@@ -8,26 +8,30 @@
 #include "screen.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "sound/flt_biquad.h"
+#include "sound/mixer.h"
 #include "emupal.h"
 
 class magmax_state : public driver_device
 {
 public:
-	magmax_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_vreg(*this, "vreg"),
-		m_scroll_x(*this, "scroll_x"),
-		m_scroll_y(*this, "scroll_y"),
-		m_rom18B(*this, "user1"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_ay(*this, "ay%u", 0U),
-		m_soundlatch(*this, "soundlatch"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+	magmax_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_videoram(*this, "videoram")
+		, m_spriteram(*this, "spriteram")
+		, m_vreg(*this, "vreg")
+		, m_scroll_x(*this, "scroll_x")
+		, m_scroll_y(*this, "scroll_y")
+		, m_rom18B(*this, "user1")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_ay(*this, "ay%u", 0U)
+		, m_aymixer(*this, "aymixer%u", 0U)
+		, m_ayfilter(*this, "ayfilter%u", 0U)
+		, m_soundlatch(*this, "soundlatch")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 	{ }
 
 	void magmax(machine_config &config);
@@ -47,6 +51,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<ay8910_device, 3> m_ay;
+	required_device_array<mixer_device, 3> m_aymixer;
+	required_device_array<filter_biquad_device, 4> m_ayfilter;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

@@ -32,7 +32,6 @@ TODO:
 
 #include "emu.h"
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 #include "arm7.h"
 #include "arm7core.h"   //include arm7 core
@@ -876,7 +875,7 @@ void arm7_cpu_device::translate_command(const std::vector<std::string_view> &par
 {
 	uint64_t vaddr;
 
-	if (!machine().debugger().commands().validate_number_parameter(params[0], vaddr)) return;
+	if (!machine().debugger().console().validate_number_parameter(params[0], vaddr)) return;
 
 	vaddr &= 0xffffffff;
 

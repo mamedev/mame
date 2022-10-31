@@ -10407,6 +10407,7 @@ talbot                          // Volt Electronics
 
 @source:taito/champbwl.cpp
 champbwl                        // (c)1989 Romstar.  not Taito, but the same Seta video chips
+champbwla                       // (c)1989 Romstar.  not Taito, but the same Seta video chips
 doraemon                        // Sunsoft / Epoch / Fujiko - Shogakukan - TV Asahi (prototype)
 
 @source:dataeast/chanbara.cpp
@@ -15042,7 +15043,7 @@ gcus                            // (c) 2001 Nintendo
 gceu                            // (c) 2002 Nintendo
 gcbr                            // (c) 2002 Nintendo
 
-@source:skeleton/gameking.cpp
+@source:handheld/gameking.cpp
 gamekin3                        //
 gameking                        //
 
@@ -15351,6 +15352,7 @@ gtsers12a                       // (c) 1984 Greyhound Electronics
 gtsers14                        // (c) 1986 Greyhound Electronics
 gtsers14a                       // (c) 1986 Greyhound Electronics
 gtsers15                        // (c) 1986 Greyhound Electronics
+gtsers18                        // (c) 1986 Greyhound Electronics
 gtsers2                         // (c) 1984 Greyhound Electronics
 gtsers3                         // (c) 1984 Greyhound Electronics
 gtsers4                         // (c) 1984 Greyhound Electronics
@@ -15845,6 +15847,7 @@ cmasteri                        // (c) 1991 Dyna Electronics
 cmasterj                        // (c) 1991 Dyna Electronics
 cmasterk                        // (c) 1991 Dyna Electronics
 cmezspin                        // (c) 1991 Dyna Electronics
+cmfb55                          // bootleg
 cmfun                           // (c) 1995 Dyna Electronics
 cmpacman                        //
 cmpacmana                       //
@@ -16887,6 +16890,7 @@ playmaker                       // Tiger Electronics
 qfire                           // Electroplay
 quizwizc                        // Coleco
 raisedvl                        // Entex
+scruiser                        // US Games
 simon                           // Milton Bradley
 simonf                          // Milton Bradley
 slepachi                        // Tsukuda
@@ -20587,6 +20591,9 @@ luckybale                       // (c) 1996 Sielcon Games
 
 @source:omron/luna_68k.cpp
 luna                            // Omron Luna
+
+@source:omron/luna_88k.cpp
+luna88k2                        // Omron Luna 88K²
 
 @source:tecmo/lvcards.cpp
 lvcards                         // (c) 1985 Tehkan
@@ -42632,6 +42639,7 @@ gq863                           //
 @source:edevices/twins.cpp
 spider                          //
 twins                           // (c) 1993 Ecogames
+twinsa                          // (c) 1993 Ecogames
 twinsed1                        // (c) 1994 Electronic Devices
 twinsed2                        // (c) 1994 Electronic Devices
 
@@ -42711,6 +42719,9 @@ uts20                           //
 @source:att/unixpc.cpp
 3b1                             // 3B1 "Unix PC"
 
+@source:sega/unkhockey.cpp
+unkhockey
+
 @source:misc/unkhorse.cpp
 unkhorse                        //
 
@@ -42769,17 +42780,17 @@ dtfamily                        // (c) 2001 Semicom
 finalgdr                        // (c) 2001 Semicom
 jmpbreak                        // (c) 1999 F2 System
 jmpbreaka                       // (c) 1999 F2 System
-poosho                          // (c) 1999 F2 System
 luplup                          // (c) 1999 Omega System
-luplup29                        // (c) 1999 Omega System
 luplup10                        // (c) 1999 Omega System (Adko license)
+luplup29                        // (c) 1999 Omega System
 misncrft                        // (c) 2000 Sun
 misncrfta                       // (c) 2000 Sun
 mrdig                           // (c) 2000 Sun
 mrkicker                        // (c) 2001 Semicom
 mrkickera                       // (c) 2001 Semicom
 newxpang                        // (c) 1999 F2 System
-worldadv                        // (c) 1999 F2 System
+newxpanga                       // (c) 1999 F2 System
+poosho                          // (c) 1999 F2 System
 puzlbang                        // (c) 1999 Omega System
 puzlbanga                       // (c) 1999 Omega System
 suplup                          // (c) 1999 Omega System
@@ -42788,6 +42799,7 @@ vamphalf                        // (c) 1999 DanBi & F2 System (Europe version 1.
 vamphalfk                       // (c) 1999 DanBi & F2 System (Korea version 1.1.0908)
 vamphalfr1                      // (c) 1999 DanBi & F2 System (Europe version 1.0.0903)
 wivernwg                        // (c) 2001 Semicom
+worldadv                        // (c) 1999 F2 System
 wyvernwg                        // (c) 2001 Semicom / Game Vision
 wyvernwga                       // (c) 2001 Semicom / Game Vision
 yorijori                        // (c)

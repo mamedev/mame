@@ -1,7 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner, AJR
-/* TimeTop - GameKing */
 /*
+  TimeTop - GameKing
+
   PeT mess@utanet.at 2015
 
   Thanks to Deathadder, Judge, Porchy, Klaus Sommer, James Brolly & Brian Provinciano
@@ -20,15 +21,18 @@
 */
 
 #include "emu.h"
+
 #include "cpu/m6502/st2204.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
+namespace {
 
 class gameking_state : public driver_device
 {
@@ -38,6 +42,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_io_joy(*this, "JOY"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -45,17 +50,21 @@ public:
 	void gameking3(machine_config &config);
 	void gameking1(machine_config &config);
 
-	void init_gameking();
-
 protected:
 	virtual void machine_start() override;
 
 private:
+	required_device<st2204_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
+	required_ioport m_io_joy;
+	required_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
+
 	void gameking_palette(palette_device &palette) const;
 	void timer_w(uint8_t data);
 	uint8_t input_r();
 	uint8_t input2_r();
-	TIMER_CALLBACK_MEMBER(gameking_timer);
+	TIMER_CALLBACK_MEMBER(gameking_timer1);
 	TIMER_CALLBACK_MEMBER(gameking_timer2);
 
 	uint32_t screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -65,24 +74,18 @@ private:
 	void gameking_mem(address_map &map);
 	void gameking3_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_slot_device> m_cart;
-	required_ioport m_io_joy;
-	optional_device<palette_device> m_palette;
-
-	emu_timer *timer1;
-	emu_timer *timer2;
-
-	uint8_t m_timer;
+	emu_timer *m_timer1;
+	emu_timer *m_timer2;
+	uint8_t m_timer1_val = 0;
 };
 
 
 void gameking_state::timer_w(uint8_t data)
 {
-	m_timer = data;
+	m_timer1_val = data;
 	//m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	timer1->enable(true);
-	timer1->reset(m_maincpu->cycles_to_attotime(data * 300/*?*/));
+	m_timer1->enable(true);
+	m_timer1->reset(m_maincpu->cycles_to_attotime(data * 300/*?*/));
 }
 
 uint8_t gameking_state::input_r()
@@ -109,12 +112,12 @@ void gameking_state::gameking3_mem(address_map &map)
 
 static INPUT_PORTS_START( gameking )
 	PORT_START("JOY")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select") //?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("A")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("B")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SELECT) // ?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2) // A
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1) // B
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) //?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // ?
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
 INPUT_PORTS_END
@@ -122,8 +125,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gameking3 )
 	PORT_INCLUDE( gameking )
 	PORT_MODIFY("JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select") //?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SELECT) // ?
 INPUT_PORTS_END
 
 static constexpr rgb_t gameking_pens[] =
@@ -232,27 +235,21 @@ uint32_t gameking_state::screen_update_gameking3(screen_device& screen, bitmap_r
 }
 
 
-void gameking_state::init_gameking()
-{
-	timer1 = timer_alloc(FUNC(gameking_state::gameking_timer), this);
-	timer2 = timer_alloc(FUNC(gameking_state::gameking_timer2), this);
-}
-
-TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
+TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer1)
 {
 	m_maincpu->set_state_int(st2xxx_device::ST_IREQ,
 		m_maincpu->state_int(st2xxx_device::ST_IREQ) | (0x010 & m_maincpu->state_int(st2xxx_device::ST_IENA)));
-	timer1->enable(false);
-	timer2->enable(true);
-	timer2->reset(m_maincpu->cycles_to_attotime(10/*?*/));
+	m_timer1->enable(false);
+	m_timer2->enable(true);
+	m_timer2->reset(m_maincpu->cycles_to_attotime(10/*?*/));
 }
 
 TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer2)
 {
 	//m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); // in reality int for vector at fff4
-	timer2->enable(false);
-	timer1->enable(true);
-	timer1->reset(m_maincpu->cycles_to_attotime(m_timer * 300/*?*/));
+	m_timer2->enable(false);
+	m_timer1->enable(true);
+	m_timer1->reset(m_maincpu->cycles_to_attotime(m_timer1_val * 300/*?*/));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
@@ -277,36 +274,40 @@ void gameking_state::machine_start()
 	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (cart_rom)
 		m_maincpu->space(AS_DATA).install_rom(0x400000, 0x400000 + cart_rom->bytes() - 1, cart_rom->base()); // FIXME: gamekin3 wants Flash cartridges, not plain ROM
+
+	m_timer1 = timer_alloc(FUNC(gameking_state::gameking_timer1), this);
+	m_timer2 = timer_alloc(FUNC(gameking_state::gameking_timer2), this);
+
+	save_item(NAME(m_timer1_val));
 }
 
 
 void gameking_state::gameking(machine_config &config)
 {
-	/* basic machine hardware */
-	st2204_device &maincpu(ST2204(config, m_maincpu, 6000000));
-	maincpu.set_addrmap(AS_DATA, &gameking_state::gameking_mem);
-	maincpu.in_pa_callback().set(FUNC(gameking_state::input_r));
-	maincpu.in_pb_callback().set(FUNC(gameking_state::input2_r));
-	maincpu.out_pc_callback().set(FUNC(gameking_state::timer_w)); // wrong
-	maincpu.in_pl_callback().set_constant(6); // bios protection endless loop
-	maincpu.dac_callback().set("dac", FUNC(dac_byte_interface::write));
+	// basic machine hardware
+	ST2204(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_DATA, &gameking_state::gameking_mem);
+	m_maincpu->in_pa_callback().set(FUNC(gameking_state::input_r));
+	m_maincpu->in_pb_callback().set(FUNC(gameking_state::input2_r));
+	m_maincpu->out_pc_callback().set(FUNC(gameking_state::timer_w)); // wrong
+	m_maincpu->in_pl_callback().set_constant(6); // bios protection endless loop
+	m_maincpu->dac_callback().set("dac", FUNC(dac_byte_interface::write));
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_size(48, 32);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking));
-	screen.set_palette(m_palette);
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(48, 32);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(gameking_state::screen_update_gameking));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), std::size(gameking_pens));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(0, "speaker", 1.0);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gameking_cart", "bin").set_device_load(FUNC(gameking_state::cart_load));
 }
 
@@ -318,19 +319,22 @@ void gameking_state::gameking1(machine_config &config)
 
 void gameking_state::gameking3(machine_config &config)
 {
+	// basic machine hardware
 	gameking(config);
 	m_maincpu->set_clock(8000000);
 	m_maincpu->set_addrmap(AS_DATA, &gameking_state::gameking3_mem);
 
-	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.set_size(160, 160);
-	screen.set_visarea_full();
-	screen.set_physical_aspect(3, 2);
-	screen.set_refresh_hz(39.308176); // ?
-	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking3));
-	screen.set_no_palette();
+	// video hardware
+	m_screen->set_size(160, 160);
+	m_screen->set_visarea_full();
+	m_screen->set_physical_aspect(3, 2);
+	m_screen->set_refresh_hz(39.308176); // ?
+	m_screen->set_screen_update(FUNC(gameking_state::screen_update_gameking3));
+	m_screen->set_no_palette();
+
 	config.device_remove("palette");
 
+	// cartridge
 	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
 	SOFTWARE_LIST(config, "cart_list_3").set_original("gameking3");
 }
@@ -346,9 +350,12 @@ ROM_START(gamekin3)
 	ROM_LOAD("gm220.bin", 0x00000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
 ROM_END
 
-CONS( 2003, gameking, 0, 0, gameking1, gameking, gameking_state, init_gameking, "TimeTop", "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+} // anonymous namespace
+
+
+CONS( 2003, gameking, 0, 0, gameking1, gameking,  gameking_state, empty_init, "TimeTop", "GameKing GM-218", MACHINE_IMPERFECT_SOUND )
 // the GameKing 2 (GM-219) is probably identical HW
 
-CONS( 2003, gamekin3, 0, 0, gameking3, gameking3, gameking_state, init_gameking, "TimeTop", "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, gamekin3, 0, 0, gameking3, gameking3, gameking_state, empty_init, "TimeTop", "GameKing 3",      MACHINE_IMPERFECT_SOUND )
 // gameking 3: similiar cartridges, accepts gameking cartridges, gameking3 cartridges not working on gameking (illegal cartridge scroller)
 // my gameking bios backup solution might work on it

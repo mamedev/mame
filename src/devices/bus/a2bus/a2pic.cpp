@@ -155,7 +155,7 @@ a2bus_pic_device::a2bus_pic_device(machine_config const &mconfig, char const *ta
 
 INPUT_CHANGED_MEMBER(a2bus_pic_device::sw1_strobe)
 {
-	m_printer_conn->write_strobe(BIT(m_input_sw1->read(), 3) ^ (m_strobe_timer->enabled() ? 0U : 1U));
+	m_printer_conn->write_strobe(BIT(m_input_sw1->read(), 3) ^ (m_strobe_timer->running() ? 0U : 1U));
 }
 
 
@@ -373,7 +373,7 @@ void a2bus_pic_device::device_reset()
 		m_printer_out->write(0x00U);
 	}
 
-	m_printer_conn->write_strobe(BIT(sw1, 3) ^ (m_strobe_timer->enabled() ? 0U : 1U));
+	m_printer_conn->write_strobe(BIT(sw1, 3) ^ (m_strobe_timer->running() ? 0U : 1U));
 
 	reset_mode();
 }
@@ -486,7 +486,7 @@ void a2bus_pic_device::data_write(s32 param)
 		ioport_value const sw1(m_input_sw1->read());
 		unsigned const cycles(15U - ((sw1 & 0x07U) << 1));
 		int const state(BIT(sw1, 3));
-		if (!m_strobe_timer->enabled())
+		if (!m_strobe_timer->running())
 		{
 			LOG("Output /STROBE=%d for %u cycles\n", state, cycles);
 			clear_ack_latch();
@@ -520,7 +520,7 @@ void a2bus_pic_device::reset_mode()
 
 void a2bus_pic_device::set_ack_latch()
 {
-	if (m_strobe_timer->enabled())
+	if (m_strobe_timer->running())
 	{
 		LOG("Active strobe prevents acknowledge latch from being set\n");
 	}

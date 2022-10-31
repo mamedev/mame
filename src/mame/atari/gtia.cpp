@@ -319,8 +319,10 @@ void gtia_device::button_interrupt(int button_count)
 	/* button registers for xl/xe */
 	if (button_count == 2)
 	{
-		m_r.but[2] = 1;  /* not used on xl/xe */
-		m_r.but[3] = 0;  /* 1 if external cartridge is inserted */
+		// TRIG2: unused on xl/xe (1), xegs keyboard (1) connected (0) disconnected
+		m_r.but[2] = 1;
+		// TRIG3: RD5 external cart readback (1) present (0) disabled thru bankswitch or absent
+		m_r.but[3] = 0;
 	}
 
 }

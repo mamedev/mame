@@ -69,6 +69,8 @@ end
 #include "machine/smartmed.h"
 #include "screen.h"
 
+#include <cstdarg>
+
 #define PALM_Z22_BATTERY_LEVEL  75
 
 #define VERBOSE_LEVEL ( 0 )

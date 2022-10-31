@@ -172,7 +172,7 @@ u8 cxd1185_device::scsi_data_r()
 		{
 			data = m_fifo.dequeue();
 
-			if (m_state != IDLE && !m_state_timer->enabled())
+			if (m_state != IDLE && !m_state_timer->running())
 				m_state_timer->adjust(attotime::zero);
 		}
 		else
@@ -375,7 +375,7 @@ void cxd1185_device::scsi_data_w(u8 data)
 	{
 		m_fifo.enqueue(data);
 
-		if (m_state != IDLE && !m_state_timer->enabled())
+		if (m_state != IDLE && !m_state_timer->running())
 			m_state_timer->adjust(attotime::zero);
 	}
 	else

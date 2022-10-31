@@ -36,35 +36,6 @@
 
 
 
-namespace {
-
-template <typename T>
-inline std::string_view::size_type find_delimiter(std::string_view str, T &&is_delim)
-{
-	unsigned parens = 0;
-	for (std::string_view::size_type i = 0; str.length() > i; ++i)
-	{
-		if (str[i] == '(')
-		{
-			++parens;
-		}
-		else if (parens)
-		{
-			if (str[i] == ')')
-				--parens;
-		}
-		else if (is_delim(str[i]))
-		{
-			return i;
-		}
-	}
-	return std::string_view::npos;
-}
-
-} // anonymous namespace
-
-
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -456,466 +427,9 @@ void debugger_commands::global_set(global_entry *global, u64 value)
 
 
 
-/***************************************************************************
-    PARAMETER VALIDATION HELPERS
-***************************************************************************/
-
-/// \brief Validate parameter as a Boolean value
-///
-/// Validates a parameter as a Boolean value.  Fixed strings and
-/// expressions evaluating to numeric values are recognised.  The result
-/// is unchanged for an empty string.
-/// \param [in] param The parameter string.
-/// \param [in,out] result The default value on entry, and the value of
-///   the parameter interpreted as a Boolean on success.  Unchanged if
-///   the parameter is an empty string.
-/// \return true if the parameter is a valid Boolean value or an empty
-///   string, or false otherwise.
-bool debugger_commands::validate_boolean_parameter(std::string_view param, bool &result)
-{
-	// nullptr parameter does nothing and returns no error
-	if (param.empty())
-		return true;
-
-	// evaluate the expression; success if no error
-	using namespace std::literals;
-	bool const is_true = util::streqlower(param, "true"sv);
-	bool const is_false = util::streqlower(param, "false"sv);
-
-	if (is_true || is_false)
-	{
-		result = is_true;
-		return true;
-	}
-
-	// try to evaluate as a number
-	u64 val;
-	if (!validate_number_parameter(param, val))
-		return false;
-
-	result = val != 0;
-	return true;
-}
-
-
-/// \brief Validate parameter as a numeric value
-///
-/// Parses the parameter as an expression and evaluates it as a number.
-/// \param [in] param The parameter string.
-/// \param [out] result The numeric value of the expression on success.
-///   Unchanged on failure.
-/// \return true if the parameter is a valid expression that evaluates
-///   to a numeric value, or false otherwise.
-bool debugger_commands::validate_number_parameter(std::string_view param, u64 &result)
-{
-	// evaluate the expression; success if no error
-	try
-	{
-		result = parsed_expression(m_console.visible_symtable(), param).execute();
-		return true;
-	}
-	catch (expression_error const &error)
-	{
-		// print an error pointing to the character that caused it
-		m_console.printf("Error in expression: %s\n", param);
-		m_console.printf("                     %*s^", error.offset(), "");
-		m_console.printf("%s\n", error.code_string());
-		return false;
-	}
-}
-
-
-/// \brief Validate parameter as a device
-///
-/// Validates a parameter as a device identifier and retrieves the
-/// device on success.  A string corresponding to the tag of a device
-/// refers to that device; an empty string refers to the current CPU
-/// with debugger focus; any other string is parsed as an expression
-/// and treated as an index of a device implementing
-/// #device_execute_interface and #device_state_interface, and exposing
-/// a generic PC base value.
-/// \param [in] param The parameter string.
-/// \param [out] result A pointer to the device on success, or unchanged
-///   on failure.
-/// \return true if the parameter refers to a device in the current
-///   system, or false otherwise.
-bool debugger_commands::validate_device_parameter(std::string_view param, device_t *&result)
-{
-	// if no parameter, use the visible CPU
-	if (param.empty())
-	{
-		device_t *const current = m_console.get_visible_cpu();
-		if (current)
-		{
-			result = current;
-			return true;
-		}
-		else
-		{
-			m_console.printf("No valid CPU is currently selected\n");
-			return false;
-		}
-	}
-
-	// next look for a tag match
-	std::string_view relative = param;
-	device_t &base = get_device_search_base(relative);
-	device_t *device = base.subdevice(strmakelower(relative));
-	if (device)
-	{
-		result = device;
-		return true;
-	}
-
-	// then evaluate as an expression; on an error assume it was a tag
-	u64 cpunum;
-	try
-	{
-		cpunum = parsed_expression(m_console.visible_symtable(), param).execute();
-	}
-	catch (expression_error &)
-	{
-		m_console.printf("Unable to find device '%s'\n", param);
-		return false;
-	}
-
-	// attempt to find by numerical index
-	device = get_cpu_by_index(cpunum);
-	if (device)
-	{
-		result = device;
-		return true;
-	}
-	else
-	{
-		// if out of range, complain
-		m_console.printf("Invalid CPU index %u\n", cpunum);
-		return false;
-	}
-}
-
-
-/// \brief Validate a parameter as a CPU
-///
-/// Validates a parameter as a CPU identifier.  Uses the same rules as
-/// #validate_device_parameter to identify devices, but additionally
-/// checks that the device is a "CPU" for the debugger's purposes.
-/// \param [in] The parameter string.
-/// \param [out] result The device on success, or unchanged on failure.
-/// \return true if the parameter refers to a CPU-like device in the
-///   current system, or false otherwise.
-bool debugger_commands::validate_cpu_parameter(std::string_view param, device_t *&result)
-{
-	// first do the standard device thing
-	device_t *device;
-	if (!validate_device_parameter(param, device))
-		return false;
-
-	// check that it's a "CPU" for the debugger's purposes
-	device_execute_interface const *execute;
-	if (device->interface(execute))
-	{
-		result = device;
-		return true;
-	}
-
-	m_console.printf("Device %s is not a CPU\n", device->name());
-	return false;
-}
-
-
-/// \brief Validate a parameter as an address space identifier
-///
-/// Validates a parameter as an address space identifier.  Uses the same
-/// rules as #validate_device_parameter to identify devices.  If the
-/// default address space number is negative, the first address space
-/// exposed by the device will be used as the default.
-/// \param [in] The parameter string.
-/// \param [in] spacenum The default address space index.  If negative,
-///   the first address space exposed by the device (i.e. the address
-///   space with the lowest index) will be used as the default.
-/// \param [out] result The address space on success, or unchanged on
-///   failure.
-/// \return true if the parameter refers to an address space in the
-///   current system, or false otherwise.
-bool debugger_commands::validate_device_space_parameter(std::string_view param, int spacenum, address_space *&result)
-{
-	device_t *device;
-	std::string spacename;
-	if (param.empty())
-	{
-		// if no parameter, use the visible CPU
-		device = m_console.get_visible_cpu();
-		if (!device)
-		{
-			m_console.printf("No valid CPU is currently selected\n");
-			return false;
-		}
-	}
-	else
-	{
-		// look for a tag match on the whole parameter value
-		std::string_view relative = param;
-		device_t &base = get_device_search_base(relative);
-		device = base.subdevice(strmakelower(relative));
-
-		// if that failed, treat the last component as an address space
-		if (!device)
-		{
-			auto const delimiter = relative.find_last_of(":^");
-			bool const found = std::string_view::npos != delimiter;
-			if (!found || (':' == relative[delimiter]))
-			{
-				spacename = strmakelower(relative.substr(found ? (delimiter + 1) : 0));
-				relative = relative.substr(0, !found ? 0 : !delimiter ? 1 : delimiter);
-				if (!relative.empty())
-					device = base.subdevice(strmakelower(relative));
-				else if (m_console.get_visible_cpu())
-					device = m_console.get_visible_cpu();
-				else
-					device = &m_machine.root_device();
-			}
-		}
-	}
-
-	// if still no device found, evaluate as an expression
-	if (!device)
-	{
-		u64 cpunum;
-		try
-		{
-			cpunum = parsed_expression(m_console.visible_symtable(), param).execute();
-		}
-		catch (expression_error const &)
-		{
-			// parsing failed - assume it was a tag
-			m_console.printf("Unable to find device '%s'\n", param);
-			return false;
-		}
-
-		// attempt to find by numerical index
-		device = get_cpu_by_index(cpunum);
-		if (!device)
-		{
-			// if out of range, complain
-			m_console.printf("Invalid CPU index %u\n", cpunum);
-			return false;
-		}
-	}
-
-	// ensure the device implements the memory interface
-	device_memory_interface *memory;
-	if (!device->interface(memory))
-	{
-		m_console.printf("No memory interface found for device %s\n", device->name());
-		return false;
-	}
-
-	// fall back to supplied default space if appropriate
-	if (spacename.empty() && (0 <= spacenum))
-	{
-		if (memory->has_space(spacenum))
-		{
-			result = &memory->space(spacenum);
-			return true;
-		}
-		else
-		{
-			m_console.printf("No matching memory space found for device '%s'\n", device->tag());
-			return false;
-		}
-	}
-
-	// otherwise find the specified space or fall back to the first populated space
-	for (int i = 0; memory->max_space_count() > i; ++i)
-	{
-		if (memory->has_space(i) && (spacename.empty() || (memory->space(i).name() == spacename)))
-		{
-			result = &memory->space(i);
-			return true;
-		}
-	}
-
-	// report appropriate error message
-	if (spacename.empty())
-		m_console.printf("No memory spaces found for device '%s'\n", device->tag());
-	else
-		m_console.printf("Memory space '%s' not found found for device '%s'\n", spacename, device->tag());
-	return false;
-}
-
-
-/// \brief Validate a parameter as a target address
-///
-/// Validates a parameter as an numeric expression to use as an address
-/// optionally followed by a colon and a device identifier.  If the
-/// device identifier is not presnt, the current CPU with debugger focus
-/// is assumed.  See #validate_device_parameter for information on how
-/// device parametersare interpreted.
-/// \param [in] The parameter string.
-/// \param [in] spacenum The default address space index.  If negative,
-///   the first address space exposed by the device (i.e. the address
-///   space with the lowest index) will be used as the default.
-/// \param [out] space The address space on success, or unchanged on
-///   failure.
-/// \param [out] addr The address on success, or unchanged on failure.
-/// \return true if the address is a valid expression evaluating to a
-///   number and the address space is found, or false otherwise.
-bool debugger_commands::validate_target_address_parameter(std::string_view param, int spacenum, address_space *&space, u64 &addr)
-{
-	// check for the device delimiter
-	std::string_view::size_type const devdelim = find_delimiter(param, [] (char ch) { return ':' == ch; });
-	std::string_view device;
-	if (devdelim != std::string::npos)
-		device = param.substr(devdelim + 1);
-
-	// parse the address first
-	u64 addrval;
-	if (!validate_number_parameter(param.substr(0, devdelim), addrval))
-		return false;
-
-	// find the address space
-	if (!validate_device_space_parameter(device, spacenum, space))
-		return false;
-
-	// set the address now that we have the space
-	addr = addrval;
-	return true;
-}
-
-
-/// \brief Validate a parameter as a memory region
-///
-/// Validates a parameter as a memory region tag and retrieves the
-/// specified memory region.
-/// \param [in] The parameter string.
-/// \param [out] result The memory region on success, or unchanged on
-///   failure.
-/// \return true if the parameter refers to a memory region in the
-///   current system, or false otherwise.
-bool debugger_commands::validate_memory_region_parameter(std::string_view param, memory_region *&result)
-{
-	auto const &regions = m_machine.memory().regions();
-	std::string_view relative = param;
-	device_t &base = get_device_search_base(relative);
-	auto const iter = regions.find(base.subtag(strmakelower(relative)));
-	if (regions.end() != iter)
-	{
-		result = iter->second.get();
-		return true;
-	}
-	else
-	{
-		m_console.printf("No matching memory region found for '%s'\n", param);
-		return false;
-	}
-}
-
-
-/// \brief Get search base for device or address space parameter
-///
-/// Handles prefix prefixes used to indicate that a device tag should be
-/// interpreted relative to the selected CPU.  Removes the recognised
-/// prefixes from the parameter value.
-/// \param [in,out] param The parameter string.  Recognised prefixes
-///   affecting the search base are removed, leaving a tag relative to
-///   the base device.
-/// \return A reference to the base device that the tag should be
-///   interpreted relative to.
-device_t &debugger_commands::get_device_search_base(std::string_view &param)
-{
-	if (!param.empty())
-	{
-		// handle ".:" or ".^" prefix for tag relative to current CPU if any
-		if (('.' == param[0]) && ((param.size() == 1) || (':' == param[1]) || ('^' == param[1])))
-		{
-			param.remove_prefix(((param.size() > 1) && (':' == param[1])) ? 2 : 1);
-			device_t *const current = m_console.get_visible_cpu();
-			return current ? *current : m_machine.root_device();
-		}
-
-		// a sibling path makes most sense relative to current CPU
-		if ('^' == param[0])
-		{
-			device_t *const current = m_console.get_visible_cpu();
-			return current ? *current : m_machine.root_device();
-		}
-	}
-
-
-	// default to root device
-	return m_machine.root_device();
-}
-
-
-/// \brief Get CPU by index
-///
-/// Looks up a CPU by the number the debugger assigns it based on its
-/// position in the device tree relative to other CPUs.
-/// \param [in] cpunum Zero-based index of the CPU to find.
-/// \return A pointer to the CPU if found, or \c nullptr if no CPU has
-///   the specified index.
-device_t *debugger_commands::get_cpu_by_index(u64 cpunum)
-{
-	unsigned index = 0;
-	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
-	{
-		// real CPUs should have pcbase
-		device_state_interface const *state;
-		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE))
-		{
-			if (index++ == cpunum)
-			{
-				return &exec.device();
-			}
-		}
-	}
-	return nullptr;
-}
-
-
-/*-------------------------------------------------
-    debug_command_parameter_expression - validates
-    an expression parameter
--------------------------------------------------*/
-
-bool debugger_commands::debug_command_parameter_expression(std::string_view param, parsed_expression &result)
-{
-	try
-	{
-		// parse the expression; success if no error
-		result.parse(param);
-		return true;
-	}
-	catch (expression_error const &err)
-	{
-		// output an error
-		m_console.printf("Error in expression: %s\n", param);
-		m_console.printf("                     %*s^", err.offset(), "");
-		m_console.printf("%s\n", err.code_string());
-		return false;
-	}
-}
-
-
-/*-------------------------------------------------
-    debug_command_parameter_command - validates a
-    command parameter
--------------------------------------------------*/
-
-bool debugger_commands::debug_command_parameter_command(std::string_view param)
-{
-	/* validate the comment; success if no error */
-	CMDERR err = m_console.validate_command(param);
-	if (err.error_class() == CMDERR::NONE)
-		return true;
-
-	/* output an error */
-	m_console.printf("Error in command: %s\n", param);
-	m_console.printf("                  %*s^", err.error_offset(), "");
-	m_console.printf("%s\n", debugger_console::cmderr_to_string(err));
-	return 0;
-}
+//**************************************************************************
+//  COMMAND IMPLEMENTATIONS
+//**************************************************************************
 
 /*-------------------------------------------------
     execute_help - execute the help command
@@ -939,7 +453,7 @@ void debugger_commands::execute_print(const std::vector<std::string_view> &param
 	/* validate the other parameters */
 	u64 values[MAX_COMMAND_PARAMS];
 	for (int i = 0; i < params.size(); i++)
-		if (!validate_number_parameter(params[i], values[i]))
+		if (!m_console.validate_number_parameter(params[i], values[i]))
 			return;
 
 	/* then print each one */
@@ -1088,7 +602,7 @@ void debugger_commands::execute_index_command(std::vector<std::string_view> cons
 	std::vector<u64> index(params.size());
 	for (int paramnum = 0; paramnum < params.size(); paramnum++)
 	{
-		if (!validate_number_parameter(params[paramnum], index[paramnum]))
+		if (!m_console.validate_number_parameter(params[paramnum], index[paramnum]))
 			return;
 	}
 
@@ -1117,7 +631,7 @@ void debugger_commands::execute_printf(const std::vector<std::string_view> &para
 	/* validate the other parameters */
 	u64 values[MAX_COMMAND_PARAMS];
 	for (int i = 1; i < params.size(); i++)
-		if (!validate_number_parameter(params[i], values[i]))
+		if (!m_console.validate_number_parameter(params[i], values[i]))
 			return;
 
 	/* then do a printf */
@@ -1136,7 +650,7 @@ void debugger_commands::execute_logerror(const std::vector<std::string_view> &pa
 	/* validate the other parameters */
 	u64 values[MAX_COMMAND_PARAMS];
 	for (int i = 1; i < params.size(); i++)
-		if (!validate_number_parameter(params[i], values[i]))
+		if (!m_console.validate_number_parameter(params[i], values[i]))
 			return;
 
 	/* then do a printf */
@@ -1155,7 +669,7 @@ void debugger_commands::execute_tracelog(const std::vector<std::string_view> &pa
 	/* validate the other parameters */
 	u64 values[MAX_COMMAND_PARAMS];
 	for (int i = 1; i < params.size(); i++)
-		if (!validate_number_parameter(params[i], values[i]))
+		if (!m_console.validate_number_parameter(params[i], values[i]))
 			return;
 
 	/* then do a printf */
@@ -1190,7 +704,7 @@ void debugger_commands::execute_tracesym(const std::vector<std::string_view> &pa
 			sym->format().empty() ? "%16X" : sym->format());
 
 		// validate the parameter
-		if (!validate_number_parameter(params[i], values[i]))
+		if (!m_console.validate_number_parameter(params[i], values[i]))
 			return;
 	}
 
@@ -1229,7 +743,7 @@ void debugger_commands::execute_quit(const std::vector<std::string_view> &params
 void debugger_commands::execute_do(const std::vector<std::string_view> &params)
 {
 	u64 dummy;
-	validate_number_parameter(params[0], dummy);
+	m_console.validate_number_parameter(params[0], dummy);
 }
 
 
@@ -1241,7 +755,7 @@ void debugger_commands::execute_step(const std::vector<std::string_view> &params
 {
 	/* if we have a parameter, use it */
 	u64 steps = 1;
-	if (params.size() > 0 && !validate_number_parameter(params[0], steps))
+	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], steps))
 		return;
 
 	m_console.get_visible_cpu()->debug()->single_step(steps);
@@ -1256,7 +770,7 @@ void debugger_commands::execute_over(const std::vector<std::string_view> &params
 {
 	/* if we have a parameter, use it */
 	u64 steps = 1;
-	if (params.size() > 0 && !validate_number_parameter(params[0], steps))
+	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], steps))
 		return;
 
 	m_console.get_visible_cpu()->debug()->single_step_over(steps);
@@ -1282,7 +796,7 @@ void debugger_commands::execute_go(const std::vector<std::string_view> &params)
 	u64 addr = ~0;
 
 	/* if we have a parameter, use it instead */
-	if (params.size() > 0 && !validate_number_parameter(params[0], addr))
+	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], addr))
 		return;
 
 	m_console.get_visible_cpu()->debug()->go(addr);
@@ -1309,7 +823,7 @@ void debugger_commands::execute_go_interrupt(const std::vector<std::string_view>
 	u64 irqline = -1;
 
 	/* if we have a parameter, use it instead */
-	if (params.size() > 0 && !validate_number_parameter(params[0], irqline))
+	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], irqline))
 		return;
 
 	m_console.get_visible_cpu()->debug()->go_interrupt(irqline);
@@ -1324,11 +838,11 @@ void debugger_commands::execute_go_exception(const std::vector<std::string_view>
 	u64 exception = -1;
 
 	/* if we have a parameter, use it instead */
-	if (params.size() > 0 && !validate_number_parameter(params[0], exception))
+	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], exception))
 		return;
 
 	parsed_expression condition(m_console.visible_symtable());
-	if (params.size() > 1 && !debug_command_parameter_expression(params[1], condition))
+	if (params.size() > 1 && !m_console.validate_expression_parameter(params[1], condition))
 		return;
 
 	m_console.get_visible_cpu()->debug()->go_exception(exception, condition.is_empty() ? "1" : condition.original_string());
@@ -1344,7 +858,7 @@ void debugger_commands::execute_go_time(const std::vector<std::string_view> &par
 	u64 milliseconds = -1;
 
 	/* if we have a parameter, use it instead */
-	if (params.size() > 0 && !validate_number_parameter(params[0], milliseconds))
+	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], milliseconds))
 		return;
 
 	m_console.get_visible_cpu()->debug()->go_milliseconds(milliseconds);
@@ -1358,7 +872,7 @@ void debugger_commands::execute_go_time(const std::vector<std::string_view> &par
 void debugger_commands::execute_go_privilege(const std::vector<std::string_view> &params)
 {
 	parsed_expression condition(m_console.visible_symtable());
-	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
+	if (params.size() > 0 && !m_console.validate_expression_parameter(params[0], condition))
 		return;
 
 	m_console.get_visible_cpu()->debug()->go_privilege((condition.is_empty()) ? "1" : condition.original_string());
@@ -1372,7 +886,7 @@ void debugger_commands::execute_go_privilege(const std::vector<std::string_view>
 void debugger_commands::execute_go_branch(bool sense, const std::vector<std::string_view> &params)
 {
 	parsed_expression condition(m_console.visible_symtable());
-	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
+	if (params.size() > 0 && !m_console.validate_expression_parameter(params[0], condition))
 		return;
 
 	m_console.get_visible_cpu()->debug()->go_branch(sense, (condition.is_empty()) ? "1" : condition.original_string());
@@ -1389,7 +903,7 @@ void debugger_commands::execute_go_next_instruction(const std::vector<std::strin
 	static constexpr u64 MAX_COUNT = 512;
 
 	// if we have a parameter, use it instead */
-	if (params.size() > 0 && !validate_number_parameter(params[0], count))
+	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], count))
 		return;
 	if (count == 0)
 		return;
@@ -1400,7 +914,7 @@ void debugger_commands::execute_go_next_instruction(const std::vector<std::strin
 	}
 
 	device_state_interface *stateintf;
-	device_t *cpu = m_machine.debugger().console().get_visible_cpu();
+	device_t *cpu = m_console.get_visible_cpu();
 	if (!cpu->interface(stateintf))
 	{
 		m_console.printf("No state interface available for %s\n", cpu->name());
@@ -1438,7 +952,7 @@ void debugger_commands::execute_focus(const std::vector<std::string_view> &param
 {
 	// validate params
 	device_t *cpu;
-	if (!validate_cpu_parameter(params[0], cpu))
+	if (!m_console.validate_cpu_parameter(params[0], cpu))
 		return;
 
 	// first clear the ignore flag on the focused CPU
@@ -1488,7 +1002,7 @@ void debugger_commands::execute_ignore(const std::vector<std::string_view> &para
 
 		// validate parameters
 		for (int paramnum = 0; paramnum < params.size(); paramnum++)
-			if (!validate_cpu_parameter(params[paramnum], devicelist[paramnum]))
+			if (!m_console.validate_cpu_parameter(params[paramnum], devicelist[paramnum]))
 				return;
 
 		// set the ignore flags
@@ -1551,7 +1065,7 @@ void debugger_commands::execute_observe(const std::vector<std::string_view> &par
 
 		// validate parameters
 		for (int paramnum = 0; paramnum < params.size(); paramnum++)
-			if (!validate_cpu_parameter(params[paramnum], devicelist[paramnum]))
+			if (!m_console.validate_cpu_parameter(params[paramnum], devicelist[paramnum]))
 				return;
 
 		// clear the ignore flags
@@ -1597,7 +1111,7 @@ void debugger_commands::execute_suspend(const std::vector<std::string_view> &par
 
 		// validate parameters
 		for (int paramnum = 0; paramnum < params.size(); paramnum++)
-			if (!validate_cpu_parameter(params[paramnum], devicelist[paramnum]))
+			if (!m_console.validate_cpu_parameter(params[paramnum], devicelist[paramnum]))
 				return;
 
 		for (int paramnum = 0; paramnum < params.size(); paramnum++)
@@ -1656,7 +1170,7 @@ void debugger_commands::execute_resume(const std::vector<std::string_view> &para
 
 		// validate parameters
 		for (int paramnum = 0; paramnum < params.size(); paramnum++)
-			if (!validate_cpu_parameter(params[paramnum], devicelist[paramnum]))
+			if (!m_console.validate_cpu_parameter(params[paramnum], devicelist[paramnum]))
 				return;
 
 		for (int paramnum = 0; paramnum < params.size(); paramnum++)
@@ -1699,12 +1213,12 @@ void debugger_commands::execute_comment_add(const std::vector<std::string_view> 
 {
 	// param 1 is the address for the comment
 	u64 address;
-	if (!validate_number_parameter(params[0], address))
+	if (!m_console.validate_number_parameter(params[0], address))
 		return;
 
 	// CPU parameter is implicit
 	device_t *cpu;
-	if (!validate_cpu_parameter(std::string_view(), cpu))
+	if (!m_console.validate_cpu_parameter(std::string_view(), cpu))
 		return;
 
 	// make sure param 2 exists
@@ -1729,12 +1243,12 @@ void debugger_commands::execute_comment_del(const std::vector<std::string_view> 
 {
 	// param 1 can either be a command or the address for the comment
 	u64 address;
-	if (!validate_number_parameter(params[0], address))
+	if (!m_console.validate_number_parameter(params[0], address))
 		return;
 
 	// CPU parameter is implicit
 	device_t *cpu;
-	if (!validate_cpu_parameter(std::string_view(), cpu))
+	if (!m_console.validate_cpu_parameter(std::string_view(), cpu))
 		return;
 
 	// If it's a number, it must be an address
@@ -1804,7 +1318,7 @@ void debugger_commands::execute_bpset(const std::vector<std::string_view> &param
 	// param 1 is the address/CPU
 	u64 address;
 	address_space *space;
-	if (!validate_target_address_parameter(params[0], AS_PROGRAM, space, address))
+	if (!m_console.validate_target_address_parameter(params[0], AS_PROGRAM, space, address))
 		return;
 
 	device_execute_interface const *execute;
@@ -1823,12 +1337,12 @@ void debugger_commands::execute_bpset(const std::vector<std::string_view> &param
 
 	// param 2 is the condition
 	parsed_expression condition(debug->symtable());
-	if (params.size() > 1 && !debug_command_parameter_expression(params[1], condition))
+	if (params.size() > 1 && !m_console.validate_expression_parameter(params[1], condition))
 		return;
 
 	// param 3 is the action
 	std::string_view action;
-	if (params.size() > 2 && !debug_command_parameter_command(action = params[2]))
+	if (params.size() > 2 && !m_console.validate_command_parameter(action = params[2]))
 		return;
 
 	// set the breakpoint
@@ -1929,7 +1443,7 @@ void debugger_commands::execute_bplist(const std::vector<std::string_view> &para
 	if (!params.empty())
 	{
 		device_t *cpu;
-		if (!validate_cpu_parameter(params[0], cpu))
+		if (!m_console.validate_cpu_parameter(params[0], cpu))
 			return;
 		apply(*cpu);
 		if (!printed)
@@ -1957,7 +1471,7 @@ void debugger_commands::execute_wpset(int spacenum, const std::vector<std::strin
 	address_space *space;
 
 	// param 1 is the address/CPU
-	if (!validate_target_address_parameter(params[0], spacenum, space, address))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
 		return;
 
 	device_execute_interface const *execute;
@@ -1969,7 +1483,7 @@ void debugger_commands::execute_wpset(int spacenum, const std::vector<std::strin
 	device_debug *const debug = space->device().debug();
 
 	// param 2 is the length
-	if (!validate_number_parameter(params[1], length))
+	if (!m_console.validate_number_parameter(params[1], length))
 		return;
 
 	// param 3 is the type
@@ -1992,12 +1506,12 @@ void debugger_commands::execute_wpset(int spacenum, const std::vector<std::strin
 
 	// param 4 is the condition
 	parsed_expression condition(debug->symtable());
-	if (params.size() > 3 && !debug_command_parameter_expression(params[3], condition))
+	if (params.size() > 3 && !m_console.validate_expression_parameter(params[3], condition))
 		return;
 
 	// param 5 is the action
 	std::string_view action;
-	if (params.size() > 4 && !debug_command_parameter_command(action = params[4]))
+	if (params.size() > 4 && !m_console.validate_command_parameter(action = params[4]))
 		return;
 
 	// set the watchpoint
@@ -2110,7 +1624,7 @@ void debugger_commands::execute_wplist(const std::vector<std::string_view> &para
 	if (!params.empty())
 	{
 		device_t *cpu;
-		if (!validate_cpu_parameter(params[0], cpu))
+		if (!m_console.validate_cpu_parameter(params[0], cpu))
 			return;
 		apply(*cpu);
 		if (!printed)
@@ -2136,17 +1650,17 @@ void debugger_commands::execute_rpset(const std::vector<std::string_view> &param
 {
 	// CPU is implicit
 	device_t *cpu;
-	if (!validate_cpu_parameter(std::string_view(), cpu))
+	if (!m_console.validate_cpu_parameter(std::string_view(), cpu))
 		return;
 
 	// param 1 is the condition
 	parsed_expression condition(cpu->debug()->symtable());
-	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
+	if (params.size() > 0 && !m_console.validate_expression_parameter(params[0], condition))
 		return;
 
 	// param 2 is the action
 	std::string_view action;
-	if (params.size() > 1 && !debug_command_parameter_command(action = params[1]))
+	if (params.size() > 1 && !m_console.validate_command_parameter(action = params[1]))
 		return;
 
 	// set the registerpoint
@@ -2222,22 +1736,22 @@ void debugger_commands::execute_epset(const std::vector<std::string_view> &param
 {
 	// CPU is implicit
 	device_t *cpu;
-	if (!validate_cpu_parameter(std::string_view(), cpu))
+	if (!m_console.validate_cpu_parameter(std::string_view(), cpu))
 		return;
 
 	// param 1 is the exception type
 	u64 type;
-	if (!validate_number_parameter(params[0], type))
+	if (!m_console.validate_number_parameter(params[0], type))
 		return;
 
 	// param 2 is the condition
 	parsed_expression condition(cpu->debug()->symtable());
-	if (params.size() > 1 && !debug_command_parameter_expression(params[1], condition))
+	if (params.size() > 1 && !m_console.validate_expression_parameter(params[1], condition))
 		return;
 
 	// param 3 is the action
 	std::string_view action;
-	if (params.size() > 2 && !debug_command_parameter_command(action = params[2]))
+	if (params.size() > 2 && !m_console.validate_command_parameter(action = params[2]))
 		return;
 
 	// set the exception point
@@ -2338,7 +1852,7 @@ void debugger_commands::execute_eplist(const std::vector<std::string_view> &para
 	if (!params.empty())
 	{
 		device_t *cpu;
-		if (!validate_cpu_parameter(params[0], cpu))
+		if (!m_console.validate_cpu_parameter(params[0], cpu))
 			return;
 		apply(*cpu);
 		if (!printed)
@@ -2386,7 +1900,7 @@ void debugger_commands::execute_rplist(const std::vector<std::string_view> &para
 	if (!params.empty())
 	{
 		device_t *cpu;
-		if (!validate_cpu_parameter(params[0], cpu))
+		if (!m_console.validate_cpu_parameter(params[0], cpu))
 			return;
 		apply(*cpu);
 		if (!printed)
@@ -2461,9 +1975,9 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 	address_space *space;
 
 	// validate parameters
-	if (!validate_target_address_parameter(params[1], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[1], spacenum, space, offset))
 		return;
-	if (!validate_number_parameter(params[2], length))
+	if (!m_console.validate_number_parameter(params[2], length))
 		return;
 
 	// determine the addresses to write
@@ -2549,11 +2063,11 @@ void debugger_commands::execute_saveregion(const std::vector<std::string_view> &
 	memory_region *region;
 
 	// validate parameters
-	if (!validate_number_parameter(params[1], offset))
+	if (!m_console.validate_number_parameter(params[1], offset))
 		return;
-	if (!validate_number_parameter(params[2], length))
+	if (!m_console.validate_number_parameter(params[2], length))
 		return;
-	if (!validate_memory_region_parameter(params[3], region))
+	if (!m_console.validate_memory_region_parameter(params[3], region))
 		return;
 
 	if (offset >= region->bytes())
@@ -2589,9 +2103,9 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 	address_space *space;
 
 	// validate parameters
-	if (!validate_target_address_parameter(params[1], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[1], spacenum, space, offset))
 		return;
-	if (params.size() > 2 && !validate_number_parameter(params[2], length))
+	if (params.size() > 2 && !m_console.validate_number_parameter(params[2], length))
 		return;
 
 	// open the file
@@ -2698,11 +2212,11 @@ void debugger_commands::execute_loadregion(const std::vector<std::string_view> &
 	memory_region *region;
 
 	// validate parameters
-	if (!validate_number_parameter(params[1], offset))
+	if (!m_console.validate_number_parameter(params[1], offset))
 		return;
-	if (!validate_number_parameter(params[2], length))
+	if (!m_console.validate_number_parameter(params[2], length))
 		return;
-	if (!validate_memory_region_parameter(params[3], region))
+	if (!m_console.validate_memory_region_parameter(params[3], region))
 		return;
 
 	if (offset >= region->bytes())
@@ -2746,23 +2260,23 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 	// validate parameters
 	address_space *space;
 	u64 offset;
-	if (!validate_target_address_parameter(params[1], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[1], spacenum, space, offset))
 		return;
 
 	u64 length;
-	if (!validate_number_parameter(params[2], length))
+	if (!m_console.validate_number_parameter(params[2], length))
 		return;
 
 	u64 width = 0;
-	if (params.size() > 3 && !validate_number_parameter(params[3], width))
+	if (params.size() > 3 && !m_console.validate_number_parameter(params[3], width))
 		return;
 
 	bool ascii = true;
-	if (params.size() > 4 && !validate_boolean_parameter(params[4], ascii))
+	if (params.size() > 4 && !m_console.validate_boolean_parameter(params[4], ascii))
 		return;
 
 	u64 rowsize = space->byte_to_address(16);
-	if (params.size() > 5 && !validate_number_parameter(params[5], rowsize))
+	if (params.size() > 5 && !m_console.validate_number_parameter(params[5], rowsize))
 		return;
 
 	int shift = space->addr_shift();
@@ -2907,19 +2421,19 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 {
 	// validate parameters
 	u64 offset;
-	if (!validate_number_parameter(params[1], offset))
+	if (!m_console.validate_number_parameter(params[1], offset))
 		return;
 
 	u64 length;
-	if (!validate_number_parameter(params[2], length))
+	if (!m_console.validate_number_parameter(params[2], length))
 		return;
 
 	u64 term = 0;
-	if (params.size() > 3 && !validate_number_parameter(params[3], term))
+	if (params.size() > 3 && !m_console.validate_number_parameter(params[3], term))
 		return;
 
 	address_space *space;
-	if (!validate_device_space_parameter((params.size() > 4) ? params[4] : std::string_view(), spacenum, space))
+	if (!m_console.validate_device_space_parameter((params.size() > 4) ? params[4] : std::string_view(), spacenum, space))
 		return;
 
 	// further validation
@@ -3150,7 +2664,7 @@ void debugger_commands::execute_cheatrange(bool init, const std::vector<std::str
 		}
 
 		// fourth argument is device/space
-		if (!validate_device_space_parameter((params.size() > 3) ? params[3] : std::string_view(), -1, space))
+		if (!m_console.validate_device_space_parameter((params.size() > 3) ? params[3] : std::string_view(), -1, space))
 			return;
 	}
 
@@ -3160,9 +2674,9 @@ void debugger_commands::execute_cheatrange(bool init, const std::vector<std::str
 	{
 		// validate parameters
 		u64 offset, length;
-		if (!validate_number_parameter(params[init ? 1 : 0], offset))
+		if (!m_console.validate_number_parameter(params[init ? 1 : 0], offset))
 			return;
-		if (!validate_number_parameter(params[init ? 2 : 1], length))
+		if (!m_console.validate_number_parameter(params[init ? 2 : 1], length))
 			return;
 
 		// force region to the specified range
@@ -3277,7 +2791,7 @@ void debugger_commands::execute_cheatnext(bool initial, const std::vector<std::s
 	}
 
 	u64 comp_value = 0;
-	if (params.size() > 1 && !validate_number_parameter(params[1], comp_value))
+	if (params.size() > 1 && !m_console.validate_number_parameter(params[1], comp_value))
 		return;
 	comp_value = m_cheat.sign_extend(comp_value);
 
@@ -3580,9 +3094,9 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 	address_space *space;
 
 	// validate parameters
-	if (!validate_target_address_parameter(params[0], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, offset))
 		return;
-	if (!validate_number_parameter(params[1], length))
+	if (!m_console.validate_number_parameter(params[1], length))
 		return;
 
 	// further validation
@@ -3626,7 +3140,7 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 				data_size[data_count++] |= 0x10;
 
 			// otherwise, validate as a number
-			else if (!validate_number_parameter(pdata, data_to_find[data_count++]))
+			else if (!m_console.validate_number_parameter(pdata, data_to_find[data_count++]))
 				return;
 		}
 	}
@@ -3709,9 +3223,9 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 	address_space *space;
 
 	// validate parameters
-	if (!validate_target_address_parameter(params[0], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, offset))
 		return;
-	if (!validate_number_parameter(params[1], length))
+	if (!m_console.validate_number_parameter(params[1], length))
 		return;
 
 	// further validation
@@ -3753,7 +3267,7 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 			}
 
 			// validate as a number
-			if (!validate_number_parameter(pdata, fill_data[data_count++]))
+			if (!m_console.validate_number_parameter(pdata, fill_data[data_count++]))
 				return;
 		}
 	}
@@ -3818,13 +3332,13 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 	address_space *space;
 
 	// validate parameters
-	if (!validate_number_parameter(params[1], offset))
+	if (!m_console.validate_number_parameter(params[1], offset))
 		return;
-	if (!validate_number_parameter(params[2], length))
+	if (!m_console.validate_number_parameter(params[2], length))
 		return;
-	if (params.size() > 3 && !validate_boolean_parameter(params[3], bytes))
+	if (params.size() > 3 && !m_console.validate_boolean_parameter(params[3], bytes))
 		return;
-	if (!validate_device_space_parameter(params.size() > 4 ? params[4] : std::string_view(), AS_PROGRAM, space))
+	if (!m_console.validate_device_space_parameter(params.size() > 4 ? params[4] : std::string_view(), AS_PROGRAM, space))
 		return;
 
 	// determine the width of the bytes
@@ -3922,7 +3436,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 
 	// validate parameters
 	device_t *cpu;
-	if (!validate_cpu_parameter(params.size() > 1 ? params[1] : std::string_view(), cpu))
+	if (!m_console.validate_cpu_parameter(params.size() > 1 ? params[1] : std::string_view(), cpu))
 		return;
 	if (params.size() > 2)
 	{
@@ -3944,7 +3458,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 			}
 		}
 	}
-	if (params.size() > 3 && !debug_command_parameter_command(action = params[3]))
+	if (params.size() > 3 && !m_console.validate_command_parameter(action = params[3]))
 		return;
 
 	// open the file
@@ -3999,11 +3513,11 @@ void debugger_commands::execute_history(const std::vector<std::string_view> &par
 {
 	// validate parameters
 	device_t *device;
-	if (!validate_cpu_parameter(!params.empty() ? params[0] : std::string_view(), device))
+	if (!m_console.validate_cpu_parameter(!params.empty() ? params[0] : std::string_view(), device))
 		return;
 
 	u64 count = device_debug::HISTORY_SIZE;
-	if (params.size() > 1 && !validate_number_parameter(params[1], count))
+	if (params.size() > 1 && !m_console.validate_number_parameter(params[1], count))
 		return;
 
 	// further validation
@@ -4047,12 +3561,12 @@ void debugger_commands::execute_trackpc(const std::vector<std::string_view> &par
 {
 	// Gather the on/off switch (if present)
 	bool turnOn = true;
-	if (params.size() > 0 && !validate_boolean_parameter(params[0], turnOn))
+	if (params.size() > 0 && !m_console.validate_boolean_parameter(params[0], turnOn))
 		return;
 
 	// Gather the cpu id (if present)
 	device_t *cpu = nullptr;
-	if (!validate_cpu_parameter((params.size() > 1) ? params[1] : std::string_view(), cpu))
+	if (!m_console.validate_cpu_parameter((params.size() > 1) ? params[1] : std::string_view(), cpu))
 		return;
 
 	const device_state_interface *state;
@@ -4064,7 +3578,7 @@ void debugger_commands::execute_trackpc(const std::vector<std::string_view> &par
 
 	// Should we clear the existing data?
 	bool clear = false;
-	if (params.size() > 2 && !validate_boolean_parameter(params[2], clear))
+	if (params.size() > 2 && !m_console.validate_boolean_parameter(params[2], clear))
 		return;
 
 	cpu->debug()->set_track_pc((bool)turnOn);
@@ -4096,7 +3610,7 @@ void debugger_commands::execute_trackmem(const std::vector<std::string_view> &pa
 {
 	// Gather the on/off switch (if present)
 	bool turnOn = true;
-	if (params.size() > 0 && !validate_boolean_parameter(params[0], turnOn))
+	if (params.size() > 0 && !m_console.validate_boolean_parameter(params[0], turnOn))
 		return;
 
 	// Gather the cpu id (if present)
@@ -4104,17 +3618,17 @@ void debugger_commands::execute_trackmem(const std::vector<std::string_view> &pa
 	if (params.size() > 1)
 		cpuparam = params[1];
 	device_t *cpu = nullptr;
-	if (!validate_cpu_parameter(cpuparam, cpu))
+	if (!m_console.validate_cpu_parameter(cpuparam, cpu))
 		return;
 
 	// Should we clear the existing data?
 	bool clear = false;
-	if (params.size() > 2 && !validate_boolean_parameter(params[2], clear))
+	if (params.size() > 2 && !m_console.validate_boolean_parameter(params[2], clear))
 		return;
 
 	// Get the address space for the given cpu
 	address_space *space;
-	if (!validate_device_space_parameter(cpuparam, AS_PROGRAM, space))
+	if (!m_console.validate_device_space_parameter(cpuparam, AS_PROGRAM, space))
 		return;
 
 	// Inform the CPU it's time to start tracking memory writes
@@ -4135,7 +3649,7 @@ void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::str
 	// Gather the required target address/space parameter
 	u64 address;
 	address_space *space;
-	if (!validate_target_address_parameter(params[0], spacenum, space, address))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
 		return;
 
 	// Translate the address
@@ -4194,7 +3708,7 @@ void debugger_commands::execute_snap(const std::vector<std::string_view> &params
 	else
 	{
 		u64 scrnum = 0;
-		if (params.size() > 1 && !validate_number_parameter(params[1], scrnum))
+		if (params.size() > 1 && !m_console.validate_number_parameter(params[1], scrnum))
 			return;
 
 		screen_device_enumerator iter(m_machine.root_device());
@@ -4244,7 +3758,7 @@ void debugger_commands::execute_map(int spacenum, const std::vector<std::string_
 	// validate parameters
 	u64 address;
 	address_space *space;
-	if (!validate_target_address_parameter(params[0], spacenum, space, address))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
 		return;
 
 	// do the translation first
@@ -4275,7 +3789,7 @@ void debugger_commands::execute_map(int spacenum, const std::vector<std::string_
 void debugger_commands::execute_memdump(const std::vector<std::string_view> &params)
 {
 	device_t *root = &m_machine.root_device();
-	if ((params.size() >= 2) && !validate_device_parameter(params[1], root))
+	if ((params.size() >= 2) && !m_console.validate_device_parameter(params[1], root))
 		return;
 
 	using namespace std::literals;
@@ -4349,7 +3863,7 @@ void debugger_commands::execute_symlist(const std::vector<std::string_view> &par
 	{
 		// validate parameters
 		device_t *cpu;
-		if (!validate_cpu_parameter(params[0], cpu))
+		if (!m_console.validate_cpu_parameter(params[0], cpu))
 			return;
 		symtable = &cpu->debug()->symtable();
 		m_console.printf("CPU '%s' symbols:\n", cpu->tag());

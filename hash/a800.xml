@@ -542,12 +542,13 @@ Align test never completes, burn-in test requires a test disk and writing to flo
 		</part>
 	</software>
 
-	<software name="alfclrcv" supported="no">
+	<software name="alfclrcv" supported="partial">
 		<description>Alf in the Color Caves</description>
 		<year>1984</year>
 		<publisher>Spinnaker</publisher>
 		<notes><![CDATA[
-Doesn't complete first animation after selecting the left tunnel, [ANTIC] timing?
+a800: Doesn't complete first animation after selecting left tunnel during gameplay, [cart] handling (override right slot map?)
+Draws with solid orange at bottom of screen after selecting left tunnel, should be black [ANTIC]
 ]]></notes>
 		<info name="developer" value="Joyce Hakansson Associates, Inc" />
 		<info name="serial" value="ALF-AT" />
@@ -1250,6 +1251,7 @@ a certain time, and this isn't currently emulated.
 		</part>
 	</software>
 
+	<!-- An actual "Bomb Jack" version known to exist in .xex format, requiring 320KB RAM (!) -->
 	<software name="bombjake" supported="no">
 		<description>Bomb Jake</description>
 		<year>2009</year>
@@ -1259,6 +1261,7 @@ Loading screen is very off, [ANTIC] timing sensitive (downclock maincpu to 50% t
 Title screen has more timing glitches
 Starting a game randomly crashes
 Cuts off top portion of screen
+Hi-score table gets garbled after first attract cycle
 ]]></notes>
 		<info name="usage" value="Use PAL system for BGM during gameplay, NTSC has SFX only. Doesn't work in plain a400/a800" />
 		<sharedfeat name="compatibility" value="XL/XE"/>
@@ -2194,7 +2197,8 @@ Glitchy title screen the first time around (fixes after one playthrough)
 		<year>1999</year>
 		<publisher>Video 61 / GMG</publisher>
 		<notes><![CDATA[
-Cannot start a game (requires mouse?)
+Invisible mouse pointer on title screen, uses [GTIA] PRIOR multicolor + [ANTIC] missile DMA not enabled while sprite DMA is
+Very glitchy on gameplay, sprite eventually disappears, timing?
 Doesn't survive a soft reset
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
@@ -4896,13 +4900,11 @@ Doesn't draw game over "the end" screen properly, [ANTIC] vertical scroll?
 		</part>
 	</software>
 
-	<software name="satan" supported="no">
+	<software name="satan">
 		<description>Satan's Hollow (Unreleased)</description>
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
-		<notes><![CDATA[
-Cannot start a game, cfr. kpatrol (have to hold trigger pressed at boot then release to start) [GTIA] latch trigger
-]]></notes>
+		<info name="usage" value="Supports Booster-Grip Joystick Adaptor" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">

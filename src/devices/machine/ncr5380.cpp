@@ -168,7 +168,7 @@ void ncr5380_device::scsi_ctrl_changed()
 		}
 
 		m_state = IDLE;
-		m_state_timer->enable(false);
+		m_state_timer->adjust(attotime::never);
 
 		// clear scsi bus
 		scsi_bus->data_w(scsi_refid, 0);
@@ -182,7 +182,7 @@ void ncr5380_device::scsi_ctrl_changed()
 			if ((ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE))
 			{
 				// transfer cycle
-				if (m_state != IDLE && !m_state_timer->enabled())
+				if (m_state != IDLE && !m_state_timer->running())
 					m_state_timer->adjust(attotime::zero);
 			}
 			else
@@ -190,7 +190,7 @@ void ncr5380_device::scsi_ctrl_changed()
 				LOG("phase mismatch %d != %d\n", (ctrl & S_PHASE_MASK), (m_tcmd & TC_PHASE));
 
 				m_state = IDLE;
-				m_state_timer->enable(false);
+				m_state_timer->adjust(attotime::never);
 
 				set_drq(true);
 				set_irq(true);
@@ -286,7 +286,7 @@ void ncr5380_device::mode_w(u8 data)
 	if ((m_mode & MODE_DMA) && !(data & MODE_DMA))
 	{
 		m_state = IDLE;
-		m_state_timer->enable(false);
+		m_state_timer->adjust(attotime::never);
 
 		m_bas &= ~BAS_ENDOFDMA;
 

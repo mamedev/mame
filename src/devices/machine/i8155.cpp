@@ -116,7 +116,7 @@ inline uint8_t i8155_device::get_timer_mode() const
 
 inline uint16_t i8155_device::get_timer_count() const
 {
-	if (m_timer->enabled())
+	if (m_timer->running())
 	{
 		// timer counts down by twos
 		return std::min((uint16_t(attotime_to_clocks(m_timer->remaining())) + 1) << 1, m_count_loaded & 0x3ffe) | (m_count_even_phase ? 0 : 1);
@@ -139,12 +139,12 @@ inline void i8155_device::timer_output(int to)
 inline void i8155_device::timer_stop_count()
 {
 	// stop counting
-	if (m_timer->enabled())
+	if (m_timer->running())
 	{
 		m_count_loaded = (m_count_loaded & (TIMER_MODE_MASK << 8)) | get_timer_count();
-		m_timer->enable(false);
+		m_timer->adjust(attotime::never);
 	}
-	m_timer_tc->enable(false);
+	m_timer_tc->adjust(attotime::never);
 
 	// clear timer output
 	timer_output(1);
@@ -519,7 +519,7 @@ void i8155_device::write_command(uint8_t data)
 	case COMMAND_TM_START:
 		LOGMASKED(LOG_PORT, "Timer Command: Start\n");
 
-		if (m_timer->enabled())
+		if (m_timer->running())
 		{
 			// if timer is running, start the new mode and CNT length immediately after present TC is reached
 		}

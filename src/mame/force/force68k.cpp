@@ -407,7 +407,7 @@ void force68k_state::machine_reset ()
 /* A very inefficient User cart emulation of two 8 bit sockets (odd and even) */
 uint16_t force68k_state::read16_rom(offs_t offset){
 	offset = offset % m_cart->common_get_size("rom"); // Don't read outside buffer...
-	return ((m_usrrom [offset] << 8) & 0xff00) | ((m_usrrom [offset] >> 8) & 0x00ff);
+	return swapendian_int16(m_usrrom [offset]);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */

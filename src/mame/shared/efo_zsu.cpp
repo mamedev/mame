@@ -203,7 +203,7 @@ WRITE_LINE_MEMBER(efo_zsu_device::ctc0_z2_w)
 
 WRITE_LINE_MEMBER(efo_zsu_device::fifo_dor_w)
 {
-	if (!m_fifo_shift_timer->enabled())
+	if (!m_fifo_shift_timer->running())
 		m_ctc[0]->trg3(!state);
 }
 

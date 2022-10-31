@@ -65,7 +65,7 @@ void tv955kb_device::bell_reset()
 {
 	m_bell_on = false;
 	m_bell->level_w(0);
-	m_bell_timer->enable(false);
+	m_bell_timer->adjust(attotime::never);
 }
 
 WRITE_LINE_MEMBER(tv955kb_device::write_rxd)
@@ -88,9 +88,9 @@ u8 tv955kb_device::keys_r()
 
 WRITE_LINE_MEMBER(tv955kb_device::bell_w)
 {
-	if (state && m_bell_timer->enabled())
+	if (state && m_bell_timer->running())
 		bell_reset();
-	else if (!state && !m_bell_timer->enabled())
+	else if (!state && !m_bell_timer->running())
 	{
 		// Speaker driven through 2N4401 from Q8 output of MC14040 clocked by ALE
 		attotime period = m_mcu->cycles_to_attotime(128);

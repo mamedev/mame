@@ -13,6 +13,8 @@
 #include "mdec.h"
 #include "dma.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL ( 0 )
 
 static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
