@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /*********************************************************************
 
     debugcon.cpp
@@ -198,7 +198,7 @@ void debugger_console::execute_condump(const std::vector<std::string_view>& para
 //  symbol table
 //-------------------------------------------------
 
-symbol_table &debugger_console::visible_symtable()
+symbol_table &debugger_console::visible_symtable() const
 {
 	return m_visiblecpu->debug()->symtable();
 }
@@ -558,6 +558,494 @@ std::string debugger_console::cmderr_to_string(CMDERR error)
 	}
 }
 
+
+//**************************************************************************
+//  PARAMETER VALIDATION HELPERS
+//**************************************************************************
+
+namespace {
+
+template <typename T>
+inline std::string_view::size_type find_delimiter(std::string_view str, T &&is_delim)
+{
+	unsigned parens = 0;
+	for (std::string_view::size_type i = 0; str.length() > i; ++i)
+	{
+		if (str[i] == '(')
+		{
+			++parens;
+		}
+		else if (parens)
+		{
+			if (str[i] == ')')
+				--parens;
+		}
+		else if (is_delim(str[i]))
+		{
+			return i;
+		}
+	}
+	return std::string_view::npos;
+}
+
+} // anonymous namespace
+
+
+/// \brief Validate parameter as a Boolean value
+///
+/// Validates a parameter as a Boolean value.  Fixed strings and
+/// expressions evaluating to numeric values are recognised.  The result
+/// is unchanged for an empty string.
+/// \param [in] param The parameter string.
+/// \param [in,out] result The default value on entry, and the value of
+///   the parameter interpreted as a Boolean on success.  Unchanged if
+///   the parameter is an empty string.
+/// \return true if the parameter is a valid Boolean value or an empty
+///   string, or false otherwise.
+bool debugger_console::validate_boolean_parameter(std::string_view param, bool &result)
+{
+	// nullptr parameter does nothing and returns no error
+	if (param.empty())
+		return true;
+
+	// evaluate the expression; success if no error
+	using namespace std::literals;
+	bool const is_true = util::streqlower(param, "true"sv);
+	bool const is_false = util::streqlower(param, "false"sv);
+
+	if (is_true || is_false)
+	{
+		result = is_true;
+		return true;
+	}
+
+	// try to evaluate as a number
+	u64 val;
+	if (!validate_number_parameter(param, val))
+		return false;
+
+	result = val != 0;
+	return true;
+}
+
+
+/// \brief Validate parameter as a numeric value
+///
+/// Parses the parameter as an expression and evaluates it as a number.
+/// \param [in] param The parameter string.
+/// \param [out] result The numeric value of the expression on success.
+///   Unchanged on failure.
+/// \return true if the parameter is a valid expression that evaluates
+///   to a numeric value, or false otherwise.
+bool debugger_console::validate_number_parameter(std::string_view param, u64 &result)
+{
+	// evaluate the expression; success if no error
+	try
+	{
+		result = parsed_expression(visible_symtable(), param).execute();
+		return true;
+	}
+	catch (expression_error const &error)
+	{
+		// print an error pointing to the character that caused it
+		printf("Error in expression: %s\n", param);
+		printf("                     %*s^", error.offset(), "");
+		printf("%s\n", error.code_string());
+		return false;
+	}
+}
+
+
+/// \brief Validate parameter as a device
+///
+/// Validates a parameter as a device identifier and retrieves the
+/// device on success.  A string corresponding to the tag of a device
+/// refers to that device; an empty string refers to the current CPU
+/// with debugger focus; any other string is parsed as an expression
+/// and treated as an index of a device implementing
+/// #device_execute_interface and #device_state_interface, and exposing
+/// a generic PC base value.
+/// \param [in] param The parameter string.
+/// \param [out] result A pointer to the device on success, or unchanged
+///   on failure.
+/// \return true if the parameter refers to a device in the current
+///   system, or false otherwise.
+bool debugger_console::validate_device_parameter(std::string_view param, device_t *&result)
+{
+	// if no parameter, use the visible CPU
+	if (param.empty())
+	{
+		device_t *const current = m_visiblecpu;
+		if (current)
+		{
+			result = current;
+			return true;
+		}
+		else
+		{
+			printf("No valid CPU is currently selected\n");
+			return false;
+		}
+	}
+
+	// next look for a tag match
+	std::string_view relative = param;
+	device_t &base = get_device_search_base(relative);
+	device_t *device = base.subdevice(strmakelower(relative));
+	if (device)
+	{
+		result = device;
+		return true;
+	}
+
+	// then evaluate as an expression; on an error assume it was a tag
+	u64 cpunum;
+	try
+	{
+		cpunum = parsed_expression(visible_symtable(), param).execute();
+	}
+	catch (expression_error &)
+	{
+		printf("Unable to find device '%s'\n", param);
+		return false;
+	}
+
+	// attempt to find by numerical index
+	device = get_cpu_by_index(cpunum);
+	if (device)
+	{
+		result = device;
+		return true;
+	}
+	else
+	{
+		// if out of range, complain
+		printf("Invalid CPU index %u\n", cpunum);
+		return false;
+	}
+}
+
+
+/// \brief Validate a parameter as a CPU
+///
+/// Validates a parameter as a CPU identifier.  Uses the same rules as
+/// #validate_device_parameter to identify devices, but additionally
+/// checks that the device is a "CPU" for the debugger's purposes.
+/// \param [in] The parameter string.
+/// \param [out] result The device on success, or unchanged on failure.
+/// \return true if the parameter refers to a CPU-like device in the
+///   current system, or false otherwise.
+bool debugger_console::validate_cpu_parameter(std::string_view param, device_t *&result)
+{
+	// first do the standard device thing
+	device_t *device;
+	if (!validate_device_parameter(param, device))
+		return false;
+
+	// check that it's a "CPU" for the debugger's purposes
+	device_execute_interface const *execute;
+	if (device->interface(execute))
+	{
+		result = device;
+		return true;
+	}
+
+	printf("Device %s is not a CPU\n", device->name());
+	return false;
+}
+
+
+/// \brief Validate a parameter as an address space identifier
+///
+/// Validates a parameter as an address space identifier.  Uses the same
+/// rules as #validate_device_parameter to identify devices.  If the
+/// default address space number is negative, the first address space
+/// exposed by the device will be used as the default.
+/// \param [in] The parameter string.
+/// \param [in] spacenum The default address space index.  If negative,
+///   the first address space exposed by the device (i.e. the address
+///   space with the lowest index) will be used as the default.
+/// \param [out] result The addresfs space on success, or unchanged on
+///   failure.
+/// \return true if the parameter refers to an address space in the
+///   current system, or false otherwise.
+bool debugger_console::validate_device_space_parameter(std::string_view param, int spacenum, address_space *&result)
+{
+	device_t *device;
+	std::string spacename;
+	if (param.empty())
+	{
+		// if no parameter, use the visible CPU
+		device = m_visiblecpu;
+		if (!device)
+		{
+			printf("No valid CPU is currently selected\n");
+			return false;
+		}
+	}
+	else
+	{
+		// look for a tag match on the whole parameter value
+		std::string_view relative = param;
+		device_t &base = get_device_search_base(relative);
+		device = base.subdevice(strmakelower(relative));
+
+		// if that failed, treat the last component as an address space
+		if (!device)
+		{
+			auto const delimiter = relative.find_last_of(":^");
+			bool const found = std::string_view::npos != delimiter;
+			if (!found || (':' == relative[delimiter]))
+			{
+				spacename = strmakelower(relative.substr(found ? (delimiter + 1) : 0));
+				relative = relative.substr(0, !found ? 0 : !delimiter ? 1 : delimiter);
+				if (!relative.empty())
+					device = base.subdevice(strmakelower(relative));
+				else if (m_visiblecpu)
+					device = m_visiblecpu;
+				else
+					device = &m_machine.root_device();
+			}
+		}
+	}
+
+	// if still no device found, evaluate as an expression
+	if (!device)
+	{
+		u64 cpunum;
+		try
+		{
+			cpunum = parsed_expression(visible_symtable(), param).execute();
+		}
+		catch (expression_error const &)
+		{
+			// parsing failed - assume it was a tag
+			printf("Unable to find device '%s'\n", param);
+			return false;
+		}
+
+		// attempt to find by numerical index
+		device = get_cpu_by_index(cpunum);
+		if (!device)
+		{
+			// if out of range, complain
+			printf("Invalid CPU index %u\n", cpunum);
+			return false;
+		}
+	}
+
+	// ensure the device implements the memory interface
+	device_memory_interface *memory;
+	if (!device->interface(memory))
+	{
+		printf("No memory interface found for device %s\n", device->name());
+		return false;
+	}
+
+	// fall back to supplied default space if appropriate
+	if (spacename.empty() && (0 <= spacenum))
+	{
+		if (memory->has_space(spacenum))
+		{
+			result = &memory->space(spacenum);
+			return true;
+		}
+		else
+		{
+			printf("No matching memory space found for device '%s'\n", device->tag());
+			return false;
+		}
+	}
+
+	// otherwise find the specified space or fall back to the first populated space
+	for (int i = 0; memory->max_space_count() > i; ++i)
+	{
+		if (memory->has_space(i) && (spacename.empty() || (memory->space(i).name() == spacename)))
+		{
+			result = &memory->space(i);
+			return true;
+		}
+	}
+
+	// report appropriate error message
+	if (spacename.empty())
+		printf("No memory spaces found for device '%s'\n", device->tag());
+	else
+		printf("Memory space '%s' not found found for device '%s'\n", spacename, device->tag());
+	return false;
+}
+
+
+/// \brief Validate a parameter as a target address
+///
+/// Validates a parameter as an numeric expression to use as an address
+/// optionally followed by a colon and a device identifier.  If the
+/// device identifier is not presnt, the current CPU with debugger focus
+/// is assumed.  See #validate_device_parameter for information on how
+/// device parametersare interpreted.
+/// \param [in] The parameter string.
+/// \param [in] spacenum The default address space index.  If negative,
+///   the first address space exposed by the device (i.e. the address
+///   space with the lowest index) will be used as the default.
+/// \param [out] space The address space on success, or unchanged on
+///   failure.
+/// \param [out] addr The address on success, or unchanged on failure.
+/// \return true if the address is a valid expression evaluating to a
+///   number and the address space is found, or false otherwise.
+bool debugger_console::validate_target_address_parameter(std::string_view param, int spacenum, address_space *&space, u64 &addr)
+{
+	// check for the device delimiter
+	std::string_view::size_type const devdelim = find_delimiter(param, [] (char ch) { return ':' == ch; });
+	std::string_view device;
+	if (devdelim != std::string::npos)
+		device = param.substr(devdelim + 1);
+
+	// parse the address first
+	u64 addrval;
+	if (!validate_number_parameter(param.substr(0, devdelim), addrval))
+		return false;
+
+	// find the address space
+	if (!validate_device_space_parameter(device, spacenum, space))
+		return false;
+
+	// set the address now that we have the space
+	addr = addrval;
+	return true;
+}
+
+
+/// \brief Validate a parameter as a memory region
+///
+/// Validates a parameter as a memory region tag and retrieves the
+/// specified memory region.
+/// \param [in] The parameter string.
+/// \param [out] result The memory region on success, or unchanged on
+///   failure.
+/// \return true if the parameter refers to a memory region in the
+///   current system, or false otherwise.
+bool debugger_console::validate_memory_region_parameter(std::string_view param, memory_region *&result)
+{
+	auto const &regions = m_machine.memory().regions();
+	std::string_view relative = param;
+	device_t &base = get_device_search_base(relative);
+	auto const iter = regions.find(base.subtag(strmakelower(relative)));
+	if (regions.end() != iter)
+	{
+		result = iter->second.get();
+		return true;
+	}
+	else
+	{
+		printf("No matching memory region found for '%s'\n", param);
+		return false;
+	}
+}
+
+
+/// \brief Get search base for device or address space parameter
+///
+/// Handles prefix prefixes used to indicate that a device tag should be
+/// interpreted relative to the selected CPU.  Removes the recognised
+/// prefixes from the parameter value.
+/// \param [in,out] param The parameter string.  Recognised prefixes
+///   affecting the search base are removed, leaving a tag relative to
+///   the base device.
+/// \return A reference to the base device that the tag should be
+///   interpreted relative to.
+device_t &debugger_console::get_device_search_base(std::string_view &param) const
+{
+	if (!param.empty())
+	{
+		// handle ".:" or ".^" prefix for tag relative to current CPU if any
+		if (('.' == param[0]) && ((param.size() == 1) || (':' == param[1]) || ('^' == param[1])))
+		{
+			param.remove_prefix(((param.size() > 1) && (':' == param[1])) ? 2 : 1);
+			device_t *const current = m_visiblecpu;
+			return current ? *current : m_machine.root_device();
+		}
+
+		// a sibling path makes most sense relative to current CPU
+		if ('^' == param[0])
+		{
+			device_t *const current = m_visiblecpu;
+			return current ? *current : m_machine.root_device();
+		}
+	}
+
+	// default to root device
+	return m_machine.root_device();
+}
+
+
+/// \brief Get CPU by index
+///
+/// Looks up a CPU by the number the debugger assigns it based on its
+/// position in the device tree relative to other CPUs.
+/// \param [in] cpunum Zero-based index of the CPU to find.
+/// \return A pointer to the CPU if found, or \c nullptr if no CPU has
+///   the specified index.
+device_t *debugger_console::get_cpu_by_index(u64 cpunum) const
+{
+	unsigned index = 0;
+	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
+	{
+		// real CPUs should have pcbase
+		device_state_interface const *state;
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE))
+		{
+			if (index++ == cpunum)
+			{
+				return &exec.device();
+			}
+		}
+	}
+	return nullptr;
+}
+
+
+//-------------------------------------------------
+//  validate_expression_parameter - validates
+//  an expression parameter
+//-----------------------------------------------*/
+
+bool debugger_console::validate_expression_parameter(std::string_view param, parsed_expression &result)
+{
+	try
+	{
+		// parse the expression; success if no error
+		result.parse(param);
+		return true;
+	}
+	catch (expression_error const &err)
+	{
+		// output an error
+		printf("Error in expression: %s\n", param);
+		printf("                     %*s^", err.offset(), "");
+		printf("%s\n", err.code_string());
+		return false;
+	}
+}
+
+
+//-------------------------------------------------
+//  validate_command_parameter - validates a
+//  command parameter
+//-------------------------------------------------
+
+bool debugger_console::validate_command_parameter(std::string_view param)
+{
+	// validate the comment; success if no error
+	CMDERR err = validate_command(param);
+	if (err.error_class() == CMDERR::NONE)
+		return true;
+
+	// output an error
+	printf("Error in command: %s\n", param);
+	printf("                  %*s^", err.error_offset(), "");
+	printf("%s\n", cmderr_to_string(err));
+	return false;
+}
 
 
 /***************************************************************************

@@ -785,7 +785,7 @@ void a2bus_grapplerplus_device::data_latched(u8 data)
 
 	// generate strobe pulse after one clock cycle
 	m_next_strobe = 0U;
-	if (!m_strobe_timer->enabled())
+	if (!m_strobe_timer->running())
 	{
 		LOG("Start strobe timer\n");
 		m_strobe_timer->adjust(attotime::from_ticks(7, clock()));

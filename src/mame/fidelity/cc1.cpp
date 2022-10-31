@@ -150,7 +150,7 @@ u8 cc1_state::ppi_porta_r()
 	data |= ~m_inputs[1]->read() << 5 & 0xe0;
 
 	// d4: 555 Q
-	return data | ((m_delay->enabled()) ? 0x10 : 0);
+	return data | ((m_delay->running()) ? 0x10 : 0);
 }
 
 void cc1_state::ppi_portb_w(u8 data)
@@ -163,7 +163,7 @@ void cc1_state::ppi_portb_w(u8 data)
 void cc1_state::ppi_portc_w(u8 data)
 {
 	// d6: trigger monostable 555 (R=15K, C=1uF)
-	if (~data & m_led_select & 0x40 && !m_delay->enabled())
+	if (~data & m_led_select & 0x40 && !m_delay->running())
 		m_delay->adjust(attotime::from_msec(17));
 
 	// d0-d3: digit select

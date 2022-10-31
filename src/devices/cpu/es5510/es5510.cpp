@@ -20,6 +20,7 @@
 
 #include "corestr.h"
 
+#include <cstdarg>
 #include <cstdio>
 #include <algorithm>
 

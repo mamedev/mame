@@ -200,6 +200,8 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_nomirror(start, end, ostart, oend, handler);
+		range_cut_before(((entry - 1) << LowBits) - 1, entry);
+		range_cut_after((entry + 1) << LowBits, entry);
 	}
 }
 
@@ -275,6 +277,8 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_mirror(start, end, ostart, oend, mirror, handler);
+		range_cut_before(((entry - 1) << LowBits) - 1, entry);
+		range_cut_after((entry + 1) << LowBits, entry);
 	}
 }
 

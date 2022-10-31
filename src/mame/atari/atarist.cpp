@@ -1350,7 +1350,7 @@ TIMER_CALLBACK_MEMBER(ste_state::microwire_tick)
 		microwire_shift();
 		m_lmc1992->enable_w(1);
 		m_mw_shift = 0;
-		m_microwire_timer->enable(0);
+		m_microwire_timer->adjust(attotime::never);
 		break;
 	}
 }
@@ -1372,7 +1372,7 @@ uint16_t ste_state::microwire_data_r()
 
 void ste_state::microwire_data_w(uint16_t data)
 {
-	if (!m_microwire_timer->enabled())
+	if (!m_microwire_timer->running())
 	{
 		m_mw_data = data;
 		m_microwire_timer->adjust(attotime::zero, 0, attotime::from_usec(2));
@@ -1396,7 +1396,7 @@ uint16_t ste_state::microwire_mask_r()
 
 void ste_state::microwire_mask_w(uint16_t data)
 {
-	if (!m_microwire_timer->enabled())
+	if (!m_microwire_timer->running())
 	{
 		m_mw_mask = data;
 	}

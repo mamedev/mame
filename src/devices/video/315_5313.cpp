@@ -433,7 +433,7 @@ void sega315_5313_device::vdp_vram_write(u16 data)
 
 	if (m_vdp_address & 1)
 	{
-		data = ((data & 0x00ff) << 8) | ((data & 0xff00) >> 8);
+		data = swapendian_int16(data);
 	}
 
 	vram_w(m_vdp_address >> 1, data);
@@ -1241,7 +1241,7 @@ u16 sega315_5313_device::get_hposition()
 	{
 		attotime time_elapsed_since_megadriv_scanline_timer;
 
-		time_elapsed_since_megadriv_scanline_timer = m_megadriv_scanline_timer->time_elapsed();
+		time_elapsed_since_megadriv_scanline_timer = m_megadriv_scanline_timer->elapsed();
 
 		if (time_elapsed_since_megadriv_scanline_timer.attoseconds() < (ATTOSECONDS_PER_SECOND/get_framerate() /double(m_total_scanlines)))
 		{

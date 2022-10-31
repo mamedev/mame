@@ -970,25 +970,15 @@ void a4000_state::scsi_w(offs_t offset, u32 data, u32 mem_mask)
 
 u16 a4000_state::ide_r(offs_t offset, u16 mem_mask)
 {
-	u16 data = 0xffff;
-
 	// ide interrupt register
 	if (offset == 0x1010)
 		return m_ide_interrupt << 15;
 
-	// swap
-	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
-
 	// this very likely doesn't respond to all the addresses, figure out which ones
 	if (BIT(offset, 12))
-		data = m_ata->cs1_r((offset >> 1) & 0x07, mem_mask);
+		return m_ata->cs1_swap_r((offset >> 1) & 0x07, mem_mask);
 	else
-		data = m_ata->cs0_r((offset >> 1) & 0x07, mem_mask);
-
-	// swap
-	data = (data << 8) | (data >> 8);
-
-	return data;
+		return m_ata->cs0_swap_r((offset >> 1) & 0x07, mem_mask);
 }
 
 void a4000_state::ide_w(offs_t offset, u16 data, u16 mem_mask)
@@ -997,15 +987,11 @@ void a4000_state::ide_w(offs_t offset, u16 data, u16 mem_mask)
 	if (offset == 0x1010)
 		return;
 
-	// swap
-	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
-	data = (data << 8) | (data >> 8);
-
 	// this very likely doesn't respond to all the addresses, figure out which ones
 	if (BIT(offset, 12))
-		m_ata->cs1_w((offset >> 1) & 0x07, data, mem_mask);
+		m_ata->cs1_swap_w((offset >> 1) & 0x07, data, mem_mask);
 	else
-		m_ata->cs0_w((offset >> 1) & 0x07, data, mem_mask);
+		m_ata->cs0_swap_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
@@ -2306,12 +2292,14 @@ ROM_START( cdtv )
 	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000)
 
 	// remote control input converter, mos 6500/1 mcu
-	ROM_REGION(0x800, "rcmcu", 0)
-	ROM_LOAD("252609-02.u75", 0x000, 0x800, NO_DUMP)
+	ROM_REGION(0x1000, "rcmcu", 0)
+	ROM_LOAD("252609-02.u75", 0x000, 0x800, NO_DUMP) // internal ROM of the final version hasn't been dumped yet
+	ROM_LOAD("v1.3-1990-10-01", 0x0000, 0x1000, CRC(3c7cb7bb) SHA1(958e799897ac044fcc0f0c74c3cb5d83f3edd0c7)) // this was dumped from a pre-production CD-1000 player which had the program in external EPROM
 
 	// lcd controller, sanyo lc6554h
-	ROM_REGION(0x1000, "lcd", 0)
-	ROM_LOAD("252608-01.u62", 0x0000, 0x1000, NO_DUMP)
+	ROM_REGION(0x2000, "lcd", 0)
+	ROM_LOAD("252608-01.u62", 0x0000, 0x2000, NO_DUMP) // internal ROM of the final version hasn't been dumped yet
+	ROM_LOAD("v1.20-1990-09-26", 0x0000, 0x2000, CRC(9d69c439) SHA1(74354818ffc4d897801be705ae223717f522f8d4)) // this was dumped from a pre-production CD-1000 player which had the program in external EPROM
 ROM_END
 
 #define rom_cdtvn  rom_cdtv

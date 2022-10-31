@@ -10,6 +10,7 @@
 
 Commodore MPS-1230 Dot Matrix Printer
 Commodore 1988/89
+Hardware info by Guru
 
 This is a 9-pin dot matrix printer manufactured by Commodore (possibly under license from Olivetti)
 The printer is based on the Olivetti DM100 9-pin dot matrix printer with an added Commodore

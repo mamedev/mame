@@ -6,13 +6,16 @@
 
 ***************************************************************************/
 
-#include "cpu/mcs48/mcs48.h"
 #include "emu.h"
 #include "keyboard.h"
+
 #include "matrix.h"
+
+#include "cpu/mcs48/mcs48.h"
 
 #include "qx10ascii.lh"
 #include "qx10hasci.lh"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -21,6 +24,7 @@
 DEFINE_DEVICE_TYPE(EPSON_QX_KEYBOARD_PORT, bus::epson_qx::keyboard::keyboard_port_device, "epson_qx_kbd", "Epson QX-10 Keyboard Port")
 DEFINE_DEVICE_TYPE(QX10_KEYBOARD_HASCI, bus::epson_qx::keyboard::qx10_keyboard_hasci, "qx10_keyboard_hasci", "Epson QX-10 Keyboard (HASCI)")
 DEFINE_DEVICE_TYPE(QX10_KEYBOARD_ASCII, bus::epson_qx::keyboard::qx10_keyboard_ascii, "qx10_keyboard_ascii", "Epson QX-10 Keyboard (ASCII)")
+
 
 namespace bus::epson_qx::keyboard {
 

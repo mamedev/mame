@@ -302,7 +302,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="astdelux" cloneof="asteroid">
+	<software name="astdeluxu" cloneof="astdelux">
 		<description>Asteroids Deluxe (NTSC)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -316,7 +316,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="astdeluxp" cloneof="asteroid">
+	<software name="astdelux">
 		<description>Asteroids Deluxe (PAL)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
