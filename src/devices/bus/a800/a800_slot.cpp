@@ -1,24 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-/***********************************************************************************************************
+/**************************************************************************************************
 
+Atari A800/A5200/XEGS cart slot emulation
 
-    Atari 8 bit cart emulation
-    (through slot devices)
+<fill me>
 
-    Emulation of the cartslot(s) for Atari 8bit series of home computers
+References:
+- Altirra HW reference manual 2022-07-07 edition;
+- https://github.com/dmlloyd/atari800/blob/master/DOC/cart.txt
+- https://www.atarimax.com/jindroush.atari.org/acarts.html
 
-    Accessors to ROM are typically given in the area 0xa000-0xbfff, but some
-    carts (and the right slot in A800) maps ROM to 0x8000-0x9fff too
-    Bankswitch typically happens by accessing addresses in 0xd500-0xd5ff
-
-    Accordingly, this device offers the following handlers
-    - read_80xx/write_80xx
-    - read_d5xx/write_d5xx
-    Notice that these are installed in different ranges at machine start by
-    the drivers, so that it might well be that offs=0 for read_80xx is 0xa000!
-
- ***********************************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "a800_slot.h"
@@ -348,7 +341,6 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 	int type = A800_8K;
 
 	// TODO: canonically applies to .car extension only, have 10 bytes extra header on top
-	// https://github.com/dmlloyd/atari800/blob/master/DOC/cart.txt
 
 	// check CART format
 	if (strncmp((const char *)header, "CART", 4))

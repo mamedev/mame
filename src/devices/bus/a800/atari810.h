@@ -42,7 +42,6 @@ private:
 	required_device<fd1771_device> m_fdc;
 };
 
-// device type declaration
 DECLARE_DEVICE_TYPE(ATARI810, atari810_device)
 
 #endif // MAME_BUS_A800_ATARI810

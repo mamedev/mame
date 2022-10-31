@@ -12,14 +12,12 @@
 class a800_rom_atrax_device : public a800_rom_device
 {
 public:
-	// construction/destruction
 	a800_rom_atrax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void cart_map(address_map &map) override;
 	virtual void cctl_map(address_map &map) override;
 
 protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

@@ -4,7 +4,8 @@
 
 Telelink II
 
-4-bit NVRAM (unknown type) and other stuff not known at current stage.
+4-bit X2212 NVRAM and other stuff not known at current stage.
+RD4 hardwired to +5V
 
 TODO:
 - CCTL mapping details are unknown;

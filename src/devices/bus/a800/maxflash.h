@@ -12,7 +12,6 @@
 class a800_maxflash_1mb_device : public a800_rom_device
 {
 public:
-	// construction/destruction
 	a800_maxflash_1mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	a800_maxflash_1mb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -20,7 +19,6 @@ public:
 	virtual void cctl_map(address_map &map) override;
 
 protected:
-	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void device_start() override;
@@ -45,11 +43,9 @@ public:
 	virtual void cctl_map(address_map &map) override;
 
 protected:
-	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-// device type declaration
 DECLARE_DEVICE_TYPE(A800_MAXFLASH_1MB, a800_maxflash_1mb_device)
 DECLARE_DEVICE_TYPE(A800_MAXFLASH_8MB, a800_maxflash_8mb_device)
 

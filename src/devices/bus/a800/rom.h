@@ -16,7 +16,6 @@ class a800_rom_device : public device_t,
 						public device_a800_cart_interface
 {
 public:
-	// construction/destruction
 	a800_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t read_80xx(offs_t offset) override;
@@ -24,7 +23,6 @@ public:
 protected:
 	a800_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
@@ -35,10 +33,8 @@ protected:
 class xegs_rom_device : public a800_rom_device
 {
 public:
-	// construction/destruction
 	xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -55,7 +51,6 @@ protected:
 class a5200_rom_2chips_device : public a800_rom_device
 {
 public:
-	// construction/destruction
 	a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t read_80xx(offs_t offset) override;
@@ -67,14 +62,12 @@ public:
 class a5200_rom_bbsb_device : public a800_rom_device
 {
 public:
-	// construction/destruction
 	a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t read_80xx(offs_t offset) override;
 	virtual void write_80xx(offs_t offset, uint8_t data) override;
 
 protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
