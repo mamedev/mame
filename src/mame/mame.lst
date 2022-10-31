@@ -10407,6 +10407,7 @@ talbot                          // Volt Electronics
 
 @source:taito/champbwl.cpp
 champbwl                        // (c)1989 Romstar.  not Taito, but the same Seta video chips
+champbwla                       // (c)1989 Romstar.  not Taito, but the same Seta video chips
 doraemon                        // Sunsoft / Epoch / Fujiko - Shogakukan - TV Asahi (prototype)
 
 @source:dataeast/chanbara.cpp
