@@ -44,9 +44,10 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_tlink2",   A800_ROM_TELELINK2);
 	device.option_add_internal("a800_ultracart", A800_ROM_ULTRACART);
 	device.option_add_internal("a800_blizzard_32kb", A800_ROM_BLIZZARD_32KB);
+	device.option_add_internal("a800_adawliah", A800_ROM_ADAWLIAH);
 	device.option_add_internal("a800_atrax",    A800_ROM_ATRAX);
 	device.option_add_internal("a800_sparta",   A800_ROM_SPARTADOS);
-	// (#48-#49) SDX 64KB/128KB variants
+	// (#48-#49 / #68) SDX 64KB/128KB variants
 //	device.option_add_internal("a800_sdx_atrax_64kb", A800_ROM_SDX_ATRAX_64KB);
 //	device.option_add_internal("a800_sdx_atrax_128kb", A800_ROM_SDX_ATRAX_128KB);
 	// (#5) DB "Dave Bennett" homebrew cartridge, vaporware? cfr. https://forums.atariage.com/topic/307663-32k-db-cart/
@@ -63,12 +64,15 @@ static void a800_left(device_slot_interface &device)
 	// flash carts
 	device.option_add_internal("a800_corina",   A800_ROM_CORINA);
 	device.option_add_internal("a800_corina_sram", A800_ROM_CORINA_SRAM);
+	// TODO: rename these two (values are in megabits)
 	device.option_add(         "maxflash_1mb",  A800_MAXFLASH_1MB);
 	device.option_add(         "maxflash_8mb",  A800_MAXFLASH_8MB);
+	// (#61) MegaMax, has switch that toggles between Atarimax 1MB mode and 2MB
+//	device.option_add(         "megamax",       A800_MEGAMAX);
 	device.option_add(         "sic_128kb",     A800_SIC_128KB);
 	device.option_add(         "sic_256kb",     A800_SIC_256KB);
 	device.option_add(         "sic_512kb",     A800_SIC_512KB);
-	// (#26-#32) MegaCart 16KB up to 1MB from .car specs, later released as 4MB variant too
+	// (#26-#32 / #63-#64) MegaCart 16KB up to 4MB variant too
 //	device.option_add(         "megacart",      A800_MEGACART);
 	// Atarimax MyIDE-II, 512 KB flash ROM + 512 KB RAM + CompactFlash i/f, requires DIY MyBIOS ROM installation into main system
 //	device.option_add(         "myideii",       A800_MYIDE_II);
@@ -79,7 +83,7 @@ static void a800_left(device_slot_interface &device)
 //	device.option_add(         "side3",         A800_SIDE3);
 	// STM32 coprocessor with SD card, cfr. https://github.com/robinhedwards/UnoCart
 //	device.option_add(         "unocart",       A800_UNOCART);
-	// The!Cart, 128MB + 512KB RAM, emulation modes
+	// (#62 / #65) The!Cart, 32/64/128MB + 512KB RAM, emulation modes
 //	device.option_add(         "thecart",       A800_THECART);
 
 	// non-ROM types
@@ -115,6 +119,8 @@ static void a5200_carts(device_slot_interface &device)
 	device.option_add_internal("a5200",         A800_ROM);
 	device.option_add_internal("a5200_2chips",  A5200_ROM_2CHIPS);
 	device.option_add_internal("a5200_bbsb",    A5200_ROM_BBSB);
+	// (#71-#74) Bryan Edewaard's "Super Cart"
+//	device.option_add_internal("a5200_supercart", A5200_ROM_SUPERCART);
 }
 
 #endif // MAME_BUS_A800_A800_CARTS_H

@@ -37,6 +37,8 @@ void a800_maxflash_1mb_device::device_reset()
 	// TODO: ugly assignment, and shouldn't happen in device_reset
 	// TODO: assert against intended size for slot
 	memcpy(m_flash->base(), m_rom, get_rom_size());
+
+	// NB: this starts with 0x7f in the older Atarimax 1MB version
 	m_bank = 0;
 
 	rd4_w(0);

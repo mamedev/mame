@@ -37,9 +37,18 @@ protected:
 	virtual void binary_counter_access() override;
 };
 
+class a800_rom_adawliah_device : public a800_rom_ultracart_device
+{
+public:
+	a800_rom_adawliah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void binary_counter_access() override;
+};
 
 DECLARE_DEVICE_TYPE(A800_ROM_ULTRACART,       a800_rom_ultracart_device)
 DECLARE_DEVICE_TYPE(A800_ROM_BLIZZARD_32KB,   a800_rom_blizzard_32kb_device)
+DECLARE_DEVICE_TYPE(A800_ROM_ADAWLIAH,        a800_rom_adawliah_device)
 
 
 #endif // MAME_BUS_A800_ULTRACART_H

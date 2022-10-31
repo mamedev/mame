@@ -8,7 +8,7 @@ Atari A800/A5200/XEGS cart slot emulation
 
 References:
 - Altirra HW reference manual 2022-07-07 edition;
-- https://github.com/dmlloyd/atari800/blob/master/DOC/cart.txt
+- https://github.com/atari800/atari800/blob/master/DOC/cart.txt
 - https://www.atarimax.com/jindroush.atari.org/acarts.html
 
 **************************************************************************************************/
@@ -228,6 +228,7 @@ static const a800_slot slot_list[] =
 	{ SIC_512KB,      "sic_512kb" },
 	{ ATARIMAX_MAXFLASH_1MB, "maxflash_1mb" },
 	{ ATARIMAX_MAXFLASH_8MB, "maxflash_8mb" },
+	{ A800_ADAWLIAH,  "a800_adawliah" },
 	{ A800_8K_RIGHT,  "a800_8k_right" },
 	{ A5200_4K,       "a5200" },
 	{ A5200_8K,       "a5200" },
@@ -416,6 +417,9 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 			break;
 		case 56:
 			type = SIC_512KB;
+			break;
+		case 69:
+			type = A800_ADAWLIAH;
 			break;
 		// Atari 5200 CART files
 		case 4:

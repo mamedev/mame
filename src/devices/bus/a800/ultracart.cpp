@@ -13,6 +13,9 @@ bankswitch to the next index, disarms RD5 after bank 3, re-enables from bank 0 i
 "Blizzard 32KB" looks a derived design of Ultracart, it joins a binary counter with RD5 disarm
 once it goes past 3rd bank index.
 
+"aDawliah" scheme is again very similar but without any RD5 disarm (just loops back to index 0)
+PCB marking "A-NA0002"
+
 TODO:
 - exact interface with SN74LS169;
 
@@ -23,6 +26,7 @@ TODO:
 
 DEFINE_DEVICE_TYPE(A800_ROM_ULTRACART,     a800_rom_ultracart_device,     "a800_ultracart",    "Atari 800 64K ROM Carts Ultracart \"MicroCalc\"")
 DEFINE_DEVICE_TYPE(A800_ROM_BLIZZARD_32KB, a800_rom_blizzard_32kb_device, "a800_blizzard_32kb",    "Atari 800 Blizzard 32KB ROM cartridge")
+DEFINE_DEVICE_TYPE(A800_ROM_ADAWLIAH,      a800_rom_adawliah_device,      "a800_adawliah",    "Atari 800 aDawliah 32KB ROM cartridge")
 
 
 a800_rom_ultracart_device::a800_rom_ultracart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -108,4 +112,21 @@ inline void a800_rom_blizzard_32kb_device::binary_counter_access()
 	// it's unknown about how the binary counter behaves once this event occurs
 	if (m_bank & 0xc)
 		rd5_w(0);
+}
+
+/*-------------------------------------------------
+
+ aDawliah 32KB carts
+
+ -------------------------------------------------*/
+
+a800_rom_adawliah_device::a800_rom_adawliah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_ultracart_device(mconfig, A800_ROM_ADAWLIAH, tag, owner, clock)
+{
+}
+
+inline void a800_rom_adawliah_device::binary_counter_access()
+{
+	// TODO: simplification, the real counter has several config options
+	m_bank = (m_bank + 1) & 0x3;
 }
