@@ -180,6 +180,7 @@ protected:
 	void blackbox_em_map(address_map &map);
 	void blackbox_em_bellt_map(address_map &map);
 
+	bool m_buzzer_on;
 	bool m_in_extra_select[8];
 
 	optional_ioport m_in_extra;
@@ -732,7 +733,11 @@ void blackbox_em_state::out_lamps2_buzzer_w(offs_t offset, uint8_t data)
 
 	switch(bit)
 	{
-		case 5: if(state) m_samples->play(fruit_samples_device::SAMPLE_BUZZER); break;
+		case 5:
+		{
+			if(state && !m_buzzer_on) m_samples->play(fruit_samples_device::SAMPLE_BUZZER);
+			m_buzzer_on = state;
+		} break;
 		default: m_lamps[8 + bit] = state; break;
 	}
 }
