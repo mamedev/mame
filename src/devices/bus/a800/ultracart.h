@@ -11,6 +11,7 @@
 class a800_rom_ultracart_device : public a800_rom_device
 {
 public:
+	a800_rom_ultracart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	a800_rom_ultracart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void cart_map(address_map &map) override;
@@ -22,11 +23,23 @@ protected:
 
 	int m_bank;
 
-	void binary_counter_access();
+	virtual void binary_counter_access();
 	u8 config_bank_r(offs_t offset);
 	void config_bank_w(offs_t offset, u8 data);
 };
 
-DECLARE_DEVICE_TYPE(A800_ROM_ULTRACART,   a800_rom_ultracart_device)
+class a800_rom_blizzard_32kb_device : public a800_rom_ultracart_device
+{
+public:
+	a800_rom_blizzard_32kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void binary_counter_access() override;
+};
+
+
+DECLARE_DEVICE_TYPE(A800_ROM_ULTRACART,       a800_rom_ultracart_device)
+DECLARE_DEVICE_TYPE(A800_ROM_BLIZZARD_32KB,   a800_rom_blizzard_32kb_device)
+
 
 #endif // MAME_BUS_A800_ULTRACART_H

@@ -43,7 +43,7 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_turbo128", A800_ROM_TURBO);
 	device.option_add_internal("a800_tlink2",   A800_ROM_TELELINK2);
 	device.option_add_internal("a800_ultracart", A800_ROM_ULTRACART);
-//	device.option_add_internal("a800_blizzard_32kb", A800_ROM_BLIZZARD_32KB);
+	device.option_add_internal("a800_blizzard_32kb", A800_ROM_BLIZZARD_32KB);
 	device.option_add_internal("a800_atrax",    A800_ROM_ATRAX);
 	device.option_add_internal("a800_sparta",   A800_ROM_SPARTADOS);
 	// (#48-#49) SDX 64KB/128KB variants
@@ -52,11 +52,11 @@ static void a800_left(device_slot_interface &device)
 	// (#5) DB "Dave Bennett" homebrew cartridge, vaporware? cfr. https://forums.atariage.com/topic/307663-32k-db-cart/
 //	device.option_add_internal("a800_db",       A800_ROM_DB);
 	// (#47) "Atari Super Turbo" 32 KB Polish cart with exotic banking scheme (256 bytes at a time) that maps to CCTL
-//	device.option_add_internal("a800_ast",           A800_ROM_AST);
+//	device.option_add_internal("a800_ast",      A800_ROM_AST);
 	// TOOLBOX III / RAMBOX 2 Polish carts with additional 256KB RAM
 //	device.option_add_internal("a800_jrc",      A800_ROM_JRC);
 	// Czech cart, some kind of toolkit with bankswitch that rolls back after set time
-//	device.option_add_internal("a800_cos32",         A800_ROM_COS32);
+//	device.option_add_internal("a800_cos32",    A800_ROM_COS32);
 
 	device.option_add_internal("xegs",          XEGS_ROM);
 
