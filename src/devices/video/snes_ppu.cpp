@@ -796,10 +796,10 @@ void snes_ppu_device::update_line_mode7( uint16_t curline, uint8_t layer_idx )
 	int b = m_mode7.matrix_b;
 	int c = m_mode7.matrix_c;
 	int d = m_mode7.matrix_d;
-	int hcenter = (m_mode7.origin_x << 19) >> 19;
-	int vcenter = (m_mode7.origin_y << 19) >> 19;
-	int hoffset = (m_mode7.hor_offset << 19) >> 19;
-	int voffset = (m_mode7.ver_offset << 19) >> 19;
+	int hcenter = util::sext(m_mode7.origin_x, 13);
+	int vcenter = util::sext(m_mode7.origin_y, 13);
+	int hoffset = util::sext(m_mode7.hor_offset, 13);
+	int voffset = util::sext(m_mode7.ver_offset, 13);
 
 	uint32_t mosaic_counter = 1;
 	uint32_t mosaic_palette = 0;

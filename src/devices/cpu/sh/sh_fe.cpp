@@ -91,7 +91,7 @@ bool sh_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			[[fallthrough]]; // BSR is BRA with the addition of PR = the return address
 		case 10:    // BRA
 			{
-				int32_t disp = ((int32_t)opcode << 20) >> 20;
+				int32_t disp = util::sext(opcode, 12);
 
 				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 				desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
@@ -297,7 +297,7 @@ bool sh_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, u
 	case 11<< 8: // BF(opcode & 0xff);
 		desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 		desc.cycles = 3;
-		disp = ((int32_t)opcode << 24) >> 24;
+		disp = util::sext(opcode, 8);
 		desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
 		return true;
 
@@ -305,7 +305,7 @@ bool sh_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, u
 	case 15<< 8: // BFS(opcode & 0xff);
 		desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 		desc.cycles = 2;
-		disp = ((int32_t)opcode << 24) >> 24;
+		disp = util::sext(opcode, 8);
 		desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
 		desc.delayslots = 1;
 		return true;
