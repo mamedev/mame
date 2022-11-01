@@ -2,8 +2,13 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Atari Video Computer System digital joystick emulation with
-    boostergrip adapter
+    CBS Electronics Booster-Grip Joystick Adaptor
+
+    This peripheral device, which adds two extra buttons to an
+    ordinary single-button joystick, was packaged with the Atari 2600
+    version of Omega Race. CBS Electronics also advertised it as a
+    pack-in for their unreleased 2600 title Wings. Some other games
+    may support it as well.
 
 **********************************************************************/
 
@@ -16,7 +21,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(VCS_JOYSTICK_BOOSTER, vcs_joystick_booster_device, "vcs_joystick_booster", "Atari / CBM Digital joystick with Boostergrip")
+DEFINE_DEVICE_TYPE(VCS_JOYSTICK_BOOSTER, vcs_joystick_booster_device, "vcs_joystick_booster", "CBS Electronics Booster-Grip Joystick Adaptor")
 
 
 static INPUT_PORTS_START( vcs_joystick_booster )
