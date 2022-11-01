@@ -152,7 +152,7 @@ void emu_timer::adjust(attotime start_delay, s32 param, const attotime &period) 
 	// set the start and expire times
 	m_start = m_scheduler->time();
 	m_expire = m_start + start_delay;
-	m_enabled = true;
+	m_enabled = !m_expire.is_never();
 	m_period = period;
 
 	// remove and re-insert the timer in its new order

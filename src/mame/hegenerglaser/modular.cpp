@@ -245,7 +245,7 @@ u8 mmodular_state::bavaria2_r()
 
 	// d7: busy signal
 	// other: unused?
-	return m_bav_busy->running() ? 0x80 : 0;
+	return m_bav_busy->enabled() ? 0x80 : 0;
 }
 
 

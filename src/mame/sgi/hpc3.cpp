@@ -524,7 +524,7 @@ void hpc3_device::hd_enet_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		else
 			m_enet_tx_ctrl = (m_enet_tx_ctrl & (TXC_LC | TXC_ST)) | (data & ~((TXC_LC | TXC_ST)));
 
-		if ((m_enet_tx_ctrl & TXC_CA) && !m_enet_tx_timer->running())
+		if ((m_enet_tx_ctrl & TXC_CA) && !m_enet_tx_timer->enabled())
 			m_enet_tx_timer->adjust(attotime::zero);
 		break;
 	case 0x7008/4:

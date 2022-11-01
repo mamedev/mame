@@ -97,7 +97,6 @@ public:
 	}
 
 	// timing information
-	bool running() const { return m_timer->running(); }
 	attotime elapsed() const { return m_timer->elapsed(); }
 	attotime remaining() const { return m_timer->remaining(); }
 	attotime start() const { return m_timer->start(); }

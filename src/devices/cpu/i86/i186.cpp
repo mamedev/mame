@@ -1330,7 +1330,7 @@ void i80186_cpu_device::internal_timer_sync(int which)
 	timer_state *t = &m_timer[which];
 
 	/* if we have a timing timer running, adjust the count */
-	if ((t->control & 0x8000) && !(t->control & 0x0c) && t->int_timer->running())
+	if ((t->control & 0x8000) && !(t->control & 0x0c) && t->int_timer->enabled())
 		t->count = ((t->control & 0x1000) ? t->maxB : t->maxA) - t->int_timer->remaining().as_ticks(clock() / 8);
 }
 
@@ -1450,7 +1450,7 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 	/* update the interrupt timer */
 	if (update_int_timer)
 	{
-		if ((t->control & 0x8004) == 0x8000 && (!(t->control & 0x10) || t->int_timer->running()))
+		if ((t->control & 0x8004) == 0x8000 && (!(t->control & 0x10) || t->int_timer->enabled()))
 		{
 			int diff = ((t->control & 0x1000) ? t->maxB : t->maxA) - t->count;
 			if (diff <= 0)

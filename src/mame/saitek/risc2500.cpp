@@ -229,7 +229,7 @@ void risc2500_state::install_bootrom(bool enable)
 u32 risc2500_state::disable_boot_rom_r()
 {
 	// disconnect bootrom from the bus after next opcode
-	if (m_bootrom_enabled && !m_disable_bootrom->running() && !machine().side_effects_disabled())
+	if (m_bootrom_enabled && !m_disable_bootrom->enabled() && !machine().side_effects_disabled())
 		m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(10));
 
 	return 0;

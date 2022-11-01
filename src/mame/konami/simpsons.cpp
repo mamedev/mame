@@ -177,7 +177,7 @@ void simpsons_state::z80_arm_nmi_w(uint8_t data)
 
 void simpsons_state::z80_nmi_w(int state)
 {
-	if (state && !m_nmi_blocked->running())
+	if (state && !m_nmi_blocked->enabled())
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 

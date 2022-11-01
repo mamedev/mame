@@ -2177,7 +2177,7 @@ void apple2e_state::laserprn_w(u8 data)
 
    // generate strobe pulse after one clock cycle
 	m_next_strobe = 0U;
-	if (!m_strobe_timer->running())
+	if (!m_strobe_timer->enabled())
 	{
 	   m_strobe_timer->adjust(attotime::from_hz(1021800));
 	}
