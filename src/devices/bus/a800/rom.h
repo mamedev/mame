@@ -18,7 +18,7 @@ class a800_rom_device : public device_t,
 public:
 	a800_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t read_80xx(offs_t offset) override;
+	virtual void cart_map(address_map &map) override;
 
 protected:
 	a800_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

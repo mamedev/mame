@@ -9,11 +9,11 @@
 #include "rom.h"
 #include "machine/intelfsh.h"
 
-class a800_maxflash_1mb_device : public a800_rom_device
+class a800_maxflash_128kb_device : public a800_rom_device
 {
 public:
-	a800_maxflash_1mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	a800_maxflash_1mb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	a800_maxflash_128kb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a800_maxflash_128kb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void cart_map(address_map &map) override;
 	virtual void cctl_map(address_map &map) override;
@@ -35,10 +35,10 @@ private:
 	int m_bank;
 };
 
-class a800_maxflash_8mb_device : public a800_maxflash_1mb_device
+class a800_maxflash_1mb_device : public a800_maxflash_128kb_device
 {
 public:
-	a800_maxflash_8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	a800_maxflash_1mb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void cctl_map(address_map &map) override;
 
@@ -46,7 +46,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
+DECLARE_DEVICE_TYPE(A800_MAXFLASH_128KB, a800_maxflash_128kb_device)
 DECLARE_DEVICE_TYPE(A800_MAXFLASH_1MB, a800_maxflash_1mb_device)
-DECLARE_DEVICE_TYPE(A800_MAXFLASH_8MB, a800_maxflash_8mb_device)
 
 #endif // MAME_BUS_A800_MAXFLASH_H

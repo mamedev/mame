@@ -49,18 +49,6 @@ a5200_rom_bbsb_device::a5200_rom_bbsb_device(const machine_config &mconfig, cons
 {
 }
 
-
-
-
-void a800_rom_device::device_start()
-{
-}
-
-void a800_rom_device::device_reset()
-{
-}
-
-
 void xegs_rom_device::device_start()
 {
 	save_item(NAME(m_bank));
@@ -97,9 +85,21 @@ void a5200_rom_bbsb_device::device_reset()
 
  -------------------------------------------------*/
 
-uint8_t a800_rom_device::read_80xx(offs_t offset)
+void a800_rom_device::device_start()
 {
-	return m_rom[offset & (m_rom_size - 1)];
+}
+
+void a800_rom_device::device_reset()
+{
+	rd4_w(0);
+	rd5_w(1);
+}
+
+void a800_rom_device::cart_map(address_map &map)
+{
+	map(0x2000, 0x3fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[offset & (m_rom_size - 1)]; })
+	);
 }
 
 /*-------------------------------------------------

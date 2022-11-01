@@ -227,8 +227,8 @@ static const a800_slot slot_list[] =
 	{ SIC_128KB,      "sic_128kb" },
 	{ SIC_256KB,      "sic_256kb" },
 	{ SIC_512KB,      "sic_512kb" },
+	{ ATARIMAX_MAXFLASH_128KB, "maxflash_128kb" },
 	{ ATARIMAX_MAXFLASH_1MB, "maxflash_1mb" },
-	{ ATARIMAX_MAXFLASH_8MB, "maxflash_8mb" },
 	{ A800_ADAWLIAH,  "a800_adawliah" },
 	{ A800_8K_RIGHT,  "a800_8k_right" },
 	{ A5200_4K,       "a5200" },
@@ -393,10 +393,10 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 			type = A800_BLIZZARD;
 			break;
 		case 41:
-			type = ATARIMAX_MAXFLASH_1MB;
+			type = ATARIMAX_MAXFLASH_128KB;
 			break;
 		case 42:
-			type = ATARIMAX_MAXFLASH_8MB;
+			type = ATARIMAX_MAXFLASH_1MB;
 			break;
 		case 43:
 			type = A800_SPARTADOS_128KB;

@@ -2071,9 +2071,14 @@ uint8_t a1200xl_state::djoy_b_r()
 		if (!m_ctrl[i].found() || BIT(m_ctrl[i]->read_joy(), 5))
 			b |= 1 << i;
 
-	// TODO: (0) for XEGS keyboard disconnected, always 1 otherwise
+	// TODO: TRIG2 (0) for XEGS keyboard disconnected, always 1 otherwise
 	b |= 1 << 2;
-	b |= m_cart_rd5_enabled << 3;
+	// TODO: should be like this but maxflash carts won't boot once you select any item
+	// This is also necessary by:
+	// - SDX boot (will hang in kernel if this is 0)
+	// - a1200xl cart boot
+//	b |= m_cart_rd5_enabled << 3;
+	b |= m_cartleft->exists() << 3;
 
 	return b;
 }

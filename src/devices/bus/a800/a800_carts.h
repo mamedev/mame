@@ -65,9 +65,8 @@ static void a800_left(device_slot_interface &device)
 	// flash carts
 	device.option_add_internal("a800_corina",   A800_ROM_CORINA);
 	device.option_add_internal("a800_corina_sram", A800_ROM_CORINA_SRAM);
-	// TODO: rename these two (values are in megabits)
+	device.option_add(         "maxflash_128kb",  A800_MAXFLASH_128KB);
 	device.option_add(         "maxflash_1mb",  A800_MAXFLASH_1MB);
-	device.option_add(         "maxflash_8mb",  A800_MAXFLASH_8MB);
 	// (#61) MegaMax, has switch that toggles between Atarimax 1MB mode and 2MB
 //	device.option_add(         "megamax",       A800_MEGAMAX);
 	device.option_add(         "sic_128kb",     A800_SIC_128KB);
