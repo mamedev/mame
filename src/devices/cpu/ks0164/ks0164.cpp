@@ -100,7 +100,7 @@ void ks0164_cpu_device::state_string_export(const device_state_entry &entry, std
 
 void ks0164_cpu_device::handle_irq()
 {
-	u16 mask = m_irq & util::make_bitmask<u16>(m_r[R_PSW] & 15);
+	u16 mask = m_irq & util::make_bitmask<u16>((m_r[R_PSW] & 15) + 1);
 	if(mask) {
 		int index;
 		for(index = 0; !(mask & (1 << index)); index ++);
