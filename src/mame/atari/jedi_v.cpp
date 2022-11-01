@@ -168,7 +168,7 @@ void jedi_state::draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle 
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x += 2)
 		{
-			u16 tx_col1, tx_col2, bg_col;
+			u16 tx_col1, tx_col2, bg_col = 0;
 
 			const int sy = y + m_vscroll;
 			int sx = x + m_hscroll;
