@@ -950,8 +950,8 @@ void vs_dual_state::vsdual_vrom_banking(u8 data)
 	m_chr_banks[Side]->set_entry(BIT(data, 2));
 
 	// bit 1 ( data & 2 ) triggers irq on the other cpu
-	auto cpu = (Side == SUB) ? m_maincpu : m_subcpu;
-	cpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+	auto &cpu = (Side == SUB) ? *m_maincpu : *m_subcpu;
+	cpu.set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
 	// move along
 	vsnes_in0_w<Side>(data);
