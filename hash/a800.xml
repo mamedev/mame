@@ -2034,7 +2034,8 @@ Bottom GFX text box doesn't mask properly, also flickers
 		<year>1989</year>
 		<publisher>Reeve Software</publisher>
 		<notes><![CDATA[
-Continously prints "BOOT ERROR"
+Unresponsive with mouse, doesn't key repeat with joy option, can't go up/down
+Ugly to look at without [ANTIC] television artifacts
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_diamond" />
@@ -2044,19 +2045,20 @@ Continously prints "BOOT ERROR"
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="diamond paint.atr" size="92176" crc="d2994282" sha1="be83a0baca0f6b588e1a88a1e7d48a5ff09c2287"/>
+				<rom name="diamond utilities.atr" size="92176" crc="bb48082d" sha1="eb7ddc124960e0922be1ec426b2e98cffaa084e4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="diamond write.atr" size="92176" crc="e1e5b235" sha1="c3c2beb2f9acecb0068281ac77735f44f4988db5"/>
+				<rom name="diamond paint.atr" size="92176" crc="d2994282" sha1="be83a0baca0f6b588e1a88a1e7d48a5ff09c2287"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="diamond utilities.atr" size="92176" crc="bb48082d" sha1="eb7ddc124960e0922be1ec426b2e98cffaa084e4"/>
+				<rom name="diamond write.atr" size="92176" crc="e1e5b235" sha1="c3c2beb2f9acecb0068281ac77735f44f4988db5"/>
 			</dataarea>
 		</part>
+
 	</software>
 
 	<software name="diamond" cloneof="diamond3" supported="no">
@@ -5987,17 +5989,25 @@ Requires PLATO dial-up modem connection
 		</part>
 	</software>
 
-	<software name="writerd" supported="no">
-		<description>The Writer's Tool (Dongle)</description>
+	<software name="writerd">
+		<description>The Writer's Tool</description>
 		<year>1985</year>
 		<publisher>OSS</publisher>
-		<notes><![CDATA[
-This cartridge requires the Writer's Tool disk software. It's basic function appears to be as a copy protection dongle for the disk software.
-]]></notes>
+		<!-- cart inserted just acts as a dongle, SW runs over the floppies -->
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="the writer's tool.rom" size="8192" crc="13bcf201" sha1="7de7b160c60f162b19f45789db07ddfd13836da2"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="writer's tool extension.atr" size="92176" crc="5a6e2133" sha1="c6d4c49fb53a41b28634b209176c74ed86fbfc64"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="writer's tool dictionary.atr" size="92176" crc="18c875b0" sha1="7c727bcc488892dfd83cfbc09b3e1e642d1beff9"/>
 			</dataarea>
 		</part>
 	</software>
