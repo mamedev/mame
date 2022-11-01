@@ -215,6 +215,7 @@ static const a800_slot slot_list[] =
 	{ A800_WILLIAMS,  "a800_williams" },
 	{ A800_EXPRESS,   "a800_express" },
 	{ A800_SPARTADOS, "a800_sparta" },
+	{ A800_SPARTADOS_128KB, "a800_sparta_128kb" },
 	{ A800_TURBO64,   "a800_turbo64" },
 	{ A800_TURBO128,  "a800_turbo128" },
 	{ A800_BLIZZARD,  "a800_blizzard" },
@@ -396,6 +397,9 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 			break;
 		case 42:
 			type = ATARIMAX_MAXFLASH_8MB;
+			break;
+		case 43:
+			type = A800_SPARTADOS_128KB;
 			break;
 		case 44:
 			type = A800_OSS8K;

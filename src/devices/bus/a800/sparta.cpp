@@ -4,6 +4,8 @@
 
  A800 SpartaDOS X (SDX) cart emulation
 
+https://sdx.atari8.info/index.php?show=en_introduction
+
 SDX 128KB a newer format used by the 200x releases: adds an extra bank access to $d5f0-$d5f7.
 Should mirror $e8-$ef to $fx by logic.
 
@@ -36,12 +38,14 @@ a800_rom_spartados_device::a800_rom_spartados_device(const machine_config &mconf
 
 
 // TODO: needs smart way to avoid a cyclic import from a800_carts.h
-#include "corina.h"
+// NB: game carts will usually override SDX boot, meaning that they aren't all that useful to hook up here.
+#include "rtime8.h"
 
 static void spartados_carts(device_slot_interface &device)
 {
-	device.option_add_internal("a800_corina",   A800_ROM_CORINA);
-	device.option_add_internal("a800_corina_sram", A800_ROM_CORINA_SRAM);
+//	device.option_add_internal("a800_corina",   A800_ROM_CORINA);
+//	device.option_add_internal("a800_corina_sram", A800_ROM_CORINA_SRAM);
+	device.option_add(         "rtime8",        A800_RTIME8);
 }
 
 WRITE_LINE_MEMBER( a800_rom_spartados_device::subcart_rd4_w )

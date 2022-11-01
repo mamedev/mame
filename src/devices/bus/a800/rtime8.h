@@ -17,12 +17,11 @@ class a800_rtime8_device : public device_t, public device_a800_cart_interface
 public:
 	a800_rtime8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual void cctl_map(address_map &map) override;
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-
-	virtual u8 read_d5xx(offs_t offset) override;
-	virtual void write_d5xx(offs_t offset, u8 data) override;
 
 private:
 	required_device<m3002_device> m_rtc;
