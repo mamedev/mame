@@ -306,6 +306,8 @@ protected:
 			m_ram->pointer()[memory_offset] = data;
 	}
 
+	virtual uint8_t djoy_b_r();
+
 private:
 	void a400_palette(palette_device &palette) const;
 
@@ -315,7 +317,6 @@ private:
 	void djoy_0_1_w(uint8_t data);
 	uint8_t djoy_2_3_r();
 	void djoy_2_3_w(uint8_t data);
-	uint8_t djoy_b_r();
 
 	uint8_t read_d5xx(offs_t offset);    // at least one cart type can enable/disable roms when reading
 	void disable_cart(offs_t offset, uint8_t data);
@@ -402,6 +403,7 @@ protected:
 	memory_view m_selftest_view;
 
 	virtual void portb_cb(uint8_t data);
+	virtual uint8_t djoy_b_r() override;
 
 	void selftest_map(memory_view::memory_view_entry &block, bool is_rom_mapping);
 private:
@@ -2059,6 +2061,20 @@ uint8_t a400_state::djoy_b_r()
 	for (int i = 0; i < 4; i++)
 		if (!m_ctrl[i].found() || BIT(m_ctrl[i]->read_joy(), 5))
 			b |= 1 << i;
+	return b;
+}
+
+uint8_t a1200xl_state::djoy_b_r()
+{
+	uint8_t b = 0;
+	for (int i = 0; i < 2; i++)
+		if (!m_ctrl[i].found() || BIT(m_ctrl[i]->read_joy(), 5))
+			b |= 1 << i;
+
+	// TODO: (0) for XEGS keyboard disconnected, always 1 otherwise
+	b |= 1 << 2;
+	b |= m_cart_rd5_enabled << 3;
+
 	return b;
 }
 

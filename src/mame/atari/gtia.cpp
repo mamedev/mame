@@ -317,12 +317,13 @@ void gtia_device::button_interrupt(int button_count)
 	}
 
 	/* button registers for xl/xe */
+	// these don't really unregister on latch but are instant
 	if (button_count == 2)
 	{
 		// TRIG2: unused on xl/xe (1), xegs keyboard (1) connected (0) disconnected
-		m_r.but[2] = 1;
+		m_r.but[2] = BIT(button_port, 2);
 		// TRIG3: RD5 external cart readback (1) present (0) disabled thru bankswitch or absent
-		m_r.but[3] = 0;
+		m_r.but[3] = BIT(button_port, 3);
 	}
 
 }
