@@ -47,6 +47,7 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_adawliah", A800_ROM_ADAWLIAH);
 	device.option_add_internal("a800_atrax",    A800_ROM_ATRAX);
 	device.option_add_internal("a800_sparta",   A800_ROM_SPARTADOS);
+	device.option_add_internal("a800_sparta_128kb",   A800_ROM_SPARTADOS_128KB);
 	// (#48-#49 / #68) SDX 64KB/128KB variants
 //	device.option_add_internal("a800_sdx_atrax_64kb", A800_ROM_SDX_ATRAX_64KB);
 //	device.option_add_internal("a800_sdx_atrax_128kb", A800_ROM_SDX_ATRAX_128KB);
@@ -83,6 +84,8 @@ static void a800_left(device_slot_interface &device)
 //	device.option_add(         "side3",         A800_SIDE3);
 	// STM32 coprocessor with SD card, cfr. https://github.com/robinhedwards/UnoCart
 //	device.option_add(         "unocart",       A800_UNOCART);
+	// earlier variant of above running on FPGA, cfr. https://github.com/robinhedwards/UltimateCart
+//	device.option_add(         "ultimatecart",  A800_ULTIMATECART);
 	// (#62 / #65) The!Cart, 32/64/128MB + 512KB RAM, emulation modes
 //	device.option_add(         "thecart",       A800_THECART);
 
@@ -100,6 +103,9 @@ static void a800_left(device_slot_interface &device)
 //	device.option_add(         "pill",          A800_PILL);
 	// Thompson Proburner, EPROM burner
 //	device.option_add(         "proburner",     A800_PROBURNER);
+	// The Multiplexer! (MUX!), PBI bus between 1 master and 8 slaves
+	// cfr. https://sdx.atari8.info/sdx_files/muxsdx.txt & http://realdos.net/mux.html
+//	device.option_add(         "mux",           A800_MUX);
 }
 
 static void a800_right(device_slot_interface &device)
@@ -107,11 +113,14 @@ static void a800_right(device_slot_interface &device)
 	device.option_add_internal("a800_8k_right", A800_ROM);
 }
 
+// TODO: is it really not possible to just use the same i/f as a800?
 static void xegs_carts(device_slot_interface &device)
 {
 	device.option_add_internal("xegs",          XEGS_ROM);
 	// "XEGS demo cartridge", 4 games in 1 with binary counter applied at reset for each reboot
 //	device.option_add_internal("xegs_demo",     XEGS_ROM_DEMO);
+	// (#33-#38) Carts sold by Nir Dary in the '90s, has fixed last bank to RD5 and selectable RD4 bank. 32KB to 1MB ROM size options
+//	device.option_add_internal("xegs_switch",   XEGS_ROM_SWITCHABLE);
 }
 
 static void a5200_carts(device_slot_interface &device)

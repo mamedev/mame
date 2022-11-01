@@ -5312,7 +5312,7 @@ Glitched rows, glitched gear GFX
 		<year>2006</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.39rc.rom" size="131072" crc="a3ec2e58" sha1="79ad6acd8a61fdcbf427d098c77d84282110a6ef"/>
 			</dataarea>
@@ -5324,7 +5324,7 @@ Glitched rows, glitched gear GFX
 		<year>2008</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.41.rom" size="131072" crc="687c7a15" sha1="12fc71f8437528117079fff777838b7193d38fcc"/>
 			</dataarea>
@@ -5336,7 +5336,7 @@ Glitched rows, glitched gear GFX
 		<year>2008</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.42.rom" size="131072" crc="0b4bcfc5" sha1="663fef048ddd76316dd193023c560631b161257b"/>
 			</dataarea>
@@ -5348,7 +5348,7 @@ Glitched rows, glitched gear GFX
 		<year>2011</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.43.rom" size="131072" crc="48be5d1e" sha1="d0579bc19d0fa8938d1557924c2e1c3b968e02e7"/>
 			</dataarea>
@@ -5360,7 +5360,7 @@ Glitched rows, glitched gear GFX
 		<year>2011</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.44.rom" size="131072" crc="337516b0" sha1="99518cab315b564b2f7621d6969709bf7ee7c5af"/>
 			</dataarea>
@@ -5372,7 +5372,7 @@ Glitched rows, glitched gear GFX
 		<year>2011</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.45.rom" size="131072" crc="df4520c1" sha1="d7ae9dc6c7a5dbf3890be0a6a66c5cc0501a6ca9"/>
 			</dataarea>
@@ -5384,7 +5384,7 @@ Glitched rows, glitched gear GFX
 		<year>2013</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.46.rom" size="131072" crc="3254ee87" sha1="0123f640f56ef4be1bdabe3643770b72d4b0f396"/>
 			</dataarea>
@@ -5396,7 +5396,7 @@ Glitched rows, glitched gear GFX
 		<year>2015</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.47.rom" size="131072" crc="fb0fa6d7" sha1="2bd2ad3ea6c4d5bad6042f42f75edeee555d4fdc"/>
 			</dataarea>

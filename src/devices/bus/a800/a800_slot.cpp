@@ -7,7 +7,7 @@ Atari A800/A5200/XEGS cart slot emulation
 <fill me>
 
 References:
-- Altirra HW reference manual 2022-07-07 edition;
+- Altirra HW reference manual 2022-07-07 edition, chapter 8;
 - https://github.com/atari800/atari800/blob/master/DOC/cart.txt
 - https://www.atarimax.com/jindroush.atari.org/acarts.html
 
