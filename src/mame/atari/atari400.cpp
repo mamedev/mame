@@ -7,8 +7,6 @@
     Juergen Buchmueller, June 1998
 
     TODO (generic):
-    - modernize memory maps;
-    - modernize cart handling;
     - add cassette support;
     - add floppy .atx support;
     - Investigate supported RAM sizes and OS versions in different models;
@@ -16,14 +14,11 @@
     - Freddy emulation for 800XLF?
     - Add support for proto boards and expansions (a1400xl, C/PM board, etc.)
     - a130xe: support extended bank readback for Antic;
-    - a1200xl: boots to self-test ROM the first time around, fixes on
-      soft reset;
     - a1200xl: requires reading TRIG3 high for detecting a cart inserted,
       depends on above;
-    - a600xl, a800xl, a1200xl: crashes on MMU test in Acid800;
-    - eventually support unofficial mod for dual Pokey,
-      either make it a specific franken-machine with a130xe as base or use
-      slots.
+    - a600xl, a1200xl: crashes on MMU test in Acid800;
+	- slot support for PBI/ECI bus;
+    - slot support for overlay DYI HW mods (i.e. dual Pokey, Ultimate1MB, Covox, VBXE)
 
     2009-05 FP changes:
      Factored out MESS specific code from MAME

@@ -45,8 +45,8 @@ a800_rom_spartados_device::a800_rom_spartados_device(const machine_config &mconf
 
 static void spartados_carts(device_slot_interface &device)
 {
-//	device.option_add_internal("a800_corina",   A800_ROM_CORINA);
-//	device.option_add_internal("a800_corina_sram", A800_ROM_CORINA_SRAM);
+//  device.option_add_internal("a800_corina",   A800_ROM_CORINA);
+//  device.option_add_internal("a800_corina_sram", A800_ROM_CORINA_SRAM);
 	device.option_add_internal("a800_8k",       A800_ROM);
 	device.option_add(         "rtime8",        A800_RTIME8);
 	device.option_add(         "maxflash_128kb",  A800_MAXFLASH_128KB);

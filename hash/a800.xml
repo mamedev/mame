@@ -512,7 +512,7 @@ Align test never completes, burn-in test requires a test disk and writing to flo
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="action programming language v3.6 (alt).rom" size="16384" crc="eb905cb4" sha1="a9db2200bda7980436461e2d48d02f2a3f3b54ac"/> <!-- Verified -->
+				<rom name="action programming language v3.6 (alt).rom" size="16384" crc="eb905cb4" sha1="a9db2200bda7980436461e2d48d02f2a3f3b54ac" status="baddump"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1128,7 +1128,7 @@ https://forums.atariage.com/topic/169199-mess-a800-cartridge-software-list/#comm
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="basic xl programming language v1.02.rom" size="16384" crc="e8b3fc3c" sha1="d43bea60d15aa7ad41e074396dfe5019e8415353"/> <!-- Verified -->
+				<rom name="basic xl programming language v1.02.rom" size="16384" crc="e8b3fc3c" sha1="d43bea60d15aa7ad41e074396dfe5019e8415353" status="baddump" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3447,7 +3447,7 @@ Offset sprites on specific rows [GTIA] mixing
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="mac-65 macro assembler v1.02.rom" size="16384" crc="51931a08" sha1="48e5d5e71d6c7b00f9429e90ef7514d3226a2bcf"/>
+				<rom name="mac-65 macro assembler v1.02.rom" size="16384" crc="51931a08" sha1="48e5d5e71d6c7b00f9429e90ef7514d3226a2bcf" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5418,7 +5418,7 @@ https://forums.atariage.com/topic/146490-spectraview-1-and-2-info/
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="spectraview-ii v201 (198x)(display systems international).rom" size="16384" crc="77c75598" sha1="e7e8d8919c420770bde5da39cbb47d9d1e89a40b"/>
+				<rom name="spectraview-ii v201 (198x)(display systems international).rom" size="16384" crc="77c75598" sha1="e7e8d8919c420770bde5da39cbb47d9d1e89a40b" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

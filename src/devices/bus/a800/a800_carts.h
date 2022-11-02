@@ -35,7 +35,7 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_oss043m",  A800_ROM_OSS43);
 	device.option_add_internal("a800_ossm091",  A800_ROM_OSS91);
 	// OSS cart with subslot
-//	device.option_add_internal("a800_mddos",    A800_ROM_MDDOS);
+//  device.option_add_internal("a800_mddos",    A800_ROM_MDDOS);
 	device.option_add_internal("a800_williams", A800_ROM_WILLIAMS);
 	device.option_add_internal("a800_diamond",  A800_ROM_DIAMOND);
 	device.option_add_internal("a800_express",  A800_ROM_EXPRESS);
@@ -49,16 +49,16 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_sparta",   A800_ROM_SPARTADOS);
 	device.option_add_internal("a800_sparta_128kb",   A800_ROM_SPARTADOS_128KB);
 	// (#48-#49 / #68) SDX 64KB/128KB variants
-//	device.option_add_internal("a800_sdx_atrax_64kb", A800_ROM_SDX_ATRAX_64KB);
-//	device.option_add_internal("a800_sdx_atrax_128kb", A800_ROM_SDX_ATRAX_128KB);
+//  device.option_add_internal("a800_sdx_atrax_64kb", A800_ROM_SDX_ATRAX_64KB);
+//  device.option_add_internal("a800_sdx_atrax_128kb", A800_ROM_SDX_ATRAX_128KB);
 	// (#5) DB "Dave Bennett" homebrew cartridge, vaporware? cfr. https://forums.atariage.com/topic/307663-32k-db-cart/
-//	device.option_add_internal("a800_db",       A800_ROM_DB);
+//  device.option_add_internal("a800_db",       A800_ROM_DB);
 	// (#47) "Atari Super Turbo" 32 KB Polish cart with exotic banking scheme (256 bytes at a time) that maps to CCTL
-//	device.option_add_internal("a800_ast",      A800_ROM_AST);
+//  device.option_add_internal("a800_ast",      A800_ROM_AST);
 	// TOOLBOX III / RAMBOX 2 Polish carts with additional 256KB RAM
-//	device.option_add_internal("a800_jrc",      A800_ROM_JRC);
+//  device.option_add_internal("a800_jrc",      A800_ROM_JRC);
 	// Czech cart, some kind of toolkit with bankswitch that rolls back after set time
-//	device.option_add_internal("a800_cos32",    A800_ROM_COS32);
+//  device.option_add_internal("a800_cos32",    A800_ROM_COS32);
 
 	device.option_add_internal("xegs",          XEGS_ROM);
 
@@ -68,43 +68,43 @@ static void a800_left(device_slot_interface &device)
 	device.option_add(         "maxflash_128kb",  A800_MAXFLASH_128KB);
 	device.option_add(         "maxflash_1mb",  A800_MAXFLASH_1MB);
 	// (#61) MegaMax, has switch that toggles between Atarimax 1MB mode and 2MB
-//	device.option_add(         "megamax",       A800_MEGAMAX);
+//  device.option_add(         "megamax",       A800_MEGAMAX);
 	device.option_add(         "sic_128kb",     A800_SIC_128KB);
 	device.option_add(         "sic_256kb",     A800_SIC_256KB);
 	device.option_add(         "sic_512kb",     A800_SIC_512KB);
 	// (#26-#32 / #63-#64) MegaCart 16KB up to 4MB variant too
-//	device.option_add(         "megacart",      A800_MEGACART);
+//  device.option_add(         "megacart",      A800_MEGACART);
 	// Atarimax MyIDE-II, 512 KB flash ROM + 512 KB RAM + CompactFlash i/f, requires DIY MyBIOS ROM installation into main system
-//	device.option_add(         "myideii",       A800_MYIDE_II);
+//  device.option_add(         "myideii",       A800_MYIDE_II);
 	// 512KB flash + CompactFlash, emulates a Sparta DOS X, has DS1305 RTC hooked up thru SPI bus, SIDE 2 is an upgraded variant with slightly different CCTL mapping
-//	device.option_add(         "side1",         A800_SIDE1);
-//	device.option_add(         "side2",         A800_SIDE2);
+//  device.option_add(         "side1",         A800_SIDE1);
+//  device.option_add(         "side2",         A800_SIDE2);
 	// Upgrades SIDE 2 with SD card instead of CF, MX29LV640ET NOR flash chip, 2MB RAM, DMA with various OPs, ROM bank emulation modes with relocatable CCTL ...
-//	device.option_add(         "side3",         A800_SIDE3);
+//  device.option_add(         "side3",         A800_SIDE3);
 	// STM32 coprocessor with SD card, cfr. https://github.com/robinhedwards/UnoCart
-//	device.option_add(         "unocart",       A800_UNOCART);
+//  device.option_add(         "unocart",       A800_UNOCART);
 	// earlier variant of above running on FPGA, cfr. https://github.com/robinhedwards/UltimateCart
-//	device.option_add(         "ultimatecart",  A800_ULTIMATECART);
+//  device.option_add(         "ultimatecart",  A800_ULTIMATECART);
 	// (#62 / #65) The!Cart, 32/64/128MB + 512KB RAM, emulation modes
-//	device.option_add(         "thecart",       A800_THECART);
+//  device.option_add(         "thecart",       A800_THECART);
 
 	// non-ROM types
 	device.option_add(         "rtime8",        A800_RTIME8);
 	// adds extra 65C816 coprocessor. No firmware, runs on code uploaded by main CPU, also two rev variants (V1 and V2)
-//	device.option_add(         "veronica",      A800_VERONICA);
+//  device.option_add(         "veronica",      A800_VERONICA);
 	// 128 or 256 KB additional RAM, schematics available at atarimax
-//	device.option_add(         "ramcart",       A800_RAM_CART);
+//  device.option_add(         "ramcart",       A800_RAM_CART);
 	// converts analog mono sound to digital by reading $d500 low 4 bitset
-//	device.option_add(         "ad_converter",  A800_AD_CONVERTER);
+//  device.option_add(         "ad_converter",  A800_AD_CONVERTER);
 	// multiply/divide math unit (unknown chip type, scratched on PCB), used by "Assault Force" floppy disk
-//	device.option_add(         "supercharger",  A800_SUPER_CHARGER);
+//  device.option_add(         "supercharger",  A800_SUPER_CHARGER);
 	// The PILL! / Super PILL! / Super Cart with RD4/RD5 held high and that's about it (lolwut)
-//	device.option_add(         "pill",          A800_PILL);
+//  device.option_add(         "pill",          A800_PILL);
 	// Thompson Proburner, EPROM burner
-//	device.option_add(         "proburner",     A800_PROBURNER);
+//  device.option_add(         "proburner",     A800_PROBURNER);
 	// The Multiplexer! (MUX!), PBI bus between 1 master and 8 slaves
 	// cfr. https://sdx.atari8.info/sdx_files/muxsdx.txt & http://realdos.net/mux.html
-//	device.option_add(         "mux",           A800_MUX);
+//  device.option_add(         "mux",           A800_MUX);
 }
 
 static void a800_right(device_slot_interface &device)
@@ -117,9 +117,9 @@ static void xegs_carts(device_slot_interface &device)
 {
 	device.option_add_internal("xegs",          XEGS_ROM);
 	// "XEGS demo cartridge", 4 games in 1 with binary counter applied at reset for each reboot
-//	device.option_add_internal("xegs_demo",     XEGS_ROM_DEMO);
+//  device.option_add_internal("xegs_demo",     XEGS_ROM_DEMO);
 	// (#33-#38) Carts sold by Nir Dary in the '90s, has fixed last bank to RD5 and selectable RD4 bank. 32KB to 1MB ROM size options
-//	device.option_add_internal("xegs_switch",   XEGS_ROM_SWITCHABLE);
+//  device.option_add_internal("xegs_switch",   XEGS_ROM_SWITCHABLE);
 }
 
 static void a5200_carts(device_slot_interface &device)
@@ -128,7 +128,7 @@ static void a5200_carts(device_slot_interface &device)
 	device.option_add_internal("a5200_2chips",  A5200_ROM_2CHIPS);
 	device.option_add_internal("a5200_bbsb",    A5200_ROM_BBSB);
 	// (#71-#74) Bryan Edewaard's "Super Cart"
-//	device.option_add_internal("a5200_supercart", A5200_ROM_SUPERCART);
+//  device.option_add_internal("a5200_supercart", A5200_ROM_SUPERCART);
 }
 
 #endif // MAME_BUS_A800_A800_CARTS_H
