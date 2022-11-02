@@ -2381,6 +2381,7 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+<!-- An earlier development version, v1.05, with CRC AE1117DD does not run correctly on real hardware. On hardware and in MAME neither the player nor wasp sprites are displayed, though the game logic otherwise seems to run. -->
 	<software name="wasp">
 		<description>Wasp!</description>
 		<year>2009</year>
