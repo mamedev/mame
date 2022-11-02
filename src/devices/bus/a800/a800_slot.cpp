@@ -534,7 +534,7 @@ std::string xegs_cart_slot_device::get_default_card_software(get_default_card_so
 		hook.image_file()->length(len); // FIXME: check error return
 
 		// check whether there is an header, to identify the cart type
-		int type = A800_8K;
+		int type = A800_XEGS;
 		if ((len % 0x1000) == 0x10)
 		{
 			size_t actual;
@@ -598,6 +598,7 @@ void a800_cart_slot_device::write_cctl(offs_t offset, uint8_t data)
 	m_space_io->write_byte(offset, data);
 }
 
+// TODO: legacy stuff below this point, to be removed
 uint8_t a800_cart_slot_device::read_80xx(offs_t offset)
 {
 	if (m_cart)
