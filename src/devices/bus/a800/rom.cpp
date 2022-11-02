@@ -14,29 +14,19 @@
 //-------------------------------------------------
 
 DEFINE_DEVICE_TYPE(A800_ROM,           a800_rom_device,           "a800_rom",      "Atari 800 ROM Carts")
+DEFINE_DEVICE_TYPE(A800_ROM_16KB,      a800_rom_16kb_device,      "a800_rom_16kb", "Atari 800 ROM 16kb Carts")
+DEFINE_DEVICE_TYPE(A800_ROM_RIGHT,     a800_rom_right_device,     "a800_rom_right","Atari 800 ROM Right Carts")
 DEFINE_DEVICE_TYPE(XEGS_ROM,           xegs_rom_device,           "a800_xegs",     "Atari XEGS 64K ROM Carts")
 DEFINE_DEVICE_TYPE(A5200_ROM_2CHIPS,   a5200_rom_2chips_device,   "a5200_16k2c",   "Atari 5200 ROM Cart 16K in 2 Chips")
 DEFINE_DEVICE_TYPE(A5200_ROM_BBSB,     a5200_rom_bbsb_device,     "a5200_bbsb",    "Atari 5200 ROM Cart BBSB")
 
 
+// TODO: remove me
 a800_rom_device::a800_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a800_cart_interface( mconfig, *this )
 {
 }
-
-a800_rom_device::a800_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM, tag, owner, clock)
-{
-}
-
-
-xegs_rom_device::xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, XEGS_ROM, tag, owner, clock)
-	, m_bank(0)
-{
-}
-
 
 a5200_rom_2chips_device::a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, A5200_ROM_2CHIPS, tag, owner, clock)
@@ -47,16 +37,6 @@ a5200_rom_2chips_device::a5200_rom_2chips_device(const machine_config &mconfig, 
 a5200_rom_bbsb_device::a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, A5200_ROM_BBSB, tag, owner, clock)
 {
-}
-
-void xegs_rom_device::device_start()
-{
-	save_item(NAME(m_bank));
-}
-
-void xegs_rom_device::device_reset()
-{
-	m_bank = 0;
 }
 
 void a5200_rom_bbsb_device::device_start()
@@ -70,20 +50,16 @@ void a5200_rom_bbsb_device::device_reset()
 	m_banks[1] = 0;
 }
 
-
-
-/*-------------------------------------------------
- mapper specific handlers
- -------------------------------------------------*/
-
 /*-------------------------------------------------
 
- Carts with no bankswitch (8K, 16K)
-
- The cart accessors are mapped in the correct
- range at driver start
+ Generic left cart 8kb
 
  -------------------------------------------------*/
+
+a800_rom_device::a800_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, A800_ROM, tag, owner, clock)
+{
+}
 
 void a800_rom_device::device_start()
 {
@@ -104,26 +80,101 @@ void a800_rom_device::cart_map(address_map &map)
 
 /*-------------------------------------------------
 
- XEGS carts (32K, 64K or 128K)
-
- Bankswitch is controlled by data written in
- 0xd500-0xd5ff
+ Generic right cart 8kb
 
  -------------------------------------------------*/
 
-uint8_t xegs_rom_device::read_80xx(offs_t offset)
+a800_rom_right_device::a800_rom_right_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, A800_ROM_RIGHT, tag, owner, clock)
 {
-	if (offset < 0x2000)
-		return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
-	else
-		return m_rom[(offset & 0x1fff) + (m_bank_mask * 0x2000)];   // always last 8K bank
-
 }
 
-void xegs_rom_device::write_d5xx(offs_t offset, uint8_t data)
+void a800_rom_right_device::device_start()
 {
-	m_bank = data & m_bank_mask;
 }
+
+void a800_rom_right_device::device_reset()
+{
+	rd4_w(1);
+	rd5_w(0);
+}
+
+void a800_rom_right_device::cart_map(address_map &map)
+{
+	map(0x0000, 0x1fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[offset & (m_rom_size - 1)]; })
+	);
+}
+
+/*-------------------------------------------------
+
+ Generic 16kb RD4 + RD5 cart
+
+ -------------------------------------------------*/
+
+a800_rom_16kb_device::a800_rom_16kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, A800_ROM_16KB, tag, owner, clock)
+{
+}
+
+void a800_rom_16kb_device::device_start()
+{
+}
+
+void a800_rom_16kb_device::device_reset()
+{
+	rd_both_w(1);
+}
+
+void a800_rom_16kb_device::cart_map(address_map &map)
+{
+	map(0x0000, 0x3fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[offset & (m_rom_size - 1)]; })
+	);
+}
+
+/*-------------------------------------------------
+
+ XEGS carts (32K, 64K or 128K)
+
+ -------------------------------------------------*/
+
+xegs_rom_device::xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, XEGS_ROM, tag, owner, clock)
+	, m_bank(0)
+{
+}
+
+void xegs_rom_device::device_start()
+{
+	save_item(NAME(m_bank));
+}
+
+void xegs_rom_device::device_reset()
+{
+	// TODO: random
+	m_bank = 0;
+	rd_both_w(1);
+}
+
+// RD5 always maps to the last bank
+void xegs_rom_device::cart_map(address_map &map)
+{
+	map(0x0000, 0x1fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)]; })
+	);
+	map(0x2000, 0x3fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & 0x1fff) + (m_bank_mask * 0x2000)]; })
+	);
+}
+
+void xegs_rom_device::cctl_map(address_map &map)
+{
+	map(0x00, 0xff).lw8(
+		NAME([this](offs_t offset, u8 data) { m_bank = data & m_bank_mask; })
+	);
+}
+
 
 // Atari 5200
 

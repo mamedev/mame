@@ -646,11 +646,17 @@ void xegs_state::xegs_mem(address_map &map)
 	m_selftest_view[0](0x5000, 0x57ff).ram();
 	m_selftest_view[1](0x5000, 0x57ff).rom().region("maincpu", 0xd000);
 	map(0x5800, 0x7fff).ram();
-	// TODO: map cart space overlays
-	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xbfff).view(m_basic_view);
+
+	map(0x8000, 0x9fff).view(m_cart_rd4_view);
+	m_cart_rd4_view[0](0x8000, 0x9fff).ram();
+	m_cart_rd4_view[1](0x8000, 0x9fff).rw(m_cartleft, FUNC(a800_cart_slot_device::read_cart<0>), FUNC(a800_cart_slot_device::write_cart<0>));
+
+	map(0xa000, 0xbfff).view(m_cart_rd5_view);
+	m_cart_rd5_view[0](0xa000, 0xbfff).view(m_basic_view);
 	m_basic_view[0](0xa000, 0xbfff).ram();
 	m_basic_view[1](0xa000, 0xbfff).bankr(m_bank);
+	m_cart_rd5_view[1](0xa000, 0xbfff).rw(m_cartleft, FUNC(a800_cart_slot_device::read_cart<1>), FUNC(a800_cart_slot_device::write_cart<1>));
+
 	map(0xc000, 0xffff).view(m_kernel_view);
 	m_kernel_view[0](0xc000, 0xffff).ram();
 	m_kernel_view[1](0xc000, 0xffff).rom().region("maincpu", 0xc000);
@@ -1976,11 +1982,12 @@ void a800_state::machine_reset()
 	a400_state::machine_reset();
 
 	// TODO: stub reset state, verify if any can be run stand-alone
+/*
 	if (!m_cartright->exists())
 	{
 		m_cart_rd4_enabled = false;
 		m_cart_rd4_view.select(0);
-	}
+	}*/
 }
 
 void a1200xl_state::machine_reset()
@@ -2429,6 +2436,8 @@ void xegs_state::xegs(machine_config &config)
 	config.device_remove("ram");
 
 	XEGS_CART_SLOT(config, m_cartleft, xegs_carts, nullptr);
+	m_cartleft->rd4_callback().set(FUNC(xegs_state::cart_rd4_w));
+	m_cartleft->rd5_callback().set(FUNC(xegs_state::cart_rd5_w));
 }
 
 // memory map A5200, different ports, less RAM
