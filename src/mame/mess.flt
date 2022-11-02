@@ -308,6 +308,7 @@ handheld/rzone.cpp
 handheld/scrablex.cpp
 handheld/talkingbb.cpp
 handheld/talkingfb.cpp
+handheld/teammate.cpp
 handheld/tispeak.cpp
 handheld/tispellb.cpp
 handheld/wildfire.cpp

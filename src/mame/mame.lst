@@ -41534,6 +41534,9 @@ tdv2324                         //
 @source:misc/teamjocs.cpp
 diaelite                        //
 
+@source:handheld/teammate.cpp
+teammate
+
 @source:ausnz/tec1.cpp
 tec1                            // Talking Electronics Computer
 tecjmon                         // Talking Electronics Computer
