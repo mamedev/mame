@@ -99,7 +99,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1185   TMS1100   1979, Fonas 3 in 1: Football, Basketball, Soccer
  @MP1193   TMS1100   1980, Tandy Championship Football (model 60-2150)
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
- *MP1209   TMS1100   1980, U.S. Games Space Cruiser/Strategy Football
+ @MP1209   TMS1100   1980, U.S. Games Space Cruiser
  @MP1211   TMS1100   1980, Entex Space Invader (6012)
  @MP1215   TMS1100   1980, Tiger Playmaker
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
@@ -291,6 +291,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "qfire.lh" // clickable
 #include "quizwizc.lh"
 #include "raisedvl.lh"
+#include "scruiser.lh"
 #include "simon.lh" // clickable
 #include "speechp.lh"
 #include "splitsec.lh"
@@ -10737,7 +10738,7 @@ ROM_END
   Tandy 3 in 1 Sports Arena (model 60-2178)
   * PCB label: HP-804
   * TMS1100 (just a datestamp label (8331), die label: 1100B, MP1231)
-  * 2x2-digit 7seg LED display + 47 other LEDs, 1-bit sound
+  * 2x2-digit 7seg LED display + 45+2 other LEDs, 1-bit sound
 
   For Tandy Sports Arena (model 60-2158), see cmsport, this is a different game.
   This version is very similar to ssports4 released a few years earlier.
@@ -10775,17 +10776,17 @@ void t3in1sa_state::update_display()
 
 void t3in1sa_state::write_r(u32 data)
 {
-	// R10: speaker out
-	m_speaker->level_w(data >> 10 & 1);
-
-	// R0,R1,R5,R7-R9: input mux
-	m_inp_mux = (data & 3) | (data >> 3 & 4) | (data >> 4 & 0x38);
-
 	// R2: led data high
 	// R3-R7: led select
 	// R0,R1,R8,R9: digit select
 	m_r = data;
 	update_display();
+
+	// R0,R1,R5,R7-R9: input mux
+	m_inp_mux = (data & 3) | (data >> 3 & 4) | (data >> 4 & 0x38);
+
+	// R10: speaker out
+	m_speaker->level_w(BIT(data, 10));
 }
 
 void t3in1sa_state::write_o(u16 data)
@@ -14587,9 +14588,164 @@ ROM_END
 
 /***************************************************************************
 
-  U.S. Games Super Sports-4
+  U.S. Games Space Cruiser (model TF2)
+  * PCB label: TF2
+  * TMS1100 MP1209 (no decap)
+  * 4 7seg LEDs, 40+2 other LEDs, 1-bit sound
+
+  It's a 2-in-1 handheld, Strategy Football and Space Game. MAME external
+  artwork is recommended for the switchable overlays.
+
+***************************************************************************/
+
+class scruiser_state : public hh_tms1k_state
+{
+public:
+	scruiser_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void scruiser(machine_config &config);
+
+private:
+	void update_display();
+	void update_input();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void scruiser_state::update_display()
+{
+	m_display->matrix(m_r, m_o | (m_r & 0x300));
+}
+
+void scruiser_state::update_input()
+{
+	// switches from O7+R7
+	m_inp_mux = (m_r & 0xf) | (BIT(m_o, 7) << ((BIT(m_r, 7)) + 4));
+}
+
+void scruiser_state::write_r(u32 data)
+{
+	// R0-R3: 7seg select
+	// R4-R7: led select
+	// R8,R9: led data
+	m_r = data;
+	update_display();
+
+	// R0-R3,R7: input mux
+	update_input();
+
+	// R10: speaker out
+	m_speaker->level_w(BIT(data, 10));
+}
+
+void scruiser_state::write_o(u16 data)
+{
+	// O0-O7: led data
+	m_o = data;
+	update_display();
+
+	// O7: select switches
+	update_input();
+}
+
+u8 scruiser_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(6);
+}
+
+// config
+
+static INPUT_PORTS_START( scruiser )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Info")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Kick")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 QB / WB")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Pass")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Info")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Kick")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 QB / WB")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pass")
+
+	PORT_START("IN.4") // O7+!R7
+	PORT_CONFNAME( 0x02, 0x02, "Game Select" )
+	PORT_CONFSETTING(    0x02, "Space" )
+	PORT_CONFSETTING(    0x00, "Football" )
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // O7+R7
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x04, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x08, 0x00, "Speed" )
+	PORT_CONFSETTING(    0x08, "Fast" ) // F
+	PORT_CONFSETTING(    0x00, "Slow" ) // S
+INPUT_PORTS_END
+
+void scruiser_state::scruiser(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->read_k().set(FUNC(scruiser_state::read_k));
+	m_maincpu->write_r().set(FUNC(scruiser_state::write_r));
+	m_maincpu->write_o().set(FUNC(scruiser_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(8, 10);
+	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_bri_levels(0.0075, 0.075); // offense leds are brighter
+	config.set_default_layout(layout_scruiser);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( scruiser )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1209", 0x0000, 0x0800, CRC(a0280de4) SHA1(52beb30d8a5e4c85433db5722024f4011a07345b) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
+	ROM_LOAD( "tms1100_scruiser_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump
+	ROM_LOAD16_BYTE( "tms1100_scruiser_output.bin", 0, 0x20, CRC(cd6f162f) SHA1(3348edb697e996b5ab82be54076b9cd444e0f2b1) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  U.S. Games Super Sports-4 (model TH42)
   * TMS1100 MP1219 (no decap)
-  * 4 7seg LEDs, 49 other LEDs, 1-bit sound
+  * 4 7seg LEDs, 47+2 other LEDs, 1-bit sound
 
   The game is very similar to t3in1sa, even parts of the ROM match. But by
   the time that one was released (in 1983 or 1984), U.S. Games did not exist
@@ -14611,6 +14767,7 @@ public:
 
 private:
 	void update_display();
+	void update_input();
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
@@ -14620,19 +14777,28 @@ private:
 
 void ssports4_state::update_display()
 {
-	// note: R2 is an extra column
 	m_display->matrix(m_r, m_o | (m_r << 6 & 0x100));
+}
+
+void ssports4_state::update_input()
+{
+	// switches from O7+R5
+	m_inp_mux = (m_r & 3) | (m_r >> 6 & 0xc) | (BIT(m_o, 7) << ((BIT(m_r, 5)) + 4));
 }
 
 void ssports4_state::write_r(u32 data)
 {
-	// R10: speaker out
-	m_speaker->level_w(data >> 10 & 1);
-
-	// R0-R9: led select/data
-	// R0,R1 and R8,R9 are 7segs
+	// R0,R1,R8,R9: 7seg select
+	// R3-R7: led select
+	// R2: led data
 	m_r = data;
 	update_display();
+
+	// R0,R1,R5,R8,R9: input mux
+	update_input();
+
+	// R10: speaker out
+	m_speaker->level_w(BIT(data, 10));
 }
 
 void ssports4_state::write_o(u16 data)
@@ -14640,12 +14806,14 @@ void ssports4_state::write_o(u16 data)
 	// O0-O7: led data
 	m_o = data;
 	update_display();
+
+	// O7: select switches
+	update_input();
 }
 
 u8 ssports4_state::read_k()
 {
-	// input mux is from R0,1,5,8,9 and O7
-	m_inp_mux = (m_r & 3) | (m_r >> 3 & 4) | (m_r >> 5 & 0x18) | (m_o >> 2 & 0x20);
+	// K: multiplexed inputs
 	return read_inputs(6);
 }
 
@@ -14664,34 +14832,34 @@ static INPUT_PORTS_START( ssports4 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
 
-	PORT_START("IN.2") // R5
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x00, "1" )
-	PORT_CONFSETTING(    0x04, "2" )
-	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
-	PORT_CONFSETTING(    0x08, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
+	PORT_START("IN.2") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Up-Left / Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Up-Right / Info")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Pass")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 O.P.") // offensive player (modifier button)
 
-	PORT_START("IN.3") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_16WAY PORT_NAME("P1 Up-Left / Kick")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_16WAY PORT_NAME("P1 Up-Right / Info")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_16WAY PORT_NAME("P1 Pass")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_16WAY PORT_NAME("P1 O.P.") // offensive player (modifier button)
+	PORT_START("IN.3") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Up-Left / Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Up-Right / Info")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Pass")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 O.P.")
 
-	PORT_START("IN.4") // R9
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Up-Left / Kick")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Up-Right / Info")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Pass")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 O.P.")
-
-	PORT_START("IN.5") // O7
+	PORT_START("IN.4") // O7+!R5
 	PORT_CONFNAME( 0x03, 0x00, "Game Select" )
 	PORT_CONFSETTING(    0x02, "Basketball" )
 	PORT_CONFSETTING(    0x00, "Football" )
 	PORT_CONFSETTING(    0x01, "Soccer" )
 	PORT_CONFSETTING(    0x03, "Hockey" )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // O7+R5
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x04, 0x00, "Speed" )
+	PORT_CONFSETTING(    0x04, "High" ) // HI
+	PORT_CONFSETTING(    0x00, "Low" )  // LO
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
 void ssports4_state::ssports4(machine_config &config)
@@ -15053,6 +15221,7 @@ CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   emp
 CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, slepachi,   0,         0, slepachi,  slepachi,  slepachi_state,  empty_init, "Tsukuda", "Slot Elepachi", MACHINE_SUPPORTS_SAVE )
 
+CONS( 1980, scruiser,   0,         0, scruiser,  scruiser,  scruiser_state,  empty_init, "U.S. Games", "Space Cruiser (U.S. Games)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1983, xl25,       0,         0, xl25,      xl25,      xl25_state,      empty_init, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

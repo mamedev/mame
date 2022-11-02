@@ -2,8 +2,8 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-	apple2video.cpp
-	Apple II series video emulation
+    apple2video.cpp
+    Apple II series video emulation
 
 ***************************************************************************/
 

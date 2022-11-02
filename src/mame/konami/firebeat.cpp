@@ -454,12 +454,6 @@ private:
 
 	void control_w(offs_t offset, uint8_t data);
 
-	uint16_t ata_command_r(offs_t offset, uint16_t mem_mask = ~0);
-	void ata_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	uint16_t ata_control_r(offs_t offset, uint16_t mem_mask = ~0);
-	void ata_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
 //  uint32_t comm_uart_r(offs_t offset, uint32_t mem_mask = ~ 0);
 //  void comm_uart_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -792,8 +786,8 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x7e000100, 0x7e00013f).rw("rtc", FUNC(rtc65271_device::xram_r), FUNC(rtc65271_device::xram_w));
 	map(0x7e800000, 0x7e8000ff).rw(m_gcu, FUNC(k057714_device::read), FUNC(k057714_device::write));
 	map(0x7e800100, 0x7e8001ff).noprw(); // Secondary GCU, only used by Keyboardmania but is written to during the bootloader of other games
-	map(0x7fe00000, 0x7fe0000f).rw(FUNC(firebeat_state::ata_command_r), FUNC(firebeat_state::ata_command_w));
-	map(0x7fe80000, 0x7fe8000f).rw(FUNC(firebeat_state::ata_control_r), FUNC(firebeat_state::ata_control_w));
+	map(0x7fe00000, 0x7fe0000f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w));
+	map(0x7fe80000, 0x7fe8000f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w));
 	map(0x7ff80000, 0x7fffffff).rom().region("user1", 0);       /* System BIOS */
 }
 
@@ -1055,35 +1049,6 @@ void firebeat_state::control_w(offs_t offset, uint8_t data)
 	}
 
 	m_control = data;
-}
-
-/*****************************************************************************/
-/* ATA Interface */
-
-uint16_t firebeat_state::ata_command_r(offs_t offset, uint16_t mem_mask)
-{
-// printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
-	uint16_t r = m_ata->cs0_r(offset, swapendian_int16(mem_mask));
-	return swapendian_int16(r);
-}
-
-void firebeat_state::ata_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-//  printf("ata_command_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-	m_ata->cs0_w(offset, swapendian_int16(data & 0xffff), swapendian_int16(mem_mask & 0xffff));
-}
-
-
-uint16_t firebeat_state::ata_control_r(offs_t offset, uint16_t mem_mask)
-{
-//  printf("ata_control_r: %08X, %08X\n", offset, mem_mask);
-	uint16_t r = m_ata->cs1_r(offset, swapendian_int16(mem_mask));
-	return swapendian_int16(r);
-}
-
-void firebeat_state::ata_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	m_ata->cs1_w(offset, swapendian_int16(data & 0xffff), swapendian_int16(mem_mask & 0xffff));
 }
 
 

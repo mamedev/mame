@@ -427,7 +427,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		// SWAP16 ERn
 		uint8_t n = (prm & 0x0c) >> 2;
 		uint16_t val = get_erx(n);
-		uint16_t newval = (val << 8) | (val >> 8);
+		uint16_t newval = swapendian_int16(val);
 		set_erx(n, newval);
 		break;
 	}

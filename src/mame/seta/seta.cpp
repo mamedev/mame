@@ -9044,8 +9044,8 @@ void seta_state::krzybowl(machine_config &config)
 	m_spritegen->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 0); // correct (test grid)
-	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
-	m_spritegen->set_bg_yoffsets(0x1, -0x1);
+	m_spritegen->set_fg_yoffsets(-0x06, 0x0e);
+	m_spritegen->set_bg_yoffsets(-0x3, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

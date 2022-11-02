@@ -2265,7 +2265,7 @@ void prodos_525_get_info(const imgtool_class *imgclass, uint32_t state, union im
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = prodos_diskimage_create_525; break;
 		case IMGTOOLINFO_PTR_FLOPPY_OPEN:                   info->open = prodos_diskimage_open_525; break;
-	//	case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple2; break;
+	//  case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple2; break;
 
 		default:                                            generic_prodos_get_info(imgclass, state, info); break;
 	}
@@ -2283,7 +2283,7 @@ void prodos_35_get_info(const imgtool_class *imgclass, uint32_t state, union img
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = prodos_diskimage_create_35; break;
 		case IMGTOOLINFO_PTR_FLOPPY_OPEN:                   info->open = prodos_diskimage_open_35; break;
-	//	case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple35_iigs; break;
+	//  case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple35_iigs; break;
 
 		default:                                            generic_prodos_get_info(imgclass, state, info); break;
 	}

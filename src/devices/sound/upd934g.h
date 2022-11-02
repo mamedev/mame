@@ -49,6 +49,7 @@ private:
 		uint16_t pos;
 		int playing;
 		int volume;
+		int effect;
 	}
 	m_channel[4];
 

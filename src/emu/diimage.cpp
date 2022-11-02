@@ -24,6 +24,7 @@
 #include "zippath.h"
 
 #include <algorithm>
+#include <cstdarg>
 #include <cstring>
 #include <regex>
 #include <sstream>

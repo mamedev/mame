@@ -20,6 +20,7 @@
 #include "corestr.h"
 
 #include <algorithm>
+#include <cstdarg>
 #include <set>
 
 

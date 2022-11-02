@@ -338,7 +338,7 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 		int bank    = m_bank[(data[1] >> 12) & 0x7];
 		int xpos    = data[1] & 0x1ff;
 		int colpri  = ((data[2] >> 8) & 0xff) << 4;
-		int pitch   = int16_t(data[2] << 9) >> 9;
+		int pitch   = util::sext(data[2], 7);
 		uint16_t addr = data[3];
 		int hzoom   = ((data[4] >> 8) & 0x3f) << 1;
 		int vzoom   = (data[4] >> 0) & 0x3f;
