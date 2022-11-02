@@ -39265,6 +39265,7 @@ simpsons2pa                     // GX072 (c) 1991 (Asia)
 simpsons2pj                     // GX072 (c) 1991 (Japan)
 simpsons4pa                     // GX072 (c) 1991 (Asia)
 simpsons4pe                     // GX072 (c) 1991 (World)
+simpsons4pe2                    // GX072 (c) 1991 (World)
 
 @source:pc/sis630.cpp
 gamecst2                        // MAME based bootleg, version 2.613

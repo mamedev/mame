@@ -434,6 +434,35 @@ ROM_START( simpsons4pe ) /* World 4 Player, later? (by use of later leters) */
 	ROM_LOAD( "simpsons4pe.12c.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
 ROM_END
 
+ROM_START( simpsons4pe2 ) // PCB is original Konami GX072 but EPROM labels are from E. Devices. Only two of the program ROMs differ.
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "2 e. devices.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
+	ROM_LOAD( "1 e. devices.17c", 0x20000, 0x20000, CRC(9f843def) SHA1(858432b59101b0577c5cec6ac0c7c20ab0780c9a) )
+	ROM_LOAD( "4 e. devices.13c", 0x40000, 0x20000, CRC(5f0ada6a) SHA1(7aec6083210b751084d32709c9dc50afe524fc02) )
+	ROM_LOAD( "3 e. devices.15c", 0x60000, 0x20000, CRC(22d00d1f) SHA1(ed73695fb55c5cf931e536c34ef504f0f7b6213d) )
+
+	ROM_REGION( 0x28000, "audiocpu", 0 )
+	ROM_LOAD( "5 e. devices.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
+	ROM_CONTINUE(                0x10000, 0x18000 )
+
+	ROM_REGION( 0x100000, "k052109", 0 ) // tiles
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
+	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
+
+	ROM_REGION( 0x400000, "k053246", 0 ) // sprites
+	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) )
+	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
+	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
+	ROM_LOAD64_WORD( "072-b11.16l", 0x000006, 0x100000, CRC(55fab05d) SHA1(54db8559d71ed257de9a29c8808654eaea0df9e2) )
+
+	ROM_REGION( 0x140000, "k053260", 0 ) // samples
+	ROM_LOAD( "072-d05.1f", 0x000000, 0x100000, CRC(1397a73b) SHA1(369422c84cca5472967af54b8351e29fcd69f621) )
+	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "simpsons4pe2.12c.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
+ROM_END
+
 ROM_START( simpsons4pa ) /* Asia 4 Player */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "072-v02.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
@@ -618,11 +647,12 @@ ROM_END
 ***************************************************************************/
 
 // the region warning, if one exists, is shown after the high-score screen in attract mode
-GAME( 1991, simpsons,    0,        simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons4pe, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players Asia)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p3, simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2pa, simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players Asia)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2pj, simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons,     0,        simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pe,  simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pe2, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pa,  simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players Asia)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p,   simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p2,  simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p3,  simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2pa,  simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players Asia)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2pj,  simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players Japan)",        MACHINE_SUPPORTS_SAVE )
