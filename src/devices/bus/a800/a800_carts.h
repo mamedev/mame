@@ -16,6 +16,7 @@
 #include "rtime8.h"
 #include "sic.h"
 #include "sparta.h"
+#include "supercharger.h"
 #include "telelink2.h"
 #include "ultracart.h"
 #include "williams.h"
@@ -96,8 +97,7 @@ static void a800_left(device_slot_interface &device)
 //  device.option_add(         "ramcart",       A800_RAM_CART);
 	// converts analog mono sound to digital by reading $d500 low 4 bitset
 //  device.option_add(         "ad_converter",  A800_AD_CONVERTER);
-	// multiply/divide math unit (unknown chip type, scratched on PCB), used by "Assault Force" floppy disk
-//  device.option_add(         "supercharger",  A800_SUPER_CHARGER);
+	device.option_add(         "supercharger",  A800_SUPER_CHARGER);
 	// The PILL! / Super PILL! / Super Cart with RD4/RD5 held high and that's about it (lolwut)
 //  device.option_add(         "pill",          A800_PILL);
 	// Thompson Proburner, EPROM burner

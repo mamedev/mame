@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli, Angelo Salese
 #ifndef MAME_BUS_A800_OSS_H
 #define MAME_BUS_A800_OSS_H
 

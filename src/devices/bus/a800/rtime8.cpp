@@ -6,8 +6,7 @@
 
     The circuitry in this clock cartridge is very simple, containing the RTC itself, oscillator and
     battery, and a 74HCT138 to decode the $D5B8-$D5BF address range from the /CCTL and A7-A3 pins. No ROM
-    is included; however, the cartridge can be placed in the (currently unemulated) passthrough slot of the
-    SpartaDOS X cartridge.
+    is included; the cartridge can be placed in the passthrough slot of the SpartaDOS X cartridge.
 
 ***********************************************************************************************************/
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli, Angelo Salese
 /**************************************************************************************************
 
  "Optimized System Software" OSS ROM cart emulation
@@ -7,10 +7,9 @@
 https://en.wikipedia.org/wiki/Optimized_Systems_Software
 
 Running on similar non-linear but incompatible banking schemes.
-- OSS 8k is the original one
 
 TODO:
-- OSS034M doesn't really exist, it's an OSS043M with wrong ROM loading.
+- OSS034M doesn't really exist, it's an OSS043M with wrong ROM contents.
 
 **************************************************************************************************/
 
