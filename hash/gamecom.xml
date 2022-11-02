@@ -43,6 +43,17 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
+	<software name="sotn">
+		<description>Castlevania - Symphony of the Night (prototype)</description>
+		<year>1999?</year>
+		<publisher>Tiger Electronics</publisher>
+		<part name="cart" interface="gamecom_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="lh28f016sut-10.bin" size="0x200000" crc="eec4e8e3" sha1="86fc20a233f18c4c7aac8ebed3e4d95dabc6e8bb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="centiped">
 		<description>Centipede</description>
 		<year>1999</year>
