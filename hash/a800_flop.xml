@@ -887,7 +887,7 @@ Tested with marsmis2, fails
 		</part>
 	</software>
 
-	<!-- v.1.0 also known to exist (in .xex format -->
+	<!-- v.1.0 also known to exist (in .xex format) -->
 	<software name="yoomp" supported="partial">
 		<description>Yoomp! (v.1.1)</description>
 		<year>2007</year>

@@ -1534,7 +1534,7 @@ Crashes on Atari copyright screen
 	<software name="cblast">
 		<description>Castle Blast</description>
 		<year>2002</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Ronen Habot" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
@@ -1547,7 +1547,7 @@ Crashes on Atari copyright screen
 	<software name="ccrisis" supported="no">
 		<description>Castle Crisis</description>
 		<year>2004</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
 [ANTIC] playfield height doesn't cover full screen
 ]]></notes>
@@ -1563,7 +1563,7 @@ Crashes on Atari copyright screen
 	<software name="koffiyk">
 		<description>Koffi: Yellow Kopter</description>
 		<year>2002</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Ron Lloyd" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
