@@ -1531,10 +1531,13 @@ Crashes on Atari copyright screen
 		</part>
 	</software>
 
-	<software name="cblast">
+	<software name="cblast" supported="no">
 		<description>Castle Blast</description>
 		<year>2002</year>
 		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Playfield is gray filled, unplayable
+]]></notes>
 		<info name="developer" value="Ronen Habot" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
