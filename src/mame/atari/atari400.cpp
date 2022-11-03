@@ -2079,7 +2079,7 @@ uint8_t a1200xl_state::djoy_b_r()
 	// This is also necessary by:
 	// - SDX boot (will hang in kernel during POST by boot conflict with BASIC if not handled properly)
 	// - a1200xl cart boot
-	// - returning m_cartleft->exists() makes BASIC disable thru OPTION to not work in mega13 and makes maxflash to fail loading most .xex
+	// - returning m_cartleft->exists() makes BASIC disable thru OPTION to not work and makes maxflash to fail loading most .xex
 //	b |= m_cart_rd5_enabled << 3;
 	b |= !m_cartleft->exists() << 3;
 
@@ -2377,6 +2377,10 @@ void a1200xl_state::a1200xl(machine_config &config)
 	m_pokey->pot_r<6>().set_ioport("J3");
 	m_pokey->pot_r<7>().set_ioport("J4");
 	// TODO: console LEDs for this model only
+
+	// retail has 64KB minimum
+	m_ram->set_default_size("64K");
+//	m_ram->set_extra_options("16K,32K,48K");
 }
 
 // memory map A800XL + NTSC screen + MMU via PIA portB
