@@ -261,7 +261,7 @@ WRITE_LINE_MEMBER(er1400_device::c1_w)
 		return;
 
 	m_code_input = (m_code_input & 3) | (bool(state) << 2);
-	if (!m_data_propagation_timer->running())
+	if (!m_data_propagation_timer->enabled())
 		m_data_propagation_timer->adjust(attotime::from_usec(20));
 }
 
@@ -276,7 +276,7 @@ WRITE_LINE_MEMBER(er1400_device::c2_w)
 		return;
 
 	m_code_input = (m_code_input & 5) | (bool(state) << 1);
-	if (!m_data_propagation_timer->running())
+	if (!m_data_propagation_timer->enabled())
 		m_data_propagation_timer->adjust(attotime::from_usec(20));
 }
 
@@ -291,7 +291,7 @@ WRITE_LINE_MEMBER(er1400_device::c3_w)
 		return;
 
 	m_code_input = (m_code_input & 6) | bool(state);
-	if (!m_data_propagation_timer->running())
+	if (!m_data_propagation_timer->enabled())
 		m_data_propagation_timer->adjust(attotime::from_usec(20));
 }
 

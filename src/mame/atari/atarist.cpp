@@ -1350,7 +1350,7 @@ TIMER_CALLBACK_MEMBER(ste_state::microwire_tick)
 		microwire_shift();
 		m_lmc1992->enable_w(1);
 		m_mw_shift = 0;
-		m_microwire_timer->adjust(attotime::never);
+		m_microwire_timer->enable(0);
 		break;
 	}
 }
@@ -1372,7 +1372,7 @@ uint16_t ste_state::microwire_data_r()
 
 void ste_state::microwire_data_w(uint16_t data)
 {
-	if (!m_microwire_timer->running())
+	if (!m_microwire_timer->enabled())
 	{
 		m_mw_data = data;
 		m_microwire_timer->adjust(attotime::zero, 0, attotime::from_usec(2));
@@ -1396,7 +1396,7 @@ uint16_t ste_state::microwire_mask_r()
 
 void ste_state::microwire_mask_w(uint16_t data)
 {
-	if (!m_microwire_timer->running())
+	if (!m_microwire_timer->enabled())
 	{
 		m_mw_mask = data;
 	}
@@ -2301,7 +2301,7 @@ void st_state::common(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, Y2/4);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &st_state::cpu_space_map);
-	m_maincpu->set_reset_callback(FUNC(st_state::reset_w));
+	m_maincpu->reset_cb().set(FUNC(st_state::reset_w));
 
 	keyboard(config);
 
@@ -2525,7 +2525,7 @@ void stbook_state::stbook(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, U517/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stbook_state::stbook_map);
-	m_maincpu->set_reset_callback(FUNC(st_state::reset_w));
+	m_maincpu->reset_cb().set(FUNC(st_state::reset_w));
 
 	//COP888(config, COP888_TAG, Y700);
 

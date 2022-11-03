@@ -139,7 +139,7 @@ void a2bus_uniprint_device::write_c0nx(u8 offset, u8 data)
 
 	// generate strobe pulse after one clock cycle
 	m_next_strobe = 0U;
-	if (!m_strobe_timer->running())
+	if (!m_strobe_timer->enabled())
 	{
 		LOG("Start strobe timer\n");
 		m_strobe_timer->adjust(attotime::from_ticks(1, clock()));

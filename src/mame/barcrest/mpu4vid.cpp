@@ -2138,7 +2138,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 
 	M68000(config, m_videocpu, VIDEO_MASTER_CLOCK);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map);
-	m_videocpu->set_reset_callback(FUNC(mpu4vid_state::mpu_video_reset));
+	m_videocpu->reset_cb().set(FUNC(mpu4vid_state::mpu_video_reset));
 
 
 	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);

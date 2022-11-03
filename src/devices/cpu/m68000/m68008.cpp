@@ -19,24 +19,24 @@ std::unique_ptr<util::disasm_interface> m68008fn_device::create_disassembler()
 }
 
 m68008_device::m68008_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68008, 8,20)
+	: m68000_musashi_device(mconfig, tag, owner, clock, M68008, 8,20)
 {
 }
 
 void m68008_device::device_start()
 {
-	m68000_base_device::device_start();
+	m68000_musashi_device::device_start();
 	init_cpu_m68008();
 }
 
 
 m68008fn_device::m68008fn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68008FN, 8,22)
+	: m68000_musashi_device(mconfig, tag, owner, clock, M68008FN, 8,22)
 {
 }
 
 void m68008fn_device::device_start()
 {
-	m68000_base_device::device_start();
+	m68000_musashi_device::device_start();
 	init_cpu_m68008();
 }

@@ -1164,9 +1164,10 @@ uint16_t dpb7000_state::bus_error_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 	{
-		m_maincpu->set_buserror_details(0xb00000 + offset*2, true, m_maincpu->get_fc());
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		m68000_musashi_device *cpuptr = downcast<m68000_musashi_device *>(m_maincpu.target());
+		cpuptr->set_buserror_details(0xb00000 + offset*2, true, cpuptr->get_fc());
+		cpuptr->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		cpuptr->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
 	return 0xff;
 }
@@ -1175,9 +1176,10 @@ void dpb7000_state::bus_error_w(offs_t offset, uint16_t data)
 {
 	if(!machine().side_effects_disabled())
 	{
-		m_maincpu->set_buserror_details(0xb00000 + offset*2, false, m_maincpu->get_fc());
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		m68000_musashi_device *cpuptr = downcast<m68000_musashi_device *>(m_maincpu.target());
+		cpuptr->set_buserror_details(0xb00000 + offset*2, false, cpuptr->get_fc());
+		cpuptr->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		cpuptr->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
 }
 

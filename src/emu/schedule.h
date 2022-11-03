@@ -50,7 +50,6 @@ public:
 	void adjust(attotime start_delay, s32 param = 0, const attotime &periodicity = attotime::never) noexcept;
 
 	// timing queries
-	bool running() const noexcept { return !m_expire.is_never(); }
 	attotime elapsed() const noexcept;
 	attotime remaining() const noexcept;
 	attotime start() const noexcept { return m_start; }

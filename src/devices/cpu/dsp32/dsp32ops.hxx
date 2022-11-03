@@ -261,7 +261,7 @@ inline void dsp32c_device::cau_write_pi_4byte(int pi, uint32_t val)
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		WLONG(m_r[p], (int32_t)(val << 8) >> 8);
+		WLONG(m_r[p], util::sext(val, 24));
 		if (i < 22 || i > 23)
 			m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		else
@@ -1844,7 +1844,7 @@ void dsp32c_device::store_i(uint32_t op)
 
 void dsp32c_device::store_ei(uint32_t op)
 {
-	WLONG(EXTEND16_TO_24(op), (int32_t)(REG24((op >> 16) & 0x1f) << 8) >> 8);
+	WLONG(EXTEND16_TO_24(op), util::sext(REG24((op >> 16) & 0x1f), 24));
 }
 
 
@@ -2431,7 +2431,7 @@ void dsp32c_device::d5_ifagt(uint32_t op)
 
 void dsp32c_device::d5_float24(uint32_t op)
 {
-	double res = (double)((int32_t)(dau_read_pi_4bytes(op >> 7) << 8) >> 8);
+	double res = (double)util::sext(dau_read_pi_4bytes(op >> 7), 24);
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
 		dau_write_pi_double(zpi, res);

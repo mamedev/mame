@@ -1529,7 +1529,7 @@ void mb86235_device::generate_control(drcuml_block &block, compiler_state &compi
 	int ef1 = (op >> 16) & 0x3f;
 	int ef2 = op & 0xffff;
 	int cop = (op >> 22) & 0x1f;
-//  int rel12 = (op & 0x800) ? (0xfffff000 | (op & 0xfff)) : (op & 0xfff);
+//  int rel12 = util::sext<int>(op, 12);
 
 	switch (cop)
 	{
@@ -1811,8 +1811,7 @@ void mb86235_device::generate_xfer3(drcuml_block &block, compiler_state &compile
 	int ary = (opcode >> 4) & 7;
 	int md = opcode & 0xf;
 
-	int disp = (opcode >> 7) & 0xfff;
-	if (disp & 0x800) disp |= 0xfffff800;
+	int disp = util::sext<int>((opcode >> 7) & 0xfff, 12);
 
 	switch (dr >> 5)
 	{

@@ -180,7 +180,7 @@ u32 tasc_state::input_r()
 	if (!machine().side_effects_disabled())
 	{
 		// disconnect bootrom from the bus after next opcode
-		if (m_bootrom_enabled && !m_disable_bootrom->running())
+		if (m_bootrom_enabled && !m_disable_bootrom->enabled())
 			m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(10));
 
 		m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);

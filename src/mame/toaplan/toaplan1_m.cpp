@@ -236,13 +236,6 @@ void toaplan1_state::machine_reset()
 	machine().bookkeeping().coin_lockout_global_w(0);
 }
 
-/* zerowing, fireshrk, outzone */
-MACHINE_RESET_MEMBER(toaplan1_state,zerowing)
-{
-	machine_reset();
-	m_maincpu->set_reset_callback(*this, FUNC(toaplan1_state::reset_callback));
-}
-
 void toaplan1_demonwld_state::machine_reset()
 {
 	toaplan1_state::machine_reset();

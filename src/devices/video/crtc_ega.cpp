@@ -228,7 +228,7 @@ void crtc_ega_device::update_counters()
 {
 	m_character_counter = m_line_timer->elapsed().as_ticks( m_clock );
 
-	if ( m_hsync_off_timer->running() )
+	if ( m_hsync_off_timer->enabled() )
 	{
 		m_hsync_width_counter = m_hsync_off_timer->elapsed().as_ticks( m_clock );
 	}
@@ -718,7 +718,7 @@ void crtc_ega_device::device_reset()
 	if(!m_res_out_irq_cb.isnull())
 		m_res_out_irq_cb(false);
 
-	if (!m_line_timer->running())
+	if (!m_line_timer->enabled())
 	{
 		m_line_timer->adjust( attotime::from_ticks( m_horiz_char_total + 2, m_clock ) );
 	}

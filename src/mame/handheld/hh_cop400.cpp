@@ -1263,7 +1263,7 @@ CUSTOM_INPUT_MEMBER(mbaskb2_state::switch_r)
 {
 	// The power switch is off-1-2, and the game relies on power-on starting at 1,
 	// otherwise msoccer2 boots up to what looks like a factory test mode.
-	return (m_inputs[3]->read() & 1) | (m_on_timer->running() ? 1 : 0);
+	return (m_inputs[3]->read() & 1) | (m_on_timer->enabled() ? 1 : 0);
 }
 
 static INPUT_PORTS_START( mbaskb2 )

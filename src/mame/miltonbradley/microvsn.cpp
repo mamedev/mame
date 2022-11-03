@@ -295,7 +295,7 @@ u8 microvision_state::tms1100_k_r()
 
 	// K8: paddle capacitor
 	if (m_paddle_on)
-		data |= (m_paddle_timer->running() ? 0 : BIT(m_r, 2)) << 3;
+		data |= (m_paddle_timer->enabled() ? 0 : BIT(m_r, 2)) << 3;
 
 	return data;
 }
@@ -390,7 +390,7 @@ READ_LINE_MEMBER(microvision_state::i8021_t1_r)
 {
 	// T1: paddle capacitor (active low)
 	int active = (m_p2 & 0xc) ? 1 : 0;
-	active |= m_paddle_timer->running() ? 1 : 0;
+	active |= m_paddle_timer->enabled() ? 1 : 0;
 	return (m_paddle_on) ? active : 1;
 }
 

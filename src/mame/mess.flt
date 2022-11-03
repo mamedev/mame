@@ -308,6 +308,7 @@ handheld/rzone.cpp
 handheld/scrablex.cpp
 handheld/talkingbb.cpp
 handheld/talkingfb.cpp
+handheld/teammate.cpp
 handheld/tispeak.cpp
 handheld/tispellb.cpp
 handheld/wildfire.cpp
@@ -589,7 +590,6 @@ olympiaint/peoplepc.cpp
 omnibyte/msbc1.cpp
 omnibyte/ob68k1a.cpp
 omron/luna_68k.cpp
-omron/luna_88k.cpp
 openuni/hektor.cpp
 osborne/osbexec.cpp
 osborne/osborne1.cpp

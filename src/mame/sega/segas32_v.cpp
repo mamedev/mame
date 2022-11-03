@@ -744,8 +744,8 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 	srcy += (m_videoram[0x1ff14/2 + 4 * bgnum] & 0xfe00) << 4;
 
 	/* then account for the destination center coordinates */
-	srcx_start -= ((int16_t)(m_videoram[0x1ff30/2 + 2 * bgnum] << 6) >> 6) * srcxstep;
-	srcy -= ((int16_t)(m_videoram[0x1ff32/2 + 2 * bgnum] << 7) >> 7) * srcystep;
+	srcx_start -= util::sext(m_videoram[0x1ff30/2 + 2 * bgnum], 10) * srcxstep;
+	srcy -= util::sext(m_videoram[0x1ff32/2 + 2 * bgnum], 9) * srcystep;
 
 	/* finally, account for destination top,left coordinates */
 	srcx_start += cliprect.min_x * srcxstep;
@@ -1469,8 +1469,8 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 					((data[3] & 0x0800) >> 11) | ((data[3] & 0x4000) >> 13);
 	int dsth     = data[2] & 0x3ff;
 	int dstw     = data[3] & 0x3ff;
-	int ypos     = (int16_t)(data[4] << 4) >> 4;
-	int xpos     = (int16_t)(data[5] << 4) >> 4;
+	int ypos     = util::sext(data[4], 12);
+	int xpos     = util::sext(data[5], 12);
 	uint32_t addr  = data[6] | ((data[2] & 0xf000) << 4);
 	int color    = 0x8000 | (data[7] & (bpp8 ? 0x7f00 : 0x7ff0));
 	int hzoom, vzoom;
@@ -1676,20 +1676,20 @@ void segas32_state::sprite_render_list()
 				/* set the inclusive cliprect */
 				if (sprite[0] & 0x1000)
 				{
-					clipin.min_y = (int16_t)(sprite[0] << 4) >> 4;
-					clipin.max_y = (int16_t)(sprite[1] << 4) >> 4;
-					clipin.min_x = (int16_t)(sprite[2] << 4) >> 4;
-					clipin.max_x = (int16_t)(sprite[3] << 4) >> 4;
+					clipin.min_y = util::sext(sprite[0], 12);
+					clipin.max_y = util::sext(sprite[1], 12);
+					clipin.min_x = util::sext(sprite[2], 12);
+					clipin.max_x = util::sext(sprite[3], 12);
 					clipin &= outerclip;
 				}
 
 				/* set the exclusive cliprect */
 				if (sprite[0] & 0x2000)
 				{
-					clipout.min_y = (int16_t)(sprite[4] << 4) >> 4;
-					clipout.max_y = (int16_t)(sprite[5] << 4) >> 4;
-					clipout.min_x = (int16_t)(sprite[6] << 4) >> 4;
-					clipout.max_x = (int16_t)(sprite[7] << 4) >> 4;
+					clipout.min_y = util::sext(sprite[4], 12);
+					clipout.max_y = util::sext(sprite[5], 12);
+					clipout.min_x = util::sext(sprite[6], 12);
+					clipout.max_x = util::sext(sprite[7], 12);
 				}
 
 				/* advance to the next entry */
@@ -1702,8 +1702,8 @@ void segas32_state::sprite_render_list()
 				/* set the global offset */
 				if (sprite[0] & 0x2000)
 				{
-					yoffs = (int16_t)(sprite[1] << 4) >> 4;
-					xoffs = (int16_t)(sprite[2] << 4) >> 4;
+					yoffs = util::sext(sprite[1], 12);
+					xoffs = util::sext(sprite[2], 12);
 				}
 				spritenum = sprite[0] & 0x1fff;
 				break;
@@ -1799,12 +1799,12 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 
 	/* extract the RGB offsets */
 	int rgboffs[3][3];
-	rgboffs[0][0] = (int8_t)(m_mixer_control[which][0x40/2] << 2) >> 2;
-	rgboffs[0][1] = (int8_t)(m_mixer_control[which][0x42/2] << 2) >> 2;
-	rgboffs[0][2] = (int8_t)(m_mixer_control[which][0x44/2] << 2) >> 2;
-	rgboffs[1][0] = (int8_t)(m_mixer_control[which][0x46/2] << 2) >> 2;
-	rgboffs[1][1] = (int8_t)(m_mixer_control[which][0x48/2] << 2) >> 2;
-	rgboffs[1][2] = (int8_t)(m_mixer_control[which][0x4a/2] << 2) >> 2;
+	rgboffs[0][0] = util::sext(m_mixer_control[which][0x40/2], 6);
+	rgboffs[0][1] = util::sext(m_mixer_control[which][0x42/2], 6);
+	rgboffs[0][2] = util::sext(m_mixer_control[which][0x44/2], 6);
+	rgboffs[1][0] = util::sext(m_mixer_control[which][0x46/2], 6);
+	rgboffs[1][1] = util::sext(m_mixer_control[which][0x48/2], 6);
+	rgboffs[1][2] = util::sext(m_mixer_control[which][0x4a/2], 6);
 	rgboffs[2][0] = 0;
 	rgboffs[2][1] = 0;
 	rgboffs[2][2] = 0;

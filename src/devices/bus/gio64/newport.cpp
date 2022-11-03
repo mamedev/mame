@@ -2718,10 +2718,10 @@ uint8_t newport_base_device::get_octant(int32_t x1, int32_t y1, int32_t x2, int3
 
 void newport_base_device::do_fline(uint32_t color)
 {
-	const int32_t x1 = (int32_t)((m_rex3.m_x_start >> 7) << 12) >> 12;
-	const int32_t y1 = (int32_t)((m_rex3.m_y_start >> 7) << 12) >> 12;
-	const int32_t x2 = (int32_t)((m_rex3.m_x_end >> 7) << 12) >> 12;
-	const int32_t y2 = (int32_t)((m_rex3.m_y_end >> 7) << 12) >> 12;
+	const int32_t x1 = util::sext(m_rex3.m_x_start >> 7, 20);
+	const int32_t y1 = util::sext(m_rex3.m_y_start >> 7, 20);
+	const int32_t x2 = util::sext(m_rex3.m_x_end >> 7, 20);
+	const int32_t y2 = util::sext(m_rex3.m_y_end >> 7, 20);
 
 	const int32_t x10 = x1 & ~0xf;
 	const int32_t y10 = y1 & ~0xf;
@@ -3191,13 +3191,13 @@ uint64_t newport_base_device::do_pixel_word_read()
 void newport_base_device::iterate_shade()
 {
 	if (m_rex3.m_slope_red & 0x7fffff)
-		m_rex3.m_curr_color_red += (m_rex3.m_slope_red << 8) >> 8;
+		m_rex3.m_curr_color_red += util::sext(m_rex3.m_slope_red, 24);
 	if (m_rex3.m_slope_green & 0x7ffff)
-		m_rex3.m_curr_color_green += (m_rex3.m_slope_green << 12) >> 12;
+		m_rex3.m_curr_color_green += util::sext(m_rex3.m_slope_green, 20);
 	if (m_rex3.m_slope_blue & 0x7ffff)
-		m_rex3.m_curr_color_blue += (m_rex3.m_slope_blue << 12) >> 12;
+		m_rex3.m_curr_color_blue += util::sext(m_rex3.m_slope_blue, 20);
 	if (m_rex3.m_slope_alpha & 0x7ffff)
-		m_rex3.m_curr_color_alpha += (m_rex3.m_slope_alpha << 12) >> 12;
+		m_rex3.m_curr_color_alpha += util::sext(m_rex3.m_slope_alpha, 20);
 
 	if (BIT(m_rex3.m_draw_mode0, 21)) // CIClamp
 	{

@@ -126,7 +126,7 @@ void ccx_state::update_display()
 void ccx_state::ppi_porta_w(u8 data)
 {
 	// d7: enable beeper on falling edge (556 monostable) (unpopulated on ACR)
-	if (m_beeper != nullptr && ~data & m_7seg_data & 0x80 && !m_beeper_off->running())
+	if (m_beeper != nullptr && ~data & m_7seg_data & 0x80 && !m_beeper_off->enabled())
 	{
 		m_beeper->set_state(1);
 		m_beeper_off->adjust(attotime::from_msec(80)); // duration is approximate

@@ -62,34 +62,34 @@ private:
 
 	struct am2901
 	{
-		uint32_t ram[16]{};   /* internal ram */
-		uint32_t d = 0;         /* direct data D input */
-		uint32_t q = 0;         /* Q register */
-		uint32_t f = 0;         /* F ALU result */
-		uint32_t y = 0;         /* Y output */
+		uint32_t ram[16]{};    // internal ram
+		uint32_t d = 0;        // direct data D input
+		uint32_t q = 0;        // Q register
+		uint32_t f = 0;        // F ALU result
+		uint32_t y = 0;        // Y output
 	};
 
 	class vector_generator
 	{
 	public:
-		uint32_t sreg;      /* shift register */
-		uint32_t l1;        /* latch 1 adder operand only */
-		uint32_t l2;        /* latch 2 adder operand only */
-		uint32_t c_v;       /* vertical position counter */
-		uint32_t c_h;       /* horizontal position counter */
-		uint32_t c_l;       /* length counter */
-		uint32_t adder_s;   /* slope generator result and B input */
-		uint32_t adder_a;   /* slope generator A input */
-		uint32_t color;     /* color */
-		uint32_t intensity; /* intensity */
-		uint32_t brez = 0;      /* h/v-counters enable */
-		uint32_t vfin = 0;      /* drawing yes/no */
-		uint32_t hud1 = 0;      /* h-counter up or down (stored in L1) */
-		uint32_t hud2 = 0;      /* h-counter up or down (stored in L2) */
-		uint32_t vud1 = 0;      /* v-counter up or down (stored in L1) */
-		uint32_t vud2 = 0;      /* v-counter up or down (stored in L2) */
-		uint32_t hc1 = 0;       /* use h- or v-counter in L1 mode */
-		uint32_t ven = 0;       /* vector intensity enable */
+		uint32_t sreg = 0;     // shift register
+		uint32_t l1 = 0;       // latch 1 adder operand only
+		uint32_t l2 = 0;       // latch 2 adder operand only
+		uint32_t c_v = 0;      // vertical position counter
+		uint32_t c_h = 0;      // horizontal position counter
+		uint32_t c_l = 0;      // length counter
+		uint32_t adder_s = 0;  // slope generator result and B input
+		uint32_t adder_a = 0;  // slope generator A input
+		uint32_t color = 0;    // color
+		uint32_t intensity;    // intensity
+		uint32_t brez = 0;     // h/v-counters enable
+		uint32_t vfin = 0;     // drawing yes/no
+		uint32_t hud1 = 0;     // h-counter up or down (stored in L1)
+		uint32_t hud2 = 0;     // h-counter up or down (stored in L2)
+		uint32_t vud1 = 0;     // v-counter up or down (stored in L1)
+		uint32_t vud2 = 0;     // v-counter up or down (stored in L2)
+		uint32_t hc1 = 0;      // use h- or v-counter in L1 mode
+		uint32_t ven = 0;      // vector intensity enable
 	};
 
 	struct microcode
@@ -114,11 +114,11 @@ private:
 
 	struct vproc
 	{
-		uint16_t sram[64]{}; /* external sram */
-		uint16_t ramlatch = 0; /* latch between 2901 and sram */
-		uint16_t rom_adr = 0;  /* vector ROM/RAM address latch */
-		uint32_t pc = 0;       /* program counter */
-		uint32_t ret = 0;      /* return address */
+		uint16_t sram[64]{};   // external sram
+		uint16_t ramlatch = 0; // latch between 2901 and sram
+		uint16_t rom_adr = 0;  // vector ROM/RAM address latch
+		uint32_t pc = 0;       // program counter
+		uint32_t ret = 0;      // return address
 
 	};
 

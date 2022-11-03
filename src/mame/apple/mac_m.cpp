@@ -794,7 +794,7 @@ void mac_state::mac_via2_out_b(uint8_t data)
 
 	if (m_model == MODEL_MAC_II)
 	{
-		m68000_base_device *m68k = downcast<m68000_base_device *>(m_maincpu.target());
+		m68000_musashi_device *m68k = downcast<m68000_musashi_device *>(m_maincpu.target());
 		m68k->set_hmmu_enable((data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_II);
 	}
 }

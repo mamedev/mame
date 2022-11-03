@@ -10407,6 +10407,7 @@ talbot                          // Volt Electronics
 
 @source:taito/champbwl.cpp
 champbwl                        // (c)1989 Romstar.  not Taito, but the same Seta video chips
+champbwla                       // (c)1989 Romstar.  not Taito, but the same Seta video chips
 doraemon                        // Sunsoft / Epoch / Fujiko - Shogakukan - TV Asahi (prototype)
 
 @source:dataeast/chanbara.cpp
@@ -15964,6 +15965,7 @@ schery97                        // (c) 1998 Amcoe
 schery97a                       // (c) 1998 Amcoe
 scmaster                        // 1994, unknown
 skill98                         // (c) 1998 Amcoe
+srmagic                         // bootleg
 ss2001                          // bootleg / hack
 star100                         // (c) 199? Sang Ho
 super7                          // bootleg (New Impeuropex?)
@@ -39264,6 +39266,7 @@ simpsons2pa                     // GX072 (c) 1991 (Asia)
 simpsons2pj                     // GX072 (c) 1991 (Japan)
 simpsons4pa                     // GX072 (c) 1991 (Asia)
 simpsons4pe                     // GX072 (c) 1991 (World)
+simpsons4pe2                    // GX072 (c) 1991 (World)
 
 @source:pc/sis630.cpp
 gamecst2                        // MAME based bootleg, version 2.613
@@ -41531,6 +41534,9 @@ tdv2324                         //
 
 @source:misc/teamjocs.cpp
 diaelite                        //
+
+@source:handheld/teammate.cpp
+teammate
 
 @source:ausnz/tec1.cpp
 tec1                            // Talking Electronics Computer

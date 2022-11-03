@@ -11557,6 +11557,32 @@ ROM_START( cmasterk )
 	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+ROM_START( srmagic )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "real magic.u81", 0x00000, 0x10000, CRC(93ef9f6a) SHA1(ad482b5df9de02a245567642d20f51da2ec2dfed) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(a88e5ba1) SHA1(571658a50dd7dafdaf3eeb18a5153b014ee9f837) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(ca6578e7) SHA1(a33fe55f51b15850bef507d36192707c0959f708) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(5227ccd6) SHA1(16b31977782e14aa9757cc99bf21a95ffdae3d25) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(1df9ffa7) SHA1(851f32c369e7879c2054399a820463d84007bc1c) ) // 1xxxxxxxxxxxx = 0x00
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(123ccb63) SHA1(c23391a1fb70a8122eee48b8ea6300a058da98d5) ) // 1xxxxxxxxxxxx = 0x00
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(fdaeb68f) SHA1(f41e54d43cb73c7e9ae99e78043a7df4958cb8ce) ) // 1xxxxxxxxxxxx = 0x00
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(768d2483) SHA1(ac7f02b26d12363281cb65b74577a8fc1d68c35b) ) // 1xxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u13", 0x00000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(208727e7) SHA1(7c868b06da03fe95266555775b8185d38e25ce3f) )
+	ROM_LOAD( "82s129.u79", 0x100, 0x100, CRC(01349092) SHA1(cd2910f7d842f37db35ad25414536a8c49a85293) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
 ROM_START( ll3 ) // WANG QL-1  V3.03 string
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "min bet 8.u1", 0x00000, 0x10000, CRC(f19d0af3) SHA1(deefe5782213d60d8d0aae6826aa6a0109925289) ) // on sub PCB
@@ -19895,6 +19921,7 @@ GAMEL( 199?, super7,    cmaster,  super7,   cmaster,  cmaster_state,  init_super
 GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 GAMEL( 199?, ll3,       cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
 GAMEL( 199?, cmfb55,    cmaster,  cmfb55,   cmaster,  cmaster_state,  empty_init,     ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    MACHINE_NOT_WORKING, layout_cmv4 ) // wrong palette, inputs not done
+GAMEL( 1991, srmagic,   cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "bootleg",           "Super Real Magic (V6.3)",                     MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
