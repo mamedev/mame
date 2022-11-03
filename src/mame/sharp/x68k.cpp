@@ -924,10 +924,12 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 	if(!ACCESSING_BITS_8_15)
 		address++;
 	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
+
+	m68000_musashi_device *cpuptr = downcast<m68000_musashi_device *>(m_maincpu.target());
+	cpuptr->set_buserror_details(address, rw, cpuptr->get_fc());
+	cpuptr->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	cpuptr->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	m_bus_error_timer->adjust(cpuptr->cycles_to_attotime(16)); // let rmw cycles complete
 	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 

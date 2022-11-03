@@ -754,7 +754,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 	}
 
-	if (BIT(m_maincpu->get_fc(), 2))
+	if (m_maincpu->supervisor_mode())
 	{
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
@@ -1227,7 +1227,7 @@ uint16_t lisa_state::lisa_r(offs_t offset, uint16_t mem_mask)
 		}
 	}
 
-	if (BIT(m_maincpu->get_fc(), 2))
+	if (m_maincpu->supervisor_mode())
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1433,7 +1433,7 @@ void lisa_state::lisa_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		}
 	}
 
-	if (BIT(m_maincpu->get_fc(), 2))
+	if (m_maincpu->supervisor_mode())
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 

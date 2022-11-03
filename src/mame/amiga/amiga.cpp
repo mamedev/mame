@@ -1649,6 +1649,7 @@ void a1000_state::a1000(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a1000_state::a1000_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	amiga_base(config);
 
@@ -1687,6 +1688,7 @@ void a2000_state::a2000(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a2000_state::a2000_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	amiga_base(config);
 
@@ -1741,6 +1743,7 @@ void a500_state::a500(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a500_state::a500_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	amiga_base(config);
 
@@ -1778,6 +1781,7 @@ void cdtv_state::cdtv(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdtv_state::cdtv_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	amiga_base(config);
 
@@ -1859,6 +1863,7 @@ void a3000_state::a3000(machine_config &config)
 	M68030(config, m_maincpu, XTAL(32'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a3000_state::a3000_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	amiga_base(config);
 
@@ -1897,6 +1902,7 @@ void a500p_state::a500p(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a500p_state::a500p_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	amiga_base(config);
 
@@ -1939,6 +1945,7 @@ void a600_state::a600(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a600_state::a600_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	amiga_base(config);
 
@@ -1989,6 +1996,7 @@ void a1200_state::a1200(machine_config &config)
 	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a1200_state::a1200_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	amiga_base(config);
 
@@ -2051,6 +2059,7 @@ void a4000_state::a4000(machine_config &config)
 	M68040(config, m_maincpu, XTAL(50'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a4000_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	amiga_base(config);
 
@@ -2124,6 +2133,7 @@ void cd32_state::cd32(machine_config &config)
 	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cd32_state::cd32_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	amiga_base(config);
 

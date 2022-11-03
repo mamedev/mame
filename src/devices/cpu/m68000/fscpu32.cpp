@@ -12,13 +12,13 @@ std::unique_ptr<util::disasm_interface> fscpu32_device::create_disassembler()
 
 fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
 						const device_type type, address_map_constructor internal_map)
-	: m68000_base_device(mconfig, tag, owner, clock, type, 16,32, internal_map)
+	: m68000_musashi_device(mconfig, tag, owner, clock, type, 16,32, internal_map)
 {
 }
 
 
 void fscpu32_device::device_start()
 {
-	m68000_base_device::device_start();
+	m68000_musashi_device::device_start();
 	init_cpu_fscpu32();
 }
