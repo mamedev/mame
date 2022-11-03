@@ -2075,12 +2075,13 @@ uint8_t a1200xl_state::djoy_b_r()
 
 	// TODO: TRIG2 (0) for XEGS keyboard disconnected, always 1 otherwise
 	b |= 1 << 2;
-	// TODO: should be like this but maxflash carts won't boot once you select any item
+	// TODO: should read from RD5 but maxflash carts won't boot once you select any item
 	// This is also necessary by:
-	// - SDX boot (will hang in kernel if this is 0)
+	// - SDX boot (will hang in kernel during POST by boot conflict with BASIC if not handled properly)
 	// - a1200xl cart boot
+	// - returning m_cartleft->exists() makes BASIC disable thru OPTION to not work in mega13 and makes maxflash to fail loading most .xex
 //	b |= m_cart_rd5_enabled << 3;
-	b |= m_cartleft->exists() << 3;
+	b |= !m_cartleft->exists() << 3;
 
 	return b;
 }

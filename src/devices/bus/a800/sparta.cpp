@@ -41,6 +41,7 @@ a800_rom_spartados_device::a800_rom_spartados_device(const machine_config &mconf
 // NB: game carts will usually override SDX boot, meaning that they aren't all that useful to hook up here.
 #include "rtime8.h"
 #include "maxflash.h"
+#include "oss.h"
 #include "sic.h"
 
 static void spartados_carts(device_slot_interface &device)
@@ -54,6 +55,11 @@ static void spartados_carts(device_slot_interface &device)
 	device.option_add(         "sic_128kb",     A800_SIC_128KB);
 	device.option_add(         "sic_256kb",     A800_SIC_256KB);
 	device.option_add(         "sic_512kb",     A800_SIC_512KB);
+
+	device.option_add_internal("a800_oss8k",    A800_ROM_OSS8K);
+	device.option_add_internal("a800_oss034m",  A800_ROM_OSS34);
+	device.option_add_internal("a800_oss043m",  A800_ROM_OSS43);
+	device.option_add_internal("a800_ossm091",  A800_ROM_OSS91);
 }
 
 WRITE_LINE_MEMBER( a800_rom_spartados_device::subcart_rd4_w )

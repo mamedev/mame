@@ -54,7 +54,7 @@ u8 a800_supercharger_device::status_r(offs_t offset)
 	return m_status;
 }
 
-// TODO: not instant 
+// TODO: not instant
 // (program sets four NOPs after each call)
 void a800_supercharger_device::command_w(offs_t offset, u8 data)
 {

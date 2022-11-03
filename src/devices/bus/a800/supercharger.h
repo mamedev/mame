@@ -12,7 +12,7 @@
 // ======================> a800_rtime8_device
 
 class a800_supercharger_device : public device_t,
-                                 public device_a800_cart_interface
+								 public device_a800_cart_interface
 {
 public:
 	a800_supercharger_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -22,7 +22,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	u8 m_data[3]{};
 	u8 m_status;
 
