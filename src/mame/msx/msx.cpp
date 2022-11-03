@@ -931,7 +931,7 @@ protected:
 	template <typename T, typename U>
 	auto &add_internal_disk_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
-		return add_internal_disk_mirrored(config, std::forward<T>(type), std::forward<T>(tag), prim, true, sec, page, numpages, region, offset);
+		return add_internal_disk_mirrored(config, std::forward<T>(type), std::forward<U>(tag), prim, true, sec, page, numpages, region, offset);
 	}
 	template <typename T, typename U>
 	auto &add_internal_disk_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, u8 page, u8 numpages, const char *region, u32 offset = 0)
