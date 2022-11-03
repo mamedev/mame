@@ -99,9 +99,16 @@ The same hardware from Unidesa/Cirsa was also used on some games from
 P4, P13, P15, P16 and P19 are unused.
 Games without video support have the P8 without a connector soldered in.
 
-The CS4 security counters module is a black plastic box with anti-tamper protections for
+The CS4 security counters module is a black plastic box with an anti-tamper sticker for
 auditing the machine financials. It sits on top of the PAT security PAL and the X9313
 using two connectors (4-pin on one side and 8-pin on the other).
+It's just a small PCB with a SEEPROM:
+ _______________________
+ |: ···                 |
+ |:  _____      _____  ·|
+ |: TLP521-2   24C16WP ·|
+ |:                    ·|
+ |______________________|
 
 According with fhe Spanish laws (at that time) for slot machines, it was mandatory to destroy
 the program ROMs and the security counters module for retiring the machines from service. That's
@@ -141,14 +148,7 @@ connected to P8:
 
  On every game (with or without video), a Samsung VFD display (1x16) can be connected
  to connector P14 for diagnostics and configuration.
-
- The CB1 (CS4) security counters module is just a small PCB with a SEEPROM:
- _______________________
- |: ···                 |
- |:  _____      _____  ·|
- |: TLP521-2   24C16WP ·|
- |:                    ·|
- |______________________|
+ Sometimes this display is externally exposed so it shows game texts and messages to the players.
 
 */
 
@@ -274,7 +274,7 @@ static const gfx_layout charlayout =
 #endif
 
 static GFXDECODE_START( gfx_neptunp2 )
-//  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
+//  GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
 GFXDECODE_END
 
 void neptunp2_state::neptunp2_no_video(machine_config &config)
@@ -335,6 +335,12 @@ ROM_START( neptunp2 )
 	ROM_REGION( 0x10000, "gfx", 0 )
 	ROM_LOAD( "flash_roms", 0x00000, 0x10000, NO_DUMP )
 
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "eeprom.u10", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "pal16l8.u6", 0x000, 0x104, NO_DUMP )
 ROM_END
@@ -345,10 +351,10 @@ ROM_END
 */
 ROM_START( perlacrb )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "c.la_perla_del_caribe_600_cvb-0092-e_nserie_08-00111_a_v1.0_cat_b082.u2", 0x000000, 0x100000, CRC(73f38d0a) SHA1(ca198e26a057ab7ce3479fff1287ff265306ab1f) )
+	ROM_LOAD( "c.la_perla_del_caribe_600_cvb-0092-e_a_v1.0_cat_b082.u2", 0x000000, 0x100000, CRC(73f38d0a) SHA1(ca198e26a057ab7ce3479fff1287ff265306ab1f) )
 
 	ROM_REGION( 0x100000, "prg_data", 0 )
-	ROM_LOAD( "c.la_perla_del_caribe_600_cvb-0092-e_nserie_08-00111_b_v1.0_cat_b082.u3", 0x000000, 0x100000, CRC(b306d9be) SHA1(29e2d289770bec9c89f3938ecb8b8747477c3860) )
+	ROM_LOAD( "c.la_perla_del_caribe_600_cvb-0092-e_b_v1.0_cat_b082.u3", 0x000000, 0x100000, CRC(b306d9be) SHA1(29e2d289770bec9c89f3938ecb8b8747477c3860) )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "s-436_otp.u14", 0x000000, 0x100000, CRC(52c08401) SHA1(2cd5110bb433996f6afdf48e68c65554d393dd14) )
@@ -369,6 +375,9 @@ ROM_START( perlacrb )
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(554805fa) SHA1(a79a1617c70e02d8100e6f38062a9aa15141c73c) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4_st24c16.bin", 0x000, 0x800, CRC(16fb7d4f) SHA1(e795731d041bbfd21270d774f3c1d7d4e91c4a15) ) // Probably contains operator data
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "pat063-1_gal16v8d.u6", 0x000, 0x104, NO_DUMP ) // "PAT-063/1", protected
@@ -391,8 +400,33 @@ ROM_START( ccorsario )
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(0212ae8f) SHA1(d1db767bd4314894e0cbf8063290fe3260646843) )
 
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "pat_062_tibpal16l8-25cn.bin", 0x000, 0x104, NO_DUMP ) // "PAT 062", protected
+ROM_END
+
+// '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'.
+// There's a small piggyback PCB with a LS14 connected to the 75188 and 75189 sockets (usually not populated on other games).
+// This model has the Samsung VFD display (1x16) exposed to the player (on other games it's usually hidden, just for operator use).
+ROM_START( mltpoints )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "c_multi_points_ro_v1.0_caa_03bf9e68_checksum.u2", 0x000000, 0x100000, CRC(26c5a62c) SHA1(e376eb84a75e4ac0b3beb5b1bd0aaf7bd0c3b3cc) )
+	// U3 not used
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "s-427_otp.u14", 0x000000, 0x100000, CRC(2cc39293) SHA1(7e19ef8ad2b95e30c169c87387f14a7350e4aff8) )
+	// U15 not used
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pat.u6", 0x000, 0x104, NO_DUMP )
 ROM_END
 
 // '960606-5 PCB and 'CB1 (CS4)' security counters module. It was found with most sockets unpopulated. This is mechanical.
@@ -409,6 +443,9 @@ ROM_START( rockroll )
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(fee6b8e4) SHA1(cb0ddd23e0decda540f22ebb455c91c2aabc60fd) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin", 0x000, 0x104, NO_DUMP ) // "PAT 063", protected
@@ -428,6 +465,9 @@ ROM_START( unk960606 )
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(5e2d52ac) SHA1(98bc7a668ee23de4184bdef23fbceda0c1987cd7) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "pal16l8.u6", 0x000, 0x104, NO_DUMP )
@@ -453,6 +493,9 @@ ROM_START( unk960606b )
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(1daca43c) SHA1(28ab94799dcb4bc6889e32311e93af5e9ac2fb90) )
 
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin", 0x000, 0x104, NO_DUMP ) // "PAT 063", protected
 ROM_END
@@ -467,6 +510,7 @@ GAME( 2008,  perlacrb,   0,     neptunp2_video,    neptunp2, neptunp2_state, emp
 
 // Screenless games on Cirsa "960606-5" CPU PCB
 GAME( 1999,  ccorsario,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine)",         MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
+GAME( 2006,  mltpoints,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points",                           MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
 GAME( 1999,  rockroll,   0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Rock 'n' Roll",                          MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from parts' manual and sticker on PCB
 GAME( 2001?, unk960606,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 1)", MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
 GAME( 2001?, unk960606b, 0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "unknown 960606-5 based machine (set 2)", MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
