@@ -705,9 +705,24 @@ ROM_START( futariblj )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(c631a766) SHA1(8bb6934a2f5b8a9841c3dcf85192b1743773dd8b) )
 ROM_END
 
+// for newer revision CV1000-B PCB
 ROM_START( ibara )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(8e6c155d) SHA1(38ac2107dc7824836e2b4e04c7180d5ae43c9b79) ) // (2005/03/22 MASTER VER..)
+	ROM_LOAD16_WORD_SWAP( "ibara_u4", 0x000000, 0x200000, CRC(d5fb6657) SHA1(4b2c9057cc765054232f520ee1c93495bc6b301e) ) // '06. 3. 7 ver. shown at service menu in special mode, still same as ibarao (2005/03/22 MASTER VER..) text at normal boot
+	ROM_RELOAD(0x200000,0x200000)
+
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(55840976) SHA1(4982bdce84f9603adfed7a618f18bc80359ab81e) ) // not dumped, it is unknown if this revision really uses same U2 as ibarao
+
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(ee5e585d) SHA1(7eeba4ee693060e927f8c46b16e39227c6a62392) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(f0aa3cb6) SHA1(f9d137cd879e718811b2d21a0af2a9c6b7dca2f9) )
+ROM_END
+
+// for original/older revision CV1000-B PCB
+ROM_START( ibarao )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "ibarao_u4", 0x000000, 0x200000, CRC(8e6c155d) SHA1(38ac2107dc7824836e2b4e04c7180d5ae43c9b79) ) // (2005/03/22 MASTER VER..)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
@@ -1000,7 +1015,8 @@ GAME( 2004, mushisama,  mushisam, cv1k,   cv1k, cv1k_state, init_ibara,    ROT27
 GAME( 2004, mushisamb,  mushisam, cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)",   "Mushihime-Sama (2004/10/12 MASTER VER)",                                        MACHINE_IMPERFECT_TIMING )
 
 // CA012  Ibara
-GAME( 2005, ibara,      0,        cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Ibara (2005/03/22 MASTER VER..)",                                               MACHINE_IMPERFECT_TIMING )
+GAME( 2005, ibara,      0,        cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Ibara (2005/03/22 MASTER VER.., '06. 3. 7 ver.)",                               MACHINE_IMPERFECT_TIMING )
+GAME( 2005, ibarao,     ibara,    cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Ibara (2005/03/22 MASTER VER..)",                                               MACHINE_IMPERFECT_TIMING )
 
 // CA012B Ibara Kuro Black Label
 GAME( 2006, ibarablk,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                              MACHINE_IMPERFECT_TIMING )
