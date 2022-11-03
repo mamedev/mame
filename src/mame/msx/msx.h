@@ -119,162 +119,32 @@ public:
 		m_exp_view[3][3] = &m_view_slot3_page3;
 	}
 
-	void ax150(machine_config &config);
-	void ax170(machine_config &config);
-	void ax230(machine_config &config);
-	void canonv8(machine_config &config);
-	void canonv10(machine_config &config);
-	void canonv20(machine_config &config);
-	void canonv20e(machine_config &config);
-	void canonv25(machine_config &config);
-	void cf1200(machine_config &config);
-	void cf2000(machine_config &config);
-	void cf2700(machine_config &config);
-	void cf2700g(machine_config &config);
-	void cf2700uk(machine_config &config);
-	void cf3000(machine_config &config);
-	void cf3300(machine_config &config);
-	void cpc50a(machine_config &config);
-	void cpc50b(machine_config &config);
-	void cpc51(machine_config &config);
-	void cpc88(machine_config &config);
-	void cx5f(machine_config &config);
-	void cx5f1(machine_config &config);
-	void cx5mu(machine_config &config);
-	void dgnmsx(machine_config &config);
-	void dpc100(machine_config &config);
-	void dpc180(machine_config &config);
-	void dpc200(machine_config &config);
-	void dpc200e(machine_config &config);
-	void expert10(machine_config &config);
-	void expert11(machine_config &config);
-	void expert13(machine_config &config);
-	void expertdp(machine_config &config);
-	void expertpl(machine_config &config);
-	void fmx(machine_config &config);
-	void fdpc200(machine_config &config);
-	void fpc500(machine_config &config);
-	void fs1300(machine_config &config);
-	void fs4000(machine_config &config);
-	void fs4000a(machine_config &config);
-	void fspc800(machine_config &config);
-	void gfc1080(machine_config &config);
-	void gfc1080a(machine_config &config);
-	void gsfc80u(machine_config &config);
-	void gsfc200(machine_config &config);
-	void hb10(machine_config &config);
-	void hb10p(machine_config &config);
-	void hb20p(machine_config &config);
-	void hb55(machine_config &config);
-	void hb55d(machine_config &config);
-	void hb55p(machine_config &config);
-	void hb75(machine_config &config);
-	void hb75d(machine_config &config);
-	void hb75p(machine_config &config);
-	void hb101(machine_config &config);
-	void hb101p(machine_config &config);
-	void hb201(machine_config &config);
-	void hb201p(machine_config &config);
-	void hb501p(machine_config &config);
-	void hb701fd(machine_config &config);
-	void hb8000(machine_config &config);
-	void hc5(machine_config &config);
-	void hc6(machine_config &config);
-	void hc7(machine_config &config);
-	void hotbi13b(machine_config &config);
-	void hotbi13p(machine_config &config);
-	void hx10(machine_config &config);
-	void hx10d(machine_config &config);
-	void hx10dp(machine_config &config);
-	void hx10e(machine_config &config);
-	void hx10f(machine_config &config);
-	void hx10s(machine_config &config);
-	void hx10sa(machine_config &config);
-	void hx20(machine_config &config);
-	void hx20e(machine_config &config);
-	void hx20i(machine_config &config);
-	void hx21(machine_config &config);
-	void hx21f(machine_config &config);
-	void hx22(machine_config &config);
-	void hx22i(machine_config &config);
-	void hx32(machine_config &config);
-	void hx51i(machine_config &config);
-	void jvchc7gb(machine_config &config);
-	void mbh1(machine_config &config);
-	void mbh1e(machine_config &config);
-	void mbh2(machine_config &config);
-	void mbh25(machine_config &config);
-	void mbh50(machine_config &config);
-	void ml8000(machine_config &config);
-	void mlf48(machine_config &config);
-	void mlf80(machine_config &config);
-	void mlf110(machine_config &config);
-	void mlf120(machine_config &config);
-	void mlfx1(machine_config &config);
-	void mpc10(machine_config &config);
-	void mpc64(machine_config &config);
-	void mpc100(machine_config &config);
-	void mpc200(machine_config &config);
-	void mpc200sp(machine_config &config);
-	void mx10(machine_config &config);
-	void mx15(machine_config &config);
-	void mx64(machine_config &config);
-	void mx101(machine_config &config);
-	void nms801(machine_config &config);
-	void perfect1(machine_config &config);
-	void phc2(machine_config &config);
-	void phc28(machine_config &config);
-	void phc28l(machine_config &config);
-	void phc28s(machine_config &config);
-	void piopx7(machine_config &config);
-	void piopx7uk(machine_config &config);
-	void piopxv60(machine_config &config);
-	void pv7(machine_config &config);
-	void pv16(machine_config &config);
-	void spc800(machine_config &config);
-	void svi728(machine_config &config);
-	void sx100(machine_config &config);
-	void tadpc200(machine_config &config);
-	void vg8000(machine_config &config);
-	void vg8010(machine_config &config);
-	void vg8010f(machine_config &config);
-	void vg802000(machine_config &config);
-	void vg802020(machine_config &config);
-	void vg8020f(machine_config &config);
-	void yc64(machine_config &config);
-	void yis303(machine_config &config);
-	void yis503(machine_config &config);
-	void yis503f(machine_config &config);
+	enum ay8910_type
+	{
+		SND_AY8910,
+		SND_YM2149
+	};
+
+	enum vdp_type
+	{
+		VDP_TMS9118,
+		VDP_TMS9128,
+		VDP_TMS9129,
+		VDP_TMS9918,
+		VDP_TMS9918A,
+		VDP_TMS9928A,
+		VDP_TMS9929A
+	};
 
 protected:
-	template<typename AY8910Type> void msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL xtal, int cpu_divider);
-	template<typename AY8910Type, typename T, typename Ret, typename... Params> void msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL xtal, int cpu_divider, Ret (T::*func)(Params...));
-	template<typename VDPType, typename AY8910Type> void msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config);
-	template<typename VDPType, typename AY8910Type, typename T, typename Ret, typename... Params> void msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...));
+	void msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider);
+	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config);
 	void msx1_add_softlists(machine_config &config);
 
 	template <u8 Game_port>
 	u8 game_port_r();
 
 	// configuration helpers
-	template <typename T, typename U>
-	auto &add_base_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages)
-	{
-		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
-		device.set_memory_space(m_maincpu, AS_PROGRAM);
-		device.set_io_space(m_maincpu, AS_IO);
-		device.set_maincpu(m_maincpu);
-		m_internal_slots.push_back(std::make_tuple(prim, expanded, sec, page, numpages, &device));
-		return device;
-	}
-	template <typename T, typename U>
-	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages)
-	{
-		auto &device = add_base_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, page, numpages);
-		device.set_start_address(page * 0x4000);
-		device.set_size(numpages * 0x4000);
-		return device;
-	}
 	template <typename T, typename U>
 	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages)
 	{
@@ -284,13 +154,6 @@ protected:
 	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 page, u8 numpages)
 	{
 		return add_internal_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, false, 0, page, numpages);
-	}
-	template <typename T, typename U>
-	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
-	{
-		auto &device = add_internal_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, page, numpages);
-		device.set_rom_start(region, offset);
-		return device;
 	}
 	template <typename T, typename U>
 	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
@@ -303,13 +166,6 @@ protected:
 		return add_internal_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, false, 0, page, numpages, region, offset);
 	}
 	template <typename T, typename U>
-	auto &add_internal_disk(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
-	{
-		auto &device = add_internal_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, true, sec, page, numpages, region, offset);
-		m_hw_def.has_fdc(true);
-		return device;
-	}
-	template <typename T, typename U>
 	auto &add_internal_disk(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
 		return add_internal_disk(config, std::forward<T>(type), std::forward<U>(tag), prim, true, sec, page, numpages, region, offset);
@@ -318,13 +174,6 @@ protected:
 	auto &add_internal_disk(machine_config &config, T &&type, U &&tag, u8 prim, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
 		return add_internal_disk(config, std::forward<T>(type), std::forward<U>(tag), prim, false, 0, page, numpages, region, offset);
-	}
-	template <int N, typename T, typename U>
-	auto &add_internal_slot_irq(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
-	{
-		auto &device = add_internal_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, page, numpages, region, offset);
-		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		return device;
 	}
 	template <int N, typename T, typename U>
 	auto &add_internal_slot_irq(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
@@ -344,14 +193,6 @@ protected:
 		return device;
 	}
 	template <typename T, typename U>
-	auto &add_internal_disk_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
-	{
-		// Memory mapped FDC registers are also accessible through page 2
-		auto &device = add_internal_disk(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, page, numpages, region, offset);
-		device.set_size(0x4000);
-		return device;
-	}
-	template <typename T, typename U>
 	auto &add_internal_disk_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
 	{
 		return add_internal_disk_mirrored(config, std::forward<T>(type), std::forward<U>(tag), prim, true, sec, page, numpages, region, offset);
@@ -362,18 +203,6 @@ protected:
 		return add_internal_disk_mirrored(config, std::forward<T>(type), std::forward<U>(tag), prim, false, 0, page, numpages, region, offset);
 	}
 	template <int N, typename T, typename U, typename V>
-	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, V &&intf, const char *deft)
-	{
-		auto &device = add_base_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, 0, 4);
-		device.option_reset();
-		intf(device);
-		device.set_default_option(deft);
-		device.set_fixed(false);
-		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		m_hw_def.has_cartslot(true);
-		return device;
-	}
-	template <int N, typename T, typename U, typename V>
 	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, u8 sec, V &&intf, const char *deft)
 	{
 		return add_cartridge_slot<N>(config, std::forward<T>(type), std::forward<U>(tag), prim, true, sec, intf, deft);
@@ -382,16 +211,6 @@ protected:
 	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, V &&intf, const char *deft)
 	{
 		return add_cartridge_slot<N>(config, std::forward<T>(type), std::forward<U>(tag), prim, false, 0, intf, deft);
-	}
-	template <int N>
-	auto &add_cartridge_slot(machine_config &config, u8 prim, bool expanded, u8 sec)
-	{
-		static const char *tags[4] = {
-			"cartslot1", "cartslot2", "cartslot3", "cartslot4"
-		};
-		if (N < 1 || N > 4)
-			fatalerror("Invalid cartridge slot number %d.\n", N);
-		return add_cartridge_slot<N>(config, MSX_SLOT_CARTRIDGE, tags[N-1], prim, expanded, sec, msx_cart, nullptr);
 	}
 	template <int N>
 	auto &add_cartridge_slot(machine_config &config, u8 prim, u8 sec)
@@ -488,13 +307,85 @@ protected:
 	u8 m_secondary_slot[4]{};
 	u8 m_port_c_old = 0;
 	u8 m_keylatch = 0;
+
+private:
+	// configuration helpers
+	template <typename T, typename U>
+	auto &add_base_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages)
+	{
+		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
+		device.set_memory_space(m_maincpu, AS_PROGRAM);
+		device.set_io_space(m_maincpu, AS_IO);
+		device.set_maincpu(m_maincpu);
+		m_internal_slots.push_back(std::make_tuple(prim, expanded, sec, page, numpages, &device));
+		return device;
+	}
+	template <typename T, typename U>
+	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages)
+	{
+		auto &device = add_base_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, page, numpages);
+		device.set_start_address(page * 0x4000);
+		device.set_size(numpages * 0x4000);
+		return device;
+	}
+	template <typename T, typename U>
+	auto &add_internal_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	{
+		auto &device = add_internal_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, page, numpages);
+		device.set_rom_start(region, offset);
+		return device;
+	}
+	template <typename T, typename U>
+	auto &add_internal_disk(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	{
+		auto &device = add_internal_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, true, sec, page, numpages, region, offset);
+		m_hw_def.has_fdc(true);
+		return device;
+	}
+	template <int N, typename T, typename U>
+	auto &add_internal_slot_irq(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	{
+		auto &device = add_internal_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, page, numpages, region, offset);
+		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
+		return device;
+	}
+	template <typename T, typename U>
+	auto &add_internal_disk_mirrored(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, const char *region, u32 offset = 0)
+	{
+		// Memory mapped FDC registers are also accessible through page 2
+		auto &device = add_internal_disk(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, page, numpages, region, offset);
+		device.set_size(0x4000);
+		return device;
+	}
+	template <int N, typename T, typename U, typename V>
+	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, V &&intf, const char *deft)
+	{
+		auto &device = add_base_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, 0, 4);
+		device.option_reset();
+		intf(device);
+		device.set_default_option(deft);
+		device.set_fixed(false);
+		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
+		m_hw_def.has_cartslot(true);
+		return device;
+	}
+	template <int N>
+	auto &add_cartridge_slot(machine_config &config, u8 prim, bool expanded, u8 sec)
+	{
+		static const char *tags[4] = {
+			"cartslot1", "cartslot2", "cartslot3", "cartslot4"
+		};
+		if (N < 1 || N > 4)
+			fatalerror("Invalid cartridge slot number %d.\n", N);
+		return add_cartridge_slot<N>(config, MSX_SLOT_CARTRIDGE, tags[N-1], prim, expanded, sec, msx_cart, nullptr);
+	}
 };
 
 
-class msx2_state : public msx_state
+class msx2_base_state : public msx_state
 {
-public:
-	msx2_state(const machine_config &mconfig, device_type type, const char *tag)
+protected:
+	msx2_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: msx_state(mconfig, type, tag)
 		, m_v9938(*this, "v9938")
 		, m_v9958(*this, "v9958")
@@ -503,134 +394,16 @@ public:
 	{
 	}
 
-	void ax350(machine_config &config);
-	void ax350ii(machine_config &config);
-	void ax350iif(machine_config &config);
-	void ax370(machine_config &config);
-	void ax500(machine_config &config);
-	void canonv25(machine_config &config);
-	void canonv30(machine_config &config);
-	void canonv30f(machine_config &config);
-	void cpc300(machine_config &config);
-	void cpc300e(machine_config &config);
-	void cpc330k(machine_config &config);
-	void cpc400(machine_config &config);
-	void cpc400s(machine_config &config);
-	void cpc61(machine_config &config);
-	void cpg120(machine_config &config);
-	void cx7128(machine_config &config);
-	void cx7m128(machine_config &config);
-	void expert20(machine_config &config);
-	void expert3i(machine_config &config);
-	void expert3t(machine_config &config);
-	void expertac(machine_config &config);
-	void expertdx(machine_config &config);
-	void fpc900(machine_config &config);
-	void kmc5000(machine_config &config);
-	void mbh70(machine_config &config);
-	void mlg1(machine_config &config);
-	void mlg3(machine_config &config);
-	void mlg10(machine_config &config);
-	void mlg30(machine_config &config);
-	void mlg30_2(machine_config &config);
-	void mpc2300(machine_config &config);
-	void mpc2500f(machine_config &config);
-	void mpc25fd(machine_config &config);
-	void mpc25fs(machine_config &config);
-	void mpc27(machine_config &config);
-	void fs4500(machine_config &config);
-	void fs4600f(machine_config &config);
-	void fs4700f(machine_config &config);
-	void fs5000f2(machine_config &config);
-	void fs5500f1(machine_config &config);
-	void fs5500f2(machine_config &config);
-	void fsa1(machine_config &config);
-	void fsa1a(machine_config &config);
-	void fsa1f(machine_config &config);
-	void fsa1fm(machine_config &config);
-	void fsa1fx(machine_config &config);
-	void fsa1gt(machine_config &config);
-	void fsa1st(machine_config &config);
-	void fsa1mk2(machine_config &config);
-	void fsa1wsx(machine_config &config);
-	void fsa1wx(machine_config &config);
-	void fsa1wxa(machine_config &config);
-	void fstm1(machine_config &config);
-	void hbf1(machine_config &config);
-	void hbf1ii(machine_config &config);
-	void hbf1xd(machine_config &config);
-	void hbf1xdj(machine_config &config);
-	void hbf1xv(machine_config &config);
-	void hbf5(machine_config &config);
-	void hbf500(machine_config &config);
-	void hbf500_2(machine_config &config);
-	void hbf500f(machine_config &config);
-	void hbf500p(machine_config &config);
-	void hbf700d(machine_config &config);
-	void hbf700f(machine_config &config);
-	void hbf700p(machine_config &config);
-	void hbf700s(machine_config &config);
-	void hbf900(machine_config &config);
-	void hbf900a(machine_config &config);
-	void hbf9p(machine_config &config);
-	void hbf9pr(machine_config &config);
-	void hbf9s(machine_config &config);
-	void hbg900ap(machine_config &config);
-	void hbg900p(machine_config &config);
-	void hotbit20(machine_config &config);
-	void hx23(machine_config &config);
-	void hx23f(machine_config &config);
-	void hx33(machine_config &config);
-	void hx34(machine_config &config);
-	void mbh3(machine_config &config);
-	void nms8220(machine_config &config);
-	void nms8245(machine_config &config);
-	void nms8245f(machine_config &config);
-	void nms8250(machine_config &config);
-	void nms8255(machine_config &config);
-	void nms8255f(machine_config &config);
-	void nms8260(machine_config &config);
-	void nms8280(machine_config &config);
-	void nms8280f(machine_config &config);
-	void nms8280g(machine_config &config);
-	void phc23(machine_config &config);
-	void phc23jb(machine_config &config);
-	void phc35j(machine_config &config);
-	void phc55fd2(machine_config &config);
-	void phc70fd(machine_config &config);
-	void phc70fd2(machine_config &config);
-	void phc77(machine_config &config);
-	void tpc310(machine_config &config);
-	void tpp311(machine_config &config);
-	void tps312(machine_config &config);
-	void ucv102(machine_config &config);
-	void vg8230(machine_config &config);
-	void vg8235(machine_config &config);
-	void vg8235f(machine_config &config);
-	void vg8240(machine_config &config);
-	void victhc80(machine_config &config);
-	void victhc90(machine_config &config);
-	void victhc95(machine_config &config);
-	void victhc95a(machine_config &config);
-	void y503iiir(machine_config &config);
-	void y503iiire(machine_config &config);
-	void yis604(machine_config &config);
-	void y805128(machine_config &config);
-	void y805128r2(machine_config &config);
-	void y805128r2e(machine_config &config);
-	void y805256(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 
-	template<typename AY8910Type> void msx2_base(AY8910Type &ay8910_type, machine_config &config);
-	template<typename AY8910Type> void msx2(AY8910Type &ay8910_type, machine_config &config);
-	template<typename AY8910Type> void msx2_pal(AY8910Type &ay8910_type, machine_config &config);
-	template<typename AY8910Type> void msx2plus_base(AY8910Type &ay8910_type, machine_config &config);
-	template<typename AY8910Type> void msx2plus(AY8910Type &ay8910_type, machine_config &config);
-	template<typename AY8910Type> void msx2plus_pal(AY8910Type &ay8910_type, machine_config &config);
-	template<typename AY8910Type> void turbor(AY8910Type &ay8910_type, machine_config &config);
-
+	void msx2_base(ay8910_type ay8910_type, machine_config &config);
+	void msx2(ay8910_type ay8910_type, machine_config &config);
+	void msx2_pal(ay8910_type ay8910_type, machine_config &config);
+	void msx2plus_base(ay8910_type ay8910_type, machine_config &config);
+	void msx2plus(ay8910_type ay8910_type, machine_config &config);
+	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config);
+	void turbor(ay8910_type ay8910_type, machine_config &config);
+	
 	void msx2_add_softlists(machine_config &config);
 	void msx2plus_add_softlists(machine_config &config);
 	void turbor_add_softlists(machine_config &config);

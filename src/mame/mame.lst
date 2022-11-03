@@ -31292,23 +31292,16 @@ msisaac                         // A34 (c) 1985 Taito Corporation
 @source:skeleton/mstation.cpp
 mstation                        //
 
-@source:msx/msx.cpp
+@source:msx/msx1.cpp
 ax150                           //
 ax170                           //
 ax230                           //
-ax350                           //
-ax350ii                         //
-ax350iif                        //
-ax370                           //
-ax500                           //
 canonv10                        //
 canonv20                        //
 canonv20e                       //
 canonv20f                       //
 canonv20g                       //
 canonv20s                       //
-canonv25                        //
-canonv30f                       //
 canonv8                         //
 cf1200                          // 1984 MSX Japan
 cf2000                          // 1983 MSX Japan
@@ -31317,22 +31310,13 @@ cf2700g                         //
 cf2700uk                        //
 cf3000                          // 1984 MSX Japan
 cf3300                          // 1985 MSX Japan
-cpc300                          // 1986 MSX2 Korea
-cpc300e                         // 1986 MSX2 Korea
-cpc330k                         //
-cpc400                          // 1986 MSX2 Korea
-cpc400s                         // 1986 MSX2 Korea
 cpc50a                          //
 cpc50b                          //
 cpc51                           //
-cpc61                           //
 cpc88                           //
-cpg120                          //
 cx5f                            //
 cx5f1                           //
 cx5mu                           //
-cx7128                          // 1986 MSX2
-cx7m128                         // 1986 MSX2
 dgnmsx                          // 1985 MSX
 dpc100                          // 1984 MSX Korea
 dpc180                          // 1984 MSX Korea
@@ -31341,39 +31325,15 @@ dpc200e                         //
 expert10                        // 1983 MSX Brazil
 expert11                        // 1984 MSX Brazil
 expert13                        // 1984 MSX Brazil
-expert20                        // 1986 MSX2 Korea
-expert3i                        //
-expert3t                        //
-expertac                        //
 expertdp                        // 1985 MSX Brazil
-expertdx                        //
 expertpl                        // 1984 MSX Brazil
 fdpc200                         //
 fmx                             //
 fpc500                          //
-fpc900                          //
 fs1300                          // 1985 MSX Japan
 fs4000                          // 1985 MSX Japan
 fs4000a                         //
-fs4500                          // 1986 MSX2 Japan
-fs4600f                         // 1986 MSX2 Japan
-fs4700f                         // 1986 MSX2 Japan
-fs5000f2                        // 1986 MSX2 Japan
-fs5500f1                        // 1985 MSX2 Japan
-fs5500f2                        // 1985 MSX2 Japan
-fsa1                            // 1986 MSX2 Japan
-fsa1a                           // 1986 MSX2 Japan
-fsa1f                           // 1987 MSX2 Japan
-fsa1fm                          // 1988 MSX2 Japan
-fsa1fx                          // 1988 MSX2+ Japan
-fsa1gt                          //
-fsa1mk2                         // 1987 MSX2 Japan
-fsa1st                          //
-fsa1wsx                         // 1989 MSX2+ Japan
-fsa1wx                          // 1988 MSX2+ Japan
-fsa1wxa                         // 1988 MSX2+ Japan
 fspc800                         //
-fstm1                           //
 gfc1080                         //
 gfc1080a                        //
 gsfc200                         //
@@ -31394,6 +31354,137 @@ hb75                            //
 hb75d                           // 1983 MSX Germany
 hb75p                           // 1983 MSX
 hb8000                          // 1985 MSX Brazil
+hc5                             //
+hc6                             //
+hc7                             //
+hotbi13b                        // 1985 MSX Brazil
+hotbi13p                        // 1985 MSX Brazil
+hx10                            // 1984 MSX
+hx10d                           //
+hx10dp                          //
+hx10e                           //
+hx10f                           //
+hx10s                           // 1984 MSX
+hx10sa                          //
+hx20                            // 1984 MSX
+hx20e                           // 1985 MSX
+hx20i                           //
+hx21                            //
+hx21f                           //
+hx22                            //
+hx22i                           //
+hx32                            // 1985 MSX
+hx51i                           // 1985 MSX
+jvchc7gb                        //
+mbh1                            // 1983 MSX1
+mbh1e                           // 1984 MSX1
+mbh2                            //
+mbh25                           //
+mbh50                           //
+ml8000                          // 1983 MSX1
+mlf110                          //
+mlf120                          //
+mlf48                           //
+mlf80                           //
+mlfx1                           //
+mpc10                           //
+mpc100                          //
+mpc200                          //
+mpc200sp                        //
+mpc64                           //
+mx10                            //
+mx101                           //
+mx15                            //
+mx64                            //
+nms801                          //
+perfect1                        //
+phc2                            //
+phc28                           //
+phc28l                          //
+phc28s                          //
+piopx7                          //
+piopx7uk                        //
+piopxv60                        //
+pv16                            //
+pv7                             //
+spc800                          //
+svi728                          // 1985 MSX
+svi728es                        //
+sx100                           // 1985 MSX
+tadpc200                        //
+tadpc200b                       //
+vg8000                          //
+vg8010                          //
+vg8010f                         //
+vg802000                        //
+vg802020                        // 1985 MSX
+vg8020f                         //
+yc64                            //
+yis303                          //
+yis503                          //
+yis503f                         //
+
+@source:msx/msx1_bruc100.cpp
+bruc100                         //
+bruc100a                        //
+
+@source:msx/msx1_v9938.cpp
+ax200                           //
+ax200m                          //
+cx5m128                         //
+cx5miib                         //
+svi738                          // 1985 MSX
+svi738ar                        //
+svi738dk                        //
+svi738pl                        // 1985 MSX
+svi738sp                        //
+svi738sw                        // 1985 MSX
+tadpc200a                       //
+y503iir                         //
+y503iir2                        //
+yis503ii                        //
+
+@source:msx/msx2.cpp
+ax350                           //
+ax350ii                         //
+ax350iif                        //
+ax370                           //
+ax500                           //
+canonv25                        //
+canonv30f                       //
+cpc300                          // 1986 MSX2 Korea
+cpc300e                         // 1986 MSX2 Korea
+cpc330k                         //
+cpc400                          // 1986 MSX2 Korea
+cpc400s                         // 1986 MSX2 Korea
+cpc61                           //
+cpg120                          //
+cx7128                          // 1986 MSX2
+cx7m128                         // 1986 MSX2
+expert20                        // 1986 MSX2 Korea
+expert3i                        //
+expert3t                        //
+expertac                        //
+expertdx                        //
+fpc900                          //
+fs4500                          // 1986 MSX2 Japan
+fs4600f                         // 1986 MSX2 Japan
+fs4700f                         // 1986 MSX2 Japan
+fs5000f2                        // 1986 MSX2 Japan
+fs5500f1                        // 1985 MSX2 Japan
+fs5500f2                        // 1985 MSX2 Japan
+fsa1                            // 1986 MSX2 Japan
+fsa1a                           // 1986 MSX2 Japan
+fsa1f                           // 1987 MSX2 Japan
+fsa1fm                          // 1988 MSX2 Japan
+fsa1fx                          // 1988 MSX2+ Japan
+fsa1gt                          //
+fsa1mk2                         // 1987 MSX2 Japan
+fsa1st                          //
+fsa1wsx                         // 1989 MSX2+ Japan
+fsa1wx                          // 1988 MSX2+ Japan
+fsa1wxa                         // 1988 MSX2+ Japan
+fstm1                           //
 hbf1                            // 1986 MSX2 Japan
 hbf1ii                          // 1987 MSX2 Japan
 hbf1xd                          // 1987 MSX2 Japan
@@ -31415,67 +31506,24 @@ hbf9pr                          //
 hbf9s                           // 1985 MSX2
 hbg900ap                        // 1986 MSX2
 hbg900p                         // 1986 MSX2
-hc5                             //
-hc6                             //
-hc7                             //
-hotbi13b                        // 1985 MSX Brazil
-hotbi13p                        // 1985 MSX Brazil
 hotbit20                        // 1986 MSX2 Brazil
-hx10                            // 1984 MSX
-hx10d                           //
-hx10dp                          //
-hx10e                           //
-hx10f                           //
-hx10s                           // 1984 MSX
-hx10sa                          //
-hx20                            // 1984 MSX
-hx20e                           // 1985 MSX
-hx20i                           //
-hx21                            //
-hx21f                           //
-hx22                            //
-hx22i                           //
 hx23                            // 1986 MSX2
 hx23f                           // 1986 MSX2
-hx32                            // 1985 MSX
 hx33                            //
 hx34                            //
-hx51i                           // 1985 MSX
-jvchc7gb                        //
 kmc5000                         //
-mbh1                            // 1983 MSX1
-mbh1e                           // 1984 MSX1
-mbh2                            //
-mbh25                           //
 mbh3                            //
-mbh50                           //
 mbh70                           //
-ml8000                          // 1983 MSX1
-mlf110                          //
-mlf120                          //
-mlf48                           //
-mlf80                           //
-mlfx1                           //
 mlg1                            //
 mlg10                           //
 mlg3                            //
 mlg30                           //
 mlg30_2                         //
-mpc10                           //
-mpc100                          //
-mpc200                          //
-mpc200sp                        //
 mpc2300                         //
 mpc2500f                        //
 mpc25fd                         //
 mpc25fs                         //
 mpc27                           //
-mpc64                           //
-mx10                            //
-mx101                           //
-mx15                            //
-mx64                            //
-nms801                          //
 nms8220                         // 1986 MSX2
 nms8245                         // 1986 MSX2
 nms8245f                        // 1986 MSX2
@@ -31488,39 +31536,17 @@ nms8260                         //
 nms8280                         // 1986 MSX2
 nms8280f                        //
 nms8280g                        // 1986 MSX2
-perfect1                        //
-phc2                            //
 phc23                           // 1986 MSX2 Japan
 phc23jb                         // 1987 MSX2 Japan
-phc28                           //
-phc28l                          //
-phc28s                          //
 phc35j                          // 1989 MSX2+ Japan
 phc55fd2                        //
 phc70fd                         // 1988 MSX2+ Japan
 phc70fd2                        // 1988 MSX2+ Japan
 phc77                           //
-piopx7                          //
-piopx7uk                        //
-piopxv60                        //
-pv16                            //
-pv7                             //
-spc800                          //
-svi728                          // 1985 MSX
-svi728es                        //
-sx100                           // 1985 MSX
-tadpc200                        //
-tadpc200b                       //
 tpc310                          // 1986 MSX2
 tpp311                          //
 tps312                          //
 ucv102                          //
-vg8000                          //
-vg8010                          //
-vg8010f                         //
-vg802000                        //
-vg802020                        // 1985 MSX
-vg8020f                         //
 vg8230                          // 1986 MSX2
 vg8235                          // 1986 MSX2
 vg8235f                         // 1986 MSX2
@@ -31535,31 +31561,7 @@ y805128                         //
 y805128r2                       //
 y805128r2e                      //
 y805256                         //
-yc64                            //
-yis303                          //
-yis503                          //
-yis503f                         //
 yis604                          //
-
-@source:msx/msx1_bruc100.cpp
-bruc100                         //
-bruc100a                        //
-
-@source:msx/msx1_v9938.cpp
-ax200                           //
-ax200m                          //
-cx5m128                         //
-cx5miib                         //
-svi738                          // 1985 MSX
-svi738ar                        //
-svi738dk                        //
-svi738pl                        // 1985 MSX
-svi738sp                        //
-svi738sw                        // 1985 MSX
-tadpc200a                       //
-y503iir                         //
-y503iir2                        //
-yis503ii                        //
 
 @source:microterm/mt420.cpp
 mt420                           //

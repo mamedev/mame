@@ -22,10 +22,8 @@ public:
 	void yis503ii(machine_config &config);
 
 protected:
-	template<typename AY8910Type> void msx1_v9938(AY8910Type &ay8910_type, machine_config &config);
-	template<typename AY8910Type, typename T, typename Ret, typename... Params> void msx1_v9938(AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...));
-	template<typename AY8910Type> void msx1_v9938_pal(AY8910Type &ay8910_type, machine_config &config);
-	template<typename AY8910Type, typename T, typename Ret, typename... Params> void msx1_v9938_pal(AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...));
+	void msx1_v9938(ay8910_type ay8910_type, machine_config &config);
+	void msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config);
 
 	void io_map(address_map &map);
 
