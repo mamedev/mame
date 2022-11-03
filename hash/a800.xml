@@ -2121,10 +2121,13 @@ Ugly to look at without [ANTIC] television artifacts
 		</part>
 	</software>
 
-	<software name="digduga" cloneof="digdug">
+	<software name="digduga" cloneof="digdug" supported="partial">
 		<description>Dig Dug (Earlier Release)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Flickering score layer on title screen
+]]></notes>
 		<info name="serial" value="RX8026" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -6002,7 +6005,7 @@ Requires PLATO dial-up modem connection
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="writer's tool extension.atr" size="92176" crc="5a6e2133" sha1="c6d4c49fb53a41b28634b209176c74ed86fbfc64"/>
+				<rom name="writer's tool.atr" size="92176" crc="5a6e2133" sha1="c6d4c49fb53a41b28634b209176c74ed86fbfc64"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">

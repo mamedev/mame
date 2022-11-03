@@ -278,6 +278,10 @@ Possible Undumped protos: -
 		<description>Black Belt (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Sluggish in gameplay (btanb)
+]]></notes>
+		<info name="usage" value="Select difficulty with 1-8 keys, press start then press 0 key" />
 		<info name="serial" value="CX5231" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
@@ -497,10 +501,14 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="galaxian">
+	<software name="galaxian" supported="no">
 		<description>Galaxian</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Player missile is vertically offset when idle
+Some enemies never collides with player bullets
+]]></notes>
 		<info name="serial" value="CX5206" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
@@ -706,10 +714,15 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="meebzork">
+	<software name="meebzork" supported="partial">
 		<description>Meebzork (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Unresponsive menuing (btanb)
+Doesn't seem to provide a way to restart a game without system reset (btanb)
+Doesn't mask sprites on title and "the end" screens [GTIA] GRACTL
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
@@ -769,10 +782,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="mine2049">
+	<software name="mine2049" supported="partial">
 		<description>Miner 2049er</description>
 		<year>1983</year>
 		<publisher>Big Five Software</publisher>
+		<notes><![CDATA[
+Hi-score screen has wrong colored rotating digits and direction desyncs at bottom
+]]></notes>
 		<info name="serial" value="BF1912" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
@@ -979,10 +995,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="quintana">
+	<software name="quintana" supported="no">
 		<description>Quest for Quintana Roo</description>
 		<year>1984</year>
 		<publisher>Sunrise</publisher>
+		<notes><![CDATA[
+Doesn't recognize start button
+]]></notes>
 		<info name="serial" value="1603" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
@@ -1060,11 +1079,14 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="rssoccer">
+	<software name="rssoccer" supported="no">
 		<description>RealSports Soccer</description>
 		<!-- Originally released as "Soccer" -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Analog input ranges don't allow going down and right on full presses (i.e. on digital input tapping goes right, holding goes left)
+]]></notes>
 		<info name="serial" value="CX5213" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200_2chips" />
@@ -1363,10 +1385,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="xari">
+	<software name="xari" supported="no">
 		<description>Xari Arena (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Flickering player sprite, unplayable
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
@@ -1451,10 +1476,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="pamdiag2">
+	<software name="pamdiag2" supported="no">
 		<description>PAM Diag 2.0</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Crashes on Atari copyright screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
@@ -1463,10 +1491,14 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="pamdg23">
+	<software name="pamdg23" supported="partial">
 		<description>Atari PAM Diagnostics (Rev 2.3)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+[ANTIC] test returns "soft error 34 01"
+[POKEY] test requires an unemulated loopback serial board
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
@@ -1512,10 +1544,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="ccrisis">
+	<software name="ccrisis" supported="no">
 		<description>Castle Crisis</description>
 		<year>2004</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+[ANTIC] playfield height doesn't cover full screen
+]]></notes>
 		<info name="developer" value="Bryan Edewaard" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
