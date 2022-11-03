@@ -251,6 +251,7 @@ protected:
 	template<typename AY8910Type, typename T, typename Ret, typename... Params> void msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL xtal, int cpu_divider, Ret (T::*func)(Params...));
 	template<typename VDPType, typename AY8910Type> void msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config);
 	template<typename VDPType, typename AY8910Type, typename T, typename Ret, typename... Params> void msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...));
+	void msx1_add_softlists(machine_config &config);
 
 	template <u8 Game_port>
 	u8 game_port_r();
@@ -490,37 +491,6 @@ protected:
 };
 
 
-class msx1_v9938_state : public msx_state
-{
-public:
-	msx1_v9938_state(const machine_config &mconfig, device_type type, const char *tag)
-		: msx_state(mconfig, type, tag)
-		, m_v9938(*this, "v9938")
-	{
-	}
-
-	void ax200(machine_config &mconfig);
-	void ax200m(machine_config &mconfig);
-	void cx5m128(machine_config &config);
-	void cx5miib(machine_config &config);
-	void svi738(machine_config &config);
-	void svi738ar(machine_config &config);
-	void tadpc200a(machine_config &config);
-	void y503iir(machine_config &config);
-	void y503iir2(machine_config &config);
-	void yis503ii(machine_config &config);
-
-protected:
-	template<typename AY8910Type> void msx1_v9938(AY8910Type &ay8910_type, machine_config &config);
-	template<typename AY8910Type, typename T, typename Ret, typename... Params> void msx1_v9938(AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...));
-	template<typename AY8910Type> void msx1_v9938_pal(AY8910Type &ay8910_type, machine_config &config);
-	template<typename AY8910Type, typename T, typename Ret, typename... Params> void msx1_v9938_pal(AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...));
-
-	void io_map(address_map &map);
-
-	optional_device<v9938_device> m_v9938;
-};
-
 class msx2_state : public msx_state
 {
 public:
@@ -661,6 +631,9 @@ protected:
 	template<typename AY8910Type> void msx2plus_pal(AY8910Type &ay8910_type, machine_config &config);
 	template<typename AY8910Type> void turbor(AY8910Type &ay8910_type, machine_config &config);
 
+	void msx2_add_softlists(machine_config &config);
+	void msx2plus_add_softlists(machine_config &config);
+	void turbor_add_softlists(machine_config &config);
 	void msx_ym2413(machine_config &config);
 	void msx2_64kb_vram(machine_config &config);
 

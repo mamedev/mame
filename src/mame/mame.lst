@@ -31295,8 +31295,6 @@ mstation                        //
 @source:msx/msx.cpp
 ax150                           //
 ax170                           //
-ax200                           //
-ax200m                          //
 ax230                           //
 ax350                           //
 ax350ii                         //
@@ -31333,8 +31331,6 @@ cpg120                          //
 cx5f                            //
 cx5f1                           //
 cx5mu                           //
-cx5m128                         //
-cx5miib                         //
 cx7128                          // 1986 MSX2
 cx7m128                         // 1986 MSX2
 dgnmsx                          // 1985 MSX
@@ -31512,16 +31508,9 @@ pv7                             //
 spc800                          //
 svi728                          // 1985 MSX
 svi728es                        //
-svi738                          // 1985 MSX
-svi738ar                        //
-svi738dk                        //
-svi738pl                        // 1985 MSX
-svi738sp                        //
-svi738sw                        // 1985 MSX
 sx100                           // 1985 MSX
 tadpc200                        //
 tadpc200b                       //
-tadpc200a                       //
 tpc310                          // 1986 MSX2
 tpp311                          //
 tps312                          //
@@ -31542,8 +31531,6 @@ victhc95                        //
 victhc95a                       //
 y503iiir                        //
 y503iiire                       //
-y503iir                         //
-y503iir2                        //
 y805128                         //
 y805128r2                       //
 y805128r2e                      //
@@ -31552,12 +31539,27 @@ yc64                            //
 yis303                          //
 yis503                          //
 yis503f                         //
-yis503ii                        //
 yis604                          //
 
 @source:msx/msx1_bruc100.cpp
 bruc100                         //
 bruc100a                        //
+
+@source:msx/msx1_v9938.cpp
+ax200                           //
+ax200m                          //
+cx5m128                         //
+cx5miib                         //
+svi738                          // 1985 MSX
+svi738ar                        //
+svi738dk                        //
+svi738pl                        // 1985 MSX
+svi738sp                        //
+svi738sw                        // 1985 MSX
+tadpc200a                       //
+y503iir                         //
+y503iir2                        //
+yis503ii                        //
 
 @source:microterm/mt420.cpp
 mt420                           //

@@ -691,25 +691,6 @@ void msx_state::msx_io_map(address_map &map)
 }
 
 
-void msx1_v9938_state::io_map(address_map &map)
-{
-	map.unmap_value_high();
-	map.global_mask(0xff);
-	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	if (m_hw_def.has_printer_port())
-	{
-		map(0x90, 0x90).r(m_cent_status_in, FUNC(input_buffer_device::read));
-		map(0x90, 0x90).w(m_cent_ctrl_out, FUNC(output_latch_device::write));
-		map(0x91, 0x91).w(m_cent_data_out, FUNC(output_latch_device::write));
-	}
-	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0xa8, 0xab).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
-	map(0xd8, 0xd9).w(FUNC(msx1_v9938_state::kanji_w));
-	map(0xd9, 0xd9).r(FUNC(msx1_v9938_state::kanji_r));
-	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
-}
-
 void msx2_state::msx2_io_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -1257,20 +1238,8 @@ void msx_state::msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL x
 	}
 }
 
-template<typename VDPType, typename AY8910Type, typename T, typename Ret, typename... Params>
-void msx_state::msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...))
+void msx_state::msx1_add_softlists(machine_config &config)
 {
-	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3, func);
-
-	m_maincpu->set_addrmap(AS_IO, &msx_state::msx_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(msx_state::msx_interrupt)); /* Needed for mouse updates */
-
-	vdp_type(config, m_tms9928a, 10.738635_MHz_XTAL);
-	m_tms9928a->set_screen(m_screen);
-	m_tms9928a->set_vram_size(0x4000);
-	m_tms9928a->int_callback().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
-
-	// Software lists
 	if (m_hw_def.has_cassette())
 	{
 		SOFTWARE_LIST(config, "cass_list").set_original("msx1_cass");
@@ -1285,6 +1254,89 @@ void msx_state::msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config 
 	{
 		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
 	}
+}
+
+void msx2_state::msx2_add_softlists(machine_config &config)
+{
+	if (m_hw_def.has_cassette())
+	{
+		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+		SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
+	}
+
+	if (m_hw_def.has_cartslot())
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
+		SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
+	}
+
+	if (m_hw_def.has_fdc())
+	{
+		SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
+		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
+	}
+}
+
+void msx2_state::msx2plus_add_softlists(machine_config &config)
+{
+	if (m_hw_def.has_cassette())
+	{
+		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+		SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
+	}
+
+	if (m_hw_def.has_cartslot())
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
+		SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
+	}
+
+	if (m_hw_def.has_fdc())
+	{
+		SOFTWARE_LIST(config, "flop_list").set_original("msx2p_flop");
+		SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");
+		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
+	}
+}
+
+void msx2_state::turbor_add_softlists(machine_config &config)
+{
+	if (m_hw_def.has_cassette())
+	{
+		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+		SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
+	}
+
+	if (m_hw_def.has_cartslot())
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
+		SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
+	}
+
+	if (m_hw_def.has_fdc())
+	{
+		SOFTWARE_LIST(config, "flop_list").set_original("msxr_flop");
+		SOFTWARE_LIST(config, "msx2p_flp_l").set_compatible("msx2p_flop");
+		SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");
+		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
+	}
+}
+
+template<typename VDPType, typename AY8910Type, typename T, typename Ret, typename... Params>
+void msx_state::msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...))
+{
+	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3, func);
+
+	m_maincpu->set_addrmap(AS_IO, &msx_state::msx_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(msx_state::msx_interrupt)); /* Needed for mouse updates */
+
+	vdp_type(config, m_tms9928a, 10.738635_MHz_XTAL);
+	m_tms9928a->set_screen(m_screen);
+	m_tms9928a->set_vram_size(0x4000);
+	m_tms9928a->int_callback().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
+
+	// Software lists
+	msx1_add_softlists(config);
 }
 
 template<typename VDPType, typename AY8910Type>
@@ -1301,94 +1353,7 @@ void msx_state::msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config 
 	m_tms9928a->int_callback().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 
 	// Software lists
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
-	}
-}
-
-template<typename AY8910Type>
-void msx1_v9938_state::msx1_v9938(AY8910Type &ay8910_type, machine_config &config)
-{
-	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6);
-
-	m_maincpu->set_addrmap(AS_IO, &msx1_v9938_state::io_map);
-
-	// video hardware
-	V9938(config, m_v9938, 21.477272_MHz_XTAL);
-	m_v9938->set_screen_ntsc(m_screen);
-	m_v9938->set_vram_size(0x4000);
-	m_v9938->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
-
-	// Software lists
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
-	}
-}
-
-template<typename AY8910Type, typename T, typename Ret, typename... Params>
-void msx1_v9938_state::msx1_v9938(AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...))
-{
-	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6, func);
-
-	m_maincpu->set_addrmap(AS_IO, &msx1_v9938_state::io_map);
-
-	// video hardware
-	V9938(config, m_v9938, 21.477272_MHz_XTAL);
-	m_v9938->set_screen_ntsc(m_screen);
-	m_v9938->set_vram_size(0x4000);
-	m_v9938->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
-
-	// Software lists
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
-	}
-}
-
-template<typename AY8910Type>
-void msx1_v9938_state::msx1_v9938_pal(AY8910Type &ay8910_type, machine_config &config)
-{
-	msx1_v9938(ay8910_type, config);
-	m_v9938->set_screen_pal(m_screen);
-}
-
-template<typename AY8910Type, typename T, typename Ret, typename... Params>
-void msx1_v9938_state::msx1_v9938_pal(AY8910Type &ay8910_type, machine_config &config, Ret (T::*func)(Params...))
-{
-	msx1_v9938(ay8910_type, config, func);
-	m_v9938->set_screen_pal(m_screen);
+	msx1_add_softlists(config);
 }
 
 template<typename AY8910Type>
@@ -1414,23 +1379,7 @@ void msx2_state::msx2(AY8910Type &ay8910_type, machine_config &config)
 	m_v9938->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 
 	// Software lists
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
-		SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
-		SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
-		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
-	}
+	msx2_add_softlists(config);
 }
 
 template<typename AY8910Type>
@@ -1460,24 +1409,7 @@ void msx2_state::msx2plus(AY8910Type &ay8910_type, machine_config &config)
 	msx2plus_base(ay8910_type, config);
 
 	// Software lists
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
-		SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
-		SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msx2p_flop");
-		SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");
-		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
-	}
+	msx2plus_add_softlists(config);
 }
 
 template<typename AY8910Type>
@@ -1497,25 +1429,7 @@ void msx2_state::turbor(AY8910Type &ay8910_type, machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2plus_io_map);
 
 	// Software lists
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
-		SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
-		SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msxr_flop");
-		SOFTWARE_LIST(config, "msx2p_flp_l").set_compatible("msx2p_flop");
-		SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");
-		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
-	}
+	turbor_add_softlists(config);
 }
 
 /***************************************************************************
@@ -3330,67 +3244,6 @@ void msx_state::ax170(machine_config &config)
 
 /* MSX - Sakhr AX-170F */
 
-/* MSX - Sakhr AX-200 (Arabic/English) */
-
-ROM_START (ax200)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("ax200bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(cae98b30) SHA1(079c018739c37485f3d64ef2145a0267fce6e20e)) // need verification
-
-	ROM_REGION(0x8000, "arabic", 0)
-	ROM_LOAD("ax200arab.rom", 0x0000, 0x8000, BAD_DUMP CRC(b041e610) SHA1(7574cc5655805ea316011a8123b064917f06f83c)) // need verification
-ROM_END
-
-void msx1_v9938_state::ax200(machine_config &config)
-{
-	// YM2149 in S3527
-	// FDC: None, 0 drives
-	// 2 Cartridge slots
-	// V9938
-	// MSX Engine S3527
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram1", 0, 0, 2, 2); // 32KB RAM
-	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 0, 2, 0, 2); // 32KB RAM
-	add_internal_slot(config, MSX_SLOT_ROM, "arabic", 0, 3, 1, 2, "arabic");
-	add_cartridge_slot<1>(config, 1);
-	add_cartridge_slot<2>(config, 2);
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, msx_yamaha_60pin, nullptr);
-
-	msx1_v9938_pal(YM2149, config);
-}
-
-/* MSX - Sakhr AX-200 (Arabic/French) */
-
-/* MSX - Sakhr AX-200M (Arabic/English) */
-
-ROM_START (ax200m)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("ax200bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(cae98b30) SHA1(079c018739c37485f3d64ef2145a0267fce6e20e)) // need verification
-
-	ROM_REGION(0x8000, "arabic", 0)
-	ROM_LOAD("ax200arab.rom", 0x0000, 0x8000, BAD_DUMP CRC(b041e610) SHA1(7574cc5655805ea316011a8123b064917f06f83c)) // need verification
-ROM_END
-
-void msx1_v9938_state::ax200m(machine_config &config)
-{
-	// YM2149 in S3527
-	// FDC: None, 0 drives
-	// 2 Cartridge slots
-	// V9938
-	// MSX Engine S3527
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram1", 0, 0, 2, 2); // 32KB RAM
-	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 0, 2, 0, 2); // 32KB RAM
-	add_internal_slot(config, MSX_SLOT_ROM, "arabic", 0, 3, 1, 2, "arabic");
-	add_cartridge_slot<1>(config, 1);
-	add_cartridge_slot<2>(config, 2);
-	// Dumped unit had a SFG05 with version M5.00.011 rom
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, msx_yamaha_60pin, "sfg05");
-
-	msx1_v9938_pal(YM2149, config);
-}
-
 /* MSX - Sakhr AX-230 */
 
 ROM_START (ax230)
@@ -4129,112 +3982,6 @@ ROM_END
 
 /* MSX - Spectravideo SVI-728 (Swedish/Finnish) */
 
-/* MSX - Spectravideo SVI-738 */
-
-ROM_START(svi738)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("738bios.rom", 0x0000, 0x8000, CRC(ad007d62) SHA1(c53b3f2c00f31683914f7452f3f4d94ae2929c0d))
-
-	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("738disk.rom", 0x0000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4))
-
-	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
-	ROM_LOAD("738232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
-ROM_END
-
-void msx1_v9938_state::svi738(machine_config &config)
-{
-	// AY8910
-	// FDC: fd1793, 1 3.5" SSDD drive
-	// 1 Cartridge slot
-	// builtin 80 columns card (V9938)
-	// RS-232C interface
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, 2);
-	add_internal_slot_irq<2>(config, MSX_SLOT_RS232_SVI738, "rs232", 3, 0, 1, 1, "rs232rom");
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_FD1793_SS, "disk", 3, 1, 1, 2, "diskrom");
-
-	msx1_v9938_pal(AY8910, config);
-}
-
-/* MSX - Spectravideo SVI-738 Arabic */
-
-ROM_START(svi738ar)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("738arbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(ad007d62) SHA1(c53b3f2c00f31683914f7452f3f4d94ae2929c0d)) // need verification
-
-	ROM_REGION(0x8000, "arab", 0)
-	ROM_LOAD("738arab.rom",  0x0000, 0x8000, BAD_DUMP CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb)) // need verification
-
-	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("738ardisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4)) // meed verification
-
-	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
-	ROM_LOAD("738ar232c.rom", 0x0000, 0x2000, BAD_DUMP CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
-ROM_END
-
-void msx1_v9938_state::svi738ar(machine_config &config)
-{
-	svi738(config);
-	add_internal_slot(config, MSX_SLOT_ROM, "arab", 3, 3, 1, 2, "arab");
-}
-
-/* MSX - Spectravideo SVI-738 Danish/Norwegian */
-
-ROM_START(svi738dk)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("738dkbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(88720320) SHA1(1bda5af20cb86565bdc1ebd1e59a691fed7f9256)) // need verification
-
-	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("738dkdisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7)) // need verification
-
-	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
-	ROM_LOAD("738dk232c.rom", 0x0000, 0x2000, BAD_DUMP CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
-ROM_END
-
-/* MSX - Spectravideo SVI-738 German */
-
-/* MSX - Spectravideo SVI-738 Polish */
-
-ROM_START(svi738pl)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("738plbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(431b8bf5) SHA1(c90077ed84133a947841e07856e71133ba779da6)) // IC51 on board, need verification
-
-	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("738disk.rom",   0x0000, 0x4000, BAD_DUMP CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4)) // need verification
-
-	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
-	ROM_LOAD("738232c.rom",   0x0000, 0x2000, BAD_DUMP CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
-ROM_END
-
-/* MSX - Spectravideo SVI-738 Spanish */
-
-ROM_START(svi738sp)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("738spbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(f0c0cbb9) SHA1(5f04d5799ed72ea4993e7c4302a1dd55ac1ea8cd)) // need verification
-
-	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("738spdisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7)) // need verification
-
-	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
-	ROM_LOAD("738sp232c.rom", 0x0000, 0x2000, BAD_DUMP CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
-ROM_END
-
-/* MSX - Spectravideo SVI-738 Swedish/Finnish */
-
-ROM_START(svi738sw)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("738sebios.rom", 0x0000, 0x8000, CRC(c8ccdaa0) SHA1(87f4d0fa58cfe9cef818a3185df2735e6da6168c))
-
-	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("738sedisk.rom", 0x0000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7))
-
-	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
-	ROM_LOAD("738se232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
-ROM_END
-
 /* MSX - Talent DPC-200 */
 
 // Spanish keyboard
@@ -4262,28 +4009,6 @@ void msx_state::tadpc200(machine_config &config)
 	// Expansion slot in slot #3
 
 	msx1(TMS9129, AY8910, config);
-}
-
-/* MSX - Talent DPC-200A */
-
-ROM_START(tadpc200a)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("dpc200abios.rom", 0x0000, 0x8000, BAD_DUMP CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db)) // need verification
-ROM_END
-
-void msx1_v9938_state::tadpc200a(machine_config &config)
-{
-	// YM2149
-	// FDC: None, 0 drives
-	// 1 Cartridge slot
-	// S1985
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, 2);
-	// Expansion slot
-
-	msx1_v9938_pal(YM2149, config);
 }
 
 /* MSX - Talent DPS-201 */
@@ -4879,106 +4604,6 @@ void msx_state::cx5mu(machine_config &config)
 	msx1(TMS9918A, YM2149, config);
 }
 
-/* MSX - Yamaha CX5MII-128A (Australia, New Zealand) */
-
-/* MSX - Yamaha CX5MII-128B (Italy) */
-
-// Exact region unknown
-ROM_START(cx5m128)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("cx5m128bios.rom", 0x0000, 0x8000, CRC(7973e080) SHA1(ea4a723cf098be7d7b40f23a7ab831cf5e2190d7))
-
-	ROM_REGION(0x4000, "subrom", ROMREGION_ERASEFF)
-	ROM_LOAD("cx5m128sub.rom",  0x0000, 0x2000, CRC(b17a776d) SHA1(c2340313bfda751181e8a5287d60f77bc6a2f3e6))
-
-	ROM_REGION(0x4000, "minicart", 0)
-	ROM_LOAD("yrm502.rom", 0x0000, 0x4000, CRC(5412d5dc) SHA1(30747a56f45389be76362f7fc55d673f1bff8312))
-ROM_END
-
-void msx1_v9938_state::cx5m128(machine_config &config)
-{
-	// YM2149 in S3527
-	// FDC: None, 0 drives
-	// 2 Cartridge slots
-	// 1 Mini cart slot (with YRM-502)
-	// 1 Yamaha Module slot
-	// S3527
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, 1);
-	add_cartridge_slot<2>(config, 2);
-	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 1, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "minicart", 3, 1, 1, 1, "minicart"); /* YRM-502 */
-	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   // 128KB Mapper RAM
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
-
-	msx1_v9938_pal(YM2149, config);
-}
-
-/* MSX - Yamaha CX5MII-128 C (Canada) */
-
-/* MSX - Yamaha CX5MII-128 E (UK) */
-
-/* MSX - Yamaha CX5MII-128 F (France) */
-
-/* MSX - Yamaha CX5MII-128 G (Germany) */
-
-/* MSX - Yamaha CX5MII-128 P (Spain) */
-
-/* MSX - Yamaha CX5MII-128 S (Scandinavia) */
-
-/* MSX - Yamaha CX5MII-128 U (USA) */
-
-/* MSX - Yamaha CX5MIIA (Australia, New Zealand) */
-
-/* MSX - Yamaha CX5MIIB (Italy) */
-
-ROM_START(cx5miib)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("cx5mii_basic-bios1.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
-
-	ROM_REGION(0x4000, "subrom", 0)
-	// overdump?
-	ROM_LOAD("cx5mii_sub.rom",  0x0000, 0x4000, BAD_DUMP CRC(317f9bb5) SHA1(0ce800666c0d66bc2aa0b73a16f228289b9198be))
-
-	ROM_REGION(0x4000, "minicart", 0)
-	ROM_LOAD("yrm502.rom", 0x0000, 0x4000, CRC(5330fe21) SHA1(7b1798561ee1844a7d6432924fbee9b4fc591c19))
-ROM_END
-
-void msx1_v9938_state::cx5miib(machine_config &config)
-{
-	// YM2149 in S3527
-	// FDC: None, 0 drives
-	// 2 Cartridge slots
-	// 1 Mini cartridge slot (with YRM-502)
-	// 1 Module slot
-	// S3527
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, 1);
-	add_cartridge_slot<2>(config, 2);
-	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 1, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "minicart", 3, 1, 1, 1, "minicart"); /* YRM-502 */
-	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
-
-	msx1_v9938_pal(YM2149, config);
-}
-
-/* MSX - Yamaha CX5MIIC (Canada) */
-
-/* MSX - Yamaha CX5MIIE (UK) */
-
-/* MSX - Yamaha CX5MIIF (France) */
-
-/* MSX - Yamaha CX5MIIG (Germany) */
-
-/* MSX - Yamaha CX5MIIP (Spain) */
-
-/* MSX - Yamaha CX5MIIS (Scandinavia) */
-
-/* MSX - Yamaha CX5MIIU (USA) */
-
 /* MSX - Yamaha SX-100 */
 
 ROM_START(sx100)
@@ -5074,90 +4699,6 @@ void msx_state::yis503f(machine_config &config)
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, msx_yamaha_60pin, nullptr);
 
 	msx1(TMS9929A, YM2149, config);
-}
-
-/* MSX - Yamaha YIS-503II */
-
-ROM_START(yis503ii)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("yis503iibios.rom", 0x0000, 0x8000, CRC(3b08dc03) SHA1(4d0c37ad722366ac7aa3d64291c3db72884deb2d))
-ROM_END
-
-void msx1_v9938_state::yis503ii(machine_config &config)
-{
-	// YM2149 in S3527
-	// FDC: None, 0 drives
-	// S3527
-	// 2 Cartridge slots
-	// 1 Yamaha module slot (60 pin)
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, 1);
-	add_cartridge_slot<2>(config, 2);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
-
-	msx1_v9938(YM2149, config);
-}
-
-/* MSX - Yamaha YIS503-IIR Russian */
-
-ROM_START(y503iir)
-	ROM_REGION(0x8000, "mainrom", 0)
-	ROM_LOAD("yis503iirbios.rom", 0x0000, 0x8000, CRC(e751d55c) SHA1(807a823d4cac527c9f3758ed412aa2584c7f6d37))
-// This is in the module slot by default
-// ROM_LOAD("yis503iirnet.rom",  0xc000, 0x2000, CRC(0731db3f) SHA1(264fbb2de69fdb03f87dc5413428f6aa19511a7f))
-ROM_END
-
-void msx1_v9938_state::y503iir(machine_config &config)
-{
-	// YM2149 (in S-3527 MSX Engine)
-	// FDC: None, 0 drives
-	// 2 Cartridge slots
-	// 1 Mini cartridge slot
-	// 1 Yamaha module slot
-	// S-3527 MSX Engine
-	// V9938 VDP
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, 1);
-	add_cartridge_slot<2>(config, 2);
-	//  Mini cartridge slot in slot #3-1
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
-	// This should have a serial network interface by default
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
-
-	msx1_v9938_pal(YM2149, config);
-}
-
-/* MSX - Yamaha YIS503-IIR Estonian */
-
-ROM_START(y503iir2)
-	ROM_REGION(0x10000, "mainrom", 0)
-	ROM_LOAD("yis503ii2bios.rom", 0x0000, 0x8000, BAD_DUMP CRC(1548cee3) SHA1(42c7fff25b1bd90776ac0aea971241aedce8947d)) // need verification
-// This is in the module slot by default
-// ROM_LOAD("yis503iirnet.rom",  0xc000, 0x2000, CRC(0731db3f) SHA1(264fbb2de69fdb03f87dc5413428f6aa19511a7f))
-ROM_END
-
-void msx1_v9938_state::y503iir2(machine_config &config)
-{
-	// YM2149 (in S-3527 MSX Engine)
-	// FDC: None, 0 drives
-	// 2 Cartridge slots
-	// 1 Mini cartridge slot
-	// 1 Yamaha module slot
-	// S-3527 MSX Engine
-	// V9938 VDP
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
-	add_cartridge_slot<1>(config, 1);
-	add_cartridge_slot<2>(config, 2);
-	//  Mini cartridge slot in slot #3-1
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
-	// This should have a serial network interface by default
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
-
-	msx1_v9938_pal(YM2149, config);
 }
 
 /* MSX - Yamaha YIS-603 */
@@ -9649,8 +9190,6 @@ COMP(1985, piopx7uk,   piopx7,   0,     piopx7uk,   msxuk,    msx_state, empty_i
 COMP(1986, piopxv60,   piopx7,   0,     piopxv60,   msxjp,    msx_state, empty_init, "Pioneer", "PX-V60 (MSX1, Japan)", 0)
 COMP(1986, ax150,      0,        0,     ax150,      msx,      msx_state, empty_init, "Sakhr", "AX-150 (MSX1, Arabic)", 0)
 COMP(1986, ax170,      0,        0,     ax170,      msx,      msx_state, empty_init, "Sakhr", "AX-170 (MSX1, Arabic)", 0)
-COMP(1986, ax200,      0,        0,     ax200,      msx,      msx1_v9938_state, empty_init, "Sakhr", "AX-200 (MSX1, Arabic/English)", 0)
-COMP(1986, ax200m,     ax200,    0,     ax200m,     msx,      msx1_v9938_state, empty_init, "Sakhr", "AX-200M (MSX1, Arabic/English)", 0)
 COMP(1986, ax230,      0,        0,     ax230,      msx,      msx_state, empty_init, "Sakhr", "AX-230 (MSX1, Arabic)", MACHINE_IMPERFECT_GRAPHICS)
 COMP(1984, spc800,     0,        0,     spc800,     msxkr,    msx_state, empty_init, "Samsung", "SPC-800 (MSX1, Korea)", 0)
 COMP(1983, mpc10,      0,        0,     mpc10,      msxjp,    msx_state, empty_init, "Sanyo", "MPC-10 / Wavy10 (MSX1, Japan)", 0)
@@ -9680,15 +9219,8 @@ COMP(1984, hb75d,      hb75p,    0,     hb75d,      msxde,    msx_state, empty_i
 COMP(1984, hb75p,      0,        0,     hb75p,      msxuk,    msx_state, empty_init, "Sony", "HB-75P (MSX1, Europe)", 0)
 COMP(1984, svi728,     0,        0,     svi728,     svi728,   msx_state, empty_init, "Spectravideo", "SVI-728 (MSX1, International)", 0)
 COMP(1984, svi728es,   svi728,   0,     svi728,     svi728sp, msx_state, empty_init, "Spectravideo", "SVI-728 (MSX1, Spanish)", 0)
-COMP(1985, svi738,     0,        0,     svi738,     msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (MSX1, International)", 0)
-COMP(1987, svi738ar,   svi738,   0,     svi738ar,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (MSX1, Arabic)", 0)
-COMP(1985, svi738dk,   svi738,   0,     svi738,     svi738dk, msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (MSX1, Denmark, Norway)", 0)
-COMP(1986, svi738pl,   svi738,   0,     svi738,     msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (MSX1, Poland)", 0)
-COMP(1985, svi738sp,   svi738,   0,     svi738,     msxsp,    msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (MSX1, Spain)", 0)
-COMP(1985, svi738sw,   svi738,   0,     svi738,     svi738sw, msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (MSX1, Finland, Sweden)", 0)
 COMP(1986, tadpc200,   dpc200,   0,     tadpc200,   msxsp,    msx_state, empty_init, "Talent", "DPC-200 (MSX1, Argentina, Spanish keyboard)", 0)
 COMP(1986, tadpc200b,  dpc200,   0,     tadpc200,   msx,      msx_state, empty_init, "Talent", "DPC-200 (MSX1, Argentina, international keyboard)", 0)
-COMP(1988, tadpc200a,  dpc200,   0,     tadpc200a,  msx,      msx1_v9938_state, empty_init, "Talent", "DPC-200A (MSX1, Argentina)", 0) // Should have a Spanish keyboard layout?
 COMP(1984, hx10,       0,        0,     hx10,       msx,      msx_state, empty_init, "Toshiba", "HX-10AA (MSX1, Europe)", 0)
 COMP(1983, hx10d,      hx10,     0,     hx10d,      msxjp,    msx_state, empty_init, "Toshiba", "HX-10D (MSX1, Japan)", 0)
 COMP(1984, hx10dp,     hx10,     0,     hx10dp,     msxjp,    msx_state, empty_init, "Toshiba", "HX-10DP (MSX1, Japan)", 0)
@@ -9711,15 +9243,10 @@ COMP(1985, hc7,        0,        0,     hc7,        msxjp,    msx_state, empty_i
 COMP(1984, cx5f1,      cx5f,     0,     cx5f1,      msxjp,    msx_state, empty_init, "Yamaha", "CX5F w/SFG01 (MSX1, Japan)", 0)
 COMP(1984, cx5f,       0,        0,     cx5f,       msxjp,    msx_state, empty_init, "Yamaha", "CX5F w/SFG05 (MSX1, Japan)", 0)
 COMP(1984, cx5mu,      0,        0,     cx5mu,      msx,      msx_state, empty_init, "Yamaha", "CX5MU (MSX1, USA)", 0)
-COMP(1984, cx5m128,    0,        0,     cx5m128,    msx,      msx1_v9938_state, empty_init, "Yamaha", "CX5M-128 (MSX1)", 0)
-COMP(1984, cx5miib,    cx5m128,  0,     cx5miib,    msx,      msx1_v9938_state, empty_init, "Yamaha", "CX5MIIB (MSX1, Italy)", 0)
 COMP(1985, sx100,      0,        0,     sx100,      msxjp,    msx_state, empty_init, "Yamaha", "SX-100 (MSX1, Japan)", 0)
 COMP(1984, yis303,     0,        0,     yis303,     msxjp,    msx_state, empty_init, "Yamaha", "YIS303 (MSX1, Japan)", 0)
 COMP(1984, yis503,     0,        0,     yis503,     msxjp,    msx_state, empty_init, "Yamaha", "YIS503 (MSX1, Japan)", 0)
 COMP(1984, yis503f,    yis503,   0,     yis503f,    msxuk,    msx_state, empty_init, "Yamaha", "YIS503F (MSX1, French)", 0)
-COMP(1985, yis503ii,   yis503,   0,     yis503ii,   msxjp,    msx1_v9938_state, empty_init, "Yamaha", "YIS503II (MSX1, Japan)", 0)
-COMP(1985, y503iir,    yis503,   0,     y503iir,    msxru,    msx1_v9938_state, empty_init, "Yamaha", "YIS503IIR (MSX1, USSR)", 0)
-COMP(1986, y503iir2,   yis503,   0,     y503iir2,   y503iir2, msx1_v9938_state, empty_init, "Yamaha", "YIS503IIR (MSX1, Estonian)", 0)
 COMP(1984, yc64,       0,        0,     yc64,       msxuk,    msx_state, empty_init, "Yashica", "YC-64 (MSX1, Europe)", 0)
 COMP(1985, mx64,       0,        0,     mx64,       msxfr,    msx_state, empty_init, "Yeno", "MX64 (MSX1, France)", 0)
 
