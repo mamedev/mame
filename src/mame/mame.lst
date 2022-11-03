@@ -31303,8 +31303,6 @@ ax350ii                         //
 ax350iif                        //
 ax370                           //
 ax500                           //
-bruc100                         //
-bruc100a                        //
 canonv10                        //
 canonv20                        //
 canonv20e                       //
@@ -31556,6 +31554,10 @@ yis503                          //
 yis503f                         //
 yis503ii                        //
 yis604                          //
+
+@source:msx/msx1_bruc100.cpp
+bruc100                         //
+bruc100a                        //
 
 @source:microterm/mt420.cpp
 mt420                           //

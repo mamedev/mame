@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
+#ifndef MAME_MSX_MSX_KEYBOARD_H
+#define MAME_MSX_MSX_KEYBOARD_H
+
 
 namespace msx_keyboard {
 
@@ -35,3 +38,5 @@ INPUT_PORTS_EXTERN(msx2sp);
 INPUT_PORTS_EXTERN(msx2uk);
 
 }
+
+#endif // MAME_MSX_MSX_KEYBOARD_H
