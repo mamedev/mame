@@ -577,6 +577,7 @@ PCB Layouts missing
 #include "machine/buffer.h"
 #include "machine/input_merger.h"
 #include "msx_kanji12.h"
+#include "msx_keyboard.h"
 #include "msx_matsushita.h"
 #include "msx_s1985.h"
 #include "msx_switched.h"
@@ -594,9 +595,7 @@ PCB Layouts missing
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-#include "msx_keyboard.ipp"
-
-namespace {
+using namespace msx_keyboard;
 
 class msx_hw_def
 {
@@ -10345,8 +10344,6 @@ void msx2_state::fsa1st(machine_config &config)
 
 	turbor(AY8910, config);
 }
-
-} // anonymous namespace
 
 
 /*   YEAR  NAME        PARENT    COMPAT MACHINE     INPUT     CLASS      INIT        COMPANY       FULLNAME */
