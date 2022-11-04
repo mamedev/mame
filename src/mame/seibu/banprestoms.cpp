@@ -261,7 +261,7 @@ void banprestoms_state::prg_map(address_map &map)
 	map(0x0e0004, 0x0e0005).portr("IN2");
 
 	// Expects a '1' when entering RTC test (RTC ready line?)
-	map(0x0e0006, 0x0e0007).lr8(NAME([this](offs_t offset) { return 1; }));
+	map(0x0e0006, 0x0e0007).lr8(NAME([](offs_t offset) { return 1; }));
 	/*
 	 * Unknown RTC type (service mode in tvdenwad -> first item)
 	 * 4-bit access, in lower/upper digit fashion
