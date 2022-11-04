@@ -9,7 +9,11 @@
 	Dynamic RAM (4, 16, or 39K) starts at $0000.
 	ROM (2K) starts at $A000 and mirrors up to $BFFF
 	Static RAM starts at $C000 for 128 bytes
-	The PIA is at $FF1C
+	The PIA data port a is at $FF1C
+	     control port a is at $FF1D
+		    data port b is at $FF1E
+		 control port b is at $FF1F
+
 	The Control Register is at $FF20
 	The SAM is at $FFC0
 
@@ -21,7 +25,7 @@
 		CB1  - Modem status, carrier detect.
 		CB2  - Modem control (unverified).
 		IRQA - Connected to the 6809 FIRQ.
-		IRQB - Unconnected, not Verified.
+		IRQB - Unconnected, not verified.
 	
 	Control Register:
 		Bit 7 - RS-232 transmit.
@@ -96,10 +100,12 @@ protected:
 	void agvision_mem(address_map &map);
 	void agvision_rom(address_map &map);
 	void agvision_static_ram(address_map &map);
-	void agvision_io(address_map &map);
+	void agvision_io0(address_map &map);
+	void agvision_io1(address_map &map);
 	void agvision_boot(address_map &map);
     void ff20_write(offs_t offset, uint8_t data);
 	uint8_t pia0_pa_r();
+	void pia0_cb2_w(int state);
 
 private:
 	void configure_sam(void);
@@ -208,6 +214,8 @@ void agvision_state::agvision(machine_config &config)
 	PIA6821(config, m_pia_0, 0);
     m_pia_0->readpa_handler().set(FUNC(agvision_state::pia0_pa_r));
 	m_pia_0->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+	m_pia_0->cb2_handler().set(FUNC(agvision_state::pia0_cb2_w));
+	m_pia_0->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	// m_pia_0->readcb1_handler().set_ioport("cd");
 
 	// video hardware
@@ -221,7 +229,8 @@ void agvision_state::agvision(machine_config &config)
 	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
 	m_sam->set_addrmap(2, &agvision_state::agvision_rom);			// ROM at $A000
  	m_sam->set_addrmap(3, &agvision_state::agvision_static_ram);	// RAM at $C000
-	m_sam->set_addrmap(4, &agvision_state::agvision_io);			//  IO at $FF00
+	m_sam->set_addrmap(4, &agvision_state::agvision_io0);			//  IO at $FF00
+	m_sam->set_addrmap(5, &agvision_state::agvision_io1);			//  IO at $FF20
 	m_sam->set_addrmap(7, &agvision_state::agvision_boot);			//  IO at $FF60
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
@@ -254,12 +263,19 @@ void agvision_state::agvision_static_ram(address_map &map)
 	map(0x0000, 0x0080).ram();
 }
 
-void agvision_state::agvision_io(address_map &map)
+void agvision_state::agvision_io0(address_map &map)
 {
 	// $FF00-$FF1F
-    map(0x00, 0x01).w(FUNC(agvision_state::ff20_write));
+    
 	map(0x1c, 0x1f).rw(PIA0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
+
+void agvision_state::agvision_io1(address_map &map)
+{
+	// $FF20-$FF3F
+    
+	map(0x00, 0x01).w(FUNC(agvision_state::ff20_write));
+} 
 
 void agvision_state::agvision_boot(address_map &map)
 {
@@ -285,6 +301,8 @@ uint8_t agvision_state::sam_read(offs_t offset)
 
 void agvision_state::ff20_write(offs_t offset, uint8_t data)
 {
+	logerror( "ff20 write: $%02x\n", data );
+
     m_rs232->write_txd(data & 0x80 ? 1 : 0);
  	m_vdg->gm0_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
 	m_vdg->gm1_w(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
@@ -316,6 +334,10 @@ void agvision_state::device_start()
 	configure_sam();
 }
 
+//-------------------------------------------------
+//  pia0_pa_r - keyboard handler
+//-------------------------------------------------
+
 uint8_t agvision_state::pia0_pa_r()
 {
 	uint8_t pia0_pb = m_pia_0->b_output();
@@ -344,6 +366,17 @@ uint8_t agvision_state::pia0_pa_r()
 INPUT_CHANGED_MEMBER(agvision_state::cd_changed)
 {
 	m_pia_0->cb1_w(ioport("cd")->read());
+	logerror( "CD Changed\n" );
+
+}
+
+//-------------------------------------------------
+//  pia0_cb2_w
+//-------------------------------------------------
+
+void agvision_state::pia0_cb2_w(int state)
+{
+	logerror( "cb2 write handler: %d\n", state );
 }
 
 //**************************************************************************

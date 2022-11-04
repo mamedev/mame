@@ -64,7 +64,7 @@
 #define LOG_MBITS   (1U <<  5)
 #define LOG_RBITS   (1U <<  6)
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_FBITS)
 // #define VERBOSE (LOG_FBITS)
 // #define VERBOSE (LOG_FBITS | LOG_VBITS | LOG_PBITS | LOG_TBITS | LOG_MBITS | LOG_RBITS)
 

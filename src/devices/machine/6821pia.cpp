@@ -15,8 +15,10 @@
 
 #define LOG_SETUP   (1 << 1U)
 #define LOG_CA1     (1 << 2U)
+#define LOG_CB1     (1 << 3U)
 
-//#define VERBOSE (LOG_SETUP | LOG_GENERAL | LOG_CA1)
+//#define VERBOSE (LOG_SETUP)
+//#define VERBOSE (LOG_SETUP | LOG_CB1)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #define VERBOSE (0)
@@ -24,6 +26,7 @@
 #include "logmacro.h"
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGCA1(...)   LOGMASKED(LOG_CA1,     __VA_ARGS__)
+#define LOGCB1(...)   LOGMASKED(LOG_CB1,     __VA_ARGS__)
 
 #define PIA_IRQ1                (0x80)
 #define PIA_IRQ2                (0x40)
@@ -1044,12 +1047,12 @@ uint8_t pia6821_device::b_output()
 
 WRITE_LINE_MEMBER( pia6821_device::cb1_w )
 {
-	LOG("Set PIA input CB1 = %d\n", state);
+	LOGCB1("Set PIA input CB1 = %d\n", state);
 
 	// the new state has caused a transition
 	if ((m_in_cb1 != state) && ((state && c1_low_to_high(m_ctl_b)) || (!state && c1_high_to_low(m_ctl_b))))
 	{
-		LOG("CB1 triggering\n");
+		LOGCB1("CB1 triggering\n");
 
 		// mark the IRQ
 		m_irq_b1 = true;
