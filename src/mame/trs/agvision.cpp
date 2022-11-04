@@ -26,7 +26,7 @@
 		CB2  - Modem control (unverified).
 		IRQA - Connected to the 6809 FIRQ.
 		IRQB - Unconnected, not verified.
-	
+
 	Control Register:
 		Bit 7 - RS-232 transmit.
 		Bit 6 - RS-232 DTR, or activity LED (unsure which).
@@ -87,7 +87,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
@@ -106,6 +106,7 @@ protected:
     void ff20_write(offs_t offset, uint8_t data);
 	uint8_t pia0_pa_r();
 	void pia0_cb2_w(int state);
+	int cd_read();
 
 private:
 	void configure_sam(void);
@@ -215,7 +216,10 @@ void agvision_state::agvision(machine_config &config)
     m_pia_0->readpa_handler().set(FUNC(agvision_state::pia0_pa_r));
 	m_pia_0->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	m_pia_0->cb2_handler().set(FUNC(agvision_state::pia0_cb2_w));
-	m_pia_0->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+// 	m_pia_0->readcb1_handler().set(FUNC(agvision_state::cd_read)); // carier detect
+// 	m_pia_0->readcb1_handler().set_ioport("cd").bit(0).invert(); // carier detect
+
+// 	m_pia_0->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	// m_pia_0->readcb1_handler().set_ioport("cd");
 
 	// video hardware
@@ -266,16 +270,16 @@ void agvision_state::agvision_static_ram(address_map &map)
 void agvision_state::agvision_io0(address_map &map)
 {
 	// $FF00-$FF1F
-    
+
 	map(0x1c, 0x1f).rw(PIA0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
 
 void agvision_state::agvision_io1(address_map &map)
 {
 	// $FF20-$FF3F
-    
+
 	map(0x00, 0x01).w(FUNC(agvision_state::ff20_write));
-} 
+}
 
 void agvision_state::agvision_boot(address_map &map)
 {
@@ -330,8 +334,10 @@ void agvision_state::device_start()
 {
 	// call base device_start
 	driver_device::device_start();
-	
+
 	configure_sam();
+
+	m_pia_0->cb1_w(0);
 }
 
 //-------------------------------------------------
@@ -365,8 +371,8 @@ uint8_t agvision_state::pia0_pa_r()
 
 INPUT_CHANGED_MEMBER(agvision_state::cd_changed)
 {
-	m_pia_0->cb1_w(ioport("cd")->read());
-	logerror( "CD Changed\n" );
+ 	m_pia_0->cb1_w(ioport("cd")->read());
+	logerror( "CD Changed: %d\n", ioport("cd")->read() );
 
 }
 
@@ -377,6 +383,17 @@ INPUT_CHANGED_MEMBER(agvision_state::cd_changed)
 void agvision_state::pia0_cb2_w(int state)
 {
 	logerror( "cb2 write handler: %d\n", state );
+
+	if( state == 1 )
+		m_pia_0->cb1_w(1);
+	else
+		m_pia_0->cb1_w(0);
+}
+
+int agvision_state::cd_read()
+{
+	logerror( "cb1 read handler: %d\n", ioport("cd")->read() );
+	return ioport("cd")->read();
 }
 
 //**************************************************************************

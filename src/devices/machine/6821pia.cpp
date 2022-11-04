@@ -14,17 +14,19 @@
 //**************************************************************************
 
 #define LOG_SETUP   (1 << 1U)
-#define LOG_CA1     (1 << 2U)
-#define LOG_CB1     (1 << 3U)
+#define LOG_CTLR    (1 << 2U)
+#define LOG_CA1     (1 << 3U)
+#define LOG_CB1     (1 << 4U)
 
-//#define VERBOSE (LOG_SETUP)
+#define VERBOSE (LOG_SETUP|LOG_CTLR|LOG_CB1)
 //#define VERBOSE (LOG_SETUP | LOG_CB1)
 //#define LOG_OUTPUT_STREAM std::cout
 
-#define VERBOSE (0)
+//#define VERBOSE (0)
 
 #include "logmacro.h"
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGCTLR(...)  LOGMASKED(LOG_CTLR,    __VA_ARGS__)
 #define LOGCA1(...)   LOGMASKED(LOG_CA1,     __VA_ARGS__)
 #define LOGCB1(...)   LOGMASKED(LOG_CB1,     __VA_ARGS__)
 
@@ -541,7 +543,7 @@ uint8_t pia6821_device::control_a_r()
 	if (m_irq_a2 && c2_input(m_ctl_a))
 		ret |= PIA_IRQ2;
 
-	LOG("PIA control A read = %02X\n", ret);
+	LOGCTLR("PIA control A read = %02X\n", ret);
 
 	return ret;
 }
@@ -585,7 +587,7 @@ uint8_t pia6821_device::control_b_r()
 	if (m_irq_b2 && c2_input(m_ctl_b))
 		ret |= PIA_IRQ2;
 
-	LOG("PIA control B read = %02X\n", ret);
+	LOGCTLR("PIA control B read = %02X\n", ret);
 
 	return ret;
 }
