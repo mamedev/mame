@@ -12,7 +12,7 @@
 #include "imagedev/floppy.h"
 
 
-/* WD FDC accessed through 7ffx */
+// WD FDC accessed through 7ffx
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_FD1793, msx_slot_disk1_fd1793_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_MB8877, msx_slot_disk1_mb8877_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_N, msx_slot_disk1_wd2793_n_device)
@@ -21,33 +21,33 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793, msx_slot_disk1_wd2793_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_0, msx_slot_disk1_wd2793_0_device) // No drives, for nms8260
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_SS, msx_slot_disk1_wd2793_ss_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK1_WD2793_2_DRIVES, msx_slot_disk1_wd2793_2_drives_device)
-/* WD FDC accessed through 7fbx */
+// WD FDC accessed through 7fbx
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK2_FD1793_SS, msx_slot_disk2_fd1793_ss_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK2_MB8877, msx_slot_disk2_mb8877_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK2_MB8877_SS, msx_slot_disk2_mb8877_ss_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK2_MB8877_2_DRIVES, msx_slot_disk2_mb8877_2_drives_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK2_WD2793, msx_slot_disk2_wd2793_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK2_WD2793_2_DRIVES, msx_slot_disk2_wd2793_2_drives_device)
-/* TC8566 accessed through 7ff8-7fff */
+// TC8566 accessed through 7ff8-7fff
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK3_TC8566, msx_slot_disk3_tc8566_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK3_TC8566_2_DRIVES, msx_slot_disk3_tc8566_2_drives_device)
-/* TC8566 accessed through 7ff0-7ff7 (used in Turob-R, untested) */
+// TC8566 accessed through 7ff0-7ff7 (used in Turob-R, untested)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK4_TC8566, msx_slot_disk4_tc8566_device)
-/* WD FDC accessed through i/o ports 0xd0-0xd4 */
+// WD FDC accessed through i/o ports 0xd0-0xd4
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK5_WD2793, msx_slot_disk5_wd2793_device)
-/* WD FDC accessed through 7ff0-7ff? (used in Toshiba HX34) */
+// WD FDC accessed through 7ff0-7ff? (used in Toshiba HX34)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK6_WD2793_N, msx_slot_disk6_wd2793_n_device)
-/* MB FDC accessed through 7ff8-7ffc (used in Canon V-30F */
+// MB FDC accessed through 7ff8-7ffc (used in Canon V-30F)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK7_MB8877, msx_slot_disk7_mb8877_device)
-/* WD FDC accessed through 7f8x */
+// WD FDC accessed through 7f8x
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK8_MB8877, msx_slot_disk8_mb8877_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK8_WD2793_2_DRIVES, msx_slot_disk8_wd2793_2_drives_device)
-/* WD FDC accessed through 7ffx, slightly different from DISK1 (used in PHC-77) */
+// WD FDC accessed through 7ffx, slightly different from DISK1 (used in PHC-77)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK9_WD2793_N, msx_slot_disk9_wd2793_n_device)
-/* WD FDC accessed through 7ffx, slightly different from DISK1 (used in Victor HC-90 / HC-95) */
+// WD FDC accessed through 7ffx, slightly different from DISK1 (used in Victor HC-90 / HC-95)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK10_MB8877, msx_slot_disk10_mb8877_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK10_MB8877_2_DRIVES, msx_slot_disk10_mb8877_2_drives_device)
-/* WD FDC accessed through 7ffx, slightly different from DISK1 (used in Yamaha YIS-805) */
+// WD FDC accessed through 7ffx, slightly different from DISK1 (used in Yamaha YIS-805)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK11_WD2793, msx_slot_disk11_wd2793_device)
 
 

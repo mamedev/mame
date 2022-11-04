@@ -197,12 +197,7 @@ void msx_slot_disk1_base_device::device_reset()
 
 void msx_slot_disk1_base_device::device_post_load()
 {
-	uint8_t data = m_control;
-
-	// To make sure the FDD busy led status gets set correctly
-	m_control ^= 0x40;
-
-	set_control(data);
+	set_control(m_control);
 }
 
 void msx_slot_disk1_base_device::set_side_control(u8 data)
@@ -223,7 +218,7 @@ void msx_slot_disk1_base_device::set_control(u8 data)
 	// ------1- drive 1 select (0 = selected)
 	// -------0 drive 0 select (0 = selected)
 
-	u8 old_m_control = m_control;
+	const u8 old_m_control = m_control;
 
 	m_control = data;
 
@@ -406,17 +401,12 @@ void msx_slot_disk2_base_device::device_reset()
 
 void msx_slot_disk2_base_device::device_post_load()
 {
-	uint8_t data = m_control;
-
-	// To make sure the FDD busy led status gets set correctly
-	m_control ^= 0x40;
-
-	set_control(data);
+	set_control(m_control);
 }
 
 void msx_slot_disk2_base_device::set_control(u8 data)
 {
-	u8 old_m_control = m_control;
+	const u8 old_m_control = m_control;
 
 	m_control = data;
 
@@ -975,18 +965,13 @@ void msx_slot_disk8_mb8877_device::device_reset()
 
 void msx_slot_disk8_mb8877_device::device_post_load()
 {
-	uint8_t data = m_control;
-
-	// To make sure the FDD busy led status gets set correctly
-	m_control ^= 0x40;
-
-	set_control(data);
+	set_control(m_control);
 }
 
 
 void msx_slot_disk8_mb8877_device::set_control(u8 data)
 {
-	uint8_t old_m_control = m_control;
+	const u8 old_m_control = m_control;
 
 	m_control = data;
 
@@ -1075,17 +1060,12 @@ void msx_slot_disk9_wd2793_n_device::device_reset()
 
 void msx_slot_disk9_wd2793_n_device::device_post_load()
 {
-	u8 data = m_control;
-
-	// To make sure the FDD busy led status gets set correctly
-	m_control ^= 0x40;
-
-	control_w(data);
+	control_w(m_control);
 }
 
 void msx_slot_disk9_wd2793_n_device::control_w(u8 data)
 {
-	u8 old_m_control = m_control;
+	const u8 old_m_control = m_control;
 
 	m_control = data;
 
@@ -1169,17 +1149,12 @@ void msx_slot_disk10_mb8877_device::device_reset()
 
 void msx_slot_disk10_mb8877_device::device_post_load()
 {
-	uint8_t data = m_control;
-
-	// To make sure the FDD busy led status gets set correctly
-	m_control ^= 0x40;
-
-	control_w(data);
+	control_w(m_control);
 }
 
 void msx_slot_disk10_mb8877_device::control_w(u8 data)
 {
-	u8 old_m_control = m_control;
+	const u8 old_m_control = m_control;
 
 	m_control = data;
 
@@ -1287,12 +1262,7 @@ void msx_slot_disk11_wd2793_device::device_reset()
 
 void msx_slot_disk11_wd2793_device::device_post_load()
 {
-	uint8_t data = m_control;
-
-	// To make sure the FDD busy led status gets set correctly
-	m_control ^= 0x40;
-
-	control_w(data);
+	control_w(m_control);
 }
 
 void msx_slot_disk11_wd2793_device::side_control_w(u8 data)
@@ -1305,7 +1275,7 @@ void msx_slot_disk11_wd2793_device::side_control_w(u8 data)
 
 void msx_slot_disk11_wd2793_device::control_w(u8 data)
 {
-	uint8_t old_m_control = m_control;
+	const u8 old_m_control = m_control;
 
 	m_control = data;
 
