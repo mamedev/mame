@@ -12,6 +12,31 @@
 
 using namespace msx_keyboard;
 
+/***************************************************************************
+
+  MSX1 with v9938 Game drivers
+
+Undumped and/or not emulated:
+- Sakhr AX-200 (Arabic/French)
+- Spectravideo SVI-738 (German)
+- Yamaha CX5MII-128A (Australia, New Zealand)
+- Yamaha CX5MII-128 C (Canada)
+- Yamaha CX5MII-128 E (UK)
+- Yamaha CX5MII-128 F (France)
+- Yamaha CX5MII-128 G (Germany)
+- Yamaha CX5MII-128 P (Spain)
+- Yamaha CX5MII-128 S (Scandinavia)
+- Yamaha CX5MII-128 U (USA)
+- Yamaha CX5MIIA (Australia, New Zealand)
+- Yamaha CX5MIIC (Canada)
+- Yamaha CX5MIIE (UK)
+- Yamaha CX5MIIF (France)
+- Yamaha CX5MIIG (Germany)
+- Yamaha CX5MIIP (Spain)
+- Yamaha CX5MIIS (Scandinavia)
+- Yamaha CX5MIIU (USA)
+***************************************************************************/
+
 
 msx1_v9938_state::msx1_v9938_state(const machine_config &mconfig, device_type type, const char *tag)
 	: msx_state(mconfig, type, tag)

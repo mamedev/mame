@@ -1,10 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 
-/*
- * MSX2 machine descriptions
- */
-
 #include "emu.h"
 #include "bus/msx_slot/bunsetsu.h"
 #include "bus/msx_slot/disk.h"
@@ -30,8 +26,33 @@ using namespace msx_keyboard;
 
 /***************************************************************************
 
-  MSX2 Game driver(s)
+  MSX2 Game drivers
 
+Undumped and/or not emulated:
+- AVT CPC-300 (prototype)
+- Bawareth Perfect MSX2
+- Daisen Sangyo MX-2021
+- Laser MSX2 (unreleased)
+- ML-TS2
+- Philips NMS 8245 Home Banking (Italy)
+- Perfect Perfect2 - MSX2
+- Phonola NMS 8245
+- Phonola NMS 8280
+- Phonola VG-8235
+- Sanyo MPC-25F
+- Sanyo MPC-25FK
+- Sanyo PCT-100
+- Sony HB-F750 (prototype)
+- Sony HB-G900D
+- Sony HB-G900F
+- Sony HB-T600
+- Sony HB-T7
+- Talent DPC-300
+- Victor HC-90(A)
+- Victor HC-90(B)
+- Victor HC-90(V)
+- Victor HC-90(T)
+- Wandy CPC-300
 ***************************************************************************/
 
 /* MSX2 - AVT CPC-300 (prototype) */
@@ -3803,7 +3824,21 @@ void msx2_state::expert3i(machine_config &config)
 	msx2plus(SND_AY8910, config);
 }
 
-/* MSX2+ - Ciel Expert 3 Turbo */
+/* MSX2+ - Ciel Expert 3 Turbo
+This one is a full motherboard by CIEL (not an upgrade kit), created to replace the motherboard of a Gradiente Expert (which means that only the case, the analog boards and the keyboard remains Gradiente). This new motherboard has the following built-in features:
+
+1) MSX2+
+2) Support either 3.57MHz or 7.14MHz natively, switched either by software (*1) or by a hardware-switch on the front panel. Turbo-led included.
+3) Up to 4MB of Memory Mapper (1MB is the most common configuration)
+4) MSX-Music
+5) 4 expansion slots (two external on the front panel, two internal)
+6) Stereo sound (YM2413 channels 0-6 on right, PSG+YM2413 channels 7-9 on left)
+7) Support the V9938 instead of the V9958 by switching some jumpers
+8) The main-ram can be placed on slot 2 or slot 3, using jumpers (slot 2 is the default)
+
+
+*1: A routine hidden inside the BIOS frame-0 is used to switch the turbo.
+ */
 
 /* Uses a Z84C0010 - CMOS processor working at 7 MHz */
 ROM_START(expert3t)

@@ -1,10 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 
-/*
- * MSX1 machine descriptions
- */
-
 #include "emu.h"
 #include "bus/msx_slot/ax230.h"
 #include "bus/msx_slot/disk.h"
@@ -20,9 +16,82 @@ using namespace msx_keyboard;
 
 /***************************************************************************
 
-  MSX1 Game driver(s)
+  MSX1 Game drivers
 
+Undumped and/or not emulated:
+- Daewoo CPC-200
+- Daewoo Zemmix CPC-50
+- Daewoo Zemmix DTX-1493FW
+- General PCT-50
+- General PCT-55
+- Goldstar FC-80
+- Hitachi MB-H21
+- Hitachi MB-H80 (unreleased)
+- In Tensai DPC-200CD
+- Jotan Holland Bingo
+- Misawa-Van CX-5
+- Mitsubishi ML-FX2
+- Mitsubishi ML-TS1
+- Network DPC-200
+- Olympia DPC-200
+- Panasonic FS-3900
+- Philips NMS 800
+- Philips VG-8020/29 - MSX1
+- Philips VG-8020/40 - MSX1
+- Phonola VG-8000 (Italian market, mostly likely same as Philips VG-8000)
+- Phonola VG-8010 (Italian market, mostly likely same as Philips VG-8010)
+- Phonola VG-8020 (Italian market, mostly likely same as Philips VG-8020)
+- Pioneer PX-V7
+- Radiola MK 180
+- Sakhr AH-200
+- Sakhr AX-100
+- Sakhr AX-170F
+- Sakhr AX-330
+- Sakhr AX-660
+- Sakhr AX-990
+- Salora MSX (prototypes)
+- Sanno PHC-SPC
+- Sanno SPCmk-II
+- Sanno SPCmk-III
+- Sanyo MPC-1 / Wavy1
+- Schneider MC 810
+- Sincorp SBX (Argentina, homebrew)
+- Sony HB-10B
+- Sony HB-10D
+- Sony HB-501F
+- Sony HB-75AS
+- Sony HB-75B
+- Sony HB-701
+- Spectravideo SVI-728 (Arabic)
+- Spectravideo SVI-728 (Danish/Norwegian)
+- Spectravideo SVI-728 (Swedish/Finnish)
+- Talent DPS-201
+- Toshiba HX-10AA
+- Toshiba HX-10DPN
+- Toshiba HX-10I
+- Toshiba HX-10SF
+- Toshiba HX-20AR
+- Toshiba HX-22CH
+- Toshiba HX-22GB
+- Toshiba HX-30
+- Tosbiba HX-31
+- Toshiba HX-52
+- Triton PC64
+- Vestel FC-200
+- Victor HC-30
+- Victor HC-60
+- Wandy DPC-200
+- Yamaha CX5
+- Yamaha CX5MA (Australia / New Zealand)
+- Yamaha CX5MC (Canada)
+- Yamaha CX5ME (UK)
+- Yamaha CX5MF (France)
+- Yamaha CX5MG (Germany)
+- Yamaha CX5MS (Scandinavia)
+- Yamaha YIS-603
+- Yeno DPC-64
 ***************************************************************************/
+
 
 /* MSX - Al Fateh 100 - rebranded Sakhr / Al Alamiah AX-170, dump needed to verify */
 
@@ -1658,7 +1727,68 @@ void msx1_state::vg802020(machine_config &config)
 
 /* MSX - Phonola VG-8020 (Italian market, mostly likely same as Philips VG-8020) */
 
-/* MSX - Pioneer PX-7 */
+/* MSX - Pioneer PX-7
+
+|---------------------------------------|
+|  CN1     CN2                          |
+|                                       |
+|                                       |
+|  IC33                                 |---------------------------------|
+|                                                      CN3                |
+|   IC32   IC34            IC38  IC40                                     |
+|                                                               IC20      |
+|   IC15   IC18  IC43      IC8   IC35   IC6     |----IC3---|              |
+|                                               |----------|    IC21      |
+|   IC16   IC19  |---IC13---|    IC7    IC10                              |
+|                |----------|                   IC36  IC29      ---       |
+|   IC17   IC14                                     X2          | |       |
+|                |--IC12---|     |----IC1-----|       IC37      |I|       |
+|   IC28   IC11  |---------|     |------------|   X1            |C|       |
+|                                                               |2|       |
+|  |----IC4----| |----IC5----|   IC39  IC9      IC42  IC44      | |       |
+|  |-----------| |-----------|                                  ---       |
+|                                                                         |
+|       IC45   IC31    IC30      IC41                                     |
+|                                                                         |
+|  CN4 CN5  CN6  CN7                                  CN8                 |
+|-------------------------------------------------------------------------|
+
+Notes:
+  X1 - 3.579MHz
+  X2 - 500kHz
+  IC1 - Sharp LH0080A Z80A-CPU-D
+  IC2 - TMS91289NL
+  IC3 - MB111S112  Z10 (500kHz)
+  IC4  - M5L8255AP-5
+  IC5  - YM2149F
+  IC6,IC7,IC8,IC10,IC45 - SN74LS367AN
+  IC9 - SN74LS245N
+  IC11,IC34 - SN74LS139N
+  IC12 - YM2301-23908 / 53 18 85 A (might indicate a version)
+  IC13 - Pioneer PD5031 2364-213 514100 (M5L2764-213)
+  IC14,IC17,IC30,IC31 - SN74LS157N
+  IC15-IC19 - MB81416-12
+  IC20,IC21 - TMS4416-I5NL
+  IC28 - SN74LS153N
+  IC29 - SN74LS02N
+  IC32 - SN74LS374N
+  IC33 - M5218P
+  IC35 - SN74LS74AN
+  IC36 - SN74LS30N
+  IC37-IC39 - SN74LS04N
+  IC40,IC41 - SN74LS05N
+  IC42 - SN74LS08N
+  IC43,IC44 - SN74LS32N
+  CN1 - Printer
+  CN2 - Cassette recorder
+  CN3 - Expansion slot
+  CN4 - Keyboard
+  CN5 - Keyboard
+  CN6 - Controller #1
+  CN7 - Controller #2
+  CN8 - Expansion slot
+
+ */
 
 // BIOS is for an international keyboard while the machine has a Japanese layout
 ROM_START(piopx7)
@@ -2597,7 +2727,73 @@ void msx1_state::tadpc200(machine_config &config)
 
 /* MSX - Talent DPS-201 */
 
-/* MSX - Toshiba HX-10 / HX-10P */
+/* MSX - Toshiba HX-10 / HX-10P
+Code on PCB: MSX TUK
+        |---------------------------|-------------------|-------------|
+        |   CN1  CN2  CN3  CN4               CN5                      |
+        |                        |---------------------------|        |
+        |                        |---------------------------|        |
+        |                                    CN6                      |
+        |                        IC40                                 |
+        |                                                         CN7 |
+        |                      IC38     IC32     IC33     IC37        |
+        |                                                             |
+        |                      Q2       IC31     IC34     IC35        |
+        |    Q1                                                   CN8 |
+        |                                                 IC39        |
+        |   |--IC15------| |--IC2----|   |----IC1-----|               |
+        |   |------------| |---------|   |------------|               |
+        |                                                 IC30        |
+        |                 IC3    IC4                              CN9 |
+        |                               |-----IC15-------|            |
+        |  IC17   IC18    IC7    IC8    |----------------|            |
+        |                                                 IC27        |
+        |  IC19   IC20    IC9    IC10   |----IC25------|              |
+|----|  |                               |--------------|  IC26        |
+| Q  |  |  IC21   IC22    IC11   IC12                                 |
+|    |  |                                                             |
+| S  |  |  IC23   IC24    IC13   IC14    IC29             IC28        |
+|  L |  |                                                             |
+|    |  |                                 CN11   CN10                 |
+|----|  |-------------------------------------------------------------|
+
+Notes:
+  Mainboard components:
+   IC1               - Sharp LH0080A Z80A-CPU-D
+   IC2               - MB83256
+   IC3,IC4,IC27,IC28 - Texas Instruments SN74LS157N
+   IC7-IC14          - HM4864AP
+   IC15              - Toshiba TCX-1007 (64pin custom chip)
+   IC16              - 40pin chip covered with some kind of heatsink(?), probably TMS9929A
+   IC17-IC24         - 4116-3
+   IC25              - AY-3-8910A
+   IC26              - SN74LS09N
+   IC29              - HD74LS145P
+   IC30-IC34         - M74LS367AP
+   IC35              - MB74LS74A
+   IC37              - HD74LS373P
+   IC38              - Toshiba TC74HCU04P
+   IC39              - HD74LS08P
+   IC40              - TA75559P
+   Q1                - 10687.5
+   Q2                - 3579545
+   CN1               - Cassette connector
+   CN2               - RF connector
+   CN3               - Audio connector
+   CN4               - Video connector
+   CN5               - Expansion connector
+   CN6               - Cartridge connector
+   CN7               - Printer connector
+   CN8               - Joystick 2 connector
+   CN9               - Joystick 1 connector
+   CN10              - Keyboard connector 1
+   CN11              - Keyboard connector 2
+
+  Extra pcb (video related?) components::
+   Q - 4.433619
+   S - 74LS04
+   L - LVA510
+ */
 
 ROM_START(hx10)
 	ROM_REGION(0x8000, "mainrom", 0)
