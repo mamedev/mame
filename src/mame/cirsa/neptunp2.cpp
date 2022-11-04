@@ -407,7 +407,8 @@ ROM_START( ccorsario )
 	ROM_LOAD( "pat_062_tibpal16l8-25cn.bin", 0x000, 0x104, NO_DUMP ) // "PAT 062", protected
 ROM_END
 
-// '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'.
+// '61509960606-5 PCB (exactly the same as '960606-5', but with better quality connectors) and 'CB1 (CS4)' security counters module.
+// CPLD labeled as 'PD18'. There's a sticker on the PCB with the date '26/01/2007'.
 // There's a small piggyback PCB with a LS14 connected to the 75188 and 75189 sockets (usually not populated on other games).
 // This model has the Samsung VFD display (1x16) exposed to the player (on other games it's usually hidden, just for operator use).
 ROM_START( mltpoints )
