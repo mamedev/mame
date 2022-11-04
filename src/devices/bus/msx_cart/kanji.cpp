@@ -130,7 +130,7 @@ void msx_cart_msxwrite_device::initialize_cartridge()
 	m_bank_mask = banks - 1;
 
 	for (int i = 0; i < 2; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE); 
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
 	// The rom writes to 6fff and 7fff for banking, unknown whether

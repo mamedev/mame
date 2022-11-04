@@ -321,7 +321,7 @@ void msx1_state::cpc88(machine_config &config)
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 2, 1, "hangul");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);   // 64KB RAM 
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);   // 64KB RAM
 
 	m_hw_def.has_printer_port(false);
 	msx1(VDP_TMS9928A, SND_AY8910, config);
@@ -2156,7 +2156,7 @@ void msx1_state::hb10(machine_config &config)
 /* MSX - Sony HB-10B */
 
 /* MSX - Sony HB-10D */
-// ic12 - tmm23256p 
+// ic12 - tmm23256p
 
 /* MSX - Sony HB-10P */
 
@@ -2341,8 +2341,8 @@ ROM_START(hb55p)
 	ROM_REGION(0x8000, "mainrom", 0)
 	// Are there machines with ic42 and ic43 populated like this?
 	// Image on msx.org shows only ic42 and ic44 populated (for hb-55)
-//	ROM_LOAD("55pbios.ic42", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
-//	ROM_LOAD("55pbios.ic43", 0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
+//  ROM_LOAD("55pbios.ic42", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
+//  ROM_LOAD("55pbios.ic43", 0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
 	ROM_LOAD("55pbios.ic42", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 
 	ROM_REGION(0x4000, "firmware", 0)
@@ -2426,8 +2426,8 @@ ROM_START(hb75p)
 	ROM_REGION(0x8000, "mainrom", 0)
 	// Are there machines with ic42 and ic43 populated like this?
 	// HB-75P internal image on msx.org only has 2 roms populated (ic42 and ic44)
-//	ROM_LOAD("75pbios.ic42", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
-//	ROM_LOAD("75pbios.ic43", 0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
+//  ROM_LOAD("75pbios.ic42", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
+//  ROM_LOAD("75pbios.ic43", 0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
 	ROM_LOAD("75pbios.ic42", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 
 	ROM_REGION(0x4000, "firmware", 0)
@@ -3105,7 +3105,7 @@ void msx1_state::hc7(machine_config &config)
 ROM_START(cx5f1)
 	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("cx5fbios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
-//	ROM_LOAD("cx5fbios.rom", 0x0000, 0x8000, CRC(dc662057) SHA1(36d77d357a5fd15af2ab266ee66e5091ba4770a3))
+//  ROM_LOAD("cx5fbios.rom", 0x0000, 0x8000, CRC(dc662057) SHA1(36d77d357a5fd15af2ab266ee66e5091ba4770a3))
 ROM_END
 
 void msx1_state::cx5f1(machine_config &config)
@@ -3131,7 +3131,7 @@ void msx1_state::cx5f1(machine_config &config)
 ROM_START(cx5f)
 	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("cx5fbios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
-//	ROM_LOAD("cx5fbios.rom", 0x0000, 0x8000, CRC(dc662057) SHA1(36d77d357a5fd15af2ab266ee66e5091ba4770a3))
+//  ROM_LOAD("cx5fbios.rom", 0x0000, 0x8000, CRC(dc662057) SHA1(36d77d357a5fd15af2ab266ee66e5091ba4770a3))
 ROM_END
 
 void msx1_state::cx5f(machine_config &config)

@@ -46,7 +46,7 @@ u8 msx_cart_dooly_device::mode4_page1_r(offs_t offset)
 
 u8 msx_cart_dooly_device::mode4_page2_r(offs_t offset)
 {
-	return bitswap<8>(get_rom_base()[0x4000 | offset], 7, 6, 5, 4, 3, 1, 0, 2);	
+	return bitswap<8>(get_rom_base()[0x4000 | offset], 7, 6, 5, 4, 3, 1, 0, 2);
 }
 
 void msx_cart_dooly_device::prot_w(u8 data)

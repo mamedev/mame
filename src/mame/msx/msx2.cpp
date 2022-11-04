@@ -1155,7 +1155,7 @@ ROM_START(fsa1f)
 	ROM_LOAD("da1024d0365r.ic18", 0x00000, 0x20000, CRC(64a53ec8) SHA1(9a62d7a5ccda974261f7c0600476d85e10deb99b))
 
 	ROM_REGION(0x20000, "kanji", 0)
-	ROM_LOAD("da531p6616_0.ic17", 0, 0x20000, CRC(c61ddc5d) SHA1(5e872d5853698731a0ed22fb72dbcdfd59cd19c3))	// da531p6616-0 - tc531000ap-6616
+	ROM_LOAD("da531p6616_0.ic17", 0, 0x20000, CRC(c61ddc5d) SHA1(5e872d5853698731a0ed22fb72dbcdfd59cd19c3)) // da531p6616-0 - tc531000ap-6616
 ROM_END
 
 void msx2_state::fsa1f(machine_config &config)
@@ -1663,7 +1663,7 @@ void msx2_state::vg8230(machine_config &config)
  * /29 DE    QWERTZ        2.1
  * /36 ES    QWERTY with ñ 2.1
  * /39 FR,BE AZERTY        2.1
- */ 
+ */
 
 ROM_START(vg8235)
 	ROM_SYSTEM_BIOS(0, "r20", "VG8235/20")
@@ -1843,7 +1843,7 @@ void msx2_state::ax350(machine_config &config)
 	// YM2149 (in S1985)
 	// FDC: wd2793/tc8566af?, 1 3.5" DSDD drive
 	// 2 Cartridge slots
-	// S1985 
+	// S1985
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
@@ -1932,7 +1932,7 @@ void msx2_state::ax350iif(machine_config &config)
 	// YM2149 (in S1985)
 	// FDC: wd2793/tc8566af?, 1 3.5" DSDD drive (mb8877a in pcb picture)
 	// 2 Cartridge slots
-	// S1985 
+	// S1985
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
@@ -2657,8 +2657,8 @@ ROM_START(hbf700d)
 
 	ROM_REGION(0x8000, "extrom", 0)
 	// dumps as listed in openMSX and blueMSX
-	//	ROM_LOAD("700dsub.ic6", 0x0000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
-	//	ROM_LOAD("700ddisk.ic6", 0x4000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
+	//  ROM_LOAD("700dsub.ic6", 0x0000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
+	//  ROM_LOAD("700ddisk.ic6", 0x4000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
 	//
 	// however according to the service manual these should be in the same rom chip
 	// concatenation of 3288894e1be6af705871499b23c85732dbc40993 and 12f2cc79b3d09723840bae774be48c0d721ec1c6
@@ -2692,8 +2692,8 @@ ROM_START(hbf700f)
 
 	ROM_REGION(0x8000, "extrom", 0)
 	// dumps as listed in openMSX and blueMSX
-	//	ROM_LOAD("700fsub.ic6", 0x0000, 0x4000, CRC(e235d5c8) SHA1(792e6b2814ab783d06c7576c1e3ccd6a9bbac34a))
-	//	ROM_LOAD("700fdisk.ic6", 0x4000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
+	//  ROM_LOAD("700fsub.ic6", 0x0000, 0x4000, CRC(e235d5c8) SHA1(792e6b2814ab783d06c7576c1e3ccd6a9bbac34a))
+	//  ROM_LOAD("700fdisk.ic6", 0x4000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
 	//
 	// however according to the service manual these should be in the same rom chip
 	// concatenation of 792e6b2814ab783d06c7576c1e3ccd6a9bbac34a and 12f2cc79b3d09723840bae774be48c0d721ec1c6
@@ -2729,8 +2729,8 @@ ROM_START(hbf700p)
 	// dumps as listed in openMSX / blueMSX
 	// openMSX also lists 24624c5fa3a8069b1d865cdea8a029f15c1955ea for the subrom but the disk rom
 	// part of that machine is 'certainly not original' so this may also not be original.
-	//	ROM_LOAD("700psub.ic6", 0x0000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
-	//	ROM_LOAD("700pdisk.ic6", 0x4000, 0x4000, CRC(1d9cc7f6) SHA1(3376cf9dd2b1ac9b41bf6bf6598b33136e86f9d5))
+	//  ROM_LOAD("700psub.ic6", 0x0000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
+	//  ROM_LOAD("700pdisk.ic6", 0x4000, 0x4000, CRC(1d9cc7f6) SHA1(3376cf9dd2b1ac9b41bf6bf6598b33136e86f9d5))
 	//
 	// however according to the service manual these should be in the same rom chip
 	// concatenation of 3288894e1be6af705871499b23c85732dbc40993 and 3376cf9dd2b1ac9b41bf6bf6598b33136e86f9d5
@@ -2764,8 +2764,8 @@ ROM_START(hbf700s)
 
 	ROM_REGION(0x8000, "extrom", 0)
 	// dumps as listed in openMSX / blueMSX
-	//	ROM_LOAD("700ssub.ic6", 0x0000, 0x4000, CRC(dc0951bd) SHA1(1e9a955943aeea9b1807ddf1250ba6436d8dd276))
-	//	ROM_LOAD("700sdisk.ic6", 0x4000, 0x4000, CRC(1d9cc7f6) SHA1(3376cf9dd2b1ac9b41bf6bf6598b33136e86f9d5))
+	//  ROM_LOAD("700ssub.ic6", 0x0000, 0x4000, CRC(dc0951bd) SHA1(1e9a955943aeea9b1807ddf1250ba6436d8dd276))
+	//  ROM_LOAD("700sdisk.ic6", 0x4000, 0x4000, CRC(1d9cc7f6) SHA1(3376cf9dd2b1ac9b41bf6bf6598b33136e86f9d5))
 	//
 	// however according to the service manual these should be in the same rom chip
 	// concatenation of 1e9a955943aeea9b1807ddf1250ba6436d8dd276 and 3376cf9dd2b1ac9b41bf6bf6598b33136e86f9d5
@@ -3925,7 +3925,7 @@ ROM_START(fsa1fx)
 	ROM_LOAD("a1fx.ic16", 0, 0x40000, CRC(c0b2d882) SHA1(623cbca109b6410df08ee7062150a6bda4b5d5d4))
 
 	// Kanji rom contents are the first half of the single rom
-//	ROM_REGION(0x20000, "kanji", 0)
+//  ROM_REGION(0x20000, "kanji", 0)
 	ROM_REGION(0x40000, "kanji", 0)
 	ROM_LOAD("a1fx.ic16", 0, 0x40000, CRC(c0b2d882) SHA1(623cbca109b6410df08ee7062150a6bda4b5d5d4))
 ROM_END
@@ -4136,12 +4136,12 @@ void msx2_state::phc35j(machine_config &config)
 ROM_START(phc70fd)
 	ROM_REGION(0x20000, "mainrom", 0)
 	ROM_LOAD("phc-70fd.rom", 0x0000, 0x20000, CRC(d2307ddf) SHA1(b6f2ca2e8a18d6c7cd326cb8d1a1d7d747f23059))
-//	ROM_LOAD("70fdbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
-//	ROM_LOAD("70fdext.rom",  0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
-//	ROM_LOAD("70fddisk.rom", 0xc000, 0x4000, CRC(db7f1125) SHA1(9efa744be8355675e7bfdd3976bbbfaf85d62e1d))
-//	ROM_LOAD("70fdkdr.rom", 0x10000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
-//	ROM_LOAD("70fdmus.rom", 0x18000, 0x4000, CRC(5c32eb29) SHA1(aad42ba4289b33d8eed225d42cea930b7fc5c228))
-//	ROM_LOAD("70fdbas.rom", 0x1c000, 0x4000, CRC(da7be246) SHA1(22b3191d865010264001b9d896186a9818478a6b))
+//  ROM_LOAD("70fdbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
+//  ROM_LOAD("70fdext.rom",  0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
+//  ROM_LOAD("70fddisk.rom", 0xc000, 0x4000, CRC(db7f1125) SHA1(9efa744be8355675e7bfdd3976bbbfaf85d62e1d))
+//  ROM_LOAD("70fdkdr.rom", 0x10000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
+//  ROM_LOAD("70fdmus.rom", 0x18000, 0x4000, CRC(5c32eb29) SHA1(aad42ba4289b33d8eed225d42cea930b7fc5c228))
+//  ROM_LOAD("70fdbas.rom", 0x1c000, 0x4000, CRC(da7be246) SHA1(22b3191d865010264001b9d896186a9818478a6b))
 
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("70fdkfn.rom", 0, 0x20000, CRC(c9651b32) SHA1(84a645becec0a25d3ab7a909cde1b242699a8662))

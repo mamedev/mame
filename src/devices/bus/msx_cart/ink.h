@@ -28,7 +28,7 @@ protected:
 private:
 	required_device<amd_29f040_device> m_flash;
 
-	template <int Page>	void write_page(offs_t offset, u8 data);
+	template <int Page> void write_page(offs_t offset, u8 data);
 };
 
 

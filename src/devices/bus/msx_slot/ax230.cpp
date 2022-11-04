@@ -32,7 +32,7 @@ void msx_slot_ax230_device::device_start()
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_rombank[i]->configure_entries(0, BANKS, m_rom_region->base() + m_region_offset, 0x2000); 
+		m_rombank[i]->configure_entries(0, BANKS, m_rom_region->base() + m_region_offset, 0x2000);
 	}
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);

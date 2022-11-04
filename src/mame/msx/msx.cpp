@@ -734,8 +734,8 @@ void msx_state::msx_base_io_map(address_map &map)
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	// TODO: S-3527 mirrors ac-af
 	map(0xa8, 0xab).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-//	// Sanyo optical pen interface (not emulated)
-//	map(0xb8, 0xbb).noprw();
+//  // Sanyo optical pen interface (not emulated)
+//  map(0xb8, 0xbb).noprw();
 	map(0xd8, 0xd9).w(FUNC(msx_state::kanji_w));
 	map(0xd9, 0xd9).r(FUNC(msx_state::kanji_r));
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system

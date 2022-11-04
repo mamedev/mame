@@ -326,7 +326,7 @@ protected:
 	void msx2plus_base(ay8910_type ay8910_type, machine_config &config);
 	void msx2plus(ay8910_type ay8910_type, machine_config &config);
 	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config);
-	void turbor(ay8910_type ay8910_type, machine_config &config);	
+	void turbor(ay8910_type ay8910_type, machine_config &config);
 	void msx2_add_softlists(machine_config &config);
 	void msx2plus_add_softlists(machine_config &config);
 	void turbor_add_softlists(machine_config &config);

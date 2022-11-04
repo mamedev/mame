@@ -37,7 +37,7 @@ void msx_cart_ascii8_device::initialize_cartridge()
 	m_bank_mask = banks - 1;
 
 	for (int i = 0; i < 4; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE); 
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE);
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
@@ -84,7 +84,7 @@ void msx_cart_ascii16_device::initialize_cartridge()
 	m_bank_mask = banks - 1;
 
 	for (int i = 0; i < 2; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE); 
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
 	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<0>)));
@@ -140,7 +140,7 @@ void msx_cart_ascii8_sram_device::initialize_cartridge()
 	m_sram_select_mask = banks;
 
 	for (int i = 0; i < 4; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE); 
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE);
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);

@@ -30,8 +30,8 @@ void msx_slot_bruc100_device::device_start()
 		fatalerror("Memory region '%s' is too small for the BRUC100 firmware\n", m_rom_region.finder_tag());
 	}
 
-	m_rombank[0]->configure_entries(0, 2, m_rom_region->base() + m_region_offset, 0x8000); 
-	m_rombank[1]->configure_entries(0, 2, m_rom_region->base() + m_region_offset + 0x4000, 0x8000); 
+	m_rombank[0]->configure_entries(0, 2, m_rom_region->base() + m_region_offset, 0x8000);
+	m_rombank[1]->configure_entries(0, 2, m_rom_region->base() + m_region_offset + 0x4000, 0x8000);
 
 	page(0)->install_read_bank(0x0000, 0x3fff, m_rombank[0]);
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[1]);

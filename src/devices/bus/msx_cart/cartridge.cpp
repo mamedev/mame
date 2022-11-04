@@ -75,7 +75,7 @@ void msx_cart(device_slot_interface &device)
 	device.option_add_internal("synthesizer", MSX_CART_SYNTHESIZER);
 	device.option_add("bm_012", MSX_CART_BM_012);
 	device.option_add("moonsound", MSX_CART_MOONSOUND);
-//	device.option_add("hxm200", MSX_CART_HXM200);
+//  device.option_add("hxm200", MSX_CART_HXM200);
 }
 
 
