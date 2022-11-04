@@ -296,7 +296,6 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		int xflip = flags & 0x80;
 		int yflip = flags & 0x40;
-		const bool wide = flags & 0x08;
 
 		const int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (code >> 4 & 0x10);
 		gfx_element *gfx = m_gfxdecode->gfx(1);
@@ -307,35 +306,48 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			code ^= mask[m_sprite_bank];
 		}
 
-		int code2 = code;
-
 		if (m_cocktail_flip)
 		{
 			x = 64 * 8 - gfx->width() - x + 2;
 			y = 32 * 8 - gfx->height() - y + 2;
-			if (wide) y -= gfx->height();
 			xflip = !xflip;
 			yflip = !yflip;
 		}
 
-		if (wide)
+		switch (flags >> 3 & 3)
 		{
-			if (yflip)
-				code |= 0x10, code2 &= ~0x10;
-			else
-				code &= ~0x10, code2 |= 0x10;
+			// 16x16
+			case 0:
+				gfx->transpen(bitmap, cliprect, code, color, xflip, yflip, x, y, 0);
+				break;
 
-			gfx->transpen(bitmap, cliprect, code2, color, xflip, yflip, x, y + gfx->height(), 0);
+			// 16x32
+			case 1:
+				if (m_cocktail_flip)
+					y -= 16;
+				code &= ~0x10;
+
+				gfx->transpen(bitmap, cliprect, code | (yflip ? 16 : 0), color, xflip, yflip, x, y, 0);
+				gfx->transpen(bitmap, cliprect, code | (yflip ? 0 : 16), color, xflip, yflip, x, y + 16, 0);
+				break;
+
+			// 16x64
+			case 2:
+				if (m_cocktail_flip)
+					y -= 48;
+				code &= ~0x30;
+
+				for (int j = 0; j < 4; j++)
+				{
+					int co = 16 * (j ^ (yflip ? 3 : 0));
+					gfx->transpen(bitmap, cliprect, code | co, color, xflip, yflip, x, y + j * 16, 0);
+				}
+				break;
+
+			// unused
+			case 3:
+				break;
 		}
-
-		if (flags & 0x10)
-		{
-			gfx->transpen(bitmap, cliprect, code2 + 16, color, xflip, yflip, x, y + gfx->height(), 0);
-			gfx->transpen(bitmap, cliprect, code2 + 16 * 2, color, xflip, yflip, x, y + 2 * gfx->height(), 0);
-			gfx->transpen(bitmap, cliprect, code2 + 16 * 3, color, xflip, yflip, x, y + 3 * gfx->height(), 0);
-		}
-
-		gfx->transpen(bitmap, cliprect, code, color, xflip, yflip, x, y, 0);
 	}
 
 	// draw text layer
