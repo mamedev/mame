@@ -232,31 +232,20 @@ void msx_state::memory_map(address_map &map)
 	}
 
 	// Look for expanded slots
-	for (const auto& tuple : m_internal_slots)
+	for (const auto& entry : m_internal_slots)
 	{
-		int prim, sec, page, numpages;
-		bool is_expanded;
-		msx_internal_slot_interface *internal_slot;
-		std::tie(prim, is_expanded, sec, page, numpages, internal_slot) = tuple;
-		if (is_expanded)
-		{
-			memory_expand_slot(prim);
-		}
+		if (entry.is_expanded)
+			memory_expand_slot(entry.prim);
 	}
 
-	for (const auto& tuple : m_internal_slots)
+	for (const auto& entry : m_internal_slots)
 	{
-		int prim, sec, page, numpages;
-		bool is_expanded;
-		msx_internal_slot_interface *internal_slot;
-		std::tie(prim, is_expanded, sec, page, numpages, internal_slot) = tuple;
-
 		memory_view::memory_view_entry *view[4] = {nullptr, nullptr, nullptr, nullptr};
-		for (int i = 0; i < numpages; i++)
+		for (int i = 0; i < entry.numpages; i++)
 		{
-			view[page + i] = get_view(page + i, prim, sec);
+			view[entry.page + i] = get_view(entry.page + i, entry.prim, entry.sec);
 		}
-		internal_slot->install(view[0], view[1], view[2], view[3]);
+		entry.internal_slot->install(view[0], view[1], view[2], view[3]);
 	}
 }
 

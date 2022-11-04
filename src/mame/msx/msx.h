@@ -214,7 +214,16 @@ protected:
 	memory_view m_view_slot3_page2;
 	memory_view m_view_slot3_page3;
 	memory_view *m_exp_view[4][4];
-	std::vector<std::tuple<int, bool, int, int, int, msx_internal_slot_interface *>> m_internal_slots;
+	struct internal_slot
+	{
+		int prim;
+		bool is_expanded;
+		int sec;
+		int page;
+		int numpages;
+		msx_internal_slot_interface *internal_slot;
+	};
+	std::vector<internal_slot> m_internal_slots;
 
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 
@@ -241,7 +250,7 @@ private:
 		device.set_memory_space(m_maincpu, AS_PROGRAM);
 		device.set_io_space(m_maincpu, AS_IO);
 		device.set_maincpu(m_maincpu);
-		m_internal_slots.push_back(std::make_tuple(prim, expanded, sec, page, numpages, &device));
+		m_internal_slots.push_back({prim, expanded, sec, page, numpages, &device});
 		return device;
 	}
 	template <typename T, typename U>
