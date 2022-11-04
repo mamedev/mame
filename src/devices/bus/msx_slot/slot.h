@@ -35,7 +35,8 @@ public:
 	address_space &io_space() const { return *m_io_space; }
 	cpu_device &maincpu() const { return *m_maincpu; }
 	bool page_configured(int i) { return bool(m_page[i]); }
-	memory_view::memory_view_entry *page(int i) {
+	memory_view::memory_view_entry *page(int i)
+	{
 		if (!m_page[i])
 			fatalerror("page %i view not configured\n", i);
 		return m_page[i];
