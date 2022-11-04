@@ -32,6 +32,7 @@ TODO:
 - verify Oki banking (needs someone who understands Japanese to check if speech makes sense when it gets called)
 - lamps
 - controls / dips need to be completed and better arranged
+- identify and hookup RTC
 */
 
 #include "emu.h"
@@ -54,15 +55,15 @@ namespace {
 class banprestoms_state : public driver_device
 {
 public:
-	banprestoms_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_ticket(*this, "ticket"),
-		m_vram(*this, "vram%u", 0U),
-		m_spriteram(*this, "sprite_ram"),
-		m_okibank(*this, "okibank")
+	banprestoms_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_ticket(*this, "ticket")
+		, m_vram(*this, "vram%u", 0U)
+		, m_spriteram(*this, "sprite_ram")
+		, m_okibank(*this, "okibank")
 	{ }
 
 	void banprestoms(machine_config &config);
@@ -241,23 +242,39 @@ void banprestoms_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t me
 
 void banprestoms_state::prg_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rom().region("maincpu", 0);
-	map(0x80000, 0x807ff).ram().share("nvram");
-	map(0x80800, 0x80fff).ram().w(FUNC(banprestoms_state::vram_w<0>)).share(m_vram[0]);
-	map(0x81000, 0x817ff).ram().w(FUNC(banprestoms_state::vram_w<1>)).share(m_vram[1]);
-	map(0x81800, 0x81fff).ram().w(FUNC(banprestoms_state::vram_w<2>)).share(m_vram[2]);
-	map(0x82000, 0x82fff).ram().w(FUNC(banprestoms_state::vram_w<3>)).share(m_vram[3]);
-	map(0x83000, 0x837ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x83800, 0x83fff).ram().share(m_spriteram);
-	map(0xa0001, 0xa0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
-	map(0xc0080, 0xc0081).nopw(); // CRTC related ?
-	map(0xc00c0, 0xc00c1).nopw(); // CRTC related ?
-	map(0xc0100, 0xc0101).w(FUNC(banprestoms_state::okibank_w));
-	//map(0xc0140, 0xc0141).nopw(); // in marioun bit 3 is lamp according to test mode
-	map(0xe0000, 0xe0001).portr("DSW1");
-	map(0xe0002, 0xe0003).portr("IN1");
-	map(0xe0004, 0xe0005).portr("IN2");
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x080000, 0x0807ff).ram().share("nvram");
+	map(0x080800, 0x080fff).ram().w(FUNC(banprestoms_state::vram_w<0>)).share(m_vram[0]);
+	map(0x081000, 0x0817ff).ram().w(FUNC(banprestoms_state::vram_w<1>)).share(m_vram[1]);
+	map(0x081800, 0x081fff).ram().w(FUNC(banprestoms_state::vram_w<2>)).share(m_vram[2]);
+	map(0x082000, 0x082fff).ram().w(FUNC(banprestoms_state::vram_w<3>)).share(m_vram[3]);
+	map(0x083000, 0x0837ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x083800, 0x083fff).ram().share(m_spriteram);
+	map(0x0a0001, 0x0a0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0c0000, 0x0c004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x0c0080, 0x0c0081).nopw(); // CRTC related ?
+	map(0x0c00c0, 0x0c00c1).nopw(); // CRTC related ?
+	map(0x0c0100, 0x0c0101).w(FUNC(banprestoms_state::okibank_w));
+//	map(0x0c0140, 0x0c0141).nopw(); // in marioun bit 3 is lamp according to test mode
+	map(0x0e0000, 0x0e0001).portr("DSW1");
+	map(0x0e0002, 0x0e0003).portr("IN1");
+	map(0x0e0004, 0x0e0005).portr("IN2");
+
+	// Expects a '1' when entering RTC test (RTC ready line?)
+	map(0x0e0006, 0x0e0007).lr8(NAME([this](offs_t offset) { return 1; }));
+	/*
+	 * Unknown RTC type (service mode in tvdenwad -> first item)
+	 * 4-bit access, in lower/upper digit fashion
+	 * [0-2] seconds
+	 * [4-6] minutes
+	 * [8-a] hours
+	 * [c] weekday?
+	 * [e-0x10] day
+	 * [0x12-0x14] month
+	 * [0x16-0x18] year
+	 * [0x1a-0x1e] cleared on POST
+	 */
+//	map(0x100000, 0x10001f).ram();
 }
 
 void banprestoms_state::oki_map(address_map &map)
