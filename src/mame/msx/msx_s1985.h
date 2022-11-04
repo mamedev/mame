@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_MACHINE_MSX_S1985_H
-#define MAME_MACHINE_MSX_S1985_H
+#ifndef MAME_MSX_MSX_S1985_H
+#define MAME_MSX_MSX_S1985_H
 
 
 #include "msx_switched.h"
@@ -40,4 +40,4 @@ private:
 	u8 m_pattern;
 };
 
-#endif // MAME_MACHINE_MSX_S1985_H
+#endif // MAME_MSX_MSX_S1985_H

@@ -42,82 +42,8 @@ private:
 
 class msx_state : public driver_device
 {
-public:
-	msx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_cassette(*this, "cassette")
-		, m_ay8910(*this, "ay8910")
-		, m_dac(*this, "dac")
-		, m_ppi(*this, "ppi8255")
-		, m_tms9928a(*this, "tms9928a")
-		, m_cent_status_in(*this, "cent_status_in")
-		, m_cent_ctrl_out(*this, "cent_ctrl_out")
-		, m_cent_data_out(*this, "cent_data_out")
-		, m_centronics(*this, "centronics")
-		, m_speaker(*this, "speaker")
-		, m_mainirq(*this, "mainirq")
-		, m_screen(*this, "screen")
-		, m_region_kanji(*this, "kanji")
-		, m_io_joy(*this, "JOY%u", 0U)
-		, m_io_dsw(*this, "DSW")
-		, m_io_mouse(*this, "MOUSE%u", 0U)
-		, m_io_key(*this, "KEY%u", 0U)
-		, m_leds(*this, "led%u", 1U)
-		, m_view_page0(*this, "view0")
-		, m_view_page1(*this, "view1")
-		, m_view_page2(*this, "view2")
-		, m_view_page3(*this, "view3")
-		, m_view_slot0_page0(*this, "view0_0")
-		, m_view_slot0_page1(*this, "view0_1")
-		, m_view_slot0_page2(*this, "view0_2")
-		, m_view_slot0_page3(*this, "view0_3")
-		, m_view_slot1_page0(*this, "view1_0")
-		, m_view_slot1_page1(*this, "view1_1")
-		, m_view_slot1_page2(*this, "view1_2")
-		, m_view_slot1_page3(*this, "view1_3")
-		, m_view_slot2_page0(*this, "view2_0")
-		, m_view_slot2_page1(*this, "view2_1")
-		, m_view_slot2_page2(*this, "view2_2")
-		, m_view_slot2_page3(*this, "view2_3")
-		, m_view_slot3_page0(*this, "view3_0")
-		, m_view_slot3_page1(*this, "view3_1")
-		, m_view_slot3_page2(*this, "view3_2")
-		, m_view_slot3_page3(*this, "view3_3")
-		, m_psg_b(0)
-		, m_kanji_latch(0)
-		, m_slot_expanded{false, false, false, false}
-		, m_primary_slot(0)
-		, m_secondary_slot{0, 0, 0, 0}
-		, m_port_c_old(0)
-		, m_keylatch(0)
-	{
-		m_mouse[0] = m_mouse[1] = 0;
-		m_mouse_stat[0] = m_mouse_stat[1] = 0;
-		m_cartslot[0] = nullptr;
-		m_cartslot[1] = nullptr;
-		m_generic_internal = nullptr;
-		m_view[0] = &m_view_page0;
-		m_view[1] = &m_view_page1;
-		m_view[2] = &m_view_page2;
-		m_view[3] = &m_view_page3;
-		m_exp_view[0][0] = &m_view_slot0_page0;
-		m_exp_view[0][1] = &m_view_slot0_page1;
-		m_exp_view[0][2] = &m_view_slot0_page2;
-		m_exp_view[0][3] = &m_view_slot0_page3;
-		m_exp_view[1][0] = &m_view_slot1_page0;
-		m_exp_view[1][1] = &m_view_slot1_page1;
-		m_exp_view[1][2] = &m_view_slot1_page2;
-		m_exp_view[1][3] = &m_view_slot1_page3;
-		m_exp_view[2][0] = &m_view_slot2_page0;
-		m_exp_view[2][1] = &m_view_slot2_page1;
-		m_exp_view[2][2] = &m_view_slot2_page2;
-		m_exp_view[2][3] = &m_view_slot2_page3;
-		m_exp_view[3][0] = &m_view_slot3_page0;
-		m_exp_view[3][1] = &m_view_slot3_page1;
-		m_exp_view[3][2] = &m_view_slot3_page2;
-		m_exp_view[3][3] = &m_view_slot3_page3;
-	}
+protected:
+	msx_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	enum ay8910_type
 	{
@@ -136,7 +62,6 @@ public:
 		VDP_TMS9929A
 	};
 
-protected:
 	void msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider);
 	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config);
 	void msx1_add_softlists(machine_config &config);
@@ -226,8 +151,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void expanded_slot_w(offs_t offset, u8 data);
-	u8 expanded_slot_r(offs_t offset);
+	void expanded_slot_w(u8 data);
+	u8 expanded_slot_r();
 	u8 kanji_r(offs_t offset);
 	void kanji_w(offs_t offset, u8 data);
 	void ppi_port_a_w(u8 data);
@@ -238,7 +163,8 @@ protected:
 	void psg_port_a_w(u8 data);
 	void psg_port_b_w(u8 data);
 
-	void msx_io_map(address_map &map);
+	void msx_base_io_map(address_map &map);
+	void msx1_io_map(address_map &map);
 	void memory_map(address_map &map);
 	void memory_expand_slot(int slot);
 	memory_view::memory_view_entry *get_view(int page, int prim, int sec);
@@ -288,8 +214,6 @@ protected:
 	memory_view m_view_slot3_page2;
 	memory_view m_view_slot3_page3;
 	memory_view *m_exp_view[4][4];
-	msx_slot_cartridge_device *m_cartslot[2];
-	msx_internal_slot_interface *m_generic_internal;
 	std::vector<std::tuple<int, bool, int, int, int, msx_internal_slot_interface *>> m_internal_slots;
 
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
@@ -402,21 +326,19 @@ protected:
 	void msx2plus_base(ay8910_type ay8910_type, machine_config &config);
 	void msx2plus(ay8910_type ay8910_type, machine_config &config);
 	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config);
-	void turbor(ay8910_type ay8910_type, machine_config &config);
-	
+	void turbor(ay8910_type ay8910_type, machine_config &config);	
 	void msx2_add_softlists(machine_config &config);
 	void msx2plus_add_softlists(machine_config &config);
 	void turbor_add_softlists(machine_config &config);
 	void msx_ym2413(machine_config &config);
 	void msx2_64kb_vram(machine_config &config);
-
 	u8 rtc_reg_r();
 	void rtc_reg_w(u8 data);
 	void rtc_latch_w(u8 data);
 	u8 switched_r(offs_t offset);
 	void switched_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(turbo_w);
-
+	void msx2_base_io_map(address_map &map);
 	void msx2_io_map(address_map &map);
 	void msx2plus_io_map(address_map &map);
 

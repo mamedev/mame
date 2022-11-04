@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_MACHINE_MSX_SYSTEMFLAGS_H
-#define MAME_MACHINE_MSX_SYSTEMFLAGS_H
+#ifndef MAME_MSX_MSX_SYSTEMFLAGS_H
+#define MAME_MSX_MSX_SYSTEMFLAGS_H
 
 /*
 Some MSX2+ and TurboR machines have a 'system flags' I/O port ($F4).
@@ -40,4 +40,4 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-#endif // MAME_MACHINE_MSX_SYSTEMFLAGS_H
+#endif // MAME_MSX_MSX_SYSTEMFLAGS_H

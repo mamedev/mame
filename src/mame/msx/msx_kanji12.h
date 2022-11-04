@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_MACHINE_MSX_KANJI12_H
-#define MAME_MACHINE_MSX_KANJI12_H
+#ifndef MAME_MSX_MSX_KANJI12_H
+#define MAME_MSX_MSX_KANJI12_H
 
 
 #include "msx_switched.h"
@@ -37,4 +37,4 @@ private:
 	u32 m_address;
 };
 
-#endif // MAME_MACHINE_MSX_KANJI12_H
+#endif // MAME_MSX_MSX_KANJI12_H

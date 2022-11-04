@@ -23,7 +23,7 @@ bruc100_state::bruc100_state(const machine_config &mconfig, device_type type, co
 
 void bruc100_state::io_map(address_map &map)
 {
-	msx_io_map(map);
+	msx1_io_map(map);
 	map(0x90, 0x90).w(FUNC(bruc100_state::port90_w));
 }
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 /*
-** msx.cpp : driver for MSX family machines
+** msx.cpp : Enulation of the MSX family of machines
 **
 ** Special usage notes:
 **
@@ -26,7 +26,8 @@
 **
 **
 ** Todo/known issues:
-** - Get rid of trampolines and code duplication between msx_slot and msx_cart (eg, kanji roms, disk interfaces)
+** - Get rid of trampolines.
+** - Get rid of code duplication between msx_slot and msx_cart (eg, kanji roms, disk interfaces)
 ** - general: - Add support for kana lock
 ** -          - Expansion slots not emulated
 ** - kanji: The direct rom dump from FS-A1FX shows that the kanji font roms are accessed slightly differently. Most
@@ -539,9 +540,6 @@ Yamaha YIS805-256 - MSX2 - y805256
 Yashica YC-64 - MSX1 - yc64
 Yeno DPC-64 (same bios as Olympia PHC-2)
 Yeno MX64 - MSX1 - mx64
-=============
-
-PCB Layouts missing
 
 
 */
@@ -560,6 +558,79 @@ PCB Layouts missing
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
+
+msx_state::msx_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag)
+	, m_maincpu(*this, "maincpu")
+	, m_cassette(*this, "cassette")
+	, m_ay8910(*this, "ay8910")
+	, m_dac(*this, "dac")
+	, m_ppi(*this, "ppi8255")
+	, m_tms9928a(*this, "tms9928a")
+	, m_cent_status_in(*this, "cent_status_in")
+	, m_cent_ctrl_out(*this, "cent_ctrl_out")
+	, m_cent_data_out(*this, "cent_data_out")
+	, m_centronics(*this, "centronics")
+	, m_speaker(*this, "speaker")
+	, m_mainirq(*this, "mainirq")
+	, m_screen(*this, "screen")
+	, m_region_kanji(*this, "kanji")
+	, m_io_joy(*this, "JOY%u", 0U)
+	, m_io_dsw(*this, "DSW")
+	, m_io_mouse(*this, "MOUSE%u", 0U)
+	, m_io_key(*this, "KEY%u", 0U)
+	, m_leds(*this, "led%u", 1U)
+	, m_view_page0(*this, "view0")
+	, m_view_page1(*this, "view1")
+	, m_view_page2(*this, "view2")
+	, m_view_page3(*this, "view3")
+	, m_view_slot0_page0(*this, "view0_0")
+	, m_view_slot0_page1(*this, "view0_1")
+	, m_view_slot0_page2(*this, "view0_2")
+	, m_view_slot0_page3(*this, "view0_3")
+	, m_view_slot1_page0(*this, "view1_0")
+	, m_view_slot1_page1(*this, "view1_1")
+	, m_view_slot1_page2(*this, "view1_2")
+	, m_view_slot1_page3(*this, "view1_3")
+	, m_view_slot2_page0(*this, "view2_0")
+	, m_view_slot2_page1(*this, "view2_1")
+	, m_view_slot2_page2(*this, "view2_2")
+	, m_view_slot2_page3(*this, "view2_3")
+	, m_view_slot3_page0(*this, "view3_0")
+	, m_view_slot3_page1(*this, "view3_1")
+	, m_view_slot3_page2(*this, "view3_2")
+	, m_view_slot3_page3(*this, "view3_3")
+	, m_psg_b(0)
+	, m_kanji_latch(0)
+	, m_slot_expanded{false, false, false, false}
+	, m_primary_slot(0)
+	, m_secondary_slot{0, 0, 0, 0}
+	, m_port_c_old(0)
+	, m_keylatch(0)
+{
+	m_mouse[0] = m_mouse[1] = 0;
+	m_mouse_stat[0] = m_mouse_stat[1] = 0;
+	m_view[0] = &m_view_page0;
+	m_view[1] = &m_view_page1;
+	m_view[2] = &m_view_page2;
+	m_view[3] = &m_view_page3;
+	m_exp_view[0][0] = &m_view_slot0_page0;
+	m_exp_view[0][1] = &m_view_slot0_page1;
+	m_exp_view[0][2] = &m_view_slot0_page2;
+	m_exp_view[0][3] = &m_view_slot0_page3;
+	m_exp_view[1][0] = &m_view_slot1_page0;
+	m_exp_view[1][1] = &m_view_slot1_page1;
+	m_exp_view[1][2] = &m_view_slot1_page2;
+	m_exp_view[1][3] = &m_view_slot1_page3;
+	m_exp_view[2][0] = &m_view_slot2_page0;
+	m_exp_view[2][1] = &m_view_slot2_page1;
+	m_exp_view[2][2] = &m_view_slot2_page2;
+	m_exp_view[2][3] = &m_view_slot2_page3;
+	m_exp_view[3][0] = &m_view_slot3_page0;
+	m_exp_view[3][1] = &m_view_slot3_page1;
+	m_exp_view[3][2] = &m_view_slot3_page2;
+	m_exp_view[3][3] = &m_view_slot3_page3;
+}
 
 void msx_state::memory_expand_slot(int slot)
 {
@@ -585,7 +656,6 @@ void msx_state::memory_expand_slot(int slot)
 	}
 	m_slot_expanded[slot] = true;
 }
-
 
 void msx_state::memory_map(address_map &map)
 {
@@ -650,31 +720,10 @@ memory_view::memory_view_entry *msx_state::get_view(int page, int prim, int sec)
 	return nullptr;
 }
 
-void msx_state::msx_io_map(address_map &map)
+void msx_state::msx_base_io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	if (m_hw_def.has_printer_port())
-	{
-		map(0x90, 0x90).r(m_cent_status_in, FUNC(input_buffer_device::read));
-		map(0x90, 0x90).w(m_cent_ctrl_out, FUNC(output_latch_device::write));
-		map(0x91, 0x91).w(m_cent_data_out, FUNC(output_latch_device::write));
-	}
-	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0xa8, 0xab).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x98, 0x99).rw(m_tms9928a, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
-	map(0xd8, 0xd9).w(FUNC(msx_state::kanji_w));
-	map(0xd9, 0xd9).r(FUNC(msx_state::kanji_r));
-	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
-}
-
-
-void msx2_base_state::msx2_io_map(address_map &map)
-{
-	map.unmap_value_high();
-	map.global_mask(0xff);
-	map(0x40, 0x4f).rw(FUNC(msx2_base_state::switched_r), FUNC(msx2_base_state::switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
 	if (m_hw_def.has_printer_port())
 	{
@@ -685,40 +734,18 @@ void msx2_base_state::msx2_io_map(address_map &map)
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	// TODO: S-3527 mirrors ac-af
 	map(0xa8, 0xab).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	// TODO: S-1985 mirrors 9c-9f
-	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
-	map(0xb4, 0xb4).w(FUNC(msx2_base_state::rtc_latch_w));
-	map(0xb5, 0xb5).rw(FUNC(msx2_base_state::rtc_reg_r), FUNC(msx2_base_state::rtc_reg_w));
 //	// Sanyo optical pen interface (not emulated)
 //	map(0xb8, 0xbb).noprw();
-	map(0xd8, 0xd9).w(FUNC(msx2_base_state::kanji_w));
-	map(0xd9, 0xd9).r(FUNC(msx2_base_state::kanji_r));
+	map(0xd8, 0xd9).w(FUNC(msx_state::kanji_w));
+	map(0xd9, 0xd9).r(FUNC(msx_state::kanji_r));
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
 }
 
-
-void msx2_base_state::msx2plus_io_map(address_map &map)
+void msx_state::msx1_io_map(address_map &map)
 {
-	map.unmap_value_high();
-	map.global_mask(0xff);
-	map(0x40, 0x4f).rw(FUNC(msx2_base_state::switched_r), FUNC(msx2_base_state::switched_w));
-	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	if (m_hw_def.has_printer_port())
-	{
-		map(0x90, 0x90).r(m_cent_status_in, FUNC(input_buffer_device::read));
-		map(0x90, 0x90).w(m_cent_ctrl_out, FUNC(output_latch_device::write));
-		map(0x91, 0x91).w(m_cent_data_out, FUNC(output_latch_device::write));
-	}
-	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0xa8, 0xab).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
-	map(0xb4, 0xb4).w(FUNC(msx2_base_state::rtc_latch_w));
-	map(0xb5, 0xb5).rw(FUNC(msx2_base_state::rtc_reg_r), FUNC(msx2_base_state::rtc_reg_w));
-	map(0xd8, 0xd9).w(FUNC(msx2_base_state::kanji_w));
-	map(0xd9, 0xd9).r(FUNC(msx2_base_state::kanji_r));
-	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
+	msx_base_io_map(map);
+	map(0x98, 0x99).rw(m_tms9928a, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 }
-
 
 void msx_state::machine_reset()
 {
@@ -737,22 +764,10 @@ void msx_state::machine_reset()
 	}
 }
 
-
 void msx_state::machine_start()
 {
 	m_leds.resolve();
 	m_port_c_old = 0xff;
-}
-
-
-void msx2_base_state::machine_start()
-{
-	msx_state::machine_start();
-
-	for (msx_switched_interface &switched : device_interface_enumerator<msx_switched_interface>(*this))
-		m_switched.push_back(&switched);
-
-	save_item(NAME(m_rtc_latch));
 }
 
 /* A hack to add 1 wait cycle in each opcode fetch.
@@ -880,11 +895,6 @@ INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 	m_mouse_stat[1] = -1;
 }
 
-/*
-** The I/O functions
-*/
-
-
 template <u8 Game_port>
 u8 msx_state::game_port_r()
 {
@@ -957,31 +967,6 @@ void msx_state::psg_port_b_w(u8 data)
 	m_psg_b = data;
 }
 
-
-/*
-** RTC functions
-*/
-
-void msx2_base_state::rtc_latch_w(u8 data)
-{
-	m_rtc_latch = data & 15;
-}
-
-void msx2_base_state::rtc_reg_w(u8 data)
-{
-	m_rtc->write(m_rtc_latch, data);
-}
-
-u8 msx2_base_state::rtc_reg_r()
-{
-	return m_rtc->read(m_rtc_latch);
-}
-
-
-/*
-** The PPI functions
-*/
-
 void msx_state::ppi_port_a_w(u8 data)
 {
 	m_primary_slot = data;
@@ -1027,18 +1012,18 @@ u8 msx_state::ppi_port_b_r()
 	return result;
 }
 
-void msx_state::expanded_slot_w(offs_t offset, u8 data)
+void msx_state::expanded_slot_w(u8 data)
 {
 	const int slot = (m_primary_slot >> 6) & 0x03;
 	m_secondary_slot[slot] = data;
-	LOG("write to expanded slot select: %02x\n", m_secondary_slot[slot]);
+	LOG("write to expanded slot select: %02x\n", data);
 	m_exp_view[slot][0]->select((data >> 0) & 0x03);
 	m_exp_view[slot][1]->select((data >> 2) & 0x03);
 	m_exp_view[slot][2]->select((data >> 4) & 0x03);
 	m_exp_view[slot][3]->select((data >> 6) & 0x03);
 }
 
-u8 msx_state::expanded_slot_r(offs_t offset)
+u8 msx_state::expanded_slot_r()
 {
 	const int slot = (m_primary_slot >> 6) & 0x03;
 	return ~m_secondary_slot[slot];
@@ -1064,47 +1049,9 @@ u8 msx_state::kanji_r(offs_t offset)
 void msx_state::kanji_w(offs_t offset, u8 data)
 {
 	if (offset)
-		m_kanji_latch = (m_kanji_latch & 0x007E0) | ((data & 0x3f) << 11);
+		m_kanji_latch = (m_kanji_latch & 0x007e0) | ((data & 0x3f) << 11);
 	else
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
-}
-
-u8 msx2_base_state::switched_r(offs_t offset)
-{
-	u8 data = 0xff;
-
-	for (int i = 0; i < m_switched.size(); i++)
-	{
-		data &= m_switched[i]->switched_read(offset);
-	}
-
-	return data;
-}
-
-void msx2_base_state::switched_w(offs_t offset, u8 data)
-{
-	for (int i = 0; i < m_switched.size(); i++)
-	{
-		m_switched[i]->switched_write(offset, data);
-	}
-}
-
-// Some MSX2+ can switch the z80 clock between 3.5 and 5.3 MHz
-WRITE_LINE_MEMBER(msx2_base_state::turbo_w)
-{
-	// 0 - 5.369317 MHz
-	// 1 - 3.579545 MHz
-	m_maincpu->set_unscaled_clock(21.477272_MHz_XTAL / (state ? 6 : 4));
-}
-
-void msx2_base_state::msx_ym2413(machine_config &config)
-{
-	YM2413(config, "ym2413", 21.477272_MHz_XTAL / 6).add_route(ALL_OUTPUTS, m_speaker, 0.4);
-}
-
-void msx2_base_state::msx2_64kb_vram(machine_config &config)
-{
-	m_v9938->set_vram_size(0x10000);
 }
 
 void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider)
@@ -1167,92 +1114,20 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 void msx_state::msx1_add_softlists(machine_config &config)
 {
 	if (m_hw_def.has_cassette())
-	{
 		SOFTWARE_LIST(config, "cass_list").set_original("msx1_cass");
-	}
 
 	if (m_hw_def.has_cartslot())
-	{
 		SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
-	}
 
 	if (m_hw_def.has_fdc())
-	{
 		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
-	}
-}
-
-void msx2_base_state::msx2_add_softlists(machine_config &config)
-{
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
-		SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
-		SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
-		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
-	}
-}
-
-void msx2_base_state::msx2plus_add_softlists(machine_config &config)
-{
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
-		SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
-		SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msx2p_flop");
-		SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");
-		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
-	}
-}
-
-void msx2_base_state::turbor_add_softlists(machine_config &config)
-{
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
-		SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
-		SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msxr_flop");
-		SOFTWARE_LIST(config, "msx2p_flp_l").set_compatible("msx2p_flop");
-		SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");
-		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
-	}
 }
 
 void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config)
 {
 	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3);
 
-	m_maincpu->set_addrmap(AS_IO, &msx_state::msx_io_map);
+	m_maincpu->set_addrmap(AS_IO, &msx_state::msx1_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(msx_state::msx_interrupt)); /* Needed for mouse updates */
 
 	if (vdp_type == VDP_TMS9118)
@@ -1275,6 +1150,161 @@ void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config 
 
 	// Software lists
 	msx1_add_softlists(config);
+}
+
+void msx2_base_state::msx2_base_io_map(address_map &map)
+{
+	msx_base_io_map(map);
+	map(0x40, 0x4f).rw(FUNC(msx2_base_state::switched_r), FUNC(msx2_base_state::switched_w));
+	map(0xb4, 0xb4).w(FUNC(msx2_base_state::rtc_latch_w));
+	map(0xb5, 0xb5).rw(FUNC(msx2_base_state::rtc_reg_r), FUNC(msx2_base_state::rtc_reg_w));
+}
+
+void msx2_base_state::msx2_io_map(address_map &map)
+{
+	msx2_base_io_map(map);
+	// TODO: S-1985 mirrors 9c-9f
+	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+}
+
+void msx2_base_state::msx2plus_io_map(address_map &map)
+{
+	msx2_base_io_map(map);
+	// TODO: S-1985 mirrors 9c-9f
+	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
+}
+
+void msx2_base_state::machine_start()
+{
+	msx_state::machine_start();
+
+	for (msx_switched_interface &switched : device_interface_enumerator<msx_switched_interface>(*this))
+		m_switched.push_back(&switched);
+
+	save_item(NAME(m_rtc_latch));
+}
+
+/*
+** RTC functions
+*/
+
+void msx2_base_state::rtc_latch_w(u8 data)
+{
+	m_rtc_latch = data & 15;
+}
+
+void msx2_base_state::rtc_reg_w(u8 data)
+{
+	m_rtc->write(m_rtc_latch, data);
+}
+
+u8 msx2_base_state::rtc_reg_r()
+{
+	return m_rtc->read(m_rtc_latch);
+}
+
+u8 msx2_base_state::switched_r(offs_t offset)
+{
+	u8 data = 0xff;
+
+	for (int i = 0; i < m_switched.size(); i++)
+	{
+		data &= m_switched[i]->switched_read(offset);
+	}
+
+	return data;
+}
+
+void msx2_base_state::switched_w(offs_t offset, u8 data)
+{
+	for (int i = 0; i < m_switched.size(); i++)
+	{
+		m_switched[i]->switched_write(offset, data);
+	}
+}
+
+// Some MSX2+ can switch the z80 clock between 3.5 and 5.3 MHz
+WRITE_LINE_MEMBER(msx2_base_state::turbo_w)
+{
+	// 0 - 5.369317 MHz
+	// 1 - 3.579545 MHz
+	m_maincpu->set_unscaled_clock(21.477272_MHz_XTAL / (state ? 6 : 4));
+}
+
+void msx2_base_state::msx_ym2413(machine_config &config)
+{
+	YM2413(config, "ym2413", 21.477272_MHz_XTAL / 6).add_route(ALL_OUTPUTS, m_speaker, 0.4);
+}
+
+void msx2_base_state::msx2_64kb_vram(machine_config &config)
+{
+	m_v9938->set_vram_size(0x10000);
+}
+
+void msx2_base_state::msx2_add_softlists(machine_config &config)
+{
+	if (m_hw_def.has_cassette())
+	{
+		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+		SOFTWARE_LIST(config, "msx1_cass_list").set_compatible("msx1_cass");
+	}
+
+	if (m_hw_def.has_cartslot())
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
+		SOFTWARE_LIST(config, "msx1_cart_list").set_compatible("msx1_cart");
+	}
+
+	if (m_hw_def.has_fdc())
+	{
+		SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
+		SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
+	}
+}
+
+void msx2_base_state::msx2plus_add_softlists(machine_config &config)
+{
+	if (m_hw_def.has_cassette())
+	{
+		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+		SOFTWARE_LIST(config, "msx1_cass_list").set_compatible("msx1_cass");
+	}
+
+	if (m_hw_def.has_cartslot())
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
+		SOFTWARE_LIST(config, "msx1_cart_list").set_compatible("msx1_cart");
+	}
+
+	if (m_hw_def.has_fdc())
+	{
+		SOFTWARE_LIST(config, "flop_list").set_original("msx2p_flop");
+		SOFTWARE_LIST(config, "msx2_flop_list").set_compatible("msx2_flop");
+		SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
+	}
+}
+
+void msx2_base_state::turbor_add_softlists(machine_config &config)
+{
+	if (m_hw_def.has_cassette())
+	{
+		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+		SOFTWARE_LIST(config, "msx1_cass_list").set_compatible("msx1_cass");
+	}
+
+	if (m_hw_def.has_cartslot())
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
+		SOFTWARE_LIST(config, "msx1_cart_list").set_compatible("msx1_cart");
+	}
+
+	if (m_hw_def.has_fdc())
+	{
+		SOFTWARE_LIST(config, "flop_list").set_original("msxr_flop");
+		SOFTWARE_LIST(config, "msx2p_flop_list").set_compatible("msx2p_flop");
+		SOFTWARE_LIST(config, "msx2_flop_list").set_compatible("msx2_flop");
+		SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
+	}
 }
 
 void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config)
@@ -1345,10 +1375,3 @@ void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config)
 	// Software lists
 	turbor_add_softlists(config);
 }
-
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
-

@@ -21,21 +21,8 @@ msx1_v9938_state::msx1_v9938_state(const machine_config &mconfig, device_type ty
 
 void msx1_v9938_state::io_map(address_map &map)
 {
-	map.unmap_value_high();
-	map.global_mask(0xff);
-	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	if (m_hw_def.has_printer_port())
-	{
-		map(0x90, 0x90).r(m_cent_status_in, FUNC(input_buffer_device::read));
-		map(0x90, 0x90).w(m_cent_ctrl_out, FUNC(output_latch_device::write));
-		map(0x91, 0x91).w(m_cent_data_out, FUNC(output_latch_device::write));
-	}
-	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0xa8, 0xab).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	msx_base_io_map(map);
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
-	map(0xd8, 0xd9).w(FUNC(msx1_v9938_state::kanji_w));
-	map(0xd9, 0xd9).r(FUNC(msx1_v9938_state::kanji_r));
-	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
 }
 
 void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &config)
