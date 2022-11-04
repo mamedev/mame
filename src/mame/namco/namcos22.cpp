@@ -1828,7 +1828,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	/**
 	 * Tilemap PCG Memory
 	 */
-	map(0x90080000, 0x9009dfff).ram().w(FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
+	map(0x90080000, 0x9009ffff).ram().w(FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
 
 	/**
 	 * Tilemap Memory (64 x 64)
@@ -1865,7 +1865,7 @@ void namcos22s_state::namcos22s_am(address_map &map)
 	map(0x824000, 0x8243ff).ram().share("video_mixer");
 	map(0x828000, 0x83ffff).ram().w(FUNC(namcos22s_state::namcos22_paletteram_w)).share("paletteram");
 	map(0x860000, 0x860007).rw(FUNC(namcos22s_state::spotram_r), FUNC(namcos22s_state::spotram_w));
-	map(0x880000, 0x89dfff).ram().w(FUNC(namcos22s_state::namcos22_cgram_w)).share("cgram");
+	map(0x880000, 0x89ffff).ram().w(FUNC(namcos22s_state::namcos22_cgram_w)).share("cgram");
 	map(0x89e000, 0x89ffff).ram().w(FUNC(namcos22s_state::namcos22_textram_w)).share("textram");
 	map(0x8a0000, 0x8a000f).rw(FUNC(namcos22s_state::namcos22_tilemapattr_r), FUNC(namcos22s_state::namcos22_tilemapattr_w));
 	map(0x900000, 0x90ffff).ram().share("vics_data");
@@ -3595,7 +3595,7 @@ static const gfx_layout texture_tile_layout =
 static const gfx_layout namcos22_cg_layout =
 {
 	16,16,
-	0x400, /* 0x3c0 */
+	0x400,
 	4,
 	{ 0,1,2,3 },
 	{ XOR(0)*4,  XOR(1)*4,  XOR(2)*4,  XOR(3)*4,  XOR(4)*4,  XOR(5)*4,  XOR(6)*4,  XOR(7)*4,

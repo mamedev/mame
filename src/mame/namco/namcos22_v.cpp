@@ -1763,6 +1763,7 @@ void namcos22_state::namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask)
 		m_bgtilemap->mark_tile_dirty(offset * 2);
 		m_bgtilemap->mark_tile_dirty(offset * 2 + 1);
 	}
+	namcos22_cgram_w(offset + 0x1e000/4, data, mem_mask);
 }
 
 void namcos22_state::namcos22_cgram_w(offs_t offset, u32 data, u32 mem_mask)
