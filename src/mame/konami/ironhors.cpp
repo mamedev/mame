@@ -293,7 +293,8 @@ void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	else
 		sr = m_spriteram[1];
 
-	for (int offs = 0; offs < m_spriteram[0].bytes(); offs += 5)
+	// note that it has 5 bytes per sprite
+	for (int offs = 0; offs <= 250; offs += 5)
 	{
 		int sx = sr[offs + 3];
 		int sy = sr[offs + 2];
