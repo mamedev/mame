@@ -41,6 +41,7 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
+#include "machine/rp5c01.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 
@@ -61,6 +62,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_ticket(*this, "ticket")
+		, m_rtc(*this, "rtc")
 		, m_vram(*this, "vram%u", 0U)
 		, m_spriteram(*this, "sprite_ram")
 		, m_okibank(*this, "okibank")
@@ -79,6 +81,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_ticket;
+	required_device<lh5045_device> m_rtc;
 
 	required_shared_ptr_array<uint16_t, 4> m_vram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -260,21 +263,9 @@ void banprestoms_state::prg_map(address_map &map)
 	map(0x0e0002, 0x0e0003).portr("IN1");
 	map(0x0e0004, 0x0e0005).portr("IN2");
 
-	// Expects a '1' when entering RTC test (RTC ready line?)
+	// Expects a '1' when entering RTC test (RTC /BSY line?)
 	map(0x0e0006, 0x0e0007).lr8(NAME([](offs_t offset) { return 1; }));
-	/*
-	 * Unknown RTC type (service mode in tvdenwad -> first item)
-	 * 4-bit access, in lower/upper digit fashion
-	 * [0-2] seconds
-	 * [4-6] minutes
-	 * [8-a] hours
-	 * [c] weekday?
-	 * [e-0x10] day
-	 * [0x12-0x14] month
-	 * [0x16-0x18] year
-	 * [0x1a-0x1e] cleared on POST
-	 */
-//	map(0x100000, 0x10001f).ram();
+	map(0x100000, 0x10001f).rw(m_rtc, FUNC(lh5045_device::read), FUNC(lh5045_device::write)).umask16(0x00ff);
 }
 
 void banprestoms_state::oki_map(address_map &map)
@@ -285,6 +276,7 @@ void banprestoms_state::oki_map(address_map &map)
 
 static INPUT_PORTS_START( tvdenwad )
 	PORT_START("IN1")
+	// TODO: convert to keypad
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // 1
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // 2
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) // 3
@@ -468,6 +460,8 @@ void banprestoms_state::banprestoms(machine_config &config)
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(banprestoms_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(banprestoms_state::layer_scroll_w));
+
+	LH5045(config, m_rtc, XTAL(32'768));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_banprestoms);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400); // TODO: copied from other drivers using the same CRTC
