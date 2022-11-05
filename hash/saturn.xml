@@ -7339,11 +7339,14 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages - OutRun (Japan)... -->
 	<software name="outrun" supported="no">
 		<description>Sega Ages - Out Run (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Keeps repeating voice samples [SCSP]
+Sega logo animation draws offset [VDP2]
+]]></notes>
 		<info name="serial" value="GS-9110"/>
 		<info name="release" value="19960920"/>
 		<info name="alt_title" value="アウトラン"/>
