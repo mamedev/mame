@@ -135,23 +135,16 @@ void bestleag_state::video_start()
 	m_fg_tilemap->set_transparent_pen(15);
 }
 
-/*
-Note: sprite chip is different than the other Big Striker sets and they
-      include several similiarities with other Playmark games (including
-      the sprite end code and the data being offset (i.e. spriteram starting from 0x16/2))
-*/
 void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int start = 0x16/2;
-	int end = m_spriteram.length() - (-start & 3);
-
 	/*
-
 	Sprites are the same to sslam, but using 16x16 sprites instead of 8x8
 
+	Note: sprite chip is different than the other Big Striker sets and they
+	      include several similiarities with other Playmark games (including
+	      the sprite end code and the data being offset (i.e. spriteram starting from 0x16/2))
 	*/
-
-	for (int offs = start; offs < end; offs += 4)
+	for (int offs = 0x16/2; offs < m_spriteram.length() - 3; offs += 4)
 	{
 		int code = m_spriteram[offs+3] & 0xfff;
 		int color = (m_spriteram[offs+2] & 0xf000) >> 12;
