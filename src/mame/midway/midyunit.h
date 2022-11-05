@@ -171,6 +171,7 @@ private:
 
 	void dma_draw(uint16_t command);
 	void init_generic(int bpp, int sound, int prot_start, int prot_end);
+	void install_hidden_ram(mc6809e_device &cpu, int prot_start, int prot_end);
 	void term2_init_common(write16s_delegate hack_w);
 };
 
