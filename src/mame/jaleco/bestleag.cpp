@@ -142,7 +142,7 @@ Note: sprite chip is different than the other Big Striker sets and they
 */
 void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *spriteram16 = m_spriteram;
+	uint16_t *src = m_spriteram + 0x16/2;
 
 	/*
 
@@ -150,18 +150,16 @@ void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	*/
 
-	int offs;
-
-	for (offs = 0x16/2;offs < m_spriteram.bytes()/2;offs += 4)
+	for (int offs = 0; offs < 0x7f4; offs += 4)
 	{
-		int code = spriteram16[offs+3] & 0xfff;
-		int color = (spriteram16[offs+2] & 0xf000) >> 12;
-		int sx = (spriteram16[offs+2] & 0x1ff) - 20;
-		int sy = (0xff - (spriteram16[offs+0] & 0xff)) - 15;
-		int flipx = (spriteram16[offs+0] & 0x4000) >> 14;
+		int code = src[offs+3] & 0xfff;
+		int color = (src[offs+2] & 0xf000) >> 12;
+		int sx = (src[offs+2] & 0x1ff) - 20;
+		int sy = (0xff - (src[offs+0] & 0xff)) - 15;
+		int flipx = (src[offs+0] & 0x4000) >> 14;
 
 		/* Sprite list end code */
-		if(spriteram16[offs+0] & 0x2000)
+		if(src[offs+0] & 0x2000)
 			return;
 
 		/* it can change sprites color mask like the original set */
@@ -457,8 +455,8 @@ ROM_START( bestleaw )
 	ROM_LOAD( "26_27c4001.u45", 0x180000, 0x80000, CRC(a82c905d) SHA1(b1c1098ad79eb66943bc362246983427d0263b6e) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 ) /* 16x16x4 Sprites */
-	ROM_LOAD( "27_27c010.u86",  0x000000, 0x20000, CRC(a463422a) SHA1(a3b6efd1c57b0a3b0ce4ce734a9a9b79540c4136) )
-	ROM_LOAD( "28_27c010.u85",  0x020000, 0x20000, CRC(ebec74ed) SHA1(9a1620f4ca163470f5e567f650663ae368bdd3c1) )
+	ROM_LOAD( "27_27c010.u86", 0x000000, 0x20000, CRC(a463422a) SHA1(a3b6efd1c57b0a3b0ce4ce734a9a9b79540c4136) )
+	ROM_LOAD( "28_27c010.u85", 0x020000, 0x20000, CRC(ebec74ed) SHA1(9a1620f4ca163470f5e567f650663ae368bdd3c1) )
 	ROM_LOAD( "29_27c010.u84", 0x040000, 0x20000, CRC(7ea4e22d) SHA1(3c7f05dfd1c5889bfcbc14d08026e2a484870216) )
 	ROM_LOAD( "30_27c010.u83", 0x060000, 0x20000, CRC(283d9ba6) SHA1(6054853f76907a4a0f89ad5aa02dde9d3d4ff196) )
 
