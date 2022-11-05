@@ -366,7 +366,7 @@ protected:
 	void ic23_update();
 	void ic24_output(int data);
 	void ic24_setup();
-	void update_ay(device_t *device);
+	void update_ay();
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_config_common();
 
@@ -509,10 +509,10 @@ protected:
 	int m_lamp_extender = 0;
 	int m_last_b7 = 0;
 	int m_last_latch = 0;
-	int m_lamp_sense = 0;
-	int m_card_live = 0;
+	bool m_lamp_sense = false;
+	bool m_card_live = false;
 	int m_led_extender = 0;
-	int m_bwb_bank = 0;
+	bool m_bwb_bank = false;
 	bool m_default_to_low_bank = false;
 
 	bool m_use_pia4_porta_leds = true;
@@ -536,6 +536,7 @@ protected:
 	uint8_t m_numbanks = 0;
 
 	bool m_link7a_connected = false;
+	bool m_link7b_connected = true;
 
 	bool m_overcurrent = false;
 	bool m_undercurrent = false;
@@ -555,6 +556,7 @@ protected:
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };
+
 
 
 template<const uint8_t* Table> void mpu4_state::mod4oki_cheatchr_pal_f(machine_config &config)

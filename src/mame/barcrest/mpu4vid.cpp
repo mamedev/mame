@@ -691,7 +691,7 @@ static INPUT_PORTS_START( crmaze )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Left Red")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Left Yellow")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_NAME("Getout Yellow")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Escape/Getout Red")/* Labelled Escape on cabinet */
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Escape/Getout Red")/* Labelled Escape on cabinet, Getout in test */
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_MODIFY("AUX1")
@@ -1871,6 +1871,20 @@ void mpu4vid_state::machine_start()
 
 	/* setup communications */
 	m_link7a_connected = true;
+	m_link7b_connected = false;
+
+
+	save_item(NAME( m_m6840_irq_state ));
+	save_item(NAME( m_m6850_irq_state ));
+	save_item(NAME( m_gfx_index ));
+	save_item(NAME( m_cur ));
+
+	save_item(NAME( m_bt_palbase ));
+	save_item(NAME( m_bt_which ));
+	save_item(NAME( m_btpal_r ));
+	save_item(NAME( m_btpal_g ));
+	save_item(NAME( m_btpal_b ));
+
 }
 
 void mpu4vid_state::machine_reset()

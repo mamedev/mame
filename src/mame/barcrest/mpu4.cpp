@@ -271,16 +271,16 @@ void mpu4_state::lamp_extend_small(int data)
 
 void mpu4_state::lamp_extend_large(int data,int column,int active)
 {
-	m_lamp_sense = 0;
+	m_lamp_sense = false;
 	int bit7 = BIT(data, 7);
 	if ( bit7 != m_last_b7 )
 	{
-		m_card_live = 1;
+		m_card_live = true;
 		//depending on bit 7, we can access one of two 'blocks' of 64 lamps
 		int lampbase = bit7 ? 0 : 64;
 		if ( data & 0x3f )
 		{
-			m_lamp_sense = 1;
+			m_lamp_sense = true;
 		}
 		if ( active )
 		{
@@ -298,7 +298,7 @@ void mpu4_state::lamp_extend_large(int data,int column,int active)
 	}
 	else
 	{
-		m_card_live = 0;
+		m_card_live = false;
 	}
 }
 
@@ -442,10 +442,18 @@ WRITE_LINE_MEMBER(mpu4_state::cpu0_irq)
 							m_pia8->irq_a_state() | m_pia8->irq_b_state() |
 							m_6840ptm->irq_state();
 
-	if (!m_link7a_connected) //7B = IRQ, 7A = FIRQ, both = NMI
+	if (m_link7b_connected) //7B = IRQ, 7A = FIRQ, both = NMI
 	{
-		m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-		LOG(("6809 int%d \n", combined_state));
+		if (!m_link7a_connected)
+		{
+			m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+			LOG(("6809 int%d \n", combined_state));
+		}
+		else
+		{
+			m_maincpu->set_input_line(INPUT_LINE_NMI, combined_state ? ASSERT_LINE : CLEAR_LINE);
+			LOG(("6809 nmint%d \n", combined_state));
+		}
 	}
 	else
 	{
@@ -525,15 +533,9 @@ void mpu4_state::pia_ic3_porta_w(uint8_t data)
 			// As a consequence, the lamp column data can change before the input strobe without
 			// causing the relevant lamps to black out.
 
-			if (m_overcurrent_detect)
-			{
-				m_overcurrent = true;
-			}
+			if (m_overcurrent_detect)  m_overcurrent = true;
 
-			if (m_undercurrent_detect)
-			{
-				m_undercurrent = true;
-			}
+			if (m_undercurrent_detect) m_undercurrent = true;
 
 			for (i = 0; i < 8; i++)
 			{
@@ -553,15 +555,9 @@ void mpu4_state::pia_ic3_portb_w(uint8_t data)
 	{
 		if (m_lamp_strobe2 != m_input_strobe)
 		{
-			if (m_overcurrent_detect)
-			{
-				m_overcurrent = true;
-			}
+			if (m_overcurrent_detect)  m_overcurrent = true;
 
-			if (m_undercurrent_detect)
-			{
-				m_undercurrent = true;
-			}
+			if (m_undercurrent_detect) m_undercurrent = true;
 
 			for (i = 0; i < 8; i++)
 			{
@@ -948,8 +944,11 @@ If this sounds familiar, Amstrad did something very similar with their home comp
 
 The PSG function, defined by the BC1,BC2 and BDIR signals, is controlled by CA2 and CB2 of IC6.
 
+The chipselect for the AY chip itself, however, is CB2 on IC5, so unless this goes live, things are likely to fail
+
 PSG function selection:
 -----------------------
+CSEL = IC5 CB2
 BDIR = IC6 CB2 and BC1 = IC6 CA2
 
 Pin            | PSG Function
@@ -961,12 +960,11 @@ BDIR BC1       |
 */
 
 /* PSG function selected */
-void mpu4_state::update_ay(device_t *device)
+void mpu4_state::update_ay()
 {
 	if (!m_ay8913) return;
 
-	pia6821_device *pia = downcast<pia6821_device *>(device);
-	if (!pia->cb2_output())
+	if (!m_pia5->cb2_output())
 	{
 		switch (m_ay8913_address)
 		{
@@ -1002,7 +1000,7 @@ void mpu4_state::update_ay(device_t *device)
 
 WRITE_LINE_MEMBER(mpu4_state::pia_ic5_cb2_w)
 {
-	update_ay(m_pia5);
+	update_ay();
 }
 
 
@@ -1034,7 +1032,7 @@ void mpu4_state::pia_ic6_porta_w(uint8_t data)
 	if (m_ay8913.found())
 	{
 		m_ay_data = data;
-		update_ay(m_pia6);
+		update_ay();//
 	}
 }
 
@@ -1046,7 +1044,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_ca2_w)
 	{
 		if ( state ) m_ay8913_address |=  0x01;
 		else         m_ay8913_address &= ~0x01;
-		update_ay(m_pia6);
+		update_ay();//
 	}
 }
 
@@ -1058,7 +1056,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_cb2_w)
 	{
 		if ( state ) m_ay8913_address |=  0x02;
 		else         m_ay8913_address &= ~0x02;
-		update_ay(m_pia5); // using m_pia5 here allows m4fourmr to have sound
+		update_ay(); // using m_pia5 here allows m4fourmr to have sound
 	}
 }
 
@@ -1992,7 +1990,85 @@ void mpu4_state::mpu4_config_common()
 	m_triacs.resolve();
 
 	m_ic24_timer = timer_alloc(FUNC(mpu4_state::update_ic24), this);
+
+
+	save_item(NAME( m_mmtr_data ));
+	save_item(NAME( m_ay8913_address ));
+	save_item(NAME( m_signal_50hz ));
+	save_item(NAME( m_ic4_input_b ));
+	save_item(NAME( m_aux1_input ));
+	save_item(NAME( m_aux2_input ));
+	save_item(NAME( m_IC23G1 ));
+	save_item(NAME( m_IC23G2A ));
+	save_item(NAME( m_IC23G2B ));
+	save_item(NAME( m_IC23GC ));
+	save_item(NAME( m_IC23GB ));
+	save_item(NAME( m_IC23GA ));
+
+	save_item(NAME( m_reel_flag ));
+	save_item(NAME( m_ic23_active ));
+	save_item(NAME( m_expansion_latch ));
+	save_item(NAME( m_global_volume ));
+	save_item(NAME( m_input_strobe ));
+	save_item(NAME( m_lamp_strobe ));
+	save_item(NAME( m_lamp_strobe2 ));
+	save_item(NAME( m_lamp_strobe_ext_persistence ));
+	save_item(NAME( m_led_strobe ));
+	save_item(NAME( m_ay_data ));
+	save_item(NAME( m_optic_pattern ));
+
+	save_item(NAME( m_active_reel ));
+	save_item(NAME( m_remote_meter ));
+	save_item(NAME( m_reel_mux ));
+	save_item(NAME( m_lamp_extender ));
+	save_item(NAME( m_last_b7 ));
+	save_item(NAME( m_last_latch ));
+	save_item(NAME( m_lamp_sense ));
+	save_item(NAME( m_card_live ));
+	save_item(NAME( m_led_extender ));
+	save_item(NAME( m_bwb_bank ));
+	save_item(NAME( m_default_to_low_bank ));
+
+	save_item(NAME( m_use_pia4_porta_leds ));
+	save_item(NAME( m_pia4_porta_leds_base ));
+	save_item(NAME( m_pia4_porta_leds_strobe ));
+
+	save_item(NAME( m_use_simplecard_leds ));
+	save_item(NAME( m_simplecard_leds_base ));
+	save_item(NAME( m_simplecard_leds_strobe ));
+
+	save_item(NAME( m_pageval ));
+	save_item(NAME( m_pageset ));
+	save_item(NAME( m_hopper_type ));
+	save_item(NAME( m_reels ));
+	save_item(NAME( m_chrdata ));
+	save_item(NAME( m_t1 ));
+	save_item(NAME( m_t3l ));
+	save_item(NAME( m_t3h ));
+	save_item(NAME( m_serial_output ));
+
+	save_item(NAME( m_numbanks ));
+
+	save_item(NAME( m_link7a_connected ));
+	save_item(NAME( m_link7b_connected ));
+
+	save_item(NAME( m_overcurrent ));
+	save_item(NAME( m_undercurrent ));
+
+	save_item(NAME( m_overcurrent_detect ));
+	save_item(NAME( m_undercurrent_detect ));
+
+	save_item(NAME( m_low_volt_detect ));
+
+	save_item(NAME( m_use_coinlocks ));
+
+	save_item(NAME( m_hack_duart_fixed_low ));
+
+	save_item(NAME( m_hopper1_opto ));
+	save_item(NAME( m_hopper2_opto ));
+
 	m_lamp_strobe_ext_persistence = 0;
+
 }
 
 MACHINE_START_MEMBER(mpu4_state,mod2)
@@ -2000,6 +2076,7 @@ MACHINE_START_MEMBER(mpu4_state,mod2)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
+	m_link7b_connected=true;
 }
 
 MACHINE_START_MEMBER(mpu4_state,mpu4oki)
@@ -2008,12 +2085,13 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
+	m_link7b_connected=true;
 	mpu4_install_mod4oki_space(space);
 }
 
 void mpu4_state::init_m4()
 {
-	m_bwb_bank = 0;
+	m_bwb_bank = false;
 	setup_rom_banks();
 }
 
@@ -2027,7 +2105,7 @@ void mpu4_state::init_m4big()
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_bwb_bank = 1;
+	m_bwb_bank = true;
 	space.install_write_handler(0x0858, 0x0858, write8smo_delegate(*this, FUNC(mpu4_state::bankswitch_w)));
 	space.install_write_handler(0x0878, 0x0878, write8smo_delegate(*this, FUNC(mpu4_state::bankset_w)));
 	uint8_t *rom = memregion("maincpu")->base();
