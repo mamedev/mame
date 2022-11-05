@@ -490,7 +490,7 @@ uint16_t konamim2_state::konami_io0_r(offs_t offset)
 		case 8: return ioport("P5")->read();
 	}
 
-	//return rand();
+	//return machine().rand();
 	return 0;
 }
 
