@@ -303,11 +303,11 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 			break;
 
 		case SOUND_ADPCM:
-			install_hidden_ram(*m_cvsd_sound->get_cpu(), prot_start, prot_end);
+			install_hidden_ram(*m_adpcm_sound->get_cpu(), prot_start, prot_end);
 			break;
 
 		case SOUND_NARC:
-			install_hidden_ram(*m_cvsd_sound->get_cpu(), prot_start, prot_end);
+			install_hidden_ram(*m_narc_sound->get_cpu(), prot_start, prot_end);
 			break;
 
 		case SOUND_YAWDIM:
