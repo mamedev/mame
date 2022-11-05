@@ -228,6 +228,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 #include "bingowng.lh"
 #include "cherryb3.lh"
 #include "chrygld.lh"
@@ -18917,19 +18919,13 @@ void cmaster_state::init_ll3() // verified with ICE dump
 	uint8_t *rom = memregion("maincpu")->base();
 
 	// swap some 0x1000 blocks around
-	for (int i = 0x0000; i < 0x1000; i ++)
-	{
-		std::swap(rom[i], rom[0x8000 + i]);
-		std::swap(rom[0x5000 + i], rom[0x7000 + i]);
-	}
+	std::swap_ranges(&rom[0], &rom[0x1000], &rom[0x8000]);
+	std::swap_ranges(&rom[0x5000], &rom[0x6000], &rom[0x7000]);
 
 	// swap some 0x800 blocks around
-	for (int i = 0x000; i < 0x800; i ++)
-	{
-		std::swap(rom[0x1800 + i], rom[0x4800 + i]);
-		std::swap(rom[0x2800 + i], rom[0xa800 + i]);
-		std::swap(rom[0x6800 + i], rom[0x9800 + i]);
-	}
+	std::swap_ranges(&rom[0x1800], &rom[0x2000], &rom[0x4800]);
+	std::swap_ranges(&rom[0x2800], &rom[0x3000], &rom[0xa800]);
+	std::swap_ranges(&rom[0x6800], &rom[0x7000], &rom[0x9800]);
 }
 
 void cmaster_state::init_cmfb55()
