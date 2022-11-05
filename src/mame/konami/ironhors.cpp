@@ -286,15 +286,14 @@ void ironhors_state::video_start()
 
 void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *sr;
-
-	if (m_spriterambank != 0)
-		sr = m_spriteram[0];
-	else
-		sr = m_spriteram[1];
+	int bank = m_spriterambank ? 0 : 1;
+	uint8_t *sr = m_spriteram[bank];
 
 	// note that it has 5 bytes per sprite
-	for (int offs = 0; offs <= 250; offs += 5)
+	int end = m_spriteram[bank].bytes();
+	end -= end % 5;
+
+	for (int offs = 0; offs < end; offs += 5)
 	{
 		int sx = sr[offs + 3];
 		int sy = sr[offs + 2];

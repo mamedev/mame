@@ -142,7 +142,8 @@ Note: sprite chip is different than the other Big Striker sets and they
 */
 void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *src = m_spriteram + 0x16/2;
+	int start = 0x16/2;
+	int end = m_spriteram.length() - (start & 3);
 
 	/*
 
@@ -150,16 +151,16 @@ void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	*/
 
-	for (int offs = 0; offs < 0x7f4; offs += 4)
+	for (int offs = start; offs < end; offs += 4)
 	{
-		int code = src[offs+3] & 0xfff;
-		int color = (src[offs+2] & 0xf000) >> 12;
-		int sx = (src[offs+2] & 0x1ff) - 20;
-		int sy = (0xff - (src[offs+0] & 0xff)) - 15;
-		int flipx = (src[offs+0] & 0x4000) >> 14;
+		int code = m_spriteram[offs+3] & 0xfff;
+		int color = (m_spriteram[offs+2] & 0xf000) >> 12;
+		int sx = (m_spriteram[offs+2] & 0x1ff) - 20;
+		int sy = (0xff - (m_spriteram[offs+0] & 0xff)) - 15;
+		int flipx = (m_spriteram[offs+0] & 0x4000) >> 14;
 
 		/* Sprite list end code */
-		if(src[offs+0] & 0x2000)
+		if(m_spriteram[offs+0] & 0x2000)
 			return;
 
 		/* it can change sprites color mask like the original set */
