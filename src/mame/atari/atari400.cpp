@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Juergen Buchmueller
+// copyright-holders:Juergen Buchmueller, Angelo Salese
 /******************************************************************************
 
     Atari 400/800
@@ -17,7 +17,7 @@
     - a1200xl: requires reading TRIG3 high for detecting a cart inserted,
       depends on above;
     - a600xl, a1200xl: crashes on MMU test in Acid800;
-	- slot support for PBI/ECI bus;
+    - slot support for PBI/ECI bus;
     - slot support for overlay DYI HW mods (i.e. dual Pokey, Ultimate1MB, Covox, VBXE)
 
     2009-05 FP changes:
@@ -1817,15 +1817,15 @@ void a400_state::disable_cart(offs_t offset, uint8_t data)
 			}
 			break;
 		/*case A800_MICROCALC:
-			m_cart_helper = (m_cart_helper + 1) % 5;
-			if (m_cart_helper == 4)
-				m_cart_disabled = 1;
-			else
-			{
-				m_cart_disabled = 0;
-				m_cartleft->write_d5xx(offset, m_cart_helper);
-			}
-			break;*/
+		    m_cart_helper = (m_cart_helper + 1) % 5;
+		    if (m_cart_helper == 4)
+		        m_cart_disabled = 1;
+		    else
+		    {
+		        m_cart_disabled = 0;
+		        m_cartleft->write_d5xx(offset, m_cart_helper);
+		    }
+		    break;*/
 		default:
 			break;
 		}
@@ -1845,9 +1845,9 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 		{
 			// TODO: unimplemented in slot
 		//case A800_8K:
-		//	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-		//	m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-		//	break;
+		//  m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
+		//  m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
+		//  break;
 		case A800_8K_RIGHT:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x9fff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0x9fff);
@@ -1865,8 +1865,8 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 		case A800_OSS043M:
 		case A800_OSSM091:
 		case A800_OSS8K:
-//		case A800_TURBO64:
-//		case A800_TURBO128:
+//      case A800_TURBO64:
+//      case A800_TURBO128:
 		case A800_PHOENIX:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
@@ -1883,11 +1883,11 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_8000)), write8sm_delegate(*this, FUNC(a400_state::special_write_8000)));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
 			break;
-/*		case A800_MICROCALC:
-			// this can also disable ROM when reading in 0xd500-0xd5ff
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd500, 0xd5ff, read8sm_delegate(*this, FUNC(a400_state::read_d5xx)), write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
-			break;*/
+/*      case A800_MICROCALC:
+            // this can also disable ROM when reading in 0xd500-0xd5ff
+            m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
+            m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd500, 0xd5ff, read8sm_delegate(*this, FUNC(a400_state::read_d5xx)), write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
+            break;*/
 		case A800_XEGS:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
@@ -1983,11 +1983,11 @@ void a800_state::machine_reset()
 
 	// TODO: stub reset state, verify if any can be run stand-alone
 /*
-	if (!m_cartright->exists())
-	{
-		m_cart_rd4_enabled = false;
-		m_cart_rd4_view.select(0);
-	}*/
+    if (!m_cartright->exists())
+    {
+        m_cart_rd4_enabled = false;
+        m_cart_rd4_view.select(0);
+    }*/
 }
 
 void a1200xl_state::machine_reset()
@@ -2080,7 +2080,7 @@ uint8_t a1200xl_state::djoy_b_r()
 	// - SDX boot (will hang in kernel during POST by boot conflict with BASIC if not handled properly)
 	// - a1200xl cart boot
 	// - returning m_cartleft->exists() makes BASIC disable thru OPTION to not work and makes maxflash to fail loading most .xex
-//	b |= m_cart_rd5_enabled << 3;
+//  b |= m_cart_rd5_enabled << 3;
 	b |= !m_cartleft->exists() << 3;
 
 	return b;
@@ -2380,7 +2380,7 @@ void a1200xl_state::a1200xl(machine_config &config)
 
 	// retail has 64KB minimum
 	m_ram->set_default_size("64K");
-//	m_ram->set_extra_options("16K,32K,48K");
+//  m_ram->set_extra_options("16K,32K,48K");
 }
 
 // memory map A800XL + NTSC screen + MMU via PIA portB
