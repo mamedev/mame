@@ -24,7 +24,7 @@ license:CC0
 	<software name="airheart">
 		<description>Airheart</description>
 		<year>1986</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-10-12"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 128K Apple //e, //c, or IIgs. -->
@@ -39,7 +39,7 @@ license:CC0
 	<software name="aplpanic">
 		<description>Apple Panic</description>
 		<year>1981</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-02-17"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -99,7 +99,7 @@ license:CC0
 	<software name="agalxian">
 		<description>Apple Galaxian</description>
 		<year>1980</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-10-10"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -728,7 +728,7 @@ license:CC0
 	<software name="drol">
 		<description>Drol</description>
 		<year>1983</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-10-13"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -1027,7 +1027,7 @@ license:CC0
 	<software name="gendrift">
 		<description>Genetic Drift</description>
 		<year>1981</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-10-27"/>
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- It requires a 48K Apple II or II+.
@@ -1089,7 +1089,7 @@ license:CC0
 	<software name="gumball">
 		<description>Gumball</description>
 		<year>1983</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-10-11"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -1396,7 +1396,7 @@ license:CC0
 	<software name="karateka">
 		<description>Karateka</description>
 		<year>1984</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-10-19"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K.
@@ -1516,7 +1516,7 @@ license:CC0
 	<software name="loderunr">
 		<description>Lode Runner</description>
 		<year>1983</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-01-21"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -2144,7 +2144,7 @@ license:CC0
 	<software name="pop">
 		<description>Prince of Persia</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-09-14"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 128K Apple //e, //c, or IIgs. -->
@@ -2277,7 +2277,7 @@ license:CC0
 	<software name="redalert">
 		<description>Red Alert</description>
 		<year>1981</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-11-19"/>
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- It requires a 48K Apple II or II+.
@@ -2468,7 +2468,7 @@ license:CC0
 	<software name="seafox">
 		<description>Sea Fox</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-02-05"/>
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- It requires a 48K Apple II or II+.
@@ -2643,7 +2643,7 @@ license:CC0
 	<software name="spquarks">
 		<description>Space Quarks</description>
 		<year>1981</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-10-30"/>
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- It requires a 48K Apple II or II+.
@@ -2675,7 +2675,7 @@ license:CC0
 	<software name="sparechg">
 		<description>Spare Change</description>
 		<year>1983</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-11-08"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -3356,9 +3356,9 @@ license:CC0
 	</software>
 
 	<software name="carmnusa">
-		<description>Where in the USA is Carmen Sandiego</description>
+		<description>Where in the USA is Carmen Sandiego?</description>
 		<year>1986</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-10-01"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 64K. -->
@@ -3378,9 +3378,9 @@ license:CC0
 	</software>
 
 	<software name="carmntime">
-		<description>Where in Time is Carmen Sandiego v1.1</description>
+		<description>Where in Time is Carmen Sandiego? (v1.1)</description>
 		<year>1990</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side A"/>
@@ -3411,7 +3411,7 @@ license:CC0
 	<software name="wof">
 		<description>Wings of Fury</description>
 		<year>1987</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2018-10-01"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 128K Apple //e, //c, or IIgs. -->
@@ -3583,7 +3583,7 @@ license:CC0
 	<software name="captgngt">
 		<description>Captain Goodnight and the Islands of Fear</description>
 		<year>1985</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-02-20"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+, //e, //c, or IIgs. -->
@@ -3622,7 +3622,7 @@ license:CC0
 	<software name="choplftr">
 		<description>Choplifter</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-02-22"/>
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- It requires a 48K Apple II or II+.
@@ -3660,7 +3660,7 @@ license:CC0
 	<software name="goldmntn">
 		<description>Golden Mountain</description>
 		<year>1980</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-02-24"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -3690,7 +3690,7 @@ license:CC0
 	<software name="chldrnr">
 		<description>Championship Lode Runner</description>
 		<year>1984</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-02-26"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 48K Apple II+ or later. -->
@@ -3722,7 +3722,7 @@ license:CC0
 	<software name="srpntine">
 		<description>Serpentine</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-02-28"/>
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- It requires a 48K Apple II or II+.
@@ -3776,7 +3776,7 @@ license:CC0
 	<software name="dazldraw">
 		<description>Dazzle Draw (Version 1.1)</description>
 		<year>1984</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-03-03"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 128K Apple //e, //c, or IIgs. -->
@@ -3822,7 +3822,7 @@ license:CC0
 	<software name="ae">
 		<description>A.E.</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-03-05"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -4000,9 +4000,9 @@ license:CC0
 	</software>
 
 	<software name="carmnwld">
-		<description>Where in the World is Carmen Sandiego</description>
+		<description>Where in the World is Carmen Sandiego?</description>
 		<year>1985</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-03-16"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 64K. -->
@@ -4024,7 +4024,7 @@ license:CC0
 	<software name="labyrnth">
 		<description>Labyrinth</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-03-17"/>
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- It requires a 48K Apple II or II+.
@@ -4148,7 +4148,7 @@ license:CC0
 	<software name="starblzr">
 		<description>Star Blazer</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-03-25"/>
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- It requires a 48K Apple II or II+.
@@ -4195,7 +4195,7 @@ license:CC0
 	<software name="prntshpc">
 		<description>The Print Shop Color</description>
 		<year>1986</year>
-		<publisher>Broderbund software</publisher>
+		<publisher>Brøderbund software</publisher>
 		<info name="release" value="2019-03-29"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -4316,7 +4316,7 @@ license:CC0
 	<software name="fantvisn">
 		<description>Fantavision</description>
 		<year>1985</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-04-04"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+ or later. -->
@@ -4538,7 +4538,7 @@ license:CC0
 	<software name="spwarior">
 		<description>Space Warrior</description>
 		<year>1981</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-04-20"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 32K. -->
@@ -4605,7 +4605,7 @@ license:CC0
 	<software name="prshcomp">
 		<description>The Print Shop Companion (Version 1.2)</description>
 		<year>1985</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-04-20"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+ or later.
@@ -4773,9 +4773,9 @@ license:CC0
 	</software>
 
 	<software name="carmneur">
-		<description>Where in Europe is Carmen Sandiego</description>
+		<description>Where in Europe is Carmen Sandiego?</description>
 		<year>1988</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-04-28"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 128K Apple //e or later.-->
@@ -4812,7 +4812,7 @@ license:CC0
 	<software name="dueldigt">
 		<description>Dueling Digits</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-05-01"/>
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- It requires a 48K Apple II or II+.
@@ -5070,7 +5070,7 @@ license:CC0
 	<software name="arcmachn">
 		<description>The Arcade Machine</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-05-16"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 48K Apple II+ or later. -->
@@ -6684,7 +6684,7 @@ license:CC0
 	<software name="essex">
 		<description>Essex</description>
 		<year>1985</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-08-04"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -6986,7 +6986,7 @@ license:CC0
 	<software name="aawarsea">
 		<description>The Ancient Art of War at Sea</description>
 		<year>1988</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-08-20"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 128K Apple //e or later. -->
@@ -7045,7 +7045,7 @@ license:CC0
 	<software name="midmagic">
 		<description>David's Midnight Magic</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-08-20"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -7079,7 +7079,7 @@ license:CC0
 	<software name="hyprhdon">
 		<description>Hyper Head On</description>
 		<year>1980</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-08-23"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -7341,7 +7341,7 @@ license:CC0
 	<software name="snoggle">
 		<description>Snoggle</description>
 		<year>1981</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-09-05"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
@@ -7356,7 +7356,7 @@ license:CC0
 	<software name="tredoubt">
 		<description>Tawala's Last Redoubt</description>
 		<year>1981</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-09-05"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 48K Apple II+ or later. -->
@@ -8148,7 +8148,7 @@ license:CC0
 	<software name="masksun">
 		<description>The Mask of the Sun (Version 2.1)</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-10-14"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 48K Apple II+ or later. -->
@@ -9525,7 +9525,7 @@ license:CC0
 	<software name="artowar">
 		<description>The Ancient Art of War</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-12-18"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
@@ -9794,7 +9794,7 @@ license:CC0
 	<software name="alntyphn">
 		<description>Alien Typhoon</description>
 		<year>1981</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-12-21"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
@@ -10134,7 +10134,7 @@ license:CC0
 	<software name="dhuukrul">
 		<description>The Dark Heart of Uukrul</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2020-01-20"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
@@ -11407,7 +11407,7 @@ license:CC0
 	<software name="ndcarmen">
 		<description>Where in North Dakota is Carmen Sandiego?</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2020-03-09"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 64K Apple II+ or later. -->
@@ -11452,9 +11452,9 @@ license:CC0
 	</software>
 
 	<software name="ndcrmn98">
-		<description>Where in North Dakota is Carmen Sandiego (Version 0.98 beta)</description>
+		<description>Where in North Dakota is Carmen Sandiego? (Version 0.98 beta)</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2020-03-12"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 64K Apple II+ or later. -->
@@ -11481,9 +11481,9 @@ license:CC0
 	</software>
 
 	<software name="ndcrmnb1">
-		<description>Where in North Dakota is Carmen Sandiego (Version 1.0 final beta)</description>
+		<description>Where in North Dakota is Carmen Sandiego? (Version 1.0 final beta)</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2020-03-17"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 64K Apple II+ or later. -->
@@ -13156,7 +13156,7 @@ license:CC0
 	<software name="scitkp20">
 		<description>Science Toolkit Plus (Version 2.0)</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2020-06-05"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
@@ -14631,7 +14631,7 @@ license:CC0
 	<software name="cntralnc">
 		<description>Centauri Alliance</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2020-09-10"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 64K Apple II+ or later. -->
@@ -14681,7 +14681,7 @@ license:CC0
 		<info name="release" value="2020-09-10"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
-		<!-- The game was later re-released by Broderbund Software. -->
+		<!-- The game was later re-released by Brøderbund Software. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="95008">
@@ -15833,9 +15833,9 @@ license:CC0
 	</software>
 
 	<software name="srpst10b">
-		<description>The Serpent's Star (Version 1.0) (Broderbund release)</description>
+		<description>The Serpent's Star (Version 1.0) (Brøderbund release)</description>
 		<year>1983</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2020-11-05"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 48K Apple II+ or later. -->
@@ -16226,7 +16226,7 @@ license:CC0
 	<software name="alnrain">
 		<description>Alien Rain</description>
 		<year>1980</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2020-12-07"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
@@ -16900,11 +16900,11 @@ license:CC0
 	<software name="pop35">
 		<description>Prince of Persia (800K 3.5")</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2021-06-30"/>
 		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card -->
-		<!--"Prince of Persia" is a 1989 action game developed by Jordan Mechner and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card.-->
+		<!--"Prince of Persia" is a 1989 action game developed by Jordan Mechner and distributed by Brøderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card.-->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1297161">
@@ -16955,11 +16955,11 @@ license:CC0
 	<software name="crmneu35">
 		<description>Where in Europe is Carmen Sandiego? (800K 3.5")</description>
 		<year>1988</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2021-07-06"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
-		<!--"Where in Europe is Carmen Sandiego?" is a 1988 educational game developed by Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens, and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+		<!--"Where in Europe is Carmen Sandiego?" is a 1988 educational game developed by Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens, and distributed by Brøderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
 		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
@@ -16972,11 +16972,11 @@ license:CC0
 	<software name="playroom35">
 		<description>The Playroom (Version 1.0) (800K 3.5")</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2021-07-07"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
-		<!--"The Playroom" is a 1989 educational game developed by Leslie Grimm, Dennis Caswell, Lynn Kirkpatrick, D. Buttlaire, and D. Albrecht, and distributed by Broderbund Software. This is version 1.0. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+		<!--"The Playroom" is a 1989 educational game developed by Leslie Grimm, Dennis Caswell, Lynn Kirkpatrick, D. Buttlaire, and D. Albrecht, and distributed by Brøderbund Software. This is version 1.0. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
 		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
@@ -17199,11 +17199,11 @@ license:CC0
 	<software name="bswrtrpl">
 		<description>Bank Street Writer Plus (800K 3.5")</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2021-07-25"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
-		<!--"Bank Street Writer Plus" is a 1989 productivity program developed by Gordon Riggs and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+		<!--"Bank Street Writer Plus" is a 1989 productivity program developed by Gordon Riggs and distributed by Brøderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
 		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
@@ -17405,11 +17405,11 @@ license:CC0
 	<software name="vcrc1135">
 		<description>VCR Companion (Version 1.1) (800K 3.5")</description>
 		<year>1988</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2021-08-10"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
-		<!--"VCR Companion" is a 1988 graphics program developed by Louis Ewens and Lauren Elliott, and distributed by Broderbund Software. This is version 1.1. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+		<!--"VCR Companion" is a 1988 graphics program developed by Louis Ewens and Lauren Elliott, and distributed by Brøderbund Software. This is version 1.1. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296708">
@@ -17872,11 +17872,11 @@ license:CC0
 	<software name="trakattk">
 		<description>Track Attack</description>
 		<year>1982</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2021-08-26"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
-		<!--"Track Attack" is a 1982 action game developed by Chris Jochumson and distributed by Broderbund Software. It runs on any Apple II with 48K.-->
+		<!--"Track Attack" is a 1982 action game developed by Chris Jochumson and distributed by Brøderbund Software. It runs on any Apple II with 48K.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="261303">
@@ -17888,11 +17888,11 @@ license:CC0
 	<software name="printshp">
 		<description>The Print Shop</description>
 		<year>1984</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2021-09-15"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
-		<!--"The Print Shop" is a 1984 graphics program developed by David Balsam and Martin Kahn, and distributed by Broderbund Software. It runs on any Apple II with 48K.-->
+		<!--"The Print Shop" is a 1984 graphics program developed by David Balsam and Martin Kahn, and distributed by Brøderbund Software. It runs on any Apple II with 48K.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -17982,11 +17982,11 @@ license:CC0
 	<software name="newprntshop">
 		<description>The New Print Shop (800K 3.5")</description>
 		<year>1990</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2021-10-12"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
-		<!--"The New Print Shop" is a 1990 graphics program developed by Don Lloyd and distributed by Broderbund Software. It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+		<!--"The New Print Shop" is a 1990 graphics program developed by Don Lloyd and distributed by Brøderbund Software. It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296152">
@@ -19524,11 +19524,11 @@ license:CC0
 	<software name="playroom">
 		<description>The Playroom</description>
 		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2022-02-21"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!--"The Playroom" is a 1989 educational game developed by Leslie Grimm, Dennis Caswell, Lynn Kirkpatrick, D. Buttlaire, and D. Albrecht, and distributed by Broderbund Software. It requires a 128K Apple //e or later.-->
+		<!--"The Playroom" is a 1989 educational game developed by Leslie Grimm, Dennis Caswell, Lynn Kirkpatrick, D. Buttlaire, and D. Albrecht, and distributed by Brøderbund Software. It requires a 128K Apple //e or later.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
@@ -20298,11 +20298,11 @@ license:CC0
 	<software name="onbal35">
 		<description>On Balance (800K 3.5")</description>
 		<year>1986</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2022-02-28"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
-		<!--"On Balance" is a 1986 productivity program developed by David Eisler and distributed by Broderbund Software. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+		<!--"On Balance" is a 1986 productivity program developed by David Eisler and distributed by Brøderbund Software. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296169">
@@ -21279,11 +21279,11 @@ license:CC0
 	<software name="sgalwars">
 		<description>Super Galaxy Wars</description>
 		<year>1980</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2022-02-21"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
-		<!--"Super Galaxy Wars" is a 1980 action game developed by Starcraft and distributed by Broderbund Software. It runs on any Apple II with 48K.-->
+		<!--"Super Galaxy Wars" is a 1980 action game developed by Starcraft and distributed by Brøderbund Software. It runs on any Apple II with 48K.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="68395">
@@ -24927,11 +24927,11 @@ license:CC0
 	<software name="crmusa35">
 		<description>Where in the USA is Carmen Sandiego? (800K 3.5")</description>
 		<year>1990</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2022-09-11"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card. -->
-		<!--"Where in the USA is Carmen Sandiego" is a 1990 educational program developed by Ken Bull, Gene Portwood, and Lauren Elliot, and distributed by Broderbund Software. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
+		<!--"Where in the USA is Carmen Sandiego" is a 1990 educational program developed by Ken Bull, Gene Portwood, and Lauren Elliot, and distributed by Brøderbund Software. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296119">
@@ -24943,11 +24943,11 @@ license:CC0
 	<software name="crmtime35">
 		<description>Where in Time is Carmen Sandiego? (800K 3.5")</description>
 		<year>1990</year>
-		<publisher>Broderbund Software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2022-09-11"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card. -->
-		<!--"Where in Time is Carmen Sandiego" is a 1990 educational program developed by Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichting, Tom Rettig, and Claire Curtin, and distributed by Broderbund Software. This is version 1.1. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
+		<!--"Where in Time is Carmen Sandiego" is a 1990 educational program developed by Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichting, Tom Rettig, and Claire Curtin, and distributed by Brøderbund Software. This is version 1.1. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296281">
