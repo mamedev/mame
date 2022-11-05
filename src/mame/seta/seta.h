@@ -23,6 +23,7 @@
 #include "video/x1_001.h"
 #include "x1_012.h"
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 
@@ -41,6 +42,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_screen(*this, "screen"),
 		m_spritegen(*this, "spritegen"),
 		m_layers(*this, "layer%u", 1U),
 		m_x1snd(*this, "x1snd"),
@@ -112,6 +114,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
 	required_device<x1_001_device> m_spritegen;
 	optional_device_array<x1_012_device, 2> m_layers;
 	optional_device<x1_010_device> m_x1snd;
