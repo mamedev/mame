@@ -103,7 +103,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(blstroid_state::scanline_update)
 	int offset = (scanline / 8) * 64 + 40;
 
 	/* check for interrupts */
-	if (offset < 0x1000)
+	if (offset < 0x800)
 		if (m_playfield_tilemap->basemem_read(offset) & 0x8000)
 		{
 			/* FIXME: - the only thing this IRQ does it tweak the starting MO link */
