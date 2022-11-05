@@ -143,7 +143,7 @@ Note: sprite chip is different than the other Big Striker sets and they
 void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int start = 0x16/2;
-	int end = m_spriteram.length() - (start & 3);
+	int end = m_spriteram.length() - (-start & 3);
 
 	/*
 
