@@ -38,7 +38,8 @@ enum class meta_name {
 	owner_id,
 	attributes,
 	oem_name,
-	max = oem_name
+	rec_size,
+	max = rec_size
 };
 
 enum class meta_type {

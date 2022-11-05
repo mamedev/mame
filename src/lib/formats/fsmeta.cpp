@@ -31,6 +31,7 @@ const char *meta_data::entry_name(meta_name name)
 	case meta_name::owner_id: return "owner_id";
 	case meta_name::attributes: return "attributes";
 	case meta_name::oem_name: return "oem_name";
+		case meta_name::rec_size: return "rec_size";
 	}
 	return "";
 }

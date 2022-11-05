@@ -147,6 +147,7 @@
 #include "emu.h"
 #include "hp9885.h"
 #include "formats/hpi_dsk.h"
+#include "formats/fs_hp98x5.h"
 
 // Debugging
 #include "logmacro.h"
@@ -306,6 +307,8 @@ WRITE_LINE_MEMBER(hp9885_device::preset_w)
 static void hp9885_floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_HPI_FORMAT);
+	fr.add(fs::HP9825);
+	fr.add(fs::HP9845);
 };
 
 void hp9885_device::device_add_mconfig(machine_config &config)
