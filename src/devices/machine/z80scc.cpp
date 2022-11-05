@@ -1918,7 +1918,7 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 		LOG("- Receiver Interrupt on Special Conditions only\n");
 		break;
 	}
-	if ((data & WR1_RX_INT_MODE_MASK) == WR1_PARITY_IS_SPEC_COND)
+	if (data & WR1_PARITY_IS_SPEC_COND)
 		LOG("- Parity error is a Special Condition\n");
 	m_uart->check_interrupts();
 }
