@@ -94,7 +94,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_starshp1);
 	INTERRUPT_GEN_MEMBER(starshp1_interrupt);
 	void set_pens();
-	void draw_starfield(bitmap_ind16 &bitmap);
+	void draw_starfield(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int get_sprite_hpos(int i);
 	int get_sprite_vpos(int i);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
