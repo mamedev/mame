@@ -96,6 +96,8 @@ protected:
 	required_device<mc6847_base_device> m_vdg;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<7> m_keyboard;
+	
+	emu_timer * m_timer; // Carrier Detect Timer
 
 	void agvision_mem(address_map &map);
 	void agvision_rom(address_map &map);
@@ -107,6 +109,9 @@ protected:
 	uint8_t pia0_pa_r();
 	void pia0_cb2_w(int state);
 	int cd_read();
+
+	TIMER_CALLBACK_MEMBER(timer_elapsed);
+	int cd_count;
 
 private:
 	void configure_sam(void);
@@ -278,7 +283,7 @@ void agvision_state::agvision_io1(address_map &map)
 {
 	// $FF20-$FF3F
 
-	map(0x00, 0x01).w(FUNC(agvision_state::ff20_write));
+	map(0x00, 0x00).w(FUNC(agvision_state::ff20_write));
 }
 
 void agvision_state::agvision_boot(address_map &map)
@@ -338,6 +343,29 @@ void agvision_state::device_start()
 	configure_sam();
 
 	m_pia_0->cb1_w(0);
+	m_timer = timer_alloc(FUNC(agvision_state::timer_elapsed), this);
+	
+	
+}
+
+#define CD_DELAY 250
+
+//-------------------------------------------------
+//  timer_elapsed
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(agvision_state::timer_elapsed)
+{
+	static int value = 0;
+	// static int count = 100;
+
+	m_timer->adjust(attotime::from_usec(CD_DELAY));
+	m_pia_0->cb1_w(value);
+	value = !value;
+	cd_count = cd_count-1;
+
+	if (cd_count == 0 ) m_timer->adjust(attotime::never);
+
 }
 
 //-------------------------------------------------
@@ -371,8 +399,8 @@ uint8_t agvision_state::pia0_pa_r()
 
 INPUT_CHANGED_MEMBER(agvision_state::cd_changed)
 {
- 	m_pia_0->cb1_w(ioport("cd")->read());
-	logerror( "CD Changed: %d\n", ioport("cd")->read() );
+ 	// m_pia_0->cb1_w(ioport("cd")->read());
+	// logerror( "CD Changed: %d\n", ioport("cd")->read() );
 
 }
 
@@ -382,12 +410,22 @@ INPUT_CHANGED_MEMBER(agvision_state::cd_changed)
 
 void agvision_state::pia0_cb2_w(int state)
 {
-	logerror( "cb2 write handler: %d\n", state );
+	// logerror( "cb2 write handler: %d\n", state );
+
+	// if( state == 1 )
+	// 	m_pia_0->cb1_w(1);
+	// else
+	// 	m_pia_0->cb1_w(0);
 
 	if( state == 1 )
-		m_pia_0->cb1_w(1);
+	{
+		m_timer->adjust(attotime::from_usec(CD_DELAY*8000));
+		cd_count = 32;
+	}
 	else
-		m_pia_0->cb1_w(0);
+	{
+		m_timer->adjust(attotime::never);
+	}
 }
 
 int agvision_state::cd_read()
