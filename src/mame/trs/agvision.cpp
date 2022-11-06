@@ -218,7 +218,7 @@ void agvision_state::agvision(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &agvision_state::agvision_mem);
 
 	PIA6821(config, m_pia_0, 0);
-    m_pia_0->readpa_handler().set(FUNC(agvision_state::pia0_pa_r));
+	m_pia_0->readpa_handler().set(FUNC(agvision_state::pia0_pa_r));
 	m_pia_0->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	m_pia_0->cb2_handler().set(FUNC(agvision_state::pia0_cb2_w));
 
@@ -318,7 +318,7 @@ uint8_t agvision_state::sam_read(offs_t offset)
 
 void agvision_state::ff20_write(offs_t offset, uint8_t data)
 {
-    m_rs232->write_txd(data & 0x80 ? 1 : 0);
+	m_rs232->write_txd(data & 0x80 ? 1 : 0);
  	m_vdg->gm0_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
 	m_vdg->gm1_w(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
 	m_vdg->gm2_w(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
