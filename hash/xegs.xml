@@ -95,7 +95,7 @@ Requires unsupported [Atari XG-1 light gun]
 
 	<software name="beefdrop" supported="partial">
 		<description>Beef Drop</description>
-		<!-- This is the last WIP version by Ken Siders, dated 2005-02-16. It is here as a placeholder until the dump of the final release version by Atari Age becomes avaialable. -->
+		<!-- This is the last WIP version by Ken Siders, dated 2005-02-16. It is here as a placeholder until the dump of the final release version by AtariAge becomes avaialable. -->
 		<year>2005</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
@@ -169,7 +169,7 @@ Requires unsupported [Atari XG-1 light gun]
 	<software name="ccrisis" supported="no">
 		<description>Castle Crisis</description>
 		<year>2003</year>
-		<publisher>Atari Age</publisher>
+		<publisher>AtariAge</publisher>
 		<notes><![CDATA[
 [ANTIC] playfield height doesn't cover full screen
 ]]></notes>
