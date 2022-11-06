@@ -6151,10 +6151,21 @@ Has garbage row strip on top of active playfield during hammer throw event
 		</part>
 	</software>
 
-	<software name="turboc2" supported="no">
+	<software name="turboc2" supported="partial">
 		<description>Turbo Cartridge C2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Krazy Kopter: boots, runs too fast
+2. Outlaw: boots
+3. Race in Space: boots
+4. Moon Beam (Moon Beam Arcade): boots
+5. Frogs &amp; Flies: boots
+6. Pool: boots
+7. Hotlips (Hot Lips): boots
+8. Zenji: boots, draws [GTIA] background color as cyan instead of black
+9. Super Cobra: boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="65536">
@@ -6163,10 +6174,21 @@ Has garbage row strip on top of active playfield during hammer throw event
 		</part>
 	</software>
 
-	<software name="turboc3" supported="no">
+	<software name="turboc3" supported="partial">
 		<description>Turbo Cartridge C3 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Pacman: boots
+2. Fighter Pilot I: boots
+3. Chomper: boots
+4. Money Hungry: boots
+5. Damas: boots
+6: Billiards: boots (three balls only, hacked version to behave like a Carom variant?)
+7. Aztec Challenge: boots
+8. Arena: boots
+9. Galaxian: boots, unplayable, behaves same as galaxian entry
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6175,10 +6197,21 @@ Has garbage row strip on top of active playfield during hammer throw event
 		</part>
 	</software>
 
-	<software name="turboc4" supported="no">
+	<software name="turboc4" supported="partial">
 		<description>Turbo Cartridge C4 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Keystone Kappers (Keystone Kapers): boots
+2. Livewire: boots, glitchy sprites if run after any other entry
+3. Centipede: boots
+4. Spark Bugs: boots
+5. Allien Swarm (Alien Swarm): boots
+6. Bacterion: boots
+7. Boxing: boots
+8. Megamania: boots, behaves same as megmania entry
+9. MASH 4077: boots, behaves same as mash entry
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6191,6 +6224,17 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<description>Turbo Cartridge C5 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Tic Tac Toe:
+2. Klystron Ryder (Klystron Raider):
+3. Kunfu (Kung-Fu Master):
+4. Livewire II:
+5. Blastoff Exocet:
+6. Missile Command:
+7. Asteroids:
+8. Speedway Blast:
+9. Challenge 5:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6203,6 +6247,17 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<description>Turbo Cartridge C6 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Planetary Defense:
+2. Olympic Dual:
+3. Battle in the Ring:
+4. Grid Runner:
+5. Squish:
+6. Cavernas de Marte:
+7. Pengon:
+8. Deluxe Invaders:
+9. Space Invaders:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6215,6 +6270,23 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<description>Turbo Cartridge D1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Montezuma I:
+B. Vaquero:
+C. Olympic Dual:
+D. Outlaw:
+E. The Empire Strikes (The Empire Strikes Back):
+F. Dog Race:
+G. Retrofire:
+H. Darts:
+I. Labyrinth:
+J. Tumble Bugs:
+K. Chicken:
+L. Desmond Dungeon:
+M. River Rescue:
+N. Krazy Kopter:
+O. Danger Ranger:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
@@ -6227,6 +6299,23 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<description>Turbo Cartridge D2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Rally Speedway:
+B. Money Hungry:
+C. Tic Tac Toe:
+D. Race in Space:
+E. Sargon II:
+F. Boxing:
+G. Kunfu (Kung-Fu Master):
+H. Crystal Raider:
+I. Ant Eater:
+J. Diamonds:
+K. Gunfight:
+L. Jaw Breaker:
+M. Cloud Burst:
+N. Damas:
+O. Hotlips (Hot Lips):
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
@@ -6239,6 +6328,23 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<description>Turbo Cartridge D3 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Sea Dragon:
+B. Fighter Pilot I:
+C. Allien Ambush (Alien Ambush):
+D. Chomper:
+E. Pacman:
+F. Bacterion:
+G. Mr Cool:
+H. Thrax Lair:
+I. Livewire II:
+J. Quarxon:
+K. Derblitz:
+L. Futbol (Soccer):
+M. Shooting Arcade:
+N. Pluton Fly:
+O. Rush Hour:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
@@ -6249,9 +6355,26 @@ Has garbage row strip on top of active playfield during hammer throw event
 
 	<software name="turbod4" supported="no">
 		<description>Turbo Cartridge D4 (Chile, pirate)</description>
-		<!-- Half of the games don't run. Possible Bad dump. -->
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<!-- Half of the games don't run. Likely bad dump -->
+		<notes><![CDATA[
+A. Jungle Hunt:
+B. Klystron Rider:
+C. Planetary Defense:
+D. Rebel Fighter:
+E. Cavernas de Marte:
+F. Moon Beam (Moon Beam Arcade):
+G. Allien Swarm (Alien Swarm):
+H. Submarine Commande (Submarine Commander):
+I. Blastoff Exocet:
+J. Rats Revenge:
+K. Pengon:
+L. Frogger I:
+M. Table Soccer: hangs at cyan screen
+N. Salmon Run:
+O. Bumper Ball:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
@@ -6264,6 +6387,23 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<description>Turbo Cartridge D5 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Millipede:
+B. Frogs &amp; Flies:
+C. Sea Bandit:
+D. Futbol 2:
+E. Livewire:
+F. Space Invaders:
+G. Battle in the Ring:
+H. Legacy 2:
+I. Madnemetter:
+J. War Games:
+K. Cavernas de Marte:
+L. Keystone Kappers (Keystone Kapers):
+M. The Aardvark:
+N. Billiards:
+O. Missile Command:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
@@ -6276,6 +6416,23 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<description>Turbo Cartridge D6 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Arena:
+B. Atom Smasher:
+C. Zenji:
+D. Sea Chase:
+E. Spark Bugs:
+F. River Raid:
+G. Asteroids:
+H. Mr Dos Castle (Mr. Do's Castle):
+I. Aztec Challenge:
+J. Horse Race:
+K. Quick:
+L. Rear Door:
+M. Platter Mania:
+N. Megamania:
+O. Hyperblast:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
@@ -6289,7 +6446,21 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<notes><![CDATA[
+A. Kaboom:
+B. Krazy Shoot Out:
+C. Fantastic Voyage:
+D. Fortune Hunt:
+E. Final Orbit:
+F. Galaxian:
+G. Q'Bert:
+H. Super Cobra:
+I. Centipede:
+J. Basketball:
+K. Speedway Blast:
+L. Squish:
 M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
+N. MASH 4077:
+O. Pitfall:
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
@@ -6300,9 +6471,27 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 	</software>
 
 	<software name="turbod8" supported="no">
+		<!-- No header on menu -->
 		<description>Turbo Cartridge D8 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Popcorn:
+B. Fire Bug:
+C. Elevator:
+D. Climber:
+E. Bombers:
+F. Bonk:
+G. Incoming:
+H. Syntron:
+I. Gunpow:
+J. Elektroids:
+K. Krazy:
+L. Laberinto:
+M. Galactic:
+N. Mr. TNT:
+O. Floyd:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6312,9 +6501,37 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 	</software>
 
 	<software name="turboe1" supported="no">
+		<!-- "SUPER CARTRIDGE CX25" header on menu -->
 		<description>Turbo Cartridge E1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. River Raid:
+B. Galaxian:
+C. Futbol (Soccer):
+D. Missile Command:
+E. Vaquero:
+F. Money Hungry:
+G. Fighter Pilot I:
+H. Baty Builder:
+I. Klystron Raider (Klystron Raider):
+J. Plnetary Defense:
+K. Space Invaders:
+L. Tic Tac Toe:
+M. QS Reversi:
+N. Allien Ambush (Alien Ambush):
+O. Chomper:
+P. Boxing:
+Q. Rebel Fighter:
+R. Livewire:
+S. Outlaw:
+T. Race in Space:
+U. Bacterion:
+V. Moon Beam (Moon Beam Arcade):
+W. EA Bandit:
+X. Keystone Kappers (Keystone Kapers):
+Y. Super Cobra:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
@@ -6327,6 +6544,33 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 		<description>Turbo Cartridge E2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Firebug:
+B. Elevator:
+C. Climber V:
+D. Bombers:
+E. Bonk:
+F. Incoming:
+G. Syntron:
+H. Power Gun:
+I. Elektroids:
+J. Krazy:
+K. Laberinto:
+L. Galactic:
+M. Mr. TNT:
+N. Floyd:
+O. Ring:
+P. Olympic Dual:
+Q. Grid Runner:
+R. Dog Race:
+S. Mr. Cool:
+T. Frogs &amp; Flies:
+U. Hotlips (Hot Lips):
+V. Meamania (MegaMania):
+W. Cavernas Marte II:
+X. Kayos
+Y. Crystal Raider:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
@@ -6335,22 +6579,35 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 		</part>
 	</software>
 
-	<software name="turbox1" supported="no">
+	<software name="turbox1" supported="partial">
 		<description>Turbo Cartridge X1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Boina Verde (Green Beret): boots
+2. Missile Command: boots
+3. Sea Wolf (Sea Wolf II): boots, player missiles and playfield stutters [GTIA] mixing
+4. Outlaw: boots, glitchy sprites if run after any other entry
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_williams" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="65536">
 				<rom name="turbocartridge x1.rom" size="65536" crc="1dccc2c7" sha1="5e9ca706bbd9af33f260962e648b27f48a4b97fa"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="turbox2" supported="no">
+	<software name="turbox2" supported="partial">
+		<!-- "Supercart" header on main menu -->
 		<description>Turbo Cartridge X2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Crystal Raider: boots
+2. Space Invaders: boots, has [GTIA] background color cyan instead of black, otherwise same as spaceinv entry
+3. Cavernas de Marte (Caverns of Mars): boots, has [GTIA] background color cyan instead of black on title screen, otherwise same as cvrnmars
+4. Screeming Wings: boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
