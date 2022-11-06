@@ -61,7 +61,12 @@ static void a800_left(device_slot_interface &device)
 	// Czech cart, some kind of toolkit with bankswitch that rolls back after set time
 //  device.option_add_internal("a800_cos32",    A800_ROM_COS32);
 
+	// XEGS carts
 	device.option_add_internal("xegs",          XEGS_ROM);
+	// "XEGS demo cartridge", 4 games in 1 with binary counter applied at reset for each reboot
+//  device.option_add_internal("xegs_demo",     XEGS_ROM_DEMO);
+	// (#33-#38) Carts sold by Nir Dary in the '90s, has fixed last bank to RD5 and selectable RD4 bank. 32KB to 1MB ROM size options
+//  device.option_add_internal("xegs_switch",   XEGS_ROM_SWITCHABLE);
 
 	// flash carts
 	device.option_add_internal("a800_corina",   A800_ROM_CORINA);
@@ -92,6 +97,7 @@ static void a800_left(device_slot_interface &device)
 	// non-ROM types
 	device.option_add(         "rtime8",        A800_RTIME8);
 	// adds extra 65C816 coprocessor. No firmware, runs on code uploaded by main CPU, also two rev variants (V1 and V2)
+	// NB: SDX documentation calls this Weronika, which just seems a Polish alias
 //  device.option_add(         "veronica",      A800_VERONICA);
 	// 128 or 256 KB additional RAM, schematics available at atarimax
 //  device.option_add(         "ramcart",       A800_RAM_CART);
@@ -110,16 +116,6 @@ static void a800_left(device_slot_interface &device)
 static void a800_right(device_slot_interface &device)
 {
 	device.option_add_internal("a800_8k_right", A800_ROM_RIGHT);
-}
-
-// TODO: is it really not possible to just use the same i/f as a800?
-static void xegs_carts(device_slot_interface &device)
-{
-	device.option_add_internal("xegs",          XEGS_ROM);
-	// "XEGS demo cartridge", 4 games in 1 with binary counter applied at reset for each reboot
-//  device.option_add_internal("xegs_demo",     XEGS_ROM_DEMO);
-	// (#33-#38) Carts sold by Nir Dary in the '90s, has fixed last bank to RD5 and selectable RD4 bank. 32KB to 1MB ROM size options
-//  device.option_add_internal("xegs_switch",   XEGS_ROM_SWITCHABLE);
 }
 
 static void a5200_carts(device_slot_interface &device)

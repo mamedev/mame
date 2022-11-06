@@ -2281,9 +2281,9 @@ void a400_state::atari_common(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("a800_flop");
-	SOFTWARE_LIST(config, "cart_list").set_original("a800");
 	SOFTWARE_LIST(config, "cass_list").set_original("a800_cass");
-	SOFTWARE_LIST(config, "xegs_list").set_original("xegs");
+	SOFTWARE_LIST(config, "cart_list").set_original("a800");
+	SOFTWARE_LIST(config, "xegs_list").set_compatible("xegs");
 
 	VCS_CONTROL_PORT(config, m_ctrl[0], a800_control_port_devices, "joy");
 	VCS_CONTROL_PORT(config, m_ctrl[1], a800_control_port_devices, "joy");
@@ -2434,15 +2434,12 @@ void xegs_state::xegs(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &xegs_state::xegs_mem);
 
-	config.device_remove("cartleft");
-	config.device_remove("cart_list");
-
 	// not installable unless with DIY mods
 	config.device_remove("ram");
 
-	XEGS_CART_SLOT(config, m_cartleft, xegs_carts, nullptr);
-	m_cartleft->rd4_callback().set(FUNC(xegs_state::cart_rd4_w));
-	m_cartleft->rd5_callback().set(FUNC(xegs_state::cart_rd5_w));
+	// uses exact same slot connector
+	SOFTWARE_LIST(config.replace(), "cart_list").set_compatible("a800");
+	SOFTWARE_LIST(config.replace(), "xegs_list").set_original("xegs");
 }
 
 // memory map A5200, different ports, less RAM
