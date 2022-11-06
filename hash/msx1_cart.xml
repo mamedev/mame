@@ -3082,7 +3082,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="chackna" cloneof="chackn">
-		<description>Chack'n Pop (Japan)</description>
+		<description>Chack'n Pop (Japan, alt)</description>
 		<year>1984</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="ちゃっくんぽっぷ" />
