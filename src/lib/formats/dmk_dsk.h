@@ -29,7 +29,7 @@ public:
 	virtual const char *extensions() const override;
 	virtual bool supports_save() const override;
 protected:
-	static uint32_t wide_fm(uint32_t val);
+	static uint32_t wide_fm(uint16_t val);
 	static uint32_t data_to_wide_fm(uint8_t val);
 };
 
