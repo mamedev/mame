@@ -6156,7 +6156,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo64" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="65536">
 				<rom name="turbocartridge c2.rom" size="65536" crc="ade93e66" sha1="02e24a1444e6d4ee3ab8dae5cba58724f5cbb34f"/>
 			</dataarea>
@@ -6216,7 +6216,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d1.rom" size="131072" crc="4d1dd418" sha1="91a2e78abe4f3bfa0a95d2248e988c556fe8a5c8"/>
 			</dataarea>
@@ -6228,7 +6228,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d2.rom" size="131072" crc="025ab67a" sha1="d456adb1c53f24e15a88c00a54b33ad22c9e7fcf"/>
 			</dataarea>
@@ -6240,7 +6240,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d3.rom" size="131072" crc="bca7d11b" sha1="fb75c42cc1c896aaabda7e9591a45fe9a2f3a8e8"/>
 			</dataarea>
@@ -6253,7 +6253,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d4 [b].rom" size="131072" crc="72df4a5e" sha1="519abe32c6c3ee09ec8f027790da4d51157ba468" status="baddump" />
 			</dataarea>
@@ -6265,7 +6265,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d5.rom" size="131072" crc="a5aee6fd" sha1="136bfa432b5ab340c332019e8ceb847f4afd1b03"/>
 			</dataarea>
@@ -6277,7 +6277,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d6.rom" size="131072" crc="5498c7dc" sha1="e2ee9d60d4ce806ff822ca14d45758a26d4502cf"/>
 			</dataarea>
@@ -6292,7 +6292,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d7.rom" size="131072" crc="3fb92d9e" sha1="f4c492b2c47c14bb5c8e2e3351b2b79d07395260"/>
 			</dataarea>
@@ -6316,7 +6316,7 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge e1.rom" size="131072" crc="fa100cbf" sha1="c016952dc27960e33de3f0e652b8f4147d97d212"/>
 			</dataarea>
@@ -6328,7 +6328,7 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge e2.rom" size="131072" crc="bede95cd" sha1="0d1ab2d43fc71ee5c0f55f9dc6e893a651ae7a62"/>
 			</dataarea>
