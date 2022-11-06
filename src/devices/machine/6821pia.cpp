@@ -13,22 +13,21 @@
 //  MACROS
 //**************************************************************************
 
-#define LOG_SETUP   (1 << 1U)
-#define LOG_CTLR    (1 << 2U)
-#define LOG_CA1     (1 << 3U)
-#define LOG_CB1     (1 << 4U)
+#define LOG_SETUP    (1 << 1U)
+#define LOG_CTL_READ (1 << 2U)
+#define LOG_CA1      (1 << 3U)
+#define LOG_CB1      (1 << 4U)
 
-#define VERBOSE (LOG_SETUP|LOG_CTLR|LOG_CB1)
-//#define VERBOSE (LOG_SETUP | LOG_CB1)
+//#define VERBOSE (LOG_SETUP | LOG_GENERAL | LOG_CA1)
 //#define LOG_OUTPUT_STREAM std::cout
 
-//#define VERBOSE (0)
+#define VERBOSE (0)
 
 #include "logmacro.h"
-#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
-#define LOGCTLR(...)  LOGMASKED(LOG_CTLR,    __VA_ARGS__)
-#define LOGCA1(...)   LOGMASKED(LOG_CA1,     __VA_ARGS__)
-#define LOGCB1(...)   LOGMASKED(LOG_CB1,     __VA_ARGS__)
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,    __VA_ARGS__)
+#define LOGCTLR(...)  LOGMASKED(LOG_CTL_READ, __VA_ARGS__)
+#define LOGCA1(...)   LOGMASKED(LOG_CA1,      __VA_ARGS__)
+#define LOGCB1(...)   LOGMASKED(LOG_CB1,      __VA_ARGS__)
 
 #define PIA_IRQ1                (0x80)
 #define PIA_IRQ2                (0x40)
