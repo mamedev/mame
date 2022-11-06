@@ -158,7 +158,7 @@ ht1080z    works
 #include "sound/ay8910.h"
 #include "softlist_dev.h"
 #include "utf8.h"
-
+#include "formats/dmk_dsk.h"
 
 void trs80_state::trs80_mem(address_map &map)
 {
@@ -411,6 +411,7 @@ GFXDECODE_END
 
 void trs80_state::floppy_formats(format_registration &fr)
 {
+	fr.add(FLOPPY_DMK_FORMAT);
 	fr.add(FLOPPY_JV1_FORMAT);
 }
 
