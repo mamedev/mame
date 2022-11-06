@@ -2,7 +2,11 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-    Krokha ("Tiny") TV game.  Screen is 48x32 monochrome text.
+    Кроха (Krokha, "Tiny"), TV game by Контур (SKB Kontur).
+    It was apparently only for SKB Kontur workers, not sold in stores.
+
+    К580ВМ80А @ 2MHz, 2KB RAM. Screen is 48x32 monochrome text.
+    Joystick, built-in 1-bit speaker.
 
     Only known cartridge has 5 built-in games:
     - Breakout
@@ -20,7 +24,9 @@
     http://alemorf.ru/comps/kroha/index.html
         photos
 
-    To do: second joystick, keyboard (?)
+    TODO:
+    - second joystick?
+    - video timing
 
 ****************************************************************************/
 
@@ -33,6 +39,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
 class krokha_state : public driver_device
 {
@@ -51,8 +58,6 @@ public:
 	void krokha(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void krokha_mem(address_map &map);
@@ -60,7 +65,7 @@ private:
 	void status_callback(uint8_t data);
 	void speaker_w(uint8_t data);
 
-	required_device<i8080_cpu_device> m_maincpu;
+	required_device<i8080a_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -73,7 +78,7 @@ void krokha_state::status_callback(uint8_t data)
 {
 	if (data & i8080_cpu_device::STATUS_INTA)
 	{
-		/* interrupt acknowledge */
+		// interrupt acknowledge
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
@@ -95,34 +100,29 @@ void krokha_state::krokha_mem(address_map &map)
 
 static INPUT_PORTS_START( krokha )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void krokha_state::machine_reset()
-{
-	m_speaker->level_w(0);
-}
-
 uint32_t krokha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (uint8_t y = 0; y < 32; y++)
+	for (int y = 0; y < 32; y++)
 	{
-		uint16_t ma = 0xe0 + y;
-		for (uint8_t ra = 0; ra < 8; ra++)
+		for (int x = 0; x < 64; x++)
 		{
-			for (uint16_t x = ma; x < ma + 64 * 32; x += 32)
+			for (int ra = 0; ra < 8; ra++)
 			{
-				uint16_t chr = m_p_videoram[x] << 3;
-				uint8_t gfx = m_p_chargen[chr | ra];
-
+				uint8_t gfx = m_p_chargen[m_p_videoram[x << 5 | y] << 3 | ra];
 				for (int i = 0; i < 8; i++)
 				{
-					bitmap.pix(y * 8 + ra, (x - ma) / 4 + i) = BIT(gfx, 7 - i);
+					int dx = x << 3 | i;
+					int dy = y << 3 | ra;
+					if (cliprect.contains(dx, dy))
+						bitmap.pix(dy, dx) = BIT(gfx, i ^ 7);
 				}
 			}
 		}
@@ -134,7 +134,7 @@ uint32_t krokha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void krokha_state::krokha(machine_config &config)
 {
-	I8080(config, m_maincpu, 2000000);
+	I8080A(config, m_maincpu, 8_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &krokha_state::krokha_mem);
 	m_maincpu->out_status_func().set(FUNC(krokha_state::status_callback));
 
@@ -142,7 +142,7 @@ void krokha_state::krokha(machine_config &config)
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(64 * 8, 32 * 8);
-	m_screen->set_visarea(9 * 8, (48 + 9) * 8 - 1, 0 * 8, 32 * 8 - 1);
+	m_screen->set_visarea(16 * 8, 64 * 8 - 1, 0 * 8, 32 * 8 - 1);
 	m_screen->set_screen_update(FUNC(krokha_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -161,7 +161,8 @@ ROM_START( krokha )
 	ROM_LOAD("font.bin", 0x0000, 0x0800, CRC(2f4fcfb5) SHA1(175cafe3dc9291f505d69aced9c405c38b7f7086))
 ROM_END
 
-/* Driver */
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROT,   COMPANY        FULLNAME
 GAME( 1990, krokha,  0,      krokha,  krokha, krokha_state, empty_init, ROT0,  "SKB Kontur",  "Krokha", MACHINE_SUPPORTS_SAVE )
