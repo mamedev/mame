@@ -596,7 +596,7 @@ Unsupported [AtariLab] module
 		<description>Alien Ambush</description>
 		<year>1983</year>
 		<publisher>DANA</publisher>
-<notes><![CDATA[
+		<notes><![CDATA[
 Doesn't mask sprites on bottom of screen [GTIA] GRACTL
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
@@ -3493,9 +3493,8 @@ Offset sprites on specific rows [GTIA] mixing
 		</part>
 	</software>
 
-	<!-- TODO: is ZZTop actually a Chilean company? -->
 	<software name="mega1" supported="partial">
-		<description>Mega Cartridge 01 (Spa, Pirate)</description>
+		<description>Mega Cartridge 01 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3514,7 +3513,7 @@ Alien Ambusch: boots, cfr. alienamb
 	</software>
 
 	<software name="mega2">
-		<description>Mega Cartridge 02 (Spa, Pirate)</description>
+		<description>Mega Cartridge 02 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3532,7 +3531,7 @@ Race in Space: boots
 	</software>
 
 	<software name="mega3" supported="partial">
-		<description>Mega Cartridge 03 (Spa, Pirate)</description>
+		<description>Mega Cartridge 03 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3550,7 +3549,7 @@ Hot Lips: doesn't boot, possibly bad dump (crashes in Altirra too)
 	</software>
 
 	<software name="mega4" supported="partial">
-		<description>Mega Cartridge 04 (Spa, Pirate)</description>
+		<description>Mega Cartridge 04 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3568,7 +3567,7 @@ Fighter Pilot: boots
 	</software>
 
 	<software name="mega5">
-		<description>Mega Cartridge 05 (Spa, Pirate)</description>
+		<description>Mega Cartridge 05 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3586,7 +3585,7 @@ Keystone Kapers: boots
 	</software>
 
 	<software name="mega6" supported="partial">
-		<description>Mega Cartridge 06 (Spa, Pirate)</description>
+		<description>Mega Cartridge 06 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3603,7 +3602,7 @@ Outlaw: randomly doesn't display any sprite during gameplay
 	</software>
 
 	<software name="mega7" supported="partial">
-		<description>Mega Cartridge 07 (Spa, Pirate)</description>
+		<description>Mega Cartridge 07 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3621,7 +3620,7 @@ Space Invaders: boots, same as spaceinv [GTIA] mixing
 	</software>
 
 	<software name="mega8">
-		<description>Mega Cartridge 08 (Spa, Pirate)</description>
+		<description>Mega Cartridge 08 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3638,8 +3637,8 @@ Cavmarte.1: boots
 		</part>
 	</software>
 
-	<software name="mega9" supported="no">
-		<description>Mega Cartridge 09 (Spa, Pirate)</description>
+	<software name="mega9" supported="partial">
+		<description>Mega Cartridge 09 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3657,7 +3656,7 @@ The Empire Strikes B.: boots, runs too fast
 	</software>
 
 	<software name="mega10" supported="partial">
-		<description>Mega Cartridge 10 (Spa, Pirate)</description>
+		<description>Mega Cartridge 10 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3675,7 +3674,7 @@ Cav.Marte.1: boots
 	</software>
 
 	<software name="mega11" supported="partial">
-		<description>Mega Cartridge 11 (Spa, Pirate)</description>
+		<description>Mega Cartridge 11 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3692,8 +3691,8 @@ Kaboom: boots but expects a paddle in gameplay (hot swap?)
 		</part>
 	</software>
 
-	<software name="mega12" supported="no">
-		<description>Mega Cartridge 12 (Spa, Pirate)</description>
+	<software name="mega12" supported="partial">
+		<description>Mega Cartridge 12 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3711,7 +3710,7 @@ Rescue on Fractalus: doesn't boot, possibly bad dump
 	</software>
 
 	<software name="mega13" supported="partial">
-		<description>Mega Cartridge 13 (Spa, Pirate)</description>
+		<description>Mega Cartridge 13 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3729,8 +3728,8 @@ Wargames: boots
 		</part>
 	</software>
 
-	<software name="mega14" supported="no">
-		<description>Mega Cartridge 14 (Spa, Pirate)</description>
+	<software name="mega14" supported="partial">
+		<description>Mega Cartridge 14 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3748,7 +3747,7 @@ Salmon (Salmon Run): boots
 	</software>
 
 	<software name="mega15">
-		<description>Mega Cartridge 15 (Pirate)</description>
+		<description>Mega Cartridge 15 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -4709,15 +4708,21 @@ Attract mode has glitchy text
 		</part>
 	</software>
 
-	<!-- TODO: prisma* carts untested -->
-
-	<software name="prisma1" supported="no">
-		<description>Prisma 1 (Spa, Pirate)</description>
+	<software name="prisma1" supported="partial">
+		<description>Prisma 1 (Chile, pirate)</description>
 		<year>199?</year>
 		<publisher>Prismasoft</publisher>
 		<notes><![CDATA[
+Super Pacman: boots
+Pinhead: boots, glitchy player sprite layer, no score layer, cuts off active ball [GTIA] mixing (edited? crashes in Altirra 4.01)
+Bombers (Boulder Bombers): boots
+Race in Space: boots
 Tetrix: boots, runs too fast
+Syntron: glitchy sprite (NTSC) or no sprite (PAL), unplayable
+Exocet: boots
+Galactic Chase: boots
 ]]></notes>
+		<info name="usage" value="Super Pacman: hold OPTION key during boot to disable BASIC" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4726,13 +4731,21 @@ Tetrix: boots, runs too fast
 		</part>
 	</software>
 
-	<software name="prisma2" supported="no">
-		<description>Prisma 2 (Spa, Pirate)</description>
+	<software name="prisma2" supported="partial">
+		<description>Prisma 2 (Chile, pirate)</description>
 		<year>199?</year>
 		<publisher>Prismasoft</publisher>
 		<notes><![CDATA[
-Snookie: boots
+Mr. Do Castle: boots, [GTIA] sprites draws "angel halo" after some time in gameplay
+Climber 5: boots
+Snookie: boots, doesn't draw [GTIA] sprites if select any other game then reset and select this, btanb?
+Phobos: boots
+Pacman: boots
+Chaos: boots, doesn't clear [GTIA] trigger when player release button
+Qix: boots
+Cobra Race: boots
 ]]></notes>
+		<info name="usage" value="Mr. Do Castle: hold OPTION key during boot to disable BASIC" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4741,12 +4754,19 @@ Snookie: boots
 		</part>
 	</software>
 
-	<software name="prisma3" supported="no">
-		<description>Prisma 3 (Spa, Pirate)</description>
+	<software name="prisma3" supported="partial">
+		<description>Prisma 3 (Chile, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
 		<notes><![CDATA[
-Crystal Raider: doesn't behave correctly (always selects Night mode), bad dump?
+Super Cobra: boots
+River Raid: boots
+Gun Power Charlie: boots
+Typo Attack: boots
+Guardians of Gorn: boots, title screen "GORN" doesn't [ANTIC] mask playfield on right properly
+Shooting Arcade: boots
+Darts: boots
+Crystal Raiders: doesn't behave correctly (always selects Night mode, changing options shifts text, player always jumps), bad dump? Behaves the same in Altirra
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -4756,22 +4776,45 @@ Crystal Raider: doesn't behave correctly (always selects Night mode), bad dump?
 		</part>
 	</software>
 
-	<software name="prisma4" supported="no">
-		<description>Prisma 4 (Spa, Pirate)</description>
+	<software name="prisma4" supported="partial">
+		<!-- "Prisma Giga-Cartridg" -->
+		<description>Prisma 4 (Chile, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+Pole Position: boots
+Soccer: boots, unresponsive inputs [GTIA] latch trigger, same as soccer entry
+Snooker: boots
+Chicken: boots, runs too fast
+Climber: boots
+Space Invaders II (Atari Invaders): boots, offset bullets and player sprites when traversing playfield [GTIA] mixing
+Fire Bug: crashes on boot, behaves the same in Altirra, bad dump?
+Othello: crashes on boot, behaves the same in Altirra, bad dump?
+]]></notes>
+		<info name="usage" value="Pole Position: hold OPTION key during boot to disable BASIC" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
-				<rom name="prisma 4.rom" size="65536" crc="670c49c6" sha1="b0dfe38188b2917b244a845aad85533f2987da1a"/>
+				<rom name="prisma 4.rom" size="65536" crc="670c49c6" sha1="b0dfe38188b2917b244a845aad85533f2987da1a" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="prisma5" supported="no">
-		<description>Prisma 5 (Spa, Pirate)</description>
+	<software name="prisma5" supported="partial">
+		<description>Prisma 5 (Chile, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+Zaxxon: boots, doesn't mask sprites on top/bottom of screen [GTIA] GRACTL
+Jungle Hunt: boots
+Maze War: boots
+Centipede: boots
+Laser Gates: boots
+Super Cubes: boots
+Revenge of Plutonio (Revenge of the Plutonian Flies): boots, doesn't draw [ANTIC] playfield and text properly during gameplay
+Steeples Jack: boots, draws extra [ANTIC] char on left of status bar on gameplay that should be masked
+]]></notes>
+		<info name="usage" value="Zaxxon: hold OPTION key during boot to disable BASIC" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4780,13 +4823,21 @@ Crystal Raider: doesn't behave correctly (always selects Night mode), bad dump?
 		</part>
 	</software>
 
-	<software name="prisma6" supported="no">
-		<description>Prisma 6 (Spa, Pirate)</description>
+	<software name="prisma6" supported="partial">
+		<description>Prisma 6 (Chile, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
 		<notes><![CDATA[
+Kaboom: boots, expects a paddle in [vcs_ctrl] port 1, how to deal with menu that wants joystick instead?
+Space Invaders: boots, offset bullets when traversing playfield [GTIA] mixing, same as spaceinv
+Frogger: boots, playfield stutters, same as frogger
+Chomper: boots
 Arkanoid III (Crack-Up!): boots, draws black and white playfield [GTIA] PRIOR mode 11
+Chess: boots
+Droids: boots
+Roundup: boots, doesn't draw [GTIA] sprites if select any other game then reset and select this, cow playfield stutters, cannot capture any cow, is the dump right?
 ]]></notes>
+		<info name="usage" value="Frogger: hold OPTION key during boot to disable BASIC" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4795,10 +4846,27 @@ Arkanoid III (Crack-Up!): boots, draws black and white playfield [GTIA] PRIOR mo
 		</part>
 	</software>
 
-	<software name="prismas" supported="no">
-		<description>Prisma Super 15-2 (Spa, Pirate)</description>
+	<software name="prismas" supported="partial">
+		<description>Prisma Super 15-2 (Chile, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+Soccer: boots, unresponsive inputs [GTIA] latch trigger, same as soccer entry
+Space Invaders: boots, offset bullets when traversing playfield [GTIA] mixing, same as spaceinv
+Speed Ski: boots
+Steeple Jack: boots, draws extra [ANTIC] char on left of status bar on gameplay that should be masked
+Maze War: boots
+Blast: boots
+Bonk: boots
+Fire Bug: boots, [ANTIC] doesn't mask left/right sides of playfield
+Incoming: boots
+Gun Power Charlie: boots
+Last War: boots
+Rebel Fighter: boots
+The Electroids: boots
+Syntron: no sprites (NTSC), playable in PAL
+Krazy Katerpillars: boots, runs too fast
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6060,10 +6128,21 @@ Has garbage row strip on top of active playfield during hammer throw event
 
 	<!-- TODO: turboc* cartridges not extensively tested -->
 
-	<software name="turboc1" supported="no">
-		<description>Turbo Cartridge C1 (Spa, Pirate)</description>
+	<software name="turboc1" supported="partial">
+		<description>Turbo Cartridge C1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Basketball: boots
+2. Salmon (Salmon Run): boots
+3. Alien Ambush: boots, doesn't mask sprites on bottom of screen [GTIA] GRACTL, doesn't show sprites if run after any other entry
+4. Rebel Fighter: boots
+5. Sea Bandit: boots
+6: Madnemetter: boots
+7. Sea Chase: boots
+8. River Raid: boots
+9. Pluton Fly (Revenge of the Plutonian Flies): boots, behaves better than prisma5 entry but still not 100% right (cyan strip on top)
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6073,7 +6152,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc2" supported="no">
-		<description>Turbo Cartridge C2 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6085,7 +6164,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc3" supported="no">
-		<description>Turbo Cartridge C3 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C3 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6097,7 +6176,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc4" supported="no">
-		<description>Turbo Cartridge C4 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C4 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6109,7 +6188,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc5" supported="no">
-		<description>Turbo Cartridge C5 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C5 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6121,7 +6200,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc6" supported="no">
-		<description>Turbo Cartridge C6 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C6 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6133,7 +6212,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod1" supported="no">
-		<description>Turbo Cartridge D1 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6145,7 +6224,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod2" supported="no">
-		<description>Turbo Cartridge D2 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6157,7 +6236,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod3" supported="no">
-		<description>Turbo Cartridge D3 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D3 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6169,7 +6248,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod4" supported="no">
-		<description>Turbo Cartridge D4 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D4 (Chile, pirate)</description>
 		<!-- Half of the games don't run. Possible Bad dump. -->
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
@@ -6182,7 +6261,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod5" supported="no">
-		<description>Turbo Cartridge D5 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D5 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6194,7 +6273,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod6" supported="no">
-		<description>Turbo Cartridge D6 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D6 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6206,7 +6285,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod7" supported="no">
-		<description>Turbo Cartridge D7 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D7 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<notes><![CDATA[
@@ -6221,7 +6300,7 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 	</software>
 
 	<software name="turbod8" supported="no">
-		<description>Turbo Cartridge D8 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D8 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6233,7 +6312,7 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 	</software>
 
 	<software name="turboe1" supported="no">
-		<description>Turbo Cartridge E1 (Spa, Pirate)</description>
+		<description>Turbo Cartridge E1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6245,7 +6324,7 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 	</software>
 
 	<software name="turboe2" supported="no">
-		<description>Turbo Cartridge E2 (Spa, Pirate)</description>
+		<description>Turbo Cartridge E2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6257,7 +6336,7 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 	</software>
 
 	<software name="turbox1" supported="no">
-		<description>Turbo Cartridge X1 (Spa, Pirate)</description>
+		<description>Turbo Cartridge X1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6269,7 +6348,7 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 	</software>
 
 	<software name="turbox2" supported="no">
-		<description>Turbo Cartridge X2 (Spa, Pirate)</description>
+		<description>Turbo Cartridge X2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6284,6 +6363,9 @@ M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
 		<description>Turbo System</description>
 		<year>1993</year>
 		<publisher>Dadok</publisher>
+		<notes><![CDATA[
+Utilities for unemulated [cassette] interface
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_phoenix" />
 			<dataarea name="rom" size="8192">
