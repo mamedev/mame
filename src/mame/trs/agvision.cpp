@@ -83,7 +83,7 @@ public:
 
 	void agvision(machine_config &config);
 	uint8_t sam_read(offs_t offset);
-	DECLARE_INPUT_CHANGED_MEMBER(cd_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(hang_up);
 
 protected:
 	virtual void device_start() override;
@@ -108,10 +108,10 @@ protected:
     void ff20_write(offs_t offset, uint8_t data);
 	uint8_t pia0_pa_r();
 	void pia0_cb2_w(int state);
-	int cd_read();
 
 	TIMER_CALLBACK_MEMBER(timer_elapsed);
-	int cd_count;
+	int m_cd;
+	static constexpr int CD_DELAY = 250;
 
 private:
 	void configure_sam(void);
@@ -189,17 +189,17 @@ static INPUT_PORTS_START( agvision )
 	PORT_BIT(0x78, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
-	PORT_START("cd")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CD") PORT_CODE(KEYCODE_TILDE) PORT_CHANGED_MEMBER(DEVICE_SELF, agvision_state, agvision_state::cd_changed, 0)
-	// PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("hup")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HUP") PORT_CODE(KEYCODE_TILDE) PORT_CHANGED_MEMBER(DEVICE_SELF, agvision_state, agvision_state::hang_up, 0)
 INPUT_PORTS_END
 
 //-------------------------------------------------
-//  DEVICE_INPUT_DEFAULTS_START( modem )
+//  DEVICE_INPUT_DEFAULTS_START( ag_modem )
 //-------------------------------------------------
 
-static DEVICE_INPUT_DEFAULTS_START( modem )
+static DEVICE_INPUT_DEFAULTS_START( ag_modem )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -221,11 +221,6 @@ void agvision_state::agvision(machine_config &config)
     m_pia_0->readpa_handler().set(FUNC(agvision_state::pia0_pa_r));
 	m_pia_0->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	m_pia_0->cb2_handler().set(FUNC(agvision_state::pia0_cb2_w));
-// 	m_pia_0->readcb1_handler().set(FUNC(agvision_state::cd_read)); // carier detect
-// 	m_pia_0->readcb1_handler().set_ioport("cd").bit(0).invert(); // carier detect
-
-// 	m_pia_0->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	// m_pia_0->readcb1_handler().set_ioport("cd");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER).set_raw(3.579545_MHz_XTAL * 2, 456, 0, 320, 262, 0, 240);
@@ -235,6 +230,7 @@ void agvision_state::agvision(machine_config &config)
  	m_vdg->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_vdg->input_callback().set(FUNC(agvision_state::sam_read));
 
+	// memory controller
 	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
 	m_sam->set_addrmap(2, &agvision_state::agvision_rom);			// ROM at $A000
  	m_sam->set_addrmap(3, &agvision_state::agvision_static_ram);	// RAM at $C000
@@ -243,9 +239,7 @@ void agvision_state::agvision(machine_config &config)
 	m_sam->set_addrmap(7, &agvision_state::agvision_boot);			//  IO at $FF60
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
-//	m_rs232->dcd_handler().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
-	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(modem));
-
+	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(ag_modem));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("16K").set_extra_options("39K,4K");;
@@ -275,14 +269,12 @@ void agvision_state::agvision_static_ram(address_map &map)
 void agvision_state::agvision_io0(address_map &map)
 {
 	// $FF00-$FF1F
-
 	map(0x1c, 0x1f).rw(PIA0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
 
 void agvision_state::agvision_io1(address_map &map)
 {
 	// $FF20-$FF3F
-
 	map(0x00, 0x00).w(FUNC(agvision_state::ff20_write));
 }
 
@@ -290,6 +282,22 @@ void agvision_state::agvision_boot(address_map &map)
 {
 	// $FF60-$FFEF
 	map(0x60, 0x7f).nopw(); // SAM Registers
+}
+
+//-------------------------------------------------
+//  device_start
+//-------------------------------------------------
+
+void agvision_state::device_start()
+{
+	// call base device_start
+	driver_device::device_start();
+
+	configure_sam();
+
+	m_pia_0->cb1_w(0);
+	m_timer = timer_alloc(FUNC(agvision_state::timer_elapsed), this);
+	m_cd = 0;
 }
 
 //-------------------------------------------------
@@ -310,8 +318,6 @@ uint8_t agvision_state::sam_read(offs_t offset)
 
 void agvision_state::ff20_write(offs_t offset, uint8_t data)
 {
-	logerror( "ff20 write: $%02x\n", data );
-
     m_rs232->write_txd(data & 0x80 ? 1 : 0);
  	m_vdg->gm0_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
 	m_vdg->gm1_w(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
@@ -332,40 +338,14 @@ void agvision_state::configure_sam()
 }
 
 //-------------------------------------------------
-//  device_start
-//-------------------------------------------------
-
-void agvision_state::device_start()
-{
-	// call base device_start
-	driver_device::device_start();
-
-	configure_sam();
-
-	m_pia_0->cb1_w(0);
-	m_timer = timer_alloc(FUNC(agvision_state::timer_elapsed), this);
-
-
-}
-
-#define CD_DELAY 250
-
-//-------------------------------------------------
 //  timer_elapsed
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(agvision_state::timer_elapsed)
 {
-	static int value = 0;
-	// static int count = 100;
-
 	m_timer->adjust(attotime::from_usec(CD_DELAY));
-	m_pia_0->cb1_w(value);
-	value = !value;
-// 	cd_count = cd_count-1;
-
-// 	if (cd_count == 0 ) m_timer->adjust(attotime::never);
-
+	m_pia_0->cb1_w(m_cd);
+	m_cd = !m_cd;
 }
 
 //-------------------------------------------------
@@ -394,14 +374,12 @@ uint8_t agvision_state::pia0_pa_r()
 }
 
 //-------------------------------------------------
-//  cd_changed
+//  hang_up
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER(agvision_state::cd_changed)
+INPUT_CHANGED_MEMBER(agvision_state::hang_up)
 {
- 	// m_pia_0->cb1_w(ioport("cd")->read());
-	// logerror( "CD Changed: %d\n", ioport("cd")->read() );
-
+ 	m_timer->adjust(attotime::never);
 }
 
 //-------------------------------------------------
@@ -410,28 +388,14 @@ INPUT_CHANGED_MEMBER(agvision_state::cd_changed)
 
 void agvision_state::pia0_cb2_w(int state)
 {
-	// logerror( "cb2 write handler: %d\n", state );
-
-	// if( state == 1 )
-	// 	m_pia_0->cb1_w(1);
-	// else
-	// 	m_pia_0->cb1_w(0);
-
 	if( state == 1 )
 	{
 		m_timer->adjust(attotime::from_usec(CD_DELAY*8000));
-		cd_count = 10000;
 	}
 	else
 	{
 		m_timer->adjust(attotime::never);
 	}
-}
-
-int agvision_state::cd_read()
-{
-	logerror( "cb1 read handler: %d\n", ioport("cd")->read() );
-	return ioport("cd")->read();
 }
 
 //**************************************************************************
