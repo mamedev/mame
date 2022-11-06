@@ -96,7 +96,7 @@ protected:
 	required_device<mc6847_base_device> m_vdg;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<7> m_keyboard;
-	
+
 	emu_timer * m_timer; // Carrier Detect Timer
 
 	void agvision_mem(address_map &map);
@@ -344,8 +344,8 @@ void agvision_state::device_start()
 
 	m_pia_0->cb1_w(0);
 	m_timer = timer_alloc(FUNC(agvision_state::timer_elapsed), this);
-	
-	
+
+
 }
 
 #define CD_DELAY 250
@@ -362,9 +362,9 @@ TIMER_CALLBACK_MEMBER(agvision_state::timer_elapsed)
 	m_timer->adjust(attotime::from_usec(CD_DELAY));
 	m_pia_0->cb1_w(value);
 	value = !value;
-	cd_count = cd_count-1;
+// 	cd_count = cd_count-1;
 
-	if (cd_count == 0 ) m_timer->adjust(attotime::never);
+// 	if (cd_count == 0 ) m_timer->adjust(attotime::never);
 
 }
 
@@ -420,7 +420,7 @@ void agvision_state::pia0_cb2_w(int state)
 	if( state == 1 )
 	{
 		m_timer->adjust(attotime::from_usec(CD_DELAY*8000));
-		cd_count = 32;
+		cd_count = 10000;
 	}
 	else
 	{
