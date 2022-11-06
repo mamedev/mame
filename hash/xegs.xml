@@ -92,7 +92,7 @@ Compiled by K1W1
 
 	<software name="beefdrop" supported="partial">
 		<description>Beef Drop</description>
-		<!-- This is the last WIP version by Ken Siders, dated 2005-02-16. It is here as a placeholder until the dump of the final release version by Atari Age becomes avaialable. -->
+		<!-- This is the last WIP version by Ken Siders, dated 2005-02-16. It is here as a placeholder until the dump of the final release version by AtariAge becomes available. -->
 		<year>2005</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Ken Siders" />
@@ -159,7 +159,7 @@ Compiled by K1W1
 	<software name="ccrisis">
 		<description>Castle Crisis</description>
 		<year>2003</year>
-		<publisher>Atari Age</publisher>
+		<publisher>AtariAge</publisher>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
 			<dataarea name="rom" size="32768">
