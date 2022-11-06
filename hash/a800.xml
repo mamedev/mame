@@ -65,61 +65,7 @@ Compiled by K1W1
     - Video Easel
     - Worm War 1
 
-  * Cartridge Types :
-
-    - Standard 8k map to address area $A000-$BFFF.
-    - Standard 16k cartridges map to address area $8000-$BFFF.
-
-    - Right slot 8k cartridges are run in the address area from $8000-$9FFF. Atari 800 only.
-
-    - Phoenix 8k cartridges occupy 8k of address space between $A000 and $BFFF, and can be disabled by an access to $D500-$D5FF.
-
-    - Blizzard 16k cartridges occupy 16k of address space between $8000 and $BFFF, and can be disabled by an access to $D500-$D5FF.
-
-    - MegaCart 16k cartridges occupy 16k of address space between $8000 and $BFFF, and can be disabled by writing a byte with bit 7 set to $D500-$D5FF.
-    - MegaCart 32k are bank-switched cartridges that occupy 16k of address space between $8000 and $BFFF. It is controlled by a byte written to $D500-$D5FF.
-      Bit 0 selects one of two available banks, bit 7 disables the cartridge.
-
-    - Williams 32k cartridges have 4 banks mapped to $A000-$BFFF. An access to $D500 selects bank A, $D501 - bank B, etc. An access to $D508-$D50F disables the cartridge.
-    - Williams 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D507 selects bank A, $D506 - bank B, etc. An access to $D508-$D50F disables the cartridge.
-
-    - DB 32k bank-switched cartridges have 4 banks. Bank D is mapped to $A000-$BFFF. Bank in $8000-$9FFF is selected by an access to $D500-$D5FF.
-      Two lowest bits of address select bank A, B, C or D.
-
-    - Express 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D577 selects bank A, $D576 - bank B, etc. An access to $D578-$D57F disables the cartridge.
-
-    - Diamond 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D5D7 selects bank A, $D5D6 - bank B, etc. An access to $D5D8-$D5DF disables the cartridge.
-
-    - SpartaDOS X cartridges have 8 banks mapped to $A000-$BFFF. An access to $D5E7 selects bank A, $D5E6 - bank B, etc. An access to $D5E8-$D5EF disables the cartridge.
-
-    - BBSB Contains main bank at $A000-$BFFF. From $8000-$8FFF is first bank, $9000-$9FFF is second bank. They are switched by accessing $8FF6-$8FF9 & $9FF6-$9FF9 respectively.
-      In each bank there's 4 x 4 KBs. Totally, it's 2 x 4 x 4 + 8 = 40 KBs. This switching technique is only used with the "Bounty Bob Strikes Back" cartridge.
-
-    - OSS Cartridge: -
-
-      There are two types of OSS cartridges. Both are 16 KB and occupy 8 KB of address space between $A000 and $BFFF.
-      The cartridge memory is divided into 4 banks, 4 KB each. One bank ('main') is always mapped to $B000-$BFFF.
-      The other 3 banks are mapped to $A000-$AFFF. The current bank is selected by accessing a byte in $D500-$D5FF.
-      Only 4 lowest bits of address are significant.
-
-        034M = This scheme is the more complicated of the two. The main bank is D. An access to: -
-                $D5x0 or $D5x1 selects bank A.
-                $D5x3 or $D5x7 selects bank B.
-                $D5x4 or $D5x5 selects bank C.
-                $D5x2 or $D5x6 is not useful. It disables ROM (there're $FF bytes in $A000-$AFFF).
-                $D5x8-$D5xF disables whole cartridge (enables computer's memory in address space between $A000 and $BFFF).
-
-        MO91 = This is the simpler one of OSS schemes. It uses only A0 and A3 address lines: -
-                A3=0, A0=0 - $A000-$AFFF: bank B, $B000-$BFFF: bank A.
-                A3=0, A0=1 - $A000-$AFFF: bank D, $B000-$BFFF: bank A.
-                A3=1, A0=0 - disable cartridge.
-                A3=1, A0=1 - $A000-$AFFF: bank C, $B000-$BFFF: bank A.
-
-        043M = Not much is known about this mapping scheme. It is only used in the "MAC/65 v1.0" & "Action! v3.5" cartridges.
-
-        8k OSS = Not much is known about this mapping scheme. It is only used in the "The Writers Tool" cartridge.
-
-    - Corina cartridge designed by GR8 Software
+  * For Cartridge Types please refer to bus/a800 folder.
 
   * Copy Protection - Some cartridges were produced that utilised a form of copy protection by writing data back to the ROM area in memory. There are many versions of
     these ROM's available that have been altered to circumvent this protection. This collection where possible has used original unaltered ROM's, those that have been
@@ -3493,6 +3439,45 @@ Offset sprites on specific rows [GTIA] mixing
 		</part>
 	</software>
 
+	<!-- Comes as default with Maxflash Cartridge Studio -->
+	<software name="maxdemo" supported="partial">
+		<description>Maxflash Cartridge Studio - Demonstration Workbook</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+001. 3-D Tic-Tac-Toe:
+002. Abracadra:
+003: Alley Cat:
+004: Archon:
+005: Archon II Adept:
+006: BallBlazer:
+007: Blue Max:
+008: Bounty Bob Strikes Back: boots
+009: Demon Attack:
+010: Dimension X:
+011: Electrician: boots, garbage sprites if run after any other entry
+012: Gyruss:
+013: Pastfinder:
+014: Quasimodo:
+015: Satan's Hollow:
+016: Scrolls of Abadon:
+017: Tutankham:
+018: Yoomp! (1.1, NTSC):
+019: Alibaba and the Fourty Thieves:
+020: Jumpan:
+021: The Casten Game Disk:
+022: Spelunker:
+023: Zork I: doesn't boot, black screen
+]]></notes>
+		<info name="developer" value="Atarimax" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="maxflash_1mb" />
+			<dataarea name="rom" size="1048576">
+				<rom name="maxflash_demo.rom" size="1048576" crc="146efe26" sha1="1a5518caac16c01282c46d2d2b1b87cdfab3a093"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mega1" supported="partial">
 		<description>Mega Cartridge 01 (Chile, pirate)</description>
 		<year>2004</year>
@@ -5143,6 +5128,51 @@ Score bar glitches out when player dies
 		</part>
 	</software>
 
+	<!-- PoC cartridge dump coming from Super Inexpensive Cart package -->
+	<software name="sic31in1" supported="partial">
+		<description>SIC! 31-in-1 Demonstration</description>
+		<year>2012?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Abracadabra!:
+Asteroids:
+BC's Quest..:
+Caverns of Mars:
+Centipede:
+Choplifter:
+Decathlon:
+Donkey Kong:
+Donkey Kong Jr.: boots
+Flip and Flop:
+Frogger:
+H.E.R.O.:
+Jawbreaker:
+Joust:
+Jumpman Jr.
+Millipede:
+Miner 2049er:
+Moon Patrol:
+Ms. Pac-Man:
+Pengo:
+Pitfall:
+Pitfall II:
+Pole Position:
+Q*Bert:
+Qix:
+River Raid:
+Space Invaders:
+Star Raiders: black screen
+Super Breakout:
+Zaxxon:
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="sic_512kb" />
+			<dataarea name="rom" size="524288">
+				<rom name="sic31in1.rom" size="524288" crc="7c32d258" sha1="7669612a2dee99a2f82466b8c1e83acea0c2cf16"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="siliconw">
 		<description>Silicon Warrior</description>
 		<year>1983</year>
@@ -6209,7 +6239,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 5. Allien Swarm (Alien Swarm): boots
 6. Bacterion: boots
 7. Boxing: boots
-8. Megamania: boots, behaves same as megmania entry
+8. MegaMania: boots, behaves same as megmania entry
 9. MASH 4077: boots, behaves same as mash entry
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
@@ -6227,13 +6257,13 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<notes><![CDATA[
 1. Tic Tac Toe:
 2. Klystron Ryder (Klystron Raider):
-3. Kunfu (Kung-Fu Master):
-4. Livewire II:
-5. Blastoff Exocet:
+3. Kunfu (Kung-Fu Master): boots
+4. Livewire II: boots, no [GTIA] player sprite if run after any other entry
+5. Blastoff Exocet: boots
 6. Missile Command:
 7. Asteroids:
 8. Speedway Blast:
-9. Challenge 5:
+9. Challenge 5: boots
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -6253,7 +6283,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 3. Battle in the Ring:
 4. Grid Runner:
 5. Squish:
-6. Cavernas de Marte:
+6. Cavernas de Marte (Caverns of Mars II):
 7. Pengon:
 8. Deluxe Invaders:
 9. Space Invaders:
@@ -6329,21 +6359,21 @@ O. Hotlips (Hot Lips):
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<notes><![CDATA[
-A. Sea Dragon:
+A. Sea Dragon: boots
 B. Fighter Pilot I:
 C. Allien Ambush (Alien Ambush):
 D. Chomper:
 E. Pacman:
 F. Bacterion:
-G. Mr Cool:
-H. Thrax Lair:
+G. Mr Cool: boots, has [GTIA] background color cyan instead of black
+H. Thrax Lair: boots
 I. Livewire II:
-J. Quarxon:
-K. Derblitz:
+J. Quarxon: boots
+K. Derblitz: boots
 L. Futbol (Soccer):
 M. Shooting Arcade:
 N. Pluton Fly:
-O. Rush Hour:
+O. Rush Hour: boots, player sprite stutters when moving vertically [GTIA] mixing
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
@@ -6373,7 +6403,7 @@ K. Pengon:
 L. Frogger I:
 M. Table Soccer: hangs at cyan screen
 N. Salmon Run:
-O. Bumper Ball:
+O. Bumper Ball: hangs at cyan screen
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_turbo" />
@@ -6397,7 +6427,7 @@ F. Space Invaders:
 G. Battle in the Ring:
 H. Legacy 2:
 I. Madnemetter:
-J. War Games:
+J. War Games (Computer War): boots, behaves same as compwar entry
 K. Cavernas de Marte:
 L. Keystone Kappers (Keystone Kapers):
 M. The Aardvark:
