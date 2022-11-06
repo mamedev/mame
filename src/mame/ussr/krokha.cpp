@@ -76,7 +76,7 @@ private:
 
 void krokha_state::status_callback(uint8_t data)
 {
-	if (data & i8080_cpu_device::STATUS_INTA)
+	if (data & i8080a_cpu_device::STATUS_INTA)
 	{
 		// interrupt acknowledge
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -150,19 +150,19 @@ void krokha_state::krokha(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 ROM_START( krokha )
-	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASE00)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD("bios.bin", 0x0000, 0x2000, CRC(e37556f4) SHA1(b1da9d7338eb227b0aff5675719f7a2aab607e66))
 
-	ROM_REGION(0x0800, "chargen", ROMREGION_ERASE00)
+	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD("font.bin", 0x0000, 0x0800, CRC(2f4fcfb5) SHA1(175cafe3dc9291f505d69aced9c405c38b7f7086))
 ROM_END
 
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROT,   COMPANY        FULLNAME
-GAME( 1990, krokha,  0,      krokha,  krokha, krokha_state, empty_init, ROT0,  "SKB Kontur",  "Krokha", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMP  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME  FLAGS
+CONS( 1990, krokha,  0,      0,    krokha,  krokha, krokha_state, empty_init, "SKB Kontur",  "Krokha", MACHINE_SUPPORTS_SAVE )

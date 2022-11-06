@@ -19956,7 +19956,7 @@ toysmarch2                      // (c) 2005 Konami. Toy's March 2 (F00:J:A:A:200
 @source:ddr/kramermc.cpp
 kramermc                        // 1987 Kramer MC
 
-@source:misc/krokha.cpp
+@source:ussr/krokha.cpp
 krokha                          // 1990 SKB Kontur, USSR
 
 @source:skeleton/kron.cpp
