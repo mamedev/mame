@@ -11,7 +11,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: SNK -->
 	<software name="bstars">
-		<description>Pocket Sports Series - Baseball Stars (Euro, Japan)</description>
+		<description>Pocket Sports Series - Baseball Stars (Europe, Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00070" />
@@ -38,7 +38,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: SNK -->
 	<software name="kofr1">
-		<description>Pocket Fighting Series - King of Fighters R-1 (Euro, Japan)</description>
+		<description>Pocket Fighting Series - King of Fighters R-1 (Europe, Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00010" />
@@ -69,7 +69,7 @@ NEOP00060 Dokodemo Mahjong
 	<!-- Developer: Dyna -->
 	<software name="neocher">
 	<!-- NGPC, rated "Over 18" -->
-		<description>Pocket Casino Series - Neo Cherry Master (Euro, Japan)</description>
+		<description>Pocket Casino Series - Neo Cherry Master (Europe, Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00140" />
@@ -84,7 +84,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: SNK -->
 	<software name="neocup98">
-		<description>Pocket Sports Series - Neo Geo Cup '98 (Euro, Japan)</description>
+		<description>Pocket Sports Series - Neo Geo Cup '98 (Europe, Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00020" />
@@ -99,7 +99,7 @@ NEOP00060 Dokodemo Mahjong
 
 	<!-- Developer: Yumekobo -->
 	<software name="ptennis">
-		<description>Pocket Sports Series - Pocket Tennis (Euro, Japan)</description>
+		<description>Pocket Sports Series - Pocket Tennis (Europe, Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00090" />
@@ -116,7 +116,7 @@ NEOP00060 Dokodemo Mahjong
 	<!-- Developer: SNK -->
 	<software name="samsho">
 	<!-- NGPC -->
-		<description>Pocket Fighting Series - Samurai Spirit! (Japan) ~ Samurai Shodown! (Euro)</description>
+		<description>Pocket Fighting Series - Samurai Spirit! (Japan) ~ Samurai Shodown! (Europe)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00080" />
