@@ -3,6 +3,8 @@
 #ifndef MAME_BUS_MSX_SLOT_RAM_H
 #define MAME_BUS_MSX_SLOT_RAM_H
 
+#pragma once
+
 #include "slot.h"
 
 class msx_slot_ram_device : public device_t,

@@ -3,6 +3,7 @@
 #ifndef MAME_MSX_MSX_MATSUSHITA_H
 #define MAME_MSX_MSX_MATSUSHITA_H
 
+#pragma once
 
 #include "msx_switched.h"
 

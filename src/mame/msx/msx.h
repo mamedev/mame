@@ -3,6 +3,8 @@
 #ifndef MAME_MSX_MSX_H
 #define MAME_MSX_MSX_H
 
+#pragma once
+
 #include "bus/centronics/ctronics.h"
 #include "bus/msx_slot/cartridge.h"
 #include "cpu/z80/z80.h"
@@ -228,18 +230,18 @@ protected:
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 
 	// PSG
-	u8 m_psg_b = 0;
+	u8 m_psg_b;
 	// mouse
-	u16 m_mouse[2]{};
-	s8 m_mouse_stat[2]{};
+	u16 m_mouse[2];
+	s8 m_mouse_stat[2];
 	// kanji
-	u32 m_kanji_latch = 0;
+	u32 m_kanji_latch;
 	// memory
-	bool m_slot_expanded[4]{};
-	u8 m_primary_slot = 0;
-	u8 m_secondary_slot[4]{};
-	u8 m_port_c_old = 0;
-	u8 m_keylatch = 0;
+	bool m_slot_expanded[4];
+	u8 m_primary_slot;
+	u8 m_secondary_slot[4];
+	u8 m_port_c_old;
+	u8 m_keylatch;
 
 private:
 	// configuration helpers
@@ -308,8 +310,7 @@ private:
 		static const char *tags[4] = {
 			"cartslot1", "cartslot2", "cartslot3", "cartslot4"
 		};
-		if (N < 1 || N > 4)
-			fatalerror("Invalid cartridge slot number %d.\n", N);
+		static_assert(N >= 1 && N <= 4, "Invalid cartridge slot number");
 		return add_cartridge_slot<N>(config, MSX_SLOT_CARTRIDGE, tags[N-1], prim, expanded, sec, msx_cart, nullptr);
 	}
 };

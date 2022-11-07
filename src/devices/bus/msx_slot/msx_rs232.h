@@ -3,6 +3,8 @@
 #ifndef MAME_BUS_MSX_SLOT_MSX_RS232_H
 #define MAME_BUS_MSX_SLOT_MSX_RS232_H
 
+#pragma once
+
 #include "rom.h"
 #include "bus/rs232/rs232.h"
 #include "machine/i8251.h"

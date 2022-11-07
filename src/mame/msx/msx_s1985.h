@@ -3,6 +3,7 @@
 #ifndef MAME_MSX_MSX_S1985_H
 #define MAME_MSX_MSX_S1985_H
 
+#pragma once
 
 #include "msx_switched.h"
 

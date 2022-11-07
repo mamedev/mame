@@ -3,6 +3,8 @@
 #ifndef MAME_MSX_MSX_SYSTEMFLAGS_H
 #define MAME_MSX_MSX_SYSTEMFLAGS_H
 
+#pragma once
+
 /*
 Some MSX2+ and TurboR machines have a 'system flags' I/O port ($F4).
 The value in this register is cleared on power up, but it keeps it's

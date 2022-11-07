@@ -825,4 +825,4 @@ INPUT_PORTS_START(msx2uk)
 	PORT_INCLUDE(msx2_keypad)
 INPUT_PORTS_END
 
-}
+} // msx_keyboard namespace

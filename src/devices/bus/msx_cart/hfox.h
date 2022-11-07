@@ -3,6 +3,8 @@
 #ifndef MAME_BUS_MSX_CART_HFOX_H
 #define MAME_BUS_MSX_CART_HFOX_H
 
+#pragma once
+
 #include "bus/msx_cart/cartridge.h"
 
 

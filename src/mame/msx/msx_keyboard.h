@@ -3,6 +3,7 @@
 #ifndef MAME_MSX_MSX_KEYBOARD_H
 #define MAME_MSX_MSX_KEYBOARD_H
 
+#pragma once
 
 namespace msx_keyboard {
 

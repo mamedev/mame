@@ -7,12 +7,31 @@
 */
 
 #include "emu.h"
+#include "msx.h"
+#include "msx_keyboard.h"
+#include "bus/msx_slot/bruc100.h"
 #include "bus/msx_slot/ram.h"
 #include "bus/msx_slot/ram_mm.h"
-#include "msx_keyboard.h"
-#include "msx1_bruc100.h"
 
 using namespace msx_keyboard;
+
+
+namespace {
+
+class bruc100_state : public msx_state
+{
+public:
+	bruc100_state(const machine_config &mconfig, device_type type, const char *tag);
+
+	void bruc100(machine_config &config);
+	void bruc100a(machine_config &config);
+
+private:
+	required_device<msx_slot_bruc100_device> m_bruc100_firm;
+
+	void io_map(address_map &map);
+	void port90_w(u8 data);
+};
 
 
 bruc100_state::bruc100_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -92,6 +111,8 @@ void bruc100_state::bruc100a(machine_config &config)
 	msx1(VDP_TMS9129, SND_AY8910, config);
 	m_maincpu->set_addrmap(AS_IO, &bruc100_state::io_map);
 }
+
+} // anonymous namespace
 
 COMP(1987, bruc100,    0,        0,     bruc100,    bruc100,  bruc100_state, empty_init, "Frael", "Bruc 100-1 (MSX1, Italy)", 0)
 COMP(1988, bruc100a,   bruc100,  0,     bruc100a,   bruc100,  bruc100_state, empty_init, "Frael", "Bruc 100-2 (MSX1, Italy)", 0)

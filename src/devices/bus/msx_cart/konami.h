@@ -3,6 +3,8 @@
 #ifndef MAME_BUS_MSX_CART_KONAMI_H
 #define MAME_BUS_MSX_CART_KONAMI_H
 
+#pragma once
+
 #include "bus/msx_cart/cartridge.h"
 #include "sound/k051649.h"
 #include "sound/vlm5030.h"

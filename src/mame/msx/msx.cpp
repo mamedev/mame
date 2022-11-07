@@ -103,10 +103,10 @@
 
 #include "emu.h"
 
+#include "msx.h"
 #include "cpu/z80/r800.h"
 #include "formats/fmsx_cas.h"
 #include "hashfile.h"
-#include "msx.h"
 #include "screen.h"
 #include "softlist_dev.h"
 
@@ -157,6 +157,8 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_view_slot3_page2(*this, "view3_2")
 	, m_view_slot3_page3(*this, "view3_3")
 	, m_psg_b(0)
+	, m_mouse{0, 0}
+	, m_mouse_stat{0, 0}
 	, m_kanji_latch(0)
 	, m_slot_expanded{false, false, false, false}
 	, m_primary_slot(0)
@@ -164,8 +166,6 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_port_c_old(0)
 	, m_keylatch(0)
 {
-	m_mouse[0] = m_mouse[1] = 0;
-	m_mouse_stat[0] = m_mouse_stat[1] = 0;
 	m_view[0] = &m_view_page0;
 	m_view[1] = &m_view_page1;
 	m_view[2] = &m_view_page2;
