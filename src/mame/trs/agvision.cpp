@@ -19,7 +19,7 @@
 
 	PIA:
 		Port A and B make up the keyboard matrix
-		PA7  - RS-232 recieve.
+		PA7  - RS-232 receive.
 		CA1  - The horizontal sync from the VDG.
 		CA2  - Unconnected, not verified.
 		CB1  - Modem status, carrier detect.
@@ -43,65 +43,69 @@
 
 #include "emu.h"
 
+#include "6883sam.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 #include "screen.h"
-#include "6883sam.h"
 #include "video/mc6847.h"
-#include "bus/rs232/rs232.h"
 
 //-------------------------------------------------
 //  TYPE DEFINITIONS
 //-------------------------------------------------
 
-class agvision_state : public driver_device
+namespace
 {
-public:
-	agvision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_screen(*this, "screen")
-		, m_ram(*this, "ram")
-		, m_pia_0(*this, "pia0")
-		, m_sam(*this, "sam")
-		, m_vdg(*this, "vdg")
-		, m_rs232(*this, "rs232")
-		, m_keyboard(*this, "row%u", 0)
-	{}
+	class agvision_state : public driver_device
+	{
+	public:
+		agvision_state(const machine_config &mconfig, device_type type, const char *tag)
+			: driver_device(mconfig, type, tag)
+			, m_maincpu(*this, "maincpu")
+			, m_screen(*this, "screen")
+			, m_ram(*this, "ram")
+			, m_pia_0(*this, "pia0")
+			, m_sam(*this, "sam")
+			, m_vdg(*this, "vdg")
+			, m_rs232(*this, "rs232")
+			, m_keyboard(*this, "row%u", 0)
+		{}
 
-	void agvision(machine_config &config);
-	uint8_t sam_read(offs_t offset);
-	DECLARE_INPUT_CHANGED_MEMBER(hang_up);
+		void agvision(machine_config &config);
+		DECLARE_INPUT_CHANGED_MEMBER(hang_up);
 
-protected:
-	virtual void device_start() override;
+	protected:
+		virtual void machine_start() override;
 
-private:
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<ram_device> m_ram;
-	required_device<pia6821_device> m_pia_0;
-	required_device<sam6883_device> m_sam;
-	required_device<mc6847_base_device> m_vdg;
-	required_device<rs232_port_device> m_rs232;
-	required_ioport_array<7> m_keyboard;
+	private:
+		static constexpr int CD_DELAY = 250;
 
-	emu_timer * m_timer; // Carrier Detect Timer
-	void agvision_mem(address_map &map);
-	void agvision_rom(address_map &map);
-	void agvision_static_ram(address_map &map);
-	void agvision_io0(address_map &map);
-	void agvision_io1(address_map &map);
-	void agvision_boot(address_map &map);
-	void ff20_write(offs_t offset, uint8_t data);
-	void configure_sam(void);
-	uint8_t pia0_pa_r();
-	void pia0_cb2_w(int state);
-	TIMER_CALLBACK_MEMBER(timer_elapsed);
+		required_device<cpu_device> m_maincpu;
+		required_device<screen_device> m_screen;
+		required_device<ram_device> m_ram;
+		required_device<pia6821_device> m_pia_0;
+		required_device<sam6883_device> m_sam;
+		required_device<mc6847_base_device> m_vdg;
+		required_device<rs232_port_device> m_rs232;
+		required_ioport_array<7> m_keyboard;
 
-	int m_cd;
-	static constexpr int CD_DELAY = 250;
+		emu_timer *m_timer; // Carrier Detect Timer
+		uint8_t sam_read(offs_t offset);
+		void mem_map(address_map &map);
+		void rom_map(address_map &map);
+		void static_ram_map(address_map &map);
+		void io0_map(address_map &map);
+		void io1_map(address_map &map);
+		void boot_map(address_map &map);
+		void ff20_write(offs_t offset, uint8_t data);
+		void configure_sam();
+		uint8_t pia0_pa_r();
+		void pia0_cb2_w(int state);
+		TIMER_CALLBACK_MEMBER(timer_elapsed);
+
+		int m_cd;
+	};
 };
 
 //-------------------------------------------------
@@ -198,11 +202,9 @@ DEVICE_INPUT_DEFAULTS_END
 
 void agvision_state::agvision(machine_config &config)
 {
-	this->set_clock(XTAL(14'318'181) / 16);
-
 	// basic machine hardware
-	MC6809E(config, m_maincpu, DERIVED_CLOCK(1, 1));
-	m_maincpu->set_addrmap(AS_PROGRAM, &agvision_state::agvision_mem);
+	MC6809E(config, m_maincpu, XTAL(14'318'181) / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &agvision_state::mem_map);
 
 	PIA6821(config, m_pia_0, 0);
 	m_pia_0->readpa_handler().set(FUNC(agvision_state::pia0_pa_r));
@@ -214,58 +216,58 @@ void agvision_state::agvision(machine_config &config)
 
 	MC6847_NTSC(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
 	m_vdg->set_screen(m_screen);
-	 m_vdg->hsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::ca1_w));
+	m_vdg->hsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::ca1_w));
 	m_vdg->input_callback().set(FUNC(agvision_state::sam_read));
 
 	// memory controller
 	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
-	m_sam->set_addrmap(2, &agvision_state::agvision_rom);			// ROM at $A000
-	 m_sam->set_addrmap(3, &agvision_state::agvision_static_ram);	// RAM at $C000
-	m_sam->set_addrmap(4, &agvision_state::agvision_io0);			//  IO at $FF00
-	m_sam->set_addrmap(5, &agvision_state::agvision_io1);			//  IO at $FF20
-	m_sam->set_addrmap(7, &agvision_state::agvision_boot);			//  IO at $FF60
+	m_sam->set_addrmap(2, &agvision_state::rom_map);			// ROM at $A000
+	m_sam->set_addrmap(3, &agvision_state::static_ram_map);	// RAM at $C000
+	m_sam->set_addrmap(4, &agvision_state::io0_map);			//  IO at $FF00
+	m_sam->set_addrmap(5, &agvision_state::io1_map);			//  IO at $FF20
+	m_sam->set_addrmap(7, &agvision_state::boot_map);			//  IO at $FF60
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
 	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(ag_modem));
 
 	// internal ram
-	RAM(config, m_ram).set_default_size("16K").set_extra_options("39K,4K");;
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K,4K");
 }
 
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
-void agvision_state::agvision_mem(address_map &map)
+void agvision_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
 }
 
-void agvision_state::agvision_rom(address_map &map)
+void agvision_state::rom_map(address_map &map)
 {
 	// $A000-$BFFF
 	map(0x0000, 0x07ff).rom().region("maincpu", 0x0000).nopw().mirror(0x1800);
 }
 
-void agvision_state::agvision_static_ram(address_map &map)
+void agvision_state::static_ram_map(address_map &map)
 {
 	// $C000-$FEFF
 	map(0x0000, 0x0080).ram();
 }
 
-void agvision_state::agvision_io0(address_map &map)
+void agvision_state::io0_map(address_map &map)
 {
 	// $FF00-$FF1F
 	map(0x1c, 0x1f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
 
-void agvision_state::agvision_io1(address_map &map)
+void agvision_state::io1_map(address_map &map)
 {
 	// $FF20-$FF3F
 	map(0x00, 0x00).w(FUNC(agvision_state::ff20_write));
 }
 
-void agvision_state::agvision_boot(address_map &map)
+void agvision_state::boot_map(address_map &map)
 {
 	// $FF60-$FFEF
 	map(0x60, 0x7f).nopw(); // SAM Registers
@@ -275,13 +277,11 @@ void agvision_state::agvision_boot(address_map &map)
 //  device_start
 //-------------------------------------------------
 
-void agvision_state::device_start()
+void agvision_state::machine_start()
 {
-	// call base device_start
-	driver_device::device_start();
-
 	configure_sam();
 
+	save_item(NAME(m_cd));
 	m_pia_0->cb1_w(0);
 	m_timer = timer_alloc(FUNC(agvision_state::timer_elapsed), this);
 	m_cd = 0;
@@ -294,8 +294,8 @@ void agvision_state::device_start()
 uint8_t agvision_state::sam_read(offs_t offset)
 {
 	uint8_t data = m_sam->display_read(offset);
-	m_vdg->as_w(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);
-	m_vdg->inv_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
+	m_vdg->as_w(BIT(data,7));
+	m_vdg->inv_w(BIT(data,6));
 	return data;
 }
 
@@ -305,11 +305,11 @@ uint8_t agvision_state::sam_read(offs_t offset)
 
 void agvision_state::ff20_write(offs_t offset, uint8_t data)
 {
-	m_rs232->write_txd(data & 0x80 ? 1 : 0);
-	 m_vdg->gm0_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
-	m_vdg->gm1_w(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
-	m_vdg->gm2_w(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
-	m_vdg->ag_w(data & 0x01 ? ASSERT_LINE : CLEAR_LINE);
+	m_rs232->write_txd(BIT(data,7));
+	m_vdg->gm0_w(BIT(data,3));
+	m_vdg->gm1_w(BIT(data,2));
+	m_vdg->gm2_w(BIT(data,1));
+	m_vdg->ag_w(BIT(data,0));
 }
 
 //-------------------------------------------------
@@ -343,13 +343,13 @@ uint8_t agvision_state::pia0_pa_r()
 {
 	uint8_t pia0_pb = m_pia_0->b_output();
 
-	uint8_t pia0_pa = 0x7F;
+	uint8_t pia0_pa = 0x7f;
 
 	/* poll the keyboard, and update PA6-PA0 accordingly*/
 	for (unsigned i = 0; i < m_keyboard.size(); i++)
 	{
 		int value = m_keyboard[i]->read();
-		if ((value | pia0_pb) != 0xFF)
+		if ((value | pia0_pb) != 0xff)
 		{
 			pia0_pa &= ~(0x01 << i);
 		}
@@ -366,7 +366,10 @@ uint8_t agvision_state::pia0_pa_r()
 
 INPUT_CHANGED_MEMBER(agvision_state::hang_up)
 {
-	 m_timer->adjust(attotime::never);
+	if (newval == 1)
+	{
+		m_timer->adjust(attotime::never);
+	}
 }
 
 //-------------------------------------------------
@@ -375,7 +378,7 @@ INPUT_CHANGED_MEMBER(agvision_state::hang_up)
 
 void agvision_state::pia0_cb2_w(int state)
 {
-	if( state == 1 )
+	if (state == 1)
 	{
 		m_timer->adjust(attotime::from_usec(CD_DELAY*8000));
 	}
@@ -400,5 +403,5 @@ ROM_START(trsvidtx)
 ROM_END
 
 //    YEAR  NAME      PARENT COMPAT MACHINE   INPUT	    CLASS           INIT        COMPANY              FULLNAME    FLAGS
-COMP( 1979, agvision, 0,	 0,     agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "AgVision", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, trsvidtx, 0,	 0,     agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "Videotex", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, agvision, 0,     0,     agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "AgVision", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, trsvidtx, 0,     0,     agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "Videotex", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
