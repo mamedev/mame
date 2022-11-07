@@ -50,7 +50,7 @@ void bruc100_state::port90_w(u8 data)
 {
 	m_bruc100_firm->select_bank(BIT(data, 7));
 	m_cent_ctrl_out->write(data);
-	}
+}
 
 /* MSX - Frael Bruc 100-1 */
 
