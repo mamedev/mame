@@ -35,11 +35,6 @@ a800_rom_corina_device::a800_rom_corina_device(const machine_config &mconfig, co
 {
 }
 
-a800_rom_corina_sram_device::a800_rom_corina_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_corina_device(mconfig, A800_ROM_CORINA_SRAM, tag, owner, clock)
-{
-}
-
 void a800_rom_corina_device::device_add_mconfig(machine_config &config)
 {
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -92,16 +87,6 @@ void a800_rom_corina_device::write_view_1(offs_t offset, u8 data)
 {
 }
 
-uint8_t a800_rom_corina_sram_device::read_view_1(offs_t offset)
-{
-	return m_ram[(offset & 0x3fff) + (m_rom_bank * 0x4000)];
-}
-
-void a800_rom_corina_sram_device::write_view_1(offs_t offset, u8 data)
-{
-	m_ram[(offset & 0x3fff) + (m_rom_bank * 0x4000)] = data;
-}
-
 /*
  * 0--- ---- enable Corina window
  * 1--- ---- disable Corina and select main unit 8000-bfff window instead
@@ -119,4 +104,32 @@ void a800_rom_corina_device::ctrl_w(offs_t offset, uint8_t data)
 	m_rom_bank = data & 0x1f;
 	m_view.select((data & 0x60) >> 5);
 	rd_both_w(!BIT(data, 7));
+}
+
+/*-------------------------------------------------
+
+ SRAM variant overrides
+
+ -------------------------------------------------*/
+
+a800_rom_corina_sram_device::a800_rom_corina_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_corina_device(mconfig, A800_ROM_CORINA_SRAM, tag, owner, clock)
+{
+}
+
+void a800_rom_corina_sram_device::device_start()
+{
+	a800_rom_corina_device::device_start();
+	m_ram.resize(0x80000);
+	device().save_item(NAME(m_ram));
+}
+
+uint8_t a800_rom_corina_sram_device::read_view_1(offs_t offset)
+{
+	return m_ram[(offset & 0x3fff) + (m_rom_bank * 0x4000)];
+}
+
+void a800_rom_corina_sram_device::write_view_1(offs_t offset, u8 data)
+{
+	m_ram[(offset & 0x3fff) + (m_rom_bank * 0x4000)] = data;
 }

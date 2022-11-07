@@ -66,14 +66,10 @@ public:
 	virtual void cart_map(address_map &map);
 	virtual void cctl_map(address_map &map);
 
-
 	// TODO: remove all of this
 	void rom_alloc(uint32_t size);
-	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
-	uint8_t* get_ram_base() { return &m_ram[0]; }
 	uint32_t get_rom_size() { return m_rom_size; }
-	uint32_t get_ram_size() { return m_ram.size(); }
 
 protected:
 	device_a800_cart_interface(const machine_config &mconfig, device_t &device);
@@ -85,7 +81,6 @@ protected:
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
-	std::vector<uint8_t> m_ram;
 	// helpers
 	int m_bank_mask;
 
@@ -138,12 +133,6 @@ public:
 	template <unsigned Bank> void write_cart(offs_t offset, uint8_t data);
 	uint8_t read_cctl(offs_t offset);
 	void write_cctl(offs_t offset, uint8_t data);
-
-	// TODO: remove me
-	uint8_t read_80xx(offs_t offset);
-	uint8_t read_d5xx(offs_t offset);
-	void write_80xx(offs_t offset, uint8_t data);
-	void write_d5xx(offs_t offset, uint8_t data);
 
 protected:
 	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

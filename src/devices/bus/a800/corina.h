@@ -43,9 +43,13 @@ public:
 
 
 protected:
+	virtual void device_start() override;
 
 	virtual uint8_t read_view_1(offs_t offset) override;
 	virtual void write_view_1(offs_t offset, u8 data) override;
+
+private:
+	std::vector<uint8_t> m_ram;
 };
 
 DECLARE_DEVICE_TYPE(A800_ROM_CORINA,      a800_rom_corina_device)

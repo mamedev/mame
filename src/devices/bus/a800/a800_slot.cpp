@@ -69,16 +69,6 @@ void device_a800_cart_interface::rom_alloc(uint32_t size)
 	}
 }
 
-//-------------------------------------------------
-//  ram_alloc - alloc the space for the on-cart RAM
-//-------------------------------------------------
-
-void device_a800_cart_interface::ram_alloc(uint32_t size)
-{
-	m_ram.resize(size);
-	device().save_item(NAME(m_ram));
-}
-
 void device_a800_cart_interface::interface_pre_start()
 {
 	if (!m_slot->started())
@@ -301,11 +291,6 @@ image_init_result a800_cart_slot_device::call_load()
 			m_cart->rom_alloc(len);
 			fread(m_cart->get_rom_base(), len);
 		}
-		// TODO: remove these
-		if (m_type == A800_CORINA)
-			m_cart->ram_alloc(0x4000);
-		if (m_type == A800_CORINA_SRAM)
-			m_cart->ram_alloc(0x80000);
 
 		logerror("%s loaded cartridge '%s' size %dK\n", machine().system().name, filename(), len/1024);
 	}
