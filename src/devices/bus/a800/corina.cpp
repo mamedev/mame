@@ -120,8 +120,9 @@ a800_rom_corina_sram_device::a800_rom_corina_sram_device(const machine_config &m
 void a800_rom_corina_sram_device::device_start()
 {
 	a800_rom_corina_device::device_start();
+
 	m_ram.resize(0x80000);
-	device().save_item(NAME(m_ram));
+	save_item(NAME(m_ram));
 }
 
 uint8_t a800_rom_corina_sram_device::read_view_1(offs_t offset)

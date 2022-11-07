@@ -135,7 +135,7 @@ public:
 	void write_cctl(offs_t offset, uint8_t data);
 
 protected:
-	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cart_mem_address_bits);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -155,13 +155,9 @@ private:
 	address_space *m_space_mem;
 	address_space *m_space_io;
 
+protected:
+	int m_cart_bank_address_bits;
 };
-
-
-// The variants below are added to handle the additional formats for a5200, and to give more
-// clear error messages if you try to load an A5200 game into an A800 or a XEGS, etc.
-
-// ======================> a5200_cart_slot_device
 
 class a5200_cart_slot_device : public a800_cart_slot_device
 {

@@ -77,6 +77,8 @@ void device_a800_cart_interface::interface_pre_start()
 
 void device_a800_cart_interface::interface_post_start()
 {
+	// TODO: a5200 can't possibly work with this (needs 0x7fff)
+	// it may far better to just separate the two interfaces at this point ...
 	m_slot->m_space_mem->install_device(0x0000, 0x3fff, *this, &device_a800_cart_interface::cart_map);
 	m_slot->m_space_io->install_device(0x0000, 0x00ff, *this, &device_a800_cart_interface::cctl_map);
 
@@ -106,9 +108,8 @@ WRITE_LINE_MEMBER( device_a800_cart_interface::rd_both_w ) { rd4_w(state); rd5_w
 //  ****_cart_slot_device - constructor
 //-------------------------------------------------
 
-// TODO: make an extra constructor exposing num of address lines for cart_mem
-// (necessary for a5200 carts)
-a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+// TODO: CCTL area doesn't really exist for a5200 carts
+a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cart_mem_address_bits)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_cartrom_image_interface(mconfig, *this)
@@ -117,19 +118,20 @@ a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, devi
 	, m_type(0)
 	, m_rd4_cb(*this)
 	, m_rd5_cb(*this)
-	, m_space_mem_config("cart_mem", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor())
+	, m_space_mem_config("cart_mem", ENDIANNESS_LITTLE, 8, cart_mem_address_bits, 0, address_map_constructor())
 	, m_space_io_config("cart_io", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor())
+	, m_cart_bank_address_bits(cart_mem_address_bits - 1)
 {
 }
 
 a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a800_cart_slot_device(mconfig, A800_CART_SLOT, tag, owner, clock)
+	a800_cart_slot_device(mconfig, A800_CART_SLOT, tag, owner, clock, 14)
 {
 }
 
 
 a5200_cart_slot_device::a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a800_cart_slot_device(mconfig, A5200_CART_SLOT, tag, owner, clock)
+	a800_cart_slot_device(mconfig, A5200_CART_SLOT, tag, owner, clock, 15)
 {
 }
 
@@ -214,7 +216,6 @@ static const a800_slot slot_list[] =
 	{ A5200_16K,      "a5200" },
 	{ A5200_32K,      "a5200" },
 	{ A5200_16K_2CHIPS, "a5200_2chips" },
-	{ A5200_32K,      "a5200" },
 	{ A5200_BBSB,     "a5200_bbsb" }
 };
 
@@ -526,12 +527,12 @@ device_memory_interface::space_config_vector a800_cart_slot_device::memory_space
 
 template <unsigned Bank> uint8_t a800_cart_slot_device::read_cart(offs_t offset)
 {
-	return m_space_mem->read_byte(offset | Bank << 13);
+	return m_space_mem->read_byte(offset | Bank << (m_cart_bank_address_bits));
 }
 
 template <unsigned Bank> void a800_cart_slot_device::write_cart(offs_t offset, uint8_t data)
 {
-	return m_space_mem->write_byte(offset | Bank << 13, data);
+	return m_space_mem->write_byte(offset | Bank << (m_cart_bank_address_bits), data);
 }
 
 // Instantiate maps

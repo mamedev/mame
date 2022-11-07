@@ -647,7 +647,8 @@ void xegs_state::xegs_mem(address_map &map)
 void a5200_state::a5200_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x4000, 0xbfff).noprw(); // ROM installed at machine start
+	map(0x4000, 0x7fff).rw(m_cartleft, FUNC(a5200_cart_slot_device::read_cart<0>), FUNC(a5200_cart_slot_device::write_cart<0>));
+	map(0x8000, 0xbfff).rw(m_cartleft, FUNC(a5200_cart_slot_device::read_cart<1>), FUNC(a5200_cart_slot_device::write_cart<1>));
 	map(0xc000, 0xcfff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	// 0xe000-0xe7ff - Expansion?

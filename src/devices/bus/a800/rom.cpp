@@ -17,6 +17,8 @@ DEFINE_DEVICE_TYPE(A800_ROM,           a800_rom_device,           "a800_rom",   
 DEFINE_DEVICE_TYPE(A800_ROM_16KB,      a800_rom_16kb_device,      "a800_rom_16kb", "Atari 800 ROM 16kb Carts")
 DEFINE_DEVICE_TYPE(A800_ROM_RIGHT,     a800_rom_right_device,     "a800_rom_right","Atari 800 ROM Right Carts")
 DEFINE_DEVICE_TYPE(XEGS_ROM,           xegs_rom_device,           "a800_xegs",     "Atari XEGS 64K ROM Carts")
+
+DEFINE_DEVICE_TYPE(A5200_ROM,          a5200_rom_device,          "a5200",         "Atari 5200 ROM Cart")
 DEFINE_DEVICE_TYPE(A5200_ROM_2CHIPS,   a5200_rom_2chips_device,   "a5200_16k2c",   "Atari 5200 ROM Cart 16K in 2 Chips")
 DEFINE_DEVICE_TYPE(A5200_ROM_BBSB,     a5200_rom_bbsb_device,     "a5200_bbsb",    "Atari 5200 ROM Cart BBSB")
 
@@ -27,12 +29,6 @@ a800_rom_device::a800_rom_device(const machine_config &mconfig, device_type type
 	, device_a800_cart_interface( mconfig, *this )
 {
 }
-
-a5200_rom_2chips_device::a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A5200_ROM_2CHIPS, tag, owner, clock)
-{
-}
-
 
 a5200_rom_bbsb_device::a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, A5200_ROM_BBSB, tag, owner, clock)
@@ -187,6 +183,18 @@ void xegs_rom_device::cctl_map(address_map &map)
 
  -------------------------------------------------*/
 
+a5200_rom_device::a5200_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, A5200_ROM, tag, owner, clock)
+{
+}
+
+void a5200_rom_device::cart_map(address_map &map)
+{
+	map(0x0000, 0x7fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & (m_rom_size - 1))]; })
+	);
+}
+
 /*-------------------------------------------------
 
  Carts with 2x8K (16K) with A13 line not connected
@@ -197,14 +205,20 @@ void xegs_rom_device::cctl_map(address_map &map)
 
  -------------------------------------------------*/
 
-uint8_t a5200_rom_2chips_device::read_80xx(offs_t offset)
+a5200_rom_2chips_device::a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, A5200_ROM_2CHIPS, tag, owner, clock)
 {
-	if (offset < 0x4000)
-		return m_rom[offset & 0x1fff];
-	else
-		return m_rom[(offset & 0x1fff) + 0x2000];
 }
 
+void a5200_rom_2chips_device::cart_map(address_map &map)
+{
+	map(0x0000, 0x3fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[offset & 0x1fff]; })
+	);
+	map(0x4000, 0x7fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & 0x1fff) + 0x2000]; })
+	);
+}
 
 /*-------------------------------------------------
 
