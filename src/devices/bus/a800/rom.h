@@ -71,7 +71,7 @@ class a5200_rom_2chips_device : public a800_rom_device
 public:
 	a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t read_80xx(offs_t offset) override;
+	virtual uint8_t read_80xx(offs_t offset);
 };
 
 
@@ -80,8 +80,8 @@ class a5200_rom_bbsb_device : public a800_rom_device
 public:
 	a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t read_80xx(offs_t offset) override;
-	virtual void write_80xx(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_80xx(offs_t offset);
+	virtual void write_80xx(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_start() override;

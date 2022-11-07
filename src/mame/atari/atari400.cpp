@@ -313,20 +313,6 @@ private:
 	uint8_t djoy_2_3_r();
 	void djoy_2_3_w(uint8_t data);
 
-	uint8_t read_d5xx(offs_t offset);    // at least one cart type can enable/disable roms when reading
-	void disable_cart(offs_t offset, uint8_t data);
-
-	// these are needed to handle carts which can disable ROM without
-	// installing/disinstalling continuously RAM and ROM (with e.g. big
-	// performance hit in Williams carts)
-	uint8_t special_read_8000(offs_t offset);
-	void special_write_8000(offs_t offset, uint8_t data);
-	uint8_t special_read_a000(offs_t offset);
-	void special_write_a000(offs_t offset, uint8_t data);
-	uint8_t read_corina_overlay(offs_t offset);
-	void write_corina_overlay(offs_t offset, uint8_t data);
-	void write_corina_d5xx(offs_t offset, uint8_t data);
-
 protected:
 	optional_device<ram_device> m_ram;
 	optional_device<pia6821_device> m_pia;
@@ -344,12 +330,6 @@ protected:
 
 	virtual void area_8000_map(address_map &map);
 	virtual void area_a000_map(address_map &map);
-
-	// TODO: remove all of this
-	int m_cart_disabled, m_cart_helper;
-	int m_last_offs;
-
-	void setup_cart(a800_cart_slot_device *slot);
 };
 
 class a800_state : public a400_state
@@ -364,7 +344,7 @@ public:
 	void a800pal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+//	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -1712,188 +1692,8 @@ WRITE_LINE_MEMBER( a400_state::cart_rd5_w )
 	m_cart_rd5_view.select(m_cart_rd5_enabled);
 }
 
-// these handle cart enable/disable without calling setup_ram thousands of times
-// TODO: this should really live in a800_slot file
-uint8_t a400_state::special_read_8000(offs_t offset)
-{
-	if (!m_cart_disabled)
-		return m_cartleft->read_80xx(offset);
-	else
-	{
-		offset += 0x8000;
-		if (m_ram->size() < offset)
-			return 0;
-		else
-			return m_ram->pointer()[offset];
-	}
-}
-
-void a400_state::special_write_8000(offs_t offset, uint8_t data)
-{
-	if (m_cart_disabled)
-	{
-		offset += 0x8000;
-		if (m_ram->size() >= offset)
-			m_ram->pointer()[offset] = data;
-	}
-}
-
-uint8_t a400_state::special_read_a000(offs_t offset)
-{
-	if (!m_cart_disabled)
-		return m_cartleft->read_80xx(offset);
-	else
-	{
-		offset += 0xa000;
-		if (m_ram->size() < offset)
-			return 0;
-		else
-			return m_ram->pointer()[offset];
-	}
-}
-
-void a400_state::special_write_a000(offs_t offset, uint8_t data)
-{
-	if (m_cart_disabled)
-	{
-		offset += 0xa000;
-		if (m_ram->size() >= offset)
-			m_ram->pointer()[offset] = data;
-	}
-}
-
-
-uint8_t a400_state::read_d5xx(offs_t offset)
-{
-	if (!machine().side_effects_disabled())
-		disable_cart(offset, 0);
-	return 0xff;
-}
-
-void a400_state::disable_cart(offs_t offset, uint8_t data)
-{
-	if (m_cartleft->exists())
-	{
-		switch (m_cartleft->get_cart_type())
-		{
-		case A800_PHOENIX:
-		case A800_BLIZZARD:
-			if (!m_cart_disabled)
-				m_cart_disabled = 1;
-			break;
-		case A800_OSS034M:
-		case A800_OSS043M:
-		case A800_DIAMOND:
-		//case A800_WILLIAMS:
-			// use m_cart_disabled & m_last_offs to avoid continuous remapping of
-			// the memory space in some games (e.g. dropzone)
-			if (offset & 0x8 && !m_cart_disabled)
-				m_cart_disabled = 1;
-			else if (!(offset & 0x8))
-			{
-				if (m_cart_disabled)
-					m_cart_disabled = 0;
-
-				if ((offset & 0x7) != m_last_offs)
-				{
-					// we enter here only if we are writing to a different offset than last time
-					m_last_offs = offset & 0x7;
-					m_cartleft->write_d5xx(offset, data);
-				}
-			}
-			break;
-		case A800_SPARTADOS:
-			// writes with offset & 8 are also used to enable/disable the subcart, so they go through!
-			m_cartleft->write_d5xx(offset, data);
-			break;
-		case A800_OSSM091:
-		case A800_OSS8K:
-			if ((offset & 0x9) == 0x08)
-				m_cart_disabled = 1;
-			else
-			{
-				m_cart_disabled = 0;
-				m_cartleft->write_d5xx(offset, data);
-			}
-			break;
-		/*case A800_MICROCALC:
-		    m_cart_helper = (m_cart_helper + 1) % 5;
-		    if (m_cart_helper == 4)
-		        m_cart_disabled = 1;
-		    else
-		    {
-		        m_cart_disabled = 0;
-		        m_cartleft->write_d5xx(offset, m_cart_helper);
-		    }
-		    break;*/
-		default:
-			break;
-		}
-	}
-}
-
-void a400_state::setup_cart(a800_cart_slot_device *slot)
-{
-	return;
-	m_cart_disabled = 0;
-	m_last_offs = -1;
-
-	// FIXME: this driver should not have to differentiate between cartridge types
-	if (slot->exists())
-	{
-		switch (slot->get_cart_type())
-		{
-			// TODO: unimplemented in slot
-		//case A800_8K:
-		//  m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-		//  m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-		//  break;
-		case A800_8K_RIGHT:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x9fff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0x9fff);
-			break;
-		case A800_16K:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
-			break;
-		case A800_BBSB:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0x9fff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_80xx)));
-			m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-			break;
-		case A800_OSS034M:
-		case A800_OSS043M:
-		case A800_OSSM091:
-		case A800_OSS8K:
-//      case A800_TURBO64:
-//      case A800_TURBO128:
-		case A800_PHOENIX:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
-			break;
-		case A800_DIAMOND:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5d0, 0xd5df, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
-			break;
-		case A800_SPARTADOS:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5e0, 0xd5ef, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
-			break;
-		case A800_BLIZZARD:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_8000)), write8sm_delegate(*this, FUNC(a400_state::special_write_8000)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
-			break;
-/*      case A800_MICROCALC:
-            // this can also disable ROM when reading in 0xd500-0xd5ff
-            m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8sm_delegate(*this, FUNC(a400_state::special_read_a000)), write8sm_delegate(*this, FUNC(a400_state::special_write_a000)));
-            m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd500, 0xd5ff, read8sm_delegate(*this, FUNC(a400_state::read_d5xx)), write8sm_delegate(*this, FUNC(a400_state::disable_cart)));
-            break;*/
-		case A800_XEGS:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_d5xx)));
-			break;
-
+// old reference, to be removed
+#if 0
 		case A5200_4K:
 		case A5200_8K:
 		case A5200_16K:
@@ -1909,14 +1709,7 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 			break;
 		}
 	}
-	else if (slot->get_card_device() != nullptr)
-	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xbfff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_80xx)));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd500, 0xd5ff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_d5xx)));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_d5xx)));
-	}
-}
+#endif
 
 
 TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a400_interrupt )
@@ -1936,19 +1729,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( a5200_state::a5200_interrupt )
 
 void a400_state::machine_start()
 {
-	setup_cart(m_cartleft);
-
 	save_item(NAME(m_cart_rd4_enabled));
 	save_item(NAME(m_cart_rd5_enabled));
-	save_item(NAME(m_cart_disabled));
-	save_item(NAME(m_cart_helper));
-	save_item(NAME(m_last_offs));
-}
-
-void a800_state::machine_start()
-{
-	a400_state::machine_start();
-	setup_cart(m_cartright);
 }
 
 void a1200xl_state::machine_start()
@@ -2275,7 +2057,7 @@ void a400_state::atari_common(machine_config &config)
 
 	ATARI_FDC(config, "fdc", 0);
 
-	A800_CART_SLOT(config, m_cartleft, a800_left, nullptr);
+	A800_CART_SLOT(config, m_cartleft, a800_left, "a800_8k");
 	m_cartleft->rd4_callback().set(FUNC(a400_state::cart_rd4_w));
 	m_cartleft->rd5_callback().set(FUNC(a400_state::cart_rd5_w));
 
@@ -2326,7 +2108,7 @@ void a800_state::a800(machine_config &config)
 
 	config_ntsc_screen(config);
 
-	A800_CART_SLOT(config, m_cartright, a800_right, nullptr);
+	A800_CART_SLOT(config, m_cartright, a800_right, "a800_8k_right");
 
 	// TODO: confirm all of the official config
 	// 8K release model, 48K possible here?
@@ -2436,6 +2218,8 @@ void xegs_state::xegs(machine_config &config)
 
 	// not installable unless with DIY mods
 	config.device_remove("ram");
+
+	m_cartleft->set_default_option("xegs");
 
 	// uses exact same slot connector
 	SOFTWARE_LIST(config.replace(), "cart_list").set_compatible("a800");

@@ -25,7 +25,6 @@ References:
 
 DEFINE_DEVICE_TYPE(A800_CART_SLOT,  a800_cart_slot_device,  "a800_cart_slot",  "Atari 8bit Cartridge Slot")
 DEFINE_DEVICE_TYPE(A5200_CART_SLOT, a5200_cart_slot_device, "a5200_cart_slot", "Atari 5200 Cartridge Slot")
-DEFINE_DEVICE_TYPE(XEGS_CART_SLOT,  xegs_cart_slot_device,  "xegs_cart_slot",  "Atari XEGS Cartridge Slot")
 
 
 //-------------------------------------------------
@@ -145,12 +144,6 @@ a5200_cart_slot_device::a5200_cart_slot_device(const machine_config &mconfig, co
 }
 
 
-xegs_cart_slot_device::xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a800_cart_slot_device(mconfig, XEGS_CART_SLOT, tag, owner, clock)
-{
-}
-
-
 //-------------------------------------------------
 //  ****_cart_slot_device - destructor
 //-------------------------------------------------
@@ -160,10 +153,6 @@ a800_cart_slot_device::~a800_cart_slot_device()
 }
 
 a5200_cart_slot_device::~a5200_cart_slot_device()
-{
-}
-
-xegs_cart_slot_device::~xegs_cart_slot_device()
 {
 }
 
@@ -457,13 +446,16 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 
 std::string a800_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
+	std::string slot_default_option = default_option();
+
 	if (hook.image_file())
 	{
+		const bool is_xegs = slot_default_option.compare("xegs") == 0;
 		uint64_t len;
 		hook.image_file()->length(len); // FIXME: check error return
 
+		int type = is_xegs ? A800_XEGS : A800_8K;
 		// check whether there is an header, to identify the cart type
-		int type = A800_8K;
 		if ((len % 0x1000) == 0x10)
 		{
 			size_t actual;
@@ -473,13 +465,23 @@ std::string a800_cart_slot_device::get_default_card_software(get_default_card_so
 		}
 		else    // otherwise try to guess based on size
 		{
+			if (is_xegs)
+				return std::string("xegs");
+			// TODO: very incomplete, is it also worth it?
+			// Altirra sports a very complex scoring analysis (including code binary patterns),
+			// and it still grants to the user multiple options
 			if (len == 0x4000)
 				type = A800_16K;
 			if (len == 0x2000)
 				type = A800_8K;
 		}
 
-		if (type >= A5200_4K)
+		if (is_xegs && type != A800_XEGS)
+		{
+			osd_printf_info("This game is not designed for XEGS.\n");
+			osd_printf_info("You might want to run it in %s.\n", type >= A5200_4K ? "A5200" : "A800");
+		}
+		else if (type >= A5200_4K)
 			osd_printf_info("This game is not designed for A800. You might want to run it in A5200.\n");
 
 		char const *const slot_string = a800_get_slot(type);
@@ -487,7 +489,7 @@ std::string a800_cart_slot_device::get_default_card_software(get_default_card_so
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot("a800_8k");
+	return software_get_default_slot(slot_default_option);
 }
 
 
@@ -522,40 +524,6 @@ std::string a5200_cart_slot_device::get_default_card_software(get_default_card_s
 	}
 
 	return software_get_default_slot("a5200");
-}
-
-
-std::string xegs_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
-{
-	if (hook.image_file())
-	{
-		uint64_t len;
-		hook.image_file()->length(len); // FIXME: check error return
-
-		// check whether there is an header, to identify the cart type
-		int type = A800_XEGS;
-		if ((len % 0x1000) == 0x10)
-		{
-			size_t actual;
-			uint8_t head[0x10];
-			hook.image_file()->read(&head[0], 0x10, actual); // FIXME: check error return or read returning short
-			type = identify_cart_type(&head[0]);
-		}
-		if (type != A800_XEGS)
-		{
-			osd_printf_info("This game is not designed for XEGS. ");
-			if (type >= A5200_4K)
-				osd_printf_info("You might want to run it in A5200.\n");
-			else
-				osd_printf_info("You might want to run it in A800 or A800XL.\n");
-		}
-
-		char const *const slot_string = a800_get_slot(type);
-
-		return std::string(slot_string);
-	}
-
-	return software_get_default_slot("xegs");
 }
 
 
@@ -595,38 +563,4 @@ uint8_t a800_cart_slot_device::read_cctl(offs_t offset)
 void a800_cart_slot_device::write_cctl(offs_t offset, uint8_t data)
 {
 	m_space_io->write_byte(offset, data);
-}
-
-// TODO: legacy stuff below this point, to be removed
-uint8_t a800_cart_slot_device::read_80xx(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_80xx(offset);
-	else
-		return 0xff;
-}
-
-uint8_t a800_cart_slot_device::read_d5xx(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_d5xx(offset);
-	else
-		return 0xff;
-}
-
-
-/*-------------------------------------------------
- write
- -------------------------------------------------*/
-
-void a800_cart_slot_device::write_80xx(offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->write_80xx(offset, data);
-}
-
-void a800_cart_slot_device::write_d5xx(offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->write_d5xx(offset, data);
 }

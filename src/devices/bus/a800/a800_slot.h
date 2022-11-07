@@ -66,12 +66,8 @@ public:
 	virtual void cart_map(address_map &map);
 	virtual void cctl_map(address_map &map);
 
-	// TODO: remove me
-	virtual uint8_t read_80xx(offs_t offset) { return 0xff; }
-	virtual uint8_t read_d5xx(offs_t offset) { return 0xff; }
-	virtual void write_80xx(offs_t offset, uint8_t data) {}
-	virtual void write_d5xx(offs_t offset, uint8_t data) {}
 
+	// TODO: remove all of this
 	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
@@ -200,33 +196,8 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 };
 
-// ======================> xegs_cart_slot_device
-
-class xegs_cart_slot_device : public a800_cart_slot_device
-{
-public:
-	// construction/destruction
-	template <typename T>
-	xegs_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: xegs_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
-	xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~xegs_cart_slot_device();
-
-	virtual const char *file_extensions() const noexcept override { return "bin,rom,car"; }
-
-	// slot interface overrides
-	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
-};
-
 // device type definition
 DECLARE_DEVICE_TYPE(A800_CART_SLOT,  a800_cart_slot_device)
 DECLARE_DEVICE_TYPE(A5200_CART_SLOT, a5200_cart_slot_device)
-DECLARE_DEVICE_TYPE(XEGS_CART_SLOT,  xegs_cart_slot_device)
 
 #endif // MAME_BUS_A800_A800_SLOT_H
