@@ -15,7 +15,7 @@ license:CC0
 <!-- Confirmed dump by ElBarto -->
 
 	<software name="doom">
-		<description>Doom (Euro)</description>
+		<description>Doom (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -32,7 +32,7 @@ license:CC0
 	</software>
 
 	<software name="motox">
-		<description>Motocross Championship (Euro)</description>
+		<description>Motocross Championship (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -46,7 +46,7 @@ license:CC0
 	</software>
 
 	<software name="sharrier">
-		<description>Space Harrier (Euro)</description>
+		<description>Space Harrier (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -60,7 +60,7 @@ license:CC0
 	</software>
 
 	<software name="swa" supported="no">
-		<description>Star Wars Arcade (Euro)</description>
+		<description>Star Wars Arcade (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -77,7 +77,7 @@ license:CC0
 
 	<!-- boot OK -->
 	<software name="toughman">
-		<description>Toughman Contest (Euro, USA)</description>
+		<description>Toughman Contest (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -95,7 +95,7 @@ license:CC0
 
 	<!-- Has 3d geometry bugs on attract mode with SH2 DRC, crashes if you attempt to enter into main menu -->
 	<software name="vrdx" supported="no">
-		<description>Virtua Racing Deluxe (Euro)</description>
+		<description>Virtua Racing Deluxe (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -113,7 +113,7 @@ license:CC0
 
 	<!-- Dump by Radar -->
 	<software name="pinochio">
-		<description>Pinocchio (Euro, prototype 19951206)</description>
+		<description>Pinocchio (Europe, prototype 19951206)</description>
 		<year>1995</year>
 		<publisher>Virgin</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -154,7 +154,7 @@ license:CC0
 
 	<!-- Dump by Porchy -->
 	<software name="cf2">
-		<description>Clay Fighter 2 (Euro, USA, Jpn, prototype 19950429)</description>
+		<description>Clay Fighter 2 (Europe, USA, Japan, prototype 19950429)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -170,7 +170,7 @@ license:CC0
 <!-- PCB info and part numbers are taken from SMS Power and from nepereny's PCB pictures and other sources -->
 
 	<software name="aburner">
-		<description>After Burner Complete (Euro)</description>
+		<description>After Burner Complete (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -182,7 +182,7 @@ license:CC0
 	</software>
 
 	<software name="aburnerju" cloneof="aburner">
-		<description>After Burner (USA) ~ After Burner Complete (Jpn)</description>
+		<description>After Burner (USA) ~ After Burner Complete (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-4006 (JPN)"/>
@@ -248,7 +248,7 @@ license:CC0
 	</software>
 
 	<software name="cosmicc">
-		<description>Cosmic Carnage (Euro)</description>
+		<description>Cosmic Carnage (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -260,7 +260,7 @@ license:CC0
 	</software>
 
 	<software name="cyberb" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA)</description>
+		<description>Cyber Brawl (Japan) ~ Cosmic Carnage (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-4004 (JPN)"/>
@@ -275,7 +275,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19941011)</description>
+		<description>Cyber Brawl (Japan) ~ Cosmic Carnage (USA) (prototype, 19941011)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -287,7 +287,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp1" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19941007)</description>
+		<description>Cyber Brawl (Japan) ~ Cosmic Carnage (USA) (prototype, 19941007)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -299,7 +299,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp2" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19941005)</description>
+		<description>Cyber Brawl (Japan) ~ Cosmic Carnage (USA) (prototype, 19941005)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -311,7 +311,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp3" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19941004)</description>
+		<description>Cyber Brawl (Japan) ~ Cosmic Carnage (USA) (prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -323,7 +323,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp4" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19940928)</description>
+		<description>Cyber Brawl (Japan) ~ Cosmic Carnage (USA) (prototype, 19940928)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -335,7 +335,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp5" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19940926)</description>
+		<description>Cyber Brawl (Japan) ~ Cosmic Carnage (USA) (prototype, 19940926)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -347,7 +347,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp6" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19940921)</description>
+		<description>Cyber Brawl (Japan) ~ Cosmic Carnage (USA) (prototype, 19940921)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -359,7 +359,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp7" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19940906)</description>
+		<description>Cyber Brawl (Japan) ~ Cosmic Carnage (USA) (prototype, 19940906)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -371,7 +371,7 @@ license:CC0
 	</software>
 
 	<software name="darxide">
-		<description>Darxide (Euro)</description>
+		<description>Darxide (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -383,7 +383,7 @@ license:CC0
 	</software>
 
 	<software name="doomju" cloneof="doom">
-		<description>Doom (Jpn, USA)</description>
+		<description>Doom (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-4003 (JPN)"/>
@@ -415,7 +415,7 @@ license:CC0
 	</software>
 
 	<software name="doomp1" cloneof="doom">
-		<description>Doom (Euro, prototype, 19941002)</description>
+		<description>Doom (Europe, prototype, 19941002)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -560,7 +560,7 @@ license:CC0
 	</software>
 
 	<software name="eccodemo" supported="no">
-		<description>Ecco the Dolphin CinePak Demo (Jpn, USA, developer cart)</description>
+		<description>Ecco the Dolphin CinePak Demo (Japan, USA, developer cart)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -571,7 +571,7 @@ license:CC0
 	</software>
 
 	<software name="fifa96">
-		<description>FIFA Soccer 96 (Euro)</description>
+		<description>FIFA Soccer 96 (Europe)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -583,7 +583,7 @@ license:CC0
 	</software>
 
 	<software name="36great" supported="no">
-		<description>36 Great Holes Starring Fred Couples (Euro)</description>
+		<description>36 Great Holes Starring Fred Couples (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -595,7 +595,7 @@ license:CC0
 	</software>
 
 	<software name="36greatju" cloneof="36great" supported="no">
-		<description>36 Great Holes Starring Fred Couples (Jpn, USA)</description>
+		<description>36 Great Holes Starring Fred Couples (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-5002 (JPN)"/>
@@ -610,7 +610,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp" cloneof="36great" supported="partial">
-		<description>36 Great Holes starring Fred Couples (Euro, prototype, 19941221-B)</description>
+		<description>36 Great Holes starring Fred Couples (Europe, prototype, 19941221-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -646,7 +646,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp3" cloneof="36great" supported="partial">
-		<description>36 Great Holes starring Fred Couples (Euro, prototype, 19941214)</description>
+		<description>36 Great Holes starring Fred Couples (Europe, prototype, 19941214)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -658,7 +658,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp4" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Euro, prototype, 19941213)</description>
+		<description>36 Great Holes starring Fred Couples (Europe, prototype, 19941213)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1010,7 +1010,7 @@ license:CC0
 	</software>
 
 	<software name="chaotix">
-		<description>Chaotix (Euro)</description>
+		<description>Chaotix (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="Knuckles' Chaotix (Box)"/>
@@ -1023,7 +1023,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixju" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA)</description>
+		<description>Chaotix (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-5003 (JPN)"/>
@@ -1038,7 +1038,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, prototype 214, 19950214, 06.46)</description>
+		<description>Chaotix (Japan, USA, prototype 214, 19950214, 06.46)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1050,7 +1050,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup1" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, prototype 0213, 19950213, 07.30)</description>
+		<description>Chaotix (Japan, USA, prototype 0213, 19950213, 07.30)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1062,7 +1062,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup2" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, prototype 213B, 19950213, 06.46)</description>
+		<description>Chaotix (Japan, USA, prototype 213B, 19950213, 06.46)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1074,7 +1074,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup3" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, prototype 210, 19950210, 06.28)</description>
+		<description>Chaotix (Japan, USA, prototype 210, 19950210, 06.28)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1086,7 +1086,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup4" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, prototype 209, 19950209, 08.25)</description>
+		<description>Chaotix (Japan, USA, prototype 209, 19950209, 08.25)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1098,7 +1098,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup5" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, prototype 208, 19950208, 11.17)</description>
+		<description>Chaotix (Japan, USA, prototype 208, 19950208, 11.17)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1110,7 +1110,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup6" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, prototype 0202, 19950207, 15.25)</description>
+		<description>Chaotix (Japan, USA, prototype 0202, 19950207, 15.25)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1122,7 +1122,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup7" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, prototype 119, 19950119, 07.04)</description>
+		<description>Chaotix (Japan, USA, prototype 119, 19950119, 07.04)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1134,7 +1134,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup8" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, prototype 0111, 19950112, 09.36)</description>
+		<description>Chaotix (Japan, USA, prototype 0111, 19950112, 09.36)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1146,7 +1146,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup9" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, prototype 1207, 19941207, 07.15)</description>
+		<description>Chaotix (Japan, USA, prototype 1207, 19941207, 07.15)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1158,7 +1158,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup10" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, prototype 1227, 19941227, 10.28)</description>
+		<description>Chaotix (Japan, USA, prototype 1227, 19941227, 10.28)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1170,7 +1170,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup11" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, prototype 1229, 19941230, 15.31)</description>
+		<description>Chaotix (Japan, USA, prototype 1229, 19941230, 15.31)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1182,7 +1182,7 @@ license:CC0
 	</software>
 
 	<software name="kolibri">
-		<description>Kolibri (Euro, USA)</description>
+		<description>Kolibri (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1197,7 +1197,7 @@ license:CC0
 	</software>
 
 	<software name="marsch">
-		<description>Mars Check Program Version 1.0 (Jpn, USA, SDK build set 1)</description>
+		<description>Mars Check Program Version 1.0 (Japan, USA, SDK build set 1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1209,7 +1209,7 @@ license:CC0
 	</software>
 
 	<software name="marsch1" cloneof="marsch">
-		<description>Mars Check Program Version 1.0 (Jpn, USA, SDK build set 2)</description>
+		<description>Mars Check Program Version 1.0 (Japan, USA, SDK build set 2)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1221,7 +1221,7 @@ license:CC0
 	</software>
 
 	<software name="marssa">
-		<description>Mars Sample Program - Gnu Sierra (Jpn, USA, SDK build)</description>
+		<description>Mars Sample Program - Gnu Sierra (Japan, USA, SDK build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1233,7 +1233,7 @@ license:CC0
 	</software>
 
 	<software name="marssa1" cloneof="marssa">
-		<description>Mars Sample Program - Pharaoh (Jpn, USA, SDK build)</description>
+		<description>Mars Sample Program - Pharaoh (Japan, USA, SDK build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1245,7 +1245,7 @@ license:CC0
 	</software>
 
 	<software name="marssa2" cloneof="marssa">
-		<description>Mars Sample Program - Runlength Mode Test (Jpn, USA, SDK build)</description>
+		<description>Mars Sample Program - Runlength Mode Test (Japan, USA, SDK build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1257,7 +1257,7 @@ license:CC0
 	</software>
 
 	<software name="marssa3" cloneof="marssa">
-		<description>Mars Sample Program - Texture Test (Jpn, USA, SDK build)</description>
+		<description>Mars Sample Program - Texture Test (Japan, USA, SDK build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1269,7 +1269,7 @@ license:CC0
 	</software>
 
 	<software name="metalhd">
-		<description>Metal Head (Euro)</description>
+		<description>Metal Head (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1285,7 +1285,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdju" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA)</description>
+		<description>Metal Head (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-4008 (JPN)"/>
@@ -1300,7 +1300,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, prototype, 19941220)</description>
+		<description>Metal Head (Japan, USA, prototype, 19941220)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1312,7 +1312,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp1" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, prototype, 19941213)</description>
+		<description>Metal Head (Japan, USA, prototype, 19941213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1324,7 +1324,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp2" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, prototype, 19941209)</description>
+		<description>Metal Head (Japan, USA, prototype, 19941209)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1336,7 +1336,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp3" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, prototype, 19941207-B)</description>
+		<description>Metal Head (Japan, USA, prototype, 19941207-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1348,7 +1348,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp4" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, prototype, 19941207)</description>
+		<description>Metal Head (Japan, USA, prototype, 19941207)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1360,7 +1360,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp5" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, prototype, 19941202)</description>
+		<description>Metal Head (Japan, USA, prototype, 19941202)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1373,7 +1373,7 @@ license:CC0
 
 <!-- Also works on PAL -->
 	<software name="metalhdp6" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, prototype, 19941121)</description>
+		<description>Metal Head (Japan, USA, prototype, 19941121)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1386,7 +1386,7 @@ license:CC0
 
 <!-- Also works on PAL -->
 	<software name="metalhdp7" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, prototype, 19941118)</description>
+		<description>Metal Head (Japan, USA, prototype, 19941118)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1399,7 +1399,7 @@ license:CC0
 
 <!-- Also works on PAL -->
 	<software name="metalhdp8" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, prototype, 19941114)</description>
+		<description>Metal Head (Japan, USA, prototype, 19941114)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1411,7 +1411,7 @@ license:CC0
 	</software>
 
 	<software name="mk2">
-		<description>Mortal Kombat II (Euro)</description>
+		<description>Mortal Kombat II (Europe)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1423,7 +1423,7 @@ license:CC0
 	</software>
 
 	<software name="mk2ju" cloneof="mk2">
-		<description>Mortal Kombat II - Kyuukyoku Shinken (Jpn) ~ Mortal Kombat II (USA)</description>
+		<description>Mortal Kombat II - Kyuukyoku Shinken (Japan) ~ Mortal Kombat II (USA)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8104A (JPN)"/>
@@ -1675,7 +1675,7 @@ license:CC0
 	</software>
 
 	<software name="primal">
-		<description>Primal Rage (Euro, USA)</description>
+		<description>Primal Rage (Europe, USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1700,7 +1700,7 @@ license:CC0
 
 	<!-- black screen after Sega logo -->
 	<software name="sangoku4" supported="no">
-		<description>Sangokushi IV (Jpn)</description>
+		<description>Sangokushi IV (Japan)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7601A (JPN)"/>
@@ -1714,7 +1714,7 @@ license:CC0
 	</software>
 
 	<software name="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA)</description>
+		<description>Stellar Assault (Europe) ~ Shadow Squadron (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
@@ -1726,7 +1726,7 @@ license:CC0
 	</software>
 
 	<software name="stellarj" cloneof="stellar">
-		<description>Stellar Assault (Jpn)</description>
+		<description>Stellar Assault (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-4010 (JPN)"/>
@@ -1741,7 +1741,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950313-B)</description>
+		<description>Stellar Assault (Europe) ~ Shadow Squadron (USA) (prototype, 19950313-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
@@ -1753,7 +1753,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp1" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950313)</description>
+		<description>Stellar Assault (Europe) ~ Shadow Squadron (USA) (prototype, 19950313)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
@@ -1765,7 +1765,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp2" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950306)</description>
+		<description>Stellar Assault (Europe) ~ Shadow Squadron (USA) (prototype, 19950306)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
@@ -1777,7 +1777,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp3" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950302)</description>
+		<description>Stellar Assault (Europe) ~ Shadow Squadron (USA) (prototype, 19950302)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
@@ -1789,7 +1789,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp4" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950222)</description>
+		<description>Stellar Assault (Europe) ~ Shadow Squadron (USA) (prototype, 19950222)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1801,7 +1801,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp5" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950213)</description>
+		<description>Stellar Assault (Europe) ~ Shadow Squadron (USA) (prototype, 19950213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1813,7 +1813,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp6" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950206)</description>
+		<description>Stellar Assault (Europe) ~ Shadow Squadron (USA) (prototype, 19950206)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1839,7 +1839,7 @@ license:CC0
 	</software>
 
 	<software name="sharrierju" cloneof="sharrier">
-		<description>Space Harrier (Jpn, USA)</description>
+		<description>Space Harrier (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-4005 (JPN)"/>
@@ -1892,7 +1892,7 @@ license:CC0
 	</software>
 
 	<software name="swaj" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Jpn)</description>
+		<description>Star Wars Arcade (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-4002"/>
@@ -1922,7 +1922,7 @@ license:CC0
 	</software>
 
 	<software name="swap" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Euro, prototype, 19941007-B)</description>
+		<description>Star Wars Arcade (Europe, prototype, 19941007-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1933,7 +1933,7 @@ license:CC0
 	</software>
 
 	<software name="swap1" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Euro, prototype, 19941006-P)</description>
+		<description>Star Wars Arcade (Europe, prototype, 19941006-P)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1944,7 +1944,7 @@ license:CC0
 	</software>
 
 	<software name="swap2" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Jpn, prototype, 19941005)</description>
+		<description>Star Wars Arcade (Japan, prototype, 19941005)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1955,7 +1955,7 @@ license:CC0
 	</software>
 
 	<software name="swap3" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Jpn, prototype, 19941003)</description>
+		<description>Star Wars Arcade (Japan, prototype, 19941003)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1966,7 +1966,7 @@ license:CC0
 	</software>
 
 	<software name="swap4" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Jpn, prototype, 19940930-B)</description>
+		<description>Star Wars Arcade (Japan, prototype, 19940930-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1977,7 +1977,7 @@ license:CC0
 	</software>
 
 	<software name="swap5" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Euro, prototype, 19940929)</description>
+		<description>Star Wars Arcade (Europe, prototype, 19940929)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2120,7 +2120,7 @@ license:CC0
 	</software>
 
 	<software name="tmek">
-		<description>T-Mek (Euro, USA)</description>
+		<description>T-Mek (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -2132,7 +2132,7 @@ license:CC0
 	</software>
 
 	<software name="tempo">
-		<description>Tempo (Jpn, USA)</description>
+		<description>Tempo (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-4009 (JPN)"/>
@@ -2258,7 +2258,7 @@ license:CC0
 	</software>
 
 	<software name="vf">
-		<description>Virtua Fighter (Euro)</description>
+		<description>Virtua Fighter (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2270,7 +2270,7 @@ license:CC0
 	</software>
 
 	<software name="vfju" cloneof="vf">
-		<description>Virtua Fighter (Jpn, USA)</description>
+		<description>Virtua Fighter (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-4013 (JPN)"/>
@@ -2386,7 +2386,7 @@ license:CC0
 	</software>
 
 	<software name="vrdxj" cloneof="vrdx" supported="no">
-		<description>Virtua Racing Deluxe (Jpn)</description>
+		<description>Virtua Racing Deluxe (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-5001 (JPN)"/>
@@ -2505,7 +2505,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2k">
-		<description>Motherbase (Euro)</description>
+		<description>Motherbase (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="84512-50"/>
@@ -2518,7 +2518,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kju" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA)</description>
+		<description>Parasquad (Japan) ~ Zaxxon's Motherbase 2000 (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GM-4012 (JPN)"/>
@@ -2533,7 +2533,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950331)</description>
+		<description>Parasquad (Japan) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950331)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2545,7 +2545,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp1" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950315)</description>
+		<description>Parasquad (Japan) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950315)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2557,7 +2557,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp2" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950310)</description>
+		<description>Parasquad (Japan) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950310)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2569,7 +2569,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp3" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950306)</description>
+		<description>Parasquad (Japan) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950306)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2581,7 +2581,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp4" cloneof="zaxxon2k" supported="no">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950303)</description>
+		<description>Parasquad (Japan) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950303)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2593,7 +2593,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp5" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950227)</description>
+		<description>Parasquad (Japan) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950227)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2605,7 +2605,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp6" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950223)</description>
+		<description>Parasquad (Japan) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950223)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2617,7 +2617,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp7" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950221)</description>
+		<description>Parasquad (Japan) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950221)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2629,7 +2629,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp8" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950210)</description>
+		<description>Parasquad (Japan) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950210)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
