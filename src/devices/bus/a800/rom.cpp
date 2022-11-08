@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(A800_ROM_16KB,      a800_rom_16kb_device,      "a800_rom_16kb
 DEFINE_DEVICE_TYPE(A800_ROM_RIGHT,     a800_rom_right_device,     "a800_rom_right","Atari 800 ROM Right Carts")
 DEFINE_DEVICE_TYPE(XEGS_ROM,           xegs_rom_device,           "a800_xegs",     "Atari XEGS 64K ROM Carts")
 
-DEFINE_DEVICE_TYPE(A5200_ROM,          a5200_rom_device,          "a5200",         "Atari 5200 ROM Cart")
+DEFINE_DEVICE_TYPE(A5200_ROM,          a5200_rom_device,          "a5200_rom",     "Atari 5200 ROM Cart")
 DEFINE_DEVICE_TYPE(A5200_ROM_2CHIPS,   a5200_rom_2chips_device,   "a5200_16k2c",   "Atari 5200 ROM Cart 16K in 2 Chips")
 DEFINE_DEVICE_TYPE(A5200_ROM_BBSB,     a5200_rom_bbsb_device,     "a5200_bbsb",    "Atari 5200 ROM Cart BBSB")
 

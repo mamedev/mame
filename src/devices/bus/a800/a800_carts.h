@@ -119,7 +119,7 @@ static void a800_right(device_slot_interface &device)
 
 static void a5200_carts(device_slot_interface &device)
 {
-	device.option_add_internal("a5200",         A5200_ROM);
+	device.option_add_internal("a5200_rom",     A5200_ROM);
 	device.option_add_internal("a5200_2chips",  A5200_ROM_2CHIPS);
 	device.option_add_internal("a5200_bbsb",    A5200_ROM_BBSB);
 	// (#71-#74) Bryan Edewaard's "Super Cart"

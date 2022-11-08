@@ -318,7 +318,7 @@ protected:
 	optional_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
-	required_device<a800_cart_slot_device> m_cartleft;
+	optional_device<a800_cart_slot_device> m_cartleft;
 	memory_view m_cart_rd4_view, m_cart_rd5_view;
 	optional_device_array<vcs_control_port_device, 4> m_ctrl;
 
@@ -469,8 +469,9 @@ private:
 class a5200_state : public a400_state
 {
 public:
-	a5200_state(const machine_config &mconfig, device_type type, const char *tag) :
-		a400_state(mconfig, type, tag)
+	a5200_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a400_state(mconfig, type, tag)
+		, m_cart(*this, "cart")
 	{ }
 
 	void a5200(machine_config &config);
@@ -478,6 +479,8 @@ public:
 
 private:
 //  virtual void machine_start() override;
+
+	required_device<a5200_cart_slot_device> m_cart;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
 
@@ -2232,6 +2235,8 @@ void a5200_state::a5200(machine_config &config)
 {
 	atari_common_nodac(config);
 
+	config.device_remove("cartleft")
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &a5200_state::a5200_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a5200_state::a5200_interrupt), "screen", 0, 1);
 
@@ -2257,7 +2262,7 @@ void a5200_state::a5200(machine_config &config)
 
 	config_ntsc_screen(config);
 
-	A5200_CART_SLOT(config, m_cartleft, a5200_carts, nullptr);
+	A5200_CART_SLOT(config, m_cart, a5200_carts, nullptr);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("a5200");

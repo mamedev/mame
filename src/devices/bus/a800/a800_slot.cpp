@@ -211,10 +211,10 @@ static const a800_slot slot_list[] =
 	{ ATARIMAX_MAXFLASH_1MB, "maxflash_1mb" },
 	{ A800_ADAWLIAH,  "a800_adawliah" },
 	{ A800_8K_RIGHT,  "a800_8k_right" },
-	{ A5200_4K,       "a5200" },
-	{ A5200_8K,       "a5200" },
-	{ A5200_16K,      "a5200" },
-	{ A5200_32K,      "a5200" },
+	{ A5200_4K,       "a5200_rom" },
+	{ A5200_8K,       "a5200_rom" },
+	{ A5200_16K,      "a5200_rom" },
+	{ A5200_32K,      "a5200_rom" },
 	{ A5200_16K_2CHIPS, "a5200_2chips" },
 	{ A5200_BBSB,     "a5200_bbsb" }
 };
@@ -509,7 +509,7 @@ std::string a5200_cart_slot_device::get_default_card_software(get_default_card_s
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot("a5200");
+	return software_get_default_slot("a5200_rom");
 }
 
 
