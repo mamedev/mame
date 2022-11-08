@@ -183,8 +183,14 @@ void xegs_rom_device::cctl_map(address_map &map)
 
  -------------------------------------------------*/
 
+a5200_rom_device::a5200_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_a5200_cart_interface( mconfig, *this )
+{
+}
+
 a5200_rom_device::a5200_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A5200_ROM, tag, owner, clock)
+	: a5200_rom_device(mconfig, A5200_ROM, tag, owner, clock)
 {
 }
 
@@ -193,6 +199,10 @@ void a5200_rom_device::cart_map(address_map &map)
 	map(0x0000, 0x7fff).lr8(
 		NAME([this](offs_t offset) { return m_rom[(offset & (m_rom_size - 1))]; })
 	);
+}
+
+void a5200_rom_device::device_start()
+{
 }
 
 /*-------------------------------------------------

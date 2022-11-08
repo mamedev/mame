@@ -40,13 +40,25 @@ device_a800_cart_interface::device_a800_cart_interface (const machine_config &mc
 	m_slot = dynamic_cast<a800_cart_slot_device *>(device.owner());
 }
 
-// TODO: separate a5200 to own interface
+device_a5200_cart_interface::device_a5200_cart_interface (const machine_config &mconfig, device_t &device)
+	: device_interface(device, "a5200cart")
+	, m_rom(nullptr)
+	, m_rom_size(0)
+	, m_bank_mask(0)
+{
+	m_slot = dynamic_cast<a5200_cart_slot_device *>(device.owner());
+}
+
 
 //-------------------------------------------------
 //  ~device_a800_cart_interface  - destructor
 //-------------------------------------------------
 
 device_a800_cart_interface::~device_a800_cart_interface ()
+{
+}
+
+device_a5200_cart_interface::~device_a5200_cart_interface ()
 {
 }
 
@@ -77,11 +89,8 @@ void device_a800_cart_interface::interface_pre_start()
 
 void device_a800_cart_interface::interface_post_start()
 {
-	// TODO: a5200 can't possibly work with this (needs 0x7fff)
-	// it may far better to just separate the two interfaces at this point ...
 	m_slot->m_space_mem->install_device(0x0000, 0x3fff, *this, &device_a800_cart_interface::cart_map);
 	m_slot->m_space_io->install_device(0x0000, 0x00ff, *this, &device_a800_cart_interface::cctl_map);
-
 }
 
 void device_a800_cart_interface::cart_map(address_map &map)
@@ -100,6 +109,39 @@ WRITE_LINE_MEMBER( device_a800_cart_interface::rd5_w ) { m_slot->m_rd5_cb(state)
 WRITE_LINE_MEMBER( device_a800_cart_interface::rd_both_w ) { rd4_w(state); rd5_w(state); }
 
 
+// a5200
+
+void device_a5200_cart_interface::rom_alloc(uint32_t size)
+{
+	if (m_rom == nullptr)
+	{
+		// TODO: shouldn't really load from fixed tag
+		// (particularly inconvenient for stuff like flash ROM hookups)
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom_size = size;
+
+		// setup other helpers
+		// TODO: unusable for SIC! and any other mapping that maps over 0x4000 rather than 0x2000
+		m_bank_mask = (size / 0x2000) - 1;  // code for XEGS carts makes use of this to simplify banking
+	}
+}
+
+void device_a5200_cart_interface::cart_map(address_map &map)
+{
+	map(0x0000, 0x7fff).unmaprw();
+}
+
+void device_a5200_cart_interface::interface_pre_start()
+{
+	if (!m_slot->started())
+		throw device_missing_dependencies();
+}
+
+void device_a5200_cart_interface::interface_post_start()
+{
+	m_slot->m_space_mem->install_device(0x0000, 0x7fff, *this, &device_a5200_cart_interface::cart_map);
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -108,14 +150,12 @@ WRITE_LINE_MEMBER( device_a800_cart_interface::rd_both_w ) { rd4_w(state); rd5_w
 //  ****_cart_slot_device - constructor
 //-------------------------------------------------
 
-// TODO: CCTL area doesn't really exist for a5200 carts
-a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
+a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, A800_CART_SLOT, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_a800_cart_interface>(mconfig, *this)
 	, m_cart(nullptr)
-	, m_type(0)
 	, m_rd4_cb(*this)
 	, m_rd5_cb(*this)
 	, m_space_mem_config("cart_mem", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor())
@@ -123,14 +163,13 @@ a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, devi
 {
 }
 
-a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a800_cart_slot_device(mconfig, A800_CART_SLOT, tag, owner, clock)
-{
-}
-
-
-a5200_cart_slot_device::a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a800_cart_slot_device(mconfig, A5200_CART_SLOT, tag, owner, clock)
+a5200_cart_slot_device::a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, A5200_CART_SLOT, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_a5200_cart_interface>(mconfig, *this)
+	, m_cart(nullptr)
+	, m_space_mem_config("cart_mem", ENDIANNESS_LITTLE, 8, 15, 0, address_map_constructor())
 {
 }
 
@@ -162,6 +201,12 @@ void a800_cart_slot_device::device_resolve_objects()
 {
 	m_rd4_cb.resolve_safe();
 	m_rd5_cb.resolve_safe();
+}
+
+void a5200_cart_slot_device::device_start()
+{
+	m_cart = get_card_device();
+	m_space_mem = &space(AS_PROGRAM);
 }
 
 /*-------------------------------------------------
@@ -298,13 +343,70 @@ image_init_result a800_cart_slot_device::call_load()
 }
 
 
-/*-------------------------------------------------
- call_unload
- -------------------------------------------------*/
+image_init_result a5200_cart_slot_device::call_load()
+{
+	if (m_cart)
+	{
+		uint32_t len;
+
+		if (loaded_through_softlist())
+		{
+			const char *pcb_name;
+			len = get_software_region_length("rom");
+
+			m_cart->rom_alloc(len);
+			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
+
+			if ((pcb_name = get_feature("slot")) != nullptr)
+				m_type = a800_get_pcb_id(pcb_name);
+			else
+				m_type = A800_8K;
+		}
+		else
+		{
+			len = length();
+
+			// check whether there is an header, to identify the cart type
+			if ((len % 0x1000) == 0x10)
+			{
+				uint8_t header[16];
+				fread(header, 0x10);
+				m_type = identify_cart_type(header);
+				len -= 0x10;    // in identify_cart_type the first 0x10 bytes are read, so we need to adjust here
+			}
+			else    // otherwise try to guess based on size
+			{
+				if (len == 0x8000)
+					m_type = A5200_32K;
+				if (len == 0x4000)
+					m_type = A800_16K;
+				if (len == 0x2000)
+					m_type = A800_8K;
+				if (len == 0x1000)
+					m_type = A5200_4K;
+				// also make a try with .hsi file (for .a52 files)
+				std::string info;
+				if (hashfile_extrainfo(*this, info) && info.compare("A13MIRRORING")==0)
+					m_type = A5200_16K_2CHIPS;
+			}
+
+			m_cart->rom_alloc(len);
+			fread(m_cart->get_rom_base(), len);
+		}
+
+		logerror("%s loaded cartridge '%s' size %dK\n", machine().system().name, filename(), len/1024);
+	}
+	return image_init_result::PASS;
+}
 
 void a800_cart_slot_device::call_unload()
 {
 }
+
+void a5200_cart_slot_device::call_unload()
+{
+}
+
 
 /*-------------------------------------------------
  identify_cart_type - code to detect cart type from
@@ -312,6 +414,120 @@ void a800_cart_slot_device::call_unload()
  -------------------------------------------------*/
 
 int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
+{
+	int type = A800_8K;
+
+	// TODO: canonically applies to .car extension only, have 10 bytes extra header on top
+
+	// check CART format
+	if (strncmp((const char *)header, "CART", 4))
+		fatalerror("Invalid header detected!\n");
+
+	switch ((header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0))
+	{
+		case 1:
+			type = A800_8K;
+			break;
+		case 2:
+			type = A800_16K;
+			break;
+		case 3:
+			type = A800_OSS034M;
+			break;
+		case 8:
+			type = A800_WILLIAMS;
+			break;
+		case 9:
+			type = A800_DIAMOND;
+			break;
+		case 10:
+			type = A800_EXPRESS;
+			break;
+		case 11:
+			type = A800_SPARTADOS;
+			break;
+		case 12:
+			type = A800_XEGS;
+			break;
+		case 15:
+			type = A800_OSSM091;
+			break;
+		case 17:
+			type = A800_ATRAX;
+			break;
+		case 18:
+			type = A800_BBSB;
+			break;
+		case 21:
+			type = A800_8K_RIGHT;
+			break;
+		case 39:
+			type = A800_PHOENIX;
+			break;
+		case 40:
+			type = A800_BLIZZARD;
+			break;
+		case 41:
+			type = ATARIMAX_MAXFLASH_128KB;
+			break;
+		case 42:
+			type = ATARIMAX_MAXFLASH_1MB;
+			break;
+		case 43:
+			type = A800_SPARTADOS_128KB;
+			break;
+		case 44:
+			type = A800_OSS8K;
+			break;
+		case 50:
+			type = A800_TURBO;
+			break;
+		case 51:
+			type = A800_TURBO;
+			break;
+		case 52:
+			type = A800_ULTRACART;
+			break;
+		case 54:
+			type = SIC_128KB;
+			break;
+		case 55:
+			type = SIC_256KB;
+			break;
+		case 56:
+			type = SIC_512KB;
+			break;
+		case 69:
+			type = A800_ADAWLIAH;
+			break;
+		// Atari 5200 CART files
+		case 4:
+			type = A5200_32K;
+			break;
+		case 16:
+			type = A5200_16K;
+			break;
+		case 19:
+			type = A5200_8K;
+			break;
+		case 20:
+			type = A5200_4K;
+			break;
+		case 6:
+			type = A5200_16K_2CHIPS;
+			break;
+		case 7:
+			type = A5200_BBSB;
+			break;
+		default:
+			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", (header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0));
+			break;
+	}
+
+	return type;
+}
+
+int a5200_cart_slot_device::identify_cart_type(const uint8_t *header) const
 {
 	int type = A800_8K;
 
@@ -548,4 +764,21 @@ uint8_t a800_cart_slot_device::read_cctl(offs_t offset)
 void a800_cart_slot_device::write_cctl(offs_t offset, uint8_t data)
 {
 	m_space_io->write_byte(offset, data);
+}
+
+device_memory_interface::space_config_vector a5200_cart_slot_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(AS_PROGRAM, &m_space_mem_config)
+	};
+}
+
+uint8_t a5200_cart_slot_device::read_cart(offs_t offset)
+{
+	return m_space_mem->read_byte(offset);
+}
+
+void a5200_cart_slot_device::write_cart(offs_t offset, uint8_t data)
+{
+	return m_space_mem->write_byte(offset, data);
 }

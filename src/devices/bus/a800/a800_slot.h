@@ -52,10 +52,7 @@ enum
 	A5200_BBSB
 };
 
-
 class a800_cart_slot_device;
-
-// ======================> device_a800_cart_interface
 
 class device_a800_cart_interface : public device_interface
 {
@@ -112,19 +109,16 @@ public:
 	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~a800_cart_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
-	virtual void call_unload() override;
-
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "a8bit_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,rom,car"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
-
-	int get_cart_type() { return m_type; }
 	int identify_cart_type(const uint8_t *header) const;
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+
 	bool has_cart() { return m_cart != nullptr; }
 	auto rd4_callback() { return m_rd4_cb.bind(); }
 	auto rd5_callback() { return m_rd5_cb.bind(); }
@@ -135,7 +129,7 @@ public:
 	void write_cctl(offs_t offset, uint8_t data);
 
 protected:
-	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	//a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -144,7 +138,6 @@ protected:
 
 private:
 	device_a800_cart_interface*       m_cart;
-	int m_type;
 
 	devcb_write_line m_rd4_cb;
 	devcb_write_line m_rd5_cb;
@@ -154,10 +147,46 @@ private:
 
 	address_space *m_space_mem;
 	address_space *m_space_io;
+
+	int m_type;
 };
 
-class a5200_cart_slot_device : public a800_cart_slot_device
+class a5200_cart_slot_device;
+
+class device_a5200_cart_interface : public device_interface
 {
+public:
+	// construction/destruction
+	virtual ~device_a5200_cart_interface();
+
+	virtual void cart_map(address_map &map);
+
+	// TODO: remove all of this
+	void rom_alloc(uint32_t size);
+	uint8_t* get_rom_base() { return m_rom; }
+	uint32_t get_rom_size() { return m_rom_size; }
+
+protected:
+	device_a5200_cart_interface(const machine_config &mconfig, device_t &device);
+
+	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
+	a5200_cart_slot_device *m_slot;
+
+	// internal state
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
+	// helpers
+	int m_bank_mask;
+};
+
+
+class a5200_cart_slot_device : public device_t,
+								public device_memory_interface,
+								public device_cartrom_image_interface,
+								public device_single_card_slot_interface<device_a5200_cart_interface>
+{
+	friend class device_a5200_cart_interface;
 public:
 	// construction/destruction
 	template <typename T>
@@ -172,10 +201,29 @@ public:
 	a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a5200_cart_slot_device();
 
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "a8bit_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,rom,car,a52"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
+	int identify_cart_type(const uint8_t *header) const;
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+
+	u8 read_cart(offs_t offset);
+	void write_cart(offs_t offset, u8 data);
+
+protected:
+	virtual void device_start() override;
+	virtual space_config_vector memory_space_config() const override;
+
+private:
+	device_a5200_cart_interface*       m_cart;
+	address_space_config m_space_mem_config;
+
+	address_space *m_space_mem;
+	int m_type;
 };
 
 // device type definition

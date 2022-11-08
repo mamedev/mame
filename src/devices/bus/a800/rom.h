@@ -65,12 +65,18 @@ protected:
 	int m_bank;
 };
 
-class a5200_rom_device : public a800_rom_device
+class a5200_rom_device : public device_t,
+						public device_a5200_cart_interface
 {
 public:
 	a5200_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void cart_map(address_map &map) override;
+
+protected:
+	a5200_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
 };
 
 class a5200_rom_2chips_device : public a800_rom_device
