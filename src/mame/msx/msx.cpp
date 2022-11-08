@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 /*
-** msx.cpp : Enulation of the MSX family of machines
+** msx.cpp : Emulation of the MSX family of machines
 **
 ** Special usage notes:
 **
