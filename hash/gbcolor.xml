@@ -26122,8 +26122,8 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="GBCK003" />
 			<feature name="slot" value="rom_gbck003" />
-			<dataarea name="rom" size="8388608">
-				<rom name="m29w640ft.u2" size="8388608" crc="e4068d7d" sha1="e61ee50ed39fd5b5cc8bdcb96fe1c3cccdcfc76f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="m29w640ft.u2" size="0x800000" crc="e4068d7d" sha1="e61ee50ed39fd5b5cc8bdcb96fe1c3cccdcfc76f" />
 			</dataarea>
 		</part>
 	</software>
@@ -26134,11 +26134,10 @@ license:CC0
 		<publisher>Sintax</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="digimon crystal ii (unlicensed, english) [raw dump].bin" size="2097152" crc="685e76df" sha1="4e981044ac3a40d7a9cd63b79d5982b4b4e670a5" offset="0" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="digimon crystal ii (unlicensed, english) [raw dump].bin" size="0x200000" crc="685e76df" sha1="4e981044ac3a40d7a9cd63b79d5982b4b4e670a5" offset="0" />
 			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26149,11 +26148,10 @@ license:CC0
 		<info name="alt_title" value="老夫子傳奇"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="lao fuzi chuanqi (unlicensed, chinese) [raw dump].bin" size="2097152" crc="aeca45be" sha1="b7193fcb8b9b8958a2522be0d1a3874cffc1e1db" offset="0" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="lao fuzi chuanqi (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="aeca45be" sha1="b7193fcb8b9b8958a2522be0d1a3874cffc1e1db" offset="0" />
 			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26164,11 +26162,10 @@ license:CC0
 		<info name="alt_title" value="越南戰役X-深入敵後"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="yuenan zhanyi x - shenru dihou (unlicensed, chinese) [raw dump].bin" size="2097152" crc="602951a6" sha1="6703e9f68b989c976e93bd2eb63f884ceaff63f1" offset="0" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="yuenan zhanyi x - shenru dihou (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="602951a6" sha1="6703e9f68b989c976e93bd2eb63f884ceaff63f1" offset="0" />
 			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26179,11 +26176,10 @@ license:CC0
 		<info name="alt_title" value="七龍珠Z3"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="qi long zhu z 3 (dragon ball - advance adventure) (unlicensed, chinese) [raw dump].bin" size="2097152" crc="ccfdd63a" sha1="4f3b63cd11522b6fb291661f4d918601d95138e0" offset="0" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="qi long zhu z 3 (dragon ball - advance adventure) (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="ccfdd63a" sha1="4f3b63cd11522b6fb291661f4d918601d95138e0" offset="0" />
 			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26195,11 +26191,10 @@ license:CC0
 		<info name="alt_title" value="魔獸世紀-戰神"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="mo shou shi ji - zhan shen (unlicensed, chinese) [raw dump].bin" size="2097152" crc="80c4fd52" sha1="d2569f8176164cef1cc2a8bd94949ea9cd7dbbea"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="mo shou shi ji - zhan shen (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="80c4fd52" sha1="d2569f8176164cef1cc2a8bd94949ea9cd7dbbea"/>
 			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26210,11 +26205,10 @@ license:CC0
 		<info name="alt_title" value="风之谷II"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="feng zhi gou ii (unlicensed, chinese) [raw dump].bin" size="2097152" crc="842cb4fe" sha1="4322980e5b21332a71fb7fcadbf57a79aad6346b"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="feng zhi gou ii (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="842cb4fe" sha1="4322980e5b21332a71fb7fcadbf57a79aad6346b"/>
 			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26225,11 +26219,10 @@ license:CC0
 		<info name="alt_title" value="2003数码暴龙 格斗版"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="2003 shu ma bao long - ge dou ban (unlicensed, chinese) [raw dump].bin" size="2097152" crc="1219eec6" sha1="4a722c10e3893e04c67a66d0aea401d6d220ec7e"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="2003 shu ma bao long - ge dou ban (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="1219eec6" sha1="4a722c10e3893e04c67a66d0aea401d6d220ec7e"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192"> <!-- Internal header says 2K... -->
-			</dataarea>
+			<dataarea name="nvram" size="0x2000" /> <!-- Internal header says 2K... -->
 		</part>
 	</software>
 
@@ -26241,11 +26234,10 @@ license:CC0
 		<info name="alt_title" value="络克英雄EXE5" /> <!-- Cart -->
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="luo ke ying xiong exe5 (luo ke ren x5) (unlicensed, chinese) [raw dump].bin" size="2097152" crc="51f92403" sha1="c498a5fb261e921828831bff5c2c705453ea314e"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="luo ke ying xiong exe5 (luo ke ren x5) (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="51f92403" sha1="c498a5fb261e921828831bff5c2c705453ea314e"/>
 			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26256,11 +26248,10 @@ license:CC0
 		<info name="alt_title" value="2003 古惑狼II (Cart)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="2003 gu huo lang ii (unlicensed, chinese) [raw dump].bin" size="2097152" crc="74d71b0c" sha1="fcbb769de0896ae69fe1063fa5d87cf079c8606a"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="2003 gu huo lang ii (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="74d71b0c" sha1="fcbb769de0896ae69fe1063fa5d87cf079c8606a"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26271,11 +26262,10 @@ license:CC0
 		<info name="alt_title" value="冰原歷險記II"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="bing yuan li xian ji ii (unlicensed, chinese) [raw dump].bin" size="2097152" crc="c4eba914" sha1="9e1c0c019630d7e4884ad3d5a447bd1acf668277"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="bing yuan li xian ji ii (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="c4eba914" sha1="9e1c0c019630d7e4884ad3d5a447bd1acf668277"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26287,11 +26277,10 @@ license:CC0
 		<info name="alt_title" value="口袋妖怪-白金版"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="kou dai yao guai - bai jin ban (unlicensed, chinese) [raw dump].bin" size="2097152" crc="998ad382" sha1="f9013985d7c40eccfa863e2ba808e64deaa4b384"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="kou dai yao guai - bai jin ban (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="998ad382" sha1="f9013985d7c40eccfa863e2ba808e64deaa4b384"/>
 			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26303,11 +26292,66 @@ license:CC0
 		<info name="alt_title" value="越南戰役3"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="yue nan zhan yi 3 (unlicensed, chinese) [raw dump].bin" size="2097152" crc="9268bb9f" sha1="17ceb35582c89303f206eb7e93cbfe8a4c2b5aaa"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="yue nan zhan yi 3 (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="9268bb9f" sha1="17ceb35582c89303f206eb7e93cbfe8a4c2b5aaa"/>
 			</dataarea>
-			<dataarea name="nvram" size="32768">
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="suprsnk2">
+		<description>Chāojí Yīnsù Xiǎozi Ⅱ - Super Sonik (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="超級音速的小子Ⅱ Super Sonik"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="chaoji yinsu xiaozi ii super sonik.gbc" size="0x200000" crc="a9dd9da7" sha1="006df0ddb10c5970002134da4d75ccc466e95edd" />
 			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantsimb">
+		<description>Fantastic Simulated Battle (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="Langrsr II" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="fantastic simulated battle.gbc" size="0x200000" crc="9268bb9f" sha1="747707afd771d73dbbdeeeaec1c1201f2729fb8a" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="mnghnmn2" cloneof="fantsimb">
+		<description>Mènghuàn Mónǐ Zhàn Ⅱ (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="夢幻模擬戰Ⅱ" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="menghuan moni zhan ii.gbc" size="0x200000" crc="366067e8" sha1="745e43cba91ed6f2af0bdedf136f4247d690aa1a" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="shenguid">
+		<!-- not sure how the hiragana の (no) in the title should be read - assuming it's a stylised 之 -->
+		<description>Shénguǐ Dìguó zhī Èmó Chéng (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="神鬼帝國の惡魔城" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="shengui diguo zhi emo cheng.gbc" size="0x200000" crc="366067e8" sha1="3fc2533f71cea3aec6310f5f7c33fa7eac427b99" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -26404,18 +26448,30 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mgear2">
-		<description>Hejin Zhuangbei II (China)</description>
+	<software name="matelgr2">
+		<description>Matel Gear II (China)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
-		<info name="alt_title" value="合金裝備II"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="he jin zhuang bei ii (unlicensed, chinese) [raw dump].bin" size="2097152" crc="ef4bbb34" sha1="6a15fc7dbb3b9d7c130b9a25b568d39c655d68ca"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="matel gear ii.gbc" size="0x200000" crc="55494332" sha1="64da797bb0b6fe97b1956443f7bed4555436af46" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="hejinzb2" cloneof="matelgr2">
+		<description>Héjīn Zhuāngbèi Ⅱ (China)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="合金裝備Ⅱ"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="hejin zhuangbei ii.gbc" size="0x200000" crc="ef4bbb34" sha1="6a15fc7dbb3b9d7c130b9a25b568d39c655d68ca" />
 			</dataarea>
+			<dataarea name="nvram" size="0x2000" />
 		</part>
 	</software>
 
@@ -27158,7 +27214,7 @@ license:CC0
 	</software>
 
 	<software name="chongwu">
-	<!-- This appears to be a re-release of a Li Cheng / Niutoude game, givern that
+	<!-- This appears to be a re-release of a Li Cheng / Niutoude game, given that
 	     it contains the Niutoude logo, with most of the protection checks patched
 	     out. -->
 	<!-- 1byte difference between this and the hacked version... check what is about! -->
