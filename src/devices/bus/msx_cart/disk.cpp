@@ -102,6 +102,7 @@
 
 #include "emu.h"
 #include "disk.h"
+#include "formats/dmk_dsk.h"
 #include "formats/msx_dsk.h"
 #include "softlist_dev.h"
 
@@ -115,6 +116,7 @@ void msx_cart_disk_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_MSX_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
 }
 
 
@@ -125,7 +127,7 @@ static void msx_floppies(device_slot_interface &device)
 }
 
 
-msx_cart_disk_device::msx_cart_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_disk_device::msx_cart_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_floppy0(*this, "fdc:0")
@@ -135,14 +137,14 @@ msx_cart_disk_device::msx_cart_disk_device(const machine_config &mconfig, device
 }
 
 
-msx_cart_disk_wd_device::msx_cart_disk_wd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_disk_wd_device::msx_cart_disk_wd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_disk_device(mconfig, type, tag, owner, clock)
 	, m_fdc(*this, "fdc")
 {
 }
 
 
-msx_cart_disk_type1_device::msx_cart_disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_disk_type1_device::msx_cart_disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_disk_wd_device(mconfig, type, tag, owner, clock)
 	, m_led(*this, "led0")
 	, m_side_control(0)
@@ -151,7 +153,7 @@ msx_cart_disk_type1_device::msx_cart_disk_type1_device(const machine_config &mco
 }
 
 
-msx_cart_disk_type2_device::msx_cart_disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_disk_type2_device::msx_cart_disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_disk_wd_device(mconfig, type, tag, owner, clock)
 	, m_led(*this, "led0")
 	, m_control(0)
@@ -159,32 +161,32 @@ msx_cart_disk_type2_device::msx_cart_disk_type2_device(const machine_config &mco
 }
 
 
-msx_cart_vy0010_device::msx_cart_vy0010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_vy0010_device::msx_cart_vy0010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_disk_type1_device(mconfig, MSX_CART_VY0010, tag, owner, clock)
 {
 }
 
 
-msx_cart_fsfd1_device::msx_cart_fsfd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_fsfd1_device::msx_cart_fsfd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_disk_type1_device(mconfig, MSX_CART_FSFD1, tag, owner, clock)
 {
 }
 
 
-msx_cart_fscf351_device::msx_cart_fscf351_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_fscf351_device::msx_cart_fscf351_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_disk_type2_device(mconfig, MSX_CART_FSCF351, tag, owner, clock)
 {
 }
 
 
-msx_cart_disk_tc8566_device::msx_cart_disk_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_disk_tc8566_device::msx_cart_disk_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_disk_device(mconfig, type, tag, owner, clock)
 	, m_fdc(*this, "fdc")
 {
 }
 
 
-msx_cart_fsfd1a_device::msx_cart_fsfd1a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_fsfd1a_device::msx_cart_fsfd1a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_disk_tc8566_device(mconfig, MSX_CART_FSFD1A, tag, owner, clock)
 {
 }
@@ -192,7 +194,7 @@ msx_cart_fsfd1a_device::msx_cart_fsfd1a_device(const machine_config &mconfig, co
 
 void msx_cart_disk_device::initialize_cartridge()
 {
-	if ( get_rom_size() != 0x4000 )
+	if (get_rom_size() != 0x4000)
 	{
 		fatalerror("msx_cart_disk_device: Invalid ROM size\n");
 	}
@@ -218,6 +220,7 @@ void msx_cart_vy0010_device::device_add_mconfig(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
 	SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
 }
+
 
 void msx_cart_fsfd1_device::device_add_mconfig(machine_config &config)
 {
@@ -276,6 +279,41 @@ void msx_cart_disk_type1_device::device_start()
 	save_item(NAME(m_control));
 }
 
+void msx_cart_disk_type1_device::initialize_cartridge()
+{
+	msx_cart_disk_wd_device::initialize_cartridge();
+
+	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, read8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::side_control_r)));
+	page(1)->install_read_handler(0x7ffd, 0x7ffd, read8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::control_r)));
+	page(1)->install_read_handler(0x7fff, 0x7fff, read8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::status_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ffa, 0x7ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::set_side_control)));
+	page(1)->install_write_handler(0x7ffd, 0x7ffd, write8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::set_control)));
+
+	// TODO No idea why, but without this the other handlers do not get recognized
+	page(2)->install_rom(0xbff8,0xbff8, get_rom_base());
+	page(2)->install_read_handler(0xbff8, 0xbff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(2)->install_read_handler(0xbff9, 0xbff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(2)->install_read_handler(0xbffc, 0xbffc, read8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::side_control_r)));
+	page(2)->install_read_handler(0xbffd, 0xbffd, read8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::control_r)));
+	page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::status_r)));
+	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(2)->install_write_handler(0xbffa, 0xbffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(2)->install_write_handler(0xbffc, 0xbffc, write8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::set_side_control)));
+	page(2)->install_write_handler(0xbffd, 0xbffd, write8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::set_control)));
+}
 
 void msx_cart_disk_type1_device::device_post_load()
 {
@@ -286,7 +324,6 @@ void msx_cart_disk_type1_device::device_post_load()
 
 	set_control(data);
 }
-
 
 void msx_cart_disk_type1_device::set_control(uint8_t data)
 {
@@ -324,7 +361,6 @@ void msx_cart_disk_type1_device::set_control(uint8_t data)
 	}
 }
 
-
 void msx_cart_disk_type1_device::set_side_control(uint8_t data)
 {
 	m_side_control = data;
@@ -335,93 +371,26 @@ void msx_cart_disk_type1_device::set_side_control(uint8_t data)
 	}
 }
 
-
 void msx_cart_disk_type1_device::device_reset()
 {
 	m_fdc->dden_w(false);
 }
 
-
-uint8_t msx_cart_disk_type1_device::read_cart(offs_t offset)
+u8 msx_cart_disk_type1_device::side_control_r()
 {
-	switch (offset)
-	{
-		case 0x7ff8:
-		case 0xbff8:
-			return m_fdc->status_r();
-
-		case 0x7ff9:
-		case 0xbff9:
-			return m_fdc->track_r();
-
-		case 0x7ffa:
-		case 0xbffa:
-			return m_fdc->sector_r();
-
-		case 0x7ffb:
-		case 0xbffb:
-			return m_fdc->data_r();
-
-		case 0x7ffc:
-		case 0xbffc:
-			return 0xfe | (m_side_control & 0x01);
-
-		case 0x7ffd:
-		case 0xbffd:
-			return ( m_control & 0x83 ) | 0x78;
-
-		case 0x7fff:
-		case 0xbfff:
-			return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
-	}
-
-	if (offset >= 0x4000 && offset < 0x8000)
-	{
-		return get_rom_base()[offset & 0x3fff];
-	}
-	return 0xff;
+	return 0xfe | (m_side_control & 0x01);
 }
 
-
-void msx_cart_disk_type1_device::write_cart(offs_t offset, uint8_t data)
+u8 msx_cart_disk_type1_device::control_r()
 {
-	switch (offset)
-	{
-		case 0x7ff8:
-		case 0xbff8:
-			m_fdc->cmd_w(data);
-			break;
-
-		case 0x7ff9:
-		case 0xbff9:
-			m_fdc->track_w(data);
-			break;
-
-		case 0x7ffa:
-		case 0xbffa:
-			m_fdc->sector_w(data);
-			break;
-
-		case 0x7ffb:
-		case 0xbffb:
-			m_fdc->data_w(data);
-			break;
-
-		case 0x7ffc:
-		case 0xbffc:
-			set_side_control(data);
-			break;
-
-		case 0x7ffd:
-		case 0xbffd:
-			set_control(data);
-			break;
-
-		default:
-			logerror("msx_cart_disk_type1_device::write_cart: Unmapped write writing %02x to %04x\n", data, offset);
-			break;
-	}
+	return ( m_control & 0x83 ) | 0x78;
 }
+
+u8 msx_cart_disk_type1_device::status_r()
+{
+	return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
+}
+
 
 
 void msx_cart_disk_type2_device::device_start()
@@ -431,12 +400,10 @@ void msx_cart_disk_type2_device::device_start()
 	save_item(NAME(m_control));
 }
 
-
 void msx_cart_disk_type2_device::device_reset()
 {
 	m_fdc->dden_w(false);
 }
-
 
 void msx_cart_disk_type2_device::device_post_load()
 {
@@ -448,8 +415,37 @@ void msx_cart_disk_type2_device::device_post_load()
 	set_control(data);
 }
 
+void msx_cart_disk_type2_device::initialize_cartridge()
+{
+	msx_cart_disk_wd_device::initialize_cartridge();
 
-void msx_cart_disk_type2_device::set_control(uint8_t data)
+	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_read_handler(0x7fb8, 0x7fb8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7fb9, 0x7fb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7fba, 0x7fba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7fbb, 0x7fbb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7fbc, 0x7fbc, read8smo_delegate(*this, FUNC(msx_cart_disk_type2_device::status_r)));
+	page(1)->install_write_handler(0x7fb8, 0x7fb8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7fb9, 0x7fb9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7fba, 0x7fba, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7fbb, 0x7fbb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7fbc, 0x7fbc, write8smo_delegate(*this, FUNC(msx_cart_disk_type2_device::set_control)));
+
+	// TODO No idea why, but without this the other handlers do not get recognized
+	page(2)->install_rom(0xbfb8,0xbfb8, get_rom_base());
+	page(2)->install_read_handler(0xbfb8, 0xbfb8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(2)->install_read_handler(0xbfb9, 0xbfb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(2)->install_read_handler(0xbfba, 0xbfba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(2)->install_read_handler(0xbfbb, 0xbfbb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(2)->install_read_handler(0xbfbc, 0xbfbc, read8smo_delegate(*this, FUNC(msx_cart_disk_type2_device::status_r)));
+	page(2)->install_write_handler(0xbfb8, 0xbfb8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(2)->install_write_handler(0xbfb9, 0xbfb9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(2)->install_write_handler(0xbfba, 0xbfba, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(2)->install_write_handler(0xbfbb, 0xbfbb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(2)->install_write_handler(0xbfbc, 0xbfbc, write8smo_delegate(*this, FUNC(msx_cart_disk_type2_device::set_control)));
+}
+
+void msx_cart_disk_type2_device::set_control(u8 data)
 {
 	uint8_t old_m_control = m_control;
 
@@ -484,73 +480,9 @@ void msx_cart_disk_type2_device::set_control(uint8_t data)
 	}
 }
 
-
-uint8_t msx_cart_disk_type2_device::read_cart(offs_t offset)
+u8 msx_cart_disk_type2_device::status_r()
 {
-	switch (offset)
-	{
-		case 0x7fb8:
-		case 0xbfb8:
-			return m_fdc->status_r();
-
-		case 0x7fb9:
-		case 0xbfb9:
-			return m_fdc->track_r();
-
-		case 0x7fba:
-		case 0xbfba:
-			return m_fdc->sector_r();
-
-		case 0x7fbb:
-		case 0xbfbb:
-			return m_fdc->data_r();
-
-		case 0x7fbc:
-		case 0xbfbc:
-			return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
-	}
-
-	if (offset >= 0x4000 && offset < 0x8000)
-	{
-		return get_rom_base()[offset & 0x3fff];
-	}
-	return 0xff;
-}
-
-
-void msx_cart_disk_type2_device::write_cart(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case 0x7fb8:
-		case 0xbfb8:
-			m_fdc->cmd_w(data);
-			break;
-
-		case 0x7fb9:
-		case 0xbfb9:
-			m_fdc->track_w(data);
-			break;
-
-		case 0x7fba:
-		case 0xbfba:
-			m_fdc->sector_w(data);
-			break;
-
-		case 0x7fbb:
-		case 0xbfbb:
-			m_fdc->data_w(data);
-			break;
-
-		case 0x7fbc:
-		case 0xbfbc:
-			set_control(data);
-			break;
-
-		default:
-			logerror("msx_cart_disk_type2_device::write_cart: Unmapped write writing %02x to %04x\n", data, offset);
-			break;
-	}
+	return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
 }
 
 
@@ -565,49 +497,21 @@ void msx_cart_fsfd1a_device::device_reset()
 {
 }
 
-
-uint8_t msx_cart_fsfd1a_device::read_cart(offs_t offset)
+void msx_cart_fsfd1a_device::initialize_cartridge()
 {
-	switch (offset)
-	{
-		case 0x7ffa:
-		case 0xbffa:
-			return m_fdc->msr_r();
+	msx_cart_disk_tc8566_device::initialize_cartridge();
 
-		case 0x7ffb:
-		case 0xbffb:
-			return m_fdc->fifo_r();
-	}
-
-	if (offset >= 0x4000 && offset < 0x8000)
-	{
-		return get_rom_base()[offset & 0x3fff];
-	}
-	return 0xff;
-}
-
-
-void msx_cart_fsfd1a_device::write_cart(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case 0x7ff8:
-		case 0xbff8:
-			m_fdc->dor_w(data);
-			break;
-
-		case 0x7ff9:
-		case 0xbff9:
-			m_fdc->cr1_w(data);
-			break;
-
-		case 0x7ffb:
-		case 0xbffb:
-			m_fdc->fifo_w(data);
-			break;
-
-		default:
-			logerror("msx_cart_fsfd1a_device::write_cart: Unmapped write writing %02x to %04x\n", data, offset);
-			break;
-	}
+	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
+	// TODO No idea why, but without this the other handlers do not get recognized
+	page(2)->install_rom(0xbffa,0xbffa, get_rom_base());
+	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
+	page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
+	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
+	page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
+	page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 }

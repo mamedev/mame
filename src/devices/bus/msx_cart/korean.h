@@ -20,74 +20,58 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 private:
-	void restore_banks();
-	void setup_bank(uint8_t bank);
+	void bank_w(offs_t offset, u8 data);
 
-	uint8_t m_bank_mask;
-	uint8_t m_selected_bank[4];
-	uint8_t *m_bank_base[4];
+	memory_bank_array_creator<4> m_rombank;
+
+	u8 m_bank_mask;
 };
 
 
 class msx_cart_korean_90in1_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_korean_90in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_korean_90in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
-
-	virtual uint8_t read_cart(offs_t offset) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 private:
-	void banking(uint8_t data);
+	void banking(u8 data);
 
-	void restore_banks();
-
-	uint8_t m_bank_mask;
-	uint8_t m_selected_bank;
-	uint8_t *m_bank_base[4];
+	memory_bank_array_creator<3> m_rombank;
+	memory_view m_view;
+	u8 m_bank_mask;
 };
 
 
 class msx_cart_korean_126in1_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_korean_126in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_korean_126in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 private:
-	void restore_banks();
-	void setup_bank(uint8_t bank);
+	void bank_w(offs_t offset, u8 data);
 
-	uint8_t m_bank_mask;
-	uint8_t m_selected_bank[2];
-	uint8_t *m_bank_base[2];
+	memory_bank_array_creator<2> m_rombank;
+	u8 m_bank_mask;
 };
 
 

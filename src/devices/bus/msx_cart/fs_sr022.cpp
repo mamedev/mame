@@ -15,18 +15,15 @@ msx_cart_fs_sr022_device::msx_cart_fs_sr022_device(const machine_config &mconfig
 {
 }
 
-
 void msx_cart_fs_sr022_device::device_start()
 {
 	save_item(NAME(m_bunsetsu_address));
 }
 
-
 void msx_cart_fs_sr022_device::device_reset()
 {
 	m_bunsetsu_address = 0;
 }
-
 
 void msx_cart_fs_sr022_device::initialize_cartridge()
 {
@@ -35,36 +32,34 @@ void msx_cart_fs_sr022_device::initialize_cartridge()
 		fatalerror("fs_sr022: Invalid ROM size\n");
 	}
 	m_bunsetsu_rom = get_rom_base() + 0x20000;
+
+	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(2)->install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
+	page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_cart_fs_sr022_device::buns_r)));
+	page(2)->install_write_handler(0xbffc, 0xbffe, write8sm_delegate(*this, FUNC(msx_cart_fs_sr022_device::buns_w)));
 }
 
-
-uint8_t msx_cart_fs_sr022_device::read_cart(offs_t offset)
+u8 msx_cart_fs_sr022_device::buns_r()
 {
-	if (offset >= 0x4000 && offset < 0xc000)
-	{
-		if (offset == 0xbfff) {
-			return m_bunsetsu_rom[m_bunsetsu_address++ & 0x1ffff];
-		}
-
-		return get_rom_base()[offset - 0x4000];
-	}
-	return 0xff;
+	u8 data = m_bunsetsu_rom[m_bunsetsu_address & 0x1ffff];
+	if (!machine().side_effects_disabled())
+		m_bunsetsu_address++;
+	return data;
 }
 
-
-void msx_cart_fs_sr022_device::write_cart(offs_t offset, uint8_t data)
+void msx_cart_fs_sr022_device::buns_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0xbffc:
+		case 0:
 			m_bunsetsu_address = (m_bunsetsu_address & 0xffff00) | data;
 			break;
 
-		case 0xbffd:
+		case 1:
 			m_bunsetsu_address = (m_bunsetsu_address & 0xff00ff) | (data << 8);
 			break;
 
-		case 0xbffe:
+		case 2:
 			m_bunsetsu_address = (m_bunsetsu_address & 0x00ffff) | (data << 16);
 			break;
 	}

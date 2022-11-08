@@ -14,26 +14,28 @@ DECLARE_DEVICE_TYPE(MSX_CART_HOLY_QURAN, msx_cart_holy_quran_device)
 class msx_cart_holy_quran_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_holy_quran_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_holy_quran_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 	virtual void device_reset() override;
-	virtual void device_post_load() override { restore_banks(); }
-
-	void restore_banks();
 
 private:
-	uint8_t m_lookup_prot[256];
-	uint8_t m_selected_bank[4];
-	uint8_t *m_bank_base[4];
-	bool m_decrypt;
+	static constexpr size_t BANK_SIZE = 0x2000;
+
+	u8 read(offs_t offset);
+	u8 read2(offs_t offset);
+	template <int Bank> void bank_w(u8 data);
+
+	memory_bank_array_creator<4> m_rombank;
+	memory_view m_view1;
+	memory_view m_view2;
+
+	std::vector<u8> m_decrypted;
+	u8 m_bank_mask;
 };
 
 

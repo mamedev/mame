@@ -111,7 +111,7 @@ u32 alien_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 u8 alien_state::fpga_r()
 {
 	u8 fpga_type = 1; // 2 bit value
-	return (fpga_type << 5) | 0x10 | (rand() & 7); // status bits TODO
+	return (fpga_type << 5) | 0x10 | (machine().rand() & 7); // status bits TODO
 }
 
 void alien_state::alien_map(address_map &map)

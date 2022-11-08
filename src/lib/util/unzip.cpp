@@ -593,17 +593,17 @@ public:
 		, m_compressed_size(header.compressed_size())
 		, m_header_offset(header.header_offset())
 		, m_start_disk(header.start_disk())
-		, m_offs_compressed_size(~m_uncompressed_size ? 0 : 8)
-		, m_offs_header_offset(m_offs_compressed_size + (~m_compressed_size ? 0 : 8))
-		, m_offs_start_disk(m_offs_header_offset + (~m_header_offset ? 0 : 8))
-		, m_offs_end(m_offs_start_disk + (~m_start_disk ? 0 : 4))
+		, m_offs_compressed_size((0xffff'ffffU != m_uncompressed_size) ? 0 : 8)
+		, m_offs_header_offset(m_offs_compressed_size + ((0xffff'ffffU != m_compressed_size) ? 0 : 8))
+		, m_offs_start_disk(m_offs_header_offset + ((0xffff'ffffU != m_header_offset) ? 0 : 8))
+		, m_offs_end(m_offs_start_disk + ((0xffffU != m_start_disk) ? 0 : 4))
 	{
 	}
 
-	std::uint64_t   uncompressed_size() const noexcept  { return ~m_uncompressed_size ? m_uncompressed_size : read_qword(0x00); }
-	std::uint64_t   compressed_size() const noexcept    { return ~m_compressed_size ? m_compressed_size : read_qword(m_offs_compressed_size); }
-	std::uint64_t   header_offset() const noexcept      { return ~m_header_offset ? m_header_offset : read_qword(m_offs_header_offset); }
-	std::uint32_t   start_disk() const noexcept         { return ~m_start_disk ? m_start_disk : read_dword(m_offs_start_disk); }
+	std::uint64_t   uncompressed_size() const noexcept  { return (0xffff'ffffU != m_uncompressed_size) ? m_uncompressed_size : read_qword(0x00); }
+	std::uint64_t   compressed_size() const noexcept    { return (0xffff'ffffU != m_compressed_size) ? m_compressed_size : read_qword(m_offs_compressed_size); }
+	std::uint64_t   header_offset() const noexcept      { return (0xffff'ffffU != m_header_offset) ? m_header_offset : read_qword(m_offs_header_offset); }
+	std::uint32_t   start_disk() const noexcept         { return (0xffffU != m_start_disk) ? m_start_disk : read_dword(m_offs_start_disk); }
 
 	std::size_t total_length() const noexcept { return minimum_length() + m_offs_end; }
 	static constexpr std::size_t minimum_length() { return 0x00; }

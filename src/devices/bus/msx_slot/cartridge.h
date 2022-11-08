@@ -21,7 +21,7 @@ class msx_slot_cartridge_device : public device_t
 {
 public:
 	// construction/destruction
-	msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -36,14 +36,10 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	// msx_internal_slot-level overrides
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
-
 	DECLARE_WRITE_LINE_MEMBER(irq_out);
 
 protected:
-	msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -52,7 +48,7 @@ protected:
 	devcb_write_line m_irq_handler;
 	msx_cart_interface *m_cartridge;
 
-	static int get_cart_type(const uint8_t *rom, uint32_t length);
+	static int get_cart_type(const u8 *rom, u32 length);
 };
 
 
@@ -60,7 +56,7 @@ class msx_slot_yamaha_expansion_device : public msx_slot_cartridge_device
 {
 public:
 	// construction/destruction
-	msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual const char *image_interface() const noexcept override { return "msx_yamaha_60pin"; }
 	virtual const char *image_type_name() const noexcept override { return "cartridge60pin"; }

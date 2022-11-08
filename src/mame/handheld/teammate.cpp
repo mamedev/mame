@@ -198,8 +198,11 @@ void teammate_state::teammate(machine_config &config)
 	F8(config, m_maincpu, 3600000/2); // R/C osc, approximation
 	m_maincpu->set_addrmap(AS_PROGRAM, &teammate_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &teammate_state::main_io);
+	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
 	f38t56_device &psu(F38T56(config, "psu", 3600000/2));
+	psu.set_int_vector(0x20);
+	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 	psu.read_a().set(FUNC(teammate_state::input_r));
 	psu.write_a().set(FUNC(teammate_state::input_w));
 	psu.read_b().set(FUNC(teammate_state::sound_r));

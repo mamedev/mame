@@ -19,17 +19,16 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override { ; }
+	virtual void device_start() override { }
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	required_device<amd_29f040_device> m_flash;
+
+	template <int Page> void write_page(offs_t offset, u8 data);
 };
 
 

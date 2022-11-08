@@ -428,8 +428,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(snes_scanline_tick);
 	TIMER_CALLBACK_MEMBER(snes_hblank_tick);
 	DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_snes_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_sufami_cart);
 	void snes_init_timers();
 	void scpu_irq_refresh();
 };

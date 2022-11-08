@@ -243,8 +243,6 @@ void mc10_state::driver_reset()
 
 void mc10_state::driver_start()
 {
-	driver_device::driver_start();
-
 	save_item(NAME(m_keyboard_strobe));
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -259,8 +257,6 @@ void mc10_state::driver_start()
 
 void alice32_state::driver_start()
 {
-	driver_device::driver_start();
-
 	save_item(NAME(m_keyboard_strobe));
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);

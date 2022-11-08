@@ -511,7 +511,7 @@ void notechan_state::notechan(machine_config &config)
 	Z80(config, m_maincpu, CPU_CLOCK);  // unknown...
 	m_maincpu->set_addrmap(AS_PROGRAM, &notechan_state::notechan_map);
 	m_maincpu->set_addrmap(AS_IO, &notechan_state::notechan_port_map);
-	m_maincpu->set_periodic_int(FUNC(driver_device::irq0_line_hold), attotime::from_hz(60));
+	m_maincpu->set_periodic_int(FUNC(notechan_state::irq0_line_hold), attotime::from_hz(60));
 
 	/* NO VIDEO */
 

@@ -14,26 +14,28 @@ DECLARE_DEVICE_TYPE(MSX_CART_HALNOTE, msx_cart_halnote_device)
 class msx_cart_halnote_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_halnote_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_halnote_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
-
-	void restore_banks();
 
 private:
-	uint8_t m_selected_bank[8];
-	uint8_t *m_bank_base[8];
+	static constexpr u8 BANK_MASK = (0x100000 / 0x2000) - 1;
 
-	void map_bank(int bank);
+	void bank0_w(u8 data);
+	void bank1_w(u8 data);
+	void bank2_w(u8 data);
+	void bank3_w(u8 data);
+	void bank4_w(u8 data);
+	void bank5_w(u8 data);
+
+	memory_bank_array_creator<6> m_rombank;
+	memory_view m_view0;
+	memory_view m_view1;
 };
 
 
