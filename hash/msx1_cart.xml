@@ -670,7 +670,7 @@ Xyzolog - Electric Software
 	</software>
 
 	<!-- Code seems to work but it does not display text -->
-	<software name="msxwritj" supported="partial">
+	<software name="msxwritj">
 		<description>Japanese MSX-Write (Japan)</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
