@@ -27,7 +27,25 @@ protected:
 	void bank_w(offs_t offset, u8 data);
 };
 
+class a5200_rom_bbsb_device : public a5200_rom_device
+{
+public:
+	a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void cart_map(address_map &map) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	int m_banks[2];
+
+	template <unsigned BankNum> u8 read_bank(offs_t offset);
+	u8 bank_r(offs_t offset);
+	void bank_w(offs_t offset, u8 data);
+};
 
 DECLARE_DEVICE_TYPE(A800_ROM_BBSB,        a800_rom_bbsb_device)
+DECLARE_DEVICE_TYPE(A5200_ROM_BBSB,       a5200_rom_bbsb_device)
 
 #endif // MAME_BUS_A800_BBSB_H

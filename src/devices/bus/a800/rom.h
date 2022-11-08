@@ -87,31 +87,12 @@ public:
 	virtual void cart_map(address_map &map) override;
 };
 
-
-class a5200_rom_bbsb_device : public a800_rom_device
-{
-public:
-	a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read_80xx(offs_t offset);
-	virtual void write_80xx(offs_t offset, uint8_t data);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	int m_banks[2];
-};
-
-
-
 DECLARE_DEVICE_TYPE(A800_ROM,             a800_rom_device)
 DECLARE_DEVICE_TYPE(A800_ROM_RIGHT,       a800_rom_right_device)
 DECLARE_DEVICE_TYPE(A800_ROM_16KB,        a800_rom_16kb_device)
 DECLARE_DEVICE_TYPE(XEGS_ROM,             xegs_rom_device)
 DECLARE_DEVICE_TYPE(A5200_ROM,            a5200_rom_device)
 DECLARE_DEVICE_TYPE(A5200_ROM_2CHIPS,     a5200_rom_2chips_device)
-DECLARE_DEVICE_TYPE(A5200_ROM_BBSB,       a5200_rom_bbsb_device)
 
 
 #endif // MAME_BUS_A800_ROM_H
