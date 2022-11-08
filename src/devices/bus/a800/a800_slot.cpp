@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER( device_a800_cart_interface::rd_both_w ) { rd4_w(state); rd5_w
 //-------------------------------------------------
 
 // TODO: CCTL area doesn't really exist for a5200 carts
-a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cart_mem_address_bits)
+a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_cartrom_image_interface(mconfig, *this)
@@ -118,20 +118,19 @@ a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, devi
 	, m_type(0)
 	, m_rd4_cb(*this)
 	, m_rd5_cb(*this)
-	, m_space_mem_config("cart_mem", ENDIANNESS_LITTLE, 8, cart_mem_address_bits, 0, address_map_constructor())
+	, m_space_mem_config("cart_mem", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor())
 	, m_space_io_config("cart_io", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor())
-	, m_cart_bank_address_bits(cart_mem_address_bits - 1)
 {
 }
 
 a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a800_cart_slot_device(mconfig, A800_CART_SLOT, tag, owner, clock, 14)
+	a800_cart_slot_device(mconfig, A800_CART_SLOT, tag, owner, clock)
 {
 }
 
 
 a5200_cart_slot_device::a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a800_cart_slot_device(mconfig, A5200_CART_SLOT, tag, owner, clock, 15)
+	a800_cart_slot_device(mconfig, A5200_CART_SLOT, tag, owner, clock)
 {
 }
 
@@ -527,12 +526,12 @@ device_memory_interface::space_config_vector a800_cart_slot_device::memory_space
 
 template <unsigned Bank> uint8_t a800_cart_slot_device::read_cart(offs_t offset)
 {
-	return m_space_mem->read_byte(offset | Bank << (m_cart_bank_address_bits));
+	return m_space_mem->read_byte(offset | Bank << 13);
 }
 
 template <unsigned Bank> void a800_cart_slot_device::write_cart(offs_t offset, uint8_t data)
 {
-	return m_space_mem->write_byte(offset | Bank << (m_cart_bank_address_bits), data);
+	return m_space_mem->write_byte(offset | Bank << 13, data);
 }
 
 // Instantiate maps

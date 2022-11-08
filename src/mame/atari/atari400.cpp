@@ -2235,8 +2235,6 @@ void a5200_state::a5200(machine_config &config)
 {
 	atari_common_nodac(config);
 
-	config.device_remove("cartleft")
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &a5200_state::a5200_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a5200_state::a5200_interrupt), "screen", 0, 1);
 

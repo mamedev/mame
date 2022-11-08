@@ -135,7 +135,7 @@ public:
 	void write_cctl(offs_t offset, uint8_t data);
 
 protected:
-	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cart_mem_address_bits);
+	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -154,9 +154,6 @@ private:
 
 	address_space *m_space_mem;
 	address_space *m_space_io;
-
-protected:
-	int m_cart_bank_address_bits;
 };
 
 class a5200_cart_slot_device : public a800_cart_slot_device
