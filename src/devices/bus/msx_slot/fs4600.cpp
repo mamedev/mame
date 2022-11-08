@@ -11,27 +11,24 @@
 DEFINE_DEVICE_TYPE(MSX_SLOT_FS4600, msx_slot_fs4600_device, "msx_slot_fs4600", "MSX Internal FS4600 Firmware")
 
 
-msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_SLOT_FS4600, tag, owner, clock)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_nvram(*this, "nvram")
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
+	, m_rombank(*this, "rombank%u", 0U)
+	, m_view0(*this, "view0")
+	, m_view1(*this, "view1")
+	, m_view2(*this, "view2")
 	, m_region_offset(0)
-	, m_rom(nullptr)
-	, m_selected_bank{ 0, 0, 0, 0 }
-	, m_bank_base{ nullptr, nullptr, nullptr, nullptr }
 	, m_sram_address(0)
-	, m_control(0)
 {
-	memset(m_sram, 0, sizeof(m_sram));
 }
-
 
 void msx_slot_fs4600_device::device_add_mconfig(machine_config &config)
 {
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 }
-
 
 void msx_slot_fs4600_device::device_start()
 {
@@ -41,102 +38,101 @@ void msx_slot_fs4600_device::device_start()
 		fatalerror("Memory region '%s' is too small for the FS4600 firmware\n", m_rom_region.finder_tag());
 	}
 
-	m_rom = m_rom_region->base() + m_region_offset;
-	m_nvram->set_base(m_sram, 0x1000);
+	m_sram.resize(SRAM_SIZE);
+	m_nvram->set_base(m_sram.data(), SRAM_SIZE);
 
-	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_sram_address));
-	save_item(NAME(m_control));
 
-	restore_banks();
+	for (int i = 0; i < 3; i++)
+		m_rombank[i]->configure_entries(0, 0x40, m_rom_region->base() + m_region_offset, 0x4000);
+
+	page(0)->install_view(0x0000, 0x3fff, m_view0);
+	m_view0[0].install_read_bank(0x0000, 0x3fff, m_rombank[0]);
+	m_view0[1].install_read_bank(0x0000, 0x3fff, m_rombank[0]);
+	m_view0[1].install_write_handler(0x3ffa, 0x3ffd, write8sm_delegate(*this, FUNC(msx_slot_fs4600_device::sram_w)));
+	m_view0[1].install_read_handler(0x3ffd, 0x3ffd, read8smo_delegate(*this, FUNC(msx_slot_fs4600_device::sram_r)));
+
+	page(1)->install_view(0x4000, 0x7fff, m_view1);
+	m_view1[0].install_read_bank(0x4000, 0x7fff, m_rombank[1]);
+	m_view1[0].install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(msx_slot_fs4600_device::bank_w<1>)));
+	m_view1[0].install_write_handler(0x6400, 0x6400, write8smo_delegate(*this, FUNC(msx_slot_fs4600_device::bank_w<0>)));
+	m_view1[0].install_write_handler(0x7000, 0x7000, write8smo_delegate(*this, FUNC(msx_slot_fs4600_device::bank_w<2>)));
+	m_view1[1].install_read_bank(0x4000, 0x7fff, m_rombank[1]);
+	m_view1[1].install_write_handler(0x7ffa, 0x7ffd, write8sm_delegate(*this, FUNC(msx_slot_fs4600_device::sram_w)));
+	m_view1[1].install_read_handler(0x7ffd, 0x7ffd, read8smo_delegate(*this, FUNC(msx_slot_fs4600_device::sram_r)));
+	m_view1[2].install_read_bank(0x4000, 0x7fff, m_rombank[1]);
+	m_view1[2].install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(msx_slot_fs4600_device::bank_w<1>)));
+	m_view1[2].install_write_handler(0x6400, 0x6400, write8smo_delegate(*this, FUNC(msx_slot_fs4600_device::bank_w<0>)));
+	m_view1[2].install_write_handler(0x7000, 0x7000, write8smo_delegate(*this, FUNC(msx_slot_fs4600_device::bank_w<2>)));
+	m_view1[2].install_read_handler(0x7ff0, 0x7ff5, read8sm_delegate(*this, FUNC(msx_slot_fs4600_device::bank_r)));
+	m_view1[3].install_read_bank(0x4000, 0x7fff, m_rombank[1]);
+	m_view1[3].install_read_handler(0x7ff0, 0x7ff5, read8sm_delegate(*this, FUNC(msx_slot_fs4600_device::bank_r)));
+	m_view1[3].install_write_handler(0x7ffa, 0x7ffd, write8sm_delegate(*this, FUNC(msx_slot_fs4600_device::sram_w)));
+	m_view1[3].install_read_handler(0x7ffd, 0x7ffd, read8smo_delegate(*this, FUNC(msx_slot_fs4600_device::sram_r)));
+
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*this, FUNC(msx_slot_fs4600_device::control_w)));
+
+	page(2)->install_view(0x8000, 0xbfff, m_view2);
+	m_view2[0].install_read_bank(0x8000, 0xbfff, m_rombank[2]);
+	m_view2[1].install_read_bank(0x8000, 0xbfff, m_rombank[2]);
+	m_view2[1].install_write_handler(0xbffa, 0xbffd, write8sm_delegate(*this, FUNC(msx_slot_fs4600_device::sram_w)));
+	m_view2[1].install_read_handler(0xbffd, 0xbffd, read8smo_delegate(*this, FUNC(msx_slot_fs4600_device::sram_r)));
 }
 
-
-void msx_slot_fs4600_device::device_post_load()
+void msx_slot_fs4600_device::device_reset()
 {
-	restore_banks();
+	m_view0.select(0);
+	m_view1.select(0);
+	m_view2.select(0);
+	m_rombank[0]->set_entry(0);
+	m_rombank[1]->set_entry(0);
+	m_rombank[2]->set_entry(0);
 }
 
-
-void msx_slot_fs4600_device::restore_banks()
+u8 msx_slot_fs4600_device::sram_r()
 {
-	for (int i = 0; i < 4; i++)
+	u8 data = m_sram[m_sram_address & (SRAM_SIZE - 1)];
+	if (!machine().side_effects_disabled())
+		m_sram_address++;
+	return data;
+}
+
+void msx_slot_fs4600_device::sram_w(offs_t offset, u8 data)
+{
+	switch (offset)
 	{
-		m_bank_base[i] = m_rom + ( ( m_selected_bank[i] * 0x4000 ) & 0x0fffff );
+	case 0:
+		m_sram_address = (m_sram_address & 0x00ffff) | (data << 16);
+		break;
+
+	case 1:
+		m_sram_address = (m_sram_address & 0xff00ff) | (data << 8);
+		break;
+
+	case 2:
+		m_sram_address = (m_sram_address & 0xffff00) | data;
+		break;
+
+	case 3:
+		m_sram[m_sram_address++ & (SRAM_SIZE - 1)] = data;
+		break;
 	}
 }
 
-
-uint8_t msx_slot_fs4600_device::read(offs_t offset)
+u8 msx_slot_fs4600_device::bank_r(offs_t offset)
 {
-	if ((m_control & 0x02) && ((offset & 0x3fff) == 0x3ffd))
-	{
-		return m_sram[m_sram_address++ & 0xfff];
-	}
-	if ((m_control & 0x04) && (offset& 0x7ff8) == 0x7ff0)
-	{
-		return m_selected_bank[(offset >> 1) & 0x03];
-	}
-	return m_bank_base[offset >> 14][offset & 0x3fff];
+	return m_rombank[offset >> 1]->entry();
 }
 
-
-void msx_slot_fs4600_device::write(offs_t offset, uint8_t data)
+template <int Bank>
+void msx_slot_fs4600_device::bank_w(u8 data)
 {
-	if (offset == 0x7ff9)
-	{
-		m_control = data;
-	}
-	else
-	{
-		if (m_control & 0x02)
-		{
-			switch (offset & 0x3fff)
-			{
-				case 0x3ffa:
-					m_sram_address = (m_sram_address & 0x00ffff) | (data << 16);
-					break;
+	m_rombank[Bank]->set_entry(data & 0x3f);
+}
 
-				case 0x3ffb:
-					m_sram_address = (m_sram_address & 0xff00ff) | (data << 8);
-					break;
-
-				case 0x3ffc:
-					m_sram_address = (m_sram_address & 0xffff00) | data;
-					break;
-
-				case 0x3ffd:
-					m_sram[m_sram_address++ & 0xfff] = data;
-					break;
-
-				default:
-					logerror("msx_slot_fs4600: Unhandled write %02x to %04x\n", data, offset);
-					break;
-			}
-		}
-		else
-		{
-			switch (offset)
-			{
-				case 0x6000:
-					m_selected_bank[1] = data;
-					m_bank_base[1] = m_rom + ( ( m_selected_bank[1] * 0x4000 ) & 0x0fffff );
-					break;
-
-				case 0x6400:
-					m_selected_bank[0] = data;
-					m_bank_base[0] = m_rom + ( ( m_selected_bank[0] * 0x4000 ) & 0x0fffff );
-					break;
-
-				case 0x7000:
-					m_selected_bank[2] = data;
-					m_bank_base[2] = m_rom + ( ( m_selected_bank[2] * 0x4000 ) & 0x0fffff );
-					break;
-
-				default:
-					logerror("msx_slot_fs4600: Unhandled write %02x to %04x\n", data, offset);
-					break;
-			}
-		}
-	}
+void msx_slot_fs4600_device::control_w(u8 data)
+{
+	m_view0.select((data >> 1) & 0x01);
+	m_view1.select((data >> 1) & 0x03);
+	m_view2.select((data >> 1) & 0x01);
 }

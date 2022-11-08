@@ -15,112 +15,53 @@ DEFINE_DEVICE_TYPE(MSX_CART_SOUND_SDSNATCHER, msx_cart_konami_sound_sdsnatcher_d
 DEFINE_DEVICE_TYPE(MSX_CART_KEYBOARD_MASTER,  msx_cart_keyboard_master_device,         "msx_cart_keyboard_master",  "MSX Cartridge - Keyboard Master")
 
 
-msx_cart_konami_device::msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_konami_device::msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_KONAMI, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
+	, m_rombank(*this, "rombank%u", 0U)
 	, m_bank_mask(0)
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_selected_bank[i] = i;
-	}
-	for (auto & elem : m_bank_base)
-	{
-		elem = nullptr;
-	}
 }
-
-
-void msx_cart_konami_device::device_start()
-{
-	save_item(NAME(m_selected_bank));
-}
-
-
-void msx_cart_konami_device::device_post_load()
-{
-	restore_banks();
-}
-
-
-void msx_cart_konami_device::restore_banks()
-{
-	m_bank_base[0] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-	m_bank_base[1] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-	m_bank_base[2] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-	m_bank_base[3] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-	m_bank_base[4] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
-	m_bank_base[5] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
-	m_bank_base[6] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
-	m_bank_base[7] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
-}
-
 
 void msx_cart_konami_device::device_reset()
 {
 	for (int i = 0; i < 4; i++)
-	{
-		m_selected_bank[i] = i;
-	}
+		m_rombank[i]->set_entry(i);
 }
-
 
 void msx_cart_konami_device::initialize_cartridge()
 {
-	uint32_t size = get_rom_size();
+	u32 size = get_rom_size();
+	u16 banks = size / 0x2000;
 
-	if ( get_rom_size() > 256 * 0x2000 )
-	{
-		fatalerror("konami: ROM is too big\n");
-	}
-
-	uint16_t banks = size / 0x2000;
-
-	if (size != banks * 0x2000 || (~(banks - 1) % banks))
+	if (size > 256 * 0x2000 || size < 4 * 0x2000 || size != banks * 0x2000 || (~(banks - 1) % banks))
 	{
 		fatalerror("konami: Invalid ROM size\n");
 	}
 
 	m_bank_mask = banks - 1;
 
-	restore_banks();
+	for (int i = 0; i < 4; i++)
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), 0x2000);
+
+	page(0)->install_read_bank(0x0000, 0x1fff, m_rombank[0]);
+	page(0)->install_read_bank(0x2000, 0x3fff, m_rombank[1]);
+	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
+	page(1)->install_write_handler(0x4000, 0x47ff, 0, 0x1000, 0, write8smo_delegate(*this, FUNC(msx_cart_konami_device::bank_w<0>)));
+	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
+	page(1)->install_write_handler(0x6000, 0x67ff, 0, 0x1000, 0, write8smo_delegate(*this, FUNC(msx_cart_konami_device::bank_w<1>)));
+	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
+	page(2)->install_write_handler(0x8000, 0x87ff, 0, 0x1000, 0, write8smo_delegate(*this, FUNC(msx_cart_konami_device::bank_w<2>)));
+	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
+	page(2)->install_write_handler(0xa000, 0xa7ff, 0, 0x1000, 0, write8smo_delegate(*this, FUNC(msx_cart_konami_device::bank_w<3>)));
+	page(3)->install_read_bank(0xc000, 0xdfff, m_rombank[2]);
+	page(3)->install_read_bank(0xe000, 0xffff, m_rombank[3]);
 }
 
-
-uint8_t msx_cart_konami_device::read_cart(offs_t offset)
+template <int Bank>
+void msx_cart_konami_device::bank_w(u8 data)
 {
-	return m_bank_base[offset >> 13][offset & 0x1fff];
-}
-
-
-void msx_cart_konami_device::write_cart(offs_t offset, uint8_t data)
-{
-	switch (offset & 0xe000)
-	{
-		case 0x4000:
-			m_selected_bank[0] = data;
-			m_bank_base[0] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-			m_bank_base[2] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-			break;
-
-		case 0x6000:
-			m_selected_bank[1] = data;
-			m_bank_base[1] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-			m_bank_base[3] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-			break;
-
-		case 0x8000:
-			m_selected_bank[2] = data;
-			m_bank_base[4] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
-			m_bank_base[6] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
-			break;
-
-		case 0xa000:
-			m_selected_bank[3] = data;
-			m_bank_base[5] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
-			m_bank_base[7] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
-			break;
-	}
+	m_rombank[Bank]->set_entry(data & m_bank_mask);
 }
 
 
@@ -130,19 +71,11 @@ msx_cart_konami_scc_device::msx_cart_konami_scc_device(const machine_config &mco
 	: device_t(mconfig, MSX_CART_KONAMI_SCC, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_k051649(*this, "k051649")
+	, m_rombank(*this, "rombank%u", 0U)
+	, m_scc_view(*this, "scc_view")
 	, m_bank_mask(0)
-	, m_scc_active(false)
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_selected_bank[i] = i;
-	}
-	for (auto & elem : m_bank_base)
-	{
-		elem = nullptr;
-	}
 }
-
 
 void msx_cart_konami_scc_device::device_add_mconfig(machine_config &config)
 {
@@ -151,147 +84,61 @@ void msx_cart_konami_scc_device::device_add_mconfig(machine_config &config)
 	K051649(config, m_k051649, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
-
-void msx_cart_konami_scc_device::device_start()
-{
-	save_item(NAME(m_selected_bank));
-	save_item(NAME(m_scc_active));
-}
-
-
-void msx_cart_konami_scc_device::device_post_load()
-{
-	restore_banks();
-}
-
-
-void msx_cart_konami_scc_device::restore_banks()
-{
-	m_bank_base[0] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
-	m_bank_base[1] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
-	m_bank_base[2] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-	m_bank_base[3] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-	m_bank_base[4] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
-	m_bank_base[5] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
-	m_bank_base[6] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-	m_bank_base[7] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-}
-
-
 void msx_cart_konami_scc_device::device_reset()
 {
+	m_scc_view.select(0);
 	for (int i = 0; i < 4; i++)
-	{
-		m_selected_bank[i] = i;
-	}
-	m_scc_active = false;
+		m_rombank[i]->set_entry(i);
 }
-
 
 void msx_cart_konami_scc_device::initialize_cartridge()
 {
-	uint32_t size = get_rom_size();
+	u32 size = get_rom_size();
+	u16 banks = size / 0x2000;
 
-	if ( get_rom_size() > 256 * 0x2000 )
-	{
-		fatalerror("konami_scc: ROM is too big\n");
-	}
-
-	uint16_t banks = size / 0x2000;
-
-	if (size != banks * 0x2000 || (~(banks - 1) % banks))
+	if (size > 256 * 0x2000 || size < 0x8000 || size != banks * 0x2000 || (~(banks - 1) % banks))
 	{
 		fatalerror("konami_scc: Invalid ROM size\n");
 	}
 
 	m_bank_mask = banks - 1;
 
-	restore_banks();
+	for (int i = 0; i < 4; i++)
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), 0x2000);
+
+	page(0)->install_read_bank(0x0000, 0x1fff, m_rombank[2]);
+	page(0)->install_read_bank(0x2000, 0x3fff, m_rombank[3]);
+	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
+	page(1)->install_write_handler(0x5000, 0x57ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<0>)));
+	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
+	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<1>)));
+	page(2)->install_view(0x8000, 0x9fff, m_scc_view);
+	m_scc_view[0].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
+	m_scc_view[0].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<2>)));
+	m_scc_view[1].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
+	m_scc_view[1].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<2>)));
+	m_scc_view[1].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, read8sm_delegate(m_k051649, FUNC(k051649_device::k051649_waveform_r)));
+	m_scc_view[1].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, write8sm_delegate(m_k051649, FUNC(k051649_device::k051649_waveform_w)));
+	m_scc_view[1].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, write8sm_delegate(m_k051649, FUNC(k051649_device::k051649_frequency_w)));
+	m_scc_view[1].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, write8sm_delegate(m_k051649, FUNC(k051649_device::k051649_volume_w)));
+	m_scc_view[1].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, write8smo_delegate(m_k051649, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_scc_view[1].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, read8smo_delegate(m_k051649, FUNC(k051649_device::k051649_test_r)));
+	m_scc_view[1].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, write8smo_delegate(m_k051649, FUNC(k051649_device::k051649_test_w)));
+	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
+	page(2)->install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<2>)));
+	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
+	page(2)->install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<3>)));
+	page(3)->install_read_bank(0xc000, 0xdfff, m_rombank[0]);
+	page(3)->install_read_bank(0xe000, 0xffff, m_rombank[1]);
 }
 
-
-uint8_t msx_cart_konami_scc_device::read_cart(offs_t offset)
+template <int Bank>
+void msx_cart_konami_scc_device::bank_w(u8 data)
 {
-	if ( m_scc_active && offset >= 0x9800 && offset < 0xa000 )
+	m_rombank[Bank]->set_entry(data & m_bank_mask);
+	if (Bank == 2)
 	{
-		if (offset & 0x80)
-		{
-			if ((offset & 0xff) >= 0xe0)
-			{
-				return m_k051649->k051649_test_r();
-			}
-			return 0xff;
-		}
-		else
-		{
-			return m_k051649->k051649_waveform_r(offset & 0x7f);
-		}
-	}
-
-	return m_bank_base[offset >> 13][offset & 0x1fff];
-}
-
-
-void msx_cart_konami_scc_device::write_cart(offs_t offset, uint8_t data)
-{
-	switch (offset & 0xf800)
-	{
-		case 0x5000:
-			m_selected_bank[0] = data;
-			m_bank_base[2] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-			m_bank_base[6] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-			break;
-
-		case 0x7000:
-			m_selected_bank[1] = data;
-			m_bank_base[3] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-			m_bank_base[7] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-			break;
-
-		case 0x9000:
-			m_selected_bank[2] = data;
-			m_scc_active = ( ( data & 0x3f ) == 0x3f );
-			m_bank_base[0] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
-			m_bank_base[4] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
-			break;
-
-		case 0x9800:
-			if ( m_scc_active )
-			{
-				offset &= 0xff;
-
-				if (offset < 0x80)
-				{
-					m_k051649->k051649_waveform_w(offset, data);
-				}
-				else if (offset < 0xa0)
-				{
-					offset &= 0x0f;
-					if (offset < 0x0a)
-					{
-						m_k051649->k051649_frequency_w(offset, data);
-					}
-					else if (offset < 0x0f)
-					{
-						m_k051649->k051649_volume_w(offset - 0xa, data);
-					}
-					else
-					{
-						m_k051649->k051649_keyonoff_w(data);
-					}
-				}
-				else if (offset >= 0xe0)
-				{
-					m_k051649->k051649_test_w(data);
-				}
-			}
-			break;
-
-		case 0xb000:
-			m_selected_bank[3] = data;
-			m_bank_base[1] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
-			m_bank_base[5] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
-			break;
+		m_scc_view.select(((data & 0x3f) == 0x3f) ? 1 : 0);
 	}
 }
 
@@ -300,260 +147,130 @@ void msx_cart_konami_scc_device::write_cart(offs_t offset, uint8_t data)
 
 
 
-msx_cart_gamemaster2_device::msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_gamemaster2_device::msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_GAMEMASTER2, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
+	, m_rombank(*this, "rombank%u", 0U)
+	, m_rambank(*this, "rambank%u", 0U)
+	, m_view0(*this, "view0")
+	, m_view1(*this, "view1")
+	, m_view2(*this, "view2")
 {
-	for (auto & elem : m_selected_bank)
-	{
-		elem = 0;
-	}
-	for (auto & elem : m_bank_base)
-	{
-		elem = nullptr;
-	}
 }
-
-
-void msx_cart_gamemaster2_device::device_start()
-{
-	save_item(NAME(m_selected_bank));
-}
-
-
-void msx_cart_gamemaster2_device::device_post_load()
-{
-	restore_banks();
-}
-
-
-void msx_cart_gamemaster2_device::setup_bank(uint8_t bank)
-{
-	switch (bank)
-	{
-		case 0:
-			if (m_selected_bank[0] & 0x10)
-			{
-				m_bank_base[1] = get_sram_base() + ((m_selected_bank[0] & 0x20) ? 0x1000 : 0);
-				m_bank_base[3] = get_sram_base() + ((m_selected_bank[0] & 0x20) ? 0x1000 : 0);
-			}
-			else
-			{
-				m_bank_base[1] = get_rom_base() + ( m_selected_bank[0] & 0x0f ) * 0x2000;
-				m_bank_base[3] = get_rom_base() + ( m_selected_bank[0] & 0x0f ) * 0x2000;
-			}
-			break;
-
-		case 1:
-			if (m_selected_bank[1] & 0x10)
-			{
-				m_bank_base[4] = get_sram_base() + ((m_selected_bank[1] & 0x20) ? 0x1000 : 0);
-				m_bank_base[6] = get_sram_base() + ((m_selected_bank[1] & 0x20) ? 0x1000 : 0);
-			}
-			else
-			{
-				m_bank_base[4] = get_rom_base() + ( m_selected_bank[1] & 0x0f ) * 0x2000;
-				m_bank_base[6] = get_rom_base() + ( m_selected_bank[1] & 0x0f ) * 0x2000;
-			}
-			break;
-
-		case 2:
-			if (m_selected_bank[2] & 0x10)
-			{
-				m_bank_base[5] = get_sram_base() + ((m_selected_bank[2] & 0x20) ? 0x1000 : 0);
-				m_bank_base[7] = get_sram_base() + ((m_selected_bank[2] & 0x20) ? 0x1000 : 0);
-			}
-			else
-			{
-				m_bank_base[5] = get_rom_base() + ( m_selected_bank[2] & 0x0f ) * 0x2000;
-				m_bank_base[7] = get_rom_base() + ( m_selected_bank[2] & 0x0f ) * 0x2000;
-			}
-			break;
-	}
-}
-
-
-void msx_cart_gamemaster2_device::restore_banks()
-{
-	m_bank_base[0] = get_rom_base();
-	m_bank_base[2] = get_rom_base();
-	setup_bank(0);
-	setup_bank(1);
-	setup_bank(2);
-}
-
 
 void msx_cart_gamemaster2_device::device_reset()
 {
-	for (int i = 0; i < 3; i++)
-	{
-		m_selected_bank[i] = i + 1;
-	}
+	m_rombank[0]->set_entry(1);
+	m_rombank[1]->set_entry(1);
+	m_rombank[2]->set_entry(2);
+	m_view0.select(0);
+	m_view1.select(0);
+	m_view2.select(0);
 }
-
 
 void msx_cart_gamemaster2_device::initialize_cartridge()
 {
-	if ( get_rom_size() != 0x20000 )
+	u32 size = get_rom_size();
+	u16 banks = size / 0x2000;
+
+	if (size != 0x20000)
 	{
 		fatalerror("gamemaster2: Invalid ROM size\n");
 	}
-
 	if (get_sram_size() != 0x2000)
 	{
 		fatalerror("gamemaster2: Invalid SRAM size\n");
 	}
 
-	restore_banks();
-}
-
-
-uint8_t msx_cart_gamemaster2_device::read_cart(offs_t offset)
-{
-	uint8_t bank = offset >> 13;
-
-	switch (bank)
+	for (int i = 0; i < 3; i++)
 	{
-		case 1:
-		case 3:
-			if (m_selected_bank[0] & 0x10)
-			{
-				return m_bank_base[bank][offset & 0x0fff];
-			}
-			break;
-
-		case 4:
-		case 6:
-			if (m_selected_bank[1] & 0x10)
-			{
-				return m_bank_base[bank][offset & 0x0fff];
-			}
-			break;
-
-		case 5:
-		case 7:
-			if (m_selected_bank[2] & 0x10)
-			{
-				return m_bank_base[bank][offset & 0x0fff];
-			}
-			break;
+		m_rombank[i]->configure_entries(0, banks, get_rom_base(), 0x2000);
+		m_rambank[i]->configure_entries(0, 2, get_sram_base(), 0x1000);
 	}
-	return m_bank_base[bank][offset & 0x1fff];
+
+	page(1)->install_rom(0x4000, 0x5fff, get_rom_base());
+
+	page(1)->install_view(0x6000, 0x7fff, m_view0);
+	m_view0[0].install_read_bank(0x6000, 0x7fff, m_rombank[0]);
+	m_view0[0].install_write_handler(0x6000, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<0>)));
+	m_view0[1].install_read_bank(0x6000, 0x6fff, 0x1000, m_rambank[0]);
+	m_view0[1].install_write_handler(0x6000, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<0>)));
+
+	page(2)->install_view(0x8000, 0x9fff, m_view1);
+	m_view1[0].install_read_bank(0x8000, 0x9fff, m_rombank[1]);
+	m_view1[0].install_write_handler(0x8000, 0x8fff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<1>)));
+	m_view1[1].install_read_bank(0x8000, 0x8fff, 0x1000, m_rambank[1]);
+	m_view1[1].install_write_handler(0x8000, 0x8fff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<1>)));
+
+	page(2)->install_view(0xa000, 0xbfff, m_view2);
+	m_view2[0].install_read_bank(0xa000, 0xbfff, m_rombank[2]);
+	m_view2[0].install_write_handler(0xa000, 0xafff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
+	m_view2[1].install_read_bank(0xa000, 0xafff, m_rambank[2]);
+	m_view2[1].install_write_handler(0xa000, 0xafff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
+	m_view2[1].install_readwrite_bank(0xb000, 0xbfff, m_rambank[2]);
 }
 
-
-void msx_cart_gamemaster2_device::write_cart(offs_t offset, uint8_t data)
+template <int Bank>
+void msx_cart_gamemaster2_device::bank_w(u8 data)
 {
-	switch (offset & 0xf000)
-	{
-		case 0x6000:
-			m_selected_bank[0] = data;
-			setup_bank(0);
-			break;
-
-		case 0x8000:
-			m_selected_bank[1] = data;
-			setup_bank(1);
-			break;
-
-		case 0xa000:
-			m_selected_bank[2] = data;
-			setup_bank(2);
-			break;
-
-		case 0xb000:
-			if (m_selected_bank[2] & 0x10)
-			{
-				m_bank_base[5][offset & 0x0fff] = data;
-			}
-			break;
-	}
+	m_rombank[Bank]->set_entry(data & 0x0f);
+	m_rambank[Bank]->set_entry(BIT(data, 5) ? 1 : 0);
+	if (Bank == 0)
+		m_view0.select(BIT(data, 4) ? 1 : 0);
+	if (Bank == 1)
+		m_view1.select(BIT(data, 4) ? 1 : 0);
+	if (Bank == 2)
+		m_view2.select(BIT(data, 4) ? 1 : 0);
 }
 
 
 
 
 
-msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_SYNTHESIZER, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
-	, m_bank_base(nullptr)
 	, m_dac(*this, "dac")
 {
 }
-
 
 void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
 {
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 }
-
-
-void msx_cart_synthesizer_device::device_start()
-{
-}
-
 
 void msx_cart_synthesizer_device::initialize_cartridge()
 {
-	if ( get_rom_size() != 0x8000 )
+	if (get_rom_size() != 0x8000)
 	{
 		fatalerror("synthesizer: Invalid ROM size\n");
 	}
 
-	m_bank_base = get_rom_base();
-}
-
-
-uint8_t msx_cart_synthesizer_device::read_cart(offs_t offset)
-{
-	if (offset >= 0x4000 && offset < 0xc000 )
-	{
-		return m_bank_base[offset - 0x4000];
-	}
-	return 0xff;
-}
-
-
-void msx_cart_synthesizer_device::write_cart(offs_t offset, uint8_t data)
-{
-	if ((offset & 0xc010) == 0x4000)
-	{
-		m_dac->write(data);
-	}
+	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_write_handler(0x4000, 0x4000, 0, 0x3fef, 0, write8smo_delegate(m_dac, FUNC(dac_byte_interface::write)));
+	page(2)->install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
 }
 
 
 
 
-msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 min_rambank, u8 max_rambank)
 	: device_t(mconfig, type, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_k052539(*this, "k052539")
-	, m_scc_active(false)
-	, m_sccplus_active(false)
-	, m_scc_mode(0)
+	, m_rambank(*this, "rambank%u", 0U)
+	, m_view0(*this, "view0")
+	, m_view1(*this, "view1")
+	, m_view2(*this, "view2")
+	, m_view3(*this, "view3")
+	, m_min_rambank(min_rambank)
+	, m_max_rambank(max_rambank)
+	, m_selected_bank{0, 0, 0, 0}
+	, m_control(0)
 {
-	for (auto & elem : m_selected_bank)
-	{
-		elem = 0;
-	}
-	for (auto & elem : m_bank_base)
-	{
-		elem = nullptr;
-	}
-	for (auto & elem : m_ram_bank)
-	{
-		elem = nullptr;
-	}
-	for (auto & elem : m_ram_enabled)
-	{
-		elem = false;
-	}
 }
-
 
 void msx_cart_konami_sound_device::device_add_mconfig(machine_config &config)
 {
@@ -562,329 +279,207 @@ void msx_cart_konami_sound_device::device_add_mconfig(machine_config &config)
 	K051649(config, m_k052539, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
-
 void msx_cart_konami_sound_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
-	save_item(NAME(m_scc_active));
-	save_item(NAME(m_sccplus_active));
-	save_item(NAME(m_ram_enabled));
+	save_item(NAME(m_control));
 }
-
-
-void msx_cart_konami_sound_device::device_post_load()
-{
-	restore_banks();
-}
-
-
-void msx_cart_konami_sound_device::restore_banks()
-{
-	for (int i = 0; i < 4; i++)
-	{
-		setup_bank(i);
-	}
-}
-
-
-void msx_cart_konami_sound_device::setup_bank(uint8_t bank)
-{
-	switch (bank)
-	{
-		case 0:
-			m_bank_base[2] = m_ram_bank[m_selected_bank[0] & 0x0f];
-			m_bank_base[6] = m_ram_bank[m_selected_bank[0] & 0x0f];
-			break;
-
-		case 1:
-			m_bank_base[3] = m_ram_bank[m_selected_bank[1] & 0x0f];
-			m_bank_base[7] = m_ram_bank[m_selected_bank[1] & 0x0f];
-			break;
-
-		case 2:
-			m_bank_base[0] = m_ram_bank[m_selected_bank[2] & 0x0f];
-			m_bank_base[4] = m_ram_bank[m_selected_bank[2] & 0x0f];
-			break;
-
-		case 3:
-			m_bank_base[1] = m_ram_bank[m_selected_bank[3] & 0x0f];
-			m_bank_base[5] = m_ram_bank[m_selected_bank[3] & 0x0f];
-			break;
-	}
-}
-
 
 void msx_cart_konami_sound_device::device_reset()
 {
+	m_control = 0;
 	for (int i = 0; i < 4; i++)
 	{
 		m_selected_bank[i] = i;
-		m_ram_enabled[i] = false;
 	}
-	m_scc_active = false;
-	m_sccplus_active = false;
+	switch_bank<0>();
+	switch_bank<1>();
+	switch_bank<2>();
+	switch_bank<3>();
 }
-
 
 void msx_cart_konami_sound_device::initialize_cartridge()
 {
-	restore_banks();
+	for (int i = 0; i < 4; i++)
+	{
+		m_rambank[i]->configure_entries(0, 8, get_ram_base(), 0x2000);
+	}
+
+	// TODO Mirrors at 0000-3fff and c000-ffff
+
+	page(1)->install_view(0x4000, 0x5fff, m_view0);
+	m_view0[VIEW_READ].install_read_bank(0x4000, 0x5fff, m_rambank[0]);
+	m_view0[VIEW_READ].install_write_handler(0x5000, 0x57ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<0>)));
+	m_view0[VIEW_RAM].install_readwrite_bank(0x4000, 0x5fff, m_rambank[0]);
+	m_view0[VIEW_INVALID].install_write_handler(0x5000, 0x57ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<0>)));
+	m_view0[VIEW_INVALID | VIEW_RAM];
+
+	page(1)->install_view(0x6000, 0x7fff, m_view1);
+	m_view1[VIEW_READ].install_read_bank(0x6000, 0x7fff, m_rambank[1]);
+	m_view1[VIEW_READ].install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<1>)));
+	m_view1[VIEW_RAM].install_readwrite_bank(0x6000, 0x7fff, m_rambank[1]);
+	m_view1[VIEW_INVALID].install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<1>)));
+	m_view1[VIEW_INVALID | VIEW_RAM];
+
+	page(2)->install_view(0x8000, 0x9fff, m_view2);
+	m_view2[VIEW_READ].install_read_bank(0x8000, 0x9fff, m_rambank[2]);
+	m_view2[VIEW_READ].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view2[VIEW_RAM].install_readwrite_bank(0x8000, 0x9fff, m_rambank[2]);
+	m_view2[VIEW_INVALID].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view2[VIEW_INVALID | VIEW_RAM];
+	m_view2[VIEW_SCC | VIEW_READ].install_read_bank(0x8000, 0x9fff, m_rambank[2]);
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view2[VIEW_SCC | VIEW_READ].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_w)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view2[VIEW_SCC | VIEW_READ].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view2[VIEW_SCC | VIEW_RAM].install_readwrite_bank(0x8000, 0x9fff, m_rambank[2]);
+	m_view2[VIEW_SCC | VIEW_RAM].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view2[VIEW_SCC | VIEW_RAM].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_w)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM];
+	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+
+	page(2)->install_view(0xa000, 0xbfff, m_view3);
+	m_view3[VIEW_READ].install_read_bank(0xa000, 0xbfff, m_rambank[3]);
+	m_view3[VIEW_READ].install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view3[VIEW_RAM].install_readwrite_bank(0xa000, 0xbfff, m_rambank[3]);
+	m_view3[VIEW_INVALID].install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view3[VIEW_INVALID | VIEW_RAM];
+	m_view3[VIEW_SCC | VIEW_READ].install_read_bank(0xa000, 0xbfff, m_rambank[3]);
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view3[VIEW_SCC | VIEW_READ].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb800, 0xb89f, 0, 0x0700, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_w)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8a0, 0xb8a9, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8aa, 0xb8ae, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8af, 0xb8af, 0, 0x0710, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view3[VIEW_SCC | VIEW_READ].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view3[VIEW_SCC | VIEW_RAM].install_readwrite_bank(0xa000, 0xbfff, m_rambank[3]);
+	m_view3[VIEW_SCC | VIEW_RAM].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view3[VIEW_SCC | VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb800, 0xb89f, 0, 0x0700, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_w)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8a0, 0xb8a9, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8aa, 0xb8ae, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8af, 0xb8af, 0, 0x0710, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view3[VIEW_SCC | VIEW_INVALID | VIEW_RAM];
+	m_view3[VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view3[VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+
+	page(2)->install_write_handler(0xbffe, 0xbfff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::control_w)));
 }
 
-
-uint8_t msx_cart_konami_sound_device::read_cart(offs_t offset)
+void msx_cart_konami_sound_device::control_w(u8 data)
 {
-	if ( m_scc_active && offset >= 0x9800 && offset < 0x9fe0 )
-	{
-		offset &= 0xff;
-		if (offset < 0x80)
-		{
-			return m_k052539->k051649_waveform_r(offset);
-		}
-		if (offset < 0xa0)
-		{
-			return 0xff;
-		}
-		if (offset < 0xc0)
-		{
-			return m_k052539->k051649_waveform_r(offset & 0x9f);
-		}
-		if (offset < 0xe0)
-		{
-			return m_k052539->k051649_test_r();
-		}
-		return 0xff;
-	}
-	else if ( m_sccplus_active && offset >= 0xb800 && offset < 0xbfe0)
-	{
-		offset &= 0xff;
+	m_control = data;
 
-		if (offset < 0xa0)
-		{
-			return m_k052539->k052539_waveform_r(offset);
-		}
-		if (offset >= 0xc0 && offset < 0xe0)
-		{
-			return m_k052539->k051649_test_r();
-		}
-		return 0xff;
-	}
-
-	uint8_t *base = m_bank_base[offset >> 13];
-
-	if (base != nullptr)
-	{
-		return base[offset & 0x1fff];
-	}
-	return 0xff;
+	switch_bank<0>();
+	switch_bank<1>();
+	switch_bank<2>();
+	switch_bank<3>();
 }
 
-
-void msx_cart_konami_sound_device::write_cart(offs_t offset, uint8_t data)
+template <int Bank>
+void msx_cart_konami_sound_device::switch_bank()
 {
-	switch (offset & 0xe000)
+	u8 view = VIEW_READ;
+	if ((m_selected_bank[Bank] & 0x0f) >= m_min_rambank && (m_selected_bank[Bank] & 0x0f) <= m_max_rambank)
+		m_rambank[Bank]->set_entry(m_selected_bank[Bank] & 0x07);
+	else
+		view |= VIEW_INVALID;
+	if (BIT(m_control, 4))
+		view |= VIEW_RAM;
+	else
 	{
-		case 0x4000:
-			if (m_ram_enabled[0] && m_bank_base[2] != nullptr)
-			{
-				m_bank_base[2][offset & 0x1fff] = data;
-			}
-			if ((offset & 0x1800) == 0x1000)
-			{
-				m_selected_bank[0] = data;
-				setup_bank(0);
-			}
-			break;
-
-		case 0x6000:
-			if (m_ram_enabled[1] && m_bank_base[3] != nullptr)
-			{
-				m_bank_base[3][offset & 0x1fff] = data;
-			}
-			if ((offset & 0x1800) == 0x1000)
-			{
-				m_selected_bank[1] = data;
-				setup_bank(1);
-			}
-			break;
-
-		case 0x8000:
-			if (m_ram_enabled[2] && m_bank_base[0] != nullptr)
-			{
-				m_bank_base[0][offset & 0x1fff] = data;
-			}
-			switch (offset & 0x1800)
-			{
-				case 0x1000:        // 0x9000-0x97ff
-					m_selected_bank[2] = data;
-					m_scc_active = ( ( data & 0x3f ) == 0x3f );
-					setup_bank(2);
-					break;
-
-				case 0x1800:        // 0x9800-0x9fff
-					if ( m_scc_active )
-					{
-						offset &= 0xff;
-
-						if (offset < 0x80)
-						{
-							m_k052539->k051649_waveform_w(offset, data);
-						}
-						else if (offset < 0xa0)
-						{
-							offset &= 0x0f;
-							if (offset < 0x0a)
-							{
-								m_k052539->k051649_frequency_w(offset, data);
-							}
-							else if (offset < 0x0f)
-							{
-								m_k052539->k051649_volume_w(offset - 0xa, data);
-							}
-							else
-							{
-								m_k052539->k051649_keyonoff_w(data);
-							}
-						}
-						else if (offset >= 0xe0)
-						{
-							m_k052539->k051649_test_w(data);
-						}
-					}
-					break;
-			}
-			break;
-
-		case 0xa000:
-			if (m_ram_enabled[3] && m_bank_base[1] != nullptr)
-			{
-				m_bank_base[1][offset & 0x1fff] = data;
-			}
-			switch (offset & 0x1800)
-			{
-				// 0xb000-0xb7ff
-				case 0x1000:
-					m_selected_bank[3] = data;
-					setup_bank(3);
-					break;
-
-				// 0xb800-0xbfff
-				case 0x1800:
-					if ((offset & 0x7fe) == 0x7fe)
-					{
-						// 0xbffe-0xbfff
-						/* write to mode register */
-						m_scc_mode = data;
-
-						m_ram_enabled[0] = ((m_scc_mode & 0x10) || (m_scc_mode & 0x01));
-						m_ram_enabled[1] = ((m_scc_mode & 0x10) || (m_scc_mode & 0x02));
-						m_ram_enabled[2] = ((m_scc_mode & 0x10) || ((m_scc_mode & 0x04) && (m_scc_mode & 0x20)));
-						m_ram_enabled[3] = (m_scc_mode & 0x10);
-
-						m_scc_active = ((m_selected_bank[2] & 0x3f) == 0x3f) && !(m_scc_mode & 0x20);
-						m_sccplus_active = (m_selected_bank[3] & 0x80) && (m_scc_mode & 0x20);
-					}
-					else
-					{
-						if (m_sccplus_active)
-						{
-							offset &= 0xff;
-							if (offset < 0xa0)
-							{
-								m_k052539->k052539_waveform_w(offset, data);
-							}
-							else if (offset < 0xc0)
-							{
-								offset &= 0x0f;
-								if (offset < 0x0a)
-								{
-									m_k052539->k051649_frequency_w(offset, data);
-								}
-								else if (offset < 0x0f)
-								{
-									m_k052539->k051649_volume_w(offset - 0x0a, data);
-								}
-								else if (offset == 0x0f)
-								{
-									m_k052539->k051649_keyonoff_w(data);
-								}
-							}
-							else if (offset < 0xe0)
-							{
-								m_k052539->k051649_test_w(data);
-							}
-						}
-					}
-					break;
-			}
-			break;
+		if (Bank < 2 && BIT(m_control, Bank))
+			view |= VIEW_RAM;
+		else if (Bank == 2 && BIT(m_control, Bank) && BIT(m_control, 5))
+			view |= VIEW_RAM;
 	}
+	if (Bank == 2 && !BIT(m_control, 5) && (m_selected_bank[2] & 0x3f) == 0x3f)
+		view |= VIEW_SCC;
+	if (Bank == 3 && BIT(m_control, 5) && BIT(m_selected_bank[3], 7))
+		view |= VIEW_SCC;
+
+	if (Bank == 0)
+		m_view0.select(view);
+	if (Bank == 1)
+		m_view1.select(view);
+	if (Bank == 2)
+		m_view2.select(view);
+	if (Bank == 3)
+		m_view3.select(view);
+}
+
+template <int Bank>
+void msx_cart_konami_sound_device::bank_w(u8 data)
+{
+	m_selected_bank[Bank] = data;
+	switch_bank<Bank>();
 }
 
 
-msx_cart_konami_sound_snatcher_device::msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SNATCHER, tag, owner, clock)
+
+// The Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 0-7
+msx_cart_konami_sound_snatcher_device::msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SNATCHER, tag, owner, clock, 0, 7)
 {
 }
-
 
 void msx_cart_konami_sound_snatcher_device::initialize_cartridge()
 {
-	msx_cart_konami_sound_device::initialize_cartridge();
-
 	if (get_ram_size() != 0x10000)
 	{
 		fatalerror("sound_snatcher: Invalid RAM size\n");
 	}
 
-	// The Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 0-7
-
-	for (int i = 0; i < 8; i++)
-	{
-		m_ram_bank[i] = get_ram_base() + i * 0x2000;
-	}
+	msx_cart_konami_sound_device::initialize_cartridge();
 }
 
 
-msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SDSNATCHER, tag, owner, clock)
+// The SD Snatcher Sound cartrdige has 64KB RAM available by selecting ram banks 8-15
+msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SDSNATCHER, tag, owner, clock, 8, 15)
 {
 }
-
 
 void msx_cart_konami_sound_sdsnatcher_device::initialize_cartridge()
 {
-	msx_cart_konami_sound_device::initialize_cartridge();
-
 	if (get_ram_size() != 0x10000)
 	{
 		fatalerror("sound_sdsnatcher: Invalid RAM size\n");
 	}
-
-	// The SD Snatcher Sound cartrdige has 64KB RAM available by selecting ram banks 8-15
-
-	for (int i = 0; i < 8; i++)
-	{
-		m_ram_bank[8+i] = get_ram_base() + i * 0x2000;
-	}
-
+	msx_cart_konami_sound_device::initialize_cartridge();
 }
 
 
 
-msx_cart_keyboard_master_device::msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_keyboard_master_device::msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_KEYBOARD_MASTER, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_vlm5030(*this, "vlm5030")
 {
 }
 
-
 void msx_cart_keyboard_master_device::vlm_map(address_map &map)
 {
 	map(0x0000, 0xffff).r(FUNC(msx_cart_keyboard_master_device::read_vlm));
 }
-
 
 void msx_cart_keyboard_master_device::device_add_mconfig(machine_config &config)
 {
@@ -895,7 +490,6 @@ void msx_cart_keyboard_master_device::device_add_mconfig(machine_config &config)
 	m_vlm5030->set_addrmap(0, &msx_cart_keyboard_master_device::vlm_map);
 }
 
-
 void msx_cart_keyboard_master_device::device_start()
 {
 	// Install IO read/write handlers
@@ -904,39 +498,27 @@ void msx_cart_keyboard_master_device::device_start()
 	io_space().install_read_handler(0x00, 0x00, read8smo_delegate(*this, FUNC(msx_cart_keyboard_master_device::io_00_r)));
 }
 
-
 void msx_cart_keyboard_master_device::initialize_cartridge()
 {
 	if (get_rom_size() != 0x4000)
 	{
 		fatalerror("keyboard_master: Invalid ROM size\n");
 	}
+
+	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
 }
-
-
-uint8_t msx_cart_keyboard_master_device::read_cart(offs_t offset)
-{
-	if (offset >= 0x4000 && offset < 0x8000)
-	{
-		return m_rom[offset & 0x3fff];
-	}
-	return 0xff;
-}
-
 
 uint8_t msx_cart_keyboard_master_device::read_vlm(offs_t offset)
 {
 	return m_rom_vlm5030[offset];
 }
 
-
 void msx_cart_keyboard_master_device::io_20_w(uint8_t data)
 {
-	m_vlm5030->rst((data & 0x01) ? 1 : 0);
-	m_vlm5030->vcu((data & 0x04) ? 1 : 0);
-	m_vlm5030->st((data & 0x02) ? 1 : 0);
+	m_vlm5030->rst(BIT(data, 0) ? 1 : 0);
+	m_vlm5030->vcu(BIT(data, 2) ? 1 : 0);
+	m_vlm5030->st(BIT(data, 1) ? 1 : 0);
 }
-
 
 uint8_t msx_cart_keyboard_master_device::io_00_r()
 {

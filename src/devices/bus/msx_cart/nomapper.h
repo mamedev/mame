@@ -17,15 +17,15 @@ public:
 	msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 
 	virtual void initialize_cartridge() override;
-
-	virtual uint8_t read_cart(offs_t offset) override;
 
 private:
 	uint32_t m_start_address;
 	uint32_t m_end_address;
+
+	void install_memory();
 };
 
 #endif // MAME_BUS_MSX_CART_NOMAPPER_H

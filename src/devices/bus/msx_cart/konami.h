@@ -3,6 +3,8 @@
 #ifndef MAME_BUS_MSX_CART_KONAMI_H
 #define MAME_BUS_MSX_CART_KONAMI_H
 
+#pragma once
+
 #include "bus/msx_cart/cartridge.h"
 #include "sound/k051649.h"
 #include "sound/vlm5030.h"
@@ -21,25 +23,20 @@ DECLARE_DEVICE_TYPE(MSX_CART_KEYBOARD_MASTER,  msx_cart_keyboard_master_device)
 class msx_cart_konami_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
-
-	void restore_banks();
 
 private:
-	uint8_t m_bank_mask;
-	uint8_t m_selected_bank[4];
-	uint8_t *m_bank_base[8];
+	template <int Bank> void bank_w(u8 data);
+
+	memory_bank_array_creator<4> m_rombank;
+	u8 m_bank_mask;
 };
 
 
@@ -50,73 +47,61 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void restore_banks();
-
 private:
-	required_device<k051649_device> m_k051649;
+	template <int Bank> void bank_w(u8 data);
 
-	uint8_t m_bank_mask;
-	uint8_t m_selected_bank[4];
-	uint8_t *m_bank_base[8];
-	bool m_scc_active;
+	required_device<k051649_device> m_k051649;
+	memory_bank_array_creator<4> m_rombank;
+	memory_view m_scc_view;
+
+	u8 m_bank_mask;
 };
 
 
 class msx_cart_gamemaster2_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
-
-	void restore_banks();
 
 private:
-	uint8_t m_selected_bank[3];
-	uint8_t *m_bank_base[8];
+	template <int Bank> void bank_w(u8 data);
 
-	void setup_bank(uint8_t bank);
+	memory_bank_array_creator<3> m_rombank;
+	memory_bank_array_creator<3> m_rambank;
+	memory_view m_view0;
+	memory_view m_view1;
+	memory_view m_view2;
 };
 
 
 class msx_cart_synthesizer_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	uint8_t *m_bank_base;
 	required_device<dac_byte_interface> m_dac;
 };
 
@@ -126,42 +111,44 @@ class msx_cart_konami_sound_device : public device_t, public msx_cart_interface
 public:
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
-	msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 min_rambank, u8 max_rambank);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void restore_banks();
-
-	uint8_t *m_ram_bank[16];
-
 private:
+	static constexpr u8 VIEW_READ = 0;
+	static constexpr u8 VIEW_RAM = 1;
+	static constexpr u8 VIEW_INVALID = 2;
+	static constexpr u8 VIEW_SCC = 4;
+
+	template <int Bank> void bank_w(u8 data);
+	template <int Bank> void switch_bank();
+	void control_w(u8 data);
+
 	// This is actually a K052539
 	required_device<k051649_device> m_k052539;
+	memory_bank_array_creator<4> m_rambank;
+	memory_view m_view0;
+	memory_view m_view1;
+	memory_view m_view2;
+	memory_view m_view3;
 
-	uint8_t m_selected_bank[4];
-	uint8_t *m_bank_base[8];
-	bool m_scc_active;
-	bool m_sccplus_active;
-	bool m_ram_enabled[4];
-	uint8_t m_scc_mode;
-
-	void setup_bank(uint8_t bank);
+	u8 m_min_rambank;
+	u8 m_max_rambank;
+	u8 m_selected_bank[4];
+	u8 m_control;
 };
 
 
 class msx_cart_konami_sound_snatcher_device : public msx_cart_konami_sound_device
 {
 public:
-	msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
 };
@@ -170,7 +157,7 @@ public:
 class msx_cart_konami_sound_sdsnatcher_device : public msx_cart_konami_sound_device
 {
 public:
-	msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
 };
@@ -180,7 +167,7 @@ public:
 class msx_cart_keyboard_master_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
@@ -189,8 +176,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void initialize_cartridge() override;
-
-	virtual uint8_t read_cart(offs_t offset) override;
 
 private:
 	required_device<vlm5030_device> m_vlm5030;
