@@ -669,7 +669,6 @@ Xyzolog - Electric Software
 		</part>
 	</software>
 
-	<!-- Code seems to work but it does not display text -->
 	<software name="msxwritj">
 		<description>Japanese MSX-Write (Japan)</description>
 		<year>1986</year>
