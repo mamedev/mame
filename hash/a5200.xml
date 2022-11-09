@@ -188,7 +188,7 @@ Possible Undumped protos: -
 	</software>
 
 <!-- Barroom Baseball.  This prototype is for an standup arcade environment involving coins/timer and is based on Real Sports
-     Baseball.  While this functions in an Atari 5200 as a cartridge image, it is not a home cartridge.  Therefore, it is commented. -->
+     Baseball.  While this functions in an Atari 5200 as a cartridge image, it is not a home cartridge. Handled in atari/bartop52.cpp -->
 
 <!--
     <software name="barbball">
@@ -312,6 +312,25 @@ Sluggish in gameplay (btanb)
 			<feature name="slot" value="a5200_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="blueprnt.bin" size="16384" crc="0624e6e7" sha1="1e1a20c104bf4d55eca0ca1e72dc5dc64fa6b1b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bosco" supported="no">
+		<!-- Versioning on title screen, earlier 128KB Super Cart known to exist -->
+		<description>Bosconian 5200 - Star Destroyer (Ultimate Version)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Player dot is invisible on radar
+Status bar cuts off words (i.e. ROUN instead of ROUND)
+Text colors are off on title and score table screens
+Title grey animation doesn't mask [ANTIC] playfield properly
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_supercart" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="bosconian.bin" size="0x80000" crc="cedcd5d9" sha1="8a92963b3b0b45393bdc31d86120044282534c4b"/>
 			</dataarea>
 		</part>
 	</software>

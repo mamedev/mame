@@ -22,7 +22,6 @@ DEFINE_DEVICE_TYPE(A5200_ROM,          a5200_rom_device,          "a5200_rom",  
 DEFINE_DEVICE_TYPE(A5200_ROM_2CHIPS,   a5200_rom_2chips_device,   "a5200_16k2c",   "Atari 5200 ROM Cart 16K in 2 Chips")
 
 
-// TODO: remove me
 a800_rom_device::a800_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a800_cart_interface( mconfig, *this )
