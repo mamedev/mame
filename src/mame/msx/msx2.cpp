@@ -1462,9 +1462,9 @@ ROM_START(nms8245)
 	ROM_SYSTEM_BIOS(0, "v1.08", "v1.08")
 	ROMX_LOAD("v1_08.u7", 0x00000, 0x10000, CRC(69d5cbe6) SHA1(cc57c1dcd7249ea9f8e2547244592e7d97308ed0), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v1.06", "v1.06")
-	ROMX_LOAD("v1_06.u7", 0x00000, 0x10000, CRC(be4ae17e) SHA1(cc57c1dcd7249ea9f8e2547244592e7d97308ed0), ROM_BIOS(1))
+	ROMX_LOAD("v1_06.u7", 0x00000, 0x10000, CRC(be4ae17e) SHA1(b746192dc333eaf2a725a44777303808a3649d63), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v1.05", "v1.05")
-	ROMX_LOAD("v1_05.u7", 0x00000, 0x10000, CRC(cef8895d) SHA1(cc57c1dcd7249ea9f8e2547244592e7d97308ed0), ROM_BIOS(2))
+	ROMX_LOAD("v1_05.u7", 0x00000, 0x10000, CRC(cef8895d) SHA1(816ceb21088b116ec34be0ff869d02222b525e58), ROM_BIOS(2))
 ROM_END
 
 void msx2_state::nms8245(machine_config &config)
@@ -3701,9 +3701,7 @@ ROM_START(y503iiir)
 	ROM_LOAD("yis503iiircpm.rom", 0x0000, 0x4000, CRC(417bf00e) SHA1(f4f7a54cdf5a9dd6c59f7cb219c2c5eb0a00fa8a))
 
 	ROM_REGION(0x8000, "network", 0)
-	// TODO: Which one is correct??
 	// has 2 * 2KB RAM?
-	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(0e345b43) SHA1(e8fd2bbc1bdab12c73a0fec178a190f9063547bb))
 	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(75331cac) SHA1(307a7be064442feb4ab2e1a2bc971b138c1a1169))
 ROM_END
 
@@ -3740,8 +3738,6 @@ ROM_START(y503iiire)
 	ROM_LOAD("yis503iiirecpm.rom", 0x0000, 0x4000, CRC(417bf00e) SHA1(f4f7a54cdf5a9dd6c59f7cb219c2c5eb0a00fa8a))
 
 	ROM_REGION(0x8000, "network", 0)
-	// TODO: Which one is correct??
-	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(0e345b43) SHA1(e8fd2bbc1bdab12c73a0fec178a190f9063547bb))
 	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(75331cac) SHA1(307a7be064442feb4ab2e1a2bc971b138c1a1169))
 ROM_END
 
