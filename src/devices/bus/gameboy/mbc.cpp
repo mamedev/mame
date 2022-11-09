@@ -49,7 +49,6 @@
    the strategies.  Strategies implemented by each cartridge should be identified.
  * HK0701 and HK0819 seem to differ in that HK0819 fully decodes ROM addresses while HK0701 mirrors - we
    should probably emulated the difference at some point.
- * Digimon 2 mapper doesn't work
 
  ***********************************************************************************************************/
 
@@ -1282,71 +1281,6 @@ private:
 	u8 m_split_enable;
 };
 
-
-
-//**************************************************************************
-//  Yong Yong Digimon 2 (and maybe 4?)
-//**************************************************************************
-/*
- Digimon 2 writes to 0x2000 to set the fine ROM bank, then writes a series
- of values to 0x2400 that the patched version does not write.
- Digimon 4 seems to share part of the 0x2000 behavior, but does not write
- to 0x2400.
- */
-
-class digimon_device : public rom_mbc_device_base
-{
-public:
-	digimon_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-		rom_mbc_device_base(mconfig, GB_ROM_DIGIMON, tag, owner, clock)
-	{
-	}
-
-	virtual image_init_result load(std::string &message) override ATTR_COLD
-	{
-		// set up ROM and RAM
-		if (!install_memory(message, 4, 7))
-			return image_init_result::FAIL;
-
-		// install handlers
-		cart_space()->install_write_handler(
-				0x0000, 0x1fff,
-				write8smo_delegate(*this, FUNC(digimon_device::enable_ram)));
-		cart_space()->install_write_handler(
-				0x2000, 0x2000,
-				write8smo_delegate(*this, FUNC(digimon_device::bank_switch_fine)));
-		cart_space()->install_write_handler(
-				0x4000, 0x5fff,
-				write8smo_delegate(*this, FUNC(digimon_device::bank_switch_coarse)));
-
-		// all good
-		return image_init_result::PASS;
-	}
-
-protected:
-	virtual void device_reset() override ATTR_COLD
-	{
-		rom_mbc_device_base::device_reset();
-
-		set_bank_rom_coarse(0);
-		set_bank_rom_fine(1);
-		set_ram_enable(false);
-		set_bank_ram(0);
-	}
-
-private:
-	void enable_ram(u8 data)
-	{
-		set_ram_enable(0x0a == (data & 0x0f));
-	}
-
-	void bank_switch_fine(u8 data)
-	{
-		data >>= 1;
-		set_bank_rom_fine(data ? data : 1);
-	}
-};
-
 } // anonymous namespace
 
 } // namespace bus::gameboy
@@ -1360,4 +1294,3 @@ DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_CHONGWU,  device_gb_cart_interface, bus::gameb
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_LICHENG,  device_gb_cart_interface, bus::gameboy::licheng_device,     "gb_rom_licheng",  "Game Boy Li Cheng MBC5 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_NEWGBCHK, device_gb_cart_interface, bus::gameboy::ngbchk_device,      "gb_rom_ngbchk",   "Game Boy HK0701/HK0819 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_VF001,    device_gb_cart_interface, bus::gameboy::vf001_device,       "gb_rom_vf001",    "Game Boy Vast Fame VF001 Cartridge")
-DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_DIGIMON,  device_gb_cart_interface, bus::gameboy::digimon_device,     "gb_rom_digimon",  "Game Boy Digimon 2 Cartridge")

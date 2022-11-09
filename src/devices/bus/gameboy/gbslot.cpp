@@ -746,6 +746,9 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 	case gbxfile::TYPE_VF001:
 		result = slotoptions::GB_VF001;
 		break;
+	case gbxfile::TYPE_NTNEW:
+		result = slotoptions::GB_NTNEW;
+		break;
 	case gbxfile::TYPE_SLMULTI:
 		result = slotoptions::GB_SLMULTI;
 		break;

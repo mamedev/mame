@@ -25842,22 +25842,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="smbbhzs">
-		<description>Shuma Baobei - Hai Zhi Shen (China)</description>
-		<year>200?</year>
-		<publisher>Li Cheng</publisher>
-		<info name="serial" value="CBA087"/>
-		<info name="alt_title" value="数码宝贝-海之神"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_licheng" />
-			<dataarea name="rom" size="524288">
-				<rom name="shuma baobei - hai zhi shen (unlicensed, chinese) (cba087) [raw dump].bin" size="524288" crc="c3cedaed" sha1="4e7b7b361302e5e400047c9e668f23cbc885a9e0" offset="0" />
-			</dataarea>
-			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mojie3">
 		<description>Mo Jie 3 - Bu Wanme De Shijie (China)</description>
 		<year>200?</year>
@@ -27772,12 +27756,12 @@ license:CC0
 	</software>
 
 	<software name="yxcs" supported="no">
-		<description>Ying Xiong Chuan Shuo (China)</description>
+		<description>Yīngxióng Chuánshuō (China)</description>
 		<year>20??</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="英雄传说"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_digimon" />
+			<feature name="slot" value="rom_ntnew" /> <!-- FIXME: incorrect - what's the correct cartridge type? -->
 			<dataarea name="rom" size="1048576">
 				<rom name="legend of heroes (unl).bin" size="1048576" crc="0dd2b42b" sha1="b62bff46fb8d5962598445bd113370dd0717f170"/>
 			</dataarea>
@@ -27914,6 +27898,219 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- intro/title/win screens are a flickering mess on gbcolor (uses a high-colour trick), gameplay displays correctly -->
+	<software name="capsnk" supported="partial">
+		<description>Capcom Vs. SNK: Millennium Fight 2001 (China)</description>
+		<year>200?</year>
+		<publisher>Makon</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="capcom vs snk millennium fight 2001.gbc" size="0x100000" crc="97280455" sha1="cddd079eebaeeb45b22c808cfb5e369f70e7fa20" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digimn24">
+		<description>Digimon 02 4 (China)</description>
+		<year>200?</year>
+		<publisher>Makon</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="digimon 02 4.gbc" size="0x100000" crc="a90061e9" sha1="0c8280e5349dda05fdd27bb1eb68a1be2f3d5c04" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="shumabl24" cloneof="digimn24">
+		<description>Shùmǎ Bào Lóng 02 4 (China)</description>
+		<year>200?</year>
+		<publisher>Makon</publisher>
+		<info name="alt_title" value="數碼暴龍02 4" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="shuma bao long 02 4.gbc" size="0x100000" crc="2ee18ab2" sha1="839f0880749735ba2113e437f8efede171b7474d" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="shumabl24h" cloneof="digimn24">
+	<!-- This version bypasses the protection, but I think it's been hacked by whoever dumped
+	 the real card, so it can be removed once we properly emulate the parent -->
+		<description>Shùmǎ Bào Lóng 02 4 (China, hacked)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<info name="alt_title" value="數碼暴龍02 4" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="digimon 4 (unl) (hacked).bin" size="1048576" crc="6f67dfc6" sha1="5c5d1675188a5f618f9babf2b3848942ce08c659"/>
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- different title screen - hacked by Yong Yong? -->
+	<software name="shumabl2fcb" cloneof="digimn24">
+		<description>Shùmǎ Bào Lóng 02 Fěicuì Bǎn (China)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<info name="alt_title" value="數碼暴龍02 翡翠版" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="digimon 02 jade (unl).bin" size="1048576" crc="c64818eb" sha1="314cf9deaf5c42905d412315fe701524ebd9e9ad"/>
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digimn2">
+		<description>Digimon 2 (China)</description>
+		<year>200?</year>
+		<publisher>Makon</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="digimon 2.gbc" size="0x100000" crc="a43ab22b" sha1="8476385e380bee46f19f874dfed91b3aa61bbf66" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<!-- different title screen - hacked by Yong Yong? -->
+	<software name="shumabl3" cloneof="digimn2">
+		<description>Shùmǎ Bào Lóng 3 Shuǐjīng Bǎn (China)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<info name="alt_title" value="數碼暴龍3 水晶版" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="digimon 2 (unl).bin" size="0x100000" crc="aabbec08" sha1="b88393318c35fcd63b9bbe8ccd0ce89d971b6163" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000" />
+		</part>
+	</software>
+
+	<software name="shumabl2h" cloneof="digimn2">
+	<!-- This version bypasses the protection, but I think it's been hacked by whoever dumped
+	 the real card, so it can be removed once we properly emulate the parent -->
+		<description>Shùmǎ Bào Lóng 2 (China, hacked)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<info name="alt_title" value="數碼暴龍2" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="digimon 2 (unl) (hacked).bin" size="0x100000" crc="153ae99f" sha1="b78ba8f8f2b297a5a2847cbde27900531cfff584" />
+			</dataarea>
+			<dataarea name="ram" size="0x2000" />
+		</part>
+	</software>
+
+	<software name="hpotter3">
+		<description>Harry Potter 3 (China)</description>
+		<year>200?</year>
+		<publisher>Makon</publisher>
+		<info name="usage" value="Crashes in first level - not an emulation bug" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="harry potter 3.gbc" size="0x100000" crc="d0fece32" sha1="6820d9e05e60a380c52aa8a19a8397ec929a5b49" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="mewtwosb">
+		<description>Pokémon: Mewtwo Strikes Back (China)</description>
+		<year>200?</year>
+		<publisher>Makon</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="pokemon mewtwo strikes back.gbc" size="0x80000" crc="6e447a33" sha1="079b9d8190e8df451882f6eabc2799f82fbb9ec0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this is a reskin of Pokémon: Mewtwo Strikes Back with the stage order changed and battery save added -->
+	<software name="digimnpk">
+		<description>Digimon Pocket (China)</description>
+		<year>200?</year>
+		<publisher>Makon</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="digimon pocket.gbc" size="0x100000" crc="6791b106" sha1="87750928d5f005e67e51e4d08a6d82351effc7b2" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="pkmndspe">
+		<description>Pokémon Diamond: Special Pikachu Edition (China)</description>
+		<year>2001</year>
+		<publisher>Makon</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="pokemon diamond special pikachu edition.gbc" size="0x80000" crc="1b5bef4b" sha1="433e7991b706baedf59af8b91bc142ba2f72112f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbbhzs" cloneof="pkmndspe">
+		<description>Shùmǎ Bǎobèi: Hǎi Zhī Shén (China)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA087"/>
+		<info name="alt_title" value="数码宝贝 海之神"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="shuma baobei - hai zhi shen (unlicensed, chinese) (cba087) [raw dump].bin" size="0x80000" crc="c3cedaed" sha1="4e7b7b361302e5e400047c9e668f23cbc885a9e0" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pkmnjspe">
+		<description>Pokémon Jade: Special Pikachu Edition (China)</description>
+		<year>2001</year>
+		<publisher>Makon</publisher>
+		<info name="usage" value="Crashes when finishing the first level - not an emulation bug" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="pokemon jade special pikachu edition.gbc" size="0x80000" crc="e9488e13" sha1="254355aac31a6a75481a6a14c5c5cae1e4f41adf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- intro/title screens are a flickering mess on gbcolor (uses a high-colour trick), gameplay displays correctly -->
+	<software name="sfz4">
+		<description>Street Fighter Zero 4 (China)</description>
+		<year>2000</year>
+		<publisher>Makon</publisher>
+		<info name="alt_title" value="街霸天王4" />
+		<info name="alt_title" value="Jiē Bà Tiānwáng 4" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_ntnew" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="street fighter zero 4.gbc" size="0x100000" crc="1a6fe765" sha1="b0862fc1cc856b904b2febd094d9453a2baacb85" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sm3sp" supported="no">
 	<!--
 	There are various dumps of this:
@@ -27935,90 +28132,15 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="digimn2" supported="no">
-	<!-- This version should be the real dump, protected as the original cart -->
-		<description>Digimon 2 (China)</description>
-		<year>20??</year>
-		<publisher>Yong Yong</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_digimon" />
-			<dataarea name="rom" size="1048576">
-				<rom name="digimon 2 (unl).bin" size="1048576" crc="aabbec08" sha1="b88393318c35fcd63b9bbe8ccd0ce89d971b6163"/>
-			</dataarea>
-			<dataarea name="ram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="digimn2h" cloneof="digimn2">
-	<!-- This version bypasses the protection, but I think it's been hacked by whoever dumped
-	 the real card, so it can be removed once we properly emulate the parent -->
-		<description>Digimon 2 (China, Hacked)</description>
-		<year>20??</year>
-		<publisher>Yong Yong</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="digimon 2 (unl) (hacked).bin" size="1048576" crc="153ae99f" sha1="b78ba8f8f2b297a5a2847cbde27900531cfff584"/>
-			</dataarea>
-			<dataarea name="ram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="digimn3c">
 		<description>Digimon 3 Crystal (China)</description>
 		<year>20??</year>
 		<publisher>Yong Yong</publisher>
+		<info name="alt_title" value="數碼暴龍3 水晶版" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="digimon 3 (unl).bin" size="2097152" crc="63948092" sha1="8c934603d38b8181acdb815ebc2e6aad8e9cf6d5"/>
-			</dataarea>
-			<dataarea name="ram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="digimn4" supported="no">
-	<!-- This version should be the real dump, protected as the original cart -->
-		<description>Digimon 02 4 (China)</description>
-		<year>20??</year>
-		<publisher>Yong Yong</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_digimon" />
-			<dataarea name="rom" size="1048576">
-				<rom name="digimon 4 (unl).bin" size="1048576" crc="2ee18ab2" sha1="839f0880749735ba2113e437f8efede171b7474d"/>
-			</dataarea>
-			<dataarea name="ram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="digimn4h" cloneof="digimn4">
-	<!-- This version bypasses the protection, but I think it's been hacked by whoever dumped
-	 the real card, so it can be removed once we properly emulate the parent -->
-		<description>Digimon 02 4 (China, Hacked)</description>
-		<year>20??</year>
-		<publisher>Yong Yong</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="digimon 4 (unl) (hacked).bin" size="1048576" crc="6f67dfc6" sha1="5c5d1675188a5f618f9babf2b3848942ce08c659"/>
-			</dataarea>
-			<dataarea name="ram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="digijade" cloneof="digimn4">
-		<description>Digimon 02 Jade (China)</description>
-		<year>20??</year>
-		<publisher>Yong Yong</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="digimon 02 jade (unl).bin" size="1048576" crc="c64818eb" sha1="314cf9deaf5c42905d412315fe701524ebd9e9ad"/>
 			</dataarea>
 			<dataarea name="ram" size="8192">
 			</dataarea>
