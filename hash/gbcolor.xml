@@ -28097,7 +28097,7 @@ license:CC0
 	</software>
 
 	<!-- intro/title screens are a flickering mess on gbcolor (uses a high-colour trick), gameplay displays correctly -->
-	<software name="sfz4">
+	<software name="sfz4" supported="partial">
 		<description>Street Fighter Zero 4 (China)</description>
 		<year>2000</year>
 		<publisher>Makon</publisher>
