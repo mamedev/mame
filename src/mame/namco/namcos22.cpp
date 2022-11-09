@@ -1715,7 +1715,7 @@ void namcos22_state::namcos22_am(address_map &map)
 
 	/**
 	 * System Controller: Interrupt Control, Peripheral Control
-	 *
+	 * assumed to be C383
 	 */
 	map(0x40000000, 0x4000001f).rw(FUNC(namcos22_state::syscon_r), FUNC(namcos22_state::s22_syscon_w));
 

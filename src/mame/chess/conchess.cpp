@@ -7,7 +7,7 @@ Conchess, a series of modular chess computers by Consumenta Computer.
 Hardware development by Loproc (Germany), manufactured at Wallharn Electronics
 (Ireland). The core people involved were Ulf Rathsman for the chess engine,
 and Johan Enroth. After Consumenta went under in 1983, the Conchess brand was
-continued by Systemhuset, Enroth's company.
+continued by Systemhuset.
 
 TODO:
 - dump/add princhess module
