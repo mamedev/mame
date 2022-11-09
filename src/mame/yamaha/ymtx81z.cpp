@@ -170,8 +170,6 @@ void ymtx81z_state::tx81z(machine_config &config)
 
 ROM_START(tx81z)
 	ROM_REGION(0x10000, "program", 0)
-	ROM_SYSTEM_BIOS(0, "last", "Last Revision")
-	ROMX_LOAD("tx81z-last-revision.ic15", 0x00000, 0x10000, CRC(2d635c40) SHA1(cae098724079d7b8a711351c3132d7332ca43751), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v16", "Version 1.6")
 	ROMX_LOAD("tx81z-v1.6.ic15", 0x00000, 0x10000, CRC(ab9b7347) SHA1(208a72c0dc615825c442240e520a6a3c5fe860ea), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v15", "Version 1.5")
