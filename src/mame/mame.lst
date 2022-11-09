@@ -33462,9 +33462,12 @@ npusagif                        //
 
 @source:cirsa/neptunp2.cpp
 ccorsario                       // (c) 2002 Cirsa / Unidesa
+mltpoints                       // (c) 2006 Cirsa / Unidesa
 neptunp2                        // (c) 2003 Cirsa / Unidesa
+perlacrb                        // (c) 2008 Cirsa / Unidesa
 rockroll                        // (c) 1999 Cirsa / Unidesa
 unk960606                       // (c) 2001? Cirsa / Unidesa
+unk960606b                      // (c) 2001? Cirsa / Unidesa / Europea
 
 @source:nintendo/nes.cpp
 iq501                           // Micro Genius IQ-501
