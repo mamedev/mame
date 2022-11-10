@@ -26304,7 +26304,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
 			<dataarea name="rom" size="0x200000">
-				<rom name="fantastic simulated battle.gbc" size="0x200000" crc="9268bb9f" sha1="747707afd771d73dbbdeeeaec1c1201f2729fb8a" />
+				<rom name="fantastic simulated battle.gbc" size="0x200000" crc="34c1a63a" sha1="747707afd771d73dbbdeeeaec1c1201f2729fb8a" />
 			</dataarea>
 			<dataarea name="nvram" size="0x8000" />
 		</part>
@@ -26333,7 +26333,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
 			<dataarea name="rom" size="0x200000">
-				<rom name="shengui diguo zhi emo cheng.gbc" size="0x200000" crc="366067e8" sha1="3fc2533f71cea3aec6310f5f7c33fa7eac427b99" />
+				<rom name="shengui diguo zhi emo cheng.gbc" size="0x200000" crc="1823e24d" sha1="3fc2533f71cea3aec6310f5f7c33fa7eac427b99" />
 			</dataarea>
 			<dataarea name="nvram" size="0x8000" />
 		</part>
@@ -27947,11 +27947,10 @@ license:CC0
 		<info name="alt_title" value="數碼暴龍02 4" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="digimon 4 (unl) (hacked).bin" size="1048576" crc="6f67dfc6" sha1="5c5d1675188a5f618f9babf2b3848942ce08c659"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="digimon 4 (unl) (hacked).bin" size="0x100000" crc="6f67dfc6" sha1="5c5d1675188a5f618f9babf2b3848942ce08c659" />
 			</dataarea>
-			<dataarea name="ram" size="8192">
-			</dataarea>
+			<dataarea name="ram" size="0x2000" />
 		</part>
 	</software>
 
@@ -27963,11 +27962,10 @@ license:CC0
 		<info name="alt_title" value="數碼暴龍02 翡翠版" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="digimon 02 jade (unl).bin" size="1048576" crc="c64818eb" sha1="314cf9deaf5c42905d412315fe701524ebd9e9ad"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="digimon 02 jade (unl).bin" size="0x100000" crc="c64818eb" sha1="314cf9deaf5c42905d412315fe701524ebd9e9ad" />
 			</dataarea>
-			<dataarea name="ram" size="8192">
-			</dataarea>
+			<dataarea name="ram" size="0x2000" />
 		</part>
 	</software>
 
@@ -28048,8 +28046,8 @@ license:CC0
 		<publisher>Makon</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_ntnew" />
-			<dataarea name="rom" size="0x100000">
-				<rom name="digimon pocket.gbc" size="0x100000" crc="6791b106" sha1="87750928d5f005e67e51e4d08a6d82351effc7b2" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="digimon pocket.gbc" size="0x80000" crc="6791b106" sha1="87750928d5f005e67e51e4d08a6d82351effc7b2" />
 			</dataarea>
 			<dataarea name="nvram" size="0x8000" />
 		</part>
@@ -28078,8 +28076,7 @@ license:CC0
 			<dataarea name="rom" size="0x80000">
 				<rom name="shuma baobei - hai zhi shen (unlicensed, chinese) (cba087) [raw dump].bin" size="0x80000" crc="c3cedaed" sha1="4e7b7b361302e5e400047c9e668f23cbc885a9e0" />
 			</dataarea>
-			<dataarea name="nvram" size="0x8000"> <!-- Unconfirmed size -->
-			</dataarea>
+			<dataarea name="nvram" size="0x8000" /> <!-- Unconfirmed size -->
 		</part>
 	</software>
 
