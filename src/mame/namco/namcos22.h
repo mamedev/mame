@@ -502,37 +502,20 @@ class namcos22s_state : public namcos22_state
 {
 public:
 	namcos22s_state(const machine_config &mconfig, device_type type, const char *tag) :
-		namcos22_state(mconfig, type, tag),
-		m_motor_timer(*this, "motor_timer"),
-		m_pc_pedal_interrupt(*this, "pc_p_int"),
-		m_ar_tb_interrupt(*this, "ar_tb_int%u", 0)
+		namcos22_state(mconfig, type, tag)
 	{ }
 
 	void namcos22s(machine_config &config);
-	void propcycl(machine_config &config);
 	void dirtdash(machine_config &config);
 	void airco22b(machine_config &config);
 	void cybrcycc(machine_config &config);
 	void tokyowar(machine_config &config);
-	void alpine(machine_config &config);
-	void alpinesa(machine_config &config);
-	void adillor(machine_config &config);
-	void timecris(machine_config &config);
 
 	void init_aquajet();
-	void init_adillor();
 	void init_cybrcyc();
-	void init_timecris();
 	void init_tokyowar();
-	void init_propcycl();
-	void init_propcyclj();
-	void init_alpiner2();
 	void init_dirtdash();
 	void init_airco22();
-	void init_alpiner();
-	void init_alpinesa();
-
-	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
 
 protected:
 	virtual void machine_start() override;
@@ -540,7 +523,6 @@ protected:
 	virtual void init_tables() override;
 	virtual void draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-private:
 	void install_130_speedup();
 	void install_141_speedup();
 
@@ -557,9 +539,6 @@ private:
 	u16 spotram_r(offs_t offset);
 	void spotram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	u32 alpinesa_prot_r();
-	void alpinesa_prot_w(u32 data);
-	u16 timecris_gun_r(offs_t offset);
 	void mb87078_gain_changed(offs_t offset, u8 data);
 	void namcos22s_chipselect_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -570,26 +549,14 @@ private:
 	void mcu_port6_w(u8 data);
 	u8 mcu_port6_r();
 	template <int Channel> u16 mcu_adc_r();
-	void alpine_mcu_port4_w(u8 data);
 	u16 mcu130_speedup_r();
 	u16 mcu141_speedup_r();
 
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_update);
-	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_update);
-	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
 
-	void alpinesa_am(address_map &map);
 	void mcu_program(address_map &map);
 	void namcos22s_am(address_map &map);
-	void timecris_am(address_map &map);
-
-	optional_device<timer_device> m_motor_timer;
-	optional_device<timer_device> m_pc_pedal_interrupt;
-	optional_device_array<timer_device, 2> m_ar_tb_interrupt;
 
 	int m_spotram_enable = 0;
 	int m_spotram_address = 0;
@@ -597,11 +564,96 @@ private:
 	std::unique_ptr<u16[]> m_banked_czram[4];
 	u32 m_cz_was_written[4];
 
-	u32 m_alpinesa_protection = 0;
-	int m_motor_status = 0;
 	u8 m_mcu_iocontrol = 0;
 	u8 m_mcu_outdata = 0;
 	int m_chipselect = 0;
+};
+
+class alpine_state : public namcos22s_state
+{
+public:
+	alpine_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos22s_state(mconfig, type, tag),
+		m_motor_timer(*this, "motor_timer")
+	{ }
+
+	void alpine(machine_config &config);
+	void alpinesa(machine_config &config);
+
+	void init_alpiner2();
+	void init_alpiner();
+	void init_alpinesa();
+
+	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
+
+protected:
+	virtual void machine_start() override;
+
+	u32 alpinesa_prot_r();
+	void alpinesa_prot_w(u32 data);
+
+	void alpine_mcu_port4_w(u8 data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
+
+	void alpinesa_am(address_map &map);
+
+	required_device<timer_device> m_motor_timer;
+
+	u32 m_alpinesa_protection = 0;
+	int m_motor_status = 0;
+};
+
+class timecris_state : public namcos22s_state
+{
+public:
+	timecris_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos22s_state(mconfig, type, tag)
+	{ }
+
+	void timecris(machine_config &config);
+	void init_timecris();
+
+private:
+	u16 gun_r(offs_t offset);
+	void timecris_am(address_map &map);
+};
+
+class propcycl_state : public namcos22s_state
+{
+public:
+	propcycl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos22s_state(mconfig, type, tag),
+		m_pedal_interrupt(*this, "pedal_int")
+	{ }
+
+	void propcycl(machine_config &config);
+	void init_propcycl();
+	void init_propcyclj();
+
+private:
+	required_device<timer_device> m_pedal_interrupt;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(pedal_update);
+	TIMER_DEVICE_CALLBACK_MEMBER(pedal_interrupt);
+};
+
+class adillor_state : public namcos22s_state
+{
+public:
+	adillor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos22s_state(mconfig, type, tag),
+		m_trackball_interrupt(*this, "trackball_int%u", 0)
+	{ }
+
+	void adillor(machine_config &config);
+	void init_adillor();
+
+private:
+	required_device_array<timer_device, 2> m_trackball_interrupt;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(trackball_update);
+	TIMER_DEVICE_CALLBACK_MEMBER(trackball_interrupt);
 };
 
 #endif // MAME_INCLUDES_NAMCOS22_H
