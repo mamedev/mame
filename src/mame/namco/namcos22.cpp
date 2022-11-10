@@ -1914,38 +1914,23 @@ void timecris_state::timecris_am(address_map &map)
 }
 
 
-// Alpine Surfer protection
-u32 alpine_state::alpinesa_prot_r()
+// Alpine Surfer banking
+u32 alpinesa_state::rombank_r()
 {
-	return m_alpinesa_protection;
+	return m_rombank->entry();
 }
 
-void alpine_state::alpinesa_prot_w(u32 data)
+void alpinesa_state::rombank_w(u32 data)
 {
-	switch (data)
-	{
-		case 0:
-			m_alpinesa_protection = 0;
-			break;
-
-		case 1:
-			m_alpinesa_protection = 1;
-			break;
-
-		case 3:
-			m_alpinesa_protection = 2;
-			break;
-
-		default:
-			break;
-	}
+	m_rombank->set_entry(std::clamp(data & 3, 0U, 2U));
 }
 
-void alpine_state::alpinesa_am(address_map &map)
+void alpinesa_state::alpinesa_am(address_map &map)
 {
 	namcos22s_am(map);
-	map(0x200000, 0x200003).r(FUNC(alpine_state::alpinesa_prot_r));
-	map(0x300000, 0x300003).w(FUNC(alpine_state::alpinesa_prot_w));
+	map(0x200000, 0x3fffff).bankr("rombank");
+	map(0x200000, 0x200003).r(FUNC(alpinesa_state::rombank_r));
+	map(0x300000, 0x300003).w(FUNC(alpinesa_state::rombank_w));
 }
 
 
@@ -3734,7 +3719,6 @@ void alpine_state::machine_start()
 {
 	namcos22s_state::machine_start();
 
-	save_item(NAME(m_alpinesa_protection));
 	save_item(NAME(m_motor_status));
 }
 
@@ -3860,11 +3844,11 @@ void alpine_state::alpine(machine_config &config)
 	TIMER(config, m_motor_timer).configure_generic(FUNC(alpine_state::alpine_steplock_callback));
 }
 
-void alpine_state::alpinesa(machine_config &config)
+void alpinesa_state::alpinesa(machine_config &config)
 {
 	alpine(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &alpine_state::alpinesa_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alpinesa_state::alpinesa_am);
 }
 
 void namcos22s_state::cybrcycc(machine_config &config)
@@ -6124,10 +6108,12 @@ void alpine_state::init_alpiner2()
 	m_motor_status = 2;
 }
 
-void alpine_state::init_alpinesa()
+void alpinesa_state::init_alpinesa()
 {
 	m_gametype = NAMCOS22_ALPINE_SURFER;
 	install_141_speedup();
+
+	m_rombank->configure_entries(0, 3, memregion("maincpu")->base() + 0x200000, 0x200000);
 
 	m_motor_status = 2;
 }
@@ -6144,7 +6130,7 @@ void propcycl_state::init_propcycl()
 
 	// patch out strange routine (uninitialized-eeprom related?)
 	// maybe needs more accurate 28C64 eeprom device emulation
-	ROM[0x1992C/4] = 0x4e754e75;
+	ROM[0x1992c/4] = 0x4e754e75;
 
 	/**
 	 * The dipswitch reading routine in Prop Cycle polls the
@@ -6251,7 +6237,7 @@ GAME( 1995, timecris,   0,        timecris,  timecris,  timecris_state,  init_ti
 GAME( 1995, timecrisa,  timecris, timecris,  timecris,  timecris_state,  init_timecris,  ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
 GAME( 1996, propcycl,   0,        propcycl,  propcycl,  propcycl_state,  init_propcycl,  ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
 GAME( 1996, propcyclj,  propcycl, propcycl,  propcycl,  propcycl_state,  init_propcyclj, ROT0, "Namco", "Prop Cycle (Rev. PR1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:06:03
-GAME( 1996, alpinesa,   0,        alpinesa,  alpiner,   alpine_state,    init_alpinesa,  ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
+GAME( 1996, alpinesa,   0,        alpinesa,  alpiner,   alpinesa_state,  init_alpinesa,  ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
 GAME( 1996, tokyowar,   0,        tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
 GAME( 1996, tokyowarj,  tokyowar, tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:16:29
 GAME( 1996, aquajet,    0,        cybrcycc,  aquajet,   namcos22s_state, init_aquajet,   ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30

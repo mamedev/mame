@@ -578,30 +578,39 @@ public:
 	{ }
 
 	void alpine(machine_config &config);
-	void alpinesa(machine_config &config);
-
 	void init_alpiner2();
 	void init_alpiner();
-	void init_alpinesa();
 
 	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
 
 protected:
-	virtual void machine_start() override;
-
-	u32 alpinesa_prot_r();
-	void alpinesa_prot_w(u32 data);
-
-	void alpine_mcu_port4_w(u8 data);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
-
-	void alpinesa_am(address_map &map);
-
 	required_device<timer_device> m_motor_timer;
 
-	u32 m_alpinesa_protection = 0;
+	virtual void machine_start() override;
+
+	void alpine_mcu_port4_w(u8 data);
+	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
+
 	int m_motor_status = 0;
+};
+
+class alpinesa_state : public alpine_state
+{
+public:
+	alpinesa_state(const machine_config &mconfig, device_type type, const char *tag) :
+		alpine_state(mconfig, type, tag),
+		m_rombank(*this, "rombank")
+	{ }
+
+	void alpinesa(machine_config &config);
+	void init_alpinesa();
+
+private:
+	required_memory_bank m_rombank;
+
+	void rombank_w(u32 data);
+	u32 rombank_r();
+	void alpinesa_am(address_map &map);
 };
 
 class timecris_state : public namcos22s_state
