@@ -272,8 +272,6 @@ Few other notes:
 
 **********************************************************************************************************************************/
 
-
-
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
@@ -302,9 +300,6 @@ Few other notes:
 #include "formats/m5_dsk.h"
 #include "formats/sord_cas.h"
 
-//brno mod
-#define RAMDISK         "ramdisk"
-
 
 class m5_state : public driver_device
 {
@@ -324,7 +319,6 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_reset(*this, "RESET")
 		, m_DIPS(*this, "DIPS")
-		, m_centronics_busy(0)
 	{ }
 
 	void m5(machine_config &config);
@@ -346,13 +340,18 @@ protected:
 	optional_device<ram_device> m_ram;
 	required_ioport m_reset;
 	optional_ioport m_DIPS;
-	m5_cart_slot_device *m_cart_ram, *m_cart;
+
+	m5_cart_slot_device *m_cart_ram = nullptr;
+	m5_cart_slot_device *m_cart = nullptr;
+
+	bool m_centronics_busy = false;
 
 	u8 sts_r();
 	void com_w(u8 data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
 private:
 	u8 ppi_pa_r();
 	void ppi_pa_w(u8 data);
@@ -382,23 +381,17 @@ private:
 	void m5_io(address_map &map);
 	void m5_mem(address_map &map);
 
-	// video state
-//  const TMS9928a_interface *m_vdp_intf;
-
-protected:
-	bool m_centronics_busy;
-
 private:
-	u8 m_ram_mode;
-	u8 m_ram_type;
-	memory_region *m_cart_rom;
+	u8 m_ram_mode = 0;
+	u8 m_ram_type = 0;
+	memory_region *m_cart_rom = nullptr;
 
 	// floppy state for fd5
-	u8 m_fd5_data;
-	u8 m_fd5_com;
-	int m_intra;
-	int m_ibfa;
-	int m_obfa;
+	u8 m_fd5_data = 0;
+	u8 m_fd5_com = 0;
+	int m_intra = 0;
+	int m_ibfa = 0;
+	int m_obfa = 0;
 };
 
 
@@ -1311,9 +1304,6 @@ static void brno_floppies(device_slot_interface &device)
 //-------------------------------------------------
 void m5_state::machine_start()
 {
-	m_cart_ram = nullptr;
-	m_cart = nullptr;
-
 	// register for state saving
 	save_item(NAME(m_fd5_data));
 	save_item(NAME(m_fd5_com));
