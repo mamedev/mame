@@ -4,6 +4,19 @@
 
  Memory controller used for newer NT/Makon games
 
+ Appears to start in a mode similar to Nintendo MBC3, with a fixed 16 KiB
+ ROM bank at 0x0000 and a switchable 16 KiB ROM bank at 0x4000, but allows
+ switching to a mode with selectable 8 KiB ROM banks at 0x4000 and 0x6000.
+
+ It isn't clear how many static RAM pages are actually supported.  Many
+ cartridges included 32K*8 static RAMs despite the headers declaring smaller
+ sizes and the games using no more than 8 KiB.  The maximum supported ROM
+ size is also unknown.
+
+ Pretty much everything here is guessed based on the games' behaviour.  The
+ exact address ranges the memory controller responds to are unknown.  There
+ may be additional features that are not emulated.
+
  ***************************************************************************/
 
 #include "emu.h"
@@ -105,7 +118,7 @@ void ntnew_device::device_reset()
 void ntnew_device::enable_ram(offs_t offset, u8 data)
 {
 	// TODO: what range actually triggers this, and does it still trigger RAM enable?
-	if (((offset & 0xff00) == 0x1400) & (0x55 == data))
+	if (((offset & 0x1f00) == 0x1400) & (0x55 == data))
 	{
 		LOG("%s: 8K ROM banking enabled\n", machine().describe_context());
 		m_bank_8k = 1U;
@@ -129,7 +142,7 @@ void ntnew_device::bank_switch_rom(offs_t offset, u8 data)
 	if (m_bank_8k)
 	{
 		// TODO: what ranges does the controller actually respond to?
-		switch (offset & 0xff00)
+		switch (offset & 0x0f00)
 		{
 		case 0x0000:
 			if (!(data & 0xfe))

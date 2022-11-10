@@ -26511,7 +26511,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
 			<dataarea name="rom" size="0x200000">
-				<rom name="2003 ha li bo te 2 - xiao shi de mi shi (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="1b3e1243" sha1="0829cbcab3ef5d03c94d5efe769f4f4a93ac47fa"/>
+				<rom name="2003 ha li bo te 2 - xiao shi de mi shi (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="1b3e1243" sha1="0829cbcab3ef5d03c94d5efe769f4f4a93ac47fa" />
 			</dataarea>
 			<dataarea name="nvram" size="8192" />
 		</part>
@@ -26525,10 +26525,23 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
 			<dataarea name="rom" size="0x200000">
-				<rom name="2003 ha li xiao zi iv (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="db3c8b95" sha1="0d230b20388f4396d6345b8eb59f54fc169ad8ee"/>
+				<rom name="2003 ha li xiao zi iv (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="db3c8b95" sha1="0d230b20388f4396d6345b8eb59f54fc169ad8ee" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="0x2000" />
+		</part>
+	</software>
+
+	<!-- white screen when it should display dialogue before fights -->
+	<software name="dbz32002" supported="partial">
+		<description>Dragon Ball Z III 2002 Fighting</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="dragon ball z iii 2002 fighting.gbc" size="0x200000" crc="dbe0f44e" sha1="baea9e5ee1411988039d563ece97d8d7f765396a" />
 			</dataarea>
+			<dataarea name="nvram" size="0x2000" />
 		</part>
 	</software>
 
