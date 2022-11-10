@@ -4392,6 +4392,16 @@ ROM_START( sinvemag )
 	ROM_LOAD( "emag_si.f",    0x1c00, 0x0400, CRC(077f5ef2) SHA1(625de6839073ac4c904f949efc1b2e0afea5d676) )
 ROM_END
 
+ROM_START( sinvemag2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sie.a", 0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "sie.b", 0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
+	ROM_LOAD( "sie.c", 0x0800, 0x0400, CRC(ad6529f0) SHA1(69cbf7e052c4b1ea210c7c92af75a68a34ebf6bb) )
+	ROM_LOAD( "sie.d", 0x1400, 0x0400, CRC(68c4b9da) SHA1(8953dc0427b09b71bd763e65caa7deaca09a15da) )
+	ROM_LOAD( "sie.e", 0x1800, 0x0400, CRC(636a6b7d) SHA1(6061355176f9bf88d5b2caba9fc6828061669853) )
+	ROM_LOAD( "sie.f", 0x1c00, 0x0400, CRC(52062faa) SHA1(c3788ce39b6ddb05115733ebd0de2ece10ef7928) )
+ROM_END
+
 ROM_START( tst_invd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "test.h",       0x0000, 0x0800, CRC(f86a2eea) SHA1(4a72ff01f3e6d16bbe9bf7f123cd98895bfbed9a) )   /*  The Test ROM */
@@ -5945,7 +5955,8 @@ GAMEL(1979, invasionrz,  invaders, invasion,  invasion,  invasion_state, empty_i
 GAMEL(1979, invasionrza, invaders, invasion,  invasion,  invasion_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)",          "Invasion (bootleg set 2, R Z SRL Bologna)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, invadersem,  invaders, invaders,  sitv,      sisv_state,     empty_init,    ROT270, "Electromar",                         "Space Invaders (Electromar, Spanish)",                            MACHINE_SUPPORTS_SAVE, layout_invaders ) // Possibly licensed
 GAMEL(1978, superinv,    invaders, invaders,  superinv,  invaders_state, empty_init,    ROT270, "bootleg",                            "Super Invaders (bootleg set 1)",                                  MACHINE_SUPPORTS_SAVE, layout_invaders ) // Not related to Zenitone-Microsec version
-GAMEL(1978, sinvemag,    invaders, invaders,  sinvemag,  invaders_state, empty_init,    ROT270, "bootleg (Emag)",                     "Super Invaders (bootleg set 2)",                                  MACHINE_SUPPORTS_SAVE, layout_invaders ) // Not related to Zenitone-Microsec version
+GAMEL(1978, sinvemag,    invaders, invaders,  sinvemag,  invaders_state, empty_init,    ROT270, "bootleg (Emag)",                     "Super Invaders (Emag bootleg set 1)",                             MACHINE_SUPPORTS_SAVE, layout_invaders ) // Not related to Zenitone-Microsec version
+GAMEL(1978, sinvemag2,   invaders, invaders,  sinvemag,  invaders_state, empty_init,    ROT270, "bootleg (Emag)",                     "Super Invaders (Emag bootleg set 2)",                             MACHINE_SUPPORTS_SAVE, layout_invaders ) // Not related to Zenitone-Microsec version
 GAMEL(1980, searthin,    invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Competitive Video)",        "Super Earth Invasion (set 1)",                                    MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, searthina,   invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Competitive Video)",        "Super Earth Invasion (set 2)",                                    MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, supinvsion,  invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Electromar / Irecsa)",      "Super Invasion (Electromar, Spanish)",                            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS, layout_invaders )
