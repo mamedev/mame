@@ -149,7 +149,10 @@ void tc0080vco_device::device_start()
 //	m_tilemap[0]->set_transparent_pen(0);
 //	m_tilemap[1]->set_transparent_pen(0);
 
-
+	// ainferno expects upper color bank to be transparent for hud and landing monitor to display properly.
+	// This is drawn with bit 15, is it expecting some kind of shadowing/blending? The PCB refs doesn't seem to show anything of the like.
+	// The only other place that sets upper color bank is tetristh, and doesn't seem to have any real effect.
+	// TODO: this arrangement may be controlled by m_scroll_ram[0] bits 7 and 6, which is either b11 or b00.
 	m_tilemap[0]->set_transmask(0, 0x0001, 0xfffe);
 	m_tilemap[0]->set_transmask(1, 0x8001, 0x7ffe);
 	m_tilemap[1]->set_transmask(0, 0x0001, 0xfffe);
