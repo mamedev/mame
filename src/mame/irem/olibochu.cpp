@@ -13,7 +13,6 @@ TODO:
 - verify HC55536 clock, I don't think it's from master XTAL, maybe R/C osc
 - is the "Chu has food" sample ever played? Nothing is written to soundcmd when
   a Chu eats a Boo dropping
-- verify C-1 PROM, darkred background is odd
 
 --------------
 
