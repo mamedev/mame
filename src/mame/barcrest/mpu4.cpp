@@ -245,9 +245,9 @@ with settings like this in the majority of cases.
 8 display enables (pins 10 - 17)
 */
 
-void mpu4_state::lamp_extend_small(int data)
+void mpu4_state::lamp_extend_small(uint8_t data)
 {
-	int lamp_ext_data,column,i;
+	uint8_t lamp_ext_data,column,i;
 	column = data & 0x07;
 
 	lamp_ext_data = 0x1f - ((data & 0xf8) >> 3);//remove the mux lines from the data
@@ -269,15 +269,15 @@ void mpu4_state::lamp_extend_small(int data)
 	}
 }
 
-void mpu4_state::lamp_extend_large(int data,int column,int active)
+void mpu4_state::lamp_extend_large(uint8_t data,uint8_t column,bool active)
 {
 	m_lamp_sense = false;
-	int bit7 = BIT(data, 7);
+	uint8_t bit7 = BIT(data, 7);
 	if ( bit7 != m_last_b7 )
 	{
 		m_card_live = true;
 		//depending on bit 7, we can access one of two 'blocks' of 64 lamps
-		int lampbase = bit7 ? 0 : 64;
+		uint8_t lampbase = bit7 ? 0 : 64;
 		if ( data & 0x3f )
 		{
 			m_lamp_sense = true;
@@ -302,9 +302,9 @@ void mpu4_state::lamp_extend_large(int data,int column,int active)
 	}
 }
 
-void mpu4_state::led_write_extender(int latch, int data, int starting_column)
+void mpu4_state::led_write_extender(uint8_t latch, uint8_t data, uint8_t starting_column)
 {
-	int diff,i,j, ext_strobe;
+	uint8_t diff,i,j, ext_strobe;
 
 	diff = (latch ^ m_last_latch) & latch;
 	ext_strobe = (7 - starting_column) * 8;
@@ -328,8 +328,8 @@ void mpu4_state::led_write_extender(int latch, int data, int starting_column)
 
 void mpu4_state::update_meters()
 {
-	int meter;
-	int data = ((m_mmtr_data & 0x7f) | m_remote_meter);
+	uint8_t meter;
+	uint8_t data = ((m_mmtr_data & 0x7f) | m_remote_meter);
 	switch (m_reel_mux)
 	{
 	case STANDARD_REEL:
@@ -434,7 +434,7 @@ MACHINE_RESET_MEMBER(mpu4_state,mpu4)
 WRITE_LINE_MEMBER(mpu4_state::cpu0_irq)
 {
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
-	int combined_state = m_pia3->irq_a_state() | m_pia3->irq_b_state() |
+	uint8_t combined_state = m_pia3->irq_a_state() | m_pia3->irq_b_state() |
 							m_pia4->irq_a_state() | m_pia4->irq_b_state() |
 							m_pia5->irq_a_state() | m_pia5->irq_b_state() |
 							m_pia6->irq_a_state() | m_pia6->irq_b_state() |
@@ -447,18 +447,18 @@ WRITE_LINE_MEMBER(mpu4_state::cpu0_irq)
 		if (!m_link7a_connected)
 		{
 			m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-			LOG(("6809 int%d \n", combined_state));
+			LOG(("6809 IRQ %d \n", combined_state));
 		}
 		else
 		{
 			m_maincpu->set_input_line(INPUT_LINE_NMI, combined_state ? ASSERT_LINE : CLEAR_LINE);
-			LOG(("6809 nmint%d \n", combined_state));
+			LOG(("6809 NMI %d \n", combined_state));
 		}
 	}
 	else
 	{
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-		LOG(("6809 fint%d \n", combined_state));
+		LOG(("6809 FIRQ %d \n", combined_state));
 	}
 }
 
@@ -522,7 +522,7 @@ WRITE_LINE_MEMBER(mpu4_state::ic2_o3_callback)
 /* IC3, lamp data lines + alpha numeric display */
 void mpu4_state::pia_ic3_porta_w(uint8_t data)
 {
-	int i;
+	uint8_t i;
 	LOG_IC3(("%s: IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", machine().describe_context(),data));
 
 	if(m_ic23_active)
@@ -548,7 +548,7 @@ void mpu4_state::pia_ic3_porta_w(uint8_t data)
 
 void mpu4_state::pia_ic3_portb_w(uint8_t data)
 {
-	int i;
+	uint8_t i;
 	LOG_IC3(("%s: IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", machine().describe_context(),data));
 
 	if(m_ic23_active)
@@ -626,7 +626,7 @@ IC24 is a 74LS122 pulse generator
 CLEAR and B2 are tied high and A1 and A2 tied low, meaning any pulse
 on B1 will give a low pulse on the output pin.
 */
-void mpu4_state::ic24_output(int data)
+void mpu4_state::ic24_output(uint8_t data)
 {
 	m_IC23G2A = data;
 	ic23_update();
@@ -1103,19 +1103,19 @@ void mpu4_state::pia_ic7_portb_w(uint8_t data)
 
 uint8_t mpu4_state::pia_ic7_portb_r()
 {
-/* The meters are connected to a voltage drop sensor, where current
-flowing through them also passes through pin B7, meaning that when
-any meter is activated, pin B7 goes high.
-As for why they connected this to an output port rather than using
-CB1, no idea, although it proved of benefit when the reel multiplexer was designed
-as it allows a separate meter to be used when the rest of the port is blocked.
-This appears to have confounded the schematic drawer, who has assumed that
-all eight meters are driven from this port, giving the 8 line driver chip
-9 connections in total. */
+	/* The meters are connected to a voltage drop sensor, where current
+	flowing through them also passes through pin B7, meaning that when
+	any meter is activated, pin B7 goes high.
+	As for why they connected this to an output port rather than using
+	CB1, no idea, although it proved of benefit when the reel multiplexer was designed
+	as it allows a separate meter to be used when the rest of the port is blocked.
+	This appears to have confounded the schematic drawer, who has assumed that
+	all eight meters are driven from this port, giving the 8 line driver chip
+	9 connections in total. */
 
 	//This may be overkill, but the meter sensing is VERY picky
 
-	int combined_meter = m_meters->get_activity(0) | m_meters->get_activity(1) |
+	uint8_t combined_meter = m_meters->get_activity(0) | m_meters->get_activity(1) |
 							m_meters->get_activity(2) | m_meters->get_activity(3) |
 							m_meters->get_activity(4) | m_meters->get_activity(5) |
 							m_meters->get_activity(6) | m_meters->get_activity(7);
@@ -1176,7 +1176,7 @@ void mpu4_state::pia_ic8_portb_w(uint8_t data)
 		data &= ~0x07; //remove Triacs from use
 	}
 	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", machine().describe_context(),data));
-	for (int i = 0; i < 8; i++)
+	for (uint8_t i = 0; i < 8; i++)
 	{
 		m_triacs[i] = BIT(data, i);
 	}
@@ -1210,7 +1210,7 @@ void mpu4_state::pia_gb_porta_w(uint8_t data)
 
 void mpu4_state::pia_gb_portb_w(uint8_t data)
 {
-	int changed = m_expansion_latch^data;
+	uint8_t changed = m_expansion_latch^data;
 
 	LOG_SS(("%s: GAMEBOARD: PIA Port B Set to %2x\n", machine().describe_context(),data));
 
@@ -1241,7 +1241,7 @@ void mpu4_state::pia_gb_portb_w(uint8_t data)
 uint8_t mpu4_state::pia_gb_portb_r()
 {
 	LOG_SS(("%s: GAMEBOARD: PIA Read of Port B\n",machine().describe_context()));
-	int data=0;
+	uint8_t data=0;
 	// b7 NAR - we can load another address into Channel 1
 	// b6, 1 = OKI ready, 0 = OKI busy
 	// b5, vol clock
@@ -1312,8 +1312,8 @@ void mpu4_state::ic3ss_w(offs_t offset, uint8_t data)
 	float num = (1720000/((m_t3l + 1)*(m_t3h + 1)));
 	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
 
-	int denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
-	int freq=num*denom2;
+	uint8_t denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
+	uint8_t freq=num*denom2;
 
 	if (freq)
 	{

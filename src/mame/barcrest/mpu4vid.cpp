@@ -295,7 +295,7 @@ private:
 	//Video
 	uint8_t m_m6840_irq_state;
 	uint8_t m_m6850_irq_state;
-	int m_gfx_index;
+	uint16_t m_gfx_index;
 	int8_t m_cur[2];
 
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
