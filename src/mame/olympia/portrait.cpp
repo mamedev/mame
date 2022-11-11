@@ -239,7 +239,7 @@ static const gfx_layout tile_layout =
 	16,16, /* tile width, height   */
 	1024,  /* number of characters  */
 	3,     /* bits per pixel */
-	{ 0x8000*8, 0x4000*8, 0x0000*8 }, /* bitplane offsets */
+	{ 0x0000*8, 0x4000*8, 0x8000*8 }, /* bitplane offsets */
 	{
 		RGN_FRAC(1,2)+7, RGN_FRAC(1,2)+6, RGN_FRAC(1,2)+5, RGN_FRAC(1,2)+4,
 		RGN_FRAC(1,2)+3, RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+1, RGN_FRAC(1,2)+0,

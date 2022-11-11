@@ -74,37 +74,29 @@ void portrait_state::video_start()
 	save_item(NAME(m_scroll));
 }
 
-
-
 void portrait_state::portrait_palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 
-/*
-    for (int i = 0; i < 0x40; i++)
-    {
-        int const data = color_prom[i];
-
-        int const r = (data >> 0) & 0x7;
-        int const g = (data >> 3) & 0x3;
-        int const b = (data >> 5) & 0x7;
-
-        palette.set_indirect_color(i, rgb_t(pal3bit(r), pal2bit(g), pal3bit(b)));
-    }
-*/
-
 	for (int i = 0; i < 0x20; i++)
 	{
 		int const data = (color_prom[i + 0] << 0) | (color_prom[i + 0x20] << 8);
+		
+		// [+0x00] bit 0-3, bit 6-4
+		// [+0x20] bit 0-2, bit 7-5
 
-		int const r = (data >> 0) & 0x1f;
-		int const g = (data >> 5) & 0x1f;
-		int const b = (data >> 10) & 0x1f;
+		int ii = (data >> 0) & 0xf;
+		//int b = ((data >> 4) & 0x7) * ii;
+		//int r = ((data >> 8) & 0x7) * ii;
+		//int g = ((data >> 13) & 0x7) * ii;
+		int r = ii * 0x11;
+		int g = ii * 0x11;
+		int b = ii * 0x11;
 
-		palette.set_indirect_color(i, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 
 		// ?? the lookup seems to reference 0x3f colours, unless 1 bit is priority or similar?
-		palette.set_indirect_color(i + 0x20, rgb_t(pal5bit(r >> 1), pal5bit(g >> 1), pal5bit(b >> 1)));
+		palette.set_indirect_color(i + 0x20, rgb_t(r, g, b));
 	}
 
 	uint8_t const *const lookup = memregion("tileattr")->base();
