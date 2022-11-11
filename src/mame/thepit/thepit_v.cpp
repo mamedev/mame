@@ -135,8 +135,6 @@ void thepit_state::video_start()
 
 	m_dummy_tile = make_unique_clear<uint8_t[]>(8*8);
 
-	m_graphics_bank = 0;    /* only used in intrepid */
-
 	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thepit_state::vsync_callback), this));
 
 	save_item(NAME(m_graphics_bank));
@@ -318,6 +316,8 @@ uint32_t thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind
 	/* high priority sprites */
 	m_graphics_bank = 1;
 	draw_sprites(bitmap, m_flip_y ? spritevisibleareaflipx : spritevisiblearea, 1);
+
+	m_graphics_bank = 0;
 
 	return 0;
 }

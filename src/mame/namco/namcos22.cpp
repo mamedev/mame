@@ -30,8 +30,8 @@ TODO:
   + ridgerac waving flag shadowing
   + cybrcomm enemies should flash white when you shoot them, probably lighting related
   + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
-- improve ss22 spot, used in dirtdash, alpinesa, testmode, not understood well:
-  + does not work at all on alpinesa highscore entry
+- improve ss22 spot, used in dirtdash, alpinesa, testmode - not understood well:
+  + does not work at all on alpinesa highscore entry (maybe not spotram related?)
   + should be done before global fade, see dirtdash when starting at jungle level
   + should not apply to some of the sprites in dirtdash jungle level (eg. time/position)
   + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
@@ -41,6 +41,7 @@ TODO:
 - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snow melting effect)
 - support for text layer video partial updates after posirq, alpinesa does raster effects on it
 - alpha blended sprite/poly with priority over alpha blended text doesn't work right
+- alpinesa sprites on selection screen should not be fully alpha blended, only the drop shadow should
 - ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
 - cybrcycc speed dial needle polygon is missing

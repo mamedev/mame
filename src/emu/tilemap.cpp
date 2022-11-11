@@ -1559,10 +1559,14 @@ void tilemap_t::get_info_debug(u32 col, u32 row, u8 &gfxnum, u32 &code, u32 &col
 	// get the GFX number and code
 	gfxnum = m_tileinfo.gfxnum;
 	code = m_tileinfo.code;
+	color = m_tileinfo.palette_base;
 
-	// work back from the palette base to get the color
-	const gfx_element &gfx = *m_tileinfo.decoder->gfx(gfxnum);
-	color = (m_tileinfo.palette_base - gfx.colorbase()) / gfx.granularity();
+	if (gfxnum != 0xff)
+	{
+		// work back from the palette base to get the color
+		const gfx_element &gfx = *m_tileinfo.decoder->gfx(gfxnum);
+		color = (color - gfx.colorbase()) / gfx.granularity();
+	}
 }
 
 
