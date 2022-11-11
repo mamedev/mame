@@ -2,11 +2,9 @@
 // copyright-holders: tim lindner
 /***************************************************************************
 
-	agvision.cpp
+	Elanco AgVision and Radio Shack VideoTex terminals
 
-	TRS-80 Radio Shack AgVision and Video Text terminals
-
-	Dynamic RAM (4, 16, or 39K) starts at $0000.
+	Dynamic RAM (16 or 4k) starts at $0000.
 	ROM (2K) starts at $A000 and mirrors up to $BFFF
 	Static RAM starts at $C000 for 128 bytes
 	The PIA data port a is at $FF1C
@@ -14,8 +12,8 @@
 			data port b is at $FF1E
 		 control port b is at $FF1F
 
-	The Control Register is at $FF20
-	The SAM is at $FFC0
+	The Control Register (flip flop) is at $FF20
+	The SAM starts at $FFC0
 
 	PIA:
 		Port A and B make up the keyboard matrix
@@ -222,7 +220,7 @@ void agvision_state::agvision(machine_config &config)
 	// memory controller
 	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
 	m_sam->set_addrmap(2, &agvision_state::rom_map);			// ROM at $A000
-	m_sam->set_addrmap(3, &agvision_state::static_ram_map);	// RAM at $C000
+	m_sam->set_addrmap(3, &agvision_state::static_ram_map);		// RAM at $C000
 	m_sam->set_addrmap(4, &agvision_state::io0_map);			//  IO at $FF00
 	m_sam->set_addrmap(5, &agvision_state::io1_map);			//  IO at $FF20
 	m_sam->set_addrmap(7, &agvision_state::boot_map);			//  IO at $FF60
@@ -231,7 +229,7 @@ void agvision_state::agvision(machine_config &config)
 	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(ag_modem));
 
 	// internal ram
-	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K,4K");
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("4K");
 }
 
 //**************************************************************************
@@ -403,5 +401,5 @@ ROM_START(trsvidtx)
 ROM_END
 
 //    YEAR  NAME      PARENT COMPAT MACHINE   INPUT	    CLASS           INIT        COMPANY              FULLNAME    FLAGS
-COMP( 1979, agvision, 0,     0,     agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "AgVision", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, agvision, 0,     0,     agvision, agvision, agvision_state, empty_init, "Elanco",            "AgVision", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1980, trsvidtx, 0,     0,     agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "Videotex", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
