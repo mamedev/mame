@@ -24,7 +24,7 @@
  * Program ROM size in bytes (4 bytes).
  * Cartridge RAM size in bytes (4 bytes).
 
- There is additional data between the leader and trailer that contains
+ There is additional data between the leader and trailer that can hold
  additional wiring or configuration details for the cartridge if necessary.
  In general, it's 32 bytes long, and unused portions are filled with 0x00.
  It seems to be entirely unused for most cartridge types.
@@ -55,6 +55,7 @@ enum : u32
 	TYPE_HUC3       = 0x48554333,   // 'HUC3'
 	TYPE_SLMULTI    = 0x4c424d43,   // 'LBMC'
 	TYPE_LICHENG    = 0x4c494348,   // 'LICH'
+	TYPE_LIEBAO     = 0x4c494241,   // 'LIBA'
 	TYPE_M161       = 0x4d313631,   // 'M161'
 	TYPE_MBC1_COLL  = 0x4d42314d,   // 'MB1M'
 	TYPE_MBC1       = 0x4d424331,   // 'MBC1'

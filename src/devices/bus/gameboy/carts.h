@@ -45,6 +45,7 @@ extern char const *const GB_CHONGWU;
 extern char const *const GB_LICHENG;
 extern char const *const GB_NEWGBCHK;
 extern char const *const GB_VF001;
+extern char const *const GB_LIEBAO;
 extern char const *const GB_NTNEW;
 extern char const *const GB_SLMULTI;
 extern char const *const GB_GBCK003;

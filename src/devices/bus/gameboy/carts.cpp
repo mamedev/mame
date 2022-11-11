@@ -13,6 +13,7 @@
 #include "gbck003.h"
 #include "huc1.h"
 #include "huc3.h"
+#include "liebao.h"
 #include "mbc.h"
 #include "mbc2.h"
 #include "mbc3.h"
@@ -55,6 +56,7 @@ char const *const GB_CHONGWU        = "rom_chong";
 char const *const GB_LICHENG        = "rom_licheng";
 char const *const GB_NEWGBCHK       = "rom_newgbchk";
 char const *const GB_VF001          = "rom_vf001";
+char const *const GB_LIEBAO         = "rom_liebao";
 char const *const GB_NTNEW          = "rom_ntnew";
 char const *const GB_SLMULTI        = "rom_slmulti";
 char const *const GB_GBCK003        = "rom_gbck003";
@@ -98,6 +100,7 @@ void gameboy_cartridges(device_slot_interface &device)
 	device.option_add_internal(slotoptions::GB_LICHENG,         GB_ROM_LICHENG);
 	device.option_add_internal(slotoptions::GB_NEWGBCHK,        GB_ROM_NEWGBCHK);
 	device.option_add_internal(slotoptions::GB_VF001,           GB_ROM_VF001);
+	device.option_add_internal(slotoptions::GB_LIEBAO,          GB_ROM_LIEBAO);
 	device.option_add_internal(slotoptions::GB_NTNEW,           GB_ROM_NTNEW);
 	device.option_add_internal(slotoptions::GB_SLMULTI,         GB_ROM_SLMULTI);
 	device.option_add_internal(slotoptions::GB_GBCK003,         GB_ROM_GBCK003);
