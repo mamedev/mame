@@ -1260,7 +1260,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 			{
 				const u16 *source0 = source_baseaddr + x_start;
 				typename _BitmapClass::pixel_t *dest0 = dest_baseaddr + x_start;
-				u8 *pmap0 = priority_baseaddr + x_start;
+				u8 *pmap0 = priority_baseaddr ? (priority_baseaddr + x_start) : nullptr;
 
 				// if we were opaque, use the opaque renderer
 				if (prev_trans == WHOLLY_OPAQUE)
