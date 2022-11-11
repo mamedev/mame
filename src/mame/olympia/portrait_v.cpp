@@ -107,22 +107,26 @@ void portrait_state::portrait_palette(palette_device &palette) const
 	}
 }
 
-
-void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+/*
+ * [3]
+ * x--- ---- priority?
+ * -x-x ---- ?
+ * --x- ---- flipy
+ * ---- x--- msb source[0]
+ * ---- -x-- msb source[1]
+ */
+void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u8 priority)
 {
 	uint8_t *source = m_spriteram;
 	uint8_t *finish = source + 0x200;
 
-	while( source < finish )
+	for( ; source < finish; source += 0x10 )
 	{
+		int attr    = source[2];
+		if (BIT(attr, 7) != priority)
+			continue;
 		int sy      = source[0];
 		int sx      = source[1];
-		int attr    = source[2];
-			/* xx-x---- ?
-			 * --x----- flipy
-			 * ----x--- msb source[0]
-			 * -----x-- msb source[1]
-			 */
 		int tilenum = source[3];
 
 		int color = ((tilenum&0xff)>>1)+0x00;
@@ -138,31 +142,12 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		sy = (512 - 64) - sy;
 
-		/* wrong! */
-		switch( attr & 0xc0 )
-		{
-		case 0:
-			break;
-
-		case 0x40:
-			sy -= m_scroll;
-			break;
-
-		case 0x80:
-			sy -= m_scroll;
-			break;
-
-		case 0xc0:
-			break;
-
-		}
-
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-				tilenum,color,
-				0,fy,
-				sx,sy,7);
-
-		source += 0x10;
+		m_gfxdecode->gfx(0)->transpen(
+			bitmap, cliprect,
+			tilenum, color,
+			0, fy,
+			sx, sy,
+			7);
 	}
 }
 
@@ -183,8 +168,9 @@ uint32_t portrait_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_background->set_scrolly(0, m_scroll);
 	m_foreground->set_scrolly(0, m_scroll);
 	m_background->draw(screen, bitmap, cliprect_scroll, 0, 0);
+	draw_sprites(bitmap, cliprect, 0);
 	m_foreground->draw(screen, bitmap, cliprect_scroll, 0, 0);
+	draw_sprites(bitmap, cliprect, 1);
 
-	draw_sprites(bitmap,cliprect);
 	return 0;
 }
