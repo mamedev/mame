@@ -6511,7 +6511,7 @@ INPUT_PORTS_END
 
 void tmegaman3_state::tmegaman3(machine_config &config)
 {
-	sm510_tiger(config, 1441, 1080);
+	sm510_tiger(config, 1457, 1080);
 }
 
 // roms
@@ -6520,8 +6520,8 @@ ROM_START( tmegaman3 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ma4", 0x0000, 0x1000, CRC(851ef37a) SHA1(0b67db3fe6ffcdee0427d9fea895de6943a28abc) )
 
-	ROM_REGION( 320846, "screen", 0)
-	ROM_LOAD( "tmegaman3.svg", 0, 320846, CRC(dd1aaa05) SHA1(066e46bf5c86aaa2c4291d1338cbe4cc76ff7a22) )
+	ROM_REGION( 320824, "screen", 0)
+	ROM_LOAD( "tmegaman3.svg", 0, 320824, CRC(770e9497) SHA1(0fc68b999aa4d00eef3fa1d1226dfdf8ee2aeb7b) )
 ROM_END
 
 
