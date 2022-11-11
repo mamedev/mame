@@ -18,7 +18,6 @@ TODO:
 - Rave Racer car will sometimes do a 'strafe slide' when playing the game with a small analog device (such as an
   Xbox 360 pad), does not happen with keyboard controls or larger device like a steering wheel. BTANB or related
   to HLE I/O board emulation?
-- alpinesa doesn't work, bad dump? (previously thought it was unemulated protection)
 - C139 for linked cabinets, as well as in RR fullscale
 - confirm DSP and MCU IRQ timing
 - EEPROM write timing should be around 5ms, it doesn't do any data/rdy polling
@@ -31,7 +30,8 @@ TODO:
   + ridgerac waving flag shadowing
   + cybrcomm enemies should flash white when you shoot them, probably lighting related
   + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
-- improve ss22 spot, only used in dirtdash and testmode, not understood well:
+- improve ss22 spot, used in dirtdash, alpinesa, testmode, not understood well:
+  + does not work at all on alpinesa highscore entry
   + should be done before global fade, see dirtdash when starting at jungle level
   + should not apply to some of the sprites in dirtdash jungle level (eg. time/position)
   + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
@@ -1913,11 +1913,6 @@ void timecris_state::timecris_am(address_map &map)
 
 
 // Alpine Surfer banking
-u32 alpinesa_state::rombank_r()
-{
-	return m_rombank->entry();
-}
-
 void alpinesa_state::rombank_w(u32 data)
 {
 	m_rombank->set_entry(std::clamp(data & 3, 0U, 2U));
@@ -1927,7 +1922,6 @@ void alpinesa_state::alpinesa_am(address_map &map)
 {
 	namcos22s_am(map);
 	map(0x200000, 0x3fffff).bankr("rombank");
-	map(0x200000, 0x200003).r(FUNC(alpinesa_state::rombank_r));
 	map(0x300000, 0x300003).w(FUNC(alpinesa_state::rombank_w));
 }
 
@@ -3235,6 +3229,13 @@ static INPUT_PORTS_START( alpiner )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( alpinesa )
+	PORT_INCLUDE( alpiner )
+
+	PORT_MODIFY("ADC.0")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x080, 0x380) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_REVERSE PORT_NAME("Steps Swing")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( airco22 )
@@ -5376,10 +5377,10 @@ ROM_END
 
 ROM_START( alpinesa )
 	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "af2ver-a_ll.ic2", 0x000003, 0x200000, BAD_DUMP CRC(e776159d) SHA1(5110364afb7ec606074d58a1d216d7d687b9df62) )
-	ROM_LOAD32_BYTE( "af2ver-a_lm.ic3", 0x000002, 0x200000, BAD_DUMP CRC(c5333d38) SHA1(9486cead964f95f8e56dac2f88486f3b98561aa6) )
-	ROM_LOAD32_BYTE( "af2ver-a_um.ic4", 0x000001, 0x200000, BAD_DUMP CRC(5977fc6e) SHA1(19b8041789f8987934fa461972976a3570b1b87b) )
-	ROM_LOAD32_BYTE( "af2ver-a_uu.ic5", 0x000000, 0x200000, BAD_DUMP CRC(54ee33a1) SHA1(0eaa8707ab13a0a66551f61a08986c98f5c9e446) )
+	ROM_LOAD32_BYTE( "af2ver-a_ll.ic2", 0x000003, 0x200000, CRC(d8025e98) SHA1(e1c08557e70d632bf1e99356d6c6f76b5f407b8f) )
+	ROM_LOAD32_BYTE( "af2ver-a_lm.ic3", 0x000002, 0x200000, CRC(5f805d51) SHA1(b7fa9028deeaf1c549e9c2d6099925a0d0ad1598) )
+	ROM_LOAD32_BYTE( "af2ver-a_um.ic4", 0x000001, 0x200000, CRC(e7e057e3) SHA1(436e4645ba0e8734c0e25c7c22489bf97066944d) )
+	ROM_LOAD32_BYTE( "af2ver-a_uu.ic5", 0x000000, 0x200000, CRC(3eee10a2) SHA1(6e52c5132581e7fe69a257195af5bc9f3a3efe25) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -6227,7 +6228,7 @@ GAME( 1995, timecris,   0,        timecris,  timecris,  timecris_state,  init_ti
 GAME( 1995, timecrisa,  timecris, timecris,  timecris,  timecris_state,  init_timecris,  ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
 GAME( 1996, propcycl,   0,        propcycl,  propcycl,  propcycl_state,  init_propcycl,  ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
 GAME( 1996, propcyclj,  propcycl, propcycl,  propcycl,  propcycl_state,  init_propcyclj, ROT0, "Namco", "Prop Cycle (Rev. PR1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:06:03
-GAME( 1996, alpinesa,   0,        alpinesa,  alpiner,   alpinesa_state,  init_alpinesa,  ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, suspect bad dump
+GAME( 1996, alpinesa,   0,        alpinesa,  alpinesa,  alpinesa_state,  init_alpinesa,  ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/07/01 15:19:23
 GAME( 1996, tokyowar,   0,        tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
 GAME( 1996, tokyowarj,  tokyowar, tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:16:29
 GAME( 1996, aquajet,    0,        cybrcycc,  aquajet,   namcos22s_state, init_aquajet,   ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30

@@ -609,7 +609,6 @@ private:
 	required_memory_bank m_rombank;
 
 	void rombank_w(u32 data);
-	u32 rombank_r();
 	void alpinesa_am(address_map &map);
 };
 
