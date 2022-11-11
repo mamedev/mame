@@ -134,7 +134,6 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int fy = attr & 0x20;
 
 		if(attr & 0x04) sx |= 0x100;
-
 		if(attr & 0x08) sy |= 0x100;
 
 		sx += (source - m_spriteram) - 8;
@@ -157,6 +156,7 @@ uint32_t portrait_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	cliprect_scroll = cliprect_no_scroll = cliprect;
 
+	// TODO: make clipping areas more readable
 	cliprect_no_scroll.min_x = cliprect_no_scroll.max_x - 111;
 	cliprect_scroll.max_x    = cliprect_scroll.min_x    + 319;
 
@@ -168,9 +168,9 @@ uint32_t portrait_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_background->set_scrolly(0, m_scroll);
 	m_foreground->set_scrolly(0, m_scroll);
 	m_background->draw(screen, bitmap, cliprect_scroll, 0, 0);
-	draw_sprites(bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect_scroll, 0);
 	m_foreground->draw(screen, bitmap, cliprect_scroll, 0, 0);
-	draw_sprites(bitmap, cliprect, 1);
+	draw_sprites(bitmap, cliprect_scroll, 1);
 
 	return 0;
 }
