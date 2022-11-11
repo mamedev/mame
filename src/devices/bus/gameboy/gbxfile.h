@@ -67,6 +67,7 @@ enum : u32
 	TYPE_MMM01      = 0x4d4d4d31,   // 'MMM1'
 	TYPE_NEWGBCHK   = 0x4e47484b,   // 'NGHK'
 	TYPE_NTNEW      = 0x4e544e00,   // 'NTN\0'
+	TYPE_TFANGBOOT  = 0x504b4a44,   // 'PKJD'
 	TYPE_ROCKET     = 0x524f434b,   // 'ROCK'
 	TYPE_PLAIN      = 0x524f4d00,   // 'ROM\0'
 	TYPE_SACHEN1    = 0x53414d31,   // 'SAM1'

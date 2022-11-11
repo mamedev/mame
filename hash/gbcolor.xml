@@ -9993,9 +9993,9 @@ license:CC0
 		<description>Keitai Denjuu Telefang - Power Version (Japan)</description>
 		<year>2000</year>
 		<publisher>Natsume</publisher>
-		<info name="serial" value="DMG-BTXJ-JPN"/>
-		<info name="release" value="20001103"/>
-		<info name="alt_title" value="携帯電獣テレファング パワー・バージョン"/>
+		<info name="serial" value="DMG-BTXJ-JPN" />
+		<info name="release" value="20001103" />
+		<info name="alt_title" value="携帯電獣テレファング パワー・バージョン" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-KGDU-10" />
 			<feature name="u1" value="U1 PRG" />
@@ -10005,11 +10005,10 @@ license:CC0
 			<feature name="battery" value="BT1 CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
-			<dataarea name="rom" size="2097152">
-				<rom name="dmg-btxj-0.u1" size="2097152" crc="8b61cfcc" sha1="baaf7fb9f9958ca22982ba0600bc0cb8a7fc4764"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="dmg-btxj-0.u1" size="0x200000" crc="8b61cfcc" sha1="baaf7fb9f9958ca22982ba0600bc0cb8a7fc4764" />
 			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
+		<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -10017,17 +10016,47 @@ license:CC0
 		<description>Keitai Denjuu Telefang - Speed Version (Japan)</description>
 		<year>2000</year>
 		<publisher>Natsume</publisher>
-		<info name="serial" value="DMG-BTZJ-JPN"/>
-		<info name="release" value="20001103"/>
-		<info name="alt_title" value="携帯電獣テレファング スピード・バージョン"/>
+		<info name="serial" value="DMG-BTZJ-JPN" />
+		<info name="release" value="20001103" />
+		<info name="alt_title" value="携帯電獣テレファング スピード・バージョン" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
-			<dataarea name="rom" size="2097152">
-				<rom name="keitai denjuu telefang - speed version (japan).bin" size="2097152" crc="fb528f66" sha1="1c273f9078c580e85e5c49e7114058f3e0fe5cca"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="keitai denjuu telefang - speed version (japan).bin" size="0x200000" crc="fb528f66" sha1="1c273f9078c580e85e5c49e7114058f3e0fe5cca" />
 			</dataarea>
-			<dataarea name="nvram" size="32768">
+		<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<!-- unlicensed English translation of Keitai Denjuu Telefang - Speed Version -->
+	<software name="pkmnjade" cloneof="telefngs">
+		<description>Pokémon Jade Version</description>
+		<year>200?</year>
+		<publisher>bootleg</publisher>
+		<info name="alt_title" value="Pokémon Jade" /> <!-- title screen doesn't say "version" -->
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_tfboot" />
+			<feature name="rtc" value="no" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="pokemon jade version.bin" size="0x200000" crc="aa07f269" sha1="994a205d7c0b55f45715a65b23ec31258e43652f" />
 			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<!-- unlicensed German translation of Keitai Denjuu Telefang - Speed Version -->
+	<software name="pkmnjadede" cloneof="telefngs">
+		<description>Pokémon Vision Jade</description>
+		<year>200?</year>
+		<publisher>bootleg</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_tfboot" /> <!-- doesn't actually use protection features - works with a regular MBC3 -->
+			<feature name="rtc" value="no" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="pokemon vision jade.bin" size="0x200000" crc="2705ca20" sha1="72d5c6b8a570e67e7bce59070417cb89e985efb0" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 

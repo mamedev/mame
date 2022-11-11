@@ -734,6 +734,9 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 	case gbxfile::TYPE_HUC3:
 		result = slotoptions::GB_HUC3;
 		break;
+	case gbxfile::TYPE_TFANGBOOT:
+		result = slotoptions::GB_TFANGBOOT;
+		break;
 	case gbxfile::TYPE_SINTAX:
 		result = slotoptions::GB_SINTAX;
 		break;

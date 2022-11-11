@@ -10,7 +10,6 @@
 
 DECLARE_DEVICE_TYPE(GB_ROM_MBC1,     device_gb_cart_interface)
 DECLARE_DEVICE_TYPE(GB_ROM_MBC5,     device_gb_cart_interface)
-DECLARE_DEVICE_TYPE(GB_ROM_MMM01,    device_gb_cart_interface)
 DECLARE_DEVICE_TYPE(GB_ROM_SINTAX,   device_gb_cart_interface)
 DECLARE_DEVICE_TYPE(GB_ROM_CHONGWU,  device_gb_cart_interface)
 DECLARE_DEVICE_TYPE(GB_ROM_LICHENG,  device_gb_cart_interface)

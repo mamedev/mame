@@ -114,7 +114,7 @@ void liebao_device::device_reset()
 void liebao_device::enable_ram(offs_t offset, u8 data)
 {
 	// TODO: how many bits are checked?
-	bool const enable = 0x0a == (data & 0x0f);
+	bool const enable(0x0a == (data & 0x0f));
 	LOG(
 			"%s: Cartridge RAM %s\n",
 			machine().describe_context(),
