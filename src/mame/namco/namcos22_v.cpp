@@ -1795,10 +1795,6 @@ TIMER_CALLBACK_MEMBER(namcos22_state::posirq_callback)
 
 	if (m_irq_enabled & (1 << line))
 	{
-		// driver doesn't support partial updates yet
-		// partial updates here should apply to the text layer only, not the 3D framebuffer
-		//m_screen->update_partial(m_screen->vpos());
-
 		m_irq_state |= (1 << line);
 		m_maincpu->set_input_line(m_syscontrol[line] & 7, ASSERT_LINE);
 	}
@@ -1818,17 +1814,15 @@ void namcos22_state::namcos22_tilemapattr_w(offs_t offset, u16 data, u16 mem_mas
 	6: ?   - unused?
 	7: R   - ???
 	*/
+
+	// alpinesa changes x scroll mid-screen
+	if (offset == 0)
+		update_text_rowscroll();
+
 	COMBINE_DATA(&m_tilemapattr[offset]);
 
-	switch (offset)
-	{
-		case 4:
-			posirq_update();
-			break;
-
-		default:
-			break;
-	}
+	if (offset == 4)
+		posirq_update();
 }
 
 u16 namcos22_state::namcos22_tilemapattr_r(offs_t offset)
@@ -2063,13 +2057,41 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 	}
 }
 
+void namcos22_state::update_text_rowscroll()
+{
+	u64 frame = m_screen->frame_number();
+	if (frame != m_rs_frame)
+	{
+		m_rs_frame = frame;
+		m_lastrow = 0;
+	}
+
+	int scroll_x = (m_tilemapattr[0] - 0x35c) & 0x3ff;
+	int y = std::min(m_screen->vpos(), 480);
+
+	// save x scroll value until current scanline
+	for (int i = m_lastrow; i < y; i++)
+		m_rowscroll[i] = scroll_x;
+	m_lastrow = y;
+}
+
+void namcos22_state::apply_text_scroll()
+{
+	update_text_rowscroll();
+	int scroll_y = m_tilemapattr[1] & 0x3ff;
+
+	m_bgtilemap->set_scrolly(0, scroll_y);
+	for (int i = 0; i < 0x400; i++)
+		m_bgtilemap->set_scrollx(i, m_rowscroll[0]);
+
+	// apply current frame x scroll updates to tilemap
+	for (int i = 0; i < 480; i++)
+		m_bgtilemap->set_scrollx((i + scroll_y + 4) & 0x3ff, m_rowscroll[i]);
+}
+
 void namcos22_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int scroll_x = m_tilemapattr[0] - 0x35c;
-	int scroll_y = m_tilemapattr[1];
-
-	m_bgtilemap->set_scrollx(0, scroll_x & 0x3ff);
-	m_bgtilemap->set_scrolly(0, scroll_y & 0x3ff);
+	apply_text_scroll();
 	m_bgtilemap->set_palette_offset(m_text_palbase);
 
 	m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 2, 3);
@@ -2078,11 +2100,7 @@ void namcos22_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap
 
 void namcos22s_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int scroll_x = m_tilemapattr[0] - 0x35c;
-	int scroll_y = m_tilemapattr[1];
-
-	m_bgtilemap->set_scrollx(0, scroll_x & 0x3ff);
-	m_bgtilemap->set_scrolly(0, scroll_y & 0x3ff);
+	apply_text_scroll();
 	m_bgtilemap->set_palette_offset(m_text_palbase);
 
 	m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 4, 4);
@@ -2263,7 +2281,7 @@ void namcos22_state::update_mixer()
 	if (!m_is_ss22)
 	{
 		strcat(msg1,"\n");
-		for (i = 8; i <= 0x20; i += 8)
+		for (int i = 8; i <= 0x20; i += 8)
 		{
 			sprintf(msg2,"%04X %08X %08X %08X %08X\n", i*16, m_mixer[i*4+0], m_mixer[i*4+1], m_mixer[i*4+2], m_mixer[i*4+3]);
 			strcat(msg1,msg2);
@@ -2577,6 +2595,7 @@ void namcos22_state::video_start()
 
 	m_mix_bitmap = std::make_unique<bitmap_ind16>(640, 480);
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcos22_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bgtilemap->set_scroll_rows(64 * 16); // fake
 	m_bgtilemap->set_transparent_pen(0xf);
 
 	m_gfxdecode->gfx(0)->set_source((u8 *)m_cgram.target());

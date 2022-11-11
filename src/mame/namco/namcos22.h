@@ -386,6 +386,8 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	virtual void draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void update_text_rowscroll();
+	void apply_text_scroll();
 	u32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(namcos22_interrupt);
 	INTERRUPT_GEN_MEMBER(dsp_vblank_irq);
@@ -469,9 +471,12 @@ protected:
 	std::unique_ptr<s32[]> m_pointrom;
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
+
 	tilemap_t *m_bgtilemap;
 	u16 m_tilemapattr[8] = { };
-
+	u16 m_rowscroll[480] = { };
+	u16 m_lastrow = 0;
+	u64 m_rs_frame = 0;
 	int m_spot_factor = 0;
 	int m_text_palbase = 0;
 	int m_bg_palbase = 0;
@@ -494,7 +499,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	bool m_pdp_render_done = false;
 	bool m_render_refresh = false;
-	uint64_t m_pdp_frame = 0;
+	u64 m_pdp_frame = 0;
 	u16 m_pdp_base = 0;
 };
 

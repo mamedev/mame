@@ -30,16 +30,16 @@ TODO:
   + ridgerac waving flag shadowing
   + cybrcomm enemies should flash white when you shoot them, probably lighting related
   + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
-- improve ss22 spot, used in dirtdash, alpinesa, testmode - not understood well:
-  + does not work at all on alpinesa highscore entry (maybe not spotram related?)
+- improve ss22 spot, used in dirtdash, alpinesa highscore entry, testmode screen#14 - not understood well:
+  + does not work at all in alpinesa (uses spot_factor, not spotram, should show a spotlight with darkened background)
   + should be done before global fade, see dirtdash when starting at jungle level
   + should not apply to some of the sprites in dirtdash jungle level (eg. time/position)
+  + should not apply to some of the polygons either? see dirtdash jungle level moon
   + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
   + what is the high bit in spot_factor for? not used anywhere
   + high bits in spot_data are unknown, maybe blend mode
   + testmode looks wrong, spot_data high bits is 0 here (2 in dirtdash)
 - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snow melting effect)
-- support for text layer video partial updates after posirq, alpinesa does raster effects on it
 - alpha blended sprite/poly with priority over alpha blended text doesn't work right
 - alpinesa sprites on selection screen should not be fully alpha blended, only the drop shadow should
 - ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
@@ -3678,6 +3678,9 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_LitSurfaceCount));
 	save_item(NAME(m_LitSurfaceIndex));
 	save_item(NAME(m_tilemapattr));
+	save_item(NAME(m_rowscroll));
+	save_item(NAME(m_lastrow));
+	save_item(NAME(m_rs_frame));
 	save_item(NAME(m_spot_factor));
 	save_item(NAME(m_text_palbase));
 	save_item(NAME(m_bg_palbase));
