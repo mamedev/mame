@@ -3704,8 +3704,6 @@ void namcos22s_state::machine_start()
 {
 	namcos22_state::machine_start();
 
-	m_mcu_iocontrol = 0;
-
 	save_item(NAME(m_spotram_enable));
 	save_item(NAME(m_spotram_address));
 	save_item(NAME(m_mcu_iocontrol));
@@ -6094,16 +6092,12 @@ void alpine_state::init_alpiner()
 {
 	m_gametype = NAMCOS22_ALPINE_RACER;
 	install_130_speedup();
-
-	m_motor_status = 2;
 }
 
 void alpine_state::init_alpiner2()
 {
 	m_gametype = NAMCOS22_ALPINE_RACER_2;
 	install_130_speedup();
-
-	m_motor_status = 2;
 }
 
 void alpinesa_state::init_alpinesa()
@@ -6112,8 +6106,6 @@ void alpinesa_state::init_alpinesa()
 	install_141_speedup();
 
 	m_rombank->configure_entries(0, 3, memregion("maincpu")->base() + 0x200000, 0x200000);
-
-	m_motor_status = 2;
 }
 
 void namcos22s_state::init_airco22()

@@ -591,7 +591,7 @@ protected:
 	void alpine_mcu_port4_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
 
-	int m_motor_status = 0;
+	int m_motor_status = 2;
 };
 
 class alpinesa_state : public alpine_state
