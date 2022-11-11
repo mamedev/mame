@@ -205,7 +205,7 @@ static INPUT_PORTS_START( portrait )
 	PORT_DIPNAME( 0x40, 0x00, "Ostrich Speed" )
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x40, "Quick" )
-	PORT_DIPNAME( 0x80, 0x80, "Obstacles" )
+	PORT_DIPNAME( 0x80, 0x00, "Obstacles" )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
