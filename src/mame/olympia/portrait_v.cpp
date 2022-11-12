@@ -33,18 +33,13 @@ inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, 
 	/* or 0x10 ? */
 	if( attr & 0x20 ) flags = TILE_FLIPY;
 
-	switch( attr & 7 )
-	{
-		case 1:
-			tilenum += 0x200;
-			break;
-		case 3:
-			tilenum += 0x300;
-			break;
-		case 5:
-			tilenum += 0x100;
-			break;
-	}
+	if (attr & 1)
+		tilenum += 0x200;
+	if (attr & 2)
+		tilenum += 0x100;
+	if (attr & 4)
+		tilenum ^= 0x300;
+
 
 	if (tilenum<0x100)
 		color = ((tilenum&0xff)>>1)+0x00;
@@ -108,12 +103,12 @@ void portrait_state::portrait_palette(palette_device &palette) const
 }
 
 /*
- * [3]
+ * [2]
  * x--- ---- priority?
  * -x-x ---- ?
  * --x- ---- flipy
- * ---- x--- msb source[0]
- * ---- -x-- msb source[1]
+ * ---- x--- msb Y position?
+ * ---- -x-- msb X position?
  */
 void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u8 priority)
 {
