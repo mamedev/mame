@@ -367,39 +367,6 @@ ROM_START( portraita )
 	ROM_LOAD( "port_pr2.n4",  0x20, 0x0020, CRC(008634f3) SHA1(7cde6b09ede672d562569866d944428198f2ba9c) )
 ROM_END
 
-/* tileattr rom
-
-  this appears to be divided into 2 0x400 banks
-
-  0x000 - 0x3ff relates to tiles 0x000-0x0ff
-
-  0x400 - 0x7ff relates to tiles 0x100-0x1ff, 0x200-0x2ff, and 0x300-0x3ff
-
-  every 2 tiles are somehow related to 8 bytes in the data
-
-   so tiles 0x00 and 0x01 use bytes 0x000-0x007
-            0x02                    0x008
-            0x04                    0x010
-            0x06                    0x018
-            0x08                    0x020
-            0x0a                    0x028
-            0x0c                    0x030
-            0x0e                    0x038
-            0x10                    0x040
-               .......
-            0xfe and 0xff use bytes 0x3f8-0x3ff
-            etc.
-
-    it's probably some kind of lookup table for the colours (6bpp = 8 colours, maybe every 2 tiles share the same 8 colours)
-    I guess either the bank (0/1) can be selected, or bank 0 is hardcoded to tiles 0x000-0x0ff (because tilemaps can use
-     these tiles too, so it's not a case of it being a sprite/tilemap lookup split)
-
-    anyway.. this is why the portraits logo is broken across 3 areas (0x1f2, 0x2f2, 0x3f2) so that they can share the same
-    attributes from this rom
-
-  */
-
-
 
 GAME( 1983, portrait, 0,        portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, portraita,portrait, portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // harder set

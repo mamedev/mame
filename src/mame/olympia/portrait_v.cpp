@@ -25,8 +25,8 @@ void portrait_state::fgvideo_write(offs_t offset, uint8_t data)
 
 // NB: undisplayed areas gets filled at POST but never really used
 // $8x36-$8x3f / $8x76-$8x7f / $8xb6-$8xbf / $8xf6-$8xff
-// given that tilemap doesn't really cope well with live editing your best bet in debugging this is
-// to subscribe these unused areas to a mark_all_dirty() fn.
+// given that tilemap doesn't really cope well with live editing your best bet in debugging this is 
+// potentially to subscribe these unused areas to a mark_all_dirty() fn.
 inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, const uint8_t *source )
 {
 	int attr    = source[tile_index*2+0];
@@ -77,6 +77,37 @@ void portrait_state::video_start()
 	save_item(NAME(m_scroll));
 }
 
+/* tileattr rom
+
+  this appears to be divided into 2 0x400 banks
+
+  0x000 - 0x3ff relates to tiles 0x000-0x0ff
+
+  0x400 - 0x7ff relates to tiles 0x100-0x1ff, 0x200-0x2ff, and 0x300-0x3ff
+
+  every 2 tiles are somehow related to 8 bytes in the data
+
+   so tiles 0x00 and 0x01 use bytes 0x000-0x007
+            0x02                    0x008
+            0x04                    0x010
+            0x06                    0x018
+            0x08                    0x020
+            0x0a                    0x028
+            0x0c                    0x030
+            0x0e                    0x038
+            0x10                    0x040
+               .......
+            0xfe and 0xff use bytes 0x3f8-0x3ff
+            etc.
+
+    it's probably some kind of lookup table for the colours (6bpp = 8 colours, maybe every 2 tiles share the same 8 colours)
+    I guess either the bank (0/1) can be selected, or bank 0 is hardcoded to tiles 0x000-0x0ff (because tilemaps can use
+     these tiles too, so it's not a case of it being a sprite/tilemap lookup split)
+
+    anyway.. this is why the portraits logo is broken across 3 areas (0x1f2, 0x2f2, 0x3f2) so that they can share the same
+    attributes from this rom
+
+*/
 void portrait_state::portrait_palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
