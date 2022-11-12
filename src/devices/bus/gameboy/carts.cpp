@@ -52,6 +52,8 @@ char const *const GB_HUC3           = "rom_huc3";
 char const *const GB_TAMA5          = "rom_tama5";
 char const *const GB_CAMERA         = "rom_camera";
 char const *const GB_TFANGBOOT      = "rom_tfboot";
+char const *const GB_BBD            = "rom_bbd";
+char const *const GB_DSHGGB81       = "rom_dshggb81";
 char const *const GB_SINTAX         = "rom_sintax";
 char const *const GB_CHONGWU        = "rom_chong";
 char const *const GB_LICHENG        = "rom_licheng";
@@ -97,6 +99,8 @@ void gameboy_cartridges(device_slot_interface &device)
 	device.option_add_internal(slotoptions::GB_HUC3,            GB_ROM_HUC3);
 	device.option_add_internal(slotoptions::GB_TAMA5,           GB_ROM_TAMA5);
 	device.option_add_internal(slotoptions::GB_TFANGBOOT,       GB_ROM_TFANGBOOT);
+	device.option_add_internal(slotoptions::GB_BBD,             GB_ROM_BBD);
+	device.option_add_internal(slotoptions::GB_DSHGGB81,        GB_ROM_DSHGGB81);
 	device.option_add_internal(slotoptions::GB_SINTAX,          GB_ROM_SINTAX);
 	device.option_add_internal(slotoptions::GB_CHONGWU,         GB_ROM_CHONGWU);
 	device.option_add_internal(slotoptions::GB_LICHENG,         GB_ROM_LICHENG);

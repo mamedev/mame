@@ -50,7 +50,9 @@ enum : u32
 
 enum : u32
 {
+	TYPE_BBD        = 0x42424400,   // 'BBD\0'
 	TYPE_CAMERA     = 0x43414d52,   // 'CAMR'
+	TYPE_DSHGGB81   = 0x47423831,   // 'GB81'
 	TYPE_HUC1       = 0x48554331,   // 'HUC1'
 	TYPE_HUC3       = 0x48554333,   // 'HUC3'
 	TYPE_SLMULTI    = 0x4c424d43,   // 'LBMC'
