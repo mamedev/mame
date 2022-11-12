@@ -30,7 +30,7 @@ inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, 
 	int flags   = 0;
 	int color   = 0;
 
-	/* or 0x10 ? */
+	// TODO: always set with bit 4
 	if( attr & 0x20 ) flags = TILE_FLIPY;
 
 	if (attr & 1)
@@ -40,7 +40,9 @@ inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, 
 	if (attr & 4)
 		tilenum ^= 0x300;
 
+	// TODO: bits 7-6, color upper banks?
 
+	// TODO: kludgy, likely not right
 	if (tilenum<0x100)
 		color = ((tilenum&0xff)>>1)+0x00;
 	else

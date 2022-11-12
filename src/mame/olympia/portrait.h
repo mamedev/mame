@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/mcs48/mcs48.h"
 #include "sound/tms5220.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -15,6 +16,7 @@ public:
 	portrait_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_tms(*this, "tms")
@@ -51,6 +53,7 @@ private:
 	void portrait_sound_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<i8039_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<tms5200_device> m_tms;

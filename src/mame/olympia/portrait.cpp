@@ -24,7 +24,7 @@ Pierpaolo Prazzoli, xx-07-2004
 
 TODO:
  - add sound;
- - add colors (maybe not RGB555);
+ - fix colors;
  - fix sprites positions (zooming?);
  - video priority bits;
  - offset background scrolling positions (i.e. monkey climbing on trees);
@@ -32,7 +32,9 @@ TODO:
  - misc unknown input/outputs;
 
 
-RAM Location 9240: Controls what level you are on: 0-3 (for each scene)
+RAM location $9240: Controls what level you are on: 0-3 (for each scene).
+Can override in attract mode too:
+- bp 313a,1,{A=3;g}
 
 -------------------------------------------------------------------------
 
@@ -94,7 +96,6 @@ DM81LS95 = TriState buffer
 #include "portrait.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "screen.h"
@@ -140,6 +141,7 @@ void portrait_state::portrait_map(address_map &map)
 	map(0xa004, 0xa004).portr("DSW2");
 	map(0xa008, 0xa008).portr("SYSTEM").w(FUNC(portrait_state::ctrl_w));
 	map(0xa010, 0xa010).portr("INPUTS");
+	// reads go to $920f
 	map(0xa018, 0xa018).nopr().w(FUNC(portrait_state::positive_scroll_w));
 	map(0xa019, 0xa019).w(FUNC(portrait_state::negative_scroll_w));
 	map(0xa800, 0xa83f).ram().share("nvram");
@@ -260,8 +262,8 @@ void portrait_state::portrait(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &portrait_state::portrait_map);
 	m_maincpu->set_vblank_int("screen", FUNC(portrait_state::irq0_line_hold));
 
-	i8039_device &audiocpu(I8039(config, "audiocpu", 3120000));  /* ? */
-	audiocpu.set_addrmap(AS_PROGRAM, &portrait_state::portrait_sound_map);
+	I8039(config, m_audiocpu, 3120000);  /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &portrait_state::portrait_sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
