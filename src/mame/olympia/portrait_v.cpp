@@ -121,9 +121,12 @@ void portrait_state::portrait_palette(palette_device &palette) const
 /*
  * [2]
  * x--- ---- priority?
- *           \- seems to cope well except in some places like stage 4 fg layer mountains
- * -x-x ---- ?
+ * -x-- ---- more priority?
+ *           \- eagle sprite in stage 4 sets this only,
+ *              drawing should really go above the fg layer mountains
+ *              (missing tile category?)
  * --x- ---- flipy
+ * ---x ---- ?
  * ---- x--- msb Y position?
  * ---- -x-- msb X position?
  */
@@ -132,6 +135,7 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	uint8_t *source = m_spriteram;
 	uint8_t *finish = source + 0x200;
 
+	// is anything beyond byte [3] just work RAM buffer?
 	for( ; source < finish; source += 0x10 )
 	{
 		int attr    = source[2];
