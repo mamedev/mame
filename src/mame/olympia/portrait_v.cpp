@@ -135,7 +135,7 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	uint8_t *source = m_spriteram;
 	uint8_t *finish = source + 0x200;
 
-	// is anything beyond byte [3] just work RAM buffer?
+	// is anything beyond byte [3] really just work RAM buffer?
 	for( ; source < finish; source += 0x10 )
 	{
 		int attr    = source[2];
@@ -155,7 +155,15 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		sx += (source - m_spriteram) - 8;
 		sx &= 0x1ff;
 
-		sy = (512 - 64) - sy;
+		// confirmed by monkeys climbing trees in stage 1
+		sy = ((512 - m_scroll) - 16) - sy;
+
+		// TODO: player photo flash sprite needs to apply some kind of offset correction
+		// particularly visible when going to the right, entries $9150 / $9160 / $9190
+		// ...
+
+		sy &= 0x1ff;
+
 
 		m_gfxdecode->gfx(0)->transpen(
 			bitmap, cliprect,

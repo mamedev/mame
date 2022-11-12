@@ -26,9 +26,8 @@ TODO:
  - desperately needs a PCB analysis, particularly for color PROM formation;
  - add sound;
  - fix colors;
- - fix sprites positions (zooming?);
+ - several unknown sprite bits;
  - video priority bits;
- - offset background scrolling positions (i.e. monkey climbing on trees);
  - camera device (type?);
  - misc unknown input/outputs;
 
@@ -37,6 +36,8 @@ RAM location $9240: Controls what level you are on: 0-3 (for each scene).
 Can override in attract mode too:
 bp 313a,1,{A=2;g}
 bp 313a,1,{A=3;g}
+TODO: find a cheat that disables player collision detection
+(game is not pleasant on that regard)
 
 -------------------------------------------------------------------------
 
