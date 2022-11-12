@@ -301,7 +301,6 @@ private:
 		device.set_default_option(deft);
 		device.set_fixed(false);
 		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		m_hw_def.has_cartslot(true);
 		return device;
 	}
 	template <int N>
@@ -311,6 +310,7 @@ private:
 			"cartslot1", "cartslot2", "cartslot3", "cartslot4"
 		};
 		static_assert(N >= 1 && N <= 4, "Invalid cartridge slot number");
+		m_hw_def.has_cartslot(true);
 		return add_cartridge_slot<N>(config, MSX_SLOT_CARTRIDGE, tags[N-1], prim, expanded, sec, msx_cart, nullptr);
 	}
 };
