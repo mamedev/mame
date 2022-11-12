@@ -121,6 +121,8 @@ void portrait_state::ctrl_w(uint8_t data)
 	output().set_value("photo", (data >> 7) & 1);
 }
 
+// $9235-$9236 raw scroll values up to 512
+// $9236 bit 0 defines which of these are used
 void portrait_state::positive_scroll_w(uint8_t data)
 {
 	m_scroll = data;
@@ -128,7 +130,7 @@ void portrait_state::positive_scroll_w(uint8_t data)
 
 void portrait_state::negative_scroll_w(uint8_t data)
 {
-	m_scroll = - (data ^ 0xff);
+	m_scroll = 511 - (data ^ 0xff);
 }
 
 void portrait_state::portrait_map(address_map &map)
