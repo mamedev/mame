@@ -158,8 +158,11 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		// confirmed by monkeys climbing trees in stage 1
 		sy = ((512 - m_scroll) - 16) - sy;
 
-		// TODO: player photo flash sprite needs to apply some kind of offset correction
-		// particularly visible when going to the right, entries $9150 / $9160 / $9190
+		// TODO: player photo flash and death animation sprites needs to apply some kind of offset correction
+		// particularly visible when going to the right
+		// entries $9150 / $9160 / $9190 for photo flash
+		// notice you can also get hit by seemingly invisible enemies when standing on right side
+		// cfr. stage 4 eagle.
 		// ...
 
 		sy &= 0x1ff;

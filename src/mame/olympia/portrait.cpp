@@ -33,7 +33,7 @@ TODO:
 
 
 RAM location $9240: Controls what level you are on: 0-3 (for each scene).
-Can override in attract mode too:
+Can override in attract mode as well, with:
 bp 313a,1,{A=2;g}
 bp 313a,1,{A=3;g}
 TODO: find a cheat that disables player collision detection
