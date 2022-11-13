@@ -1645,7 +1645,7 @@ void namcos22_state::draw_sprites()
 	int deltax = (m_spriteram[1] & 0xffff) + (m_spriteram[2] & 0xffff) + 0x2d;
 	int deltay = (m_spriteram[3] >> 16) + (0x2a >> y_lowres);
 
-	int base = m_spriteram[0] & 0xffff; // alpinesa/alpinr2b
+	int base = m_spriteram[0] & 0xffff; // alpines/alpinr2b
 	int num_sprites = ((m_spriteram[1] >> 16) - base) + 1;
 
 	// airco22b doesn't use spriteset #1
@@ -1815,7 +1815,7 @@ void namcos22_state::namcos22_tilemapattr_w(offs_t offset, u16 data, u16 mem_mas
 	7: R   - ???
 	*/
 
-	// alpinesa changes x scroll mid-screen
+	// alpines changes x scroll mid-screen
 	if (offset == 0)
 		update_text_rowscroll();
 

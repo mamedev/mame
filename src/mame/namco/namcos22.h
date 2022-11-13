@@ -583,8 +583,8 @@ public:
 	{ }
 
 	void alpine(machine_config &config);
-	void init_alpiner2();
 	void init_alpiner();
+	void init_alpiner2();
 
 	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
 
@@ -599,22 +599,22 @@ protected:
 	int m_motor_status = 2;
 };
 
-class alpinesa_state : public alpine_state
+class alpines_state : public alpine_state
 {
 public:
-	alpinesa_state(const machine_config &mconfig, device_type type, const char *tag) :
+	alpines_state(const machine_config &mconfig, device_type type, const char *tag) :
 		alpine_state(mconfig, type, tag),
 		m_rombank(*this, "rombank")
 	{ }
 
-	void alpinesa(machine_config &config);
-	void init_alpinesa();
+	void alpines(machine_config &config);
+	void init_alpines();
 
 private:
 	required_memory_bank m_rombank;
 
 	void rombank_w(u32 data);
-	void alpinesa_am(address_map &map);
+	void alpines_am(address_map &map);
 };
 
 class timecris_state : public namcos22s_state
