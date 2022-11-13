@@ -329,6 +329,7 @@ protected:
 	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
 	inline u16 nthword(const u32 *src, int n) { return (src[n / 2] << ((n & 1) * 16)) >> 16; }
 
+	inline s32 signed12(s32 val) { return (val & 0x00000800) ? (s32)(val | 0xfffff000) : val & 0x000007ff; }
 	inline s32 signed18(s32 val) { return (val & 0x00020000) ? (s32)(val | 0xfffc0000) : val & 0x0001ffff; }
 	inline s32 signed24(s32 val) { return (val & 0x00800000) ? (s32)(val | 0xff000000) : val & 0x007fffff; }
 

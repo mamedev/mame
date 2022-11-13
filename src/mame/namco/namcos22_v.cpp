@@ -1213,16 +1213,16 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	    0000 7ffe 0000
 	    0000 0000 7ffe
 	*/
-	m_camera_ambient = src[0x1] >> 16;
+	m_camera_ambient = src[0x1] >> 16 & 0xffff;
 	m_camera_power = src[0x1] & 0xffff;
 
 	m_camera_lx = dspfixed_to_nativefloat(src[0x2]);
 	m_camera_ly = dspfixed_to_nativefloat(src[0x3]);
 	m_camera_lz = dspfixed_to_nativefloat(src[0x4]);
 
-	m_absolute_priority = src[0x3] >> 16;
-	m_camera_vx = (s16)(src[0x5] >> 16);
-	m_camera_vy = (s16)(src[0x5] & 0xffff);
+	m_absolute_priority = src[0x3] >> 16 & 0xffff;
+	m_camera_vx = signed12(src[0x5] >> 16);
+	m_camera_vy = signed12(src[0x5] & 0xffff);
 	m_camera_zoom = dspfloat_to_nativefloat(src[0x6]);
 	m_camera_vr = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
 	m_camera_vl = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
