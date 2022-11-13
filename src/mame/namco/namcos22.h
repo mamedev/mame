@@ -47,8 +47,8 @@ enum
 struct namcos22_polyvertex
 {
 	float x, y, z;
-	int u, v; /* 0..0xfff */
-	int bri;  /* 0..0xff */
+	int u, v; // 0..0xfff
+	int bri;  // 0..0xff
 };
 
 enum namcos22_scenenode_type
@@ -98,7 +98,7 @@ struct namcos22_scenenode
 			int cx_min, cx_max;
 			int cy_min, cy_max;
 			int sizex, sizey;
-			int translucency;
+			int alpha;
 			int cz;
 		} sprite;
 	} data;
@@ -107,7 +107,7 @@ struct namcos22_scenenode
 
 struct namcos22_object_data
 {
-	/* poly / sprites */
+	// poly / sprites
 	rgbaint_t fogcolor;
 	rgbaint_t fadecolor;
 	rgbaint_t polycolor;
@@ -125,10 +125,11 @@ struct namcos22_object_data
 	int cz_adjust;
 	int cz_sdelta;
 	const u8 *czram;
-
-	/* sprites */
-	const u8 *source;
 	int alpha;
+	bool alpha_enabled;
+
+	// sprites
+	const u8 *source;
 	int line_modulo;
 	int flipx;
 	int flipy;
@@ -232,7 +233,6 @@ public:
 	void init_ridgeraj();
 
 	// renderer
-	int m_poly_translucency;
 	u16 *m_texture_tilemap;
 	std::unique_ptr<u8[]> m_texture_tileattr;
 	u8 *m_texture_tiledata;
@@ -247,6 +247,9 @@ public:
 	int m_poly_fade_r;
 	int m_poly_fade_g;
 	int m_poly_fade_b;
+	int m_poly_alpha_color;
+	int m_poly_alpha_pen;
+	int m_poly_alpha_factor;
 	u32 m_fog_colormask;
 	int m_fog_r;
 	int m_fog_g;

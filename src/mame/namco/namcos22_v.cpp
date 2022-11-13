@@ -44,7 +44,9 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 	int zfog_enabled = extra.zfog_enabled;
 	int fogfactor = 0xff - extra.fogfactor;
 	int fadefactor = 0xff - extra.fadefactor;
-	int alphafactor = 0xff - m_state.m_poly_translucency;
+	int alphafactor = 0xff - extra.alpha;
+	bool alpha_enabled = extra.alpha_enabled;
+	u8 alpha_pen = m_state.m_poly_alpha_pen;
 	rgbaint_t fogcolor = extra.fogcolor;
 	rgbaint_t fadecolor = extra.fadecolor;
 	rgbaint_t polycolor = extra.polycolor;
@@ -121,7 +123,7 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 				rgb.blend(fadecolor, fadefactor);
 			}
 
-			if (alphafactor != 0xff)
+			if (alphafactor != 0xff && (alpha_enabled || pen == alpha_pen))
 			{
 				rgb.blend(rgbaint_t(dest[x]), alphafactor);
 			}
@@ -190,6 +192,8 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 	const pen_t *pal = extra.pens;
 	int prioverchar = extra.prioverchar;
 	int alphafactor = extra.alpha;
+	bool alpha_enabled = extra.alpha_enabled;
+	u8 alpha_pen = m_state.m_poly_alpha_pen;
 	int fogfactor = 0xff - extra.fogfactor;
 	int fadefactor = 0xff - extra.fadefactor;
 	rgbaint_t fogcolor(extra.fogcolor);
@@ -215,7 +219,7 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 				rgb.blend(fadecolor, fadefactor);
 			}
 
-			if (alphafactor != 0xff)
+			if (alphafactor != 0xff && (alpha_enabled || pen == alpha_pen))
 			{
 				rgb.blend(rgbaint_t(dest[x]), alphafactor);
 			}
@@ -326,6 +330,10 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		extra.pfade_enabled = m_state.m_poly_fade_enabled;
 		extra.polycolor.set(0, m_state.m_poly_fade_r, m_state.m_poly_fade_g, m_state.m_poly_fade_b);
 
+		// alpha
+		extra.alpha = m_state.m_poly_alpha_factor;
+		extra.alpha_enabled = (color & 0x7f) != m_state.m_poly_alpha_color;
+
 		// poly fog
 		if (~color & 0x80)
 		{
@@ -428,7 +436,6 @@ void namcos22_renderer::poly3d_drawsprite(
 		extra.flags = 0;
 
 		extra.destbase = &dest_bmp;
-		extra.alpha = alpha;
 		extra.prioverchar = 2 | prioverchar;
 		extra.line_modulo = gfx->rowbytes();
 		extra.flipx = flipx;
@@ -468,6 +475,10 @@ void namcos22_renderer::poly3d_drawsprite(
 			extra.fogcolor.set(0, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
 		}
 
+		// alpha
+		extra.alpha = alpha;
+		extra.alpha_enabled = (color & 0x7f) != m_state.m_poly_alpha_color;
+
 		render_triangle_fan<2>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_sprite, this), 4, vert);
 	}
 }
@@ -504,7 +515,7 @@ void namcos22_renderer::render_sprite(screen_device &screen, bitmap_rgb32 &bitma
 				node->data.sprite.cz,
 				node->data.sprite.prioverchar,
 				node->data.sprite.fade_enabled,
-				0xff - node->data.sprite.translucency
+				0xff - node->data.sprite.alpha
 			);
 			offset++;
 		}
@@ -1481,8 +1492,8 @@ void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_
 
 		src[3]
 		    xxxx.xxxx.xxxx.xxxx | ----.----.----.----  tile number
-		    ----.----.----.---- | xxxx.xxxx.----.----  translucency
-		    ----.----.----.---- | ----.----.xxxx.xxxx  no function(?) - set in timecris when increasing translucency, it's probably not 16bit
+		    ----.----.----.---- | xxxx.xxxx.----.----  alpha
+		    ----.----.----.---- | ----.----.xxxx.xxxx  no function(?) - set in timecris when increasing alpha, it's probably not 16bit
 
 		attr[0]
 		    xxxx.xxxx.----.---- | ----.----.----.----  unused
@@ -1506,7 +1517,7 @@ void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_
 		int cols = (src[2] >> 4) & 0x7;
 		u32 code = src[3];
 		int tile = code >> 16;
-		int translucency = (code & 0xff00) >> 8;
+		int alpha = (code & 0xff00) >> 8;
 
 		u32 zcoord = attr[0] & 0x00ffffff;
 		int color = attr[1] >> 16 & 0xff;
@@ -1573,7 +1584,7 @@ void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_
 			node->data.sprite.cy_max = cy_max;
 			node->data.sprite.sizex = sizex;
 			node->data.sprite.sizey = sizey;
-			node->data.sprite.translucency = translucency;
+			node->data.sprite.alpha = alpha;
 			node->data.sprite.color = color;
 			node->data.sprite.cz = cz;
 			node->data.sprite.prioverchar = prioverchar;
@@ -2294,6 +2305,7 @@ void namcos22_state::update_mixer()
 	{
 /*
            0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
+00824000: ffffff00 00000000 0000007f 00ff006f fe00eded 0f700000 0000037f 00010007 // alpine surfer
 00824000: ffffff00 00000000 0000007f 00ff0000 1000ff00 0f000000 00ff007f 00010007 // time crisis
 00824000: ffffff00 00000000 1830407f 00800000 0000007f 0f000000 0000037f 00010007 // trans sprite
 00824000: ffffff00 00000000 3040307f 00000000 0080007f 0f000000 0000037f 00010007 // trans poly
@@ -2308,8 +2320,8 @@ void namcos22_state::update_mixer()
     0b
     0c
     0d,0e           spot factor
-    0f
-    10
+    0f              polygon alpha color mask
+    10              polygon alpha pen mask
     11              global polygon alpha factor
     12,13           textlayer alpha pen comparison
     14              textlayer alpha pen mask?
@@ -2330,7 +2342,9 @@ void namcos22_state::update_mixer()
 		m_fog_g              = nthbyte(m_mixer, 0x06);
 		m_fog_b              = nthbyte(m_mixer, 0x07);
 		m_spot_factor        = nthbyte(m_mixer, 0x0e) << 8 | nthbyte(m_mixer, 0x0d);
-		m_poly_translucency  = nthbyte(m_mixer, 0x11);
+		m_poly_alpha_color   = nthbyte(m_mixer, 0x0f);
+		m_poly_alpha_pen     = nthbyte(m_mixer, 0x10);
+		m_poly_alpha_factor  = nthbyte(m_mixer, 0x11);
 		m_screen_fade_r      = nthbyte(m_mixer, 0x16);
 		m_screen_fade_g      = nthbyte(m_mixer, 0x17);
 		m_screen_fade_b      = nthbyte(m_mixer, 0x18);

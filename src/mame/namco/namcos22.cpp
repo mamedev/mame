@@ -41,8 +41,7 @@ TODO:
   + testmode looks wrong, spot_data high bits is 0 here (2 in dirtdash)
 - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snow melting effect)
 - alpha blended sprite/poly with priority over alpha blended text doesn't work right
-- alpines sprites on selection screen should not be fully alpha blended, only the drop shadow should
-- ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
+- ss22 poly alpha is probably more limited than currently emulated, not supporting stacked layers
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
 - cybrcycc speed dial needle polygon is missing
 - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrive, victlap
@@ -56,6 +55,7 @@ TODO:
 - lots of smaller issues
 
 ***********************************************************************************************************
+
 Input
      - input ports require manual calibration through built-in diagnostics (or canned EEPROM)
 
@@ -135,6 +135,7 @@ System Super22
 - "PDP" device, for automated block memory transfers (dsp ram, point ram)
 
 ***********************************************************************************************************
+
 SYSTEM22 Known Custom Chips
 
 CPU PCB:
@@ -3634,7 +3635,6 @@ void namcos22_state::machine_start()
 
 	// register for savestates, stuff that isn't done in video_start()
 	// note: namcos22_renderer class doesn't need saving, it is refreshed every frame
-	save_item(NAME(m_poly_translucency));
 	save_item(NAME(m_mixer_flags));
 	save_item(NAME(m_fog_r));
 	save_item(NAME(m_fog_g));
@@ -3648,6 +3648,9 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_poly_fade_g));
 	save_item(NAME(m_poly_fade_b));
 	save_item(NAME(m_poly_fade_enabled));
+	save_item(NAME(m_poly_alpha_color));
+	save_item(NAME(m_poly_alpha_pen));
+	save_item(NAME(m_poly_alpha_factor));
 
 	save_item(NAME(m_syscontrol));
 	save_item(NAME(m_dsp_irq_enabled));
@@ -3782,8 +3785,8 @@ void namcos22_state::namcos22(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	C352(config, m_c352, 49.152_MHz_XTAL/2, 288);
-	m_c352->add_route(0, "lspeaker", 1.00);
-	m_c352->add_route(1, "rspeaker", 1.00);
+	m_c352->add_route(0, "lspeaker", 1.0);
+	m_c352->add_route(1, "rspeaker", 1.0);
 }
 
 void namcos22_state::cybrcomm(machine_config &config)
@@ -3793,8 +3796,8 @@ void namcos22_state::cybrcomm(machine_config &config)
 	SPEAKER(config, "rear_left").rear_left();
 	SPEAKER(config, "rear_right").rear_right();
 
-	m_c352->add_route(2, "rear_left", 1.00);
-	m_c352->add_route(3, "rear_right", 1.00);
+	m_c352->add_route(2, "rear_left", 1.0);
+	m_c352->add_route(3, "rear_right", 1.0);
 }
 
 // System Super22
@@ -3861,7 +3864,7 @@ void namcos22s_state::cybrcycc(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "tank", 0.0, 0.0, 0.0);
-	m_c352->add_route(2, "tank", 1.00);
+	m_c352->add_route(2, "tank", 1.0);
 }
 
 void namcos22s_state::dirtdash(machine_config &config)
@@ -3869,7 +3872,7 @@ void namcos22s_state::dirtdash(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "road", 0.0, 0.0, 0.0);
-	m_c352->add_route(3, "road", 1.00);
+	m_c352->add_route(3, "road", 0.5);
 }
 
 void timecris_state::timecris(machine_config &config)
@@ -3886,8 +3889,8 @@ void namcos22s_state::tokyowar(machine_config &config)
 	SPEAKER(config, "vibration").seat();
 	SPEAKER(config, "seat").headrest_center();
 
-	m_c352->add_route(2, "vibration", 0.50); // to "bass shaker"
-	m_c352->add_route(3, "seat", 1.00);
+	m_c352->add_route(2, "vibration", 0.5); // to "bass shaker"
+	m_c352->add_route(3, "seat", 1.0);
 }
 
 void propcycl_state::propcycl(machine_config &config)
