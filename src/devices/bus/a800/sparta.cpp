@@ -13,7 +13,7 @@ Should mirror $e8-$ef to $fx by logic.
 
 #include "emu.h"
 #include "sparta.h"
-
+#include "a800_carts.h"
 
 //-------------------------------------------------
 //  constructor
@@ -36,30 +36,12 @@ a800_rom_spartados_device::a800_rom_spartados_device(const machine_config &mconf
 {
 }
 
-
-// TODO: needs smart way to avoid a cyclic import from a800_carts.h
-// NB: game carts will usually override SDX boot, meaning that they aren't all that useful to hook up here.
-#include "rtime8.h"
-#include "maxflash.h"
-#include "oss.h"
-#include "sic.h"
-
 static void spartados_carts(device_slot_interface &device)
 {
-//  device.option_add_internal("a800_corina",   A800_ROM_CORINA);
-//  device.option_add_internal("a800_corina_sram", A800_ROM_CORINA_SRAM);
-	device.option_add_internal("a800_8k",       A800_ROM);
-	device.option_add(         "rtime8",        A800_RTIME8);
-	device.option_add(         "maxflash_128kb",  A800_MAXFLASH_128KB);
-	device.option_add(         "maxflash_1mb",  A800_MAXFLASH_1MB);
-	device.option_add(         "sic_128kb",     A800_SIC_128KB);
-	device.option_add(         "sic_256kb",     A800_SIC_256KB);
-	device.option_add(         "sic_512kb",     A800_SIC_512KB);
-
-	device.option_add_internal("a800_oss8k",    A800_ROM_OSS8K);
-	device.option_add_internal("a800_oss034m",  A800_ROM_OSS34);
-	device.option_add_internal("a800_oss043m",  A800_ROM_OSS43);
-	device.option_add_internal("a800_ossm091",  A800_ROM_OSS91);
+	// NB: game carts will usually override SDX boot, meaning that they aren't all that useful to hook up here.
+	// also a SDX attached to another SDX just produces a black screen.
+	// we just hook them all up for the sake of completeness.
+	a800_left(device);
 }
 
 WRITE_LINE_MEMBER( a800_rom_spartados_device::subcart_rd4_w )
@@ -104,6 +86,7 @@ void a800_rom_spartados_device::device_reset()
 	m_subcart_enabled = false;
 	if (!m_subcart->exists())
 		m_subcart_rd4_enabled = m_subcart_rd5_enabled = 0;
+	// TODO: otherwise needs initial state for rd4/rd5
 
 	m_cart_view.select(0);
 }
