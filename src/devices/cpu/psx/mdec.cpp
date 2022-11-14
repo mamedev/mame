@@ -13,6 +13,8 @@
 #include "mdec.h"
 #include "dma.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL ( 0 )
 
 static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
@@ -166,7 +168,7 @@ static inline uint16_t mdec_unpack_run( uint16_t n_packed )
 
 static inline int32_t mdec_unpack_val( uint16_t n_packed )
 {
-	return ( ( (int32_t)n_packed ) << 22 ) >> 22;
+	return util::sext<int32_t>( n_packed, 10 );
 }
 
 uint32_t psxmdec_device::mdec_unpack( uint32_t *p_n_psxram, uint32_t n_address )

@@ -13,7 +13,6 @@ TODO:
 - verify HC55536 clock, I don't think it's from master XTAL, maybe R/C osc
 - is the "Chu has food" sample ever played? Nothing is written to soundcmd when
   a Chu eats a Boo dropping
-- verify C-1 PROM, darkred background is odd
 
 --------------
 
@@ -494,6 +493,15 @@ static INPUT_PORTS_START( olibochu )
 	PORT_CONFSETTING(    0x00, "Punching Kid" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( punchkid )
+	PORT_INCLUDE( olibochu )
+
+	PORT_MODIFY("CONF") // change the default
+	PORT_CONFNAME( 0x01, 0x00, "Palette" ) PORT_CHANGED_MEMBER(DEVICE_SELF, olibochu_state, palette_changed, 0)
+	PORT_CONFSETTING(    0x01, "Oli-Boo-Chu" )
+	PORT_CONFSETTING(    0x00, "Punching Kid" )
+INPUT_PORTS_END
+
 
 
 /***************************************************************************
@@ -613,6 +621,41 @@ ROM_START( olibochu )
 	ROM_LOAD( "c-3.d6",    0x0120, 0x0100, CRC(efc4e408) SHA1(f0796426cf324791853aa2ae6d0c3d1f8108d5c2) ) // sprite lookup table
 ROM_END
 
+ROM_START( punchkid )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pka_1.n3",  0x0000, 0x1000, CRC(18f1fa10) SHA1(cc586d9502c7c1e922570400063a0f2277cf6b3c) )
+	ROM_LOAD( "pka_2.m3",  0x1000, 0x1000, CRC(7766d9be) SHA1(bd7c3b4499f9dd6eb4b2c4a8e4e8fe4851b67b74) )
+	ROM_LOAD( "pka_3.k3",  0x2000, 0x1000, CRC(bb90e21b) SHA1(ae58c05058197943ecfa0612163da5cc38f99fd2) )
+	ROM_LOAD( "pka_4.j3",  0x3000, 0x1000, CRC(ce18a851) SHA1(104e82b8f2fa662655e6eb33f1115c81c058c365) )
+	ROM_LOAD( "pka_5.h3",  0x4000, 0x1000, CRC(426c8254) SHA1(df0c119edcf27f547051c320300920d9c9b12148) )
+	ROM_LOAD( "pka_6.f3",  0x5000, 0x1000, CRC(288b223e) SHA1(7ce0c948d2024ee9495f4cdcaa5807fc9425b4bf) )
+	ROM_LOAD( "pka_7.e3",  0x6000, 0x1000, CRC(c689e057) SHA1(9b94fac8d1608412f8900aa9ddf56be12bdb847a) )
+	ROM_LOAD( "pka_8.d3",  0x7000, 0x1000, CRC(61c118e0) SHA1(9c0f17283b42e6d4622b83a08ac2ac59913be50f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "pka_17.j4", 0x0000, 0x1000, CRC(57f07402) SHA1(a763a835ac512c69b4351c1ec72b0a64e46203aa) )
+	ROM_LOAD( "pka_18.l4", 0x1000, 0x1000, CRC(0a903e9c) SHA1(d893c2f5373f748d8bebf3673b15014f4a8d4b5c) )
+
+	ROM_REGION( 0x2000, "samples", 0 )
+	ROM_LOAD( "pka_15.k1", 0x0000, 0x1000, CRC(fb5dd281) SHA1(fba947ae7b619c2559b5af69ef02acfb15733f0d) )
+	ROM_LOAD( "pka_16.m1", 0x1000, 0x1000, CRC(c07614a5) SHA1(d13d271a324f99d008429c16193c4504e5894493) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "pka_13.n6", 0x0000, 0x1000, CRC(388f2bfd) SHA1(939cf2dcb21965106aa2fcdcd3abcee5e4071770) )
+	ROM_LOAD( "pka_14.n4", 0x1000, 0x1000, CRC(b5bf456f) SHA1(5db9af314d74cef8a3405162c4ba99204b79ae5a) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "pka_9.a6",  0x0000, 0x1000, CRC(fa69e16e) SHA1(5a493a0a108b3e496884d1f499f3445d4e241ecd) )
+	ROM_LOAD( "pka_10.a2", 0x1000, 0x1000, CRC(10359f84) SHA1(df55f06fd98233d0efbc30e3e24bf9b8cab1a5cc) )
+	ROM_LOAD( "pka_11.a4", 0x2000, 0x1000, CRC(1d968f5f) SHA1(4acf78d865ca36355bb15dc1d476f5e97a5d91b7) )
+	ROM_LOAD( "pka_12.b2", 0x3000, 0x1000, CRC(d8f0c157) SHA1(a7b0c873e016c3b3252c2c9b6400b0fd3d650b2f) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "c-1.n2",    0x0000, 0x0020, CRC(e488e831) SHA1(6264741f7091c614093ae1ea4f6ead3d0cef83d3) ) // palette
+	ROM_LOAD( "c-2.k6",    0x0020, 0x0100, CRC(698a3ba0) SHA1(3c1a6cb881ef74647c651462a27d812234408e45) ) // char lookup table
+	ROM_LOAD( "c-3.d6",    0x0120, 0x0100, CRC(efc4e408) SHA1(f0796426cf324791853aa2ae6d0c3d1f8108d5c2) ) // sprite lookup table
+ROM_END
+
 } // anonymous namespace
 
 
@@ -623,3 +666,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        SCREEN  COMPANY, FULLNAME, FLAGS
 GAME( 1981, olibochu, 0,        olibochu, olibochu, olibochu_state, empty_init, ROT270, "Irem (GDI license)", "Oli-Boo-Chu (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, punchkid, olibochu, olibochu, punchkid, olibochu_state, empty_init, ROT270, "Irem", "Punching Kid (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

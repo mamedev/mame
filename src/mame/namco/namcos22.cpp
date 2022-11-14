@@ -18,9 +18,6 @@ TODO:
 - Rave Racer car will sometimes do a 'strafe slide' when playing the game with a small analog device (such as an
   Xbox 360 pad), does not happen with keyboard controls or larger device like a steering wheel. BTANB or related
   to HLE I/O board emulation?
-- alpinesa doesn't work, protection related? - depending on value written, it looks like it changes the addressing
-  of some of the gfx chips on the fly. This is probably due to the PAL modification on the PROGRAM ROM PCB. Check
-  the modification details of the TYPE 4 Program ROM PCB below.
 - C139 for linked cabinets, as well as in RR fullscale
 - confirm DSP and MCU IRQ timing
 - EEPROM write timing should be around 5ms, it doesn't do any data/rdy polling
@@ -33,19 +30,19 @@ TODO:
   + ridgerac waving flag shadowing
   + cybrcomm enemies should flash white when you shoot them, probably lighting related
   + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
-- improve ss22 spot, only used in dirtdash and testmode, not understood well:
+- improve ss22 spot, used in dirtdash, alpines highscore entry, testmode screen#14 - not understood well:
+  + does not work at all in alpines (uses spot_factor, not spotram, should show a spotlight with darkened background)
   + should be done before global fade, see dirtdash when starting at jungle level
   + should not apply to some of the sprites in dirtdash jungle level (eg. time/position)
+  + should not apply to some of the polygons either? see dirtdash jungle level moon
   + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
   + what is the high bit in spot_factor for? not used anywhere
   + high bits in spot_data are unknown, maybe blend mode
   + testmode looks wrong, spot_data high bits is 0 here (2 in dirtdash)
 - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snow melting effect)
-- support for text layer video partial updates after posirq, alpinesa does raster effects on it
 - alpha blended sprite/poly with priority over alpha blended text doesn't work right
-- ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
+- ss22 poly alpha is probably more limited than currently emulated, not supporting stacked layers
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
-- cybrcycc speed dial needle polygon is missing
 - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrive, victlap
 - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2,
   czram contents is rather odd here and partly cleared (probably the cause?):
@@ -57,6 +54,7 @@ TODO:
 - lots of smaller issues
 
 ***********************************************************************************************************
+
 Input
      - input ports require manual calibration through built-in diagnostics (or canned EEPROM)
 
@@ -136,6 +134,7 @@ System Super22
 - "PDP" device, for automated block memory transfers (dsp ram, point ram)
 
 ***********************************************************************************************************
+
 SYSTEM22 Known Custom Chips
 
 CPU PCB:
@@ -1643,6 +1642,7 @@ void namcos22s_state::namcos22s_chipselect_w(offs_t offset, u32 data, u32 mem_ma
 
 
 // System22
+
 void namcos22_state::namcos22_am(address_map &map)
 {
 	/**
@@ -1715,7 +1715,7 @@ void namcos22_state::namcos22_am(address_map &map)
 
 	/**
 	 * System Controller: Interrupt Control, Peripheral Control
-	 *
+	 * assumed to be C383
 	 */
 	map(0x40000000, 0x4000001f).rw(FUNC(namcos22_state::syscon_r), FUNC(namcos22_state::s22_syscon_w));
 
@@ -1828,7 +1828,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	/**
 	 * Tilemap PCG Memory
 	 */
-	map(0x90080000, 0x9009dfff).ram().w(FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
+	map(0x90080000, 0x9009ffff).ram().w(FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
 
 	/**
 	 * Tilemap Memory (64 x 64)
@@ -1847,6 +1847,7 @@ void namcos22_state::namcos22_am(address_map &map)
 
 
 // System Super22
+
 void namcos22s_state::namcos22s_am(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
@@ -1865,7 +1866,7 @@ void namcos22s_state::namcos22s_am(address_map &map)
 	map(0x824000, 0x8243ff).ram().share("video_mixer");
 	map(0x828000, 0x83ffff).ram().w(FUNC(namcos22s_state::namcos22_paletteram_w)).share("paletteram");
 	map(0x860000, 0x860007).rw(FUNC(namcos22s_state::spotram_r), FUNC(namcos22s_state::spotram_w));
-	map(0x880000, 0x89dfff).ram().w(FUNC(namcos22s_state::namcos22_cgram_w)).share("cgram");
+	map(0x880000, 0x89ffff).ram().w(FUNC(namcos22s_state::namcos22_cgram_w)).share("cgram");
 	map(0x89e000, 0x89ffff).ram().w(FUNC(namcos22s_state::namcos22_textram_w)).share("textram");
 	map(0x8a0000, 0x8a000f).rw(FUNC(namcos22s_state::namcos22_tilemapattr_r), FUNC(namcos22s_state::namcos22_tilemapattr_w));
 	map(0x900000, 0x90ffff).ram().share("vics_data");
@@ -1878,7 +1879,8 @@ void namcos22s_state::namcos22s_am(address_map &map)
 
 
 // Time Crisis gun
-u16 namcos22s_state::timecris_gun_r(offs_t offset)
+
+u16 timecris_state::gun_r(offs_t offset)
 {
 	u16 xpos = m_opt[0]->read();
 	u16 ypos = m_opt[1]->read();
@@ -1907,45 +1909,25 @@ u16 namcos22s_state::timecris_gun_r(offs_t offset)
 	}
 }
 
-void namcos22s_state::timecris_am(address_map &map)
+void timecris_state::timecris_am(address_map &map)
 {
 	namcos22s_am(map);
-	map(0x430000, 0x43000f).r(FUNC(namcos22s_state::timecris_gun_r)).umask32(0xffff0000);
+	map(0x430000, 0x43000f).r(FUNC(timecris_state::gun_r)).umask32(0xffff0000);
 }
 
 
-// Alpine Surfer protection
-u32 namcos22s_state::alpinesa_prot_r()
+// Alpine Surfer ROM banking
+
+void alpines_state::rombank_w(u32 data)
 {
-	return m_alpinesa_protection;
+	m_rombank->set_entry(std::clamp(data & 3, 0U, 2U));
 }
 
-void namcos22s_state::alpinesa_prot_w(u32 data)
-{
-	switch (data)
-	{
-		case 0:
-			m_alpinesa_protection = 0;
-			break;
-
-		case 1:
-			m_alpinesa_protection = 1;
-			break;
-
-		case 3:
-			m_alpinesa_protection = 2;
-			break;
-
-		default:
-			break;
-	}
-}
-
-void namcos22s_state::alpinesa_am(address_map &map)
+void alpines_state::alpines_am(address_map &map)
 {
 	namcos22s_am(map);
-	map(0x200000, 0x200003).r(FUNC(namcos22s_state::alpinesa_prot_r));
-	map(0x300000, 0x300003).w(FUNC(namcos22s_state::alpinesa_prot_w));
+	map(0x200000, 0x3fffff).bankr("rombank");
+	map(0x300000, 0x300003).w(FUNC(alpines_state::rombank_w));
 }
 
 
@@ -2755,7 +2737,7 @@ void namcos22s_state::mcu_program(address_map &map)
 	map(0x004000, 0x00bfff).ram().share("shareram");
 	map(0x00c000, 0x00ffff).rom().region("mcu", 0xc000);
 	map(0x200000, 0x27ffff).rom().region("mcu", 0);
-	map(0x300000, 0x300001).nopr(); // ? (cybrcycc, alpinesa - writes data to RAM, but then never reads from there)
+	map(0x300000, 0x300001).nopr(); // ? (cybrcycc, alpines - writes data to RAM, but then never reads from there)
 	map(0x301000, 0x301001).nopw(); // watchdog? LEDs?
 	map(0x308000, 0x308003).w("mb87078", FUNC(mb87078_device::data_w)).umask16(0x00ff);
 }
@@ -2842,12 +2824,12 @@ void namcos22_state::handle_cybrcomm_io()
 
 // Alpine skiing games
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::alpine_steplock_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(alpine_state::alpine_steplock_callback)
 {
 	m_motor_status = param;
 }
 
-void namcos22s_state::alpine_mcu_port4_w(u8 data)
+void alpine_state::alpine_mcu_port4_w(u8 data)
 {
 	if (~m_mcu_iocontrol & data & 0x20)
 	{
@@ -2878,13 +2860,13 @@ void namcos22s_state::alpine_mcu_port4_w(u8 data)
 
 // Prop Cycle
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(propcycl_state::pedal_interrupt)
 {
 	m_mcu->set_input_line(M37710_LINE_TIMERA3OUT, param ? ASSERT_LINE : CLEAR_LINE);
 	m_mcu->pulse_input_line(M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_update)
+TIMER_DEVICE_CALLBACK_MEMBER(propcycl_state::pedal_update)
 {
 	// arbitrary timer for reading optical pedal
 	int pedal = m_opt[0]->read() - 0x80;
@@ -2902,25 +2884,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_update)
 		const int range = 100000;
 
 		attotime freq = attotime::from_usec(base + range * (1.0 / abs(pedal)));
-		m_pc_pedal_interrupt->adjust(std::min(freq, m_pc_pedal_interrupt->remaining()), pedal < 0, freq);
+		m_pedal_interrupt->adjust(std::min(freq, m_pedal_interrupt->remaining()), pedal < 0, freq);
 	}
 	else
 	{
 		// not moving
-		m_pc_pedal_interrupt->adjust(attotime::never, 0, attotime::never);
+		m_pedal_interrupt->adjust(attotime::never, 0, attotime::never);
 	}
 }
 
 
 // Armadillo Racing
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(adillor_state::trackball_interrupt)
 {
 	m_mcu->set_input_line((param & 1) ? M37710_LINE_TIMERA2OUT : M37710_LINE_TIMERA3OUT, (param & 2) ? ASSERT_LINE : CLEAR_LINE);
 	m_mcu->pulse_input_line((param & 1) ? M37710_LINE_TIMERA2IN : M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_update)
+TIMER_DEVICE_CALLBACK_MEMBER(adillor_state::trackball_update)
 {
 	// arbitrary timer for reading optical trackball
 	// -1.0 .. 1.0
@@ -2948,12 +2930,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_update)
 		if (t[axis] > (1.0 / range))
 		{
 			attotime freq = attotime::from_hz(base + range * t[axis]);
-			m_ar_tb_interrupt[axis]->adjust(std::min(freq, m_ar_tb_interrupt[axis]->remaining()), params[axis], freq);
+			m_trackball_interrupt[axis]->adjust(std::min(freq, m_trackball_interrupt[axis]->remaining()), params[axis], freq);
 		}
 		else
 		{
 			// not moving
-			m_ar_tb_interrupt[axis]->adjust(attotime::never, axis, attotime::never);
+			m_trackball_interrupt[axis]->adjust(attotime::never, axis, attotime::never);
 		}
 	}
 }
@@ -3218,7 +3200,7 @@ INPUT_PORTS_END
 /*********************************************************************************************/
 
 template <int N>
-READ_LINE_MEMBER(namcos22s_state::alpine_motor_r)
+READ_LINE_MEMBER(alpine_state::alpine_motor_r)
 {
 	return BIT(m_motor_status, N);
 }
@@ -3232,8 +3214,8 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) // Decision / View Change
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(namcos22s_state, alpine_motor_r<0>) // steps are free
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(namcos22s_state, alpine_motor_r<1>) // steps are locked
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(alpine_state, alpine_motor_r<0>) // steps are free
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(alpine_state, alpine_motor_r<1>) // steps are locked
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC.0")
@@ -3252,6 +3234,13 @@ static INPUT_PORTS_START( alpiner )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( alpines )
+	PORT_INCLUDE( alpiner )
+
+	PORT_MODIFY("ADC.0")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x080, 0x380) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_REVERSE PORT_NAME("Steps Swing")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( airco22 )
@@ -3595,7 +3584,7 @@ static const gfx_layout texture_tile_layout =
 static const gfx_layout namcos22_cg_layout =
 {
 	16,16,
-	0x400, /* 0x3c0 */
+	0x400,
 	4,
 	{ 0,1,2,3 },
 	{ XOR(0)*4,  XOR(1)*4,  XOR(2)*4,  XOR(3)*4,  XOR(4)*4,  XOR(5)*4,  XOR(6)*4,  XOR(7)*4,
@@ -3645,7 +3634,6 @@ void namcos22_state::machine_start()
 
 	// register for savestates, stuff that isn't done in video_start()
 	// note: namcos22_renderer class doesn't need saving, it is refreshed every frame
-	save_item(NAME(m_poly_translucency));
 	save_item(NAME(m_mixer_flags));
 	save_item(NAME(m_fog_r));
 	save_item(NAME(m_fog_g));
@@ -3659,6 +3647,9 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_poly_fade_g));
 	save_item(NAME(m_poly_fade_b));
 	save_item(NAME(m_poly_fade_enabled));
+	save_item(NAME(m_poly_alpha_color));
+	save_item(NAME(m_poly_alpha_pen));
+	save_item(NAME(m_poly_alpha_factor));
 
 	save_item(NAME(m_syscontrol));
 	save_item(NAME(m_dsp_irq_enabled));
@@ -3693,6 +3684,9 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_LitSurfaceCount));
 	save_item(NAME(m_LitSurfaceIndex));
 	save_item(NAME(m_tilemapattr));
+	save_item(NAME(m_rowscroll));
+	save_item(NAME(m_lastrow));
+	save_item(NAME(m_rs_frame));
 	save_item(NAME(m_spot_factor));
 	save_item(NAME(m_text_palbase));
 	save_item(NAME(m_bg_palbase));
@@ -3721,15 +3715,18 @@ void namcos22s_state::machine_start()
 {
 	namcos22_state::machine_start();
 
-	m_mcu_iocontrol = 0;
-
 	save_item(NAME(m_spotram_enable));
 	save_item(NAME(m_spotram_address));
-	save_item(NAME(m_alpinesa_protection));
-	save_item(NAME(m_motor_status));
 	save_item(NAME(m_mcu_iocontrol));
 	save_item(NAME(m_mcu_outdata));
 	save_item(NAME(m_chipselect));
+}
+
+void alpine_state::machine_start()
+{
+	namcos22s_state::machine_start();
+
+	save_item(NAME(m_motor_status));
 }
 
 // System22
@@ -3787,8 +3784,8 @@ void namcos22_state::namcos22(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	C352(config, m_c352, 49.152_MHz_XTAL/2, 288);
-	m_c352->add_route(0, "lspeaker", 1.00);
-	m_c352->add_route(1, "rspeaker", 1.00);
+	m_c352->add_route(0, "lspeaker", 1.0);
+	m_c352->add_route(1, "rspeaker", 1.0);
 }
 
 void namcos22_state::cybrcomm(machine_config &config)
@@ -3798,8 +3795,8 @@ void namcos22_state::cybrcomm(machine_config &config)
 	SPEAKER(config, "rear_left").rear_left();
 	SPEAKER(config, "rear_right").rear_right();
 
-	m_c352->add_route(2, "rear_left", 1.00);
-	m_c352->add_route(3, "rear_right", 1.00);
+	m_c352->add_route(2, "rear_left", 1.0);
+	m_c352->add_route(3, "rear_right", 1.0);
 }
 
 // System Super22
@@ -3846,20 +3843,19 @@ void namcos22s_state::airco22b(machine_config &config)
 	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer behind back
 }
 
-void namcos22s_state::alpine(machine_config &config)
+void alpine_state::alpine(machine_config &config)
 {
 	namcos22s(config);
 
-	m_mcu->p4_out_cb().set(FUNC(namcos22s_state::alpine_mcu_port4_w));
-
-	TIMER(config, m_motor_timer).configure_generic(FUNC(namcos22s_state::alpine_steplock_callback));
+	m_mcu->p4_out_cb().set(FUNC(alpine_state::alpine_mcu_port4_w));
+	TIMER(config, m_motor_timer).configure_generic(FUNC(alpine_state::alpine_steplock_callback));
 }
 
-void namcos22s_state::alpinesa(machine_config &config)
+void alpines_state::alpines(machine_config &config)
 {
 	alpine(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22s_state::alpinesa_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alpines_state::alpines_am);
 }
 
 void namcos22s_state::cybrcycc(machine_config &config)
@@ -3867,7 +3863,7 @@ void namcos22s_state::cybrcycc(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "tank", 0.0, 0.0, 0.0);
-	m_c352->add_route(2, "tank", 1.00);
+	m_c352->add_route(2, "tank", 1.0);
 }
 
 void namcos22s_state::dirtdash(machine_config &config)
@@ -3875,14 +3871,14 @@ void namcos22s_state::dirtdash(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "road", 0.0, 0.0, 0.0);
-	m_c352->add_route(3, "road", 1.00);
+	m_c352->add_route(3, "road", 0.5);
 }
 
-void namcos22s_state::timecris(machine_config &config)
+void timecris_state::timecris(machine_config &config)
 {
 	namcos22s(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22s_state::timecris_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &timecris_state::timecris_am);
 }
 
 void namcos22s_state::tokyowar(machine_config &config)
@@ -3892,25 +3888,25 @@ void namcos22s_state::tokyowar(machine_config &config)
 	SPEAKER(config, "vibration").seat();
 	SPEAKER(config, "seat").headrest_center();
 
-	m_c352->add_route(2, "vibration", 0.50); // to "bass shaker"
-	m_c352->add_route(3, "seat", 1.00);
+	m_c352->add_route(2, "vibration", 0.5); // to "bass shaker"
+	m_c352->add_route(3, "seat", 1.0);
 }
 
-void namcos22s_state::propcycl(machine_config &config)
+void propcycl_state::propcycl(machine_config &config)
 {
 	namcos22s(config);
 
-	TIMER(config, "pc_p_upd").configure_periodic(FUNC(namcos22s_state::propcycl_pedal_update), attotime::from_msec(20));
-	TIMER(config, m_pc_pedal_interrupt).configure_generic(FUNC(namcos22s_state::propcycl_pedal_interrupt));
+	TIMER(config, "pedal_update").configure_periodic(FUNC(propcycl_state::pedal_update), attotime::from_msec(20));
+	TIMER(config, m_pedal_interrupt).configure_generic(FUNC(propcycl_state::pedal_interrupt));
 }
 
-void namcos22s_state::adillor(machine_config &config)
+void adillor_state::adillor(machine_config &config)
 {
 	namcos22s(config);
 
-	TIMER(config, "ar_tb_upd").configure_periodic(FUNC(namcos22s_state::adillor_trackball_update), attotime::from_msec(20));
+	TIMER(config, "trackball_update").configure_periodic(FUNC(adillor_state::trackball_update), attotime::from_msec(20));
 	for (int i = 0; i < 2; i++)
-		TIMER(config, m_ar_tb_interrupt[i]).configure_generic(FUNC(namcos22s_state::adillor_trackball_interrupt));
+		TIMER(config, m_trackball_interrupt[i]).configure_generic(FUNC(adillor_state::trackball_interrupt));
 }
 
 
@@ -4591,10 +4587,8 @@ ROM_START( cybrcomm )
 	ROM_LOAD( "cyc1cg3.5a", 0x200000*0x7, 0x200000,CRC(2222e16f) SHA1(562bcd4d43b1543303d8fd66d9f0d9a8e3702492) ) /* cyc1cg3.9a */
 
 	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
-
 	//cyc1ccrl.1c FIXED BITS (xxxxxxxx11xxxxxx)
 	ROM_LOAD( "cyc1ccrl.1c",     0x000000, 0x100000,CRC(1a0dc5f0) SHA1(bf0093d9cbdcb45a82705e966c48a1f408fa344e) ) /* cyc1ccrl.8c */
-
 	//cyc1ccrh.2c 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD( "cyc1ccrh.2c",     0x200000, 0x080000,CRC(8c4090b8) SHA1(456d548a48833e840c5d39d47b2dcca03f8d6321) ) /* cyc1ccrh.7c */
 
@@ -4926,17 +4920,6 @@ ROM_START( propcyclj )
 	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
 	ROM_LOAD( "pr1ccrl.3d",  0x000000, 0x200000,CRC(e01321fd) SHA1(5938c6eff8e1b3642728c3be733f567a97cb5aad) ) /* identical to "pr1ccrl.7b" */
 	ROM_LOAD( "pr1ccrh.1d",  0x200000, 0x080000,CRC(1d68bc31) SHA1(d534d0daebe7018e83b57cc7919c294ab89bddc8) ) /* identical to "pr1ccrh.5b" */
-	/* These two ROMs define a huge texture tilemap using the tiles from "textile".
-	 * The tilemap has 0x100 columns.
-	 *
-	 * pr1ccrl contains little endian 16 bit words.  Each word references a 16x16 tile.
-	 *
-	 * pr1ccrh.1d contains packed nibbles.  Each nibble encodes three tile attributes:
-	 *  0x8 = swapxy
-	 *  0x4 = flipx
-	 *  0x2 = flipy
-	 *  0x1 = tile bank (used in some sys22 games)
-	 */
 
 	ROM_REGION( 0x80000*9, "pointrom", 0 ) /* 3d model data */
 	ROM_LOAD( "pr1ptrl0.18k", 0x80000*0, 0x80000,CRC(fddb27a2) SHA1(6e837b45e3f9ed7ca3d1a457d0f0124de5618d1f) )
@@ -5389,11 +5372,11 @@ ROM_START( alpinr2a )
 ROM_END
 
 
-ROM_START( alpinesa )
+ROM_START( alpines )
 	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "af2ver-a_ll.ic2", 0x000003, 0x200000, CRC(e776159d) SHA1(5110364afb7ec606074d58a1d216d7d687b9df62) )
 	ROM_LOAD32_BYTE( "af2ver-a_lm.ic3", 0x000002, 0x200000, CRC(c5333d38) SHA1(9486cead964f95f8e56dac2f88486f3b98561aa6) )
-	ROM_LOAD32_BYTE( "af2ver-a_um.ic4", 0x000001, 0x200000, CRC(5977fc6e) SHA1(19b8041789f8987934fa461972976a3570b1b87b) )
+	ROM_LOAD32_BYTE( "af2ver-a_um.ic4", 0x000001, 0x200000, CRC(c9095af3) SHA1(4981c8c84057373ef678e51fe72ebac40d1a0cf4) )
 	ROM_LOAD32_BYTE( "af2ver-a_uu.ic5", 0x000000, 0x200000, CRC(54ee33a1) SHA1(0eaa8707ab13a0a66551f61a08986c98f5c9e446) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
@@ -5429,9 +5412,48 @@ ROM_START( alpinesa )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
 	ROM_LOAD( "af1wavea.2l",  0x000000, 0x400000, CRC(28cca494) SHA1(4ff87ab85fd17bf8dbee5b03d99cc5c31dd6349a) )
+ROM_END
 
-	ROM_REGION( 0x2000, "eeprom", 0 ) // default eeprom
-	ROM_LOAD( "alpinesa_defaults.nv", 0x0000, 0x2000, CRC(d9e74daa) SHA1(aa2ddec61d8e9ae69726bab8ed5701e4c41b833b) )
+ROM_START( alpinesa ) // only 4 different DWORDs at 0x700, watchpoint does not trigger there
+	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "af2ver-a_ll.ic2", 0x000003, 0x200000, CRC(d8025e98) SHA1(e1c08557e70d632bf1e99356d6c6f76b5f407b8f) )
+	ROM_LOAD32_BYTE( "af2ver-a_lm.ic3", 0x000002, 0x200000, CRC(5f805d51) SHA1(b7fa9028deeaf1c549e9c2d6099925a0d0ad1598) )
+	ROM_LOAD32_BYTE( "af2ver-a_um.ic4", 0x000001, 0x200000, CRC(e7e057e3) SHA1(436e4645ba0e8734c0e25c7c22489bf97066944d) )
+	ROM_LOAD32_BYTE( "af2ver-a_uu.ic5", 0x000000, 0x200000, CRC(3eee10a2) SHA1(6e52c5132581e7fe69a257195af5bc9f3a3efe25) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
+	ROM_LOAD( "af1data.8k",   0x000000, 0x080000, CRC(ef13ebe8) SHA1(5d3f697994d4b5b19ee7fea1e2aef8e39449b68e) )
+
+	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
+	ROM_LOAD( "af1scg0b.12f", 0x000000, 0x200000, CRC(46a6222a) SHA1(5322ef60690625b9b8dbe1cfe0c49dcd9c8b1a4c) )
+
+	ROM_REGION( 0x200000*5, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "af1cg0.8d",    0x200000*0, 0x200000, CRC(7423f3ff) SHA1(6a2fd44823ef46111deb57d328b1b75cc355d413) )
+	ROM_LOAD( "af1cg1.10d",   0x200000*1, 0x200000, CRC(ea76689a) SHA1(73dd3af737a3e9903abe5ed9c9ae7eded51d8350) )
+	ROM_LOAD( "af1cg2.12d",   0x200000*2, 0x200000, CRC(2a38943a) SHA1(15d737996f49bf6374ef6191bbfbe0298d398378) )
+	ROM_LOAD( "af1cg3.13d",   0x200000*3, 0x200000, CRC(7f5a3e0f) SHA1(241f9995323b28df23d20a75e1f43ce6e05434cd) )
+	ROM_LOAD( "af1cg4.14d",   0x200000*4, 0x200000, CRC(a5ee13e2) SHA1(48fd3c912690f21cbbc2a39bed0a82be41a0d011) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "af1ccrl.3d",   0x000000, 0x200000, CRC(6c054698) SHA1(8537607646b183883c5aa4060fb0af640da4af87) )
+	ROM_LOAD( "af1ccrh.1d",   0x200000, 0x080000, CRC(95a02a27) SHA1(32ee87b76ae9fcec6d825e3cf4d5cbb97db39544) )
+
+	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "af1ptrl0.18k", 0x80000*0, 0x80000, CRC(31ce46d3) SHA1(568fb9ee9ac14e613a4fd7668cb38315c10be62b) )
+	ROM_LOAD( "af1ptrl1.16k", 0x80000*1, 0x80000, CRC(e869bf00) SHA1(b3c3026891ae3958d1774c905e97c3b57a414ea7) )
+	ROM_LOAD( "af1ptrm0.18j", 0x80000*2, 0x80000, CRC(ef7f4d8a) SHA1(02f77c68004b7dccc99b61126e7d07960eb15028) )
+	ROM_LOAD( "af1ptrm1.16j", 0x80000*3, 0x80000, CRC(7dd01d52) SHA1(adc1087435d31ed6163ad046466955f01517450f) )
+	ROM_LOAD( "af1ptru0.18f", 0x80000*4, 0x80000, CRC(177f1591) SHA1(3969e780e5603eca0a65f65c1ad14d1cef918b39) )
+	ROM_LOAD( "af1ptru1.16f", 0x80000*5, 0x80000, CRC(7521d18e) SHA1(dc03ef369db16f59c138ff4e22260d1c04782d1f) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
+	ROM_LOAD( "af1wavea.2l",  0x000000, 0x400000, CRC(28cca494) SHA1(4ff87ab85fd17bf8dbee5b03d99cc5c31dd6349a) )
 ROM_END
 
 
@@ -6103,28 +6125,24 @@ void namcos22_state::init_cybrcomm()
 	install_c74_speedup();
 }
 
-void namcos22s_state::init_alpiner()
+void alpine_state::init_alpiner()
 {
 	m_gametype = NAMCOS22_ALPINE_RACER;
 	install_130_speedup();
-
-	m_motor_status = 2;
 }
 
-void namcos22s_state::init_alpiner2()
+void alpine_state::init_alpiner2()
 {
 	m_gametype = NAMCOS22_ALPINE_RACER_2;
 	install_130_speedup();
-
-	m_motor_status = 2;
 }
 
-void namcos22s_state::init_alpinesa()
+void alpines_state::init_alpines()
 {
 	m_gametype = NAMCOS22_ALPINE_SURFER;
 	install_141_speedup();
 
-	m_motor_status = 2;
+	m_rombank->configure_entries(0, 3, memregion("maincpu")->base() + 0x200000, 0x200000);
 }
 
 void namcos22s_state::init_airco22()
@@ -6133,13 +6151,13 @@ void namcos22s_state::init_airco22()
 	install_130_speedup(); // S22-BIOS ver1.20 namco all rights reserved 94/12/21
 }
 
-void namcos22s_state::init_propcycl()
+void propcycl_state::init_propcycl()
 {
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
 	// patch out strange routine (uninitialized-eeprom related?)
 	// maybe needs more accurate 28C64 eeprom device emulation
-	ROM[0x1992C/4] = 0x4e754e75;
+	ROM[0x1992c/4] = 0x4e754e75;
 
 	/**
 	 * The dipswitch reading routine in Prop Cycle polls the
@@ -6157,7 +6175,7 @@ void namcos22s_state::init_propcycl()
 	install_141_speedup();
 }
 
-void namcos22s_state::init_propcyclj()
+void propcycl_state::init_propcyclj()
 {
 	// see init_propcycl for notes
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
@@ -6177,7 +6195,7 @@ void namcos22s_state::init_cybrcyc()
 	install_130_speedup();
 }
 
-void namcos22s_state::init_timecris()
+void timecris_state::init_timecris()
 {
 	m_gametype = NAMCOS22_TIME_CRISIS;
 	install_130_speedup();
@@ -6195,7 +6213,7 @@ void namcos22s_state::init_aquajet()
 	install_141_speedup();
 }
 
-void namcos22s_state::init_adillor()
+void adillor_state::init_adillor()
 {
 	m_gametype = NAMCOS22_ARMADILLO_RACING;
 	install_141_speedup();
@@ -6211,46 +6229,47 @@ void namcos22s_state::init_dirtdash()
 
 /*********************************************************************************************/
 
-/*     YEAR, NAME,      PARENT,   MACHINE,   INPUT,     CLASS,           INIT,           MNTR, COMPANY, FULLNAME, FLAGS */
+/*    YEAR,  NAME,      PARENT,   MACHINE,   INPUT,     CLASS,           INIT,           MNTR, COMPANY, FULLNAME, FLAGS */
 // System22 games
-GAME( 1993, ridgerac,   0,        namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
-GAME( 1993, ridgeraca,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28
-GAME( 1993, ridgeracb,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR3 Ver.B, US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, reports as "-Foreign B-" RR3 means USA?
-GAME( 1993, ridgeracc,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR3, US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, purportedly 3 Screen version, reports as "-Foreign B-"
-GAME( 1993, ridgeracj,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracf,  ridgerac, namcos22,  ridgeracf, namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer Full Scale (Rev. RRF2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
-GAME( 1994, ridgera2,   0,        namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21 - NOT labeled "B" but based off Japan Rev.B
-GAME( 1994, ridgera2j,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
-GAME( 1994, ridgera2ja, ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
-GAME( 1994, ridgera28,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS8, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-XX-XX - Test Location / proto??
-GAME( 1994, cybrcomm,   0,        cybrcomm,  cybrcomm,  namcos22_state,  init_cybrcomm,  ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94
-GAME( 1995, raverace,   0,        namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Rev. RV2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
-GAME( 1995, raveracej,  raverace, namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Rev. RV1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
-GAME( 1995, raveraceja, raverace, namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
-GAME( 1994, acedrive,   0,        namcos22,  acedrvr,   namcos22_state,  init_acedrvr,   ROT0, "Namco", "Ace Driver: Racing Evolution (Rev. AD2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
-GAME( 1996, victlap,    0,        namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/05/21 19:39:59
-GAME( 1996, victlapa,   victlap,  namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
-GAME( 1996, victlapj,   victlap,  namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV1 Ver.C, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
+GAME( 1993, ridgerac,   0,        namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (World, RR2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
+GAME( 1993, ridgeraca,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (World, RR2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28
+GAME( 1993, ridgeracb,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (US, RR3 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, reports as "-Foreign B-" RR3 means USA?
+GAME( 1993, ridgeracc,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (US, RR3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, purportedly 3 Screen version, reports as "-Foreign B-"
+GAME( 1993, ridgeracj,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Japan, RR1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
+GAME( 1993, ridgeracf,  ridgerac, namcos22,  ridgeracf, namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer Full Scale (World, RRF2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
+GAME( 1994, ridgera2,   0,        namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (World, RRS2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21 - NOT labeled "B" but based off Japan Rev.B
+GAME( 1994, ridgera2j,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Japan, RRS1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
+GAME( 1994, ridgera2ja, ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Japan, RRS1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
+GAME( 1994, ridgera28,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (World, RRS8)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-XX-XX - Test Location / proto??
+GAME( 1994, cybrcomm,   0,        cybrcomm,  cybrcomm,  namcos22_state,  init_cybrcomm,  ROT0, "Namco", "Cyber Commando (Japan, CY1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94
+GAME( 1995, raverace,   0,        namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (World, RV2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
+GAME( 1995, raveracej,  raverace, namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Japan, RV1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
+GAME( 1995, raveraceja, raverace, namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Japan, RV1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
+GAME( 1994, acedrive,   0,        namcos22,  acedrvr,   namcos22_state,  init_acedrvr,   ROT0, "Namco", "Ace Driver: Racing Evolution (World, AD2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
+GAME( 1996, victlap,    0,        namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (World, ADV2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/05/21 19:39:59
+GAME( 1996, victlapa,   victlap,  namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (World, ADV2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
+GAME( 1996, victlapj,   victlap,  namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Japan, ADV1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
 
 // System Super22 games
-GAME( 1994, alpinerd,   0,        alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, alpinerc,   alpinerd, alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, alpinerjc,  alpinerd, alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR1 Ver.C, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, airco22b,   0,        airco22b,  airco22,   namcos22s_state, init_airco22,   ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, cybrcycc,   0,        cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
-GAME( 1995, cybrcyccj,  cybrcycc, cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (Rev. CB1 Ver.C, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
-GAME( 1995, dirtdash,   0,        dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/?1/0? 21:03:?6, one ROM is bad
-GAME( 1995, dirtdasha,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
-GAME( 1995, dirtdashj,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:06:45
-GAME( 1995, timecris,   0,        timecris,  timecris,  namcos22s_state, init_timecris,  ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
-GAME( 1995, timecrisa,  timecris, timecris,  timecris,  namcos22s_state, init_timecris,  ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
-GAME( 1996, propcycl,   0,        propcycl,  propcycl,  namcos22s_state, init_propcycl,  ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
-GAME( 1996, propcyclj,  propcycl, propcycl,  propcycl,  namcos22s_state, init_propcyclj, ROT0, "Namco", "Prop Cycle (Rev. PR1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:06:03
-GAME( 1996, alpinesa,   0,        alpinesa,  alpiner,   namcos22s_state, init_alpinesa,  ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
-GAME( 1996, tokyowar,   0,        tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
-GAME( 1996, tokyowarj,  tokyowar, tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:16:29
-GAME( 1996, aquajet,    0,        cybrcycc,  aquajet,   namcos22s_state, init_aquajet,   ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
-GAME( 1996, alpinr2b,   0,        alpine,    alpiner,   namcos22s_state, init_alpiner2,  ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
-GAME( 1996, alpinr2a,   alpinr2b, alpine,    alpiner,   namcos22s_state, init_alpiner2,  ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05
-GAME( 1997, adillor,    0,        adillor,   adillor,   namcos22s_state, init_adillor,   ROT0, "Namco", "Armadillo Racing (Rev. AM2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:43:29
-GAME( 1997, adillorj,   adillor,  adillor,   adillor,   namcos22s_state, init_adillor,   ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:19:41
+GAME( 1994, alpinerd,   0,        alpine,    alpiner,   alpine_state,    init_alpiner,   ROT0, "Namco", "Alpine Racer (World, AR2 Ver.D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, alpinerc,   alpinerd, alpine,    alpiner,   alpine_state,    init_alpiner,   ROT0, "Namco", "Alpine Racer (World, AR2 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, alpinerjc,  alpinerd, alpine,    alpiner,   alpine_state,    init_alpiner,   ROT0, "Namco", "Alpine Racer (Japan, AR1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, airco22b,   0,        airco22b,  airco22,   namcos22s_state, init_airco22,   ROT0, "Namco", "Air Combat 22 (Japan, ACS1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, cybrcycc,   0,        cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (World, CB2 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
+GAME( 1995, cybrcyccj,  cybrcycc, cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (Japan, CB1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
+GAME( 1995, dirtdash,   0,        dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (World, DT2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/?1/0? 21:03:?6, one ROM is bad
+GAME( 1995, dirtdasha,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (World, DT2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
+GAME( 1995, dirtdashj,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Japan, DT1 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:06:45
+GAME( 1996, timecris,   0,        timecris,  timecris,  timecris_state,  init_timecris,  ROT0, "Namco", "Time Crisis (World, TS2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
+GAME( 1996, timecrisa,  timecris, timecris,  timecris,  timecris_state,  init_timecris,  ROT0, "Namco", "Time Crisis (World, TS2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
+GAME( 1996, propcycl,   0,        propcycl,  propcycl,  propcycl_state,  init_propcycl,  ROT0, "Namco", "Prop Cycle (World, PR2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
+GAME( 1996, propcyclj,  propcycl, propcycl,  propcycl,  propcycl_state,  init_propcyclj, ROT0, "Namco", "Prop Cycle (Japan, PR1 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:06:03
+GAME( 1996, alpines,    0,        alpines,   alpines,   alpines_state,   init_alpines,   ROT0, "Namco", "Alpine Surfer (World, AF2 Ver.A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/07/01 15:19:23
+GAME( 1996, alpinesa,   alpines,  alpines,   alpines,   alpines_state,   init_alpines,   ROT0, "Namco", "Alpine Surfer (World, AF2 Ver.A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/07/01 15:19:23
+GAME( 1996, tokyowar,   0,        tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (World, TW2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
+GAME( 1996, tokyowarj,  tokyowar, tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Japan, TW1 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:16:29
+GAME( 1996, aquajet,    0,        cybrcycc,  aquajet,   namcos22s_state, init_aquajet,   ROT0, "Namco", "Aqua Jet (World, AJ2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
+GAME( 1996, alpinr2b,   0,        alpine,    alpiner,   alpine_state,    init_alpiner2,  ROT0, "Namco", "Alpine Racer 2 (World, ARS2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
+GAME( 1996, alpinr2a,   alpinr2b, alpine,    alpiner,   alpine_state,    init_alpiner2,  ROT0, "Namco", "Alpine Racer 2 (World, ARS2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05
+GAME( 1997, adillor,    0,        adillor,   adillor,   adillor_state,   init_adillor,   ROT0, "Namco", "Armadillo Racing (World, AM2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:43:29
+GAME( 1997, adillorj,   adillor,  adillor,   adillor,   adillor_state,   init_adillor,   ROT0, "Namco", "Armadillo Racing (Japan, AM1 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:19:41

@@ -71,13 +71,13 @@ namespace esqpanel {
 				return 0;
 			}
 
-			int n;
-			while (!is.eof()) {
-				char c = is.get();
-				int message_type = external_panel::get_message_type(c);
+			int c;
+			while ((c = is.get()) != EOF)
+			{
+				int message_type = external_panel::get_message_type(char(uint8_t(unsigned(c))));
+				int n;
 				is >> n;
-				int send = (n != 0);
-				if (send)
+				if (n != 0)
 				{
 					m_send_message_types |= message_type;
 				}

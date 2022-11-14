@@ -44,7 +44,9 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 	int zfog_enabled = extra.zfog_enabled;
 	int fogfactor = 0xff - extra.fogfactor;
 	int fadefactor = 0xff - extra.fadefactor;
-	int alphafactor = 0xff - m_state.m_poly_translucency;
+	int alphafactor = 0xff - extra.alpha;
+	bool alpha_enabled = extra.alpha_enabled;
+	u8 alpha_pen = m_state.m_poly_alpha_pen;
 	rgbaint_t fogcolor = extra.fogcolor;
 	rgbaint_t fadecolor = extra.fadecolor;
 	rgbaint_t polycolor = extra.polycolor;
@@ -121,7 +123,7 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 				rgb.blend(fadecolor, fadefactor);
 			}
 
-			if (alphafactor != 0xff)
+			if (alphafactor != 0xff && (alpha_enabled || pen == alpha_pen))
 			{
 				rgb.blend(rgbaint_t(dest[x]), alphafactor);
 			}
@@ -190,6 +192,8 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 	const pen_t *pal = extra.pens;
 	int prioverchar = extra.prioverchar;
 	int alphafactor = extra.alpha;
+	bool alpha_enabled = extra.alpha_enabled;
+	u8 alpha_pen = m_state.m_poly_alpha_pen;
 	int fogfactor = 0xff - extra.fogfactor;
 	int fadefactor = 0xff - extra.fadefactor;
 	rgbaint_t fogcolor(extra.fogcolor);
@@ -215,7 +219,7 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 				rgb.blend(fadecolor, fadefactor);
 			}
 
-			if (alphafactor != 0xff)
+			if (alphafactor != 0xff && (alpha_enabled || pen == alpha_pen))
 			{
 				rgb.blend(rgbaint_t(dest[x]), alphafactor);
 			}
@@ -326,6 +330,10 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		extra.pfade_enabled = m_state.m_poly_fade_enabled;
 		extra.polycolor.set(0, m_state.m_poly_fade_r, m_state.m_poly_fade_g, m_state.m_poly_fade_b);
 
+		// alpha
+		extra.alpha = m_state.m_poly_alpha_factor;
+		extra.alpha_enabled = (color & 0x7f) != m_state.m_poly_alpha_color;
+
 		// poly fog
 		if (~color & 0x80)
 		{
@@ -428,7 +436,6 @@ void namcos22_renderer::poly3d_drawsprite(
 		extra.flags = 0;
 
 		extra.destbase = &dest_bmp;
-		extra.alpha = alpha;
 		extra.prioverchar = 2 | prioverchar;
 		extra.line_modulo = gfx->rowbytes();
 		extra.flipx = flipx;
@@ -468,6 +475,10 @@ void namcos22_renderer::poly3d_drawsprite(
 			extra.fogcolor.set(0, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
 		}
 
+		// alpha
+		extra.alpha = alpha;
+		extra.alpha_enabled = (color & 0x7f) != m_state.m_poly_alpha_color;
+
 		render_triangle_fan<2>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_sprite, this), 4, vert);
 	}
 }
@@ -504,7 +515,7 @@ void namcos22_renderer::render_sprite(screen_device &screen, bitmap_rgb32 &bitma
 				node->data.sprite.cz,
 				node->data.sprite.prioverchar,
 				node->data.sprite.fade_enabled,
-				0xff - node->data.sprite.translucency
+				0xff - node->data.sprite.alpha
 			);
 			offset++;
 		}
@@ -1202,16 +1213,16 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	    0000 7ffe 0000
 	    0000 0000 7ffe
 	*/
-	m_camera_ambient = src[0x1] >> 16;
+	m_camera_ambient = src[0x1] >> 16 & 0xffff;
 	m_camera_power = src[0x1] & 0xffff;
 
 	m_camera_lx = dspfixed_to_nativefloat(src[0x2]);
 	m_camera_ly = dspfixed_to_nativefloat(src[0x3]);
 	m_camera_lz = dspfixed_to_nativefloat(src[0x4]);
 
-	m_absolute_priority = src[0x3] >> 16;
-	m_camera_vx = (s16)(src[0x5] >> 16);
-	m_camera_vy = (s16)(src[0x5] & 0xffff);
+	m_absolute_priority = src[0x3] >> 16 & 0xffff;
+	m_camera_vx = signed12(src[0x5] >> 16);
+	m_camera_vy = signed12(src[0x5] & 0xffff);
 	m_camera_zoom = dspfloat_to_nativefloat(src[0x6]);
 	m_camera_vr = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
 	m_camera_vl = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
@@ -1481,8 +1492,8 @@ void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_
 
 		src[3]
 		    xxxx.xxxx.xxxx.xxxx | ----.----.----.----  tile number
-		    ----.----.----.---- | xxxx.xxxx.----.----  translucency
-		    ----.----.----.---- | ----.----.xxxx.xxxx  no function(?) - set in timecris when increasing translucency, it's probably not 16bit
+		    ----.----.----.---- | xxxx.xxxx.----.----  alpha
+		    ----.----.----.---- | ----.----.xxxx.xxxx  no function(?) - set in timecris when increasing alpha, it's probably not 16bit
 
 		attr[0]
 		    xxxx.xxxx.----.---- | ----.----.----.----  unused
@@ -1506,7 +1517,7 @@ void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_
 		int cols = (src[2] >> 4) & 0x7;
 		u32 code = src[3];
 		int tile = code >> 16;
-		int translucency = (code & 0xff00) >> 8;
+		int alpha = (code & 0xff00) >> 8;
 
 		u32 zcoord = attr[0] & 0x00ffffff;
 		int color = attr[1] >> 16 & 0xff;
@@ -1573,7 +1584,7 @@ void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_
 			node->data.sprite.cy_max = cy_max;
 			node->data.sprite.sizex = sizex;
 			node->data.sprite.sizey = sizey;
-			node->data.sprite.translucency = translucency;
+			node->data.sprite.alpha = alpha;
 			node->data.sprite.color = color;
 			node->data.sprite.cz = cz;
 			node->data.sprite.prioverchar = prioverchar;
@@ -1645,7 +1656,7 @@ void namcos22_state::draw_sprites()
 	int deltax = (m_spriteram[1] & 0xffff) + (m_spriteram[2] & 0xffff) + 0x2d;
 	int deltay = (m_spriteram[3] >> 16) + (0x2a >> y_lowres);
 
-	int base = m_spriteram[0] & 0xffff; // alpinesa/alpinr2b
+	int base = m_spriteram[0] & 0xffff; // alpines/alpinr2b
 	int num_sprites = ((m_spriteram[1] >> 16) - base) + 1;
 
 	// airco22b doesn't use spriteset #1
@@ -1763,6 +1774,7 @@ void namcos22_state::namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask)
 		m_bgtilemap->mark_tile_dirty(offset * 2);
 		m_bgtilemap->mark_tile_dirty(offset * 2 + 1);
 	}
+	namcos22_cgram_w(offset + 0x1e000/4, data, mem_mask);
 }
 
 void namcos22_state::namcos22_cgram_w(offs_t offset, u32 data, u32 mem_mask)
@@ -1794,10 +1806,6 @@ TIMER_CALLBACK_MEMBER(namcos22_state::posirq_callback)
 
 	if (m_irq_enabled & (1 << line))
 	{
-		// driver doesn't support partial updates yet
-		// partial updates here should apply to the text layer only, not the 3D framebuffer
-		//m_screen->update_partial(m_screen->vpos());
-
 		m_irq_state |= (1 << line);
 		m_maincpu->set_input_line(m_syscontrol[line] & 7, ASSERT_LINE);
 	}
@@ -1817,17 +1825,15 @@ void namcos22_state::namcos22_tilemapattr_w(offs_t offset, u16 data, u16 mem_mas
 	6: ?   - unused?
 	7: R   - ???
 	*/
+
+	// alpines changes x scroll mid-screen
+	if (offset == 0)
+		update_text_rowscroll();
+
 	COMBINE_DATA(&m_tilemapattr[offset]);
 
-	switch (offset)
-	{
-		case 4:
-			posirq_update();
-			break;
-
-		default:
-			break;
-	}
+	if (offset == 4)
+		posirq_update();
 }
 
 u16 namcos22_state::namcos22_tilemapattr_r(offs_t offset)
@@ -2062,13 +2068,41 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 	}
 }
 
+void namcos22_state::update_text_rowscroll()
+{
+	u64 frame = m_screen->frame_number();
+	if (frame != m_rs_frame)
+	{
+		m_rs_frame = frame;
+		m_lastrow = 0;
+	}
+
+	int scroll_x = (m_tilemapattr[0] - 0x35c) & 0x3ff;
+	int y = std::min(m_screen->vpos(), 480);
+
+	// save x scroll value until current scanline
+	for (int i = m_lastrow; i < y; i++)
+		m_rowscroll[i] = scroll_x;
+	m_lastrow = y;
+}
+
+void namcos22_state::apply_text_scroll()
+{
+	update_text_rowscroll();
+	int scroll_y = m_tilemapattr[1] & 0x3ff;
+
+	m_bgtilemap->set_scrolly(0, scroll_y);
+	for (int i = 0; i < 0x400; i++)
+		m_bgtilemap->set_scrollx(i, m_rowscroll[0]);
+
+	// apply current frame x scroll updates to tilemap
+	for (int i = 0; i < 480; i++)
+		m_bgtilemap->set_scrollx((i + scroll_y + 4) & 0x3ff, m_rowscroll[i]);
+}
+
 void namcos22_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int scroll_x = m_tilemapattr[0] - 0x35c;
-	int scroll_y = m_tilemapattr[1];
-
-	m_bgtilemap->set_scrollx(0, scroll_x & 0x3ff);
-	m_bgtilemap->set_scrolly(0, scroll_y & 0x3ff);
+	apply_text_scroll();
 	m_bgtilemap->set_palette_offset(m_text_palbase);
 
 	m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 2, 3);
@@ -2077,11 +2111,7 @@ void namcos22_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap
 
 void namcos22s_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int scroll_x = m_tilemapattr[0] - 0x35c;
-	int scroll_y = m_tilemapattr[1];
-
-	m_bgtilemap->set_scrollx(0, scroll_x & 0x3ff);
-	m_bgtilemap->set_scrolly(0, scroll_y & 0x3ff);
+	apply_text_scroll();
 	m_bgtilemap->set_palette_offset(m_text_palbase);
 
 	m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 4, 4);
@@ -2262,7 +2292,7 @@ void namcos22_state::update_mixer()
 	if (!m_is_ss22)
 	{
 		strcat(msg1,"\n");
-		for (i = 8; i <= 0x20; i += 8)
+		for (int i = 8; i <= 0x20; i += 8)
 		{
 			sprintf(msg2,"%04X %08X %08X %08X %08X\n", i*16, m_mixer[i*4+0], m_mixer[i*4+1], m_mixer[i*4+2], m_mixer[i*4+3]);
 			strcat(msg1,msg2);
@@ -2275,6 +2305,7 @@ void namcos22_state::update_mixer()
 	{
 /*
            0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
+00824000: ffffff00 00000000 0000007f 00ff006f fe00eded 0f700000 0000037f 00010007 // alpine surfer
 00824000: ffffff00 00000000 0000007f 00ff0000 1000ff00 0f000000 00ff007f 00010007 // time crisis
 00824000: ffffff00 00000000 1830407f 00800000 0000007f 0f000000 0000037f 00010007 // trans sprite
 00824000: ffffff00 00000000 3040307f 00000000 0080007f 0f000000 0000037f 00010007 // trans poly
@@ -2289,8 +2320,8 @@ void namcos22_state::update_mixer()
     0b
     0c
     0d,0e           spot factor
-    0f
-    10
+    0f              polygon alpha color mask
+    10              polygon alpha pen mask
     11              global polygon alpha factor
     12,13           textlayer alpha pen comparison
     14              textlayer alpha pen mask?
@@ -2311,7 +2342,9 @@ void namcos22_state::update_mixer()
 		m_fog_g              = nthbyte(m_mixer, 0x06);
 		m_fog_b              = nthbyte(m_mixer, 0x07);
 		m_spot_factor        = nthbyte(m_mixer, 0x0e) << 8 | nthbyte(m_mixer, 0x0d);
-		m_poly_translucency  = nthbyte(m_mixer, 0x11);
+		m_poly_alpha_color   = nthbyte(m_mixer, 0x0f);
+		m_poly_alpha_pen     = nthbyte(m_mixer, 0x10);
+		m_poly_alpha_factor  = nthbyte(m_mixer, 0x11);
 		m_screen_fade_r      = nthbyte(m_mixer, 0x16);
 		m_screen_fade_g      = nthbyte(m_mixer, 0x17);
 		m_screen_fade_b      = nthbyte(m_mixer, 0x18);
@@ -2576,6 +2609,7 @@ void namcos22_state::video_start()
 
 	m_mix_bitmap = std::make_unique<bitmap_ind16>(640, 480);
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcos22_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bgtilemap->set_scroll_rows(64 * 16); // fake
 	m_bgtilemap->set_transparent_pen(0xf);
 
 	m_gfxdecode->gfx(0)->set_source((u8 *)m_cgram.target());

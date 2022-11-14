@@ -17,12 +17,8 @@ DECLARE_DEVICE_TYPE(MSX_CART_SFG05, msx_cart_sfg05_device)
 
 class msx_cart_sfg_device : public device_t, public msx_cart_interface
 {
-public:
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
-	msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override;
 
@@ -40,7 +36,7 @@ protected:
 	required_device<ym2148_device> m_ym2148;
 	int m_ym2151_irq_state;
 	int m_ym2148_irq_state;
-	uint32_t m_rom_mask;
+	u32 m_rom_mask;
 
 	void check_irq();
 };
@@ -49,7 +45,7 @@ protected:
 class msx_cart_sfg01_device : public msx_cart_sfg_device
 {
 public:
-	msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -58,7 +54,7 @@ public:
 class msx_cart_sfg05_device : public msx_cart_sfg_device
 {
 public:
-	msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;

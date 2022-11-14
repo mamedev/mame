@@ -58,7 +58,7 @@ void igs022_device::device_reset()
 	const u16 size = PROTROM[0x104 / 2];
 	u16 mode       = PROTROM[0x106 / 2];
 
-	mode = (mode >> 8) | (mode << 8);
+	mode = swapendian_int16(mode);
 
 	src >>= 1;
 
@@ -152,7 +152,7 @@ void igs022_device::do_dma(u16 src, u16 dst, u16 size, u16 mode)
 		{
 			u16 dat = PROTROM[src + x];
 
-			dat = ((dat &0x00ff) << 8) | ((dat &0xff00) >> 8);
+			dat = swapendian_int16(dat);
 
 			m_sharedprotram[dst + x] = dat;
 		}

@@ -70,7 +70,6 @@ protected:
 	void via_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	DECLARE_WRITE_LINE_MEMBER(via_irq);
 
 	void vectrex_base(machine_config &config);

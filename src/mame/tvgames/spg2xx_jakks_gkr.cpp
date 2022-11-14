@@ -58,8 +58,6 @@ private:
 	void jakks_porta_key_io_w(uint16_t data);
 	bool m_porta_key_mode;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_gamekey);
-
 	optional_device<jakks_gamekey_slot_device> m_cart;
 	memory_region *m_cart_region;
 
@@ -442,11 +440,6 @@ void jakks_gkr_state::machine_start()
 		m_bank->configure_entries(0, (m_cart_region->bytes() + 0x7fffff) / 0x800000, m_cart_region->base(), 0x800000);
 		m_bank->set_entry(0);
 	}
-}
-
-DEVICE_IMAGE_LOAD_MEMBER(jakks_gkr_state::cart_load_gamekey)
-{
-	return m_cart->call_load();
 }
 
 void jakks_gkr_state::jakks_gkr(machine_config &config)

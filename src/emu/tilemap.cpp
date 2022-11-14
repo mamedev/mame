@@ -1260,7 +1260,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 			{
 				const u16 *source0 = source_baseaddr + x_start;
 				typename _BitmapClass::pixel_t *dest0 = dest_baseaddr + x_start;
-				u8 *pmap0 = priority_baseaddr + x_start;
+				u8 *pmap0 = priority_baseaddr ? (priority_baseaddr + x_start) : nullptr;
 
 				// if we were opaque, use the opaque renderer
 				if (prev_trans == WHOLLY_OPAQUE)
@@ -1559,10 +1559,14 @@ void tilemap_t::get_info_debug(u32 col, u32 row, u8 &gfxnum, u32 &code, u32 &col
 	// get the GFX number and code
 	gfxnum = m_tileinfo.gfxnum;
 	code = m_tileinfo.code;
+	color = m_tileinfo.palette_base;
 
-	// work back from the palette base to get the color
-	const gfx_element &gfx = *m_tileinfo.decoder->gfx(gfxnum);
-	color = (m_tileinfo.palette_base - gfx.colorbase()) / gfx.granularity();
+	if (gfxnum != 0xff)
+	{
+		// work back from the palette base to get the color
+		const gfx_element &gfx = *m_tileinfo.decoder->gfx(gfxnum);
+		color = (color - gfx.colorbase()) / gfx.granularity();
+	}
 }
 
 

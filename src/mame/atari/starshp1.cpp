@@ -311,8 +311,6 @@ void starshp1_state::starshp1(machine_config &config)
 	misclatch.q_out_cb<7>().set(FUNC(starshp1_state::led_w));
 
 	/* video hardware */
-
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(STARSHP1_PIXEL_CLOCK, STARSHP1_HTOTAL, STARSHP1_HBEND, STARSHP1_HBSTART, STARSHP1_VTOTAL, STARSHP1_VBEND, STARSHP1_VBSTART);
 	m_screen->set_screen_update(FUNC(starshp1_state::screen_update_starshp1));

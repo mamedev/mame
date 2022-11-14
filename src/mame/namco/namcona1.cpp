@@ -1368,6 +1368,22 @@ ROM_START(bbbingo) // uses NA E4M8 ROM PCB with unpopulated keycus
 	ROM_LOAD16_BYTE("bi1-slp2.3f", 0x200000, 0x080000, CRC(a09cef53) SHA1(96c666a3a4f1747afe32bf791537b211bc8ac6d8))
 ROM_END
 
+ROM_START(bbbingot) // this uses a different ROM board: Namco MDROM PCB - 8625961102 with MB8464A-15LL battery-backed RAM
+	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("bi1 msp1.3e", 0x000001, 0x080000, CRC(ea5bf674) SHA1(079a74bbc70386a1dc7df6a146d23bf64a941b7e))
+	ROM_LOAD16_BYTE("bi1 msp0.6e", 0x000000, 0x080000, CRC(3e5c275d) SHA1(2c20a07b5fc36de6a17e171c7db9e12348eaf1d1))
+
+	ROM_REGION16_BE(0x800000, "maskrom", ROMREGION_ERASE00) // these are identical to the main unit ones
+	ROM_LOAD16_BYTE("bi1 msp5.3b", 0x000001, 0x080000, CRC(fb3dbcf2) SHA1(f94d339491215cf05dfe616f963560dc47aed472))
+	ROM_LOAD16_BYTE("bi1 msp4.6b", 0x000000, 0x080000, CRC(82d34c59) SHA1(638af6cfec3b09a4b35139bba51bcd21711efa2b))
+	// 0x100000 - 0x1fffff empty
+	ROM_LOAD16_BYTE("bi1 msp3.3c", 0x200001, 0x080000, CRC(4c1f16c4) SHA1(360eb5aaee83b7e6b6d0902aaab75b045cf72d3f))
+	ROM_LOAD16_BYTE("bi1 msp2.6c", 0x200000, 0x080000, CRC(a09cef53) SHA1(96c666a3a4f1747afe32bf791537b211bc8ac6d8))
+
+	ROM_REGION(0x500, "plds", 0)
+	ROM_LOAD("na1r1m.10a", 0x000, 0x2dd, CRC(585f0f83) SHA1(1042ea156a039a5d20ef6f349e3dbd68043f04cb)) // PALCE22V10H, bruteforced
+	ROM_LOAD("na1r2m.8a",  0x300, 0x117, CRC(273bccd1) SHA1(63bacb7b8792a72fa9b912a2e2207ae74d38ecd3)) // PAL16L8BCN, bruteforced
+ROM_END
 
 ROM_START(emeralda) /* NA-2 Game PCB, clones are NA-1 based; see games listed above */
 	ROM_REGION(0x200000, "maincpu", 0)
@@ -1524,6 +1540,10 @@ ROM_START(zelost) // this uses a different ROM board: Namco MDROM PCB - 86259611
 	ROM_REGION16_BE(0x800000, "maskrom", ROMREGION_ERASE00)
 	// not populated
 
+	ROM_REGION(0x500, "plds", 0)
+	ROM_LOAD("na1r1m.10a", 0x000, 0x2dd, CRC(585f0f83) SHA1(1042ea156a039a5d20ef6f349e3dbd68043f04cb)) // PALCE22V10H, bruteforced
+	ROM_LOAD("na1r2m.8a",  0x300, 0x117, CRC(273bccd1) SHA1(63bacb7b8792a72fa9b912a2e2207ae74d38ecd3)) // PAL16L8BCN, bruteforced
+
 	ROM_REGION(0x0800, "eeprom", 0) // default EEPROM, to avoid error on start-up
 	ROM_LOAD("eeprom", 0x0000, 0x0800, CRC(ac117acc) SHA1(fa7d8d1f47cc0cbcc37d1fa4d41d76a109320b0b))
 ROM_END
@@ -1555,3 +1575,4 @@ GAME(1995, xday2,      0,        xday2,     namcona1_joy,  xday2_namcona2_state,
 GAME(1994, zelos,      0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals
 GAME(1994, zelost,     0,        zelos,     zelost,        namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, terminal)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // no way to insert medal. Maybe needs communication with main unit?
 GAME(1996, bbbingo,    0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Bin Bin Bingo (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals
+GAME(1996, bbbingot,   0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Bin Bin Bingo (Japan, terminal)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the main unit

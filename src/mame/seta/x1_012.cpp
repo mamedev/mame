@@ -20,6 +20,7 @@ x1_012_device::x1_012_device(const machine_config &mconfig, const char *tag, dev
 	, device_gfx_interface(mconfig, *this)
 	, m_tile_offset_callback(*this)
 	, m_vram(*this, DEVICE_SELF)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_tilemap(nullptr)
 	, m_xoffsets{0, 0}
 	, m_rambank(0)
@@ -77,6 +78,8 @@ u16 x1_012_device::vctrl_r(offs_t offset, u16 mem_mask)
 
 void x1_012_device::vctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	m_screen->update_partial(m_screen->vpos()); // needed for calibr50 effect when entering underground area
+
 	// Select tilemap bank. Only one tilemap bank per layer is enabled.
 	if (offset == 2 && ACCESSING_BITS_0_7)
 	{

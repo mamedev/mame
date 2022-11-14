@@ -1128,6 +1128,7 @@ void stv_state::stv(machine_config &config)
 
 	M68000(config, m_audiocpu, 11289600); //11.2896 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &stv_state::sound_mem);
+	m_audiocpu->reset_cb().set(FUNC(stv_state::m68k_reset_callback));
 
 	SEGA_SCU(config, m_scu, 0);
 	m_scu->set_hostcpu(m_maincpu);
@@ -1376,8 +1377,6 @@ void stv_state::machine_start()
 	save_item(NAME(m_vdp2.odd));
 
 	stv_register_protection_savestates();
-
-	m_audiocpu->set_reset_callback(*this, FUNC(stv_state::m68k_reset_callback));
 }
 
 

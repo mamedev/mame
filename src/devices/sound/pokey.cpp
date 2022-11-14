@@ -257,11 +257,10 @@ void pokey_device::device_start()
 	m_KBCODE = 0x09; // Atari 800 'no key'
 	m_SKCTL = 0;
 
-	// TODO, remove this line:
-	m_SKCTL = SK_RESET;
-	// It's left in place to accomodate demos that don't explicitly reset pokey.
+	// TODO: several a7800 demos don't explicitly reset pokey at startup
 	// See https://atariage.com/forums/topic/337317-a7800-52-release/ and
 	// https://atariage.com/forums/topic/268458-a7800-the-atari-7800-emulator/?do=findComment&comment=5079170)
+	// m_SKCTL = SK_RESET;
 
 	m_SKSTAT = 0;
 	/* This bit should probably get set later. Acid5200 pokey_setoc test tests this. */
@@ -357,6 +356,10 @@ void pokey_device::device_start()
 void pokey_device::device_reset()
 {
 	m_stream->update();
+	// a1200xl reads POT4 twice at startup for reading self-test mode jumpers.
+	// we need to update POT counters here otherwise it will boot to self-test
+	// the first time around no matter the setting.
+	pokey_potgo();
 }
 
 
@@ -979,7 +982,8 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 
 	case POTGO_C:
 		LOG("%s: POKEY POTGO  $%02x\n", machine().describe_context(), data);
-		pokey_potgo();
+		if (m_SKCTL & SK_RESET)
+			pokey_potgo();
 		break;
 
 	case SEROUT_C:
@@ -1104,9 +1108,6 @@ inline void pokey_device::process_channel(int ch)
 
 void pokey_device::pokey_potgo()
 {
-	if (!(m_SKCTL & SK_RESET))
-		return;
-
 	LOG("pokey_potgo\n");
 
 	m_ALLPOT = 0x00;

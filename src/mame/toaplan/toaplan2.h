@@ -178,7 +178,6 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(toaplan2);
 	DECLARE_MACHINE_RESET(bgaregga);
 	DECLARE_VIDEO_START(toaplan2);
 	DECLARE_MACHINE_RESET(ghox);

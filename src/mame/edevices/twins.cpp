@@ -29,7 +29,7 @@ _________________________________________________________
 |                               |U30 40PIN DEVICE |  ----|
 | 74LS245      74LS245  74HC573 |_________________|  ----|
 |                                                    ----|
-| 74HC573      74HC573  74HC74                       ____|
+| 74HC573      74HC573  74HC74      DS1232           ____|
 |  __________________                                |
 |  |NEC V30 9327N5   |  74HC04      24C2AB1          |___
 |  |_________________|         XTAL8MHz                  |
@@ -93,14 +93,19 @@ To access Service Mode:
 */
 
 #include "emu.h"
+
 #include "cpu/nec/nec.h"
 #include "sound/ay8910.h"
 #include "machine/bankdev.h"
 #include "machine/i2cmem.h"
 #include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 class twins_state : public driver_device
 {
@@ -639,6 +644,15 @@ ROM_START( twins )
 	ROM_LOAD("24c02.u15", 0x000, 0x100, CRC(2ff05b0e) SHA1(df6854446ba83f4a13ddf68bd2d0bc35be21be79) )
 ROM_END
 
+ROM_START( twinsa )
+	ROM_REGION16_LE( 0x100000, "ipl", 0 )
+	ROM_LOAD16_BYTE( "l.u8", 0x000000, 0x080000, CRC(19d16ba0) SHA1(2c42d7e1cde0f722dc5ebe7771fcc461b9a60962) )
+	ROM_LOAD16_BYTE( "h.u9", 0x000001, 0x080000, CRC(9352b56e) SHA1(f9977d1d38941dc710e07d6d95cb6b88abc4a069) )
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD("24c02.u15", 0x000, 0x100, CRC(2ff05b0e) SHA1(df6854446ba83f4a13ddf68bd2d0bc35be21be79) )
+ROM_END
+
 /** Electronic Devices Twins */
 ROM_START( twinsed1 )
 	ROM_REGION16_LE( 0x100000, "ipl", 0 )
@@ -710,8 +724,12 @@ void twins_state::init_twinsed2()
 	rom[0x349dd] = 0x90;
 }
 
-GAME( 1993, twins,    0,     twins,    twins, twins_state,    init_twins,      ROT0, "Ecogames",                              "Twins",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twinsed1, twins, twinsed1, twins, twinsed1_state, empty_init,      ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twinsed2, twins, twins,    twins, twins_state,    init_twinsed2,   ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, set 2)", MACHINE_SUPPORTS_SAVE )
+} // anonymous namespace
+
+
+GAME( 1993, twins,    0,     twins,    twins, twins_state,    init_twins,      ROT0, "Ecogames",                              "Twins (newer)",                             MACHINE_SUPPORTS_SAVE ) // 26/11/93 15:10:50
+GAME( 1993, twinsa,   twins, twins,    twins, twins_state,    init_twins,      ROT0, "Ecogames",                              "Twins (older)",                             MACHINE_SUPPORTS_SAVE ) // 23/11/93 13:13:33
+GAME( 1994, twinsed1, twins, twinsed1, twins, twinsed1_state, empty_init,      ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, older)", MACHINE_SUPPORTS_SAVE ) // 18/01/94 16:07:56
+GAME( 1994, twinsed2, twins, twins,    twins, twins_state,    init_twinsed2,   ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, newer)", MACHINE_SUPPORTS_SAVE ) // 19/01/94 11:10:22
 
 GAME( 1994, spider,   0,     spider,   twins, spider_state,   empty_init,      ROT0, "Buena Vision",                          "Spider (Buena Vision)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

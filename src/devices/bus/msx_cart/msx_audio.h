@@ -19,11 +19,9 @@ DECLARE_DEVICE_TYPE(MSX_CART_MSX_AUDIO_FSCA1,   msx_cart_msx_audio_fsca1_device)
 class msx_cart_msx_audio_hxmu900_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_msx_audio_hxmu900_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_msx_audio_hxmu900_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
-
-	virtual uint8_t read_cart(offs_t offset) override;
 
 protected:
 	virtual void device_start() override;
@@ -40,11 +38,9 @@ private:
 class msx_cart_msx_audio_nms1205_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_msx_audio_nms1205_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_msx_audio_nms1205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
-
-	virtual uint8_t read_cart(offs_t offset) override;
 
 protected:
 	virtual void device_start() override;
@@ -67,15 +63,13 @@ private:
 class msx_cart_msx_audio_fsca1_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_msx_audio_fsca1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_msx_audio_fsca1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -83,17 +77,20 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	void write_y8950(offs_t offset, uint8_t data);
-	uint8_t read_y8950(offs_t offset);
-
-	void y8950_io_w(uint8_t data);
-	uint8_t y8950_io_r();
+	void write_y8950(offs_t offset, u8 data);
+	u8 read_y8950(offs_t offset);
+	void y8950_io_w(u8 data);
+	u8 y8950_io_r();
+	void bank_w(u8 data);
+	void write_7fff(u8 data);
 
 	required_device<y8950_device> m_y8950;
 	required_ioport m_io_config;
 	required_memory_region m_region_y8950;
-	uint8_t m_7ffe;
-	uint8_t m_7fff;
+	memory_bank_array_creator<2> m_rombank;
+	memory_view m_view0;
+	memory_view m_view1;
+	u8 m_7fff;
 };
 
 #endif // MAME_BUS_MSX_CART_MSX_AUDIO_H

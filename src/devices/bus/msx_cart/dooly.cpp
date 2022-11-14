@@ -10,22 +10,16 @@ DEFINE_DEVICE_TYPE(MSX_CART_DOOLY, msx_cart_dooly_device, "msx_cart_dooly", "MSX
 msx_cart_dooly_device::msx_cart_dooly_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_DOOLY, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
-	, m_prot(0)
+	, m_view1(*this, "view1")
+	, m_view2(*this, "view2")
 {
 }
-
-
-void msx_cart_dooly_device::device_start()
-{
-	save_item(NAME(m_prot));
-}
-
 
 void msx_cart_dooly_device::device_reset()
 {
-	m_prot = 0;
+	m_view1.select(0);
+	m_view2.select(0);
 }
-
 
 void msx_cart_dooly_device::initialize_cartridge()
 {
@@ -33,35 +27,35 @@ void msx_cart_dooly_device::initialize_cartridge()
 	{
 		fatalerror("dooly: Invalid ROM size\n");
 	}
+
+	page(1)->install_view(0x4000, 0x7fff, m_view1);
+	m_view1[0].install_rom(0x4000, 0x7fff, get_rom_base());
+	m_view1[1].install_read_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(msx_cart_dooly_device::mode4_page1_r)));
+	page(2)->install_view(0x8000, 0xbfff, m_view2);
+	m_view2[0].install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
+	m_view2[1].install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(msx_cart_dooly_device::mode4_page2_r)));
+
+	page(1)->install_write_handler(0x4000, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_dooly_device::prot_w)));
+	page(2)->install_write_handler(0x8000, 0xbfff, write8smo_delegate(*this, FUNC(msx_cart_dooly_device::prot_w)));
 }
 
-
-uint8_t msx_cart_dooly_device::read_cart(offs_t offset)
+u8 msx_cart_dooly_device::mode4_page1_r(offs_t offset)
 {
-	if (offset >= 0x4000 && offset < 0xc000)
-	{
-		uint8_t data = get_rom_base()[offset - 0x4000];
-
-		switch (m_prot)
-		{
-			case 0x04:
-				data = bitswap<8>(data, 7, 6, 5, 4, 3, 1, 0, 2);
-				break;
-		}
-		return data;
-	}
-	return 0xff;
+	return bitswap<8>(get_rom_base()[offset], 7, 6, 5, 4, 3, 1, 0, 2);
 }
 
-
-void msx_cart_dooly_device::write_cart(offs_t offset, uint8_t data)
+u8 msx_cart_dooly_device::mode4_page2_r(offs_t offset)
 {
-	if (offset >= 0x4000 && offset < 0xc000)
+	return bitswap<8>(get_rom_base()[0x4000 | offset], 7, 6, 5, 4, 3, 1, 0, 2);
+}
+
+void msx_cart_dooly_device::prot_w(u8 data)
+{
+	data &= 0x07;
+	m_view1.select(BIT(data, 2) ? 1 : 0);
+	m_view2.select(BIT(data, 2) ? 1 : 0);
+	if (data != 0 && data != 4)
 	{
-		m_prot = data & 0x07;
-		if (m_prot != 0 && m_prot != 4)
-		{
-			logerror("msx_cart_dooly_device: unhandled write %02x to %04x\n", data, offset);
-		}
+		logerror("msx_cart_dooly_device: unhandled protection mode %02x\n", data);
 	}
 }

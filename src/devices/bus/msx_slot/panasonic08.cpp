@@ -4,9 +4,9 @@
 
   Emulation of the firmware mapper as found in Panasonic FS-A1WX andFS-A1WSX machines.
 
-Todo:
-- Anything besides the basic mapping
-- SRAM?
+TODO:
+- SRAM has only 2 4KB pages
+- SRAM is not accessible at 4000-7fff?
 */
 
 #include "emu.h"
@@ -16,149 +16,130 @@ Todo:
 DEFINE_DEVICE_TYPE(MSX_SLOT_PANASONIC08, msx_slot_panasonic08_device, "msx_slot_panasonic08", "MSX Internal Panasonic08")
 
 
-msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_SLOT_PANASONIC08, tag, owner, clock)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_nvram(*this, "nvram")
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
+	, m_bank(*this, "bank%u", 0U)
+	, m_view0(*this, "view0")
+	, m_view1(*this, "view1")
+	, m_view3(*this, "view3")
+	, m_view4(*this, "view4")
+	, m_view5(*this, "view5")
 	, m_region_offset(0)
-	, m_rom(nullptr)
 	, m_control(0)
 {
-	for (int i = 0; i < 8; i++)
-	{
-		m_selected_bank[i] = 0;
-		m_bank_base[i] = nullptr;
-	}
 }
-
 
 void msx_slot_panasonic08_device::device_add_mconfig(machine_config &config)
 {
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 }
-
 
 void msx_slot_panasonic08_device::device_start()
 {
 	// Sanity checks
 	if (m_rom_region->bytes() < m_region_offset + 0x200000)
 	{
-		fatalerror("Memory region '%s' is too small for the FS4600 firmware\n", m_rom_region.finder_tag());
+		fatalerror("Memory region '%s' is too small for the panasonic08 firmware\n", m_rom_region.finder_tag());
 	}
 
-	m_sram.resize(0x4000);
+	m_sram.resize(SRAM_SIZE);
 
-	m_nvram->set_base(&m_sram[0], 0x4000);
-
-	m_rom = m_rom_region->base() + m_region_offset;
+	m_nvram->set_base(&m_sram[0], SRAM_SIZE);
 
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_control));
 
-	restore_banks();
+	for (int i = 0; i < 6; i++)
+	{
+		m_bank[i]->configure_entries(0, 0x100, m_rom_region->base() + m_region_offset, 0x2000);
+		m_bank[i]->configure_entry(0x80, m_sram.data());
+		m_bank[i]->configure_entry(0x81, m_sram.data() + 0x2000);
+		m_bank[i]->configure_entry(0x82, m_sram.data());
+		m_bank[i]->configure_entry(0x83, m_sram.data() + 0x2000);
+	}
+
+	page(0)->install_view(0x0000, 0x1fff, m_view0);
+	m_view0[0].install_read_bank(0x0000, 0x1fff, m_bank[0]);
+	m_view0[1].install_readwrite_bank(0x0000, 0x1fff, m_bank[0]);
+
+	page(0)->install_view(0x2000, 0x3fff, m_view1);
+	m_view1[0].install_read_bank(0x2000, 0x3fff, m_bank[1]);
+	m_view1[1].install_readwrite_bank(0x2000, 0x3fff, m_bank[1]);
+
+	// no sram writing in 4000-7fff?
+	page(1)->install_read_bank(0x4000, 0x5fff, m_bank[2]);
+
+	page(1)->install_view(0x6000, 0x7fff, m_view3);
+	m_view3[0].install_read_bank(0x6000, 0x7fff, m_bank[3]);
+	m_view3[1].install_read_bank(0x6000, 0x7fff, m_bank[3]);
+	m_view3[1].install_read_handler(0x7ff0, 0x7ff7, read8sm_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_r)));
+	page(1)->install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<0>)));
+	page(1)->install_write_handler(0x6400, 0x6400, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<1>)));
+	page(1)->install_write_handler(0x6800, 0x6800, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<2>)));
+	page(1)->install_write_handler(0x6c00, 0x6c00, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<3>)));
+	page(1)->install_write_handler(0x7000, 0x7000, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<4>)));
+	page(1)->install_write_handler(0x7800, 0x7800, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<5>)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::control_w)));
+
+	page(2)->install_view(0x8000, 0x9fff, m_view4);
+	m_view4[0].install_read_bank(0x8000, 0x9fff, m_bank[4]);
+	m_view4[1].install_readwrite_bank(0x8000, 0x9fff, m_bank[4]);
+
+	page(2)->install_view(0xa000, 0xbfff, m_view5);
+	m_view5[0].install_read_bank(0xa000, 0xbfff, m_bank[5]);
+	m_view5[1].install_readwrite_bank(0xa000, 0xbfff, m_bank[5]);
 }
 
-
-void msx_slot_panasonic08_device::device_post_load()
+void msx_slot_panasonic08_device::device_reset()
 {
-	restore_banks();
+	m_control = 0;
+	for (int i = 0 ; i < 6; i++)
+	{
+		m_selected_bank[i] = 0;
+		m_bank[i]->set_entry(0);
+	}
+	m_view0.select(0);
+	m_view1.select(0);
+	m_view3.select(0);
+	m_view4.select(0);
+	m_view5.select(0);
 }
 
-
-void msx_slot_panasonic08_device::map_bank(int bank)
+template <int Bank>
+void msx_slot_panasonic08_device::set_view()
 {
-	if (m_selected_bank[bank] >= 0x80 && m_selected_bank[bank] < 0x84)   // Are these banks were sram is present? Mirroring?
-	{
-		logerror("panasonic08: mapping bank %d to sram\n", bank);
-		m_bank_base[bank] = &m_sram[((m_selected_bank[bank] & 0x7f) * 0x2000) & 0x3fff];
-	}
-	else
-	{
-		m_bank_base[bank] = m_rom + ( ( m_selected_bank[bank] * 0x2000 ) & 0x1fffff );
-	}
+	bool ram_active = (m_selected_bank[Bank] >= 0x80 && m_selected_bank[Bank] < 0x84);
+	if (Bank == 0)
+		m_view0.select(ram_active ? 1 : 0);
+	if (Bank == 1)
+		m_view1.select(ram_active ? 1 : 0);
+	if (Bank == 3)
+		m_view3.select(BIT(m_control, 2) ? 1 : 0);
+	if (Bank == 4)
+		m_view4.select(ram_active ? 1 : 0);
+	if (Bank == 5)
+		m_view5.select(ram_active ? 1 : 0);
 }
 
-
-void msx_slot_panasonic08_device::restore_banks()
+template <int Bank>
+void msx_slot_panasonic08_device::bank_w(u8 data)
 {
-	for (int i = 0; i < 8; i++)
-	{
-		map_bank(i);
-	}
+	m_selected_bank[Bank] = data;
+	m_bank[Bank]->set_entry(data);
+	set_view<Bank>();
 }
 
-
-uint8_t msx_slot_panasonic08_device::read(offs_t offset)
+u8 msx_slot_panasonic08_device::bank_r(offs_t offset)
 {
-	if (m_control & 0x04)
-	{
-		// 7ff0 - 6000
-		// 7ff1 - 6400
-		// 7ff2 - 6800
-		// 7ff3 - 6c00
-		// 7ff4 - 7000
-		// 7ff5 - 7800
-		if (offset >= 0x7ff0 && offset < 0x7ff6)     // maybe 7ff8 would make more sense here??
-		{
-			return m_selected_bank[offset - 0x7ff0];
-		}
-	}
-	return m_bank_base[offset >> 13][offset & 0x1fff];
+	return (offset < 6) ? m_selected_bank[offset] : 0;
 }
 
-
-void msx_slot_panasonic08_device::write(offs_t offset, uint8_t data)
+void msx_slot_panasonic08_device::control_w(u8 data)
 {
-	if ((offset & 0xc000) == 0x8000 || (offset & 0xc000) == 0x0000)
-	{
-		uint8_t bank = m_selected_bank[offset >> 13];
-		if (bank >= 0x80 && bank < 0x84)   // Are these banks were sram is present? Mirroring?
-		{
-			logerror("msx_slot_panasonic08: writing %02x to sram %04x, bank = %02x\n", data, offset & 0x1fff, bank);
-			m_sram[((bank & 0x01) * 0x2000) + (offset & 0x1fff)] = data;
-		}
-		return;
-	}
-
-	switch (offset)
-	{
-		case 0x6000:    /* Switched 0x0000-0x1FFF */
-			m_selected_bank[0] = data;
-			map_bank(0);
-			break;
-
-		case 0x6400:    /* Switches 0x2000-0x3FFF */
-			m_selected_bank[1] = data;
-			map_bank(1);
-			break;
-
-		case 0x6800:    /* Switches 0x4000-0x5FFF */
-			m_selected_bank[2] = data;
-			map_bank(2);
-			break;
-
-		case 0x6c00:    /* Switches 0x6000-0x7FFF */
-			m_selected_bank[3] = data;
-			map_bank(3);
-			break;
-
-		case 0x7000:    /* Switches 0x8000-0x9FFF */
-			m_selected_bank[4] = data;
-			map_bank(4);
-			break;
-
-		case 0x7800:    /* Switches 0xA000-0xBFFF */
-			m_selected_bank[5] = data;
-			map_bank(5);
-			break;
-
-		case 0x7ff9:
-			m_control = data;
-			break;
-
-		default:
-			logerror("msx_slot_panasonic08: Unhandled write %02x to %04x\n", data, offset);
-			break;
-	}
+	// writing $04 enables read back of banking registers at 7ff0-7ff5
+	m_control = data;
+	set_view<3>();
 }

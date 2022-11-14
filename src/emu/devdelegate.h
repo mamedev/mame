@@ -211,7 +211,7 @@ public:
 	device_delegate(device_t &owner, T &&funcptr, std::enable_if_t<suitable_functoid<T>::value, char const *> name)
 		: basetype(std::forward<T>(funcptr), name)
 		, detail::device_delegate_helper(owner)
-	{ basetype::operator=(basetype(std::forward<T>(funcptr), name)); }
+	{ }
 
 	// setters that implicitly bind to the current device
 	template <class D> void set(ReturnType (D::*funcptr)(Params...), char const *name)

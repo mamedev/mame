@@ -18,17 +18,17 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	const uint8_t *m_bunsetsu_rom;
-	uint32_t m_bunsetsu_address;
+	u8 buns_r();
+	void buns_w(offs_t offset, u8 data);
+
+	u8 *m_bunsetsu_rom;
+	u32 m_bunsetsu_address;
 };
 
 

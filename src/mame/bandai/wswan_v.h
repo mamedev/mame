@@ -62,7 +62,6 @@ protected:
 	void refresh_scanline();
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	void common_save();
-	u16 swap_bytes(u16 word);
 
 	bitmap_ind16 m_bitmap;
 	u8 m_layer_bg_enable;          // Background layer on/off

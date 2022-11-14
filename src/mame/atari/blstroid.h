@@ -27,7 +27,6 @@ public:
 		m_priorityram(*this, "priorityram")
 	{ }
 
-	void init_blstroid();
 	void blstroid(machine_config &config);
 
 protected:

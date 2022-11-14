@@ -18,22 +18,14 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_post_load() override;
-
-	void restore_banks();
+	virtual void device_start() override { }
 
 private:
-	uint8_t m_selected_bank;
-	uint8_t *m_bank_base[4];
+	void mapper_write(u8 data);
 
-	void setup_bank();
+	memory_bank_creator m_rombank;
 };
 
 

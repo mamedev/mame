@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-16 02:30+1100\n"
-"PO-Revision-Date: 2022-06-25 21:09+0200\n"
+"PO-Revision-Date: 2022-10-28 19:21+0200\n"
 "Last-Translator: Milan Galcik <milan.galcik@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: sk\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 3.1\n"
+"X-Generator: Poedit 3.2\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
 msgid ""
@@ -277,7 +277,7 @@ msgstr "%1$s %2$s (%3$d z %4$d softvérových balíkov)"
 #: src/frontend/mame/ui/selsoft.cpp:709
 #, c-format
 msgid "%1$s - select software"
-msgstr ""
+msgstr "%1$s - vybrať softvér"
 
 #: src/frontend/mame/ui/selsoft.cpp:714 src/frontend/mame/ui/selgame.cpp:1074
 #, c-format
@@ -973,6 +973,10 @@ msgid ""
 "physical interaction or consist of mechanical devices. It is not possible to "
 "fully experience this system.\n"
 msgstr ""
+"\n"
+"Niektoré prvky tohto systému nemôžu byť správne emulované, pretože vyžadujú "
+"fyzickú interakciu alebo pozostávajú z mechanických súčastí. Nebude preto "
+"možné poskytnúť dokonalý herný zážitok.\n"
 
 #: src/frontend/mame/ui/info.cpp:167
 #, c-format
@@ -1879,17 +1883,17 @@ msgstr ""
 #: src/frontend/mame/ui/inputdevices.cpp:88
 msgctxt "menu-inputdev"
 msgid "Copy Device ID"
-msgstr ""
+msgstr "Kopírovať ID zariadenia"
 
 #: src/frontend/mame/ui/inputdevices.cpp:122
 msgctxt "menu-inputdev"
 msgid "Copied device ID to clipboard"
-msgstr ""
+msgstr "ID zariadenia bolo skopírované do clipboardu"
 
 #: src/frontend/mame/ui/inputdevices.cpp:124
 msgctxt "menu-inputdev"
 msgid "Error copying device ID to clipboard"
-msgstr ""
+msgstr "Chyba pri kopírovaní ID zariadenia do clipboardu"
 
 #: src/frontend/mame/ui/inputdevices.cpp:162
 msgctxt "menu-inputdev"
@@ -2174,7 +2178,7 @@ msgstr "Jazykové mutácie"
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgctxt "path-option"
 msgid "Software Lists"
-msgstr ""
+msgstr "Zoznamy softvéru"
 
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgctxt "path-option"
@@ -6517,18 +6521,3 @@ msgid ""
 msgstr ""
 "Vložte kombináciu alebo stlačte %s pre storno\n"
 "%s"
-
-#~ msgid ""
-#~ "\n"
-#~ "Elements of this system cannot be emulated as they require physical "
-#~ "interaction or consist of mechanical devices. It is not possible to fully "
-#~ "experience this system.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Niektoré prvky tohto systému nemôžu byť emulované, pretože vyžadujú "
-#~ "fyzickú interakciu alebo pozostávajú z mechanických súčastí. Nebude preto "
-#~ "možné poskytnúť dokonalý herný zážitok.\n"
-
-#, c-format
-#~ msgid "System: \"%1$s\" software list "
-#~ msgstr "Systém: \"%1$s\" zoznam softvéru "

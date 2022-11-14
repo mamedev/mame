@@ -2757,7 +2757,11 @@ Region byte encoding is as follows:
 Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for the region byte.
   NOTE: this doesn't work for the HOTD2 or multi screen boot roms
 
+Dev BIOS v1.2: NAOMI DEVELOP  1999 02/15  1.2
+BIOS for games debugging and testing using NAOMI dev.box. Basically it's same as retail BIOSes but have enabled monitor/debugger and does read region code from DSW2/3/4.
+BAD_DUMP note: we got only 1st half of ROM, 2nd half was handcrafted from same revision retail BIOS.
 
+Next two BIOSes are likely special tools for dev.box hardware test, repair, reprogram, etc purposes, not 'regular' ones.
 Dev BIOS: older version, from about mid November 1998 (some sources call it "NAOMI Test BIOS ROM")
 
 Dev BIOS v1.10: NAOMI DEVELOP  1999 01/10  1.10
@@ -2857,6 +2861,8 @@ OFF  OFF  ON   Australia
 	ROM_LOAD16_WORD_SWAP_BIOS( 24, "zukinver0930.ic25", 0x000000, 0x200000, CRC(58e17c23) SHA1(19330f906accf1b859f56bbcedc2edff73747599) ) \
 	ROM_SYSTEM_BIOS( 25, "bios25", "epr-21576h (multi-region hack)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 25, "epr-21576h_multi.ic27", 0x000000, 0x200000, CRC(cce01f1f) SHA1(cca17119ad13e3a4ef7cb6902a37b65d6a844aee) ) \
+	ROM_SYSTEM_BIOS( 26, "bios26", "Dev BIOS v1.2" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 26, "epr-21336a.ic27", 0x000000, 0x200000, BAD_DUMP CRC(d3d57af8) SHA1(0eb72c2a20ad8b86d442b77760eab5e89521d469) ) \
 	ROM_REGION( 0x4000, "altera_pof", 0) \
 	ROM_LOAD("315-6188.ic31", 0x0000, 0x2034, CRC(7c9fea46) SHA1(f77c07ae65dfed18c1c4c632c8945be21d02ddaf) )
 

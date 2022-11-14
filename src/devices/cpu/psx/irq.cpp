@@ -11,6 +11,8 @@
 #include "psx.h"
 #include "irq.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL ( 0 )
 
 #define PSX_IRQ_MASK ( 0x7fd )

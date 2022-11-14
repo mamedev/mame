@@ -16,85 +16,91 @@ GCMK-16X PCB, 2 ROM chips, Yamaha XE297A0 mapper chip.
 DEFINE_DEVICE_TYPE(MSX_CART_HOLY_QURAN, msx_cart_holy_quran_device, "msx_cart_holy_quran", "MSX Cartridge - Holy Quran")
 
 
-msx_cart_holy_quran_device::msx_cart_holy_quran_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_holy_quran_device::msx_cart_holy_quran_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_HOLY_QURAN, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
+	, m_rombank(*this, "rombank%u", 0U)
+	, m_view1(*this, "view1")
+	, m_view2(*this, "view2")
 {
-}
-
-void msx_cart_holy_quran_device::device_start()
-{
-	// zerofill
-	m_decrypt = false;
-	std::fill_n(&m_selected_bank[0], 4, 0);
-	std::fill_n(&m_bank_base[0], 4, nullptr);
-
-	// register for savestates
-	save_item(NAME(m_selected_bank));
-	save_item(NAME(m_decrypt));
-
-	// protection uses a simple rotation on databus, some lines inverted
-	for (int i = 0; i < 0x100; i++)
-		m_lookup_prot[i] = bitswap<8>(i,6,2,4,0,1,5,7,3) ^ 0x4d;
 }
 
 void msx_cart_holy_quran_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x100000)
+	u32 size = get_rom_size();
+	u16 banks = size / BANK_SIZE;
+
+	if (size > 256 * BANK_SIZE || size < 0x10000 || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		fatalerror("holy_quran: Invalid ROM size\n");
 	}
 
-	restore_banks();
+	m_bank_mask = banks - 1;
+
+	m_decrypted.resize(size);
+
+	u8 lookup_prot[256];
+	// protection uses a simple rotation on databus, some lines inverted
+	for (int i = 0; i < 0x100; i++)
+		lookup_prot[i] = bitswap<8>(i,6,2,4,0,1,5,7,3) ^ 0x4d;
+
+	for (u32 i = 0; i < size; i++)
+		m_decrypted[i] = lookup_prot[m_rom[i]];
+
+	for (int i = 0; i < 4; i++)
+		m_rombank[i]->configure_entries(0, banks, m_decrypted.data(), BANK_SIZE);
+
+	page(1)->install_view(0x4000, 0x7fff, m_view1);
+	m_view1[0].install_read_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(msx_cart_holy_quran_device::read)));
+	m_view1[1].install_read_bank(0x4000, 0x5fff, m_rombank[0]);
+	m_view1[1].install_read_bank(0x6000, 0x7fff, m_rombank[1]);
+	m_view1[1].install_write_handler(0x5000, 0x5000, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<0>)));
+	m_view1[1].install_write_handler(0x5400, 0x5400, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<1>)));
+	m_view1[1].install_write_handler(0x5800, 0x5800, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<2>)));
+	m_view1[1].install_write_handler(0x5c00, 0x5c00, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<3>)));
+
+	page(2)->install_view(0x8000, 0xbfff, m_view2);
+	m_view2[0].install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(msx_cart_holy_quran_device::read2)));
+	m_view2[1].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
+	m_view2[1].install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 }
 
 void msx_cart_holy_quran_device::device_reset()
 {
-	m_decrypt = false;
-
-	std::fill_n(&m_selected_bank[0], 4, 0);
-	restore_banks();
-}
-
-void msx_cart_holy_quran_device::restore_banks()
-{
+	m_view1.select(0);
+	m_view2.select(0);
 	for (int i = 0; i < 4; i++)
-		m_bank_base[i] = get_rom_base() + (m_selected_bank[i] & 0x7f) * 0x2000;
+		m_rombank[i]->set_entry(0);
 }
 
-
-// mapper interface
-
-uint8_t msx_cart_holy_quran_device::read_cart(offs_t offset)
+u8 msx_cart_holy_quran_device::read(offs_t offset)
 {
-	if (offset >= 0x4000 && offset < 0xc000)
+	u8 data = m_rom[offset];
+	// The decryption should actually start working after the first M1 cycle executing something from the cartridge.
+	if (offset + 0x4000 == ((m_rom[3] << 8) | m_rom[2]) && !machine().side_effects_disabled())
 	{
-		uint8_t data = m_bank_base[(offset - 0x4000) >> 13][offset & 0x1fff];
-
-		if (m_decrypt)
-			return m_lookup_prot[data];
-
-		// The decryption should actually start working after the first M1 cycle executing something from the cartridge.
-		if (offset == ((m_rom[3] << 8) | m_rom[2]) && !machine().side_effects_disabled())
-			m_decrypt = true;
-
-		return data;
+		// Switch to decrypted contents
+		m_view1.select(1);
+		m_view2.select(1);
 	}
-
-	return 0xff;
+	return data;
 }
 
-void msx_cart_holy_quran_device::write_cart(offs_t offset, uint8_t data)
+u8 msx_cart_holy_quran_device::read2(offs_t offset)
 {
-	switch (offset)
+	u8 data = m_rom[offset + 0x4000];
+	// The decryption should actually start working after the first M1 cycle executing something from the cartridge.
+	if (offset + 0x8000 == ((m_rom[3] << 8) | m_rom[2]) && !machine().side_effects_disabled())
 	{
-		case 0x5000: case 0x5400: case 0x5800: case 0x5c00:
-			m_selected_bank[offset >> 10 & 3] = data;
-			restore_banks();
-			break;
-
-		default:
-			logerror("msx_cart_holy_quran_device: unhandled write %02x to %04x\n", data, offset);
-			break;
+		// Switch to decrypted contents
+		m_view1.select(1);
+		m_view2.select(1);
 	}
+	return data;
+}
+
+template <int Bank>
+void msx_cart_holy_quran_device::bank_w(u8 data)
+{
+	m_rombank[Bank]->set_entry(data & m_bank_mask);
 }

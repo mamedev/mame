@@ -488,6 +488,19 @@ void terracre_state::ym3526(machine_config &config)
 	// R9 - Yamaha (digital/FM) - 1kohm = 0.4074 of total
 	// R12 - DAC1 - 2.2kohm = 0.1852 of total
 	// R8 - DAC2 - 1kohm = 0.4074 of total
+	// However, the actual volume output by the ym3014 dac and the r2r resistors
+	//  is not the same range on each!
+	// The YM3014 dac has a DC offset of 1/2 VDD, then +- 1/4 VDD of signal,
+	//  so min of 1.25v and max of 3.75v, vpp of 2.5v
+	// The R2R dacs are full range, min of 0v and max of (almost) 5v, vpp of ~5.0v
+	// Because of this, we have to compensate as MAME's ymfm core outputs full range.
+	// Math::
+	//  YMFM:  0.407407 * 0.5 = 0.203704
+	//  DAC1:  0.185185 * 1.0 = 0.185185
+	//  DAC2:  0.407407 * 1.0 = 0.407407
+	//  Sum:                    0.796296
+	//  Multiply all 3 values by 1 / 0.796296 (i.e. 1.255814):
+	// Final values are: ym: 0.255814; dac1: 0.232558; dac2: 0.511628)
 
 	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R10, R11, nothing(infinite resistance), wire(short), C11, C12
 	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -496,10 +509,11 @@ void terracre_state::ym3526(machine_config &config)
 	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R16, R15, nothing(infinite resistance), wire(short), C18, C21
 	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	YM3526(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, m_ymfilter, 0.4074);     // 4MHz verified on PCB
+	YM3526(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, m_ymfilter, 0.2558);     // 4MHz verified on PCB
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.1852); // SIP R2R DAC @ RA-1 with 74HC374P latch
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.4074); // SIP R2R DAC @ RA-2 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.2326); // SIP R2R DAC @ RA-1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.5116); // SIP R2R DAC @ RA-2 with 74HC374P latch
+
 }
 
 void terracre_state::ym2203(machine_config &config)
@@ -517,6 +531,24 @@ void terracre_state::ym2203(machine_config &config)
 	// R8 - DAC2 - 1kohm = 0.3500 of total
 	// Yamaha (analog/SSG, channels A and B) - 3.3k = 0.1060
 	// Yamaha (analog/SSG, channel C) - 10k = 0.0350
+	// However, the actual volume output by the ym3014 dac and the r2r resistors
+	//  is not the same range on each!
+	// The YM3014 dac has a DC offset of 1/2 VDD, then +- 1/4 VDD of signal,
+	//  so min of 1.25v and max of 3.75v, vpp of 2.5v
+	// The YM2203's 3 SSG analog channels each have a vpp of about 1.15v
+	//  (i.e. midway between 0.95 and 1.35v on datasheet), before mixing.
+	//  (we assume mixing is perfectly additive, which probably isn't 100% true)
+	// The R2R dacs are full range, min of 0v and max of (almost) 5v, vpp of ~5.0v
+	// Because of this, we have to compensate as MAME's ymfm core outputs full range.
+	// Math: (assuming a constant current for each component)
+	//  YMFM:  0.350000 * 0.5  = 0.175
+	//  DAC1:  0.159000 * 1.0  = 0.159
+	//  DAC2:  0.350000 * 1.0  = 0.350
+	//  SSGA+B:0.106000 * 0.46 = 0.04876
+	//  SSGC:  0.035000 * 0.23 = 0.00805
+	//  Sum:                     0.74081
+	//  Multiply all 5 values by 1 / 0.74081 (i.e. 1.349873):
+	//	ym: 0.236228; dac1: 0.21463; dac2: 0.472456, ssgA+B: 0.06582; ssg3: 0.010866)
 
 	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R10, R11, nothing(infinite resistance), wire(short), C11, C12
 	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -530,7 +562,7 @@ void terracre_state::ym2203(machine_config &config)
 	//  capacitance as the capacitor part of said circuit. (YR12, YR15).
 	// Technically there may be some capacitance from YC3, although that is intended to be part of the SK filter below.
 	FILTER_BIQUAD(config, m_ssgfilter_abgain).opamp_mfb_lowpass_setup(RES_K(4.7), 0.0, RES_K(10), 0.0, CAP_N(22)/100.0); // YR12, N/A(short), YR15, N/A(unpopulated), (parasitic capacitance from YC3)
-	m_ssgfilter_abgain->add_route(ALL_OUTPUTS, "speaker", 0.1060);
+	m_ssgfilter_abgain->add_route(ALL_OUTPUTS, "speaker", 1.0);
 	// This filter is a 2nd order sallen-key lowpass, unity gain.
 	FILTER_BIQUAD(config, m_ssgfilter_abfilt).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(22), CAP_N(10)); // YR3, YR5, nothing(infinite resistance), wire(short), YC3, YC6
 	m_ssgfilter_abfilt->add_route(ALL_OUTPUTS, m_ssgfilter_abgain, 1.0);
@@ -541,19 +573,19 @@ void terracre_state::ym2203(machine_config &config)
 	// It turns out this cap is mathematically redundant vs the cap at YC1, and serves the
 	//  exact same purpose for calculating the cutoff.
 	FILTER_BIQUAD(config, m_ssgfilter_cgain).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_N(100)); // YR8, N/A(short), YR7, N/A(unpopulated), YC1
-	m_ssgfilter_cgain->add_route(ALL_OUTPUTS, "speaker", 0.0350);
+	m_ssgfilter_cgain->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	MIXER(config, m_ssgmixer);
-	m_ssgmixer->add_route(0, m_ssgfilter_abfilt, 1.0);
+	m_ssgmixer->add_route(0, m_ssgfilter_abfilt, 0.06582);
 
 	ym2203_device &ym1(YM2203(config, "ym1", XTAL(16'000'000)/4));     // 4MHz verified on PCB
 	ym1.add_route(0, m_ssgmixer, 1.0);
 	ym1.add_route(1, m_ssgmixer, 1.0);
-	ym1.add_route(2, m_ssgfilter_cgain, 1.0);
-	ym1.add_route(3, m_ymfilter, 0.35);
+	ym1.add_route(2, m_ssgfilter_cgain, 0.010866);
+	ym1.add_route(3, m_ymfilter, 0.2362);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.1590); // SIP R2R DAC @ RA-1 with 74HC374P latch
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.35); // SIP R2R DAC @ RA-2 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.2146); // SIP R2R DAC @ RA-1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.4725); // SIP R2R DAC @ RA-2 with 74HC374P latch
 }
 
 void terracre_state::amazon_base(machine_config &config)

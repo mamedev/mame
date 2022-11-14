@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(MSX_CART_SFG01, msx_cart_sfg01_device, "msx_cart_sfg01", "MSX
 DEFINE_DEVICE_TYPE(MSX_CART_SFG05, msx_cart_sfg05_device, "msx_cart_sfg05", "MSX Cartridge - SFG05")
 
 
-msx_cart_sfg_device::msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_sfg_device::msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_region_sfg(*this, "sfg")
@@ -30,18 +30,15 @@ msx_cart_sfg_device::msx_cart_sfg_device(const machine_config &mconfig, const de
 {
 }
 
-
-msx_cart_sfg01_device::msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_sfg01_device::msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_sfg_device(mconfig, MSX_CART_SFG01, tag, owner, clock)
 {
 }
 
-
-msx_cart_sfg05_device::msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_sfg05_device::msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_cart_sfg_device(mconfig, MSX_CART_SFG05, tag, owner, clock)
 {
 }
-
 
 void msx_cart_sfg_device::device_add_mconfig(machine_config &config)
 {
@@ -78,50 +75,63 @@ void msx_cart_sfg05_device::device_add_mconfig(machine_config &config)
 	ym2164.add_route(1, "rspeaker", 0.80);
 }
 
-
-ROM_START( msx_sfg01 )
+ROM_START(msx_sfg01)
 	ROM_REGION(0x4000, "sfg", 0)
 	ROM_LOAD("sfg01.rom", 0x0, 0x4000, CRC(0995fb36) SHA1(434651305f92aa770a89e40b81125fb22d91603d)) // correct label is almost certainly "yamaha__ym2211-22702__48_18_89_b.ic104" though the datecode portion may vary between late 1983 and mid 1984
 ROM_END
 
-
 const tiny_rom_entry *msx_cart_sfg01_device::device_rom_region() const
 {
-	return ROM_NAME( msx_sfg01 );
+	return ROM_NAME(msx_sfg01);
 }
 
-
-ROM_START( msx_sfg05 )
+ROM_START(msx_sfg05)
 	ROM_REGION(0x8000, "sfg", 0)
-	ROM_SYSTEM_BIOS( 0, "sfg05", "SFG05 (original)" )
-	ROMX_LOAD( "sfg05.rom", 0x0, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321), ROM_BIOS(0) ) // correct label MIGHT be "yamaha__ym2301-23959.ic104" but this needs redump/verification
-	ROM_SYSTEM_BIOS( 1, "sfg05a", "SFG05 (SFG01 upgrade)" ) // SFG01 PCB, Yamaha official upgrade, has YM2151 instead of YM2164
-	ROMX_LOAD( "sfg05a.rom", 0x0, 0x8000, CRC(5bc237f8) SHA1(930338f45c08228108c0831cc4a26014c2674718), ROM_BIOS(1) ) // this came on a single eprom on a daughterboard on an SFG01 board which had been factory upgraded to SFG05
+	// Version string starts at $02BD
+	ROM_SYSTEM_BIOS(0, "m5.01.011", "SFG05 (original) M5.01.011")
+	ROMX_LOAD( "sfg05.rom", 0x0, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321), ROM_BIOS(0)) // correct label MIGHT be "yamaha__ym2301-23959.ic104" but this needs redump/verification
+	ROM_SYSTEM_BIOS(1, "m5.00.013", "SFG05 (SFG01 upgrade) M5.00.013") // SFG01 PCB, Yamaha official upgrade, has YM2151 instead of YM2164
+	ROMX_LOAD( "sfg05a.rom", 0x0, 0x8000, CRC(5bc237f8) SHA1(930338f45c08228108c0831cc4a26014c2674718), ROM_BIOS(1)) // this came on a single eprom on a daughterboard on an SFG01 board which had been factory upgraded to SFG05
+	ROM_SYSTEM_BIOS(2, "m5.00.011", "SFG05 M5.00.011") // Found in Sakhr AX-200M
+	ROMX_LOAD("sfg05_m5_00_011.rom", 0x0, 0x8000, BAD_DUMP CRC(9d5e20c9) SHA1(fcc385b90c65575e29fc009aa00b5120fc4c251a), ROM_BIOS(2)) // Still seems to have I/O reads at $7ff0 - $7fff
 ROM_END
-
 
 const tiny_rom_entry *msx_cart_sfg05_device::device_rom_region() const
 {
-	return ROM_NAME( msx_sfg05 );
+	return ROM_NAME(msx_sfg05);
 }
-
 
 void msx_cart_sfg_device::device_start()
 {
 	// Set rom mask
 	m_rom_mask = m_region_sfg->bytes() - 1;
 
-	// This should probably moved up in the bus/slot hierarchy for the msx driver
-	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-	maincpu->set_irq_acknowledge_callback(*this, FUNC(msx_cart_sfg_device::irq_callback));
-}
+	maincpu().set_irq_acknowledge_callback(*this, FUNC(msx_cart_sfg_device::irq_callback));
 
+	page(0)->install_rom(0x0000, 0x3fff, m_region_sfg->base());
+	if (m_region_sfg->bytes() == 0x8000)
+	{
+		page(1)->install_rom(0x4000, 0x7fff, m_region_sfg->base() + 0x4000);
+	}
+	else
+	{
+		page(1)->install_rom(0x4000, 0x7fff, m_region_sfg->base());
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		// These addresses deliberately overlap
+		page(i)->install_read_handler(0x4000 * i + 0x3ff0, 0x4000 * i + 0x3ff6, read8sm_delegate(*m_ym2148, FUNC(ym2148_device::read)));
+		page(i)->install_read_handler(0x4000 * i + 0x3ff0, 0x4000 * i + 0x3ff1, read8sm_delegate(*m_ym2151, FUNC(ym_generic_device::read)));
+		page(i)->install_write_handler(0x4000 * i + 0x3ff0, 0x4000 * i + 0x3ff6, write8sm_delegate(*m_ym2148, FUNC(ym2148_device::write)));
+		page(i)->install_write_handler(0x4000 * i + 0x3ff0, 0x4000 * i + 0x3ff1, write8sm_delegate(*m_ym2151, FUNC(ym_generic_device::write)));
+	}
+}
 
 IRQ_CALLBACK_MEMBER(msx_cart_sfg_device::irq_callback)
 {
 	return m_ym2148->get_irq_vector();
 }
-
 
 WRITE_LINE_MEMBER(msx_cart_sfg_device::ym2151_irq_w)
 {
@@ -129,13 +139,11 @@ WRITE_LINE_MEMBER(msx_cart_sfg_device::ym2151_irq_w)
 	check_irq();
 }
 
-
 WRITE_LINE_MEMBER(msx_cart_sfg_device::ym2148_irq_w)
 {
 	m_ym2148_irq_state = state ? ASSERT_LINE : CLEAR_LINE;
 	check_irq();
 }
-
 
 void msx_cart_sfg_device::check_irq()
 {
@@ -146,63 +154,5 @@ void msx_cart_sfg_device::check_irq()
 	else
 	{
 		irq_out(CLEAR_LINE);
-	}
-}
-
-
-uint8_t msx_cart_sfg_device::read_cart(offs_t offset)
-{
-	switch (offset & 0x3fff)
-	{
-		case 0x3ff0:     // YM-2151 status read
-		case 0x3ff1:     // YM-2151 status read mirror?
-			return m_ym2151->read(offset & 1);
-
-		case 0x3ff2:     // YM-2148 keyboard column read
-		case 0x3ff3:     // YM-2148 --
-		case 0x3ff4:     // YM-2148 --
-		case 0x3ff5:     // YM-2148 MIDI UART data read register
-		case 0x3ff6:     // YM-2148 MIDI UART status register
-							// ------x- - 1 = received a byte/receive buffer full?
-							// -------x - 1 = ready to send next byte/send buffer empty?
-			return m_ym2148->read(offset & 7);
-	}
-
-	if (offset < 0x8000)
-	{
-		return m_region_sfg->as_u8(offset & m_rom_mask);
-	}
-
-	return 0xff;
-}
-
-
-void msx_cart_sfg_device::write_cart(offs_t offset, uint8_t data)
-{
-	switch (offset & 0x3fff)
-	{
-		case 0x3ff0:     // YM-2151 register
-		case 0x3ff1:    // YM-2151 data
-			m_ym2151->write(offset & 1, data);
-			break;
-
-		case 0x3ff2:   // YM-2148 write keyboard row
-		case 0x3ff3:   // YM-2148 MIDI IRQ vector
-		case 0x3ff4:   // YM-2148 External IRQ vector
-		case 0x3ff5:   // YM-2148 MIDI UART data write register
-		case 0x3ff6:   // YM-2148 MIDI UART command register
-						// On startup the sfg01 writes 0x80
-						// followed by 0x05.
-						// Other write seen in the code: 0x15
-						//
-						// x------- - 1 = reset
-						// -----x-- - 1 = enable receiving / sending midi data
-						// -------x - 1 = enable receiving / sending midi data
-			m_ym2148->write(offset & 7, data);
-			break;
-
-		default:
-			logerror("msx_cart_sfg_device::write_cart: write %02x to %04x\n", data, offset);
-			break;
 	}
 }

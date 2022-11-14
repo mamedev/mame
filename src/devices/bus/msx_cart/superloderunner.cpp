@@ -6,35 +6,18 @@
 DEFINE_DEVICE_TYPE(MSX_CART_SUPERLODERUNNER, msx_cart_superloderunner_device, "msx_cart_superloderunner", "MSX Cartridge - Super Lode Runner")
 
 
-msx_cart_superloderunner_device::msx_cart_superloderunner_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_superloderunner_device::msx_cart_superloderunner_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_SUPERLODERUNNER, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
-	, m_selected_bank(0)
-	, m_bank_base(nullptr)
+	, m_rombank(*this, "rombank")
 {
 }
-
 
 void msx_cart_superloderunner_device::device_start()
 {
-	save_item(NAME(m_selected_bank));
-
-	// Install evil memory write handler
-	memory_space().install_write_handler(0x0000, 0x0000, write8smo_delegate(*this, FUNC(msx_cart_superloderunner_device::banking)));
+	// Install evil system wide memory write handler
+	memory_space().install_write_handler(0x0000, 0x0000, write8smo_delegate(*this, FUNC(msx_cart_superloderunner_device::bank_w)));
 }
-
-
-void msx_cart_superloderunner_device::device_post_load()
-{
-	restore_banks();
-}
-
-
-void msx_cart_superloderunner_device::restore_banks()
-{
-	m_bank_base = get_rom_base() + (m_selected_bank & 0x0f) * 0x4000;
-}
-
 
 void msx_cart_superloderunner_device::initialize_cartridge()
 {
@@ -43,23 +26,12 @@ void msx_cart_superloderunner_device::initialize_cartridge()
 		fatalerror("superloderunner: Invalid ROM size\n");
 	}
 
-	restore_banks();
+	m_rombank->configure_entries(0, 8, get_rom_base(), 0x4000);
+
+	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank);
 }
 
-
-uint8_t msx_cart_superloderunner_device::read_cart(offs_t offset)
+void msx_cart_superloderunner_device::bank_w(u8 data)
 {
-	if (offset >= 0x8000 && offset < 0xc000)
-	{
-		return m_bank_base[offset & 0x3fff];
-	}
-
-	return 0xff;
-}
-
-
-void msx_cart_superloderunner_device::banking(uint8_t data)
-{
-	m_selected_bank = data;
-	restore_banks();
+	m_rombank->set_entry(data & 0x07);
 }

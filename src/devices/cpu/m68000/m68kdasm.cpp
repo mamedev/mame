@@ -1515,7 +1515,7 @@ std::string m68k_disassembler::d68040_fpu()
 			switch ((w2>>10)&7)
 			{
 				case 3:     // packed decimal w/fixed k-factor
-					return util::string_format("fmove%s   FP%d, %s {#%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(m_cpu_ir), sext_7bit_int(w2&0x7f));
+					return util::string_format("fmove%s   FP%d, %s {#%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(m_cpu_ir), util::sext(w2&0x7f, 7));
 
 				case 7:     // packed decimal w/dynamic k-factor (register)
 					return util::string_format("fmove%s   FP%d, %s {D%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(m_cpu_ir), (w2>>4)&7);

@@ -202,6 +202,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 
 MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
 {
@@ -1368,15 +1370,6 @@ ROM_START( gcastle )
 ROM_END
 
 
-void gladiatr_state::swap_block(u8 *src1, u8 *src2, int len)
-{
-	for (int i = 0; i < len; i++)
-	{
-		using std::swap;
-		swap(src1[i], src2[i]);
-	}
-}
-
 void gladiatr_state::init_gladiatr()
 {
 	u8 *rom = memregion("gfx2")->base();
@@ -1390,7 +1383,7 @@ void gladiatr_state::init_gladiatr()
 		}
 	}
 	// sort data
-	swap_block(rom + 0x14000, rom + 0x18000, 0x4000);
+	std::swap_ranges(rom + 0x14000, rom + 0x18000, rom + 0x18000);
 
 
 	rom = memregion("gfx3")->base();
@@ -1404,10 +1397,10 @@ void gladiatr_state::init_gladiatr()
 		}
 	}
 	// sort data
-	swap_block(rom + 0x1a000, rom + 0x1c000, 0x2000);
-	swap_block(rom + 0x22000, rom + 0x28000, 0x2000);
-	swap_block(rom + 0x26000, rom + 0x2c000, 0x2000);
-	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
+	std::swap_ranges(rom + 0x1a000, rom + 0x1c000, rom + 0x1c000);
+	std::swap_ranges(rom + 0x22000, rom + 0x24000, rom + 0x28000);
+	std::swap_ranges(rom + 0x26000, rom + 0x28000, rom + 0x2c000);
+	std::swap_ranges(rom + 0x24000, rom + 0x28000, rom + 0x28000);
 
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x6000);
 	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0xc000);

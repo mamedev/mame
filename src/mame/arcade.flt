@@ -770,7 +770,6 @@ misc/jubilee.cpp
 misc/jungleyo.cpp
 misc/kas89.cpp
 misc/kingpin.cpp
-misc/krokha.cpp
 misc/kurukuru.cpp
 misc/kyugo.cpp
 misc/ladyfrog.cpp
@@ -1258,6 +1257,7 @@ sega/system16.cpp
 sega/timetrv.cpp
 sega/triforce.cpp
 sega/turbo.cpp
+sega/unkhockey.cpp
 sega/vicdual.cpp
 sega/winclub.cpp
 sega/y2.cpp

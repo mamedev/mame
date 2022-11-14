@@ -858,9 +858,6 @@ WRITE_LINE_MEMBER(apache3_state::apache3_68000_reset)
 MACHINE_RESET_MEMBER(apache3_state,apache3)
 {
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // TODO
-
-	/* Hook the RESET line, which resets the Z80 */
-	m_subcpu->set_reset_callback(*this, FUNC(apache3_state::apache3_68000_reset));
 }
 
 
@@ -874,6 +871,7 @@ void apache3_state::apache3(machine_config &config)
 	M68000(config, m_subcpu, CLOCK_2 / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &apache3_state::apache3_68000_map);
 	m_subcpu->set_vblank_int("screen", FUNC(apache3_state::irq4_line_hold));
+	m_subcpu->reset_cb().set(FUNC(apache3_state::apache3_68000_reset));
 
 	V20(config, m_audiocpu, CLOCK_1 / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &apache3_state::apache3_v20_map);

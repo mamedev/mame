@@ -10860,6 +10860,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Omega Race</description>
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
+		<sharedfeat name="joyport1_default" value="joybstr" />
+		<sharedfeat name="joyport2_default" value="joybstr" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_fa" />
 			<dataarea name="rom" size="12288">
@@ -17132,6 +17134,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<publisher>Xype / AtariAge</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
+			<feature name="peripheral" value="joybstr" />
 			<dataarea name="rom" size="0x4000">
 				<rom name="thrust v1.26 (pd).bin" size="0x4000" crc="70b25fb7" sha1="79e9d3a3e9bd8a8a9e4c7242c16cdfcccb1de1a2"/>
 			</dataarea>
@@ -17144,6 +17147,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<publisher>Xype / AtariAge</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
+			<feature name="peripheral" value="joybstr" />
 			<dataarea name="rom" size="0x4000">
 				<rom name="thrust.bin" size="0x4000" crc="c6ba1bc6" sha1="09608cfaa7c6e9638f12a1cff9dd5036c9effa43"/>
 			</dataarea>

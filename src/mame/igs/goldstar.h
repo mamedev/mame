@@ -195,10 +195,12 @@ public:
 	void init_cmtetrisc();
 	void init_cmtetrisd();
 	void init_ll3();
+	void init_cmfb55();
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cm(machine_config &config);
+	void cmfb55(machine_config &config);
 	void cm97(machine_config &config);
 	void cmasterc(machine_config &config);
 	void amcoe1a(machine_config &config);

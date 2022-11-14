@@ -112,8 +112,9 @@ with MSYS2 and the **pacman** package manager.
 * Download the latest version of the ``mame-essentials`` package from the
   `MAME package repository <https://repo.mamedev.org/x86_64/>`_ and install it
   using the **pacman** command.
-* Add the ``mame`` repository to ``/etc/pacman.conf`` using
-  ``/etc/pacman.d/mirrorlist.mame`` for locations.
+* Add the ``mame`` package repository to ``/etc/pacman.conf`` using
+  ``/etc/pacman.d/mirrorlist.mame`` for locations, and disable signature
+  verification for this repository (``SigLevel = Never``).
 * Install packages necessary to build MAME.  At the very least, you’ll need
   ``bash``, ``git``, ``make``.
 * For 64-bit builds you’ll need ``mingw-w64-x86_64-gcc`` and
@@ -175,7 +176,7 @@ configuration::
 
     curl -O "https://repo.mamedev.org/x86_64/mame-essentials-1.0.6-1-x86_64.pkg.tar.xz"
     pacman -U mame-essentials-1.0.6-1-x86_64.pkg.tar.xz
-    echo -e '\n[mame]\nInclude = /etc/pacman.d/mirrorlist.mame' >> /etc/pacman.conf
+    echo -e '\n[mame]\nInclude = /etc/pacman.d/mirrorlist.mame\nSigLevel = Never' >> /etc/pacman.conf
 
 Building with Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

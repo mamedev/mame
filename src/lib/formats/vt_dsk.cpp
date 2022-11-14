@@ -11,6 +11,7 @@
 #include "formats/vt_dsk.h"
 
 #include "ioprocs.h"
+#include "osdcomm.h"
 
 
 // Zero = |    9187     |
@@ -332,7 +333,7 @@ bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const s
 
 			} else if(count == 128+2) {
 				uint16_t disk_checksum = buf;
-				disk_checksum = (disk_checksum << 8) | (disk_checksum >> 8);
+				disk_checksum = swapendian_int16(disk_checksum);
 				mode = 0;
 			}
 			break;

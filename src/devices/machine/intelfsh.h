@@ -13,57 +13,11 @@ class intelfsh_device : public device_t,
 						public device_nvram_interface
 {
 public:
-	enum
-	{
-		// 8-bit variants
-		FLASH_INTEL_28F016S5 = 0x0800,
-		FLASH_FUJITSU_29F160TE,
-		FLASH_FUJITSU_29F016A,
-		FLASH_FUJITSU_29DL164BD,
-		FLASH_FUJITSU_29LV002TC,
-		FLASH_FUJITSU_29LV800B,
-		FLASH_ATMEL_29C010,
-		FLASH_AMD_29F010,
-		FLASH_AMD_29F040,
-		FLASH_AMD_29F080,
-		FLASH_AMD_29F400T,
-		FLASH_AMD_29F800T,
-		FLASH_AMD_29F800B_16BIT,
-		FLASH_AMD_29LV200T,
-		FLASH_CAT28F020,
-		FLASH_SHARP_LH28F016S,
-		FLASH_SHARP_LH28F016S_16BIT,
-		FLASH_INTEL_E28F008SA,
-		FLASH_MACRONIX_29F008TC,
-		FLASH_MACRONIX_29L001MC,
-		FLASH_MACRONIX_29LV160TMC,
-		FLASH_PANASONIC_MN63F805MNP,
-		FLASH_SANYO_LE26FV10N1TS,
-		FLASH_SST_28SF040,
-		FLASH_SST_39SF040,
-		FLASH_SST_39VF020,
-		FLASH_SST_49LF020,
-		FLASH_TMS_29F040,
-
-		// 16-bit variants
-		FLASH_SHARP_LH28F400 = 0x1000,
-		FLASH_INTEL_E28F400B,
-		FLASH_INTEL_TE28F160,
-		FLASH_SHARP_LH28F160S3,
-		FLASH_INTEL_TE28F320,
-		FLASH_SHARP_LH28F320BF,
-		FLASH_INTEL_28F320J3D,
-		FLASH_SPANSION_S29GL064S,
-		FLASH_INTEL_28F320J5,
-		FLASH_SST_39VF400A,
-		FLASH_ATMEL_49F4096
-	};
-
 	uint8_t *base() { return &m_data[0]; }
 
 protected:
 	// construction/destruction
-	intelfsh_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	intelfsh_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t bits, uint32_t size, uint8_t maker_id, uint16_t device_id);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -82,8 +36,7 @@ protected:
 	optional_memory_region   m_region;
 
 	// configuration state
-	uint32_t                 m_type;
-	int32_t                  m_size;
+	uint32_t                 m_size;
 	uint8_t                  m_bits;
 	uint32_t                 m_addrmask;
 	uint16_t                 m_device_id;
@@ -120,7 +73,7 @@ public:
 
 protected:
 	// construction/destruction
-	intelfsh8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	intelfsh8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t size, uint8_t maker_id, uint16_t device_id);
 };
 
 
@@ -138,7 +91,7 @@ public:
 
 protected:
 	// construction/destruction
-	intelfsh16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	intelfsh16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t size, uint8_t maker_id, uint16_t device_id);
 };
 
 
@@ -380,6 +333,12 @@ public:
 	cat28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class tc58fvt800_device : public intelfsh16_device
+{
+public:
+	tc58fvt800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(INTEL_28F016S5,        intel_28f016s5_device)
@@ -423,5 +382,6 @@ DECLARE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device)
 DECLARE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device)
 DECLARE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device)
 DECLARE_DEVICE_TYPE(CAT28F020,             cat28f020_device)
+DECLARE_DEVICE_TYPE(TC58FVT800,            tc58fvt800_device)
 
 #endif // MAME_MACHINE_INTELFSH_H
