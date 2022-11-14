@@ -1960,9 +1960,9 @@ void a130xe_state::portb_cb(uint8_t data)
 	else
 		m_ext_view.select(0);
 
-	// dirty check for ANTIC extended memory access, to be removed out of this branch ...
-	if ((!BIT(data, 5) && BIT(data, 4)) || (!BIT(data, 4) && BIT(data, 5)))
-		popmessage("ANTIC extended memory access, implement me %02x", data & 0x30);
+	// TODO: ANTIC extended memory access enable
+	// Prince of Persia homebrew has it always on.
+	// May be used for the intro screen (where text don't draw at the time of this writing)
 }
 
 // TODO: propagate portb to RAMBO XL and COMPY sub-devices for a800xl and onward
