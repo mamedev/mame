@@ -103,7 +103,7 @@ void a800_rom_spartados_device::device_reset()
 	m_bank = 7;
 	m_subcart_enabled = false;
 	if (!m_subcart->exists())
-		m_subcart_rd4_enabled = m_subcart_rd5_enabled = false;
+		m_subcart_rd4_enabled = m_subcart_rd5_enabled = 0;
 
 	m_cart_view.select(0);
 }

@@ -41,7 +41,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( subcart_rd5_w );
 
 	bool m_subcart_enabled;
-	bool m_subcart_rd4_enabled, m_subcart_rd5_enabled;
+	int m_subcart_rd4_enabled = 0, m_subcart_rd5_enabled = 0;
 };
 
 class a800_rom_spartados_128kb_device : public a800_rom_spartados_device

@@ -339,7 +339,7 @@ protected:
 
 	void hw_iomap(address_map &map);
 
-	bool m_cart_rd4_enabled, m_cart_rd5_enabled;
+	int m_cart_rd4_enabled = 0, m_cart_rd5_enabled = 0;
 	DECLARE_WRITE_LINE_MEMBER( cart_rd4_w );
 	DECLARE_WRITE_LINE_MEMBER( cart_rd5_w );
 
@@ -1751,8 +1751,8 @@ void a400_state::machine_reset()
 	// TODO: stub reset state
 	if (!m_cartleft->exists())
 	{
-		m_cart_rd4_enabled = false;
-		m_cart_rd5_enabled = false;
+		m_cart_rd4_enabled = 0;
+		m_cart_rd5_enabled = 0;
 		m_cart_rd4_view.select(0);
 		m_cart_rd5_view.select(0);
 	}
