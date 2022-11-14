@@ -1711,26 +1711,6 @@ WRITE_LINE_MEMBER( a400_state::cart_rd5_w )
 	m_cart_rd5_view.select(m_cart_rd5_enabled);
 }
 
-// old reference, to be removed
-#if 0
-		case A5200_4K:
-		case A5200_8K:
-		case A5200_16K:
-		case A5200_32K:
-		case A5200_16K_2CHIPS:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0xbfff);
-			break;
-		case A5200_BBSB:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x5fff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_80xx)));
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x6000, 0xbfff);
-			break;
-		}
-	}
-#endif
-
-
 TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a400_interrupt )
 {
 	m_antic->generic_interrupt(4);
@@ -1887,7 +1867,7 @@ uint8_t a1200xl_state::djoy_b_r()
 	// TODO: should read from RD5 but maxflash carts won't boot once you select any item
 	// This is also necessary by:
 	// - SDX boot (will hang in kernel during POST by boot conflict with BASIC if not handled properly)
-	// - a1200xl cart boot
+	// - a1200xl cart boot (expects this to be reversed)
 	// - returning m_cartleft->exists() makes BASIC disable thru OPTION to not work and makes maxflash to fail loading most .xex
 //  b |= m_cart_rd5_enabled << 3;
 	b |= !m_cartleft->exists() << 3;
@@ -2084,7 +2064,7 @@ void a400_state::atari_common(machine_config &config)
 
 	ATARI_FDC(config, "fdc", 0);
 
-	A800_CART_SLOT(config, m_cartleft, a800_left, "a800_8k");
+	A800_CART_SLOT(config, m_cartleft, a800_left, nullptr);
 	m_cartleft->rd4_callback().set(FUNC(a400_state::cart_rd4_w));
 	m_cartleft->rd5_callback().set(FUNC(a400_state::cart_rd5_w));
 
@@ -2135,7 +2115,7 @@ void a800_state::a800(machine_config &config)
 
 	config_ntsc_screen(config);
 
-	A800_CART_SLOT(config, m_cartright, a800_right, "a800_8k_right");
+	A800_CART_SLOT(config, m_cartright, a800_right, nullptr);
 
 	// TODO: confirm all of the official config
 	// 8K release model, 48K possible here?
@@ -2246,7 +2226,8 @@ void xegs_state::xegs(machine_config &config)
 	// not installable unless with DIY mods
 	config.device_remove("ram");
 
-	m_cartleft->set_default_option("xegs");
+//	m_cartleft->set_default_option("xegs");
+	m_cartleft->set_is_xegs(true);
 
 	// uses exact same slot connector
 	SOFTWARE_LIST(config.replace(), "cart_list").set_compatible("a800");

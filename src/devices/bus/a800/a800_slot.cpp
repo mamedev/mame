@@ -160,6 +160,7 @@ a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, cons
 	, m_rd5_cb(*this)
 	, m_space_mem_config("cart_mem", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor())
 	, m_space_io_config("cart_io", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor())
+	, m_is_xegs(false)
 {
 }
 
@@ -647,11 +648,12 @@ int a5200_cart_slot_device::identify_cart_type(const uint8_t *header) const
 
 std::string a800_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	std::string slot_default_option = default_option();
+	// Nope, will crash when mounting the SDX subslot
+//	std::string slot_default_option = default_option();
+	const bool is_xegs = m_is_xegs;
 
 	if (hook.image_file())
 	{
-		const bool is_xegs = slot_default_option.compare("xegs") == 0;
 		uint64_t len;
 		hook.image_file()->length(len); // FIXME: check error return
 
@@ -690,7 +692,7 @@ std::string a800_cart_slot_device::get_default_card_software(get_default_card_so
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot(slot_default_option);
+	return software_get_default_slot(is_xegs ? "xegs" : "a800_8k");
 }
 
 

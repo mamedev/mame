@@ -122,6 +122,7 @@ public:
 	bool has_cart() { return m_cart != nullptr; }
 	auto rd4_callback() { return m_rd4_cb.bind(); }
 	auto rd5_callback() { return m_rd5_cb.bind(); }
+	void set_is_xegs(bool is_xegs) { m_is_xegs = is_xegs; }
 
 	template <unsigned Bank> uint8_t read_cart(offs_t offset);
 	template <unsigned Bank> void write_cart(offs_t offset, uint8_t data);
@@ -148,7 +149,8 @@ private:
 	address_space *m_space_mem;
 	address_space *m_space_io;
 
-	int m_type;
+	int m_type = 0;
+	bool m_is_xegs = false;
 };
 
 class a5200_cart_slot_device;
