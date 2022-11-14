@@ -44,12 +44,14 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 	int zfog_enabled = extra.zfog_enabled;
 	int fogfactor = 0xff - extra.fogfactor;
 	int fadefactor = 0xff - extra.fadefactor;
+	int brifactor = 0xff - extra.brifactor;
 	int alphafactor = 0xff - extra.alpha;
 	bool alpha_enabled = extra.alpha_enabled;
 	u8 alpha_pen = m_state.m_poly_alpha_pen;
 	rgbaint_t fogcolor = extra.fogcolor;
 	rgbaint_t fadecolor = extra.fadecolor;
 	rgbaint_t polycolor = extra.polycolor;
+	rgbaint_t white(0, 0xff, 0xff, 0xff);
 	int polyfade_enabled = extra.pfade_enabled;
 	int penmask = 0xff;
 	int penshift = 0;
@@ -171,6 +173,12 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 			// apply shading after fog
 			int shade = i*ooz;
 			rgb.scale_imm_and_clamp(shade << 2);
+
+			// additional brightness
+			if (brifactor != 0xff)
+			{
+				rgb.blend(white, brifactor);
+			}
 
 			dest[x] = rgb.to_rgba();
 			primap[x] = (primap[x] & ~1) | prioverchar;
@@ -297,16 +305,19 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	namcos22_object_data &extra = object_data().next();
 	int flags = node->data.quad.flags;
 	int color = node->data.quad.color;
 	int cz_adjust = node->data.quad.cz_adjust;
+	int bri_adjust = node->data.quad.bri_adjust;
+
+	namcos22_object_data &extra = object_data().next();
 
 	extra.destbase = &bitmap;
 	extra.pfade_enabled = 0;
 	extra.zfog_enabled = 0;
 	extra.fadefactor = 0;
 	extra.fogfactor = 0;
+	extra.brifactor = 0;
 
 	extra.pens = &m_state.m_palette->pen((color & 0x7f) << 8);
 	extra.primap = &screen.priority();
@@ -370,6 +381,11 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 					extra.czram = m_state.m_recalc_czram[bank].get();
 				}
 			}
+			else
+			{
+				extra.fogcolor.set(0, 0xff, 0xff, 0xff);
+				extra.fogfactor = std::clamp(bri_adjust >> 15 & 0x1c0, 0, 0xff);
+			}
 		}
 	}
 
@@ -396,6 +412,9 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 				extra.czram = (u8*)&m_state.m_czram[cztype << (13-2)];
 			}
 		}
+
+		// additional brightness, only used in cybrcomm
+		extra.brifactor = std::clamp(bri_adjust >> 15 & 0x1c0, 0, 0xff);
 	}
 
 	render_triangle_fan<4>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_uvi_full, this), clipverts, clipv);
@@ -536,7 +555,7 @@ struct namcos22_scenenode *namcos22_renderer::alloc_scenenode(running_machine &m
 {
 	if (node)
 	{
-		/* use free pool */
+		// use free pool
 		m_scenenode_cur = node->next;
 	}
 	else
@@ -559,7 +578,7 @@ struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &mac
 		struct namcos22_scenenode *next = node->data.nonleaf.next[hash];
 		if (!next)
 		{
-			/* lazily allocate tree node for this radix */
+			// lazily allocate tree node for this radix
 			next = alloc_scenenode(machine, m_scenenode_cur);
 			next->type = NAMCOS22_SCENENODE_NONLEAF;
 			node->data.nonleaf.next[hash] = next;
@@ -571,7 +590,7 @@ struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &mac
 
 	if (node->type == NAMCOS22_SCENENODE_NONLEAF)
 	{
-		/* first leaf allocation on this branch */
+		// first leaf allocation on this branch
 		node->type = type;
 		return node;
 	}
@@ -732,7 +751,7 @@ void namcos22_state::register_normals(int addr, float m[4][4])
 		float ny = dspfixed_to_nativefloat(point_read(addr + i * 3 + 1));
 		float nz = dspfixed_to_nativefloat(point_read(addr + i * 3 + 2));
 
-		/* transform normal vector */
+		// transform normal vector
 		transform_normal(&nx, &ny, &nz, m);
 		float dotproduct = nx*m_camera_lx + ny*m_camera_ly + nz*m_camera_lz;
 		if (dotproduct < 0.0f)
@@ -790,6 +809,7 @@ void namcos22_state::draw_direct_poly(const u16 *src)
 		node->data.quad.texturebank = (src[1 + 4] & 0xf000) >> 12;
 	}
 	node->data.quad.cz_adjust = m_cz_adjust;
+	node->data.quad.bri_adjust = m_bri_adjust;
 	node->data.quad.flags = (src[3] << 6 & 0x1fff00) | cztype;
 	node->data.quad.color = (src[2] & 0xff00) >> 8;
 	src += 4;
@@ -901,7 +921,7 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 		transform_point(&pv->x, &pv->y, &pv->z, m);
 	}
 
-	/* backface cull one-sided polygons */
+	// backface cull one-sided polygons
 	if (flags & 0x0020)
 	{
 		float c1 =
@@ -1010,6 +1030,7 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 	node->data.quad.color = (color >> 8) & 0xff;
 	node->data.quad.flags = flags >> 10 & 3;
 	node->data.quad.cz_adjust = m_cz_adjust;
+	node->data.quad.bri_adjust = m_bri_adjust;
 
 	for (i = 0; i < 4; i++)
 	{
@@ -1290,9 +1311,9 @@ void namcos22_state::slavesim_handle_200002(const s32 *src, int code)
 		m[1][2] = dspfixed_to_nativefloat(src[0x8]);
 		m[2][2] = dspfixed_to_nativefloat(src[0x9]);
 
-		m[3][0] = src[0xa]; /* xpos */
-		m[3][1] = src[0xb]; /* ypos */
-		m[3][2] = src[0xc]; /* zpos */
+		m[3][0] = src[0xa]; // xpos
+		m[3][1] = src[0xb]; // ypos
+		m[3][2] = src[0xc]; // zpos
 
 		matrix3d_multiply(m, m_viewmatrix);
 		blit_polyobject(code, m);
@@ -1322,18 +1343,28 @@ void namcos22_state::slavesim_handle_300000(const s32 *src)
 
 void namcos22_state::slavesim_handle_233002(const s32 *src)
 {
-	/*
-	00233002
-	   00000000 // cz adjust (signed24)
-	   0003dd00 // z bias adjust
-	   001fffff // far plane?
-	   00007fff 00000000 00000000
-	   00000000 00007fff 00000000
-	   00000000 00000000 00007fff
-	   00000000 00000000 00000000
+	/**
+	* 00233002
+	* 00000000 // cz adjust (signed24)
+	* 0003dd00 // z bias adjust
+	* 001fffff // brightness adjust?
+	* 00007fff 00000000 00000000
+	* 00000000 00007fff 00000000
+	* 00000000 00000000 00007fff
+	* 00000000 00000000 00000000
 	*/
 	m_cz_adjust = signed24(src[1]);
 	m_objectshift = src[2];
+
+	/**
+	* 001fffff: common                                             - no effect
+	* 003fffff: adillor arrows on level select screen              - no effect according to video
+	* 003fffff: propcycl attract mode particles when Solitar rises - unknown
+	* 003fffff: timecris shoot helicopter                          - small increase in brightness
+	* 005fffff: timecris shoot other destructible object           - big increase in brightness
+	* 009fffff: cybrcomm shoot enemy with machine gun              - opaque white (no shading)
+	*/
+	m_bri_adjust = src[3];
 }
 
 void namcos22_state::simulate_slavedsp()
@@ -2389,7 +2420,7 @@ void namcos22_state::update_mixer()
 		m_screen_fade_g       = nthbyte(m_mixer, 0x13) << 8 | nthbyte(m_mixer, 0x14);
 		m_screen_fade_b       = nthbyte(m_mixer, 0x15) << 8 | nthbyte(m_mixer, 0x16);
 
-		// raveracw is the only game using multiple fog colors (city smog, cars under tunnels, brake disc in attract mode)
+		// raverace is the only game using multiple fog colors (city smog, cars under tunnels, brake disc in attract mode)
 		m_fog_colormask       = m_mixer[0x84/4];
 
 		// fog color per cz type

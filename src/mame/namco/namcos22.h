@@ -82,6 +82,7 @@ struct namcos22_scenenode
 			int cmode;
 			int flags;
 			int cz_adjust;
+			int bri_adjust;
 			int direct;
 			namcos22_polyvertex v[4];
 		} quad;
@@ -120,6 +121,7 @@ struct namcos22_object_data
 	int cmode;
 	int fadefactor;
 	int pfade_enabled;
+	int brifactor;
 	int fogfactor;
 	int zfog_enabled;
 	int cz_adjust;
@@ -225,12 +227,12 @@ public:
 	void cybrcomm(machine_config &config);
 	void namcos22(machine_config &config);
 
-	void init_acedrvr();
-	void init_raveracw();
-	void init_ridger2j();
+	void init_acedrive();
+	void init_raverace();
+	void init_ridgera2();
 	void init_victlap();
 	void init_cybrcomm();
-	void init_ridgeraj();
+	void init_ridgerac();
 
 	// renderer
 	u16 *m_texture_tilemap;
@@ -458,6 +460,7 @@ protected:
 	u16 m_keycus_rng = 0;
 	int m_gametype = 0;
 	int m_cz_adjust = 0;
+	int m_bri_adjust = 0;
 	std::unique_ptr<namcos22_renderer> m_poly;
 	u16 m_dspram_bank = 0;
 	u16 m_dspram16_latch = 0;
@@ -521,7 +524,7 @@ public:
 	void tokyowar(machine_config &config);
 
 	void init_aquajet();
-	void init_cybrcyc();
+	void init_cybrcycc();
 	void init_tokyowar();
 	void init_dirtdash();
 	void init_airco22();

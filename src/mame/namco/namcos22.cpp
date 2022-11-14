@@ -28,8 +28,6 @@ TODO:
 - improve ss22 lighting:
   + mountains in alpinr2b selection screen
   + ridgerac waving flag shadowing
-  + cybrcomm enemies should flash white when you shoot them, probably lighting related
-  + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
 - improve ss22 spot, used in dirtdash, alpines highscore entry, testmode screen#14 - not understood well:
   + does not work at all in alpines (uses spot_factor, not spotram, should show a spotlight with darkened background)
   + should be done before global fade, see dirtdash when starting at jungle level
@@ -2068,7 +2066,7 @@ u16 namcos22_state::point_loword_r()
 
 u16 namcos22_state::point_hiword_ir()
 {
-	// high bit is unknown busy signal (ridgerac, ridgera2, raveracw, cybrcomm)
+	// high bit is unknown busy signal (ridgerac, ridgera2, raverace, cybrcomm)
 	return 0x8000 | (point_read(m_point_address++) >> 16 & 0x00ff);
 }
 
@@ -3043,7 +3041,7 @@ static INPUT_PORTS_START( ridgera2 )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( raveracw )
+static INPUT_PORTS_START( raverace )
 	PORT_INCLUDE( ridgera )
 
 	PORT_MODIFY("INPUTS")
@@ -3110,7 +3108,7 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( acedrvr )
+static INPUT_PORTS_START( acedrive )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Shift Down")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
@@ -3188,7 +3186,7 @@ static INPUT_PORTS_START( acedrvr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( victlap )
-	PORT_INCLUDE( acedrvr )
+	PORT_INCLUDE( acedrive )
 
 	PORT_MODIFY("CUSTOM.0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Exit")
@@ -3673,6 +3671,7 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_keycus_id));
 	save_item(NAME(m_keycus_rng));
 	save_item(NAME(m_cz_adjust));
+	save_item(NAME(m_bri_adjust));
 	save_item(NAME(m_dspram_bank));
 	save_item(NAME(m_dspram16_latch));
 	save_item(NAME(m_slave_simulation_active));
@@ -6089,19 +6088,19 @@ void namcos22s_state::install_141_speedup()
 
 /*********************************************************************************************/
 
-void namcos22_state::init_ridgeraj()
+void namcos22_state::init_ridgerac()
 {
 	m_gametype = NAMCOS22_RIDGE_RACER;
 	install_c74_speedup();
 }
 
-void namcos22_state::init_ridger2j()
+void namcos22_state::init_ridgera2()
 {
 	m_gametype = NAMCOS22_RIDGE_RACER2;
 	install_c74_speedup();
 }
 
-void namcos22_state::init_acedrvr()
+void namcos22_state::init_acedrive()
 {
 	m_gametype = NAMCOS22_ACE_DRIVER;
 	install_c74_speedup();
@@ -6113,7 +6112,7 @@ void namcos22_state::init_victlap()
 	install_c74_speedup();
 }
 
-void namcos22_state::init_raveracw()
+void namcos22_state::init_raverace()
 {
 	m_gametype = NAMCOS22_RAVE_RACER;
 	install_c74_speedup();
@@ -6189,7 +6188,7 @@ void propcycl_state::init_propcyclj()
 	install_141_speedup();
 }
 
-void namcos22s_state::init_cybrcyc()
+void namcos22s_state::init_cybrcycc()
 {
 	m_gametype = NAMCOS22_CYBER_CYCLES;
 	install_130_speedup();
@@ -6231,21 +6230,21 @@ void namcos22s_state::init_dirtdash()
 
 /*    YEAR,  NAME,      PARENT,   MACHINE,   INPUT,     CLASS,           INIT,           MNTR, COMPANY, FULLNAME, FLAGS */
 // System22 games
-GAME( 1993, ridgerac,   0,        namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (World, RR2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
-GAME( 1993, ridgeraca,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (World, RR2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28
-GAME( 1993, ridgeracb,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (US, RR3 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, reports as "-Foreign B-" RR3 means USA?
-GAME( 1993, ridgeracc,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (US, RR3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, purportedly 3 Screen version, reports as "-Foreign B-"
-GAME( 1993, ridgeracj,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Japan, RR1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracf,  ridgerac, namcos22,  ridgeracf, namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer Full Scale (World, RRF2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
-GAME( 1994, ridgera2,   0,        namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (World, RRS2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21 - NOT labeled "B" but based off Japan Rev.B
-GAME( 1994, ridgera2j,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Japan, RRS1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
-GAME( 1994, ridgera2ja, ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Japan, RRS1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
-GAME( 1994, ridgera28,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (World, RRS8)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-XX-XX - Test Location / proto??
+GAME( 1993, ridgerac,   0,        namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (World, RR2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
+GAME( 1993, ridgeraca,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (World, RR2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28
+GAME( 1993, ridgeracb,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (US, RR3 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, reports as "-Foreign B-" RR3 means USA?
+GAME( 1993, ridgeracc,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (US, RR3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, purportedly 3 Screen version, reports as "-Foreign B-"
+GAME( 1993, ridgeracj,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (Japan, RR1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
+GAME( 1993, ridgeracf,  ridgerac, namcos22,  ridgeracf, namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer Full Scale (World, RRF2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
+GAME( 1994, ridgera2,   0,        namcos22,  ridgera2,  namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (World, RRS2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21 - NOT labeled "B" but based off Japan Rev.B
+GAME( 1994, ridgera2j,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (Japan, RRS1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
+GAME( 1994, ridgera2ja, ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (Japan, RRS1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
+GAME( 1994, ridgera28,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (World, RRS8)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-XX-XX - Test Location / proto??
 GAME( 1994, cybrcomm,   0,        cybrcomm,  cybrcomm,  namcos22_state,  init_cybrcomm,  ROT0, "Namco", "Cyber Commando (Japan, CY1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94
-GAME( 1995, raverace,   0,        namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (World, RV2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
-GAME( 1995, raveracej,  raverace, namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Japan, RV1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
-GAME( 1995, raveraceja, raverace, namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Japan, RV1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
-GAME( 1994, acedrive,   0,        namcos22,  acedrvr,   namcos22_state,  init_acedrvr,   ROT0, "Namco", "Ace Driver: Racing Evolution (World, AD2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
+GAME( 1995, raverace,   0,        namcos22,  raverace,  namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (World, RV2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
+GAME( 1995, raveracej,  raverace, namcos22,  raverace,  namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (Japan, RV1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
+GAME( 1995, raveraceja, raverace, namcos22,  raverace,  namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (Japan, RV1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
+GAME( 1994, acedrive,   0,        namcos22,  acedrive,  namcos22_state,  init_acedrive,  ROT0, "Namco", "Ace Driver: Racing Evolution (World, AD2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
 GAME( 1996, victlap,    0,        namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (World, ADV2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/05/21 19:39:59
 GAME( 1996, victlapa,   victlap,  namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (World, ADV2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
 GAME( 1996, victlapj,   victlap,  namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Japan, ADV1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
@@ -6255,8 +6254,8 @@ GAME( 1994, alpinerd,   0,        alpine,    alpiner,   alpine_state,    init_al
 GAME( 1994, alpinerc,   alpinerd, alpine,    alpiner,   alpine_state,    init_alpiner,   ROT0, "Namco", "Alpine Racer (World, AR2 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, alpinerjc,  alpinerd, alpine,    alpiner,   alpine_state,    init_alpiner,   ROT0, "Namco", "Alpine Racer (Japan, AR1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, airco22b,   0,        airco22b,  airco22,   namcos22s_state, init_airco22,   ROT0, "Namco", "Air Combat 22 (Japan, ACS1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, cybrcycc,   0,        cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (World, CB2 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
-GAME( 1995, cybrcyccj,  cybrcycc, cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (Japan, CB1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
+GAME( 1995, cybrcycc,   0,        cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcycc,  ROT0, "Namco", "Cyber Cycles (World, CB2 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
+GAME( 1995, cybrcyccj,  cybrcycc, cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcycc,  ROT0, "Namco", "Cyber Cycles (Japan, CB1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
 GAME( 1995, dirtdash,   0,        dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (World, DT2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/?1/0? 21:03:?6, one ROM is bad
 GAME( 1995, dirtdasha,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (World, DT2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
 GAME( 1995, dirtdashj,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Japan, DT1 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:06:45
