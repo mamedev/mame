@@ -69,6 +69,8 @@ protected:
 	virtual void scsi_command() override;
 	virtual uint8_t scsi_get_data(int id, int pos) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
+	virtual attotime scsi_data_byte_period() override;
+	virtual attotime scsi_data_command_delay() override;
 
 	uint8_t params[8];
 };
