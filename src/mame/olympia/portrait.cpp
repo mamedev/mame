@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
+// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli, Angelo Salese
 /**************************************************************************
  Portraits
  (c) 1983 Olympia
@@ -108,6 +108,8 @@ DM81LS95 = TriState buffer
 void portrait_state::ctrl_w(uint8_t data)
 {
 	/* bits 4 and 5 are unknown */
+	// TODO: condition for just displaying stored camera image
+	// 0xf8 when capturing for the hi-score new pic, 0xb0 when displaying it from attract mode.
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);

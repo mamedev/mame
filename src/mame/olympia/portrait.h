@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
+// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli, Angelo Salese
 #ifndef MAME_INCLUDES_PORTRAIT_H
 #define MAME_INCLUDES_PORTRAIT_H
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
+// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli, Angelo Salese
 /***************************************************************************
 
   Portraits
@@ -166,38 +166,46 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	uint8_t *source = m_spriteram;
 	uint8_t *finish = source + 0x200;
 
-	// is anything beyond byte [3] really just work RAM buffer?
+	// TODO: is anything beyond byte [3] really just work RAM buffer?
 	for( ; source < finish; source += 0x10 )
 	{
-		int attr    = source[2];
+		u8 attr    = source[2];
 		if (BIT(attr, 7) != priority)
 			continue;
-		int sy      = source[0];
-		int sx      = source[1];
-		int tilenum = source[3];
+		u16 sy     = source[0];
+		u16 sx     = source[1];
+		u8 tilenum = source[3];
 
-		int color = ((tilenum&0xff)>>1)+0x00;
+		// TODO: may be given by source[4] and/or source[5] instead
+		u8 color = ((tilenum&0xff)>>1)+0x00;
 
-		int fy = attr & 0x20;
+		int fy = BIT(attr, 5);
 
-		if(attr & 0x04) sx |= 0x100;
-		if(attr & 0x08) sy |= 0x100;
+		if (BIT(attr, 2)) sx |= 0x100;
+		if (BIT(attr, 3)) sy |= 0x100;
 
 		sx += (source - m_spriteram) - 8;
 		sx &= 0x1ff;
 
-		// confirmed by monkeys climbing trees in stage 1
-		sy = ((511 - m_scroll) - 16) - sy;
-
-		// TODO: player photo flash and death animation sprites needs to apply some kind of offset correction
-		// particularly visible when going to the right
-		// entries $9150 / $9160 / $9190 for photo flash
-		// notice you can also get hit by seemingly invisible enemies when standing on right side
-		// cfr. stage 4 eagle.
-		// ...
+		// TODO: confirm Y calculation
+		// it expects to follow up whatever is the current scroll value (cfr. monkeys climbing trees in stage 1)
+		// but then there are various misc sprites that breaks this rule. Examples are:
+		// - player photo flash;
+		// - death animation sprites;
+		// - capturing photo frame in gameplay;
+		// PC=0x2828 is where all of these odd sprites happens, where:
+		// HL=ROM pointer for destination sprite pointer, IY=sprite pointer source
+		// where they copy the origin of the given sprite, read scroll buffer $9235-36 then apply offset,
+		// with [2] bits 7-6 set high and bits 5-4 copied from the source sprite.
+		// Note that this will break elsewhere by logically using any of the [2] bits,
+		// arguably SW does a very limited use to pinpoint what's the actual scroll disable condition,
+		// it just implicitly don't setup [4] to [7] ...
+		if ((source[5] & 0xf) == 0)
+			sy = (511 - 16) - sy;
+		else
+			sy = ((511 - m_scroll) - 16) - sy;
 
 		sy &= 0x1ff;
-
 
 		m_gfxdecode->gfx(0)->transpen(
 			bitmap, cliprect,
