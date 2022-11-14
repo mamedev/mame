@@ -45,8 +45,6 @@ void a800_rom_device::device_start()
 
 void a800_rom_device::device_reset()
 {
-	rd4_w(0);
-	rd5_w(1);
 }
 
 void a800_rom_device::cart_map(address_map &map)
@@ -132,7 +130,6 @@ void xegs_rom_device::device_reset()
 {
 	// TODO: random
 	m_bank = 0;
-	rd_both_w(1);
 }
 
 // RD5 always maps to the last bank

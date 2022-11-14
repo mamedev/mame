@@ -48,8 +48,6 @@ void a800_rom_ultracart_device::device_start()
 void a800_rom_ultracart_device::device_reset()
 {
 	m_bank = 0;
-	rd4_w(0);
-	rd5_w(1);
 }
 
 void a800_rom_ultracart_device::cart_map(address_map &map)

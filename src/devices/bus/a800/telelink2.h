@@ -17,6 +17,9 @@ public:
 	virtual void cart_map(address_map &map) override;
 	virtual void cctl_map(address_map &map) override;
 
+	// RD4 tied to +5V, assume always enabled
+	virtual std::tuple<int, int> get_initial_rd_state() override { return std::make_tuple(1, 1); }
+
 private:
 	virtual void device_start() override;
 	virtual void device_reset() override;

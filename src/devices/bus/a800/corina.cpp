@@ -54,7 +54,6 @@ void a800_rom_corina_device::device_reset()
 {
 	m_rom_bank = 0;
 	m_view.select(0);
-	rd_both_w(1);
 }
 
 void a800_rom_corina_device::cart_map(address_map &map)

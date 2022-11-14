@@ -41,8 +41,6 @@ void a800_rom_williams_device::device_reset()
 	// turboc1 (at least) reads ROM window without setting bank first,
 	// any non-zero value will make it to punt
 	m_bank = 0;
-	rd4_w(0);
-	rd5_w(1);
 }
 
 void a800_rom_williams_device::cart_map(address_map &map)

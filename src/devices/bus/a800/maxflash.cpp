@@ -49,9 +49,6 @@ void a800_maxflash_128kb_device::device_reset()
 
 	// NB: this starts with 0x7f in the older Atarimax 1MB version
 	m_bank = 0;
-
-	rd4_w(0);
-	rd5_w(1);
 }
 
 void a800_maxflash_128kb_device::cart_map(address_map &map)

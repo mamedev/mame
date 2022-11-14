@@ -330,10 +330,16 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="saltse02">
+	<software name="saltse02" supported="partial">
 		<description>600xl/800xl SALT Diagnostic Cartridge vSE.02</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+RAM test corrupts gfxs when RAM size is bigger than 16K
+Unemulated XTERN bus item [PBI]
+ITIA test returns not [GTIA]
+Voltage test fails
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -488,13 +494,14 @@ Align test never completes, burn-in test requires a test disk and writing to flo
 		</part>
 	</software>
 
-	<software name="alfclrcv" supported="partial">
+	<software name="alfclrcv" supported="no">
 		<description>Alf in the Color Caves</description>
 		<year>1984</year>
 		<publisher>Spinnaker</publisher>
 		<notes><![CDATA[
 a800: Doesn't complete first animation after selecting left tunnel during gameplay, [cart] handling (override right slot map?)
 Draws with solid orange at bottom of screen after selecting left tunnel, should be black [ANTIC]
+Crashes during attract
 ]]></notes>
 		<info name="developer" value="Joyce Hakansson Associates, Inc" />
 		<info name="serial" value="ALF-AT" />

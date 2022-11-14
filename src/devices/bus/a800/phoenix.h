@@ -16,6 +16,7 @@ public:
 
 	virtual void cart_map(address_map &map) override;
 	virtual void cctl_map(address_map &map) override;
+	virtual std::tuple<int, int> get_initial_rd_state() override { return std::make_tuple(0, 1); }
 
 protected:
 	virtual void device_start() override;
@@ -32,6 +33,7 @@ public:
 	a800_rom_blizzard_16kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void cart_map(address_map &map) override;
+	virtual std::tuple<int, int> get_initial_rd_state() override { return std::make_tuple(1, 1); }
 
 protected:
 	virtual void device_reset() override;

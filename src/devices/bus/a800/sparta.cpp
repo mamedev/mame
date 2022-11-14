@@ -79,14 +79,12 @@ void a800_rom_spartados_device::device_start()
 
 void a800_rom_spartados_device::device_reset()
 {
-	rd4_w(0);
-	rd5_w(1);
-
 	m_bank = 7;
 	m_subcart_enabled = false;
 	if (!m_subcart->exists())
 		m_subcart_rd4_enabled = m_subcart_rd5_enabled = 0;
-	// TODO: otherwise needs initial state for rd4/rd5
+	else
+		std::tie(m_subcart_rd4_enabled, m_subcart_rd5_enabled) = m_subcart->get_initial_rd_state();
 
 	m_cart_view.select(0);
 }

@@ -514,12 +514,12 @@ private:
 void a400_state::hw_iomap(address_map &map)
 {
 	map(0x0000, 0x00ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
-	map(0x0100, 0x01ff).noprw();
+//	map(0x0100, 0x01ff).noprw();
 	map(0x0200, 0x02ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x0300, 0x03ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0x0400, 0x04ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0x0500, 0x05ff).rw(m_cartleft, FUNC(a800_cart_slot_device::read_cctl), FUNC(a800_cart_slot_device::write_cctl));
-	map(0x0600, 0x07ff).noprw();
+//	map(0x0600, 0x07ff).noprw();
 }
 
 void a400_state::area_8000_map(address_map &map)
@@ -1753,9 +1753,12 @@ void a400_state::machine_reset()
 	{
 		m_cart_rd4_enabled = 0;
 		m_cart_rd5_enabled = 0;
-		m_cart_rd4_view.select(0);
-		m_cart_rd5_view.select(0);
 	}
+	else
+		std::tie(m_cart_rd4_enabled, m_cart_rd5_enabled) = m_cartleft->get_initial_rd_state();
+	
+	m_cart_rd4_view.select(m_cart_rd4_enabled);
+	m_cart_rd5_view.select(m_cart_rd5_enabled);
 }
 
 void a800_state::machine_reset()

@@ -52,8 +52,6 @@ void a800_sic_128kb_device::device_reset()
 	// value of 0 for config_bank_w confirmed
 	m_bank = 0;
 	m_write_protect = true;
-	rd4_w(0);
-	rd5_w(1);
 }
 
 // SIC! maps rd4 and rd5 linearly

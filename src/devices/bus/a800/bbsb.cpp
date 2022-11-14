@@ -39,7 +39,6 @@ void a800_rom_bbsb_device::device_reset()
 {
 	m_banks[0] = 0;
 	m_banks[1] = 0;
-	rd_both_w(1);
 }
 
 template <unsigned BankNum> u8 a800_rom_bbsb_device::read_bank(offs_t offset)

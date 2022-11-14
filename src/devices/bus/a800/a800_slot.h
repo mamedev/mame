@@ -68,6 +68,14 @@ public:
 	uint8_t* get_rom_base() { return m_rom; }
 	uint32_t get_rom_size() { return m_rom_size; }
 
+	///
+	/// Carts can either init RD4/RD5 at startup or not, depending on if they have
+	/// reset circuitry or not. Future expansion of this getter will return a third value,
+	/// giving back the timing value where the initialization should happen.
+	/// 
+	/// \return RD4, RD5 initial state
+	virtual std::tuple<int, int> get_initial_rd_state() { return std::make_tuple(0, 0); }
+
 protected:
 	device_a800_cart_interface(const machine_config &mconfig, device_t &device);
 
@@ -128,6 +136,7 @@ public:
 	template <unsigned Bank> void write_cart(offs_t offset, uint8_t data);
 	uint8_t read_cctl(offs_t offset);
 	void write_cctl(offs_t offset, uint8_t data);
+	auto get_initial_rd_state() { return m_cart->get_initial_rd_state(); }
 
 protected:
 	//a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

@@ -50,8 +50,7 @@ void a800_rom_phoenix_device::device_start()
 
 void a800_rom_phoenix_device::device_reset()
 {
-	rd4_w(0);
-	rd5_w(1);
+
 }
 
 void a800_rom_phoenix_device::cart_map(address_map &map)
@@ -92,7 +91,6 @@ a800_rom_blizzard_16kb_device::a800_rom_blizzard_16kb_device(const machine_confi
 
 void a800_rom_blizzard_16kb_device::device_reset()
 {
-	rd_both_w(1);
 }
 
 void a800_rom_blizzard_16kb_device::cart_map(address_map &map)

@@ -42,9 +42,6 @@ void a800_rom_telelink2_device::device_start()
 
 void a800_rom_telelink2_device::device_reset()
 {
-	// TODO: rd4 is likely disabled at startup then enabled somehow
-	rd4_w(1);
-	rd5_w(1);
 }
 
 

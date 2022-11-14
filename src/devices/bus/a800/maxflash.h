@@ -17,6 +17,7 @@ public:
 
 	virtual void cart_map(address_map &map) override;
 	virtual void cctl_map(address_map &map) override;
+	virtual std::tuple<int, int> get_initial_rd_state() override { return std::make_tuple(0, 1); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
