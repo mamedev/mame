@@ -5679,6 +5679,88 @@ ROM_END
 
 /***************************************************************************
 
+  Tiger Castlevania II: Simon's Quest (model 7-781)
+  * Sharp SM510 under epoxy (die label S81)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class tsimquest_state : public hh_sm510_state
+{
+public:
+	tsimquest_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tsimquest(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( tsimquest )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Whip Up")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Whip Down")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sword")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Jump Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Jump Forward")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Max Score")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void tsimquest_state::tsimquest(machine_config &config)
+{
+	sm510_tiger(config, 1436, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( tsimquest )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "s81", 0x0000, 0x1000, CRC(f6bd105f) SHA1(86255bf9fea63f27d10552fbbfc5f8764846f0ab) )
+
+	ROM_REGION( 413192, "screen", 0)
+	ROM_LOAD( "tsimquest.svg", 0, 413192, CRC(8351a240) SHA1(4f95ac8a17cdd80b8462a9813f0bbcae83bc41ea) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Karnov (model 7-783)
   * Sharp SM510 under epoxy (die label CMS54C, KMS582)
   * lcd screen with custom segments, 1-bit sound
@@ -10107,6 +10189,7 @@ CONS( 1993, nstarfox,     0,           0, nstarfox,     nstarfox,     nstarfox_s
 CONS( 1989, tgaunt,       0,           0, tgaunt,       tgaunt,       tgaunt_state,       empty_init, "Tiger Electronics (licensed from Tengen)", "Gauntlet (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1991, trobhood,     tgaunt,      0, trobhood,     trobhood,     tgaunt_state,       empty_init, "Tiger Electronics", "Robin Hood (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, tddragon,     0,           0, tddragon,     tddragon,     tddragon_state,     empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, tsimquest,    0,           0, tsimquest,    tsimquest,    tsimquest_state,    empty_init, "Tiger Electronics (licensed from Konami)", "Castlevania II: Simon's Quest (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, tkarnov,      0,           0, tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics (licensed from Data East)", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, tvindictr,    0,           0, tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics (licensed from Tengen)", "Vindicators (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, tgaiden,      0,           0, tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
