@@ -1182,7 +1182,16 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 
 	// look up priority and destination base addresses for y1
 	bitmap_ind8 &priority_bitmap = *blit.priority;
-	u8 *priority_baseaddr = &priority_bitmap.pix(y1, xpos);
+	u8 *priority_baseaddr = nullptr;
+	int prio_rowpixels = 0;
+	if (priority_bitmap.valid())
+	{
+		prio_rowpixels = priority_bitmap.rowpixels();
+		priority_baseaddr = &priority_bitmap.pix(y1, xpos);
+	}
+	else
+		assert((blit.tilemap_priority_code & 0xffff) == 0xff00);
+
 	typename _BitmapClass::pixel_t *dest_baseaddr = nullptr;
 	int dest_rowpixels = 0;
 	if (dest.valid())
@@ -1278,7 +1287,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 
 						dest0 += dest_rowpixels;
 						source0 += m_pixmap.rowpixels();
-						pmap0 += priority_bitmap.rowpixels();
+						pmap0 += prio_rowpixels;
 					}
 				}
 
@@ -1300,7 +1309,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 						dest0 += dest_rowpixels;
 						source0 += m_pixmap.rowpixels();
 						mask0 += m_flagsmap.rowpixels();
-						pmap0 += priority_bitmap.rowpixels();
+						pmap0 += prio_rowpixels;
 					}
 				}
 			}
@@ -1315,7 +1324,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 			break;
 
 		// advance to the next row on all our bitmaps
-		priority_baseaddr += priority_bitmap.rowpixels() * (nexty - y);
+		priority_baseaddr += prio_rowpixels * (nexty - y);
 		source_baseaddr += m_pixmap.rowpixels() * (nexty - y);
 		mask_baseaddr += m_flagsmap.rowpixels() * (nexty - y);
 		dest_baseaddr += dest_rowpixels * (nexty - y);
