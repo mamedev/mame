@@ -12,7 +12,7 @@ single CCTL register that covers RD5 and bank.
 #include "emu.h"
 #include "atrax.h"
 
-DEFINE_DEVICE_TYPE(A800_ROM_ATRAX, a800_rom_atrax_device, "a800_atrax",   "Atari 800 Atrax 128KB ROM cartridge")
+DEFINE_DEVICE_TYPE(A800_ROM_ATRAX, a800_rom_atrax_device, "a800_atrax", "Atari 8-bit Atrax 128KB cart")
 
 
 a800_rom_atrax_device::a800_rom_atrax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -14,9 +14,9 @@ TODO:
 #include "sic.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(A800_SIC_128KB, a800_sic_128kb_device, "a800_siccart_128kb", "Atari 800 SIC! 128KB flash ROM")
-DEFINE_DEVICE_TYPE(A800_SIC_256KB, a800_sic_256kb_device, "a800_siccart_256kb", "Atari 800 SIC! 256KB flash ROM")
-DEFINE_DEVICE_TYPE(A800_SIC_512KB, a800_sic_512kb_device, "a800_siccart_512kb", "Atari 800 SIC! 512KB flash ROM")
+DEFINE_DEVICE_TYPE(A800_SIC_128KB, a800_sic_128kb_device, "a800_siccart_128kb", "Atari 8-bit SIC! 128KB flash ROM cart")
+DEFINE_DEVICE_TYPE(A800_SIC_256KB, a800_sic_256kb_device, "a800_siccart_256kb", "Atari 8-bit SIC! 256KB flash ROM cart")
+DEFINE_DEVICE_TYPE(A800_SIC_512KB, a800_sic_512kb_device, "a800_siccart_512kb", "Atari 8-bit SIC! 512KB flash ROM cart")
 
 a800_sic_128kb_device::a800_sic_128kb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, type, tag, owner, clock)

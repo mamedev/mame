@@ -15,10 +15,10 @@ Williams cart scheme and variants
 #include "emu.h"
 #include "williams.h"
 
-DEFINE_DEVICE_TYPE(A800_ROM_WILLIAMS,  a800_rom_williams_device,  "a800_williams", "Atari 800 64K ROM Carts Williams")
-DEFINE_DEVICE_TYPE(A800_ROM_EXPRESS,   a800_rom_express_device,   "a800_express",  "Atari 800 64K ROM Carts Express")
-DEFINE_DEVICE_TYPE(A800_ROM_DIAMOND,   a800_rom_diamond_device,   "a800_diamond",  "Atari 800 64K ROM Carts Diamond")
-DEFINE_DEVICE_TYPE(A800_ROM_TURBO,     a800_rom_turbo_device,     "a800_turbo",    "Atari 800 64K/128K ROM Carts Turbosoft")
+DEFINE_DEVICE_TYPE(A800_ROM_WILLIAMS,  a800_rom_williams_device,  "a800_williams", "Atari 8-bit Williams cart")
+DEFINE_DEVICE_TYPE(A800_ROM_EXPRESS,   a800_rom_express_device,   "a800_express",  "Atari 8-bit Express cart")
+DEFINE_DEVICE_TYPE(A800_ROM_DIAMOND,   a800_rom_diamond_device,   "a800_diamond",  "Atari 8-bit Diamond cart")
+DEFINE_DEVICE_TYPE(A800_ROM_TURBO,     a800_rom_turbo_device,     "a800_turbo",    "Atari 8-bit Turbosoft 64KB/128KB cart")
 
 a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, type, tag, owner, clock)

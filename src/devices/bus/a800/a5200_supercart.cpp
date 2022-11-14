@@ -16,7 +16,7 @@ TODO:
 
 #include "a5200_supercart.h"
 
-DEFINE_DEVICE_TYPE(A5200_ROM_SUPERCART,      a5200_rom_supercart_device,      "a5200_supercart",     "Atari 5200 512K Super Cart")
+DEFINE_DEVICE_TYPE(A5200_ROM_SUPERCART, a5200_rom_supercart_device, "a5200_supercart", "Atari 5200 Super Cart")
 
 
 a5200_rom_supercart_device::a5200_rom_supercart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

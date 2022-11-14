@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli, Angelo Salese
 /**************************************************************************************************
 
- A800 SpartaDOS X (SDX) cart emulation
+SpartaDOS X (SDX) cart emulation
 
 https://sdx.atari8.info/index.php?show=en_introduction
 
@@ -19,8 +19,8 @@ Should mirror $e8-$ef to $fx by logic.
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(A800_ROM_SPARTADOS, a800_rom_spartados_device, "a800_sparta", "Atari 800 SpartaDOS X ROM Carts")
-DEFINE_DEVICE_TYPE(A800_ROM_SPARTADOS_128KB, a800_rom_spartados_128kb_device, "a800_sparta_128kb", "Atari 800 SpartaDOS X 128KB ROM Carts")
+DEFINE_DEVICE_TYPE(A800_ROM_SPARTADOS,       a800_rom_spartados_device,       "a800_sparta",       "Atari 8-bit SpartaDOS X cart")
+DEFINE_DEVICE_TYPE(A800_ROM_SPARTADOS_128KB, a800_rom_spartados_128kb_device, "a800_sparta_128kb", "Atari 8-bit SpartaDOS X 128KB cart")
 
 a800_rom_spartados_device::a800_rom_spartados_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, type, tag, owner, clock)

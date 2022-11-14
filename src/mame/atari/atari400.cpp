@@ -18,7 +18,22 @@
       depends on above;
     - a600xl, a1200xl: crashes on MMU test in Acid800;
     - slot support for PBI/ECI bus;
-    - slot support for overlay DYI HW mods (i.e. dual Pokey, Ultimate1MB, Covox, VBXE)
+    - slot support for overlay DIY HW mods:
+      \- PokeyMAX 
+         (with stereo support via second Pokey alias accessed to $d280-$d2ff,
+         cfr. yoomp);
+      \- Ultimate1MB;
+      \- Covox;
+      \- VBXE "VideoBoard XE";
+      \- Incognito;
+      \- Rapidus;
+      \- AKI PS/2 keyboard inteface;
+      \- RAMBO XL and COMPY RAM expansion;
+      \- APE Warp+ OS 32-in-1;
+      \- MyBIOS for MyIDE-II;
+      \- Bit-3 Full-View 80
+         (technically maps in cart CCTL space, but installs in RAM card slot 3
+         and overrides ANTIC+GTIA layer when enabled);
 
     2009-05 FP changes:
      Factored out MESS specific code from MAME

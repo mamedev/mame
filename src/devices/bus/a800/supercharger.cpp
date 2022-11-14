@@ -6,7 +6,8 @@
 "SuperCharger"
 
 multiply/divide math unit (unknown 18-pins chip type, scratched on PCB)
-used by "Assault Force" floppy disk
+used by "Assault Force" floppy disk.
+Not to be confused with Starpath SuperCharger, which is for Atari VCS.
 
 **************************************************************************************************/
 
@@ -14,7 +15,7 @@ used by "Assault Force" floppy disk
 #include "supercharger.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(A800_SUPER_CHARGER, a800_supercharger_device, "a800_supercharger", "Atari 800 SuperCharger 3D math unit")
+DEFINE_DEVICE_TYPE(A800_SUPER_CHARGER, a800_supercharger_device, "a800_supercharger", "Atari 8-bit SuperCharger 3D math unit cart")
 
 a800_supercharger_device::a800_supercharger_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, A800_SUPER_CHARGER, tag, owner, clock)

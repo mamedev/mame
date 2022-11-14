@@ -24,9 +24,9 @@ TODO:
 #include "emu.h"
 #include "ultracart.h"
 
-DEFINE_DEVICE_TYPE(A800_ROM_ULTRACART,     a800_rom_ultracart_device,     "a800_ultracart",    "Atari 800 64K ROM Carts Ultracart \"MicroCalc\"")
-DEFINE_DEVICE_TYPE(A800_ROM_BLIZZARD_32KB, a800_rom_blizzard_32kb_device, "a800_blizzard_32kb",    "Atari 800 Blizzard 32KB ROM cartridge")
-DEFINE_DEVICE_TYPE(A800_ROM_ADAWLIAH,      a800_rom_adawliah_device,      "a800_adawliah",    "Atari 800 aDawliah 32KB ROM cartridge")
+DEFINE_DEVICE_TYPE(A800_ROM_ULTRACART,     a800_rom_ultracart_device,     "a800_ultracart",    "Atari 8-bit Ultracart \"MicroCalc\" cart")
+DEFINE_DEVICE_TYPE(A800_ROM_BLIZZARD_32KB, a800_rom_blizzard_32kb_device, "a800_blizzard_32kb",    "Atari 8-bit Blizzard 32KB cart")
+DEFINE_DEVICE_TYPE(A800_ROM_ADAWLIAH,      a800_rom_adawliah_device,      "a800_adawliah",    "Atari 8-bit aDawliah 32KB cart")
 
 
 a800_rom_ultracart_device::a800_rom_ultracart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

@@ -1,12 +1,21 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
+/**************************************************************************************************
+
+Maxflash
+
+TODO:
+- alt flash configs;
+- alt buggy revision of 1MB version, with m_bank starting at 0x7f;
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "maxflash.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(A800_MAXFLASH_128KB, a800_maxflash_128kb_device, "maxflash_128kb", "Atarimax MaxFlash 128KB Flash ROM")
-DEFINE_DEVICE_TYPE(A800_MAXFLASH_1MB,   a800_maxflash_1mb_device,   "maxflash_1mb",   "Atarimax MaxFlash 1MB Flash ROM")
+DEFINE_DEVICE_TYPE(A800_MAXFLASH_128KB, a800_maxflash_128kb_device, "maxflash_128kb", "Atari 8-bit Atarimax Maxflash 128K flash ROM cart")
+DEFINE_DEVICE_TYPE(A800_MAXFLASH_1MB,   a800_maxflash_1mb_device,   "maxflash_1mb",   "Atari 8-bit Atarimax Maxflash 1MB flash ROM cart")
 
 a800_maxflash_128kb_device::a800_maxflash_128kb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, type, tag, owner, clock)
@@ -115,4 +124,3 @@ void a800_maxflash_1mb_device::cctl_map(address_map &map)
 	map(0x00, 0x7f).rw(FUNC(a800_maxflash_1mb_device::rom_bank_r), FUNC(a800_maxflash_1mb_device::rom_bank_w));
 	map(0x80, 0xff).rw(FUNC(a800_maxflash_1mb_device::disable_rom_r), FUNC(a800_maxflash_1mb_device::disable_rom_w));
 }
-

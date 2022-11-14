@@ -22,10 +22,10 @@ TODO:
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(A800_ROM_OSS8K, a800_rom_oss8k_device,   "a800_oss8k", "Atari 800 ROM Carts OSS 8K")
-DEFINE_DEVICE_TYPE(A800_ROM_OSS34, a800_rom_oss034m_device, "a800_034m",  "Atari 800 ROM Carts OSS-034M")
-DEFINE_DEVICE_TYPE(A800_ROM_OSS43, a800_rom_oss043m_device, "a800_043m",  "Atari 800 ROM Carts OSS-043M")
-DEFINE_DEVICE_TYPE(A800_ROM_OSS91, a800_rom_oss091m_device,   "a800_m091",  "Atari 800 ROM Carts OSS-M091")
+DEFINE_DEVICE_TYPE(A800_ROM_OSS8K, a800_rom_oss8k_device,   "a800_oss8k", "Atari 8-bit OSS 8K cart")
+DEFINE_DEVICE_TYPE(A800_ROM_OSS34, a800_rom_oss034m_device, "a800_034m",  "Atari 8-bit OSS-034M cart")
+DEFINE_DEVICE_TYPE(A800_ROM_OSS43, a800_rom_oss043m_device, "a800_043m",  "Atari 8-bit OSS-043M cart")
+DEFINE_DEVICE_TYPE(A800_ROM_OSS91, a800_rom_oss091m_device, "a800_m091",  "Atari 8-bit OSS-M091 cart")
 
 /*-------------------------------------------------
 

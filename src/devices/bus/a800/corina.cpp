@@ -19,8 +19,8 @@ TODO:
 #include "emu.h"
 #include "corina.h"
 
-DEFINE_DEVICE_TYPE(A800_ROM_CORINA,      a800_rom_corina_device,         "a800_corina",        "Atari 800 Corina 1MB flash ROM")
-DEFINE_DEVICE_TYPE(A800_ROM_CORINA_SRAM, a800_rom_corina_sram_device,    "a800_corina_sram",   "Atari 800 Corina 512KB flash ROM + 512KB RAM")
+DEFINE_DEVICE_TYPE(A800_ROM_CORINA,      a800_rom_corina_device,         "a800_corina",        "Atari 8-bit Corina 1MB flash ROM cart")
+DEFINE_DEVICE_TYPE(A800_ROM_CORINA_SRAM, a800_rom_corina_sram_device,    "a800_corina_sram",   "Atari 8-bit Corina 512KB flash ROM + 512KB RAM cart")
 
 a800_rom_corina_device::a800_rom_corina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: a800_rom_device(mconfig, type, tag, owner, clock)
