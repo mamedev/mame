@@ -2433,6 +2433,15 @@ ROM_START( bchopper )
 
 	ROM_REGION( 0x10000, "samples", 0 ) // samples
 	ROM_LOAD( "mh_c-v0-b.ic44", 0x00000, 0x10000, CRC(d0c27e58) SHA1(fec76217cc0c04c723989c3ec127a2bd33d64c60) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
+	ROM_REGION( 0x0600, "pals", 0 )
+	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "mh-c-3f-.ic13",  0x0400, 0x0117, CRC(2d774e1e) SHA1(373c3cbfaf983961c17ebe96b5aff850f36cb30c) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 ROM_START( mrheli )
@@ -2469,6 +2478,15 @@ ROM_START( mrheli )
 
 	ROM_REGION( 0x10000, "samples", 0 ) // samples
 	ROM_LOAD( "mh_c-v0-b.ic44", 0x00000, 0x10000, CRC(d0c27e58) SHA1(fec76217cc0c04c723989c3ec127a2bd33d64c60) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
+	ROM_REGION( 0x0600, "pals", 0 )
+	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "mh-c-3f-.ic13",  0x0400, 0x0117, CRC(2d774e1e) SHA1(373c3cbfaf983961c17ebe96b5aff850f36cb30c) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 /*
@@ -2725,10 +2743,14 @@ ROM_START( imgfight )
 	ROM_LOAD( "if-c-v0.ic44", 0x00000, 0x10000, CRC(cb64a194) SHA1(940fad6b9147bccc8290e112f5973f8ea062b52f) )
 	ROM_LOAD( "if-c-v1.ic45", 0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
 
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
 	ROM_REGION( 0x0600, "pals", 0 )
 	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "if-c-3f.ic13",   0x0400, 0x0117, CRC(2d774e1e) SHA1(373c3cbfaf983961c17ebe96b5aff850f36cb30c) ) // PAL16L8 - bruteforced - located on M72-C-A top board
+	ROM_LOAD( "if-c-3f-.ic13",  0x0400, 0x0117, CRC(2d774e1e) SHA1(373c3cbfaf983961c17ebe96b5aff850f36cb30c) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 ROM_START( imgfightj )
@@ -2765,10 +2787,14 @@ ROM_START( imgfightj )
 	ROM_LOAD( "if-c-v0.ic44", 0x00000, 0x10000, CRC(cb64a194) SHA1(940fad6b9147bccc8290e112f5973f8ea062b52f) )
 	ROM_LOAD( "if-c-v1.ic45", 0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
 
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
 	ROM_REGION( 0x0600, "pals", 0 )
 	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "if-c-3f.ic13",   0x0400, 0x0117, CRC(2d774e1e) SHA1(373c3cbfaf983961c17ebe96b5aff850f36cb30c) ) // PAL16L8 - bruteforced - located on M72-C-A top board
+	ROM_LOAD( "if-c-3f-.ic13",  0x0400, 0x0117, CRC(2d774e1e) SHA1(373c3cbfaf983961c17ebe96b5aff850f36cb30c) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 ROM_START( imgfightb ) // mostly identical to imgfightj content-wise, it's a 4 PCB stack bootleg with flying wires
@@ -2847,6 +2873,15 @@ ROM_START( loht )
 
 	ROM_REGION( 0x10000, "samples", 0 ) // samples
 	ROM_LOAD( "tom_m44.ic44", 0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
+	ROM_REGION( 0x0600, "pals", 0 )
+	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "tom-c-3f.ic13",  0x0400, 0x0117, CRC(2d774e1e) SHA1(373c3cbfaf983961c17ebe96b5aff850f36cb30c) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 /*
@@ -2921,26 +2956,35 @@ ROM_START( lohtj )
 	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
 	ROM_LOAD( "tom_c-pr-.ic1",  0x00000, 0x01000, CRC(9fa9b496) SHA1(b529bcd7bf123894e11f2a8df8826932122e375a) ) // i8751 MCU labeled  TOM C-PR-
 
-	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_REGION( 0x080000, "sprites", 0 ) // same data as loht above, just mask ROMs without labels
 	ROM_LOAD( "r200",     0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )  // sprites
 	ROM_LOAD( "r210",     0x20000, 0x20000, CRC(8ec5f6f3) SHA1(210f2753f5eeb06396758d21ab1778d459add247) )
 	ROM_LOAD( "r220",     0x40000, 0x20000, CRC(a41d3bfd) SHA1(536fb7c0321dbbc1a8b73e9647fba9c53a253fcc) )
 	ROM_LOAD( "r230",     0x60000, 0x20000, CRC(9d81a25b) SHA1(a354537c2fbba85f06485aa8487d7583a7133357) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "gfx2", 0 ) // same data as loht above, just mask ROMs without labels
 	ROM_LOAD( "r2a0.a0",  0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )  // tiles #1
 	ROM_LOAD( "r2a1.a1",  0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
 	ROM_LOAD( "r2a2.a2",  0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
 	ROM_LOAD( "r2a3.a3",  0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "gfx3", 0 ) // same data as loht above, just mask ROMs without labels
 	ROM_LOAD( "078.b0",   0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )  // tiles #2
 	ROM_LOAD( "079.b1",   0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
 	ROM_LOAD( "080.b2",   0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
 	ROM_LOAD( "081.b3",   0x30000, 0x10000, CRC(f01fe899) SHA1(c5ab967b7af55a757638bcdc9975f4b15064022d) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) // samples
-	ROM_LOAD( "082",      0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
+	ROM_REGION( 0x10000, "samples", 0 ) // same data as loht above, just mask ROM without label
+	ROM_LOAD( "082",      0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) ) // samples
+
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
+	ROM_REGION( 0x0600, "pals", 0 )
+	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "tom-c-3f.ic13",  0x0400, 0x0117, CRC(2d774e1e) SHA1(373c3cbfaf983961c17ebe96b5aff850f36cb30c) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 /*
@@ -3022,7 +3066,6 @@ ROM_START( lohtb2 )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
 	ROM_LOAD( "loht-a19.bin",  0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )  // tiles #1
-//  ROM_LOAD( "loht-a20.bin",  0x10000, 0x10000, BAD_DUMP CRC(db2e3d77) SHA1(3f0758f74490b084321d8b2da29525dd1f19da09) )
 	ROM_LOAD( "loht-a20.bin",  0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
 	ROM_LOAD( "loht-a18.bin",  0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
 	ROM_LOAD( "loht-a21.bin",  0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
@@ -3400,6 +3443,15 @@ ROM_START( xmultiplm72 )
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "t52.v0.ic44",       0x00000, 0x20000, CRC(2db1bd80) SHA1(657006d0642ec7fb949bb52821d78fe51a599415) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
+	ROM_REGION( 0x0600, "pals", 0 )
+	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "xm-c-3f-.ic13",  0x0400, 0x0117, CRC(f43e91e4) SHA1(37dd9b9436ad57232da7fd57040311ac140c1841) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 
@@ -3436,10 +3488,14 @@ ROM_START( dbreedm72 )
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "db_c-v0.ic44",  0x00000, 0x20000, CRC(312f7282) SHA1(742d56980b4618180e9a0e02051c5aec4d5cdae4) )
 
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
 	ROM_REGION( 0x0600, "pals", 0 )
 	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "db-c-3f.ic13",   0x0400, 0x0117, CRC(7184d421) SHA1(3120ac2ca32e89d2f2abdb278a8c8cfa298aad75) ) // PAL16L8 - bruteforced - located on M72-C-A top board
+	ROM_LOAD( "db-c-3f-.ic13",  0x0400, 0x0117, CRC(7184d421) SHA1(3120ac2ca32e89d2f2abdb278a8c8cfa298aad75) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 ROM_START( dbreedjm72 )
@@ -3475,10 +3531,14 @@ ROM_START( dbreedjm72 )
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "db_c-v0.ic44",  0x00000, 0x20000, CRC(312f7282) SHA1(742d56980b4618180e9a0e02051c5aec4d5cdae4) )
 
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
 	ROM_REGION( 0x0600, "pals", 0 )
 	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "db-c-3f.ic13",   0x0400, 0x0117, CRC(7184d421) SHA1(3120ac2ca32e89d2f2abdb278a8c8cfa298aad75) ) // PAL16L8 - bruteforced - located on M72-C-A top board
+	ROM_LOAD( "db-c-3f-.ic13",  0x0400, 0x0117, CRC(7184d421) SHA1(3120ac2ca32e89d2f2abdb278a8c8cfa298aad75) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 
@@ -3514,6 +3574,15 @@ ROM_START( dkgensanm72 )
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "gen-vo.bin",   0x00000, 0x20000, CRC(d8595c66) SHA1(97920c9947fbac609fb901415e5471c6e4ca066c) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
+	ROM_REGION( 0x0600, "pals", 0 ) // where you see gen=72= actual label reads GEN(72)
+	ROM_LOAD( "m72_a-3d-.ic11",      0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m72_a-4d-.ic19",      0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "gen=m72=c-3f-b.ic13", 0x0400, 0x0117, CRC(028932a4) SHA1(04ec1fc874e7edb646777b301421953b26f49587) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 
@@ -3550,10 +3619,14 @@ ROM_START( airduelm72 )
 	ROM_REGION( 0x20000, "samples", 0 )
 	ROM_LOAD( "ad-v0.ic44", 0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
 
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
 	ROM_REGION( 0x0600, "pals", 0 )
 	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "ad-c-3f.ic13",   0x0400, 0x0117, CRC(9748fa38) SHA1(cc883dd801be03f2559c0dcd77580fe7d9546ed3) ) // PAL16L8 - bruteforced - located on M72-C-A top board
+	ROM_LOAD( "ad-c-3f-.ic13",  0x0400, 0x0117, CRC(9748fa38) SHA1(cc883dd801be03f2559c0dcd77580fe7d9546ed3) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 
@@ -3590,14 +3663,18 @@ ROM_START( airdueljm72 )
 	ROM_REGION( 0x20000, "samples", 0 )
 	ROM_LOAD( "ad-v0.ic44", 0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
 
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
 	ROM_REGION( 0x0600, "pals", 0 )
 	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "ad-c-3f.ic13",   0x0400, 0x0117, CRC(9748fa38) SHA1(cc883dd801be03f2559c0dcd77580fe7d9546ed3) ) // PAL16L8 - bruteforced - located on M72-C-A top board
+	ROM_LOAD( "ad-c-3f-.ic13",  0x0400, 0x0117, CRC(9748fa38) SHA1(cc883dd801be03f2559c0dcd77580fe7d9546ed3) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 
-ROM_START( gallopa )
+ROM_START( gallopm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cc-c-h0.ic40", 0x00001, 0x20000, CRC(2217dcd0) SHA1(9485b6c3eec99e720439e69dcbe0e55798bbff1c) )
 	ROM_LOAD16_BYTE( "cc-c-l0.ic37", 0x00000, 0x20000, CRC(ff39d7fb) SHA1(fad95f76050fce04464268b5edff6622b2cb798f) )
@@ -3630,10 +3707,14 @@ ROM_START( gallopa )
 	ROM_REGION( 0x20000, "samples", 0 ) // samples - same data as the cosmccop/gallop sets
 	ROM_LOAD( "cc-c-v0.ic44", 0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )   // == cc-d-v0.ic14
 
+	ROM_REGION( 0x0200, "proms", 0 ) // Located on M72-A-C CPU/Sound board
+	ROM_LOAD( "m72_a-8l-.ic66", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m72_a-9l-.ic75", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
 	ROM_REGION( 0x0600, "pals", 0 )
 	ROM_LOAD( "m72_a-3d-.ic11", 0x0000, 0x0117, CRC(8a3732ff) SHA1(6e3039e7dc424cbef7156312fa1ce67d7b082d30) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m72_a-4d-.ic19", 0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "cc-c-3f.ic13",   0x0400, 0x0117, CRC(16ca7c50) SHA1(8291bb2fc12c374a970cdb7da6315b32a01cf3b8) ) // PAL16L8 - bruteforced - located on M72-C-A top board
+	ROM_LOAD( "cc-c-3f-.ic13",  0x0400, 0x0117, CRC(16ca7c50) SHA1(8291bb2fc12c374a970cdb7da6315b32a01cf3b8) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
 
@@ -3726,10 +3807,10 @@ ROM_START( hharry ) // where you see gen=81= actual label reads GEN(81)
 	ROM_LOAD( "m81_a-9p-.ic74", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "m81_b-9h-.ic94",       0x0000, 0x0117, CRC(4bc1d393) SHA1(d9358a409b4568839ee6cea7241e37f557c3d3a9) ) // TIBPAL-16L8-25 - bruteforced - located on M81-B-B daughterboard
-	ROM_LOAD( "m81_a-5l-.ic28",       0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // TIBPAL-16L8-25 - bruteforced
-	ROM_LOAD( "m81_a-2h-.ic2",        0x0400, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
-	ROM_LOAD( "gen=81=_a-7d-a.ic48",  0x0600, 0x0117, CRC(92fe9eff) SHA1(970f9ed9b2fc3289cded9cde2b68cce2106fae7d) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "m81_b-9h-.ic94",      0x0000, 0x0117, CRC(4bc1d393) SHA1(d9358a409b4568839ee6cea7241e37f557c3d3a9) ) // TIBPAL-16L8-25 - bruteforced - located on M81-B-B daughterboard
+	ROM_LOAD( "m81_a-5l-.ic28",      0x0200, 0x0117, CRC(56c29834) SHA1(a66c589845f9995c673325f1161c687eb90d68c1) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "m81_a-2h-.ic2",       0x0400, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "gen=81=_a-7d-a.ic48", 0x0600, 0x0117, CRC(92fe9eff) SHA1(970f9ed9b2fc3289cded9cde2b68cce2106fae7d) ) // TIBPAL-16L8-25 - bruteforced
 ROM_END
 
 
@@ -3762,6 +3843,10 @@ ROM_START( dbreed )
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "db_a-v0.rom", 0x00000, 0x20000, CRC(312f7282) SHA1(742d56980b4618180e9a0e02051c5aec4d5cdae4) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // proms - located on M81-A-B mainboard
+	ROM_LOAD( "m81_a-9l-.ic72", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "m81_a-9p-.ic74", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
 
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "m81_b-9h-.ic94", 0x0000, 0x0117, CRC(4bc1d393) SHA1(d9358a409b4568839ee6cea7241e37f557c3d3a9) ) // TIBPAL-16L8-25 - bruteforced - located on M81-B-B daughterboard
@@ -3807,6 +3892,16 @@ ROM_START( majtitle )
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "mt_vo.bin",    0x00000, 0x20000, CRC(eb24bb2c) SHA1(9fca04fba0249e8213dd164eb6829e1a5acbee65) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // proms - located on M82-B-B daughterboard
+	ROM_LOAD( "mt_b-6a-.ic37", 0x0000, 0x0100, NO_DUMP ) // TBP24S10
+	ROM_LOAD( "mt_b-7c-.ic47", 0x0100, 0x0100, NO_DUMP ) // TBP24S10
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "mt_b-3q-.ic23", 0x0000, 0x0117, CRC(8c864543) SHA1(1167524b72a4d72898dcdc2561a9706f8683c888) ) // TIBPAL-16L8-25 - bruteforced - located on M82-B-B daughterboard
+	ROM_LOAD( "mt_a-2h-.ic5",  0x0200, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "mt_a-5l-.ic31", 0x0400, 0x0117, CRC(e3064bfe) SHA1(c25b0d734be332042f86661d8743008c2a9d3a4e) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "mt_a-7d-.ic43", 0x0600, 0x0117, CRC(d7ec1cc6) SHA1(94afb0098206777d68de5e6122114fdc76618931) ) // TIBPAL-16L8-25 - bruteforced
 ROM_END
 
 ROM_START( majtitlej )
@@ -3841,6 +3936,16 @@ ROM_START( majtitlej )
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "mt_vo.bin",    0x00000, 0x20000, CRC(eb24bb2c) SHA1(9fca04fba0249e8213dd164eb6829e1a5acbee65) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // proms - located on M82-B-B daughterboard
+	ROM_LOAD( "mt_b-6a-.ic37", 0x0000, 0x0100, NO_DUMP ) // TBP24S10
+	ROM_LOAD( "mt_b-7c-.ic47", 0x0100, 0x0100, NO_DUMP ) // TBP24S10
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "mt_a-2h-.ic5",  0x0000, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "mt_a-5l-.ic31", 0x0200, 0x0117, CRC(e3064bfe) SHA1(c25b0d734be332042f86661d8743008c2a9d3a4e) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "mt_a-7d-.ic43", 0x0400, 0x0117, CRC(d7ec1cc6) SHA1(94afb0098206777d68de5e6122114fdc76618931) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "mt_b-3q-.ic23", 0x0600, 0x0117, CRC(8c864543) SHA1(1167524b72a4d72898dcdc2561a9706f8683c888) ) // TIBPAL-16L8-25 - bruteforced - located on M82-B-B daughterboard
 ROM_END
 
 
@@ -3876,6 +3981,11 @@ ROM_START( airduel )
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "ad_=m82=_a-v0-d.ic12",    0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "mt_a-2h-.ic5",  0x0000, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "mt_a-5l-.ic31", 0x0200, 0x0117, CRC(e3064bfe) SHA1(c25b0d734be332042f86661d8743008c2a9d3a4e) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "mt_a-7d-.ic43", 0x0400, 0x0117, CRC(d7ec1cc6) SHA1(94afb0098206777d68de5e6122114fdc76618931) ) // TIBPAL-16L8-25 - bruteforced
 ROM_END
 
 ROM_START( airduelu )
@@ -3910,6 +4020,11 @@ ROM_START( airduelu )
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "r10-voice.ic12",    0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "mt_a-2h-.ic5",  0x0000, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "mt_a-5l-.ic31", 0x0200, 0x0117, CRC(e3064bfe) SHA1(c25b0d734be332042f86661d8743008c2a9d3a4e) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "mt_a-7d-.ic43", 0x0400, 0x0117, CRC(d7ec1cc6) SHA1(94afb0098206777d68de5e6122114fdc76618931) ) // TIBPAL-16L8-25 - bruteforced
 ROM_END
 
 
@@ -4014,6 +4129,12 @@ ROM_START( dkgensanm82 )
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "gen_=m84=_a-v0-d.ic12",   0x00000, 0x20000, CRC(d8595c66) SHA1(97920c9947fbac609fb901415e5471c6e4ca066c) )
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "mt_a-2h-.ic5",        0x0000, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "mt_a-5l-.ic31",       0x0200, 0x0117, CRC(e3064bfe) SHA1(c25b0d734be332042f86661d8743008c2a9d3a4e) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "gen=m84=a-7d-d.ic43", 0x0400, 0x0117, CRC(a3ee35fe) SHA1(c6d448c245d7c7dde981c970ce70f7d0f43723ed) ) // TIBPAL-16L8-25 labeled GEN(M84)-A-7D-D - bruteforced
+	ROM_LOAD( "gen=m72=c-3f-b.ic23", 0x0600, 0x0117, CRC(028932a4) SHA1(04ec1fc874e7edb646777b301421953b26f49587) ) // TIBPAL-16L8-25 labeled GEN(M72)-C-3F-B - bruteforced - located on M82-B-B daughterboard
 ROM_END
 
 
@@ -4053,8 +4174,8 @@ ROM_START( rtype2 )
 	ROM_LOAD( "rt2_a-vo.ic14", 0x00000, 0x20000, CRC(637172d5) SHA1(9dd0dc409306287238826bf301e2a7a12d6cd9ce) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // located on M84-B-A daughterboard
-	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
-	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
+	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
 
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "rt2-a-2h-.5",  0x0000, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
@@ -4095,8 +4216,8 @@ ROM_START( rtype2j )
 	ROM_LOAD( "rt2_a-vo.ic14", 0x00000, 0x20000, CRC(637172d5) SHA1(9dd0dc409306287238826bf301e2a7a12d6cd9ce) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // located on M84-B-A daughterboard
-	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
-	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
+	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
 
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "rt2-a-2h-.5",  0x0000, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
@@ -4137,8 +4258,8 @@ ROM_START( rtype2jc )
 	ROM_LOAD( "rt2_a-vo.ic14", 0x00000, 0x20000, CRC(637172d5) SHA1(9dd0dc409306287238826bf301e2a7a12d6cd9ce) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // located on M84-B-A daughterboard
-	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
-	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
+	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
 
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "rt2-a-2h-.5",  0x0000, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
@@ -4175,15 +4296,15 @@ ROM_START( hharryu ) // where you see gen=84= actual label reads GEN(84)
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "gen=84=_a-v0-f.ic17", 0x00000, 0x20000, CRC(faaacaff) SHA1(ea3a3920255c07aa9c0a7e0191eae257a9f7f558) )
 
-	ROM_REGION( 0x200, "proms", 0 ) // located on M84-C-A top board - NOT dumped from PCB, taken from bootleg
-	ROM_LOAD( "gen=84=_c-4n-.ic21", 0x0000, 0x0100, BAD_DUMP CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
-	ROM_LOAD( "gen=84=_c-4p-.ic22", 0x0100, 0x0100, BAD_DUMP CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+	ROM_REGION( 0x200, "proms", 0 ) // located on M84-C-A top board
+	ROM_LOAD( "gen=84=_c-4n-.ic21", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "gen=84=_c-4p-.ic22", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "gen=84=_c-3a.ic8",  0x0000, 0x0117, CRC(c1e19913) SHA1(7292ea25df818fe25e00dc4f37b3338abf2caaa2) ) // TIBPAL-16L8-25 - bruteforced - located on M84-C-A top board
-	ROM_LOAD( "gen=84=_a-7d.ic45", 0x0200, 0x0117, CRC(79ef86f2) SHA1(69d3ead62e2c70f5831ec6915920da356c922dfb) ) // TIBPAL-16L8-25 - bruteforced
-	ROM_LOAD( "gen=84=_a-5l.ic33", 0x0400, 0x0117, CRC(579e257d) SHA1(bea2da60dc068fe16f469695f66786fe5406a823) ) // TIBPAL-16L8-25 - bruteforced
-	ROM_LOAD( "gen=84=_a-2h.ic5",  0x0600, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "m84-a-2h.ic5",      0x0000, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "gen=84=_a-5l.ic33", 0x0200, 0x0117, CRC(579e257d) SHA1(bea2da60dc068fe16f469695f66786fe5406a823) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "gen=84=_a-7d.ic45", 0x0400, 0x0117, CRC(79ef86f2) SHA1(69d3ead62e2c70f5831ec6915920da356c922dfb) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "m84-c-3a.ic8",      0x0600, 0x0117, CRC(c1e19913) SHA1(7292ea25df818fe25e00dc4f37b3338abf2caaa2) ) // TIBPAL-16L8-25 - bruteforced - located on M84-C-A top board
 ROM_END
 
 ROM_START( dkgensan ) // where you see gen=84= actual label reads GEN(84)
@@ -4213,9 +4334,15 @@ ROM_START( dkgensan ) // where you see gen=84= actual label reads GEN(84)
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "gen-vo.bin", 0x00000, 0x20000, CRC(d8595c66) SHA1(97920c9947fbac609fb901415e5471c6e4ca066c) )
 
-	ROM_REGION( 0x200, "proms", 0 ) // located on M84-C-A top board - NOT dumped from PCB, taken from bootleg
-	ROM_LOAD( "gen=84=_c-4n-.ic21", 0x0000, 0x0100, BAD_DUMP CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
-	ROM_LOAD( "gen=84=_c-4p-.ic22", 0x0100, 0x0100, BAD_DUMP CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+	ROM_REGION( 0x200, "proms", 0 ) // located on M84-C-A top board
+	ROM_LOAD( "gen=84=_c-4n-.ic21", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "gen=84=_c-4p-.ic22", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "m84-a-2h.ic5",      0x0000, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "gen=84=_a-5l.ic33", 0x0200, 0x0117, CRC(579e257d) SHA1(bea2da60dc068fe16f469695f66786fe5406a823) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "gen=84=_a-7d.ic45", 0x0400, 0x0117, CRC(79ef86f2) SHA1(69d3ead62e2c70f5831ec6915920da356c922dfb) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "m84-c-3a.ic8",      0x0600, 0x0117, CRC(c1e19913) SHA1(7292ea25df818fe25e00dc4f37b3338abf2caaa2) ) // TIBPAL-16L8-25 - bruteforced - located on M84-C-A top board
 ROM_END
 
 ROM_START( hharryb )
@@ -4284,10 +4411,10 @@ ROM_START( cosmccop )
 	ROM_LOAD( "ken_b-4p-.ic24", 0x0100, 0x0100, CRC(526f10ca) SHA1(e0ecd4db0720a4a37489e4d725843a2fbf266ebf) ) // TBP24S10N
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "ken_d-2h-.ic5",  0x0000, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_d-5l-.ic33", 0x0200, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "cc_d-7b-.ic45",  0x0600, 0x0117, CRC(75ff4517) SHA1(87ea8f44eaa7e317a066484b3cb5f20de1d80844) ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, NO_DUMP ) // TIBPAL-16L8-25 - located on M84-B-B top board
+	ROM_LOAD( "ken_d-2h-.ic5",  0x0000, 0x0117, CRC(a83807e9) SHA1(3875d9881789756870721cab41a198c5af67a446) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_d-5l-.ic33", 0x0200, 0x0117, CRC(c719b8a3) SHA1(dba75220c002ca4c75c578ed6c8c56dcfbb781ca) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "cc_d-7b-.ic45",  0x0400, 0x0117, CRC(75ff4517) SHA1(87ea8f44eaa7e317a066484b3cb5f20de1d80844) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, CRC(ad1a7942) SHA1(72c699de17e3d65081a5951581af90aadb4ba65b) ) // TIBPAL-16L8-25 - bruteforced - located on M84-B-B top board
 ROM_END
 
 
@@ -4321,10 +4448,10 @@ ROM_START( gallop )
 	ROM_LOAD( "ken_b-4p-.ic24", 0x0100, 0x0100, CRC(526f10ca) SHA1(e0ecd4db0720a4a37489e4d725843a2fbf266ebf) ) // TBP24S10N
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "ken_d-2h-.ic5",  0x0000, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_d-5l-.ic33", 0x0200, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "cc_d-7b-.ic45",  0x0600, 0x0117, CRC(75ff4517) SHA1(87ea8f44eaa7e317a066484b3cb5f20de1d80844) ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, NO_DUMP ) // TIBPAL-16L8-25 - located on M84-B-B top board
+	ROM_LOAD( "ken_d-2h-.ic5",  0x0000, 0x0117, CRC(a83807e9) SHA1(3875d9881789756870721cab41a198c5af67a446) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_d-5l-.ic33", 0x0200, 0x0117, CRC(c719b8a3) SHA1(dba75220c002ca4c75c578ed6c8c56dcfbb781ca) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "cc_d-7b-.ic45",  0x0400, 0x0117, CRC(75ff4517) SHA1(87ea8f44eaa7e317a066484b3cb5f20de1d80844) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, CRC(ad1a7942) SHA1(72c699de17e3d65081a5951581af90aadb4ba65b) ) // TIBPAL-16L8-25 - bruteforced - located on M84-B-B top board
 ROM_END
 
 
@@ -4358,10 +4485,10 @@ ROM_START( ltswords )
 	ROM_LOAD( "ken_b-4p-.ic24", 0x0100, 0x0100, CRC(526f10ca) SHA1(e0ecd4db0720a4a37489e4d725843a2fbf266ebf) ) // TBP24S10N
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "ken_d-2h-.ic5",  0x0000, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_d-5l-.ic33", 0x0200, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_d-7b-.ic45", 0x0600, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, NO_DUMP ) // TIBPAL-16L8-25 - located on M84-B-B top board
+	ROM_LOAD( "ken_d-2h-.ic5",  0x0000, 0x0117, CRC(a83807e9) SHA1(3875d9881789756870721cab41a198c5af67a446) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_d-5l-.ic33", 0x0200, 0x0117, CRC(c719b8a3) SHA1(dba75220c002ca4c75c578ed6c8c56dcfbb781ca) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_d-7b-.ic45", 0x0400, 0x0117, CRC(b0558dc5) SHA1(e95d9a8ddc49f99062439803c3359fca6fecf703) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, CRC(ad1a7942) SHA1(72c699de17e3d65081a5951581af90aadb4ba65b) ) // TIBPAL-16L8-25 - bruteforced - located on M84-B-B top board
 ROM_END
 
 ROM_START( kengo )
@@ -4394,10 +4521,10 @@ ROM_START( kengo )
 	ROM_LOAD( "ken_b-4p-.ic24", 0x0100, 0x0100, CRC(526f10ca) SHA1(e0ecd4db0720a4a37489e4d725843a2fbf266ebf) ) // TBP24S10N
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "ken_d-2h-.ic5",  0x0000, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_d-5l-.ic33", 0x0200, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_d-7b-.ic45", 0x0600, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, NO_DUMP ) // TIBPAL-16L8-25 - located on M84-B-B top board
+	ROM_LOAD( "ken_d-2h-.ic5",  0x0000, 0x0117, CRC(a83807e9) SHA1(3875d9881789756870721cab41a198c5af67a446) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_d-5l-.ic33", 0x0200, 0x0117, CRC(c719b8a3) SHA1(dba75220c002ca4c75c578ed6c8c56dcfbb781ca) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_d-7b-.ic45", 0x0400, 0x0117, CRC(b0558dc5) SHA1(e95d9a8ddc49f99062439803c3359fca6fecf703) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, CRC(ad1a7942) SHA1(72c699de17e3d65081a5951581af90aadb4ba65b) ) // TIBPAL-16L8-25 - bruteforced - located on M84-B-B top board
 ROM_END
 
 ROM_START( kengoa )
@@ -4430,10 +4557,10 @@ ROM_START( kengoa )
 	ROM_LOAD( "ken_b-4p-.ic24", 0x0100, 0x0100, CRC(526f10ca) SHA1(e0ecd4db0720a4a37489e4d725843a2fbf266ebf) ) // TBP24S10N
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "ken_d-2h-.ic5",  0x0000, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_d-5l-.ic33", 0x0200, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_d-7b-.ic45", 0x0600, 0x0117, NO_DUMP ) // TIBPAL-16L8-25
-	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, NO_DUMP ) // TIBPAL-16L8-25 - located on M84-B-B top board
+	ROM_LOAD( "ken_d-2h-.ic5",  0x0000, 0x0117, CRC(a83807e9) SHA1(3875d9881789756870721cab41a198c5af67a446) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_d-5l-.ic33", 0x0200, 0x0117, CRC(c719b8a3) SHA1(dba75220c002ca4c75c578ed6c8c56dcfbb781ca) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_d-7b-.ic45", 0x0400, 0x0117, CRC(b0558dc5) SHA1(e95d9a8ddc49f99062439803c3359fca6fecf703) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, CRC(ad1a7942) SHA1(72c699de17e3d65081a5951581af90aadb4ba65b) ) // TIBPAL-16L8-25 - bruteforced - located on M84-B-B top board
 ROM_END
 
 
@@ -4467,6 +4594,15 @@ ROM_START( poundfor )
 
 	ROM_REGION( 0x40000, "samples", 0 ) // samples
 	ROM_LOAD( "ppa-v0.bin",   0x00000, 0x40000, CRC(03321664) SHA1(51f2b2b712385c1cd55fd069829efac01838d603) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // proms - located on M85-B daughterboard
+	ROM_LOAD( "m85_b-1f-.ic5",  0x0000, 0x0100, NO_DUMP ) // TBP24S10
+	ROM_LOAD( "m85_b-3f-.ic12", 0x0100, 0x0100, NO_DUMP ) // TBP24S10
+
+	ROM_REGION( 0x0600, "pals", 0 )
+	ROM_LOAD( "m85_a-5h-.5h",  0x0000, 0x0117, CRC(a7ce2e57) SHA1(7af157d0ffb3001c3066d4abb1e3f731744243cb) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m85_a-6j-.6j",  0x0200, 0x0117, CRC(733ed0f9) SHA1(863055a2b13825a900095b18aad3829faef0f79e) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m85_b-1a-.ic1", 0x0400, 0x0117, CRC(3cf26744) SHA1(b367e142b24695aa42d2a6634d66072aad925614) ) // PAL16L8 - bruteforced - located on M85-B daughterboard
 ROM_END
 
 ROM_START( poundforj )
@@ -4495,6 +4631,15 @@ ROM_START( poundforj )
 
 	ROM_REGION( 0x40000, "samples", 0 ) // samples
 	ROM_LOAD( "ppa-v0.bin",   0x00000, 0x40000, CRC(03321664) SHA1(51f2b2b712385c1cd55fd069829efac01838d603) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // proms - located on M85-B daughterboard
+	ROM_LOAD( "m85_b-1f-.ic5",  0x0000, 0x0100, NO_DUMP ) // TBP24S10
+	ROM_LOAD( "m85_b-3f-.ic12", 0x0100, 0x0100, NO_DUMP ) // TBP24S10
+
+	ROM_REGION( 0x0600, "pals", 0 )
+	ROM_LOAD( "m85_a-5h-.5h",  0x0000, 0x0117, CRC(a7ce2e57) SHA1(7af157d0ffb3001c3066d4abb1e3f731744243cb) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m85_a-6j-.6j",  0x0200, 0x0117, CRC(733ed0f9) SHA1(863055a2b13825a900095b18aad3829faef0f79e) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m85_b-1a-.ic1", 0x0400, 0x0117, CRC(3cf26744) SHA1(b367e142b24695aa42d2a6634d66072aad925614) ) // PAL16L8 - bruteforced - located on M85-B daughterboard
 ROM_END
 
 ROM_START( poundforu )
@@ -4523,6 +4668,15 @@ ROM_START( poundforu )
 
 	ROM_REGION( 0x40000, "samples", 0 ) // samples
 	ROM_LOAD( "ppa-v0.bin",   0x00000, 0x40000, CRC(03321664) SHA1(51f2b2b712385c1cd55fd069829efac01838d603) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // proms - located on M85-B daughterboard
+	ROM_LOAD( "m85_b-1f-.ic5",  0x0000, 0x0100, NO_DUMP ) // TBP24S10
+	ROM_LOAD( "m85_b-3f-.ic12", 0x0100, 0x0100, NO_DUMP ) // TBP24S10
+
+	ROM_REGION( 0x0600, "pals", 0 )
+	ROM_LOAD( "m85_a-5h-.5h",  0x0000, 0x0117, CRC(a7ce2e57) SHA1(7af157d0ffb3001c3066d4abb1e3f731744243cb) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m85_a-6j-.6j",  0x0200, 0x0117, CRC(733ed0f9) SHA1(863055a2b13825a900095b18aad3829faef0f79e) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m85_b-1a-.ic1", 0x0400, 0x0117, CRC(3cf26744) SHA1(b367e142b24695aa42d2a6634d66072aad925614) ) // PAL16L8 - bruteforced - located on M85-B daughterboard
 ROM_END
 
 // For i8751 protected games, each region uses unique internal MCU code. The MCU code provides checksum information
@@ -4556,7 +4710,7 @@ GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m
 GAME( 1989, dbreedm72,   dbreed,   m72_dbreedw,  dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (World, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 GAME( 1989, dbreedjm72,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_m72_8751,   ROT0,   "Irem", "Dragon Breed (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gallopa,     cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
+GAME( 1991, gallopm72,   cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 
 GAME( 1990, airduelm72,  airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (World, M72 hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, airdueljm72, airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 hardware)", MACHINE_SUPPORTS_SAVE )
