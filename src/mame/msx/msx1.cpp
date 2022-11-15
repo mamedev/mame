@@ -4,12 +4,12 @@
 #include "emu.h"
 #include "msx.h"
 #include "msx_keyboard.h"
-#include "bus/msx_slot/ax230.h"
-#include "bus/msx_slot/disk.h"
-#include "bus/msx_slot/msx_rs232.h"
-#include "bus/msx_slot/ram.h"
-#include "bus/msx_slot/ram_mm.h"
-#include "bus/msx_slot/rom.h"
+#include "bus/msx/slot/ax230.h"
+#include "bus/msx/slot/disk.h"
+#include "bus/msx/slot/msx_rs232.h"
+#include "bus/msx/slot/ram.h"
+#include "bus/msx/slot/ram_mm.h"
+#include "bus/msx/slot/rom.h"
 
 using namespace msx_keyboard;
 
