@@ -574,7 +574,7 @@ struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &mac
 
 	for (int i = 0; i < 24; i += NAMCOS22_RADIX_BITS)
 	{
-		hash = (zsort >> 20) & NAMCOS22_RADIX_MASK;
+		hash = (zsort >> (24 - NAMCOS22_RADIX_BITS)) & NAMCOS22_RADIX_MASK;
 		struct namcos22_scenenode *next = node->data.nonleaf.next[hash];
 		if (!next)
 		{
@@ -905,7 +905,6 @@ void namcos22_state::draw_direct_poly(const u16 *src)
  */
 void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int polyshift, int flags, int packetformat)
 {
-	int absolute_priority = m_absolute_priority;
 	int zsort;
 	float zmin = 0.0f;
 	float zmax = 0.0f;
@@ -985,17 +984,20 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 	switch (flags & 0x300)
 	{
 		case 0x000:
-			zsort = (int)zmin;
+			zsort = zmin;
 			break;
 
 		case 0x100:
-			zsort = (int)zmax;
+			zsort = zmax;
 			break;
 
 		default:
-			zsort = (int)((zmin + zmax) / 2.0f);
+			zsort = (zmin + zmax) / 2.0f;
 			break;
 	}
+
+	zsort = std::clamp(zsort, 0, 0x1fffff);
+	int absolute_priority = m_absolute_priority & 7;
 
 	/* relative: representative z + shift values
 	* 1x.xxxx.xxxxxxxx.xxxxxxxx fixed z value
@@ -1018,8 +1020,7 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 		absolute_priority += (m_objectshift & 0x1c0000) >> 18;
 	}
 
-	if (zsort < 0) zsort = 0;
-	else if (zsort > 0x1fffff) zsort = 0x1fffff;
+	zsort = std::clamp(zsort, 0, 0x1fffff);
 	absolute_priority &= 7;
 	zsort |= (absolute_priority << 21);
 

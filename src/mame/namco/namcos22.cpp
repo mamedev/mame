@@ -31,7 +31,6 @@ TODO:
 - polygon z position problems? (also has glitches on real hw, but not as bad)
   + ridgerac suspension bridge, cables appear through the guardrail
   + timecris stage 1-2 start, beam appears through platform
-  + timecris stage 1-3 after car, clock tower disappears behind background
 - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2,
   czram contents is rather odd here and partly cleared (probably the cause?):
   + $0000-$0d7f - gradual increase from $00-$7c
