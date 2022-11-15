@@ -6,8 +6,8 @@
 #pragma once
 
 #include "bus/centronics/ctronics.h"
-#include "bus/msx_ctrl/ctrl.h"
-#include "bus/msx_slot/cartridge.h"
+#include "bus/msx/ctrl/ctrl.h"
+#include "bus/msx/slot/cartridge.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"
