@@ -1796,6 +1796,22 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/msx_ctrl/ctrl.h,BUSES["MSX_CTRL"] = true
+---------------------------------------------------
+
+if (BUSES["MSX_CTRL"]~=null) then
+    files {
+        MAME_DIR .. "src/devices/bus/msx_ctrl/ctrl.cpp",
+        MAME_DIR .. "src/devices/bus/msx_ctrl/ctrl.h",
+        MAME_DIR .. "src/devices/bus/msx_ctrl/joystick.cpp",
+        MAME_DIR .. "src/devices/bus/msx_ctrl/joystick.h",
+        MAME_DIR .. "src/devices/bus/msx_ctrl/mouse.cpp",
+        MAME_DIR .. "src/devices/bus/msx_ctrl/mouse.h",
+    }
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/msx_slot/slot.h,BUSES["MSX_SLOT"] = true
 ---------------------------------------------------
 
