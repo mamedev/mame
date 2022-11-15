@@ -11,9 +11,9 @@
 
 
 // poly constructor
-namcos22_renderer::namcos22_renderer(namcos22_state &state)
-	: poly_manager<float, namcos22_object_data, 4>(state.machine()),
-		m_state(state)
+namcos22_renderer::namcos22_renderer(namcos22_state &state) :
+	poly_manager<float, namcos22_object_data, 4>(state.machine()),
+	m_state(state)
 	{
 		init();
 	}
