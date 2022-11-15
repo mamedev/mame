@@ -3,7 +3,7 @@
 /****************************************************************************************************************
 
   Skeleton driver for "El Circulo", from Inder.
-  It's a gambling roulette build with lights (mix of leds and small light bulbs) and an crystal artwork overlay.
+  It's a gambling roulette built with lights (mix of leds and small light bulbs) and an crystal artwork overlay.
 
      ______________    ______    __________________________________    ____________    ________________
     | | | | | | | |___| | | |___|               _         _       |___| | | | | | |___| | | | | | | | |
