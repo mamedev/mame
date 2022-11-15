@@ -435,9 +435,9 @@ u8 msx_state::psg_port_a_r()
 		data = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 
 	if (BIT(m_psg_b, 6))
-		data |= bitswap<8>(m_gen_port2->read(), 4, 7, 6, 5, 3, 2, 1, 0) & 0x3f;
+		data |= bitswap<6>(m_gen_port2->read(), 6, 5, 3, 2, 1, 0);
 	else
-		data |= bitswap<8>(m_gen_port1->read(), 4, 7, 6, 5, 3, 2, 1, 0) & 0x3f;
+		data |= bitswap<6>(m_gen_port1->read(), 6, 5, 3, 2, 1, 0);
 
 	return data;
 }
