@@ -328,15 +328,15 @@ protected:
 	u16 mcuc74_speedup_r();
 	void mcu_speedup_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
-	inline u16 nthword(const u32 *src, int n) { return (src[n / 2] << ((n & 1) * 16)) >> 16; }
+	static u8 nthbyte(const u32 *src, int n) { return util::big_endian_cast<u8>(src)[n]; }
+	static u16 nthword(const u32 *src, int n) { return util::big_endian_cast<u16>(src)[n];; }
 
-	inline s32 signed12(s32 val) { return (val & 0x00000800) ? (s32)(val | 0xfffff000) : val & 0x000007ff; }
-	inline s32 signed18(s32 val) { return (val & 0x00020000) ? (s32)(val | 0xfffc0000) : val & 0x0001ffff; }
-	inline s32 signed24(s32 val) { return (val & 0x00800000) ? (s32)(val | 0xff000000) : val & 0x007fffff; }
+	static constexpr s32 signed12(s32 val) { return util::sext(val, 12); }
+	static constexpr s32 signed18(s32 val) { return util::sext(val, 18); }
+	static constexpr s32 signed24(s32 val) { return util::sext(val, 24); }
 
-	inline float dspfixed_to_nativefloat(s16 val) { return val / (float)0x7fff; }
-	float dspfloat_to_nativefloat(u32 val);
+	static constexpr float dspfixed_to_nativefloat(s16 val) { return val / (float)0x7fff; }
+	static float dspfloat_to_nativefloat(u32 val);
 
 	void handle_driving_io();
 	void handle_coinage(u16 flags);
