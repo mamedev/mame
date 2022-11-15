@@ -1882,7 +1882,7 @@ void a1200xl_state::pia_portb_w(uint8_t data)
 	const u8 dir = m_pia->port_b_z_mask();
 
 	// On a1200xl BIOS jumps from PC=0xc550, expecting ROM to be still
-	// enabled at PC=0xe40c, expecting the dir to work properly.
+	// enabled at PC=0xe40c, needing direction to work properly.
 	const u8 new_mmu = (data & ~dir) | (m_mmu & dir);
 
 	if (m_mmu != new_mmu)
