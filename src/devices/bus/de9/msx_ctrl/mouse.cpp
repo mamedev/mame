@@ -15,9 +15,9 @@ DEFINE_DEVICE_TYPE(MSX_MOUSE, msx_mouse_device, "msx_mouse", "MSX Mouse")
 
 static INPUT_PORTS_START(msx_mouse)
 	PORT_START("BUTTONS")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)
-	PORT_BIT(0xcf, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2)
+	PORT_BIT(0xff9f, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("MOUSE_X")
 	PORT_BIT(0xffff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(50)
@@ -33,7 +33,7 @@ ioport_constructor msx_mouse_device::device_input_ports() const
 
 msx_mouse_device::msx_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_MOUSE, tag, owner, clock)
-	, device_msx_general_purpose_port_interface(mconfig, *this)
+	, device_de9_port_interface(mconfig, *this)
 	, m_buttons(*this, "BUTTONS")
 	, m_port_mouse_x(*this, "MOUSE_X")
 	, m_port_mouse_y(*this, "MOUSE_Y")
@@ -61,13 +61,16 @@ void msx_mouse_device::device_reset()
 	m_mouse_y = 0;
 }
 
-u8 msx_mouse_device::read()
+u16 msx_mouse_device::read()
 {
-	return (m_buttons->read() & 0xf0) | ((m_data >> (4 * (3 - m_stat))) & 0x0f);
+	return (m_buttons->read() & 0xfff0) | ((m_data >> (4 * (3 - m_stat))) & 0x0f);
 }
 
-void msx_mouse_device::pin_8_w(int state)
+void msx_mouse_device::pin_w(int pin, int state)
 {
+	if (pin != 8)
+		return;
+
 	if (m_old_pin8 != state)
 	{
 		attotime now = machine().scheduler().time();

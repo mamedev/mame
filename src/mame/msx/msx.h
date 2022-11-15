@@ -6,7 +6,7 @@
 #pragma once
 
 #include "bus/centronics/ctronics.h"
-#include "bus/msx/ctrl/ctrl.h"
+#include "bus/de9/de9.h"
 #include "bus/msx/slot/cartridge.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -183,8 +183,8 @@ protected:
 	required_device<input_merger_any_high_device> m_mainirq;
 	required_device<screen_device> m_screen;
 	optional_memory_region m_region_kanji;
-	required_device<msx_general_purpose_port_device> m_gen_port1;
-	required_device<msx_general_purpose_port_device> m_gen_port2;
+	required_device<de9_port_device> m_gen_port1;
+	required_device<de9_port_device> m_gen_port2;
 	required_ioport_array<11> m_io_key;
 	output_finder<2> m_leds;
 	msx_hw_def m_hw_def;

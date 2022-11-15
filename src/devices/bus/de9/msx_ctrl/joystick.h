@@ -6,21 +6,21 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_MSX_CTRL_JOYSTICK_H
-#define MAME_BUS_MSX_CTRL_JOYSTICK_H
+#ifndef MAME_BUS_DE9_MSX_CTRL_JOYSTICK_H
+#define MAME_BUS_DE9_MSX_CTRL_JOYSTICK_H
 
 #pragma once
 
-#include "ctrl.h"
+#include "bus/de9/de9.h"
 
 
 class msx_joystick_device : public device_t,
-							public device_msx_general_purpose_port_interface
+							public device_de9_port_interface
 {
 public:
 	msx_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual u8 read() override;
+	virtual u16 read() override;
 
 protected:
 	virtual void device_start() override { }
