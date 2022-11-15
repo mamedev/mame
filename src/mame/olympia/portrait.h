@@ -36,8 +36,7 @@ protected:
 
 private:
 	void ctrl_w(uint8_t data);
-	void positive_scroll_w(uint8_t data);
-	void negative_scroll_w(uint8_t data);
+	void scroll_w(offs_t offset, uint8_t data);
 	void bgvideo_write(offs_t offset, uint8_t data);
 	void fgvideo_write(offs_t offset, uint8_t data);
 
