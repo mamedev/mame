@@ -131,9 +131,8 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_mainirq(*this, "mainirq")
 	, m_screen(*this, "screen")
 	, m_region_kanji(*this, "kanji")
-	, m_io_joy(*this, "JOY%u", 0U)
-	, m_io_dsw(*this, "DSW")
-	, m_io_mouse(*this, "MOUSE%u", 0U)
+	, m_gen_port1(*this, "gen1")
+	, m_gen_port2(*this, "gen2")
 	, m_io_key(*this, "KEY%u", 0U)
 	, m_leds(*this, "led%u", 1U)
 	, m_view_page0(*this, "view0")
@@ -157,8 +156,6 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_view_slot3_page2(*this, "view3_2")
 	, m_view_slot3_page3(*this, "view3_3")
 	, m_psg_b(0)
-	, m_mouse{0, 0}
-	, m_mouse_stat{0, 0}
 	, m_kanji_latch(0)
 	, m_slot_expanded{false, false, false, false}
 	, m_primary_slot(0)
@@ -421,8 +418,6 @@ void msx_state::driver_start()
 	m_maincpu->z80_set_cycle_tables(cc_op, cc_cb, cc_ed, cc_xy, nullptr, cc_ex);
 
 	save_item(NAME(m_psg_b));
-	save_item(NAME(m_mouse));
-	save_item(NAME(m_mouse_stat));
 	save_item(NAME(m_kanji_latch));
 	save_item(NAME(m_kanji_fsa1fx));
 	save_item(NAME(m_slot_expanded));
@@ -432,53 +427,16 @@ void msx_state::driver_start()
 	save_item(NAME(m_keylatch));
 }
 
-INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
-{
-	m_mouse[0] = m_io_mouse[0]->read();
-	m_mouse_stat[0] = -1;
-	m_mouse[1] = m_io_mouse[1]->read();
-	m_mouse_stat[1] = -1;
-}
-
-template <u8 Game_port>
-u8 msx_state::game_port_r()
-{
-	u8 inp = m_io_joy[Game_port]->read();
-	if (!(inp & 0x80))
-	{
-		// joystick
-		return (inp & 0x7f);
-	}
-	else
-	{
-		// mouse
-		u8 data = (inp & 0x70);
-		if (m_mouse_stat[Game_port] < 0)
-			data |= 0xf;
-		else
-			data |= ~(m_mouse[Game_port] >> (4 * m_mouse_stat[Game_port])) & 0x0f;
-		return data;
-	}
-}
-
 u8 msx_state::psg_port_a_r()
 {
 	u8 data = 0x80;
 	if (m_cassette)
-	{
 		data = (m_cassette->input() > 0.0038 ? 0x80 : 0);
-	}
 
-	if ((m_psg_b ^ m_io_dsw->read()) & 0x40)
-	{
-		// game port 2
-		data |= game_port_r<1>();
-	}
+	if (BIT(m_psg_b, 6))
+		data |= m_gen_port2->read() & 0x3f;
 	else
-	{
-		// game port 1
-		data |= game_port_r<0>();
-	}
+		data |= m_gen_port1->read() & 0x3f;
 
 	return data;
 }
@@ -498,16 +456,12 @@ void msx_state::psg_port_b_w(u8 data)
 	if ((data ^ m_psg_b) & 0x80)
 		m_leds[1] = BIT(~data, 7);
 
-	if ((m_psg_b ^ data) & 0x10)
-	{
-		if (++m_mouse_stat[0] > 3)
-			m_mouse_stat[0] = -1;
-	}
-	if ((m_psg_b ^ data) & 0x20)
-	{
-		if (++m_mouse_stat[1] > 3)
-			m_mouse_stat[1] = -1;
-	}
+	m_gen_port1->pin_6_w(BIT(data, 0));
+	m_gen_port1->pin_7_w(BIT(data, 1));
+	m_gen_port2->pin_6_w(BIT(data, 2));
+	m_gen_port2->pin_7_w(BIT(data, 3));
+	m_gen_port1->pin_8_w(BIT(data, 4));
+	m_gen_port2->pin_8_w(BIT(data, 5));
 
 	m_psg_b = data;
 }
@@ -631,6 +585,9 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 	m_ay8910->port_b_write_callback().set(FUNC(msx2_base_state::psg_port_b_w));
 	m_ay8910->add_route(ALL_OUTPUTS, m_speaker, 0.3);
 
+	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port1, msx_general_purpose_port_devices, "joystick");
+	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port2, msx_general_purpose_port_devices, "joystick");
+
 	if (m_hw_def.has_printer_port())
 	{
 		// printer
@@ -673,7 +630,6 @@ void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config 
 	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3);
 
 	m_maincpu->set_addrmap(AS_IO, &msx_state::msx1_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(msx_state::msx_interrupt)); /* Needed for mouse updates */
 
 	if (vdp_type == VDP_TMS9118)
 		TMS9118(config, m_tms9928a, 10.738635_MHz_XTAL);
