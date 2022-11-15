@@ -13471,6 +13471,9 @@ carlecfg
 pvmilfin
 pvwwcas
 
+@source:skeleton/elcirculo.cpp
+elcirculo                       // (c) 1980 Inder
+
 @source:misc/electra.cpp
 avenger                         // (c) 1975 Electra
 flyingf                         // (c) 1976 Electra
