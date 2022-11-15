@@ -2865,7 +2865,7 @@ void alpine_state::alpine_mcu_port4_w(u8 data)
 }
 
 
-// Prop Cycle
+// Prop Cycle pedal
 
 TIMER_DEVICE_CALLBACK_MEMBER(propcycl_state::pedal_interrupt)
 {
@@ -2901,7 +2901,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(propcycl_state::pedal_update)
 }
 
 
-// Armadillo Racing
+// Armadillo Racing trackball
 
 TIMER_DEVICE_CALLBACK_MEMBER(adillor_state::trackball_interrupt)
 {
@@ -3738,6 +3738,7 @@ void alpine_state::machine_start()
 }
 
 // System22
+
 void namcos22_state::namcos22(machine_config &config)
 {
 	/* basic machine hardware */
@@ -3808,6 +3809,7 @@ void namcos22_state::cybrcomm(machine_config &config)
 }
 
 // System Super22
+
 void namcos22s_state::namcos22s(machine_config &config)
 {
 	namcos22(config);

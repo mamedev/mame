@@ -161,8 +161,8 @@ private:
 	float m_clipy = 0.0;
 	rectangle m_cliprect;
 
-	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
-	inline u16 nthword(const u32 *src, int n) { return (src[n / 2] << ((n & 1) * 16)) >> 16; }
+	static u8 nthbyte(const u32 *src, int n) { return util::big_endian_cast<u8>(src)[n]; }
+	static u16 nthword(const u32 *src, int n) { return util::big_endian_cast<u16>(src)[n]; }
 
 	void render_scene_nodes(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
 	void render_sprite(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
@@ -329,7 +329,7 @@ protected:
 	void mcu_speedup_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	static u8 nthbyte(const u32 *src, int n) { return util::big_endian_cast<u8>(src)[n]; }
-	static u16 nthword(const u32 *src, int n) { return util::big_endian_cast<u16>(src)[n];; }
+	static u16 nthword(const u32 *src, int n) { return util::big_endian_cast<u16>(src)[n]; }
 
 	static constexpr s32 signed12(s32 val) { return util::sext(val, 12); }
 	static constexpr s32 signed18(s32 val) { return util::sext(val, 18); }
