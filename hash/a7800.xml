@@ -285,6 +285,19 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
+	<software name="armora2">
+		<description>Armor Attack II</description>
+		<year>2013</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="armor attack ii (20130416).bin" size="0x4000" crc="08eb2b5a" sha1="56f8bb2bc34ceba0c1107fcacab46dd0d4677075"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- 3-D Asteroids Rev A, Prototype.  Functionally, the same game, just unencrypted.  Only observed difference is a section of text in the
      rom states: "IF YOU CAN READ THIS YOU'RE TOO CLOSE. GCC(C) 1984".  Release version only has the text: "TOO CLOSE. GCC(C) 1984"
 -->
@@ -449,6 +462,20 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
+	<software name="bentley">
+		<description>Bentley Bear's Crystal Quest (NTSC)</description>
+		<year>2015</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_p450_ta" />
+			<dataarea name="rom" size="0x24000">
+				<rom name="bentley bear's crystal quest (20151220).bin" size="0x24000" crc="d44622b3" sha1="4a850d4b97bea621e9b6df142afeec8b398d6d6c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bonq">
 		<description>b*nQ (NTSC)</description>
 		<year>2007</year>
@@ -599,6 +626,34 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="crackeu.bin" size="131072" crc="50fd19cb" sha1="0c1a7806e431efbf0c826a11b92d74eb45e08661"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazyottou" cloneof="crazyotto">
+		<description>Crazy Otto (NTSC, Ms. Pac-Man hack)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="crazyotto (ntsc) (20100612).bin" size="0x4000" crc="5049e4be" sha1="c4af478c38d524f0f5c418f0dd51af38ea62c3ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazyotto">
+		<description>Crazy Otto (PAL, Ms. Pac-Man hack)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="crazyotto (pal) (20100612).bin" size="0x4000" crc="5637c44a" sha1="5fc657219e4e513bc6ef84f093ac17846b11e2c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -977,6 +1032,19 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
+	<software name="froggie">
+		<description>Froggie</description>
+		<year>2018</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Matthias Luedtke" />
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_pokey" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="froggie (final release) (20180920).bin" size="0x8000" crc="224b93d4" sha1="586b43ca3acd35307bb58f32d08649c755944c5e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="galagau" cloneof="galaga">
 		<description>Galaga (NTSC)</description>
 		<year>1984</year>
@@ -1294,6 +1362,19 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="jousteu.bin" size="49152" crc="9b3be616" sha1="aae5b9ee00c39d577858aba9d1fd791194be2c0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcmunch">
+		<description>K.C. Munchkin!</description>
+		<year>2014</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="kc munchkin (20140408).bin" size="0x4000" crc="3a935531" sha1="13a19fc0be062952a93359020778d04705b0b75d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1969,6 +2050,34 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+	<software name="ripoffu" cloneof="ripoff">
+		<description>Rip-Off (NTSC)</description>
+		<year>2012</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="rip-off (ntsc) (20120502).bin" size="0x4000" crc="ab65a41d" sha1="6c377ef750c8a7eebccde2c6cdaa3c0d0df65852"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ripoff">
+		<description>Rip-Off (PAL)</description>
+		<year>2012</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="rip-off (pal) (20120502).bin" size="0x4000" crc="b1c8d47d" sha1="52ddb5fdf55c5862dc435dfec37d0c59948dcb19"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="robotron">
 		<description>Robotron: 2084 (NTSC)</description>
 		<year>1984</year>
@@ -2007,6 +2116,20 @@ almost nothing like the prototype.
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="santa simon.bin" size="49152" crc="30d641ff" sha1="610e08f226c66b15ff699b02c736ce5ce7a8a862"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramble">
+		<description>Scramble (NTSC)</description>
+		<year>2016</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0xc000">
+				<rom name="scramble (ntsc) (20161202).bin" size="0xc000" crc="ea42ff6e" sha1="65d12610c14a44ab86c481dbb0fa9e562930a0e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2442,6 +2565,19 @@ almost nothing like the prototype.
 				<rom name="wingameso.bin" size="131072" crc="cf648e88" sha1="361501982f4795c2d79fb6519e5c56452ebc5774"/>
 			</dataarea>
 			<dataarea name="ram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worm">
+		<description>Worm!</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Mark Ball" />
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="worm.07_03_10.1.16.bin" size="0x4000" crc="39296da2" sha1="d1b7cd5c27c2ec39cba55542eb1f90b027abd50b"/>
 			</dataarea>
 		</part>
 	</software>
