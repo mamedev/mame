@@ -874,7 +874,7 @@ void wd_fdc_device_base::write_track_continue()
 			if (floppy && floppy->wpt_r()) {
 				LOGSTATE("WRITE_PROT\n");
 				sub_state = WRITE_PROTECT_WAIT;
-				delay_cycles(t_gen, 218);
+				delay_cycles(t_gen, 145);
 				return;
 			}
 			set_drq();
@@ -996,7 +996,7 @@ void wd_fdc_device_base::write_sector_continue()
 			if (floppy && floppy->wpt_r()) {
 				LOGSTATE("WRITE_PROT\n");
 				sub_state = WRITE_PROTECT_WAIT;
-				delay_cycles(t_gen, 218);
+				delay_cycles(t_gen, 145);
 				return;
 			}
 			sub_state = SCAN_ID;

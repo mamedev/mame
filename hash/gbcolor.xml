@@ -26047,18 +26047,33 @@ license:CC0
   * ST-0504093C 口袋宝贝-珍珠/Poketmon-pearl
 -->
 
+	<!-- probably developed by BBD - Chinese title, English text -->
 	<software name="hpotter">
-	<!-- probably developed by BDD -->
-		<description>Harry Potter (China)</description>
+		<description>Harry Potter (China, English)</description>
+		<year>20??</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="哈利波特" /> <!-- Hālì Bōtè - Harry Potter transliterated into Chinese -->
+		<info name="alt_title" value="Harry Potter 2 - The Black Art Wtrstle Edition" /> <!-- cartridge label supposedly says this -->
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_bbd" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="harry potter.gbc" size="0x100000" crc="772337f4" sha1="d173a8faf3f4045d6cde08b59c2ff1d04eb4f2f1" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000" /> <!-- unconfirmed size -->
+		</part>
+	</software>
+
+	<!-- probably developed by BBD - English title, Chinese text -->
+	<software name="hpotterzh" cloneof="hpotter">
+		<description>Harry Potter (China, Chinese)</description>
 		<year>20??</year>
 		<publisher>Sintax</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="harry potter (unl).bin" size="1048576" crc="5bebe333" sha1="dfd0693315da697240b510776695162880a75a82"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="harry potter.bin" size="0x100000" crc="5bebe333" sha1="dfd0693315da697240b510776695162880a75a82" />
 			</dataarea>
-			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
-			</dataarea>
+			<dataarea name="nvram" size="0x2000" /> <!-- unconfirmed size -->
 		</part>
 	</software>
 
@@ -26138,6 +26153,48 @@ license:CC0
 			<dataarea name="rom" size="0x800000">
 				<rom name="m29w640ft.u2" size="0x800000" crc="e4068d7d" sha1="e61ee50ed39fd5b5cc8bdcb96fe1c3cccdcfc76f" />
 			</dataarea>
+		</part>
+	</software>
+
+	<software name="dmadv2k1">
+		<description>Digimon Adventure 2001</description>
+		<year>2001?</year>
+		<publisher>BBD</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_bbd" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="digimon adventure 2001.gbc" size="0x100000" crc="01f1fcee" sha1="cb4327829bc90c7bb448e7591e6ee3729a12a8cd" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" /> <!-- based on header - needs confirmation -->
+		</part>
+	</software>
+
+	<!-- seems to just be a title screen change -->
+	<software name="dmadv2k2" cloneof="dmadv2k1">
+		<description>Digimon Adventure 6 2002</description>
+		<year>2002?</year>
+		<publisher>BBD</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_bbd" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="digimon 6 adventure 2002.gbc" size="0x100000" crc="3f0d046b" sha1="eea8928b277beb56ca8878b6dbfc094b0c3c5463" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" /> <!-- based on header - needs confirmation -->
+		</part>
+	</software>
+
+	<software name="garou2k1">
+		<description>Garou: Mark of the Wolves 2001</description>
+		<year>2001?</year>
+		<publisher>BBD</publisher> <!-- cartridges with identical contents from Sintax also exist -->
+		<info name="alt_title" value="餓狼傳說 世紀之戰" />
+		<info name="alt_title" value="Èláng Chuánshuō: Shìjì zhī Zhàn" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_bbd" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="garou mark of the wolves 2001.gbc" size="0x100000" crc="1cb8e67f" sha1="334bebed71956822f7cf9af9a2e2be2f1280654c" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" /> <!-- based on header - needs confirmation -->
 		</part>
 	</software>
 
@@ -26597,6 +26654,53 @@ license:CC0
 			<dataarea name="rom" size="0x200000">
 				<rom name="chaoju gedou 2001 alpha.gbc" size="0x200000" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
 			</dataarea>
+		</part>
+	</software>
+
+	<software name="smblkdb">
+		<description>Shùmǎ Bào Lóng: Kǒudài Bǎn (China)</description>
+		<year>200?</year>
+		<publisher>Kong Feng Industries Limited</publisher>
+		<info name="alt_title" value="數碼暴龍 口袋版" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DSHGGB-81" />
+			<feature name="slot" value="rom_dshggb81" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="shuma bao long koudai ban.gbc" size="0x80000" crc="9507e5d3" sha1="99d5c7ad319158735597432e195615c9df09840c" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<!-- GB全彩中文 branding  - this is an LOTR-themed reskin of 惡魔島 (Èmó dǎo) -->
+	<software name="mojiecs">
+		<description>Mó Jiè Chuánshuō (China)</description>
+		<year>200?</year>
+		<publisher>Kong Feng Industries Limited</publisher>
+		<info name="alt_title" value="魔戒傳說" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DSHGGB-81" />
+			<feature name="slot" value="rom_dshggb81" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="mo jie chuanshuo.gbc" size="0x80000" crc="7aa7eea5" sha1="109e4ba61b04afe15cc5a5ee994f56405938cee3" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<!-- GB全彩中文 branding - this is a Harvest Moon-themed reskin of 星空神獸 (Xīngkōng Shénshòu) -->
+	<software name="muchang6">
+		<description>Mùchǎng Wùyǔ 6 GB (China)</description>
+		<year>200?</year>
+		<publisher>Kong Feng Industries Limited</publisher>
+		<info name="alt_title" value="牧場物語6 GB" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DSHGGB-81" />
+			<feature name="slot" value="rom_dshggb81" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="muchang wuyu 6 gb.gbc" size="0x200000" crc="416e6efa" sha1="86b2de0fc2806f3d13145e2c0296389ec0897a6a" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -27944,7 +28048,7 @@ license:CC0
 	<software name="capsnk" supported="partial">
 		<description>Capcom Vs. SNK: Millennium Fight 2001 (China)</description>
 		<year>200?</year>
-		<publisher>Makon</publisher>
+		<publisher>Kǎshèng</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_ntnew" />
 			<dataarea name="rom" size="0x100000">
@@ -27956,7 +28060,7 @@ license:CC0
 	<software name="digimn24">
 		<description>Digimon 02 4 (China)</description>
 		<year>200?</year>
-		<publisher>Makon</publisher>
+		<publisher>Kǎshèng</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_ntnew" />
 			<dataarea name="rom" size="0x100000">
@@ -27969,7 +28073,7 @@ license:CC0
 	<software name="shumabl24" cloneof="digimn24">
 		<description>Shùmǎ Bào Lóng 02 4 (China)</description>
 		<year>200?</year>
-		<publisher>Makon</publisher>
+		<publisher>Kǎshèng</publisher>
 		<info name="alt_title" value="數碼暴龍02 4" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_ntnew" />
@@ -28014,7 +28118,7 @@ license:CC0
 	<software name="digimn2">
 		<description>Digimon 2 (China)</description>
 		<year>200?</year>
-		<publisher>Makon</publisher>
+		<publisher>Kǎshèng</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_ntnew" />
 			<dataarea name="rom" size="0x100000">
@@ -28058,7 +28162,7 @@ license:CC0
 	<software name="hpotter3">
 		<description>Harry Potter 3 (China)</description>
 		<year>200?</year>
-		<publisher>Makon</publisher>
+		<publisher>Kǎshèng</publisher>
 		<info name="usage" value="Crashes in first level - not an emulation bug" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_ntnew" />
@@ -28072,7 +28176,7 @@ license:CC0
 	<software name="mewtwosb">
 		<description>Pokémon: Mewtwo Strikes Back (China)</description>
 		<year>200?</year>
-		<publisher>Makon</publisher>
+		<publisher>Kǎshèng</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_ntnew" />
 			<dataarea name="rom" size="0x80000">
@@ -28085,7 +28189,7 @@ license:CC0
 	<software name="digimnpk">
 		<description>Digimon Pocket (China)</description>
 		<year>200?</year>
-		<publisher>Makon</publisher>
+		<publisher>Kǎshèng</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_ntnew" />
 			<dataarea name="rom" size="0x80000">
@@ -28098,7 +28202,7 @@ license:CC0
 	<software name="pkmndspe">
 		<description>Pokémon Diamond: Special Pikachu Edition (China)</description>
 		<year>2001</year>
-		<publisher>Makon</publisher>
+		<publisher>Kǎshèng</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_ntnew" />
 			<dataarea name="rom" size="0x80000">
@@ -28125,7 +28229,7 @@ license:CC0
 	<software name="pkmnjspe">
 		<description>Pokémon Jade: Special Pikachu Edition (China)</description>
 		<year>2001</year>
-		<publisher>Makon</publisher>
+		<publisher>Kǎshèng</publisher>
 		<info name="usage" value="Crashes when finishing the first level - not an emulation bug" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_ntnew" />
@@ -28139,7 +28243,7 @@ license:CC0
 	<software name="sfz4" supported="partial">
 		<description>Street Fighter Zero 4 (China)</description>
 		<year>2000</year>
-		<publisher>Makon</publisher>
+		<publisher>Kǎshèng</publisher>
 		<info name="alt_title" value="街霸天王4" />
 		<info name="alt_title" value="Jiē Bà Tiānwáng 4" />
 		<part name="cart" interface="gameboy_cart">

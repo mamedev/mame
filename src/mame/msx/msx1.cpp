@@ -2594,7 +2594,7 @@ void msx1_state::hb55d(machine_config &config)
 	// 2 Cartridge slots?
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 2, 1, "firmware", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 2, 1, "firmware");
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 3, 1);   // 16KB RAM
 	add_cartridge_slot<2>(config, 3);

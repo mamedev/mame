@@ -41,6 +41,8 @@ extern char const *const GB_HUC1;
 extern char const *const GB_HUC3;
 extern char const *const GB_TAMA5;
 extern char const *const GB_TFANGBOOT;
+extern char const *const GB_BBD;
+extern char const *const GB_DSHGGB81;
 extern char const *const GB_SINTAX;
 extern char const *const GB_CHONGWU;
 extern char const *const GB_LICHENG;

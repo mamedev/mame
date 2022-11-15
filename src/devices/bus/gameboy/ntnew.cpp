@@ -176,4 +176,4 @@ void ntnew_device::bank_switch_ram(u8 data)
 } // namespace bus::gameboy
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_NTNEW, device_gb_cart_interface, bus::gameboy::ntnew_device, "gb_rom_ntnew", "Game Boy newer NT/Makon Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_NTNEW, device_gb_cart_interface, bus::gameboy::ntnew_device, "gb_rom_ntnew", "Game Boy newer Kasheng/Makon Cartridge")

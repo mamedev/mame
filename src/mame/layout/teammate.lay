@@ -6,12 +6,14 @@ license:CC0
 
 <!-- define elements -->
 
+	<element name="grey"><rect><color red="0.7" green="0.72" blue="0.75" /></rect></element>
+
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 
 	<element name="led" defstate="0">
-		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="0"><color red="0.2" green="0.02" blue="0.03" /></disk>
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
 	</element>
 
@@ -19,7 +21,9 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-1" right="8" top="-1" bottom="12.4" />
+		<bounds left="-1" right="8" top="-1" bottom="11.4" />
+
+		<element ref="grey"><bounds x="-1" y="-1" width="9" height="9" /></element>
 
 		<element name="0.0" ref="led"><bounds x="0" y="6" width="1" height="1" /></element>
 		<element name="0.1" ref="led"><bounds x="0" y="4" width="1" height="1" /></element>
@@ -39,8 +43,8 @@ license:CC0
 		<element name="1.6" ref="led"><bounds x="6" y="4" width="1" height="1" /></element>
 		<element name="1.7" ref="led"><bounds x="6" y="6" width="1" height="1" /></element>
 
-		<element name="digit3" ref="digit"><bounds x="2" y="10" width="1" height="1.4" /></element>
-		<element name="digit2" ref="digit"><bounds x="4" y="10" width="1" height="1.4" /></element>
+		<element name="digit3" ref="digit"><bounds x="2" y="9" width="1" height="1.4" /></element>
+		<element name="digit2" ref="digit"><bounds x="4" y="9" width="1" height="1.4" /></element>
 
 	</view>
 </mamelayout>

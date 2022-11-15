@@ -47,8 +47,8 @@ enum
 struct namcos22_polyvertex
 {
 	float x, y, z;
-	int u, v; /* 0..0xfff */
-	int bri;  /* 0..0xff */
+	int u, v; // 0..0xfff
+	int bri;  // 0..0xff
 };
 
 enum namcos22_scenenode_type
@@ -82,6 +82,7 @@ struct namcos22_scenenode
 			int cmode;
 			int flags;
 			int cz_adjust;
+			int bri_adjust;
 			int direct;
 			namcos22_polyvertex v[4];
 		} quad;
@@ -98,7 +99,7 @@ struct namcos22_scenenode
 			int cx_min, cx_max;
 			int cy_min, cy_max;
 			int sizex, sizey;
-			int translucency;
+			int alpha;
 			int cz;
 		} sprite;
 	} data;
@@ -107,7 +108,7 @@ struct namcos22_scenenode
 
 struct namcos22_object_data
 {
-	/* poly / sprites */
+	// poly / sprites
 	rgbaint_t fogcolor;
 	rgbaint_t fadecolor;
 	rgbaint_t polycolor;
@@ -120,15 +121,17 @@ struct namcos22_object_data
 	int cmode;
 	int fadefactor;
 	int pfade_enabled;
+	int brifactor;
 	int fogfactor;
 	int zfog_enabled;
 	int cz_adjust;
 	int cz_sdelta;
 	const u8 *czram;
-
-	/* sprites */
-	const u8 *source;
 	int alpha;
+	bool alpha_enabled;
+
+	// sprites
+	const u8 *source;
 	int line_modulo;
 	int flipx;
 	int flipy;
@@ -224,15 +227,14 @@ public:
 	void cybrcomm(machine_config &config);
 	void namcos22(machine_config &config);
 
-	void init_acedrvr();
-	void init_raveracw();
-	void init_ridger2j();
+	void init_acedrive();
+	void init_raverace();
+	void init_ridgera2();
 	void init_victlap();
 	void init_cybrcomm();
-	void init_ridgeraj();
+	void init_ridgerac();
 
 	// renderer
-	int m_poly_translucency;
 	u16 *m_texture_tilemap;
 	std::unique_ptr<u8[]> m_texture_tileattr;
 	u8 *m_texture_tiledata;
@@ -247,6 +249,9 @@ public:
 	int m_poly_fade_r;
 	int m_poly_fade_g;
 	int m_poly_fade_b;
+	int m_poly_alpha_color;
+	int m_poly_alpha_pen;
+	int m_poly_alpha_factor;
 	u32 m_fog_colormask;
 	int m_fog_r;
 	int m_fog_g;
@@ -326,6 +331,7 @@ protected:
 	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
 	inline u16 nthword(const u32 *src, int n) { return (src[n / 2] << ((n & 1) * 16)) >> 16; }
 
+	inline s32 signed12(s32 val) { return (val & 0x00000800) ? (s32)(val | 0xfffff000) : val & 0x000007ff; }
 	inline s32 signed18(s32 val) { return (val & 0x00020000) ? (s32)(val | 0xfffc0000) : val & 0x0001ffff; }
 	inline s32 signed24(s32 val) { return (val & 0x00800000) ? (s32)(val | 0xff000000) : val & 0x007fffff; }
 
@@ -454,6 +460,7 @@ protected:
 	u16 m_keycus_rng = 0;
 	int m_gametype = 0;
 	int m_cz_adjust = 0;
+	int m_bri_adjust = 0;
 	std::unique_ptr<namcos22_renderer> m_poly;
 	u16 m_dspram_bank = 0;
 	u16 m_dspram16_latch = 0;
@@ -517,7 +524,7 @@ public:
 	void tokyowar(machine_config &config);
 
 	void init_aquajet();
-	void init_cybrcyc();
+	void init_cybrcycc();
 	void init_tokyowar();
 	void init_dirtdash();
 	void init_airco22();
@@ -583,8 +590,8 @@ public:
 	{ }
 
 	void alpine(machine_config &config);
-	void init_alpiner2();
 	void init_alpiner();
+	void init_alpiner2();
 
 	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
 
@@ -599,22 +606,22 @@ protected:
 	int m_motor_status = 2;
 };
 
-class alpinesa_state : public alpine_state
+class alpines_state : public alpine_state
 {
 public:
-	alpinesa_state(const machine_config &mconfig, device_type type, const char *tag) :
+	alpines_state(const machine_config &mconfig, device_type type, const char *tag) :
 		alpine_state(mconfig, type, tag),
 		m_rombank(*this, "rombank")
 	{ }
 
-	void alpinesa(machine_config &config);
-	void init_alpinesa();
+	void alpines(machine_config &config);
+	void init_alpines();
 
 private:
 	required_memory_bank m_rombank;
 
 	void rombank_w(u32 data);
-	void alpinesa_am(address_map &map);
+	void alpines_am(address_map &map);
 };
 
 class timecris_state : public namcos22s_state
