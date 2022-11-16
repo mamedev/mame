@@ -17491,6 +17491,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="turbo">
+		<description>Turbo (NTSC, prototype)</description>
+		<year>1983</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="turbo coleco.u5" size="0x2000" crc="fdfeef58" sha1="345f72320ac51d659780f898bbb540fc788bf371"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="turmoil">
 		<description>Turmoil</description>
 		<year>1982</year>
