@@ -179,7 +179,10 @@ protected:
 	u8 OPCN_r();
 	void OPCN_w(u8 data);
 
-	virtual u8 get_pic_ack(offs_t offset) override {
+	// TODO: non-offset 7 configuration
+	// Currently used by pc88va only, which uses the canonical IRQ7 for cascading an external PIC to the internal one.
+	virtual u8 get_pic_ack(offs_t offset) override
+	{
 		if (offset == 7)
 			return m_icu_slave_ack(0);
 		return 0;
