@@ -39,21 +39,22 @@
 class pc88va_state : public driver_device
 {
 public:
-	pc88va_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_fdc(*this, "upd765"),
-		m_fdd(*this, "upd765:%u", 0U),
-//		m_dmac(*this, "dmac"),
-//		m_pic1(*this, "pic8259_master"),
-		m_pic2(*this, "pic8259_slave"),
-		m_palram(*this, "palram"),
-		m_sysbank(*this, "sysbank"),
-		m_tvram(*this, "tvram"),
-		m_gvram(*this, "gvram"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+	pc88va_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_fdc(*this, "upd765")
+		, m_fdd(*this, "upd765:%u", 0U)
+		, m_pic2(*this, "pic8259_slave")
+		, m_opna(*this, "opna")
+		, m_lspeaker(*this, "lspeaker")
+		, m_rspeaker(*this, "rspeaker")
+		, m_palram(*this, "palram")
+		, m_sysbank(*this, "sysbank")
+		, m_tvram(*this, "tvram")
+		, m_gvram(*this, "gvram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 	{ }
 
 	void pc88va(machine_config &config);
@@ -88,6 +89,9 @@ private:
 //	required_device<am9517a_device> m_dmac;
 //	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
+	required_device<ym2608_device> m_opna;
+	required_device<speaker_device> m_lspeaker;
+	required_device<speaker_device> m_rspeaker;
 	required_shared_ptr<uint16_t> m_palram;
 	required_device<address_map_bank_device> m_sysbank;
 	required_shared_ptr<uint16_t> m_tvram;
@@ -198,6 +202,7 @@ private:
 	void pc88va_map(address_map &map);
 	void pc88va_io_map(address_map &map);
 	void sysbank_map(address_map &map);
+	void opna_map(address_map &map);
 
 	void pc88va_z80_io_map(address_map &map);
 	void pc88va_z80_map(address_map &map);

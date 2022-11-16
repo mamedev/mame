@@ -4,16 +4,18 @@
 
     PC-88VA (c) 1987 NEC
 
-    A follow up of the regular PC-8801. It can also run PC-8801 software in compatible mode
+    Here be dragons, a mostly compatible PC-8801 with extra V3 Mode for superset.
 
     preliminary driver by Angelo Salese
     Special thanks to Fujix for his documentation translation help
 
     TODO:
-    - What exact kind of garbage happens if you try to enable both direct and palette color
-      modes to a graphic layer?
-    - unemulated upd71071 demand mode;
-    - What is exactly supposed to be a "bus slot"? Does it have an official name?
+    - Currently fails floppy loading in PC Engine OS checking for ah=2h brk 8Ch, 
+      cfr. rtype PC=0x1c02c, others are quite similar.
+    - Implement bus slot, which should still be PC-8801 EXPansion bus.
+    - Backport from PC-8801 main map;
+
+    (old notes, to be reordered)
     - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
       hooked up by the current z80 core
     - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.
@@ -22,6 +24,8 @@
       Update: it never reaches latter with V30->V50 CPU switch fix;
     - Fix floppy motor hook-up (floppy believes to be always in even if empty drive);
     - Support for PC8801 compatible mode & PC80S31K (floppy interface);
+    - What exact kind of garbage happens if you try to enable both direct and palette color
+      modes to a graphic layer?
 
 ********************************************************************************************/
 
@@ -756,7 +760,7 @@ uint8_t pc88va_state::rom_bank_r()
 
 uint8_t pc88va_state::key_r(offs_t offset)
 {
-	// note row D bit 2 does something at POST ... some kind of test mode?
+	// holding F8 at POST to bring a service mode
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 											"KEY4", "KEY5", "KEY6", "KEY7",
 											"KEY8", "KEY9", "KEYA", "KEYB",
@@ -818,6 +822,7 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_1)
 	m_fdc_motor_status[1] = 1;
 }
 
+#if 0
 void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 {
 	bool ready = m_fdc_ctrl_2 & 0x40;
@@ -833,6 +838,37 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 
 	m_fdc->ready_w(ready);
 }
+
+#else
+
+void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
+{
+	if (!BIT(m_fdc_ctrl_2, 5))
+		return;
+	bool force_ready = (BIT(m_fdc_ctrl_2, 6));
+
+	floppy_image_device *floppy0, *floppy1;
+	floppy0 = m_fdd[0]->get_device();
+	floppy1 = m_fdd[1]->get_device();
+	if (!floppy0 && !floppy1)
+		force_ready = false;
+	
+	//if(floppy && force_ready)
+	//	ready = floppy->ready_r();
+
+	//if(floppy && force_ready)
+	//	ready = floppy->ready_r();
+
+	if (force_ready)
+	{
+		m_fdc->set_ready_line_connected(0);
+		m_fdc->ready_w(0);
+	}
+	else
+		m_fdc->set_ready_line_connected(1);
+}
+
+#endif
 
 void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 {
@@ -887,6 +923,9 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 		/*
 		x--- ---- FDCRST: FDC Reset
 		-xx- ---- FDCFRY FRYCEN: FDC force ready control
+		-x0- ---- ignored
+		-01- ---- force ready release
+		-11- ---- force ready assert
 		---x ---- DMAE: DMA Enable (0) Prohibit DMA (1) Enable DMA
 		---- -x-- XTMASK: FDC timer IRQ mask (0) Disable (1) Enable
 		---- ---x TTRG: FDC timer trigger (0) FDC timer clearing (1) FDC timer start
@@ -898,11 +937,10 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 				m_fdc_timer->adjust(attotime::from_msec(100));
 			}
 
-			m_fdd[0]->get_device()->mon_w(!(BIT(data, 2)));
 
-
-			//if((m_fdc_ctrl_2 & 0x10) != (data & 0x10))
-			//	m_dmac->dreq2_w(1);
+			//if (!BIT(m_fdc_ctrl_2, 4) && BIT(data, 4))
+			//	m_maincpu->dreq_w<2>(1);
+			//m_dmac->dreq2_w(1);
 
 			if(data & 0x80) // correct?
 				m_fdc->reset();
@@ -989,6 +1027,7 @@ uint8_t pc88va_state::no_subfdc_r()
 }
 #endif
 
+// TODO: I/O 0x00xx is almost same as pc8801
 void pc88va_state::pc88va_io_map(address_map &map)
 {
 	map(0x0000, 0x000f).r(FUNC(pc88va_state::key_r)); // Keyboard ROW reading
@@ -999,7 +1038,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 //  map(0x0034, 0x0034) GVRAM Control Port 1
 //  map(0x0035, 0x0035) GVRAM Control Port 2
 	map(0x0040, 0x0041).r(FUNC(pc88va_state::sys_port4_r)); // (R) System Port 4 (W) System port 3 (strobe port)
-	map(0x0044, 0x0045).mirror(0x0002).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x0044, 0x0047).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write));
 //  map(0x005c, 0x005c) (R) GVRAM status
 //  map(0x005c, 0x005f) (W) GVRAM selection
 //  map(0x0070, 0x0070) ? (*)
@@ -1051,7 +1090,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x01a8, 0x01a8).w(FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
 	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff);// FDC related (765)
 	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
-//  map(0x01c0, 0x01c1) keyboard, polled thru IRQ1 ...
+//  map(0x01c0, 0x01c1) keyboard scan code, polled thru IRQ1 ...
 	map(0x01c6, 0x01c7).nopw(); // ???
 	map(0x01c8, 0x01cf).rw("d8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8255 3 (byte access)
 //  map(0x01d0, 0x01d1) Expansion RAM bank selection
@@ -1108,6 +1147,13 @@ void pc88va_state::pc88va_z80_io_map(address_map &map)
 	map(0xfc, 0xff).rw("d8255_2s", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 #endif
+
+void pc88va_state::opna_map(address_map &map)
+{
+	// TODO: confirm it really is ROMless
+	// TODO: confirm size
+	map(0x000000, 0x1fffff).ram();
+}
 
 /* TODO: active low or active high? */
 static INPUT_PORTS_START( pc88va )
@@ -1572,6 +1618,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_map);
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::pc88va_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::pc88va_vrtc_irq));
+	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
 //	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->set_tclk(MASTER_CLOCK);
 	// "timer 1"
@@ -1582,8 +1629,8 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
 	m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
 	m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
-	m_maincpu->in_memr_cb().set(FUNC(pc88va_state::dma_memr_cb));
-	m_maincpu->out_memw_cb().set(FUNC(pc88va_state::dma_memw_cb));
+	m_maincpu->in_memr_cb().set([this] (offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); });
+	m_maincpu->out_memw_cb().set([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
 
 #if TEST_SUBFDC
 	z80_device &fdccpu(Z80(config, "fdccpu", 4000000));        /* 8 MHz */
@@ -1661,12 +1708,19 @@ void pc88va_state::pc88va(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 18+4, 0x40000);
 
-	SPEAKER(config, "mono").front_center();
-	ym2203_device &ym(YM2203(config, "ym", FM_CLOCK)); //unknown clock / divider
-	ym.add_route(0, "mono", 0.25);
-	ym.add_route(1, "mono", 0.25);
-	ym.add_route(2, "mono", 0.50);
-	ym.add_route(3, "mono", 0.50);
+	SPEAKER(config, m_lspeaker).front_left();
+	SPEAKER(config, m_rspeaker).front_right();
+
+	YM2608(config, m_opna, MASTER_CLOCK*2);
+	m_opna->set_addrmap(0, &pc88va_state::opna_map);
+//	m_opna->irq_handler().set(FUNC(pc8801fh_state::int4_irq_w));
+//	m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
+//	m_opna->port_b_read_callback().set_ioport("OPN_PB");
+	// TODO: per-channel mixing is unconfirmed
+	m_opna->add_route(0, m_lspeaker, 0.25);
+	m_opna->add_route(0, m_rspeaker, 0.25);
+	m_opna->add_route(1, m_lspeaker, 0.75);
+	m_opna->add_route(2, m_rspeaker, 0.75);
 }
 
 
