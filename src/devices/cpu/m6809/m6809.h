@@ -92,11 +92,11 @@ protected:
 	};
 
 	// register transfer
-	struct exgtfr_register
-	{
-		uint8_t   byte_value;
-		uint16_t  word_value;
-	};
+// 	struct exgtfr_register
+// 	{
+// 		uint8_t   byte_value;
+// 		uint16_t  word_value;
+// 	};
 
 	// flag bits in the cc register
 	enum
@@ -272,8 +272,8 @@ protected:
 	uint16_t entire_state_registers()     { return 0xFF; }
 
 	// miscellaneous
-	inline exgtfr_register read_exgtfr_register(uint8_t reg);
-	inline void write_exgtfr_register(uint8_t reg, exgtfr_register value);
+	inline uint16_t read_exgtfr_register(uint8_t reg);
+	inline void write_exgtfr_register(uint8_t reg, uint16_t value);
 	bool is_register_addressing_mode();
 	bool is_ea_addressing_mode() { return m_addressing_mode == ADDRESSING_MODE_EA; }
 	uint16_t get_pending_interrupt();
