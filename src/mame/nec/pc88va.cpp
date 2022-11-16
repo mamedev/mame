@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/********************************************************************************************
+// thanks-to: Fujix
+/**************************************************************************************************
 
     PC-88VA (c) 1987 NEC
 
@@ -14,6 +15,8 @@
       cfr. rtype PC=0x1c02c, others are quite similar.
     - Implement bus slot, which should still be PC-8801 EXPansion bus.
     - Backport from PC-8801 main map;
+    - Convert SASI from PC-9801 to a shared device, apparently it's same i/f;
+    - select between PIC slave and i8214;
 
     (old notes, to be reordered)
     - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
@@ -27,7 +30,29 @@
     - What exact kind of garbage happens if you try to enable both direct and palette color
       modes to a graphic layer?
 
-********************************************************************************************/
+===================================================================================================
+
+irq table (line - vector - source):
+ICU
+irq 0  - 08h - timer 1
+irq 1  - 09h - keyboard irq
+irq 2  - 0Ah - VRTC
+irq 3  - 0Bh - UINT0 (B24)
+irq 4  - 0Ch - RS-232C
+irq 5  - 0Dh - UINT1 (B25)
+irq 6  - 0Eh - UINT2 (B26)
+irq 7  - N/A - Slave (either secondary i8259 or i8214)
+i8259 slave
+irq 8  - 10H - SGP
+irq 9  - 11H - UINT3 (HDD, B27)
+irq 10 - 12H - UINT4 (B28)
+irq 11 - 13H - FDC
+irq 12 - 14H - Sound
+irq 13 - 15H - General timer 3 (mouse)
+irq 14 - 16H - <reserved>
+irq 15 - 17H - <reserved>
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "pc88va.h"
@@ -1027,6 +1052,21 @@ uint8_t pc88va_state::no_subfdc_r()
 }
 #endif
 
+uint8_t pc88va_state::misc_ctrl_r()
+{
+	return m_misc_ctrl;
+}
+
+void pc88va_state::misc_ctrl_w(uint8_t data)
+{
+	m_misc_ctrl = data;
+
+	m_sound_irq_enable = ((data & 0x80) == 0);
+
+	if (m_sound_irq_enable)
+		int4_irq_w(m_sound_irq_pending);
+}
+
 // TODO: I/O 0x00xx is almost same as pc8801
 void pc88va_state::pc88va_io_map(address_map &map)
 {
@@ -1034,7 +1074,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 //  map(0x0010, 0x0010) Printer / Calendar Clock Interface
 	map(0x0020, 0x0021).noprw(); // RS-232C
 	map(0x0030, 0x0031).rw(FUNC(pc88va_state::backupram_dsw_r), FUNC(pc88va_state::sys_port1_w)); // 0x30 (R) DSW1 (W) Text Control Port 0 / 0x31 (R) DSW2 (W) System Port 1
-//  map(0x0032, 0x0032) (R) ? (W) System Port 2
+	map(0x32, 0x32).rw(FUNC(pc88va_state::misc_ctrl_r), FUNC(pc88va_state::misc_ctrl_w));
 //  map(0x0034, 0x0034) GVRAM Control Port 1
 //  map(0x0035, 0x0035) GVRAM Control Port 2
 	map(0x0040, 0x0041).r(FUNC(pc88va_state::sys_port4_r)); // (R) System Port 4 (W) System port 3 (strobe port)
@@ -1306,7 +1346,7 @@ static INPUT_PORTS_START( pc88va )
 	PORT_BIT(0xff,IP_ACTIVE_LOW,IPT_UNUSED)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "CRT Mode" )
+	PORT_DIPNAME( 0x01, 0x00, "CRT Mode" )
 	PORT_DIPSETTING(    0x01, "15.7 KHz" )
 	PORT_DIPSETTING(    0x00, "24.8 KHz" )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -1528,6 +1568,10 @@ void pc88va_state::machine_reset()
 
 	m_fdc_motor_status[0] = 0;
 	m_fdc_motor_status[1] = 0;
+
+	m_misc_ctrl = 0x80;
+	m_sound_irq_enable = false;
+	m_sound_irq_pending = false;
 }
 
 INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
@@ -1611,6 +1655,14 @@ void pc88va_state::dma_memw_cb(offs_t offset, uint8_t data)
 	printf("%08x %02x finally DMA-ed\n",offset,data);
 }
 
+WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
+{
+	bool irq_state = m_sound_irq_enable & state;
+
+	m_pic2->ir4_w(irq_state);
+//	m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
+	m_sound_irq_pending = state;
+}
 
 void pc88va_state::pc88va(machine_config &config)
 {
@@ -1641,6 +1693,7 @@ void pc88va_state::pc88va(machine_config &config)
 #endif
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: convert to set_raw (timings available)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 200-1);
@@ -1713,7 +1766,7 @@ void pc88va_state::pc88va(machine_config &config)
 
 	YM2608(config, m_opna, MASTER_CLOCK*2);
 	m_opna->set_addrmap(0, &pc88va_state::opna_map);
-//	m_opna->irq_handler().set(FUNC(pc8801fh_state::int4_irq_w));
+	m_opna->irq_handler().set(FUNC(pc88va_state::int4_irq_w));
 //	m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
 //	m_opna->port_b_read_callback().set_ioport("OPN_PB");
 	// TODO: per-channel mixing is unconfirmed

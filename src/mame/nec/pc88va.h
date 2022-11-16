@@ -112,6 +112,7 @@ private:
 	uint8_t m_portc_test = 0;
 	uint8_t m_fdc_motor_status[2]{};
 
+
 	/* timers */
 	emu_timer *m_tc_clear_timer = nullptr;
 	emu_timer *m_fdc_timer = nullptr;
@@ -209,6 +210,16 @@ private:
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+// TODO: stuff backported from PC8801 that should really be common
+private:
+	uint8_t misc_ctrl_r();
+	void misc_ctrl_w(uint8_t data);
+
+	u8 m_misc_ctrl = 0x80;
+	bool m_sound_irq_enable = false;
+	bool m_sound_irq_pending = false;
+	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
 };
 
 
