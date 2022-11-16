@@ -14,10 +14,10 @@
 #include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
-#include "machine/am9517a.h"
+//#include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
-#include "machine/pit8253.h"
+//#include "machine/pit8253.h"
 //#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "machine/bankdev.h"
@@ -45,8 +45,8 @@ public:
 		m_screen(*this, "screen"),
 		m_fdc(*this, "upd765"),
 		m_fdd(*this, "upd765:%u", 0U),
-		m_dmac(*this, "dmac"),
-		m_pic1(*this, "pic8259_master"),
+//		m_dmac(*this, "dmac"),
+//		m_pic1(*this, "pic8259_master"),
 		m_pic2(*this, "pic8259_slave"),
 		m_palram(*this, "palram"),
 		m_sysbank(*this, "sysbank"),
@@ -81,12 +81,12 @@ protected:
 
 private:
 
-	required_device<cpu_device> m_maincpu;
+	required_device<v50_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_fdd;
-	required_device<am9517a_device> m_dmac;
-	required_device<pic8259_device> m_pic1;
+//	required_device<am9517a_device> m_dmac;
+//	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_shared_ptr<uint16_t> m_palram;
 	required_device<address_map_bank_device> m_sysbank;
@@ -160,7 +160,7 @@ private:
 	void r232_ctrl_portb_w(uint8_t data);
 	void r232_ctrl_portc_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
+//	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
 //  DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
 	uint8_t m_fdc_ctrl_2;
 	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
@@ -171,7 +171,7 @@ private:
 //  uint16_t m_fdc_dma_r();
 //  void m_fdc_dma_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_hlda_w);
-	DECLARE_WRITE_LINE_MEMBER(pc88va_tc_w);
+	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	uint8_t fdc_dma_r();
 	void fdc_dma_w(uint8_t data);
 	uint8_t dma_memr_cb(offs_t offset);

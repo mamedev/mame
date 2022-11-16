@@ -826,6 +826,7 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 	floppy = m_fdd[0]->get_device();
 	if(floppy && ready)
 		ready = floppy->ready_r();
+
 	floppy = m_fdd[1]->get_device();
 	if(floppy && ready)
 		ready = floppy->ready_r();
@@ -893,15 +894,22 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 		case 0x06:
 			//printf("%02x\n",data);
 			if(data & 1)
+			{
 				m_fdc_timer->adjust(attotime::from_msec(100));
+			}
 
-			if((m_fdc_ctrl_2 & 0x10) != (data & 0x10))
-				m_dmac->dreq2_w(1);
+			m_fdd[0]->get_device()->mon_w(!(BIT(data, 2)));
+
+
+			//if((m_fdc_ctrl_2 & 0x10) != (data & 0x10))
+			//	m_dmac->dreq2_w(1);
 
 			if(data & 0x80) // correct?
 				m_fdc->reset();
 
 			m_fdc_ctrl_2 = data;
+
+			//m_fdd[0]->get_device()->mon_w(!(BIT(data, 5)));
 
 			pc88va_fdc_update_ready(nullptr, 0);
 
@@ -1032,18 +1040,18 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x0156, 0x0156).r(FUNC(pc88va_state::rom_bank_r)); // ROM bank status
 //  map(0x0158, 0x0159) Interruption Mode Modification
 //  map(0x015c, 0x015f) NMI mask port (strobe port)
-	map(0x0160, 0x016f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // DMA Controller
+//	map(0x0160, 0x016f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // DMA Controller
 	map(0x0184, 0x0187).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x0188, 0x018b).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // ICU, also controls 8214 emulation
+//	map(0x0188, 0x018b).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // ICU, also controls 8214 emulation
 //  map(0x0190, 0x0191) System Port 5
 //  map(0x0196, 0x0197) Keyboard sub CPU command port
 	map(0x0198, 0x0199).w(FUNC(pc88va_state::backupram_wp_1_w)); //Backup RAM write inhibit
 	map(0x019a, 0x019b).w(FUNC(pc88va_state::backupram_wp_0_w)); //Backup RAM write permission
-	map(0x01a0, 0x01a7).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);// vTCU (timer counter unit)
+//	map(0x01a0, 0x01a7).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);// vTCU (timer counter unit)
 	map(0x01a8, 0x01a8).w(FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
 	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff);// FDC related (765)
 	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
-//  map(0x01c0, 0x01c1) ?
+//  map(0x01c0, 0x01c1) keyboard, polled thru IRQ1 ...
 	map(0x01c6, 0x01c7).nopw(); // ???
 	map(0x01c8, 0x01cf).rw("d8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8255 3 (byte access)
 //  map(0x01d0, 0x01d1) Expansion RAM bank selection
@@ -1478,32 +1486,26 @@ void pc88va_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
 {
-	m_pic1->ir2_w(0);
-	m_pic1->ir2_w(1);
-}
-
-WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
-{
-	if(state)
-	{
-		m_pic1->ir0_w(0);
-		m_pic1->ir0_w(1);
-	}
+	// TODO: verify when ack should happen
+	m_maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER( pc88va_state::fdc_drq )
 {
 	printf("%02x DRQ\n",state);
-	m_dmac->dreq2_w(state);
+//	m_dmac->dreq2_w(state);
 }
 
 WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 {
-	if(m_fdc_mode && state)
+	if(m_fdc_mode)
 	{
 		//printf("%d\n",state);
 		m_pic2->ir3_w(0);
 		m_pic2->ir3_w(1);
+		//m_maincpu->set_input_line(INPUT_LINE_IRQ6, state ? ASSERT_LINE : CLEAR_LINE);
+		//machine().debug_break();
 	}
 	#if TEST_SUBFDC
 	else
@@ -1515,12 +1517,12 @@ WRITE_LINE_MEMBER(pc88va_state::pc88va_hlda_w)
 {
 //  m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-	m_dmac->hack_w(state);
+//	m_dmac->hack_w(state);
 
 //  printf("%02x HLDA\n",state);
 }
 
-WRITE_LINE_MEMBER( pc88va_state::pc88va_tc_w )
+WRITE_LINE_MEMBER( pc88va_state::tc_w )
 {
 	/* floppy terminal count */
 	m_fdc->tc_w(state);
@@ -1554,13 +1556,13 @@ static void pc88va_floppies(device_slot_interface &device)
 
 uint8_t pc88va_state::dma_memr_cb(offs_t offset)
 {
-	printf("%08x\n",offset);
+	printf("%08x finally DMA-ed\n",offset);
 	return 0;
 }
 
 void pc88va_state::dma_memw_cb(offs_t offset, uint8_t data)
 {
-	printf("%08x %02x\n",offset,data);
+	printf("%08x %02x finally DMA-ed\n",offset,data);
 }
 
 
@@ -1570,10 +1572,21 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_map);
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::pc88va_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::pc88va_vrtc_irq));
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+//	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_tclk(MASTER_CLOCK);
+	// "timer 1"
+	m_maincpu->tout1_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+//  m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
+	// ch2 is FDC, ch0/3 are "user". ch1 is unused
+	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
+	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
+	m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_maincpu->in_memr_cb().set(FUNC(pc88va_state::dma_memr_cb));
+	m_maincpu->out_memw_cb().set(FUNC(pc88va_state::dma_memw_cb));
 
 #if TEST_SUBFDC
-	z80_device &fdccpu(Z80(config, "fdccpu", 8000000));        /* 8 MHz */
+	z80_device &fdccpu(Z80(config, "fdccpu", 4000000));        /* 8 MHz */
 	fdccpu.set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_z80_map);
 	fdccpu.set_addrmap(AS_IO, &pc88va_state::pc88va_z80_io_map);
 
@@ -1610,35 +1623,41 @@ void pc88va_state::pc88va(machine_config &config)
 	d8255_2s.in_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_r));
 	d8255_2s.out_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_w));
 
+#if 0
 	PIC8259(config, m_pic1, 0);
 	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic1->in_sp_callback().set_constant(1);
 	m_pic1->read_slave_ack_callback().set(FUNC(pc88va_state::get_slave_ack));
+#endif
 
 	PIC8259(config, m_pic2, 0);
-	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir7_w));
+	m_pic2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
 	m_pic2->in_sp_callback().set_constant(0);
 
-	AM9517A(config, m_dmac, MASTER_CLOCK); // ch2 is FDC, ch0/3 are "user". ch1 is unused
+#if 0
+	AM9517A(config, m_dmac, MASTER_CLOCK);
 	m_dmac->out_hreq_callback().set(FUNC(pc88va_state::pc88va_hlda_w));
 	m_dmac->out_eop_callback().set(FUNC(pc88va_state::pc88va_tc_w));
 	m_dmac->in_ior_callback<2>().set(FUNC(pc88va_state::fdc_dma_r));
 	m_dmac->out_iow_callback<2>().set(FUNC(pc88va_state::fdc_dma_w));
 	m_dmac->in_memr_callback().set(FUNC(pc88va_state::dma_memr_cb));
 	m_dmac->out_memw_callback().set(FUNC(pc88va_state::dma_memw_cb));
+#endif
 
-	UPD765A(config, m_fdc, 8000000, false, true);
+	UPD765A(config, m_fdc, 4000000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pc88va_state::fdc_irq));
-	m_fdc->drq_wr_callback().set(FUNC(pc88va_state::fdc_drq));
-	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>));
+	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
 
+#if 0
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
 	pit8253.set_clk<0>(MASTER_CLOCK); /* general purpose timer 1 */
 	pit8253.out_handler<0>().set(FUNC(pc88va_state::pc88va_pit_out0_changed));
 	pit8253.set_clk<1>(MASTER_CLOCK); /* BEEP frequency setting */
 	pit8253.set_clk<2>(MASTER_CLOCK); /* RS232C baud rate setting */
+#endif
 
 	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 18+4, 0x40000);
 
