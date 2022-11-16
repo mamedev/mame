@@ -3889,7 +3889,7 @@ ROM_END
 void msx2_state::y805128r2(machine_config &config)
 {
 	// YM2149 (in S1985)
-	// FDC: wd2793?, 1 3.5" DSDD drive
+	// FDC: wd2793, 2 3.5" DSDD drives
 	// 2 Cartridge slots
 	// S1985 MSX Engine
 	// Networking built in
@@ -3899,7 +3899,7 @@ void msx2_state::y805128r2(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 0, 0, 4, "firmware");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793, "disk", 3, 1, 1, 2, "diskrom");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK8_WD2793_2_DRIVES, "disk", 3, 1, 1, 2, "diskrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 	// This is actually the module slot
 	add_internal_slot(config, MSX_SLOT_ROM, "network", 3, 3, 0, 2, "network", 0x00000);
@@ -4682,8 +4682,8 @@ COMP(1985, y503iiir,   0,        0,     y503iiir,   msxru,    msx2_state, empty_
 COMP(198?, y503iiire,  y503iiir, 0,     y503iiir,   msx2,     msx2_state, empty_init, "Yamaha", "YIS-503 III R (MSX2, Estonian)", MACHINE_NOT_WORKING) // network not implemented
 COMP(1985, yis604,     0,        0,     yis604,     msx2jp,   msx2_state, empty_init, "Yamaha", "YIS604/128 (MSX2, Japan)", 0)
 COMP(1986, y805128,    y805256,  0,     y805128,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/128 (MSX2, Japan)", MACHINE_NOT_WORKING) // Floppy support broken
-COMP(1986, y805128r2,  y805256,  0,     y805128r2,  msx2,     msx2_state, empty_init, "Yamaha", "YIS805/128R2 (MSX2, USSR)", MACHINE_NOT_WORKING) // Floppy support broken, network not implemented
-COMP(198?, y805128r2e, y805256,  0,     y805128r2,  y503iir2, msx2_state, empty_init, "Yamaha", "YIS805/128R2 (MSX2, Estonian)", MACHINE_NOT_WORKING) // Floppy support broken, network not implemented
+COMP(1986, y805128r2,  y805256,  0,     y805128r2,  msx2,     msx2_state, empty_init, "Yamaha", "YIS805/128R2 (MSX2, USSR)", MACHINE_NOT_WORKING) // Network not implemented
+COMP(198?, y805128r2e, y805256,  0,     y805128r2,  y503iir2, msx2_state, empty_init, "Yamaha", "YIS805/128R2 (MSX2, Estonian)", MACHINE_NOT_WORKING) // Network not implemented
 COMP(198?, y805256,    0,        0,     y805256,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/256 (MSX2, Japan)", MACHINE_NOT_WORKING) // Floppy support broken?
 
 /* MSX2+ */
