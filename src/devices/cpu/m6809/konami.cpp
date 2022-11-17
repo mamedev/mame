@@ -195,7 +195,7 @@ inline uint16_t &konami_cpu_device::ireg()
 
 inline uint16_t konami_cpu_device::read_exgtfr_register(uint8_t reg)
 {
-	uint16_t result;
+	uint16_t result = 0x00FF;
 
 	switch(reg & 0x07)
 	{
@@ -219,8 +219,8 @@ inline void konami_cpu_device::write_exgtfr_register(uint8_t reg, uint16_t value
 {
 	switch(reg & 0x07)
 	{
-		case  0: m_q.r.a = value & 0xff;    break;  // A
-		case  1: m_q.r.b = value & 0xff;    break;  // B
+		case  0: m_q.r.a = value;    break;  // A
+		case  1: m_q.r.b = value;    break;  // B
 		case  2: m_x.w   = value;    break;  // X
 		case  3: m_y.w   = value;    break;  // Y
 		case  4: m_s.w   = value;    break;  // S
