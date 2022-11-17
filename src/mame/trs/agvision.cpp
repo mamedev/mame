@@ -400,6 +400,6 @@ ROM_START(trsvidtx)
 	ROM_LOAD("8041716-1.1-videotex.u13", 0x0000, 0x0800, CRC(821a59bb) SHA1(e3643f27fcf8287c0bc0f66b21554dc988ded9c1))
 ROM_END
 
-//    YEAR  NAME      PARENT COMPAT MACHINE   INPUT	    CLASS           INIT        COMPANY              FULLNAME    FLAGS
+//    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     CLASS           INIT        COMPANY              FULLNAME    FLAGS
 COMP( 1979, agvision, 0,     0,     agvision, agvision, agvision_state, empty_init, "Elanco",            "AgVision", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1980, trsvidtx, 0,     0,     agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "Videotex", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
