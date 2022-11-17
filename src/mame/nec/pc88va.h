@@ -21,6 +21,7 @@
 //#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "machine/bankdev.h"
+#include "machine/upd1990a.h"
 #include "sound/ymopn.h"
 
 #include "emupal.h"
@@ -47,6 +48,7 @@ public:
 		, m_fdc(*this, "upd765")
 		, m_fdd(*this, "upd765:%u", 0U)
 		, m_pic2(*this, "pic8259_slave")
+		, m_rtc(*this, "rtc")
 		, m_opna(*this, "opna")
 		, m_lspeaker(*this, "lspeaker")
 		, m_rspeaker(*this, "rspeaker")
@@ -90,6 +92,7 @@ private:
 //	required_device<am9517a_device> m_dmac;
 //	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
+	required_device<upd4990a_device> m_rtc;
 	required_device<ym2608_device> m_opna;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
@@ -129,7 +132,6 @@ private:
 	void idp_command_w(uint8_t data);
 	void idp_param_w(uint8_t data);
 	void palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t sys_port4_r();
 	uint16_t bios_bank_r();
 	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t rom_bank_r();
@@ -214,6 +216,9 @@ protected:
 private:
 	uint8_t misc_ctrl_r();
 	void misc_ctrl_w(uint8_t data);
+	uint8_t port40_r();
+	void port40_w(offs_t offset, u8 data);
+	void rtc_w(offs_t offset, u8 data);
 
 	u8 m_misc_ctrl = 0x80;
 	bool m_sound_irq_enable = false;

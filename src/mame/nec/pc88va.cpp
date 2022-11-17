@@ -11,8 +11,6 @@
     Special thanks to Fujix for his documentation translation help
 
     TODO:
-    - Several entries fails floppy loading in PC Engine OS checking for ah=2h brk 8Ch, 
-      cfr. rtype PC=0x1c02c.
     - video emulation is bare bones;
     - keyboard irq (mightmg2, hold F8 service mode menu, presumably rogueall)
     - Backport from PC-8801 main map, apply supersets where applicable;
@@ -59,6 +57,9 @@ irq 12 - 14H - Sound
 irq 13 - 15H - General timer 3 (mouse)
 irq 14 - 16H - <reserved>
 irq 15 - 17H - <reserved>
+
+trap list (brief, for quick consultation):
+brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL = 0
 
 **************************************************************************************************/
 
@@ -824,15 +825,31 @@ void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	m_palette->set_pen_color(offset,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
-uint16_t pc88va_state::sys_port4_r()
+u8 pc88va_state::port40_r()
 {
-	uint8_t vrtc,sw1;
-	// TODO: logic fails with upo
-	vrtc = (m_screen->vpos() < 400) ? 0x20 : 0x00; // vblank
+	u8 data = 0;
+	// TODO: vblank logic fails with upo
+	data = (m_screen->vpos() < 400) ? 0x20 : 0x00; // vblank
+	data |= m_rtc->data_out_r() << 4;
+	data |= (ioport("DSW")->read() & 1) ? 2 : 0;
 
-	sw1 = (ioport("DSW")->read() & 1) ? 2 : 0;
+	return data | 0xc0;
+}
 
-	return vrtc | sw1 | 0xc0;
+void pc88va_state::port40_w(offs_t offset, u8 data)
+{
+	m_rtc->stb_w((data & 2) >> 1);
+	m_rtc->clk_w((data & 4) >> 2);
+}
+
+void pc88va_state::rtc_w(offs_t offset, u8 data)
+{
+	m_rtc->c0_w((data & 1) >> 0);
+	m_rtc->c1_w((data & 2) >> 1);
+	m_rtc->c2_w((data & 4) >> 2);
+	m_rtc->data_in_w((data & 8) >> 3);
+
+	// TODO: remaining bits
 }
 
 uint16_t pc88va_state::bios_bank_r()
@@ -1170,13 +1187,13 @@ void pc88va_state::misc_ctrl_w(uint8_t data)
 void pc88va_state::pc88va_io_map(address_map &map)
 {
 	map(0x0000, 0x000f).r(FUNC(pc88va_state::key_r)); // Keyboard ROW reading
-//  map(0x0010, 0x0010) Printer / Calendar Clock Interface
+	map(0x0010, 0x0010).w(FUNC(pc88va_state::rtc_w)); // Printer / Calendar Clock Interface
 	map(0x0020, 0x0021).noprw(); // RS-232C
 	map(0x0030, 0x0031).rw(FUNC(pc88va_state::backupram_dsw_r), FUNC(pc88va_state::sys_port1_w)); // 0x30 (R) DSW1 (W) Text Control Port 0 / 0x31 (R) DSW2 (W) System Port 1
 	map(0x0032, 0x0032).rw(FUNC(pc88va_state::misc_ctrl_r), FUNC(pc88va_state::misc_ctrl_w));
 //  map(0x0034, 0x0034) GVRAM Control Port 1
 //  map(0x0035, 0x0035) GVRAM Control Port 2
-	map(0x0040, 0x0041).r(FUNC(pc88va_state::sys_port4_r)); // (R) System Port 4 (W) System port 3 (strobe port)
+	map(0x0040, 0x0040).rw(FUNC(pc88va_state::port40_r), FUNC(pc88va_state::port40_w)); // (R) System Port 4 (W) System port 3 (strobe port)
 	map(0x0044, 0x0047).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write));
 //  map(0x005c, 0x005c) (R) GVRAM status
 //  map(0x005c, 0x005f) (W) GVRAM selection
@@ -1608,6 +1625,9 @@ uint8_t pc88va_state::get_slave_ack(offs_t offset)
 
 void pc88va_state::machine_start()
 {
+	m_rtc->cs_w(1);
+	m_rtc->oe_w(1);
+
 	m_tc_clear_timer = timer_alloc(FUNC(pc88va_state::pc8801fd_upd765_tc_to_zero), this);
 	m_tc_clear_timer->adjust(attotime::never);
 
@@ -1796,6 +1816,8 @@ void pc88va_state::pc88va(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
+
+	UPD4990A(config, m_rtc);
 
 #if 0
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
