@@ -20068,6 +20068,7 @@ void m68000_musashi_device::x4e7b_movec_l_2f()
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 			break;
