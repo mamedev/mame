@@ -67,6 +67,7 @@ PC88VA doujin games (mostly undumped)
     * 翼君の宝箱14 (by Wing software, 1999)
     * くるッ★彡 (by Cenkeil, 1999)
     * Frail Rulers (by Fredia, 1999)
+	* Voltige Aerienne / ディスクイメージ (20??)
 -->
 
 
@@ -1094,7 +1095,8 @@ PC88VA doujin games (mostly undumped)
 
 	<software name="harehare" supported="no">
 		<description>Hare Hare Yukai</description>
-		<year>19??</year>
+		<!-- "PC88VA 20th Anniversary" -->
+		<year>2006</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Shinra" />
 		<info name="alt_title" value="ハレ晴レユカイ" />
@@ -1166,7 +1168,7 @@ PC88VA doujin games (mostly undumped)
 
 <!-- PC88 Images which have been patched to work on the VA? -->
 	<!-- is this legit? -->
-	<!-- TODO: None of the disks is bootable from V3 Mode, boots from pc8801ma by quick glance so likely belongs to pc8801_flop.xml, move once we have working V2 emulation mode -->
+	<!-- TODO: None of the disks are bootable from V3 Mode, boots from pc8801ma by quick glance so likely belongs to pc8801_flop.xml, move once we have working V2 emulation mode -->
 	<software name="midgarts" supported="no">
 		<description>Mid Garts (VA patched?)</description>
 		<year>19??</year>

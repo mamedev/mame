@@ -142,9 +142,11 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				}
 			}
 		}
-		else // 4bpp mode (UNTESTED)
+		else
 		{
-			xsize = (xsize + 1) * 8;
+			// 4bpp mode
+			// TODO: xsize may be doubled, cfr. pc88vad
+			xsize = (xsize + 1) * 4;
 			ysize = (ysize + 1) * 4;
 
 			if(!(spda & 0x8000)) // correct?
@@ -152,16 +154,19 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			spr_count = 0;
 
-			for(int y_i=0;y_i<ysize;y_i++)
+			for(int y_i = 0; y_i < ysize; y_i++)
 			{
-				for(int x_i=0;x_i<xsize;x_i+=2)
+				for(int x_i = 0; x_i < xsize; x_i+=2)
 				{
-					for(int x_s=0;x_s<2;x_s++)
+					for(int x_s = 0; x_s < 2; x_s++)
 					{
-						int pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
+						int pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (8-(x_s*8)) & 0xf;
 
+						// TODO: bc
 						//if(bc != -1) //transparent pen
-						bitmap.pix(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
+						//if (pen != 0 && pen != m_text_transpen)
+						if (pen != 0)
+							bitmap.pix(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
 					}
 					spr_count+=2;
 				}
@@ -321,7 +326,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						//hline = 1;
 					break;
 				default:
-					popmessage("Illegal text tilemap attribute mode %02x, contact MESSdev",attr_mode);
+					popmessage("Illegal text tilemap attribute mode %02x",attr_mode);
 					return;
 			}
 
@@ -344,7 +349,9 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 					if(secret) { pen = 0; } //hide text
 
-					if(pen != -1) //transparent
+					// TODO: transpen not right, cfr. rogueall
+					// (sets 1, wants 7)
+					if(pen != 0 && pen != m_text_transpen)
 						bitmap.pix(res_y, res_x) = m_palette->pen(pen);
 				}
 			}
@@ -355,7 +362,66 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
-uint32_t pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+// TODO: $102 determine mode set (including using this or indexed modes)
+void pc88va_state::draw_raw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	u16 *gvram = m_gvram;
+
+	int count = 0;
+
+	// TODO: cliprect
+	for(int y = 0; y < 400; y+= 2)
+	{
+		for(int x = 0; x < 640; x++)
+		{
+			uint16_t color = gvram[count];
+
+			for (int yi = 0; yi < 2; yi ++)
+			{
+				int res_y = y + yi;
+				if(cliprect.contains(x, res_y))
+				{
+					u8 b = pal5bit((color & 0x001f));
+					u8 r = pal5bit((color & 0x03e0) >> 5);
+					u8 g = pal6bit((color & 0xfc00) >> 10);
+					bitmap.pix(res_y, x) = (b) | (g << 8) | (r << 16);
+				}
+			}
+
+			count ++;
+		}
+	}
+}
+
+
+void pc88va_state::draw_indexed_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base)
+{
+	uint8_t *gvram = (uint8_t *)m_gvram.target();
+
+	for(int y = cliprect.min_x; y <= cliprect.max_y; y++)
+	{
+		// TODO: famista wants pitch width = 656, where it comes from?
+		const u32 line_offset = ((y * 640) / 2) + start_offset;
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=2)
+		{
+			u16 x_char = (x >> 1);
+			u32 bitmap_offset = line_offset + x_char;
+			
+			uint32_t color = (gvram[bitmap_offset] & 0xf0) >> 4;
+
+			if(color && cliprect.contains(x, y))
+				bitmap.pix(y, x) = m_palette->pen(color + pal_base);
+			
+			color = (gvram[bitmap_offset] & 0x0f) >> 0;
+
+			if(color && cliprect.contains(x + 1, y))
+				bitmap.pix(y, x + 1) = m_palette->pen(color + pal_base);
+		}
+	}
+}
+
+
+uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t pri, cur_pri_lv;
 	uint32_t screen_pri;
@@ -377,6 +443,7 @@ uint32_t pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 
 	Note that orthogonality level is actually REVERSED than the level number it indicates, so we have to play a little with the data for an easier usage ...
 	*/
 
+	// TODO: this should be calculated only in video_pri_w for cache
 	screen_pri = (m_video_pri_reg[1] & 0x00f0) >> 4; // priority 5
 	screen_pri|= (m_video_pri_reg[1] & 0x000f) << 4; // priority 4
 	screen_pri|= (m_video_pri_reg[0] & 0xf000) >> 4; // priority 3
@@ -384,16 +451,29 @@ uint32_t pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 
 	screen_pri|= (m_video_pri_reg[0] & 0x00f0) << 12; // priority 1
 	screen_pri|= (m_video_pri_reg[0] & 0x000f) << 20; // priority 0
 
-	for(pri = 0; pri < 6;pri++)
+	//popmessage("%08x", screen_pri);
+
+	for(pri = 0; pri < 6; pri++)
 	{
-		cur_pri_lv = (screen_pri >> (pri*4)) & 0xf;
+		cur_pri_lv = (screen_pri >> (pri * 4)) & 0xf;
 
 		if(cur_pri_lv & 8) // enable layer
 		{
 			if(pri <= 1) // (direct color mode, priority 5 and 4)
 			{
-				// 8 = graphic 0
-				// 9 = graphic 1
+				switch(cur_pri_lv & 3)
+				{
+					// 8 = graphic 0
+					case 0:
+						draw_raw_gfx(bitmap, cliprect);
+						break;
+					// 9 = graphic 1
+					case 1:
+						popmessage("Unimplemented raw GFX 1");
+						break;
+					default:
+						popmessage("Undocumented pri level %d", cur_pri_lv);
+				}
 			}
 			else
 			{
@@ -401,8 +481,11 @@ uint32_t pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 
 				{
 					case 0: draw_text(bitmap,cliprect); break;
 					case 1: if(m_tsp.spr_on) { draw_sprites(bitmap,cliprect); } break;
-					case 2: /* A = graphic 0 */ break;
-					case 3: /* B = graphic 1 */ break;
+					// TODO: understand where pal bases come from
+					/* A = graphic 0 */ 
+					case 2: draw_indexed_gfx(bitmap, cliprect, 0x00000, 0x10); break;
+					/* B = graphic 1 */ 
+					case 3: draw_indexed_gfx(bitmap, cliprect, 0x20000, 0x00); break;
 				}
 			}
 		}
@@ -591,7 +674,7 @@ void pc88va_state::execute_sync_cmd()
 
 	refresh = HZ_TO_ATTOSECONDS(60);
 
-	m_screen->configure(640, 480, visarea, refresh);
+	m_screen->configure(848, 448, visarea, refresh);
 }
 
 void pc88va_state::execute_dspon_cmd()
@@ -1061,6 +1144,13 @@ uint8_t pc88va_state::no_subfdc_r()
 }
 #endif
 
+void pc88va_state::text_transpen_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_text_transpen);
+	if (m_text_transpen & 0xfff0)
+		popmessage("text transpen > 15 (%04x)", m_text_transpen);
+}
+
 uint8_t pc88va_state::misc_ctrl_r()
 {
 	return m_misc_ctrl;
@@ -1083,7 +1173,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 //  map(0x0010, 0x0010) Printer / Calendar Clock Interface
 	map(0x0020, 0x0021).noprw(); // RS-232C
 	map(0x0030, 0x0031).rw(FUNC(pc88va_state::backupram_dsw_r), FUNC(pc88va_state::sys_port1_w)); // 0x30 (R) DSW1 (W) Text Control Port 0 / 0x31 (R) DSW2 (W) System Port 1
-	map(0x32, 0x32).rw(FUNC(pc88va_state::misc_ctrl_r), FUNC(pc88va_state::misc_ctrl_w));
+	map(0x0032, 0x0032).rw(FUNC(pc88va_state::misc_ctrl_r), FUNC(pc88va_state::misc_ctrl_w));
 //  map(0x0034, 0x0034) GVRAM Control Port 1
 //  map(0x0035, 0x0035) GVRAM Control Port 2
 	map(0x0040, 0x0041).r(FUNC(pc88va_state::sys_port4_r)); // (R) System Port 4 (W) System port 3 (strobe port)
@@ -1116,7 +1206,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 //  map(0x0110, 0x0111) Color Code/Plain Mask Register
 //  map(0x0124, 0x0125) ? (related to Transparent Color of Graphic Screen 0)
 //  map(0x0126, 0x0127) ? (related to Transparent Color of Graphic Screen 1)
-//  map(0x012e, 0x012f) ? (related to Transparent Color of Text/Sprite)
+	map(0x012e, 0x012f).w(FUNC(pc88va_state::text_transpen_w));
 //  map(0x0130, 0x0137) Picture Mask Parameter
 	map(0x0142, 0x0142).rw(FUNC(pc88va_state::idp_status_r), FUNC(pc88va_state::idp_command_w)); //Text Controller (IDP) - (R) Status (W) command
 	map(0x0146, 0x0146).w(FUNC(pc88va_state::idp_param_w)); //Text Controller (IDP) - (R/W) Parameter
@@ -1544,7 +1634,8 @@ void pc88va_state::machine_start()
 	m_fdd[0]->get_device()->set_rpm(300);
 	m_fdd[1]->get_device()->set_rpm(300);
 	m_fdc->set_rate(250000);
-
+	
+	save_item(NAME(m_text_transpen));
 }
 
 void pc88va_state::machine_reset()
@@ -1662,7 +1753,7 @@ void pc88va_state::pc88va(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: fully convert to set_raw (timings available)
 	m_screen->set_raw(XTAL(42'105'200) / 2, 848, 0, 640, 448, 0, 400);
-	m_screen->set_screen_update(FUNC(pc88va_state::screen_update_pc88va));
+	m_screen->set_screen_update(FUNC(pc88va_state::screen_update));
 
 	PALETTE(config, m_palette).set_entries(32);
 //  m_palette->set_init(FUNC(pc88va_state::pc8801));

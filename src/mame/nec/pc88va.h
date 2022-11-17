@@ -113,6 +113,7 @@ private:
 	uint8_t m_portc_test = 0;
 	uint8_t m_fdc_motor_status[2]{};
 
+	u16 m_text_transpen = 0;
 
 	/* timers */
 	emu_timer *m_tc_clear_timer = nullptr;
@@ -150,10 +151,9 @@ private:
 	uint16_t screen_ctrl_r();
 	void screen_ctrl_w(uint16_t data);
 	void timer3_ctrl_reg_w(uint8_t data);
-	void video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t backupram_dsw_r(offs_t offset);
 	void sys_port1_w(uint8_t data);
-	uint32_t screen_update_pc88va(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc88va_vrtc_irq);
 	uint8_t cpu_8255_c_r();
 	void cpu_8255_c_w(uint8_t data);
@@ -182,8 +182,12 @@ private:
 	static void floppy_formats(format_registration &fr);
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_indexed_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base);
+	void draw_raw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit);
 	void execute_sync_cmd();
 	void execute_dspon_cmd();
