@@ -28,6 +28,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "formats/pc98fdi_dsk.h"
 #include "formats/xdf_dsk.h"
 
 // TODO: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway.
@@ -175,15 +176,9 @@ private:
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
 //  uint16_t m_fdc_dma_r();
 //  void m_fdc_dma_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(pc88va_hlda_w);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	uint8_t fdc_dma_r();
-	void fdc_dma_w(uint8_t data);
-	uint8_t dma_memr_cb(offs_t offset);
-	void dma_memw_cb(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	static void floppy_formats(format_registration &fr);
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);

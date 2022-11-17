@@ -268,6 +268,8 @@ PC88VA doujin games (mostly undumped)
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="alt_title" value="マイトアンドマジック" />
+		<info name="usage" value="Boot with Disk C in drive 1"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A - User" />
 			<dataarea name="flop" size="1094592">
@@ -670,6 +672,7 @@ PC88VA doujin games (mostly undumped)
 	</software>
 
 <!-- Dual floppies, should work both on the PC88VA and on the PC98 (usually you just have to switch the first two disks depending on the system) -->
+	<!-- TODO: move to a shared SW list -->
 
 	<software name="illcity" supported="no">
 		<description>Illusion City - Genei Toshi</description>
@@ -786,6 +789,7 @@ PC88VA doujin games (mostly undumped)
 	</software>
 
 <!-- Dual floppies, should work both on the PC88VA and on the X68000 (usually you just have to switch the first two disks depending on the system) -->
+	<!-- TODO: move to a shared SW list -->
 
 	<software name="abunaten" supported="no">
 		<description>Abunai Tengu Densetsu</description>
@@ -1162,6 +1166,7 @@ PC88VA doujin games (mostly undumped)
 
 <!-- PC88 Images which have been patched to work on the VA? -->
 	<!-- is this legit? -->
+	<!-- TODO: None of the disks is bootable from V3 Mode, boots from pc8801ma by quick glance so likely belongs to pc8801_flop.xml, move once we have working V2 emulation mode -->
 	<software name="midgarts" supported="no">
 		<description>Mid Garts (VA patched?)</description>
 		<year>19??</year>

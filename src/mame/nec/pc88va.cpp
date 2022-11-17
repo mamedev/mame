@@ -11,12 +11,20 @@
     Special thanks to Fujix for his documentation translation help
 
     TODO:
-    - Currently fails floppy loading in PC Engine OS checking for ah=2h brk 8Ch, 
-      cfr. rtype PC=0x1c02c, others are quite similar.
-    - Implement bus slot, which should still be PC-8801 EXPansion bus.
-    - Backport from PC-8801 main map;
+    - Several entries fails floppy loading in PC Engine OS checking for ah=2h brk 8Ch, 
+      cfr. rtype PC=0x1c02c.
+    - video emulation is bare bones;
+    - keyboard irq (mightmg2, hold F8 service mode menu, presumably rogueall)
+    - Backport from PC-8801 main map, apply supersets where applicable;
+      \- IDP has EMUL for upd3301
+      \- In emulation mode HW still relies to a i8214, so it bridges thru
+         main ICU in cascaded mode via IRQ7;
+      \- (other stuff ...)
+    - sorcer, abunaten, cresmoon, rance2, pacman, pacmana jumps off the weeds, investigate;
+    - rance triggers SETALC in V50;
+    - upo fails vblank on/off logic bit;
     - Convert SASI from PC-9801 to a shared device, apparently it's same i/f;
-    - select between PIC slave and i8214;
+    - Implement bus slot, which should still be PC-8801 EXPansion bus.
 
     (old notes, to be reordered)
     - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
@@ -62,7 +70,7 @@ irq 15 - 17H - <reserved>
 
 // TODO: verify clocks
 #define MASTER_CLOCK    XTAL(8'000'000) // may be XTAL(31'948'800) / 4? (based on PC-8801 and PC-9801)
-#define FM_CLOCK        (XTAL(31'948'800) / 8) // 3993600
+#define FM_CLOCK        (XTAL(31'948'800) / 4) // 3993600
 
 
 void pc88va_state::video_start()
@@ -190,9 +198,9 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	uint8_t screen_fg_col = (tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0xf000) >> 12;
 	uint8_t screen_bg_col = (tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0x0f00) >> 8;
 
-	for(int y=0;y<13;y++)
+	for(int y = 0; y < 25; y++)
 	{
-		for(int x=0;x<80;x++)
+		for(int x = 0; x < 80; x++)
 		{
 			uint8_t jis1 = (tvram[count] & 0x7f) + 0x20;
 			uint8_t jis2 = (tvram[count] & 0x7f00) >> 8;
@@ -317,9 +325,9 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					return;
 			}
 
-			for(int yi=0;yi<16;yi++)
+			for(int yi = 0; yi < 16; yi++)
 			{
-				for(int xi=0;xi<8;xi++)
+				for(int xi = 0; xi < 8; xi++)
 				{
 					int res_x = x*8+xi;
 					int res_y = y*16+yi;
@@ -341,15 +349,15 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				}
 			}
 
-			count++;
-			count&=0xffff;
+			count ++;
+			count &=0xffff;
 		}
 	}
 }
 
 uint32_t pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t pri,cur_pri_lv;
+	uint8_t pri, cur_pri_lv;
 	uint32_t screen_pri;
 	bitmap.fill(0, cliprect);
 
@@ -376,7 +384,7 @@ uint32_t pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 
 	screen_pri|= (m_video_pri_reg[0] & 0x00f0) << 12; // priority 1
 	screen_pri|= (m_video_pri_reg[0] & 0x000f) << 20; // priority 0
 
-	for(pri=0;pri<6;pri++)
+	for(pri = 0; pri < 6;pri++)
 	{
 		cur_pri_lv = (screen_pri >> (pri*4)) & 0xf;
 
@@ -736,7 +744,8 @@ void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask
 uint16_t pc88va_state::sys_port4_r()
 {
 	uint8_t vrtc,sw1;
-	vrtc = (m_screen->vpos() < 200) ? 0x20 : 0x00; // vblank
+	// TODO: logic fails with upo
+	vrtc = (m_screen->vpos() < 400) ? 0x20 : 0x00; // vblank
 
 	sw1 = (ioport("DSW")->read() & 1) ? 2 : 0;
 
@@ -1581,21 +1590,14 @@ INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( pc88va_state::fdc_drq )
-{
-	printf("%02x DRQ\n",state);
-//	m_dmac->dreq2_w(state);
-}
-
 WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 {
 	if(m_fdc_mode)
 	{
+		// TODO: ugh why it doesn't follow state?
 		//printf("%d\n",state);
 		m_pic2->ir3_w(0);
 		m_pic2->ir3_w(1);
-		//m_maincpu->set_input_line(INPUT_LINE_IRQ6, state ? ASSERT_LINE : CLEAR_LINE);
-		//machine().debug_break();
 	}
 	#if TEST_SUBFDC
 	else
@@ -1603,56 +1605,21 @@ WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 	#endif
 }
 
-WRITE_LINE_MEMBER(pc88va_state::pc88va_hlda_w)
-{
-//  m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-
-//	m_dmac->hack_w(state);
-
-//  printf("%02x HLDA\n",state);
-}
-
 WRITE_LINE_MEMBER( pc88va_state::tc_w )
 {
-	/* floppy terminal count */
 	m_fdc->tc_w(state);
-
-//  printf("TC %02x\n",state);
-}
-
-
-uint8_t pc88va_state::fdc_dma_r()
-{
-	printf("R DMA\n");
-	return m_fdc->dma_r();
-}
-
-void pc88va_state::fdc_dma_w(uint8_t data)
-{
-	printf("W DMA %08x\n",data);
-	m_fdc->dma_w(data);
 }
 
 void pc88va_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_XDF_FORMAT);
+	fr.add(FLOPPY_PC98FDI_FORMAT);
 }
 
 static void pc88va_floppies(device_slot_interface &device)
 {
 	device.option_add("525hd", FLOPPY_525_HD);
-}
-
-uint8_t pc88va_state::dma_memr_cb(offs_t offset)
-{
-	printf("%08x finally DMA-ed\n",offset);
-	return 0;
-}
-
-void pc88va_state::dma_memw_cb(offs_t offset, uint8_t data)
-{
-	printf("%08x %02x finally DMA-ed\n",offset,data);
 }
 
 WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
@@ -1693,10 +1660,8 @@ void pc88va_state::pc88va(machine_config &config)
 #endif
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: convert to set_raw (timings available)
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea(0, 640-1, 0, 200-1);
+	// TODO: fully convert to set_raw (timings available)
+	m_screen->set_raw(XTAL(42'105'200) / 2, 848, 0, 640, 448, 0, 400);
 	m_screen->set_screen_update(FUNC(pc88va_state::screen_update_pc88va));
 
 	PALETTE(config, m_palette).set_entries(32);
@@ -1734,16 +1699,6 @@ void pc88va_state::pc88va(machine_config &config)
 	m_pic2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
 	m_pic2->in_sp_callback().set_constant(0);
 
-#if 0
-	AM9517A(config, m_dmac, MASTER_CLOCK);
-	m_dmac->out_hreq_callback().set(FUNC(pc88va_state::pc88va_hlda_w));
-	m_dmac->out_eop_callback().set(FUNC(pc88va_state::pc88va_tc_w));
-	m_dmac->in_ior_callback<2>().set(FUNC(pc88va_state::fdc_dma_r));
-	m_dmac->out_iow_callback<2>().set(FUNC(pc88va_state::fdc_dma_w));
-	m_dmac->in_memr_callback().set(FUNC(pc88va_state::dma_memr_cb));
-	m_dmac->out_memw_callback().set(FUNC(pc88va_state::dma_memw_cb));
-#endif
-
 	UPD765A(config, m_fdc, 4000000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pc88va_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>));
@@ -1764,7 +1719,7 @@ void pc88va_state::pc88va(machine_config &config)
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
 
-	YM2608(config, m_opna, MASTER_CLOCK*2);
+	YM2608(config, m_opna, FM_CLOCK);
 	m_opna->set_addrmap(0, &pc88va_state::opna_map);
 	m_opna->irq_handler().set(FUNC(pc88va_state::int4_irq_w));
 //	m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
