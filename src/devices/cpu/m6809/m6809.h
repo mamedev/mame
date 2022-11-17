@@ -91,13 +91,6 @@ protected:
 		ADDRESSING_MODE_REGISTER_D = 4
 	};
 
-	// register transfer
-// 	struct exgtfr_register
-// 	{
-// 		uint8_t   byte_value;
-// 		uint16_t  word_value;
-// 	};
-
 	// flag bits in the cc register
 	enum
 	{

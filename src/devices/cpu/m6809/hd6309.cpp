@@ -464,8 +464,8 @@ inline uint16_t hd6309_device::read_exgtfr_register(uint8_t reg)
 		case  9: result = ((uint16_t) m_q.r.b) << 8 | m_q.r.b; break;  // B
 		case 10: result = ((uint16_t) m_cc) << 8 | m_cc;       break;  // CC
 		case 11: result = ((uint16_t) m_dp) << 8 | m_dp;       break;  // DP
-		case 12: result = 0;                                 break;  // 0
-		case 13: result = 0;                                 break;  // 0
+		case 12: result = 0;                                   break;  // 0
+		case 13: result = 0;                                   break;  // 0
 		case 14: result = ((uint16_t) m_q.r.e) << 8 | m_q.r.e; break;  // E
 		case 15: result = ((uint16_t) m_q.r.f) << 8 | m_q.r.f; break;  // F
 		default:
@@ -497,8 +497,8 @@ inline void hd6309_device::write_exgtfr_register(uint8_t reg, uint16_t value)
 		case  9: m_q.r.b = (uint8_t) (value >> 0); break;  // B
 		case 10: m_cc    = (uint8_t) (value >> 0); break;  // CC
 		case 11: m_dp    = (uint8_t) (value >> 8); break;  // DP
-		case 12:                                            break;  // 0
-		case 13:                                            break;  // 0
+		case 12:                                   break;  // 0
+		case 13:                                   break;  // 0
 		case 14: m_q.r.e = (uint8_t) (value >> 8); break;  // E
 		case 15: m_q.r.f = (uint8_t) (value >> 0); break;  // F
 		default:
