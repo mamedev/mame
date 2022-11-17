@@ -20125,6 +20125,7 @@ void m68000_musashi_device::x4e7b_movec_l_3()
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 			break;
@@ -20180,6 +20181,7 @@ void m68000_musashi_device::x4e7b_movec_l_4()
 			m_cacr = REG_DA()[(word2 >> 12) & 15];
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 		case 0x800:            /* USP */
@@ -20269,6 +20271,7 @@ void m68000_musashi_device::x4e7b_movec_l_c()
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 		case 0x800:            /* USP */
