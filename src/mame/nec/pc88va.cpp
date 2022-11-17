@@ -59,6 +59,7 @@ irq 14 - 16H - <reserved>
 irq 15 - 17H - <reserved>
 
 trap list (brief, for quick consultation):
+brk 82h AH=01h <undocumented>, "paint" uses it
 brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL = 0
 
 **************************************************************************************************/
@@ -147,21 +148,22 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		{
 			// 4bpp mode
 			// TODO: xsize may be doubled, cfr. pc88vad
-			xsize = (xsize + 1) * 4;
+			xsize = (xsize + 1) * 8;
 			ysize = (ysize + 1) * 4;
 
-			if(!(spda & 0x8000)) // correct?
+			// TODO: verify me up
+			if(!(spda & 0x8000))
 				spda *= 2;
 
 			spr_count = 0;
 
 			for(int y_i = 0; y_i < ysize; y_i++)
 			{
-				for(int x_i = 0; x_i < xsize; x_i+=2)
+				for(int x_i = 0; x_i < xsize; x_i += 4)
 				{
-					for(int x_s = 0; x_s < 2; x_s++)
+					for(int x_s = 0; x_s < 4; x_s ++)
 					{
-						int pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (8-(x_s*8)) & 0xf;
+						int pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (12 - (x_s * 4)) & 0xf;
 
 						// TODO: bc
 						//if(bc != -1) //transparent pen
@@ -185,41 +187,64 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y
 		return ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
 	else if(jis1 >= 0x40 && jis1 < 0x50)
 		return 0x4000 + ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
-	else if(x == 0 && y == 0 && jis1 != 0) // debug stuff, to be nuked in the end
-		printf("%02x\n",jis1);
+	else if(x == 0 && y == 0 && jis1 != 0 && jis2 != 0) // debug stuff, to be nuked in the end
+		printf("%02x %02x\n",jis1, jis2);
 
 	return 0;
 }
 
+/*
+ * [+00] Frame buffer start address (VSA)
+ * [+02] ---- ---- ---- -xxx Upper VSA
+ * [+04] ---- -xxx xxxx xxxx Frame buffer height (VH)
+ * [+06] <reserved>
+ * [+08] ---- --xx xxxx xxxx Frame buffer width (VW), in bytes
+ * [+0a] xxxx ---- ---- ---- background color
+ *       ---- xxxx ---- ---- foreground color
+ *       ---- ---- ---x xxxx display mode
+ * [+0c] Raster address offset
+ * [+0e] <reserved>
+ * [+10] Split screen start address (RSA)
+ * [+12] <reserved> / Upper RSA
+ * [+14] Split screen height (RH)
+ * [+16] Split screen width (RW)
+ * [+18] Split screen vertical start position (RYP)
+ * [+1a] Split screen horizontal start position (RXP)
+ * [+1c] <reserved>
+ * [+1e] <reserved>
+ */
 void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint16_t const *const tvram = m_tvram;
+	uint16_t const *const fb_regs = &tvram[m_tsp.tvram_vreg_offset / 2];
 	// TODO: PCG select won't work with this arrangement
 	uint8_t const *const kanji = memregion("kanji")->base();
 
-	uint32_t count = tvram[m_tsp.tvram_vreg_offset/2];
+	u32 vsa = (fb_regs[0 / 2]); // | (fb_regs[2 / 2] & 7) << 16;
 
-	uint8_t attr_mode = tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0x1f;
-	/* Note: bug in docs has the following two reversed */
-	uint8_t screen_fg_col = (tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0xf000) >> 12;
-	uint8_t screen_bg_col = (tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0x0f00) >> 8;
+	if (fb_regs[2 / 2])
+		popmessage("Upper VSA enabled!");
 
-	for(int y = 0; y < 25; y++)
+	const u8 attr_mode = fb_regs[0xa / 2] & 0x1f;
+	// TODO: check this out, diverges with documentation
+	const u8 screen_fg_col = (fb_regs[0xa / 2] & 0xf000) >> 12;
+	const u8 screen_bg_col = (fb_regs[0xa / 2] & 0x0f00) >> 8;
+
+	// TODO: how even vh/vw can run have all these bytes?
+	const u8 vh = (fb_regs[4 / 2] & 0x7ff);
+	const u16 vw = (fb_regs[8 / 2] & 0x3ff) / 2;
+
+	for(int y = 0; y < vh; y++)
 	{
-		for(int x = 0; x < 80; x++)
+		for(int x = 0; x < vw; x++)
 		{
-			uint8_t jis1 = (tvram[count] & 0x7f) + 0x20;
-			uint8_t jis2 = (tvram[count] & 0x7f00) >> 8;
-			uint16_t lr_half_gfx = ((tvram[count] & 0x8000) >> 15);
+			uint16_t attr = (tvram[vsa+(m_tsp.attr_offset/2)] & 0x00ff);
 
-			uint32_t tile_num = calc_kanji_rom_addr(jis1,jis2,x,y);
-
-			uint16_t attr = (tvram[count+(m_tsp.attr_offset/2)] & 0x00ff);
-
-			uint8_t fg_col,bg_col,secret,reverse;
+			uint8_t fg_col, bg_col, secret, reverse;
 			//uint8_t blink,dwidc,dwid,uline,hline;
 			fg_col = bg_col = reverse = secret = 0; //blink = dwidc = dwid = uline = hline = 0;
 
+			// TODO: convert to functional programming
 			switch(attr_mode)
 			{
 				/*
@@ -330,35 +355,75 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					popmessage("Illegal text tilemap attribute mode %02x",attr_mode);
 					return;
 			}
-
-			for(int yi = 0; yi < 16; yi++)
+			
+			// TODO: more functional programming
+			if ((tvram[vsa] & 0xff00) == 0) // ANK
 			{
-				for(int xi = 0; xi < 8; xi++)
+				
+				u32 tile_num = ((tvram[vsa] & 0xff)  * 16) | 0x40000;
+
+				for(int yi = 0; yi < 16; yi++)
 				{
-					int res_x = x*8+xi;
-					int res_y = y*16+yi;
+					for(int xi = 0; xi < 8; xi++)
+					{
+						int res_x = x * 8 + xi;
+						int res_y = y * 16 + yi;
 
-					if(!cliprect.contains(res_x, res_y))
-						continue;
+						if(!cliprect.contains(res_x, res_y))
+							continue;
 
-					int pen = kanji[((yi*2)+lr_half_gfx)+tile_num] >> (7-xi) & 1;
+						int pen = kanji[yi + tile_num] >> (7-xi) & 1;
 
-					if(reverse)
-						pen = pen & 1 ? bg_col : fg_col;
-					else
-						pen = pen & 1 ? fg_col : bg_col;
+						if(reverse)
+							pen = pen & 1 ? bg_col : fg_col;
+						else
+							pen = pen & 1 ? fg_col : bg_col;
 
-					if(secret) { pen = 0; } //hide text
+						if(secret) { pen = 0; } //hide text
 
-					// TODO: transpen not right, cfr. rogueall
-					// (sets 1, wants 7)
-					if(pen != 0 && pen != m_text_transpen)
-						bitmap.pix(res_y, res_x) = m_palette->pen(pen);
+						if(pen != 0 && pen != m_text_transpen)
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen);
+					}
+				}
+			}
+			else // kanji
+			{
+				uint8_t jis1 = (tvram[vsa] & 0x7f) + 0x20;
+				uint8_t jis2 = (tvram[vsa] & 0x7f00) >> 8;
+				uint16_t lr_half_gfx = ((tvram[vsa] & 0x8000) >> 15);
+
+				uint32_t tile_num = calc_kanji_rom_addr(jis1, jis2, x, y);
+
+				for(int yi = 0; yi < 16; yi++)
+				{
+					for(int xi = 0; xi < 8; xi++)
+					{
+						int res_x = x * 8 + xi;
+						int res_y = y * 16 + yi;
+
+						if(!cliprect.contains(res_x, res_y))
+							continue;
+
+						int pen = kanji[((yi*2)+lr_half_gfx)+tile_num] >> (7-xi) & 1;
+
+						if(reverse)
+							pen = pen & 1 ? bg_col : fg_col;
+						else
+							pen = pen & 1 ? fg_col : bg_col;
+
+						if(secret) { pen = 0; } //hide text
+
+						// TODO: transpen not right, cfr. rogueall
+						// (sets 1, wants 7)
+						if(pen != 0 && pen != m_text_transpen)
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen);
+					}
 				}
 			}
 
-			count ++;
-			count &=0xffff;
+
+			vsa ++;
+			vsa &=0xffff;
 		}
 	}
 }
@@ -663,8 +728,8 @@ void pc88va_state::execute_sync_cmd()
 	//printf("V border end: %d\n",(sync_cmd[0xc]));
 	//printf("V blank end: %d\n",(sync_cmd[0xd]));
 
-	x_vis_area = m_buf_ram[4] * 4;
-	y_vis_area = (m_buf_ram[0xa])|((m_buf_ram[0xb] & 0x40)<<2);
+	x_vis_area = (m_buf_ram[4] + 1) * 4;
+	y_vis_area = (m_buf_ram[0xa]) | ((m_buf_ram[0xb] & 0x40) << 2);
 
 	visarea.set(0, x_vis_area - 1, 0, y_vis_area - 1);
 
@@ -1545,7 +1610,7 @@ static const gfx_layout pc88va_kanji_16x16 =
 	16*16
 };
 
-// TODO: decoded for debugging purpose, this will be nuked in the end ...
+// debug only
 static GFXDECODE_START( gfx_pc88va )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_8x8,    0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 1 )

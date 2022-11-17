@@ -17,6 +17,7 @@ license:CC0
     * Igo-mei-kyoku Shuu '87 ~ 囲碁名局集'87, by GAM
     * Death Bringer ~ デス・ブリンガー, by Telenet Japan
     * Arantia (Atlantia?) VA Special ~ アランティアVAスペシャル, by Victor Music Industry
+    * Go Kichi-kun ~ 碁キチくん, by GAM
     * Go Kichi-kun 2 ~ 碁キチくん2, by GAM
     * Ultima V ~ ウルティマⅤ, by Pony Canyon
     * The Bard's Tale ~ ザ バーズテイル, by Pony Canyon
@@ -28,7 +29,7 @@ license:CC0
     * Ishin no Arashi ~ 維新の嵐, by Koei
     * Teitoku no Ketsudan ~ 提督の決断, by Koei
     * Nobunaga no Yabou - Sengoku Gunyou Den ~ 信長の野望・戦国群雄伝, by Koei
-    * Suikoden ~ 水滸伝, by Koei
+    * Suikoden - Tenmei no Chikai ~ 水滸伝 天命の誓い, by Koei
     * Kawaiso Monogatari ~ かわいそう物語, by System Software
     * Fantasy III ~ ファンタジーⅢ, by Starcraft
     * Lodoss Shima Senki ~ ロードス島戦記, by Humming Bird Soft
@@ -37,6 +38,10 @@ license:CC0
     * Ultima I-IV ~ ウルティマI～IV, by Pony Canyon
     * Heroes of the Lance ~ ヒーローオブランス, by Pony Canyon
     * Lightning Bacchus? ~ ライトニングバッカス, by NCS
+    * Record of Lodoss War ~ ロードス島戦記 by Humming Bird Soft
+
+PC88VA software
+    * The Print Shop II ~ プリントショップ Ⅱ (Broderbund Japan)
 
 PC88VA doujin games (mostly undumped)
 
@@ -67,7 +72,13 @@ PC88VA doujin games (mostly undumped)
     * 翼君の宝箱14 (by Wing software, 1999)
     * くるッ★彡 (by Cenkeil, 1999)
     * Frail Rulers (by Fredia, 1999)
-	* Voltige Aerienne / ディスクイメージ (20??)
+    * Voltige Aerienne / ディスクイメージ (2008?)
+
+Operating Systems
+    * MS-DOS 2.11
+    * MS-DOS 3.1
+    * CDOS
+
 -->
 
 
@@ -111,9 +122,10 @@ PC88VA doujin games (mostly undumped)
 	</software>
 
 	<software name="animefrm" supported="no">
-		<description>AnimeFramer</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- PS88-VA101-HMW subtitle on cover -->
+		<description>Anime Framer</description>
+		<year>1987</year>
+		<publisher>NEC</publisher>
 		<info name="alt_title" value="アニメフレーマー" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
@@ -128,6 +140,8 @@ PC88VA doujin games (mostly undumped)
 				<rom name="animeframer - data disk.d88" size="1338960" crc="9b5cd907" sha1="80f1558a3d5c6d21d1c42d8325ae55e320674ef7"/>
 			</dataarea>
 		</part>
+
+		<!-- Package also contains a CD-ROM, what for? -->
 	</software>
 
 <!-- Is this an Alt version of the program above (mistranslated), or another program? -->
