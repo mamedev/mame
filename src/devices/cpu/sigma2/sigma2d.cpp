@@ -92,7 +92,7 @@ offs_t sigma2_disassembler::dasm_memory_reference(std::ostream &stream, offs_t p
 	if (BIT(inst, 11))
 	{
 		// Self-relative addressing
-		util::stream_format(stream, "X'%04X'", (pc + (inst & 0x00ff) - (inst & 0x0100)) & 0xffff);
+		util::stream_format(stream, "X'%04X'", (pc + util::sext(inst, 9)) & 0xffff);
 		if (BIT(inst, 9))
 			stream << ',' << m_reg_names[4];
 	}
@@ -341,7 +341,7 @@ offs_t sigma2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	if ((inst & 0xf000) == 0x6000)
 	{
 		// Conditional branch instructions use self-relative addressing only
-		util::stream_format(stream, "%-8sX'%04X'", s_bc_names[BIT(inst, 9, 3)], (pc + (inst & 0x00ff) - (inst & 0x0100)) & 0xffff);
+		util::stream_format(stream, "%-8sX'%04X'", s_bc_names[BIT(inst, 9, 3)], (pc + util::sext(inst, 9)) & 0xffff);
 		return 1 | STEP_COND | SUPPORTED;
 	}
 	else if ((inst & 0xf000) == 0x7000)
