@@ -13443,7 +13443,8 @@ kept for now until finding out what those bytes affect...
 		<publisher>Philips</publisher>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="stcmsx1p.rom" size="16384" crc="941647ed" sha1="d24682996ab2291199d49ba77a60e1888398e967" offset="0x0000" />
+				<!-- It does not seem like a real dump of the service test cartridge. It only contains some RS232 setup code, but those components are not even on the pcb. -->
+				<rom name="stcmsx1p.rom" size="16384" crc="941647ed" sha1="d24682996ab2291199d49ba77a60e1888398e967" status="baddump" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
