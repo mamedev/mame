@@ -10712,6 +10712,10 @@ zerotrgta                       // (c) 1985 Data East Corporation
 bujutsu                         // G?645 (c)1997
 racjamdx                        // G?676 (c)1997 Japan JAA
 
+@source:trs/agvision.cpp
+agvision                        // TRS-80 AgVision
+trsvidtx                        // TRS-80 Videotex
+
 @source:trs/coco12.cpp
 cd6809                          // Codimex CD-6809
 coco                            // Color Computer
@@ -10728,7 +10732,6 @@ lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
 ms1600                          // ILCE / SEP Micro-SEP 1600
 mx1600                          // Dynacom MX-1600
 t4426                           // Terco 4426 CNC programming station
-trsvidtx                        // TRS-80 Videotex
 
 @source:trs/coco3.cpp
 coco3                           // Color Computer 3 (NTSC)
