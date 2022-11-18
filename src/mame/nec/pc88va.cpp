@@ -464,12 +464,16 @@ TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 	}
 }
 
+/*
+ * x--- ---- MINTEN (TCU irq enable)
+ * ---- --xx MTP1/MTP0 general purpose timer 3 interval
+ * ---- --00 120 Hz
+ * ---- --01 60 Hz
+ * ---- --10 30 Hz
+ * ---- --11 15 Hz
+ */
 void pc88va_state::timer3_ctrl_reg_w(uint8_t data)
 {
-	/*
-	x--- ---- MINTEN (TCU irq enable)
-	---- --xx general purpose timer 3 interval (120, 60, 30, 15)
-	*/
 	m_timer3_io_reg = data;
 
 	if(data & 0x80)
@@ -517,6 +521,8 @@ void pc88va_state::misc_ctrl_w(uint8_t data)
 }
 
 // TODO: I/O 0x00xx is almost same as pc8801
+// (*) are specific N88 V1 / V2 ports
+
 void pc88va_state::pc88va_io_map(address_map &map)
 {
 	map(0x0000, 0x000f).r(FUNC(pc88va_state::key_r)); // Keyboard ROW reading
@@ -528,8 +534,10 @@ void pc88va_state::pc88va_io_map(address_map &map)
 //  map(0x0035, 0x0035) GVRAM Control Port 2
 	map(0x0040, 0x0040).rw(FUNC(pc88va_state::port40_r), FUNC(pc88va_state::port40_w)); // (R) System Port 4 (W) System port 3 (strobe port)
 	map(0x0044, 0x0047).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write));
+//  map(0x0050, 0x005b) CRTC/backdrop on PC8801, causes HW trap on VA
 //  map(0x005c, 0x005c) (R) GVRAM status
 //  map(0x005c, 0x005f) (W) GVRAM selection
+//  map(0x0060, 0x0068) DMA on PC8801, causes HW trap on VA
 //  map(0x0070, 0x0070) ? (*)
 //  map(0x0071, 0x0071) Expansion ROM select (*)
 //  map(0x0078, 0x0078) Memory offset increment (*)
@@ -561,22 +569,22 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x0142, 0x0142).rw(FUNC(pc88va_state::idp_status_r), FUNC(pc88va_state::idp_command_w)); //Text Controller (IDP) - (R) Status (W) command
 	map(0x0146, 0x0146).w(FUNC(pc88va_state::idp_param_w)); //Text Controller (IDP) - (R/W) Parameter
 //  map(0x0148, 0x0149) Text control port 1
-//  map(0x014c, 0x014f) ? CG Port, animefrm
+//  map(0x014c, 0x014f) Kanji CG Port, animefrm
 	map(0x0150, 0x0151).r(FUNC(pc88va_state::sysop_r)); // System Operational Mode
 	map(0x0152, 0x0153).rw(FUNC(pc88va_state::bios_bank_r), FUNC(pc88va_state::bios_bank_w)); // Memory Map Register
 //  map(0x0154, 0x0155) Refresh Register (wait states)
 	map(0x0156, 0x0156).r(FUNC(pc88va_state::rom_bank_r)); // ROM bank status
-//  map(0x0158, 0x0159) Interruption Mode Modification
+//  map(0x0158, 0x0159) Interruption Mode Modification (strobe), changes i8214 mode to i8259, cannot be changed back
 //  map(0x015c, 0x015f) NMI mask port (strobe port)
-//  map(0x0160, 0x016f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // DMA Controller
+//  map(0x0160, 0x016f) V50 DMAC
 //  map(0x0180, 0x0180) read by Olteus
 	map(0x0184, 0x0187).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-//  map(0x0188, 0x018b).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // ICU, also controls 8214 emulation
+//  map(0x0188, 0x018b) V50 ICU
 //  map(0x0190, 0x0191) System Port 5
 //  map(0x0196, 0x0197) Keyboard sub CPU command port
 	map(0x0198, 0x0199).w(FUNC(pc88va_state::backupram_wp_1_w)); //Backup RAM write inhibit
 	map(0x019a, 0x019b).w(FUNC(pc88va_state::backupram_wp_0_w)); //Backup RAM write permission
-//  map(0x01a0, 0x01a7).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);// vTCU (timer counter unit)
+//  map(0x01a0, 0x01a7) V50 TCU
 	map(0x01a8, 0x01a8).w(FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
 	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff);// FDC related (765)
 	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
@@ -590,11 +598,10 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x0260, 0x027f).ram(); // Frame buffer 3 control parameter
 	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
 
-//  map(0x0500, 0x05ff) GVRAM
+//  map(0x0500, 0x05ff) SGP
 //  map(0x1000, 0xfeff) user area (???)
 	map(0xff00, 0xffff).noprw(); // CPU internal use
 }
-// (*) are specific N88 V1 / V2 ports
 
 TIMER_CALLBACK_MEMBER(pc88va_state::pc8801fd_upd765_tc_to_zero)
 {
