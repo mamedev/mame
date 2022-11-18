@@ -28,9 +28,14 @@ TODO:
 - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrive, victlap
 - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
-- polygon z position problems? (also has glitches on real hw, but not as bad)
+- propcycl attract mode, when the altar button is pressed, global fade should affect the background sprite
+- slavesim_handle_233002 is not fully understood, objectshift and the flag to disable fog are obvious, the others are unclear
+- polygon position problems? (also has glitches on real hw, but not as bad)
   + ridgerac suspension bridge, cables appear through the guardrail
   + timecris stage 1-2 start, beam appears through platform
+  + timecris stage 2-1 final section, steel beam appears through plank
+  + cybrcycc speed dial should be more to the left
+  + plenty more, but need clearly visible cases with PCB evidence
 - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2,
   czram contents is rather odd here and partly cleared (probably the cause?):
   + $0000-$0d7f - gradual increase from $00-$7c
@@ -39,12 +44,15 @@ TODO:
   + $1a00-$0dff - $77
   + $1e00-$1fff - $78
 - improve ss22 lighting:
+  + acedrive/victlap sparks
   + adillor title logo
+  + alpinr2b spinning yellow best times in attract mode
   + alpinr2b mountains in selection screen
   + propcycl score/time
   + propcycl Solitar pillars
-  + ridgerac waving flag shadowing
-  + ridgerac rotating sign after 2nd tunnel
+  + ridgerac car when entering highscore
+  + ridgerac waving flag
+  + ridgerac rotating sign before 2nd tunnel
   + timecris Sherudo's knives
 - improve ss22 spot, used in dirtdash, alpines highscore entry, testmode screen#14 - not understood well:
   + does not work at all in alpines (uses spot_factor, not spotram, should show a spotlight with darkened background)
@@ -57,7 +65,9 @@ TODO:
   + testmode looks wrong, spot_data high bits is 0 here (2 in dirtdash)
 - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snow melting effect)
 - alpha blended sprite/poly with priority over alpha blended text doesn't work right
-- ss22 poly alpha is probably more limited than currently emulated, not supporting stacked layers
+- ss22 poly/sprite alpha is probably more limited than currently emulated, not supporting stacked layers
+  + airco22 attract mode, see-through plane looks weird (they probably meant to just darken it)
+  + cybrcycc game over screen has a weird glitch
 
 ***********************************************************************************************************
 
@@ -3679,7 +3689,7 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_keycus_id));
 	save_item(NAME(m_keycus_rng));
 	save_item(NAME(m_cz_adjust));
-	save_item(NAME(m_bri_adjust));
+	save_item(NAME(m_objectflags));
 	save_item(NAME(m_dspram_bank));
 	save_item(NAME(m_dspram16_latch));
 	save_item(NAME(m_slave_simulation_active));
