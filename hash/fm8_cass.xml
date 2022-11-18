@@ -81,42 +81,42 @@ Fujitsu FM-8 cassette images
 		<info name="alt_title" value="FM−8プログラムライブラリNO.2"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="328964">
-				<rom name="demonstration.t77" size="328964" crc="c80a32c1" sha1="64db2b9ecf50a239ad103be7aa52f6ca84d4c20f" offset="0"/>
+				<rom name="demonstration.t77" size="328964" crc="c80a32c1" sha1="64db2b9ecf50a239ad103be7aa52f6ca84d4c20f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="924508">
-				<rom name="graph.t77" size="924508" crc="f7c65807" sha1="8b079cfaaab3670cc2cd250d7ad3b9d273c8a5cd" offset="0"/>
+				<rom name="graph.t77" size="924508" crc="f7c65807" sha1="8b079cfaaab3670cc2cd250d7ad3b9d273c8a5cd"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="fm7_cass">
 			<dataarea name="cass" size="416272">
-				<rom name="sumwint.t77" size="416272" crc="d219f306" sha1="6f2b6abdd71101047e482cd80930b8ddab15280a" offset="0"/>
+				<rom name="sumwint.t77" size="416272" crc="d219f306" sha1="6f2b6abdd71101047e482cd80930b8ddab15280a"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="fm7_cass">
 			<dataarea name="cass" size="394700">
-				<rom name="wordpro.t77" size="394700" crc="3c5c622c" sha1="d1322d3c4ef0f19037e39e1c9308db5ad791ce58" offset="0"/>
+				<rom name="wordpro.t77" size="394700" crc="3c5c622c" sha1="d1322d3c4ef0f19037e39e1c9308db5ad791ce58"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="fm7_cass">
 			<dataarea name="cass" size="419418">
-				<rom name="lunar lander.t77" size="419418" crc="ca58b4d0" sha1="b34f6f71c04f4b9f135334463f88032067215785" offset="0"/>
+				<rom name="lunar lander.t77" size="419418" crc="ca58b4d0" sha1="b34f6f71c04f4b9f135334463f88032067215785"/>
 			</dataarea>
 		</part>
 		<part name="cass6" interface="fm7_cass">
 			<dataarea name="cass" size="448498">
-				<rom name="bjbonus.t77" size="448498" crc="90bd16b0" sha1="95b5a8c8a9259063017d409e1d3c5bb2826ac898" offset="0"/>
+				<rom name="bjbonus.t77" size="448498" crc="90bd16b0" sha1="95b5a8c8a9259063017d409e1d3c5bb2826ac898"/>
 			</dataarea>
 		</part>
 		<part name="cass7" interface="fm7_cass">
 			<dataarea name="cass" size="201096">
-				<rom name="sort.t77" size="201096" crc="4f1a8a23" sha1="b0610ee3414d49149a81bf8b9986b229338407b5" offset="0"/>
+				<rom name="sort.t77" size="201096" crc="4f1a8a23" sha1="b0610ee3414d49149a81bf8b9986b229338407b5"/>
 			</dataarea>
 		</part>
 		<part name="cass8" interface="fm7_cass">
 			<dataarea name="cass" size="426582">
-				<rom name="meibo.t77" size="426582" crc="6048ed8a" sha1="be297c0119fe9f5d634f9ccb1538e5547229a980" offset="0"/>
+				<rom name="meibo.t77" size="426582" crc="6048ed8a" sha1="be297c0119fe9f5d634f9ccb1538e5547229a980"/>
 			</dataarea>
 		</part>
 	</software>
@@ -128,7 +128,7 @@ Fujitsu FM-8 cassette images
 		<info name="alt_title" value="FM−8プログラムライブラリNO.3"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3453092">
-				<rom name="fm-8 program library 3.t77" size="3453092" crc="bb5bc9eb" sha1="85c75f9c8d243a9b94fcabcb50fbd581bb5d4ae9" offset="0"/>
+				<rom name="fm-8 program library 3.t77" size="3453092" crc="bb5bc9eb" sha1="85c75f9c8d243a9b94fcabcb50fbd581bb5d4ae9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,7 +140,7 @@ Fujitsu FM-8 cassette images
 		<info name="alt_title" value="FM−8プログラムライブラリNO.4"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3230932">
-				<rom name="fm-8 program library 4.t77" size="3230932" crc="2b2c73c1" sha1="02e6fadf819d7b5337b590c670106b379ff95030" offset="0"/>
+				<rom name="fm-8 program library 4.t77" size="3230932" crc="2b2c73c1" sha1="02e6fadf819d7b5337b590c670106b379ff95030"/>
 			</dataarea>
 		</part>
 	</software>
