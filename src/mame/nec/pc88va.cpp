@@ -18,8 +18,11 @@
       \- In emulation mode HW still relies to a i8214, so it bridges thru
          main ICU in cascaded mode via IRQ7;
       \- (other stuff ...)
-    - sorcer, abunaten, cresmoon, rance2, pacman, pacmana jumps off the weeds, investigate;
-    - rance triggers SETALC in V50;
+    - sorcer: disables FDC DMA mode, expects to continue loading thru PC80S31K PIO;
+    - abunaten, cresmoon, rance2, pacman: flips FDC DS1 then changes FDD#0 track density to 96 TPI, 
+      gets stuck to infinite reti loop and jumps to EMM area;
+    - pacmana: crashes after or during PC Engine OS POST, plays again with FDC settings;
+    - rance: as above, triggers SETALC in V50;
     - upo fails vblank on/off logic bit;
     - Convert SASI from PC-9801 to a shared device, apparently it's same i/f;
     - Implement bus slot, which should still be PC-8801 EXPansion bus.
@@ -68,7 +71,19 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 #include "pc88va.h"
 
 #include "softlist_dev.h"
+#include <iostream>
 
+
+#define LOG_FDC     (1U << 2) // $1b0-$1b2 accesses
+#define LOG_FDC2    (1U << 3) // $1b4-$1b6 accesses
+
+#define VERBOSE (LOG_GENERAL | LOG_FDC)
+#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGFDC(...)      LOGMASKED(LOG_FDC, __VA_ARGS__)
+#define LOGFDC2(...)     LOGMASKED(LOG_FDC2, __VA_ARGS__)
 
 // TODO: verify clocks
 #define MASTER_CLOCK    XTAL(8'000'000) // may be XTAL(31'948'800) / 4? (based on PC-8801 and PC-9801)
@@ -985,9 +1000,9 @@ uint8_t pc88va_state::hdd_status_r()
 
 uint8_t pc88va_state::pc88va_fdc_r(offs_t offset)
 {
-	printf("%08x\n",offset);
+	LOGFDC("Unhandled read $%04x\n", (offset << 1) + 0x1b0);
 
-	switch(offset*2)
+	switch(offset << 1)
 	{
 		case 0x00: return 0; // FDC mode register
 		case 0x02: return 0; // FDC control port 0
@@ -1071,14 +1086,17 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 
 void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 {
-	printf("%08x %02x\n",offset<<1,data);
-	switch(offset<<1)
+	switch(offset << 1)
 	{
 		/*
 		---- ---x MODE: FDC op mode (0) Intelligent (1) DMA
 		*/
 		case 0x00: // FDC mode register
 			m_fdc_mode = data & 1;
+			LOGFDC("$1b0 FDC op mode (%02x) %s mode\n"
+				, data
+				, m_fdc_mode ? "DMA" : "Intelligent (PIO)"
+			);
 			#if TEST_SUBFDC
 			m_fdccpu->set_input_line(INPUT_LINE_HALT, (m_fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
 			#endif
@@ -1090,17 +1108,46 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 		---- --xx RV1/RV0: Drive 1/0 mode selection (0) 2D and 2DD mode (1) 2HD mode
 		*/
 		case 0x02: // FDC control port 0
-			m_fdd[0]->get_device()->set_rpm(data & 0x01 ? 360 : 300);
-			m_fdd[1]->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+		{
+			const bool clk = bool(BIT(data, 5));
+			const bool rv1 = bool(BIT(data, 1));
+			const bool rv0 = bool(BIT(data, 0));
+			LOGFDC("$1b2 FDC control port 0 (%02x) %s CLK %d DS1 %d%d TD1/TD0 %d%d RV1/RV0\n"
+				, data
+				, clk ? "  8 MHz" : "4.8 MHz"
+				, !bool(BIT(data, 4))
+				, bool(BIT(data, 3))
+				, bool(BIT(data, 2))
+				, rv1
+				, rv0
+			);
+			m_fdd[0]->get_device()->set_rpm(rv0 ? 360 : 300);
+			m_fdd[1]->get_device()->set_rpm(rv1 ? 360 : 300);
 
-			m_fdc->set_rate(data & 0x20 ? 500000 : 250000);
+			//m_fdd[0]->get_device()->ds_w(!BIT(data, 4));
+			//m_fdd[1]->get_device()->ds_w(!BIT(data, 4));
+
+			// TODO: is this correct? sounds more like a controller clock change, while TD1/TD0 should do the rate change
+			m_fdc->set_rate(clk ? 500000 : 250000);
 			break;
+		}
 		/*
-		---- x--- PCM: ?
+		---- x--- PCM: precompensation control (1) on
 		---- --xx M1/M0: Drive 1/0 motor control (0) NOP (1) Change motor status
 		*/
 		case 0x04:
-			if(data & 1)
+		{
+			const bool m0 = bool(BIT(data, 0));
+			const bool m1 = bool(BIT(data, 1));
+
+			LOGFDC2("$1b4 FDC control port 1 (%02x) %d PCM %d%d M1/M0\n"
+				, data
+				, bool(BIT(data, 3))
+				, m1
+				, m0
+			);
+
+			if(m0)
 			{
 				m_fdd[0]->get_device()->mon_w(1);
 				if(m_fdc_motor_status[0] == 0)
@@ -1109,7 +1156,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 					m_fdc_motor_status[0] = 0;
 			}
 
-			if(data & 2)
+			if(m1)
 			{
 				m_fdd[1]->get_device()->mon_w(1);
 				if(m_fdc_motor_status[1] == 0)
@@ -1119,29 +1166,42 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 			}
 
 			break;
-		/*
-		x--- ---- FDCRST: FDC Reset
-		-xx- ---- FDCFRY FRYCEN: FDC force ready control
-		-x0- ---- ignored
-		-01- ---- force ready release
-		-11- ---- force ready assert
-		---x ---- DMAE: DMA Enable (0) Prohibit DMA (1) Enable DMA
-		---- -x-- XTMASK: FDC timer IRQ mask (0) Disable (1) Enable
-		---- ---x TTRG: FDC timer trigger (0) FDC timer clearing (1) FDC timer start
-		*/
-		case 0x06:
-			//printf("%02x\n",data);
-			if(data & 1)
-			{
-				m_fdc_timer->adjust(attotime::from_msec(100));
-			}
+		}
 
+		/*
+		 * FDC control port 2
+		 * x--- ---- FDCRST: FDC Reset
+		 * -xx- ---- FDCFRY FRYCEN: FDC force ready control
+		 * -x0- ---- ignored
+		 * -01- ---- force ready release
+		 * -11- ---- force ready assert
+		 * ---x ---- DMAE: DMA Enable (0) Prohibit DMA (1) Enable DMA
+		 * ---- -x-- XTMASK: FDC timer IRQ mask (0) Disable (1) Enable
+		 * ---- ---x TTRG: FDC timer trigger (0) FDC timer clearing (1) FDC timer start
+		 */
+		case 0x06:
+		{
+			const bool fdcrst = bool(BIT(data, 7));
+			const bool ttrg = bool(BIT(data, 0));
+			LOGFDC2("$1b6 FDC control port 2 (%02x) %d FDCRST %d%d FDCFRY %d DMAE %d XTMASK %d TTRG\n"
+				, data
+				, fdcrst
+				, bool(BIT(data, 6))
+				, bool(BIT(data, 5))
+				, bool(BIT(data, 4))
+				, bool(BIT(data, 2))
+				, ttrg
+			);
+
+			if(ttrg)
+				m_fdc_timer->adjust(attotime::from_msec(100));
 
 			//if (!BIT(m_fdc_ctrl_2, 4) && BIT(data, 4))
 			//	m_maincpu->dreq_w<2>(1);
 			//m_dmac->dreq2_w(1);
 
-			if(data & 0x80) // correct?
+			// TODO: 0 -> 1 transition?
+			if(fdcrst)
 				m_fdc->reset();
 
 			m_fdc_ctrl_2 = data;
@@ -1150,7 +1210,8 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 
 			pc88va_fdc_update_ready(nullptr, 0);
 
-			break; // FDC control port 2
+			break;
+		}
 	}
 }
 
