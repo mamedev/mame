@@ -5998,8 +5998,10 @@ ROM_END
 /***************************************************************************
 
   Tiger Batman (model 7-799)
-  * Sharp SM510 under epoxy (die label CMS54C, KMS597)
+  * Sharp SM510 under epoxy (die label CMS54C, KMS597, 597)
   * lcd screen with custom segments, 1-bit sound
+
+  MCU ROM is the same for Shinobi, Batman.
 
 ***************************************************************************/
 

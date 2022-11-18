@@ -41974,7 +41974,6 @@ snread                          //
 snspell                         //
 snspellc                        //
 snspellca                       //
-snspellcuk                      //
 snspellfr                       //
 snspellit                       //
 snspelljp                       //
@@ -41984,6 +41983,7 @@ snspellua                       //
 snspellub                       //
 snspelluk                       //
 snspelluka                      //
+snwrite                         //
 tntell                          //
 tntellfr                        //
 tntellp                         //
@@ -41991,7 +41991,10 @@ tntelluk                        //
 vocaid                          //
 
 @source:handheld/tispellb.cpp
+letterlf                        //
+letterlg                        //
 mrchalgr                        //
+spellabc                        //
 spellb                          //
 spellba                         //
 
