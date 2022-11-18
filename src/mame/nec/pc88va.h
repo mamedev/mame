@@ -103,7 +103,6 @@ private:
 	std::unique_ptr<uint8_t[]> m_kanjiram;
 
 	uint16_t m_bank_reg = 0;
-	uint16_t m_screen_ctrl_reg = 0;
 	uint8_t m_timer3_io_reg = 0;
 	emu_timer *m_t3_mouse_timer = nullptr;
 	tsp_t m_tsp;
@@ -150,8 +149,6 @@ private:
 	uint8_t pc88va_fdc_r(offs_t offset);
 	void pc88va_fdc_w(offs_t offset, uint8_t data);
 	uint16_t sysop_r();
-	uint16_t screen_ctrl_r();
-	void screen_ctrl_w(uint16_t data);
 	void timer3_ctrl_reg_w(uint8_t data);
 	uint8_t backupram_dsw_r(offs_t offset);
 	void sys_port1_w(uint8_t data);
@@ -183,6 +180,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	static void floppy_formats(format_registration &fr);
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
+
+	u16 m_screen_ctrl_reg = 0;
+
+	u16 screen_ctrl_r();
+	void screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_indexed_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base);
 	void draw_raw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -224,6 +227,8 @@ private:
 	bool m_sound_irq_enable = false;
 	bool m_sound_irq_pending = false;
 	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
+
+
 };
 
 
