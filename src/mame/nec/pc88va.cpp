@@ -19,7 +19,7 @@
          main ICU in cascaded mode via IRQ7;
       \- (other stuff ...)
     - sorcer: disables FDC DMA mode, expects to continue loading thru PC80S31K PIO;
-    - abunaten, cresmoon, rance2, pacman: flips FDC DS1 then changes FDD#0 track density to 96 TPI, 
+    - abunaten, cresmoon, rance2, pacman: flips FDC DS1 then changes FDD#0 track density to 96 TPI,
       gets stuck to infinite reti loop and jumps to EMM area;
     - pacmana: crashes after or during PC Engine OS POST, plays again with FDC settings;
     - rance: as above, triggers SETALC in V50;
@@ -293,12 +293,12 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 	floppy1 = m_fdd[1]->get_device();
 	if (!floppy0 && !floppy1)
 		force_ready = false;
-	
-	//if(floppy && force_ready)
-	//	ready = floppy->ready_r();
 
 	//if(floppy && force_ready)
-	//	ready = floppy->ready_r();
+	//  ready = floppy->ready_r();
+
+	//if(floppy && force_ready)
+	//  ready = floppy->ready_r();
 
 	if (force_ready)
 	{
@@ -426,7 +426,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 				m_fdc_timer->adjust(attotime::from_msec(100));
 
 			//if (!BIT(m_fdc_ctrl_2, 4) && BIT(data, 4))
-			//	m_maincpu->dreq_w<2>(1);
+			//  m_maincpu->dreq_w<2>(1);
 			//m_dmac->dreq2_w(1);
 
 			// TODO: 0 -> 1 transition?
@@ -548,7 +548,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	#endif
 
 	map(0x0100, 0x0101).rw(FUNC(pc88va_state::screen_ctrl_r), FUNC(pc88va_state::screen_ctrl_w)); // Screen Control Register
-//  map(0x0102, 0x0103) Graphic Screen Control Register
+	map(0x0102, 0x0103).w(FUNC(pc88va_state::gfx_ctrl_w));
 	map(0x0106, 0x0109).w(FUNC(pc88va_state::video_pri_w)); // Palette Control Register (priority) / Direct Color Control Register (priority)
 //  map(0x010a, 0x010b) Picture Mask Mode Register
 //  map(0x010c, 0x010d) Color Palette Mode Register
@@ -561,21 +561,22 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x0142, 0x0142).rw(FUNC(pc88va_state::idp_status_r), FUNC(pc88va_state::idp_command_w)); //Text Controller (IDP) - (R) Status (W) command
 	map(0x0146, 0x0146).w(FUNC(pc88va_state::idp_param_w)); //Text Controller (IDP) - (R/W) Parameter
 //  map(0x0148, 0x0149) Text control port 1
-//  map(0x014c, 0x014f) ? CG Port
+//  map(0x014c, 0x014f) ? CG Port, animefrm
 	map(0x0150, 0x0151).r(FUNC(pc88va_state::sysop_r)); // System Operational Mode
 	map(0x0152, 0x0153).rw(FUNC(pc88va_state::bios_bank_r), FUNC(pc88va_state::bios_bank_w)); // Memory Map Register
 //  map(0x0154, 0x0155) Refresh Register (wait states)
 	map(0x0156, 0x0156).r(FUNC(pc88va_state::rom_bank_r)); // ROM bank status
 //  map(0x0158, 0x0159) Interruption Mode Modification
 //  map(0x015c, 0x015f) NMI mask port (strobe port)
-//	map(0x0160, 0x016f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // DMA Controller
+//  map(0x0160, 0x016f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // DMA Controller
+//  map(0x0180, 0x0180) read by Olteus
 	map(0x0184, 0x0187).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-//	map(0x0188, 0x018b).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // ICU, also controls 8214 emulation
+//  map(0x0188, 0x018b).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // ICU, also controls 8214 emulation
 //  map(0x0190, 0x0191) System Port 5
 //  map(0x0196, 0x0197) Keyboard sub CPU command port
 	map(0x0198, 0x0199).w(FUNC(pc88va_state::backupram_wp_1_w)); //Backup RAM write inhibit
 	map(0x019a, 0x019b).w(FUNC(pc88va_state::backupram_wp_0_w)); //Backup RAM write permission
-//	map(0x01a0, 0x01a7).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);// vTCU (timer counter unit)
+//  map(0x01a0, 0x01a7).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);// vTCU (timer counter unit)
 	map(0x01a8, 0x01a8).w(FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
 	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff);// FDC related (765)
 	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
@@ -1069,7 +1070,7 @@ WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
 	bool irq_state = m_sound_irq_enable & state;
 
 	m_pic2->ir4_w(irq_state);
-//	m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
+//  m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
 	m_sound_irq_pending = state;
 }
 
@@ -1080,7 +1081,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::pc88va_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::pc88va_vrtc_irq));
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
-//	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+//  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->set_tclk(MASTER_CLOCK);
 	// "timer 1"
 	m_maincpu->tout1_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1166,8 +1167,8 @@ void pc88va_state::pc88va(machine_config &config)
 	YM2608(config, m_opna, FM_CLOCK);
 	m_opna->set_addrmap(0, &pc88va_state::opna_map);
 	m_opna->irq_handler().set(FUNC(pc88va_state::int4_irq_w));
-//	m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
-//	m_opna->port_b_read_callback().set_ioport("OPN_PB");
+//  m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
+//  m_opna->port_b_read_callback().set_ioport("OPN_PB");
 	// TODO: per-channel mixing is unconfirmed
 	m_opna->add_route(0, m_lspeaker, 0.25);
 	m_opna->add_route(0, m_rspeaker, 0.25);

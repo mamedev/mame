@@ -89,8 +89,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_fdd;
-//	required_device<am9517a_device> m_dmac;
-//	required_device<pic8259_device> m_pic1;
+//  required_device<am9517a_device> m_dmac;
+//  required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<upd4990a_device> m_rtc;
 	required_device<ym2608_device> m_opna;
@@ -165,7 +165,7 @@ private:
 	void r232_ctrl_portb_w(uint8_t data);
 	void r232_ctrl_portc_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-//	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
+//  DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
 //  DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
 	uint8_t m_fdc_ctrl_2;
 	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
@@ -182,13 +182,18 @@ private:
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
 
 	u16 m_screen_ctrl_reg = 0;
+	u16 m_gfx_ctrl_reg = 0;
 
 	u16 screen_ctrl_r();
 	void screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_indexed_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base);
-	void draw_raw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base);
+	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base);
+	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset);
+	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

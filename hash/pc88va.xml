@@ -166,9 +166,9 @@ Operating Systems
 	</software>
 
 	<software name="micromus" supported="no">
-		<description>Micromusician VA</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Micro Musician VA</description>
+		<year>1989</year>
+		<publisher>Music Network</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
 				<rom name="micromusician va.d88" size="1331888" crc="f2ff8069" sha1="a201a60330c701f1f2021b73664582e535dc9b7e"/>
@@ -229,6 +229,7 @@ Operating Systems
 		</part>
 	</software>
 
+	<!-- TODO: seems a clone of famista, while famist89a is the actual '89 version -->
 	<software name="famist89" supported="no">
 		<description>Family Stadium '89 - Pennant Race Hen</description>
 		<year>19??</year>

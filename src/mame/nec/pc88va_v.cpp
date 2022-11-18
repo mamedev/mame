@@ -13,6 +13,8 @@ void pc88va_state::video_start()
 	m_gfxdecode->gfx(3)->set_source(m_kanjiram.get());
 
 	save_item(NAME(m_screen_ctrl_reg));
+	save_item(NAME(m_gfx_ctrl_reg));
+
 	save_item(NAME(m_text_transpen));
 	save_pointer(NAME(m_video_pri_reg), 2);
 }
@@ -55,17 +57,27 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 		if(cur_pri_lv & 8) // enable layer
 		{
+			// why this is even a thing ...
 			if(pri <= 1) // (direct color mode, priority 5 and 4)
 			{
 				switch(cur_pri_lv & 3)
 				{
 					// 8 = graphic 0
 					case 0:
-						draw_raw_gfx(bitmap, cliprect);
+						switch(m_gfx_ctrl_reg & 3)
+						{
+							case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, 0x00000, 0x10); break;
+							// TODO: 5bpp, shared with this
+							case 2: draw_direct_gfx_8bpp(bitmap, cliprect, 0x00000); break;
+							case 3: draw_direct_gfx_rgb565(bitmap, cliprect); break;
+						}
 						break;
 					// 9 = graphic 1
 					case 1:
-						popmessage("Unimplemented raw GFX 1");
+						switch((m_gfx_ctrl_reg >> 8) & 3)
+						{
+							case 2: draw_direct_gfx_8bpp(bitmap, cliprect, 0x20000); break;
+						}
 						break;
 					default:
 						popmessage("Undocumented pri level %d", cur_pri_lv);
@@ -75,13 +87,28 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			{
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
-					case 0: draw_text(bitmap,cliprect); break;
+					case 0: draw_text(bitmap, cliprect); break;
 					case 1: if(m_tsp.spr_on) { draw_sprites(bitmap,cliprect); } break;
 					// TODO: understand where pal bases come from
-					/* A = graphic 0 */ 
-					case 2: draw_indexed_gfx(bitmap, cliprect, 0x00000, 0x10); break;
-					/* B = graphic 1 */ 
-					case 3: draw_indexed_gfx(bitmap, cliprect, 0x20000, 0x00); break;
+					/* A = graphic 0 */
+					case 2:
+					{
+						switch(m_gfx_ctrl_reg & 3)
+						{
+							case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, 0x00000, 0x10); break;
+							// TODO: 5bpp, shared with this
+							case 2: draw_direct_gfx_8bpp(bitmap, cliprect, 0x00000); break;
+						}
+						break;
+					}
+					/* B = graphic 1 */
+					case 3:
+						switch((m_gfx_ctrl_reg >> 8) & 3)
+						{
+							case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, 0x00000, 0x10); break;
+							case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, 0x20000, 0x00); break;
+						}
+						break;
 				}
 			}
 		}
@@ -122,11 +149,15 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			yp = 0x100 - yp;
 		}
 
-		if(0) // uhm, makes more sense without the sign?
-		if(xp & 0x200)
+		// TODO: verify this disabled code path
+		// makes more sense without the sign?
+		if(0)
 		{
-			xp &= 0x1ff;
-			xp = 0x200 - xp;
+			if(xp & 0x200)
+			{
+				xp &= 0x1ff;
+				xp = 0x200 - xp;
+			}
 		}
 
 		if(md) // 1bpp mode
@@ -367,11 +398,11 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					popmessage("Illegal text tilemap attribute mode %02x",attr_mode);
 					return;
 			}
-			
+
 			// TODO: more functional programming
 			if ((tvram[vsa] & 0xff00) == 0) // ANK
 			{
-				
+
 				u32 tile_num = ((tvram[vsa] & 0xff)  * 16) | 0x40000;
 
 				for(int yi = 0; yi < 16; yi++)
@@ -440,8 +471,83 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
-// TODO: $102 determine mode set (including using this or indexed modes)
-void pc88va_state::draw_raw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base)
+{
+	uint8_t *gvram = (uint8_t *)m_gvram.target();
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u32 line_offset = ((y * 640) / 8) + start_offset;
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=8)
+		{
+			u16 x_char = (x >> 3);
+			u32 bitmap_offset = line_offset + x_char;
+
+			for (int xi = 0; xi < 8; xi ++)
+			{
+				uint32_t color = (gvram[bitmap_offset] >> (7 - xi)) & 1;
+				int res_x = x + xi;
+
+				if(color && cliprect.contains(res_x, y))
+					bitmap.pix(y, res_x) = m_palette->pen(color + pal_base);
+			}
+		}
+	}
+}
+
+void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base)
+{
+	uint8_t *gvram = (uint8_t *)m_gvram.target();
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		// TODO: famista wants pitch width = 656, comes from area $200
+		const u32 line_offset = ((y * 640) / 2) + start_offset;
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=2)
+		{
+			u16 x_char = (x >> 1);
+			u32 bitmap_offset = line_offset + x_char;
+
+			uint32_t color = (gvram[bitmap_offset] & 0xf0) >> 4;
+
+			if(color && cliprect.contains(x, y))
+				bitmap.pix(y, x) = m_palette->pen(color + pal_base);
+
+			color = (gvram[bitmap_offset] & 0x0f) >> 0;
+
+			if(color && cliprect.contains(x + 1, y))
+				bitmap.pix(y, x + 1) = m_palette->pen(color + pal_base);
+		}
+	}
+}
+
+void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset)
+{
+	uint8_t *gvram = (uint8_t *)m_gvram.target();
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u32 line_offset = (y * 640) + start_offset;
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			u32 bitmap_offset = line_offset + x;
+
+			uint32_t color = (gvram[bitmap_offset] & 0xff);
+
+			// TODO: how transparency is calculated?
+			// TODO: may not be clamped to palNbit
+			if(cliprect.contains(x, y))
+			{
+				u8 b = pal2bit(color & 0x03);
+				u8 r = pal3bit((color & 0x1c) >> 2);
+				u8 g = pal3bit((color & 0xe0) >> 5);
+				bitmap.pix(y, x) = (b) | (g << 8) | (r << 16);
+			}
+		}
+	}
+}
+
+void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u16 *gvram = m_gvram;
 
@@ -471,33 +577,6 @@ void pc88va_state::draw_raw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
-
-void pc88va_state::draw_indexed_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base)
-{
-	uint8_t *gvram = (uint8_t *)m_gvram.target();
-
-	for(int y = cliprect.min_x; y <= cliprect.max_y; y++)
-	{
-		// TODO: famista wants pitch width = 656, where it comes from?
-		const u32 line_offset = ((y * 640) / 2) + start_offset;
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=2)
-		{
-			u16 x_char = (x >> 1);
-			u32 bitmap_offset = line_offset + x_char;
-			
-			uint32_t color = (gvram[bitmap_offset] & 0xf0) >> 4;
-
-			if(color && cliprect.contains(x, y))
-				bitmap.pix(y, x) = m_palette->pen(color + pal_base);
-			
-			color = (gvram[bitmap_offset] & 0x0f) >> 0;
-
-			if(color && cliprect.contains(x + 1, y))
-				bitmap.pix(y, x + 1) = m_palette->pen(color + pal_base);
-		}
-	}
-}
-
 /****************************************
  * IDP - NEC μPD72022
  ***************************************/
@@ -514,7 +593,6 @@ void pc88va_state::draw_indexed_gfx(bitmap_rgb32 &bitmap, const rectangle &clipr
  */
 uint8_t pc88va_state::idp_status_r()
 {
-
 	return 0x00;
 }
 
@@ -581,10 +659,11 @@ void pc88va_state::idp_command_w(uint8_t data)
 		*/
 		case SPROV:  m_cmd = SPROV; /* TODO: where it returns the info? */ break;
 
+		// TODO: 0x84 - <unknown>, pc88vad
 		// TODO: 0x89 - mask command
 
-		default: 
-			m_cmd = 0x00; 
+		default:
+			m_cmd = 0x00;
 			printf("PC=%05x: Unknown IDP %02x cmd set\n",m_maincpu->pc(),data);
 			break;
 	}
@@ -786,6 +865,7 @@ void pc88va_state::idp_param_w(uint8_t data)
  ***************************************/
 
 /*
+ * $100
  * x--- ---- ---- ---- GDEN0 graphics display enable
  * -x-- ---- ---- ---- GVM superimpose if 1?
  * --x- ---- ---- ---- XVSP video signal output mode (0) inhibit scan signals
@@ -812,6 +892,23 @@ void pc88va_state::screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 u16 pc88va_state::screen_ctrl_r()
 {
 	return m_screen_ctrl_reg;
+}
+
+/*
+ * $102
+ * ---x --xx ---- ---- screen 1 regs
+ * ---x ---- ---- ---- HW1 screen 1 hres (0) 640 dots (1) 320
+ * ---- --xx ---- ---- PM1 screen 1 pixel mode
+ * ---- --00 ---- ---- 1bpp
+ * ---- --01 ---- ---- 4bpp
+ * ---- --10 ---- ---- 8bpp
+ * ---- --11 ---- ---- RGB565
+ * ---- ---- ---x ---- HW0 screen 0 hres
+ * ---- ---- ---- --xx PM0 screen 0 pixel mode
+ */
+void pc88va_state::gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_gfx_ctrl_reg);
 }
 
 void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
