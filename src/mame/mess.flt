@@ -394,8 +394,8 @@ husky/hunter2.cpp
 husky/husky.cpp
 ibm/ibm3153.cpp
 ibm/ibm6580.cpp
-ibm/rtpc.cpp
 ibm/rs6000_type7xxx.cpp
+ibm/rtpc.cpp
 informer/informer_207_100.cpp
 informer/informer_207_376.cpp
 informer/informer_213.cpp
@@ -513,6 +513,10 @@ motorola/powerstack.cpp
 motorola/sys1121.cpp
 motorola/uchroma68.cpp
 msx/msx.cpp
+msx/msx1.cpp
+msx/msx1_bruc100.cpp
+msx/msx1_v9938.cpp
+msx/msx2.cpp
 multitech/mkit09.cpp
 multitech/mpf1.cpp
 mupid/mdisk.cpp
