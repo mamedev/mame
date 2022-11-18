@@ -46,8 +46,8 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
-#include "screen.h"
 #include "video/mc6847.h"
+#include "screen.h"
 
 //-------------------------------------------------
 //  TYPE DEFINITIONS
@@ -55,55 +55,55 @@
 
 namespace
 {
-	class agvision_state : public driver_device
-	{
-	public:
-		agvision_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag)
-			, m_maincpu(*this, "maincpu")
-			, m_screen(*this, "screen")
-			, m_ram(*this, "ram")
-			, m_pia_0(*this, "pia0")
-			, m_sam(*this, "sam")
-			, m_vdg(*this, "vdg")
-			, m_rs232(*this, "rs232")
-			, m_keyboard(*this, "row%u", 0)
-		{}
 
-		void agvision(machine_config &config);
-		DECLARE_INPUT_CHANGED_MEMBER(hang_up);
+class agvision_state : public driver_device
+{
+public:
+	agvision_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_ram(*this, "ram")
+		, m_pia_0(*this, "pia0")
+		, m_sam(*this, "sam")
+		, m_vdg(*this, "vdg")
+		, m_rs232(*this, "rs232")
+		, m_keyboard(*this, "row%u", 0)
+	{}
 
-	protected:
-		virtual void machine_start() override;
+	void agvision(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(hang_up);
 
-	private:
-		static constexpr int CD_DELAY = 250;
+protected:
+	virtual void machine_start() override;
 
-		required_device<cpu_device> m_maincpu;
-		required_device<screen_device> m_screen;
-		required_device<ram_device> m_ram;
-		required_device<pia6821_device> m_pia_0;
-		required_device<sam6883_device> m_sam;
-		required_device<mc6847_base_device> m_vdg;
-		required_device<rs232_port_device> m_rs232;
-		required_ioport_array<7> m_keyboard;
+private:
+	static constexpr int CD_DELAY = 250;
 
-		emu_timer *m_timer; // Carrier Detect Timer
-		uint8_t sam_read(offs_t offset);
-		void mem_map(address_map &map);
-		void rom_map(address_map &map);
-		void static_ram_map(address_map &map);
-		void io0_map(address_map &map);
-		void io1_map(address_map &map);
-		void boot_map(address_map &map);
-		void ff20_write(offs_t offset, uint8_t data);
-		void configure_sam();
-		uint8_t pia0_pa_r();
-		void pia0_cb2_w(int state);
-		TIMER_CALLBACK_MEMBER(timer_elapsed);
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<ram_device> m_ram;
+	required_device<pia6821_device> m_pia_0;
+	required_device<sam6883_device> m_sam;
+	required_device<mc6847_base_device> m_vdg;
+	required_device<rs232_port_device> m_rs232;
+	required_ioport_array<7> m_keyboard;
 
-		int m_cd;
-	};
+	emu_timer *m_timer; // Carrier Detect Timer
+	uint8_t sam_read(offs_t offset);
+	void mem_map(address_map &map);
+	void rom_map(address_map &map);
+	void static_ram_map(address_map &map);
+	void io0_map(address_map &map);
+	void io1_map(address_map &map);
+	void boot_map(address_map &map);
+	void ff20_write(offs_t offset, uint8_t data);
+	void configure_sam();
+	uint8_t pia0_pa_r();
+	void pia0_cb2_w(int state);
+	TIMER_CALLBACK_MEMBER(timer_elapsed);
+
+	int m_cd;
 };
 
 //-------------------------------------------------
@@ -399,6 +399,8 @@ ROM_START(trsvidtx)
 	ROM_REGION(0xa000,"maincpu",0)
 	ROM_LOAD("8041716-1.1-videotex.u13", 0x0000, 0x0800, CRC(821a59bb) SHA1(e3643f27fcf8287c0bc0f66b21554dc988ded9c1))
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR  NAME      PARENT COMPAT MACHINE   INPUT	    CLASS           INIT        COMPANY              FULLNAME    FLAGS
 COMP( 1979, agvision, 0,     0,     agvision, agvision, agvision_state, empty_init, "Elanco",            "AgVision", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
