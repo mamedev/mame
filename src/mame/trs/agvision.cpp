@@ -402,6 +402,6 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME      PARENT COMPAT MACHINE   INPUT	    CLASS           INIT        COMPANY              FULLNAME    FLAGS
+//    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     CLASS           INIT        COMPANY              FULLNAME    FLAGS
 COMP( 1979, agvision, 0,     0,     agvision, agvision, agvision_state, empty_init, "Elanco",            "AgVision", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1980, trsvidtx, 0,     0,     agvision, agvision, agvision_state, empty_init, "Tandy Radio Shack", "Videotex", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
