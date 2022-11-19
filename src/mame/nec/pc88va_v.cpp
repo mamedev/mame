@@ -122,6 +122,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	uint16_t const *const tvram = m_tvram;
 
 	int offs = m_tsp.spr_offset;
+	// TODO: should be top to bottom for priority
 	for(int i = 0; i < 0x100; i += 8)
 	{
 		int spr_count;
@@ -139,16 +140,23 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		if(!sw)
 			continue;
 
-		if(yp & 0x100)
-		{
-			yp &= 0xff;
-			yp = 0x100 - yp;
-		}
+		// shanghai hand (4bpp) and rtype beam sparks (1bpp) wants this arrangement
+		if (spda & 0x8000)
+			spda -= 0x4000;
+
+		spda <<= 1;
 
 		// TODO: verify this disabled code path
 		// makes more sense without the sign?
 		if(0)
 		{
+			// olteus wants this off
+			if(yp & 0x100)
+			{
+				yp &= 0xff;
+				yp = 0x100 - yp;
+			}
+
 			if(xp & 0x200)
 			{
 				xp &= 0x1ff;
@@ -161,9 +169,6 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			xsize = (xsize + 1) * 32;
 			ysize = (ysize + 1) * 4;
 
-			if(!(spda & 0x8000)) // correct?
-				spda *= 2;
-
 			spr_count = 0;
 
 			for(int y_i=0;y_i<ysize;y_i++)
@@ -172,12 +177,19 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				{
 					for(int x_s=0;x_s<16;x_s++)
 					{
-						int pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
+						int res_x = xp + x_i + x_s;
+						int res_y = (yp + y_i) << m_tsp.spr_mg;
+						
+						if (!cliprect.contains(res_x, res_y))
+							continue;
+						
+						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
+						int pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
 
 						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
 
 						if(pen != -1) //transparent pen
-							bitmap.pix(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen);
 					}
 					spr_count+=2;
 				}
@@ -189,10 +201,6 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			xsize = (xsize + 1) * 8;
 			ysize = (ysize + 1) * 4;
 
-			// TODO: verify me up
-			if(!(spda & 0x8000))
-				spda *= 2;
-
 			spr_count = 0;
 
 			for(int y_i = 0; y_i < ysize; y_i++)
@@ -201,13 +209,19 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				{
 					for(int x_s = 0; x_s < 4; x_s ++)
 					{
-						int pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (12 - (x_s * 4)) & 0xf;
+						int res_x = xp + x_i + x_s;
+						int res_y = (yp + y_i) << m_tsp.spr_mg;
 
-						// TODO: bc
-						//if(bc != -1) //transparent pen
+						if (!cliprect.contains(res_x, res_y))
+							continue;
+
+						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
+
+						int pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (12 - (x_s * 4)) & 0xf;
+
 						//if (pen != 0 && pen != m_text_transpen)
 						if (pen != 0)
-							bitmap.pix(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen);
 					}
 					spr_count+=2;
 				}
@@ -906,13 +920,14 @@ void pc88va_state::execute_spron_cmd()
 	*/
 	m_tsp.spr_offset = m_buf_ram[0] << 8;
 	m_tsp.spr_on = 1;
+	m_tsp.spr_mg = BIT(m_buf_ram[2], 1);
 	LOGIDP("SPRON (%02x %02x %02x) %05x offs| %d max sprites| %d MG| %d GR|\n"
 		, m_buf_ram[0]
 		, m_buf_ram[1]
 		, m_buf_ram[2]
 		, m_tsp.spr_offset + 0x40000
 		, (m_buf_ram[2] & 0xf8) + 1
-		, bool(BIT(m_buf_ram[2], 1))
+		, m_tsp.spr_mg
 		, bool(BIT(m_buf_ram[2], 0))
 	);
 }

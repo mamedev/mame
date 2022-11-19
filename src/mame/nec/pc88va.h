@@ -69,6 +69,7 @@ protected:
 		uint16_t tvram_vreg_offset = 0;
 		uint16_t attr_offset = 0;
 		uint16_t spr_offset = 0;
+		u8 spr_mg = 0;
 		uint8_t disp_on = 0;
 		uint8_t spr_on = 0;
 		uint8_t pitch = 0;
