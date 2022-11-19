@@ -44,7 +44,7 @@ void pss12_state::pss12(machine_config &config)
 {
 	M65C02(config, m_maincpu, 2'000'000); // TODO: YMW282-F, clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &pss12_state::pss12_map);
-	
+
 	SPEAKER(config, "speaker", 0).front_center();
 }
 
