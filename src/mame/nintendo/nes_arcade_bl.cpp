@@ -173,7 +173,7 @@ TIMER_CALLBACK_MEMBER(nes_arcade_bl_state::irq_timer_tick)
 	// counter does not stop when interrupts are disabled
 	if (m_irq_count != 0xffff)
 		m_irq_count++;
-	else if (m_irq_enable)
+	if (m_irq_enable && m_irq_count == 0xffff)
 		m_maincpu->set_input_line(m6502_device::IRQ_LINE, ASSERT_LINE);
 }
 
