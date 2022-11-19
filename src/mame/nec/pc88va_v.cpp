@@ -33,6 +33,22 @@ void pc88va_state::video_start()
 
 	save_item(NAME(m_text_transpen));
 	save_pointer(NAME(m_video_pri_reg), 2);
+
+	// default palette
+	const u16 default_palette[16] = {
+		0x0000, 0x001f, 0x03e0, 0x03ff, 0xfc00, 0xfc1f, 0xffe0, 0xffff,
+		0x7def, 0x0015, 0x02a0, 0x02b5, 0xac00, 0xac15, 0xaea0, 0xaeb5
+	};
+	int i, pal_base;
+	for (i = 0; i < 16; i++)
+	{
+		int b = pal4bit((default_palette[i] >> 1) & 0xf);
+		int r = pal4bit((default_palette[i] >> 6) & 0xf);
+		int g = pal4bit((default_palette[i] >> 11) & 0xf);
+		for (pal_base = 0; pal_base < 2; pal_base ++)
+			m_palette->set_pen_color(i + pal_base * 16, r, g, b);
+	}
+
 }
 
 uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -269,23 +285,23 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y
 void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint16_t const *const tvram = m_tvram;
-	uint16_t const *const fb_regs = &tvram[m_tsp.tvram_vreg_offset / 2];
+	uint16_t const *const tsp_regs = &tvram[m_tsp.tvram_vreg_offset / 2];
 	// TODO: PCG select won't work with this arrangement
 	uint8_t const *const kanji = memregion("kanji")->base();
 
-	u32 vsa = (fb_regs[0 / 2]); // | (fb_regs[2 / 2] & 7) << 16;
+	u32 vsa = (tsp_regs[0 / 2]); // | (tsp_regs[2 / 2] & 7) << 16;
 
-	if (fb_regs[2 / 2])
+	if (tsp_regs[2 / 2])
 		popmessage("Upper VSA enabled!");
 
-	const u8 attr_mode = fb_regs[0xa / 2] & 0x1f;
+	const u8 attr_mode = tsp_regs[0xa / 2] & 0x1f;
 	// TODO: check this out, diverges with documentation
-	const u8 screen_fg_col = (fb_regs[0xa / 2] & 0xf000) >> 12;
-	const u8 screen_bg_col = (fb_regs[0xa / 2] & 0x0f00) >> 8;
+	const u8 screen_fg_col = (tsp_regs[0xa / 2] & 0xf000) >> 12;
+	const u8 screen_bg_col = (tsp_regs[0xa / 2] & 0x0f00) >> 8;
 
 	// TODO: how even vh/vw can run have all these bytes?
-	const u8 vh = (fb_regs[4 / 2] & 0x7ff);
-	const u16 vw = (fb_regs[8 / 2] & 0x3ff) / 2;
+	const u8 vh = (tsp_regs[4 / 2] & 0x7ff);
+	const u16 vw = (tsp_regs[8 / 2] & 0x3ff) / 2;
 
 	for(int y = 0; y < vh; y++)
 	{
@@ -305,8 +321,8 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				---- xxxx background color
 				*/
 				case 0:
-					fg_col = (attr & 0xf0) >> 4;
-					bg_col = (attr & 0x0f) >> 0;
+					fg_col = (attr & 0x0f) >> 0;
+					bg_col = (attr & 0xf0) >> 4;
 					break;
 				/*
 				xxxx ---- foreground color
@@ -362,6 +378,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				*/
 				case 3:
 					{
+						// TODO: similar to 3301 drawing (where it should save previous attribute setup)
 						if(attr & 0x8)
 						{
 							fg_col = (attr & 0xf0) >> 4;
@@ -435,7 +452,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						if(secret) { pen = 0; } //hide text
 
 						if(pen != 0 && pen != m_text_transpen)
-							bitmap.pix(res_y, res_x) = m_palette->pen(pen);
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen + 0x10);
 					}
 				}
 			}
@@ -469,7 +486,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						// TODO: transpen not right, cfr. rogueall
 						// (sets 1, wants 7)
 						if(pen != 0 && pen != m_text_transpen)
-							bitmap.pix(res_y, res_x) = m_palette->pen(pen);
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen + 0x10);
 					}
 				}
 			}
@@ -546,6 +563,7 @@ void pc88va_state::draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	
 		switch(m_gfx_ctrl_reg & 3)
 		{
+			//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, 0x10); break;
 			case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, dsa, 0x10, fbw, fbl, y_start); break;
 			// TODO: 5bpp, shared with mode 2
 			case 2: draw_direct_gfx_8bpp(bitmap, cliprect, dsa, fbw, fbl, y_start); break;
@@ -837,7 +855,12 @@ void pc88va_state::execute_dspon_cmd()
 	*/
 	m_tsp.tvram_vreg_offset = m_buf_ram[0] << 8;
 	m_tsp.disp_on = 1;
-	LOGIDP("DSPON %02x %02x %02x (%04x)\n", m_buf_ram[0], m_buf_ram[1], m_buf_ram[2], m_tsp.tvram_vreg_offset);
+	LOGIDP("DSPON (%02x %02x %02x) %05x\n"
+		, m_buf_ram[0]
+		, m_buf_ram[1]
+		, m_buf_ram[2]
+		, m_tsp.tvram_vreg_offset | 0x40000
+	);
 }
 
 void pc88va_state::execute_dspdef_cmd()
@@ -855,6 +878,14 @@ void pc88va_state::execute_dspdef_cmd()
 	m_tsp.line_height = m_buf_ram[3] + 1;
 	m_tsp.h_line_pos = m_buf_ram[4];
 	m_tsp.blink = (m_buf_ram[5] & 0xf8) >> 3;
+	LOGIDP("DSPDEF (%02x %02x %02x %02x %02x %02x) %05x ATTR | %02x pitch | %02x line height| %02x hline | %02x blink\n"
+		, m_buf_ram[0], m_buf_ram[1], m_buf_ram[2], m_buf_ram[3], m_buf_ram[4], m_buf_ram[5]
+		, m_tsp.attr_offset | 0x40000
+		, m_tsp.pitch
+		, m_tsp.line_height
+		, m_tsp.h_line_pos
+		, m_tsp.blink
+	);
 }
 
 void pc88va_state::execute_curdef_cmd()
