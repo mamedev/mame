@@ -123,7 +123,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	int offs = m_tsp.spr_offset;
 	// TODO: should be top to bottom for priority
-	for(int i = 0; i < 0x100; i += 8)
+	for(int i = 0x100 - 8; i >= 0; i -= 8)
 	{
 		int spr_count;
 

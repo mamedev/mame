@@ -150,6 +150,60 @@ void pc88va_state::port40_w(offs_t offset, u8 data)
 {
 	m_rtc->stb_w((data & 2) >> 1);
 	m_rtc->clk_w((data & 4) >> 2);
+
+	if((m_device_ctrl_data & 0x40) != (data & 0x40))
+	{
+		attotime new_time = machine().time();
+
+		if(data & 0x40 && (new_time - m_mouse.time) > mouse_limit_hz())
+		{
+			m_mouse.phase = 0;
+		}
+		else
+		{
+			m_mouse.phase ++;
+			m_mouse.phase &= 3;
+		}
+
+		if(m_mouse.phase == 0)
+		{
+			const u8 mouse_x = ioport("MOUSEX")->read();
+			const u8 mouse_y = ioport("MOUSEY")->read();
+
+			m_mouse.lx = (mouse_x - m_mouse.prev_dx) & 0xff;
+			m_mouse.ly = (mouse_y - m_mouse.prev_dy) & 0xff;
+
+			m_mouse.prev_dx = mouse_x;
+			m_mouse.prev_dy = mouse_y;
+		}
+
+		m_mouse.time = machine().time();
+	}
+	
+	m_device_ctrl_data = data;
+}
+
+inline attotime pc88va_state::mouse_limit_hz()
+{
+	return attotime::from_hz(1800);
+}
+
+
+u8 pc88va_state::opn_porta_r()
+{
+	if(ioport("BOARD_CONFIG")->read() & 2)
+	{
+		u8 shift, res;
+
+		shift = (m_mouse.phase & 1) ? 0 : 4;
+		res = (m_mouse.phase & 2) ? m_mouse.ly : m_mouse.lx;
+
+//      logerror("%d\n",m_mouse.phase);
+
+		return ((res >> shift) & 0x0f) | 0xf0;
+	}
+
+	return ioport("OPN_PA")->read();
 }
 
 void pc88va_state::rtc_w(offs_t offset, u8 data)
@@ -841,16 +895,29 @@ static INPUT_PORTS_START( pc88va )
 //  PORT_DIPSETTING(    0x03, "???" )
 
 	PORT_START("OPN_PA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("OPN_PB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Mouse Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Mouse Button 2") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
+	
+	PORT_START("BOARD_CONFIG")
+	PORT_CONFNAME( 0x02, 0x00, "Port 1 Connection" )
+	PORT_CONFSETTING(    0x00, "Joystick" )
+	PORT_CONFSETTING(    0x02, "Mouse" )
 INPUT_PORTS_END
 
 static const gfx_layout pc88va_chars_8x8 =
@@ -1188,8 +1255,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_opna->set_addrmap(0, &pc88va_state::opna_map);
 	m_opna->irq_handler().set(FUNC(pc88va_state::int4_irq_w));
 	// TODO: DE-9
-//  m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
-	m_opna->port_a_read_callback().set_ioport("OPN_PA");
+	m_opna->port_a_read_callback().set(FUNC(pc88va_state::opn_porta_r));
 	m_opna->port_b_read_callback().set_ioport("OPN_PB");
 	// TODO: per-channel mixing is unconfirmed
 	m_opna->add_route(0, m_lspeaker, 0.25);

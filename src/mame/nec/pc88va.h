@@ -233,13 +233,24 @@ private:
 	uint8_t port40_r();
 	void port40_w(offs_t offset, u8 data);
 	void rtc_w(offs_t offset, u8 data);
+	u8 opn_porta_r();
 
+	u8 m_device_ctrl_data = 0;
 	u8 m_misc_ctrl = 0x80;
 	bool m_sound_irq_enable = false;
 	bool m_sound_irq_pending = false;
 	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
 
+	struct mouse_t {
+		uint8_t phase = 0;
+		int8_t prev_dx = 0, prev_dy = 0;
+		uint8_t lx = 0, ly = 0;
 
+		attotime time = attotime::never;
+	};
+	attotime mouse_limit_hz();
+
+	mouse_t m_mouse;
 };
 
 
