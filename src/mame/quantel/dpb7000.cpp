@@ -794,7 +794,7 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_diskseq_cyl_write_pending));
 	save_item(NAME(m_diskseq_use_hdd_pending));
 	save_item(NAME(m_diskseq_command_stride));
-	m_diskseq_complete_clk = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::req_b_w), this));;
+	m_diskseq_complete_clk = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::req_b_w), this));
 	m_diskseq_complete_clk->adjust(attotime::never);
 
 	// Floppy Disc Controller Card

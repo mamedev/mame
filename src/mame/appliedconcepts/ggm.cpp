@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:bataais
+// thanks-to:bataais, Berger
 /******************************************************************************
 
 Applied Concepts Great Game Machine (GGM), electronic board game computer.
@@ -15,6 +15,12 @@ Hardware notes:
 
 Games are on separate cartridges, each came with a keypad overlay.
 There were also some standalone machines, eg. Morphy Encore, Odin Encore.
+Cartridge pins are A0-A15, D0-D7, external RAM CS and RAM WR.
+
+The opening/endgame cartridges are meant to be ejected/inserted while playing:
+switch power switch to MEM (internal RAM gets powered by rechargable battery),
+swap cartridge, switch power switch back to ON. In other words, don't power
+cycle the machine (or MAME).
 
 Known chess cartridges (*denotes not dumped):
 - Chess/Boris 2.5 (aka Sargon 2.5)
@@ -25,10 +31,6 @@ Known chess cartridges (*denotes not dumped):
 - Steinitz Edition-4 - Master Chess
 - *Monitor Edition - Master Kriegspiel
 
-The opening/endgame cartridges are meant to be ejected/inserted while playing:
-switch power switch to MEM, swap cartridge, switch power switch back to ON.
-In other words, don't power cycle the machine (or MAME).
-
 Other games:
 - *Borchek Edition - Master Checkers
 - *Odin Edition - Master Reversi
@@ -37,11 +39,7 @@ Other games:
 - *Lunar Lander (unreleased?)
 
 TODO:
-- it doesn't have nvram, it's a workaround for MAME forcing a hard reset when
-  swapping in a new cartridge
 - confirm display AP segment, is it used anywhere?
-- verify cartridge pinout, right now assume A0-A15 (max known cart size is 24KB).
-  Boris/Sargon cartridge is A0-A11 and 2 CS lines, Steinitz uses the whole range.
 
 ******************************************************************************/
 
@@ -109,6 +107,8 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_cart);
 
+	u8 extram_r(offs_t offset);
+	void extram_w(offs_t offset, u8 data);
 	void select_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
@@ -121,6 +121,7 @@ private:
 	u8 m_shift_data = 0;
 	u8 m_shift_clock = 0;
 
+	bool m_extram_enabled = false;
 	u8 m_overlay = 0;
 };
 
@@ -175,21 +176,33 @@ DEVICE_IMAGE_LOAD_MEMBER(ggm_state::load_cart)
 	const char *overlay = image.get_feature("overlay");
 	m_overlay = overlay ? strtoul(overlay, nullptr, 0) & 0xf : 0;
 
-	// extra ram (optional)
-	if (image.get_feature("ram"))
-		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, m_extram);
+	// external ram (optional)
+	memset(m_extram, 0, m_extram.bytes());
+	m_extram_enabled = image.get_feature("ram") != nullptr;
 
 	return image_init_result::PASS;
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(ggm_state::unload_cart)
 {
-	// unmap extra ram
-	if (image.get_feature("ram"))
-	{
-		m_maincpu->space(AS_PROGRAM).nop_readwrite(0x0800, 0x0fff);
-		memset(m_extram, 0, m_extram.bytes());
-	}
+	// reset external ram
+	memset(m_extram, 0, m_extram.bytes());
+	m_extram_enabled = false;
+}
+
+u8 ggm_state::extram_r(offs_t offset)
+{
+	// A11 = 1, A14 + A15 = 0
+	if (m_extram_enabled)
+		return m_extram[offset & 0x7ff];
+	else
+		return m_cart->read_rom(offset);
+}
+
+void ggm_state::extram_w(offs_t offset, u8 data)
+{
+	if (m_extram_enabled)
+		m_extram[offset & 0x7ff] = data;
 }
 
 
@@ -258,8 +271,9 @@ void ggm_state::main_map(address_map &map)
 {
 	// external slot has potential bus conflict with RAM/VIA
 	map(0x0000, 0xffff).r(m_cart, FUNC(generic_slot_device::read_rom));
-	map(0x0000, 0x07ff).ram().share("nvram");
-	map(0x8000, 0x800f).m(m_via, FUNC(via6522_device::map));
+	map(0x0000, 0x3fff).rw(FUNC(ggm_state::extram_r), FUNC(ggm_state::extram_w));
+	map(0x0000, 0x07ff).mirror(0x3000).ram().share("nvram");
+	map(0x8000, 0x800f).mirror(0x3ff0).m(m_via, FUNC(via6522_device::map));
 }
 
 

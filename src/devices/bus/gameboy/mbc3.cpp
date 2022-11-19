@@ -47,6 +47,17 @@
        -X------ Set to halt real-time clock.
        -------X Bit 8 of days.
 
+ Telefang bootlegs have three additional registers:
+ 0x5 - Low value.
+ 0x6 - High value.
+ 0x7 - Command:
+       0x11 Decrement low value.
+       0x12 Decrement high value.
+       0x41 Add high value to low value.
+       0x42 Add low value to high value.
+       0x51 Increment low value.
+       0x52 Increment high value.
+
  TODO:
  * How are the static RAM bank outputs set when real-time clock registers
    are selected?
@@ -54,6 +65,8 @@
  * How do invalid seconds, minutes and hours values roll over?
  * Does MBC30 really have eight ROM bank outputs?  The one game using it
    only uses seven.
+ * Does the bootleg Keitai Denjuu Telefang controller actually include a
+   real-time clock?  No oscillator crystal is present.
 
  ***************************************************************************/
 
@@ -100,6 +113,13 @@ protected:
 
 	bool install_memory(std::string &message, unsigned highbits, unsigned lowbits) ATTR_COLD;
 
+protected:
+	u8 const rtc_select() const { return BIT(m_rtc_select, 3); }
+	u8 const rtc_register() const { return m_rtc_select & 0x07; }
+
+	virtual u8 read_rtc(address_space &space);
+	virtual void write_rtc(u8 data);
+
 private:
 	static inline constexpr u8 RTC_MASK[]{ 0x3f, 0x3f, 0x1f, 0xff, 0xc1 };
 	static inline constexpr u8 RTC_ROLLOVER[]{ 0x3c, 0x3c, 0x18, 0x00, 0x00 };
@@ -110,8 +130,6 @@ private:
 	void bank_switch_fine(u8 data);
 	void select_ram_rtc(u8 data);
 	void latch_rtc(u8 data);
-	u8 read_rtc(address_space &space);
-	void write_rtc(u8 data);
 
 	u8 rtc_increment(unsigned index)
 	{
@@ -150,6 +168,25 @@ public:
 	mbc30_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	virtual image_init_result load(std::string &message) override ATTR_COLD;
+};
+
+
+class tfboot_device : public mbc3_device_base
+{
+public:
+	tfboot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	virtual image_init_result load(std::string &message) override ATTR_COLD;
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual u8 read_rtc(address_space &space) override;
+	virtual void write_rtc(u8 data) override;
+
+private:
+	u8 m_protection[2];
 };
 
 
@@ -546,12 +583,12 @@ void mbc3_device_base::enable_ram_rtc(u8 data)
 				machine().describe_context());
 		m_view_ram.disable();
 	}
-	else if (BIT(m_rtc_select, 3))
+	else if (rtc_select())
 	{
 		LOG(
 				"%s: RTC register %u enabled\n",
 				machine().describe_context(),
-				m_rtc_select & 0x07);
+				rtc_register());
 		m_view_ram.select(1);
 	}
 	else
@@ -611,7 +648,7 @@ void mbc3_device_base::latch_rtc(u8 data)
 
 u8 mbc3_device_base::read_rtc(address_space &space)
 {
-	u8 const reg(m_rtc_select & 0x07);
+	u8 const reg(rtc_register());
 	if (std::size(m_rtc_regs[1]) > reg)
 	{
 		LOG(
@@ -634,7 +671,7 @@ u8 mbc3_device_base::read_rtc(address_space &space)
 
 void mbc3_device_base::write_rtc(u8 data)
 {
-	u8 const reg(m_rtc_select & 0x07);
+	u8 const reg(rtc_register());
 	if (std::size(m_rtc_regs[0]) > reg)
 	{
 		LOG(
@@ -712,10 +749,107 @@ image_init_result mbc30_device::load(std::string &message)
 		return image_init_result::PASS;
 }
 
+
+
+//**************************************************************************
+//  tfboot_device
+//**************************************************************************
+
+tfboot_device::tfboot_device(
+		machine_config const &mconfig,
+		char const *tag,
+		device_t *owner,
+		u32 clock) :
+	mbc3_device_base(mconfig, GB_ROM_TFANGBOOT, tag, owner, clock),
+	m_protection{ 0U, 0U }
+{
+}
+
+
+image_init_result tfboot_device::load(std::string &message)
+{
+	if (!install_memory(message, 2, 7))
+		return image_init_result::FAIL;
+	else
+		return image_init_result::PASS;
+}
+
+
+void tfboot_device::device_start()
+{
+	mbc3_device_base::device_start();
+
+	save_item(NAME(m_protection));
+}
+
+
+void tfboot_device::device_reset()
+{
+	mbc3_device_base::device_reset();
+
+	m_protection[0] = 0U;
+	m_protection[1] = 0U;
+}
+
+
+u8 tfboot_device::read_rtc(address_space &space)
+{
+	u8 const reg(rtc_register());
+	switch (reg)
+	{
+	case 0x05:
+	case 0x06:
+		return m_protection[BIT(reg, 0)];
+	case 0x07:
+		return 0U;
+	default:
+		return mbc3_device_base::read_rtc(space);
+	}
+}
+
+
+void tfboot_device::write_rtc(u8 data)
+{
+	u8 const reg(rtc_register());
+	switch (reg)
+	{
+	case 0x05:
+	case 0x06:
+		m_protection[BIT(reg, 0)] = data;
+		break;
+	case 0x07:
+		LOG("%s: Protection command 0x%02X\n", machine().describe_context(), data);
+		switch (data)
+		{
+		case 0x11:
+		case 0x12:
+			--m_protection[BIT(data, 0)];
+			break;
+		case 0x41:
+		case 0x42:
+			m_protection[BIT(data, 0)] += m_protection[BIT(~data, 0)];
+			break;
+		case 0x51:
+		case 0x52:
+			++m_protection[BIT(data, 0)];
+			break;
+		default:
+			logerror(
+					"%s: Unknown protection command 0x%02X\n",
+					machine().describe_context(),
+					data);
+		}
+		break;
+	default:
+		mbc3_device_base::write_rtc(data);
+	}
+}
+
 } // anonymous namespace
 
 } // namespace bus::gameboy
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC3,  device_gb_cart_interface, bus::gameboy::mbc3_device,  "gb_rom_mbc3",  "Game Boy MBC3 Cartridge")
-DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC30, device_gb_cart_interface, bus::gameboy::mbc30_device, "gb_rom_mbc30", "Game Boy MBC30 Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC3,      device_gb_cart_interface, bus::gameboy::mbc3_device,   "gb_rom_mbc3",   "Game Boy MBC3 Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC30,     device_gb_cart_interface, bus::gameboy::mbc30_device,  "gb_rom_mbc30",  "Game Boy MBC30 Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_TFANGBOOT, device_gb_cart_interface, bus::gameboy::tfboot_device, "gb_rom_tfboot", "Game Boy Telefang bootleg Cartridge")

@@ -339,6 +339,9 @@ public:
 					8 << Width, 8 << AccessWidth,
 					handler_r.name(), data_width() / 4, unitmask);
 
+			r()->select_u(m_id);
+			w()->select_u(m_id);
+
 			offs_t nstart, nend, nmask, nmirror;
 			u64 nunitmask;
 			int ncswidth;
@@ -371,6 +374,9 @@ public:
 					m_addrchars, addrmask, m_addrchars, addrmirror,
 					8 << Width, 8 << AccessWidth,
 					handler_w.name(), data_width() / 4, unitmask);
+
+			r()->select_u(m_id);
+			w()->select_u(m_id);
 
 			offs_t nstart, nend, nmask, nmirror;
 			u64 nunitmask;
@@ -405,6 +411,9 @@ public:
 					m_addrchars, addrmask, m_addrchars, addrmirror,
 					8 << Width, 8 << AccessWidth,
 					handler_r.name(), handler_w.name(), data_width() / 4, unitmask);
+
+			r()->select_u(m_id);
+			w()->select_u(m_id);
 
 			offs_t nstart, nend, nmask, nmirror;
 			u64 nunitmask;
@@ -959,6 +968,10 @@ template<int Level, int Width, int AddrShift> memory_passthrough_handler memory_
 template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &delegate, u64 unitmask, int cswidth, u16 flags)
 {
 	check_range_address("install_device_delegate", addrstart, addrend);
+
+	r()->select_u(m_id);
+	w()->select_u(m_id);
+
 	address_map map(*m_view.m_space, addrstart, addrend, unitmask, cswidth, flags, m_view.m_device, delegate);
 	map.import_submaps(m_manager.machine(), device, data_width(), endianness(), addr_shift());
 	prepare_device_map(map);

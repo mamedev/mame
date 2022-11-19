@@ -104,6 +104,7 @@ protected:
 	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == M68K_LINE_BUSERROR || (m_interrupt_mixer ? inputnum == M68K_IRQ_7 : false); }
 
 	// device-level overrides
 	virtual void device_start() override;

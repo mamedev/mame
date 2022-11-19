@@ -227,7 +227,7 @@ void mmm01_device::device_reset()
 
 	set_bank_rom_low(0x01fe);
 	set_bank_rom_high(0x01ff);
-	set_bank_ram(0U);
+	set_bank_ram(0);
 }
 
 

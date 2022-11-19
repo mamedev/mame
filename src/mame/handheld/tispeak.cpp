@@ -204,7 +204,8 @@ Touch & Tell:
     - TMS51xx: CD2802
     - VSM: 4KB CD2610
     - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
-      too, maybe an earlier version?
+      too, maybe an earlier version? For some reason, it doesn't use the standard
+      TMS1100 microinstructions, the opcodes are scrambled.
 
     Touch & Tell (UK), 1981
     - MCU & TMS51xx: same as US version
@@ -216,11 +217,11 @@ Touch & Tell:
 
     Touch & Tell (Germany) "Tipp & Sprich", 1981
     - MCU & TMS51xx: same as US version
-    - VSM: ?KB CD62172*
+    - VSM: 16KB? CD62172*
 
     Touch & Tell (Italy) "Libro Parlante", 1982
     - MCU & TMS51xx: same as US version
-    - VSM: ?KB CD62176* (on a module)
+    - VSM: 16KB? CD62176* (on a module)
 
     Vocaid (US), 1982
     - MCU & TMS51xx: same as Touch & Tell (US)
@@ -485,7 +486,7 @@ public:
 	void snspellit(machine_config &config);
 	void snspellsp(machine_config &config);
 	void snspellc(machine_config &config);
-	void snspellcuk(machine_config &config);
+	void snwrite(machine_config &config);
 	void snmath(machine_config &config);
 	void snread(machine_config &config);
 	void tntell(machine_config &config);
@@ -1143,7 +1144,7 @@ static INPUT_PORTS_START( snspellc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( snspellcuk )
+static INPUT_PORTS_START( snwrite )
 	PORT_INCLUDE( snspellc )
 
 	PORT_MODIFY("IN.9")
@@ -1478,7 +1479,7 @@ void tispeak_state::snspellc(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
 }
 
-void tispeak_state::snspellcuk(machine_config &config)
+void tispeak_state::snwrite(machine_config &config)
 {
 	snspellc(config);
 
@@ -1734,7 +1735,7 @@ ROM_START( snspellca )
 	ROM_LOAD( "cd2354.vsm", 0x0000, 0x4000, CRC(3af3232e) SHA1(f89d90dca209ee612634d664d5d4562f1d1786cf) )
 ROM_END
 
-ROM_START( snspellcuk )
+ROM_START( snwrite )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "cd8011a-nl", 0x0000, 0x0800, CRC(8a82a467) SHA1(fa4f8a232392603721bd8136c141a340fd5936a0) )
 
@@ -1960,7 +1961,7 @@ COMP( 1983, snspellit,  snspell,  0, snspellit,    snspellit,  tispeak_state, in
 
 COMP( 1982, snspellc,   0,        0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1981, snspellca,  snspellc, 0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1982, snspellcuk, snspellc, 0, snspellcuk,   snspellcuk, tispeak_state, init_snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1982, snwrite,    snspellc, 0, snwrite,      snwrite,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 COMP( 1980, snmath,     0,        0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1986, snmatha,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data

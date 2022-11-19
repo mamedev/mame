@@ -13278,13 +13278,81 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="msxlogo">
-		<description>MSX~Logo (Netherlands)</description>
+		<description>MSX-Logo (English UK)</description>
+		<year>1985</year>
+		<publisher>Philips UK</publisher>
+		<info name="serial" value="VG 8103/20" />
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_uk.rom" size="32768" crc="ca258fd7" sha1="c07f47c59f83038c16d6d5052aaf6c271bff4334" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogoar" cloneof="msxlogo">
+		<description>MSX-Logo (Argentina)</description>
+		<year>1985</year>
+		<publisher>Telemática/Talent</publisher>
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_ar.rom" size="32768" crc="0e6ecb9f" sha1="e45ddc5bf1a1e63756d11fb43fc50276ca35cab0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogobr11" cloneof="msxlogo">
+		<description>MSX-Logo (Brazil) HOT-Logo Version 1.1</description>
+		<year>1986</year>
+		<publisher>Epcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_br_11.rom" size="32768" crc="1ed6cd48" sha1="abb5cd4c8bdde234cadb0e10b794be3249dc51a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogobr12" cloneof="msxlogo">
+		<description>MSX-Logo (Brazil) HOT-Logo Version 1.2</description>
+		<year>1986</year>
+		<publisher>Epcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_br_12.rom" size="32768" crc="9b841c1c" sha1="a99796b45c92ca6b18e685130ae3eea43946cf2b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogoes" cloneof="msxlogo">
+		<description>MSX-Logo (Spain)</description>
+		<year>1985</year>
+		<publisher>Philips Spain</publisher>
+		<info name="serial" value="VG 8103/28" />
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_es.rom" size="32768" crc="83dd2424" sha1="4141eb7540003f4abd31dee14fa1ee8be1b01a97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogonl" cloneof="msxlogo">
+		<description>MSX-Logo (Netherlands)</description>
 		<year>1985</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="VG 8103/23" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="msx-logo (netherlands) (program).rom" size="32768" crc="7af0aa39" sha1="47663f883f98ab9ddaa0bf0c2831c567919f56f1" />
+				<rom name="msxlogo_nl.rom" size="32768" crc="7af0aa39" sha1="47663f883f98ab9ddaa0bf0c2831c567919f56f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogopl" cloneof="msxlogo">
+		<description>MSX-Logo (Poland) COMtech</description>
+		<year>1987</year>
+		<publisher>COMtech</publisher>
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_pl.rom" size="32768" crc="98d394eb" sha1="4354b46484c07c43eec80a92e405e13c2a8fcb73" offset="0" />
 			</dataarea>
 		</part>
 	</software>

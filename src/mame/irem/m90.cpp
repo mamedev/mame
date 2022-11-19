@@ -75,7 +75,7 @@ void m90_state::quizf1_main_cpu_map(address_map &map)
 void m90_state::dynablsb_main_cpu_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x6000e, 0x60fff).ram().share("spriteram");
+	map(0x60000, 0x60fff).ram().share("spriteram");
 	map(0xa0000, 0xa3fff).ram();
 	map(0xd0000, 0xdffff).ram().w(FUNC(m90_state::bootleg_video_w)).share("video_data");
 	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -86,7 +86,7 @@ void m90_state::bomblord_main_cpu_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
 	map(0xa0000, 0xa3fff).ram();
-	map(0xc000e, 0xc0fff).ram().share("spriteram");
+	map(0xc0000, 0xc0fff).ram().share("spriteram");
 	map(0xd0000, 0xdffff).ram().w(FUNC(m90_state::bootleg_video_w)).share("video_data");
 	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffff0, 0xfffff).rom();

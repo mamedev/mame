@@ -235,7 +235,8 @@ sflush                          // (c) 1979 Taito
 shuttlei                        // (c) 1979 Omori (Arcade Tv Game List - P.79, Left, 6 from bottom)
 sicv                            // (c) 1979 Taito
 sicv1                           // (c) 1979 Taito
-sinvemag                        // Zenitone-Microsec Ltd.
+sinvemag                        // bootleg (Emag)
+sinvemag2                       // bootleg (Emag)
 sinvzen                         // Zenitone-Microsec Ltd
 sisv                            // (c) 1978 Taito
 sisv1                           // (c) 1978 Taito
@@ -10597,6 +10598,7 @@ f1gpstar3                       // (c) 1991 Jaleco
 f1gpstar2                       // (c) 1991 Jaleco
 f1gpstr2                        // (c) 1993 Jaleco
 scudhamm                        // (c) 1994 Jaleco
+scudhamma                       // (c) 1994 Jaleco
 wildplt                         // (c) 1992 Jaleco
 
 @source:citoh/cit101.cpp
@@ -10711,6 +10713,10 @@ zerotrgta                       // (c) 1985 Data East Corporation
 bujutsu                         // G?645 (c)1997
 racjamdx                        // G?676 (c)1997 Japan JAA
 
+@source:trs/agvision.cpp
+agvision                        // TRS-80 AgVision
+trsvidtx                        // TRS-80 Videotex
+
 @source:trs/coco12.cpp
 cd6809                          // Codimex CD-6809
 coco                            // Color Computer
@@ -10727,7 +10733,6 @@ lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
 ms1600                          // ILCE / SEP Micro-SEP 1600
 mx1600                          // Dynacom MX-1600
 t4426                           // Terco 4426 CNC programming station
-trsvidtx                        // TRS-80 Videotex
 
 @source:trs/coco3.cpp
 coco3                           // Color Computer 3 (NTSC)
@@ -11611,6 +11616,7 @@ bestria                         //
 crospang                        // (c) 1998 F2 System
 heuksun                         // (c) 1998 Oksan / F2 System
 pitapat
+pitapata
 
 @source:misc/crospuzl.cpp
 crospuzl                        //
@@ -14728,6 +14734,7 @@ froggert                        // 834-0222 (c) 1981 Sega
 froggrs                         //
 froggervd                       // Video Dens
 fourplay                        // multigame
+galactica2                      // bootleg (Cirsa)
 galap1                          // hack
 galap4                          // hack
 galapx                          // hack
@@ -16806,6 +16813,7 @@ tsf2010                         // Tiger
 tsfight2                        // Tiger
 tshadow                         // Tiger
 tsharr2                         // Tiger
+tsimquest                       // Tiger
 tsjam                           // Tiger
 tskelwarr                       // Tiger
 tsonic                          // Tiger
@@ -17103,6 +17111,7 @@ vector1                         //
 
 @source:konami/hornet.cpp
 gradius4                        // GX837 (c)1999
+gradius4a                       // GX837 (c)1999
 nbapbp                          // GX778 (c)1998
 nbapbpa                         // GX778 (c)1998
 sscope                          // GX830 (c)1999
@@ -20754,6 +20763,7 @@ dkgensan                        // (c) 1990 (Japan)
 dkgensanm72                     // (c) 1990 (Japan)
 dkgensanm82                     // (c) 1990 (Japan)
 gallop                          // (c) 1991 (Japan)
+gallopm72                       // (c) 1991 (Japan)
 hharry                          // (c) 1990 (World)
 hharryu                         // (c) 1990 Irem America (US)
 hharryb                         // bootleg
@@ -23119,6 +23129,7 @@ mccpm                           //
 demoderb                        // (c) 1984
 demoderbc                       // (c) 1984
 domino                          // (c) 1982
+dominoa                         // (c) 1982
 dotron                          // (c) 1983
 dotrona                         // (c) 1983
 dotrone                         // (c) 1983
@@ -32184,6 +32195,7 @@ speedrcr                        // (c) 1995
 
 @source:namco/namcona1.cpp
 bbbingo                         // (c) 1996 (Japan)
+bbbingot                        // (c) 1996 (Japan)
 bkrtmaq                         // (c) 1992 (Japan)
 cgangpzl                        // (c) 1992 (US)
 cgangpzlj                       // (c) 1992 (Japan)
@@ -32548,6 +32560,7 @@ airco22b                        // (c) 1995
 alpinerc                        // (c) 1994
 alpinerd                        // (c) 1994
 alpinerjc                       // (c) 1994
+alpines                         // (c) 1996
 alpinesa                        // (c) 1996
 alpinr2a                        // (c) 1995
 alpinr2b                        // (c) 1995
@@ -33459,9 +33472,12 @@ npusagif                        //
 
 @source:cirsa/neptunp2.cpp
 ccorsario                       // (c) 2002 Cirsa / Unidesa
+mltpoints                       // (c) 2006 Cirsa / Unidesa
 neptunp2                        // (c) 2003 Cirsa / Unidesa
+perlacrb                        // (c) 2008 Cirsa / Unidesa
 rockroll                        // (c) 1999 Cirsa / Unidesa
 unk960606                       // (c) 2001? Cirsa / Unidesa
+unk960606b                      // (c) 2001? Cirsa / Unidesa / Europea
 
 @source:nintendo/nes.cpp
 iq501                           // Micro Genius IQ-501
@@ -34134,6 +34150,7 @@ okean240t                       //
 
 @source:irem/olibochu.cpp
 olibochu                        // M47 (c) 1981 + "GDI presents"
+punchkid
 
 @source:olivetti/olivpc1.cpp
 olivpc1
@@ -38388,6 +38405,7 @@ astormjd                        //
 astormu                         // 1990.04 Alien Storm (US, FD1094)
 astormud                        //
 bloxeed                         // 1989.12 Bloxeed (Japan, FD1094)
+bloxeeda                        //
 bloxeedd                        //
 cltchitr                        // 1991.02 Clutch Hitter (US, FD1094)
 cltchitrd                       //
@@ -38499,7 +38517,8 @@ jpark                           // 1994.?? Jurassic Park (World)
 jparkj                          // 1994.02 Jurassic Park (Japan) - Deluxe with moving cabinet, Rev A
 jparkja                         // 1994.02 Jurassic Park (Japan) - Deluxe with moving cabinet
 jparkjc                         // 1994.02 Jurassic Park (Japan) - Cabinet conversion kit
-kokoroj                         // 1992.?? Soreike! Kokoroji (Japan)
+kokoroj                         // 1992.?? Soreike! Kokoroji (Japan, Rev A)
+kokoroja                        // 1992.?? Soreike! Kokoroji (Japan)
 kokoroj2                        // 1993.12 Soreike! Kokoroji 2 (Japan)
 orunners                        // 1993.?? Outrunners (World)
 orunnersj                       // 1993.05 Outrunners (Japan)
@@ -41956,7 +41975,6 @@ snread                          //
 snspell                         //
 snspellc                        //
 snspellca                       //
-snspellcuk                      //
 snspellfr                       //
 snspellit                       //
 snspelljp                       //
@@ -41966,6 +41984,7 @@ snspellua                       //
 snspellub                       //
 snspelluk                       //
 snspelluka                      //
+snwrite                         //
 tntell                          //
 tntellfr                        //
 tntellp                         //
@@ -41973,7 +41992,10 @@ tntelluk                        //
 vocaid                          //
 
 @source:handheld/tispellb.cpp
+letterlf                        //
+letterlg                        //
 mrchalgr                        //
+spellabc                        //
 spellb                          //
 spellba                         //
 
@@ -44542,6 +44564,9 @@ psr340                          // 1999 PSR-340
 
 @source:yamaha/ympsr400.cpp
 psr500                          // 1991 PSR-500
+
+@source:yamaha/ympss12.cpp
+pss12                           //
 
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70

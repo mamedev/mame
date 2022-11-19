@@ -26,7 +26,6 @@ public:
 
 	// configuration
 	void set_gfxlayout(int layout) { m_gfxlayout = layout; }
-	void set_color_base(u16 base) { m_col_base = base; }
 	template <typename... T> void set_tile_callback(T &&... args) { m_tc0100scn_cb.set(std::forward<T>(args)...); }
 	void set_multiscr_xoffs(int xoffs) { m_multiscrn_xoffs = xoffs; }
 	void set_multiscr_hack(int hack) { m_multiscrn_hack = hack; }
@@ -99,8 +98,6 @@ private:
 	int          m_flip_text_xoffs, m_flip_text_yoffs;
 	int          m_multiscrn_xoffs;
 	int          m_multiscrn_hack;
-
-	u16          m_col_base;
 
 	template<unsigned Offset, unsigned Colbank> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	template<unsigned Offset, unsigned Gfx> TILE_GET_INFO_MEMBER(get_tx_tile_info);

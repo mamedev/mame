@@ -2943,7 +2943,7 @@ GAME( 1984, triviayp,  0,        balsente, triviag1, balsente_state, init_trivia
 GAME( 1984, triviasp,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gimeabrk,  0,        balsente, gimeabrk, balsente_state, init_gimeabrk,  ROT0, "Bally/Sente",  "Gimme A Break (7/7/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, minigolf,  0,        balsente, minigolf, balsente_state, init_minigolf,  ROT0, "Bally/Sente",  "Mini Golf (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, minigolfa, minigolf, balsente, minigolf2,balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, minigolfa, minigolf, balsente, minigolf, balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, minigolfb, minigolf, balsente, minigolf2,balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, teamht,    0,        teamht,   teamht,   balsente_state, init_hattrick,  ROT0, "Bally/Sente",  "Team Hat Trick (11/16/84)", MACHINE_SUPPORTS_SAVE ) // ROM chips dated 11/16/84
 GAME( 1987, grudge,    0,        grudge,   grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, prototype)", MACHINE_SUPPORTS_SAVE ) // only the PCB was found

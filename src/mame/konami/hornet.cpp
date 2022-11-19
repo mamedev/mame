@@ -355,6 +355,8 @@ Jumpers set on GFX PCB to scope monitor:
 #include "machine/adc1213x.h"
 #include "machine/ds2401.h"
 #include "machine/eepromser.h"
+#include "machine/jvsdev.h"
+#include "machine/jvshost.h"
 #include "machine/k033906.h"
 #include "konami_gn676_lan.h"
 #include "konppc.h"
@@ -370,6 +372,64 @@ Jumpers set on GFX PCB to scope monitor:
 
 #include "layout/generic.h"
 
+
+DECLARE_DEVICE_TYPE(HORNET_JVS_HOST, hornet_jvs_host)
+
+class hornet_jvs_host : public jvs_host
+{
+public:
+	// construction/destruction
+	hornet_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void read();
+	void write(uint8_t *data, int length);
+
+	DECLARE_READ_LINE_MEMBER( sense );
+
+	auto output_callback() { return output_cb.bind(); }
+
+protected:
+	virtual void device_start() override;
+
+private:
+	devcb_write8 output_cb;
+};
+
+DEFINE_DEVICE_TYPE(HORNET_JVS_HOST, hornet_jvs_host, "hornet_jvs_host", "JVS Host (Hornet)")
+
+hornet_jvs_host::hornet_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: jvs_host(mconfig, HORNET_JVS_HOST, tag, owner, clock),
+	output_cb(*this)
+{
+}
+
+void hornet_jvs_host::device_start()
+{
+	jvs_host::device_start();
+	output_cb.resolve_safe();
+}
+
+READ_LINE_MEMBER( hornet_jvs_host::sense )
+{
+	return !get_address_set_line();
+}
+
+void hornet_jvs_host::read()
+{
+	const uint8_t *data;
+	uint32_t length;
+
+	get_encoded_reply(data, length);
+
+	for (int i = 0; i < length; i++)
+		output_cb(data[i]);
+}
+
+void hornet_jvs_host::write(uint8_t *data, int length)
+{
+	for (int i = 0; i < length; i++)
+		push(data[i]);
+	commit_raw();
+}
 
 namespace {
 
@@ -399,6 +459,7 @@ public:
 		m_comm_bank(*this, "comm_bank"),
 		m_lan_ds2401(*this, "lan_serial_id"),
 		m_watchdog(*this, "watchdog"),
+		m_hornet_jvs_host(*this, "hornet_jvs_host"),
 		m_cg_view(*this, "cg_view")
 	{ }
 
@@ -422,6 +483,7 @@ protected:
 private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
+	static constexpr int JVS_BUFFER_SIZE = 1024;
 
 	required_shared_ptr<uint32_t> m_workram;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
@@ -444,11 +506,14 @@ private:
 	optional_memory_bank m_comm_bank;
 	optional_device<ds2401_device> m_lan_ds2401;
 	required_device<watchdog_timer_device> m_watchdog;
+	required_device<hornet_jvs_host> m_hornet_jvs_host;
 	memory_view m_cg_view;
 
 	emu_timer *m_sound_irq_timer;
 	std::unique_ptr<uint8_t[]> m_jvs_sdata;
 	uint32_t m_jvs_sdata_ptr;
+	bool m_jvs_is_escape_byte;
+
 	uint16_t m_gn680_latch;
 	uint16_t m_gn680_ret0;
 	uint16_t m_gn680_ret1;
@@ -474,9 +539,6 @@ private:
 
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	int jvs_encode_data(uint8_t *in, int length);
-	int jvs_decode_data(uint8_t *in, uint8_t *out, int length);
-	void jamma_jvs_cmd_exec();
 	void hornet_map(address_map &map);
 	void hornet_lan_map(address_map &map);
 	void terabrst_map(address_map &map);
@@ -527,7 +589,8 @@ uint8_t hornet_state::sysreg_r(offs_t offset)
 			    0x02 = ADDOR (ADC DOR)
 			    0x01 = ADDO (ADC DO)
 			*/
-			r = 0xf0;
+			r = 0x70;
+			r |= m_hornet_jvs_host->sense() << 7;
 			r |= m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
 			break;
 
@@ -559,7 +622,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x80 = EEPWEN (EEPROM write enable)
 			    0x40 = EEPCS (EEPROM CS)
 			    0x20 = EEPSCL (EEPROM SCL?)
-			    0x10 = EEPDT (EEPROM data)
+			    0x10 = EEPDT (EEPROM data) / JVSTXEN (for Gradius 4)
 			    0x08 = JVSTXEN / LAMP3 (something about JAMMA interface)
 			    0x04 = LAMP2
 			    0x02 = LAMP1
@@ -1056,7 +1119,8 @@ void hornet_state::machine_start()
 	m_pcb_digit.resolve();
 
 	m_jvs_sdata_ptr = 0;
-	m_jvs_sdata = make_unique_clear<uint8_t[]>(1024);
+	m_jvs_sdata = make_unique_clear<uint8_t[]>(JVS_BUFFER_SIZE);
+	m_jvs_is_escape_byte = false;
 
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
@@ -1064,8 +1128,9 @@ void hornet_state::machine_start()
 	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_workram);
 
-	save_pointer(NAME(m_jvs_sdata), 1024);
+	save_pointer(NAME(m_jvs_sdata), JVS_BUFFER_SIZE);
 	save_item(NAME(m_jvs_sdata_ptr));
+	save_item(NAME(m_jvs_is_escape_byte));
 
 	m_sound_irq_timer = timer_alloc(FUNC(hornet_state::sound_irq), this);
 }
@@ -1088,6 +1153,9 @@ void hornet_state::machine_reset()
 		if (membank("slave_cgboard_bank"))
 			membank("slave_cgboard_bank")->set_base(memregion("master_cgboard")->base());
 	}
+
+	m_jvs_sdata_ptr = 0;
+	m_jvs_is_escape_byte = false;
 }
 
 double hornet_state::adc12138_input_callback(uint8_t input)
@@ -1162,6 +1230,11 @@ void hornet_state::hornet(machine_config &config)
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HORNET);
+
+	HORNET_JVS_HOST(config, m_hornet_jvs_host, 0);
+	m_hornet_jvs_host->output_callback().set([this](uint8_t c) {
+		m_maincpu->ppc4xx_spu_receive_byte(c);
+	});
 }
 
 void hornet_state::hornet_lan(machine_config &config)
@@ -1280,138 +1353,36 @@ void hornet_state::sscope2_voodoo1(machine_config& config)
 
 void hornet_state::jamma_jvs_w(uint8_t data)
 {
+	bool is_escape_byte = m_jvs_is_escape_byte;
+	m_jvs_is_escape_byte = false;
+
+	// Throw away the buffer and wait for the next sync marker instead of overflowing when
+	// a invalid packet is filling the entire buffer.
+	if (m_jvs_sdata_ptr >= JVS_BUFFER_SIZE)
+		m_jvs_sdata_ptr = 0;
+
 	if (m_jvs_sdata_ptr == 0 && data != 0xe0)
 		return;
-	m_jvs_sdata[m_jvs_sdata_ptr] = data;
-	m_jvs_sdata_ptr++;
 
-	if (m_jvs_sdata_ptr >= 3 && m_jvs_sdata_ptr >= 3 + m_jvs_sdata[2])
-		jamma_jvs_cmd_exec();
-}
-
-int hornet_state::jvs_encode_data(uint8_t *in, int length)
-{
-	int inptr = 0;
-	int sum = 0;
-
-	while (inptr < length)
+	if (m_jvs_sdata_ptr > 0 && data == 0xd0)
 	{
-		uint8_t b = in[inptr++];
-		if (b == 0xe0)
-		{
-			sum += 0xd0 + 0xdf;
-			m_maincpu->ppc4xx_spu_receive_byte(0xd0);
-			m_maincpu->ppc4xx_spu_receive_byte(0xdf);
-		}
-		else if (b == 0xd0)
-		{
-			sum += 0xd0 + 0xcf;
-			m_maincpu->ppc4xx_spu_receive_byte(0xd0);
-			m_maincpu->ppc4xx_spu_receive_byte(0xcf);
-		}
-		else
-		{
-			sum += b;
-			m_maincpu->ppc4xx_spu_receive_byte(b);
-		}
-	}
-	return sum;
-}
-
-int hornet_state::jvs_decode_data(uint8_t *in, uint8_t *out, int length)
-{
-	int outptr = 0;
-	int inptr = 0;
-
-	while (inptr < length)
-	{
-		uint8_t b = in[inptr++];
-		if (b == 0xd0)
-		{
-			uint8_t b2 = in[inptr++];
-			out[outptr++] = b2 + 1;
-		}
-		else
-		{
-			out[outptr++] = b;
-		}
-	};
-
-	return outptr;
-}
-
-void hornet_state::jamma_jvs_cmd_exec()
-{
-	uint8_t byte_num;
-	uint8_t data[1024], rdata[1024];
-#if 0
-	int length;
-#endif
-	int rdata_ptr;
-	int sum;
-
-//  sync = m_jvs_sdata[0];
-//  node = m_jvs_sdata[1];
-	byte_num = m_jvs_sdata[2];
-
-#if 0
-	length =
-#endif
-		jvs_decode_data(&m_jvs_sdata[3], data, byte_num-1);
-#if 0
-	printf("jvs input data:\n");
-	for (i=0; i < byte_num; i++)
-	{
-		printf("%02X ", m_jvs_sdata[3+i]);
-	}
-	printf("\n");
-
-	printf("jvs data decoded to:\n");
-	for (i=0; i < length; i++)
-	{
-		printf("%02X ", data[i]);
-	}
-	printf("\n\n");
-#endif
-
-	// clear return data
-	memset(rdata, 0, sizeof(rdata));
-	rdata_ptr = 0;
-
-	// status
-	rdata[rdata_ptr++] = 0x01;      // normal
-
-	// handle the command
-	switch (data[0]) // TODO: thrilldbu trips case 0x01
-	{
-		case 0xf0:      // Reset
-		{
-			break;
-		}
-		case 0xf1:      // Address setting
-		{
-			rdata[rdata_ptr++] = 0x01;      // report data (normal)
-			break;
-		}
-		case 0xfa:
-		{
-			break;
-		}
-		default:
-		{
-			logerror("jamma_jvs_cmd_exec: unknown command %02X\n", data[0]);
-		}
+		m_jvs_is_escape_byte = true;
+		return;
 	}
 
-	// write jvs return data
-	sum = 0x00 + (rdata_ptr+1);
-	m_maincpu->ppc4xx_spu_receive_byte(0xe0);           // sync
-	m_maincpu->ppc4xx_spu_receive_byte(0x00);           // node
-	m_maincpu->ppc4xx_spu_receive_byte(rdata_ptr + 1);  // num of bytes
-	sum += jvs_encode_data(rdata, rdata_ptr);
-	m_maincpu->ppc4xx_spu_receive_byte(sum - 1);        // checksum
+	m_jvs_sdata[m_jvs_sdata_ptr++] = is_escape_byte ? data + 1 : data;
 
-	m_jvs_sdata_ptr = 0;
+	const bool is_complete_packet = m_jvs_sdata_ptr >= 5
+		&& m_jvs_sdata_ptr == m_jvs_sdata[2] + 3
+		&& m_jvs_sdata[0] == 0xe0
+		&& m_jvs_sdata[1] != 0x00
+		&& m_jvs_sdata[m_jvs_sdata_ptr - 1] == (std::accumulate(&m_jvs_sdata[1], &m_jvs_sdata[m_jvs_sdata_ptr - 1], 0) & 0xff);
+	if (is_complete_packet)
+	{
+		m_hornet_jvs_host->write(&m_jvs_sdata[1], m_jvs_sdata_ptr - 2);
+		m_hornet_jvs_host->read();
+		m_jvs_sdata_ptr = 0;
+	}
 }
 
 /*****************************************************************************/
@@ -1715,6 +1686,32 @@ ROM_START(gradius4)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(935f9d05) SHA1(c3a787dff1b2ac4942858ffa1574405db01292b6) )
 ROM_END
 
+ROM_START(gradius4a)
+	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
+	ROM_LOAD16_WORD_SWAP( "837a01.27p",   0x200000, 0x200000, CRC(6083ed08) SHA1(42d4dc78a94b235ae4ea5934641528eb776dcdde) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
+	ROM_LOAD32_WORD_SWAP( "837a04.16t",   0x000000, 0x200000, CRC(18453b59) SHA1(3c75a54d8c09c0796223b42d30fb3867a911a074) )
+	ROM_LOAD32_WORD_SWAP( "837a05.14t",   0x000002, 0x200000, CRC(77178633) SHA1(ececdd501d0692390325c8dad6dbb068808a8b26) )
+
+	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "837a14.32u",   0x000002, 0x400000, CRC(ff1b5d18) SHA1(7a38362170133dcc6ea01eb62981845917b85c36) )
+	ROM_LOAD32_WORD_SWAP( "837a13.24u",   0x000000, 0x400000, CRC(d86e10ff) SHA1(6de1179d7081d9a93ab6df47692d3efc190c38ba) )
+	ROM_LOAD32_WORD_SWAP( "837a16.32v",   0x800002, 0x400000, CRC(bb7a7558) SHA1(8c8cc062793c2dcfa72657b6ea0813d7223a0b87) )
+	ROM_LOAD32_WORD_SWAP( "837a15.24v",   0x800000, 0x400000, CRC(e0620737) SHA1(c14078cdb44f75c7c956b3627045d8494941d6b4) )
+
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
+	ROM_LOAD16_WORD_SWAP( "837a08.7s",    0x000000, 0x080000, CRC(c3a7ff56) SHA1(9d8d033277d560b58da151338d14b4758a9235ea) )
+
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)        // PCM sample roms
+	ROM_LOAD( "837a09.16p",   0x000000, 0x400000, CRC(fb8f3dc2) SHA1(69e314ac06308c5a24309abc3d7b05af6c0302a8) )
+	ROM_LOAD( "837a10.14p",   0x400000, 0x400000, CRC(1419cad2) SHA1(a6369a5c29813fa51e8246d0c091736f32994f3d) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(799bd8d0) SHA1(c69b5bb99657c2fdb71049ba1db0075a024fe8ff) ) // hand edited the one from gradius4 to be version UAA, needs real dump
+ROM_END
+
 ROM_START(nbapbp)
 	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
 	ROM_LOAD16_WORD_SWAP( "778a01.27p",   0x200000, 0x200000, CRC(e70019ce) SHA1(8b187b6e670fdc88771da08a56685cd621b139dc) )
@@ -1855,6 +1852,7 @@ ROM_END
 /*************************************************************************/
 
 GAME(  1998, gradius4,  0,        hornet,     gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4a, gradius4, hornet,     gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver UAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbp,    0,        hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbpa,   nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrst,  0,        terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

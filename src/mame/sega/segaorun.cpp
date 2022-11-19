@@ -1236,6 +1236,7 @@ void segaorun_state::outrun_fd1094(machine_config &config)
 	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaorun_state::decrypted_opcodes_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
 
 void segaorun_state::outrun_fd1089a(machine_config &config)
@@ -1245,6 +1246,7 @@ void segaorun_state::outrun_fd1089a(machine_config &config)
 	// basic machine hardware
 	FD1089A(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
 
 void segaorun_state::shangon(machine_config &config)
@@ -1275,6 +1277,7 @@ void segaorun_state::shangon_fd1089b(machine_config &config)
 	// basic machine hardware
 	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
 
 

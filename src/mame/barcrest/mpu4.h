@@ -359,14 +359,14 @@ protected:
 	void mpu4_memmap_bootleg_characteriser(address_map &map);
 	void mpu4_memmap_bl_characteriser_blastbank(address_map &map);
 
-	void lamp_extend_small(int data);
-	void lamp_extend_large(int data,int column,int active);
-	void led_write_extender(int latch, int data, int column);
+	void lamp_extend_small(uint8_t data);
+	void lamp_extend_large(uint8_t data,uint8_t column,bool active);
+	void led_write_extender(uint8_t latch, uint8_t data, uint8_t column);
 	void update_meters();
 	void ic23_update();
-	void ic24_output(int data);
+	void ic24_output(uint8_t data);
 	void ic24_setup();
-	void update_ay(device_t *device);
+	void update_ay();
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_config_common();
 
@@ -476,43 +476,43 @@ protected:
 
 	output_finder<8> m_triacs;
 
-	int m_mmtr_data = 0;
-	int m_ay8913_address = 0;
-	int m_signal_50hz = 0;
-	int m_ic4_input_b = 0;
-	int m_aux1_input = 0;
-	int m_aux2_input = 0;
-	int m_IC23G1 = 0;
-	int m_IC23G2A = 0;
-	int m_IC23G2B = 0;
-	int m_IC23GC = 0;
-	int m_IC23GB = 0;
-	int m_IC23GA = 0;
+	uint8_t m_mmtr_data = 0;
+	uint8_t m_ay8913_address = 0;
+	uint8_t m_signal_50hz = 0;
+	uint8_t m_ic4_input_b = 0;
+	uint8_t m_aux1_input = 0;
+	uint8_t m_aux2_input = 0;
+	uint8_t m_IC23G1 = 0;
+	uint8_t m_IC23G2A = 0;
+	uint8_t m_IC23G2B = 0;
+	uint8_t m_IC23GC = 0;
+	uint8_t m_IC23GB = 0;
+	uint8_t m_IC23GA = 0;
 
-	int m_reel_flag = 0;
+	uint8_t m_reel_flag = 0;
 	bool m_ic23_active = false;
 	emu_timer *m_ic24_timer = nullptr;
-	int m_expansion_latch = 0;
-	int m_global_volume = 0;
-	int m_input_strobe = 0;
+	uint8_t m_expansion_latch = 0;
+	uint8_t m_global_volume = 0;
+	uint8_t m_input_strobe = 0;
 	uint8_t m_lamp_strobe = 0;
 	uint8_t m_lamp_strobe2 = 0;
 	uint8_t m_lamp_strobe_ext[2] = { 0, 0 };
 	uint8_t m_lamp_strobe_ext_persistence = 0;
 	uint8_t m_led_strobe = 0;
 	uint8_t m_ay_data = 0;
-	int m_optic_pattern = 0;
+	uint8_t m_optic_pattern = 0;
 
-	int m_active_reel = 0;
-	int m_remote_meter = 0;
-	int m_reel_mux = 0;
-	int m_lamp_extender = 0;
-	int m_last_b7 = 0;
-	int m_last_latch = 0;
-	int m_lamp_sense = 0;
-	int m_card_live = 0;
-	int m_led_extender = 0;
-	int m_bwb_bank = 0;
+	uint8_t m_active_reel = 0;
+	uint8_t m_remote_meter = 0;
+	uint8_t m_reel_mux = 0;
+	uint8_t m_lamp_extender = 0;
+	uint8_t m_last_b7 = 0;
+	uint8_t m_last_latch = 0;
+	bool m_lamp_sense = false;
+	bool m_card_live = false;
+	uint8_t m_led_extender = 0;
+	bool m_bwb_bank = false;
 	bool m_default_to_low_bank = false;
 
 	bool m_use_pia4_porta_leds = true;
@@ -523,17 +523,20 @@ protected:
 	uint8_t m_simplecard_leds_base = 0;
 	uint8_t m_simplecard_leds_strobe = 0;
 
-	int m_pageval = 0;
-	int m_pageset = 0;
-	int m_hopper_type = 0;
-	int m_reels = 0;
-	int m_chrdata = 0;
-	int m_t1 = 0;
-	int m_t3l = 0;
-	int m_t3h = 0;
+	uint8_t m_pageval = 0;
+	uint8_t m_pageset = 0;
+	uint8_t m_hopper_type = 0;
+	uint8_t m_reels = 0;
+	uint8_t m_chrdata = 0;
+	uint8_t m_t1 = 0;
+	uint8_t m_t3l = 0;
+	uint8_t m_t3h = 0;
+	uint8_t m_serial_output = 0;
+
 	uint8_t m_numbanks = 0;
 
 	bool m_link7a_connected = false;
+	bool m_link7b_connected = true;
 
 	bool m_overcurrent = false;
 	bool m_undercurrent = false;
@@ -553,6 +556,7 @@ protected:
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };
+
 
 
 template<const uint8_t* Table> void mpu4_state::mod4oki_cheatchr_pal_f(machine_config &config)

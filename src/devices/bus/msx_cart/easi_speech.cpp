@@ -48,9 +48,6 @@ void msx_cart_easispeech_device::initialize_cartridge()
 	}
 
 	page(1)->install_rom(0x4000, 0x5fff, 0x2000, get_rom_base());
-
-	// Without this line the read and write handler don't get picked up??
-	page(2)->install_rom(0x8000, 0x8000, get_rom_base());
 	page(2)->install_read_handler(0x8000, 0x8000, read8smo_delegate(*this, FUNC(msx_cart_easispeech_device::speech_r)));
 	page(2)->install_write_handler(0x8000, 0x8000, write8smo_delegate(*this, FUNC(msx_cart_easispeech_device::speech_w)));
 }

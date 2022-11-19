@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
+// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli, Angelo Salese
 #ifndef MAME_INCLUDES_PORTRAIT_H
 #define MAME_INCLUDES_PORTRAIT_H
 
 #pragma once
 
+#include "cpu/mcs48/mcs48.h"
 #include "sound/tms5220.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -15,6 +16,7 @@ public:
 	portrait_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_tms(*this, "tms")
@@ -34,8 +36,7 @@ protected:
 
 private:
 	void ctrl_w(uint8_t data);
-	void positive_scroll_w(uint8_t data);
-	void negative_scroll_w(uint8_t data);
+	void scroll_w(offs_t offset, uint8_t data);
 	void bgvideo_write(offs_t offset, uint8_t data);
 	void fgvideo_write(offs_t offset, uint8_t data);
 
@@ -46,11 +47,12 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, const uint8_t *source );
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u8 priority);
 	void portrait_map(address_map &map);
 	void portrait_sound_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<i8039_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<tms5200_device> m_tms;
