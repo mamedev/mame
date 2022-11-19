@@ -1875,7 +1875,7 @@ void namcos22s_state::namcos22s_am(address_map &map)
 	map(0x450008, 0x45000b).rw(FUNC(namcos22s_state::namcos22_portbit_r), FUNC(namcos22s_state::namcos22_portbit_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0x700000, 0x70001f).rw(FUNC(namcos22s_state::syscon_r), FUNC(namcos22s_state::ss22_syscon_w));
-	map(0x800000, 0x800003).w(FUNC(namcos22s_state::namcos22s_chipselect_w));
+	map(0x800000, 0x800003).w(FUNC(namcos22s_state::namcos22s_chipselect_w)); // C304, C399
 	map(0x810000, 0x81000f).rw(FUNC(namcos22s_state::namcos22s_czattr_r), FUNC(namcos22s_state::namcos22s_czattr_w));
 	map(0x810200, 0x8103ff).rw(FUNC(namcos22s_state::namcos22s_czram_r), FUNC(namcos22s_state::namcos22s_czram_w));
 	map(0x820000, 0x8202ff).nopw(); // leftover of old (non-super) video mixer device
