@@ -568,10 +568,21 @@ INDEXED:
 EXG:
 	{
 		uint8_t param = read_opcode_arg();
-		uint16_t reg1 = read_exgtfr_register(param >> 4);
-		uint16_t reg2 = read_exgtfr_register(param >> 0);
-		write_exgtfr_register(param >> 4, reg2);
+		uint16_t reg1, reg2;
+
+		// Exchange differs based on 16 bit register or 8 bit register first
+		if (BIT(param,7)==1)
+		{
+			reg1 = read_tfr_exg_816_register(param >> 4);
+			reg2 = read_tfr_exg_816_register(param >> 0);
+		}
+		else
+		{
+			reg1 = read_exg_168_register(param >> 4);
+			reg2 = read_exg_168_register(param >> 0);
+		}
 		write_exgtfr_register(param >> 0, reg1);
+		write_exgtfr_register(param >> 4, reg2);
 	}
 	@dummy_vma(hd6309_native_mode() ? 3 : 6);
 	return;
@@ -579,7 +590,7 @@ EXG:
 TFR:
 	{
 		uint8_t param = read_opcode_arg();
-		uint16_t reg = read_exgtfr_register(param >> 4);
+		uint16_t reg = read_tfr_exg_816_register(param >> 4);
 		write_exgtfr_register(param >> 0, reg);
 		if ((param & 0x0F) == 4) {
 			m_lds_encountered = true;

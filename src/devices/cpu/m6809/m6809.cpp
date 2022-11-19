@@ -490,10 +490,10 @@ const char *m6809_base_device::inputnum_string(int inputnum)
 
 
 //-------------------------------------------------
-//  read_exgtfr_register
+//  read_tfr_register
 //-------------------------------------------------
 
-uint16_t m6809_base_device::read_exgtfr_register(uint8_t reg)
+uint16_t m6809_base_device::read_tfr_exg_816_register(uint8_t reg)
 {
 	uint16_t result;
 
@@ -509,6 +509,29 @@ uint16_t m6809_base_device::read_exgtfr_register(uint8_t reg)
 		case  9: result = ((uint16_t)0xff00) | m_q.r.b;   break;  // B
 		case 10: result = ((uint16_t)m_cc) << 8 | m_cc;   break;  // CC
 		case 11: result = ((uint16_t)m_dp) << 8 | m_dp;   break;  // DP
+		default: result = 0xffff; break;
+	}
+
+	return result;
+}
+
+
+uint16_t m6809_base_device::read_exg_168_register(uint8_t reg)
+{
+	uint16_t result;
+
+	switch(reg & 0x0F)
+	{
+		case  0: result = m_q.r.d;   break;  // D
+		case  1: result = m_x.w;     break;  // X
+		case  2: result = m_y.w;     break;  // Y
+		case  3: result = m_u.w;     break;  // U
+		case  4: result = m_s.w;     break;  // S
+		case  5: result = m_pc.w;    break;  // PC
+		case  8: result = ((uint16_t)0xff00) | m_q.r.a;   break;  // A
+		case  9: result = ((uint16_t)0xff00) | m_q.r.b;   break;  // B
+		case 10: result = ((uint16_t)0xff00) | m_cc;   break;  // CC
+		case 11: result = ((uint16_t)0xff00) | m_dp;   break;  // DP
 		default: result = 0xffff; break;
 	}
 
