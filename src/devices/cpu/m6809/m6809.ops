@@ -570,7 +570,7 @@ EXG:
 		uint8_t param = read_opcode_arg();
 		uint16_t reg1, reg2;
 
-		// Exchange differs based on 16 bit register or 8 bit register first
+		// Exchange differs if 16 bit register or 8 bit register is first
 		if (BIT(param,7)==1)
 		{
 			reg1 = read_tfr_exg_816_register(param >> 4);
