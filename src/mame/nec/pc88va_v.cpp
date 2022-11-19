@@ -12,7 +12,7 @@
 #define LOG_KANJI   (1U << 4) // Kanji data
 #define LOG_CRTC    (1U << 5)
 
-#define VERBOSE (LOG_GENERAL | LOG_IDP)
+#define VERBOSE (LOG_GENERAL | LOG_KANJI | LOG_IDP | LOG_FB)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -33,22 +33,6 @@ void pc88va_state::video_start()
 
 	save_item(NAME(m_text_transpen));
 	save_pointer(NAME(m_video_pri_reg), 2);
-
-	// default palette
-	const u16 default_palette[16] = {
-		0x0000, 0x001f, 0x03e0, 0x03ff, 0xfc00, 0xfc1f, 0xffe0, 0xffff,
-		0x7def, 0x0015, 0x02a0, 0x02b5, 0xac00, 0xac15, 0xaea0, 0xaeb5
-	};
-	int i, pal_base;
-	for (i = 0; i < 16; i++)
-	{
-		int b = pal4bit((default_palette[i] >> 1) & 0xf);
-		int r = pal4bit((default_palette[i] >> 6) & 0xf);
-		int g = pal4bit((default_palette[i] >> 11) & 0xf);
-		for (pal_base = 0; pal_base < 2; pal_base ++)
-			m_palette->set_pen_color(i + pal_base * 16, r, g, b);
-	}
-
 }
 
 uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1053,8 +1037,8 @@ u16 pc88va_state::screen_ctrl_r()
  * ---- --01 ---- ---- 4bpp
  * ---- --10 ---- ---- 8bpp
  * ---- --11 ---- ---- RGB565
- * ---- ---- ---x ---- HW0 screen 0 hres
- * ---- ---- ---- --xx PM0 screen 0 pixel mode
+ * ---- ---- ---x ---- HW0 screen 0 hres, as above
+ * ---- ---- ---- --xx PM0 screen 0 pixel mode, as above
  */
 void pc88va_state::gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -1063,14 +1047,20 @@ void pc88va_state::gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 
 void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int r,g,b;
 	COMBINE_DATA(&m_palram[offset]);
 
-	b = (m_palram[offset] & 0x001e) >> 1;
-	r = (m_palram[offset] & 0x03c0) >> 6;
-	g = (m_palram[offset] & 0x7800) >> 11;
+	const u16 color = m_palram[offset];
+	u8 b = pal5bit((color & 0x001f));
+	u8 r = pal5bit((color & 0x03e0) >> 5);
+	u8 g = pal6bit((color & 0xfc00) >> 10);
 
-	m_palette->set_pen_color(offset,pal4bit(r),pal4bit(g),pal4bit(b));
+	// TODO: docs suggests this arrangement but it's wrong
+	// may be just one bit always on?
+//	b = (m_palram[offset] & 0x001e) >> 1;
+//	r = (m_palram[offset] & 0x03c0) >> 6;
+//	g = (m_palram[offset] & 0x7800) >> 11;
+
+	m_palette->set_pen_color(offset, r, g, b);
 }
 
 void pc88va_state::video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask)
