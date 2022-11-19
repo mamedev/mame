@@ -58,6 +58,11 @@ void truesys_state::main_map(address_map &map)
 	map(0x00000000, 0x0000001f).rom().region("maincpu", 0);
 	map(0x00000020, 0x007fffff).ram();
 	map(0x00800000, 0x0087ffff).rom().region("maincpu", 0);
+	map(0x00900000, 0x009003ff).ram(); // video RAM or debug RAM?
+	map(0x009092f0, 0x009092f3).nopw(); // semaphore?
+	map(0x00909300, 0x00909303).noprw(); // byte-wide peripheral (SPI?)
+	map(0x00909304, 0x00909307).noprw();
+	map(0x00909308, 0x0090930b).nopw(); // byte-wide peripheral control?
 }
 
 
