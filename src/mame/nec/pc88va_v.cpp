@@ -4,7 +4,23 @@
 #include "emu.h"
 #include "pc88va.h"
 
+#include <iostream>
 
+
+#define LOG_IDP     (1U << 2) // TSP data
+#define LOG_FB      (1U << 3) // framebuffer strips
+#define LOG_KANJI   (1U << 4) // Kanji data
+#define LOG_CRTC    (1U << 5)
+
+#define VERBOSE (LOG_GENERAL | LOG_IDP)
+#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGIDP(...)       LOGMASKED(LOG_IDP, __VA_ARGS__)
+#define LOGFB(...)        LOGMASKED(LOG_FB, __VA_ARGS__)
+#define LOGKANJI(...)     LOGMASKED(LOG_KANJI, __VA_ARGS__)
+#define LOGCRTC(...)      LOGMASKED(LOG_CRTC, __VA_ARGS__)
 
 void pc88va_state::video_start()
 {
@@ -64,20 +80,11 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				{
 					// 8 = graphic 0
 					case 0:
-						switch(m_gfx_ctrl_reg & 3)
-						{
-							case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, 0x00000, 0x10); break;
-							// TODO: 5bpp, shared with this
-							case 2: draw_direct_gfx_8bpp(bitmap, cliprect, 0x00000); break;
-							case 3: draw_direct_gfx_rgb565(bitmap, cliprect); break;
-						}
+						draw_graphic_a(bitmap, cliprect);
 						break;
 					// 9 = graphic 1
 					case 1:
-						switch((m_gfx_ctrl_reg >> 8) & 3)
-						{
-							case 2: draw_direct_gfx_8bpp(bitmap, cliprect, 0x20000); break;
-						}
+						draw_graphic_b(bitmap, cliprect);
 						break;
 					default:
 						popmessage("Undocumented pri level %d", cur_pri_lv);
@@ -92,22 +99,11 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 					// TODO: understand where pal bases come from
 					/* A = graphic 0 */
 					case 2:
-					{
-						switch(m_gfx_ctrl_reg & 3)
-						{
-							case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, 0x00000, 0x10); break;
-							// TODO: 5bpp, shared with this
-							case 2: draw_direct_gfx_8bpp(bitmap, cliprect, 0x00000); break;
-						}
+						draw_graphic_a(bitmap, cliprect);
 						break;
-					}
 					/* B = graphic 1 */
 					case 3:
-						switch((m_gfx_ctrl_reg >> 8) & 3)
-						{
-							case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, 0x00000, 0x10); break;
-							case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, 0x20000, 0x00); break;
-						}
+						draw_graphic_b(bitmap, cliprect);
 						break;
 				}
 			}
@@ -126,7 +122,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	uint16_t const *const tvram = m_tvram;
 
 	int offs = m_tsp.spr_offset;
-	for(int i=0;i<(0x100);i+=(8))
+	for(int i = 0; i < 0x100; i += 8)
 	{
 		int spr_count;
 
@@ -190,7 +186,6 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		else
 		{
 			// 4bpp mode
-			// TODO: xsize may be doubled, cfr. pc88vad
 			xsize = (xsize + 1) * 8;
 			ysize = (ysize + 1) * 4;
 
@@ -231,12 +226,13 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y
 	else if(jis1 >= 0x40 && jis1 < 0x50)
 		return 0x4000 + ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
 	else if(x == 0 && y == 0 && jis1 != 0 && jis2 != 0) // debug stuff, to be nuked in the end
-		printf("%02x %02x\n",jis1, jis2);
+		LOGKANJI("%02x %02x\n",jis1, jis2);
 
 	return 0;
 }
 
 /*
+ * Text is handled in strips at the location stored in TSP
  * [+00] Frame buffer start address (VSA)
  * [+02] ---- ---- ---- -xxx Upper VSA
  * [+04] ---- -xxx xxxx xxxx Frame buffer height (VH)
@@ -471,13 +467,99 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
+/*
+ * as above, graphics are stored in 4 strips in I/O $200-$27f
+ * [+00] xxxx xxxx xxxx xx-- frame buffer start address (FSA), 4 byte boundary
+ * [+02] ---- ---- ---- --xx FSA upper bit address
+ *                           \- fixed at 0x20000 for frame buffer 1
+ * [+04] ---- -xxx xxxx xx-- frame buffer width (FBW), 4 byte boundary
+ * [+06] ---- --xx xxxx xxxx frame buffer height (FBL) - 1
+ *                           \- cannot be set for frame buffer 1 (?)
+ * [+08] ---- ---- ---x xxxx X dot offset (fractional shift)
+ *                           \- changes depending on single/multiplane mode
+ * [+0a] ---- -xxx xxxx xx-- X scroll offset (OFX), 4 byte boundary
+ * [+0c] ---- --xx xxxx xxxx Y scroll offset (OFY)
+ * [+0e] xxxx xxxx xxxx xx-- Display start address (DSA)
+ * [+10] ---- ---- ---- --xx DSA upper bit address
+ * [+12] ---- ---x xxxx xxxx Sub screen height (DSH)
+ * [+14] <reserved>
+ * [+16] ---- ---x xxxx xxxx Sub screen display position (DSP)
+ */
+// TODO: what happens with FBW = 0?
+
+void pc88va_state::draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint16_t const *const fb_regs = m_fb_regs;
+
+	u16 y_start = 0;
+
+	LOGFB("%d GFX MODE\n", m_gfx_ctrl_reg & 3);
+
+	for (int strip_n = 0; strip_n < 4; strip_n ++)
+	{
+		uint16_t const *const fb_strip_regs = &fb_regs[(strip_n * 0x20) / 2];
+		const u16 fbw = fb_strip_regs[0x04 / 2] & 0x7fc;
+		
+		if (fbw == 0)
+		{
+			LOGFB("%d FBW = 0\n", strip_n);
+			continue;
+		}
+
+		const u32 fsa = (fb_strip_regs[0x00 / 2] & 0xfffc) | ((fb_strip_regs[0x02 / 2] & 0x3) << 16) >> 1;
+		const u16 fbl = (fb_strip_regs[0x06 / 2] & 0x3ff) + 1;
+		const u8 x_dot_offs = fb_strip_regs[0x08 / 2];
+		const u8 ofx = fb_strip_regs[0x0a / 2] & 0x7fc;
+		const u8 ofy = fb_strip_regs[0x0c / 2] & 0x7fc;
+		const u32 dsa = (fb_strip_regs[0x0e / 2] & 0xfffc) | ((fb_strip_regs[0x10 / 2] & 0x3) << 16);
+		const u16 dsh = fb_strip_regs[0x12 / 2] & 0x1ff;
+		const u16 dsp = fb_strip_regs[0x16 / 2] & 0x1ff;
+
+		LOGFB("%d %08x FSA|\n\t%d FBW | %d FBL |\n\t %d OFX (%d dot)| %d OFY|\n\t %08x DSA|\n\t %04x (%d) DSH | %04x (%d) DSP\n"
+			, strip_n
+			, fsa << 1
+			, fbw
+			, fbl
+			, ofx
+			, x_dot_offs
+			, ofy
+			, dsa
+			, dsh
+			, dsh
+			, dsp
+			, dsp
+		);
+	
+		switch(m_gfx_ctrl_reg & 3)
+		{
+			case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, dsa, 0x10, fbw, fbl, y_start); break;
+			// TODO: 5bpp, shared with mode 2
+			case 2: draw_direct_gfx_8bpp(bitmap, cliprect, dsa, fbw, fbl, y_start); break;
+			case 3: draw_direct_gfx_rgb565(bitmap, cliprect, dsa, fbw, fbl, y_start); break;
+		}
+
+		y_start += fbl;
+		if (y_start >= cliprect.max_y)
+			return;
+	}
+}
+
+void pc88va_state::draw_graphic_b(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	switch((m_gfx_ctrl_reg >> 8) & 3)
+	{
+		case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, 0x20000, 0x00, 320, cliprect.max_y, cliprect.min_y); break;
+		case 2: draw_direct_gfx_8bpp(bitmap, cliprect, 0x20000, 320, cliprect.max_y, cliprect.min_y); break;
+	}
+}
+
 void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = ((y * 640) / 8) + start_offset;
+		const u32 line_offset = (((y * 640) / 8) + start_offset) & 0x3ffff;
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=8)
 		{
 			u16 x_char = (x >> 3);
@@ -495,14 +577,19 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base)
+void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base, u16 fb_width, u16 fb_height, int y_start)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	const u16 y_min = std::max(cliprect.min_y, y_start);
+	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+
+	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
+
+	for(int y = y_min; y <= y_max; y++)
 	{
 		// TODO: famista wants pitch width = 656, comes from area $200
-		const u32 line_offset = ((y * 640) / 2) + start_offset;
+		const u32 line_offset = ((y * fb_width) + start_offset) & 0x3ffff;
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=2)
 		{
 			u16 x_char = (x >> 1);
@@ -521,13 +608,16 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset)
+void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u16 fb_width, u16 fb_height, int y_start)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	const u16 y_min = std::max(cliprect.min_y, y_start);
+	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+
+	for(int y = y_min; y <= y_max; y++)
 	{
-		const u32 line_offset = (y * 640) + start_offset;
+		const u32 line_offset = ((y * fb_width) + start_offset) & 0x3ffff;
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			u32 bitmap_offset = line_offset + x;
@@ -547,32 +637,31 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
-void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u16 fb_width, u16 fb_height, int y_start)
 {
-	u16 *gvram = m_gvram;
+	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-	int count = 0;
+	const u16 y_min = std::max(cliprect.min_y, y_start);
+	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
-	// TODO: cliprect
-	for(int y = 0; y < 400; y+= 2)
+	for(int y = y_min; y <= y_max; y++)
 	{
-		for(int x = 0; x < 640; x++)
+		const u32 line_offset = ((y * fb_width) + start_offset) & 0x3ffff;
+
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t color = gvram[count];
+			u32 bitmap_offset = (line_offset + x) << 1;
 
-			for (int yi = 0; yi < 2; yi ++)
+			uint16_t color = (gvram[bitmap_offset] & 0xff) | (gvram[bitmap_offset + 1] << 8);
+
+
+			if(cliprect.contains(x, y))
 			{
-				int res_y = y + yi;
-				if(cliprect.contains(x, res_y))
-				{
-					u8 b = pal5bit((color & 0x001f));
-					u8 r = pal5bit((color & 0x03e0) >> 5);
-					u8 g = pal6bit((color & 0xfc00) >> 10);
-					bitmap.pix(res_y, x) = (b) | (g << 8) | (r << 16);
-				}
+				u8 b = pal5bit((color & 0x001f));
+				u8 r = pal5bit((color & 0x03e0) >> 5);
+				u8 g = pal6bit((color & 0xfc00) >> 10);
+				bitmap.pix(y, x) = (b) | (g << 8) | (r << 16);
 			}
-
-			count ++;
 		}
 	}
 }
@@ -664,7 +753,7 @@ void pc88va_state::idp_command_w(uint8_t data)
 
 		default:
 			m_cmd = 0x00;
-			printf("PC=%05x: Unknown IDP %02x cmd set\n",m_maincpu->pc(),data);
+			LOG("PC=%05x: Unknown IDP %02x cmd set\n",m_maincpu->pc(),data);
 			break;
 	}
 }
@@ -702,13 +791,13 @@ void pc88va_state::execute_sync_cmd()
 	*/
 	rectangle visarea;
 	attoseconds_t refresh;
-	uint16_t x_vis_area,y_vis_area;
+	uint16_t x_vis_area, y_vis_area;
 
-	//printf("V blank start: %d\n",(sync_cmd[0x8]));
-	//printf("V border start: %d\n",(sync_cmd[0x9]));
-	//printf("V Visible Area: %d\n",(sync_cmd[0xa])|((sync_cmd[0xb] & 0x40)<<2));
-	//printf("V border end: %d\n",(sync_cmd[0xc]));
-	//printf("V blank end: %d\n",(sync_cmd[0xd]));
+	LOGCRTC("V blank start: %d\n",(m_buf_ram[0x8]));
+	LOGCRTC("V border start: %d\n",(m_buf_ram[0x9]));
+	LOGCRTC("V Visible Area: %d\n",(m_buf_ram[0xa]) | ((m_buf_ram[0xb] & 0x40)<<2));
+	LOGCRTC("V border end: %d\n",(m_buf_ram[0xc]));
+	LOGCRTC("V blank end: %d\n",(m_buf_ram[0xd]));
 
 	x_vis_area = (m_buf_ram[4] + 1) * 4;
 	y_vis_area = (m_buf_ram[0xa]) | ((m_buf_ram[0xb] & 0x40) << 2);
@@ -734,6 +823,7 @@ void pc88va_state::execute_dspon_cmd()
 	*/
 	m_tsp.tvram_vreg_offset = m_buf_ram[0] << 8;
 	m_tsp.disp_on = 1;
+	LOGIDP("DSPON %02x %02x %02x (%04x)\n", m_buf_ram[0], m_buf_ram[1], m_buf_ram[2], m_tsp.tvram_vreg_offset);
 }
 
 void pc88va_state::execute_dspdef_cmd()
@@ -816,7 +906,15 @@ void pc88va_state::execute_spron_cmd()
 	*/
 	m_tsp.spr_offset = m_buf_ram[0] << 8;
 	m_tsp.spr_on = 1;
-	printf("SPR TABLE %02x %02x %02x\n",m_buf_ram[0],m_buf_ram[1],m_buf_ram[2]);
+	LOGIDP("SPRON (%02x %02x %02x) %05x offs| %d max sprites| %d MG| %d GR|\n"
+		, m_buf_ram[0]
+		, m_buf_ram[1]
+		, m_buf_ram[2]
+		, m_tsp.spr_offset + 0x40000
+		, (m_buf_ram[2] & 0xf8) + 1
+		, bool(BIT(m_buf_ram[2], 1))
+		, bool(BIT(m_buf_ram[2], 0))
+	);
 }
 
 void pc88va_state::execute_sprsw_cmd()
@@ -827,6 +925,11 @@ void pc88va_state::execute_sprsw_cmd()
 	[0] ---- --x- sprite off/on switch
 	*/
 
+	LOGIDP("SPRSW (%02x) %08x offset| %s enable"
+		, m_buf_ram[0]
+		, m_tsp.spr_offset + 0x40000
+		, m_buf_ram[0] & 2 ? "enable" : "disable"
+	);
 	tsp_sprite_enable(m_tsp.spr_offset + (m_buf_ram[0] & 0xf8), (m_buf_ram[0] & 2) << 8);
 }
 

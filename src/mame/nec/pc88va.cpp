@@ -23,7 +23,10 @@
       gets stuck to infinite reti loop and jumps to EMM area;
     - pacmana: crashes after or during PC Engine OS POST, plays again with FDC settings;
     - rance: as above, triggers SETALC in V50;
-    - upo fails vblank on/off logic bit;
+    - upo: fails vblank on/off logic bit;
+    - olteus: sometimes fails disk swap with an (A)bort (R)etry (F)ail;
+    - famista: throws an "abnormal disk" error when left on title screen for a while;
+    - hatisora: throws an (A)bort (R)etry (F)ail (hidden behind current screen brokenness);
     - Convert SASI from PC-9801 to a shared device, apparently it's same i/f;
     - Implement bus slot, which should still be PC-8801 EXPansion bus.
 
@@ -339,7 +342,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 			const bool clk = bool(BIT(data, 5));
 			const bool rv1 = bool(BIT(data, 1));
 			const bool rv0 = bool(BIT(data, 0));
-			LOGFDC("$1b2 FDC control port 0 (%02x) %s CLK %d DS1 %d%d TD1/TD0 %d%d RV1/RV0\n"
+			LOGFDC("$1b2 FDC control port 0 (%02x) %s CLK| %d DS1| %d%d TD1/TD0| %d%d RV1/RV0\n"
 				, data
 				, clk ? "  8 MHz" : "4.8 MHz"
 				, !bool(BIT(data, 4))
@@ -367,7 +370,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 			const bool m0 = bool(BIT(data, 0));
 			const bool m1 = bool(BIT(data, 1));
 
-			LOGFDC2("$1b4 FDC control port 1 (%02x) %d PCM %d%d M1/M0\n"
+			LOGFDC2("$1b4 FDC control port 1 (%02x) %d PCM| %d%d M1/M0\n"
 				, data
 				, bool(BIT(data, 3))
 				, m1
@@ -412,7 +415,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 		{
 			const bool fdcrst = bool(BIT(data, 7));
 			const bool ttrg = bool(BIT(data, 0));
-			LOGFDC2("$1b6 FDC control port 2 (%02x) %d FDCRST %d%d FDCFRY %d DMAE %d XTMASK %d TTRG\n"
+			LOGFDC2("$1b6 FDC control port 2 (%02x) %d FDCRST| %d%d FDCFRY| %d DMAE| %d XTMASK| %d TTRG\n"
 				, data
 				, fdcrst
 				, bool(BIT(data, 6))
@@ -592,10 +595,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x01c6, 0x01c7).nopw(); // ???
 	map(0x01c8, 0x01cf).rw("d8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8255 3 (byte access)
 //  map(0x01d0, 0x01d1) Expansion RAM bank selection
-	map(0x0200, 0x021f).ram(); // Frame buffer 0 control parameter
-	map(0x0220, 0x023f).ram(); // Frame buffer 1 control parameter
-	map(0x0240, 0x025f).ram(); // Frame buffer 2 control parameter
-	map(0x0260, 0x027f).ram(); // Frame buffer 3 control parameter
+	map(0x0200, 0x027f).ram().share("fb_regs"); // Frame buffer 0-1-2-3 control parameter
 	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
 
 //  map(0x0500, 0x05ff) SGP
@@ -839,6 +839,18 @@ static INPUT_PORTS_START( pc88va )
 	PORT_DIPSETTING(    0x01, "N88 V2 Mode" )
 	PORT_DIPSETTING(    0x02, "N88 V1 Mode" )
 //  PORT_DIPSETTING(    0x03, "???" )
+
+	PORT_START("OPN_PA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("OPN_PB")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2")
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout pc88va_chars_8x8 =
@@ -1072,6 +1084,7 @@ static void pc88va_floppies(device_slot_interface &device)
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
+// TODO: often dies
 WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
 {
 	bool irq_state = m_sound_irq_enable & state;
@@ -1083,7 +1096,7 @@ WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
 
 void pc88va_state::pc88va(machine_config &config)
 {
-	V50(config, m_maincpu, MASTER_CLOCK); // μPD9002, aka V30 + μPD70008AC (for PC8801 compatibility mode)
+	V50(config, m_maincpu, MASTER_CLOCK); // μPD9002, aka V50 + μPD70008AC (for PC8801 compatibility mode) in place of 8080
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_map);
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::pc88va_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::pc88va_vrtc_irq));
@@ -1174,8 +1187,10 @@ void pc88va_state::pc88va(machine_config &config)
 	YM2608(config, m_opna, FM_CLOCK);
 	m_opna->set_addrmap(0, &pc88va_state::opna_map);
 	m_opna->irq_handler().set(FUNC(pc88va_state::int4_irq_w));
+	// TODO: DE-9
 //  m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
-//  m_opna->port_b_read_callback().set_ioport("OPN_PB");
+	m_opna->port_a_read_callback().set_ioport("OPN_PA");
+	m_opna->port_b_read_callback().set_ioport("OPN_PB");
 	// TODO: per-channel mixing is unconfirmed
 	m_opna->add_route(0, m_lspeaker, 0.25);
 	m_opna->add_route(0, m_rspeaker, 0.25);

@@ -56,6 +56,7 @@ public:
 		, m_sysbank(*this, "sysbank")
 		, m_tvram(*this, "tvram")
 		, m_gvram(*this, "gvram")
+		, m_fb_regs(*this, "fb_regs")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 	{ }
@@ -100,6 +101,7 @@ private:
 	required_device<address_map_bank_device> m_sysbank;
 	required_shared_ptr<uint16_t> m_tvram;
 	required_shared_ptr<uint16_t> m_gvram;
+	required_shared_ptr<uint16_t> m_fb_regs;
 	std::unique_ptr<uint8_t[]> m_kanjiram;
 
 	uint16_t m_bank_reg = 0;
@@ -189,10 +191,13 @@ private:
 	void gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_graphic_b(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base);
-	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base);
-	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset);
-	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base, u16 fb_width, u16 fb_height, int y_start);
+	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u16 fb_width, u16 fb_height, int y_start);
+	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u16 fb_width, u16 fb_height, int y_start);
 
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
