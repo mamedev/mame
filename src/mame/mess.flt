@@ -1273,6 +1273,7 @@ yamaha/ympsr340.cpp
 yamaha/ympsr40.cpp
 yamaha/ympsr400.cpp
 yamaha/ympsr60.cpp
+yamaha/ympss12.cpp
 yamaha/ymqy70.cpp
 yamaha/ymrx15.cpp
 yamaha/ymsy35.cpp
