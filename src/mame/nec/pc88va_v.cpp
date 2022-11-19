@@ -12,7 +12,7 @@
 #define LOG_KANJI   (1U << 4) // Kanji data
 #define LOG_CRTC    (1U << 5)
 
-#define VERBOSE (LOG_GENERAL | LOG_KANJI | LOG_IDP | LOG_FB)
+#define VERBOSE (LOG_GENERAL | LOG_IDP)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"

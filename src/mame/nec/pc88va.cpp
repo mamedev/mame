@@ -26,7 +26,7 @@
     - upo: fails vblank on/off logic bit;
     - olteus: sometimes fails disk swap with an (A)bort (R)etry (F)ail;
     - famista: throws an "abnormal disk" error when left on title screen for a while;
-    - hatisora: throws an (A)bort (R)etry (F)ail (hidden behind current screen brokenness);
+    - hatisora: throws an (A)bort (R)etry (F)ail (hidden behind current video brokenness);
     - Convert SASI from PC-9801 to a shared device, apparently it's same i/f;
     - Implement bus slot, which should still be PC-8801 EXPansion bus.
 
@@ -284,7 +284,8 @@ uint8_t pc88va_state::hdd_status_r()
 
 uint8_t pc88va_state::pc88va_fdc_r(offs_t offset)
 {
-	LOGFDC("Unhandled read $%04x\n", (offset << 1) + 0x1b0);
+	if (!machine().side_effects_disabled())
+		LOGFDC("Unhandled read $%04x\n", (offset << 1) + 0x1b0);
 
 	switch(offset << 1)
 	{
@@ -301,7 +302,7 @@ uint8_t pc88va_state::pc88va_fdc_r(offs_t offset)
 
 TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
 {
-	if(m_fdc_ctrl_2 & 4) // XTMASK
+	if(m_xtmask)
 	{
 		m_pic2->ir3_w(0);
 		m_pic2->ir3_w(1);
@@ -311,13 +312,11 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
 TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_0)
 {
 	m_fdd[0]->get_device()->mon_w(0);
-	m_fdc_motor_status[0] = 1;
 }
 
 TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_1)
 {
 	m_fdd[1]->get_device()->mon_w(0);
-	m_fdc_motor_status[1] = 1;
 }
 
 #if 0
@@ -356,6 +355,8 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 
 	//if(floppy && force_ready)
 	//  ready = floppy->ready_r();
+
+	LOGFDC2("Force ready signal %d\n", force_ready);
 
 	if (force_ready)
 	{
@@ -432,24 +433,17 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 			);
 
 			// TODO: fine grain motor timings
-			// VAEG claims 600 msecs, must be more complex than that
+			// docs claims 600 msecs, must be more complex than that
 			if( m0 )
-			{
+				m_motor_start_timer[0]->adjust(attotime::from_msec(505));
+			else
 				m_fdd[0]->get_device()->mon_w(1);
-				if(m_fdc_motor_status[0] == 0)
-					m_motor_start_timer[0]->adjust(attotime::from_msec(505));
-				else
-					m_fdc_motor_status[0] = 0;
-			}
+
 
 			if( m1 )
-			{
+				m_motor_start_timer[1]->adjust(attotime::from_msec(505));
+			else
 				m_fdd[1]->get_device()->mon_w(1);
-				if(m_fdc_motor_status[1] == 0)
-					m_motor_start_timer[1]->adjust(attotime::from_msec(505));
-				else
-					m_fdc_motor_status[1] = 0;
-			}
 
 			break;
 		}
@@ -469,18 +463,42 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 		{
 			const bool fdcrst = bool(BIT(data, 7));
 			const bool ttrg = bool(BIT(data, 0));
+			const bool cur_xtmask = bool(BIT(data, 2));
 			LOGFDC2("$1b6 FDC control port 2 (%02x) %d FDCRST| %d%d FDCFRY| %d DMAE| %d XTMASK| %d TTRG\n"
 				, data
 				, fdcrst
 				, bool(BIT(data, 6))
 				, bool(BIT(data, 5))
 				, bool(BIT(data, 4))
-				, bool(BIT(data, 2))
+				, cur_xtmask
 				, ttrg
 			);
 
 			if( ttrg )
 				m_fdc_timer->adjust(attotime::from_msec(100));
+
+			// TODO: confirm condition
+			// shanghai and famista (at very least) sends a motor off if left idle for a while,
+			// then any attempt to load/save will fail because there's no explicit motor on
+			// written back to $1b4. 
+			// Note that this still isn't enough to avoid floppy errors, but makes failures
+			// to be eventually recoverable for now.
+			if (!m_xtmask && cur_xtmask && ttrg)
+			{
+				floppy_image_device *floppy0, *floppy1;
+				floppy0 = m_fdd[0]->get_device();
+				floppy1 = m_fdd[1]->get_device();
+				
+				if (floppy0)
+					if (m_fdd[0]->get_device()->mon_r() == 1)
+						m_motor_start_timer[0]->adjust(attotime::from_msec(505));
+
+				if (floppy1)
+					if (m_fdd[1]->get_device()->mon_r() == 1)
+						m_motor_start_timer[1]->adjust(attotime::from_msec(505));
+			}
+
+			m_xtmask = cur_xtmask;
 
 			//if (!BIT(m_fdc_ctrl_2, 4) && BIT(data, 4))
 			//  m_maincpu->dreq_w<2>(1);
@@ -646,6 +664,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff);// FDC related (765)
 	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 //  map(0x01c0, 0x01c1) keyboard scan code, polled thru IRQ1 ...
+	map(0x01c1, 0x01c1).lr8(NAME([this] () { return m_keyb.data; }));
 	map(0x01c6, 0x01c7).nopw(); // ???
 	map(0x01c8, 0x01cf).rw("d8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8255 3 (byte access)
 //  map(0x01d0, 0x01d1) Expansion RAM bank selection
@@ -706,6 +725,23 @@ void pc88va_state::opna_map(address_map &map)
 	map(0x000000, 0x1fffff).ram();
 }
 
+INPUT_CHANGED_MEMBER(pc88va_state::key_stroke)
+{
+	if(newval && !oldval)
+	{
+		m_keyb.data = uint8_t(param & 0xff);
+		//m_keyb.status &= ~1;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	}
+
+	if(oldval && !newval)
+	{
+		m_keyb.data = 0xff;
+		//m_keyb.status |= 1;
+	}
+}
+
 /* TODO: active low or active high? */
 static INPUT_PORTS_START( pc88va )
 	PORT_START("KEY0")
@@ -726,7 +762,7 @@ static INPUT_PORTS_START( pc88va )
 	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("= (PAD)") // PORT_CODE(KEYCODE_EQUAL_PAD) PORT_CHAR(UCHAR_MAMEKEY(EQUAL_PAD))
 	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(", (PAD)") // PORT_CODE(KEYCODE_EQUAL_PAD) PORT_CHAR(UCHAR_MAMEKEY(EQUAL_PAD))
 	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(". (PAD)") // PORT_CODE(KEYCODE_EQUAL_PAD) PORT_CHAR(UCHAR_MAMEKEY(EQUAL_PAD))
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("RETURN (PAD)") //PORT_CODE(KEYCODE_RETURN_PAD) PORT_CHAR(UCHAR_MAMEKEY(RETURN_PAD))
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("RETURN (PAD)") PORT_CHANGED_MEMBER(DEVICE_SELF, pc88va_state, key_stroke, 0x1c)
 
 	PORT_START("KEY2")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("@") // PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -740,7 +776,7 @@ static INPUT_PORTS_START( pc88va )
 
 	PORT_START("KEY3")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') PORT_CHANGED_MEMBER(DEVICE_SELF, pc88va_state, key_stroke, 0x17)
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
@@ -749,17 +785,17 @@ static INPUT_PORTS_START( pc88va )
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 
 	PORT_START("KEY4")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') PORT_CHANGED_MEMBER(DEVICE_SELF, pc88va_state, key_stroke, 0x19)
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_CHANGED_MEMBER(DEVICE_SELF, pc88va_state, key_stroke, 0x13)
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T') PORT_CHANGED_MEMBER(DEVICE_SELF, pc88va_state, key_stroke, 0x14)
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U') PORT_CHANGED_MEMBER(DEVICE_SELF, pc88va_state, key_stroke, 0x16)
 	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') PORT_CHANGED_MEMBER(DEVICE_SELF, pc88va_state, key_stroke, 0x11)
 
 	PORT_START("KEY5")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHANGED_MEMBER(DEVICE_SELF, pc88va_state, key_stroke, 0x12)
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("[")
@@ -1099,13 +1135,11 @@ void pc88va_state::machine_reset()
 
 	m_fdc_mode = 0;
 	m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
+	m_xtmask = false;
 
 	#if TEST_SUBFDC
 	m_fdccpu->set_input_line_vector(0, 0); // Z80
 	#endif
-
-	m_fdc_motor_status[0] = 0;
-	m_fdc_motor_status[1] = 0;
 
 	m_misc_ctrl = 0x80;
 	m_sound_irq_enable = false;

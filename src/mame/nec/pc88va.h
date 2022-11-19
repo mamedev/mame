@@ -63,6 +63,8 @@ public:
 
 	void pc88va(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+
 protected:
 	struct tsp_t
 	{
@@ -81,9 +83,16 @@ protected:
 		uint8_t curn_blink = 0;
 	};
 
+	struct keyb_t
+	{
+		u8 data = 0;
+	};
+	keyb_t m_keyb;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
 
 private:
 
@@ -111,14 +120,7 @@ private:
 	tsp_t m_tsp;
 	uint16_t m_video_pri_reg[2]{};
 	uint8_t m_backupram_wp = 0;
-	uint8_t m_cmd = 0;
-	uint8_t m_buf_size = 0;
-	uint8_t m_buf_index = 0;
-	uint8_t m_buf_ram[16]{};
-	uint8_t m_portc_test = 0;
-	uint8_t m_fdc_motor_status[2]{};
 
-	u16 m_text_transpen = 0;
 
 	/* timers */
 	emu_timer *m_tc_clear_timer = nullptr;
@@ -130,10 +132,20 @@ private:
 	uint8_t m_i8255_1_pc = 0;
 	uint8_t m_fdc_mode = 0;
 	uint8_t m_fdc_irq_opcode = 0;
-	uint8_t idp_status_r();
-	void idp_command_w(uint8_t data);
-	void idp_param_w(uint8_t data);
-	void palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t m_fdc_ctrl_2 = 0;
+	bool m_xtmask = false;
+	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
+	TIMER_CALLBACK_MEMBER(t3_mouse_callback);
+	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
+	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
+	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
+	DECLARE_WRITE_LINE_MEMBER(tc_w);
+
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	static void floppy_formats(format_registration &fr);
+	void pc88va_fdc_update_ready(floppy_image_device *, int);
+
+
 	uint16_t bios_bank_r();
 	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t rom_bank_r();
@@ -168,28 +180,27 @@ private:
 	void r232_ctrl_portb_w(uint8_t data);
 	void r232_ctrl_portc_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-//  DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
-//  DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
-	uint8_t m_fdc_ctrl_2;
-	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
-	TIMER_CALLBACK_MEMBER(t3_mouse_callback);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
-//  uint16_t m_fdc_dma_r();
-//  void m_fdc_dma_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	static void floppy_formats(format_registration &fr);
-	void pc88va_fdc_update_ready(floppy_image_device *, int);
 
 	u16 m_screen_ctrl_reg = 0;
 	u16 m_gfx_ctrl_reg = 0;
 
+	uint8_t m_cmd = 0;
+	uint8_t m_buf_size = 0;
+	uint8_t m_buf_index = 0;
+	uint8_t m_buf_ram[16]{};
+
+	u16 m_text_transpen = 0;
+
 	u16 screen_ctrl_r();
 	void screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	uint8_t idp_status_r();
+	void idp_command_w(uint8_t data);
+	void idp_param_w(uint8_t data);
+
+	void palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprect);
