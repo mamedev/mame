@@ -138,7 +138,8 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	uint16_t const *const tvram = m_tvram;
 
 	int offs = m_tsp.spr_offset;
-	// TODO: should be top to bottom for priority
+
+	// top to bottom for priority (shanghai menuing)
 	for(int i = 0x100 - 8; i >= 0; i -= 8)
 	{
 		int spr_count;
@@ -157,6 +158,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			continue;
 
 		// shanghai hand (4bpp) and rtype beam sparks (1bpp) wants this arrangement
+		// Apparently TSP runs on its own translation unit for addresses
 		if (spda & 0x8000)
 			spda -= 0x4000;
 
@@ -187,11 +189,11 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			spr_count = 0;
 
-			for(int y_i=0;y_i<ysize;y_i++)
+			for(int y_i = 0; y_i < ysize; y_i++)
 			{
-				for(int x_i=0;x_i<xsize;x_i+=16)
+				for(int x_i = 0; x_i < xsize; x_i+=16)
 				{
-					for(int x_s=0;x_s<16;x_s++)
+					for(int x_s = 0; x_s < 16; x_s++)
 					{
 						int res_x = xp + x_i + x_s;
 						int res_y = (yp + y_i) << m_tsp.spr_mg;
@@ -429,7 +431,6 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			// TODO: more functional programming
 			if ((tvram[vsa] & 0xff00) == 0) // ANK
 			{
-
 				u32 tile_num = ((tvram[vsa] & 0xff)  * 16) | 0x40000;
 
 				for(int yi = 0; yi < 16; yi++)
