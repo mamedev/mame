@@ -485,7 +485,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 			// written back to $1b4. 
 			// Note that this still isn't enough to avoid floppy errors, but makes failures
 			// to be eventually recoverable for now.
-			/*if (!m_xtmask && cur_xtmask && ttrg)
+			if (!m_xtmask && cur_xtmask && ttrg)
 			{
 				floppy_image_device *floppy0, *floppy1;
 				floppy0 = m_fdd[0]->get_device();
@@ -498,7 +498,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 				if (floppy1)
 					if (m_fdd[1]->get_device()->mon_r() == 1)
 						m_motor_start_timer[1]->adjust(attotime::from_msec(505));
-			}*/
+			}
 
 			m_xtmask = cur_xtmask;
 
@@ -1197,7 +1197,11 @@ WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
 {
 	bool irq_state = m_sound_irq_enable & state;
 
-	m_pic2->ir4_w(irq_state);
+	if (irq_state)
+	{
+		m_pic2->ir4_w(0);
+		m_pic2->ir4_w(1);
+	}
 //  m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
 	m_sound_irq_pending = state;
 }
