@@ -141,7 +141,7 @@ u8 pc88va_state::port40_r()
 {
 	u8 data = 0;
 	// TODO: vblank logic fails with upo
-	data = (m_screen->vpos() >= 400) ? 0x20 : 0x00; // vblank
+	data = (m_screen->vblank()) ? 0x20 : 0x00; // vblank
 	data |= m_rtc->data_out_r() << 4;
 	data |= (ioport("DSW")->read() & 1) ? 2 : 0;
 

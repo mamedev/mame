@@ -13,7 +13,7 @@
 #define LOG_CRTC    (1U << 5)
 #define LOG_COLOR   (1U << 6) // current color mode
 
-#define VERBOSE (LOG_GENERAL | LOG_IDP | LOG_COLOR)
+#define VERBOSE (LOG_GENERAL | LOG_IDP)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -628,7 +628,6 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 
 	for(int y = y_min; y <= y_max; y++)
 	{
-		// TODO: famista wants pitch width = 656, comes from area $200
 		const u32 line_offset = ((y * fb_width) + start_offset) & 0x3ffff;
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=2)
 		{
@@ -708,6 +707,7 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 
 /****************************************
  * IDP - NEC μPD72022
+ * "Intelligent Display Processor"
  ***************************************/
 
 /*
@@ -724,8 +724,7 @@ uint8_t pc88va_state::idp_status_r()
 {
 	u8 data = 0;
 	
-	// illcity, after setup menu on opening, PC=0x418f6
-	data |= (m_screen->vpos() >= 400) ? 0x40 : 0x00;
+	data |= (m_screen->vblank()) ? 0x40 : 0x00;
 
 	return data;
 }
@@ -814,49 +813,93 @@ void pc88va_state::tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit)
 	m_tvram[target_offset] = (m_tvram[target_offset] & ~0x200) | (sw_bit & 0x200);
 }
 
-/* TODO: very preliminary, needs something showable first */
+/*
+ * IDP SYNC command
+ * <TODO: complete me, use the actual datasheet, use actual names>
+ * ???? ???? [0] - unknown - clock source select?
+ * ???? ???? [1] - unknown /
+ * [0] xx-- ---- RM raster mode
+ *     00-- ---- non-interlace 640 x 400 24kHz
+ *     01-- ---- interlace 640 x 400 15kHz
+ *     10-- ---- vertical magnify 640 x 200 24kHz
+ *     11-- ---- normal 640 x 200 15kHz
+ * --xx xxxx [2] - h blank start
+ * --xx xxxx [3] - h border start
+ * xxxx xxxx [4] - (h visible area - 1) / 4
+ * --xx xxxx [5] - h border end
+ * --xx xxxx [6] - h blank end
+ * --xx xxxx [7] - h sync
+ *               \- assume all params to be - 1 / 4
+ * --xx xxxx [8] - v blank start
+ * --xx xxxx [9] - v border start
+ * xxxx xxxx [A] - v visible area
+ * -x-- ---- [B] - v visible area (bit 9)
+ * --xx xxxx [B] - v border end
+ * --xx xxxx [C] - v blank end
+ * --xx xxxx [D] - v sync
+ */
 void pc88va_state::execute_sync_cmd()
 {
-	/*
-	    ???? ???? [0] - unknown
-	    ???? ???? [1] - unknown
-	    --xx xxxx [2] - h blank start
-	    --xx xxxx [3] - h border start
-	    xxxx xxxx [4] - h visible area
-	    --xx xxxx [5] - h border end
-	    --xx xxxx [6] - h blank end
-	    --xx xxxx [7] - h sync
-	    --xx xxxx [8] - v blank start
-	    --xx xxxx [9] - v border start
-	    xxxx xxxx [A] - v visible area
-	    -x-- ---- [B] - v visible area (bit 9)
-	    --xx xxxx [C] - v border end
-	    --xx xxxx [D] - v blank end
-	    --xx xxxx [E] - v sync
-	*/
+	// olteus will punt loading on PC Engine OS if the vblank bit is completely off
+	// illcity expects the actual IDP vblank bit to work, from setup menu to opening transition PC=0x418f6
+	// upo wants precise vblank bit readouts plus something else (SGP irq?)
+
 	rectangle visarea;
 	attoseconds_t refresh;
-	uint16_t x_vis_area, y_vis_area;
 
-	LOGCRTC("V blank start: %d\n",(m_buf_ram[0x8]));
-	LOGCRTC("V border start: %d\n",(m_buf_ram[0x9]));
-	LOGCRTC("V Visible Area: %d\n",(m_buf_ram[0xa]) | ((m_buf_ram[0xb] & 0x40)<<2));
-	LOGCRTC("V border end: %d\n",(m_buf_ram[0xc]));
-	LOGCRTC("V blank end: %d\n",(m_buf_ram[0xd]));
+	LOGCRTC("IDP SYNC: ");
 
-	x_vis_area = (m_buf_ram[4] + 1) * 4;
-	y_vis_area = (m_buf_ram[0xa]) | ((m_buf_ram[0xb] & 0x40) << 2);
+	for (int i = 0; i < 15; i++)
+		LOGCRTC("%02x ", m_buf_ram[i]);
 
-	visarea.set(0, x_vis_area - 1, 0, y_vis_area - 1);
+	// assume all parame
+	const u8 h_blank_start = (m_buf_ram[0x02] & 0x3f) + 1;
+	const u8 h_border_start = (m_buf_ram[0x03] & 0x3f) + 1;
+	const u16 h_vis_area = (m_buf_ram[0x04] + 1) * 4;
+	const u8 h_border_end = (m_buf_ram[0x05] & 0x3f) + 1;
+	const u8 h_blank_end = (m_buf_ram[0x06] & 0x3f) + 1;
+	const u8 h_sync = (m_buf_ram[0x07] & 0x3f) + 1;
 
-	//if(y_vis_area == 400)
-	//  refresh = HZ_TO_ATTOSECONDS(24800) * x_vis_area * y_vis_area; //24.8 KHz
-	//else
-	//  refresh = HZ_TO_ATTOSECONDS(15730) * x_vis_area * y_vis_area; //15.73 KHz
+	LOGCRTC("\n\t");
+	LOGCRTC("H blank start %d - end %d|", h_blank_start, h_blank_end);
+	LOGCRTC("H visible area: %d|", h_vis_area);
+	LOGCRTC("H border start %d - end %d|", h_border_start, h_border_end);
+	LOGCRTC("H sync: %d", h_sync);
 
-	refresh = HZ_TO_ATTOSECONDS(60);
+	LOGCRTC("\n\t");
+	const u16 h_total = 
+		(h_blank_start + h_blank_end + h_border_start + h_border_end + h_sync) * 4 + h_vis_area;
+	
+	LOGCRTC("H Total calc = %d", h_total);
+	LOGCRTC("\n\t");
 
-	m_screen->configure(848, 448, visarea, refresh);
+	const u8 v_blank_start = m_buf_ram[0x08] & 0x3f;
+	const u8 v_border_start = m_buf_ram[0x09] & 0x3f;
+	const u16 v_vis_area = (m_buf_ram[0x0a]) | ((m_buf_ram[0x0b] & 0x40) << 2);
+	const u8 v_border_end = m_buf_ram[0x0b] & 0x3f;
+	const u8 v_blank_end = m_buf_ram[0x0c] & 0x3f;
+	const u8 v_sync = (m_buf_ram[0x0d] & 0x3f);
+
+	LOGCRTC("V blank start %d - end %d|", v_blank_start,  v_blank_end);
+	LOGCRTC("V visible area: %d|", v_vis_area);
+	LOGCRTC("V border start: %d - end %d|", v_border_start,  v_border_end);
+	LOGCRTC("V sync: %d", v_sync);
+
+	LOGCRTC("\n\t");
+	const u16 v_total = v_blank_start + v_blank_end + v_vis_area + v_border_start + v_border_end + v_sync;
+
+	LOGCRTC("V Total calc = %d", v_total);
+	LOGCRTC("\n");
+
+	visarea.set(0, h_vis_area - 1, 0, v_vis_area - 1);
+
+	// TODO: interlace / vertical magnify, bit 7
+	// TODO: actual clock source must be external, assume known PC-88 XTALs, a bit off compared to PC-88 with the values above
+	const int clock_speed = BIT(m_buf_ram[0x00], 6) ? (31'948'800 / 4) : (28'636'363 / 2);
+
+	refresh = HZ_TO_ATTOSECONDS(clock_speed) * h_vis_area * v_vis_area;
+
+	m_screen->configure(h_total, v_total, visarea, refresh);
 }
 
 void pc88va_state::execute_dspon_cmd()
