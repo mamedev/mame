@@ -141,7 +141,7 @@ u8 pc88va_state::port40_r()
 {
 	u8 data = 0;
 	// TODO: vblank logic fails with upo
-	data = (m_screen->vpos() < 400) ? 0x20 : 0x00; // vblank
+	data = (m_screen->vpos() >= 400) ? 0x20 : 0x00; // vblank
 	data |= m_rtc->data_out_r() << 4;
 	data |= (ioport("DSW")->read() & 1) ? 2 : 0;
 
@@ -485,7 +485,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 			// written back to $1b4. 
 			// Note that this still isn't enough to avoid floppy errors, but makes failures
 			// to be eventually recoverable for now.
-			if (!m_xtmask && cur_xtmask && ttrg)
+			/*if (!m_xtmask && cur_xtmask && ttrg)
 			{
 				floppy_image_device *floppy0, *floppy1;
 				floppy0 = m_fdd[0]->get_device();
@@ -498,7 +498,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 				if (floppy1)
 					if (m_fdd[1]->get_device()->mon_r() == 1)
 						m_motor_start_timer[1]->adjust(attotime::from_msec(505));
-			}
+			}*/
 
 			m_xtmask = cur_xtmask;
 
@@ -636,7 +636,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x0102, 0x0103).w(FUNC(pc88va_state::gfx_ctrl_w));
 	map(0x0106, 0x0109).w(FUNC(pc88va_state::video_pri_w)); // Palette Control Register (priority) / Direct Color Control Register (priority)
 //  map(0x010a, 0x010b) Picture Mask Mode Register
-//  map(0x010c, 0x010d) Color Palette Mode Register
+	map(0x010c, 0x010d).w(FUNC(pc88va_state::color_mode_w)); // Color Palette Mode Register
 //  map(0x010e, 0x010f) Backdrop Color Register
 //  map(0x0110, 0x0111) Color Code/Plain Mask Register
 //  map(0x0124, 0x0125) ? (related to Transparent Color of Graphic Screen 0)

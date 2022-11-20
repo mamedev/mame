@@ -93,7 +93,6 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-
 private:
 
 	required_device<v50_device> m_maincpu;
@@ -117,17 +116,18 @@ private:
 	uint16_t m_bank_reg = 0;
 	uint8_t m_timer3_io_reg = 0;
 	emu_timer *m_t3_mouse_timer = nullptr;
-	tsp_t m_tsp;
 	uint16_t m_video_pri_reg[2]{};
 	uint8_t m_backupram_wp = 0;
 
-
-	/* timers */
+	// FDC
 	emu_timer *m_tc_clear_timer = nullptr;
 	emu_timer *m_fdc_timer = nullptr;
 	emu_timer *m_motor_start_timer[2]{};
 
-	/* floppy state */
+	uint8_t cpu_8255_c_r();
+	void cpu_8255_c_w(uint8_t data);
+	uint8_t fdc_8255_c_r();
+	void fdc_8255_c_w(uint8_t data);
 	uint8_t m_i8255_0_pc = 0;
 	uint8_t m_i8255_1_pc = 0;
 	uint8_t m_fdc_mode = 0;
@@ -144,17 +144,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	static void floppy_formats(format_registration &fr);
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
-
-
-	uint16_t bios_bank_r();
-	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t rom_bank_r();
-	uint8_t key_r(offs_t offset);
-	void backupram_wp_1_w(uint16_t data);
-	void backupram_wp_0_w(uint16_t data);
-	uint8_t kanji_ram_r(offs_t offset);
-	void kanji_ram_w(offs_t offset, uint8_t data);
-	uint8_t hdd_status_r();
 	#if TEST_SUBFDC
 	uint8_t upd765_tc_r();
 	void upd765_mc_w(uint8_t data);
@@ -163,16 +152,25 @@ private:
 	#endif
 	uint8_t pc88va_fdc_r(offs_t offset);
 	void pc88va_fdc_w(offs_t offset, uint8_t data);
+	
+	uint16_t bios_bank_r();
+	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t rom_bank_r();
+	uint8_t key_r(offs_t offset);
+	void backupram_wp_1_w(uint16_t data);
+	void backupram_wp_0_w(uint16_t data);
+	uint8_t kanji_ram_r(offs_t offset);
+	void kanji_ram_w(offs_t offset, uint8_t data);
+
+	uint8_t hdd_status_r();
+
 	uint16_t sysop_r();
 	void timer3_ctrl_reg_w(uint8_t data);
 	uint8_t backupram_dsw_r(offs_t offset);
 	void sys_port1_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc88va_vrtc_irq);
-	uint8_t cpu_8255_c_r();
-	void cpu_8255_c_w(uint8_t data);
-	uint8_t fdc_8255_c_r();
-	void fdc_8255_c_w(uint8_t data);
+
 	uint8_t r232_ctrl_porta_r();
 	uint8_t r232_ctrl_portb_r();
 	uint8_t r232_ctrl_portc_r();
@@ -181,27 +179,24 @@ private:
 	void r232_ctrl_portc_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
 
-
+	u16 m_color_mode = 0;
+	u8 m_pltm, m_pltp = 0;
 	u16 m_screen_ctrl_reg = 0;
 	u16 m_gfx_ctrl_reg = 0;
-
-	uint8_t m_cmd = 0;
-	uint8_t m_buf_size = 0;
-	uint8_t m_buf_index = 0;
-	uint8_t m_buf_ram[16]{};
 
 	u16 m_text_transpen = 0;
 
 	u16 screen_ctrl_r();
 	void screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint8_t idp_status_r();
-	void idp_command_w(uint8_t data);
-	void idp_param_w(uint8_t data);
+	void color_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	u8 get_layer_pal_bank(u8 which);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_graphic_b(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -213,8 +208,19 @@ private:
 
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	// IDP
+	tsp_t m_tsp;
+
+	uint8_t m_cmd = 0;
+	uint8_t m_buf_size = 0;
+	uint8_t m_buf_index = 0;
+	uint8_t m_buf_ram[16]{};
+
+	uint8_t idp_status_r();
+	void idp_command_w(uint8_t data);
+	void idp_param_w(uint8_t data);
+
 	void tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit);
 	void execute_sync_cmd();
 	void execute_dspon_cmd();

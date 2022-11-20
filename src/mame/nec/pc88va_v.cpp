@@ -8,11 +8,12 @@
 
 
 #define LOG_IDP     (1U << 2) // TSP data
-#define LOG_FB      (1U << 3) // framebuffer strips
+#define LOG_FB      (1U << 3) // framebuffer strips (verbose)
 #define LOG_KANJI   (1U << 4) // Kanji data
 #define LOG_CRTC    (1U << 5)
+#define LOG_COLOR   (1U << 6) // current color mode
 
-#define VERBOSE (LOG_GENERAL | LOG_IDP)
+#define VERBOSE (LOG_GENERAL | LOG_IDP | LOG_COLOR)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -21,6 +22,7 @@
 #define LOGFB(...)        LOGMASKED(LOG_FB, __VA_ARGS__)
 #define LOGKANJI(...)     LOGMASKED(LOG_KANJI, __VA_ARGS__)
 #define LOGCRTC(...)      LOGMASKED(LOG_CRTC, __VA_ARGS__)
+#define LOGCOLOR(...)     LOGMASKED(LOG_COLOR, __VA_ARGS__)
 
 void pc88va_state::video_start()
 {
@@ -30,6 +32,7 @@ void pc88va_state::video_start()
 
 	save_item(NAME(m_screen_ctrl_reg));
 	save_item(NAME(m_gfx_ctrl_reg));
+	save_item(NAME(m_color_mode));
 
 	save_item(NAME(m_text_transpen));
 	save_pointer(NAME(m_video_pri_reg), 2);
@@ -43,6 +46,13 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	if(m_tsp.disp_on == 0) // don't bother if we are under DSPOFF command
 		return 0;
+
+	// rollback to V1/V2 mode
+	if (!BIT(m_pltm, 2))
+	{
+		// pc8801_state::screen_update(bitmap, cliprect);
+		return 0;
+	}
 
 	/*
 	m_video_pri_reg[0]
@@ -117,11 +127,23 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
  * Drawing fns
  ***************************************/
 
+inline u8 pc88va_state::get_layer_pal_bank(u8 which)
+{
+	if (!(BIT(m_pltm, 1)))
+		return (m_pltm & 1) << 4;
+
+	if (m_pltm == 3)
+		return 0;
+	
+	return (m_pltp == which) << 4;
+}
+
 void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint16_t const *const tvram = m_tvram;
-
+	
 	int offs = m_tsp.spr_offset;
+	const u8 layer_pal_bank = get_layer_pal_bank(1);
 
 	// top to bottom for priority (shanghai menuing)
 	for(int i = 0x100 - 8; i >= 0; i -= 8)
@@ -159,6 +181,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				yp = 0x100 - yp;
 			}
 
+			// TODO: shinraba needs wrap-around during gameplay (touching left edge of screen).
 			if(xp & 0x200)
 			{
 				xp &= 0x1ff;
@@ -191,7 +214,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
 
 						if(pen != -1) //transparent pen
-							bitmap.pix(res_y, res_x) = m_palette->pen(pen);
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 					}
 					spr_count+=2;
 				}
@@ -223,7 +246,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 						//if (pen != 0 && pen != m_text_transpen)
 						if (pen != 0)
-							bitmap.pix(res_y, res_x) = m_palette->pen(pen);
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 					}
 					spr_count+=2;
 				}
@@ -232,7 +255,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
-/* TODO: this is either a result of an hand-crafted ROM or the JIS stuff is really attribute related ... */
+// TODO: handcrafted kanji ROM causes this, should be simplified by a more accurate dump
 uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y)
 {
 	if(jis1 < 0x30)
@@ -279,6 +302,8 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	if (tsp_regs[2 / 2])
 		popmessage("Upper VSA enabled!");
+
+	const u8 layer_pal_bank = get_layer_pal_bank(0);
 
 	const u8 attr_mode = tsp_regs[0xa / 2] & 0x1f;
 	// TODO: check this out, diverges with documentation
@@ -437,7 +462,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						if(secret) { pen = 0; } //hide text
 
 						if(pen != 0 && pen != m_text_transpen)
-							bitmap.pix(res_y, res_x) = m_palette->pen(pen + 0x10);
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 					}
 				}
 			}
@@ -471,7 +496,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						// TODO: transpen not right, cfr. rogueall
 						// (sets 1, wants 7)
 						if(pen != 0 && pen != m_text_transpen)
-							bitmap.pix(res_y, res_x) = m_palette->pen(pen + 0x10);
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 					}
 				}
 			}
@@ -501,13 +526,12 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
  * [+14] <reserved>
  * [+16] ---- ---x xxxx xxxx Sub screen display position (DSP)
  */
-// TODO: what happens with FBW = 0?
 
 void pc88va_state::draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint16_t const *const fb_regs = m_fb_regs;
 
-	u16 y_start = 0;
+	const u8 layer_pal_bank = get_layer_pal_bank(2);
 
 	LOGFB("%d GFX MODE\n", m_gfx_ctrl_reg & 3);
 
@@ -516,6 +540,7 @@ void pc88va_state::draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		uint16_t const *const fb_strip_regs = &fb_regs[(strip_n * 0x20) / 2];
 		const u16 fbw = fb_strip_regs[0x04 / 2] & 0x7fc;
 		
+		// assume that a fbw = 0 don't generate a layer at all
 		if (fbw == 0)
 		{
 			LOGFB("%d FBW = 0\n", strip_n);
@@ -545,27 +570,25 @@ void pc88va_state::draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			, dsp
 			, dsp
 		);
-	
+
 		switch(m_gfx_ctrl_reg & 3)
 		{
-			//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, 0x10); break;
-			case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, dsa, 0x10, fbw, fbl, y_start); break;
+			//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
+			case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, dsa, layer_pal_bank, fbw, fbl, dsp); break;
 			// TODO: 5bpp, shared with mode 2
-			case 2: draw_direct_gfx_8bpp(bitmap, cliprect, dsa, fbw, fbl, y_start); break;
-			case 3: draw_direct_gfx_rgb565(bitmap, cliprect, dsa, fbw, fbl, y_start); break;
+			case 2: draw_direct_gfx_8bpp(bitmap, cliprect, dsa, fbw, fbl, dsp); break;
+			case 3: draw_direct_gfx_rgb565(bitmap, cliprect, dsa, fbw, fbl, dsp); break;
 		}
-
-		y_start += fbl;
-		if (y_start >= cliprect.max_y)
-			return;
 	}
 }
 
 void pc88va_state::draw_graphic_b(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const u8 layer_pal_bank = get_layer_pal_bank(3);
+
 	switch((m_gfx_ctrl_reg >> 8) & 3)
 	{
-		case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, 0x20000, 0x00, 320, cliprect.max_y, cliprect.min_y); break;
+		case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, 0x20000, layer_pal_bank, 320, cliprect.max_y, cliprect.min_y); break;
 		case 2: draw_direct_gfx_8bpp(bitmap, cliprect, 0x20000, 320, cliprect.max_y, cliprect.min_y); break;
 	}
 }
@@ -699,7 +722,12 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
  */
 uint8_t pc88va_state::idp_status_r()
 {
-	return 0x00;
+	u8 data = 0;
+	
+	// illcity, after setup menu on opening, PC=0x418f6
+	data |= (m_screen->vpos() >= 400) ? 0x40 : 0x00;
+
+	return data;
 }
 
 
@@ -1043,6 +1071,72 @@ u16 pc88va_state::screen_ctrl_r()
 void pc88va_state::gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_gfx_ctrl_reg);
+}
+
+/*
+ * $10c
+ * --xx ---- ---- ---- BDM1/BDM0 color backdrop mode #
+ * --00 ---- ---- ---- inner background color, outer transparent
+ * --01 ---- ---- ---- inner transparent, outer background
+ * --10 ---- ---- ---- inside/outside background color
+ * --11 ---- ---- ---- inside/outside transparent
+ *                     \- mode 0 only available on 24.8KHz monitor
+ * ---- ---x xx-- ---- PLTM2/PLTM1/PLTM0 color palette mode
+ * ---- ---0 xx-- ---- <V1/V2 Modes, cfr. pmode in $32 and pm00 in $31)>
+ * ---- ---1 00-- ---- use palette bank 0
+ * ---- ---1 01-- ---- use palette bank 1
+ * ---- ---1 10-- ---- mixed mode
+ * ---- ---1 11-- ---- combined 32-color mode
+ * ---- ---- --xx ---- PLTP1/PLTP0 layer select for PLTM mixed mode
+ * ---- ---- --00 ---- text layer
+ * ---- ---- --01 ---- sprites
+ * ---- ---- --10 ---- graphic 0
+ * ---- ---- --11 ---- graphic 1
+ * ---- ---- ---- xx-- BLKM1/BLKM0 color blink rate
+ * ---- ---- ---- 00-- blink off
+ * ---- ---- ---- 01-- blink every 32 frames
+ * ---- ---- ---- 10-- blink every 64 frames
+ * ---- ---- ---- 11-- blink every 128 frames
+ * ---- ---- ---- --xx BLKD blink duty
+ * ---- ---- ---- --00 12.5%
+ * ---- ---- ---- --01 25%
+ * ---- ---- ---- --10 50%
+ * ---- ---- ---- --11 75%
+ */
+void pc88va_state::color_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_color_mode);
+	
+	const u8 bdm = (m_color_mode & 0x3000) >> 12;
+	m_pltm = (m_color_mode & 0x01c0) >> 6;
+	m_pltp = (m_color_mode & 0x0030) >> 4;
+	const u8 blkm = (m_color_mode & 0x000c) >> 2;
+	const u8 blkd = (m_color_mode & 0x0003) >> 0;
+	LOGCOLOR("Color Mode (%04x & %04x)|%02x BDM|%s PLTM2|%02x PLTM1/PLTM0|%02x PLTP|%02x BLKM|%02x BLKD\n"
+		, m_color_mode, mem_mask
+		, bdm
+		, m_pltm & 4 ? "V3 mode" : "V1/V2 mode"
+		, m_pltm & 3
+		, m_pltp
+		, blkm
+		, blkd
+	);
+	//        PLTM          - PLTP
+	// rtype, shinraba:
+	//        0x02 (mixed)    0x03 graphics 1
+	// micromus, famista, shanghai, ballbrkr:
+	//        0x02 (mixed)    0x02 graphics 0
+	// olteus:
+	//        0x02 (mixed)    0x01 sprites
+	// mightmag:
+	//        0x02 (mixed)    0x00 text
+	// animefrm:
+	//        0x03 (combined) 0x00 text
+	// boomer (gameplay):
+	//        0x01 (bank 1)   0x02 graphic 0 (left on for previous 0x02 - 0x02 mode)
+	// illcity, xak2 (pre-loading screens):
+	//        0x00 (bank 0)   0x00 text
+	
 }
 
 void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)

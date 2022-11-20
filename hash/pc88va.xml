@@ -287,9 +287,9 @@ Operating Systems
 		<info name="usage" value="Boot with Disk C in drive 1"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A - User" />
-			<dataarea name="flop" size="1094592">
-				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da"/>
+			<feature name="part_id" value="Disk C - Boot" />
+			<dataarea name="flop" size="1331888">
+				<rom name="might &amp; magic(diskc_bootdisk) (star craft).d88" size="1331888" crc="f3c56b5e" sha1="ab39d96aa7a5446a8cb8b929978f6211746d02bc"/>
 			</dataarea>
 		</part>
 
@@ -301,9 +301,9 @@ Operating Systems
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C - Boot" />
-			<dataarea name="flop" size="1331888">
-				<rom name="might &amp; magic(diskc_bootdisk) (star craft).d88" size="1331888" crc="f3c56b5e" sha1="ab39d96aa7a5446a8cb8b929978f6211746d02bc"/>
+			<feature name="part_id" value="Disk A - User" />
+			<dataarea name="flop" size="1094592">
+				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da"/>
 			</dataarea>
 		</part>
 	</software>
