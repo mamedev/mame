@@ -466,30 +466,24 @@ DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC_V11, coco_family_fdc_device_base, coco_fdc_v
 
 
 //**************************************************************************
-//				Disto / CRC Super Controller II
+//				Disto / CRC Super Controller II Base
 //**************************************************************************
-
-ROM_START(coco_scii)
-	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-// 	ROM_LOAD("cdos11.bin", 0x0000, 0x4000, CRC(92a2b2c5) SHA1(8a1246758e6957dc7c9689e915e1b65122024c3e))
-	ROM_LOAD("cdos12.bin", 0x0000, 0x4000, CRC(172ba592) SHA1(083c5ea91866cfebcf2cb9818dd311d8a0206c4c))
-// 	ROM_LOAD("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
-ROM_END
 
 namespace
 {
-	class coco_scii_device
+	class coco_scii_device_base
 		: public coco_fdc_device_base
 		, public device_distomeb_host_interface
 	{
 	public:
 		// construction/destruction
-		coco_scii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-			: coco_fdc_device_base(mconfig, COCO_SCII, tag, owner, clock)
+		coco_scii_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+			: coco_fdc_device_base(mconfig, type, tag, owner, clock)
 			, m_slot(*this, MEB_TAG)
 			, m_carts(*this, "cart_line")
 		{
 		}
+
 	protected:
 		// device-level overrides
 		virtual void device_start() override;
@@ -499,10 +493,10 @@ namespace
 
 		// optional information overrides
 		virtual void device_add_mconfig(machine_config &config) override;
-		virtual const tiny_rom_entry *device_rom_region() const override
-		{
-			return ROM_NAME(coco_scii);
-		}
+		// virtual const tiny_rom_entry *device_rom_region() const override
+		// {
+		// 	return ROM_NAME(coco_scii);
+		// }
 
 		// methods
 		virtual void update_lines() override;
@@ -527,15 +521,15 @@ namespace
 //	device_start - device-specific start
 //-------------------------------------------------
 
-void coco_scii_device::device_start()
+void coco_scii_device_base::device_start()
 {
 	coco_family_fdc_device_base::device_start();
 
 	m_cache = std::make_unique<uint8_t[]>(0x200);
 
 	install_readwrite_handler(0xFF74, 0xFF77,
-			read8sm_delegate(*this, FUNC(coco_scii_device::ff74_read)),
-			write8sm_delegate(*this, FUNC(coco_scii_device::ff74_write)));
+			read8sm_delegate(*this, FUNC(coco_scii_device_base::ff74_read)),
+			write8sm_delegate(*this, FUNC(coco_scii_device_base::ff74_write)));
 
 	save_pointer(NAME(m_cache), 0x200);
 	save_item(NAME(m_cache_pointer));
@@ -546,7 +540,7 @@ void coco_scii_device::device_start()
 //	device_reset - device-specific reset
 //-------------------------------------------------
 
-void coco_scii_device::device_reset()
+void coco_scii_device_base::device_reset()
 {
 	coco_family_fdc_device_base::device_reset();
 
@@ -563,7 +557,7 @@ static void disto_meb_slot(device_slot_interface &device)
 //	device_add_mconfig - device-specific machine config
 //-------------------------------------------------
 
-void coco_scii_device::device_add_mconfig(machine_config &config)
+void coco_scii_device_base::device_add_mconfig(machine_config &config)
 {
 	coco_fdc_device_base::device_add_mconfig(config);
 
@@ -577,7 +571,7 @@ void coco_scii_device::device_add_mconfig(machine_config &config)
 //	scs_read
 //-------------------------------------------------
 
-u8 coco_scii_device::scs_read(offs_t offset)
+u8 coco_scii_device_base::scs_read(offs_t offset)
 {
 	if (offset > 0x0f && offset < 0x18)
 		return m_slot->meb_read(offset - 0x10);
@@ -590,7 +584,7 @@ u8 coco_scii_device::scs_read(offs_t offset)
 //	scs_write
 //-------------------------------------------------
 
-void coco_scii_device::scs_write(offs_t offset, u8 data)
+void coco_scii_device_base::scs_write(offs_t offset, u8 data)
 {
 	if (offset > 0x0f && offset < 0x18)
 		m_slot->meb_write(offset - 0x10, data);
@@ -604,7 +598,7 @@ void coco_scii_device::scs_write(offs_t offset, u8 data)
 //	update_lines - SCII controller lines
 //-------------------------------------------------
 
-void coco_scii_device::update_lines()
+void coco_scii_device_base::update_lines()
 {
 	// clear HALT enable under certain circumstances
 	if (intrq() && (dskreg() & 0x20))
@@ -661,7 +655,7 @@ void coco_scii_device::update_lines()
 //	ff74_read - no halt registers
 //-------------------------------------------------
 
-u8 coco_scii_device::ff74_read(offs_t offset)
+u8 coco_scii_device_base::ff74_read(offs_t offset)
 {
 	u8 data = 0x0;
 
@@ -697,7 +691,7 @@ u8 coco_scii_device::ff74_read(offs_t offset)
 //	ff74_write - no halt registers
 //-------------------------------------------------
 
-void coco_scii_device::ff74_write(offs_t offset, u8 data)
+void coco_scii_device_base::ff74_write(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -722,8 +716,71 @@ void coco_scii_device::ff74_write(offs_t offset, u8 data)
 
 }
 
-DEFINE_DEVICE_TYPE_PRIVATE(COCO_SCII, coco_family_fdc_device_base, coco_scii_device, "coco_scii", "Disto Super Controller II")
 
+//**************************************************************************
+//	Disto / CRC  Super Controller II, CoCo 1 / 2 ROM
+//**************************************************************************
+
+ROM_START(coco_scii_cc1)
+	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
+	ROM_LOAD("cdos 4 4-6-89 cc1.bin", 0x0000, 0x4000, CRC(9da6db28) SHA1(2cc6e275178ca8d8f281d845792fb0ae069aaeda))
+ROM_END
+
+namespace
+{
+	class coco_scii_device_cc1 : public coco_scii_device_base
+	{
+	public:
+		// construction/destruction
+		coco_scii_device_cc1(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+			: coco_scii_device_base(mconfig, COCO_SCII_CC1, tag, owner, clock)
+		{
+		}
+
+	protected:
+		// optional information overrides
+		virtual const tiny_rom_entry *device_rom_region() const override
+		{
+			return ROM_NAME(coco_scii_cc1);
+		}
+
+	};
+
+}
+
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_SCII_CC1, coco_family_fdc_device_base, coco_scii_device_cc1, "coco_scii_cc1", "Disto Super Controller II (CoCo 1/2 ROM)")
+
+//**************************************************************************
+//	Disto / CRC  Super Controller II, CoCo 3 ROM
+//**************************************************************************
+
+ROM_START(coco_scii_cc3)
+	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
+	ROM_LOAD("cdos 1_2 3-30-89 cc3.bin", 0x0000, 0x4000, CRC(891c0094) SHA1(c1fa0fcbf1202a9b63aafd98dce777b502584230))
+ROM_END
+
+namespace
+{
+	class coco_scii_device_cc3 : public coco_scii_device_base
+	{
+	public:
+		// construction/destruction
+		coco_scii_device_cc3(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+			: coco_scii_device_base(mconfig, COCO_SCII_CC3, tag, owner, clock)
+		{
+		}
+
+	protected:
+		// optional information overrides
+		virtual const tiny_rom_entry *device_rom_region() const override
+		{
+			return ROM_NAME(coco_scii_cc3);
+		}
+
+	};
+}
+
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_SCII_CC3, coco_family_fdc_device_base, coco_scii_device_cc3, "coco_scii_cc3", "Disto Super Controller II (CoCo 3 ROM)")
 
 //**************************************************************************
 //				COCO-3 HDB-DOS
