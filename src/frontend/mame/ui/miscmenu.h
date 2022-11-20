@@ -98,6 +98,7 @@ public:
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
+	int current_bios(const device_t &device);
 };
 
 

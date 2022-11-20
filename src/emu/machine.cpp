@@ -1116,7 +1116,20 @@ std::string running_machine::nvram_filename(device_t &device) const
 		if (software != nullptr && *software != '\0')
 			result << PATH_SEPARATOR << software;
 
-		std::string tag(device.tag());
+		std::ostringstream dev_tag;
+		dev_tag << device.tag();
+		if (device.owner() != &root_device() && device.owner()->rom_region() && !std::strcmp(device.owner()->rom_region()->name, device.basetag()))
+		{
+			for (romload::system_bios const &bios : romload::entries(device.owner()->rom_region()).get_system_bioses())
+			{
+				if (device.owner()->system_bios() == bios.get_value())
+				{
+					util::stream_format(dev_tag, "_%s", bios.get_name());
+					break;
+				}
+			}
+		}
+		std::string tag = dev_tag.str();
 		tag.erase(0, 1);
 		strreplacechr(tag,':', '_');
 		result << PATH_SEPARATOR << tag;

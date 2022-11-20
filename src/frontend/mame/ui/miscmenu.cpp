@@ -54,6 +54,35 @@ menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container 
 	set_heading(_("BIOS Selection"));
 }
 
+int menu_bios_selection::current_bios(const device_t &device)
+{
+	const char *val;
+	std::string bios;
+	if (device.owner())
+	{
+		const char *slot_option_name = device.owner()->tag() + 1;
+		bios = machine().options().slot_option(slot_option_name).bios();
+		val = bios.empty() ?  nullptr : bios.c_str();
+	}
+	else
+	{
+		val = machine().options().value("bios");
+	}
+	if (val)
+	{
+		for (romload::system_bios const &entry : romload::entries(device.rom_region()).get_system_bioses())
+		{
+			uint32_t const bios_flags(entry.get_value());
+			std::string bios_number = std::to_string(bios_flags - 1);
+			if (!core_stricmp(bios_number.c_str(), val) || !core_stricmp(entry.get_name(), val))
+			{
+				return bios_flags;
+			}
+		}
+	}
+	return device.system_bios();
+}
+
 void menu_bios_selection::populate(float &customtop, float &custombottom)
 {
 	// cycle through all devices for this system
@@ -63,13 +92,14 @@ void menu_bios_selection::populate(float &customtop, float &custombottom)
 		device_slot_interface const *const slot(dynamic_cast<device_slot_interface const *>(parent));
 		if (!parent || (slot && (slot->get_card_device() == &device)))
 		{
+			int bios_val = current_bios(device);
 			tiny_rom_entry const *rom(device.rom_region());
 			if (rom && !ROMENTRY_ISEND(rom))
 			{
 				char const *val = nullptr;
 				for ( ; !ROMENTRY_ISEND(rom) && !val; rom++)
 				{
-					if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom) == device.system_bios())
+					if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom) == bios_val)
 						val = rom->hashdata;
 				}
 				if (val)
@@ -113,7 +143,7 @@ void menu_bios_selection::handle(event const *ev)
 				case IPT_UI_LEFT: case IPT_UI_RIGHT:
 				{
 					int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
-					bios_val = dev->system_bios() + ((ev->iptkey == IPT_UI_LEFT) ? -1 : +1);
+					bios_val = current_bios(*dev) + ((ev->iptkey == IPT_UI_LEFT) ? -1 : +1);
 
 					// wrap
 					if (bios_val < 1)
@@ -130,7 +160,6 @@ void menu_bios_selection::handle(event const *ev)
 
 			if (bios_val > 0)
 			{
-				dev->set_system_bios(bios_val);
 				if (strcmp(dev->tag(),":")==0) {
 					machine().options().set_value("bios", bios_val-1, OPTION_PRIORITY_CMDLINE);
 				} else {
