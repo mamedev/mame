@@ -113,10 +113,8 @@ image_init_result msx_slot_cartridge_device::call_load()
 	{
 		if (loaded_through_softlist())
 		{
-			u32 length;
-
 			// Allocate and copy rom contents
-			length = get_software_region_length("rom");
+			u32 length = get_software_region_length("rom");
 			m_cartridge->rom_alloc(length);
 			if (length > 0)
 			{
