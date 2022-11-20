@@ -31,18 +31,10 @@ TODO:
 - propcycl attract mode, when the altar button is pressed, global fade should affect the background sprite
 - slavesim_handle_233002 is not fully understood, objectshift and the flag to disable fog are obvious, the others are unclear
 - polygon position problems? (also has glitches on real hw, but not as bad)
-  + ridgerac suspension bridge, cables appear through the guardrail
   + timecris stage 1-2 start, beam appears through platform
   + timecris stage 2-1 final section, steel beam appears through plank
   + cybrcycc speed dial should be more to the left
   + plenty more, but need clearly visible cases with PCB evidence
-- ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2,
-  czram contents is rather odd here and partly cleared (probably the cause?):
-  + $0000-$0d7f - gradual increase from $00-$7c
-  + $0d80-$0fff - $73, huh, why lower?
-  + $1000-$19ff - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
-  + $1a00-$0dff - $77
-  + $1e00-$1fff - $78
 - improve ss22 lighting:
   + acedrive/victlap sparks
   + adillor title logo
@@ -68,6 +60,13 @@ TODO:
 - ss22 poly/sprite alpha is probably more limited than currently emulated, not supporting stacked layers
   + airco22 attract mode, see-through plane looks weird (they probably meant to just darken it)
   + cybrcycc game over screen has a weird glitch
+
+BTANB:
+- ridgerac suspension bridge, cables appearing through the guardrail (worse on MAME, see poly position in TODO?),
+  I think they improved it in ridgera2, but it still happens there on MAME
+- ridgerac sunset gradual fade is not smooth (good in ridgera2)
+- ridgera2 rearview mirror is glitchy when driving downhill towards the beach
+- victlap titlescreen, saturated colors instead of a clean fade
 
 ***********************************************************************************************************
 

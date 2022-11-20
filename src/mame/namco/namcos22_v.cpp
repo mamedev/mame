@@ -11,6 +11,7 @@
 
 
 // poly constructor
+
 namcos22_renderer::namcos22_renderer(namcos22_state &state) :
 	poly_manager<float, namcos22_object_data, 4>(state.machine()),
 	m_state(state)
@@ -26,7 +27,12 @@ void namcos22_renderer::init()
 
 
 // poly scanline callbacks
-void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
+
+// differences between super and non-super
+// normal: per-poly fog, shading after fog, global fader (handled elsewhere), no alpha
+// super:  shading before fog, per-z fog, 2 faders, alpha, sprites in a separate callback
+
+void namcos22_renderer::renderscanline_poly(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
 {
 	float z = extent.param[0].start;
 	float u = extent.param[1].start;
@@ -38,25 +44,16 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 	float di = extent.param[3].dpdx;
 	int bn = extra.bn * 0x1000;
 	const pen_t *pens = extra.pens;
-	const u8 *czram = extra.czram;
-	int cz_sdelta = extra.cz_sdelta;
-	bool zfog_enabled = extra.zfog_enabled;
 	int fogfactor = 0xff - extra.fogfactor;
-	int fadefactor = 0xff - extra.fadefactor;
-	int alphafactor = 0xff - extra.alpha;
-	bool alpha_enabled = extra.alpha_enabled;
-	u8 alpha_pen = m_state.m_poly_alpha_pen;
 	bool shade_enabled = extra.shade_enabled;
 	bool texture_enabled = extra.texture_enabled;
 	rgbaint_t fogcolor = extra.fogcolor;
-	rgbaint_t fadecolor = extra.fadecolor;
-	rgbaint_t polycolor = extra.polycolor;
-	bool polyfade_enabled = extra.pfade_enabled;
+	int prioverchar = extra.prioverchar;
 	int penmask = 0xff;
 	int penshift = 0;
 	int pen = 0;
 	rgbaint_t rgb;
-	int prioverchar = extra.prioverchar;
+
 	u32 *const dest = &extra.destbase->pix(scanline);
 	u8 *const primap = &extra.primap->pix(scanline);
 	u16 *const ttmap = m_state.m_texture_tilemap;
@@ -77,131 +74,166 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 		penshift = 4 * (~extra.cmode & 1);
 	}
 
-	// slight differences between super and non-super, do the branch here for optimization
-	// normal: no alpha, shading after fog, global fader
-	// super:  2 faders, alpha, shading before fog
-	if (m_state.m_is_ss22)
+	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		for (int x = extent.startx; x < extent.stopx; x++)
+		float ooz = 1.0f / z;
+
+		// texture mapping
+		if (texture_enabled)
 		{
-			float ooz = 1.0f / z;
-
-			// texture mapping
-			if (texture_enabled)
-			{
-				int tx = u * ooz;
-				int ty = v * ooz + bn;
-				int to = ((ty & 0xfff0) << 4) | ((tx & 0xff0) >> 4);
-				pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
-				rgb.set(pens[pen >> penshift & penmask]);
-			}
-			else
-				rgb.set(0, 0xff, 0xff, 0xff);
-
-			// apply shading before fog
-			if (shade_enabled)
-			{
-				int shade = i*ooz;
-				rgb.scale_imm_and_clamp(shade << 2);
-			}
-
-			// per-z distance fogging
-			if (zfog_enabled)
-			{
-				// discard low byte and clamp to 0-1fff
-				int cz = int(ooz) >> 8;
-				if (cz > 0x1fff) cz = 0x1fff;
-				fogfactor = czram[cz] + cz_sdelta;
-				if (fogfactor > 0)
-				{
-					if (fogfactor > 0xff) fogfactor = 0xff;
-					rgb.blend(fogcolor, 0xff - fogfactor);
-				}
-			}
-			else if (fogfactor != 0xff) // direct
-			{
-				rgb.blend(fogcolor, fogfactor);
-			}
-
-			// fade
-			if (polyfade_enabled)
-			{
-				rgb.scale_and_clamp(polycolor);
-			}
-
-			if (fadefactor != 0xff)
-			{
-				rgb.blend(fadecolor, fadefactor);
-			}
-
-			// alpha
-			if (alphafactor != 0xff && (alpha_enabled || pen == alpha_pen))
-			{
-				rgb.blend(rgbaint_t(dest[x]), alphafactor);
-			}
-
-			dest[x] = rgb.to_rgba();
-			primap[x] = (primap[x] & ~1) | prioverchar;
-
-			u += du;
-			v += dv;
-			i += di;
-			z += dz;
+			int tx = u * ooz;
+			int ty = v * ooz + bn;
+			int to = ((ty & 0xfff0) << 4) | ((tx & 0xff0) >> 4);
+			pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
+			rgb.set(pens[pen >> penshift & penmask]);
 		}
-	}
-	else
-	{
-		for (int x = extent.startx; x < extent.stopx; x++)
+		else
+			rgb.set(0, 0xff, 0xff, 0xff);
+
+		// poly fog
+		if (fogfactor != 0xff)
 		{
-			float ooz = 1.0f / z;
-
-			// texture mapping
-			if (texture_enabled)
-			{
-				int tx = u * ooz;
-				int ty = v * ooz + bn;
-				int to = ((ty & 0xfff0) << 4) | ((tx & 0xff0) >> 4);
-				pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
-				rgb.set(pens[pen >> penshift & penmask]);
-			}
-			else
-				rgb.set(0, 0xff, 0xff, 0xff);
-
-			// per-z distance fogging
-			if (zfog_enabled)
-			{
-				// discard low byte and clamp to 0-1fff
-				int cz = int(ooz) >> 8;
-				if (cz > 0x1fff) cz = 0x1fff;
-				fogfactor = czram[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ cz];
-				if (fogfactor != 0)
-				{
-					rgb.blend(fogcolor, 0xff - fogfactor);
-				}
-			}
-			else if (fogfactor != 0xff) // direct
-			{
-				rgb.blend(fogcolor, fogfactor);
-			}
-
-			// apply shading after fog
-			if (shade_enabled)
-			{
-				int shade = i*ooz;
-				rgb.scale_imm_and_clamp(shade << 2);
-			}
-
-			dest[x] = rgb.to_rgba();
-			primap[x] = (primap[x] & ~1) | prioverchar;
-
-			u += du;
-			v += dv;
-			i += di;
-			z += dz;
+			rgb.blend(fogcolor, fogfactor);
 		}
+
+		// shading after fog
+		if (shade_enabled)
+		{
+			int shade = i * ooz;
+			rgb.scale_imm_and_clamp(shade << 2);
+		}
+
+		dest[x] = rgb.to_rgba();
+		primap[x] = (primap[x] & ~1) | prioverchar;
+
+		u += du;
+		v += dv;
+		i += di;
+		z += dz;
 	}
 }
 
+
+void namcos22_renderer::renderscanline_poly_ss22(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
+{
+	float z = extent.param[0].start;
+	float u = extent.param[1].start;
+	float v = extent.param[2].start;
+	float i = extent.param[3].start;
+	float dz = extent.param[0].dpdx;
+	float du = extent.param[1].dpdx;
+	float dv = extent.param[2].dpdx;
+	float di = extent.param[3].dpdx;
+	int bn = extra.bn * 0x1000;
+	const pen_t *pens = extra.pens;
+	int fogfactor = 0xff - extra.fogfactor;
+	bool shade_enabled = extra.shade_enabled;
+	bool texture_enabled = extra.texture_enabled;
+	rgbaint_t fogcolor = extra.fogcolor;
+	int prioverchar = extra.prioverchar;
+	int penmask = 0xff;
+	int penshift = 0;
+	int pen = 0;
+	rgbaint_t rgb;
+
+	const u8 *czram = extra.czram;
+	int cz_sdelta = extra.cz_sdelta;
+	bool zfog_enabled = extra.zfog_enabled;
+	int fadefactor = 0xff - extra.fadefactor;
+	int alphafactor = 0xff - extra.alpha;
+	bool alpha_enabled = extra.alpha_enabled;
+	u8 alpha_pen = m_state.m_poly_alpha_pen;
+	bool polyfade_enabled = extra.pfade_enabled;
+	rgbaint_t fadecolor = extra.fadecolor;
+	rgbaint_t polycolor = extra.polycolor;
+
+	u32 *const dest = &extra.destbase->pix(scanline);
+	u8 *const primap = &extra.primap->pix(scanline);
+	u16 *const ttmap = m_state.m_texture_tilemap;
+	u8 *const ttattr = m_state.m_texture_tileattr.get();
+	u8 *const ttdata = m_state.m_texture_tiledata;
+	u8 *const tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel.get();
+
+	if (extra.cmode & 4)
+	{
+		pens += 0xec + ((extra.cmode & 8) << 1);
+		penmask = 0x03;
+		penshift = 2 * (~extra.cmode & 3);
+	}
+	else if (extra.cmode & 2)
+	{
+		pens += 0xe0 + ((extra.cmode & 8) << 1);
+		penmask = 0x0f;
+		penshift = 4 * (~extra.cmode & 1);
+	}
+
+	for (int x = extent.startx; x < extent.stopx; x++)
+	{
+		float ooz = 1.0f / z;
+
+		// texture mapping
+		if (texture_enabled)
+		{
+			int tx = u * ooz;
+			int ty = v * ooz + bn;
+			int to = ((ty & 0xfff0) << 4) | ((tx & 0xff0) >> 4);
+			pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
+			rgb.set(pens[pen >> penshift & penmask]);
+		}
+		else
+			rgb.set(0, 0xff, 0xff, 0xff);
+
+		// shading before fog
+		if (shade_enabled)
+		{
+			int shade = i * ooz;
+			rgb.scale_imm_and_clamp(shade << 2);
+		}
+
+		// per-z fog
+		if (zfog_enabled)
+		{
+			// discard low byte and clamp to 0-1fff
+			int cz = int(ooz) >> 8;
+			if (cz > 0x1fff) cz = 0x1fff;
+			fogfactor = czram[cz] + cz_sdelta;
+			if (fogfactor > 0)
+			{
+				if (fogfactor > 0xff) fogfactor = 0xff;
+				rgb.blend(fogcolor, 0xff - fogfactor);
+			}
+		}
+		else if (fogfactor != 0xff) // direct
+		{
+			rgb.blend(fogcolor, fogfactor);
+		}
+
+		// fade
+		if (polyfade_enabled)
+		{
+			rgb.scale_and_clamp(polycolor);
+		}
+
+		if (fadefactor != 0xff)
+		{
+			rgb.blend(fadecolor, fadefactor);
+		}
+
+		// alpha
+		if (alphafactor != 0xff && (alpha_enabled || pen == alpha_pen))
+		{
+			rgb.blend(rgbaint_t(dest[x]), alphafactor);
+		}
+
+		dest[x] = rgb.to_rgba();
+		primap[x] = (primap[x] & ~1) | prioverchar;
+
+		u += du;
+		v += dv;
+		i += di;
+		z += dz;
+	}
+}
 
 void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
 {
@@ -294,9 +326,9 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			clipv[vertnum].x = m_clipx + clipv[vertnum].x * ooz;
 			clipv[vertnum].y = m_clipy - clipv[vertnum].y * ooz;
 			clipv[vertnum].p[0] = ooz;
-			clipv[vertnum].p[1] = (clipv[vertnum].p[1] + 0.5f) * ooz;
-			clipv[vertnum].p[2] = (clipv[vertnum].p[2] + 0.5f) * ooz;
-			clipv[vertnum].p[3] = (clipv[vertnum].p[3] + 0.5f) * ooz;
+			clipv[vertnum].p[1] = (clipv[vertnum].p[1] + 0.5f) * ooz; // u
+			clipv[vertnum].p[2] = (clipv[vertnum].p[2] + 0.5f) * ooz; // v
+			clipv[vertnum].p[3] = (clipv[vertnum].p[3] + 0.5f) * ooz; // bri
 		}
 	}
 
@@ -316,8 +348,9 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	int flags = node->data.quad.flags;
 	int color = node->data.quad.color;
+	int cz_value = node->data.quad.cz_value;
+	int cz_type = node->data.quad.cz_type;
 	int cz_adjust = node->data.quad.cz_adjust;
 	int objectflags = node->data.quad.objectflags;
 
@@ -335,7 +368,6 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 	extra.pens = &m_state.m_palette->pen((color & 0x7f) << 8);
 	extra.primap = &screen.priority();
 	extra.bn = node->data.quad.texturebank;
-	extra.flags = flags;
 	extra.cmode = node->data.quad.cmode;
 	extra.prioverchar = ((node->data.quad.cmode & 7) == 1) ? 1 : 0;
 	extra.prioverchar |= m_state.m_is_ss22 ? 2 : 0;
@@ -360,13 +392,13 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		// poly fog
 		if (~color & 0x80)
 		{
-			int cztype = flags & 3;
-			int bank = m_state.m_czattr[6] >> (cztype * 2) & 3;
+			int bank = m_state.m_czattr[6] >> (cz_type * 2) & 3;
 			int bank_enabled = m_state.m_czattr[4] >> (bank * 4) & 4;
 
 			if (bank_enabled)
 			{
 				s16 delta = m_state.m_czattr[bank];
+
 				// sign-extend
 				if (delta < 0) delta |= 0xff00;
 				else delta &= 0x00ff;
@@ -375,8 +407,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 
 				if (direct)
 				{
-					int cz = (flags & 0x1fff00) >> 8;
-					int fogfactor = m_state.m_recalc_czram[bank][cz] + delta;
+					int fogfactor = m_state.m_recalc_czram[bank][cz_value] + delta;
 					extra.fogfactor = std::clamp(fogfactor, 0, 0xff);
 				}
 				else
@@ -388,28 +419,14 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			}
 		}
 	}
-
 	else
 	{
 		// poly fog
 		if (~color & 0x80)
 		{
-			int cztype = flags & 3;
-			int czcolor = cztype & nthbyte(&m_state.m_fog_colormask, cztype);
-			extra.fogcolor.set(0, m_state.m_fog_r_per_cztype[czcolor], m_state.m_fog_g_per_cztype[czcolor], m_state.m_fog_b_per_cztype[czcolor]);
-
-			if (direct)
-			{
-				// direct case, cz value is preset
-				int cz = (flags & 0x1fff00) >> 8;
-				int fogfactor = nthbyte(m_state.m_czram, cztype << 13 | cz);
-				extra.fogfactor = std::clamp(fogfactor, 0, 0xff);
-			}
-			else
-			{
-				extra.zfog_enabled = true;
-				extra.czram = (u8*)&m_state.m_czram[cztype << (13-2)];
-			}
+			int cz_color = cz_type & nthbyte(&m_state.m_fog_colormask, cz_type);
+			extra.fogcolor.set(0, m_state.m_fog_r_per_cztype[cz_color], m_state.m_fog_g_per_cztype[cz_color], m_state.m_fog_b_per_cztype[cz_color]);
+			extra.fogfactor = nthbyte(m_state.m_czram, cz_type << 13 | cz_value);
 		}
 	}
 
@@ -429,9 +446,15 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 
 	// disable poly fog
 	if (cz_adjust & 0x800000)
+	{
 		extra.zfog_enabled = false;
+		extra.fogfactor = 0;
+	}
 
-	render_triangle_fan<4>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_uvi_full, this), clipverts, clipv);
+	if (m_state.m_is_ss22)
+		render_triangle_fan<4>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_poly_ss22, this), clipverts, clipv);
+	else
+		render_triangle_fan<4>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_poly, this), clipverts, clipv);
 }
 
 
@@ -466,8 +489,6 @@ void namcos22_renderer::poly3d_drawsprite(
 
 		extra.fadefactor = 0;
 		extra.fogfactor = 0;
-		extra.flags = 0;
-
 		extra.destbase = &dest_bmp;
 		extra.prioverchar = 2 | prioverchar;
 		extra.line_modulo = gfx->rowbytes();
@@ -810,7 +831,6 @@ void namcos22_state::draw_direct_poly(const u16 *src)
 	*/
 	u32 zsort = ((src[1] & 0xfff) << 12) | (src[0] & 0xfff);
 	struct namcos22_scenenode *node = m_poly->new_scenenode(machine(), zsort, NAMCOS22_SCENENODE_QUAD);
-	int cztype = src[3] & 3;
 
 	if (m_is_ss22)
 	{
@@ -822,10 +842,11 @@ void namcos22_state::draw_direct_poly(const u16 *src)
 		node->data.quad.cmode = (src[0 + 4] & 0xf000) >> 12;
 		node->data.quad.texturebank = (src[1 + 4] & 0xf000) >> 12;
 	}
+	node->data.quad.color = (src[2] & 0xff00) >> 8;
+	node->data.quad.cz_value = src[3] >> 2 & 0x1fff;
+	node->data.quad.cz_type = src[3] & 3;
 	node->data.quad.cz_adjust = 0;
 	node->data.quad.objectflags = 0;
-	node->data.quad.flags = (src[3] << 6 & 0x1fff00) | cztype;
-	node->data.quad.color = (src[2] & 0xff00) >> 8;
 	src += 4;
 
 	for (int i = 0; i < 4; i++)
@@ -893,7 +914,7 @@ void namcos22_state::draw_direct_poly(const u16 *src)
  *     ----.xx--.----.---- cz table
  *     ----.--xx.----.---- representative z algorithm?
  *     ----.----.--x-.---- backface cull enable
- *     ----.----.----.---x ?
+ *     ----.----.----.---x lighting related?
  *
  *      1163 // sky
  *      1262 // score (front)
@@ -992,8 +1013,8 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 		pv->bri = bri;
 	}
 
-	if (zmin < 0.0f) zmin = 0.0f;
-	if (zmax < 0.0f) zmax = 0.0f;
+	zmin = std::clamp(zmin, 0.0f, (float)0x1fffff) + 0.5f;
+	zmax = std::clamp(zmax, 0.0f, (float)0x1fffff) + 0.5f;
 
 	switch (flags & 0x300)
 	{
@@ -1010,7 +1031,6 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 			break;
 	}
 
-	zsort = std::clamp(zsort, 0, 0x1fffff);
 	int absolute_priority = m_absolute_priority & 7;
 
 	/* relative: representative z + shift values
@@ -1038,12 +1058,15 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 	absolute_priority &= 7;
 	zsort |= (absolute_priority << 21);
 
+	int cz_value = (int)zmax; // not from zsort
+
 	// allocate quad
 	struct namcos22_scenenode *node = m_poly->new_scenenode(machine(), zsort, NAMCOS22_SCENENODE_QUAD);
 	node->data.quad.cmode = (v[0].u >> 12) & 0xf;
 	node->data.quad.texturebank = (v[0].v >> 12) & 0xf;
 	node->data.quad.color = (color >> 8) & 0xff;
-	node->data.quad.flags = flags >> 10 & 3;
+	node->data.quad.cz_value = cz_value >> 8;
+	node->data.quad.cz_type = flags >> 10 & 3;
 	node->data.quad.cz_adjust = m_cz_adjust;
 	node->data.quad.objectflags = m_objectflags;
 

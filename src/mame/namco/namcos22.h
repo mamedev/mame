@@ -81,7 +81,8 @@ struct namcos22_scenenode
 			int texturebank;
 			int color;
 			int cmode;
-			int flags;
+			int cz_value;
+			int cz_type;
 			int cz_adjust;
 			int objectflags;
 			int direct;
@@ -111,20 +112,21 @@ struct namcos22_object_data
 {
 	// poly / sprites
 	rgbaint_t fogcolor;
-	rgbaint_t fadecolor;
-	rgbaint_t polycolor;
 	const pen_t *pens;
 	bitmap_rgb32 *destbase;
 	bitmap_ind8 *primap;
 	int bn;
-	int flags;
 	int prioverchar;
 	int cmode;
-	int fadefactor;
-	bool pfade_enabled;
 	bool shade_enabled;
 	bool texture_enabled;
 	int fogfactor;
+
+	// ss22
+	rgbaint_t polycolor;
+	rgbaint_t fadecolor;
+	int fadefactor;
+	bool pfade_enabled;
 	bool zfog_enabled;
 	int cz_sdelta;
 	const u8 *czram;
@@ -173,7 +175,8 @@ private:
 	void free_scenenode(struct namcos22_scenenode *node);
 	struct namcos22_scenenode *alloc_scenenode(running_machine &machine, struct namcos22_scenenode *node);
 
-	void renderscanline_uvi_full(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
+	void renderscanline_poly(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
+	void renderscanline_poly_ss22(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 	void renderscanline_sprite(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 };
 
