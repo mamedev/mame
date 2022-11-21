@@ -185,6 +185,7 @@ private:
 	u16 m_gfx_ctrl_reg = 0;
 
 	u16 m_text_transpen = 0;
+	bitmap_rgb32 m_graphic_bitmap[2];
 
 	u16 screen_ctrl_r();
 	void screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);

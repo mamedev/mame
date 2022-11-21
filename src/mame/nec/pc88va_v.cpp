@@ -32,6 +32,9 @@ void pc88va_state::video_start()
 	m_gfxdecode->gfx(2)->set_source(m_kanjiram.get());
 	m_gfxdecode->gfx(3)->set_source(m_kanjiram.get());
 
+	for (int i = 0; i < 2; i++)
+		m_screen->register_screen_bitmap(m_graphic_bitmap[i]);
+
 	save_item(NAME(m_screen_ctrl_reg));
 	save_item(NAME(m_gfx_ctrl_reg));
 	save_item(NAME(m_color_mode));
@@ -586,7 +589,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 
 	const u8 gfx_ctrl = (m_gfx_ctrl_reg >> (which * 8)) & 0x13;
 
-//	const u8 pixel_size = BIT(gfx_ctrl, 4) + 1;
+	const u32 pixel_size = 0x10000 >> BIT(gfx_ctrl, 4);
 
 	const u8 layer_pal_bank = get_layer_pal_bank(2 + which);
 
@@ -595,6 +598,8 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		, which ? "B" : "A"
 		, layer_pal_bank
 	);
+
+	m_graphic_bitmap[which].fill(0, cliprect);
 
 	for (int layer_n = which; layer_n < 4; layer_n += 2)
 	{
@@ -642,12 +647,20 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		switch(gfx_ctrl & 3)
 		{
 			//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
-			case 1: draw_indexed_gfx_4bpp(bitmap, split_cliprect, fsa, layer_pal_bank, fbw, fbl); break;
+			case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, fsa, layer_pal_bank, fbw, fbl); break;
 			// TODO: 5bpp, shared with mode 2
-			case 2: draw_direct_gfx_8bpp(bitmap, split_cliprect, fsa, fbw, fbl); break;
-			case 3: draw_direct_gfx_rgb565(bitmap, split_cliprect, fsa, fbw, fbl); break;
+			case 2: draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); break;
+			case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); break;
 		}
 	}
+
+	// TODO: we eventually need primask_copyrozbitmap_trans here, or a custom copy, depending on what the "transpen" registers really does.
+	copyrozbitmap_trans(
+		bitmap, cliprect, m_graphic_bitmap[which],
+		0, 0,
+		pixel_size, 0, 0, pixel_size,
+		false, 0
+	);
 }
 
 void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base)
@@ -693,7 +706,7 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 
 			for (int xi = 0; xi < 2; xi ++)
 			{
-				u8 color = (gvram[bitmap_offset] >> (4 * xi)) & 0xf;
+				u8 color = (gvram[bitmap_offset] >> (xi ? 0 : 4)) & 0xf;
 
 				if(color && cliprect.contains(x + xi, y))
 					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
