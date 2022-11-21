@@ -7657,6 +7657,84 @@ ROM_END
 
 /***************************************************************************
 
+  Tiger Ninja Gaiden III (model 78-503)
+  * Sharp SM510 under epoxy (die label MD6)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class tgaiden3_state : public hh_sm510_state
+{
+public:
+	tgaiden3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tgaiden3(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( tgaiden3 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Jump")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Attack/Pick")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void tgaiden3_state::tgaiden3(machine_config &config)
+{
+	sm510_tiger(config, 1474, 1080);
+}
+
+// roms
+
+ROM_START( tgaiden3 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "md6", 0x0000, 0x1000, CRC(00037018) SHA1(ca1e9f87706e44fb14c302626bdb4d1b274ffe03) )
+
+	ROM_REGION( 512535, "screen", 0)
+	ROM_LOAD( "tgaiden3.svg", 0, 512535, CRC(c9006c7b) SHA1(c50279d8133f5fb4d1e3da5c6ebefbc9bbd9dbcd) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger X-Men - Project X (model 78-504)
   * Sharp SM510 under epoxy (die label MD3)
   * lcd screen with custom segments, 1-bit sound
@@ -10273,6 +10351,7 @@ CONS( 1991, thook,        0,           0, thook,        thook,        thook_stat
 CONS( 1992, tbttf,        0,           0, tbttf,        tbttf,        tbttf_state,        empty_init, "Tiger Electronics", "Back to the Future (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1992, taddams,      0,           0, taddams,      taddams,      taddams_state,      empty_init, "Tiger Electronics", "The Addams Family (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1992, thalone,      0,           0, thalone,      thalone,      thalone_state,      empty_init, "Tiger Electronics", "Home Alone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1992, tgaiden3,     0,           0, tgaiden3,     tgaiden3,     tgaiden3_state,     empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden III (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1993, txmenpx,      0,           0, txmenpx,      txmenpx,      txmenpx_state,      empty_init, "Tiger Electronics", "X-Men - Project X (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1992, thalone2,     0,           0, thalone2,     thalone2,     thalone2_state,     empty_init, "Tiger Electronics", "Home Alone 2 - Lost in New York (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1992, tsonic,       0,           0, tsonic,       tsonic,       tsonic_state,       empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
