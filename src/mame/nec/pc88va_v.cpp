@@ -12,6 +12,7 @@
 #define LOG_KANJI   (1U << 4) // Kanji data
 #define LOG_CRTC    (1U << 5)
 #define LOG_COLOR   (1U << 6) // current color mode
+#define LOG_TEXT    (1U << 7) // text strips (verbose)
 
 #define VERBOSE (LOG_GENERAL | LOG_IDP)
 #define LOG_OUTPUT_STREAM std::cout
@@ -23,6 +24,7 @@
 #define LOGKANJI(...)     LOGMASKED(LOG_KANJI, __VA_ARGS__)
 #define LOGCRTC(...)      LOGMASKED(LOG_CRTC, __VA_ARGS__)
 #define LOGCOLOR(...)     LOGMASKED(LOG_COLOR, __VA_ARGS__)
+#define LOGTEXT(...)      LOGMASKED(LOG_TEXT, __VA_ARGS__)
 
 void pc88va_state::video_start()
 {
@@ -280,7 +282,7 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y
  * [+0a] xxxx ---- ---- ---- background color
  *       ---- xxxx ---- ---- foreground color
  *       ---- ---- ---x xxxx display mode
- * [+0c] Raster address offset
+ * [+0c] ---x xxxx ---- ---- Raster address offset
  * [+0e] <reserved>
  * [+10] Split screen start address (RSA)
  * [+12] <reserved> / Upper RSA
@@ -294,216 +296,268 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y
 void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint16_t const *const tvram = m_tvram;
-	uint16_t const *const tsp_regs = &tvram[m_tsp.tvram_vreg_offset / 2];
 	// TODO: PCG select won't work with this arrangement
 	uint8_t const *const kanji = memregion("kanji")->base();
 
-	u32 vsa = (tsp_regs[0 / 2]); // | (tsp_regs[2 / 2] & 7) << 16;
+	LOGTEXT("=== Start TEXT frame\n");
 
-	if (tsp_regs[2 / 2])
-		popmessage("Upper VSA enabled!");
-
-	const u8 layer_pal_bank = get_layer_pal_bank(0);
-
-	const u8 attr_mode = tsp_regs[0xa / 2] & 0x1f;
-	// TODO: check this out, diverges with documentation
-	const u8 screen_fg_col = (tsp_regs[0xa / 2] & 0xf000) >> 12;
-	const u8 screen_bg_col = (tsp_regs[0xa / 2] & 0x0f00) >> 8;
-
-	// TODO: how even vh/vw can run have all these bytes?
-	const u8 vh = (tsp_regs[4 / 2] & 0x7ff);
-	const u16 vw = (tsp_regs[8 / 2] & 0x3ff) / 2;
-
-	for(int y = 0; y < vh; y++)
+	// TODO: 4 strips?
+	for (int layer_n = 0; layer_n < 3; layer_n ++)
 	{
-		for(int x = 0; x < vw; x++)
+		uint16_t const *const tsp_regs = &tvram[(layer_n * 0x20 + m_tsp.tvram_vreg_offset) / 2];
+
+		const u32 vsa = tsp_regs[0 / 2]; // | (tsp_regs[2 / 2] & 7) << 16;
+		const u32 rsa = tsp_regs[0x10 / 2]; // | (tsp_regs[0x12 / 2] & 7) << 16;
+
+		// as-is it doesn't make much sense to enable either of these two,
+		// since TVRAM is really 16-bit address lines here.
+		// Since we are in IDP domain it may be used on another system ...
+		if (tsp_regs[2 / 2] || tsp_regs[0x12 / 2])
+			popmessage("Upper VSA enabled!");
+
+		const u8 layer_pal_bank = get_layer_pal_bank(0);
+
+		const u8 attr_mode = tsp_regs[0xa / 2] & 0x1f;
+		// TODO: check this out, diverges with documentation
+		const u8 screen_fg_col = (tsp_regs[0xa / 2] & 0xf000) >> 12;
+		const u8 screen_bg_col = (tsp_regs[0xa / 2] & 0x0f00) >> 8;
+
+		// TODO: how even vh/vw can run have all these bytes?
+		const u8 vh = (tsp_regs[4 / 2] & 0x7ff);
+		const u16 vw = (tsp_regs[8 / 2] & 0x3ff) / 2;
+
+
+		if (vh == 0 || vw == 0)
 		{
-			uint16_t attr = (tvram[vsa+(m_tsp.attr_offset/2)] & 0x00ff);
+			LOGTEXT("\t%d skip VW = %d VH = %d\n"
+				, layer_n
+				, vw
+				, vh
+			);
+			continue;
+		}
 
-			uint8_t fg_col, bg_col, secret, reverse;
-			//uint8_t blink,dwidc,dwid,uline,hline;
-			fg_col = bg_col = reverse = secret = 0; //blink = dwidc = dwid = uline = hline = 0;
+		LOGTEXT("\t%d %08x VSA - %08x RSA| %02x DISPLAY MODE|%d VW x %d VH\n"
+			, layer_n
+			, vsa
+			, rsa
+			, attr_mode
+			, vw
+			, vh
+		);
 
-			// TODO: convert to functional programming
-			switch(attr_mode)
+		const u16 rh = tsp_regs[0x14 /2];
+		const u16 rw = tsp_regs[0x16 /2];
+		const u16 ryp = tsp_regs[0x18 / 2];
+		const u16 rxp = tsp_regs[0x1a / 2];
+
+		const int raster_offset = (tsp_regs[0x0c / 2] >> 8) & 0x1f;
+
+		LOGTEXT("\t%d RXP x %d RYP|%d RW x %d RH %d\n", rxp, ryp, rw, rh, raster_offset);
+
+		rectangle split_cliprect(rxp, rxp + rw - 1, ryp, ryp + rh - 1);
+		split_cliprect &= cliprect;
+
+		for(int y = 0; y < vh; y++)
+		{
+			int y_base = y * 16 + ryp - raster_offset;
+			
+			// TODO: consult with OG
+			if (!split_cliprect.contains(rxp, y_base) && 
+				!split_cliprect.contains(rxp, y_base + 16))
+				continue;
+
+			for(int x = 0; x < vw; x++)
 			{
-				/*
-				xxxx ---- foreground color
-				---- xxxx background color
-				*/
-				case 0:
-					fg_col = (attr & 0x0f) >> 0;
-					bg_col = (attr & 0xf0) >> 4;
-					break;
-				/*
-				xxxx ---- foreground color
-				---- x--- horizontal line
-				---- -x-- reverse
-				---- --x- blink
-				---- ---x secret (hide text)
-				background color is defined by screen control table values
-				*/
-				case 1:
-					fg_col = (attr & 0xf0) >> 4;
-					bg_col = screen_bg_col;
-					//hline = (attr & 0x08) >> 3;
-					reverse = (attr & 0x04) >> 2;
-					//blink = (attr & 0x02) >> 1;
-					secret = (attr & 0x01) >> 0;
-					break;
-				/*
-				x--- ---- dwidc
-				-x-- ---- dwid
-				--x- ---- uline
-				---x ---- hline
-				---- -x-- reverse
-				---- --x- blink
-				---- ---x secret (hide text)
-				background and foreground colors are defined by screen control table values
-				*/
-				case 2:
-					fg_col = screen_fg_col;
-					bg_col = screen_bg_col;
-					//dwidc = (attr & 0x80) >> 7;
-					//dwid = (attr & 0x40) >> 6;
-					//uline = (attr & 0x20) >> 5;
-					//hline = (attr & 0x10) >> 4;
-					reverse = (attr & 0x04) >> 2;
-					//blink = (attr & 0x02) >> 1;
-					secret = (attr & 0x01) >> 0;
-					break;
-				/*
-				---- x--- mixes between mode 0 and 2
+				int x_base = x * 8;
+				if (!split_cliprect.contains(x_base, y_base) &&
+					!split_cliprect.contains(x_base, y_base + 16))
+					continue;
 
-				xxxx 1--- foreground color
-				---- 1xxx background color
-				2)
-				x--- 0--- dwidc
-				-x-- 0--- dwid
-				--x- 0--- uline
-				---x 0--- hline
-				---- 0x-- reverse
-				---- 0-x- blink
-				---- 0--x secret (hide text)
-				background and foreground colors are defined by screen control table values
-				*/
-				case 3:
-					{
-						// TODO: similar to 3301 drawing (where it should save previous attribute setup)
-						if(attr & 0x8)
+				// TODO: understand where VSA comes into equation
+				const u32 cur_offset = ((rsa >> 1) + x + (y * vw));
+
+				uint16_t attr = (tvram[cur_offset + (m_tsp.attr_offset / 2)] & 0x00ff);
+
+				uint8_t fg_col, bg_col, secret, reverse;
+				//uint8_t blink,dwidc,dwid,uline,hline;
+				fg_col = bg_col = reverse = secret = 0; //blink = dwidc = dwid = uline = hline = 0;
+
+				// TODO: convert to functional programming
+				switch(attr_mode)
+				{
+					/*
+					xxxx ---- foreground color
+					---- xxxx background color
+					*/
+					case 0:
+						fg_col = (attr & 0x0f) >> 0;
+						bg_col = (attr & 0xf0) >> 4;
+						break;
+					/*
+					xxxx ---- foreground color
+					---- x--- horizontal line
+					---- -x-- reverse
+					---- --x- blink
+					---- ---x secret (hide text)
+					background color is defined by screen control table values
+					*/
+					case 1:
+						fg_col = (attr & 0xf0) >> 4;
+						bg_col = screen_bg_col;
+						//hline = (attr & 0x08) >> 3;
+						reverse = (attr & 0x04) >> 2;
+						//blink = (attr & 0x02) >> 1;
+						secret = (attr & 0x01) >> 0;
+						break;
+					/*
+					x--- ---- dwidc
+					-x-- ---- dwid
+					--x- ---- uline
+					---x ---- hline
+					---- -x-- reverse
+					---- --x- blink
+					---- ---x secret (hide text)
+					background and foreground colors are defined by screen control table values
+					*/
+					case 2:
+						fg_col = screen_fg_col;
+						bg_col = screen_bg_col;
+						//dwidc = (attr & 0x80) >> 7;
+						//dwid = (attr & 0x40) >> 6;
+						//uline = (attr & 0x20) >> 5;
+						//hline = (attr & 0x10) >> 4;
+						reverse = (attr & 0x04) >> 2;
+						//blink = (attr & 0x02) >> 1;
+						secret = (attr & 0x01) >> 0;
+						break;
+					/*
+					---- x--- mixes between mode 0 and 2
+
+					xxxx 1--- foreground color
+					---- 1xxx background color
+					2)
+					x--- 0--- dwidc
+					-x-- 0--- dwid
+					--x- 0--- uline
+					---x 0--- hline
+					---- 0x-- reverse
+					---- 0-x- blink
+					---- 0--x secret (hide text)
+					background and foreground colors are defined by screen control table values
+					*/
+					case 3:
 						{
-							fg_col = (attr & 0xf0) >> 4;
-							bg_col = (attr & 0x07) >> 0;
+							// TODO: similar to 3301 drawing (where it should save previous attribute setup)
+							if(attr & 0x8)
+							{
+								fg_col = (attr & 0xf0) >> 4;
+								bg_col = (attr & 0x07) >> 0;
+							}
+							else
+							{
+								fg_col = screen_fg_col;
+								bg_col = screen_bg_col;
+								//dwidc = (attr & 0x80) >> 7;
+								//dwid = (attr & 0x40) >> 6;
+								//uline = (attr & 0x20) >> 5;
+								//hline = (attr & 0x10) >> 4;
+								reverse = (attr & 0x04) >> 2;
+								//blink = (attr & 0x02) >> 1;
+								secret = (attr & 0x01) >> 0;
+							}
 						}
-						else
+						break;
+					/*
+					x--- ---- blink
+					-xxx ---- background color
+					---- xxxx foreground color
+					*/
+					case 4:
+						fg_col = (attr & 0x0f) >> 0;
+						bg_col = (attr & 0x70) >> 4;
+						//blink = (attr & 0x80) >> 7;
+						break;
+					/*
+					x--- ---- blink
+					-xxx ---- background color
+					---- xxxx foreground color
+					hline is enabled if foreground color is 1 or 9
+					*/
+					case 5:
+						fg_col = (attr & 0x0f) >> 0;
+						bg_col = (attr & 0x70) >> 4;
+						//blink = (attr & 0x80) >> 7;
+						//if((fg_col & 7) == 1)
+							//hline = 1;
+						break;
+					default:
+						popmessage("Illegal text tilemap attribute mode %02x",attr_mode);
+						return;
+				}
+
+				// TODO: more functional programming
+				if ((tvram[cur_offset] & 0xff00) == 0) // ANK
+				{
+					u32 tile_num = ((tvram[cur_offset] & 0xff)  * 16) | 0x40000;
+
+					for(int yi = 0; yi < 16; yi++)
+					{
+						for(int xi = 0; xi < 8; xi++)
 						{
-							fg_col = screen_fg_col;
-							bg_col = screen_bg_col;
-							//dwidc = (attr & 0x80) >> 7;
-							//dwid = (attr & 0x40) >> 6;
-							//uline = (attr & 0x20) >> 5;
-							//hline = (attr & 0x10) >> 4;
-							reverse = (attr & 0x04) >> 2;
-							//blink = (attr & 0x02) >> 1;
-							secret = (attr & 0x01) >> 0;
+							int res_x = x_base + xi;
+							int res_y = y_base + yi;
+
+							if(!split_cliprect.contains(res_x, res_y))
+								continue;
+
+							int pen = kanji[yi + tile_num] >> (7-xi) & 1;
+
+							if(reverse)
+								pen = pen & 1 ? bg_col : fg_col;
+							else
+								pen = pen & 1 ? fg_col : bg_col;
+
+							if(secret) { pen = 0; } //hide text
+
+							if(pen != 0 && pen != m_text_transpen)
+								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
-					break;
-				/*
-				x--- ---- blink
-				-xxx ---- background color
-				---- xxxx foreground color
-				*/
-				case 4:
-					fg_col = (attr & 0x0f) >> 0;
-					bg_col = (attr & 0x70) >> 4;
-					//blink = (attr & 0x80) >> 7;
-					break;
-				/*
-				x--- ---- blink
-				-xxx ---- background color
-				---- xxxx foreground color
-				hline is enabled if foreground color is 1 or 9
-				*/
-				case 5:
-					fg_col = (attr & 0x0f) >> 0;
-					bg_col = (attr & 0x70) >> 4;
-					//blink = (attr & 0x80) >> 7;
-					//if((fg_col & 7) == 1)
-						//hline = 1;
-					break;
-				default:
-					popmessage("Illegal text tilemap attribute mode %02x",attr_mode);
-					return;
-			}
-
-			// TODO: more functional programming
-			if ((tvram[vsa] & 0xff00) == 0) // ANK
-			{
-				u32 tile_num = ((tvram[vsa] & 0xff)  * 16) | 0x40000;
-
-				for(int yi = 0; yi < 16; yi++)
+				}
+				else // kanji
 				{
-					for(int xi = 0; xi < 8; xi++)
+					uint8_t jis1 = (tvram[cur_offset] & 0x7f) + 0x20;
+					uint8_t jis2 = (tvram[cur_offset] & 0x7f00) >> 8;
+					uint16_t lr_half_gfx = ((tvram[cur_offset] & 0x8000) >> 15);
+
+					uint32_t tile_num = calc_kanji_rom_addr(jis1, jis2, x, y);
+
+					for(int yi = 0; yi < 16; yi++)
 					{
-						int res_x = x * 8 + xi;
-						int res_y = y * 16 + yi;
+						for(int xi = 0; xi < 8; xi++)
+						{
+							int res_x = x_base + xi;
+							int res_y = y_base + yi;
 
-						if(!cliprect.contains(res_x, res_y))
-							continue;
+							if(!split_cliprect.contains(res_x, res_y))
+								continue;
 
-						int pen = kanji[yi + tile_num] >> (7-xi) & 1;
+							int pen = kanji[((yi*2)+lr_half_gfx)+tile_num] >> (7-xi) & 1;
 
-						if(reverse)
-							pen = pen & 1 ? bg_col : fg_col;
-						else
-							pen = pen & 1 ? fg_col : bg_col;
+							if(reverse)
+								pen = pen & 1 ? bg_col : fg_col;
+							else
+								pen = pen & 1 ? fg_col : bg_col;
 
-						if(secret) { pen = 0; } //hide text
+							if(secret) { pen = 0; } //hide text
 
-						if(pen != 0 && pen != m_text_transpen)
-							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+							if(pen != 0)
+								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+						}
 					}
 				}
 			}
-			else // kanji
-			{
-				uint8_t jis1 = (tvram[vsa] & 0x7f) + 0x20;
-				uint8_t jis2 = (tvram[vsa] & 0x7f00) >> 8;
-				uint16_t lr_half_gfx = ((tvram[vsa] & 0x8000) >> 15);
-
-				uint32_t tile_num = calc_kanji_rom_addr(jis1, jis2, x, y);
-
-				for(int yi = 0; yi < 16; yi++)
-				{
-					for(int xi = 0; xi < 8; xi++)
-					{
-						int res_x = x * 8 + xi;
-						int res_y = y * 16 + yi;
-
-						if(!cliprect.contains(res_x, res_y))
-							continue;
-
-						int pen = kanji[((yi*2)+lr_half_gfx)+tile_num] >> (7-xi) & 1;
-
-						if(reverse)
-							pen = pen & 1 ? bg_col : fg_col;
-						else
-							pen = pen & 1 ? fg_col : bg_col;
-
-						if(secret) { pen = 0; } //hide text
-
-						// TODO: transpen not right, cfr. rogueall
-						// (sets 1, wants 7)
-						if(pen != 0 && pen != m_text_transpen)
-							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
-					}
-				}
-			}
-
-
-			vsa ++;
-			vsa &=0xffff;
 		}
 	}
 }
@@ -533,7 +587,7 @@ void pc88va_state::draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	const u8 layer_pal_bank = get_layer_pal_bank(2);
 
-	LOGFB("%d GFX MODE\n", m_gfx_ctrl_reg & 3);
+	LOGFB("=== %d GFX MODE\n", m_gfx_ctrl_reg & 3);
 
 	for (int strip_n = 0; strip_n < 4; strip_n ++)
 	{
@@ -891,6 +945,8 @@ void pc88va_state::execute_sync_cmd()
 	LOGCRTC("V Total calc = %d", v_total);
 	LOGCRTC("\n");
 
+	// TODO: validate
+
 	visarea.set(0, h_vis_area - 1, 0, v_vis_area - 1);
 
 	// TODO: interlace / vertical magnify, bit 7
@@ -1207,6 +1263,8 @@ void pc88va_state::video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void pc88va_state::text_transpen_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	// TODO: understand what these are for, docs blabbers about text/sprite color separation?
+	//	cfr. rogueall
 	COMBINE_DATA(&m_text_transpen);
 	if (m_text_transpen & 0xfff0)
 		popmessage("text transpen > 15 (%04x)", m_text_transpen);
