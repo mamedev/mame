@@ -123,7 +123,11 @@ void upd71071_device::device_start()
 	m_reg.device_control = 0;
 	m_reg.mask = 0x0f;  // mask all channels
 	for (int x = 0; x < 4; x++)
+	{
+		m_reg.address_current[x] = 0;
+		m_reg.count_current[x] = 0;
 		m_reg.mode_control[x] = 0;
+	}
 
 	save_item(NAME(m_reg.initialise));
 	save_item(NAME(m_reg.channel));
