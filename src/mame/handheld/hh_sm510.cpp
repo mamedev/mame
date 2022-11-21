@@ -4618,7 +4618,7 @@ ROM_END
 
 /***************************************************************************
 
-  Konami Double Dribble
+  Konami Double Dribble (model BH001)
   * Sharp SM510 under epoxy (die label CMS54C, KMS584)
   * lcd screen with custom segments, 1-bit sound
 
@@ -4684,70 +4684,9 @@ ROM_END
 
 /***************************************************************************
 
-  Konami Top Gun
-  * PCB label: BH003
-  * Sharp SM510 under epoxy (die label CMS54C, KMS598)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class ktopgun_state : public hh_sm510_state
-{
-public:
-	ktopgun_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void ktopgun(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( ktopgun )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void ktopgun_state::ktopgun(machine_config &config)
-{
-	sm510_common(config, 1515, 1080); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( ktopgun ) // except for filler/unused bytes, ROM listing in patent US5137277 "BH003 Top Gun" is same
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "598", 0x0000, 0x1000, CRC(50870b35) SHA1(cda1260c2e1c180995eced04b7d7ff51616dcef5) )
-
-	ROM_REGION( 425839, "screen", 0)
-	ROM_LOAD( "ktopgun.svg", 0, 425839, CRC(f0eb200f) SHA1(cbdc7cfaf1785b393c806dabd1a355d325bddc3f) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami Contra
+  Konami Contra (model BH002)
   * PCB label: BH002
-  * Sharp SM511 under epoxy (die label KMS73B, KMS773)
+  * Sharp SM511 under epoxy (die label KMS73B, 773)
   * lcd screen with custom segments, 1-bit sound
 
   Contra handheld is titled simply "C" in the USA.
@@ -4814,26 +4753,26 @@ ROM_END
 
 /***************************************************************************
 
-  Konami Teenage Mutant Ninja Turtles
-  * PCB label: BH005
-  * Sharp SM511 under epoxy (die label KMS73B, KMS774)
+  Konami Top Gun (model BH003)
+  * PCB label: BH003
+  * Sharp SM510 under epoxy (die label CMS54C, KMS598)
   * lcd screen with custom segments, 1-bit sound
 
 ***************************************************************************/
 
-class ktmnt_state : public hh_sm510_state
+class ktopgun_state : public hh_sm510_state
 {
 public:
-	ktmnt_state(const machine_config &mconfig, device_type type, const char *tag) :
+	ktopgun_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
-	void ktmnt(machine_config &config);
+	void ktopgun(machine_config &config);
 };
 
 // config
 
-static INPUT_PORTS_START( ktmnt )
+static INPUT_PORTS_START( ktopgun )
 	PORT_START("IN.0") // S1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
@@ -4844,33 +4783,29 @@ static INPUT_PORTS_START( ktmnt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
 
 	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-void ktmnt_state::ktmnt(machine_config &config)
+void ktopgun_state::ktopgun(machine_config &config)
 {
-	sm511_common(config, 1505, 1080);
+	sm510_common(config, 1515, 1080); // R mask option confirmed
 }
 
 // roms
 
-ROM_START( ktmnt ) // except for filler/unused bytes, ROM listing in patent US5150899 "BH005 TMNT" program/melody is same
+ROM_START( ktopgun ) // except for filler/unused bytes, ROM listing in patent US5137277 "BH003 Top Gun" is same
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "774.program", 0x0000, 0x1000, CRC(a1064f87) SHA1(92156c35fbbb414007ee6804fe635128a741d5f1) )
+	ROM_LOAD( "598", 0x0000, 0x1000, CRC(50870b35) SHA1(cda1260c2e1c180995eced04b7d7ff51616dcef5) )
 
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "774.melody", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
-
-	ROM_REGION( 610309, "screen", 0)
-	ROM_LOAD( "ktmnt.svg", 0, 610309, CRC(9f48c50d) SHA1(917c0ed8e83d949e5115c897cacda8d60e42d74d) )
+	ROM_REGION( 425839, "screen", 0)
+	ROM_LOAD( "ktopgun.svg", 0, 425839, CRC(f0eb200f) SHA1(cbdc7cfaf1785b393c806dabd1a355d325bddc3f) )
 ROM_END
 
 
@@ -4879,12 +4814,14 @@ ROM_END
 
 /***************************************************************************
 
-  Konami Gradius
+  Konami Gradius (model BH004)
   * PCB label: BH004
-  * Sharp SM511 under epoxy (die label KMS73B, KMS774)
+  * Sharp SM511 under epoxy (die label KMS73B, 771)
   * lcd screen with custom segments, 1-bit sound
 
-  Known in Japan as Nemesis.
+  known releases:
+  - World: Gradius
+  - Japan: Nemesis
 
 ***************************************************************************/
 
@@ -4941,9 +4878,143 @@ ROM_END
 
 /***************************************************************************
 
+  Konami Teenage Mutant Ninja Turtles (model BH005)
+  * PCB label: BH005
+  * Sharp SM511 under epoxy (die label KMS73B, 774)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class ktmnt_state : public hh_sm510_state
+{
+public:
+	ktmnt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void ktmnt(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( ktmnt )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void ktmnt_state::ktmnt(machine_config &config)
+{
+	sm511_common(config, 1505, 1080);
+}
+
+// roms
+
+ROM_START( ktmnt ) // except for filler/unused bytes, ROM listing in patent US5150899 "BH005 TMNT" program/melody is same
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "774.program", 0x0000, 0x1000, CRC(a1064f87) SHA1(92156c35fbbb414007ee6804fe635128a741d5f1) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "774.melody", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
+
+	ROM_REGION( 610309, "screen", 0)
+	ROM_LOAD( "ktmnt.svg", 0, 610309, CRC(9f48c50d) SHA1(917c0ed8e83d949e5115c897cacda8d60e42d74d) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Bottom of the Ninth (model BH008)
+  * PCB label: BH008
+  * Sharp SM511 under epoxy (die label KMS73B, 779)
+  * lcd screen with custom segments, 1-bit sound
+
+  known releases:
+  - World: Bottom of the Ninth
+  - USA: Major League Baseball
+  - Japan: がんばれ ベースボール (Ganbare Baseball)
+
+***************************************************************************/
+
+class kbottom9_state : public hh_sm510_state
+{
+public:
+	kbottom9_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void kbottom9(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( kbottom9 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Level/Time")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void kbottom9_state::kbottom9(machine_config &config)
+{
+	sm511_common(config, 1480, 1080);
+}
+
+// roms
+
+ROM_START( kbottom9 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "779.program", 0x0000, 0x1000, CRC(2f566534) SHA1(01f67fad87648e00278a5aa707a3cd827e6d68cf) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "779.melody", 0x000, 0x100, CRC(eaa2aa04) SHA1(24f1d9b381c3f6a3f9ee1b336593d0ca46744978) )
+
+	ROM_REGION( 411107, "screen", 0)
+	ROM_LOAD( "kbottom9.svg", 0, 411107, CRC(04a50349) SHA1(eba3bee0dba7c2d37405fea6156adc0e2fe6cb07) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Konami Lone Ranger
   * PCB label: BH009
-  * Sharp SM511 under epoxy (die label KMS73B, KMS781)
+  * Sharp SM511 under epoxy (die label KMS73B, 781)
   * lcd screen with custom segments, 1-bit sound
 
 ***************************************************************************/
@@ -5001,9 +5072,9 @@ ROM_END
 
 /***************************************************************************
 
-  Konami Blades of Steel
+  Konami Blades of Steel (model 13011)
   * PCB label: BH011
-  * Sharp SM511 under epoxy (die label KMS73B, KMS782)
+  * Sharp SM511 under epoxy (die label KMS73B, 782)
   * lcd screen with custom segments, 1-bit sound
 
 ***************************************************************************/
@@ -5069,7 +5140,7 @@ ROM_END
 /***************************************************************************
 
   Konami NFL Football
-  * Sharp SM511 under epoxy (die label KMS73B, KMS786)
+  * Sharp SM511 under epoxy (die label KMS73B, 786)
   * lcd screen with custom segments, 1-bit sound
 
   This is the 1989 version. It was rereleased in 1992, assumed to be the same
@@ -5138,7 +5209,7 @@ ROM_END
 /***************************************************************************
 
   Konami The Adventures of Bayou Billy
-  * Sharp SM511 under epoxy (die label KMS73B, KMS788)
+  * Sharp SM511 under epoxy (die label KMS73B, 788)
   * lcd screen with custom segments, 1-bit sound
 
 ***************************************************************************/
@@ -10307,14 +10378,15 @@ CONS( 1990, auslalom,     0,           0, auslalom,     auslalom,     auslalom_s
 
 // Konami
 CONS( 1989, kdribble,     0,           0, kdribble,     kdribble,     kdribble_state,     empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, ktopgun,      0,           0, ktopgun,      ktopgun,      ktopgun_state,      empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, kcontra,      0,           0, kcontra,      kcontra,      kcontra_state,      empty_init, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, ktmnt,        0,           0, ktmnt,        ktmnt,        ktmnt_state,        empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, ktopgun,      0,           0, ktopgun,      ktopgun,      ktopgun_state,      empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, kgradius,     0,           0, kgradius,     kgradius,     kgradius_state,     empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kloneran,     0,           0, kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kblades,      0,           0, kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, knfl,         0,           0, knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kbilly,       0,           0, kbilly,       kbilly,       kbilly_state,       empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, ktmnt,        0,           0, ktmnt,        ktmnt,        ktmnt_state,        empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, kbottom9,     0,           0, kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, kloneran,     0,           0, kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, kblades,      0,           0, kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, knfl,         0,           0, knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, kbilly,       0,           0, kbilly,       kbilly,       kbilly_state,       empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1991, kbucky,       0,           0, kbucky,       kbucky,       kbucky_state,       empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1991, kgarfld,      0,           0, kgarfld,      kgarfld,      kgarfld_state,      empty_init, "Konami", "Garfield (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

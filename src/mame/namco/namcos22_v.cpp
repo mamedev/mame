@@ -698,8 +698,8 @@ void namcos22_renderer::render_scene(screen_device &screen, bitmap_rgb32 &bitmap
 float namcos22_state::dspfloat_to_nativefloat(u32 val)
 {
 	s16 mantissa = (s16)val;
-	float result = mantissa;//?((float)mantissa):((float)0x10000);
-	int exponent = (val >> 16) & 0xff;
+	float result = (float)mantissa;
+	int exponent = (val >> 16) & 0x3f;
 	while (exponent < 0x2e)
 	{
 		result /= 2.0f;
@@ -865,7 +865,7 @@ void namcos22_state::draw_direct_poly(const u16 *src)
 
 		int mantissa = (s16)src[5];
 		float zf = (float)mantissa;
-		int exponent = (src[4]) & 0xff;
+		int exponent = (src[4]) & 0x3f;
 		if (mantissa)
 		{
 			while (exponent < 0x2e)
@@ -1352,9 +1352,9 @@ void namcos22_state::slavesim_handle_200002(const s32 *src, int code)
 		m[1][2] = dspfixed_to_nativefloat(src[0x8]);
 		m[2][2] = dspfixed_to_nativefloat(src[0x9]);
 
-		m[3][0] = src[0xa]; // xpos
-		m[3][1] = src[0xb]; // ypos
-		m[3][2] = src[0xc]; // zpos
+		m[3][0] = signed24(src[0xa]); // xpos
+		m[3][1] = signed24(src[0xb]); // ypos
+		m[3][2] = signed24(src[0xc]); // zpos
 
 		matrix3d_multiply(m, m_viewmatrix);
 		blit_polyobject(code, m);

@@ -25,7 +25,10 @@ TODO:
   the MOTHER PCB at J2 Pin 7 /TXD
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
   it used to be much worse with the legacy_poly_manager
-- global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrive, victlap
+- tokyowar garbage tile at right edge in attract mode. It's part of the cabinet link message, maybe BTANB?
+- global offset is wrong in non-super22 testmode video test, and above that, it flickers in acedrive, victlap
+- ss22 testmode video test screen#04 translucent polygon should be higher priority than sprite
+- ss22 testmode video test screen#13 geometry should not be lopsided (uses draw_direct_poly)
 - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
 - propcycl attract mode, when the altar button is pressed, global fade should affect the background sprite
