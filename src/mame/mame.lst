@@ -20639,6 +20639,7 @@ trojan                          // 4/1986 (c) 1986 (US)
 trojana                         // 4/1986 (c) 1986 (US)
 trojanb                         // bootleg
 trojanj                         // 4/1986 (c) 1986 (Japan)
+trojanlt                        // location test
 trojanr                         // 4/1986 (c) 1986 + Romstar
 
 @source:apple/lwriter.cpp
