@@ -586,6 +586,8 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 
 	const u8 gfx_ctrl = (m_gfx_ctrl_reg >> (which * 8)) & 0x13;
 
+//	const u8 pixel_size = BIT(gfx_ctrl, 4) + 1;
+
 	const u8 layer_pal_bank = get_layer_pal_bank(2 + which);
 
 	LOGFB("=== %02x GFX MODE graphic %s color bank %02x\n"
@@ -689,15 +691,13 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 			u16 x_char = (x >> 1);
 			u32 bitmap_offset = line_offset + x_char;
 
-			uint32_t color = (gvram[bitmap_offset] & 0xf0) >> 4;
+			for (int xi = 0; xi < 2; xi ++)
+			{
+				u8 color = (gvram[bitmap_offset] >> (4 * xi)) & 0xf;
 
-			if(color && cliprect.contains(x, y))
-				bitmap.pix(y, x) = m_palette->pen(color + pal_base);
-
-			color = (gvram[bitmap_offset] & 0x0f) >> 0;
-
-			if(color && cliprect.contains(x + 1, y))
-				bitmap.pix(y, x + 1) = m_palette->pen(color + pal_base);
+				if(color && cliprect.contains(x + xi, y))
+					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
+			}
 		}
 	}
 }
