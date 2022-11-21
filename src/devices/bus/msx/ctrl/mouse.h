@@ -6,22 +6,22 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_DE9_MSX_CTRL_MOUSE_H
-#define MAME_BUS_DE9_MSX_CTRL_MOUSE_H
+#ifndef MAME_BUS_MSX_CTRL_MOUSE_H
+#define MAME_BUS_MSX_CTRL_MOUSE_H
 
 #pragma once
 
-#include "bus/de9/de9.h"
+#include "ctrl.h"
 
 
 class msx_mouse_device : public device_t,
-							public device_de9_port_interface
+							public device_msx_general_purpose_port_interface
 {
 public:
 	msx_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual u16 read() override;
-	virtual void pin_w(int pin, int state) override;
+	virtual u8 read() override;
+	virtual void pin_8_w(int state) override;
 
 protected:
 	virtual void device_start() override;
@@ -46,4 +46,4 @@ private:
 DECLARE_DEVICE_TYPE(MSX_MOUSE, msx_mouse_device)
 
 
-#endif // MAME_BUS_DE9_MSX_CTRL_MOUSE_H
+#endif // MAME_BUS_MSX_CTRL_MOUSE_H

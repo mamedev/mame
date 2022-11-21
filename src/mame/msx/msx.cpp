@@ -104,7 +104,6 @@
 #include "emu.h"
 
 #include "msx.h"
-#include "bus/de9/msx_ctrl/ctrl.h"
 #include "cpu/z80/r800.h"
 #include "formats/fmsx_cas.h"
 #include "hashfile.h"
@@ -435,9 +434,9 @@ u8 msx_state::psg_port_a_r()
 		data = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 
 	if (BIT(m_psg_b, 6))
-		data |= bitswap<8>(m_gen_port2->read(), 4, 7, 6, 5, 3, 2, 1, 0) & 0x3f;
+		data |= m_gen_port2->read() & 0x3f;
 	else
-		data |= bitswap<8>(m_gen_port1->read(), 4, 7, 6, 5, 3, 2, 1, 0) & 0x3f;
+		data |= m_gen_port1->read() & 0x3f;
 
 	return data;
 }
@@ -457,12 +456,12 @@ void msx_state::psg_port_b_w(u8 data)
 	if ((data ^ m_psg_b) & 0x80)
 		m_leds[1] = BIT(~data, 7);
 
-	m_gen_port1->pin_w<6>(BIT(data, 0));
-	m_gen_port1->pin_w<7>(BIT(data, 1));
-	m_gen_port2->pin_w<6>(BIT(data, 2));
-	m_gen_port2->pin_w<7>(BIT(data, 3));
-	m_gen_port1->pin_w<8>(BIT(data, 4));
-	m_gen_port2->pin_w<8>(BIT(data, 5));
+	m_gen_port1->pin_6_w(BIT(data, 0));
+	m_gen_port1->pin_7_w(BIT(data, 1));
+	m_gen_port2->pin_6_w(BIT(data, 2));
+	m_gen_port2->pin_7_w(BIT(data, 3));
+	m_gen_port1->pin_8_w(BIT(data, 4));
+	m_gen_port2->pin_8_w(BIT(data, 5));
 
 	m_psg_b = data;
 }
@@ -586,8 +585,8 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 	m_ay8910->port_b_write_callback().set(FUNC(msx2_base_state::psg_port_b_w));
 	m_ay8910->add_route(ALL_OUTPUTS, m_speaker, 0.3);
 
-	DE9_PORT(config, m_gen_port1, msx_general_purpose_port_devices, "joystick");
-	DE9_PORT(config, m_gen_port2, msx_general_purpose_port_devices, "joystick");
+	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port1, msx_general_purpose_port_devices, "joystick");
+	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port2, msx_general_purpose_port_devices, "joystick");
 
 	if (m_hw_def.has_printer_port())
 	{

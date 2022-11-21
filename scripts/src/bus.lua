@@ -1135,25 +1135,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/de9/de9.h,BUSES["DE9"] = true
----------------------------------------------------
-
-if (BUSES["DE9"]~=null) then
-    files {
-        MAME_DIR .. "src/devices/bus/de9/de9.cpp",
-        MAME_DIR .. "src/devices/bus/de9/de9.h",
-        MAME_DIR .. "src/devices/bus/de9/msx_ctrl/ctrl.cpp",
-        MAME_DIR .. "src/devices/bus/de9/msx_ctrl/ctrl.h",
-        MAME_DIR .. "src/devices/bus/de9/msx_ctrl/joystick.cpp",
-        MAME_DIR .. "src/devices/bus/de9/msx_ctrl/joystick.h",
-        MAME_DIR .. "src/devices/bus/de9/msx_ctrl/mouse.cpp",
-        MAME_DIR .. "src/devices/bus/de9/msx_ctrl/mouse.h",
-    }
-end
-
-
----------------------------------------------------
---
 --@src/devices/bus/dmv/dmvbus.h,BUSES["DMV"] = true
 ---------------------------------------------------
 
@@ -1811,6 +1792,22 @@ if (BUSES["JAKKS_GAMEKEY"]~=null) then
 		MAME_DIR .. "src/devices/bus/jakks_gamekey/rom.cpp",
 		MAME_DIR .. "src/devices/bus/jakks_gamekey/rom.h",
 	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/msx/ctrl/ctrl.h,BUSES["MSX_CTRL"] = true
+---------------------------------------------------
+
+if (BUSES["MSX_CTRL"]~=null) then
+    files {
+        MAME_DIR .. "src/devices/bus/msx/ctrl/ctrl.cpp",
+        MAME_DIR .. "src/devices/bus/msx/ctrl/ctrl.h",
+        MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.cpp",
+        MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.h",
+        MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.cpp",
+        MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.h",
+    }
 end
 
 ---------------------------------------------------
