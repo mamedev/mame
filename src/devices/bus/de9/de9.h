@@ -21,6 +21,7 @@ public:
 	virtual ~device_de9_port_interface() { }
 
 	virtual u16 read() { return 0xff; }
+	virtual void write(u16 data) { }
 	virtual void pin_w(int pin, int state) { }
 
 protected:
@@ -47,7 +48,7 @@ public:
 
 	// computer interface
 	//
-	// Mapping between bits and pins:
+	// Mapping between bits and pins used by the read and write methods:
 	// bit 0 - pin 1
 	// bit 1 - pin 2
 	// bit 2 - pin 3
@@ -59,6 +60,7 @@ public:
 	// bit 8 - pin 9
 	//
 	u16 read() { return exists() ? m_device->read() : 0xffff; }
+	void write(u16 data) { if (exists()) m_device->write(data); }
 	template<int Pin> void pin_w(int state)
 	{
 		static_assert(Pin >= 1 && Pin <= 9, "Invalid DE-9 pin number");
