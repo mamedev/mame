@@ -96,7 +96,7 @@
 #define LOG_WDIO	(1U << 2) // Shows data read and write
 #define LOG_WDSCII	(1U << 3) // Shows SCII register setup
 
-#define VERBOSE (LOG_GENERAL|LOG_WDFDC|LOG_WDSCII)
+//#define VERBOSE (LOG_GENERAL|LOG_WDFDC|LOG_WDSCII)
 #include "logmacro.h"
 
 #define LOGWDFDC(...)	LOGMASKED(LOG_WDFDC,  __VA_ARGS__)
@@ -240,7 +240,7 @@ coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device
 	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
 	, m_wd17xx(*this, WD_TAG)
 	, m_floppies(*this, WD_TAG ":%u", 0)
-	{
+{
 }
 
 
