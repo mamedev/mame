@@ -708,7 +708,6 @@ void coco_scii_device_base::ff74_write(offs_t offset, u8 data)
 			// reset static ram buffer pointer on any write
 			m_cache_pointer = 0;
 
-// 			m_cache_controler = (m_cache_controler & 0x80) | (data & 0x7f);
 			m_cache_controler = data;
 			update_lines();
 			break;
