@@ -17138,7 +17138,11 @@ sscopeb                         // GX830 (c)1999
 sscopec                         // GX830 (c)1999
 sscoped                         // GX830 (c)1999
 terabrst                        // GX715 (c)1998 USA UEL 1998/07/17
-terabrsta                       // GX715 (c)1998 Asia AAA 1998/02/25
+terabrsta                       // GX715 (c)1998 Asia HEL 1998/07/17
+terabrstaa                      // GX715 (c)1998 Asia HAA 1998/02/25
+terabrstj                       // GX715 (c)1998 Japan JEL 1998/07/17
+terabrstja                      // GX715 (c)1998 Japan JAA 1998/02/25
+terabrstua                      // GX715 (c)1998 USA UAA 1998/02/25
 thrilldbu                       // GE713UF (c)1998 ?AB
 
 @source:misc/hotblock.cpp
