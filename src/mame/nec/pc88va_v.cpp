@@ -92,11 +92,11 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				{
 					// 8 = graphic 0
 					case 0:
-						draw_graphic_a(bitmap, cliprect);
+						draw_graphic_layer(bitmap, cliprect, 0);
 						break;
 					// 9 = graphic 1
 					case 1:
-						draw_graphic_b(bitmap, cliprect);
+						draw_graphic_layer(bitmap, cliprect, 1);
 						break;
 					default:
 						popmessage("Undocumented pri level %d", cur_pri_lv);
@@ -108,14 +108,13 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				{
 					case 0: draw_text(bitmap, cliprect); break;
 					case 1: if(m_tsp.spr_on) { draw_sprites(bitmap,cliprect); } break;
-					// TODO: understand where pal bases come from
 					/* A = graphic 0 */
 					case 2:
-						draw_graphic_a(bitmap, cliprect);
+						draw_graphic_layer(bitmap, cliprect, 0);
 						break;
 					/* B = graphic 1 */
 					case 3:
-						draw_graphic_b(bitmap, cliprect);
+						draw_graphic_layer(bitmap, cliprect, 1);
 						break;
 				}
 			}
@@ -581,37 +580,47 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
  * [+16] ---- ---x xxxx xxxx Sub screen display position (DSP)
  */
 
-void pc88va_state::draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 which)
 {
 	uint16_t const *const fb_regs = m_fb_regs;
 
-	const u8 layer_pal_bank = get_layer_pal_bank(2);
+	const u8 gfx_ctrl = (m_gfx_ctrl_reg >> (which * 8)) & 0x13;
 
-	LOGFB("=== %d GFX MODE\n", m_gfx_ctrl_reg & 3);
+	const u8 layer_pal_bank = get_layer_pal_bank(2 + which);
 
-	for (int strip_n = 0; strip_n < 4; strip_n ++)
+	LOGFB("=== %02x GFX MODE graphic %s color bank %02x\n"
+		, gfx_ctrl
+		, which ? "B" : "A"
+		, layer_pal_bank
+	);
+
+	for (int layer_n = which; layer_n < 4; layer_n += 2)
 	{
-		uint16_t const *const fb_strip_regs = &fb_regs[(strip_n * 0x20) / 2];
+		uint16_t const *const fb_strip_regs = &fb_regs[(layer_n * 0x20) / 2];
 		const u16 fbw = fb_strip_regs[0x04 / 2] & 0x7fc;
 		
 		// assume that a fbw = 0 don't generate a layer at all
 		if (fbw == 0)
 		{
-			LOGFB("%d FBW = 0\n", strip_n);
+			LOGFB("%d FBW = 0\n", layer_n);
 			continue;
 		}
 
-		const u32 fsa = (fb_strip_regs[0x00 / 2] & 0xfffc) | ((fb_strip_regs[0x02 / 2] & 0x3) << 16) >> 1;
+		// on layer = 1 fsa is always 0x20000, cfr. shanghai
+		// (almost likely an HW quirk, it's also in the docs)
+		const u32 fsa = (layer_n == 1) ? 0x20000 
+			: (fb_strip_regs[0x00 / 2] & 0xfffc) | ((fb_strip_regs[0x02 / 2] & 0x3) << 16) >> 1;
+
 		const u16 fbl = (fb_strip_regs[0x06 / 2] & 0x3ff) + 1;
 		const u8 x_dot_offs = fb_strip_regs[0x08 / 2];
 		const u8 ofx = fb_strip_regs[0x0a / 2] & 0x7fc;
 		const u8 ofy = fb_strip_regs[0x0c / 2] & 0x7fc;
-		const u32 dsa = (fb_strip_regs[0x0e / 2] & 0xfffc) | ((fb_strip_regs[0x10 / 2] & 0x3) << 16);
+		const u32 dsa = ((fb_strip_regs[0x0e / 2] & 0xfffc) | ((fb_strip_regs[0x10 / 2] & 0x3) << 16));
 		const u16 dsh = fb_strip_regs[0x12 / 2] & 0x1ff;
 		const u16 dsp = fb_strip_regs[0x16 / 2] & 0x1ff;
 
 		LOGFB("%d %08x FSA|\n\t%d FBW | %d FBL |\n\t %d OFX (%d dot)| %d OFY|\n\t %08x DSA|\n\t %04x (%d) DSH | %04x (%d) DSP\n"
-			, strip_n
+			, layer_n
 			, fsa << 1
 			, fbw
 			, fbl
@@ -625,25 +634,17 @@ void pc88va_state::draw_graphic_a(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			, dsp
 		);
 
-		switch(m_gfx_ctrl_reg & 3)
+		rectangle split_cliprect(cliprect.min_x,  cliprect.max_x, dsp, dsh + dsp - 1);
+		split_cliprect &= cliprect;
+
+		switch(gfx_ctrl & 3)
 		{
 			//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
-			case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, dsa, layer_pal_bank, fbw, fbl, dsp); break;
+			case 1: draw_indexed_gfx_4bpp(bitmap, split_cliprect, fsa, layer_pal_bank, fbw, fbl); break;
 			// TODO: 5bpp, shared with mode 2
-			case 2: draw_direct_gfx_8bpp(bitmap, cliprect, dsa, fbw, fbl, dsp); break;
-			case 3: draw_direct_gfx_rgb565(bitmap, cliprect, dsa, fbw, fbl, dsp); break;
+			case 2: draw_direct_gfx_8bpp(bitmap, split_cliprect, fsa, fbw, fbl); break;
+			case 3: draw_direct_gfx_rgb565(bitmap, split_cliprect, fsa, fbw, fbl); break;
 		}
-	}
-}
-
-void pc88va_state::draw_graphic_b(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	const u8 layer_pal_bank = get_layer_pal_bank(3);
-
-	switch((m_gfx_ctrl_reg >> 8) & 3)
-	{
-		case 1: draw_indexed_gfx_4bpp(bitmap, cliprect, 0x20000, layer_pal_bank, 320, cliprect.max_y, cliprect.min_y); break;
-		case 2: draw_direct_gfx_8bpp(bitmap, cliprect, 0x20000, 320, cliprect.max_y, cliprect.min_y); break;
 	}
 }
 
@@ -671,16 +672,16 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base, u16 fb_width, u16 fb_height, int y_start)
+void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-	const u16 y_min = std::max(cliprect.min_y, y_start);
-	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+//	const u16 y_min = std::max(cliprect.min_y, y_start);
+//	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
 
-	for(int y = y_min; y <= y_max; y++)
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const u32 line_offset = ((y * fb_width) + start_offset) & 0x3ffff;
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=2)
@@ -701,14 +702,14 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u16 fb_width, u16 fb_height, int y_start)
+void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u16 fb_width, u16 fb_height)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-	const u16 y_min = std::max(cliprect.min_y, y_start);
-	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+//	const u16 y_min = std::max(cliprect.min_y, y_start);
+//	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
-	for(int y = y_min; y <= y_max; y++)
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const u32 line_offset = ((y * fb_width) + start_offset) & 0x3ffff;
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -717,9 +718,9 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 			uint32_t color = (gvram[bitmap_offset] & 0xff);
 
-			// TODO: how transparency is calculated?
+			// boomer suggests that transparency is calculated over just color = 0, may be settable?
 			// TODO: may not be clamped to palNbit
-			if(cliprect.contains(x, y))
+			if(color && cliprect.contains(x, y))
 			{
 				u8 b = pal2bit(color & 0x03);
 				u8 r = pal3bit((color & 0x1c) >> 2);
@@ -730,14 +731,14 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
-void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u16 fb_width, u16 fb_height, int y_start)
+void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u16 fb_width, u16 fb_height)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-	const u16 y_min = std::max(cliprect.min_y, y_start);
-	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+//	const u16 y_min = std::max(cliprect.min_y, y_start);
+//	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
-	for(int y = y_min; y <= y_max; y++)
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const u32 line_offset = ((y * fb_width) + start_offset) & 0x3ffff;
 
