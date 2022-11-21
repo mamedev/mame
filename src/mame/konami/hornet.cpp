@@ -466,6 +466,7 @@ public:
 	{ }
 
 	void hornet(machine_config &config);
+	void hornet_x76(machine_config &config);
 	void hornet_lan(machine_config &config);
 	void terabrst(machine_config &config);
 	void sscope(machine_config &config);
@@ -498,7 +499,7 @@ private:
 	required_device<adc12138_device> m_adc12138;
 	required_device<konppc_device> m_konppc;
 	optional_device<eeprom_serial_93cxx_device> m_lan_eeprom;
-	required_device<x76f041_device> m_x76f041;
+	optional_device<x76f041_device> m_x76f041;
 	optional_device_array<generic_voodoo_device, 2> m_voodoo;
 	required_ioport_array<3> m_in;
 	required_ioport m_dsw;
@@ -594,7 +595,8 @@ uint8_t hornet_state::sysreg_r(offs_t offset)
 			*/
 			r = 0x70;
 			r |= m_hornet_jvs_host->sense() << 7;
-			r |= m_x76f041->read_sda() << 3;
+			if (m_x76f041)
+				r |= m_x76f041->read_sda() << 3;
 			r |= m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
 			break;
 
@@ -632,7 +634,8 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x02 = LAMP1
 			    0x01 = LAMP0
 			*/
-			m_x76f041->write_cs(BIT(data, 6));
+			if (m_x76f041)
+				m_x76f041->write_cs(BIT(data, 6));
 
 			osd_printf_debug("System register 0 = %02X\n", data);
 			break;
@@ -649,9 +652,16 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x02 = ADDI (ADC DI)
 			    0x01 = ADDSCLK (ADC SCLK)
 			*/
-			m_x76f041->write_rst(BIT(data, 2));
-			m_x76f041->write_sda(BIT(data, 1));
-			m_x76f041->write_scl(BIT(data, 0));
+			if (m_x76f041) {
+				m_x76f041->write_rst(BIT(data, 2)); // ?
+				m_x76f041->write_sda(BIT(data, 1));
+				m_x76f041->write_scl(BIT(data, 0));
+			} else {
+				m_adc12138->cs_w(BIT(data, 3));
+				m_adc12138->conv_w(BIT(data, 2));
+				m_adc12138->di_w(BIT(data, 1));
+				m_adc12138->sclk_w(BIT(data, 0));
+			}
 
 			bool sndres = (data & 0x80) ? true : false;
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (sndres) ? CLEAR_LINE : ASSERT_LINE);
@@ -1240,7 +1250,11 @@ void hornet_state::hornet(machine_config &config)
 	m_hornet_jvs_host->output_callback().set([this](uint8_t c) {
 		m_maincpu->ppc4xx_spu_receive_byte(c);
 	});
+}
 
+void hornet_state::hornet_x76(machine_config &config)
+{
+	hornet(config);
 	X76F041(config, m_x76f041);
 }
 
@@ -2298,21 +2312,21 @@ ROM_END
 
 /*************************************************************************/
 
-GAME(  1998, gradius4,   0,        hornet, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4u,  gradius4, hornet, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver UAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4a,  gradius4, hornet, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver AAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4ja, gradius4, hornet, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4ua, gradius4, hornet, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver UAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4aa, gradius4, hornet, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver AAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4,   0,        hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4u,  gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver UAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4a,  gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver AAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4ja, gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4ua, gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver UAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4aa, gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver AAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME(  1998, nbapbp,    0,        hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver UAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpa,   nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpj,   nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpua,  nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpaa,  nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpja,  nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbaatw,    nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA All The Way (ver EAB)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbaatwa,   nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA All The Way (ver EAA)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,   0,      hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver UAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpa,  nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpj,  nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpua, nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpaa, nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpja, nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbaatw,   nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA All The Way (ver EAB)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbaatwa,  nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA All The Way (ver EAA)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME(  1998, terabrst,   0,        terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrstj,  terabrst, terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/07/17 ver JEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
