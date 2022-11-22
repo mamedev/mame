@@ -336,7 +336,12 @@ void nscsi_full_device::step(bool timeout)
 		if(!(ctrl & S_ACK)) {
 			scsi_state &= STATE_MASK;
 			scsi_bus->ctrl_wait(scsi_refid, 0, S_ACK);
-			scsi_timer->adjust(scsi_data_byte_period(), false);
+			attotime delay = scsi_data_byte_period();
+			if (delay == attotime::zero) {
+				step(false);
+			} else {
+				scsi_timer->adjust(delay, false);
+			}
 		}
 		break;
 
@@ -352,7 +357,12 @@ void nscsi_full_device::step(bool timeout)
 		if(!(ctrl & S_ACK)) {
 			scsi_state &= STATE_MASK;
 			scsi_bus->ctrl_wait(scsi_refid, 0, S_ACK);
-			scsi_timer->adjust(scsi_data_byte_period(), false);
+			attotime delay = scsi_data_byte_period();
+			if (delay == attotime::zero) {
+				step(false);
+			} else {
+				scsi_timer->adjust(delay, false);
+			}
 		}
 		break;
 
@@ -460,7 +470,12 @@ void nscsi_full_device::step(bool timeout)
 			scsi_bus->ctrl_wait(scsi_refid, 0, S_ACK);
 			scsi_command();
 			scsi_state = TARGET_NEXT_CONTROL;
-			scsi_timer->adjust(scsi_data_command_delay(), false);
+			attotime delay = scsi_data_command_delay();
+			if (delay == attotime::zero) {
+				step(false);
+			} else {
+				scsi_timer->adjust(delay, false);
+			}
 		} else
 			target_recv_byte();
 		break;

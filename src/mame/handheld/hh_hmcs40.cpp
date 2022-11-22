@@ -97,7 +97,7 @@ known chips:
 
 ============================================================================
 
-ROM source notes when dumped from another model, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - gckong: CGL Super Kong
 - ggdman: Bandai Kampf der Monster
 - ghalien: CGL Earth Invaders

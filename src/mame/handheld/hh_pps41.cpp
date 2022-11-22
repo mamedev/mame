@@ -5,7 +5,7 @@
 
 Rockwell PPS-4/1 MCU series handhelds
 
-ROM source notes when dumped from another publisher, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - memoquiz: Mattel Mind Boggler
 
 ***************************************************************************/

@@ -217,7 +217,6 @@ static void     execute_z_table(dsp56156_core* cpustate, int RR, uint16_t z);
 
 static uint16_t   assemble_address_from_Pppppp_table(dsp56156_core* cpustate, uint16_t P, uint16_t ppppp);
 static uint16_t   assemble_address_from_IO_short_address(dsp56156_core* cpustate, uint16_t pp);
-static uint16_t   assemble_address_from_6bit_signed_relative_short_address(dsp56156_core* cpustate, uint16_t srs);
 
 static void dsp56156_process_loop(dsp56156_core* cpustate);
 static void dsp56156_process_rep(dsp56156_core* cpustate, size_t repSize);
@@ -1930,12 +1929,6 @@ static size_t dsp56156_op_addsub_2(dsp56156_core* cpustate, const uint16_t op_by
 /* MAC : 011m mKKK 1xx0 F1QQ : A-122 */
 static size_t dsp56156_op_mac_1(dsp56156_core* cpustate, const uint16_t op_byte, typed_pointer* d_register, uint8_t* cycles)
 {
-	int64_t opD = 0;
-	int64_t result = 0;
-
-	int32_t s1 = 0;
-	int32_t s2 = 0;
-
 	void* D = nullptr;
 	void* S1 = nullptr;
 	void* S2 = nullptr;
@@ -1943,18 +1936,14 @@ static size_t dsp56156_op_mac_1(dsp56156_core* cpustate, const uint16_t op_byte,
 	decode_QQF_table(cpustate, BITS(op_byte,0x0003), BITS(op_byte,0x0008), &S1, &S2, &D);
 
 	/* Cast both values as being signed */
-	s1 = *((int16_t*)S1);
-	s2 = *((int16_t*)S2);
+	int32_t s1 = *((int16_t*)S1);
+	int32_t s2 = *((int16_t*)S2);
 
 	/* Fixed-point 2's complement multiplication requires a shift */
-	result = (s1 * s2) << 1;
+	int64_t result = (s1 * s2) << 1;
 
 	/* Sign extend D into a temp variable */
-	opD = (*((uint64_t*)D));
-	if (opD & 0x0000008000000000ULL)
-		opD |= 0xffffff0000000000ULL;
-	else
-		opD &= 0x000000ffffffffffULL;
+	int64_t opD = util::sext(*((uint64_t*)D), 40);
 
 	/* Accumulate */
 	opD += result;
@@ -2736,7 +2725,6 @@ static size_t dsp56156_op_and(dsp56156_core* cpustate, const uint16_t op_byte, t
 /* ABS : .... .... 0111 F001 : A-18 */
 static size_t dsp56156_op_abs(dsp56156_core* cpustate, const uint16_t op_byte, typed_pointer* d_register, uint64_t* p_accum, uint8_t* cycles)
 {
-	int64_t opD = 0;
 	typed_pointer D = {nullptr, DT_LONG_WORD};
 
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
@@ -2744,11 +2732,7 @@ static size_t dsp56156_op_abs(dsp56156_core* cpustate, const uint16_t op_byte, t
 	*p_accum = *((uint64_t*)D.addr);
 
 	/* Sign extend D into a temp variable */
-	opD = *p_accum;
-	if (opD &  0x0000008000000000ULL)
-		opD |= 0xffffff0000000000ULL;
-	else
-		opD &= 0x000000ffffffffffULL;
+	int64_t opD = util::sext(*p_accum, 40);
 
 	/* Take the absolute value and clean up */
 	opD = (opD < 0) ? -opD : opD;
@@ -2842,32 +2826,22 @@ static size_t dsp56156_op_cmpm(dsp56156_core* cpustate, const uint16_t op_byte, 
 	/* Sign extend and get absolute value of the source */
 	if (S.addr == &A || S.addr == &B)
 	{
-		absS = *((uint64_t*)S.addr);
-		if (absS &  0x0000008000000000ULL)
-			absS |= 0xffffff8000000000ULL;
+		absS = std::abs(util::sext(*((uint64_t*)S.addr), 40));
 	}
 	else
 	{
-		absS = (*((uint16_t*)S.addr)) << 16;
-		if (absS &  0x0000000080000000ULL)
-			absS |= 0xffffffff80000000ULL;
+		absS = std::abs((int64_t)(int32_t)((*((uint16_t*)S.addr)) << 16));
 	}
-	absS = (absS & 0x8000000000000000ULL) ? (0 - absS) : absS;
 
 	/* Sign extend and get absolute value of the destination */
 	if (D.addr == &A || D.addr == &B)
 	{
-		absD = *((uint64_t*)D.addr);
-		if (absD &  0x0000008000000000ULL)
-			absD |= 0xffffff8000000000ULL;
+		absD = std::abs(util::sext(*((uint64_t*)D.addr), 40));
 	}
 	else
 	{
-		absD = (*((uint16_t*)D.addr)) << 16;
-		if (absD &  0x0000000080000000ULL)
-			absD |= 0xffffffff80000000ULL;
+		absD = std::abs((int64_t)(int32_t)(*((uint16_t*)D.addr) << 16));
 	}
-	absD = (absD & 0x8000000000000000ULL) ? (0 - absD) : absD;
 
 	/* Make sure they're both real 40-bit values */
 	absS &= 0x000000ffffffffffULL;
@@ -3456,7 +3430,7 @@ static size_t dsp56156_op_bcc_1(dsp56156_core* cpustate, const uint16_t op, uint
 
 	if (shouldBranch)
 	{
-		int16_t offset = (int16_t)assemble_address_from_6bit_signed_relative_short_address(cpustate, BITS(op,0x003f));
+		int16_t offset = util::sext(op, 6);
 
 		PC += offset + 1;
 
@@ -5572,15 +5546,6 @@ static uint16_t assemble_address_from_IO_short_address(dsp56156_core* cpustate, 
 {
 	uint16_t fullAddy = 0xffe0;
 	fullAddy |= pp;
-	return fullAddy;
-}
-
-static uint16_t assemble_address_from_6bit_signed_relative_short_address(dsp56156_core* cpustate, uint16_t srs)
-{
-	uint16_t fullAddy = srs;
-	if (fullAddy & 0x0020)
-		fullAddy |= 0xffc0;
-
 	return fullAddy;
 }
 

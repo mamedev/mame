@@ -1077,10 +1077,7 @@ avi_file::error avi_stream::yuv_decompress_to_yuy16(const std::uint8_t *data, st
 		case FORMAT_VYUY:
 		case FORMAT_YUY2:
 			for (x = 0; x < m_width && source < dataend; x++)
-			{
-				std::uint16_t pix = *source++;
-				*dest++ = (pix >> 8) | (pix << 8);
-			}
+				*dest++ = swapendian_int16(*source++);
 			break;
 		}
 	}
@@ -1129,10 +1126,7 @@ avi_file::error avi_stream::yuy16_compress_to_yuy(const bitmap_yuy16 &bitmap, st
 		case FORMAT_VYUY:
 		case FORMAT_YUY2:
 			for (x = 0; x < m_width && dest < dataend; x++)
-			{
-				std::uint16_t pix = *source++;
-				*dest++ = (pix >> 8) | (pix << 8);
-			}
+				*dest++ = swapendian_int16(*source++);
 			break;
 		}
 	}

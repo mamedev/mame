@@ -17,7 +17,7 @@ class mc88100_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mc88100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mc88100_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
@@ -36,6 +36,12 @@ protected:
 
 	void execute(u32 const inst);
 	void exception(unsigned vector, bool const trap = false);
+
+	// memory helpers
+	bool fetch(u32 address, u32 &inst);
+	template <typename T> void ld(u32 address, unsigned const reg);
+	template <typename T> bool st(u32 address, unsigned const reg);
+	template <typename T> void xmem(u32 address, unsigned const reg);
 
 	// integer helpers
 	void set_cr(unsigned const cr, u32 const data);

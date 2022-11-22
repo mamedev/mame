@@ -18,6 +18,7 @@ DECLARE_DEVICE_TYPE(MSX_CART_SYNTHESIZER,      msx_cart_synthesizer_device)
 DECLARE_DEVICE_TYPE(MSX_CART_SOUND_SNATCHER,   msx_cart_konami_sound_snatcher_device)
 DECLARE_DEVICE_TYPE(MSX_CART_SOUND_SDSNATCHER, msx_cart_konami_sound_sdsnatcher_device)
 DECLARE_DEVICE_TYPE(MSX_CART_KEYBOARD_MASTER,  msx_cart_keyboard_master_device)
+DECLARE_DEVICE_TYPE(MSX_CART_EC701,            msx_cart_ec701_device)
 
 
 class msx_cart_konami_device : public device_t, public msx_cart_interface
@@ -185,6 +186,27 @@ private:
 	uint8_t io_00_r();
 
 	void vlm_map(address_map &map);
+};
+
+
+
+class msx_cart_ec701_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_ec701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+	virtual void initialize_cartridge() override;
+
+private:
+	void bank_w(u8 data);
+
+	memory_bank_creator m_rombank;
+	memory_view m_view;
 };
 
 

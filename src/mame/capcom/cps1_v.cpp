@@ -1821,6 +1821,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2qp2",      CPS_B_14,     mapper_STF29,  0x36 },
 	{"sf2thndr",    CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2thndr2",   CPS_B_17,     mapper_STF29,  0x36 },
+	{"hkittymp",    CPS_B_21_DEF, mapper_sfzch }, // PAL is dumped but not analyzed yet, same as SFZCH
 
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
 

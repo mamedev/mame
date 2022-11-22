@@ -123,16 +123,13 @@ void portrait_state::ctrl_w(uint8_t data)
 	output().set_value("photo", (data >> 7) & 1);
 }
 
-// $9235-$9236 raw scroll values up to 512
-// $9236 bit 0 defines which of these are used
-void portrait_state::positive_scroll_w(uint8_t data)
+// $9235-$9236 raw scroll values up to 511
+// $9236 bit 0 defines if $a018 or $a019 is used during active frame
+void portrait_state::scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll = data;
-}
-
-void portrait_state::negative_scroll_w(uint8_t data)
-{
-	m_scroll = 511 - (data ^ 0xff);
+	if (offset & 1)
+		m_scroll += 256;
 }
 
 void portrait_state::portrait_map(address_map &map)
@@ -149,8 +146,8 @@ void portrait_state::portrait_map(address_map &map)
 	map(0xa008, 0xa008).portr("SYSTEM").w(FUNC(portrait_state::ctrl_w));
 	map(0xa010, 0xa010).portr("INPUTS");
 	// $a018 reads go to $920f, never really read up?
-	map(0xa018, 0xa018).nopr().w(FUNC(portrait_state::positive_scroll_w));
-	map(0xa019, 0xa019).w(FUNC(portrait_state::negative_scroll_w));
+	map(0xa018, 0xa018).nopr();
+	map(0xa018, 0xa019).w(FUNC(portrait_state::scroll_w));
 	map(0xa800, 0xa83f).ram().share("nvram");
 	map(0xffff, 0xffff).nopr(); // on POST only, value discarded, likely just a bug
 }

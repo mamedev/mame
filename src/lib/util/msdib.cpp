@@ -627,10 +627,10 @@ msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::
 			}
 			else
 			{
-				std::uint8_t r(dib_splat_sample((pix >> red_shift) & ((std::uint32_t(1) << red_bits) - 1), red_bits));
-				std::uint8_t g(dib_splat_sample((pix >> green_shift) & ((std::uint32_t(1) << green_bits) - 1), green_bits));
-				std::uint8_t b(dib_splat_sample((pix >> blue_shift) & ((std::uint32_t(1) << blue_bits) - 1), blue_bits));
-				std::uint8_t a(dib_splat_sample((pix >> alpha_shift) & ((std::uint32_t(1) << alpha_bits) - 1), alpha_bits));
+				std::uint8_t r(dib_splat_sample(BIT(pix, red_shift, red_bits), red_bits));
+				std::uint8_t g(dib_splat_sample(BIT(pix, green_shift, green_bits), green_bits));
+				std::uint8_t b(dib_splat_sample(BIT(pix, blue_shift, blue_bits), blue_bits));
+				std::uint8_t a(dib_splat_sample(BIT(pix, alpha_shift, alpha_bits), alpha_bits));
 				*dest = rgb_t(alpha_bits ? a : 255, r, g, b);
 			}
 		}

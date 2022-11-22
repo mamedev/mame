@@ -10598,6 +10598,7 @@ f1gpstar3                       // (c) 1991 Jaleco
 f1gpstar2                       // (c) 1991 Jaleco
 f1gpstr2                        // (c) 1993 Jaleco
 scudhamm                        // (c) 1994 Jaleco
+scudhamma                       // (c) 1994 Jaleco
 wildplt                         // (c) 1992 Jaleco
 
 @source:citoh/cit101.cpp
@@ -10712,6 +10713,10 @@ zerotrgta                       // (c) 1985 Data East Corporation
 bujutsu                         // G?645 (c)1997
 racjamdx                        // G?676 (c)1997 Japan JAA
 
+@source:trs/agvision.cpp
+agvision                        // TRS-80 AgVision
+trsvidtx                        // TRS-80 Videotex
+
 @source:trs/coco12.cpp
 cd6809                          // Codimex CD-6809
 coco                            // Color Computer
@@ -10728,7 +10733,6 @@ lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
 ms1600                          // ILCE / SEP Micro-SEP 1600
 mx1600                          // Dynacom MX-1600
 t4426                           // Terco 4426 CNC programming station
-trsvidtx                        // TRS-80 Videotex
 
 @source:trs/coco3.cpp
 coco3                           // Color Computer 3 (NTSC)
@@ -11003,6 +11007,7 @@ ganbare                         // 11/04/2000 (c) 2000 (Japan)
 ghouls                          // 12/1988 (c) 1988 (World)
 ghoulsu                         // 12/1988 (c) 1988 (USA)
 gulunpa                         //
+hkittymp                        // 12/07/1996 (c) 1996 (Japan)
 knights                         // 27/11/1991 (c) 1991 (World)
 knightsb2                       // bootleg
 knightsj                        // 27/11/1991 (c) 1991 (Japan)
@@ -12509,6 +12514,7 @@ diablo              //
 @source:misc/diamondking.cpp
 diamondking                     // (c) 1997 SegaSA / Sonic
 diamondkinp                     // (c) 1997 SegaSA / Sonic
+goldenchip                      // (c) 19?? SegaSA / Sonic
 
 @source:skeleton/didact.cpp
 md6802                          //
@@ -13926,6 +13932,8 @@ ts28                            // 1983
 
 @source:misc/falgas_m89.cpp
 cbully                          // (c) 1991 Falgas
+fantcar                         // (c) 19?? Falgas
+fantcar87                       // (c) 1987 Falgas
 rmontecarlo                     // (c) 1991 Falgas
 
 @source:nintendo/famibox.cpp
@@ -16741,6 +16749,7 @@ gnw_vermin                      // Nintendo
 gnw_zelda                       // Nintendo
 kbilly                          // Konami
 kblades                         // Konami
+kbottom9                        // Konami
 kbucky                          // Konami
 kcontra                         // Konami
 kdribble                        // Konami
@@ -16778,6 +16787,7 @@ tdennis                         // Tiger
 tdummies                        // Tiger
 tflash                          // Tiger
 tgaiden                         // Tiger
+tgaiden3                        // Tiger
 tgaunt                          // Tiger
 tgoldeye                        // Tiger
 tgoldnaxe                       // Tiger
@@ -16809,6 +16819,7 @@ tsf2010                         // Tiger
 tsfight2                        // Tiger
 tshadow                         // Tiger
 tsharr2                         // Tiger
+tsimquest                       // Tiger
 tsjam                           // Tiger
 tskelwarr                       // Tiger
 tsonic                          // Tiger
@@ -20631,6 +20642,7 @@ trojan                          // 4/1986 (c) 1986 (US)
 trojana                         // 4/1986 (c) 1986 (US)
 trojanb                         // bootleg
 trojanj                         // 4/1986 (c) 1986 (Japan)
+trojanlt                        // location test
 trojanr                         // 4/1986 (c) 1986 + Romstar
 
 @source:apple/lwriter.cpp
@@ -21111,7 +21123,7 @@ mastboy                         // (c) 1991 - No Ref on the PCB
 mastboya                        // (c) 1991 - No Ref on the PCB
 mastboyi                        // (c) 1991 - No Ref on the PCB
 mastboyia                       // (c) 1991 - No Ref on the PCB
-mastboyib                       // (c) 1992 - No Ref on the PCB
+mastboyiv2                      // (c) 1992 - No Ref on the PCB
 
 @source:gaelco/mastboyo.cpp
 mastboyo                        // (c) 1987 - No Ref on the PCB
@@ -32260,7 +32272,8 @@ kinniku                         //
 kinniku2                        //
 minnadk                         //
 motogp                          //
-netchu02                        //
+netchu02b                       //
+netchu02c                       //
 prdgp03                         //
 qgundam                         //
 rrvac                           //
@@ -38400,6 +38413,7 @@ astormjd                        //
 astormu                         // 1990.04 Alien Storm (US, FD1094)
 astormud                        //
 bloxeed                         // 1989.12 Bloxeed (Japan, FD1094)
+bloxeeda                        //
 bloxeedd                        //
 cltchitr                        // 1991.02 Clutch Hitter (US, FD1094)
 cltchitrd                       //
@@ -38511,7 +38525,8 @@ jpark                           // 1994.?? Jurassic Park (World)
 jparkj                          // 1994.02 Jurassic Park (Japan) - Deluxe with moving cabinet, Rev A
 jparkja                         // 1994.02 Jurassic Park (Japan) - Deluxe with moving cabinet
 jparkjc                         // 1994.02 Jurassic Park (Japan) - Cabinet conversion kit
-kokoroj                         // 1992.?? Soreike! Kokoroji (Japan)
+kokoroj                         // 1992.?? Soreike! Kokoroji (Japan, Rev A)
+kokoroja                        // 1992.?? Soreike! Kokoroji (Japan)
 kokoroj2                        // 1993.12 Soreike! Kokoroji 2 (Japan)
 orunners                        // 1993.?? Outrunners (World)
 orunnersj                       // 1993.05 Outrunners (Japan)
@@ -41968,7 +41983,6 @@ snread                          //
 snspell                         //
 snspellc                        //
 snspellca                       //
-snspellcuk                      //
 snspellfr                       //
 snspellit                       //
 snspelljp                       //
@@ -41978,6 +41992,7 @@ snspellua                       //
 snspellub                       //
 snspelluk                       //
 snspelluka                      //
+snwrite                         //
 tntell                          //
 tntellfr                        //
 tntellp                         //
@@ -41985,7 +42000,10 @@ tntelluk                        //
 vocaid                          //
 
 @source:handheld/tispellb.cpp
+letterlf                        //
+letterlg                        //
 mrchalgr                        //
+spellabc                        //
 spellb                          //
 spellba                         //
 
@@ -44554,6 +44572,9 @@ psr340                          // 1999 PSR-340
 
 @source:yamaha/ympsr400.cpp
 psr500                          // 1991 PSR-500
+
+@source:yamaha/ympss12.cpp
+pss12                           //
 
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70

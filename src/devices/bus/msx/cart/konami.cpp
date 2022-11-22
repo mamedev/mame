@@ -13,6 +13,7 @@ DEFINE_DEVICE_TYPE(MSX_CART_SYNTHESIZER,      msx_cart_synthesizer_device,      
 DEFINE_DEVICE_TYPE(MSX_CART_SOUND_SNATCHER,   msx_cart_konami_sound_snatcher_device,   "msx_cart_sound_snatcher",   "MSX Cartridge - Sound Snatcher")
 DEFINE_DEVICE_TYPE(MSX_CART_SOUND_SDSNATCHER, msx_cart_konami_sound_sdsnatcher_device, "msx_cart_sound_sdsnatcher", "MSX Cartridge - Sound SD Snatcher")
 DEFINE_DEVICE_TYPE(MSX_CART_KEYBOARD_MASTER,  msx_cart_keyboard_master_device,         "msx_cart_keyboard_master",  "MSX Cartridge - Keyboard Master")
+DEFINE_DEVICE_TYPE(MSX_CART_EC701,            msx_cart_ec701_device,                   "msx_cart_ec701",            "MSX Cartridge - Konami EC-701")
 
 
 msx_cart_konami_device::msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -523,4 +524,59 @@ void msx_cart_keyboard_master_device::io_20_w(uint8_t data)
 uint8_t msx_cart_keyboard_master_device::io_00_r()
 {
 	return m_vlm5030->bsy() ? 0x10 : 0x00;
+}
+
+
+
+msx_cart_ec701_device::msx_cart_ec701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, MSX_CART_EC701, tag, owner, clock)
+	, msx_cart_interface(mconfig, *this)
+	, m_rombank(*this, "rombank")
+	, m_view(*this, "view")
+{
+}
+
+void msx_cart_ec701_device::device_reset()
+{
+	m_view.select(0);
+}
+
+void msx_cart_ec701_device::initialize_cartridge()
+{
+	m_rombank->configure_entries(0, 24, get_rom_base() + 0x20000, 0x4000);
+
+	page(1)->install_view(0x4000, 0x7fff, m_view);
+	m_view[0].install_rom(0x4000, 0x7fff, get_rom_base());
+	m_view[1].install_read_bank(0x4000, 0x7fff, m_rombank);
+	m_view[2].nop_read(0x4000, 0x7fff);
+
+	page(2)->install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
+	page(2)->install_write_handler(0xbff8, 0xbfff, write8smo_delegate(*this, FUNC(msx_cart_ec701_device::bank_w)));
+}
+
+void msx_cart_ec701_device::bank_w(u8 data)
+{
+	data = ~data;
+	switch (data & 0x38)
+	{
+	case 0x00:  // ic1
+		m_view.select(0);
+		break;
+	case 0x20:  // ic2
+		m_view.select(1);
+		m_rombank->set_entry(data & 0x07);
+		break;
+	case 0x28:  // ic3
+		m_view.select(1);
+		m_rombank->set_entry(0x08 + (data & 0x07));
+		break;
+	case 0x30:  // ic4
+		m_view.select(1);
+		m_rombank->set_entry(0x10 + (data & 0x07));
+		break;
+	default:
+		m_view.select(2);
+		break;
+	}
+
 }

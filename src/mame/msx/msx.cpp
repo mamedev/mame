@@ -91,7 +91,7 @@
 ** - cpc51/cpc61: Remove keyboard and add a keyboard connector
 ** - mbh3: touch pad not emulated
 ** - mbh70: Verify firmware operation
-** - y805*: Floppy support broken
+** - y805128. y805256: Floppy support broken, jumping to the irq routine in slot 0-0 fails
 ** - y8805128r2/e: Firmware not working
 ** - cpg120: Remove ports
 **

@@ -3196,6 +3196,26 @@ if opt_tool(CPUS, "HP2100") then
 end
 
 --------------------------------------------------
+-- SDS Sigma 2 (disassembler only)
+--@src/devices/cpu/sigma2/sigma2.h,CPUS["SIGMA2"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "SIGMA2") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sigma2/sigma2d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sigma2/sigma2d.h")
+end
+
+--------------------------------------------------
+-- Control Data Corporation 1700 (disassembler only)
+--@src/devices/cpu/cdc1700/cdc1700.h,CPUS["CDC1700"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "CDC1700") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc1700/cdc1700d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc1700/cdc1700d.h")
+end
+
+--------------------------------------------------
 -- National Semiconductor HPC
 --@src/devices/cpu/hpc/hpc.h,CPUS["HPC"] = true
 --------------------------------------------------

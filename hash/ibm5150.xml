@@ -12950,29 +12950,6 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="andretti">
-		<description>Mario Andretti's Racing Challenge</description>
-		<year>1991</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="developer" value="Distinctive Software" />
-		<info name="version" value="1.0" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Mario Andretti's Racing Challenge [Electronic Arts] [1991] [3.5DD] [Career Disk].img" size="737280" crc="affe5fe6" sha1="74e2fe67f71ef56e9104c72c89cabec4a2f57f66"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Mario Andretti's Racing Challenge [Electronic Arts] [1991] [3.5DD] [Program Control Disk].img" size="737280" crc="7c6dab1f" sha1="c9447f411da447af0190c61312271221990818ab"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Mario Andretti's Racing Challenge [Electronic Arts] [1991] [3.5DD] [Race Disk].img" size="737280" crc="eb3ab737" sha1="01c291ec3086c1d621fee6d65fee804ef7930432"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="martmemo">
 		<description>Martian Memorandum</description>
 		<year>1991</year>
@@ -13422,84 +13399,6 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Ninja Gaiden II - The Dark Sword of Chaos (1991)(GameTek).dsk" size="737280" crc="f69da21d" sha1="d9a8bc1d5a9d4314c3b4df078fdd7aa7d92a7b6c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nova9">
-		<description>Nova 9: The Return of Gir Draxon (v1.1)</description>
-		<year>1991</year>
-		<publisher>Sierra On-Line</publisher>
-		<info name="developer" value="Dynamix" />
-		<info name="version" value="1.1" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 1 of 6).dsk" size="737280" crc="de0b75ae" sha1="31590a0c27972a3a956ac853276bc2da770ffef8"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 2 of 6).dsk" size="737280" crc="b3756c77" sha1="a818d399fa8b9a77a09217bb6a99f18cbf42acfd"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 3 of 6).dsk" size="737280" crc="19411f94" sha1="1580aa2a51991b8463fc3179612c9d96341f03d9"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 4 of 6).dsk" size="737280" crc="a69a0ec3" sha1="84c32577287f9a581f2ec0fbebe354d27da9a7c5"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 5 of 6).dsk" size="737280" crc="1c283926" sha1="b077201788af23bc55af4a76ba55e00495717827"/>
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 6 of 6).dsk" size="737280" crc="095ea434" sha1="16a443f8f8d3471908b1c5dc4850b4b266081ab9"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- matches dump of 3.5" "International Version" -->
-	<software name="nova9a" cloneof="nova9">
-		<description>Nova 9: The Return of Gir Draxon (v1.0)</description>
-		<year>1991</year>
-		<publisher>Sierra On-Line</publisher>
-		<info name="developer" value="Dynamix" />
-		<info name="version" value="1.0" />
-		<info name="usage" value="Install from DOS with: INSTALL" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 1 of 6].img" size="737280" crc="a14599bc" sha1="f94be59a1426c00b2b0421c8b47433b1fda48b19"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 2 of 6].img" size="737280" crc="7a3eaeac" sha1="5bc1879831c26dd7c1fb76df2af2ac938385d14c"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 3 of 6].img" size="737280" crc="ebce8727" sha1="e308e3b461ef6e23c53308fefe670f51e83ea940"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 4 of 6].img" size="737280" crc="1d884a9f" sha1="927fe65a2c607a21ca2f24d41d019b65abc47dda"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 5 of 6].img" size="737280" crc="3e9db843" sha1="7ca2acf1e7c270636d182c1484503246d310529d"/>
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 6 of 6].img" size="737280" crc="cc16d0de" sha1="3ba05e1d37397ff92f833ddc0111baeb342c1704"/>
 			</dataarea>
 		</part>
 	</software>

@@ -913,7 +913,8 @@ void rb2_device::deserialize(FILE *file)
 
 uint32_t rb2_device::expand_to_all_lanes(uint32_t src)
 {
-	switch (m_draw_depth) {
+	switch (m_draw_depth)
+	{
 	case 0:
 		src |= src << 4;
 		src |= src << 8;
@@ -2726,7 +2727,8 @@ void newport_base_device::do_setup(void)
 	const int32_t dy = abs(y1 - y2);
 	const uint8_t adrmode = (m_rex3.m_draw_mode0 >> 2) & 7;
 
-	if (adrmode >= 0 && adrmode <= 1) {
+	if (adrmode >= 0 && adrmode <= 1)
+	{
 		/* quadrant for block or span */
 		uint8_t quadrant = 0;
 		/* This is purely guessed */
@@ -2746,7 +2748,9 @@ void newport_base_device::do_setup(void)
 		}
 		m_rex3.m_bres_octant_inc1 &= ~(0x7 << 24);
 		m_rex3.m_bres_octant_inc1 |= quadrant << 24;
-	} else if (adrmode >= 2 && adrmode <= 4) {
+	}
+	else if (adrmode >= 2 && adrmode <= 4)
+	{
 		uint8_t octant;
 		/* octant for line */
 		/* FIXME: error terms and Bresenham terms */

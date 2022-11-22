@@ -493,6 +493,10 @@ memory_view::memory_view_entry &memory_view::operator[](int slot)
 		m_entries.resize(id+1);
 		m_entries[id].reset(e);
 		m_entry_mapping[slot] = id;
+		if (m_handler_read) {
+			m_handler_read->select_u(id);
+			m_handler_write->select_u(id);
+		}
 		return *e;
 
 	} else

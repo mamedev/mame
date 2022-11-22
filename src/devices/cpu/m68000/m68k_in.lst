@@ -4919,6 +4919,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 			break;
@@ -4973,6 +4974,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 			break;
@@ -5026,6 +5028,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 			m_cacr = REG_DA()[(word2 >> 12) & 15];
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 		case 0x800:            /* USP */
@@ -5113,6 +5116,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 		case 0x800:            /* USP */
