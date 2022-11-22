@@ -660,8 +660,10 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 
 		rectangle split_cliprect(cliprect.min_x, cliprect.max_x, dsp, dsh + dsp - 1);
 		split_cliprect &= cliprect;
+		
 		// animefrm uses layer 1 with fbl = 1 for the color cycling bar on top
-		rectangle fb_cliprect(cliprect.min_x, cliprect.min_x + fbw, dsp, dsp + fbl - 1);
+		// rtype definitely don't want to be clipped on fbw, assume valid for pitch calc only.
+		rectangle fb_cliprect(cliprect.min_x, cliprect.max_x, dsp, dsp + fbl - 1);
 		split_cliprect &= fb_cliprect;
 
 		if (!m_dm)
