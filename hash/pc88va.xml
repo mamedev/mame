@@ -546,6 +546,7 @@ Opening has a few weird places for [gfx] priority
 Has [SGP] artifacts
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
+		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1331888">

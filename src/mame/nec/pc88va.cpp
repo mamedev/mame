@@ -837,11 +837,11 @@ static INPUT_PORTS_START( pc88va )
 
 	PORT_START("KEY9")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Stop")                                  PORT_CHAR(UCHAR_MAMEKEY(PAUSE)) VA_PORT_SCAN(0x60)
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)                              PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)                              PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)                              PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)                              PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)                              PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1)                              PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)                              PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)                              PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)                              PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)                              PORT_CHAR(UCHAR_MAMEKEY(F5)) VA_PORT_SCAN(0x66)
 	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)                           PORT_CHAR(' ') VA_PORT_SCAN(0x34)
 	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)                             PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
@@ -1125,13 +1125,6 @@ void pc88va_state::machine_reset()
 	m_sysbank->set_bank(1);
 	m_backupram_wp = 1;
 
-	/* default palette */
-	{
-		uint8_t i;
-		for(i=0;i<32;i++)
-			m_palette->set_pen_color(i,pal1bit((i & 2) >> 1),pal1bit((i & 4) >> 2),pal1bit(i & 1));
-	}
-
 	m_tsp.tvram_vreg_offset = 0;
 
 	m_fdc_mode = 0;
@@ -1187,6 +1180,7 @@ static void pc88va_floppies(device_slot_interface &device)
 }
 
 // TODO: often dies
+// shinraba doesn't even unmask the irq not even in sound test wtf
 WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
 {
 	bool irq_state = m_sound_irq_enable & state;
