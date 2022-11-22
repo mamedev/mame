@@ -462,7 +462,8 @@ public:
 		m_lan_ds2401(*this, "lan_serial_id"),
 		m_watchdog(*this, "watchdog"),
 		m_hornet_jvs_host(*this, "hornet_jvs_host"),
-		m_cg_view(*this, "cg_view")
+		m_cg_view(*this, "cg_view"),
+		m_k033906(*this, "k033906_%u", 1U)
 	{ }
 
 	void hornet(machine_config &config);
@@ -512,6 +513,7 @@ private:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<hornet_jvs_host> m_hornet_jvs_host;
 	memory_view m_cg_view;
+	optional_device_array<k033906_device, 2> m_k033906;
 
 	emu_timer *m_sound_irq_timer;
 	std::unique_ptr<uint8_t[]> m_jvs_sdata;
@@ -1216,7 +1218,7 @@ void hornet_state::hornet(machine_config &config)
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
-	K033906(config, "k033906_1", 0, m_voodoo[0]);
+	K033906(config, m_k033906[0], 0, m_voodoo[0]);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1308,7 +1310,7 @@ void hornet_state::sscope(machine_config &config)
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
-	K033906(config, "k033906_2", 0, m_voodoo[1]);
+	K033906(config, m_k033906[1], 0, m_voodoo[1]);
 
 	// video hardware
 	config.device_remove("screen");
@@ -1350,6 +1352,9 @@ void hornet_state::sscope_voodoo2(machine_config& config)
 	m_voodoo[1]->set_cpu(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
+
+	m_k033906[0]->set_pciid(0x0002121a); // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0002 = Voodoo 2)
+	m_k033906[1]->set_pciid(0x0002121a); // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0002 = Voodoo 2)
 }
 
 void hornet_state::sscope2(machine_config &config)
@@ -1905,160 +1910,6 @@ ROM_START(sscopeubvd2)
 
 	ROM_REGION(0x2000, "m48t58",0)
 	ROM_LOAD( "m48t58y-70pc1_ua", 0x000000, 0x002000, BAD_DUMP CRC(458900fb) SHA1(ae2f5477e3999ecce5199fc4a53c5ddf78c4406d) ) // hand built
-ROM_END
-
-ROM_START(sscopeebvd2)
-	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
-	ROM_LOAD16_WORD_SWAP("830b01.27p", 0x200000, 0x200000, CRC(3b6bb075) SHA1(babc134c3a20c7cdcaa735d5f1fd5cab38667a14) )
-	ROM_RELOAD(0x000000, 0x200000)
-
-	ROM_REGION32_BE(0x800000, "datarom", ROMREGION_ERASE00)   // Data roms
-
-	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
-	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
-
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
-	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
-
-	ROM_REGION16_LE(0x1000000, "rfsnd", 0)       // PCM sample roms
-	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
-	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
-
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(7d94272c) SHA1(ef0b3e5d4fcf3cec71caa8e48776f71f850f3b09) ) // hand built
-ROM_END
-
-ROM_START(sscopejbvd2)
-	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
-	ROM_LOAD16_WORD_SWAP("830b01.27p", 0x200000, 0x200000, CRC(3b6bb075) SHA1(babc134c3a20c7cdcaa735d5f1fd5cab38667a14) )
-	ROM_RELOAD(0x000000, 0x200000)
-
-	ROM_REGION32_BE(0x800000, "datarom", ROMREGION_ERASE00)   // Data roms
-
-	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
-	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
-
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
-	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
-
-	ROM_REGION16_LE(0x1000000, "rfsnd", 0)       // PCM sample roms
-	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
-	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
-
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1_ja", 0x000000, 0x002000, BAD_DUMP CRC(325465c5) SHA1(24524a8eed8f0aa45881bddf65a8fa8ba5270eb1) ) // hand built
-ROM_END
-
-ROM_START(sscopeabvd2)
-	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
-	ROM_LOAD16_WORD_SWAP("830b01.27p", 0x200000, 0x200000, CRC(3b6bb075) SHA1(babc134c3a20c7cdcaa735d5f1fd5cab38667a14) )
-	ROM_RELOAD(0x000000, 0x200000)
-
-	ROM_REGION32_BE(0x800000, "datarom", ROMREGION_ERASE00)   // Data roms
-
-	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
-	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
-
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
-	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
-
-	ROM_REGION16_LE(0x1000000, "rfsnd", 0)       // PCM sample roms
-	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
-	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
-
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(e8f7ac69) SHA1(93df4d8cc6ae376460873e4f3a95dc3921e5690e) ) // hand built
-ROM_END
-
-ROM_START(sscopeuavd2)
-	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
-	ROM_LOAD16_WORD_SWAP("830a01.27p", 0x200000, 0x200000, CRC(39e353f1) SHA1(569b06969ae7a690f6d6e63cc3b5336061663a37) )
-	ROM_RELOAD(0x000000, 0x200000)
-
-	ROM_REGION32_BE(0x800000, "datarom", ROMREGION_ERASE00)   // Data roms
-
-	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
-	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
-
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
-	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
-
-	ROM_REGION16_LE(0x1000000, "rfsnd", 0)       // PCM sample roms
-	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
-	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
-
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1_ua", 0x000000, 0x002000, BAD_DUMP CRC(458900fb) SHA1(ae2f5477e3999ecce5199fc4a53c5ddf78c4406d) ) // hand built
-ROM_END
-
-ROM_START(sscopeeavd2)
-	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
-	ROM_LOAD16_WORD_SWAP("830a01.27p", 0x200000, 0x200000, CRC(39e353f1) SHA1(569b06969ae7a690f6d6e63cc3b5336061663a37) )
-	ROM_RELOAD(0x000000, 0x200000)
-
-	ROM_REGION32_BE(0x800000, "datarom", ROMREGION_ERASE00)   // Data roms
-
-	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
-	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
-
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
-	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
-
-	ROM_REGION16_LE(0x1000000, "rfsnd", 0)       // PCM sample roms
-	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
-	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
-
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(7d94272c) SHA1(ef0b3e5d4fcf3cec71caa8e48776f71f850f3b09) ) // hand built
-ROM_END
-
-ROM_START(sscopejavd2)
-	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
-	ROM_LOAD16_WORD_SWAP("830a01.27p", 0x200000, 0x200000, CRC(39e353f1) SHA1(569b06969ae7a690f6d6e63cc3b5336061663a37) )
-	ROM_RELOAD(0x000000, 0x200000)
-
-	ROM_REGION32_BE(0x800000, "datarom", ROMREGION_ERASE00)   // Data roms
-
-	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
-	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
-
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
-	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
-
-	ROM_REGION16_LE(0x1000000, "rfsnd", 0)       // PCM sample roms
-	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
-	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
-
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1_ja", 0x000000, 0x002000, BAD_DUMP CRC(325465c5) SHA1(24524a8eed8f0aa45881bddf65a8fa8ba5270eb1) ) // hand built
-ROM_END
-
-ROM_START(sscopeaavd2)
-	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
-	ROM_LOAD16_WORD_SWAP("830a01.27p", 0x200000, 0x200000, CRC(39e353f1) SHA1(569b06969ae7a690f6d6e63cc3b5336061663a37) )
-	ROM_RELOAD(0x000000, 0x200000)
-
-	ROM_REGION32_BE(0x800000, "datarom", ROMREGION_ERASE00)   // Data roms
-
-	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
-	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
-
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
-	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
-
-	ROM_REGION16_LE(0x1000000, "rfsnd", 0)       // PCM sample roms
-	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
-	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
-
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(e8f7ac69) SHA1(93df4d8cc6ae376460873e4f3a95dc3921e5690e) ) // hand built
 ROM_END
 
 ROM_START(sscope2)
@@ -3493,7 +3344,7 @@ GAME(  1998, terabrstaa, terabrst, terabrst,   terabrst, hornet_state, init_horn
 // identifies as NWK-LC system
 GAME(  1998, thrilldbu, thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // heavy GFX glitches, fails wheel motor test, for now it's possible to get in game by switching "SW:2" to on
 
-// The D and C revision program ROMs don't support J region. Do J region revisions exist for C and later?
+// Revisions C and D removed Japanese region support but introduced Voodoo 2 support.
 GAMEL( 1999, sscope,   0,      sscope, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 1999, sscopee,  sscope, sscope, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver EAD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 1999, sscopea,  sscope, sscope, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver AAD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
@@ -3508,21 +3359,13 @@ GAMEL( 1999, sscopeua, sscope, sscope, sscope, hornet_state, init_sscope, ROT0, 
 GAMEL( 1999, sscopeea, sscope, sscope, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver EAA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 1999, sscopeaa, sscope, sscope, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver AAA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 1999, sscopeja, sscope, sscope, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver JAA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-// This version of Silent Scope runs on GQ871 video boards (Voodoo 2 instead of Voodoo 1)
+// This version of Silent Scope runs on GQ871 video boards (Voodoo 2 instead of Voodoo 1). Only revisions C and D of the available program ROMs have support for Voodoo 2.
 GAMEL( 1999, sscopevd2,   sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 1999, sscopeevd2,  sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver EAD, Ver 1.33, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 1999, sscopeavd2,  sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver AAD, Ver 1.33, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 1999, sscopeucvd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver UAC, Ver 1.30, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 1999, sscopeecvd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver EAC, Ver 1.30, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 1999, sscopeacvd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver AAC, Ver 1.30, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopeubvd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver UAB, Ver 1.20, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopeebvd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver EAB, Ver 1.20, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopeabvd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver AAB, Ver 1.20, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopejbvd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver JAB, Ver 1.20, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopeuavd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver UAA, Ver 1.00, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopeeavd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver EAA, Ver 1.00, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopeaavd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver AAA, Ver 1.00, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopejavd2, sscope, sscope_voodoo2, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver JAA, Ver 1.00, GQ871 Voodoo 2 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 
 GAMEL( 2000, sscope2,   0,       sscope2, sscope2, hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD, Ver 1.03)",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dualhsxs )
 GAMEL( 2000, sscope2e,  sscope2, sscope2, sscope2, hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver EAD, Ver 1.03)",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dualhsxs )
