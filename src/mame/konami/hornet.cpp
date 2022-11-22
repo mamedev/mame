@@ -373,36 +373,29 @@ The two mask roms serve as compressed GFX roms for the game to "download" data o
 
 TODO:
 - POST fails to complete the following games:
-  + terabrst: Freezes with colorful jailbars (voodoo buffer offset out of bounds; culprit currently unknown); resets after freezing
+  + terabrst: Freezes with colorful jailbars; resets after freezing
   + thrilldbu: LAN board tests bad (gn676_lan.cpp)
-  + sscope/sscope2: Crashes during second DSP board test (culprit currently unknown)
-- gradius4 hardlocks during mask rom check with SHARC recompiler enabled...
+  + sscope/sscope2: Crashes during second DSP board test
+- gradius4 hardlocks during mask rom check with SHARC recompiler enabled (MT#6322)
   + and also crashes during the 6th level boss even (likely) without the recompiler (MT#8423)
-- nbapbp doesn't display a proper region regardless of timekeeper
 - terabrst has priority related issues putting the tilemap above the 3d (title screen, ranking, CG board check)
 - terabrst freezes with sticky 3d during the 'explosion' events (stage 1 gas station and most bosses) with the SHARC
   recompiler enabled
 - terabrst stage 2 boss doesn't properly spawn with the flying saucer that spawns the boss staying in place (for ~5 mins).
   On actual h/w, the flying saucer flys over and destroys a nearby building to the left spawning the boss
-- terabrsta doesn't boot at all (culprit currently unknown)
-- thrilldbu randomly freezes with sticky 3d. It's possible to somehow lower the chances of freezing by underclocking
-  the maincpu and/or dsp (culprit currently unknown)
+- terabrsta doesn't boot at all
+- thrilldbu randomly freezes with sticky 3d. It's possible to lower the chances of freezing by underclocking the maincpu
+  and/or dsp
 - implement thrilldbu's wheel feedback logic (controlled through the parallel data port via sysreg_w). Can be bypassed by enabling
   DIP #2
-- sscope/sscope2's scope monitor has severe lag. The culprit lies within the video core unable to handle two screens
-  with different refresh rates at once (either requiring a timing hack or major video core rewrite).
+- sscope/sscope2's scope monitor has severe lag. MAME's core currently can't handle partial updates if you have multiple screens with
+  different update frequencies (see 'hack_timer' in src/mame/atari/harddriv.cpp for more info).
 - figure out a way to properly hook sscope's additional adc12138
-- sscope/sscope2 has random crashes (was more common in earlier versions but needs a bit more testing)
 - sscope/sscope2 prioity problems:
   + the main screen's scope in attract mode demo has a tendency to 'wipe/cover' itself in certain areas
   + the tilemap text and high score graphic are enclosed in a black box
 - sscope2's gfx banking isn't fully understood. Various 3d models show incorrect textures.
 - give proper PCI support for k033906
-  + as a matter of fact, konppc.cpp's current implementation is very werid. How the main/cg interface rewrite is yet to be determined
-  + it would be for the best to put the CG board as a device interface.
-- JVS device fixups (see sysreg_r note)
-- add the onboard X76F041 for the games that support that and their dumps
-- add all remaining timekeeper region files.
 - (eventually) implement sscope2's LAN networking (and also thrilldbu)
   + sscope2 may not like it if it links to another instance with the same serial ID. If that is the case, then something to set the
   serial ID should be implemented.
@@ -650,11 +643,6 @@ uint8_t hornet_state::sysreg_r(offs_t offset)
 			    0x04 = ADEOC (ADC EOC)
 			    0x02 = ADDOR (ADC DOR)
 			    0x01 = ADDO (ADC DO)
-			
-			FIXME: Only gradius4 and nbapbp take advantage of JVS; the rest do not.
-			In fact, the rest of the games might NOT like it if a JVS I/O board is
-			plugged in (or the SENSE line is enabled). This needs verifcation on
-			actual hardware.
 			*/
 			r = 0x70;
 			r |= m_hornet_jvs_host->sense() << 7;
@@ -1505,7 +1493,8 @@ ROM_START(sscope)
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
 	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) )
+	ROM_LOAD( "m48t58y.35d",   0x000000, 0x002000, CRC(b077e262) SHA1(5cdcc1b742bf23562f4558216063fea903f045ab) ) // this is set to the JXD, I don't think it's valid.
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) ) // so just load over it with the US one, we know works.
 ROM_END
 
 ROM_START(sscopec)
@@ -1574,7 +1563,7 @@ ROM_START(sscopea)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) )
 ROM_END
 
-ROM_START(sscoped) 
+ROM_START(sscoped)
 	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
 	ROM_LOAD16_WORD_SWAP("830d01.27p", 0x200000, 0x200000, CRC(de9b3dfa) SHA1(660652a5f745cb04687481c3626d8a43cd169193))
 	ROM_RELOAD(0x000000, 0x200000)
@@ -1654,10 +1643,10 @@ ROM_START(sscope2e)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) ) // needs proper dump for the European version
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
-	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, BAD_DUMP CRC(2b813979) SHA1(b940f4e1c0e1867788632bca3bdc3df265bdde7a) )
+	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(2b813979) SHA1(b940f4e1c0e1867788632bca3bdc3df265bdde7a) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // and a proper LAN EEPROM dump
+	ROM_LOAD16_WORD_SWAP( "at93c46.8g", 0x000000, 0x000080, CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) )
 ROM_END
 
 ROM_START(sscope2b)
@@ -1682,8 +1671,8 @@ ROM_START(sscope2b)
 	ROM_LOAD("931a10.14p", 0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad))
 	ROM_LOAD("931a11.12p", 0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294))
 
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) )
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD("m48t58y-70pc1", 0x000000, 0x002000, CRC(72f41511) SHA1(2097bcf7fe56f798182219ff46908a20aa47546a))
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
 	ROM_LOAD("ds2401.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a)) // hand built
@@ -1714,8 +1703,8 @@ ROM_START(sscope2c)
 	ROM_LOAD("931a10.14p", 0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad))
 	ROM_LOAD("931a11.12p", 0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294))
 
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) )
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD("m48t58y-70pc1", 0x000000, 0x002000, CRC(216ec340) SHA1(bbcb42a3fe54d7f5b83d45f063ecbead705c7b66))
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
 	ROM_LOAD("ds2401.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a)) // hand built
@@ -1917,25 +1906,28 @@ ROM_END
 
 GAME(  1998, gradius4,  0,        hornet,     gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, gradius4a, gradius4, hornet,     gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver UAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbp,    0,        hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpa,   nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,    0,        hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpa,   nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrst,  0,        terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrsta, terabrst, terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // identifies as NWK-LC system
-GAME(  1998, thrilldbu, thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // random freezes, fails wheel motor test, for now it's possible to get in game by switching "SW:2" to on
+GAME(  1998, thrilldbu, thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // heavy GFX glitches, fails wheel motor test, for now it's possible to get in game by switching "SW:2" to on
 
-GAMEL( 1999, sscope,    0,        sscope,  sscope,    hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopec,   sscope,   sscope,  sscope,    hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver UAC, Ver 1.30)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopeb,   sscope,   sscope,  sscope,    hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver UAB, Ver 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1999, sscopea,   sscope,   sscope,  sscope,    hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver UAA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+// The region comes from the Timekeeper NVRAM, without a valid default all sets except 'xxD, Ver 1.33' will init their NVRAM to UAx versions, the xxD set seems to incorrectly init it to JXD, which isn't a valid
+// version, and thus can't be booted.  If you copy the NVRAM from another already initialized set, it will boot as UAD.
+// to get the actual game to boot you must calibrate the guns etc.
+GAMEL( 1999, sscope,    0,        sscope,  sscope,    hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver xxD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 1999, sscopec,   sscope,   sscope,  sscope,    hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver xxC, Ver 1.30)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 1999, sscopeb,   sscope,   sscope,  sscope,    hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 1999, sscopea,   sscope,   sscope,  sscope,    hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 
-// This version of Silent Scope runs on GQ871 video boards (Voodoo 2 instead of Voodoo 1) TODO: Identical program to sscope meaning it can boot with either with a voodoo 1 or 2. May need to find a way to select which CG board it can use on startup.
+// This version of Silent Scope runs on GQ871 video boards (Voodoo 2 instead of Voodoo 1)
 GAMEL( 1999, sscoped,   sscope,   sscope_voodoo2,  sscope,  hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33, GQ871 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 
-GAMEL( 2000, sscope2,   0,        sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD, Ver 1.03)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
-GAMEL( 2000, sscope2e,  sscope2,  sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver EAD, Ver 1.03)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs ) // hardware error 8B, has a bad LAN eeprom dump
+GAMEL( 2000, sscope2,   0,        sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
+GAMEL( 2000, sscope2e,  sscope2,  sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver EAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs ) // hardware error as the dumped LAN PCB EEPROM region doesn't match the one on the main PCB timekeeper dump
 //GAMEL( 2000, sscope2j, sscope2  sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Innocent Sweeper (ver JAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
 
 // These versions of Silent Scope 2 run on GN715 video boards (Voodoo 1 instead of Voodoo 2)
-GAMEL( 2000, sscope2b, sscope2, sscope2_voodoo1, sscope2, hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAB, Ver 1.01, GN715 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscope2c, sscope2, sscope2_voodoo1, sscope2, hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAC, Ver 1.02, GN715 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2b, sscope2, sscope2_voodoo1, sscope2, hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver UAB, Ver 1.01, GN715 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2c, sscope2, sscope2_voodoo1, sscope2, hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver UAC, Ver 1.02, GN715 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
