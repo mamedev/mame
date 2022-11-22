@@ -14,7 +14,7 @@
 #define LOG_COLOR   (1U << 6) // current color mode
 #define LOG_TEXT    (1U << 7) // text strips (verbose)
 
-#define VERBOSE (LOG_GENERAL | LOG_IDP)
+#define VERBOSE (LOG_GENERAL | LOG_IDP | LOG_FB)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -663,14 +663,15 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 	);
 }
 
-void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base)
+void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y * 640) / 8) + start_offset) & 0x3ffff;
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=8)
+		const u32 line_offset = (((y * 640) / 8) + fb_start_offset) & 0x3ffff;
+
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
 			u16 x_char = (x >> 3);
 			u32 bitmap_offset = line_offset + x_char;
@@ -687,7 +688,7 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
@@ -698,8 +699,9 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = ((y * fb_width) + start_offset) & 0x3ffff;
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=2)
+		const u32 line_offset = ((y * fb_width) + fb_start_offset) & 0x3ffff;
+
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			u16 x_char = (x >> 1);
 			u32 bitmap_offset = line_offset + x_char;
@@ -715,7 +717,7 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
@@ -724,7 +726,8 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = ((y * fb_width) + start_offset) & 0x3ffff;
+		const u32 line_offset = ((y * fb_width) + fb_start_offset) & 0x3ffff;
+
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			u32 bitmap_offset = line_offset + x;
@@ -744,7 +747,7 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
-void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 start_offset, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
@@ -753,7 +756,7 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = ((y * fb_width) + start_offset) & 0x3ffff;
+		const u32 line_offset = ((y * fb_width) + fb_start_offset) & 0x3ffff;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
