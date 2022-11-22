@@ -179,10 +179,13 @@ private:
 	void r232_ctrl_portc_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
 
+	u16 m_screen_ctrl_reg = 0;
+	bool m_dm = false;
+	bool m_ymmd = false;
+	u16 m_gfx_ctrl_reg = 0;
+
 	u16 m_color_mode = 0;
 	u8 m_pltm, m_pltp = 0;
-	u16 m_screen_ctrl_reg = 0;
-	u16 m_gfx_ctrl_reg = 0;
 
 	u16 m_text_transpen = 0;
 	bitmap_rgb32 m_graphic_bitmap[2];
@@ -202,9 +205,11 @@ private:
 	void draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 which);
 
 	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base);
-	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base, u16 fb_width, u16 fb_height);
+	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height);
 	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height);
 	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height);
+
+	void draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height);
 
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);

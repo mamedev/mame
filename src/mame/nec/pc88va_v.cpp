@@ -14,7 +14,7 @@
 #define LOG_COLOR   (1U << 6) // current color mode
 #define LOG_TEXT    (1U << 7) // text strips (verbose)
 
-#define VERBOSE (LOG_GENERAL | LOG_IDP | LOG_FB)
+#define VERBOSE (LOG_GENERAL | LOG_IDP)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -38,6 +38,8 @@ void pc88va_state::video_start()
 	save_item(NAME(m_screen_ctrl_reg));
 	save_item(NAME(m_gfx_ctrl_reg));
 	save_item(NAME(m_color_mode));
+	save_item(NAME(m_pltm));
+	save_item(NAME(m_pltp));
 
 	save_item(NAME(m_text_transpen));
 	save_pointer(NAME(m_video_pri_reg), 2);
@@ -585,10 +587,16 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 which)
 {
+	// disable graphic B if screen 0 only setting is enabled
+	if (which > m_ymmd)
+		return;
+
 	uint16_t const *const fb_regs = m_fb_regs;
 
 	const u8 gfx_ctrl = (m_gfx_ctrl_reg >> (which * 8)) & 0x13;
 
+	// TODO: xak2 wants independent doubled Y axis on setup menu & Micro Cabin logo
+	// i.e. 200 lines draw on a 400 lines canvas
 	const u32 pixel_size = 0x10000 >> BIT(gfx_ctrl, 4);
 
 	const u8 layer_pal_bank = get_layer_pal_bank(2 + which);
@@ -644,13 +652,23 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		rectangle split_cliprect(cliprect.min_x,  cliprect.max_x, dsp, dsh + dsp - 1);
 		split_cliprect &= cliprect;
 
-		switch(gfx_ctrl & 3)
+		if (!m_dm)
 		{
-			//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
-			case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, fsa, layer_pal_bank, fbw, fbl); break;
-			// TODO: 5bpp, shared with mode 2
-			case 2: draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); break;
-			case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); break;
+			switch(gfx_ctrl & 3)
+			{
+				case 1: draw_packed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, layer_pal_bank, fbw, fbl); break;
+			}
+		}
+		else
+		{
+			switch(gfx_ctrl & 3)
+			{
+				//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
+				case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, layer_pal_bank, fbw, fbl); break;
+				// TODO: 5bpp, shared with mode 2
+				case 2: draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); break;
+				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); break;
+			}
 		}
 	}
 
@@ -688,7 +706,7 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
@@ -764,13 +782,41 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 
 			uint16_t color = (gvram[bitmap_offset] & 0xff) | (gvram[bitmap_offset + 1] << 8);
 
-
 			if(cliprect.contains(x, y))
 			{
 				u8 b = pal5bit((color & 0x001f));
 				u8 r = pal5bit((color & 0x03e0) >> 5);
 				u8 g = pal6bit((color & 0xfc00) >> 10);
 				bitmap.pix(y, x) = (b) | (g << 8) | (r << 16);
+			}
+		}
+	}
+}
+
+void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
+{
+	uint8_t *gvram = (uint8_t *)m_gvram.target();
+
+//	const u16 y_min = std::max(cliprect.min_y, y_start);
+//	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u32 line_offset = ((y * (fb_width >> 2)) + fb_start_offset) & 0x0ffff;
+
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		{
+			u16 x_char = (x >> 3);
+			u32 bitmap_offset = line_offset + x_char;
+
+			for (int xi = 0; xi < 8; xi ++)
+			{
+				u8 color = 0;
+				for (int bank_num = 0; bank_num < 4; bank_num ++)
+					color |= ((gvram[bitmap_offset + bank_num * 0x10000] >> (7 - xi)) & 1) << bank_num;
+
+				if(color && cliprect.contains(x + xi, y))
+					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
 			}
 		}
 	}
@@ -1165,6 +1211,11 @@ void pc88va_state::idp_param_w(uint8_t data)
 void pc88va_state::screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_screen_ctrl_reg);
+
+	m_ymmd = bool(BIT(m_screen_ctrl_reg, 11));
+	m_dm = bool(BIT(m_screen_ctrl_reg, 10));
+	//                  YMMD           DM
+	// mightmag 0xb060  (0) screen 0  (0) multiplane
 }
 
 u16 pc88va_state::screen_ctrl_r()
