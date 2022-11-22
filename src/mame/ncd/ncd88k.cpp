@@ -313,7 +313,7 @@ void ncdmcx_state::data_map(address_map &map)
 
 	// 0x64 -> ack or clear irq 4?
 	map(0x01d80001, 0x01d80001).lrw8(
-		[this]()
+		[]()
 		{
 			return 0;
 		}, "int?_r",
