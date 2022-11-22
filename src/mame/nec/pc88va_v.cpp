@@ -270,8 +270,12 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y
 		return ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
 	else if(jis1 >= 0x40 && jis1 < 0x50)
 		return 0x4000 + ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
-	else if(x == 0 && y == 0 && jis1 != 0 && jis2 != 0) // debug stuff, to be nuked in the end
-		LOGKANJI("%02x %02x\n",jis1, jis2);
+	else if(jis1 >= 0x70 && jis1 < 0x80)
+	{
+		// TODO: famista cursor, unknown base
+		return 0x18000 + ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
+	}
+	LOGKANJI("%d %d %02x %02x\n",x, y, jis1, jis2);
 
 	return 0;
 }
@@ -305,8 +309,8 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	LOGTEXT("=== Start TEXT frame\n");
 
-	// TODO: 4 strips?
-	for (int layer_n = 0; layer_n < 3; layer_n ++)
+	// four layers
+	for (int layer_n = 0; layer_n < 4; layer_n ++)
 	{
 		uint16_t const *const tsp_regs = &tvram[(layer_n * 0x20 + m_tsp.tvram_vreg_offset) / 2];
 
@@ -1119,7 +1123,11 @@ void pc88va_state::execute_curdef_cmd()
 	/* TODO: needs basic sprite emulation */
 	m_tsp.curn = (m_buf_ram[0] & 0xf8);
 	m_tsp.curn_blink = (m_buf_ram[0] & 1);
-
+	LOGIDP("CURDEF %02x|%d show|%d blink\n"
+		, m_buf_ram[0] & 0xf8
+		, BIT(m_buf_ram[0], 1)
+		, BIT(m_buf_ram[0], 0)
+	);
 	tsp_sprite_enable(m_tsp.spr_offset + m_tsp.curn, (m_buf_ram[0] & 2) << 8);
 }
 
@@ -1191,7 +1199,7 @@ void pc88va_state::execute_sprsw_cmd()
 	[0] ---- --x- sprite off/on switch
 	*/
 
-	LOGIDP("SPRSW (%02x) %08x offset| %s enable"
+	LOGIDP("SPRSW (%02x) %08x offset| %s SW\n"
 		, m_buf_ram[0]
 		, m_tsp.spr_offset + 0x40000
 		, m_buf_ram[0] & 2 ? "enable" : "disable"
