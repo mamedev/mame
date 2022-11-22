@@ -103,33 +103,37 @@
 
 #include "emu.h"
 #include "disk.h"
-#include "bus/msx_cart/cartridge.h"
-#include "formats/dmk_dsk.h"
-#include "formats/msx_dsk.h"
+
+#include "cartridge.h"
+
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/upd765.h"
+
 #include "softlist_dev.h"
 
+#include "formats/dmk_dsk.h"
+#include "formats/msx_dsk.h"
 
-DECLARE_DEVICE_TYPE(MSX_CART_AVDPF550, msx_cart_avdpf550_device)
-DECLARE_DEVICE_TYPE(MSX_CART_CDX2,     msx_cart_cdx2_device)
-DECLARE_DEVICE_TYPE(MSX_CART_DDX3,     msx_cart_ddx3_device)
-DECLARE_DEVICE_TYPE(MSX_CART_FD03,     msx_cart_fd03_device)
-DECLARE_DEVICE_TYPE(MSX_CART_FD051,    msx_cart_fd051_device)
-DECLARE_DEVICE_TYPE(MSX_CART_FSCF351,  msx_cart_fscf351_device)
-DECLARE_DEVICE_TYPE(MSX_CART_FSFD1,    msx_cart_fsfd1_device)
-DECLARE_DEVICE_TYPE(MSX_CART_FSFD1A,   msx_cart_fsfd1a_device)
-DECLARE_DEVICE_TYPE(MSX_CART_HB3600,   msx_cart_hb3600_device)
-DECLARE_DEVICE_TYPE(MSX_CART_HBD20W,   msx_cart_hbd20w_device)
-DECLARE_DEVICE_TYPE(MSX_CART_HBD50,    msx_cart_hbd50_device)
-DECLARE_DEVICE_TYPE(MSX_CART_HBDF1,    msx_cart_hbdf1_device)
-DECLARE_DEVICE_TYPE(MSX_CART_HXF101PE, msx_cart_hxf101pe_device)
-DECLARE_DEVICE_TYPE(MSX_CART_MFD001,   msx_cart_mfd001_device)
-DECLARE_DEVICE_TYPE(MSX_CART_ML30DC,   msx_cart_ml30dc_device)
-DECLARE_DEVICE_TYPE(MSX_CART_NMS1200,  msx_cart_nms1200_device)
-DECLARE_DEVICE_TYPE(MSX_CART_TADPF550, msx_cart_tadpf550_device)
-DECLARE_DEVICE_TYPE(MSX_CART_VY0010,   msx_cart_vy0010_device)
+
+DECLARE_DEVICE_TYPE(MSX_CART_AVDPF550, msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_CDX2,     msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_DDX3,     msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_FD03,     msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_FD051,    msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_FSCF351,  msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_FSFD1,    msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_FSFD1A,   msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_HB3600,   msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_HBD20W,   msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_HBD50,    msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_HBDF1,    msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_HXF101PE, msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_MFD001,   msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_ML30DC,   msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_NMS1200,  msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_TADPF550, msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_VY0010,   msx_cart_interface)
 
 
 void msx_cart_disk_register_options(device_slot_interface &device)
@@ -155,7 +159,9 @@ void msx_cart_disk_register_options(device_slot_interface &device)
 }
 
 
-static void msx_floppies(device_slot_interface &device)
+namespace {
+
+void msx_floppies(device_slot_interface &device)
 {
 	device.option_add("35dd", FLOPPY_35_DD);
 	device.option_add("35ssdd", FLOPPY_35_SSDD);
@@ -247,10 +253,10 @@ void msx_cart_disk_device::add_floppy_mconfig(machine_config &config)
 
 
 
-class msx_cart_disk_tc8566_device : public msx_cart_disk_device
+class disk_tc8566_device : public msx_cart_disk_device
 {
 protected:
-	msx_cart_disk_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	disk_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 		: msx_cart_disk_device(mconfig, type, tag, owner, clock, PAGE1, PAGE2)
 		, m_fdc(*this, "fdc")
 	{ }
@@ -260,10 +266,10 @@ protected:
 
 
 
-class msx_cart_disk_wd_device : public msx_cart_disk_device
+class disk_wd_device : public msx_cart_disk_device
 {
 protected:
-	msx_cart_disk_wd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int fdc_regs_start_page = PAGE1, int fdc_regs_end_page = PAGE2)
+	disk_wd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int fdc_regs_start_page = PAGE1, int fdc_regs_end_page = PAGE2)
 		: msx_cart_disk_device(mconfig, type, tag, owner, clock, fdc_regs_start_page, fdc_regs_end_page)
 		, m_fdc(*this, "fdc")
 	{ }
@@ -291,14 +297,14 @@ protected:
 
 
 
-class msx_cart_disk_type1_device : public msx_cart_disk_wd_device
+class disk_type1_device : public disk_wd_device
 {
 public:
 	virtual void initialize_cartridge() override;
 
 protected:
-	msx_cart_disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int fdc_regs_start_page = PAGE1, int fdc_regs_end_page = PAGE2)
-		: msx_cart_disk_wd_device(mconfig, type, tag, owner, clock, fdc_regs_start_page, fdc_regs_end_page)
+	disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int fdc_regs_start_page = PAGE1, int fdc_regs_end_page = PAGE2)
+		: disk_wd_device(mconfig, type, tag, owner, clock, fdc_regs_start_page, fdc_regs_end_page)
 		, m_led(*this, "led0")
 		, m_side_control(0)
 		, m_control(0)
@@ -319,7 +325,7 @@ protected:
 	u8 m_control;
 };
 
-void msx_cart_disk_type1_device::device_start()
+void disk_type1_device::device_start()
 {
 	m_led.resolve();
 
@@ -327,9 +333,9 @@ void msx_cart_disk_type1_device::device_start()
 	save_item(NAME(m_control));
 }
 
-void msx_cart_disk_type1_device::initialize_cartridge()
+void disk_type1_device::initialize_cartridge()
 {
-	msx_cart_disk_wd_device::initialize_cartridge();
+	disk_wd_device::initialize_cartridge();
 
 	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
@@ -339,24 +345,24 @@ void msx_cart_disk_type1_device::initialize_cartridge()
 		page(i)->install_read_handler(base + 0x3ff9, base + 0x3ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 		page(i)->install_read_handler(base + 0x3ffa, base + 0x3ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
 		page(i)->install_read_handler(base + 0x3ffb, base + 0x3ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-		page(i)->install_read_handler(base + 0x3ffc, base + 0x3ffc, read8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::side_control_r)));
-		page(i)->install_read_handler(base + 0x3ffd, base + 0x3ffd, read8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::control_r)));
-		page(i)->install_read_handler(base + 0x3fff, base + 0x3fff, read8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::status_r)));
+		page(i)->install_read_handler(base + 0x3ffc, base + 0x3ffc, read8smo_delegate(*this, FUNC(disk_type1_device::side_control_r)));
+		page(i)->install_read_handler(base + 0x3ffd, base + 0x3ffd, read8smo_delegate(*this, FUNC(disk_type1_device::control_r)));
+		page(i)->install_read_handler(base + 0x3fff, base + 0x3fff, read8smo_delegate(*this, FUNC(disk_type1_device::status_r)));
 		page(i)->install_write_handler(base + 0x3ff8, base + 0x3ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
 		page(i)->install_write_handler(base + 0x3ff9, base + 0x3ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
 		page(i)->install_write_handler(base + 0x3ffa, base + 0x3ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
 		page(i)->install_write_handler(base + 0x3ffb, base + 0x3ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-		page(i)->install_write_handler(base + 0x3ffc, base + 0x3ffc, write8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::set_side_control)));
-		page(i)->install_write_handler(base + 0x3ffd, base + 0x3ffd, write8smo_delegate(*this, FUNC(msx_cart_disk_type1_device::set_control)));
+		page(i)->install_write_handler(base + 0x3ffc, base + 0x3ffc, write8smo_delegate(*this, FUNC(disk_type1_device::set_side_control)));
+		page(i)->install_write_handler(base + 0x3ffd, base + 0x3ffd, write8smo_delegate(*this, FUNC(disk_type1_device::set_control)));
 	}
 }
 
-void msx_cart_disk_type1_device::device_post_load()
+void disk_type1_device::device_post_load()
 {
 	set_control(m_control);
 }
 
-void msx_cart_disk_type1_device::set_control(u8 data)
+void disk_type1_device::set_control(u8 data)
 {
 	u8 old_m_control = m_control;
 
@@ -392,7 +398,7 @@ void msx_cart_disk_type1_device::set_control(u8 data)
 	}
 }
 
-void msx_cart_disk_type1_device::set_side_control(u8 data)
+void disk_type1_device::set_side_control(u8 data)
 {
 	m_side_control = data;
 
@@ -402,28 +408,28 @@ void msx_cart_disk_type1_device::set_side_control(u8 data)
 	}
 }
 
-u8 msx_cart_disk_type1_device::side_control_r()
+u8 disk_type1_device::side_control_r()
 {
 	return 0xfe | (m_side_control & 0x01);
 }
 
-u8 msx_cart_disk_type1_device::control_r()
+u8 disk_type1_device::control_r()
 {
 	return (m_control & 0x83) | 0x78;
 }
 
-u8 msx_cart_disk_type1_device::status_r()
+u8 disk_type1_device::status_r()
 {
 	return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
 }
 
 
 
-class msx_cart_fd051_device : public msx_cart_disk_type1_device
+class fd051_device : public disk_type1_device
 {
 public:
-	msx_cart_fd051_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type1_device(mconfig, MSX_CART_FD051, tag, owner, clock, PAGE0, PAGE3)
+	fd051_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type1_device(mconfig, MSX_CART_FD051, tag, owner, clock, PAGE0, PAGE3)
 	{ }
 
 protected:
@@ -435,11 +441,11 @@ protected:
 
 
 
-class msx_cart_fsfd1_device : public msx_cart_disk_type1_device
+class fsfd1_device : public disk_type1_device
 {
 public:
-	msx_cart_fsfd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type1_device(mconfig, MSX_CART_FSFD1, tag, owner, clock)
+	fsfd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type1_device(mconfig, MSX_CART_FSFD1, tag, owner, clock)
 	{ }
 
 protected:
@@ -451,11 +457,11 @@ protected:
 
 
 
-class msx_cart_hb3600_device : public msx_cart_disk_type1_device
+class hb3600_device : public disk_type1_device
 {
 public:
-	msx_cart_hb3600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type1_device(mconfig, MSX_CART_HB3600, tag, owner, clock)
+	hb3600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type1_device(mconfig, MSX_CART_HB3600, tag, owner, clock)
 	{ }
 
 protected:
@@ -467,11 +473,11 @@ protected:
 
 
 
-class msx_cart_hbd20w_device : public msx_cart_disk_type1_device
+class hbd20w_device : public disk_type1_device
 {
 public:
-	msx_cart_hbd20w_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type1_device(mconfig, MSX_CART_HBD20W, tag, owner, clock)
+	hbd20w_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type1_device(mconfig, MSX_CART_HBD20W, tag, owner, clock)
 	{ }
 
 protected:
@@ -483,11 +489,11 @@ protected:
 
 
 
-class msx_cart_hbd50_device : public msx_cart_disk_type1_device
+class hbd50_device : public disk_type1_device
 {
 public:
-	msx_cart_hbd50_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type1_device(mconfig, MSX_CART_HBD50, tag, owner, clock, PAGE0, PAGE3)
+	hbd50_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type1_device(mconfig, MSX_CART_HBD50, tag, owner, clock, PAGE0, PAGE3)
 	{ }
 
 protected:
@@ -499,11 +505,11 @@ protected:
 
 
 
-class msx_cart_hbdf1_device : public msx_cart_disk_type1_device
+class hbdf1_device : public disk_type1_device
 {
 public:
-	msx_cart_hbdf1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type1_device(mconfig, MSX_CART_HBDF1, tag, owner, clock)
+	hbdf1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type1_device(mconfig, MSX_CART_HBDF1, tag, owner, clock)
 	{ }
 
 protected:
@@ -515,11 +521,11 @@ protected:
 
 
 
-class msx_cart_ml30dc_device : public msx_cart_disk_type1_device
+class ml30dc_device : public disk_type1_device
 {
 public:
-	msx_cart_ml30dc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type1_device(mconfig, MSX_CART_ML30DC, tag, owner, clock)
+	ml30dc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type1_device(mconfig, MSX_CART_ML30DC, tag, owner, clock)
 	{ }
 
 protected:
@@ -533,11 +539,11 @@ protected:
 
 
 
-class msx_cart_nms1200_device : public msx_cart_disk_type1_device
+class nms1200_device : public disk_type1_device
 {
 public:
-	msx_cart_nms1200_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type1_device(mconfig, MSX_CART_NMS1200, tag, owner, clock)
+	nms1200_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type1_device(mconfig, MSX_CART_NMS1200, tag, owner, clock)
 	{ }
 
 protected:
@@ -549,11 +555,11 @@ protected:
 
 
 
-class msx_cart_vy0010_device : public msx_cart_disk_type1_device
+class vy0010_device : public disk_type1_device
 {
 public:
-	msx_cart_vy0010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type1_device(mconfig, MSX_CART_VY0010, tag, owner, clock)
+	vy0010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type1_device(mconfig, MSX_CART_VY0010, tag, owner, clock)
 	{ }
 
 protected:
@@ -565,14 +571,14 @@ protected:
 
 
 
-class msx_cart_disk_type2_device : public msx_cart_disk_wd_device
+class disk_type2_device : public disk_wd_device
 {
 public:
 	virtual void initialize_cartridge() override;
 
 protected:
-	msx_cart_disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int fdc_regs_start_page = PAGE1, int fdc_regs_end_page = PAGE2)
-		: msx_cart_disk_wd_device(mconfig, type, tag, owner, clock, fdc_regs_start_page, fdc_regs_end_page)
+	disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int fdc_regs_start_page = PAGE1, int fdc_regs_end_page = PAGE2)
+		: disk_wd_device(mconfig, type, tag, owner, clock, fdc_regs_start_page, fdc_regs_end_page)
 		, m_led(*this, "led0")
 		, m_control(0)
 	{ }
@@ -588,21 +594,21 @@ protected:
 	u8 m_control;
 };
 
-void msx_cart_disk_type2_device::device_start()
+void disk_type2_device::device_start()
 {
 	m_led.resolve();
 
 	save_item(NAME(m_control));
 }
 
-void msx_cart_disk_type2_device::device_post_load()
+void disk_type2_device::device_post_load()
 {
 	set_control(m_control);
 }
 
-void msx_cart_disk_type2_device::initialize_cartridge()
+void disk_type2_device::initialize_cartridge()
 {
-	msx_cart_disk_wd_device::initialize_cartridge();
+	disk_wd_device::initialize_cartridge();
 
 	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
@@ -612,16 +618,16 @@ void msx_cart_disk_type2_device::initialize_cartridge()
 		page(i)->install_read_handler(base + 0x3fb9, base + 0x3fb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 		page(i)->install_read_handler(base + 0x3fba, base + 0x3fba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
 		page(i)->install_read_handler(base + 0x3fbb, base + 0x3fbb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-		page(i)->install_read_handler(base + 0x3fbc, base + 0x3fbc, read8smo_delegate(*this, FUNC(msx_cart_disk_type2_device::status_r)));
+		page(i)->install_read_handler(base + 0x3fbc, base + 0x3fbc, read8smo_delegate(*this, FUNC(disk_type2_device::status_r)));
 		page(i)->install_write_handler(base + 0x3fb8, base + 0x3fb8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
 		page(i)->install_write_handler(base + 0x3fb9, base + 0x3fb9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
 		page(i)->install_write_handler(base + 0x3fba, base + 0x3fba, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
 		page(i)->install_write_handler(base + 0x3fbb, base + 0x3fbb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-		page(i)->install_write_handler(base + 0x3fbc, base + 0x3fbc, write8smo_delegate(*this, FUNC(msx_cart_disk_type2_device::set_control)));
+		page(i)->install_write_handler(base + 0x3fbc, base + 0x3fbc, write8smo_delegate(*this, FUNC(disk_type2_device::set_control)));
 	}
 }
 
-void msx_cart_disk_type2_device::set_control(u8 data)
+void disk_type2_device::set_control(u8 data)
 {
 	uint8_t old_m_control = m_control;
 
@@ -656,18 +662,18 @@ void msx_cart_disk_type2_device::set_control(u8 data)
 	}
 }
 
-u8 msx_cart_disk_type2_device::status_r()
+u8 disk_type2_device::status_r()
 {
 	return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
 }
 
 
 
-class msx_cart_fscf351_device : public msx_cart_disk_type2_device
+class fscf351_device : public disk_type2_device
 {
 public:
-	msx_cart_fscf351_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type2_device(mconfig, MSX_CART_FSCF351, tag, owner, clock)
+	fscf351_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type2_device(mconfig, MSX_CART_FSCF351, tag, owner, clock)
 	{ }
 
 protected:
@@ -679,11 +685,11 @@ protected:
 
 
 
-class msx_cart_tadpf550_device : public msx_cart_disk_type2_device
+class tadpf550_device : public disk_type2_device
 {
 public:
-	msx_cart_tadpf550_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type2_device(mconfig, MSX_CART_TADPF550, tag, owner, clock)
+	tadpf550_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type2_device(mconfig, MSX_CART_TADPF550, tag, owner, clock)
 	{ }
 
 protected:
@@ -696,14 +702,14 @@ protected:
 
 
 
-class msx_cart_disk_type5_device : public msx_cart_disk_wd_device
+class disk_type5_device : public disk_wd_device
 {
 public:
 	virtual void initialize_cartridge() override;
 
 protected:
-	msx_cart_disk_type5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_wd_device(mconfig, type, tag, owner, clock)
+	disk_type5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+		: disk_wd_device(mconfig, type, tag, owner, clock)
 		, m_control(0)
 	{ }
 
@@ -717,14 +723,14 @@ protected:
 	u8 m_control;
 };
 
-void msx_cart_disk_type5_device::device_start()
+void disk_type5_device::device_start()
 {
 	save_item(NAME(m_control));
 }
 
-void msx_cart_disk_type5_device::initialize_cartridge()
+void disk_type5_device::initialize_cartridge()
 {
-	msx_cart_disk_wd_device::initialize_cartridge();
+	disk_wd_device::initialize_cartridge();
 
 	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
 
@@ -733,20 +739,20 @@ void msx_cart_disk_type5_device::initialize_cartridge()
 	io_space().install_write_handler(0xd1, 0xd1, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
 	io_space().install_write_handler(0xd2, 0xd2, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
 	io_space().install_write_handler(0xd3, 0xd3, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	io_space().install_write_handler(0xd4, 0xd4, write8smo_delegate(*this, FUNC(msx_cart_disk_type5_device::control_w)));
+	io_space().install_write_handler(0xd4, 0xd4, write8smo_delegate(*this, FUNC(disk_type5_device::control_w)));
 	io_space().install_read_handler(0xd0, 0xd0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	io_space().install_read_handler(0xd1, 0xd1, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	io_space().install_read_handler(0xd2, 0xd2, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
 	io_space().install_read_handler(0xd3, 0xd3, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	io_space().install_read_handler(0xd4, 0xd4, read8smo_delegate(*this, FUNC(msx_cart_disk_type5_device::status_r)));
+	io_space().install_read_handler(0xd4, 0xd4, read8smo_delegate(*this, FUNC(disk_type5_device::status_r)));
 }
 
-void msx_cart_disk_type5_device::device_post_load()
+void disk_type5_device::device_post_load()
 {
 	control_w(m_control);
 }
 
-void msx_cart_disk_type5_device::control_w(u8 control)
+void disk_type5_device::control_w(u8 control)
 {
 	m_control = control;
 
@@ -774,17 +780,17 @@ void msx_cart_disk_type5_device::control_w(u8 control)
 	m_fdc->set_floppy(m_floppy);
 }
 
-u8 msx_cart_disk_type5_device::status_r()
+u8 disk_type5_device::status_r()
 {
 	return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
 }
 
 
-class msx_cart_cdx2_device : public msx_cart_disk_type5_device
+class cdx2_device : public disk_type5_device
 {
 public:
-	msx_cart_cdx2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type5_device(mconfig, MSX_CART_CDX2, tag, owner, clock)
+	cdx2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type5_device(mconfig, MSX_CART_CDX2, tag, owner, clock)
 	{ }
 
 protected:
@@ -795,11 +801,11 @@ protected:
 };
 
 
-class msx_cart_ddx3_device : public msx_cart_disk_type5_device
+class ddx3_device : public disk_type5_device
 {
 public:
-	msx_cart_ddx3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_type5_device(mconfig, MSX_CART_DDX3, tag, owner, clock)
+	ddx3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_type5_device(mconfig, MSX_CART_DDX3, tag, owner, clock)
 	{ }
 
 protected:
@@ -811,11 +817,11 @@ protected:
 
 
 
-class msx_cart_fsfd1a_device : public msx_cart_disk_tc8566_device
+class fsfd1a_device : public disk_tc8566_device
 {
 public:
-	msx_cart_fsfd1a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_tc8566_device(mconfig, MSX_CART_FSFD1A, tag, owner, clock)
+	fsfd1a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_tc8566_device(mconfig, MSX_CART_FSFD1A, tag, owner, clock)
 	{ }
 
 	virtual void initialize_cartridge() override;
@@ -830,9 +836,9 @@ protected:
 	}
 };
 
-void msx_cart_fsfd1a_device::initialize_cartridge()
+void fsfd1a_device::initialize_cartridge()
 {
-	msx_cart_disk_tc8566_device::initialize_cartridge();
+	disk_tc8566_device::initialize_cartridge();
 
 	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
@@ -848,11 +854,11 @@ void msx_cart_fsfd1a_device::initialize_cartridge()
 
 
 
-class msx_cart_fd03_device : public msx_cart_disk_wd_device
+class fd03_device : public disk_wd_device
 {
 public:
-	msx_cart_fd03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_wd_device(mconfig, MSX_CART_FD03, tag, owner, clock)
+	fd03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_wd_device(mconfig, MSX_CART_FD03, tag, owner, clock)
 		, m_led(*this, "led0")
 		, m_control(0)
 	{ }
@@ -874,23 +880,23 @@ protected:
 	u8 m_control;
 };
 
-void msx_cart_fd03_device::device_add_mconfig(machine_config &config)
+void fd03_device::device_add_mconfig(machine_config &config)
 {
 	add_mconfig<F35, SS>(config, FD1793);
 }
 
-void msx_cart_fd03_device::device_start()
+void fd03_device::device_start()
 {
 	m_led.resolve();
 
 	save_item(NAME(m_control));
 }
 
-void msx_cart_fd03_device::initialize_cartridge()
+void fd03_device::initialize_cartridge()
 {
 	if (get_rom_size() != 0x4000 && get_rom_size() != 0x8000)
 	{
-		fatalerror("msx_cart_fd03_device: Invalid ROM size\n");
+		fatalerror("fd03_device: Invalid ROM size\n");
 	}
 
 	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
@@ -903,23 +909,23 @@ void msx_cart_fd03_device::initialize_cartridge()
 		page(i)->install_read_handler(base + 0x3fc1, base + 0x3fc1, 0, 0x001c, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 		page(i)->install_read_handler(base + 0x3fc2, base + 0x3fc2, 0, 0x001c, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
 		page(i)->install_read_handler(base + 0x3fc3, base + 0x3fc3, 0, 0x001c, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-		page(i)->install_read_handler(base + 0x3fe0, base + 0x3fef, read8smo_delegate(*this, FUNC(msx_cart_fd03_device::status_r)));
-		page(i)->install_read_handler(base + 0x3ff0, base + 0x3fff, read8smo_delegate(*this, FUNC(msx_cart_fd03_device::dskchg_r)));
+		page(i)->install_read_handler(base + 0x3fe0, base + 0x3fef, read8smo_delegate(*this, FUNC(fd03_device::status_r)));
+		page(i)->install_read_handler(base + 0x3ff0, base + 0x3fff, read8smo_delegate(*this, FUNC(fd03_device::dskchg_r)));
 		page(i)->install_write_handler(base + 0x3fc0, base + 0x3fc0, 0, 0x001c, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
 		page(i)->install_write_handler(base + 0x3fc1, base + 0x3fc1, 0, 0x001c, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
 		page(i)->install_write_handler(base + 0x3fc2, base + 0x3fc2, 0, 0x001c, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
 		page(i)->install_write_handler(base + 0x3fc3, base + 0x3fc3, 0, 0x001c, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-		page(i)->install_write_handler(base + 0x3fe0, base + 0x3fef, write8smo_delegate(*this, FUNC(msx_cart_fd03_device::set_control)));
-		page(i)->install_write_handler(base + 0x3ff0, base + 0x3fff, write8smo_delegate(*this, FUNC(msx_cart_fd03_device::dskchg_w)));
+		page(i)->install_write_handler(base + 0x3fe0, base + 0x3fef, write8smo_delegate(*this, FUNC(fd03_device::set_control)));
+		page(i)->install_write_handler(base + 0x3ff0, base + 0x3fff, write8smo_delegate(*this, FUNC(fd03_device::dskchg_w)));
 	}
 }
 
-void msx_cart_fd03_device::device_post_load()
+void fd03_device::device_post_load()
 {
 	set_control(m_control);
 }
 
-void msx_cart_fd03_device::set_control(u8 data)
+void fd03_device::set_control(u8 data)
 {
 	u8 old_m_control = m_control;
 
@@ -953,7 +959,7 @@ void msx_cart_fd03_device::set_control(u8 data)
 	}
 }
 
-u8 msx_cart_fd03_device::status_r()
+u8 fd03_device::status_r()
 {
 	// bit 0 - drive 0 ready / has media
 	// bit 1 - drive 1 ready / has media
@@ -972,7 +978,7 @@ u8 msx_cart_fd03_device::status_r()
 	return result | (m_fdc->intrq_r() ? 0x80 : 0) | (m_fdc->drq_r() ? 0x40 : 0);
 }
 
-u8 msx_cart_fd03_device::dskchg_r()
+u8 fd03_device::dskchg_r()
 {
 	if (m_floppy1)
 		m_floppy1->get_device()->dskchg_w(0);
@@ -980,7 +986,7 @@ u8 msx_cart_fd03_device::dskchg_r()
 	return 0xff;
 }
 
-void msx_cart_fd03_device::dskchg_w(u8 data)
+void fd03_device::dskchg_w(u8 data)
 {
 	if (m_floppy0)
 		m_floppy0->get_device()->dskchg_w(0);
@@ -988,11 +994,11 @@ void msx_cart_fd03_device::dskchg_w(u8 data)
 
 
 
-class msx_cart_hxf101pe_device : public msx_cart_disk_wd_device
+class hxf101pe_device : public disk_wd_device
 {
 public:
-	msx_cart_hxf101pe_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_wd_device(mconfig, MSX_CART_HXF101PE, tag, owner, clock, PAGE1, PAGE1)
+	hxf101pe_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_wd_device(mconfig, MSX_CART_HXF101PE, tag, owner, clock, PAGE1, PAGE1)
 		, m_side_motor(0)
 		, m_drive_select0(0)
 		, m_drive_select1(0)
@@ -1021,46 +1027,46 @@ protected:
 	u8 m_drive_select1;
 };
 
-void msx_cart_hxf101pe_device::device_add_mconfig(machine_config &config)
+void hxf101pe_device::device_add_mconfig(machine_config &config)
 {
 	add_mconfig<F35, SS>(config, WD2793);
 }
 
-void msx_cart_hxf101pe_device::device_start()
+void hxf101pe_device::device_start()
 {
 	save_item(NAME(m_side_motor));
 	save_item(NAME(m_drive_select0));
 	save_item(NAME(m_drive_select1));
 }
 
-void msx_cart_hxf101pe_device::initialize_cartridge()
+void hxf101pe_device::initialize_cartridge()
 {
-	msx_cart_disk_wd_device::initialize_cartridge();
+	disk_wd_device::initialize_cartridge();
 
 	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
 	page(1)->install_read_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(1)->install_read_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(1)->install_read_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
 	page(1)->install_read_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(1)->install_read_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_cart_hxf101pe_device::side_motor_r)));
-	page(1)->install_read_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_cart_hxf101pe_device::select0_r)));
-	page(1)->install_read_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_cart_hxf101pe_device::select1_r)));
-	page(1)->install_read_handler(0x7ff7, 0x7ff7, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_cart_hxf101pe_device::status_r)));
+	page(1)->install_read_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(hxf101pe_device::side_motor_r)));
+	page(1)->install_read_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(hxf101pe_device::select0_r)));
+	page(1)->install_read_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(hxf101pe_device::select1_r)));
+	page(1)->install_read_handler(0x7ff7, 0x7ff7, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(hxf101pe_device::status_r)));
 	page(1)->install_write_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
 	page(1)->install_write_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
 	page(1)->install_write_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
 	page(1)->install_write_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(1)->install_write_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_cart_hxf101pe_device::side_motor_w)));
-	page(1)->install_write_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_cart_hxf101pe_device::select0_w)));
-	page(1)->install_write_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_cart_hxf101pe_device::select1_w)));
+	page(1)->install_write_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(hxf101pe_device::side_motor_w)));
+	page(1)->install_write_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(hxf101pe_device::select0_w)));
+	page(1)->install_write_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(hxf101pe_device::select1_w)));
 }
 
-void msx_cart_hxf101pe_device::device_post_load()
+void hxf101pe_device::device_post_load()
 {
 	select_drive();
 }
 
-void msx_cart_hxf101pe_device::select_drive()
+void hxf101pe_device::select_drive()
 {
 	if (m_drive_select1)
 	{
@@ -1081,7 +1087,7 @@ void msx_cart_hxf101pe_device::select_drive()
 	set_side_motor();
 }
 
-void msx_cart_hxf101pe_device::set_side_motor()
+void hxf101pe_device::set_side_motor()
 {
 	if (m_floppy)
 	{
@@ -1090,31 +1096,31 @@ void msx_cart_hxf101pe_device::set_side_motor()
 	}
 }
 
-u8 msx_cart_hxf101pe_device::side_motor_r()
+u8 hxf101pe_device::side_motor_r()
 {
 	// bit 0 = side control
 	// bit 1 = motor control
 	return 0xfc | m_side_motor;
 }
 
-u8 msx_cart_hxf101pe_device::select0_r()
+u8 hxf101pe_device::select0_r()
 {
 	// This reads back a 1 in bit 0 if drive0 is present and selected
 	return 0xfe | m_drive_select0;
 }
 
-u8 msx_cart_hxf101pe_device::select1_r()
+u8 hxf101pe_device::select1_r()
 {
 	// This reads back a 1 in bit 0 if drive1 is present and selected
 	return 0xfe | m_drive_select1;
 }
 
-u8 msx_cart_hxf101pe_device::status_r()
+u8 hxf101pe_device::status_r()
 {
 	return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
 }
 
-void msx_cart_hxf101pe_device::side_motor_w(u8 data)
+void hxf101pe_device::side_motor_w(u8 data)
 {
 	// Side and motor control
 	// bit 0 = side select
@@ -1123,14 +1129,14 @@ void msx_cart_hxf101pe_device::side_motor_w(u8 data)
 	set_side_motor();
 }
 
-void msx_cart_hxf101pe_device::select0_w(u8 data)
+void hxf101pe_device::select0_w(u8 data)
 {
 	// bit 0 - select drive 0
 	m_drive_select0 = data;
 	select_drive();
 }
 
-void msx_cart_hxf101pe_device::select1_w(u8 data)
+void hxf101pe_device::select1_w(u8 data)
 {
 	// bit 1 - select drive 1
 	m_drive_select1 = data;
@@ -1139,11 +1145,11 @@ void msx_cart_hxf101pe_device::select1_w(u8 data)
 
 
 
-class msx_cart_mfd001_device : public msx_cart_disk_wd_device
+class mfd001_device : public disk_wd_device
 {
 public:
-	msx_cart_mfd001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_wd_device(mconfig, MSX_CART_MFD001, tag, owner, clock)
+	mfd001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_wd_device(mconfig, MSX_CART_MFD001, tag, owner, clock)
 		, m_control(0)
 	{ }
 
@@ -1163,14 +1169,14 @@ protected:
 	u8 m_control;
 };
 
-void msx_cart_mfd001_device::device_add_mconfig(machine_config &config)
+void mfd001_device::device_add_mconfig(machine_config &config)
 {
 	add_mconfig<F525, DS>(config, MB8877);
 }
 
-void msx_cart_mfd001_device::initialize_cartridge()
+void mfd001_device::initialize_cartridge()
 {
-	msx_cart_disk_wd_device::initialize_cartridge();
+	disk_wd_device::initialize_cartridge();
 
 	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
@@ -1180,26 +1186,26 @@ void msx_cart_mfd001_device::initialize_cartridge()
 		page(i)->install_read_handler(base + 0x3ff9, base + 0x3ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 		page(i)->install_read_handler(base + 0x3ffa, base + 0x3ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
 		page(i)->install_read_handler(base + 0x3ffb, base + 0x3ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-		page(i)->install_read_handler(base + 0x3ffc, base + 0x3ffc, read8smo_delegate(*this, FUNC(msx_cart_mfd001_device::status_r)));
+		page(i)->install_read_handler(base + 0x3ffc, base + 0x3ffc, read8smo_delegate(*this, FUNC(mfd001_device::status_r)));
 		page(i)->install_write_handler(base + 0x3ff8, base + 0x3ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
 		page(i)->install_write_handler(base + 0x3ff9, base + 0x3ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
 		page(i)->install_write_handler(base + 0x3ffa, base + 0x3ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
 		page(i)->install_write_handler(base + 0x3ffb, base + 0x3ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-		page(i)->install_write_handler(base + 0x3ffc, base + 0x3ffc, write8smo_delegate(*this, FUNC(msx_cart_mfd001_device::control_w)));
+		page(i)->install_write_handler(base + 0x3ffc, base + 0x3ffc, write8smo_delegate(*this, FUNC(mfd001_device::control_w)));
 	}
 }
 
-void msx_cart_mfd001_device::device_start()
+void mfd001_device::device_start()
 {
 	save_item(NAME(m_control));
 }
 
-void msx_cart_mfd001_device::device_post_load()
+void mfd001_device::device_post_load()
 {
 	select_drive();
 }
 
-void msx_cart_mfd001_device::select_drive()
+void mfd001_device::select_drive()
 {
 	if (BIT(m_control, 0))
 	{
@@ -1220,12 +1226,12 @@ void msx_cart_mfd001_device::select_drive()
 	}
 }
 
-u8 msx_cart_mfd001_device::status_r()
+u8 mfd001_device::status_r()
 {
 	return 0x3f | (m_fdc->intrq_r() ? 0x80 : 0) | (m_fdc->drq_r() ? 0x40 : 0);
 }
 
-void msx_cart_mfd001_device::control_w(u8 data)
+void mfd001_device::control_w(u8 data)
 {
 	// Drive, side and motor control
 	// bit 0 = select drive 0
@@ -1237,11 +1243,11 @@ void msx_cart_mfd001_device::control_w(u8 data)
 }
 
 
-class msx_cart_avdpf550_device : public msx_cart_disk_wd_device
+class avdpf550_device : public disk_wd_device
 {
 public:
-	msx_cart_avdpf550_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_disk_wd_device(mconfig, MSX_CART_AVDPF550, tag, owner, clock)
+	avdpf550_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: disk_wd_device(mconfig, MSX_CART_AVDPF550, tag, owner, clock)
 		, m_control(0)
 	{ }
 
@@ -1259,20 +1265,20 @@ protected:
 	u8 m_control;
 };
 
-void msx_cart_avdpf550_device::device_add_mconfig(machine_config &config)
+void avdpf550_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 8_MHz_XTAL);
 	add_floppy_mconfig<F525, SS>(config);
 }
 
-void msx_cart_avdpf550_device::device_start()
+void avdpf550_device::device_start()
 {
 	save_item(NAME(m_control));
 }
 
-void msx_cart_avdpf550_device::initialize_cartridge()
+void avdpf550_device::initialize_cartridge()
 {
-	msx_cart_disk_wd_device::initialize_cartridge();
+	disk_wd_device::initialize_cartridge();
 
 	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
 
@@ -1281,20 +1287,20 @@ void msx_cart_avdpf550_device::initialize_cartridge()
 	io_space().install_write_handler(0xd1, 0xd1, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
 	io_space().install_write_handler(0xd2, 0xd2, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
 	io_space().install_write_handler(0xd3, 0xd3, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	io_space().install_write_handler(0xd5, 0xd5, write8smo_delegate(*this, FUNC(msx_cart_avdpf550_device::control_w)));
+	io_space().install_write_handler(0xd5, 0xd5, write8smo_delegate(*this, FUNC(avdpf550_device::control_w)));
 	io_space().install_read_handler(0xd0, 0xd0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	io_space().install_read_handler(0xd1, 0xd1, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	io_space().install_read_handler(0xd2, 0xd2, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
 	io_space().install_read_handler(0xd3, 0xd3, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	io_space().install_read_handler(0xd4, 0xd4, read8smo_delegate(*this, FUNC(msx_cart_avdpf550_device::status_r)));
+	io_space().install_read_handler(0xd4, 0xd4, read8smo_delegate(*this, FUNC(avdpf550_device::status_r)));
 }
 
-void msx_cart_avdpf550_device::device_post_load()
+void avdpf550_device::device_post_load()
 {
 	control_w(m_control);
 }
 
-void msx_cart_avdpf550_device::control_w(u8 control)
+void avdpf550_device::control_w(u8 control)
 {
 	m_control = control;
 
@@ -1322,27 +1328,29 @@ void msx_cart_avdpf550_device::control_w(u8 control)
 	m_fdc->set_floppy(m_floppy);
 }
 
-u8 msx_cart_avdpf550_device::status_r()
+u8 avdpf550_device::status_r()
 {
 	return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
 }
 
+} // anonymous namespace
 
-DEFINE_DEVICE_TYPE(MSX_CART_AVDPF550, msx_cart_avdpf550_device, "msx_cart_avdpf550", "MSX Cartridge - AVT DPF-550")
-DEFINE_DEVICE_TYPE(MSX_CART_CDX2,     msx_cart_cdx2_device,     "msx_cart_cdx2",     "MSX Cartridge - CDX-2")
-DEFINE_DEVICE_TYPE(MSX_CART_DDX3,     msx_cart_ddx3_device,     "msx_cart_ddx3",     "MSX Cartridge - DDX3.0")
-DEFINE_DEVICE_TYPE(MSX_CART_FD03,     msx_cart_fd03_device,     "msx_cart_fd03",     "MSX Cartridge - FD-03")
-DEFINE_DEVICE_TYPE(MSX_CART_FD051,    msx_cart_fd051_device,    "msx_cart_fd051",    "MSX Cartridge - FD-051")
-DEFINE_DEVICE_TYPE(MSX_CART_FSFD1,    msx_cart_fsfd1_device,    "msx_cart_fsfd1",    "MSX Cartridge - FS-FD1")
-DEFINE_DEVICE_TYPE(MSX_CART_FSFD1A,   msx_cart_fsfd1a_device,   "msx_cart_fsfd1a",   "MSX Cartridge - FS-FD1A")
-DEFINE_DEVICE_TYPE(MSX_CART_FSCF351,  msx_cart_fscf351_device,  "msx_cart_fscf351",  "MSX Cartridge - FS-CF351")
-DEFINE_DEVICE_TYPE(MSX_CART_HB3600,   msx_cart_hb3600_device,   "msx_cart_hb3600",   "MSX Cartridge - HB-3600")
-DEFINE_DEVICE_TYPE(MSX_CART_HBD20W,   msx_cart_hbd20w_device,   "msx_cart_hbd20w",   "MSX Cartridge - HBD-20W")
-DEFINE_DEVICE_TYPE(MSX_CART_HBD50,    msx_cart_hbd50_device,    "msx_cart_hbd50",    "MSX Cartridge - HBD-50")
-DEFINE_DEVICE_TYPE(MSX_CART_HBDF1,    msx_cart_hbdf1_device,    "msx_cart_hbdf1",    "MSX Cartridge - HBD-F1")
-DEFINE_DEVICE_TYPE(MSX_CART_HXF101PE, msx_cart_hxf101pe_device, "msx_cart_hxf101pe", "MSX Cartridge - HX-F101PE")
-DEFINE_DEVICE_TYPE(MSX_CART_MFD001,   msx_cart_mfd001_device,   "msx_cart_mfd001",   "MSX Cartridge - MFD-001")
-DEFINE_DEVICE_TYPE(MSX_CART_ML30DC,   msx_cart_ml30dc_device,   "msx_cart_ml30dc",   "MSX Cartridge - ML-30DC")
-DEFINE_DEVICE_TYPE(MSX_CART_NMS1200,  msx_cart_nms1200_device,  "msx_cart_nms1200",  "MSX Cartridge - NMS-1200")
-DEFINE_DEVICE_TYPE(MSX_CART_TADPF550, msx_cart_tadpf550_device, "msx_cart_tadpf550", "MSX Cartridge - Talent DPF-550")
-DEFINE_DEVICE_TYPE(MSX_CART_VY0010,   msx_cart_vy0010_device,   "msx_cart_vy0010",   "MSX Cartridge - VY0010")
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_AVDPF550, msx_cart_interface, avdpf550_device, "msx_cart_avdpf550", "MSX Cartridge - AVT DPF-550")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_CDX2,     msx_cart_interface, cdx2_device,     "msx_cart_cdx2",     "MSX Cartridge - CDX-2")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_DDX3,     msx_cart_interface, ddx3_device,     "msx_cart_ddx3",     "MSX Cartridge - DDX3.0")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_FD03,     msx_cart_interface, fd03_device,     "msx_cart_fd03",     "MSX Cartridge - FD-03")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_FD051,    msx_cart_interface, fd051_device,    "msx_cart_fd051",    "MSX Cartridge - FD-051")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_FSFD1,    msx_cart_interface, fsfd1_device,    "msx_cart_fsfd1",    "MSX Cartridge - FS-FD1")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_FSFD1A,   msx_cart_interface, fsfd1a_device,   "msx_cart_fsfd1a",   "MSX Cartridge - FS-FD1A")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_FSCF351,  msx_cart_interface, fscf351_device,  "msx_cart_fscf351",  "MSX Cartridge - FS-CF351")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_HB3600,   msx_cart_interface, hb3600_device,   "msx_cart_hb3600",   "MSX Cartridge - HB-3600")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_HBD20W,   msx_cart_interface, hbd20w_device,   "msx_cart_hbd20w",   "MSX Cartridge - HBD-20W")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_HBD50,    msx_cart_interface, hbd50_device,    "msx_cart_hbd50",    "MSX Cartridge - HBD-50")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_HBDF1,    msx_cart_interface, hbdf1_device,    "msx_cart_hbdf1",    "MSX Cartridge - HBD-F1")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_HXF101PE, msx_cart_interface, hxf101pe_device, "msx_cart_hxf101pe", "MSX Cartridge - HX-F101PE")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_MFD001,   msx_cart_interface, mfd001_device,   "msx_cart_mfd001",   "MSX Cartridge - MFD-001")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_ML30DC,   msx_cart_interface, ml30dc_device,   "msx_cart_ml30dc",   "MSX Cartridge - ML-30DC")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_NMS1200,  msx_cart_interface, nms1200_device,  "msx_cart_nms1200",  "MSX Cartridge - NMS-1200")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_TADPF550, msx_cart_interface, tadpf550_device, "msx_cart_tadpf550", "MSX Cartridge - Talent DPF-550")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_VY0010,   msx_cart_interface, vy0010_device,   "msx_cart_vy0010",   "MSX Cartridge - VY0010")

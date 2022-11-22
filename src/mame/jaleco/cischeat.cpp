@@ -3954,4 +3954,3 @@ GAME(  1993, captflag,  0,        captflag, captflag, captflag_state,  init_capt
 
 GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state,  empty_init,    ROT270, "Jaleco", "Scud Hammer (ver 1.4)",                  MACHINE_IMPERFECT_GRAPHICS ) // version on program ROMS' labels
 GAME(  1994, scudhamma, scudhamm, scudhamm, scudhamma,cischeat_state,  empty_init,    ROT270, "Jaleco", "Scud Hammer (older version?)",           MACHINE_IMPERFECT_GRAPHICS ) // maybe older cause it has one less dip listed?
-

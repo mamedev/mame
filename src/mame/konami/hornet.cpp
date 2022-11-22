@@ -349,6 +349,11 @@ Jumpers set on GFX PCB to scope monitor:
 */
 
 #include "emu.h"
+
+#include "k037122.h"
+#include "konami_gn676_lan.h"
+#include "konppc.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
@@ -358,15 +363,13 @@ Jumpers set on GFX PCB to scope monitor:
 #include "machine/jvsdev.h"
 #include "machine/jvshost.h"
 #include "machine/k033906.h"
-#include "machine/x76f041.h"
-#include "konami_gn676_lan.h"
-#include "konppc.h"
 #include "machine/timekpr.h"
 #include "machine/watchdog.h"
+#include "machine/x76f041.h"
 #include "sound/k056800.h"
 #include "sound/rf5c400.h"
-#include "k037122.h"
 #include "video/voodoo_2.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -437,8 +440,8 @@ namespace {
 class hornet_state : public driver_device
 {
 public:
-	hornet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hornet_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
 		m_maincpu(*this, "maincpu"),
@@ -654,14 +657,19 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x02 = ADDI (ADC DI)
 			    0x01 = ADDSCLK (ADC SCLK)
 			*/
-			if (m_x76f041) {
+			if (m_x76f041)
+			{
 				// HACK: Figure out a way a better way to differentiate between what device it wants to talk to here.
-				// I haven't seen a combination of both x76 + adc usage in the available Hornet library so this hack works but there may be a proper way differentiate the two.
-				// Not emulating the x76 results in NBA Play By Play becoming regionless/bugged, and not emulating the adc results in Silent Scope boot looping.
+				// I haven't seen a combination of both x76 + adc usage in the available Hornet library so this hack
+				// works but there may be a proper way differentiate the two.
+				// Not emulating the x76 results in NBA Play By Play becoming regionless/bugged, and not emulating the
+				// ADC results in Silent Scope boot looping.
 				m_x76f041->write_rst(BIT(data, 2));
 				m_x76f041->write_sda(BIT(data, 1));
 				m_x76f041->write_scl(BIT(data, 0));
-			} else {
+			}
+			else
+			{
 				m_adc12138->cs_w(BIT(data, 3));
 				m_adc12138->conv_w(BIT(data, 2));
 				m_adc12138->di_w(BIT(data, 1));
@@ -1252,9 +1260,7 @@ void hornet_state::hornet(machine_config &config)
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HORNET);
 
 	HORNET_JVS_HOST(config, m_hornet_jvs_host, 0);
-	m_hornet_jvs_host->output_callback().set([this](uint8_t c) {
-		m_maincpu->ppc4xx_spu_receive_byte(c);
-	});
+	m_hornet_jvs_host->output_callback().set([this](uint8_t c) { m_maincpu->ppc4xx_spu_receive_byte(c); });
 }
 
 void hornet_state::hornet_x76(machine_config &config)

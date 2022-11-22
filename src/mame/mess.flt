@@ -512,7 +512,6 @@ motorola/mvme162.cpp
 motorola/powerstack.cpp
 motorola/sys1121.cpp
 motorola/uchroma68.cpp
-msx/msx.cpp
 msx/msx1.cpp
 msx/msx1_bruc100.cpp
 msx/msx1_v9938.cpp
