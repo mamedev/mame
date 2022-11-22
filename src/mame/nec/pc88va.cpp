@@ -11,36 +11,30 @@
     Special thanks to Fujix for his documentation translation help
 
     TODO:
-    - video emulation is bare bones;
-    - keyboard irq (mightmg2, hold F8 service mode menu, presumably rogueall)
+    - pc88va (stock version) has two bogus opcodes. 
+      One is at 0xf0b15 (0x0f 0xfe), another at 0xf0b31 (br 1000h:0c003h).
+      Latter will make the program flow to jump to lalaland.
+    - video emulation is lacking many features, cfr. pc88va_v.cpp;
+    - keyboard runs on undumped MCU, we currently stick irqs together on
+      selected keys in order to have an easier QoL on testing this.
     - Backport from PC-8801 main map, apply supersets where applicable;
       \- IDP has EMUL for upd3301
       \- In emulation mode HW still relies to a i8214, so it bridges thru
          main ICU in cascaded mode via IRQ7;
       \- (other stuff ...)
-    - sorcer: disables FDC DMA mode, expects to continue loading thru PC80S31K PIO;
-    - abunaten, cresmoon, rance2, pacman: flips FDC DS1 then changes FDD#0 track density to 96 TPI,
-      gets stuck to infinite reti loop and jumps to EMM area;
-    - pacmana: crashes after or during PC Engine OS POST, plays again with FDC settings;
-    - rance: as above, triggers SETALC in V50;
-    - upo: fails vblank on/off logic bit;
-    - olteus: sometimes fails disk swap with an (A)bort (R)etry (F)ail;
-    - famista: throws an "abnormal disk" error when left on title screen for a while;
-    - hatisora: throws an (A)bort (R)etry (F)ail (hidden behind current video brokenness);
+    - FDC very unstable, may really always need a PIO comms therefore needs
+      converting to a subclass of PC80S31K (also necessary for sorcer anyway);
+    - irq dispatch also needs to be revisited, too many instances of sound irq
+      failing for example;
+    - all N88 BASIC entries tries to do stuff with EMM, banking bug?
     - Convert SASI from PC-9801 to a shared device, apparently it's same i/f;
     - Implement bus slot, which should still be PC-8801 EXPansion bus.
 
     (old notes, to be reordered)
     - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
       hooked up by the current z80 core
-    - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.
-      Making a patch for the latter makes the system to jump into a "DIP-Switch" display.
-      bp f0b31,pc=0xf0b36,g
-      Update: it never reaches latter with V30->V50 CPU switch fix;
     - Fix floppy motor hook-up (floppy believes to be always in even if empty drive);
     - Support for PC8801 compatible mode & PC80S31K (floppy interface);
-    - What exact kind of garbage happens if you try to enable both direct and palette color
-      modes to a graphic layer?
 
 ===================================================================================================
 
@@ -79,7 +73,7 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 #include "utf8.h"
 
 #define LOG_FDC     (1U << 2) // $1b0-$1b2 accesses
-#define LOG_FDC2    (1U << 3) // $1b4-$1b6 accesses
+#define LOG_FDC2    (1U << 3) // $1b4-$1b6 accesses (verbose)
 
 #define VERBOSE (LOG_GENERAL | LOG_FDC)
 #define LOG_OUTPUT_STREAM std::cout
@@ -848,7 +842,7 @@ static INPUT_PORTS_START( pc88va )
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)                              PORT_CHAR(UCHAR_MAMEKEY(F3))
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)                              PORT_CHAR(UCHAR_MAMEKEY(F4))
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)                              PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)                           PORT_CHAR(' ')
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)                           PORT_CHAR(' ') VA_PORT_SCAN(0x34)
 	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)                             PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
 	PORT_START("KEYA")
@@ -885,7 +879,7 @@ static INPUT_PORTS_START( pc88va )
 	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10) VA_PORT_SCAN(0x6b)
 	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) // Conversion?
 	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) // Decision?
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Space") VA_PORT_SCAN(0x34)
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Space") // ?
 
 	PORT_START("KEYE")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD)
