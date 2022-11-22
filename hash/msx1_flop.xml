@@ -135,18 +135,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="msxdostb">
-		<description>MSX-DOS Tools (Bra, v4.3)</description>
-		<year>1991</year>
-		<publisher>Nemesis Informatica</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="184320">
-				<rom name="msx-dos tools v4.3 (1991)(nemesis informatica)(br).dsk" size="184320" crc="e93070dd" sha1="f78578bf88fa08d0268d7ed2f3cb62406527c500" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="msxdostba" cloneof="msxdostb">
+	<software name="msxdostba">
 		<description>MSX-DOS Tools (Bra, v2.1)</description>
 		<year>1984</year>
 		<publisher>Nemesis Informatica</publisher>
