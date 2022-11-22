@@ -103,7 +103,7 @@
 
 #include "emu.h"
 #include "disk.h"
-#include "bus/msx_cart/cartridge.h"
+#include "bus/msx/cart/cartridge.h"
 #include "formats/dmk_dsk.h"
 #include "formats/msx_dsk.h"
 #include "imagedev/floppy.h"
