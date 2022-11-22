@@ -181,7 +181,7 @@ void pc88va_state::port40_w(offs_t offset, u8 data)
 
 		m_mouse.time = machine().time();
 	}
-	
+
 	m_device_ctrl_data = data;
 }
 
@@ -482,7 +482,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 			// TODO: confirm condition
 			// shanghai and famista (at very least) sends a motor off if left idle for a while,
 			// then any attempt to load/save will fail because there's no explicit motor on
-			// written back to $1b4. 
+			// written back to $1b4.
 			// Note that this still isn't enough to avoid floppy errors, but makes failures
 			// to be eventually recoverable for now.
 			if (!m_xtmask && cur_xtmask && ttrg)
@@ -490,7 +490,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 				floppy_image_device *floppy0, *floppy1;
 				floppy0 = m_fdd[0]->get_device();
 				floppy1 = m_fdd[1]->get_device();
-				
+
 				if (floppy0)
 					if (m_fdd[0]->get_device()->mon_r() == 1)
 						m_motor_start_timer[0]->adjust(attotime::from_msec(505));
@@ -843,7 +843,7 @@ static INPUT_PORTS_START( pc88va )
 
 	PORT_START("KEY9")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Stop")                                  PORT_CHAR(UCHAR_MAMEKEY(PAUSE)) VA_PORT_SCAN(0x60)
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)                              PORT_CHAR(UCHAR_MAMEKEY(F1)) 
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)                              PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)                              PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)                              PORT_CHAR(UCHAR_MAMEKEY(F3))
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)                              PORT_CHAR(UCHAR_MAMEKEY(F4))
@@ -956,7 +956,7 @@ static INPUT_PORTS_START( pc88va )
 
 	PORT_START("MOUSEY")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
-	
+
 	PORT_START("BOARD_CONFIG")
 	PORT_CONFNAME( 0x02, 0x00, "Port 1 Connection" )
 	PORT_CONFSETTING(    0x00, "Joystick" )

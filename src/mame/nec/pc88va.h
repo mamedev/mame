@@ -152,7 +152,7 @@ private:
 	#endif
 	uint8_t pc88va_fdc_r(offs_t offset);
 	void pc88va_fdc_w(offs_t offset, uint8_t data);
-	
+
 	uint16_t bios_bank_r();
 	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t rom_bank_r();

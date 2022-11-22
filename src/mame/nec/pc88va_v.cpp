@@ -140,14 +140,14 @@ inline u8 pc88va_state::get_layer_pal_bank(u8 which)
 
 	if (m_pltm == 3)
 		return 0;
-	
+
 	return (m_pltp == which) << 4;
 }
 
 void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint16_t const *const tvram = m_tvram;
-	
+
 	int offs = m_tsp.spr_offset;
 	const u8 layer_pal_bank = get_layer_pal_bank(1);
 
@@ -210,10 +210,10 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						int res_x = xp + x_i + x_s;
 						int res_y = (yp + y_i) << m_tsp.spr_mg;
-						
+
 						if (!cliprect.contains(res_x, res_y))
 							continue;
-						
+
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
 						int pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
 
@@ -365,9 +365,9 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		for(int y = 0; y < vh; y++)
 		{
 			int y_base = y * 16 + ryp - raster_offset;
-			
+
 			// TODO: consult with OG
-			if (!split_cliprect.contains(rxp, y_base) && 
+			if (!split_cliprect.contains(rxp, y_base) &&
 				!split_cliprect.contains(rxp, y_base + 16))
 				continue;
 
@@ -621,7 +621,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 	{
 		uint16_t const *const fb_strip_regs = &fb_regs[(layer_n * 0x20) / 2];
 		const u16 fbw = fb_strip_regs[0x04 / 2] & 0x7fc;
-		
+
 		// assume that a fbw = 0 don't generate a layer at all
 		if (fbw == 0)
 		{
@@ -632,7 +632,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		// on layer = 1 fsa is always 0x20000, cfr. shanghai
 		// (almost likely an HW quirk, described in the docs)
 		// also animefrm swaps this with layer 2 (main canvas)
-		const u32 fsa = (layer_n == layer_fixed) ? 0x20000 
+		const u32 fsa = (layer_n == layer_fixed) ? 0x20000
 			: (fb_strip_regs[0x00 / 2] & 0xfffc) | ((fb_strip_regs[0x02 / 2] & 0x3) << 16) >> 1;
 
 		const u16 fbl = (fb_strip_regs[0x06 / 2] & 0x3ff) + 1;
@@ -683,7 +683,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, layer_pal_bank, fbw, fbl);
 					}
 					else
-						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); 
+						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl);
 					break;
 				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); break;
 			}
@@ -728,8 +728,8 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-//	const u16 y_min = std::max(cliprect.min_y, y_start);
-//	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+//  const u16 y_min = std::max(cliprect.min_y, y_start);
+//  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
 
@@ -757,8 +757,8 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-//	const u16 y_min = std::max(cliprect.min_y, y_start);
-//	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+//  const u16 y_min = std::max(cliprect.min_y, y_start);
+//  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
 
@@ -782,8 +782,8 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-//	const u16 y_min = std::max(cliprect.min_y, y_start);
-//	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+//  const u16 y_min = std::max(cliprect.min_y, y_start);
+//  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -812,8 +812,8 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-//	const u16 y_min = std::max(cliprect.min_y, y_start);
-//	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+//  const u16 y_min = std::max(cliprect.min_y, y_start);
+//  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -840,8 +840,8 @@ void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &c
 {
 	uint8_t *gvram = (uint8_t *)m_gvram.target();
 
-//	const u16 y_min = std::max(cliprect.min_y, y_start);
-//	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+//  const u16 y_min = std::max(cliprect.min_y, y_start);
+//  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -883,7 +883,7 @@ void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &c
 uint8_t pc88va_state::idp_status_r()
 {
 	u8 data = 0;
-	
+
 	data |= (m_screen->vblank()) ? 0x40 : 0x00;
 
 	return data;
@@ -1027,9 +1027,9 @@ void pc88va_state::execute_sync_cmd()
 	LOGCRTC("H sync: %d", h_sync);
 
 	LOGCRTC("\n\t");
-	const u16 h_total = 
+	const u16 h_total =
 		(h_blank_start + h_blank_end + h_border_start + h_border_end + h_sync) * 4 + h_vis_area;
-	
+
 	LOGCRTC("H Total calc = %d", h_total);
 	LOGCRTC("\n\t");
 
@@ -1316,7 +1316,7 @@ void pc88va_state::gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 void pc88va_state::color_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_color_mode);
-	
+
 	const u8 bdm = (m_color_mode & 0x3000) >> 12;
 	m_pltm = (m_color_mode & 0x01c0) >> 6;
 	m_pltp = (m_color_mode & 0x0030) >> 4;
@@ -1346,7 +1346,7 @@ void pc88va_state::color_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	//        0x01 (bank 1)   0x02 graphic 0 (left on for previous 0x02 - 0x02 mode)
 	// illcity, xak2 (pre-loading screens):
 	//        0x00 (bank 0)   0x00 text
-	
+
 }
 
 void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1360,9 +1360,9 @@ void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 	// TODO: docs suggests this arrangement but it's wrong
 	// may be just one bit always on?
-//	b = (m_palram[offset] & 0x001e) >> 1;
-//	r = (m_palram[offset] & 0x03c0) >> 6;
-//	g = (m_palram[offset] & 0x7800) >> 11;
+//  b = (m_palram[offset] & 0x001e) >> 1;
+//  r = (m_palram[offset] & 0x03c0) >> 6;
+//  g = (m_palram[offset] & 0x7800) >> 11;
 
 	m_palette->set_pen_color(offset, r, g, b);
 }
@@ -1375,7 +1375,7 @@ void pc88va_state::video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void pc88va_state::text_transpen_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// TODO: understand what these are for, docs blabbers about text/sprite color separation?
-	//	cfr. rogueall
+	//  cfr. rogueall
 	COMBINE_DATA(&m_text_transpen);
 	if (m_text_transpen & 0xfff0)
 		popmessage("text transpen > 15 (%04x)", m_text_transpen);
