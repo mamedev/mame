@@ -591,6 +591,11 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 	if (which > m_ymmd)
 		return;
 
+	// ditto for 5bpp color mode
+	const bool is_5bpp = m_pltm == 7;
+	if (is_5bpp && which == 1)
+		return;
+
 	uint16_t const *const fb_regs = m_fb_regs;
 
 	const u8 gfx_ctrl = (m_gfx_ctrl_reg >> (which * 8)) & 0x13;
@@ -609,7 +614,10 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 
 	m_graphic_bitmap[which].fill(0, cliprect);
 
-	for (int layer_n = which; layer_n < 4; layer_n += 2)
+	const int layer_inc = (!is_5bpp) + 1;
+	const int layer_fixed = is_5bpp + 1;
+
+	for (int layer_n = which; layer_n < 4; layer_n += layer_inc)
 	{
 		uint16_t const *const fb_strip_regs = &fb_regs[(layer_n * 0x20) / 2];
 		const u16 fbw = fb_strip_regs[0x04 / 2] & 0x7fc;
@@ -622,8 +630,9 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		}
 
 		// on layer = 1 fsa is always 0x20000, cfr. shanghai
-		// (almost likely an HW quirk, it's also in the docs)
-		const u32 fsa = (layer_n == 1) ? 0x20000 
+		// (almost likely an HW quirk, described in the docs)
+		// also animefrm swaps this with layer 2 (main canvas)
+		const u32 fsa = (layer_n == layer_fixed) ? 0x20000 
 			: (fb_strip_regs[0x00 / 2] & 0xfffc) | ((fb_strip_regs[0x02 / 2] & 0x3) << 16) >> 1;
 
 		const u16 fbl = (fb_strip_regs[0x06 / 2] & 0x3ff) + 1;
@@ -649,8 +658,11 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 			, dsp
 		);
 
-		rectangle split_cliprect(cliprect.min_x,  cliprect.max_x, dsp, dsh + dsp - 1);
+		rectangle split_cliprect(cliprect.min_x, cliprect.max_x, dsp, dsh + dsp - 1);
 		split_cliprect &= cliprect;
+		// animefrm uses layer 1 with fbl = 1 for the color cycling bar on top
+		rectangle fb_cliprect(cliprect.min_x, cliprect.min_x + fbw, dsp, dsp + fbl - 1);
+		split_cliprect &= fb_cliprect;
 
 		if (!m_dm)
 		{
@@ -665,14 +677,20 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 			{
 				//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
 				case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, layer_pal_bank, fbw, fbl); break;
-				// TODO: 5bpp, shared with mode 2
-				case 2: draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); break;
+				case 2:
+					if (m_pltm == 7)
+					{
+						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, layer_pal_bank, fbw, fbl);
+					}
+					else
+						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); 
+					break;
 				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); break;
 			}
 		}
 	}
 
-	// TODO: we eventually need primask_copyrozbitmap_trans here, or a custom copy, depending on what the "transpen" registers really does.
+	// TODO: we eventually need primask_copyrozbitmap_trans here, or a custom copy, depending on what the "transpen" registers really do.
 	copyrozbitmap_trans(
 		bitmap, cliprect, m_graphic_bitmap[which],
 		0, 0,
@@ -731,6 +749,31 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 				if(color && cliprect.contains(x + xi, y))
 					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
 			}
+		}
+	}
+}
+
+void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
+{
+	uint8_t *gvram = (uint8_t *)m_gvram.target();
+
+//	const u16 y_min = std::max(cliprect.min_y, y_start);
+//	const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+
+	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u32 line_offset = ((y * fb_width) + fb_start_offset) & 0x3ffff;
+
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			u32 bitmap_offset = line_offset + x;
+
+			u8 color = gvram[bitmap_offset] & 0x1f;
+
+			if(color && cliprect.contains(x, y))
+				bitmap.pix(y, x) = m_palette->pen(color);
 		}
 	}
 }
