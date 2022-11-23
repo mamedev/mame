@@ -3865,7 +3865,7 @@ license:CC0
 		<part name="side_b" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="33664">
-				<rom name="data msx - issue 04 (198x)(geasa)(es)(side b)[load'cas-',r].cas" size="33664" crc="5cf2563d" sha1="87bcb02107962b2a27177bbf1505392395c0822e"/>
+				<rom name="data msx - issue 04 (198x)(geasa)(es)(side b)[load'cas-',r].cas" size="33664" crc="5cf2563d" sha1="64cccaeb325e9e7bff414980ea3c85f4bff70271"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13027,7 +13027,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="20455">
-				<rom name="soccer boss (198x)(alternative software)(gb)[shift][cload].cas" size="20455" crc="055b5d11" sha1="cc3e946976c9ac2b50b9355321edf3d6fdbf42ec"/>
+				<rom name="soccer boss (198x)(alternative software)(gb)[shift][cload].cas" size="20455" crc="055b5d11" sha1="d0f6244f3972970ab09db940f64f0c5911dbdf82"/>
 			</dataarea>
 		</part>
 	</software>
