@@ -665,6 +665,8 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x01c8, 0x01cf).rw("d8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8255 3 (byte access)
 //  map(0x01d0, 0x01d1) Expansion RAM bank selection
 	map(0x0200, 0x027f).ram().share("fb_regs"); // Frame buffer 0-1-2-3 control parameter
+	// TODO: shinraba writes to 0x340-0x37f on transition between opening and title screens
+	// (mirror? bug?)
 	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
 
 //  map(0x0500, 0x05ff) SGP
