@@ -1006,10 +1006,10 @@ static const gfx_layout pc88va_kanji_16x16 =
 
 // debug only
 static GFXDECODE_START( gfx_pc88va )
-	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_8x8,    0, 1 )
-	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 1 )
-	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_8x8,    0, 1 )
-	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_16x16,  0, 1 )
+	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_8x8,    0, 16 )
+	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 16 )
+	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_8x8,    0, 16 )
+	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_16x16,  0, 16 )
 GFXDECODE_END
 
 uint8_t pc88va_state::cpu_8255_c_r()
