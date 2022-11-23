@@ -98,6 +98,8 @@
 
 #include "emu.h"
 
+#include "maria.h"
+
 #include "bus/a7800/a78_carts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/timer.h"
@@ -105,11 +107,12 @@
 #include "sound/tiaintf.h"
 
 #include "emupal.h"
-#include "maria.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
 
 class a7800_state : public driver_device
 {
@@ -1465,6 +1468,8 @@ void a7800_pal_state::init_a7800_pal()
 	m_p1_one_button = 1;
 	m_p2_one_button = 1;
 }
+
+} // anonymous namespace
 
 
 /***************************************************************************
