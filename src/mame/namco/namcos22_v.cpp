@@ -13,7 +13,7 @@
 // poly constructor
 
 namcos22_renderer::namcos22_renderer(namcos22_state &state) :
-	poly_manager<float, namcos22_object_data, 4>(state.machine()),
+	poly_manager<poly3d_t, namcos22_object_data, 4>(state.machine()),
 	m_state(state)
 	{
 		init();
@@ -313,20 +313,20 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			v[vertnum].p[3] = node->data.quad.v[vertnum].bri;
 		}
 
-		clipverts = zclip_if_less<4>(4, v, clipv, 10.0f);
+		clipverts = zclip_if_less<4>(4, v, clipv, 0.00001);
 		assert(clipverts <= std::size(clipv));
 		if (clipverts < 3)
 			return;
 
 		for (vertnum = 0; vertnum < clipverts; vertnum++)
 		{
-			float ooz = 1.0f / clipv[vertnum].p[0];
+			poly3d_t ooz = 1.0 / clipv[vertnum].p[0];
 			clipv[vertnum].x = cx + clipv[vertnum].x * ooz;
 			clipv[vertnum].y = cy - clipv[vertnum].y * ooz;
 			clipv[vertnum].p[0] = ooz;
-			clipv[vertnum].p[1] = (clipv[vertnum].p[1] + 0.5f) * ooz; // u
-			clipv[vertnum].p[2] = (clipv[vertnum].p[2] + 0.5f) * ooz; // v
-			clipv[vertnum].p[3] = (clipv[vertnum].p[3] + 0.5f) * ooz; // bri
+			clipv[vertnum].p[1] = (clipv[vertnum].p[1] + 0.5) * ooz; // u
+			clipv[vertnum].p[2] = (clipv[vertnum].p[2] + 0.5) * ooz; // v
+			clipv[vertnum].p[3] = (clipv[vertnum].p[3] + 0.5) * ooz; // bri
 		}
 	}
 
@@ -336,13 +336,13 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		clipverts = 4;
 		for (vertnum = 0; vertnum < 4; vertnum++)
 		{
-			float ooz = node->data.quad.v[vertnum].z;
+			poly3d_t ooz = node->data.quad.v[vertnum].z;
 			clipv[vertnum].x = cx + node->data.quad.v[vertnum].x;
 			clipv[vertnum].y = cy - node->data.quad.v[vertnum].y;
 			clipv[vertnum].p[0] = ooz;
-			clipv[vertnum].p[1] = (node->data.quad.v[vertnum].u + 0.5f) * ooz;
-			clipv[vertnum].p[2] = (node->data.quad.v[vertnum].v + 0.5f) * ooz;
-			clipv[vertnum].p[3] = (node->data.quad.v[vertnum].bri + 0.5f) * ooz;
+			clipv[vertnum].p[1] = (node->data.quad.v[vertnum].u + 0.5) * ooz;
+			clipv[vertnum].p[2] = (node->data.quad.v[vertnum].v + 0.5) * ooz;
+			clipv[vertnum].p[3] = (node->data.quad.v[vertnum].bri + 0.5) * ooz;
 		}
 	}
 
@@ -475,12 +475,12 @@ void namcos22_renderer::poly3d_drawsprite(
 	int sprite_screen_width = (scalex * gfx->width() + 0x8000) >> 16;
 	if (sprite_screen_width && sprite_screen_height)
 	{
-		float fsx = sx;
-		float fsy = sy;
-		float fwidth = gfx->width();
-		float fheight = gfx->height();
-		float fsw = sprite_screen_width;
-		float fsh = sprite_screen_height;
+		poly3d_t fsx = sx;
+		poly3d_t fsy = sy;
+		poly3d_t fwidth = gfx->width();
+		poly3d_t fheight = gfx->height();
+		poly3d_t fsw = sprite_screen_width;
+		poly3d_t fsh = sprite_screen_height;
 
 		namcos22_object_data &extra = object_data().next();
 		vertex_t vert[4];
@@ -861,32 +861,12 @@ void namcos22_state::draw_direct_poly(const u16 *src)
 			p->v = src[1] & 0x0fff;
 		}
 
-		int mantissa = (s16)src[5];
-		float zf = (float)mantissa;
+		int mantissa = src[5] & 0x7fff;
 		int exponent = (src[4]) & 0x3f;
 		if (mantissa)
-		{
-			while (exponent < 0x2e)
-			{
-				zf /= 2.0f;
-				exponent++;
-			}
-			if (m_is_ss22)
-				p->z = zf;
-			else
-				p->z = 1.0f / zf;
-		}
+			p->z = dspfloat_to_nativefloat(exponent << 16 | mantissa);
 		else
-		{
-			zf = (float)0x10000;
-			exponent = 0x40 - exponent;
-			while (exponent < 0x2e)
-			{
-				zf /= 2.0f;
-				exponent++;
-			}
-			p->z = 1.0f / zf;
-		}
+			p->z = (float)0x7fff;
 
 		p->x = (s16)src[2];
 		p->y = -(s16)src[3];

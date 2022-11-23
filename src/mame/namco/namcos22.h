@@ -25,6 +25,8 @@
 
 class namcos22_state;
 
+// higher precision for internal poly.h
+typedef double poly3d_t;
 
 enum
 {
@@ -144,7 +146,7 @@ struct namcos22_object_data
 };
 
 
-class namcos22_renderer : public poly_manager<float, namcos22_object_data, 4>
+class namcos22_renderer : public poly_manager<poly3d_t, namcos22_object_data, 4>
 {
 public:
 	namcos22_renderer(namcos22_state &state);
