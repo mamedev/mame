@@ -35,8 +35,8 @@ protected:
 };
 
 
-class msx_general_purpose_port_device : public device_t,
-								public device_slot_interface
+class msx_general_purpose_port_device : public device_t
+									, public device_single_card_slot_interface<device_msx_general_purpose_port_interface>
 {
 public:
 	template <typename T>
@@ -69,7 +69,7 @@ public:
 	void pin_7_w(int state) { if (exists()) m_device->pin_7_w(state); }
 	void pin_8_w(int state) { if (exists()) m_device->pin_8_w(state); }
 
-	bool exists() { return m_device != nullptr; }
+	bool exists() const { return m_device != nullptr; }
 
 protected:
 	virtual void device_start() override;

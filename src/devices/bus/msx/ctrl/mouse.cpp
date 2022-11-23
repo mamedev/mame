@@ -56,7 +56,7 @@ void msx_mouse_device::device_reset()
 	m_data = 0;
 	m_stat = 3;
 	m_old_pin8 = 0;
-	m_last_pin8_change = attotime::never;
+	m_last_pin8_change = attotime::zero;
 	m_mouse_x = 0;
 	m_mouse_y = 0;
 }
@@ -71,7 +71,7 @@ void msx_mouse_device::pin_8_w(int state)
 	if (m_old_pin8 != state)
 	{
 		attotime now = machine().scheduler().time();
-		if (m_last_pin8_change == attotime::never || now - m_last_pin8_change > m_timeout)
+		if (now - m_last_pin8_change > m_timeout)
 		{
 			// force restart
 			m_stat = 3;
