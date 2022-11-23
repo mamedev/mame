@@ -84,7 +84,7 @@ void jvs_device::message(uint8_t dest, const uint8_t *send_buffer, uint32_t send
 
 	// Pass along the message if the device hasn't replied
 	// Should we cumulate answers instead?
-	if(next_device && !recv_size)
+	if(next_device && (dest == 0xff || !recv_size))
 		next_device->message(dest, send_buffer, send_size, recv_buffer, recv_size);
 }
 
