@@ -295,11 +295,9 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 	int direct = node->data.quad.direct;
 
 	// scene clip
-	float cx = 320.0f + node->data.quad.vx;
-	float cy = 240.0f + node->data.quad.vy;
-	m_clipx = cx;
-	m_clipy = cy;
-	m_cliprect.set(cx + node->data.quad.vl, cx - node->data.quad.vr, cy + node->data.quad.vu, cy - node->data.quad.vd);
+	int cx = 320 + node->data.quad.vx;
+	int cy = 240 + node->data.quad.vy;
+	m_cliprect.set(cx + node->data.quad.vl, cx - node->data.quad.vr - 1, cy + node->data.quad.vu, cy - node->data.quad.vd - 1);
 	m_cliprect &= screen.visible_area();
 
 	// non-direct case: project and z-clip
@@ -323,8 +321,8 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		for (vertnum = 0; vertnum < clipverts; vertnum++)
 		{
 			float ooz = 1.0f / clipv[vertnum].p[0];
-			clipv[vertnum].x = m_clipx + clipv[vertnum].x * ooz;
-			clipv[vertnum].y = m_clipy - clipv[vertnum].y * ooz;
+			clipv[vertnum].x = cx + clipv[vertnum].x * ooz;
+			clipv[vertnum].y = cy - clipv[vertnum].y * ooz;
 			clipv[vertnum].p[0] = ooz;
 			clipv[vertnum].p[1] = (clipv[vertnum].p[1] + 0.5f) * ooz; // u
 			clipv[vertnum].p[2] = (clipv[vertnum].p[2] + 0.5f) * ooz; // v
@@ -339,8 +337,8 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		for (vertnum = 0; vertnum < 4; vertnum++)
 		{
 			float ooz = node->data.quad.v[vertnum].z;
-			clipv[vertnum].x = m_clipx + node->data.quad.v[vertnum].x;
-			clipv[vertnum].y = m_clipy - node->data.quad.v[vertnum].y;
+			clipv[vertnum].x = cx + node->data.quad.v[vertnum].x;
+			clipv[vertnum].y = cy - node->data.quad.v[vertnum].y;
 			clipv[vertnum].p[0] = ooz;
 			clipv[vertnum].p[1] = (node->data.quad.v[vertnum].u + 0.5f) * ooz;
 			clipv[vertnum].p[2] = (node->data.quad.v[vertnum].v + 0.5f) * ooz;
@@ -940,13 +938,9 @@ void namcos22_state::draw_direct_poly(const u16 *src)
  */
 void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int polyshift, int flags, int packetformat)
 {
-	int zsort;
-	float zmin = 0.0f;
-	float zmax = 0.0f;
 	namcos22_polyvertex v[4];
-	int i;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		namcos22_polyvertex *pv = &v[i];
 		pv->x = point_read(0x8 + i * 3 + addr);
@@ -954,6 +948,19 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 		pv->z = point_read(0xa + i * 3 + addr);
 		transform_point(&pv->x, &pv->y, &pv->z, m);
 	}
+
+	float zmin = 0.0f;
+	float zmax = 0.0f;
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (i == 0 || v[i].z > zmax) zmax = v[i].z;
+		if (i == 0 || v[i].z < zmin) zmin = v[i].z;
+	}
+
+	// fully behind camera
+	if (zmax < 0.0f)
+		return;
 
 	// backface cull one-sided polygons
 	if (flags & 0x0020)
@@ -971,16 +978,62 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 			return;
 	}
 
-	for (i = 0; i < 4; i++)
+	int zsort = 0;
+	if (zmin < 0.0f) zmin = 0.0f;
+
+	switch (flags & 0x300)
 	{
-		namcos22_polyvertex *pv = &v[i];
+		case 0x000:
+			zsort = zmin + 0.5f;
+			break;
+
+		case 0x100:
+			zsort = zmax + 0.5f;
+			break;
+
+		default:
+			zsort = (zmin + zmax) / 2.0f + 0.5f;
+			break;
+	}
+
+	if (zsort > 0x1fffff) zsort = 0x1fffff;
+	int absolute_priority = m_absolute_priority & 7;
+
+	/* relative: representative z + shift values
+	* 1x.xxxx.xxxxxxxx.xxxxxxxx fixed z value
+	* 0x.xx--.--------.-------- absolute priority shift
+	* 0-.--xx.xxxxxxxx.xxxxxxxx z-representative value shift
+	*/
+	if (polyshift & 0x200000)
+		zsort = polyshift & 0x1fffff;
+	else
+	{
+		zsort += signed18(polyshift);
+		absolute_priority += (polyshift & 0x1c0000) >> 18;
+	}
+
+	if (m_objectshift & 0x200000)
+		zsort = m_objectshift & 0x1fffff;
+	else
+	{
+		zsort += signed18(m_objectshift);
+		absolute_priority += (m_objectshift & 0x1c0000) >> 18;
+	}
+
+	zsort = std::clamp(zsort, 0, 0x1fffff);
+	absolute_priority &= 7;
+	zsort |= (absolute_priority << 21);
+
+	zmax = std::clamp(zmax, 0.0f, (float)0x1fffff);
+	int cz_value = zmax + 0.5f; // not from zsort
+
+	// u, v, bri
+	for (int i = 0; i < 4; i++)
+	{
 		int bri;
 
-		pv->u = point_read(0 + i * 2 + addr);
-		pv->v = point_read(1 + i * 2 + addr);
-
-		if (i == 0 || pv->z > zmax) zmax = pv->z;
-		if (i == 0 || pv->z < zmin) zmin = pv->z;
+		v[i].u = point_read(0 + i * 2 + addr);
+		v[i].v = point_read(1 + i * 2 + addr);
 
 		if (m_LitSurfaceCount)
 		{
@@ -1010,55 +1063,8 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 			bri = color >> 16 & 0xff;
 		}
 
-		pv->bri = bri;
+		v[i].bri = bri;
 	}
-
-	zmin = std::clamp(zmin, 0.0f, (float)0x1fffff) + 0.5f;
-	zmax = std::clamp(zmax, 0.0f, (float)0x1fffff) + 0.5f;
-
-	switch (flags & 0x300)
-	{
-		case 0x000:
-			zsort = zmin;
-			break;
-
-		case 0x100:
-			zsort = zmax;
-			break;
-
-		default:
-			zsort = (zmin + zmax) / 2.0f;
-			break;
-	}
-
-	int absolute_priority = m_absolute_priority & 7;
-
-	/* relative: representative z + shift values
-	* 1x.xxxx.xxxxxxxx.xxxxxxxx fixed z value
-	* 0x.xx--.--------.-------- absolute priority shift
-	* 0-.--xx.xxxxxxxx.xxxxxxxx z-representative value shift
-	*/
-	if (polyshift & 0x200000)
-		zsort = polyshift & 0x1fffff;
-	else
-	{
-		zsort += signed18(polyshift);
-		absolute_priority += (polyshift & 0x1c0000) >> 18;
-	}
-
-	if (m_objectshift & 0x200000)
-		zsort = m_objectshift & 0x1fffff;
-	else
-	{
-		zsort += signed18(m_objectshift);
-		absolute_priority += (m_objectshift & 0x1c0000) >> 18;
-	}
-
-	zsort = std::clamp(zsort, 0, 0x1fffff);
-	absolute_priority &= 7;
-	zsort |= (absolute_priority << 21);
-
-	int cz_value = (int)zmax; // not from zsort
 
 	// allocate quad
 	struct namcos22_scenenode *node = m_poly->new_scenenode(machine(), zsort, NAMCOS22_SCENENODE_QUAD);
@@ -1070,7 +1076,7 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 	node->data.quad.cz_adjust = m_cz_adjust;
 	node->data.quad.objectflags = m_objectflags;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		namcos22_polyvertex *p = &node->data.quad.v[i];
 		p->x = v[i].x * m_camera_zoom;
@@ -1286,23 +1292,23 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	m_camera_vx = signed12(src[0x5] >> 16);
 	m_camera_vy = signed12(src[0x5] & 0xffff);
 	m_camera_zoom = dspfloat_to_nativefloat(src[0x6]);
-	m_camera_vr = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
-	m_camera_vl = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
-	m_camera_vu = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom + 0.5f;
-	m_camera_vd = dspfloat_to_nativefloat(src[0xa]) * m_camera_zoom + 0.5f;
+	m_camera_vr = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom - 0.5f;
+	m_camera_vl = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom - 0.5f;
+	m_camera_vu = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom - 0.5f;
+	m_camera_vd = dspfloat_to_nativefloat(src[0xa]) * m_camera_zoom - 0.5f;
 
 	m_reflection = src[0x2] >> 16 & 0x30; // z too?
 	m_cullflip = (m_reflection == 0x10 || m_reflection == 0x20);
 
 	if (m_reflection & 0x10)
 	{
-		float vl = m_camera_vl;
+		int vl = m_camera_vl;
 		m_camera_vl = m_camera_vr;
 		m_camera_vr = vl;
 	}
 	if (m_reflection & 0x20)
 	{
-		float vu = m_camera_vu;
+		int vu = m_camera_vu;
 		m_camera_vu = m_camera_vd;
 		m_camera_vd = vu;
 	}

@@ -23,10 +23,10 @@ TODO:
   to HLE I/O board emulation?
 - where is the steering wheel motor torque output for dirtdash? Answer: The data comes from the Serial Port on
   the MOTHER PCB at J2 Pin 7 /TXD
-- texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
-  it used to be much worse with the legacy_poly_manager
 - tokyowar garbage tile at right edge in attract mode. It's part of the cabinet link message, maybe BTANB?
-- global offset is wrong in non-super22 testmode video test, and above that, it flickers in acedrive, victlap
+- texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
+- global offset is wrong in non-super22 testmode video test
+- acedrive/victlap testmode video test flickers
 - ss22 testmode video test screen#04 translucent polygon should be higher priority than sprite
 - ss22 testmode video test screen#13 geometry should not be lopsided (uses draw_direct_poly)
 - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
@@ -37,7 +37,7 @@ TODO:
   + timecris stage 1-2 start, beam appears through platform
   + timecris stage 2-1 final section, steel beam appears through plank
   + cybrcycc speed dial should be more to the left
-  + plenty more, but need clearly visible cases with PCB evidence
+  + most of it is zsort related, there's plenty more, but need clearly visible cases with PCB evidence
 - improve ss22 lighting:
   + acedrive/victlap sparks
   + adillor title logo
@@ -2990,10 +2990,10 @@ static INPUT_PORTS_START( ridgera )
 	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x280, 0xd80) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
 	PORT_START("ADC.1") // 1552
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Gas Pedal")
 
 	PORT_START("ADC.2") // 1552
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Brake Pedal")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Brake Pedal")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW2:1")
@@ -3151,7 +3151,7 @@ static INPUT_PORTS_START( acedrive )
 	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x200, 0xe00) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
 	PORT_START("ADC.1") // 1152
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x480) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x480) PORT_SENSITIVITY(100) PORT_KEYDELTA(120) PORT_NAME("Gas Pedal")
 
 	PORT_START("ADC.2") // 576
 	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x240) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Brake Pedal")
