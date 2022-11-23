@@ -1315,6 +1315,7 @@ sigma/sigmab52.cpp
 sigma/sigmab98.cpp
 sigma/spiders.cpp
 sigma/sub.cpp
+skeleton/elcirculo.cpp
 snk/bbusters.cpp
 snk/dmndrby.cpp
 snk/hng64.cpp
