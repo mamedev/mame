@@ -1096,6 +1096,7 @@ trainer/savia84.cpp
 trainer/selz80.cpp
 trainer/tk80.cpp
 trainer/zapcomputer.cpp
+trs/agvision.cpp
 trs/coco12.cpp
 trs/coco3.cpp
 trs/dgn_beta.cpp
