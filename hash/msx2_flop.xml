@@ -1850,7 +1850,7 @@ The following floppies came with the machines.
 				<rom name="cosmos club (1989)(jast)(jp)(disk 1 of 2).dsk" size="737280" crc="78f7fe09" sha1="4e245bb052eb67a377cef2f12b3e7fe41da48c50"/>
 			</dataarea>
 		</part>
-			<part name="flop2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="cosmos club (1989)(jast)(jp)(disk 2 of 2).dsk" size="737280" crc="09f0abfe" sha1="3cc9b2ffc84abd4c54a2b88fe64f7c0fd6440bf2"/>
 			</dataarea>
@@ -2113,6 +2113,7 @@ The following floppies came with the machines.
 		<description>Daiva Story V - The Cup of Soma (Japan)</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="alt_title" value="ディーヴァ ストーリー5·ソーマの杯" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daiva story 5 - the cup of soma (1987)(t&amp;e soft)(jp).dsk" size="737280" crc="c55c9b66" sha1="c68acf155b1245dd341641fb0ebcfcd90a3cf16c"/>
@@ -2124,6 +2125,7 @@ The following floppies came with the machines.
 		<description>Daiva Story V - The Cup of Soma (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="alt_title" value="ディーヴァ ストーリー5·ソーマの杯" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daiva story 5 - the cup of soma (1987)(t&amp;e soft)(jp)[a].dsk" size="737280" crc="458c3e5a" sha1="bc4cfc1872463fdf5d1c273bc2234f552705cc0c"/>
@@ -2135,6 +2137,7 @@ The following floppies came with the machines.
 		<description>Daiva Story V - The Cup of Soma (Japan, alt 2)</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="alt_title" value="ディーヴァ ストーリー5·ソーマの杯" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daiva story 5 - the cup of soma (1987)(t&amp;e soft)(jp)[a2].dsk" size="737280" crc="ea46013d" sha1="41137570dce216a7c136f532c2aab3fe5526b795"/>
@@ -3902,28 +3905,6 @@ The following floppies came with the machines.
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dragon quiz (1991)(compile)(jp)(disk 2 of 2)[a].dsk" size="737280" crc="1da7bdae" sha1="bc1e5d2575920350fdf20512ec7d640ebbd5fbcd"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dslayer4">
-		<description>Dragon Slayer IV - Drasle Family (Japan)</description>
-		<year>1987</year>
-		<publisher>Falcom</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="368640">
-				<rom name="dragon slayer 4 - drasle family (1987)(falcom)(jp).dsk" size="368640" crc="c02d493a" sha1="c98bbe6e898b0af672596e1f52f92cad642cefae"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dslayer4a" cloneof="dslayer4">
-		<description>Dragon Slayer IV - Drasle Family (Japan, alt)</description>
-		<year>1987</year>
-		<publisher>Falcom</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="dragon slayer 4 - drasle family (1987)(falcom)(jp)[a].dsk" size="737280" crc="feabb87b" sha1="fd2011711641bde43bd17416c4103430dc7d79c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14973,7 +14954,7 @@ HOMEBREW
 	</software>
 
 	<software name="nvmg0207">
-		<description>NV Magazine 2002-07 (Japan, Incomplete Dump)</description>
+		<description>NV Magazine 2002-07 (Japan, incomplete dump)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Syntax" />
@@ -15077,7 +15058,7 @@ HOMEBREW
 		<info name="developer" value="Anma" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="pentaro odyssey  - the revenge.dsk" size="737280" crc="c9513751" sha1="a463eaec03210f8cce72df597f7513f1c59f610f"/>
+				<rom name="pentaro odyssey - the revenge.dsk" size="737280" crc="c9513751" sha1="a463eaec03210f8cce72df597f7513f1c59f610f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16839,8 +16820,6 @@ DISKMAG
 
 -->
 
-
-
 	<software name="1942">
 		<description>1942 (Japan)</description>
 		<year>19??</year>
@@ -17277,6 +17256,28 @@ DISKMAG
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="contra. gryzor (1989)(konami)(jp)[a2].dsk" size="737280" crc="ac22c7b7" sha1="6fa567e8a03d0f86ce21a9ee2d4d2a3152339c4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dslayer4">
+		<description>Dragon Slayer IV - Drasle Family (Japan)</description>
+		<year>19??</year>
+		<publisher>&lt;cart2disk hack&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="dragon slayer 4 - drasle family (1987)(falcom)(jp).dsk" size="368640" crc="c02d493a" sha1="c98bbe6e898b0af672596e1f52f92cad642cefae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dslayer4a" cloneof="dslayer4">
+		<description>Dragon Slayer IV - Drasle Family (Japan, alt)</description>
+		<year>19??</year>
+		<publisher>&lt;cart2disk hack&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dragon slayer 4 - drasle family (1987)(falcom)(jp)[a].dsk" size="737280" crc="feabb87b" sha1="fd2011711641bde43bd17416c4103430dc7d79c0"/>
 			</dataarea>
 		</part>
 	</software>
