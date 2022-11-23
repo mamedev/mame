@@ -1243,6 +1243,7 @@ sega/segasm1.cpp
 sega/segasp.cpp
 sega/segattl.cpp
 sega/segaufo.cpp
+sega/segaufoh8.cpp
 sega/segaxbd.cpp
 sega/segaybd.cpp
 sega/sg1000a.cpp

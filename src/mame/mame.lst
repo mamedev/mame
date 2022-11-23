@@ -38647,6 +38647,9 @@ ufo21                           //
 ufo800                          //
 ufomini                         //
 
+@source:sega/segaufoh8.cpp
+ufo7                            //
+
 @source:sega/segaxbd.cpp
 abcop                           // 1990.?? A.B.Cop (World, FD1094)
 abcopd                          //
