@@ -18,9 +18,15 @@
 #include "sound/c352.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
+class namcos22_state;
+
+// higher precision for internal poly.h
+typedef double poly3d_t;
 
 enum
 {
@@ -43,14 +49,6 @@ enum
 	NAMCOS22_ARMADILLO_RACING
 };
 
-
-struct namcos22_polyvertex
-{
-	float x, y, z;
-	int u, v; /* 0..0xfff */
-	int bri;  /* 0..0xff */
-};
-
 enum namcos22_scenenode_type
 {
 	NAMCOS22_SCENENODE_NONLEAF,
@@ -61,6 +59,14 @@ enum namcos22_scenenode_type
 #define NAMCOS22_RADIX_BITS 4
 #define NAMCOS22_RADIX_BUCKETS (1 << NAMCOS22_RADIX_BITS)
 #define NAMCOS22_RADIX_MASK (NAMCOS22_RADIX_BUCKETS - 1)
+
+
+struct namcos22_polyvertex
+{
+	float x, y, z;
+	int u, v; // 0..0xfff
+	int bri;  // 0..0xff
+};
 
 struct namcos22_scenenode
 {
@@ -75,13 +81,15 @@ struct namcos22_scenenode
 
 		struct
 		{
-			float vx, vy;
-			float vu, vd, vl, vr;
+			int vx, vy;
+			int vu, vd, vl, vr;
 			int texturebank;
 			int color;
 			int cmode;
-			int flags;
+			int cz_value;
+			int cz_type;
 			int cz_adjust;
+			int objectflags;
 			int direct;
 			namcos22_polyvertex v[4];
 		} quad;
@@ -90,7 +98,7 @@ struct namcos22_scenenode
 		{
 			int tile, color;
 			int prioverchar;
-			int fade_enabled;
+			bool fade_enabled;
 			int flipx, flipy;
 			int linktype;
 			int cols, rows;
@@ -98,7 +106,7 @@ struct namcos22_scenenode
 			int cx_min, cx_max;
 			int cy_min, cy_max;
 			int sizex, sizey;
-			int translucency;
+			int alpha;
 			int cz;
 		} sprite;
 	} data;
@@ -107,37 +115,38 @@ struct namcos22_scenenode
 
 struct namcos22_object_data
 {
-	/* poly / sprites */
+	// poly / sprites
 	rgbaint_t fogcolor;
-	rgbaint_t fadecolor;
-	rgbaint_t polycolor;
 	const pen_t *pens;
 	bitmap_rgb32 *destbase;
 	bitmap_ind8 *primap;
 	int bn;
-	int flags;
 	int prioverchar;
 	int cmode;
-	int fadefactor;
-	int pfade_enabled;
+	bool shade_enabled;
+	bool texture_enabled;
 	int fogfactor;
-	int zfog_enabled;
-	int cz_adjust;
+
+	// ss22
+	rgbaint_t polycolor;
+	rgbaint_t fadecolor;
+	int fadefactor;
+	bool pfade_enabled;
+	bool zfog_enabled;
 	int cz_sdelta;
 	const u8 *czram;
-
-	/* sprites */
-	const u8 *source;
+	bool alpha_enabled;
 	int alpha;
+
+	// sprites
+	const u8 *source;
 	int line_modulo;
 	int flipx;
 	int flipy;
 };
 
 
-class namcos22_state;
-
-class namcos22_renderer : public poly_manager<float, namcos22_object_data, 4>
+class namcos22_renderer : public poly_manager<poly3d_t, namcos22_object_data, 4>
 {
 public:
 	namcos22_renderer(namcos22_state &state);
@@ -153,23 +162,21 @@ private:
 	struct namcos22_scenenode m_scenenode_root;
 	struct namcos22_scenenode *m_scenenode_cur;
 	std::list<namcos22_scenenode> m_scenenode_alloc;
-
-	float m_clipx = 0.0;
-	float m_clipy = 0.0;
 	rectangle m_cliprect;
 
-	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
-	inline u16 nthword(const u32 *src, int n) { return (src[n / 2] << ((n & 1) * 16)) >> 16; }
+	static u8 nthbyte(const u32 *src, int n) { return util::big_endian_cast<u8>(src)[n]; }
+	static u16 nthword(const u32 *src, int n) { return util::big_endian_cast<u16>(src)[n]; }
 
 	void render_scene_nodes(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
 	void render_sprite(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
 	void poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
-	void poly3d_drawsprite(screen_device &screen, bitmap_rgb32 &dest_bmp, u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int cz_factor, int prioverchar, int fade_enabled, int alpha);
+	void poly3d_drawsprite(screen_device &screen, bitmap_rgb32 &dest_bmp, u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int cz_factor, int prioverchar, bool fade_enabled, int alpha);
 
 	void free_scenenode(struct namcos22_scenenode *node);
 	struct namcos22_scenenode *alloc_scenenode(running_machine &machine, struct namcos22_scenenode *node);
 
-	void renderscanline_uvi_full(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
+	void renderscanline_poly(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
+	void renderscanline_poly_ss22(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 	void renderscanline_sprite(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 };
 
@@ -224,15 +231,14 @@ public:
 	void cybrcomm(machine_config &config);
 	void namcos22(machine_config &config);
 
-	void init_acedrvr();
-	void init_raveracw();
-	void init_ridger2j();
+	void init_acedrive();
+	void init_raverace();
+	void init_ridgera2();
 	void init_victlap();
 	void init_cybrcomm();
-	void init_ridgeraj();
+	void init_ridgerac();
 
 	// renderer
-	int m_poly_translucency;
 	u16 *m_texture_tilemap;
 	std::unique_ptr<u8[]> m_texture_tileattr;
 	u8 *m_texture_tiledata;
@@ -243,10 +249,13 @@ public:
 	int m_screen_fade_r;
 	int m_screen_fade_g;
 	int m_screen_fade_b;
-	int m_poly_fade_enabled;
+	bool m_poly_fade_enabled;
 	int m_poly_fade_r;
 	int m_poly_fade_g;
 	int m_poly_fade_b;
+	int m_poly_alpha_color;
+	int m_poly_alpha_pen;
+	int m_poly_alpha_factor;
 	u32 m_fog_colormask;
 	int m_fog_r;
 	int m_fog_g;
@@ -323,14 +332,15 @@ protected:
 	u16 mcuc74_speedup_r();
 	void mcu_speedup_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
-	inline u16 nthword(const u32 *src, int n) { return (src[n / 2] << ((n & 1) * 16)) >> 16; }
+	static u8 nthbyte(const u32 *src, int n) { return util::big_endian_cast<u8>(src)[n]; }
+	static u16 nthword(const u32 *src, int n) { return util::big_endian_cast<u16>(src)[n]; }
 
-	inline s32 signed18(s32 val) { return (val & 0x00020000) ? (s32)(val | 0xfffc0000) : val & 0x0001ffff; }
-	inline s32 signed24(s32 val) { return (val & 0x00800000) ? (s32)(val | 0xff000000) : val & 0x007fffff; }
+	static constexpr s32 signed12(s32 val) { return util::sext(val, 12); }
+	static constexpr s32 signed18(s32 val) { return util::sext(val, 18); }
+	static constexpr s32 signed24(s32 val) { return util::sext(val, 24); }
 
-	inline float dspfixed_to_nativefloat(s16 val) { return val / (float)0x7fff; }
-	float dspfloat_to_nativefloat(u32 val);
+	static constexpr float dspfixed_to_nativefloat(s16 val) { return val / (float)0x7fff; }
+	static float dspfloat_to_nativefloat(u32 val);
 
 	void handle_driving_io();
 	void handle_coinage(u16 flags);
@@ -386,6 +396,8 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	virtual void draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void update_text_rowscroll();
+	void apply_text_scroll();
 	u32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(namcos22_interrupt);
 	INTERRUPT_GEN_MEMBER(dsp_vblank_irq);
@@ -452,6 +464,7 @@ protected:
 	u16 m_keycus_rng = 0;
 	int m_gametype = 0;
 	int m_cz_adjust = 0;
+	int m_objectflags = 0;
 	std::unique_ptr<namcos22_renderer> m_poly;
 	u16 m_dspram_bank = 0;
 	u16 m_dspram16_latch = 0;
@@ -469,20 +482,23 @@ protected:
 	std::unique_ptr<s32[]> m_pointrom;
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
+
 	tilemap_t *m_bgtilemap;
 	u16 m_tilemapattr[8] = { };
-
+	u16 m_rowscroll[480] = { };
+	u16 m_lastrow = 0;
+	u64 m_rs_frame = 0;
 	int m_spot_factor = 0;
 	int m_text_palbase = 0;
 	int m_bg_palbase = 0;
 
+	int m_camera_vx = 0;
+	int m_camera_vy = 0;
+	int m_camera_vu = 0;
+	int m_camera_vd = 0;
+	int m_camera_vl = 0;
+	int m_camera_vr = 0;
 	float m_camera_zoom = 0.0f;
-	float m_camera_vx = 0.0f;
-	float m_camera_vy = 0.0f;
-	float m_camera_vu = 0.0f;
-	float m_camera_vd = 0.0f;
-	float m_camera_vl = 0.0f;
-	float m_camera_vr = 0.0f;
 	float m_camera_lx = 0.0f; // unit vector for light direction
 	float m_camera_ly = 0.0f; // "
 	float m_camera_lz = 0.0f; // "
@@ -494,7 +510,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	bool m_pdp_render_done = false;
 	bool m_render_refresh = false;
-	uint64_t m_pdp_frame = 0;
+	u64 m_pdp_frame = 0;
 	u16 m_pdp_base = 0;
 };
 
@@ -502,37 +518,20 @@ class namcos22s_state : public namcos22_state
 {
 public:
 	namcos22s_state(const machine_config &mconfig, device_type type, const char *tag) :
-		namcos22_state(mconfig, type, tag),
-		m_motor_timer(*this, "motor_timer"),
-		m_pc_pedal_interrupt(*this, "pc_p_int"),
-		m_ar_tb_interrupt(*this, "ar_tb_int%u", 0)
+		namcos22_state(mconfig, type, tag)
 	{ }
 
 	void namcos22s(machine_config &config);
-	void propcycl(machine_config &config);
 	void dirtdash(machine_config &config);
 	void airco22b(machine_config &config);
 	void cybrcycc(machine_config &config);
 	void tokyowar(machine_config &config);
-	void alpine(machine_config &config);
-	void alpinesa(machine_config &config);
-	void adillor(machine_config &config);
-	void timecris(machine_config &config);
 
 	void init_aquajet();
-	void init_adillor();
-	void init_cybrcyc();
-	void init_timecris();
+	void init_cybrcycc();
 	void init_tokyowar();
-	void init_propcycl();
-	void init_propcyclj();
-	void init_alpiner2();
 	void init_dirtdash();
 	void init_airco22();
-	void init_alpiner();
-	void init_alpinesa();
-
-	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
 
 protected:
 	virtual void machine_start() override;
@@ -540,7 +539,6 @@ protected:
 	virtual void init_tables() override;
 	virtual void draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-private:
 	void install_130_speedup();
 	void install_141_speedup();
 
@@ -557,9 +555,6 @@ private:
 	u16 spotram_r(offs_t offset);
 	void spotram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	u32 alpinesa_prot_r();
-	void alpinesa_prot_w(u32 data);
-	u16 timecris_gun_r(offs_t offset);
 	void mb87078_gain_changed(offs_t offset, u8 data);
 	void namcos22s_chipselect_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -570,26 +565,14 @@ private:
 	void mcu_port6_w(u8 data);
 	u8 mcu_port6_r();
 	template <int Channel> u16 mcu_adc_r();
-	void alpine_mcu_port4_w(u8 data);
 	u16 mcu130_speedup_r();
 	u16 mcu141_speedup_r();
 
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_update);
-	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_update);
-	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
 
-	void alpinesa_am(address_map &map);
 	void mcu_program(address_map &map);
 	void namcos22s_am(address_map &map);
-	void timecris_am(address_map &map);
-
-	optional_device<timer_device> m_motor_timer;
-	optional_device<timer_device> m_pc_pedal_interrupt;
-	optional_device_array<timer_device, 2> m_ar_tb_interrupt;
 
 	int m_spotram_enable = 0;
 	int m_spotram_address = 0;
@@ -597,11 +580,104 @@ private:
 	std::unique_ptr<u16[]> m_banked_czram[4];
 	u32 m_cz_was_written[4];
 
-	u32 m_alpinesa_protection = 0;
-	int m_motor_status = 0;
 	u8 m_mcu_iocontrol = 0;
 	u8 m_mcu_outdata = 0;
 	int m_chipselect = 0;
+};
+
+class alpine_state : public namcos22s_state
+{
+public:
+	alpine_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos22s_state(mconfig, type, tag),
+		m_motor_timer(*this, "motor_timer")
+	{ }
+
+	void alpine(machine_config &config);
+	void init_alpiner();
+	void init_alpiner2();
+
+	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
+
+protected:
+	required_device<timer_device> m_motor_timer;
+
+	virtual void machine_start() override;
+
+	void alpine_mcu_port4_w(u8 data);
+	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
+
+	int m_motor_status = 2;
+};
+
+class alpines_state : public alpine_state
+{
+public:
+	alpines_state(const machine_config &mconfig, device_type type, const char *tag) :
+		alpine_state(mconfig, type, tag),
+		m_rombank(*this, "rombank")
+	{ }
+
+	void alpines(machine_config &config);
+	void init_alpines();
+
+private:
+	required_memory_bank m_rombank;
+
+	void rombank_w(u32 data);
+	void alpines_am(address_map &map);
+};
+
+class timecris_state : public namcos22s_state
+{
+public:
+	timecris_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos22s_state(mconfig, type, tag)
+	{ }
+
+	void timecris(machine_config &config);
+	void init_timecris();
+
+private:
+	u16 gun_r(offs_t offset);
+	void timecris_am(address_map &map);
+};
+
+class propcycl_state : public namcos22s_state
+{
+public:
+	propcycl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos22s_state(mconfig, type, tag),
+		m_pedal_interrupt(*this, "pedal_int")
+	{ }
+
+	void propcycl(machine_config &config);
+	void init_propcycl();
+	void init_propcyclj();
+
+private:
+	required_device<timer_device> m_pedal_interrupt;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(pedal_update);
+	TIMER_DEVICE_CALLBACK_MEMBER(pedal_interrupt);
+};
+
+class adillor_state : public namcos22s_state
+{
+public:
+	adillor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos22s_state(mconfig, type, tag),
+		m_trackball_interrupt(*this, "trackball_int%u", 0)
+	{ }
+
+	void adillor(machine_config &config);
+	void init_adillor();
+
+private:
+	required_device_array<timer_device, 2> m_trackball_interrupt;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(trackball_update);
+	TIMER_DEVICE_CALLBACK_MEMBER(trackball_interrupt);
 };
 
 #endif // MAME_INCLUDES_NAMCOS22_H

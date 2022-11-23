@@ -35,7 +35,6 @@ license:CC0
     Programando mi MSX - Issue 02 (Spa)
     Programando mi MSX - Issue 04 (Spa)
     Programando mi MSX - Issue 05 (Spa)
-    Soft-MSX - Issue 01 (Spa)
     Software Cometa - Issue 0 (Spa)
     Super Cassette (Ned)
     Super MSX - Issue 21 (Ita)
@@ -882,21 +881,91 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="apring2">
-		<description>Aprendiendo Ingles 2 - Bernard goes to Mars (Spa)</description>
+	<software name="aprsol">
+		<description>Aprende astronomía con El Sol (Spain)</description>
+		<year>1986</year>
+		<publisher>Grupo de Trabajo Software</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="24704">
+				<rom name="aprende astronomia con el sol (198x)(grupo de trabajo software)(es)[cload].cas" size="24704" crc="349496cb" sha1="20d2b118b426ce692668bd8e0423f4922b5d87ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aprluna">
+		<description>Aprende astronomía con la Luna (Spain)</description>
+		<year>1986</year>
+		<publisher>Grupo de Trabajo Software</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="26750">
+				<rom name="aprende astronomia con la luna (198x)(grupo de trabajo software)(es)[cload].cas" size="26750" crc="166a19a1" sha1="ff1508ac5abb70a27ea8f2d04976bdf0729d2047"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aprtier">
+		<description>Aprende astronomía con la Tierra en el espacio (Spain)</description>
+		<year>1986</year>
+		<publisher>Grupo de Trabajo Software</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="26946">
+				<rom name="aprende astronomia con la tierra en el espacio (198x)(grupo de trabajo software)(es)[cload].cas" size="26946" crc="7817a83b" sha1="e0f45ede31ec19c4069fa032907c007baf5fe243"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aprplan">
+		<description>Aprende astronomía con los planetas (Spain)</description>
+		<year>1986</year>
+		<publisher>Grupo de Trabajo Software</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="26799">
+				<rom name="aprende astronomia con los planetas (198x)(grupo de trabajo software)(es)[position tape + cload + run].cas" size="26799" crc="9afd19b7" sha1="73317f30a1948b84b008eca16105279519bbd42e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dump is incomplete: Tape 2, en el castillo, is missing. -->
+	<software name="apring1" supported="partial">
+		<description>Aprendiendo Inglés 1 - en el campo y en el castillo (Spain)</description>
 		<year>1985</year>
 		<publisher>Sony Spain</publisher>
+		<info name="alt_title" value="Bernardino in the country; Bernardino in the castle"/>
+		<info name="serial" value="HBS-IE205"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="18571">
+				<rom name="aprendiendo ingles 1. bernardino in the country (1984)(sony spain)(es)(en)(tape 1)[hbs-ie205][run'cas-'].cas" size="18571" crc="14a8cb81" sha1="20e25761d9f5947f783058e5d16ae60f734b6062"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apring2">
+		<description>Aprendiendo Inglés 2 - en la ciudad y en Marte (Spain)</description>
+		<year>1985</year>
+		<publisher>Sony Spain</publisher>
+		<info name="alt_title" value="Bernardino in the city; Bernardino goes to Mars"/> <!-- Mars is written as Marte on the cover. -->
 		<info name="serial" value="HBS-IE206"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Tape 1 - HBS-IE206-1 - Bernardino in the city"/>
 			<dataarea name="cass" size="17055">
 				<rom name="aprendiendo ingles 2. bernard goes to mars (1985)(sony spain)(es)(en)(side a)[hbs-ie206][run'cas-'][martos].cas" size="17055" crc="dece53b5" sha1="bc07580b6d925a8e32e9ff51bd74623d583544dd"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="msx_cass">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Tape 2 - HBS-IE206-2 - Bernardino goes to mars"/>
 			<dataarea name="cass" size="21527">
 				<rom name="aprendiendo ingles 2. bernard goes to mars (1985)(sony spain)(es)(en)(side b)[hbs-ie206][run'cas-'][martos].cas" size="21527" crc="b4625ce6" sha1="b61f741ac4e44a2b679564fb55581044511cabfc"/>
 			</dataarea>
@@ -3087,6 +3156,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="cocos">
+		<description>Cocos (Spain)</description>
+		<year>1984</year>
+		<publisher>Advance</publisher>
+		<info name="serial" value="MS-02"/>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="4589">
+				<rom name="cocos (19xx)(advance)(es)[cload].cas" size="4589" crc="0a01fcd9" sha1="744b4e85da152f026a009d380885eeae8c843644"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="coliseum">
 		<description>Coliseum (Spa)</description>
 		<year>1988</year>
@@ -3335,14 +3418,14 @@ license:CC0
 	</software>
 
 	<software name="contab2">
-		<description>Contabilidad 2 (Spa)</description>
+		<description>Contabilidad 2 (Spain)</description>
 		<year>1988</year>
 		<publisher>Mind Games España</publisher>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
 		<part name="cass1" interface="msx_cass">
-			<dataarea name="cass" size="20233">
-				<rom name="contabilidad 2 (1988)(mind games)(es)[cload][martos].cas" size="20233" crc="2562a234" sha1="077d92640fa165ed1c27d92774b7857d5da95ec5"/>
+			<dataarea name="cass" size="20234">
+				<rom name="contabilidad 2 (1988)(mind games espana)(es)[cload + run].cas" size="20234" crc="f3c006ac" sha1="27090489b2bedf1c59ae0d6b0c7a6e0623916b55"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3360,6 +3443,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="contab2b" cloneof="contab2">
+		<description>Contabilidad 2 (Spain, alt 2)</description>
+		<year>1988</year>
+		<publisher>Mind Games España</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="20233">
+				<rom name="contabilidad 2 (1988)(mind games)(es)[cload][martos].cas" size="20233" crc="2562a234" sha1="077d92640fa165ed1c27d92774b7857d5da95ec5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="contabdm">
 		<description>Contabilidad Domestica (Spa)</description>
 		<year>1985</year>
@@ -3369,6 +3465,21 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="18972">
 				<rom name="contabilidad domestica (1985)(dimensionnew)(es)[run'cas-'].cas" size="18972" crc="9515ccbf" sha1="90098e24c9e45a7e9f3ab78e76d5df19531b2d33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="contabpr">
+		<description>Contabilidad Personal (Spain)</description>
+		<year>1984</year>
+		<publisher>Sony Spain</publisher>
+		<info name="alt_title" value="Contabilidad General" />
+		<info name="serial" value="HBS-IG102"/>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="26480">
+				<rom name="contabilidad personal (1984)(sony spain)(es)[cload + run].cas" size="26480" crc="a08a13b4" sha1="ab8de8dc5ee9f26fc5ff6331061ab954ad1b7a71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3722,6 +3833,52 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="18024">
 				<rom name="darts (1987)(blue ribbon software)(gb)[run'cas-'][martos].cas" size="18024" crc="0c0f96df" sha1="e21cf2b0cf297a1585b643d7c0f5c28fa5c0d0e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datmsx01">
+		<description>Data MSX - Issue 01 (Spain)</description>
+		<year>198?</year>
+		<publisher>GEASA</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="27733">
+				<rom name="data msx - issue 01 (19xx)(geasa)(es).cas" size="27733" crc="15e1063c" sha1="d07f101c7aee8c5b4b313ddcf315cdcc8b50c2cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datmsx04">
+		<description>Data MSX - Issue 04 (Spain)</description>
+		<year>198?</year>
+		<publisher>GEASA</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="33664">
+				<rom name="data msx - issue 04 (198x)(geasa)(es)(side a)[load'cas-',r].cas" size="33664" crc="14c5e45b" sha1="565e37807aa2dda649ac2a732d0f832662799c5d"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="33664">
+				<rom name="data msx - issue 04 (198x)(geasa)(es)(side b)[load'cas-',r].cas" size="33664" crc="5cf2563d" sha1="87bcb02107962b2a27177bbf1505392395c0822e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datmsx09">
+		<description>Data MSX - Issue 09 (Spain)</description>
+		<year>198?</year>
+		<publisher>GEASA</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="32293">
+				<rom name="data msx vol. 9 (19xx)(geasa)(es).cas" size="32293" crc="72bcd9e5" sha1="87bcb02107962b2a27177bbf1505392395c0822e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4194,6 +4351,21 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="8534">
 				<rom name="dog fighter (1986)(sony)(jp)[hbj-g020t][bload'cas-',r].cas" size="8534" crc="5b1a6ee2" sha1="3cebeff3e3a3b04d5db7146af822458e3b1f09e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dogfights" cloneof="dogfight">
+		<description>Dog Fighter (Spain)</description>
+		<year>1985</year>
+		<publisher>Canon / Microbyte</publisher>
+		<info name="alt_title" value="Zero fighter (Box)" />
+		<info name="serial" value="VS-200"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="8534">
+				<rom name=" zero fighter - dog fighter (1985)(microbyte)(es)[bload'cas-',r].cas" size="8534" crc="94a480e2" sha1="da0f4e2660ca03e3403e7d22945ea9bae89ab571"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5177,6 +5349,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="floppypr">
+		<description>Floppy el Pregunton (Spain)</description>
+		<year>1986</year>
+		<publisher>Manhattan Transfer</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="37120">
+				<rom name="floppy el pregunton (19xx)(manhattan transfer)(es)[run'cas-'].cas" size="37120" crc="6613138d" sha1="a1cfa7d846e78f39f212d274fccafdb7debd9aaf"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="footvoll">
 		<description>Foot Volley</description>
 		<year>1986</year>
@@ -5268,6 +5453,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="frankie">
+		<description>Frankie (Spain)</description>
+		<year>1988</year>
+		<publisher>System 4</publisher>
+		<info name="serial" value="6 STY 271"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="55226">
+				<rom name="frankie (1988)(system 4)(es)[run'cas-'].cas" size="55226" crc="d53362ac" sha1="105b4e7b62b4c856e08ab81be59d6d89794dfe6f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fredhard">
 		<description>Freddy Hardest (Spa)</description>
 		<year>1987</year>
@@ -5324,6 +5523,27 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="52687">
 				<rom name="freddy hardest (1987)(dinamic software)(es)(side b)[a2][run'cas-'].cas" size="52687" crc="bf444fdb" sha1="18ea5a2a1a1dbd8722dc9cb59b57cadbacfce8ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fredhardc" cloneof="fredhard">
+		<description>Freddy Hardest (UK, Italy)</description>
+		<year>1987</year>
+		<publisher>Alternative Software</publisher>
+		<info name="serial" value="AS711"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="53007">
+				<rom name="(freddy hardest (19xx)(alternative software)(gb)(side a)[run'cas-'].cas" size="53007" crc="b8623ea9" sha1="29e30ae30787b8d605d106adc948ebbf96576cf2"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="52687">
+				<rom name="freddy hardest (19xx)(alternative software)(gb)(side b)[run'cas-'][pwd 897653].cas" size="52687" crc="20bb3f5e" sha1="896ea94e93dfe7222fe5307c0ba8fb5809923f9e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5646,6 +5866,19 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="92410">
 				<rom name="gemini wing (1989)(virgin mastertronic)(gb)(side b)[run'cas-'].cas" size="92410" crc="ea2dbf6c" sha1="7f3b82dcc83b086b32b20972712adfa1ee534f3d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genspr">
+		<description>Generador de Sprites (Spain)</description>
+		<year>1984</year>
+		<publisher>Adcance</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="3359">
+				<rom name="generador de sprites (1984)(advance)(es)[cload].cas" size="3359" crc="9ca70ba2" sha1="fc73018d9ebf03fcac9e786c6d305773940f91c5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7521,6 +7754,40 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Tape 3 is either a baddump or we cannot load it -->
+	<software name="jueintel" supported="partial">
+		<description>Juegos de Inteligencia (Spain)</description>
+		<year>1985</year>
+		<publisher>Advance</publisher>
+		<info name="serial" value="MS-19"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
+
+		<part name="cass1" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 - Parejas"/>
+			<dataarea name="cass" size="9742">
+				<rom name="juegos de inteligencia - parejas (1985)(advance)(es)(tape 1 of 4)[bload'cas-',r].cas" size="9742" crc="8c7aa589" sha1="a25e128a59cf54b1e95309139976ae203b700f76"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 - Radar"/>
+			<dataarea name="cass" size="4156">
+				<rom name="juegos de inteligencia - radar (1985)(advance)(es)(tape 2 of 4)[bload'cas-',r].cas" size="4156" crc="3fc055e2" sha1="bc8dd99d7d5b49219198fd9b2533268ed1c260bb"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="msx_cass">
+			<feature name="part_id" value="Tape 3 - Rompecabezas"/>
+			<dataarea name="cass" size="4065">
+				<rom name="juegos de inteligencia - rompecabezas (1985)(advance)(es)(tape 3 of 4)[bload'cas-',r].cas)" size="4065" crc="6814f9d5" sha1="b4b644aa8f2ab591c906f30d7469913c5a14cda4"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="msx_cass">
+			<feature name="part_id" value="Tape 4 - Simon"/>
+			<dataarea name="cass" size="5834">
+				<rom name="juegos de inteligencia - simon (1985)(advance)(es)(tape 4 of 4)[bload'cas-',r].cas" size="5834" crc="104dd227" sha1="82c22581dd5230c584ec100c7fae388cef856e80"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jumpjack">
 		<description>Jumping Jack (Euro)</description>
 		<year>1986</year>
@@ -8214,6 +8481,40 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lengegb7">
+		<description>Lenguaje 7° E.G.B. (Spain)</description>
+		<year>1985</year>
+		<publisher>Santillana</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass" interface="msx_cass">
+			<dataarea name="cass" size="22553">
+				<rom name="lenguaje 7 egb (19xx)(santillana)(es)[cload].cas" size="22553" crc="34cb2785" sha1="69b5d78839c59e4f3ab3ad53aaf5b673a639053a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lengegb8">
+		<description>Lenguaje 8° E.G.B. (Spain)</description>
+		<year>1985</year>
+		<publisher>Santillana</publisher>
+		<info name="serial" value="CJ17"/>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="45712">
+				<rom name="lenguaje 8 egb (19xx)(santillana)(es)(side a)[cload].cas" size="45712" crc="2814b715" sha1="a6bac8858a3723a9c930469f3445614110e82a05"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="44554">
+				<rom name="lenguaje 8 egb (19xx)(santillana)(es)(side b)[cload].cas" size="44554" crc="c8990505" sha1="f24542808c790f712cdcb58f3503d9f83ae2000a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="licantro">
 		<description>Licantropo (Spa)</description>
 		<year>1986</year>
@@ -8236,6 +8537,19 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="53218">
 				<rom name="007 - licence to kill (1989)(domark)(gb)[run'cas-'].cas" size="53218" crc="bb994bbc" sha1="f6b7be4407690989681eeb99492a732c6b8b2fc5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liebre">
+		<description>La Liebre y la Tortuga (Spain)</description>
+		<year>1985</year>
+		<publisher>Advance</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="5229">
+				<rom name="liebre y la tortuga, la (1985)(advance)(es)[bload'cas-',r].cas" size="5229" crc="2b2214ce" sha1="43b3057d5dcc47a2f13ed4feeff37df74f990b0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8392,6 +8706,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="m47">
+		<description>M-47 Combate de blindados (Spain)</description>
+		<year>1986</year>
+		<publisher>Edisoft</publisher>
+		<info name="usage" value="Detach floppy drives. Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="14808">
+				<rom name="m-47 combate de blindados (1986)(edisoft)(es)[shift][run'cas-'].cas" size="14808" crc="c9700f67" sha1="ddb57998c6786ae30c8764773f4bb09634434213"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mdroid">
 		<description>M-Droid (Euro)</description>
 		<year>198?</year>
@@ -8479,6 +8806,19 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="34616">
 				<rom name="macross countdown (19xx)(eaglesoft)[run'cas-',r][martos].cas" size="34616" crc="8043613b" sha1="cc77d7aac598ee3cec49a440520d5de7ca8caf13"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madfox">
+		<description>Mad-Fox (Spain)</description>
+		<year>1986</year>
+		<publisher>Manhattan Transfer</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="26791">
+				<rom name="mad-fox (1986)(manhattan transfer)(es)[cload].cas" size="26791" crc="2e4bd736" sha1="8ef9d43a311abebdb0dda23efd0103bc88e9694b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9580,6 +9920,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="musjueg1">
+		<description>Música en Juego I - Notas (Spain)</description>
+		<year>1986</year>
+		<publisher>Sony Spain</publisher>
+		<info name="serial" value="HBS-DAI04"/>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="23491">
+				<rom name="musica en juego - notas (1986)(sony)(es)[cload].cas" size="23491" crc="7c0d2121" sha1="1e991995e8fb2fbf83dd7dcc4b1b031ec1c1ae35"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="musjueg2">
 		<description>Musica en Juego II - Figuras (Spa)</description>
 		<year>1986</year>
@@ -10388,6 +10742,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="panickon">
+		<description>Panic Kong (Spain)</description>
+		<year>1986</year>
+		<publisher>Soft Machine</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="19000">
+				<rom name="panic kong (1986)(soft machine)(es)[load'cas-',r].cas" size="19000" crc="44061958" sha1="e41d4aec1f21205852817655982ebd1f3de7b750"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="panique">
 		<description>Panique (Euro)</description>
 		<year>1986</year>
@@ -10565,6 +10932,20 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Appeared as listing in Login Soft issue 4 -->
+	<software name="perspect" cloneof="ship">
+		<description>Perspective (Japan, v1.1)</description>
+		<year>1987</year>
+		<publisher>Login Soft</publisher>
+		<info name="usage" value="Load with CLOAD and RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="23590">
+				<rom name="perspective v1.1 (1987)(login 04)(jp)(en)[f title fukenko][tetsuma yoshida][cload].cas" size="23590" crc="70160bfa" sha1="a31c9e346c2fe8f6d8d84cd6926fb976c5941e39"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pert">
 		<description>PERT (Spa)</description>
 		<year>1986</year>
@@ -10679,6 +11060,20 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="55232">
 				<rom name="pharaoh's revenge (1988)(eurosoft)(nl)[a][run'cas-'].cas" size="55232" crc="81689eb6" sha1="117ec92f7f2ce5f530fdb46cf13cac63fb7076cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phcalc">
+		<description>PHCalc (Spain)</description>
+		<year>1985</year>
+		<publisher>Philips Spain</publisher>
+		<info name="serial" value="VG-8381"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="18911">
+				<rom name="phcalc (1985)(philips)(es)[bload'cas-'r].cas" size="18911" crc="46180116" sha1="5bdcda3e40c6af1c66780a7ae115d0655d1fc92f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11183,6 +11578,41 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="20382">
 				<rom name="queen's golf (1984)(ascii)(jp)[bload'cas-',r].cas" size="20382" crc="17e4c7fc" sha1="9b7126afd818eb4ac790e5008d405fb18ca93f38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golf" cloneof="queenglf">
+		<description>Golf (Spain)</description>
+		<year>1984</year>
+		<publisher>Philips Spain</publisher>
+		<info name="serial" value="VG-8386"/>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="20406">
+				<rom name="golf (1985)(philips)(es)[a][bload'cas-',r].cas" size="20406" crc="9cd1d0fc" sha1="148e64fb4aed1a24cc2649bd7dc00f6dc1e61a49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quinredu">
+		<description>Quinielas y Reducciones (Spain)</description>
+		<year>1985</year>
+		<publisher>Sony Spain</publisher>
+		<info name="serial" value="HBS-IA001"/>
+		<info name="usage" value="Load Tape 1 with RUN&quot;CAS:&quot; or Tape 2 with BLOAD&quot;CAS:&quot;,R"/>
+
+		<part name="cass1" interface="msx_cass">
+			<feature name="part_id" value="HBS-IA001-1"/>
+			<dataarea name="cass" size="9216">
+				<rom name="quinielas y reducciones. quinielas (1985)(sony spain)(es).cas" size="9216" crc="6493e693" sha1="55560fbc32a6c362f4b956a63fb2ace5c70047fb"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="msx_cass">
+			<feature name="part_id" value="HBS-IA001-2"/>
+			<dataarea name="cass" size="8576">
+				<rom name="quinielas y reducciones. reducciones (1985)(sony spain)(es).cas" size="8576" crc="1dbe4528" sha1="2c803f867c8731174b816035773eb5f0185ed099"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12089,9 +12519,9 @@ license:CC0
 	</software>
 
 	<software name="ship">
-		<description>Ship (Spa?)</description>
+		<description>Ship (Spain)</description>
 		<year>1989</year>
-		<publisher>Eurosoft</publisher>
+		<publisher>System 4</publisher>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -12478,6 +12908,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="skyhawks">
+		<description>Sky Hawk (Spain)</description>
+		<year>19??</year>
+		<publisher>Manhattan Transfer</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="27765">
+				<rom name="skyhawk (19xx)(manhattan transfer)(es)[bload'cas-',r].cas" size="27765" crc="e6748eba" sha1="9f0fc302279dbabe3105281944c0d968d55f2279"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="slapshot">
 		<description>Slapshot (Euro)</description>
 		<year>1985</year>
@@ -12552,6 +12995,79 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="20191">
 				<rom name="snowman, the (1984)(quicksilva)(gb)[bload'cas-',r].cas" size="20191" crc="5f5db8c5" sha1="1c9c5f319b973d71bd09bc6001b7169433eb3aa2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snackbar">
+		<description>Snackbar + Mouse Jump (Spain)</description>
+		<year>19??</year>
+		<publisher>Compulogical</publisher>
+		<info name="usage" value="Load with LOAD&quot;CAS:&quot;,R."/>
+
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="12696">
+				<rom name="snack-bar + mouse (19xx)(compulogical)(es)(side a)[run'cas-'].cas" size="12696" crc="03e67e33" sha1="d30b3f7a193bd63cba4e0ba8e919d54af20650a1"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="11112">
+				<rom name="snack-bar + mouse (19xx)(compulogical)(es)(side b)[free program][run'cas-'].cas" size="11112" crc="949c29d1" sha1="9b50cd856eb473f85825b50ab2744139ce6f0b8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soccerbo">
+		<description>Soccer Boss (UK)</description>
+		<year>1987</year>
+		<publisher>Alternative Software</publisher>
+		<info name="usage" value="Detach floppy drives. Load with CLOAD and RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="20455">
+				<rom name="soccer boss (198x)(alternative software)(gb)[shift][cload].cas" size="20455" crc="055b5d11" sha1="cc3e946976c9ac2b50b9355321edf3d6fdbf42ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="softmsx1">
+		<description>Soft-MSX 1 (Spain)</description>
+		<year>1985</year>
+		<publisher>Editorial Cometa</publisher>
+		<info name="usage" value="Load with CLOAD and RUN"/>
+
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="17225">
+				<rom name="soft-msx - issue 01 - (19xx)(editorial cometa)(es)(side a)[cload].cas" size="17225" crc="80820f3e" sha1="cc3e946976c9ac2b50b9355321edf3d6fdbf42ec"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="11163">
+				<rom name="soft-msx - issue 01 - (19xx)(editorial cometa)(es)(side b)[cload].cas" size="11163" crc="e632b98a" sha1="ac52bac8f45dfafff802374f579fa8c4aa8c50ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="softmsx3">
+		<description>Soft-MSX 3 (Spain)</description>
+		<year>1985</year>
+		<publisher>Editorial Cometa</publisher>
+		<info name="usage" value="Load with LOAD&quot;CAS:&quot;,R"/>
+
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="14978">
+				<rom name="soft-msx - issue 3 - el sabiondo 3. el nucleon (19xx)(editorial cometa)(es)(side a)[run'cas-'].cas" size="14978" crc="984a9fac" sha1="81d41697961c08dcdbde2fba919f705b5474f5de"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="14985">
+				<rom name="soft-msx - issue 3 - las 4 en raya. la armada invencible (19xx)(editorial cometa)(es)(side b)[cload].cas" size="14985" crc="7762a998" sha1="4068f235564ba151c66350b0122b12444298640d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13059,6 +13575,28 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- The programs are in English. -->
+	<software name="starseeks">
+		<description>Star Seeker - Solar System (Spain)</description>
+		<year>1986</year>
+		<publisher>Discovery Informatic</publisher>
+		<info name="serial" value="RS-105"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A - Star Seeker"/>
+			<dataarea name="cass" size="45592">
+				<rom name="star seeker (1986)(discovery informatic)(es)(side a)[star seeker][load'cas-',r].cas" size="45592" crc="49ea37e1" sha1="328a71413dc1ecfcc28a88726478554651635eec"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B - Solar System"/>
+			<dataarea name="cass" size="44960">
+				<rom name="star seeker (1986)(discovery informatic)(es)(side b)[solar system][load'cas-',r].cas" size="44960" crc="f8c8e777" sha1="72e49733ca58c6920edb027a3457a0feb95c23ab"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starwars">
 		<description>Star Wars (Euro)</description>
 		<year>1986</year>
@@ -13146,6 +13684,68 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="50630">
 				<rom name="starquake (1986)(bubble bus software)(gb)[a][run'cas-'].cas" size="50630" crc="85713c79" sha1="5c770031f66d570e691fb398d90d79b3796f400b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stars1">
+		<description>Stars MSX 1 (Spain)</description>
+		<year>1985</year>
+		<publisher>Stars</publisher>
+		<info name="usage" value="Side A: LOAD&quot;CAS:STARS&quot;,R or LOAD&quot;CAS:BIO&quot;,R or LOAD&quot;CAS:PINCEL&quot;,R or LOAD&quot;CAS:RMSSN&quot;,R. Side B: LOAD&quot;CAS:&quot;,R."/>
+
+		<!-- The order of the games does not match the cassette labels. -->
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="28134">
+				<rom name="stars msx - issue 01 (19xx)(stars)(es)(side a).cas" size="28134" crc="82ae21a3" sha1="959fc1210b05f7898073250e0c2431309e7ee402"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="24104">
+				<!-- Likely marked bad by the dumper because that are multiple copies of 'HOTDOG' on the tape. However, the first one plays fine. -->
+				<rom name="stars msx - issue 01 (19xx)(stars)(es)(side b)[b].cas" size="24104" crc="8952a054" sha1="8d8869c2c9f4bb7aa0c80d64145da7f18c093c82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stars2">
+		<description>Stars MSX 2 (Spain)</description>
+		<year>1985</year>
+		<publisher>Stars</publisher>
+		<info name="usage" value="Side A: LOAD&quot;CAS:STARS&quot;,R or LOAD&quot;CAS:PLGNS&quot;,R or LOAD&quot;CAS:PIANO&quot;,R or LOAD&quot;CAS:AS&quot;,R. Side B: LOAD&quot;CAS:&quot;,R."/>
+
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="13965">
+				<rom name="stars - issue 2 (1985)(stars)(es)(side a)[load'cas-',r].cas" size="13965" crc="90506907" sha1="1e758befb18fbbfe3e4d13128fb8be42ab9111cc"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="13536">
+				<rom name="stars - issue 2 (1985)(stars)(es)(side b)[load'cas-',r].cas" size="13536" crc="cd1dc903" sha1="39d22ca3609b37266db1711adecb5dc5dc8c310b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stars4">
+		<description>Stars MSX 4 (Spain)</description>
+		<year>1986</year>
+		<publisher>Stars</publisher>
+		<info name="usage" value="Side A: LOAD&quot;CAS:TIRO&quot;,R or LOAD&quot;CAS:PANCHO&quot;,R or LOAD&quot;CAS:BLACK&quot;,R. Side B: LOAD&quot;CAS:SUMAS&quot;,R or LOAD&quot;CAS:CARAC&quot;,R or LOAD&quot;CAS:EUROPA&quot;,R."/>
+
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="37477">
+				<rom name="stars - issue 04 (1986-04)(stars)(es)(side a)[load'cas-',r].cas" size="37477" crc="00a026d9" sha1="aae2605932eb1069ab2e6cbcd94d77c8e8953572"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="8784">
+				<rom name="stars - issue 04 (1986-04)(stars)(es)(side b)[load'cas-',r].cas" size="8784" crc="8c541ebf" sha1="df29d6fe9092c8eed8824cbcd43b5d56ceff3157"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14695,6 +15295,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="viajeesp">
+		<description>Viaje Espacial (Spain)</description>
+		<year>1986</year>
+		<publisher>Sony Spain</publisher>
+		<info name="serial" value="HBS-AN002"/>
+		<info name="usage" value="Detach floppy drives. Load with CLOAD + RUN or RUN&quot;CAS:&quot;"/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="58545">
+				<rom name="viaje espacial (1985)(sony spain)(es)[hbs-an002][shift][load'cas-',r].cas" size="58545" crc="0736ee57" sha1="ba473e140cd1c929768f20fb02bd110dbbc70335"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="viajecee">
 		<description>Viaje por la C.E.E. (Spa)</description>
 		<year>1986</year>
@@ -15048,6 +15661,19 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="24903">
 				<rom name="who dares wins ii (1986)(alligata software)(gb)[run'cas-'].cas" size="24903" crc="5b28d106" sha1="6a36fe5c3303c313181bf761ce93a47777cce766"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whodare2a" cloneof="whodare2">
+		<description>Who Dares Wins 2 (UK, Italy)</description>
+		<year>1988</year>
+		<publisher>Alternative Software</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="25247">
+				<rom name="who dares wins ii (1988)(alternative software)(gb)[cload].cas" size="25247" crc="59ae960c" sha1="4a415dc56d2d6cc3e6f7e4099c762afacd7e9aab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15610,6 +16236,55 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="juegue02">
+		<description>Juegue con su MSX - Issue 02 - Alpha Centauro (Spain)</description>
+		<year>1987</year>
+		<publisher>Grupo de Trabajo Software</publisher>
+		<info name="usage" value="Detach floppy drives. Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="9197">
+				<rom name="juegue con su msx - issue 02 - alpha centauro  (1987)(grupo de trabajo software)(es)[shift][run'cas-'].cas" size="9197" crc="a6d8f4c1" sha1="ad550c79cd5baafbdaf8ec68a04bcfd7f0fe3eca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="juegue07">
+		<description>Juegue con su MSX - Issue 07 - Robber (Spain)</description>
+		<year>1987</year>
+		<publisher>Grupo de Trabajo Software</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="25944">
+				<rom name="juegue con su msx - issue 07 - robber (1986)(grupo de trabajo software)(es)[run'cas-'].cas" size="25944" crc="43b20836" sha1="bccc81e7a598e7a6e22a5be6ebfa08580edb2105"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lenmaqx">
+		<!-- Not issue 3 or 6 -->
+		<description>Lenguaje Maquina - Issue unknown (Spain)</description>
+		<year>19??</year>
+		<publisher>Audimicro</publisher>
+		<info name="usage" value="Load with LOAD&quot;CAS:&quot; and RUN"/>
+
+		<!-- Damas - RUN"CAS:DAMA", Mision Imposible - RUN"CAS:MISI" -->
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="23328">
+				<rom name="lenguaje maquina - issue xx (198x)(lenguaje maquina)(es)(side a).cas" size="23328" crc="6535ed98" sha1="68e94590577c6a4c9291363c199aa6a2f162ff68"/>
+			</dataarea>
+		</part>
+		<!-- Reto Numerico - RUN"CAS:RETO", Calimero - RUN"CAS:CALI", Amortizacion - RUN"CAS:AMORT", Dibujo Lineal - RUN"CAS:DIBU" -->
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="19728">
+				<rom name="lenguaje maquina - issue xx (198x)(lenguaje maquina)(es)(Side b).cas" size="19728" crc="4c8d3be0" sha1="95b51b1bbfeb8da2b5261ff3493eeeb39c06207e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msxcmp06">
 		<description>MSX Computer Magazine - Issue 06 (Ita)</description>
 		<year>1986</year>
@@ -15747,6 +16422,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="msxgame5">
+		<description>MSX Games Vol 05 - Patrullera XH-63 (Spain)</description>
+		<year>1987</year>
+		<publisher>Grupo de Trabajo Software</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="15272">
+				<rom name="msx games - issue 05 - patrullera xh-63 (1987)(grupo de trabajo software)(es)[run'cas-'].cas" size="15272" crc="193c1d84" sha1="d7aa3753276e5193b1de85cbed2f359f3ed4dd0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxgame10">
+		<description>MSX Games Vol 10 - Invasores (Spain)</description>
+		<year>198?</year>
+		<publisher>P.P.P. Ediciones</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="2151">
+				<rom name="msx games vol 10 - invasores (19xx)(p.p.p. ediciones)(es)[run'cas-'].cas" size="2151" crc="e96ae2b6" sha1="9c1aff7a6f4b0c3909196af43c1e53a8a9b3e82b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msxmag1">
 		<description>MSX Magazine - Issue 01 (Ita)</description>
 		<year>1987</year>
@@ -15772,6 +16473,23 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+<!--
+	The contens of this cassette is the same as the regular release by DK'Tronic.
+
+	<software name="msxsof03">
+		<description>MSX Soft Magazine - Issue 03 - Fruit Machine (Spain)</description>
+		<year>1985</year>
+		<publisher>Monser</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="12031">
+				<rom name="msx soft magazine - issue 03 - fruit machine (1985)(monser)(es).cas" size="12031" crc="275345d5" sha1="8dc0a3c8057fb1887fb1d93c0d7bc849f462ae0b"/>
+			</dataarea>
+		</part>
+	</software>
+-->
 
 	<software name="msxsof04">
 		<description>MSX Soft Magazine - Issue 04 - Tragamanzanas (Spa)</description>
@@ -15799,6 +16517,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="msxsof08a" cloneof="msxsof08">
+		<description>MSX Soft Magazine - Issue 08 - Rana Sideral (Spain, alt)</description>
+		<year>1985</year>
+		<publisher>Monser</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;. Requires Pinforic"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="13568">
+				<rom name="msx soft magazine - issue 08 - rana sideral. gusanoco (1985)(monser)(es)[run'cas-'].cas" size="13568" crc="8997cffa" sha1="cc6519c89d2d1f8efa7a8d18e64d9e1e8891a7bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxsof09">
+		<description>MSX Soft Magazine - Issue 09 - Cazador de tiburones (Spain)</description>
+		<year>1985</year>
+		<publisher>Monser</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="13696">
+				<rom name="msx soft magazine - issue 09 - cazador de tiburones (19xx)(monser)(es)[run'cas-'].cas" size="13696" crc="d8abe008" sha1="842ea23d138b9764878a42961b76bcd83b209c96"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msxsof10">
 		<description>MSX Soft Magazine - Issue 10 - F-16 (Spa)</description>
 		<year>198?</year>
@@ -15808,6 +16552,26 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="7152">
 				<rom name="msx soft magazine - issue 10 - f-16 (198x)(monser)(es)[run'cas-'][martos].cas" size="7152" crc="2d64d7b1" sha1="d81aa08cd43fbc59ed0c2bdb38fe9ef35befdcf3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxsw04">
+		<description>MSX Software - Issue 04 (Spain)</description>
+		<year>1985</year>
+		<publisher>Grupo de Trabajo Software</publisher>
+		<info name="usage" value="Load with CLOAD + RUN"/>
+
+		<part name="side_a" interface="msx_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="19067">
+				<rom name="msx software - issue 04 (198x)(grupo de trabajo software)(es)(side a)[cload].cas" size="19067" crc="9ba6b335" sha1="838bd75e15f8b9bbd4bc22e674b5d0c6402eebac"/>
+			</dataarea>
+		</part>
+		<part name="side_b" interface="msx_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="14212">
+				<rom name="msx software - issue 04 (198x)(grupo de trabajo software)(es)(side b)[cload].cas" size="14212" crc="d2c0406c" sha1="a4f165b050591d2cff26662f5a1d8c34393adcb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15874,6 +16638,19 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="12741">
 				<rom name="msx software - issue 12 - phantom ataca (1986)(grupo de trabajo software)(es)[a][run'cas-'].cas" size="12741" crc="27a9f5c1" sha1="55096a0a185e9930f9ed979bd30cfbc5a69af022"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxsw16">
+		<description>MSX Software - Issue 16 - Hungry Harry (Spain)</description>
+		<year>1987</year>
+		<publisher>Grupo de Trabajo Software</publisher>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="12192">
+				<rom name="msx software 16 - hungry harry (1987)(grupo de trabajo software - john peter)(es).cas" size="12192" crc="836f28b4" sha1="a1533f25686ca3be64d5920aa0af05dcd8f23df2"/>
 			</dataarea>
 		</part>
 	</software>

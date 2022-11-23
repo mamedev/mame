@@ -34,13 +34,13 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Install Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="installation disk [fd].hdm" size="1261568" crc="afac2fa0" sha1="10fe461659220379a0daad875e6e1c3f9e70f60e" offset="0" />
+				<rom name="installation disk [fd].hdm" size="1261568" crc="afac2fa0" sha1="10fe461659220379a0daad875e6e1c3f9e70f60e" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk 1 [fd].hdm" size="1261568" crc="7f61ff57" sha1="cad9ab86ae7e5d5c6ab92a374efc71034f443604" offset="0" />
+				<rom name="disk 1 [fd].hdm" size="1261568" crc="7f61ff57" sha1="cad9ab86ae7e5d5c6ab92a374efc71034f443604" />
 			</dataarea>
 		</part>
 		<!-- The package also includes a "Device Support Disk" floppy, but the one in this copy was damaged -->
@@ -454,25 +454,25 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Install Disk #1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="pc-9821xa12c8 system software (system install disk #1).hdm" size="1261568" crc="b728dcae" sha1="d9277990e7739da403e5fb653c6d1966ef0b4044" offset="0" />
+				<rom name="pc-9821xa12c8 system software (system install disk #1).hdm" size="1261568" crc="b728dcae" sha1="d9277990e7739da403e5fb653c6d1966ef0b4044" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="System Install Disk #2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="pc-9821xa12c8 system software (system install disk #2).hdm" size="1261568" crc="093085db" sha1="c67652c0dc24b6a9ba699ffbbd7c463151f998fc" offset="0" />
+				<rom name="pc-9821xa12c8 system software (system install disk #2).hdm" size="1261568" crc="093085db" sha1="c67652c0dc24b6a9ba699ffbbd7c463151f998fc" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="PCI Setup Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="pc-9821xa12c8 system software (pci setup disk).hdm" size="1261568" crc="227f2047" sha1="cffce55224793a66bfbf80910c80dece7aec4430" offset="0" />
+				<rom name="pc-9821xa12c8 system software (pci setup disk).hdm" size="1261568" crc="227f2047" sha1="cffce55224793a66bfbf80910c80dece7aec4430" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Demonstration Program" />
 			<dataarea name="flop" size="1261568">
-				<rom name="pc-9821xa12c8 system software (demonstration program).hdm" size="1261568" crc="f98985f7" sha1="39e260b78807cd99b2abd0f02abffb13a30aec0f" offset="0" />
+				<rom name="pc-9821xa12c8 system software (demonstration program).hdm" size="1261568" crc="f98985f7" sha1="39e260b78807cd99b2abd0f02abffb13a30aec0f" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -661,7 +661,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="akiko_gold_disk_a.hdm" size="1261568" crc="110cfa6c" sha1="d27aa70f07bd45d751ee14f5841ed60f732e25af" offset="0" />
+				<rom name="akiko_gold_disk_a.hdm" size="1261568" crc="110cfa6c" sha1="d27aa70f07bd45d751ee14f5841ed60f732e25af" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -756,7 +756,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="angel (u-jin presents) (cd save disk).hdm" size="1261568" crc="5a6758a1" sha1="aff63d873bd6ba8e39d0bd80a66eb29690edbe18" offset="0" />
+				<rom name="angel (u-jin presents) (cd save disk).hdm" size="1261568" crc="5a6758a1" sha1="aff63d873bd6ba8e39d0bd80a66eb29690edbe18" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -857,7 +857,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Update Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="appare-den_update_disk.hdm" size="1261568" crc="febbae89" sha1="55d8a639718353fe9f26f9f9d3a804ab14f05c51" offset="0" />
+				<rom name="appare-den_update_disk.hdm" size="1261568" crc="febbae89" sha1="55d8a639718353fe9f26f9f9d3a804ab14f05c51" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -1022,7 +1022,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="ballade for maria (maria ni sasageru ballade) (cd boot disk).hdm" size="1261568" crc="b477937a" sha1="eefcd765ec25bc9c9d923dd79ca136bb020fc8f2" offset="0" />
+				<rom name="ballade for maria (maria ni sasageru ballade) (cd boot disk).hdm" size="1261568" crc="b477937a" sha1="eefcd765ec25bc9c9d923dd79ca136bb020fc8f2" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -1086,7 +1086,7 @@ license:CC0
 		<info name="release" value="19931126" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="branmarker (cd boot disk).hdm" size="1261568" crc="96260d7a" sha1="686c6fcb4525544ba37c55270c3535173668e3f7" offset="0" />
+				<rom name="branmarker (cd boot disk).hdm" size="1261568" crc="96260d7a" sha1="686c6fcb4525544ba37c55270c3535173668e3f7" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -1174,7 +1174,7 @@ license:CC0
 		<info name="release" value="19950310" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="3594434">
-				<rom name="brandish_renewal_disk2.mfm" size="3594434" crc="411f9f13" sha1="97054b414c002e0b6884746015026e1acb03ddaf" offset="0" />
+				<rom name="brandish_renewal_disk2.mfm" size="3594434" crc="411f9f13" sha1="97054b414c002e0b6884746015026e1acb03ddaf" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -1345,7 +1345,7 @@ license:CC0
 		<info name="release" value="199312xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="chiemi-and-naomi.hdm" size="1261568" crc="7b3706d4" sha1="a63be0d0426e54291586f8d246c4fab58630026d" offset="000000" />
+				<rom name="chiemi-and-naomi.hdm" size="1261568" crc="7b3706d4" sha1="a63be0d0426e54291586f8d246c4fab58630026d" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -1442,7 +1442,7 @@ license:CC0
 		<info name="release" value="19930813" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="collector_d.hdm" size="1261568" crc="9ddce323" sha1="5631b5b2cd65efbfaf09e14c3ef9ec849ad70f15" offset="000000" />
+				<rom name="collector_d.hdm" size="1261568" crc="9ddce323" sha1="5631b5b2cd65efbfaf09e14c3ef9ec849ad70f15" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -1635,7 +1635,7 @@ license:CC0
 		<info name="release" value="19940408" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="tanjou - debut (cd version) (key disk) [original].hdm" size="1261568" crc="216950bb" sha1="d5ab1830b82de1cf53403871c768aa85b923c74d" offset="0" />
+				<rom name="tanjou - debut (cd version) (key disk) [original].hdm" size="1261568" crc="216950bb" sha1="d5ab1830b82de1cf53403871c768aa85b923c74d" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -1994,7 +1994,7 @@ license:CC0
 		<info name="release" value="19930427" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="dor best selection vol. 1 (joukan) (cd boot disk) [original].hdm" size="1261568" crc="42ee3c3c" sha1="d278c712f993ea7944509d9d6b583544c6cd8983" offset="0" />
+				<rom name="dor best selection vol. 1 (joukan) (cd boot disk) [original].hdm" size="1261568" crc="42ee3c3c" sha1="d278c712f993ea7944509d9d6b583544c6cd8983" />
 			</dataarea>
 		</part>
 		<part name="cdrom1" interface="cdrom">
@@ -2030,7 +2030,7 @@ license:CC0
 		<info name="release" value="19930521" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="dor best selection vol. 2 (gekan) (cd boot disk) [original].hdm" size="1261568" crc="bb48197e" sha1="d388abfeca45b7cd18513be71d6b7583d745c9f6" offset="0" />
+				<rom name="dor best selection vol. 2 (gekan) (cd boot disk) [original].hdm" size="1261568" crc="bb48197e" sha1="d388abfeca45b7cd18513be71d6b7583d745c9f6" />
 			</dataarea>
 		</part>
 		<part name="cdrom1" interface="cdrom">
@@ -2187,7 +2187,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk P"/>
 			<dataarea name="flop" size="1261568">
-				<rom name="doom ii (disk p - patch file).hdm" size="1261568" crc="44d368e5" sha1="21c318a5f40402b1a0ae9acfa9d35009c25a2132" offset="0" />
+				<rom name="doom ii (disk p - patch file).hdm" size="1261568" crc="44d368e5" sha1="21c318a5f40402b1a0ae9acfa9d35009c25a2132" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -2384,7 +2384,7 @@ license:CC0
 		<info name="alt_title" value="エルムナイト" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1542672">
-				<rom name="elm knight - a living body armor (cd boot disk) [original].nfd" size="1542672" crc="8c78cba1" sha1="ae3dfe73781246a2451fdd6ee04ad48e73c0dd9e" offset="0" />
+				<rom name="elm knight - a living body armor (cd boot disk) [original].nfd" size="1542672" crc="8c78cba1" sha1="ae3dfe73781246a2451fdd6ee04ad48e73c0dd9e" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -2434,7 +2434,7 @@ license:CC0
 		<info name="release" value="19940930" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="emit1.hdm" size="1261568" crc="fb267721" sha1="38c5ef1bb24d9249d35ac877898f35c3ade5964e" offset="0" />
+				<rom name="emit1.hdm" size="1261568" crc="fb267721" sha1="38c5ef1bb24d9249d35ac877898f35c3ade5964e" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -2458,7 +2458,7 @@ license:CC0
 		<info name="release" value="19950113" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="emit2.hdm" size="1261568" crc="5efad009" sha1="1c28db3b732a255e97a30cbe67a864ec911976f0" offset="0" />
+				<rom name="emit2.hdm" size="1261568" crc="5efad009" sha1="1c28db3b732a255e97a30cbe67a864ec911976f0" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -2482,7 +2482,7 @@ license:CC0
 		<info name="release" value="19950317" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="emit3.hdm" size="1261568" crc="a9661250" sha1="2f9923c0f959fd7a2af384e2cb7ac291f5747eb3" offset="0" />
+				<rom name="emit3.hdm" size="1261568" crc="a9661250" sha1="2f9923c0f959fd7a2af384e2cb7ac291f5747eb3" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -2507,7 +2507,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="etemible_system_disk.hdm" size="1261568" crc="5c7f0709" sha1="6d433a7c5b54e5e52dc6a9c165ee0d572b56d42d" offset="0" status="baddump" />
+				<rom name="etemible_system_disk.hdm" size="1261568" crc="5c7f0709" sha1="6d433a7c5b54e5e52dc6a9c165ee0d572b56d42d" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -2549,7 +2549,7 @@ license:CC0
 		<info name="release" value="19950715" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="f117a_cd_install_boot_disk.hdm" size="1261568" crc="bed6ec5c" sha1="2b59b5ab4e8e384501db820d1d68412b59d32b28" offset="0"/>
+				<rom name="f117a_cd_install_boot_disk.hdm" size="1261568" crc="bed6ec5c" sha1="2b59b5ab4e8e384501db820d1d68412b59d32b28"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -2630,7 +2630,7 @@ license:CC0
 		<info name="release" value="199409xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="uchuu kaitou funny bee (boot disk).hdm" size="1261568" crc="4bcc3120" sha1="f721efe9534554a1a9e4e2201b8f7c4102987b29" offset="000000" />
+				<rom name="uchuu kaitou funny bee (boot disk).hdm" size="1261568" crc="4bcc3120" sha1="f721efe9534554a1a9e4e2201b8f7c4102987b29" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -2969,7 +2969,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Install Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="guardian recall - shugojuu shoukan (install disk).hdm" size="1261568" crc="75e7b6c4" sha1="5e763e760e96ffe7fba796ec1e52db04970412ff" offset="0"/>
+				<rom name="guardian recall - shugojuu shoukan (install disk).hdm" size="1261568" crc="75e7b6c4" sha1="5e763e760e96ffe7fba796ec1e52db04970412ff"/>
 			</dataarea>
 		</part>
 		<part name="cdrom1" interface="cdrom">
@@ -3330,7 +3330,7 @@ license:CC0
 		<info name="release" value="19950714" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="inherit.hdm" size="1261568" crc="c7315ec7" sha1="d41c552cb523f95187e38a12334ce865664ac61b" offset="0"/>
+				<rom name="inherit.hdm" size="1261568" crc="c7315ec7" sha1="d41c552cb523f95187e38a12334ce865664ac61b"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -3405,7 +3405,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="jinmon yuugi (cd boot disk).hdm" size="1261568" crc="61d5fdb9" sha1="47caf5d5562e67df53e614fd17fd74dfd3ff0f09" offset="000000" />
+				<rom name="jinmon yuugi (cd boot disk).hdm" size="1261568" crc="61d5fdb9" sha1="47caf5d5562e67df53e614fd17fd74dfd3ff0f09" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -3440,7 +3440,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="kanako_disk_a.hdm" size="1261568" crc="7f8f4bc8" sha1="15a66cf6e85b70ade329c0be1c7fc0866abf5708" offset="000000" />
+				<rom name="kanako_disk_a.hdm" size="1261568" crc="7f8f4bc8" sha1="15a66cf6e85b70ade329c0be1c7fc0866abf5708" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -3646,7 +3646,7 @@ license:CC0
 		<info name="release" value="199310xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="the legend of kyrandia (cd install disk).hdm" size="1261568" crc="005afba9" sha1="b60c579d34363f947bfb187401aa53eafe4d299a" offset="000000" />
+				<rom name="the legend of kyrandia (cd install disk).hdm" size="1261568" crc="005afba9" sha1="b60c579d34363f947bfb187401aa53eafe4d299a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -3672,7 +3672,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<!-- Several bad sectors, needs a redump -->
 			<dataarea name="flop" size="1261568">
-				<rom name="kyrandia ii pc-9821.hdm" size="1261568" crc="67ad11ea" sha1="c1f9f4ab622cd04d8954b921750acda1650ffac5" offset="000000" status="baddump" />
+				<rom name="kyrandia ii pc-9821.hdm" size="1261568" crc="67ad11ea" sha1="c1f9f4ab622cd04d8954b921750acda1650ffac5" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -3739,13 +3739,13 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="lesser mern special director's edition (boot disk).hdm" size="1261568" crc="c1fcf6ba" sha1="715daad023ce610432191b7d45fcd35250bd061c" offset="000000" />
+				<rom name="lesser mern special director's edition (boot disk).hdm" size="1261568" crc="c1fcf6ba" sha1="715daad023ce610432191b7d45fcd35250bd061c" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Install Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="lesser mern special director's edition (install disk).hdm" size="1261568" crc="54de4fde" sha1="bf1a9816e8e1f7f1b6dae873ccd91fff9296b1bd" offset="000000" />
+				<rom name="lesser mern special director's edition (install disk).hdm" size="1261568" crc="54de4fde" sha1="bf1a9816e8e1f7f1b6dae873ccd91fff9296b1bd" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -3819,7 +3819,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="lip3_disk_a.hdm" size="1261568" crc="4a24ddcb" sha1="a51f7bf887728cbc47f0b71b41190a3510433d7a" offset="000000" />
+				<rom name="lip3_disk_a.hdm" size="1261568" crc="4a24ddcb" sha1="a51f7bf887728cbc47f0b71b41190a3510433d7a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -3842,7 +3842,7 @@ license:CC0
 		<info name="release" value="19931223" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="lodoss tosenki cd install disk.fdi" size="1265664" crc="27498b96" sha1="d5142465ab5b82868b6aad5e9b724f8a51b05b43" offset="0"/>
+				<rom name="lodoss tosenki cd install disk.fdi" size="1265664" crc="27498b96" sha1="d5142465ab5b82868b6aad5e9b724f8a51b05b43"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -3871,7 +3871,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Hozon-you Kidou Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="record_of_lodoss_war_2.hdm" size="1261568" crc="4b65f375" sha1="d00436addaaf3e51936866691d227f3c8d281a0d" offset="0"/>
+				<rom name="record_of_lodoss_war_2.hdm" size="1261568" crc="4b65f375" sha1="d00436addaaf3e51936866691d227f3c8d281a0d"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -4046,7 +4046,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk No. 1" />
 			<dataarea name="flop" size="3528431">
-				<rom name="manji_psyyuuki.mfm" size="3528431" crc="68a252ff" sha1="dd5e5c81fbb9b3a22604a17a191c72555f07603a" offset="0"/>
+				<rom name="manji_psyyuuki.mfm" size="3528431" crc="68a252ff" sha1="dd5e5c81fbb9b3a22604a17a191c72555f07603a"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -4405,7 +4405,7 @@ license:CC0
 		<info name="release" value="19930417" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="msd#1(canbe).fdi" size="1265664" crc="a79ac902" sha1="b87b9f194967f5b8920084a284ebc8aea5add970" offset="000000" />
+				<rom name="msd#1(canbe).fdi" size="1265664" crc="a79ac902" sha1="b87b9f194967f5b8920084a284ebc8aea5add970" />
 			</dataarea>
 		</part>
 		<part name="cdrom1" interface="cdrom">
@@ -4431,7 +4431,7 @@ license:CC0
 		<info name="release" value="19931029" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="ms. detective #2 - sugatanaki iraisha (cd boot disk).hdm" size="1261568" crc="7d8c3c93" sha1="f9f683f9f24b97c974e1b6d3ba92e9c84369c474" offset="000000" />
+				<rom name="ms. detective #2 - sugatanaki iraisha (cd boot disk).hdm" size="1261568" crc="7d8c3c93" sha1="f9f683f9f24b97c974e1b6d3ba92e9c84369c474" />
 			</dataarea>
 		</part>
 		<part name="cdrom1" interface="cdrom">
@@ -4521,7 +4521,7 @@ license:CC0
 		<info name="release" value="19930917" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="might and magic - clouds of xeen (japan).hdm" size="1261568" crc="e7738b2e" sha1="1c58c1ee565f777e931bd301cc535eb27a4b70e6" offset="000000" />
+				<rom name="might and magic - clouds of xeen (japan).hdm" size="1261568" crc="e7738b2e" sha1="1c58c1ee565f777e931bd301cc535eb27a4b70e6" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -4677,7 +4677,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="necronomicon (cd boot disk) [original].hdm" size="1261568" crc="6ac8e7fd" sha1="f422b45c5f56f7d3a5f3007b210d46fb33ffaa7b" offset="000000" />
+				<rom name="necronomicon (cd boot disk) [original].hdm" size="1261568" crc="6ac8e7fd" sha1="f422b45c5f56f7d3a5f3007b210d46fb33ffaa7b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -4933,7 +4933,7 @@ license:CC0
 		<info name="usage" value="Works best with MS-DOS 5.0 and AVSDRV.SYS v3.10 Rev 1" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="policenauts (japan) (system disk).fdi" size="1265664" crc="ef3e4428" sha1="246b674a48903ff7e3fe90292b1236d75a8d6c23" offset="000000" />
+				<rom name="policenauts (japan) (system disk).fdi" size="1265664" crc="ef3e4428" sha1="246b674a48903ff7e3fe90292b1236d75a8d6c23" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -5103,7 +5103,7 @@ license:CC0
 		<info name="usage" value="Replace DWCD98.SYS with the appropriate CD-ROM driver" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="psychic detective series vol. 1 - invitation (cd boot disk) [original].hdm" size="1261568" crc="03ba40f0" sha1="befb2ce9bd31f2eaeb347717241d7b885da881da" offset="0" />
+				<rom name="psychic detective series vol. 1 - invitation (cd boot disk) [original].hdm" size="1261568" crc="03ba40f0" sha1="befb2ce9bd31f2eaeb347717241d7b885da881da" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -5129,7 +5129,7 @@ license:CC0
 		<info name="release" value="19940422" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="psychic detective series vol. 2 - memories (cd boot disk) [original].hdm" size="1261568" crc="d2c6630e" sha1="b0fa0742748ea5441cc05bf89c642424dd120e88" offset="0" />
+				<rom name="psychic detective series vol. 2 - memories (cd boot disk) [original].hdm" size="1261568" crc="d2c6630e" sha1="b0fa0742748ea5441cc05bf89c642424dd120e88" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -5155,7 +5155,7 @@ license:CC0
 		<info name="release" value="19940715" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="psychic detective series vol. 3 - aya (cd boot disk) [original].hdm" size="1261568" crc="89378fcf" sha1="a0d879ce1d1f983aa66eb8c86716d3aa060b91a0" offset="0" />
+				<rom name="psychic detective series vol. 3 - aya (cd boot disk) [original].hdm" size="1261568" crc="89378fcf" sha1="a0d879ce1d1f983aa66eb8c86716d3aa060b91a0" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -5838,7 +5838,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk"/>
 			<dataarea name="flop" size="1261568">
-				<rom name="sangokushi_v_startup_disk.hdm" size="1261568" crc="a4286d4b" sha1="c7e25ec9699ee679dab678ff5d49804ea6c83305" offset="0"/>
+				<rom name="sangokushi_v_startup_disk.hdm" size="1261568" crc="a4286d4b" sha1="c7e25ec9699ee679dab678ff5d49804ea6c83305"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -6004,7 +6004,7 @@ license:CC0
 		<info name="usage" value="Replace DWCD98.SYS with the appropriate CD-ROM driver" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="sensual angels (cd boot disk) [original].hdm" size="1261568" crc="bec41290" sha1="58a8701c158470f66da3e03179fd53a9b70d17cf" offset="0"/>
+				<rom name="sensual angels (cd boot disk) [original].hdm" size="1261568" crc="bec41290" sha1="58a8701c158470f66da3e03179fd53a9b70d17cf"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -6045,7 +6045,7 @@ license:CC0
 		<info name="release" value="19940310" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="shamhat the holy circlet (1994)(datewest) master boot disk.fdi" size="1265664" crc="589a7c5d" sha1="732598c8ac8d07e928fa15a111cdc88ba9bcbab1" offset="0"/>
+				<rom name="shamhat the holy circlet (1994)(datewest) master boot disk.fdi" size="1265664" crc="589a7c5d" sha1="732598c8ac8d07e928fa15a111cdc88ba9bcbab1"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -6070,7 +6070,7 @@ license:CC0
 		<info name="release" value="19930410" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="silent_service.hdm" size="1261568" crc="f0ed606a" sha1="2852329d81afa0adccd362f539dc949e6dc208c0" offset="0"/>
+				<rom name="silent_service.hdm" size="1261568" crc="f0ed606a" sha1="2852329d81afa0adccd362f539dc949e6dc208c0"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -6883,7 +6883,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="virtuacall_disk_a.hdm" size="1261568" crc="ff512460" sha1="30b1796781f23aba0c2a77b08e87bb93ab62ea3b" offset="0"/>
+				<rom name="virtuacall_disk_a.hdm" size="1261568" crc="ff512460" sha1="30b1796781f23aba0c2a77b08e87bb93ab62ea3b"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -6908,7 +6908,7 @@ license:CC0
 		<info name="release" value="19960202" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="virtuacall 2 (cd boot disk) [original].hdm" size="1261568" crc="8212a907" sha1="b9332c1dca6e7d75be4aff6eaff4a03e2d7733b9" offset="0"/>
+				<rom name="virtuacall 2 (cd boot disk) [original].hdm" size="1261568" crc="8212a907" sha1="b9332c1dca6e7d75be4aff6eaff4a03e2d7733b9"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -7005,7 +7005,7 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="xgirl_disk_a.hdm" size="1261568" crc="91f931c6" sha1="08bcd3ab241cc15509ca4587bc7031f7c74cb03d" offset="0" />
+				<rom name="xgirl_disk_a.hdm" size="1261568" crc="91f931c6" sha1="08bcd3ab241cc15509ca4587bc7031f7c74cb03d" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">

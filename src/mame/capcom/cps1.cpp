@@ -13,7 +13,7 @@ Paul Leaman (paul@vortexcomputing.demon.co.uk)
 68000 clock speeds are unknown for all games (except where commented)
 
 todo: move the bootleg sets with modified hardware into their own
-      drivers, like fcrash.cpp
+      drivers, like capcom/fcrash.cpp
 
 
 Notes
@@ -13819,6 +13819,51 @@ ROM_START( pokonyan )
 	*/
 ROM_END
 
+ROM_START( hkittymp ) // B board: ? C board: 92631C-6
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "mpa_23.8f", 0x00000, 0x80000, CRC(38b9883a) SHA1(94a89a360a502f209aa905e7eb2f1d472960850f) )
+	// remaining sockets are empty
+
+	ROM_REGION( 0x600000, "gfx", 0 ) // 7a - 9a and  8a - 10a have same contents?
+	ROM_LOAD64_WORD( "mpa_01.3a",  0x000000, 0x80000, CRC(7c8c0c22) SHA1(29659c37a519470452afcd553a501788ad56dc1e) )
+	ROM_LOAD64_WORD( "mpa_02.4a",  0x000002, 0x80000, CRC(23f95339) SHA1(09227f55ecdf86265e85ea3d09e0a829a1220f3a) )
+	ROM_LOAD64_WORD( "mpa_03.5a",  0x000004, 0x80000, CRC(107842a6) SHA1(8410370d97ac2e6e23774375c4e9d5d000a6eda4) )
+	ROM_LOAD64_WORD( "mpa_04.6a",  0x000006, 0x80000, CRC(fce457ae) SHA1(7e2116aeeb6204311a78af5f3c1736fbff4e6723) )
+	ROM_LOAD64_WORD( "mpa_05.7a",  0x200000, 0x80000, CRC(ba8f3585) SHA1(7f43328d8a921478a24909eed18c8c921177add0) )
+	ROM_LOAD64_WORD( "mpa_06.8a",  0x200002, 0x80000, CRC(037f20cc) SHA1(d702d648bcf47fe6f9fa033aa5b9fa1238191cf2) )
+	ROM_LOAD64_WORD( "mpa_07.9a",  0x200004, 0x80000, CRC(ba8f3585) SHA1(7f43328d8a921478a24909eed18c8c921177add0) )
+	ROM_LOAD64_WORD( "mpa_08.10a", 0x200006, 0x80000, CRC(037f20cc) SHA1(d702d648bcf47fe6f9fa033aa5b9fa1238191cf2) )
+	ROM_LOAD64_WORD( "mpa_10.3c",  0x400000, 0x80000, CRC(870f3a2a) SHA1(7e852cb7a0d2c49aeb3ff28676b2f66bb42646ed) )
+	ROM_LOAD64_WORD( "mpa_11.4c",  0x400002, 0x80000, CRC(8923fc3a) SHA1(619ac7218ef14d863180e70c9d55729025f14d7c) )
+	ROM_LOAD64_WORD( "mpa_12.5c",  0x400004, 0x80000, CRC(87b88629) SHA1(85fed8a00e4c960456732ba6e6ae45ce23a60470) )
+	ROM_LOAD64_WORD( "mpa_13.6c",  0x400006, 0x80000, CRC(a09a6acf) SHA1(cb6b75dabb5422572123be60356765cedcdcbfe9) )
+	// 7c to 10c empty
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "mpa_09.12a", 0x00000, 0x08000, CRC(0b5b1b72) SHA1(a8883f141a00870c98a74d9d57378c4a607dc590) )
+	ROM_CONTINUE(           0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "mpa_18.11c",     0x00000, 0x20000, CRC(cef6d39e) SHA1(3180a3f397b5c4fbbc2b8f84cf461764ddd10d4e) )
+	ROM_LOAD( "mpa_19.12c",     0x20000, 0x20000, CRC(24947f8e) SHA1(e26270962cc4b0f9a6a5c306fa09d2cdd524cfa9) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "sfz63b.1a",    0x0000, 0x0104, CRC(f5a351da) SHA1(a867947d784167b5284efb76a8634ca5713dafdb) )
+	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
+
+	ROM_REGION( 0x0200, "cboardplds", 0 )
+	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
+ROM_END
+
 ROM_START( gulunpa ) // ROMs could do with 2nd pass dump verification
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "26",           0x00000, 0x020000, CRC(f30ffa29) SHA1(9e70daf4229485dc5700b074dba55839c7357351) )
@@ -14619,6 +14664,7 @@ GAME( 1995, megamana,    megaman,  cps1_12MHz, megaman,  cps_state, init_cps1,  
 GAME( 1995, rockmanj,    megaman,  cps1_12MHz, rockmanj, cps_state, init_cps1,     ROT0,   "Capcom", "Rockman: The Power Battle (CPS1, Japan 950922)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ganbare,     0,        ganbare,    ganbare,  cps_state, init_ganbare,  ROT0,   "Capcom", "Ganbare! Marine Kun (Japan 2K0411)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, pokonyan,    0,        cps1_10MHz, pokonyan, cps_state, init_cps1,     ROT0,   "Capcom", "Pokonyan! Balloon (Japan 940322)", MACHINE_SUPPORTS_SAVE ) // 2002-10-24 was on the ROM labels, 940322 on the startup screen... take your pick
+GAME( 1996, hkittymp,    0,        cps1_10MHz, pokonyan, cps_state, init_cps1,     ROT0,   "Capcom", "Hello Kitty Magical Pumpkin (Japan 960712)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs 'wheel' emulation
 
 /* Games released on CPS-1 hardware by Mitchell */
 
@@ -14639,4 +14685,4 @@ CONS( 1995, sfzch,  0,     0, cps1_12MHz, sfzch, cps_state, init_cps1, "Capcom",
 CONS( 1995, sfach,  sfzch, 0, cps1_12MHz, sfzch, cps_state, init_cps1, "Capcom", "Street Fighter Alpha: Warriors' Dreams (CPS Changer, Publicity USA 950727)", MACHINE_SUPPORTS_SAVE )
 CONS( 1995, sfzbch, sfzch, 0, cps1_12MHz, sfzch, cps_state, init_cps1, "Capcom", "Street Fighter Zero (CPS Changer, Brazil 950727)", MACHINE_SUPPORTS_SAVE )
 
-// Ken Sei Mogura: Street Fighter II - see kenseim.c
+// Ken Sei Mogura: Street Fighter II - see capcom/kenseim.cpp

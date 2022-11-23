@@ -1462,9 +1462,9 @@ ROM_START(nms8245)
 	ROM_SYSTEM_BIOS(0, "v1.08", "v1.08")
 	ROMX_LOAD("v1_08.u7", 0x00000, 0x10000, CRC(69d5cbe6) SHA1(cc57c1dcd7249ea9f8e2547244592e7d97308ed0), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v1.06", "v1.06")
-	ROMX_LOAD("v1_06.u7", 0x00000, 0x10000, CRC(be4ae17e) SHA1(cc57c1dcd7249ea9f8e2547244592e7d97308ed0), ROM_BIOS(1))
+	ROMX_LOAD("v1_06.u7", 0x00000, 0x10000, CRC(be4ae17e) SHA1(b746192dc333eaf2a725a44777303808a3649d63), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v1.05", "v1.05")
-	ROMX_LOAD("v1_05.u7", 0x00000, 0x10000, CRC(cef8895d) SHA1(cc57c1dcd7249ea9f8e2547244592e7d97308ed0), ROM_BIOS(2))
+	ROMX_LOAD("v1_05.u7", 0x00000, 0x10000, CRC(cef8895d) SHA1(816ceb21088b116ec34be0ff869d02222b525e58), ROM_BIOS(2))
 ROM_END
 
 void msx2_state::nms8245(machine_config &config)
@@ -3000,6 +3000,26 @@ ROM_START(hbf900a)
 	ROM_LOAD("f900kfn.rom", 0, 0x20000, CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799))
 ROM_END
 
+void msx2_state::hbf900a(machine_config &config)
+{
+	// YM2149 (in S1985)
+	// FDC: wd2793, 2 3.5" DSDD drives
+	// 2 Cartridge slots
+	// S1985
+
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
+	add_cartridge_slot<1>(config, 1);
+	add_cartridge_slot<2>(config, 2);
+	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
+	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 1, 0, 4).set_total_size(0x40000).set_ramio_bits(0x80);   // 256KB Mapper RAM
+	add_internal_disk(config, MSX_SLOT_DISK1_WD2793_N_2_DRIVES, "disk", 3, 2, 1, 1, "diskrom");
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 1, "firmware");
+
+	MSX_S1985(config, "s1985", 0);
+
+	msx2(SND_YM2149, config);
+}
+
 /* MSX2 - Sony HB-F9P */
 
 ROM_START(hbf9p)
@@ -3701,9 +3721,7 @@ ROM_START(y503iiir)
 	ROM_LOAD("yis503iiircpm.rom", 0x0000, 0x4000, CRC(417bf00e) SHA1(f4f7a54cdf5a9dd6c59f7cb219c2c5eb0a00fa8a))
 
 	ROM_REGION(0x8000, "network", 0)
-	// TODO: Which one is correct??
 	// has 2 * 2KB RAM?
-	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(0e345b43) SHA1(e8fd2bbc1bdab12c73a0fec178a190f9063547bb))
 	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(75331cac) SHA1(307a7be064442feb4ab2e1a2bc971b138c1a1169))
 ROM_END
 
@@ -3740,8 +3758,6 @@ ROM_START(y503iiire)
 	ROM_LOAD("yis503iiirecpm.rom", 0x0000, 0x4000, CRC(417bf00e) SHA1(f4f7a54cdf5a9dd6c59f7cb219c2c5eb0a00fa8a))
 
 	ROM_REGION(0x8000, "network", 0)
-	// TODO: Which one is correct??
-	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(0e345b43) SHA1(e8fd2bbc1bdab12c73a0fec178a190f9063547bb))
 	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(75331cac) SHA1(307a7be064442feb4ab2e1a2bc971b138c1a1169))
 ROM_END
 
@@ -3873,7 +3889,7 @@ ROM_END
 void msx2_state::y805128r2(machine_config &config)
 {
 	// YM2149 (in S1985)
-	// FDC: wd2793?, 1 3.5" DSDD drive
+	// FDC: wd2793, 2 3.5" DSDD drives
 	// 2 Cartridge slots
 	// S1985 MSX Engine
 	// Networking built in
@@ -3883,7 +3899,7 @@ void msx2_state::y805128r2(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 0, 0, 4, "firmware");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793, "disk", 3, 1, 1, 2, "diskrom");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK8_WD2793_2_DRIVES, "disk", 3, 1, 1, 2, "diskrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 	// This is actually the module slot
 	add_internal_slot(config, MSX_SLOT_ROM, "network", 3, 3, 0, 2, "network", 0x00000);
@@ -4645,7 +4661,7 @@ COMP(1986, hbf700f,    hbf700p,  0,     hbf700f,    msx2fr,   msx2_state, empty_
 COMP(1986, hbf700p,    0,        0,     hbf700p,    msx2uk,   msx2_state, empty_init, "Sony", "HB-F700P (MSX2, Europe)", 0)
 COMP(1986, hbf700s,    hbf700p,  0,     hbf700s,    msx2sp,   msx2_state, empty_init, "Sony", "HB-F700S (MSX2, Spain)", 0)
 COMP(1986, hbf900,     hbf900a,  0,     hbf900,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F900 (MSX2, Japan)", 0)
-COMP(1986, hbf900a,    0,        0,     hbf900,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F900 (alt) (MSX2, Japan)", 0)
+COMP(1986, hbf900a,    0,        0,     hbf900a,    msx2jp,   msx2_state, empty_init, "Sony", "HB-F900 (alt) (MSX2, Japan)", 0)
 COMP(1987, hbg900ap,   hbg900p,  0,     hbg900ap,   msx2uk,   msx2_state, empty_init, "Sony", "HB-G900AP (MSX2, Europe)", MACHINE_NOT_WORKING) // rs232 not communicating
 COMP(1986, hbg900p,    0,        0,     hbg900p,    msx2uk,   msx2_state, empty_init, "Sony", "HB-G900P (MSX2, Europe)", MACHINE_NOT_WORKING) // rs232 not communicating
 COMP(1987, tpc310,     0,        0,     tpc310,     msxsp,    msx2_state, empty_init, "Talent", "TPC-310 (MSX2, Argentina)", 0)
@@ -4666,8 +4682,8 @@ COMP(1985, y503iiir,   0,        0,     y503iiir,   msxru,    msx2_state, empty_
 COMP(198?, y503iiire,  y503iiir, 0,     y503iiir,   msx2,     msx2_state, empty_init, "Yamaha", "YIS-503 III R (MSX2, Estonian)", MACHINE_NOT_WORKING) // network not implemented
 COMP(1985, yis604,     0,        0,     yis604,     msx2jp,   msx2_state, empty_init, "Yamaha", "YIS604/128 (MSX2, Japan)", 0)
 COMP(1986, y805128,    y805256,  0,     y805128,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/128 (MSX2, Japan)", MACHINE_NOT_WORKING) // Floppy support broken
-COMP(1986, y805128r2,  y805256,  0,     y805128r2,  msx2,     msx2_state, empty_init, "Yamaha", "YIS805/128R2 (MSX2, USSR)", MACHINE_NOT_WORKING) // Floppy support broken, network not implemented
-COMP(198?, y805128r2e, y805256,  0,     y805128r2,  y503iir2, msx2_state, empty_init, "Yamaha", "YIS805/128R2 (MSX2, Estonian)", MACHINE_NOT_WORKING) // Floppy support broken, network not implemented
+COMP(1986, y805128r2,  y805256,  0,     y805128r2,  msx2,     msx2_state, empty_init, "Yamaha", "YIS805/128R2 (MSX2, USSR)", MACHINE_NOT_WORKING) // Network not implemented
+COMP(198?, y805128r2e, y805256,  0,     y805128r2,  y503iir2, msx2_state, empty_init, "Yamaha", "YIS805/128R2 (MSX2, Estonian)", MACHINE_NOT_WORKING) // Network not implemented
 COMP(198?, y805256,    0,        0,     y805256,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/256 (MSX2, Japan)", MACHINE_NOT_WORKING) // Floppy support broken?
 
 /* MSX2+ */

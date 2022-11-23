@@ -49,7 +49,7 @@
    the strategies.  Strategies implemented by each cartridge should be identified.
  * HK0701 and HK0819 seem to differ in that HK0819 fully decodes ROM addresses while HK0701 mirrors - we
    should probably emulated the difference at some point.
- * Digimon 2 mapper doesn't work
+ * BC-R1616T3P is a variant of DSHGGB-81 with the same ROM scrambling but without logo spoofing.
 
  ***********************************************************************************************************/
 
@@ -281,12 +281,16 @@ protected:
 		m_spoof_logo = 0U;
 
 		install_ram_tap();
-		m_notif_cart_space = cart_space()->add_change_notifier(
-				[this] (read_or_write mode)
-				{
-					if (u32(mode) & u32(read_or_write::WRITE))
-						install_ram_tap();
-				});
+		add_ram_notifier();
+	}
+
+	virtual void device_post_load() override ATTR_COLD
+	{
+		mbc5_device_base::device_post_load();
+
+		install_ram_tap();
+		if (!m_spoof_logo)
+			add_ram_notifier();
 	}
 
 	u8 read_rom(offs_t offset)
@@ -374,12 +378,160 @@ private:
 		}
 	}
 
+	void add_ram_notifier()
+	{
+		m_notif_cart_space = cart_space()->add_change_notifier(
+				[this] (read_or_write mode)
+				{
+					if (u32(mode) & u32(read_or_write::WRITE))
+						install_ram_tap();
+				});
+	}
+
 	memory_passthrough_handler m_ram_tap;
 	util::notifier_subscription m_notif_cart_space;
 
 	u8 m_counter;
 	u8 m_spoof_logo;
 	bool m_installing_tap;
+};
+
+
+
+//**************************************************************************
+//  MBC5-like pirate cartridges with scrambled bank numbers and data
+//**************************************************************************
+
+class mbc5_scrambled_device_base : public mbc5_logo_spoof_device_base
+{
+
+	virtual image_init_result load(std::string &message) override ATTR_COLD
+	{
+		// install regular MBC5 handlers
+		image_init_result const result(mbc5_logo_spoof_device_base::load(message));
+		if (image_init_result::PASS != result)
+			return result;
+
+		// bank numbers and ROM contents are scrambled for protection
+		cart_space()->install_read_handler(
+				0x0000, 0x3fff,
+				read8sm_delegate(*this, FUNC(mbc5_scrambled_device_base::read_rom_low)));
+		cart_space()->install_read_handler(
+				0x4000, 0x7fff,
+				read8sm_delegate(*this, FUNC(mbc5_scrambled_device_base::read_rom_high)));
+		cart_space()->install_write_handler(
+				0x2000, 0x2000, 0x0000, 0x0f00, 0x0000,
+				write8smo_delegate(*this, FUNC(mbc5_scrambled_device_base::bank_switch_fine_low_scrambled)));
+		cart_space()->install_write_handler(
+				0x2001, 0x2001, 0x0000, 0x0f00, 0x0000,
+				write8smo_delegate(*this, FUNC(mbc5_scrambled_device_base::set_data_scramble)));
+		cart_space()->install_write_handler(
+				0x2080, 0x2080, 0x0000, 0x0f00, 0x0000,
+				write8smo_delegate(*this, FUNC(mbc5_scrambled_device_base::set_bank_scramble)));
+
+		// all good
+		return image_init_result::PASS;
+	}
+
+protected:
+	using unscramble_function = u8 (*)(u8);
+
+	mbc5_scrambled_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+		mbc5_logo_spoof_device_base(mconfig, type, tag, owner, clock),
+		m_unscramble_data(nullptr),
+		m_unscramble_bank(nullptr),
+		m_scramble_mode{ 0U, 0U }
+	{
+	}
+
+	virtual void device_start() override ATTR_COLD
+	{
+		mbc5_logo_spoof_device_base::device_start();
+
+		save_item(NAME(m_scramble_mode));
+	}
+
+	virtual void device_reset() override ATTR_COLD
+	{
+		mbc5_logo_spoof_device_base::device_reset();
+
+		m_unscramble_data = unscramble_data(0U);
+		m_unscramble_bank = unscramble_bank(0U);
+		m_scramble_mode[0] = 0U;
+		m_scramble_mode[1] = 0U;
+	}
+
+	virtual void device_post_load() override ATTR_COLD
+	{
+		mbc5_logo_spoof_device_base::device_post_load();
+
+		m_unscramble_data = unscramble_data(m_scramble_mode[0]);
+		m_unscramble_bank = unscramble_bank(m_scramble_mode[1]);
+	}
+
+	virtual unscramble_function unscramble_data(u8 data) = 0;
+	virtual unscramble_function unscramble_bank(u8 data) = 0;
+
+	template <unsigned... B>
+	static u8 unscramble(u8 data)
+	{
+		return bitswap<8>(data, B...);
+	}
+
+private:
+	u8 read_rom_low(offs_t offset)
+	{
+		offset = rom_access(offset);
+		return bank_rom_low_base()[offset];
+	}
+
+	u8 read_rom_high(offs_t offset)
+	{
+		offset = rom_access(0x4000 | offset) & 0x3fff;
+		return m_unscramble_data(bank_rom_high_base()[offset]);
+	}
+
+	void bank_switch_fine_low_scrambled(u8 data)
+	{
+		set_bank_rom_fine((bank_rom_fine() & 0x0100) | u16(m_unscramble_bank(data)));
+	}
+
+	void set_data_scramble(u8 data)
+	{
+		LOG(
+				"%s: Set ROM data scrambling mode 0x%02X\n",
+				machine().describe_context(),
+				data);
+		if (data != m_scramble_mode[0])
+		{
+			m_unscramble_data = unscramble_data(data);
+			m_scramble_mode[0] = data;
+		}
+
+		// TODO: does this actually trigger a bank switch?
+		set_bank_rom_fine((bank_rom_fine() & 0x0100) | u16(data));
+	}
+
+	void set_bank_scramble(u8 data)
+	{
+		LOG(
+				"%s: Set ROM bank number scrambling mode 0x%02X\n",
+				machine().describe_context(),
+				data);
+		if (data != m_scramble_mode[1])
+		{
+			m_unscramble_bank = unscramble_bank(data);
+			m_scramble_mode[1] = data;
+		}
+
+		// TODO: does this actually trigger a bank switch?
+		set_bank_rom_fine((bank_rom_fine() & 0x0100) | u16(data));
+	}
+
+	unscramble_function m_unscramble_data;
+	unscramble_function m_unscramble_bank;
+
+	u8 m_scramble_mode[2];
 };
 
 
@@ -660,6 +812,109 @@ private:
 
 
 //**************************************************************************
+//  MBC5 variant used by BBD games
+//**************************************************************************
+
+class bbd_device : public mbc5_scrambled_device_base
+{
+public:
+	bbd_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+		mbc5_scrambled_device_base(mconfig, GB_ROM_BBD, tag, owner, clock)
+	{
+	}
+
+protected:
+	virtual unscramble_function unscramble_data(u8 data) override
+	{
+		switch (data & 0x07)
+		{
+		case 0x0: // no scrambling
+			return &bbd_device::unscramble<7, 6, 5, 4, 3, 2, 1, 0>;
+		case 0x4: // Garou
+			return &bbd_device::unscramble<7, 6, 2, 4, 3, 1, 5, 0>;
+		case 0x5: // Harry Potter
+			return  &bbd_device::unscramble<7, 6, 5, 1, 3, 2, 4, 0>;
+		case 0x7: // Digimon Adventure
+			return  &bbd_device::unscramble<7, 6, 2, 4, 3, 5, 1, 0>;
+		}
+
+		logerror(
+				"%s: Unsupported ROM data scrambling mode 0x%02X\n",
+				machine().describe_context(),
+				data);
+		return &bbd_device::unscramble<7, 6, 5, 4, 3, 2, 1, 0>;
+	}
+
+	virtual unscramble_function unscramble_bank(u8 data) override
+	{
+		switch (data & 0x07)
+		{
+		case 0x0: // no scrambling
+			return &bbd_device::unscramble<7, 6, 5, 4, 3, 2, 1, 0>;
+		case 0x3: // Digimon Adventure, Garou - two most significant bits unconfirmed
+			return &bbd_device::unscramble<7, 6, 5, 1, 0, 2, 4, 3>;
+		case 0x5: // Harry Potter - two most significant bits unconfirmed
+			return &bbd_device::unscramble<7, 6, 5, 0, 4, 3, 2, 1>;
+		}
+
+		logerror(
+				"%s: Unsupported ROM bank number scrambling mode 0x%02X\n",
+				machine().describe_context(),
+				data);
+		return &bbd_device::unscramble<7, 6, 5, 4, 3, 2, 1, 0>;
+	}
+};
+
+
+
+//**************************************************************************
+//  MBC5 variant with DSHGGB-81 PCB
+//**************************************************************************
+
+class dshggb81_device : public mbc5_scrambled_device_base
+{
+public:
+	dshggb81_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+		mbc5_scrambled_device_base(mconfig, GB_ROM_DSHGGB81, tag, owner, clock)
+	{
+	}
+
+protected:
+	virtual unscramble_function unscramble_data(u8 data) override
+	{
+		switch (data & 0x07)
+		{
+		default: // just to shut up dumb compilers
+		case 0x0: return &dshggb81_device::unscramble<7, 6, 5, 4, 3, 2, 1, 0>;
+		case 0x1: return &dshggb81_device::unscramble<7, 5, 6, 4, 3, 1, 2, 0>;
+		case 0x2: return &dshggb81_device::unscramble<7, 1, 2, 4, 3, 5, 6, 0>;
+		case 0x3: return &dshggb81_device::unscramble<7, 6, 2, 4, 3, 1, 5, 0>;
+		case 0x4: return &dshggb81_device::unscramble<7, 6, 1, 4, 3, 2, 5, 0>;
+		case 0x5: return &dshggb81_device::unscramble<7, 1, 5, 4, 3, 6, 2, 0>;
+		case 0x6: return &dshggb81_device::unscramble<7, 5, 2, 4, 3, 6, 1, 0>;
+		case 0x7: return &dshggb81_device::unscramble<7, 1, 6, 4, 3, 5, 2, 0>;
+		}
+	}
+
+	virtual unscramble_function unscramble_bank(u8 data) override
+	{
+		switch (data & 0x07)
+		{
+		case 0x0: // no scrambling
+			return &dshggb81_device::unscramble<7, 6, 5, 4, 3, 2, 1, 0>;
+		}
+
+		logerror(
+				"%s: Unsupported ROM bank number scrambling mode 0x%02X\n",
+				machine().describe_context(),
+				data);
+		return &dshggb81_device::unscramble<7, 6, 5, 4, 3, 2, 1, 0>;
+	}
+};
+
+
+
+//**************************************************************************
 //  MBC5 variant used by Sintax games
 //**************************************************************************
 
@@ -682,8 +937,11 @@ public:
 
 		// bank numbers and ROM contents are scrambled for protection
 		cart_space()->install_read_handler(
-				0x0000, 0x7fff,
-				read8sm_delegate(*this, FUNC(sintax_device::read_rom)));
+				0x0000, 0x3fff,
+				read8sm_delegate(*this, FUNC(sintax_device::read_rom_low)));
+		cart_space()->install_read_handler(
+				0x4000, 0x7fff,
+				read8sm_delegate(*this, FUNC(sintax_device::read_rom_high)));
 		cart_space()->install_write_handler(
 				0x2000, 0x2fff,
 				write8smo_delegate(*this, FUNC(sintax_device::bank_switch_fine_low_scrambled)));
@@ -718,13 +976,16 @@ protected:
 	}
 
 private:
-	u8 read_rom(offs_t offset)
+	u8 read_rom_low(offs_t offset)
 	{
 		offset = rom_access(offset);
-		if (BIT(offset, 14))
-			return bank_rom_high_base()[offset & 0x3fff] ^ m_xor_table[m_xor_index];
-		else
-			return bank_rom_low_base()[offset];
+		return bank_rom_low_base()[offset];
+	}
+
+	u8 read_rom_high(offs_t offset)
+	{
+		offset = rom_access(0x4000 | offset) & 0x3fff;
+		return bank_rom_high_base()[offset] ^ m_xor_table[m_xor_index];
 	}
 
 	void bank_switch_fine_low_scrambled(u8 data)
@@ -755,8 +1016,12 @@ private:
 			data = bitswap<8>(data, 1, 0, 7, 6, 5, 4, 3, 2);
 			break;
 		case 0x0f: // no scrambling
-		default:
 			break;
+		default:
+			logerror(
+					"%s: Unsupported ROM bank number scrambling mode 0x%X\n",
+					machine().describe_context(),
+					m_scramble_mode & 0x0f);
 		}
 
 		set_bank_rom_fine((bank_rom_fine() & 0x0100) | u16(data));
@@ -1282,71 +1547,6 @@ private:
 	u8 m_split_enable;
 };
 
-
-
-//**************************************************************************
-//  Yong Yong Digimon 2 (and maybe 4?)
-//**************************************************************************
-/*
- Digimon 2 writes to 0x2000 to set the fine ROM bank, then writes a series
- of values to 0x2400 that the patched version does not write.
- Digimon 4 seems to share part of the 0x2000 behavior, but does not write
- to 0x2400.
- */
-
-class digimon_device : public rom_mbc_device_base
-{
-public:
-	digimon_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-		rom_mbc_device_base(mconfig, GB_ROM_DIGIMON, tag, owner, clock)
-	{
-	}
-
-	virtual image_init_result load(std::string &message) override ATTR_COLD
-	{
-		// set up ROM and RAM
-		if (!install_memory(message, 4, 7))
-			return image_init_result::FAIL;
-
-		// install handlers
-		cart_space()->install_write_handler(
-				0x0000, 0x1fff,
-				write8smo_delegate(*this, FUNC(digimon_device::enable_ram)));
-		cart_space()->install_write_handler(
-				0x2000, 0x2000,
-				write8smo_delegate(*this, FUNC(digimon_device::bank_switch_fine)));
-		cart_space()->install_write_handler(
-				0x4000, 0x5fff,
-				write8smo_delegate(*this, FUNC(digimon_device::bank_switch_coarse)));
-
-		// all good
-		return image_init_result::PASS;
-	}
-
-protected:
-	virtual void device_reset() override ATTR_COLD
-	{
-		rom_mbc_device_base::device_reset();
-
-		set_bank_rom_coarse(0);
-		set_bank_rom_fine(1);
-		set_ram_enable(false);
-		set_bank_ram(0);
-	}
-
-private:
-	void enable_ram(u8 data)
-	{
-		set_ram_enable(0x0a == (data & 0x0f));
-	}
-
-	void bank_switch_fine(u8 data)
-	{
-		data >>= 1;
-		set_bank_rom_fine(data ? data : 1);
-	}
-};
-
 } // anonymous namespace
 
 } // namespace bus::gameboy
@@ -1355,9 +1555,10 @@ private:
 // device type definition
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC1,     device_gb_cart_interface, bus::gameboy::mbc1_device,        "gb_rom_mbc1",     "Game Boy MBC1 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC5,     device_gb_cart_interface, bus::gameboy::mbc5_device,        "gb_rom_mbc5",     "Game Boy MBC5 Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_BBD,      device_gb_cart_interface, bus::gameboy::bbd_device,         "gb_rom_bbd",      "Game Boy BBD Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_DSHGGB81, device_gb_cart_interface, bus::gameboy::dshggb81_device,    "gb_rom_dshggb81", "Game Boy DSHGGB-81 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_SINTAX,   device_gb_cart_interface, bus::gameboy::sintax_device,      "gb_rom_sintax",   "Game Boy Sintax MBC5 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_CHONGWU,  device_gb_cart_interface, bus::gameboy::chongwu_device,     "gb_rom_chongwu",  "Game Boy Chongwu Xiao Jingling Pokemon Pikecho Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_LICHENG,  device_gb_cart_interface, bus::gameboy::licheng_device,     "gb_rom_licheng",  "Game Boy Li Cheng MBC5 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_NEWGBCHK, device_gb_cart_interface, bus::gameboy::ngbchk_device,      "gb_rom_ngbchk",   "Game Boy HK0701/HK0819 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_VF001,    device_gb_cart_interface, bus::gameboy::vf001_device,       "gb_rom_vf001",    "Game Boy Vast Fame VF001 Cartridge")
-DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_DIGIMON,  device_gb_cart_interface, bus::gameboy::digimon_device,     "gb_rom_digimon",  "Game Boy Digimon 2 Cartridge")

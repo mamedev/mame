@@ -154,9 +154,14 @@ ht1080z    works
 
 #include "emu.h"
 #include "trs80.h"
+
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
+
 #include "softlist_dev.h"
+
+#include "formats/dmk_dsk.h"
+
 #include "utf8.h"
 
 
@@ -411,6 +416,7 @@ GFXDECODE_END
 
 void trs80_state::floppy_formats(format_registration &fr)
 {
+	fr.add(FLOPPY_DMK_FORMAT);
 	fr.add(FLOPPY_JV1_FORMAT);
 }
 

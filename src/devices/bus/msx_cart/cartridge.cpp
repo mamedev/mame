@@ -34,16 +34,13 @@
 
 void msx_cart(device_slot_interface &device)
 {
+	msx_cart_disk_register_options(device);
 	device.option_add_internal("arc", MSX_CART_ARC);
 	device.option_add_internal("ascii8", MSX_CART_ASCII8);
 	device.option_add_internal("ascii8_sram", MSX_CART_ASCII8_SRAM);
 	device.option_add_internal("ascii16", MSX_CART_ASCII16);
 	device.option_add_internal("ascii16_sram", MSX_CART_ASCII16_SRAM);
 	device.option_add_internal("cross_blaim", MSX_CART_CROSSBLAIM);
-	device.option_add_internal("disk_vy0010", MSX_CART_VY0010);
-	device.option_add_internal("disk_fsfd1", MSX_CART_FSFD1);
-	device.option_add_internal("disk_fsfd1a", MSX_CART_FSFD1A);
-	device.option_add_internal("disk_fscf351", MSX_CART_FSCF351);
 	device.option_add_internal("dooly", MSX_CART_DOOLY);
 	device.option_add_internal("easispeech", MSX_CART_EASISPEECH);
 	device.option_add_internal("fmpac", MSX_CART_FMPAC);
@@ -73,6 +70,7 @@ void msx_cart(device_slot_interface &device)
 	device.option_add_internal("super_swangi", MSX_CART_SUPER_SWANGI);
 	device.option_add_internal("superloderunner", MSX_CART_SUPERLODERUNNER);
 	device.option_add_internal("synthesizer", MSX_CART_SYNTHESIZER);
+	device.option_add_internal("ec701", MSX_CART_EC701);
 	device.option_add("bm_012", MSX_CART_BM_012);
 	device.option_add("moonsound", MSX_CART_MOONSOUND);
 }

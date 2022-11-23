@@ -13033,6 +13033,24 @@ ROM_START( moonal2b )
 	ROM_LOAD( "6331.l6",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+ROM_START( galactica2 ) // on a PCB silkscreend 'Cirsa'
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a_2_galactica_cirsa", 0x0000, 0x0800, CRC(c561235e) SHA1(d960bc73a330a73b8c7bd8cce6a91ae180a59fe7) )
+	ROM_LOAD( "b_2_galactica_cirsa", 0x0800, 0x0800, CRC(0b3c3cae) SHA1(f0f03a9110bee1288ab042d963470f5a4b0903c6) )
+	ROM_LOAD( "c_2_galactica_cirsa", 0x1000, 0x0800, CRC(b2170d3b) SHA1(76e463f70de92663e672c54737de5471cd04ba7c) )
+	ROM_LOAD( "f_2_galactica_cirsa", 0x1800, 0x0800, CRC(51c95126) SHA1(c408cbd17a5207b3744fe0c7f2de51812e6fdc16) )
+	ROM_LOAD( "g_2_galactica_cirsa", 0x2000, 0x1000, CRC(16b9d56d) SHA1(238d007533754f1451920e9fc99ab23a60141159) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "h_2_galactica_cirsa", 0x0000, 0x0800, CRC(6babd14e) SHA1(c8601803bc74c1089f767c4672376d4788dc4f49) )
+	ROM_RELOAD(                      0x0800, 0x0800 )
+	ROM_LOAD( "i_2_galactica_cirsa", 0x1000, 0x0800, CRC(0997e81b) SHA1(a5c6b2b59f7a807b44e5d49c54c42d1abf2fc71a) )
+	ROM_RELOAD(                      0x1800, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s288n", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
 
 /*
 
@@ -16144,8 +16162,9 @@ GAME( 1980, mooncrgx,    mooncrst, galaxian,   mooncrgx,   galaxian_state, init_
 GAME( 1980, moonqsr,     0,        moonqsr,    moonqsr,    galaxian_state, init_moonqsr,    ROT90,  "Nichibutsu", "Moon Quasar", MACHINE_SUPPORTS_SAVE )
 
 // These have an energy bar, and 'rowscroll effect' title made out of the energy bar tiles.
-GAME( 1980, moonal2,     0,        mooncrst,   moonal2,    galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu", "Moon Alien Part 2",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1980, moonal2b,    moonal2,  mooncrst,   moonal2,    galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu", "Moon Alien Part 2 (older version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, moonal2,     0,        mooncrst,   moonal2,    galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu", "Moon Alien Part 2",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1980, moonal2b,    moonal2,  mooncrst,   moonal2,    galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu", "Moon Alien Part 2 (older version)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1980, galactica2,  moonal2,  mooncrst,   moonal2,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Cirsa)",    "Galactica-2 (Moon Alien Part 2 bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Larger romspace, interrupt enable moved
 GAME( 198?, thepitm,     thepit,   thepitm,    thepitm,    galaxian_state, init_mooncrsu,   ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", MACHINE_SUPPORTS_SAVE ) // on an original MQ-2FJ PCB, even if the memory map appears closer to Moon Cresta

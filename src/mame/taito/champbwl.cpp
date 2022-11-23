@@ -193,7 +193,7 @@ class champbwl_state : public champbwl_base_state
 public:
 	champbwl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		champbwl_base_state(mconfig, type, tag),
-		m_nvram(*this, "nvram"),
+		m_inputs(*this, "IN%u", 0U),
 		m_fakex(*this, "FAKEX%u", 1U),
 		m_fakey(*this, "FAKEY%u", 1U)
 	{ }
@@ -205,11 +205,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_shared_ptr<uint8_t> m_nvram;
-	required_ioport_array<2> m_fakex;
-	required_ioport_array<2> m_fakey;
-	uint8_t m_last_trackball_val[2][2];
-
 	uint8_t trackball_r();
 	uint8_t trackball_reset_r();
 	void misc_w(uint8_t data);
@@ -217,6 +212,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void prg_map(address_map &map);
+
+	required_ioport_array<2> m_inputs;
+	required_ioport_array<2> m_fakex;
+	required_ioport_array<2> m_fakey;
+
+	bool m_input_select;
+	uint8_t m_last_trackball_val[2][2];
 };
 
 class doraemon_state : public champbwl_base_state
@@ -252,7 +254,7 @@ void champbwl_base_state::palette(palette_device &palette) const
 
 uint8_t champbwl_state::trackball_r()
 {
-	uint8_t which = BIT(m_nvram[0x400], 7);
+	uint8_t which = m_input_select;
 
 	uint8_t port4 = m_fakex[which]->read();
 	uint8_t port5 = m_fakey[which]->read();
@@ -264,7 +266,7 @@ uint8_t champbwl_state::trackball_r()
 
 uint8_t champbwl_state::trackball_reset_r()
 {
-	uint8_t which = BIT(m_nvram[0x400], 7);
+	uint8_t which = m_input_select;
 
 	if (!machine().side_effects_disabled())
 	{
@@ -284,6 +286,8 @@ void champbwl_state::misc_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_w(1, ~data & 4);
 
 	m_mainbank->set_entry((data & 0x30) >> 4);
+
+	m_input_select = BIT(data, 7);
 }
 
 
@@ -300,7 +304,7 @@ void champbwl_state::prg_map(address_map &map)
 	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8)); // enable / disable background transparency
 
 	map(0xf000, 0xf000).r(FUNC(champbwl_state::trackball_r));
-	map(0xf002, 0xf002).lr8(NAME([this] () -> u8 { return !BIT(m_nvram[0x400], 7) ? ioport("IN0")->read() : ioport("IN1")->read(); }));
+	map(0xf002, 0xf002).lr8(NAME([this] () -> u8 { return m_inputs[m_input_select]->read(); }));
 	map(0xf004, 0xf004).r(FUNC(champbwl_state::trackball_reset_r));
 	map(0xf006, 0xf006).portr("IN2");
 	map(0xf007, 0xf007).portr("IN3");
@@ -417,13 +421,13 @@ static INPUT_PORTS_START( champbwl )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("FAKEX1")     // FAKE
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0) PORT_REVERSE
 
 	PORT_START("FAKEY1")     // FAKE
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(45) PORT_CENTERDELTA(0) PORT_REVERSE
 
 	PORT_START("FAKEX2")     // FAKE
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0) PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0) PORT_REVERSE PORT_COCKTAIL
 
 	PORT_START("FAKEY2")     // FAKE
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(45) PORT_CENTERDELTA(0) PORT_REVERSE PORT_COCKTAIL
@@ -512,11 +516,13 @@ void champbwl_state::machine_start()
 {
 	champbwl_base_state::machine_start();
 
+	save_item(NAME(m_input_select));
 	save_item(NAME(m_last_trackball_val));
 }
 
 void champbwl_state::machine_reset()
 {
+	m_input_select = false;
 	m_last_trackball_val[0][0] = 0;
 	m_last_trackball_val[0][1] = 0;
 	m_last_trackball_val[1][0] = 0;

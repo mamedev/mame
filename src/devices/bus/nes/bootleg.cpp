@@ -840,7 +840,7 @@ TIMER_CALLBACK_MEMBER(nes_smb3p_device::irq_timer_tick)
 	// counter does not stop when interrupts are disabled
 	if (m_irq_count != 0xffff)
 		m_irq_count++;
-	else if (m_irq_enable)
+	if (m_irq_enable && m_irq_count == 0xffff)
 		set_irq_line(ASSERT_LINE);
 }
 
