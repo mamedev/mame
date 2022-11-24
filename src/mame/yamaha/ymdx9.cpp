@@ -106,7 +106,7 @@ private:
 	 * Input line 3 covers the numeric front-panel switches 17 though 20, as well as the
 	 * modulation pedal inputs: The Portamento, and Sustain pedals are mapped to 
 	 * bits 6, and 7 respectively.
-	 * Note: Input line 4 covers the keyboard circuit, which is not implemented here.
+	 * Note: Input lines 4-15 are used to map the keyboard, which is not implemented here.
 	 * When the keyboard state is read, the default value of 0 will be returned.
 	 * @param offset The offset into the memory mapped region being read.
 	 * @return uint8_t The value read from the bus.
