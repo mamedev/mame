@@ -1201,6 +1201,12 @@ void hornet_state::hornet(machine_config &config)
 {
 	// basic machine hardware
 	PPC403GA(config, m_maincpu, XTAL(64'000'000) / 2);   // PowerPC 403GA 32MHz
+	// The default serial clock used by the ppc4xx code results in JVS comm at 57600 baud,
+	// so set serial clock to 7.3728MHz (xtal on PCB) to allow for 115200 baud.
+	// With the slower clock rate the in and out rx ptr slowly desyncs (does not read
+	// last byte sometimes) on frequent large responses and eventually fatal errors with
+	// the message "ppc4xx_spu_rx_data: buffer overrun!".
+	m_maincpu->set_serial_clock(XTAL(7'372'800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::hornet_map);
 
 	M68000(config, m_audiocpu, XTAL(64'000'000) / 4);    // 16MHz
