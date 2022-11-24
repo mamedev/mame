@@ -40,6 +40,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -328,7 +329,7 @@ struct ymfm_output
 // ======================> ymfm_wavfile
 
 // this class is a debugging helper that accumulates data and writes it to wav files
-template<int _Channels>
+template<int Channels>
 class ymfm_wavfile
 {
 public:
@@ -360,10 +361,10 @@ public:
 			memcpy(&header[12], "fmt ", 4);
 			*(uint32_t *)&header[16] = 16;
 			*(uint16_t *)&header[20] = 1;
-			*(uint16_t *)&header[22] = _Channels;
+			*(uint16_t *)&header[22] = Channels;
 			*(uint32_t *)&header[24] = m_samplerate;
-			*(uint32_t *)&header[28] = m_samplerate * 2 * _Channels;
-			*(uint16_t *)&header[32] = 2 * _Channels;
+			*(uint32_t *)&header[28] = m_samplerate * 2 * Channels;
+			*(uint16_t *)&header[32] = 2 * Channels;
 			*(uint16_t *)&header[34] = 16;
 			memcpy(&header[36], "data", 4);
 			*(uint32_t *)&header[40] = m_buffer.size() * 2 + 44 - 44;
@@ -376,24 +377,24 @@ public:
 	}
 
 	// add data to the file
-	template<int _Outputs>
-	void add(ymfm_output<_Outputs> output)
+	template<int Outputs>
+	void add(ymfm_output<Outputs> output)
 	{
-		int16_t sum[_Channels] = { 0 };
-		for (int index = 0; index < _Outputs; index++)
-			sum[index % _Channels] += output.data[index];
-		for (int index = 0; index < _Channels; index++)
+		int16_t sum[Channels] = { 0 };
+		for (int index = 0; index < Outputs; index++)
+			sum[index % Channels] += output.data[index];
+		for (int index = 0; index < Channels; index++)
 			m_buffer.push_back(sum[index]);
 	}
 
 	// add data to the file, using a reference
-	template<int _Outputs>
-	void add(ymfm_output<_Outputs> output, ymfm_output<_Outputs> const &ref)
+	template<int Outputs>
+	void add(ymfm_output<Outputs> output, ymfm_output<Outputs> const &ref)
 	{
-		int16_t sum[_Channels] = { 0 };
-		for (int index = 0; index < _Outputs; index++)
-			sum[index % _Channels] += output.data[index] - ref.data[index];
-		for (int index = 0; index < _Channels; index++)
+		int16_t sum[Channels] = { 0 };
+		for (int index = 0; index < Outputs; index++)
+			sum[index % Channels] += output.data[index] - ref.data[index];
+		for (int index = 0; index < Channels; index++)
 			m_buffer.push_back(sum[index]);
 	}
 
