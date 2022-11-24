@@ -267,14 +267,15 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 // (or a better rearrange from driver_init, but that implies getting everything in place).
 uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1, uint8_t jis2, int x, int y)
 {
+	// famista uses jis1 = 0x2c for the text box lines
+	// xak2 also wants jis1 bit 3 arranged this way for 8x16 English menuing plus other stuff
 	if(jis1 < 0x30)
-	{
-		// famista uses jis1 = 0x2c for the text box lines
 		return ((jis2 & 0x60) << 8) + ((jis1 & 0x07) << 10) + ((jis2 & 0x1f) << 5) + ((jis1 & 0x8) << 15);
-	}
-	else if(jis1 >= 0x30 && jis1 < 0x3f)
+
+	if((jis1 & 0xf0) == 0x30)
 		return ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
-	else if(jis1 >= 0x40 && jis1 < 0x50)
+
+	if((jis1 & 0xf0) == 0x40)
 		return 0x4000 + ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
 
 	LOGKANJI("%d %d %02x %02x\n",x, y, jis1, jis2);
