@@ -1541,8 +1541,8 @@ static INPUT_PORTS_START( vsmahjng )
 	PORT_DIPSETTING(    0x08, "Tonnan" )
 	PORT_DIPSETTING(    0x00, "Tonton" )
 	PORT_DIPNAME( 0x10, 0x00, "Dora" )                  PORT_DIPLOCATION("SW2:!5")
-	PORT_DIPSETTING(    0x00, "?" )
-	PORT_DIPSETTING(    0x10, "?" )
+	PORT_DIPSETTING(    0x00, "Genbutsu" )
+	PORT_DIPSETTING(    0x10, "Next" )
 	PORT_DIPNAME( 0x60, 0x00, "Starting Points" )       PORT_DIPLOCATION("SW2:!6,!7")
 	PORT_DIPSETTING(    0x60, "15000" )
 	PORT_DIPSETTING(    0x20, "20000" )
@@ -2098,7 +2098,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vsskykid )
 	PORT_INCLUDE( vsnes_rev )
 
-	// FIXME: vsskykid needs button 3 to select a 2 player game. This is installed here for now, but really 2 player mode should only work on a DualSystem.
+	// FIXME: according to the manual, the operator "must solder a jumper wire connecting traces 9 and 10 on the edge connector P2"
+	// This mod will make Select 2 start a two player game on a UniSystem, as the game is really hard coded to use the nonexistent Select 3.
+	// Similar fake button for jajamaru can also be removed when this is fixed.
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START3 ) PORT_NAME("Select 3 (Purple)")  // START on a NES
 
