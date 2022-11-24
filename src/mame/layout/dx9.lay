@@ -309,36 +309,36 @@ license:CC0
 	<group name="front-panel-buttons-main">
 		<!-- Main buttons -->
 		<element ref="button-text-store"><bounds x="0" y="0" width="72" height="16" /></element>
-		<element ref="button-membrane-red" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_0" inputmask="0x04">
+		<element ref="button-membrane-red" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x04">
 			<bounds x="0" y="16" width="72" height="32" />
 		</element>
 
 		<element ref="button-text-function"><bounds x="80" y="0" width="72" height="16" /></element>
-		<element ref="button-membrane-brown" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_0" inputmask="0x10">
+		<element ref="button-membrane-brown" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x10">
 			<bounds x="80" y="16" width="72" height="32" />
 		</element>
 
 		<element ref="button-text-edit"><bounds x="0" y="64" width="72" height="16" /></element>
-		<element ref="button-membrane-blue" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_0" inputmask="0x20">
+		<element ref="button-membrane-blue" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x20">
 			<bounds x="0" y="80" width="72" height="32" />
 		</element>
 
 		<element ref="button-text-memory"><bounds x="80" y="64" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_0" inputmask="0x40">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x40">
 			<bounds x="80" y="80" width="72" height="32" />
 		</element>
 	</group>
 
 	<group name="front-panel-buttons-up-down">
 		<element ref="button-text-no"><bounds x="0" y="0" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_0" inputmask="0x2">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x2">
 			<bounds x="0" y="16" width="72" height="32" />
 		</element>
 		<element ref="button-text-minus"><bounds x="4" y="22" width="18" height="18" /></element>
 		<element ref="button-text-off"><bounds x="0" y="48" width="72" height="16" /></element>
 
 		<element ref="button-text-yes"><bounds x="80" y="0" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_0" inputmask="0x1">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x1">
 			<bounds x="80" y="16" width="72" height="32" />
 		</element>
 		<element ref="button-text-plus"><bounds x="84" y="22" width="18" height="18" /></element>
@@ -351,7 +351,7 @@ license:CC0
 		<element ref="button-text-operator-copy"><bounds x="0" y="0" width="128" height="16" /></element>
 		<element ref="button-text-separator-blue"><bounds x="0" y="16" width="312" height="1" /></element>
 		<element ref="button-text-operator-1"><bounds x="0" y="16" width="10" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_1" inputmask="0x01">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x01">
 			<bounds x="0" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-number-1"><bounds x="4" y="38" width="10" height="18" /></element>
@@ -360,7 +360,7 @@ license:CC0
 
 		<!-- Button 2 -->
 		<element ref="button-text-operator-2"><bounds x="80" y="16" width="10" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_1" inputmask="0x02">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x02">
 			<bounds x="80" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-number-2"><bounds x="84" y="38" width="10" height="18" /></element>
@@ -368,7 +368,7 @@ license:CC0
 
 		<!-- Button 3 -->
 		<element ref="button-text-operator-3"><bounds x="160" y="16" width="10" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_1" inputmask="0x04">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x04">
 			<bounds x="160" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-number-3"><bounds x="164" y="38" width="10" height="18" /></element>
@@ -377,7 +377,7 @@ license:CC0
 
 		<!-- Button 4 -->
 		<element ref="button-text-operator-4"><bounds x="240" y="16" width="10" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_1" inputmask="0x08">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x08">
 			<bounds x="240" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-number-4"><bounds x="244" y="38" width="10" height="18" /></element>
@@ -388,7 +388,7 @@ license:CC0
 		<!-- Button 5 -->
 		<element ref="button-text-algorithm"><bounds x="320" y="4" width="72" height="16" /></element>
 		<element ref="button-text-feedback"><bounds x="320" y="16" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_1" inputmask="0x10">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x10">
 			<bounds x="320" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-number-5"><bounds x="324" y="38" width="10" height="18" /></element>
@@ -398,14 +398,14 @@ license:CC0
 		<element ref="button-text-lfo"><bounds x="400" y="0" width="72" height="16" /></element>
 		<element ref="button-text-separator-blue"><bounds x="400" y="16" width="312" height="1" /></element>
 		<element ref="button-text-lfo-wave"><bounds x="400" y="16" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_1" inputmask="0x20">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x20">
 			<bounds x="400" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-number-6"><bounds x="404" y="38" width="10" height="18" /></element>
 
 		<!-- Button 7 -->
 		<element ref="button-text-lfo-speed"><bounds x="480" y="16" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_1" inputmask="0x40">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x40">
 			<bounds x="480" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-number-7"><bounds x="484" y="38" width="10" height="18" /></element>
@@ -415,7 +415,7 @@ license:CC0
 
 		<!-- Button 8 -->
 		<element ref="button-text-lfo-delay"><bounds x="560" y="16" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_1" inputmask="0x80">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x80">
 			<bounds x="560" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-number-8"><bounds x="564" y="38" width="10" height="18" /></element>
@@ -423,7 +423,7 @@ license:CC0
 
 		<!-- Button 9 -->
 		<element ref="button-text-lfo-pmd"><bounds x="640" y="16" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_2" inputmask="0x1">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x1">
 			<bounds x="640" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-number-9"><bounds x="644" y="38" width="10" height="18" /></element>
@@ -433,7 +433,7 @@ license:CC0
 		<element ref="button-text-mod-sens"><bounds x="720" y="0" width="72" height="16" /></element>
 		<element ref="button-text-separator-blue"><bounds x="720" y="16" width="72" height="1" /></element>
 		<element ref="button-text-pitch-amp"><bounds x="720" y="16" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_2" inputmask="0x2">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x2">
 			<bounds x="720" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-number-10"><bounds x="724" y="38" width="18" height="18" /></element>
@@ -445,7 +445,7 @@ license:CC0
 		<!-- Button 11 -->
 		<element ref="button-text-operator"><bounds x="0" y="0" width="72" height="16" /></element>
 		<element ref="button-text-select"><bounds x="0" y="12" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_2" inputmask="0x04">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x04">
 			<bounds x="0" y="48" width="72" height="32" />
 		</element>
 		<element ref="button-number-11"><bounds x="4" y="52" width="18" height="18" /></element>
@@ -458,7 +458,7 @@ license:CC0
 		<element ref="button-text-separator-blue"><bounds x="80" y="16" width="230" height="1" /></element>
 		<element ref="button-text-oscillator-frequency"><bounds x="80" y="16" width="72" height="16" /></element>
 		<element ref="button-text-oscillator-coarse"><bounds x="80" y="28" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_2" inputmask="0x08">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x08">
 			<bounds x="80" y="48" width="72" height="32" />
 		</element>
 		<element ref="button-number-12"><bounds x="84" y="52" width="18" height="18" /></element>
@@ -467,7 +467,7 @@ license:CC0
 		<!-- Button 13 -->
 		<element ref="button-text-oscillator-frequency"><bounds x="160" y="16" width="72" height="16" /></element>
 		<element ref="button-text-oscillator-fine"><bounds x="160" y="28" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_2" inputmask="0x10">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x10">
 			<bounds x="160" y="48" width="72" height="32" />
 		</element>
 		<element ref="button-number-13"><bounds x="164" y="52" width="18" height="18" /></element>
@@ -476,7 +476,7 @@ license:CC0
 		<!-- Button 14 -->
 		<element ref="button-text-oscillator-detune"><bounds x="240" y="16" width="72" height="16" /></element>
 		<element ref="button-text-oscillator-sync"><bounds x="240" y="28" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_2" inputmask="0x20">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x20">
 			<bounds x="240" y="48" width="72" height="32" />
 		</element>
 		<element ref="button-number-14"><bounds x="244" y="52" width="18" height="18" /></element>
@@ -486,7 +486,7 @@ license:CC0
 		<element ref="button-text-eg"><bounds x="320" y="0" width="72" height="16" /></element>
 		<element ref="button-text-separator-blue"><bounds x="320" y="16" width="152" height="1" /></element>
 		<element ref="button-text-rate"><bounds x="320" y="28" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_2" inputmask="0x40">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x40">
 			<bounds x="320" y="48" width="72" height="32" />
 		</element>
 		<element ref="button-number-15"><bounds x="324" y="52" width="18" height="18" /></element>
@@ -496,7 +496,7 @@ license:CC0
 
 		<!-- Button 16 -->
 		<element ref="button-text-level"><bounds x="400" y="28" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_2" inputmask="0x80">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x80">
 			<bounds x="400" y="48" width="72" height="32" />
 		</element>
 		<element ref="button-number-16"><bounds x="404" y="52" width="18" height="18" /></element>
@@ -506,7 +506,7 @@ license:CC0
 		<element ref="button-text-scaling"><bounds x="480" y="0" width="150" height="16" /></element>
 		<element ref="button-text-separator-blue"><bounds x="480" y="16" width="152" height="1" /></element>
 		<element ref="button-text-rate"><bounds x="480" y="28" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_3" inputmask="0x02">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.3" inputmask="0x02">
 			<bounds x="480" y="48" width="72" height="32" />
 		</element>
 		<element ref="button-number-17"><bounds x="484" y="52" width="18" height="18" /></element>
@@ -514,7 +514,7 @@ license:CC0
 
 		<!-- Button 18 -->
 		<element ref="button-text-level"><bounds x="560" y="28" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_3" inputmask="0x04">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.3" inputmask="0x04">
 			<bounds x="560" y="48" width="72" height="32" />
 		</element>
 		<element ref="button-number-18"><bounds x="564" y="52" width="18" height="18" /></element>
@@ -525,7 +525,7 @@ license:CC0
 		<element ref="button-text-separator-blue"><bounds x="640" y="16" width="72" height="1" /></element>
 		<element ref="button-text-output"><bounds x="640" y="16" width="72" height="16" /></element>
 		<element ref="button-text-level"><bounds x="640" y="28" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_3" inputmask="0x08">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.3" inputmask="0x08">
 			<bounds x="640" y="48" width="72" height="32" />
 		</element>
 		<element ref="button-number-19"><bounds x="644" y="52" width="18" height="18" /></element>
@@ -535,7 +535,7 @@ license:CC0
 		<!-- Button 20 -->
 		<element ref="button-text-key"><bounds x="720" y="16" width="72" height="16" /></element>
 		<element ref="button-text-transpose"><bounds x="720" y="28" width="72" height="16" /></element>
-		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT_DRIVER_LINE_3" inputmask="0x10">
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.3" inputmask="0x10">
 			<bounds x="720" y="48" width="72" height="32" />
 		</element>
 		<element ref="button-number-20"><bounds x="724" y="52" width="18" height="18" /></element>

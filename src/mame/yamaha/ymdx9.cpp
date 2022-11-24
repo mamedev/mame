@@ -36,10 +36,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_adc(*this, "adc"),
 			m_leds(*this, "led_%u", 0U),
-			m_key_switch_input_driver_line_0(*this, "KEY_SWITCH_INPUT_DRIVER_LINE_0"),
-			m_key_switch_input_driver_line_1(*this, "KEY_SWITCH_INPUT_DRIVER_LINE_1"),
-			m_key_switch_input_driver_line_2(*this, "KEY_SWITCH_INPUT_DRIVER_LINE_2"),
-			m_key_switch_input_driver_line_3(*this, "KEY_SWITCH_INPUT_DRIVER_LINE_3")
+			m_key_switch_input(*this, "KEY_SWITCH_INPUT.%u", 0)
 	{
 	}
 
@@ -49,19 +46,12 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	/**
-	 * @brief The 63B03RP microcontroller instance.
-	 * Also refer to: https://docs.mamedev.org/techspecs/object_finders.html
-	 */
 	required_device<hd6303r_cpu_device> m_maincpu;
 	required_device<adc0808_device> m_adc;
 	output_finder<2> m_leds;
-	// These ioport instances are used to communicate with the interface in the layout.
+	// This ioport array is used to communicate with the front-panel interface in the layout.
 	// They emulate the circuits wired to the 'Key/Switch Scan Driver'.
-	required_ioport m_key_switch_input_driver_line_0;
-	required_ioport m_key_switch_input_driver_line_1;
-	required_ioport m_key_switch_input_driver_line_2;
-	required_ioport m_key_switch_input_driver_line_3;
+	required_ioport_array<16> m_key_switch_input;
 
 	/**
 	 * @brief Which input line on the keyboard/switch scan driver is currently selected.
@@ -71,7 +61,7 @@ private:
 	 * implementation is based off the *very* limited description in the service manual, and
 	 * the behaviour that's shown in the firmware.
 	 */
-	uint8_t m_key_switch_scan_driver_select = 0;
+	uint8_t m_key_switch_input_select = 0;
 
 	int m_rx_data;
 
@@ -82,27 +72,27 @@ private:
 	bool m_cassette_interface_remote_polarity = 0;
 
 	/**
-	* @brief LCD pixel update function.
-	* The `HD44780_PIXEL_UPDATE` macro expands the definition to include the correct
-	* parameters for the LCD update function.
-	* Refer to: `src/devices/video/hd44780.h` for the full definition format.
-	*/
+	 * @brief LCD pixel update function.
+	 * The `HD44780_PIXEL_UPDATE` macro expands the definition to include the correct
+	 * parameters for the LCD update function.
+	 * Refer to: `src/devices/video/hd44780.h` for the full definition format.
+	 */
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 	/**
-	* @brief Handles a write to the synth's OPS chip registers.
-	* This chip is currently not emulated, however this function is useful for debugging.
-	* @param offset The offset into the memory mapped region being written.
-	* @param data The data being written.
-	*/
+	 * @brief Handles a write to the synth's OPS chip registers.
+	 * This chip is currently not emulated, however this function is useful for debugging.
+	 * @param offset The offset into the memory mapped region being written.
+	 * @param data The data being written.
+	 */
 	void ops_w(offs_t offset, uint8_t data);
 
 	/**
-	* @brief Handles a write to the synth's EGS chip registers.
-	* This chip is currently not emulated, however this function is useful for debugging.
-	* @param offset The offset into the memory mapped region being written.
-	* @param data The data being written.
-	*/
+	 * @brief Handles a write to the synth's EGS chip registers.
+	 * This chip is currently not emulated, however this function is useful for debugging.
+	 * @param offset The offset into the memory mapped region being written.
+	 * @param data The data being written.
+	 */
 	void egs_w(offs_t offset, uint8_t data);
 
 	/**
@@ -110,19 +100,29 @@ private:
 	 * This multiplexing driver circuit is used to read the states of the synth's front-panel
 	 * switches, and keyboard. The driver's input is wired to the CPU's IO port 1, and the 
 	 * output is wired into the address map.
-	 * Refer to the comments inside the function for the driver's internal mapping.
+	 * Input line 0 covers the 'main' front-panel switches.
+	 * Input line 1 covers the numeric front-panel switches 1 through 8.
+	 * Input line 2 covers the numeric front-panel switches 9 though 16.
+	 * Input line 3 covers the numeric front-panel switches 17 though 20, as well as the
+	 * modulation pedal inputs: The Portamento, and Sustain pedals are mapped to 
+	 * bits 6, and 7 respectively.
+	 * Note: Input line 4 covers the keyboard circuit, which is not implemented here.
+	 * When the keyboard state is read, the default value of 0 will be returned.
 	 * @param offset The offset into the memory mapped region being read.
 	 * @return uint8_t The value read from the bus.
 	 */
-	uint8_t key_switch_scan_driver_r(offs_t offset);
+	uint8_t key_switch_scan_driver_r(offs_t offset)
+	{
+		return m_key_switch_input[m_key_switch_input_select]->read();
+	}
 
 	/**
-	* @brief Handles a write to the 7-segment LED memory mapped region.
-	* This function is responsible for setting the two 7-segment LEDs set in the
-	* device's layout file.
-	* @param offset The offset into the memory mapped region being written.
-	* @param data The data being written.
-	*/
+	 * @brief Handles a write to the 7-segment LED memory mapped region.
+	 * This function is responsible for setting the two 7-segment LEDs set in the
+	 * device's layout file.
+	 * @param offset The offset into the memory mapped region being written.
+	 * @param data The data being written.
+	 */
 	void led_w(offs_t offset, uint8_t data);
 
 	void palette_init(palette_device &palette);
@@ -159,8 +159,8 @@ private:
 
 
 /**
-* yamaha_dx9_state::machine_start
-*/
+ * yamaha_dx9_state::machine_start
+ */
 void yamaha_dx9_state::machine_start()
 {
 	m_leds.resolve();
@@ -279,43 +279,6 @@ void yamaha_dx9_state::dx9(machine_config &config)
 
 
 /**
- * yamaha_dx9_state::key_switch_scan_driver_r
- */
-uint8_t yamaha_dx9_state::key_switch_scan_driver_r(offs_t offset)
-{
-	/**
-	 * @brief The value to be returned.
-	 * This is implemented as a separate variable to allow for much easier debugging, as
-	 * opposed to just instantly returning the value read from the input lines.
-	 */
-	uint8_t value = 0;
-
-	// Note: Input line 4 covers the keyboard circuit, which is not implemented here.
-	// When the keyboard state is read, the default value of 0 will be returned.
-	if(m_key_switch_scan_driver_select == 0)
-	{
-		// Input line 0 covers the 'main' front-panel switches.
-		value = m_key_switch_input_driver_line_0->read();
-	} else if(m_key_switch_scan_driver_select == 1)
-	{
-		// Input line 1 covers the numeric front-panel switches 1 through 8.
-		value = m_key_switch_input_driver_line_1->read();
-	} else if(m_key_switch_scan_driver_select == 2)
-	{
-		// Input line 2 covers the numeric front-panel switches 9 though 16.
-		value = m_key_switch_input_driver_line_2->read();
-	} else if(m_key_switch_scan_driver_select == 3)
-	{
-		// Input line 3 covers the numeric front-panel switches 17 though 20.
-		// The Portamento, and Sustain pedals are mapped to bits 6, and 7 respectively.
-		value = m_key_switch_input_driver_line_3->read();
-	}
-
-	return value;
-}
-
-
-/**
  * yamaha_dx9_state::ops_w
  */
 void yamaha_dx9_state::ops_w(offs_t offset, uint8_t data)
@@ -363,7 +326,7 @@ uint8_t yamaha_dx9_state::p1_r(offs_t offset)
 void yamaha_dx9_state::p1_w(offs_t offset, uint8_t data)
 {
 	// The low-nibble is written by the firmware to select the key/switch driver input line.
-	m_key_switch_scan_driver_select = data & 0xF;
+	m_key_switch_input_select = data & 0xF;
 
 	// The cassette interface remote port polarity is set by bit 5.
 	m_cassette_interface_remote_polarity = data & 0x20;
@@ -374,41 +337,58 @@ void yamaha_dx9_state::p1_w(offs_t offset, uint8_t data)
 
 
 static INPUT_PORTS_START(dx9)
-	PORT_START("KEY_SWITCH_INPUT_DRIVER_LINE_0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)    // Front-panel button Yes/Up.
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2)    // Front-panel button No/Down.
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3)    // Front-panel button Store.
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5)    // Front-panel button Function.
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON6)    // Front-panel button Edit.
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON7)    // Front-panel button Memory.
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON8)
+	PORT_START("KEY_SWITCH_INPUT.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Yes/Up")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("No/Down")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Store")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Function")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Edit")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Memory")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
-	PORT_START("KEY_SWITCH_INPUT_DRIVER_LINE_1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)    // Front-panel button 1.
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2)    // Front-panel button 2.
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3)    // Front-panel button 3.
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4)    // Front-panel button 4.
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5)    // Front-panel button 5.
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON6)    // Front-panel button 6.
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON7)    // Front-panel button 7.
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON8)    // Front-panel button 8.
+	PORT_START("KEY_SWITCH_INPUT.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 1")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 2")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 3")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 4")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 5")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 6")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 7")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 8")
 
-	PORT_START("KEY_SWITCH_INPUT_DRIVER_LINE_2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)    // Front-panel button 9.
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2)    // Front-panel button 10.
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3)    // Front-panel button 11.
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4)    // Front-panel button 12.
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5)    // Front-panel button 13.
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON6)    // Front-panel button 14.
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON7)    // Front-panel button 15.
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON8)    // Front-panel button 16.
+	PORT_START("KEY_SWITCH_INPUT.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 9")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 10")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 11")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 12")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 13")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 14")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 15")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 16")
 
-	PORT_START("KEY_SWITCH_INPUT_DRIVER_LINE_3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2)    // Front-panel button 17.
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3)    // Front-panel button 18.
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4)    // Front-panel button 19.
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5)    // Front-panel button 20.
+	PORT_START("KEY_SWITCH_INPUT.3")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 17")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 18")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 19")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 20")
+
+	// These IO ports belong to the keyboard scan circuit.
+	// Each of these 12 ports represents an individual key within an octave.
+	// The keyboard is wired so that when each key's line is selected, reading the keyboard 
+	// scan driver output will return a power of two indicating the octave the pressed key 
+	// is in, from 0 to 7.
+	PORT_START("KEY_SWITCH_INPUT.4")
+	PORT_START("KEY_SWITCH_INPUT.5")
+	PORT_START("KEY_SWITCH_INPUT.6")
+	PORT_START("KEY_SWITCH_INPUT.7")
+	PORT_START("KEY_SWITCH_INPUT.8")
+	PORT_START("KEY_SWITCH_INPUT.9")
+	PORT_START("KEY_SWITCH_INPUT.10")
+	PORT_START("KEY_SWITCH_INPUT.11")
+	PORT_START("KEY_SWITCH_INPUT.12")
+	PORT_START("KEY_SWITCH_INPUT.13")
+	PORT_START("KEY_SWITCH_INPUT.14")
+	PORT_START("KEY_SWITCH_INPUT.15")
 INPUT_PORTS_END
 
 
@@ -420,4 +400,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1983, dx9, 0, 0, dx9, dx9, yamaha_dx9_state, empty_init, "Yamaha", "DX9 Digital Programmable Algorithm Synthesizer", MACHINE_NO_SOUND | MACHINE_CLICKABLE_ARTWORK)
+SYST(1983, dx9, 0, 0, dx9, dx9, yamaha_dx9_state, empty_init, "Yamaha", "DX9 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON | MACHINE_CLICKABLE_ARTWORK)
