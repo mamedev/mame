@@ -755,9 +755,9 @@ void ppc_device::device_start()
 
 	m_tb_divisor = (m_tb_divisor * clock() + m_system_clock / 2 - 1) / m_system_clock;
 
-	m_serial_clock = c_serial_clock != 0 ? c_serial_clock : 3686400;
+	m_serial_clock = c_serial_clock != 0 ? c_serial_clock : 3'686'400; // TODO: get rid of this hard-coded magic number
 	if (m_serial_clock > m_system_clock / 2)
-		fatalerror("PPC: serial clock (%d) must not be more than half of the system clock (%d)\n", m_serial_clock, m_system_clock);
+		fatalerror("%s: PPC: serial clock (%d) must not be more than half of the system clock (%d)\n", tag(), m_serial_clock, m_system_clock);
 
 	/* allocate a timer for the compare interrupt */
 	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor))
