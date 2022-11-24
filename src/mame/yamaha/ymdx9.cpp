@@ -23,6 +23,10 @@
 #include "emupal.h"
 #include "screen.h"
 
+//#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
 #include "dx9.lh"
 
 
@@ -31,8 +35,8 @@ namespace {
 class yamaha_dx9_state : public driver_device
 {
 public:
-	yamaha_dx9_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag),
+	yamaha_dx9_state(const machine_config &mconfig, device_type type, const char *tag) :
+			driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_adc(*this, "adc"),
 			m_leds(*this, "led_%u", 0U),
@@ -66,10 +70,10 @@ private:
 	int m_rx_data;
 
 	/** The polarity of the cassette interface's output line. */
-	bool m_cassette_interface_output_polarity = 0;
+	bool m_cassette_interface_output_polarity = false;
 
 	/** The polarity of the cassette interface's remote line. */
-	bool m_cassette_interface_remote_polarity = 0;
+	bool m_cassette_interface_remote_polarity = false;
 
 	/**
 	 * @brief LCD pixel update function.
@@ -174,7 +178,7 @@ void yamaha_dx9_state::machine_start()
 HD44780_PIXEL_UPDATE(yamaha_dx9_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 16)
-			bitmap.pix(line * 10 + y + 1 + ((y == 7) ? 1 : 0), pos * 6 + x + 1) = state ? 1 : 2;
+		bitmap.pix(line * 10 + y + 1 + ((y == 7) ? 1 : 0), pos * 6 + x + 1) = state ? 1 : 2;
 }
 
 
@@ -183,9 +187,9 @@ HD44780_PIXEL_UPDATE(yamaha_dx9_state::lcd_pixel_update)
  */
 void yamaha_dx9_state::palette_init(palette_device &palette)
 {
-	palette.set_pen_color(0, rgb_t(0x87, 0xAD, 0x34)); // background
+	palette.set_pen_color(0, rgb_t(0x87, 0xad, 0x34)); // background
 	palette.set_pen_color(1, rgb_t(0x0, 0x0, 0x0)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(0x7D, 0x9F, 0x32)); // lcd pixel off
+	palette.set_pen_color(2, rgb_t(0x7d, 0x9f, 0x32)); // lcd pixel off
 }
 
 
@@ -199,8 +203,8 @@ void yamaha_dx9_state::mem_map(address_map &map)
 
 	map(0x0020, 0x0020).r(FUNC(yamaha_dx9_state::key_switch_scan_driver_r));
 
-	map(0x0022, 0x0022).r("adc", FUNC(m58990_device::data_r));
-	map(0x0024, 0x0024).w("adc", FUNC(m58990_device::address_data_start_w));
+	map(0x0022, 0x0022).r(m_adc, FUNC(m58990_device::data_r));
+	map(0x0024, 0x0024).w(m_adc, FUNC(m58990_device::address_data_start_w));
 
 	// YM21280 OPS.
 	map(0x0026, 0x0027).w(FUNC(yamaha_dx9_state::ops_w));
@@ -244,10 +248,10 @@ void yamaha_dx9_state::dx9(machine_config &config)
 	NVRAM(config, "ram2", nvram_device::DEFAULT_ALL_0);
 
 	// Configure the ADC. The clock speed here is a guess.
-	M58990(config, m_adc, 8_MHz_XTAL / 16);
+	M58990(config, m_adc, 500'000);
 
 	// ADC source 4 is the battery voltage. Set this input to always read 0x80.
-	// If the read value is below 0x6F, the firmware considers this a low battery voltage.
+	// If the read value is below 0x6f, the firmware considers this a low battery voltage.
 	m_adc->in_callback<4>().set_constant(0x80);
 
 	// Configure MIDI.
@@ -283,7 +287,7 @@ void yamaha_dx9_state::dx9(machine_config &config)
  */
 void yamaha_dx9_state::ops_w(offs_t offset, uint8_t data)
 {
-	// printf("OPS: %02X=%02X\n", offset, data);
+	LOG("OPS: %02X=%02X\n", offset, data);
 }
 
 
@@ -292,7 +296,7 @@ void yamaha_dx9_state::ops_w(offs_t offset, uint8_t data)
  */
 void yamaha_dx9_state::egs_w(offs_t offset, uint8_t data)
 {
-	// printf("EGS: %02X=%02X\n", offset, data);
+	LOG("EGS: %02X=%02X\n", offset, data);
 }
 
 
@@ -305,7 +309,7 @@ void yamaha_dx9_state::led_w(offs_t offset, uint8_t data)
 	// size, the led number is the least-significant bit of the offset.
 	// The DX9's LEDs are wired so that a high input line disables the segment, so
 	// get the one's complement of the data.
-	m_leds[offset & 1] = (~data) & 0xFF;
+	m_leds[offset & 1] = (~data) & 0xff;
 }
 
 
@@ -326,51 +330,51 @@ uint8_t yamaha_dx9_state::p1_r(offs_t offset)
 void yamaha_dx9_state::p1_w(offs_t offset, uint8_t data)
 {
 	// The low-nibble is written by the firmware to select the key/switch driver input line.
-	m_key_switch_input_select = data & 0xF;
+	m_key_switch_input_select = data & 0xf;
 
 	// The cassette interface remote port polarity is set by bit 5.
-	m_cassette_interface_remote_polarity = data & 0x20;
+	m_cassette_interface_remote_polarity = BIT(data, 5);
 
 	// The cassette interface output polarity is set by bit 6.
-	m_cassette_interface_output_polarity = data & 0x40;
+	m_cassette_interface_output_polarity = BIT(data, 6);
 }
 
 
 static INPUT_PORTS_START(dx9)
 	PORT_START("KEY_SWITCH_INPUT.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Yes/Up")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("No/Down")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Store")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Function")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Edit")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Memory")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Yes/Up")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("No/Down")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Store")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Function")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Edit")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Memory")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
 	PORT_START("KEY_SWITCH_INPUT.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 3")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 4")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 5")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 7")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 1")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 2")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 3")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 4")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 5")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 6")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 7")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 8")
 
 	PORT_START("KEY_SWITCH_INPUT.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 9")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 10")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 11")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 12")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 13")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 14")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 15")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 16")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 9")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 10")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 11")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 12")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 13")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 14")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 15")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 16")
 
 	PORT_START("KEY_SWITCH_INPUT.3")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 17")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 18")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 19")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN) PORT_NAME("Button 20")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 17")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 18")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 19")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Button 20")
 
 	// These IO ports belong to the keyboard scan circuit.
 	// Each of these 12 ports represents an individual key within an octave.
