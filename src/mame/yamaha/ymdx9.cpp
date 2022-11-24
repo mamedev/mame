@@ -155,10 +155,6 @@ private:
 	 * @return uint8_t The value read from the port.
 	 */
 	uint8_t p1_r(offs_t offset);
-
-	void unmapped_w(offs_t address, uint8_t data);
-
-	uint8_t unmapped_r(offs_t offset);
 };
 
 
@@ -201,17 +197,17 @@ void yamaha_dx9_state::mem_map(address_map &map)
 	// Internal CPU registers.
 	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303r_cpu_device::m6801_io));
 
-	map(0x20, 0x20).r(FUNC(yamaha_dx9_state::key_switch_scan_driver_r));
+	map(0x0020, 0x0020).r(FUNC(yamaha_dx9_state::key_switch_scan_driver_r));
 
-	map(0x22, 0x22).r("adc", FUNC(m58990_device::data_r));
-	map(0x24, 0x24).w("adc", FUNC(m58990_device::address_data_start_w));
+	map(0x0022, 0x0022).r("adc", FUNC(m58990_device::data_r));
+	map(0x0024, 0x0024).w("adc", FUNC(m58990_device::address_data_start_w));
 
 	// YM21280 OPS.
-	map(0x26, 0x27).w(FUNC(yamaha_dx9_state::ops_w));
+	map(0x0026, 0x0027).w(FUNC(yamaha_dx9_state::ops_w));
 	// HD44780 LCD Controller.
 	map(0x0028, 0x0029).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	// LED.
-	map(0x2B, 0x2C).w(FUNC(yamaha_dx9_state::led_w));
+	map(0x002b, 0x002c).w(FUNC(yamaha_dx9_state::led_w));
 
 	// Internal RAM.
 	map(0x0040, 0x00ff).ram();
@@ -222,7 +218,7 @@ void yamaha_dx9_state::mem_map(address_map &map)
 	map(0x1000, 0x1800).ram().share("ram2");
 
 	// YM21290 EGS
-	map(0x1800, 0x18F3).w(FUNC(yamaha_dx9_state::egs_w));
+	map(0x1800, 0x18f3).w(FUNC(yamaha_dx9_state::egs_w));
 
 	// ROM.
 	map(0xc000, 0xffff).rom().region("program", 0);
@@ -242,14 +238,7 @@ void yamaha_dx9_state::dx9(machine_config &config)
 	// Unlike the DX7 only IO port 1 is used.
 	// The direction flags of other ports are set, however they are never read, or written.
 	m_maincpu->in_p1_cb().set(FUNC(yamaha_dx9_state::p1_r));
-	m_maincpu->in_p2_cb().set(FUNC(yamaha_dx9_state::unmapped_r));
-	m_maincpu->in_p3_cb().set(FUNC(yamaha_dx9_state::unmapped_r));
-	m_maincpu->in_p4_cb().set(FUNC(yamaha_dx9_state::unmapped_r));
-
 	m_maincpu->out_p1_cb().set(FUNC(yamaha_dx9_state::p1_w));
-	m_maincpu->out_p2_cb().set(FUNC(yamaha_dx9_state::unmapped_w));
-	m_maincpu->out_p3_cb().set(FUNC(yamaha_dx9_state::unmapped_w));
-	m_maincpu->out_p4_cb().set(FUNC(yamaha_dx9_state::unmapped_w));
 
 	NVRAM(config, "ram1", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "ram2", nvram_device::DEFAULT_ALL_0);
@@ -290,15 +279,6 @@ void yamaha_dx9_state::dx9(machine_config &config)
 
 
 /**
- * yamaha_dx9_state::unmapped_r
- */
-uint8_t yamaha_dx9_state::unmapped_r(offs_t offset)
-{
-	return 0xFF;
-}
-
-
-/**
  * yamaha_dx9_state::key_switch_scan_driver_r
  */
 uint8_t yamaha_dx9_state::key_switch_scan_driver_r(offs_t offset)
@@ -333,12 +313,6 @@ uint8_t yamaha_dx9_state::key_switch_scan_driver_r(offs_t offset)
 
 	return value;
 }
-
-
-/**
- * yamaha_dx9_state::unmapped_w
- */
-void yamaha_dx9_state::unmapped_w(offs_t address, uint8_t data) {}
 
 
 /**
