@@ -185,6 +185,9 @@ No text for [gfx] status bar
 		<description>Micro Musician VA</description>
 		<year>1989</year>
 		<publisher>Music Network</publisher>
+		<notes><![CDATA[
+Has unsupported MIF-201 [MIDI] interface cfr. http://www.pc88.gr.jp/vafaq/view.php/article/88va/vafaq/71
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
 				<rom name="micromusician va.d88" size="1331888" crc="f2ff8069" sha1="a201a60330c701f1f2021b73664582e535dc9b7e"/>
@@ -195,7 +198,10 @@ No text for [gfx] status bar
 	<software name="pceva2tb" supported="no">
 		<description>PC-Engine (VA2 Tenpu-ban)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Has HDFORM.COM utility
+]]></notes>
 		<info name="alt_title" value="PC-Engine(VA2添付版)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1338960">
@@ -777,6 +783,7 @@ White screen after [SGP] transfers, jumps to lalaland
 		<notes><![CDATA[
 Crashes with [SGP] artifacts on opening
 No [OPNA] sound
+Has unemulated [MIDI] options
 ]]></notes>
 		<info name="release" value="199201xx"/>
 		<info name="alt_title" value="幻影都市 ～イリュージョンシティ～"/>
@@ -839,13 +846,13 @@ No [OPNA] sound
 Hangs on check at PC=2c67b on opening, wants either [OPNA] or [SGP] irq
 No [OPNA] sound
 [gfx]s have halved height
-Broken [kanji] on menuing
 Heavy [SGP] artifacts during gameplay
+Optionally wants kana lock enabled for entering a name for new game [keyboard] irq
 ]]></notes>
 		<info name="release" value="19901102"/>
 		<info name="usage" value="Boot with disk 2 in drive A: for gameplay"/>
 
-		<!-- status: baddump for non-factory saves -->
+		<!-- status: baddump for non-factory save 1 -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="xak 2 (disk 1).d88" size="1281968" crc="cd855b7a" sha1="508e25ca306631be64e69e476d49116e7ac04bce" />

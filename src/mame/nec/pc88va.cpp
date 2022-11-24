@@ -14,6 +14,8 @@
     - pc88va (stock version) has two bogus opcodes. 
       One is at 0xf0b15 (0x0f 0xfe), another at 0xf0b31 (br 1000h:0c003h).
       Latter will make the program flow to jump to lalaland.
+    - pc88va is also known to have a slightly different banking scheme and
+      regular YM2203 as default sound board.
     - video emulation is lacking many features, cfr. pc88va_v.cpp;
     - keyboard runs on undumped MCU, we currently stick irqs together on
       selected keys in order to have an easier QoL on testing this.
@@ -21,6 +23,7 @@
       \- IDP has EMUL for upd3301
       \- In emulation mode HW still relies to a i8214, so it bridges thru
          main ICU in cascaded mode via IRQ7;
+      \- beeper or dac1bit (to be confirmed);
       \- (other stuff ...)
     - FDC very unstable, may really always need a PIO comms therefore needs
       converting to a subclass of PC80S31K (also necessary for sorcer anyway);
@@ -35,6 +38,10 @@
       hooked up by the current z80 core
     - Fix floppy motor hook-up (floppy believes to be always in even if empty drive);
     - Support for PC8801 compatible mode & PC80S31K (floppy interface);
+
+    References:
+    - PC-88VAテクニカルマニュアル
+    - http://www.pc88.gr.jp/vafaq/view.php/articlelist/88va/vafaq
 
 ===================================================================================================
 
@@ -820,8 +827,8 @@ static INPUT_PORTS_START( pc88va )
 	PORT_START("KEY7")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)           PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)           PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)       PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)       PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)       PORT_CHAR(':') PORT_CHAR('*') VA_PORT_SCAN(0x27)
+	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)       PORT_CHAR(';') PORT_CHAR('+') VA_PORT_SCAN(0x26)
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)       PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)        PORT_CHAR('.') PORT_CHAR('>') VA_PORT_SCAN(0x50)
 	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)       PORT_CHAR('/') PORT_CHAR('?')
@@ -829,8 +836,8 @@ static INPUT_PORTS_START( pc88va )
 
 	PORT_START("KEY8")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clr Home") PORT_CODE(KEYCODE_HOME)      PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)   PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)   PORT_CHAR(UCHAR_MAMEKEY(UP)) VA_PORT_SCAN(0x3a)
+	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) VA_PORT_SCAN(0x3c)
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Grph") PORT_CODE(KEYCODE_LALT)  PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(F7))
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Kana") PORT_CODE(KEYCODE_LCONTROL) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(F6))
@@ -849,8 +856,8 @@ static INPUT_PORTS_START( pc88va )
 
 	PORT_START("KEYA")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)                             PORT_CHAR('\t')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN)   PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)   PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN)   PORT_CHAR(UCHAR_MAMEKEY(DOWN)) VA_PORT_SCAN(0x3d)
+	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)   PORT_CHAR(UCHAR_MAMEKEY(LEFT)) VA_PORT_SCAN(0x3b)
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help") PORT_CODE(KEYCODE_END)           PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CODE(KEYCODE_F2)            PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)                       PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
@@ -1286,6 +1293,7 @@ void pc88va_state::pc88va(machine_config &config)
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
 
+	// PC-88VA-12 "Sound Board II", YM2608B
 	YM2608(config, m_opna, FM_CLOCK);
 	m_opna->set_addrmap(0, &pc88va_state::opna_map);
 	m_opna->irq_handler().set(FUNC(pc88va_state::int4_irq_w));
@@ -1358,6 +1366,7 @@ ROM_START( pc88va2 )
 	ROM_LOAD( "vadic_va2.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
 ROM_END
 
-COMP( 1987, pc88va,  0,      0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1988, pc88va2, pc88va, 0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1987, pc88va,  0,      0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
+COMP( 1988, pc88va2, pc88va, 0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
+// VA3 has 3.5" 2TD drives with about 9.3 MB capacity
 //COMP( 1988, pc88va3, pc88va, 0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA3", MACHINE_NOT_WORKING )
