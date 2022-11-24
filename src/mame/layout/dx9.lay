@@ -345,7 +345,7 @@ license:CC0
 		<element ref="button-text-on"><bounds x="80" y="48" width="72" height="16" /></element>
 	</group>
 
-		<!-- Numeric Buttons Row 1 -->
+	<!-- Numeric Buttons Row 1 -->
 	<group name="front-panel-buttons-numeric-row-1">
 		<!-- Button 1 -->
 		<element ref="button-text-operator-copy"><bounds x="0" y="0" width="128" height="16" /></element>
