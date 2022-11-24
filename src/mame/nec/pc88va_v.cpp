@@ -551,7 +551,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 							if(!split_cliprect.contains(res_x, res_y))
 								continue;
 
-							int pen = m_kanjiram[(( yi * 2 ) + lr_half_gfx) + tile_num] >> (7-xi) & 1;
+							int pen = m_kanjiram[(( yi * 2 ) + lr_half_gfx) + tile_num] >> (7 - xi) & 1;
 
 							if(reverse)
 								pen = pen & 1 ? bg_col : fg_col;
@@ -1421,4 +1421,41 @@ void pc88va_state::text_transpen_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_text_transpen);
 	if (m_text_transpen & 0xfff0)
 		popmessage("text transpen > 15 (%04x)", m_text_transpen);
+}
+
+/*
+ * $14c-$14f Kanji CG ports
+ * Alt method for access kanji ROM for drawing to bitmap gfxs
+ */
+u8 pc88va_state::kanji_cg_r()
+{
+	uint8_t *kanji_rom = (uint8_t *)m_kanji_rom.target();
+
+	// ANK
+	if (m_kanji_cg_jis[1] == 0)
+		return kanji_rom[0x40000 + (m_kanji_cg_jis[0] * 0x10) + (m_kanji_cg_line)];
+
+	// TODO: PCG
+	// jis2 = 0x21 PC on top-left for animefrm, not uploaded?
+	if (m_kanji_cg_jis[0] == 0x56)
+	{
+		return 0xff;
+		//const u32 pcg_addr = (m_kanji_cg_jis[1] + 0x20) * 0x20;
+		//return m_kanjiram[pcg_addr + (m_kanji_cg_line << 1) + (m_kanji_cg_lr ^ 1)];
+	}
+
+	const u32 kanji_address = calc_kanji_rom_addr(m_kanji_cg_jis[0] + 0x20, m_kanji_cg_jis[1], 0, 0);
+
+	return kanji_rom[kanji_address + (m_kanji_cg_line << 1) + (m_kanji_cg_lr ^ 1)];
+}
+
+void pc88va_state::kanji_cg_raster_w(u8 data)
+{
+	m_kanji_cg_line = data & 0xf;
+	m_kanji_cg_lr = BIT(data, 5);
+}
+
+void pc88va_state::kanji_cg_address_w(offs_t offset, u8 data)
+{
+	m_kanji_cg_jis[offset] = data;
 }

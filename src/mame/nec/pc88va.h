@@ -57,6 +57,7 @@ public:
 		, m_tvram(*this, "tvram")
 		, m_gvram(*this, "gvram")
 		, m_fb_regs(*this, "fb_regs")
+		, m_kanji_rom(*this, "kanji")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 	{ }
@@ -111,6 +112,7 @@ private:
 	required_shared_ptr<uint16_t> m_tvram;
 	required_shared_ptr<uint16_t> m_gvram;
 	required_shared_ptr<uint16_t> m_fb_regs;
+	required_region_ptr<u16> m_kanji_rom;
 	std::unique_ptr<uint8_t[]> m_kanjiram;
 
 	uint16_t m_bank_reg = 0;
@@ -197,6 +199,14 @@ private:
 
 	void color_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	u8 m_kanji_cg_line = 0;
+	u8 m_kanji_cg_jis[2]{};
+	u8 m_kanji_cg_lr = 0;
+
+	u8 kanji_cg_r();
+	void kanji_cg_raster_w(u8 data);
+	void kanji_cg_address_w(offs_t offset, u8 data);
 
 	void palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 

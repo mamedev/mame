@@ -598,9 +598,12 @@ void pc88va_state::misc_ctrl_w(uint8_t data)
 		int4_irq_w(m_sound_irq_pending);
 }
 
+
+
+
+
 // TODO: I/O 0x00xx is almost same as pc8801
 // (*) are specific N88 V1 / V2 ports
-
 void pc88va_state::pc88va_io_map(address_map &map)
 {
 	map(0x0000, 0x000f).r(FUNC(pc88va_state::key_r)); // Keyboard ROW reading
@@ -648,6 +651,9 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x0146, 0x0146).w(FUNC(pc88va_state::idp_param_w)); //Text Controller (IDP) - (R/W) Parameter
 //  map(0x0148, 0x0149) Text control port 1
 //  map(0x014c, 0x014f) Kanji CG Port, animefrm
+	map(0x014c, 0x014d).w(FUNC(pc88va_state::kanji_cg_address_w));
+	map(0x014e, 0x014e).r(FUNC(pc88va_state::kanji_cg_r));
+	map(0x014f, 0x014f).w(FUNC(pc88va_state::kanji_cg_raster_w));
 	map(0x0150, 0x0151).r(FUNC(pc88va_state::sysop_r)); // System Operational Mode
 	map(0x0152, 0x0153).rw(FUNC(pc88va_state::bios_bank_r), FUNC(pc88va_state::bios_bank_w)); // Memory Map Register
 //  map(0x0154, 0x0155) Refresh Register (wait states)

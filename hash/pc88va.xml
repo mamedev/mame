@@ -134,7 +134,7 @@ Crashes during or after second demo sequence
 
 	<software name="animefrm" supported="no">
 		<!-- PS88-VA101-HMW subtitle on cover -->
-		<description>Anime Framer</description>
+		<description>Anime Framer (v1.0)</description>
 		<year>1987</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
@@ -159,7 +159,7 @@ No text for [gfx] status bar
 	</software>
 
 	<software name="paint" cloneof="animefrm" supported="no">
-		<description>Anime Framer (alt)</description>
+		<description>Anime Framer (v1.0 alt)</description>
 		<year>1987</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
