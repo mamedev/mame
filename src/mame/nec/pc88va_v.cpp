@@ -28,7 +28,8 @@
 
 void pc88va_state::video_start()
 {
-	m_kanjiram = std::make_unique<uint8_t[]>(0x4000);
+	const u32 kanjiram_size = 0x4000;
+	m_kanjiram = std::make_unique<uint8_t[]>(kanjiram_size);
 	m_gfxdecode->gfx(2)->set_source(m_kanjiram.get());
 	m_gfxdecode->gfx(3)->set_source(m_kanjiram.get());
 
@@ -43,6 +44,7 @@ void pc88va_state::video_start()
 
 	save_item(NAME(m_text_transpen));
 	save_pointer(NAME(m_video_pri_reg), 2);
+	save_pointer(NAME(m_kanjiram), kanjiram_size);
 }
 
 uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -262,19 +264,19 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 }
 
 // TODO: handcrafted kanji ROM causes this, should be simplified by a more accurate dump
-uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y)
+// (or a better rearrange from driver_init, but that implies getting everything in place).
+uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1, uint8_t jis2, int x, int y)
 {
 	if(jis1 < 0x30)
-		return ((jis2 & 0x60) << 8) + ((jis1 & 0x07) << 10) + ((jis2 & 0x1f) << 5);
+	{
+		// famista uses jis1 = 0x2c for the text box lines
+		return ((jis2 & 0x60) << 8) + ((jis1 & 0x07) << 10) + ((jis2 & 0x1f) << 5) + ((jis1 & 0x8) << 15);
+	}
 	else if(jis1 >= 0x30 && jis1 < 0x3f)
 		return ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
 	else if(jis1 >= 0x40 && jis1 < 0x50)
 		return 0x4000 + ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
-	else if(jis1 >= 0x70 && jis1 < 0x80)
-	{
-		// TODO: famista cursor, unknown base
-		return 0x18000 + ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
-	}
+
 	LOGKANJI("%d %d %02x %02x\n",x, y, jis1, jis2);
 
 	return 0;
@@ -304,7 +306,6 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y
 void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint16_t const *const tvram = m_tvram;
-	// TODO: PCG select won't work with this arrangement
 	uint8_t const *const kanji = memregion("kanji")->base();
 
 	LOGTEXT("=== Start TEXT frame\n");
@@ -520,6 +521,36 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 								continue;
 
 							int pen = kanji[yi + tile_num] >> (7-xi) & 1;
+
+							if(reverse)
+								pen = pen & 1 ? bg_col : fg_col;
+							else
+								pen = pen & 1 ? fg_col : bg_col;
+
+							if(secret) { pen = 0; } //hide text
+
+							if(pen != 0 && pen != m_text_transpen)
+								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+						}
+					}
+				}
+				else if ((tvram[cur_offset] & 0x00ff) == 0x56)
+				{
+					// famista draws cursor/team letters/referee calls with PCG
+					u32 tile_num = (((tvram[cur_offset] & 0x7f00) >> 8) + 0x20) * 0x20;
+					u16 lr_half_gfx = ((tvram[cur_offset] & 0x8000) >> 15);
+
+					for(int yi = 0; yi < 16; yi++)
+					{
+						for(int xi = 0; xi < 8; xi++)
+						{
+							int res_x = x_base + xi;
+							int res_y = y_base + yi;
+
+							if(!split_cliprect.contains(res_x, res_y))
+								continue;
+
+							int pen = m_kanjiram[(( yi * 2 ) + lr_half_gfx) + tile_num] >> (7-xi) & 1;
 
 							if(reverse)
 								pen = pen & 1 ? bg_col : fg_col;
