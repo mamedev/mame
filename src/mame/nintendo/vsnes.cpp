@@ -1503,7 +1503,7 @@ static INPUT_PORTS_START( balonfgt )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )       // Manual states this is Unused
 INPUT_PORTS_END
 
-// TODO: verify DIPs for Rules, Difficulty, Mawashi, and Dora. Finding a copy of the manual would certainly help.
+// TODO: verify DIPs for Rules, Difficulty, and Dora. Finding a copy of the manual would certainly help.
 static INPUT_PORTS_START( vsmahjng )
 	PORT_INCLUDE( vsnes_dual_rev )
 
@@ -1538,8 +1538,8 @@ static INPUT_PORTS_START( vsmahjng )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x08, 0x00, "Mawashi" )               PORT_DIPLOCATION("SW2:!4")
+	PORT_DIPSETTING(    0x08, "Tonnan" )
 	PORT_DIPSETTING(    0x00, "Tonton" )
-	PORT_DIPSETTING(    0x08, "Tounan" )
 	PORT_DIPNAME( 0x10, 0x00, "Dora" )                  PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x00, "?" )
 	PORT_DIPSETTING(    0x10, "?" )
