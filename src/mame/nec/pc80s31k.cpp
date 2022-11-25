@@ -511,8 +511,7 @@ void pc88va2_fd_if_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().append([this](int state) { if(m_fdc_mode & 1) { m_write_irq(state); } });
 	m_fdc->drq_wr_callback().set([this](int state) { printf("%d %d\n", m_fdc_mode, state); if(m_fdc_mode & 1) { m_write_drq(state); } });
 
-	m_fdc->set_ready_line_connected(false);
-
+//	m_fdc->set_ready_line_connected(false);
 }
 
 void pc88va2_fd_if_device::device_start()
@@ -595,7 +594,10 @@ void pc88va2_fd_if_device::fdc_update_ready(floppy_image_device *, int)
 	LOG("Force ready signal %d\n", force_ready);
 
 	if (force_ready)
+	{
+		m_fdc->set_ready_line_connected(false);
 		m_fdc->ready_w(0);
+	}
 	else
 		m_fdc->ready_w(1);
 }
