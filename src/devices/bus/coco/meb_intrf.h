@@ -2,9 +2,9 @@
 // copyright-holders:tim lindner
 /*********************************************************************
 
-	intrf.h
+    intrf.h
 
-	CRC / Disto Mini Expansion Bus management
+    CRC / Disto Mini Expansion Bus management
 
 *********************************************************************/
 
@@ -14,7 +14,7 @@
 #pragma once
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 // ======================> distomeb_slot_device
@@ -62,35 +62,25 @@ private:
 DECLARE_DEVICE_TYPE(DISTOMEB_SLOT, distomeb_slot_device)
 
 
-// ======================> device_distomeb_host_interface
-
-// this is implemented by the Disto root devices
-class device_distomeb_host_interface
-{
-public:
-};
-
-
 // ======================> device_distomeb_interface
 
 class device_distomeb_interface : public device_interface
 {
 public:
-	// construction/destruction
+	// destruction
 	virtual ~device_distomeb_interface();
-	virtual void interface_pre_start() override;
 
 	virtual u8 meb_read(offs_t offset);
 	virtual void meb_write(offs_t offset, u8 data);
 
 protected:
+	virtual void interface_pre_start() override;
 	virtual void interface_config_complete() override;
 
 	device_distomeb_interface(const machine_config &mconfig, device_t &device);
 
 	// accessors for containers
-	distomeb_slot_device &owning_slot()		{ assert(m_owning_slot); return *m_owning_slot; }
-	device_distomeb_host_interface &host()	{ assert(m_host); return *m_host; }
+	distomeb_slot_device &owning_slot()     { assert(m_owning_slot); return *m_owning_slot; }
 
 	// setting cart values
 	void set_cart_value(int value);
@@ -98,7 +88,6 @@ protected:
 
 private:
 	distomeb_slot_device *m_owning_slot;
-	device_distomeb_host_interface *m_host;
 };
 
 void disto_meb_add_basic_devices(device_slot_interface &device);

@@ -2,37 +2,37 @@
 // copyright-holders:tim lindner
 /*********************************************************************
 
-	meb_intrf.h
+    meb_intrf.h
 
-	CRC / Disto Mini Expansion Bus management
+    CRC / Disto Mini Expansion Bus management
 
-	Mini Expansion Bus
-		17 pin in-line header
-			pin
-			1	reset
-			2	e clock
-			3	address 0
-			4	address 1
-			5	data 0
-			6	data 1
-			7	data 2
-			8	data 3
-			9	data 4
-			10	data 5
-			11	data 6
-			12	data 7
-			13	chip enable*
-			14	ground
-			15	r/w*
-			16	+5v
-			17	address 2
+    Mini Expansion Bus
+        17 pin in-line header
+            pin
+            1   reset
+            2   e clock
+            3   address 0
+            4   address 1
+            5   data 0
+            6   data 1
+            7   data 2
+            8   data 3
+            9   data 4
+            10  data 5
+            11  data 6
+            12  data 7
+            13  chip enable*
+            14  ground
+            15  r/w*
+            16  +5v
+            17  address 2
 
-		There is also one additional pin for the CART signal
+        There is also one additional pin for the CART signal
 
-		Addresses active: $FF50 to $FF57
+        Addresses active: $FF50 to $FF57
 
-	This was implemented in the Super (floppy) Controller I and II,
-	and in the ram disk expansion pak.
+    This was implemented in the Super (floppy) Controller I and II,
+    and in the ram disk expansion pak.
 
 *********************************************************************/
 
@@ -42,14 +42,14 @@
 #include "meb_rtime.h"
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(DISTOMEB_SLOT, distomeb_slot_device, "distomeb_slot", "Disto Mini Expansion Bus")
 
 
 //-------------------------------------------------
-//	distomeb_slot_device - constructor
+//  distomeb_slot_device - constructor
 //-------------------------------------------------
 distomeb_slot_device::distomeb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DISTOMEB_SLOT, tag, owner, clock)
@@ -61,7 +61,7 @@ distomeb_slot_device::distomeb_slot_device(const machine_config &mconfig, const 
 
 
 //-------------------------------------------------
-//	device_start - device-specific startup
+//  device_start - device-specific startup
 //-------------------------------------------------
 
 void distomeb_slot_device::device_start()
@@ -71,7 +71,7 @@ void distomeb_slot_device::device_start()
 
 
 //-------------------------------------------------
-//	meb_read
+//  meb_read
 //-------------------------------------------------
 
 u8 distomeb_slot_device::meb_read(offs_t offset)
@@ -84,7 +84,7 @@ u8 distomeb_slot_device::meb_read(offs_t offset)
 
 
 //-------------------------------------------------
-//	meb_write
+//  meb_write
 //-------------------------------------------------
 
 
@@ -95,7 +95,7 @@ void distomeb_slot_device::meb_write(offs_t offset, u8 data)
 }
 
 //-------------------------------------------------
-//	set_cart_line
+//  set_cart_line
 //-------------------------------------------------
 
 void distomeb_slot_device::set_cart_line(int value)
@@ -107,7 +107,7 @@ void distomeb_slot_device::set_cart_line(int value)
 
 
 //-------------------------------------------------
-//	get_cart_line
+//  get_cart_line
 //-------------------------------------------------
 
 int distomeb_slot_device::get_cart_line() const
@@ -117,8 +117,8 @@ int distomeb_slot_device::get_cart_line() const
 
 
 //**************************************************************************
-//	DEVICE DISTO MEB INTERFACE - Implemented by devices that plug into
-//	Disto Mini Expansion Bus
+//  DEVICE DISTO MEB INTERFACE - Implemented by devices that plug into
+//  Disto Mini Expansion Bus
 //**************************************************************************
 
 template class device_finder<device_distomeb_interface, false>;
@@ -126,19 +126,18 @@ template class device_finder<device_distomeb_interface, true>;
 
 
 //-------------------------------------------------
-//	device_distomeb_interface - constructor
+//  device_distomeb_interface - constructor
 //-------------------------------------------------
 
 device_distomeb_interface::device_distomeb_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "distomeb")
 	, m_owning_slot(nullptr)
-	, m_host(nullptr)
 {
 }
 
 
 //-------------------------------------------------
-//	~device_distomeb_interface - destructor
+//  ~device_distomeb_interface - destructor
 //-------------------------------------------------
 
 device_distomeb_interface::~device_distomeb_interface()
@@ -147,33 +146,28 @@ device_distomeb_interface::~device_distomeb_interface()
 
 
 //-------------------------------------------------
-//	interface_config_complete
+//  interface_config_complete
 //-------------------------------------------------
 
 void device_distomeb_interface::interface_config_complete()
 {
 	m_owning_slot = dynamic_cast<distomeb_slot_device *>(device().owner());
-	m_host = m_owning_slot
-			? dynamic_cast<device_distomeb_host_interface *>(m_owning_slot->owner())
-			: nullptr;
 }
 
 
 //-------------------------------------------------
-//	interface_pre_start
+//  interface_pre_start
 //-------------------------------------------------
 
 void device_distomeb_interface::interface_pre_start()
 {
 	if (!m_owning_slot)
 		throw emu_fatalerror("Expected device().owner() to be of type distomeb_slot_device");
-	if (!m_host)
-		throw emu_fatalerror("Expected m_owning_slot->owner() to be of type device_distomeb_host_interface");
 }
 
 
 //-------------------------------------------------
-//	meb_read - Addresses active: $FF50 to $FF57
+//  meb_read - Addresses active: $FF50 to $FF57
 //-------------------------------------------------
 
 u8 device_distomeb_interface::meb_read(offs_t offset)
@@ -183,7 +177,7 @@ u8 device_distomeb_interface::meb_read(offs_t offset)
 
 
 //-------------------------------------------------
-//	cts_write - Addresses active: $FF50 to $FF57
+//  cts_write - Addresses active: $FF50 to $FF57
 //-------------------------------------------------
 
 void device_distomeb_interface::meb_write(offs_t offset, u8 data)
@@ -192,7 +186,7 @@ void device_distomeb_interface::meb_write(offs_t offset, u8 data)
 
 
 //-------------------------------------------------
-//	set_cart_value
+//  set_cart_value
 //-------------------------------------------------
 
 void device_distomeb_interface::set_cart_value(int value)
@@ -202,7 +196,7 @@ void device_distomeb_interface::set_cart_value(int value)
 
 
 //-------------------------------------------------
-//	disto_meb_add_basic_devices
+//  disto_meb_add_basic_devices
 //-------------------------------------------------
 
 void disto_meb_add_basic_devices(device_slot_interface &device)

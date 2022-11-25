@@ -17,9 +17,6 @@
 
 #include "meb_intrf.h"
 
-#define RTC_TAG "rtc"
-#define CENTRONICS_TAG "centronics"
-#define LATCH_TAG "latch"
 
 // ======================> disto_rtime_device
 
@@ -53,7 +50,7 @@ namespace
 
 
 	/***************************************************************************
-		IMPLEMENTATION
+	    IMPLEMENTATION
 	***************************************************************************/
 
 	//-------------------------------------------------
@@ -63,11 +60,11 @@ namespace
 	disto_rtime_device::disto_rtime_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, DISTOMEB_RTIME, tag, owner, clock)
 		, device_distomeb_interface(mconfig, *this)
-		, m_rtc(*this, RTC_TAG)
+		, m_rtc(*this, "rtc")
 		, m_rtc_address(0)
 		, m_double_write(0)
-		, m_centronics(*this, CENTRONICS_TAG)
-		, m_latch(*this, LATCH_TAG)
+		, m_centronics(*this, "centronics")
+		, m_latch(*this, "latch")
 		, m_centronics_busy(0)
 	{
 	}
@@ -113,7 +110,7 @@ namespace
 				result = m_rtc->read(m_rtc_address & 0x0f);
 				break;
 
-			case 0x02:	/* FF52 */
+			case 0x02:  /* FF52 */
 				result = m_centronics_busy << 7;
 		}
 
@@ -162,12 +159,11 @@ namespace
 	{
 		m_centronics_busy = state;
 	}
-}
-
-	//**************************************************************************
-	//  GLOBAL VARIABLES
-	//**************************************************************************
-
-	DEFINE_DEVICE_TYPE_PRIVATE(DISTOMEB_RTIME, device_distomeb_interface, disto_rtime_device, "distomeb_rtime", "Disto Real Time Clock Card")
+} // Anonymous namespace
 
 
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(DISTOMEB_RTIME, device_distomeb_interface, disto_rtime_device, "distomeb_rtime", "Disto Real Time Clock Card")
