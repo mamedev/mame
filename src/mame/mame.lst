@@ -44589,6 +44589,9 @@ yiear2                          // GX407 (c) 1985
 @source:yamaha/yman1x.cpp
 an1x                            //
 
+@source:yamaha/ymdx7.cpp
+dx7                             // 1983 DX-7
+
 @source:yamaha/ymdx9.cpp
 dx9                             //
 

@@ -1263,6 +1263,7 @@ yamaha/fb01.cpp
 yamaha/tg100.cpp
 yamaha/yman1x.cpp
 yamaha/ymdx100.cpp
+yamaha/ymdx7.cpp
 yamaha/ymdx9.cpp
 yamaha/ymdx11.cpp
 yamaha/ymmu100.cpp
