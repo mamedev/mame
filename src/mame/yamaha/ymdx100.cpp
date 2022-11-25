@@ -240,6 +240,7 @@ public:
 protected:
 	virtual void driver_start() override;
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -271,6 +272,12 @@ void yamaha_dx100_state::driver_start()
 void yamaha_dx100_state::machine_start()
 {
 	save_item(NAME(m_midi_in));
+}
+
+void yamaha_dx100_state::machine_reset()
+{
+	// TODO: figure out the actual power-on state
+	m_port6_val = 0;
 }
 
 HD44780_PIXEL_UPDATE(yamaha_dx100_state::lcd_pixel_update)
@@ -555,9 +562,6 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	});
 	m_maincpu->out_ser_tx_cb().set("mdout", FUNC(midi_port_device::write_txd));
 
-	// TODO: figure out the actual power-on state
-	m_port6_val = 0;
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5518BPL + CR2032T battery
 
 	M58990(config, m_adc, 7.15909_MHz_XTAL / 8); // M58990P-1 (clocked by E)
@@ -606,5 +610,5 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1985, dx100, 0, 0, dx100, dx100, yamaha_dx100_state, empty_init, "Yamaha", "DX100 Digital Programmable Algorithm Synthesizer", MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND)
+SYST(1985, dx100, 0, 0, dx100, dx100, yamaha_dx100_state, empty_init, "Yamaha", "DX100 Digital Programmable Algorithm Synthesizer", MACHINE_IMPERFECT_SOUND)
 
