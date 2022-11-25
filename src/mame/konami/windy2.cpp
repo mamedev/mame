@@ -39,18 +39,24 @@
 #include "emu.h"
 #include "windy2.h"
 
-windy2_device::windy2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	jvs_device(mconfig, KONAMI_WINDY2_JVS_IO, tag, owner, clock),
+DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L6B_PANEL,  windy2_2l6b_device,  "windy2", "Konami Windy2 I/O (2L6B Panel, Standard)")
+DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_QUIZ_PANEL,  windy2_quiz_device,  "windy2", "Konami Windy2 I/O (Quiz Panel, GU707-JB)")
+DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L8B_PANEL,  windy2_2l8b_device,  "windy2", "Konami Windy2 I/O (2L8B Panel, GU707-JC)")
+DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_1L6B_PANEL,  windy2_1l6b_device,  "windy2", "Konami Windy2 I/O (1L6B Panel, GU707-JD)")
+DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L12B_PANEL, windy2_2l12b_device, "windy2", "Konami Windy2 I/O (2L12B Panel, GU707-JG)")
+
+windy2_device::windy2_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t player_count, uint8_t switch_count) :
+	jvs_device(mconfig, type, tag, owner, clock),
 	m_test_port(*this, "TEST"),
 	m_player_ports(*this, "P%u", 1U),
-	m_panel_type(windy2_device::PANEL_2L6B)
+	m_player_count(player_count),
+	m_switch_count(switch_count)
 {
 }
 
 void windy2_device::device_start()
 {
 	jvs_device::device_start();
-	save_item(NAME(m_panel_type));
 	save_item(NAME(m_coin_counter));
 }
 
@@ -86,40 +92,10 @@ uint8_t windy2_device::comm_method_version()
 
 void windy2_device::function_list(uint8_t*& buf)
 {
-	int players, switches;
-
-	switch (m_panel_type) {
-		case windy2_device::PANEL_QUIZ:
-			players = 2;
-			switches = 6; // 4 buttons + start + service
-			break;
-
-		case windy2_device::PANEL_2L8B:
-			players = 2;
-			switches = 10; // 4 lever + 4 buttons + start + service
-			break;
-
-		case windy2_device::PANEL_1L6B:
-			players = 1;
-			switches = 12; // 4 lever + 6 buttons + start + service
-			break;
-
-		case windy2_device::PANEL_2L12B:
-			players = 2;
-			switches = 12; // 4 lever + 6 buttons + start + service
-			break;
-
-		case windy2_device::PANEL_2L6B: // same panel as 2L12B shown in diagram, but only top 3 buttons are used instead of the full 6 buttons
-		default:
-			players = 2;
-			switches = 9; // 4 lever + 3 buttons + start + service
-			break;
-	}
-
 	// Switch input function
 	*buf++ = 0x01;
-	*buf++ = players;
-	*buf++ = switches;
+	*buf++ = m_player_count;
+	*buf++ = m_switch_count; // this count includes any levers positions and additional buttons (start, service) per player
 	*buf++ = 0;
 
 	// Coin input function
@@ -164,16 +140,20 @@ INPUT_CHANGED_MEMBER(windy2_device::coin_inserted)
 		m_coin_counter[param] = (m_coin_counter[param] + 1) & 0x3fff;
 }
 
-INPUT_PORTS_START( windy2 )
+static INPUT_PORTS_START( windy2 )
 	PORT_START( "TEST" )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START( "P1" )
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff3fff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 
 	PORT_START( "P2" )
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff3fff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SERVICE2 )
 
 	PORT_START( "COIN" )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -181,145 +161,140 @@ INPUT_PORTS_START( windy2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER( DEVICE_SELF, windy2_device, coin_inserted, 1 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( windy2_2l12b )
+static INPUT_PORTS_START( windy2_2l6b )
 	PORT_INCLUDE( windy2 )
 
 	PORT_MODIFY( "P1" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 1 )
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 1 )
 
 	PORT_MODIFY( "P2" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE2 )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 2 )
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 2 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( windy2_2l8b )
-	PORT_INCLUDE( windy2 )
+static INPUT_PORTS_START( windy2_2l8b )
+	PORT_INCLUDE( windy2_2l6b )
 
 	PORT_MODIFY( "P1" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 1 )
 
 	PORT_MODIFY( "P2" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE2 )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 2 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( windy2_2l6b )
-	PORT_INCLUDE( windy2 )
+static INPUT_PORTS_START( windy2_2l12b )
+	PORT_INCLUDE( windy2_2l8b )
 
 	PORT_MODIFY( "P1" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER( 1 )
 
 	PORT_MODIFY( "P2" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE2 )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 2 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER( 2 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( windy2_quiz )
+static INPUT_PORTS_START( windy2_1l6b )
+	PORT_INCLUDE( windy2_2l12b )
+
+	// Same button layout as 2L12B but only 1 player
+	PORT_MODIFY( "P2" )
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( windy2_quiz )
 	PORT_INCLUDE( windy2 )
 
 	PORT_MODIFY( "P1" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 1 )
 
 	PORT_MODIFY( "P2" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE2 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 2 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( windy2_1l6b )
-	PORT_INCLUDE( windy2 )
+/////////////////////////////////////////////
 
-	PORT_MODIFY( "P1" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER( 1 )
-INPUT_PORTS_END
-
-ioport_constructor windy2_device::device_input_ports() const
+// Stock Windy II cabinet panel for 2 players with 3 buttons + start + service per player
+// Corresponds to the dipswitch setting of 01000000 on I/O board
+windy2_2l6b_device::windy2_2l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_2L6B_PANEL, tag, owner, clock, 2, 9)
 {
-	switch (m_panel_type) {
-		case windy2_device::PANEL_2L12B:
-			return INPUT_PORTS_NAME(windy2_2l12b);
-		case windy2_device::PANEL_2L8B:
-			return INPUT_PORTS_NAME(windy2_2l8b);
-		case windy2_device::PANEL_QUIZ:
-			return INPUT_PORTS_NAME(windy2_quiz);
-		case windy2_device::PANEL_1L6B:
-			return INPUT_PORTS_NAME(windy2_1l6b);
-		case windy2_device::PANEL_2L6B:
-		default:
-			return INPUT_PORTS_NAME(windy2_2l6b);
-	}
 }
 
-DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO, windy2_device, "windy2", "Konami Windy2 I/O")
+ioport_constructor windy2_2l6b_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(windy2_2l6b);
+}
+
+/////////////////////////////////////////////
+
+// GU707-JB Quiz panel setup for 2 players with 4 buttons + start + service per player
+// Corresponds to the dipswitch setting of 00000000 on I/O board
+windy2_quiz_device::windy2_quiz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_QUIZ_PANEL, tag, owner, clock, 2, 6)
+{
+}
+
+ioport_constructor windy2_quiz_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(windy2_quiz);
+}
+
+/////////////////////////////////////////////
+
+// GU707-JC 2L8B panel setup for 2 players with 4 buttons + 4 levers + start + service per player
+// Corresponds to the dipswitch setting of 11000000 on I/O board
+windy2_2l8b_device::windy2_2l8b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_QUIZ_PANEL, tag, owner, clock, 2, 10)
+{
+}
+
+ioport_constructor windy2_2l8b_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(windy2_2l8b);
+}
+
+/////////////////////////////////////////////
+
+// GU707-JD 1L6B panel setup for 1 player with 6 buttons + 4 levers + start + test
+// Corresponds to the dipswitch setting of 10101001 on I/O board
+windy2_1l6b_device::windy2_1l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_QUIZ_PANEL, tag, owner, clock, 1, 12)
+{
+}
+
+ioport_constructor windy2_1l6b_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(windy2_1l6b);
+}
+
+/////////////////////////////////////////////
+
+// GU707-JG 2L12B panel setup for 2 players with 6 buttons + 4 levers + start + service per player
+// Corresponds to the dipswitch setting of 10101000 on I/O board
+windy2_2l12b_device::windy2_2l12b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_QUIZ_PANEL, tag, owner, clock, 2, 12)
+{
+}
+
+ioport_constructor windy2_2l12b_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(windy2_2l12b);
+}

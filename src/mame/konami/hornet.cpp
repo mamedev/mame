@@ -1297,7 +1297,7 @@ void hornet_state::nbapbp(machine_config &config)
 	// with the 2L6B panel dipswitch settings on the Windy2 board.
 	// NOTE: Harness JVS + cabinet 4 player will work with a second JVS I/O device hooked up, but then
 	// the official recommended setting of cabinet type 4 player + harness JAMMA breaks.
-	KONAMI_WINDY2_JVS_IO(config, "windy2_jvsio", 0, m_hornet_jvs_host, windy2_device::PANEL_2L6B);
+	KONAMI_WINDY2_JVS_IO_2L6B_PANEL(config, "windy2_jvsio", 0, m_hornet_jvs_host);
 }
 
 void hornet_state::terabrst(machine_config &config) //todo: add K056800 from I/O board

@@ -25,21 +25,11 @@ public:
 		PANEL_2L12B = 0b00010101, // 2L12B Panel (2x 1L6B) (GU707-JG)
 	};
 
-	template <typename T>
-	windy2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag, uint8_t panel_type)
-		: windy2_device(mconfig, tag, owner, clock)
-	{
-		host.set_tag(std::forward<T>(jvs_host_tag));
-		m_panel_type = panel_type;
-	}
-
-	windy2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
+	windy2_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t player_count, uint8_t switch_count);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -56,10 +46,101 @@ private:
 	required_ioport m_test_port;
 	required_ioport_array<2> m_player_ports;
 
-	uint8_t m_panel_type;
 	uint16_t m_coin_counter[2];
+	const uint8_t m_player_count, m_switch_count;
 };
 
-DECLARE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO, windy2_device)
+/////////////////////////////////////////////
+
+// Default Windy 2 cabinet panel setup for 2 players with 3 buttons + 4 levers + start + service per player
+// Corresponds to the dipswitch setting of 01000000 on I/O board
+class windy2_2l6b_device : public windy2_device
+{
+public:
+	windy2_2l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T>
+	windy2_2l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag)
+		: windy2_2l6b_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+	}
+
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+/////////////////////////////////////////////
+
+class windy2_quiz_device : public windy2_device
+{
+public:
+	windy2_quiz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T>
+	windy2_quiz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag)
+		: windy2_quiz_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+	}
+
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+/////////////////////////////////////////////
+
+class windy2_2l8b_device : public windy2_device
+{
+public:
+	windy2_2l8b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T>
+	windy2_2l8b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag)
+		: windy2_2l8b_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+	}
+
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+/////////////////////////////////////////////
+
+class windy2_1l6b_device : public windy2_device
+{
+public:
+	windy2_1l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T>
+	windy2_1l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag)
+		: windy2_1l6b_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+	}
+
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+/////////////////////////////////////////////
+
+class windy2_2l12b_device : public windy2_device
+{
+public:
+	windy2_2l12b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T>
+	windy2_2l12b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag)
+		: windy2_2l12b_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+	}
+
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+DECLARE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L6B_PANEL,  windy2_2l6b_device)
+DECLARE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_QUIZ_PANEL,  windy2_quiz_device)
+DECLARE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L8B_PANEL,  windy2_2l8b_device)
+DECLARE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_1L6B_PANEL,  windy2_1l6b_device)
+DECLARE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L12B_PANEL, windy2_2l12b_device)
 
 #endif // MAME_KONAMI_WINDY2_H
