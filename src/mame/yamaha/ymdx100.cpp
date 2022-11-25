@@ -48,7 +48,7 @@ service manual, but is still readily available.
 
 *** Currently imperfectly emulated
 
-    - [TODO1] The cassette interface.
+    - The cassette interface.
       This uses an 8-pin DIN with what appears to be the same pinout as the MSX.
       However, the remote lines are completely unused, and the tape player has
       to be manually operated. The "dxconvert" project by rarepixel does claim to
@@ -74,7 +74,7 @@ service manual, but is still readily available.
 
 *** Currently unemulated
 
-    - [TODO2] Bit 5 of port 6 is tied to the /G2A and /G2B pins of the two
+    - Bit 5 of port 6 is tied to the /G2A and /G2B pins of the two
       TC40H138P chips (~~ 74138?) that sit between the panel switches and the CPU.
       I don't yet understand how these lines are actually used, but I can still use
       the full functions of the keyboard if I just have it return 0 on read, so.
@@ -104,7 +104,7 @@ service manual, but is still readily available.
     Bit(s)    Connection
     0-3       Which set of buttons to expose on port 5.
     4         Connected to the EOC line of the ADC.
-    5         [TODO2]
+    5         (see /G2A and /G2B comment in Currently unemulated)
     6         Connected to the REC (TS) line of the cassette interface.
     7         Connected to the PLAY (TL) line of the cassette interface.
 
@@ -307,14 +307,15 @@ void yamaha_dx100_state::mem_map(address_map &map)
 
 static INPUT_PORTS_START(dx100)
 	PORT_START("P2")
-	// TODO should 0x02, 0x04, 0x10, and 0x80 be listed here? they should be handled by the other interconnections in this file
-	// TODO if so, verify the active states of the MIDI ports
+	// TODO: Should 0x02, 0x04, 0x10, and 0x80 be listed here?
+	// They should be handled by the other interconnections in this file.
+	// If so, verify the active states of the MIDI ports.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT )   PORT_NAME("LED") PORT_WRITE_LINE_MEMBER(yamaha_dx100_state, led_w)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )  // tied to ground
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )  // 500khz clock
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(yamaha_dx100_state, midi_in_r)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT )  // MIDI out
-	PORT_CONFNAME( 0x20, 0x00, "Foot Switch Connected?" )
+	PORT_CONFNAME( 0x20, 0x00, "Foot Switch" )
 	PORT_CONFSETTING( 0x00, "Connected" )
 	PORT_CONFSETTING( 0x20, "Disconnected" )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Foot Switch")
@@ -491,7 +492,7 @@ static INPUT_PORTS_START(dx100)
 	PORT_BIT( 0xff, 0, IPT_PADDLE_V ) PORT_NAME("Modulation Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_CENTERDELTA(0) PORT_REVERSE
 
 	PORT_START("AN2")
-	// TODO this appears to be inverted; if this is set to 255 it behaves as if
+	// TODO: This appears to be inverted; if this is set to 255 it behaves as if
 	// there was no breath controller? or at least seems to? on instruments like
 	// 112 Pianobrass if this is set to 0 it acts as if the mod wheel had been turned
 	// all the way up and enables LFO -- and there's probably a better way we could
@@ -533,9 +534,9 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	m_maincpu->in_p2_cb().set_ioport("P2");
 	m_maincpu->out_p2_cb().set_ioport("P2");
 	m_maincpu->in_p6_cb().set([this]() -> u8 {
-		// [TODO1] The threshold here and the output values below should be double-checked.
+		// TODO: The threshold here and the output values below should be double-checked.
 		u8 casplay = (m_cassette->input() > 0.009) ? 0x80 : 0;
-		// [TODO1] Need to verify if this bit is held on output or not
+		// TODO: Need to verify if this bit is held on output or not
 		u8 casrec = m_port6_val & 0x40;
 		u8 adcval = ((u8) (m_adc->eoc_r() << 4)) & 0x10;
 		u8 port5line = (m_port6_val & 0x2f);
@@ -547,13 +548,15 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	});
 	m_maincpu->in_p5_cb().set([this]() -> u8 {
 		u8 line = m_port6_val & 0x2f;
+		// TODO: figure out how the /G2A and /G2B pins are connected
 		if ((line & 0x20) != 0)
-			return 0x00;	// [TODO2]
+			return 0x00;
 		return (u8) (m_keysbuttons[line]->read() & 0xff);
 	});
 	m_maincpu->out_ser_tx_cb().set("mdout", FUNC(midi_port_device::write_txd));
 
-	m_port6_val = 0;		// TODO figure out the actual power-on state
+	// TODO: figure out the actual power-on state
+	m_port6_val = 0;
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5518BPL + CR2032T battery
 
