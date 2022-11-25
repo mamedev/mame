@@ -14,9 +14,8 @@
     cartridge, it is dealt with in the main coco.cpp file.
 
     The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43
-    on the Dragon.  In addition, there is another register
-    called DSKREG that controls the interface with the wd1793.  DSKREG is
-    detailed below:
+    on the Dragon. In addition, there is another register called DSKREG that
+    controls the interface with the wd1793. DSKREG is detailed below:
 
     References:
         CoCo:   Disk Basic Unravelled
@@ -69,7 +68,7 @@
                         0:  0 - buffered write operation
                             1 - buffered read operation
 
-        There was a jumper to set the addresses to be FF58 to FF5B. Not implemented.
+        There was a jumper to set the addresses to be FF58 or FF5B. Not implemented.
 
 *********************************************************************/
 
@@ -98,9 +97,9 @@
 //#define VERBOSE (LOG_GENERAL|LOG_WDFDC|LOG_WDSCII)
 #include "logmacro.h"
 
-#define LOGWDFDC(...)	LOGMASKED(LOG_WDFDC,	__VA_ARGS__)
-#define LOGWDIO(...)	LOGMASKED(LOG_WDIO,		__VA_ARGS__)
-#define LOGWDSCII(...)	LOGMASKED(LOG_WDSCII,	__VA_ARGS__)
+#define LOGWDFDC(...)   LOGMASKED(LOG_WDFDC,    __VA_ARGS__)
+#define LOGWDIO(...)    LOGMASKED(LOG_WDIO,     __VA_ARGS__)
+#define LOGWDSCII(...)  LOGMASKED(LOG_WDSCII,   __VA_ARGS__)
 
 
 /***************************************************************************
@@ -396,7 +395,7 @@ void coco_fdc_device_base::scs_write(offs_t offset, u8 data)
 
 
 //**************************************************************************
-//  CoCo ROMs
+//  CoCo DOS ROMs
 //**************************************************************************
 
 ROM_START(coco_fdc)
@@ -470,7 +469,6 @@ namespace
 		{
 			return ROM_NAME(coco_fdc);
 		}
-
 	};
 
 
@@ -521,10 +519,6 @@ namespace
 
 		// optional information overrides
 		virtual void device_add_mconfig(machine_config &config) override;
-		// virtual const tiny_rom_entry *device_rom_region() const override
-		// {
-		//  return ROM_NAME(coco_scii);
-		// }
 
 		// methods
 		virtual void update_lines() override;
@@ -608,7 +602,6 @@ namespace
 			return m_slot->meb_read(offset - 0x10);
 
 		return coco_fdc_device_base::scs_read(offset);
-
 	}
 
 
@@ -747,7 +740,6 @@ namespace
 				update_lines();
 				break;
 		}
-
 	}
 
 
@@ -770,7 +762,6 @@ namespace
 		{
 			return ROM_NAME(coco_scii_cc1);
 		}
-
 	};
 
 
@@ -793,7 +784,6 @@ namespace
 		{
 			return ROM_NAME(coco_scii_cc3);
 		}
-
 	};
 
 
