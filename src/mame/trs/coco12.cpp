@@ -102,6 +102,13 @@ void coco12_state::ms1600_rom2(address_map &map)
 	map(0x3000, 0x3eff).rom().region(MAINCPU_TAG, 0x7000).nopw();
 }
 
+void deluxecoco_state::deluxecoco_io1(address_map &map)
+{
+	// $FF20-$FF3F
+	map(0x00, 0x03).mirror(0x1c).r(PIA1_TAG, FUNC(pia6821_device::read)).w(FUNC(coco12_state::ff20_write));
+	map(0x18, 0x19).w(m_psg, FUNC(ay8913_device::data_address_w));
+	map(0x1c, 0x1f).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+}
 
 //**************************************************************************
 //  INPUT PORTS
@@ -562,6 +569,33 @@ void coco12_state::cocoeh(machine_config &config)
 	m_ram->set_default_size("64K");
 }
 
+void deluxecoco_state::deluxecoco(machine_config &config)
+{
+	coco12_state::coco2b(config);
+
+	m_ram->set_default_size("64K");
+
+	// Asynchronous Communications Interface Adapter
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(acia, FUNC(mos6551_device::write_cts));
+
+	// Programable Sound Generator
+	AY8913(config, m_psg, DERIVED_CLOCK(2, 1));
+	m_psg->set_flags(AY8910_SINGLE_OUTPUT);
+	// m_psg->add_route(ALL_OUTPUTS, "coco_sac_tag", 1.0);
+
+	// Adjust Memory Map
+	m_sam->set_addrmap(5, &deluxecoco_state::deluxecoco_io1);
+}
+
 void coco12_state::coco2(machine_config &config)
 {
 	coco(config);
@@ -708,6 +742,7 @@ ROM_END
 
 #define rom_cocoh rom_coco
 #define rom_cocoeh rom_cocoe
+#define rom_deluxecoco rom_cocoe
 #define rom_coco2h rom_coco2
 #define rom_coco2bh rom_coco2b
 
@@ -720,6 +755,7 @@ COMP( 1980,  coco,      0,      0,      coco,    coco,    coco12_state, empty_in
 COMP( 1981,  cocoe,     coco,   0,      cocoe,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", MACHINE_SUPPORTS_SAVE )
 COMP( 19??,  cocoh,     coco,   0,      cocoh,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
 COMP( 19??,  cocoeh,    coco,   0,      cocoeh,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1983,  deluxecoco,  coco,   0,      deluxecoco,coco,    deluxecoco_state,empty_init,"Tandy Radio Shack",            "Deluxe Color Computer",               MACHINE_SUPPORTS_SAVE )
 COMP( 1983,  coco2,     coco,   0,      coco2,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2",                    MACHINE_SUPPORTS_SAVE )
 COMP( 19??,  coco2h,    coco,   0,      coco2h,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
 COMP( 1985?, coco2b,    coco,   0,      coco2b,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
