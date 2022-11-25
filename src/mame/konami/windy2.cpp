@@ -39,11 +39,11 @@
 #include "emu.h"
 #include "windy2.h"
 
-DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L6B_PANEL,  windy2_2l6b_device,  "windy2", "Konami Windy2 I/O (2L6B Panel, Standard)")
-DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_QUIZ_PANEL,  windy2_quiz_device,  "windy2", "Konami Windy2 I/O (Quiz Panel, GU707-JB)")
-DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L8B_PANEL,  windy2_2l8b_device,  "windy2", "Konami Windy2 I/O (2L8B Panel, GU707-JC)")
-DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_1L6B_PANEL,  windy2_1l6b_device,  "windy2", "Konami Windy2 I/O (1L6B Panel, GU707-JD)")
-DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L12B_PANEL, windy2_2l12b_device, "windy2", "Konami Windy2 I/O (2L12B Panel, GU707-JG)")
+DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L6B_PANEL,  windy2_2l6b_device,  "windy2_2l6b", "Konami Windy2 I/O (2L6B Panel, Standard)")
+DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_QUIZ_PANEL,  windy2_quiz_device,  "windy2_quiz", "Konami Windy2 I/O (Quiz Panel, GU707-JB)")
+DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L8B_PANEL,  windy2_2l8b_device,  "windy2_2l8b", "Konami Windy2 I/O (2L8B Panel, GU707-JC)")
+DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_1L6B_PANEL,  windy2_1l6b_device,  "windy2_1l6b", "Konami Windy2 I/O (1L6B Panel, GU707-JD)")
+DEFINE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L12B_PANEL, windy2_2l12b_device, "windy2_2l12b", "Konami Windy2 I/O (2L12B Panel, GU707-JG)")
 
 windy2_device::windy2_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t player_count, uint8_t switch_count) :
 	jvs_device(mconfig, type, tag, owner, clock),
