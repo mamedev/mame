@@ -57,13 +57,6 @@ protected:
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 
-	enum
-	{
-		TIMER_ID_LSS = 0,
-		TIMER_ID_SEEK,
-		TIMER_ID_MOTOR
-	};
-
 	required_device<i8255_device> m_d14;
 	required_device<i8255_device> m_d15;
 

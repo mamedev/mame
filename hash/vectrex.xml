@@ -179,7 +179,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="blitza" cloneof="blitz">
-		<description>Blitz! (Alt)</description>
+		<description>Blitz! (alt)</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -526,7 +526,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="poleposa" cloneof="polepos">
-		<description>Pole Position (Alt)</description>
+		<description>Pole Position (alt)</description>
 		<year>1983</year>
 		<publisher>GCE / Namco Ltd.</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -589,7 +589,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="rocksled">
-		<description>Rocket Sledge (Sample)</description>
+		<description>Rocket Sledge (sample)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -813,7 +813,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="thrusta" cloneof="thrust">
-		<description>Thrust (Final 1.01)</description>
+		<description>Thrust (final 1.01)</description>
 		<year>2004</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Ville Krumlinde" />

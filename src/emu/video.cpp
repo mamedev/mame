@@ -19,6 +19,7 @@
 #include "screen.h"
 
 #include "corestr.h"
+#include "path.h"
 #include "png.h"
 #include "xmlfile.h"
 
@@ -301,7 +302,7 @@ std::string video_manager::speed_text()
 
 	// append the speed for all cases except paused
 	if (!paused)
-		util::stream_format(str, "%4d%%", (int)(100 * m_speed_percent + 0.5));
+		util::stream_format(str, " %3d%%", int(100 * m_speed_percent + 0.5));
 
 	// display the number of partial updates as well
 	int partials = 0;

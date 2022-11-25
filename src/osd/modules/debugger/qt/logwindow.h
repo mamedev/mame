@@ -3,9 +3,13 @@
 #ifndef MAME_DEBUGGER_QT_LOGWINDOW_H
 #define MAME_DEBUGGER_QT_LOGWINDOW_H
 
+#pragma once
+
 #include "debuggerview.h"
 #include "windowqt.h"
 
+
+namespace osd::debugger::qt {
 
 //============================================================
 //  The Log Window.
@@ -17,6 +21,9 @@ class LogWindow : public WindowQt
 public:
 	LogWindow(running_machine &machine, QWidget *parent = nullptr);
 	virtual ~LogWindow();
+
+protected:
+	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
 
 private:
 	// Widgets
@@ -31,17 +38,16 @@ class LogWindowQtConfig : public WindowQtConfig
 {
 public:
 	LogWindowQtConfig() :
-		WindowQtConfig(WIN_TYPE_LOG)
+		WindowQtConfig(WINDOW_TYPE_ERROR_LOG_VIEWER)
 	{
 	}
 
 	~LogWindowQtConfig() {}
 
-	void buildFromQWidget(QWidget *widget);
 	void applyToQWidget(QWidget *widget);
-	void addToXmlDataNode(util::xml::data_node &node) const;
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_LOGWINDOW_H

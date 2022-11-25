@@ -15,23 +15,19 @@ Hardware notes:
 
 Japanese-language flyers show an upright cabinet with a start button, steering
 wheel and a control lever marked LOW at the upper end of the range and HIGH at
-the lower end.  It appears to be spring-returned to the LOW position.  The
-cabinet appears to have the position where an accelerator pedal would be
-located covered with a panel.  The dumped set seems to be designed for this
-cabinet.
+the lower end. It appears to be spring-returned to the LOW position. The cabinet
+appears to have the position where an accelerator pedal would be located covered
+with a panel. The dumped set seems to be designed for this cabinet.
 
 English-language flyers show a sit-down cabinet with a gear shift lever,
-accelerator pedal, and digital displays for high scores.  The set dumped set
-doesn't have support for the additional I/O.
+accelerator pedal, and digital displays for high scores. The dumped set doesn't
+have support for the additional I/O.
 
 TODO:
-- unknown DIP switches, and verify factory defaults;
+- verify DIP switches factory defaults (not mentioned in Japanese manual);
 - several unknowns in the video emulation:
   - score layer is a simplification hack, it is unknown how it should really
-    cope RMW-wise against main layer. It also has wrong colors (different color
-    base or overlay artwork, with extra bit output for taking priority?).
-    The score background color should change from white(or is it cyan?) to red
-    after Extended Play, the score digits themselves should always be black;
+    cope RMW-wise against main layer;
   - According to flyers, screen sides should have a green background color,
     it can't be an artwork overlay since it only occurs when the trees are
     on screen. However, the German flyer contains a cabinet photo and there
@@ -65,7 +61,7 @@ public:
 		, m_gfxrom(*this, "gfx")
 		, m_screen(*this, "screen")
 		, m_inputs(*this, "IN.%u", 0)
-		, m_dsw(*this, "DSW.%u", 0)
+		, m_dsw(*this, "DSW")
 		, m_wheel(*this, "WHEEL")
 	{ }
 
@@ -84,7 +80,7 @@ private:
 	required_region_ptr<u8> m_gfxrom;
 	required_device<screen_device> m_screen;
 	required_ioport_array<3> m_inputs;
-	required_ioport_array<2> m_dsw;
+	required_ioport m_dsw;
 	required_ioport m_wheel;
 
 	void main_map(address_map &map);
@@ -94,7 +90,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void io_w(offs_t offset, u8 data);
-	template <unsigned N> u8 dsw_r(offs_t offset);
+	u8 dsw_r(offs_t offset);
 	template <unsigned N> u8 input_r(offs_t offset);
 	u8 busy_r();
 
@@ -122,34 +118,22 @@ void getaway_state::machine_start()
 
 u32 getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// apparently score overlay covers only the rightmost 3 columns
-	const int x_overlay = 29*8;
-
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x+=8)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
+			// score panel covers the right(top) part of the screen
+			const u16 panel_offset = 29 * 8 - 1;
+			u8 *vram = (x < panel_offset) ? m_vram : m_score_vram;
+
 			u16 xi = x >> 3;
-			u8 b = m_vram[0x0000 | (xi << 8 | y)];
-			u8 g = m_vram[0x2000 | (xi << 8 | y)];
-			u8 r = m_vram[0x4000 | (xi << 8 | y)];
+			u8 bit0 = BIT(vram[0x0000 | (xi << 8 | y)], x & 7);
+			u8 bit1 = BIT(vram[0x2000 | (xi << 8 | y)], x & 7);
+			u8 bit2 = BIT(vram[0x4000 | (xi << 8 | y)], x & 7);
 
-			for (int i = 0; i < 8; i++)
-				bitmap.pix(y, x + i) = BIT(r, i) << 2 | BIT(g, i) << 1 | BIT(b, i);
-
-			if (x < x_overlay)
-				continue;
-
-			b = m_score_vram[0x0000 | (xi << 8 | y)];
-			g = m_score_vram[0x2000 | (xi << 8 | y)];
-			r = m_score_vram[0x4000 | (xi << 8 | y)];
-
-			for (int i = 0; i < 8; i++)
-			{
-				u8 pix_data = BIT(r, i) << 2 | BIT(g, i) << 1 | BIT(b, i);
-				if (pix_data != 0)
-					bitmap.pix(y, x + i) = pix_data;
-			}
+			// palette is a bit scrambled
+			static const u8 clut[8] = { 0, 1, 6, 5, 4, 3, 2, 7 };
+			bitmap.pix(y, x) = clut[bit2 << 2 | bit1 << 1 | bit0];
 		}
 	}
 
@@ -207,7 +191,7 @@ void getaway_state::io_w(offs_t offset, u8 data)
 
 	[0x07]
 	???w wwww transfer width, in 8 pixel units
-	        Notice that 0xff is set on POST, either full clear or NOP
+	          Notice that 0xff is set on POST, either full clear or NOP
 
 	[0x08]
 	hhhh hhhh transfer height, in scanline units
@@ -235,7 +219,6 @@ void getaway_state::io_w(offs_t offset, u8 data)
 		u16 src = m_regs[6] << 8 | m_regs[5];
 		// several valid entries are drawn with color=0 cfr. tyres
 		// flyer shows them as white so definitely xor-ed
-		// TODO: may be applied at palette init time instead + score layer colors doesn't match flyer.
 		u8 color_mask = (src >> 13) ^ 7;
 		src &= 0x1fff;
 		src <<= 3;
@@ -263,13 +246,15 @@ void getaway_state::io_w(offs_t offset, u8 data)
 
 					if (fill_mode)
 					{
+						// different method for score panel?
+						u8 fill_mask = layer_bank ? 0 : color_mask;
 						for (int i = 0; i < 3; i++)
 						{
-							// reversed for score VRAM?
-							if (layer_bank)
-								vram[i * 0x2000 + dest] &= ~pen_mask;
+							u16 out_bank = i * 0x2000 + dest;
+							if (BIT(fill_mask, i))
+								vram[out_bank] |= pen_mask;
 							else
-								vram[i * 0x2000 + dest] |= pen_mask;
+								vram[out_bank] &= ~pen_mask;
 						}
 					}
 					else
@@ -308,9 +293,9 @@ template <unsigned N> u8 getaway_state::input_r(offs_t offset)
 	return BIT(m_inputs[N]->read(), offset);
 }
 
-template <unsigned N> u8 getaway_state::dsw_r(offs_t offset)
+u8 getaway_state::dsw_r(offs_t offset)
 {
-	return BIT(m_dsw[N]->read(), offset);
+	return BIT(m_dsw->read(), offset);
 }
 
 
@@ -330,8 +315,7 @@ void getaway_state::io_map(address_map &map)
 	map(0x00, 0xff).w(FUNC(getaway_state::io_w));
 	map(0x00, 0x09).r(FUNC(getaway_state::input_r<1>)); // accelerator
 	map(0x0a, 0x19).r(FUNC(getaway_state::input_r<2>)); // steering wheel
-	map(0x1a, 0x21).r(FUNC(getaway_state::dsw_r<1>));
-	map(0x22, 0x2f).r(FUNC(getaway_state::dsw_r<0>));
+	map(0x1a, 0x2f).r(FUNC(getaway_state::dsw_r));
 	map(0x32, 0x35).r(FUNC(getaway_state::input_r<0>)); // coin + start
 	map(0x36, 0x37).r(FUNC(getaway_state::busy_r));
 }
@@ -357,46 +341,41 @@ static INPUT_PORTS_START( getaway )
 	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x08, IPT_PADDLE ) PORT_MINMAX(0x00, 0x10) PORT_SENSITIVITY(5) PORT_KEYDELTA(15)
 
-	PORT_START("DSW.0") // DTS-8 DIP switch @ location k6
-	// TODO: defaults for these two, assume they have different quotas?
-	PORT_DIPNAME( 0x07, 0x02, "Extended Play" )
-	PORT_DIPSETTING(    0x00, "None" )
-	PORT_DIPSETTING(    0x01, "2000" )
-	PORT_DIPSETTING(    0x02, "3000" )
-	PORT_DIPSETTING(    0x03, "4000" )
-	PORT_DIPSETTING(    0x04, "5000" )
-	PORT_DIPSETTING(    0x05, "6000" )
-	PORT_DIPSETTING(    0x06, "7000" )
-	PORT_DIPSETTING(    0x07, "8000" )
-	PORT_DIPNAME( 0x38, 0x28, "Extra Play" )
-	PORT_DIPSETTING(    0x00, "None" )
-	PORT_DIPSETTING(    0x08, "2000" )
-	PORT_DIPSETTING(    0x10, "3000" )
-	PORT_DIPSETTING(    0x18, "4000" )
-	PORT_DIPSETTING(    0x20, "5000" )
-	PORT_DIPSETTING(    0x28, "6000" )
-	PORT_DIPSETTING(    0x30, "7000" )
-	PORT_DIPSETTING(    0x38, "8000" )
-	PORT_DIPNAME( 0x40, 0x00, "Language" )
-	PORT_DIPSETTING(    0x00, "English" )
-	PORT_DIPSETTING(    0x40, "Japanese" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("DSW.1") // DNS04 DIP switch @ location m7
+	PORT_START("DSW")
 	// credit display is shown if both extended plays are on "None"
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit (again)" )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x003, 0x000, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SWB:3,2")
+	PORT_DIPSETTING(     0x002, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(     0x000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(     0x003, "1 Coin/1 Credit (again)" ) // not mentioned in manual
+	PORT_DIPSETTING(     0x001, DEF_STR( 1C_2C ) )
+	// game time setting determines duration of one 'second'
+	// As for the weird min/max terms? that's what the manual calls these settings.
+	PORT_DIPNAME( 0x00c, 0x004, "Game Time" ) PORT_DIPLOCATION("SWB:1,SWA:5")
+	PORT_DIPSETTING(     0x00c, "Min I" )
+	PORT_DIPSETTING(     0x008, "Min II" )
+	PORT_DIPSETTING(     0x004, "Max I" )
+	PORT_DIPSETTING(     0x000, "Max II" )
+	PORT_DIPNAME( 0x070, 0x020, "Extended Play" ) PORT_DIPLOCATION("SWA:6,7,8")
+	PORT_DIPSETTING(     0x000, "None" )
+	PORT_DIPSETTING(     0x010, "2000" )
+	PORT_DIPSETTING(     0x020, "3000" )
+	PORT_DIPSETTING(     0x030, "4000" )
+	PORT_DIPSETTING(     0x040, "5000" )
+	PORT_DIPSETTING(     0x050, "6000" )
+	PORT_DIPSETTING(     0x060, "7000" )
+	PORT_DIPSETTING(     0x070, "8000" )
+	PORT_DIPNAME( 0x380, 0x280, "Extra Play" ) PORT_DIPLOCATION("SWA:4,3,2")
+	PORT_DIPSETTING(     0x000, "None" )
+	PORT_DIPSETTING(     0x080, "2000" )
+	PORT_DIPSETTING(     0x100, "3000" )
+	PORT_DIPSETTING(     0x180, "4000" )
+	PORT_DIPSETTING(     0x200, "5000" )
+	PORT_DIPSETTING(     0x280, "6000" )
+	PORT_DIPSETTING(     0x300, "7000" )
+	PORT_DIPSETTING(     0x380, "8000" )
+	PORT_DIPNAME( 0x400, 0x000, "Language" ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(     0x000, "English" )
+	PORT_DIPSETTING(     0x400, "Japanese" )
 INPUT_PORTS_END
 
 
@@ -407,23 +386,24 @@ INPUT_PORTS_END
 
 void getaway_state::getaway(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS9900(config, m_maincpu, 48_MHz_XTAL/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &getaway_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &getaway_state::io_map);
 	m_maincpu->intlevel_cb().set_constant(2);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	m_screen->set_visarea(1*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(getaway_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(getaway_state::vblank_irq));
 	m_screen->set_palette("palette");
-	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
-	/* sound hardware */
+	PALETTE(config, "palette", palette_device::BRG_3BIT);
+
+	// sound hardware
 	// TODO: discrete
 }
 
@@ -454,4 +434,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY      FULLNAME               FLAGS
-GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way (upright)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way (upright)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

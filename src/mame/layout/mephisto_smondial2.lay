@@ -31,14 +31,9 @@ license:CC0
 		</rect>
 	</element>
 	<element name="hlb" defstate="0">
-		<text string=" ">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-		<disk state="1">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</disk>
+		</rect>
 	</element>
 
 	<element name="led7seg_background"><rect><color red="0.54" green="0.57" blue="0.58" />      </rect></element>
@@ -71,24 +66,44 @@ license:CC0
 	<element name="text_wlev">  <rect><color red="0.86" green="0.85" blue="0.85" /></rect>  <text string="LEV">           <color red="0" green="0" blue="0" /></text> </element>
 	<element name="text_black"> <rect><color red="0.86" green="0.85" blue="0.85" /></rect>  <text string="&#x25a0;">      <color red="0" green="0" blue="0" /></text> </element>
 	<element name="text_white"> <rect><color red="0.86" green="0.85" blue="0.85" /></rect>  <text string="&#x25a1;">      <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_pos">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="POS">                 <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_mem">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="MEM">                 <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_lev">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="LEV">                 <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b1">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[P] 1">               <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b2">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[N] 2">               <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b3">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[B] 3">               <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b4">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[R] 4">               <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b5">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[Q] 5">               <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b6">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="[K] 6">               <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b7">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x25a1; 7 &#x25c4;"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b8">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x25a0; 8 &#x25ba;"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_help9"> <rect><color red="0.8"  green="0.2" blue="0.2" /></rect>  <text string="HELP 9">              <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_info0"> <rect><color red="0"    green="0" blue="0" /></rect>  <text string="INFO 0">              <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_cl">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="CL">                  <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_ent">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="ENT">                 <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_res">   <rect><color red="0.8"  green="0.2" blue="0.2" /></rect>  <text string="RES">                 <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_pos">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="POS">                 <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_mem">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="MEM">                 <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_lev">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="LEV">                 <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b1">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="1">                   <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b2">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="2">                   <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b3">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="3">                   <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b4">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="4">                   <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b5">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="5">                   <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b6">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="6">                   <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b7">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x25a1; 7 &#x25c4;"> <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b8">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="&#x25a0; 8 &#x25ba;"> <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_help9"> <rect><color red="0.8"  green="0.2" blue="0.2" /></rect>  <text string="HELP 9">          <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_info0"> <rect><color red="0"    green="0" blue="0" /></rect>  <text string="INFO 0">              <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_cl">    <rect><color red="0"    green="0" blue="0" /></rect>  <text string="CL">                  <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_ent">   <rect><color red="0"    green="0" blue="0" /></rect>  <text string="ENT">                 <color red="0.85" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_res">   <rect><color red="0.8"  green="0.2" blue="0.2" /></rect>  <text string="RES">             <color red="0.85" green="0.85" blue="0.85" /></text> </element>
 	<element name="text_lcd">   <rect><color red="0.86" green="0.85" blue="0.85" /></rect>  <text string="MULTI INFO LCD"><color red="0" green="0" blue="0" /></text> </element>
 
+	<element name="text_p1"><image file="chess/wp.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p2"><image file="chess/wn.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p3"><image file="chess/wb.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p4"><image file="chess/wr.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p5"><image file="chess/wq.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p6"><image file="chess/wk.svg"><color alpha="0.85" /></image></element>
+
+
+<!-- sb board -->
+
+	<element name="cwhite"><rect><color red="0.86" green="0.85" blue="0.85" /></rect></element>
+	<element name="cblack"><rect><color red="0.4" green="0.4" blue="0.4" /></rect></element>
+
+	<element name="hlbb" defstate="0">
+		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<disk state="1">
+			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+	</element>
 
 	<element name="piece" defstate="0">
 		<image file="chess/wp.svg" state="1"/>
@@ -119,20 +134,6 @@ license:CC0
 		<image file="chess/br.svg" state="22"><color alpha="0.5" /></image>
 		<image file="chess/bq.svg" state="23"><color alpha="0.5" /></image>
 		<image file="chess/bk.svg" state="24"><color alpha="0.5" /></image>
-	</element>
-
-
-<!-- sb board -->
-
-	<element name="cwhite"><rect><color red="0.86" green="0.85" blue="0.85" /></rect></element>
-	<element name="cblack"><rect><color red="0.4" green="0.4" blue="0.4" /></rect></element>
-
-	<element name="hlbb" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
-		<disk state="1">
-			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
-			<color red="0" green="0" blue="0" />
-		</disk>
 	</element>
 
 	<group name="sb_board">
@@ -457,6 +458,13 @@ license:CC0
 		<element ref="text_cl">           <bounds x="56"   y="8.75" width="5" height="1.5" /> </element>
 		<element ref="text_ent">          <bounds x="64.5" y="8.75" width="5" height="1.5" /> </element>
 		<element ref="text_res">          <bounds x="73"   y="8.75" width="5" height="1.5" /> </element>
+
+		<element ref="text_p1">           <bounds x="13.5" y="3.0" width="1.8" height="1.8" /> </element>
+		<element ref="text_p2">           <bounds x="22"   y="3.0" width="1.8" height="1.8" /> </element>
+		<element ref="text_p3">           <bounds x="30.5" y="3.0" width="1.8" height="1.8" /> </element>
+		<element ref="text_p4">           <bounds x="39"   y="3.0" width="1.8" height="1.8" /> </element>
+		<element ref="text_p5">           <bounds x="47.5" y="3.0" width="1.8" height="1.8" /> </element>
+		<element ref="text_p6">           <bounds x="56"   y="3.0" width="1.8" height="1.8" /> </element>
 
 		<element ref="hlb" inputtag="KEY.0" inputmask="0x01">     <bounds x="13"   y="2"   width="6" height="4" />        <color alpha="0.3" /></element>
 		<element ref="hlb" inputtag="KEY.1" inputmask="0x01">     <bounds x="21.5" y="2"   width="6" height="4" />        <color alpha="0.3" /></element>

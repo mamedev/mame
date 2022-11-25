@@ -191,12 +191,11 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
 #include "sound/saa1099.h"
-#include "sound/upd7759.h"
-#include "sound/ymopl.h"
 
 #include "video/ef9369.h"
 #include "video/scn2674.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -207,6 +206,9 @@ TODO:
 #include "v4dbltak.lh"
 #include "v4psi.lh"
 #include "v4strike.lh"
+
+
+#define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
 
 
 namespace {
@@ -227,6 +229,7 @@ public:
 		m_trackx_port(*this, "TRACKX"),
 		m_tracky_port(*this, "TRACKY"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_ef9369(*this, "ef9369")
 	{
 	}
@@ -285,13 +288,14 @@ private:
 	optional_ioport m_trackx_port;
 	optional_ioport m_tracky_port;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	optional_device<ef9369_device> m_ef9369;
 
 	//Video
 	uint8_t m_m6840_irq_state;
 	uint8_t m_m6850_irq_state;
-	int m_gfx_index;
+	uint16_t m_gfx_index;
 	int8_t m_cur[2];
 
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
@@ -687,7 +691,7 @@ static INPUT_PORTS_START( crmaze )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Left Red")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Left Yellow")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_NAME("Getout Yellow")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Escape/Getout Red")/* Labelled Escape on cabinet */
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Escape/Getout Red")/* Labelled Escape on cabinet, Getout in test */
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_MODIFY("AUX1")
@@ -1865,9 +1869,22 @@ void mpu4vid_state::machine_start()
 {
 	mpu4_config_common();
 
-	m_mod_number=2;
 	/* setup communications */
 	m_link7a_connected = true;
+	m_link7b_connected = false;
+
+
+	save_item(NAME( m_m6840_irq_state ));
+	save_item(NAME( m_m6850_irq_state ));
+	save_item(NAME( m_gfx_index ));
+	save_item(NAME( m_cur ));
+
+	save_item(NAME( m_bt_palbase ));
+	save_item(NAME( m_bt_which ));
+	save_item(NAME( m_btpal_r ));
+	save_item(NAME( m_btpal_g ));
+	save_item(NAME( m_btpal_b ));
+
 }
 
 void mpu4vid_state::machine_reset()
@@ -2135,7 +2152,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 
 	M68000(config, m_videocpu, VIDEO_MASTER_CLOCK);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map);
-	m_videocpu->set_reset_callback(FUNC(mpu4vid_state::mpu_video_reset));
+	m_videocpu->reset_cb().set(FUNC(mpu4vid_state::mpu_video_reset));
 
 
 	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);
@@ -8707,28 +8724,28 @@ the copyright dates recorded.
 TODO: Sort these better given the wide variation in dates/versions/core code (SWP version id, for one thing).
 */
 
-GAME(  199?, v4bios,     0,        mod2,       mpu4vid,     mpu4_state,    init_m4default,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
+GAME(  199?, v4bios,     0,        mod2(),     mpu4vid,     mpu4_state,    init_m4,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
 
 #define GAME_FLAGS MACHINE_NOT_WORKING
 #define GAME_FLAGS_OK (MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 GAMEL( 1993, v4cmaze,    v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993, v4cmazedat, v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D
+GAMEL( 1993, v4cmazedat, v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9D
 GAMEL( 1993, v4cmazeb,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993, v4cmazec,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993, v4cmazec,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993, v4cmazed,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.6
 
 GAMEL( 1993, v4cmaze_amld,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
 
 GAMEL( 1993, v4cmaze2,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
+GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0D
 GAMEL( 1993, v4cmaze2b,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0
 GAMEL( 1993, v4cmaze2c,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
 
 GAMEL( 1993, v4cmaze2_amld,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
 
 GAMEL( 1994, v4cmaze3,   v4bios,   crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
+GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7D
 GAMEL( 1994, v4cmaze3b,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
 GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.6) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
 

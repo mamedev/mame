@@ -49,7 +49,10 @@ static const double unknown_game_angles[3] = {0,0.16666666, 0.33333333};
 TIMER_CALLBACK_MEMBER(vectrex_base_state::update_analog)
 {
 	update_vector();
-	m_analog[param] = m_via_out[PORTA];
+	if (param & 0x100)
+		m_analog[param & 0xff] = param >> 9;
+	else
+		m_analog[param] = m_via_out[PORTA];
 }
 
 TIMER_CALLBACK_MEMBER(vectrex_base_state::update_blank)

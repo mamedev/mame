@@ -133,7 +133,7 @@
 	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
 	for (int i = 0; i < width; i++)                             \
 	{                                                           \
-		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		uint16_t ch = RDVIDEO(space,i) << 3;                    \
 		if (ch & 0x400)                                         \
 		{                                                       \
 			ch = RDCHGEN(space,(ch & 0x3f8) + m_w.chbasl);  \
@@ -209,17 +209,12 @@
 		video->data[i] = ch;                                    \
 	}
 
-#define PREPARE_GFX8(space,width)                               \
+#define PREPARE_GFX89(space,width)                              \
 	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
 	for (int i = 0; i < width; i++)                             \
 		video->data[i] = RDVIDEO(space,i) << 2
 
-#define PREPARE_GFX9BC(space,width)                             \
-	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
-	for (int i = 0; i < width; i++)                             \
-		video->data[i] = RDVIDEO(space,i) << 1
-
-#define PREPARE_GFXA(space,width)                               \
+#define PREPARE_GFXABC(space,width)                             \
 	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
 	for (int i = 0; i < width; i++)                             \
 		video->data[i] = RDVIDEO(space,i) << 1
@@ -308,7 +303,6 @@ antic_device::antic_device(const machine_config &mconfig, const char *tag, devic
 	device_video_interface(mconfig, *this),
 	m_gtia(*this, finder_base::DUMMY_TAG),
 	m_maincpu(*this, ":maincpu"),
-	m_djoy_b(*this, ":djoy_b"),
 	m_artifacts(*this, ":artifacts"),
 	m_tv_artifacts(0),
 	m_render1(0),
@@ -346,31 +340,18 @@ void antic_device::device_start()
 {
 	m_bitmap = std::make_unique<bitmap_ind16>(screen().width(), screen().height());
 
-	m_cclk_expand = make_unique_clear<uint32_t[]>(21 * 256);
+	m_cclk_expand = make_unique_clear<uint32_t[]>(37 * 256);
 
 	m_pf_21       = &m_cclk_expand[ 0 * 256];
 	m_pf_x10b     = &m_cclk_expand[ 1 * 256];
-	m_pf_3210b2   = &m_cclk_expand[ 3 * 256];
-	m_pf_210b4    = &m_cclk_expand[11 * 256];
-	m_pf_210b2    = &m_cclk_expand[15 * 256];
-	m_pf_1b       = &m_cclk_expand[17 * 256];
-	m_pf_gtia1    = &m_cclk_expand[18 * 256];
-	m_pf_gtia2    = &m_cclk_expand[19 * 256];
-	m_pf_gtia3    = &m_cclk_expand[20 * 256];
-
-	m_used_colors = std::make_unique<uint8_t[]>(21 * 256);
-
-	memset(m_used_colors.get(), 0, 21 * 256 * sizeof(uint8_t));
-
-	m_uc_21       = &m_used_colors[ 0 * 256];
-	m_uc_x10b     = &m_used_colors[ 1 * 256];
-	m_uc_3210b2   = &m_used_colors[ 3 * 256];
-	m_uc_210b4    = &m_used_colors[11 * 256];
-	m_uc_210b2    = &m_used_colors[15 * 256];
-	m_uc_1b       = &m_used_colors[17 * 256];
-	m_uc_g1       = &m_used_colors[18 * 256];
-	m_uc_g2       = &m_used_colors[19 * 256];
-	m_uc_g3       = &m_used_colors[20 * 256];
+	m_pf_3210b    = &m_cclk_expand[ 3 * 256];
+	m_pf_3210b2   = &m_cclk_expand[11 * 256];
+	m_pf_210b4    = &m_cclk_expand[27 * 256];
+	m_pf_210b2    = &m_cclk_expand[31 * 256];
+	m_pf_1b       = &m_cclk_expand[33 * 256];
+	m_pf_gtia1    = &m_cclk_expand[34 * 256];
+	m_pf_gtia2    = &m_cclk_expand[35 * 256];
+	m_pf_gtia3    = &m_cclk_expand[36 * 256];
 
 	LOG("atari cclk_init\n");
 	cclk_init();
@@ -411,8 +392,7 @@ void antic_device::device_start()
 	save_item(NAME(m_cclock));
 	save_item(NAME(m_pmbits));
 
-	save_pointer(NAME(m_cclk_expand), 21 * 256);
-	save_pointer(NAME(m_used_colors), 21 * 256);
+	save_pointer(NAME(m_cclk_expand), 37 * 256);
 
 	/* timers */
 	m_cycle_steal_timer = timer_alloc(FUNC(antic_device::steal_cycles), this);
@@ -454,6 +434,12 @@ void antic_device::device_reset()
 
 	memset(m_cclock, 0, sizeof(m_cclock));
 	memset(m_pmbits, 0, sizeof(m_pmbits));
+
+	// TODO: we shouldn't need this variable but rather rely on screen().vpos()
+	m_scanline  = 0;
+
+	m_chand     = 0xff;
+	m_chxor     = 0x00;
 }
 
 
@@ -916,8 +902,8 @@ void antic_device::cclk_init()
 		*dst++ = _pf_310b[(i>>2)&3];
 		*dst++ = _pf_310b[(i>>0)&3];
 
-		/****** pf0 color text (6,7), 9, B, C **********/
-		dst = (uint8_t *)&m_pf_3210b2[0x000+i*2];
+		/****** pf0 color text (6,7), B, C **********/
+		dst = (uint8_t *)&m_pf_3210b[0x000+i*2];
 		*dst++ = (i&0x80)?PF0:PBK;
 		*dst++ = (i&0x40)?PF0:PBK;
 		*dst++ = (i&0x20)?PF0:PBK;
@@ -927,8 +913,8 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x02)?PF0:PBK;
 		*dst++ = (i&0x01)?PF0:PBK;
 
-		/****** pf1 color text (6,7), 9, B, C **********/
-		dst = (uint8_t *)&m_pf_3210b2[0x200+i*2];
+		/****** pf1 color text (6,7), B, C **********/
+		dst = (uint8_t *)&m_pf_3210b[0x200+i*2];
 		*dst++ = (i&0x80)?PF1:PBK;
 		*dst++ = (i&0x40)?PF1:PBK;
 		*dst++ = (i&0x20)?PF1:PBK;
@@ -938,8 +924,8 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x02)?PF1:PBK;
 		*dst++ = (i&0x01)?PF1:PBK;
 
-		/****** pf2 color text (6,7), 9, B, C **********/
-		dst = (uint8_t *)&m_pf_3210b2[0x400+i*2];
+		/****** pf2 color text (6,7), B, C **********/
+		dst = (uint8_t *)&m_pf_3210b[0x400+i*2];
 		*dst++ = (i&0x80)?PF2:PBK;
 		*dst++ = (i&0x40)?PF2:PBK;
 		*dst++ = (i&0x20)?PF2:PBK;
@@ -949,8 +935,8 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x02)?PF2:PBK;
 		*dst++ = (i&0x01)?PF2:PBK;
 
-		/****** pf3 color text (6,7), 9, B, C **********/
-		dst = (uint8_t *)&m_pf_3210b2[0x600+i*2];
+		/****** pf3 color text (6,7), B, C **********/
+		dst = (uint8_t *)&m_pf_3210b[0x600+i*2];
 		*dst++ = (i&0x80)?PF3:PBK;
 		*dst++ = (i&0x40)?PF3:PBK;
 		*dst++ = (i&0x20)?PF3:PBK;
@@ -978,6 +964,82 @@ void antic_device::cclk_init()
 		*dst++ = _pf_210b[(i>>0)&3];
 		*dst++ = _pf_210b[(i>>0)&3];
 		*dst++ = _pf_210b[(i>>0)&3];
+
+		/****** pf0 co2 color graphics (9) **********/
+		dst = (uint8_t *)&m_pf_3210b2[0x000+i*4];
+		*dst++ = (i&0x80)?PF0:PBK;
+		*dst++ = (i&0x80)?PF0:PBK;
+		*dst++ = (i&0x40)?PF0:PBK;
+		*dst++ = (i&0x40)?PF0:PBK;
+		*dst++ = (i&0x20)?PF0:PBK;
+		*dst++ = (i&0x20)?PF0:PBK;
+		*dst++ = (i&0x10)?PF0:PBK;
+		*dst++ = (i&0x10)?PF0:PBK;
+		*dst++ = (i&0x08)?PF0:PBK;
+		*dst++ = (i&0x08)?PF0:PBK;
+		*dst++ = (i&0x04)?PF0:PBK;
+		*dst++ = (i&0x04)?PF0:PBK;
+		*dst++ = (i&0x02)?PF0:PBK;
+		*dst++ = (i&0x02)?PF0:PBK;
+		*dst++ = (i&0x01)?PF0:PBK;
+		*dst++ = (i&0x01)?PF0:PBK;
+
+		/****** pf1 2 color graphics (9) **********/
+		dst = (uint8_t *)&m_pf_3210b2[0x400+i*4];
+		*dst++ = (i&0x80)?PF1:PBK;
+		*dst++ = (i&0x80)?PF1:PBK;
+		*dst++ = (i&0x40)?PF1:PBK;
+		*dst++ = (i&0x40)?PF1:PBK;
+		*dst++ = (i&0x20)?PF1:PBK;
+		*dst++ = (i&0x20)?PF1:PBK;
+		*dst++ = (i&0x10)?PF1:PBK;
+		*dst++ = (i&0x10)?PF1:PBK;
+		*dst++ = (i&0x08)?PF1:PBK;
+		*dst++ = (i&0x08)?PF1:PBK;
+		*dst++ = (i&0x04)?PF1:PBK;
+		*dst++ = (i&0x04)?PF1:PBK;
+		*dst++ = (i&0x02)?PF1:PBK;
+		*dst++ = (i&0x02)?PF1:PBK;
+		*dst++ = (i&0x01)?PF1:PBK;
+		*dst++ = (i&0x01)?PF1:PBK;
+
+		/****** pf2 2 color graphics (9) **********/
+		dst = (uint8_t *)&m_pf_3210b2[0x800+i*4];
+		*dst++ = (i&0x80)?PF2:PBK;
+		*dst++ = (i&0x80)?PF2:PBK;
+		*dst++ = (i&0x40)?PF2:PBK;
+		*dst++ = (i&0x40)?PF2:PBK;
+		*dst++ = (i&0x20)?PF2:PBK;
+		*dst++ = (i&0x20)?PF2:PBK;
+		*dst++ = (i&0x10)?PF2:PBK;
+		*dst++ = (i&0x10)?PF2:PBK;
+		*dst++ = (i&0x08)?PF2:PBK;
+		*dst++ = (i&0x08)?PF2:PBK;
+		*dst++ = (i&0x04)?PF2:PBK;
+		*dst++ = (i&0x04)?PF2:PBK;
+		*dst++ = (i&0x02)?PF2:PBK;
+		*dst++ = (i&0x02)?PF2:PBK;
+		*dst++ = (i&0x01)?PF2:PBK;
+		*dst++ = (i&0x01)?PF2:PBK;
+
+		/****** pf3 2 color graphics (9) **********/
+		dst = (uint8_t *)&m_pf_3210b2[0xc00+i*4];
+		*dst++ = (i&0x80)?PF3:PBK;
+		*dst++ = (i&0x80)?PF3:PBK;
+		*dst++ = (i&0x40)?PF3:PBK;
+		*dst++ = (i&0x40)?PF3:PBK;
+		*dst++ = (i&0x20)?PF3:PBK;
+		*dst++ = (i&0x20)?PF3:PBK;
+		*dst++ = (i&0x10)?PF3:PBK;
+		*dst++ = (i&0x10)?PF3:PBK;
+		*dst++ = (i&0x08)?PF3:PBK;
+		*dst++ = (i&0x08)?PF3:PBK;
+		*dst++ = (i&0x04)?PF3:PBK;
+		*dst++ = (i&0x04)?PF3:PBK;
+		*dst++ = (i&0x02)?PF3:PBK;
+		*dst++ = (i&0x02)?PF3:PBK;
+		*dst++ = (i&0x01)?PF3:PBK;
+		*dst++ = (i&0x01)?PF3:PBK;
 
 		/****** 4 color graphics 2 cclks (A) **********/
 		dst = (uint8_t *)&m_pf_210b2[i*2];
@@ -1018,124 +1080,6 @@ void antic_device::cclk_init()
 		*dst++ = GT3+(i&15);
 		*dst++ = GT3+(i&15);
 
-	}
-
-	/* setup used color tables */
-	for( i = 0; i < 256; i++ )
-	{
-		/* used colors in text modes 2,3 */
-		m_uc_21[i] = (i) ? PF2 | PF1 : PF2;
-
-		/* used colors in text modes 4,5 and graphics modes D,E */
-		switch( i & 0x03 )
-		{
-			case 0x01: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
-			case 0x02: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
-			case 0x03: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
-		}
-		switch( i & 0x0c )
-		{
-			case 0x04: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
-			case 0x08: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
-			case 0x0c: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
-		}
-		switch( i & 0x30 )
-		{
-			case 0x10: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
-			case 0x20: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
-			case 0x30: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
-		}
-		switch( i & 0xc0 )
-		{
-			case 0x40: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
-			case 0x80: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
-			case 0xc0: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
-		}
-
-		/* used colors in text modes 6,7 and graphics modes 9,B,C */
-		if( i )
-		{
-			m_uc_3210b2[0x000+i*2] |= PF0;
-			m_uc_3210b2[0x200+i*2] |= PF1;
-			m_uc_3210b2[0x400+i*2] |= PF2;
-			m_uc_3210b2[0x600+i*2] |= PF3;
-		}
-
-		/* used colors in graphics mode 8 */
-		switch( i & 0x03 )
-		{
-			case 0x01: m_uc_210b4[i*4] |= PF0; break;
-			case 0x02: m_uc_210b4[i*4] |= PF1; break;
-			case 0x03: m_uc_210b4[i*4] |= PF2; break;
-		}
-		switch( i & 0x0c )
-		{
-			case 0x04: m_uc_210b4[i*4] |= PF0; break;
-			case 0x08: m_uc_210b4[i*4] |= PF1; break;
-			case 0x0c: m_uc_210b4[i*4] |= PF2; break;
-		}
-		switch( i & 0x30 )
-		{
-			case 0x10: m_uc_210b4[i*4] |= PF0; break;
-			case 0x20: m_uc_210b4[i*4] |= PF1; break;
-			case 0x30: m_uc_210b4[i*4] |= PF2; break;
-		}
-		switch( i & 0xc0 )
-		{
-			case 0x40: m_uc_210b4[i*4] |= PF0; break;
-			case 0x80: m_uc_210b4[i*4] |= PF1; break;
-			case 0xc0: m_uc_210b4[i*4] |= PF2; break;
-		}
-
-		/* used colors in graphics mode A */
-		switch( i & 0x03 )
-		{
-			case 0x01: m_uc_210b2[i*2] |= PF0; break;
-			case 0x02: m_uc_210b2[i*2] |= PF1; break;
-			case 0x03: m_uc_210b2[i*2] |= PF2; break;
-		}
-		switch( i & 0x0c )
-		{
-			case 0x04: m_uc_210b2[i*2] |= PF0; break;
-			case 0x08: m_uc_210b2[i*2] |= PF1; break;
-			case 0x0c: m_uc_210b2[i*2] |= PF2; break;
-		}
-		switch( i & 0x30 )
-		{
-			case 0x10: m_uc_210b2[i*2] |= PF0; break;
-			case 0x20: m_uc_210b2[i*2] |= PF1; break;
-			case 0x30: m_uc_210b2[i*2] |= PF2; break;
-		}
-		switch( i & 0xc0 )
-		{
-			case 0x40: m_uc_210b2[i*2] |= PF0; break;
-			case 0x80: m_uc_210b2[i*2] |= PF1; break;
-			case 0xc0: m_uc_210b2[i*2] |= PF2; break;
-		}
-
-		/* used colors in graphics mode F */
-		if( i )
-			m_uc_1b[i] |= PF1;
-
-		/* used colors in GTIA graphics modes */
-		/* GTIA 1 is 16 different luminances with hue of colbk */
-		m_uc_g1[i] = 0x00;
-		/* GTIA 2 is all 9 colors (8..15 is colbk) */
-		switch( i & 0x0f )
-		{
-			case 0x00: m_uc_g2[i] = 0x10; break;
-			case 0x01: m_uc_g2[i] = 0x20; break;
-			case 0x02: m_uc_g2[i] = 0x40; break;
-			case 0x03: m_uc_g2[i] = 0x80; break;
-			case 0x04: m_uc_g2[i] = 0x01; break;
-			case 0x05: m_uc_g2[i] = 0x02; break;
-			case 0x06: m_uc_g2[i] = 0x04; break;
-			case 0x07: m_uc_g2[i] = 0x08; break;
-			default:   m_uc_g2[i] = 0x00;
-		}
-
-		/* GTIA 3 is 16 different hues with luminance of colbk */
-		m_uc_g3[i] = 0x00;
 	}
 }
 
@@ -1183,8 +1127,12 @@ uint8_t antic_device::read(offs_t offset)
 		data = m_r.antic09;
 		break;
 	case 10: /* WSYNC read */
-		m_maincpu->spin_until_trigger(TRIGGER_HSYNC);
-		m_w.wsync = 1;
+		// TODO: strobe signal, should happen on write only?
+		if (!machine().side_effects_disabled())
+		{
+			m_maincpu->spin_until_trigger(TRIGGER_HSYNC);
+			m_w.wsync = 1;
+		}
 		data = m_r.antic0a;
 		break;
 	case 11: /* vert counter (scanline / 2) */
@@ -1400,7 +1348,7 @@ inline void antic_device::mode_5(address_space &space, VIDEO *video, int bytes, 
 /*************  ANTIC mode 06: *********************************
  * character mode 16x8:5 single color (16/20/24 byte per line)
  ***************************************************************/
-#define MODE6(s) COPY8(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1])
+#define MODE6(s) COPY8(dst, m_pf_3210b[video->data[s]], m_pf_3210b[video->data[s]+1])
 
 inline void antic_device::mode_6(address_space &space, VIDEO *video, int bytes, int erase)
 {
@@ -1414,7 +1362,7 @@ inline void antic_device::mode_6(address_space &space, VIDEO *video, int bytes, 
 /*************  ANTIC mode 07: *********************************
  * character mode 16x16:5 single color (16/20/24 byte per line)
  ***************************************************************/
-#define MODE7(s) COPY8(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1])
+#define MODE7(s) COPY8(dst, m_pf_3210b[video->data[s]], m_pf_3210b[video->data[s]+1])
 
 inline void antic_device::mode_7(address_space &space, VIDEO *video, int bytes, int erase)
 {
@@ -1432,7 +1380,7 @@ inline void antic_device::mode_7(address_space &space, VIDEO *video, int bytes, 
 
 inline void antic_device::mode_8(address_space &space, VIDEO *video, int bytes, int erase)
 {
-	PREPARE_GFX8(space, bytes);
+	PREPARE_GFX89(space, bytes);
 	ERASE(erase);
 	REP(MODE8, bytes);
 	ERASE(erase);
@@ -1442,11 +1390,11 @@ inline void antic_device::mode_8(address_space &space, VIDEO *video, int bytes, 
 /*************  ANTIC mode 09: *********************************
  * graphics mode 4x4:2 (8/10/12 byte per line)
  ***************************************************************/
-#define MODE9(s) COPY8(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1])
+#define MODE9(s) COPY16(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1], m_pf_3210b2[video->data[s]+2], m_pf_3210b2[video->data[s]+3])
 
 inline void antic_device::mode_9(address_space &space, VIDEO *video, int bytes, int erase)
 {
-	PREPARE_GFX9BC(space, bytes);
+	PREPARE_GFX89(space, bytes);
 	ERASE(erase);
 	REP(MODE9, bytes);
 	ERASE(erase);
@@ -1460,7 +1408,7 @@ inline void antic_device::mode_9(address_space &space, VIDEO *video, int bytes, 
 
 inline void antic_device::mode_a(address_space &space, VIDEO *video, int bytes, int erase)
 {
-	PREPARE_GFXA(space, bytes);
+	PREPARE_GFXABC(space, bytes);
 	ERASE(erase);
 	REP(MODEA, bytes);
 	ERASE(erase);
@@ -1470,11 +1418,11 @@ inline void antic_device::mode_a(address_space &space, VIDEO *video, int bytes, 
 /*************  ANTIC mode 0B: *********************************
  * graphics mode 2x2:2 (16/20/24 byte per line)
  ***************************************************************/
-#define MODEB(s) COPY8(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1])
+#define MODEB(s) COPY8(dst, m_pf_3210b[video->data[s]], m_pf_3210b[video->data[s]+1])
 
 inline void antic_device::mode_b(address_space &space, VIDEO *video, int bytes, int erase)
 {
-	PREPARE_GFX9BC(space, bytes);
+	PREPARE_GFXABC(space, bytes);
 	ERASE(erase);
 	REP(MODEB, bytes);
 	ERASE(erase);
@@ -1484,11 +1432,11 @@ inline void antic_device::mode_b(address_space &space, VIDEO *video, int bytes, 
 /*************  ANTIC mode 0C: *********************************
  * graphics mode 2x1:2 (16/20/24 byte per line)
  ***************************************************************/
-#define MODEC(s) COPY8(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1])
+#define MODEC(s) COPY8(dst, m_pf_3210b[video->data[s]], m_pf_3210b[video->data[s]+1])
 
 inline void antic_device::mode_c(address_space &space, VIDEO *video, int bytes, int erase)
 {
-	PREPARE_GFX9BC(space, bytes);
+	PREPARE_GFXABC(space, bytes);
 	ERASE(erase);
 	REP(MODEC, bytes);
 	ERASE(erase);
@@ -1636,7 +1584,7 @@ void antic_device::render(address_space &space, int param1, int param2, int para
 			mode_8(space, video, add_bytes >> 2, erase);
 			return;
 		case 0x09:
-			mode_9(space, video, add_bytes >> 1, erase);
+			mode_9(space, video, add_bytes >> 2, erase);
 			return;
 		case 0x0a:
 			mode_a(space, video, add_bytes >> 1, erase);
@@ -2007,7 +1955,7 @@ TIMER_CALLBACK_MEMBER( antic_device::line_done )
 TIMER_CALLBACK_MEMBER( antic_device::steal_cycles )
 {
 	LOG("           @cycle #%3d steal %d cycles\n", cycle(), m_steal_cycles);
-	m_line_done_timer->adjust(ANTIC_TIME_FROM_CYCLES(m_steal_cycles));
+	m_line_done_timer->adjust((attotime)screen().pixel_period() * (m_steal_cycles));
 	m_steal_cycles = 0;
 	m_maincpu->spin_until_trigger(TRIGGER_STEAL);
 }
@@ -2354,7 +2302,7 @@ void antic_device::generic_interrupt(int button_count)
 	if( m_scanline == VBL_START )
 	{
 		/* specify buttons relevant to this Atari variant */
-		m_gtia->button_interrupt(button_count, m_djoy_b.read_safe(0));
+		m_gtia->button_interrupt(button_count);
 
 		/* do nothing new for the rest of the frame */
 		m_modelines = screen().height() - VBL_START;
@@ -2362,12 +2310,16 @@ void antic_device::generic_interrupt(int button_count)
 		m_render2 = 0;
 		m_render3 = 0;
 
-		/* if the CPU want's to be interrupted at vertical blank... */
+		// At scanline 248 vblank status is always held without caring about the mask reg
+		// (cfr. anteater PC=a10a), while DLI always goes low.
+		m_r.nmist |= VBL_NMI;
+		m_r.nmist &= ~DLI_NMI;
+
+		/* if the CPU wants to be interrupted at vertical blank... */
 		if( m_w.nmien & VBL_NMI )
 		{
 			LOG("           cause VBL NMI\n");
 			/* set the VBL NMI status bit */
-			m_r.nmist |= VBL_NMI;
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}

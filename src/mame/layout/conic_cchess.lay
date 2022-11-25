@@ -13,6 +13,7 @@ license:CC0
 	<element name="black"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
 	<element name="disk_black"><disk><color red="0.25" green="0.25" blue="0.25" /></disk></element>
 	<element name="white"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+	<element name="whitem"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
 	<element name="orange"><rect><color red="0.75" green="0.35" blue="0.05" /></rect></element>
 	<element name="red"><rect><color red="1.0" green="0.1" blue="0.15" /></rect></element>
 
@@ -35,118 +36,47 @@ license:CC0
 		<text string="RESET"><color red="0.05" green="0.05" blue="0.05" /></text>
 	</element>
 
-	<element name="text_b01a">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="A"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b01b">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="[P]"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b02a">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="B"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b02b">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="[R]"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b03a">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="C"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b03b">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="[N]"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b04a">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="D"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b04b">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="[B]"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b05a">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="E"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b05b">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="[Q]"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b06a">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="F"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b06b">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="[K]"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b07a">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="G"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b07b">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="MD"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b08a">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="H"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_b08b">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="GO"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
+	<element name="text_b01a"><text string="A"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b02a"><text string="B"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b03a"><text string="C"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b04a"><text string="D"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b05a"><text string="E"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b06a"><text string="F"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b07a"><text string="G"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b07b"><text string="MD"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b08a"><text string="H"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b08b"><text string="GO"><color red="1" green="1" blue="1" /></text></element>
+
+	<element name="text_b01b"><image file="chess/wp.svg" /></element>
+	<element name="text_b02b"><image file="chess/wr.svg" /></element>
+	<element name="text_b03b"><image file="chess/wn.svg" /></element>
+	<element name="text_b04b"><image file="chess/wb.svg" /></element>
+	<element name="text_b05b"><image file="chess/wq.svg" /></element>
+	<element name="text_b06b"><image file="chess/wk.svg" /></element>
 
 	<element name="text_b09a">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="1"><color red="0.05" green="0.05" blue="0.05" /></text>
 	</element>
-	<element name="text_b09b">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="[P]"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
 	<element name="text_b10a">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="2"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b10b">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="[R]"><color red="0.05" green="0.05" blue="0.05" /></text>
 	</element>
 	<element name="text_b11a">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="3"><color red="0.05" green="0.05" blue="0.05" /></text>
 	</element>
-	<element name="text_b11b">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="[N]"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
 	<element name="text_b12a">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="4"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b12b">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="[B]"><color red="0.05" green="0.05" blue="0.05" /></text>
 	</element>
 	<element name="text_b13a">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="5"><color red="0.05" green="0.05" blue="0.05" /></text>
 	</element>
-	<element name="text_b13b">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="[Q]"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
 	<element name="text_b14a">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="6"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b14b">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="[K]"><color red="0.05" green="0.05" blue="0.05" /></text>
 	</element>
 	<element name="text_b15a">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
@@ -163,6 +93,37 @@ license:CC0
 	<element name="text_b16b">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="IP"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+
+	<element name="text_b09b">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<image file="chess/bp.svg" />
+		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
+	</element>
+	<element name="text_b10b">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<image file="chess/br.svg" />
+		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
+	</element>
+	<element name="text_b11b">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<image file="chess/bn.svg" />
+		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
+	</element>
+	<element name="text_b12b">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<image file="chess/bb.svg" />
+		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
+	</element>
+	<element name="text_b13b">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<image file="chess/bq.svg" />
+		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
+	</element>
+	<element name="text_b14b">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<image file="chess/bk.svg" />
+		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
 	</element>
 
 
@@ -202,16 +163,43 @@ license:CC0
 		<element name="0.8" ref="led"><bounds x="35.0" y="26.05" width="0.45" height="0.45" /></element>
 		<element ref="red"><bounds x="25.3" y="22" width="20" height="6.5" /><color alpha="0.15" /></element>
 
-	<!-- button panel -->
+		<!-- button panel -->
+		<element ref="text_b01a"><bounds x="20.10" y="30.4" width="2.4" height="1.2" /></element>
+		<element ref="text_b02a"><bounds x="24.10" y="30.4" width="2.4" height="1.2" /></element>
+		<element ref="text_b03a"><bounds x="28.10" y="30.4" width="2.4" height="1.2" /></element>
+		<element ref="text_b04a"><bounds x="32.10" y="30.4" width="2.4" height="1.2" /></element>
+		<element ref="text_b05a"><bounds x="36.10" y="30.4" width="2.4" height="1.2" /></element>
+		<element ref="text_b06a"><bounds x="40.10" y="30.4" width="2.4" height="1.2" /></element>
+		<element ref="text_b07a"><bounds x="44.10" y="30.4" width="2.4" height="1.2" /></element>
+		<element ref="text_b07b"><bounds x="44.15" y="32.2" width="2.4" height="1.9" /></element>
+		<element ref="text_b08a"><bounds x="48.10" y="30.4" width="2.4" height="1.2" /></element>
+		<element ref="text_b08b"><bounds x="48.15" y="32.2" width="2.4" height="1.9" /></element>
 
-		<element ref="black"><bounds x="20" y="30" width="2.6" height="4.5" /></element>
-		<element ref="black"><bounds x="24" y="30" width="2.6" height="4.5" /></element>
-		<element ref="black"><bounds x="28" y="30" width="2.6" height="4.5" /></element>
-		<element ref="black"><bounds x="32" y="30" width="2.6" height="4.5" /></element>
-		<element ref="black"><bounds x="36" y="30" width="2.6" height="4.5" /></element>
-		<element ref="black"><bounds x="40" y="30" width="2.6" height="4.5" /></element>
-		<element ref="black"><bounds x="44" y="30" width="2.6" height="4.5" /></element>
-		<element ref="black"><bounds x="48" y="30" width="2.6" height="4.5" /></element>
+		<element ref="text_b01b"><bounds x="20.20" y="31.9" width="2.2" height="2.2" /></element>
+		<element ref="text_b02b"><bounds x="24.20" y="31.9" width="2.2" height="2.2" /></element>
+		<element ref="text_b03b"><bounds x="28.20" y="31.9" width="2.2" height="2.2" /></element>
+		<element ref="text_b04b"><bounds x="32.20" y="31.9" width="2.2" height="2.2" /></element>
+		<element ref="text_b05b"><bounds x="36.20" y="31.9" width="2.2" height="2.2" /></element>
+		<element ref="text_b06b"><bounds x="40.20" y="31.9" width="2.2" height="2.2" /></element>
+
+		<element ref="whitem" blend="multiply"><bounds x="20" y="30" width="2.6" height="4.5" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="24" y="30" width="2.6" height="4.5" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="28" y="30" width="2.6" height="4.5" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="32" y="30" width="2.6" height="4.5" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="36" y="30" width="2.6" height="4.5" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="40" y="30" width="2.6" height="4.5" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="44" y="30" width="2.6" height="4.5" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="48" y="30" width="2.6" height="4.5" /></element>
+
+		<element ref="black" blend="add"><bounds x="20" y="30" width="2.6" height="4.5" /></element>
+		<element ref="black" blend="add"><bounds x="24" y="30" width="2.6" height="4.5" /></element>
+		<element ref="black" blend="add"><bounds x="28" y="30" width="2.6" height="4.5" /></element>
+		<element ref="black" blend="add"><bounds x="32" y="30" width="2.6" height="4.5" /></element>
+		<element ref="black" blend="add"><bounds x="36" y="30" width="2.6" height="4.5" /></element>
+		<element ref="black" blend="add"><bounds x="40" y="30" width="2.6" height="4.5" /></element>
+		<element ref="black" blend="add"><bounds x="44" y="30" width="2.6" height="4.5" /></element>
+		<element ref="black" blend="add"><bounds x="48" y="30" width="2.6" height="4.5" /></element>
+
 		<element ref="white"><bounds x="20" y="36.2" width="2.6" height="4.5" /></element>
 		<element ref="white"><bounds x="24" y="36.2" width="2.6" height="4.5" /></element>
 		<element ref="white"><bounds x="28" y="36.2" width="2.6" height="4.5" /></element>
@@ -221,39 +209,23 @@ license:CC0
 		<element ref="white"><bounds x="44" y="36.2" width="2.6" height="4.5" /></element>
 		<element ref="white"><bounds x="48" y="36.2" width="2.6" height="4.5" /></element>
 
-		<element ref="text_b01a"><bounds x="20.10" y="30.4" width="2.4" height="1.2" /></element>
-		<element ref="text_b01b"><bounds x="20.15" y="32.0" width="2.4" height="1.9" /></element>
-		<element ref="text_b02a"><bounds x="24.10" y="30.4" width="2.4" height="1.2" /></element>
-		<element ref="text_b02b"><bounds x="24.15" y="32.0" width="2.4" height="1.9" /></element>
-		<element ref="text_b03a"><bounds x="28.10" y="30.4" width="2.4" height="1.2" /></element>
-		<element ref="text_b03b"><bounds x="28.15" y="32.0" width="2.4" height="1.9" /></element>
-		<element ref="text_b04a"><bounds x="32.10" y="30.4" width="2.4" height="1.2" /></element>
-		<element ref="text_b04b"><bounds x="32.15" y="32.0" width="2.4" height="1.9" /></element>
-		<element ref="text_b05a"><bounds x="36.10" y="30.4" width="2.4" height="1.2" /></element>
-		<element ref="text_b05b"><bounds x="36.15" y="32.0" width="2.4" height="1.9" /></element>
-		<element ref="text_b06a"><bounds x="40.10" y="30.4" width="2.4" height="1.2" /></element>
-		<element ref="text_b06b"><bounds x="40.15" y="32.0" width="2.4" height="1.9" /></element>
-		<element ref="text_b07a"><bounds x="44.10" y="30.4" width="2.4" height="1.2" /></element>
-		<element ref="text_b07b"><bounds x="44.15" y="32.0" width="2.4" height="1.9" /></element>
-		<element ref="text_b08a"><bounds x="48.10" y="30.4" width="2.4" height="1.2" /></element>
-		<element ref="text_b08b"><bounds x="48.15" y="32.0" width="2.4" height="1.9" /></element>
-
 		<element ref="text_b09a"><bounds x="20.10" y="36.6" width="2.4" height="1.2" /></element>
-		<element ref="text_b09b"><bounds x="20.15" y="38.2" width="2.4" height="1.9" /></element>
 		<element ref="text_b10a"><bounds x="24.10" y="36.6" width="2.4" height="1.2" /></element>
-		<element ref="text_b10b"><bounds x="24.15" y="38.2" width="2.4" height="1.9" /></element>
 		<element ref="text_b11a"><bounds x="28.10" y="36.6" width="2.4" height="1.2" /></element>
-		<element ref="text_b11b"><bounds x="28.15" y="38.2" width="2.4" height="1.9" /></element>
 		<element ref="text_b12a"><bounds x="32.10" y="36.6" width="2.4" height="1.2" /></element>
-		<element ref="text_b12b"><bounds x="32.15" y="38.2" width="2.4" height="1.9" /></element>
 		<element ref="text_b13a"><bounds x="36.10" y="36.6" width="2.4" height="1.2" /></element>
-		<element ref="text_b13b"><bounds x="36.15" y="38.2" width="2.4" height="1.9" /></element>
 		<element ref="text_b14a"><bounds x="40.10" y="36.6" width="2.4" height="1.2" /></element>
-		<element ref="text_b14b"><bounds x="40.15" y="38.2" width="2.4" height="1.9" /></element>
 		<element ref="text_b15a"><bounds x="44.10" y="36.6" width="2.4" height="1.2" /></element>
-		<element ref="text_b15b"><bounds x="44.15" y="38.2" width="2.4" height="1.9" /></element>
+		<element ref="text_b15b"><bounds x="44.15" y="38.4" width="2.4" height="1.9" /></element>
 		<element ref="text_b16a"><bounds x="48.10" y="36.6" width="2.4" height="1.2" /></element>
-		<element ref="text_b16b"><bounds x="48.15" y="38.2" width="2.4" height="1.9" /></element>
+		<element ref="text_b16b"><bounds x="48.15" y="38.4" width="2.4" height="1.9" /></element>
+
+		<element ref="text_b09b" blend="multiply"><bounds x="20.20" y="38.1" width="2.2" height="2.2" /></element>
+		<element ref="text_b10b" blend="multiply"><bounds x="24.20" y="38.1" width="2.2" height="2.2" /></element>
+		<element ref="text_b11b" blend="multiply"><bounds x="28.20" y="38.1" width="2.2" height="2.2" /></element>
+		<element ref="text_b12b" blend="multiply"><bounds x="32.20" y="38.1" width="2.2" height="2.2" /></element>
+		<element ref="text_b13b" blend="multiply"><bounds x="36.20" y="38.1" width="2.2" height="2.2" /></element>
+		<element ref="text_b14b" blend="multiply"><bounds x="40.20" y="38.1" width="2.2" height="2.2" /></element>
 
 		<element ref="hl" inputtag="IN.2" inputmask="0x08"><bounds x="20" y="30" width="2.6" height="4.5" /><color alpha="0.25" /></element>
 		<element ref="hl" inputtag="IN.2" inputmask="0x04"><bounds x="24" y="30" width="2.6" height="4.5" /><color alpha="0.25" /></element>

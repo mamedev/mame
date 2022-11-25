@@ -7,6 +7,7 @@
 
 
 #include "rom.h"
+#include "rtime8.h"
 #include "oss.h"
 #include "sparta.h"
 
@@ -30,7 +31,9 @@ static void a800_left(device_slot_interface &device)
 	device.option_add_internal("a800_turbo128", A800_ROM_TURBO);
 	device.option_add_internal("a800_tlink2",   A800_ROM_TELELINK2);
 	device.option_add_internal("a800_sitsa",    A800_ROM_MICROCALC);
-	device.option_add_internal("a800_corina",   A800_ROM);  // NOT SUPPORTED YET!
+	device.option_add_internal("a800_corina",   A800_ROM_CORINA);
+	device.option_add_internal("a800_corina_sram", A800_ROM_CORINA_SRAM);
+	device.option_add(         "rtime8",        A800_RTIME8); // not a ROM cartridge
 	device.option_add_internal("xegs",          XEGS_ROM);
 }
 

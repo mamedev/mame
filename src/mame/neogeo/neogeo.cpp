@@ -993,9 +993,9 @@ void mvs_state::io_control_w(offs_t offset, uint8_t data)
 
 void neogeo_base_state::audio_command_w(uint8_t data)
 {
-	// glitches in s1945p without the boost_interleave here
+	// glitches in s1945p without the perfect_quantum here
 	m_soundlatch->write(data);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+	machine().scheduler().perfect_quantum(attotime::from_usec(50));
 }
 
 

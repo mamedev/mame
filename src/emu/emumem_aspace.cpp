@@ -433,20 +433,10 @@ public:
 		return dispatch_read<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, mask, m_dispatch_read);
 	}
 
-	std::pair<NativeType, u16> read_native_flags(offs_t offset, NativeType mask)
-	{
-		return dispatch_read_flags<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, mask, m_dispatch_read);
-	}
-
 	// mask-less native read
 	NativeType read_native(offs_t offset)
 	{
 		return dispatch_read<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, uX(0xffffffffffffffffU), m_dispatch_read);
-	}
-
-	std::pair<NativeType, u16> read_native_flags(offs_t offset)
-	{
-		return dispatch_read_flags<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, uX(0xffffffffffffffffU), m_dispatch_read);
 	}
 
 	// native write
@@ -455,26 +445,14 @@ public:
 		dispatch_write<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, data, mask, m_dispatch_write);
 	}
 
-	u16 write_native_flags(offs_t offset, NativeType data, NativeType mask)
-	{
-		return dispatch_write_flags<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, data, mask, m_dispatch_write);
-	}
-
 	// mask-less native write
 	void write_native(offs_t offset, NativeType data)
 	{
 		dispatch_write<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, data, uX(0xffffffffffffffffU), m_dispatch_write);
 	}
 
-	u16 write_native_flags(offs_t offset, NativeType data)
-	{
-		return dispatch_write_flags<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, data, uX(0xffffffffffffffffU), m_dispatch_write);
-	}
-
-	auto rop()  { return [this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }; }
-	auto ropf() { return [this](offs_t offset, NativeType mask) -> std::pair<NativeType, u16> { return read_native_flags(offset, mask); }; }
-	auto wop()  { return [this](offs_t offset, NativeType data, NativeType mask) -> void { write_native(offset, data, mask); }; }
-	auto wopf() { return [this](offs_t offset, NativeType data, NativeType mask) -> u16 { return write_native_flags(offset, data, mask); }; }
+	auto rop()   { return [this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }; }
+	auto wop()   { return [this](offs_t offset, NativeType data, NativeType mask) -> void { write_native(offset, data, mask); }; }
 
 	// virtual access to these functions
 	u8 read_byte(offs_t address) override { if constexpr(Width == 0) return read_native(address & ~NATIVE_MASK); else return memory_read_generic<Width, AddrShift, Endian, 0, true>(rop(), address, 0xff); }
@@ -504,34 +482,6 @@ public:
 	void write_qword(offs_t address, u64 data, u64 mask) override { memory_write_generic<Width, AddrShift, Endian, 3, true>(wop(), address, data, mask); }
 	void write_qword_unaligned(offs_t address, u64 data) override { memory_write_generic<Width, AddrShift, Endian, 3, false>(wop(), address, data, 0xffffffffffffffffU); }
 	void write_qword_unaligned(offs_t address, u64 data, u64 mask) override { memory_write_generic<Width, AddrShift, Endian, 3, false>(wop(), address, data, mask); }
-
-	std::pair<u8,  u16> read_byte_flags(offs_t address) override { if constexpr(Width == 0) return read_native_flags(address & ~NATIVE_MASK); else return memory_read_generic_flags<Width, AddrShift, Endian, 0, true>(ropf(), address, 0xff); }
-	std::pair<u16, u16> read_word_flags(offs_t address) override { if constexpr(Width == 1) return read_native_flags(address & ~NATIVE_MASK); else return memory_read_generic_flags<Width, AddrShift, Endian, 1, true>(ropf(), address, 0xffff); }
-	std::pair<u16, u16> read_word_flags(offs_t address, u16 mask) override { return memory_read_generic_flags<Width, AddrShift, Endian, 1, true>(ropf(), address, mask); }
-	std::pair<u16, u16> read_word_unaligned_flags(offs_t address) override { return memory_read_generic_flags<Width, AddrShift, Endian, 1, false>(ropf(), address, 0xffff); }
-	std::pair<u16, u16> read_word_unaligned_flags(offs_t address, u16 mask) override { return memory_read_generic_flags<Width, AddrShift, Endian, 1, false>(ropf(), address, mask); }
-	std::pair<u32, u16> read_dword_flags(offs_t address) override { if constexpr(Width == 2) return read_native_flags(address & ~NATIVE_MASK); else return memory_read_generic_flags<Width, AddrShift, Endian, 2, true>(ropf(), address, 0xffffffff); }
-	std::pair<u32, u16> read_dword_flags(offs_t address, u32 mask) override { return memory_read_generic_flags<Width, AddrShift, Endian, 2, true>(ropf(), address, mask); }
-	std::pair<u32, u16> read_dword_unaligned_flags(offs_t address) override { return memory_read_generic_flags<Width, AddrShift, Endian, 2, false>(ropf(), address, 0xffffffff); }
-	std::pair<u32, u16> read_dword_unaligned_flags(offs_t address, u32 mask) override { return memory_read_generic_flags<Width, AddrShift, Endian, 2, false>(ropf(), address, mask); }
-	std::pair<u64, u16> read_qword_flags(offs_t address) override { if constexpr(Width == 3) return read_native_flags(address & ~NATIVE_MASK); else return memory_read_generic_flags<Width, AddrShift, Endian, 3, true>(ropf(), address, 0xffffffffffffffffU); }
-	std::pair<u64, u16> read_qword_flags(offs_t address, u64 mask) override { return memory_read_generic_flags<Width, AddrShift, Endian, 3, true>(ropf(), address, mask); }
-	std::pair<u64, u16> read_qword_unaligned_flags(offs_t address) override { return memory_read_generic_flags<Width, AddrShift, Endian, 3, false>(ropf(), address, 0xffffffffffffffffU); }
-	std::pair<u64, u16> read_qword_unaligned_flags(offs_t address, u64 mask) override { return memory_read_generic_flags<Width, AddrShift, Endian, 3, false>(ropf(), address, mask); }
-
-	u16 write_byte_flags(offs_t address, u8 data) override { if constexpr(Width == 0) return write_native_flags(address & ~NATIVE_MASK, data); else return memory_write_generic_flags<Width, AddrShift, Endian, 0, true>(wopf(), address, data, 0xff); }
-	u16 write_word_flags(offs_t address, u16 data) override { if constexpr(Width == 1) return write_native_flags(address & ~NATIVE_MASK, data); else return memory_write_generic_flags<Width, AddrShift, Endian, 1, true>(wopf(), address, data, 0xffff); }
-	u16 write_word_flags(offs_t address, u16 data, u16 mask) override { return memory_write_generic_flags<Width, AddrShift, Endian, 1, true>(wopf(), address, data, mask); }
-	u16 write_word_unaligned_flags(offs_t address, u16 data) override { return memory_write_generic_flags<Width, AddrShift, Endian, 1, false>(wopf(), address, data, 0xffff); }
-	u16 write_word_unaligned_flags(offs_t address, u16 data, u16 mask) override { return memory_write_generic_flags<Width, AddrShift, Endian, 1, false>(wopf(), address, data, mask); }
-	u16 write_dword_flags(offs_t address, u32 data) override { if constexpr(Width == 2) return write_native_flags(address & ~NATIVE_MASK, data); else return memory_write_generic_flags<Width, AddrShift, Endian, 2, true>(wopf(), address, data, 0xffffffff); }
-	u16 write_dword_flags(offs_t address, u32 data, u32 mask) override { return memory_write_generic_flags<Width, AddrShift, Endian, 2, true>(wopf(), address, data, mask); }
-	u16 write_dword_unaligned_flags(offs_t address, u32 data) override { return memory_write_generic_flags<Width, AddrShift, Endian, 2, false>(wopf(), address, data, 0xffffffff); }
-	u16 write_dword_unaligned_flags(offs_t address, u32 data, u32 mask) override { return memory_write_generic_flags<Width, AddrShift, Endian, 2, false>(wopf(), address, data, mask); }
-	u16 write_qword_flags(offs_t address, u64 data) override { if constexpr(Width == 3) return write_native_flags(address & ~NATIVE_MASK, data); else return memory_write_generic_flags<Width, AddrShift, Endian, 3, true>(wopf(), address, data, 0xffffffffffffffffU); }
-	u16 write_qword_flags(offs_t address, u64 data, u64 mask) override { return memory_write_generic_flags<Width, AddrShift, Endian, 3, true>(wopf(), address, data, mask); }
-	u16 write_qword_unaligned_flags(offs_t address, u64 data) override { return memory_write_generic_flags<Width, AddrShift, Endian, 3, false>(wopf(), address, data, 0xffffffffffffffffU); }
-	u16 write_qword_unaligned_flags(offs_t address, u64 data, u64 mask) override { return memory_write_generic_flags<Width, AddrShift, Endian, 3, false>(wopf(), address, data, mask); }
 
 
 	// static access to these functions

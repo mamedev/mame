@@ -12,8 +12,6 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-#define VSMILE_SLOT_ROM_REGION_TAG ":cart:rom"
-
 enum
 {
 	VSMILE_STD = 0,
@@ -41,7 +39,7 @@ public:
 	// banking
 	virtual void set_cs2(bool cs2) = 0;
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void nvram_alloc(uint32_t size);
 	uint16_t* get_rom_base() { return m_rom; }
 	uint16_t* get_nvram_base() { return &m_nvram[0]; }

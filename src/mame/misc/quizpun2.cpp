@@ -570,17 +570,6 @@ INPUT_PORTS_END
                                 Graphics Layout
 ***************************************************************************/
 
-static const gfx_layout layout_16x16x4 =
-{
-	16, 16,
-	RGN_FRAC(1, 1),
-	4,
-	{ STEP4(0,1) },
-	{ 4*1,4*0, 4*3,4*2, 4*5,4*4, 4*7,4*6, 4*9,4*8, 4*11,4*10, 4*13,4*12, 4*15,4*14 },
-	{ STEP16(0,16*4) },
-	16*16*4
-};
-
 static const gfx_layout layout_16x16x1 =
 {
 	16, 16,
@@ -593,9 +582,9 @@ static const gfx_layout layout_16x16x1 =
 };
 
 static GFXDECODE_START( gfx_quizpun2 )
-	GFXDECODE_ENTRY( "bg",  0, layout_16x16x4,     0, 256/16 )
-	GFXDECODE_ENTRY( "fg",  0, layout_16x16x1, 0x100, 256/2  )
-	GFXDECODE_ENTRY( "fg2", 0, layout_16x16x1, 0x100, 256/2  )
+	GFXDECODE_ENTRY( "bg",  0, gfx_16x16x4_packed_lsb,     0, 256/16 )
+	GFXDECODE_ENTRY( "fg",  0, layout_16x16x1        , 0x100, 256/2  )
+	GFXDECODE_ENTRY( "fg2", 0, layout_16x16x1,         0x100, 256/2  )
 GFXDECODE_END
 
 /***************************************************************************

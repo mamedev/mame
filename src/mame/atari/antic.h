@@ -22,8 +22,8 @@ class antic_device : public device_t, public device_video_interface
 {
 private:
 	static constexpr unsigned   VBL_END             = 8;    // vblank ends in this scanline
-	static constexpr unsigned   VDATA_START         = 11;   // video display begins in this scanline
-	static constexpr unsigned   VDATA_END           = 244;  // video display ends in this scanline
+	static constexpr unsigned   VDATA_START         = 8;   // video display begins in this scanline
+	static constexpr unsigned   VDATA_END           = 248;  // video display ends in this scanline
 	static constexpr unsigned   VBL_START           = 248;  // vblank starts in this scanline
 
 public:
@@ -40,7 +40,7 @@ public:
 	static constexpr unsigned   MIN_X               = ((HWIDTH - 42) / 2) * 8;
 	static constexpr unsigned   MAX_X               = MIN_X + (42 * 8) - 1;
 	static constexpr unsigned   MIN_Y               = VDATA_START;
-	static constexpr unsigned   MAX_Y               = VDATA_END - 8 - 1;
+	static constexpr unsigned   MAX_Y               = VDATA_END - 1;
 
 	// construction/destruction
 	antic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -109,7 +109,6 @@ private:
 
 	required_device<gtia_device> m_gtia;
 	required_device<cpu_device> m_maincpu;
-	optional_ioport m_djoy_b;
 	optional_ioport m_artifacts;
 
 	uint32_t m_tv_artifacts;
@@ -163,23 +162,14 @@ private:
 	std::unique_ptr<uint32_t[]>  m_cclk_expand;       /* shared buffer for the following: */
 	uint32_t  *m_pf_21;             /* 1cclk 2 color txt 2,3 */
 	uint32_t  *m_pf_x10b;           /* 1cclk 4 color txt 4,5, gfx D,E */
-	uint32_t  *m_pf_3210b2;         /* 1cclk 5 color txt 6,7, gfx 9,B,C */
+	uint32_t  *m_pf_3210b;          /* 1cclk 5 color txt 6,7, gfx B,C */
+	uint32_t  *m_pf_3210b2;         /* 1cclk 5 color gfx 9 */
 	uint32_t  *m_pf_210b4;          /* 4cclk 4 color gfx 8 */
 	uint32_t  *m_pf_210b2;          /* 2cclk 4 color gfx A */
 	uint32_t  *m_pf_1b;             /* 1cclk hires gfx F */
 	uint32_t  *m_pf_gtia1;          /* 1cclk gtia mode 1 */
 	uint32_t  *m_pf_gtia2;          /* 1cclk gtia mode 2 */
 	uint32_t  *m_pf_gtia3;          /* 1cclk gtia mode 3 */
-	std::unique_ptr<uint8_t[]>   m_used_colors;       /* shared buffer for the following: */
-	uint8_t   *m_uc_21;             /* used colors for txt (2,3) */
-	uint8_t   *m_uc_x10b;           /* used colors for txt 4,5, gfx D,E */
-	uint8_t   *m_uc_3210b2;         /* used colors for txt 6,7, gfx 9,B,C */
-	uint8_t   *m_uc_210b4;          /* used colors for gfx 8 */
-	uint8_t   *m_uc_210b2;          /* used colors for gfx A */
-	uint8_t   *m_uc_1b;             /* used colors for gfx F */
-	uint8_t   *m_uc_g1;             /* used colors for gfx GTIA 1 */
-	uint8_t   *m_uc_g2;             /* used colors for gfx GTIA 2 */
-	uint8_t   *m_uc_g3;             /* used colors for gfx GTIA 3 */
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 
 	void prio_init();

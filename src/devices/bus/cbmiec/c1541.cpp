@@ -138,8 +138,10 @@
 
 #include "emu.h"
 #include "c1541.h"
-#include "formats/fs_cbmdos.h"
+
 #include "bus/centronics/ctronics.h"
+
+#include "formats/fs_cbmdos.h"
 
 
 

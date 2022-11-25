@@ -1695,6 +1695,30 @@ ROM_START( thegrida ) // Version 1.1 Program ROMs
 	ROM_LOAD32_WORD( "the_grid.u23",   0x1000002, 0x400000, CRC(f48ef409) SHA1(79d74b4fe38b06a02ae0351d13d7f0a7ed0f0c87) )
 ROM_END
 
+ROM_START( thegridb ) // Version 1.01 Program ROMs
+	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )   // sound data
+	ROM_LOAD( "the_grid.u2", 0x000000, 0x400000, CRC(e6a39ee9) SHA1(4ddc62f5d278ea9791205098fa5f018ab1e698b4) )
+	ROM_LOAD( "the_grid.u3", 0x400000, 0x400000, CRC(40be7585) SHA1(e481081edffa07945412a6eab17b4d3e7b42cfd3) )
+	ROM_LOAD( "the_grid.u4", 0x800000, 0x400000, CRC(7a15c203) SHA1(a0a49dd08bba92402640ed2d1fb4fee112c4ab5f) )
+
+	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C57
+	ROM_LOAD( "pic16c57.u76", 0x0000, 0x1fff, CRC(8234d466) SHA1(5737e355d3262cd0b13191cdf9b49dd74f69dd15) ) // decapped but not hooked up
+
+	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_LOAD32_WORD( "mpg_the_grid_1-17-00_ver1.01_54e6.u10", 0x0000000, 0x100000, CRC(cd0bf7c3) SHA1(8b490955381c078443e048dadd78fa931754bd0f) )
+	ROM_LOAD32_WORD( "mpg_the_grid_1-17-00_ver1.01_568d.u11", 0x0000002, 0x100000, CRC(ffea0d0a) SHA1(f0fe36b9f2fe890957a0dcc05bb091a78357cced) )
+	ROM_LOAD32_WORD( "mpg_the_grid_1-17-00_ver1.01_a117.u12", 0x0200000, 0x100000, CRC(ad54ad55) SHA1(2c7175bed85c75070357c83009527229e4943fe0) )
+	ROM_LOAD32_WORD( "mpg_the_grid_1-17-00_ver1.01_5694.u13", 0x0200002, 0x100000, CRC(976a3ab8) SHA1(6e521525208358f270a4961cad408ed598a25c88) )
+
+	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_LOAD32_WORD( "the_grid.u18",   0x0000000, 0x400000, CRC(3a3460be) SHA1(e719dae8a2e54584cb6a074ed42e35e3debef2f6) )
+	ROM_LOAD32_WORD( "the_grid.u19",   0x0000002, 0x400000, CRC(af262d5b) SHA1(3eb3980fa81a360a70aa74e793b2bc3028f68cf2) )
+	ROM_LOAD32_WORD( "the_grid.u20",   0x0800000, 0x400000, CRC(e6ad1917) SHA1(acab25e1251fd07b374badebe79f6ec1772b3589) )
+	ROM_LOAD32_WORD( "the_grid.u21",   0x0800002, 0x400000, CRC(48c03f8e) SHA1(50790bdae9f2234ffb4914c2c5c16374e3508b47) )
+	ROM_LOAD32_WORD( "the_grid.u22",   0x1000000, 0x400000, CRC(84c3a8b6) SHA1(de0dcf9daf7ada7a6952b9e29a29571b2aa9d0b2) )
+	ROM_LOAD32_WORD( "the_grid.u23",   0x1000002, 0x400000, CRC(f48ef409) SHA1(79d74b4fe38b06a02ae0351d13d7f0a7ed0f0c87) )
+ROM_END
+
 
 
 /*************************************
@@ -1751,3 +1775,4 @@ GAMEL( 1999, crusnexoc,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusne
 GAMEL( 1999, crusnexod,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
 GAME(  2000, thegrid,  0,        thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.2)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 10/16/00
 GAME(  2000, thegrida, thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.1)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/26/00
+GAME(  2000, thegridb, thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.01)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/17/00

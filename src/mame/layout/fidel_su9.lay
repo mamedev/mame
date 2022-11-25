@@ -8,9 +8,9 @@ license:CC0
 
 <!-- define elements -->
 
-	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
+	<element name="black"><rect><color red="0.15" green="0.15" blue="0.15" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
-	<element name="disk_black"><disk><color red="0.17" green="0.15" blue="0.15" /></disk></element>
+	<element name="disk_black"><disk><color red="0.15" green="0.15" blue="0.15" /></disk></element>
 	<element name="disk_white"><disk><color red="0.81" green="0.8" blue="0.79" /></disk></element>
 
 	<element name="digit" defstate="0">
@@ -111,84 +111,72 @@ license:CC0
 
 	<element name="text_re">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="RE"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="RE"><color red="0.15" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_cl">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="CL"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="CL"><color red="0.15" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_pb">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="PB"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="PB"><color red="0.15" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_pv">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="PV"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="PV"><color red="0.15" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_lv">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="LV"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="LV"><color red="0.15" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_tb">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="TB"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="TB"><color red="0.15" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_dm">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="DM"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="DM"><color red="0.15" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_rv">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="RV"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="RV"><color red="0.15" green="0.15" blue="0.15" /></text>
 	</element>
 
-	<element name="text_king">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[K]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_queen">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[Q]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_rook">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[R]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_bishop">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[B]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_knight">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[N]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_pawn">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[P]"><color red="0.17" green="0.15" blue="0.15" /></text>
+	<element name="text_p1"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wk.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+	<element name="text_p2"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wq.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+	<element name="text_p3"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wr.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+	<element name="text_p4"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wb.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+	<element name="text_p5"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wn.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+	<element name="text_p6"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+
+	<!-- generic speaker icon, (C) Mobius, public domain -->
+	<element name="speaker">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="500" height="500" viewBox="0 0 75 75">
+				<path d="M39.389,13.769 L22.235,28.606 L6,28.606 L6,47.699 L21.989,47.699 L39.389,62.75 L39.389,13.769z" style="stroke:#ceccca;stroke-width:5;stroke-linejoin:round;fill:#ceccca;"/>
+				<path d="M48,27.6a19.5,19.5 0 0 1 0,21.4M55.1,20.5a30,30 0 0 1 0,35.6M61.6,14a38.8,38.8 0 0 1 0,48.6" style="fill:none;stroke:#ceccca;stroke-width:5;stroke-linecap:round"/>
+			</svg>
+		]]></data></image>
 	</element>
 
 	<element name="text_tmp">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
+		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
 		<text string="TM"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 	<element name="text_rvp">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
+		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
 		<text string="RV"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
-	<element name="text_speak">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="spk"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
 	<element name="text_stp">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
+		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
 		<text string="ST"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 	<element name="text_dmp">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
+		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
 		<text string="DM"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 	<element name="text_lvp">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
+		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
 		<text string="LV"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 
@@ -495,8 +483,7 @@ license:CC0
 		<group ref="sb_board"><bounds x="3.5" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="0.2" y="7"  width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="0.2" y="17" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="0.2" y="27" width="2" height="2" /></element>
@@ -515,16 +502,8 @@ license:CC0
 		<element ref="text_g"><bounds x="67.5" y="84.5" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="77.5" y="84.5" width="2" height="2" /></element>
 
-	<!-- right side -->
-
+		<!-- right side -->
 		<element name="0.7" ref="led"><bounds x="91.95" y="7.25" width="1.5" height="1.5" /></element>
-
-		<element ref="text_king"><bounds x="84.01" y="32.8" width="5.7" height="3" /></element>
-		<element ref="text_queen"><bounds x="84.01" y="41.6" width="5.7" height="3" /></element>
-		<element ref="text_rook"><bounds x="84.01" y="50.4" width="5.7" height="3" /></element>
-		<element ref="text_bishop"><bounds x="84.01" y="59.2" width="5.7" height="3" /></element>
-		<element ref="text_knight"><bounds x="84.01" y="68" width="5.7" height="3" /></element>
-		<element ref="text_pawn"><bounds x="84.01" y="76.8" width="5.7" height="3" /></element>
 
 		<element ref="disk_black"><bounds x="89" y="13" width="7.4" height="7.4" /></element>
 		<element ref="disk_black"><bounds x="89" y="21.8" width="7.4" height="7.4" /></element>
@@ -553,6 +532,12 @@ license:CC0
 		<element ref="text_dm"><bounds x="90.2" y="68" width="5" height="3" /></element>
 		<element ref="text_rv"><bounds x="90.2" y="76.8" width="5" height="3" /></element>
 
+		<repeat count="6">
+			<param name="y" start="31.9" increment="8.8" />
+			<param name="i" start="1" increment="1" />
+			<element ref="text_p~i~" blend="multiply"><bounds x="84.5" y="~y~" width="4.4" height="4.4" /></element>
+		</repeat>
+
 		<element ref="hlb" inputtag="IN.8" inputmask="0x80"><bounds x="89" y="13" width="7.4" height="7.4" /><color alpha="0.3" /></element>
 		<element ref="hlb" inputtag="IN.8" inputmask="0x40"><bounds x="89" y="21.8" width="7.4" height="7.4" /><color alpha="0.3" /></element>
 		<element ref="hlb" inputtag="IN.8" inputmask="0x20"><bounds x="89" y="30.6" width="7.4" height="7.4" /><color alpha="0.3" /></element>
@@ -562,8 +547,7 @@ license:CC0
 		<element ref="hlb" inputtag="IN.8" inputmask="0x02"><bounds x="89" y="65.8" width="7.4" height="7.4" /><color alpha="0.3" /></element>
 		<element ref="hlb" inputtag="IN.8" inputmask="0x01"><bounds x="89" y="74.6" width="7.4" height="7.4" /><color alpha="0.3" /></element>
 
-	<!-- panel 7seg leds -->
-
+		<!-- panel 7seg leds -->
 		<element name="digit3" ref="digit">
 			<bounds x="33" y="-12" width="5.66" height="8.5" />
 		</element>
@@ -584,8 +568,7 @@ license:CC0
 			<bounds x="45.13" y="-5.85" width="0.85" height="0.85" />
 		</element>
 
-	<!-- panel buttons -->
-
+		<!-- panel buttons -->
 		<element ref="black"><bounds x="73" y="-12" width="5" height="3" /></element>
 		<element ref="text_tmp"><bounds x="73.05" y="-11.95" width="4.9" height="2.9" /></element>
 		<element ref="hlp" inputtag="IN.2" inputmask="0x100"><bounds x="73" y="-12" width="5" height="3" /><color alpha="0.25" /></element>
@@ -595,7 +578,7 @@ license:CC0
 		<element ref="hlp" inputtag="IN.1" inputmask="0x100"><bounds x="79.2" y="-12" width="5" height="3" /><color alpha="0.25" /></element>
 
 		<element ref="black"><bounds x="85.4" y="-12" width="5" height="3" /></element>
-		<element ref="text_speak"><bounds x="85.45" y="-11.95" width="4.9" height="2.9" /></element>
+		<element ref="speaker"><bounds x="86.5" y="-11.9" width="2.8" height="2.8" /></element>
 		<element ref="hlp" inputtag="IN.0" inputmask="0x100"><bounds x="85.4" y="-12" width="5" height="3" /><color alpha="0.25" /></element>
 
 		<element ref="black"><bounds x="73" y="-6.5" width="5" height="3" /></element>

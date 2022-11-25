@@ -812,7 +812,7 @@ void naomi_gdrom_board::i2cmem_dimm_w(uint64_t data)
 		picbus = (data >> 2) & 0xf;
 		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
 		m_maincpu->abort_timeslice();
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(1));
+		machine().scheduler().perfect_quantum(attotime::from_msec(1));
 	}
 	else
 	{

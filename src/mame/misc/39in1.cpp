@@ -105,27 +105,10 @@ private:
 	void _39in1_map(address_map &map);
 	void base_map(address_map &map);
 
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
-
 	void decrypt(uint8_t xor00, uint8_t xor02, uint8_t xor04, uint8_t xor08, uint8_t xor10, uint8_t xor20, uint8_t xor40, uint8_t xor80, uint8_t bit7, uint8_t bit6, uint8_t bit5, uint8_t bit4, uint8_t bit3, uint8_t bit2, uint8_t bit1, uint8_t bit0);
 	void further_decrypt(uint8_t xor400, uint8_t xor800, uint8_t xor1000, uint8_t xor2000, uint8_t xor4000, uint8_t xor8000);
 };
 
-
-#define VERBOSE_LEVEL (0)
-
-inline void ATTR_PRINTF(3,4) _39in1_state::verboselog(int n_level, const char *s_fmt, ... )
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror("%s: %s", machine().describe_context(), buf);
-	}
-}
 
 uint32_t _39in1_state::eeprom_r()
 {
@@ -349,21 +332,21 @@ void _39in1_state::further_decrypt(uint8_t xor400, uint8_t xor800, uint8_t xor10
 	}
 }
 
-void _39in1_state::init_39in1()  { driver_init(); decrypt(0xc0, 0x00, 0x00, 0x02, 0x40, 0x04, 0x80, 0x00, 7, 2, 5, 6, 0, 3, 1, 4); m_mcu_ipt_pc = 0xe3af4; } // good
-void _39in1_state::init_4in1a()  { driver_init(); decrypt(0x25, 0x00, 0x00, 0x01, 0x80, 0x04, 0x40, 0x00, 6, 0, 2, 1, 7, 5, 4, 3); m_mcu_ipt_pc = 0x45814; } // good
-void _39in1_state::init_4in1b()  { driver_init(); decrypt(0x43, 0x00, 0x00, 0x80, 0x04, 0x40, 0x08, 0x00, 2, 4, 0, 6, 7, 3, 1, 5); m_mcu_ipt_pc = 0x57628; } // good
-void _39in1_state::init_19in1()  { driver_init(); decrypt(0x00, 0x00, 0x00, 0x04, 0x01, 0x80, 0x40, 0x00, 2, 1, 7, 4, 5, 0, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: 0x4000, 0x8000, 0x10000, 0x20000, 0x40000 conditional XORs?
-void _39in1_state::init_48in1()  { driver_init(); decrypt(0x00, 0x00, 0x00, 0x01, 0x40, 0x00, 0x20, 0x00, 5, 3, 2, 1, 4, 6, 0, 7); further_decrypt(0x00, 0x01, 0x20, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // applies to both 48in1 and 48in1b, same main CPU ROM. TODO: see above
+void _39in1_state::init_39in1()  { decrypt(0xc0, 0x00, 0x00, 0x02, 0x40, 0x04, 0x80, 0x00, 7, 2, 5, 6, 0, 3, 1, 4); m_mcu_ipt_pc = 0xe3af4; } // good
+void _39in1_state::init_4in1a()  { decrypt(0x25, 0x00, 0x00, 0x01, 0x80, 0x04, 0x40, 0x00, 6, 0, 2, 1, 7, 5, 4, 3); m_mcu_ipt_pc = 0x45814; } // good
+void _39in1_state::init_4in1b()  { decrypt(0x43, 0x00, 0x00, 0x80, 0x04, 0x40, 0x08, 0x00, 2, 4, 0, 6, 7, 3, 1, 5); m_mcu_ipt_pc = 0x57628; } // good
+void _39in1_state::init_19in1()  { decrypt(0x00, 0x00, 0x00, 0x04, 0x01, 0x80, 0x40, 0x00, 2, 1, 7, 4, 5, 0, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: 0x4000, 0x8000, 0x10000, 0x20000, 0x40000 conditional XORs?
+void _39in1_state::init_48in1()  { decrypt(0x00, 0x00, 0x00, 0x01, 0x40, 0x00, 0x20, 0x00, 5, 3, 2, 1, 4, 6, 0, 7); further_decrypt(0x00, 0x01, 0x20, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // applies to both 48in1 and 48in1b, same main CPU ROM. TODO: see above
 void _39in1_state::init_48in1a() { init_48in1(); m_mcu_ipt_pc = 0x00000; } // same encryption as 48in1
 void _39in1_state::init_48in1c() { init_48in1(); m_mcu_ipt_pc = 0x00000; } // same encryption as 48in1
 void _39in1_state::init_rodent() { init_4in1b(); /*m_mcu_ipt_pc = 0x?????;*/ } // same encryption as 4in1b, thus good, but doesn't boot because of different CPLD calls
-void _39in1_state::init_60in1()  { driver_init(); decrypt(0x00, 0x00, 0x00, 0x40, 0x10, 0x80, 0x20, 0x00, 5, 1, 4, 2, 0, 7, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: see 19in1
+void _39in1_state::init_60in1()  { decrypt(0x00, 0x00, 0x00, 0x40, 0x10, 0x80, 0x20, 0x00, 5, 1, 4, 2, 0, 7, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: see 19in1
 
 // I.A.M. slots
-void _39in1_state::init_fruitwld()  { driver_init(); decrypt(0x0a, 0x00, 0x00, 0x20, 0x80, 0x00, 0x00, 0x00, 5, 1, 7, 4, 3, 2, 0, 6); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
-void _39in1_state::init_jumanji()   { driver_init(); decrypt(0x00, 0x00, 0x00, 0x02, 0x00, 0x40, 0x08, 0x00, 1, 0, 6, 2, 5, 3, 4, 7); further_decrypt(0x00, 0x08, 0x10, 0x40, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
-void _39in1_state::init_plutus()    { driver_init(); decrypt(0x00, 0x40, 0x08, 0x01, 0x00, 0x04, 0x80, 0x02, 6, 4, 0, 5, 7, 3, 2, 1); further_decrypt(0x00, 0x00, 0x10, 0x00, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO:  >= 0x4000 XORs unverified
-void _39in1_state::init_pokrwild()  { driver_init(); decrypt(0x20, 0x00, 0x00, 0x40, 0x08, 0x00, 0x00, 0x00, 6, 5, 3, 1, 0, 7, 2, 4); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
+void _39in1_state::init_fruitwld()  { decrypt(0x0a, 0x00, 0x00, 0x20, 0x80, 0x00, 0x00, 0x00, 5, 1, 7, 4, 3, 2, 0, 6); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
+void _39in1_state::init_jumanji()   { decrypt(0x00, 0x00, 0x00, 0x02, 0x00, 0x40, 0x08, 0x00, 1, 0, 6, 2, 5, 3, 4, 7); further_decrypt(0x00, 0x08, 0x10, 0x40, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
+void _39in1_state::init_plutus()    { decrypt(0x00, 0x40, 0x08, 0x01, 0x00, 0x04, 0x80, 0x02, 6, 4, 0, 5, 7, 3, 2, 1); further_decrypt(0x00, 0x00, 0x10, 0x00, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO:  >= 0x4000 XORs unverified
+void _39in1_state::init_pokrwild()  { decrypt(0x20, 0x00, 0x00, 0x40, 0x08, 0x00, 0x00, 0x00, 6, 5, 3, 1, 0, 7, 2, 4); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
 
 void _39in1_state::base(machine_config &config)
 {

@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, hap
+// copyright-holders:Aaron Giles, Curt Coder, hap
 /***************************************************************************
 
     plaparse.h
 
-    Parser for Berkeley standard PLA files into raw fusemaps.
+    Parser for Berkeley standard (aka Espresso) PLA files into raw fusemaps.
 
 ***************************************************************************/
 

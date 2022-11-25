@@ -9,8 +9,8 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "osdepend.h"
 #include "midiout.h"
+#include "osdepend.h"
 
 /***************************************************************************
     IMPLEMENTATION
@@ -27,6 +27,10 @@ midiout_device::midiout_device(const machine_config &mconfig, const char *tag, d
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
 		m_midi()
+{
+}
+
+midiout_device::~midiout_device()
 {
 }
 

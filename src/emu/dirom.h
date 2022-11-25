@@ -32,7 +32,8 @@ public:
 	void set_rom_bank(int bank);
 
 protected:
-	virtual void rom_bank_updated() = 0;
+	virtual void rom_bank_pre_change() { }
+	virtual void rom_bank_post_change() { }
 	virtual space_config_vector memory_space_config() const override;
 
 	void override_address_width(u8 width);

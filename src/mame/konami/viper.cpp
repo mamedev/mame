@@ -1972,7 +1972,6 @@ uint64_t viper_state::e70000_r(offs_t offset, uint64_t mem_mask)
 	if (ACCESSING_BITS_56_63)
 	{
 		m_ds2430_bit_timer->reset();
-		m_ds2430_bit_timer->start_time();
 
 //      printf("%s e70000_r: %08X (mask %08X%08X)\n", machine().describe_context().c_str(), offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
@@ -1997,7 +1996,7 @@ void viper_state::e70000_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 			// Bit 0 = ~3.6 microsecs
 			// Bit 1 = ~98 microsecs
 
-			attotime diff_time = m_ds2430_bit_timer->time_elapsed();
+			attotime diff_time = m_ds2430_bit_timer->elapsed();
 			m_ds2430_bit_timer->reset();
 			if (diff_time < attotime::from_usec(20))
 				DS2430_w(0);

@@ -132,7 +132,7 @@ license:CC0
 	</software>
 
 	<software name="lpw39upda" cloneof="lpw39upd">
-	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MESS-->
+	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MAME-->
 		<description>Lisa Pascal Workshop V3.9 Update (Alt)</description>
 		<year>1985</year>
 		<publisher>Apple Computer Inc.</publisher>
@@ -175,7 +175,7 @@ license:CC0
 	</software>
 
 	<software name="lpwsupa" cloneof="lpwsup">
-	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MESS-->
+	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MAME-->
 		<description>Lisa Pascal Workshop Supplement (Alt)</description>
 		<year>1985</year>
 		<publisher>Apple Computer Inc.</publisher>
@@ -620,7 +620,7 @@ license:CC0
 	</software>
 
 	<software name="macwrkxl">
-	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MESS-->
+	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MAME-->
 		<description>Lisa Macworks XL</description>
 		<year>198?</year>
 		<publisher>Apple Computer Inc.</publisher>

@@ -338,12 +338,12 @@ void rasterizer_params::compute_equations()
 u32 rasterizer_params::hash() const
 {
 	return m_generic ^
-			rotate(m_alphamode, 0) ^
-			rotate(m_fbzmode, 6) ^
-			rotate(m_fbzcp, 12) ^
-			rotate(m_fogmode, 18) ^
-			rotate(m_texmode0, 24) ^
-			rotate(m_texmode1, 30);
+			rotl_32(m_alphamode, 0) ^
+			rotl_32(m_fbzmode, 6) ^
+			rotl_32(m_fbzcp, 12) ^
+			rotl_32(m_fogmode, 18) ^
+			rotl_32(m_texmode0, 24) ^
+			rotl_32(m_texmode1, 30);
 }
 
 

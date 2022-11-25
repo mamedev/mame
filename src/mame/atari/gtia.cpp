@@ -26,6 +26,8 @@
 #define GTIA_HWIDTH    48      /* total characters per line */
 #define GTIA_TRIGGER    0x04
 
+// bit 1 player DMA, bit 0 missile DMA
+// TODO: should block writing to grafp* / grafm register writes, enabling this will fail Acid800 "GTIA: address mirroring" test
 #define CHECK_GRACTL    0
 #define VERBOSE         0
 
@@ -123,6 +125,7 @@ gtia_device::gtia_device(const machine_config &mconfig, const char *tag, device_
 	, m_region(GTIA_NTSC)
 	, m_read_cb(*this)
 	, m_write_cb(*this)
+	, m_trigger_cb(*this)
 {
 }
 
@@ -135,6 +138,7 @@ void gtia_device::device_start()
 {
 	m_read_cb.resolve();
 	m_write_cb.resolve();
+	m_trigger_cb.resolve_safe(0xf);
 
 	save_item(NAME(m_r.m0pf));
 	save_item(NAME(m_r.m1pf));
@@ -164,7 +168,7 @@ void gtia_device::device_start()
 	save_item(NAME(m_r.gtia1c));
 	save_item(NAME(m_r.gtia1d));
 	save_item(NAME(m_r.gtia1e));
-	save_item(NAME(m_r.cons));
+	save_item(NAME(m_r.consol));
 
 	save_item(NAME(m_w.hposp0));
 	save_item(NAME(m_w.hposp1));
@@ -197,7 +201,7 @@ void gtia_device::device_start()
 	save_item(NAME(m_w.vdelay));
 	save_item(NAME(m_w.gractl));
 	save_item(NAME(m_w.hitclr));
-	save_item(NAME(m_w.cons));
+	save_item(NAME(m_w.consol));
 
 	save_item(NAME(m_h.grafp0));
 	save_item(NAME(m_h.grafp1));
@@ -251,24 +255,36 @@ void gtia_device::device_reset()
 	m_lumpf1 = 0;
 
 	/* reset the GTIA read/write/helper registers */
-	for (int i = 0; i < 32; i++)
-		write(i, 0);
 
-	if (is_ntsc())
-		m_r.pal = 0xff;
-	else
-		m_r.pal = 0xf1;
-	m_r.gtia15 = 0xff;
-	m_r.gtia16 = 0xff;
-	m_r.gtia17 = 0xff;
-	m_r.gtia18 = 0xff;
-	m_r.gtia19 = 0xff;
-	m_r.gtia1a = 0xff;
-	m_r.gtia1b = 0xff;
-	m_r.gtia1c = 0xff;
-	m_r.gtia1d = 0xff;
-	m_r.gtia1e = 0xff;
-	m_r.cons = 0x07;     /* console keys */
+	// Altirra observed values on real HW
+	// initial state for w/o regs marked as undefined
+	const u8 cold_start_values[32] = {
+		// m*pf                 p*pf
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		// m*pl                 p*pl
+		0x0f, 0x0f, 0x0f, 0x0f, 0x0e, 0x0d, 0x0b, 0x07,
+		// trig*                <undefined>
+		0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00,
+		// <undefined>          <undefined>
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	};
+	for (int i = 0; i < 32; i++)
+		write(i, cold_start_values[i]);
+
+	m_r.pal = is_ntsc() ? 0x0f : 0x01;
+	m_r.gtia15 = 0x0f;
+	m_r.gtia16 = 0x0f;
+	m_r.gtia17 = 0x0f;
+	m_r.gtia18 = 0x0f;
+	m_r.gtia19 = 0x0f;
+	m_r.gtia1a = 0x0f;
+	m_r.gtia1b = 0x0f;
+	m_r.gtia1c = 0x0f;
+	m_r.gtia1d = 0x0f;
+	m_r.gtia1e = 0x0f;
+	/* set consol default dir with all lines r/o */
+	m_r.consol = 0x00;
+	m_w.consol = 0x00;
 	SETCOL_B(ILL, 0x3e);     /* bright red */
 	SETCOL_B(EOR, 0xff);     /* yellow */
 
@@ -288,8 +304,10 @@ int gtia_device::is_ntsc()
 	return m_region == GTIA_NTSC;
 }
 
-void gtia_device::button_interrupt(int button_count, uint8_t button_port)
+void gtia_device::button_interrupt(int button_count)
 {
+	uint8_t button_port = m_trigger_cb();
+
 	/* specify buttons relevant to this Atari variant */
 	for (int i = 0; i < button_count; i++)
 	{
@@ -301,8 +319,10 @@ void gtia_device::button_interrupt(int button_count, uint8_t button_port)
 	/* button registers for xl/xe */
 	if (button_count == 2)
 	{
-		m_r.but[2] = 1;  /* not used on xl/xe */
-		m_r.but[3] = 0;  /* 1 if external cartridge is inserted */
+		// TRIG2: unused on xl/xe (1), xegs keyboard (1) connected (0) disconnected
+		m_r.but[2] = 1;
+		// TRIG3: RD5 external cart readback (1) present (0) disabled thru bankswitch or absent
+		m_r.but[3] = 0;
 	}
 
 }
@@ -355,10 +375,17 @@ uint8_t gtia_device::read(offs_t offset)
 		case 30: return m_r.gtia1e;
 
 		case 31:
-			m_r.cons = !m_read_cb.isnull() ? (m_read_cb(0) & 0x0f) : 0x00;
-			return m_r.cons;
+		{
+			// unconfirmed behaviour with reading lines unconnected,
+			// assume active low logic with read direction.
+			const u8 consol_read_dir = (~m_w.consol & 0xf);
+			const u8 res = !m_read_cb.isnull() ? m_read_cb(0) : 0x0f;
+			m_r.consol = res & consol_read_dir;
+			return m_r.consol;
+		}
 	}
-	return 0xff;
+	// unreachable
+	return 0x0f;
 }
 
 
@@ -367,7 +394,7 @@ void gtia_device::recalc_p0()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_PLAYER) == 0 ||
+		(BIT(m_w.gractl, 1) == 0) ||
 #endif
 		m_w.grafp0[m_h.vdelay_p0] == 0 || m_w.hposp0 >= 224 )
 	{
@@ -385,7 +412,7 @@ void gtia_device::recalc_p1()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_PLAYER) == 0 ||
+		(BIT(m_w.gractl, 1) == 0) ||
 #endif
 		m_w.grafp1[m_h.vdelay_p1] == 0 || m_w.hposp1 >= 224 )
 	{
@@ -403,7 +430,7 @@ void gtia_device::recalc_p2()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_PLAYER) == 0 ||
+		(BIT(m_w.gractl, 1) == 0) ||
 #endif
 		m_w.grafp2[m_h.vdelay_p2] == 0 || m_w.hposp2 >= 224 )
 	{
@@ -421,7 +448,7 @@ void gtia_device::recalc_p3()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_PLAYER) == 0 ||
+		(BIT(m_w.gractl, 1) == 0) ||
 #endif
 		m_w.grafp3[m_h.vdelay_p3] == 0 || m_w.hposp3 >= 224 )
 	{
@@ -439,7 +466,7 @@ void gtia_device::recalc_m0()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_MISSILE) == 0 ||
+		(BIT(m_w.gractl, 0) == 0) ||
 #endif
 		(m_w.grafm[m_h.vdelay_m0] & 0x03) == 0 || m_w.hposm0 >= 224 )
 	{
@@ -457,7 +484,7 @@ void gtia_device::recalc_m1()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_MISSILE) == 0 ||
+		(BIT(m_w.gractl, 0) == 0) ||
 #endif
 		(m_w.grafm[m_h.vdelay_m1] & 0x0c) == 0 || m_w.hposm1 >= 224 )
 	{
@@ -475,7 +502,7 @@ void gtia_device::recalc_m2()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_MISSILE) == 0 ||
+		(BIT(m_w.gractl, 0) == 0) ||
 #endif
 		(m_w.grafm[m_h.vdelay_m2] & 0x30) == 0 || m_w.hposm2 >= 224 )
 	{
@@ -493,7 +520,7 @@ void gtia_device::recalc_m3()
 {
 	if (
 #if CHECK_GRACTL
-		(m_w.gractl & GTIA_MISSILE) == 0 ||
+		(BIT(m_w.gractl, 0) == 0) ||
 #endif
 		(m_w.grafm[m_h.vdelay_m3] & 0xc0) == 0 || m_w.hposm3 >= 224)
 	{
@@ -575,7 +602,6 @@ void gtia_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case 12:
-		data &= 3;
 		m_w.sizem = data;
 		recalc_m0();
 		recalc_m1();
@@ -876,11 +902,11 @@ void gtia_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case 31:    /* write console (speaker) */
-		if (data == m_w.cons)
+		if (data == m_w.consol)
 			break;
-		m_w.cons  = data;
+		m_w.consol = data & 0x0f;
 		if (!m_write_cb.isnull())
-			m_write_cb((offs_t)0, m_w.cons);
+			m_write_cb((offs_t)0, m_w.consol);
 		break;
 	}
 }
@@ -940,22 +966,29 @@ static const int    pf_prioindex[256] = {
 /*     */   0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000
 };
 
-inline void gtia_device::player_render(uint8_t gfx, int size, uint8_t color, uint8_t *dst)
+inline void gtia_device::player_render(uint8_t gfx, u8 size_index, uint8_t color, uint8_t *dst)
 {
 	// size is the number of bits in *dst to be filled: 1, 2 or 4
-	if (size == 3)
-		size = 2;
+	// x0 normal width
+	// 01 double width
+	// 11 quadruple width
+	// jmpmanjr sets all sizes to 10, still expecting it to be normal width
+	const u8 sizes[4] = { 1, 2, 1, 4 };
+	const int size = sizes[size_index & 3];
+
 	for (int i = 0; i < 8; i++)
 		if (BIT(gfx, 7 - i))
 			for (int s = 0; s < size; s++)
 				dst[i * size + s] |= color;
 }
 
-inline void gtia_device::missile_render(uint8_t gfx, int size, uint8_t color, uint8_t *dst)
+inline void gtia_device::missile_render(uint8_t gfx, u8 size_index, uint8_t color, uint8_t *dst)
 {
-	// size is the number of bits in *dst to be filled: 1, 2 or 4
-	if (size == 3)
-		size = 2;
+	// TODO: verify usage with missile 1-2-3 renders
+	// otherwise same as player width rendering
+	const u8 sizes[4] = { 1, 2, 1, 4 };
+	const int size = sizes[size_index & 3];
+
 	for (int i = 0; i < 2; i++)
 		if (BIT(gfx, 7 - i))
 			for (int s = 0; s < size; s++)
@@ -966,22 +999,22 @@ inline void gtia_device::missile_render(uint8_t gfx, int size, uint8_t color, ui
 void gtia_device::render(uint8_t *src, uint8_t *dst, uint8_t *prio, uint8_t *pmbits)
 {
 	if (m_h.grafp0)
-		player_render(m_h.grafp0, m_w.sizep0 + 1, GTIA_P0, &pmbits[m_w.hposp0]);
+		player_render(m_h.grafp0, m_w.sizep0, GTIA_P0, &pmbits[m_w.hposp0]);
 	if (m_h.grafp1)
-		player_render(m_h.grafp1, m_w.sizep1 + 1, GTIA_P1, &pmbits[m_w.hposp1]);
+		player_render(m_h.grafp1, m_w.sizep1, GTIA_P1, &pmbits[m_w.hposp1]);
 	if (m_h.grafp2)
-		player_render(m_h.grafp2, m_w.sizep2 + 1, GTIA_P2, &pmbits[m_w.hposp2]);
+		player_render(m_h.grafp2, m_w.sizep2, GTIA_P2, &pmbits[m_w.hposp2]);
 	if (m_h.grafp3)
-		player_render(m_h.grafp3, m_w.sizep3 + 1, GTIA_P3, &pmbits[m_w.hposp3]);
+		player_render(m_h.grafp3, m_w.sizep3, GTIA_P3, &pmbits[m_w.hposp3]);
 
 	if (m_h.grafm0)
-		missile_render(m_h.grafm0, m_w.sizem + 1, GTIA_M0, &pmbits[m_w.hposm0]);
+		missile_render(m_h.grafm0, (m_w.sizem >> 0) & 3, GTIA_M0, &pmbits[m_w.hposm0]);
 	if (m_h.grafm1)
-		missile_render(m_h.grafm1, m_w.sizem + 1, GTIA_M1, &pmbits[m_w.hposm1]);
+		missile_render(m_h.grafm1, (m_w.sizem >> 2) & 3, GTIA_M1, &pmbits[m_w.hposm1]);
 	if (m_h.grafm2)
-		missile_render(m_h.grafm2, m_w.sizem + 1, GTIA_M2, &pmbits[m_w.hposm2]);
+		missile_render(m_h.grafm2, (m_w.sizem >> 4) & 3, GTIA_M2, &pmbits[m_w.hposm2]);
 	if (m_h.grafm3)
-		missile_render(m_h.grafm3, m_w.sizem + 1, GTIA_M3, &pmbits[m_w.hposm3]);
+		missile_render(m_h.grafm3, (m_w.sizem >> 6) & 3, GTIA_M3, &pmbits[m_w.hposm3]);
 
 	for (int x = 0; x < GTIA_HWIDTH * 4; x++, src++, dst++)
 	{

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  editwininfo.c - Win32 debug window handling
+//  editwininfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -16,6 +16,8 @@
 
 #include "winutil.h"
 
+
+namespace osd::debugger::win {
 
 namespace {
 
@@ -241,3 +243,5 @@ LRESULT CALLBACK editwin_info::static_edit_proc(HWND wnd, UINT message, WPARAM w
 	assert(info->m_editwnd == wnd);
 	return info->edit_proc(message, wparam, lparam);
 }
+
+} // namespace osd::debugger::win

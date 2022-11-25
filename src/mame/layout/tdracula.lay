@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="text_warp"><text string="^^^^"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<screen index="0"><bounds x="0" y="0" width="478" height="1080" /></screen>
+
+		<collection name="Warp Indicator">
+			<element ref="text_warp"><bounds x="-25" y="559" width="25" height="80" /><orientation rotate="270" /></element>
+			<element ref="text_warp"><bounds x="478" y="813" width="25" height="80" /><orientation rotate="90" /></element>
+		</collection>
+
+	</view>
+</mamelayout>

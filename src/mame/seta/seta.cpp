@@ -61,7 +61,6 @@ P0-096A  (BP934KA)      93 Kamen Rider                          Banpresto
 P0-097A                 93 Oishii Puzzle ..                     Sunsoft + Atlus
 bootleg                 9? Triple Fun (4)                       bootleg (Comad?)
 P0-100A                 93 Quiz Kokology 2                      Tecmo
-P0-101-1                94 Pro Mahjong Kiwame                   Athena
 P0-102A                 93 Mad Shark                            Allumer
 P0-107A  (prototype?)   94 Orbs (prototype?)                    American Sammy
 P0-107A                 93 Kero Kero Keroppi no Isshoni Asobou  Sammy Industries  [added Chack'n, Hau]
@@ -114,7 +113,7 @@ TODO:
 - in msgundam1, colors for the score display screw up after the second animation
   in attract mode. The end of the animation also has garbled sprites.
   Note that the animation is not present in msgundam.
-- Some games: battery backed portion of RAM (e.g. downtown, kiwame, zombraid)
+- Some games: battery backed portion of RAM (e.g. downtown, zombraid)
 - the zombraid crosshair hack can go if the nvram regions are figured out.
 - Some games: programmable timer that generates IRQ. See e.g. gundhara:
   lev 4 is triggered by writes at d00000-6 and drives the sound.
@@ -976,33 +975,6 @@ ROMs  :
 
 ***************************************************************************/
 
-/***************************************************************************
-
-                            Pro Mahjong Kiwame
-
-PCB  : P0-101-1 (the board is made by Allumer/Seta)
-CPU  : TMP68301AF-16 (68000 core)
-Sound: X1-010
-OSC  : 20.0000MHz
-
-ROMs:
-fp001001.bin - Main program (27c2001, even)
-fp001002.bin - Main program (27c2001, odd)
-fp001003.bin - Graphics (23c4000)
-fp001005.bin - Samples (27c4000, high)
-fp001006.bin - Samples (27c4000, low)
-
-Chips:  X1-001A
-        X1-002A
-        X1-004
-        X1-006
-        X1-007
-        X1-010
-
-- To initialize high scores, power-on holding start button in service mode
-
-***************************************************************************/
-
 
 /***************************************************************************
 
@@ -1496,7 +1468,6 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
 #include "machine/watchdog.h"
-#include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
@@ -2776,6 +2747,39 @@ void seta_state::madshark_map(address_map &map)
 	map(0xd00000, 0xd03fff).rw(m_x1snd, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 }
 
+void seta_state::madsharkbl_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                             // ROM
+	map(0x100001, 0x100001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x200000, 0x20ffff).ram();                             // RAM
+	map(0x500000, 0x500001).portr("P1");                 // P1
+	map(0x500002, 0x500003).portr("P2");                 // P2
+	map(0x500004, 0x500005).portr("COINS");              // Coins
+	map(0x500008, 0x50000b).r(FUNC(seta_state::seta_dsw_r));                // DSW
+	map(0x50000d, 0x50000d).lw8(NAME([this] (u8 data) { m_oki_bank->set_entry(bitswap<2>(data, 3, 2)); })); // watchdog has been patched out, Oki bank selection instead. TODO: doesn't work
+	map(0x600001, 0x600001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x600003, 0x600003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x600004, 0x600005).w(FUNC(seta_state::ipl1_ack_w));
+	map(0x600006, 0x600007).w(FUNC(seta_state::ipl2_ack_w));
+	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
+	map(0x800000, 0x803fff).ram().w(m_layers[0], FUNC(x1_012_device::vram_w)).share("layer1"); // VRAM 0&1
+	map(0x880000, 0x883fff).ram().w(m_layers[1], FUNC(x1_012_device::vram_w)).share("layer2"); // VRAM 2&3
+	map(0x900000, 0x900005).rw(m_layers[0], FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));     // VRAM 0&1 Ctrl
+	map(0x980000, 0x980005).rw(m_layers[1], FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));     // VRAM 2&3 Ctrl
+
+	map(0xa00000, 0xa005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));     // Sprites Y
+	map(0xa00600, 0xa00607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
+	map(0xa80000, 0xa80001).ram();                             // ? $4000
+	map(0xb00000, 0xb03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));     // Sprites Code + X + Attr
+	map(0xc00000, 0xc00007).noprw(); // leftover from the PIC of the original
+	map(0xd00000, 0xd03fff).noprw(); // leftover from the X1-010 of the original
+}
+
+void seta_state::madsharkbl_oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr(m_oki_bank);
+}
 
 void magspeed_state::lights_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -2972,52 +2976,6 @@ void seta_state::triplfun_map(address_map &map)
 	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
 	map(0xb00000, 0xb03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));     // Sprites Code + X + Attr
 	map(0xc00400, 0xc00fff).ram().share("paletteram1");  // Palette
-}
-
-
-/***************************************************************************
-                            Pro Mahjong Kiwame
-***************************************************************************/
-
-void kiwame_state::row_select_w(u16 data)
-{
-	m_kiwame_row_select = data & 0x001f;
-}
-
-u16 kiwame_state::input_r(offs_t offset)
-{
-	const int row_select = m_kiwame_row_select;
-	int i;
-
-	for (i = 0; i < 5; i++)
-		if (row_select & (1<<i))    break;
-
-	switch (offset)
-	{
-		case 0x00/2:    return m_key[i]->read();
-		case 0x02/2:    return m_key[i + 5]->read();
-		case 0x04/2:    return m_coins->read();
-//      case 0x06/2:
-		case 0x08/2:    return 0xffff;
-
-		default:
-			logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset * 2);
-			return 0x0000;
-	}
-}
-
-void kiwame_state::kiwame_map(address_map &map)
-{
-	map(0x000000, 0x07ffff).rom();                             // ROM
-	map(0x200000, 0x20ffff).ram().share("nvram");                            // RAM
-	map(0x800000, 0x803fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0x900000, 0x900001).ram();                             // ? 0x4000
-	map(0xa00000, 0xa005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));     // Sprites Y
-	map(0xa00600, 0xa00607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
-	map(0xb00000, 0xb003ff).ram().share("paletteram1");  // Palette
-	map(0xc00000, 0xc03fff).rw(m_x1snd, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xd00000, 0xd00009).r(FUNC(kiwame_state::input_r));                 // mahjong panel
-	map(0xe00000, 0xe00003).r(FUNC(kiwame_state::seta_dsw_r));              // DSW
 }
 
 
@@ -5728,161 +5686,6 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-                            Pro Mahjong Kiwame
-***************************************************************************/
-
-static INPUT_PORTS_START( kiwame )
-	PORT_START("P1") //Unused
-	PORT_START("P2") //Unused
-
-	PORT_START("COINS") //Coins
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(5)
-
-	PORT_START("DSW") //2 DSWs - $e00001 & 3.b
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:4,5,6")
-	PORT_DIPSETTING(      0x0008, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Player's TSUMO" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(      0x0080, "Manual" )
-	PORT_DIPSETTING(      0x0000, "Auto"   )
-
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(  0x0200, IP_ACTIVE_LOW, "SW1:2" )
-	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4,5")
-	PORT_DIPSETTING(      0x1c00, DEF_STR( None ) )
-	PORT_DIPSETTING(      0x1800, "Prelim  1" )
-	PORT_DIPSETTING(      0x1400, "Prelim  2" )
-	PORT_DIPSETTING(      0x1000, "Final   1" )
-	PORT_DIPSETTING(      0x0c00, "Final   2" )
-	PORT_DIPSETTING(      0x0800, "Final   3" )
-	PORT_DIPSETTING(      0x0400, "Qrt Final" )
-	PORT_DIPSETTING(      0x0000, "SemiFinal" )
-	PORT_DIPNAME( 0xe000, 0xe000, "Points Gap" ) PORT_DIPLOCATION("SW1:6,7,8")
-	PORT_DIPSETTING(      0xe000, DEF_STR( None ) )
-	PORT_DIPSETTING(      0xc000, "+6000" )
-	PORT_DIPSETTING(      0xa000, "+4000" )
-	PORT_DIPSETTING(      0x8000, "+2000" )
-	PORT_DIPSETTING(      0x6000, "-2000" )
-	PORT_DIPSETTING(      0x4000, "-4000" )
-	PORT_DIPSETTING(      0x2000, "-6000" )
-	PORT_DIPSETTING(      0x0000, "-8000" )
-
-/*
-        row 0   1   2   3   4
-bit 0       a   b   c   d   lc
-    1       e   f   g   h
-    2       i   j   k   l
-    3       m   n   ch  po  ff
-    4       ka  re  ro
-    5       st  bt
-*/
-
-	PORT_START("KEY0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1  )
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY5")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY6")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY7")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2  )
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY8")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY9")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-
-
-/***************************************************************************
                                 Quiz Kokology
 ***************************************************************************/
 
@@ -8164,6 +7967,7 @@ void downtown_state::twineagl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
 	m_layers[0]->set_xoffsets(-3, 0);
 
@@ -8214,6 +8018,7 @@ void downtown_state::downtown(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
 	m_layers[0]->set_xoffsets(0, -1);
 
@@ -8304,6 +8109,7 @@ void usclssic_state::usclssic(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_usclssic);
+	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_tile_offset_callback(FUNC(usclssic_state::tile_offset));
 	m_layers[0]->set_xoffsets(-1, 0);
 
@@ -8368,6 +8174,7 @@ void downtown_state::calibr50(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_xoffsets(-2, -3);
 
 	PALETTE(config, m_palette).set_entries(512);
@@ -8420,6 +8227,7 @@ void downtown_state::metafox(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
 	m_layers[0]->set_xoffsets(-19, 16);
 
@@ -8517,7 +8325,9 @@ void seta_state::blandia(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(6, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	/* sound hardware */
@@ -8554,7 +8364,9 @@ void seta_state::blandiap(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(6, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	/* sound hardware */
@@ -8668,7 +8480,9 @@ void seta_state::daioh(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -8726,6 +8540,7 @@ void seta_state::drgnunit(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
@@ -8813,6 +8628,7 @@ void setaroul_state::setaroul(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_setaroul).set_xoffsets(0, 5);
+	m_layers[0]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
 
 	/* sound hardware */
@@ -8857,7 +8673,9 @@ void seta_state::eightfrc(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -8905,7 +8723,9 @@ void seta_state::extdwnhl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	/* sound hardware */
@@ -8972,7 +8792,9 @@ void seta_state::gundhara(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	/* sound hardware */
@@ -8998,7 +8820,7 @@ void zombraid_state::machine_start()
 void zombraid_state::zombraid(machine_config &config)
 {
 	gundhara(config);
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate());
+	MCFG_MACHINE_START_REMOVE()
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &zombraid_state::zombraid_map);
@@ -9047,7 +8869,9 @@ void seta_state::jjsquawk(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1).set_xoffsets(-1, -1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2).set_xoffsets(-1, -1);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	/* sound hardware */
@@ -9081,7 +8905,9 @@ void seta_state::jjsquawb(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawkb_layer1).set_xoffsets(-1, -1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawkb_layer2).set_xoffsets(-1, -1);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	/* sound hardware */
@@ -9127,7 +8953,9 @@ void seta_state::kamenrid(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9241,8 +9069,8 @@ void seta_state::krzybowl(machine_config &config)
 	m_spritegen->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 0); // correct (test grid)
-	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
-	m_spritegen->set_bg_yoffsets(0x1, -0x1);
+	m_spritegen->set_fg_yoffsets(-0x06, 0x0e);
+	m_spritegen->set_bg_yoffsets(-0x3, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9298,7 +9126,9 @@ void seta_state::madshark(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	/* sound hardware */
@@ -9308,6 +9138,42 @@ void seta_state::madshark(machine_config &config)
 	m_x1snd->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
+void seta_state::madsharkbl(machine_config &config) // bootleg doesn't actually use the Seta customs
+{
+	/* basic machine hardware */
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::madsharkbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
+
+	X1_001(config, m_spritegen, 16000000, m_palette, gfx_sprites);
+	m_spritegen->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_spritegen->set_fg_xoffsets(0, 0); // unknown (wrong when flipped, but along y)
+	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
+	m_spritegen->set_bg_yoffsets(0x1, -0x1);
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
+
+	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
+	m_layers[0]->set_screen(m_screen);
+	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
+	m_layers[1]->set_screen(m_screen);
+	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	OKIM6295(config, m_oki, 1'000'000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->set_addrmap(0, &seta_state::madsharkbl_oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
                                 Magical Speed
@@ -9353,7 +9219,9 @@ void magspeed_state::magspeed(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(0, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9399,7 +9267,9 @@ void seta_state::msgundam(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9444,7 +9314,9 @@ void seta_state::oisipuzl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-1, -1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-1, -1);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	set_tilemaps_flip(1); // flip is inverted for the tilemaps
@@ -9489,7 +9361,9 @@ void seta_state::triplfun(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-1, -1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-1, -1);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	set_tilemaps_flip(1); // flip is inverted for the tilemaps
@@ -9501,56 +9375,6 @@ void seta_state::triplfun(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", 792000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-
-/***************************************************************************
-                            Pro Mahjong Kiwame
-***************************************************************************/
-
-WRITE_LINE_MEMBER(kiwame_state::kiwame_vblank)
-{
-	if (state)
-		m_maincpu->external_interrupt_0();
-}
-
-void kiwame_state::kiwame(machine_config &config)
-{
-	// TODO: determine actual CPU, video and sound clocks (only XTAL is 20 MHz)
-
-	/* basic machine hardware */
-	TMP68301(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kiwame_state::kiwame_map);
-	m_maincpu->out_parallel_callback().set(FUNC(kiwame_state::row_select_w));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	X1_001(config, m_spritegen, 16000000, m_palette, gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(kiwame_state::setac_gfxbank_callback));
-	// position kludges
-	m_spritegen->set_fg_xoffsets(-16, 0); // correct (test grid)
-	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
-	m_spritegen->set_bg_yoffsets(0x1, -0x1);
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 56*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(kiwame_state::screen_update_seta_no_layers));
-	screen.screen_vblank().set(FUNC(kiwame_state::kiwame_vblank));
-	screen.set_palette(m_palette);
-
-	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	X1_010(config, m_x1snd, 16000000);
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
 }
 
 
@@ -9586,7 +9410,9 @@ void seta_state::rezon(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9825,7 +9651,9 @@ void seta_state::utoukond(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(0, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9885,7 +9713,9 @@ void seta_state::wrofaero(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9931,7 +9761,9 @@ void seta_state::zingzip(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -1);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	/* sound hardware */
@@ -10024,7 +9856,9 @@ void seta_state::crazyfgt(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(0, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(0, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	/* sound hardware */
@@ -10105,6 +9939,7 @@ void jockeyc_state::jockeyc(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(126, -2);
+	m_layers[0]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
 
 	/* sound hardware */
@@ -11532,23 +11367,6 @@ ROM_START( eightfrc )
 	ROM_LOAD( "uy-017.u116", 0xa00, 0x104, NO_DUMP )
 ROM_END
 
-ROM_START( kiwame )
-	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "fp001001.bin", 0x000000, 0x040000, CRC(31b17e39) SHA1(4f001bf365d6c259ac8a13894e207a44c15e1d8b) )
-	ROM_LOAD16_BYTE( "fp001002.bin", 0x000001, 0x040000, CRC(5a6e2efb) SHA1(a3b2ecfb5b91c6013370b359f89db0da8f120ad9) )
-
-	ROM_REGION( 0x080000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "fp001003.bin", 0x000000, 0x080000, CRC(0f904421) SHA1(de5810746cfab1a4a7d1b055b1a97bc7fbc173dd) )
-
-	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "fp001006.bin", 0x000000, 0x080000, CRC(96cf395d) SHA1(877b291598e3a42e5003b2f50a16d162348ce72d) )
-	ROM_LOAD( "fp001005.bin", 0x080000, 0x080000, CRC(65b5fe9a) SHA1(35605be00c7c455551d18386fcb5ad013aa2907e) )
-
-	// default NVRAM, avoids "BACKUP RAM ERROR" at boot (useful for inp record/playback)
-	ROM_REGION( 0x10000, "nvram", 0 )
-	ROM_LOAD( "nvram.bin", 0, 0x10000, CRC(1f719400) SHA1(c63bbe5d3a0a917f74c1bd5e57cd44389e4e645c) )
-ROM_END
-
 ROM_START( krzybowl )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "fv001.002", 0x000000, 0x040000, CRC(8c03c75f) SHA1(e56c50440681a0b06d785000018c4213266f2a4e) )
@@ -11904,7 +11722,7 @@ ROM_START( madshark )
 
 	ROM_REGION( 0x300000, "user1", 0 )  /* Layers 1+2 */
 	ROM_LOAD24_WORD_SWAP( "fq001006.152", 0x000001, 0x200000, CRC(3bc5e8e4) SHA1(74cdf1bb2e58bef29c6f4371ff40f64472bff3ce) )
-	ROM_LOAD24_BYTE     ( "fq001005.205", 0x000000, 0x100000, CRC(5f6c6d4a) SHA1(eed5661738282a14ce89917335fd1b695eb7351e) )
+	ROM_LOAD24_BYTE     ( "fq001005.205", 0x000000, 0x100000, CRC(5f6c6d4a) SHA1(eed5661738282a14ce89917335fd1b695eb7351e) ) // 1xxxxxxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x180000, "gfx2", 0 )   /* Layer 1 */
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x180000 )
@@ -11921,6 +11739,35 @@ ROM_START( madshark )
 	ROM_LOAD( "fq-010.u52", 0x400, 0x104, NO_DUMP )
 	ROM_LOAD( "fq-011.u53", 0x600, 0x104, NO_DUMP )
 	ROM_LOAD( "fq-012.u54", 0x800, 0x104, NO_DUMP )
+ROM_END
+
+// same PCB as Triple Fun
+ROM_START( madsharkbl )
+	ROM_REGION( 0x180000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "prog2.040",  0x000000, 0x080000, CRC(210e5771) SHA1(3c392cf34b1fb071ba9267c9a6dfd0e015f71c7a) )
+	ROM_LOAD16_BYTE( "prog1.040",  0x000001, 0x080000, CRC(dca34f11) SHA1(a8012bf57cc61f9a8106472c5f4bf768ee1cd633) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   // Sprites
+	ROM_LOAD16_BYTE( "gfx2.3.040", 0x000000, 0x080000, BAD_DUMP CRC(8e1f5e4e) SHA1(e55718cf00aa44bd6e67faa7b69d54a669cc01f8) ) // ROM wouldn't read correctly, taken from original and split
+	ROM_LOAD16_BYTE( "gfx2.1.040", 0x000001, 0x080000, BAD_DUMP CRC(97cae9ce) SHA1(8031dfb2429861fea2c30541be48d270a8a021cf) ) // suspect dump, fq001004.202 [odd 2/2]  99.999809%, just one single bit (!) difference
+	ROM_LOAD16_BYTE( "gfx2.4.040", 0x100000, 0x080000, BAD_DUMP CRC(921e8b4c) SHA1(d022da7b76cae9413ab64cb9e34f0c000710d408) ) // ROM wouldn't read correctly, taken from original and split
+	ROM_LOAD16_BYTE( "gfx2.2.040", 0x100001, 0x080000, CRC(b22c8227) SHA1(295c2377db4402e1ab5d491f1dfd5a30ef022934) )
+
+	ROM_REGION( 0x300000, "user1", ROMREGION_ERASE00 )  // Layers 1+2
+	ROM_LOAD24_BYTE( "center.040", 0x000000, 0x080000, CRC(6210413f) SHA1(466580b20ba8e7beac9c386854ffad49fc3956c4) )
+	ROM_LOAD24_BYTE( "gfx1.3.040", 0x000001, 0x080000, CRC(91735a7a) SHA1(68f8ea29998a9b56b581a0b5f370c82547b4a331) )
+	ROM_LOAD24_BYTE( "gfx1.1.040", 0x000002, 0x080000, CRC(ef10d0ee) SHA1(5245f4e9cc89c8f7d1e43f9e169f1bf177791522) )
+	ROM_LOAD24_BYTE( "gfx1.4.040", 0x180001, 0x080000, CRC(8ebf40da) SHA1(0f5885ea04247b3bc1d1a2d6f53fab3e55b7fbeb) )
+	ROM_LOAD24_BYTE( "gfx1.2.040", 0x180002, 0x080000, CRC(81502591) SHA1(92c113c1e4d322d56e93ef7e0d7a40495f811884) )
+
+	ROM_REGION( 0x180000, "gfx2", 0 )   // Layer 1
+	ROM_COPY( "user1", 0x000000, 0x000000, 0x180000 )
+
+	ROM_REGION( 0x180000, "gfx3", 0 )   // Layer 2
+	ROM_COPY( "user1", 0x180000, 0x000000, 0x180000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // Samples
+	ROM_LOAD( "oki.040", 0x00000, 0x80000, CRC(b12ff374) SHA1(ca959f95bccdf453a13a1796aeeb5364503ad7bc) )
 ROM_END
 
 ROM_START( magspeed )
@@ -12472,7 +12319,7 @@ u16 downtown_state::metafox_protection_r(offs_t offset)
 	// the first address in each range is special and returns data written elsewhere in that range
 	// 21fde0-21fdff appears to be control bytes?
 
-	// Protection device is a surface-scratched SDIP64 on the P1-049-A sub PCB
+	// Protection device (likely X1-017) is a surface-scratched SDIP64 on the P1-049-A sub PCB
 
 	switch (offset)
 	{
@@ -12499,6 +12346,11 @@ void downtown_state::init_metafox()
 void seta_state::init_bankx1()
 {
 	m_x1_bank->configure_entries(0, 8, memregion("x1snd")->base(), 0x40000);
+}
+
+void seta_state::init_madsharkbl()
+{
+	m_oki_bank->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
 }
 
 void seta_state::init_eightfrc()
@@ -12649,6 +12501,7 @@ GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_ini
 GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race / Kamen Rider Club Battle Racer", 0 )
 
 GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_init,     ROT270, "Allumer",                   "Mad Shark", 0 )
+GAME( 1993, madsharkbl,madshark, madsharkbl,madshark,  seta_state,     init_madsharkbl,ROT270, "bootleg",                   "Mad Shark (bootleg)", MACHINE_IMPERFECT_SOUND ) // no BGM. Wrong Oki banking?
 
 // end credits shows Allumer as developer.
 GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam", 0 )
@@ -12665,8 +12518,6 @@ GAME( 1993, utoukond,  0,        utoukond,  utoukond,  seta_state,     empty_ini
 GAME( 1993, wrofaero,  0,        wrofaero,  wrofaero,  seta_state,     empty_init,     ROT270, "Yang Cheng",                "War of Aero - Project MEIOU", 0 )
 
 GAME( 1994, eightfrc,  0,        eightfrc,  eightfrc,  seta_state,     init_eightfrc,  ROT90,  "Tecmo",                     "Eight Forces", 0 )
-
-GAME( 1994, kiwame,    0,        kiwame,    kiwame,    kiwame_state,   empty_init,     ROT0,   "Athena",                    "Pro Mahjong Kiwame", 0 )
 
 GAME( 1994, krzybowl,  0,        krzybowl,  krzybowl,  seta_state,     empty_init,     ROT270, "American Sammy",            "Krazy Bowl", 0 )
 

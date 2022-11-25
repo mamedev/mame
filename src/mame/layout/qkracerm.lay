@@ -4,23 +4,23 @@ license:CC0
 -->
 <mamelayout version="2">
 
-	<!-- define elements -->
+<!-- define elements -->
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.3" blue="0.2" /></led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 
 	<element name="seg_rect" defstate="0">
-		<rect state="1"><color red="1.0" green="0.3" blue="0.2" /></rect>
-		<rect state="0"><color red="0.125490" green="0.035294" blue="0.0235294" /></rect>
+		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="0"><color red="0.125" green="0.012" blue="0.019" /></rect>
 	</element>
 	<element name="seg_x1" defstate="0">
-		<text string="/" state="1"><color red="1.0" green="0.3" blue="0.2" /></text>
-		<text string="/" state="0"><color red="0.125490" green="0.035294" blue="0.0235294" /></text>
+		<text string="/" state="1"><color red="1.0" green="0.1" blue="0.15" /></text>
+		<text string="/" state="0"><color red="0.125" green="0.012" blue="0.019" /></text>
 	</element>
 	<element name="seg_x2" defstate="0">
-		<text string="&#x5c;" state="1"><color red="1.0" green="0.3" blue="0.2" /></text>
-		<text string="&#x5c;" state="0"><color red="0.125490" green="0.035294" blue="0.0235294" /></text>
+		<text string="&#x5c;" state="1"><color red="1.0" green="0.1" blue="0.15" /></text>
+		<text string="&#x5c;" state="0"><color red="0.125" green="0.012" blue="0.019" /></text>
 	</element>
 
 	<element name="gled" defstate="0">
@@ -32,7 +32,7 @@ license:CC0
 	</element>
 
 
-	<!-- build screen -->
+<!-- build screen -->
 
 	<view name="Internal Layout">
 		<bounds left="0" right="93.5" top="0" bottom="15" />
@@ -50,7 +50,6 @@ license:CC0
 		<element name="digit7" ref="digit"><bounds x="70" y="0" width="10" height="15" /></element>
 
 		<!-- math symbols custom digit -->
-
 		<element name="2.4" ref="seg_rect"><bounds x="21.5" y="7.25" width="7" height="0.5" /></element>
 
 		<element name="2.0" ref="seg_rect"><bounds x="24.75" y="0.9" width="0.5" height="5.75" /></element>

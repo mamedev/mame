@@ -9,8 +9,8 @@
     04/05/2008 Created by Miodrag Milanovic
 
 *********************************************************************/
-#ifndef MAME_MACHINE_BETA_H
-#define MAME_MACHINE_BETA_H
+#ifndef MAME_SINCLAIR_BETA_H
+#define MAME_SINCLAIR_BETA_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 DECLARE_DEVICE_TYPE(BETA_DISK, beta_disk_device)
 
 
-#endif // MAME_MACHINE_BETA_H
+#endif // MAME_SINCLAIR_BETA_H

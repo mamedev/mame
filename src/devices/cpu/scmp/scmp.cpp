@@ -132,15 +132,10 @@ uint16_t scmp_device::GET_ADDR(uint8_t code)
 	uint16_t ptr = GET_PTR_REG(code & 0x03)->w.l;
 
 	uint8_t arg = ARG();
-	if (arg == 0x80) {
+	if (arg == 0x80)
 		offset = m_ER;
-	} else {
-		if (arg & 0x80) {
-			offset = (int8_t)arg;
-		} else {
-			offset = arg;
-		}
-	}
+	else
+		offset = (int8_t)arg;
 
 	addr = ADD12(ptr,offset);
 

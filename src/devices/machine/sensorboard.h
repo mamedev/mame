@@ -88,7 +88,7 @@ protected:
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
-	virtual bool nvram_can_write() override;
+	virtual bool nvram_can_write() const override;
 
 private:
 	output_finder<0x10, 0x10> m_out_piece;
@@ -129,7 +129,7 @@ private:
 	u32 m_usize;
 
 	bool m_nvram_auto;
-	bool nvram_on();
+	bool nvram_on() const;
 
 	emu_timer *m_undotimer;
 	TIMER_CALLBACK_MEMBER(undo_tick);

@@ -4,7 +4,7 @@
 
   MAME/MESS NES APU CORE
 
-  Based on the Nofrendo/Nosefart NES N2A03 sound emulation core written by
+  Based on the Nofrendo/Nosefart NES RP2A03 sound emulation core written by
   Matthew Conte (matt@conte.com) and redesigned for use in MAME/MESS by
   Who Wants to Know? (wwtk@mail.com)
 
@@ -86,7 +86,7 @@ struct apu_t
 		}
 
 		u8 regs[4]; /* regs[1] unused */
-		u32 seed = 1;
+		u16 lfsr = 1;
 		int vbl_length = 0;
 		float phaseacc = 0.0;
 		float env_phase = 0.0;

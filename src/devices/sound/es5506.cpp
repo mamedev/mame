@@ -1208,32 +1208,32 @@ inline void es5506_device::reg_write_high(es550x_voice *voice, offs_t offset, u3
 			break;
 
 		case 0x20/8:    /* O4(n-1) */
-			voice->o4n1 = (s32)(data << 14) >> 14;
+			voice->o4n1 = util::sext(data, 18);
 			LOG("voice %d, O4(n-1)=%05x\n", m_current_page & 0x1f, voice->o4n1 & 0x3ffff);
 			break;
 
 		case 0x28/8:    /* O3(n-1) */
-			voice->o3n1 = (s32)(data << 14) >> 14;
+			voice->o3n1 = util::sext(data, 18);
 			LOG("voice %d, O3(n-1)=%05x\n", m_current_page & 0x1f, voice->o3n1 & 0x3ffff);
 			break;
 
 		case 0x30/8:    /* O3(n-2) */
-			voice->o3n2 = (s32)(data << 14) >> 14;
+			voice->o3n2 = util::sext(data, 18);
 			LOG("voice %d, O3(n-2)=%05x\n", m_current_page & 0x1f, voice->o3n2 & 0x3ffff);
 			break;
 
 		case 0x38/8:    /* O2(n-1) */
-			voice->o2n1 = (s32)(data << 14) >> 14;
+			voice->o2n1 = util::sext(data, 18);
 			LOG("voice %d, O2(n-1)=%05x\n", m_current_page & 0x1f, voice->o2n1 & 0x3ffff);
 			break;
 
 		case 0x40/8:    /* O2(n-2) */
-			voice->o2n2 = (s32)(data << 14) >> 14;
+			voice->o2n2 = util::sext(data, 18);
 			LOG("voice %d, O2(n-2)=%05x\n", m_current_page & 0x1f, voice->o2n2 & 0x3ffff);
 			break;
 
 		case 0x48/8:    /* O1(n-1) */
-			voice->o1n1 = (s32)(data << 14) >> 14;
+			voice->o1n1 = util::sext(data, 18);
 			LOG("voice %d, O1(n-1)=%05x\n", m_current_page & 0x1f, voice->o1n1 & 0x3ffff);
 			break;
 

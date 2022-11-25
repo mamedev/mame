@@ -1,38 +1,43 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood,Stephane Humbert
+// copyright-holders:Luca Elia, David Haywood, Stephane Humbert
 /* Kaneko 'Calc' hitbox collision / protection
 
-   It is thought that this is done by the 'CALC1' 'TOYBOX' and 'CALC3' protection chips found on the various boards
-   however we have 3 implementations, and they don't quite pair up with the chips at the moment, this might be
-   because our implementations are wrong / incomplete, or in some cases the newer chips are backwards compatible.
+It is thought that this is done by the 'CALC1' 'TOYBOX' and 'CALC3' protection chips found on the various boards
+however we have 3 implementations, and they don't quite pair up with the chips at the moment, this might be
+because our implementations are wrong / incomplete, or in some cases the newer chips are backwards compatible.
 
-   galpanica  - CALC1   - type 0
-   sandscrp   - CALC1   - type 0 ( only uses Random Number? )
-   bonkadv    - TOYBOX  - type 0 ( only uses Random Number, XY Overlap Collision bit and register '0x02' )
-   gtmr       - TOYBOX  - type 1 ( only uses Random Number )
-   gtmr2      - TOYBOX  - type 1 ( only uses Random Number )
-   bloodwar   - TOYBOX  - type 1
-   shogwarr   - CALC3   - type 1
-   brapboys   - CALC3   - type 2
+airbustr   - CALC1   - type 0
+expro02    - CALC1   - type 0
+galpanica  - CALC1   - type 0
+sandscrp   - CALC1   - type 0 ( only uses Random Number? )
+bonkadv    - TOYBOX  - type 0 ( only uses Random Number, XY Overlap Collision bit and register '0x02' )
+gtmr       - TOYBOX  - type 1 ( only uses Random Number )
+gtmr2      - TOYBOX  - type 1 ( only uses Random Number )
+bloodwar   - TOYBOX  - type 1
+shogwarr   - CALC3   - type 1
+brapboys   - CALC3   - type 2
 
-   note: shogwarr won't work with our brapboys implementation despite them being the same PCB and same MCU, this
-         suggests that at least one of the implementations is wrong
+note: shogwarr won't work with our brapboys implementation despite them being the same PCB and same CALC chip,
+this suggests that at least one of the implementations is wrong
 
-   suprnova.c also has a similar device, the implementation hasn't been fully compared
+suprnova.cpp also has a similar device, the implementation hasn't been fully compared
 
-  CALC1 is a 40 pin DIP ULA with no internal ROM
+CALC1 is a 40 pin DIP ULA with no internal ROM
+
+TODO:
+- change to 3 devices, it's not like m_hittype can be changed on the fly
+- is watchdog used by any driver? if not, watchdog device can be moved to here
 
 */
-
 
 #include "emu.h"
 #include "kaneko_hit.h"
 
 DEFINE_DEVICE_TYPE(KANEKO_HIT, kaneko_hit_device, "kaneko_hit", "Kaneko CALC Hitbox")
 
-kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KANEKO_HIT, tag, owner, clock),
-		m_watchdog(*this, "^watchdog")
+kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, KANEKO_HIT, tag, owner, clock),
+	m_watchdog(*this, "^watchdog")
 {
 	m_hittype = -1;
 	memset(&m_hit, 0, sizeof m_hit);
@@ -132,11 +137,14 @@ void kaneko_hit_device::kaneko_hit_w(offs_t offset, uint16_t data, uint16_t mem_
 	}
 }
 
+
 /*********************************************************************
  TYPE 0
- galpanica
- sandscrp
- bonkadv
+ * airbustr
+ * expro02
+ * galpanica
+ * sandscrp
+ * bonkadv
 *********************************************************************/
 
 uint16_t kaneko_hit_device::kaneko_hit_type0_r(offs_t offset)
@@ -220,8 +228,8 @@ void kaneko_hit_device::kaneko_hit_type0_w(offs_t offset, uint16_t data, uint16_
 
 /*********************************************************************
  TYPE 1
- shogwarr
- bloorwar
+ * shogwarr
+ * bloorwar
 *********************************************************************/
 
 uint16_t kaneko_hit_device::kaneko_hit_type1_r(offs_t offset)
@@ -229,7 +237,6 @@ uint16_t kaneko_hit_device::kaneko_hit_type1_r(offs_t offset)
 	calc1_hit_t &hit = m_hit;
 	uint16_t data = 0;
 	int16_t x_coll, y_coll;
-
 
 	x_coll = calc_compute_x(hit);
 	y_coll = calc_compute_y(hit);
@@ -354,9 +361,8 @@ int16_t kaneko_hit_device::calc_compute_y(calc1_hit_t &hit)
 
 /*********************************************************************
  TYPE 2
- brapboys
+ * brapboys
 *********************************************************************/
-
 
 void kaneko_hit_device::kaneko_hit_type2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -369,54 +375,54 @@ void kaneko_hit_device::kaneko_hit_type2_w(offs_t offset, uint16_t data, uint16_
 		// p is position, s is size
 		case 0x00:
 		case 0x28:
-
-					hit3.x1po = data; break;
+			hit3.x1po = data; break;
 
 		case 0x04:
 		case 0x2c:
-					hit3.x1so = data; break;
+			hit3.x1so = data; break;
 
 		case 0x08:
 		case 0x30:
-					hit3.y1po = data; break;
+			hit3.y1po = data; break;
 
 		case 0x0c:
 		case 0x34:
-					hit3.y1so = data; break;
+			hit3.y1so = data; break;
 
 		case 0x10:
 		case 0x58:
-					hit3.x2po = data; break;
+			hit3.x2po = data; break;
 
 		case 0x14:
 		case 0x5c:
-					hit3.x2so = data; break;
+			hit3.x2so = data; break;
 
 		case 0x18:
 		case 0x60:
-					hit3.y2po = data; break;
+			hit3.y2po = data; break;
 
 		case 0x1c:
 		case 0x64:
-					hit3.y2so = data; break;
+			hit3.y2so = data; break;
 
 		case 0x38:
 		case 0x50:
-					hit3.z1po = data; break;
+			hit3.z1po = data; break;
+
 		case 0x3c:
 		case 0x54:
-					hit3.z1so = data; break;
+			hit3.z1so = data; break;
 
 		case 0x20:
 		case 0x68:
-					hit3.z2po = data; break;
+			hit3.z2po = data; break;
 
 		case 0x24:
 		case 0x6c:
-					hit3.z2so = data; break;
+			hit3.z2so = data; break;
 
 		case 0x70:
-					hit3.mode=data;break;
+			hit3.mode = data; break;
 
 		default:
 			logerror("%s warning - write unmapped hit address %06x [ %06x] = %06x\n",machine().describe_context(),offset<<1, idx, data);
@@ -477,7 +483,7 @@ uint16_t kaneko_hit_device::kaneko_hit_type2_r(offs_t offset)
 	return 0;
 }
 
-//calculate simple intersection of two segments
+// calculate simple intersection of two segments
 
 int kaneko_hit_device::type2_calc_compute(int x1, int w1, int x2, int w2)
 {
@@ -485,21 +491,21 @@ int kaneko_hit_device::type2_calc_compute(int x1, int w1, int x2, int w2)
 
 	if(x2>=x1 && x2+w2<=(x1+w1))
 	{
-		//x2 inside x1
+		// x2 inside x1
 		dist=w2;
 	}
 	else
 	{
 		if(x1>=x2 && x1+w1<=(x2+w2))
 		{
-			//x1 inside x2
+			// x1 inside x2
 			dist=w1;
 		}
 		else
 		{
 			if(x2<x1)
 			{
-				//swap
+				// swap
 				int tmp=x1;
 				x1=x2;
 				x2=tmp;
@@ -513,7 +519,7 @@ int kaneko_hit_device::type2_calc_compute(int x1, int w1, int x2, int w2)
 	return dist;
 }
 
-//calc segment coordinates
+// calc segment coordinates
 
 void kaneko_hit_device::type2_calc_org(int mode, int x0, int s0,  int* x1, int* s1)
 {
@@ -524,12 +530,12 @@ void kaneko_hit_device::type2_calc_org(int mode, int x0, int s0,  int* x1, int* 
 		case 2: *x1=x0-s0; *s1=s0; break;
 		case 3: *x1=x0-s0; *s1=2*s0; break;
 	}
-	//x1 is the left most coord, s1 = width
+	// x1 is the left most coord, s1 = width
 }
 
 void kaneko_hit_device::type2_recalc_collisions(calc3_hit_t &hit3)
 {
-	//calculate positions and sizes
+	// calculate positions and sizes
 
 	int mode=hit3.mode;
 
@@ -543,16 +549,13 @@ void kaneko_hit_device::type2_recalc_collisions(calc3_hit_t &hit3)
 	type2_calc_org((mode>>10)&3, hit3.y2po, hit3.y2so, &hit3.y2p, &hit3.y2s);
 	type2_calc_org((mode>>12)&3, hit3.z2po, hit3.z2so, &hit3.z2p, &hit3.z2s);
 
-
 	hit3.x1tox2=abs(hit3.x2po-hit3.x1po);
 	hit3.y1toy2=abs(hit3.y2po-hit3.y1po);
 	hit3.z1toz2=abs(hit3.z2po-hit3.z1po);
 
-
 	hit3.x_coll = type2_calc_compute(hit3.x1p, hit3.x1s, hit3.x2p, hit3.x2s);
 	hit3.y_coll = type2_calc_compute(hit3.y1p, hit3.y1s, hit3.y2p, hit3.y2s);
 	hit3.z_coll = type2_calc_compute(hit3.z1p, hit3.z1s, hit3.z2p, hit3.z2s);
-
 
 	// 4th nibble: Y Absolute Collision -> possible values = 9,8,4,3,2
 	if      (hit3.y1p >  hit3.y2p)  hit3.flags |= 0x2000;

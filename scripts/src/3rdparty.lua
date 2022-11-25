@@ -1052,6 +1052,12 @@ end
 
 	configuration { }
 
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 150000 then
+		buildoptions_c {
+			"-Wno-strict-prototypes",
+		}
+	end
+
 	files {
 		MAME_DIR .. "3rdparty/portmidi/pm_common/portmidi.c",
 		MAME_DIR .. "3rdparty/portmidi/pm_common/pmutil.c",

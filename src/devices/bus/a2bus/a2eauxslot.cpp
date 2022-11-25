@@ -2,9 +2,8 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-  a2eauxslot.c - Apple IIe auxiliary slot and card emulation
-
-  by R. Belmont
+    a2eauxslot.cpp - Apple IIe auxiliary slot and card emulation
+    by R. Belmont
 
 ***************************************************************************/
 

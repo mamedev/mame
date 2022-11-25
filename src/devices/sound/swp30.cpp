@@ -301,11 +301,6 @@ void swp30_device::device_reset()
 	m_waverom_val = 0;
 }
 
-void swp30_device::rom_bank_updated()
-{
-	// Nothing to do, stream is synchronous
-}
-
 void swp30_device::map(address_map &map)
 {
 	map(0x0000, 0x1fff).rw(FUNC(swp30_device::snd_r), FUNC(swp30_device::snd_w));

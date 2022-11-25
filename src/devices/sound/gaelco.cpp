@@ -327,7 +327,7 @@ void gaelco_gae1_device::device_clock_changed()
 }
 
 
-void gaelco_gae1_device::rom_bank_updated()
+void gaelco_gae1_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

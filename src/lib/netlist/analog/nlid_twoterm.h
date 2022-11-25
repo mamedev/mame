@@ -312,7 +312,7 @@ namespace netlist::analog
 		NETLIB_IS_TIMESTEP(true)
 		NETLIB_TIMESTEPI()
 		{
-			if (ts_type == time_step_type::FORWARD)
+			if (ts_type == detail::time_step_type::FORWARD)
 			{
 				// G, Ieq
 				const auto      res(m_cap.time_step(m_C(), deltaV(), step));
@@ -584,7 +584,7 @@ namespace netlist::analog
 
 		NETLIB_TIMESTEPI()
 		{
-			if (ts_type == time_step_type::FORWARD)
+			if (ts_type == detail::time_step_type::FORWARD)
 			{
 				m_t += step;
 				m_funcparam[0] = m_t;
@@ -637,7 +637,7 @@ namespace netlist::analog
 		NETLIB_IS_TIMESTEP(!m_func().empty())
 		NETLIB_TIMESTEPI()
 		{
-			if (ts_type == time_step_type::FORWARD)
+			if (ts_type == detail::time_step_type::FORWARD)
 			{
 				m_t += step;
 				m_funcparam[0] = m_t;

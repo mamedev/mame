@@ -13,27 +13,30 @@ Auto Response Board (ARB) overview:
 - PCB label AV001C01 REV A
 
 The electronic magnetic chessboard is the first of its kind. AVE later licensed
-it to Fidelity (see fidel_elite.cpp).
+it to Fidelity (see fidelity/elite.cpp).
 ARB is a romless system, the program ROM is on a cartridge.
 
-Known chess modules (*denotes not dumped yet):
-- Sargon 2.5
-- *Grand Master Series 3
-- *Grand Master Series 3.5
+Known chess modules:
+- Grand Master Series 3
 - Grand Master Series 4.0
+- Sargon 2.5
+- Sargon 3.5 (unofficial)
 
 Other games:
 - Avelan (checkers)
 
-Newer modules included button label stickers for OPTIONS, Verify, Take Back, Clear.
+Sandy Electronic renamed GMS 3 and GMS 4.0 to "3000 GMS" and "4,0 - 50 S".
+Sargon 3.5 was an unofficial module published by them. It was also a free EPROM
+upgrade for their customers who were unhappy with GMS 3.
 
-Around 2012, Steve Braid(aka Trilobyte/Steve UK) started manufacturing ARB V2 boards
-without a module slot. CPU and VIA were replaced with new WDC 14MHz-rated chips,
-running at 16MHz.
+GMS 4.0 included button label stickers for OPTIONS, Verify, Take Back, Clear.
+
+Around 2012, Steve Braid(aka Trilobyte/Steve UK) started manufacturing ARB V2
+boards without a module slot. CPU and VIA were replaced with new WDC 14MHz-rated
+chips, running at 16MHz.
 
 TODO:
-- verify gms40 module memory layout
-- gms40 and avelan rom labels
+- avelan, gms3, gms4, sargon35 rom labels
 
 ******************************************************************************/
 
@@ -44,9 +47,9 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/w65c02s.h"
 #include "video/pwm.h"
-#include "machine/sensorboard.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
+#include "machine/sensorboard.h"
 #include "sound/dac.h"
 
 #include "speaker.h"
@@ -78,7 +81,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(halt_button) { m_maincpu->set_input_line(M6502_NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE); update_reset(); }
 	void update_reset();
 
-	// machine configs
 	void arb(machine_config &config);
 	void v2(machine_config &config);
 
@@ -96,20 +98,14 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
-	// address maps
 	void main_map(address_map &map);
 	void v2_map(address_map &map);
 
-	// sensorboard
 	void init_board(int state);
 	bool m_altboard = false;
 
-	// cartridge
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	u8 cartridge_r(offs_t offset);
-	u32 m_cart_mask;
 
-	// I/O handlers
 	void update_display();
 	void leds_w(u8 data);
 	void control_w(u8 data);
@@ -169,8 +165,6 @@ void arb_state::init_board(int state)
 DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
-	m_cart_mask = ((1 << (31 - count_leading_zeros_32(size))) - 1) & 0x7fff;
-
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
@@ -181,11 +175,6 @@ DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 	m_altboard = bool(image.get_feature("altboard"));
 
 	return image_init_result::PASS;
-}
-
-u8 arb_state::cartridge_r(offs_t offset)
-{
-	return m_cart->read_rom(offset & m_cart_mask);
 }
 
 
@@ -246,7 +235,7 @@ u8 arb_state::input_r()
 void arb_state::main_map(address_map &map)
 {
 	// external slot is A0-A14, potential bus conflict with RAM/VIA
-	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(arb_state::cartridge_r));
+	map(0x0000, 0x7fff).mirror(0x8000).r(m_cart, FUNC(generic_slot_device::read_rom));
 	map(0x0000, 0x07ff).mirror(0x1000).ram().share("nvram");
 	map(0x8000, 0x800f).mirror(0x1ff0).m(m_via, FUNC(via6522_device::map));
 }
@@ -276,8 +265,11 @@ static INPUT_PORTS_START( arb )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_0) PORT_NAME("New Game / Options / Pawn / 0")
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, 0)
+
+	PORT_START("CLICKABLE") // helper for clickable artwork
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -329,7 +321,7 @@ void arb_state::arb(machine_config &config)
 	m_via->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb");
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "arb");
 	m_cart->set_device_load(FUNC(arb_state::cart_load));
 	m_cart->set_must_be_loaded(true);
 

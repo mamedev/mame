@@ -924,10 +924,12 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 	if(!ACCESSING_BITS_8_15)
 		address++;
 	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
+
+	m68000_musashi_device *cpuptr = downcast<m68000_musashi_device *>(m_maincpu.target());
+	cpuptr->set_buserror_details(address, rw, cpuptr->get_fc());
+	cpuptr->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	cpuptr->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	m_bus_error_timer->adjust(cpuptr->cycles_to_attotime(16)); // let rmw cycles complete
 	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 
@@ -1543,7 +1545,7 @@ void x68k_state::machine_start()
 	m_led_state = 0;
 }
 
-void x68k_state::driver_init()
+void x68k_state::driver_start()
 {
 	unsigned char* rom = memregion("maincpu")->base();
 	unsigned char* user2 = memregion("user2")->base();
@@ -1577,16 +1579,16 @@ void x68k_state::driver_init()
 	save_item(NAME(m_spritereg));
 }
 
-void x68ksupr_state::driver_init()
+void x68ksupr_state::driver_start()
 {
-	x68k_state::driver_init();
+	x68k_state::driver_start();
 	m_sysport.cputype = 0xfe; // 68000, 16MHz
 	m_is_32bit = false;
 }
 
-void x68030_state::driver_init()
+void x68030_state::driver_start()
 {
-	x68k_state::driver_init();
+	x68k_state::driver_start();
 	m_sysport.cputype = 0xdc; // 68030, 25MHz
 	m_is_32bit = true;
 }

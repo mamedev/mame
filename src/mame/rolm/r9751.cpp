@@ -49,7 +49,7 @@
 
 /* Core includes */
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/terminal.h"
 
 #include "machine/nscsi_bus.h"

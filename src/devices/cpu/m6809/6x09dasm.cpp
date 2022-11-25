@@ -155,8 +155,8 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x08)
 			util::stream_format(stream, "%sDP", (pb&0xf0)?",":"");
 		if (pb & 0x04)
-			util::stream_format(stream, "%sB",  (pb&0xf8)?",":"");
-		if (pb & 0x02)
+			util::stream_format(stream, "%s%s", (pb&0xf8)?",":"", (pb & 0x02) ? "D" : "B");
+		else if (pb & 0x02)
 			util::stream_format(stream, "%sA",  (pb&0xfc)?",":"");
 		if (pb & 0x01)
 			util::stream_format(stream, "%sCC", (pb&0xfe)?",":"");
@@ -168,8 +168,8 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x01)
 			util::stream_format(stream, "CC");
 		if (pb & 0x02)
-			util::stream_format(stream, "%sA",  (pb&0x01)?",":"");
-		if (pb & 0x04)
+			util::stream_format(stream, "%s%s", (pb&0x01)?",":"", (pb & 0x04) ? "D" : "A");
+		else if (pb & 0x04)
 			util::stream_format(stream, "%sB",  (pb&0x03)?",":"");
 		if (pb & 0x08)
 			util::stream_format(stream, "%sDP", (pb&0x07)?",":"");

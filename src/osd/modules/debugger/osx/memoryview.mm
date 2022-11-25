@@ -212,20 +212,22 @@
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
 	debug_view_memory *const memView = downcast<debug_view_memory *>(view);
-	node->set_attribute_int("reverse", memView->reverse() ? 1 : 0);
-	node->set_attribute_int("addressmode", memView->physical() ? 1 : 0);
-	node->set_attribute_int("dataformat", int(memView->get_data_format()));
-	node->set_attribute_int("rowchunks", memView->chunks_per_row());
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, memView->reverse() ? 1 : 0);
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_MODE, memView->physical() ? 1 : 0);
+	node->get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_RADIX, memView->address_radix());
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_DATA_FORMAT, int(memView->get_data_format()));
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ROW_CHUNKS, memView->chunks_per_row());
 }
 
 
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	[super restoreConfigurationFromNode:node];
 	debug_view_memory *const memView = downcast<debug_view_memory *>(view);
-	memView->set_reverse(0 != node->get_attribute_int("reverse", memView->reverse() ? 1 : 0));
-	memView->set_physical(0 != node->get_attribute_int("addressmode", memView->physical() ? 1 : 0));
-	memView->set_data_format(debug_view_memory::data_format(node->get_attribute_int("dataformat", int(memView->get_data_format()))));
-	memView->set_chunks_per_row(node->get_attribute_int("rowchunks", memView->chunks_per_row()));
+	memView->set_reverse(0 != node->get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, memView->reverse() ? 1 : 0));
+	memView->set_physical(0 != node->get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_MODE, memView->physical() ? 1 : 0));
+	memView->set_address_radix(node->get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_RADIX, memView->address_radix()));
+	memView->set_data_format(debug_view_memory::data_format(node->get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_DATA_FORMAT, int(memView->get_data_format()))));
+	memView->set_chunks_per_row(node->get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ROW_CHUNKS, memView->chunks_per_row()));
 }
 
 

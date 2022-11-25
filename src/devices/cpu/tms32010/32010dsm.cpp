@@ -153,9 +153,8 @@ tms32010_disassembler::tms32010_disassembler()
 	const char *const *ops;
 	u16 mask, bits;
 	int bit;
-	int i;
 
-	ops = TMS32010Formats; i = 0;
+	ops = TMS32010Formats;
 	while (*ops)
 	{
 		p = *ops;
@@ -191,7 +190,6 @@ tms32010_disassembler::tms32010_disassembler()
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
-		i++;
 	}
 }
 

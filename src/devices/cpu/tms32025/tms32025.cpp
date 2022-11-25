@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tony La Porta, hap
+// copyright-holders:Tony La Porta
 	/**************************************************************************\
 	*                Texas Instruments TMS320x25 DSP Emulator                  *
 	*                                                                          *
@@ -410,11 +410,11 @@ void tms32025_device::MODIFY_AR_ARP()
 			break;
 
 		case 0x10: /* 001   *-       */
-			m_AR[ARP] -- ;
+			m_AR[ARP]--;
 			break;
 
 		case 0x20: /* 010   *+       */
-			m_AR[ARP] ++ ;
+			m_AR[ARP]++;
 			break;
 
 		case 0x30: /* 011   reserved */
@@ -606,7 +606,7 @@ void tms32025_device::abst()
 		m_ACC.d = -m_ACC.d;
 		if (m_ACC.d == 0x80000000) {
 			SET0(OV_FLAG);
-			if (OVM) m_ACC.d-- ;
+			if (OVM) m_ACC.d--;
 		}
 	}
 	CLR1(C_FLAG);
@@ -714,43 +714,43 @@ void tms32025_device::bacc()
 void tms32025_device::banz()
 {
 	if (m_AR[ARP]) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bbnz()
 {
 	if (TC) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bbz()
 {
 	if (TC == 0) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bc()
 {
 	if (CARRY) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bgez()
 {
 	if ( (int32_t)(m_ACC.d) >= 0 ) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bgz()
 {
 	if ( (int32_t)(m_ACC.d) > 0 ) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bioz()
 {
 	if (m_bio_in() != CLEAR_LINE) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bit()
@@ -768,7 +768,7 @@ void tms32025_device::bitt()
 void tms32025_device::blez()
 {
 	if ( (int32_t)(m_ACC.d) <= 0 ) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::blkd()
@@ -795,21 +795,21 @@ void tms32025_device::blkp()
 }
 void tms32025_device::blz()
 {
-	if ( (int32_t)(m_ACC.d) <  0 ) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	if ( (int32_t)(m_ACC.d) < 0 ) m_PC = m_cache.read_word(m_PC);
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bnc()
 {
 	if (CARRY == 0) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bnv()
 {
 	if (OV == 0) m_PC = m_cache.read_word(m_PC);
 	else {
-		m_PC++ ;
+		m_PC++;
 		CLR0(OV_FLAG);
 	}
 	MODIFY_AR_ARP();
@@ -817,7 +817,7 @@ void tms32025_device::bnv()
 void tms32025_device::bnz()
 {
 	if (m_ACC.d != 0) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bv()
@@ -826,13 +826,13 @@ void tms32025_device::bv()
 		m_PC = m_cache.read_word(m_PC);
 		CLR0(OV_FLAG);
 	}
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bz()
 {
 	if (m_ACC.d == 0) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::cala()
@@ -842,7 +842,7 @@ void tms32025_device::cala()
 }
 void tms32025_device::call()
 {
-	m_PC++ ;
+	m_PC++;
 	PUSH_STACK(m_PC);
 	m_PC = m_cache.read_word(m_PC - 1);
 	MODIFY_AR_ARP();
@@ -855,18 +855,22 @@ void tms32025_device::cmpr()
 {
 	switch (m_opcode.b.l & 3)
 	{
-		case 00:    if ( (uint16_t)(m_AR[ARP]) == (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
-					else CLR1(TC_FLAG);
-					break;
-		case 01:    if ( (uint16_t)(m_AR[ARP]) <  (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
-					else CLR1(TC_FLAG);
-					break;
-		case 02:    if ( (uint16_t)(m_AR[ARP])  > (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
-					else CLR1(TC_FLAG);
-					break;
-		case 03:    if ( (uint16_t)(m_AR[ARP]) != (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
-					else CLR1(TC_FLAG);
-					break;
+		case 0:
+			if ( (uint16_t)(m_AR[ARP]) == (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			else CLR1(TC_FLAG);
+			break;
+		case 1:
+			if ( (uint16_t)(m_AR[ARP]) <  (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			else CLR1(TC_FLAG);
+			break;
+		case 2:
+			if ( (uint16_t)(m_AR[ARP])  > (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			else CLR1(TC_FLAG);
+			break;
+		case 3:
+			if ( (uint16_t)(m_AR[ARP]) != (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			else CLR1(TC_FLAG);
+			break;
 	}
 }
 void tms32025_device::cnfd()  /** next two fetches need to use previous CNF value ! **/
@@ -2057,7 +2061,7 @@ void tms32025_device::execute_run()
 					(this->*s_opcode_main[m_opcode.b.h].function)();
 				}
 				m_init_load_addr = 0;
-				m_RPTC-- ;
+				m_RPTC--;
 			} while ((int8_t)(m_RPTC) != -1);
 			m_RPTC = 0;
 			m_PFC = m_PC;

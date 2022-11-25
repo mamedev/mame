@@ -6,18 +6,20 @@
     Seibu Raiden hardware
 
     Raiden                          (c) 1990 Seibu Kaihatsu
-    Raiden (Alternate Hardware)     (c) 1990 Seibu Kaihatsu
-    Raiden (Korean license)         (c) 1990 Seibu Kaihatsu
-    Raiden (Taiwanese license)      (c) 1990 Seibu Kaihatsu
 
     To access test mode, reset with both start buttons held.
 
-    The country/game mode byte is stored at 0xffffd in the main cpu region,
-    (that's 0x1fffe in program rom 4).
+    There are 3 configuration bytes at 0xffffb, 0xffffd and 0xfffff.
+    The byte at 0xffffb (0x1fffd in program rom 4) controls the appearance of
+    the "Winners Don't Use Drugs" screen:
+        0x00  = Normal
+        0x01  = "Winners Don't Use Drugs" screen appears on boot and between attract loops
+        0x02  = Unknown, identical to 0x00? (seen in raident and raidenk)
 
-    High nibble: Player respawn behavior when single playing
-        0x0*  = If single playing, Restart at checkpoint when every miss
-        0x8*  = Respawn instantly when every miss
+    The byte at 0xffffd (0x1fffe in program rom 4) in the main cpu region controls the
+    country/game mode:
+        bit 7 = if set, respawn instantly; else restart at checkpoint
+        bit 5 = unknown (seen in raidenk)
 
     Low nibble: country/region code
         0x*0  = World/Japan version? (Seibu Kaihatsu) (distributed by Tecmo?)
@@ -26,8 +28,18 @@
         0x*3  = Hong Kong version (Wah Yan Electronics license)
         0x*4  = Korean version (IBL Corporation license)
 
-        There are also strings for Spanish, Greece, Mexico, Middle &
-        South America though it's not clear if they are used.
+        An additional 5 codes are in the newer hardware versions:
+        0x*5  = Spain version (Ichi Funtel, S.A. license)
+        0x*6  = Mexico version
+        0x*7  = Central & South America version
+        0x*8  = Greece version
+        0x*9  = Union Trading Co. license
+
+    The byte at 0xfffff (0x1ffff in program rom 4) controls whether invincibility is enabled:
+        0x00  = Disabled
+        0xFF  = Enabled
+    On sets with the newer hardware, any non-zero value can be used, but setting SW1:7 to On
+    is additionally required.
 
     Common set is main PCB and an OBJ1 daughterboard.
     XTALs: 20MHz, 14.31818MHz, 12MHz
@@ -204,7 +216,7 @@ void raiden_state::sei80bu_encrypted_full_map(address_map &map)
 /*****************************************************************************/
 
 static INPUT_PORTS_START( raiden )
-	SEIBU_COIN_INPUTS /* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS // coin inputs read through sound cpu
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -228,7 +240,7 @@ static INPUT_PORTS_START( raiden )
 	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, "A" )
 	PORT_DIPSETTING(      0x0000, "B" )
-	/* Coin Mode A */
+	// Coin Mode A
 	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0001) PORT_DIPLOCATION("SW1:2,3,4,5")
 	PORT_DIPSETTING(      0x0014, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0x0016, DEF_STR( 5C_1C ) )
@@ -246,7 +258,7 @@ static INPUT_PORTS_START( raiden )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	/* Coin Mode B */
+	// Coin Mode B
 	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW", 0x0001, NOTEQUALS, 0x0001) PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(      0x0000, "5C/1C or Free if Coin B too" )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -293,9 +305,9 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,           /* 8*8 characters */
-	RGN_FRAC(1,1), /* 1024 characters */
-	4,             /* 4 bits per pixel */
+	8,8,           // 8*8 characters
+	RGN_FRAC(1,1), // 1024 characters
+	4,             // 4 bits per pixel
 	{ STEP4(12,-4) },
 	{ STEP4(0,1), STEP4(16,1) },
 	{ STEP8(0,16*2) },
@@ -304,9 +316,9 @@ static const gfx_layout charlayout =
 
 static const gfx_layout tilelayout =
 {
-	16,16,         /* 16*16 tiles */
-	RGN_FRAC(1,1), /* 4096 tiles */
-	4,             /* 4 bits per pixel */
+	16,16,         // 16*16 tiles
+	RGN_FRAC(1,1), // 4096 tiles
+	4,             // 4 bits per pixel
 	{ STEP4(12,-4) },
 	{ STEP4(0,1), STEP4(16,1), STEP4(16*16*2,1), STEP4(16*16*2+16,1) },
 	{ STEP16(0,16*2) },
@@ -334,25 +346,25 @@ WRITE_LINE_MEMBER(raiden_state::vblank_irq)
 
 void raiden_state::raiden(machine_config &config)
 {
-	/* basic machine hardware */
-	V30(config, m_maincpu, XTAL(20'000'000)/2); /* NEC V30 CPU, 20MHz verified on pcb */
+	// basic machine hardware
+	V30(config, m_maincpu, XTAL(20'000'000)/2); // NEC V30 CPU, 20MHz verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::main_map);
 
-	V30(config, m_subcpu, XTAL(20'000'000)/2); /* NEC V30 CPU, 20MHz verified on pcb */
+	V30(config, m_subcpu, XTAL(20'000'000)/2); // NEC V30 CPU, 20MHz verified on pcb
 	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_state::sub_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4)); /* verified on pcb */
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4)); // verified on pcb
 	audiocpu.set_addrmap(AS_PROGRAM, &raiden_state::seibu_sound_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.60); // verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_refresh_hz(59.60); // verified on pcb
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(raiden_state::screen_update_raiden));
@@ -363,7 +375,7 @@ void raiden_state::raiden(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiden);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181)/4));
@@ -414,10 +426,10 @@ void raidenb_state::raidenb(machine_config &config)
 {
 	raiden(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &raidenb_state::raidenb_main_map);
 
-	/* video hardware */
+	// video hardware
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(raidenb_state::raidenb_layer_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raidenb_state::raidenb_layer_scroll_w));
@@ -429,44 +441,42 @@ void raidenb_state::raidenb(machine_config &config)
 /***************************************************************************/
 
 /*
-
-Note: Seibu labeled the roms simply as 1 through 10 and didn't generally
-      change the labels at all between versions even though the data was
-      different between them.
+    Note: Seibu labeled the roms simply as 1 through 10 and didn't generally
+          change the labels at all between versions even though the data was
+          different between them.
 */
 
-/* These versions use the same board and make use of the region byte at 0x1fffe (0x1fffd also may differ and is used for unknown purpose) */
-
-ROM_START( raiden ) /* from a board with 2 daughter cards, no official board #s? */
-	ROM_REGION( 0x060000, "maincpu", 0 ) /* v30 main cpu */
+// These versions use the same board and make use of the configuration bytes at 0x1fffd & 0x1fffe
+ROM_START( raiden ) // from a board with 2 daughter cards, no official board #s?
+	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.u0253", 0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
-	ROM_LOAD16_BYTE( "3.u022",  0x020000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) ) /* both 3 & 4 had a red "dot" on label, 4 also had printed "J" */
-	ROM_LOAD16_BYTE( "4j.u023", 0x020001, 0x20000, CRC(505c4c5d) SHA1(07f61fd1ff24f482a1ae2f86c4c0f32850cbd539) ) /* 0x1fffd == 0x00, 0x1fffe == 0x04 */
+	ROM_LOAD16_BYTE( "3.u022",  0x020000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) ) // both 3 & 4 had a red "dot" on label, 4 also had printed "J"
+	ROM_LOAD16_BYTE( "4j.u023", 0x020001, 0x20000, CRC(505c4c5d) SHA1(07f61fd1ff24f482a1ae2f86c4c0f32850cbd539) ) // 0x1fffd == 0x00, 0x1fffe == 0x04
 
-	ROM_REGION( 0x040000, "sub", 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x040000, "sub", 0 ) // v30 sub cpu
 	ROM_LOAD16_BYTE( "5.u042", 0x000000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "6.u043", 0x000001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 64k code for sound Z80
 	ROM_LOAD( "8.u212",      0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, "text", 0 ) /* Chars */
-	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
-	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+	ROM_REGION( 0x010000, "text", 0 ) // Chars
+	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) // On some PCBs there is no explicit
+	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) // U location for these two roms
 
-	ROM_REGION( 0x080000, "bgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* tiles @ U105 on this PCB */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // tiles
+	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) // tiles @ U105 on this PCB
 
-	ROM_REGION( 0x080000, "fgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* tiles @ U115 on this PCB */
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // tiles
+	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) // tiles @ U115 on this PCB
 
-	ROM_REGION( 0x090000, "sprites", 0 ) /* sprites */
+	ROM_REGION( 0x090000, "sprites", 0 ) // sprites
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) )
 
-	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
 	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
@@ -479,35 +489,35 @@ ROM_START( raiden ) /* from a board with 2 daughter cards, no official board #s?
 ROM_END
 
 ROM_START( raidena )
-	ROM_REGION( 0x060000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.u0253", 0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "3.u022",  0x020000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
-	ROM_LOAD16_BYTE( "4.u023",  0x020001, 0x20000, CRC(6bdfd416) SHA1(7c3692d0c46c0fd360b9b2b5a8dc55d9217be357) ) /* 0x1fffd == 0x00, 0x1fffe == 0x84 */
+	ROM_LOAD16_BYTE( "4.u023",  0x020001, 0x20000, CRC(6bdfd416) SHA1(7c3692d0c46c0fd360b9b2b5a8dc55d9217be357) ) // 0x1fffd == 0x00, 0x1fffe == 0x84
 
-	ROM_REGION( 0x040000, "sub", 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x040000, "sub", 0 ) // v30 sub cpu
 	ROM_LOAD16_BYTE( "5.u042", 0x000000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "6.u043", 0x000001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 64k code for sound Z80
 	ROM_LOAD( "8.u212",      0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, "text", 0 ) /* Chars */
-	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
-	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+	ROM_REGION( 0x010000, "text", 0 ) // Chars
+	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) // On some PCBs there is no explicit
+	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) // U location for these two roms
 
-	ROM_REGION( 0x080000, "bgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* tiles @ U105 on this PCB */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // tiles
+	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) // tiles @ U105 on this PCB
 
-	ROM_REGION( 0x080000, "fgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* tiles @ U115 on this PCB */
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // tiles
+	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) // tiles @ U115 on this PCB
 
-	ROM_REGION( 0x090000, "sprites", 0 ) /* sprites */
+	ROM_REGION( 0x090000, "sprites", 0 ) // sprites
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) )
 
-	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
 	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
@@ -520,35 +530,35 @@ ROM_START( raidena )
 ROM_END
 
 ROM_START( raident )
-	ROM_REGION( 0x060000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.u0253", 0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "3.u022",  0x020000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
-	ROM_LOAD16_BYTE( "4t.u023", 0x020001, 0x20000, CRC(61eefab1) SHA1(a886ce1eb1c6451b1cf9eb8dbdc2d484d9881ced) ) /* 0x1fffd == 0x02, 0x1fffe == 0x06 */
+	ROM_LOAD16_BYTE( "4t.u023", 0x020001, 0x20000, CRC(61eefab1) SHA1(a886ce1eb1c6451b1cf9eb8dbdc2d484d9881ced) ) // 0x1fffd == 0x02, 0x1fffe == 0x06
 
-	ROM_REGION( 0x040000, "sub", 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x040000, "sub", 0 ) // v30 sub cpu
 	ROM_LOAD16_BYTE( "5.u042", 0x000000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "6.u043", 0x000001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 64k code for sound Z80
 	ROM_LOAD( "8.u212",      0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, "text", 0 ) /* Chars */
-	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
-	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+	ROM_REGION( 0x010000, "text", 0 ) // Chars
+	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) // On some PCBs there is no explicit
+	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) // U location for these two roms
 
-	ROM_REGION( 0x080000, "bgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* tiles @ U105 on this PCB */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // tiles
+	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) // tiles @ U105 on this PCB
 
-	ROM_REGION( 0x080000, "fgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* tiles @ U115 on this PCB */
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // tiles
+	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) // tiles @ U115 on this PCB
 
-	ROM_REGION( 0x090000, "sprites", 0 ) /* sprites */
+	ROM_REGION( 0x090000, "sprites", 0 ) // sprites
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) )
 
-	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
 	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
@@ -561,35 +571,35 @@ ROM_START( raident )
 ROM_END
 
 ROM_START( raidenu )
-	ROM_REGION( 0x060000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.u0253", 0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
-	ROM_LOAD16_BYTE( "3a.u022", 0x020000, 0x20000, CRC(a8fadbdd) SHA1(a23729a51c45c1dba4e625503a37d111ae72ced0) ) /* Both 3A & 4A different for the US version */
-	ROM_LOAD16_BYTE( "4a.u023", 0x020001, 0x20000, CRC(bafb268d) SHA1(132d3ebf9d9d5fffa3040338106fad428c54dbaa) ) /* 0x1fffd == 0x01, 0x1fffe == 0x85 */
+	ROM_LOAD16_BYTE( "3a.u022", 0x020000, 0x20000, CRC(a8fadbdd) SHA1(a23729a51c45c1dba4e625503a37d111ae72ced0) ) // Both 3A & 4A different for the US version
+	ROM_LOAD16_BYTE( "4a.u023", 0x020001, 0x20000, CRC(bafb268d) SHA1(132d3ebf9d9d5fffa3040338106fad428c54dbaa) ) // 0x1fffd == 0x01, 0x1fffe == 0x85
 
-	ROM_REGION( 0x040000, "sub", 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x040000, "sub", 0 ) // v30 sub cpu
 	ROM_LOAD16_BYTE( "5.u042", 0x000000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "6.u043", 0x000001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 64k code for sound Z80
 	ROM_LOAD( "8.u212",      0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, "text", 0 ) /* Chars */
-	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
-	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+	ROM_REGION( 0x010000, "text", 0 ) // Chars
+	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) // On some PCBs there is no explicit
+	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) // U location for these two roms
 
-	ROM_REGION( 0x080000, "bgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* tiles @ U105 on this PCB */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // tiles
+	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) // tiles @ U105 on this PCB
 
-	ROM_REGION( 0x080000, "fgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* tiles @ U115 on this PCB */
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // tiles
+	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) // tiles @ U115 on this PCB
 
-	ROM_REGION( 0x090000, "sprites", 0 ) /* sprites */
+	ROM_REGION( 0x090000, "sprites", 0 ) // sprites
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) )
 
-	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
 	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
@@ -601,36 +611,36 @@ ROM_START( raidenu )
 	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
-ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be decrypted */
-	ROM_REGION( 0x060000, "maincpu", 0 ) /* v30 main cpu */
+ROM_START( raidenk ) // Same board as above. Not sure why the sound CPU would be decrypted
+	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.u0253", 0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "3.u022",  0x020000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
-	ROM_LOAD16_BYTE( "4k.u023", 0x020001, 0x20000, CRC(fddf24da) SHA1(ececed0b0b96d070d85bfb6174029142bc96d5f0) ) /* 0x1fffd == 0x02, 0x1fffe == 0xA4 */
+	ROM_LOAD16_BYTE( "4k.u023", 0x020001, 0x20000, CRC(fddf24da) SHA1(ececed0b0b96d070d85bfb6174029142bc96d5f0) ) // 0x1fffd == 0x02, 0x1fffe == 0xA4
 
-	ROM_REGION( 0x040000, "sub", 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x040000, "sub", 0 ) // v30 sub cpu
 	ROM_LOAD16_BYTE( "5.u042", 0x000000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "6.u043", 0x000001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "8b.u212",     0x000000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) ) /* Not encrypted */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 64k code for sound Z80
+	ROM_LOAD( "8b.u212",     0x000000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) ) // Not encrypted
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, "text", 0 ) /* Chars */
-	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
-	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+	ROM_REGION( 0x010000, "text", 0 ) // Chars
+	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) // On some PCBs there is no explicit
+	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) // U location for these two roms
 
-	ROM_REGION( 0x080000, "bgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* tiles @ U105 on this PCB */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // tiles
+	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) // tiles @ U105 on this PCB
 
-	ROM_REGION( 0x080000, "fgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* tiles @ U115 on this PCB */
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // tiles
+	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) // tiles @ U115 on this PCB
 
-	ROM_REGION( 0x090000, "sprites", 0 ) /* sprites */
+	ROM_REGION( 0x090000, "sprites", 0 ) // sprites
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) )
 
-	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
 	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
@@ -642,81 +652,81 @@ ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be
 	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
-ROM_START( raidenkb ) /* Korean bootleg board. ROMs for main, sub, audiocpu, chars and oki match raidenk, while object and tile ROMs are differently split */
-	ROM_REGION( 0x060000, "maincpu", 0 ) /* v30 main cpu */
+ROM_START( raidenkb ) // Korean bootleg board. ROMs for main, sub, audiocpu, chars and oki match raidenk, while object and tile ROMs are differently split
+	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.u0253", 0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "3.u022",  0x020000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
-	ROM_LOAD16_BYTE( "4k.u023", 0x020001, 0x20000, CRC(fddf24da) SHA1(ececed0b0b96d070d85bfb6174029142bc96d5f0) ) /* 0x1fffd == 0x02, 0x1fffe == 0xA4 */
+	ROM_LOAD16_BYTE( "4k.u023", 0x020001, 0x20000, CRC(fddf24da) SHA1(ececed0b0b96d070d85bfb6174029142bc96d5f0) ) // 0x1fffd == 0x02, 0x1fffe == 0xA4
 
-	ROM_REGION( 0x040000, "sub", 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x040000, "sub", 0 ) // v30 sub cpu
 	ROM_LOAD16_BYTE( "5.u042", 0x000000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "6.u043", 0x000001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "8b.u212",     0x000000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) ) /* Not encrypted */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 64k code for sound Z80
+	ROM_LOAD( "8b.u212",     0x000000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) ) // Not encrypted
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, "text", 0 ) /* Chars */
-	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
-	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+	ROM_REGION( 0x010000, "text", 0 ) // Chars
+	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) // On some PCBs there is no explicit
+	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) // U location for these two roms
 
-	ROM_REGION( 0x080000, "bgtiles", 0 ) /* tiles */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // tiles
 	ROM_LOAD16_BYTE( "rkb15bg.bin", 0x00000, 0x20000, CRC(13a69064) SHA1(a9fcd785e3bac7c0d39be532b3755e6dd45fc314) )
 	ROM_LOAD16_BYTE( "rkb17bg.bin", 0x00001, 0x20000, CRC(d7a6c649) SHA1(01d6f18af0385466e3956c3f3afc82393acee6bc) )
 	ROM_LOAD16_BYTE( "rkb16bg.bin", 0x40000, 0x20000, CRC(66ea8484) SHA1(f4452e1b0991bf81a60b580ba822fc43b1a443e6) )
 	ROM_LOAD16_BYTE( "rkb18bg.bin", 0x40001, 0x20000, CRC(42362d56) SHA1(1cad19fa3f66e34865383d9a94e9058114910365) )
 
-	ROM_REGION( 0x080000, "fgtiles", 0 ) /* tiles */
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // tiles
 	ROM_LOAD16_BYTE( "rkb7bg.bin",  0x00000, 0x20000, CRC(25239711) SHA1(978cfc6487ed711cc1b513824741c347ec92889d) )
 	ROM_LOAD16_BYTE( "rkb9bg.bin",  0x00001, 0x20000, CRC(6ca0d7b3) SHA1(ef63657a01b07aaa0ded7b0d405b872b4d3a56a8) )
 	ROM_LOAD16_BYTE( "rkb8bg.bin",  0x40000, 0x20000, CRC(3cad38fc) SHA1(de2257f70c3e71905bc959f80be183c6d95fd06d) )
 	ROM_LOAD16_BYTE( "rkb10bg.bin", 0x40001, 0x20000, CRC(6fce95a3) SHA1(1d3beda3a4dd0a2a3afbb7b5b16d87bf3257bcb4) )
 
-	ROM_REGION( 0x090000, "sprites", 0 ) /* sprites */
+	ROM_REGION( 0x090000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "rkb19obj.bin", 0x00000, 0x20000, CRC(34fa4485) SHA1(d9893c484ee4f80e364824500c6c048f58f49752) )
 	ROM_LOAD16_BYTE( "rkb21obj.bin", 0x00001, 0x20000, CRC(d806395b) SHA1(7c6fc848aa40a49590e00d0b02ce21ad5414e387) )
 	ROM_LOAD16_BYTE( "rkb20obj.bin", 0x40000, 0x20000, CRC(8b7ca3c6) SHA1(81c3e98cbd81a39e04b5e7fb3683aba50545f774) )
 	ROM_LOAD16_BYTE( "rkb22obj.bin", 0x40001, 0x20000, CRC(82ee78a0) SHA1(4af0593f9c7d8db59f17d75d6f9020ecd4bdcb98) )
 
-	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.h7", 0x0000, 0x0200, NO_DUMP )
 ROM_END
 
-ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
-	ROM_REGION( 0x060000, "maincpu", 0 ) /* v30 main cpu */
+ROM_START( raidenb )// Different hardware, Main & Sub CPU code not encrypted.
+	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.u0253", 0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
-	ROM_LOAD16_BYTE( "3__,raidenb.u022", 0x020000, 0x20000, CRC(9d735bf5) SHA1(531981eac2ef0c0635f067a649899f98738d5c67) ) /* Simply labeled as 3 */
-	ROM_LOAD16_BYTE( "4__,raidenb.u023", 0x020001, 0x20000, CRC(8d184b99) SHA1(71cd4179aa2341d2ceecbb6a9c26f5919d46ca4c) ) /* Simply labeled as 4 */
+	ROM_LOAD16_BYTE( "3__,raidenb.u022", 0x020000, 0x20000, CRC(9d735bf5) SHA1(531981eac2ef0c0635f067a649899f98738d5c67) ) // Simply labeled as 3
+	ROM_LOAD16_BYTE( "4__,raidenb.u023", 0x020001, 0x20000, CRC(8d184b99) SHA1(71cd4179aa2341d2ceecbb6a9c26f5919d46ca4c) ) // Simply labeled as 4; 0x1fffd == 0x00, 0x1fffe == 0x80
 
-	ROM_REGION( 0x040000, "sub", 0 ) /* v30 sub cpu */
-	ROM_LOAD16_BYTE( "5__,raidenb.u042", 0x000000, 0x20000, CRC(7aca6d61) SHA1(4d80ec87e54d7495b9bdf819b9985b1c8183c80d) ) /* Simply labeled as 5 */
-	ROM_LOAD16_BYTE( "6__,raidenb.u043", 0x000001, 0x20000, CRC(e3d35cc2) SHA1(4329865985aaf3fb524618e2e958563c8fa6ead5) ) /* Simply labeled as 6 */
+	ROM_REGION( 0x040000, "sub", 0 ) // v30 sub cpu
+	ROM_LOAD16_BYTE( "5__,raidenb.u042", 0x000000, 0x20000, CRC(7aca6d61) SHA1(4d80ec87e54d7495b9bdf819b9985b1c8183c80d) ) // Simply labeled as 5
+	ROM_LOAD16_BYTE( "6__,raidenb.u043", 0x000001, 0x20000, CRC(e3d35cc2) SHA1(4329865985aaf3fb524618e2e958563c8fa6ead5) ) // Simply labeled as 6
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "rai6.u212",   0x000000, 0x08000, CRC(723a483b) SHA1(50e67945e83ea1748fb748de3287d26446d4e0a0) ) /* Should be labeled "8" ??? */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 64k code for sound Z80
+	ROM_LOAD( "rai6.u212",   0x000000, 0x08000, CRC(723a483b) SHA1(50e67945e83ea1748fb748de3287d26446d4e0a0) ) // Should be labeled "8" ???
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, "text", 0 ) /* Chars */
-	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
-	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+	ROM_REGION( 0x010000, "text", 0 ) // Chars
+	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) // On some PCBs there is no explicit
+	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) // U location for these two roms
 
-	ROM_REGION( 0x080000, "bgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* U919 on this PCB */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // tiles
+	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) // U919 on this PCB
 
-	ROM_REGION( 0x080000, "fgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* U920 on this PCB */
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // tiles
+	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) // U920 on this PCB
 
-	ROM_REGION( 0x090000, "sprites", 0 ) /* Sprites */
-	ROM_LOAD( "sei440", 0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* U165 on this PCB */
+	ROM_REGION( 0x090000, "sprites", 0 ) // Sprites
+	ROM_LOAD( "sei440", 0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) // U165 on this PCB
 
-	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // N82S135N bipolar PROM
@@ -724,71 +734,71 @@ ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
 ROM_END
 
 ROM_START( raidenub ) // only region bits differ from raidenb
-	ROM_REGION( 0x060000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.u0253", 0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
-	ROM_LOAD16_BYTE( "3u.u022", 0x020000, 0x20000, CRC(9d735bf5) SHA1(531981eac2ef0c0635f067a649899f98738d5c67) ) /* Simply labeled as 3u */
-	ROM_LOAD16_BYTE( "4u.u023", 0x020001, 0x20000, CRC(95c110ef) SHA1(e6aea374ca63cdd851af66240e51461882d170e8) ) /* Simply labeled as 4u */
+	ROM_LOAD16_BYTE( "3u.u022", 0x020000, 0x20000, CRC(9d735bf5) SHA1(531981eac2ef0c0635f067a649899f98738d5c67) ) // Simply labeled as 3u
+	ROM_LOAD16_BYTE( "4u.u023", 0x020001, 0x20000, CRC(95c110ef) SHA1(e6aea374ca63cdd851af66240e51461882d170e8) ) // Simply labeled as 4u; 0x1fffd == 0x01, 0x1fffe == 0x81
 
-	ROM_REGION( 0x040000, "sub", 0 ) /* v30 sub cpu */
-	ROM_LOAD16_BYTE( "5__,raidenb.u042", 0x000000, 0x20000, CRC(7aca6d61) SHA1(4d80ec87e54d7495b9bdf819b9985b1c8183c80d) ) /* Simply labeled as 5 */
-	ROM_LOAD16_BYTE( "6__,raidenb.u043", 0x000001, 0x20000, CRC(e3d35cc2) SHA1(4329865985aaf3fb524618e2e958563c8fa6ead5) ) /* Simply labeled as 6 */
+	ROM_REGION( 0x040000, "sub", 0 ) // v30 sub cpu
+	ROM_LOAD16_BYTE( "5__,raidenb.u042", 0x000000, 0x20000, CRC(7aca6d61) SHA1(4d80ec87e54d7495b9bdf819b9985b1c8183c80d) ) // Simply labeled as 5
+	ROM_LOAD16_BYTE( "6__,raidenb.u043", 0x000001, 0x20000, CRC(e3d35cc2) SHA1(4329865985aaf3fb524618e2e958563c8fa6ead5) ) // Simply labeled as 6
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "rai6.u212",   0x000000, 0x08000, CRC(723a483b) SHA1(50e67945e83ea1748fb748de3287d26446d4e0a0) ) /* Should be labeled "8" ??? */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 64k code for sound Z80
+	ROM_LOAD( "rai6.u212",   0x000000, 0x08000, CRC(723a483b) SHA1(50e67945e83ea1748fb748de3287d26446d4e0a0) ) // Should be labeled "8" ???
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, "text", 0 ) /* Chars */
-	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
-	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+	ROM_REGION( 0x010000, "text", 0 ) // Chars
+	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) // On some PCBs there is no explicit
+	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) // U location for these two roms
 
-	ROM_REGION( 0x080000, "bgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* U919 on this PCB */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // tiles
+	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) // U919 on this PCB
 
-	ROM_REGION( 0x080000, "fgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* U920 on this PCB */
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // tiles
+	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) // U920 on this PCB
 
-	ROM_REGION( 0x090000, "sprites", 0 ) /* Sprites */
-	ROM_LOAD( "sei440", 0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* U165 on this PCB */
+	ROM_REGION( 0x090000, "sprites", 0 ) // Sprites
+	ROM_LOAD( "sei440", 0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) // U165 on this PCB
 
-	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // N82S135N bipolar PROM
 	ROM_LOAD( "jj3010.u0116", 0x0000, 0x0100, NO_DUMP )
 ROM_END
 
-ROM_START( raidenua )/* Different hardware, Main, Sub & sound CPU code not encrypted. */
-	ROM_REGION( 0x060000, "maincpu", 0 ) /* v30 main cpu */
+ROM_START( raidenua )// Different hardware, Main, Sub & sound CPU code not encrypted.
+	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.c8",   0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.c7",   0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "3dd.e8", 0x020000, 0x20000, CRC(b6f3bad2) SHA1(214474ab9fa65e2716155b77d7825951cc98148a) )
-	ROM_LOAD16_BYTE( "4dd.e7", 0x020001, 0x20000, CRC(d294dfc1) SHA1(03606ddfa35d5cb34c447fa370495e1fbb0cad0e) )
+	ROM_LOAD16_BYTE( "4dd.e7", 0x020001, 0x20000, CRC(d294dfc1) SHA1(03606ddfa35d5cb34c447fa370495e1fbb0cad0e) ) // 0x1fffd == 0x01, 0x1fffe == 0x81
 
-	ROM_REGION( 0x040000, "sub", 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x040000, "sub", 0 ) // v30 sub cpu
 	ROM_LOAD16_BYTE( "5.p8", 0x000000, 0x20000, CRC(15c1cf45) SHA1(daac732a1d3e8f36fa665f984e05651cbca74fef) )
 	ROM_LOAD16_BYTE( "6.p7", 0x000001, 0x20000, CRC(261c381b) SHA1(64a9e0ea9abcba6287829cf4abb806362b62c806) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 64k code for sound Z80
 	ROM_LOAD( "8.w8",        0x00000, 0x08000, CRC(105b9c11) SHA1(eb142806f8410d584d914b91207361a15ab18e6f) )
 	ROM_CONTINUE(            0x10000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x18000, 0x08000 )
 
-	ROM_REGION( 0x010000, "text", 0 ) /* Chars */
-	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* U016 on this PCB */
-	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U017 on this PCB */
+	ROM_REGION( 0x010000, "text", 0 ) // Chars
+	ROM_LOAD16_BYTE( "9",  0x00001, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) // U016 on this PCB
+	ROM_LOAD16_BYTE( "10", 0x00000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) // U017 on this PCB
 
-	ROM_REGION( 0x080000, "bgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* U011 on this PCB */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // tiles
+	ROM_LOAD( "sei420", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) // U011 on this PCB
 
-	ROM_REGION( 0x080000, "fgtiles", 0 ) /* tiles */
-	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* U013 on this PCB */
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // tiles
+	ROM_LOAD( "sei430", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) // U013 on this PCB
 
-	ROM_REGION( 0x090000, "sprites", 0 ) /* Sprites */
-	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* U012 on this PCB */
+	ROM_REGION( 0x090000, "sprites", 0 ) // Sprites
+	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) // U012 on this PCB
 
-	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "7.x10", 0x00000, 0x10000, CRC(2051263e) SHA1(dff96caa11adf619360d88704e3af8427ddfe524) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -799,9 +809,12 @@ ROM_END
 
 /***************************************************************************/
 
-/* This is based on code by Niclas Karlsson Mate, who figured out the
-encryption method! The technique is a combination of a XOR table plus
-bit-swapping */
+/*
+  This is based on code by Niclas Karlsson Mate, who figured out the
+  encryption method! The technique is a combination of a XOR table plus
+  bit-swapping
+*/
+
 void raiden_state::common_decrypt()
 {
 	u16 *RAM = (u16 *)memregion("maincpu")->base();
@@ -837,22 +850,22 @@ void raiden_state::init_raiden()
 
 /***************************************************************************/
 
-/* Same PCB, differ by region byte(s) */
+// Same PCB, differ by region byte(s)
 GAME( 1990, raiden,   0,      raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, raidena,  raiden, raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, raidenu,  raiden, raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, raident,  raiden, raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", MACHINE_SUPPORTS_SAVE )
 
-/* Same as above, but the sound CPU code is not encrypted */
+// Same as above, but the sound CPU code is not encrypted
 GAME( 1990, raidenk,  raiden, raiden,   raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", MACHINE_SUPPORTS_SAVE )
 
-/* Bootleg of the Korean release */
-/* real hw has heavy slow downs, sometimes making the game borderline unplayable (https://www.youtube.com/watch?v=_FF4N9mBxao) */
+// Bootleg of the Korean release
+// real hw has heavy slow downs, sometimes making the game borderline unplayable (https://www.youtube.com/watch?v=_FF4N9mBxao)
 GAME( 1990, raidenkb, raiden, raidenkb, raiden, raiden_state,  init_raiden,  ROT270, "bootleg", "Raiden (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
-/* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
+// Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted
 GAME( 1990, raidenua, raiden, raidenu,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2, SEI8904 hardware)", MACHINE_SUPPORTS_SAVE )
 
-/* Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports Seibu custom CRTC. */
+// Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports a Seibu custom CRTC.
 GAME( 1990, raidenb,  raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu", "Raiden (set 3, newer hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, raidenub, raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 3, newer hardware)", MACHINE_SUPPORTS_SAVE )

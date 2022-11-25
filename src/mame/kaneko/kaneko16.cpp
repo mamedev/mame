@@ -4152,6 +4152,41 @@ ROM_START( brapboysp ) /* World 'special version' with EXROM sub board; serial R
 	ROM_LOAD( "rb-002.u45",  0x100000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
 ROM_END
 
+ROM_START( brapboysp2 ) // World (?) 'special version' with EXROM sub board; suffix code N */
+	ROM_REGION( 0x040000, "maincpu", 0 ) // 68000
+	ROM_LOAD16_BYTE( "rb-30n.u61", 0x000000, 0x020000, CRC(632269b0) SHA1(4dfe63b02cb95022b8c439d106b8b28d47b0e1da) ) // EPROM labeled RB-30N/U61 (white label)
+	ROM_LOAD16_BYTE( "rb-31n.u62", 0x000001, 0x020000, CRC(99623650) SHA1(498d58716298ce6e1bb8146a75089301f46079b1) ) // EPROM labeled RB-31N/U62 (white label)
+
+	ROM_REGION( 0x020000, "calc3_rom", 0 )
+	ROM_LOAD( "rb-40n.u33",  0x000000, 0x020000, CRC(313b7a6d) SHA1(59e1ac88c70498a8731dc3b2b01515d0ba1ac65b) ) // EPROM labeled RB-40N/U33 (white label), 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x1000000, "kan_spr", 0 )
+	ROM_LOAD( "rb-020.c2",   0x000000, 0x100000, CRC(ce220d38) SHA1(b88d7c89a3e1a826bf19a1fa692ec77c944596d9) ) // rb-020 0013 mask ROM; really at location next to capacitor C2 on Z01DK-EXROM-K daughterboard
+	ROM_LOAD( "rb-021.u76",  0x100000, 0x100000, CRC(74001407) SHA1(90002056ceb4e0401246950b8c3f996af0a2463c) ) // rb-021 0014 mask ROM
+	ROM_LOAD( "rb-022.u77",  0x200000, 0x100000, CRC(cb3f42dc) SHA1(5415f15621924dd263b8fe7daaf3dc25d470b814) ) // rb-022 0015 mask ROM
+	ROM_LOAD( "rb-023.u78",  0x300000, 0x100000, CRC(0e6530c5) SHA1(72bff46f0672927e540f4f3546ae533dd0a231e0) ) // rb-023 0016 mask ROM
+	ROM_LOAD( "rb-024.u79",  0x400000, 0x080000, CRC(65fa6447) SHA1(551e540d7bf412753b4a7098e25e6f9d8774bcf4) ) // rb-023 0017 w29 mask ROM, both halves identical when dumped as larger
+	ROM_RELOAD( 0x480000,  0x080000 )
+	ROM_LOAD( "rb-25n.c3",   0x500000, 0x040000, CRC(065d9bb5) SHA1(1f5b2f3cc95a4257eeeb9e41f9cc1c68f8118989) ) // EPROM labeled RB-25N (white label), really at location next to capacitor C3 on Z01DK-EXROM-K daughterboard
+	ROM_LOAD( "rb-26n.c4",   0x540000, 0x040000, CRC(8fac668b) SHA1(0f98f8b0ab366b30b7fb613c910c16ff32d214b7) ) // EPROM labeled RB-26N (white label), really at location next to capacitor C4 on Z01DK-EXROM-K daughterboard
+	ROM_LOAD( "rb-27n.c5",   0x580000, 0x040000, CRC(fb9ed35f) SHA1(7c1cd1f25febfeaeac4f51ff32b2d35b535d2539) ) // EPROM labeled RB-27N (white label), really at location next to capacitor C5 on Z01DK-EXROM-K daughterboard
+	ROM_LOAD( "rb-28n.c7",   0x5c0000, 0x040000, CRC(13acdcab) SHA1(d2e3e9cfd6b6a61ecb5dde85fd16c13877bd6eb1) ) // EPROM labeled RB-28N (white label), really at location next to capacitor C7 on Z01DK-EXROM-K daughterboard
+
+	ROM_REGION( 0x400000, "view2_0", 0 )
+	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) ) // rb-010 0009 w17 mask ROM
+	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) ) // rb-011 0010 w18 mask ROM
+	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) ) // rb-012 0011 w21 mask ROM
+	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) ) // rb-013 0012 w22 mask ROM
+
+	ROM_REGION( 0x100000, "oki1", 0 )
+	ROM_LOAD( "rb-000.u43",  0x000000, 0x080000, CRC(58ad1a62) SHA1(1d2643b5f6eac22682972a88d284e00de3e3b223) ) // rb-000 0006 w28 mask ROM
+	ROM_LOAD( "rb-003.u101", 0x080000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) ) // rb-003 0018 mask ROM
+
+	ROM_REGION( 0x200000, "oki2", 0 )
+	ROM_LOAD( "rb-001.u44",  0x000000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) ) // rb-001 0007 mask ROM
+	ROM_LOAD( "rb-002.u45",  0x100000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) ) // rb-002 0008 w11 mask ROM
+ROM_END
+
 // TODO: the eproms for brapboysj are missing the region-specific numeric suffix;
 // it should be something like -00 or -01 or -10 or -11 or etc
 ROM_START( brapboyspj ) /* Japanese 'special version' with EXROM sub board; serial unknown; suffix codes unknown */
@@ -4355,10 +4390,11 @@ GAME( 1995, gtmr2,      0,        gtmr2,    gtmr2,     kaneko16_gtmr_state,     
 GAME( 1995, gtmr2a,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gtmr2u,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, brapboys,   0,        brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboysp,  brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboyspj, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboyspu, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboys,   0,        brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)",                MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.xxx.06 string at 0x270
+GAME( 1992, brapboysp,  brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World, newer)", MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.000.08 string at 0x270
+GAME( 1992, brapboysp2, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World, older)", MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.00x.07 string at 0x270
+GAME( 1992, brapboyspj, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)",        MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.000.08 string at 0x270
+GAME( 1992, brapboyspu, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)",           MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.000.08 string at 0x270
 // these 3 are all the same code revision (differ by region byte + extra gfx roms/sample roms)
 GAME( 1992, shogwarr,   0,        shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, shogwarrk,  shogwarr, shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Shogun Warriors (Korea?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // censored Japanese flags etc.

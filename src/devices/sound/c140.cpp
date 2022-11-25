@@ -204,7 +204,7 @@ void c140_device::device_clock_changed()
 }
 
 
-void c140_device::rom_bank_updated()
+void c140_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

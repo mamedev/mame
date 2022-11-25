@@ -1,22 +1,489 @@
 // license:BSD-3-Clause
-// copyright-holders:Mirko Buffoni, Couriersud
+// copyright-holders: Mirko Buffoni, Couriersud
+
 /***************************************************************************
 
     IronHorse
+    GX560
 
     driver by Mirko Buffoni
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "ironhors.h"
+
 #include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/timer.h"
+#include "sound/discrete.h"
 #include "sound/ymopn.h"
-#include "speaker.h"
+#include "video/resnet.h"
 
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
+// configurable logging
+#define LOG_PALETTEBANK     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PALETTEBANK)
+
+#include "logmacro.h"
+
+#define LOGPALETTEBANK(...)     LOGMASKED(LOG_PALETTEBANK,     __VA_ARGS__)
+
+
+namespace {
+
+class ironhors_base_state : public driver_device
+{
+public:
+	ironhors_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_disc_ih(*this, "disc_ih"),
+		m_interrupt_enable(*this, "int_enable"),
+		m_scroll(*this, "scroll"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram%u", 1U)
+	{ }
+
+	void base(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void sh_irqtrigger_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void charbank_w(uint8_t data);
+	void palettebank_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void filter_w(uint8_t data);
+
+	void palette(palette_device &palette) const;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<discrete_device> m_disc_ih;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_interrupt_enable;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_palettebank = 0U;
+	uint8_t m_charbank = 0U;
+	uint8_t m_spriterambank = 0U;
+};
+
+class ironhors_state : public ironhors_base_state
+{
+public:
+	ironhors_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ironhors_base_state(mconfig, type, tag)
+	{ }
+
+	void ironhors(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_tick);
+
+	void master_map(address_map &map);
+	void slave_map(address_map &map);
+	void slave_io_map(address_map &map);
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+};
+
+class farwest_state : public ironhors_base_state
+{
+public:
+	farwest_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ironhors_base_state(mconfig, type, tag)
+	{ }
+
+	void farwest(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_tick);
+
+	void master_map(address_map &map);
+	void slave_map(address_map &map);
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+***************************************************************************/
+
+void ironhors_base_state::palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	static constexpr int resistances[4] = { 2000, 1000, 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[4], gweights[4], bweights[4];
+	compute_resistor_weights(0, 255, -1.0,
+			4, resistances, rweights, 1000, 0,
+			4, resistances, gweights, 1000, 0,
+			4, resistances, bweights, 1000, 0);
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
+	{
+		int bit0, bit1, bit2, bit3;
+
+		// red component
+		bit0 = BIT(color_prom[i | 0x000], 0);
+		bit1 = BIT(color_prom[i | 0x000], 1);
+		bit2 = BIT(color_prom[i | 0x000], 2);
+		bit3 = BIT(color_prom[i | 0x000], 3);
+		int const r = combine_weights(rweights, bit0, bit1, bit2, bit3);
+
+		// green component
+		bit0 = BIT(color_prom[i | 0x100], 0);
+		bit1 = BIT(color_prom[i | 0x100], 1);
+		bit2 = BIT(color_prom[i | 0x100], 2);
+		bit3 = BIT(color_prom[i | 0x100], 3);
+		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
+
+		// blue component
+		bit0 = BIT(color_prom[i | 0x200], 0);
+		bit1 = BIT(color_prom[i | 0x200], 1);
+		bit2 = BIT(color_prom[i | 0x200], 2);
+		bit3 = BIT(color_prom[i | 0x200], 3);
+		int const b = combine_weights(bweights, bit0, bit1, bit2, bit3);
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// color_prom now points to the beginning of the lookup table
+	color_prom += 0x300;
+
+	// characters use colors 0x10-0x1f of each 0x20 color bank, while sprites use colors 0-0x0f
+	for (int i = 0; i < 0x200; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			uint8_t const ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
+			palette.set_pen_indirect(((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
+		}
+	}
+}
+
+void ironhors_base_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void ironhors_base_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void ironhors_base_state::charbank_w(uint8_t data)
+{
+	if (m_charbank != (data & 0x03))
+	{
+		m_charbank = data & 0x03;
+		machine().tilemap().mark_all_dirty();
+	}
+
+	m_spriterambank = data & 0x08;
+
+	// other bits unknown
+}
+
+void ironhors_base_state::palettebank_w(uint8_t data)
+{
+	if (m_palettebank != (data & 0x07))
+	{
+		m_palettebank = data & 0x07;
+		machine().tilemap().mark_all_dirty();
+	}
+
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+
+	// bit 6 unknown - set after game over
+
+	if (data & 0x88)
+		LOGPALETTEBANK("palettebank_w %02x", data);
+}
+
+void ironhors_base_state::flipscreen_w(uint8_t data)
+{
+	if (flip_screen() != (~data & 0x08))
+	{
+		flip_screen_set(~data & 0x08);
+		machine().tilemap().mark_all_dirty();
+	}
+
+	// other bits are used too, but unknown
+}
+
+TILE_GET_INFO_MEMBER(ironhors_state::get_bg_tile_info)
+{
+	int const code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x40) << 2) +
+			  ((m_colorram[tile_index] & 0x20) << 4) + (m_charbank << 10);
+	int const color = (m_colorram[tile_index] & 0x0f) + 16 * m_palettebank;
+	int const flags = ((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |
+			  ((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
+
+	tileinfo.set(0, code, color, flags);
+}
+
+void ironhors_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ironhors_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_bg_tilemap->set_scroll_rows(32);
+}
+
+void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int bank = m_spriterambank ? 0 : 1;
+	uint8_t *sr = m_spriteram[bank];
+
+	// note that it has 5 bytes per sprite
+	int end = m_spriteram[bank].bytes();
+	end -= end % 5;
+
+	for (int offs = 0; offs < end; offs += 5)
+	{
+		int sx = sr[offs + 3];
+		int sy = sr[offs + 2];
+		int flipx = sr[offs + 4] & 0x20;
+		int flipy = sr[offs + 4] & 0x40;
+		int const code = (sr[offs] << 2) + ((sr[offs + 1] & 0x03) << 10) + ((sr[offs + 1] & 0x0c) >> 2);
+		int const color = ((sr[offs + 1] & 0xf0) >> 4) + 16 * m_palettebank;
+	//  int mod = flip_screen() ? -8 : 8;
+
+		if (flip_screen())
+		{
+			sx = 240 - sx;
+			sy = 240 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		switch (sr[offs + 4] & 0x0c)
+		{
+			case 0x00:  // 16x16
+				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+						code / 4,
+						color,
+						flipx, flipy,
+						sx, sy, 0);
+				break;
+
+			case 0x04:  // 16x8
+				{
+					if (flip_screen()) sy += 8; // this fixes the train wheels' position
+
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+							code & ~1,
+							color,
+							flipx, flipy,
+							flipx ? sx + 8 : sx, sy, 0);
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+							code | 1,
+							color,
+							flipx, flipy,
+							flipx ? sx : sx + 8, sy, 0);
+				}
+				break;
+
+			case 0x08:  // 8x16
+				{
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+							code & ~2,
+							color,
+							flipx, flipy,
+							sx, flipy ? sy + 8 : sy, 0);
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+							code | 2,
+							color,
+							flipx, flipy,
+							sx, flipy ? sy : sy + 8, 0);
+				}
+				break;
+
+			case 0x0c:  // 8x8
+				{
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+							code,
+							color,
+							flipx, flipy,
+							sx, sy, 0);
+				}
+				break;
+		}
+	}
+}
+
+uint32_t ironhors_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int row = 0; row < 32; row++)
+		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+TILE_GET_INFO_MEMBER(farwest_state::get_bg_tile_info)
+{
+	int const code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x40) << 2) +
+			 ((m_colorram[tile_index] & 0x20) << 4) + (m_charbank << 10);
+	int const color = (m_colorram[tile_index] & 0x0f) + 16 * m_palettebank;
+	int const flags = 0;//((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |  ((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
+
+	tileinfo.set(0, code, color, flags);
+}
+
+void farwest_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(farwest_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_bg_tilemap->set_scroll_rows(32);
+}
+
+void farwest_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t *sr = m_spriteram[1];
+	uint8_t *sr2 = m_spriteram[0];
+
+	for (int offs = 0; offs < m_spriteram[0].bytes(); offs += 4)
+	{
+		int sx = sr[offs + 2];
+		int sy = sr[offs + 1];
+		int flipx = sr[offs + 3] & 0x20;
+		int flipy = sr[offs + 3] & 0x40;
+		int const code = (sr[offs] << 2) + ((sr2[offs] & 0x03) << 10) + ((sr2[offs] & 0x0c) >> 2);
+		int const color = ((sr2[offs] & 0xf0) >> 4) + 16 * m_palettebank;
+
+	//  int mod = flip_screen() ? -8 : 8;
+
+//      if (flip_screen())
+		{
+		//  sx = 240 - sx;
+			sy = 240 - sy;
+		//  flipx = !flipx;
+		//  flipy = !flipy;
+		}
+
+		switch (sr[offs + 3] & 0x0c)
+		{
+			case 0x00:  // 16x16
+				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+						code / 4,
+						color,
+						flipx, flipy,
+						sx, sy, 0);
+				break;
+
+			case 0x04:  // 16x8
+				{
+					if (flip_screen()) sy += 8; // this fixes the train wheels' position
+
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+							code & ~1,
+							color,
+							flipx, flipy,
+							flipx ? sx + 8 : sx, sy, 0);
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+							code | 1,
+							color,
+							flipx, flipy,
+							flipx ? sx : sx + 8, sy, 0);
+				}
+				break;
+
+			case 0x08:  // 8x16
+				{
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+							code & ~2,
+							color,
+							flipx, flipy,
+							sx, flipy ? sy + 8 : sy, 0);
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+							code | 2,
+							color,
+							flipx, flipy,
+							sx, flipy ? sy : sy + 8, 0);
+				}
+				break;
+
+			case 0x0c:  // 8x8
+				{
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+							code,
+							color,
+							flipx, flipy,
+							sx, sy, 0);
+				}
+				break;
+		}
+	}
+}
+
+uint32_t farwest_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int row = 0; row < 32; row++)
+		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -26,7 +493,7 @@
 
 TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::scanline_tick)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if (scanline == 240 && (m_screen->frame_number() & 1) == 0)
 	{
@@ -232,9 +699,9 @@ static const gfx_layout ironhors_spritelayout =
 };
 
 static GFXDECODE_START( gfx_ironhors )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,        0, 16*8 )
-	GFXDECODE_ENTRY( "gfx1", 0, ironhors_spritelayout, 16*8*16, 16*8 )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,  16*8*16, 16*8 )  // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb,        0, 16*8 )
+	GFXDECODE_ENTRY( "gfx", 0, ironhors_spritelayout, 16*8*16, 16*8 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb,  16*8*16, 16*8 )  // to handle 8x8 sprites
 GFXDECODE_END
 
 
@@ -274,9 +741,9 @@ static const gfx_layout farwest_spritelayout2 =
 };
 
 static GFXDECODE_START( gfx_farwest )
-	GFXDECODE_ENTRY( "gfx1", 0, farwest_charlayout,         0, 16*8 )
-	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout, 16*8*16, 16*8 )
-	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout2,16*8*16, 16*8 )  // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "tiles",   0, farwest_charlayout,         0, 16*8 )
+	GFXDECODE_ENTRY( "sprites", 0, farwest_spritelayout, 16*8*16, 16*8 )
+	GFXDECODE_ENTRY( "sprites", 0, farwest_spritelayout2,16*8*16, 16*8 )  // to handle 8x8 sprites
 GFXDECODE_END
 
 
@@ -369,7 +836,7 @@ These clocks make the emulation run too fast.
 void ironhors_base_state::base(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, 18432000/6);        // 3.072 MHz??? mod by Shingo Suzuki 1999/10/15
+	MC6809E(config, m_maincpu, 18'432'000 / 6);        // 3.072 MHz??? mod by Shingo Suzuki 1999/10/15
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -377,7 +844,7 @@ void ironhors_base_state::base(machine_config &config)
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(1*8, 31*8-1, 2*8, 30*8-1);
-	m_screen->set_raw(18432000/4,296,8,256-8,255,16,240); // pixel clock is a guesswork
+	m_screen->set_raw(18'432'000 / 4, 296, 8, 256 - 8, 255, 16, 240); // pixel clock is a guesswork
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(ironhors_state::palette), 16*8*16+16*8*16, 256);
@@ -387,7 +854,7 @@ void ironhors_base_state::base(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym2203(YM2203(config, "ym2203", 18432000/6));
+	ym2203_device &ym2203(YM2203(config, "ym2203", 18'432'000 / 6));
 	ym2203.port_a_write_callback().set(FUNC(ironhors_state::filter_w));
 	ym2203.add_route(0, "disc_ih", 1.0, 0);
 	ym2203.add_route(1, "disc_ih", 1.0, 1);
@@ -404,7 +871,7 @@ void ironhors_state::ironhors(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ironhors_state::scanline_tick), "screen", 0, 1);
 
-	Z80(config, m_soundcpu, 18432000/6);      // 3.072 MHz
+	Z80(config, m_soundcpu, 18'432'000 / 6);      // 3.072 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::slave_map);
 	m_soundcpu->set_addrmap(AS_IO, &ironhors_state::slave_io_map);
 
@@ -415,7 +882,7 @@ void ironhors_state::ironhors(machine_config &config)
 
 TIMER_DEVICE_CALLBACK_MEMBER(farwest_state::scanline_tick)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if ((scanline % 2) == 1)
 	{
@@ -436,7 +903,7 @@ void farwest_state::farwest(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &farwest_state::master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(farwest_state::scanline_tick), "screen", 0, 1);
 
-	Z80(config, m_soundcpu, 18432000/6);      // 3.072 MHz
+	Z80(config, m_soundcpu, 18'432'000 / 6);      // 3.072 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &farwest_state::slave_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_farwest);
@@ -462,7 +929,7 @@ ROM_START( ironhors )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "560_h01.10c",  0x0000, 0x4000, CRC(2b17930f) SHA1(be7b21f050f6b74c75a33c9284455bbed5b03c63) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "560_h06.08f",  0x00000, 0x8000, CRC(f21d8c93) SHA1(4245fff5360e10441e11d0d207d510e5c317bb0e) )
 	ROM_LOAD16_BYTE( "560_h05.07f",  0x00001, 0x8000, CRC(60107859) SHA1(ab59b6be155d36811a37dc873abbd97cd0a4120d) )
 	ROM_LOAD16_BYTE( "560_h07.09f",  0x10000, 0x8000, CRC(c761ec73) SHA1(78266c9ff3ea74a59fd3ce84afb4f8a1164c8bba) )
@@ -484,7 +951,7 @@ ROM_START( ironhorsh )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "10c_h01.bin",  0x0000, 0x4000, CRC(2b17930f) SHA1(be7b21f050f6b74c75a33c9284455bbed5b03c63) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "08f_h06.bin",  0x00000, 0x8000, CRC(f21d8c93) SHA1(4245fff5360e10441e11d0d207d510e5c317bb0e) )
 	ROM_LOAD16_BYTE( "07f_h05.bin",  0x00001, 0x8000, CRC(60107859) SHA1(ab59b6be155d36811a37dc873abbd97cd0a4120d) )
 	ROM_LOAD16_BYTE( "09f_h07.bin",  0x10000, 0x8000, CRC(c761ec73) SHA1(78266c9ff3ea74a59fd3ce84afb4f8a1164c8bba) )
@@ -506,7 +973,7 @@ ROM_START( dairesya )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "560-j01.10c",  0x0000, 0x4000, CRC(a203b223) SHA1(fd19ae55bda467a09151539be6dce3791c28f18a) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "560-j06.8f",   0x00000, 0x8000, CRC(a6e8248d) SHA1(7df653bb3a2257c249c3cf2c3f4f324d687a6b39) )
 	ROM_LOAD16_BYTE( "560-j05.7f",   0x00001, 0x8000, CRC(f75893d4) SHA1(dc71b912d9bf5104dc633f687c52043df37852f0) )
 	ROM_LOAD16_BYTE( "560-k07.9f",   0x10000, 0x8000, CRC(c8a1b840) SHA1(753b6fcbb4b28bbb63a392cdef90568734eac9bd) )
@@ -521,7 +988,7 @@ ROM_START( dairesya )
 ROM_END
 
 ROM_START( farwest )
-	ROM_REGION( 0x12000, "maincpu", 0 ) // 64k for code + 8k for extra ROM
+	ROM_REGION( 0x12000, "maincpu", 0 )
 	ROM_LOAD( "ironhors.008", 0x04000, 0x4000, CRC(b1c8246c) SHA1(4ceb098bb0b4efcbe50bb4b23bd27a60dabf2b3e) )
 	ROM_LOAD( "ironhors.009", 0x08000, 0x8000, CRC(ea34ecfc) SHA1(8c7f12e76d2b9eb592ebf1bfd3e16a6b130da8e5) )
 	ROM_LOAD( "ironhors.007", 0x00000, 0x2000, CRC(471182b7) SHA1(48ff58cbbf971b257e8099ec331397cf73dc8325) )   // don't know what this is for
@@ -529,11 +996,11 @@ ROM_START( farwest )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ironhors.010", 0x0000, 0x4000, CRC(a28231a6) SHA1(617e8fdf8129081c6a1bbbf140837a375a51da72) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "tiles", 0 )
 	ROM_LOAD( "ironhors.005", 0x00000, 0x8000, CRC(f77e5b83) SHA1(6c72732dc96c1652713b2aba6f0a2410f9457818) )
 	ROM_LOAD( "ironhors.006", 0x08000, 0x8000, CRC(7bbc0b51) SHA1(9b4890f2d20a8ddf5ba3f4325df070509252e06e) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "ironhors.001", 0x00000, 0x4000, CRC(a8fc21d3) SHA1(1e898aaccad1919bbacf8d7957f5a0761df20767) )
 	ROM_LOAD( "ironhors.002", 0x04000, 0x4000, CRC(9c1e5593) SHA1(7d41d2224f0653e09d8728ccdec2df60f549e36e) )
 	ROM_LOAD( "ironhors.003", 0x08000, 0x4000, CRC(3a0bf799) SHA1(b34d5c7edda06b8a579d6d390511781a43ffce83) )
@@ -547,6 +1014,8 @@ ROM_START( farwest )
 	ROM_LOAD( "ironcol.005",  0x0400, 0x0100, CRC(15077b9c) SHA1(c7fe24e3d481150452ff774f3908510db9e28367) ) // sprite lookup table
 ROM_END
 
+} // anonymous namespace
+
 
 /*************************************
  *
@@ -554,7 +1023,7 @@ ROM_END
  *
  *************************************/
 // versions are taken from the letters on the program ROMs' labels
-GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami", "Iron Horse (version K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami", "Iron Horse (version H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami",                    "Iron Horse (version K)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami",                    "Iron Horse (version H)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dairesya,  ironhors, ironhors, dairesya, ironhors_state, empty_init, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan, version K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, farwest,   ironhors, farwest,  ironhors, farwest_state,  empty_init, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, farwest,   ironhors, farwest,  ironhors, farwest_state,  empty_init, ROT0, "bootleg?",                  "Far West",                             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

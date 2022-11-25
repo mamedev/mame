@@ -759,10 +759,6 @@ public:
 	void sub_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t sub_mainbd_r(offs_t offset, uint32_t mem_mask = ~0);
 	void sub_mainbd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint16_t sub_ata0_r(offs_t offset, uint16_t mem_mask = ~0);
-	void sub_ata0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t sub_ata1_r(offs_t offset, uint16_t mem_mask = ~0);
-	void sub_ata1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t sub_psac2_r();
 	void sub_psac2_w(uint32_t data);
 	void sub_psac_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -1904,41 +1900,6 @@ void cobra_state::sub_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-uint16_t cobra_state::sub_ata0_r(offs_t offset, uint16_t mem_mask)
-{
-	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
-
-	uint32_t data = m_ata->cs0_r(offset, mem_mask);
-	data = ( data << 8 ) | ( data >> 8 );
-
-	return data;
-}
-
-void cobra_state::sub_ata0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
-	data = ( data << 8 ) | ( data >> 8 );
-
-	m_ata->cs0_w(offset, data, mem_mask);
-}
-
-uint16_t cobra_state::sub_ata1_r(offs_t offset, uint16_t mem_mask)
-{
-	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
-
-	uint32_t data = m_ata->cs1_r(offset, mem_mask);
-
-	return ( data << 8 ) | ( data >> 8 );
-}
-
-void cobra_state::sub_ata1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
-	data = ( data << 8 ) | ( data >> 8 );
-
-	m_ata->cs1_w(offset, data, mem_mask);
-}
-
 uint32_t cobra_state::sub_comram_r(offs_t offset)
 {
 	int page = m_comram_page ^ 1;
@@ -2041,8 +2002,8 @@ void cobra_state::cobra_sub_map(address_map &map)
 	map(0x70000000, 0x7003ffff).rw(FUNC(cobra_state::sub_comram_r), FUNC(cobra_state::sub_comram_w));         // Double buffered shared RAM between Main and Sub
 //  map(0x78000000, 0x780000ff).noprw();                                           // SCSI controller (unused)
 	map(0x78040000, 0x7804ffff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
-	map(0x78080000, 0x7808000f).rw(FUNC(cobra_state::sub_ata0_r), FUNC(cobra_state::sub_ata0_w));
-	map(0x780c0010, 0x780c001f).rw(FUNC(cobra_state::sub_ata1_r), FUNC(cobra_state::sub_ata1_w));
+	map(0x78080000, 0x7808000f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w));
+	map(0x780c0010, 0x780c001f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w));
 	map(0x78200000, 0x782000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));              // PSAC registers
 	map(0x78210000, 0x78217fff).ram().w(FUNC(cobra_state::sub_psac_palette_w)).share("paletteram");                      // PSAC palette RAM
 	map(0x78220000, 0x7823ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));            // PSAC tile RAM
@@ -2878,7 +2839,6 @@ void cobra_renderer::gfx_fifo_exec()
 			}
 			default:
 			{
-				int k = 0;
 				int c = 0;
 				printf("gfxfifo_exec: unknown command %08X %08X\n", w1, w2);
 
@@ -2903,7 +2863,6 @@ void cobra_renderer::gfx_fifo_exec()
 						printf("\n");
 						c = 0;
 					}
-					k++;
 				};
 				cobra->logerror("\n");
 			}

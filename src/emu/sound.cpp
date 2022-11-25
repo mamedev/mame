@@ -10,11 +10,14 @@
 
 #include "emu.h"
 
-#include "speaker.h"
-#include "emuopts.h"
-#include "osdepend.h"
 #include "config.h"
+#include "emuopts.h"
+#include "speaker.h"
+
 #include "wavwrite.h"
+#include "xmlfile.h"
+
+#include "osdepend.h"
 
 
 //**************************************************************************
@@ -1090,14 +1093,6 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_wavfile(),
 	m_first_reset(true)
 {
-	// get filename for WAV file or AVI file if specified
-	const char *wavfile = machine.options().wav_write();
-	const char *avifile = machine.options().avi_write();
-
-	// handle -nosound and lower sample rate if not recording WAV or AVI
-	if (m_nosound_mode && wavfile[0] == 0 && avifile[0] == 0)
-		machine.m_sample_rate = 11025;
-
 	// count the mixers
 #if VERBOSE
 	mixer_interface_enumerator iter(machine.root_device());
@@ -1380,6 +1375,10 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
+	// master volume attenuation
+	if (util::xml::data_node const *node = parentnode->get_child("attenuation"))
+		set_attenuation(std::clamp(int(node->get_attribute_int("value", 0)), -32, 0));
+
 	// iterate over channel nodes
 	for (util::xml::data_node const *channelnode = parentnode->get_child("channel"); channelnode != nullptr; channelnode = channelnode->get_next_sibling("channel"))
 	{
@@ -1405,6 +1404,13 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 	// we only save system-specific configuration
 	if (cfg_type != config_type::SYSTEM)
 		return;
+
+	// master volume attenuation
+	if (m_attenuation != machine().options().volume())
+	{
+		if (util::xml::data_node *const node = parentnode->add_child("attenuation", nullptr))
+			node->set_attribute_int("value", m_attenuation);
+	}
 
 	// iterate over mixer channels
 	for (int mixernum = 0; ; mixernum++)

@@ -2450,7 +2450,7 @@ void vidchal_state::vidchal(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125); // unknown DAC
+	DAC_4BIT_BINARY_WEIGHTED(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms

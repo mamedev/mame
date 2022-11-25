@@ -30,12 +30,12 @@ public:
 	// construction/destruction
 	pce_joypad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-
 protected:
 	// construction/destruction
 	pce_joypad2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -58,10 +58,10 @@ public:
 	// construction/destruction
 	pce_joypad2_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+protected:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -73,13 +73,13 @@ protected:
 private:
 	u8 buttons_r();
 
-	// internal states
-	u8 m_counter = 0; // Turbo rate counter, connected on 74xx163 QB and QC.
-	bool m_prev_clr = false; // previous CLR pin state
-
 	// IO ports
 	required_ioport m_buttons_io;
 	required_ioport m_turbo_io;
+
+	// internal states
+	u8 m_counter; // Turbo rate counter, connected on 74xx163 QB and QC.
+	bool m_prev_clr; // previous CLR pin state
 };
 
 

@@ -189,5 +189,5 @@ void saitekosa_sparc_device::nmi_w(int state)
 void saitekosa_sparc_device::ack_w(int state)
 {
 	if (state != m_expansion->ack_state())
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }

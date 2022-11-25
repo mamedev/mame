@@ -63,6 +63,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "utf8.h"
+
 
 void microtan_state::mt65_map(address_map &map)
 {

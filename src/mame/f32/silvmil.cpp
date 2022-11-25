@@ -188,7 +188,7 @@ u32 silvmil_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 void silvmil_state::soundcmd_w(u8 data)
 {
 	m_soundlatch->write(data & 0xff);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+	machine().scheduler().perfect_quantum(attotime::from_usec(20));
 }
 
 void silvmil_state::mem_map(address_map &map)

@@ -540,7 +540,7 @@ void sms_state::sms_ntsc_base(machine_config &config)
 template <typename X>
 void sms_state::screen_sms_pal_raw_params(screen_device &screen, X &&pixelclock)
 {
-	screen.set_raw(std::forward<X>(pixelclock),
+	screen.set_raw(pixelclock,
 		sega315_5124_device::WIDTH,
 		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2,
 		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10,
@@ -553,7 +553,7 @@ void sms_state::screen_sms_pal_raw_params(screen_device &screen, X &&pixelclock)
 template <typename X>
 void sms_state::screen_sms_ntsc_raw_params(screen_device &screen, X &&pixelclock)
 {
-	screen.set_raw(std::forward<X>(pixelclock),
+	screen.set_raw(pixelclock,
 		sega315_5124_device::WIDTH,
 		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2,
 		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10,
@@ -566,7 +566,7 @@ void sms_state::screen_sms_ntsc_raw_params(screen_device &screen, X &&pixelclock
 template <typename X>
 void gamegear_state::screen_gg_raw_params(screen_device &screen, X &&pixelclock)
 {
-	screen.set_raw(std::forward<X>(pixelclock),
+	screen.set_raw(pixelclock,
 		sega315_5124_device::WIDTH,
 		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 6*8,
 		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 26*8,

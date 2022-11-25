@@ -4919,6 +4919,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 			break;
@@ -4973,6 +4974,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 			break;
@@ -5026,6 +5028,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 			m_cacr = REG_DA()[(word2 >> 12) & 15];
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 		case 0x800:            /* USP */
@@ -5113,6 +5116,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 		case 0x800:            /* USP */
@@ -6237,10 +6241,10 @@ f548 ffd8 ptest    l .          4:8p
 
 4e70 ffff reset    . .          071234fc:0p
 	if(m_s_flag) {
-		if(!m_reset_instr_callback.isnull())
-			(m_reset_instr_callback)(1);
+		m_reset_cb(1);
 		m68k_reset_peripherals();
 		m_icount -= m_cyc_reset;
+		m_reset_cb(0);
 	} else {
 		m68ki_exception_privilege_violation();
 	}

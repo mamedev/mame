@@ -12,8 +12,6 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-#define A800SLOT_ROM_REGION_TAG ":cart:rom"
-
 /* PCB */
 enum
 {
@@ -37,6 +35,7 @@ enum
 	A800_TELELINK2,
 	A800_MICROCALC,
 	A800_CORINA,
+	A800_CORINA_SRAM,
 	A5200_4K,
 	A5200_8K,
 	A5200_16K,
@@ -60,7 +59,7 @@ public:
 	virtual void write_80xx(offs_t offset, uint8_t data) {}
 	virtual void write_d5xx(offs_t offset, uint8_t data) {}
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 	void nvram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }

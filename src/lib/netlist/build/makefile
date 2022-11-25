@@ -114,7 +114,7 @@ TIDY_DB = $(OBJ)/compile_commands.json
 #LTO decreases performance :-(
 #LTO = -flto=4  -fuse-linker-plugin -Wodr
 
-CCOREFLAGS = -g -O3 -std=c++17 -I$(SRC) -I$(SRC)/.. -I$(SRC)/../..
+CCOREFLAGS = -g -O3 -std=c++17 -I$(SRC)
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++17 $(LDEXTRAFLAGS)

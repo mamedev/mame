@@ -74,7 +74,6 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_nvram_interface overrides
-	virtual bool nvram_can_write() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 	virtual void nvram_default() override;

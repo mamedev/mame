@@ -10,6 +10,7 @@
 
 #include "../nltypes.h"
 
+#include "../plib/pfmtlog.h"
 #include "../plib/pstring.h"
 
 namespace netlist

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "nes_vt_soc.h"
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/rp2a03.h"
 #include "sound/nes_apu_vt.h"
 #include "m6502_vtscr.h"
 #include "m6502_swap_op_d5_d6.h"

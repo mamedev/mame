@@ -3,7 +3,7 @@
 license:CC0
 -->
 <mamelayout version="2">
-	<!-- Lua script (demo for -plugin layout) -->
+	<!-- Lua script (-plugin layout) -->
 	<!-- this adds support for combining outputs to make an aggregated output -->
 	<script><![CDATA[
 		local ledlamps = {

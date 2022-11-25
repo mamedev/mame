@@ -8,10 +8,10 @@
 #include "winutil.h"
 
 #include <cassert>
-
-#include <windows.h>
 #include <cstdlib>
 #include <cstring>
+
+#include <windows.h>
 
 
 namespace {
@@ -44,7 +44,7 @@ public:
 	{
 		DWORD bytes_read;
 		if (!ReadFile(m_handle, buffer, count, &bytes_read, nullptr))
-			return win_error_to_file_error(GetLastError());
+			return win_error_to_error_condition(GetLastError());
 
 		actual = bytes_read;
 		return std::error_condition();
@@ -54,7 +54,7 @@ public:
 	{
 		DWORD bytes_written;
 		if (!WriteFile(m_handle, buffer, count, &bytes_written, nullptr))
-			return win_error_to_file_error(GetLastError());
+			return win_error_to_error_condition(GetLastError());
 
 		actual = bytes_written;
 		return std::error_condition();
@@ -99,7 +99,7 @@ std::error_condition win_open_ptty(std::string const &path, std::uint32_t openfl
 		if (openflags & OPEN_FLAG_CREATE)
 			pipe = CreateNamedPipe(t_name.c_str(), PIPE_ACCESS_DUPLEX, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT, 1, 32, 32, 0, nullptr);
 		if (INVALID_HANDLE_VALUE == pipe)
-			return win_error_to_file_error(GetLastError());
+			return win_error_to_error_condition(GetLastError());
 	}
 	else
 	{

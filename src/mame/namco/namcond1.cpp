@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Mark McDougall, R. Belmont
+// copyright-holders: Mark McDougall, R. Belmont
+
 /*************************************************************
 
     Namco ND-1 Driver - Mark McDougall
@@ -180,7 +181,7 @@ The PCB contains the following parts....
 1x 27C010 128k x8-bit EPROM (DIP32 at U9)
 1x 16M-bit mask ROM (SOP44 at U4)
 1x 8-position DIP Switch labelled SW1. Position 2 is on, all others are off
-1x NEC uPC393 Dual Comparitor (SIL9)
+1x NEC uPC393 Dual Comparator (SIL9)
 1x Sanyo LB1650 Dual-Directional Motor Driver (DIP16)
 1x Maxim MAX202 RS232 Transceiver (SOIC16)
 1x Toshiba TC55257 32k x8-bit SRAM (TSOP28)
@@ -190,31 +191,168 @@ Some logic, resistors/caps/transistors, some connectors etc.
 *************************************************************/
 
 #include "emu.h"
-#include "namcond1.h"
+
+#include "ygv608.h"
 
 #include "cpu/h8/h83002.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/at28c16.h"
+#include "machine/nvram.h"
 #include "sound/c352.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 
+// configurable logging
+#define LOG_CUSKEY     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_CUSKEY)
+
+#include "logmacro.h"
+
+#define LOGCUSKEY(...)     LOGMASKED(LOG_CUSKEY,     __VA_ARGS__)
+
+
+namespace {
+
+class namcond1_state : public driver_device
+{
+public:
+	namcond1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
+		m_ygv608(*this, "ygv608"),
+		m_shared_ram(*this, "shared_ram") { }
+
+	void abcheck(machine_config &config);
+	void namcond1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
+	required_device<ygv608_device> m_ygv608;
+
+	required_shared_ptr<uint16_t> m_shared_ram;
+
+	uint8_t m_h8_irq5_enabled = 0;
+	uint16_t m_p8 = 0;
+
+	uint16_t mcu_p7_read();
+	uint16_t mcu_pa_read();
+	void mcu_pa_write(uint16_t data);
+	uint16_t cuskey_r(offs_t offset);
+	void cuskey_w(offs_t offset, uint16_t data);
+	uint16_t printer_r();
+
+	INTERRUPT_GEN_MEMBER(mcu_interrupt);
+	void abcheck_main_map(address_map &map);
+	void main_map(address_map &map);
+	void h8iomap(address_map &map);
+	void h8rwmap(address_map &map);
+};
+
+
+// Perform basic machine initialisation
+
+
+void namcond1_state::machine_start()
+{
+	save_item(NAME(m_h8_irq5_enabled));
+	// save_item(NAME(m_p8)); //isn't read anywhere for the time being
+}
+
+void namcond1_state::machine_reset()
+{
+#ifdef MAME_DEBUG
+	/*uint8_t   *ROM = memregion(REGION_CPU1)->base();*/
+	/*uint32_t debug_trigger_addr;*/
+	/*int             i;*/
+
+#if 0
+	// debug trigger patch
+	// insert a "move.b $B0000000,D2" into the code
+	debug_trigger_addr = 0x152d4; // after ygv_init
+	ROM[debug_trigger_addr++] = 0x39;
+	ROM[debug_trigger_addr++] = 0x14;
+	ROM[debug_trigger_addr++] = 0xb0;
+	ROM[debug_trigger_addr++] = 0x00;
+	ROM[debug_trigger_addr++] = 0x00;
+	ROM[debug_trigger_addr++] = 0x00;
+#endif
+#endif
+
+	// initialise MCU states
+	m_h8_irq5_enabled = 0;
+
+	// halt the MCU
+	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
+// $c3ff00-$c3ffff
+uint16_t namcond1_state::cuskey_r(offs_t offset)
+{
+	switch (offset)
+	{
+		// this address returns a jump vector inside ISR2
+		// - if zero then the ISR returns without jumping
+		case (0x2e >> 1):
+			return 0x0000;
+		case (0x30 >> 1):
+			return 0x0000;
+
+		default:
+			LOGCUSKEY("%s offset $%X accessed\n",
+				machine().describe_context(), offset << 1);
+			return 0;
+	}
+}
+
+void namcond1_state::cuskey_w(offs_t offset, uint16_t data)
+{
+	switch (offset)
+	{
+		case (0x0a >> 1):
+			// this is a kludge until we emulate the h8
+		if ((m_h8_irq5_enabled == 0) && (data != 0x0000))
+		{
+			m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		}
+			m_h8_irq5_enabled = (data != 0x0000);
+			break;
+
+		case (0x0c >> 1):
+			m_ygv608->set_gfxbank(data & 0x0003);
+			// bit 0 used in abcheck during garbage screens, tile/color select of some kind?
+			break;
+
+		default:
+			break;
+	}
+}
+
+
 /*************************************************************/
 
-void namcond1_state::namcond1_map(address_map &map)
+void namcond1_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x400000, 0x40ffff).ram().share("shared_ram");
+	map(0x400000, 0x40ffff).ram().share(m_shared_ram);
 	map(0x800000, 0x80000f).m(m_ygv608, FUNC(ygv608_device::port_map)).umask16(0xff00);
 	map(0xa00000, 0xa00fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask16(0xff00);
 	map(0xc3ff00, 0xc3ffff).rw(FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
 }
 
-void namcond1_state::abcheck_map(address_map &map)
+void namcond1_state::abcheck_main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x400000, 0x40ffff).ram().share("shared_ram");
+	map(0x400000, 0x40ffff).ram().share(m_shared_ram);
 	map(0x600000, 0x607fff).ram().share("zpr1");
 	map(0x608000, 0x60ffff).ram().share("zpr2");
 	map(0x700000, 0x700001).nopw();
@@ -319,11 +457,11 @@ void namcond1_state::mcu_pa_write(uint16 data)
 	m_p8 = data;
 }
 
-/* H8/3002 MCU stuff */
-void namcond1_state::nd1h8rwmap(address_map &map)
+// H8/3002 MCU stuff
+void namcond1_state::h8rwmap(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x200000, 0x20ffff).ram().share("shared_ram");
+	map(0x200000, 0x20ffff).ram().share(m_shared_ram);
 	map(0xa00000, 0xa07fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
 	map(0xc00000, 0xc00001).portr("DSW");
 	map(0xc00002, 0xc00003).portr("P1_P2");
@@ -334,7 +472,7 @@ void namcond1_state::nd1h8rwmap(address_map &map)
 	map(0xffff1e, 0xffff1f).noprw();     // ^
 }
 
-void namcond1_state::nd1h8iomap(address_map &map)
+void namcond1_state::h8iomap(address_map &map)
 {
 	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(namcond1_state::mcu_p7_read));
 	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcond1_state::mcu_pa_read), FUNC(namcond1_state::mcu_pa_write));
@@ -344,7 +482,7 @@ void namcond1_state::nd1h8iomap(address_map &map)
 
 INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
 {
-	if( m_h8_irq5_enabled )
+	if (m_h8_irq5_enabled)
 	{
 		device.execute().pulse_input_line(5, device.execute().minimum_quantum_time());
 	}
@@ -357,50 +495,40 @@ INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
   - The level 1 interrupt to the 68k has been measured at 60Hz.
 *******************************************/
 
-WRITE_LINE_MEMBER( namcond1_state::vblank_irq_w )
-{
-	m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER( namcond1_state::raster_irq_w )
-{
-	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void namcond1_state::namcond1(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(49'152'000)/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcond1_state::namcond1_map);
+	// basic machine hardware
+	M68000(config, m_maincpu, XTAL(49'152'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcond1_state::main_map);
 //  m_maincpu->set_vblank_int("screen", FUNC(namcond1_state::irq1_line_hold));
 
-	H83002(config, m_mcu, XTAL(49'152'000)/3 );
-	m_mcu->set_addrmap(AS_PROGRAM, &namcond1_state::nd1h8rwmap);
-	m_mcu->set_addrmap(AS_IO, &namcond1_state::nd1h8iomap);
+	H83002(config, m_mcu, XTAL(49'152'000) / 3);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcond1_state::h8rwmap);
+	m_mcu->set_addrmap(AS_IO, &namcond1_state::h8iomap);
 	m_mcu->set_vblank_int("screen", FUNC(namcond1_state::mcu_interrupt));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	YGV608(config, m_ygv608, 0);
-	m_ygv608->vblank_callback().set(FUNC(namcond1_state::vblank_irq_w));
-	m_ygv608->raster_callback().set(FUNC(namcond1_state::raster_irq_w));
+	m_ygv608->vblank_callback().set_inputline(m_maincpu, 1);
+	m_ygv608->raster_callback().set_inputline(m_maincpu, 2);
 	m_ygv608->set_screen("screen");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	/*
 	H 804 108 576 48 32
 	V 261 26 224 3 0
 	*/
-	screen.set_raw( XTAL(49'152'000)/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224);
+	screen.set_raw(XTAL(49'152'000) / 8, 804 / 2, 108 / 2, (108 + 576) / 2, 261, 26, 26 + 224);
 	screen.set_screen_update("ygv608", FUNC(ygv608_device::update_screen));
 	screen.set_palette("ygv608");
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	c352_device &c352(C352(config, "c352", XTAL(49'152'000)/2, 288));
+	c352_device &c352(C352(config, "c352", XTAL(49'152'000) / 2, 288));
 	c352.add_route(0, "lspeaker", 1.00);
 	c352.add_route(1, "rspeaker", 1.00);
 	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
@@ -412,7 +540,7 @@ void namcond1_state::namcond1(machine_config &config)
 void namcond1_state::abcheck(machine_config &config)
 {
 	namcond1(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcond1_state::abcheck_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcond1_state::abcheck_main_map);
 //  m_maincpu->set_vblank_int("screen", FUNC(namcond1_state::irq1_line_hold));
 
 	NVRAM(config, "zpr1", nvram_device::DEFAULT_ALL_0);
@@ -420,14 +548,14 @@ void namcond1_state::abcheck(machine_config &config)
 }
 
 ROM_START( ncv1 )
-	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "nc2main0.14d", 0x00000, 0x80000, CRC(4ffc530b) SHA1(23d622d0261a3584236a77b2cefa522a0f46490e) )
 	ROM_LOAD16_WORD( "nc2main1.13d", 0x80000, 0x80000, CRC(26499a4e) SHA1(4af0c365713b4a51da684a3423b07cbb70d9599b) )
 
-	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x800000, "ygv608", 0 )    /* 2MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    // 2MB character generator
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 	ROM_RELOAD(                     0x200000, 0x200000 )
 	ROM_RELOAD(                     0x400000, 0x200000 )
@@ -438,14 +566,14 @@ ROM_START( ncv1 )
 ROM_END
 
 ROM_START( ncv1j )
-	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "nc1main0.14d",  0x00000, 0x80000, CRC(48ce0b2b) SHA1(07dfca8ba935ee0151211f9eb4d453f2da1d4bd7) )
 	ROM_LOAD16_WORD( "nc1main1.13d",  0x80000, 0x80000, CRC(49f99235) SHA1(97afde7f7dddd8538de78a74325d0038cb1217f7) )
 
-	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x800000, "ygv608", 0 )    /* 2MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    // 2MB character generator
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 	ROM_RELOAD(                     0x200000, 0x200000 )
 	ROM_RELOAD(                     0x400000, 0x200000 )
@@ -456,14 +584,14 @@ ROM_START( ncv1j )
 ROM_END
 
 ROM_START( ncv1j2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "nc1main0b.14d", 0x00000, 0x80000, CRC(7207469d) SHA1(73faf1973a57c1bc2163e9ee3fe2febd3b8763a4) )
 	ROM_LOAD16_WORD( "nc1main1b.13d", 0x80000, 0x80000, CRC(52401b17) SHA1(60c9f20831d0101c02dafbc0bd15422f71f3ad81) )
 
-	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x800000, "ygv608", 0 )    /* 2MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    // 2MB character generator
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 	ROM_RELOAD(                     0x200000, 0x200000 )
 	ROM_RELOAD(                     0x400000, 0x200000 )
@@ -474,14 +602,14 @@ ROM_START( ncv1j2 )
 ROM_END
 
 ROM_START( ncv2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "ncs2main0.14e", 0x00000, 0x80000, CRC(fb8a4123) SHA1(47acdfe9b5441d0e3649aaa9780e676f760c4e42) )
 	ROM_LOAD16_WORD( "ncs2main1.13e", 0x80000, 0x80000, CRC(7a5ef23b) SHA1(0408742424a6abad512b5baff63409fe44353e10) )
 
-	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )
 	ROM_LOAD( "ncs1sub.1d",          0x00000, 0x80000, CRC(365cadbf) SHA1(7263220e1630239e3e88b828c00389d02628bd7d) )
 
-	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    // 4MB character generator
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_RELOAD(                      0x200000, 0x200000 )
 	ROM_LOAD( "ncs1cg1.10f",         0x400000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
@@ -492,14 +620,14 @@ ROM_START( ncv2 )
 ROM_END
 
 ROM_START( ncv2j )
-	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "ncs1main0.14e", 0x00000, 0x80000, CRC(99991192) SHA1(e0b0e15ae23560b77119b3d3e4b2d2bb9d8b36c9) )
 	ROM_LOAD16_WORD( "ncs1main1.13e", 0x80000, 0x80000, CRC(af4ba4f6) SHA1(ff5adfdd462cfd3f17fbe2401dfc88ff8c71b6f8) )
 
-	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )
 	ROM_LOAD("ncs1sub.1d",          0x00000, 0x80000, CRC(365cadbf) SHA1(7263220e1630239e3e88b828c00389d02628bd7d) )
 
-	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    // 4MB character generator
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_RELOAD(                      0x200000, 0x200000 )
 	ROM_LOAD( "ncs1cg1.10f",         0x400000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
@@ -510,14 +638,14 @@ ROM_START( ncv2j )
 ROM_END
 
 ROM_START( gynotai )
-	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "gy1main0.14e", 0x000000, 0x080000, CRC(1421dbf5) SHA1(7e4322cddc3317c9ed82a97c0fe387ce1364cf9b) )
 	ROM_LOAD( "gy1main1.13e", 0x080000, 0x080000, CRC(dc10a4a7) SHA1(01a6b5aae8599de9015d6e332f5bd286bc84c807) )
 
-	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )
 	ROM_LOAD( "gy1sub0.1d",   0x000000, 0x080000, CRC(fd31e963) SHA1(b658921dd29cfad0c366465ae37a356c3d2fb4d3) )
 
-	ROM_REGION( 0x800000, "ygv608", 0 )    /* 8MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    // 8MB character generator
 	ROM_LOAD( "gy1cg0.10e",   0x000000, 0x400000, CRC(938c7912) SHA1(36278a945a00e1549ae55ec65a9b4001537023b0) )
 	ROM_LOAD( "gy1cg1.10f",   0x400000, 0x400000, CRC(5a518733) SHA1(b6ea91629bc6ddf67c47c4189084aa947f4e31ed) )
 
@@ -526,14 +654,14 @@ ROM_START( gynotai )
 ROM_END
 
 ROM_START( abcheck )
-	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "an1main0b.14e", 0x000000, 0x080000, CRC(f1b9777d) SHA1(b28f4106e1e145dc1aaa5af455b6f991d2b04c59) )
 	ROM_LOAD( "an1main1b.13e", 0x080000, 0x080000, CRC(d40ccdcc) SHA1(05f864d84bf34a1722c598378ed8d27fba00f575) )
 
-	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )
 	ROM_LOAD( "an1sub.1d",    0x000000, 0x080000, CRC(50de9130) SHA1(470b3977f4bf12ca65bc42631ccdf81753ef56fd) )
 
-	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    // 4MB character generator
 	ROM_LOAD( "an1cg0.10e",   0x000000, 0x400000, CRC(14425378) SHA1(c690bd0f48fa2bc285b63e6bc379d2b345eafc7b) )
 	ROM_LOAD( "an1cg1.10f",   0x400000, 0x400000, CRC(0428d718) SHA1(4b4dca7196b9ba1a01558f41c761d3211be67fb0) )
 
@@ -557,12 +685,14 @@ ROM_START( abcheck )
 	ROM_LOAD( "npg1624lc.u4", 0x020000, 0x200000, CRC(7e00254f) SHA1(b0fa8f979e8322d71f842de5358ae2a2e36386f7) )
 ROM_END
 
+} // anonymous namespace
 
-// fwiw it looks like version numbering at POST is for the ND1 framework build the games are based on.
-GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 1.00
+
+// FWIW it looks like version numbering at POST is for the ND1 framework build the games are based on.
+GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 1.00
 GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 1.03
-GAME( 1996, gynotai,   0, namcond1, gynotai,  namcond1_state, empty_init, ROT0,  "Namco", "Gynotai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // 1.04
-GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 1.10
-GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // 1.20EM
+GAME( 1996, gynotai,   0, namcond1, gynotai,  namcond1_state, empty_init, ROT0,  "Namco", "Gynotai (Japan)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // 1.04
+GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 1.10
+GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // 1.20EM

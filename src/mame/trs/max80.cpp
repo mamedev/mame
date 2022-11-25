@@ -57,6 +57,7 @@ Status: Beeps every so often. Unable to read the disk.
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 //#include "machine/ram.h"
 #include "imagedev/floppy.h"
@@ -70,12 +71,16 @@ Status: Beeps every so often. Unable to read the disk.
 #include "sound/beep.h"
 #include "machine/timer.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 #include "formats/imd_dsk.h"
 //#include "formats/trs80_dsk.h"
 //#include "formats/dmk_dsk.h"
+
+#include "utf8.h"
 
 class max80_state : public driver_device
 {

@@ -6,7 +6,7 @@ Tavernier CPU09 and IVG09 (Realisez votre ordinateur individuel)
 
 2013-12-08 Skeleton driver.
 
-This system was described in a French computer magazine "Micro-Informatique".
+This system was described in a French magazine "Le Haut-Parleur".
 
 CPU09 includes 6809, 6821, 6840, 6850, cassette, rs232
 IVG09 includes 6845, another 6821, beeper

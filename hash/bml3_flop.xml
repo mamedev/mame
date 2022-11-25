@@ -17,12 +17,12 @@ Compaibility flags:
 		<sharedfeat name="compatibility" value="5" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="346800">
-				<rom name="hiwriter.d88" size="346800" crc="637f3b94" sha1="0bf7fdb528e03aa2409f386e63e257f5aa013c8f"  />
+				<rom name="hiwriter.d88" size="346800" crc="637f3b94" sha1="0bf7fdb528e03aa2409f386e63e257f5aa013c8f" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="185008">
-				<rom name="hidata.d88" size="185008" crc="bc610e83" sha1="162432ff9be34a87f20a02664c0aa1f8e0cb674b"  />
+				<rom name="hidata.d88" size="185008" crc="bc610e83" sha1="162432ff9be34a87f20a02664c0aa1f8e0cb674b" />
 			</dataarea>
 		</part>
 	</software>

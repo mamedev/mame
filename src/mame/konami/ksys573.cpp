@@ -49,7 +49,7 @@ P Anime Champ                                         2000.12    GCA07 JA       
 P Bass Angler                                         1998.03    GE765 JA          765 JA A02
 P Bass Angler 2                                       1998.07    GC865 JA          865 JA A02
 K Dance Dance Revolution Karaoke MIX (DAM-DDR)        1999.11    GQ921 JB          921 JB B02
-K *Dance Dance Revolution Karaoke MIX (DAM-DDR) 2nd   2000.07
+K Dance Dance Revolution Karaoke MIX (DAM-DDR) 2nd    2000.07    GQ947 JA          947 JA A02
 A Dance Dance Revolution                              1998.09    GC845 JA          845 JA(missing)/UA A01 / 845 JA A02
 A Dance Dance Revolution Internet Ranking ver.        1998.11    GC845 JB          845 JB A01 / 845 JA/UA A02
 A Dance Dance Revolution 2ndMIX                       1999.01    GC895 JA          895 JA A02
@@ -76,7 +76,7 @@ D Dancing Stage featuring Disney's Rave               2000.11    GCA37 JA       
 D Dancing Stage featuring DREAMS COME TRUE            1999.12    GC910 JA          910 JA/JC A02
 A Dancing Stage featuring TRUE KiSS DESTiNATiON       1999.07    G*884 JA          884 JA A02
 P Dark Horse Legend                                   1998.03    GX706 JA          706 JA A02
-A drummania                                           1999.07    GQ881 JA          881 JA D01 / 881 JA A02(missing, audio CD)
+A drummania                                           1999.07    GQ881 JA          881 JA D01 / 881 JA A02
 D drummania 2ndMIX                                    2000.03    GE912 JA          912 JA B02
 D drummania 3rdMIX                                    2000.09    GCA23 JA          A23 JA A02
 D drummania 4thMIX                                    2001.03    GEA25 JA          A25 JA A02
@@ -93,9 +93,10 @@ P Fisherman's Bait 2                                  1998       GC865 UA       
 P Fisherman's Bait Marlin Challenge                   1999       GX889             889 AA/EA/JA/UA(needs redump)
 P Gachagachamp                                        1999.01    GQ877 JA          GE877-JA(PCMCIA card)
 P Great Bishi Bashi Champ                             2002.??    GBA48 JA          (no CD)
-A GUITARFREAKS                                        1999.02    GQ886 EA/JA/UA    886 ** C02
-A GUITARFREAKS 2ndMIX                                 1999.07    GQ883 JA          929 JB B02(needs redump)
-A *GUITARFREAKS 2ndMIX Link ver.                      1999.09
+A GUITARFREAKS                                        1999.02    GQ886 EA/JA/UA/AA 886 ** A02/C02/D02
+A GUITARFREAKS 2ndMIX                                 1999.07    GQ883 JA          883 ** A02
+A GUITARFREAKS 2ndMIX Link Kit 1                      1999.09    GE929 JA          929 JA A02
+A GUITARFREAKS 2ndMIX Link Kit 2                      1999.11    GC929 JB          929 JB B02
 D GUITARFREAKS 3rdMIX                                 2000.04    GE949 JA          949 JA C01 / 949 JA C02
 D GUITARFREAKS 4thMIX                                 2000.08    GEA24 JA          A24 JA A02
 D GUITARFREAKS 5thMIX                                 2001.03    GCA26 JA          A26 JA A02
@@ -107,7 +108,7 @@ N GUITARFREAKS 9thMIX                                 2003.04    GCC39 JA       
 N GUITARFREAKS 10thMIX                                2003.10    GCD10 JA          D10 JA A02
 N GUITARFREAKS 11thMIX                                2004.04
 G GunMania                                            2000.07    G?906 JA          (no CD)
-? *GunMania Zone Plus                                 2000.10
+? *GunMania Zone Plus                                 2000.10    GCA15 JA
 P Handle Champ                                        1997.12    GQ710 JA          (no CD)
 P Hyper Bishi Bashi Champ                             1998.07    GC876 EA          (no CD)
 P Hyper Bishi Bashi Champ - 2 Player                  1999.08    GC908 JA          908    A02
@@ -3890,6 +3891,19 @@ ROM_START( ddrkara )
 	DISK_IMAGE_READONLY( "921jbb02", 0, SHA1(32849007fe5527245a6cc2de38e73d60ae74eff0) )
 ROM_END
 
+ROM_START( ddrkara2 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gc947ja.u1", 0x000000, 0x000224, CRC(5bea7b68) SHA1(46d3ae1ffa97474cc2e91cb5982dcf4ca9cc9a1d) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gc947ja.u6", 0x000000, 0x000008, CRC(6d76f4a9) SHA1(4fe5d9151ca0a0a67d64657c9a82776b928f429b) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "947jaa02", 0, SHA1(c1e9ad0386b52867bdabd550b95e1651d07d972c) )
+ROM_END
+
 ROM_START( ddr2m )
 	SYS573_BIOS_A
 
@@ -3933,13 +3947,23 @@ ROM_START( ddr2ml )
 	ROM_LOAD( "ge885jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(a066ad5e) SHA1(1783c62d7396e4e7f8d723b7bc07e45285dc122d) )
 
 	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "885jac01", 0, SHA1(ed864096ee99aa813f40642b9467fe2cbb07d669) )
+ROM_END
+
+ROM_START( ddr2mla )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "ge885jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(a066ad5e) SHA1(1783c62d7396e4e7f8d723b7bc07e45285dc122d) )
+
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "885jab01", 0, SHA1(c2bbb9e2e6f34e07f57e7076726af81df39f55c9) )
 
 	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "885jaa02", 0, SHA1(f02bb09f41533c6ec496a662d815e85b304fcc72) )
 ROM_END
 
-ROM_START( ddr2mla )
+ROM_START( ddr2mlb )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
@@ -4295,7 +4319,7 @@ ROM_START( drmn )
 	ROM_LOAD( "gq881ja.22h",  0x000000, 0x002000, CRC(e834d5ec) SHA1(1c845811e43d7dfec657da288b5a38b8bc9c8366) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "881xxb02", 0, BAD_DUMP SHA1(9252ff1841584c06506f58c9a9cefbc82b32187d) )
+	DISK_IMAGE_READONLY( "881xxb02", 0, BAD_DUMP SHA1(9252ff1841584c06506f58c9a9cefbc82b32187d) ) // drummania/percussion freaks hybrid cd
 ROM_END
 
 ROM_START( drmna )
@@ -4313,11 +4337,10 @@ ROM_START( drmna )
 	ROM_LOAD( "gq881ja.22h",  0x000000, 0x002000, CRC(e834d5ec) SHA1(1c845811e43d7dfec657da288b5a38b8bc9c8366) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "881jad01", 0, BAD_DUMP SHA1(7d9d47bef636dbaa8d578f34ea9489e349d3d6df) ) // upgrade or bootleg?
+	DISK_IMAGE_READONLY( "881jad01", 0, BAD_DUMP SHA1(7d9d47bef636dbaa8d578f34ea9489e349d3d6df) ) // upgrade cd
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "881jaa02", 0, NO_DUMP ) // game asks for this after installation
-	DISK_IMAGE_READONLY( "881xxb02", 0, BAD_DUMP SHA1(9252ff1841584c06506f58c9a9cefbc82b32187d) )
+	DISK_IMAGE_READONLY( "881jaa02", 0, SHA1(dad3eab14bb4535dd52885fef022720caf280e2b) )
 ROM_END
 
 ROM_START( drmn2m )
@@ -4506,10 +4529,42 @@ ROM_START( drmn9m )
 	ROM_LOAD( "gcd09jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "d09jab01", 0, SHA1(f3962f77b96a48bf0195700f4b72bf02d75a7e03) )
+
+	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "d09jaa02", 0, BAD_DUMP SHA1(33f3e48ed5a8becd8c4714413e454328d8d5baae) )
 
 	DISK_REGION( "multisession" )
-	DISK_IMAGE_READONLY( "d09jba02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "d09jba02", 0, BAD_DUMP SHA1(68324d474d89a9ddf5cadc9ab4a8d615b3739879) )
+ROM_END
+
+ROM_START( drmn9ma )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gcd09jaa.u1",   0x000000, 0x00008c, BAD_DUMP CRC(f73f2f6b) SHA1(30abe964fcef3901b2098e32946568f4a7c617d7) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gcd09jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "d09jaa02", 0, BAD_DUMP SHA1(33f3e48ed5a8becd8c4714413e454328d8d5baae) )
+
+	DISK_REGION( "multisession" )
+	DISK_IMAGE_READONLY( "d09jba02", 0, BAD_DUMP SHA1(68324d474d89a9ddf5cadc9ab4a8d615b3739879) )
+ROM_END
+
+ROM_START( drmn9mb )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gcd09jaa.u1",   0x000000, 0x00008c, BAD_DUMP CRC(f73f2f6b) SHA1(30abe964fcef3901b2098e32946568f4a7c617d7) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gcd09jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "d09jca02", 0, SHA1(4583ce07fca67660f9f1928589f39d3f551206ff) )
 ROM_END
 
 ROM_START( drmn10m )
@@ -4528,6 +4583,19 @@ ROM_START( drmn10m )
 	DISK_IMAGE_READONLY( "d40jba02", 0, BAD_DUMP SHA1(0ded9e0a6c77b181e7b6beb1dbdfa17dee4acd90) )
 ROM_END
 
+ROM_START( drmn10ma )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gcd40jaa.u1",   0x000000, 0x00008c, BAD_DUMP CRC(d98d4aa5) SHA1(7142c1e6291fdaac726477662487c7600c048e0a) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gcd40jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "d40jca02", 0, SHA1(f0208a62e2d15773961e89383ae8d4bd2e8f6b47) )
+ROM_END
+
 ROM_START( dmx )
 	SYS573_BIOS_A
 
@@ -4539,6 +4607,19 @@ ROM_START( dmx )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "874jaa", 0, BAD_DUMP SHA1(3338a784efdca4f8bdcc83d2c9a6bbe7f7046d5c) )
+ROM_END
+
+ROM_START( dmxa )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "ge874aa.u1",   0x000000, 0x00008c, BAD_DUMP CRC(cf2fc30c) SHA1(1d2688f8fe2d8b51dd73815dedb3e99f53439846) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "ge874aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "874aaa02", 0, SHA1(6985445a492e9d8ccd9938c7c47402c3886e2d62) )
 ROM_END
 
 ROM_START( dmx2m )
@@ -5048,6 +5129,46 @@ ROM_START( gtrfrksac )
 	DISK_IMAGE_READONLY( "886__c02", 0, BAD_DUMP SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
 ROM_END
 
+ROM_START( gtrfrksea )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886eac.u1",  0x000000, 0x000224, BAD_DUMP CRC(3b38dccf) SHA1(c313d025b4faed73ab021b76dbf0c51c9d701eb3) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
+ROM_START( gtrfrksua )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886uac.u1",  0x000000, 0x000224, BAD_DUMP CRC(29bb1ad5) SHA1(797ba61b6407fc0d0531e58129a9230e1484dc11) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
+ROM_START( gtrfrksja )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886jac.u1",  0x000000, 0x000224, BAD_DUMP CRC(2c7a64bd) SHA1(01bd46989a897dbd023603e5cabbd7deb85825ff) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
+ROM_START( gtrfrksaa )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886aac.u1",  0x000000, 0x000224, BAD_DUMP CRC(d220ae69) SHA1(dfdd29197222cb621b05f9b9091cff9a20cd846e) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
 ROM_START( gtrfrk2m )
 	SYS573_BIOS_A
 
@@ -5243,6 +5364,24 @@ ROM_START( gtrfrk5m )
 	DISK_IMAGE_READONLY( "a26jaa02", 0, BAD_DUMP SHA1(9909e08abff780db6fd7a5fbcc57ffbe14ae08ce) )
 ROM_END
 
+ROM_START( gtrfrk5ma )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gea26aaa.u1",  0x000000, 0x00008c, BAD_DUMP CRC(09539c73) SHA1(a92a9c41121d98e06890323564cf731c437d9286) )
+
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
+	ROM_LOAD( "gea26aaa.31m", 0x000000, 0x200000, CRC(59a9a1a0) SHA1(f673d8f60a77e2257ffc9c7e486fc836733bc14c) )
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
+	ROM_LOAD( "gea26aaa.27m", 0x000000, 0x200000, CRC(345dc5f2) SHA1(61af3fcfe6119c1e8e18b92693855ab4fe708b30) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gea26aaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "a26aaa02", 0, SHA1(79c430664b79fb8f8d78b61b0192b73e70d3f206) )
+ROM_END
+
 ROM_START( gtrfrk6m )
 	SYS573_BIOS_A
 
@@ -5376,6 +5515,19 @@ ROM_START( gtfrk11m )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "d39jaa02", 0, BAD_DUMP SHA1(7a87ee331ba0301bb8724c398e6c77cfb9c172a7) )
+ROM_END
+
+ROM_START( gtfrk11ma )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gcd39ja.u1",   0x000000, 0x00008c, BAD_DUMP CRC(809301a6) SHA1(718e646bc6e72d89e78b771fb64374f77c5662a0) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gcd39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "d39jba02", 0, SHA1(a10225d1dd6cfd22382970099927aeba5e0c03e7) )
 ROM_END
 
 ROM_START( gunmania )
@@ -5985,10 +6137,39 @@ ROM_START( pcnfrk9m )
 	ROM_LOAD( "gcd09aba.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "d09aaa02", 0, SHA1(593706872e3a541acfe4d9527c3a5e89cc193e98) )
+ROM_END
+
+ROM_START( pcnfrk9ma )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gcd09aba.u1",   0x000000, 0x00008c, BAD_DUMP CRC(1fe73b91) SHA1(b3c49b84295b9dfc946b12a53bdec5cd24541c98) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gcd09aba.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "d09aba02", 0, BAD_DUMP SHA1(a817d1c7fdb354b7d2d5c08f92a352c76a2b1a72) )
 ROM_END
 
 ROM_START( pcnfrk10m )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gcd40aca.u1",   0x000000, 0x00008c, BAD_DUMP CRC(cbeaaaae) SHA1(ccc6c47b20ab847859ec37c9c45dc90b24a232b5) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gcd40aca.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "d40aaa02", 0, SHA1(638c19588c5f9967eb5623a3a979ac68e7c96dae) )
+
+	DISK_REGION( "multisession" )
+	DISK_IMAGE_READONLY( "d40aba02", 0, NO_DUMP )
+ROM_END
+
+ROM_START( pcnfrk10ma )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
@@ -6226,7 +6407,7 @@ GAME( 1998, ddrj,      dstage,   ddr,        ddr,       ddr_state,     init_ddr,
 GAME( 1998, ddrja,     dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GC845 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, ddrjb,     dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GC845 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, ddra,      dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GN845 VER. AAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1999, ddrkara,   dstage,   ddrk,       ddrkara,   ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Karaoke Mix (GQ921 VER. JBB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, ddrkara,   sys573,   ddrk,       ddrkara,   ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Karaoke Mix (GQ921 VER. JBB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, fbait2bc,  sys573,   fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, bassang2,  fbait2bc, fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Bass Angler 2 (GE865 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, hyperbbc,  sys573,   hyperbbc,   hyperbbc,  ksys573_state, init_hyperbbc, ROT0,  "Konami", "Hyper Bishi Bashi Champ (GQ876 VER. EAA)", MACHINE_IMPERFECT_SOUND )
@@ -6241,13 +6422,18 @@ GAME( 1999, gtrfrksc,  gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_ini
 GAME( 1999, gtrfrksuc, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. UAC)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksjc, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. JAC)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksac, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. AAC)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksea, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. EAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksua, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. UAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksja, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. JAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksaa, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. AAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, fbaitmc,   sys573,   fbaitbc,    fbaitmc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. EA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, fbaitmcu,  fbaitmc,  fbaitbc,    fbaitmc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. UA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, fbaitmcj,  fbaitmc,  fbaitbc,    fbaitmc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. JA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, fbaitmca,  fbaitmc,  fbaitbc,    fbaitmc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. AA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ddr2m,     sys573,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix (GN895 VER. JAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1999, ddr2ml,    ddr2m,    ddr2ml,     ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAB)", MACHINE_IMPERFECT_SOUND )
-GAME( 1999, ddr2mla,   ddr2m,    ddr2ml,     ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, ddr2ml,    ddr2m,    ddr2ml,     ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAC)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, ddr2mla,   ddr2m,    ddr2ml,     ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAB)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, ddr2mlb,   ddr2m,    ddr2ml,     ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ddrbocd,   ddr2m,    ddrbocd,    ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Best of Cool Dancers (GE892 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ddr2mc,    ddr2m,    ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ddr2mc2,   ddr2m,    ddr2mc2,    ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)", MACHINE_IMPERFECT_SOUND )
@@ -6286,6 +6472,7 @@ GAME( 1999, drmn2mpu,  pcnfrk2m, drmn2m,     drmn,      ksys573_state, empty_ini
 GAME( 1999, stepchmp,  sys573,   stepchmp,   hyperbbc,  ksys573_state, init_serlamp,  ROT0,  "Konami", "Step Champ (GQ930 VER. JA)", MACHINE_NO_SOUND )
 GAME( 2000, dncfrks,   sys573,   dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Freaks (G*874 VER. KAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,       dncfrks,  dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Maniax (G*874 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.6 */
+GAME( 2000, dmxa,      dncfrks,  dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Maniax (G*874 VER. AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, gunmania,  sys573,   gunmania,   gunmania,  ksys573_state, empty_init,    ROT0,  "Konami", "GunMania (GL906 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAMEL(2000, fghtmn,    sys573,   pnchmn,     pnchmn,    pnchmn_state,  init_pnchmn,   ROT0,  "Konami", "Fighting Mania (QG918 VER. EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_pnchmn ) /* artwork/network */
 GAMEL(2000, fghtmna,   fghtmn,   pnchmn,     pnchmn,    pnchmn_state,  init_pnchmn,   ROT0,  "Konami", "Fighting Mania (QG918 VER. AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_pnchmn ) /* artwork/network */
@@ -6294,6 +6481,7 @@ GAMEL(2000, pnchmna,   fghtmn,   pnchmn,     pnchmn,    pnchmn_state,  init_pnch
 GAMEL(2000, fghtmnk,   fghtmn,   pnchmn,     pnchmn,    pnchmn_state,  init_pnchmn,   ROT0,  "Konami", "Fighting Mania (QG918 VER. KAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_pnchmn ) /* artwork/network */
 GAMEL(2000, fghtmnu,   fghtmn,   pnchmn,     pnchmn,    pnchmn_state,  init_pnchmn,   ROT0,  "Konami", "Fighting Mania (QG918 VER. UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_pnchmn ) /* artwork/network */
 GAME( 2000, dsem,      sys573,   dsem,       ddr,       ddr_state,     empty_init,    ROT0,  "Konami", "Dancing Stage Euro Mix (G*936 VER. EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.7 */
+GAME( 2000, ddrkara2,  sys573,   ddrk,       ddrkara,   ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Karaoke Mix 2 (GQ947 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, gtrfrk3m,  sys573,   gtrfrk3m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3ma,  gtrfrk3m, gtrfrk3m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3mb,  gtrfrk3m, gtrfrk5m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */
@@ -6318,6 +6506,7 @@ GAME( 2001, pcnfrk4m,  sys573,   drmn4m,     drmn,      ksys573_state, empty_ini
 GAME( 2001, pcnfrk4mk, pcnfrk4m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 4th Mix (G*A25 VER. KAA)", MACHINE_IMPERFECT_SOUND ) /* BOOT VER 1.9 */
 GAME( 2001, drmn4m,    pcnfrk4m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 4th Mix (G*A25 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, gtrfrk5m,  sys573,   gtrfrk5m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, gtrfrk5ma, gtrfrk5m, gtrfrk5m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 5th Mix (G*A26 VER. AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, ddr5m,     sys573,   ddr5m,      ddr,       ddr_state,     empty_init,    ROT0,  "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, kicknkick, sys573,   kicknkick,  kicknkick, ksys573_state, empty_init,    ROT0,  "Konami", "Kick & Kick (GNA36 VER. EAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, dmx2majp,  sys573,   dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
@@ -6344,11 +6533,17 @@ GAME( 2002, ddrextrm,  sys573,   ddr5m,      ddr,       ddr_state,     empty_ini
 GAME( 2003, pcnfrk8m,  sys573,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 8th Mix (G*C38 VER. AAA)", MACHINE_IMPERFECT_SOUND ) /* BOOT VER 1.95 */
 GAME( 2003, drmn8m,    pcnfrk8m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 8th Mix (G*C38 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtrfrk9m,  sys573,   gtrfrk7m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 9th Mix (G*C39 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2003, pcnfrk9m,  sys573,   drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 9th Mix eAmusement (G*D09 VER. ABA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2003, drmn9m,    pcnfrk9m, drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 9th Mix (G*D09 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2003, pcnfrk9m,  sys573,   drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 9th Mix (G*D09 VER. AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2003, pcnfrk9ma, pcnfrk9m, drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 9th Mix eAmusement (G*D09 VER. ABA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2003, drmn9m,    pcnfrk9m, drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 9th Mix (G*D09 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2003, drmn9ma,   pcnfrk9m, drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 9th Mix (G*D09 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2003, drmn9mb,   pcnfrk9m, drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 9th Mix eAmusement (G*D09 VER. JCA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtfrk10m,  sys573,   gtfrk10m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix (G*D10 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtfrk10ma, gtfrk10m, gtfrk10m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix (G*D10 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtfrk10mb, gtfrk10m, gtfrk10mb,  gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix eAmusement (G*D10 VER. JBA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2004, gtfrk11m,  sys573,   gtfrk11m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 11th Mix (G*D39 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2004, pcnfrk10m, sys573,   drmn10m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 10th Mix eAmusement (G*D40 VER. ACA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2004, gtfrk11ma, gtfrk11m, gtfrk11m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 11th Mix eAmusement (G*D39 VER. JBA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2004, pcnfrk10m, sys573,   drmn10m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 10th Mix (G*D40 VER. AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2004, pcnfrk10ma,pcnfrk10m,drmn10m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 10th Mix eAmusement (G*D40 VER. ACA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2004, drmn10m,   pcnfrk10m,drmn10m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 10th Mix (G*D40 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2004, drmn10ma,  pcnfrk10m,drmn10m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 10th Mix eAmusement (G*D40 VER. JCA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */

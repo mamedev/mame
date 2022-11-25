@@ -214,8 +214,8 @@ protected:
 	uint16_t m_spritebase = 0U;
 
 	// sound-related
-	uint32_t m_adpcm_data = 0U;
 	uint32_t m_adpcm_address = 0U;
+	bool m_adpcm_playing = false;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -247,7 +247,9 @@ class appoooh_state : public base_state
 public:
 	appoooh_state(const machine_config &mconfig, device_type type, const char *tag) :
 		base_state(mconfig, type, tag)
-	{ m_spritebase = 0; }
+	{
+		m_spritebase = 0;
+	}
 
 	void appoooh(machine_config &config);
 
@@ -261,7 +263,9 @@ public:
 	robowres_state(const machine_config &mconfig, device_type type, const char *tag) :
 		base_state(mconfig, type, tag),
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
-	{ m_spritebase = 0x200; }
+	{
+		m_spritebase = 0x200;
+	}
 
 	void init_robowresb();
 
@@ -277,8 +281,6 @@ private:
 	void decrypted_opcodes_map(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -327,7 +329,7 @@ void robowres_state::palette(palette_device &palette) const
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-			uint8_t const pen = color_prom[0x20 + i] & 0x0f;
+		uint8_t const pen = color_prom[0x20 + i] & 0x0f;
 
 		// red component
 		int bit0 = BIT(color_prom[pen], 0);
@@ -352,7 +354,6 @@ void robowres_state::palette(palette_device &palette) const
 }
 
 
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -371,6 +372,7 @@ TILE_GET_INFO_MEMBER(base_state::get_tile_info)
 	);
 }
 
+
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -385,9 +387,6 @@ void base_state::video_start()
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[0]->set_scrolldy(8, 8);
 	m_tilemap[1]->set_scrolldy(8, 8);
-
-	save_item(NAME(m_scroll_x));
-	save_item(NAME(m_priority));
 }
 
 void base_state::scroll_w(uint8_t data)
@@ -454,11 +453,11 @@ void base_state::draw_sprites(bitmap_ind16 &dest_bmp, const rectangle &cliprect,
 			flipx = !flipx;
 		}
 
-				gfx->transpen(dest_bmp, cliprect,
-				code,
-				color,
-				flipx, flipy,
-				sx, sy, 0);
+		gfx->transpen(dest_bmp, cliprect,
+		code,
+		color,
+		flipx, flipy,
+		sx, sy, 0);
 	}
 }
 
@@ -493,37 +492,35 @@ uint32_t base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 
-// machine
+/*************************************
+ *
+ *  ADPCM sound
+ *
+ *************************************/
 
 WRITE_LINE_MEMBER(base_state::adpcm_int)
 {
-	if (m_adpcm_address != 0xffffffff)
-	{
-		if (m_adpcm_data == 0xffffffff)
-		{
-			m_adpcm_data = m_adpcm_rom[m_adpcm_address++];
-			m_msm->data_w(m_adpcm_data >> 4);
+	if (!m_adpcm_playing || !state)
+		return;
 
-			if (m_adpcm_data == 0x70)
-			{
-				m_adpcm_address = 0xffffffff;
-				m_msm->reset_w(1);
-			}
-		}
-		else
-		{
-			m_msm->data_w(m_adpcm_data & 0x0f);
-			m_adpcm_data = -1;
-		}
+	uint8_t data = m_adpcm_rom[m_adpcm_address / 2];
+	if (data == 0x70)
+	{
+		m_msm->reset_w(1);
+		m_adpcm_playing = false;
+	}
+	else
+	{
+		m_msm->data_w(m_adpcm_address & 1 ? data & 0xf : data >> 4);
+		m_adpcm_address = (m_adpcm_address + 1) & 0x1ffff;
 	}
 }
 
-// adpcm address write
 void base_state::adpcm_w(uint8_t data)
 {
-	m_adpcm_address = data << 8;
+	m_adpcm_address = (data << 8) * 2;
 	m_msm->reset_w(0);
-	m_adpcm_data = 0xffffffff;
+	m_adpcm_playing = true;
 }
 
 
@@ -646,8 +643,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-
- static const gfx_layout charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,
 	RGN_FRAC(1,3),
@@ -690,16 +686,17 @@ void base_state::machine_start()
 {
 	m_mainbank->configure_entries(0, 2, memregion("maincpu")->base() + 0xa000, 0x6000);
 
-	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_priority));
 	save_item(NAME(m_adpcm_address));
+	save_item(NAME(m_adpcm_playing));
+	save_item(NAME(m_nmi_mask));
 }
 
 void base_state::machine_reset()
 {
-	m_adpcm_address = 0xffffffff;
-	m_adpcm_data = 0;
-	m_scroll_x = 0;
-	m_priority = 0;
+	m_adpcm_playing = false;
+	out_w(0);
 }
 
 INTERRUPT_GEN_MEMBER(base_state::vblank_irq)
@@ -724,8 +721,8 @@ void base_state::common(machine_config &config)
 	SN76489(config, "sn3", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.30); // divider unknown
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(base_state::adpcm_int)); // interrupt function
-	m_msm->set_prescaler_selector(msm5205_device::S64_4B);  // 6KHz
+	m_msm->vck_callback().set(FUNC(base_state::adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S64_4B); // 6KHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -797,21 +794,21 @@ ROM_START( appoooh )
 	ROM_LOAD( "epr-5914.bin", 0x12000, 0x2000, CRC(58792d4a) SHA1(8acdb0ebee5faadadd64bd64db1fdf881ee70333) ) // a000-dfff
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )
-	ROM_LOAD( "epr-5895.bin", 0x00000, 0x4000, CRC(4b0d4294) SHA1(f9f4d928c76b32cbcbaf7bfd0ebec2d4dfc37566) )   // playfield #1 chars
+	ROM_LOAD( "epr-5895.bin", 0x00000, 0x4000, CRC(4b0d4294) SHA1(f9f4d928c76b32cbcbaf7bfd0ebec2d4dfc37566) ) // playfield #1 chars
 	ROM_LOAD( "epr-5896.bin", 0x04000, 0x4000, CRC(7bc84d75) SHA1(36e98eaac1ba23ab842080205bdb5b76b888ddc2) )
 	ROM_LOAD( "epr-5897.bin", 0x08000, 0x4000, CRC(745f3ffa) SHA1(03f5d1d567e786e7835defc6995d1b39aee2c28d) )
 
 	ROM_REGION( 0x0c000, "gfx2", 0 )
-	ROM_LOAD( "epr-5898.bin", 0x00000, 0x4000, CRC(cf01644d) SHA1(0cc1b7f7a3b33b0edf4e277e320467b19dfc5bc8) )   // playfield #2 chars
+	ROM_LOAD( "epr-5898.bin", 0x00000, 0x4000, CRC(cf01644d) SHA1(0cc1b7f7a3b33b0edf4e277e320467b19dfc5bc8) ) // playfield #2 chars
 	ROM_LOAD( "epr-5899.bin", 0x04000, 0x4000, CRC(885ad636) SHA1(d040948f7cf030e4ab0f0509df23cb855e9c920c) )
 	ROM_LOAD( "epr-5900.bin", 0x08000, 0x4000, CRC(a8ed13f3) SHA1(31c4a52fea8f26b4a79564c7e8443a88d43aee12) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pr5921.prm",   0x0000, 0x020, CRC(f2437229) SHA1(8fb4240142f4c77f820d7c153c22ff82f66aa7b1) )     // palette
-	ROM_LOAD( "pr5922.prm",   0x0020, 0x100, CRC(85c542bf) SHA1(371d92fca2ae609a47d3a2ea349f14f30b846da8) )     // charset #1 lookup table
-	ROM_LOAD( "pr5923.prm",   0x0120, 0x100, CRC(16acbd53) SHA1(e5791646730c6232efa2c0327b484472c47baf21) )     // charset #2 lookup table
+	ROM_LOAD( "pr5921.prm",   0x0000, 0x020, CRC(f2437229) SHA1(8fb4240142f4c77f820d7c153c22ff82f66aa7b1) ) // palette
+	ROM_LOAD( "pr5922.prm",   0x0020, 0x100, CRC(85c542bf) SHA1(371d92fca2ae609a47d3a2ea349f14f30b846da8) ) // charset #1 lookup table
+	ROM_LOAD( "pr5923.prm",   0x0120, 0x100, CRC(16acbd53) SHA1(e5791646730c6232efa2c0327b484472c47baf21) ) // charset #2 lookup table
 
-	ROM_REGION( 0xa000, "adpcm", 0 )
+	ROM_REGION( 0x10000, "adpcm", 0 )
 	ROM_LOAD( "epr-5901.bin", 0x0000, 0x2000, CRC(170a10a4) SHA1(7b0c8427c69525cbcbe9f88b22b12aafb6949bfd) )
 	ROM_LOAD( "epr-5902.bin", 0x2000, 0x2000, CRC(f6981640) SHA1(1a93913ecb64d1c459e5bbcc28c4ca3ea90f21e1) )
 	ROM_LOAD( "epr-5903.bin", 0x4000, 0x2000, CRC(0439df50) SHA1(1f981c1867366fa57de25ff8f421c121d82d7321) )
@@ -842,7 +839,7 @@ ROM_START( robowres )
 	ROM_LOAD( "pr7572.7f",   0x00020, 0x0100, CRC(2b083d0c) SHA1(5b39bd4297bec788caac9e9de5128d43932a24e2) )
 	ROM_LOAD( "pr7573.7g",   0x00120, 0x0100, CRC(2b083d0c) SHA1(5b39bd4297bec788caac9e9de5128d43932a24e2) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )
+	ROM_REGION( 0x10000, "adpcm", 0 )
 	ROM_LOAD( "epr-7543.12b", 0x00000, 0x8000, CRC(4d108c49) SHA1(a7c3c5a5ad36917ea7f6d917377c2392fa9beea3) )
 ROM_END
 
@@ -870,7 +867,7 @@ ROM_START( robowresb )
 	ROM_LOAD( "pr7572.7f",   0x00020, 0x0100, CRC(2b083d0c) SHA1(5b39bd4297bec788caac9e9de5128d43932a24e2) )
 	ROM_LOAD( "pr7573.7g",   0x00120, 0x0100, CRC(2b083d0c) SHA1(5b39bd4297bec788caac9e9de5128d43932a24e2) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )
+	ROM_REGION( 0x10000, "adpcm", 0 )
 	ROM_LOAD( "epr-7543.12b", 0x00000, 0x8000, CRC(4d108c49) SHA1(a7c3c5a5ad36917ea7f6d917377c2392fa9beea3) )
 ROM_END
 
@@ -881,7 +878,6 @@ ROM_END
  *  Driver initialization
  *
  *************************************/
-
 
 void robowres_state::init_robowresb()
 {

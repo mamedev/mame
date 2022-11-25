@@ -458,49 +458,49 @@ void i386_device::i486_group0F01_32()      // Opcode 0x0f 01
 
 void i386_device::i486_bswap_eax()     // Opcode 0x0f 38
 {
-	REG32(EAX) = SWITCH_ENDIAN_32(REG32(EAX));
+	REG32(EAX) = swapendian_int32(REG32(EAX));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_ecx()     // Opcode 0x0f 39
 {
-	REG32(ECX) = SWITCH_ENDIAN_32(REG32(ECX));
+	REG32(ECX) = swapendian_int32(REG32(ECX));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_edx()     // Opcode 0x0f 3A
 {
-	REG32(EDX) = SWITCH_ENDIAN_32(REG32(EDX));
+	REG32(EDX) = swapendian_int32(REG32(EDX));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_ebx()     // Opcode 0x0f 3B
 {
-	REG32(EBX) = SWITCH_ENDIAN_32(REG32(EBX));
+	REG32(EBX) = swapendian_int32(REG32(EBX));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_esp()     // Opcode 0x0f 3C
 {
-	REG32(ESP) = SWITCH_ENDIAN_32(REG32(ESP));
+	REG32(ESP) = swapendian_int32(REG32(ESP));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_ebp()     // Opcode 0x0f 3D
 {
-	REG32(EBP) = SWITCH_ENDIAN_32(REG32(EBP));
+	REG32(EBP) = swapendian_int32(REG32(EBP));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_esi()     // Opcode 0x0f 3E
 {
-	REG32(ESI) = SWITCH_ENDIAN_32(REG32(ESI));
+	REG32(ESI) = swapendian_int32(REG32(ESI));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_edi()     // Opcode 0x0f 3F
 {
-	REG32(EDI) = SWITCH_ENDIAN_32(REG32(EDI));
+	REG32(EDI) = swapendian_int32(REG32(EDI));
 	CYCLES(1);     // TODO
 }
 

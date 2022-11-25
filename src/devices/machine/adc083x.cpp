@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "adc083x.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL ( 0 )
 
 static inline void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, device_t &device, const char *s_fmt, ... )

@@ -190,10 +190,11 @@ void okim6295_device::sound_stream_update(sound_stream &stream, std::vector<read
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void okim6295_device::rom_bank_updated()
+void okim6295_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

@@ -37,6 +37,7 @@
 #include "machine/bcreader.h"
 
 #include "crsshair.h"
+#include "dinetwork.h"
 #include "dipty.h"
 #include "emuopts.h"
 

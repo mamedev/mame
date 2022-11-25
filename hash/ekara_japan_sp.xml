@@ -3,12 +3,13 @@
 <!--
 license:CC0
 -->
-<softwarelist name="ekara_japan_sp" description="Takara e-kara (Japan) SP-xx series cartridges">
+<softwarelist name="ekara_japan_sp" description="Takara e-kara (Japan) Super Cartridge series (SP-xx)">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 	     some cartridges also contain an SEEPROM
 
 	***********************************************************************************
 
+	Super Cartridge (スーパーカートリッジ) series
 	Japanese cart listing (by SP code)  * = dumped
 
 	A secondary 4-digit naming scheme SPxxxx (no extension) appears on a sticker on the cartridge PCB only
@@ -25,21 +26,22 @@ license:CC0
 	 "please play this cartridge on e-kara series, popira, popira 2, taiko de popira or jumping popira"
 
 	 SP-01  (unknown)
-	*SP-02  'Super Cartridge' SP-2
-	*SP-03  'Super Cartridge' SP-3 TV Pop
-	*SP-04  'Super Cartridge' SP-4
-	*SP-05  'Super Cartridge' SP-5 TV POP Junior with Chibi Marukochan & Anpanman
-	 SP-06  (seen)
-	 SP-07  (seen)
+	*SP-02  'Super Cartridge' SP-02 Best Hit
+	*SP-03  'Super Cartridge' SP-03 TV Pop Junior
+	*SP-04  'Super Cartridge' SP-04 Best Hit
+	*SP-05  'Super Cartridge' SP-05 TV Pop Junior
+	 SP-06  'Super Cartridge' SP-06 TV Pop Junior
+	 SP-07  'Super Cartridge' SP-07 Best Hit
 
 	(more? what's the SP highest number? correct titles for each of these etc.)
 
 	-->
 
 	<software name="sp02">
-		<description>SP-02 Super Cartridge (Japan)</description>
+		<description>Super Cartridge: Best Hit (Japan) (SP-02)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
 			<dataarea name="rom" size="0x200000">
@@ -49,9 +51,10 @@ license:CC0
 	</software>
 
 	<software name="sp03">
-		<description>SP-03 Super Cartridge - TV Pop (Japan)</description>
+		<description>Super Cartridge: TV Pop Junior (Japan) (SP-03)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ TVPOPジュニア"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
 			<dataarea name="rom" size="0x200000">
@@ -61,9 +64,10 @@ license:CC0
 	</software>
 
 	<software name="sp04">
-		<description>SP-04 Super Cartridge (Japan)</description>
+		<description>Super Cartridge: Best Hit (Japan) (SP-04)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
 			<dataarea name="rom" size="0x200000">
@@ -73,9 +77,10 @@ license:CC0
 	</software>
 
 	<software name="sp05">
-		<description>SP-05 Super Cartridge - TV POP Junior with Chibi Marukochan &amp; Anpanman (Japan)</description>
+		<description>Super Cartridge: TV Pop Junior (Japan) (SP-05)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ TVPOPジュニア"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
 			<dataarea name="rom" size="0x200000">

@@ -30,6 +30,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/rescap.h"
 #include "speaker.h"
 
 
@@ -146,27 +147,14 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 
 	//  popmessage("gain_ctrl = %2x",data&0x0f);
 
-	float percent = (m_gain_control & 1) ? 1.0 : 0.50;
-	m_ay[0]->set_output_gain(0, percent);
-//fixme:    set_RC_filter(0,10000,100000000,0,10000);   // 10K, 10000pF = 0.010uF
-
-	percent = (m_gain_control & 2) ? 0.45 : 0.23;
-	m_ay[0]->set_output_gain(1, percent);
-	m_ay[0]->set_output_gain(2, percent);
-	m_ay[1]->set_output_gain(0, percent);
-	m_ay[1]->set_output_gain(1, percent);
-//fixme:    set_RC_filter(1,4700,100000000,0,4700); //  4.7K, 4700pF = 0.0047uF
-//fixme:    set_RC_filter(2,4700,100000000,0,4700); //  4.7K, 4700pF = 0.0047uF
-//fixme:    set_RC_filter(3,4700,100000000,0,4700); //  4.7K, 4700pF = 0.0047uF
-//fixme:    set_RC_filter(4,4700,100000000,0,4700); //  4.7K, 4700pF = 0.0047uF
-
-	percent = (m_gain_control & 4) ? 0.45 : 0.23;
-	m_ay[1]->set_output_gain(2, percent);
-	m_ay[2]->set_output_gain(0, percent);
-
-	percent = (m_gain_control & 8) ? 0.45 : 0.23;
-	m_ay[2]->set_output_gain(1, percent);
-	m_ay[2]->set_output_gain(2, percent);
+	const double mix_resistors[4] = { RES_K(1.0), RES_K(2.2), RES_K(10.0), RES_K(10.0) }; // R35, R33, R32, R34
+	for (int i = 0; i < 4; i++)
+	{
+		// RES_K(5) == (1.0 / ((1.0 / RES_K(10)) + (1.0 / RES_K(10)))) because of the optional extra 10k in parallel in each inverting amplifier circuit
+		// the total max number of output gain 'units' of all 4 inputs is 10 + 10/2.2 + 1 + 1 = 16.545454, so we divide the gain amount by this number so we don't clip
+		m_ayfilter[i]->set_output_gain(0, (-1.0 * ( ((m_gain_control & (1<<i)) ? RES_K(10) : RES_K(5)) / mix_resistors[i] )) / 16.545454);
+		//m_ayfilter[i]->set_output_gain(0, (m_gain_control & (1<<i)) ? 1.0 : 0.5);
+	}
 }
 
 void magmax_state::vreg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -351,16 +339,37 @@ void magmax_state::magmax(machine_config &config)
 	PALETTE(config, m_palette, FUNC(magmax_state::palette), 1*16 + 16*16 + 256, 256);
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "speaker").front_center();
 
-	AY8910(config, m_ay[0], XTAL(20'000'000)/16); // verified on PCB
+	FILTER_BIQUAD(config, m_ayfilter[0]).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(22), CAP_N(10)); // R22, R23, nothing(infinite resistance), wire(short), C16, C19
+	m_ayfilter[0]->add_route(ALL_OUTPUTS, "speaker", 1.0); // <- gain here is controlled by m_ay[0] IOA0 and resistor R35
+	FILTER_BIQUAD(config, m_ayfilter[1]).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R26, R27, nothing(infinite resistance), wire(short), C18, C14
+	m_ayfilter[1]->add_route(ALL_OUTPUTS, "speaker", 1.0); // <- gain here is controlled by m_ay[0] IOA1 and resistor R33
+	FILTER_BIQUAD(config, m_ayfilter[2]).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_P(330)); // R24, wire(short), R28, wire(short), C22
+	m_ayfilter[2]->add_route(ALL_OUTPUTS, "speaker", 1.0); // <- gain here is controlled by m_ay[0] IOA2 and resistor R32
+	FILTER_BIQUAD(config, m_ayfilter[3]).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_P(330)); // R25, wire(short), R31, wire(short), C23
+	m_ayfilter[3]->add_route(ALL_OUTPUTS, "speaker", 1.0); // <- gain here is controlled by m_ay[0] IOA3 and resistor R34
+
+	MIXER(config, m_aymixer[0]).add_route(0, m_ayfilter[1], 1.0);
+	MIXER(config, m_aymixer[1]).add_route(0, m_ayfilter[2], 1.0);
+	MIXER(config, m_aymixer[2]).add_route(0, m_ayfilter[3], 1.0);
+
+	AY8910(config, m_ay[0], XTAL(20'000'000)/16); // @20G verified on PCB and schematics
 	m_ay[0]->port_a_write_callback().set(FUNC(magmax_state::ay8910_portA_0_w));
 	m_ay[0]->port_b_write_callback().set(FUNC(magmax_state::ay8910_portB_0_w));
-	m_ay[0]->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_ay[0]->add_route(0, m_ayfilter[0], 1.0);
+	m_ay[0]->add_route(1, m_aymixer[0], 1.0);
+	m_ay[0]->add_route(2, m_aymixer[0], 1.0);
 
-	AY8910(config, m_ay[1], XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40); // verified on PCB
+	AY8910(config, m_ay[1], XTAL(20'000'000)/16); // @18G verified on PCB and schematics
+	m_ay[1]->add_route(0, m_aymixer[0], 1.0);
+	m_ay[1]->add_route(1, m_aymixer[0], 1.0);
+	m_ay[1]->add_route(2, m_aymixer[1], 1.0);
 
-	AY8910(config, m_ay[2], XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40); // verified on PCB
+	AY8910(config, m_ay[2], XTAL(20'000'000)/16); // @16G verified on PCB and schematics
+	m_ay[2]->add_route(0, m_aymixer[1], 1.0);
+	m_ay[2]->add_route(1, m_aymixer[2], 1.0);
+	m_ay[2]->add_route(2, m_aymixer[2], 1.0);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);

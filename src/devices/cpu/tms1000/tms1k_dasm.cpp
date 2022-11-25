@@ -43,7 +43,20 @@ tms1000_base_disassembler::tms1000_base_disassembler(const u8 *lut_mnemonic, boo
 tms1000_disassembler::tms1000_disassembler() : tms1000_base_disassembler(tms1000_mnemonic, false, 6)
 { }
 
-tms1100_disassembler::tms1100_disassembler() : tms1000_base_disassembler(tms1100_mnemonic, false, 6)
+tms1100_disassembler::tms1100_disassembler(const u8 *lut_mnemonic, bool opcode_9bits, int pc_bits) :
+	tms1000_base_disassembler(lut_mnemonic, opcode_9bits, pc_bits)
+{ }
+
+tms1100_disassembler::tms1100_disassembler() : tms1100_disassembler(tms1100_mnemonic, false, 6)
+{ }
+
+tms1400_disassembler::tms1400_disassembler() : tms1100_disassembler(tms1400_mnemonic, false, 6)
+{ }
+
+tms2100_disassembler::tms2100_disassembler() : tms1100_disassembler(tms2100_mnemonic, false, 6)
+{ }
+
+tms2400_disassembler::tms2400_disassembler() : tms1100_disassembler(tms2400_mnemonic, false, 6)
 { }
 
 tms0980_disassembler::tms0980_disassembler() : tms1000_base_disassembler(tms0980_mnemonic, true, 7)
@@ -71,37 +84,37 @@ offs_t tms1000_base_disassembler::pc_real_to_linear(offs_t pc) const
 const char *const tms1000_base_disassembler::s_mnemonic[] =
 {
 	"?",
-	"A10AAC", "A6AAC", "A8AAC", "AC1AC", "ACACC", "ACNAA", "ALEC", "ALEM", "AMAAC", "BRANCH", "CALL", "CCLA",
+	"AC0AC", "AC1AC", "ACACC", "ACNAA", "ALEC", "ALEM", "AMAAC", "BRANCH", "CALL", "CCLA",
 	"CLA", "CLO", "COMC", "COMX", "COMX8", "CPAIZ", "CTMDYN", "DAN", "DMAN", "DMEA", "DNAA",
 	"DYN", "IA", "IMAC", "IYC", "KNEZ", "LDP", "LDX", "LDX", "LDX", "MNEA", "MNEZ",
 	"NDMEA", "OFF", "RBIT", "REAC", "RETN", "RSTR", "SAL", "SAMAN", "SBIT",
-	"SBL", "SEAC", "SETR", "TAM", "TAMACS", "TAMDYN", "TAMIY", "TAMIYC", "TAMZA",
-	"TAY", "TBIT", "TCMIY", "TCY", "TDO", "TKA", "TKM", "TMA",
-	"TMY", "TYA", "XDA", "XMA", "YMCY", "YNEA", "YNEC"
+	"SBL", "SEAC", "SETR", "TAC", "TADM", "TAM", "TAMACS", "TAMDYN", "TAMIY", "TAMIYC", "TAMZA",
+	"TAX", "TAY", "TBIT", "TCA", "TCMIY", "TCY", "TDO", "TKA", "TKM", "TMA",
+	"TMY", "TPC", "TRA", "TXA", "TYA", "XDA", "XMA", "YMCY", "YNEA", "YNEC"
 };
 
 const u32 tms1000_base_disassembler::s_flags[] =
 {
 	0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_COND, STEP_OVER | STEP_COND, 0,
+	0, 0, 0, 0, 0, 0, 0, STEP_COND, STEP_OVER | STEP_COND, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, STEP_OUT, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-const u8 tms1000_base_disassembler::s_addressing[] =
+const u8 tms1000_base_disassembler::s_bits[] =
 {
-	zB0,
-	zB0, zB0, zB0, zI4, zI4, zI4, zI4, zB0, zB0, zB7, zB7, zB0,
-	zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0,
-	zB0, zB0, zB0, zB0, zB0, zI4, zI2, zI3, zI4, zB0, zB0,
-	zB0, zB0, zI2, zB0, zB0, zB0, zB0, zB0, zI2,
-	zB0, zB0, zB0, zB0, zI4, zB0, zB0, zB0, zB0,
-	zB0, zI2, zI4, zI4, zB0, zB0, zB0, zB0,
-	zB0, zB0, zB0, zB0, zI4, zB0, zI4
+	0,
+	4, 4, 4, 4, 4, 0, 0, 6, 6, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 4, 2, 3, 4, 0, 0,
+	0, 0, 2, 0, 0, 0, 0, 0, 2,
+	0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0,
+	0, 0, 2, 0, 4, 4, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 4, 0, 4
 };
 
 
@@ -110,7 +123,7 @@ const u8 tms1000_base_disassembler::s_addressing[] =
 const u8 tms1000_disassembler::tms1000_mnemonic[256] =
 {
 /* 0x00 */
-	zCOMX,   zA8AAC,  zYNEA,   zTAM,    zTAMZA,  zA10AAC, zA6AAC,  zDAN,    zTKA,    zKNEZ,   zTDO,    zCLO,    zRSTR,   zSETR,   zIA,     zRETN,   // 0
+	zCOMX,   zAC0AC,  zYNEA,   zTAM,    zTAMZA,  zAC0AC,  zAC0AC,  zDAN,    zTKA,    zKNEZ,   zTDO,    zCLO,    zRSTR,   zSETR,   zIA,     zRETN,   // 0
 	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 1
 	zTAMIY,  zTMA,    zTMY,    zTYA,    zTAY,    zAMAAC,  zMNEZ,   zSAMAN,  zIMAC,   zALEM,   zDMAN,   zIYC,    zDYN,    zCPAIZ,  zXMA,    zCLA,    // 2
 	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   zTBIT,   zTBIT,   zTBIT,   zTBIT,   zLDX2,   zLDX2,   zLDX2,   zLDX2,   // 3
@@ -141,6 +154,75 @@ const u8 tms1100_disassembler::tms1100_mnemonic[256] =
 	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
 	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
 	zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zCLA,    // 7
+/* 0x80 */
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 8
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 9
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // A
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // B
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // C
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // D
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // E
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL    // F
+/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+};
+
+const u8 tms1400_disassembler::tms1400_mnemonic[256] =
+{
+/* 0x00 */
+	zMNEA,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zAMAAC,  zDMAN,   zTKA,    zCOMX,   zTDO,    zTPC,    zRSTR,   zSETR,   zKNEZ,   zRETN,   // 0
+	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 1
+	zTAY,    zTMA,    zTMY,    zTYA,    zTAMDYN, zTAMIYC, zTAMZA,  zTAM,    zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   // 2
+	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   zTBIT,   zTBIT,   zTBIT,   zTBIT,   zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   // 3
+	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
+	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
+	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
+	zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zCLA,    // 7
+/* 0x80 */
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 8
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 9
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // A
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // B
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // C
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // D
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // E
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL    // F
+/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+};
+
+const u8 tms2100_disassembler::tms2100_mnemonic[256] =
+{
+/* 0x00 */
+	zMNEA,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zAMAAC,  zDMAN,   zTKA,    zTAX,    zTDO,    zCOMC,   zRSTR,   zSETR,   zTADM,   zRETN,   // 0
+	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 1
+	zTAY,    zTMA,    zTMY,    zTYA,    zTAMDYN, zTAMIYC, zTAC,    zTAM,    zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   // 2
+	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   zTBIT,   zTBIT,   zTBIT,   zTBIT,   zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   // 3
+	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
+	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
+	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
+	zAC1AC,  zAC1AC,  zAC1AC,  zTCA,    zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zTRA,    zAC1AC,  zAC1AC,  zAC1AC,  zCLA,    // 7
+/* 0x80 */
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 8
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 9
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // A
+	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // B
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // C
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // D
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // E
+	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL    // F
+/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+};
+
+const u8 tms2400_disassembler::tms2400_mnemonic[256] =
+{
+/* 0x00 */
+	zMNEA,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zAMAAC,  zDMAN,   zTKA,    zTAX,    zTDO,    zTPC,    zRSTR,   zSETR,   zTADM,   zRETN,   // 0
+	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 1
+	zTAY,    zTMA,    zTMY,    zTYA,    zTAMDYN, zTAMIYC, zTAC,    zTAM,    zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   // 2
+	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   zTBIT,   zTBIT,   zTBIT,   zTBIT,   zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   // 3
+	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
+	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
+	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
+	zAC1AC,  zAC1AC,  zAC1AC,  zTCA,    zAC1AC,  zCOMX,   zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zTRA,    zAC1AC,  zTXA,    zAC1AC,  zCLA,    // 7
 /* 0x80 */
 	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 8
 	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 9
@@ -256,27 +338,36 @@ const u8 tms1000_base_disassembler::i4_value[16] =
 offs_t tms1000_base_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	u16 op = m_opcode_9bits ? opcodes.r16(pc) & 0x1ff : opcodes.r8(pc);
-
-	// convert to mnemonic/param
 	u16 instr = m_lut_mnemonic[op];
-	util::stream_format(stream, "%-8s", s_mnemonic[instr]);
 
-	switch( s_addressing[instr] )
+	if (instr == zAC0AC || instr == zAC1AC)
 	{
-		case zI2:
-			util::stream_format(stream, "%d", i2_value[op & 0x03]);
-			break;
-		case zI3:
-			util::stream_format(stream, "%d", i3_value[op & 0x07]);
-			break;
-		case zI4:
-			util::stream_format(stream, "%d", i4_value[op & 0x0f]);
-			break;
-		case zB7:
-			util::stream_format(stream, "$%02X", op & (m_opcode_9bits ? 0x7f : 0x3f));
-			break;
-		default:
-			break;
+		// special case for AcAAC
+		u8 c = (i4_value[op & 0x0f] + ((instr == zAC1AC) ? 1 : 0)) & 0xf;
+		util::stream_format(stream, "A%dACC", c);
+	}
+	else
+	{
+		// convert to mnemonic/param
+		util::stream_format(stream, "%-8s", s_mnemonic[instr]);
+
+		switch (s_bits[instr])
+		{
+			case 2:
+				util::stream_format(stream, "%d", i2_value[op & 0x03]);
+				break;
+			case 3:
+				util::stream_format(stream, "%d", i3_value[op & 0x07]);
+				break;
+			case 4:
+				util::stream_format(stream, "%d", i4_value[op & 0x0f]);
+				break;
+			case 6:
+				util::stream_format(stream, "$%02X", op & (m_opcode_9bits ? 0x7f : 0x3f));
+				break;
+			default:
+				break;
+		}
 	}
 
 	return 1 | s_flags[instr] | SUPPORTED;

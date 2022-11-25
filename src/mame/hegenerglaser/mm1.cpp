@@ -5,7 +5,7 @@
 
 Mephisto MM I, the first H+G slide-in chesscomputer module
 
-The module was included with either the Modular or Modular Exclusive chessboards.
+The module was included with either the Modular or Exclusive chessboards.
 Initially, the module itself didn't have a name. It was only later in retrospect,
 after the release of Modul MM II that it became known as the MM I. The program is
 actually more like a prequel of III-S Glasgow, same chess engine authors too.
@@ -25,13 +25,12 @@ LCD module is assumed to be same as MM II and others.
 
 Mephisto Mirage is on similar hardware, but it's a single module (LCD is included
 on the main PCB). Like MM I, the module by itself didn't have a name at first.
-The boards that were included with the product were either Mephisto Mobil, or
-Mephisto Mirage (both ledless, push-sensory). The module also works on the more
-expensive wooden chessboards like Modular Exclusive or Muenchen, as long as it
-supports the higher voltage.
+The boards that were included with the product were either Mephisto Mirage
+(button sensors, no leds), or Mephisto Mobil (no sensors, no leds). The module
+also works on the more expensive wooden chessboards like Modular, Exclusive or
+Muenchen, as long as it supports the higher voltage.
 
 TODO:
-- remove external interrupt hack when timer interrupt is added to CDP1806 device
 - mmirage unknown_w
 - mm1 unknown expansion rom at $c000?
 - add mm1 STP/ON buttons? (they're off/on, game continues when ON again)
@@ -91,7 +90,6 @@ private:
 	void mm1_io(address_map &map);
 
 	// I/O handlers
-	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_display();
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	void sound_w(u8 data);
@@ -121,14 +119,9 @@ void mm1_state::machine_reset()
     I/O
 ******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(mm1_state::interrupt)
-{
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, HOLD_LINE);
-}
-
 READ_LINE_MEMBER(mm1_state::clear_r)
 {
-	// CLEAR low + RESET high resets cpu
+	// CLEAR low + WAIT high resets cpu
 	int ret = (m_reset) ? 0 : 1;
 	m_reset = false;
 	return ret;
@@ -239,7 +232,7 @@ static INPUT_PORTS_START( mirage )
 
 	PORT_START("FAKE") // module came with buttons sensorboard by default
 	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mm1_state, mirage_switch_sensor_type, 0)
-	PORT_CONFSETTING(    0x00, "Buttons (Mobil)" )
+	PORT_CONFSETTING(    0x00, "Buttons (Mirage)" )
 	PORT_CONFSETTING(    0x01, "Magnets (Modular)" )
 INPUT_PORTS_END
 
@@ -265,10 +258,6 @@ void mm1_state::mirage(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(mm1_state::keypad_r<0>));
 	m_maincpu->ef4_cb().set(FUNC(mm1_state::keypad_r<1>));
 
-	// wrong! uses internal timer interrupt
-	const attotime irq_period = attotime::from_ticks(8 * 32 * 0x71, 8_MHz_XTAL); // LDC = 0x71
-	m_maincpu->set_periodic_int(FUNC(mm1_state::interrupt), irq_period);
-
 	MEPHISTO_BUTTONS_BOARD(config, m_board); // see mirage_switch_sensor_type
 	m_board->set_delay(attotime::from_msec(200));
 
@@ -288,10 +277,6 @@ void mm1_state::mm1(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
 	m_maincpu->q_cb().set("display", FUNC(mephisto_display1_device::strobe_w));
-
-	// wrong! uses internal timer interrupt
-	const attotime irq_period = attotime::from_ticks(8 * 32 * 0xfa, 8_MHz_XTAL); // LDC = 0xFA
-	m_maincpu->set_periodic_int(FUNC(mm1_state::interrupt), irq_period);
 
 	MEPHISTO_SENSORS_BOARD(config.replace(), m_board);
 	m_board->set_delay(attotime::from_msec(200));

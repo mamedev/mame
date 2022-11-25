@@ -38,7 +38,7 @@ known chips:
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-ROM source notes when dumped from another publisher, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - drdunk: Tandy Electronic Basketball
 - flash: Radio Shack Sound Effects Chassis
 - hccbaskb: Sears Electronic Basketball
@@ -656,7 +656,7 @@ ROM_END
 /***************************************************************************
 
   Ideal Flash
-  * PCB label 25-600321, REV C, TCI-A3H / 94HB
+  * PCB label: 25-600321, REV C, TCI-A3H / 94HB
   * PIC 1655A-078
   * 2 7seg LEDs + 8 other LEDs, 1-bit sound with volume decay
 

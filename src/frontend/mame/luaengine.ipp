@@ -128,6 +128,51 @@ public:
 };
 
 
+class lua_engine::palette_wrapper
+{
+public:
+	palette_wrapper(uint32_t numcolors, uint32_t numgroups) : m_palette(palette_t::alloc(numcolors, numgroups))
+	{
+	}
+
+	palette_wrapper(palette_t &pal) : m_palette(&pal)
+	{
+		m_palette->ref();
+	}
+
+	palette_wrapper(palette_wrapper const &that) : m_palette(that.m_palette)
+	{
+		m_palette->ref();
+	}
+
+	~palette_wrapper()
+	{
+		m_palette->deref();
+	}
+
+	palette_wrapper &operator=(palette_wrapper const &that)
+	{
+		that.m_palette->ref();
+		m_palette->deref();
+		m_palette = that.m_palette;
+		return *this;
+	}
+
+	palette_t const &palette() const
+	{
+		return *m_palette;
+	}
+
+	palette_t &palette()
+	{
+		return *m_palette;
+	}
+
+private:
+	palette_t *m_palette;
+};
+
+
 namespace sol {
 
 // don't convert core_options to a table directly

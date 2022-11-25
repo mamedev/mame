@@ -108,7 +108,7 @@ static imgtoolerr_t lookup_rsdos_file(imgtool::image &f, const char *fname, rsdo
 		if (ent.filename[0] != -1)
 			fnamebuf = get_dirent_fname(ent);
 	}
-	while((ent.filename[0] != -1) && core_stricmp(fnamebuf.c_str(), fname));
+	while((ent.filename[0] != -1) && core_stricmp(fnamebuf, fname));
 
 	if (ent.filename[0] == -1)
 		return IMGTOOLERR_FILENOTFOUND;

@@ -29,9 +29,6 @@ constexpr int COMMENT_VERSION       = 1;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef int (*debug_instruction_hook_func)(device_t &device, offs_t curpc);
-
-
 // ======================> device_debug
 
 // [TODO] This whole thing is terrible.
@@ -58,9 +55,6 @@ public:
 	void exception_hook(int exception);
 	void privilege_hook();
 	void instruction_hook(offs_t curpc);
-
-	// hooks into our operations
-	void set_instruction_hook(debug_instruction_hook_func hook);
 
 	// debugger focus
 	void ignore(bool ignore = true);
@@ -94,7 +88,7 @@ public:
 	// breakpoints
 	const auto &breakpoint_list() const { return m_bplist; }
 	const debug_breakpoint *breakpoint_find(offs_t address) const;
-	int breakpoint_set(offs_t address, const char *condition = nullptr, const char *action = nullptr);
+	int breakpoint_set(offs_t address, const char *condition = nullptr, std::string_view action = {});
 	bool breakpoint_clear(int index);
 	void breakpoint_clear_all();
 	bool breakpoint_enable(int index, bool enable = true);
@@ -104,7 +98,7 @@ public:
 	// watchpoints
 	int watchpoint_space_count() const { return m_wplist.size(); }
 	const std::vector<std::unique_ptr<debug_watchpoint>> &watchpoint_vector(int spacenum) const { return m_wplist[spacenum]; }
-	int watchpoint_set(address_space &space, read_or_write type, offs_t address, offs_t length, const char *condition, const char *action);
+	int watchpoint_set(address_space &space, read_or_write type, offs_t address, offs_t length, const char *condition = nullptr, std::string_view action = {});
 	bool watchpoint_clear(int wpnum);
 	void watchpoint_clear_all();
 	bool watchpoint_enable(int index, bool enable = true);
@@ -113,12 +107,20 @@ public:
 	debug_watchpoint *triggered_watchpoint() { debug_watchpoint *ret = m_triggered_watchpoint; m_triggered_watchpoint = nullptr; return ret; }
 
 	// registerpoints
-	const std::forward_list<debug_registerpoint> &registerpoint_list() const { return *m_rplist; }
-	int registerpoint_set(const char *condition, const char *action = nullptr);
+	const std::forward_list<debug_registerpoint> &registerpoint_list() const { return m_rplist; }
+	int registerpoint_set(const char *condition, std::string_view action = {});
 	bool registerpoint_clear(int index);
 	void registerpoint_clear_all();
 	bool registerpoint_enable(int index, bool enable = true);
-	void registerpoint_enable_all(bool enable = true );
+	void registerpoint_enable_all(bool enable = true);
+
+	// exception points
+	const auto &exceptionpoint_list() const { return m_eplist; }
+	int exceptionpoint_set(int exception, const char *condition = nullptr, std::string_view action = {});
+	bool exceptionpoint_clear(int index);
+	void exceptionpoint_clear_all();
+	bool exceptionpoint_enable(int index, bool enable = true);
+	void exceptionpoint_enable_all(bool enable = true);
 
 	// comments
 	void comment_add(offs_t address, const char *comment, rgb_t color);
@@ -147,8 +149,12 @@ public:
 	void track_mem_data_clear() { m_track_mem_set.clear(); }
 
 	// tracing
-	void trace(FILE *file, bool trace_over, bool detect_loops, bool logerror, const char *action);
-	void trace_printf(const char *fmt, ...) ATTR_PRINTF(2,3);
+	void trace(std::unique_ptr<std::ostream> &&file, bool trace_over, bool detect_loops, bool logerror, std::string_view action);
+	template <typename Format, typename... Params> void trace_printf(Format &&fmt, Params &&...args)
+	{
+		if (m_trace != nullptr)
+			m_trace->vprintf(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
 	void trace_flush() { if (m_trace != nullptr) m_trace->flush(); }
 
 	void reset_transient_flag() { m_flags &= ~DEBUG_FLAG_TRANSIENT; }
@@ -182,7 +188,6 @@ private:
 	// global state
 	u32                         m_flags;                // debugging flags for this CPU
 	std::unique_ptr<symbol_table> m_symtable;           // symbol table for expression evaluation
-	debug_instruction_hook_func m_instrhook;            // per-instruction callback hook
 
 	// stepping information
 	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER or DEBUG_FLAG_STEPPING_BRANCH
@@ -208,7 +213,8 @@ private:
 	// breakpoints and watchpoints
 	std::multimap<offs_t, std::unique_ptr<debug_breakpoint>> m_bplist;     // list of breakpoints
 	std::vector<std::vector<std::unique_ptr<debug_watchpoint>>> m_wplist;  // watchpoint lists for each address space
-	std::unique_ptr<std::forward_list<debug_registerpoint>> m_rplist;      // list of registerpoints
+	std::forward_list<debug_registerpoint> m_rplist;                       // list of registerpoints
+	std::multimap<offs_t, std::unique_ptr<debug_exceptionpoint>> m_eplist; // list of exception points
 
 	debug_breakpoint *      m_triggered_breakpoint;     // latest breakpoint that was triggered
 	debug_watchpoint *      m_triggered_watchpoint;     // latest watchpoint that was triggered
@@ -217,11 +223,11 @@ private:
 	class tracer
 	{
 	public:
-		tracer(device_debug &debug, FILE &file, bool trace_over, bool detect_loops, bool logerror, const char *action);
+		tracer(device_debug &debug, std::unique_ptr<std::ostream> &&file, bool trace_over, bool detect_loops, bool logerror, std::string_view action);
 		~tracer();
 
 		void update(offs_t pc);
-		void vprintf(const char *format, va_list va);
+		void vprintf(util::format_argument_pack<std::ostream> const &args);
 		void flush();
 		bool logerror() const { return m_logerror; }
 
@@ -229,7 +235,7 @@ private:
 		static const int TRACE_LOOPS = 64;
 
 		device_debug &      m_debug;                    // reference to our owner
-		FILE &              m_file;                     // tracing file for this CPU
+		std::unique_ptr<std::ostream> m_file;           // tracing file for this CPU
 		std::string         m_action;                   // action to perform during a trace
 		offs_t              m_history[TRACE_LOOPS];     // history of recent PCs
 		bool                m_detect_loops;             // whether or not we should detect loops
@@ -312,7 +318,6 @@ private:
 	static constexpr u32 DEBUG_FLAG_HISTORY         = 0x00000002;       // tracking this CPU's history
 	static constexpr u32 DEBUG_FLAG_TRACING         = 0x00000004;       // tracing this CPU
 	static constexpr u32 DEBUG_FLAG_TRACING_OVER    = 0x00000008;       // tracing this CPU with step over behavior
-	static constexpr u32 DEBUG_FLAG_HOOKED          = 0x00000010;       // per-instruction callback hook
 	static constexpr u32 DEBUG_FLAG_STEPPING        = 0x00000020;       // CPU is single stepping
 	static constexpr u32 DEBUG_FLAG_STEPPING_OVER   = 0x00000040;       // CPU is stepping over a function
 	static constexpr u32 DEBUG_FLAG_STEPPING_OUT    = 0x00000080;       // CPU is stepping out of a function
@@ -384,6 +389,7 @@ public:
 	u32 get_breakpoint_index() { return m_bpindex++; }
 	u32 get_watchpoint_index() { return m_wpindex++; }
 	u32 get_registerpoint_index() { return m_rpindex++; }
+	u32 get_exceptionpoint_index() { return m_epindex++; }
 
 	// setters
 	void set_break_cpu(device_t * breakcpu) { m_breakcpu = breakcpu; }
@@ -426,6 +432,7 @@ private:
 	u32         m_bpindex;
 	u32         m_wpindex;
 	u32         m_rpindex;
+	u32         m_epindex;
 
 	u64         m_wpdata;
 	u64         m_wpaddr;

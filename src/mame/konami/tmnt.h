@@ -61,7 +61,6 @@ public:
 	void init_mia();
 	void init_tmnt();
 	void init_cuebrick();
-	void init_thndrx2();
 
 protected:
 	virtual void machine_start() override;

@@ -322,7 +322,6 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 
 void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const rectangle &cliprect, int flip, int xpos, int pri, int realxsize, int palt, bool draw)
 {
-	int xoffset = 0;
 	int xdrawpos = 0;
 	int xcntdraw = 0;
 
@@ -340,8 +339,6 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 
 					if (draw)
 					{
-						xoffset++;
-
 						if (!get_flipx(flip))
 							xdrawpos = xpos + xcntdraw;
 						else
@@ -355,7 +352,6 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 				}
 				else
 				{
-					xoffset++;
 					xcntdraw++;
 				}
 
@@ -379,8 +375,6 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 
 					if (draw)
 					{
-						xoffset++;
-
 						if (!get_flipx(flip))
 							xdrawpos = xpos + xcntdraw;
 						else
@@ -394,7 +388,6 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 				}
 				else
 				{
-					xoffset++;
 					xcntdraw++;
 				}
 

@@ -46,10 +46,10 @@ DEFINE_DEVICE_TYPE(PCE_JOYPAD2_TURBO, pce_joypad2_turbo_device, "pce_joypad2_tur
 static INPUT_PORTS_START( pce_joypad2 )
 	// II is left of I on the original pad so we map them in reverse order
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button I")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button II")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT  ) PORT_NAME("Select")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START   ) PORT_NAME("Run")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("%p Button I")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("%p Button II")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT  ) PORT_NAME("%p Select")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START   ) PORT_NAME("%p Run")
 
 	PORT_START("DIRECTION")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
@@ -119,7 +119,9 @@ pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, const char
 pce_joypad2_turbo_device::pce_joypad2_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	pce_joypad2_device(mconfig, PCE_JOYPAD2_TURBO, tag, owner, clock),
 	m_buttons_io(*this, "BUTTONS"),
-	m_turbo_io(*this, "TURBO")
+	m_turbo_io(*this, "TURBO"),
+	m_counter(0),
+	m_prev_clr(false)
 {
 }
 

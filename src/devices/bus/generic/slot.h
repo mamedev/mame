@@ -52,6 +52,38 @@ public:
 		}
 	}
 
+	// TODO: find a better home for this helper
+	template <typename T, typename U>
+	static T map_non_power_of_two(T count, U &&map)
+	{
+		if (T(0) >= count)
+			return T(0);
+
+		T const max(count - 1);
+		T mask(max);
+		for (unsigned i = 1; (sizeof(T) * 8) > i; i <<= 1)
+			mask = T(std::make_unsigned_t<T>(mask) | (std::make_unsigned_t<T>(mask) >> i));
+		int bits(0);
+		while (BIT(mask, bits))
+			++bits;
+
+		for (T entry = T(0); mask >= entry; ++entry)
+		{
+			T mapped(entry);
+			int b(bits - 1);
+			while (max < mapped)
+			{
+				while (BIT(max, b))
+					--b;
+				assert(0 <= b);
+				mapped = T(std::make_unsigned_t<T>(mapped) & ~(std::make_unsigned_t<T>(1) << b--));
+			}
+			map(entry, mapped);
+		}
+
+		return mask;
+	}
+
 	// construction/destruction
 	virtual ~device_generic_cart_interface();
 

@@ -90,31 +90,6 @@ clipper_device::clipper_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-// rotate helpers to replace MSVC intrinsics
-inline u32 rotl32(u32 x, u8 shift)
-{
-  shift &= 31;
-  return (x << shift) | (x >> ((32 - shift) & 31));
-}
-
-inline u32 rotr32(u32 x, u8 shift)
-{
-  shift &= 31;
-  return (x >> shift) | (x << ((32 - shift) & 31));
-}
-
-inline u64 rotl64(u64 x, u8 shift)
-{
-  shift &= 63;
-  return (x << shift) | (x >> ((64 - shift) & 63));
-}
-
-inline u64 rotr64(u64 x, u8 shift)
-{
-  shift &= 63;
-  return (x >> shift) | (x << ((64 - shift) & 63));
-}
-
 void clipper_device::device_start()
 {
 	// configure the cammu address spaces
@@ -693,18 +668,18 @@ void clipper_device::execute_instruction()
 	case 0x34:
 		// rotw: rotate word
 		if (!BIT31(m_r[R1]))
-			m_r[R2] = rotl32(m_r[R2], m_r[R1]);
+			m_r[R2] = rotl_32(m_r[R2], m_r[R1]);
 		else
-			m_r[R2] = rotr32(m_r[R2], -m_r[R1]);
+			m_r[R2] = rotr_32(m_r[R2], -m_r[R1]);
 		// FLAGS: 00ZN
 		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		break;
 	case 0x35:
 		// rotl: rotate longword
 		if (!BIT31(m_r[R1]))
-			set_64(R2, rotl64(get_64(R2), m_r[R1]));
+			set_64(R2, rotl_64(get_64(R2), m_r[R1]));
 		else
-			set_64(R2, rotr64(get_64(R2), -m_r[R1]));
+			set_64(R2, rotr_64(get_64(R2), -m_r[R1]));
 		// FLAGS: 00ZN
 		FLAGS(0, 0, get_64(R2) == 0, BIT63(get_64(R2)));
 		break;
@@ -772,9 +747,9 @@ void clipper_device::execute_instruction()
 	case 0x3c:
 		// roti: rotate immediate
 		if (!BIT31(m_info.imm))
-			m_r[R2] = rotl32(m_r[R2], m_info.imm);
+			m_r[R2] = rotl_32(m_r[R2], m_info.imm);
 		else
-			m_r[R2] = rotr32(m_r[R2], -m_info.imm);
+			m_r[R2] = rotr_32(m_r[R2], -m_info.imm);
 		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		// TRAPS: I
@@ -782,9 +757,9 @@ void clipper_device::execute_instruction()
 	case 0x3d:
 		// rotli: rotate longword immediate
 		if (!BIT31(m_info.imm))
-			set_64(R2, rotl64(get_64(R2), m_info.imm));
+			set_64(R2, rotl_64(get_64(R2), m_info.imm));
 		else
-			set_64(R2, rotr64(get_64(R2), -m_info.imm));
+			set_64(R2, rotr_64(get_64(R2), -m_info.imm));
 		FLAGS(0, 0, get_64(R2) == 0, BIT63(get_64(R2)));
 		// FLAGS: 00ZN
 		// TRAPS: I
@@ -1268,7 +1243,7 @@ void clipper_device::execute_instruction()
 
 				m_r[0]--;
 				m_r[1]++;
-				m_r[2] = rotr32(m_r[2], 8);
+				m_r[2] = rotr_32(m_r[2], 8);
 			}
 			// TRAPS: P,W
 			break;

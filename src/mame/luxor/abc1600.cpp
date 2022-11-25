@@ -34,14 +34,13 @@
 
     TODO:
 
-    - z80dma.cpp register read must return byte UP counter value (0x200 at end of block, not 0 as it does now)
+    - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!
         - port C, open drain output bit PC1 (RTC/NVRAM data)
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
-    - Z80 SCC DMA request
     - [:2a:chb] - TX FIFO is full, discarding data
 
 */
@@ -866,7 +865,7 @@ void abc1600_state::abc1600(machine_config &config)
 	// devices
 	ABC1600_MAC(config, m_mac, 0);
 	m_mac->set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
-	m_mac->fc_cb().set(m_maincpu, FUNC(m68000_base_device::get_fc));
+	m_mac->fc_cb().set(m_maincpu, FUNC(m68000_musashi_device::get_fc));
 	m_mac->buserr_cb().set(FUNC(abc1600_state::buserr_w));
 	m_mac->in_tren0_cb().set(m_bus0i, FUNC(abcbus_slot_device::read_tren)); // TODO bus0x
 	m_mac->out_tren0_cb().set(m_bus0i, FUNC(abcbus_slot_device::write_tren)); // TODO bus0x

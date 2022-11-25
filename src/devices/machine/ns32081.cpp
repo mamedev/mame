@@ -570,7 +570,10 @@ void ns32081_device::execute()
 		m_status |= SLAVE_Q;
 	}
 	else if (softfloat_exceptionFlags & softfloat_flag_invalid)
+	{
 		m_fsr |= TT_INV;
+		m_status |= SLAVE_Q;
+	}
 	else if (softfloat_exceptionFlags & softfloat_flag_inexact)
 	{
 		m_fsr |= FSR_IF | TT_INX;

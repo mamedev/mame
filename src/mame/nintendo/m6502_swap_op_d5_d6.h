@@ -4,7 +4,7 @@
 
     m6502_swap_op_d5_d6.h
 
-    6502 / N2A03 with instruction scrambling
+    6502 / RP2A03 with instruction scrambling
 
 ***************************************************************************/
 
@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include "cpu/m6502/n2a03.h"
-#include "cpu/m6502/n2a03d.h"
+#include "cpu/m6502/rp2a03.h"
+#include "cpu/m6502/rp2a03d.h"
 
 class m6502_swap_op_d5_d6 : public m6502_device {
 public:
@@ -48,9 +48,9 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
-class n2a03_core_swap_op_d5_d6 : public n2a03_core_device {
+class rp2a03_core_swap_op_d5_d6 : public rp2a03_core_device {
 public:
-	n2a03_core_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rp2a03_core_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_encryption_state(bool state);
 protected:
@@ -65,7 +65,7 @@ protected:
 		uint8_t descramble(uint8_t op);
 	};
 
-	class disassembler : public n2a03_disassembler {
+	class disassembler : public rp2a03_disassembler {
 	public:
 		mi_decrypt *mintf;
 
@@ -82,6 +82,6 @@ protected:
 
 
 DECLARE_DEVICE_TYPE(M6502_SWAP_OP_D5_D6, m6502_swap_op_d5_d6)
-DECLARE_DEVICE_TYPE(N2A03_CORE_SWAP_OP_D5_D6, n2a03_core_swap_op_d5_d6)
+DECLARE_DEVICE_TYPE(RP2A03_CORE_SWAP_OP_D5_D6, rp2a03_core_swap_op_d5_d6)
 
 #endif // MAME_M6502_SWAP_OP_D5_D6_H

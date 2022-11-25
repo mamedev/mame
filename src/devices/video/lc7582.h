@@ -51,15 +51,15 @@ protected:
 private:
 	void refresh_output();
 
-	int m_data = 0;
-	int m_ce = 0;
-	int m_clk = 0;
-	bool m_blank = false;
+	int m_data;
+	int m_ce;
+	int m_clk;
+	bool m_blank;
 
-	int m_duty = 0;
-	int m_addsp = 0;
-	u64 m_shift = 0;
-	u64 m_latch[2] = { 0, 0 };
+	int m_duty;
+	int m_addsp;
+	u64 m_shift;
+	u64 m_latch[2];
 
 	// callbacks
 	devcb_write64 m_write_segs;

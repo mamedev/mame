@@ -48,7 +48,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
   - When in "test mode", press START1 to cycle through next sound, and press START2
     to directly test the inputs and the Dip Switches.
-  - Bit 1 of Dip Switch is only read in combinaison of bit 0 during P.O.S.T. to
+  - Bit 1 of Dip Switch is only read in combination of bit 0 during P.O.S.T. to
     enter the "test mode", but it doesn't add any credit ! That's why I've patched
     the inputs, so you can enter the "test mode" by pressing COIN1 during P.O.S.T.
 

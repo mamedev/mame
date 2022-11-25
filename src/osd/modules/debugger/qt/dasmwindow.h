@@ -3,12 +3,16 @@
 #ifndef MAME_DEBUGGER_QT_DASMWINDOW_H
 #define MAME_DEBUGGER_QT_DASMWINDOW_H
 
+#pragma once
+
 #include "debuggerview.h"
 #include "windowqt.h"
 
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLineEdit>
 
+
+namespace osd::debugger::qt {
 
 //============================================================
 //  The Disassembly Window.
@@ -20,6 +24,9 @@ class DasmWindow : public WindowQt
 public:
 	DasmWindow(running_machine &machine, QWidget *parent = nullptr);
 	virtual ~DasmWindow();
+
+protected:
+	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
 
 private slots:
 	void cpuChanged(int index);
@@ -55,7 +62,7 @@ class DasmWindowQtConfig : public WindowQtConfig
 {
 public:
 	DasmWindowQtConfig() :
-		WindowQtConfig(WIN_TYPE_DASM),
+		WindowQtConfig(WINDOW_TYPE_DISASSEMBLY_VIEWER),
 		m_cpu(0),
 		m_rightBar(0)
 	{
@@ -67,11 +74,10 @@ public:
 	int m_cpu;
 	int m_rightBar;
 
-	void buildFromQWidget(QWidget *widget);
 	void applyToQWidget(QWidget *widget);
-	void addToXmlDataNode(util::xml::data_node &node) const;
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_DASMWINDOW_H

@@ -48,13 +48,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(audio_sync) { }
 
 private:
-	// timer IDs
-	enum
-	{
-		TIMER_ID_NOP,
-		TIMER_ID_DELAYED_SOUND
-	};
-
 	// shared pointers
 	memory_share_creator<uint8_t> m_vram_fg0;
 	memory_share_creator<uint8_t> m_vram_fg1;

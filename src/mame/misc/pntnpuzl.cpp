@@ -138,21 +138,25 @@ CN1 standard DB15 VGA connector (15KHz)
 */
 
 #include "emu.h"
+#include "bus/isa/trident.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/6522via.h"
 #include "machine/eepromser.h"
 #include "video/pc_vga.h"
+
 #include "screen.h"
 
 
 class pntnpuzl_state : public driver_device
 {
 public:
-	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_via(*this, "via")
+	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_svga(*this, "svga")
+		, m_via(*this, "via")
+		, m_screen(*this, "screen")
 	{ }
 
 	void pntnpuzl(machine_config &config);
@@ -162,13 +166,19 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<tvga9000_device> m_svga;
+	required_device<via6522_device> m_via;
+	required_device<screen_device> m_screen;
+
 	uint16_t m_pntpzl_200000 = 0;
 	uint16_t m_serial = 0;
 	uint16_t m_serial_out = 0;
 	uint16_t m_read_count = 0;
 	int m_touchscr[5]{};
 
-	required_device<cpu_device> m_maincpu;
+
+
 	void pntnpuzl_200000_w(uint16_t data);
 	void pntnpuzl_280018_w(uint16_t data);
 	uint16_t pntnpuzl_280014_r();
@@ -176,7 +186,6 @@ private:
 	uint16_t irq1_ack_r();
 	uint16_t irq2_ack_r();
 	uint16_t irq4_ack_r();
-	required_device<via6522_device> m_via;
 	void mcu_map(address_map &map);
 	void pntnpuzl_map(address_map &map);
 };
@@ -298,10 +307,13 @@ void pntnpuzl_state::pntnpuzl_map(address_map &map)
 	map(0x28001a, 0x28001b).r(FUNC(pntnpuzl_state::pntnpuzl_28001a_r));
 
 	/* standard VGA */
-	map(0x3a0000, 0x3bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x3c03b0, 0x3c03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x3c03c0, 0x3c03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x3c03d0, 0x3c03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x3a0000, 0x3bffff).rw(m_svga, FUNC(tvga9000_device::mem_r), FUNC(tvga9000_device::mem_w));
+	map(0x3c03b0, 0x3c03bf).rw(m_svga, FUNC(tvga9000_device::port_03b0_r), FUNC(tvga9000_device::port_03b0_w));
+	map(0x3c03c0, 0x3c03cf).rw(m_svga, FUNC(tvga9000_device::port_03c0_r), FUNC(tvga9000_device::port_03c0_w));
+	map(0x3c03d0, 0x3c03df).rw(m_svga, FUNC(tvga9000_device::port_03d0_r), FUNC(tvga9000_device::port_03d0_w));
+	// TODO: accesses $46e8 & 4ae8 at POST
+	map(0x3c43c4, 0x3c43cb).rw(m_svga, FUNC(tvga9000_device::port_43c6_r), FUNC(tvga9000_device::port_43c6_w));
+	map(0x3c83c4, 0x3c83cb).rw(m_svga, FUNC(tvga9000_device::port_83c6_r), FUNC(tvga9000_device::port_83c6_w));
 
 	map(0x400000, 0x407fff).ram();
 }
@@ -378,14 +390,14 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "mcu_eeprom").do_callback().set_inputline("mcu", i8x9x_device::HSI3_LINE);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
+	TVGA9000_VGA(config, m_svga, 0);
+	m_svga->set_screen(m_screen);
+	m_svga->set_vram_size(0x200000);
 
-	vga_device &vga(VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
+	// TODO: runs in external clock mode, needs setter to pc_vga. ~70 Hz is best guess
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(40'000'000) / 2, 1080, 0, 400, 265, 0, 240);
+	m_screen->set_screen_update(m_svga, FUNC(tvga9000_device::screen_update));
 }
 
 ROM_START( pntnpuzl )

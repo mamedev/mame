@@ -11,11 +11,18 @@
 
 #if defined(OSD_WINDOWS)
 
-#include <windows.h>
+#include "corestr.h"
+
+#include "winutil.h"
+
+#include "osdcore.h"
+#include "strconv.h"
 
 #include <cmath>
 #include <memory>
 #include <stdexcept>
+
+#include <windows.h>
 
 // Windows Imaging Components
 #include <wincodec.h>
@@ -33,11 +40,6 @@ DEFINE_GUID(GUID_WICPixelFormat8bppAlpha, 0xe6cd0116, 0xeeba, 0x4161, 0xaa, 0x85
 
 #include <wrl/client.h>
 #undef interface
-
-#include "strconv.h"
-#include "corestr.h"
-#include "winutil.h"
-#include "osdcore.h"
 
 using namespace Microsoft::WRL;
 

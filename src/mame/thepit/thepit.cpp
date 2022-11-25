@@ -311,7 +311,7 @@ void thepit_state::audio_io_map(address_map &map)
 
 
 static INPUT_PORTS_START( in0_real)
-	PORT_START("IN0")\
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -323,7 +323,7 @@ static INPUT_PORTS_START( in0_real)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( in2_fake )
-	PORT_START("IN2")\
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -1030,7 +1030,6 @@ ROM_START( ttfitter )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "ttfitter.clr", 0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) // dlsh
-
 ROM_END
 
 ROM_START( intrepid )
@@ -1132,7 +1131,6 @@ ROM_START( intrepidb3)
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.ic4",      0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
 ROM_END
-
 
 ROM_START( zaryavos )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1457,7 +1455,7 @@ GAME( 1982, funnymou,   suprmous, suprmous, suprmous, thepit_state, empty_init, 
 
 GAME( 1982, machomou,   0,        suprmous, suprmous, thepit_state, empty_init, ROT90, "Techstar",                                    "Macho Mouse", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, desertdn,   0,        desertdn, desertdn, thepit_state, empty_init, ROT0,  "Video Optics",                                "Desert Dan", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, desertdn,   0,        desertdn, desertdn, thepit_state, empty_init, ROT0,  "Kawakusu (Video Optics license)",             "Desert Dan", MACHINE_SUPPORTS_SAVE ) // export version of Gonta Road-Rush (gfx still contains part of "RUSH")
 
 GAME( 1983, intrepid,   0,        intrepid, intrepid, thepit_state, empty_init, ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, intrepid2,  intrepid, intrepid, intrepid, thepit_state, empty_init, ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", MACHINE_SUPPORTS_SAVE )

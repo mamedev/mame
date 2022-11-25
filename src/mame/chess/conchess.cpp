@@ -7,7 +7,7 @@ Conchess, a series of modular chess computers by Consumenta Computer.
 Hardware development by Loproc (Germany), manufactured at Wallharn Electronics
 (Ireland). The core people involved were Ulf Rathsman for the chess engine,
 and Johan Enroth. After Consumenta went under in 1983, the Conchess brand was
-continued by Systemhuset, Enroth's company.
+continued by Systemhuset.
 
 TODO:
 - dump/add princhess module
@@ -341,4 +341,4 @@ ROM_END
 CONS( 1982, concstd,  0,        0,      concstd,  conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, concply5, 0,        0,      concply5, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate 5.5MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, concply8, concply5, 0,      concply8, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate 8.0MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, concplyv, 0,        0,      concplyv, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, concplyv, 0,        0,      concplyv, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

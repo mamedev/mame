@@ -94,7 +94,7 @@
     SOUND CPU
     ========================================================================
     0000-0FFF   R/W   xxxxxxxx   Program RAM
-    1000-17FF   R/W   xxxxxxxx   EEPROM
+    1000-11FF   R/W   xxxxxxxx   EEPROM
     1800-180F   R/W   xxxxxxxx   POKEY 1 (left) communications
     1810-1813   R     xxxxxxxx   LETA analog inputs
     1830-183F   R/W   xxxxxxxx   POKEY 2 (right) communications
@@ -300,14 +300,6 @@ INTERRUPT_GEN_MEMBER(atarisy2_state::sound_irq_gen)
 void atarisy2_state::sound_irq_ack_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(m6502_device::IRQ_LINE, CLEAR_LINE);
-}
-
-
-WRITE_LINE_MEMBER(atarisy2_state::boost_interleave_hack)
-{
-	// apb3 fails the self-test with a 100 µs delay or less
-	if (state)
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
 }
 
 
@@ -820,7 +812,7 @@ void atarisy2_state::main_map(address_map &map)
 void atarisy2_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).mirror(0x2000).ram();
-	map(0x1000, 0x17ff).mirror(0x2000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+	map(0x1000, 0x11ff).mirror(0x2600).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 	map(0x1800, 0x180f).mirror(0x2780).rw(m_pokey[0], FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1810, 0x1813).mirror(0x278c).r(FUNC(atarisy2_state::leta_r));
 	map(0x1830, 0x183f).mirror(0x2780).rw(m_pokey[1], FUNC(pokey_device::read), FUNC(pokey_device::write));
@@ -1267,7 +1259,8 @@ void atarisy2_state::atarisy2(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
-	m_soundlatch->data_pending_callback().append(FUNC(atarisy2_state::boost_interleave_hack));
+	// apb3 fails the self-test with a 100 µs delay or less
+	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(200)); });
 
 	GENERIC_LATCH_8(config, m_mainlatch);
 

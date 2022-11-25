@@ -2,7 +2,7 @@
 // copyright-holders:Dirk Verwiebe, Cowering, hap
 /******************************************************************************
 
-Mephisto 4 + 5 Chess Computer
+Mephisto MM II series chesscomputers
 2007 Dirk V.
 
 TODO:
@@ -13,7 +13,40 @@ TODO:
 
 ===============================================================================
 
-Hardware notes:
+For rebel5 and newer, the chess engine is by Ed Schröder. Older chesscomputers in
+this driver were authored by Ulf Rathsman.
+
+The MM II program was also licensed to Daimler-Benz, who gave away several custom
+chesscomputers as a parting gift to retiring executives. The hardware is same as MM II.
+see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
+see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
+
+MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
+real one didn't get further than a prototype.
+
+Mephisto 4 Turbo Kit 18mhz - (mm4tk)
+    This is a replacement rom combining the turbo kit initial rom with the original MM IV.
+    The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
+    copies that to faster SRAM, then patches the checksum and the LED blink delays.
+    If someone else wants to code up the power up banking, feel free
+
+    There is an undumped MM V Turbo Kit, which will be the exact same except for location of
+    the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
+    blinks the LEDs a little slower.
+
+    -- Cowering (2011)
+
+The MM V prototype was the program that Ed Schröder participated with as "Rebel" at the
+1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
+For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
+
+MM VI (Saitek, 1994) is on different hardware, H8 CPU.
+
+===============================================================================
+
+MM IV + MM V hardware notes
+
+Overview:
 - CPU: R65C02P3/R65C02P4 or G65SC02P-4
 - Clock: 4.9152 MHz
 - NMI CLK: 600 Hz
@@ -58,28 +91,8 @@ $2400 // Chess Board
 $2800 // Chess Board
 $3000 // Chess Board
 
-$4000-7FFF Opening Modul HG550
-$8000-$FFF ROM
-
-===============================================================================
-
-Mephisto 4 Turbo Kit 18mhz - (mm4tk)
-    This is a replacement rom combining the turbo kit initial rom with the original MM IV.
-    The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
-    copies that to faster SRAM, then patches the checksum and the LED blink delays.
-    If someone else wants to code up the power up banking, feel free
-
-    There is an undumped MM V Turbo Kit, which will be the exact same except for location of
-    the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
-    blinks the LEDs a little slower.
-
-    -- Cowering (2011)
-
-The MM V prototype was the program that Ed Schroeder participated with as "Rebel" at the
-1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
-For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
-
-MM VI (Saitek, 1994) is on different hardware, H8 CPU.
+$4000-$7FFF Opening Module HG550
+$8000-$FFFF ROM
 
 ******************************************************************************/
 
@@ -97,8 +110,9 @@ MM VI (Saitek, 1994) is on different hardware, H8 CPU.
 #include "speaker.h"
 
 // internal artwork
-#include "mephisto_mm2.lh"
 #include "mephisto_bup.lh"
+#include "mephisto_mm2.lh"
+#include "mephisto_mm5.lh"
 
 
 namespace {
@@ -169,7 +183,7 @@ void mm2_state::lcd_irqack_w(u8 data)
 {
 	m_display->data_w(data);
 
-	// accessing 0x2800 also clears irq
+	// accessing here also clears irq
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -208,7 +222,7 @@ void mm2_state::rebel5_mem(address_map &map)
 	map(0x2000, 0x2007).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
 	map(0x3000, 0x3007).r(FUNC(mm2_state::keys_r));
 	map(0x4000, 0x4000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x5000, 0x5000).w(m_display, FUNC(mephisto_display1_device::data_w));
+	map(0x5000, 0x5000).w(FUNC(mm2_state::lcd_irqack_w));
 	map(0x6000, 0x6000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x7000, 0x7000).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x8000, 0xffff).rom();
@@ -217,13 +231,13 @@ void mm2_state::rebel5_mem(address_map &map)
 void mm2_state::mm5p_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2000).w(m_display, FUNC(mephisto_display1_device::data_w));
-	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
-	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0x2c00, 0x2c07).r(FUNC(mm2_state::keys_r));
-	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
-	map(0x3800, 0x3800).nopw(); // N/C
+	map(0x2000, 0x2000).mirror(0x03ff).w(m_display, FUNC(mephisto_display1_device::data_w));
+	map(0x2400, 0x2400).mirror(0x03ff).w("board", FUNC(mephisto_board_device::led_w)).nopr();
+	map(0x2800, 0x2800).mirror(0x03ff).w("board", FUNC(mephisto_board_device::mux_w));
+	map(0x2c00, 0x2c07).mirror(0x03f8).r(FUNC(mm2_state::keys_r));
+	map(0x3000, 0x3000).mirror(0x03ff).r("board", FUNC(mephisto_board_device::input_r));
+	map(0x3400, 0x3407).mirror(0x03f8).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
+	map(0x3800, 0x3800).mirror(0x03ff).nopw(); // N/C
 	map(0x4000, 0xffff).rom();
 }
 
@@ -263,6 +277,9 @@ static INPUT_PORTS_START( mm2 )
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
+
+	PORT_START("CLICKABLE") // helper for clickable artwork
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bup )
@@ -289,6 +306,9 @@ static INPUT_PORTS_START( bup )
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
+
+	PORT_START("CLICKABLE") // helper for clickable artwork
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -299,12 +319,12 @@ INPUT_PORTS_END
 
 void mm2_state::rebel5(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config, m_maincpu, 9.8304_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::rebel5_mem);
 
-	const attotime nmi_period = attotime::from_hz(9.8304_MHz_XTAL / 2 / 0x2000); // 600Hz
-	m_maincpu->set_periodic_int(FUNC(mm2_state::nmi_line_pulse), nmi_period);
+	const attotime irq_period = attotime::from_hz(9.8304_MHz_XTAL / 2 / 0x2000); // 600Hz
+	m_maincpu->set_periodic_int(FUNC(mm2_state::irq0_line_assert), irq_period);
 
 	HC259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set_output("led100");
@@ -320,7 +340,7 @@ void mm2_state::rebel5(machine_config &config)
 	MEPHISTO_DISPLAY_MODULE1(config, m_display);
 	config.set_default_layout(layout_mephisto_mm2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -329,7 +349,7 @@ void mm2_state::mm5p(machine_config &config)
 {
 	rebel5(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm5p_mem);
 
@@ -341,7 +361,7 @@ void mm2_state::mm4(machine_config &config)
 {
 	mm5p(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm4_mem);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mephisto_cart");
@@ -358,13 +378,15 @@ void mm2_state::mm5(machine_config &config)
 {
 	mm4(config);
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("mephisto_mm5");
+
+	config.set_default_layout(layout_mephisto_mm5); // does not apply to mm5p
 }
 
 void mm2_state::bup(machine_config &config)
 {
 	rebel5(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(7.3728_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::bup_mem);
 
@@ -380,7 +402,7 @@ void mm2_state::mm2(machine_config &config)
 {
 	bup(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm2_mem);
 
 	config.set_default_layout(layout_mephisto_mm2);
@@ -395,41 +417,6 @@ void mm2_state::mm2(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( mm2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("400", 0x8000, 0x8000, CRC(e8c1f431) SHA1(c32dfa66eefbf3e539438d2fe6e6916f78a128be) ) // HN27C256G-20
-ROM_END
-
-ROM_START( mm2a ) // binary identical to mm2
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mm2a_1.bin", 0x8000, 0x4000, CRC(e9adcb8f) SHA1(498f48f96678f7bf429fd43e4f392ec6dd649fc6) )
-	ROM_LOAD("mm2a_2.bin", 0xc000, 0x4000, CRC(d40cbfc2) SHA1(4e9b19b1a0ad97868b31d7a55143a1778110cc96) )
-ROM_END
-
-ROM_START( mm2b )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("300", 0x8000, 0x8000, CRC(60c777d4) SHA1(a77d678be60094073275558b4e8f0d34b43dd9ae) ) // D27C256D-20
-ROM_END
-
-ROM_START( mm2c )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("8-b_21.4_green", 0x8000, 0x4000, CRC(09cf6228) SHA1(7f33d3776afcc984998a955b433d5feb12de28f8) ) // D27128A-2
-	ROM_LOAD("c-f_21.4_red",   0xc000, 0x4000, CRC(86d77724) SHA1(e46c59e87465a9a1784fbaf4743649b2c10006e0) ) // "
-ROM_END
-
-ROM_START( mm2d )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mm2d_1.bin", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
-	ROM_LOAD("mm2d_2.bin", 0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
-ROM_END
-
-ROM_START( mm2e )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mm2e_1.bin", 0x8000, 0x4000, CRC(b91dab77) SHA1(67762304afe51fb8f1eb91259567b2451bf9bbfd) )
-	ROM_LOAD("mm2e_2.bin", 0xc000, 0x4000, CRC(01143cc1) SHA1(f78474b410dbecb209aa23ef81e9f894e8b54942) )
-ROM_END
-
-
 ROM_START( bup )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("bup_1.bin", 0x8000, 0x4000, CRC(e1e9625a) SHA1(8a757e28b7afca2a092f8ff419087e06b07b743e) )
@@ -443,14 +430,56 @@ ROM_START( bupa )
 ROM_END
 
 
-ROM_START( rebel5 )
+ROM_START( mm2 ) // 10 Sep 1986
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("400", 0x8000, 0x8000, CRC(e8c1f431) SHA1(c32dfa66eefbf3e539438d2fe6e6916f78a128be) ) // HN27C256G-20
+	// 2-EPROM version also exists: CRC32 e9adcb8f & d40cbfc2
+ROM_END
+
+ROM_START( mm2a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("300", 0x8000, 0x8000, CRC(60c777d4) SHA1(a77d678be60094073275558b4e8f0d34b43dd9ae) ) // D27C256D-20
+	// 2-EPROM version also exists: CRC32 86a5a14f & a122f2c0
+ROM_END
+
+ROM_START( mm2b ) // 21 Apr 1986
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("200", 0x8000, 0x8000, CRC(9b69aaab) SHA1(98ee4879eef4d8b06553290f16ca661cf4181af8) )
+	// 2-EPROM version also exists: CRC32 09cf6228 & 86d77724, ROM labels 8-b_21.4 & c-f_21.4
+ROM_END
+
+ROM_START( mm2c ) // serial 05780xx
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("hg86", 0x8000, 0x4000, CRC(e26d1f17) SHA1(3227bb1f8f22dd0d902a9a8be3c508b45c57d6cc) )
+	ROM_LOAD("50",   0xc000, 0x4000, CRC(86d77724) SHA1(e46c59e87465a9a1784fbaf4743649b2c10006e0) )
+ROM_END
+
+ROM_START( mm2d ) // serial 05650xx
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("mm2d_1.bin", 0x8000, 0x4000, CRC(b91dab77) SHA1(67762304afe51fb8f1eb91259567b2451bf9bbfd) )
+	ROM_LOAD("mm2d_2.bin", 0xc000, 0x4000, CRC(01143cc1) SHA1(f78474b410dbecb209aa23ef81e9f894e8b54942) )
+ROM_END
+
+ROM_START( mm2e ) // 13 Sep 1985, serial 05569xx
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("hg86_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
+	ROM_LOAD("c-f_6.9",   0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
+ROM_END
+
+
+ROM_START( rebel5 ) // 8 Feb 1987?
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("rebel5.bin", 0x8000, 0x8000, CRC(17232752) SHA1(3cd6893c0071f3dc02785bf99f1950eed81eba39) )
 ROM_END
 
-ROM_START( rebel5a )
+ROM_START( rebel5a ) // 5 Dec 1986
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("rebell_5.12.86", 0x8000, 0x8000, CRC(8d02e1ef) SHA1(9972c75936613bd68cfd3fe62bd222e90e8b1083) )
+ROM_END
+
+ROM_START( rebel5b ) // 18 Aug 1986
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("reb_18.8.86", 0x8000, 0x8000, CRC(c8c95e81) SHA1(0fb83ade11d2a2a74c94d7bd6f71130ebbc77497) )
 ROM_END
 
 
@@ -469,7 +498,7 @@ ROM_START( mm4b )
 	ROM_LOAD("600", 0x8000, 0x8000, CRC(837d49b9) SHA1(9fb2dfaaeca2559ce582211137635c069180e95f) )
 ROM_END
 
-ROM_START( mm4tk )
+ROM_START( mm4tk ) // hack of 710
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("mm4tk.bin", 0x8000, 0x8000, CRC(51cb36a4) SHA1(9e184b4e85bb721e794b88d8657ae8d2ff5a24af) )
 ROM_END
@@ -500,18 +529,19 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1984, mm2,     0,      0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 1, v4.00 1 EPROM)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, mm2a,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 2, v4.00 2 EPROMs)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, mm2b,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 3, v3.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, mm2c,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, mm2d,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, mm2e,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-
 CONS( 1985, bup,     0,      0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, bupa,    bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
+CONS( 1985, mm2,     0,      0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 1, v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2a,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 2, v3.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2b,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 3, v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2c,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2d,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2e,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 CONS( 1986, rebel5,  0,      0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka MM III
 CONS( 1986, rebel5a, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
+CONS( 1986, rebel5b, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
 
 CONS( 1987, mm4,     0,      0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, mm4a,    mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

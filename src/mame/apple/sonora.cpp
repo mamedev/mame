@@ -6,22 +6,28 @@
 
     Sonora contains the following:
     - A memory controller for up to 36MB (up to 4MB soldered and 32MB of SIMMs)
-    - A VRAM controller and framebuffer controller
+    - A VRAM controller and framebuffer controller, supporting monitor ID selection
     - A full VIA (VIA1) and a "pseudo-VIA", which is basically a combination GPIO and
       interrupt controller that looks somewhat like a VIA with no timers and no shift register.
     - A SWIM2 floppy controller
     - An ASC-like 4-channel audio controller
+    - 16/25 MHz CPU clock generator
+    - Support logic for various external subsystems (ADB, PDS, SCC, SCSI, SONIC)
 
-    The "Ardbeg" ASIC (LC 520) appears to be a renamed copy of Sonora, and "Prime Time"
-    (LC 475/575 and some low-end Quadras) is Sonora adapted to the 68040 bus.  "Prime Time II"
-    is similar but adds an ATA controller.
+    The "Ardbeg" ASIC (LC 520) appears to be a modest update of Sonora, adding support for
+    pushbuttons controlling display brightness and sound volume, plus monitor power saver mode.
+    "Prime Time" (LC 475/575 and Quadra 605) adapts the peripheral section of Sonora to the
+    68040 bus, but omits the DRAM and video controllers.  "Prime Time II" is similar but adds
+    an ATA controller.
 
     Sonora's video controller is in some of the PowerMac chipsets as well.
 */
 
 #include "emu.h"
 #include "sonora.h"
+
 #include "formats/ap_dsk35.h"
+
 
 static constexpr u32 C7M  = 7833600;
 static constexpr u32 C15M = (C7M * 2);
@@ -72,6 +78,7 @@ void sonora_device::device_add_mconfig(machine_config &config)
 	ASC(config, m_asc, C15M, asc_device::asc_type::SONORA);
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->irqf_callback().set(FUNC(sonora_device::asc_irq));
 
 	SWIM2(config, m_fdc, C15M);
 	m_fdc->devsel_cb().set(FUNC(sonora_device::devsel_w));
@@ -132,6 +139,8 @@ void sonora_device::device_start()
 
 	m_rom_ptr = &m_rom[0];
 	m_rom_size = m_rom.length() << 2;
+
+	m_pseudovia_ier = m_pseudovia_ifr = 0;
 }
 
 //-------------------------------------------------
@@ -290,6 +299,20 @@ WRITE_LINE_MEMBER(sonora_device::vbl_w)
 
 	if (m_pseudovia_regs[0x12] & 0x40)
 	{
+		pseudovia_recalc_irqs();
+	}
+}
+
+WRITE_LINE_MEMBER(sonora_device::asc_irq)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_pseudovia_regs[3] |= 0x10; // any VIA 2 interrupt | sound interrupt
+		pseudovia_recalc_irqs();
+	}
+	else
+	{
+		m_pseudovia_regs[3] &= ~0x10;
 		pseudovia_recalc_irqs();
 	}
 }

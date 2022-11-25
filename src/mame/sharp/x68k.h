@@ -14,6 +14,7 @@
 #pragma once
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "imagedev/floppy.h"
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
@@ -82,7 +83,7 @@ public:
 	void x68000_base(machine_config &config);
 	void x68000(machine_config &config);
 
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 protected:
 	template <typename CpuType, typename AddrMap, typename Clock>
@@ -321,11 +322,12 @@ protected:
 	void cpu_space_map(address_map &map);
 
 	inline void plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
-	void draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);
+	bool get_text_pixel(int line, int pixel, uint16_t *pix);
 	bool draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, uint8_t priority);
-	void draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
+	bool draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 	void draw_bg(bitmap_ind16 &bitmap, screen_device &screen, int layer, bool opaque, rectangle rect);
+	template <bool Blend> rgb_t get_gfx_pixel(int scanline, int pixel, bool gfxblend, rgb_t blendpix);
 
 public:
 	static rgb_t GGGGGRRRRRBBBBBI(uint32_t raw);
@@ -350,7 +352,7 @@ public:
 	void x68kxvi(machine_config &config);
 	void x68ksupr(machine_config &config);
 
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
@@ -371,7 +373,7 @@ public:
 
 	void x68030(machine_config &config);
 
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 protected:
 	void x68030_map(address_map &map);

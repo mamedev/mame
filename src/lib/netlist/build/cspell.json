@@ -19,6 +19,7 @@
 	"Schmitt",
 	"Schottky",
 	"Zener",
+	"Thevenin",
 	// Company names
 	"Fairchild",
 	"Signetics",
@@ -69,6 +70,7 @@
 	// FIXME: Remove everything below here again
 	//        Excluded for now ... Still over 1000 in the log
 	"plib",    // namespace
+	"isnull",
 	"pstring",
 	"passert",
 	"putf",
@@ -79,6 +81,8 @@
 	"idrn",
 	"preprocessor",
 	"ppreprocessor",
+	"psource",
+	"psemaphore",
 	"modacc",
 	"Ainv",
 	"anetlist",

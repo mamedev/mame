@@ -158,6 +158,10 @@ public:
 	{
 		install_space(AS_ISA_MEM, start, end, rhandler, whandler);
 	}
+	template<typename T> void install_memory(offs_t addrstart, offs_t addrend, T &device, void (T:: *map)(class address_map &map), uint64_t unitmask = ~u64(0))
+	{
+		m_memspace->install_device(addrstart, addrend, device, map, unitmask);
+	}
 
 	void unmap_device(offs_t start, offs_t end) const { m_iospace->unmap_readwrite(start, end); }
 	void unmap_bank(offs_t start, offs_t end);

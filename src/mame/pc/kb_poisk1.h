@@ -10,6 +10,8 @@
  * F12 - XXX
  */
 
+#include "utf8.h"
+
 INPUT_PORTS_START( poisk1_keyboard_v89 )
 	PORT_START("Y1")
 	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}') // scancode 0x55

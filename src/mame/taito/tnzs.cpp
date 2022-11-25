@@ -2,7 +2,6 @@
 // copyright-holders:Luca Elia, Mirko Buffoni, Takahiro Nogi
 /***************************************************************************
 
-
 Notes:
 - There are four versions of TNZS supported.
   1) "tnzs".   New hardware revision. 3 Z80 and no M-Chip (8742 MPU).
@@ -17,6 +16,51 @@ Notes:
   If you have enough patience and go up until the level reads "Q-1" (which corresponds
   to 1-1), AND the "Invulnerability" dip switch is On, you'll be invulnerable.
   Invulnerability isn't possible in 'tnzsop' (level select is stucked to level 6-1).
+
+
+PCBs:
+  The TNZS/Seta hardware has a variety of somewhat different pcbs, all of
+  which have both Seta and Taito Part numbers.
+  All pcbs have Z80B processors and one 6264 main RAM chip and an X1-001
+  and X1-002 video chip and an X1-004 I/O? Chip, and four PALs
+
+Seta#       Taito#s             CPUS    RxM2    ROM1    MCU?    Video RAM   PROMs   SETA X1 GFXROMs     QUADRATURE  ESD. PROT   Games                           Picture
+P0-022-A    K1100245A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      23c1000     uPD4701AC   3x X2-003*4 arkanoid2                       http://www.classicarcaderesource.com/RevengeOfDoh3.jpg
+P0-022-B    K1100234A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      27c512(A)   uPD4701AC   3x X2-003*4 plumppop                        N/A
+P0-025-A    K1100241A J1100107A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      23c1000     N/A         3x X2-003   drtoppel,extermatn,chukatai(B)  http://arcade.ym2149.com/pcb/taito/drtoppel_pcb_partside.jpg
+P0-028-A    K1100416A J1100332A 2xZ80B  512/256 512/256 8042    4x6116      No      05,06   23c1000     N/A         3x X2-004   chukatai(B)                     http://i.ebayimg.com/images/g/AhoAAOSw-FZXj5A5/s-l1600.jpg
+P0-038A     M6100309A           3xZ80B  512/256 512/256 NONE    1x6164      No      05,06   23c1000     N/A         3x X2-003   kageki                          http://i.ebayimg.com/images/a/(KGrHqJ,!lwE6C8-G97lBOjOu9mwVw~~/s-l1600.jpg
+P0-041-1    CA403001A           2xZ80B  61256   27c1000 8742    1x6164      No      05,06   27c1000     N/A         5x X2-005   tnzsop(C)                       http://arcade.ym2149.com/pcb/taito/tnzs_pcb3_partside.jpg
+P0-041-A    K1100356A J1100156A 2xZ80B  61256   27c1000 8042    1x6164      No      05,06   23c1000     N/A         5x X2-005   tnzs(j,u)o                      http://arcade.ym2149.com/pcb/taito/tnzs_pcb1_partside.jpg
+P0-043A     M6100356A           3xZ80B* 61256   27512** NONE    1x6164      No      05,06   LH534000*   N/A         4x X2-004   tnzs(j,u), kabukiz              http://arcade.ym2149.com/pcb/taito/tnzs_pcb2_mainboard_partside.jpg
+P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No      05,06   LH534000    N/A         5x X2-005   insectx(D)                      http://www.jammarcade.net/images/2014/04/InsectorX.jpg
+
+(A) GFX ROM mapping is slightly different to P0-022-A pcb, possibly configured
+    by a jumper.
+(B) chukatai has one set which unlike its earlier sets uses the P0-025-A
+    PCB, but with a daughterboard which converts four of the 23c1000 gfx ROM
+    sockets into 8 27c1000 EPROM sockets, and DOES use color PROMs!
+    The other pcb set uses P0-028-A pcb and 23c1000 mask ROMs and color RAM,
+    but has lower ROM id numbers. The higher numbered set was likely created
+    by Taito to 'use up' a stock of older P0-025-A pcbs.
+(C) This is a development/prototype PCB, hence it has 32 pin sockets for the
+    gfx ROMs as 27c1000 EPROMs, instead of 28 pin sockets for 23c1000 mask
+    ROMs. It also uses an (unprotected?) 8742 MCU.
+    Another curious thing is the Taito ID number may have accidentally been
+    printed in backwards order, i.e should be C1100304A which fits the pattern
+    of the other boards.
+(D) InsectorX has a lot of rework on its PCB, two greenwires for each of the
+    two LH534000 mask ROMs, and four wires connected to the X1-004 I/O chip
+    pins 18, 19, 20, and 21, connecting it to the 4 input pins of a Toshiba
+    TD62064AP Darlington driver @ U43.
+*   tnzs(j,u) uses a sub board with a z80b and 23c1000 mask ROMs on it for gfx,
+    plugged into the four LH534000 mask ROM sockets and the 2nd z80 socket.
+    Like Kageki's P0-038A mainboard, this mainboard has a third z80 on it which
+    acts in place of the 8x42 mcu used by the older tnzs sets.
+**  This is a 28-pin 27512 in a 32-pin socket which alternately holds a 27c1000.
+*3  This is unpopulated, but the pcb can accept a 61256 SRAM here.
+*4  arkanoid2 and plumppop lack all but one or two buttons, so two of the three
+    ESD protection modules are unpopulated.
 
 
 Hardware details for the newer tnzs board (from pictures):
@@ -44,7 +88,7 @@ Hardware details for the newer tnzs board (from pictures):
   (note: Taito logo is the new version)
   Z80-B
 
-
+****************************************************************************
 
 Stephh's notes (based on the games Z80 code and some tests) :
 
@@ -404,7 +448,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * ......1. : No
     Notice screen displays "Korea" instead of "Japan".
   - Copyright relies on bits 2 and 3 of the region (code at 0x276d),
-    but table at 0x2781 is the same for any combinaison :
+    but table at 0x2781 is the same for any combination :
       * ....??.. : "NICS CO. LTD. 1992" / "ALL RIGHTS RESERVED"
 
 
@@ -424,9 +468,6 @@ TODO:
 - Sprite/background sync during scrolling, e.g. insectx, kabukiz.
 - Merge video driver with seta.c (it's the same thing but seta.c assumes a 16-bit CPU)
 - Figure out remaining unknown Dip Switches in 'plumppop' and 'jpopnics'
-- Get rid of the COMMON_* macros to use generic INPUT_PORTS definition
-  and PORT_INCLUDE macro by changing the ym2203_config definition
-
 
 Arkanoid 2:
   - What do writes at $f400 do ?
@@ -500,6 +541,7 @@ e000-efff RAM shared with CPU #1
 f000-f003 inputs (used only by Arkanoid 2)
 
 ****************************************************************************/
+
 /***************************************************************************
 
                 Arkanoid 2 - Revenge of Doh!
@@ -511,7 +553,6 @@ f000-f003 inputs (used only by Arkanoid 2)
                 Mirko Buffoni
 
 - The game doesn't write to f800-fbff (static palette)
-
 
 
             Interesting routines (main cpu)
@@ -584,16 +625,18 @@ d011=if 00 checks counter, if FF doesn't
 d23f=input port 1 value
 
 ***************************************************************************/
+
 /***************************************************************************
 
-Kageki
-(c) 1988 Taito Corporation
+  Kageki
+  (c) 1988 Taito Corporation
 
-Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
+  Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 ***************************************************************************/
 
 /***************************************************************************
+
   Jumping Pop
    - added by David Haywood, thanks to Robin Cooper
 
@@ -891,16 +934,27 @@ void tnzs_base_state::tnzs_mainbank(machine_config &config)
 	ADDRESS_MAP_BANK(config, "mainbank").set_map(&tnzs_base_state::mainbank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x4000);
 }
 
-#define COMMON_IN2\
-	PORT_START("IN2")\
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )\
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )\
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )\
+
+static INPUT_PORTS_START( common_in2 )
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( common_coins )
+	PORT_START("COIN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( plumppop )
 	/* 0xb001 (CPU1) port 0 -> 0xef0e (shared RAM) */
@@ -937,7 +991,7 @@ static INPUT_PORTS_START( plumppop )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Button 2 (Cheat)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_PLAYER(1) PORT_NAME("P1 Warp (Cheat)") // not a cabinet button, so don't map it by default
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
@@ -947,25 +1001,13 @@ static INPUT_PORTS_START( plumppop )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Button 2 (Cheat)")    /* not working ? */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_PLAYER(2) PORT_NAME("P2 Warp (Cheat)") // see above, but P2 one only works in testmode?
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( common_in2 )
 
-	PORT_START("COIN1")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("COIN2")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_INCLUDE( common_coins )
 
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
 	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -1005,13 +1047,9 @@ static INPUT_PORTS_START( extrmatn )
 	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
-	COMMON_IN2
+	PORT_INCLUDE( common_in2 )
 
-	PORT_START("COIN1")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("COIN2")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_INCLUDE( common_coins )
 INPUT_PORTS_END
 
 
@@ -1106,13 +1144,9 @@ static INPUT_PORTS_START( drtoppel )
 	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
-	COMMON_IN2
+	PORT_INCLUDE( common_in2 )
 
-	PORT_START("COIN1")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("COIN2")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_INCLUDE( common_coins )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drtopplu )
@@ -1147,15 +1181,11 @@ static INPUT_PORTS_START( kageki )
 	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( common_in2 )
+
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kagekiu )
@@ -1169,7 +1199,7 @@ static INPUT_PORTS_START( kagekij )
 	PORT_INCLUDE( kagekiu )
 
 	PORT_MODIFY("DSWA")
-	TAITO_MACHINE_COCKTAIL_LOC(SWA)                              /* see notes */
+	TAITO_MACHINE_COCKTAIL_LOC(SWA) /* see notes */
 INPUT_PORTS_END
 
 
@@ -1201,13 +1231,9 @@ static INPUT_PORTS_START( chukatai )
 	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
-	COMMON_IN2
+	PORT_INCLUDE( common_in2 )
 
-	PORT_START("COIN1")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("COIN2")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_INCLUDE( common_coins )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chukatau )
@@ -1257,15 +1283,11 @@ static INPUT_PORTS_START( tnzs )
 	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( common_in2 )
+
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tnzsj )
@@ -1314,13 +1336,13 @@ static INPUT_PORTS_START( tnzsjo )
 	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
-	COMMON_IN2
+	PORT_INCLUDE( common_in2 )
 
 	PORT_START("COIN1")
-	PORT_BIT( 1, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("COIN2")
-	PORT_BIT( 1, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tnzsop )
@@ -1475,14 +1497,14 @@ static INPUT_PORTS_START( jpopnics )
 	PORT_START("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Button 2 (Cheat)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_PLAYER(1) PORT_NAME("P1 Warp (Cheat)") // not a cabinet button, so don't map it by default
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Button 2 (Cheat)")    /* not working ? */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_PLAYER(2) PORT_NAME("P2 Warp (Cheat)") // see above, but P2 one only works in testmode?
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -1720,55 +1742,6 @@ void jpopnics_state::jpopnics(machine_config &config)
 	/* sound hardware */
 	YM2151(config, "ymsnd", XTAL(12'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Not verified - Main board Crystal is 12MHz */
 }
-
-/***************************************************************************
-
-  PCBs
-
-***************************************************************************/
-/*  The TNZS/Seta hardware has a variety of somewhat different pcbs, all of
-    which have both Seta and Taito Part numbers.
-    All pcbs have Z80B processors and one 6264 main RAM chip and an X1-001
-    and X1-002 video chip and an X1-004 I/O? Chip, and four PALs
-
-Seta#       Taito#s             CPUS    RxM2    ROM1    MCU?    Video RAM   PROMs   SETA X1 GFXROMs     QUADRATURE  ESD. PROT   Games                           Picture
-P0-022-A    K1100245A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      23c1000     uPD4701AC   3x X2-003*4 arkanoid2                       http://www.classicarcaderesource.com/RevengeOfDoh3.jpg
-P0-022-B    K1100234A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      27c512(A)   uPD4701AC   3x X2-003*4 plumppop                        N/A
-P0-025-A    K1100241A J1100107A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      23c1000     N/A         3x X2-003   drtoppel,extermatn,chukatai(B)  http://arcade.ym2149.com/pcb/taito/drtoppel_pcb_partside.jpg
-P0-028-A    K1100416A J1100332A 2xZ80B  512/256 512/256 8042    4x6116      No      05,06   23c1000     N/A         3x X2-004   chukatai(B)                     http://i.ebayimg.com/images/g/AhoAAOSw-FZXj5A5/s-l1600.jpg
-P0-038A     M6100309A           3xZ80B  512/256 512/256 NONE    1x6164      No      05,06   23c1000     N/A         3x X2-003   kageki                          http://i.ebayimg.com/images/a/(KGrHqJ,!lwE6C8-G97lBOjOu9mwVw~~/s-l1600.jpg
-P0-041-1    CA403001A           2xZ80B  61256   27c1000 8742    1x6164      No      05,06   27c1000     N/A         5x X2-005   tnzsop(C)                       http://arcade.ym2149.com/pcb/taito/tnzs_pcb3_partside.jpg
-P0-041-A    K1100356A J1100156A 2xZ80B  61256   27c1000 8042    1x6164      No      05,06   23c1000     N/A         5x X2-005   tnzs(j,u)o                      http://arcade.ym2149.com/pcb/taito/tnzs_pcb1_partside.jpg
-P0-043A     M6100356A           3xZ80B* 61256   27512** NONE    1x6164      No      05,06   LH534000*   N/A         4x X2-004   tnzs(j,u), kabukiz              http://arcade.ym2149.com/pcb/taito/tnzs_pcb2_mainboard_partside.jpg
-P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No      05,06   LH534000    N/A         5x X2-005   insectx(D)                      http://www.jammarcade.net/images/2014/04/InsectorX.jpg
-
-(A) GFX ROM mapping is slightly different to P0-022-A pcb, possibly configured
-    by a jumper.
-(B) chukatai has one set which unlike its earlier sets uses the P0-025-A
-    PCB, but with a daughterboard which converts four of the 23c1000 gfx ROM
-    sockets into 8 27c1000 EPROM sockets, and DOES use color PROMs!
-    The other pcb set uses P0-028-A pcb and 23c1000 mask ROMs and color RAM,
-    but has lower ROM id numbers. The higher numbered set was likely created
-    by Taito to 'use up' a stock of older P0-025-A pcbs.
-(C) This is a development/prototype PCB, hence it has 32 pin sockets for the
-    gfx ROMs as 27c1000 EPROMs, instead of 28 pin sockets for 23c1000 mask
-    ROMs. It also uses an (unprotected?) 8742 MCU.
-    Another curious thing is the Taito ID number may have accidentally been
-    printed in backwards order, i.e should be C1100304A which fits the pattern
-    of the other boards.
-(D) InsectorX has a lot of rework on its PCB, two greenwires for each of the
-    two LH534000 mask ROMs, and four wires connected to the X1-004 I/O chip
-    pins 18, 19, 20, and 21, connecting it to the 4 input pins of a Toshiba
-    TD62064AP Darlington driver @ U43.
-*   tnzs(j,u) uses a sub board with a z80b and 23c1000 mask ROMs on it for gfx,
-    plugged into the four LH534000 mask ROM sockets and the 2nd z80 socket.
-    Like Kageki's P0-038A mainboard, this mainboard has a third z80 on it which
-    acts in place of the 8x42 mcu used by the older tnzs sets.
-**  This is a 28-pin 27512 in a 32-pin socket which alternately holds a 27c1000.
-*3  This is unpopulated, but the pcb can accept a 61256 SRAM here.
-*4  arkanoid2 and plumppop lack all but one or two buttons, so two of the three
-    ESD protection modules are unpopulated.
-*/
 
 
 /***************************************************************************

@@ -339,4 +339,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, driver_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

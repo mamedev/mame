@@ -11,7 +11,8 @@ QTY     Type            clock   position        function
 3x      P8255A-5                ic11,ic25,ic31  Programmable Peripheral Interface
 1x      MM5450N                 ic29            LED Display Driver - main
 2x      LM358                   ic64,ic65       Dual Operational Amplifier - sound
-1x      oscillator      6.0MHz  Q1
+1x      oscillator      6.0MHz  Q1              Near MCU
+1x      oscillator      ?MHz    Q2              Near Z80 (ceramic resonator)
 
 ROMs
 QTY     Type                    position        status
@@ -43,7 +44,7 @@ QTY     Type
 1x      red LED (5V)
 1x      red LED (5V)
 1x      red LED (5V)
-1x      16 digits LED display (on solder side), each digit is made by 18 segments
+1x      16 digits VFD (on solder side), each digit is made by 18 segments
 Notes
 
 This is the PCB for one of the first ever CD based Juke Box, made in 1988 by Midcoin, some info here:

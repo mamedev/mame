@@ -180,7 +180,7 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 
 #include "emu.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"

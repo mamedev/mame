@@ -214,10 +214,12 @@ WRITE_LINE_MEMBER(metro_state::puzzlet_vblank_irq)
 {
 	if (state)
 	{
-		m_vdp2->set_irq(5);
-
 		m_vdp2->screen_eof(state);
+		if (m_ext_irq_enable)
+			m_vdp2->set_irq(5);
 	}
+	else
+		m_vdp2->clear_irq(5);
 }
 
 /***************************************************************************
@@ -3503,11 +3505,12 @@ void metro_state::puzzlet(machine_config &config)
 	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set_inputline("coinmcu", INPUT_LINE_IRQ0).invert();
 
 	/* video hardware */
-	// TODO: looks like game is running in i4220 compatibilty mode, $778000 seems to be an id for the chip?
+	// TODO: looks like game is running in i4220 compatibility mode, $778000 seems to be an id for the chip?
 	i4220_config(config);
 	m_vdp2->irq_cb().set_inputline(m_maincpu, 0);
 	m_vdp2->set_vblank_irq_level(1);
 	m_vdp2->set_blit_irq_level(3);
+	m_vdp2->ext_ctrl_0_cb().set(FUNC(metro_state::ext_irq5_enable_w));
 
 	m_screen->screen_vblank().set(FUNC(metro_state::puzzlet_vblank_irq));
 
@@ -5491,5 +5494,5 @@ GAME( 1995, vmetal,    0,        vmetal,    vmetal,     metro_state, init_vmetal
 GAME( 1995, vmetaln,   vmetal,   vmetal,    vmetal,     metro_state, init_vmetal,   ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)", MACHINE_SUPPORTS_SAVE )
 
 // VG2200
-GAME( 2000, puzzlet,   0,        puzzlet,   puzzlet,    metro_state, empty_init,    ROT0,   "Unies Corporation",                               "Puzzlet (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, metabee,   0,        puzzlet,   puzzlet,    metro_state, empty_init,    ROT0,   "Natsume / Banpresto",                             "Metabee Shot", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // Hopper problem
+GAME( 2000, puzzlet,   0,        puzzlet,   puzzlet,    metro_state, init_puzzlet,  ROT0,   "Unies Corporation",                               "Puzzlet (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, metabee,   0,        puzzlet,   puzzlet,    metro_state, init_puzzlet,  ROT0,   "Natsume / Banpresto",                             "Metabee Shot", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // Hopper problem

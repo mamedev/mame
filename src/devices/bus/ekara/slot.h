@@ -46,7 +46,7 @@ public:
 	virtual bool is_read_access_not_rom(void) { return false; }
 	virtual bool is_write_access_not_rom(void) { return false; }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint32_t get_rom_size() { return m_rom_size; }
 
@@ -127,8 +127,6 @@ DECLARE_DEVICE_TYPE(EKARA_CART_SLOT, ekara_cart_slot_device)
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
-
-#define EKARASLOT_ROM_REGION_TAG ":cart:rom"
 
 void ekara_cart(device_slot_interface &device);
 

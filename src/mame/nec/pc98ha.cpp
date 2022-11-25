@@ -21,7 +21,8 @@
           everything else ugh;
         - EMS fails at boot, it's never ever really checked;
         - MSDOS cannot detect EMS properly, is there a flag somewhere?
-        - JEIDA memory card interface;
+        - JEIDA memory card interface (68pin cfr. "Super Daisenryaku HA",
+          most likely same as NeoGeo JEIDA 3.0 memory cards);
         - optional docking station (for floppy device only or can mount other stuff too?);
 
 **************************************************************************************************/
@@ -240,6 +241,7 @@ void pc98ha_state::ha_map(address_map &map)
 	map(0xc4000, 0xc7fff).bankrw("ems_bank2");
 	map(0xc8000, 0xcbfff).bankrw("ems_bank3");
 	map(0xcc000, 0xcffff).bankrw("ems_bank4");
+
 	map(0xdc000, 0xdffff).view(m_ext_view);
 	m_ext_view[0](0xdc000, 0xdffff).unmaprw(); // unknown, accessed on MSDOS boot
 	m_ext_view[1](0xdc000, 0xdffff).bankrw("ramdrv_bank");
@@ -259,6 +261,7 @@ void pc98ha_state::ha_io(address_map &map)
 	map(0x1e8e, 0x1e8e).w(FUNC(pc98ha_state::ext_view_sel_w));
 	map(0x5f8e, 0x5f8e).r(FUNC(pc98ha_state::memcard_status_2_r));
 }
+
 
 static INPUT_PORTS_START( pc98lt )
 	PORT_START("SYSB")
@@ -522,5 +525,6 @@ ROM_START( pc98ha )
 	ROM_LOAD( "ramdrv.bin",   0x000000, 0x160000, BAD_DUMP CRC(f2cec994) SHA1(c986ad6d8f810ac0a9657c1af26b6fec712d56ed) )
 ROM_END
 
-COMP( 1989, pc98lt,      0,        0, lt_config,    pc98lt,   pc98lt_state, empty_init,   "NEC",   "PC-98LT",                   MACHINE_NOT_WORKING )
-COMP( 1990, pc98ha,      0,        0, ha_config,    pc98ha,   pc98ha_state, empty_init,   "NEC",   "PC-98HA (Handy98)",         MACHINE_NOT_WORKING )
+
+COMP( 1989, pc98lt,      0,        0, lt_config,         pc98lt,   pc98lt_state,        empty_init,   "NEC",   "PC-98LT", MACHINE_NOT_WORKING )
+COMP( 1990, pc98ha,      0,        0, ha_config,         pc98ha,   pc98ha_state,        empty_init,   "NEC",   "PC-98HA (Handy98)", MACHINE_NOT_WORKING )

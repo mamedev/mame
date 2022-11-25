@@ -76,7 +76,7 @@ void xybots_state::main_map(address_map &map)
 	map(0x802e00, 0x802fff).mirror(0x7f8000).ram().share("mob");
 	map(0x803000, 0x803fff).mirror(0x7f8000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x804000, 0x8047ff).mirror(0x7f8800).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x805000, 0x805fff).mirror(0x7f8000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x805000, 0x8053ff).mirror(0x7f8c00).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x806000, 0x8060ff).mirror(0x7f8000).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r)).umask16(0x00ff);
 	map(0x806100, 0x8061ff).mirror(0x7f8000).portr("FFE100");
 	map(0x806200, 0x8062ff).mirror(0x7f8000).r(FUNC(xybots_state::special_port1_r));

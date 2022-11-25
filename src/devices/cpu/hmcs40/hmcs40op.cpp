@@ -21,26 +21,18 @@ inline void hmcs40_cpu_device::ram_w(u8 data)
 	m_data->write_byte(address, data & 0xf);
 }
 
-void hmcs40_cpu_device::exc_stack()
-{
-	// exchange stack/pc
-	u16 pc = m_stack[m_sp] & m_pcmask;
-	m_stack[m_sp] = m_pc;
-	m_pc = pc;
-}
-
 void hmcs40_cpu_device::pop_stack()
 {
-	if (++m_sp >= m_stack_levels)
-		m_sp = 0;
-	exc_stack();
+	m_pc = m_stack[0] & m_pcmask;
+	for (int i = 0; i < m_stack_levels-1; i++)
+		m_stack[i] = m_stack[i+1];
 }
 
 void hmcs40_cpu_device::push_stack()
 {
-	exc_stack();
-	if (--m_sp < 0)
-		m_sp = m_stack_levels - 1;
+	for (int i = m_stack_levels-1; i >= 1; i--)
+		m_stack[i] = m_stack[i-1];
+	m_stack[0] = m_pc;
 }
 
 
@@ -182,7 +174,7 @@ void hmcs40_cpu_device::op_xsp()
 }
 
 
-// Ram Register Instruction
+// RAM Register Instruction
 
 void hmcs40_cpu_device::op_lam()
 {
@@ -460,6 +452,7 @@ void hmcs40_cpu_device::op_cal()
 	// CAL a: Subroutine Jump on Status 1
 	if (m_s)
 	{
+		m_block_int = true;
 		push_stack();
 		m_pc = m_op & 0x3f; // short calls default to page 0
 	}
@@ -471,7 +464,10 @@ void hmcs40_cpu_device::op_lpu()
 {
 	// LPU u: Load Program Counter Upper on Status 1
 	if (m_s)
+	{
+		m_block_int = true;
 		m_page = m_op & 0x1f;
+	}
 	else
 		m_op |= 0x400; // indicate unhandled LPU
 }
@@ -668,6 +664,8 @@ void hmcs40_cpu_device::op_lrb()
 
 void hmcs40_cpu_device::op_p()
 {
+	cycle();
+
 	// P p: Pattern Generation
 	u16 address = m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9 | (m_pc & ~0x3f);
 	u16 o = m_program->read_word(address & m_prgmask);
@@ -686,6 +684,4 @@ void hmcs40_cpu_device::op_p()
 		write_r(2, o & 0xf);
 		write_r(3, o >> 4 & 0xf);
 	}
-
-	cycle();
 }

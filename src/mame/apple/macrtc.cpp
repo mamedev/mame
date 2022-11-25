@@ -43,8 +43,14 @@ DEFINE_DEVICE_TYPE(RTC3430042, rtc3430042_device, "rtc3430042", "Apple 343-0042 
 rtc3430042_device::rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RTC3430042, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
-		device_nvram_interface(mconfig, *this)
+		device_nvram_interface(mconfig, *this),
+		m_cko_cb(*this)
 {
+}
+
+void rtc3430042_device::device_resolve_objects()
+{
+	m_cko_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -54,10 +60,26 @@ rtc3430042_device::rtc3430042_device(const machine_config &mconfig, const char *
 void rtc3430042_device::device_start()
 {
 	// allocate timers
-	m_clock_timer = timer_alloc(FUNC(rtc3430042_device::seconds_tick), this);
-	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
+	attotime period = clocks_to_attotime(32768 / 2);
+	m_clock_timer = timer_alloc(FUNC(rtc3430042_device::half_seconds_tick), this);
+	m_clock_timer->adjust(period, 0, period);
+	m_cko = true;
 
 	// state saving
+	save_item(NAME(m_rtc_rTCEnb));
+	save_item(NAME(m_rtc_rTCClk));
+	save_item(NAME(m_rtc_data_byte));
+	save_item(NAME(m_rtc_bit_count));
+	save_item(NAME(m_rtc_data_dir));
+	save_item(NAME(m_rtc_data_out));
+	save_item(NAME(m_rtc_cmd));
+	save_item(NAME(m_rtc_write_protect));
+	save_item(NAME(m_rtc_seconds));
+	save_item(NAME(m_pram));
+	save_item(NAME(m_rtc_xpaddr));
+	save_item(NAME(m_rtc_state));
+	save_item(NAME(m_data_latch));
+	save_item(NAME(m_cko));
 }
 
 void rtc3430042_device::device_reset()
@@ -76,12 +98,17 @@ void rtc3430042_device::device_reset()
 }
 
 //-------------------------------------------------
-//  seconds_tick -
+//  half_second_tick -
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(rtc3430042_device::seconds_tick)
+TIMER_CALLBACK_MEMBER(rtc3430042_device::half_seconds_tick)
 {
-	advance_seconds();
+	m_cko = !m_cko;
+	m_cko_cb(m_cko);
+
+	// seconds register increments following rising edge of CKO
+	if (m_cko)
+		advance_seconds();
 }
 
 //-------------------------------------------------

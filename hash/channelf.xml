@@ -65,7 +65,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="muehle" cloneof="tctactoe">
-		<description>Muehle / Tontauben-Schiessen / Kreatives Malspiel / Videoscope (Ger)</description>
+		<description>Muehle / Tontauben-Schiessen / Kreatives Malspiel / Videoscope (Germany)</description>
 		<year>1978</year>
 		<publisher>SABA</publisher>
 		<info name="series" value="Videocart 1" />
@@ -117,7 +117,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="spitfirep" cloneof="spitfire">
-		<description>Spitfire (Prototype)</description>
+		<description>Spitfire (prototype)</description>
 		<year>1976</year>
 		<publisher>Fairchild</publisher>
 		<part name="cart" interface="channelf_cart">
@@ -209,7 +209,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="mazea" cloneof="maze">
-		<description>Maze / Jailbreak / Blind-man's-bluff / Trailblazer (Alt)</description>
+		<description>Maze / Jailbreak / Blind-man's-bluff / Trailblazer (alt)</description>
 		<year>1977</year>
 		<publisher>Fairchild</publisher>
 		<info name="series" value="Videocart 10" />
@@ -264,7 +264,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="robotwarp" cloneof="robotwar">
-		<description>Robot War (Prototype)</description>
+		<description>Robot War (prototype)</description>
 		<year>1977</year>
 		<publisher>Fairchild</publisher>
 		<part name="cart" interface="channelf_cart">
@@ -328,7 +328,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="pinballa" cloneof="pinball">
-		<description>Pinball Challenge (Alt)</description>
+		<description>Pinball Challenge (alt)</description>
 		<year>1978</year>
 		<publisher>Fairchild</publisher>
 		<info name="series" value="Videocart 17" />
@@ -356,7 +356,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="ordtvlng" cloneof="hangman">
-		<description>Ordtävling (Swe)</description>
+		<description>Ordtävling (Sweden)</description>
 		<year>1978</year>
 		<publisher>Luxor</publisher>
 		<info name="series" value="Luxor 18" />
@@ -371,7 +371,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="ratmal" cloneof="hangman">
-		<description>Rat' Mal (Ger)</description>
+		<description>Rat' Mal (Germany)</description>
 		<year>197?</year>
 		<publisher>SABA</publisher>
 		<info name="series" value="SABA 16" />
@@ -412,7 +412,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="schach">
-		<description>Schach (Ger)</description>
+		<description>Schach (Germany)</description>
 		<year>197?</year>
 		<publisher>SABA</publisher>
 		<info name="series" value="SABA 20" />
@@ -466,7 +466,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="galacticp" cloneof="galactic">
-		<description>Galactic Space Wars (Prototype)</description>
+		<description>Galactic Space Wars (prototype)</description>
 		<year>1980</year>
 		<publisher>Zircon</publisher>
 		<part name="cart" interface="channelf_cart">
@@ -491,7 +491,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="football" cloneof="pfootbll">
-		<description>Football (Prototype)</description>
+		<description>Football (prototype)</description>
 		<year>1981</year>
 		<publisher>Zircon</publisher>
 		<part name="cart" interface="channelf_cart">
@@ -516,7 +516,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="drawpkr" cloneof="casinop">
-		<description>Draw Poker (Prototype)</description>
+		<description>Draw Poker (prototype)</description>
 		<year>1980</year>
 		<publisher>Zircon</publisher>
 		<part name="cart" interface="channelf_cart">
@@ -553,7 +553,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="clrorgan">
-		<description>Color Organ (Prototype)</description>
+		<description>Color Organ (prototype)</description>
 		<year>19??</year>
 		<publisher>Zircon</publisher>
 		<part name="cart" interface="channelf_cart">
@@ -566,7 +566,7 @@ X-1221 : Bowling
 
 
 	<software name="multicrt" supported="partial">
-		<description>Channel F Multi-Cart (Final)</description>
+		<description>Channel F Multi-Cart (final)</description>
 		<year>2004</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="cart" interface="channelf_cart">
@@ -578,7 +578,7 @@ X-1221 : Bowling
 	</software>
 
 	<software name="multicrto" cloneof="multicrt" supported="partial">
-		<description>Channel F Multi-Cart (Older)</description>
+		<description>Channel F Multi-Cart (older)</description>
 		<year>2004</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="cart" interface="channelf_cart">

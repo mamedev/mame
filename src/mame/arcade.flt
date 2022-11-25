@@ -72,6 +72,7 @@ atari/foodf.cpp
 atari/gauntlet.cpp
 atari/gumrally.cpp
 atari/harddriv.cpp
+atari/hitparade.cpp
 atari/irobot.cpp
 atari/jaguar.cpp
 atari/jedi.cpp
@@ -122,6 +123,7 @@ atlus/bowltry.cpp
 atlus/ohmygod.cpp
 atlus/patapata.cpp
 atlus/rallypnt.cpp
+barcrest/mpu1.cpp
 barcrest/mpu2.cpp
 barcrest/mpu3.cpp
 barcrest/mpu4avan.cpp
@@ -136,6 +138,7 @@ barcrest/mpu4mod2sw.cpp
 barcrest/mpu4mod4oki.cpp
 barcrest/mpu4mod4yam.cpp
 barcrest/mpu4plasma.cpp
+barcrest/mpu4redpoint.cpp
 barcrest/mpu4union.cpp
 barcrest/mpu4unsorted.cpp
 barcrest/mpu4vid.cpp
@@ -309,6 +312,7 @@ funworld/photoply.cpp
 funworld/photoplys.cpp
 funworld/photoplysx.cpp
 funworld/snookr10.cpp
+funworld/supercrd.cpp
 fuuki/fuukifg2.cpp
 fuuki/fuukifg3.cpp
 gaelco/atvtrack.cpp
@@ -346,6 +350,14 @@ gametron/gotya.cpp
 gametron/sbugger.cpp
 gottlieb/exterm.cpp
 gottlieb/gottlieb.cpp
+ice/chexx.cpp
+ice/frenzyxprss.cpp
+ice/ice_bozopail.cpp
+ice/ice_hhhippos.cpp
+ice/ice_tbd.cpp
+ice/lethalj.cpp
+ice/schexx4gen.cpp
+ice/vp101.cpp
 igs/cabaret.cpp
 igs/dunhuang.cpp
 igs/funtech.cpp
@@ -371,6 +383,7 @@ igt/splus.cpp
 igt/videopkr.cpp
 irem/m10.cpp
 irem/m107.cpp
+irem/m119.cpp
 irem/m14.cpp
 irem/m52.cpp
 irem/m57.cpp
@@ -394,6 +407,7 @@ itech/itech8.cpp
 jaleco/acommand.cpp
 jaleco/aeroboto.cpp
 jaleco/argus.cpp
+jaleco/armchamp.cpp
 jaleco/bestleag.cpp
 jaleco/bigstrkb.cpp
 jaleco/blueprnt.cpp
@@ -490,6 +504,7 @@ konami/konmedal68k.cpp
 konami/kontest.cpp
 konami/kpontoon.cpp
 konami/kpython.cpp
+konami/kpython2.cpp
 konami/ksys573.cpp
 konami/labyrunr.cpp
 konami/lethal.cpp
@@ -609,9 +624,11 @@ misc/acesp.cpp
 misc/age_candy.cpp
 misc/alinvade.cpp
 misc/amaticmg.cpp
+misc/amuzy.cpp
 misc/amerihok.cpp
 misc/ampoker2.cpp
 misc/amspdwy.cpp
+misc/amstarz80.cpp
 misc/amusco.cpp
 misc/anes.cpp
 misc/arachnid.cpp
@@ -644,7 +661,6 @@ misc/cb2001.cpp
 misc/chameleonrx1.cpp
 misc/chance32.cpp
 misc/changyu.cpp
-misc/chexx.cpp
 misc/chicago.cpp
 misc/chsuper.cpp
 misc/clowndwn.cpp
@@ -705,7 +721,6 @@ misc/flower.cpp
 misc/fortecar.cpp
 misc/freekick.cpp
 misc/freeway.cpp
-misc/frenzyxprss.cpp
 misc/fresh.cpp
 misc/funeball.cpp
 misc/fungames.cpp
@@ -739,9 +754,6 @@ misc/hotblock.cpp
 misc/hotchili.cpp
 misc/hotstuff.cpp
 misc/houseball.cpp
-misc/ice_bozopail.cpp
-misc/ice_hhhippos.cpp
-misc/ice_tbd.cpp
 misc/imolagp.cpp
 misc/intrscti.cpp
 misc/island.cpp
@@ -758,7 +770,6 @@ misc/jubilee.cpp
 misc/jungleyo.cpp
 misc/kas89.cpp
 misc/kingpin.cpp
-misc/krokha.cpp
 misc/kurukuru.cpp
 misc/kyugo.cpp
 misc/ladyfrog.cpp
@@ -766,7 +777,6 @@ misc/laserbas.cpp
 misc/laz_aftrshok.cpp
 misc/laz_ribrac.cpp
 misc/lependu.cpp
-misc/lethalj.cpp
 misc/limenko.cpp
 misc/ltcasino.cpp
 misc/luckybal.cpp
@@ -800,6 +810,7 @@ misc/multfish.cpp
 misc/multfish_boot.cpp
 misc/murogem.cpp
 misc/murogmbl.cpp
+misc/musclem.cpp
 misc/neomania.cpp
 misc/neoprint.cpp
 misc/news.cpp
@@ -850,7 +861,6 @@ misc/rulechan.cpp
 misc/sanremmg.cpp
 misc/sanremo.cpp
 misc/savquest.cpp
-misc/schexx4gen.cpp
 misc/scm_500.cpp
 misc/sealy.cpp
 misc/sealy_fr.cpp
@@ -879,7 +889,6 @@ misc/stuntair.cpp
 misc/su2000.cpp
 misc/summit.cpp
 misc/sumt8035.cpp
-misc/supercrd.cpp
 misc/supertnk.cpp
 misc/tapatune.cpp
 misc/tattack.cpp
@@ -913,7 +922,6 @@ misc/videosaa.cpp
 misc/vlc.cpp
 misc/vlc34010.cpp
 misc/voyager.cpp
-misc/vp101.cpp
 misc/vpoker.cpp
 misc/vroulet.cpp
 misc/wildpkr.cpp
@@ -1010,6 +1018,7 @@ nintendo/mario.cpp
 nintendo/mmagic.cpp
 nintendo/multigam.cpp
 nintendo/n8080.cpp
+nintendo/nes_arcade_bl.cpp
 nintendo/nss.cpp
 nintendo/playch10.cpp
 nintendo/popeye.cpp
@@ -1115,6 +1124,7 @@ pinball/micropin.cpp
 pinball/missamer.cpp
 pinball/mrgame.cpp
 pinball/nsm.cpp
+pinball/newcanasta.cpp
 pinball/peyper.cpp
 pinball/play_1.cpp
 pinball/play_2.cpp
@@ -1192,6 +1202,7 @@ sega/coolridr.cpp
 sega/dc_atomiswave.cpp
 sega/deniam.cpp
 sega/dotrikun.cpp
+sega/eshockey.cpp
 sega/flashbeats.cpp
 sega/fwheel.cpp
 sega/gpworld.cpp
@@ -1232,6 +1243,7 @@ sega/segasm1.cpp
 sega/segasp.cpp
 sega/segattl.cpp
 sega/segaufo.cpp
+sega/segaufoh8.cpp
 sega/segaxbd.cpp
 sega/segaybd.cpp
 sega/sg1000a.cpp
@@ -1246,7 +1258,9 @@ sega/system16.cpp
 sega/timetrv.cpp
 sega/triforce.cpp
 sega/turbo.cpp
+sega/unkhockey.cpp
 sega/vicdual.cpp
+sega/winclub.cpp
 sega/y2.cpp
 sega/zaxxon.cpp
 seibu/airraid.cpp
@@ -1281,6 +1295,7 @@ seibu/wiz.cpp
 seta/albazc.cpp
 seta/hanaawas.cpp
 seta/jclub2.cpp
+seta/kiwame.cpp
 seta/macs.cpp
 seta/seta.cpp
 seta/seta2.cpp
@@ -1300,6 +1315,7 @@ sigma/sigmab52.cpp
 sigma/sigmab98.cpp
 sigma/spiders.cpp
 sigma/sub.cpp
+skeleton/elcirculo.cpp
 snk/bbusters.cpp
 snk/dmndrby.cpp
 snk/hng64.cpp
@@ -1453,20 +1469,20 @@ technos/tagteam.cpp
 technos/vball.cpp
 technos/wwfsstar.cpp
 technos/xain.cpp
-tehkan/bombjack.cpp
-tehkan/gaiden.cpp
-tehkan/lvcards.cpp
-tehkan/pbaction.cpp
-tehkan/senjyo.cpp
-tehkan/solomon.cpp
-tehkan/spbactn.cpp
-tehkan/tbowl.cpp
-tehkan/tecmo.cpp
-tehkan/tecmo16.cpp
-tehkan/tecmosys.cpp
-tehkan/tehkanwc.cpp
-tehkan/wc90.cpp
-tehkan/wc90b.cpp
+tecmo/bombjack.cpp
+tecmo/gaiden.cpp
+tecmo/lvcards.cpp
+tecmo/pbaction.cpp
+tecmo/senjyo.cpp
+tecmo/solomon.cpp
+tecmo/spbactn.cpp
+tecmo/tbowl.cpp
+tecmo/tecmo.cpp
+tecmo/tecmo16.cpp
+tecmo/tecmosys.cpp
+tecmo/tehkanwc.cpp
+tecmo/wc90.cpp
+tecmo/wc90b.cpp
 thepit/thepit.cpp
 thepit/timelimt.cpp
 toaplan/mjsister.cpp
@@ -1488,8 +1504,9 @@ universal/docastle.cpp
 universal/getaway.cpp
 universal/ladybug.cpp
 universal/mrdo.cpp
-universal/redclash.cpp
+universal/sraider.cpp
 universal/superdq.cpp
+universal/zerohour.cpp
 upl/mouser.cpp
 upl/ninjakd2.cpp
 upl/nova2001.cpp

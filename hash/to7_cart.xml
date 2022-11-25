@@ -168,7 +168,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 -->
 
 	<software name="colorpnt_de" cloneof="colorpnt">
-		<description>Colorpaint (Ger)</description>
+		<description>Colorpaint (Germany)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 
@@ -218,7 +218,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gerezfica" cloneof="gerezfic">
-		<description>Gerez vos Fiches (Alt)</description>
+		<description>Gerez vos Fiches (alt)</description>
 		<year>1984</year>
 		<publisher>Answare</publisher>
 
@@ -266,7 +266,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="logoa" cloneof="logo">
-		<description>LOGO (v1.0, Alt)</description>
+		<description>LOGO (v1.0, alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan + TO TEK International</publisher>
 
@@ -278,7 +278,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="logode" cloneof="logo">
-		<description>LOGO-TO7 (Ger, v2.8E)</description>
+		<description>LOGO-TO7 (Germany, v2.8E)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 
@@ -623,7 +623,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="motusa" cloneof="motus">
-		<description>Motus (Alt)</description>
+		<description>Motus (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -683,7 +683,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="threshldea" cloneof="threshld">
-		<description>Threshold (English, Alt)</description>
+		<description>Threshold (English, alt)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
 

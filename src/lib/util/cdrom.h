@@ -249,7 +249,7 @@ private:
 	static void get_info_from_type_string(const char *typestring, uint32_t *trktype, uint32_t *datasize);
 	static uint8_t ecc_source_byte(const uint8_t *sector, uint32_t offset);
 	static void ecc_compute_bytes(const uint8_t *sector, const uint16_t *row, int rowlen, uint8_t &val1, uint8_t &val2);
-	std::error_condition read_partial_sector(void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length, bool phys=false);
+	std::error_condition read_partial_sector(void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length, bool phys);
 
 	static std::string get_file_path(std::string &path);
 	static uint64_t get_file_size(std::string_view filename);

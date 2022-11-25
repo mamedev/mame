@@ -50,6 +50,7 @@ name of a command, to see documentation directly in MAME.
     breakpoint
     watchpoint
     registerpoints
+    exceptionpoint
     annotation
     cheats
     image

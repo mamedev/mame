@@ -58,7 +58,7 @@ void acclaim_rax_device::data_w(uint16_t data)
 {
 	m_data_in->write(data);
 	m_cpu->set_input_line(ADSP2181_IRQL0, ASSERT_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
+	machine().scheduler().perfect_quantum(attotime::from_usec(5));
 }
 
 

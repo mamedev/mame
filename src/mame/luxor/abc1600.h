@@ -8,7 +8,7 @@
 #include "bus/abcbus/abcbus.h"
 #include "bus/abckb/abckb.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "formats/abc1600_dsk.h"
 #include "imagedev/floppy.h"
 #include "abc1600mac.h"
@@ -86,7 +86,7 @@ public:
 	void abc1600(machine_config &config);
 
 private:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68008_device> m_maincpu;
 	required_device<abc1600_mac_device> m_mac;
 	required_device<z80dma_device> m_dma0;
 	required_device<z80dma_device> m_dma1;

@@ -50,10 +50,11 @@ qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *
 }
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void qsound_hle_device::rom_bank_updated()
+void qsound_hle_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

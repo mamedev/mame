@@ -12,8 +12,6 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-#define ASTROCADESLOT_ROM_REGION_TAG ":cart:rom"
-
 /* PCB */
 enum
 {
@@ -35,8 +33,8 @@ public:
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
 
-	void rom_alloc(uint32_t size, const char *tag);
-	uint8_t* get_rom_base() { return m_rom; }
+	void rom_alloc(uint32_t size);
+	uint8_t *get_rom_base() { return m_rom; }
 	uint32_t get_rom_size() { return m_rom_size; }
 
 protected:

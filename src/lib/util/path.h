@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb
+// copyright-holders:Vas Crabb, Aaron Giles
 /***************************************************************************
 
     path.h
@@ -13,6 +13,7 @@
 #include "osdfile.h" // for PATH_SEPARATOR
 
 #include <string>
+#include <string_view>
 #include <utility>
 
 
@@ -54,7 +55,7 @@ inline std::string &path_append(std::string &path, T &&next, U &&... more)
 		path.append(PATH_SEPARATOR);
 	path.append(std::forward<T>(next));
 	if constexpr (sizeof...(U))
-		return path_append(std::forward<U>(more)...);
+		return path_append(path, std::forward<U>(more)...);
 	else
 		return path;
 }
@@ -79,5 +80,21 @@ inline std::string path_concat(T &&first, U &&... more)
 /// \}
 
 } // namespace util
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+/* ----- filename utilities ----- */
+
+// extract the base part of a filename (remove extensions and paths)
+std::string_view core_filename_extract_base(std::string_view name, bool strip_extension = false) noexcept;
+
+// extracts the file extension from a filename
+std::string_view core_filename_extract_extension(std::string_view filename, bool strip_period = false) noexcept;
+
+// true if the given filename ends with a particular extension
+bool core_filename_ends_with(std::string_view filename, std::string_view extension) noexcept;
 
 #endif // MAME_LIB_UTIL_PATH_H

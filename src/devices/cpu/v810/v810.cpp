@@ -1029,7 +1029,7 @@ void v810_device::opXB(uint32_t op)
 {
 	int val=GETREG(GET2);
 	SET_OV(0);
-	val = (val & 0xffff0000) | ((val & 0xff) << 8) | ((val & 0xff00) >> 8);
+	val = (val & 0xffff0000) | swapendian_int16(val & 0xffff);
 	SET_Z((val==0.0f)?1:0);
 	SET_S((val<0.0f)?1:0);
 	SETREG(GET2,val);

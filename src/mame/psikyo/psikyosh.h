@@ -41,9 +41,11 @@ public:
 	void psikyo5(machine_config &config);
 	void psikyo5_mahjong(machine_config &config);
 	void psikyo5_240(machine_config &config);
+	void s1945iiibl(machine_config &config);
 
 	void init_ps3();
 	void init_ps5();
+	void init_s1945iiibl();
 
 private:
 	/* memory pointers */
@@ -124,6 +126,7 @@ private:
 	void ps3v1_map(address_map &map);
 	void ps5_map(address_map &map);
 	void ps5_mahjong_map(address_map &map);
+	void s1945iiibl_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_PSIKYOSH_H

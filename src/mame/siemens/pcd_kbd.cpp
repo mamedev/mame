@@ -7,6 +7,8 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 DEFINE_DEVICE_TYPE(PCD_KEYBOARD, pcd_keyboard_device, "pcd_kbd", "Siemens PC-D Keyboard")
 
 ROM_START( pcd_keyboard )

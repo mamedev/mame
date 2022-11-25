@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "dinetwork.h"
+
 class i82586_base_device :
 	public device_t,
 	public device_memory_interface,
@@ -219,6 +221,7 @@ protected:
 	bool m_rnr;         // receive unit became not ready
 	bool m_initialised;
 	bool m_reset;
+	bool m_irq;
 	int m_irq_assert;   // configurable interrupt polarity
 
 	// receive/command unit state

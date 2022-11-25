@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /***************************************************************************
 
-  ** subclass of hh_sm510_state (includes/hh_sm510.h, drivers/hh_sm510.cpp) **
+  ** subclass of hh_sm510_state (hh_sm510.h, hh_sm510.cpp) **
 
   Tiger R-Zone driver
 

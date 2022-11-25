@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    jedparse.c
+    jedparse.cpp
 
     Parser for .JED files into raw fusemaps.
 

@@ -41,14 +41,6 @@ PD7 Y MOTOR COM D
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define M6500_1_TAG "u1"
-
-
-
-//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -60,7 +52,7 @@ DEFINE_DEVICE_TYPE(VIC1520, vic1520_device, "vic1520", "VIC-1520 Color Printer P
 //-------------------------------------------------
 
 ROM_START( vic1520 )
-	ROM_REGION( 0x800, M6500_1_TAG, 0 )
+	ROM_REGION( 0x800, "mcu", 0 )
 	ROM_SYSTEM_BIOS( 0, "r01", "325340-01" )
 	ROMX_LOAD( "325340-01.u1", 0x000, 0x800, CRC(3757da6f) SHA1(8ab43603f74b0f269bbe890d1939a9ae31307eb1), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r03", "325340-03" )
@@ -79,25 +71,17 @@ const tiny_rom_entry *vic1520_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( vic1520_mem )
-//-------------------------------------------------
-
-void vic1520_device::vic1520_mem(address_map &map)
-{
-	map.global_mask(0xfff);
-	map(0x000, 0x03f).ram();
-	map(0x800, 0xfff).rom().region(M6500_1_TAG, 0);
-}
-
-
-//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void vic1520_device::device_add_mconfig(machine_config &config)
 {
-	m6502_device &cpu(M6502(config, M6500_1_TAG, XTAL(2'000'000))); // M6500/1
-	cpu.set_addrmap(AS_PROGRAM, &vic1520_device::vic1520_mem);
+	M6500_1(config, m_mcu, 2_MHz_XTAL); // MPS 6500/1
+	m_mcu->pa_out_cb().set(FUNC(vic1520_device::port_w));
+	m_mcu->pb_in_cb().set(FUNC(vic1520_device::select_r));
+	m_mcu->pb_out_cb().set(FUNC(vic1520_device::led_w));
+	m_mcu->pc_out_cb().set(FUNC(vic1520_device::pen_w));
+	m_mcu->pd_out_cb().set(FUNC(vic1520_device::motor_w));
 }
 
 
@@ -128,9 +112,11 @@ ioport_constructor vic1520_device::device_input_ports() const
 //  vic1520_device - constructor
 //-------------------------------------------------
 
-vic1520_device::vic1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VIC1520, tag, owner, clock),
-	device_cbm_iec_interface(mconfig, *this)
+vic1520_device::vic1520_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, VIC1520, tag, owner, clock)
+	, device_cbm_iec_interface(mconfig, *this)
+	, m_mcu(*this, "mcu")
+	, m_pa_data(0xff)
 {
 }
 
@@ -141,15 +127,7 @@ vic1520_device::vic1520_device(const machine_config &mconfig, const char *tag, d
 
 void vic1520_device::device_start()
 {
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vic1520_device::device_reset()
-{
+	save_item(NAME(m_pa_data));
 }
 
 
@@ -159,6 +137,35 @@ void vic1520_device::device_reset()
 
 void vic1520_device::cbm_iec_atn(int state)
 {
+	if (state && BIT(m_pa_data, 0))
+	{
+		m_pa_data &= 0xfe;
+		m_mcu->pa_w(m_pa_data);
+	}
+	else if (!state && !BIT(m_pa_data, 0))
+	{
+		m_pa_data |= 0x01;
+		m_mcu->pa_w(m_pa_data);
+	}
+}
+
+
+//-------------------------------------------------
+//  cbm_iec_clk -
+//-------------------------------------------------
+
+void vic1520_device::cbm_iec_clk(int state)
+{
+	if (state && BIT(m_pa_data, 1))
+	{
+		m_pa_data &= 0xfd;
+		m_mcu->pa_w(m_pa_data);
+	}
+	else if (!state && !BIT(m_pa_data, 1))
+	{
+		m_pa_data |= 0x02;
+		m_mcu->pa_w(m_pa_data);
+	}
 }
 
 
@@ -168,6 +175,16 @@ void vic1520_device::cbm_iec_atn(int state)
 
 void vic1520_device::cbm_iec_data(int state)
 {
+	if (state && BIT(m_pa_data, 7))
+	{
+		m_pa_data &= 0x7f;
+		m_mcu->pa_w(m_pa_data);
+	}
+	else if (!state && !BIT(m_pa_data, 7))
+	{
+		m_pa_data |= 0x80;
+		m_mcu->pa_w(m_pa_data);
+	}
 }
 
 
@@ -177,8 +194,52 @@ void vic1520_device::cbm_iec_data(int state)
 
 void vic1520_device::cbm_iec_reset(int state)
 {
-	if (!state)
-	{
-		device_reset();
-	}
+	m_mcu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  port_w - issue response on data line
+//-------------------------------------------------
+
+void vic1520_device::port_w(u8 data)
+{
+	m_bus->data_w(this, !BIT(data, 6) && (data & 0x21) != 0x01);
+}
+
+
+//-------------------------------------------------
+//  select_r -
+//-------------------------------------------------
+
+u8 vic1520_device::select_r()
+{
+	return 0xff;
+}
+
+
+//-------------------------------------------------
+//  led_w -
+//-------------------------------------------------
+
+void vic1520_device::led_w(u8 data)
+{
+}
+
+
+//-------------------------------------------------
+//  pen_w -
+//-------------------------------------------------
+
+void vic1520_device::pen_w(u8 data)
+{
+}
+
+
+//-------------------------------------------------
+//  motor_w -
+//-------------------------------------------------
+
+void vic1520_device::motor_w(u8 data)
+{
 }

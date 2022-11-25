@@ -3,11 +3,16 @@
 #ifndef MAME_DEBUGGER_QT_MEMORYWINDOW_H
 #define MAME_DEBUGGER_QT_MEMORYWINDOW_H
 
+#pragma once
+
 #include "debuggerview.h"
 #include "windowqt.h"
 
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLineEdit>
+
+
+namespace osd::debugger::qt {
 
 class DebuggerMemView;
 
@@ -23,6 +28,9 @@ public:
 	MemoryWindow(running_machine &machine, QWidget *parent = nullptr);
 	virtual ~MemoryWindow();
 
+protected:
+	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
+
 private slots:
 	void memoryRegionChanged(int index);
 	void expressionSubmitted();
@@ -36,7 +44,6 @@ private slots:
 private:
 	void populateComboBox();
 	void setToCurrentCpu();
-	QAction *dataFormatMenuItem(const QString &itemName);
 
 	// Widgets
 	QLineEdit *m_inputEdit;
@@ -77,7 +84,7 @@ class MemoryWindowQtConfig : public WindowQtConfig
 {
 public:
 	MemoryWindowQtConfig() :
-		WindowQtConfig(WIN_TYPE_MEMORY),
+		WindowQtConfig(WINDOW_TYPE_MEMORY_VIEWER),
 		m_reverse(0),
 		m_addressMode(0),
 		m_addressRadix(0),
@@ -95,11 +102,10 @@ public:
 	int m_dataFormat;
 	int m_memoryRegion;
 
-	void buildFromQWidget(QWidget *widget);
 	void applyToQWidget(QWidget *widget);
-	void addToXmlDataNode(util::xml::data_node &node) const;
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_MEMORYWINDOW_H

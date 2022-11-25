@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="gcslottv" description="Gachinko Contest! Slot machine TV cartridges">
+<softwarelist name="gcslottv" description="Gachinko Shōbu! PachisloTV cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 
 	***********************************************************************************
@@ -34,7 +34,7 @@ license:CC0
 	</software>
 
 	<software name="salarymn" supported="no">
-		<description>Salaryman Kintaro</description>
+		<description>Salaryman Kintarō</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
 		<info name="alt_title" value="サラリーマン金太郎"/>
@@ -46,7 +46,7 @@ license:CC0
 	</software>
 
 	<software name="mojuotv" supported="no">
-		<description>Moju-o TV</description>
+		<description>Mōjū-ō TV</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
 		<info name="alt_title" value="猛獣王TV"/>

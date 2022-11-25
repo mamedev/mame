@@ -14,42 +14,6 @@
 #include "atari400.h"
 #include "sound/pokey.h"
 
-#define VERBOSE_POKEY   1
-#define VERBOSE_SERIAL  1
-#define VERBOSE_TIMERS  1
-
-
-POKEY_INTERRUPT_CB_MEMBER(atari_common_state::interrupt_cb)
-{
-	if (VERBOSE_POKEY)
-	{
-		if (mask & 0x80)
-			logerror("atari interrupt_cb BREAK\n");
-		if (mask & 0x40)
-			logerror("atari interrupt_cb KBCOD\n");
-	}
-	if (VERBOSE_SERIAL)
-	{
-		if (mask & 0x20)
-			logerror("atari interrupt_cb SERIN\n");
-		if (mask & 0x10)
-			logerror("atari interrupt_cb SEROR\n");
-		if (mask & 0x08)
-			logerror("atari interrupt_cb SEROC\n");
-	}
-	if (VERBOSE_TIMERS)
-	{
-		if (mask & 0x04)
-			logerror("atari interrupt_cb TIMR4\n");
-		if (mask & 0x02)
-			logerror("atari interrupt_cb TIMR2\n");
-		if (mask & 0x01)
-			logerror("atari interrupt_cb TIMR1\n");
-	}
-
-	m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
 
 /**************************************************************
  *

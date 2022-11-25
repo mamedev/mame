@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Takahiro Nogi, David Haywood
+// copyright-holders: Takahiro Nogi, David Haywood
+
 /******************************************************************************
 
     Gomoku Narabe Renju
@@ -19,18 +20,277 @@ todo:
 
 - Couldn't figure out the method to specify palette, so I modified palette number manually.
 
-- Couldn't figure out oneshot sound playback parameter. so I adjusted it manually.
+- Couldn't figure out oneshot sound playback parameter, so I adjusted it manually.
 
 ******************************************************************************/
 
 #include "emu.h"
-#include "gomoku.h"
+
 #include "gomoku_a.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
-#include "speaker.h"
 
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class gomoku_state : public driver_device
+{
+public:
+	gomoku_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_bgram(*this, "bgram"),
+		m_inputs(*this, {"IN0", "IN1", "DSW", "UNUSED0", "UNUSED1", "UNUSED2", "UNUSED3", "UNUSED4"}),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_bg_x(*this, "bg_x"),
+		m_bg_y(*this, "bg_y"),
+		m_bg_d(*this, "bg_d")
+	{ }
+
+	void gomoku(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_bgram;
+	optional_ioport_array<8> m_inputs;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_region_ptr<uint8_t> m_bg_x;
+	required_region_ptr<uint8_t> m_bg_y;
+	required_region_ptr<uint8_t> m_bg_d;
+
+	bool m_flipscreen = false;
+	bool m_bg_dispsw = false;
+	tilemap_t *m_fg_tilemap = nullptr;
+	bitmap_ind16 m_bg_bitmap{};
+
+	uint8_t input_port_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void flipscreen_w(int state);
+	void bg_dispsw_w(int state);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void prg_map(address_map &map);
+};
+
+
+// video
+
+/******************************************************************************
+
+    palette RAM
+
+******************************************************************************/
+
+void gomoku_state::palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(*color_prom, 6);
+		bit2 = BIT(*color_prom, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+		color_prom++;
+	}
+}
+
+
+/******************************************************************************
+
+    Tilemap callbacks
+
+******************************************************************************/
+
+TILE_GET_INFO_MEMBER(gomoku_state::get_fg_tile_info)
+{
+	int const code = (m_videoram[tile_index]);
+	int const attr = (m_colorram[tile_index]);
+	int const color = (attr & 0x0f);
+	int const flipyx = (attr & 0xc0) >> 6;
+
+	tileinfo.set(0,
+			code,
+			color,
+			TILE_FLIPYX(flipyx));
+}
+
+void gomoku_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void gomoku_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void gomoku_state::flipscreen_w(int state)
+{
+	m_flipscreen = state ? 0 : 1;
+}
+
+void gomoku_state::bg_dispsw_w(int state)
+{
+	m_bg_dispsw = state ? 0 : 1;
+}
+
+
+/******************************************************************************
+
+    Start the video hardware emulation
+
+******************************************************************************/
+
+void gomoku_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_bg_bitmap);
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gomoku_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+
+	// make background bitmap
+	m_bg_bitmap.fill(0x20);
+
+	// board
+	for (int y = 0; y < 256; y++)
+	{
+		for (int x = 0; x < 256; x++)
+		{
+			int const bgdata = m_bg_d[m_bg_x[x] + (m_bg_y[y] << 4)];
+
+			int color = 0x20;                       // outside frame (black)
+
+			if (bgdata & 0x01) color = 0x21;    // board (brown)
+			if (bgdata & 0x02) color = 0x20;    // frame line (while)
+
+			m_bg_bitmap.pix((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+		}
+	}
+
+	save_item(NAME(m_flipscreen)); // set but never used?
+	save_item(NAME(m_bg_dispsw));
+}
+
+
+/******************************************************************************
+
+    Display refresh
+
+******************************************************************************/
+
+uint32_t gomoku_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// draw background layer
+	if (m_bg_dispsw)
+	{
+		int color;
+
+		// copy bg bitmap
+		copybitmap(bitmap, m_bg_bitmap, 0, 0, 0, 0, cliprect);
+
+		// stone
+		for (int y = 0; y < 256; y++)
+		{
+			for (int x = 0; x < 256; x++)
+			{
+				int const bgoffs = ((((255 - x - 2) / 14) | (((255 - y - 10) / 14) << 4)) & 0xff);
+
+				int const bgdata = m_bg_d[m_bg_x[x] + (m_bg_y[y] << 4) ];
+				int const bgram = m_bgram[bgoffs];
+
+				if (bgdata & 0x04)
+				{
+					if (bgram & 0x01)
+					{
+						color = 0x2f;   // stone (black)
+					}
+					else if (bgram & 0x02)
+					{
+						color = 0x22;   // stone (white)
+					}
+					else continue;
+				}
+				else continue;
+
+				bitmap.pix((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+			}
+		}
+
+		// cursor
+		for (int y = 0; y < 256; y++)
+		{
+			for (int x = 0; x < 256; x++)
+			{
+				int const bgoffs = ((((255 - x - 2) / 14) | (((255 - y - 10) / 14) << 4)) & 0xff);
+
+				int const bgdata = m_bg_d[m_bg_x[x] + (m_bg_y[y] << 4) ];
+				int const bgram = m_bgram[bgoffs];
+
+				if (bgdata & 0x08)
+				{
+					if (bgram & 0x04)
+					{
+						color = 0x2f;   // cursor (black)
+					}
+					else if (bgram & 0x08)
+					{
+						color = 0x22;       // cursor (white)
+					}
+					else continue;
+				}
+				else continue;
+
+				bitmap.pix((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+			}
+		}
+	}
+	else
+	{
+		bitmap.fill(0x20);
+	}
+
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
 
 // input ports are rotated 90 degrees
 uint8_t gomoku_state::input_port_r(offs_t offset)
@@ -77,7 +337,7 @@ static INPUT_PORTS_START( gomoku )
 	PORT_DIPNAME (0x10, 0x10, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) /* service coin */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) // service coin
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
 
@@ -123,7 +383,7 @@ GFXDECODE_END
 void gomoku_state::gomoku(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(18'432'000)/12);      // 1.536 MHz ?
+	Z80(config, m_maincpu, XTAL(18'432'000) / 12);      // 1.536 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &gomoku_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gomoku_state::irq0_line_hold));
 
@@ -181,6 +441,8 @@ ROM_START( gomoku )
 	ROM_REGION( 0x0020, "unkprom", 0 )    // unknown
 	ROM_LOAD( "rj_prom.9k", 0x0000, 0x0020, CRC(cff72923) SHA1(4f61375028ab62da46ed119bc81052f5f98c28d4) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,       MONITOR, COMPANY,      FULLNAME,              FLAGS

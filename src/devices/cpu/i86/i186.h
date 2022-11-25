@@ -9,6 +9,8 @@
 
 DECLARE_DEVICE_TYPE(I80186, i80186_cpu_device)
 DECLARE_DEVICE_TYPE(I80188, i80188_cpu_device)
+DECLARE_DEVICE_TYPE(AM186EM, am186em_device)
+DECLARE_DEVICE_TYPE(AM188EM, am188em_device)
 
 class i80186_cpu_device : public i8086_common_cpu_device
 {
@@ -167,6 +169,30 @@ class i80188_cpu_device : public i80186_cpu_device
 public:
 	// construction/destruction
 	i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class am186em_device : public i80186_cpu_device
+{
+public:
+	// construction/destruction
+	am186em_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_execute_interface overrides
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return clocks; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles; }
+};
+
+class am188em_device : public i80186_cpu_device
+{
+public:
+	// construction/destruction
+	am188em_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_execute_interface overrides
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return clocks; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles; }
 };
 
 #endif // MAME_CPU_I86_I186_H

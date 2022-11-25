@@ -36,7 +36,7 @@ u8 taito_sj_security_mcu_device::data_r(address_space &space, offs_t offset)
 	if (BIT(offset, 0))
 	{
 		// ZLSTATUS
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+		machine().scheduler().perfect_quantum(attotime::from_usec(10));
 		return
 				(u8(space.unmap()) & 0xfc) |
 				u8(m_zaccept ? 0x00 : 0x02) |
@@ -66,7 +66,7 @@ void taito_sj_security_mcu_device::data_w(offs_t offset, u8 data)
 		// ZLWRITE
 		device_scheduler &sched(machine().scheduler());
 		sched.synchronize(timer_expired_delegate(FUNC(taito_sj_security_mcu_device::do_host_write), this), data);
-		sched.boost_interleave(attotime::zero, attotime::from_usec(10));
+		sched.perfect_quantum(attotime::from_usec(10));
 	}
 }
 

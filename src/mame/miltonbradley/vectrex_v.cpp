@@ -275,7 +275,7 @@ void vectrex_state::video_start()
 
 void vectrex_base_state::multiplexer(int mux)
 {
-	machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_base_state::update_analog), this), mux);
+	machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_base_state::update_analog), this), m_via_out[PORTA] << 9 | 0x100 | mux);
 
 	if (mux == A_AUDIO)
 		m_dac->write(m_via_out[PORTA] ^ 0x80); // not gate shown on schematic

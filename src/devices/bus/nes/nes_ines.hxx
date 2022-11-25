@@ -1104,9 +1104,9 @@ void nes_cart_slot_device::call_load_ines()
 
 	// SETUP step 5: allocate pointers for PRG/VROM
 	if (prg_size)
-		m_cart->prg_alloc(prg_size, tag());
+		m_cart->prg_alloc(prg_size);
 	if (vrom_size)
-		m_cart->vrom_alloc(vrom_size, tag());
+		m_cart->vrom_alloc(vrom_size);
 
 	// if there is a trainer, skip it for the moment
 	if (m_cart->get_trainer())

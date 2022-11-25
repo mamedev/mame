@@ -421,7 +421,7 @@ void qvt102_state::mcu_p2_w(uint8_t data)
 	// the boost lasts for the critical section of the IRQ handler.
 	//
 	if (m_kbd_data)
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(350));
+		machine().scheduler().perfect_quantum(attotime::from_usec(350));
 
 	m_irqs->in_w<2>(m_kbd_data);
 }

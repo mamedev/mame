@@ -543,16 +543,57 @@ void device_scheduler::trigger(int trigid, const attotime &after)
 
 
 //-------------------------------------------------
-//  boost_interleave - temporarily boosts the
-//  interleave factor
+//  add_quantum - add a scheduling quantum;
+//  the smallest active one is the one that is in use
 //-------------------------------------------------
 
-void device_scheduler::boost_interleave(const attotime &timeslice_time, const attotime &boost_duration)
+void device_scheduler::add_quantum(const attotime &quantum, const attotime &duration)
 {
-	// ignore timeslices > 1 second
-	if (timeslice_time.seconds() > 0)
-		return;
-	add_scheduling_quantum(timeslice_time, boost_duration);
+	assert(quantum.seconds() == 0);
+
+	attotime curtime = time();
+	attotime expire = curtime + duration;
+	const attoseconds_t quantum_attos = quantum.attoseconds();
+
+	// figure out where to insert ourselves, expiring any quanta that are out-of-date
+	quantum_slot *insert_after = nullptr;
+	quantum_slot *next;
+	for (quantum_slot *quant = m_quantum_list.first(); quant != nullptr; quant = next)
+	{
+		// if this quantum is expired, nuke it
+		next = quant->next();
+		if (curtime >= quant->m_expire)
+			m_quantum_allocator.reclaim(m_quantum_list.detach(*quant));
+
+		// if this quantum is shorter than us, we need to be inserted afterwards
+		else if (quant->m_requested <= quantum_attos)
+			insert_after = quant;
+	}
+
+	// if we found an exact match, just take the maximum expiry time
+	if (insert_after != nullptr && insert_after->m_requested == quantum_attos)
+		insert_after->m_expire = std::max(insert_after->m_expire, expire);
+
+	// otherwise, allocate a new quantum and insert it after the one we picked
+	else
+	{
+		quantum_slot &quant = *m_quantum_allocator.alloc();
+		quant.m_requested = quantum_attos;
+		quant.m_actual = std::max(quantum_attos, m_quantum_minimum);
+		quant.m_expire = expire;
+		m_quantum_list.insert_after(quant, insert_after);
+	}
+}
+
+
+//-------------------------------------------------
+//  perfect_quantum - add a (temporary) minimum
+//  scheduling quantum to boost the interleave
+//-------------------------------------------------
+
+void device_scheduler::perfect_quantum(const attotime &duration)
+{
+	add_quantum(attotime::zero, duration);
 }
 
 
@@ -760,7 +801,7 @@ void device_scheduler::rebuild_execute_list()
 			min_quantum = (std::min)(attotime(0, exec->minimum_quantum()), min_quantum);
 
 		// inform the timer system of our decision
-		add_scheduling_quantum(min_quantum, attotime::never);
+		add_quantum(min_quantum, attotime::never);
 	}
 
 	// start with an empty list
@@ -931,51 +972,6 @@ inline void device_scheduler::execute_timers()
 
 	// clear the callback timer global
 	m_callback_timer = nullptr;
-}
-
-
-//-------------------------------------------------
-//  add_scheduling_quantum - add a scheduling
-//  quantum; the smallest active one is the one
-//  that is in use
-//-------------------------------------------------
-
-void device_scheduler::add_scheduling_quantum(const attotime &quantum, const attotime &duration)
-{
-	assert(quantum.seconds() == 0);
-
-	attotime curtime = time();
-	attotime expire = curtime + duration;
-	const attoseconds_t quantum_attos = quantum.attoseconds();
-
-	// figure out where to insert ourselves, expiring any quanta that are out-of-date
-	quantum_slot *insert_after = nullptr;
-	quantum_slot *next;
-	for (quantum_slot *quant = m_quantum_list.first(); quant != nullptr; quant = next)
-	{
-		// if this quantum is expired, nuke it
-		next = quant->next();
-		if (curtime >= quant->m_expire)
-			m_quantum_allocator.reclaim(m_quantum_list.detach(*quant));
-
-		// if this quantum is shorter than us, we need to be inserted afterwards
-		else if (quant->m_requested <= quantum_attos)
-			insert_after = quant;
-	}
-
-	// if we found an exact match, just take the maximum expiry time
-	if (insert_after != nullptr && insert_after->m_requested == quantum_attos)
-		insert_after->m_expire = std::max(insert_after->m_expire, expire);
-
-	// otherwise, allocate a new quantum and insert it after the one we picked
-	else
-	{
-		quantum_slot &quant = *m_quantum_allocator.alloc();
-		quant.m_requested = quantum_attos;
-		quant.m_actual = std::max(quantum_attos, m_quantum_minimum);
-		quant.m_expire = expire;
-		m_quantum_list.insert_after(quant, insert_after);
-	}
 }
 
 

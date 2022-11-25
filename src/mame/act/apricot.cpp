@@ -36,6 +36,9 @@
 #include "speaker.h"
 
 
+namespace {
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -173,22 +176,26 @@ uint8_t apricot_state::i8255_portc_r()
 
 void apricot_state::i8255_portb_w(uint8_t data)
 {
-	// bit 0, crt reset
-	// bit 1, not connected
+	// 7-------  centronics transceiver direction (0 = output)
+	// -6------  disk select
+	// --5-----  enable disk select
+	// ---4----  video mode
+	// ----3---  display enabled
+	// -----2--  head load
+	// ------1-  not used
+	// -------0  crtc reset
 
 	m_display_on = BIT(data, 3);
 	m_video_mode = BIT(data, 4);
 
 	floppy_image_device *floppy = nullptr;
 
-	// bit 5, enable disk select
-	// bit 6, disk select
 	if (!BIT(data, 5))
 		floppy = BIT(data, 6) ? m_floppy1->get_device() : m_floppy0->get_device();
 
 	m_fdc->set_floppy(floppy);
 
-	// bit 2, head load (motor on is wired to be active once a disk has been inserted)
+	// motor on is wired to be active once a disk has been inserted
 	// we just let the motor run all the time for now
 	if (floppy)
 		floppy->mon_w(0);
@@ -196,8 +203,6 @@ void apricot_state::i8255_portb_w(uint8_t data)
 	// switch video modes
 	m_crtc->set_unscaled_clock(15_MHz_XTAL / (m_video_mode ? 10 : 16));
 	m_crtc->set_hpixels_per_column(m_video_mode ? 10 : 16);
-
-	// PB7 Centronics transceiver direction. 0 = output, 1 = input
 }
 
 void apricot_state::i8255_portc_w(uint8_t data)
@@ -253,7 +258,6 @@ WRITE_LINE_MEMBER( apricot_state::fdc_intrq_w )
 void apricot_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
-
 	fr.add(FLOPPY_APRIDISK_FORMAT);
 }
 
@@ -385,9 +389,7 @@ void apricot_state::apricot(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
-	screen.set_size(800, 400);
-	screen.set_visarea(0, 800-1, 0, 400-1);
-	screen.set_refresh_hz(72);
+	screen.set_raw(15_MHz_XTAL, 950, 0, 800, 426, 0, 400); // should be interlace
 	screen.set_screen_update(FUNC(apricot_state::screen_update_apricot));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
@@ -510,8 +512,11 @@ ROM_START( apricotxi )
 ROM_END
 
 
+} // anonymous namespace
+
+
 //**************************************************************************
-//  GAME DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT        COMPANY  FULLNAME      FLAGS

@@ -25,6 +25,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	mode_advanced = false;
 	mode_a20 = false;
 	has_exr = false;
+	has_mac = false;
 	mac_saturating = false;
 	has_trace = false;
 	has_hc = true;
@@ -481,16 +482,16 @@ uint8_t h8_device::do_addx8(uint8_t v1, uint8_t v2)
 uint8_t h8_device::do_subx8(uint8_t v1, uint8_t v2)
 {
 	uint16_t res = v1 - v2 - (CCR & F_C ? 1 : 0);
-	CCR &= ~(F_N|F_V|F_Z|F_C);
+	CCR &= ~(F_N|F_V|F_C);
 	if (has_hc)
 	{
 		CCR &= ~F_H;
 		if (((v1 & 0xf) - (v2 & 0xf) - (CCR & F_C ? 1 : 0)) & 0x10)
 			CCR |= F_H;
 	}
-	if(!uint8_t(res))
-		CCR |= F_Z;
-	else if(int8_t(res) < 0)
+	if(uint8_t(res))
+		CCR &= ~F_Z;
+	if(int8_t(res) < 0)
 		CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x80)
 		CCR |= F_V;

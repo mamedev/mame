@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/hd63450.h"
 //#include "machine/imsc012.h"
 #include "machine/mc68681.h"

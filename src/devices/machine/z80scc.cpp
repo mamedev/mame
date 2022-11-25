@@ -416,6 +416,7 @@ inline void z80scc_channel::out_dtr_cb(int state)
 z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
+	m_wr9(0),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
 	m_rxca(0),
@@ -1917,7 +1918,7 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 		LOG("- Receiver Interrupt on Special Conditions only\n");
 		break;
 	}
-	if ((data & WR1_RX_INT_MODE_MASK) == WR1_PARITY_IS_SPEC_COND)
+	if (data & WR1_PARITY_IS_SPEC_COND)
 		LOG("- Parity error is a Special Condition\n");
 	m_uart->check_interrupts();
 }

@@ -5,8 +5,8 @@
 adc_c_aba
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
-	TMP = read(TMP);
-	do_adc(TMP);
+	TMP2 = read(TMP);
+	do_adc(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -20,8 +20,8 @@ adc_c_abx
 		read(set_l(TMP, TMP+X));
 	}
 	TMP += X;
-	TMP = read(TMP);
-	do_adc(TMP);
+	TMP2 = read(TMP);
+	do_adc(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -35,8 +35,8 @@ adc_c_aby
 		read(set_l(TMP, TMP+Y));
 	}
 	TMP += Y;
-	TMP = read(TMP);
-	do_adc(TMP);
+	TMP2 = read(TMP);
+	do_adc(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -81,8 +81,8 @@ adc_c_imm
 
 adc_c_zpg
 	TMP = read_pc();
-	TMP = read(TMP);
-	do_adc(TMP);
+	TMP2 = read(TMP);
+	do_adc(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -103,8 +103,8 @@ adc_c_zpi
 adc_c_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(uint8_t(TMP+X));
-	do_adc(TMP);
+	TMP2 = read(uint8_t(TMP+X));
+	do_adc(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -206,8 +206,8 @@ bit_imm
 bit_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(uint8_t(TMP+X));
-	do_bit(TMP);
+	TMP2 = read(uint8_t(TMP+X));
+	do_bit(TMP2);
 	prefetch();
 
 bra_rel
@@ -563,8 +563,8 @@ ror_c_zpx
 sbc_c_aba
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
-	TMP = read(TMP);
-	do_sbc(TMP);
+	TMP2 = read(TMP);
+	do_sbc(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -578,8 +578,8 @@ sbc_c_abx
 		read(set_l(TMP, TMP+X));
 	}
 	TMP += X;
-	TMP = read(TMP);
-	do_sbc(TMP);
+	TMP2 = read(TMP);
+	do_sbc(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -593,8 +593,8 @@ sbc_c_aby
 		read(set_l(TMP, TMP+Y));
 	}
 	TMP += Y;
-	TMP = read(TMP);
-	do_sbc(TMP);
+	TMP2 = read(TMP);
+	do_sbc(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -639,8 +639,8 @@ sbc_c_imm
 
 sbc_c_zpg
 	TMP = read_pc();
-	TMP = read(TMP);
-	do_sbc(TMP);
+	TMP2 = read(TMP);
+	do_sbc(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -661,8 +661,8 @@ sbc_c_zpi
 sbc_c_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(uint8_t(TMP+X));
-	do_sbc(TMP);
+	TMP2 = read(uint8_t(TMP+X));
+	do_sbc(TMP2);
 	if(P & F_D) {
 		read_pc_noinc();
 		set_nz(A);
@@ -775,9 +775,12 @@ wai_imp
 reset_c
 	read_arg(0xffff);
 	read_pc_noinc();
-	read(SP); dec_SP();
-	read(SP); dec_SP();
-	read(SP); dec_SP();
+	read(SP);
+	dec_SP();
+	read(SP);
+	dec_SP();
+	read(SP);
+	dec_SP();
 	P = (P | F_I) & ~F_D;
 	PC = read_arg(0xfffc);
 	PC = set_h(PC, read_arg(0xfffd));

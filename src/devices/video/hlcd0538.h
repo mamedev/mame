@@ -63,10 +63,10 @@ protected:
 
 	emu_timer *m_lcd_timer;
 
-	int m_lcd = 0;
-	int m_clk = 0;
-	int m_data = 0;
-	u64 m_shift = 0;
+	int m_lcd;
+	int m_clk;
+	int m_data;
+	u64 m_shift;
 
 	// callbacks
 	devcb_write64 m_write_cols;

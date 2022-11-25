@@ -14,6 +14,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <cstdarg>
+
 
 #define VERBOSE_LEVEL ( 0 )
 

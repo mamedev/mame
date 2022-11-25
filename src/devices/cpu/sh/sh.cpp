@@ -265,7 +265,7 @@ void sh_common_execution::BF(uint32_t d)
 {
 	if ((m_sh2_state->sr & SH_T) == 0)
 	{
-		int32_t disp = ((int32_t)d << 24) >> 24;
+		int32_t disp = util::sext(d, 8);
 		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
 		m_sh2_state->icount -= 2;
 	}
@@ -279,7 +279,7 @@ void sh_common_execution::BFS(uint32_t d)
 {
 	if ((m_sh2_state->sr & SH_T) == 0)
 	{
-		int32_t disp = ((int32_t)d << 24) >> 24;
+		int32_t disp = util::sext(d, 8);
 		m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
 		m_sh2_state->icount--;
 	}
@@ -291,7 +291,7 @@ void sh_common_execution::BFS(uint32_t d)
  */
 void sh_common_execution::BRA(uint32_t d)
 {
-	int32_t disp = ((int32_t)d << 20) >> 20;
+	int32_t disp = util::sext(d, 12);
 
 #if BUSY_LOOP_HACKS
 	if (disp == -2)
@@ -324,7 +324,7 @@ void sh_common_execution::BRAF(uint32_t m)
  */
 void sh_common_execution::BSR(uint32_t d)
 {
-	int32_t disp = ((int32_t)d << 20) >> 20;
+	int32_t disp = util::sext(d, 12);
 
 	m_sh2_state->pr = m_sh2_state->pc + 2;
 	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
@@ -350,7 +350,7 @@ void sh_common_execution::BT(uint32_t d)
 {
 	if ((m_sh2_state->sr & SH_T) != 0)
 	{
-		int32_t disp = ((int32_t)d << 24) >> 24;
+		int32_t disp = util::sext(d, 8);
 		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
 		m_sh2_state->icount -= 2;
 	}
@@ -364,7 +364,7 @@ void sh_common_execution::BTS(uint32_t d)
 {
 	if ((m_sh2_state->sr & SH_T) != 0)
 	{
-		int32_t disp = ((int32_t)d << 24) >> 24;
+		int32_t disp = util::sext(d, 8);
 		m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
 		m_sh2_state->icount--;
 	}
@@ -736,13 +736,13 @@ void sh_common_execution::DT(uint32_t n)
 /*  EXTS.B  Rm,Rn */
 void sh_common_execution::EXTSB(uint32_t m, uint32_t n)
 {
-	m_sh2_state->r[n] = ((int32_t)m_sh2_state->r[m] << 24) >> 24;
+	m_sh2_state->r[n] = util::sext(m_sh2_state->r[m], 8);
 }
 
 /*  EXTS.W  Rm,Rn */
 void sh_common_execution::EXTSW(uint32_t m, uint32_t n)
 {
-	m_sh2_state->r[n] = ((int32_t)m_sh2_state->r[m] << 16) >> 16;
+	m_sh2_state->r[n] = util::sext(m_sh2_state->r[m], 16);
 }
 
 /*  EXTU.B  Rm,Rn */
@@ -1347,14 +1347,14 @@ void sh_common_execution::ROTCR(uint32_t n)
 void sh_common_execution::ROTL(uint32_t n)
 {
 	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | ((m_sh2_state->r[n] >> 31) & SH_T);
-	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->r[n] >> 31);
+	m_sh2_state->r[n] = rotl_32(m_sh2_state->r[n], 1);
 }
 
 /*  ROTR    Rn */
 void sh_common_execution::ROTR(uint32_t n)
 {
 	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | (m_sh2_state->r[n] & SH_T);
-	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 1) | (m_sh2_state->r[n] << 31);
+	m_sh2_state->r[n] = rotr_32(m_sh2_state->r[n], 1);
 }
 
 /*  RTS */
@@ -2853,7 +2853,7 @@ bool sh_common_execution::generate_opcode(drcuml_block &block, compiler_state &c
 			return true;
 
 		case 10:    // BRA
-			disp = ((int32_t)opcode << 20) >> 20;
+			disp = util::sext(opcode, 12);
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;            // m_sh2_state->ea = pc+4 + disp*2 + 2
 
 			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
@@ -2867,7 +2867,7 @@ bool sh_common_execution::generate_opcode(drcuml_block &block, compiler_state &c
 			// do this before running the delay slot
 			UML_ADD(block, mem(&m_sh2_state->pr), desc->pc, 4); // add m_pr, desc->pc, #4 (skip the current insn & delay slot)
 
-			disp = ((int32_t)opcode << 20) >> 20;
+			disp = util::sext(opcode, 12);
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;            // m_sh2_state->ea = pc+4 + disp*2 + 2
 
 			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
@@ -3401,7 +3401,7 @@ bool sh_common_execution::generate_group_8(drcuml_block &block, compiler_state &
 		UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
 		UML_JMPc(block, COND_Z, compiler.labelnum);    // jz compiler.labelnum
 
-		disp = ((int32_t)opcode << 24) >> 24;
+		disp = util::sext(opcode, 8);
 		m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;    // m_sh2_state->ea = destination
 
 		generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
@@ -3414,7 +3414,7 @@ bool sh_common_execution::generate_group_8(drcuml_block &block, compiler_state &
 		UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
 		UML_JMPc(block, COND_NZ, compiler.labelnum);   // jnz compiler.labelnum
 
-		disp = ((int32_t)opcode << 24) >> 24;
+		disp = util::sext(opcode, 8);
 		m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
 		generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
@@ -3429,7 +3429,7 @@ bool sh_common_execution::generate_group_8(drcuml_block &block, compiler_state &
 			UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
 			UML_JMPc(block, COND_Z, compiler.labelnum);    // jz compiler.labelnum
 
-			disp = ((int32_t)opcode << 24) >> 24;
+			disp = util::sext(opcode, 8);
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
 			templabel = compiler.labelnum;         // save our label
@@ -3450,7 +3450,7 @@ bool sh_common_execution::generate_group_8(drcuml_block &block, compiler_state &
 			UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
 			UML_JMPc(block, COND_NZ, compiler.labelnum);   // jnz compiler.labelnum
 
-			disp = ((int32_t)opcode << 24) >> 24;
+			disp = util::sext(opcode, 8);
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
 			templabel = compiler.labelnum;         // save our label

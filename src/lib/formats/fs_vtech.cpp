@@ -69,10 +69,9 @@ const char *vtech_image::description() const
 	return "VTech (Laser 200/300)";
 }
 
-void vtech_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void vtech_image::enumerate_f(floppy_enumerator &fe) const
 {
-	if(has(form_factor, variants, floppy_image::FF_525, floppy_image::SSSD))
-		fe.add(FLOPPY_VTECH_BIN_FORMAT, 163840, "vtech", "VTech");
+	fe.add(FLOPPY_VTECH_BIN_FORMAT, floppy_image::FF_525, floppy_image::SSSD, 163840, "vtech", "VTech");
 }
 
 std::unique_ptr<filesystem_t> vtech_image::mount(fsblk_t &blockdev) const
@@ -176,7 +175,7 @@ std::pair<err_t, meta_data> vtech_impl::metadata(const std::vector<std::string> 
 	if(off == 0xffffffff)
 		return std::make_pair(ERR_NOT_FOUND, meta_data());
 
-	return std::make_pair(ERR_OK, file_metadata(bdir.rodata() + off));	
+	return std::make_pair(ERR_OK, file_metadata(bdir.rodata() + off));
 }
 
 err_t vtech_impl::metadata_change(const std::vector<std::string> &path, const meta_data &meta)

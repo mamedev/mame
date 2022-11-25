@@ -13,6 +13,7 @@
 #include "mcr.h"
 
 #include "machine/74259.h"
+#include "machine/adc0804.h"
 #include "machine/adc0844.h"
 
 #include "screen.h"
@@ -124,10 +125,14 @@ class mcrsc_csd_state : public mcr3_state
 public:
 	mcrsc_csd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mcr3_state(mconfig, type, tag)
+		, m_adc(*this, "adc")
 		, m_lamplatch(*this, "lamplatch")
+		, m_analog_inputs(*this, {"ssio:IP2", "ssio:IP2.ALT"})
 	{ }
 
 	void mcrsc_csd(machine_config &config);
+	void spyhunt(machine_config &config);
+	void turbotag(machine_config &config);
 
 	void init_spyhunt();
 	void init_turbotag();
@@ -139,7 +144,9 @@ private:
 	uint8_t turbotag_ip2_r();
 	uint8_t turbotag_kludge_r();
 
+	required_device<adc0804_device> m_adc;
 	optional_device<cd4099_device> m_lamplatch;
+	required_ioport_array<2> m_analog_inputs;
 };
 
 #endif // MAME_INCLUDES_MCR3_H

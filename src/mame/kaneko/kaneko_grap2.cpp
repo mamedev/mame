@@ -74,10 +74,6 @@ void kaneko_grap2_device::device_reset()
 	m_framebuffer_bright2 = 0;
 }
 
-void kaneko_grap2_device::rom_bank_updated()
-{
-}
-
 uint16_t kaneko_grap2_device::regs1_r(offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)

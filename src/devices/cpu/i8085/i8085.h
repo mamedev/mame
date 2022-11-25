@@ -61,7 +61,7 @@ public:
 	auto out_sod_func() { return m_out_sod_func.bind(); }
 
 protected:
-	i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int cputype);
+	i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -91,13 +91,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	enum
-	{
-		CPUTYPE_8080 = 0,
-		CPUTYPE_8080A,
-		CPUTYPE_8085A
-	};
-
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -109,10 +102,6 @@ private:
 	devcb_read_line m_in_sid_func;
 	devcb_write_line m_out_sod_func;
 	clock_update_delegate m_clk_out_func;
-
-	inline bool is_8080() { return m_cputype == CPUTYPE_8080 || m_cputype == CPUTYPE_8080A; }
-	inline bool is_8085() { return m_cputype == CPUTYPE_8085A; }
-	int m_cputype;
 
 	PAIR m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_WZ;
 	u8 m_halt;
@@ -141,6 +130,11 @@ private:
 	/* flags lookup */
 	u8 lut_zs[256];
 	u8 lut_zsp[256];
+
+	virtual int extra_ret() { return 6; }
+	virtual int extra_jmp() { return 3; }
+	virtual int extra_call() { return 9; }
+	virtual bool is_8085() { return true; }
 
 	void set_sod(int state);
 	void set_inte(int state);
@@ -176,30 +170,27 @@ private:
 	void op_rst(u8 v);
 };
 
-
 class i8080_cpu_device : public i8085a_cpu_device
 {
 public:
-	// construction/destruction
 	i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	i8080_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return clocks; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return cycles; }
+
+	virtual int extra_jmp() override { return 0; }
+	virtual int extra_call() override { return 6; }
+	virtual bool is_8085() override { return false; }
 };
 
-
-class i8080a_cpu_device : public i8085a_cpu_device
+class i8080a_cpu_device : public i8080_cpu_device
 {
 public:
-	// construction/destruction
 	i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual u32 execute_input_lines() const noexcept override { return 1; }
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return clocks; }
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return cycles; }
 };
 
 

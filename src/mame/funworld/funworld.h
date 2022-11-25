@@ -149,7 +149,7 @@ public:
 
 	void multiwin(machine_config& config);
 
-	void driver_init() override;
+	void driver_init();
 
 protected:
 	virtual void video_start() override;
@@ -167,7 +167,7 @@ public:
 
 	void royalcrdf(machine_config& config);
 
-	void driver_init() override;
+	void driver_init();
 
 private:
 	uint8_t royalcrdf_opcode_r(offs_t offset);
@@ -189,7 +189,7 @@ public:
 	void intrgmes(machine_config &config);
 
 protected:
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 	virtual void machine_reset() override;
 
 private:

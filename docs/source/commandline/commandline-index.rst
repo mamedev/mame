@@ -412,8 +412,13 @@ SDL Keyboard Mapping
 SDL Joystick Mapping
 ~~~~~~~~~~~~~~~~~~~~
 
-| :ref:`joyidx <mame-scommandline-joyidx>`
 | :ref:`sixaxis <mame-scommandline-sixaxis>`
+
+
+SDL Lightgun Mapping
+~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`lightgun_index <mame-scommandline-lightgunindex>`
 
 
 SDL Low-level Driver Options

@@ -257,7 +257,7 @@ void upd775x_device::device_clock_changed()
 	m_channel->set_sample_rate(clock() / 4);
 }
 
-void upd775x_device::rom_bank_updated()
+void upd775x_device::rom_bank_pre_change()
 {
 	m_channel->update();
 }
@@ -653,7 +653,6 @@ void upd7759_device::internal_start_w(int state)
 
 void upd7756_device::internal_start_w(int state)
 {
-
 	uint8_t oldstart = m_start;
 	m_start = (state != 0);
 

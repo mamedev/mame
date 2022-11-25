@@ -4,12 +4,10 @@ license:CC0
 -->
 <mamelayout version="2">
 	<element name="matrixlamp">
-		<rect state ="0">
-			<bounds x="0" y="0" width="7" height="7" />
+		<rect state="0">
 			<color red="0.7" green="0.7" blue="0.7" />
 		</rect>
-		<rect state ="1">
-			<bounds x="0" y="0" width="7" height="7" />
+		<rect state="1">
 			<color red="0.95" green="0.95" blue="0.43" />
 		</rect>
 	</element>
@@ -59,11 +57,26 @@ license:CC0
 				<yscroll name="sreel~i~" size="0.25" wrap="yes" min="65536" max="0"/>
 			</element>
 		</repeat>
-		<element name="digit0" ref="LCD"><bounds x="220" y="350" width="24" height="40" /></element>
-		<element name="digit1" ref="LCD"><bounds x="244" y="350" width="24" height="40" /></element>
-		<repeat count="13">
+		<element name="digit5" ref="LCD"><bounds x="20" y="250" width="24" height="40" /></element>
+		<element name="digit4" ref="LCD"><bounds x="44" y="250" width="24" height="40" /></element>
+		<element name="digit3" ref="LCD"><bounds x="68" y="250" width="24" height="40" /></element>
+		<element name="digit2" ref="LCD"><bounds x="92" y="250" width="24" height="40" /></element>
+		<element name="digit1" ref="LCD"><bounds x="116" y="250" width="24" height="40" /></element>
+		<element name="digit0" ref="LCD"><bounds x="140" y="250" width="24" height="40" /></element>
+		<repeat count="5">
 			<param name="i" start="0" increment="8" />
 			<param name="y" start="0" increment="8" />
+			<repeat count="8">
+				<param name="j" start="~i~" increment="1" />
+				<param name="x" start="0" increment="8" />
+				<element name="lamp~j~" ref="matrixlamp" state="0">
+					<bounds x="~x~" y="~y~" width="7" height="7"/>
+				</element>
+			</repeat>
+		</repeat>
+		<repeat count="7">
+			<param name="i" start="40" increment="8" />
+			<param name="y" start="48" increment="8" />
 			<repeat count="8">
 				<param name="j" start="~i~" increment="1" />
 				<param name="x" start="0" increment="8" />

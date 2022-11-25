@@ -467,7 +467,7 @@ void fs3216_state::fs3216(machine_config &config)
 	M68000(config, m_maincpu, 44.2368_MHz_XTAL / 8); // 5.5 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fs3216_state::main_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &fs3216_state::fc7_map);
-	m_maincpu->set_reset_callback(FUNC(fs3216_state::mmu_reset_w));
+	m_maincpu->reset_cb().set(FUNC(fs3216_state::mmu_reset_w));
 
 	ADDRESS_MAP_BANK(config, m_clb);
 	m_clb->set_addrmap(0, &fs3216_state::clb_map);

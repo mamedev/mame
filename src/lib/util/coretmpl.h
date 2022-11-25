@@ -664,6 +664,14 @@ template <unsigned B, typename T, typename... U> T bitswap(T val, U... b) noexce
 /// \}
 
 
+// utility function for sign-extending values of arbitrary width
+template <typename T, typename U>
+constexpr std::make_signed_t<T> sext(T value, U width) noexcept
+{
+	return std::make_signed_t<T>(value << (8 * sizeof(value) - width)) >> (8 * sizeof(value) - width);
+}
+
+
 // constexpr absolute value of an integer
 template <typename T>
 constexpr std::enable_if_t<std::is_signed<T>::value, T> iabs(T v) noexcept

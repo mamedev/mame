@@ -72,7 +72,7 @@ void nes_vt369_soc_device::device_add_mconfig(machine_config& config)
 
 	VT_VT1682_ALU(config, m_alu, 0);
 
-	M6502(config, m_soundcpu, N2A03_NTSC_XTAL);
+	M6502(config, m_soundcpu, RP2A03_NTSC_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &nes_vt369_soc_device::vt369_sound_map);
 }
 
@@ -322,9 +322,9 @@ void nes_vt369_alt_soc_device::nes_vt_hh_map(address_map &map)
 void nes_vt369_alt_swap_d5_d6_soc_device::encryption_4169_w(uint8_t data)
 {
 	if (data == 0x01)
-		downcast<n2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(false);
+		downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(false);
 	else if (data == 0x00)
-		downcast<n2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(true);
+		downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(true);
 	else
 		logerror("%s: encryption_4169_w %02x\n", machine().describe_context(), data);
 }
@@ -342,7 +342,7 @@ void nes_vt369_alt_swap_d5_d6_soc_device::device_add_mconfig(machine_config& con
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 
-	N2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt369_alt_swap_d5_d6_soc_device::nes_vt_hh_swap_map);
 }
 

@@ -211,14 +211,6 @@ private:
 		bool      timer_active = false;
 	};
 
-	enum
-	{
-		TIMER_BLITTER,
-		TIMER_SHOT,
-		TIMER_UART_LOOPBACK,
-		TIMER_UART
-	};
-
 	// devices
 	required_shared_ptr<u8> m_dram; // 2 64Kx4 bit DRAMs connected to CPU
 	required_device<cpu_device> m_maincpu;

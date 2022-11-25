@@ -557,10 +557,11 @@ void k054539_device::device_reset()
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void k054539_device::rom_bank_updated()
+void k054539_device::rom_bank_pre_change()
 {
 	stream->update();
 }

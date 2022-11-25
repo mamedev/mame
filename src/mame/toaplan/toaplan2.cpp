@@ -431,18 +431,8 @@ WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 }
 
 
-MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
-{
-	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
-	// This is important for games with common RAM; the RAM test will fail
-	// when leaving service mode if the sound CPU is not reset.
-	m_maincpu->set_reset_callback(*this, FUNC(toaplan2_state::toaplan2_reset));
-}
-
-
 MACHINE_RESET_MEMBER(toaplan2_state,ghox)
 {
-	MACHINE_RESET_CALL_MEMBER(toaplan2);
 	m_old_p1_paddle_h = 0;
 	m_old_p2_paddle_h = 0;
 }
@@ -450,7 +440,6 @@ MACHINE_RESET_MEMBER(toaplan2_state,ghox)
 
 MACHINE_RESET_MEMBER(toaplan2_state,bgaregga)
 {
-	MACHINE_RESET_CALL_MEMBER(toaplan2);
 	for (int chip = 0; chip < 2; chip++)
 	{
 		for (int i = 0; i < 8; i++)
@@ -3050,6 +3039,16 @@ static INPUT_PORTS_START( bgareggatw )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( bgareggak )
+	PORT_INCLUDE( bgaregga )
+
+	PORT_MODIFY("JMPR")
+	PORT_CONFNAME( 0x0003,  0x0003, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!2,!1")
+	PORT_CONFSETTING(       0x0001, "Greece" )
+	PORT_CONFSETTING(       0x0003, "Korea" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( bgareggacn )
 	PORT_INCLUDE( bgaregga )
 
@@ -3333,6 +3332,7 @@ void toaplan2_state::tekipaki(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // 10MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::tekipaki_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, 10_MHz_XTAL));
 	// 16k byte ROM and 512 byte RAM are internal
@@ -3340,8 +3340,6 @@ void toaplan2_state::tekipaki(machine_config &config)
 	audiocpu.in_pa_callback().set(FUNC(toaplan2_state::tekipaki_cmdavailable_r));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3377,6 +3375,7 @@ void toaplan2_state::ghox(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::ghox_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	HD647180X(config, m_audiocpu, 10_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::ghox_hd647180_mem_map);
@@ -3465,6 +3464,7 @@ void toaplan2_state::dogyuun(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 25_MHz_XTAL/2);           /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::dogyuun_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 25_MHz_XTAL/2));         /* NEC V25 type Toaplan marked CPU ??? */
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_state::v25_mem);
@@ -3508,6 +3508,7 @@ void toaplan2_state::kbash(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* 16MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::kbash_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	/* ROM based v25 */
 	v25_device &audiocpu(V25(config, m_audiocpu, 16_MHz_XTAL));         /* NEC V25 type Toaplan marked CPU ??? */
@@ -3552,6 +3553,7 @@ void toaplan2_state::kbash2(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* 16MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::kbash2_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3588,6 +3590,7 @@ void toaplan2_state::truxton2(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::truxton2_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3632,13 +3635,12 @@ void toaplan2_state::pipibibs(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, 27_MHz_XTAL/8);         // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3674,13 +3676,12 @@ void toaplan2_state::pipibibsbl(machine_config &config)
 	M68000(config, m_maincpu, 12_MHz_XTAL); // ??? (position labeled "68000-12" but 10 MHz-rated parts used)
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibi_bootleg_68k_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &toaplan2_state::cpu_space_pipibibsbl_map);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3750,6 +3751,7 @@ void toaplan2_state::fixeight(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::fixeight_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 16_MHz_XTAL));           // NEC V25 type Toaplan marked CPU ???
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_state::fixeight_v25_mem);
@@ -3792,6 +3794,7 @@ void toaplan2_state::fixeightbl(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'000'000));         /* 10MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::fixeightbl_68k_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &toaplan2_state::cpu_space_fixeightbl_map);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3827,6 +3830,7 @@ void toaplan2_state::vfive(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20_MHz_XTAL/2);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::vfive_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 20_MHz_XTAL/2)); // Verified on PCB, NEC V25 type Toaplan mark scratched out
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_state::vfive_v25_mem);
@@ -3864,6 +3868,7 @@ void toaplan2_state::batsugun(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);           // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batsugun_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 32_MHz_XTAL/2));         // NEC V25 type Toaplan marked CPU ???
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_state::v25_mem);
@@ -3925,6 +3930,7 @@ void toaplan2_state::pwrkick(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pwrkick_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	UPD4992(config, m_rtc, 32'768);
 
@@ -3960,6 +3966,7 @@ void toaplan2_state::othldrby(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::othldrby_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	UPD4992(config, m_rtc, 32'768);
 
@@ -3994,6 +4001,7 @@ void toaplan2_state::enmadaio(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::enmadaio_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4026,6 +4034,7 @@ void toaplan2_state::snowbro2(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::snowbro2_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4061,13 +4070,12 @@ void toaplan2_state::mahoudai(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::mahoudai_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::raizing_sound_z80_mem);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4111,6 +4119,7 @@ void toaplan2_state::bgaregga(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bgaregga_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bgaregga_sound_z80_mem);
@@ -4167,6 +4176,7 @@ void toaplan2_state::batrider(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator (verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batrider_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, 32_MHz_XTAL/6);     // 5.333MHz, 32MHz Oscillator (verified)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batrider_sound_z80_mem);
@@ -4230,6 +4240,7 @@ void toaplan2_state::bbakraid(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bbakraid_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, XTAL(32'000'000)/6);     /* 5.3333MHz , 32MHz Oscillator */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bbakraid_sound_z80_mem);
@@ -4237,8 +4248,6 @@ void toaplan2_state::bbakraid(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(toaplan2_state::bbakraid_snd_interrupt), attotime::from_hz(XTAL(32'000'000) / 6 / 12000)); // sound CPU clock (divider unverified)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	EEPROM_93C66_8BIT(config, "eeprom");
 
@@ -4289,6 +4298,7 @@ void toaplan2_state::nprobowl(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2);   // 32MHz Oscillator, divisor not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::nprobowl_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	ADDRESS_MAP_BANK(config, m_dma_space, 0);
 	m_dma_space->set_addrmap(0, &toaplan2_state::batrider_dma_mem);
@@ -5377,7 +5387,6 @@ ROM_START( bgareggat )
 	/* Stored on an NEC ES23C8001EJ Mask ROM with no Raizing/8ing custom markings.*/
 	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
 	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
-
 ROM_END
 
 ROM_START( bgaregga )
@@ -5443,6 +5452,31 @@ ROM_START( bgareggatw )
 
 	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
 	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+ROM_END
+
+
+// only the program ROMs' dumps were provided for this set.
+// According to the dumper: 'In the Korea Region Setting, DIP SWITCH's 'STAGE EDIT' does not work and
+// the C button (formation change) function in the in-game is also deleted.'
+ROM_START( bgareggak )
+	ROM_REGION( 0x100000, "maincpu", 0 )            // Main 68K code
+	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(40a108a7) SHA1(cc3227dc87ffefb961dbcdff146e787dbfbdfc2c) )
+	ROM_LOAD16_BYTE( "prg1.bin", 0x000001, 0x080000, CRC(45a6e48a) SHA1(f4d4158b8556b4261291ba9905b9731623b47e54) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )            // Sound Z80 code + bank
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, BAD_DUMP CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
+
+	ROM_REGION( 0x800000, "gp9001_0", 0 )
+	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, BAD_DUMP CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
+	ROM_LOAD( "rom3.bin",  0x200000, 0x200000, BAD_DUMP CRC(51b9ebfb) SHA1(30e0c326f5175aa436df8dba08f6f4e08130b92f) )
+	ROM_LOAD( "rom2.bin",  0x400000, 0x200000, BAD_DUMP CRC(b330e5e2) SHA1(5d48e9d56f99d093b6390e0af1609fd796df2d35) )
+	ROM_LOAD( "rom1.bin",  0x600000, 0x200000, BAD_DUMP CRC(7eafdd70) SHA1(7c8da8e86c3f9491719b1d7d5d285568d7614f38) )
+
+	ROM_REGION( 0x008000, "text", 0 )
+	ROM_LOAD( "text.u81", 0x00000, 0x08000, BAD_DUMP CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )        // ADPCM Samples
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, BAD_DUMP CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
 
@@ -5553,6 +5587,28 @@ ROM_START( bgareggabla )
 	ROM_LOAD( "base.bin", 0x00000, 0x08000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+ROM_END
+
+ROM_START( bgareggablj ) // fixed on Japanese region
+	ROM_REGION( 0x100000, "maincpu", 0 )            // Main 68K code
+	ROM_LOAD16_WORD_SWAP( "sys.bin", 0x000000, 0x100000, CRC(b2a1225f) SHA1(dda00aa5e7ce3f39bb0eebbcd9500ef22a5d74d3) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                                0x100000 )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )            // Sound Z80 code + bank
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
+
+	ROM_REGION( 0x800000, "gp9001_0", 0 )
+	ROM_LOAD( "322_2.bin",  0x000000, 0x400000, CRC(37fe48ed) SHA1(ded5d13c33b4582310cdfb3dd52c052f741c00c5) ) // == rom4.bin+rom3.bin
+	ROM_LOAD( "322_1.bin",  0x400000, 0x400000, CRC(5a06c031) SHA1(ee241ff90117cec1f33ab163601a9d5c75609739) ) // == rom2.bin+rom1.bin
+
+	ROM_REGION( 0x008000, "text", 0 )
+	ROM_LOAD( "text.bin", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
+
+	ROM_REGION( 0x010000, "user1", 0 ) // not graphics
+	ROM_LOAD( "base.bin", 0x00000, 0x08000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )        // ADPCM Samples
 	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
@@ -5988,6 +6044,22 @@ ROM_START( nprobowl )
 	ROM_LOAD( "newprobowl-adpcm1-u0835", 0x80000, 0x80000, CRC(8c191e60) SHA1(f81c2849ffc553d921fc680cd50c2997b834c44a) )
 ROM_END
 
+ROM_START( probowl2 ) // identical to New Pro Bowl but for slight mods to the GFX ROMs to display the different title
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "probowl2.prg0.u021", 0x000000, 0x080000, CRC(3a57f122) SHA1(cc361c295f23bc0479ba49eb15de2ec6ca535a56) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "probowl2.prg1.u024", 0x000001, 0x080000, CRC(9e9bb58a) SHA1(3d2159bde418dee5d89e3df9a248b4b1989e6ee9) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "gp9001_0", 0 )
+	ROM_LOAD16_BYTE( "probowl2.chr1.u0519", 0x000000, 0x80000, CRC(66a5c9cd) SHA1(b8edc6a66e3929af2a1399e5fb6fc341b9789136) )
+	ROM_LOAD16_BYTE( "probowl2.chr0.u0518", 0x000001, 0x80000, CRC(b4439673) SHA1(5ca19d9c3c3cce9485fb9bd5224f0b14abe07f49) )
+	ROM_LOAD16_BYTE( "probowl2.chr2.u0520", 0x100000, 0x80000, CRC(e05be3a0) SHA1(922c6f094358cf3df790063e68d5dd4a32d46b06) )
+	ROM_LOAD16_BYTE( "probowl2.chr3.u0521", 0x100001, 0x80000, CRC(55e2565f) SHA1(b6a570b736a9b30e26d2a59b53f218ef5cd6f0f6) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )
+	ROM_LOAD( "probowl2.adpcm0.u0834", 0x00000, 0x80000, CRC(be2fb43f) SHA1(f3f9bc522f4668852b751f291cef0000bb86b779) )
+	ROM_LOAD( "probowl2.adpcm1.u0835", 0x80000, 0x80000, CRC(8c191e60) SHA1(f81c2849ffc553d921fc680cd50c2997b834c44a) )
+ROM_END
+
 
 // The following is in order of Toaplan Board/game numbers
 // See list at top of file
@@ -6025,20 +6097,20 @@ GAME( 1991, pipibibsbl3, pipibibs, pipibibsbl,   pipibibsbl, toaplan2_state, emp
 GAME( 1993, enmadaio,    0,        enmadaio,     enmadaio,   toaplan2_state, init_enmadaio, ROT0,   "Toaplan / Taito",  "Enma Daio (Japan)", 0 ) // TP-031
 
 // region is in eeprom (and also requires correct return value from a v25 mapped address??)
-GAME( 1992, fixeight,    0,        fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Europe)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightk,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Korea)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighth,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Hong Kong)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighttw,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Taiwan)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighta,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Southeast Asia)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightu,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (USA)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightj,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Japan)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightt,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Europe, Taito license)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightkt,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Korea, Taito license)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightht,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Hong Kong, Taito license)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighttwt, fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Taiwan, Taito license)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightat,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Southeast Asia, Taito license)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightut,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightjt,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Japan, Taito license)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeight,    0,        fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Europe)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightk,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Korea)",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighth,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Hong Kong)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighttw,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Taiwan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighta,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Southeast Asia)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightu,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (USA)",                                              MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightj,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight - Jigoku no Eiyuu Densetsu (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightt,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Europe, Taito license)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightkt,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Korea, Taito license)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightht,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Hong Kong, Taito license)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighttwt, fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Taiwan, Taito license)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightat,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Southeast Asia, Taito license)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightut,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightjt,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight - Jigoku no Eiyuu Densetsu (Japan, Taito license)",  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, fixeightbl,  fixeight, fixeightbl, fixeightbl, toaplan2_state, init_fixeightbl, ROT270,"bootleg", "FixEight (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
@@ -6072,11 +6144,13 @@ GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   toaplan2_state, init_
 GAME( 1996, bgareggat,   bgaregga, bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (location test) (Wed Jan 17 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggahk,  bgaregga, bgaregga,   bgareggahk, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggatw,  bgaregga, bgaregga,   bgareggatw, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggak,   bgaregga, bgaregga,   bgareggak,  toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Korea / Greece) (Wed Feb 7 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgaregganv,  bgaregga, bgaregga,   bgareggahk, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays New Version only when set to HK
 GAME( 1996, bgareggat2,  bgaregga, bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
 GAME( 1996, bgareggacn,  bgaregga, bgaregga,   bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
 GAME( 1996, bgareggabl,  bgaregga, bgareggabl, bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "1945 Part-2 (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggabla, bgaregga, bgareggabl, bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "Lei Shen Zhuan Thunder Deity Biography (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggablj, bgaregga, bgareggabl, bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "Battle Garegga (Japan, bootleg) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
 
 // these are all based on Version B, even if only the Japan version states 'version B'
 GAME( 1998, batrider,    0,        batrider,   batrider,   toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)",           MACHINE_SUPPORTS_SAVE )
@@ -6098,4 +6172,5 @@ GAME( 1999, bbakraidj,   bbakraid, bbakraid,   bbakraid,   toaplan2_state, init_
 GAME( 1999, bbakraidja,  bbakraid, bbakraid,   bbakraid,   toaplan2_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
 
 // dedicated PCB
-GAME( 1996, nprobowl,    0,        nprobowl,   nprobowl,   toaplan2_state, empty_init,      ROT0,   "Zuck / Able Corp", "New Pro Bowl", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // bad GFXs, no sound banking, controls, etc
+GAME( 1996, nprobowl,    0,        nprobowl,   nprobowl,   toaplan2_state, empty_init,      ROT0,   "Zuck / Able Corp", "New Pro Bowl", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // bad GFXs, no sound banking, controls, etc
+GAME( 1996, probowl2,    nprobowl, nprobowl,   nprobowl,   toaplan2_state, empty_init,      ROT0,   "Zuck / Able Corp", "Pro Bowl 2",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // bad GFXs, no sound banking, controls, etc

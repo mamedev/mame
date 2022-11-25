@@ -89,7 +89,7 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 					}
 					else
 					{
-						popmessage("unsupported voice type %01x", m_voice[v].type);
+						logerror("unsupported voice type %01x", m_voice[v].type);
 						m_voice[v].enabled[channel] = false;
 					}
 				}

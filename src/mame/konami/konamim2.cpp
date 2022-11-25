@@ -227,7 +227,6 @@ Notes:
 #include "sound/ymz280b.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 #include "romload.h"
 #include "screen.h"
@@ -329,16 +328,6 @@ public:
 		}
 	}
 
-	uint16_t konami_ide_r(offs_t offset, uint16_t mem_mask = ~0)
-	{
-		return swapendian_int16(m_ata->cs0_r(offset, mem_mask));
-	}
-
-	void konami_ide_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0)
-	{
-		m_ata->cs0_w(offset, swapendian_int16(data), mem_mask);
-	}
-
 private:
 	void install_ymz280b();
 	void install_m48t58();
@@ -371,10 +360,10 @@ private:
 		m_ata_int = param;
 	}
 
-	void debug_help_command(const std::vector<std::string> &params);
-	void debug_commands(const std::vector<std::string> &params);
+	void debug_help_command(const std::vector<std::string_view> &params);
+	void debug_commands(const std::vector<std::string_view> &params);
 
-	void dump_task_command(const std::vector<std::string> &params);
+	void dump_task_command(const std::vector<std::string_view> &params);
 };
 
 
@@ -501,7 +490,7 @@ uint16_t konamim2_state::konami_io0_r(offs_t offset)
 		case 8: return ioport("P5")->read();
 	}
 
-	//return rand();
+	//return machine().rand();
 	return 0;
 }
 
@@ -753,7 +742,7 @@ void konamim2_state::m2_map(address_map &map)
 	map(0x37a00020, 0x37a0003f).rw(FUNC(konamim2_state::konami_io0_r), FUNC(konamim2_state::konami_io0_w));
 	map(0x37c00010, 0x37c0001f).rw(FUNC(konamim2_state::konami_sio_r), FUNC(konamim2_state::konami_sio_w));
 	map(0x37e00000, 0x37e0000f).rw(FUNC(konamim2_state::konami_io1_r), FUNC(konamim2_state::konami_io1_w));
-	map(0x3f000000, 0x3fffffff).rw(FUNC(konamim2_state::konami_ide_r), FUNC(konamim2_state::konami_ide_w));
+	map(0x3f000000, 0x3fffffff).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w));
 }
 
 
@@ -1485,7 +1474,7 @@ void konamim2_state::init_hellngt()
  *
  *************************************/
 
-void konamim2_state::debug_help_command(const std::vector<std::string> &params)
+void konamim2_state::debug_help_command(const std::vector<std::string_view> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -1494,7 +1483,7 @@ void konamim2_state::debug_help_command(const std::vector<std::string> &params)
 	con.printf("  konm2 dump_dspp,<address> -- Dump DSPP object at <address>\n");
 }
 
-void konamim2_state::debug_commands(const std::vector<std::string> &params)
+void konamim2_state::debug_commands(const std::vector<std::string_view> &params)
 {
 	if (params.size() < 1)
 		return;
@@ -1507,7 +1496,7 @@ void konamim2_state::debug_commands(const std::vector<std::string> &params)
 		subdevice<dspp_device>("bda:dspp")->dump_state();
 }
 
-void konamim2_state::dump_task_command(const std::vector<std::string> &params)
+void konamim2_state::dump_task_command(const std::vector<std::string_view> &params)
 {
 	typedef uint32_t   Item;
 	typedef uint32_t   m2ptr;
@@ -1563,7 +1552,7 @@ void konamim2_state::dump_task_command(const std::vector<std::string> &params)
 	if (params.size() < 1)
 		return;
 
-	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
+	if (!con.validate_number_parameter(params[1], addr))
 		return;
 
 	address = (offs_t)addr;

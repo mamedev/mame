@@ -33,6 +33,8 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/i8255.h"
+#include "utf8.h"
+
 #include "amico2k.lh"
 
 

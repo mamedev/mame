@@ -25,7 +25,7 @@
 #include "emu.h"
 #include "toobin.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
@@ -109,7 +109,7 @@ void toobin_state::main_map(address_map &map)
 	map(0x828800, 0x828801).mirror(0x4507fe).portr("FF8800");
 	map(0x829000, 0x829001).mirror(0x4507fe).portr("FF9000");
 	map(0x829801, 0x829801).mirror(0x4507fe).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r));
-	map(0x82a000, 0x82afff).mirror(0x451000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x82a000, 0x82a3ff).mirror(0x451c00).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x82c000, 0x82ffff).mirror(0x450000).ram();
 }
 

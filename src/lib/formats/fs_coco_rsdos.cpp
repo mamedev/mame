@@ -23,10 +23,11 @@ namespace fs { const coco_rsdos_image COCO_RSDOS; }
 
 namespace {
 
-class coco_rsdos_impl : public filesystem_t {
+class coco_rsdos_impl : public filesystem_t
+{
 public:
-    coco_rsdos_impl(fsblk_t &blockdev);
-    virtual ~coco_rsdos_impl() = default;
+	coco_rsdos_impl(fsblk_t &blockdev);
+	virtual ~coco_rsdos_impl() = default;
 
 	struct rsdos_dirent
 	{
@@ -47,7 +48,8 @@ public:
 		} m_entries[4];
 	};
 
-	class granule_iterator {
+	class granule_iterator
+	{
 	public:
 		granule_iterator(coco_rsdos_impl &fs, const rsdos_dirent &dirent);
 		bool next(u8 &granule, u16 &byte_count);
@@ -75,7 +77,8 @@ private:
 	meta_data get_metadata_from_dirent(const rsdos_dirent &dirent);
 	static std::string get_filename_from_dirent(const rsdos_dirent &dirent);
 };
-}
+
+} // anonymous namespace
 
 
 //-------------------------------------------------
@@ -102,13 +105,10 @@ const char *coco_rsdos_image::description() const
 //  enumerate_f
 //-------------------------------------------------
 
-void coco_rsdos_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void coco_rsdos_image::enumerate_f(floppy_enumerator &fe) const
 {
-	if (has(form_factor, variants, floppy_image::FF_525, floppy_image::SSDD))
-	{
-		fe.add(FLOPPY_COCO_RAWDSK_FORMAT, 161280, "coco_rawdsk_rsdos_35", "CoCo Raw Disk RS-DOS single-sided 35 tracks");
-		fe.add(FLOPPY_COCO_RAWDSK_FORMAT, 184320, "coco_rawdsk_rsdos_40", "CoCo Raw Disk RS-DOS single-sided 40 tracks");
-	}
+	fe.add(FLOPPY_COCO_RAWDSK_FORMAT, floppy_image::FF_525, floppy_image::SSSD, 161280, "coco_rawdsk_rsdos_35", "CoCo Raw Disk RS-DOS single-sided 35 tracks");
+	fe.add(FLOPPY_COCO_RAWDSK_FORMAT, floppy_image::FF_525, floppy_image::SSSD, 184320, "coco_rawdsk_rsdos_40", "CoCo Raw Disk RS-DOS single-sided 40 tracks");
 }
 
 
@@ -482,4 +482,3 @@ bool coco_rsdos_impl::granule_iterator::next(u8 &granule, u16 &byte_count)
 	}
 	return success;
 }
-

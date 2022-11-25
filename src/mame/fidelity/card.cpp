@@ -24,6 +24,8 @@ BTANB:
 
 TODO:
 - verify if BV2 is a newer program version than VBRC
+- the VFD scrolls around 30% too slow compared to the real one, probably depends
+  on how many T1 clock edges the 8041 can detect (see mcu_t1_r)
 
 *******************************************************************************
 
@@ -172,7 +174,6 @@ Two card decks exist (red and blue), each has the same set of barcodes.
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8243.h"
-#include "machine/clock.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/s14001a.h"
@@ -240,6 +241,7 @@ private:
 	void mcu_p1_w(u8 data);
 	u8 mcu_p2_r();
 	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
+	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
 	template<int P> void ioexp_port_w(uint8_t data);
 };
 
@@ -349,6 +351,12 @@ READ_LINE_MEMBER(card_state::mcu_t0_r)
 {
 	// T0: card scanner light sensor (1=white, 0=black/none)
 	return m_barcode & 1;
+}
+
+READ_LINE_MEMBER(card_state::mcu_t1_r)
+{
+	// T1: xtal / 4 (do *2 for high-low transitions)
+	return (machine().time().as_ticks(5_MHz_XTAL / 4 * 2)) & 1;
 }
 
 
@@ -582,10 +590,7 @@ void card_state::brc_base(machine_config &config)
 	m_mcu->p2_out_cb().set(m_i8243, FUNC(i8243_device::p2_w));
 	m_mcu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 	m_mcu->t0_in_cb().set(FUNC(card_state::mcu_t0_r));
-
-	// MCU T1 tied to master clock / 4
-	CLOCK(config, "t1_clock", 5_MHz_XTAL/4);
-	m_mcu->t1_in_cb().set("t1_clock", FUNC(clock_device::signal_r)).invert();
+	m_mcu->t1_in_cb().set(FUNC(card_state::mcu_t1_r));
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(card_state::ioexp_port_w<0>));

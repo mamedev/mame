@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders: Nicola Salmoria
+
 /***************************************************************************
 
 Mahjong Kyou Jidai (麻雀狂時代)     (c)1986 Sanritsu
@@ -23,14 +24,218 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "mjkjidai.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "sound/msm5205.h"
 #include "sound/sn76496.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+// configurable logging
+#define LOG_CTRL     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_CTRL)
+
+#include "logmacro.h"
+
+#define LOGCTRL(...)     LOGMASKED(LOG_CTRL,     __VA_ARGS__)
+
+
+namespace {
+
+class mjkjidai_state : public driver_device
+{
+public:
+	mjkjidai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm"),
+		m_nvram(*this, "nvram"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_adpcmrom(*this, "adpcm"),
+		m_videoram(*this, "videoram"),
+		m_mainbank(*this, "mainbank"),
+		m_row(*this, "ROW.%u", 0)
+	{ }
+
+	void mjkjidai(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
+	required_device<nvram_device> m_nvram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_region_ptr<uint8_t> m_adpcmrom;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_memory_bank m_mainbank;
+
+	required_ioport_array<12> m_row;
+
+	uint16_t m_adpcm_pos = 0;
+	uint32_t m_adpcm_end = 0;
+	uint16_t m_keyb = 0;
+	bool m_nmi_enable = false;
+	bool m_display_enable = false;
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	void keyboard_select_lo_w(uint8_t data);
+	void keyboard_select_hi_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void ctrl_w(uint8_t data);
+	void adpcm_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
+{
+	int attr = m_videoram[tile_index + 0x800];
+	int code = m_videoram[tile_index] + ((attr & 0x1f) << 8);
+	int color = m_videoram[tile_index + 0x1000];
+	tileinfo.set(0, code, color >> 3, 0);
+}
+
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void mjkjidai_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mjkjidai_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+}
+
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void mjkjidai_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+}
+
+void mjkjidai_state::ctrl_w(uint8_t data)
+{
+	LOGCTRL("%s: port c0 = %02x\n", m_maincpu->pc(), data);
+
+	// bit 0 = NMI enable
+	m_nmi_enable = data & 1;
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
+	// bit 1 = flip screen
+	flip_screen_set(data & 0x02);
+
+	// bit 2 = display enable
+	m_display_enable = data & 0x04;
+
+	// bit 5 = coin counter
+	machine().bookkeeping().coin_counter_w(0, data & 0x20);
+
+	// bits 6-7 select ROM bank
+	m_mainbank->set_entry(data >> 6);
+}
+
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+void mjkjidai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t *spriteram = &m_videoram[0];
+	uint8_t *spriteram_2 = &m_videoram[0x800];
+	uint8_t *spriteram_3 = &m_videoram[0x1000];
+
+	for (int offs = 0x20 - 2; offs >= 0; offs -= 2)
+	{
+		int code = spriteram[offs] + ((spriteram_2[offs] & 0x1f) << 8);
+		int color = (spriteram_3[offs] & 0x78) >> 3;
+		int sx = 2 * spriteram_2[offs + 1];
+		int sy = 240 - spriteram[offs + 1];
+		int flipx = code & 1;
+		int flipy = code & 2;
+
+		code >>= 2;
+
+		sx += (spriteram_2[offs] & 0x20) >> 5;  // not sure about this
+
+		if (flip_screen())
+		{
+			sx = 496 - sx;
+			sy = 240 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		sx += 16;
+		sy += 1;
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+}
+
+
+
+uint32_t mjkjidai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (!m_display_enable)
+		bitmap.fill(m_palette->black_pen(), cliprect);
+	else
+	{
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect);
+	}
+	return 0;
+}
+
+
+// machine
 
 void mjkjidai_state::adpcm_w(uint8_t data)
 {
@@ -269,8 +474,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_mjkjidai )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx", 0, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( "gfx", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
 WRITE_LINE_MEMBER(mjkjidai_state::vblank_irq)
@@ -311,7 +516,7 @@ void mjkjidai_state::mjkjidai(machine_config &config)
 	ppi1.in_pc_callback().set_ioport("IN2");
 
 	i8255_device &ppi2(I8255A(config, "ppi2"));
-	ppi2.out_pa_callback().set(FUNC(mjkjidai_state::ctrl_w));  // rom bank, coin counter, flip screen etc
+	ppi2.out_pa_callback().set(FUNC(mjkjidai_state::ctrl_w));  // ROM bank, coin counter, flip screen etc
 	ppi2.in_pb_callback().set_ioport("DSW1");
 	ppi2.in_pc_callback().set_ioport("DSW2");
 
@@ -352,7 +557,7 @@ ROM_START( mjkjidai )
 	ROM_LOAD( "mkj-01.15g",   0x08000, 0x8000, CRC(a6a5e9c7) SHA1(974f4343f4347a0065f833c1fdcc47e96d42932d) )
 	ROM_LOAD( "mkj-02.16g",   0x10000, 0x8000, CRC(fb312927) SHA1(b71db72ba881474f9c2523d0617757889af9f28e) )
 
-	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_REGION( 0x30000, "gfx", 0 )
 	ROM_LOAD( "mkj-20.4e",    0x00000, 0x8000, CRC(8fc66bce) SHA1(4f1006bc5168e39eb7a1f6a4b3c3f5aaa3c1c7dd) )
 	ROM_LOAD( "mkj-21.5e",    0x08000, 0x8000, CRC(4dd41a9b) SHA1(780f9e5bbf9dc47e931cebd67d89122209f573a2) )
 	ROM_LOAD( "mkj-22.6e",    0x10000, 0x8000, CRC(70ac2bd7) SHA1(8ddb00a24f2b49b9eb1a70ae95fcd6bb0820be50) )
@@ -372,5 +577,7 @@ ROM_START( mjkjidai )
 	ROM_LOAD( "default.nv",   0x0000, 0x1000, CRC(eccc0263) SHA1(679010f096536e8bb572551e9d0776cad72145e2) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, mjkjidai_state, empty_init, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, mjkjidai_state, empty_init, ROT0, "Sanritsu", "Mahjong Kyou Jidai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

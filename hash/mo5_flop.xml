@@ -22,7 +22,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="35basica" cloneof="35basic">
-		<description>3'5 Disk BASIC (v1.0, Alt)</description>
+		<description>3'5 Disk BASIC (v1.0, alt)</description>
 		<year>1985</year>
 		<publisher>Microsoft</publisher>
 
@@ -34,7 +34,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="35basicb" cloneof="35basic">
-		<description>3'5 Disk BASIC (v1.0, Alt 2)</description>
+		<description>3'5 Disk BASIC (v1.0, alt 2)</description>
 		<year>1985</year>
 		<publisher>Microsoft</publisher>
 
@@ -127,7 +127,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<!-- can also be found in to_flop.xml -->
 	<!-- contains 2 duplicates of parent set -->
 	<software name="dumproma" cloneof="dumprom">
-		<description>Dump rom UC, controleur, cartouche (640K Disk)</description>
+		<description>Dump rom UC, controleur, cartouche (640K disk)</description>
 		<year>2008</year>
 		<publisher>DCsoft</publisher>
 
@@ -140,7 +140,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- This version has been modified to boot off a disk instead of a cartridge -->
 	<software name="jane">
-		<description>Jane (Hacked to use boot disk)</description>
+		<description>Jane (hacked to use boot disk)</description>
 		<year>2002</year>
 		<publisher>Thomson - E. Forler</publisher>
 		<info name="usage" value="Insert Chargeur disk first, then load Systeme disk when prompted" />
@@ -391,7 +391,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="hitsloria" cloneof="hitslori">
-		<description>Les Hits de Loriciels 1 (Alt)</description>
+		<description>Les Hits de Loriciels 1 (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -415,7 +415,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="jeuxsayaa" cloneof="jeuxsaya">
-		<description>Jeux Saya (SAP Format)</description>
+		<description>Jeux Saya (SAP format)</description>
 		<year>198?</year>
 		<publisher>Sayasupacrew</publisher>
 
@@ -486,7 +486,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in to_flop.xml -->
 	<software name="thomcata" cloneof="thomcat">
-		<description>THOM-CAT (SAP Format)</description>
+		<description>THOM-CAT (SAP format)</description>
 		<year>2015</year>
 		<publisher>Puls</publisher>
 
@@ -658,7 +658,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="blitza" cloneof="blitz">
-		<description>Blitz! (Alt)</description>
+		<description>Blitz! (alt)</description>
 		<year>1985</year>
 		<publisher>TO TEK International</publisher>
 
@@ -850,9 +850,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mandrago">
-		<description>Mandragore (Hacked by Prehisto)</description>
+		<description>Mandragore (hacked)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="hacked" value="Prehisto" />
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="327680">
@@ -862,9 +863,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mandragoa" cloneof="mandrago">
-		<description>Mandragore (Hacked by Prehisto, SAP Format)</description>
+		<description>Mandragore (hacked, SAP format)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="hacked" value="Prehisto" />
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="335426">
@@ -910,7 +912,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sapiensa" cloneof="sapiens">
-		<description>Sapiens (Alt)</description>
+		<description>Sapiens (alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 

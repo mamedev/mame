@@ -1,12 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 
-#ifndef MAME_MACHINE_SONORA_H
-#define MAME_MACHINE_SONORA_H
+#ifndef MAME_APPLE_SONORA_H
+#define MAME_APPLE_SONORA_H
 
 #pragma once
 
-#include "emu.h"
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
 #include "machine/mv_sonora.h"
@@ -35,7 +34,7 @@ public:
 
 	void map(address_map &map);
 
-	template <typename T> void set_maincpu_tag(T &&cpu_tag) { m_maincpu.set_tag(std::forward<T>(cpu_tag)); }
+	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
 	void set_ram_info(u32 *ram, u32 size);
 
@@ -90,6 +89,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(via1_irq);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq);
+	DECLARE_WRITE_LINE_MEMBER(asc_irq);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 
 	void phases_w(uint8_t phases);
@@ -104,4 +104,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SONORA, sonora_device)
 
-#endif // MAME_MACHINE_SONORA_H
+#endif // MAME_APPLE_SONORA_H

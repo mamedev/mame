@@ -28,13 +28,13 @@ debug_breakpoint::debug_breakpoint(
 		int index,
 		offs_t address,
 		const char *condition,
-		const char *action) :
+		std::string_view action) :
 	m_debugInterface(debugInterface),
 	m_index(index),
 	m_enabled(true),
 	m_address(address),
 	m_condition(symbols, condition ? condition : "1"),
-	m_action(action ? action : "")
+	m_action(action)
 {
 }
 
@@ -88,7 +88,7 @@ debug_watchpoint::debug_watchpoint(
 		offs_t address,
 		offs_t length,
 		const char *condition,
-		const char *action) :
+		std::string_view action) :
 	m_debugInterface(debugInterface),
 	m_phr(nullptr),
 	m_phw(nullptr),
@@ -99,7 +99,7 @@ debug_watchpoint::debug_watchpoint(
 	m_address(address & space.addrmask()),
 	m_length(length),
 	m_condition(symbols, condition ? condition : "1"),
-	m_action(action ? action : ""),
+	m_action(action),
 	m_installing(false)
 {
 	std::fill(std::begin(m_start_address), std::end(m_start_address), 0);
@@ -431,11 +431,11 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 //  debug_registerpoint - constructor
 //-------------------------------------------------
 
-debug_registerpoint::debug_registerpoint(symbol_table &symbols, int index, const char *condition, const char *action)
+debug_registerpoint::debug_registerpoint(symbol_table &symbols, int index, const char *condition, std::string_view action)
 	: m_index(index),
 		m_enabled(true),
 		m_condition(symbols, (condition != nullptr) ? condition : "1"),
-		m_action((action != nullptr) ? action : "")
+		m_action(action)
 {
 }
 
@@ -448,6 +448,62 @@ bool debug_registerpoint::hit()
 {
 	// don't hit if disabled
 	if (!m_enabled)
+		return false;
+
+	// must satisfy the condition
+	if (!m_condition.is_empty())
+	{
+		try
+		{
+			return (m_condition.execute() != 0);
+		}
+		catch (expression_error &)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+//**************************************************************************
+//  DEBUG EXCEPTION POINT
+//**************************************************************************
+
+//-------------------------------------------------
+//  debug_exceptionpoint - constructor
+//-------------------------------------------------
+
+debug_exceptionpoint::debug_exceptionpoint(
+		device_debug *debugInterface,
+		symbol_table &symbols,
+		int index,
+		int type,
+		const char *condition,
+		std::string_view action)
+	: m_debugInterface(debugInterface),
+		m_index(index),
+		m_enabled(true),
+		m_type(type),
+		m_condition(symbols, (condition != nullptr) ? condition : "1"),
+		m_action(action)
+{
+}
+
+
+//-------------------------------------------------
+//  hit - detect a hit
+//-------------------------------------------------
+
+bool debug_exceptionpoint::hit(int exception)
+{
+	// don't hit if disabled
+	if (!m_enabled)
+		return false;
+
+	// must match our type
+	if (m_type != exception)
 		return false;
 
 	// must satisfy the condition

@@ -95,6 +95,8 @@ TODO
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 
 #define MAIN_CLOCK           14_MHz_XTAL
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */

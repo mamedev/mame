@@ -394,6 +394,7 @@ inline void sh2_device::RTE()
 inline void sh2_device::TRAPA(uint32_t i)
 {
 	uint32_t imm = i & 0xff;
+	debugger_exception_hook(imm);
 
 	m_sh2_state->ea = m_sh2_state->vbr + imm * 4;
 
@@ -411,6 +412,8 @@ inline void sh2_device::TRAPA(uint32_t i)
 inline void sh2_device::ILLEGAL()
 {
 	//logerror("Illegal opcode at %08x\n", m_sh2_state->pc - 2);
+	debugger_exception_hook(4);
+
 	m_sh2_state->r[15] -= 4;
 	WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
 	m_sh2_state->r[15] -= 4;
@@ -814,6 +817,7 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 		vector = 11;
 		LOG("SH-2 nmi exception (autovector: $%x) after [%s]\n", vector, message);
 	}
+	debugger_exception_hook(vector);
 
 	if (m_isdrc)
 	{

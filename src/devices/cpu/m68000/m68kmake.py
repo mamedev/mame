@@ -257,23 +257,23 @@ class Info:
         f.write("#include \"m68000.h\"\n")
         f.write("\n")
         for h in self.opcode_handlers:
-            f.write('void m68000_base_device::%s()\n{\n%s}\n' % (h.function_name, h.body))
+            f.write('void m68000_musashi_device::%s()\n{\n%s}\n' % (h.function_name, h.body))
 
         order = list(range(len(self.opcode_handlers)))
         order.sort(key = lambda id: "%02d %04x %04x" % (self.opcode_handlers[id].bits, self.opcode_handlers[id].op_mask, self.opcode_handlers[id].op_value))
 
         illegal_id = 0
         nid = 0
-        f.write("const m68000_base_device::opcode_handler_ptr m68000_base_device::m68k_handler_table[] =\n{\n\n")
+        f.write("const m68000_musashi_device::opcode_handler_ptr m68000_musashi_device::m68k_handler_table[] =\n{\n\n")
         for id in order:
             oh = self.opcode_handlers[id]
-            f.write("\t&m68000_base_device::%s,\n" % oh.function_name)
+            f.write("\t&m68000_musashi_device::%s,\n" % oh.function_name)
             if oh.function_name == 'x4afc_illegal_' + cpu_names:
                 illegal_id = nid
             nid += 1
         f.write("};\n\n")
-        f.write("const u16 m68000_base_device::m68k_state_illegal = %d;\n\n" % illegal_id)
-        f.write("const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_table[] =\n{\n\n")
+        f.write("const u16 m68000_musashi_device::m68k_state_illegal = %d;\n\n" % illegal_id)
+        f.write("const m68000_musashi_device::opcode_handler_struct m68000_musashi_device::m68k_opcode_table[] =\n{\n\n")
         for id in order:
             oh = self.opcode_handlers[id]
             f.write("\t{ 0x%04x, 0x%04x, {" % (oh.op_value, oh.op_mask))

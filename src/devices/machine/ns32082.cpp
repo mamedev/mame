@@ -278,8 +278,10 @@ void ns32082_device::write_op(u16 data)
 			switch ((m_opword >> 2) & 15)
 			{
 			case 0: // rdval
+				m_op[0].expected = size + 1;
 				break;
 			case 1: // wrval
+				m_op[0].expected = size + 1;
 				break;
 			case 2: // lmr
 				m_op[0].expected = size + 1;
@@ -432,9 +434,6 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 
 	LOGMASKED(LOG_TRANSLATE, "translate address_space %d access_level %d page table 0x%08x address 0x%08x\n", address_space, access_level, ptb, address);
 
-	if (m_state == IDLE && !debug)
-		m_msr &= ~(MSR_EST | MSR_ED | MSR_TET | MSR_TE);
-
 	// read level 1 page table entry
 	u32 const pte1_address = ptb | ((address & VA_INDEX1) >> 14);
 	u32 const pte1 = space.read_dword(pte1_address);
@@ -444,6 +443,9 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	{
 		if (m_state == IDLE && !debug)
 		{
+			// reset error status
+			m_msr &= ~(MSR_EST | MSR_ED | MSR_TET | MSR_TE);
+
 			m_msr |= (write ? 0 : MSR_ED) | ((st & 7) << 10) | MSR_TE;
 			if (access_level > (pte1 & PTE_PL))
 				m_msr |= TET_PL;
@@ -483,6 +485,9 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	{
 		if (m_state == IDLE && !debug)
 		{
+			// reset error status
+			m_msr &= ~(MSR_EST | MSR_ED | MSR_TET | MSR_TE);
+
 			m_msr |= (write ? 0 : MSR_ED) | ((st & 7) << 10) | MSR_TE;
 			if (access_level > (pte2 & PTE_PL))
 				m_msr |= TET_PL;
@@ -513,6 +518,9 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 
 	address = ((pte1 & PTE_MS) >> 7) | (pte2 & PTE_PFN) | (address & VA_OFFSET);
 	LOGMASKED(LOG_TRANSLATE, "translate complete 0x%08x\n", address);
+
+	if (m_state == RDVAL || m_state == WRVAL)
+		m_state = STATUS;
 
 	return COMPLETE;
 }

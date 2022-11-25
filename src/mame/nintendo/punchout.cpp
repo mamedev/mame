@@ -612,7 +612,7 @@ void punchout_state::punchout(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &punchout_state::punchout_map);
 	m_maincpu->set_addrmap(AS_IO, &punchout_state::punchout_io_map);
 
-	N2A03(config, m_audiocpu, NTSC_APU_CLOCK);
+	RP2A03(config, m_audiocpu, NTSC_APU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &punchout_state::punchout_sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -657,7 +657,7 @@ void punchout_state::punchout(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	VLM5030(config, m_vlm, N2A03_NTSC_XTAL/6);
+	VLM5030(config, m_vlm, RP2A03_NTSC_XTAL/6);
 	m_vlm->set_addrmap(0, &punchout_state::punchout_vlm_map);
 	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0.50);

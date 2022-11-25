@@ -20,6 +20,7 @@
 
 #include "corestr.h"
 
+#include <cstdarg>
 #include <cstdio>
 #include <algorithm>
 
@@ -34,11 +35,6 @@ static constexpr int64_t MAX_48 = (s64(1) << 47) - 1;
 #define IS_NEGATIVE(x) (((x) & SIGN_BIT_24) != 0)
 
 #define CARRY_OUT_24 (0x01000000)
-
-constexpr int32_t SX(int32_t x) { return IS_NEGATIVE(x) ? x | 0xff000000 : x & 0x00ffffff; }
-constexpr int32_t SC(int32_t x) { return x & 0x00ffffff; }
-constexpr int64_t SX64(int64_t x) { return (x & s64(0x0000800000000000U)) ? x | s64(0xffff000000000000U) : x & s64(0x0000ffffffffffffU); }
-//constexpr int64_t SC64(int64_t x) { return x & s64(0x0000ffffffffffffU); }
 
 #define VERBOSE 0
 #define VERBOSE_EXEC 0
@@ -107,7 +103,7 @@ inline static int32_t add(int32_t a, int32_t b, uint8_t &flags) {
 	flags = setFlagTo(flags, FLAG_Z, result == 0);
 	flags = setFlagTo(flags, FLAG_V, overflow);
 	flags = setFlagTo(flags, FLAG_LT, lessThan);
-	return SC(result);
+	return result & 0x00ffffff;
 }
 
 inline static int32_t saturate(int32_t value, uint8_t &flags, bool negative) {
@@ -291,7 +287,7 @@ const es5510_device::ram_control_t es5510_device::RAM_CONTROL[8] = {
 };
 
 static inline char * DESCRIBE_RAM(char *s, uint8_t ramControl, uint32_t gprContents) {
-	return s + sprintf(s, es5510_device::RAM_CONTROL[ramControl].description, SC(gprContents));
+	return s + sprintf(s, es5510_device::RAM_CONTROL[ramControl].description, gprContents & 0x00ffffff);
 }
 
 static inline char * DESCRIBE_ALU(char *s, uint8_t opcode, uint8_t aReg, const char *aName, uint8_t bReg, const char *bName, const op_select_t &opSelect) {
@@ -413,15 +409,15 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 	switch (offset) {
 	case 0x00:
 		gpr_latch = (gpr_latch&0x00ffff) | ((data&0xff)<<16);
-		LOG("ES5510: Host Write GPR latch[2] = %02x -> %06x (%d)\n", data, gpr_latch, SX(gpr_latch));
+		LOG("ES5510: Host Write GPR latch[2] = %02x -> %06x (%d)\n", data, gpr_latch, util::sext(gpr_latch, 24));
 		break;
 	case 0x01:
 		gpr_latch = (gpr_latch&0xff00ff) | ((data&0xff)<< 8);
-		LOG("ES5510: Host Write GPR latch[1] = %02x -> %06x (%d)\n", data, gpr_latch, SX(gpr_latch));
+		LOG("ES5510: Host Write GPR latch[1] = %02x -> %06x (%d)\n", data, gpr_latch, util::sext(gpr_latch, 24));
 		break;
 	case 0x02:
 		gpr_latch = (gpr_latch&0xffff00) | ((data&0xff)<< 0);
-		LOG("ES5510: Host Write GPR latch[0] = %02x -> %06x (%d)\n", data, gpr_latch, SX(gpr_latch));
+		LOG("ES5510: Host Write GPR latch[0] = %02x -> %06x (%d)\n", data, gpr_latch, util::sext(gpr_latch, 24));
 		break;
 
 		/* 0x03 to 0x08 INSTR Register */
@@ -434,9 +430,18 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 
 		/* 0x09 to 0x0b DIL Register (r/o) */
 
-	case 0x0c: dol_latch = (dol_latch&0x00ffff) | ((data&0xff)<<16); LOG("ES5510: Host Write DOL latch[2] = %02x -> %06x (%d)\n", data, dol_latch, SX(dol_latch)); break;
-	case 0x0d: dol_latch = (dol_latch&0xff00ff) | ((data&0xff)<< 8); LOG("ES5510: Host Write DOL latch[1] = %02x -> %06x (%d)\n", data, dol_latch, SX(dol_latch)); break;
-	case 0x0e: dol_latch = (dol_latch&0xffff00) | ((data&0xff)<< 0); LOG("ES5510: Host Write DOL latch[0] = %02x -> %06x (%d)\n", data, dol_latch, SX(dol_latch)); break; //TODO: docs says that this always returns 0xff
+	case 0x0c:
+		dol_latch = (dol_latch&0x00ffff) | ((data&0xff)<<16);
+		LOG("ES5510: Host Write DOL latch[2] = %02x -> %06x (%d)\n", data, dol_latch, util::sext(dol_latch, 24));
+		break;
+	case 0x0d:
+		dol_latch = (dol_latch&0xff00ff) | ((data&0xff)<< 8);
+		LOG("ES5510: Host Write DOL latch[1] = %02x -> %06x (%d)\n", data, dol_latch, util::sext(dol_latch, 24));
+		break;
+	case 0x0e:
+		dol_latch = (dol_latch&0xffff00) | ((data&0xff)<< 0);
+		LOG("ES5510: Host Write DOL latch[0] = %02x -> %06x (%d)\n", data, dol_latch, util::sext(dol_latch, 24));
+		break; //TODO: docs says that this always returns 0xff
 
 	case 0x0f:
 		dadr_latch = (dadr_latch&0x00ffff) | ((data&0xff)<<16);
@@ -508,7 +513,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 		break;
 
 	case 0xa0: /* Write select - GPR */
-		LOG("ES5510: Host Write GPR %02x (%s): %06x (%d)\n", data, REGNAME(data&0xff), gpr_latch, SX(gpr_latch));
+		LOG("ES5510: Host Write GPR %02x (%s): %06x (%d)\n", data, REGNAME(data&0xff), gpr_latch, util::sext(gpr_latch, 24));
 		write_reg(data, gpr_latch);
 		break;
 
@@ -525,7 +530,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 	case 0xe0: /* Write select - GPR + INSTR */
 #if VERBOSE
 		DESCRIBE_INSTR(buf, instr_latch, gpr_latch, nullptr, nullptr, nullptr, nullptr);
-		LOG("%s",string_format("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, SX(gpr_latch), buf).c_str());
+		LOG("%s",string_format("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), buf).c_str());
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch;
@@ -768,10 +773,10 @@ void es5510_device::list_program(void(p)(const char *, ...)) {
 		uint8_t cReg = (uint8_t)((instr[addr] >> 32) & 0xff);
 		uint8_t dReg = (uint8_t)((instr[addr] >> 40) & 0xff);
 		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], name[aReg], name[bReg], name[cReg], name[dReg]);
-		p("%s",string_format("%02x: %012x %06x (%8d) %s\n", addr, instr[addr], gpr[addr]&0xffffff, SX(gpr[addr]&0xffffff), buf).c_str());
+		p("%s",string_format("%02x: %012x %06x (%8d) %s\n", addr, instr[addr], gpr[addr]&0xffffff, util::sext(gpr[addr], 24), buf).c_str());
 	}
 	for (; addr < 0xc0; addr++) {
-		p("%02x: %06x (%d)\n", addr, gpr[addr]&0xffffff, SX(gpr[addr]&0xffffff));
+		p("%02x: %06x (%d)\n", addr, gpr[addr]&0xffffff, util::sext(gpr[addr], 24));
 	}
 }
 
@@ -869,7 +874,7 @@ void es5510_device::execute_run() {
 			// --- Write Multiplier result N-1
 			LOG_EXEC((". write mulacc:\n"));
 			if (mulacc.write_result) {
-				mulacc.product = ((int64_t)SX(mulacc.cValue) * (int64_t)SX(mulacc.dValue)) << mulshift;
+				mulacc.product = mul_32x32(util::sext(mulacc.cValue, 24), util::sext(mulacc.dValue, 24)) << mulshift;
 				if (mulacc.accumulate) {
 					mulacc.result = mulacc.product + machl;
 				} else {
@@ -883,7 +888,7 @@ void es5510_device::execute_run() {
 				}
 #if VERBOSE_EXEC
 				if (mulacc.cValue || mulacc.dValue || (mulacc.accumulate && machl)) {
-					LOG_EXEC((". mulacc: %x (%d) * %x (%d) << %d", SX(mulacc.cValue), SX(mulacc.cValue), SX(mulacc.dValue), SX(mulacc.dValue), mulshift));
+					LOG_EXEC((". mulacc: %x (%d) * %x (%d) << %d", (mulacc.cValue & 0x00ffffff), util::sext(mulacc.cValue, 24), (mulacc.dValue & 0x00ffffff), util::sext(mulacc.dValue, 24), mulshift));
 					if (mulacc.accumulate) LOG_EXEC((" + %llx (%lld) ", machl, machl));
 					LOG_EXEC((" = %llx (%lld)", mulacc.result, mulacc.result));
 					if (mac_overflow) {
@@ -1136,7 +1141,7 @@ void es5510_device::write_reg(uint8_t reg, int32_t value)
 			#endif
 			int64_t masked = machl & (s64(0x00ffffffU) << 24);
 			int64_t shifted = (int64_t)(value & 0x00ffffff) << 0;
-			machl = SX64(masked | shifted);
+			machl = util::sext(masked | shifted, 48);
 			#if VERBOSE_EXEC
 			LOG_EXEC(("  . writing machl: l -> %06x => %llx -> %llx\n", value, old, machl));
 			#endif
@@ -1148,7 +1153,7 @@ void es5510_device::write_reg(uint8_t reg, int32_t value)
 			#endif
 			int64_t masked = machl & (s64(0x00ffffffU) << 0);
 			int64_t shifted = (int64_t)(value & 0x00ffffff) << 24;
-			machl = SX64(masked | shifted);
+			machl = util::sext(masked | shifted, 48);
 			mac_overflow = false;
 			#if VERBOSE_EXEC
 			LOG_EXEC(("  . writing machl: h -> %06x => %llx -> %llx\n", value, old, machl));

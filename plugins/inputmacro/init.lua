@@ -97,7 +97,7 @@ function inputmacro.startplugin()
 		end
 		for key, field in pairs(previous_inputs) do
 			if not active_inputs[key] then
-				field:set_value(0)
+				field:clear_value()
 			end
 		end
 	end

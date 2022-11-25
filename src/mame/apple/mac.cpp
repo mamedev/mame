@@ -6,8 +6,9 @@
     Macintosh II family emulation
 
     TODO:
-        - V8 and friends (LC, LC2, Classic 2, Color Classic) to own driver
-        - IIvx / IIvi to own driver
+    - Move RBV machines (IIci/IIsi) to separate driver?
+    - Move IIfx to separate driver?
+    - Rewrite this driver in the newer (maclc3/maciivx/maclc) style as macii.cpp?
 
 ****************************************************************************/
 
@@ -15,10 +16,12 @@
 #include "mac.h"
 
 #include "macadb.h"
+#include "mactoolbox.h"
 
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/applepic.h"
 #include "machine/iwm.h"
@@ -80,69 +83,21 @@ void mac_state::rbv_ramdac_w(offs_t offset, uint32_t data)
 		if (m_rbv_count == 3)
 		{
 			// for portrait display, force monochrome by using the blue channel
-			if (m_model != MODEL_MAC_CLASSIC_II)
+			if (m_montype.read_safe(2) == 1)
 			{
-				// Color Classic has no MONTYPE so the default gets us 512x384, which is right
-				if (m_montype.read_safe(2) == 1)
-				{
-					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
-					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
-					m_rbv_clutoffs++;
-					m_rbv_count = 0;
-				}
-				else
-				{
-					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
-					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
-					m_rbv_clutoffs++;
-					m_rbv_count = 0;
-				}
+				m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
+				m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
+				m_rbv_clutoffs++;
+				m_rbv_count = 0;
+			}
+			else
+			{
+				m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
+				m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
+				m_rbv_clutoffs++;
+				m_rbv_count = 0;
 			}
 		}
-	}
-}
-
-void mac_state::ariel_ramdac_w(offs_t offset, uint32_t data, uint32_t mem_mask) // this is for the "Ariel" style RAMDAC
-{
-	if (mem_mask == 0xff000000)
-	{
-		m_rbv_clutoffs = data>>24;
-		m_rbv_count = 0;
-	}
-	else if (mem_mask == 0x00ff0000)
-	{
-		m_rbv_colors[m_rbv_count++] = (data>>16) & 0xff;
-
-		if (m_rbv_count == 3)
-		{
-			// for portrait display, force monochrome by using the blue channel
-			if (m_model != MODEL_MAC_CLASSIC_II)
-			{
-				// Color Classic has no MONTYPE so the default gets us 512x384, which is right
-				if (m_montype.read_safe(2) == 1)
-				{
-					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
-					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
-					m_rbv_clutoffs = (m_rbv_clutoffs + 1) & 0xff;
-					m_rbv_count = 0;
-				}
-				else
-				{
-					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
-					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
-					m_rbv_clutoffs = (m_rbv_clutoffs + 1) & 0xff;
-					m_rbv_count = 0;
-				}
-			}
-		}
-	}
-	else if (mem_mask == 0x0000ff00)
-	{
-		// config reg
-//      printf("Ariel: %02x to config\n", (data>>8)&0xff);
-	}
-	else    // color key reg
-	{
 	}
 }
 
@@ -235,22 +190,6 @@ void mac_state::mac_rbv_w(offs_t offset, uint8_t data)
 //      printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, m_maincpu->pc());
 		switch (offset)
 		{
-			case 0x00:
-				if (m_model == MODEL_MAC_LC)
-				{
-					m68000_base_device *m68k = downcast<m68000_base_device *>(m_maincpu.target());
-					m68k->set_hmmu_enable((data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_LC);
-				}
-				break;
-
-			case 0x01:
-				if (((data & 0xc0) != (m_rbv_regs[1] & 0xc0)) && (m_rbv_type == RBV_TYPE_V8))
-				{
-					m_rbv_regs[1] = data;
-					this->v8_resize();
-				}
-				break;
-
 			case 0x02:
 				data &= 0x40;
 				m_rbv_regs[offset] &= ~data;
@@ -443,43 +382,6 @@ uint8_t mac_state::maciifx_8040_r()
     ADDRESS MAPS
 ***************************************************************************/
 
-void mac_state::maclc_map(address_map &map)
-{
-	map.global_mask(0x80ffffff); // V8 uses bit 31 and 23-0 for address decoding only
-
-	map(0xa00000, 0xafffff).rom().region("bootrom", 0); // ROM (in 32-bit mode)
-
-	map(0xf00000, 0xf01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0xf04000, 0xf05fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
-	map(0xf06000, 0xf07fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
-	map(0xf10000, 0xf11fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w));
-	map(0xf12000, 0xf13fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w));
-	map(0xf14000, 0xf15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0xf16000, 0xf17fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0xf24000, 0xf24003).rw(FUNC(mac_state::rbv_ramdac_r), FUNC(mac_state::ariel_ramdac_w));
-	map(0xf26000, 0xf27fff).rw(FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w));    // VIA2 (V8)
-	map(0xf40000, 0xfbffff).ram().share("vram");
-}
-
-void mac_state::maclc3_map(address_map &map)
-{
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
-
-	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
-	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x50012000, 0x50013fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
-	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
-	map(0x50024000, 0x50025fff).w(FUNC(mac_state::ariel_ramdac_w)).mirror(0x00f00000);
-	map(0x50026000, 0x50027fff).rw(FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w)).mirror(0x00f00000);
-
-	map(0x5ffffffc, 0x5fffffff).r(FUNC(mac_state::mac_read_id));
-
-	map(0x60000000, 0x600fffff).ram().mirror(0x0ff00000).share("vram");
-}
-
 void mac_state::macii_map(address_map &map)
 {
 	map(0x40000000, 0x4003ffff).rom().region("bootrom", 0).mirror(0x0ffc0000);
@@ -555,21 +457,16 @@ void mac_state::maciifx_map(address_map &map)
 }
 
 /***************************************************************************
-    DEVICE CONFIG
-***************************************************************************/
-
-static void mac_lcpds_cards(device_slot_interface &device)
-{
-}
-
-/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
 void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_version)
 {
 	if (rtc)
+	{
 		RTC3430042(config, m_rtc, XTAL(32'768));
+		m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
+	}
 
 	switch (woz_version) {
 	case 0:
@@ -658,30 +555,6 @@ void mac_state::add_via2(machine_config &config)
 	m_via2->irq_handler().set(FUNC(mac_state::mac_via2_irq));
 }
 
-void mac_state::add_egret(machine_config &config, int type)
-{
-	EGRET(config, m_egret, type);
-	m_egret->reset_callback().set(FUNC(mac_state::cuda_reset_w));
-	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
-	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->set_mcu_mode(true);
-	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
-	config.set_perfect_quantum(m_maincpu);
-}
-
-void mac_state::add_cuda(machine_config &config, int type)
-{
-	CUDA(config, m_cuda, type);
-	m_cuda->reset_callback().set(FUNC(mac_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
-	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->set_mcu_mode(true);
-	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
-	config.set_perfect_quantum(m_maincpu);
-}
-
 void mac_state::add_asc(machine_config &config, asc_device::asc_type type)
 {
 	SPEAKER(config, "lspeaker").front_left();
@@ -735,7 +608,7 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 	{
 		M68020PMMU(config, m_maincpu, C15M);
 		m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
-		m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+		m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 	}
 
 	PALETTE(config, m_palette).set_entries(256);
@@ -749,10 +622,25 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 	add_via1_adb(config, true);
 	add_via2(config);
 
+#if MACII_USE_ADBMODEM
+	ADBMODEM(config, m_adbmodem, C7M);
+	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->irq_callback().set(FUNC(mac_state::adb_irq_w));
+	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
+	config.set_perfect_quantum(m_maincpu);
+#endif
+
 	MACADB(config, m_macadb, C15M);
+#if !MACII_USE_ADBMODEM
+	m_macadb->set_mcu_mode(false);
 	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
 	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
+#else
+	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+#endif
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
@@ -767,7 +655,7 @@ void mac_state::maciihmu(machine_config &config)
 
 	M68020HMMU(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 }
 
 void mac_state::maciihd(machine_config &config)
@@ -790,7 +678,7 @@ void mac_state::maciifx(machine_config &config)
 	/* basic machine hardware */
 	M68030(config, m_maincpu, 40000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciifx_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	add_asc(config, asc_device::asc_type::ASC);
 	add_base_devices(config, true, 1);
@@ -843,102 +731,13 @@ void mac_state::maciifx(machine_config &config)
 	nubus.out_irqe_callback().set(FUNC(mac_state::oss_interrupt<5>));
 }
 
-void mac_state::maclc(machine_config &config, bool cpu, bool egret, asc_device::asc_type asc_type, int woz_version)
-{
-	macii(config, false, asc_type, false, true, true, woz_version);
-
-	if (cpu)
-	{
-		M68020HMMU(config, m_maincpu, C15M);
-		m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc_map);
-		m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-	}
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
-	m_screen->set_size(1024, 768);
-	m_screen->set_visarea(0, 640-1, 0, 480-1);
-	m_screen->set_screen_update(FUNC(mac_state::screen_update_macv8));
-	m_screen->screen_vblank().set(FUNC(mac_state::mac_rbv_vbl));
-	config.set_default_layout(layout_monitors);
-
-	m_ram->set_default_size("2M");
-	m_ram->set_extra_options("4M,6M,8M,10M");
-
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_egadb));
-
-	add_nubus_pds(config, "lcpds", mac_lcpds_cards);
-
-	if (egret)
-	{
-		add_egret(config, EGRET_341S0850);
-	}
-}
-
-void mac_state::maclc2(machine_config &config, bool egret, int woz_version)
-{
-	maclc(config, false, egret, asc_device::asc_type::V8, woz_version);
-
-	M68030(config, m_maincpu, C15M);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("6M,8M,10M");
-}
-
-void mac_state::maccclas(machine_config &config)
-{
-	maclc(config, false, false, asc_device::asc_type::VASP, 2);
-
-	M68030(config, m_maincpu, C15M);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("6M,8M,10M");
-
-	add_cuda(config, CUDA_341S0788); // should be 0417, but that version won't sync up properly with the '030 right now
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_cdadb));
-}
-
-void mac_state::maciivx(machine_config &config)
-{
-	maclc(config, false, true, asc_device::asc_type::VASP);
-
-	M68030(config, m_maincpu, C32M);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc3_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
-
-	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbvvram));
-
-	add_nubus(config, false);
-
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M");
-
-	m_egret->set_type(EGRET_341S0851);
-}
-
-void mac_state::maciivi(machine_config &config)
-{
-	maciivx(config);
-	m_maincpu->set_clock(C15M);
-}
-
 void mac_state::maciix(machine_config &config, bool nubus_bank1, bool nubus_bank2)
 {
 	macii(config, false, asc_device::asc_type::ASC, true, nubus_bank1, nubus_bank2);
 
 	M68030(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	SWIM1(config.replace(), m_fdc, C15M);
 	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
@@ -963,7 +762,7 @@ void mac_state::macse30(machine_config &config)
 {
 	M68030(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macse30_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -977,8 +776,6 @@ void mac_state::macse30(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
-	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
-
 	add_base_devices(config, true, 1);
 	add_asc(config, asc_device::asc_type::ASC);
 	add_scsi(config);
@@ -988,10 +785,25 @@ void mac_state::macse30(machine_config &config)
 	add_via1_adb(config, false);
 	add_via2(config);
 
+#if MACII_USE_ADBMODEM
+	ADBMODEM(config, m_adbmodem, C7M);
+	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->irq_callback().set(FUNC(mac_state::adb_irq_w));
+	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
+	config.set_perfect_quantum(m_maincpu);
+#endif
+
 	MACADB(config, m_macadb, C15M);
+#if !MACII_USE_ADBMODEM
+	m_macadb->set_mcu_mode(false);
 	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
 	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
+#else
+	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+#endif
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
@@ -1000,39 +812,13 @@ void mac_state::macse30(machine_config &config)
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
-void mac_state::macclas2(machine_config &config)
-{
-	maclc(config, false, true, asc_device::asc_type::EAGLE);
-
-	M68030(config, m_maincpu, C15M);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,maceagle)
-
-	m_screen->set_size(MAC_H_TOTAL, MAC_V_TOTAL);
-	m_screen->set_visarea(0, MAC_H_VIS-1, 0, MAC_V_VIS-1);
-	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbv));
-
-	m_asc->set_type(asc_device::asc_type::EAGLE);
-
-	m_ram->set_default_size("10M");
-	m_ram->set_extra_options("2M,4M,6M,8M,10M");
-
-	m_egret->set_type(EGRET_341S0851);
-}
-
 void mac_state::maciici(machine_config &config)
 {
 	macii(config, false, asc_device::asc_type::ASC, true, false, true, 1);
 
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macrbv)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
@@ -1049,14 +835,24 @@ void mac_state::maciici(machine_config &config)
 
 void mac_state::maciisi(machine_config &config)
 {
-	macii(config, false, asc_device::asc_type::ASC, false, true, true, 1);
-
 	M68030(config, m_maincpu, 20000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macrbv)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
+	PALETTE(config, m_palette).set_entries(256);
+
+	add_asc(config, asc_device::asc_type::ASC);
+	add_base_devices(config, true, 1);
+	add_scsi(config, true);
+
+	add_via1_adb(config, true);
+	add_via2(config);
+
+	RAM(config, m_ram);
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("8M,32M,64M,96M,128M");
+
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
@@ -1069,9 +865,16 @@ void mac_state::maciisi(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,8M,16M,32M,48M,64M,128M");
 
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_egadb));
+	MACADB(config, m_macadb, C15M);
 
-	add_egret(config, EGRET_344S0100);
+	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_egadb));
+	EGRET(config, m_egret, EGRET_344S0100);
+	m_egret->reset_callback().set(FUNC(mac_state::egret_reset_w));
+	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
+	config.set_perfect_quantum(m_maincpu);
 }
 
 static INPUT_PORTS_START( macadb )
@@ -1092,14 +895,6 @@ INPUT_PORTS_END
   The Mac driver uses a convention of placing the BIOS in "bootrom"
 
 ***************************************************************************/
-
-ROM_START( maclc )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD("350eacf0.rom", 0x000000, 0x080000, CRC(71681726) SHA1(6bef5853ae736f3f06c2b4e79772f65910c3b7d4))
-
-	ROM_REGION(0x1100, "egret", 0)
-	ROM_LOAD( "341s0851.bin", 0x000000, 0x001100, CRC(ea9ea6e4) SHA1(8b0dae3ec66cdddbf71567365d2c462688aeb571) )
-ROM_END
 
 ROM_START( macii )
 	ROM_REGION32_BE(0x40000, "bootrom", 0)
@@ -1158,39 +953,6 @@ ROM_START( maciisi )
 	ROM_LOAD( "36b7fb6c.rom", 0x000000, 0x080000, CRC(f304d973) SHA1(f923de4125aae810796527ff6e25364cf1d54eec) )
 ROM_END
 
-ROM_START( maciivx )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "4957eb49.rom", 0x000000, 0x100000, CRC(61be06e5) SHA1(560ce203d65178657ad09d03f532f86fa512bb40) )
-ROM_END
-
-ROM_START( maciivi )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "4957eb49.rom", 0x000000, 0x100000, CRC(61be06e5) SHA1(560ce203d65178657ad09d03f532f86fa512bb40) )
-ROM_END
-
-ROM_START( macclas2 )
-	ROM_REGION32_BE(0x100000, "bootrom", 0) // 3193670e
-	//ROM_LOAD( "3193670e.rom", 0x000000, 0x080000, CRC(96d2e1fd) SHA1(50df69c1b6e805e12a405dc610bc2a1471b2eac2) )
-	ROM_LOAD32_BYTE( "341-0867__ba16__=c=apple_91.romhh.27c010.u25", 0x000000, 0x020000, CRC(88230887) SHA1(8f45f6d7eb6a8ec9242a46db4773af1d154409c6) )
-	ROM_LOAD32_BYTE( "341-0866__5be9__=c=apple_91.rommh.27c010.u24", 0x000001, 0x020000, CRC(eae68c36) SHA1(e6ce79647dfe7e66590a012836d0b6e985ff672b) )
-	ROM_LOAD32_BYTE( "341-0865__821e__=c=apple_91.romml.27c010.u23", 0x000002, 0x020000, CRC(cb306c01) SHA1(4d6e409995fd9a4aa9afda0fd790a5b09b1c2aca) )
-	ROM_LOAD32_BYTE( "341-0864__6fc6__=c=apple_91.romll.27c010.u22", 0x000003, 0x020000, CRC(21a51e72) SHA1(bb513c1a5b8a41c7534d66aeacaeea47f58dae92) )
-ROM_END
-
-ROM_START( maclc2 )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD32_BYTE( "341-0476_ue2-hh.bin", 0x000000, 0x020000, CRC(0c3b0ce4) SHA1(e4e8c883d7f2e002a3f7b7aefaa3840991e57025) )
-	ROM_LOAD32_BYTE( "341-0475_ud2-mh.bin", 0x000001, 0x020000, CRC(7b013595) SHA1(0b82d8fac570270db9774f6254017d28611ae756) )
-	ROM_LOAD32_BYTE( "341-0474_uc2-ml.bin", 0x000002, 0x020000, CRC(2ff2f52b) SHA1(876850df61d0233c1dd3c00d48d8d6690186b164) )
-	ROM_LOAD32_BYTE( "341-0473_ub2-ll.bin", 0x000003, 0x020000, CRC(8843c37c) SHA1(bb5104110507ca543d106f11c6061245fd90c1a7) )
-ROM_END
-
-ROM_START( maccclas )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "ecd99dc0.rom", 0x000000, 0x100000, CRC(c84c3aa5) SHA1(fd9e852e2d77fe17287ba678709b9334d4d74f1e) )
-ROM_END
-
-
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME */
 COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  MACHINE_SUPPORTS_SAVE )
 COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_SUPPORTS_SAVE )
@@ -1200,10 +962,4 @@ COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macs
 COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  MACHINE_SUPPORTS_SAVE )
 COMP( 1989, maciici,   0,        0,      maciici,  maciici, mac_state, init_maciici,       "Apple Computer", "Macintosh IIci", MACHINE_SUPPORTS_SAVE )
 COMP( 1990, maciifx,   0,        0,      maciifx,  macadb,  mac_state, init_maciifx,       "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
-COMP( 1990, maclc,     0,        0,      maclc,    maciici, mac_state, init_maclc,         "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
 COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maciisi,       "Apple Computer", "Macintosh IIsi", MACHINE_SUPPORTS_SAVE )
-COMP( 1991, macclas2,  0,        0,      macclas2, macadb,  mac_state, init_macclassic2,   "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
-COMP( 1991, maclc2,    0,        0,      maclc2,   maciici, mac_state, init_maclc2,        "Apple Computer", "Macintosh LC II",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maccclas,  0,        0,      maccclas, macadb,  mac_state, init_maclrcclassic, "Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
-COMP( 1993, maciivx,   0,        0,      maciivx,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvx", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivi,   maciivx,  0,      maciivi,  maciici, mac_state, init_maciivi,       "Apple Computer", "Macintosh IIvi", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )

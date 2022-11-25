@@ -46,7 +46,6 @@ private:
 	void k007232_extvolume_w(uint8_t data);
 	void volume_callback0(uint8_t data);
 	void volume_callback1(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(background_brt_w);
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051960_CB_MEMBER(sprite_callback);

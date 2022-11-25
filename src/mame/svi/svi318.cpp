@@ -27,6 +27,8 @@
 
 #include "formats/svi_cas.h"
 
+#include "utf8.h"
+
 
 //**************************************************************************
 //  CONSTANTS & MACROS

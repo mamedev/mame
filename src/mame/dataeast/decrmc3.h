@@ -87,8 +87,8 @@ protected:
 	virtual void device_start() override;
 
 	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return m_entries; }
-	virtual u32 palette_indirect_entries() const override { return m_indirect_entries; }
+	virtual u32 palette_entries() const noexcept override { return m_entries; }
+	virtual u32 palette_indirect_entries() const noexcept override { return m_indirect_entries; }
 
 private:
 	void update_for_write(offs_t byte_offset, int bytes_modified, bool indirect = false);

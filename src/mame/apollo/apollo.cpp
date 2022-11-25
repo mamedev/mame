@@ -139,7 +139,7 @@ std::string apollo_cpu_context(running_machine &machine) {
  apollo_set_cpu_has_fpu - enable/disable the FPU
  -------------------------------------------------*/
 
-void apollo_set_cpu_has_fpu(m68000_base_device *device, int onoff)
+void apollo_set_cpu_has_fpu(m68000_musashi_device *device, int onoff)
 {
 	if (device == nullptr || (device->type() != M68020PMMU && device->type() != M68030))
 	{
@@ -966,9 +966,6 @@ void apollo_state::init_dn3500()
 {
 //  MLOG1(("driver_init_dn3500"));
 
-	/* hook the RESET line, which resets a slew of other components */
-	m_maincpu->set_reset_callback(*this, FUNC(apollo_state::apollo_reset_instr_callback));
-
 	ram_base_address = DN3500_RAM_BASE;
 	ram_end_address = DN3500_RAM_END;
 
@@ -1050,6 +1047,7 @@ void apollo_state::dn3500(machine_config &config)
 	M68030(config, m_maincpu, 25000000); /* 25 MHz 68030 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dn3500_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
+	m_maincpu->reset_cb().set(FUNC(apollo_state::apollo_reset_instr_callback));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -1069,6 +1067,7 @@ void apollo_state::dsp3500(machine_config &config)
 	M68030(config, m_maincpu, 25000000); /* 25 MHz 68030 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp3500_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
+	m_maincpu->reset_cb().set(FUNC(apollo_state::apollo_reset_instr_callback));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	apollo_terminal(config);
@@ -1106,6 +1105,7 @@ void apollo_state::dn3000(machine_config &config)
 	M68020PMMU(config.replace(), m_maincpu, 12000000); /* 12 MHz */
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dn3000_map);
+	m_maincpu->reset_cb().set(FUNC(apollo_state::apollo_reset_instr_callback));
 	config.device_remove( APOLLO_SIO2_TAG );
 	m_ram->set_default_size("8M").set_extra_options("4M");
 
@@ -1118,6 +1118,7 @@ void apollo_state::dsp3000(machine_config &config)
 	M68020PMMU(config, m_maincpu, 12000000); /* 12 MHz */
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp3000_map);
+	m_maincpu->reset_cb().set(FUNC(apollo_state::apollo_reset_instr_callback));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	apollo_terminal(config);
@@ -1156,6 +1157,7 @@ void apollo_state::dn5500(machine_config &config)
 	dn3500(config);
 	M68040(config.replace(), m_maincpu, 25000000); /* 25 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dn5500_map);
+	m_maincpu->reset_cb().set(FUNC(apollo_state::apollo_reset_instr_callback));
 }
 
 void apollo_state::dsp5500(machine_config &config)
@@ -1163,6 +1165,7 @@ void apollo_state::dsp5500(machine_config &config)
 	M68040(config, m_maincpu, 25000000); /* 25 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp5500_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
+	m_maincpu->reset_cb().set(FUNC(apollo_state::apollo_reset_instr_callback));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	apollo_terminal(config);

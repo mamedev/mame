@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "hashing.h"
+#include "dinetwork.h"
 
 class am7990_device_base : public device_t, public device_network_interface
 {

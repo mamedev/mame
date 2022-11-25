@@ -180,7 +180,7 @@ public:
 //**************************************************************************
 
 /** handle addition between two attotimes */
-inline attotime operator+(const attotime &left, const attotime &right) noexcept
+inline constexpr attotime operator+(const attotime &left, const attotime &right) noexcept
 {
 	attotime result;
 
@@ -230,7 +230,7 @@ inline attotime &attotime::operator+=(const attotime &right) noexcept
 
 
 /** handle subtraction between two attotimes */
-inline attotime operator-(const attotime &left, const attotime &right) noexcept
+inline constexpr attotime operator-(const attotime &left, const attotime &right) noexcept
 {
 	attotime result;
 

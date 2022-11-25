@@ -32,7 +32,6 @@ TODO:
 
 #include "emu.h"
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 #include "arm7.h"
 #include "arm7core.h"   //include arm7 core
@@ -862,21 +861,21 @@ bool arm7_cpu_device::translate_vaddr_to_paddr(offs_t &vaddr, const int flags)
 	}
 }
 
-void arm7_cpu_device::translate_insn_command(const std::vector<std::string> &params)
+void arm7_cpu_device::translate_insn_command(const std::vector<std::string_view> &params)
 {
 	translate_command(params, TRANSLATE_FETCH);
 }
 
-void arm7_cpu_device::translate_data_command(const std::vector<std::string> &params)
+void arm7_cpu_device::translate_data_command(const std::vector<std::string_view> &params)
 {
 	translate_command(params, TRANSLATE_READ);
 }
 
-void arm7_cpu_device::translate_command(const std::vector<std::string> &params, int intention)
+void arm7_cpu_device::translate_command(const std::vector<std::string_view> &params, int intention)
 {
 	uint64_t vaddr;
 
-	if (!machine().debugger().commands().validate_number_parameter(params[0], vaddr)) return;
+	if (!machine().debugger().console().validate_number_parameter(params[0], vaddr)) return;
 
 	vaddr &= 0xffffffff;
 
@@ -2132,8 +2131,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
 		if (addr & 3)
 		{
 			uint32_t *wp = (uint32_t *)&ITCM[(addr & ~3)&0x7fff];
-			result = *wp;
-			result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+			result = rotr_32(*wp, 8 * (addr & 3));
 		}
 		else
 		{
@@ -2146,8 +2144,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
 		if (addr & 3)
 		{
 			uint32_t *wp = (uint32_t *)&DTCM[(addr & ~3)&0x3fff];
-			result = *wp;
-			result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+			result = rotr_32(*wp, 8 * (addr & 3));
 		}
 		else
 		{
@@ -2159,8 +2156,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
 	{
 		if (addr & 3)
 		{
-			result = m_program->read_dword(addr & ~3);
-			result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+			result = rotr_32(m_program->read_dword(addr & ~3), 8 * (addr & 3));
 		}
 		else
 		{
@@ -2330,8 +2326,7 @@ uint32_t arm7_cpu_device::arm7_cpu_read32(uint32_t addr)
 
 	if (addr & 3)
 	{
-		result = m_program->read_dword(addr & ~3);
-		result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+		result = rotr_32(m_program->read_dword(addr & ~3), 8 * (addr & 3));
 	}
 	else
 	{

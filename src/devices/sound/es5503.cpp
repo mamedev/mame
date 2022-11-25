@@ -34,6 +34,7 @@
                Conversely, the intro voice in FTA Delta Demo has swap on the even and one-shot on the odd and doesn't
                want to loop.
   2.1.3 (RB) - Fixed oscillator enable register off-by-1 which caused everything to be half a step sharp.
+  2.2 (RB) - More precise one-shot even/swap odd behavior from hardware observations with Ian Brumby's SWAPTEST.
 */
 
 #include "emu.h"
@@ -76,16 +77,16 @@ TIMER_CALLBACK_MEMBER(es5503_device::delayed_stream_update)
 }
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void es5503_device::rom_bank_updated()
+void es5503_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
 
 // halt_osc: handle halting an oscillator
-// chip = chip ptr
 // onum = oscillator #
 // type = 1 for 0 found in sample data, 0 for hit end of table size
 void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int resshift)
@@ -117,14 +118,35 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 		*accumulator = altram << resshift;
 	}
 
-	// if we're in swap mode or we're the even oscillator and the partner is in swap mode,
-	// start the partner.
-	if ((mode == MODE_SWAP) || ((partnerMode == MODE_SWAP) && ((onum & 1)==0)))
+	// if we're in swap mode, start the partner
+	if (mode == MODE_SWAP)
 	{
 		pPartner->control &= ~1;    // clear the halt bit
 		pPartner->accumulator = 0;  // and make sure it starts from the top (does this also need phase preservation?)
 	}
+	else
+	{
+		// if we're not swap and we're the even oscillator of the pair and the partner's swap
+		// but we aren't, we retrigger (!!!)  Verified on IIgs hardware.
+		if ((partnerMode == MODE_SWAP) && ((onum & 1)==0))
+		{
+			pOsc->control &= ~1;
 
+			// preserve the phase in this case too
+			uint16_t wtsize = pOsc->wtsize - 1;
+			uint32_t altram = (*accumulator) >> resshift;
+			if (altram > wtsize)
+			{
+				altram -= wtsize;
+			}
+			else
+			{
+				altram = 0;
+			}
+
+			*accumulator = altram << resshift;
+		}
+	}
 	// IRQ enabled for this voice?
 	if (pOsc->control & 0x08)
 	{
@@ -396,7 +418,7 @@ void es5503_device::write(offs_t offset, u8 data)
 				break;
 
 			case 0xa0:  // oscillator control
-				// if a fresh key-on, reset the accumulator
+				// key on?
 				if ((oscillators[osc].control & 1) && (!(data&1)))
 				{
 					oscillators[osc].accumulator = 0;

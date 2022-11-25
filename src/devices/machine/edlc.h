@@ -7,6 +7,7 @@
 #pragma once
 
 #include "machine/bankdev.h"
+#include "dinetwork.h"
 
 class seeq8003_device :
 	public device_t,

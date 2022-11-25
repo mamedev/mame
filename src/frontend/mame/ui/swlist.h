@@ -93,6 +93,7 @@ private:
 
 	// functions
 	void append_software_entry(const software_info &swinfo);
+	void update_search(void *selectedref);
 };
 
 

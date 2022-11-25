@@ -45,7 +45,6 @@ K051316_CB_MEMBER(chqflag_state::zoom_callback_2)
 {
 	enum { zoom_colorbase_2 = 512 / 256 };
 
-	*flags = TILE_FLIPYX((*color & 0xc0) >> 6);
 	*code |= ((*color & 0x0f) << 8);
 	*color = zoom_colorbase_2 + ((*color & 0x10) >> 4);
 }

@@ -2,7 +2,7 @@
 // copyright-holders:Guru, Scott Stone
 /***************************************************************************
 
-Konami Python/2 Hardware Overview
+Konami Python Hardware Overview
 Konami 2001-2005
 
 This system uses a standard GH-006 PS2 main board (the older Playstation 2 square type) with a
@@ -23,6 +23,7 @@ Game Title                                          Label     Label             
 *Baseball Heroes 2005
 *Battle Climaxx!
 *Battle Climaxx! 2
+*Dancing Stage Fusion
 *Dog Station
 *Dog Station Deluxe
 *Hawaiian De Golf
@@ -32,7 +33,12 @@ Game Title                                          Label     Label             
 *Paintball Mania
 *Perfect Pool
 *Pool Pocket Fortunes
-Pop'n Music 9
+pop'n music 9
+*pop'n music 10
+*pop'n music 11
+*pop'n music 12 Iroha
+*pop'n music 13 Carnival
+*pop'n music 14 FEVER!
 *Pro Evolution Soccer The Arcade                    C18EAA03  not used             KN00002   Labels from partial dump (just the CF)
 *R.P.M. Red
 World Soccer Winning Eleven Arcade Game Style       C18JAA03  DIN5 dongle GCC27JA  KN00002
@@ -151,8 +157,7 @@ Notes:
      6PIN_JVS  /
 
     TODO:
-        More undumped games for Python/2?
-        Python 2 is based on consumer PS2, can be derived with ps2sony.cpp?
+        More undumped games for Python?
         Everything
 
 ***************************************************************************/
@@ -341,5 +346,3 @@ GAME(2002, pesta,      kpython,   kpython,   kpython, kpython_state, empty_init,
 GAME(2002, wswe,       kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
 GAME(2003, wswe2k3,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003",  MACHINE_IS_SKELETON)
 GAME(2003, popn9,      kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Pop'n Music 9 (ver JAB)",                       MACHINE_IS_SKELETON)
-
-// Konami Python 2 (Customized? PS2 SCPH-50000)

@@ -452,12 +452,12 @@ license:CC0
 		<element ref="text_ent">   <bounds x="65.25" y="11" width="5" height="1.5" />  </element>
 		<element ref="text_res">   <bounds x="74.25" y="11" width="5" height="1.5" />  </element>
 
-		<element ref="text_p6">    <bounds x="11.9" y="4.75"  width="1.7" height="1.7" />  </element>
-		<element ref="text_p5">    <bounds x="20.9" y="4.75"  width="1.7" height="1.7" />  </element>
-		<element ref="text_p4">    <bounds x="29.9" y="4.75"  width="1.7" height="1.7" />  </element>
-		<element ref="text_p3">    <bounds x="38.9" y="4.75"  width="1.7" height="1.7" />  </element>
-		<element ref="text_p2">    <bounds x="47.9" y="4.75"  width="1.7" height="1.7" />  </element>
-		<element ref="text_p1">    <bounds x="56.9" y="4.75"  width="1.7" height="1.7" />  </element>
+		<element ref="text_p6">    <bounds x="11.9" y="4.8"  width="1.7" height="1.7" />  </element>
+		<element ref="text_p5">    <bounds x="20.9" y="4.8"  width="1.7" height="1.7" />  </element>
+		<element ref="text_p4">    <bounds x="29.9" y="4.8"  width="1.7" height="1.7" />  </element>
+		<element ref="text_p3">    <bounds x="38.9" y="4.8"  width="1.7" height="1.7" />  </element>
+		<element ref="text_p2">    <bounds x="47.9" y="4.8"  width="1.7" height="1.7" />  </element>
+		<element ref="text_p1">    <bounds x="56.9" y="4.8"  width="1.7" height="1.7" />  </element>
 
 		<element ref="pmask" blend="multiply"><bounds x="0" y="-0.5" width="80" height="13.5" /></element>
 		<element ref="background" blend="add"><bounds x="0" y="-0.5" width="80" height="13.5" /></element>

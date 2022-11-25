@@ -16,6 +16,7 @@
 
 #include "corestr.h"
 #include "coreutil.h"
+#include "path.h"
 
 #include "osdepend.h"
 #include "uismall.fh"

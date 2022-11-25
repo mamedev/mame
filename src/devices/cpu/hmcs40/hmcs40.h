@@ -147,13 +147,13 @@ protected:
 	u16 m_polarity;     // i/o polarity (pmos vs cmos)
 	int m_stack_levels; // number of callstack levels
 	u16 m_stack[4];     // max 4
-	int m_sp;           // internal 'stackpointer'
 	u16 m_op;           // current opcode
 	u16 m_prev_op;
 	u8 m_i;             // 4-bit immediate opcode param
 	int m_eint_line;    // which input_line caused an interrupt
 	int m_halt;         // internal HLT state
 	u8 m_prescaler;     // internal timer prescaler
+	bool m_block_int;   // block interrupt on next cycle
 
 	u16 m_pc;           // Program Counter
 	u16 m_prev_pc;
@@ -188,7 +188,6 @@ protected:
 
 	u8 ram_r();
 	void ram_w(u8 data);
-	void exc_stack();
 	void pop_stack();
 	void push_stack();
 

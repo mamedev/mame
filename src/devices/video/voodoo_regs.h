@@ -806,8 +806,6 @@ private:
 class voodoo_regs
 {
 public:
-	static constexpr s32 s24(s32 value) { return s32(value << 8) >> 8; }
-
 	// 0x000
 	static constexpr u32 reg_vdstatus =        0x000/4;   // R  P
 	static constexpr u32 reg_intrCtrl =        0x004/4;   // RW P   -- Voodoo2/Banshee only
@@ -1028,26 +1026,26 @@ public:
 	s32 by() const { return s16(m_regs[reg_vertexBy].u); }
 	s32 cx() const { return s16(m_regs[reg_vertexCx].u); }
 	s32 cy() const { return s16(m_regs[reg_vertexCy].u); }
-	s32 start_r() const { return s24(m_regs[reg_startR].u); }
-	s32 start_g() const { return s24(m_regs[reg_startG].u); }
-	s32 start_b() const { return s24(m_regs[reg_startB].u); }
-	s32 start_a() const { return s24(m_regs[reg_startA].u); }
+	s32 start_r() const { return util::sext(m_regs[reg_startR].u, 24); }
+	s32 start_g() const { return util::sext(m_regs[reg_startG].u, 24); }
+	s32 start_b() const { return util::sext(m_regs[reg_startB].u, 24); }
+	s32 start_a() const { return util::sext(m_regs[reg_startA].u, 24); }
 	s32 start_z() const { return m_regs[reg_startZ].u; }
 	s64 start_s() const { return m_starts; }
 	s64 start_t() const { return m_startt; }
 	s64 start_w() const { return m_startw; }
-	s32 dr_dx() const { return s24(m_regs[reg_dRdX].u); }
-	s32 dg_dx() const { return s24(m_regs[reg_dGdX].u); }
-	s32 db_dx() const { return s24(m_regs[reg_dBdX].u); }
-	s32 da_dx() const { return s24(m_regs[reg_dAdX].u); }
+	s32 dr_dx() const { return util::sext(m_regs[reg_dRdX].u, 24); }
+	s32 dg_dx() const { return util::sext(m_regs[reg_dGdX].u, 24); }
+	s32 db_dx() const { return util::sext(m_regs[reg_dBdX].u, 24); }
+	s32 da_dx() const { return util::sext(m_regs[reg_dAdX].u, 24); }
 	s32 dz_dx() const { return m_regs[reg_dZdX].u; }
 	s64 ds_dx() const { return m_dsdx; }
 	s64 dt_dx() const { return m_dtdx; }
 	s64 dw_dx() const { return m_dwdx; }
-	s32 dr_dy() const { return s24(m_regs[reg_dRdY].u); }
-	s32 dg_dy() const { return s24(m_regs[reg_dGdY].u); }
-	s32 db_dy() const { return s24(m_regs[reg_dBdY].u); }
-	s32 da_dy() const { return s24(m_regs[reg_dAdY].u); }
+	s32 dr_dy() const { return util::sext(m_regs[reg_dRdY].u, 24); }
+	s32 dg_dy() const { return util::sext(m_regs[reg_dGdY].u, 24); }
+	s32 db_dy() const { return util::sext(m_regs[reg_dBdY].u, 24); }
+	s32 da_dy() const { return util::sext(m_regs[reg_dAdY].u, 24); }
 	s32 dz_dy() const { return m_regs[reg_dZdY].u; }
 	s64 ds_dy() const { return m_dsdy; }
 	s64 dt_dy() const { return m_dtdy; }

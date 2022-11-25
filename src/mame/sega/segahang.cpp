@@ -334,7 +334,7 @@ void segahang_state::machine_reset()
 TIMER_CALLBACK_MEMBER(segahang_state::i8751_sync)
 {
 	if (m_mcu != nullptr)
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
+		machine().scheduler().perfect_quantum(attotime::from_msec(10));
 }
 
 TIMER_CALLBACK_MEMBER(segahang_state::ppi_sync)

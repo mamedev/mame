@@ -6,7 +6,6 @@ license:CC0
 
 <softwarelist name="tntell" description="Touch &amp; Tell modules">
 
-
 	<software name="alphabet">
 		<description>Alphabet Fun</description>
 		<year>1981</year>
@@ -90,6 +89,5 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>

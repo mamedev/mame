@@ -179,7 +179,7 @@ void vt100_state::nvr_latch_w(u8 data)
 	m_nvr->c1_w(!BIT(data, 1));
 
 	// C2 is used to disable pullup on data line
-	m_nvr->data_w(BIT(data, 2) ? 0 : !BIT(data, 0));
+	m_nvr->data_w(BIT(data, 2) ? 1 : !BIT(data, 0));
 
 	// SPDS present on pins 11, 19 and 23 of EIA connector
 	m_rs232->write_spds(BIT(data, 5));

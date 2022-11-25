@@ -37,7 +37,7 @@ public:
 		, m_mcu_ram(*this, "mcu_ram")
 	{ }
 
-	virtual void driver_init() override;
+	void driver_init();
 	void common(machine_config &config);
 	void _40love(machine_config &config);
 	void undoukai(machine_config &config);
