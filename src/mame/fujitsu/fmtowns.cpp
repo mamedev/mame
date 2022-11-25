@@ -894,10 +894,11 @@ void towns_state::towns_sound_ctrl_w(offs_t offset, uint8_t data)
 }
 
 // Controller ports
-// Joysticks are multiplexed, with fire buttons available when bits 0 and 1 of port 0x4d6 are high. (bits 2 and 3 for second port?)
-TIMER_CALLBACK_MEMBER(towns_state::mouse_timeout)
+// Joysticks are multiplexed, with fire buttons available when bits 0 and 1 of port 0x4d6 are high. (bits 2 and 3 for second port)
+uint8_t towns_state::towns_padport_r(offs_t offset)
 {
-	m_towns_mouse_output = MOUSE_START;  // reset mouse data
+	unsigned const pad = BIT(offset, 1);
+	return m_pad_ports[pad]->read() & (0x8f | (bitswap<3>(m_towns_pad_mask, pad + 4, (pad * 2) + 1, pad * 2) << 4));
 }
 
 uint8_t towns_state::towns_padport_r(offs_t offset)
@@ -2832,6 +2833,10 @@ void towns_state::towns_base(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	//MCFG_MACHINE_RESET_OVERRIDE(towns_state,towns)
+
+	/* pad ports */
+	MSX_GENERAL_PURPOSE_PORT(config, m_pad_ports[0], msx_general_purpose_port_devices, "townspad");
+	MSX_GENERAL_PURPOSE_PORT(config, m_pad_ports[1], msx_general_purpose_port_devices, "mouse");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

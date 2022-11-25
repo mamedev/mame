@@ -10,10 +10,9 @@
 #include "mouse.h"
 
 
-DEFINE_DEVICE_TYPE(MSX_MOUSE, msx_mouse_device, "msx_mouse", "MSX Mouse")
+namespace {
 
-
-static INPUT_PORTS_START(msx_mouse)
+INPUT_PORTS_START(msx_mouse)
 	PORT_START("BUTTONS")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)
@@ -26,10 +25,33 @@ static INPUT_PORTS_START(msx_mouse)
 	PORT_BIT(0xffff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(50)
 INPUT_PORTS_END
 
-ioport_constructor msx_mouse_device::device_input_ports() const
+
+class msx_mouse_device : public device_t, public device_msx_general_purpose_port_interface
 {
-	return INPUT_PORTS_NAME(msx_mouse);
-}
+public:
+	msx_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read() override;
+	virtual void pin_8_w(int state) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(msx_mouse); }
+
+private:
+	required_ioport m_buttons;
+	required_ioport m_port_mouse_x;
+	required_ioport m_port_mouse_y;
+	u16 m_data;
+	u8 m_stat;
+	u8 m_old_pin8;
+	s16 m_mouse_x;
+	s16 m_mouse_y;
+	attotime m_last_pin8_change;
+	attotime m_timeout;
+};
 
 msx_mouse_device::msx_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_MOUSE, tag, owner, clock)
@@ -48,7 +70,7 @@ void msx_mouse_device::device_start()
 	save_item(NAME(m_last_pin8_change));
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
-	m_timeout =	attotime::from_msec(3);
+	m_timeout = attotime::from_msec(3);
 }
 
 void msx_mouse_device::device_reset()
@@ -91,3 +113,8 @@ void msx_mouse_device::pin_8_w(int state)
 	}
 	m_old_pin8 = state;
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_MOUSE, device_msx_general_purpose_port_interface, msx_mouse_device, "msx_mouse", "MSX Mouse")

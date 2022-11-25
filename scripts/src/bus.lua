@@ -1800,14 +1800,18 @@ end
 ---------------------------------------------------
 
 if (BUSES["MSX_CTRL"]~=null) then
-    files {
-        MAME_DIR .. "src/devices/bus/msx/ctrl/ctrl.cpp",
-        MAME_DIR .. "src/devices/bus/msx/ctrl/ctrl.h",
-        MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.cpp",
-        MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.h",
-        MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.cpp",
-        MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.h",
-    }
+	files {
+		MAME_DIR .. "src/devices/bus/msx/ctrl/ctrl.cpp",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/ctrl.h",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.h",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.h",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/towns6b.cpp",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/towns6b.h",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/townspad.cpp",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/townspad.h",
+	}
 end
 
 ---------------------------------------------------
