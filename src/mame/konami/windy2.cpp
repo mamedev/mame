@@ -2,6 +2,38 @@
 // copyright-holders:windyfairy
 /*
  * Konami Windy2 I/O (JVS)
+ *
+ * Main PCB Layout
+ * ---------------
+ * PWB405270B
+ * (C)1997 KONAMI CO.,LTD.
+ * |------------------------------------------|
+ * |    CN1         CN2                 CN3   |
+ * |                                          |
+ * |                                          |
+ * |                                          |
+ * |  CN6    CN5             JP3 JP4   CN4    |
+ * |                                          |
+ * |               DIPSW8P                    |
+ * |                                          |
+ * |                                          |
+ * |                         SP485        B   |
+ * |                                          |
+ * |                                          |
+ * |7.378MHZ H8                           A   |
+ * |                                          |
+ * |------------------------------------------|
+ *
+ * CN1 - 12-pin connector (for Player 1)
+ * CN2 - 12-pin connector (for Player 2)
+ * CN3 - 8-pin connector
+ * CN4 - 8-pin connector
+ * CN5 - 4-pin connector
+ * CN6 - 6-pin Power Connector
+ * H8 - Hitachi H8/3644 microcontroller labeled '707 V2 31484'
+ * SP485 - 9619 LTC485 CN8 Low Power RS485 Interface Transceiver
+ * A - USB-A connector
+ * B - USB-B connector
  */
 
 #include "emu.h"

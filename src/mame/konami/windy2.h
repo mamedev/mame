@@ -18,6 +18,7 @@ public:
 	enum : uint8_t {
 		// Corresponds to positions on DIPSW8 that controls panel type
 		PANEL_2L6B  = 0b00000010, // "Windy II Standard" 2L6B Panel (2x 1L3B)
+		//PANEL_MAHJONG  = 0b11111111, // Mahjong Panel (23B) (GU707-JA), dipswitch setting unknown
 		PANEL_QUIZ  = 0b00000000, // Quiz Panel (4B) (GU707-JB)
 		PANEL_2L8B  = 0b00000011, // 2L8B Panel (2x 1L4B) (GU707-JC)
 		PANEL_1L6B  = 0b10010101, // 1L6B Panel (GU707-JD)
