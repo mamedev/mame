@@ -285,6 +285,7 @@ uint8_t pc88va_state::hdd_status_r()
 	return 0x20;
 }
 
+#if 0
 uint8_t pc88va_state::pc88va_fdc_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
@@ -302,7 +303,9 @@ uint8_t pc88va_state::pc88va_fdc_r(offs_t offset)
 
 	return 0xff;
 }
+#endif
 
+#if 0
 TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
 {
 	if(m_xtmask)
@@ -321,26 +324,9 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_1)
 {
 	m_fdd[1]->get_device()->mon_w(0);
 }
+#endif
 
 #if 0
-void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
-{
-	bool ready = m_fdc_ctrl_2 & 0x40;
-
-	floppy_image_device *floppy;
-	floppy = m_fdd[0]->get_device();
-	if(floppy && ready)
-		ready = floppy->ready_r();
-
-	floppy = m_fdd[1]->get_device();
-	if(floppy && ready)
-		ready = floppy->ready_r();
-
-	m_fdc->ready_w(ready);
-}
-
-#else
-
 void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 {
 	if (!BIT(m_fdc_ctrl_2, 5))
@@ -372,6 +358,7 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 
 #endif
 
+#if 0
 void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 {
 	switch(offset << 1)
@@ -521,7 +508,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 		}
 	}
 }
-
+#endif
 
 uint16_t pc88va_state::sysop_r()
 {
@@ -577,10 +564,12 @@ void pc88va_state::sys_port1_w(uint8_t data)
 }
 
 #if !TEST_SUBFDC
+#if 0
 uint8_t pc88va_state::no_subfdc_r()
 {
 	return machine().rand();
 }
+#endif
 #endif
 
 uint8_t pc88va_state::misc_ctrl_r()
@@ -630,11 +619,7 @@ void pc88va_state::pc88va_io_map(address_map &map)
 //  map(0x00e6, 0x00e6) 8214 IRQ mask (*)
 //  map(0x00e8, 0x00e9) ? (*)
 //  map(0x00ec, 0x00ed) ? (*)
-	#if TEST_SUBFDC
-	map(0x00fc, 0x00ff).rw("d8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // d8255 2, FDD
-	#else
-	map(0x00fc, 0x00ff).r(FUNC(pc88va_state::no_subfdc_r)).nopw();
-	#endif
+	map(0x00fc, 0x00ff).m(m_fd_if, FUNC(pc88va2_fd_if_device::host_map));
 
 	map(0x0100, 0x0101).rw(FUNC(pc88va_state::screen_ctrl_r), FUNC(pc88va_state::screen_ctrl_w)); // Screen Control Register
 	map(0x0102, 0x0103).w(FUNC(pc88va_state::gfx_ctrl_w));
@@ -670,8 +655,9 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0x019a, 0x019b).w(FUNC(pc88va_state::backupram_wp_0_w)); //Backup RAM write permission
 //  map(0x01a0, 0x01a7) V50 TCU
 	map(0x01a8, 0x01a8).w(FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
-	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff);// FDC related (765)
-	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0x01b0, 0x01bb).m(m_fd_if, FUNC(pc88va2_fd_if_device::host_io));
+//	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff);// FDC related (765)
+//	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 //  map(0x01c0, 0x01c1) keyboard scan code, polled thru IRQ1 ...
 	map(0x01c1, 0x01c1).lr8(NAME([this] () { return m_keyb.data; }));
 	map(0x01c6, 0x01c7).nopw(); // ???
@@ -687,10 +673,12 @@ void pc88va_state::pc88va_io_map(address_map &map)
 	map(0xff00, 0xffff).noprw(); // CPU internal use
 }
 
+#if 0
 TIMER_CALLBACK_MEMBER(pc88va_state::pc8801fd_upd765_tc_to_zero)
 {
 	m_fdc->tc_w(false);
 }
+#endif
 
 /* FDC subsytem CPU */
 #if TEST_SUBFDC
@@ -1100,20 +1088,21 @@ void pc88va_state::machine_start()
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
-	m_tc_clear_timer = timer_alloc(FUNC(pc88va_state::pc8801fd_upd765_tc_to_zero), this);
-	m_tc_clear_timer->adjust(attotime::never);
+//	m_tc_clear_timer = timer_alloc(FUNC(pc88va_state::pc8801fd_upd765_tc_to_zero), this);
+//	m_tc_clear_timer->adjust(attotime::never);
 
-	m_fdc_timer = timer_alloc(FUNC(pc88va_state::pc88va_fdc_timer), this);
-	m_fdc_timer->adjust(attotime::never);
+//	m_fdc_timer = timer_alloc(FUNC(pc88va_state::pc88va_fdc_timer), this);
+//	m_fdc_timer->adjust(attotime::never);
 
-	m_motor_start_timer[0] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_0), this);
-	m_motor_start_timer[1] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_1), this);
-	m_motor_start_timer[0]->adjust(attotime::never);
-	m_motor_start_timer[1]->adjust(attotime::never);
+//	m_motor_start_timer[0] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_0), this);
+//	m_motor_start_timer[1] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_1), this);
+//	m_motor_start_timer[0]->adjust(attotime::never);
+//	m_motor_start_timer[1]->adjust(attotime::never);
 
 	m_t3_mouse_timer = timer_alloc(FUNC(pc88va_state::t3_mouse_callback), this);
 	m_t3_mouse_timer->adjust(attotime::never);
 
+	#if 0
 	floppy_image_device *floppy;
 	floppy = m_fdd[0]->get_device();
 	if(floppy)
@@ -1126,6 +1115,7 @@ void pc88va_state::machine_start()
 	m_fdd[0]->get_device()->set_rpm(300);
 	m_fdd[1]->get_device()->set_rpm(300);
 	m_fdc->set_rate(250000);
+	#endif
 }
 
 void pc88va_state::machine_reset()
@@ -1142,9 +1132,9 @@ void pc88va_state::machine_reset()
 
 	m_tsp.tvram_vreg_offset = 0;
 
-	m_fdc_mode = 0;
-	m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
-	m_xtmask = false;
+//	m_fdc_mode = 0;
+//	m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
+//	m_xtmask = false;
 
 	#if TEST_SUBFDC
 	m_fdccpu->set_input_line_vector(0, 0); // Z80
@@ -1162,6 +1152,7 @@ INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 
+#if 0
 WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 {
 	if(m_fdc_mode)
@@ -1176,23 +1167,31 @@ WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 		m_fdccpu->set_input_line(0, HOLD_LINE);
 	#endif
 }
+#endif
 
+#if 0
 WRITE_LINE_MEMBER( pc88va_state::tc_w )
 {
 	m_fdc->tc_w(state);
 }
+#endif
 
+#if 0
+// TODO: move me in fd_if
 void pc88va_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_XDF_FORMAT);
 	fr.add(FLOPPY_PC98FDI_FORMAT);
 }
+#endif
 
+#if 0
 static void pc88va_floppies(device_slot_interface &device)
 {
 	device.option_add("525hd", FLOPPY_525_HD);
 }
+#endif
 
 // TODO: often dies
 // shinraba doesn't even unmask the irq not even in sound test wtf
@@ -1223,11 +1222,11 @@ void pc88va_state::pc88va(machine_config &config)
 //  m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
 	// ch2 is FDC, ch0/3 are "user". ch1 is unused
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
-	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
-	m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
-	m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_maincpu->out_eop_cb().set([this] (int state) { m_fd_if->tc_w(state); } );
+	m_maincpu->in_ior_cb<2>().set([this] () { return m_fd_if->dack_r(); } );
+	m_maincpu->out_iow_cb<2>().set([this] (u8 data) { m_fd_if->dack_w(data); } );
 	m_maincpu->in_memr_cb().set([this] (offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); });
-	m_maincpu->out_memw_cb().set([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
+	m_maincpu->out_memw_cb().set([this] (offs_t offset, u8 data) { printf("%08x %02x\n",offset, data); m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
 
 #if TEST_SUBFDC
 	z80_device &fdccpu(Z80(config, "fdccpu", 4000000));        /* 8 MHz */
@@ -1277,11 +1276,19 @@ void pc88va_state::pc88va(machine_config &config)
 	m_pic2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
 	m_pic2->in_sp_callback().set_constant(0);
 
+	PC88VA2_FD_IF(config, m_fd_if, MASTER_CLOCK);
+	config.set_perfect_quantum(m_maincpu);
+	config.set_perfect_quantum("fd_if:fdc_cpu");
+	m_fd_if->int_wr_callback().set([this] (int state) { if (state) { m_pic2->ir3_w(0); m_pic2->ir3_w(1); } } );
+	m_fd_if->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>));
+
+#if 0
 	UPD765A(config, m_fdc, 4000000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pc88va_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>));
 	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);
+#endif
 	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
 
 	UPD4990A(config, m_rtc);

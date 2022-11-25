@@ -22,15 +22,13 @@
 #include "machine/upd765.h"
 #include "machine/bankdev.h"
 #include "machine/upd1990a.h"
+#include "pc80s31k.h"
 #include "sound/ymopn.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
-
-#include "formats/pc98fdi_dsk.h"
-#include "formats/xdf_dsk.h"
 
 // TODO: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway.
 //       the whole FDC device should be converted (it's also used by PC-9801)
@@ -45,8 +43,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_fdc(*this, "upd765")
-		, m_fdd(*this, "upd765:%u", 0U)
+		, m_fd_if(*this, "fd_if")
+//		, m_fdc(*this, "upd765")
+//		, m_fdd(*this, "upd765:%u", 0U)
 		, m_pic2(*this, "pic8259_slave")
 		, m_rtc(*this, "rtc")
 		, m_opna(*this, "opna")
@@ -98,8 +97,9 @@ private:
 
 	required_device<v50_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<upd765a_device> m_fdc;
-	required_device_array<floppy_connector, 2> m_fdd;
+	required_device<pc88va2_fd_if_device> m_fd_if;
+//	required_device<upd765a_device> m_fdc;
+//	required_device_array<floppy_connector, 2> m_fdd;
 //  required_device<am9517a_device> m_dmac;
 //  required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
@@ -123,8 +123,8 @@ private:
 
 	// FDC
 	emu_timer *m_tc_clear_timer = nullptr;
-	emu_timer *m_fdc_timer = nullptr;
-	emu_timer *m_motor_start_timer[2]{};
+//	emu_timer *m_fdc_timer = nullptr;
+//	emu_timer *m_motor_start_timer[2]{};
 
 	uint8_t cpu_8255_c_r();
 	void cpu_8255_c_w(uint8_t data);
@@ -132,28 +132,28 @@ private:
 	void fdc_8255_c_w(uint8_t data);
 	uint8_t m_i8255_0_pc = 0;
 	uint8_t m_i8255_1_pc = 0;
-	uint8_t m_fdc_mode = 0;
+//	uint8_t m_fdc_mode = 0;
 	uint8_t m_fdc_irq_opcode = 0;
-	uint8_t m_fdc_ctrl_2 = 0;
-	bool m_xtmask = false;
-	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
+//	uint8_t m_fdc_ctrl_2 = 0;
+//	bool m_xtmask = false;
+//	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
 	TIMER_CALLBACK_MEMBER(t3_mouse_callback);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
+//	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
+//	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
+//	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
+//	DECLARE_WRITE_LINE_MEMBER(tc_w);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	static void floppy_formats(format_registration &fr);
-	void pc88va_fdc_update_ready(floppy_image_device *, int);
+//	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+//	static void floppy_formats(format_registration &fr);
+//	void pc88va_fdc_update_ready(floppy_image_device *, int);
 	#if TEST_SUBFDC
 	uint8_t upd765_tc_r();
 	void upd765_mc_w(uint8_t data);
 	#else
-	uint8_t no_subfdc_r();
+//	uint8_t no_subfdc_r();
 	#endif
-	uint8_t pc88va_fdc_r(offs_t offset);
-	void pc88va_fdc_w(offs_t offset, uint8_t data);
+//	uint8_t pc88va_fdc_r(offs_t offset);
+//	void pc88va_fdc_w(offs_t offset, uint8_t data);
 
 	uint16_t bios_bank_r();
 	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
