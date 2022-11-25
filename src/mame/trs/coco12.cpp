@@ -177,17 +177,6 @@ INPUT_PORTS_START( coco_beckerport_dw )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ))
 INPUT_PORTS_END
 
-//-------------------------------------------------
-//  INPUT_PORTS( coco_rtc )
-//-------------------------------------------------
-
-INPUT_PORTS_START( coco_rtc )
-	PORT_START("real_time_clock")
-	PORT_CONFNAME( 0x03, 0x00, "Real Time Clock" )
-	PORT_CONFSETTING(    0x00, "Disto" )
-	PORT_CONFSETTING(    0x01, "Cloud-9" )
-INPUT_PORTS_END
-
 
 
 //-------------------------------------------------
@@ -285,7 +274,6 @@ static INPUT_PORTS_START( coco )
 	PORT_INCLUDE( coco_keyboard )
 	PORT_INCLUDE( coco_joystick )
 	PORT_INCLUDE( coco_analog_control )
-	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport )
 INPUT_PORTS_END
 
@@ -387,7 +375,6 @@ static INPUT_PORTS_START( cp400c2 )
 	PORT_INCLUDE( cp400c2_keyboard )
 	PORT_INCLUDE( coco_joystick )
 	PORT_INCLUDE( coco_analog_control )
-	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport )
 INPUT_PORTS_END
 
