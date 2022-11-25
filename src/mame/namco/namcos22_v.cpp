@@ -861,12 +861,20 @@ void namcos22_state::draw_direct_poly(const u16 *src)
 			p->v = src[1] & 0x0fff;
 		}
 
-		int mantissa = src[5] & 0x7fff;
-		int exponent = (src[4]) & 0x3f;
+		int mantissa = src[5];
+		int exponent = src[4] & 0x3f;
+
 		if (mantissa)
-			p->z = dspfloat_to_nativefloat(exponent << 16 | mantissa);
+		{
+			p->z = mantissa;
+			while (exponent < 0x2e)
+			{
+				p->z /= 2.00f;
+				exponent++;
+			}
+		}
 		else
-			p->z = (float)0x7fff;
+			p->z = (float)0x10000;
 
 		p->x = (s16)src[2];
 		p->y = -(s16)src[3];
@@ -881,6 +889,15 @@ void namcos22_state::draw_direct_poly(const u16 *src)
 	node->data.quad.vd = -240;
 	node->data.quad.vl = -320;
 	node->data.quad.vr = -320;
+	return;
+
+	// s22 testmode expects:
+	node->data.quad.vx = -320;
+	node->data.quad.vy = -240;
+	node->data.quad.vu = 0;
+	node->data.quad.vd = -480;
+	node->data.quad.vl = 0;
+	node->data.quad.vr = -640;
 }
 
 /**
