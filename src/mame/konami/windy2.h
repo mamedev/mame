@@ -4,8 +4,8 @@
  * Konami Windy2 I/O (JVS)
  *
  */
-#ifndef MAME_MACHINE_WINDY2_H
-#define MAME_MACHINE_WINDY2_H
+#ifndef MAME_KONAMI_WINDY2_H
+#define MAME_KONAMI_WINDY2_H
 
 #pragma once
 
@@ -40,8 +40,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	template <uint8_t First> void set_port_tags() { }
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -64,4 +62,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO, windy2_device)
 
-#endif // MAME_MACHINE_WINDY2_H
+#endif // MAME_KONAMI_WINDY2_H
