@@ -28,6 +28,7 @@
 #define SAM_TAG         "sam"
 #define VDG_TAG         "vdg"
 #define ACIA_TAG        "acia"
+#define PORT_TAG        "uart"
 #define PSG_TAG         "psg"
 
 

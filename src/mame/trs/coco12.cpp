@@ -47,7 +47,6 @@ void coco12_state::coco_mem(address_map &map)
 	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
 }
 
-
 void coco12_state::coco_ram(address_map &map)
 {
 	// mapped by configure_sam
@@ -576,12 +575,12 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 	m_ram->set_default_size("64K");
 
 	// Asynchronous Communications Interface Adapter
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, ACIA_TAG, 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
-	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	acia.txd_handler().set(PORT_TAG, FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232_port_device &rs232(RS232_PORT(config, PORT_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(acia, FUNC(mos6551_device::write_rxd));
 	rs232.dcd_handler().set(acia, FUNC(mos6551_device::write_dcd));
 	rs232.dsr_handler().set(acia, FUNC(mos6551_device::write_dsr));
