@@ -2,12 +2,12 @@
 // copyright-holders:tim lindner
 /***************************************************************************
 
-	coco_ram.cpp
+    coco_ram.cpp
 
-	Code for emulating the Disto RAM cartridge
+    Code for emulating the Disto RAM cartridge
 
-	This cartridge came in several forms: 256K, 512K, 768K, and 1024K.
-	It also includes a mini expansion bus.
+    This cartridge came in several forms: 256K, 512K, 768K, and 1024K.
+    It also includes a mini expansion bus.
 
 ***************************************************************************/
 
@@ -23,7 +23,7 @@
 
 
 //**************************************************************************
-//	TYPE DECLARATIONS
+//  TYPE DECLARATIONS
 //**************************************************************************
 
 namespace
@@ -33,7 +33,6 @@ namespace
 	class coco_pak_ram_device
 		: public device_t
 		, public device_cococart_interface
-		, public device_distomeb_host_interface
 	{
 		public:
 			// construction/destruction
@@ -57,7 +56,7 @@ namespace
 
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_RAM, device_cococart_interface, coco_pak_ram_device, "cocopakram", "Disto RAM Cartridge")
@@ -65,7 +64,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_RAM, device_cococart_interface, coco_pak_ram
 
 
 //-------------------------------------------------
-//	coco_pak_ram_device - constructor
+//  coco_pak_ram_device - constructor
 //-------------------------------------------------
 
 coco_pak_ram_device::coco_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -78,7 +77,7 @@ coco_pak_ram_device::coco_pak_ram_device(const machine_config &mconfig, const ch
 
 
 //**************************************************************************
-//	MACHINE FRAGMENTS AND ADDRESS MAPS
+//  MACHINE FRAGMENTS AND ADDRESS MAPS
 //**************************************************************************
 
 static void disto_meb_slot(device_slot_interface &device)
@@ -95,7 +94,7 @@ void coco_pak_ram_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//	device_start - device-specific startup
+//  device_start - device-specific startup
 //-------------------------------------------------
 
 void coco_pak_ram_device::device_start()
@@ -112,7 +111,7 @@ void coco_pak_ram_device::device_start()
 
 
 //-------------------------------------------------
-//	device_reset - device-specific reset
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
 void coco_pak_ram_device::device_reset()
@@ -123,7 +122,7 @@ void coco_pak_ram_device::device_reset()
 
 
 //-------------------------------------------------
-//	  scs_write
+//    scs_write
 //-------------------------------------------------
 
 void coco_pak_ram_device::scs_write(offs_t offset, u8 data)
@@ -158,7 +157,7 @@ void coco_pak_ram_device::scs_write(offs_t offset, u8 data)
 
 
 //-------------------------------------------------
-//	scs_read
+//  scs_read
 //-------------------------------------------------
 
 u8 coco_pak_ram_device::scs_read(offs_t offset)
@@ -167,7 +166,7 @@ u8 coco_pak_ram_device::scs_read(offs_t offset)
 
 	if (offset > 0x0f && offset < 0x18)
 	{
-		data =	m_slot->meb_read(offset - 0x10);
+		data =  m_slot->meb_read(offset - 0x10);
 	}
 	else
 	{
@@ -190,7 +189,7 @@ u8 coco_pak_ram_device::scs_read(offs_t offset)
 				break;
 		}
 
-		LOG("scs_read:	%s: %06x, %02x, %02x\n", machine().describe_context(), m_offset, offset, data);
+		LOG("scs_read:\t%s: %06x, %02x, %02x\n", machine().describe_context(), m_offset, offset, data);
 	}
 
 	return data;
