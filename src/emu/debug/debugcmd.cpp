@@ -151,9 +151,6 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	symtable.add("s32", 1, 1, // sign-extend from 32 bits
 			[] (int params, const u64 *param) -> u64
 			{ return s64(s32(u32(param[0]))); });
-	symtable.add("sext", 2, 2, // sign-extend from any width
-			[] (int params, const u64 *param) -> u64
-			{ return util::sext(param[0], param[1]); });
 	symtable.add("cpunum", std::bind(&debugger_commands::get_cpunum, this));
 
 	// add all single-entry save state globals
@@ -524,7 +521,11 @@ bool debugger_commands::mini_printf(std::ostream &stream, std::string_view forma
 						m_console.printf("Not enough parameters for format!\n");
 						return false;
 					}
-					util::stream_format(stream, zerofill ? "%0*X" : "%*X", width, *param);
+					if (u32(*param >> 32) != 0)
+						util::stream_format(stream, zerofill ? "%0*X" : "%*X", (width <= 8) ? 1 : width - 8, u32(*param >> 32));
+					else if (width > 8)
+						util::stream_format(stream, zerofill ? "%0*X" : "%*X", width - 8, 0);
+					util::stream_format(stream, zerofill ? "%0*X" : "%*X", (width < 8) ? width : 8, u32(*param));
 					param++;
 					params--;
 					break;
@@ -536,7 +537,21 @@ bool debugger_commands::mini_printf(std::ostream &stream, std::string_view forma
 						m_console.printf("Not enough parameters for format!\n");
 						return false;
 					}
-					util::stream_format(stream, zerofill ? "%0*o" : "%*o", width, *param);
+					if (u32(*param >> 60) != 0)
+					{
+						util::stream_format(stream, zerofill ? "%0*o" : "%*o", (width <= 20) ? 1 : width - 20, u32(*param >> 60));
+						util::stream_format(stream, "%0*o", 10, u32(BIT(*param, 30, 30)));
+					}
+					else
+					{
+						if (width > 20)
+							util::stream_format(stream, zerofill ? "%0*o" : "%*o", width - 20, 0);
+						if (u32(BIT(*param, 30, 30)) != 0)
+							util::stream_format(stream, zerofill ? "%0*o" : "%*o", (width <= 10) ? 1 : width - 10, u32(BIT(*param, 30, 30)));
+						else if (width > 10)
+							util::stream_format(stream, zerofill ? "%0*o" : "%*o", width - 10, 0);
+					}
+					util::stream_format(stream, zerofill ? "%0*o" : "%*o", (width < 10) ? width : 10, u32(BIT(*param, 0, 30)));
 					param++;
 					params--;
 					break;
@@ -548,23 +563,10 @@ bool debugger_commands::mini_printf(std::ostream &stream, std::string_view forma
 						m_console.printf("Not enough parameters for format!\n");
 						return false;
 					}
-					util::stream_format(stream, zerofill ? "%0*d" : "%*d", width, s64(*param));
+					util::stream_format(stream, zerofill ? "%0*d" : "%*d", width, u32(*param));
 					param++;
 					params--;
 					break;
-
-				case 'U':
-				case 'u':
-					if (params == 0)
-					{
-						m_console.printf("Not enough parameters for format!\n");
-						return false;
-					}
-					util::stream_format(stream, zerofill ? "%0*u" : "%*u", width, *param);
-					param++;
-					params--;
-					break;
-
 				case 'C':
 				case 'c':
 					if (params == 0)
