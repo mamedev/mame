@@ -16,7 +16,7 @@ void softcard(device_slot_interface &device)
 
 
 softcard_interface::softcard_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "beecard")
+	: device_interface(device, "softcard")
 	, m_exp(nullptr)
 {
 	for (int i = 0; i < 4; i++)
