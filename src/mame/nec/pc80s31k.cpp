@@ -332,7 +332,9 @@ TIMER_CALLBACK_MEMBER(pc80s31_device::tc_zero_tick)
 	{
 		logerror("%s: attempt to trigger TC while in HALT state (read ID copy protection warning)\n", machine().describe_context());
 		// TODO: temp for VA
-		m_fdc_cpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+		// this is actually a upd765 issue with scan id failed:
+		// it's not supposed to enter TC sequence at all, misconfigured irq?
+		//m_fdc_cpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 //      throw emu_fatalerror("copy protection hit");
 	}
 }
