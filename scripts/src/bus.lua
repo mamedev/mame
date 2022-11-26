@@ -1901,12 +1901,16 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/nomapper.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/rtype.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/rtype.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/softcard.cpp",
+		MAME_DIR .. "src/devices/bus/msx/cart/softcard.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/superloderunner.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/superloderunner.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/super_swangi.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/super_swangi.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/yamaha.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/yamaha.h",
+		MAME_DIR .. "src/devices/bus/msx/softcard/softcard.cpp",
+		MAME_DIR .. "src/devices/bus/msx/softcard/softcard.h",
 	}
 end
 

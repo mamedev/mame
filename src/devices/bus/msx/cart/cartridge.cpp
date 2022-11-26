@@ -26,6 +26,7 @@
 #include "msxdos2.h"
 #include "nomapper.h"
 #include "rtype.h"
+#include "softcard.h"
 #include "superloderunner.h"
 #include "super_swangi.h"
 #include "yamaha.h"
@@ -75,6 +76,7 @@ void msx_cart(device_slot_interface &device)
 	device.option_add("beepack", MSX_CART_BEEPACK);
 	device.option_add("bm_012", MSX_CART_BM_012);
 	device.option_add("moonsound", MSX_CART_MOONSOUND);
+	device.option_add("softcard", MSX_CART_SOFTCARD);
 }
 
 

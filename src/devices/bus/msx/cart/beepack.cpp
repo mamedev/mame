@@ -19,14 +19,14 @@ DEFINE_DEVICE_TYPE(MSX_CART_BEEPACK, msx_cart_beepack_device, "msx_cart_beepack"
 msx_cart_beepack_device::msx_cart_beepack_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_CART_BEEPACK, tag, owner, clock)
 	, device_cartrom_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<bee_card_interface>(mconfig, *this)
 	, msx_cart_interface(mconfig, *this)
 {
 }
 
 void msx_cart_beepack_device::device_resolve_objects()
 {
-	m_beecard = dynamic_cast<bee_card_interface *>(get_card_device());
+	m_beecard = get_card_device();
 	if (m_beecard)
 	{
 		m_beecard->m_exp = this;

@@ -1932,18 +1932,6 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- Softcard -->
-	<software name="backgamm">
-		<description>Backgammon (Euro)</description>
-		<year>1984</year>
-		<publisher>Electric Software</publisher>
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="backgammon (europe).rom" size="32768" crc="b3694e5a" sha1="363b5a8c94cdb63a7ee72b9d25f7b5053cab319a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="backgamj">
 		<description>Back Gammon (Jpn)</description>
 		<year>1984</year>
@@ -7573,19 +7561,6 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- Softcard -->
-	<software name="lemans2">
-		<description>Le Mans 2 (Euro)</description>
-		<year>1984</year>
-		<publisher>Electric Software</publisher>
-		<info name="serial" value="5305" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="le mans 2 (europe).rom" size="32768" crc="82dddc34" sha1="f69541b86c2b396cdce765c2dec498e11232b3c9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 <!-- Which is the right hardware and which has been hacked to run on the modified pcb? -->
 	<software name="legendk">
 		<description>Legendly Knight - Daemaseong (Kor)</description>
@@ -12425,12 +12400,11 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- Softcard -->
 	<software name="wreck">
 		<description>The Wreck (Euro)</description>
 		<year>1984</year>
 		<publisher>Electric Software</publisher>
-		<info name="serial" value="5306/1" />
+		<info name="serial" value="5206/1" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="wreck, the (europe).rom" size="32768" crc="7efde800" sha1="58e335c943d2647c3ff1e689069d9fa5e1c7ff6e" offset="0" />
