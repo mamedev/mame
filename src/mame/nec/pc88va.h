@@ -122,21 +122,12 @@ private:
 	uint8_t m_backupram_wp = 0;
 
 	// FDC
-	emu_timer *m_tc_clear_timer = nullptr;
 	emu_timer *m_fdc_timer = nullptr;
 	emu_timer *m_motor_start_timer[2]{};
 
-	uint8_t cpu_8255_c_r();
-	void cpu_8255_c_w(uint8_t data);
-	uint8_t fdc_8255_c_r();
-	void fdc_8255_c_w(uint8_t data);
-	uint8_t m_i8255_0_pc = 0;
-	uint8_t m_i8255_1_pc = 0;
 	uint8_t m_fdc_mode = 0;
-	uint8_t m_fdc_irq_opcode = 0;
 	uint8_t m_fdc_ctrl_2 = 0;
 	bool m_xtmask = false;
-	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
 	TIMER_CALLBACK_MEMBER(t3_mouse_callback);
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
@@ -146,12 +137,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	static void floppy_formats(format_registration &fr);
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
-	#if TEST_SUBFDC
-	uint8_t upd765_tc_r();
-	void upd765_mc_w(uint8_t data);
-	#else
-	uint8_t no_subfdc_r();
-	#endif
+	uint8_t fake_subfdc_r();
 	uint8_t pc88va_fdc_r(offs_t offset);
 	void pc88va_fdc_w(offs_t offset, uint8_t data);
 

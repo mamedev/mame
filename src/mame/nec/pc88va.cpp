@@ -385,9 +385,6 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 				, data
 				, m_fdc_mode ? "DMA" : "Intelligent (PIO)"
 			);
-			#if TEST_SUBFDC
-			m_fdccpu->set_input_line(INPUT_LINE_HALT, (m_fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
-			#endif
 			break;
 		/*
 		--x- ---- CLK: FDC clock selection (0) 4.8MHz (1) 8 MHz
@@ -576,12 +573,10 @@ void pc88va_state::sys_port1_w(uint8_t data)
 	// ...
 }
 
-#if !TEST_SUBFDC
-uint8_t pc88va_state::no_subfdc_r()
+uint8_t pc88va_state::fake_subfdc_r()
 {
 	return machine().rand();
 }
-#endif
 
 uint8_t pc88va_state::misc_ctrl_r()
 {
@@ -630,11 +625,8 @@ void pc88va_state::pc88va_io_map(address_map &map)
 //  map(0x00e6, 0x00e6) 8214 IRQ mask (*)
 //  map(0x00e8, 0x00e9) ? (*)
 //  map(0x00ec, 0x00ed) ? (*)
-	#if TEST_SUBFDC
-	map(0x00fc, 0x00ff).rw("d8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // d8255 2, FDD
-	#else
-	map(0x00fc, 0x00ff).r(FUNC(pc88va_state::no_subfdc_r)).nopw();
-	#endif
+	// TODO: convert to pc80s31k family
+	map(0x00fc, 0x00ff).r(FUNC(pc88va_state::fake_subfdc_r)).nopw();
 
 	map(0x0100, 0x0101).rw(FUNC(pc88va_state::screen_ctrl_r), FUNC(pc88va_state::screen_ctrl_w)); // Screen Control Register
 	map(0x0102, 0x0103).w(FUNC(pc88va_state::gfx_ctrl_w));
@@ -686,48 +678,6 @@ void pc88va_state::pc88va_io_map(address_map &map)
 //  map(0x1000, 0xfeff) user area (???)
 	map(0xff00, 0xffff).noprw(); // CPU internal use
 }
-
-TIMER_CALLBACK_MEMBER(pc88va_state::pc8801fd_upd765_tc_to_zero)
-{
-	m_fdc->tc_w(false);
-}
-
-/* FDC subsytem CPU */
-#if TEST_SUBFDC
-void pc88va_state::pc88va_z80_map(address_map &map)
-{
-	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x7fff).ram();
-}
-
-uint8_t pc88va_state::upd765_tc_r()
-{
-	m_fdc->tc_w(true);
-	m_tc_clear_timer->adjust(attotime::from_usec(50));
-	return 0;
-}
-
-void pc88va_state::fdc_irq_vector_w(uint8_t data)
-{
-	m_fdc_irq_opcode = data;
-}
-
-void pc88va_state::upd765_mc_w(uint8_t data)
-{
-	m_fdd[0]->get_device()->mon_w(!(data & 1));
-	m_fdd[1]->get_device()->mon_w(!(data & 2));
-}
-
-void pc88va_state::pc88va_z80_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(FUNC(pc88va_state::fdc_irq_vector_w)); // Interrupt Opcode Port
-//  map(0xf4, 0xf4) // Drive Control Port
-	map(0xf8, 0xf8).rw(FUNC(pc88va_state::upd765_tc_r), FUNC(pc88va_state::upd765_mc_w)); // (R) Terminal Count Port (W) Motor Control Port
-	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
-	map(0xfc, 0xff).rw("d8255_2s", FUNC(i8255_device::read), FUNC(i8255_device::write));
-}
-#endif
 
 void pc88va_state::opna_map(address_map &map)
 {
@@ -1025,25 +975,6 @@ static GFXDECODE_START( gfx_pc88va )
 	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_16x16,  0, 16 )
 GFXDECODE_END
 
-uint8_t pc88va_state::cpu_8255_c_r()
-{
-	return m_i8255_1_pc >> 4;
-}
-
-void pc88va_state::cpu_8255_c_w(uint8_t data)
-{
-	m_i8255_0_pc = data;
-}
-
-uint8_t pc88va_state::fdc_8255_c_r()
-{
-	return m_i8255_0_pc >> 4;
-}
-
-void pc88va_state::fdc_8255_c_w(uint8_t data)
-{
-	m_i8255_1_pc = data;
-}
 
 uint8_t pc88va_state::r232_ctrl_porta_r()
 {
@@ -1089,7 +1020,7 @@ void pc88va_state::r232_ctrl_portc_w(uint8_t data)
 
 uint8_t pc88va_state::get_slave_ack(offs_t offset)
 {
-	if (offset==7) { // IRQ = 7
+	if (offset == 7) {
 		return m_pic2->acknowledge();
 	}
 	return 0x00;
@@ -1099,9 +1030,6 @@ void pc88va_state::machine_start()
 {
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
-
-	m_tc_clear_timer = timer_alloc(FUNC(pc88va_state::pc8801fd_upd765_tc_to_zero), this);
-	m_tc_clear_timer->adjust(attotime::never);
 
 	m_fdc_timer = timer_alloc(FUNC(pc88va_state::pc88va_fdc_timer), this);
 	m_fdc_timer->adjust(attotime::never);
@@ -1143,12 +1071,7 @@ void pc88va_state::machine_reset()
 	m_tsp.tvram_vreg_offset = 0;
 
 	m_fdc_mode = 0;
-	m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
 	m_xtmask = false;
-
-	#if TEST_SUBFDC
-	m_fdccpu->set_input_line_vector(0, 0); // Z80
-	#endif
 
 	m_misc_ctrl = 0x80;
 	m_sound_irq_enable = false;
@@ -1171,10 +1094,6 @@ WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 		m_pic2->ir3_w(0);
 		m_pic2->ir3_w(1);
 	}
-	#if TEST_SUBFDC
-	else
-		m_fdccpu->set_input_line(0, HOLD_LINE);
-	#endif
 }
 
 WRITE_LINE_MEMBER( pc88va_state::tc_w )
@@ -1229,13 +1148,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->in_memr_cb().set([this] (offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); });
 	m_maincpu->out_memw_cb().set([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
 
-#if TEST_SUBFDC
-	z80_device &fdccpu(Z80(config, "fdccpu", 4000000));        /* 8 MHz */
-	fdccpu.set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_z80_map);
-	fdccpu.set_addrmap(AS_IO, &pc88va_state::pc88va_z80_io_map);
-
-	config.m_perfect_cpu_quantum = subtag("maincpu");
-#endif
+	// TODO: pc80s31k here
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: fully convert to set_raw (timings available)
@@ -1246,12 +1159,6 @@ void pc88va_state::pc88va(machine_config &config)
 //  m_palette->set_init(FUNC(pc88va_state::pc8801));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc88va);
 
-	i8255_device &d8255_2(I8255(config, "d8255_2"));
-	d8255_2.in_pa_callback().set("d8255_2s", FUNC(i8255_device::pb_r));
-	d8255_2.in_pb_callback().set("d8255_2s", FUNC(i8255_device::pa_r));
-	d8255_2.in_pc_callback().set(FUNC(pc88va_state::cpu_8255_c_r));
-	d8255_2.out_pc_callback().set(FUNC(pc88va_state::cpu_8255_c_w));
-
 	i8255_device &d8255_3(I8255(config, "d8255_3"));
 	d8255_3.in_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_r));
 	d8255_3.out_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_w));
@@ -1259,12 +1166,6 @@ void pc88va_state::pc88va(machine_config &config)
 	d8255_3.out_pb_callback().set(FUNC(pc88va_state::r232_ctrl_portb_w));
 	d8255_3.in_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_r));
 	d8255_3.out_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_w));
-
-	i8255_device &d8255_2s(I8255(config, "d8255_2s"));
-	d8255_2s.in_pa_callback().set("d8255_2", FUNC(i8255_device::pb_r));
-	d8255_2s.in_pb_callback().set("d8255_2", FUNC(i8255_device::pa_r));
-	d8255_2s.in_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_r));
-	d8255_2s.out_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_w));
 
 #if 0
 	PIC8259(config, m_pic1, 0);
