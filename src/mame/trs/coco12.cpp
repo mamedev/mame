@@ -21,6 +21,10 @@
     coco3p  1.2 2.0         1.1
     coco3h  1.2 2.0         1.1
 
+	TRS-80 Deluxe Color Computer
+
+	Prototype Color Computer with added MOS6551 and AY-3-8913
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -289,6 +293,109 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( coco )
 	PORT_INCLUDE( coco_keyboard )
+	PORT_INCLUDE( coco_joystick )
+	PORT_INCLUDE( coco_analog_control )
+	PORT_INCLUDE( coco_rtc )
+	PORT_INCLUDE( coco_beckerport )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( deluxecoco_keyboard )
+//-------------------------------------------------
+//
+//  Deluxe CoCo keyboard
+//
+//         PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
+//    PA6: Ent Clr Brk Alt Ctr F1  F2 Shift
+//    PA5: 8   9   :   ;   ,   -   .   /
+//    PA4: 0   1   2   3   4   5   6   7
+//    PA3: X   Y   Z   Up  Dwn Lft Rgt Space
+//    PA2: P   Q   R   S   T   U   V   W
+//    PA1: H   I   J   K   L   M   N   O
+//    PA0: @   A   B   C   D   E   F   G
+//-------------------------------------------------
+
+static INPUT_PORTS_START( deluxecoco_keyboard )
+	PORT_START("row0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+
+	PORT_START("row1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+
+	PORT_START("row2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+
+	PORT_START("row3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("UP") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN), 10)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(LEFT), 8)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT), 9)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+
+	PORT_START("row4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!') PORT_CHAR('|')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#') PORT_CHAR('~')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'') PORT_CHAR('^')
+
+	PORT_START("row5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(') PORT_CHAR('[')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')') PORT_CHAR(']')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<') PORT_CHAR('{')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=') PORT_CHAR('_')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>') PORT_CHAR('}')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?') PORT_CHAR('\\')
+
+	PORT_START("row6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_HOME) PORT_CHAR(12)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("BREAK") PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("ALT") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL), UCHAR_SHIFT_2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+INPUT_PORTS_END
+
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( deluxecoco )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( deluxecoco )
+	PORT_INCLUDE( deluxecoco_keyboard )
 	PORT_INCLUDE( coco_joystick )
 	PORT_INCLUDE( coco_analog_control )
 	PORT_INCLUDE( coco_rtc )
@@ -591,9 +698,9 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 	mos6551_device &acia(MOS6551(config, ACIA_TAG, 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
-	acia.txd_handler().set(PORT_TAG, FUNC(rs232_port_device::write_txd));
+	acia.txd_handler().set(ACIA_TAG, FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232(RS232_PORT(config, PORT_TAG, default_rs232_devices, nullptr));
+	rs232_port_device &rs232(RS232_PORT(config, ACIA_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(acia, FUNC(mos6551_device::write_rxd));
 	rs232.dcd_handler().set(acia, FUNC(mos6551_device::write_dcd));
 	rs232.dsr_handler().set(acia, FUNC(mos6551_device::write_dsr));
@@ -602,7 +709,7 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 	// Programable Sound Generator
 	AY8913(config, m_psg, DERIVED_CLOCK(2, 1));
 	m_psg->set_flags(AY8910_SINGLE_OUTPUT);
-	// m_psg->add_route(ALL_OUTPUTS, "coco_sac_tag", 1.0);
+	m_psg->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	// Adjust Memory Map
 	m_sam->set_addrmap(5, &deluxecoco_state::deluxecoco_io1);
@@ -754,7 +861,7 @@ ROM_END
 
 #define rom_cocoh rom_coco
 #define rom_cocoeh rom_cocoe
-#define rom_deluxecoco rom_cocoe
+#define rom_deluxecoco rom_coco2b
 #define rom_coco2h rom_coco2
 #define rom_coco2bh rom_coco2b
 
@@ -762,20 +869,20 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR   NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY                         FULLNAME                               FLAGS
-COMP( 1980,  coco,      0,      0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1981,  cocoe,     coco,   0,      cocoe,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  cocoh,     coco,   0,      cocoh,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
-COMP( 19??,  cocoeh,    coco,   0,      cocoeh,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
-COMP( 1983,  deluxecoco,  coco,   0,      deluxecoco,coco,    deluxecoco_state,empty_init,"Tandy Radio Shack",            "Deluxe Color Computer",               MACHINE_SUPPORTS_SAVE )
-COMP( 1983,  coco2,     coco,   0,      coco2,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2",                    MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  coco2h,    coco,   0,      coco2h,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
-COMP( 1985?, coco2b,    coco,   0,      coco2b,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  coco2bh,   coco,   0,      coco2bh, coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
-COMP( 1983,  cp400,     coco,   0,      cp400,   coco,    coco12_state, empty_init, "Prológica",                    "CP400",                               MACHINE_SUPPORTS_SAVE )
-COMP( 1985,  cp400c2,   coco,   0,      cp400,   cp400c2, coco12_state, empty_init, "Prológica",                    "CP400 Color II",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1984,  mx1600,    coco,   0,      coco,    coco,    coco12_state, empty_init, "Dynacom",                      "MX-1600",                             MACHINE_SUPPORTS_SAVE )
-COMP( 1986,  t4426,     coco,   0,      t4426,   coco,    coco12_state, empty_init, "Terco AB",                     "Terco 4426 CNC Programming station",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983,  lzcolor64, coco,   0,      coco,    coco,    coco12_state, empty_init, "Novo Tempo / LZ Equipamentos", "Color64",                             MACHINE_SUPPORTS_SAVE )
-COMP( 1983,  cd6809,    coco,   0,      cd6809,  coco,    coco12_state, empty_init, "Codimex",                      "CD-6809",                             MACHINE_SUPPORTS_SAVE )
-COMP( 1987,  ms1600,    coco,   0,      ms1600,  coco,    coco12_state, empty_init, "ILCE / SEP",                   "Micro-SEP 1600",                      MACHINE_SUPPORTS_SAVE )
+//    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                         FULLNAME                               FLAGS
+COMP( 1980,  coco,       0,      0,      coco,       coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer",                      MACHINE_SUPPORTS_SAVE )
+COMP( 1981,  cocoe,      coco,   0,      cocoe,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 19??,  cocoeh,     coco,   0,      cocoeh,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1983,  deluxecoco, coco,   0,      deluxecoco, deluxecoco, deluxecoco_state, empty_init, "Tandy Radio Shack",            "Deluxe Color Computer",               MACHINE_SUPPORTS_SAVE )
+COMP( 1983,  coco2,      coco,   0,      coco2,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2",                    MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  coco2h,     coco,   0,      coco2h,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1985?, coco2b,     coco,   0,      coco2b,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  coco2bh,    coco,   0,      coco2bh,    coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1983,  cp400,      coco,   0,      cp400,      coco,       coco12_state,     empty_init, "Prológica",                    "CP400",                               MACHINE_SUPPORTS_SAVE )
+COMP( 1985,  cp400c2,    coco,   0,      cp400,      cp400c2,    coco12_state,     empty_init, "Prológica",                    "CP400 Color II",                      MACHINE_SUPPORTS_SAVE )
+COMP( 1984,  mx1600,     coco,   0,      coco,       coco,       coco12_state,     empty_init, "Dynacom",                      "MX-1600",                             MACHINE_SUPPORTS_SAVE )
+COMP( 1986,  t4426,      coco,   0,      t4426,      coco,       coco12_state,     empty_init, "Terco AB",                     "Terco 4426 CNC Programming station",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983,  lzcolor64,  coco,   0,      coco,       coco,       coco12_state,     empty_init, "Novo Tempo / LZ Equipamentos", "Color64",                             MACHINE_SUPPORTS_SAVE )
+COMP( 1983,  cd6809,     coco,   0,      cd6809,     coco,       coco12_state,     empty_init, "Codimex",                      "CD-6809",                             MACHINE_SUPPORTS_SAVE )
+COMP( 1987,  ms1600,     coco,   0,      ms1600,     coco,       coco12_state,     empty_init, "ILCE / SEP",                   "Micro-SEP 1600",                      MACHINE_SUPPORTS_SAVE )
