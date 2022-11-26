@@ -1067,7 +1067,7 @@ void hp9825a_state::hp9825a(machine_config &config)
 
 	m_ram->set_default_size("8K").set_extra_options("16K,24K,32K");
 
-	SOFTWARE_LIST(config, "optrom_list").set_original("hp9825a_rom");
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9825_rom").set_filter("A");
 }
 
 void hp9825a_state::machine_start()
@@ -1129,7 +1129,7 @@ void hp9825b_state::hp9825b(machine_config &config)
 		finder->set_rom_limit(0x5000);
 	}
 
-	SOFTWARE_LIST(config, "optrom_list").set_original("hp9825b_rom");
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9825_rom").set_filter("B");
 }
 
 void hp9825b_state::device_reset()
@@ -1219,7 +1219,7 @@ void hp9825t_state::hp9825t(machine_config &config)
 		finder->set_rom_limit(0x6000);
 	}
 
-	SOFTWARE_LIST(config, "optrom_list").set_original("hp9825b_rom");
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9825_rom").set_filter("T");
 }
 
 void hp9825t_state::machine_start()
