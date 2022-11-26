@@ -682,7 +682,7 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 	m_ram->set_default_size("64K");
 
 	// Asynchronous Communications Interface Adapter
-	mos6551_device &acia(MOS6551(config, ACIA_TAG, 0));
+	mos6551_device &acia(MOS6551(config, MOSACIA_TAG, 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	acia.txd_handler().set(ACIA_TAG, FUNC(rs232_port_device::write_txd));
