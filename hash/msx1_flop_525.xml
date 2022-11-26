@@ -5,7 +5,7 @@ license:CC0
 -->
 <softwarelist name="msx1_flop_525" description="MSX1 5.25&quot; disk images">
 <!--
-	MSX(1) software that was released on 5 1/4" floppies
+    MSX(1) software that was released on 5 1/4" floppies
 -->
 
 	<software name="msxdostb">

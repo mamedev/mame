@@ -309,7 +309,7 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_req )
 	{
 		// reset REQ FF
 		m_req = 0;
-	} 
+	}
 
 	update_ack();
 	update_dma();

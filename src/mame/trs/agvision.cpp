@@ -2,40 +2,40 @@
 // copyright-holders: tim lindner
 /***************************************************************************
 
-	Elanco AgVision and Radio Shack VideoTex terminals
+    Elanco AgVision and Radio Shack VideoTex terminals
 
-	Dynamic RAM (16 or 4k) starts at $0000.
-	ROM (2K) starts at $A000 and mirrors up to $BFFF
-	Static RAM starts at $C000 for 128 bytes
-	The PIA data port a is at $FF1C
-		 control port a is at $FF1D
-			data port b is at $FF1E
-		 control port b is at $FF1F
+    Dynamic RAM (16 or 4k) starts at $0000.
+    ROM (2K) starts at $A000 and mirrors up to $BFFF
+    Static RAM starts at $C000 for 128 bytes
+    The PIA data port a is at $FF1C
+         control port a is at $FF1D
+            data port b is at $FF1E
+         control port b is at $FF1F
 
-	The Control Register (flip flop) is at $FF20
-	The SAM starts at $FFC0
+    The Control Register (flip flop) is at $FF20
+    The SAM starts at $FFC0
 
-	PIA:
-		Port A and B make up the keyboard matrix
-		PA7  - RS-232 receive.
-		CA1  - The horizontal sync from the VDG.
-		CA2  - Unconnected, not verified.
-		CB1  - Modem status, carrier detect.
-		CB2  - Modem control (unverified).
-		IRQA - Connected to the 6809 FIRQ.
-		IRQB - Unconnected, not verified.
+    PIA:
+        Port A and B make up the keyboard matrix
+        PA7  - RS-232 receive.
+        CA1  - The horizontal sync from the VDG.
+        CA2  - Unconnected, not verified.
+        CB1  - Modem status, carrier detect.
+        CB2  - Modem control (unverified).
+        IRQA - Connected to the 6809 FIRQ.
+        IRQB - Unconnected, not verified.
 
-	Control Register:
-		Bit 7 - RS-232 transmit.
-		Bit 6 - RS-232 DTR, or activity LED (unsure which).
-		Bit 5 - unconnected (not verified).
-		Bit 3 - VDG GM0.
-		Bit 2 - VDG GM1.
-		Bit 1 - VDG GM2.
-		Bit 0 - VDG A* / G.
+    Control Register:
+        Bit 7 - RS-232 transmit.
+        Bit 6 - RS-232 DTR, or activity LED (unsure which).
+        Bit 5 - unconnected (not verified).
+        Bit 3 - VDG GM0.
+        Bit 2 - VDG GM1.
+        Bit 1 - VDG GM2.
+        Bit 0 - VDG A* / G.
 
-	Reverse engineering used with permission of George Phillips of the
-	trs80gp emulator.
+    Reverse engineering used with permission of George Phillips of the
+    trs80gp emulator.
 
 ***************************************************************************/
 
@@ -219,11 +219,11 @@ void agvision_state::agvision(machine_config &config)
 
 	// memory controller
 	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
-	m_sam->set_addrmap(2, &agvision_state::rom_map);			// ROM at $A000
-	m_sam->set_addrmap(3, &agvision_state::static_ram_map);		// RAM at $C000
-	m_sam->set_addrmap(4, &agvision_state::io0_map);			//  IO at $FF00
-	m_sam->set_addrmap(5, &agvision_state::io1_map);			//  IO at $FF20
-	m_sam->set_addrmap(7, &agvision_state::boot_map);			//  IO at $FF60
+	m_sam->set_addrmap(2, &agvision_state::rom_map);            // ROM at $A000
+	m_sam->set_addrmap(3, &agvision_state::static_ram_map);     // RAM at $C000
+	m_sam->set_addrmap(4, &agvision_state::io0_map);            //  IO at $FF00
+	m_sam->set_addrmap(5, &agvision_state::io1_map);            //  IO at $FF20
+	m_sam->set_addrmap(7, &agvision_state::boot_map);           //  IO at $FF60
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
 	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(ag_modem));

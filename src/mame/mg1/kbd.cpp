@@ -3,7 +3,7 @@
 
 /*
  * Emulation of a keyboard for the Whitechapel Computer Works MG-1 workstation.
- * 
+ *
  * Sources:
  *  - Data sheet E501-1083, "Personal Computer Keyboard", General Instrument, Computer Products Division, C.P. Clare International N.V.
  *

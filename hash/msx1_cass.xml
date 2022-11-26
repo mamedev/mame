@@ -16475,20 +16475,20 @@ license:CC0
 	</software>
 
 <!--
-	The contens of this cassette is the same as the regular release by DK'Tronic.
+    The contens of this cassette is the same as the regular release by DK'Tronic.
 
-	<software name="msxsof03">
-		<description>MSX Soft Magazine - Issue 03 - Fruit Machine (Spain)</description>
-		<year>1985</year>
-		<publisher>Monser</publisher>
-		<info name="usage" value="Load with CLOAD + RUN"/>
+    <software name="msxsof03">
+        <description>MSX Soft Magazine - Issue 03 - Fruit Machine (Spain)</description>
+        <year>1985</year>
+        <publisher>Monser</publisher>
+        <info name="usage" value="Load with CLOAD + RUN"/>
 
-		<part name="cass1" interface="msx_cass">
-			<dataarea name="cass" size="12031">
-				<rom name="msx soft magazine - issue 03 - fruit machine (1985)(monser)(es).cas" size="12031" crc="275345d5" sha1="8dc0a3c8057fb1887fb1d93c0d7bc849f462ae0b"/>
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="msx_cass">
+            <dataarea name="cass" size="12031">
+                <rom name="msx soft magazine - issue 03 - fruit machine (1985)(monser)(es).cas" size="12031" crc="275345d5" sha1="8dc0a3c8057fb1887fb1d93c0d7bc849f462ae0b"/>
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="msxsof04">

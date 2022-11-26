@@ -59,7 +59,7 @@ private:
 
 	/**
 	 * @brief Which input line on the keyboard/switch scan driver is currently selected.
-	 * This driver is used to read the analog switch values from the synth's keyboard, and 
+	 * This driver is used to read the analog switch values from the synth's keyboard, and
 	 * front-panel switches.
 	 * TODO: I'm currently not sure of the actual implementation of this circuit. This
 	 * implementation is based off the *very* limited description in the service manual, and
@@ -102,13 +102,13 @@ private:
 	/**
 	 * @brief Handles a read from the keyboard/switch scan driver.
 	 * This multiplexing driver circuit is used to read the states of the synth's front-panel
-	 * switches, and keyboard. The driver's input is wired to the CPU's IO port 1, and the 
+	 * switches, and keyboard. The driver's input is wired to the CPU's IO port 1, and the
 	 * output is wired into the address map.
 	 * Input line 0 covers the 'main' front-panel switches.
 	 * Input line 1 covers the numeric front-panel switches 1 through 8.
 	 * Input line 2 covers the numeric front-panel switches 9 though 16.
 	 * Input line 3 covers the numeric front-panel switches 17 though 20, as well as the
-	 * modulation pedal inputs: The Portamento, and Sustain pedals are mapped to 
+	 * modulation pedal inputs: The Portamento, and Sustain pedals are mapped to
 	 * bits 6, and 7 respectively.
 	 * Note: Input lines 4-15 are used to map the keyboard, which is not implemented here.
 	 * When the keyboard state is read, the default value of 0 will be returned.
@@ -378,8 +378,8 @@ static INPUT_PORTS_START(dx9)
 
 	// These IO ports belong to the keyboard scan circuit.
 	// Each of these 12 ports represents an individual key within an octave.
-	// The keyboard is wired so that when each key's line is selected, reading the keyboard 
-	// scan driver output will return a power of two indicating the octave the pressed key 
+	// The keyboard is wired so that when each key's line is selected, reading the keyboard
+	// scan driver output will return a power of two indicating the octave the pressed key
 	// is in, from 0 to 7.
 	PORT_START("KEY_SWITCH_INPUT.4")
 	PORT_START("KEY_SWITCH_INPUT.5")
