@@ -1805,6 +1805,8 @@ if (BUSES["MSX_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/ctrl/ctrl.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.cpp",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.h",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/libbler.cpp",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/libbler.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.cpp",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/towns6b.cpp",

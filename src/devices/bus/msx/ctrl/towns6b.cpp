@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Vas Crabb
 /**********************************************************************
 
-   FM Towns 6-button Pad emulation
+    FM Towns 6-button Pad emulation
 
 **********************************************************************/
 
@@ -39,7 +39,7 @@ public:
 	fm_towns_6b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual u8 read() override;
-	void pin_8_w(int state) override { m_pin8 = state; }
+	virtual void pin_8_w(int state) override { m_pin8 = state; }
 
 protected:
 	virtual void device_start() override;
