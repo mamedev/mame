@@ -529,9 +529,11 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<notes><![CDATA[
-No sound even if the game claims to have it, cfr. settings pane
+No sound even if the game claims to have it, cfr. settings pane (particularly clicks)
+Disk errors if accessing [FDC] with motor off (goes idle after a while)
 Doesn't clear sprites when you exit from setting pane [SGP]
 [mouse] is a requirement?
+Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), eventually crashes (no pointer available)
 ]]></notes>
 		<info name="alt_title" value="上海" />
 		<part name="flop1" interface="floppy_5_25">

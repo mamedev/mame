@@ -1417,7 +1417,8 @@ void pc88va_state::video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void pc88va_state::text_transpen_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// TODO: understand what these are for, docs blabbers about text/sprite color separation?
-	//  cfr. rogueall
+	//  cfr. rogueall, olteus on disk swap screen
+	// shanghai on winning animation (flips 0xf801 / 0x07c1, intentional?)
 	COMBINE_DATA(&m_text_transpen);
 	if (m_text_transpen & 0xfff0)
 		popmessage("text transpen > 15 (%04x)", m_text_transpen);

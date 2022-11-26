@@ -32,12 +32,6 @@
 #include "formats/pc98fdi_dsk.h"
 #include "formats/xdf_dsk.h"
 
-// TODO: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway.
-//       the whole FDC device should be converted (it's also used by PC-9801)
-#define TEST_SUBFDC 0
-
-
-
 class pc88va_state : public driver_device
 {
 public:
@@ -245,7 +239,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-// TODO: stuff backported from PC8801 that should really be common
+// TODO: stuff backported from PC8801 as QoL that should really be common
 private:
 	uint8_t misc_ctrl_r();
 	void misc_ctrl_w(uint8_t data);
