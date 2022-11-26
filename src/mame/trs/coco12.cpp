@@ -561,6 +561,20 @@ static DEVICE_INPUT_DEFAULTS_START( rs_printer )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
+
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS_START( acia )
+//-------------------------------------------------
+
+static DEVICE_INPUT_DEFAULTS_START(acia)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_300)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_300)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
+
 //-------------------------------------------------
 //  machine_config
 //-------------------------------------------------
@@ -686,8 +700,11 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	acia.txd_handler().set(ACIA_TAG, FUNC(rs232_port_device::write_txd));
+	acia.rts_handler().set(ACIA_TAG, FUNC(rs232_port_device::write_rts));
+	acia.dtr_handler().set(ACIA_TAG, FUNC(rs232_port_device::write_dtr));
 
 	rs232_port_device &rs232(RS232_PORT(config, ACIA_TAG, default_rs232_devices, nullptr));
+	rs232.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(acia));
 	rs232.rxd_handler().set(acia, FUNC(mos6551_device::write_rxd));
 	rs232.dcd_handler().set(acia, FUNC(mos6551_device::write_dcd));
 	rs232.dsr_handler().set(acia, FUNC(mos6551_device::write_dsr));
