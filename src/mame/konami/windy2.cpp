@@ -262,7 +262,7 @@ ioport_constructor windy2_quiz_device::device_input_ports() const
 // GU707-JC 2L8B panel setup for 2 players with 4 buttons + 4 levers + start + service per player
 // Corresponds to the dipswitch setting of 11000000 on I/O board
 windy2_2l8b_device::windy2_2l8b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_QUIZ_PANEL, tag, owner, clock, 2, 10)
+	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_2L8B_PANEL, tag, owner, clock, 2, 10)
 {
 }
 
@@ -276,7 +276,7 @@ ioport_constructor windy2_2l8b_device::device_input_ports() const
 // GU707-JD 1L6B panel setup for 1 player with 6 buttons + 4 levers + start + test
 // Corresponds to the dipswitch setting of 10101001 on I/O board
 windy2_1l6b_device::windy2_1l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_QUIZ_PANEL, tag, owner, clock, 1, 12)
+	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_1L6B_PANEL, tag, owner, clock, 1, 12)
 {
 }
 
@@ -290,7 +290,7 @@ ioport_constructor windy2_1l6b_device::device_input_ports() const
 // GU707-JG 2L12B panel setup for 2 players with 6 buttons + 4 levers + start + service per player
 // Corresponds to the dipswitch setting of 10101000 on I/O board
 windy2_2l12b_device::windy2_2l12b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_QUIZ_PANEL, tag, owner, clock, 2, 12)
+	windy2_device(mconfig, KONAMI_WINDY2_JVS_IO_2L12B_PANEL, tag, owner, clock, 2, 12)
 {
 }
 
