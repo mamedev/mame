@@ -15,5 +15,6 @@
 
 
 DECLARE_DEVICE_TYPE(MSX_TOWNSPAD, device_msx_general_purpose_port_interface)
+DECLARE_DEVICE_TYPE(MSX_MARTYPAD, device_msx_general_purpose_port_interface)
 
 #endif // MAME_BUS_MSX_CTRL_TOWNSPAD_H

@@ -101,6 +101,7 @@ public:
 		, m_dma(*this, "dma_%u", 1U)
 		, m_scsi(*this, "fmscsi")
 		, m_flop(*this, "fdc:%u", 0U)
+		, m_pad_ports(*this, "pad%u", 1U)
 		, m_speaker(*this, "speaker")
 		, m_pic_master(*this, "pic8259_master")
 		, m_pic_slave(*this, "pic8259_slave")
@@ -124,7 +125,6 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_nvram16(*this, "nvram16")
 		, m_kb_ports(*this, "key%u", 1U)
-		, m_pad_ports(*this, "pad%u", 1U)
 		, m_user(*this,"user")
 		, m_serial(*this,"serial")
 	{ }
@@ -162,6 +162,9 @@ protected:
 	required_device_array<upd71071_device, 2> m_dma;
 	optional_device<fmscsi_device> m_scsi;
 	required_device_array<floppy_connector, 2> m_flop;
+
+	required_device_array<msx_general_purpose_port_device, 2U> m_pad_ports;
+
 	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
@@ -359,7 +362,6 @@ private:
 	void cdda_db_to_gain(float db);
 
 	required_ioport_array<4> m_kb_ports;
-	required_device_array<msx_general_purpose_port_device, 2U> m_pad_ports;
 	required_memory_region m_user;
 	optional_memory_region m_serial;
 

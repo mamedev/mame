@@ -2724,6 +2724,9 @@ void marty_state::marty(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
+	m_pad_ports[0]->set_default_option("martypad");
+	m_pad_ports[1]->set_default_option(nullptr);
+
 	FLOPPY_CONNECTOR(config.replace(), m_flop[1], towns_floppies, nullptr, towns_state::floppy_formats);
 
 	// 2 MB onboard, expandable to 4 MB with a Marty-only expansion card

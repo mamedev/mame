@@ -44,6 +44,7 @@ void msx_general_purpose_port_devices(device_slot_interface &device)
 {
 	device.option_add("joystick", MSX_JOYSTICK);
 	device.option_add("libbler", MSX_LIBBLERPAD);
+	device.option_add("martypad", MSX_MARTYPAD);
 	device.option_add("mouse", MSX_MOUSE);
 	device.option_add("towns6b", MSX_TOWNS6B);
 	device.option_add("townspad", MSX_TOWNSPAD);
