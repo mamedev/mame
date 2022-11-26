@@ -6,7 +6,7 @@
 #include "bus/msx/cart/softcard.h"
 
 
-DECLARE_DEVICE_TYPE(SOFTCARD_NOMAPPER, softcard_nomapper_device)
+DECLARE_DEVICE_TYPE(SOFTCARD_NOMAPPER, softcard_interface)
 
 
 void softcard(device_slot_interface &device)
@@ -38,6 +38,8 @@ void softcard_interface::set_views(memory_view::memory_view_entry *page0, memory
 }
 
 
+namespace {
+
 class softcard_nomapper_device : public device_t
 								, public softcard_interface
 {
@@ -56,9 +58,6 @@ private:
 
 	void install_memory();
 };
-
-
-DEFINE_DEVICE_TYPE(SOFTCARD_NOMAPPER, softcard_nomapper_device, "softcard_nomapper", "SoftCard ROM")
 
 
 softcard_nomapper_device::softcard_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -140,3 +139,9 @@ void softcard_nomapper_device::initialize_cartridge()
 
 	install_memory();
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(SOFTCARD_NOMAPPER, softcard_interface, softcard_nomapper_device, "softcard_nomapper", "SoftCard ROM")
+
+

@@ -6,7 +6,7 @@
 #include "bus/msx/cart/beepack.h"
 
 
-DECLARE_DEVICE_TYPE(BEE_CARD_NOMAPPER, bee_card_nomapper_device)
+DECLARE_DEVICE_TYPE(BEE_CARD_NOMAPPER, bee_card_interface)
 
 
 void bee_card(device_slot_interface &device)
@@ -38,6 +38,8 @@ void bee_card_interface::set_views(memory_view::memory_view_entry *page0, memory
 }
 
 
+namespace {
+
 class bee_card_nomapper_device : public device_t
 								, public bee_card_interface
 {
@@ -56,9 +58,6 @@ private:
 
 	void install_memory();
 };
-
-
-DEFINE_DEVICE_TYPE(BEE_CARD_NOMAPPER, bee_card_nomapper_device, "bee_card_nomapper", "Bee Card ROM")
 
 
 bee_card_nomapper_device::bee_card_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -140,3 +139,7 @@ void bee_card_nomapper_device::initialize_cartridge()
 
 	install_memory();
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(BEE_CARD_NOMAPPER, bee_card_interface, bee_card_nomapper_device, "bee_card_nomapper", "Bee Card ROM")
