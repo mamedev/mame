@@ -11107,7 +11107,7 @@ license:CC0
 	</software>
 
 	<software name="doorswin">
-		<!-- Rainbow disc (CD-ROM XA / CD-i / VideoCD / CD-DA) -->
+		<!-- Rainbow disc (CD-ROM XA / CD-i / VideoCD / CD-DA), CD-i part does not need DVC -->
 		<!--
 		Origin: redump (http://redump.org/disc/54514/)
 		<rom name="Cranberries, The - Doors and Windows (USA) (Track 1).bin" size="553665504" crc="499dc148" md5="ec76c5c41095ce953509bbfb889dd95a"/>
@@ -11121,9 +11121,9 @@ license:CC0
 		The info for the original cue is below.
 		<rom name="Cranberries, The - Doors and Windows (USA).cue" size="819" crc="c4424220" md5="cd3b4ef9fe2c410b199e6ceede112cc3"/>
 		-->
-		<description>The Cranberies: Doors and Windows (USA)</description>
+		<description>The Cranberries: Doors and Windows (USA)</description>
 		<year>1995</year>
-		<publisher>Phillips Media / Island Records</publisher>
+		<publisher>Philips Media / Island Records</publisher>
 		<info name="serial" value="310691030-2 / 310691081-2"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

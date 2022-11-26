@@ -1950,9 +1950,9 @@ license:CC0
 	-->
 	<!-- TODO: Continuous MAME warnings about "requires ide_controller_32_device" -->
 	<software name="doorswin">
-		<description>The Cranberies: Doors and Windows (USA)</description>
+		<description>The Cranberries: Doors and Windows (USA)</description>
 		<year>1995</year>
-		<publisher>Phillips Media / Island Records</publisher>
+		<publisher>Philips Media / Island Records</publisher>
 		<info name="serial" value="310691030-2 / 310691081-2"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
