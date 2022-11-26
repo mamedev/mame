@@ -13,7 +13,7 @@ license:CC0
 		<info name="release" value="2021-08-13"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- It requires a 512K Apple IIgs -->
-		<!-- The Team Construction Set was sold separatly, but only works with 4th & Inches so it's included as "Disk 2" -->
+		<!-- The Team Construction Set was sold separately, but only works with 4th & Inches so it's included as "Disk 2" -->
 		<!-- The Team Construction Set disk doesn't check itself for being an original, but runs a nibble count on the 4th & Inches disk -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
 
