@@ -63,19 +63,19 @@ public:
 protected:
 	struct tsp_t
 	{
-		uint16_t tvram_vreg_offset = 0;
-		uint16_t attr_offset = 0;
-		uint16_t spr_offset = 0;
+		u16 tvram_vreg_offset = 0;
+		u32 attr_offset = 0;
+		u32 spr_offset = 0;
 		u8 spr_mg = 0;
-		uint8_t disp_on = 0;
-		uint8_t spr_on = 0;
-		uint8_t pitch = 0;
-		uint8_t line_height = 0;
-		uint8_t h_line_pos = 0;
-		uint8_t blink = 0;
-		uint16_t cur_pos_x = 0, cur_pos_y = 0;
-		uint8_t curn = 0;
-		uint8_t curn_blink = 0;
+		bool disp_on = false;
+		bool spr_on = false;
+		u8 pitch = 0;
+		u8 line_height = 0;
+		u8 h_line_pos = 0;
+		u16 blink = 0;
+		u16 cur_pos_x = 0, cur_pos_y = 0;
+		u8 curn = 0;
+		bool curn_blink = false;
 	};
 
 	struct keyb_t
@@ -87,6 +87,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void palette_init(palette_device &palette) const;
 
 private:
 
@@ -151,7 +152,7 @@ private:
 	uint8_t backupram_dsw_r(offs_t offset);
 	void sys_port1_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pc88va_vrtc_irq);
+	INTERRUPT_GEN_MEMBER(vrtc_irq);
 
 	uint8_t r232_ctrl_porta_r();
 	uint8_t r232_ctrl_portb_r();
@@ -217,7 +218,7 @@ private:
 	void idp_command_w(uint8_t data);
 	void idp_param_w(uint8_t data);
 
-	void tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit);
+	void tsp_sprite_enable(u32 sprite_number, bool sprite_enable, bool blink_enable);
 	void execute_sync_cmd();
 	void execute_dspon_cmd();
 	void execute_dspdef_cmd();

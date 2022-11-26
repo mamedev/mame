@@ -14,7 +14,7 @@
 #define LOG_COLOR   (1U << 6) // current color mode
 #define LOG_TEXT    (1U << 7) // text strips (verbose)
 
-#define VERBOSE (LOG_GENERAL | LOG_IDP)
+#define VERBOSE (LOG_GENERAL | LOG_IDP | LOG_CRTC)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -47,20 +47,42 @@ void pc88va_state::video_start()
 	save_pointer(NAME(m_kanjiram), kanjiram_size);
 }
 
+void pc88va_state::palette_init(palette_device &palette) const
+{
+	// default palette
+	const u16 default_palette[16] = {
+		0x0000, 0x001f, 0x03e0, 0x03ff, 0xfc00, 0xfc1f, 0xffe0, 0xffff,
+		0x7def, 0x0015, 0x02a0, 0x02b5, 0xac00, 0xac15, 0xaea0, 0xaeb5
+	};
+	int i, pal_base;
+	for (i = 0; i < 16; i++)
+	{
+		const u16 color = default_palette[i];
+		u8 b = pal5bit((color & 0x001f));
+		u8 r = pal5bit((color & 0x03e0) >> 5);
+		u8 g = pal6bit((color & 0xfc00) >> 10);
+		for (pal_base = 0; pal_base < 2; pal_base ++)
+			palette.set_pen_color(i + pal_base * 16, r, g, b);
+	}
+}
+
+
 uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t pri, cur_pri_lv;
 	uint32_t screen_pri;
 	bitmap.fill(0, cliprect);
 
-	if(m_tsp.disp_on == 0) // don't bother if we are under DSPOFF command
+	// don't bother if we are under DSPOFF command
+	if(m_tsp.disp_on == false)
 		return 0;
 
 	// rollback to V1/V2 mode
 	if (!BIT(m_pltm, 2))
 	{
+		// BIOS doesn't explicitly set a color mode for the V1/V2 Mode printout at POST
 		// pc8801_state::screen_update(bitmap, cliprect);
-		return 0;
+		//return 0;
 	}
 
 	/*
@@ -114,7 +136,7 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
 					case 0: draw_text(bitmap, cliprect); break;
-					case 1: if(m_tsp.spr_on) { draw_sprites(bitmap,cliprect); } break;
+					case 1: draw_sprites(bitmap,cliprect); break;
 					/* A = graphic 0 */
 					case 2:
 						draw_graphic_layer(bitmap, cliprect, 0);
@@ -148,6 +170,10 @@ inline u8 pc88va_state::get_layer_pal_bank(u8 which)
 
 void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// punt if we are under SPROFF
+	if(m_tsp.spr_on == false)
+		return;
+
 	uint16_t const *const tvram = m_tvram;
 
 	int offs = m_tsp.spr_offset;
@@ -165,10 +191,14 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		int md = (tvram[(offs + i + 2) / 2] & 0x400) >> 10;
 		int xp = (tvram[(offs + i + 2) / 2] & 0x3ff);
 		int spda = (tvram[(offs + i + 4) / 2] & 0xffff);
-		int fg_col = (tvram[(offs + i + 6) / 2] & 0xf0) >> 4;
-		int bc = (tvram[(offs + i + 6) / 2] & 0x08) >> 3;
 
-		if(!sw)
+		const bool is_cursor_sprite =
+			i == m_tsp.curn
+			&& m_tsp.curn_blink == true
+			&& (m_screen->frame_number() % (m_tsp.blink * 2)) >= m_tsp.blink;
+
+		// assume cursor sprite just going transparent with blink effect
+		if(!sw || is_cursor_sprite)
 			continue;
 
 		// shanghai hand (4bpp) and rtype beam sparks (1bpp) wants this arrangement
@@ -199,6 +229,9 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 		if(md) // 1bpp mode
 		{
+			int fg_col = (tvram[(offs + i + 6) / 2] & 0xf0) >> 4;
+			int bc = (tvram[(offs + i + 6) / 2] & 0x08) >> 3;
+
 			xsize = (xsize + 1) * 32;
 			ysize = (ysize + 1) * 4;
 
@@ -211,20 +244,22 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					for(int x_s = 0; x_s < 16; x_s++)
 					{
 						int res_x = xp + x_i + x_s;
+						// TODO: MG actually doubles Y size
 						int res_y = (yp + y_i) << m_tsp.spr_mg;
 
 						if (!cliprect.contains(res_x, res_y))
 							continue;
 
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
-						int pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
+						int pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15 - x_s)) & 1;
 
 						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
 
 						if(pen != -1) //transparent pen
 							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 					}
-					spr_count+=2;
+
+					spr_count += 2;
 				}
 			}
 		}
@@ -256,7 +291,8 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						if (pen != 0)
 							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 					}
-					spr_count+=2;
+
+					spr_count += 2;
 				}
 			}
 		}
@@ -696,7 +732,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 
 		rectangle split_cliprect(cliprect.min_x, cliprect.max_x, dsp, dsh + dsp - 1);
 		split_cliprect &= cliprect;
-		
+
 		// animefrm uses layer 1 with fbl = 1 for the color cycling bar on top
 		// rtype definitely don't want to be clipped on fbw, assume valid for pitch calc only.
 		rectangle fb_cliprect(cliprect.min_x, cliprect.max_x, dsp, dsp + fbl - 1);
@@ -953,7 +989,7 @@ void pc88va_state::idp_command_w(uint8_t data)
 		case DSPON:  m_cmd = DSPON; m_buf_size = 3;  m_buf_index = 0; break;
 
 		/* 0x13 - DSPOFF: set DiSPlay OFF */
-		case DSPOFF: m_cmd = DSPOFF; m_tsp.disp_on = 0; break;
+		case DSPOFF: m_cmd = DSPOFF; m_tsp.disp_on = false; break;
 
 		/* 0x14 - DSPDEF: set DiSPlay DEFinitions */
 		case DSPDEF: m_cmd = DSPDEF; m_buf_size = 6; m_buf_index = 0; break;
@@ -961,23 +997,23 @@ void pc88va_state::idp_command_w(uint8_t data)
 		/* 0x15 - CURDEF: set CURsor DEFinition */
 		case CURDEF: m_cmd = CURDEF; m_buf_size = 1; m_buf_index = 0; break;
 
-		/* 0x16 - ACTSCR: ??? */
+		/* 0x16 - ACTSCR: set ACTive SCReen for CURSor command */
 		case ACTSCR: m_cmd = ACTSCR; m_buf_size = 1; m_buf_index = 0; break;
 
 		/* 0x15 - CURS: set CURSor position */
 		case CURS:   m_cmd = CURS;   m_buf_size = 4; m_buf_index = 0; break;
 
-		/* 0x8c - EMUL: set 3301 EMULation */
+		/* 0x8c - EMUL: set 3301 EMULation (PC88VA specific) */
 		case EMUL:   m_cmd = EMUL;   m_buf_size = 4; m_buf_index = 0; break;
 
-		/* 0x88 - EXIT: ??? */
+		/* 0x88 - EXIT: aborts current command attribute selection */
 		case EXIT:   m_cmd = EXIT; break;
 
 		/* 0x82 - SPRON: set SPRite ON */
 		case SPRON:  m_cmd = SPRON;  m_buf_size = 3; m_buf_index = 0; break;
 
 		/* 0x83 - SPROFF: set SPRite OFF */
-		case SPROFF: m_cmd = SPROFF; m_tsp.spr_on = 0; break;
+		case SPROFF: m_cmd = SPROFF; m_tsp.spr_on = false; break;
 
 		/* 0x85 - SPRSW: ??? */
 		case SPRSW:  m_cmd = SPRSW;  m_buf_size = 1; m_buf_index = 0; break;
@@ -1000,15 +1036,14 @@ void pc88va_state::idp_command_w(uint8_t data)
 	}
 }
 
-// TODO: checkout this one
-void pc88va_state::tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit)
+void pc88va_state::tsp_sprite_enable(u32 sprite_number, bool sprite_enable, bool blink_enable)
 {
-	uint32_t target_offset = (spr_offset & 0xffff)/2;
-//  address_space &space = m_maincpu->space(AS_PROGRAM);
+	const u32 target_offset = (m_tsp.spr_offset + sprite_number) / 2;
 
-//  space.write_word(spr_offset, space.read_word(spr_offset) & ~0x200);
-//  space.write_word(spr_offset, space.read_word(spr_offset) | (sw_bit & 0x200));
-	m_tvram[target_offset] = (m_tvram[target_offset] & ~0x200) | (sw_bit & 0x200);
+	m_tvram[target_offset] = (m_tvram[target_offset] & ~0x200) | (sprite_enable << 9);
+	// disable blink if an override of CURN occurs
+	if (m_tsp.spr_offset == m_tsp.curn)
+		m_tsp.curn_blink = blink_enable;
 }
 
 /*
@@ -1027,7 +1062,7 @@ void pc88va_state::tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit)
  * --xx xxxx [5] - h border end
  * --xx xxxx [6] - h blank end
  * --xx xxxx [7] - h sync
- *               \- assume all params to be - 1 / 4
+ *               \- assume all params to be val - 1 / 4
  * --xx xxxx [8] - v blank start
  * --xx xxxx [9] - v border start
  * xxxx xxxx [A] - v visible area
@@ -1089,7 +1124,12 @@ void pc88va_state::execute_sync_cmd()
 	LOGCRTC("V Total calc = %d", v_total);
 	LOGCRTC("\n");
 
-	// TODO: validate
+	// punt with message if values are off (shouldn't happen)
+	if (h_vis_area <= 1 || v_vis_area <= 1 || h_total <= h_vis_area || v_total <= v_vis_area)
+	{
+		popmessage("CRTC assertion failed total (%d x %d) visible (%d x %d)", h_total, v_total, h_vis_area, v_vis_area);
+		return;
+	}
 
 	visarea.set(0, h_vis_area - 1, 0, v_vis_area - 1);
 
@@ -1110,7 +1150,7 @@ void pc88va_state::execute_dspon_cmd()
 	[2] unknown
 	*/
 	m_tsp.tvram_vreg_offset = m_buf_ram[0] << 8;
-	m_tsp.disp_on = 1;
+	m_tsp.disp_on = true;
 	LOGIDP("DSPON (%02x %02x %02x) %05x\n"
 		, m_buf_ram[0]
 		, m_buf_ram[1]
@@ -1119,22 +1159,38 @@ void pc88va_state::execute_dspon_cmd()
 	);
 }
 
+/*
+ * xxxx xxxx [0] ATROFF attribute offset (L)
+ * xxxx xxxx [1] ^ (M)
+ * ---- -xxx [2] ^ (H), possibly unused on PC88VA, signed in two's complement (!)
+ * -xxx ---- [2] PITCH for character code
+ * x--- ---- [2] (undocumented pitch bit?)
+ * ---x xxxx [3] MRA Maximum Raster Address, line height + 1
+ *               \- affects underline, disables layer if setting < 7
+ * ---x xxxx [4] HRA Horizontal Raster Address, horizontal position for hline vertical attribute
+ * ---x xxxx [5] BR Blinking Rate, affects both attribute and cursor in number of frames, max value on 0
+ *               \- attribute x24 on, x8 off
+ *               \- cursor x8 on, x8 off
+ */
 void pc88va_state::execute_dspdef_cmd()
 {
-	/*
-	[0] attr offset (lo word)
-	[1] attr offset (hi word)
-	[2] pitch (character code interval x 16, i.e. 0x20 = 2 bytes
-	[3] line height
-	[4] hline vertical position
-	[5] blink number
-	*/
 	m_tsp.attr_offset = m_buf_ram[0] | m_buf_ram[1] << 8;
-	m_tsp.pitch = (m_buf_ram[2] & 0xf0) >> 4;
-	m_tsp.line_height = m_buf_ram[3] + 1;
+	// m_buf_ram[2] & 1 used on POST (?)
+	if (m_buf_ram[2] & 0x6)
+		popmessage("TSP: unimplemented (H) attribute ");
+
+	m_tsp.pitch = (m_buf_ram[2] & 0x70) >> 4;
+	if (BIT(m_buf_ram[2], 7))
+		popmessage("TSP: undocumented PITCH bit set");
+
+	m_tsp.line_height = (m_buf_ram[3] & 0x1f) + 1;
+	if (m_tsp.line_height < 8)
+		popmessage("TSP: line height disable");
 	m_tsp.h_line_pos = m_buf_ram[4];
-	m_tsp.blink = (m_buf_ram[5] & 0xf8) >> 3;
-	LOGIDP("DSPDEF (%02x %02x %02x %02x %02x %02x) %05x ATTR | %02x pitch | %02x line height| %02x hline | %02x blink\n"
+	m_tsp.blink = (m_buf_ram[5] & 0xf8);
+	if (m_tsp.blink == 0)
+		m_tsp.blink = 0x100;
+	LOGIDP("DSPDEF (%02x %02x %02x %02x %02x %02x) %05x ATTR | %02x pitch | %02x line height| %02x hline | %d blink rate\n"
 		, m_buf_ram[0], m_buf_ram[1], m_buf_ram[2], m_buf_ram[3], m_buf_ram[4], m_buf_ram[5]
 		, m_tsp.attr_offset | 0x40000
 		, m_tsp.pitch
@@ -1144,47 +1200,44 @@ void pc88va_state::execute_dspdef_cmd()
 	);
 }
 
+/*
+ * xxxx x--- [0] CURN Sprite Cursor number (sprite RAM entry)
+ * ---- --x- [0] CE show cursor bit (actively modifies the spriteram entry)
+ * ---- ---x [0] BE Blink Enable
+ */
 void pc88va_state::execute_curdef_cmd()
 {
-	/*
-	xxxx x--- [0] Sprite Cursor number (sprite RAM entry)
-	---- --x- [0] show cursor bit (actively modifies the spriteram entry)
-	---- ---x [0] Blink Enable
-	*/
-
-	/* TODO: needs basic sprite emulation */
 	m_tsp.curn = (m_buf_ram[0] & 0xf8);
-	m_tsp.curn_blink = (m_buf_ram[0] & 1);
+	const bool cursor_enable = bool(BIT(m_buf_ram[0], 1));
+	const bool blink_enable = bool(BIT(m_buf_ram[0], 0));
 	LOGIDP("CURDEF %02x|%d show|%d blink\n"
 		, m_buf_ram[0] & 0xf8
-		, BIT(m_buf_ram[0], 1)
-		, BIT(m_buf_ram[0], 0)
+		, cursor_enable
+		, blink_enable
 	);
-	tsp_sprite_enable(m_tsp.spr_offset + m_tsp.curn, (m_buf_ram[0] & 2) << 8);
+	tsp_sprite_enable(m_tsp.curn, cursor_enable, blink_enable);
 }
 
+/*
+ * -xx- ---- [0] strip layer ID for cursor (attribute?) and light pen
+ */
 void pc88va_state::execute_actscr_cmd()
 {
-	/*
-	This command assigns a strip where the cursor is located.
-	xxxx xxxx [0] strip ID * 32 (???)
-	*/
-
-	/* TODO: no idea about this command */
-	//printf("ACTSCR: %02x\n",m_buf_ram[0]);
+	const u8 active_screen_area = (m_buf_ram[0] & 0x60) >> 5;
+	LOGIDP("ACTSCR (%02x) %d\n", m_buf_ram[0], active_screen_area);
 }
 
+/*
+ * xxxx xxxx [0] Cursor Position Y (lo word)
+ * ---- -xxx [1] Cursor Position Y (hi word)
+ * xxxx xxxx [2] Cursor Position X (lo word)
+ * ---- --xx [3] Cursor Position X (hi word)
+ */
 void pc88va_state::execute_curs_cmd()
 {
-	/*
-	[0] Cursor Position Y (lo word)
-	[1] Cursor Position Y (hi word)
-	[2] Cursor Position X (lo word)
-	[3] Cursor Position X (hi word)
-	*/
-
-	m_tsp.cur_pos_y = m_buf_ram[0] | m_buf_ram[1] << 8;
-	m_tsp.cur_pos_x = m_buf_ram[2] | m_buf_ram[3] << 8;
+	m_tsp.cur_pos_y = m_buf_ram[0] | (m_buf_ram[1] & 0x7) << 8;
+	m_tsp.cur_pos_x = m_buf_ram[2] | (m_buf_ram[3] & 0x3) << 8;
+	LOGIDP("CURS X: %d Y: %d\n", m_tsp.cur_pos_x, m_tsp.cur_pos_y);
 }
 
 void pc88va_state::execute_emul_cmd()
@@ -1210,7 +1263,7 @@ void pc88va_state::execute_spron_cmd()
 	---- ---x [2] GR: 1 to enable the group collision detection
 	*/
 	m_tsp.spr_offset = m_buf_ram[0] << 8;
-	m_tsp.spr_on = 1;
+	m_tsp.spr_on = true;
 	m_tsp.spr_mg = BIT(m_buf_ram[2], 1);
 	LOGIDP("SPRON (%02x %02x %02x) %05x offs| %d max sprites| %d MG| %d GR|\n"
 		, m_buf_ram[0]
@@ -1223,20 +1276,21 @@ void pc88va_state::execute_spron_cmd()
 	);
 }
 
+/*
+ * Toggle an individual sprite in the sprite ram entry
+ * xxxx x--- [0] SPN target sprite number
+ * ---- --x- [0] SPSW sprite off/on switch
+ */
 void pc88va_state::execute_sprsw_cmd()
 {
-	/*
-	Toggle an individual sprite in the sprite ram entry
-	[0] xxxx x--- target sprite number
-	[0] ---- --x- sprite off/on switch
-	*/
-
+	const u8 spn = m_buf_ram[0] & 0xf8;
+	const bool spsw = bool(BIT(m_buf_ram[0], 1));
 	LOGIDP("SPRSW (%02x) %08x offset| %s SW\n"
 		, m_buf_ram[0]
 		, m_tsp.spr_offset + 0x40000
-		, m_buf_ram[0] & 2 ? "enable" : "disable"
+		, spsw ? "enable" : "disable"
 	);
-	tsp_sprite_enable(m_tsp.spr_offset + (m_buf_ram[0] & 0xf8), (m_buf_ram[0] & 2) << 8);
+	tsp_sprite_enable(spn, spsw, false);
 }
 
 void pc88va_state::idp_param_w(uint8_t data)
@@ -1426,7 +1480,7 @@ void pc88va_state::text_transpen_w(offs_t offset, u16 data, u16 mem_mask)
 
 /*
  * $14c-$14f Kanji CG ports
- * Alt method for access kanji ROM for drawing to bitmap gfxs
+ * Alt method for access kanji ROM for drawing to graphic layers
  */
 u8 pc88va_state::kanji_cg_r()
 {

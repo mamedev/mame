@@ -11,7 +11,7 @@
     Special thanks to Fujix for his documentation translation help
 
     TODO:
-    - pc88va (stock version) has two bogus opcodes. 
+    - pc88va (stock version) has two bogus opcodes.
       One is at 0xf0b15 (0x0f 0xfe), another at 0xf0b31 (br 1000h:0c003h).
       Latter will make the program flow to jump to lalaland.
     - pc88va is also known to have a slightly different banking scheme and
@@ -1078,7 +1078,7 @@ void pc88va_state::machine_reset()
 	m_sound_irq_pending = false;
 }
 
-INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
+INTERRUPT_GEN_MEMBER(pc88va_state::vrtc_irq )
 {
 	// TODO: verify when ack should happen
 	m_maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
@@ -1133,7 +1133,7 @@ void pc88va_state::pc88va(machine_config &config)
 	V50(config, m_maincpu, MASTER_CLOCK); // μPD9002, aka V50 + μPD70008AC (for PC8801 compatibility mode) in place of 8080
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_map);
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::pc88va_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::pc88va_vrtc_irq));
+	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::vrtc_irq));
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->set_tclk(MASTER_CLOCK);
@@ -1155,7 +1155,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_screen->set_raw(XTAL(42'105'200) / 2, 848, 0, 640, 448, 0, 400);
 	m_screen->set_screen_update(FUNC(pc88va_state::screen_update));
 
-	PALETTE(config, m_palette).set_entries(32);
+	PALETTE(config, m_palette, FUNC(pc88va_state::palette_init)).set_entries(32);
 //  m_palette->set_init(FUNC(pc88va_state::pc8801));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc88va);
 
