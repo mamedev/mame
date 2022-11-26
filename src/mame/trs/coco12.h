@@ -27,6 +27,7 @@
 
 #define SAM_TAG         "sam"
 #define VDG_TAG         "vdg"
+#define MOSACIA_TAG     "mosacia"
 #define ACIA_TAG        "acia"
 #define PSG_TAG         "psg"
 
@@ -94,7 +95,7 @@ class deluxecoco_state : public coco12_state
 public:
 	deluxecoco_state(const machine_config &mconfig, device_type type, const char *tag)
 		: coco12_state(mconfig, type, tag)
-		, m_acia(*this, ACIA_TAG)
+		, m_acia(*this, MOSACIA_TAG)
 		, m_psg(*this, PSG_TAG)
 	{
 	}
