@@ -331,4 +331,4 @@ ROM_START(dx7)
 	ROM_LOAD("hd6805s1p-a33.ic13", 0x0000, 0x800, CRC(ac1d84b3) SHA1(ee0ebb118dd0d282d7c195d3b246a0094b2cb6ad))
 ROM_END
 
-SYST(1983, dx7, 0, 0, dx7, dx7, yamaha_dx7_state, empty_init, "Yamaha", "DX-7 Digital Programmable Algorithm Synthesizer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1983, dx7, 0, 0, dx7, dx7, yamaha_dx7_state, empty_init, "Yamaha", "DX7 Digital Programmable Algorithm Synthesizer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

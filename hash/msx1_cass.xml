@@ -8482,7 +8482,7 @@ license:CC0
 	</software>
 
 	<software name="lengegb7">
-		<description>Lenguaje 7° E.G.B. (Spain)</description>
+		<description>Lenguaje 7º E.G.B. (Spain)</description>
 		<year>1985</year>
 		<publisher>Santillana</publisher>
 		<info name="usage" value="Load with CLOAD + RUN"/>
@@ -8495,7 +8495,7 @@ license:CC0
 	</software>
 
 	<software name="lengegb8">
-		<description>Lenguaje 8° E.G.B. (Spain)</description>
+		<description>Lenguaje 8º E.G.B. (Spain)</description>
 		<year>1985</year>
 		<publisher>Santillana</publisher>
 		<info name="serial" value="CJ17"/>
