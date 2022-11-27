@@ -952,7 +952,7 @@ void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &c
  * ---- x--- In the midst of execution of EMEN emulation development
  * ---- -x-- In the midst of BUSY command execution
  * ---- --x- OBF output data buffer full
- * ---- ---x IBF input data buffer full (command/parameter commonness)
+ * ---- ---x IBF input data buffer full (common with command and parameters)
  */
 uint8_t pc88va_state::idp_status_r()
 {
@@ -977,6 +977,7 @@ uint8_t pc88va_state::idp_status_r()
 #define SPROFF 0x83
 #define SPRSW  0x85
 #define SPROV  0x81
+#define SPWR   0x84
 
 void pc88va_state::idp_command_w(uint8_t data)
 {
@@ -1015,7 +1016,7 @@ void pc88va_state::idp_command_w(uint8_t data)
 		/* 0x83 - SPROFF: set SPRite OFF */
 		case SPROFF: m_cmd = SPROFF; m_tsp.spr_on = false; break;
 
-		/* 0x85 - SPRSW: ??? */
+		/* 0x85 - SPRSW: flip SPRite SW bit */
 		case SPRSW:  m_cmd = SPRSW;  m_buf_size = 1; m_buf_index = 0; break;
 
 		/* 0x81 - SPROV: set SPRite OVerflow information */
@@ -1024,10 +1025,13 @@ void pc88va_state::idp_command_w(uint8_t data)
 		--x- ---- Sprite Collision flag
 		---x xxxx First sprite that caused Sprite Over event
 		*/
-		case SPROV:  m_cmd = SPROV; /* TODO: where it returns the info? */ break;
+		// TODO: data is readback in $146
+		case SPROV:  m_cmd = SPROV; break;
 
-		// TODO: 0x84 - <unknown>, pc88vad
-		// TODO: 0x89 - mask command
+		/* 0x84 - SPRW: SPRite Write */
+		case SPWR:   m_cmd = SPWR; m_tsp.spwr_define = true; break;
+
+		// TODO: 0x89 - MASK command
 
 		default:
 			m_cmd = 0x00;
@@ -1085,7 +1089,6 @@ void pc88va_state::execute_sync_cmd()
 	for (int i = 0; i < 15; i++)
 		LOGCRTC("%02x ", m_buf_ram[i]);
 
-	// assume all parame
 	const u8 h_blank_start = (m_buf_ram[0x02] & 0x3f) + 1;
 	const u8 h_border_start = (m_buf_ram[0x03] & 0x3f) + 1;
 	const u16 h_vis_area = (m_buf_ram[0x04] + 1) * 4;
@@ -1293,10 +1296,46 @@ void pc88va_state::execute_sprsw_cmd()
 	tsp_sprite_enable(spn, spsw, false);
 }
 
+// 88va2d and friends during transitions
+/*
+ * xxxx x--- [0] target SPN
+ * ---- -xxx [0] target attribute
+ * Afterwards, data written to the param port will indefinitely write to sprite area
+ * until command is cancelled, auto-incrementing per byte and eventually moving on to 
+ * the next SPN when attribute overruns past 7.
+ */
+void pc88va_state::execute_spwr_cmd(u8 data)
+{
+	if (m_tsp.spwr_define == true)
+	{
+		m_tsp.spwr_define = false;
+		m_tsp.spwr_offset = data;
+	}
+	else
+	{
+		// TODO: likely going in FIFO full state
+		// 88va2d delays on status & 0x1f being all off then checks for IBF before every data dispatch.
+		const u32 target_offset = (m_tsp.spr_offset + m_tsp.spwr_offset) / 2;
+
+		if (m_tsp.spwr_offset & 1)
+			m_tvram[target_offset] = (m_tvram[target_offset] & 0x00ff) | (data << 8);
+		else
+			m_tvram[target_offset] = (m_tvram[target_offset] & 0xff00) | (data & 0xff);
+		m_tsp.spwr_offset ++;
+	}
+}
+
 void pc88va_state::idp_param_w(uint8_t data)
 {
 	if(m_cmd == DSPOFF || m_cmd == EXIT || m_cmd == SPROFF || m_cmd == SPROV) // no param commands
 		return;
+
+	// special: until a different command is issued just route to SPWR
+	if (m_cmd == SPWR)
+	{
+		execute_spwr_cmd(data);
+		return;
+	}
 
 	m_buf_ram[m_buf_index] = data;
 	m_buf_index++;

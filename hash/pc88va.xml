@@ -124,6 +124,7 @@ Crashes during first demo sequence
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
 Crashes during or after second demo sequence
+Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">

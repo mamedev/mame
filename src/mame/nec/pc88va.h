@@ -76,6 +76,8 @@ protected:
 		u16 cur_pos_x = 0, cur_pos_y = 0;
 		u8 curn = 0;
 		bool curn_blink = false;
+		bool spwr_define = false;
+		u8 spwr_offset = 0;
 	};
 
 	struct keyb_t
@@ -228,6 +230,7 @@ private:
 	void execute_emul_cmd();
 	void execute_spron_cmd();
 	void execute_sprsw_cmd();
+	void execute_spwr_cmd(u8 data);
 
 	void pc88va_map(address_map &map);
 	void pc88va_io_map(address_map &map);
