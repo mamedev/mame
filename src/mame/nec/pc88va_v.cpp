@@ -574,8 +574,13 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				else if ((tvram[cur_offset] & 0x00ff) == 0x56)
 				{
 					// famista draws cursor/team letters/referee calls with PCG
-					u32 tile_num = (((tvram[cur_offset] & 0x7f00) >> 8) + 0x20) * 0x20;
-					u16 lr_half_gfx = ((tvram[cur_offset] & 0x8000) >> 15);
+					// boomer draws HP bar on gameplay
+					// both shifts bits 5-6 by 1 for upper tiles to be properly accessed,
+					// cfr. gfxdecoding where there's an hole every 0x20 chars
+					// (no way to access these?)
+					const u8 base_tile = (tvram[cur_offset] & 0xff00) >> 8;
+					u32 tile_num = ((base_tile & 0x1f) + ((base_tile & 0x60) << 1)) * 0x20;
+					u8 lr_half_gfx = BIT(base_tile, 7);
 
 					for(int yi = 0; yi < 16; yi++)
 					{
