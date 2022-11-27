@@ -1004,10 +1004,10 @@ void pc88va_state::idp_command_w(uint8_t data)
 		/* 0x15 - CURS: set CURSor position */
 		case CURS:   m_cmd = CURS;   m_buf_size = 4; m_buf_index = 0; break;
 
-		/* 0x8c - EMUL: set 3301 EMULation (PC88VA specific) */
+		/* 0x8c - EMUL: set 3301 EMULation (PC88VA specific, undocumented in 72022 specs) */
 		case EMUL:   m_cmd = EMUL;   m_buf_size = 4; m_buf_index = 0; break;
 
-		/* 0x88 - EXIT: aborts current command attribute selection */
+		/* 0x88 - EXIT: aborts current command attribute selection, or clear an ERror state */
 		case EXIT:   m_cmd = EXIT; break;
 
 		/* 0x82 - SPRON: set SPRite ON */
@@ -1031,11 +1031,19 @@ void pc88va_state::idp_command_w(uint8_t data)
 		/* 0x84 - SPRW: SPRite Write */
 		case SPWR:   m_cmd = SPWR; m_tsp.spwr_define = true; break;
 
-		// TODO: 0x89 - MASK command
+		// TODO: 0x80 - SPRRD (same as SPWR but on read)
+		// TODO: 0x1a - LPNR (returns current light pen latch)
+		// TODO: 0x89 - MASK (ANDs successive VRAM writes for block write commands)
+		// TODO: 0x8e/0x8f - DPLD (set internal DPTR0/DPTR1 address variables)
+		// TODO: 0x8a - DPRD (get internal DPTR0 address)
+		// TODO: 0x90/0x91/0x92/0x93 - RDAT (Read DATa)
+		// TODO: 0x94/0x95/0x96/0x97 - WDAT (Write DATa)
+		// TODO: 0x99/0x9a/0x9b - BLKTOT (DMA block output)
+		// TODO: 0x9d/0x9e/0x9f - BLKTIN (DMA block input)
 
 		default:
 			m_cmd = 0x00;
-			LOG("PC=%05x: Unknown IDP %02x cmd set\n",m_maincpu->pc(),data);
+			LOG("Unknown IDP %02x cmd set\n", data);
 			break;
 	}
 }
@@ -1253,7 +1261,7 @@ void pc88va_state::execute_emul_cmd()
 	*/
 
 	// TODO: this starts 3301 video emulation
-	//popmessage("Warning: TSP executes EMUL command, contact MESSdev");
+	//popmessage("TSP: executed EMUL command");
 }
 
 void pc88va_state::execute_spron_cmd()
