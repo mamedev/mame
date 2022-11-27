@@ -31,9 +31,9 @@ uint32_t wide_fm(uint16_t val)
 
 uint32_t data_to_wide_fm(uint8_t val)
 {
-	uint16_t res = 0xaaaa;	// clock
+	uint16_t res = 0xaaaa;  // clock
 	for (int i = 7; i >= 0; i--) {
-		res |= (util::BIT(val, i) << i*2);		// data
+		res |= (util::BIT(val, i) << i*2);      // data
 	}
 	return wide_fm(res);
 }
@@ -166,7 +166,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			{
 				mark_location[i] = -1;
 				mark_value[i] = 0xfe;
-				mark_is_mfm[i] = !is_sd;	// Use default encoding
+				mark_is_mfm[i] = !is_sd;    // Use default encoding
 			}
 			int mark_count = 0;
 
@@ -241,7 +241,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					}
 					else
 					{
-						raw_w(raw_track_data, 32, wide_fm(0xf77a));	// FC clocked with D7
+						raw_w(raw_track_data, 32, wide_fm(0xf77a)); // FC clocked with D7
 						offset += fm_stride;
 					}
 				}
@@ -299,7 +299,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				else
 					raw_w(raw_track_data, 32, data_to_wide_fm(track_data[offset]));
 
-	
+
 				if (!enc_mfm)
 					offset += fm_stride - 1;
 			}

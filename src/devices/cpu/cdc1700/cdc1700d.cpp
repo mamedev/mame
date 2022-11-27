@@ -60,7 +60,7 @@ const char *const s_register_insts[15] =
 
 const char *const s_memory_insts[15] =
 {
-	       "JMP", "MUI", "DVI",
+		   "JMP", "MUI", "DVI",
 	"STQ", "RTJ", "STA", "SPA",
 	"ADD", "SUB", "AND", "EOR",
 	"LDA", "RAO", "LDQ", "ADQ"
@@ -311,7 +311,7 @@ offs_t cyber18_disassembler::dasm_register_reference(std::ostream &stream, offs_
 			if (BIT(inst, 8))
 				util::stream_format(stream, ",%d,%d", BIT(inst2, 12, 4), BIT(inst2, 8, 4) + 1);
 
-			// For LCA, SCA and CCE, first index is a character index 
+			// For LCA, SCA and CCE, first index is a character index
 			if (!BIT(inst, 8) && (inst2 & 0xde00) == 0xc200)
 				util::stream_format(stream, ",%s", s_reg_long_names[BIT(inst, 0, 3)]);
 
@@ -524,7 +524,7 @@ offs_t cdc1700_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0xf:
 		// Shift instructions
 		if (BIT(inst, 5, 2) != 0)
-			util::stream_format(stream, "%c%c%-3c%d", "QAL"[BIT(inst, 5, 2) - 1], BIT(inst, 7) ? 'L' : 'R', 'S', inst & 0x001f);		
+			util::stream_format(stream, "%c%c%-3c%d", "QAL"[BIT(inst, 5, 2) - 1], BIT(inst, 7) ? 'L' : 'R', 'S', inst & 0x001f);
 		else
 			util::stream_format(stream, "%-5s$%04X", "NUM", inst);
 		return 1 | SUPPORTED;

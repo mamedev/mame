@@ -38,7 +38,7 @@ The "960606-5" PCB is used at least on the following games:
   Unidesa/Cirsa Vikingos
   Unidesa/Cirsa Vulcano
 
-The same hardware from Unidesa/Cirsa was also used on some games from 
+The same hardware from Unidesa/Cirsa was also used on some games from
 "Europea de Investigaciones Electrónicas S.A.":
 
   Unidesa/Cirsa/Europea Atlantis

@@ -8,8 +8,12 @@
 
 #include "emu.h"
 #include "ctrl.h"
+
 #include "joystick.h"
+#include "libbler.h"
 #include "mouse.h"
+#include "towns6b.h"
+#include "townspad.h"
 
 
 DEFINE_DEVICE_TYPE(MSX_GENERAL_PURPOSE_PORT, msx_general_purpose_port_device, "msx_general_purpose_port", "MSX General Purpose port")
@@ -39,5 +43,9 @@ void msx_general_purpose_port_device::device_start()
 void msx_general_purpose_port_devices(device_slot_interface &device)
 {
 	device.option_add("joystick", MSX_JOYSTICK);
+	device.option_add("libbler", MSX_LIBBLERPAD);
+	device.option_add("martypad", MSX_MARTYPAD);
 	device.option_add("mouse", MSX_MOUSE);
+	device.option_add("towns6b", MSX_TOWNS6B);
+	device.option_add("townspad", MSX_TOWNSPAD);
 }

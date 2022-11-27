@@ -353,6 +353,7 @@ Jumpers set on GFX PCB to scope monitor:
 #include "k037122.h"
 #include "konami_gn676_lan.h"
 #include "konppc.h"
+#include "windy2.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
@@ -472,6 +473,7 @@ public:
 	void hornet(machine_config &config);
 	void hornet_x76(machine_config &config);
 	void hornet_lan(machine_config &config);
+	void nbapbp(machine_config &config);
 	void terabrst(machine_config &config);
 	void sscope(machine_config &config);
 	void sscope2(machine_config &config);
@@ -638,6 +640,9 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x04 = LAMP2
 			    0x02 = LAMP1
 			    0x01 = LAMP0
+
+			    The bit used for JVSTXEN changes between 3 and 4 based on the lower 2 bits of IN2.
+			    If m_in[2]->read() & 3 != 0, bit 4 is used. Otherwise, bit 3 is used.
 			*/
 			if (m_x76f041)
 				m_x76f041->write_cs(BIT(data, 6));
@@ -1282,6 +1287,17 @@ void hornet_state::hornet_lan(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::hornet_lan_map);
 
 	KONAMI_GN676_LAN(config, "gn676_lan", 0, m_workram);
+}
+
+void hornet_state::nbapbp(machine_config &config)
+{
+	hornet_x76(config);
+
+	// The official recommended settings in the manual for 4 player mode is cabinet type 4 player + harness JAMMA
+	// with the 2L6B panel dipswitch settings on the Windy2 board.
+	// NOTE: Harness JVS + cabinet 4 player will work with a second JVS I/O device hooked up, but then
+	// the official recommended setting of cabinet type 4 player + harness JAMMA breaks.
+	KONAMI_WINDY2_JVS_IO_2L6B_PANEL(config, "windy2_jvsio", 0, m_hornet_jvs_host);
 }
 
 void hornet_state::terabrst(machine_config &config) //todo: add K056800 from I/O board
@@ -3330,14 +3346,14 @@ GAME(  1998, gradius4ja, gradius4, hornet_x76, gradius4, hornet_state, init_grad
 GAME(  1998, gradius4ua, gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver UAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, gradius4aa, gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver AAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME(  1998, nbapbp,   0,      hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver UAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpa,  nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpj,  nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpua, nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpaa, nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpja, nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbaatw,   nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA All The Way (ver EAB)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbaatwa,  nbapbp, hornet_x76, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA All The Way (ver EAA)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,   0,      nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver UAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpa,  nbapbp, nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpj,  nbapbp, nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpua, nbapbp, nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpaa, nbapbp, nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpja, nbapbp, nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbaatw,   nbapbp, nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA All The Way (ver EAB)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbaatwa,  nbapbp, nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA All The Way (ver EAA)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME(  1998, terabrst,   0,        terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrstj,  terabrst, terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/07/17 ver JEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

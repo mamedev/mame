@@ -269,7 +269,8 @@ void scmp_device::execute_one(int opcode)
 			// Transfer Instructions
 			case 0x90 : case 0x91 : case 0x92 : case 0x93 :// JMP
 						m_icount -= 11;
-						m_PC.w.l = ADD12(GET_PTR_REG(ptr)->w.l,(int8_t)ARG());
+						tmp = ARG(); // PC must be updated before the destination address is calculated
+						m_PC.w.l = ADD12(GET_PTR_REG(ptr)->w.l,(int8_t)tmp);
 						break;
 			case 0x94 : case 0x95 : case 0x96 : case 0x97 :
 						// JP
