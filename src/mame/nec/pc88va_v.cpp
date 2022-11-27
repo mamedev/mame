@@ -14,7 +14,7 @@
 #define LOG_COLOR   (1U << 6) // current color mode
 #define LOG_TEXT    (1U << 7) // text strips (verbose)
 
-#define VERBOSE (LOG_GENERAL | LOG_IDP)
+#define VERBOSE (LOG_GENERAL | LOG_IDP | LOG_FB)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -714,8 +714,8 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 
 		const u16 fbl = (fb_strip_regs[0x06 / 2] & 0x3ff) + 1;
 		const u8 x_dot_offs = fb_strip_regs[0x08 / 2];
-		const u8 ofx = fb_strip_regs[0x0a / 2] & 0x7fc;
-		const u8 ofy = fb_strip_regs[0x0c / 2] & 0x7fc;
+		const u16 ofx = fb_strip_regs[0x0a / 2] & 0x7fc;
+		const u16 ofy = fb_strip_regs[0x0c / 2] & 0x3ff;
 		const u32 dsa = ((fb_strip_regs[0x0e / 2] & 0xfffc) | ((fb_strip_regs[0x10 / 2] & 0x3) << 16));
 		const u16 dsh = fb_strip_regs[0x12 / 2] & 0x1ff;
 		const u16 dsp = fb_strip_regs[0x16 / 2] & 0x1ff;
