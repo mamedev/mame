@@ -33,19 +33,19 @@
 // mass storage ROMs (see http://www.hpmuseum.net).
 
 #include "emu.h"
+#include "bus/hp9845_io/hp9845_io.h"
 #include "cpu/hphybrid/hphybrid.h"
+#include "imagedev/bitbngr.h"
+#include "machine/ram.h"
 #include "machine/timer.h"
+#include "sound/beep.h"
+#include "hp9825_optrom.h"
 #include "hp9825_tape.h"
 #include "hp98x5_io_sys.h"
-#include "hp9825_optrom.h"
-#include "bus/hp9845_io/hp9845_io.h"
-#include "imagedev/bitbngr.h"
-#include "speaker.h"
 #include "screen.h"
-#include "sound/beep.h"
-#include "hp9825.lh"
 #include "softlist_dev.h"
-#include "machine/ram.h"
+#include "speaker.h"
+#include "hp9825.lh"
 
 // Debugging
 #define VERBOSE 0
