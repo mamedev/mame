@@ -150,14 +150,15 @@ public:
 	{
 	}
 
-	void hp98xx_base(machine_config &config);
-
 	DECLARE_INPUT_CHANGED_MEMBER(kb_changed);
 
 protected:
+	void hp98xx_base(machine_config &config);
+
 	virtual void machine_start() override;
 	virtual void device_reset() override;
 	virtual void machine_reset() override;
+	virtual void print_line();
 
 	required_device<hp_09825_67907_cpu_device> m_cpu;
 	required_device_array<hp9825_optrom_device , 4> m_rom_drawers;
@@ -166,8 +167,6 @@ protected:
 	uint8_t m_printer_mem[ PRINT_COLUMNS ];
 	uint8_t m_printer_idx;
 	unsigned m_printer_line;    // 0: printer idle, 1..10: line being printed
-
-	virtual void print_line();
 
 private:
 	required_device<hp98x5_io_sys_device> m_io_sys;
@@ -912,13 +911,13 @@ public:
 	{
 	}
 
-	void hp9825_base(machine_config &config);
-
 	DECLARE_INPUT_CHANGED_MEMBER(scroll_changed);
 
 	uint32_t printer_out_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	void hp9825_base(machine_config &config);
+
 	virtual void machine_start() override;
 
 	virtual void print_line() override;
