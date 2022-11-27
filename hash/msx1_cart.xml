@@ -12472,6 +12472,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- This might not exist on cartridge, no photographic evidence yet. -->
 	<software name="yakyukyo">
 		<description>Yakyu Kyo (Jpn)</description>
 		<year>1985</year>
