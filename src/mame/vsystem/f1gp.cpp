@@ -12,8 +12,9 @@
       being an extra 68000.
 
     TODO:
-    - Hook up link for Multi Player game mode. Currently will show ID CHECK
-      ERROR then hang.
+    - Hook up link for Multi Player game mode. Currently they boot with
+	  link set to multiple, but the ID changes every boot (and will black
+	  out if a multiplayer game is started).
 
     f1gp:
     - gfxctrl register not understood - handling of fg/sprite priority to fix
@@ -692,7 +693,7 @@ ROM_START( f1gp2 )
 ROM_END
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // censored banners, US McO'River release?
 GAME( 1991, f1gpa, f1gp, f1gp,  f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 2)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state,  empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
