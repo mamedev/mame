@@ -13280,7 +13280,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="msxlogo">
-		<description>MSX-Logo (English UK)</description>
+		<description>MSX-Logo (UK)</description>
 		<year>1985</year>
 		<publisher>Philips UK</publisher>
 		<info name="serial" value="VG 8103/20" />
@@ -13303,7 +13303,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="msxlogobr11" cloneof="msxlogo">
-		<description>MSX-Logo (Brazil) HOT-Logo Version 1.1</description>
+		<description>HOT-LOGO (Brazil, version 1.1)</description>
 		<year>1986</year>
 		<publisher>Epcom</publisher>
 		<part name="cart" interface="msx_cart">
@@ -13314,7 +13314,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="msxlogobr12" cloneof="msxlogo">
-		<description>MSX-Logo (Brazil) HOT-Logo Version 1.2</description>
+		<description>HOT-LOGO (Brazil, version 1.2)</description>
 		<year>1986</year>
 		<publisher>Epcom</publisher>
 		<part name="cart" interface="msx_cart">
@@ -13349,9 +13349,10 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="msxlogopl" cloneof="msxlogo">
-		<description>MSX-Logo (Poland) COMtech</description>
+		<description>MSX-Logo (Poland)</description>
 		<year>1987</year>
 		<publisher>COMtech</publisher>
+		<info name="alt_title" value="COMTECH-LOGO" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="msxlogo_pl.rom" size="32768" crc="98d394eb" sha1="4354b46484c07c43eec80a92e405e13c2a8fcb73" offset="0" />
