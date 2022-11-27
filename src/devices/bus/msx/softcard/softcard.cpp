@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "softcard.h"
-#include "bus/msx/cart/softcard.h"
 
 
 DECLARE_DEVICE_TYPE(SOFTCARD_NOMAPPER, softcard_interface)
@@ -17,10 +16,8 @@ void softcard(device_slot_interface &device)
 
 softcard_interface::softcard_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "softcard")
-	, m_exp(nullptr)
+	, m_page{nullptr, nullptr, nullptr, nullptr}
 {
-	for (int i = 0; i < 4; i++)
-		m_page[i] = nullptr;
 }
 
 void softcard_interface::rom_alloc(u32 size)

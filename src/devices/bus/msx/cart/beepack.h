@@ -25,7 +25,7 @@ public:
 	virtual image_init_result call_load() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "bee_card"; }
-	virtual const char *file_extensions() const noexcept override { return "mx1,bin,rom"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,rom"; }
 
 protected:
 	virtual void device_resolve_objects() override;

@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "beecard.h"
-#include "bus/msx/cart/beepack.h"
 
 
 DECLARE_DEVICE_TYPE(BEE_CARD_NOMAPPER, bee_card_interface)
@@ -17,10 +16,8 @@ void bee_card(device_slot_interface &device)
 
 bee_card_interface::bee_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "beecard")
-	, m_exp(nullptr)
+	, m_page{nullptr, nullptr, nullptr, nullptr}
 {
-	for (int i = 0; i < 4; i++)
-		m_page[i] = nullptr;
 }
 
 void bee_card_interface::rom_alloc(u32 size)

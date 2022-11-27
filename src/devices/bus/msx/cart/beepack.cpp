@@ -29,7 +29,6 @@ void msx_cart_beepack_device::device_resolve_objects()
 	m_beecard = get_card_device();
 	if (m_beecard)
 	{
-		m_beecard->m_exp = this;
 		m_beecard->set_views(page(0), page(1), page(2), page(3));
 	}
 }
@@ -77,7 +76,6 @@ image_init_result msx_cart_beepack_device::call_load()
 			}
 		}
 
-		m_beecard->m_exp = this;
 		m_beecard->initialize_cartridge();
 	}
 	return image_init_result::PASS;
