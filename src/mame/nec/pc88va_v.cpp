@@ -14,7 +14,7 @@
 #define LOG_COLOR   (1U << 6) // current color mode
 #define LOG_TEXT    (1U << 7) // text strips (verbose)
 
-#define VERBOSE (LOG_GENERAL | LOG_IDP | LOG_CRTC)
+#define VERBOSE (LOG_GENERAL | LOG_IDP)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -1589,13 +1589,13 @@ u8 pc88va_state::kanji_cg_r()
 	if (m_kanji_cg_jis[1] == 0)
 		return kanji_rom[0x40000 + (m_kanji_cg_jis[0] * 0x10) + (m_kanji_cg_line)];
 
-	// TODO: PCG
-	// jis2 = 0x21 PC on top-left for animefrm, not uploaded?
+	// PCG
 	if (m_kanji_cg_jis[0] == 0x56)
 	{
-		return 0xff;
-		//const u32 pcg_addr = (m_kanji_cg_jis[1] + 0x20) * 0x20;
-		//return m_kanjiram[pcg_addr + (m_kanji_cg_line << 1) + (m_kanji_cg_lr ^ 1)];
+		// jis2 = 0x21 / 0x22 "PC" on hovered top status bar for animefrm
+		// NB: software reverts the two chars once it gets upped to bitmap layer.
+		const u32 pcg_addr = ((m_kanji_cg_jis[1] & 0x1f) + ((m_kanji_cg_jis[1] & 0x60) << 1)) * 0x20;
+		return m_kanjiram[pcg_addr + (m_kanji_cg_line << 1) + (m_kanji_cg_lr ^ 1)];
 	}
 
 	const u32 kanji_address = calc_kanji_rom_addr(m_kanji_cg_jis[0] + 0x20, m_kanji_cg_jis[1], 0, 0);
