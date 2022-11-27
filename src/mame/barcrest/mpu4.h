@@ -359,12 +359,12 @@ protected:
 	void mpu4_memmap_bootleg_characteriser(address_map &map);
 	void mpu4_memmap_bl_characteriser_blastbank(address_map &map);
 
-	void lamp_extend_small(uint8_t data);
-	void lamp_extend_large(uint8_t data,uint8_t column,bool active);
-	void led_write_extender(uint8_t latch, uint8_t data, uint8_t column);
+	void lamp_extend_small(int data);
+	void lamp_extend_large(int data,int column,int active);
+	void led_write_extender(int latch, int data, int column);
 	void update_meters();
 	void ic23_update();
-	void ic24_output(uint8_t data);
+	void ic24_output(int data);
 	void ic24_setup();
 	void update_ay();
 	void mpu4_install_mod4oki_space(address_space &space);
@@ -476,7 +476,7 @@ protected:
 
 	output_finder<8> m_triacs;
 
-	uint8_t m_mmtr_data = 0;
+uint8_t m_mmtr_data = 0;
 	uint8_t m_ay8913_address = 0;
 	uint8_t m_signal_50hz = 0;
 	uint8_t m_ic4_input_b = 0;
