@@ -1049,7 +1049,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void device_reset() override;
 
 private:
 	required_device<ram_device> m_ram;
@@ -1075,20 +1074,11 @@ void hp9825a_state::machine_start()
 
 	offs_t ram_start = 0x8000U - m_ram->size() / 2;
 
-	m_cpu->space(AS_PROGRAM).install_ram(ram_start, 0x7fff, m_ram->pointer());
+	auto space = &m_cpu->space(AS_PROGRAM);
+	space->install_ram(ram_start, 0x7fff, m_ram->pointer());
 
 	for (auto& finder : m_rom_drawers) {
 		finder->set_rom_limit(ram_start);
-	}
-}
-
-void hp9825a_state::device_reset()
-{
-	hp98xx_state::device_reset();
-
-	auto space = &m_cpu->space(AS_PROGRAM);
-
-	for (auto& finder : m_rom_drawers) {
 		finder->install_rw_handlers(space , nullptr);
 	}
 }
@@ -1113,7 +1103,7 @@ public:
 	void hp9825b(machine_config &config);
 
 protected:
-	virtual void device_reset() override;
+	virtual void machine_start() override;
 
 private:
 	void cpu_mem_map(address_map &map);
@@ -1131,9 +1121,9 @@ void hp9825b_state::hp9825b(machine_config &config)
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp9825_rom").set_filter("B");
 }
 
-void hp9825b_state::device_reset()
+void hp9825b_state::machine_start()
 {
-	hp98xx_state::device_reset();
+	hp9825_state::machine_start();
 
 	auto space = &m_cpu->space(AS_PROGRAM);
 
@@ -1426,7 +1416,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void device_reset() override;
 
 private:
 	required_device<ram_device> m_ram;
@@ -1452,20 +1441,11 @@ void hp9831_state::machine_start()
 
 	offs_t ram_start = 0x8000U - m_ram->size() / 2;
 
-	m_cpu->space(AS_PROGRAM).install_ram(ram_start, 0x7fff, m_ram->pointer());
+	auto space = &m_cpu->space(AS_PROGRAM);
+	space->install_ram(ram_start, 0x7fff, m_ram->pointer());
 
 	for (auto& finder : m_rom_drawers) {
 		finder->set_rom_limit(ram_start);
-	}
-}
-
-void hp9831_state::device_reset()
-{
-	hp98xx_state::device_reset();
-
-	auto space = &m_cpu->space(AS_PROGRAM);
-
-	for (auto& finder : m_rom_drawers) {
 		finder->install_rw_handlers(space , nullptr);
 	}
 }
