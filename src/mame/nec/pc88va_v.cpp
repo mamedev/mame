@@ -945,14 +945,23 @@ void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &c
  ***************************************/
 
 /*
- * x--- ---- LP   Light-pen signal detection (with VA use failure)
- * -x-- ---- VB   Vertical elimination period
- * --x- ---- SC   Sprite control (sprite over/collision)
- * ---x ---- ER   Error occurrence
+ * x--- ---- LP Light-Pen signal detection
+ * -x-- ---- VB Vertical Blank
+ * --x- ---- SC Sprite control (sprite over/collision)
+ * ---x ---- ER IDP Error
+ *           \- set when required parameters aren't entered or are malformed,
+ *              or mishandling of command/parameter ports. IDP won't accept any
+ *              further commands and requires an EXIT to be issued to resume operations.
  * ---- x--- In the midst of execution of EMEN emulation development
- * ---- -x-- In the midst of BUSY command execution
+ *           \- undocumented, PC88VA specific?
+ * ---- -x-- BUSY set high when IDP is processing commands,
+ *                clear when all commands in FIFO have been completed
  * ---- --x- OBF output data buffer full
- * ---- ---x IBF input data buffer full (common with command and parameters)
+ *           \- output FIFO from IDP to host (for commands that implies reading to param port),
+ *              reset on host reading, causes ready pin low when flag is (un?)set.
+ * ---- ---x IBF input data buffer full
+ *           \- command/parameter FIFO, high when IDP cannot accept any more from host,
+ *              causes ready pin low if any further param write is written (host stalls?).
  */
 uint8_t pc88va_state::idp_status_r()
 {
@@ -1060,28 +1069,52 @@ void pc88va_state::tsp_sprite_enable(u32 sprite_number, bool sprite_enable, bool
 
 /*
  * IDP SYNC command
- * <TODO: complete me, use the actual datasheet, use actual names>
- * ???? ???? [0] - unknown - clock source select?
- * ???? ???? [1] - unknown /
- * [0] xx-- ---- RM raster mode
- *     00-- ---- non-interlace 640 x 400 24kHz
- *     01-- ---- interlace 640 x 400 15kHz
- *     10-- ---- vertical magnify 640 x 200 24kHz
- *     11-- ---- normal 640 x 200 15kHz
- * --xx xxxx [2] - h blank start
- * --xx xxxx [3] - h border start
- * xxxx xxxx [4] - (h visible area - 1) / 4
- * --xx xxxx [5] - h border end
- * --xx xxxx [6] - h blank end
- * --xx xxxx [7] - h sync
+ * xx-- ---- [0] RM raster mode
+ * 00-- ----     \- non-interlace 640 x 400 24kHz
+ * 01-- ----     \- interlace 640 x 400 15kHz
+ * 10-- ----     \- vertical magnify 640 x 200 24kHz
+ * 11-- ----     \- normal 640 x 200 15kHz
+ *               \- PC88VA POST sets either 00 or 11, depending on the monitor setting
+ * --x- ---- [0] EL Enable Light Pen IRQ
+ * ---x ---- [0] EV Enable Vertical Blank IRQ
+ *               \- Generated to INT pin line, assume same as uPD3301 where VRTC != INT
+ *                  (therefore unconnected in PC88VA)
+ * ---- x--- [0] VM VRAM Access Mode (0) Random access mode (1) serial access mode
+ * ---- --xx [0] ILM, DPM Interleave and Dual Port Modes
+ * ---- --00     \- standalone mode
+ * ---- --01     \- interleave mode
+ * ---- --10     \- dual-port mode (VM must be 1)
+ * ---- --11     \- disabled
+ *               \- Related to comms between host, IDP and VRAM, PC88VA POST sets 01.
+ * -x-- ---- [1] RF video memory refresh (0) no refresh (1) refresh
+ *               \- enabled by PC88VA POST
+ * --x- ---- [1] EC external clock (1) output to DTCLK pin
+ * ---x ---- [1] ES external sync (1) output sync signals to /HSYN and /VSYN pins
+ *               \- enabled by PC88VA POST
+ * ---- x--- [1] RV reverse screen (1) reverse color in text display
+ *               \- sounds similar to the correlated function in uPD3301
+ * ---- -xxx [1] RS Resolution Select, divides dot clock
+ * ---- -000     \- divide by 4
+ * ---- -001     \- divide by 3
+ * ---- -010     \- divide by 2
+ * ---- -011     \- divide by 1.5
+ * ---- -100     \- divide by 1
+ * ---- -1xx     \- disabled, no dot clock output
+ *               \- NB: PC88VA POST sets 7
+ * --xx xxxx [2] - LBL h blank start
+ * --xx xxxx [3] - LBR h border start
+ * xxxx xxxx [4] - HAD (h visible area - 1) / 4
+ * --xx xxxx [5] - RBR h border end
+ * --xx xxxx [6] - RBL h blank end
+ * --xx xxxx [7] - HS h sync
  *               \- assume all params to be val - 1 / 4
- * --xx xxxx [8] - v blank start
- * --xx xxxx [9] - v border start
- * xxxx xxxx [A] - v visible area
- * -x-- ---- [B] - v visible area (bit 9)
- * --xx xxxx [B] - v border end
- * --xx xxxx [C] - v blank end
- * --xx xxxx [D] - v sync
+ * --xx xxxx [8] - TBL v blank start
+ * --xx xxxx [9] - TBR v border start
+ * xxxx xxxx [A] - VAD (L) v visible area
+ * -x-- ---- [B] - VAD (H) v visible area (bit 9)
+ * --xx xxxx [B] - BBR v border end
+ * --xx xxxx [C] - BBL v blank end
+ * --xx xxxx [D] - VS v sync
  */
 void pc88va_state::execute_sync_cmd()
 {
@@ -1136,6 +1169,14 @@ void pc88va_state::execute_sync_cmd()
 	LOGCRTC("\n");
 
 	// punt with message if values are off (shouldn't happen)
+	// TODO: more validation:
+	// HS >= 4
+	// LBL >= 3
+	// HAD & 1 == 1
+	// VS >= 4
+	// TBL + TBR >= 16 for non-sprite display, >= 32 for sprite display
+	// VAD >= 4
+	// BBR + BBL >= 2
 	if (h_vis_area <= 1 || v_vis_area <= 1 || h_total <= h_vis_area || v_total <= v_vis_area)
 	{
 		popmessage("CRTC assertion failed total (%d x %d) visible (%d x %d)", h_total, v_total, h_vis_area, v_vis_area);
@@ -1153,13 +1194,15 @@ void pc88va_state::execute_sync_cmd()
 	m_screen->configure(h_total, v_total, visarea, refresh);
 }
 
+/*
+ * xxxx x??? [0] lower text attribute table offset
+ * ---- -xxx [1] upper text attribute, unused on PC88VA
+ *           \- Multiplied by 256, lower 3 bits of [0] separated on datasheet (typo?)
+ * ---- xxxx [2] BC Backdrop Color
+ */
 void pc88va_state::execute_dspon_cmd()
 {
-	/*
-	[0] text table offset (hi word)
-	[1] unknown
-	[2] unknown
-	*/
+
 	m_tsp.tvram_vreg_offset = m_buf_ram[0] << 8;
 	m_tsp.disp_on = true;
 	LOGIDP("DSPON (%02x %02x %02x) %05x\n"
@@ -1251,28 +1294,31 @@ void pc88va_state::execute_curs_cmd()
 	LOGIDP("CURS X: %d Y: %d\n", m_tsp.cur_pos_x, m_tsp.cur_pos_y);
 }
 
+/*
+ * [0] Emulate target strip ID x 32
+ * [1] The number of chars
+ * [2] The number of attributes
+ * [3] The number of lines
+ */
 void pc88va_state::execute_emul_cmd()
 {
-	/*
-	[0] Emulate target strip ID x 32
-	[1] The number of chars
-	[2] The number of attributes
-	[3] The number of lines
-	*/
-
-	// TODO: this starts 3301 video emulation
+	// TODO: PC88VA specific, starts 3301 video emulation
 	//popmessage("TSP: executed EMUL command");
 }
 
+/*
+ * xxxx xxxx [0] SAB Sprite Table Offset (lo word)
+ * ---- -xxx [1] SAB hi word
+ *           \- again multiplied by 256
+ * xxxx x--- [2] HSPN: Maximum number of sprites in one raster (num + 1) for Sprite Over
+ * ---- -x-- [2] ESP: Enable Sprite Interrupt
+ *           \- causes INT pin high for sprite collision or maximum sprite detected
+ * ---- --x- [2] MG: all sprites are 2x zoomed vertically when 1
+ * ---- ---x [2] GR: 1 to enable the group collision detection
+ */
 void pc88va_state::execute_spron_cmd()
 {
-	/*
-	[0] Sprite Table Offset (hi word)
-	[1] (unknown / reserved)
-	xxxx x--- [2] HSPN: Maximum number of sprites in one raster (num + 1) for Sprite Over
-	---- --x- [2] MG: all sprites are 2x zoomed vertically when 1
-	---- ---x [2] GR: 1 to enable the group collision detection
-	*/
+
 	m_tsp.spr_offset = m_buf_ram[0] << 8;
 	m_tsp.spr_on = true;
 	m_tsp.spr_mg = BIT(m_buf_ram[2], 1);
@@ -1285,6 +1331,7 @@ void pc88va_state::execute_spron_cmd()
 		, m_tsp.spr_mg
 		, bool(BIT(m_buf_ram[2], 0))
 	);
+	// TODO: reset sprite status
 }
 
 /*
@@ -1309,7 +1356,7 @@ void pc88va_state::execute_sprsw_cmd()
  * xxxx x--- [0] target SPN
  * ---- -xxx [0] target attribute
  * Afterwards, data written to the param port will indefinitely write to sprite area
- * until command is cancelled, auto-incrementing per byte and eventually moving on to 
+ * until command is cancelled, auto-incrementing per byte and eventually moving on to
  * the next SPN when attribute overruns past 7.
  */
 void pc88va_state::execute_spwr_cmd(u8 data)
