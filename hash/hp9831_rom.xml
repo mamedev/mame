@@ -28,7 +28,7 @@ Compiled by F.Ulivi with data from http://www.hpmuseum.net/
 		<part name="rom" interface="hp9825_rom">
 		  <!-- Just guessing here, no dump & no mapping info are available -->
 			<dataarea name="rom4000" size="0x800" width="16" endianness="big">
-				<rom name="98223a.bin" status="nodump"/>
+				<rom name="98223a.bin" size="0x800" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>

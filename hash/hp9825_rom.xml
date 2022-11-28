@@ -68,7 +68,7 @@ Compiled by F.Ulivi with data from http://www.hpmuseum.net/
 		</part>
 	</software>
 
-	<software name="genio_ext_plot9862">
+	<software name="genio_ext_plot62">
 		<description>General/extended I/O/9862 plotter ROM for 9825</description>
 		<year>1976</year>
 		<publisher>Hewlett-Packard</publisher>
