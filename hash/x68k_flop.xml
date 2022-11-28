@@ -432,8 +432,41 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="38mankk">
+	<!-- Hangs with a black screen after the initial OS boot -->
+	<software name="38mankk" supported="no">
 		<description>38 Man Kilo no Kokuu</description>
+		<year>1989</year>
+		<publisher>システムサコム (System Sacom)</publisher>
+		<info name="alt_title" value="38万キロの虚空" />
+		<info name="release" value="19891006" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="3432787">
+				<rom name="38man_kilo_no_kokuu_disk1.mfm" size="3432787" crc="d06e68e0" sha1="3cb3b040db005bb8f20e52c619c2a6d9da9c4a86" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="3398408">
+				<rom name="38man_kilo_no_kokuu_disk2.mfm" size="3398408" crc="36b9d432" sha1="b2275f1eb8e8d3b7ed159cbf7cdb89570386db8c" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="3432703">
+				<rom name="38man_kilo_no_kokuu_disk3.mfm" size="3432703" crc="32d0efd6" sha1="4ee7def5a89de7c957914bb4fc575d6486775420" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="3434548">
+				<rom name="38man_kilo_no_kokuu_disk4.mfm" size="3434548" crc="9448e4c2" sha1="6ec8795b55389170dc9a535e4e95bae506fe69fd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="38mankkc" cloneof="38mankk">
+		<description>38 Man Kilo no Kokuu (cracked)</description>
 		<year>1989</year>
 		<publisher>システムサコム (System Sacom)</publisher>
 		<info name="alt_title" value="38万キロの虚空" />
@@ -2634,6 +2667,26 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		<info name="release" value="19891210" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 0" />
+			<dataarea name="flop" size="3438841">
+				<rom name="casablanca_ni_ai_o_disk0.mfm" size="3438841" crc="e78a95c0" sha1="202a0bde6302fc121b694eeec73663d514e5fad3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="3431650">
+				<rom name="casablanca_ni_ai_o_disk1.mfm" size="3431650" crc="b79a61d4" sha1="689b9ce8a980cde62039afbe379fd09d4bb0234e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casablanc" cloneof="casablan">
+		<description>Casablanca ni Ai o - Satsujin-sha wa Jikuu o Koete (cracked)</description>
+		<year>1989</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<info name="alt_title" value="カサブランカに愛を -殺人者は時空を超えて-" />
+		<info name="release" value="19891210" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 0" />
 			<dataarea name="flop" size="1261824">
 				<rom name="casablanca ni ai o - satsujin-sha wa jikuu o koete (19xx)(thinking rabbit)(disk 1 of 2)(disk 0).dim" size="1261824" crc="72d882ee" sha1="c3395e7c0aee6d4d15523c0e85a583333ec345a4" offset="000000" />
 			</dataarea>
@@ -3602,6 +3655,34 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="デスブリンガー" />
 		<info name="release" value="19890310" />
+		<info name="usage" value="To create a user disk, first boot from disk B and follow the instructions, then boot from disk A to run the game." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3416404">
+				<rom name="death_bringer_disk_a.mfm" size="3416404" crc="c5716fdc" sha1="6f3f2bdace24e592e9e3c4173a885fa63aeced78" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3440324">
+				<rom name="death_bringer_disk_b.mfm" size="3440324" crc="bef8c544" sha1="7919e80ae4dd95c62bc5c31bc062a6057b0f5e5f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="3442986">
+				<rom name="death_bringer_disk_c.mfm" size="3442986" crc="bf957d34" sha1="ccedb644d4136465676a40b97266b410e32e787d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbringerc" cloneof="dbringer">
+		<description>Death Bringer (cracked)</description>
+		<year>1989</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="デスブリンガー" />
+		<info name="release" value="19890310" />
+		<info name="usage" value="To create a user disk, first boot from disk B and follow the instructions, then boot from disk A to run the game." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
@@ -3865,31 +3946,67 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<year>1988</year>
 		<publisher>システムサコム (System Sacom)</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk I" />
+			<dataarea name="flop" size="3433073">
+				<rom name="dome_disk1.mfm" size="3433073" crc="45ba5018" sha1="790247a5e1553fb78959f324036cb65044c67b33" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk II" />
+			<dataarea name="flop" size="3436897">
+				<rom name="dome_disk2.mfm" size="3436897" crc="fa43bce2" sha1="3c9ba35ce7f3c15313633455be9034d5a43bbf41" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk III" />
+			<dataarea name="flop" size="3441764">
+				<rom name="dome_disk3.mfm" size="3441764" crc="5dcaf579" sha1="9ef54b09f332a78316954e9c94d757bfc924bba6" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk IV" />
+			<dataarea name="flop" size="3434337">
+				<rom name="dome_disk4.mfm" size="3434337" crc="7cd22d8e" sha1="4b61fc0484d29b45efbf9029523c0ef80c261195" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk V" />
+			<dataarea name="flop" size="3434875">
+				<rom name="dome_disk5.mfm" size="3434875" crc="ebee8ffd" sha1="93a6c62277bfd9b971b66cae48becfa1ddffe9fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="domec" cloneof="dome">
+		<description>Dome (cracked)</description>
+		<year>1988</year>
+		<publisher>システムサコム (System Sacom)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk I" />
 			<dataarea name="flop" size="1261824">
 				<rom name="dome (1988)(system sacom)(disk 1 of 5).dim" size="1261824" crc="833ff421" sha1="d55ea1b7b888b94c74c17ae2a719cdaa3352fba8" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk II" />
 			<dataarea name="flop" size="1261824">
 				<rom name="dome (1988)(system sacom)(disk 2 of 5).dim" size="1261824" crc="ec323086" sha1="e38341996e61dacbf3ce280bb57ebee4e26d4431" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk III" />
 			<dataarea name="flop" size="1261824">
 				<rom name="dome (1988)(system sacom)(disk 3 of 5).dim" size="1261824" crc="6047ad54" sha1="f577560e5a29c5b63524c20866d97efc0d105a55" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Disk IV" />
 			<dataarea name="flop" size="1261824">
 				<rom name="dome (1988)(system sacom)(disk 4 of 5).dim" size="1261824" crc="00f86ef7" sha1="6d80dcd4ed398cd18edef1b2070cfdc7e8bda6f9" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5" />
+			<feature name="part_id" value="Disk V" />
 			<dataarea name="flop" size="1261824">
 				<rom name="dome (1988)(system sacom)(disk 5 of 5).dim" size="1261824" crc="808218e8" sha1="d29d6edd59116415c82dfeac85d9693287f8454c" offset="000000" />
 			</dataarea>
@@ -4782,6 +4899,50 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="19901206" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="3435049">
+				<rom name="emerald_dragon_system_disk.mfm" size="3435049" crc="8f66ed86" sha1="6761115e69058a75690f7a6216ae125d99169689" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size="3442955">
+				<rom name="emerald_dragon_data_disk.mfm" size="3442955" crc="ead64b9d" sha1="b918a72e0ed1ccc65daba1dba8e246dbe10134c8" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Opening Disk" />
+			<dataarea name="flop" size="3445528">
+				<rom name="emerald_dragon_opening_disk.mfm" size="3445528" crc="5ead9c98" sha1="3c620a3c097f978b5b139daea5c7295bbdec2830" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Visual Disk A" />
+			<dataarea name="flop" size="3433503">
+				<rom name="emerald_dragon_visual_disk_a.mfm" size="3433503" crc="ac8c5699" sha1="2cfb3fb0adba10ba10738d8b80f43c0a5bafff6e" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Visual Disk B" />
+			<dataarea name="flop" size="3425440">
+				<rom name="emerald_dragon_visual_disk_b.mfm" size="3425440" crc="20bb1a16" sha1="98c79ab1a4c85e7728c2c3e9fce0d92e38a66b10" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Ending Disk" />
+			<dataarea name="flop" size="3423922">
+				<rom name="emerald_dragon_ending_disk.mfm" size="3423922" crc="5f9dce67" sha1="43709132719a1cae4fc882972e153bc505b2b092" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emeralddc" cloneof="emeraldd">
+		<description>Emerald Dragon (cracked)</description>
+		<year>1990</year>
+		<publisher>グローディア (Glodia)</publisher>
+		<info name="alt_title" value="エメラルドドラゴン" />
+		<info name="release" value="19901206" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="emerald dragon (1990)(glodia)(disk 1 of 6)(system).dim" size="1261824" crc="b2099996" sha1="cd6063c14108dcbec2b15e5736736c8c3075a626" offset="000000" />
 			</dataarea>
@@ -4799,13 +4960,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Visual Disk 1" />
+			<feature name="part_id" value="Visual Disk A" />
 			<dataarea name="flop" size="1261824">
 				<rom name="emerald dragon (1990)(glodia)(disk 4 of 6)(visual 1).dim" size="1261824" crc="25329020" sha1="46c2787fc6e0d99267544d13e43178c245cbeed0" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Visual Disk 2" />
+			<feature name="part_id" value="Visual Disk B" />
 			<dataarea name="flop" size="1261824">
 				<rom name="emerald dragon (1990)(glodia)(disk 5 of 6)(visual 2).dim" size="1261824" crc="3b137fd3" sha1="c73616238b2a9049dd67e2feaaf7888ccd56c900" offset="000000" />
 			</dataarea>
@@ -5722,9 +5883,41 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
+	<software name="genocid2">
+		<description>Genocide 2 - Master of the Dark Communion</description>
+		<year>1991</year>
+		<publisher>Zoom</publisher>
+		<info name="alt_title" value="ジェノサイド2" />
+		<info name="release" value="19911207" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="3444252">
+				<rom name="genocide2_system_disk.mfm" size="3444252" crc="d9689f02" sha1="ecea70c429a430eea90f471f94f37ade5f54282f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk A" />
+			<dataarea name="flop" size="3443369">
+				<rom name="genocide2_data_disk_1.mfm" size="3443369" crc="b46c94f7" sha1="279de76a9da0da7d1968e96ece5d4e76ffd3b192" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk B" />
+			<dataarea name="flop" size="3444039">
+				<rom name="genocide2_data_disk_2.mfm" size="3444039" crc="2ec69087" sha1="6fd49f1ba5c8769d230d5332ab7756021a50e328" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk C" />
+			<dataarea name="flop" size="3443714">
+				<rom name="genocide2_data_disk_3.mfm" size="3443714" crc="817870c2" sha1="6e47bb65a3da56d22293e494d1381d738b5008ff" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- boot OK -->
-	<software name="genocid2" supported="yes">
-		<description>Genocide 2</description>
+	<software name="genocid2c" cloneof="genocid2" supported="yes">
+		<description>Genocide 2 - Master of the Dark Communion (cracked)</description>
 		<year>1991</year>
 		<publisher>Zoom</publisher>
 		<info name="alt_title" value="ジェノサイド2" />
@@ -5736,19 +5929,19 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 1" />
+			<feature name="part_id" value="Data Disk A" />
 			<dataarea name="flop" size="1261824">
 				<rom name="genocide 2 (1991)(zoom)(disk 2 of 4)(data 1).dim" size="1261824" crc="5cc18a79" sha1="f7426cf6598554f54f0731dcdfd31163cc05cdd1" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 2" />
+			<feature name="part_id" value="Data Disk B" />
 			<dataarea name="flop" size="1261824">
 				<rom name="genocide 2 (1991)(zoom)(disk 3 of 4)(data 2).dim" size="1261824" crc="157e6464" sha1="e68d2464d2764ec842d02ba9d2c5c57f5668200b" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 3" />
+			<feature name="part_id" value="Data Disk C" />
 			<dataarea name="flop" size="1261824">
 				<rom name="genocide 2 (1991)(zoom)(disk 4 of 4)(data 3).dim" size="1261824" crc="c06136a0" sha1="9cb3670dcd0080eb42397f0c4d1e282be33905e7" offset="000000" />
 			</dataarea>
@@ -12456,7 +12649,44 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="signchou">
-		<description>Signatory Chouinsha</description>
+		<description>Signatory - Chouinsha</description>
+		<year>1991</year>
+		<publisher>NCS</publisher>
+		<info name="alt_title" value="シグナトリー 調印者" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="3423046">
+				<rom name="signatory_system_disk.mfm" size="3423046" crc="2663a3c0" sha1="e56bebcf064d10af97c97a0743921f7dc9def42e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario Disk A" />
+			<dataarea name="flop" size="3443616">
+				<rom name="signatory_scenario_disk_a.mfm" size="3443616" crc="cf4064ca" sha1="5c3c2026e24899a0f70da0e8739ab09ee437113f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario Disk B" />
+			<dataarea name="flop" size="3424730">
+				<rom name="signatory_scenario_disk_b.mfm" size="3424730" crc="8b336066" sha1="293eca46eeec581ed1260a83ae1ad978d190f8cb" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario Disk C" />
+			<dataarea name="flop" size="3435026">
+				<rom name="signatory_scenario_disk_c.mfm" size="3435026" crc="e94c48bc" sha1="19e9ced5a13661db545502cd3222c0652af7c7c2" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario Disk D" />
+			<dataarea name="flop" size="3426221">
+				<rom name="signatory_scenario_disk_d.mfm" size="3426221" crc="d361311e" sha1="8dea2ddf682a25b191ea8aa3eaa8953f0c0901a3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="signchouc" cloneof="signchou">
+		<description>Signatory - Chouinsha (cracked)</description>
 		<year>1991</year>
 		<publisher>NCS</publisher>
 		<info name="alt_title" value="シグナトリー 調印者" />
@@ -12467,25 +12697,25 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Scenario Disk A" />
 			<dataarea name="flop" size="1261824">
 				<rom name="signatory (1991)(ncs)(disk 2 of 5)(disk 1).dim" size="1261824" crc="a9e3f2a4" sha1="c5c43d8beccd7900d0ecf1d6d87a4a2820178fcf" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Scenario Disk B" />
 			<dataarea name="flop" size="1261824">
 				<rom name="signatory (1991)(ncs)(disk 3 of 5)(disk 2).dim" size="1261824" crc="f97c2d66" sha1="b7b82483650e94f361b66587515a56a8b55b18e5" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Scenario Disk C" />
 			<dataarea name="flop" size="1261824">
 				<rom name="signatory (1991)(ncs)(disk 4 of 5)(disk 3).dim" size="1261824" crc="b611cfb0" sha1="5daafabe0502248806683b10b7fa1681ec248273" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Scenario Disk D" />
 			<dataarea name="flop" size="1261824">
 				<rom name="signatory (1991)(ncs)(disk 5 of 5)(disk 4).dim" size="1261824" crc="59f37282" sha1="dff2d1f46b8b8704ee968e26cc41ce01023f707d" offset="000000" />
 			</dataarea>
@@ -12667,8 +12897,41 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="softhrd2">
+	<!-- Hangs after switching to disk 2 -->
+	<software name="softhrd2" supported="no">
 		<description>Soft de Hard na Monogatari II</description>
+		<year>1989</year>
+		<publisher>システムサコム (System Sacom)</publisher>
+		<info name="alt_title" value="ソフトでハードな物語2" />
+		<info name="release" value="19890616" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="3443657">
+				<rom name="soft_de_hard_na_monogatari_2_disk_1.mfm" size="3443657" crc="bcb4add3" sha1="477de1bce6a06aaef5bb7f47ddf75e0dff9a5b45" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="3433371">
+				<rom name="soft_de_hard_na_monogatari_2_disk_2.mfm" size="3433371" crc="0c45661a" sha1="08825eb9661446447bf492ff6fa69692be9f48b5" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="3431294">
+				<rom name="soft_de_hard_na_monogatari_2_disk_3.mfm" size="3431294" crc="42c37e55" sha1="c269012e86ba9536379b9e65b2d7b4711b52d607" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="3433745">
+				<rom name="soft_de_hard_na_monogatari_2_disk_4.mfm" size="3433745" crc="3c48bdf6" sha1="6f599a1f9e962a01ad68d42481aac8dcfd12f1e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="softhrd2c" cloneof="softhrd2">
+		<description>Soft de Hard na Monogatari II (cracked)</description>
 		<year>1989</year>
 		<publisher>システムサコム (System Sacom)</publisher>
 		<info name="alt_title" value="ソフトでハードな物語2" />
@@ -14247,6 +14510,38 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="release" value="19890723" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3417974">
+				<rom name="tritorn_final_disk_a.mfm" size="3417974" crc="c9f79876" sha1="b86be1a27af10d3a64c0e35c3be0f7322cb66037" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3425033">
+				<rom name="tritorn_final_disk_b.mfm" size="3425033" crc="afefa2c2" sha1="74ba8a04d34feeffb5cc30f26fad18f1d4498e21" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="3441324">
+				<rom name="tritorn_final_disk_c.mfm" size="3441324" crc="7a67ce01" sha1="49e37858f4bb41a6a838e55e30597ef11768fcdb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="3434982">
+				<rom name="tritorn_final_disk_d.mfm" size="3434982" crc="ae58cc9a" sha1="ba511f6dfb6b797dd4906780c8db5efdc91dd9c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tritornfc" cloneof="tritornf">
+		<description>Tritorn Final (cracked)</description>
+		<year>1989</year>
+		<publisher>ザインソフト (Zain Soft)</publisher>
+		<info name="alt_title" value="トリトーンファイナル" />
+		<info name="release" value="19890723" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
 				<rom name="tritorn final (19xx)(xain)(disk 1 of 4)(disk a).dim" size="1261824" crc="3feb2cf7" sha1="d6f6dce8d71c3a34ee320d2fefe8f933dfa84e72" offset="0" />
 			</dataarea>
@@ -14796,9 +15091,29 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!-- boot OK -->
-	<software name="warning" supported="yes">
+	<software name="warning">
 		<description>Warning Type 68</description>
+		<year>1988</year>
+		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<info name="alt_title" value="ウォーニング Type68" />
+		<info name="release" value="19881212" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3423969">
+				<rom name="warning_type_68_disk_a.mfm" size="3423969" crc="f8acfc02" sha1="b17a4d009b2df4249676625b490f64a111f3845c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3443422">
+				<rom name="warning_type_68_disk_b.mfm" size="3443422" crc="701f4a8d" sha1="7d50dfded4c65aac7931f08f7900643f6910ddaa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="warningc" cloneof="warning" supported="yes">
+		<description>Warning Type 68 (cracked)</description>
 		<year>1988</year>
 		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
 		<info name="alt_title" value="ウォーニング Type68" />
@@ -17033,6 +17348,29 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="hotfiledisk_vol7.hdm" size="1261568" crc="feb381d8" sha1="c8fb4984a54b0574dc6bf28967411d4ddea7c1f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- It's unknown if the Hot File Express disks were distributed under a more specific name. For now we are using the file dates to distinguish them. -->
+	<software name="hotfilex1">
+		<description>The Hot File Express (1993-10-28)</description>
+		<year>1993</year>
+		<publisher>Kyouto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3423115">
+				<rom name="the_hot_file_express_1993-10-28.mfm" size="3423115" crc="6b53b0dd" sha1="36c82aca646ce58d80e16105529c3e386da78914" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotfilex2">
+		<description>The Hot File Express (1991-12-24)</description>
+		<year>1991</year>
+		<publisher>Kyouto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3396905">
+				<rom name="the_hot_file_express_1991-12-24.mfm" size="3396905" crc="56ae6aad" sha1="67f29de49e2a65be000544e19c818106af07bd89" />
 			</dataarea>
 		</part>
 	</software>
