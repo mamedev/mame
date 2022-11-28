@@ -34159,9 +34159,14 @@ nss_ssoc                        // 1992 Human Inc.
 nss_sten                        // 199? Nintendo
 
 @source:konami/nwk-tr.cpp
-racingj                         // GX676 (c)1998
-racingj2                        // GX888 (c)1999 (EAE)
-racingj2j                       // GX888 (c)1999 (JAE)
+racingj                         // GQ676 (c)1998 (UAC)
+racingj2                        // GQ888 (c)1999 (UAA)
+racingj2a                       // GQ888 (c)1999 (AAA)
+racingj2e                       // GQ888 (c)1999 (EAA)
+racingj2j                       // GQ888 (c)1999 (JAA)
+racingja                        // GQ676 (c)1998 (AAC)
+racingje                        // GQ676 (c)1998 (EAC)
+racingjj                        // GQ676 (c)1998 (JAC)
 thrilld                         // GC713 (c)1998 Japan UDE
 thrillda                        // GC713 (c)1998 Japan ACE
 thrilldab                       // GC713 (c)1998 Japan ABE
