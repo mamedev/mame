@@ -314,11 +314,12 @@ public:
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
 		m_cg_view(*this, "cg_view"),
-		m_jvs_host(*this, "jvs_host")
+		m_jvs_host(*this, "jvs_host"),
+		m_gn676_lan(*this, "gn676_lan")
 	{ }
 
-	void thrilld(machine_config &config);
 	void nwktr(machine_config &config);
+	void nwktr_lan_b(machine_config &config);
 
 	void init_nwktr();
 	void init_racingj();
@@ -351,6 +352,7 @@ private:
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	memory_view m_cg_view;
 	required_device<konppc_jvs_host_device> m_jvs_host;
+	required_device<konami_gn676_lan_device> m_gn676_lan;
 
 	emu_timer *m_sound_irq_timer;
 	bool m_exrgb;
@@ -442,10 +444,12 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 4:
 		{
-			int cs = (data >> 3) & 0x1;
-			int conv = (data >> 2) & 0x1;
-			int di = (data >> 1) & 0x1;
-			int sclk = data & 0x1;
+			m_gn676_lan->reset_fpga_state(BIT(data, 6));
+
+			int cs = BIT(data, 3);
+			int conv = BIT(data, 2);
+			int di = BIT(data, 1);
+			int sclk = BIT(data, 0);
 
 			m_adc12138->cs_w(cs);
 			m_adc12138->conv_w(conv);
@@ -548,8 +552,8 @@ void nwktr_state::ppc_map(address_map &map)
 	map(0x7d010000, 0x7d01ffff).w(FUNC(nwktr_state::sysreg_w));
 	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)); // M48T58Y RTC/NVRAM
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
-	map(0x7d040000, 0x7d04ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
-	map(0x7d050000, 0x7d05ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
+	map(0x7d040000, 0x7d04ffff).rw(m_gn676_lan, FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
+	map(0x7d050000, 0x7d05ffff).rw(m_gn676_lan, FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
 	map(0x7e000000, 0x7e7fffff).rom().region("datarom", 0);
 	map(0x7f000000, 0x7f1fffff).rom().region("prgrom", 0);
 	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
@@ -751,15 +755,17 @@ void nwktr_state::nwktr(machine_config &config)
 	m_konppc->set_num_boards(2);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
 
-	KONAMI_GN676_LAN(config, "gn676_lan", 0, m_work_ram);
+	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
 
 	KONPPC_JVS_HOST(config, m_jvs_host, 0);
 	m_jvs_host->output_callback().set([this](uint8_t c) { m_maincpu->ppc4xx_spu_receive_byte(c); });
 }
 
-void nwktr_state::thrilld(machine_config &config)
+void nwktr_state::nwktr_lan_b(machine_config &config)
 {
 	nwktr(config);
+
+	KONAMI_GN676B_LAN(config.replace(), m_gn676_lan, 0);
 }
 
 /*****************************************************************************/
@@ -845,7 +851,7 @@ ROM_START(racingj2)
 	ROM_LOAD( "888a09.16p",   0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
 	ROM_LOAD( "888a10.14p",   0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
 
-	ROM_REGION( 0x0000084, "laneeprom", 0 )
+	ROM_REGION( 0x0000084, "gn676_lan:eeprom", 0 )
 	ROM_LOAD( "ge888ea.2g",   0x000000, 0x000084, NO_DUMP )
 
 	ROM_REGION(0x2000, "m48t58",0)
@@ -876,7 +882,7 @@ ROM_START(racingj2j)
 	ROM_LOAD( "888a09.16p", 0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
 	ROM_LOAD( "888a10.14p", 0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
 
-	ROM_REGION( 0x0000084, "laneeprom", 0 )
+	ROM_REGION( 0x0000084, "gn676_lan:eeprom", 0 )
 	ROM_LOAD( "ge888ja.2g",   0x000000, 0x000084, NO_DUMP )
 
 	ROM_REGION(0x2000, "m48t58",0)
@@ -902,7 +908,7 @@ ROM_START(thrilld)
 	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
-	ROM_REGION( 0x0000084, "laneeprom", 0 )
+	ROM_REGION( 0x0000084, "gn676_lan:eeprom", 0 )
 	ROM_LOAD( "gc713jc.2g",   0x000000, 0x000084, NO_DUMP )
 
 	ROM_REGION(0x2000, "m48t58",0)
@@ -928,7 +934,7 @@ ROM_START(thrilldb)
 	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
-	ROM_REGION( 0x0000084, "laneeprom", 0 )
+	ROM_REGION( 0x0000084, "gn676_lan:eeprom", 0 )
 	ROM_LOAD( "gc713jc.2g",   0x000000, 0x000084, NO_DUMP )
 
 	ROM_REGION(0x2000, "m48t58",0)
@@ -954,7 +960,7 @@ ROM_START(thrilldbe)
 	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
-	ROM_REGION( 0x0000084, "laneeprom", 0 )
+	ROM_REGION( 0x0000084, "gn676_lan:eeprom", 0 )
 	ROM_LOAD( "gc713ec.2g",   0x000000, 0x000084, NO_DUMP )
 
 	ROM_REGION(0x2000, "m48t58",0)
@@ -968,9 +974,9 @@ ROM_END
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 
-GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (JAC)",            GAME_FLAGS )
-GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", GAME_FLAGS )
-GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", GAME_FLAGS )
-GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAE)",          GAME_FLAGS )
-GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAB)",          GAME_FLAGS )
-GAME( 1998, thrilldbe,  thrilld, thrilld, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EAB)",          GAME_FLAGS )
+GAME( 1998, racingj,    0,       nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (JAC)",            GAME_FLAGS )
+GAME( 1998, racingj2,   racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", GAME_FLAGS )
+GAME( 1998, racingj2j,  racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", GAME_FLAGS )
+GAME( 1998, thrilld,    0,       nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAE)",          GAME_FLAGS )
+GAME( 1998, thrilldb,   thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAB)",          GAME_FLAGS )
+GAME( 1998, thrilldbe,  thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EAB)",          GAME_FLAGS )

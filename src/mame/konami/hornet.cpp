@@ -407,7 +407,8 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_jvs_host(*this, "jvs_host"),
 		m_cg_view(*this, "cg_view"),
-		m_k033906(*this, "k033906_%u", 1U)
+		m_k033906(*this, "k033906_%u", 1U),
+		m_gn676_lan(*this, "gn676_lan")
 	{ }
 
 	void hornet(machine_config &config);
@@ -458,6 +459,7 @@ private:
 	required_device<konppc_jvs_host_device> m_jvs_host;
 	memory_view m_cg_view;
 	optional_device_array<k033906_device, 2> m_k033906;
+	optional_device<konami_gn676_lan_device> m_gn676_lan;
 
 	emu_timer *m_sound_irq_timer;
 
@@ -598,6 +600,11 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x02 = ADDI (ADC DI)
 			    0x01 = ADDSCLK (ADC SCLK)
 			*/
+
+			// Set FPGA into a state to accept new firmware
+			if (m_gn676_lan)
+				m_gn676_lan->reset_fpga_state(BIT(data, 6));
+
 			if (m_x76f041)
 			{
 				// HACK: Figure out a way a better way to differentiate between what device it wants to talk to here.
@@ -775,8 +782,8 @@ void hornet_state::hornet_lan_map(address_map &map)
 {
 	hornet_map(map);
 
-	map(0x7d040000, 0x7d04ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
-	map(0x7d050000, 0x7d05ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
+	map(0x7d040000, 0x7d04ffff).rw(m_gn676_lan, FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
+	map(0x7d050000, 0x7d05ffff).rw(m_gn676_lan, FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
 }
 
 void hornet_state::terabrst_map(address_map &map)
@@ -1211,7 +1218,7 @@ void hornet_state::hornet_lan(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::hornet_lan_map);
 
-	KONAMI_GN676_LAN(config, "gn676_lan", 0, m_workram);
+	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
 }
 
 void hornet_state::nbapbp(machine_config &config)
