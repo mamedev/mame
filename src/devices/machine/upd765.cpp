@@ -2412,7 +2412,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 			result[5] = 0;
 			result[6] = command[2];
 			result_pos = 7;
-			command_end(fi, true);
+			command_end(fi, (fi.st0 & 0xc0) == 0x00);
 			return;
 
 		default:
