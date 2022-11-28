@@ -17190,7 +17190,14 @@ terabrstaa                      // GX715 (c)1998 Asia HAA 1998/02/25
 terabrstj                       // GX715 (c)1998 Japan JEL 1998/07/17
 terabrstja                      // GX715 (c)1998 Japan JAA 1998/02/25
 terabrstua                      // GX715 (c)1998 USA UAA 1998/02/25
-thrilldbu                       // GE713UF (c)1998 ?AB
+thrilldgej                      // GE713JA (c)1998 GE713JAB
+thrilldgeu                      // GE713UF (c)1998 GE713UFB
+thrilldgke                      // GK713EA (c)1998 GK713EAB
+thrilldgkee                     // GK713EE (c)1998 GK713EEB
+thrilldgkk                      // GK713K* (c)1998 GK713K*B
+thrilldgmj                      // GM713JA (c)1998 GM713JAB
+thrilldgnj                      // GN713JA (c)1998 GN713JAB
+thrilldgpj                      // GP713JA (c)1998 GP713JAB
 
 @source:misc/hotblock.cpp
 hotblock                        // (c) 1993 Nics? / NIX?
