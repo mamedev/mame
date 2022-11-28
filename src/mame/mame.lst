@@ -34155,9 +34155,18 @@ nss_sten                        // 199? Nintendo
 racingj                         // GX676 (c)1998
 racingj2                        // GX888 (c)1999 (EAE)
 racingj2j                       // GX888 (c)1999 (JAE)
-thrilld                         // GX713 (c)1998 Japan JAE
-thrilldb                        // GX713 (c)1998 Japan JAB
-thrilldbe                       // GX713 (c)1998 Europe EAB
+thrilld                         // GC713 (c)1998 Japan UDE
+thrillda                        // GC713 (c)1998 Japan ACE
+thrilldab                       // GC713 (c)1998 Japan ABE
+thrilldb                        // GC713 (c)1998 Japan UDB
+thrilldba                       // GC713 (c)1998 Japan ACB
+thrilldbab                      // GC713 (c)1998 Japan ABB
+thrilldbe                       // GC713 (c)1998 Japan EDB
+thrilldbj                       // GC713 (c)1998 Japan JCB
+thrilldbja                      // GC713 (c)1998 Japan JAB
+thrillde                        // GC713 (c)1998 Japan EDE
+thrilldj                        // GC713 (c)1998 Japan JCE
+thrilldja                       // GC713 (c)1998 Japan JAE
 
 @source:taito/nycaptor.cpp
 bronx                           // bootleg
