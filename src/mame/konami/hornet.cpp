@@ -353,6 +353,7 @@ Jumpers set on GFX PCB to scope monitor:
 #include "k037122.h"
 #include "konami_gn676_lan.h"
 #include "konppc.h"
+#include "konppc_jvshost.h"
 #include "windy2.h"
 
 #include "cpu/m68000/m68000.h"
@@ -361,8 +362,6 @@ Jumpers set on GFX PCB to scope monitor:
 #include "machine/adc1213x.h"
 #include "machine/ds2401.h"
 #include "machine/eepromser.h"
-#include "machine/jvsdev.h"
-#include "machine/jvshost.h"
 #include "machine/k033906.h"
 #include "machine/timekpr.h"
 #include "machine/watchdog.h"
@@ -376,65 +375,6 @@ Jumpers set on GFX PCB to scope monitor:
 #include "speaker.h"
 
 #include "layout/generic.h"
-
-
-DECLARE_DEVICE_TYPE(HORNET_JVS_HOST, hornet_jvs_host)
-
-class hornet_jvs_host : public jvs_host
-{
-public:
-	// construction/destruction
-	hornet_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void read();
-	void write(uint8_t *data, int length);
-
-	DECLARE_READ_LINE_MEMBER( sense );
-
-	auto output_callback() { return output_cb.bind(); }
-
-protected:
-	virtual void device_start() override;
-
-private:
-	devcb_write8 output_cb;
-};
-
-DEFINE_DEVICE_TYPE(HORNET_JVS_HOST, hornet_jvs_host, "hornet_jvs_host", "JVS Host (Hornet)")
-
-hornet_jvs_host::hornet_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jvs_host(mconfig, HORNET_JVS_HOST, tag, owner, clock),
-	output_cb(*this)
-{
-}
-
-void hornet_jvs_host::device_start()
-{
-	jvs_host::device_start();
-	output_cb.resolve_safe();
-}
-
-READ_LINE_MEMBER( hornet_jvs_host::sense )
-{
-	return !get_address_set_line();
-}
-
-void hornet_jvs_host::read()
-{
-	const uint8_t *data;
-	uint32_t length;
-
-	get_encoded_reply(data, length);
-
-	for (int i = 0; i < length; i++)
-		output_cb(data[i]);
-}
-
-void hornet_jvs_host::write(uint8_t *data, int length)
-{
-	for (int i = 0; i < length; i++)
-		push(data[i]);
-	commit_raw();
-}
 
 namespace {
 
@@ -465,7 +405,7 @@ public:
 		m_comm_bank(*this, "comm_bank"),
 		m_lan_ds2401(*this, "lan_serial_id"),
 		m_watchdog(*this, "watchdog"),
-		m_hornet_jvs_host(*this, "hornet_jvs_host"),
+		m_jvs_host(*this, "jvs_host"),
 		m_cg_view(*this, "cg_view"),
 		m_k033906(*this, "k033906_%u", 1U)
 	{ }
@@ -492,7 +432,6 @@ protected:
 private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
-	static constexpr int JVS_BUFFER_SIZE = 1024;
 
 	required_shared_ptr<uint32_t> m_workram;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
@@ -516,14 +455,11 @@ private:
 	optional_memory_bank m_comm_bank;
 	optional_device<ds2401_device> m_lan_ds2401;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_device<hornet_jvs_host> m_hornet_jvs_host;
+	required_device<konppc_jvs_host_device> m_jvs_host;
 	memory_view m_cg_view;
 	optional_device_array<k033906_device, 2> m_k033906;
 
 	emu_timer *m_sound_irq_timer;
-	std::unique_ptr<uint8_t[]> m_jvs_sdata;
-	uint32_t m_jvs_sdata_ptr;
-	bool m_jvs_is_escape_byte;
 
 	uint16_t m_gn680_latch;
 	uint16_t m_gn680_ret0;
@@ -601,7 +537,7 @@ uint8_t hornet_state::sysreg_r(offs_t offset)
 			    0x01 = ADDO (ADC DO)
 			*/
 			r = 0x70;
-			r |= m_hornet_jvs_host->sense() << 7;
+			r |= m_jvs_host->sense() << 7;
 			if (m_x76f041)
 				r |= m_x76f041->read_sda() << 3;
 			r |= m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
@@ -1151,19 +1087,11 @@ void hornet_state::machine_start()
 {
 	m_pcb_digit.resolve();
 
-	m_jvs_sdata_ptr = 0;
-	m_jvs_sdata = make_unique_clear<uint8_t[]>(JVS_BUFFER_SIZE);
-	m_jvs_is_escape_byte = false;
-
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_workram);
-
-	save_pointer(NAME(m_jvs_sdata), JVS_BUFFER_SIZE);
-	save_item(NAME(m_jvs_sdata_ptr));
-	save_item(NAME(m_jvs_is_escape_byte));
 
 	m_sound_irq_timer = timer_alloc(FUNC(hornet_state::sound_irq), this);
 }
@@ -1186,9 +1114,6 @@ void hornet_state::machine_reset()
 		if (membank("slave_cgboard_bank"))
 			membank("slave_cgboard_bank")->set_base(memregion("master_cgboard")->base());
 	}
-
-	m_jvs_sdata_ptr = 0;
-	m_jvs_is_escape_byte = false;
 }
 
 double hornet_state::adc12138_input_callback(uint8_t input)
@@ -1270,8 +1195,8 @@ void hornet_state::hornet(machine_config &config)
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HORNET);
 
-	HORNET_JVS_HOST(config, m_hornet_jvs_host, 0);
-	m_hornet_jvs_host->output_callback().set([this](uint8_t c) { m_maincpu->ppc4xx_spu_receive_byte(c); });
+	KONPPC_JVS_HOST(config, m_jvs_host, 0);
+	m_jvs_host->output_callback().set([this](uint8_t c) { m_maincpu->ppc4xx_spu_receive_byte(c); });
 }
 
 void hornet_state::hornet_x76(machine_config &config)
@@ -1297,7 +1222,7 @@ void hornet_state::nbapbp(machine_config &config)
 	// with the 2L6B panel dipswitch settings on the Windy2 board.
 	// NOTE: Harness JVS + cabinet 4 player will work with a second JVS I/O device hooked up, but then
 	// the official recommended setting of cabinet type 4 player + harness JAMMA breaks.
-	KONAMI_WINDY2_JVS_IO_2L6B_PANEL(config, "windy2_jvsio", 0, m_hornet_jvs_host);
+	KONAMI_WINDY2_JVS_IO_2L6B_PANEL(config, "windy2_jvsio", 0, m_jvs_host);
 }
 
 void hornet_state::terabrst(machine_config &config) //todo: add K056800 from I/O board
@@ -1410,36 +1335,9 @@ void hornet_state::sscope2_voodoo1(machine_config& config)
 
 void hornet_state::jamma_jvs_w(uint8_t data)
 {
-	bool is_escape_byte = m_jvs_is_escape_byte;
-	m_jvs_is_escape_byte = false;
-
-	// Throw away the buffer and wait for the next sync marker instead of overflowing when
-	// a invalid packet is filling the entire buffer.
-	if (m_jvs_sdata_ptr >= JVS_BUFFER_SIZE)
-		m_jvs_sdata_ptr = 0;
-
-	if (m_jvs_sdata_ptr == 0 && data != 0xe0)
-		return;
-
-	if (m_jvs_sdata_ptr > 0 && data == 0xd0)
-	{
-		m_jvs_is_escape_byte = true;
-		return;
-	}
-
-	m_jvs_sdata[m_jvs_sdata_ptr++] = is_escape_byte ? data + 1 : data;
-
-	const bool is_complete_packet = m_jvs_sdata_ptr >= 5
-		&& m_jvs_sdata_ptr == m_jvs_sdata[2] + 3
-		&& m_jvs_sdata[0] == 0xe0
-		&& m_jvs_sdata[1] != 0x00
-		&& m_jvs_sdata[m_jvs_sdata_ptr - 1] == (std::accumulate(&m_jvs_sdata[1], &m_jvs_sdata[m_jvs_sdata_ptr - 1], 0) & 0xff);
-	if (is_complete_packet)
-	{
-		m_hornet_jvs_host->write(&m_jvs_sdata[1], m_jvs_sdata_ptr - 2);
-		m_hornet_jvs_host->read();
-		m_jvs_sdata_ptr = 0;
-	}
+	bool accepted = m_jvs_host->write(data);
+	if (accepted)
+		m_jvs_host->read();
 }
 
 /*****************************************************************************/
