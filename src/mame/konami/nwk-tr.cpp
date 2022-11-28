@@ -268,23 +268,27 @@ Thrill Drive 713A13  -       713A14  -
 */
 
 #include "emu.h"
+
+#include "k001604.h"
+#include "k573mcal.h"
+#include "konami_gn676_lan.h"
+#include "konppc.h"
+#include "konppc_jvshost.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/adc1213x.h"
 #include "machine/k033906.h"
-#include "konami_gn676_lan.h"
-#include "konppc.h"
 #include "machine/timekpr.h"
-//#include "machine/x76f041.h"
+#include "machine/x76f041.h"
 #include "sound/k056800.h"
 #include "sound/rf5c400.h"
-#include "k001604.h"
 #include "video/voodoo.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
 
 namespace {
 
@@ -309,12 +313,14 @@ public:
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
-		m_cg_view(*this, "cg_view")
+		m_cg_view(*this, "cg_view"),
+		m_jvs_host(*this, "jvs_host")
 	{ }
 
 	void thrilld(machine_config &config);
 	void nwktr(machine_config &config);
 
+	void init_nwktr();
 	void init_racingj();
 	void init_thrilld();
 
@@ -325,9 +331,10 @@ protected:
 private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
+	static constexpr int JVS_BUFFER_SIZE = 1024;
 
 	required_shared_ptr<uint32_t> m_work_ram;
-	required_device<ppc_device> m_maincpu;
+	required_device<ppc4xx_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<adsp21062_device, 2> m_dsp;
 	required_device<k056800_device> m_k056800;
@@ -343,6 +350,7 @@ private:
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	memory_view m_cg_view;
+	required_device<konppc_jvs_host_device> m_jvs_host;
 
 	emu_timer *m_sound_irq_timer;
 	bool m_exrgb;
@@ -353,6 +361,7 @@ private:
 	void soundtimer_en_w(uint16_t data);
 	void soundtimer_count_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
+	void jamma_jvs_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
 
@@ -402,7 +411,8 @@ uint8_t nwktr_state::sysreg_r(offs_t offset)
 			r = m_in[2]->read();
 			break;
 		case 3:
-			r = m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
+			r |= m_jvs_host->sense() << 7;
+			r |= m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
 			break;
 		case 4:
 			r = m_dsw->read();
@@ -421,6 +431,13 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 		case 0:
 		case 1:
 			m_pcb_digit[offset] = bitswap<7>(~data , 0, 1, 2, 3, 4, 5, 6);
+			break;
+
+		case 3:
+			/*
+			    The bit used for JVSTXEN changes between 3 and 4 based on the lower 2 bits of IN2.
+			    If m_in[2]->read() & 3 != 0, bit 4 is used. Otherwise, bit 3 is used.
+			*/
 			break;
 
 		case 4:
@@ -735,6 +752,9 @@ void nwktr_state::nwktr(machine_config &config)
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
 
 	KONAMI_GN676_LAN(config, "gn676_lan", 0, m_work_ram);
+
+	KONPPC_JVS_HOST(config, m_jvs_host, 0);
+	m_jvs_host->output_callback().set([this](uint8_t c) { m_maincpu->ppc4xx_spu_receive_byte(c); });
 }
 
 void nwktr_state::thrilld(machine_config &config)
@@ -744,14 +764,30 @@ void nwktr_state::thrilld(machine_config &config)
 
 /*****************************************************************************/
 
+void nwktr_state::jamma_jvs_w(uint8_t data)
+{
+	bool accepted = m_jvs_host->write(data);
+	if (accepted)
+		m_jvs_host->read();
+}
+
+/*****************************************************************************/
+
+void nwktr_state::init_nwktr()
+{
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(nwktr_state::jamma_jvs_w)));
+}
+
 void nwktr_state::init_racingj()
 {
+	init_nwktr();
 	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
 	m_konppc->set_cgboard_texture_bank(0, "slave_cgboard_bank", memregion("slave_cgboard")->base()); // for some reason, additional CG roms are located on the slave CG board...
 }
 
 void nwktr_state::init_thrilld()
 {
+	init_nwktr();
 	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
 	m_konppc->set_cgboard_texture_bank(0, "slave_cgboard_bank", memregion("master_cgboard")->base()); // ...while this is not the case for thrilld
 }
