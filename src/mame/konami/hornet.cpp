@@ -392,6 +392,7 @@ public:
 		m_dsp(*this, {"dsp", "dsp2"}), // TODO: hardcoded tags in machine/konpc.cpp
 		m_k037122(*this, "k037122_%u", 0U),
 		m_adc12138(*this, "adc12138"),
+		m_adc12138_sscope(*this, "adc12138_sscope"),
 		m_konppc(*this, "konppc"),
 		m_lan_eeprom(*this, "lan_eeprom"),
 		m_x76f041(*this, "security_eeprom"),
@@ -442,6 +443,7 @@ private:
 	optional_device_array<adsp21062_device, 2> m_dsp;
 	optional_device_array<k037122_device, 2> m_k037122;
 	required_device<adc12138_device> m_adc12138;
+	optional_device<adc12138_device> m_adc12138_sscope;
 	required_device<konppc_device> m_konppc;
 	optional_device<eeprom_serial_93cxx_device> m_lan_eeprom;
 	optional_device<x76f041_device> m_x76f041;
@@ -480,6 +482,7 @@ private:
 	void soundtimer_en_w(uint16_t data);
 	void soundtimer_count_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
+	double sscope_input_callback(uint8_t input);
 	void jamma_jvs_w(uint8_t data);
 	uint8_t comm_eeprom_r();
 	void comm_eeprom_w(uint8_t data);
@@ -521,6 +524,11 @@ uint8_t hornet_state::sysreg_r(offs_t offset)
 			break;
 		case 1: // I/O port 1
 			r = m_in[1]->read();
+			if (m_adc12138_sscope)
+			{
+				r &= ~7;
+				r |= m_adc12138_sscope->do_r() | (m_adc12138_sscope->eoc_r() << 2);
+			}
 			break;
 		case 2: // I/O port 2
 			r = m_in[2]->read();
@@ -564,6 +572,14 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 2: // Parallel data register
 			osd_printf_debug("Parallel data = %02X\n", data);
+
+			if (m_adc12138_sscope)
+			{
+				m_adc12138_sscope->cs_w(BIT(data, 4));
+				m_adc12138_sscope->conv_w(BIT(data, 3));
+				m_adc12138_sscope->di_w(BIT(data, 5));
+				m_adc12138_sscope->sclk_w(BIT(data, 7));
+			}
 			break;
 
 		case 3: // System Register 0
@@ -1027,11 +1043,16 @@ static INPUT_PORTS_START( sscope )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x40, 0x40, "Disable Machine Init" ) PORT_DIPLOCATION("SW:2") // Default DIPSW2 to OFF for sscope
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
 	PORT_START("ANALOG1") // Gun Yaw
-	PORT_BIT( 0x7ff, 0x400, IPT_AD_STICK_X ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(20)
+	PORT_BIT( 0x7ff, 0x400, IPT_AD_STICK_X ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(20) PORT_CENTERDELTA(0)
 
 	PORT_START("ANALOG2") // Gun Pitch
-	PORT_BIT( 0x7ff, 0x3ff, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(20) PORT_INVERT
+	PORT_BIT( 0x7ff, 0x3ff, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_INVERT
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sscope2 )
@@ -1117,6 +1138,17 @@ void hornet_state::machine_reset()
 }
 
 double hornet_state::adc12138_input_callback(uint8_t input)
+{
+	if (input < m_analog.size())
+	{
+		int value = m_analog[input].read_safe(0);
+		return (double)(value) / 2047.0;
+	}
+
+	return 0.0;
+}
+
+double hornet_state::sscope_input_callback(uint8_t input)
 {
 	if (input < m_analog.size())
 	{
@@ -1278,8 +1310,9 @@ void hornet_state::sscope(machine_config &config)
 	rscreen.set_raw(XTAL(64'000'000) / 4, 1017, 106, 106 + 768, 262, 17, 17 + 236);
 	rscreen.set_screen_update(FUNC(hornet_state::screen_update<1>));
 
-/*  ADC12138(config, m_adc12138_2, 0);
-    m_adc12138->set_ipt_convert_callback(FUNC(hornet_state::sscope_input_callback)); */
+	// Comes from the GQ830-PWB(J) board
+	ADC12138(config, m_adc12138_sscope, 0);
+	m_adc12138_sscope->set_ipt_convert_callback(FUNC(hornet_state::sscope_input_callback));
 
 	m_konppc->set_num_boards(2);
 }
