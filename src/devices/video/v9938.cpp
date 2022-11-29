@@ -1138,43 +1138,72 @@ void v99x8_device::mode_graphic1(uint32_t *ln, int line)
 
 void v99x8_device::mode_graphic23(uint32_t *ln, int line)
 {
-	pen_t fg, bg, pen;
-	int nametbl_addr, patterntbl_addr, colourtbl_addr;
-	int pattern, x, xx, line2, name, charcode,
-	colour, colourmask, patternmask, xxx;
+	const int colourmask = ((m_cont_reg[3] & 0x7f) * 8) | 7;
+	const int patternmask = ((m_cont_reg[4] & 0x03) * 256) | 0xff;
+	const int nametbl_addr = m_cont_reg[2] << 10;
+	const int colourtbl_addr = ((m_cont_reg[3] & 0x80) << 6) + (m_cont_reg[10] << 14);
+	const int patterntbl_addr = ((m_cont_reg[4] & 0x3c) << 11);
+	const int scrolled_y = (line + m_cont_reg[23]) & 255;
+	const pen_t border_pen = pen16(m_cont_reg[7] & 0x0f);
 
-	colourmask = ((m_cont_reg[3] & 0x7f) * 8) | 7;
-	patternmask = ((m_cont_reg[4] & 0x03) * 256) | 0xff;
+	int name = (scrolled_y / 8) * 32;
 
-	nametbl_addr =  (m_cont_reg[2] << 10);
-	colourtbl_addr =  ((m_cont_reg[3] & 0x80) << 6) + (m_cont_reg[10] << 14);
-	patterntbl_addr = ((m_cont_reg[4] & 0x3c) << 11);
+	for (int x = m_offset_x * 2; x > 0; x--)
+		*ln++ = border_pen;
 
-	line2 = (line + m_cont_reg[23]) & 255;
-	name = (line2/8)*32;
-
-	pen = pen16(m_cont_reg[7] & 0x0f);
-	xxx = m_offset_x * 2;
-	while (xxx--) *ln++ = pen;
-
-	for (x=0;x<32;x++)
+	int scroll_to_mask = 0;
+	int pixels_to_draw = 256;
+	if (m_cont_reg[27] & 0x07)
 	{
-		charcode = m_vram_space->read_byte(nametbl_addr + name) + (line2&0xc0)*4;
-		colour = m_vram_space->read_byte(colourtbl_addr + ((charcode&colourmask)*8+(line2&7)));
-		pattern = m_vram_space->read_byte(patterntbl_addr + ((charcode&patternmask)*8+(line2&7)));
-		fg = pen16(colour >> 4);
-		bg = pen16(colour & 15);
-		for (xx=0;xx<8;xx++)
+		// Scroll max 7 pixels to the right
+		int dot_scroll = m_cont_reg[27] & 0x07;
+		scroll_to_mask = 8 - dot_scroll;
+		pixels_to_draw -= dot_scroll;
+		while (dot_scroll--)
 		{
-			*ln++ = (pattern & 0x80) ? fg : bg;
-			*ln++ = (pattern & 0x80) ? fg : bg;
+			*ln++ = border_pen;
+			*ln++ = border_pen;
+		}
+	}
+
+	do
+	{
+		const int charcode = m_vram_space->read_byte(nametbl_addr + name) + (scrolled_y & 0xc0) * 4;
+		const u8 colour = m_vram_space->read_byte(colourtbl_addr + ((charcode & colourmask) * 8 + (scrolled_y & 7)));
+		u8 pattern = m_vram_space->read_byte(patterntbl_addr + ((charcode & patternmask) * 8 + (scrolled_y & 7)));
+		const pen_t fg = pen16(colour >> 4);
+		const pen_t bg = pen16(colour & 15);
+		for (int x = 0; x < 8 && pixels_to_draw > 0; x++)
+		{
+			if (!scroll_to_mask)
+			{
+				*ln++ = (pattern & 0x80) ? fg : bg;
+				*ln++ = (pattern & 0x80) ? fg : bg;
+				pixels_to_draw--;
+			}
+			else
+			{
+				scroll_to_mask--;
+				if (BIT(m_cont_reg[25], 1))
+				{
+					*ln++ = border_pen;
+					*ln++ = border_pen;
+				}
+				else
+				{
+					*ln++ = (pattern & 0x80) ? fg : bg;
+					*ln++ = (pattern & 0x80) ? fg : bg;
+				}
+				pixels_to_draw--;
+			}
 			pattern <<= 1;
 		}
 		name++;
 	}
+	while (pixels_to_draw > 0);
 
-	xx = (16 - m_offset_x) * 2;
-	while (xx--) *ln++ = pen;
+	for (int x = (16 - m_offset_x) * 2; x > 0; x--)
+		*ln++ = border_pen;
 }
 
 void v99x8_device::mode_graphic4(uint32_t *ln, int line)
