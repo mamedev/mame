@@ -1546,7 +1546,8 @@ ROM_START( bonzeadvp2 ) // only main CPU first 4 ROMs and audio CPU ROM differ f
 	// ic10 and ic5 not populated
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )  // on BV903001B MAIN PCB, not dumped
-	ROM_LOAD( "10-9 f3eb.ic43", 0x0000, 0x2000, BAD_DUMP CRC(75c52553) SHA1(87bbaefab90e7d43f63556fbae3e937baf9d397b) ) // is the C-Chip the same as the final? probably not as SUM doesn't match
+	ROM_LOAD( "generic 10-9 f3eb.ic43", 0x0000, 0x2000, BAD_DUMP CRC(75c52553) SHA1(87bbaefab90e7d43f63556fbae3e937baf9d397b) ) // actually 汎用 on label (translated as 'generic').
+	// Is the C-Chip the same as the final? Probably not as SUM doesn't match
 
 	ROM_REGION( 0x80000, "tc0100scn", ROMREGION_ERASEFF ) // on a second ROM P.C.BOARD BT203007B
 	ROM_LOAD16_BYTE( "scn 0h 8711.ic7", 0x00000, 0x10000, CRC(17466da0) SHA1(1de9cc4bcbfa50d6c40d1acd4ac0a47c705e2f09) )
@@ -1573,14 +1574,14 @@ ROM_START( bonzeadvp2 ) // only main CPU first 4 ROMs and audio CPU ROM differ f
 	// no ADPCM-A samples
 
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 ) // on KE7X0003B 4M 8BIT ROM BOARD, // actual label is 3/8 instead of 3-8, possibly a date?
-	ROM_LOAD( "sound 0h 3-8.bin", 0x00000, 0x10000, CRC(2996e756) SHA1(b6fa6f20bdecb1e6ed7166083c9581f8f97f9836) )
-	ROM_LOAD( "sound 1h 3-8.bin", 0x10000, 0x10000, CRC(780368ac) SHA1(bc5592fbefa310b1c496b4a9f60e29cb1efa9070) )
-	ROM_LOAD( "sound 2h 3-8.bin", 0x20000, 0x10000, CRC(8f3b9fa5) SHA1(c4d536af730336b70813653e3b216f7ca9518909) )
-	ROM_LOAD( "sound 3h 3-8.bin", 0x30000, 0x10000, CRC(1a8be621) SHA1(410a4f93e95f1824643ee918a06fb8c3ac93765d) )
-	ROM_LOAD( "sound 0l 3-8.bin", 0x40000, 0x10000, CRC(3711abfa) SHA1(35237b13b201f2883bc969ebbb51f7e112f0eb35) )
-	ROM_LOAD( "sound 1l 3-8.bin", 0x50000, 0x10000, CRC(f24a3d1a) SHA1(c2d8a8e4835429b7830dad5a8d3cdf1afe21b7d6) )
-	ROM_LOAD( "sound 2l 3-8.bin", 0x60000, 0x10000, CRC(5987900c) SHA1(1109e48d196b3ed5788326df235f1ad950492d17) )
-	ROM_LOAD( "sound 3l 3-8.bin", 0x70000, 0x10000, CRC(e8a6a9e6) SHA1(435a599d188f6c4650bd3dd72d8080541824148d) )
+	ROM_LOAD( "sound 0h 3-8.ic2",  0x00000, 0x10000, CRC(2996e756) SHA1(b6fa6f20bdecb1e6ed7166083c9581f8f97f9836) )
+	ROM_LOAD( "sound 1h 3-8.ic3",  0x10000, 0x10000, CRC(780368ac) SHA1(bc5592fbefa310b1c496b4a9f60e29cb1efa9070) )
+	ROM_LOAD( "sound 2h 3-8.ic4",  0x20000, 0x10000, CRC(8f3b9fa5) SHA1(c4d536af730336b70813653e3b216f7ca9518909) )
+	ROM_LOAD( "sound 3h 3-8.ic5",  0x30000, 0x10000, CRC(1a8be621) SHA1(410a4f93e95f1824643ee918a06fb8c3ac93765d) )
+	ROM_LOAD( "sound 0l 3-8.ic7",  0x40000, 0x10000, CRC(3711abfa) SHA1(35237b13b201f2883bc969ebbb51f7e112f0eb35) )
+	ROM_LOAD( "sound 1l 3-8.ic8",  0x50000, 0x10000, CRC(f24a3d1a) SHA1(c2d8a8e4835429b7830dad5a8d3cdf1afe21b7d6) )
+	ROM_LOAD( "sound 2l 3-8.ic9",  0x60000, 0x10000, CRC(5987900c) SHA1(1109e48d196b3ed5788326df235f1ad950492d17) )
+	ROM_LOAD( "sound 3l 3-8.ic10", 0x70000, 0x10000, CRC(e8a6a9e6) SHA1(435a599d188f6c4650bd3dd72d8080541824148d) )
 ROM_END
 
 ROM_START( asuka ) // Taito PCB: ASKA&ASKA - K1100388A / J1100169A
