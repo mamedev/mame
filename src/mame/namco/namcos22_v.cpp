@@ -1177,6 +1177,12 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 				return;
 		}
 		addr += packetlength;
+
+		if (packetformat & 0x800000 && addr != finish)
+		{
+			logerror("blit_quads unexpected end: addr=0x%06x\n", addr);
+			return;
+		}
 	}
 }
 
