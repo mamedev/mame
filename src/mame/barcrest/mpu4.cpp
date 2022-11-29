@@ -1271,7 +1271,7 @@ The MSM6376 sound chip is configured in a slightly strange way, to enable dynami
 sample rate changes (8Khz, 10.6 Khz, 16 KHz) by varying the clock.
 According to the BwB programmer's guide, the formula is:
 MSM6376 clock frequency:-
-freq = (1720000/((t3L+1)(t3H+1)))*[(t3H(T3L+1)+1)/(2(t1+1))]
+freq = (CPU_CLOCK/((t3L+1)(t3H+1)))*[(t3H(T3L+1)+1)/(2(t1+1))]
 where [] means rounded up integer,
 t3L is the LSB of Clock 3,
 t3H is the MSB of Clock 3,
@@ -2334,6 +2334,11 @@ void mpu4_state::tr_htw(machine_config &config)
 void mpu4_state::tr_over(machine_config &config)
 {
 	m_overcurrent_detect = true;
+}
+
+void mpu4_state::tr_lvdoff(machine_config &config)
+{
+	m_low_volt_detect = false;
 }
 
 void mpu4_state::tr_p4l(machine_config &config)

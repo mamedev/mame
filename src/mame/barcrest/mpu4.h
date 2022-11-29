@@ -130,6 +130,7 @@ namespace mpu4_traits {
 
 		// Features
 		OVER,   // overcurrent detection
+		LVDOFF, // Disable 50hz check
 		P4L,    // use pia4 port a leds
 		SCARDL, // use simple card leds
 	};
@@ -208,6 +209,7 @@ public:
 	void tr_hnb(machine_config &config);
 	void tr_htw(machine_config &config);
 	void tr_over(machine_config &config);
+	void tr_lvdoff(machine_config &config);
 	void tr_p4l(machine_config &config);
 	void tr_scardl(machine_config &config);
 
@@ -262,6 +264,7 @@ public:
 			case mpu4_traits::HNB:    return &mpu4_state::tr_hnb;
 			case mpu4_traits::HTW:    return &mpu4_state::tr_htw;
 			case mpu4_traits::OVER:   return &mpu4_state::tr_over;
+			case mpu4_traits::LVDOFF: return &mpu4_state::tr_lvdoff;
 			case mpu4_traits::P4L:    return &mpu4_state::tr_p4l;
 			case mpu4_traits::SCARDL: return &mpu4_state::tr_scardl;
 			default: return nullptr; // crash later on invalid arguments

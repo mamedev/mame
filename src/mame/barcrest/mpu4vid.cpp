@@ -2107,11 +2107,11 @@ void mpu4vid_state::ic3ss_vid_w(offs_t offset, uint8_t data)
 
 	// E clock = VIDEO_MASTER_CLOCK / 10
 
-	float num = (1000000/((m_t3l + 1)*(m_t3h + 1)));
-	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
+	float const num = float(1'000'000) / ((m_t3l + 1) * (m_t3h + 1));
+	float const denom = std::ceil(float(m_t3h * (m_t3l + 1) + 1) / (2 * (m_t1 + 1))); //need to round up, this gives same precision as chip
 
-	int denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
-	int freq=num*denom2;
+	int const freq = int(num * denom);
+
 	if (freq)
 	{
 		m_msm6376->set_unscaled_clock(freq);
