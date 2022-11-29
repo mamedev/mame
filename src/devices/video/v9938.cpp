@@ -1140,65 +1140,55 @@ void v99x8_device::mode_graphic23(uint32_t *ln, int line)
 {
 	const int colourmask = ((m_cont_reg[3] & 0x7f) * 8) | 7;
 	const int patternmask = ((m_cont_reg[4] & 0x03) * 256) | 0xff;
-	const int nametbl_addr = m_cont_reg[2] << 10;
+	const int scrolled_y = (line + m_cont_reg[23]) & 255;
 	const int colourtbl_addr = ((m_cont_reg[3] & 0x80) << 6) + (m_cont_reg[10] << 14);
 	const int patterntbl_addr = ((m_cont_reg[4] & 0x3c) << 11);
-	const int scrolled_y = (line + m_cont_reg[23]) & 255;
 	const pen_t border_pen = pen16(m_cont_reg[7] & 0x0f);
 
-	int name = (scrolled_y / 8) * 32;
+	int nametbl_base = (m_cont_reg[2] << 10) + ((scrolled_y / 8) * 32);
+	int nametbl_offset = (m_cont_reg[26] & 0x1f);
+
+	if (BIT(m_cont_reg[25], 0) && BIT(m_cont_reg[26], 5))
+		nametbl_base ^= 0x8000;
 
 	for (int x = m_offset_x * 2; x > 0; x--)
 		*ln++ = border_pen;
 
-	int scroll_to_mask = 0;
-	int pixels_to_draw = 256;
-	if (m_cont_reg[27] & 0x07)
+	int dot_scroll = m_cont_reg[27] & 0x07;
+	int pixels_to_mask = BIT(m_cont_reg[25], 1) ? 8 - dot_scroll : 0;
+	int pixels_to_draw = 256 - dot_scroll;
+	while (dot_scroll--)
 	{
-		// Scroll max 7 pixels to the right
-		int dot_scroll = m_cont_reg[27] & 0x07;
-		scroll_to_mask = 8 - dot_scroll;
-		pixels_to_draw -= dot_scroll;
-		while (dot_scroll--)
-		{
-			*ln++ = border_pen;
-			*ln++ = border_pen;
-		}
+		*ln++ = border_pen;
+		*ln++ = border_pen;
 	}
 
 	do
 	{
-		const int charcode = m_vram_space->read_byte(nametbl_addr + name) + (scrolled_y & 0xc0) * 4;
+		const int charcode = m_vram_space->read_byte(nametbl_base + (nametbl_offset & 0x1f)) + (scrolled_y & 0xc0) * 4;
 		const u8 colour = m_vram_space->read_byte(colourtbl_addr + ((charcode & colourmask) * 8 + (scrolled_y & 7)));
 		u8 pattern = m_vram_space->read_byte(patterntbl_addr + ((charcode & patternmask) * 8 + (scrolled_y & 7)));
 		const pen_t fg = pen16(colour >> 4);
 		const pen_t bg = pen16(colour & 15);
 		for (int x = 0; x < 8 && pixels_to_draw > 0; x++)
 		{
-			if (!scroll_to_mask)
+			if (!pixels_to_mask)
 			{
 				*ln++ = (pattern & 0x80) ? fg : bg;
 				*ln++ = (pattern & 0x80) ? fg : bg;
-				pixels_to_draw--;
 			}
 			else
 			{
-				scroll_to_mask--;
-				if (BIT(m_cont_reg[25], 1))
-				{
-					*ln++ = border_pen;
-					*ln++ = border_pen;
-				}
-				else
-				{
-					*ln++ = (pattern & 0x80) ? fg : bg;
-					*ln++ = (pattern & 0x80) ? fg : bg;
-				}
-				pixels_to_draw--;
+				pixels_to_mask--;
+				*ln++ = border_pen;
+				*ln++ = border_pen;
 			}
+			pixels_to_draw--;
 			pattern <<= 1;
 		}
-		name++;
+		nametbl_offset = (nametbl_offset + 1) & 0x1f;
+		if (BIT(m_cont_reg[25], 0) && !nametbl_offset)
+			nametbl_base ^= 0x8000;
 	}
 	while (pixels_to_draw > 0);
 
@@ -1208,35 +1198,63 @@ void v99x8_device::mode_graphic23(uint32_t *ln, int line)
 
 void v99x8_device::mode_graphic4(uint32_t *ln, int line)
 {
-	int nametbl_addr, colour;
-	int line2, linemask, x, xx;
-	pen_t pen, pen_bg;
+	int linemask = ((m_cont_reg[2] & 0x1f) << 3) | 7;
+	const int scrolled_y = ((line + m_cont_reg[23]) & linemask) & 255;
+	const pen_t border_pen = pen16(m_cont_reg[7] & 0x0f);
 
-	linemask = ((m_cont_reg[2] & 0x1f) << 3) | 7;
+	int nametbl_base = ((m_cont_reg[2] & 0x40) << 10) + scrolled_y * 128;
+	int nametbl_offset = (m_cont_reg[26] & 0x1f) * 4;
+	if (!BIT(m_cont_reg[25], 0) && BIT(m_cont_reg[2], 5) && v9938_second_field())
+		nametbl_base += 0x8000;
+	if (BIT(m_cont_reg[25], 0) && BIT(m_cont_reg[26], 5))
+		nametbl_base ^= 0x8000;
 
-	line2 = ((line + m_cont_reg[23]) & linemask) & 255;
+	for (int x = m_offset_x * 2; x > 0; x--)
+		*ln++ = border_pen;
 
-	nametbl_addr = ((m_cont_reg[2] & 0x40) << 10) + line2 * 128;
-	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
-		nametbl_addr += 0x8000;
-
-	pen_bg = pen16(m_cont_reg[7] & 0x0f);
-	xx = m_offset_x * 2;
-	while (xx--) *ln++ = pen_bg;
-
-	for (x=0;x<128;x++)
+	int dot_scroll = m_cont_reg[27] & 0x07;
+	int pixels_to_mask = BIT(m_cont_reg[25], 1) ? 8 - dot_scroll : 0;
+	int pixels_to_draw = 256 - dot_scroll;
+	while (dot_scroll--)
 	{
-		colour = m_vram_space->read_byte(nametbl_addr++);
-		pen = pen16(colour >> 4);
-		*ln++ = pen;
-		*ln++ = pen;
-		pen = pen16(colour & 15);
-		*ln++ = pen;
-		*ln++ = pen;
+		*ln++ = border_pen;
+		*ln++ = border_pen;
 	}
 
-	xx = (16 - m_offset_x) * 2;
-	while (xx--) *ln++ = pen_bg;
+	do
+	{
+		bool mask_pixel_1 = false;
+		bool mask_pixel_2 = false;
+		if (pixels_to_mask)
+		{
+			mask_pixel_1 = true;
+			pixels_to_mask--;
+			if (pixels_to_mask)
+			{
+				mask_pixel_2 = true;
+				pixels_to_mask--;
+			}
+		}
+		const u8 colour = m_vram_space->read_byte(nametbl_base + (nametbl_offset & 0x7f));
+		const pen_t pen1 = mask_pixel_1 ? border_pen : pen16(colour >> 4);
+		const pen_t pen2 = mask_pixel_2 ? border_pen : pen16(colour & 15);
+		*ln++ = pen1;
+		*ln++ = pen1;
+		pixels_to_draw--;
+		if (pixels_to_draw)
+		{
+			*ln++ = pen2;
+			*ln++ = pen2;
+			pixels_to_draw--;
+		}
+		nametbl_offset = (nametbl_offset + 1) & 0x7f;
+		if (BIT(m_cont_reg[25], 0) && !nametbl_offset)
+			nametbl_base ^= 0x8000;
+	}
+	while (pixels_to_draw > 0);
+
+	for (int x = (16 - m_offset_x) * 2; x > 0; x--)
+		*ln++ = border_pen;
 }
 
 void v99x8_device::mode_graphic5(uint32_t *ln, int line)
@@ -1453,20 +1471,17 @@ void v99x8_device::mode_graphic7(uint32_t *ln, int line)
 
 void v99x8_device::mode_unknown(uint32_t *ln, int line)
 {
-	pen_t fg, bg;
-	int x;
+	const pen_t fg = pen16(m_cont_reg[7] >> 4);
+	const pen_t bg = pen16(m_cont_reg[7] & 0x0f);
 
-	fg = pen16(m_cont_reg[7] >> 4);
-	bg = pen16(m_cont_reg[7] & 15);
+	for (int x = m_offset_x * 2; x > 0; x--)
+		*ln++ = bg;
 
-	x = m_offset_x * 2;
-	while (x--) *ln++ = bg;
+	for (int x = 512; x > 0; x--)
+		*ln++ = fg;
 
-	x = 512;
-	while (x--) *ln++ = fg;
-
-	x = (16 - m_offset_x) * 2;
-	while (x--) *ln++ = bg;
+	for (int x = (16 - m_offset_x) * 2; x > 0; x--)
+		*ln++ = bg;
 }
 
 void v99x8_device::default_draw_sprite(uint32_t *ln, uint8_t *col)
