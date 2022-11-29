@@ -360,7 +360,7 @@ protected:
 	void mpu4_memmap_bl_characteriser_blastbank(address_map &map);
 
 	void lamp_extend_small(uint8_t data);
-	void lamp_extend_large(uint8_t data,uint8_t column,bool active);
+	void lamp_extend_large(uint8_t data, uint8_t column, bool active);
 	void led_write_extender(uint8_t latch, uint8_t data, uint8_t column);
 	void update_meters();
 	void ic23_update();

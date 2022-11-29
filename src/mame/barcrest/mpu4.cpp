@@ -225,6 +225,8 @@ To change between them, follow these instructions:
 #include "mpu4.lh"
 #include "mpu4ext.lh"
 
+#include <cmath>
+
 
 /*
 LED Segments related to pins (5 is not connected):
@@ -289,7 +291,7 @@ void mpu4_state::lamp_extend_large(uint8_t data, uint8_t column, bool active)
 				for (int i = 0; i < 8; i++)
 				{
 					// this includes bit 7, so you don't get a true 128 extra lamps as the last row is always 0 or 1 depending on which set of 64 we're dealing with
-					m_lamps[(8*column)+i+128+lampbase] = BIT(data, i);
+					m_lamps[(8*column) + i + 128 + lampbase] = BIT(data, i);
 				}
 				m_lamp_strobe_ext[bit7] = column;
 			}
@@ -302,10 +304,10 @@ void mpu4_state::lamp_extend_large(uint8_t data, uint8_t column, bool active)
 	}
 }
 
-void mpu4_state::led_write_extender(uint8_t latch, uint8_t data, uint8_t starting_column)
+void mpu4_state::led_write_extender(uint8_t latch, uint8_t data, uint8_t column)
 {
 	const uint8_t diff = (latch ^ m_last_latch) & latch;
-	const uint8_t ext_strobe = (7 - starting_column) * 8;
+	const uint8_t ext_strobe = (7 - column) * 8;
 
 	data = ~data;//invert drive lines
 	for (int i = 0; i < 5; i++)
@@ -383,16 +385,16 @@ void mpu4_state::update_meters()
 		break;
 	}
 
-	m_meters->update(7, (data & 0x80));
+	m_meters->update(7, data & 0x80);
 
-	for (int meter = 0; meter < 4; meter ++)
+	for (int meter = 0; meter < 4; meter++)
 	{
 		m_meters->update(meter, (data & (1 << meter)));
 	}
 
 	if (m_reel_mux == STANDARD_REEL)
 	{
-		for (int meter = 4; meter < 7; meter ++)
+		for (int meter = 4; meter < 7; meter++)
 		{
 			m_meters->update(meter, (data & (1 << meter)));
 		}
@@ -535,7 +537,7 @@ void mpu4_state::pia_ic3_porta_w(uint8_t data)
 
 			for (int i = 0; i < 8; i++)
 			{
-				m_lamps[(8*m_input_strobe)+i] = BIT(data, i);
+				m_lamps[(8*m_input_strobe) + i] = BIT(data, i);
 			}
 			m_lamp_strobe = m_input_strobe;
 		}
@@ -556,7 +558,7 @@ void mpu4_state::pia_ic3_portb_w(uint8_t data)
 
 			for (int i = 0; i < 8; i++)
 			{
-				m_lamps[(8*m_input_strobe)+i+64] = BIT(data, i);
+				m_lamps[(8*m_input_strobe) + i + 64] = BIT(data, i);
 			}
 			m_lamp_strobe2 = m_input_strobe;
 		}
@@ -695,17 +697,17 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 {
 	m_ic4_input_b = 0x00;
 
-	if (m_serial_output) m_ic4_input_b |=  0x80;
+	if (m_serial_output) m_ic4_input_b |= 0x80;
 
 	if (!m_reel_mux)
 	{
-		if (m_optic_pattern & 0x01) m_ic4_input_b |=  0x40; /* reel A tab */
+		if (m_optic_pattern & 0x01) m_ic4_input_b |= 0x40; /* reel A tab */
 
-		if (m_optic_pattern & 0x02) m_ic4_input_b |=  0x20; /* reel B tab */
+		if (m_optic_pattern & 0x02) m_ic4_input_b |= 0x20; /* reel B tab */
 
-		if (m_optic_pattern & 0x04) m_ic4_input_b |=  0x10; /* reel C tab */
+		if (m_optic_pattern & 0x04) m_ic4_input_b |= 0x10; /* reel C tab */
 
-		if (m_optic_pattern & 0x08) m_ic4_input_b |=  0x08; /* reel D tab */
+		if (m_optic_pattern & 0x08) m_ic4_input_b |= 0x08; /* reel D tab */
 	}
 	else
 	{
@@ -817,7 +819,6 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 			{
 				m_mpu4leds[((m_input_strobe | 8) << 3) | i] = BIT(data, i);
 			}
-		//  m_digits[m_input_strobe | 8] = data;
 		}
 		break;
 
@@ -837,7 +838,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 #if 0
 		if ((m_ic23_active) && m_card_live)
 		{
-			for(int i=0; i<8; i++)
+			for (int i = 0; i < 8; i++)
 			{
 				m_mpu4leds[(m_last_b7 << 6) | (m_input_strobe << 3) | i] = BIT(~data, i);
 			}
@@ -1023,7 +1024,7 @@ void mpu4_state::pia_ic6_porta_w(uint8_t data)
 	if (m_ay8913.found())
 	{
 		m_ay_data = data;
-		update_ay();//
+		update_ay();
 	}
 }
 
@@ -1035,7 +1036,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_ca2_w)
 	{
 		if ( state ) m_ay8913_address |=  0x01;
 		else         m_ay8913_address &= ~0x01;
-		update_ay();//
+		update_ay();
 	}
 }
 
@@ -1104,7 +1105,7 @@ uint8_t mpu4_state::pia_ic7_portb_r()
 	all eight meters are driven from this port, giving the 8 line driver chip
 	9 connections in total. */
 
-	//This may be overkill, but the meter sensing is VERY picky
+	//This may be overkill, but the meter sensing is VERY picky.
 
 	uint8_t combined_meter = m_meters->get_activity(0) | m_meters->get_activity(1) |
 							m_meters->get_activity(2) | m_meters->get_activity(3) |
@@ -1239,12 +1240,12 @@ uint8_t mpu4_state::pia_gb_portb_r()
 	//
 
 	if ( m_msm6376->nar_r() ) data |= 0x80;
-	else                           data &= ~0x80;
+	else                      data &= ~0x80;
 
 	if ( m_msm6376->busy_r() ) data |= 0x40;
-	else                            data &= ~0x40;
+	else                       data &= ~0x40;
 
-	return ( data | m_expansion_latch );
+	return data | m_expansion_latch;
 }
 
 WRITE_LINE_MEMBER(mpu4_state::pia_gb_ca2_w)
@@ -1299,11 +1300,10 @@ void mpu4_state::ic3ss_w(offs_t offset, uint8_t data)
 		m_t3l = data;
 	}
 
-	float num = (1720000/((m_t3l + 1)*(m_t3h + 1)));
-	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
+	float const num = float(1'720'000) / ((m_t3l + 1) * (m_t3h + 1));
+	float const denom = std::ceil(float(m_t3h * (m_t3l + 1) + 1) / (2 * (m_t1 + 1))); //need to round up, this gives same precision as chip
 
-	uint8_t denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
-	uint8_t freq=num*denom2;
+	int const freq = int(num * denom);
 
 	if (freq)
 	{
