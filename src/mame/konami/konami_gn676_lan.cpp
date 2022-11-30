@@ -88,6 +88,8 @@ and the Racing Jam 2 dfc74cc9 firmware are actually the same except for the fina
 
 #include "logmacro.h"
 
+#define DUMP_FIRMWARE 0
+
 
 DEFINE_DEVICE_TYPE(KONAMI_GN676A_LAN, konami_gn676a_lan_device, "konami_gn676a_lan", "Konami GN676-PWB(H)A Network PCB")
 DEFINE_DEVICE_TYPE(KONAMI_GN676B_LAN, konami_gn676b_lan_device, "konami_gn676b_lan", "Konami GN676-PWB(H)B Network PCB")
@@ -180,15 +182,16 @@ void konami_gn676_lan_device::lanc1_w(offs_t offset, uint8_t data)
 			m_x76f041_enabled = m_fpga_firmware_crc == 0xa8c97a75 || m_fpga_firmware_crc == 0xdfc74cc9 || m_fpga_firmware_crc == 0x93b86e35;
 			m_fpga_is_stubbed = m_fpga_firmware_crc == 0x3760e3ce;
 
-			/*
-			// DEBUG: Dump firmware for quick comparison
-			FILE *f = fopen(util::string_format("firmware_%08x.bin", m_fpga_firmware_crc).c_str(), "wb");
-			if (f)
+			if (DUMP_FIRMWARE)
 			{
-				fwrite(m_lanc2_ram.get(), 1, m_fpga_firmware_size, f);
-				fclose(f);
+				// DEBUG: Dump firmware for quick comparison
+				FILE *f = fopen(util::string_format("firmware_%08x.bin", m_fpga_firmware_crc).c_str(), "wb");
+				if (f)
+				{
+					fwrite(m_lanc2_ram.get(), 1, m_fpga_firmware_size, f);
+					fclose(f);
+				}
 			}
-			*/
 
 			std::fill_n(m_lanc2_ram.get(), 0x8000, 0);
 		}
@@ -205,51 +208,57 @@ uint8_t konami_gn676_lan_device::lanc2_r(offs_t offset)
 	}
 
 	uint8_t r = m_lanc2_reg[offset];
-	if (offset == 1)
+	switch (offset)
 	{
-		r = BIT(m_lanc2_ram_r, 8, 8);
-	}
-	else if (offset == 2)
-	{
-		r = BIT(m_lanc2_ram_r, 0, 8);
-	}
-	else if (offset == 3)
-	{
-		r = m_lanc2_ram[m_lanc2_ram_r];
-		m_lanc2_ram_r = (m_lanc2_ram_r + 1) & 0x7fff;
+		case 1:
+			r = BIT(m_lanc2_ram_r, 8, 8);
+			break;
 
-		if (!m_fpga_is_stubbed)
-			r = 0xff; // HACK: network traffic isn't implemented so give dummy data
-	}
-	else if (offset == 6 || offset == 7)
-	{
-		if (m_fpga_is_stubbed)
+		case 2:
+			r = BIT(m_lanc2_ram_r, 0, 8);
+			break;
+
+		case 3:
+			r = m_lanc2_ram[m_lanc2_ram_r];
+			m_lanc2_ram_r = (m_lanc2_ram_r + 1) & 0x7fff;
+
+			if (!m_fpga_is_stubbed)
+				r = 0xff; // HACK: network traffic isn't implemented so give dummy data
+			break;
+
+		case 6:
+		case 7:
+			if (m_fpga_is_stubbed)
+			{
+				// Thrill Drive's boot test checks for this specific logic
+				r = (m_lanc2_reg[offset] + 3) & 0x7f;
+				m_lanc2_reg[offset]++;
+			}
+			else
+				r = 0x55; // HACK: force clients to show as disconnected
+			break;
+
+		case 9:
 		{
 			// Thrill Drive's boot test checks for this specific logic
-			r = (m_lanc2_reg[offset] + 3) & 0x7f;
-			m_lanc2_reg[offset]++;
-		}
-		else
-			r = 0x55; // HACK: force clients to show as disconnected
-	}
-	else if (offset == 9)
-	{
-		// Thrill Drive's boot test checks for this specific logic
-		uint8_t a = m_lanc2_reg[offset] + 6;
-		uint8_t b = BIT(a, 4, 4) & BIT(a, 5, 3) & BIT(a, 6, 2) & 3;
-		r = (b << 4) | (a & 0x0f);
+			uint8_t a = m_lanc2_reg[offset] + 6;
+			uint8_t b = BIT(a, 4, 4) & BIT(a, 5, 3) & BIT(a, 6, 2);
+			r = (b << 4) | (a & 0x0f);
 
-		if (m_fpga_is_stubbed)
-			m_lanc2_reg[offset]++;
-	}
-	else if (offset == 0x0c || offset == 0x0d)
-	{
-		// Used with reg 6/7 to determine info about clients
-	}
-	else if (offset == 0x10)
-	{
-		if (m_x76f041 && m_x76f041_enabled && m_x76f041_read_enabled)
-			r = m_x76f041->read_sda();
+			if (m_fpga_is_stubbed)
+				m_lanc2_reg[offset]++;
+			break;
+		}
+
+		case 0x0c:
+		case 0x0d:
+			// Used with reg 6/7 to determine info about clients
+			break;
+
+		case 0x10:
+			if (m_x76f041 && m_x76f041_enabled && m_x76f041_read_enabled)
+				r = m_x76f041->read_sda();
+			break;
 	}
 
 	LOG("%s: lanc2_r: read %02X from %08X\n", tag(), r, offset, machine().describe_context());
@@ -270,79 +279,81 @@ void konami_gn676_lan_device::lanc2_w(offs_t offset, uint8_t data)
 
 	m_lanc2_reg[offset] = data;
 
-	if (offset == 0)
+	switch (offset)
 	{
-		// This shouldn't actually be used in practice but Thrill Drive's boot test explicitly writes
-		// (addr >> 16) & 1 to this register which would put it out of the available RAM space.
-	}
-	else if (offset == 1)
-	{
-		m_lanc2_ram_r = (m_lanc2_ram_r & 0x100ff) | (data << 8);
-		m_lanc2_ram_w = (m_lanc2_ram_w & 0x100ff) | (data << 8);
-	}
-	else if (offset == 2)
-	{
-		m_lanc2_ram_r = (m_lanc2_ram_r & 0x1ff00) | data;
-		m_lanc2_ram_w = (m_lanc2_ram_w & 0x1ff00) | data;
-	}
-	else if (offset == 3)
-	{
-		m_lanc2_ram[m_lanc2_ram_w] = data;
-		m_lanc2_ram_w = (m_lanc2_ram_w + 1) & 0x7fff;
-	}
-	else if (offset == 4)
-	{
-		// Network enabled flag?
-		// Set to 0 after firmware is uploaded, set to 1 when setting self network ID and similar info
-	}
-	else if (offset == 5)
-	{
-		m_network_id = data;
-	}
-	else if (offset == 0x10)
-	{
-		if (m_x76f041 && m_x76f041_enabled)
-		{
-			/*
-				0x01 = x76 SDA
-				0x02 = x76 RST
-				0x04 = x76 CS???
-				0x08 = x76 SCL
-				0x10 = Controls direction of x76 SDA
-			*/
+		case 0:
+			// This shouldn't actually be used in practice but Thrill Drive's boot test explicitly writes
+			// (addr >> 16) & 1 to this register which would put it out of the available RAM space.
+			break;
 
-			if (BIT(data, 1))
-				m_x76f041_rst_triggered = true;
+		case 1:
+			m_lanc2_ram_r = (m_lanc2_ram_r & 0x100ff) | (data << 8);
+			m_lanc2_ram_w = (m_lanc2_ram_w & 0x100ff) | (data << 8);
+			break;
 
-			m_x76f041_read_enabled = BIT(data, 4);
-			m_x76f041->write_rst(BIT(data, 1));
-			m_x76f041->write_scl(BIT(data, 3));
+		case 2:
+			m_lanc2_ram_r = (m_lanc2_ram_r & 0x1ff00) | data;
+			m_lanc2_ram_w = (m_lanc2_ram_w & 0x1ff00) | data;
+			break;
 
-			if (!m_x76f041_read_enabled)
+		case 3:
+			m_lanc2_ram[m_lanc2_ram_w] = data;
+			m_lanc2_ram_w = (m_lanc2_ram_w + 1) & 0x7fff;
+			break;
+
+		case 4:
+			// Network enabled flag?
+			// Set to 0 after firmware is uploaded, set to 1 when setting self network ID and similar info
+			break;
+
+		case 5:
+			m_network_id = data;
+			break;
+
+		case 0x10:
+			if (m_x76f041 && m_x76f041_enabled)
 			{
-				if (m_x76f041_rst_triggered && BIT(data, 1) == 0)
-				{
-					// HACK: RST was triggered previously and now we're exiting read mode, so reset
-					// the x76 state so we're not stuck in a loop reading the reset response.
-					// My guess is bit 2 is used in some way for this but the usage doesn't make
-					// sense (if used as CS then it'll reset the chip state entirely during ACK
-					// polling in normal usage). FPGA magic?
-					m_x76f041->write_cs(1);
-					m_x76f041->write_cs(0);
-					m_x76f041_rst_triggered = false;
-				}
+				/*
+					0x01 = x76 SDA
+					0x02 = x76 RST
+					0x04 = x76 CS???
+					0x08 = x76 SCL
+					0x10 = Controls direction of x76 SDA
+				*/
 
-				m_x76f041->write_sda(BIT(data, 0));
+				if (BIT(data, 1))
+					m_x76f041_rst_triggered = true;
+
+				m_x76f041_read_enabled = BIT(data, 4);
+				m_x76f041->write_rst(BIT(data, 1));
+				m_x76f041->write_scl(BIT(data, 3));
+
+				if (!m_x76f041_read_enabled)
+				{
+					if (m_x76f041_rst_triggered && BIT(data, 1) == 0)
+					{
+						// HACK: RST was triggered previously and now we're exiting read mode, so reset
+						// the x76 state so we're not stuck in a loop reading the reset response.
+						// My guess is bit 2 is used in some way for this but the usage doesn't make
+						// sense (if used as CS then it'll reset the chip state entirely during ACK
+						// polling in normal usage). FPGA magic?
+						m_x76f041->write_cs(1);
+						m_x76f041->write_cs(0);
+						m_x76f041_rst_triggered = false;
+					}
+
+					m_x76f041->write_sda(BIT(data, 0));
+				}
 			}
-		}
-	}
-	else if (offset == 0x1c)
-	{
-		m_network_buffer_max_size = (data << 8) | (m_network_buffer_max_size & 0xff);
-	}
-	else if (offset == 0x1d)
-	{
-		m_network_buffer_max_size = (m_network_buffer_max_size & 0xff00) | data;
+			break;
+
+		case 0x1c:
+			m_network_buffer_max_size = (data << 8) | (m_network_buffer_max_size & 0xff);
+			break;
+
+		case 0x1d:
+			m_network_buffer_max_size = (m_network_buffer_max_size & 0xff00) | data;
+			break;
 	}
 }
 

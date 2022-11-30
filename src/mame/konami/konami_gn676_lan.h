@@ -11,6 +11,8 @@
 class konami_gn676_lan_device : public device_t
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::LAN; }
+
 	uint8_t lanc1_r(offs_t offset);
 	void lanc1_w(offs_t offset, uint8_t data);
 	uint8_t lanc2_r(offs_t offset);
@@ -40,11 +42,11 @@ private:
 	uint32_t m_fpga_firmware_size;
 	uint32_t m_fpga_firmware_crc;
 
-	int m_lanc2_ram_r;
-	int m_lanc2_ram_w;
+	uint32_t m_lanc2_ram_r;
+	uint32_t m_lanc2_ram_w;
 
-	int m_network_buffer_max_size;
-	int m_network_id;
+	uint16_t m_network_buffer_max_size;
+	uint8_t m_network_id;
 
 	bool m_x76f041_enabled;
 	bool m_x76f041_read_enabled;
