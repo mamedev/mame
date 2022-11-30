@@ -1349,7 +1349,7 @@ ROM_END
 
 /*****************************************************************************/
 
-#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // GYxxx, GNxxx -> 5+R gear shift, clutch pedal, left/right panel buttons, hand brake lever
 // GPxxx, GExxx, GMxxx -> up/down gear shift, no left or right panel buttons, no clutch, hand brake lever

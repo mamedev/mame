@@ -3454,14 +3454,14 @@ GAME(  1998, terabrstaa, terabrst, terabrst,   terabrst, hornet_state, init_horn
 // GK713EA no clutch. settings configurable on boot: handbrake lever, shifter (up/down, 4 pos, 5+R), shifter display position (right/left)
 // GK713EE no clutch. settings configurable on boot: handbrake lever, shifter (up/down, 4 pos, 5+R), shifter display position (right/left)
 // GK713K* no handbrake, up/down shifter, no clutch, English only version of GP713JA?
-GAME(  1998, thrilldgeu,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME(  1998, thrilldgnj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GN713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME(  1998, thrilldgmj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GM713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME(  1998, thrilldgpj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GP713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME(  1998, thrilldgej,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME(  1998, thrilldgke,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME(  1998, thrilldgkee, thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EEB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME(  1998, thrilldgkk,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713K*B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME(  1998, thrilldgeu,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgnj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GN713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgmj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GM713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgpj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GP713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgej,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgke,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgkee, thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EEB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgkk,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713K*B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // Revisions C and D removed Japanese region support but introduced Voodoo 2 support.
 GAMEL( 1999, sscope,   0,      sscope, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
