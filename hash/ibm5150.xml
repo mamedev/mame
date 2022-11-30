@@ -8392,7 +8392,7 @@ has been replaced with an all-zero block. -->
 	<software name="ys" supported="no">
 		<description>Ancient Land of Ys</description>
 		<year>1989</year>
-		<publisher>Kyodia Software Marketing</publisher>
+		<publisher>Kyodai Software Marketing</publisher>
 		<info name="original_publisher" value="日本ファルコム (Nihon Falcom)" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697170">
