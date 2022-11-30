@@ -2499,13 +2499,10 @@ ROM_START( m4rltst )
 	ROM_LOAD( "rtv.p1", 0x08000, 0x08000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532) )
 ROM_END
 
+GAME( 198?, m4tst,    0,          mod2_no_bacta(R4, RT1, OVER),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
 GAME( 198?, m4tst2,   0,          mod2_no_bacta(R4, RT1, OVER),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Unit Test (Program 2)",MACHINE_MECHANICAL )
 GAME( 198?, m4clr,    0,          mod2_no_bacta(R4, RT1, OVER),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Meter Clear ROM",MACHINE_MECHANICAL )
 GAME( 198?, m4rltst,  0,          mod2_no_bacta(R4, RT1, OVER),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Reel Test (3.0)",MACHINE_MECHANICAL )
-GAME( 198?, m4tst,    0,          mod2_no_bacta(R4, RT1, CURRENT),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
-GAME( 198?, m4tst2,   0,          mod2_no_bacta(R4, RT1, CURRENT),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Unit Test (Program 2)",MACHINE_MECHANICAL )
-GAME( 198?, m4clr,    0,          mod2_no_bacta(R4, RT1, CURRENT),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Meter Clear ROM",MACHINE_MECHANICAL )
-GAME( 198?, m4rltst,  0,          mod2_no_bacta(R4, RT1, CURRENT),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Reel Test (3.0)",MACHINE_MECHANICAL )
 
 
 /*********************************************************************************************************
@@ -2550,7 +2547,6 @@ GAME(199?, m4pick,    0,          mod2(R4, RT1), mpu4,            mpu4mod2_machi
 
 // No reels
 GAMEL(1989?, m4conn4, 0,          mod2(OVER), connect4,        mpu4mod2_machines_state, init_m4,      ROT0, "Dolbeck Systems","Connect 4",MACHINE_IMPERFECT_GRAPHICS|MACHINE_REQUIRES_ARTWORK,layout_connect4 )
-GAMEL(1989?, m4conn4, 0,          mod2(CURRENT), connect4,        mpu4mod2_machines_state, init_m4,      ROT0, "Dolbeck Systems","Connect 4",MACHINE_IMPERFECT_GRAPHICS|MACHINE_REQUIRES_ARTWORK,layout_connect4 )
 
 // TUNE ALARM (may or may not be sound-related); probably needs RS-232 link
 GAME(198?, m4funh,    0,          mod4psg(R4, RT1), mpu4,         mpu4mod2_machines_state, init_m4, 0,      "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // was in the SC1 Fun House set
