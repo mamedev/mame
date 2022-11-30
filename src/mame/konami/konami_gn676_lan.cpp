@@ -242,7 +242,7 @@ uint8_t konami_gn676_lan_device::lanc2_r(offs_t offset)
 		{
 			// Thrill Drive's boot test checks for this specific logic
 			uint8_t a = m_lanc2_reg[offset] + 6;
-			uint8_t b = BIT(a, 4, 4) & BIT(a, 5, 3) & BIT(a, 6, 2);
+			uint8_t b = BIT(a, 4, 2) & BIT(a, 5, 2) & BIT(a, 6, 2);
 			r = (b << 4) | (a & 0x0f);
 
 			if (m_fpga_is_stubbed)
