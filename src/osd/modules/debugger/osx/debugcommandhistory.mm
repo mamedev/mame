@@ -12,6 +12,8 @@
 
 #import "debugcommandhistory.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEDebugCommandHistory
 
@@ -124,14 +126,14 @@
 	[self clear];
 	util::xml::data_node const *const hist = node->get_child(osd::debugger::NODE_WINDOW_HISTORY);
 	if (hist) {
-		util::xml::data_node const *item = hist->get_child(NODE_HISTORY_ITEM);
+		util::xml::data_node const *item = hist->get_child(osd::debugger::NODE_HISTORY_ITEM);
 		while (item) {
 			if (item->get_value() && *item->get_value()) {
 				while ([history count] >= length)
 					[history removeLastObject];
 				[history insertObject:[NSString stringWithUTF8String:item->get_value()] atIndex:0];
 			}
-			item = item->get_next_sibling(NODE_HISTORY_ITEM);
+			item = item->get_next_sibling(osd::debugger::NODE_HISTORY_ITEM);
 		}
 	}
 }
