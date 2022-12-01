@@ -8389,11 +8389,15 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="ys" supported="no">
+	<software name="ys" supported="partial">
 		<description>Ancient Land of Ys</description>
 		<year>1989</year>
 		<publisher>Kyodai Software Marketing</publisher>
+		<notes><![CDATA[
+No title screen if running from floppy, btanb?
+]]></notes>
 		<info name="original_publisher" value="日本ファルコム (Nihon Falcom)" />
+		<info name="usage" value="Needs a formatted disk in DOS before starting in order to load or save if run from floppy" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697170">
 				<rom name="ancient land of ys.td0" size="697170" crc="2ce1c65b" sha1="3e24853872cf98e10983c51ff51159dc7a61e063"/>
