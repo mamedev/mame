@@ -9370,12 +9370,6 @@ b85royal                        //
 b85scard                        // (c) 198? BFM
 b85sngam                        //
 
-@source:misc/bgt.cpp
-bg_barmy                        //
-bg_ddb                          //
-bg_max                          //
-bg_maxa                         //
-
 @source:msx/big10.cpp
 big10                           // (c) 198? Unknown
 
@@ -33547,6 +33541,10 @@ npssr2                          //
 npusagif                        //
 
 @source:cirsa/neptunp2.cpp
+bg_barmy                        //
+bg_ddb                          //
+bg_max                          //
+bg_maxa                         //
 ccorsario                       // (c) 2002 Cirsa / Unidesa
 mltpoints                       // (c) 2006 Cirsa / Unidesa
 neptunp2                        // (c) 2003 Cirsa / Unidesa
