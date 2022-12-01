@@ -7403,6 +7403,9 @@ has been replaced with an all-zero block. -->
 		<description>Mouse Software Test/Demo</description>
 		<year>1987</year>
 		<publisher>Mouse Systems</publisher>
+		<notes><![CDATA[
+Driver and test suite for unemulated Mouse Systems Mighty Mouse
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="disk1.img" size="368640" crc="ca451d20" sha1="0b1a6be07407c3a5fd15d9d17c61ccc8d1b94c5e"/>
@@ -7428,6 +7431,10 @@ has been replaced with an all-zero block. -->
 		<description>Olivetti Prodest PC1 HDU Install</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
+		<notes><![CDATA[
+Throws "invalid himem.sys", "invalid emm386.exe" and "unrecognized command in config.sys" if autobooted
+Throws "invalid directory" if run from DOS
+]]></notes>
 		<info name="version" value="1.00" />
 		<info name="serial" value="718165 E" />
 		<part name="flop1" interface="floppy_3_5">
@@ -7437,12 +7444,13 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="pc1mouse" supported="no">
+	<software name="pc1mouse" supported="yes">
 		<description>Olivetti Prodest PC1 Mouse Driver</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 		<info name="version" value="1.02" />
 		<info name="serial" value="961248 M" />
+		<info name="usage" value="Logitech mouse driver for Prodest PC1 only" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Driver Mouse.dsk" size="737280" crc="c7b67dd4" sha1="80fb80702e2a673d71df588ea42566ac3bf66f43"/>
@@ -7454,7 +7462,9 @@ has been replaced with an all-zero block. -->
 		<description>SICOS Mouse</description>
 		<year>1990</year>
 		<publisher>SICOS</publisher>
-
+		<notes><![CDATA[
+Corrupt files
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="SICOS\nMOUSE DRIVER\nMOUSE TESTER\nMENU MAKER"/>
 			<dataarea name="flop" size="368640">
