@@ -32,4 +32,7 @@
 - (void)reset;
 - (void)clear;
 
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node;
+
 @end

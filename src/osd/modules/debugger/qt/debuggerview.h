@@ -29,6 +29,9 @@ public:
 	template <typename T> T *view() { return downcast<T *>(m_view); }
 	int sourceIndex() const;
 
+	virtual void restoreConfigurationFromNode(util::xml::data_node const &node);
+	virtual void saveConfigurationToNode(util::xml::data_node &node);
+
 signals:
 	void updated();
 
