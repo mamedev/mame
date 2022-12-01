@@ -8,6 +8,8 @@
 
 #import "debugosx.h"
 
+#include "util/utilfwd.h"
+
 #import <Cocoa/Cocoa.h>
 
 
