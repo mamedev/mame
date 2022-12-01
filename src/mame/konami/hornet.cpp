@@ -434,6 +434,8 @@ private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(sscope_screen_timer_hack);
+
 	required_shared_ptr<uint32_t> m_workram;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	required_device<ppc4xx_device> m_maincpu;
@@ -468,6 +470,7 @@ private:
 	uint16_t m_gn680_ret1;
 
 	bool m_sndres;
+	bool m_sscope_irq1_triggered;
 
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
@@ -482,7 +485,6 @@ private:
 	void soundtimer_en_w(uint16_t data);
 	void soundtimer_count_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
-	double sscope_input_callback(uint8_t input);
 	void jamma_jvs_w(uint8_t data);
 	uint8_t comm_eeprom_r();
 	void comm_eeprom_w(uint8_t data);
@@ -675,6 +677,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x40 = EXRES0
 			    0x20 = EXID1
 			    0x10 = EXID0
+			    0x0C = 0x00 = 24kHz, 0x04 = 31kHz, 0x0c = 15kHz
 			    0x01 = EXRGB
 			*/
 			if (data & 0x80)
@@ -1044,7 +1047,7 @@ static INPUT_PORTS_START( sscope )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x40, 0x40, "Disable Machine Init" ) PORT_DIPLOCATION("SW:2") // Default DIPSW2 to OFF for sscope
+	PORT_DIPNAME( 0x40, 0x40, "Disable Machine Init" ) PORT_DIPLOCATION("SW:2") // Default DIPSW2 to OFF
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
@@ -1097,7 +1100,7 @@ INPUT_PORTS_END
 
     IRQ0:   Vblank CG Board 0
     IRQ1:   Vblank CG Board 1
-    IRQ2:   LANC
+    IRQ2:   LANC (GQ931(H) board), Teraburst (usage unknown)
     DMA0
     NMI:    SCI
 
@@ -1135,20 +1138,11 @@ void hornet_state::machine_reset()
 		if (membank("slave_cgboard_bank"))
 			membank("slave_cgboard_bank")->set_base(memregion("master_cgboard")->base());
 	}
+
+	m_sscope_irq1_triggered = false;
 }
 
 double hornet_state::adc12138_input_callback(uint8_t input)
-{
-	if (input < m_analog.size())
-	{
-		int value = m_analog[input].read_safe(0);
-		return (double)(value) / 2047.0;
-	}
-
-	return 0.0;
-}
-
-double hornet_state::sscope_input_callback(uint8_t input)
 {
 	if (input < m_analog.size())
 	{
@@ -1292,7 +1286,7 @@ void hornet_state::sscope(machine_config &config)
 	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo[1]->set_screen("rscreen");
 	m_voodoo[1]->set_cpu(m_dsp[1]);
-	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_voodoo[1]->vblank_callback().set([this] (bool c) { m_sscope_irq1_triggered = true; });
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
 	K033906(config, m_k033906[1], 0, m_voodoo[1]);
@@ -1312,9 +1306,11 @@ void hornet_state::sscope(machine_config &config)
 
 	// Comes from the GQ830-PWB(J) board
 	ADC12138(config, m_adc12138_sscope, 0);
-	m_adc12138_sscope->set_ipt_convert_callback(FUNC(hornet_state::sscope_input_callback));
+	m_adc12138_sscope->set_ipt_convert_callback(FUNC(hornet_state::adc12138_input_callback));
 
 	m_konppc->set_num_boards(2);
+
+	TIMER(config, "sscope_screen_timer_hack").configure_periodic(FUNC(hornet_state::sscope_screen_timer_hack), rscreen.frame_period() / 60);
 }
 
 void hornet_state::sscope_voodoo2(machine_config& config)
@@ -1336,7 +1332,7 @@ void hornet_state::sscope_voodoo2(machine_config& config)
 	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo[1]->set_screen("rscreen");
 	m_voodoo[1]->set_cpu(m_dsp[1]);
-	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_voodoo[1]->vblank_callback().set([this] (bool c) { m_sscope_irq1_triggered = true; });
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
 	m_k033906[0]->set_pciid(0x0002121a); // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0002 = Voodoo 2)
@@ -1363,6 +1359,19 @@ void hornet_state::sscope2_voodoo1(machine_config& config)
 	EEPROM_93C46_16BIT(config, "lan_eeprom");
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(hornet_state::sscope_screen_timer_hack)
+{
+	// HACK: IRQ1 controls the scope screen's update for the Silent Scope games.
+	// The screen will only update once every 57 IRQ calls due to the use of a counter.
+	// Triggering IRQ1 on vblank makes the screen update once every ~1 sec so I suspect
+	// this shouldn't be tied to vblank.
+	// Triggering IRQ1 too early causes things to crash so make it only start asserting
+	// after a known "good" timing.
+	if (!m_sscope_irq1_triggered)
+		return;
+
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+}
 
 /*****************************************************************************/
 
