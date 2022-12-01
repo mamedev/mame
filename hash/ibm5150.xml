@@ -7513,10 +7513,13 @@ has been replaced with an all-zero block. -->
 
 	<!-- DOS-based games -->
 
-	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM -->
+	<software name="2400ad" supported="no">
 		<description>2400 A.D. (set 1)</description>
 		<year>1987</year>
 		<publisher>Origin</publisher>
+		<notes><![CDATA[
+Punts with "PLEASE USE ORIGINAL DISK ONLY.", unemulated protection
+]]></notes>
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -7727,12 +7730,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<!-- black screen (works in DOSBox) -->
-	<software name="abcbox" supported="no">
+	<!-- TODO: consider moving to ibm5170.xml -->
+	<software name="abcbox" supported="partial">
 		<description>ABC's Wide World of Sports Boxing</description>
 		<year>1991</year>
 		<publisher>Data East</publisher>
-		<info name="usage" value="VGA required" />
+		<notes><![CDATA[
+Black screen, loops on [COM1] $3f8 accesses waiting for an irq, expecting serial mouse? Bypass by not hooking up a mouse.
+Ugly color fade-in/outs for manager copy protection screen
+Very aliased [filtered DAC] during gameplay for voice samples
+]]></notes>
+		<info name="usage" value="VGA required, sports manual copy protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- saved config file -->
 			<dataarea name="flop" size = "737280">
@@ -7750,6 +7758,7 @@ has been replaced with an all-zero block. -->
 		<description>Academy - Tau Ceti 2</description>
 		<year>1987</year>
 		<publisher>CRL Group</publisher>
+		<!-- TODO: seems working -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Academy - Tau Ceti 2 [1987] [CRL Group] [5.25] [1 of 1].img" size="368640" crc="d9047aa4" sha1="09198868eb826dc1be90b941f66c336d21f5df92"/>
@@ -7798,6 +7807,10 @@ has been replaced with an all-zero block. -->
 		<description>Action Service (5.25")</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+Crashes on [EGA] after title screen
+Corrupt graphics on [CGA]
+]]></notes>
 		<info name="developer" value="Cobra Soft" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
