@@ -1982,7 +1982,10 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			result[5] = command[4];
 			result[6] = command[5];
 			result_pos = 7;
-			command_end(fi, true);
+			// PC80S31K i/f is fussy on this:
+			// wants data_completion = false for anything that throws a scan_id failed,
+			// otherwise it will try to terminal count something that doesn't have data in the first place.
+			command_end(fi, (fi.st0 & 0xc0) == 0x00);
 			return;
 
 		default:
@@ -2133,7 +2136,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 			result[5] = command[4];
 			result[6] = command[5];
 			result_pos = 7;
-			command_end(fi, true);
+			command_end(fi, (fi.st0 & 0xc0) == 0x00);
 			return;
 
 		default:
@@ -2319,7 +2322,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			result[5] = command[4];
 			result[6] = command[5];
 			result_pos = 7;
-			command_end(fi, true);
+			command_end(fi, (fi.st0 & 0xc0) == 0x00);
 			return;
 
 		default:
@@ -2409,7 +2412,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 			result[5] = 0;
 			result[6] = command[2];
 			result_pos = 7;
-			command_end(fi, true);
+			command_end(fi, (fi.st0 & 0xc0) == 0x00);
 			return;
 
 		default:
@@ -2501,7 +2504,7 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 			result[5] = cur_live.idbuf[2];
 			result[6] = cur_live.idbuf[3];
 			result_pos = 7;
-			command_end(fi, true);
+			command_end(fi, (fi.st0 & 0xc0) == 0x00);
 			return;
 
 		default:
