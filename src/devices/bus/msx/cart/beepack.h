@@ -6,11 +6,12 @@
 #pragma once
 
 #include "cartridge.h"
-#include "bus/msx/beecard/beecard.h"
 #include "imagedev/cartrom.h"
 
 
 DECLARE_DEVICE_TYPE(MSX_CART_BEEPACK, msx_cart_beepack_device)
+
+class bee_card_interface;
 
 
 class msx_cart_beepack_device : public device_t
@@ -34,6 +35,23 @@ protected:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	bee_card_interface *m_beecard;
+};
+
+
+class bee_card_interface : public device_interface
+{
+public:
+	virtual void initialize_cartridge() { }
+	void set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3);
+
+protected:
+	bee_card_interface(const machine_config &mconfig, device_t &device);
+	memory_region *cart_rom_region() { return m_slot ? m_slot->memregion("rom") : nullptr; }
+	memory_view::memory_view_entry *page(int i) { return m_page[i]; }
+
+private:
+	memory_view::memory_view_entry *m_page[4];
+	msx_cart_beepack_device *const m_slot;
 };
 
 

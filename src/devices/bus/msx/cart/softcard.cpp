@@ -10,6 +10,7 @@ This cartridge allows SoftCards to be used on an MSX system.
 
 #include "emu.h"
 #include "softcard.h"
+#include "bus/msx/softcard/softcard.h"
 #include "softlist_dev.h"
 
 
@@ -45,31 +46,26 @@ image_init_result msx_cart_softcard_device::call_load()
 	{
 		if (loaded_through_softlist())
 		{
-			// Allocate and copy rom contents
 			u32 length = get_software_region_length("rom");
-			// Only 16KB or 32KB images are supported
-			if (length != 0x4000 && length != 0x8000)
+			// Only 32KB images are supported
+			if (length != 0x8000)
 			{
-				seterror(image_error::UNSPECIFIED, "Invalid file size for a bee card");
+				seterror(image_error::UNSPECIFIED, "Invalid file size for a softcard");
 				return image_init_result::FAIL;
 			}
-
-			m_softcard->rom_alloc(length);
-			u8 *rom_base = m_softcard->get_rom_base();
-			memcpy(rom_base, get_software_region("rom"), length);
 		}
 		else
 		{
 			u32 length = this->length();
-			// Only 16KB or 32KB images are supported
-			if (length != 0x4000 && length != 0x8000)
+			// Only 32KB images are supported
+			if (length != 0x8000)
 			{
-				seterror(image_error::UNSPECIFIED, "Invalid file size for a bee card");
+				seterror(image_error::UNSPECIFIED, "Invalid file size for a softcard");
 				return image_init_result::FAIL;
 			}
 
-			m_softcard->rom_alloc(length);
-			if (fread(m_softcard->get_rom_base(), length) != length)
+			memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), length, 1, ENDIANNESS_LITTLE);
+			if (fread(romregion->base(), length) != length)
 			{
 				seterror(image_error::UNSPECIFIED, "Unable to fully read file");
 				return image_init_result::FAIL;
@@ -84,4 +80,20 @@ image_init_result msx_cart_softcard_device::call_load()
 std::string msx_cart_softcard_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("nomapper");
+}
+
+
+softcard_interface::softcard_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "softcard")
+	, m_page{nullptr, nullptr, nullptr, nullptr}
+	, m_slot(dynamic_cast<msx_cart_softcard_device *>(device.owner()))
+{
+}
+
+void softcard_interface::set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
+{
+	m_page[0] = page0;
+	m_page[1] = page1;
+	m_page[2] = page2;
+	m_page[3] = page3;
 }

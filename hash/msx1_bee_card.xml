@@ -27,8 +27,8 @@ No dump known for entries marked with a *
 		<info name="serial" value="BC-M7" />
 		<info name="alt_title" value="ボンバーマンスペシャル" />
 		<part name="cart" interface="bee_card">
-			<dataarea name="rom" size="32768">
-				<rom name="bomber man special (japan).rom" size="32768" crc="042ad44d" sha1="e700493e1c4c14f711e9c1c262fe3e8d76931ca3" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="bomber man special (japan).rom" size="0x8000" crc="042ad44d" sha1="e700493e1c4c14f711e9c1c262fe3e8d76931ca3" />
 			</dataarea>
 		</part>
 	</software>
@@ -40,8 +40,8 @@ No dump known for entries marked with a *
 		<info name="serial" value="BC-M3" />
 		<info name="alt_title" value="ジェットセットウィリー" />
 		<part name="cart" interface="bee_card">
-			<dataarea name="rom" size="16384">
-				<rom name="jet set willy (japan).rom" size="16384" crc="9191c890" sha1="45b5b0e9dd8d11d034e09803f92ec9720cda1e3c" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="jet set willy (japan).rom" size="0x4000" crc="9191c890" sha1="45b5b0e9dd8d11d034e09803f92ec9720cda1e3c" />
 			</dataarea>
 		</part>
 	</software>
@@ -53,8 +53,8 @@ No dump known for entries marked with a *
 		<info name="serial" value="BC-M5" />
 		<info name="alt_title" value="コナミのプーヤン ~ Konami no Pooyan (Box?)" />
 		<part name="cart" interface="bee_card">
-			<dataarea name="rom" size="16384">
-				<rom name="pooyan (japan).rom" size="16384" crc="558a09f6" sha1="692a55393e8eef0800a612c01456e9cecd9c1418" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="pooyan (japan).rom" size="0x4000" crc="558a09f6" sha1="692a55393e8eef0800a612c01456e9cecd9c1418" />
 			</dataarea>
 		</part>
 	</software>
@@ -66,8 +66,8 @@ No dump known for entries marked with a *
 		<info name="serial" value="BC-M2" />
 		<info name="alt_title" value="スターフォース" />
 		<part name="cart" interface="bee_card">
-			<dataarea name="rom" size="32768">
-				<rom name="star force (japan).rom" size="32768" crc="c14e53a1" sha1="c1746efeb4b44dcc80dfc4f429009feac91d9c48" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="star force (japan).rom" size="0x8000" crc="c14e53a1" sha1="c1746efeb4b44dcc80dfc4f429009feac91d9c48" />
 			</dataarea>
 		</part>
 	</software>
@@ -79,8 +79,8 @@ No dump known for entries marked with a *
 		<info name="serial" value="BC-M2" />
 		<info name="alt_title" value="スターフォース" />
 		<part name="cart" interface="bee_card">
-			<dataarea name="rom" size="32768">
-				<rom name="star force (japan) (alt 1).rom" size="32768" crc="e9de7e32" sha1="5fe86465119343804a722ce4768eb33de806a39f" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="star force (japan) (alt 1).rom" size="0x8000" crc="e9de7e32" sha1="5fe86465119343804a722ce4768eb33de806a39f" />
 			</dataarea>
 		</part>
 	</software>
@@ -92,8 +92,8 @@ No dump known for entries marked with a *
 		<info name="serial" value="BC-M8" />
 		<info name="alt_title" value="スターソルジャー" />
 		<part name="cart" interface="bee_card">
-			<dataarea name="rom" size="32768">
-				<rom name="star soldier (japan).rom" size="32768" crc="0b3d975d" sha1="6a56b46b8bf014b25863433d6d96e64641a93eef" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="star soldier (japan).rom" size="0x8000" crc="0b3d975d" sha1="6a56b46b8bf014b25863433d6d96e64641a93eef" />
 			</dataarea>
 		</part>
 	</software>
@@ -105,8 +105,8 @@ No dump known for entries marked with a *
 		<info name="serial" value="BC-M8" />
 		<info name="alt_title" value="スターソルジャー" />
 		<part name="cart" interface="bee_card">
-			<dataarea name="rom" size="32768">
-				<rom name="star soldier (japan) (alt 1).rom" size="32768" crc="f6d4e101" sha1="b58caf47c953b6f00935a201bfccf7ee968dff32" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="star soldier (japan) (alt 1).rom" size="0x8000" crc="f6d4e101" sha1="b58caf47c953b6f00935a201bfccf7ee968dff32" />
 			</dataarea>
 		</part>
 	</software>
@@ -118,8 +118,8 @@ No dump known for entries marked with a *
 		<info name="serial" value="BC-M9" />
 		<info name="alt_title" value="高橋名人の冒険島" />
 		<part name="cart" interface="bee_card">
-			<dataarea name="rom" size="32768">
-				<rom name="wonder boy (japan).rom" size="32768" crc="892266ca" sha1="d74c381ea17acb94527ef3abaa280793a824d322" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="wonder boy (japan).rom" size="0x8000" crc="892266ca" sha1="d74c381ea17acb94527ef3abaa280793a824d322" />
 			</dataarea>
 		</part>
 	</software>
@@ -131,8 +131,8 @@ No dump known for entries marked with a *
 		<info name="serial" value="BC-M9" />
 		<info name="alt_title" value="高橋名人の冒険島" />
 		<part name="cart" interface="bee_card">
-			<dataarea name="rom" size="32768">
-				<rom name="wonder boy (japan) (alt 1).rom" size="32768" crc="5130c27b" sha1="1672af5bc1740480e8302f7690589ea5b5391bcb" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="wonder boy (japan) (alt 1).rom" size="0x8000" crc="5130c27b" sha1="1672af5bc1740480e8302f7690589ea5b5391bcb" />
 			</dataarea>
 		</part>
 	</software>
@@ -144,8 +144,8 @@ No dump known for entries marked with a *
 		<info name="serial" value="BC-M1" />
 		<info name="alt_title" value="野球狂" />
 		<part name="cart" interface="bee_card">
-			<dataarea name="rom" size="32768">
-				<rom name="baseball (japan).rom" size="32768" crc="24b94274" sha1="f27721cf9ec316ea3b18233f699febf739b25678" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="baseball (japan).rom" size="0x8000" crc="24b94274" sha1="f27721cf9ec316ea3b18233f699febf739b25678" />
 			</dataarea>
 		</part>
 	</software>

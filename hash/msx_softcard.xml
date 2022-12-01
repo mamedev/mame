@@ -34,8 +34,8 @@ No dump known for entries marked with a *
 		<publisher>Electric Software</publisher>
 		<info name="serial" value="5304" />
 		<part name="cart" interface="softcard">
-			<dataarea name="rom" size="32768">
-				<rom name="backgammon (europe).rom" size="32768" crc="b3694e5a" sha1="363b5a8c94cdb63a7ee72b9d25f7b5053cab319a" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="backgammon (europe).rom" size="0x8000" crc="b3694e5a" sha1="363b5a8c94cdb63a7ee72b9d25f7b5053cab319a" />
 			</dataarea>
 		</part>
 	</software>
@@ -46,8 +46,8 @@ No dump known for entries marked with a *
 		<publisher>Electric Software</publisher>
 		<info name="serial" value="5305" />
 		<part name="cart" interface="softcard">
-			<dataarea name="rom" size="32768">
-				<rom name="le mans 2 (europe).rom" size="32768" crc="82dddc34" sha1="f69541b86c2b396cdce765c2dec498e11232b3c9" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="le mans 2 (europe).rom" size="0x8000" crc="82dddc34" sha1="f69541b86c2b396cdce765c2dec498e11232b3c9" />
 			</dataarea>
 		</part>
 	</software>
@@ -58,8 +58,8 @@ No dump known for entries marked with a *
 		<publisher>Electric Software</publisher>
 		<info name="serial" value="5306/1" />
 		<part name="cart" interface="softcard">
-			<dataarea name="rom" size="32768">
-				<rom name="wreck, the (europe).rom" size="32768" crc="7efde800" sha1="58e335c943d2647c3ff1e689069d9fa5e1c7ff6e" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="wreck, the (europe).rom" size="0x8000" crc="7efde800" sha1="58e335c943d2647c3ff1e689069d9fa5e1c7ff6e" />
 			</dataarea>
 		</part>
 	</software>
