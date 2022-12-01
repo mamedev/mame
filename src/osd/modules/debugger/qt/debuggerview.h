@@ -21,7 +21,7 @@ public:
 	DebuggerView(debug_view_type type, running_machine &machine, QWidget *parent = nullptr);
 	virtual ~DebuggerView();
 
-	void paintEvent(QPaintEvent *event);
+	virtual void paintEvent(QPaintEvent *event) override;
 
 	// Setters and accessors
 	void setPreferBottom(bool pb) { m_preferBottom = pb; }
@@ -36,9 +36,9 @@ signals:
 	void updated();
 
 protected:
-	void keyPressEvent(QKeyEvent *event) override;
-	void mousePressEvent(QMouseEvent *event) override;
-	void contextMenuEvent(QContextMenuEvent *event) override;
+	virtual void keyPressEvent(QKeyEvent *event) override;
+	virtual void mousePressEvent(QMouseEvent *event) override;
+	virtual void contextMenuEvent(QContextMenuEvent *event) override;
 
 	virtual void addItemsToContextMenu(QMenu *menu);
 
