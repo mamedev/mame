@@ -5,6 +5,7 @@
 #include "cartridge.h"
 #include "arc.h"
 #include "ascii.h"
+#include "beepack.h"
 #include "bm_012.h"
 #include "crossblaim.h"
 #include "disk.h"
@@ -25,6 +26,7 @@
 #include "msxdos2.h"
 #include "nomapper.h"
 #include "rtype.h"
+#include "softcard.h"
 #include "superloderunner.h"
 #include "super_swangi.h"
 #include "yamaha.h"
@@ -71,8 +73,10 @@ void msx_cart(device_slot_interface &device)
 	device.option_add_internal("superloderunner", MSX_CART_SUPERLODERUNNER);
 	device.option_add_internal("synthesizer", MSX_CART_SYNTHESIZER);
 	device.option_add_internal("ec701", MSX_CART_EC701);
+	device.option_add("beepack", MSX_CART_BEEPACK);
 	device.option_add("bm_012", MSX_CART_BM_012);
 	device.option_add("moonsound", MSX_CART_MOONSOUND);
+	device.option_add("softcard", MSX_CART_SOFTCARD);
 }
 
 
