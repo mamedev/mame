@@ -453,7 +453,7 @@ private:
 	required_ioport_array<3> m_in;
 	required_ioport m_dsw;
 	optional_ioport m_eepromout;
-	optional_ioport_array<3> m_analog;
+	optional_ioport_array<4> m_analog;
 	output_finder<2> m_pcb_digit;
 	optional_region_ptr<uint32_t> m_comm_board_rom;
 	optional_memory_bank m_comm_bank;
@@ -468,6 +468,7 @@ private:
 	uint16_t m_gn680_latch;
 	uint16_t m_gn680_ret0;
 	uint16_t m_gn680_ret1;
+	uint16_t m_gn680_check;
 
 	bool m_sndres;
 	bool m_sscope_irq1_triggered;
@@ -477,8 +478,8 @@ private:
 	void comm1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void comm_rombank_w(uint32_t data);
 	uint32_t comm0_unk_r(offs_t offset, uint32_t mem_mask = ~0);
-	uint32_t gun_r();
-	void gun_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t gun_r(offs_t offset);
+	void gun_w(offs_t offset, uint16_t data);
 	void gn680_sysctrl(uint16_t data);
 	uint16_t gn680_latch_r();
 	void gn680_latch_w(offs_t offset, uint16_t data);
@@ -726,16 +727,63 @@ uint32_t hornet_state::comm0_unk_r(offs_t offset, uint32_t mem_mask)
 }
 
 
-uint32_t hornet_state::gun_r()
+uint16_t hornet_state::gun_r(offs_t offset)
 {
-	return m_gn680_ret0<<16 | m_gn680_ret1;
+	uint16_t r = 0;
+
+	// TODO: Replace this with proper emulation of a CCD camera
+	// so the GN680's program can handle inputs normally.
+	if (offset == 0 || offset == 1)
+	{
+		// All values are offset so that the range in-game is
+		// +/- 280 on the X and +/- 220 on the Y axis.
+
+		// Parts of Player 2's Y axis value is included with every read,
+		// so it doesn't have its own index for reading.
+		int16_t p2y = (int16_t)m_analog[3].read_safe(0) - 220;
+
+		r = m_gn680_check;
+
+		switch (m_gn680_latch & 3)
+		{
+			case 1:
+				r |= ((int16_t)m_analog[0].read_safe(0) - 281) & 0x7ff;
+				r |= (p2y & 0x700) << 4;
+				break;
+			case 2:
+				r |= ((int16_t)m_analog[1].read_safe(0) - 220) & 0x7ff;
+				r |= (p2y & 0xf0) << 7;
+				break;
+			case 3:
+				r |= ((int16_t)m_analog[2].read_safe(0) - 280) & 0x7ff;
+				r |= (p2y & 0x0f) << 11;
+				break;
+		}
+
+		switch (offset)
+		{
+			case 0:
+				r = (r >> 8) & 0xff;
+				break;
+			case 1:
+				r &= 0xff;
+				m_gn680_check ^= 0x8000; // Must be in sync with the game every read or the update will be rejected
+				break;
+		}
+	}
+	else
+	{
+		r = m_gn680_ret0<<16 | m_gn680_ret1;
+	}
+
+	return r;
 }
 
-void hornet_state::gun_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hornet_state::gun_w(offs_t offset, uint16_t data)
 {
-	if (mem_mask == 0xffff0000)
+	if (offset == 0)
 	{
-		m_gn680_latch = data>>16;
+		m_gn680_latch = data;
 		m_gn680->set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 }
@@ -992,33 +1040,13 @@ static INPUT_PORTS_START( gradius4 )
 	PORT_DIPSETTING( 0x00, "15KHz" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(nbapbp) //Need to add inputs for player 3 and 4.
+static INPUT_PORTS_START(nbapbp)
 	PORT_INCLUDE(gradius4)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME(0x02, 0x02, "Cabinet Type") PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(0x02, "2 Player")
 	PORT_DIPSETTING(0x00, "4 Player")
-
-/*  PORT_START("IN3")
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-
-    PORT_START("IN4")
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(terabrst)
@@ -1033,6 +1061,24 @@ static INPUT_PORTS_START(terabrst)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Bomb")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2 Temp Cursor Speedup")
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x40, 0x40, "Disable Machine Init" ) PORT_DIPLOCATION("SW:2") // Default DIPSW2 to OFF
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
+	// Ranges picked to allow the cursor to go just off screen because the acceptable range is too wide
+	PORT_START("ANALOG1") // P1 Gun X
+	PORT_BIT( 0x7ff, 280, IPT_LIGHTGUN_X ) PORT_MINMAX(0, 560) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_START("ANALOG2") // P1 Gun Y
+	PORT_BIT( 0x7ff, 220, IPT_LIGHTGUN_Y ) PORT_MINMAX(0, 440) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_START("ANALOG3") // P2 Gun X
+	PORT_BIT( 0x7ff, 280, IPT_LIGHTGUN_X ) PORT_MINMAX(0, 560) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(2)
+
+	PORT_START("ANALOG4") // P2 Gun Y
+	PORT_BIT( 0x7ff, 220, IPT_LIGHTGUN_Y ) PORT_MINMAX(0, 440) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sscope )
@@ -1140,6 +1186,7 @@ void hornet_state::machine_reset()
 	}
 
 	m_sscope_irq1_triggered = false;
+	m_gn680_check = 0x8000;
 }
 
 double hornet_state::adc12138_input_callback(uint8_t input)
