@@ -52,5 +52,3 @@ void softcard_nomapper_device::initialize_cartridge()
 } // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(SOFTCARD_NOMAPPER, softcard_interface, softcard_nomapper_device, "softcard_nomapper", "SoftCard ROM")
-
-
