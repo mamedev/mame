@@ -5919,23 +5919,28 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="msdos32a" supported="no" cloneof="msdos32">
+	<!-- TODO: consider removing this -->
+	<software name="msdos32a" cloneof="msdos32" supported="no">
 		<description>MS-DOS (Version 3.2) (alt)</description>
 		<year>1985</year>
 		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+Black screen, "General failure" when mounted after msdos32 boot
+Throws "Null sized DOS image ! Invalid disk !" from HxC Disk Browser
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk1 (alt).img" size="368640" crc="136579c0" sha1="dc50472d5355b7c29fab0361c262ef83dde6a2ea"/>
+				<rom name="disk1 (alt).img" size="368640" crc="136579c0" sha1="dc50472d5355b7c29fab0361c262ef83dde6a2ea" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk2 (alt).img" size="368640" crc="c5e7e32f" sha1="c03f03494271bbdfb8865efa79bf8f5b5061b233"/>
+				<rom name="disk2 (alt).img" size="368640" crc="c5e7e32f" sha1="c03f03494271bbdfb8865efa79bf8f5b5061b233" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk3 (alt).img" size="368640" crc="9a7366fe" sha1="e56a8fb2732a258bd50465c596ff5e16b53afae3"/>
+				<rom name="disk3 (alt).img" size="368640" crc="9a7366fe" sha1="e56a8fb2732a258bd50465c596ff5e16b53afae3" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6426,8 +6431,12 @@ has been replaced with an all-zero block. -->
 		<description>IBM Personal Computer DOS (Version 1.10, Master diskette)</description>
 		<year>1982</year>
 		<publisher>IBM</publisher>
+		<notes><![CDATA[
+autoexec.bat mentions "National", is this disk specific to a PC brand?
+Currently testable in ibmpcjr only being the only system with cart slot
+]]></notes>
 		<info name="version" value="1.10" />
-		<info name="usage" value="Requires ROM BASIC" />
+		<info name="usage" value="Requires ROM BASIC, bypass copy setup with CTRL+C" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="6936918" />
 			<feature name="part_id" value="DOS" />
@@ -6444,11 +6453,16 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="pcdos11ma" cloneof="pcdos11" supported="no">
+	<software name="pcdos11ma" cloneof="pcdos11">
 		<description>IBM Personal Computer DOS (Version 1.10) (Master diskette, alt)</description>
 		<year>1982</year>
 		<publisher>IBM</publisher>
+		<notes><![CDATA[
+autoexec.bat mentions "National", is this disk specific to a PC brand?
+Currently testable in ibmpcjr only being the only system with cart slot
+]]></notes>
 		<info name="version" value="1.10" />
+		<info name="usage" value="Requires ROM BASIC, bypass copy setup with CTRL+C" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "146929">
 				<rom name="dos1.td0" size="146929" crc="52f54b0d" sha1="ff156f90f22329f19684111cd84b7b353d5917b3"/>
@@ -6604,20 +6618,24 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<!-- doesn't boot, bad dump? -->
+	<!-- TODO: consider removing this -->
 	<software name="pcdos3a" cloneof="pcdos3" supported="no">
 		<description>IBM Personal Computer DOS (Version 3.00, alternate)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
+		<notes><![CDATA[
+"Disk boot failure"
+DIR contains exact same contents as the parent set
+]]></notes>
 		<info name="version" value="3.00" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk1.img" size="368640" crc="7a24e3bf" sha1="8cfebd5548b918c8d03f501ef02e66aca4ce3231"/>
+				<rom name="disk1.img" size="368640" crc="7a24e3bf" sha1="8cfebd5548b918c8d03f501ef02e66aca4ce3231" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk2.img" size="368640" crc="33184477" sha1="a7c150881903359859e46f9fe2de21d5c3afba99"/>
+				<rom name="disk2.img" size="368640" crc="33184477" sha1="a7c150881903359859e46f9fe2de21d5c3afba99" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6685,11 +6703,13 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<!-- Fatal error: Device 5.25" double density floppy drive load failed: Unable to identify the image format -->
 	<software name="pcdos32a" cloneof="pcdos32" supported="no">
 		<description>IBM Personal Computer DOS (Version 3.20, 5.25", 1986-02-21, alt)</description>
 		<year>1986</year>
 		<publisher>IBM</publisher>
+		<notes><![CDATA[
+Fatal errors with "Unable to identify the image format" when mounted
+]]></notes>
 		<info name="version" value="3.20" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="405504">
@@ -7104,11 +7124,15 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<!-- "Thoroughbred Passport" copy-protection dongle not emulated -->
 	<software name="tbos" supported="no">
 		<description>Thoroughbred/OS 6.6.2-6</description>
 		<year>1987</year>
 		<publisher>Concept Omega</publisher>
+		<notes><![CDATA[
+Requires unemulated [Thoroughbred Passport] dongle option attached to COM1 or COM2 as minimum
+Has optional unemulated TOS expansion boards
+"read error" at boot, related to above?
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="THOROUGHBRED/OS SYSTEM (T/OS)"/>
 			<dataarea name="flop" size = "368640">
