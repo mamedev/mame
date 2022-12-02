@@ -434,8 +434,6 @@ private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(sscope_screen_timer_hack);
-
 	required_shared_ptr<uint32_t> m_workram;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	required_device<ppc4xx_device> m_maincpu;
@@ -471,7 +469,6 @@ private:
 	uint16_t m_gn680_check;
 
 	bool m_sndres;
-	bool m_sscope_irq1_triggered;
 
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
@@ -1185,7 +1182,6 @@ void hornet_state::machine_reset()
 			membank("slave_cgboard_bank")->set_base(memregion("master_cgboard")->base());
 	}
 
-	m_sscope_irq1_triggered = false;
 	m_gn680_check = 0x8000;
 }
 
@@ -1333,7 +1329,7 @@ void hornet_state::sscope(machine_config &config)
 	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo[1]->set_screen("rscreen");
 	m_voodoo[1]->set_cpu(m_dsp[1]);
-	m_voodoo[1]->vblank_callback().set([this] (bool c) { m_sscope_irq1_triggered = true; });
+	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
 	K033906(config, m_k033906[1], 0, m_voodoo[1]);
@@ -1356,8 +1352,6 @@ void hornet_state::sscope(machine_config &config)
 	m_adc12138_sscope->set_ipt_convert_callback(FUNC(hornet_state::adc12138_input_callback));
 
 	m_konppc->set_num_boards(2);
-
-	TIMER(config, "sscope_screen_timer_hack").configure_periodic(FUNC(hornet_state::sscope_screen_timer_hack), rscreen.frame_period() / 60);
 }
 
 void hornet_state::sscope_voodoo2(machine_config& config)
@@ -1379,7 +1373,7 @@ void hornet_state::sscope_voodoo2(machine_config& config)
 	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo[1]->set_screen("rscreen");
 	m_voodoo[1]->set_cpu(m_dsp[1]);
-	m_voodoo[1]->vblank_callback().set([this] (bool c) { m_sscope_irq1_triggered = true; });
+	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
 	m_k033906[0]->set_pciid(0x0002121a); // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0002 = Voodoo 2)
@@ -1404,20 +1398,6 @@ void hornet_state::sscope2_voodoo1(machine_config& config)
 
 	DS2401(config, "lan_serial_id");
 	EEPROM_93C46_16BIT(config, "lan_eeprom");
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(hornet_state::sscope_screen_timer_hack)
-{
-	// HACK: IRQ1 controls the scope screen's update for the Silent Scope games.
-	// The screen will only update once every 57 IRQ calls due to the use of a counter.
-	// Triggering IRQ1 on vblank makes the screen update once every ~1 sec so I suspect
-	// this shouldn't be tied to vblank.
-	// Triggering IRQ1 too early causes things to crash so make it only start asserting
-	// after a known "good" timing.
-	if (!m_sscope_irq1_triggered)
-		return;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 /*****************************************************************************/
