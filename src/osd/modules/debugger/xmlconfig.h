@@ -28,6 +28,9 @@ extern char const *const NODE_WINDOW_SPLITS;
 extern char const *const NODE_WINDOW_SELECTION;
 extern char const *const NODE_WINDOW_SCROLL;
 extern char const *const NODE_WINDOW_EXPRESSION;
+extern char const *const NODE_WINDOW_HISTORY;
+
+extern char const *const NODE_HISTORY_ITEM;
 
 extern char const *const ATTR_DEBUGGER_SAVE_WINDOWS;
 

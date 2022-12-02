@@ -21,7 +21,7 @@ up to 50kHz. This is probably exaggerated due to components getting worn out
 after many decades. TMS1000 RC curve is documented in the data manual, but
 not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
 
-ROM source notes when dumped from another publisher, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - arrball: Tandy Zingo
 - bcheetah: Fundimensions Incredible Brain Buggy
 - cchime: Videomaster Door Tunes

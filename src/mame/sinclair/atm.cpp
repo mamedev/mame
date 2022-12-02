@@ -510,7 +510,7 @@ void atm_state::atm(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
 
 	BETA_DISK(config, m_beta, 0);
-	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, nullptr, nullptr, false);;
+	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, nullptr, nullptr, false);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "covox");
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));

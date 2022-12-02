@@ -14,9 +14,33 @@ TODO:
 
 #include "dmk_dsk.h"
 
+#include "coretmpl.h"
 #include "ioprocs.h"
 
-#include "coretmpl.h"
+
+namespace {
+
+uint32_t wide_fm(uint16_t val)
+{
+	uint32_t res = 0;
+	for (int i = 15; i >= 0; i--) {
+		res |= (util::BIT(val, i) << (i*2 + 1));
+	}
+	return res;
+}
+
+uint32_t data_to_wide_fm(uint8_t val)
+{
+	uint16_t res = 0xaaaa;  // clock
+	for (int i = 7; i >= 0; i--) {
+		res |= (util::BIT(val, i) << i*2);      // data
+	}
+	return wide_fm(res);
+}
+
+} // anonymous namespace
+
+
 
 dmk_format::dmk_format()
 {
@@ -83,24 +107,6 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 }
 
 
-uint32_t dmk_format::wide_fm(uint16_t val)
-{
-	uint32_t res = 0;
-	for (int i = 15; i >= 0; i--) {
-		res |= (util::BIT(val, i) << (i*2 + 1));
-	}
-	return res;
-}
-
-uint32_t dmk_format::data_to_wide_fm(uint8_t val)
-{
-	uint16_t res = 0xaaaa;	// clock
-	for (int i = 7; i >= 0; i--) {
-		res |= (util::BIT(val, i) << i*2);		// data
-	}
-	return wide_fm(res);
-}
-
 bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
@@ -160,7 +166,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			{
 				mark_location[i] = -1;
 				mark_value[i] = 0xfe;
-				mark_is_mfm[i] = !is_sd;	// Use default encoding
+				mark_is_mfm[i] = !is_sd;    // Use default encoding
 			}
 			int mark_count = 0;
 
@@ -235,7 +241,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					}
 					else
 					{
-						raw_w(raw_track_data, 32, wide_fm(0xf77a));	// FC clocked with D7
+						raw_w(raw_track_data, 32, wide_fm(0xf77a)); // FC clocked with D7
 						offset += fm_stride;
 					}
 				}
@@ -293,7 +299,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				else
 					raw_w(raw_track_data, 32, data_to_wide_fm(track_data[offset]));
 
-	
+
 				if (!enc_mfm)
 					offset += fm_stride - 1;
 			}

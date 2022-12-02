@@ -139,6 +139,7 @@ MACHINE_START_MEMBER(mpu4mod4yam_machines_state,mpu4yam)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
+	m_link7b_connected=true;
 }
 
 void mpu4mod4yam_machines_state::memmap_ym2413(address_map &map)

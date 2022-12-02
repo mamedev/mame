@@ -1503,21 +1503,32 @@ static INPUT_PORTS_START( balonfgt )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )       // Manual states this is Unused
 INPUT_PORTS_END
 
+// TODO: verify DIPs for Rules, Difficulty, and Dora. Finding a copy of the manual would certainly help.
 static INPUT_PORTS_START( vsmahjng )
 	PORT_INCLUDE( vsnes_dual_rev )
 
 	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW1:!1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:!2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
-	PORT_DIPNAME( 0x30, 0x00, "Time" )                  PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x01, 0x00, "Rules" )                 PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x00, "Kansai" )
+	PORT_DIPSETTING(    0x01, "Kantou" )
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!2,!3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x08, 0x00, "Timer" )                 PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, "Initial Time" )          PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x30, "30" )
 	PORT_DIPSETTING(    0x10, "45" )
 	PORT_DIPSETTING(    0x20, "60" )
 	PORT_DIPSETTING(    0x00, "90" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
+	PORT_DIPNAME( 0xc0, 0x00, "Additional Time" )       PORT_DIPLOCATION("SW1:!7,!8")
+	PORT_DIPSETTING(    0xc0, "8" )
+	PORT_DIPSETTING(    0x40, "12" )
+	PORT_DIPSETTING(    0x80, "15" )
+	PORT_DIPSETTING(    0x00, "20" )
 
 	PORT_START("DSW1")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )                PORT_DIPLOCATION("SW2:!1")
@@ -1526,9 +1537,13 @@ static INPUT_PORTS_START( vsmahjng )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( Free_Play ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
-	PORT_DIPNAME( 0x60, 0x20, "Starting Points" )       PORT_DIPLOCATION("SW2:!6,!7")
+	PORT_DIPNAME( 0x08, 0x00, "Mawashi" )               PORT_DIPLOCATION("SW2:!4")
+	PORT_DIPSETTING(    0x08, "Tonnan" )
+	PORT_DIPSETTING(    0x00, "Tonton" )
+	PORT_DIPNAME( 0x10, 0x00, "Dora" )                  PORT_DIPLOCATION("SW2:!5")
+	PORT_DIPSETTING(    0x00, "Genbutsu" )
+	PORT_DIPSETTING(    0x10, "Next" )
+	PORT_DIPNAME( 0x60, 0x00, "Starting Points" )       PORT_DIPLOCATION("SW2:!6,!7")
 	PORT_DIPSETTING(    0x60, "15000" )
 	PORT_DIPSETTING(    0x20, "20000" )
 	PORT_DIPSETTING(    0x40, "25000" )
@@ -2083,7 +2098,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vsskykid )
 	PORT_INCLUDE( vsnes_rev )
 
-	// FIXME: vsskykid needs button 3 to select a 2 player game. This is installed here for now, but really 2 player mode should only work on a DualSystem.
+	// FIXME: according to the manual, the operator "must solder a jumper wire connecting traces 9 and 10 on the edge connector P2"
+	// This mod will make Select 2 start a two player game on a UniSystem, as the game is really hard coded to use the nonexistent Select 3.
+	// Similar fake button for jajamaru can also be removed when this is fixed.
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START3 ) PORT_NAME("Select 3 (Purple)")  // START on a NES
 

@@ -243,12 +243,11 @@ void a78_rom_pokey_device::write_40xx(offs_t offset, uint8_t data)
 		m_pokey->write(offset & 0x0f, data);
 }
 
-// TO DO: do we need a PAL variant?!?
 void a78_rom_pokey_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "addon").front_center();
 
-	POKEY(config, m_pokey, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+	POKEY(config, m_pokey, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "addon", 1.00);
 }
 
 /*-------------------------------------------------
@@ -346,7 +345,7 @@ void a78_rom_sg_pokey_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "addon").front_center();
 
-	POKEY(config, m_pokey, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+	POKEY(config, m_pokey, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "addon", 1.00);
 }
 
 
@@ -501,16 +500,16 @@ void a78_rom_p450_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "pokey_450").front_center();
 
-	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
+	POKEY(config, m_pokey450, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
 }
 
 void a78_rom_p450_pokey_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "addon").front_center();
 
-	POKEY(config, m_pokey, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+	POKEY(config, m_pokey, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "addon", 1.00);
 
-	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+	POKEY(config, m_pokey450, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "addon", 1.00);
 }
 
 
@@ -518,12 +517,12 @@ void a78_rom_p450_sg_ram_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "pokey_450").front_center();
 
-	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
+	POKEY(config, m_pokey450, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
 }
 
 void a78_rom_p450_sg9_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "pokey_450").front_center();
 
-	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
+	POKEY(config, m_pokey450, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
 }

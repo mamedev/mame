@@ -32,6 +32,11 @@
  Vast Fame VF001 (FourCC 'VF01') additional data:
  * Command preload value (1 byte).
 
+ Kong Feng DSH-GGB81 (FourCC 'GB81') additional data:
+ * Cartridge/PCB type (1 byte):
+  - 0x00: DSH-GGB81
+  - 0x01: BC-R1616T3P
+
  The list of cartridge type FourCC values here is incomplete.
 
  ***************************************************************************/

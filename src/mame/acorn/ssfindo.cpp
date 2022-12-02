@@ -71,7 +71,7 @@ Notes:
 
 ===================================================================================================
 
-Pong Pong Car
+Pang Pang Car
 Icarus, 1999
 
 This game runs on hardware that is similar to that used on 'See See Find Out'

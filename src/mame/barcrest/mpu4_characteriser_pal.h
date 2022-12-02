@@ -56,7 +56,7 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	/* While some games use unique keys and lamp scrambles, several do write the same sequencesand expect the
+	/* While some games use unique keys and lamp scrambles, several do write the same sequences and expect the
 	   same responses.  It is possible PALs were reused.  Sometimes the lamp tables are masked subsets, as
 	   they were handcrafted when the layouts were made, they could also be incorrect in places.
 

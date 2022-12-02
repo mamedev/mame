@@ -3,7 +3,7 @@
 /*
 
       F2 System
-         "bootleg tumble pop" hardware (like tumbleb.cpp)
+         "bootleg tumble pop" hardware (like dataeast/tumbleb.cpp)
 
   Driver by Pierpaolo Prazzoli with some bits by David Haywood
 
@@ -74,6 +74,7 @@ public:
 	void bestri(machine_config &config);
 	void bestria(machine_config &config);
 	void pitapat(machine_config &config);
+	void pitapata(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -117,6 +118,7 @@ private:
 	void bestria_map(address_map &map);
 	void crospang_map(address_map &map);
 	void pitapat_map(address_map &map);
+	void pitapata_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 };
@@ -294,6 +296,18 @@ void crospang_state::pitapat_map(address_map &map)
 	map(0x100004, 0x100005).w(FUNC(crospang_state::bg_scrollx_w));
 	map(0x100006, 0x100007).w(FUNC(crospang_state::bg_scrolly_w));
 	map(0x100008, 0x100009).w(FUNC(crospang_state::fg_scrollx_w));
+
+	map(0x300000, 0x30ffff).ram();
+}
+
+void crospang_state::pitapata_map(address_map &map)
+{
+	base_map(map);
+
+	map(0x100002, 0x100003).w(FUNC(crospang_state::fg_scrollx_w));
+	map(0x100004, 0x100005).w(FUNC(crospang_state::fg_scrolly_w));
+	map(0x100006, 0x100007).w(FUNC(crospang_state::bg_scrollx_w));
+	map(0x100008, 0x100009).w(FUNC(crospang_state::bg_scrolly_w));
 
 	map(0x300000, 0x30ffff).ram();
 }
@@ -713,6 +727,14 @@ void crospang_state::pitapat(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(crospang_state::irq6_line_hold));
 }
 
+void crospang_state::pitapata(machine_config &config)
+{
+	pitapat(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::pitapata_map);
+}
+
+
 ROM_START( crospang ) // Developed April 1998
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000
 	ROM_LOAD16_BYTE( "p1.bin", 0x00001, 0x20000, CRC(0bcbbaad) SHA1(807f07be340d7af0aad8d49461b5a7f0221ea3b7) )
@@ -963,11 +985,40 @@ ROM_START( pitapat )
 	ROM_LOAD16_BYTE( "ud17", 0x080001, 0x40000, CRC(d4c67e2e) SHA1(e684b58333d64f5961983b42f56c61bb0bea2e5c) )
 ROM_END
 
+ROM_START( pitapata ) // Main CPU ROMs only differ in the addresses of the scroll registers and this one is 0x00 filled after 0x36c4f up to 0x3ffff while pitapat is 0x00 filled after 0x38a3f up to 0x3ffff
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000
+	ROM_LOAD16_BYTE( "ua02", 0x00001, 0x40000, CRC(742652cb) SHA1(9ad426cd95b7ccc4a9394692ac204809ab4f74fd) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "ua03", 0x00000, 0x40000, CRC(936bd573) SHA1(112980271bc55d2e689a05142830415ff6bb9d23) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80, identical to pitapat
+	ROM_LOAD( "us02", 0x00000, 0x10000, CRC(c7cc05fa) SHA1(5fbf479be98f618c63e4c74a250d51279c2f5e3b) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // samples, seem to be moved around wrt pitapat, but audio CPU ROM's the same
+	ROM_LOAD( "us08", 0x00000, 0x40000, CRC(8d8fe72a) SHA1(40d4b1a1eb2fe703e00e63f36b8ae7ae16287fb4) ) // sample ROM contains oksan?
+
+	ROM_REGION( 0x200000, "tiles", 0 ) // 0x3fc80 to 0x3ffff is zero filled while it contains something in pitapat (although it seems gibberish)
+	ROM_LOAD16_BYTE( "uc08", 0x000001, 0x20000, CRC(3108a9f2) SHA1(7a5b17b704439cfdc58aabddfc02639992a99354) )
+	ROM_CONTINUE(            0x100001, 0x20000 )
+	ROM_CONTINUE(            0x040001, 0x20000 )
+	ROM_CONTINUE(            0x140001, 0x20000 )
+	ROM_LOAD16_BYTE( "uc07", 0x000000, 0x20000, CRC(fa2ff22b) SHA1(afb02ee8598442826b709cac417786aa1bfda009) )
+	ROM_CONTINUE(            0x100000, 0x20000 )
+	ROM_CONTINUE(            0x040000, 0x20000 )
+	ROM_CONTINUE(            0x140000, 0x20000 )
+
+	ROM_REGION( 0x100000, "sprites", 0 ) // identical to pitapat
+	ROM_LOAD16_BYTE( "ud14", 0x000000, 0x40000, CRC(92e23e92) SHA1(4e1b85cef2a55a54ca571bf948809715dd789f30) )
+	ROM_LOAD16_BYTE( "ud15", 0x000001, 0x40000, CRC(7d3d6dba) SHA1(d543613fa22407bc8570e9e388c35620850ecd15) )
+	ROM_LOAD16_BYTE( "ud16", 0x080000, 0x40000, CRC(5c09dff8) SHA1(412260784e45c6d742e02a285e3adc7361034268) )
+	ROM_LOAD16_BYTE( "ud17", 0x080001, 0x40000, CRC(d4c67e2e) SHA1(e684b58333d64f5961983b42f56c61bb0bea2e5c) )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1998, crospang, 0,      crospang, crospang, crospang_state, empty_init, ROT0, "F2 System",         "Cross Pang",               MACHINE_SUPPORTS_SAVE )
-GAME( 1997, heuksun,  0,      crospang, heuksun,  crospang_state, empty_init, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestri,   0,      bestri,   bestri,   crospang_state, empty_init, ROT0, "F2 System",         "Bestri (Korea, set 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestria,  bestri, bestria,  bestri,   crospang_state, empty_init, ROT0, "F2 System",         "Bestri (Korea, set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1997, pitapat,  0,      pitapat,  pitapat,  crospang_state, empty_init, ROT0, "F2 System",         "Pitapat Puzzle",           MACHINE_SUPPORTS_SAVE ) // Test Mode calls it 'Puzzle Ball'
+GAME( 1998, crospang, 0,       crospang, crospang, crospang_state, empty_init, ROT0, "F2 System",         "Cross Pang",               MACHINE_SUPPORTS_SAVE )
+GAME( 1997, heuksun,  0,       crospang, heuksun,  crospang_state, empty_init, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestri,   0,       bestri,   bestri,   crospang_state, empty_init, ROT0, "F2 System",         "Bestri (Korea, set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestria,  bestri,  bestria,  bestri,   crospang_state, empty_init, ROT0, "F2 System",         "Bestri (Korea, set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1997, pitapat,  0,       pitapat,  pitapat,  crospang_state, empty_init, ROT0, "F2 System",         "Pitapat Puzzle (set 1)",   MACHINE_SUPPORTS_SAVE ) // Test Mode calls it 'Puzzle Ball'
+GAME( 1997, pitapata, pitapat, pitapata, pitapat,  crospang_state, empty_init, ROT0, "F2 System",         "Pitapat Puzzle (set 2)",   MACHINE_SUPPORTS_SAVE ) // "

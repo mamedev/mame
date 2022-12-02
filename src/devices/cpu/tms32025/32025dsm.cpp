@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tony La Porta, hap
+// copyright-holders:Tony La Porta
 	/**************************************************************************\
 	*              Texas Instruments TMS320x25 DSP Disassembler                *
 	*                                                                          *

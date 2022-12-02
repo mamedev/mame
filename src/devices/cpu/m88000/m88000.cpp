@@ -184,8 +184,8 @@ void mc88100_device::device_start()
 		}).mask(IP_A);
 	state_add(35, "SB", m_sb);
 
-	state_add(36 + PSR, "PSR", m_cr[PSR]).mask(PSR_MASK);
-	state_add(36 + VBR, "VBR", m_cr[VBR]).mask(VBR_MASK);
+	state_add(36 + PSR, "PSR", m_cr[PSR]);
+	state_add(36 + VBR, "VBR", m_cr[VBR]);
 	state_add(36 + SR0, "sr0", m_cr[SR0]);
 	state_add(36 + SR1, "sr1", m_cr[SR1]);
 	state_add(36 + SR2, "sr2", m_cr[SR2]);
@@ -221,14 +221,6 @@ void mc88100_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		// update shadow registers
-		if (!(m_cr[PSR] & PSR_SFRZ))
-		{
-			m_cr[SXIP] = m_xip;
-			m_cr[SNIP] = m_nip;
-			m_cr[SFIP] = m_fip;
-		}
-
 		// interrupt check
 		if (m_int_state && !(m_cr[PSR] & PSR_IND))
 		{
@@ -237,6 +229,14 @@ void mc88100_device::execute_run()
 			// notify debugger
 			if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 				debug()->interrupt_hook(INPUT_LINE_IRQ0);
+		}
+
+		// update shadow registers
+		if (!(m_cr[PSR] & PSR_SFRZ))
+		{
+			m_cr[SXIP] = m_xip;
+			m_cr[SNIP] = m_nip;
+			m_cr[SFIP] = m_fip;
 		}
 
 		if (m_xip & IP_V)
@@ -248,7 +248,7 @@ void mc88100_device::execute_run()
 
 		// fetch
 		if (m_fip & IP_V)
-			m_fop = m_inst_cache.read_dword(m_fip & IP_A);
+			fetch(m_fip & IP_A, m_fop);
 
 		// next becomes execute
 		m_xop = m_nop;
@@ -267,8 +267,6 @@ void mc88100_device::execute_run()
 
 // decoding macros
 #define D     BIT(inst, 21, 5)
-#define D0    (((inst >> 21) + 0) & 31)
-#define D1    (((inst >> 21) + 1) & 31)
 
 #define S1    BIT(inst, 16, 5)
 #define S1H   (((inst >> 16) + 0) & 31)
@@ -288,52 +286,40 @@ void mc88100_device::execute(u32 const inst)
 	{
 		// load/store/exchange immediate
 	case 0x00: // xmem.bu: exchange register with memory unsigned byte
-		{
-			u32 const data = m_r[D];
-
-			m_r[D] = m_data_space.read_byte(m_r[S1] + IMM16);
-			m_data_space.write_byte(m_r[S1] + IMM16, u8(data));
-		}
+		xmem<u8>(m_r[S1] + IMM16, D);
 		break;
 	case 0x01: // xmem: exchange register with memory word
-		{
-			u32 const data = m_r[D];
-
-			m_r[D] = m_data_space.read_dword(m_r[S1] + IMM16);
-			m_data_space.write_dword(m_r[S1] + IMM16, data);
-		}
+		xmem<u32>(m_r[S1] + IMM16, D);
 		break;
 	case 0x02: // ld.hu: load half word unsigned
-		m_r[D] = m_data_space.read_word(m_r[S1] + IMM16);
+		ld<u16>(m_r[S1] + IMM16, D);
 		break;
 	case 0x03: // ld.bu: load byte unsigned
-		m_r[D] = m_data_space.read_byte(m_r[S1] + IMM16);
+		ld<u8>(m_r[S1] + IMM16, D);
 		break;
 	case 0x04: // ld.d: load double word
-		m_r[D0] = m_data_space.read_dword(m_r[S1] + IMM16 + 0);
-		m_r[D1] = m_data_space.read_dword(m_r[S1] + IMM16 + 4);
+		ld<u64>(m_r[S1] + IMM16, D);
 		break;
 	case 0x05: // ld: load word
-		m_r[D] = m_data_space.read_dword(m_r[S1] + IMM16);
+		ld<u32>(m_r[S1] + IMM16, D);
 		break;
 	case 0x06: // ld.h: load half word
-		m_r[D] = s32(s16(m_data_space.read_word(m_r[S1] + IMM16)));
+		ld<s16>(m_r[S1] + IMM16, D);
 		break;
 	case 0x07: // ld.b: load byte
-		m_r[D] = s32(s8(m_data_space.read_byte(m_r[S1] + IMM16)));
+		ld<s8>(m_r[S1] + IMM16, D);
 		break;
 	case 0x08: // st.d: store double word (unscaled)
-		m_data_space.write_dword(m_r[S1] + IMM16 + 0, m_r[D0]);
-		m_data_space.write_dword(m_r[S1] + IMM16 + 4, m_r[D1]);
+		st<u64>(m_r[S1] + IMM16, D);
 		break;
 	case 0x09: // st: store word (unscaled)
-		m_data_space.write_dword(m_r[S1] + IMM16, m_r[D]);
+		st<u32>(m_r[S1] + IMM16, D);
 		break;
 	case 0x0a: // st.h: store half word (unscaled)
-		m_data_space.write_word(m_r[S1] + IMM16, u16(m_r[D]));
+		st<u16>(m_r[S1] + IMM16, D);
 		break;
 	case 0x0b: // st.b: store byte (unscaled)
-		m_data_space.write_byte(m_r[S1] + IMM16, u8(m_r[D]));
+		st<u8>(m_r[S1] + IMM16, D);
 		break;
 	case 0x0c: // lda.d: load address double word (unscaled)
 	case 0x0d: // lda: load address word (unscaled)
@@ -379,7 +365,7 @@ void mc88100_device::execute(u32 const inst)
 		if (!(m_cr[PSR] & PSR_SFD1))
 		{
 			if (IMM16)
-				m_r[D] = s32(m_r[S1]) / s32(IMM16);
+				m_r[D] = m_r[S1] / IMM16;
 			else
 				exception(E_INT_DIVIDE);
 		}
@@ -656,78 +642,38 @@ void mc88100_device::execute(u32 const inst)
 		switch (BIT(inst, 5, 11))
 		{
 		case 0x000: // xmem.bu: exchange register with memory byte unsigned
-			{
-				u32 const data = m_r[D];
-
-				m_r[D] = m_data_space.read_byte(m_r[S1] + m_r[S2]);
-				m_data_space.write_byte(m_r[S1] + m_r[S2], u8(data));
-			}
+			xmem<u8>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x008: // xmem.bu.usr: exchange register with memory byte unsigned user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-			{
-				u32 const data = m_r[D];
-
-				m_r[D] = m_data_space.read_byte(m_r[S1] + m_r[S2]);
-				m_data_space.write_byte(m_r[S1] + m_r[S2], u8(data));
-			}
+				xmem<u8>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x020: // xmem: exchange register with memory word
-			{
-				u32 const data = m_r[D];
-
-				m_r[D] = m_data_space.read_dword(m_r[S1] + m_r[S2]);
-				m_data_space.write_dword(m_r[S1] + m_r[S2], u32(data));
-			}
+			xmem<u32>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x028: // xmem.usr: exchange register with memory word user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-			{
-				u32 const data = m_r[D];
-
-				m_r[D] = m_data_space.read_dword(m_r[S1] + m_r[S2]);
-				m_data_space.write_dword(m_r[S1] + m_r[S2], u32(data));
-			}
+				xmem<u32>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x010: // xmem.bu: exchange register with memory byte unsigned (scaled)
-			{
-				u32 const data = m_r[D];
-
-				m_r[D] = m_data_space.read_byte(m_r[S1] + (m_r[S2] << 0));
-				m_data_space.write_byte(m_r[S1] + (m_r[S2] << 0), u8(data));
-			}
+			xmem<u8>(m_r[S1] + (m_r[S2] << 0), D);
 			break;
 		case 0x018: // xmem.bu.usr: exchange register with memory byte unsigned user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-			{
-				u32 const data = m_r[D];
-
-				m_r[D] = m_data_space.read_byte(m_r[S1] + (m_r[S2] << 0));
-				m_data_space.write_byte(m_r[S1] + (m_r[S2] << 0), u8(data));
-			}
+				xmem<u8>(m_r[S1] + (m_r[S2] << 0), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x030: // xmem: exchange register with memory word (scaled)
-			{
-				u32 const data = m_r[D];
-
-				m_r[D] = m_data_space.read_dword(m_r[S1] + (m_r[S2] << 2));
-				m_data_space.write_dword(m_r[S1] + (m_r[S2] << 2), u32(data));
-			}
+			xmem<u32>(m_r[S1] + (m_r[S2] << 2), D);
 			break;
 		case 0x038: // xmem.usr: exchange register with memory word user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-			{
-				u32 const data = m_r[D];
-
-				m_r[D] = m_data_space.read_dword(m_r[S1] + (m_r[S2] << 2));
-				m_data_space.write_dword(m_r[S1] + (m_r[S2] << 2), u32(data));
-			}
+				xmem<u32>(m_r[S1] + (m_r[S2] << 2), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
@@ -1031,7 +977,8 @@ void mc88100_device::execute(u32 const inst)
 				m_xip &= ~IP_V;
 
 				m_nip = m_cr[SNIP];
-				m_nop = m_inst_cache.read_dword(m_nip & IP_A);
+				if (m_nip & IP_V)
+					fetch(m_nip & IP_A, m_nop);
 
 				m_fip = m_cr[SFIP];
 
@@ -1043,201 +990,185 @@ void mc88100_device::execute(u32 const inst)
 			break;
 
 		case 0x040: // ld.hu: load half word unsigned
-			m_r[D] = m_data_space.read_word(m_r[S1] + m_r[S2]);
+			ld<u16>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x048: // ld.hu.usr: load half word unsigned user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = m_data_space.read_word(m_r[S1] + m_r[S2]);
+				ld<u16>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x060: // ld.b: load byte unsigned
-			m_r[D] = m_data_space.read_byte(m_r[S1] + m_r[S2]);
+			ld<u8>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x068: // ld.b.usr: load byte unsigned user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = m_data_space.read_byte(m_r[S1] + m_r[S2]);
+				ld<u8>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x080: // ld.d: load double word
-			m_r[D0] = m_data_space.read_dword(m_r[S1] + m_r[S2] + 0);
-			m_r[D1] = m_data_space.read_dword(m_r[S1] + m_r[S2] + 4);
+			ld<u64>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x088: // ld.d.usr: load double word user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-			{
-				m_r[D0] = m_data_space.read_dword(m_r[S1] + m_r[S2] + 0);
-				m_r[D1] = m_data_space.read_dword(m_r[S1] + m_r[S2] + 4);
-			}
+				ld<u64>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x0a0: // ld: load word
-			m_r[D] = m_data_space.read_dword(m_r[S1] + m_r[S2]);
+			ld<u32>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x0a8: // ld.usr: load word user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = m_data_space.read_dword(m_r[S1] + m_r[S2]);
+				ld<u32>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x0c0: // ld.h: load half word
-			m_r[D] = s32(s16(m_data_space.read_word(m_r[S1] + m_r[S2])));
+			ld<s16>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x0c8: // ld.h.usr: load half word user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = s32(s16(m_data_space.read_word(m_r[S1] + m_r[S2])));
+				ld<s16>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x0e0: // ld.b: load byte
-			m_r[D] = s32(s8(m_data_space.read_byte(m_r[S1] + m_r[S2])));
+			ld<s8>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x0e8: // ld.b.usr: load byte user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = s32(s8(m_data_space.read_byte(m_r[S1] + m_r[S2])));
+				ld<s8>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 
 		case 0x050: // ld.hu: load half word unsigned (scaled)
-			m_r[D] = m_data_space.read_word(m_r[S1] + (m_r[S2] << 1));
+			ld<u16>(m_r[S1] + (m_r[S2] << 1), D);
 			break;
 		case 0x058: // ld.hu.usr: load half word unsigned user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = m_data_space.read_word(m_r[S1] + (m_r[S2] << 1));
+				ld<u16>(m_r[S1] + (m_r[S2] << 1), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x070: // ld.b: load byte unsigned (scaled)
-			m_r[D] = m_data_space.read_byte(m_r[S1] + (m_r[S2] << 0));
+			ld<u8>(m_r[S1] + (m_r[S2] << 0), D);
 			break;
 		case 0x078: // ld.b.usr: load byte unsigned user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = m_data_space.read_byte(m_r[S1] + (m_r[S2] << 0));
+				ld<u8>(m_r[S1] + (m_r[S2] << 0), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x090: // ld.d: load double word (scaled)
-			m_r[D0] = m_data_space.read_dword(m_r[S1] + (m_r[S2] << 3) + 0);
-			m_r[D1] = m_data_space.read_dword(m_r[S1] + (m_r[S2] << 3) + 4);
+			ld<u64>(m_r[S1] + (m_r[S2] << 3), D);
 			break;
 		case 0x098: // ld.d.usr: load double word user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-			{
-				m_r[D0] = m_data_space.read_dword(m_r[S1] + (m_r[S2] << 3) + 0);
-				m_r[D1] = m_data_space.read_dword(m_r[S1] + (m_r[S2] << 3) + 4);
-			}
+				ld<u64>(m_r[S1] + (m_r[S2] << 3), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x0b0: // ld: load word (scaled)
-			m_r[D] = m_data_space.read_dword(m_r[S1] + (m_r[S2] << 2));
+			ld<u32>(m_r[S1] + (m_r[S2] << 2), D);
 			break;
 		case 0x0b8: // ld.usr: load word user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = m_data_space.read_dword(m_r[S1] + (m_r[S2] << 2));
+				ld<u32>(m_r[S1] + (m_r[S2] << 2),D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x0d0: // ld.h: load half word (scaled)
-			m_r[D] = s32(s16(m_data_space.read_word(m_r[S1] + (m_r[S2] << 1))));
+			ld<s16>(m_r[S1] + (m_r[S2] << 1), D);
 			break;
 		case 0x0d8: // ld.h.usr: load half word user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = s32(s16(m_data_space.read_word(m_r[S1] + (m_r[S2] << 1))));
+				ld<s16>(m_r[S1] + (m_r[S2] << 1), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x0f0: // ld.b: load byte (scaled)
-			m_r[D] = s32(s8(m_data_space.read_byte(m_r[S1] + (m_r[S2] << 1))));
+			ld<s8>(m_r[S1] + (m_r[S2] << 0), D);
 			break;
 		case 0x0f8: // ld.b.usr: load byte user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = s32(s8(m_data_space.read_byte(m_r[S1] + (m_r[S2] << 1))));
+				ld<s8>(m_r[S1] + (m_r[S2] << 0), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 
 		case 0x100: // st.d: store double word
-			m_data_space.write_dword(m_r[S1] + m_r[S2] + 0, u32(m_r[D0]));
-			m_data_space.write_dword(m_r[S1] + m_r[S2] + 4, u32(m_r[D1]));
+			st<u64>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x108: // st.d.usr: store double word user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-			{
-				m_data_space.write_dword(m_r[S1] + m_r[S2] + 0, u32(m_r[D0]));
-				m_data_space.write_dword(m_r[S1] + m_r[S2] + 4, u32(m_r[D1]));
-			}
+				st<u64>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x120: // st: store word
-			m_data_space.write_dword(m_r[S1] + m_r[S2], u32(m_r[D]));
+			st<u32>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x128: // st.usr: store word user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_data_space.write_dword(m_r[S1] + m_r[S2], u32(m_r[D]));
+				st<u32>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x140: // st.h: store half word
-			m_data_space.write_word(m_r[S1] + m_r[S2], u16(m_r[D]));
+			st<u16>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x148: // st.h.usr: store half word user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_data_space.write_word(m_r[S1] + m_r[S2], u16(m_r[D]));
+				st<u16>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x160: // st.b: store byte
-			m_data_space.write_byte(m_r[S1] + m_r[S2], u8(m_r[D]));
+			st<u8>(m_r[S1] + m_r[S2], D);
 			break;
 		case 0x168: // st.b.usr: store byte user (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_data_space.write_byte(m_r[S1] + m_r[S2], u8(m_r[D]));
+				st<u8>(m_r[S1] + m_r[S2], D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 
 		case 0x110: // st.d: store double word (scaled)
-			m_data_space.write_dword(m_r[S1] + (m_r[S2] << 3) + 0, u32(m_r[D0]));
-			m_data_space.write_dword(m_r[S1] + (m_r[S2] << 3) + 4, u32(m_r[D1]));
+			st<u64>(m_r[S1] + (m_r[S2] << 3), D);
 			break;
 		case 0x118: // st.d.usr: store double word user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-			{
-				m_data_space.write_dword(m_r[S1] + (m_r[S2] << 3) + 0, u32(m_r[D0]));
-				m_data_space.write_dword(m_r[S1] + (m_r[S2] << 3) + 4, u32(m_r[D1]));
-			}
+				st<u64>(m_r[S1] + (m_r[S2] << 3), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x130: // st: store word (scaled)
-			m_data_space.write_dword(m_r[S1] + (m_r[S2] << 2), u32(m_r[D]));
+			st<u32>(m_r[S1] + (m_r[S2] << 2), D);
 			break;
 		case 0x138: // st.usr: store word user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_data_space.write_dword(m_r[S1] + (m_r[S2] << 2), u32(m_r[D]));
+				st<u32>(m_r[S1] + (m_r[S2] << 2), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x150: // st.h: store half word (scaled)
-			m_data_space.write_word(m_r[S1] + (m_r[S2] << 1), u16(m_r[D]));
+			st<u16>(m_r[S1] + (m_r[S2] << 1), D);
 			break;
 		case 0x158: // st.h.usr: store half word user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_data_space.write_word(m_r[S1] + (m_r[S2] << 1), u16(m_r[D]));
+				st<u16>(m_r[S1] + (m_r[S2] << 1), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
 		case 0x170: // st.b: store byte (scaled)
-			m_data_space.write_byte(m_r[S1] + (m_r[S2] << 0), u8(m_r[D]));
+			st<u8>(m_r[S1] + (m_r[S2] << 0), D);
 			break;
 		case 0x178: // st.b.usr: store byte user (scaled, privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_data_space.write_byte(m_r[S1] + (m_r[S2] << 0), u8(m_r[D]));
+				st<u8>(m_r[S1] + (m_r[S2] << 0), D);
 			else
 				exception(E_PRIVILEGE);
 			break;
@@ -1493,5 +1424,126 @@ void mc88100_device::fset(unsigned const td, unsigned const d, float64_t const d
 		m_r[(d + 0) & 31] = u32(data.v >> 32);
 		m_r[(d + 1) & 31] = u32(data.v >> 0);
 		break;
+	}
+}
+
+bool mc88100_device::fetch(u32 address, u32 &inst)
+{
+	inst = m_inst_cache.read_dword(address);
+
+	return true;
+}
+
+template <typename T> void mc88100_device::ld(u32 address, unsigned const reg)
+{
+	// alignment check
+	if (address & (sizeof(T) - 1))
+	{
+		if (!(m_cr[PSR] & PSR_MXM))
+		{
+			exception(E_MISALIGNED);
+
+			return;
+		}
+		else
+			address &= ~(sizeof(T) - 1);
+	}
+
+	if constexpr (sizeof(T) == 1)
+	{
+		u32 const data = std::is_signed<T>() ? s32(T(m_data_space.read_byte(address))) : m_data_space.read_byte(address);
+
+		if (reg)
+			m_r[reg] = data;
+	}
+	else if constexpr (sizeof(T) == 2)
+	{
+		u32 const data = std::is_signed<T>() ? s32(T(m_data_space.read_word(address))) : m_data_space.read_word(address);
+
+		if (reg)
+			m_r[reg] = data;
+	}
+	else if constexpr (sizeof(T) == 4)
+	{
+		u32 const data = m_data_space.read_dword(address);
+
+		if (reg)
+			m_r[reg] = data;
+	}
+	else if constexpr (sizeof(T) == 8)
+	{
+		u64 const data = m_data_space.read_qword(address);
+
+		if (reg != 0)
+			m_r[(reg + 0) & 31] = u32(data >> 32);
+		if (reg != 31)
+			m_r[(reg + 1) & 31] = u32(data >> 0);
+	}
+}
+
+template <typename T> bool mc88100_device::st(u32 address, unsigned const reg)
+{
+	// alignment check
+	if (address & (sizeof(T) - 1))
+	{
+		if (!(m_cr[PSR] & PSR_MXM))
+		{
+			exception(E_MISALIGNED);
+
+			return false;
+		}
+		else
+			address &= ~(sizeof(T) - 1);
+	}
+
+	if constexpr (sizeof(T) == 1)
+		m_data_space.write_byte(address, m_r[reg]);
+	else if constexpr (sizeof(T) == 2)
+		m_data_space.write_word(address, m_r[reg]);
+	else if constexpr (sizeof(T) == 4)
+		m_data_space.write_dword(address, m_r[reg]);
+	else if constexpr (sizeof(T) == 8)
+		m_data_space.write_qword(address, (u64(m_r[(reg + 0) & 31]) << 32) | m_r[(reg + 1) & 31]);
+
+	return true;
+}
+
+template <typename T> void mc88100_device::xmem(u32 address, unsigned const reg)
+{
+	// alignment check
+	if (address & (sizeof(T) - 1))
+	{
+		if (!(m_cr[PSR] & PSR_MXM))
+			exception(E_MISALIGNED);
+		else
+			address &= ~(sizeof(T) - 1);
+	}
+
+	// save source value
+	T const src = m_r[reg];
+
+	if constexpr (sizeof(T) == 1)
+	{
+		// read destination
+		T const dst = m_data_space.read_byte(address);
+
+		// update register
+		if (reg)
+			m_r[reg] = dst;
+
+		// write destination
+		m_data_space.write_byte(address, src);
+	}
+	else if constexpr (sizeof(T) == 4)
+	{
+		// read destination
+		T const dst = m_data_space.read_dword(address);
+
+		// update register
+		if (reg)
+			m_r[reg] = dst;
+
+		// write destination
+		m_data_space.write_dword(address, src);
 	}
 }

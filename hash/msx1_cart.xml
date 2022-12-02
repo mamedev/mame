@@ -674,13 +674,15 @@ Xyzolog - Electric Software
 		<year>1986</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="日本語MSX-Write" />
-		<info name="usage" value="To display texts this needs to run on a machine with kanji support or have an external kanji cartridge mounted." />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX WRITE 900178B" />
 			<feature name="slot" value="msxwrite" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="524288">
 				<rom name="225 aa 8716 zoo" size="524288" crc="ef02e4f3" sha1="4180544158a57c99162269e33e4f2c77c9fce84e" offset="0" />
+			</dataarea>
+			<dataarea name="kanji" size="131072">
+				<rom name="kanjifont.rom" size="131072" crc="3b8fdf44" sha1="fc71561a64f73da0e0043d256f67fd18d7fc3a7f" />
 			</dataarea>
 		</part>
 	</software>
@@ -13278,13 +13280,82 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="msxlogo">
-		<description>MSX~Logo (Ned)</description>
+		<description>MSX-Logo (UK)</description>
+		<year>1985</year>
+		<publisher>Philips UK</publisher>
+		<info name="serial" value="VG 8103/20" />
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_uk.rom" size="32768" crc="ca258fd7" sha1="c07f47c59f83038c16d6d5052aaf6c271bff4334" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogoar" cloneof="msxlogo">
+		<description>MSX-Logo (Argentina)</description>
+		<year>1985</year>
+		<publisher>Telemática/Talent</publisher>
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_ar.rom" size="32768" crc="0e6ecb9f" sha1="e45ddc5bf1a1e63756d11fb43fc50276ca35cab0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogobr11" cloneof="msxlogo">
+		<description>HOT-LOGO (Brazil, version 1.1)</description>
+		<year>1986</year>
+		<publisher>Epcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_br_11.rom" size="32768" crc="1ed6cd48" sha1="abb5cd4c8bdde234cadb0e10b794be3249dc51a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogobr12" cloneof="msxlogo">
+		<description>HOT-LOGO (Brazil, version 1.2)</description>
+		<year>1986</year>
+		<publisher>Epcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_br_12.rom" size="32768" crc="9b841c1c" sha1="a99796b45c92ca6b18e685130ae3eea43946cf2b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogoes" cloneof="msxlogo">
+		<description>MSX-Logo (Spain)</description>
+		<year>1985</year>
+		<publisher>Philips Spain</publisher>
+		<info name="serial" value="VG 8103/28" />
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_es.rom" size="32768" crc="83dd2424" sha1="4141eb7540003f4abd31dee14fa1ee8be1b01a97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogonl" cloneof="msxlogo">
+		<description>MSX-Logo (Netherlands)</description>
 		<year>1985</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="VG 8103/23" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="msx-logo (netherlands) (program).rom" size="32768" crc="7af0aa39" sha1="47663f883f98ab9ddaa0bf0c2831c567919f56f1" offset="0" />
+				<rom name="msxlogo_nl.rom" size="32768" crc="7af0aa39" sha1="47663f883f98ab9ddaa0bf0c2831c567919f56f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxlogopl" cloneof="msxlogo">
+		<description>MSX-Logo (Poland)</description>
+		<year>1987</year>
+		<publisher>COMtech</publisher>
+		<info name="alt_title" value="COMTECH-LOGO" />
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="msxlogo_pl.rom" size="32768" crc="98d394eb" sha1="4354b46484c07c43eec80a92e405e13c2a8fcb73" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13443,7 +13514,8 @@ kept for now until finding out what those bytes affect...
 		<publisher>Philips</publisher>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="stcmsx1p.rom" size="16384" crc="941647ed" sha1="d24682996ab2291199d49ba77a60e1888398e967" offset="0x0000" />
+				<!-- It does not seem like a real dump of the service test cartridge. It only contains some RS232 setup code, but those components are not even on the pcb. -->
+				<rom name="stcmsx1p.rom" size="16384" crc="941647ed" sha1="d24682996ab2291199d49ba77a60e1888398e967" status="baddump" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16163,12 +16235,321 @@ legacy FM implementations cannot find it.
 	</software>
 
 
+	<!-- Kanji cartridges -->
+
+	<software name="hxm200">
+		<description>Toshiba Kanji ROM Cartridge HX-M200 (Japan)</description>
+		<year>1984</year>
+		<publisher>Toshiba</publisher>
+		<info name="alt_title" value="東芝漢字ROMカートリッジ" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="kanji" />
+			<dataarea name="kanji" size="131072">
+				<rom name="kanjifont.rom" size="131072" crc="d23d4d2d" sha1="db03211b7db46899df41db2b1dfbec972109a967" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec700">
+		<description>EC-700 Word Processor (EC-701 + EC-702) (Japan)</description>
+		<year>1985</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="日本語ワードプロセッサ" />
+		<!-- Word processor -->
+		<part name="ec701" interface="msx_cart">
+			<feature name="slot" value="ec701" />
+			<dataarea name="rom" size="524288">
+				<rom name="ec701_program.ic1" size="32768" crc="1caec27b" sha1="4cc5be7536c11a89b5ec736a62a2b832361cd23d" />
+				<!-- should be 3 roms at ic2, ic3, and ic4 -->
+				<rom name="ec701_dictionary.rom" size="393216" crc="b3582eb0" sha1="661c7261dc261e9ef2106755946f95d8b9b699b4" status="baddump" offset="0x20000" />
+			</dataarea>
+		</part>
+		<!-- Kanji ROM -->
+		<part name="ec702" interface="msx_cart">
+			<feature name="slot" value="kanji" />
+			<dataarea name="kanji" size="131072">
+				<rom name="kanjifont.rom" size="131072" crc="3b8fdf44" sha1="fc71561a64f73da0e0043d256f67fd18d7fc3a7f" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- Devices -->
 
+	<!-- TODO possibility to add a second drive -->
+	<software name="avdpf550">
+		<description>DPF-550 Controller + 5.25" SSDD floppy drive (Belgium/Netherlands)</description>
+		<year>1985</year>
+		<publisher>AVT</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_avdpf550" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="avt_dpf-550_disk.rom" size="0x4000" crc="938f51b0" sha1="633ad62599361bbb8ba6803cdcfaa14c54521c43" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Was sold alone or in combination with a 5.25" drive (unknown if single or double sided). -->
+	<!-- TODO: Supports up to 2 single or double sided 5.25" or 3.5" floppy drives -->
+	<software name="cdx2">
+		<description>CDX-2 + 5.25" DSDD floppy drive (Brazil)</description>
+		<year>19??</year>
+		<publisher>Microsol</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_cdx2" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="cdx-2.rom" size="0x4000" crc="7d55811a" sha1="ffc1bafca38d20ed6e9a27c90c6ab089a8482d89" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Was sold alone or in combination with a 5.25" double sided drive. -->
+	<!-- TODO: Supports up to 2 single or double sided 5.25" or 3.5" floppy drives -->
+	<software name="ddx30d">
+		<description>DDX + 5.25" DSDD floppy drive (Brazil, v3.0d)</description>
+		<year>19??</year>
+		<publisher>Digital Design</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_ddx3" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="interface_405033.u2" size="0x4000" crc="2a623a9a" sha1="a363015286341ffabcdc38ef0d890897ed51e322" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Was sold alone or in combination with a 5.25" double sided drive. -->
+	<!-- TODO: Supports up to 2 single or double sided 5.25" or 3.5" floppy drives -->
+	<software name="ddx30" cloneof="ddx30d">
+		<description>DDX + 5.25" DSDD floppy drive (Brazil, v3.0)</description>
+		<year>19??</year>
+		<publisher>Digital Design</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_ddx3" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="ddx30.rom" size="0x4000" crc="337b11b7" sha1="124126cee840e43c7668c11c2bec2f34b3d00c68" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO possibility to add a second drive -->
+	<software name="fd03_38" supported="no">
+		<description>FD-03 Controller + 3.5" DSDD floppy drive v3.8</description>
+		<year>1986</year>
+		<publisher>Yamaha</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_fd03" />
+			<dataarea name="rom" size="0x8000">
+				<!-- Dump contains contents of the memory mapped FDC registers starting at 3fc0 -->
+				<rom name="fd03_38.bin" size="0x8000" crc="f691d69b" sha1="ea3c1d20310e7fbaacfdede839be0118ecea015e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO possibility to add a second drive -->
+	<software name="fd03_35" cloneof="fd03_38" supported="no">
+		<description>FD-03 Controller + 3.5" DSDD floppy drive v3.5</description>
+		<year>1986</year>
+		<publisher>Yamaha</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_fd03" />
+			<dataarea name="rom" size="0x4000">
+				<!-- Dump contains contents of the memory mapped FDC registers starting at 3fc0 and contains the text "I love Mariel\nMemole M" -->
+				<rom name="fd03_35.bin" size="0x4000" crc="ec1aca6e" sha1="5a5cc35ffb7f78ef440df9548c7360ab56719c5a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO possibility to add a second drive -->
+	<software name="fd051">
+		<description>FD-051 Controller + FD-05 3.5" DSDD floppy drive</description>
+		<year>1985</year>
+		<publisher>Yamaha</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_fd051" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="fd051.bin" size="0x4000" crc="ab94a273" sha1="4b08a057e5863ade179dcf8bc9377e90940e6d61" />
+			</dataarea>
+			<!-- The floppy drive was bundled with a blank 2DD disk. -->
+		</part>
+	</software>
+
+	<software name="fsfd1">
+		<description>FS-FD1 (Floppy controller + 3.5" DSDD floppy drive) (Japan)</description>
+		<year>1987</year>
+		<publisher>Panasonic</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_fsfd1" />
+			<dataarea name="rom" size="0x4000">
+				<!-- hashes not verified -->
+				<rom name="fs_fd1.rom" size="0x4000" crc="4c9b8214" sha1="8e3f6f08309f082a82be8298a66c9b90f2d34ad4" offset="0" />
+			</dataarea>
+		</part>
+		<!-- TODO: The floppy drive was bundled with a copy of MSX-DOS, undumped -->
+	</software>
+
+	<software name="fsfd1a">
+		<description>FS-FD1A (3.5" DSDD floppy drive with integrated controller) (Japan)</description>
+		<year>1987</year>
+		<publisher>Panasonic</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_fsfd1a" />
+			<dataarea name="rom" size="0x4000">
+				<!-- hashes not verified -->
+				<rom name="fs_fd1a.rom" size="0x4000" crc="4b673b29" sha1="74ead27eec8d876144c2a015c0260d6db2117d72" offset="0" />
+			</dataarea>
+		</part>
+		<!-- TODO: The floppy drive was bundled with a copy of MSX-DOS, undumped -->
+	</software>
+
+	<!-- TODO possibility to add a second drive -->
+	<software name="fscf351">
+		<description>FS-CF351 Controller + FS-FD351 DSDD 3.5" Floppy drive (Japan)</description>
+		<year>1985</year>
+		<publisher>National</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_fscf351" />
+			<dataarea name="rom" size="0x4000">
+				<!-- hashes not verified -->
+				<rom name="fs_cf351.rom" size="0x4000" crc="006fba38" sha1="c1fb0fa01fadf82d86ed02daff46e7bd4ad7a59d" offset="0" />
+			</dataarea>
+		</part>
+		<!-- TODO: The floppy drive was bundled with a copy of MSX-DOS, undumped -->
+	</software>
+
+	<!-- TODO possibility to add a second drive -->
+	<software name="hb3600">
+		<description>HB-3600 Controller + HB-6000 5.25" DSDD floppy drive (Brazil)</description>
+		<year>19??</year>
+		<publisher>Sharp</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_hb3600" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="hb3600_disk.rom" size="0x4000" crc="af445c3d" sha1="608e8e9ab91c67f7015a67ea12f52ea3b0d609cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbd20w">
+		<description>HBD-20W (Floppy controller + 3.5" DSDD floppy drive) (Japan)</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_hbd20w" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="hbd-20w.rom" size="0x4000" crc="54c73ad6" sha1="12f2cc79b3d09723840bae774be48c0d721ec1c6" />
+			</dataarea>
+		</part>
+		<!-- TODO: The floppy drive was bundled with a copy of MSX-DOS, undumped -->
+	</software>
+
+	<!-- TODO: possibility to add a second drive -->
+	<software name="hbd50_121">
+		<description>HBD-50 (Floppy controller + 3.5" SSDD floppy drive, SNYJX121)</description>
+		<year>1984</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_hbd50" />
+			<dataarea name="rom" size="0x4000">
+				<!-- Dump contains contents of the memory mapped FDC registers starting at 3ff8 -->
+				<rom name="hbd-50.rom" size="0x4000" crc="a8569f6f" sha1="ab57b4c8e5d47c2a39031c2057b97d2d10546582" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbdf1">
+		<description>HBD-F1 (Floppy controller + 3.5" DSDD floppy drive) (Japan)</description>
+		<year>1988</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_hbdf1" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="hbd-f1.rom" size="0x4000" crc="54c73ad6" sha1="12f2cc79b3d09723840bae774be48c0d721ec1c6" />
+			</dataarea>
+		</part>
+		<!-- TODO: The floppy drive was bundled with a copy of MSX-DOS, undumped. -->
+	</software>
+
+	<!-- TODO has a connector to add a second drive, but it is unknown if any were actually released. -->
+	<software name="hxf101pe">
+		<description>HX-F101PE Controller + 3.5" SSDD floppy drive (Europe)</description>
+		<year>1985</year>
+		<publisher>Toshiba</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_hxf101pe" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="hxf101.ic1" size="0x4000" crc="8c3b1271" sha1="b88c507720a0617a27141c329755de1a48b89deb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO possibility to add a second drive to the enclosure -->
+	<software name="mfd001">
+		<description>MFD-001 (Controller + enclosure with 1 5.25" DSDD floppy drive) (Europe)</description>
+		<year>19??</year>
+		<publisher>Sanyo</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_mfd001" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="mfd-001_disk.rom" size="0x4000" crc="7055c36f" sha1="bb72819da1160bc375fa3623f2d0a5424d08c89b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO possibility to add a second drive to the enclosure -->
+	<software name="ml30dc">
+		<description>ML-30DC Controller + ML-30FD enclosure with 1 3.5" DSDD floppy drive (Japan)</description>
+		<year>1985</year>
+		<publisher>Mitsubishi</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_ml30dc" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="ml30dc.rom" size="0x4000" crc="0ed4d468" sha1="658bc7cd4b19bd5face14f09e4e2904157a5c298" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO possibility to add a second drive -->
+	<software name="nms1200_6">
+		<description>NMS-1200 Floppy controller + 3.5" DSDD floppy drive (Europe, v1.06)</description>
+		<year>19??</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_nms1200" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="nms1200_6.rom" size="0x4000" crc="7c0b1439" sha1="f0e0447a0872a2f09d7b28d9599fdd183acb5cb2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO possibility to add a second drive -->
+	<software name="nms1200_4" cloneof="nms1200_6">
+		<description>NMS-1200 Floppy controller + 3.5" DSDD floppy drive (Europe, v1.04)</description>
+		<year>19??</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_nms1200" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="nms1200_4.rom" size="0x4000" crc="6df59842" sha1="0b63e9cf99bc2a3d7f21cabf1cb668a6ca71ad2d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO possibility to add a second drive -->
+	<software name="tadpf550">
+		<description>DPF-550 Controller + 5.25" SSDD floppy drive (Argentina)</description>
+		<year>19??</year>
+		<publisher>Talent</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_tadpf550" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="dpf-550_disk.rom" size="0x4000" crc="bed64b97" sha1="d9c82e091b5fa1b5ee9b7f012f0084611762eb93" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: possibility to add a second drive -->
 	<software name="vy0010">
-		<description>VY-0010 (Floppy controller + 3.5" SSDD floppy drive)</description>
-		<year>198?</year>
+		<description>VY-0010 (Floppy controller + 3.5" SSDD floppy drive) (Europe)</description>
+		<year>1985</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="disk_vy0010" />
@@ -16178,65 +16559,6 @@ legacy FM implementations cannot find it.
 				<rom name="27128q25-8.ic2" size="0x4000" crc="164f5a6d" sha1="8924e3e11eb1c8c1edcb7efa63c26d2bdc142473" status="baddump" offset="0" />
 			</dataarea>
 		</part>
-		<!-- The package came with a copy of MSX-DOS -->
-<!--
-        <part name="flop1" interface="floppy_3_5">
-        </part>
--->
-	</software>
-
-	<software name="fsfd1">
-		<description>FS-FD1 (Floppy controller + 3.5" DSDD floppy drive)</description>
-		<year>198?</year>
-		<publisher>Panasonic</publisher>
-		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="disk_fsfd1" />
-			<dataarea name="rom" size="0x4000">
-				<!-- hashes not verified -->
-				<rom name="fs_fd1.rom" size="0x4000" crc="4c9b8214" sha1="8e3f6f08309f082a82be8298a66c9b90f2d34ad4" offset="0" />
-			</dataarea>
-		</part>
-<!--
-        The floppy drive was most likely bundled with a copy of MSX-DOS, but we are not 100% sure yet
-        <part name="flop1" interface="floppy_3_5">
-        </part>
--->
-	</software>
-
-	<software name="fsfd1a">
-		<description>FS-FD1A (3.5" DSDD floppy drive with integrated controller)</description>
-		<year>198?</year>
-		<publisher>Panasonic</publisher>
-		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="disk_fsfd1a" />
-			<dataarea name="rom" size="0x4000">
-				<!-- hashes not verified -->
-				<rom name="fs_fd1a.rom" size="0x4000" crc="4b673b29" sha1="74ead27eec8d876144c2a015c0260d6db2117d72" offset="0" />
-			</dataarea>
-		</part>
-<!--
-        The floppy drive was most likely bundled with a copy of MSX-DOS, but we are not 10% sure yet
-        <part name="flop1" interface="floppy_3_5">
-        </part>
--->
-	</software>
-
-	<software name="fscf351">
-		<description>FS-CF351 Controller + FS-FD351 DSDD 3.5" Floppy drive</description>
-		<year>198?</year>
-		<publisher>National</publisher>
-		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="disk_fscf351" />
-			<dataarea name="rom" size="0x4000">
-				<!-- hashes not verified -->
-				<rom name="fs_cf351.rom" size="0x4000" crc="006fba38" sha1="c1fb0fa01fadf82d86ed02daff46e7bd4ad7a59d" offset="0" />
-			</dataarea>
-		</part>
-<!--
-        The floppy drive was most likely bundled with a copy of MSX-DOS, but we are not 10% sure yet
-        <part name="flop1" interface="floppy_3_5">
-        </part>
--->
 	</software>
 
 	<!-- SORT -->

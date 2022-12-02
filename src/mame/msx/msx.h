@@ -6,7 +6,8 @@
 #pragma once
 
 #include "bus/centronics/ctronics.h"
-#include "bus/msx_slot/cartridge.h"
+#include "bus/msx/ctrl/ctrl.h"
+#include "bus/msx/slot/cartridge.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"
@@ -67,9 +68,6 @@ protected:
 	void msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider);
 	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config);
 	void msx1_add_softlists(machine_config &config);
-
-	template <u8 Game_port>
-	u8 game_port_r();
 
 	// configuration helpers
 	template <typename T, typename U>
@@ -185,9 +183,8 @@ protected:
 	required_device<input_merger_any_high_device> m_mainirq;
 	required_device<screen_device> m_screen;
 	optional_memory_region m_region_kanji;
-	required_ioport_array<2> m_io_joy;
-	required_ioport m_io_dsw;
-	required_ioport_array<2> m_io_mouse;
+	required_device<msx_general_purpose_port_device> m_gen_port1;
+	required_device<msx_general_purpose_port_device> m_gen_port2;
 	required_ioport_array<11> m_io_key;
 	output_finder<2> m_leds;
 	msx_hw_def m_hw_def;
@@ -227,13 +224,8 @@ protected:
 	};
 	std::vector<internal_slot> m_internal_slots;
 
-	INTERRUPT_GEN_MEMBER(msx_interrupt);
-
 	// PSG
 	u8 m_psg_b;
-	// mouse
-	u16 m_mouse[2];
-	s8 m_mouse_stat[2];
 	// kanji
 	u32 m_kanji_latch;
 	// memory

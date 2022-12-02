@@ -8,7 +8,7 @@
     driver by Angelo Salese, original MESS PC-88SR driver by ???
 
     TODO:
-	- cassette support;
+    - cassette support;
     - waitstates;
     - support for partial palette updates (pretty off in p8suite analog RGB test if enabled);
     - understand why i8214 needs a dis hack setter (depends on attached i8212?);
