@@ -30,7 +30,7 @@
         the CPU IPL signals (it is even possible that GLUE make some kind of latching). This would create a window
         long enough for the 'precise point' described above.
 
-        "yes, the spurious interrupt occurs when i mask a timer. i did not notice an occurance of the SPI when changing data and control registers.
+        "yes, the spurious interrupt occurs when i mask a timer. i did not notice an occurrence of the SPI when changing data and control registers.
         if i kill interrupts with the status reg before masking the timer interrupt, then the SPI occurs as soon as the status register is set to re-enable interrupts."
 
         Well, more experiments show that it's somewhat incorrect, and
