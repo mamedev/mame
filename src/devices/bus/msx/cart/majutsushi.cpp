@@ -26,17 +26,18 @@ void msx_cart_majutsushi_device::device_add_mconfig(machine_config &config)
 
 void msx_cart_majutsushi_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x20000)
-	{
+	if (!cart_rom_region())
+		fatalerror("majutsushi: ROM region not setup\n");
+
+	if (cart_rom_region()->bytes() != 0x20000)
 		fatalerror("majutsushi: Invalid ROM size\n");
-	}
 
 	for (int i = 0; i < 3; i++)
-		m_rombank[i]->configure_entries(0, 16, get_rom_base(), 0x2000);
+		m_rombank[i]->configure_entries(0, 16, cart_rom_region()->base(), 0x2000);
 
-	page(0)->install_rom(0x0000, 0x1fff, get_rom_base());
+	page(0)->install_rom(0x0000, 0x1fff, cart_rom_region()->base());
 	page(0)->install_read_bank(0x2000, 0x3fff, m_rombank[0]);
-	page(1)->install_rom(0x4000, 0x5fff, get_rom_base());
+	page(1)->install_rom(0x4000, 0x5fff, cart_rom_region()->base());
 	page(1)->install_write_handler(0x5000, 0x5000, 0, 0x0fff, 0, write8smo_delegate(m_dac, FUNC(dac_byte_interface::write)));
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[0]);
 	page(1)->install_write_handler(0x6000, 0x6000, 0, 0x1fff, 0, write8smo_delegate(*this, FUNC(msx_cart_majutsushi_device::bank_w<0>)));

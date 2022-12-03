@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cartridge.h"
+#include "bus/msx/slot/cartridge.h"
 #include "machine/intelfsh.h"
 
 

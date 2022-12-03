@@ -26,9 +26,6 @@
 **
 **
 ** Todo/known issues:
-** - Get rid of trampolines.
-** - Get rid of code duplication between msx_slot and msx_cart (eg, kanji roms, disk interfaces)
-** - Use standard game controller slot interface for joystick and mouse
 ** - general: - Add support for kana lock
 ** -          - Expansion slots not emulated
 ** - kanji: The direct rom dump from FS-A1FX shows that the kanji font roms are accessed slightly differently. Most

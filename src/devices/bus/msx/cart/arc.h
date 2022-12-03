@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cartridge.h"
+#include "bus/msx/slot/cartridge.h"
 
 
 DECLARE_DEVICE_TYPE(MSX_CART_ARC, msx_cart_arc_device)

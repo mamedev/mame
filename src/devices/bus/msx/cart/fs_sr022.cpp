@@ -27,14 +27,16 @@ void msx_cart_fs_sr022_device::device_reset()
 
 void msx_cart_fs_sr022_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x40000)
-	{
-		fatalerror("fs_sr022: Invalid ROM size\n");
-	}
-	m_bunsetsu_rom = get_rom_base() + 0x20000;
+	if (!cart_rom_region())
+		fatalerror("fs_sr022: ROM region not setup\n");
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
-	page(2)->install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
+	if (cart_rom_region()->bytes() != 0x40000)
+		fatalerror("fs_sr022: Invalid ROM size\n");
+
+	m_bunsetsu_rom = cart_rom_region()->base() + 0x20000;
+
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
+	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
 	page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_cart_fs_sr022_device::buns_r)));
 	page(2)->install_write_handler(0xbffc, 0xbffe, write8sm_delegate(*this, FUNC(msx_cart_fs_sr022_device::buns_w)));
 }

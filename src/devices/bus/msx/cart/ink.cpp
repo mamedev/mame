@@ -38,10 +38,13 @@ void msx_cart_ink_device::device_add_mconfig(machine_config &config)
 
 void msx_cart_ink_device::initialize_cartridge()
 {
-	size_t size = std::min<size_t>(0x80000, get_rom_size());
+	if (!cart_rom_region())
+		fatalerror("ink: ROM region not setup\n");
+
+	const size_t size = std::min<size_t>(0x80000, cart_rom_region()->bytes());
 
 	u8 *flash = memregion("flash")->base();
-	memcpy(flash, get_rom_base(), size);
+	memcpy(flash, cart_rom_region()->base(), size);
 
 	page(0)->install_rom(0x0000, 0x3fff, flash);
 	page(1)->install_rom(0x4000, 0x7fff, flash + 0x4000);

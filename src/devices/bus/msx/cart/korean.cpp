@@ -24,18 +24,19 @@ void msx_cart_korean_80in1_device::device_reset()
 
 void msx_cart_korean_80in1_device::initialize_cartridge()
 {
-	u32 size = get_rom_size();
-	u16 banks = size / 0x2000;
+	if (!cart_rom_region())
+		fatalerror("korean_80in1: ROM region not setup\n");
+
+	const u32 size = cart_rom_region()->bytes();
+	const u16 banks = size / 0x2000;
 
 	if (size > 256 * 0x2000 || size < 0x8000 || size != banks * 0x2000 || (~(banks - 1) % banks))
-	{
 		fatalerror("korean_80in1: Invalid ROM size\n");
-	}
 
 	m_bank_mask = banks - 1;
 
 	for (int i = 0; i < 4; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), 0x2000);
+		m_rombank[i]->configure_entries(0, banks, cart_rom_region()->base(), 0x2000);
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_write_handler(0x4000, 0x4003, write8sm_delegate(*this, FUNC(msx_cart_korean_80in1_device::bank_w)));
@@ -78,19 +79,20 @@ void msx_cart_korean_90in1_device::device_reset()
 
 void msx_cart_korean_90in1_device::initialize_cartridge()
 {
-	u32 size = get_rom_size();
-	u16 banks = size / 0x4000;
+	if (!cart_rom_region())
+		fatalerror("korean_90in1: ROM region not setup\n");
+
+	const u32 size = cart_rom_region()->bytes();
+	const u16 banks = size / 0x4000;
 
 	if (size > 64 * 0x4000 || size < 0x8000 || size != banks * 0x4000 || (~(banks - 1) % banks))
-	{
 		fatalerror("korean_90in1: Invalid ROM size\n");
-	}
 
 	m_bank_mask = banks - 1;
 
-	m_rombank[0]->configure_entries(0, banks, get_rom_base(), 0x4000);
-	m_rombank[1]->configure_entries(0, banks, get_rom_base(), 0x4000);
-	m_rombank[2]->configure_entries(0, banks, get_rom_base() + 0x2000, 0x4000);
+	m_rombank[0]->configure_entries(0, banks, cart_rom_region()->base(), 0x4000);
+	m_rombank[1]->configure_entries(0, banks, cart_rom_region()->base(), 0x4000);
+	m_rombank[2]->configure_entries(0, banks, cart_rom_region()->base() + 0x2000, 0x4000);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
 
@@ -133,18 +135,19 @@ void msx_cart_korean_126in1_device::device_reset()
 
 void msx_cart_korean_126in1_device::initialize_cartridge()
 {
-	u32 size = get_rom_size();
-	u16 banks = size / 0x4000;
+	if (!cart_rom_region())
+		fatalerror("korean_126in1: ROM region not setup\n");
+
+	const u32 size = cart_rom_region()->bytes();
+	const u16 banks = size / 0x4000;
 
 	if (size > 256 * 0x4000 || size < 0x8000 || size != banks * 0x4000 || (~(banks - 1) % banks))
-	{
 		fatalerror("korean_126in1: Invalid ROM size\n");
-	}
 
 	m_bank_mask = banks - 1;
 
-	m_rombank[0]->configure_entries(0, banks, get_rom_base(), 0x4000);
-	m_rombank[1]->configure_entries(0, banks, get_rom_base(), 0x4000);
+	m_rombank[0]->configure_entries(0, banks, cart_rom_region()->base(), 0x4000);
+	m_rombank[1]->configure_entries(0, banks, cart_rom_region()->base(), 0x4000);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
 	page(1)->install_write_handler(0x4000, 0x4001, write8sm_delegate(*this, FUNC(msx_cart_korean_126in1_device::bank_w)));

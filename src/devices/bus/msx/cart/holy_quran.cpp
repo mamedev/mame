@@ -27,13 +27,14 @@ msx_cart_holy_quran_device::msx_cart_holy_quran_device(const machine_config &mco
 
 void msx_cart_holy_quran_device::initialize_cartridge()
 {
-	u32 size = get_rom_size();
-	u16 banks = size / BANK_SIZE;
+	if (!cart_rom_region())
+		fatalerror("holy_quran: ROM region not setup\n");
+
+	const u32 size = cart_rom_region()->bytes();
+	const u16 banks = size / BANK_SIZE;
 
 	if (size > 256 * BANK_SIZE || size < 0x10000 || size != banks * BANK_SIZE || (~(banks - 1) % banks))
-	{
 		fatalerror("holy_quran: Invalid ROM size\n");
-	}
 
 	m_bank_mask = banks - 1;
 
@@ -44,8 +45,9 @@ void msx_cart_holy_quran_device::initialize_cartridge()
 	for (int i = 0; i < 0x100; i++)
 		lookup_prot[i] = bitswap<8>(i,6,2,4,0,1,5,7,3) ^ 0x4d;
 
+	u8 *rom = cart_rom_region()->base();
 	for (u32 i = 0; i < size; i++)
-		m_decrypted[i] = lookup_prot[m_rom[i]];
+		m_decrypted[i] = lookup_prot[rom[i]];
 
 	for (int i = 0; i < 4; i++)
 		m_rombank[i]->configure_entries(0, banks, m_decrypted.data(), BANK_SIZE);
@@ -75,9 +77,9 @@ void msx_cart_holy_quran_device::device_reset()
 
 u8 msx_cart_holy_quran_device::read(offs_t offset)
 {
-	u8 data = m_rom[offset];
+	u8 data = cart_rom_region()->base()[offset];
 	// The decryption should actually start working after the first M1 cycle executing something from the cartridge.
-	if (offset + 0x4000 == ((m_rom[3] << 8) | m_rom[2]) && !machine().side_effects_disabled())
+	if (offset + 0x4000 == ((cart_rom_region()->base()[3] << 8) | cart_rom_region()->base()[2]) && !machine().side_effects_disabled())
 	{
 		// Switch to decrypted contents
 		m_view1.select(1);
@@ -88,9 +90,9 @@ u8 msx_cart_holy_quran_device::read(offs_t offset)
 
 u8 msx_cart_holy_quran_device::read2(offs_t offset)
 {
-	u8 data = m_rom[offset + 0x4000];
+	u8 data = cart_rom_region()->base()[offset + 0x4000];
 	// The decryption should actually start working after the first M1 cycle executing something from the cartridge.
-	if (offset + 0x8000 == ((m_rom[3] << 8) | m_rom[2]) && !machine().side_effects_disabled())
+	if (offset + 0x8000 == ((cart_rom_region()->base()[3] << 8) | cart_rom_region()->base()[2]) && !machine().side_effects_disabled())
 	{
 		// Switch to decrypted contents
 		m_view1.select(1);

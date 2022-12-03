@@ -15,14 +15,15 @@ msx_cart_crossblaim_device::msx_cart_crossblaim_device(const machine_config &mco
 
 void msx_cart_crossblaim_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x10000)
-	{
+	if (!cart_rom_region())
+		fatalerror("ascii8: ROM region not configured\n");
+
+	if (cart_rom_region()->bytes() != 0x10000)
 		fatalerror("crossblaim: Invalid ROM size\n");
-	}
 
-	m_rombank->configure_entries(0, 4, get_rom_base(), 0x4000);
+	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), 0x4000);
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	page(1)->install_write_handler(0x4045, 0x4045, write8smo_delegate(*this, FUNC(msx_cart_crossblaim_device::mapper_write)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank);
 }

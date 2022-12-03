@@ -48,14 +48,13 @@ void msx_cart_kanji_device::device_start()
 
 void msx_cart_kanji_device::initialize_cartridge()
 {
-	u32 size = get_kanji_size();
+	if (!cart_kanji_region())
+		fatalerror("kanji: KANJI region not setup\n");
 
-	if (size != 0x20000)
-	{
+	if (cart_kanji_region()->bytes() != 0x20000)
 		fatalerror("kanji: Invalid ROM size\n");
-	}
 
-	m_kanji_mask = size - 1;
+	m_kanji_mask = cart_kanji_region()->bytes() - 1;
 
 	// Install IO read/write handlers
 	io_space().install_write_handler(0xd8, 0xd9, write8sm_delegate(*this, FUNC(msx_cart_kanji_device::kanji_w)));
@@ -64,7 +63,7 @@ void msx_cart_kanji_device::initialize_cartridge()
 
 u8 msx_cart_kanji_device::kanji_r(offs_t offset)
 {
-	u8 result = get_kanji_base()[m_kanji_address];
+	u8 result = cart_kanji_region()->base()[m_kanji_address];
 
 	if (!machine().side_effects_disabled())
 	{
@@ -119,18 +118,19 @@ void msx_cart_msxwrite_device::device_reset()
 
 void msx_cart_msxwrite_device::initialize_cartridge()
 {
-	u32 size = get_rom_size();
-	u16 banks = size / BANK_SIZE;
+	if (!cart_rom_region())
+		fatalerror("msxwrite: ROM region not setup\n");
+
+	const u32 size = cart_rom_region()->bytes();
+	const u16 banks = size / BANK_SIZE;
 
 	if (size > 256 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
-	{
 		fatalerror("msxwrite: Invalid ROM size\n");
-	}
 
 	m_bank_mask = banks - 1;
 
 	for (int i = 0; i < 2; i++)
-		m_rombank[i]->configure_entries(0, banks, get_rom_base(), BANK_SIZE);
+		m_rombank[i]->configure_entries(0, banks, cart_rom_region()->base(), BANK_SIZE);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
 	// The rom writes to 6fff and 7fff for banking, unknown whether

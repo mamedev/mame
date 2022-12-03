@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cartridge.h"
+#include "bus/msx/slot/cartridge.h"
 #include "sound/k051649.h"
 #include "sound/vlm5030.h"
 #include "sound/dac.h"

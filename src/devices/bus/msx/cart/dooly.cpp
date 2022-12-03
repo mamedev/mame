@@ -23,16 +23,17 @@ void msx_cart_dooly_device::device_reset()
 
 void msx_cart_dooly_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x8000)
-	{
+	if (!cart_rom_region())
+		fatalerror("dooly: ROM region not setup\n");
+
+	if (cart_rom_region()->bytes() != 0x8000)
 		fatalerror("dooly: Invalid ROM size\n");
-	}
 
 	page(1)->install_view(0x4000, 0x7fff, m_view1);
-	m_view1[0].install_rom(0x4000, 0x7fff, get_rom_base());
+	m_view1[0].install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	m_view1[1].install_read_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(msx_cart_dooly_device::mode4_page1_r)));
 	page(2)->install_view(0x8000, 0xbfff, m_view2);
-	m_view2[0].install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
+	m_view2[0].install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
 	m_view2[1].install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(msx_cart_dooly_device::mode4_page2_r)));
 
 	page(1)->install_write_handler(0x4000, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_dooly_device::prot_w)));
@@ -41,12 +42,12 @@ void msx_cart_dooly_device::initialize_cartridge()
 
 u8 msx_cart_dooly_device::mode4_page1_r(offs_t offset)
 {
-	return bitswap<8>(get_rom_base()[offset], 7, 6, 5, 4, 3, 1, 0, 2);
+	return bitswap<8>(cart_rom_region()->base()[offset], 7, 6, 5, 4, 3, 1, 0, 2);
 }
 
 u8 msx_cart_dooly_device::mode4_page2_r(offs_t offset)
 {
-	return bitswap<8>(get_rom_base()[0x4000 | offset], 7, 6, 5, 4, 3, 1, 0, 2);
+	return bitswap<8>(cart_rom_region()->base()[0x4000 | offset], 7, 6, 5, 4, 3, 1, 0, 2);
 }
 
 void msx_cart_dooly_device::prot_w(u8 data)

@@ -16,14 +16,15 @@ msx_cart_super_swangi_device::msx_cart_super_swangi_device(const machine_config 
 
 void msx_cart_super_swangi_device::initialize_cartridge()
 {
-	if (get_rom_size() < 0x10000)
-	{
+	if (!cart_rom_region())
+		fatalerror("super_swangi: ROM region not setup\n");
+
+	if (cart_rom_region()->bytes() < 0x10000)
 		fatalerror("super_swangi: Invalid ROM size\n");
-	}
 
-	m_rombank->configure_entries(0, 4, get_rom_base(), 0x4000);
+	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), 0x4000);
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank);
 	page(2)->install_write_handler(0x8000, 0x8000, write8smo_delegate(*this, FUNC(msx_cart_super_swangi_device::bank_w)));
 }

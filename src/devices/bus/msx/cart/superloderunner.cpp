@@ -21,12 +21,13 @@ void msx_cart_superloderunner_device::device_start()
 
 void msx_cart_superloderunner_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x20000)
-	{
-		fatalerror("superloderunner: Invalid ROM size\n");
-	}
+	if (!cart_rom_region())
+		fatalerror("superloderunner: ROM region not setup\n");
 
-	m_rombank->configure_entries(0, 8, get_rom_base(), 0x4000);
+	if (cart_rom_region()->bytes() != 0x20000)
+		fatalerror("superloderunner: Invalid ROM size\n");
+
+	m_rombank->configure_entries(0, 8, cart_rom_region()->base(), 0x4000);
 
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank);
 }

@@ -30,13 +30,14 @@ void msx_cart_arc_device::device_reset()
 
 void msx_cart_arc_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x8000)
-	{
-		fatalerror("arc: Invalid ROM size\n");
-	}
+	if (!cart_rom_region())
+		fatalerror("arc: ROM region not setup\n");
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
-	page(2)->install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
+	if (cart_rom_region()->bytes() != 0x8000)
+		fatalerror("arc: Invalid ROM size\n");
+
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
+	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
 }
 
 void msx_cart_arc_device::io_7f_w(u8 data)

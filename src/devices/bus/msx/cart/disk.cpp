@@ -104,8 +104,7 @@
 #include "emu.h"
 #include "disk.h"
 
-#include "cartridge.h"
-
+#include "bus/msx/slot/cartridge.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/upd765.h"
@@ -218,10 +217,11 @@ void msx_cart_disk_device::floppy_formats(format_registration &fr)
 
 void msx_cart_disk_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x4000)
-	{
+	if (!cart_rom_region())
+		fatalerror("msx_cart_disk_device: ROM region not setup\n");
+
+	if (cart_rom_region()->bytes() != 0x4000)
 		fatalerror("msx_cart_disk_device: Invalid ROM size\n");
-	}
 }
 
 void msx_cart_disk_device::softlist_35(machine_config &config)
@@ -337,7 +337,7 @@ void disk_type1_device::initialize_cartridge()
 {
 	disk_wd_device::initialize_cartridge();
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
 	{
 		const offs_t base = 0x4000 * i;
@@ -610,7 +610,7 @@ void disk_type2_device::initialize_cartridge()
 {
 	disk_wd_device::initialize_cartridge();
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
 	{
 		const offs_t base = 0x4000 * i;
@@ -732,7 +732,7 @@ void disk_type5_device::initialize_cartridge()
 {
 	disk_wd_device::initialize_cartridge();
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 
 	// Install IO read/write handlers
 	io_space().install_write_handler(0xd0, 0xd0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
@@ -840,7 +840,7 @@ void fsfd1a_device::initialize_cartridge()
 {
 	disk_tc8566_device::initialize_cartridge();
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
 	{
 		const offs_t base = 0x4000 * i;
@@ -894,14 +894,15 @@ void fd03_device::device_start()
 
 void fd03_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x4000 && get_rom_size() != 0x8000)
-	{
-		fatalerror("fd03_device: Invalid ROM size\n");
-	}
+	if (!cart_rom_region())
+		fatalerror("fd03_device:: ROM region not setup\n");
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
-	if (get_rom_size() >= 0x8000)
-		page(2)->install_rom(0x8000,0xbfff, get_rom_base() + 0x4000);
+	if (cart_rom_region()->bytes() != 0x4000 && cart_rom_region()->bytes() != 0x8000)
+		fatalerror("fd03_device: Invalid ROM size\n");
+
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
+	if (cart_rom_region()->bytes() >= 0x8000)
+		page(2)->install_rom(0x8000,0xbfff, cart_rom_region()->base() + 0x4000);
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
 	{
 		const offs_t base = 0x4000 * i;
@@ -1043,7 +1044,7 @@ void hxf101pe_device::initialize_cartridge()
 {
 	disk_wd_device::initialize_cartridge();
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	page(1)->install_read_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
 	page(1)->install_read_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
 	page(1)->install_read_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
@@ -1178,7 +1179,7 @@ void mfd001_device::initialize_cartridge()
 {
 	disk_wd_device::initialize_cartridge();
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
 	{
 		const offs_t base = 0x4000 * i;
@@ -1280,7 +1281,7 @@ void avdpf550_device::initialize_cartridge()
 {
 	disk_wd_device::initialize_cartridge();
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 
 	// Install IO read/write handlers
 	io_space().install_write_handler(0xd0, 0xd0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));

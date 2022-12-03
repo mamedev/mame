@@ -61,16 +61,19 @@ void msx_cart_fmpac_device::device_reset()
 
 void msx_cart_fmpac_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x10000)
-	{
-		fatalerror("fmpac: Invalid ROM size\n");
-	}
-	if (get_sram_size() != 0x2000)
-	{
-		fatalerror("fmpac: Invalid SRAM size\n");
-	}
+	if (!cart_rom_region())
+		fatalerror("fmpac: ROM region not setup\n");
 
-	m_rombank->configure_entries(0, 4, get_rom_base(), 0x4000);
+	if (!cart_sram_region())
+		fatalerror("fmpac: SRAM region not setup\n");
+
+	if (cart_rom_region()->bytes() != 0x10000)
+		fatalerror("fmpac: Invalid ROM size\n");
+
+	if (cart_sram_region()->bytes() < 0x2000)
+		fatalerror("fmpac: Invalid SRAM size\n");
+
+	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), 0x4000);
 
 	page(1)->install_view(0x4000, 0x7fff, m_view);
 	m_view[0].install_read_bank(0x4000, 0x7fff, m_rombank);
@@ -81,7 +84,7 @@ void msx_cart_fmpac_device::initialize_cartridge()
 	m_view[0].install_read_handler(0x7ff7, 0x7ff7, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_r)));
 	m_view[0].install_write_handler(0x7ff7, 0x7ff7, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_w)));
 
-	m_view[1].install_ram(0x4000, 0x5fff, get_sram_base());
+	m_view[1].install_ram(0x4000, 0x5fff, cart_sram_region()->base());
 	m_view[1].install_write_handler(0x5ffe, 0x5fff, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::sram_unlock)));
 	m_view[1].install_write_handler(0x7ff4, 0x7ff5, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
 	m_view[1].install_read_handler(0x7ff6, 0x7ff6, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_r)));

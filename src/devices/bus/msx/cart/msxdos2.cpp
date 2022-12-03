@@ -25,12 +25,13 @@ void msx_cart_msxdos2_device::device_reset()
 
 void msx_cart_msxdos2_device::initialize_cartridge()
 {
-	if (get_rom_size() != 0x10000)
-	{
-		fatalerror("msxdos2: Invalid ROM size\n");
-	}
+	if (!cart_rom_region())
+		fatalerror("msxdos2: ROM region not setup\n");
 
-	m_rombank->configure_entries(0, 4, get_rom_base(), 0x4000);
+	if (cart_rom_region()->bytes() != 0x10000)
+		fatalerror("msxdos2: Invalid ROM size\n");
+
+	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), 0x4000);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank);
 	page(1)->install_write_handler(0x7ffe, 0x7ffe, write8smo_delegate(*this, FUNC(msx_cart_msxdos2_device::bank_w)));
