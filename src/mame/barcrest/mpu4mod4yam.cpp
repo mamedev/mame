@@ -80,8 +80,7 @@ private:
 void mpu4mod4yam_machines_state::add_ym2413(machine_config &config)
 {
 	YM2413(config, m_ym2413, XTAL(3'579'545)); // XTAL on sound board
-	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ym2413->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void mpu4mod4yam_machines_state::base_f(machine_config &config)

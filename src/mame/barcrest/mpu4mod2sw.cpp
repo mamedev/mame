@@ -151,8 +151,7 @@ void mpu4mod2_machines_state::mod4psg_f(machine_config &config)
 	m_ay8913->port_a_write_callback().set(FUNC(mpu4mod2_machines_state::ay8912_outport_w));
 	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8913->set_resistors_load(820, 0, 0);
-	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
