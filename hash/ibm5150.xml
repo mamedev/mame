@@ -467,6 +467,7 @@ Shows a broken EOA logo then hangs at game selection
 		<publisher>Mattel Electronics</publisher>
 		<notes><![CDATA[
 Fatal error: Incorrect layout on track 17 head 0, expected_size=100000, current_size=139488
+Copy protection check kicks in after selecting an input device on title screen
 ]]></notes>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3455,14 +3456,21 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		</part>
 	</software>
 
-	<software name="pc1pc" supported="partial">
+	<software name="pc1pc" supported="no">
 		<description>Olivetti Prodest PC1 - Per Cominciare</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
+		<notes><![CDATA[
+Doesn't work on intended olivpc1 (mouse goes to the top right corner, doesn't accept function keys). Mouse can be bypassed by preloading flop3 first.
+WordProcessor doesn't draw properly, particularly boxes don't draw opaque making this unusable.
+Uno Paint doesn't accept any input except exit (requires mouse?)
+Gioca 13 contains Italian foul word as default Serie C1d table (intentional? Manual claims normal Italian team names). Elaborazione pronostico crashes with subscript out of range.
+Albero throws "read only disk" if no disk is in. Otherwise requires a missing Logotron data disk (with back file inside according to manual)
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Subito 1 - Menù di Inizio / Gioca 13 / L'albero del Sapere"/>
 			<dataarea name="flop" size = "737280">
-				<rom name="Per Cominciare Subito 1.dsk" size="737280" crc="953d9f97" sha1="d3297b772550c2a520b829b8dedcfa3578924b4b"/>
+				<rom name="Per Cominciare Subito 1.dsk" size="737280" crc="953d9f97" sha1="d3297b772550c2a520b829b8dedcfa3578924b4b" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -5942,8 +5950,8 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<!-- TODO: consider removing this -->
 	<software name="msdos32a" cloneof="msdos32" supported="no">
+		<!-- OEM for Epson Equity computers -->
 		<description>MS-DOS (Version 3.2) (alt)</description>
 		<year>1985</year>
 		<publisher>Microsoft</publisher>
@@ -7491,10 +7499,13 @@ Throws "invalid directory" if run from DOS
 		</part>
 	</software>
 
-	<software name="pc1mouse" supported="yes">
+	<software name="pc1mouse" supported="no">
 		<description>Olivetti Prodest PC1 Mouse Driver</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
+		<notes><![CDATA[
+Causes unresponsive keyboard once installed on PC1
+]]></notes>
 		<info name="version" value="1.02" />
 		<info name="serial" value="961248 M" />
 		<info name="usage" value="Logitech mouse driver for Prodest PC1 only" />
