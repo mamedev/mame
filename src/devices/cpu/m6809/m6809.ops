@@ -571,7 +571,7 @@ EXG:
 		uint16_t reg1, reg2;
 
 		// Exchange differs if 16 bit register or 8 bit register is first
-		if (BIT(param,7)==1)
+		if (BIT(param, 7))
 		{
 			reg1 = read_tfr_exg_816_register(param >> 4);
 			reg2 = read_tfr_exg_816_register(param >> 0);
