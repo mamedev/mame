@@ -3708,3 +3708,23 @@ if opt_tool(CPUS, "NIOS2") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nios2/nios2dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nios2/nios2dasm.h")
 end
+
+--------------------------------------------------
+-- IBM 1800, disassembler only
+--@src/devices/cpu/ibm1800/ibm1800.h,CPUS["IBM1800"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "IBM1800") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ibm1800/ibm1800d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ibm1800/ibm1800d.h")
+end
+
+--------------------------------------------------
+-- Data General Nova, disassembler only
+--@src/devices/cpu/nova/nova.h,CPUS["NOVA"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "NOVA") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nova/novadasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nova/novadasm.h")
+end
