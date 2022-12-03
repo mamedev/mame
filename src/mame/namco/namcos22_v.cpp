@@ -1172,8 +1172,9 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 				used in:
 				- acedrive/victlap sparks
 				- adillor title logo
-				- alpinr2b spinning yellow best times in attract mode
 				- alpinr2b mountains in selection screen
+				- alpinr2b spinning yellow best times in attract mode
+				- alpinr2b highscore entry letters
 				- propcycl score/time
 				- propcycl Solitar pillars
 				- ridgerac car when entering highscore
