@@ -671,15 +671,21 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 7: // CG Control Register
 			/*
-			    0x80 = EXRES1
-			    0x40 = EXRES0
+			    0x80 = EXRES1?
+			    0x40 = EXRES0?
 			    0x20 = EXID1
 			    0x10 = EXID0
 			    0x0C = 0x00 = 24kHz, 0x04 = 31kHz, 0x0c = 15kHz
 			    0x01 = EXRGB
 			*/
-			if (data & 0x80)
-				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+
+			// TODO: The IRQ1 clear line is causing Silent Scope's screen to not update
+			// at the correct rate. Bits 6 and 7 always seem to be set even if an IRQ
+			// hasn't been called so they don't appear to be responsible for clearing IRQs,
+			// and ends up clearing IRQs out of turn.
+			// The IRQ0 clear bit is also questionable but games run too fast and crash without it.
+			// if (data & 0x80)
+			// 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
