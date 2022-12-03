@@ -300,7 +300,7 @@ Fatal error: Incorrect layout on track 0 head 0, expected_size=50000, current_si
 		</part>
 	</software>
 
-	<software name="bigtop" supported="no">
+	<software name="bigtop">
 		<description>Big Top (cracked)</description>
 		<year>1983</year>
 		<publisher>Funtastic</publisher>
@@ -399,6 +399,9 @@ Fatal error: Incorrect layout on track 0 head 0, expected_size=50000, current_si
 		<description>Boulder Dash I &amp; II</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Shows a broken EOA logo then hangs at game selection
+]]></notes>
 		<info name="developer" value="First Star Software" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
@@ -458,11 +461,13 @@ Fatal error: Incorrect layout on track 0 head 0, expected_size=50000, current_si
 		</part>
 	</software>
 
-	<!-- Fatal error: Incorrect layout on track 17 head 0, expected_size=100000, current_size=139488 -->
 	<software name="burgtime" supported="no">
 		<description>BurgerTime</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
+		<notes><![CDATA[
+Fatal error: Incorrect layout on track 17 head 0, expected_size=100000, current_size=139488
+]]></notes>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "48162">
