@@ -4525,6 +4525,7 @@ slotsnl                         // 1995
 sltblgp1                        // 1996
 sltblgpo                        // 1996
 sltblgtk                        // 1996
+sltblgtka                       // 1996
 
 @source:bfm/bfm_sc4.cpp
 ad4ctl                          //
