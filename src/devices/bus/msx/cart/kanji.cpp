@@ -49,7 +49,7 @@ void msx_cart_kanji_device::device_start()
 void msx_cart_kanji_device::initialize_cartridge()
 {
 	if (!cart_kanji_region())
-		fatalerror("kanji: KANJI region not setup\n");
+		fatalerror("kanji: KANJI region not set up\n");
 
 	if (cart_kanji_region()->bytes() != 0x20000)
 		fatalerror("kanji: Invalid ROM size\n");
@@ -119,7 +119,7 @@ void msx_cart_msxwrite_device::device_reset()
 void msx_cart_msxwrite_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("msxwrite: ROM region not setup\n");
+		fatalerror("msxwrite: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;

@@ -31,7 +31,7 @@ void msx_cart_arc_device::device_reset()
 void msx_cart_arc_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("arc: ROM region not setup\n");
+		fatalerror("arc: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x8000)
 		fatalerror("arc: Invalid ROM size\n");

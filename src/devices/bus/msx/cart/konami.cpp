@@ -33,7 +33,7 @@ void msx_cart_konami_device::device_reset()
 void msx_cart_konami_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("konami: ROM region not setup\n");
+		fatalerror("konami: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x2000;
@@ -96,7 +96,7 @@ void msx_cart_konami_scc_device::device_reset()
 void msx_cart_konami_scc_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("konami_scc: ROM region not setup\n");
+		fatalerror("konami_scc: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x2000;
@@ -174,10 +174,10 @@ void msx_cart_gamemaster2_device::device_reset()
 void msx_cart_gamemaster2_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("gamemaster2: ROM region not setup\n");
+		fatalerror("gamemaster2: ROM region not set up\n");
 
 	if (!cart_sram_region())
-		fatalerror("gamemaster2: SRAM region not setup\n");
+		fatalerror("gamemaster2: SRAM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x2000;
@@ -250,7 +250,7 @@ void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
 void msx_cart_synthesizer_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("synthesizer: ROM region not setup\n");
+		fatalerror("synthesizer: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x8000)
 		fatalerror("synthesizer: Invalid ROM size\n");
@@ -451,7 +451,7 @@ msx_cart_konami_sound_snatcher_device::msx_cart_konami_sound_snatcher_device(con
 void msx_cart_konami_sound_snatcher_device::initialize_cartridge()
 {
 	if (!cart_ram_region())
-		fatalerror("sound_snatcher: RAM region not setup\n");
+		fatalerror("sound_snatcher: RAM region not set up\n");
 
 	if (cart_ram_region()->bytes() != 0x10000)
 		fatalerror("sound_snatcher: Invalid RAM size\n");
@@ -469,7 +469,7 @@ msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device
 void msx_cart_konami_sound_sdsnatcher_device::initialize_cartridge()
 {
 	if (!cart_ram_region())
-		fatalerror("sound_sdsnatcher: RAM region not setup\n");
+		fatalerror("sound_sdsnatcher: RAM region not set up\n");
 
 	if (cart_ram_region()->bytes() != 0x10000)
 		fatalerror("sound_sdsnatcher: Invalid RAM size\n");
@@ -511,10 +511,10 @@ void msx_cart_keyboard_master_device::device_start()
 void msx_cart_keyboard_master_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("keyboard_master: ROM region not setup\n");
+		fatalerror("keyboard_master: ROM region not set up\n");
 
 	if (!cart_vlm5030_region())
-		fatalerror("keyboard_master: VLM5030 region not setup\n");
+		fatalerror("keyboard_master: VLM5030 region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x4000)
 		fatalerror("keyboard_master: Invalid ROM size\n");
@@ -560,7 +560,7 @@ void msx_cart_ec701_device::device_reset()
 void msx_cart_ec701_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("ec701: ROM region not setup\n");
+		fatalerror("ec701: ROM region not set up\n");
 
 	m_rombank->configure_entries(0, 24, cart_rom_region()->base() + 0x20000, 0x4000);
 

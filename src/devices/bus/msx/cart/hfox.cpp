@@ -23,7 +23,7 @@ void msx_cart_hfox_device::device_reset()
 void msx_cart_hfox_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("hfox: ROM region not setup\n");
+		fatalerror("hfox: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x8000;

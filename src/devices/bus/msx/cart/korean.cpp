@@ -25,7 +25,7 @@ void msx_cart_korean_80in1_device::device_reset()
 void msx_cart_korean_80in1_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("korean_80in1: ROM region not setup\n");
+		fatalerror("korean_80in1: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x2000;
@@ -80,7 +80,7 @@ void msx_cart_korean_90in1_device::device_reset()
 void msx_cart_korean_90in1_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("korean_90in1: ROM region not setup\n");
+		fatalerror("korean_90in1: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x4000;
@@ -136,7 +136,7 @@ void msx_cart_korean_126in1_device::device_reset()
 void msx_cart_korean_126in1_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("korean_126in1: ROM region not setup\n");
+		fatalerror("korean_126in1: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x4000;

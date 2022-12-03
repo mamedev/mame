@@ -16,7 +16,7 @@ msx_cart_rtype_device::msx_cart_rtype_device(const machine_config &mconfig, cons
 void msx_cart_rtype_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("rtype: ROM region not setup\n");
+		fatalerror("rtype: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x80000 && cart_rom_region()->bytes() != 0x60000)
 		fatalerror("rtype: Invalid ROM size\n");

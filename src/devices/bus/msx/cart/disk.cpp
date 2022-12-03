@@ -218,7 +218,7 @@ void msx_cart_disk_device::floppy_formats(format_registration &fr)
 void msx_cart_disk_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("msx_cart_disk_device: ROM region not setup\n");
+		fatalerror("msx_cart_disk_device: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x4000)
 		fatalerror("msx_cart_disk_device: Invalid ROM size\n");
@@ -895,7 +895,7 @@ void fd03_device::device_start()
 void fd03_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("fd03_device:: ROM region not setup\n");
+		fatalerror("fd03_device:: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x4000 && cart_rom_region()->bytes() != 0x8000)
 		fatalerror("fd03_device: Invalid ROM size\n");

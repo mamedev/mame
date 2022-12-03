@@ -17,7 +17,7 @@ msx_cart_super_swangi_device::msx_cart_super_swangi_device(const machine_config 
 void msx_cart_super_swangi_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("super_swangi: ROM region not setup\n");
+		fatalerror("super_swangi: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() < 0x10000)
 		fatalerror("super_swangi: Invalid ROM size\n");

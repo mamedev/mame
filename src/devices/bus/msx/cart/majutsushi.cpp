@@ -27,7 +27,7 @@ void msx_cart_majutsushi_device::device_add_mconfig(machine_config &config)
 void msx_cart_majutsushi_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("majutsushi: ROM region not setup\n");
+		fatalerror("majutsushi: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x20000)
 		fatalerror("majutsushi: Invalid ROM size\n");

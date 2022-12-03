@@ -28,7 +28,7 @@ void msx_cart_fs_sr022_device::device_reset()
 void msx_cart_fs_sr022_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("fs_sr022: ROM region not setup\n");
+		fatalerror("fs_sr022: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x40000)
 		fatalerror("fs_sr022: Invalid ROM size\n");

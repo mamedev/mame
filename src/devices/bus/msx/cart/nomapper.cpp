@@ -42,7 +42,7 @@ void msx_cart_nomapper_device::install_memory()
 void msx_cart_nomapper_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("nomapper: ROM region not setup\n");
+		fatalerror("nomapper: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	u8 *rom = cart_rom_region()->base();

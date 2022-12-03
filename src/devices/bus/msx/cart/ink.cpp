@@ -39,7 +39,7 @@ void msx_cart_ink_device::device_add_mconfig(machine_config &config)
 void msx_cart_ink_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("ink: ROM region not setup\n");
+		fatalerror("ink: ROM region not set up\n");
 
 	const size_t size = std::min<size_t>(0x80000, cart_rom_region()->bytes());
 

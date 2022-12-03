@@ -43,7 +43,7 @@ void msx_cart_easispeech_device::device_add_mconfig(machine_config &config)
 void msx_cart_easispeech_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("easispeech: ROM region not setup\n");
+		fatalerror("easispeech: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x2000)
 		fatalerror("easispeech: Invalid ROM size\n");

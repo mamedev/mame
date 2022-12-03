@@ -101,7 +101,7 @@ void msx_cart_msx_audio_hxmu900_device::device_start()
 void msx_cart_msx_audio_hxmu900_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("msx_audio: ROM region not setup\n");
+		fatalerror("msx_audio: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() < 0x8000)
 		fatalerror("msx_audio: Invalid ROM size\n");
@@ -275,7 +275,7 @@ void msx_cart_msx_audio_fsca1_device::device_reset()
 void msx_cart_msx_audio_fsca1_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("msx_audio_fsca1: ROM region not setup\n");
+		fatalerror("msx_audio_fsca1: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() < 0x20000)
 		fatalerror("msx_audio_fsca1: Invalid ROM size\n");

@@ -26,7 +26,7 @@ void msx_cart_msxdos2_device::device_reset()
 void msx_cart_msxdos2_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("msxdos2: ROM region not setup\n");
+		fatalerror("msxdos2: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x10000)
 		fatalerror("msxdos2: Invalid ROM size\n");

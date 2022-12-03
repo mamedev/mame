@@ -62,10 +62,10 @@ void msx_cart_fmpac_device::device_reset()
 void msx_cart_fmpac_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("fmpac: ROM region not setup\n");
+		fatalerror("fmpac: ROM region not set up\n");
 
 	if (!cart_sram_region())
-		fatalerror("fmpac: SRAM region not setup\n");
+		fatalerror("fmpac: SRAM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x10000)
 		fatalerror("fmpac: Invalid ROM size\n");

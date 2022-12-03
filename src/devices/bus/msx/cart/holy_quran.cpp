@@ -28,7 +28,7 @@ msx_cart_holy_quran_device::msx_cart_holy_quran_device(const machine_config &mco
 void msx_cart_holy_quran_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("holy_quran: ROM region not setup\n");
+		fatalerror("holy_quran: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;

@@ -24,7 +24,7 @@ void msx_cart_dooly_device::device_reset()
 void msx_cart_dooly_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("dooly: ROM region not setup\n");
+		fatalerror("dooly: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x8000)
 		fatalerror("dooly: Invalid ROM size\n");

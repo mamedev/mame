@@ -16,7 +16,7 @@ msx_cart_crossblaim_device::msx_cart_crossblaim_device(const machine_config &mco
 void msx_cart_crossblaim_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("ascii8: ROM region not configured\n");
+		fatalerror("crossblaim: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x10000)
 		fatalerror("crossblaim: Invalid ROM size\n");

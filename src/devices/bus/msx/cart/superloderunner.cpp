@@ -22,7 +22,7 @@ void msx_cart_superloderunner_device::device_start()
 void msx_cart_superloderunner_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("superloderunner: ROM region not setup\n");
+		fatalerror("superloderunner: ROM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x20000)
 		fatalerror("superloderunner: Invalid ROM size\n");

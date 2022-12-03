@@ -27,7 +27,7 @@ void msx_cart_ascii8_device::device_reset()
 void msx_cart_ascii8_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("ascii8: ROM region not configured\n");
+		fatalerror("ascii8: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;
@@ -75,7 +75,7 @@ void msx_cart_ascii16_device::device_reset()
 void msx_cart_ascii16_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("ascii8: ROM region not configured\n");
+		fatalerror("ascii16: ROM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;
@@ -126,10 +126,10 @@ void msx_cart_ascii8_sram_device::device_reset()
 void msx_cart_ascii8_sram_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("ascii8_sram: ROM region not setup\n");
+		fatalerror("ascii8_sram: ROM region not set up\n");
 
 	if (!cart_sram_region())
-		fatalerror("ascii8_sram: SRAM region not setup\n");
+		fatalerror("ascii8_sram: SRAM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;
@@ -205,10 +205,10 @@ void msx_cart_ascii16_sram_device::device_reset()
 void msx_cart_ascii16_sram_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("ascii16_sram: ROM region not setup\n");
+		fatalerror("ascii16_sram: ROM region not set up\n");
 
 	if (!cart_sram_region())
-		fatalerror("ascii16_sram: SRAM region not setup\n");
+		fatalerror("ascii16_sram: SRAM region not set up\n");
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;

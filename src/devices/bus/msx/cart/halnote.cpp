@@ -28,10 +28,10 @@ void msx_cart_halnote_device::device_reset()
 void msx_cart_halnote_device::initialize_cartridge()
 {
 	if (!cart_rom_region())
-		fatalerror("halnote: ROM region not setup\n");
+		fatalerror("halnote: ROM region not set up\n");
 
 	if (!cart_sram_region())
-		fatalerror("halnote: SRAM region not setup\n");
+		fatalerror("halnote: SRAM region not set up\n");
 
 	if (cart_rom_region()->bytes() != 0x100000)
 		fatalerror("halnote: Invalid ROM size\n");
