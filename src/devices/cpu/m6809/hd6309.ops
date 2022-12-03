@@ -797,8 +797,8 @@ INDEXED:
 EXG:
 	{
 		uint8_t param = read_opcode_arg();
-		exgtfr_register reg1 = read_exgtfr_register(param >> 4);
-		exgtfr_register reg2 = read_exgtfr_register(param >> 0);
+		uint16_t reg1 = read_exgtfr_register(param >> 4);
+		uint16_t reg2 = read_exgtfr_register(param >> 0);
 		write_exgtfr_register(param >> 4, reg2);
 		write_exgtfr_register(param >> 0, reg1);
 	}
@@ -808,7 +808,7 @@ EXG:
 TFR:
 	{
 		uint8_t param = read_opcode_arg();
-		exgtfr_register reg = read_exgtfr_register(param >> 4);
+		uint16_t reg = read_exgtfr_register(param >> 4);
 		write_exgtfr_register(param >> 0, reg);
 	}
 	eat(hd6309_native_mode() ? 2 : 4);
