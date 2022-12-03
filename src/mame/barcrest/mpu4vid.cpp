@@ -2488,7 +2488,7 @@ void mpu4vid_state::init_bwbhack()
 
 	logerror("option byte is %02x\n", option);
 	logerror("bit 0: Datapak     = %d\n", (option >> 0) & 1);
-	logerror("bit 1: Fixed %     = %d\n", (option >> 1) & 1);
+	logerror("bit 1: Fixed %%     = %d\n", (option >> 1) & 1);
 	logerror("bit 2: Arcade      = %d\n", (option >> 2) & 1);
 	logerror("bit 3: Switchable  = %d\n", (option >> 3) & 1);
 	logerror("bit 4: Irish       = %d\n", (option >> 4) & 1);
