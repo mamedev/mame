@@ -1384,6 +1384,7 @@ Resets itself while "Loading StoryTeller"
 		</part>
 	</software>
 
+	<!-- TODO: eventually lift supported partial after checking it works ok with 286/386 class machines -->
 	<software name="lockon" supported="partial">
 		<description>Lock On</description>
 		<year>1987</year>
@@ -1397,6 +1398,7 @@ Resets itself while "Loading StoryTeller"
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<!-- not recognized by the game; has an anachronistic MS-DOS 5.0 header -->
+				<!-- Update: "EGA data disk", boots fine in ibm5160 when prompted to -->
 				<rom name="lock-on (disk 2 of 2).img" size="368640" crc="5e7df33e" sha1="bf10963eca71b106bc6ca6b2bedc2b8416da4b1f" status="baddump" />
 			</dataarea>
 		</part>
@@ -3464,7 +3466,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 Doesn't work on intended olivpc1 (mouse goes to the top right corner, doesn't accept function keys). Mouse can be bypassed by preloading flop3 first.
 WordProcessor doesn't draw properly, particularly boxes don't draw opaque making this unusable.
 Uno Paint doesn't accept any input except exit (requires mouse?)
-Gioca 13 contains Italian foul word as default Serie C1d table (intentional? Manual claims normal Italian team names). Elaborazione pronostico crashes with subscript out of range.
+Gioca 13 contains Italian foul word as default Serie C1d table (intentional? Manual claims normal Italian team names tho). Elaborazione pronostico crashes with subscript out of range.
 Albero throws "read only disk" if no disk is in. Otherwise requires a missing Logotron data disk (with back file inside according to manual)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -3514,7 +3516,7 @@ Albero throws "read only disk" if no disk is in. Otherwise requires a missing Lo
 		<year>1990</year>
 		<publisher>PC Globe, Inc</publisher>
 		<notes><![CDATA[
-No text in [VGA] mode
+Text doesn't draw in menu boxes for [VGA] mode
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -3548,7 +3550,7 @@ No text in [VGA] mode
 		<year>1990</year>
 		<publisher>PC Globe, Inc</publisher>
 		<notes><![CDATA[
-No text in [VGA] mode
+Text doesn't draw in menu boxes for [VGA] mode
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -3581,6 +3583,9 @@ No text in [VGA] mode
 		<description>PC Globe 5.04</description>
 		<year>1992</year>
 		<publisher>PC Globe, Inc</publisher>
+		<notes><![CDATA[
+Text doesn't draw in menu boxes for [VGA] mode
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="PC Globe 5.04 [PC Globe] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="284214e4" sha1="6c9a1fe9a0678d922fb994464fdba4abc0748d2c"/>
@@ -3597,6 +3602,9 @@ No text in [VGA] mode
 		<description>PC Globe 5.0 (Spanish)</description>
 		<year>1992</year>
 		<publisher>Broderbund</publisher>
+		<notes><![CDATA[
+Text doesn't draw in menu boxes for [VGA] mode
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="PC Globe 5.0 (Spanish) [Broderbund] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="8d611e3c" sha1="4ad8761012b869bb51f495470389cffef8032efd"/>
@@ -12626,11 +12634,13 @@ Hangs when launching soccer.com
 		</part>
 	</software>
 
-	<!-- black square glitches behind sprites -->
 	<software name="lombrall" supported="partial">
-		<description>Lombard RAC Rally (5.25")</description>
+		<description>Lombard RAC Rally (5.25", France)</description>
 		<year>1989</year>
 		<publisher>Mandarin Software</publisher>
+		<notes><![CDATA[
+Draws transparent pens as opaque in [EGA] mode during gameplay
+]]></notes>
 		<info name="developer" value="Red Rat Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<!-- Dumped via Kryoflux, custom format with copy protection -->
@@ -12647,9 +12657,13 @@ Hangs when launching soccer.com
 	</software>
 
 	<software name="lombrall35" cloneof="lombrall" supported="partial">
+		<!-- English version -->
 		<description>Lombard RAC Rally (3.5")</description>
 		<year>1989</year>
 		<publisher>Mandarin Software</publisher>
+		<notes><![CDATA[
+Draws transparent pens as opaque in [EGA] mode during gameplay
+]]></notes>
 		<info name="developer" value="Red Rat Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
