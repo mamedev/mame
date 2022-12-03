@@ -705,6 +705,7 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 
 	rs232_port_device &rs232(RS232_PORT(config, ACIA_TAG, default_rs232_devices, nullptr));
 	rs232.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(acia));
+	rs232.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(acia));
 	rs232.rxd_handler().set(acia, FUNC(mos6551_device::write_rxd));
 	rs232.dcd_handler().set(acia, FUNC(mos6551_device::write_dcd));
 	rs232.dsr_handler().set(acia, FUNC(mos6551_device::write_dsr));
