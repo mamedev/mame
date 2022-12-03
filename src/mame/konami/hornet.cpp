@@ -392,6 +392,7 @@ public:
 		m_dsp(*this, {"dsp", "dsp2"}), // TODO: hardcoded tags in machine/konpc.cpp
 		m_k037122(*this, "k037122_%u", 0U),
 		m_adc12138(*this, "adc12138"),
+		m_adc12138_sscope(*this, "adc12138_sscope"),
 		m_konppc(*this, "konppc"),
 		m_lan_eeprom(*this, "lan_eeprom"),
 		m_x76f041(*this, "security_eeprom"),
@@ -407,7 +408,8 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_jvs_host(*this, "jvs_host"),
 		m_cg_view(*this, "cg_view"),
-		m_k033906(*this, "k033906_%u", 1U)
+		m_k033906(*this, "k033906_%u", 1U),
+		m_gn676_lan(*this, "gn676_lan")
 	{ }
 
 	void hornet(machine_config &config);
@@ -442,6 +444,7 @@ private:
 	optional_device_array<adsp21062_device, 2> m_dsp;
 	optional_device_array<k037122_device, 2> m_k037122;
 	required_device<adc12138_device> m_adc12138;
+	optional_device<adc12138_device> m_adc12138_sscope;
 	required_device<konppc_device> m_konppc;
 	optional_device<eeprom_serial_93cxx_device> m_lan_eeprom;
 	optional_device<x76f041_device> m_x76f041;
@@ -449,7 +452,7 @@ private:
 	required_ioport_array<3> m_in;
 	required_ioport m_dsw;
 	optional_ioport m_eepromout;
-	optional_ioport_array<3> m_analog;
+	optional_ioport_array<4> m_analog;
 	output_finder<2> m_pcb_digit;
 	optional_region_ptr<uint32_t> m_comm_board_rom;
 	optional_memory_bank m_comm_bank;
@@ -458,12 +461,14 @@ private:
 	required_device<konppc_jvs_host_device> m_jvs_host;
 	memory_view m_cg_view;
 	optional_device_array<k033906_device, 2> m_k033906;
+	optional_device<konami_gn676_lan_device> m_gn676_lan;
 
 	emu_timer *m_sound_irq_timer;
 
 	uint16_t m_gn680_latch;
 	uint16_t m_gn680_ret0;
 	uint16_t m_gn680_ret1;
+	uint16_t m_gn680_check;
 
 	bool m_sndres;
 
@@ -472,8 +477,8 @@ private:
 	void comm1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void comm_rombank_w(uint32_t data);
 	uint32_t comm0_unk_r(offs_t offset, uint32_t mem_mask = ~0);
-	uint32_t gun_r();
-	void gun_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t gun_r(offs_t offset);
+	void gun_w(offs_t offset, uint16_t data);
 	void gn680_sysctrl(uint16_t data);
 	uint16_t gn680_latch_r();
 	void gn680_latch_w(offs_t offset, uint16_t data);
@@ -521,6 +526,11 @@ uint8_t hornet_state::sysreg_r(offs_t offset)
 			break;
 		case 1: // I/O port 1
 			r = m_in[1]->read();
+			if (m_adc12138_sscope)
+			{
+				r &= ~7;
+				r |= m_adc12138_sscope->do_r() | (m_adc12138_sscope->eoc_r() << 2);
+			}
 			break;
 		case 2: // I/O port 2
 			r = m_in[2]->read();
@@ -564,6 +574,14 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 2: // Parallel data register
 			osd_printf_debug("Parallel data = %02X\n", data);
+
+			if (m_adc12138_sscope)
+			{
+				m_adc12138_sscope->cs_w(BIT(data, 4));
+				m_adc12138_sscope->conv_w(BIT(data, 3));
+				m_adc12138_sscope->di_w(BIT(data, 5));
+				m_adc12138_sscope->sclk_w(BIT(data, 7));
+			}
 			break;
 
 		case 3: // System Register 0
@@ -598,6 +616,11 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x02 = ADDI (ADC DI)
 			    0x01 = ADDSCLK (ADC SCLK)
 			*/
+
+			// Set FPGA into a state to accept new firmware
+			if (m_gn676_lan)
+				m_gn676_lan->reset_fpga_state(BIT(data, 6));
+
 			if (m_x76f041)
 			{
 				// HACK: Figure out a way a better way to differentiate between what device it wants to talk to here.
@@ -655,14 +678,21 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 7: // CG Control Register
 			/*
-			    0x80 = EXRES1
-			    0x40 = EXRES0
+			    0x80 = EXRES1?
+			    0x40 = EXRES0?
 			    0x20 = EXID1
 			    0x10 = EXID0
+			    0x0C = 0x00 = 24kHz, 0x04 = 31kHz, 0x0c = 15kHz
 			    0x01 = EXRGB
 			*/
-			if (data & 0x80)
-				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+
+			// TODO: The IRQ1 clear line is causing Silent Scope's screen to not update
+			// at the correct rate. Bits 6 and 7 always seem to be set even if an IRQ
+			// hasn't been called so they don't appear to be responsible for clearing IRQs,
+			// and ends up clearing IRQs out of turn.
+			// The IRQ0 clear bit is also questionable but games run too fast and crash without it.
+			// if (data & 0x80)
+			// 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
@@ -707,16 +737,63 @@ uint32_t hornet_state::comm0_unk_r(offs_t offset, uint32_t mem_mask)
 }
 
 
-uint32_t hornet_state::gun_r()
+uint16_t hornet_state::gun_r(offs_t offset)
 {
-	return m_gn680_ret0<<16 | m_gn680_ret1;
+	uint16_t r = 0;
+
+	// TODO: Replace this with proper emulation of a CCD camera
+	// so the GN680's program can handle inputs normally.
+	if (offset == 0 || offset == 1)
+	{
+		// All values are offset so that the range in-game is
+		// +/- 280 on the X and +/- 220 on the Y axis.
+
+		// Parts of Player 2's Y axis value is included with every read,
+		// so it doesn't have its own index for reading.
+		int16_t p2y = (int16_t)m_analog[3].read_safe(0) - 220;
+
+		r = m_gn680_check;
+
+		switch (m_gn680_latch & 3)
+		{
+			case 1:
+				r |= ((int16_t)m_analog[0].read_safe(0) - 281) & 0x7ff;
+				r |= (p2y & 0x700) << 4;
+				break;
+			case 2:
+				r |= ((int16_t)m_analog[1].read_safe(0) - 220) & 0x7ff;
+				r |= (p2y & 0xf0) << 7;
+				break;
+			case 3:
+				r |= ((int16_t)m_analog[2].read_safe(0) - 280) & 0x7ff;
+				r |= (p2y & 0x0f) << 11;
+				break;
+		}
+
+		switch (offset)
+		{
+			case 0:
+				r = (r >> 8) & 0xff;
+				break;
+			case 1:
+				r &= 0xff;
+				m_gn680_check ^= 0x8000; // Must be in sync with the game every read or the update will be rejected
+				break;
+		}
+	}
+	else
+	{
+		r = m_gn680_ret0<<16 | m_gn680_ret1;
+	}
+
+	return r;
 }
 
-void hornet_state::gun_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hornet_state::gun_w(offs_t offset, uint16_t data)
 {
-	if (mem_mask == 0xffff0000)
+	if (offset == 0)
 	{
-		m_gn680_latch = data>>16;
+		m_gn680_latch = data;
 		m_gn680->set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 }
@@ -775,8 +852,8 @@ void hornet_state::hornet_lan_map(address_map &map)
 {
 	hornet_map(map);
 
-	map(0x7d040000, 0x7d04ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
-	map(0x7d050000, 0x7d05ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
+	map(0x7d040000, 0x7d04ffff).rw(m_gn676_lan, FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
+	map(0x7d050000, 0x7d05ffff).rw(m_gn676_lan, FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
 }
 
 void hornet_state::terabrst_map(address_map &map)
@@ -973,33 +1050,13 @@ static INPUT_PORTS_START( gradius4 )
 	PORT_DIPSETTING( 0x00, "15KHz" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(nbapbp) //Need to add inputs for player 3 and 4.
+static INPUT_PORTS_START(nbapbp)
 	PORT_INCLUDE(gradius4)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME(0x02, 0x02, "Cabinet Type") PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(0x02, "2 Player")
 	PORT_DIPSETTING(0x00, "4 Player")
-
-/*  PORT_START("IN3")
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-
-    PORT_START("IN4")
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(terabrst)
@@ -1014,6 +1071,24 @@ static INPUT_PORTS_START(terabrst)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Bomb")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2 Temp Cursor Speedup")
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x40, 0x40, "Disable Machine Init" ) PORT_DIPLOCATION("SW:2") // Default DIPSW2 to OFF
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
+	// Ranges picked to allow the cursor to go just off screen because the acceptable range is too wide
+	PORT_START("ANALOG1") // P1 Gun X
+	PORT_BIT( 0x7ff, 280, IPT_LIGHTGUN_X ) PORT_MINMAX(0, 560) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_START("ANALOG2") // P1 Gun Y
+	PORT_BIT( 0x7ff, 220, IPT_LIGHTGUN_Y ) PORT_MINMAX(0, 440) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_START("ANALOG3") // P2 Gun X
+	PORT_BIT( 0x7ff, 280, IPT_LIGHTGUN_X ) PORT_MINMAX(0, 560) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(2)
+
+	PORT_START("ANALOG4") // P2 Gun Y
+	PORT_BIT( 0x7ff, 220, IPT_LIGHTGUN_Y ) PORT_MINMAX(0, 440) PORT_SENSITIVITY(35) PORT_KEYDELTA(1) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sscope )
@@ -1027,11 +1102,16 @@ static INPUT_PORTS_START( sscope )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x40, 0x40, "Disable Machine Init" ) PORT_DIPLOCATION("SW:2") // Default DIPSW2 to OFF
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
 	PORT_START("ANALOG1") // Gun Yaw
-	PORT_BIT( 0x7ff, 0x400, IPT_AD_STICK_X ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(20)
+	PORT_BIT( 0x7ff, 0x400, IPT_AD_STICK_X ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(20) PORT_CENTERDELTA(0)
 
 	PORT_START("ANALOG2") // Gun Pitch
-	PORT_BIT( 0x7ff, 0x3ff, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(20) PORT_INVERT
+	PORT_BIT( 0x7ff, 0x3ff, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_INVERT
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sscope2 )
@@ -1076,7 +1156,7 @@ INPUT_PORTS_END
 
     IRQ0:   Vblank CG Board 0
     IRQ1:   Vblank CG Board 1
-    IRQ2:   LANC
+    IRQ2:   LANC (GQ931(H) board), Teraburst (usage unknown)
     DMA0
     NMI:    SCI
 
@@ -1114,6 +1194,8 @@ void hornet_state::machine_reset()
 		if (membank("slave_cgboard_bank"))
 			membank("slave_cgboard_bank")->set_base(memregion("master_cgboard")->base());
 	}
+
+	m_gn680_check = 0x8000;
 }
 
 double hornet_state::adc12138_input_callback(uint8_t input)
@@ -1211,7 +1293,7 @@ void hornet_state::hornet_lan(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::hornet_lan_map);
 
-	KONAMI_GN676_LAN(config, "gn676_lan", 0, m_workram);
+	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
 }
 
 void hornet_state::nbapbp(machine_config &config)
@@ -1278,8 +1360,9 @@ void hornet_state::sscope(machine_config &config)
 	rscreen.set_raw(XTAL(64'000'000) / 4, 1017, 106, 106 + 768, 262, 17, 17 + 236);
 	rscreen.set_screen_update(FUNC(hornet_state::screen_update<1>));
 
-/*  ADC12138(config, m_adc12138_2, 0);
-    m_adc12138->set_ipt_convert_callback(FUNC(hornet_state::sscope_input_callback)); */
+	// Comes from the GQ830-PWB(J) board
+	ADC12138(config, m_adc12138_sscope, 0);
+	m_adc12138_sscope->set_ipt_convert_callback(FUNC(hornet_state::adc12138_input_callback));
 
 	m_konppc->set_num_boards(2);
 }
@@ -1329,7 +1412,6 @@ void hornet_state::sscope2_voodoo1(machine_config& config)
 	DS2401(config, "lan_serial_id");
 	EEPROM_93C46_16BIT(config, "lan_eeprom");
 }
-
 
 /*****************************************************************************/
 
@@ -1394,7 +1476,7 @@ ROM_START(sscope)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ua", 0x000000, 0x002000, BAD_DUMP CRC(458900fb) SHA1(ae2f5477e3999ecce5199fc4a53c5ddf78c4406d) ) // hand built
 ROM_END
 
@@ -1416,7 +1498,7 @@ ROM_START(sscopee)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(7d94272c) SHA1(ef0b3e5d4fcf3cec71caa8e48776f71f850f3b09) ) // hand built
 ROM_END
 
@@ -1438,7 +1520,7 @@ ROM_START(sscopea)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(e8f7ac69) SHA1(93df4d8cc6ae376460873e4f3a95dc3921e5690e) ) // hand built
 ROM_END
 
@@ -1460,7 +1542,7 @@ ROM_START(sscopeuc)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ua", 0x000000, 0x002000, BAD_DUMP CRC(458900fb) SHA1(ae2f5477e3999ecce5199fc4a53c5ddf78c4406d) ) // hand built
 ROM_END
 
@@ -1482,7 +1564,7 @@ ROM_START(sscopeec)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(7d94272c) SHA1(ef0b3e5d4fcf3cec71caa8e48776f71f850f3b09) ) // hand built
 ROM_END
 
@@ -1504,7 +1586,7 @@ ROM_START(sscopeac)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(e8f7ac69) SHA1(93df4d8cc6ae376460873e4f3a95dc3921e5690e) ) // hand built
 ROM_END
 
@@ -1526,7 +1608,7 @@ ROM_START(sscopeub)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ua", 0x000000, 0x002000, BAD_DUMP CRC(458900fb) SHA1(ae2f5477e3999ecce5199fc4a53c5ddf78c4406d) ) // hand built
 ROM_END
 
@@ -1548,7 +1630,7 @@ ROM_START(sscopeeb)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(7d94272c) SHA1(ef0b3e5d4fcf3cec71caa8e48776f71f850f3b09) ) // hand built
 ROM_END
 
@@ -1570,7 +1652,7 @@ ROM_START(sscopejb)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ja", 0x000000, 0x002000, BAD_DUMP CRC(325465c5) SHA1(24524a8eed8f0aa45881bddf65a8fa8ba5270eb1) ) // hand built
 ROM_END
 
@@ -1592,7 +1674,7 @@ ROM_START(sscopeab)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(e8f7ac69) SHA1(93df4d8cc6ae376460873e4f3a95dc3921e5690e) ) // hand built
 ROM_END
 
@@ -1614,7 +1696,7 @@ ROM_START(sscopeua)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ua", 0x000000, 0x002000, BAD_DUMP CRC(458900fb) SHA1(ae2f5477e3999ecce5199fc4a53c5ddf78c4406d) ) // hand built
 ROM_END
 
@@ -1636,7 +1718,7 @@ ROM_START(sscopeea)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(7d94272c) SHA1(ef0b3e5d4fcf3cec71caa8e48776f71f850f3b09) ) // hand built
 ROM_END
 
@@ -1658,7 +1740,7 @@ ROM_START(sscopeja)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ja", 0x000000, 0x002000, BAD_DUMP CRC(325465c5) SHA1(24524a8eed8f0aa45881bddf65a8fa8ba5270eb1) ) // hand built
 ROM_END
 
@@ -1680,7 +1762,7 @@ ROM_START(sscopeaa)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(e8f7ac69) SHA1(93df4d8cc6ae376460873e4f3a95dc3921e5690e) ) // hand built
 ROM_END
 
@@ -1702,7 +1784,7 @@ ROM_START(sscopevd2)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ua", 0x000000, 0x002000, BAD_DUMP CRC(458900fb) SHA1(ae2f5477e3999ecce5199fc4a53c5ddf78c4406d) ) // hand built
 ROM_END
 
@@ -1724,7 +1806,7 @@ ROM_START(sscopeevd2)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(7d94272c) SHA1(ef0b3e5d4fcf3cec71caa8e48776f71f850f3b09) ) // hand built
 ROM_END
 
@@ -1746,7 +1828,7 @@ ROM_START(sscopeavd2)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(e8f7ac69) SHA1(93df4d8cc6ae376460873e4f3a95dc3921e5690e) ) // hand built
 ROM_END
 
@@ -1768,7 +1850,7 @@ ROM_START(sscopeucvd2)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ua", 0x000000, 0x002000, BAD_DUMP CRC(458900fb) SHA1(ae2f5477e3999ecce5199fc4a53c5ddf78c4406d) ) // hand built
 ROM_END
 
@@ -1790,7 +1872,7 @@ ROM_START(sscopeecvd2)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(7d94272c) SHA1(ef0b3e5d4fcf3cec71caa8e48776f71f850f3b09) ) // hand built
 ROM_END
 
@@ -1812,7 +1894,7 @@ ROM_START(sscopeacvd2)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(e8f7ac69) SHA1(93df4d8cc6ae376460873e4f3a95dc3921e5690e) ) // hand built
 ROM_END
 
@@ -1834,7 +1916,7 @@ ROM_START(sscopeubvd2)
 	ROM_LOAD( "830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ua", 0x000000, 0x002000, BAD_DUMP CRC(458900fb) SHA1(ae2f5477e3999ecce5199fc4a53c5ddf78c4406d) ) // hand built
 ROM_END
 
@@ -1860,7 +1942,7 @@ ROM_START(sscope2)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -1892,7 +1974,7 @@ ROM_START(sscope2e)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(832f9148) SHA1(42a8cc9436eaa79b5bab242692e18c3807f6af74) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -1924,7 +2006,7 @@ ROM_START(sscope2j)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ja", 0x000000, 0x002000, BAD_DUMP CRC(d16ac629) SHA1(92c65a67ef201912e4f81d896126b045c5cc2072) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -1956,7 +2038,7 @@ ROM_START(sscope2a)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(164c1a0d) SHA1(9f7e6cc1acae114aa97d9ed435661bf9c8b845c5) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -1988,7 +2070,7 @@ ROM_START(sscope2uc)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2020,7 +2102,7 @@ ROM_START(sscope2ec)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(832f9148) SHA1(42a8cc9436eaa79b5bab242692e18c3807f6af74) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2052,7 +2134,7 @@ ROM_START(sscope2jc)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ja", 0x000000, 0x002000, BAD_DUMP CRC(d16ac629) SHA1(92c65a67ef201912e4f81d896126b045c5cc2072) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2084,7 +2166,7 @@ ROM_START(sscope2ac)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(164c1a0d) SHA1(9f7e6cc1acae114aa97d9ed435661bf9c8b845c5) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2116,7 +2198,7 @@ ROM_START(sscope2ub)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2148,7 +2230,7 @@ ROM_START(sscope2eb)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(832f9148) SHA1(42a8cc9436eaa79b5bab242692e18c3807f6af74) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2180,7 +2262,7 @@ ROM_START(sscope2jb)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ja", 0x000000, 0x002000, BAD_DUMP CRC(d16ac629) SHA1(92c65a67ef201912e4f81d896126b045c5cc2072) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2212,7 +2294,7 @@ ROM_START(sscope2ab)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(164c1a0d) SHA1(9f7e6cc1acae114aa97d9ed435661bf9c8b845c5) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2244,7 +2326,7 @@ ROM_START(sscope2vd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2276,7 +2358,7 @@ ROM_START(sscope2evd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(832f9148) SHA1(42a8cc9436eaa79b5bab242692e18c3807f6af74) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2308,7 +2390,7 @@ ROM_START(sscope2jvd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ja", 0x000000, 0x002000, BAD_DUMP CRC(d16ac629) SHA1(92c65a67ef201912e4f81d896126b045c5cc2072) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2340,7 +2422,7 @@ ROM_START(sscope2avd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(164c1a0d) SHA1(9f7e6cc1acae114aa97d9ed435661bf9c8b845c5) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2372,7 +2454,7 @@ ROM_START(sscope2ucvd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2404,7 +2486,7 @@ ROM_START(sscope2ecvd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(832f9148) SHA1(42a8cc9436eaa79b5bab242692e18c3807f6af74) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2436,7 +2518,7 @@ ROM_START(sscope2jcvd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ja", 0x000000, 0x002000, BAD_DUMP CRC(d16ac629) SHA1(92c65a67ef201912e4f81d896126b045c5cc2072) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2468,7 +2550,7 @@ ROM_START(sscope2acvd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(164c1a0d) SHA1(9f7e6cc1acae114aa97d9ed435661bf9c8b845c5) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2500,7 +2582,7 @@ ROM_START(sscope2ubvd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2532,7 +2614,7 @@ ROM_START(sscope2ebvd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ea", 0x000000, 0x002000, BAD_DUMP CRC(832f9148) SHA1(42a8cc9436eaa79b5bab242692e18c3807f6af74) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2564,7 +2646,7 @@ ROM_START(sscope2jbvd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_ja", 0x000000, 0x002000, BAD_DUMP CRC(d16ac629) SHA1(92c65a67ef201912e4f81d896126b045c5cc2072) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2596,7 +2678,7 @@ ROM_START(sscope2abvd1)
 	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
 	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aa", 0x000000, 0x002000, BAD_DUMP CRC(164c1a0d) SHA1(9f7e6cc1acae114aa97d9ed435661bf9c8b845c5) ) // hand built
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
@@ -2628,7 +2710,7 @@ ROM_START(gradius4)
 	ROM_LOAD( "837a09.16p",   0x000000, 0x400000, CRC(fb8f3dc2) SHA1(69e314ac06308c5a24309abc3d7b05af6c0302a8) )
 	ROM_LOAD( "837a10.14p",   0x400000, 0x400000, CRC(1419cad2) SHA1(a6369a5c29813fa51e8246d0c091736f32994f3d) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_jac", 0x000000, 0x002000, BAD_DUMP CRC(935f9d05) SHA1(c3a787dff1b2ac4942858ffa1574405db01292b6) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2657,7 +2739,7 @@ ROM_START(gradius4u)
 	ROM_LOAD( "837a09.16p",   0x000000, 0x400000, CRC(fb8f3dc2) SHA1(69e314ac06308c5a24309abc3d7b05af6c0302a8) )
 	ROM_LOAD( "837a10.14p",   0x400000, 0x400000, CRC(1419cad2) SHA1(a6369a5c29813fa51e8246d0c091736f32994f3d) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_uac", 0x000000, 0x002000, BAD_DUMP CRC(cc8986c1) SHA1(a32bc175acae48bede7a97629e215ab4fb6954c6) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2686,7 +2768,7 @@ ROM_START(gradius4a)
 	ROM_LOAD( "837a09.16p",   0x000000, 0x400000, CRC(fb8f3dc2) SHA1(69e314ac06308c5a24309abc3d7b05af6c0302a8) )
 	ROM_LOAD( "837a10.14p",   0x400000, 0x400000, CRC(1419cad2) SHA1(a6369a5c29813fa51e8246d0c091736f32994f3d) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aac", 0x000000, 0x002000, BAD_DUMP CRC(7977736d) SHA1(149ae7bc4987362f928a6c0c1e9671c2396ac811) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2715,7 +2797,7 @@ ROM_START(gradius4ja)
 	ROM_LOAD( "837a09.16p",   0x000000, 0x400000, CRC(fb8f3dc2) SHA1(69e314ac06308c5a24309abc3d7b05af6c0302a8) )
 	ROM_LOAD( "837a10.14p",   0x400000, 0x400000, CRC(1419cad2) SHA1(a6369a5c29813fa51e8246d0c091736f32994f3d) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_jaa", 0x000000, 0x002000, BAD_DUMP CRC(264dc314) SHA1(1800b93063a6b3d424c329e124acc30814eb7ef0) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2744,7 +2826,7 @@ ROM_START(gradius4ua)
 	ROM_LOAD( "837a09.16p",   0x000000, 0x400000, CRC(fb8f3dc2) SHA1(69e314ac06308c5a24309abc3d7b05af6c0302a8) )
 	ROM_LOAD( "837a10.14p",   0x400000, 0x400000, CRC(1419cad2) SHA1(a6369a5c29813fa51e8246d0c091736f32994f3d) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_uaa", 0x000000, 0x002000, BAD_DUMP CRC(799bd8d0) SHA1(c69b5bb99657c2fdb71049ba1db0075a024fe8ff) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2773,7 +2855,7 @@ ROM_START(gradius4aa)
 	ROM_LOAD( "837a09.16p",   0x000000, 0x400000, CRC(fb8f3dc2) SHA1(69e314ac06308c5a24309abc3d7b05af6c0302a8) )
 	ROM_LOAD( "837a10.14p",   0x400000, 0x400000, CRC(1419cad2) SHA1(a6369a5c29813fa51e8246d0c091736f32994f3d) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_aaa", 0x000000, 0x002000, BAD_DUMP CRC(cc652d7c) SHA1(238086ba9eac26e6ae4217e085859e40f98a5050) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2804,7 +2886,7 @@ ROM_START(nbapbp) // only the PowerPC program rom present in the archive
 	ROM_LOAD( "778a11.12p",   0x800000, 0x400000, CRC(40199382) SHA1(bee268adf9b6634a4f6bb39278ecd02f2bdcb1f4) )
 	ROM_LOAD( "778a12.9p",    0xc00000, 0x400000, CRC(27d0c724) SHA1(48e48cbaea6db0de8c3471a2eda6faaa16eed46e) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(3cff1b1d) SHA1(bed0fc657a785be0c69bb21ad52365635c83d751) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2835,7 +2917,7 @@ ROM_START(nbapbpa) // only the PowerPC program rom present in the archive
 	ROM_LOAD( "778a11.12p",   0x800000, 0x400000, CRC(40199382) SHA1(bee268adf9b6634a4f6bb39278ecd02f2bdcb1f4) )
 	ROM_LOAD( "778a12.9p",    0xc00000, 0x400000, CRC(27d0c724) SHA1(48e48cbaea6db0de8c3471a2eda6faaa16eed46e) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(3cff1b1d) SHA1(bed0fc657a785be0c69bb21ad52365635c83d751) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2866,7 +2948,7 @@ ROM_START(nbapbpj) // only the PowerPC program rom present in the archive
 	ROM_LOAD( "778a11.12p",   0x800000, 0x400000, CRC(40199382) SHA1(bee268adf9b6634a4f6bb39278ecd02f2bdcb1f4) )
 	ROM_LOAD( "778a12.9p",    0xc00000, 0x400000, CRC(27d0c724) SHA1(48e48cbaea6db0de8c3471a2eda6faaa16eed46e) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(3cff1b1d) SHA1(bed0fc657a785be0c69bb21ad52365635c83d751) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2897,7 +2979,7 @@ ROM_START(nbapbpua)
 	ROM_LOAD( "778a11.12p",   0x800000, 0x400000, CRC(40199382) SHA1(bee268adf9b6634a4f6bb39278ecd02f2bdcb1f4) )
 	ROM_LOAD( "778a12.9p",    0xc00000, 0x400000, CRC(27d0c724) SHA1(48e48cbaea6db0de8c3471a2eda6faaa16eed46e) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(3cff1b1d) SHA1(bed0fc657a785be0c69bb21ad52365635c83d751) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2928,7 +3010,7 @@ ROM_START(nbapbpaa)
 	ROM_LOAD( "778a11.12p",   0x800000, 0x400000, CRC(40199382) SHA1(bee268adf9b6634a4f6bb39278ecd02f2bdcb1f4) )
 	ROM_LOAD( "778a12.9p",    0xc00000, 0x400000, CRC(27d0c724) SHA1(48e48cbaea6db0de8c3471a2eda6faaa16eed46e) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(3cff1b1d) SHA1(bed0fc657a785be0c69bb21ad52365635c83d751) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2959,7 +3041,7 @@ ROM_START(nbapbpja)
 	ROM_LOAD( "778a11.12p",   0x800000, 0x400000, CRC(40199382) SHA1(bee268adf9b6634a4f6bb39278ecd02f2bdcb1f4) )
 	ROM_LOAD( "778a12.9p",    0xc00000, 0x400000, CRC(27d0c724) SHA1(48e48cbaea6db0de8c3471a2eda6faaa16eed46e) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(3cff1b1d) SHA1(bed0fc657a785be0c69bb21ad52365635c83d751) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -2990,7 +3072,7 @@ ROM_START(nbaatw) // only the PowerPC program rom present in the archive
 	ROM_LOAD( "778a11.12p",   0x800000, 0x400000, CRC(40199382) SHA1(bee268adf9b6634a4f6bb39278ecd02f2bdcb1f4) )
 	ROM_LOAD( "778a12.9p",    0xc00000, 0x400000, CRC(27d0c724) SHA1(48e48cbaea6db0de8c3471a2eda6faaa16eed46e) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(3cff1b1d) SHA1(bed0fc657a785be0c69bb21ad52365635c83d751) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -3021,7 +3103,7 @@ ROM_START(nbaatwa)
 	ROM_LOAD( "778a11.12p",   0x800000, 0x400000, CRC(40199382) SHA1(bee268adf9b6634a4f6bb39278ecd02f2bdcb1f4) )
 	ROM_LOAD( "778a12.9p",    0xc00000, 0x400000, CRC(27d0c724) SHA1(48e48cbaea6db0de8c3471a2eda6faaa16eed46e) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(3cff1b1d) SHA1(bed0fc657a785be0c69bb21ad52365635c83d751) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -3051,7 +3133,7 @@ ROM_START(terabrst)
 	ROM_REGION(0x20000, "gn680", 0)     // 68K Program
 	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "715uel_m48t58y.35d", 0x000000, 0x002000, CRC(57322db4) SHA1(59cb8cd6ab446bf8781e3dddf902a4ff2484068e) )
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -3081,7 +3163,7 @@ ROM_START(terabrstj)
 	ROM_REGION(0x20000, "gn680", 0)     // 68K Program
 	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_jel", 0x000000, 0x002000, BAD_DUMP CRC(bcf8610f) SHA1(b52e4ca707cf36f16fb3ba29a8a8f5dc4a42be7b) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -3111,7 +3193,7 @@ ROM_START(terabrsta)
 	ROM_REGION(0x20000, "gn680", 0)     // 68K Program
 	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_hel", 0x000000, 0x002000, BAD_DUMP CRC(1bf1278d) SHA1(40d437eb7428a42c0d8eb47cbcebc95ff8dc1767) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -3141,7 +3223,7 @@ ROM_START(terabrstua)
 	ROM_REGION(0x20000, "gn680", 0)     // 68K Program
 	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_uaa", 0x000000, 0x002000, BAD_DUMP CRC(60509b6a) SHA1(5938587770bdf5569c8b4c7413967869bddfcf84) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -3171,7 +3253,7 @@ ROM_START(terabrstja)
 	ROM_REGION(0x20000, "gn680", 0)     // 68K Program
 	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_jaa", 0x000000, 0x002000, BAD_DUMP CRC(ac54bdf9) SHA1(0139d29db112f9581a94091c2fac008e5c9f855d) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
@@ -3201,14 +3283,14 @@ ROM_START(terabrstaa)
 	ROM_REGION(0x20000, "gn680", 0)     // 68K Program
 	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
 
-	ROM_REGION(0x2000, "m48t58",0)
+	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_haa", 0x000000, 0x002000, BAD_DUMP CRC(960b864e) SHA1(9f6d7b81689777b98c0e1b6ac41135604da48429) ) // hand built
 
 	ROM_REGION( 0x0000224, "security_eeprom", 0 )
 	ROM_LOAD( "security_eeprom", 0x000000, 0x000224, NO_DUMP ) // Unused?
 ROM_END
 
-ROM_START(thrilldbu) // GE713UF sticker, does not have the chip at 2G since it uses the rev A network board
+ROM_START(thrilldgeu) // GE713UF sticker, does not have the chip at 2G since it uses the rev A network board
 	ROM_REGION32_BE(0x400000, "prgrom", ROMREGION_ERASEFF) // PowerPC program roms
 	ROM_LOAD16_WORD_SWAP("713ab01.27p", 0x200000, 0x200000, CRC(a005d728) SHA1(8e265b1bb3adb7db2d342d3c0e3361a7174cb54d) )
 	ROM_RELOAD(0x000000, 0x200000)
@@ -3228,9 +3310,178 @@ ROM_START(thrilldbu) // GE713UF sticker, does not have the chip at 2G since it u
 	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "713uab_m48t58y.35d", 0x000000, 0x002000, CRC(33a5250f) SHA1(3ffe2c812b341a9ed805c791c9dcfcb7587fbf3a) )
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "ge713uf_m48t58y.35d", 0x000000, 0x002000, CRC(39f521d4) SHA1(2a1a574eb5830d40f5db87464785a159a5ab252d) ) // hand built
 ROM_END
+
+ROM_START(thrilldgnj)
+	ROM_REGION32_BE(0x400000, "prgrom", ROMREGION_ERASEFF) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713ab01.27p", 0x200000, 0x200000, CRC(a005d728) SHA1(8e265b1bb3adb7db2d342d3c0e3361a7174cb54d) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gn713ja_m48t58y.35d", 0x000000, 0x002000, CRC(4496250d) SHA1(d433dc63afb3fd1c0ce772a62bec0e026d0e278c) ) // hand built
+ROM_END
+
+ROM_START(thrilldgmj)
+	ROM_REGION32_BE(0x400000, "prgrom", ROMREGION_ERASEFF) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713ab01.27p", 0x200000, 0x200000, CRC(a005d728) SHA1(8e265b1bb3adb7db2d342d3c0e3361a7174cb54d) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm713ja_m48t58y.35d", 0x000000, 0x002000, CRC(96792a3f) SHA1(f05e9f83fc655da2b300e2a17b71a52b7933cfb2) ) // hand built
+ROM_END
+
+ROM_START(thrilldgpj)
+	ROM_REGION32_BE(0x400000, "prgrom", ROMREGION_ERASEFF) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713ab01.27p", 0x200000, 0x200000, CRC(a005d728) SHA1(8e265b1bb3adb7db2d342d3c0e3361a7174cb54d) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gp713ja_m48t58y.35d", 0x000000, 0x002000, CRC(2a5011ef) SHA1(9bac6d95d2f035ad1fd1b91810be198fa6e4c7ce) ) // hand built
+ROM_END
+
+ROM_START(thrilldgej)
+	ROM_REGION32_BE(0x400000, "prgrom", ROMREGION_ERASEFF) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713ab01.27p", 0x200000, 0x200000, CRC(a005d728) SHA1(8e265b1bb3adb7db2d342d3c0e3361a7174cb54d) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "ge713ja_m48t58y.35d", 0x000000, 0x002000, CRC(f484975b) SHA1(027097109a850d38376b79e5a5f844d357967f2c) ) // hand built
+ROM_END
+
+ROM_START(thrilldgke)
+	ROM_REGION32_BE(0x400000, "prgrom", ROMREGION_ERASEFF) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713ab01.27p", 0x200000, 0x200000, CRC(a005d728) SHA1(8e265b1bb3adb7db2d342d3c0e3361a7174cb54d) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gk713ea_m48t58y.35d", 0x000000, 0x002000, CRC(3e77a0b9) SHA1(fdbd0b72447cb8077ae614864452152223fd2b57) ) // hand built
+ROM_END
+
+ROM_START(thrilldgkee)
+	ROM_REGION32_BE(0x400000, "prgrom", ROMREGION_ERASEFF) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713ab01.27p", 0x200000, 0x200000, CRC(a005d728) SHA1(8e265b1bb3adb7db2d342d3c0e3361a7174cb54d) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gk713ee_m48t58y.35d", 0x000000, 0x002000, CRC(ac6a7648) SHA1(73d06b219c2d6859a565d1b0d3dea79268cc3795) ) // hand built
+ROM_END
+
+ROM_START(thrilldgkk)
+	ROM_REGION32_BE(0x400000, "prgrom", ROMREGION_ERASEFF) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713ab01.27p", 0x200000, 0x200000, CRC(a005d728) SHA1(8e265b1bb3adb7db2d342d3c0e3361a7174cb54d) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gk713ka_m48t58y.35d", 0x000000, 0x002000, CRC(688f5164) SHA1(0617e2e2a0078854e2344412f8c4fbee22452ba1) ) // hand built
+ROM_END
+
 
 } // Anonymous namespace
 
@@ -3268,7 +3519,24 @@ GAME(  1998, terabrstja, terabrst, terabrst,   terabrst, hornet_state, init_horn
 GAME(  1998, terabrstaa, terabrst, terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/02/25 ver HAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // identifies as NWK-LC system
-GAME(  1998, thrilldbu, thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // heavy GFX glitches, fails wheel motor test, for now it's possible to get in game by switching "SW:2" to on
+// heavy GFX glitches, fails wheel motor test, for now it's possible to get in game by switching "SW:2" to on
+// notable version differences:
+// GN713JA handbrake, 5+R shifter, no clutch
+// GM713JA handbrake, up/down shifter, no clutch
+// GP713JA no handbrake, up/down shifter, no clutch
+// GE713JA handbrake, 5+R shifter, clutch
+// GE713UF no handbrake, no clutch. settings configurable on boot: brake pedal, shifter (up/down, 4 pos, 5+R), steering motor type (A, W, H types)
+// GK713EA no clutch. settings configurable on boot: handbrake lever, shifter (up/down, 4 pos, 5+R), shifter display position (right/left)
+// GK713EE no clutch. settings configurable on boot: handbrake lever, shifter (up/down, 4 pos, 5+R), shifter display position (right/left)
+// GK713K* no handbrake, up/down shifter, no clutch, English only version of GP713JA?
+GAME(  1998, thrilldgeu,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgnj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GN713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgmj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GM713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgpj,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GP713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgej,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GE713JAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgke,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EAB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgkee, thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713EEB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, thrilldgkk,  thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver GK713K*B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // Revisions C and D removed Japanese region support but introduced Voodoo 2 support.
 GAMEL( 1999, sscope,   0,      sscope, sscope, hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )

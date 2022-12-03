@@ -465,8 +465,14 @@ data_node *data_node::copy_into(data_node &parent) const
 			}
 			else
 			{
-				dst = dst->get_parent();
-				src = src->get_parent()->get_next_sibling();
+				do
+				{
+					dst = dst->get_parent();
+					src = src->get_parent();
+					next = src->get_next_sibling();
+				}
+				while (!next && (&parent != dst));
+				src = next;
 			}
 		}
 	}

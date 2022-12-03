@@ -4525,6 +4525,7 @@ slotsnl                         // 1995
 sltblgp1                        // 1996
 sltblgpo                        // 1996
 sltblgtk                        // 1996
+sltblgtka                       // 1996
 
 @source:bfm/bfm_sc4.cpp
 ad4ctl                          //
@@ -9370,12 +9371,6 @@ b85royal                        //
 b85scard                        // (c) 198? BFM
 b85sngam                        //
 
-@source:misc/bgt.cpp
-bg_barmy                        //
-bg_ddb                          //
-bg_max                          //
-bg_maxa                         //
-
 @source:msx/big10.cpp
 big10                           // (c) 198? Unknown
 
@@ -11012,7 +11007,6 @@ ganbare                         // 11/04/2000 (c) 2000 (Japan)
 ghouls                          // 12/1988 (c) 1988 (World)
 ghoulsu                         // 12/1988 (c) 1988 (USA)
 gulunpa                         //
-hkittymp                        // 12/07/1996 (c) 1996 (Japan)
 knights                         // 27/11/1991 (c) 1991 (World)
 knightsb2                       // bootleg
 knightsj                        // 27/11/1991 (c) 1991 (Japan)
@@ -11035,6 +11029,7 @@ mercs                           // 02/03/1990 (c) 1990 (World)
 mercsj                          // 02/03/1990 (c) 1990 (Japan)
 mercsu                          // 08/06/1990 (c) 1990 (USA)
 mercsur1                        // 02/03/1990 (c) 1990 (USA)
+mpumpkin                        // 12/07/1996 (c) 1996 (Japan)
 msword                          // 25/07/1990 (c) 1990 (World)
 mswordj                         // 23/06/1990 (c) 1990 (Japan)
 mswordr1                        // 23/06/1990 (c) 1990 (World)
@@ -16764,10 +16759,12 @@ kdribble                        // Konami
 kgarfld                         // Konami
 kgradius                        // Konami
 kloneran                        // Konami
+knascar                         // Konami
 knfl                            // Konami
 kosmicmt                        // Elektronika
 kosmicpt                        // Elektronika
 krybolov                        // Elektronika
+kskatedie                       // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
 kvakazad                        // Elektronika
@@ -17190,7 +17187,14 @@ terabrstaa                      // GX715 (c)1998 Asia HAA 1998/02/25
 terabrstj                       // GX715 (c)1998 Japan JEL 1998/07/17
 terabrstja                      // GX715 (c)1998 Japan JAA 1998/02/25
 terabrstua                      // GX715 (c)1998 USA UAA 1998/02/25
-thrilldbu                       // GE713UF (c)1998 ?AB
+thrilldgej                      // GE713JA (c)1998 GE713JAB
+thrilldgeu                      // GE713UF (c)1998 GE713UFB
+thrilldgke                      // GK713EA (c)1998 GK713EAB
+thrilldgkee                     // GK713EE (c)1998 GK713EEB
+thrilldgkk                      // GK713K* (c)1998 GK713K*B
+thrilldgmj                      // GM713JA (c)1998 GM713JAB
+thrilldgnj                      // GN713JA (c)1998 GN713JAB
+thrilldgpj                      // GP713JA (c)1998 GP713JAB
 
 @source:misc/hotblock.cpp
 hotblock                        // (c) 1993 Nics? / NIX?
@@ -33538,6 +33542,10 @@ npssr2                          //
 npusagif                        //
 
 @source:cirsa/neptunp2.cpp
+bg_barmy                        //
+bg_ddb                          //
+bg_max                          //
+bg_maxa                         //
 ccorsario                       // (c) 2002 Cirsa / Unidesa
 mltpoints                       // (c) 2006 Cirsa / Unidesa
 neptunp2                        // (c) 2003 Cirsa / Unidesa
@@ -34152,12 +34160,26 @@ nss_ssoc                        // 1992 Human Inc.
 nss_sten                        // 199? Nintendo
 
 @source:konami/nwk-tr.cpp
-racingj                         // GX676 (c)1998
-racingj2                        // GX888 (c)1999 (EAE)
-racingj2j                       // GX888 (c)1999 (JAE)
-thrilld                         // GX713 (c)1998 Japan JAE
-thrilldb                        // GX713 (c)1998 Japan JAB
-thrilldbe                       // GX713 (c)1998 Europe EAB
+racingj                         // GQ676 (c)1998 (UAC)
+racingj2                        // GQ888 (c)1999 (UAA)
+racingj2a                       // GQ888 (c)1999 (AAA)
+racingj2e                       // GQ888 (c)1999 (EAA)
+racingj2j                       // GQ888 (c)1999 (JAA)
+racingja                        // GQ676 (c)1998 (AAC)
+racingje                        // GQ676 (c)1998 (EAC)
+racingjj                        // GQ676 (c)1998 (JAC)
+thrilld                         // GC713 (c)1998 Japan UDE
+thrillda                        // GC713 (c)1998 Japan ACE
+thrilldab                       // GC713 (c)1998 Japan ABE
+thrilldb                        // GC713 (c)1998 Japan UDB
+thrilldba                       // GC713 (c)1998 Japan ACB
+thrilldbab                      // GC713 (c)1998 Japan ABB
+thrilldbe                       // GC713 (c)1998 Japan EDB
+thrilldbj                       // GC713 (c)1998 Japan JCB
+thrilldbja                      // GC713 (c)1998 Japan JAB
+thrillde                        // GC713 (c)1998 Japan EDE
+thrilldj                        // GC713 (c)1998 Japan JCE
+thrilldja                       // GC713 (c)1998 Japan JAE
 
 @source:taito/nycaptor.cpp
 bronx                           // bootleg
@@ -40528,6 +40550,7 @@ mausuke                         // 1996.07 Mausuke no Ojama the World (Data East
 micrombc                        // 1999.03 Microman Battle Charge
 myfairld                        // 1998.07 My Fair Lady (Micronet)
 nameclub                        // 1996.03 Name Club
+nclubdis                        // 1998.06 Name Club Disney
 nclubv2                         // 1996.03 Name Club Ver. 2
 nclubv3                         // 1997.07 Name Club Ver. 3
 othellos                        // 1998.07 Othello Shiyouyo (Success)

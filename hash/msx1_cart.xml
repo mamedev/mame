@@ -1932,18 +1932,6 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- Softcard -->
-	<software name="backgamm">
-		<description>Backgammon (Euro)</description>
-		<year>1984</year>
-		<publisher>Electric Software</publisher>
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="backgammon (europe).rom" size="32768" crc="b3694e5a" sha1="363b5a8c94cdb63a7ee72b9d25f7b5053cab319a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="backgamj">
 		<description>Back Gammon (Jpn)</description>
 		<year>1984</year>
@@ -2493,20 +2481,6 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="bomber man (1986)(korea soft bank)[a].rom" size="8192" crc="c9a2c37e" sha1="8976f8b8ab2a82f626a73c781d0a21899ae68dae" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Bee Card -->
-	<software name="bombmnsp">
-		<description>Bomber Man Special (Jpn)</description>
-		<year>1986</year>
-		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="BC-M7" />
-		<info name="alt_title" value="ボンバーマンスペシャル" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="bomber man special (japan).rom" size="32768" crc="042ad44d" sha1="e700493e1c4c14f711e9c1c262fe3e8d76931ca3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7587,19 +7561,6 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- Softcard -->
-	<software name="lemans2">
-		<description>Le Mans 2 (Euro)</description>
-		<year>1984</year>
-		<publisher>Electric Software</publisher>
-		<info name="serial" value="5305" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="le mans 2 (europe).rom" size="32768" crc="82dddc34" sha1="f69541b86c2b396cdce765c2dec498e11232b3c9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 <!-- Which is the right hardware and which has been hacked to run on the modified pcb? -->
 	<software name="legendk">
 		<description>Legendly Knight - Daemaseong (Kor)</description>
@@ -9834,20 +9795,6 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- Bee Card -->
-	<software name="pooyan">
-		<description>Pooyan (Jpn)</description>
-		<year>1985</year>
-		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="BC-M5" />
-		<info name="alt_title" value="コナミのプーヤン ~ Konami no Pooyan (Box?)" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="pooyan (japan).rom" size="16384" crc="558a09f6" sha1="692a55393e8eef0800a612c01456e9cecd9c1418" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="poppaq">
 		<description>Poppaq the Fish (Jpn)</description>
 		<year>1984</year>
@@ -11070,60 +11017,6 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="star command (japan).rom" size="16384" crc="4579ce12" sha1="225894da7e3afabf33abf05e519e1f6bcac77a21" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="starfrce">
-		<description>Star Force (Jpn)</description>
-		<year>1985</year>
-		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="BC-M2" />
-		<info name="alt_title" value="スターフォース" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="star force (japan).rom" size="32768" crc="c14e53a1" sha1="c1746efeb4b44dcc80dfc4f429009feac91d9c48" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="starfrcea" cloneof="starfrce">
-		<description>Star Force (Jpn, Alt)</description>
-		<year>1985</year>
-		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="BC-M2" />
-		<info name="alt_title" value="スターフォース" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="star force (japan) (alt 1).rom" size="32768" crc="e9de7e32" sha1="5fe86465119343804a722ce4768eb33de806a39f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Bee Card -->
-	<software name="starsold">
-		<description>Star Soldier (Jpn)</description>
-		<year>1986</year>
-		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="BC-M8" />
-		<info name="alt_title" value="スターソルジャー" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="star soldier (japan).rom" size="32768" crc="0b3d975d" sha1="6a56b46b8bf014b25863433d6d96e64641a93eef" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Bee Card -->
-	<software name="starsolda" cloneof="starsold">
-		<description>Star Soldier (Jpn, Alt)</description>
-		<year>1986</year>
-		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="BC-M8" />
-		<info name="alt_title" value="スターソルジャー" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="star soldier (japan) (alt 1).rom" size="32768" crc="f6d4e101" sha1="b58caf47c953b6f00935a201bfccf7ee968dff32" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12507,12 +12400,11 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- Softcard -->
 	<software name="wreck">
 		<description>The Wreck (Euro)</description>
 		<year>1984</year>
 		<publisher>Electric Software</publisher>
-		<info name="serial" value="5306/1" />
+		<info name="serial" value="5206/1" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="wreck, the (europe).rom" size="32768" crc="7efde800" sha1="58e335c943d2647c3ff1e689069d9fa5e1c7ff6e" offset="0" />
@@ -12580,7 +12472,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- Bee Card (possibly also ROM) -->
+	<!-- This might not exist on cartridge, no photographic evidence yet. -->
 	<software name="yakyukyo">
 		<description>Yakyu Kyo (Jpn)</description>
 		<year>1985</year>

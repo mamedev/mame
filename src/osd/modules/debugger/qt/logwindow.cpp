@@ -14,8 +14,8 @@
 
 namespace osd::debugger::qt {
 
-LogWindow::LogWindow(running_machine &machine, QWidget *parent) :
-	WindowQt(machine, nullptr)
+LogWindow::LogWindow(DebuggerQt &debugger, QWidget *parent) :
+	WindowQt(debugger, nullptr)
 {
 	setWindowTitle("Debug: Machine Log");
 
@@ -48,27 +48,21 @@ LogWindow::~LogWindow()
 }
 
 
+void LogWindow::restoreConfiguration(util::xml::data_node const &node)
+{
+	WindowQt::restoreConfiguration(node);
+
+	m_logView->restoreConfigurationFromNode(node);
+}
+
+
 void LogWindow::saveConfigurationToNode(util::xml::data_node &node)
 {
 	WindowQt::saveConfigurationToNode(node);
 
 	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_ERROR_LOG_VIEWER);
-}
 
-
-//=========================================================================
-//  LogWindowQtConfig
-//=========================================================================
-
-void LogWindowQtConfig::applyToQWidget(QWidget *widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-}
-
-
-void LogWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
+	m_logView->saveConfigurationToNode(node);
 }
 
 } // namespace osd::debugger::qt

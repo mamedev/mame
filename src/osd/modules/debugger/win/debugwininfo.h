@@ -20,7 +20,6 @@ namespace osd::debugger::win {
 class debugwin_info : protected debugbase_info
 {
 public:
-	debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
 	virtual ~debugwin_info();
 
 	bool is_valid() const { return m_wnd != nullptr; }
@@ -120,6 +119,8 @@ protected:
 
 		ID_DEVICE_OPTIONS   // always keep this at the end
 	};
+
+	debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
 
 	bool is_main_console() const { return m_is_main_console; }
 	HWND window() const { return m_wnd; }

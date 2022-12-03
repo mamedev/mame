@@ -3609,6 +3609,26 @@ static INPUT_PORTS_START( pokonyan )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW(C):8" )
 INPUT_PORTS_END
 
+static const ioport_value mpumpkin_handle[] = { 0, 1, 3, 2 };
+
+static INPUT_PORTS_START( mpumpkin )
+	PORT_INCLUDE( pokonyan )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0003, 0x0000, IPT_POSITIONAL ) PORT_POSITIONS(4) PORT_REMAP_TABLE(mpumpkin_handle) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_WRAPS
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Kitty
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Keroppi
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Badtz-Maru
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 /*
 A Final Fight board with mismatched USA and Japan GFX proves that the columns
 of the 8x8 tilemap alternate between sides of the 16x16 tile resulting
@@ -13819,7 +13839,7 @@ ROM_START( pokonyan )
 	*/
 ROM_END
 
-ROM_START( hkittymp ) // B board: ? C board: 92631C-6
+ROM_START( mpumpkin ) // B board: ? C board: 92631C-6
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "mpa_23.8f", 0x00000, 0x80000, CRC(38b9883a) SHA1(94a89a360a502f209aa905e7eb2f1d472960850f) )
 	// remaining sockets are empty
@@ -14664,7 +14684,7 @@ GAME( 1995, megamana,    megaman,  cps1_12MHz, megaman,  cps_state, init_cps1,  
 GAME( 1995, rockmanj,    megaman,  cps1_12MHz, rockmanj, cps_state, init_cps1,     ROT0,   "Capcom", "Rockman: The Power Battle (CPS1, Japan 950922)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ganbare,     0,        ganbare,    ganbare,  cps_state, init_ganbare,  ROT0,   "Capcom", "Ganbare! Marine Kun (Japan 2K0411)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, pokonyan,    0,        cps1_10MHz, pokonyan, cps_state, init_cps1,     ROT0,   "Capcom", "Pokonyan! Balloon (Japan 940322)", MACHINE_SUPPORTS_SAVE ) // 2002-10-24 was on the ROM labels, 940322 on the startup screen... take your pick
-GAME( 1996, hkittymp,    0,        cps1_10MHz, pokonyan, cps_state, init_cps1,     ROT0,   "Capcom", "Hello Kitty Magical Pumpkin (Japan 960712)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs 'wheel' emulation
+GAME( 1996, mpumpkin,    0,        cps1_10MHz, mpumpkin, cps_state, init_cps1,     ROT0,   "Capcom", "Magical Pumpkin: Puroland de Daibouken (Japan 960712)", MACHINE_SUPPORTS_SAVE )
 
 /* Games released on CPS-1 hardware by Mitchell */
 
