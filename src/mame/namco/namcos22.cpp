@@ -25,6 +25,7 @@ TODO:
   the MOTHER PCB at J2 Pin 7 /TXD
 - tokyowar garbage tile at right edge in attract mode. It's part of the cabinet link message, maybe BTANB?
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
+- improve vertex lighting (is it phong shading?)
 - global offset is wrong in non-super22 testmode video test
 - acedrive/victlap testmode video test flickers
 - ss22 testmode video test screen#04 translucent polygon should be higher priority than sprite
@@ -38,17 +39,6 @@ TODO:
   + timecris stage 2-1 final section, steel beam appears through plank
   + cybrcycc speed dial should be more to the left
   + most of it is zsort related, there's plenty more, but need clearly visible cases with PCB evidence
-- improve ss22 lighting:
-  + acedrive/victlap sparks
-  + adillor title logo
-  + alpinr2b spinning yellow best times in attract mode
-  + alpinr2b mountains in selection screen
-  + propcycl score/time
-  + propcycl Solitar pillars
-  + ridgerac car when entering highscore
-  + ridgerac waving flag
-  + ridgerac rotating sign before 2nd tunnel
-  + timecris Sherudo's knives
 - improve ss22 spot, used in dirtdash, alpines highscore entry, testmode screen#14 - not understood well:
   + does not work at all in alpines (uses spot_factor, not spotram, should show a spotlight with darkened background)
   + should be done before global fade, see dirtdash when starting at jungle level

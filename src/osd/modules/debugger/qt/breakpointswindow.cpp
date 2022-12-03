@@ -17,8 +17,8 @@
 
 namespace osd::debugger::qt {
 
-BreakpointsWindow::BreakpointsWindow(running_machine &machine, QWidget *parent) :
-	WindowQt(machine, nullptr)
+BreakpointsWindow::BreakpointsWindow(DebuggerQt &debugger, QWidget *parent) :
+	WindowQt(debugger, nullptr)
 {
 	setWindowTitle("Debug: All Breakpoints");
 
@@ -83,6 +83,20 @@ BreakpointsWindow::~BreakpointsWindow()
 }
 
 
+void BreakpointsWindow::restoreConfiguration(util::xml::data_node const &node)
+{
+	WindowQt::restoreConfiguration(node);
+
+	auto const type = node.get_attribute_int(ATTR_WINDOW_POINTS_TYPE, -1);
+	QActionGroup *typeGroup = findChild<QActionGroup *>("typegroup");
+	if ((0 <= type) && (typeGroup->actions().size() > type))
+		typeGroup->actions()[type]->trigger();
+
+	m_breakpointsView->restoreConfigurationFromNode(node);
+
+}
+
+
 void BreakpointsWindow::saveConfigurationToNode(util::xml::data_node &node)
 {
 	WindowQt::saveConfigurationToNode(node);
@@ -105,6 +119,8 @@ void BreakpointsWindow::saveConfigurationToNode(util::xml::data_node &node)
 			break;
 		}
 	}
+
+	m_breakpointsView->saveConfigurationToNode(node);
 }
 
 
@@ -134,27 +150,6 @@ void BreakpointsWindow::typeChanged(QAction* changedTo)
 	// Re-register
 	QVBoxLayout *layout = findChild<QVBoxLayout *>("vlayout");
 	layout->addWidget(m_breakpointsView);
-}
-
-
-
-//=========================================================================
-//  BreakpointsWindowQtConfig
-//=========================================================================
-void BreakpointsWindowQtConfig::applyToQWidget(QWidget* widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-	BreakpointsWindow *window = dynamic_cast<BreakpointsWindow *>(widget);
-
-	QActionGroup *typeGroup = window->findChild<QActionGroup *>("typegroup");
-	typeGroup->actions()[m_bwType]->trigger();
-}
-
-
-void BreakpointsWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
-	m_bwType = node.get_attribute_int(ATTR_WINDOW_POINTS_TYPE, m_bwType);
 }
 
 } // namespace osd::debugger::qt

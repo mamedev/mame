@@ -1,19 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, R. Belmont
-/* The Legend of Silk Road - Unico 1999 */
+// copyright-holders: David Haywood, R. Belmont
+// The Legend of Silk Road - Unico 1999
 
-/* Preliminary Driver by David Haywood */
-/* Inputs, DIPs by Stephh & R. Belmont */
-/* and preliminary sound hookup by R. Belmont + fixes by Pierpaolo Prazzoli */
-
-#include "emu.h"
-#include "silkroad.h"
-
-#include "cpu/m68000/m68020.h"
-#include "sound/okim6295.h"
-#include "sound/ymopm.h"
-#include "screen.h"
-#include "speaker.h"
+/* Preliminary Driver by David Haywood
+   Inputs, DIPs by Stephh & R. Belmont
+   and preliminary sound hookup by R. Belmont + fixes by Pierpaolo Prazzoli */
 
 /*
 
@@ -38,7 +29,7 @@ CPU    : MC68EC020FG16 (68020, 100 pin PQFP)
 SND    : YM2151, YM3012, OKI M6295 (x2) (Note: No sound CPU)
 OSC    : 32.000MHz, 3.579545MHz
 RAM    : 62256 (x8), 6116 (x2), KM681000BLG-7L (x4, SOP32, Surface-mounted)
-Other  : 2x Actel A40MX04 (84 pin PLCC, same video chips as Multi Champ...ESD16.c)
+Other  : 2x Actel A40MX04 (84 pin PLCC, same video chips as Multi Champ...misc/esd16.cpp)
          15x PALs
 
 DIPs   : 8 position (x2)
@@ -132,10 +123,182 @@ ROM15.BIN       MX29F1610, SOP44 Surface Mounted Mask ROM /
 
 */
 
+#include "emu.h"
+
+#include "cpu/m68000/m68020.h"
+#include "sound/okim6295.h"
+#include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class silkroad_state : public driver_device
+{
+public:
+	silkroad_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_vram(*this, "vram%u", 1U),
+		m_sprram(*this, "sprram"),
+		m_regs(*this, "regs"),
+		m_okibank(*this, "okibank")
+	{ }
+
+	void silkroad(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr_array<uint32_t, 3> m_vram;
+	required_shared_ptr<uint32_t> m_sprram;
+	required_shared_ptr<uint32_t> m_regs;
+
+	required_memory_bank m_okibank;
+
+	tilemap_t *m_tilemap[3]{};
+
+	void coin_w(uint8_t data);
+	template<int Layer> void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void okibank_w(uint8_t data);
+
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cpu_map(address_map &map);
+	void oki_map(address_map &map);
+};
+
+
+// video
+
+/* Sprites probably need to be delayed
+   Some scroll layers may need to be offset slightly?
+   Check sprite colours
+   Clean up
+   Is there a bg colour register? */
+
+void silkroad_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	gfx_element *gfx = m_gfxdecode->gfx(0);
+	uint32_t const *source = m_sprram;
+	uint32_t const *finish = source + 0x1000 / 4;
+
+	while (source < finish)
+	{
+		int const xpos = (source[0] & 0x01ff0000) >> 16;
+		int const ypos = (source[0] & 0x0000ffff);
+		int tileno = (source[1] & 0xffff0000) >> 16;
+		int const attr = (source[1] & 0x0000ffff);
+		int const flipx = (attr & 0x0080);
+		int const width = ((attr & 0x0f00) >> 8) + 1;
+		int const color = (attr & 0x003f) ;
+		int const pri = ((attr & 0x1000) >> 12);  // Priority (1 = Low)
+		int const pri_mask = ~((1 << (pri + 1)) - 1);  // Above the first "pri" levels
+
+		// attr & 0x2000 -> another priority bit?
+
+		if ((source[1] & 0xff00) == 0xff00) break;
+
+		if ((attr & 0x8000) == 0x8000) tileno += 0x10000;
+
+		if (!flipx)
+		{
+			for (int wcount = 0; wcount < width; wcount++)
+			{
+				gfx->prio_transpen(bitmap, cliprect, tileno + wcount, color, 0, 0, xpos + wcount * 16 + 8, ypos, screen.priority(), pri_mask, 0);
+			}
+		}
+		else
+		{
+			for (int wcount = width; wcount > 0; wcount--)
+			{
+				gfx->prio_transpen(bitmap, cliprect, tileno + (width - wcount), color, 1, 0, xpos + wcount * 16 - 16 + 8, ypos, screen.priority(), pri_mask, 0);
+			}
+		}
+
+		source += 2;
+	}
+}
+
+template<int Layer>
+TILE_GET_INFO_MEMBER(silkroad_state::get_tile_info)
+{
+	int code = ((m_vram[Layer][tile_index] & 0xffff0000) >> 16);
+	int const color = ((m_vram[Layer][tile_index] & 0x000001f));
+	int const flipx = ((m_vram[Layer][tile_index] & 0x0000080) >> 7);
+
+	code += 0x18000;
+
+	tileinfo.set(0,
+			code,
+			color,
+			TILE_FLIPYX(flipx));
+}
+
+void silkroad_state::video_start()
+{
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(silkroad_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(silkroad_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(silkroad_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[2]->set_transparent_pen(0);
+}
+
+uint32_t silkroad_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(0x7c0, cliprect);
+
+	m_tilemap[0]->set_scrollx(0, ((m_regs[0] & 0xffff0000) >> 16));
+	m_tilemap[0]->set_scrolly(0, (m_regs[0] & 0x0000ffff) >> 0);
+
+	m_tilemap[2]->set_scrolly(0, (m_regs[1] & 0xffff0000) >> 16);
+	m_tilemap[2]->set_scrollx(0, (m_regs[2] & 0xffff0000) >> 16);
+
+	m_tilemap[1]->set_scrolly(0, ((m_regs[5] & 0xffff0000) >> 16));
+	m_tilemap[1]->set_scrollx(0, (m_regs[2] & 0x0000ffff) >> 0);
+
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
+	m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 2);
+	draw_sprites(screen, bitmap, cliprect);
+
+	if (0)
+	{
+		popmessage("Regs %08x %08x %08x %08x %08x",
+		m_regs[0],
+		m_regs[1],
+		m_regs[2],
+		m_regs[4],
+		m_regs[5]);
+	}
+
+	return 0;
+}
+
+
+// machine
+
 void silkroad_state::okibank_w(uint8_t data)
 {
-	int bank = (data & 0x3);
-	if(bank < 3)
+	int const bank = (data & 0x3);
+	if (bank < 3)
 		m_okibank->set_entry(bank);
 }
 
@@ -155,11 +318,11 @@ void silkroad_state::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void silkroad_state::cpu_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x40c000, 0x40cfff).ram().share("sprram"); // sprites
-	map(0x600000, 0x603fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0xffff0000).share("palette"); // palette
-	map(0x800000, 0x803fff).ram().w(FUNC(silkroad_state::vram_w<0>)).share("vram1");  // lower Layer
-	map(0x804000, 0x807fff).ram().w(FUNC(silkroad_state::vram_w<1>)).share("vram2");  // mid layer
-	map(0x808000, 0x80bfff).ram().w(FUNC(silkroad_state::vram_w<2>)).share("vram3"); // higher layer
+	map(0x40c000, 0x40cfff).ram().share(m_sprram);
+	map(0x600000, 0x603fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0xffff0000).share("palette");
+	map(0x800000, 0x803fff).ram().w(FUNC(silkroad_state::vram_w<0>)).share(m_vram[0]); // lower Layer
+	map(0x804000, 0x807fff).ram().w(FUNC(silkroad_state::vram_w<1>)).share(m_vram[1]); // mid layer
+	map(0x808000, 0x80bfff).ram().w(FUNC(silkroad_state::vram_w<2>)).share(m_vram[2]); // higher layer
 	map(0xc00000, 0xc00003).portr("INPUTS");
 	map(0xc00004, 0xc00007).portr("DSW");
 	map(0xc00025, 0xc00025).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -167,14 +330,14 @@ void silkroad_state::cpu_map(address_map &map)
 	map(0xc00031, 0xc00031).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc00034, 0xc00034).w(FUNC(silkroad_state::okibank_w));
 	map(0xc00039, 0xc00039).w(FUNC(silkroad_state::coin_w));
-	map(0xc0010c, 0xc00123).writeonly().share("regs");
+	map(0xc0010c, 0xc00123).writeonly().share(m_regs);
 	map(0xfe0000, 0xffffff).ram();
 }
 
 void silkroad_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x3ffff).bankr("okibank");
+	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
 
@@ -186,8 +349,8 @@ static INPUT_PORTS_START( silkroad )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SERVICE2 ) /* Not mentioned in the "test mode" */
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_CUSTOM )  /* See notes - Stephh*/
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Not mentioned in the "test mode"
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_CUSTOM )  // See notes - Stephh
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )  // this input makes the 020 lock up...- RB
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -253,13 +416,13 @@ static INPUT_PORTS_START( silkroad )
 	PORT_DIPSETTING(          0xa0000000, DEF_STR(1C_3C))
 	PORT_DIPSETTING(          0x80000000, DEF_STR(1C_4C))
 
-//  PORT_START("MISC")  /* Misc inputs */
-//  PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* VBLANK ? */
-//  PORT_BIT( 0xff7f, IP_ACTIVE_LOW, IPT_UNUSED ) /* unknown / unused */
+//  PORT_START("MISC")  // Misc inputs
+//  PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) // VBLANK ?
+//  PORT_BIT( 0xff7f, IP_ACTIVE_LOW, IPT_UNUSED ) // unknown / unused
 INPUT_PORTS_END
 
 
-/* BACKGROUNDS */
+// Backgrounds
 static const gfx_layout tiles16x16x6_layout =
 {
 	16,16,
@@ -272,7 +435,7 @@ static const gfx_layout tiles16x16x6_layout =
 };
 
 static GFXDECODE_START( gfx_silkroad )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x6_layout,  0x0000, 256 )
+	GFXDECODE_ENTRY( "gfx", 0, tiles16x16x6_layout, 0x0000, 256 )
 GFXDECODE_END
 
 void silkroad_state::machine_start()
@@ -282,12 +445,12 @@ void silkroad_state::machine_start()
 
 void silkroad_state::silkroad(machine_config &config)
 {
-	/* basic machine hardware */
-	M68EC020(config, m_maincpu, XTAL(32'000'000)/2); /* 16MHz */
+	// basic machine hardware
+	M68EC020(config, m_maincpu, XTAL(32'000'000) / 2); // 16MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &silkroad_state::cpu_map);
 	m_maincpu->set_vblank_int("screen", FUNC(silkroad_state::irq4_line_hold));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -299,18 +462,18 @@ void silkroad_state::silkroad(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_silkroad);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000).set_membits(16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified (was 1056000)
+	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'000'000) / 32, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified (was 1056000)
 	oki1.set_addrmap(0, &silkroad_state::oki_map);
 	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.45);
 	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.45);
 
-	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(32'000'000)/16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified (was 2112000)
+	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(32'000'000) / 16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified (was 2112000)
 	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.45);
 	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.45);
 }
@@ -327,8 +490,8 @@ ROM_START( silkroad )
 	ROM_LOAD32_WORD_SWAP( "rom02.bin", 0x000000, 0x100000, CRC(4e5200fc) SHA1(4d4cab03a6ec4ad825001e1e92193940646141e5) )
 	ROM_LOAD32_WORD_SWAP( "rom03.bin", 0x000002, 0x100000, CRC(73ccc78c) SHA1(2ac17aa8d7dac8636d29a4e4228a556334b51f1a) )
 
-	ROM_REGION( 0x1800000, "gfx1", ROMREGION_INVERT )
-	/* Sprites */
+	ROM_REGION( 0x1800000, "gfx", ROMREGION_INVERT )
+	// Sprites
 	ROM_LOAD( "rom12.rom12", 0x0000000, 0x0200000, CRC(96393d04) SHA1(f512bb8603510d39e649f4ec1c5e2d0e4bf3a2cc) ) // 0
 	ROM_LOAD( "rom08.rom08", 0x0800000, 0x0200000, CRC(23f1d462) SHA1(6ca8052b16ccc1fe59716e03f66bd33af5145b37) ) // 0
 	ROM_LOAD( "rom04.rom04", 0x1000000, 0x0200000, CRC(d9f0bbd7) SHA1(32c055ad5497c0bec5db40b528e589d7724e354f) ) // 0
@@ -340,13 +503,12 @@ ROM_START( silkroad )
 	ROM_LOAD( "rom14.rom14", 0x0400000, 0x0200000, CRC(d00b19c4) SHA1(d5b955dca5d0d251166a7f35a0bbbda6a91ecbd0) ) // 2
 	ROM_LOAD( "rom10.rom10", 0x0c00000, 0x0200000, CRC(7d324280) SHA1(cdf6d9342292f693cc5ec1b72816f2788963fcec) ) // 2
 	ROM_LOAD( "rom06.rom06", 0x1400000, 0x0200000, CRC(3ac26060) SHA1(98ad8efbbf8020daf7469db3e0fda02af6c4c767) ) // 2
-	/* Backgrounds */
+	// Backgrounds
 	ROM_LOAD( "rom07.rom07", 0x0600000, 0x0200000, CRC(9fc6ff9d) SHA1(51c3ca9709a01e0ad6bc76c0d674ed03f9822598) ) // 3
 	ROM_LOAD( "rom11.rom11", 0x0e00000, 0x0200000, CRC(11abaf1c) SHA1(19e86f3ebfec518a96c0520f36cfc1b525e7e55c) ) // 3
 	ROM_LOAD( "rom15.rom15", 0x1600000, 0x0200000, CRC(26a3b168) SHA1(a4b7955cc4d4fbec7c975a9456f2219ef33f1166) ) // 3
 
-	/* $00000-$20000 stays the same in all sound banks, */
-	/* the second half of the bank is what gets switched */
+	// $00000-$20000 stays the same in all sound banks, the second half of the bank is what gets switched
 	ROM_REGION( 0x080000, "oki1", 0 )
 	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
 
@@ -359,8 +521,8 @@ ROM_START( silkroada )
 	ROM_LOAD32_WORD_SWAP( "rom02.bin", 0x000000, 0x100000, CRC(4e5200fc) SHA1(4d4cab03a6ec4ad825001e1e92193940646141e5) )
 	ROM_LOAD32_WORD_SWAP( "rom03.bin", 0x000002, 0x100000, CRC(73ccc78c) SHA1(2ac17aa8d7dac8636d29a4e4228a556334b51f1a) )
 
-	ROM_REGION( 0x1800000, "gfx1", ROMREGION_INVERT )
-	/* Sprites */ // this board has these 3 ROMs instead of the 6 on the set above
+	ROM_REGION( 0x1800000, "gfx", ROMREGION_INVERT )
+	// Sprites, this board has these 3 ROMs instead of the 6 on the set above
 	ROM_LOAD( "unico_sr13.rom13", 0x0000000, 0x0400000, CRC(d001c3df) SHA1(ef1b1510f33401b0983093e2d8db48d3886c4fe1) ) // 0 + 1
 	ROM_LOAD( "unico_sr09.rom09", 0x0800000, 0x0400000, CRC(696d908d) SHA1(abe3ec8a53875a136f78bbed723bb89d04196427) ) // 0 + 1
 	ROM_LOAD( "unico_sr05.rom05", 0x1000000, 0x0400000, CRC(00f638c1) SHA1(cc6da13f8e82b08f8098c7636fbd1d40ee5ab132) ) // 0 + 1
@@ -368,13 +530,12 @@ ROM_START( silkroada )
 	ROM_LOAD( "rom14.rom14",      0x0400000, 0x0200000, CRC(d00b19c4) SHA1(d5b955dca5d0d251166a7f35a0bbbda6a91ecbd0) ) // 2
 	ROM_LOAD( "rom10.rom10",      0x0c00000, 0x0200000, CRC(7d324280) SHA1(cdf6d9342292f693cc5ec1b72816f2788963fcec) ) // 2
 	ROM_LOAD( "rom06.rom06",      0x1400000, 0x0200000, CRC(3ac26060) SHA1(98ad8efbbf8020daf7469db3e0fda02af6c4c767) ) // 2
-	/* Backgrounds */
+	// Backgrounds
 	ROM_LOAD( "rom07.rom07",      0x0600000, 0x0200000, CRC(9fc6ff9d) SHA1(51c3ca9709a01e0ad6bc76c0d674ed03f9822598) ) // 3
 	ROM_LOAD( "rom11.rom11",      0x0e00000, 0x0200000, CRC(11abaf1c) SHA1(19e86f3ebfec518a96c0520f36cfc1b525e7e55c) ) // 3
 	ROM_LOAD( "rom15.rom15",      0x1600000, 0x0200000, CRC(26a3b168) SHA1(a4b7955cc4d4fbec7c975a9456f2219ef33f1166) ) // 3
 
-	/* $00000-$20000 stays the same in all sound banks, */
-	/* the second half of the bank is what gets switched */
+	// $00000-$20000 stays the same in all sound banks, the second half of the bank is what gets switched
 	ROM_REGION( 0x080000, "oki1", 0 )
 	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
 
@@ -382,6 +543,8 @@ ROM_START( silkroada )
 	ROM_LOAD( "rom01.bin", 0x000000, 0x040000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
 ROM_END
 
+} // anonymous namespace
+
 
 GAME( 1999, silkroad,  0,        silkroad, silkroad, silkroad_state, empty_init, ROT0, "Unico", "The Legend of Silkroad",               MACHINE_SUPPORTS_SAVE )
-GAME( 1999, silkroada, silkroad, silkroad, silkroad, silkroad_state, empty_init, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", MACHINE_SUPPORTS_SAVE ) // same content but fewer GFX roms of a larger size
+GAME( 1999, silkroada, silkroad, silkroad, silkroad, silkroad_state, empty_init, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", MACHINE_SUPPORTS_SAVE ) // same content but fewer GFX ROMs of a larger size

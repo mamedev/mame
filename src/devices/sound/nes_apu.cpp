@@ -699,6 +699,8 @@ u8 nesapu_device::read(offs_t offset)
 {
 	if (offset == 0x15) /*FIXED* Address $4015 has different behaviour*/
 	{
+		m_stream->update();
+
 		int readval = 0;
 		if (m_APU.squ[0].vbl_length > 0)
 			readval |= 0x01;

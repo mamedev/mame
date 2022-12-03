@@ -10,6 +10,7 @@
 #include "util/xmlfile.h"
 
 #include <QtGui/QClipboard>
+#include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QActionGroup>
 #include <QtWidgets/QApplication>
@@ -27,8 +28,9 @@
 
 namespace osd::debugger::qt {
 
-MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
-	WindowQt(machine, nullptr)
+MemoryWindow::MemoryWindow(DebuggerQt &debugger, QWidget *parent) :
+	WindowQt(debugger, nullptr),
+	m_inputHistory()
 {
 	setWindowTitle("Debug: Memory View");
 
@@ -49,6 +51,8 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	// The input edit
 	m_inputEdit = new QLineEdit(topSubFrame);
 	connect(m_inputEdit, &QLineEdit::returnPressed, this, &MemoryWindow::expressionSubmitted);
+	connect(m_inputEdit, &QLineEdit::textEdited, this, &MemoryWindow::expressionEdited);
+	m_inputEdit->installEventFilter(this);
 
 	// The memory space combo box
 	m_memoryComboBox = new QComboBox(topSubFrame);
@@ -219,6 +223,71 @@ MemoryWindow::~MemoryWindow()
 }
 
 
+void MemoryWindow::restoreConfiguration(util::xml::data_node const &node)
+{
+	WindowQt::restoreConfiguration(node);
+
+	debug_view_memory &memView = *m_memTable->view<debug_view_memory>();
+
+	auto const region = node.get_attribute_int(ATTR_WINDOW_MEMORY_REGION, m_memTable->sourceIndex());
+	if ((0 <= region) && (m_memoryComboBox->count() > region))
+		m_memoryComboBox->setCurrentIndex(region);
+
+	auto const reverse = node.get_attribute_int(ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, memView.reverse() ? 1 : 0);
+	if (memView.reverse() != bool(reverse))
+	{
+		memView.set_reverse(bool(reverse));
+		findChild<QAction *>("reverse")->setChecked(bool(reverse));
+	}
+
+	auto const mode = node.get_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_MODE, memView.physical() ? 1 : 0);
+	QActionGroup *const addressGroup = findChild<QActionGroup *>("addressgroup");
+	for (QAction *action : addressGroup->actions())
+	{
+		if (action->data().toBool() == mode)
+		{
+			action->trigger();
+			break;
+		}
+	}
+
+	auto const radix = node.get_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_RADIX, memView.address_radix());
+	QActionGroup *const radixGroup = findChild<QActionGroup *>("radixgroup");
+	for (QAction *action : radixGroup->actions())
+	{
+		if (action->data().toInt() == radix)
+		{
+			action->trigger();
+			break;
+		}
+	}
+
+	auto const format = node.get_attribute_int(ATTR_WINDOW_MEMORY_DATA_FORMAT, int(memView.get_data_format()));
+	QActionGroup *const dataFormat = findChild<QActionGroup *>("dataformat");
+	for (QAction *action : dataFormat->actions())
+	{
+		if (action->data().toInt() == format)
+		{
+			action->trigger();
+			break;
+		}
+	}
+
+	auto const chunks = node.get_attribute_int(ATTR_WINDOW_MEMORY_ROW_CHUNKS, memView.chunks_per_row());
+	memView.set_chunks_per_row(chunks);
+
+	util::xml::data_node const *const expression = node.get_child(NODE_WINDOW_EXPRESSION);
+	if (expression && expression->get_value())
+	{
+		m_inputEdit->setText(QString::fromUtf8(expression->get_value()));
+		expressionSubmitted();
+	}
+
+	m_memTable->restoreConfigurationFromNode(node);
+	m_inputHistory.restoreConfigurationFromNode(node);
+}
+
+
 void MemoryWindow::saveConfigurationToNode(util::xml::data_node &node)
 {
 	WindowQt::saveConfigurationToNode(node);
@@ -233,6 +302,9 @@ void MemoryWindow::saveConfigurationToNode(util::xml::data_node &node)
 	node.set_attribute_int(ATTR_WINDOW_MEMORY_DATA_FORMAT, int(memView.get_data_format()));
 	node.set_attribute_int(ATTR_WINDOW_MEMORY_ROW_CHUNKS, memView.chunks_per_row());
 	node.add_child(NODE_WINDOW_EXPRESSION, memView.expression());
+
+	m_memTable->saveConfigurationToNode(node);
+	m_inputHistory.saveConfigurationToNode(node);
 }
 
 
@@ -256,7 +328,7 @@ void MemoryWindow::memoryRegionChanged(int index)
 			}
 		}
 
-		QActionGroup *radixGroup = findChild<QActionGroup*>("radixgroup");
+		QActionGroup *radixGroup = findChild<QActionGroup *>("radixgroup");
 		for (QAction *action : radixGroup->actions())
 		{
 			if (action->data().toInt() == memView->address_radix())
@@ -269,21 +341,65 @@ void MemoryWindow::memoryRegionChanged(int index)
 }
 
 
+// Used to intercept the user hitting the up arrow in the input widget
+bool MemoryWindow::eventFilter(QObject *obj, QEvent *event)
+{
+	// Only filter keypresses
+	if (event->type() != QEvent::KeyPress)
+		return QObject::eventFilter(obj, event);
+
+	QKeyEvent const &keyEvent = *static_cast<QKeyEvent *>(event);
+
+	// Catch up & down keys
+	if (keyEvent.key() == Qt::Key_Escape)
+	{
+		m_inputEdit->setText(QString::fromUtf8(m_memTable->view<debug_view_memory>()->expression()));
+		m_inputEdit->selectAll();
+		m_inputHistory.reset();
+		return true;
+	}
+	else if (keyEvent.key() == Qt::Key_Up)
+	{
+		QString const *const hist = m_inputHistory.previous(m_inputEdit->text());
+		if (hist)
+		{
+			m_inputEdit->setText(*hist);
+			m_inputEdit->setSelection(hist->size(), 0);
+		}
+		return true;
+	}
+	else if (keyEvent.key() == Qt::Key_Down)
+	{
+		QString const *const hist = m_inputHistory.next(m_inputEdit->text());
+		if (hist)
+		{
+			m_inputEdit->setText(*hist);
+			m_inputEdit->setSelection(hist->size(), 0);
+		}
+		return true;
+	}
+	else
+	{
+		return QObject::eventFilter(obj, event);
+	}
+}
+
+
 void MemoryWindow::expressionSubmitted()
 {
 	const QString expression = m_inputEdit->text();
-	m_memTable->view<debug_view_memory>()->set_expression(expression.toLocal8Bit().data());
+	m_memTable->view<debug_view_memory>()->set_expression(expression.toUtf8().data());
+	m_inputEdit->selectAll();
 
-	// Make the cursor pop
-	m_memTable->view()->set_cursor_visible(true);
+	// Add history
+	if (!expression.isEmpty())
+		m_inputHistory.add(expression);
+}
 
-	// Check where the cursor is and adjust the scroll accordingly
-	debug_view_xy cursorPosition = m_memTable->view()->cursor_position();
-	// TODO: check if the region is already visible?
-	m_memTable->verticalScrollBar()->setValue(cursorPosition.y);
 
-	m_memTable->update();
-	m_memTable->viewport()->update();
+void MemoryWindow::expressionEdited(QString const &text)
+{
+	m_inputHistory.edit();
 }
 
 
@@ -428,64 +544,6 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 void DebuggerMemView::copyLastPc()
 {
 	QApplication::clipboard()->setText(m_lastPc);
-}
-
-
-//=========================================================================
-//  MemoryWindowQtConfig
-//=========================================================================
-
-void MemoryWindowQtConfig::applyToQWidget(QWidget *widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-	MemoryWindow *window = dynamic_cast<MemoryWindow *>(widget);
-	QComboBox *memoryRegion = window->findChild<QComboBox *>("memoryregion");
-	memoryRegion->setCurrentIndex(m_memoryRegion);
-
-	QAction *reverse = window->findChild<QAction *>("reverse");
-	if (m_reverse)
-		reverse->trigger();
-
-	QActionGroup *const addressGroup = window->findChild<QActionGroup*>("addressgroup");
-	for (QAction *action : addressGroup->actions())
-	{
-		if (action->data().toBool() == m_addressMode)
-		{
-			action->trigger();
-			break;
-		}
-	}
-
-	QActionGroup *const radixGroup = window->findChild<QActionGroup*>("radixgroup");
-	for (QAction *action : radixGroup->actions())
-	{
-		if (action->data().toInt() == m_addressRadix)
-		{
-			action->trigger();
-			break;
-		}
-	}
-
-	QActionGroup *const dataFormat = window->findChild<QActionGroup*>("dataformat");
-	for (QAction *action : dataFormat->actions())
-	{
-		if (action->data().toInt() == m_dataFormat)
-		{
-			action->trigger();
-			break;
-		}
-	}
-}
-
-
-void MemoryWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
-	m_memoryRegion = node.get_attribute_int(ATTR_WINDOW_MEMORY_REGION, m_memoryRegion);
-	m_reverse = node.get_attribute_int(ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, m_reverse);
-	m_addressMode = node.get_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_MODE, m_addressMode);
-	m_addressRadix = node.get_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_RADIX, m_addressRadix);
-	m_dataFormat = node.get_attribute_int(ATTR_WINDOW_MEMORY_DATA_FORMAT, m_dataFormat);
 }
 
 } // namespace osd::debugger::qt

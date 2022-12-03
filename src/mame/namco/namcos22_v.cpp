@@ -786,7 +786,13 @@ void namcos22_state::register_normals(int addr, float m[4][4])
 
 		// transform normal vector
 		transform_normal(&nx, &ny, &nz, m);
-		float dotproduct = nx*m_camera_lx + ny*m_camera_ly + nz*m_camera_lz;
+
+		float cx = m_camera_lx;
+		float cy = m_camera_ly;
+		float cz = m_camera_lz;
+		transform_normal(&cx, &cy, &cz, m_viewmatrix);
+
+		float dotproduct = nx*cx + ny*cy + nz*cz;
 		if (dotproduct < 0.0f)
 			dotproduct = 0.0f;
 
@@ -797,6 +803,23 @@ void namcos22_state::register_normals(int addr, float m[4][4])
 
 void namcos22_state::draw_direct_poly(const u16 *src)
 {
+	/**
+	* master DSP can write directly to render device via port 0xc.
+	* This is used for "direct drawn" polygons, and "direct draw from point rom"
+	* feature - both opcodes exist in Ridge Racer's display-list processing
+	*
+	* record format:
+	*  header (3 words)
+	*      polyshift
+	*      color
+	*      flags
+	*
+	*  per-vertex data (4*6 words)
+	*      u,v
+	*      sx,sy
+	*      intensity;z.exponent
+	*      z.mantissa
+	*/
 	if (machine().video().skip_this_frame())
 		return;
 
@@ -900,41 +923,41 @@ void namcos22_state::draw_direct_poly(const u16 *src)
 	node->data.quad.vr = -640;
 }
 
-/**
- * @brief render a single quad
- *
- * @param flags
- *     00-1.----.01-0.001- ? (always set/clear)
- *     --x-.----.----.---- ?
- *     ----.xx--.----.---- cz table
- *     ----.--xx.----.---- representative z algorithm?
- *     ----.----.--x-.---- backface cull enable
- *     ----.----.----.---x lighting related?
- *
- *      1163 // sky
- *      1262 // score (front)
- *      1242 // score (hinge)
- *      1243 // ?
- *      1063 // n/a
- *      1243 // various (2-sided?)
- *      1263 // everything else (1-sided?)
- *      1663 // ?
- *
- * @param color
- *      xxxxxxxx -------- -------- flat shading factor
- *      -------- x------- -------- fog enable
- *      -------- -xxxxxxx -------- palette select
- *      -------- -------- xxxxxxxx unused?
- *
- * @param polyshift
- *    0x1fbd0 - sky+sea
- *    0x0c350 - mountains
- *    0x09c40 - boats, surf, road, buildings
- *    0x07350 - guardrail
- *    0x061a8 - red car
- */
 void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int polyshift, int flags, int packetformat)
 {
+	/**
+	* @brief render a single quad
+	*
+	* @param flags
+	*     00-1.----.01-0.001- ? (always set/clear)
+	*     --x-.----.----.---- ?
+	*     ----.xx--.----.---- cz table
+	*     ----.--xx.----.---- representative z algorithm?
+	*     ----.----.--x-.---- backface cull enable
+	*     ----.----.----.---x lighting related?
+	*
+	*      1163 // sky
+	*      1262 // score (front)
+	*      1242 // score (hinge)
+	*      1243 // ?
+	*      1063 // n/a
+	*      1243 // various (2-sided?)
+	*      1263 // everything else (1-sided?)
+	*      1663 // ?
+	*
+	* @param color
+	*      xxxxxxxx -------- -------- flat shading factor
+	*      -------- x------- -------- fog enable
+	*      -------- -xxxxxxx -------- palette select
+	*      -------- -------- xxxxxxxx unused?
+	*
+	* @param polyshift
+	*    0x1fbd0 - sky+sea
+	*    0x0c350 - mountains
+	*    0x09c40 - boats, surf, road, buildings
+	*    0x07350 - guardrail
+	*    0x061a8 - red car
+	*/
 	namcos22_polyvertex v[4];
 
 	for (int i = 0; i < 4; i++)
@@ -1032,22 +1055,15 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 		v[i].u = point_read(0 + i * 2 + addr);
 		v[i].v = point_read(1 + i * 2 + addr);
 
-		if (m_LitSurfaceCount)
+		if (m_LitSurfaceCount > 0)
 		{
 			// lighting (prelim)
-			bri = m_LitSurfaceInfo[m_LitSurfaceIndex % m_LitSurfaceCount];
+			int index = m_LitSurfaceIndex++;
+			if (m_LitSurfaceCount > 4)
+				index >>= 2;
+			index %= m_LitSurfaceCount;
 
-			if (m_SurfaceNormalFormat == 0x6666)
-			{
-				if (i == 3)
-					m_LitSurfaceIndex++;
-			}
-			else if (m_SurfaceNormalFormat == 0x4000)
-			{
-				m_LitSurfaceIndex++;
-			}
-			else
-				logerror("blit_single_quad:unknown normal format: 0x%x\n", m_SurfaceNormalFormat);
+			bri = m_LitSurfaceInfo[index];
 		}
 		else if (packetformat & 0x40)
 		{
@@ -1096,7 +1112,6 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 
 void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 {
-	//int additionalnormals = 0;
 	int finish = addr + len;
 
 	while (addr < finish)
@@ -1153,8 +1168,20 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 				000000  000000  007fff // normal vector
 				000000  000000  007fff // normal vector
 				000000  000000  007fff // normal vector
+
+				used in:
+				- acedrive/victlap sparks
+				- adillor title logo
+				- alpinr2b mountains in selection screen
+				- alpinr2b spinning yellow best times in attract mode
+				- alpinr2b highscore entry letters
+				- propcycl score/time
+				- propcycl Solitar pillars
+				- ridgerac car when entering highscore
+				- ridgerac waving flag
+				- ridgerac rotating sign before 2nd tunnel
+				- timecris Sherudo's knives
 				*/
-				//additionalnormals = point_read(addr+2);
 				m_SurfaceNormalFormat = point_read(addr + 3);
 				m_LitSurfaceCount = 0;
 				m_LitSurfaceIndex = 0;
@@ -1233,35 +1260,6 @@ void namcos22_state::blit_polyobject(int code, float m[4][4])
 }
 
 
-/**
- * master DSP can write directly to render device via port 0xc.
- * This is used for "direct drawn" polygons, and "direct draw from point rom"
- * feature - both opcodes exist in Ridge Racer's display-list processing
- *
- * record format:
- *  header (3 words)
- *      polyshift
- *      color
- *      flags
- *
- *  per-vertex data (4*6 words)
- *      u,v
- *      sx,sy
- *      intensity;z.exponent
- *      z.mantissa
- *
- * master DSP can specify 3d objects indirectly (along with view transforms),
- * via the "transmit" PDP opcode.  the "render device" sends quad data to the slave DSP
- * viewspace clipping and projection
- *
- * most "3d object" references are 0x45 and greater.  references less than 0x45 are "special"
- * commands, using a similar point rom format.  the point rom header may point to point ram.
- *
- * slave DSP reads records via port 4
- * its primary purpose is applying lighting calculations
- * the slave DSP forwards draw commands to a "draw device"
- */
-
 /*******************************************************************************/
 
 void namcos22_state::slavesim_handle_bb0003(const s32 *src)
@@ -1329,7 +1327,6 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	m_viewmatrix[2][2] = dspfixed_to_nativefloat(src[0x14]);
 
 	matrix3d_apply_reflection(m_viewmatrix);
-	transform_normal(&m_camera_lx, &m_camera_ly, &m_camera_lz, m_viewmatrix);
 }
 
 void namcos22_state::slavesim_handle_200002(const s32 *src, int code)
@@ -1428,6 +1425,18 @@ void namcos22_state::slavesim_handle_233002(const s32 *src)
 
 void namcos22_state::simulate_slavedsp()
 {
+	/**
+	* master DSP can specify 3d objects indirectly (along with view transforms),
+	* via the "transmit" PDP opcode.  the "render device" sends quad data to the slave DSP
+	* viewspace clipping and projection
+	*
+	* most "3d object" references are 0x45 and greater.  references less than 0x45 are "special"
+	* commands, using a similar point rom format.  the point rom header may point to point ram.
+	*
+	* slave DSP reads records via port 4
+	* its primary purpose is applying lighting calculations
+	* the slave DSP forwards draw commands to a "draw device"
+	*/
 	const s32 *src = 0x300 + (s32 *)m_polygonram.target();
 
 	if (m_is_ss22)
@@ -2393,38 +2402,38 @@ void namcos22_state::update_mixer()
 
 	if (m_is_ss22)
 	{
-/*
-           0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
-00824000: ffffff00 00000000 0000007f 00ff006f fe00eded 0f700000 0000037f 00010007 // alpine surfer
-00824000: ffffff00 00000000 0000007f 00ff0000 1000ff00 0f000000 00ff007f 00010007 // time crisis
-00824000: ffffff00 00000000 1830407f 00800000 0000007f 0f000000 0000037f 00010007 // trans sprite
-00824000: ffffff00 00000000 3040307f 00000000 0080007f 0f000000 0000037f 00010007 // trans poly
-00824000: ffffff00 00000000 1800187f 00800000 0080007f 0f000000 0000037f 00010007 // trans poly(2)
-00824000: ffffff00 00000000 1800187f 00000000 0000007f 0f800000 0000037f 00010007 // trans text
+		/*
+				0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
+		00824000: ffffff00 00000000 0000007f 00ff006f fe00eded 0f700000 0000037f 00010007 // alpine surfer
+		00824000: ffffff00 00000000 0000007f 00ff0000 1000ff00 0f000000 00ff007f 00010007 // time crisis
+		00824000: ffffff00 00000000 1830407f 00800000 0000007f 0f000000 0000037f 00010007 // trans sprite
+		00824000: ffffff00 00000000 3040307f 00000000 0080007f 0f000000 0000037f 00010007 // trans poly
+		00824000: ffffff00 00000000 1800187f 00800000 0080007f 0f000000 0000037f 00010007 // trans poly(2)
+		00824000: ffffff00 00000000 1800187f 00000000 0000007f 0f800000 0000037f 00010007 // trans text
 
-    00,01,02        polygon fade rgb
-    03
-    04
-    05,06,07        world fog rgb
-    08,09,0a        background color
-    0b
-    0c
-    0d,0e           spot factor
-    0f              polygon alpha color mask
-    10              polygon alpha pen mask
-    11              global polygon alpha factor
-    12,13           textlayer alpha pen comparison
-    14              textlayer alpha pen mask?
-    15              textlayer alpha factor
-    16,17,18        global fade rgb
-    19              global fade factor
-    1a              fade target flags
-    1b              textlayer palette base
-    1c
-    1d
-    1e
-    1f              layer enable
-*/
+			00,01,02        polygon fade rgb
+			03
+			04
+			05,06,07        world fog rgb
+			08,09,0a        background color
+			0b
+			0c
+			0d,0e           spot factor
+			0f              polygon alpha color mask
+			10              polygon alpha pen mask
+			11              global polygon alpha factor
+			12,13           textlayer alpha pen comparison
+			14              textlayer alpha pen mask?
+			15              textlayer alpha factor
+			16,17,18        global fade rgb
+			19              global fade factor
+			1a              fade target flags
+			1b              textlayer palette base
+			1c
+			1d
+			1e
+			1f              layer enable
+		*/
 		m_poly_fade_r        = nthbyte(m_mixer, 0x00);
 		m_poly_fade_g        = nthbyte(m_mixer, 0x01);
 		m_poly_fade_b        = nthbyte(m_mixer, 0x02);
@@ -2446,34 +2455,34 @@ void namcos22_state::update_mixer()
 	}
 	else
 	{
-/*
-90020000: 4f030000 7f00007f 4d4d4d42 0c00c0c0
-90020010: c0010001 00010000 00000000 00000000
-90020080: 00010101 01010102 00000000 00000000
-900200c0: 00000000 00000000 00000000 03000000
-90020100: fff35000 00000000 00000000 00000000
-90020180: ff713700 00000000 00000000 00000000
-90020200: ff100000 00000000 00000000 00000000
+		/*
+		90020000: 4f030000 7f00007f 4d4d4d42 0c00c0c0
+		90020010: c0010001 00010000 00000000 00000000
+		90020080: 00010101 01010102 00000000 00000000
+		900200c0: 00000000 00000000 00000000 03000000
+		90020100: fff35000 00000000 00000000 00000000
+		90020180: ff713700 00000000 00000000 00000000
+		90020200: ff100000 00000000 00000000 00000000
 
-    00,01           display flags
-    02
-    03
-    04              bgcolor palette base?
-    05
-    06
-    07              textlayer palette base?
-    08,09,0a        textlayer pen c shadow rgb
-    0b,0c,0d        textlayer pen d shadow rgb
-    0e,0f,10        textlayer pen e shadow rgb
-    11,12           global fade factor red
-    13,14           global fade factor green
-    15,16           global fade factor blue
-    80-87           fog color mask?
-    100,180,200     fog rgb 0
-    101,181,201     fog rgb 1
-    102,182,202     fog rgb 2
-    103,183,203     fog rgb 3
-*/
+			00,01           display flags
+			02
+			03
+			04              bgcolor palette base?
+			05
+			06
+			07              textlayer palette base?
+			08,09,0a        textlayer pen c shadow rgb
+			0b,0c,0d        textlayer pen d shadow rgb
+			0e,0f,10        textlayer pen e shadow rgb
+			11,12           global fade factor red
+			13,14           global fade factor green
+			15,16           global fade factor blue
+			80-87           fog color mask?
+			100,180,200     fog rgb 0
+			101,181,201     fog rgb 1
+			102,182,202     fog rgb 2
+			103,183,203     fog rgb 3
+		*/
 		m_mixer_flags         = nthbyte(m_mixer, 0x00) << 8 | nthbyte(m_mixer, 0x01);
 		m_bg_palbase          = nthbyte(m_mixer, 0x04) << 8 & 0x7f00;
 		m_text_palbase        = nthbyte(m_mixer, 0x07) << 8 & 0x7f00;

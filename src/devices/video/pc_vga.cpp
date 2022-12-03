@@ -2072,20 +2072,22 @@ uint8_t vga_device::mem_r(offs_t offset)
 
 		if (vga.gc.read_mode)
 		{
-			uint8_t byte,layer;
-			uint8_t fill_latch;
-			data=0;
+			// In Read Mode 1 latch is checked against this
+			// cfr. lombrall & intsocch where they RMW sprite-like objects
+			// and anything outside this formula goes transparent.
+			const u8 target_color = (vga.gc.color_compare & vga.gc.color_dont_care);
+			data = 0;
 
-			for(byte=0;byte<8;byte++)
+			for(u8 byte = 0; byte < 8; byte++)
 			{
-				fill_latch = 0;
-				for(layer=0;layer<4;layer++)
+				u8 fill_latch = 0;
+				for(u8 layer = 0; layer < 4; layer++)
 				{
 					if(vga.gc.latch[layer] & 1 << byte)
 						fill_latch |= 1 << layer;
 				}
 				fill_latch &= vga.gc.color_dont_care;
-				if(fill_latch == vga.gc.color_compare)
+				if(fill_latch == target_color)
 					data |= 1 << byte;
 			}
 		}

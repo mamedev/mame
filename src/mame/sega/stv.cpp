@@ -3071,6 +3071,30 @@ ROM_START( nclubv3 )
 	ROM_LOAD( "nclubv3.nv", 0x0000, 0x0080, CRC(9122a9e9) SHA1(5318994905e005567709c41449547c545182bece) )
 ROM_END
 
+ROM_START( nclubdis ) // 837-12765-11 sticker
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "ic22", 0x0200000, 0x0200000, BAD_DUMP CRC(cfd5eb54) SHA1(878195c70ad931d3015d497d2739a0867ff83cf7) ) // tests bad but believed good, flagged so it gets double checked if possible
+	ROM_LOAD16_WORD_SWAP( "ic24", 0x0400000, 0x0200000, CRC(943682eb) SHA1(ad41625244509affe7b6d6caffef58bb7bf75b72) )
+	ROM_LOAD16_WORD_SWAP( "ic26", 0x0600000, 0x0200000, CRC(a17bd53a) SHA1(e05079e3bfc7187b70ddc4b48de9e5ffcb19e473) )
+	ROM_LOAD16_WORD_SWAP( "ic28", 0x0800000, 0x0200000, CRC(9a597bff) SHA1(8cc265a89bbc42d4e6d55e23a4ed87fc1224c9dc) )
+	ROM_LOAD16_WORD_SWAP( "ic30", 0x0a00000, 0x0200000, CRC(3eb020f6) SHA1(6b87a6e7ab9eb820b7661fa6ea8c29bf8ead820d) )
+	ROM_LOAD16_WORD_SWAP( "ic32", 0x0c00000, 0x0200000, CRC(ac26d375) SHA1(a01125eb4bca7823eb12d4e03d93612e09dcddda) )
+	ROM_LOAD16_WORD_SWAP( "ic34", 0x0e00000, 0x0200000, CRC(e157cd99) SHA1(52c976540157cc63c599ee34ec5bade7e489599d) ) // 111xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_WORD_SWAP( "ic36", 0x1000000, 0x0200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // FIXED BITS (11111111), but present
+	ROM_LOAD16_WORD_SWAP( "ic23", 0x1200000, 0x0200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // FIXED BITS (11111111), but present
+	ROM_LOAD16_WORD_SWAP( "ic25", 0x1400000, 0x0200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // FIXED BITS (11111111), but present
+	// ic27, ic29, ic31, ic33, ic35, ic37 not populated
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "nclubdis.nv", 0x0000, 0x0080, CRC(7efc9c6a) SHA1(3d44940b7497b07151908a0a6bc2809c7e15f4a8) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "315-6055.ic12",    0x000, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the front side of the cart
+	ROM_LOAD( "315-6056-01.ic13", 0x200, 0x117, NO_DUMP ) // PALCE16V8-10JC on the back side of the cart
+ROM_END
+
 ROM_START( techbowl ) // set to 1p
 	STV_BIOS
 
@@ -3897,7 +3921,7 @@ GAME( 1997, prc28su,   stvbios, stv,      stv,      stvpc_state, init_stv,      
 GAME( 1997, prc29au,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 9 Autumn (J V1.100)", MACHINE_NOT_WORKING ) // internal string 97AUTUMN, no date code! (all 0)
 GAME( 1997, prc297wi,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 1)", MACHINE_NOT_WORKING ) // internal string is '97WINTER'
 GAME( 1997, prc297wia, prc297wi,stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 2)", MACHINE_NOT_WORKING ) // different program revision, same date code, clearly didn't get updated properly
-GAME( 1998, prc298sp,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
+GAME( 1998, prc298sp,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have been updated, this should be early 98
 GAME( 1998, prc298su,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
 GAME( 1998, prc298au,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
 GAME( 2000, prc2ksu,   stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
@@ -3917,9 +3941,9 @@ GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_n
 GAME( 1998, stress,    stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
+GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released the same day)
 GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,         ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
-
+GAME( 1998, nclubdis,  stvbios, stv,      stv,      stvpc_state, init_stv,              ROT0,   "Sega",                         "Name Club Disney (J 980614 V1.000)", MACHINE_NOT_WORKING ) // errors due to missing security card
 
 
 
