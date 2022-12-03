@@ -1325,7 +1325,7 @@ Resets itself while "Loading StoryTeller"
 		</part>
 	</software>
 
-	<software name="kobanaru" supported="no">
+	<software name="kobanaru">
 		<description>Kobayashi Naru</description>
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
@@ -2666,12 +2666,13 @@ ibmpcjr: hangs on title screen, is it supported?
 		</part>
 	</software>
 
-	<!-- These won't work as the floppy drive emulation isn't complete enough-->
-
 	<software name="baddudes" supported="no">
 		<description>Bad Dudes (5.25")</description>
 		<year>1988</year>
 		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360
+]]></notes>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk"/>
@@ -2691,6 +2692,9 @@ ibmpcjr: hangs on title screen, is it supported?
 		<description>Bad Dudes (3.5")</description>
 		<year>1988</year>
 		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360
+]]></notes>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="656393">
@@ -3491,6 +3495,9 @@ ibmpcjr: hangs on title screen, is it supported?
 		<description>PC Globe 3.0</description>
 		<year>1990</year>
 		<publisher>PC Globe, Inc</publisher>
+		<notes><![CDATA[
+No text in [VGA] mode
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="PC Globe 3.0 [PC Globe] [1990] [5.25DD] [Disk 1 of 5].img" size="368640" crc="223af156" sha1="b195707c8fdfa1c21dec44c498104efc53e2b886"/>
@@ -3518,10 +3525,13 @@ ibmpcjr: hangs on title screen, is it supported?
 		</part>
 	</software>
 
-	<software name="pcglobe4" supported="no">
+	<software name="pcglobe4" supported="partial">
 		<description>PC Globe 4.0</description>
 		<year>1990</year>
 		<publisher>PC Globe, Inc</publisher>
+		<notes><![CDATA[
+No text in [VGA] mode
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="PC Globe 4.0 [PC Globe] [1990] [5.25DD] [Disk 1 of 5].img" size="368640" crc="5f6e5912" sha1="39d53b36612c5e7df96a753221a043ded4a88b1f"/>
@@ -4030,9 +4040,11 @@ ibmpcjr: hangs on title screen, is it supported?
 		<description>VisiCalc (VC-156Y0-IBM)</description>
 		<year>1981</year>
 		<publisher>Personal Software</publisher>
+		<notes><![CDATA[
+Black screen on boot, contains custom COMMAND.COM
+Stalls or throws either "Bad command or file name", "disk read error" or "divide overflow" if launched from a DOS env, failed copy protection check
+]]></notes>
 		<!-- Origin: WinWorld, SCP image converted to MFM using HxC 2.5.6.6 -->
-		<!-- Doesn't work, gives either fake "Bad command or file name" error (failed copy protection check)
-		     or "Disk read error" -->
 		<!-- Tested working on 86Box v3.0 -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1639095">
@@ -5297,6 +5309,7 @@ ibmpcjr: hangs on title screen, is it supported?
 		<description>Concurrent DOS XM 6.0 (5.25")</description>
 		<year>1987</year>
 		<publisher>Digital Research</publisher>
+		<!-- TODO: throws "Invalid directory" during install, does it requires a proper CP/M partition first on HDD? -->
 		<info name="version" value="6.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
