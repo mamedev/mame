@@ -2672,21 +2672,54 @@ ROM_END
 
 // ROM definition Belgian Slots (Token pay per round) Payslide ////////////
 
+/*
+PR6496V2
+BELGIUM SLOTS GAME 95 750 943 TYPE TOKEN PAYOUT VER. (no more information)
+BELGIUM SLOTS TPO 95 770 121 PROG.
+BELGIUM SLOTS TPO 95 770 122 CHAR.
+BELGIUM SLOTS TPO 95 001 029 SOUND.
+*/
+
 ROM_START( sltblgtk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("95750943.bin", 0x00000, 0x10000, CRC(c9fb8153) SHA1(7c1d0660c15f05b1e0784d8322c62981fe8dc4c9))
+	ROM_LOAD("95750943.gam", 0x00000, 0x10000, CRC(c9fb8153) SHA1(7c1d0660c15f05b1e0784d8322c62981fe8dc4c9))
 
 	ROM_REGION( 0x20000, "adder2:cpu", 0 )
-	ROM_LOAD("adder121.bin", 0x00000, 0x20000, CRC(cedbbf28) SHA1(559ae341b55462feea771127394a54fc65266818))
+	ROM_LOAD("95770121.prg", 0x00000, 0x20000, CRC(cedbbf28) SHA1(559ae341b55462feea771127394a54fc65266818))
 
 	ROM_REGION( 0x20000, "upd", 0 )
-	ROM_LOAD("sound029.bin", 0x00000, 0x20000, CRC(7749c724) SHA1(a87cce0c99e392f501bba44b3936a7059d682c9c))
+	ROM_LOAD("95001029.snd", 0x00000, 0x20000, CRC(7749c724) SHA1(a87cce0c99e392f501bba44b3936a7059d682c9c))
 
 	ROM_REGION( 0x40000, "adder2:tiles", ROMREGION_ERASEFF )
-	ROM_LOAD("chr122.bin",   0x00000, 0x20000, CRC(a1e3bdf4) SHA1(f0cabe08dee028e2014cbf0fc3fe0806cdfa60c6))
+	ROM_LOAD("95770122.chr", 0x00000, 0x20000, CRC(a1e3bdf4) SHA1(f0cabe08dee028e2014cbf0fc3fe0806cdfa60c6))
 
 	ROM_REGION( 0x10, "proms", 0 )
-	ROM_LOAD("stsbtpal.bin", 0, 8 , CRC(20e13635) SHA1(5aa7e7cac8c00ebc193d63d0c6795904f42c70fa))
+	ROM_LOAD("95790017.pal", 0, 8 , CRC(20e13635) SHA1(5aa7e7cac8c00ebc193d63d0c6795904f42c70fa))
+ROM_END
+
+/*
+PR6496V1
+BELGIUM SLOTS GAME 95 750 452 TYPE TOKEN PAYOUT VER. BSLT 1.3 B.F.M
+BELGIUM SLOTS TPO 95 770 065 PROG.
+BELGIUM SLOTS TPO 95 770 066 CHAR.
+BELGIUM SLOTS TPO 95 001 029 SOUND.
+*/
+
+ROM_START( sltblgtka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("95750452.gam", 0x00000, 0x10000, CRC(5637591d) SHA1(e5ce1e9a06bec7a9c9d1417f61a60bb3d97f4c7d))
+
+	ROM_REGION( 0x20000, "adder2:cpu", 0 )
+	ROM_LOAD("95770065.prg", 0x00000, 0x20000, CRC(28997756) SHA1(9fc0922be20d7dfbc7f5c831b045607e53de0c2a))
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD("95001029.snd", 0x00000, 0x20000, CRC(7749c724) SHA1(a87cce0c99e392f501bba44b3936a7059d682c9c))
+
+	ROM_REGION( 0x40000, "adder2:tiles", ROMREGION_ERASEFF )
+	ROM_LOAD("95770066.chr", 0x00000, 0x20000, CRC(a0a3a2dd) SHA1(54f1c0233d5d1b43283c427813195b32a182ec6e))
+
+	ROM_REGION( 0x10, "proms", 0 )
+	ROM_LOAD("95790017.pal", 0, 8 , CRC(20e13635) SHA1(5aa7e7cac8c00ebc193d63d0c6795904f42c70fa))
 ROM_END
 
 // ROM definition Belgian Slots (Cash Payout) /////////////////////////////
@@ -8577,6 +8610,7 @@ GAMEL( 1996, pyramid,     0,        scorpion2_vid,  pyramid,  bfm_sc2_vid_state,
 GAMEL( 1995, slotsnl,     0,        scorpion2_vid,  slotsnl,  bfm_sc2_vid_state,  init_adder_dutch, 0, "BFM/ELAM", "Slots (Dutch, Game Card 95-750-368)",          MACHINE_SUPPORTS_SAVE,layout_slots )
 
 GAMEL( 1996, sltblgtk,    0,        scorpion2_vid,  sltblgtk, bfm_sc2_vid_state,  init_sltsbelg,    0, "BFM/ELAM", "Slots (Belgian Token, Game Card 95-750-943)",  MACHINE_SUPPORTS_SAVE,layout_sltblgtk )
+GAMEL( 1996, sltblgtka,   sltblgtk, scorpion2_vid,  sltblgtk, bfm_sc2_vid_state,  init_sltsbelg,    0, "BFM/ELAM", "Slots (Belgian Token, Game Card 95-750-452)",  MACHINE_SUPPORTS_SAVE,layout_sltblgtk )
 
 GAMEL( 1996, sltblgpo,    0,        scorpion2_vid,  sltblgpo, bfm_sc2_vid_state,  init_sltsbelg,    0, "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-750-938)",   MACHINE_SUPPORTS_SAVE,layout_sltblgpo )
 GAMEL( 1996, sltblgp1,    sltblgpo, scorpion2_vid,  sltblgpo, bfm_sc2_vid_state,  init_sltsbelg,    0, "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-752-008)",   MACHINE_SUPPORTS_SAVE,layout_sltblgpo )

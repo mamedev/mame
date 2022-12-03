@@ -56,8 +56,8 @@ private:
 	uint8_t read_operand(int ordinal);
 	void write_operand(uint8_t data);
 	void write_operand(int ordinal, uint8_t data);
-	exgtfr_register read_exgtfr_register(uint8_t reg);
-	void write_exgtfr_register(uint8_t reg, exgtfr_register value);
+	uint16_t read_exgtfr_register(uint8_t reg);
+	void write_exgtfr_register(uint8_t reg, uint16_t value);
 
 	// instructions
 	void lmul();
