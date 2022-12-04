@@ -532,6 +532,10 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 		for (int yi=0;yi<height;yi++)
 		{
 			uint32_t *const bitmapline = &bitmap.pix(line + yi);
+			// ibm_5150:batmanmv uses this on gameplay for both EGA and "VGA" modes
+			// TODO: EGA mode sets 663, should be 303 like the other mode
+			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
+				addr = 0;
 
 			for (int pos=addr, c=0, column=0; column<EGA_COLUMNS+1; column++, c+=8, pos=(pos+1)&0xffff)
 			{
@@ -1025,6 +1029,7 @@ uint8_t svga_device::get_video_depth()
 uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t cur_mode = pc_vga_choosevideomode();
+
 	switch(cur_mode)
 	{
 		case SCREEN_OFF:   bitmap.fill  (black_pen(), cliprect);break;
