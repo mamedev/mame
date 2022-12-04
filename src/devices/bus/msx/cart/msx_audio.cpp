@@ -98,15 +98,24 @@ void msx_cart_msx_audio_hxmu900_device::device_start()
 	io_space().install_read_handler(0xc0, 0xc1, read8sm_delegate(*m_y8950, FUNC(y8950_device::read)));
 }
 
-void msx_cart_msx_audio_hxmu900_device::initialize_cartridge()
+image_init_result msx_cart_msx_audio_hxmu900_device::initialize_cartridge(std::string &message)
 {
-	if (get_rom_size() < 0x8000)
+	if (!cart_rom_region())
 	{
-		fatalerror("msx_audio: Invalid ROM size\n");
+		message = "msx_cart_msx_audio_hxmu900_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
 	}
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
-	page(2)->install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
+	if (cart_rom_region()->bytes() < 0x8000)
+	{
+		message = "msx_cart_msx_audio_hxmu900_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
+
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
+	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
+
+	return image_init_result::PASS;
 }
 
 ROM_START(msx_hxmu)
@@ -188,14 +197,24 @@ void msx_cart_msx_audio_nms1205_device::device_start()
 	io_space().install_read_handler(0x04, 0x05, read8sm_delegate(*m_acia6850, FUNC(acia6850_device::read)));
 }
 
-void msx_cart_msx_audio_nms1205_device::initialize_cartridge()
+image_init_result msx_cart_msx_audio_nms1205_device::initialize_cartridge(std::string &message)
 {
-	if (get_rom_size() < 0x8000)
+	if (!cart_rom_region())
 	{
-		fatalerror("msx_audio: Invalid ROM size\n");
+		message = "msx_cart_msx_audio_nms1205_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
 	}
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
-	page(2)->install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
+
+	if (cart_rom_region()->bytes() < 0x8000)
+	{
+		message = "msx_cart_msx_audio_nms1205_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
+
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
+	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
+
+	return image_init_result::PASS;
 }
 
 
@@ -269,30 +288,39 @@ void msx_cart_msx_audio_fsca1_device::device_reset()
 	m_rombank[1]->set_entry(0);
 }
 
-void msx_cart_msx_audio_fsca1_device::initialize_cartridge()
+image_init_result msx_cart_msx_audio_fsca1_device::initialize_cartridge(std::string &message)
 {
-	if (get_rom_size() < 0x20000)
+	if (!cart_rom_region())
 	{
-		fatalerror("msx_audio_fsca1: Invalid ROM size\n");
+		message = "msx_cart_msx_audio_fsca1_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
 	}
 
-	m_rombank[0]->configure_entries(0, 4, get_rom_base(), 0x8000);
-	m_rombank[1]->configure_entries(0, 4, get_rom_base() + 0x4000, 0x8000);
+	if (cart_rom_region()->bytes() < 0x20000)
+	{
+		message = "msx_cart_msx_audio_fsca1_device: Region 'rom' has unsupported size";
+		return image_init_result::FAIL;
+	}
+
+	m_rombank[0]->configure_entries(0, 4, cart_rom_region()->base(), 0x8000);
+	m_rombank[1]->configure_entries(0, 4, cart_rom_region()->base() + 0x4000, 0x8000);
 
 	page(0)->install_view(0x0000, 0x3fff, m_view0);
 	m_view0[0].install_read_bank(0x0000, 0x3fff, m_rombank[0]);
-	m_view0[0].install_ram(0x3000, 0x3fff, get_sram_base());
+	m_view0[0].install_ram(0x3000, 0x3fff, cart_sram_region()->base());
 	m_view0[1].install_read_bank(0x0000, 0x3fff, m_rombank[0]);
 
 	page(1)->install_view(0x4000, 0x7fff, m_view1);
 	m_view1[0].install_read_bank(0x4000, 0x7ffd, m_rombank[1]);
-	m_view1[0].install_ram(0x7000, 0x7ffd, get_sram_base());
+	m_view1[0].install_ram(0x7000, 0x7ffd, cart_sram_region()->base());
 	m_view1[1].install_read_bank(0x4000, 0x7ffd, m_rombank[1]);
 	page(1)->install_write_handler(0x7ffe, 0x7ffe, write8smo_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::bank_w)));
 	page(1)->install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::write_7fff)));
 
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[0]);
 	page(3)->install_read_bank(0xc000, 0xffff, m_rombank[1]);
+
+	return image_init_result::PASS;
 }
 
 void msx_cart_msx_audio_fsca1_device::bank_w(u8 data)
