@@ -28,15 +28,24 @@ void msx_cart_arc_device::device_reset()
 	m_7f = 0;
 }
 
-void msx_cart_arc_device::initialize_cartridge()
+image_init_result msx_cart_arc_device::initialize_cartridge(std::string &message)
 {
-	if (get_rom_size() != 0x8000)
+	if (!cart_rom_region())
 	{
-		fatalerror("arc: Invalid ROM size\n");
+		message = "msx_cart_arc_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
 	}
 
-	page(1)->install_rom(0x4000, 0x7fff, get_rom_base());
-	page(2)->install_rom(0x8000, 0xbfff, get_rom_base() + 0x4000);
+	if (cart_rom_region()->bytes() != 0x8000)
+	{
+		message = "msx_cart_arc_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
+
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
+	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
+
+	return image_init_result::PASS;
 }
 
 void msx_cart_arc_device::io_7f_w(u8 data)

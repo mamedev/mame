@@ -26,7 +26,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override { }
 
-	virtual void initialize_cartridge() override;
+	virtual image_init_result initialize_cartridge(std::string &message) override;
 
 };
 
@@ -37,16 +37,18 @@ softcard_nomapper_device::softcard_nomapper_device(const machine_config &mconfig
 {
 }
 
-void softcard_nomapper_device::initialize_cartridge()
+image_init_result softcard_nomapper_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
-		fatalerror("softcard_nomapper: ROM region not setup\n");
+		message = "softcard_nomapper: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
 	}
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
 
+	return image_init_result::PASS;
 }
 
 } // anonymous namespace

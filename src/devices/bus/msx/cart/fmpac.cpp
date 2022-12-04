@@ -59,18 +59,33 @@ void msx_cart_fmpac_device::device_reset()
 
 }
 
-void msx_cart_fmpac_device::initialize_cartridge()
+image_init_result msx_cart_fmpac_device::initialize_cartridge(std::string &message)
 {
-	if (get_rom_size() != 0x10000)
+	if (!cart_rom_region())
 	{
-		fatalerror("fmpac: Invalid ROM size\n");
-	}
-	if (get_sram_size() != 0x2000)
-	{
-		fatalerror("fmpac: Invalid SRAM size\n");
+		message = "msx_cart_fmpac_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
 	}
 
-	m_rombank->configure_entries(0, 4, get_rom_base(), 0x4000);
+	if (!cart_sram_region())
+	{
+		message = "msx_cart_fmpac_device: Required region 'sram' was not found.";
+		return image_init_result::FAIL;
+	}
+
+	if (cart_rom_region()->bytes() != 0x10000)
+	{
+		message = "msx_cart_fmpac_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
+
+	if (cart_sram_region()->bytes() < 0x2000)
+	{
+		message = "msx_cart_fmpac_device: Region 'sram' has unsupported size.";
+		return image_init_result::FAIL;
+	}
+
+	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), 0x4000);
 
 	page(1)->install_view(0x4000, 0x7fff, m_view);
 	m_view[0].install_read_bank(0x4000, 0x7fff, m_rombank);
@@ -81,13 +96,15 @@ void msx_cart_fmpac_device::initialize_cartridge()
 	m_view[0].install_read_handler(0x7ff7, 0x7ff7, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_r)));
 	m_view[0].install_write_handler(0x7ff7, 0x7ff7, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_w)));
 
-	m_view[1].install_ram(0x4000, 0x5fff, get_sram_base());
+	m_view[1].install_ram(0x4000, 0x5fff, cart_sram_region()->base());
 	m_view[1].install_write_handler(0x5ffe, 0x5fff, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::sram_unlock)));
 	m_view[1].install_write_handler(0x7ff4, 0x7ff5, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
 	m_view[1].install_read_handler(0x7ff6, 0x7ff6, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_r)));
 	m_view[1].install_write_handler(0x7ff6, 0x7ff6, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::control_w)));
 	m_view[1].install_read_handler(0x7ff7, 0x7ff7, read8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_r)));
 	m_view[1].install_write_handler(0x7ff7, 0x7ff7, write8smo_delegate(*this, FUNC(msx_cart_fmpac_device::bank_w)));
+
+	return image_init_result::PASS;
 }
 
 void msx_cart_fmpac_device::sram_unlock(offs_t offset, u8 data)

@@ -14,6 +14,8 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_CARTRIDGE,        msx_slot_cartridge_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_YAMAHA_EXPANSION, msx_slot_yamaha_expansion_device)
 
 
+class msx_cart_interface;
+
 class msx_slot_cartridge_device : public device_t
 								, public device_cartrom_image_interface
 								, public device_slot_interface
@@ -52,6 +54,7 @@ protected:
 };
 
 
+
 class msx_slot_yamaha_expansion_device : public msx_slot_cartridge_device
 {
 public:
@@ -66,5 +69,38 @@ protected:
 	virtual void device_start() override;
 };
 
+
+
+class msx_cart_interface : public device_interface
+{
+	friend class msx_slot_cartridge_device;
+
+public:
+	// This is called after loading cartridge contents and allows the cartridge
+	// implementation to perform some additional initialization based on the
+	// cartridge contents.
+	virtual image_init_result initialize_cartridge(std::string &message) { return image_init_result::PASS; }
+	virtual void interface_pre_start() override { assert(m_exp != nullptr); }
+
+	void set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3);
+
+protected:
+	msx_cart_interface(const machine_config &mconfig, device_t &device);
+
+	memory_region *cart_rom_region() { return m_exp ? m_exp->memregion("rom") : nullptr; }
+	memory_region *cart_vlm5030_region() { return m_exp ? m_exp->memregion("vlm5030") : nullptr; }
+	memory_region *cart_kanji_region() { return m_exp ? m_exp->memregion("kanji") : nullptr; }
+	memory_region *cart_ram_region() { return m_exp ? m_exp->memregion("ram") : nullptr; }
+	memory_region *cart_sram_region() { return m_exp ? m_exp->memregion("sram") : nullptr; }
+	DECLARE_WRITE_LINE_MEMBER(irq_out);
+	address_space &memory_space() const;
+	address_space &io_space() const;
+	cpu_device &maincpu() const;
+	memory_view::memory_view_entry *page(int i) { return m_page[i]; }
+
+private:
+	msx_slot_cartridge_device *m_exp;
+	memory_view::memory_view_entry *m_page[4];
+};
 
 #endif // MAME_BUS_MSX_SLOT_CARTRIDGE_H
