@@ -3503,7 +3503,6 @@ TODO:
 		-->
 	</software>
 
-<!-- is this hacked as well? if so it shall be removed -->
 	<software name="advlanda" cloneof="advland">
 		<description>Adventureland (alt)</description>
 		<year>1984</year>
