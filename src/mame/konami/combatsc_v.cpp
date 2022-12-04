@@ -491,7 +491,7 @@ void combatscb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 	finish = source;
 	source += 0x400;
 	limit = (0x3400 - limit) / 8;
-	if (limit >= 0)
+	if (limit >= 0 && limit <= 0x80)
 		finish = source - limit * 8;
 	source -= 8;
 
