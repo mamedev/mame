@@ -1218,8 +1218,9 @@ void pc88va_state::pc88va(machine_config &config)
 ROM_START( pc88va )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
+	// In pc80s31k device
+//	ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
+//	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
 
 	ROM_REGION( 0x100000, "rom00", ROMREGION_ERASEFF ) // 0xe0000 - 0xeffff
 	ROM_LOAD( "varom00.rom", 0x00000, 0x80000, CRC(8a853b00) SHA1(1266ba969959ff25433ecc900a2caced26ef1a9e))
@@ -1228,8 +1229,7 @@ ROM_START( pc88va )
 	ROM_REGION( 0x20000, "rom10", 0 ) // 0xf0000 - 0xfffff
 	ROM_LOAD( "varom1.rom", 0x00000, 0x20000, CRC(0783b16a) SHA1(54536dc03238b4668c8bb76337efade001ec7826))
 
-	/* No idea of the proper size: it has never been dumped */
-	// TODO: identify this
+	// TODO: identify this, likely don't even belong to pc88va internals
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
@@ -1247,8 +1247,8 @@ ROM_END
 ROM_START( pc88va2 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
+//	ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
+//	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
 
 	ROM_REGION( 0x100000, "rom00", ROMREGION_ERASEFF ) // 0xe0000 - 0xeffff
 	ROM_LOAD( "varom00_va2.rom",   0x00000, 0x80000, CRC(98c9959a) SHA1(bcaea28c58816602ca1e8290f534360f1ca03fe8) )
@@ -1257,8 +1257,7 @@ ROM_START( pc88va2 )
 	ROM_REGION( 0x20000, "rom10", 0 ) // 0xf0000 - 0xfffff
 	ROM_LOAD( "varom1_va2.rom",    0x00000, 0x20000, CRC(7e767f00) SHA1(dd4f4521bfbb068f15ab3bcdb8d47c7d82b9d1d4) )
 
-	/* No idea of the proper size: it has never been dumped */
-	// TODO: identify this
+	// TODO: identify this, likely don't even belong to pc88va internals
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
