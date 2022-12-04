@@ -60,6 +60,7 @@ public:
 	void init_decocass();
 	void init_decocrom();
 	void init_cdsteljn();
+	void init_nebula();
 
 protected:
 	/* devices */
@@ -257,6 +258,7 @@ public:
 	void ctsttape(machine_config &config);
 	void castfant(machine_config &config);
 	void ctisland(machine_config &config);
+	void cnebula(machine_config &config);
 
 private:
 	DECLARE_MACHINE_RESET(ctsttape);
@@ -276,6 +278,7 @@ private:
 	DECLARE_MACHINE_RESET(cocean1a); /* 10 */
 	DECLARE_MACHINE_RESET(cfboy0a1); /* 12 */
 	DECLARE_MACHINE_RESET(clocknchj); /* 11 */
+	DECLARE_MACHINE_RESET(cnebula);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
