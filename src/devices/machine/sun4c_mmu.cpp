@@ -12,7 +12,6 @@
 #include "cpu/sparc/sparc.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 
 DEFINE_DEVICE_TYPE(SUN4_MMU, sun4_mmu_device, "sun4_mmu", "Sun 4 MMU")
@@ -986,7 +985,7 @@ void sun4_mmu_base_device::l2p_command(const std::vector<std::string_view> &para
 {
 	uint64_t addr, offset;
 
-	if (!machine().debugger().commands().validate_number_parameter(params[0], addr)) return;
+	if (!machine().debugger().console().validate_number_parameter(params[0], addr)) return;
 
 	addr &= 0xffffffff;
 	offset = addr >> 2;

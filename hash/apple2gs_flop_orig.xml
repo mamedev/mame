@@ -4070,4 +4070,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="canalmeu">
+		<description>Canal Meurtre</description>
+		<year>2022</year>
+		<publisher>Brutal Deluxe Software</publisher>
+		<info name="release" value="2022-9-30"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819272">
+				<rom name="canalmeurtre.2mg" size="819272" crc="b5c3cf6d" sha1="be8b75f6352d4e77146e75a911f4b8bbc54f5480"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -266,7 +266,7 @@ MAIN:
 		case 0xFD:				set_regop16(m_q.p.d);	%EXTENDED;	%ST16;		return;
 		case 0xFE:				set_regop16(m_u);		%EXTENDED;	%LD16;		return;
 		case 0xFF:				set_regop16(m_u);		%EXTENDED;	%ST16;		return;
-		default:													%ILLEGAL;	return;			
+		default:													%ILLEGAL;	return;
 	}
 	return;
 
@@ -319,7 +319,7 @@ DISPATCH10:
 		case 0xFE:				set_regop16(m_s);	%EXTENDED;		%LD16;		return;
 		case 0xFF:				set_regop16(m_s);	%EXTENDED;		%ST16;		return;
 
-		default:													%ILLEGAL;	return;			
+		default:													%ILLEGAL;	return;
 	}
 	return;
 
@@ -336,10 +336,10 @@ DISPATCH11:
 		case 0xAC:				set_regop16(m_s);	%INDEXED;		%CMP16;		return;
 		case 0xB3:				set_regop16(m_u);	%EXTENDED;		%CMP16;		return;
 		case 0xBC:				set_regop16(m_s);	%EXTENDED;		%CMP16;		return;
-		default:													%ILLEGAL;	return;			
+		default:													%ILLEGAL;	return;
 	}
 	return;
-	
+
 #include "base6x09.ops"
 
 PUSH_REGISTERS:
@@ -568,10 +568,21 @@ INDEXED:
 EXG:
 	{
 		uint8_t param = read_opcode_arg();
-		exgtfr_register reg1 = read_exgtfr_register(param >> 4);
-		exgtfr_register reg2 = read_exgtfr_register(param >> 0);
-		write_exgtfr_register(param >> 4, reg2);
+		uint16_t reg1, reg2;
+
+		// Exchange differs if 16 bit register or 8 bit register is first
+		if (BIT(param, 7))
+		{
+			reg1 = read_tfr_exg_816_register(param >> 4);
+			reg2 = read_tfr_exg_816_register(param >> 0);
+		}
+		else
+		{
+			reg1 = read_exg_168_register(param >> 4);
+			reg2 = read_exg_168_register(param >> 0);
+		}
 		write_exgtfr_register(param >> 0, reg1);
+		write_exgtfr_register(param >> 4, reg2);
 	}
 	@dummy_vma(hd6309_native_mode() ? 3 : 6);
 	return;
@@ -579,7 +590,7 @@ EXG:
 TFR:
 	{
 		uint8_t param = read_opcode_arg();
-		exgtfr_register reg = read_exgtfr_register(param >> 4);
+		uint16_t reg = read_tfr_exg_816_register(param >> 4);
 		write_exgtfr_register(param >> 0, reg);
 		if ((param & 0x0F) == 4) {
 			m_lds_encountered = true;

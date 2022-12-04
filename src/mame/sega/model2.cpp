@@ -114,7 +114,7 @@ u32 model2_state::timers_r(offs_t offset)
 	if (m_timerrun[offset])
 	{
 		// get elapsed time, convert to units of 25 MHz
-		u32 cur = (m_timers[offset]->time_elapsed() * 25000000).as_double();
+		u32 cur = (m_timers[offset]->elapsed() * 25000000).as_double();
 
 		// subtract units from starting value
 		m_timervals[offset] = m_timerorig[offset] - cur;
@@ -7412,7 +7412,7 @@ GAME( 1996, schamp,     0,        model2b,      schamp,    model2b_state, empty_
 GAME( 1996, sfight,     schamp,   model2b,      schamp,    model2b_state, empty_init,    ROT0, "Sega",   "Sonic the Fighters (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, lastbrnx,   0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, lastbrnxu,  lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, lastbrnxj,  lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, lastbrnxj,  lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx: Tokyo Bangaichi (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, doa,        0,        model2b_0229, doa,       model2b_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Jan 10 1997
 GAME( 1996, doab,       doa,      model2b_0229, doa,       model2b_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Dec 4 1996
 GAME( 1996, sgt24h,     0,        overrev2b,    sgt24h,    model2b_state, init_sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

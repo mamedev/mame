@@ -174,8 +174,6 @@ void calorie_state::video_start()
 
 uint32_t calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x;
-
 	if (m_bg_bank & 0x10)
 	{
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -186,7 +184,7 @@ uint32_t calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind1
 		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
-	for (x = 0x400; x >= 0; x -= 4)
+	for (int x = m_sprites.bytes() - 4; x >= 0; x -= 4)
 	{
 		int xpos, ypos, tileno, color, flipx, flipy;
 
@@ -211,7 +209,7 @@ uint32_t calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind1
 
 		if (m_sprites[x + 1] & 0x10)
 		{
-				/* 32x32 sprites */
+			/* 32x32 sprites */
 			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
 		}
 		else

@@ -193,21 +193,20 @@ inline uint16_t &konami_cpu_device::ireg()
 //  read_exgtfr_register
 //-------------------------------------------------
 
-inline m6809_base_device::exgtfr_register konami_cpu_device::read_exgtfr_register(uint8_t reg)
+inline uint16_t konami_cpu_device::read_exgtfr_register(uint8_t reg)
 {
-	exgtfr_register result;
-	result.word_value = 0x00FF;
+	uint16_t result = 0x00FF;
 
 	switch(reg & 0x07)
 	{
-		case  0: result.word_value = m_q.r.a;   break;  // A
-		case  1: result.word_value = m_q.r.b;   break;  // B
-		case  2: result.word_value = m_x.w;     break;  // X
-		case  3: result.word_value = m_y.w;     break;  // Y
-		case  4: result.word_value = m_s.w;     break;  // S
-		case  5: result.word_value = m_u.w;     break;  // U
+		case  0: result = m_q.r.a;   break;  // A
+		case  1: result = m_q.r.b;   break;  // B
+		case  2: result = m_x.w;     break;  // X
+		case  3: result = m_y.w;     break;  // Y
+		case  4: result = m_s.w;     break;  // S
+		case  5: result = m_u.w;     break;  // U
 	}
-	result.byte_value = (uint8_t) result.word_value;
+
 	return result;
 }
 
@@ -216,16 +215,16 @@ inline m6809_base_device::exgtfr_register konami_cpu_device::read_exgtfr_registe
 //  write_exgtfr_register
 //-------------------------------------------------
 
-inline void konami_cpu_device::write_exgtfr_register(uint8_t reg, m6809_base_device::exgtfr_register value)
+inline void konami_cpu_device::write_exgtfr_register(uint8_t reg, uint16_t value)
 {
 	switch(reg & 0x07)
 	{
-		case  0: m_q.r.a = value.byte_value;    break;  // A
-		case  1: m_q.r.b = value.byte_value;    break;  // B
-		case  2: m_x.w   = value.word_value;    break;  // X
-		case  3: m_y.w   = value.word_value;    break;  // Y
-		case  4: m_s.w   = value.word_value;    break;  // S
-		case  5: m_u.w   = value.word_value;    break;  // U
+		case  0: m_q.r.a = value;    break;  // A
+		case  1: m_q.r.b = value;    break;  // B
+		case  2: m_x.w   = value;    break;  // X
+		case  3: m_y.w   = value;    break;  // Y
+		case  4: m_s.w   = value;    break;  // S
+		case  5: m_u.w   = value;    break;  // U
 	}
 }
 

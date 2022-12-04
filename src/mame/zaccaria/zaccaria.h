@@ -40,6 +40,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	void videoram_w(offs_t offset, uint8_t data);
 	void attributes_w(offs_t offset, uint8_t data);
+	uint8_t read_attr(offs_t offset, int which);
+	void update_colscroll();
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	void dsw_sel_w(uint8_t data);

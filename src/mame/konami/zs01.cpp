@@ -14,6 +14,8 @@
 #include "emu.h"
 #include "zs01.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL ( 0 )
 
 inline void ATTR_PRINTF( 3, 4 ) zs01_device::verboselog( int n_level, const char *s_fmt, ... )

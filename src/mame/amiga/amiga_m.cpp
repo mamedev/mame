@@ -152,9 +152,6 @@ void amiga_state::machine_start()
 {
 	m_power_led.resolve();
 
-	// add callback for RESET instruction
-	m_maincpu->set_reset_callback(*this, FUNC(amiga_state::m68k_reset));
-
 	// set up chip RAM access
 	memory_share *share = memshare("chip_ram");
 	if (share == nullptr)

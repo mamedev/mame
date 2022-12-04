@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Mirko Buffoni
+// copyright-holders: Mirko Buffoni
+
 /***************************************************************************
 
 Son Son memory map (preliminary)
+Capcom 84601-A + 84601-B PCBs
 
 driver by Mirko Buffoni
 
@@ -51,15 +53,225 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "sonson.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
+
+class sonson_state : public driver_device
+{
+public:
+	sonson_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+	{ }
+
+	void sonson(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void scrollx_w(uint8_t data);
+	template<uint8_t Which> WRITE_LINE_MEMBER(coin_counter_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Son Son has two 32x8 palette PROMs and two 256x4 lookup table PROMs (one
+  for characters, one for sprites).
+  The palette PROMs are connected to the RGB output this way:
+
+  I don't know the exact values of the resistors between the PROMs and the
+  RGB output. I assumed these values (the same as Commando)
+  bit 7 -- 220 ohm resistor  -- GREEN
+        -- 470 ohm resistor  -- GREEN
+        -- 1  kohm resistor  -- GREEN
+        -- 2.2kohm resistor  -- GREEN
+        -- 220 ohm resistor  -- BLUE
+        -- 470 ohm resistor  -- BLUE
+        -- 1  kohm resistor  -- BLUE
+  bit 0 -- 2.2kohm resistor  -- BLUE
+
+  bit 7 -- unused
+        -- unused
+        -- unused
+        -- unused
+        -- 220 ohm resistor  -- RED
+        -- 470 ohm resistor  -- RED
+        -- 1  kohm resistor  -- RED
+  bit 0 -- 2.2kohm resistor  -- RED
+
+***************************************************************************/
+
+void sonson_state::palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2, bit3;
+
+		// red component
+		bit0 = (color_prom[i + 0x20] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x20] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x20] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x20] >> 3) & 0x01;
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		// green component
+		bit0 = (color_prom[i + 0x00] >> 4) & 0x01;
+		bit1 = (color_prom[i + 0x00] >> 5) & 0x01;
+		bit2 = (color_prom[i + 0x00] >> 6) & 0x01;
+		bit3 = (color_prom[i + 0x00] >> 7) & 0x01;
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		// blue component
+		bit0 = (color_prom[i + 0x00] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x00] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x00] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x00] >> 3) & 0x01;
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// color_prom now points to the beginning of the lookup table
+	color_prom += 0x40;
+
+	// characters use colors 0-0x0f
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
+		palette.set_pen_indirect(i, ctabentry);
+	}
+
+	// sprites use colors 0x10-0x1f
+	for (int i = 0x100; i < 0x200; i++)
+	{
+		uint8_t const ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		palette.set_pen_indirect(i, ctabentry);
+	}
+}
+
+void sonson_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void sonson_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void sonson_state::scrollx_w(uint8_t data)
+{
+	for (int row = 5; row < 32; row++)
+		m_bg_tilemap->set_scrollx(row, data);
+}
+
+TILE_GET_INFO_MEMBER(sonson_state::get_bg_tile_info)
+{
+	int const attr = m_colorram[tile_index];
+	int const code = m_videoram[tile_index] + 256 * (attr & 0x03);
+	int const color = attr >> 2;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+void sonson_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sonson_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_rows(32);
+}
+
+void sonson_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int const code = m_spriteram[offs + 2] + ((m_spriteram[offs + 1] & 0x20) << 3);
+		int const color = m_spriteram[offs + 1] & 0x1f;
+		int flipx = ~m_spriteram[offs + 1] & 0x40;
+		int flipy = ~m_spriteram[offs + 1] & 0x80;
+		int sx = m_spriteram[offs + 3];
+		int sy = m_spriteram[offs + 0];
+
+		if (flip_screen())
+		{
+			sx = 240 - sx;
+			sy = 240 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+			code, color,
+			flipx, flipy,
+			sx, sy, 0);
+
+		// wrap-around
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx - 256, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy - 256, 0);
+	}
+}
+
+uint32_t sonson_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+
+// machine
 
 WRITE_LINE_MEMBER(sonson_state::sh_irqtrigger_w)
 {
@@ -68,23 +280,19 @@ WRITE_LINE_MEMBER(sonson_state::sh_irqtrigger_w)
 		m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(sonson_state::coin1_counter_w)
+template <uint8_t Which>
+WRITE_LINE_MEMBER(sonson_state::coin_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-WRITE_LINE_MEMBER(sonson_state::coin2_counter_w)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
+	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
 void sonson_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x13ff).ram().w(FUNC(sonson_state::sonson_videoram_w)).share("videoram");
-	map(0x1400, 0x17ff).ram().w(FUNC(sonson_state::sonson_colorram_w)).share("colorram");
-	map(0x2020, 0x207f).ram().share("spriteram");
-	map(0x3000, 0x3000).w(FUNC(sonson_state::sonson_scrollx_w));
+	map(0x1000, 0x13ff).ram().w(FUNC(sonson_state::videoram_w)).share(m_videoram);
+	map(0x1400, 0x17ff).ram().w(FUNC(sonson_state::colorram_w)).share(m_colorram);
+	map(0x2020, 0x207f).ram().share(m_spriteram);
+	map(0x3000, 0x3000).w(FUNC(sonson_state::scrollx_w));
 	map(0x3002, 0x3002).portr("P1");
 	map(0x3003, 0x3003).portr("P2");
 	map(0x3004, 0x3004).portr("SYSTEM");
@@ -110,33 +318,33 @@ void sonson_state::sound_map(address_map &map)
 static INPUT_PORTS_START( sonson )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -156,14 +364,14 @@ static INPUT_PORTS_START( sonson )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x10, 0x10, "Coinage affects" ) PORT_DIPLOCATION("SW1:5")  /* Not documented in manual */
+	PORT_DIPNAME( 0x10, 0x10, "Coinage affects" ) PORT_DIPLOCATION("SW1:5")  // Not documented in manual
 	PORT_DIPSETTING(    0x10, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Coin_B ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:7")
-		PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen )) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen )) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -173,7 +381,7 @@ static INPUT_PORTS_START( sonson )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, "2 Players Game" ) PORT_DIPLOCATION("SW2:3")  /* Not documented in manual */
+	PORT_DIPNAME( 0x04, 0x00, "2 Players Game" ) PORT_DIPLOCATION("SW2:3")  // Not documented in manual
 	PORT_DIPSETTING(    0x04, "1 Credit" )
 	PORT_DIPSETTING(    0x00, "2 Credits" )
 	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
@@ -206,8 +414,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_sonson )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar,      0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       64*4, 32 )
+	GFXDECODE_ENTRY( "chars",   0, gfx_8x8x2_planar,      0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,       64*4, 32 )
 GFXDECODE_END
 
 
@@ -215,41 +423,41 @@ GFXDECODE_END
 
 void sonson_state::sonson(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809(config, m_maincpu, XTAL(12'000'000)/2); // HD68B09P (/4 internally)
+	// basic machine hardware
+	MC6809(config, m_maincpu, XTAL(12'000'000) / 2); // HD68B09P (/4 internally)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sonson_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sonson_state::irq0_line_hold));
 
-	MC6809(config, m_audiocpu, XTAL(12'000'000)/2); // HD68B09P (/4 internally)
+	MC6809(config, m_audiocpu, XTAL(12'000'000) / 2); // HD68B09P (/4 internally)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sonson_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(sonson_state::irq0_line_hold), attotime::from_hz(4*60));    /* FIRQs are triggered by the main CPU */
+	m_audiocpu->set_periodic_int(FUNC(sonson_state::irq0_line_hold), attotime::from_hz(4 * 60));    // FIRQs are triggered by the main CPU
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // A9
-	mainlatch.q_out_cb<0>().set(FUNC(sonson_state::flipscreen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(sonson_state::flip_screen_set)).invert();
 	mainlatch.q_out_cb<1>().set(FUNC(sonson_state::sh_irqtrigger_w));
-	mainlatch.q_out_cb<6>().set(FUNC(sonson_state::coin2_counter_w));
-	mainlatch.q_out_cb<7>().set(FUNC(sonson_state::coin1_counter_w));
+	mainlatch.q_out_cb<6>().set(FUNC(sonson_state::coin_counter_w<1>));
+	mainlatch.q_out_cb<7>().set(FUNC(sonson_state::coin_counter_w<0>));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57.37);
+	screen.set_refresh_hz(55.40);
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(1*8, 31*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(sonson_state::screen_update_sonson));
+	screen.set_screen_update(FUNC(sonson_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sonson);
 
-	PALETTE(config, m_palette, FUNC(sonson_state::sonson_palette), 64*4 + 32*8, 32);
+	PALETTE(config, m_palette, FUNC(sonson_state::palette), 64*4 + 32*8, 32);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);   /* 1.5 MHz */
+	AY8910(config, "ay1", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);   // 1.5 MHz
 
-	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);   /* 1.5 MHz */
+	AY8910(config, "ay2", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);   // 1.5 MHz
 }
 
 
@@ -261,7 +469,7 @@ void sonson_state::sonson(machine_config &config)
 ***************************************************************************/
 
 ROM_START( sonson )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ss.01e",       0x4000, 0x4000, CRC(cd40cc54) SHA1(4269586099638d31dd30381e94538701982e9f5a) )
 	ROM_LOAD( "ss.02e",       0x8000, 0x4000, CRC(c3476527) SHA1(499b879a12b55443ec833e5a2819e9da20e3b033) )
 	ROM_LOAD( "ss.03e",       0xc000, 0x4000, CRC(1fd0e729) SHA1(e04215b0c3d11ce844ab250ff3e1a845dd0b6c3e) )
@@ -269,12 +477,12 @@ ROM_START( sonson )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ss_6.c11",     0xe000, 0x2000, CRC(1135c48a) SHA1(bfc10363fc42fb589088675a6e8e3d1668d8a6b8) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "ss_7.b6",      0x00000, 0x2000, CRC(990890b1) SHA1(0ae5da75e8ff013d32f2a6e3a015d5e1623fbb19) )   /* characters */
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "ss_7.b6",      0x00000, 0x2000, CRC(990890b1) SHA1(0ae5da75e8ff013d32f2a6e3a015d5e1623fbb19) )
 	ROM_LOAD( "ss_8.b5",      0x02000, 0x2000, CRC(9388ff82) SHA1(31ff5e61d062262754bbf6763d094495c1d2e838) )
 
-	ROM_REGION( 0x0c000, "gfx2", 0 )
-	ROM_LOAD( "ss_9.m5",      0x00000, 0x2000, CRC(8cb1cacf) SHA1(41b479dae84176ceb4eacb30b4dad58b7767606e) )   /* sprites */
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "ss_9.m5",      0x00000, 0x2000, CRC(8cb1cacf) SHA1(41b479dae84176ceb4eacb30b4dad58b7767606e) )
 	ROM_LOAD( "ss_10.m6",     0x02000, 0x2000, CRC(f802815e) SHA1(968145680483620cb0c9e7c00b4927aeace99e0c) )
 	ROM_LOAD( "ss_11.m3",     0x04000, 0x2000, CRC(4dbad88a) SHA1(721612555714e116564d2b301cfa04980d21ad3b) )
 	ROM_LOAD( "ss_12.m4",     0x06000, 0x2000, CRC(aa05e687) SHA1(4988d540e3deb9107f0448cd8ef47fa73ec926fe) )
@@ -282,15 +490,15 @@ ROM_START( sonson )
 	ROM_LOAD( "ss_14.m2",     0x0a000, 0x2000, CRC(e14ef54e) SHA1(69ab42defff2cb91c6e07ea8805f64868a028630) )
 
 	ROM_REGION( 0x0340, "proms", 0 )
-	ROM_LOAD( "ssb4.b2",      0x0000, 0x0020, CRC(c8eaf234) SHA1(d39dfab6dcad6b0a719c466b5290d2d081e4b58d) )    /* red/green component */
-	ROM_LOAD( "ssb5.b1",      0x0020, 0x0020, CRC(0e434add) SHA1(238c281813d6079b9ae877bd0ced33abbbe39442) )    /* blue component */
-	ROM_LOAD( "ssb2.c4",      0x0040, 0x0100, CRC(c53321c6) SHA1(439d98a98cdf2118b887c725a7759a98e2c377d9) )    /* character lookup table */
-	ROM_LOAD( "ssb3.h7",      0x0140, 0x0100, CRC(7d2c324a) SHA1(3dcf09bd3f58bddb9760183d2c1b0fe5d77536ea) )    /* sprite lookup table */
-	ROM_LOAD( "ssb1.k11",     0x0240, 0x0100, CRC(a04b0cfe) SHA1(89ab33c6b0aa313ebda2f11516cea667a9951a81) )    /* unknown (not used) */
+	ROM_LOAD( "ssb4.b2",      0x0000, 0x0020, CRC(c8eaf234) SHA1(d39dfab6dcad6b0a719c466b5290d2d081e4b58d) )    // red/green component
+	ROM_LOAD( "ssb5.b1",      0x0020, 0x0020, CRC(0e434add) SHA1(238c281813d6079b9ae877bd0ced33abbbe39442) )    // blue component
+	ROM_LOAD( "ssb2.c4",      0x0040, 0x0100, CRC(c53321c6) SHA1(439d98a98cdf2118b887c725a7759a98e2c377d9) )    // character lookup table
+	ROM_LOAD( "ssb3.h7",      0x0140, 0x0100, CRC(7d2c324a) SHA1(3dcf09bd3f58bddb9760183d2c1b0fe5d77536ea) )    // sprite lookup table
+	ROM_LOAD( "ssb1.k11",     0x0240, 0x0100, CRC(a04b0cfe) SHA1(89ab33c6b0aa313ebda2f11516cea667a9951a81) )    // unknown (not used)
 ROM_END
 
 ROM_START( sonsonj )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ss_0.l9",      0x4000, 0x2000, CRC(705c168f) SHA1(28d3b186cd0b927d96664051fb759b64ecc18908) )
 	ROM_LOAD( "ss_1.j9",      0x6000, 0x2000, CRC(0f03b57d) SHA1(7d14a88f43952d5c4df2951a5b62e399ba5ef37b) )
 	ROM_LOAD( "ss_2.l8",      0x8000, 0x2000, CRC(a243a15d) SHA1(a736a163fbb20fa0e318f53ccf29d155b6f77781) )
@@ -301,12 +509,12 @@ ROM_START( sonsonj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ss_6.c11",     0xe000, 0x2000, CRC(1135c48a) SHA1(bfc10363fc42fb589088675a6e8e3d1668d8a6b8) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "ss_7.b6",      0x00000, 0x2000, CRC(990890b1) SHA1(0ae5da75e8ff013d32f2a6e3a015d5e1623fbb19) )   /* characters */
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "ss_7.b6",      0x00000, 0x2000, CRC(990890b1) SHA1(0ae5da75e8ff013d32f2a6e3a015d5e1623fbb19) )
 	ROM_LOAD( "ss_8.b5",      0x02000, 0x2000, CRC(9388ff82) SHA1(31ff5e61d062262754bbf6763d094495c1d2e838) )
 
-	ROM_REGION( 0x0c000, "gfx2", 0 )
-	ROM_LOAD( "ss_9.m5",      0x00000, 0x2000, CRC(8cb1cacf) SHA1(41b479dae84176ceb4eacb30b4dad58b7767606e) )   /* sprites */
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "ss_9.m5",      0x00000, 0x2000, CRC(8cb1cacf) SHA1(41b479dae84176ceb4eacb30b4dad58b7767606e) )
 	ROM_LOAD( "ss_10.m6",     0x02000, 0x2000, CRC(f802815e) SHA1(968145680483620cb0c9e7c00b4927aeace99e0c) )
 	ROM_LOAD( "ss_11.m3",     0x04000, 0x2000, CRC(4dbad88a) SHA1(721612555714e116564d2b301cfa04980d21ad3b) )
 	ROM_LOAD( "ss_12.m4",     0x06000, 0x2000, CRC(aa05e687) SHA1(4988d540e3deb9107f0448cd8ef47fa73ec926fe) )
@@ -314,12 +522,14 @@ ROM_START( sonsonj )
 	ROM_LOAD( "ss_14.m2",     0x0a000, 0x2000, CRC(e14ef54e) SHA1(69ab42defff2cb91c6e07ea8805f64868a028630) )
 
 	ROM_REGION( 0x0340, "proms", 0 )
-	ROM_LOAD( "ssb4.b2",      0x0000, 0x0020, CRC(c8eaf234) SHA1(d39dfab6dcad6b0a719c466b5290d2d081e4b58d) )    /* red/green component */
-	ROM_LOAD( "ssb5.b1",      0x0020, 0x0020, CRC(0e434add) SHA1(238c281813d6079b9ae877bd0ced33abbbe39442) )    /* blue component */
-	ROM_LOAD( "ssb2.c4",      0x0040, 0x0100, CRC(c53321c6) SHA1(439d98a98cdf2118b887c725a7759a98e2c377d9) )    /* character lookup table */
-	ROM_LOAD( "ssb3.h7",      0x0140, 0x0100, CRC(7d2c324a) SHA1(3dcf09bd3f58bddb9760183d2c1b0fe5d77536ea) )    /* sprite lookup table */
-	ROM_LOAD( "ssb1.k11",     0x0240, 0x0100, CRC(a04b0cfe) SHA1(89ab33c6b0aa313ebda2f11516cea667a9951a81) )    /* unknown (not used) */
+	ROM_LOAD( "ssb4.b2",      0x0000, 0x0020, CRC(c8eaf234) SHA1(d39dfab6dcad6b0a719c466b5290d2d081e4b58d) )    // red/green component
+	ROM_LOAD( "ssb5.b1",      0x0020, 0x0020, CRC(0e434add) SHA1(238c281813d6079b9ae877bd0ced33abbbe39442) )    // blue component
+	ROM_LOAD( "ssb2.c4",      0x0040, 0x0100, CRC(c53321c6) SHA1(439d98a98cdf2118b887c725a7759a98e2c377d9) )    // character lookup table
+	ROM_LOAD( "ssb3.h7",      0x0140, 0x0100, CRC(7d2c324a) SHA1(3dcf09bd3f58bddb9760183d2c1b0fe5d77536ea) )    // sprite lookup table
+	ROM_LOAD( "ssb1.k11",     0x0240, 0x0100, CRC(a04b0cfe) SHA1(89ab33c6b0aa313ebda2f11516cea667a9951a81) )    // unknown (not used)
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1984, sonson,  0,      sonson, sonson, sonson_state, empty_init, ROT0, "Capcom", "Son Son",         MACHINE_SUPPORTS_SAVE )

@@ -228,6 +228,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 #include "bingowng.lh"
 #include "cherryb3.lh"
 #include "chrygld.lh"
@@ -8574,6 +8576,11 @@ static GFXDECODE_START( gfx_pkrmast )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout, 128+64, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_cmfb55 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout, 128+64, 16 )
+	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 )
+GFXDECODE_END
 
 static const gfx_layout cm97_layout =
 {
@@ -9021,6 +9028,12 @@ void cmaster_state::cmasterc(machine_config &config)
 {
 	cm(config);
 	m_gfxdecode->set_info(gfx_cmasterc);
+}
+
+void cmaster_state::cmfb55(machine_config &config)
+{
+	cm(config);
+	m_gfxdecode->set_info(gfx_cmfb55);
 }
 
 void cmaster_state::cm97(machine_config &config)
@@ -11546,6 +11559,32 @@ ROM_START( cmasterk )
 	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+ROM_START( srmagic )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "real magic.u81", 0x00000, 0x10000, CRC(93ef9f6a) SHA1(ad482b5df9de02a245567642d20f51da2ec2dfed) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(a88e5ba1) SHA1(571658a50dd7dafdaf3eeb18a5153b014ee9f837) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(ca6578e7) SHA1(a33fe55f51b15850bef507d36192707c0959f708) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(5227ccd6) SHA1(16b31977782e14aa9757cc99bf21a95ffdae3d25) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(1df9ffa7) SHA1(851f32c369e7879c2054399a820463d84007bc1c) ) // 1xxxxxxxxxxxx = 0x00
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(123ccb63) SHA1(c23391a1fb70a8122eee48b8ea6300a058da98d5) ) // 1xxxxxxxxxxxx = 0x00
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(fdaeb68f) SHA1(f41e54d43cb73c7e9ae99e78043a7df4958cb8ce) ) // 1xxxxxxxxxxxx = 0x00
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(768d2483) SHA1(ac7f02b26d12363281cb65b74577a8fc1d68c35b) ) // 1xxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u13", 0x00000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(208727e7) SHA1(7c868b06da03fe95266555775b8185d38e25ce3f) )
+	ROM_LOAD( "82s129.u79", 0x100, 0x100, CRC(01349092) SHA1(cd2910f7d842f37db35ad25414536a8c49a85293) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
 ROM_START( ll3 ) // WANG QL-1  V3.03 string
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "min bet 8.u1", 0x00000, 0x10000, CRC(f19d0af3) SHA1(deefe5782213d60d8d0aae6826aa6a0109925289) ) // on sub PCB
@@ -11811,6 +11850,36 @@ ROM_START( tonypok )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( cmfb55 ) // uses same GFX as pkrmast
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cherry master dyna plus v9.0. jackpot 9000.n3", 0x3000, 0x1000, CRC(875bc881) SHA1(c4b59442f6c55e37672d9b80712125042408d541) )
+	ROM_CONTINUE(                                              0x6000, 0x1000)
+	ROM_CONTINUE(                                              0x4000, 0x1000)
+	ROM_CONTINUE(                                              0x1000, 0x1000)
+	ROM_CONTINUE(                                              0x0000, 0x1000)
+	ROM_CONTINUE(                                              0x2000, 0x1000)
+	ROM_CONTINUE(                                              0x7000, 0x1000)
+	ROM_CONTINUE(                                              0x5000, 0x1000)
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "cherry master f-3.f3", 0x00000,  0x20000, CRC(ed0dfbfe) SHA1(c3a5b68e821461b161293eaec1515e2b0f26c4f9) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) // reels
+	ROM_LOAD( "cherry master h-3.3h", 0x00000,  0x10000, CRC(4c42f829) SHA1(110f7b7cd186d0e56ae822709ad42db70a3d0788) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "c.m.89-005-8.j6",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x10000, "palette_rom", 0 )
+	ROM_LOAD( "cherry master n-5.n5", 0x00000, 0x10000, CRC(2ae7f151) SHA1(b41ec09fddf51895dfcca461d9b0ddb1cdb72506) ) // this uses a big ROM containing the data for the usual PROMs
+
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	// filled at init from the "palette_rom" region
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_COPY( "palette_rom", 0x1000, 0x0000, 0x0100 )
 ROM_END
 
 // the program roms on these are scrambled
@@ -18850,19 +18919,28 @@ void cmaster_state::init_ll3() // verified with ICE dump
 	uint8_t *rom = memregion("maincpu")->base();
 
 	// swap some 0x1000 blocks around
-	for (int i = 0x0000; i < 0x1000; i ++)
-	{
-		std::swap(rom[i], rom[0x8000 + i]);
-		std::swap(rom[0x5000 + i], rom[0x7000 + i]);
-	}
+	std::swap_ranges(&rom[0], &rom[0x1000], &rom[0x8000]);
+	std::swap_ranges(&rom[0x5000], &rom[0x6000], &rom[0x7000]);
 
 	// swap some 0x800 blocks around
-	for (int i = 0x000; i < 0x800; i ++)
+	std::swap_ranges(&rom[0x1800], &rom[0x2000], &rom[0x4800]);
+	std::swap_ranges(&rom[0x2800], &rom[0x3000], &rom[0xa800]);
+	std::swap_ranges(&rom[0x6800], &rom[0x7000], &rom[0x9800]);
+}
+
+void cmaster_state::init_cmfb55()
+{
+	// palette is in a ROM with different format, adapt to what MAME expects
+	uint8_t *palette_rom = memregion("palette_rom")->base();
+	uint8_t *proms = memregion("proms")->base();
+
+	for (int i = 0x000; i < 0x100; i++)
 	{
-		std::swap(rom[0x1800 + i], rom[0x4800 + i]);
-		std::swap(rom[0x2800 + i], rom[0xa800 + i]);
-		std::swap(rom[0x6800 + i], rom[0x9800 + i]);
+		proms[i] = palette_rom[i] & 0x0f;
+		proms[i + 0x100] = (palette_rom[i] & 0xf0) >> 4;
 	}
+
+	m_palette->update();
 }
 
 void goldstar_state::init_cmast91()
@@ -19856,6 +19934,8 @@ GAMEL( 1991, cmasterk,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,
 GAMEL( 199?, super7,    cmaster,  super7,   cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb ) // bad palette, no reels, decryption might be missing something, too
 GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 GAMEL( 199?, ll3,       cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
+GAMEL( 199?, cmfb55,    cmaster,  cmfb55,   cmaster,  cmaster_state,  init_cmfb55,    ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    MACHINE_NOT_WORKING, layout_cmv4 ) // inputs not done
+GAMEL( 1991, srmagic,   cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "bootleg",           "Super Real Magic (V6.3)",                     MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls

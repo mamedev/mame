@@ -343,9 +343,6 @@ void segaxbd_state::device_reset()
 {
 	m_segaic16vid->tilemap_reset(*m_screen);
 
-	// hook the RESET line, which resets CPU #1
-	m_maincpu->set_reset_callback(*this, FUNC(segaxbd_state::m68k_reset_callback));
-
 	// start timers to track interrupts
 	m_scanline_timer->adjust(m_screen->time_until_pos(0), 0);
 }
@@ -1663,6 +1660,7 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_state::main_map);
+	m_maincpu->reset_cb().set(FUNC(segaxbd_state::m68k_reset_callback));
 
 	M68000(config, m_subcpu, MASTER_CLOCK/4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segaxbd_state::sub_map);
@@ -1766,6 +1764,7 @@ void segaxbd_fd1094_state::device_add_mconfig(machine_config &config)
 	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_fd1094_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaxbd_fd1094_state::decrypted_opcodes_map);
+	m_maincpu->reset_cb().set(FUNC(segaxbd_fd1094_state::m68k_reset_callback));
 }
 
 void segaxbd_new_state::sega_xboard_fd1094(machine_config &config)
@@ -1821,6 +1820,7 @@ void segaxbd_lastsurv_fd1094_state::device_add_mconfig(machine_config &config)
 	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_lastsurv_fd1094_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaxbd_lastsurv_fd1094_state::decrypted_opcodes_map);
+	m_maincpu->reset_cb().set(FUNC(segaxbd_lastsurv_fd1094_state::m68k_reset_callback));
 
 	// basic machine hardware
 	// TODO: network board
@@ -1883,6 +1883,7 @@ void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
 	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaxbd_smgp_fd1094_state::decrypted_opcodes_map);
+	m_maincpu->reset_cb().set(FUNC(segaxbd_smgp_fd1094_state::m68k_reset_callback));
 
 	// basic machine hardware
 	Z80(config, m_soundcpu2, SOUND_CLOCK/4);

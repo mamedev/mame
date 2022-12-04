@@ -622,6 +622,7 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 	add_via1_adb(config, true);
 	add_via2(config);
 
+#if MACII_USE_ADBMODEM
 	ADBMODEM(config, m_adbmodem, C7M);
 	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
@@ -629,9 +630,17 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 	m_adbmodem->irq_callback().set(FUNC(mac_state::adb_irq_w));
 	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
 	config.set_perfect_quantum(m_maincpu);
+#endif
 
 	MACADB(config, m_macadb, C15M);
+#if !MACII_USE_ADBMODEM
+	m_macadb->set_mcu_mode(false);
+	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
+#else
 	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+#endif
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
@@ -776,6 +785,7 @@ void mac_state::macse30(machine_config &config)
 	add_via1_adb(config, false);
 	add_via2(config);
 
+#if MACII_USE_ADBMODEM
 	ADBMODEM(config, m_adbmodem, C7M);
 	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
@@ -783,9 +793,17 @@ void mac_state::macse30(machine_config &config)
 	m_adbmodem->irq_callback().set(FUNC(mac_state::adb_irq_w));
 	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
 	config.set_perfect_quantum(m_maincpu);
+#endif
 
 	MACADB(config, m_macadb, C15M);
+#if !MACII_USE_ADBMODEM
+	m_macadb->set_mcu_mode(false);
+	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
+#else
 	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+#endif
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");

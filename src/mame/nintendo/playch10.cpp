@@ -137,7 +137,7 @@ However, this is effective ONLY if 7 other DSWB (I-O) are OFF !
 I add the 32 combinations for coinage.
 
 As I don't know what is the default value for timer speed, and I don't want to write
-the 64 combinaisons, I only put some values ... Feel free to add the other ones ...
+the 64 combinations, I only put some values ... Feel free to add the other ones ...
 
  DSW A    DSW B
 HGFEDCBA PONMLKJI    coin A  coin B

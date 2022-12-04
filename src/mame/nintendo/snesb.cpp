@@ -35,7 +35,7 @@ TODO:
  - venom    : gfx glitches on second level
  - wldgunsb : dipswitches
  - wldgunsb : sometimes continue counter doesn't start from '9', verify if protection is involved.
- - tmnsmwb  : dipswitches
+ - tmntmwb  : dipswitches
 
 ***************************************************************************
 
@@ -453,8 +453,8 @@ void snesb_state::tmntmwb_map(address_map &map)
 
 	map(0x7103cd, 0x7103ce).r(FUNC(snesb_state::tmntmwb_7103cd_r));
 	map(0x7065f0, 0x7065f1).r(FUNC(snesb_state::tmntmwb_7065f0_r));
-	map(0x7132cc, 0x7132cd).r(FUNC(snesb_state::tmntmwb_7132cc_r)); 
-	map(0x7010f1, 0x7010f2).r(FUNC(snesb_state::tmntmwb_7010f1_r)); 
+	map(0x7132cc, 0x7132cd).r(FUNC(snesb_state::tmntmwb_7132cc_r));
+	map(0x7010f1, 0x7010f2).r(FUNC(snesb_state::tmntmwb_7010f1_r));
 
 	map(0x781000, 0x7810ff).ram().share(m_shared_ram[0]);
 }
@@ -1704,9 +1704,7 @@ ROM_END
 
 ROM_START( legendsb )
 	ROM_REGION( 0x100000, "user3", 0 )
-	ROM_LOAD( "u37_0", 0x000000, 0x080000, BAD_DUMP CRC(44101f23) SHA1(7563886598b290faa616397f7e87a56e2f984b79) ) // U37 ROM is bad, was unable to get stable reads
-	ROM_LOAD( "u37_1", 0x000000, 0x080000, BAD_DUMP CRC(d2e835bb) SHA1(0620e099f43cde95d6b4b210eef13abbff5f40e9) )
-	ROM_LOAD( "u37_2", 0x000000, 0x008000, BAD_DUMP CRC(1bc6f429) SHA1(eb4e1a483d2aa545a1ba33243afd9693ee5bebd0) )
+	ROM_LOAD( "u37",   0x000000, 0x008000, BAD_DUMP CRC(bbcb643f) SHA1(f8c013a50ad43aca231032c731c14d298a7a1e31) ) // Combined from a number of bad dumps
 	ROM_CONTINUE(      0x088000, 0x008000 )
 	ROM_CONTINUE(      0x010000, 0x008000 )
 	ROM_CONTINUE(      0x098000, 0x008000 )

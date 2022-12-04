@@ -52,19 +52,14 @@ TILE_GET_INFO_MEMBER(starshp1_state::get_tile_info)
 
 void starshp1_state::video_start()
 {
-	uint16_t val = 0;
-
-	int i;
-
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(starshp1_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 8);
-
 	m_bg_tilemap->set_transparent_pen(0);
-
 	m_bg_tilemap->set_scrollx(0, -8);
 
 	m_LSFR = std::make_unique<uint16_t[]>(0x10000);
 
-	for (i = 0; i < 0x10000; i++)
+	uint16_t val = 0;
+	for (int i = 0; i < 0x10000; i++)
 	{
 		int bit = (val >> 0xf) ^
 					(val >> 0xc) ^
@@ -123,7 +118,6 @@ void starshp1_state::starshp1_sspic_w(uint8_t data)
 	 */
 
 	m_ship_picture = data;
-
 }
 
 
@@ -138,7 +132,7 @@ void starshp1_state::starshp1_playfield_w(offs_t offset, uint8_t data)
 }
 
 
-void starshp1_state::draw_starfield(bitmap_ind16 &bitmap)
+void starshp1_state::draw_starfield(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/*
 	 * The LSFR is reset once per frame at the position of
@@ -146,13 +140,12 @@ void starshp1_state::draw_starfield(bitmap_ind16 &bitmap)
 	 * really needed by the game. Not emulated.
 	 */
 
-	for (int y = 0; y < bitmap.height(); y++)
+	for (int y = 0; y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const p = m_LSFR.get() + (uint16_t) (512 * y);
-
 		uint16_t *const pLine = &bitmap.pix(y);
 
-		for (int x = 0; x < bitmap.width(); x++)
+		for (int x = 0; x <= cliprect.right(); x++)
 			if ((p[x] & 0x5b56) == 0x5b44)
 				pLine[x] = (p[x] & 0x0400) ? 0x0e : 0x0f;
 	}
@@ -171,9 +164,7 @@ int starshp1_state::get_sprite_vpos(int i)
 
 void starshp1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
-	for (i = 0; i < 14; i++)
+	for (int i = 0; i < 14; i++)
 	{
 		int code = (m_obj_ram[i] & 0xf) ^ 0xf;
 
@@ -341,7 +332,7 @@ uint32_t starshp1_state::screen_update_starshp1(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 
 	if (m_starfield_kill == 0)
-		draw_starfield(bitmap);
+		draw_starfield(bitmap, cliprect);
 
 	draw_sprites(bitmap, cliprect);
 

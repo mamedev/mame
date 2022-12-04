@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli, Bryan McPhail
+// copyright-holders: Pierpaolo Prazzoli, Bryan McPhail
+
 /***************************************************************
 
  Pro Baseball Skill Tryout (JPN Ver.)
@@ -20,14 +21,338 @@ $208 strikes count
 ****************************************************************/
 
 #include "emu.h"
-#include "tryout.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+// configurable logging
+#define LOG_GFXCTRL (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_GFXCTRL)
+
+#include "logmacro.h"
+
+#define LOGGFXCTRL(...) LOGMASKED(LOG_GFXCTRL, __VA_ARGS__)
+
+
+namespace {
+
+class tryout_state : public driver_device
+{
+public:
+	tryout_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram%u", 1U),
+		m_gfx_control(*this, "gfx_control"),
+		m_vram(*this, "vram", 8 * 0x800, ENDIANNESS_LITTLE),
+		m_vram_gfx(*this, "vram_gfx", 0x6000, ENDIANNESS_LITTLE),
+		m_rombank(*this, "rombank")
+	{ }
+
+	void tryout(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
+	required_shared_ptr<uint8_t> m_gfx_control;
+	memory_share_creator<uint8_t> m_vram;
+	memory_share_creator<uint8_t> m_vram_gfx;
+
+	required_memory_bank m_rombank;
+
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_vram_bank = 0;
+
+	void nmi_ack_w(uint8_t data);
+	void sound_irq_ack_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	void vram_w(offs_t offset, uint8_t data);
+	void vram_bankswitch_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILEMAP_MAPPER_MEMBER(get_fg_memory_offset);
+	TILEMAP_MAPPER_MEMBER(get_bg_memory_offset);
+
+	void palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+
+	void main_cpu(address_map &map);
+	void sound_cpu(address_map &map);
+};
+
+
+// video
+
+void tryout_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+TILE_GET_INFO_MEMBER(tryout_state::get_fg_tile_info)
+{
+	int code = m_videoram[tile_index];
+	int const attr = m_videoram[tile_index + 0x400];
+	code |= ((attr & 0x03) << 8);
+	int const color = ((attr & 0x4) >> 2) + 6;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(tryout_state::get_bg_tile_info)
+{
+	tileinfo.set(2, m_vram[tile_index] & 0x7f, 2, 0);
+}
+
+uint8_t tryout_state::vram_r(offs_t offset)
+{
+	return m_vram[offset]; // debug only
+}
+
+void tryout_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+void tryout_state::vram_w(offs_t offset, uint8_t data)
+{
+	/*  There are eight banks of vram - in bank 0 the first 0x400 bytes
+	are reserved for the tilemap.  In banks 2, 4 and 6 the game never
+	writes to the first 0x400 bytes - I suspect it's either
+	unused, or it actually mirrors the tilemap ram from the first bank.
+
+	The rest of the vram is tile data which has the bitplanes arranged
+	in a very strange format.  For MAME's sake we reformat this on
+	the fly for easier gfx decode.
+
+	Bit 0 of the bank register seems special - it's kept low when uploading
+	gfx data and then set high from that point onwards.
+
+	*/
+	const uint8_t bank = (m_vram_bank >> 1) & 0x7;
+
+
+	if ((bank == 0 || bank == 2 || bank == 4 || bank == 6) && (offset & 0x7ff) < 0x400)
+	{
+		int const newoff = offset & 0x3ff;
+
+		m_vram[newoff] = data;
+		m_bg_tilemap->mark_tile_dirty(newoff);
+		return;
+	}
+
+	/*
+	    Bit planes for tiles are arranged as follows within vram (split into high/low nibbles):
+	        0x0400 (0) + 0x0400 (4) + 0x0800(0) - tiles 0x00 to 0x0f
+	        0x0800 (4) + 0x0c00 (0) + 0x0c00(4) - tiles 0x10 to 0x1f
+	        0x1400 (0) + 0x1400 (4) + 0x1800(0) - tiles 0x20 to 0x2f
+	        0x1800 (4) + 0x1c00 (0) + 0x1c00(4) - tiles 0x30 to 0x3f
+	        etc.
+	*/
+
+	offset = (offset & 0x7ff) | (bank << 11);
+	m_vram[offset] = data;
+
+	switch (offset & 0x1c00)
+	{
+	case 0x0400:
+		m_vram_gfx[(offset & 0x3ff) + 0x0000 + ((offset & 0x2000) >> 1)] = (~data & 0xf);
+		m_vram_gfx[(offset & 0x3ff) + 0x2000 + ((offset & 0x2000) >> 1)] = (~data & 0xf0) >> 4;
+		break;
+	case 0x0800:
+		m_vram_gfx[(offset & 0x3ff) + 0x4000 + ((offset & 0x2000) >> 1)] = (~data & 0xf);
+		m_vram_gfx[(offset & 0x3ff) + 0x4400 + ((offset & 0x2000) >> 1)] = (~data & 0xf0) >> 4;
+		break;
+	case 0x0c00:
+		m_vram_gfx[(offset & 0x3ff) + 0x0400 + ((offset & 0x2000) >> 1)] = (~data & 0xf);
+		m_vram_gfx[(offset & 0x3ff) + 0x2400 + ((offset & 0x2000) >> 1)] = (~data & 0xf0) >> 4;
+		break;
+	case 0x1400:
+		m_vram_gfx[(offset & 0x3ff) + 0x0800 + ((offset & 0x2000) >> 1)] = (~data & 0xf);
+		m_vram_gfx[(offset & 0x3ff) + 0x2800 + ((offset & 0x2000) >> 1)] = (~data & 0xf0) >> 4;
+		break;
+	case 0x1800:
+		m_vram_gfx[(offset & 0x3ff) + 0x4800 + ((offset & 0x2000) >> 1)] = (~data & 0xf);
+		m_vram_gfx[(offset & 0x3ff) + 0x4c00 + ((offset & 0x2000) >> 1)] = (~data & 0xf0) >> 4;
+		break;
+	case 0x1c00:
+		m_vram_gfx[(offset & 0x3ff) + 0x0c00 + ((offset & 0x2000) >> 1)] = (~data & 0xf);
+		m_vram_gfx[(offset & 0x3ff) + 0x2c00 + ((offset & 0x2000) >> 1)] = (~data & 0xf0) >> 4;
+		break;
+	}
+
+	m_gfxdecode->gfx(2)->mark_dirty((offset - 0x400 / 64) & 0x7f);
+}
+
+void tryout_state::vram_bankswitch_w(uint8_t data)
+{
+	m_vram_bank = data;
+}
+
+void tryout_state::flipscreen_w(uint8_t data)
+{
+	flip_screen_set(data & 1);
+}
+
+TILEMAP_MAPPER_MEMBER(tryout_state::get_fg_memory_offset)
+{
+	return (row ^ 0x1f) + (col << 5);
+}
+
+TILEMAP_MAPPER_MEMBER(tryout_state::get_bg_memory_offset)
+{
+	int a;
+//  if (col&0x20)
+//      a= (7 - (row & 7)) + ((0x8 - (row & 0x8)) << 4) + ((col & 0xf) << 3) + (( (  0x10 - (col & 0x10) ) ) << 4) + ((( (col & 0x20))) << 4);
+//  else
+		a= (7 - (row & 7)) + ((0x8 - (row & 0x8)) << 4) + ((col & 0xf) << 3) + ((col & 0x10) << 4) + ((col & 0x20) << 4);
+
+//  osd_printf_debug("%d %d -> %d\n", col, row, a);
+	return a;
+}
+
+void tryout_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tryout_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(tryout_state::get_fg_memory_offset)),  8, 8, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tryout_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(tryout_state::get_bg_memory_offset)), 16,16, 64,16);
+
+	m_fg_tilemap->set_transparent_pen(0);
+
+	save_item(NAME(m_vram_bank));
+}
+
+void tryout_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	for (int offs = 0; offs < 0x7f; offs += 4)
+	{
+		if (!(m_spriteram[0][offs] & 1))
+			continue;
+
+		int const sprite = m_spriteram[0][offs + 1] + ((m_spriteram[1][offs] & 7) << 8);
+		int x = m_spriteram[0][offs + 3] - 3;
+		int y = m_spriteram[0][offs + 2];
+		int const color = 0;//(m_spriteram[0][offs] & 8) >> 3;
+		int fx = (m_spriteram[0][offs] & 8) >> 3;
+		int fy = 0;
+		int inc = 16;
+
+		if (flip_screen())
+		{
+			x = 240 - x;
+			fx = !fx;
+
+			y = 240 - y;
+			fy = !fy;
+
+			inc = -inc;
+		}
+
+		// Double Height
+		if (m_spriteram[0][offs] & 0x10)
+		{
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				sprite,
+				color, fx, fy, x, y + inc, 0);
+
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				sprite + 1,
+				color, fx, fy, x, y, 0);
+		}
+		else
+		{
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				sprite,
+				color, fx, fy, x, y, 0);
+		}
+	}
+}
+
+uint32_t tryout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (!flip_screen())
+		m_fg_tilemap->set_scrollx(0, 16); // Assumed hard-wired
+	else
+		m_fg_tilemap->set_scrollx(0, -8); // Assumed hard-wired
+
+	int scrollx = m_gfx_control[1] + ((m_gfx_control[0] & 1) << 8) + ((m_gfx_control[0] & 4) << 7) - ((m_gfx_control[0] & 2) ? 0 : 0x100);
+
+	// wrap-around
+	if (m_gfx_control[1] == 0) { scrollx += 0x100; }
+
+	m_bg_tilemap->set_scrollx(0, scrollx + 2); // why +2? hard-wired?
+	m_bg_tilemap->set_scrolly(0, -m_gfx_control[2]);
+
+	if (!(m_gfx_control[0] & 0x8)) // screen disable
+	{
+		// TODO: Color might be different, needs a video from an original PCB.
+		bitmap.fill(m_palette->pen(0x10), cliprect);
+	}
+	else
+	{
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect);
+	}
+
+	LOGGFXCTRL("%02x %02x %02x %02x", m_gfx_control[0], m_gfx_control[1], m_gfx_control[2], scrollx);
+	return 0;
+}
+
+
+// machine
 
 void tryout_state::nmi_ack_w(uint8_t data)
 {
@@ -180,18 +505,18 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_tryout )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 4 )
-	GFXDECODE_RAM( "vram_gfx", 0, vramlayout, 0, 4 )
+	GFXDECODE_ENTRY( "chars",    0, charlayout,   0, 8 )
+	GFXDECODE_ENTRY( "sprites",  0, spritelayout, 0, 4 )
+	GFXDECODE_RAM(   "vram_gfx", 0, vramlayout,   0, 4 )
 GFXDECODE_END
 
 void tryout_state::tryout(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 2000000);     // ?
+	M6502(config, m_maincpu, 2'000'000);     // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &tryout_state::main_cpu);
 
-	M6502(config, m_audiocpu, 1500000);    // ?
+	M6502(config, m_audiocpu, 1'500'000);    // ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tryout_state::sound_cpu);
 	m_audiocpu->set_periodic_int(FUNC(tryout_state::nmi_line_pulse), attotime::from_hz(1000)); // controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video
 
@@ -213,7 +538,7 @@ void tryout_state::tryout(machine_config &config)
 	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
 	soundlatch.data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
-	YM2203(config, "ymsnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	YM2203(config, "ymsnd", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 ROM_START( tryout )
@@ -225,10 +550,10 @@ ROM_START( tryout )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ch00-1.bin",   0x0c000, 0x4000, CRC(8b33d968) SHA1(cf44529e5577d09978b87dc2bbe1415babbf36a0) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "chars", 0 )
 	ROM_LOAD( "ch13.bin",     0x00000, 0x4000, CRC(a9619c58) SHA1(92528b1c4afc95394ac8cad5b37f23da0c6a5310) )
 
-	ROM_REGION( 0x24000, "gfx2", 0 )
+	ROM_REGION( 0x24000, "sprites", 0 )
 	ROM_LOAD( "ch09.bin",     0x00000, 0x4000, CRC(9c5e275b) SHA1(83b29996573d85c73bb4b63086c7a624fad19bde) )
 	ROM_LOAD( "ch08.bin",     0x04000, 0x4000, CRC(88396abb) SHA1(2865a265ddfb91c2ad2770da5e0d84a544f3c419) )
 	ROM_LOAD( "ch07.bin",     0x08000, 0x4000, CRC(901b5f5e) SHA1(f749b5ec0c51c66655798e8a37c887870370991e) )
@@ -242,5 +567,8 @@ ROM_START( tryout )
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "ch14.bpr",     0x00000, 0x0020, CRC(8ce19925) SHA1(12f8f6022f1148b6ba1d019a34247452637063a7) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1985, tryout, 0, tryout, tryout, tryout_state, empty_init, ROT90, "Data East Corporation", "Pro Baseball Skill Tryout (Japan)", MACHINE_SUPPORTS_SAVE )

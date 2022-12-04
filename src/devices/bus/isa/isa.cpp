@@ -596,35 +596,33 @@ void isa16_device::io16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t isa16_device::mem16_swap_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t rv;
-	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+	mem_mask = swapendian_int16(mem_mask);
 
-	rv = m_memspace->read_word(offset<<1, mem_mask);
+	uint16_t rv = m_memspace->read_word(offset<<1, mem_mask);
 
-	return (rv<<8) | (rv>>8);
+	return swapendian_int16(rv);
 }
 
 void isa16_device::mem16_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	mem_mask = (mem_mask<<8) | (mem_mask>>8);
-	data = (data<<8) | (data>>8);
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data);
 	m_memspace->write_word(offset<<1, data, mem_mask);
 }
 
 uint16_t isa16_device::io16_swap_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t rv;
-	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+	mem_mask = swapendian_int16(mem_mask);
 
-	rv = m_iospace->read_word(offset<<1, mem_mask);
+	uint16_t rv = m_iospace->read_word(offset<<1, mem_mask);
 
-	return (rv<<8) | (rv>>8);
+	return swapendian_int16(rv);
 }
 
 void isa16_device::io16_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	mem_mask = (mem_mask<<8) | (mem_mask>>8);
-	data = (data<<8) | (data>>8);
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data);
 	m_iospace->write_word(offset<<1, data, mem_mask);
 }
 

@@ -10860,6 +10860,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Omega Race</description>
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
+		<sharedfeat name="joyport1_default" value="joybstr" />
+		<sharedfeat name="joyport2_default" value="joybstr" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_fa" />
 			<dataarea name="rom" size="12288">
@@ -13901,7 +13903,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="sentinel">
+	<software name="sentinel" supported="no"> <!-- XEGS light gun not yet emulated -->
 		<description>Sentinel</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
@@ -13946,7 +13948,19 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="shootarc">
+	<software name="shootinge" cloneof="shooting">
+		<description>Shootin' Gallery (PAL, prototype)</description>
+		<year>1982?</year>
+		<publisher>Imagic</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="pfair.1" size="0x1000" crc="05e98494" sha1="25a280afdf057a070b1c1e48a91a4bd77e0068a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootarc" supported="no"> <!-- XEGS light gun not yet emulated -->
 		<description>Shooting Arcade (prototype 19890919)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
@@ -13961,7 +13975,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="shootarce" cloneof="shootarc">
+	<software name="shootarce" cloneof="shootarc" supported="no"> <!-- XEGS light gun not yet emulated -->
 		<description>Shooting Arcade (PAL) (prototype 19900116)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
@@ -17132,6 +17146,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<publisher>Xype / AtariAge</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
+			<feature name="peripheral" value="joybstr" />
 			<dataarea name="rom" size="0x4000">
 				<rom name="thrust v1.26 (pd).bin" size="0x4000" crc="70b25fb7" sha1="79e9d3a3e9bd8a8a9e4c7242c16cdfcccb1de1a2"/>
 			</dataarea>
@@ -17144,6 +17159,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<publisher>Xype / AtariAge</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
+			<feature name="peripheral" value="joybstr" />
 			<dataarea name="rom" size="0x4000">
 				<rom name="thrust.bin" size="0x4000" crc="c6ba1bc6" sha1="09608cfaa7c6e9638f12a1cff9dd5036c9effa43"/>
 			</dataarea>
@@ -17483,6 +17499,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 				<rom name="tunnel runner (black box) (1983) (richard k. balaska jr., andy frank, stuart ross) (4l 2520 5000) (prototype).bin" size="12288" crc="bd2d975a" sha1="af202ee515b41113660bdf4500802108b12f85a3"/>
 			</dataarea>
 			<dataarea name="ram" size="256">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbo">
+		<description>Turbo (NTSC, prototype)</description>
+		<year>1983</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="turbo coleco.u5" size="0x2000" crc="fdfeef58" sha1="345f72320ac51d659780f898bbb540fc788bf371"/>
 			</dataarea>
 		</part>
 	</software>

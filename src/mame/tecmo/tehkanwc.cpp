@@ -246,7 +246,7 @@ void tehkanwc_state::main_mem(address_map &map)
 	map(0xf813, 0xf813).portr("P2BUT");
 	map(0xf820, 0xf820).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(FUNC(tehkanwc_state::sound_command_w));  /* answer from the sound CPU */
 	map(0xf840, 0xf840).portr("DSW2").w(FUNC(tehkanwc_state::sub_cpu_halt_w));
-	map(0xf850, 0xf850).portr("DSW3").nopw();           /* ?? writes 0x00 or 0xff */
+	map(0xf850, 0xf850).portr("DSW3").nopw(); // teedoff: written in tandem with $f840, busreq or busack?
 	map(0xf860, 0xf860).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(tehkanwc_state::flipscreen_x_w));
 	map(0xf870, 0xf870).portr("DSW1").w(FUNC(tehkanwc_state::flipscreen_y_w));
 }
@@ -744,7 +744,11 @@ void tehkanwc_state::init_teedoff()
 	    0239: 00          nop
 	    023A: 00          nop
 	*/
-
+	// Update 2022: sub CPU doesn't seem responsible for sharing code to main,
+	// and bit 7 write to 0xca00 happens after that main checks it out during attract.
+	// Notice that main CPU just fakes the ROM checksum check at startup, just drawing ROM # OK at PC=0x1726
+	// There's also this (nsfw link) -> https://sudden-desu.net/entry/tee-d-off-a-saucy-secret-and-hidden-dev-credits
+	// which implies that at least 1 ROM is bad here.
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x0238] = 0x00;
@@ -969,12 +973,12 @@ ROM_END
 
 ROM_START( teedoff )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "to-1.bin",     0x0000, 0x4000, CRC(cc2aebc5) SHA1(358e77e53b35dd89fcfdb3b2484b8c4fbc34c1be) )
-	ROM_LOAD( "to-2.bin",     0x4000, 0x4000, CRC(f7c9f138) SHA1(2fe56059ef67387b5938bb4751aa2f74a58b04fb) )
-	ROM_LOAD( "to-3.bin",     0x8000, 0x4000, CRC(a0f0a6da) SHA1(72390c8dc5519d90e39a660e6ec18861fdbadcc8) )
+	ROM_LOAD( "to-1.bin",     0x0000, 0x4000, BAD_DUMP CRC(cc2aebc5) SHA1(358e77e53b35dd89fcfdb3b2484b8c4fbc34c1be) )
+	ROM_LOAD( "to-2.bin",     0x4000, 0x4000, BAD_DUMP CRC(f7c9f138) SHA1(2fe56059ef67387b5938bb4751aa2f74a58b04fb) )
+	ROM_LOAD( "to-3.bin",     0x8000, 0x4000, BAD_DUMP CRC(a0f0a6da) SHA1(72390c8dc5519d90e39a660e6ec18861fdbadcc8) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "to-4.bin",     0x0000, 0x8000, CRC(e922cbd2) SHA1(922c030be70150efb760fa81bda0bc54f2ec681a) )
+	ROM_LOAD( "to-4.bin",     0x0000, 0x8000, BAD_DUMP CRC(e922cbd2) SHA1(922c030be70150efb760fa81bda0bc54f2ec681a) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "to-6.bin",     0x0000, 0x4000, CRC(d8dfe1c8) SHA1(d00a71ad89b530339990780334588f5738c60f25) )

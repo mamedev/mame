@@ -1,10 +1,142 @@
 // license:BSD-3-Clause
 // copyright-holders:
-/****************************************************************************
+/******************************************************************************************************
 
-    Skeleton driver for Diamond King slot game by SegaSA / Sonic.
+    Skeleton driver for "SEGASA-SONIC 1B-20xx-202" hardware slot games by SegaSA / Sonic.
+    Different configurations found for different games around the same main PCB (8085 + AY8910 + 8155).
 
-Four PCBs found (there may be more):
+*******************************************************************************************************/
+
+#include "emu.h"
+
+#include "cpu/i8085/i8085.h"
+#include "machine/68340.h"
+#include "sound/ay8910.h"
+#include "sound/msm5205.h"
+#include "sound/okim6376.h"
+#include "speaker.h"
+
+namespace
+{
+
+class ss1b202base_state : public driver_device
+{
+public:
+	ss1b202base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{
+	}
+
+	void ss1b202base(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
+};
+
+class diamondking_state : public ss1b202base_state
+{
+public:
+	diamondking_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ss1b202base_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_iocpu(*this, "iocpu"),
+		m_okim6376(*this, "oki")
+	{
+	}
+
+	void diamondking(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<m68340_cpu_device> m_iocpu;
+	required_device<okim6376_device> m_okim6376;
+};
+
+static INPUT_PORTS_START(diamondking)
+	// On main board, near the AY-3-8910
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+
+	// On I/O board
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
+
+	// On I/O board
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW3:8")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(goldenchip)
+	// On main board, near the AY-3-8910
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+
+	// On main board, near one of the 8155
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
+INPUT_PORTS_END
+
+void ss1b202base_state::ss1b202base(machine_config &config)
+{
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+
+	SPEAKER(config, "mono").front_center();
+
+	ay8910_device &ay8910(AY8910(config, "ay8910", 2'000'000)); // Frequency unknown
+	ay8910.port_a_read_callback().set_ioport("DSW1");
+	ay8910.add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
+}
+
+void diamondking_state::diamondking(machine_config &config)
+{
+	ss1b202base(config);
+
+	M68340(config, m_iocpu, 16'000'000); // Frequency unknown
+
+	msm6585_device &msm6585(MSM6585(config, "msm6585", 640'000)); // Frequency unknown
+	msm6585.add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
+
+	// OkiM6376
+	OKIM6376(config, m_okim6376, XTAL(4'194'304)/4).add_route(ALL_OUTPUTS, "mono", 1.0); // Frequency divisor is a guess
+}
+
+/* Four PCBs found for Diamond King (there may be more):
 
   ____|_|_|_|___|_|_|_|_|_|_|_|_|____|_|_|_|____|_|_|_|____|_|_|_|___|_|_|_|____________________________________
  |   _|_|_|_|  _|_|_|_|_|_|_|_|_|   _|_|_|_|_  _|_|_|_|   _|_|_|_|  _|_|_|_|                ··                 |
@@ -34,8 +166,8 @@ _||_|         ___________________  ___________________  ________  ________      
                 | | | | |     | | | |     | | | |    | | | |                           SEGASA-SONIC 1B-2010-202
 
  Note about 1B-2010-202: The sub-PCB shown in the above diagram (where the ROMs are) is an add-on for supporting Euros.
-  It's plugged on the program ROM socket (CI-16). The original version (supporting only Ptas) had exactly the same ROM
-  at U3 plugged onto CI-16, without the subboard.
+ It's plugged on the program ROM socket (CI-16). The original version (supporting only Ptas) had exactly the same ROM
+ at U3 plugged onto CI-16, without the subboard.
 
        ___________________________________________________________
       |     _______  ___________  ____________  ___________      |
@@ -124,93 +256,7 @@ REEL1->|C| A  |K6T0808C10 |    ____________                  |__||
  |               |________________|                    |
  |_____________________________________________________|
 
-****************************************************************************/
-
-#include "emu.h"
-
-#include "cpu/i8085/i8085.h"
-#include "machine/68340.h"
-#include "sound/ay8910.h"
-#include "sound/msm5205.h"
-#include "sound/okim6376.h"
-#include "speaker.h"
-
-namespace
-{
-
-class diamondking_state : public driver_device
-{
-public:
-	diamondking_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_iocpu(*this, "iocpu"),
-		m_okim6376(*this, "oki")
-	{
-	}
-
-	void diamondking(machine_config &config);
-
-private:
-	required_device<cpu_device> m_maincpu;
-	required_device<m68340_cpu_device> m_iocpu;
-	required_device<okim6376_device> m_okim6376;
-};
-
-static INPUT_PORTS_START(diamondking)
-	// On main board
-	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
-
-	// On I/O board
-	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
-
-	// On I/O board
-	PORT_START("DSW3")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW3:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW3:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW3:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW3:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW3:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW3:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW3:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW3:8")
-INPUT_PORTS_END
-
-void diamondking_state::diamondking(machine_config &config)
-{
-	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
-
-	SPEAKER(config, "mono").front_center();
-
-	ay8910_device &ay8910(AY8910(config, "ay8910", 2'000'000)); // Frequency unknown
-	ay8910.port_a_read_callback().set_ioport("DSW1");
-	ay8910.add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
-
-	M68340(config, m_iocpu, 16'000'000); // Frequency unknown
-
-	msm6585_device &msm6585(MSM6585(config, "msm6585", 640'000)); // Frequency unknown
-	msm6585.add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
-
-	// OkiM6376
-	OKIM6376(config, m_okim6376, XTAL(4'194'304)/4).add_route(ALL_OUTPUTS, "mono", 1.0); // Frequency divisor is a guess
-}
-
+*/
 ROM_START(diamondking) // With Euro support
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("mb_ve_segasa_m-12_diamond_king_eur_ef4d_97-5848_b2018.u3", 0x00000, 0x10000, CRC(7e702012) SHA1(2858edc92fd1f672966af81ded4d6519427356bd))
@@ -234,7 +280,79 @@ ROM_START(diamondkinp) // Without Euro support, just Ptas
 	ROM_LOAD( "b_segasa_m-12_diamond_king_sonido.ci4", 0x00000, 0x80000, CRC(1c0f8b4d) SHA1(38cf35e545db8f24320b0c80e6655d0a59aaec10) )
 ROM_END
 
+/* Golden Chip uses an different revision of the main PCB found on Diamond King. It has a battery backed RAM (undumped) and just one ROM:
+
+  ____|_|_|_|___|_|_|_|_|_|_|_|_|__________________________|_|_|_|______________________________________________
+ |   _|_|_|_|  _|_|_|_|_|_|_|_|_|   _________  ________   _|_|_|_|  ________                ··                 |
+ |  |_CON11__||___CON10__________| |__CON9__| |__CON8_|  |__CON7_| |__CON6_|               CON5                |
+ | __                                unused     unused              unused     ________   unused               |
+_||CON __     ________  ________                         ________   ________  |74LS74AN     ________  ________ |
+_||1| | |    |_7407N_| |74LS14N|                        4116R-001  4116R-001  ________     |74LS14N|  CD4001BE |
+_||2| | |<-7407N                                                              74LS393B1                        |
+_||_| |_|     ___________________                    ___________________                                       |
+ | __        | NEC D81C55HC     |        ________   | NEC D81C55HC     |       ________         ____           |
+_||C|        |__________________|       |_DIPSx8|   |__________________|      74LS153B1        LM311P          |
+_||O|                                                                       _____________                      |
+_||N|                                                                      |  ___       |                      |
+_||1|      _________                                                       | /   \ BATT |                      |
+_||3|     |DIPS x 8|                                                       | \___/      |                      |
+_||_|         ___________________  ___________________  ________  ________ | ___________| ___________________  |
+ |           | AY-3-8910        | | NEC D81C55HC     |  CD4011BE  74LS139N || 6116L-5  ||| NEC D8085A       |  |
+ |           |__________________| |__________________|                     ||__________|||__________________|  |
+ |  ________                                                               |____________| ________             |
+ | |_LM380N|      ________         ________           ________                           |74LS373N             |
+ |               4116R-001        4116R-001          |_7407N_|            _______________                      |
+ |                                          ________                     | ROM U2       |             Xtal     |
+ |                                         |4116R-001            ______  |______________|             6.144    |
+ |              __________    _________   _________  ________   |BATT  |                              MHz      |
+ |             |___CON1__|   |___CON2_|  |__CON3___| |_CON4_|   |3.6V__|                                       |
+ |______________|_|_|_|_|_____|_|_|_|_____|_|_|_|____|_|_|_|___________________________________________________|
+                | | | | |     | | | |     | | | |    | | | |                           SEGASA-SONIC 1B-2003-202
+
+Additional PCBs found on Golden Chip:
+
+ _________|_|_|_|_______|_|_|_|_____________
+ |       _|_|_|_|_     _|_|_|_|_            |
+ |      | CON 1  |    | CON 2  |            |
+ | __    _________     _________          __|
+_||C|   |899-3-R470   |4116R-001         |C||_
+_||O|    _________     _________         |O||_
+_||N|   |74LS299N|    |74LS299N|   ___   |N||_
+_||7|                             |  |   |3||_
+_|| |       1B-2002-205           |  |   | ||_
+_|| |                             |__|   | ||_
+_|| |    _________  _________  _________ |_||
+_|| |   |74LS299N| |74LS299N| |74LS299N|    |
+ ||_|    _________  _________  _________    |
+ |      |ULN2003A| |ULN2003A| |ULN2003A|    |
+ |       _________  _________  _________    |
+ |      | CON 6  | | CON 5  | | CON 4  |    |
+ |_______|_|_|_|_____|_|_|_|____|_|_|_|_____|
+         | | | |    SEGASA SONIC 1B-2002-205
+ ________________________________________
+ | __               _________  _________ |
+_||C|              |SN7407N_| |________| |
+_||O|    _________  _________  _________ |
+_||N|   |74LS251N| |_EMPTY__| |_EMPTY__| |
+_||4|                                    |
+_||_|    _________  _________  _________ |
+ |      |4116R-001 |_EMPTY__| |_EMPTY__| |
+ |       _________  _________  _________ |
+ |      | CON 3  | | CON 2  | | CON 1  | |
+ |_______|_|_|_|____ unused ___ unused __|
+         | | | |  SEGASA SONIC 1B-2001-206
+*/
+ROM_START(goldenchip)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("segasa_g.chip_l_chl.bin", 0x00000, 0x08000, CRC(1bc48a7d) SHA1(765129c552cc1e515a5ec1aba23d8663add5f025))
+
+	ROM_REGION(0x00800, "aux", 0)
+	ROM_LOAD("hm3_6116l-5.bin", 0x00000, 0x00800, NO_DUMP) // Battery backed RAM, undumped
+ROM_END
+
 } // anonymous namespace
 
+//   YEAR  NAME         PARENT       MACHINE      INPUT        CLASS              INIT        ROT   COMPANY           FULLNAME                               FLAGS
 GAME(1997, diamondking, 0,           diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (with Euro support)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1997, diamondkinp, diamondking, diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (without Euro support)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(19??, goldenchip,  0,           ss1b202base, goldenchip,  ss1b202base_state, empty_init, ROT0, "SegaSA / Sonic", "Golden Chip",                         MACHINE_IS_SKELETON_MECHANICAL)

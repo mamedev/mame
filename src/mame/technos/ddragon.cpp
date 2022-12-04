@@ -2222,10 +2222,10 @@ GAME( 1987, ddragonba,    ddragon,  ddragonba,   ddragon,  ddragon_state,  init_
 GAME( 1987, ddragon6809,  ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 1)", MACHINE_NOT_WORKING )
 GAME( 1987, ddragon6809a, ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 2)", MACHINE_NOT_WORKING )
 
-GAME( 1988, ddragon2,     0,        ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2u,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2j,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2b,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "bootleg",       "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2,     0,        ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2u,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2j,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2b,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "bootleg",       "Double Dragon II: The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,      0,        darktowr,    tstrike,  darktowr_state, init_darktowr,    ROT0, "East Coast Coin Company", "Thunder Strike (set 1)",        MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?

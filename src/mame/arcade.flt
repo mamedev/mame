@@ -644,7 +644,6 @@ misc/bailey.cpp
 misc/beaminv.cpp
 misc/beezer.cpp
 misc/belatra.cpp
-misc/bgt.cpp
 misc/bingoman.cpp
 misc/bingor.cpp
 misc/blitz68k.cpp
@@ -770,7 +769,6 @@ misc/jubilee.cpp
 misc/jungleyo.cpp
 misc/kas89.cpp
 misc/kingpin.cpp
-misc/krokha.cpp
 misc/kurukuru.cpp
 misc/kyugo.cpp
 misc/ladyfrog.cpp
@@ -1244,6 +1242,7 @@ sega/segasm1.cpp
 sega/segasp.cpp
 sega/segattl.cpp
 sega/segaufo.cpp
+sega/segaufoh8.cpp
 sega/segaxbd.cpp
 sega/segaybd.cpp
 sega/sg1000a.cpp
@@ -1258,6 +1257,7 @@ sega/system16.cpp
 sega/timetrv.cpp
 sega/triforce.cpp
 sega/turbo.cpp
+sega/unkhockey.cpp
 sega/vicdual.cpp
 sega/winclub.cpp
 sega/y2.cpp
@@ -1314,6 +1314,7 @@ sigma/sigmab52.cpp
 sigma/sigmab98.cpp
 sigma/spiders.cpp
 sigma/sub.cpp
+skeleton/elcirculo.cpp
 snk/bbusters.cpp
 snk/dmndrby.cpp
 snk/hng64.cpp

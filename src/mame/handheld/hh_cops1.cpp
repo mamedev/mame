@@ -7,7 +7,7 @@ National Semiconductor COPS(MM57 MCU series) handhelds
 
 MCU die label for MM5799 games says MM4799, but they are in fact MM5799.
 
-ROM source notes when dumped from another publisher, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - cambrp: Radio Shack EC-4001 Programmable
 
 TODO:

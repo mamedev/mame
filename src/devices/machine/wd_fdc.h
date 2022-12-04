@@ -200,6 +200,9 @@ private:
 		SETTLE_WAIT,
 		SETTLE_DONE,
 
+		WRITE_PROTECT_WAIT,
+		WRITE_PROTECT_DONE,
+
 		DATA_LOAD_WAIT,
 		DATA_LOAD_WAIT_DONE,
 
@@ -357,7 +360,7 @@ private:
 	void live_run(attotime limit = attotime::never);
 	bool read_one_bit(const attotime &limit);
 	bool write_one_bit(const attotime &limit);
-
+	void reset_data_sync();
 	void live_write_raw(uint16_t raw);
 	void live_write_mfm(uint8_t mfm);
 	void live_write_fm(uint8_t fm);

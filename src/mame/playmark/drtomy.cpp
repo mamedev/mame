@@ -4,8 +4,32 @@
 
 Dr. Tomy    -   (c) 1993 Playmark
 
-A rip-off of Dr. Mario by Playmark, using some code from Gaelco's Big Karnak on
-similar hardware.
+A rip-off of Dr. Mario by Playmark, using some code from Gaelco's Big Karnak on similar hardware.
+
+TOMY
++---------------------------------------------+
+| VR1   14             MCM2118                |
+|     M6295  1MHz      MCM2118                |
+|                                             |
+|        MCM2118                           17 |
+|J       MCM2118       GAL                 18 |
+|A                          TPC1020AFN     19 |
+|M                                         20 |
+|M                                            |
+|A                                     MS6264 |
+|  DSW1                        MCM2118        |
+|        MS6264 MS6264         MCM2118        |
+|  DSW2    15    16                           |
+|20MHz    TS68000P12           26MHz          |
++---------------------------------------------+
+
+  CPU: ST TS68000P12
+Sound: OKI M6295
+Video: TMS TCP1020AFN-084C
+  OSC: 26MHz, 20MHz & 1MHz resonator
+  GAL: Lattice GAL22V10B-25LP
+  VR1: Volume pot
+  DSW: Two 8 switch dipswitches
 
 */
 
@@ -99,19 +123,19 @@ TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_bg)
 
 void drtomy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int i, x, y, ex, ey;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	static const int x_offset[2] = {0x0, 0x2};
 	static const int y_offset[2] = {0x0, 0x1};
 
-	for (i = 3; i < 0x1000 / 2; i += 4)
+	for (int i = 3; i < m_spriteram.length() - 3; i += 4)
 	{
-		int sx = m_spriteram[i + 2] & 0x01ff;
-		int sy = (240 - (m_spriteram[i] & 0x00ff)) & 0x00ff;
-		int number = m_spriteram[i + 3];
-		int color = (m_spriteram[i + 2] & 0x1e00) >> 9;
-		int attr = (m_spriteram[i] & 0xfe00) >> 9;
+		const uint16_t *src = &m_spriteram[i];
+		int sx = src[2] & 0x01ff;
+		int sy = (240 - (src[0] & 0x00ff)) & 0x00ff;
+		int number = src[3];
+		int color = (src[2] & 0x1e00) >> 9;
+		int attr = (src[0] & 0xfe00) >> 9;
 
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
@@ -122,15 +146,15 @@ void drtomy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		else
 		{
 			spr_size = 2;
-			number &= (~3);
+			number &= ~3;
 		}
 
-		for (y = 0; y < spr_size; y++)
+		for (int y = 0; y < spr_size; y++)
 		{
-			for (x = 0; x < spr_size; x++)
+			for (int x = 0; x < spr_size; x++)
 			{
-				ex = xflip ? (spr_size - 1 - x) : x;
-				ey = yflip ? (spr_size - 1 - y) : y;
+				int ex = xflip ? (spr_size - 1 - x) : x;
+				int ey = yflip ? (spr_size - 1 - y) : y;
 
 				gfx->transpen(bitmap,cliprect,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
@@ -310,7 +334,7 @@ void drtomy_state::machine_reset()
 void drtomy_state::drtomy(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 24000000/2);          /* ? MHz */
+	M68000(config, m_maincpu, XTAL(20'000'000)/2); // 10 MHz - Need to verify
 	m_maincpu->set_addrmap(AS_PROGRAM, &drtomy_state::drtomy_map);
 	m_maincpu->set_vblank_int("screen", FUNC(drtomy_state::irq6_line_hold));
 
@@ -330,7 +354,7 @@ void drtomy_state::drtomy(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 26000000/16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.8);
+	OKIM6295(config, m_oki, XTAL(1'000'000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.8); // 1MHz resonator - pin 7 not verified
 }
 
 

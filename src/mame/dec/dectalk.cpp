@@ -307,7 +307,6 @@ private:
 	uint16_t spc_infifo_data_r();
 	void spc_outfifo_data_w(uint16_t data);
 	DECLARE_READ_LINE_MEMBER(spc_semaphore_r);
-	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 	emu_timer *m_outfifo_read_timer = nullptr;
@@ -465,12 +464,6 @@ void dectalk_state::machine_start()
 	save_item(NAME(m_hack_self_test_is_second_read));
 	clear_all_fifos();
 	m_simulate_outfifo_error = false; // TODO: HACK for now, should be hooked to a fake dipswitch to simulate fifo errors
-}
-
-void dectalk_state::machine_reset()
-{
-	/* hook the RESET line, which resets a slew of other components */
-	m_maincpu->set_reset_callback(*this, FUNC(dectalk_state::dectalk_reset));
 }
 
 /* Begin 68k i/o handlers */
@@ -854,6 +847,7 @@ void dectalk_state::dectalk(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* E74 20MHz OSC (/2) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dectalk_state::m68k_mem);
+	m_maincpu->reset_cb().set(FUNC(dectalk_state::dectalk_reset));
 
 	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);

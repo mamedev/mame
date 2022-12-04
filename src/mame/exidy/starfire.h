@@ -57,10 +57,10 @@ protected:
 	required_ioport m_dsw;
 	required_ioport m_system;
 
-	uint8_t m_vidctrl;
-	uint8_t m_vidctrl1;
-	uint8_t m_color;
-	uint16_t m_colors[STARFIRE_NUM_PENS];
+	uint8_t m_vidctrl = 0;
+	uint8_t m_vidctrl1 = 0;
+	uint8_t m_color = 0;
+	uint16_t m_colors[STARFIRE_NUM_PENS] = { };
 
 	emu_timer* m_scanline_timer;
 	bitmap_rgb32 m_screen_bitmap;
@@ -122,8 +122,8 @@ private:
 	NETDEV_ANALOG_CALLBACK_MEMBER(laseron1_cb);
 	NETDEV_ANALOG_CALLBACK_MEMBER(sound_out_cb);
 
-	uint8_t m_sound_tie_on;
-	uint8_t m_sound_laser_on;
+	uint8_t m_sound_tie_on = 0;
+	uint8_t m_sound_laser_on = 0;
 
 	required_device<netlist_mame_logic_input_device> m_sound_size;
 	required_device<netlist_mame_logic_input_device> m_sound_explosion;

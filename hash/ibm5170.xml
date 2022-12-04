@@ -10648,6 +10648,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bestbest">
+		<description>Best of the Best: Championship Karate (Spain, PC Games release)</description>
+		<year>1993</year>
+		<publisher>Proein</publisher>
+		<info name="developer" value="Futura" />
+		<info name="distributed" value="Planeta DeAgostini" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Best of the Best (Spain) [Proein] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="6b156b62" sha1="5a0f0906d6f113e7129ccf7553db5b76a758c2c0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Best of the Best (Spain) [Proein] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="8eb343e3" sha1="37d399c5d2443b6e20ce00e2ee47bb882b399553"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- The floppy disks are strangely labelled "Eternam" - necessary to validate if it's a good dmup -->
 	<software name="hillbill">
 		<description>The Beverly Hillbillies</description>
@@ -13343,6 +13363,34 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="fleetdef">
+		<description>Fleet Defender</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="alt_title" value="Fleet Defender - The F-14 Tomcat Simulation" />
+		<info name="developer" value="MicroProse" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Fleet Defender [Microprose] [1994] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="bb98cb58" sha1="d6ec3ca21e49f44e92713a4f759d6a5ace35802b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Fleet Defender [Microprose] [1994] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="5e9c6094" sha1="493371841d50bb0064223c0aa5c0f783636d9335"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Fleet Defender [Microprose] [1994] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="273a6552" sha1="599d46305b38b760783d95ebe569812664bf772c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Fleet Defender [Microprose] [1994] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="f00ea489" sha1="901c0e314ef44e3a19e4074d2e748ba813063999"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="f1gp">
 		<description>Formula One Grand Prix (Euro, v1.05)</description>
 		<year>1993</year>
@@ -14323,6 +14371,62 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="humans2">
+		<description>The Humans: Insult to Injury (France)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<info name="alt_title" value="The Humans 2: The Jurassic Levels" />
+		<info name="developer" value="Imagitec Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans 2 (France) [GameTek] [1993] [3.5DD] [Disk 1 of 4].img" size="737280" crc="fd31aa77" sha1="ff428781222e311e242c7e1f7811192182788669"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans 2 (France) [GameTek] [1993] [3.5DD] [Disk 2 of 4].img" size="737280" crc="db32b9a3" sha1="c684a20b17ec7f9ae6ce8e8d7a43bd34d611c5af"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans 2 (France) [GameTek] [1993] [3.5DD] [Disk 3 of 4].img" size="737280" crc="6a2b9026" sha1="626514d7068b55d646a53d1e342fac5ffce91386"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans 2 (France) [GameTek] [1993] [3.5DD] [Disk 4 of 4].img" size="737280" crc="c0ad5374" sha1="ea4ed40af53a8007c1e4a5422c9b2850266bc607"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="humans2sp" cloneof="humans2">
+		<description>The Humans: Insult to Injury (Spain, PC Games release)</description>
+		<year>1995</year>
+		<publisher>Proein</publisher>
+		<info name="developer" value="Imagitec Design" />
+		<info name="distributed" value="Planeta DeAgostini" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Humans 2 (Spain) [Proein] [1995] [3.5DD] [Disk 1 of 4].img" size="1474560" crc="f4764f28" sha1="2bdb2be33871ccc7ddc0b44d3ceb67b0ee355526"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Humans 2 (Spain) [Proein] [1995] [3.5DD] [Disk 2 of 4].img" size="1474560" crc="21d53d45" sha1="1476dc60ede6b6368fe43a5de6bef5e2b451b6d3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Humans 2 (Spain) [Proein] [1995] [3.5DD] [Disk 3 of 4].img" size="1474560" crc="00e176d9" sha1="ac6671de03746bfa1f0ee3717998dfb0c487636e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Humans 2 (Spain) [Proein] [1995] [3.5DD] [Disk 4 of 4].img" size="1474560" crc="e6520bdc" sha1="0e16adabee13377ce5aee5287a98bf4086adb1fa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hyperspd">
 		<description>Hyperspeed (3.5" DD)</description>
 		<year>1991</year>
@@ -14358,6 +14462,18 @@ license:CC0
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Hyperspeed [Microprose] [1991] [5.25HD] [Disk B].img" size="1228800" crc="1974ae9d" sha1="a7b79de112e19e427d041637e9eb7ba206356523"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dreamjean">
+		<description>I Dream of Jeannie</description>
+		<year>1996</year>
+		<publisher>Trendmasters</publisher>
+		<info name="usage" value="Windows 3.x required"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="I Dream of Jeannie [Trendmasters] [1996] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8944c5d0" sha1="04d9a1359065db2fc93d013ff051788933c1c1c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16577,6 +16693,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="andretti">
+		<description>Mario Andretti's Racing Challenge</description>
+		<year>1991</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Career Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Mario Andretti's Racing Challenge [Electronic Arts] [1991] [3.5DD] [Career Disk].img" size="737280" crc="affe5fe6" sha1="74e2fe67f71ef56e9104c72c89cabec4a2f57f66"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Program Control Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Mario Andretti's Racing Challenge [Electronic Arts] [1991] [3.5DD] [Program Control Disk].img" size="737280" crc="7c6dab1f" sha1="c9447f411da447af0190c61312271221990818ab"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Race Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Mario Andretti's Racing Challenge [Electronic Arts] [1991] [3.5DD] [Race Disk].img" size="737280" crc="eb3ab737" sha1="01c291ec3086c1d621fee6d65fee804ef7930432"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mmagic">
 		<description>Master of Magic (v1.1)</description>
 		<year>1994</year>
@@ -17507,10 +17649,89 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="nova9_525">
-		<description>Nova 9 (International Version, 5.25")</description>
+	<software name="nova9">
+		<description>Nova 9: The Return of Gir Draxon (v1.1, 3.5" DD)</description>
 		<year>1991</year>
-		<publisher>Dynamix</publisher>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 1 of 6).dsk" size="737280" crc="de0b75ae" sha1="31590a0c27972a3a956ac853276bc2da770ffef8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 2 of 6).dsk" size="737280" crc="b3756c77" sha1="a818d399fa8b9a77a09217bb6a99f18cbf42acfd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 3 of 6).dsk" size="737280" crc="19411f94" sha1="1580aa2a51991b8463fc3179612c9d96341f03d9"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 4 of 6).dsk" size="737280" crc="a69a0ec3" sha1="84c32577287f9a581f2ec0fbebe354d27da9a7c5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 5 of 6).dsk" size="737280" crc="1c283926" sha1="b077201788af23bc55af4a76ba55e00495717827"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 - Return of Gir Draxon (1991)(Sierra On-Line)(Disk 6 of 6).dsk" size="737280" crc="095ea434" sha1="16a443f8f8d3471908b1c5dc4850b4b266081ab9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- matches dump of 3.5" "International Version" -->
+	<software name="nova9a" cloneof="nova9">
+		<description>Nova 9: The Return of Gir Draxon (v1.0, 3.5" DD)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="1.0" />
+		<info name="usage" value="Install from DOS with: INSTALL" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 1 of 6].img" size="737280" crc="a14599bc" sha1="f94be59a1426c00b2b0421c8b47433b1fda48b19"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 2 of 6].img" size="737280" crc="7a3eaeac" sha1="5bc1879831c26dd7c1fb76df2af2ac938385d14c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 3 of 6].img" size="737280" crc="ebce8727" sha1="e308e3b461ef6e23c53308fefe670f51e83ea940"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 4 of 6].img" size="737280" crc="1d884a9f" sha1="927fe65a2c607a21ca2f24d41d019b65abc47dda"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 5 of 6].img" size="737280" crc="3e9db843" sha1="7ca2acf1e7c270636d182c1484503246d310529d"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 6 of 6].img" size="737280" crc="cc16d0de" sha1="3ba05e1d37397ff92f833ddc0111baeb342c1704"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nova9_525" cloneof="nova9">
+		<description>Nova 9: The Return of Gir Draxon (v1.0, 5.25" HD)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Install from DOS with: INSTALL" />
 		<part name="flop1" interface="floppy_5_25">
@@ -17588,6 +17809,37 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Operation Body Count [Capstone] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="a1aa7cc6" sha1="fb359ceb2f075d3a7acbc700b5c5d30b4d10b876"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opcrusad">
+		<description>Operation Crusader</description>
+		<year>1994</year>
+		<publisher>The Avalon Hill Game Company</publisher>
+		<info name="developer" value="Atomic Games" />
+		<info name="version" value="1.1"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Operation Crusader [Avalon Hill] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="3ba760f4" sha1="ec3911f95e1b4cebf30764da9952ef76d8828f06"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Operation Crusader [Avalon Hill] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="79f1c60f" sha1="98a2341e847bb162115d2b883a6b8b0a323dfe8e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opharrier">
+		<description>Operation Harrier (Kixx release)</description>
+		<year>1993</year>
+		<publisher>Kixx</publisher>
+		<info name="developer" value="Creative Materials" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A/B" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Operation Harrier [1993] [Kixx] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="76136c6f" sha1="04feec4f4940b79c56f244ec939d182142346421"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18652,33 +18904,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="robocop3">
-		<description>Robocop 3</description>
-		<year>1992</year>
-		<publisher>Ocean</publisher>
-		<info name="developer" value="Digital Image Design" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 1 of 4] [Disk A].img" size="1474560" crc="7cbfe1fa" sha1="ceb0753583af8e79dd8d327aec9311518f91d261"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 2 of 4] [Disk B].img" size="1474560" crc="1f121e28" sha1="9fd78576e7e45b8f41f4d56dd524197c841ce780"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 3 of 4] [Disk C].img" size="1474560" crc="4fc50a60" sha1="4af0ab94e05e99f7041fde74dd7c09e680dafb2d"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 4 of 4] [Disk D].img" size="1474560" crc="f8b8cc0b" sha1="21ae96f4bdb9c0e88b8dfd2dffc3ba6a1cb247f4"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="laurabw2">
 		<description>Roberta Williams' Laura Bow in "The Dagger of Amon Ra"</description>
 		<year>1992</year>
@@ -18752,6 +18977,68 @@ license:CC0
 			<feature name="part_id" value="Message Disk" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Laura Bow in The Dagger of Amon Ra (Germany) [Sierra] [1992] [3.5HD] [Disk 6 of 6].img" size="737280" crc="7d884c9a" sha1="6dd0caa64b7b533a80a54f8585ef9769a502e031"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocop3">
+		<description>Robocop 3</description>
+		<year>1992</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="Digital Image Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 1 of 4] [Disk A].img" size="1474560" crc="7cbfe1fa" sha1="ceb0753583af8e79dd8d327aec9311518f91d261"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 2 of 4] [Disk B].img" size="1474560" crc="1f121e28" sha1="9fd78576e7e45b8f41f4d56dd524197c841ce780"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 3 of 4] [Disk C].img" size="1474560" crc="4fc50a60" sha1="4af0ab94e05e99f7041fde74dd7c09e680dafb2d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 4 of 4] [Disk D].img" size="1474560" crc="f8b8cc0b" sha1="21ae96f4bdb9c0e88b8dfd2dffc3ba6a1cb247f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robsport">
+		<description>RoboSport (3.5" DD)</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="usage" value="Requires Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="RoboSport [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="81258412" sha1="bed82f0bebcc3496185de03ef834fb57b89aebb3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="RoboSport [Maxis] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="9241f0da" sha1="2db4d0b2c911f0776c9cce62cf2bf83c9469c430"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robsport_525" cloneof="robsport">
+		<description>RoboSport (5.25" HD)</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="usage" value="Requires Windows 3.x" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="RoboSport [Maxis] [1992] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="eb5a4f6d" sha1="b77a1895dcee0d367caa663c2ac70e592c129e5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20725,11 +21012,13 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="F-18 Hornet Disk" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Top Gun - Danger Zone [Konami] [1991] [3.5HD] [Disk 1 of 2] [F-18 Hornet Disk].img" size="1474560" crc="2655f097" sha1="59d4e6b206b0f4c0807a2487e0cc56bcf44a7c6c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="F-14 Tomcat Disk" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Top Gun - Danger Zone [Konami] [1991] [3.5HD] [Disk 2 of 2] [F-14 Tomcat Disk].img" size="1474560" crc="ab5bdade" sha1="841ca7a5813b4d85e5757d63399f7fff26e9a2d8"/>
 			</dataarea>
@@ -21861,7 +22150,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Future Publishing</publisher>
 		<notes><![CDATA[
-Disk 2 includes: "Player Manager 2 (demo)""
+Disk 2 includes: "Player Manager 2 (demo)"
 Disk 3 includes: "Media8or 2 (shareware)"
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -22386,7 +22675,55 @@ Walking Fingers [David Geffen]: Let your fingers do the walking in this handy mi
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Bad dump: Modified root file -->
 			<dataarea name="flop" size="737280">
-				<rom name="Personal Computer World 1994-04 [VNU] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="72867707" sha1="b51dedbc660fe88012fd5d4a0749e72296eef279"  status="baddump"/>
+				<rom name="Personal Computer World 1994-04 [VNU] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="72867707" sha1="b51dedbc660fe88012fd5d4a0749e72296eef279" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcw9406">
+		<description>Personal Computer World (1994-06 - June 1994)</description>
+		<year>1994</year>
+		<publisher>VNU Business Publications</publisher>
+		<notes><![CDATA[Cover Disk includes:
+Programmer's File Editor: A multi-featured, multi-file programming editor for Windows 3.1.
+Win Crabs: Invade someone's desktop with roving crabs. An amusing desktop curio.
+Dropper: Drop programs AND data files where you like. Add extra drag and drop facilities to your Windows desktop.
+Win Life: Study the way primitive organisms may develop. Run a implementation of the classic simulation.
+Speaker Driver: Play WAV files on your ordinary PC speaker. Play Windows 3.1 sounds through your PC's internal speaker.
+Waxman 1.2w: Play chess with yourself, a friend or the PC.
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Personal Computer World 1994-06 [VNU] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3dde9df3" sha1="6c88acc7ac27ef5d9d0e1d0bec3caced09f1cbbb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bad dump: Modified ROOT and OEM id -->
+	<software name="pcw9411">
+		<description>Personal Computer World (1994-11 - November 1994)</description>
+		<year>1994</year>
+		<publisher>VNU Business Publications</publisher>
+		<notes>Cover Disk includes: "World Rally Fever (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Personal Computer World 1994-11 [VNU] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="53122bb9" sha1="edbb532dd935541049b1891c7b4ac76022d4036c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bad dump: Modified ROOT and OEM id -->
+	<software name="pcw9705">
+		<description>Personal Computer World (1997-05 - May 1997)</description>
+		<year>1997</year>
+		<publisher>VNU Business Publications</publisher>
+		<notes><![CDATA[Cover Disk includes:
+Free the music! v1.01: Not a keyboard in sight, but you can explore all the MIDI features of your computer by pointing with your mouse. Guaranteed to give you hours of fun!
+Bombs: An amusing little desktop game.
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Personal Computer World 1997-05 [VNU] [1997] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="ea3909f6" sha1="c121c7afafdfda79a9d742bd4f9b4c6ecffb6aa7" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

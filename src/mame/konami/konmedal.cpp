@@ -1025,7 +1025,7 @@ void konmedal_state::shuriboy(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	K051649(config, "k051649", XTAL(24'000'000) / 6).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
+	K051649(config, "k051649", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
 
 	UPD7759(config, m_upd7759, XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.60);
 }

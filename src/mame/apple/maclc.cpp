@@ -74,7 +74,7 @@ public:
 	void maccclassic_map(address_map &map);
 
 private:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<v8_device> m_v8;

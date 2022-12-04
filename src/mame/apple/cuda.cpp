@@ -445,11 +445,11 @@ void cuda_device::device_start()
 		switch (rom_offset)
 		{
 			case CUDA_341S0060:
-				rom[0x101d-0xf00] = 0x27;	// patch for 2.40 (BNE to BEQ)
+				rom[0x101d-0xf00] = 0x27;   // patch for 2.40 (BNE to BEQ)
 				break;
 
 			case CUDA_341S0788:
-				rom[0x1035-0xf00] = 0x27;	// patch for 2.37 (BNE to BEQ)
+				rom[0x1035-0xf00] = 0x27;   // patch for 2.37 (BNE to BEQ)
 				break;
 		}
 	}

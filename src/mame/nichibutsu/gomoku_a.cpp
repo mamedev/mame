@@ -49,7 +49,7 @@ void gomoku_sound_device::device_start()
 	m_stream = stream_alloc(0, 1, clock());
 
 	// allocate a buffer to mix into - 1 second's worth should be more than enough
-	m_mixer_buffer.resize(clock()/50);
+	m_mixer_buffer.resize(clock());
 
 	// start with sound enabled, many games don't have a sound enable register
 	m_sound_enable = 1;

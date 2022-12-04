@@ -85,7 +85,10 @@ AT-2
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/rescap.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
+#include "sound/mixer.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
 #include "screen.h"
@@ -443,17 +446,16 @@ static GFXDECODE_START( gfx_terracre )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 1*16+16*16, 256 )
 GFXDECODE_END
 
-
-void terracre_state::ym3526(machine_config &config)
+void terracre_state::tc_base(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &terracre_state::terracre_map);
 	m_maincpu->set_vblank_int("screen", FUNC(terracre_state::irq1_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(16'000'000)/4));     // 4MHz verified on PCB
-	audiocpu.set_addrmap(AS_PROGRAM, &terracre_state::sound_map);
-	audiocpu.set_addrmap(AS_IO, &terracre_state::sound_3526_io_map);
-	audiocpu.set_periodic_int(FUNC(terracre_state::irq0_line_hold), attotime::from_hz(XTAL(16'000'000)/4/512)); // ?
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);     // 4MHz verified on PCB
+	m_audiocpu->set_addrmap(AS_PROGRAM, &terracre_state::sound_map);
+	// z80 io map set in 2203 or 3526 configs below
+	m_audiocpu->set_periodic_int(FUNC(terracre_state::irq0_line_hold), attotime::from_hz(XTAL(16'000'000)/4/512)); // ?
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
@@ -472,25 +474,118 @@ void terracre_state::ym3526(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+}
 
-	YM3526(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.5);     // 4MHz verified on PCB
+void terracre_state::ym3526(machine_config &config)
+{
+	tc_base(config);
+	m_audiocpu->set_addrmap(AS_IO, &terracre_state::sound_3526_io_map);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	// Note: The terra cresta filters are not identical to the later Nichibutsu filters(galivan.cpp, armedf.cpp)
+	// While the yamaha (ym2203/ym3526 digital/FM portion) filter is the same, the dac filters are not,
+	// and (if present) the ym2203 (analog/SSG section only) filter is entirely new.
+	// Mixing resistor calculations for ym3526 set:
+	// R9 - Yamaha (digital/FM) - 1kohm = 0.4074 of total
+	// R12 - DAC1 - 2.2kohm = 0.1852 of total
+	// R8 - DAC2 - 1kohm = 0.4074 of total
+	// However, the actual volume output by the ym3014 dac and the r2r resistors
+	//  is not the same range on each!
+	// The YM3014 dac has a DC offset of 1/2 VDD, then +- 1/4 VDD of signal,
+	//  so min of 1.25v and max of 3.75v, vpp of 2.5v
+	// The R2R dacs are full range, min of 0v and max of (almost) 5v, vpp of ~5.0v
+	// Because of this, we have to compensate as MAME's ymfm core outputs full range.
+	// Math::
+	//  YMFM:  0.407407 * 0.5 = 0.203704
+	//  DAC1:  0.185185 * 1.0 = 0.185185
+	//  DAC2:  0.407407 * 1.0 = 0.407407
+	//  Sum:                    0.796296
+	//  Multiply all 3 values by 1 / 0.796296 (i.e. 1.255814):
+	// Final values are: ym: 0.255814; dac1: 0.232558; dac2: 0.511628)
+
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R10, R11, nothing(infinite resistance), wire(short), C11, C12
+	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R17, R18, nothing(infinite resistance), wire(short), C19, C17
+	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R16, R15, nothing(infinite resistance), wire(short), C18, C21
+	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	YM3526(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, m_ymfilter, 0.2558);     // 4MHz verified on PCB
+
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.2326); // SIP R2R DAC @ RA-1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.5116); // SIP R2R DAC @ RA-2 with 74HC374P latch
+
 }
 
 void terracre_state::ym2203(machine_config &config)
 {
-	ym3526(config);
-	subdevice<z80_device>("audiocpu")->set_addrmap(AS_IO, &terracre_state::sound_2203_io_map);
+	tc_base(config);
+	m_audiocpu->set_addrmap(AS_IO, &terracre_state::sound_2203_io_map);
+	//subdevice<z80_device>("audiocpu")->set_addrmap(AS_IO, &terracre_state::sound_2203_io_map);
 
-	config.device_remove("ymsnd");
+	// Note: The Terra Cresta filters are not identical to the later Nichibutsu filters(galivan.cpp, armedf.cpp)
+	// While the yamaha (ym2203/ym3526 digital/FM portion) filter is the same, the dac filters are not,
+	//  and (if present) the ym2203 (analog/SSG section only) filter is entirely new.
+	// Mixing resistor calculations for ym2203 set:
+	// R9 - Yamaha (digital/FM) - 1kohm = 0.3500 of total
+	// R12 - DAC1 - 2.2kohm = 0.1590 of total
+	// R8 - DAC2 - 1kohm = 0.3500 of total
+	// Yamaha (analog/SSG, channels A and B) - 3.3k = 0.1060
+	// Yamaha (analog/SSG, channel C) - 10k = 0.0350
+	// However, the actual volume output by the ym3014 dac and the r2r resistors
+	//  is not the same range on each!
+	// The YM3014 dac has a DC offset of 1/2 VDD, then +- 1/4 VDD of signal,
+	//  so min of 1.25v and max of 3.75v, vpp of 2.5v
+	// The YM2203's 3 SSG analog channels each have a vpp of about 1.15v
+	//  (i.e. midway between 0.95 and 1.35v on datasheet), before mixing.
+	//  (we assume mixing is perfectly additive, which probably isn't 100% true)
+	// The R2R dacs are full range, min of 0v and max of (almost) 5v, vpp of ~5.0v
+	// Because of this, we have to compensate as MAME's ymfm core outputs full range.
+	// Math: (assuming a constant current for each component)
+	//  YMFM:  0.350000 * 0.5  = 0.175
+	//  DAC1:  0.159000 * 1.0  = 0.159
+	//  DAC2:  0.350000 * 1.0  = 0.350
+	//  SSGA+B:0.106000 * 0.46 = 0.04876
+	//  SSGC:  0.035000 * 0.23 = 0.00805
+	//  Sum:                     0.74081
+	//  Multiply all 5 values by 1 / 0.74081 (i.e. 1.349873):
+	//  ym: 0.236228; dac1: 0.21463; dac2: 0.472456, ssgA+B: 0.06582; ssg3: 0.010866)
+
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R10, R11, nothing(infinite resistance), wire(short), C11, C12
+	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R17, R18, nothing(infinite resistance), wire(short), C19, C17
+	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R16, R15, nothing(infinite resistance), wire(short), C18, C21
+	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	// This filter is a simple first order inverting op-amp lowpass circuit with a gain of
+	//  -4.54545 and a cutoff at effectively infinity, as it has nothing but parasitic
+	//  capacitance as the capacitor part of said circuit. (YR12, YR15).
+	// Technically there may be some capacitance from YC3, although that is intended to be part of the SK filter below.
+	FILTER_BIQUAD(config, m_ssgfilter_abgain).opamp_mfb_lowpass_setup(RES_K(4.7), 0.0, RES_K(10), 0.0, CAP_N(22)/100.0); // YR12, N/A(short), YR15, N/A(unpopulated), (parasitic capacitance from YC3)
+	m_ssgfilter_abgain->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	// This filter is a 2nd order sallen-key lowpass, unity gain.
+	FILTER_BIQUAD(config, m_ssgfilter_abfilt).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(22), CAP_N(10)); // YR3, YR5, nothing(infinite resistance), wire(short), YC3, YC6
+	m_ssgfilter_abfilt->add_route(ALL_OUTPUTS, m_ssgfilter_abgain, 1.0);
+	// This filter is a first order inverting op-amp lowpass circuit with a gain of -4.54545 and a
+	//  cutoff at 10.1hz (YR8, YR7, YC1).
+	// Technically it was probably intended as first order MFB lowpass, but the cap ("YC0")
+	//  near/bypassing YR7 was left unpopulated.
+	// It turns out this cap is mathematically redundant vs the cap at YC1, and serves the
+	//  exact same purpose for calculating the cutoff.
+	FILTER_BIQUAD(config, m_ssgfilter_cgain).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_N(100)); // YR8, N/A(short), YR7, N/A(unpopulated), YC1
+	m_ssgfilter_cgain->add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	MIXER(config, m_ssgmixer);
+	m_ssgmixer->add_route(0, m_ssgfilter_abfilt, 0.06582);
 
 	ym2203_device &ym1(YM2203(config, "ym1", XTAL(16'000'000)/4));     // 4MHz verified on PCB
-	ym1.add_route(0, "speaker", 0.1);
-	ym1.add_route(1, "speaker", 0.1);
-	ym1.add_route(2, "speaker", 0.1);
-	ym1.add_route(3, "speaker", 0.2);
+	ym1.add_route(0, m_ssgmixer, 1.0);
+	ym1.add_route(1, m_ssgmixer, 1.0);
+	ym1.add_route(2, m_ssgfilter_cgain, 0.010866);
+	ym1.add_route(3, m_ymfilter, 0.2362);
+
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.2146); // SIP R2R DAC @ RA-1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.4725); // SIP R2R DAC @ RA-2 with 74HC374P latch
 }
 
 void terracre_state::amazon_base(machine_config &config)
@@ -553,10 +648,10 @@ ROM_START( terracre )
 	ROM_LOAD( "3.10f", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )  // red component on BK-1 PCB
 	ROM_LOAD( "2.11f", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )  // green component on BK-1 PCB
 	ROM_LOAD( "1.12f", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )  // blue component on BK-1 PCB
-	ROM_LOAD( "4.2g",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )  // sprite lookup table on BK-2 PCB
+	ROM_LOAD( "4.2g",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )  // (82s129 with white dot) sprite lookup table on BK-2 PCB
 
 	ROM_REGION( 0x0100, "user1", 0 ) // 82S129
-	ROM_LOAD( "5.4e",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )  // sprite palette bank on BK-2 PCB
+	ROM_LOAD( "5.4e",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )  // (82s129 with pink dot) sprite palette bank on BK-2 PCB
 
 	ROM_REGION( 0x030c, "plds", 0 )
 	ROM_LOAD( "11e", 0x000, 0x104, NO_DUMP ) // PAL16L8 on BK-1 PCB
@@ -988,10 +1083,10 @@ GAME( 1985, terracrea, terracre, ym3526,  terracre, terracre_state,        empty
 GAME( 1985, terracren, terracre, ym2203,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", MACHINE_SUPPORTS_SAVE )
 
 // later HW: supports 1412M2 device, see also mightguy.cpp
-GAME( 1986, amazon,    0,        amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, amazont,   amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu (Tecfri license)", "Soldier Girl Amazon (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, amatelas,  amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, horekid,   0,        amazon_1412m2,  horekid,  amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amazon,    0,        amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE ) //AT-1(1602) and AT-2(1602) pcbs
+GAME( 1986, amazont,   amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu (Tecfri license)", "Soldier Girl Amazon (Tecfri license)", MACHINE_SUPPORTS_SAVE ) //AT-1(1602) and AT-2(1602) pcbs
+GAME( 1986, amatelas,  amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE ) //AT-1(1602) and AT-2(1602) pcbs
+GAME( 1987, horekid,   0,        amazon_1412m2,  horekid,  amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE ) //BK-I(1502) and BK-II(1502) pcbs
 
 // bootlegs
 GAME( 1987, horekidb,  horekid,  amazon_base,    horekid,   terracre_state, empty_init, ROT270,  "bootleg",    "Kid no Hore Hore Daisakusen (bootleg set 1)", MACHINE_SUPPORTS_SAVE )

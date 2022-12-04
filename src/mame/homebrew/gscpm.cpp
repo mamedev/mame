@@ -124,7 +124,6 @@ void gscpm_state::switch_to_ram_w(uint8_t data)
 
 void gscpm_state::machine_reset()
 {
-	driver_device::machine_reset();
 	// Install the ROM handler here
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x3fff);  // Unmap RAM handler if being rebooted
 	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x3fff, memregion("maincpu")->base());

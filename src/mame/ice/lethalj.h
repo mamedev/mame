@@ -34,6 +34,7 @@ public:
 
 	void lethalj(machine_config &config);
 	void gameroom(machine_config &config);
+	void franticf(machine_config &config);
 
 	void init_cfarm();
 	void init_ripribit();

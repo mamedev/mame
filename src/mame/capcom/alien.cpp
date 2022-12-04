@@ -59,7 +59,7 @@
 
     Medalusion 2:
  !   - Doko Demo Issho Toro's Fishing (c) 2006
- !   - Pingu's Ice Block (c) 2005
+ *   - Pingu's Ice Block (c) 2005
      - Geki Makaimura (c) 2005
  !   - Won! Tertainment Happy Channel (c) 2008 note: main board is different, uses Yamaha YMZ770C instead of YMZ770B
 
@@ -111,7 +111,7 @@ u32 alien_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 u8 alien_state::fpga_r()
 {
 	u8 fpga_type = 1; // 2 bit value
-	return (fpga_type << 5) | 0x10 | (rand() & 7); // status bits TODO
+	return (fpga_type << 5) | 0x10 | (machine().rand() & 7); // status bits TODO
 }
 
 void alien_state::alien_map(address_map &map)
@@ -324,11 +324,10 @@ ROM_START( dokodemo )
 	DISK_IMAGE( "dokodemo", 0, SHA1(0c786b6857a29b26971578abe1c8439fe43d94b5) )
 ROM_END
 
-// ROM board only dumped, main board is missing
 ROM_START( pingu )
 	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS code
-	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
-	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
+	ROM_LOAD32_WORD( "stp_04.ic30", 0x000000, 0x400000, CRC(74687757) SHA1(96b6e3725bcf16e92c6966f9b9ce93cfdd7ba641) )
+	ROM_LOAD32_WORD( "stp_05.ic33", 0x000002, 0x400000, CRC(ba2e6716) SHA1(49c5abb9d96e3f4a78ed4dced7a9f052a96b186d) )
 
 	ROM_REGION( 0x800100, "ymz770b", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD( "ic10", 0x000000, 0x800100, CRC(04cf9722) SHA1(854e056a03d6f7ac9b438ba9ce8a0499a79bdec8) )

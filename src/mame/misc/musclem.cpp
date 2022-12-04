@@ -2,7 +2,7 @@
 // copyright-holders:Phil Bennett
 /***************************************************************************
 
-	Inter Geo Muscle Master hardware
+    Inter Geo Muscle Master hardware
 
     driver by Phil Bennett
 

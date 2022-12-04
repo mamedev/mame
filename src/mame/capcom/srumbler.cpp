@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Paul Leaman
+// copyright-holders: Paul Leaman
+
 /***************************************************************************
 
   Speed Rumbler
+  86610-A-1 + 86610-B-1 PCBs
 
   Driver provided by Paul Leaman
 
@@ -11,7 +13,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "srumbler.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
@@ -20,6 +21,223 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+#include "machine/timer.h"
+#include "video/bufsprite.h"
+#include "emupal.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class srumbler_state : public driver_device
+{
+public:
+	srumbler_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_spriteram(*this,"spriteram"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_backgroundram(*this, "backgroundram"),
+		m_foregroundram(*this, "foregroundram"),
+		m_proms(*this, "proms"),
+		m_rombank(*this, "%01x000", 5U)
+	{ }
+
+	void srumbler(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<buffered_spriteram8_device> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_backgroundram;
+	required_shared_ptr<uint8_t> m_foregroundram;
+	required_region_ptr<uint8_t> m_proms;
+	required_memory_bank_array<11> m_rombank;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_scroll[4]{};
+
+	void bankswitch_w(uint8_t data);
+	void foreground_w(offs_t offset, uint8_t data);
+	void background_w(offs_t offset, uint8_t data);
+	void _4009_w(uint8_t data);
+	void scroll_w(offs_t offset, uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(srumbler_state::get_fg_tile_info)
+{
+	uint8_t const attr = m_foregroundram[2 * tile_index];
+	tileinfo.set(0,
+			m_foregroundram[2 * tile_index + 1] + ((attr & 0x03) << 8),
+			(attr & 0x3c) >> 2,
+			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);
+}
+
+TILE_GET_INFO_MEMBER(srumbler_state::get_bg_tile_info)
+{
+	uint8_t const attr = m_backgroundram[2 * tile_index];
+	tileinfo.set(1,
+			m_backgroundram[2 * tile_index + 1] + ((attr & 0x07) << 8),
+			(attr & 0xe0) >> 5,
+			((attr & 0x08) ? TILE_FLIPY : 0));
+	tileinfo.group = (attr & 0x10) >> 4;
+}
+
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void srumbler_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(srumbler_state::get_fg_tile_info)), TILEMAP_SCAN_COLS,  8, 8, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(srumbler_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16,16, 64,64);
+
+	m_fg_tilemap->set_transparent_pen(3);
+
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); // split type 0 is totally transparent in front half
+	m_bg_tilemap->set_transmask(1, 0x07ff, 0xf800); // split type 1 has pens 0-10 transparent in front half
+
+	save_item(NAME(m_scroll));
+}
+
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void srumbler_state::foreground_w(offs_t offset, uint8_t data)
+{
+	m_foregroundram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+void srumbler_state::background_w(offs_t offset, uint8_t data)
+{
+	m_backgroundram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+
+void srumbler_state::_4009_w(uint8_t data)
+{
+	// bit 0 flips screen
+	flip_screen_set(data & 1);
+
+	// bits 4-5 used during attract mode, unknown
+
+	// bits 6-7 coin counters
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x80);
+}
+
+
+void srumbler_state::scroll_w(offs_t offset, uint8_t data)
+{
+	m_scroll[offset] = data;
+
+	m_bg_tilemap->set_scrollx(0, m_scroll[0] | (m_scroll[1] << 8));
+	m_bg_tilemap->set_scrolly(0, m_scroll[2] | (m_scroll[3] << 8));
+}
+
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+void srumbler_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
+
+	// Draw the sprites.
+	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	{
+		/* SPRITES
+		=====
+		Attribute
+		0x80 Code MSB
+		0x40 Code MSB
+		0x20 Code MSB
+		0x10 Colour
+		0x08 Colour
+		0x04 Colour
+		0x02 y Flip
+		0x01 X MSB
+		*/
+
+
+		int const attr = buffered_spriteram[offs + 1];
+		int code = buffered_spriteram[offs];
+		code += ((attr & 0xe0) << 3);
+		int const colour = (attr & 0x1c) >> 2;
+		int sy = buffered_spriteram[offs + 2];
+		int sx = buffered_spriteram[offs + 3] + 0x100 * (attr & 0x01);
+		int flipy = attr & 0x02;
+
+		if (flip_screen())
+		{
+			sx = 496 - sx;
+			sy = 240 - sy;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+				code,
+				colour,
+				flip_screen(), flipy,
+				sx, sy, 15);
+	}
+}
+
+
+uint32_t srumbler_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	draw_sprites(bitmap, cliprect);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
 
 void srumbler_state::bankswitch_w(uint8_t data)
 {
@@ -31,42 +249,36 @@ void srumbler_state::bankswitch_w(uint8_t data)
 	  Note that 5000-8fff can be either ROM or RAM, so we should handle
 	  that as well to be 100% accurate.
 	 */
-	uint8_t *prom1 = memregion("proms")->base() + (data & 0xf0);
-	uint8_t *prom2 = memregion("proms")->base() + 0x100 + ((data & 0x0f) << 4);
+	uint8_t const *prom1 = &m_proms[data & 0xf0];
+	uint8_t const *prom2 = &m_proms[0x100 + ((data & 0x0f) << 4)];
 
-	for (int i = 0x05;i < 0x10;i++)
+	for (int i = 0x05; i < 0x10; i++)
 	{
-		/* bit 2 of prom1 selects ROM or RAM - not supported */
-		int bank = ((prom1[i] & 0x03) << 4) | (prom2[i] & 0x0f);
+		// bit 2 of prom1 selects ROM or RAM - not supported
+		int const bank = ((prom1[i] & 0x03) << 4) | (prom2[i] & 0x0f);
 
-		char bankname[10];
-		sprintf(bankname, "%04x", i*0x1000);
-		membank(bankname)->set_entry(bank);
+		m_rombank[i - 5]->set_entry(bank);
 	}
 }
 
 void srumbler_state::machine_start()
 {
-	for (int i = 0x05; i < 0x10; i++)
-	{
-		char bankname[10];
-		sprintf(bankname, "%04x", i*0x1000);
-		membank(bankname)->configure_entries(0, 64, memregion("user1")->base(), 0x1000);
-	}
+	for (int i = 0x00; i < 0x0b; i++)
+		m_rombank[i]->configure_entries(0, 64, memregion("maincpu")->base(), 0x1000);
 
-	/* initialize banked ROM pointers */
+	// initialize banked ROM pointers
 	bankswitch_w(0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(srumbler_state::interrupt)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if (scanline == 248)
-		m_maincpu->set_input_line(0,HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 
 	if (scanline == 0)
-		m_maincpu->set_input_line(M6809_FIRQ_LINE,HOLD_LINE);
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 /*
@@ -79,11 +291,11 @@ to the page register.
 Ignore the warnings about writing to unmapped memory.
 */
 
-void srumbler_state::srumbler_map(address_map &map)
+void srumbler_state::main_map(address_map &map)
 {
-	map(0x0000, 0x1dff).ram();  /* RAM (of 1 sort or another) */
+	map(0x0000, 0x1dff).ram();  // RAM (of 1 sort or another)
 	map(0x1e00, 0x1fff).ram().share("spriteram");
-	map(0x2000, 0x3fff).ram().w(FUNC(srumbler_state::background_w)).share("backgroundram");
+	map(0x2000, 0x3fff).ram().w(FUNC(srumbler_state::background_w)).share(m_backgroundram);
 	map(0x4008, 0x4008).portr("SYSTEM").w(FUNC(srumbler_state::bankswitch_w));
 	map(0x4009, 0x4009).portr("P1").w(FUNC(srumbler_state::_4009_w));
 	map(0x400a, 0x400a).portr("P2");
@@ -91,22 +303,22 @@ void srumbler_state::srumbler_map(address_map &map)
 	map(0x400c, 0x400c).portr("DSW2");
 	map(0x400a, 0x400d).w(FUNC(srumbler_state::scroll_w));
 	map(0x400e, 0x400e).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x5000, 0x5fff).bankr("5000").w(FUNC(srumbler_state::foreground_w)).share("foregroundram"); /* Banked ROM */
-	map(0x6000, 0x6fff).bankr("6000"); /* Banked ROM */
-	map(0x6000, 0x6fff).nopw();        /* Video RAM 2 ??? (not used) */
-	map(0x7000, 0x7fff).bankr("7000"); /* Banked ROM */
+	map(0x5000, 0x5fff).bankr(m_rombank[0]).w(FUNC(srumbler_state::foreground_w)).share(m_foregroundram);
+	map(0x6000, 0x6fff).bankr(m_rombank[1]);
+	map(0x6000, 0x6fff).nopw();        // Video RAM 2 ??? (not used)
+	map(0x7000, 0x7fff).bankr(m_rombank[2]);
 	map(0x7000, 0x73ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x8000, 0x8fff).bankr("8000"); /* Banked ROM */
-	map(0x9000, 0x9fff).bankr("9000"); /* Banked ROM */
-	map(0xa000, 0xafff).bankr("a000"); /* Banked ROM */
-	map(0xb000, 0xbfff).bankr("b000"); /* Banked ROM */
-	map(0xc000, 0xcfff).bankr("c000"); /* Banked ROM */
-	map(0xd000, 0xdfff).bankr("d000"); /* Banked ROM */
-	map(0xe000, 0xefff).bankr("e000"); /* Banked ROM */
-	map(0xf000, 0xffff).bankr("f000"); /* Banked ROM */
+	map(0x8000, 0x8fff).bankr(m_rombank[3]);
+	map(0x9000, 0x9fff).bankr(m_rombank[4]);
+	map(0xa000, 0xafff).bankr(m_rombank[5]);
+	map(0xb000, 0xbfff).bankr(m_rombank[6]);
+	map(0xc000, 0xcfff).bankr(m_rombank[7]);
+	map(0xd000, 0xdfff).bankr(m_rombank[8]);
+	map(0xe000, 0xefff).bankr(m_rombank[9]);
+	map(0xf000, 0xffff).bankr(m_rombank[10]);
 }
 
-void srumbler_state::srumbler_sound_map(address_map &map)
+void srumbler_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8001).w("ym1", FUNC(ym2203_device::write));
@@ -236,24 +448,24 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( gfx_srumbler )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   448, 16 ) /* colors 448 - 511 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   128,  8 ) /* colors 128 - 255 */
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 256,  8 ) /* colors 256 - 383 */
+	GFXDECODE_ENTRY( "chars",   0, charlayout,   448, 16 ) // colors 448 - 511
+	GFXDECODE_ENTRY( "tiles",   0, tilelayout,   128,  8 ) // colors 128 - 255
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 256,  8 ) // colors 256 - 383
 GFXDECODE_END
 
 
 
 void srumbler_state::srumbler(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MC6809(config, m_maincpu, 16_MHz_XTAL / 2); // HD68B09P
-	m_maincpu->set_addrmap(AS_PROGRAM, &srumbler_state::srumbler_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &srumbler_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(srumbler_state::interrupt), "screen", 0, 1);
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 4));
-	audiocpu.set_addrmap(AS_PROGRAM, &srumbler_state::srumbler_sound_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &srumbler_state::sound_map);
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -269,7 +481,7 @@ void srumbler_state::srumbler(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 512);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -297,7 +509,7 @@ void srumbler_state::srumbler(machine_config &config)
 ***************************************************************************/
 
 ROM_START( srumbler )
-	ROM_REGION( 0x40000, "user1", 0 ) /* Paged ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // Paged ROMs
 	ROM_LOAD( "rc04.14e",   0x00000, 0x08000, CRC(a68ce89c) SHA1(cb5dd8c47c24f9d8ac9a6135c0b7942d16002d25) )
 	ROM_LOAD( "rc03.13e",   0x08000, 0x08000, CRC(87bda812) SHA1(f46dcce21d78c8525a2578b73e05b7cd8a2d8745) ) // sldh
 	ROM_LOAD( "rc02.12e",   0x10000, 0x08000, CRC(d8609cca) SHA1(893f1f1ac0aef5d31e75228252c14c4b522bff16) ) // sldh
@@ -310,11 +522,11 @@ ROM_START( srumbler )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rc05.2f",    0x00000, 0x08000, CRC(0177cebe) SHA1(0fa94d2057f509a6fe1de210bf513efc82f1ffe7) ) // sldh
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "rc10.6g",    0x00000, 0x04000, CRC(adabe271) SHA1(256d6823dcda404375825103272213e1442c3320) ) /* characters */
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "rc10.6g",    0x00000, 0x04000, CRC(adabe271) SHA1(256d6823dcda404375825103272213e1442c3320) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "rc11.11a",   0x00000, 0x08000, CRC(5fa042ba) SHA1(9e03eaf22286330826501619a7b74181dc42a5fa) ) /* tiles */
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD( "rc11.11a",   0x00000, 0x08000, CRC(5fa042ba) SHA1(9e03eaf22286330826501619a7b74181dc42a5fa) )
 	ROM_LOAD( "rc12.13a",   0x08000, 0x08000, CRC(a2db64af) SHA1(35ab93397ee8172813e69edd085b36a5b98ba082) )
 	ROM_LOAD( "rc13.14a",   0x10000, 0x08000, CRC(f1df5499) SHA1(b1c47b35c00bc05825353474ad2b33d9669b879e) )
 	ROM_LOAD( "rc14.15a",   0x18000, 0x08000, CRC(b22b31b3) SHA1(7aa1a042bccf6a1117c983bb36e88ace7712e867) )
@@ -323,8 +535,8 @@ ROM_START( srumbler )
 	ROM_LOAD( "rc17.14c",   0x30000, 0x08000, CRC(aa80aaab) SHA1(37a8e57e4d8ed8372bc1d7c94cf5a087a01d79ad) )
 	ROM_LOAD( "rc18.15c",   0x38000, 0x08000, CRC(ce67868e) SHA1(867d6bc65119fdb7a9788f7d92e6be0326756776) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "rc20.15e",   0x00000, 0x08000, CRC(3924c861) SHA1(e31e0ea50823a910f87eefc969de53f1ad738629) ) /* sprites */
+	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_LOAD( "rc20.15e",   0x00000, 0x08000, CRC(3924c861) SHA1(e31e0ea50823a910f87eefc969de53f1ad738629) )
 	ROM_LOAD( "rc19.14e",   0x08000, 0x08000, CRC(ff8f9129) SHA1(8402236e297c3b03984a22b727198cc54e0c8117) )
 	ROM_LOAD( "rc22.15f",   0x10000, 0x08000, CRC(ab64161c) SHA1(4d8b01ba4c85a732df38db7663bd765a49c671de) )
 	ROM_LOAD( "rc21.14f",   0x18000, 0x08000, CRC(fd64bcd1) SHA1(4bb6c0e0027387284de1dc1320887de3231252e9) )
@@ -334,13 +546,13 @@ ROM_START( srumbler )
 	ROM_LOAD( "rc25.14j",   0x38000, 0x08000, CRC(d2a4ea4f) SHA1(365e534bf56e08b1e727ea7bfdfb537fa274448b) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "63s141.12a", 0x0000, 0x0100, CRC(8421786f) SHA1(7ffe9f3cd081842d9ee38bd67421cb8836e3f7ed) ) /* ROM banking */
-	ROM_LOAD( "63s141.13a", 0x0100, 0x0100, CRC(6048583f) SHA1(a0b0f560e7f52978a1bf59417da13cc852617eff) ) /* ROM banking */
-	ROM_LOAD( "63s141.8j",  0x0200, 0x0100, CRC(1a89a7ff) SHA1(437160ad5d61a257b7deaf5f5e8b3d4cf56a9663) ) /* priority (not used) */
+	ROM_LOAD( "63s141.12a", 0x0000, 0x0100, CRC(8421786f) SHA1(7ffe9f3cd081842d9ee38bd67421cb8836e3f7ed) ) // ROM banking
+	ROM_LOAD( "63s141.13a", 0x0100, 0x0100, CRC(6048583f) SHA1(a0b0f560e7f52978a1bf59417da13cc852617eff) ) // ROM banking
+	ROM_LOAD( "63s141.8j",  0x0200, 0x0100, CRC(1a89a7ff) SHA1(437160ad5d61a257b7deaf5f5e8b3d4cf56a9663) ) // priority (not used)
 ROM_END
 
 ROM_START( srumbler2 )
-	ROM_REGION( 0x40000, "user1", 0 ) /* Paged ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // Paged ROMs
 	ROM_LOAD( "rc04.14e",   0x00000, 0x08000, CRC(a68ce89c) SHA1(cb5dd8c47c24f9d8ac9a6135c0b7942d16002d25) )
 	ROM_LOAD( "rc03.13e",   0x08000, 0x08000, CRC(e82f78d4) SHA1(39cb5d9c18e7635d48aa29221ae99e6a500e2841) ) // sldh
 	ROM_LOAD( "rc02.12e",   0x10000, 0x08000, CRC(009a62d8) SHA1(72b52b34186304d70214f56acdb0f3af5bed9503) )
@@ -353,11 +565,11 @@ ROM_START( srumbler2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rc05.2f",    0x00000, 0x08000, CRC(ea04fa07) SHA1(e29bfc3ed9e6606206ee41c90aaaeddffa26c1b4) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "rc10.6g",    0x00000, 0x04000, CRC(adabe271) SHA1(256d6823dcda404375825103272213e1442c3320) ) /* characters */
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "rc10.6g",    0x00000, 0x04000, CRC(adabe271) SHA1(256d6823dcda404375825103272213e1442c3320) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "rc11.11a",   0x00000, 0x08000, CRC(5fa042ba) SHA1(9e03eaf22286330826501619a7b74181dc42a5fa) ) /* tiles */
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD( "rc11.11a",   0x00000, 0x08000, CRC(5fa042ba) SHA1(9e03eaf22286330826501619a7b74181dc42a5fa) )
 	ROM_LOAD( "rc12.13a",   0x08000, 0x08000, CRC(a2db64af) SHA1(35ab93397ee8172813e69edd085b36a5b98ba082) )
 	ROM_LOAD( "rc13.14a",   0x10000, 0x08000, CRC(f1df5499) SHA1(b1c47b35c00bc05825353474ad2b33d9669b879e) )
 	ROM_LOAD( "rc14.15a",   0x18000, 0x08000, CRC(b22b31b3) SHA1(7aa1a042bccf6a1117c983bb36e88ace7712e867) )
@@ -366,8 +578,8 @@ ROM_START( srumbler2 )
 	ROM_LOAD( "rc17.14c",   0x30000, 0x08000, CRC(aa80aaab) SHA1(37a8e57e4d8ed8372bc1d7c94cf5a087a01d79ad) )
 	ROM_LOAD( "rc18.15c",   0x38000, 0x08000, CRC(ce67868e) SHA1(867d6bc65119fdb7a9788f7d92e6be0326756776) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "rc20.15e",   0x00000, 0x08000, CRC(3924c861) SHA1(e31e0ea50823a910f87eefc969de53f1ad738629) ) /* sprites */
+	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_LOAD( "rc20.15e",   0x00000, 0x08000, CRC(3924c861) SHA1(e31e0ea50823a910f87eefc969de53f1ad738629) )
 	ROM_LOAD( "rc19.14e",   0x08000, 0x08000, CRC(ff8f9129) SHA1(8402236e297c3b03984a22b727198cc54e0c8117) )
 	ROM_LOAD( "rc22.15f",   0x10000, 0x08000, CRC(ab64161c) SHA1(4d8b01ba4c85a732df38db7663bd765a49c671de) )
 	ROM_LOAD( "rc21.14f",   0x18000, 0x08000, CRC(fd64bcd1) SHA1(4bb6c0e0027387284de1dc1320887de3231252e9) )
@@ -377,13 +589,13 @@ ROM_START( srumbler2 )
 	ROM_LOAD( "rc25.14j",   0x38000, 0x08000, CRC(d2a4ea4f) SHA1(365e534bf56e08b1e727ea7bfdfb537fa274448b) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "63s141.12a", 0x0000, 0x0100, CRC(8421786f) SHA1(7ffe9f3cd081842d9ee38bd67421cb8836e3f7ed) ) /* ROM banking */
-	ROM_LOAD( "63s141.13a", 0x0100, 0x0100, CRC(6048583f) SHA1(a0b0f560e7f52978a1bf59417da13cc852617eff) ) /* ROM banking */
-	ROM_LOAD( "63s141.8j",  0x0200, 0x0100, CRC(1a89a7ff) SHA1(437160ad5d61a257b7deaf5f5e8b3d4cf56a9663) ) /* priority (not used) */
+	ROM_LOAD( "63s141.12a", 0x0000, 0x0100, CRC(8421786f) SHA1(7ffe9f3cd081842d9ee38bd67421cb8836e3f7ed) ) // ROM banking
+	ROM_LOAD( "63s141.13a", 0x0100, 0x0100, CRC(6048583f) SHA1(a0b0f560e7f52978a1bf59417da13cc852617eff) ) // ROM banking
+	ROM_LOAD( "63s141.8j",  0x0200, 0x0100, CRC(1a89a7ff) SHA1(437160ad5d61a257b7deaf5f5e8b3d4cf56a9663) ) // priority (not used)
 ROM_END
 
 ROM_START( srumbler3 )
-	ROM_REGION( 0x40000, "user1", 0 ) /* Paged ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // Paged ROMs
 	ROM_LOAD( "rc04.14e",   0x00000, 0x08000, CRC(a68ce89c) SHA1(cb5dd8c47c24f9d8ac9a6135c0b7942d16002d25) )
 	ROM_LOAD( "rc03.13e",   0x08000, 0x08000, CRC(0a21992b) SHA1(6096313210ae729b1c2a27a581473b06c60f5611) ) // sldh
 	ROM_LOAD( "rc02.12e",   0x10000, 0x08000, CRC(009a62d8) SHA1(72b52b34186304d70214f56acdb0f3af5bed9503) )
@@ -396,11 +608,11 @@ ROM_START( srumbler3 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rc05.2f",    0x00000, 0x08000, CRC(ea04fa07) SHA1(e29bfc3ed9e6606206ee41c90aaaeddffa26c1b4) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "rc10.6g",    0x00000, 0x04000, CRC(adabe271) SHA1(256d6823dcda404375825103272213e1442c3320) ) /* characters */
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "rc10.6g",    0x00000, 0x04000, CRC(adabe271) SHA1(256d6823dcda404375825103272213e1442c3320) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "rc11.11a",   0x00000, 0x08000, CRC(5fa042ba) SHA1(9e03eaf22286330826501619a7b74181dc42a5fa) ) /* tiles */
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD( "rc11.11a",   0x00000, 0x08000, CRC(5fa042ba) SHA1(9e03eaf22286330826501619a7b74181dc42a5fa) )
 	ROM_LOAD( "rc12.13a",   0x08000, 0x08000, CRC(a2db64af) SHA1(35ab93397ee8172813e69edd085b36a5b98ba082) )
 	ROM_LOAD( "rc13.14a",   0x10000, 0x08000, CRC(f1df5499) SHA1(b1c47b35c00bc05825353474ad2b33d9669b879e) )
 	ROM_LOAD( "rc14.15a",   0x18000, 0x08000, CRC(b22b31b3) SHA1(7aa1a042bccf6a1117c983bb36e88ace7712e867) )
@@ -409,8 +621,8 @@ ROM_START( srumbler3 )
 	ROM_LOAD( "rc17.14c",   0x30000, 0x08000, CRC(aa80aaab) SHA1(37a8e57e4d8ed8372bc1d7c94cf5a087a01d79ad) )
 	ROM_LOAD( "rc18.15c",   0x38000, 0x08000, CRC(ce67868e) SHA1(867d6bc65119fdb7a9788f7d92e6be0326756776) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "rc20.15e",   0x00000, 0x08000, CRC(3924c861) SHA1(e31e0ea50823a910f87eefc969de53f1ad738629) ) /* sprites */
+	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_LOAD( "rc20.15e",   0x00000, 0x08000, CRC(3924c861) SHA1(e31e0ea50823a910f87eefc969de53f1ad738629) )
 	ROM_LOAD( "rc19.14e",   0x08000, 0x08000, CRC(ff8f9129) SHA1(8402236e297c3b03984a22b727198cc54e0c8117) )
 	ROM_LOAD( "rc22.15f",   0x10000, 0x08000, CRC(ab64161c) SHA1(4d8b01ba4c85a732df38db7663bd765a49c671de) )
 	ROM_LOAD( "rc21.14f",   0x18000, 0x08000, CRC(fd64bcd1) SHA1(4bb6c0e0027387284de1dc1320887de3231252e9) )
@@ -420,13 +632,13 @@ ROM_START( srumbler3 )
 	ROM_LOAD( "rc25.14j",   0x38000, 0x08000, CRC(d2a4ea4f) SHA1(365e534bf56e08b1e727ea7bfdfb537fa274448b) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "63s141.12a", 0x0000, 0x0100, CRC(8421786f) SHA1(7ffe9f3cd081842d9ee38bd67421cb8836e3f7ed) ) /* ROM banking */
-	ROM_LOAD( "63s141.13a", 0x0100, 0x0100, CRC(6048583f) SHA1(a0b0f560e7f52978a1bf59417da13cc852617eff) ) /* ROM banking */
-	ROM_LOAD( "63s141.8j",  0x0200, 0x0100, CRC(1a89a7ff) SHA1(437160ad5d61a257b7deaf5f5e8b3d4cf56a9663) ) /* priority (not used) */
+	ROM_LOAD( "63s141.12a", 0x0000, 0x0100, CRC(8421786f) SHA1(7ffe9f3cd081842d9ee38bd67421cb8836e3f7ed) ) // ROM banking
+	ROM_LOAD( "63s141.13a", 0x0100, 0x0100, CRC(6048583f) SHA1(a0b0f560e7f52978a1bf59417da13cc852617eff) ) // ROM banking
+	ROM_LOAD( "63s141.8j",  0x0200, 0x0100, CRC(1a89a7ff) SHA1(437160ad5d61a257b7deaf5f5e8b3d4cf56a9663) ) // priority (not used)
 ROM_END
 
 ROM_START( rushcrsh )
-	ROM_REGION( 0x40000, "user1", 0 ) /* Paged ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // Paged ROMs
 	ROM_LOAD( "rc04.14e",   0x00000, 0x08000, CRC(a68ce89c) SHA1(cb5dd8c47c24f9d8ac9a6135c0b7942d16002d25) )
 	ROM_LOAD( "rc03.13e",   0x08000, 0x08000, CRC(a49c9be0) SHA1(9aa385063a289e71fef4c2846c8c960a8adafcc0) )
 	ROM_LOAD( "rc02.12e",   0x10000, 0x08000, CRC(009a62d8) SHA1(72b52b34186304d70214f56acdb0f3af5bed9503) )
@@ -439,11 +651,11 @@ ROM_START( rushcrsh )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rc05.2f",    0x00000, 0x08000, CRC(ea04fa07) SHA1(e29bfc3ed9e6606206ee41c90aaaeddffa26c1b4) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "rc10.6g",    0x00000, 0x04000, CRC(0a3c0b0d) SHA1(63f4daaea852c077f0ddd04d4bb4cd6333a8de7c) ) /* characters */ // sldh
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "rc10.6g",    0x00000, 0x04000, CRC(0a3c0b0d) SHA1(63f4daaea852c077f0ddd04d4bb4cd6333a8de7c) ) // sldh
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "rc11.11a",   0x00000, 0x08000, CRC(5fa042ba) SHA1(9e03eaf22286330826501619a7b74181dc42a5fa) ) /* tiles */
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD( "rc11.11a",   0x00000, 0x08000, CRC(5fa042ba) SHA1(9e03eaf22286330826501619a7b74181dc42a5fa) )
 	ROM_LOAD( "rc12.13a",   0x08000, 0x08000, CRC(a2db64af) SHA1(35ab93397ee8172813e69edd085b36a5b98ba082) )
 	ROM_LOAD( "rc13.14a",   0x10000, 0x08000, CRC(f1df5499) SHA1(b1c47b35c00bc05825353474ad2b33d9669b879e) )
 	ROM_LOAD( "rc14.15a",   0x18000, 0x08000, CRC(b22b31b3) SHA1(7aa1a042bccf6a1117c983bb36e88ace7712e867) )
@@ -452,8 +664,8 @@ ROM_START( rushcrsh )
 	ROM_LOAD( "rc17.14c",   0x30000, 0x08000, CRC(aa80aaab) SHA1(37a8e57e4d8ed8372bc1d7c94cf5a087a01d79ad) )
 	ROM_LOAD( "rc18.15c",   0x38000, 0x08000, CRC(ce67868e) SHA1(867d6bc65119fdb7a9788f7d92e6be0326756776) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "rc20.15e",   0x00000, 0x08000, CRC(3924c861) SHA1(e31e0ea50823a910f87eefc969de53f1ad738629) ) /* sprites */
+	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_LOAD( "rc20.15e",   0x00000, 0x08000, CRC(3924c861) SHA1(e31e0ea50823a910f87eefc969de53f1ad738629) )
 	ROM_LOAD( "rc19.14e",   0x08000, 0x08000, CRC(ff8f9129) SHA1(8402236e297c3b03984a22b727198cc54e0c8117) )
 	ROM_LOAD( "rc22.15f",   0x10000, 0x08000, CRC(ab64161c) SHA1(4d8b01ba4c85a732df38db7663bd765a49c671de) )
 	ROM_LOAD( "rc21.14f",   0x18000, 0x08000, CRC(fd64bcd1) SHA1(4bb6c0e0027387284de1dc1320887de3231252e9) )
@@ -463,14 +675,15 @@ ROM_START( rushcrsh )
 	ROM_LOAD( "rc25.14j",   0x38000, 0x08000, CRC(d2a4ea4f) SHA1(365e534bf56e08b1e727ea7bfdfb537fa274448b) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "63s141.12a", 0x0000, 0x0100, CRC(8421786f) SHA1(7ffe9f3cd081842d9ee38bd67421cb8836e3f7ed) ) /* ROM banking */
-	ROM_LOAD( "63s141.13a", 0x0100, 0x0100, CRC(6048583f) SHA1(a0b0f560e7f52978a1bf59417da13cc852617eff) ) /* ROM banking */
-	ROM_LOAD( "63s141.8j",  0x0200, 0x0100, CRC(1a89a7ff) SHA1(437160ad5d61a257b7deaf5f5e8b3d4cf56a9663) ) /* priority (not used) */
+	ROM_LOAD( "63s141.12a", 0x0000, 0x0100, CRC(8421786f) SHA1(7ffe9f3cd081842d9ee38bd67421cb8836e3f7ed) ) // ROM banking
+	ROM_LOAD( "63s141.13a", 0x0100, 0x0100, CRC(6048583f) SHA1(a0b0f560e7f52978a1bf59417da13cc852617eff) ) // ROM banking
+	ROM_LOAD( "63s141.8j",  0x0200, 0x0100, CRC(1a89a7ff) SHA1(437160ad5d61a257b7deaf5f5e8b3d4cf56a9663) ) // priority (not used)
 ROM_END
 
+} // anonymous namespace
 
 
-GAME( 1986, srumbler,  0,        srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom", "The Speed Rumbler (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, srumbler2, srumbler, srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom", "The Speed Rumbler (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler,  0,        srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom",                  "The Speed Rumbler (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler2, srumbler, srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom",                  "The Speed Rumbler (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, srumbler3, srumbler, srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom (Tecfri license)", "The Speed Rumbler (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rushcrsh,  srumbler, srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom", "Rush & Crash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rushcrsh,  srumbler, srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom",                  "Rush & Crash (Japan)",      MACHINE_SUPPORTS_SAVE )

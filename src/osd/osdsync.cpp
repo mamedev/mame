@@ -286,7 +286,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	if (flags & WORK_QUEUE_FLAG_MULTI)
 		allocthreadnum = queue->threads + 1;
 	else
-		allocthreadnum = queue->threads;
+		allocthreadnum = std::max(queue->threads, 1u);
 
 #if KEEP_STATISTICS
 	printf("osdprocs: %d effecprocs: %d threads: %d allocthreads: %d osdthreads: %d maxthreads: %d queuethreads: %d\n", osd_num_processors, numprocs, threadnum, allocthreadnum, osdthreadnum, WORK_MAX_THREADS, queue->threads);

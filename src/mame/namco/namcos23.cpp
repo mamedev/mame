@@ -13,7 +13,7 @@
 
     All games use a JVS I/O board connected to the H8/3002's serial port #0 and requires an I/O board to
     get past the subcpu check. It's similar to System 22 where one 37702 reads the I/O and communicates
-	serially with the second 37702 which is the traditional "subcpu". Several I/O boards are accepted
+    serially with the second 37702 which is the traditional "subcpu". Several I/O boards are accepted
     including TSS-I/O, FCA, ASCA3, ASCA5 and the common JVS I/O boards manufactured by Sega.
 
     NOTES:
@@ -113,7 +113,7 @@ c8000000:
     Game status:
         rapidrvr,v2c        Missing 3d graphics. Coins up. Freezes right when a game starts.
         rapidrvrp           Same as above but it's possible to enable (glitchy) 3d by entering certain portions of the development menu.
-        finfurl             Missing 3d graphics. Freezes in attract mode but can 'play' the game with missing 3d. 
+        finfurl             Missing 3d graphics. Freezes in attract mode but can 'play' the game with missing 3d.
         motoxgo(all)        Inputs don't respond at all. Hardlocks shortly in atract mode.
         downhill            Freeze with black screen after POST.
         downhillu           Heavy gfx glitches. Missing rotary inputs. Random freezes.
@@ -999,7 +999,7 @@ Notes:
       62256    - 32k x2 SRAM (SOP28)
       EPM7096  - Altera EPM7064 CPLD labelled 'MG1,P LD0A' (PLCC44)
       27C1001  - 128k x8 EPROM labelled 'MG1-PRG0' (DIP40)
-      ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8) 
+      ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
       J4/J5    - Standard USB A and B connectors.
       J2       - Ribbon cable connector.
       SS22 FFB - The recycled System 22 v147 motor drive board portion.
@@ -3397,9 +3397,9 @@ static INPUT_PORTS_START( rapidrvr )
 	PORT_DIPNAME(0x80,  0x80, "Service Mode DIP" ) PORT_DIPLOCATION("DIP:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_INCLUDE( h8analog )
-	
+
 	PORT_MODIFY("ADC0")
 	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_Y )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Yaw")
 
@@ -3455,7 +3455,7 @@ static INPUT_PORTS_START( finfurl )
 	PORT_MODIFY("IN01")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Whip Button L")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Whip Button R")
-	
+
 	PORT_MODIFY("ADC0")
 	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_Y )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Swing")
 
@@ -3584,7 +3584,7 @@ static INPUT_PORTS_START( downhill )
 	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Right Brake")
 	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0xf3ff, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	
+
 	PORT_MODIFY("ADC6")
 	PORT_BIT( 0x3ff, 0x0200, IPT_PADDLE )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering")
 INPUT_PORTS_END
@@ -4571,7 +4571,7 @@ ROM_START( aking )
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code. Hacked firmware to change the JVS ID to 'FCA-1' */
 	ROM_LOAD( "asc3_io-c1.ic14", 0x000000, 0x020000, BAD_DUMP CRC(b6627a0e) SHA1(92343d527f4a62773c4495b9a04e7e16b9d6fb96) )
 
-	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code 
+	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
 
 	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
@@ -4623,7 +4623,7 @@ ROM_START( 500gp )
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code. Hacked firmware to change the JVS ID to 'FCA-1' */
 	ROM_LOAD( "asc3_io-c1.ic14", 0x000000, 0x020000, BAD_DUMP CRC(b6627a0e) SHA1(92343d527f4a62773c4495b9a04e7e16b9d6fb96) )
 
-	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code 
+	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
 
 	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code

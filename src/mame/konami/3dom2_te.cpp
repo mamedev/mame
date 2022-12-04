@@ -2538,12 +2538,8 @@ void m2_te_device::destination_blend(uint32_t x, uint32_t y, uint32_t w, const r
 	if (!(m_gc.te_master_mode & TEMASTER_MODE_DZBUF) &&
 		(m_db.usergen_ctrl & DBUSERGENCTL_ZBUFEN))
 	{
-		int32_t x_offs = (m_db.z_offset & DBZOFFS_XOFFS_MASK) >> DBZOFFS_XOFFS_SHIFT;
-		int32_t y_offs = (m_db.z_offset & DBZOFFS_YOFFS_MASK) >> DBZOFFS_YOFFS_SHIFT;
-
-		// Sign extend
-		x_offs = (x_offs << 20) >> 20;
-		y_offs = (x_offs << 20) >> 20;
+		int32_t x_offs = util::sext((m_db.z_offset & DBZOFFS_XOFFS_MASK) >> DBZOFFS_XOFFS_SHIFT, 12);
+		int32_t y_offs = util::sext((m_db.z_offset & DBZOFFS_YOFFS_MASK) >> DBZOFFS_YOFFS_SHIFT, 12);
 
 		x_offs += m_dbstate.x;
 		y_offs += m_dbstate.y;
@@ -2736,12 +2732,8 @@ void m2_te_device::select_src_pixel()
 		&& (m_db.usergen_ctrl & DBUSERGENCTL_BLENDEN)
 		&& !(m_gc.te_master_mode & TEMASTER_MODE_DBLEND))
 	{
-		int32_t x_offs = (m_db.src_offset & DBSRCOFFS_XOFFS_MASK) >> DBSRCOFFS_YOFFS_SHIFT;
-		int32_t y_offs = (m_db.src_offset & DBSRCOFFS_YOFFS_MASK) >> DBSRCOFFS_YOFFS_SHIFT;
-
-		// Sign extend
-		x_offs = (x_offs << 20) >> 20;
-		y_offs = (y_offs << 20) >> 20;
+		int32_t x_offs = util::sext((m_db.src_offset & DBSRCOFFS_XOFFS_MASK) >> DBSRCOFFS_XOFFS_SHIFT, 12);
+		int32_t y_offs = util::sext((m_db.src_offset & DBSRCOFFS_YOFFS_MASK) >> DBSRCOFFS_YOFFS_SHIFT, 12);
 
 		x_offs += m_dbstate.x;
 		y_offs += m_dbstate.y;

@@ -65,7 +65,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="biomotor">
-		<description>BioMotor Unitron (Euro, USA)</description>
+		<description>BioMotor Unitron (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00530" />
@@ -132,7 +132,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: UEP Systems -->
 	<software name="coolboar">
 		<!-- NGPC only -->
-		<description>Cool Boarders Pocket (Euro, Japan)</description>
+		<description>Cool Boarders Pocket (Europe, Japan)</description>
 		<year>2000</year>
 		<publisher>UEP Systems</publisher>
 		<info name="serial" value="NeoP00750" />
@@ -147,7 +147,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<software name="coolcool">
 		<!-- NGPC only -->
-		<description>Cool Cool Jam (Euro, USA, Sample)</description>
+		<description>Cool Cool Jam (Europe, USA, sample)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -174,7 +174,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="cotton">
-		<description>Fantastic Night Dreams Cotton (Euro)</description>
+		<description>Fantastic Night Dreams Cotton (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP01050" />
@@ -217,7 +217,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: SNK -->
 	<software name="darkarms">
-		<description>Dark Arms - Beast Buster 1999 (Euro, USA) ~ Beast Buster - Yami no Seitai Heiki (Japan)</description>
+		<description>Dark Arms - Beast Buster 1999 (Europe, USA) ~ Beast Buster - Yami no Seitai Heiki (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00450" />
@@ -284,7 +284,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="divealrm">
-		<description>Dive Alert - Matt's Version (Euro, USA)</description>
+		<description>Dive Alert - Matt's Version (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00880" />
@@ -296,7 +296,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="divealrb">
-		<description>Dive Alert - Becky's Version (Euro, USA)</description>
+		<description>Dive Alert - Becky's Version (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00890" />
@@ -365,7 +365,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: ADK -->
 	<software name="dynaslug">
-		<description>Dynamite Slugger (Euro, Japan)</description>
+		<description>Dynamite Slugger (Europe, Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00710" />
@@ -380,7 +380,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<software name="evolutn">
 		<!-- NGPC only -->
-		<description>Evolution - Eternal Dungeons (Euro)</description>
+		<description>Evolution - Eternal Dungeons (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00990" />
@@ -408,7 +408,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="faselei">
-		<description>Faselei! (Euro)</description>
+		<description>Faselei! (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00900" />
@@ -580,7 +580,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<software name="lastblad">
 		<!-- NGPC only -->
-		<description>The Last Blade - Beyond the Destiny (Euro)</description>
+		<description>The Last Blade - Beyond the Destiny (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00950" />
@@ -593,7 +593,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 <!-- The prototype found and released by NeoTurfMasta has only different NVRAM data compared to the final version -->
 	<software name="magdrop">
-		<description>Magical Drop Pocket (Euro, USA)</description>
+		<description>Magical Drop Pocket (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00580" />
@@ -733,7 +733,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="neo21">
-		<description>Pocket Casino Series - Neo 21 (Euro, USA)</description>
+		<description>Pocket Casino Series - Neo 21 (Europe, USA)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00700" />
@@ -745,7 +745,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="neobacca">
-		<description>Pocket Casino Series - Neo Baccarat (Euro)</description>
+		<description>Pocket Casino Series - Neo Baccarat (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00980" />
@@ -993,7 +993,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Taito / Ukiyotei -->
 	<software name="pbobble">
-		<description>Puzzle Bobble Mini (Euro, Japan, v10)</description>
+		<description>Puzzle Bobble Mini (Europe, Japan, v10)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00200" />
@@ -1007,7 +1007,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="pbobblea" cloneof="pbobble">
-		<description>Puzzle Bobble Mini (Euro, Japan, v09)</description>
+		<description>Puzzle Bobble Mini (Europe, Japan, v09)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00200 (JPN)" />
@@ -1021,7 +1021,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="pbobbleb" cloneof="pbobble">
-		<description>Puzzle Bobble Mini (Euro, Japan, v09 prototype?)</description>
+		<description>Puzzle Bobble Mini (Europe, Japan, v09 prototype?)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -1032,7 +1032,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="picturep">
-		<description>Picture Puzzle (Euro, USA)</description>
+		<description>Picture Puzzle (Europe, USA)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP01060" />
@@ -1060,7 +1060,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<software name="pockrev">
 		<!-- NGPC only -->
-		<description>Pocket Reversi (Euro)</description>
+		<description>Pocket Reversi (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP01040" />
@@ -1299,7 +1299,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="puzzlink">
-		<description>Puzzle Link (Euro)</description>
+		<description>Puzzle Link (Europe)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00540" />
@@ -1312,7 +1312,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 <!-- The prototype found and released by NeoTurfMasta has only different NVRAM data compared to the final version -->
 	<software name="puzzlnk2">
-		<description>Puzzle Link 2 (Euro, USA)</description>
+		<description>Puzzle Link 2 (Europe, USA)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00760" />
@@ -1436,7 +1436,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="snkgals">
-		<description>SNK Gals' Fighters (Euro, USA)</description>
+		<description>SNK Gals' Fighters (Europe, USA)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00930" />
@@ -1587,7 +1587,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="svccardc">
-		<description>SNK vs. Capcom - Card Fighters' Clash - Capcom Cardfighter's Version (Euro, USA)</description>
+		<description>SNK vs. Capcom - Card Fighters' Clash - Capcom Cardfighter's Version (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00680" />
@@ -1625,7 +1625,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="svccards">
-		<description>SNK vs. Capcom - Card Fighters' Clash - SNK Cardfighter's Version (Euro, USA)</description>
+		<description>SNK vs. Capcom - Card Fighters' Clash - SNK Cardfighter's Version (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00670" />
@@ -1682,7 +1682,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="wrestmad">
-		<description>Wrestling Madness (Euro, USA, prototype)</description>
+		<description>Wrestling Madness (Europe, USA, prototype)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">

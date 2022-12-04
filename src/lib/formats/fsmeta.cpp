@@ -119,10 +119,10 @@ uint64_t meta_value::as_number() const
 
 	std::visit(overloaded
 	{
-		[&result](const std::string &s)				{ result = std::stoull(s); },
-		[&result](uint64_t i)						{ result = i; },
-		[](const util::arbitrary_datetime &)		{ /* nonsensical */ },
-		[](bool)									{ /* nonsensical */ }
+		[&result](const std::string &s)             { result = std::stoull(s); },
+		[&result](uint64_t i)                       { result = i; },
+		[](const util::arbitrary_datetime &)        { /* nonsensical */ },
+		[](bool)                                    { /* nonsensical */ }
 	}, value);
 	return result;
 }

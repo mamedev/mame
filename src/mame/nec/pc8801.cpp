@@ -8,15 +8,16 @@
     driver by Angelo Salese, original MESS PC-88SR driver by ???
 
     TODO:
-    - implement proper i8214 routing, and add irq latch mechanism;
-    - implement proper upd3301 / i8257 text support (currently hacked around);
-    - Add limits for extend work RAM;
+    - cassette support;
     - waitstates;
+    - support for partial palette updates (pretty off in p8suite analog RGB test if enabled);
+    - understand why i8214 needs a dis hack setter (depends on attached i8212?);
     - clean-ups:
+      - slotify extended work RAM, make sure that p8suite memtest88 detects it properly;
       - better state machine isolation of features between various models.
         Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
-        (uses external minidisk), other misc banking bits.
-      - refactor memory banking to use address maps;
+        (uses external minidisk), only model with working border color, other misc banking bits.
+      - refactor memory banking to use address maps & views;
       - double check dipswitches;
       - Slotify PC80S31K, also needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801. **partially done**
         Also notice that there are common points with SPC-1000 and TF-20 FDDs;
@@ -24,7 +25,7 @@
       - Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
         Needs identification effort about what's internal to machine models and what instead
         can be optionally installed;
-    - implement proper joypad / mouse (PC-8872) DB9 port connector;
+    - implement proper joypad / mouse (PC-8872) DB9 port connector, consider deriving from vcs_ctrl;
     - Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
       guessing from the back panels seems that each model can install between 1 to 3 cards.
       Also note: most cards aren't compatible between each other;

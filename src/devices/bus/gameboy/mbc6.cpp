@@ -55,6 +55,8 @@
 #include "emu.h"
 #include "mbc6.h"
 
+#include "cartbase.h"
+
 #include "bus/generic/slot.h"
 #include "machine/intelfsh.h"
 
@@ -69,7 +71,7 @@ namespace bus::gameboy {
 
 namespace {
 
-class mbc6_device : public device_t, public device_gb_cart_interface
+class mbc6_device : public mbc_8k_device_base
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::ROM; }
@@ -85,7 +87,6 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	static inline constexpr unsigned PAGE_ROM_SIZE = 0x2000;
 	static inline constexpr unsigned PAGE_RAM_SIZE = 0x1000;
 
 	template <unsigned Bank> u8 read_flash(offs_t offset);
@@ -97,18 +98,14 @@ private:
 	void enable_flash_write(u8 data);
 	void enable_ram(u8 data);
 
-	bool check_rom(std::string &message) ATTR_COLD;
 	bool check_ram(std::string &message) ATTR_COLD;
-	void install_rom() ATTR_COLD;
 	void install_ram() ATTR_COLD;
 
 	required_device<intelfsh8_device> m_flash;
 	memory_view m_view_rom_low;
 	memory_view m_view_rom_high;
 	memory_view m_view_ram;
-	memory_bank_array_creator<2> m_bank_rom;
 	memory_bank_array_creator<2> m_bank_ram;
-	u8 m_bank_mask_rom;
 	u8 m_bank_mask_ram;
 
 	u8 m_bank_sel_rom[2];
@@ -124,15 +121,12 @@ mbc6_device::mbc6_device(
 		char const *tag,
 		device_t *owner,
 		u32 clock) :
-	device_t(mconfig, GB_ROM_MBC6, tag, owner, clock),
-	device_gb_cart_interface(mconfig, *this),
+	mbc_8k_device_base(mconfig, GB_ROM_MBC6, tag, owner, clock),
 	m_flash(*this, "flash"),
 	m_view_rom_low(*this, "romlow"),
 	m_view_rom_high(*this, "romhigh" ),
 	m_view_ram(*this, "ram"),
-	m_bank_rom(*this, { "romlow", "romhigh" }),
 	m_bank_ram(*this, { "ramlow", "ramhigh" }),
-	m_bank_mask_rom(0U),
 	m_bank_mask_ram(0U),
 	m_bank_sel_rom{ 0U, 0U },
 	m_bank_sel_ram{ 0U, 0U },
@@ -146,6 +140,7 @@ mbc6_device::mbc6_device(
 image_init_result mbc6_device::load(std::string &message)
 {
 	// first check that ROM/RAM regions are supportable
+	set_bank_bits_rom(7);
 	if (!check_rom(message) || !check_ram(message))
 		return image_init_result::FAIL;
 
@@ -155,7 +150,7 @@ image_init_result mbc6_device::load(std::string &message)
 	cart_space()->install_view(0xa000, 0xbfff, m_view_ram);
 
 	// set up ROM and RAM as appropriate
-	install_rom();
+	install_rom(*cart_space(), m_view_rom_low[0], m_view_rom_high[0]);
 	install_ram();
 
 	// install memory controller handlers
@@ -209,8 +204,11 @@ void mbc6_device::device_add_mconfig(machine_config &config)
 	MACRONIX_29F008TC(config, m_flash);
 }
 
+
 void mbc6_device::device_start()
 {
+	mbc_8k_device_base::device_start();
+
 	save_item(NAME(m_bank_sel_rom));
 	save_item(NAME(m_bank_sel_ram));
 	save_item(NAME(m_flash_select));
@@ -218,8 +216,11 @@ void mbc6_device::device_start()
 	save_item(NAME(m_flash_writable));
 }
 
+
 void mbc6_device::device_reset()
 {
+	mbc_8k_device_base::device_reset();
+
 	m_bank_sel_rom[0] = 0U;
 	m_bank_sel_rom[1] = 0U;
 	m_bank_sel_ram[0] = 0U;
@@ -233,17 +234,14 @@ void mbc6_device::device_reset()
 	m_view_rom_high.select(0);
 	m_view_ram.disable();
 
-	if (m_bank_mask_rom)
-	{
-		m_bank_rom[0]->set_entry(0);
-		m_bank_rom[1]->set_entry(0);
-	}
-
 	if (m_bank_mask_ram)
 	{
 		m_bank_ram[0]->set_entry(0);
 		m_bank_ram[1]->set_entry(0);
 	}
+
+	set_bank_rom_low(0);
+	set_bank_rom_high(0);
 }
 
 
@@ -291,16 +289,10 @@ void mbc6_device::bank_switch_rom(offs_t offset, u8 data)
 		}
 	}
 
-	if (m_bank_mask_rom)
-	{
-		u8 const entry(data & m_bank_mask_rom);
-		LOG(
-				"%s: Set ROM bank %s = 0x%05X\n",
-				machine().describe_context(),
-				bank ? "high" : "low",
-				entry * PAGE_ROM_SIZE);
-		m_bank_rom[bank]->set_entry(entry);
-	}
+	if (bank)
+		set_bank_rom_high(data & 0x7f);
+	else
+		set_bank_rom_low(data & 0x7f);
 }
 
 
@@ -441,23 +433,6 @@ void mbc6_device::enable_ram(u8 data)
 }
 
 
-bool mbc6_device::check_rom(std::string &message)
-{
-	memory_region *const romregion(cart_rom_region());
-	if (romregion)
-	{
-		auto const rombytes(romregion->bytes());
-		if (((PAGE_ROM_SIZE < rombytes) && (rombytes & (PAGE_ROM_SIZE - 1))) || ((u32(PAGE_ROM_SIZE) << 7) < rombytes))
-		{
-			message = "Unsupported cartridge ROM size (must be no larger than 8 KiB, or a multiple of 8 KiB and no larger than 2 MiB)";
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
 bool mbc6_device::check_ram(std::string &message)
 {
 	memory_region *const ramregion(cart_ram_region());
@@ -478,68 +453,6 @@ bool mbc6_device::check_ram(std::string &message)
 	}
 
 	return true;
-}
-
-
-void mbc6_device::install_rom()
-{
-	memory_region *const romregion(cart_rom_region());
-	auto const rombytes(romregion ? romregion->bytes() : 0);
-	if (!rombytes)
-	{
-		// just avoid fatal errors
-		m_view_rom_low[0];
-		m_view_rom_high[0];
-		m_bank_mask_rom = 0U;
-	}
-	else if (PAGE_ROM_SIZE >= rombytes)
-	{
-		// not big enough to need banking - install directly
-		device_generic_cart_interface::install_non_power_of_two<0>(
-				rombytes,
-				PAGE_ROM_SIZE - 1,
-				0,
-				0,
-				0x0000,
-				[this, base = &romregion->as_u8()] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
-				{
-					LOG(
-							"Install ROM 0x%04X-0x%04X at 0x%04X-0x%04X mirror 0x%04X\n",
-							src,
-							src + (end - begin),
-							begin,
-							end,
-							mirror);
-					cart_space()->install_rom(begin, end, 0x2000 | mirror, &base[src]);
-					m_view_rom_low[0].install_rom(0x4000 | begin, 0x4000 | end, mirror, &base[src]);
-					m_view_rom_high[0].install_rom(0x6000 | begin, 0x6000 | end, mirror, &base[src]);
-				});
-		m_bank_mask_rom = 0U;
-	}
-	else
-	{
-		// install the fixed ROM, mirrored if it’s too small
-		if (0x4000 > rombytes)
-			cart_space()->install_rom(0x0000, 0x1fff, 0x2000, romregion->base());
-		else
-			cart_space()->install_rom(0x0000, 0x3fff, 0x0000, romregion->base());
-
-		// configure both banks as views of the ROM
-		m_bank_mask_rom = device_generic_cart_interface::map_non_power_of_two(
-				unsigned(rombytes / PAGE_ROM_SIZE),
-				[this, base = &romregion->as_u8()] (unsigned entry, unsigned page)
-				{
-					LOG(
-							"Install ROM 0x%05X-0x%05X in bank entry %u\n",
-							page * PAGE_ROM_SIZE,
-							(page * PAGE_ROM_SIZE) + (PAGE_ROM_SIZE - 1),
-							entry);
-					m_bank_rom[0]->configure_entry(entry, &base[page * PAGE_ROM_SIZE]);
-					m_bank_rom[1]->configure_entry(entry, &base[page * PAGE_ROM_SIZE]);
-				});
-		m_view_rom_low[0].install_read_bank(0x4000, 0x5fff, m_bank_rom[0]);
-		m_view_rom_high[0].install_read_bank(0x6000, 0x7fff, m_bank_rom[1]);
-	}
 }
 
 

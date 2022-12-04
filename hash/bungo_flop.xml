@@ -43,11 +43,14 @@ Sample disk: has two sectors broken hence baddump
 
 	<software name="tetris" supported="no">
 		<description>Tetris (Mini5)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Sublicensed by BPS to Tokyo System House, floppy printout reports '90 but internal TETRIS.COM file has August 1991 -->
+		<year>1991</year>
+		<publisher>Tokyo System House</publisher>
 		<notes><![CDATA[
 Has copy protection (non-standard sector sizes)
+https://www.leadedsolder.com/2022/10/20/mini5-tetris-dump.html
 ]]></notes>
+		<!-- supported archs according to manual: Mini5R/5RD/5RG/5RX/5RS/5RC/5SX -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="355203">
 				<rom name="mini5-tetris.imd" size="355203" crc="d369f80b" sha1="156a339746057b483e0f104dc69a3bf70cd18a26" />

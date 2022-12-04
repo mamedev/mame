@@ -422,7 +422,8 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 								cloneof = false;
 						}
 
-						item_append(info.longname, cloneof ? FLAG_INVERT : 0, (void *)&info);
+						ui_system_info const &sysinfo = m_persistent_data.systems()[driver_list::find(info.driver->name)];
+						item_append(sysinfo.description, cloneof ? FLAG_INVERT : 0, (void *)&info);
 					}
 					else
 					{
@@ -502,7 +503,7 @@ void menu_select_game::build_available_list()
 	// now check and include NONE_NEEDED
 	if (!ui().options().hide_romless())
 	{
-		// FIXME: can't use the convenience macros tiny ROM entries
+		// FIXME: can't use the convenience macros with tiny ROM entries
 		auto const is_required_rom =
 				[] (tiny_rom_entry const &rom) { return ROMENTRY_ISFILE(rom) && !ROM_ISOPTIONAL(rom) && !std::strchr(rom.hashdata, '!'); };
 		for (std::size_t x = 0; total > x; ++x)
@@ -682,7 +683,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		}
 		return;
 	}
-	else if (ui_swinfo->startempty == 1)
+	else if (ui_swinfo->startempty)
 	{
 		driver_enumerator enumerator(machine().options(), *ui_swinfo->driver);
 		enumerator.next();

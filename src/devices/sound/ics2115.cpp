@@ -434,8 +434,8 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 	{
 		constexpr int RAMP_SHIFT = 6;
 		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
-		const u16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law
-		const u16 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
+		const s16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law
+		const s16 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
 		//check negative values so no cracks, is it a hardware feature ?
 		const u16 vleft = vlefti > 0 ? (m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT) : 0;
 		const u16 vright = vrighti > 0 ? (m_volume[vrighti] * voice.state.ramp >> RAMP_SHIFT) : 0;
@@ -448,10 +448,9 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 		s32 sample = get_sample(voice);
 
 		//15-bit volume + (5-bit worth of 32 channel sum) + 16-bit samples = 4-bit extra
+		//if (voice.playing())
 		if (!m_vmode || voice.playing())
 		{
-		/*if (voice.playing())
-		{*/
 			outputs[0].add_int(i, (sample * vleft) >> (5 + volume_bits), 32768);
 			outputs[1].add_int(i, (sample * vright) >> (5 + volume_bits), 32768);
 		}
@@ -618,7 +617,8 @@ u16 ics2115_device::reg_read()
 			ret = m_active_osc;
 			break;
 
-		case 0x0f:{// [osc] Interrupt source/oscillator
+		case 0x0f: // [osc] Interrupt source/oscillator
+		{
 			ret = 0xff;
 			for (int i = 0; i <= m_active_osc; i++)
 			{
@@ -643,7 +643,8 @@ u16 ics2115_device::reg_read()
 				}
 			}
 			ret <<= 8;
-			break;}
+			break;
+		}
 
 		case 0x10: // [osc] Oscillator Control
 			ret = voice.osc.ctl << 8;
@@ -1079,7 +1080,7 @@ void ics2115_device::recalc_irq()
 	//Suspect
 	bool irq = (m_irq_pending & m_irq_enabled);
 	for (int i = 0; (!irq) && (i < 32); i++)
-		irq |=  m_voice[i].vol_ctrl.bitflags.irq_pending && m_voice[i].osc_conf.bitflags.irq_pending;
+		irq |= m_voice[i].vol_ctrl.bitflags.irq_pending && m_voice[i].osc_conf.bitflags.irq_pending;
 	m_irq_on = irq;
 	if (!m_irq_cb.isnull())
 		m_irq_cb(irq ? ASSERT_LINE : CLEAR_LINE);

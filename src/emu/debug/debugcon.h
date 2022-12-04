@@ -110,11 +110,38 @@ public:
 		vprintf_wrap(wrapcol, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
-	device_t *get_visible_cpu() { return m_visiblecpu; }
+	device_t *get_visible_cpu() const { return m_visiblecpu; }
 	void set_visible_cpu(device_t *visiblecpu) { m_visiblecpu = visiblecpu; }
-	symbol_table &visible_symtable();
+	symbol_table &visible_symtable() const;
 
 	static std::string cmderr_to_string(CMDERR error);
+
+	// validates a parameter as a boolean value
+	bool validate_boolean_parameter(std::string_view param, bool &result);
+
+	// validates a parameter as a numeric value
+	bool validate_number_parameter(std::string_view param, u64 &result);
+
+	// validates a parameter as a device
+	bool validate_device_parameter(std::string_view param, device_t *&result);
+
+	// validates a parameter as a CPU
+	bool validate_cpu_parameter(std::string_view param, device_t *&result);
+
+	// validates a parameter as an address space identifier
+	bool validate_device_space_parameter(std::string_view param, int spacenum, address_space *&result);
+
+	// validates a parameter as a target address and retrieves the given address space and address
+	bool validate_target_address_parameter(std::string_view param, int spacenum, address_space *&space, u64 &addr);
+
+	// validates a parameter as a memory region name and retrieves the given region
+	bool validate_memory_region_parameter(std::string_view param, memory_region *&result);
+
+	// validates a parameter as a debugger expression
+	bool validate_expression_parameter(std::string_view param, parsed_expression &result);
+
+	// validates a parameter as a debugger command
+	bool validate_command_parameter(std::string_view param);
 
 private:
 	void exit();
@@ -128,6 +155,9 @@ private:
 
 	void print_core(std::string_view text);                   // core text output
 	void print_core_wrap(std::string_view text, int wrapcol); // core text output
+
+	device_t &get_device_search_base(std::string_view &param) const;
+	device_t *get_cpu_by_index(u64 cpunum) const;
 
 	struct debug_command
 	{

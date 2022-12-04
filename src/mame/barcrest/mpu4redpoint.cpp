@@ -63,6 +63,7 @@ MACHINE_START_MEMBER(mpu4redpoint_state,mpu4redpoint)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
+	m_link7b_connected=true;
 }
 
 } // anonymous namespace

@@ -182,7 +182,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( mux_serial_a_w );
 
 	void victor9k_palette(palette_device &palette) const;
-	
+
 	// video state
 	int m_brt;
 	int m_cont;
@@ -267,7 +267,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	int hires = BIT(ma, 13);
 	int dot_addr = BIT(ma, 12);
 	int width = hires ? 16 : 10;
-	
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
@@ -332,7 +332,7 @@ MC6845_BEGIN_UPDATE( victor9k_state::crtc_begin_update )
 	uint16_t ma = m_crtc->get_ma();
 	int hires = BIT(ma, 13);
 	int width = hires ? 16 : 10;
-	if (hires != m_hires) 
+	if (hires != m_hires)
 	{
 		//LOGDISPLAY("mc6845 begin update change resolution: %s\n", hires ? "high" : "low");
 		m_crtc->set_hpixels_per_column(width);
@@ -672,7 +672,7 @@ void victor9k_state::machine_start()
 	int m_ram_size = m_ram->size();
 	u8 *m_ram_ptr = m_ram->pointer();
 
-    int ramsize = m_ram_size;
+	int ramsize = m_ram_size;
 	if (ramsize > 0)
 	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
@@ -714,12 +714,12 @@ void victor9k_state::victor9k(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
- 	m_screen->set_color(rgb_t::green());
- 	m_screen->set_refresh_hz(72);
- 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200)); 
- 	m_screen->set_size(800, 400);
- 	m_screen->set_visarea(0, 799, 0, 399);
- 	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
+	m_screen->set_color(rgb_t::green());
+	m_screen->set_refresh_hz(72);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200));
+	m_screen->set_size(800, 400);
+	m_screen->set_visarea(0, 799, 0, 399);
+	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
 	HD6845S(config, m_crtc, 15_MHz_XTAL / 10); // HD6845 == HD46505S
@@ -727,11 +727,11 @@ void victor9k_state::victor9k(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
 	m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
-	
+
 	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(victor9k_state::vert_w));
 	m_crtc->set_begin_update_callback(FUNC(victor9k_state::crtc_begin_update));
-	
+
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	HC55516(config, m_cvsd, 0);

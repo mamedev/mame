@@ -45,7 +45,6 @@ private:
 		int start_counter;
 	};
 
-
 	/* channel_data structure holds info about each active sound channel */
 	struct sound_channel_data
 	{
@@ -53,7 +52,6 @@ private:
 		int offset;
 		int remaining;
 	};
-
 
 	/* sound_cache_entry structure contains info on each decoded sample */
 	struct sound_cache_entry

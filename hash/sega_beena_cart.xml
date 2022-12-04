@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="sega_beena_cart" description="Sega Beena Cartridges">
+<softwarelist name="sega_beena_cart" description="Sega Beena cartridges">
 	<!-- you must byteswap ROMs to see text, due to endian? -->
 
 	<software name="1nichi10" supported="no">

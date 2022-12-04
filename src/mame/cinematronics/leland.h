@@ -21,12 +21,6 @@
 #define ATAXX_EXTRA_TRAM_SIZE 0x800
 
 
-struct vram_state_data
-{
-	u16  m_addr;
-	u8   m_latch[2];
-};
-
 class leland_80186_sound_device;
 
 class leland_state : public driver_device
@@ -102,18 +96,18 @@ protected:
 	optional_ioport_array<4> m_io_in;
 	optional_ioport_array<6> m_io_an;
 
-	emu_timer *m_master_int_timer;
-	u8 m_battery_ram_enable;
+	emu_timer *m_master_int_timer = nullptr;
+	u8 m_battery_ram_enable = 0U;
 
 	void rotate_memory(const char *cpuname);
 
 	int dial_compute_value(int new_val, int indx);
-	u8 m_dial_last_input[4];
-	u8 m_dial_last_result[4];
-	u8 m_analog_result;
+	u8 m_dial_last_input[4]{};
+	u8 m_dial_last_result[4]{};
+	u8 m_analog_result = 0U;
 
-	int m_dangerz_x;
-	int m_dangerz_y;
+	int m_dangerz_x = 0;
+	int m_dangerz_y = 0;
 
 	void init_master_ports(u8 mvram_base, u8 io_base);
 	void (leland_state::*m_update_master_bank)();
@@ -121,7 +115,7 @@ protected:
 	int vram_port_r(offs_t offset, int num);
 	void vram_port_w(offs_t offset, u8 data, int num);
 
-	u8 m_wcol_enable;
+	u8 m_wcol_enable = 0U;
 
 	u8 master_analog_key_r(offs_t offset);
 	void master_analog_key_w(offs_t offset, u8 data);
@@ -131,10 +125,18 @@ protected:
 	void scroll_w(offs_t offset, u8 data);
 	void leland_master_alt_bankswitch_w(u8 data);
 
-	tilemap_t      *m_tilemap;
-	u16 m_xscroll;
-	u16 m_yscroll;
+	tilemap_t *m_tilemap = nullptr;
+	u16 m_xscroll = 0U;
+	u16 m_yscroll = 0U;
+
 	std::unique_ptr<u8[]> m_video_ram;
+
+	struct vram_state_data
+	{
+		u16  m_addr = 0U;
+		u8   m_latch[2]{};
+	};
+
 	struct vram_state_data m_vram_state[2];
 
 	void slave_map_program(address_map &map);
@@ -150,20 +152,20 @@ private:
 	required_region_ptr<u8> m_bg_gfxrom;
 	optional_region_ptr<u8> m_bg_prom;
 
-	u8 m_dac_control;
-	u8 *m_alleymas_kludge_mem;
-	u8 m_gfx_control;
-	u8 m_keycard_shift;
-	u8 m_keycard_bit;
-	u8 m_keycard_state;
-	u8 m_keycard_clock;
-	u8 m_keycard_command[3];
-	u8 m_top_board_bank;
-	u8 m_sound_port_bank;
-	u8 m_alternate_bank;
-	u8 m_gfxbank;
-	u16 m_last_scanline;
-	emu_timer *m_scanline_timer;
+	u8 m_dac_control = 0U;
+	u8 *m_alleymas_kludge_mem = nullptr;
+	u8 m_gfx_control = 0U;
+	u8 m_keycard_shift = 0U;
+	u8 m_keycard_bit = 0U;
+	u8 m_keycard_state = 0U;
+	u8 m_keycard_clock = 0U;
+	u8 m_keycard_command[3]{};
+	u8 m_top_board_bank = 0U;
+	u8 m_sound_port_bank = 0U;
+	u8 m_alternate_bank = 0U;
+	u8 m_gfxbank = 0U;
+	u16 m_last_scanline = 0U;
+	emu_timer *m_scanline_timer = nullptr;
 
 	u8 cerberus_dial_1_r();
 	u8 cerberus_dial_2_r();
