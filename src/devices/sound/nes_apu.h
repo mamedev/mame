@@ -52,7 +52,7 @@ public:
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 
-	u8 read(offs_t offset);
+	u8 status_r();
 	void write(offs_t offset, u8 data);
 
 protected:

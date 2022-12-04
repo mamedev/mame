@@ -694,36 +694,31 @@ logerror("invalid apu write: $%02X at $%04X\n", value, offset);
 	}
 }
 
-/* READ VALUES FROM REGISTERS */
-u8 nesapu_device::read(offs_t offset)
+// Read status register at $4015
+u8 nesapu_device::status_r()
 {
-	if (offset == 0x15) /*FIXED* Address $4015 has different behaviour*/
-	{
-		m_stream->update();
+	m_stream->update();
 
-		int readval = 0;
-		if (m_APU.squ[0].vbl_length > 0)
-			readval |= 0x01;
+	u8 readval = 0;
+	if (m_APU.squ[0].vbl_length > 0)
+		readval |= 0x01;
 
-		if (m_APU.squ[1].vbl_length > 0)
-			readval |= 0x02;
+	if (m_APU.squ[1].vbl_length > 0)
+		readval |= 0x02;
 
-		if (m_APU.tri.vbl_length > 0)
-			readval |= 0x04;
+	if (m_APU.tri.vbl_length > 0)
+		readval |= 0x04;
 
-		if (m_APU.noi.vbl_length > 0)
-			readval |= 0x08;
+	if (m_APU.noi.vbl_length > 0)
+		readval |= 0x08;
 
-		if (m_APU.dpcm.enabled)
-			readval |= 0x10;
+	if (m_APU.dpcm.enabled)
+		readval |= 0x10;
 
-		if (m_APU.dpcm.irq_occurred)
-			readval |= 0x80;
+	if (m_APU.dpcm.irq_occurred)
+		readval |= 0x80;
 
-		return readval;
-	}
-	else
-		return 0xff; // FIXME: this should be open bus?
+	return readval;
 }
 
 

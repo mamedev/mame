@@ -3687,21 +3687,21 @@ void dkong_state::init_dkongx()
 void dkong_state::init_dkong3()
 {
 	// RP2A03 bus conflict between internal APU and external RAM
-	m_dkong3_tap[0] = subdevice<cpu_device>("rp2a03a")->space(AS_PROGRAM).install_write_tap(
+	m_dkong3_tap[0] = m_dev_rp2a03a->space(AS_PROGRAM).install_write_tap(
 			0x4000, 0x400f,
 			"rp2a03a_conflict_w",
 			[this] (offs_t offset, u8 &data, u8 mem_mask)
 			{
-				subdevice<cpu_device>("rp2a03a")->space(AS_PROGRAM).write_byte(offset & 0x07ff, data);
+				m_dev_rp2a03a->space(AS_PROGRAM).write_byte(offset & 0x07ff, data);
 			},
 			&m_dkong3_tap[0]);
 
-	m_dkong3_tap[1] = subdevice<cpu_device>("rp2a03b")->space(AS_PROGRAM).install_write_tap(
+	m_dkong3_tap[1] = m_dev_rp2a03b->space(AS_PROGRAM).install_write_tap(
 			0x4000, 0x400f,
 			"rp2a03b_conflict_w",
 			[this] (offs_t offset, u8 &data, u8 mem_mask)
 			{
-				subdevice<cpu_device>("rp2a03b")->space(AS_PROGRAM).write_byte(offset & 0x07ff, data);
+				m_dev_rp2a03b->space(AS_PROGRAM).write_byte(offset & 0x07ff, data);
 			},
 			&m_dkong3_tap[1]);
 }
@@ -3774,7 +3774,7 @@ GAME( 1982, maguila,   dkongjr,  dkongjr,   dkongjr,  dkong_state, init_dkingjr,
 
 GAME( 1983, dkong3,    0,        dkong3,    dkong3,   dkong_state, init_dkong3,   ROT270, "Nintendo of America", "Donkey Kong 3 (US)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1983, dkong3j,   dkong3,   dkong3,    dkong3,   dkong_state, init_dkong3,   ROT270, "Nintendo",            "Donkey Kong 3 (Japan)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dkong3b,   dkong3,   dkong3b,   dkong3b,  dkong_state, init_dkong3,   ROT270, "bootleg",             "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dkong3b,   dkong3,   dkong3b,   dkong3b,  dkong_state, empty_init,    ROT270, "bootleg",             "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, dkong3hs,  dkong3,   dk3_braze, dkong3,   dkong_state, init_dkong3hs, ROT270, "hack (Braze Technologies)", "Donkey Kong High Score Kit (hack,V1.0a)",       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, pestplce,  mario,    pestplce,  pestplce, dkong_state, empty_init,    ROT0,   "bootleg", "Pest Place", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -21,18 +21,13 @@ void rp2a03_device::apu_w(offs_t offset, uint8_t data)
 	m_apu->write(offset, data);
 }
 
-uint8_t rp2a03_device::apu_status_r()
-{
-	return m_apu->read(0x15);
-}
-
 
 void rp2a03_device::rp2a03_map(address_map &map)
 {
 	map(0x4000, 0x4013).w(FUNC(rp2a03_device::apu_w));
 	map(0x4015, 0x4015).lw8(NAME([this](u8 data) { apu_w(0x15, data); }));
 	map(0x4017, 0x4017).lw8(NAME([this](u8 data) { apu_w(0x17, data); }));
-	map(0x4015, 0x4015).r(FUNC(rp2a03_device::apu_status_r));
+	map(0x4015, 0x4015).r(m_apu, FUNC(nesapu_device::status_r));
 	// 0x4014 w -> NES sprite DMA (is this internal?)
 	// 0x4016 w -> d0-d2: RP2A03 OUT0,OUT1,OUT2
 	// 0x4016 r -> d0-d4: RP2A03 IN0
