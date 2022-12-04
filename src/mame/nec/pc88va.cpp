@@ -14,22 +14,29 @@
     - pc88va (stock version) has two bogus opcodes.
       One is at 0xf0b15 (0x0f 0xfe), another at 0xf0b31 (br 1000h:0c003h).
       Latter will make the program flow to jump to lalaland.
+      This also happens if you load a regular V1/V2 game assuming you have FDC PIO properly
+      hooked up, is the first opcode actually a Z80 mode switch?
     - pc88va is also known to have a slightly different banking scheme and
       regular YM2203 as default sound board.
     - video emulation is lacking many features, cfr. pc88va_v.cpp;
     - keyboard runs on undumped MCU, we currently stick irqs together on
-      selected keys in order to have an easier QoL on testing this.
+      selected keys in order to have an easier QoL while testing this.
     - Backport from PC-8801 main map, apply supersets where applicable;
       \- IDP has EMUL for upd3301
       \- In emulation mode HW still relies to a i8214, so it bridges thru
          main ICU in cascaded mode via IRQ7;
       \- beeper or dac1bit (to be confirmed);
       \- (other stuff ...)
-    - FDC very unstable, may really always need a PIO comms therefore needs
-      converting to a subclass of PC80S31K (also necessary for sorcer anyway);
-    - irq dispatch also needs to be revisited, too many instances of sound irq
-      failing for example;
-    - all N88 BASIC entries tries to do stuff with EMM, banking bug?
+    - Convert FDC usage to pc88va2_fd_if_device, we also need PIO comms for sorcer anyway;
+    - irq dispatch needs to be revisited, too many instances of sound irq failing for example.
+      The current hook-ups aren't legal, V50 core bug?
+    - Very inconsistent SW boot behaviours, either down to:
+      \- the current hack in FDC PIO port returning RNG;
+      \- V50 timings;
+      \- FDC;
+    - Every PC Engine OS boot tries to write TVRAM ASCII data on every boot to
+      $exxxx ROM region, banking bug?
+    - all N88 BASIC entries tries to do stuff with EMM, more banking?
     - Convert SASI from PC-9801 to a shared device, apparently it's same i/f;
     - Implement bus slot, which should still be PC-8801 EXPansion bus.
 
