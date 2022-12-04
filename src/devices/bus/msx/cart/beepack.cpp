@@ -72,7 +72,12 @@ image_init_result msx_cart_beepack_device::call_load()
 			}
 		}
 
-		m_beecard->initialize_cartridge();
+		std::string message;
+		image_init_result result = m_beecard->initialize_cartridge(message);
+		if (image_init_result::PASS != result)
+			seterror(image_error::INVALIDIMAGE, message.c_str());
+
+		return result;
 	}
 	return image_init_result::PASS;
 }

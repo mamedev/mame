@@ -25,16 +25,22 @@ msx_cart_holy_quran_device::msx_cart_holy_quran_device(const machine_config &mco
 {
 }
 
-void msx_cart_holy_quran_device::initialize_cartridge()
+image_init_result msx_cart_holy_quran_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("holy_quran: ROM region not set up\n");
+	{
+		message = "msx_cart_holy_quran_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;
 
 	if (size > 256 * BANK_SIZE || size < 0x10000 || size != banks * BANK_SIZE || (~(banks - 1) % banks))
-		fatalerror("holy_quran: Invalid ROM size\n");
+	{
+		message = "msx_cart_holy_quran_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	m_bank_mask = banks - 1;
 
@@ -65,6 +71,8 @@ void msx_cart_holy_quran_device::initialize_cartridge()
 	m_view2[0].install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(msx_cart_holy_quran_device::read2)));
 	m_view2[1].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	m_view2[1].install_read_bank(0xa000, 0xbfff, m_rombank[3]);
+
+	return image_init_result::PASS;
 }
 
 void msx_cart_holy_quran_device::device_reset()

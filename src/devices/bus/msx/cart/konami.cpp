@@ -30,16 +30,22 @@ void msx_cart_konami_device::device_reset()
 		m_rombank[i]->set_entry(i);
 }
 
-void msx_cart_konami_device::initialize_cartridge()
+image_init_result msx_cart_konami_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("konami: ROM region not set up\n");
+	{
+		message = "msx_cart_konami_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x2000;
 
 	if (size > 256 * 0x2000 || size < 4 * 0x2000 || size != banks * 0x2000 || (~(banks - 1) % banks))
-		fatalerror("konami: Invalid ROM size\n");
+	{
+		message = "msx_cart_konami_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	m_bank_mask = banks - 1;
 
@@ -58,6 +64,8 @@ void msx_cart_konami_device::initialize_cartridge()
 	page(2)->install_write_handler(0xa000, 0xa7ff, 0, 0x1000, 0, write8smo_delegate(*this, FUNC(msx_cart_konami_device::bank_w<3>)));
 	page(3)->install_read_bank(0xc000, 0xdfff, m_rombank[2]);
 	page(3)->install_read_bank(0xe000, 0xffff, m_rombank[3]);
+
+	return image_init_result::PASS;
 }
 
 template <int Bank>
@@ -93,16 +101,22 @@ void msx_cart_konami_scc_device::device_reset()
 		m_rombank[i]->set_entry(i);
 }
 
-void msx_cart_konami_scc_device::initialize_cartridge()
+image_init_result msx_cart_konami_scc_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("konami_scc: ROM region not set up\n");
+	{
+		message = "msx_cart_konami_scc_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x2000;
 
 	if (size > 256 * 0x2000 || size < 0x8000 || size != banks * 0x2000 || (~(banks - 1) % banks))
-		fatalerror("konami_scc: Invalid ROM size\n");
+	{
+		message = "msx_cart_konami_scc_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	m_bank_mask = banks - 1;
 
@@ -133,6 +147,8 @@ void msx_cart_konami_scc_device::initialize_cartridge()
 	page(2)->install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<3>)));
 	page(3)->install_read_bank(0xc000, 0xdfff, m_rombank[0]);
 	page(3)->install_read_bank(0xe000, 0xffff, m_rombank[1]);
+
+	return image_init_result::PASS;
 }
 
 template <int Bank>
@@ -171,22 +187,34 @@ void msx_cart_gamemaster2_device::device_reset()
 	m_view2.select(0);
 }
 
-void msx_cart_gamemaster2_device::initialize_cartridge()
+image_init_result msx_cart_gamemaster2_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("gamemaster2: ROM region not set up\n");
+	{
+		message = "msx_cart_gamemaster2_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	if (!cart_sram_region())
-		fatalerror("gamemaster2: SRAM region not set up\n");
+	{
+		message = "msx_cart_gamemaster2_device: Required region 'sram' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x2000;
 
 	if (size != 0x20000)
-		fatalerror("gamemaster2: Invalid ROM size\n");
+	{
+		message = "msx_cart_gamemaster2_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	if (cart_sram_region()->bytes() != 0x2000)
-		fatalerror("gamemaster2: Invalid SRAM size\n");
+	{
+		message = "msx_cart_gamemaster2_device: Region 'sram' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -214,6 +242,8 @@ void msx_cart_gamemaster2_device::initialize_cartridge()
 	m_view2[1].install_read_bank(0xa000, 0xafff, m_rambank[2]);
 	m_view2[1].install_write_handler(0xa000, 0xafff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
 	m_view2[1].install_readwrite_bank(0xb000, 0xbfff, m_rambank[2]);
+
+	return image_init_result::PASS;
 }
 
 template <int Bank>
@@ -247,17 +277,25 @@ void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 }
 
-void msx_cart_synthesizer_device::initialize_cartridge()
+image_init_result msx_cart_synthesizer_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("synthesizer: ROM region not set up\n");
+	{
+		message = "msx_cart_synthesizer_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	if (cart_rom_region()->bytes() != 0x8000)
-		fatalerror("synthesizer: Invalid ROM size\n");
+	{
+		message = "msx_cart_synthesizer_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	page(1)->install_write_handler(0x4000, 0x4000, 0, 0x3fef, 0, write8smo_delegate(m_dac, FUNC(dac_byte_interface::write)));
 	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
+
+	return image_init_result::PASS;
 }
 
 
@@ -305,7 +343,7 @@ void msx_cart_konami_sound_device::device_reset()
 	switch_bank<3>();
 }
 
-void msx_cart_konami_sound_device::initialize_cartridge()
+image_init_result msx_cart_konami_sound_device::initialize_cartridge(std::string &message)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -389,6 +427,8 @@ void msx_cart_konami_sound_device::initialize_cartridge()
 	m_view3[VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
 
 	page(2)->install_write_handler(0xbffe, 0xbfff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::control_w)));
+
+	return image_init_result::PASS;
 }
 
 void msx_cart_konami_sound_device::control_w(u8 data)
@@ -448,15 +488,21 @@ msx_cart_konami_sound_snatcher_device::msx_cart_konami_sound_snatcher_device(con
 {
 }
 
-void msx_cart_konami_sound_snatcher_device::initialize_cartridge()
+image_init_result msx_cart_konami_sound_snatcher_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_ram_region())
-		fatalerror("sound_snatcher: RAM region not set up\n");
+	{
+		message = "msx_cart_konami_sound_snatcher_device: Required region 'ram' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	if (cart_ram_region()->bytes() != 0x10000)
-		fatalerror("sound_snatcher: Invalid RAM size\n");
+	{
+		message = "msx_cart_konami_sound_snatcher_device: Region 'ram' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
-	msx_cart_konami_sound_device::initialize_cartridge();
+	return msx_cart_konami_sound_device::initialize_cartridge(message);
 }
 
 
@@ -466,15 +512,21 @@ msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device
 {
 }
 
-void msx_cart_konami_sound_sdsnatcher_device::initialize_cartridge()
+image_init_result msx_cart_konami_sound_sdsnatcher_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_ram_region())
-		fatalerror("sound_sdsnatcher: RAM region not set up\n");
+	{
+		message = "msx_cart_konami_sound_sdsnatcher_device: Required region 'ram' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	if (cart_ram_region()->bytes() != 0x10000)
-		fatalerror("sound_sdsnatcher: Invalid RAM size\n");
+	{
+		message = "msx_cart_konami_sound_sdsnatcher_device: Region 'ram' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
-	msx_cart_konami_sound_device::initialize_cartridge();
+	return msx_cart_konami_sound_device::initialize_cartridge(message);
 }
 
 
@@ -508,18 +560,29 @@ void msx_cart_keyboard_master_device::device_start()
 	io_space().install_read_handler(0x00, 0x00, read8smo_delegate(*this, FUNC(msx_cart_keyboard_master_device::io_00_r)));
 }
 
-void msx_cart_keyboard_master_device::initialize_cartridge()
+image_init_result msx_cart_keyboard_master_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("keyboard_master: ROM region not set up\n");
+	{
+		message = "msx_cart_keyboard_master_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	if (!cart_vlm5030_region())
-		fatalerror("keyboard_master: VLM5030 region not set up\n");
+	{
+		message = "msx_cart_keyboard_master_device: Required region 'vlm5030' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	if (cart_rom_region()->bytes() != 0x4000)
-		fatalerror("keyboard_master: Invalid ROM size\n");
+	{
+		message = "msx_cart_keyboard_master_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
+
+	return image_init_result::PASS;
 }
 
 uint8_t msx_cart_keyboard_master_device::read_vlm(offs_t offset)
@@ -557,10 +620,13 @@ void msx_cart_ec701_device::device_reset()
 	m_view.select(0);
 }
 
-void msx_cart_ec701_device::initialize_cartridge()
+image_init_result msx_cart_ec701_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("ec701: ROM region not set up\n");
+	{
+		message = "msx_cart_ec701_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	m_rombank->configure_entries(0, 24, cart_rom_region()->base() + 0x20000, 0x4000);
 
@@ -571,6 +637,8 @@ void msx_cart_ec701_device::initialize_cartridge()
 
 	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
 	page(2)->install_write_handler(0xbff8, 0xbfff, write8smo_delegate(*this, FUNC(msx_cart_ec701_device::bank_w)));
+
+	return image_init_result::PASS;
 }
 
 void msx_cart_ec701_device::bank_w(u8 data)

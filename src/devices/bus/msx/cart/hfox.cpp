@@ -20,16 +20,22 @@ void msx_cart_hfox_device::device_reset()
 	m_rombank[1]->set_entry(0);
 }
 
-void msx_cart_hfox_device::initialize_cartridge()
+image_init_result msx_cart_hfox_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("hfox: ROM region not set up\n");
+	{
+		message = "msx_cart_hfox_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / 0x8000;
 
 	if (size > 256 * 0x8000 || size < 0x10000 || size != banks * 0x8000 || (~(banks - 1) % banks))
-		fatalerror("hfox: Invalid ROM size\n");
+	{
+		message = "msx_cart_hfox_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	m_bank_mask = banks - 1;
 
@@ -40,6 +46,8 @@ void msx_cart_hfox_device::initialize_cartridge()
 	page(1)->install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(msx_cart_hfox_device::bank_w<0>)));
 	page(1)->install_write_handler(0x7000, 0x7000, write8smo_delegate(*this, FUNC(msx_cart_hfox_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
+
+	return image_init_result::PASS;
 }
 
 template <int Bank>

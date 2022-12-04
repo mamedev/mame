@@ -24,13 +24,19 @@ void msx_cart_majutsushi_device::device_add_mconfig(machine_config &config)
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
 }
 
-void msx_cart_majutsushi_device::initialize_cartridge()
+image_init_result msx_cart_majutsushi_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("majutsushi: ROM region not set up\n");
+	{
+		message = "msx_cart_majutsushi_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	if (cart_rom_region()->bytes() != 0x20000)
-		fatalerror("majutsushi: Invalid ROM size\n");
+	{
+		message = "msx_cart_majutsushi_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	for (int i = 0; i < 3; i++)
 		m_rombank[i]->configure_entries(0, 16, cart_rom_region()->base(), 0x2000);
@@ -47,6 +53,8 @@ void msx_cart_majutsushi_device::initialize_cartridge()
 	page(2)->install_write_handler(0xa000, 0xa000, 0, 0x1fff, 0, write8smo_delegate(*this, FUNC(msx_cart_majutsushi_device::bank_w<2>)));
 	page(3)->install_read_bank(0xc000, 0xdfff, m_rombank[1]);
 	page(3)->install_read_bank(0xe000, 0xffff, m_rombank[2]);
+
+	return image_init_result::PASS;
 }
 
 template <int Bank>

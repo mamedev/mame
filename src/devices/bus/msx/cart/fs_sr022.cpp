@@ -25,13 +25,19 @@ void msx_cart_fs_sr022_device::device_reset()
 	m_bunsetsu_address = 0;
 }
 
-void msx_cart_fs_sr022_device::initialize_cartridge()
+image_init_result msx_cart_fs_sr022_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("fs_sr022: ROM region not set up\n");
+	{
+		message = "msx_cart_fs_sr022_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	if (cart_rom_region()->bytes() != 0x40000)
-		fatalerror("fs_sr022: Invalid ROM size\n");
+	{
+		message = "msx_cart_fs_sr022_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	m_bunsetsu_rom = cart_rom_region()->base() + 0x20000;
 
@@ -39,6 +45,8 @@ void msx_cart_fs_sr022_device::initialize_cartridge()
 	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
 	page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_cart_fs_sr022_device::buns_r)));
 	page(2)->install_write_handler(0xbffc, 0xbffe, write8sm_delegate(*this, FUNC(msx_cart_fs_sr022_device::buns_w)));
+
+	return image_init_result::PASS;
 }
 
 u8 msx_cart_fs_sr022_device::buns_r()

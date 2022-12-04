@@ -24,16 +24,22 @@ void msx_cart_ascii8_device::device_reset()
 		m_rombank[i]->set_entry(0);
 }
 
-void msx_cart_ascii8_device::initialize_cartridge()
+image_init_result msx_cart_ascii8_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("ascii8: ROM region not set up\n");
+	{
+		message = "msx_cart_ascii8_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;
 
 	if (size > 256 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
-		fatalerror("ascii8: Invalid ROM size\n");
+	{
+		message = "msx_cart_ascii8_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	m_bank_mask = banks - 1;
 
@@ -48,6 +54,8 @@ void msx_cart_ascii8_device::initialize_cartridge()
 	page(1)->install_write_handler(0x7800, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<3>)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
+
+	return image_init_result::PASS;
 }
 
 template <int Bank>
@@ -72,16 +80,22 @@ void msx_cart_ascii16_device::device_reset()
 	m_rombank[1]->set_entry(0);
 }
 
-void msx_cart_ascii16_device::initialize_cartridge()
+image_init_result msx_cart_ascii16_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("ascii16: ROM region not set up\n");
+	{
+		message = "msx_cart_ascii16_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;
 
 	if (size > 256 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
-		fatalerror("ascii16: Invalid ROM size\n");
+	{
+		message = "msx_cart_ascii16_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	m_bank_mask = banks - 1;
 
@@ -92,6 +106,8 @@ void msx_cart_ascii16_device::initialize_cartridge()
 	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<0>)));
 	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
+
+	return image_init_result::PASS;
 }
 
 template <int Bank>
@@ -123,22 +139,34 @@ void msx_cart_ascii8_sram_device::device_reset()
 	m_view3.select(0);
 }
 
-void msx_cart_ascii8_sram_device::initialize_cartridge()
+image_init_result msx_cart_ascii8_sram_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("ascii8_sram: ROM region not set up\n");
+	{
+		message = "msx_cart_ascii8_sram_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	if (!cart_sram_region())
-		fatalerror("ascii8_sram: SRAM region not set up\n");
+	{
+		message = "msx_cart_ascii8_sram_device: Required region 'sram' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;
 
 	if (size > 128 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
-		fatalerror("ascii8_sram: Invalid ROM size\n");
+	{
+		message = "msx_cart_ascii8_sram_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	if (cart_sram_region()->bytes() < 0x2000)
-		fatalerror("ascii8_sram: Unsupported SRAM size\n");
+	{
+		message = "msx_cart_ascii8_sram_device: Region 'sram' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	m_bank_mask = banks - 1;
 	m_sram_select_mask = banks;
@@ -155,6 +183,8 @@ void msx_cart_ascii8_sram_device::initialize_cartridge()
 	page(2)->install_view(0xa000, 0xbfff, m_view3);
 	m_view3[0].install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 	m_view3[1].install_ram(0xa000, 0xbfff, cart_sram_region()->base());
+
+	return image_init_result::PASS;
 }
 
 void msx_cart_ascii8_sram_device::mapper_write(offs_t offset, u8 data)
@@ -202,22 +232,34 @@ void msx_cart_ascii16_sram_device::device_reset()
 	m_rombank[1]->set_entry(0);
 }
 
-void msx_cart_ascii16_sram_device::initialize_cartridge()
+image_init_result msx_cart_ascii16_sram_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
-		fatalerror("ascii16_sram: ROM region not set up\n");
+	{
+		message = "msx_cart_ascii16_sram_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	if (!cart_sram_region())
-		fatalerror("ascii16_sram: SRAM region not set up\n");
+	{
+		message = "msx_cart_ascii16_sram_device: Required region 'sram' was not found.";
+		return image_init_result::FAIL;
+	}
 
 	const u32 size = cart_rom_region()->bytes();
 	const u16 banks = size / BANK_SIZE;
 
 	if (size > 128 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
-		fatalerror("ascii16_sram: Invalid ROM size\n");
+	{
+		message = "msx_cart_ascii16_sram_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	if (cart_sram_region()->bytes() < 0x800)
-		fatalerror("ascii16_sram: Unsupported SRAM size\n");
+	{
+		message = "msx_cart_ascii16_sram_device: Region 'sram' has unsupported size.";
+		return image_init_result::FAIL;
+	}
 
 	m_bank_mask = banks - 1;
 	m_sram_select_mask = banks;
@@ -231,6 +273,8 @@ void msx_cart_ascii16_sram_device::initialize_cartridge()
 	page(2)->install_view(0x8000, 0xbfff, m_view);
 	m_view[0].install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 	m_view[1].install_ram(0x8000, 0x87ff, 0x3800, cart_sram_region()->base());
+
+	return image_init_result::PASS;
 }
 
 void msx_cart_ascii16_sram_device::mapper_write_6000(u8 data)

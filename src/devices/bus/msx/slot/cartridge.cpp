@@ -145,7 +145,13 @@ image_init_result msx_slot_cartridge_device::call_load()
 			}
 		}
 
-		m_cartridge->initialize_cartridge();
+		std::string message;
+		image_init_result result = m_cartridge->initialize_cartridge(message);
+		if (image_init_result::PASS != result)
+		{
+			seterror(image_error::INVALIDIMAGE, message.c_str());
+			return result;
+		}
 
 		if (m_cartridge->cart_sram_region())
 		{

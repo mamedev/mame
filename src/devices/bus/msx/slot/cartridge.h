@@ -79,7 +79,7 @@ public:
 	// This is called after loading cartridge contents and allows the cartridge
 	// implementation to perform some additional initialization based on the
 	// cartridge contents.
-	virtual void initialize_cartridge() { }
+	virtual image_init_result initialize_cartridge(std::string &message) { return image_init_result::PASS; }
 	virtual void interface_pre_start() override { assert(m_exp != nullptr); }
 
 	void set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3);
