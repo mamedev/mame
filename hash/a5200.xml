@@ -98,7 +98,7 @@ Possible Undumped protos: -
 -->
 <softwarelist name="a5200" description="Atari 5200 cartridges">
 	<software name="5200menu">
-		<description>5200 Menu (Prototype)</description>
+		<description>5200 Menu (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -110,7 +110,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="aep">
-		<description>A.E. (Prototype)</description>
+		<description>A.E. (prototype)</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software Inc</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -135,7 +135,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="asteroid">
-		<description>Asteroids (Prototype)</description>
+		<description>Asteroids (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5201" />
@@ -205,7 +205,7 @@ Possible Undumped protos: -
 -->
 
 	<software name="bzone">
-		<description>Battlezone (Prototype)</description>
+		<description>Battlezone (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5239" />
@@ -275,7 +275,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="blckbelt">
-		<description>Black Belt (Prototype)</description>
+		<description>Black Belt (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5231" />
@@ -288,7 +288,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="blaster">
-		<description>Blaster (Prototype)</description>
+		<description>Blaster (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -447,7 +447,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="flegacy">
-		<description>Final Legacy (Prototype)</description>
+		<description>Final Legacy (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5256" />
@@ -460,7 +460,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="friskyt">
-		<description>Frisky Tom (Prototype)</description>
+		<description>Frisky Tom (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -590,7 +590,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="jrpacman">
-		<description>Jr Pacman (Prototype)</description>
+		<description>Jr Pacman (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5251" />
@@ -669,7 +669,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="laststar">
-		<description>The Last Starfighter (Prototype)</description>
+		<description>The Last Starfighter (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5260" />
@@ -682,7 +682,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="looneyh">
-		<description>Looney Tunes Hotel (Prototype)</description>
+		<description>Looney Tunes Hotel (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -707,7 +707,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="meebzork">
-		<description>Meebzork (Prototype)</description>
+		<description>Meebzork (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -744,7 +744,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="microgam">
-		<description>Microgammon SB (Prototype)</description>
+		<description>Microgammon SB (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -756,7 +756,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="milliped">
-		<description>Millipede (Prototype)</description>
+		<description>Millipede (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5248" />
@@ -783,7 +783,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="minigolf">
-		<description>Miniature Golf (Prototype)</description>
+		<description>Miniature Golf (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5230" />
@@ -1020,7 +1020,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="rsbasket1" cloneof="rsbasket">
-		<description>RealSports Basketball (Prototype, 19831031)</description>
+		<description>RealSports Basketball (prototype, 19831031)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5219" />
@@ -1033,7 +1033,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="rsbasket2" cloneof="rsbasket">
-		<description>RealSports Basketball (Prototype, 19821105)</description>
+		<description>RealSports Basketball (prototype, 19821105)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5219" />
@@ -1116,7 +1116,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="roadrun">
-		<description>Road Runner (Prototype)</description>
+		<description>Road Runner (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5242" />
@@ -1182,7 +1182,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="spitfire">
-		<description>Spitfire (Prototype)</description>
+		<description>Spitfire (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1194,7 +1194,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="sprtgoof">
-		<description>Sport Goofy (Prototype)</description>
+		<description>Sport Goofy (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5237" />
@@ -1259,7 +1259,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="stargate">
-		<description>Stargate (Prototype)</description>
+		<description>Stargate (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5252" />
@@ -1299,7 +1299,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="spacman">
-		<description>Super Pac-Man (Prototype)</description>
+		<description>Super Pac-Man (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1311,7 +1311,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="tempest">
-		<description>Tempest (Prototype)</description>
+		<description>Tempest (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="developer" value="Keithen Hayenga" />
@@ -1325,7 +1325,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="trackfld">
-		<description>Track and Field (Prototype)</description>
+		<description>Track and Field (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5258" />
@@ -1364,7 +1364,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="xari">
-		<description>Xari Arena (Prototype)</description>
+		<description>Xari Arena (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1376,7 +1376,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="xevious">
-		<description>Xevious (Prototype)</description>
+		<description>Xevious (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5246" />
@@ -1464,7 +1464,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="pamdg23">
-		<description>Atari PAM Diagnostics (Rev 2.3)</description>
+		<description>Atari PAM Diagnostics (rev 2.3)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1476,7 +1476,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="finaltst">
-		<description>Atari PAM Final System Test (Rev 1.0)</description>
+		<description>Atari PAM Final System Test (rev 1.0)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">

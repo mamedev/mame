@@ -52,7 +52,7 @@ const char *const s_reg_names[32] =
 const char *const s_ctlreg_names[16] =
 {
 	"status", "estatus", "bstatus", "ienable", "ipending", "cpuid", "ctl6", "exception",
-	"pteaddr", "tlbacc", "tlbmisc", "ctl11", "badaddr", "config", "mpubase", "mpuacc"
+	"pteaddr", "tlbacc", "tlbmisc", "eccinj", "badaddr", "config", "mpubase", "mpuacc"
 };
 
 } // anonymous namespace

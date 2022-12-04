@@ -42,13 +42,14 @@ public:
 	Type *live() const { return m_spriteram; }
 	Type *buffer() { return &m_buffered[0]; }
 	uint32_t bytes() const { return m_spriteram.bytes(); }
+	uint32_t length() const { return bytes() / sizeof(Type); }
 
 	// operations
 	Type *copy(uint32_t srcoffset = 0, uint32_t srclength = 0x7fffffff)
 	{
 		assert(m_spriteram != nullptr);
 		if (m_spriteram != nullptr)
-			memcpy(&m_buffered[0], m_spriteram + srcoffset, (std::min<size_t>)(srclength, m_spriteram.bytes() / sizeof(Type) - srcoffset) * sizeof(Type));
+			memcpy(&m_buffered[0], m_spriteram + srcoffset, (std::min<size_t>)(srclength, length() - srcoffset) * sizeof(Type));
 		return &m_buffered[0];
 	}
 

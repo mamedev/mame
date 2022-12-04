@@ -33,6 +33,7 @@ known chips:
  @A70     HD38800  1982, Coleco Galaxian
  @A73     HD38800  1982, Mattel Star Hawk (PT-317B)
  @A77     HD38800  1982, Bandai Frisky Tom (PT-327A)
+ *A87     HD38800  1982, Gakken Paint Roller
  @A88     HD38800  1982, Tomy Tron (THN-02)
  @B01     HD38800  1982, Gakken Crazy Kong
  @B19     HD38800  1982, Bandai Zaxxon
@@ -97,7 +98,7 @@ known chips:
 
 ============================================================================
 
-ROM source notes when dumped from another model, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - gckong: CGL Super Kong
 - ggdman: Bandai Kampf der Monster
 - ghalien: CGL Earth Invaders

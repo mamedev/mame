@@ -2510,16 +2510,16 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+<!-- An earlier development version, v1.05, with CRC AE1117DD does not run correctly on real hardware. On hardware and in MAME neither the player nor wasp sprites are displayed, though the game logic otherwise seems to run. -->
 	<software name="wasp">
-		<description>Wasp (NTSC)</description>
+		<description>Wasp!</description>
 		<year>2009</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Mark Ball" />
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="32768">
-				<rom name="wasp v1.05.bin" size="32768" crc="ae1117dd" sha1="be65bdc225aca4a8bb9a18653da7de78aaac3f80"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="wasp_standard_edition.bin" size="0x8000" crc="ccdc2dbf" sha1="4e259a2a01e86e970aa58acd94325f8a37eea1cc"/>
 			</dataarea>
 		</part>
 	</software>

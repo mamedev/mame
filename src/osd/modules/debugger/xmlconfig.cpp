@@ -12,6 +12,9 @@ char const *const NODE_WINDOW_SPLITS = "splits";
 char const *const NODE_WINDOW_SELECTION = "selection";
 char const *const NODE_WINDOW_SCROLL = "scroll";
 char const *const NODE_WINDOW_EXPRESSION = "expression";
+char const *const NODE_WINDOW_HISTORY = "history";
+
+char const *const NODE_HISTORY_ITEM = "item";
 
 char const *const ATTR_DEBUGGER_SAVE_WINDOWS = "savewindows";
 

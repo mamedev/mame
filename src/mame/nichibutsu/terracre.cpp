@@ -548,7 +548,7 @@ void terracre_state::ym2203(machine_config &config)
 	//  SSGC:  0.035000 * 0.23 = 0.00805
 	//  Sum:                     0.74081
 	//  Multiply all 5 values by 1 / 0.74081 (i.e. 1.349873):
-	//	ym: 0.236228; dac1: 0.21463; dac2: 0.472456, ssgA+B: 0.06582; ssg3: 0.010866)
+	//  ym: 0.236228; dac1: 0.21463; dac2: 0.472456, ssgA+B: 0.06582; ssg3: 0.010866)
 
 	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R10, R11, nothing(infinite resistance), wire(short), C11, C12
 	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);

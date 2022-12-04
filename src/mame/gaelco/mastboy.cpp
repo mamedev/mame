@@ -933,6 +933,58 @@ ROM_END
 /* The internal ROM should be different on the Italian sets, as it indexes the wrong strings on the startup screens,
    showing MARK instead of PLAY MARK etc. So, marked as BAD_DUMP on these sets */
 
+// PCB dated 03/02/92
+ROM_START( mastboyiv2 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "hd647180.bin",        0x00000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
+	ROM_LOAD( "13_mem-a.ic77",       0x04000, 0x4000, CRC(06465aa5) SHA1(c2958197cf5d0f36efb1654d9d0f7c660768f4d1) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(                    0x04000, 0x4000 )
+	ROM_CONTINUE(                    0x04000, 0x4000 )
+	ROM_CONTINUE(                    0x04000, 0x4000 ) // only the last 16kb matters
+
+	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) // ROM accessed by the video chip
+	ROM_LOAD( "14.ic91",             0x00000, 0x10000, CRC(388beade) SHA1(2161ac884d5537293e2dd9786b3556bbc8ebdce6) ) // RAMM err.
+
+	ROM_REGION( 0x200000, "bankedrom", 0 ) // question data - 6 sockets
+	ROM_LOAD( "11_mem-c.ic75",       0x000000, 0x040000, CRC(4030846a) SHA1(8782bae43d506f8b9e584087d9325a88f7020f4f) ) // 99% gfx
+	ROM_LOAD( "12_mem-b.ic76",       0x040000, 0x020000, CRC(a38293eb) SHA1(07be32df7dd689b6262f0da2e4e0500bf29d4428) ) // data
+	ROM_RELOAD(                      0x060000, 0x020000) // 128kb ROMs are mirrored
+
+/* SPORT - GENERALE       011092 7515 1329 */
+	ROM_LOAD( "15_domande-rom.ic92", 0x080000, 0x020000, CRC(45dd77e3) SHA1(856fbd1b7f888e1768abceb2465d5bb97a685332) )
+	ROM_RELOAD(                      0x0a0000, 0x020000) // 128kb ROMs are mirrored
+
+/* SCIENZA - STORIA       011092 6361 0808
+   MUSICA - GENERALE      011092 6875 0719 */
+	ROM_LOAD( "16_domande-rom.ic93", 0x0c0000, 0x020000, CRC(31ececb2) SHA1(a62b1ecdedf8c587afefef4a7d5cdc9746abb093) )
+	ROM_RELOAD(                      0x0e0000, 0x020000) // 128kb ROMs are mirrored
+
+/* SCIENZA - GEOGRAFIA    011092 6756 0565
+   SPETTACOLOS - CINE-TV  011092 6171 0918 */
+	ROM_LOAD( "17_domande-rom.ic94", 0x100000, 0x020000, CRC(bdce54df) SHA1(b30a3adcdeba26f91f7de8e174f54a158d173dba) )
+	ROM_RELOAD(                      0x120000, 0x020000) // 128kb ROMs are mirrored
+
+/* TEMPO LIBERO - CULTURA 011092 6913 0424
+   SCIENZA - NATURA       011092 6969 0400
+   TEMPO LIBERO - HOBBY   011092 6569 0300
+   SPORT - WC_90          011092 6072 0212
+   SCIENZA - SESSUOLOGIA  011092 6098 0276 */
+	ROM_LOAD( "18_domande-rom.ic95", 0x140000, 0x020000, CRC(3ea4dd86) SHA1(6db92010ab6d6adbdf6bea9b257423bb7607c7f2) )
+	ROM_RELOAD(                      0x160000, 0x020000) // 128kb ROMs are mirrored
+
+/* SPETTACOLOS - FUMETTI  011092 6938 0496
+   TEMPO LIBERO - PAROLE  011092 6075 0219 */
+	ROM_LOAD( "19_domande-rom.ic96", 0x180000, 0x020000, CRC(146c46f9) SHA1(a6b09ffb98146ed2eb67a9d43465abc076758d60) )
+	ROM_RELOAD(                      0x1a0000, 0x020000) // 128kb ROMs are mirrored
+
+	/*                  0x1c0000 to 0x1fffff EMPTY */
+
+	ROM_REGION( 0x00345, "plds", 0 )
+	ROM_LOAD( "gal16v8-25.ic32",   0x000000, 0x000117, NO_DUMP )
+	ROM_LOAD( "gal16v8-25.ic49",   0x000117, 0x000117, NO_DUMP )
+	ROM_LOAD( "gal16v8-25.ic84",   0x00022e, 0x000117, NO_DUMP )
+ROM_END
+
 ROM_START( mastboyi )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
@@ -1020,64 +1072,12 @@ ROM_START( mastboyia )
 	ROM_LOAD( "gal16v8-25.ic84",   0x00022e, 0x000117, NO_DUMP )
 ROM_END
 
-// PCB dated 03/02/92
-ROM_START( mastboyib )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "hd647180.bin",        0x00000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
-	ROM_LOAD( "13_mem-a.ic77",       0x04000, 0x4000, CRC(06465aa5) SHA1(c2958197cf5d0f36efb1654d9d0f7c660768f4d1) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
-	ROM_CONTINUE(                    0x04000, 0x4000 )
-	ROM_CONTINUE(                    0x04000, 0x4000 )
-	ROM_CONTINUE(                    0x04000, 0x4000 ) // only the last 16kb matters
-
-	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) // ROM accessed by the video chip
-	ROM_LOAD( "14.ic91",             0x00000, 0x10000, CRC(388beade) SHA1(2161ac884d5537293e2dd9786b3556bbc8ebdce6) ) // RAMM err.
-
-	ROM_REGION( 0x200000, "bankedrom", 0 ) // question data - 6 sockets
-	ROM_LOAD( "11_mem-c.ic75",       0x000000, 0x040000, CRC(4030846a) SHA1(8782bae43d506f8b9e584087d9325a88f7020f4f) ) // 99% gfx
-	ROM_LOAD( "12_mem-b.ic76",       0x040000, 0x020000, CRC(a38293eb) SHA1(07be32df7dd689b6262f0da2e4e0500bf29d4428) ) // data
-	ROM_RELOAD(                      0x060000, 0x020000) // 128kb ROMs are mirrored
-
-/* SPORT - GENERALE       011092 7515 1329 */
-	ROM_LOAD( "15_domande-rom.ic92", 0x080000, 0x020000, CRC(45dd77e3) SHA1(856fbd1b7f888e1768abceb2465d5bb97a685332) )
-	ROM_RELOAD(                      0x0a0000, 0x020000) // 128kb ROMs are mirrored
-
-/* SCIENZA - STORIA       011092 6361 0808
-   MUSICA - GENERALE      011092 6875 0719 */
-	ROM_LOAD( "16_domande-rom.ic93", 0x0c0000, 0x020000, CRC(31ececb2) SHA1(a62b1ecdedf8c587afefef4a7d5cdc9746abb093) )
-	ROM_RELOAD(                      0x0e0000, 0x020000) // 128kb ROMs are mirrored
-
-/* SCIENZA - GEOGRAFIA    011092 6756 0565
-   SPETTACOLOS - CINE-TV  011092 6171 0918 */
-	ROM_LOAD( "17_domande-rom.ic94", 0x100000, 0x020000, CRC(bdce54df) SHA1(b30a3adcdeba26f91f7de8e174f54a158d173dba) )
-	ROM_RELOAD(                      0x120000, 0x020000) // 128kb ROMs are mirrored
-
-/* TEMPO LIBERO - CULTURA 011092 6913 0424
-   SCIENZA - NATURA       011092 6969 0400
-   TEMPO LIBERO - HOBBY   011092 6569 0300
-   SPORT - WC_90          011092 6072 0212
-   SCIENZA - SESSUOLOGIA  011092 6098 0276 */
-	ROM_LOAD( "18_domande-rom.ic95", 0x140000, 0x020000, CRC(3ea4dd86) SHA1(6db92010ab6d6adbdf6bea9b257423bb7607c7f2) )
-	ROM_RELOAD(                      0x160000, 0x020000) // 128kb ROMs are mirrored
-
-/* SPETTACOLOS - FUMETTI  011092 6938 0496
-   TEMPO LIBERO - PAROLE  011092 6075 0219 */
-	ROM_LOAD( "19_domande-rom.ic96", 0x180000, 0x020000, CRC(146c46f9) SHA1(a6b09ffb98146ed2eb67a9d43465abc076758d60) )
-	ROM_RELOAD(                      0x1a0000, 0x020000) // 128kb ROMs are mirrored
-
-	/*                  0x1c0000 to 0x1fffff EMPTY */
-
-	ROM_REGION( 0x00345, "plds", 0 )
-	ROM_LOAD( "gal16v8-25.ic32",   0x000000, 0x000117, NO_DUMP )
-	ROM_LOAD( "gal16v8-25.ic49",   0x000117, 0x000117, NO_DUMP )
-	ROM_LOAD( "gal16v8-25.ic84",   0x00022e, 0x000117, NO_DUMP )
-ROM_END
-
 } // anonymous namespace
 
-GAME( 1991, mastboy,   0,       mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, rev A)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboya,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, rev A, hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboy,    0,       mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, rev A)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboya,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, rev A, hack?)", MACHINE_SUPPORTS_SAVE )
 
 // There were specific Gaelco Master Boy PCBs for the Italian market, silkcreened in Italian instead of in Spanish ("DOMANDE ROMS", "MASTER-BOY VERSIONE", etc.).
-GAME( 1991, mastboyi,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboyia, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mastboyib, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Questions from 1992, needs a different MCU program
+GAME( 1992, mastboyiv2, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Version II (Italian, rev A)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Questions from 1992, needs a different MCU program
+GAME( 1991, mastboyi,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyia,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 2)",     MACHINE_SUPPORTS_SAVE )

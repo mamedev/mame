@@ -27,6 +27,30 @@
     TODO:
         * adpcm samples don't seem to be playing at the proper tempo - too fast?
 
+EDIT00
++-------------------------------+
+|AMP   PAL   1        Z80A    6 |
+|    M6295 GM76C28              |
+|            2    A1020B        |
+|            3          GM76C28 |
+|J          GM76C28     GM76C28 |
+|A          GM76C28             |
+|M                         16MHz|
+|M DSW1  62256 4                |
+|A       62256 5                |
+|  DSW2  MC68000P10  10MHz      |
++-------------------------------+
+
+  CPU: Motorola MC68000P10
+Sound: GoldStar Z8400A
+       M6295 branded as AR17961
+       TDA1033 AMP
+Video: Actel A1020B PL84C
+  OSC: 16MHz & 10MHz
+  RAM: Hyundia HY62256ALP1-10 32Kx8bit CMOS SRAM (x2)
+       GoldStar GM76C28K-10 2Kx8bit CMOS SRAM (x5)
+  GAL: Lattice GAL16V10B-25LP
+  DSW: Two 8 switch dipswitches
 
 *********************************************************************************/
 
@@ -267,7 +291,7 @@ void zerozone_state::zerozone(machine_config &config)
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zerozone_state::main_map);
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL / 16);  // divisor not verified, 1 MHz ???
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // Z80A clocked at either 2.5MHz (10MH/4) or 4MHz (16MHz/4) - not verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zerozone_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
@@ -291,7 +315,7 @@ void zerozone_state::zerozone(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1'056'000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH)); // 1MHz - clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

@@ -9,31 +9,29 @@
 
   The Spelling B was introduced together with the Speak & Spell. It is a
   handheld educational toy with booklet. Two revisions of the hardware exist.
-  The words/indexes from the documentation are the same for each version.
-  (* indicates not dumped)
 
-  1st revision:
+  1st version:
 
   Spelling B (US), 1978
   - TMS0270 MCU TMC0272 (die label: 0272A T0270B)
   - TMS1980 MCU TMC1984 (die label: 1980A 84A)
   - 8-digit cyan VFD (seen with and without apostrophe)
 
-  Spelling ABC (UK), 1979: exact same hardware as US version
+  2nd version:
 
-  2nd revision:
-
-  Spelling B (US), 1979
+  Spelling B (US), 1980
   - TMS0270 MCU TMC0274
   - TMC0355 4KB VSM ROM CD2602
   - 8-digit cyan VFD
   - 1-bit sound (indicated by a music note symbol on the top-right of the casing)
-  - note: much rarer than the 1978 version, not much luck finding one on eBay
+  - note: much rarer than the 1978 version, not much luck finding one on eBay.
+    The words/indexes from the documentation are the same as the older version.
 
-  Spelling ABC (UK), 1979: exact same hardware as US version
+  Spelling ABC (UK), 1980: exact same hardware as US 2nd version (the 1st version
+  was also sold in the UK earlier, but not renamed)
 
-  Spelling ABC (Germany), 1979: different VSM
-  - TMC0355 4KB VSM ROM CD2607*
+  Spelling ABC (Germany), 1980: different VSM
+  - TMC0355 4KB VSM ROM CD2607
 
   Mr. Challenger (US), 1979
   - TMS0270 MCU TMC0273
@@ -45,10 +43,10 @@
   - note: stylized as "LETTERlogic", same for other language versions
 
   Letterlogic (France), 1980: different VSM
-  - TMC0355 4KB VSM ROM CD2603*
+  - TMC0355 4KB VSM ROM CD2603
 
   Letterlogic (Germany), 1980: different VSM
-  - TMC0355 4KB VSM ROM CD2604*
+  - TMC0355 4KB VSM ROM CD2604
 
 ***************************************************************************/
 
@@ -61,6 +59,7 @@
 // internal artwork
 #include "spellb.lh"
 
+namespace {
 
 class tispellb_state : public hh_tms1k_state
 {
@@ -279,25 +278,45 @@ static INPUT_PORTS_START( spellb )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
 
 	PORT_START("IN.5") // R5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Memory") PORT_CHAR('=')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Clue") PORT_CHAR('-')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Erase") PORT_CHAR(8)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Enter") PORT_CHAR(13)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_NAME("Memory")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("Clue")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Erase")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Enter")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 
 	PORT_START("IN.6") // R6
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_NAME("Go") PORT_CHAR('7')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_CHAR('1') PORT_NAME("Go")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("Level") PORT_CHAR('/')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_NAME("Level")
 
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Missing Letter") PORT_CHAR('3')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Mystery Word") PORT_CHAR('4')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Scramble") PORT_CHAR('5')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_NAME("Spelling B/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Starts With") PORT_CHAR('2')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("Missing Letter")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("Mystery Word")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("Scramble")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Spelling B/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("Starts With")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spellabc )
+	PORT_INCLUDE( spellb )
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_NAME("Speicher")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("Rat")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Tilgen")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Eingabe")
+
+	PORT_MODIFY("IN.6")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_NAME("Stufe")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("Was Fehlt?")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME(u8"Wörter Rätsel")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("Wirr Warr")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Lerne ABC/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("Anfang Mit")
 INPUT_PORTS_END
 
 
@@ -305,15 +324,55 @@ static INPUT_PORTS_START( mrchalgr )
 	PORT_INCLUDE( spellb ) // same key layout as spellb
 
 	PORT_MODIFY("IN.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("2nd Player")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Score")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_NAME("2nd Player")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Score")
 
 	PORT_MODIFY("IN.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Crazy Letters")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Letter Guesser")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Word Challenge")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_NAME("Mystery Word/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Replay")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("Crazy Letters")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("Letter Guesser")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("Word Challenge")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Mystery Word/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("Replay")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( letterlf )
+	PORT_INCLUDE( mrchalgr )
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_NAME("Joueur 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("Aide")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Effacez")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Marque")
+
+	PORT_MODIFY("IN.6")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_NAME("Niveau")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("Suite Folle")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("Devin")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("Duel")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Mot Mystere/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("Rejouez")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( letterlg )
+	PORT_INCLUDE( mrchalgr )
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_NAME("Spieler 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("Rat")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Tilgen")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Punkte")
+
+	PORT_MODIFY("IN.6")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_NAME("Stufe")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("Lettern Salat")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("Lettern Rater")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("Wettstreit")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME(u8"Wörter Rätsel/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("Wiedergabe")
 INPUT_PORTS_END
 
 
@@ -327,14 +386,14 @@ INPUT_PORTS_END
 void tispellb_state::rev1(machine_config &config)
 {
 	// basic machine hardware
-	TMS0270(config, m_maincpu, 350000); // approximation
+	TMS0270(config, m_maincpu, 320000); // approximation
 	m_maincpu->read_k().set(FUNC(tispellb_state::main_read_k));
 	m_maincpu->write_o().set(FUNC(tispellb_state::main_write_o));
 	m_maincpu->write_r().set(FUNC(tispellb_state::main_write_r));
 	m_maincpu->read_ctl().set(FUNC(tispellb_state::rev1_ctl_r));
 	m_maincpu->write_ctl().set(FUNC(tispellb_state::rev1_ctl_w));
 
-	TMS1980(config, m_subcpu, 350000); // approximation
+	TMS1980(config, m_subcpu, 320000); // approximation
 	m_subcpu->read_k().set(FUNC(tispellb_state::sub_read_k));
 	m_subcpu->write_o().set(FUNC(tispellb_state::sub_write_o));
 	m_subcpu->write_r().set(FUNC(tispellb_state::sub_write_r));
@@ -349,18 +408,17 @@ void tispellb_state::rev1(machine_config &config)
 	// no sound!
 }
 
-
 void tispellb_state::rev2(machine_config &config)
 {
 	// basic machine hardware
-	TMS0270(config, m_maincpu, 350000); // approximation
+	TMS0270(config, m_maincpu, 320000); // approximation
 	m_maincpu->read_k().set(FUNC(tispellb_state::main_read_k));
 	m_maincpu->write_o().set(FUNC(tispellb_state::rev2_write_o));
 	m_maincpu->write_r().set(FUNC(tispellb_state::rev2_write_r));
 	m_maincpu->read_ctl().set(m_tms6100, FUNC(tms6100_device::data_r));
 	m_maincpu->write_ctl().set(m_tms6100, FUNC(tms6100_device::add_w));
 
-	TMS6100(config, m_tms6100, 350000);
+	TMS6100(config, m_tms6100, 320000);
 	m_tms6100->enable_4bit_mode(true);
 
 	// video hardware
@@ -394,6 +452,21 @@ ROM_START( spellb )
 
 	ROM_REGION( 0x1000, "tms6100", 0 )
 	ROM_LOAD( "cd2602.vsm", 0x0000, 0x1000, CRC(dd1fff8c) SHA1(f1760b29aa50fc96a1538db814cc73289654ac25) )
+ROM_END
+
+ROM_START( spellabc )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tmc0274n2l", 0x0000, 0x1000, CRC(98e3bd32) SHA1(e79b59ac29b0183bf1ee8d84b2944450c5e5d8fb) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_spellb_output.pla", 0, 1246, CRC(b95e35e6) SHA1(430917486856c9e6c28af10ff3758242048096c4) )
+
+	ROM_REGION( 0x1000, "tms6100", 0 )
+	ROM_LOAD( "cd2607.vsm", 0x0000, 0x1000, CRC(875090c0) SHA1(73b87fff64054f6ab3b7e69d89585582145dbaa7) )
 ROM_END
 
 ROM_START( spellba )
@@ -434,10 +507,45 @@ ROM_START( mrchalgr )
 	ROM_LOAD( "cd2601.vsm", 0x0000, 0x1000, CRC(a9fbe7e9) SHA1(9d480cb30313b8cbce2d048140c1e5e6c5b92452) )
 ROM_END
 
+ROM_START( letterlf )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tmc0273nll", 0x0000, 0x1000, CRC(ef6d23bd) SHA1(194e3b022c299e99a731bbcfba5bf8a3a9f0d07e) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_mrchalgr_output.pla", 0, 1246, CRC(4785289c) SHA1(60567af0ea120872a4ccf3128e1365fe84722aa8) )
+
+	ROM_REGION( 0x1000, "tms6100", 0 )
+	ROM_LOAD( "cd2603.vsm", 0x0000, 0x1000, CRC(70ac954b) SHA1(5593a5844063acdf399600e3e842f0fbe712ba69) )
+ROM_END
+
+ROM_START( letterlg )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tmc0273nll", 0x0000, 0x1000, CRC(ef6d23bd) SHA1(194e3b022c299e99a731bbcfba5bf8a3a9f0d07e) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_mrchalgr_output.pla", 0, 1246, CRC(4785289c) SHA1(60567af0ea120872a4ccf3128e1365fe84722aa8) )
+
+	ROM_REGION( 0x1000, "tms6100", 0 )
+	ROM_LOAD( "cd2604.vsm", 0x0000, 0x1000, CRC(cdb6f039) SHA1(56f512720c5e80cd74b65e31d5a19bf1260017fb) )
+ROM_END
+
+} // anonymous namespace
 
 
-//    YEAR  NAME      PARENT CMP MACHINE  INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1979, spellb,   0,      0, rev2,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (1979 version)", MACHINE_SUPPORTS_SAVE )
-COMP( 1978, spellba,  spellb, 0, rev1,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1979, mrchalgr, 0,      0, rev2,    mrchalgr, tispellb_state, empty_init, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   CMP MACHINE  INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1980, spellb,   0,        0, rev2,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1980 version)", MACHINE_SUPPORTS_SAVE )
+COMP( 1978, spellba,  spellb,   0, rev1,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, spellabc, spellb,   0, rev2,    spellabc, tispellb_state, empty_init, "Texas Instruments", "Spelling ABC (Germany)", MACHINE_SUPPORTS_SAVE )
+
+COMP( 1979, mrchalgr, 0,        0, rev2,    mrchalgr, tispellb_state, empty_init, "Texas Instruments", "Mr. Challenger (US)", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, letterlf, mrchalgr, 0, rev2,    letterlf, tispellb_state, empty_init, "Texas Instruments", "Letterlogic (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, letterlg, mrchalgr, 0, rev2,    letterlg, tispellb_state, empty_init, "Texas Instruments", "Letterlogic (Germany)", MACHINE_SUPPORTS_SAVE )

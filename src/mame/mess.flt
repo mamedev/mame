@@ -394,8 +394,8 @@ husky/hunter2.cpp
 husky/husky.cpp
 ibm/ibm3153.cpp
 ibm/ibm6580.cpp
-ibm/rtpc.cpp
 ibm/rs6000_type7xxx.cpp
+ibm/rtpc.cpp
 informer/informer_207_100.cpp
 informer/informer_207_376.cpp
 informer/informer_213.cpp
@@ -512,7 +512,10 @@ motorola/mvme162.cpp
 motorola/powerstack.cpp
 motorola/sys1121.cpp
 motorola/uchroma68.cpp
-msx/msx.cpp
+msx/msx1.cpp
+msx/msx1_bruc100.cpp
+msx/msx1_v9938.cpp
+msx/msx2.cpp
 multitech/mkit09.cpp
 multitech/mpf1.cpp
 mupid/mdisk.cpp
@@ -590,6 +593,7 @@ olympiaint/peoplepc.cpp
 omnibyte/msbc1.cpp
 omnibyte/ob68k1a.cpp
 omron/luna_68k.cpp
+omron/luna_88k.cpp
 openuni/hektor.cpp
 osborne/osbexec.cpp
 osborne/osborne1.cpp
@@ -1092,6 +1096,7 @@ trainer/savia84.cpp
 trainer/selz80.cpp
 trainer/tk80.cpp
 trainer/zapcomputer.cpp
+trs/agvision.cpp
 trs/coco12.cpp
 trs/coco3.cpp
 trs/dgn_beta.cpp
@@ -1258,6 +1263,8 @@ yamaha/fb01.cpp
 yamaha/tg100.cpp
 yamaha/yman1x.cpp
 yamaha/ymdx100.cpp
+yamaha/ymdx7.cpp
+yamaha/ymdx9.cpp
 yamaha/ymdx11.cpp
 yamaha/ymmu100.cpp
 yamaha/ymmu5.cpp
@@ -1268,6 +1275,7 @@ yamaha/ympsr340.cpp
 yamaha/ympsr40.cpp
 yamaha/ympsr400.cpp
 yamaha/ympsr60.cpp
+yamaha/ympss12.cpp
 yamaha/ymqy70.cpp
 yamaha/ymrx15.cpp
 yamaha/ymsy35.cpp

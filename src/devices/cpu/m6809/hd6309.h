@@ -108,8 +108,8 @@ private:
 	void set_e()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_E; }
 	void set_f()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_F; }
 	void set_w()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_W; }
-	exgtfr_register read_exgtfr_register(uint8_t reg);
-	void write_exgtfr_register(uint8_t reg, exgtfr_register value);
+	uint16_t read_exgtfr_register(uint8_t reg);
+	void write_exgtfr_register(uint8_t reg, uint16_t value);
 	bool tfr_read(uint8_t opcode, uint8_t arg, uint8_t &data);
 	bool tfr_write(uint8_t opcode, uint8_t arg, uint8_t data);
 	bool add8_sets_h()                              { return (m_opcode & 0xFE) != 0x30; }

@@ -191,7 +191,7 @@ precedence:
     Addition, subtraction
 ``<<`` ``>>``
     Bitwise left/right shift
-``< ``<=`` ``>`` ``>=``
+``<`` ``<=`` ``>`` ``>=``
     Less than, less than or equal, greater than, greater than or equal
 ``==`` ``!=``
     Equal, not equal

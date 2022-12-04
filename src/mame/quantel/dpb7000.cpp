@@ -4,19 +4,19 @@
 
     DPB-7001 (c) 1981 Quantel
 
-	Known issues/possible improvements:
-	- Disk Sequencer Card is currently implemented via HLE.
-	- Tablet is currently implemented via HLE.
-	- Blanking PAL is currently disabled, which results in on-screen
-	  garbage when scrolling.
-	- Size Card and Filter Card functionality is not yet implemented.
-	- Video input functionality is not yet implemented.
-	- There are numerous Brush Processor Card functions that are not yet
-	  implemented.
+    Known issues/possible improvements:
+    - Disk Sequencer Card is currently implemented via HLE.
+    - Tablet is currently implemented via HLE.
+    - Blanking PAL is currently disabled, which results in on-screen
+      garbage when scrolling.
+    - Size Card and Filter Card functionality is not yet implemented.
+    - Video input functionality is not yet implemented.
+    - There are numerous Brush Processor Card functions that are not yet
+      implemented.
 
-	To create a hard disk image compatible with the "330Mb Fujitsu" DIP
-	setting:
-	- chdman createhd -o [output name] -chs 1024,16,80 -ss 256 -c none
+    To create a hard disk image compatible with the "330Mb Fujitsu" DIP
+    setting:
+    - chdman createhd -o [output name] -chs 1024,16,80 -ss 256 -c none
 
 ***************************************************************************/
 
@@ -69,12 +69,12 @@
 #define LOG_TDS             (1 << 17)
 #define LOG_TABLET          (1 << 18)
 #define LOG_COMMANDS        (1 << 19)
-#define LOG_HDD				(1 << 20)
-#define LOG_FDD				(1 << 21)
-#define LOG_DDB				(1 << 22)
-#define LOG_IRQ				(1 << 23)
-#define LOG_BRUSH_LATCH		(1 << 24)
-#define LOG_BRUSH_DRAWS		(1 << 25)
+#define LOG_HDD             (1 << 20)
+#define LOG_FDD             (1 << 21)
+#define LOG_DDB             (1 << 22)
+#define LOG_IRQ             (1 << 23)
+#define LOG_BRUSH_LATCH     (1 << 24)
+#define LOG_BRUSH_DRAWS     (1 << 25)
 #define LOG_BRUSH_WRITES    (1 << 26)
 #define LOG_STORE_READS     (1 << 27)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_BRUSH_ADDR | \
@@ -267,18 +267,18 @@ private:
 
 	enum : uint16_t
 	{
-		DGROUP_TYPE_INVALID0		= 0,
-		DGROUP_TYPE_80MB_CDC		= 1,
-		DGROUP_TYPE_INVALID1		= 2,
-		DGROUP_TYPE_FLOPPY			= 3,
-		DGROUP_TYPE_INVALID2		= 4,
-		DGROUP_TYPE_330MB_FUJITSU	= 5,
-		DGROUP_TYPE_160MB_FUJITSU	= 6,
-		DGROUP_TYPE_NONE			= 7,
+		DGROUP_TYPE_INVALID0        = 0,
+		DGROUP_TYPE_80MB_CDC        = 1,
+		DGROUP_TYPE_INVALID1        = 2,
+		DGROUP_TYPE_FLOPPY          = 3,
+		DGROUP_TYPE_INVALID2        = 4,
+		DGROUP_TYPE_330MB_FUJITSU   = 5,
+		DGROUP_TYPE_160MB_FUJITSU   = 6,
+		DGROUP_TYPE_NONE            = 7,
 
-		DGROUP_0_SHIFT				= 2,
-		DGROUP_1_SHIFT				= 7,
-		DGROUP_2_SHIFT				= 12
+		DGROUP_0_SHIFT              = 2,
+		DGROUP_1_SHIFT              = 7,
+		DGROUP_2_SHIFT              = 12
 	};
 
 	// Computer Card
@@ -1433,34 +1433,34 @@ bool dpb7000_state::handle_command(uint16_t data)
 		LOGMASKED(LOG_COMMANDS, "Unsupported command: Fast Wipe Brush Store\n");
 		break;
 	/*case 7: // Fast Wipe Framestore
-		for (int i = 0; i < 2; i++)
-		{
-			if (!BIT(data, 5 + i))
-			{
-				m_bylen_counter = m_bylen;
-				for (uint16_t y = m_cypos[1]; m_bylen_counter != 0x1000; m_bylen_counter++, y = (y + 1) & 0xfff)
-				{
-					if (y >= 768)
-						continue;
+	    for (int i = 0; i < 2; i++)
+	    {
+	        if (!BIT(data, 5 + i))
+	        {
+	            m_bylen_counter = m_bylen;
+	            for (uint16_t y = m_cypos[1]; m_bylen_counter != 0x1000; m_bylen_counter++, y = (y + 1) & 0xfff)
+	            {
+	                if (y >= 768)
+	                    continue;
 
-					uint8_t *lum = &m_framestore_lum[i][y * 800];
-					uint8_t *chr = &m_framestore_chr[i][y * 800];
-					uint8_t *ext = &m_framestore_ext[i][y * 800];
-					m_bxlen_counter = m_bxlen;
-					for (uint16_t x = m_cxpos[1]; m_bxlen_counter != 0x1000; m_bxlen_counter++, x = (x + 1) & 0xfff)
-					{
-						if (x >= 800)
-							continue;
+	                uint8_t *lum = &m_framestore_lum[i][y * 800];
+	                uint8_t *chr = &m_framestore_chr[i][y * 800];
+	                uint8_t *ext = &m_framestore_ext[i][y * 800];
+	                m_bxlen_counter = m_bxlen;
+	                for (uint16_t x = m_cxpos[1]; m_bxlen_counter != 0x1000; m_bxlen_counter++, x = (x + 1) & 0xfff)
+	                {
+	                    if (x >= 800)
+	                        continue;
 
-						lum[x] = m_bs_y_latch;
-						chr[x] = (x & 1) ? m_bs_v_latch : m_bs_u_latch;
-						if (BIT(data, 9))
-							ext[x] = m_bs_y_latch;
-					}
-				}
-			}
-		}
-		break;*/
+	                    lum[x] = m_bs_y_latch;
+	                    chr[x] = (x & 1) ? m_bs_v_latch : m_bs_u_latch;
+	                    if (BIT(data, 9))
+	                        ext[x] = m_bs_y_latch;
+	                }
+	            }
+	        }
+	    }
+	    break;*/
 	case 7: // Fast Wipe Framestore
 	case 8: // Draw
 	{
@@ -2403,8 +2403,8 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::req_a_w)
 	}
 	/*else
 	{
-		m_sys_ctrl &= ~SYSCTRL_REQ_A_IN;
-		update_req_irqs();
+	    m_sys_ctrl &= ~SYSCTRL_REQ_A_IN;
+	    update_req_irqs();
 	}*/
 }
 
@@ -3285,12 +3285,12 @@ void dpb7000_state::tds_p2_w(uint8_t data)
 
 /*INPUT_CHANGED_MEMBER(dpb7000_state::pen_prox_changed)
 {
-	m_tds_in_proximity = newval ? false : true;
-	if (m_tds_in_proximity)
-	{
-		LOGMASKED(LOG_TABLET, "Triggering IRQ due to proximity\n");
-		m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-	}
+    m_tds_in_proximity = newval ? false : true;
+    if (m_tds_in_proximity)
+    {
+        LOGMASKED(LOG_TABLET, "Triggering IRQ due to proximity\n");
+        m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+    }
 }*/
 
 TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_hle_tick)

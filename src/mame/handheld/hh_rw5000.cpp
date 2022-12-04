@@ -6,7 +6,7 @@
 Rockwell A/B5000 MCU series handhelds (before PPS-4/1)
 Mostly calculators on these MCUs, but also Mattel's first couple of handhelds.
 
-ROM source notes when dumped from another model, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - rw18r: Rockwell 8R
 - rw24k: Rockwell 14RD-II
 - misatk: Mattel Space Alert

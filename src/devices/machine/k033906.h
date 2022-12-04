@@ -26,6 +26,8 @@ public:
 
 	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_pciid(uint32_t pciid) { m_voodoo_pciid = pciid; }
+
 	u32 read(offs_t offset);
 	void write(offs_t offset, u32 data);
 	DECLARE_WRITE_LINE_MEMBER(set_reg);
@@ -44,6 +46,7 @@ private:
 	/* i/o lines */
 
 	int          m_reg_set; // 1 = access reg / 0 = access ram
+	uint32_t     m_voodoo_pciid;
 
 	required_device<generic_voodoo_device> m_voodoo;
 

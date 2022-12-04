@@ -23,30 +23,22 @@ TODO:
   to HLE I/O board emulation?
 - where is the steering wheel motor torque output for dirtdash? Answer: The data comes from the Serial Port on
   the MOTHER PCB at J2 Pin 7 /TXD
-- texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
-  it used to be much worse with the legacy_poly_manager
-- global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrive, victlap
+- tokyowar garbage tile at right edge in attract mode. It's part of the cabinet link message, maybe BTANB?
+- texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
+- improve vertex lighting (is it phong shading?)
+- global offset is wrong in non-super22 testmode video test
+- acedrive/victlap testmode video test flickers
+- ss22 testmode video test screen#04 translucent polygon should be higher priority than sprite
+- ss22 testmode video test screen#13 geometry should not be lopsided (uses draw_direct_poly)
 - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
-- polygon z position problems? (also has glitches on real hw, but not as bad)
-  + ridgerac suspension bridge, cables appear through the guardrail
+- propcycl attract mode, when the altar button is pressed, global fade should affect the background sprite
+- slavesim_handle_233002 is not fully understood, objectshift and the flag to disable fog are obvious, the others are unclear
+- polygon position problems? (also has glitches on real hw, but not as bad)
   + timecris stage 1-2 start, beam appears through platform
-  + timecris stage 1-3 after car, clock tower disappears behind background
-- ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2,
-  czram contents is rather odd here and partly cleared (probably the cause?):
-  + $0000-$0d7f - gradual increase from $00-$7c
-  + $0d80-$0fff - $73, huh, why lower?
-  + $1000-$19ff - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
-  + $1a00-$0dff - $77
-  + $1e00-$1fff - $78
-- improve ss22 lighting:
-  + adillor title logo
-  + alpinr2b mountains in selection screen
-  + propcycl score/time
-  + propcycl Solitar pillars
-  + ridgerac waving flag shadowing
-  + ridgerac rotating sign after 2nd tunnel
-  + timecris Sherudo's knives
+  + timecris stage 2-1 final section, steel beam appears through plank
+  + cybrcycc speed dial should be more to the left
+  + most of it is zsort related, there's plenty more, but need clearly visible cases with PCB evidence
 - improve ss22 spot, used in dirtdash, alpines highscore entry, testmode screen#14 - not understood well:
   + does not work at all in alpines (uses spot_factor, not spotram, should show a spotlight with darkened background)
   + should be done before global fade, see dirtdash when starting at jungle level
@@ -58,7 +50,16 @@ TODO:
   + testmode looks wrong, spot_data high bits is 0 here (2 in dirtdash)
 - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snow melting effect)
 - alpha blended sprite/poly with priority over alpha blended text doesn't work right
-- ss22 poly alpha is probably more limited than currently emulated, not supporting stacked layers
+- ss22 poly/sprite alpha is probably more limited than currently emulated, not supporting stacked layers
+  + airco22 attract mode, see-through plane looks weird (they probably meant to just darken it)
+  + cybrcycc game over screen has a weird glitch
+
+BTANB:
+- ridgerac suspension bridge, cables appearing through the guardrail (worse on MAME, see poly position in TODO?),
+  I think they improved it in ridgera2, but it still happens there on MAME
+- ridgerac sunset gradual fade is not smooth (good in ridgera2)
+- ridgera2 rearview mirror is glitchy when driving downhill towards the beach
+- victlap titlescreen, saturated colors instead of a clean fade
 
 ***********************************************************************************************************
 
@@ -1866,7 +1867,7 @@ void namcos22s_state::namcos22s_am(address_map &map)
 	map(0x450008, 0x45000b).rw(FUNC(namcos22s_state::namcos22_portbit_r), FUNC(namcos22s_state::namcos22_portbit_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0x700000, 0x70001f).rw(FUNC(namcos22s_state::syscon_r), FUNC(namcos22s_state::ss22_syscon_w));
-	map(0x800000, 0x800003).w(FUNC(namcos22s_state::namcos22s_chipselect_w));
+	map(0x800000, 0x800003).w(FUNC(namcos22s_state::namcos22s_chipselect_w)); // C304, C399
 	map(0x810000, 0x81000f).rw(FUNC(namcos22s_state::namcos22s_czattr_r), FUNC(namcos22s_state::namcos22s_czattr_w));
 	map(0x810200, 0x8103ff).rw(FUNC(namcos22s_state::namcos22s_czram_r), FUNC(namcos22s_state::namcos22s_czram_w));
 	map(0x820000, 0x8202ff).nopw(); // leftover of old (non-super) video mixer device
@@ -2979,10 +2980,10 @@ static INPUT_PORTS_START( ridgera )
 	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x280, 0xd80) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
 	PORT_START("ADC.1") // 1552
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Gas Pedal")
 
 	PORT_START("ADC.2") // 1552
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Brake Pedal")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Brake Pedal")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW2:1")
@@ -3140,7 +3141,7 @@ static INPUT_PORTS_START( acedrive )
 	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x200, 0xe00) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
 	PORT_START("ADC.1") // 1152
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x480) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x480) PORT_SENSITIVITY(100) PORT_KEYDELTA(120) PORT_NAME("Gas Pedal")
 
 	PORT_START("ADC.2") // 576
 	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x240) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Brake Pedal")
@@ -3680,7 +3681,7 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_keycus_id));
 	save_item(NAME(m_keycus_rng));
 	save_item(NAME(m_cz_adjust));
-	save_item(NAME(m_bri_adjust));
+	save_item(NAME(m_objectflags));
 	save_item(NAME(m_dspram_bank));
 	save_item(NAME(m_dspram16_latch));
 	save_item(NAME(m_slave_simulation_active));

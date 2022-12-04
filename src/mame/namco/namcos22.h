@@ -18,9 +18,15 @@
 #include "sound/c352.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
+class namcos22_state;
+
+// higher precision for internal poly.h
+typedef double poly3d_t;
 
 enum
 {
@@ -43,14 +49,6 @@ enum
 	NAMCOS22_ARMADILLO_RACING
 };
 
-
-struct namcos22_polyvertex
-{
-	float x, y, z;
-	int u, v; // 0..0xfff
-	int bri;  // 0..0xff
-};
-
 enum namcos22_scenenode_type
 {
 	NAMCOS22_SCENENODE_NONLEAF,
@@ -61,6 +59,14 @@ enum namcos22_scenenode_type
 #define NAMCOS22_RADIX_BITS 4
 #define NAMCOS22_RADIX_BUCKETS (1 << NAMCOS22_RADIX_BITS)
 #define NAMCOS22_RADIX_MASK (NAMCOS22_RADIX_BUCKETS - 1)
+
+
+struct namcos22_polyvertex
+{
+	float x, y, z;
+	int u, v; // 0..0xfff
+	int bri;  // 0..0xff
+};
 
 struct namcos22_scenenode
 {
@@ -75,14 +81,15 @@ struct namcos22_scenenode
 
 		struct
 		{
-			float vx, vy;
-			float vu, vd, vl, vr;
+			int vx, vy;
+			int vu, vd, vl, vr;
 			int texturebank;
 			int color;
 			int cmode;
-			int flags;
+			int cz_value;
+			int cz_type;
 			int cz_adjust;
-			int bri_adjust;
+			int objectflags;
 			int direct;
 			namcos22_polyvertex v[4];
 		} quad;
@@ -91,7 +98,7 @@ struct namcos22_scenenode
 		{
 			int tile, color;
 			int prioverchar;
-			int fade_enabled;
+			bool fade_enabled;
 			int flipx, flipy;
 			int linktype;
 			int cols, rows;
@@ -110,25 +117,26 @@ struct namcos22_object_data
 {
 	// poly / sprites
 	rgbaint_t fogcolor;
-	rgbaint_t fadecolor;
-	rgbaint_t polycolor;
 	const pen_t *pens;
 	bitmap_rgb32 *destbase;
 	bitmap_ind8 *primap;
 	int bn;
-	int flags;
 	int prioverchar;
 	int cmode;
-	int fadefactor;
-	int pfade_enabled;
-	int brifactor;
+	bool shade_enabled;
+	bool texture_enabled;
 	int fogfactor;
-	int zfog_enabled;
-	int cz_adjust;
+
+	// ss22
+	rgbaint_t polycolor;
+	rgbaint_t fadecolor;
+	int fadefactor;
+	bool pfade_enabled;
+	bool zfog_enabled;
 	int cz_sdelta;
 	const u8 *czram;
-	int alpha;
 	bool alpha_enabled;
+	int alpha;
 
 	// sprites
 	const u8 *source;
@@ -138,9 +146,7 @@ struct namcos22_object_data
 };
 
 
-class namcos22_state;
-
-class namcos22_renderer : public poly_manager<float, namcos22_object_data, 4>
+class namcos22_renderer : public poly_manager<poly3d_t, namcos22_object_data, 4>
 {
 public:
 	namcos22_renderer(namcos22_state &state);
@@ -156,9 +162,6 @@ private:
 	struct namcos22_scenenode m_scenenode_root;
 	struct namcos22_scenenode *m_scenenode_cur;
 	std::list<namcos22_scenenode> m_scenenode_alloc;
-
-	float m_clipx = 0.0;
-	float m_clipy = 0.0;
 	rectangle m_cliprect;
 
 	static u8 nthbyte(const u32 *src, int n) { return util::big_endian_cast<u8>(src)[n]; }
@@ -167,12 +170,13 @@ private:
 	void render_scene_nodes(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
 	void render_sprite(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
 	void poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node);
-	void poly3d_drawsprite(screen_device &screen, bitmap_rgb32 &dest_bmp, u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int cz_factor, int prioverchar, int fade_enabled, int alpha);
+	void poly3d_drawsprite(screen_device &screen, bitmap_rgb32 &dest_bmp, u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int cz_factor, int prioverchar, bool fade_enabled, int alpha);
 
 	void free_scenenode(struct namcos22_scenenode *node);
 	struct namcos22_scenenode *alloc_scenenode(running_machine &machine, struct namcos22_scenenode *node);
 
-	void renderscanline_uvi_full(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
+	void renderscanline_poly(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
+	void renderscanline_poly_ss22(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 	void renderscanline_sprite(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 };
 
@@ -245,7 +249,7 @@ public:
 	int m_screen_fade_r;
 	int m_screen_fade_g;
 	int m_screen_fade_b;
-	int m_poly_fade_enabled;
+	bool m_poly_fade_enabled;
 	int m_poly_fade_r;
 	int m_poly_fade_g;
 	int m_poly_fade_b;
@@ -460,7 +464,7 @@ protected:
 	u16 m_keycus_rng = 0;
 	int m_gametype = 0;
 	int m_cz_adjust = 0;
-	int m_bri_adjust = 0;
+	int m_objectflags = 0;
 	std::unique_ptr<namcos22_renderer> m_poly;
 	u16 m_dspram_bank = 0;
 	u16 m_dspram16_latch = 0;
@@ -488,13 +492,13 @@ protected:
 	int m_text_palbase = 0;
 	int m_bg_palbase = 0;
 
+	int m_camera_vx = 0;
+	int m_camera_vy = 0;
+	int m_camera_vu = 0;
+	int m_camera_vd = 0;
+	int m_camera_vl = 0;
+	int m_camera_vr = 0;
 	float m_camera_zoom = 0.0f;
-	float m_camera_vx = 0.0f;
-	float m_camera_vy = 0.0f;
-	float m_camera_vu = 0.0f;
-	float m_camera_vd = 0.0f;
-	float m_camera_vl = 0.0f;
-	float m_camera_vr = 0.0f;
 	float m_camera_lx = 0.0f; // unit vector for light direction
 	float m_camera_ly = 0.0f; // "
 	float m_camera_lz = 0.0f; // "
