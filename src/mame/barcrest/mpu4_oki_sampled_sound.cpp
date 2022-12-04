@@ -14,9 +14,9 @@ I've separated the channels here, to tie back at the game level
 
 #include "mpu4_oki_sampled_sound.h"
 
+//#define VERBOSE 1
 #include "logmacro.h"
 
-//#define VERBOSE 1
 
 DEFINE_DEVICE_TYPE(MPU4_OKI_SAMPLED_SOUND, mpu4_oki_sampled_sound, "mpu4okisnd", "Barcrest Sampled Sound Program Card")
 
@@ -101,7 +101,7 @@ uint8_t mpu4_oki_sampled_sound::ic4_read(offs_t offset)
 
 void mpu4_oki_sampled_sound::pia_gb_porta_w(uint8_t data)
 {
-	LOG("%s: PIA Port A Set to %2x\n", machine().describe_context(), data);
+	LOG("PIA Port A Set to %2x\n", data);
 	m_msm6376->write(data);
 }
 
@@ -109,7 +109,7 @@ void mpu4_oki_sampled_sound::pia_gb_portb_w(uint8_t data)
 {
 	uint8_t changed = m_expansion_latch^data;
 
-	LOG("%s: PIA Port B Set to %2x\n", machine().describe_context(), data);
+	LOG("PIA Port B Set to %2x\n", data);
 
 	if (changed & 0x20)
 	{ // digital volume clock line changed
@@ -124,7 +124,7 @@ void mpu4_oki_sampled_sound::pia_gb_portb_w(uint8_t data)
 				if (m_global_volume > 0) m_global_volume--;
 			}
 
-			LOG("%s: Volume Set to %2x\n", machine().describe_context(), data);
+			LOG("Volume Set to %2x\n", data);
 			float percent = (32-m_global_volume)/32.0;
 			m_msm6376->set_output_gain(0, percent);
 			m_msm6376->set_output_gain(1, percent);
@@ -136,7 +136,7 @@ void mpu4_oki_sampled_sound::pia_gb_portb_w(uint8_t data)
 
 uint8_t mpu4_oki_sampled_sound::pia_gb_portb_r()
 {
-	LOG("%s: PIA Read of Port B\n", machine().describe_context());
+	LOG("PIA Read of Port B\n", machine().describe_context());
 	uint8_t data = 0;
 	// b7 NAR - we can load another address into Channel 1
 	// b6, 1 = OKI ready, 0 = OKI busy
@@ -155,7 +155,7 @@ uint8_t mpu4_oki_sampled_sound::pia_gb_portb_r()
 
 WRITE_LINE_MEMBER(mpu4_oki_sampled_sound::pia_gb_ca2_w)
 {
-	LOG("%s: OKI RESET data = %02X\n", machine().describe_context(), state);
+	LOG("OKI RESET data = %02X\n", state);
 	if ((m_last_reset != state) && !state)
 	{
 		m_msm6376->reset();
