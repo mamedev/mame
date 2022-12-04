@@ -3688,7 +3688,7 @@ void dkong_state::init_dkong3()
 {
 	// RP2A03 bus conflict between internal APU and external RAM
 	m_dkong3_tap[0] = m_dev_rp2a03a->space(AS_PROGRAM).install_write_tap(
-			0x4000, 0x400f,
+			0x4000, 0x4017,
 			"rp2a03a_conflict_w",
 			[this] (offs_t offset, u8 &data, u8 mem_mask)
 			{
@@ -3697,7 +3697,7 @@ void dkong_state::init_dkong3()
 			&m_dkong3_tap[0]);
 
 	m_dkong3_tap[1] = m_dev_rp2a03b->space(AS_PROGRAM).install_write_tap(
-			0x4000, 0x400f,
+			0x4000, 0x4017,
 			"rp2a03b_conflict_w",
 			[this] (offs_t offset, u8 &data, u8 mem_mask)
 			{
