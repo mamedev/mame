@@ -232,8 +232,8 @@ private:
 	void execute_sprsw_cmd();
 	void execute_spwr_cmd(u8 data);
 
-	void pc88va_map(address_map &map);
-	void pc88va_io_map(address_map &map);
+	void main_map(address_map &map);
+	void io_map(address_map &map);
 	void sysbank_map(address_map &map);
 	void opna_map(address_map &map);
 

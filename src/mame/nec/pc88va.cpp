@@ -102,7 +102,7 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 #define FM_CLOCK        (XTAL(31'948'800) / 4) // 3993600
 
 
-void pc88va_state::pc88va_map(address_map &map)
+void pc88va_state::main_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).ram();
 //  map(0x80000, 0x9ffff).ram(); // EMM
@@ -606,7 +606,7 @@ void pc88va_state::misc_ctrl_w(uint8_t data)
 
 // TODO: I/O 0x00xx is almost same as pc8801
 // (*) are specific N88 V1 / V2 ports
-void pc88va_state::pc88va_io_map(address_map &map)
+void pc88va_state::io_map(address_map &map)
 {
 	map(0x0000, 0x000f).r(FUNC(pc88va_state::key_r)); // Keyboard ROW reading
 	map(0x0010, 0x0010).w(FUNC(pc88va_state::rtc_w)); // Printer / Calendar Clock Interface
@@ -1138,8 +1138,8 @@ WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
 void pc88va_state::pc88va(machine_config &config)
 {
 	V50(config, m_maincpu, MASTER_CLOCK); // μPD9002, aka V50 + μPD70008AC (for PC8801 compatibility mode) in place of 8080
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_map);
-	m_maincpu->set_addrmap(AS_IO, &pc88va_state::pc88va_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &pc88va_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::vrtc_irq));
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
