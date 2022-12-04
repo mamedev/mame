@@ -35,8 +35,8 @@ void rp2a03_device::rp2a03_map(address_map &map)
 	map(0x4015, 0x4015).r(FUNC(rp2a03_device::apu_status_r));
 	// 0x4014 w -> NES sprite DMA (is this internal?)
 	// 0x4016 w -> d0-d2: RP2A03 OUT0,OUT1,OUT2
-	// 0x4016 r -> RP2A03 IN0
-	// 0x4017 r -> RP2A03 IN1
+	// 0x4016 r -> d0-d4: RP2A03 IN0
+	// 0x4017 r -> d0-d4: RP2A03 IN1
 }
 
 
