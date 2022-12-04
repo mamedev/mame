@@ -1737,12 +1737,13 @@ Resets itself while "Loading StoryTeller"
 		</part>
 	</software>
 
-	<software name="oilswell">
+	<software name="oilswell" supported="partial">
 		<description>Oil's Well</description>
 		<year>1984</year>
 		<publisher>Sierra</publisher>
 		<notes><![CDATA[
 ibmpcjr: hangs on title screen, is it supported?
+Draws half height in CGA mode if a [VGA] is attached (verify)
 ]]></notes>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
@@ -10510,14 +10511,17 @@ Hangs after few seconds of gameplay
 		</part>
 	</software>
 
-	<!-- bad graphics in CGA mode -->
 	<software name="drgnflam" supported="partial">
 		<!-- Dumped from a copied disk -->
 		<description>Dragons of Flame</description>
 		<year>1989</year>
 		<publisher>SSI</publisher>
+		<notes><![CDATA[
+Very broken gfxs in [CGA] mode
+]]></notes>
 		<info name="developer" value="U.S. Gold" />
 		<info name="version" value="1.1" />
+		<info name="usage" value="Sports manual copy protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] Dragons of Flame [3.5DD] [Disk 1 of 1].img" size="737280" crc="0684051f" sha1="58ab0c9460ab9249a999ab00aba930ec92ebe744"/>
@@ -10666,12 +10670,16 @@ Hangs after few seconds of gameplay
 		</part>
 	</software>
 
-	<software name="dynablst" supported="partial">
-	<!-- Need an adaptator connected to the parallel port to play-->
+	<!-- TODO: consider moving to ibm5170 -->
+	<software name="dynablst" supported="no">
 		<description>Dyna Blaster</description>
 		<year>1992</year>
 		<publisher>Ubi Soft</publisher>
+		<notes><![CDATA[
+Prompts user to "press fire" but no correlated keyboard bind, requires unemulated parallel port dongle
+]]></notes>
 		<info name="developer" value="Hudson Soft" />
+		<info name="usage" value="Requires HDD install" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Dyna Blaster [Ubi Soft] [[1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="d6af7500" sha1="c4acd9f2731d9d80eda759d9833cc1c4e4c064ea"/>
@@ -15184,7 +15192,15 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		<description>The Software Toolworks Game Pack 3</description>
 		<year>1993</year>
 		<publisher>The Software Toolworks</publisher>
+		<notes><![CDATA[
+Jack Nicklaus Ultimate Golf & Course Design:
+Road &amp; Track Presents Grand Prix Unlimited: goes autopilot when using keyboard (verify)
+F-19 Stealth Fighter: sports copy protection but it's skipped?
+Life &amp; Death -- You are the Surgeon:
+Gin King and Cribbage King: prints "packet file is corrupt after selection in batch file, both games shows a bit of [VGA] offset [pel_shift]
+]]></notes>
 		<info name="version" value="3.0.1" />
+		<info name="usage" value="Requires HDD install, Jack Nicklaus and Grand Prix sports code wheel copy protection, F-19 sports manual copy protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="the software toolworks game pack 3 disk 1.img" size="737280" crc="a1476386" sha1="77f22c2b2ab60f738c6ff5858f57192b14ef68ff"/>
@@ -16125,11 +16141,13 @@ ibmpcjr: unsupported, "program too big to fit in memory"
 		</part>
 	</software>
 
-	<!-- keyboard input locks when the manual copy protection screen's appears -->
+	<!-- keyboard input locks when the manual copy protection screen's appears (cannot reproduce) -->
+	<!-- TODO: untested, no manual available -->
 	<software name="toutrun" supported="partial">
 		<description>Turbo Out Run (5.25")</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Sports manual copy protection"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Turbo Out Run [Sega] [1990] [5.25DD] [Disk 1 of 3].img" size="368640" crc="5c2ed4fe" sha1="6f5ca56e4e40b81cbf7a9e07f55e9cb18f31e0da"/>
@@ -16147,11 +16165,12 @@ ibmpcjr: unsupported, "program too big to fit in memory"
 		</part>
 	</software>
 
-	<!-- keyboard input locks when the manual copy protection screen's appears -->
+	<!-- keyboard input locks when the manual copy protection screen's appears (cannot reproduce) -->
 	<software name="toutrun35" cloneof="toutrun" supported="partial">
 		<description>Turbo Out Run (3.5")</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Sports manual copy protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Turbo Out Run [Sega] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="67d93e45" sha1="9b6a1ee5abfa46f879c1bfdc661bfc95b2539853"/>
@@ -16695,10 +16714,15 @@ Black screen, incomplete dump? Has autoexec.bat without command.com, requires to
 
 	<!-- Demoscene -->
 
-	<software name="8088mph" supported="partial">
+	<software name="8088mph" supported="no">
 		<description>8088 MPH (Final Version)</description>
 		<year>2015</year>
 		<publisher>Hornet + CRTC + DESiRE</publisher>
+		<notes><![CDATA[
+Prints "Metric cycle count of 1127 deviates 33%" with ibm5160
+Various GFX glitches, cfr. https://youtu.be/hNRO7lno_DM for side by side test
+Hangs at credits screen
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="8088mph final.360" size="368640" crc="a30504e8" sha1="5f637b83dca774b7104fed0d20195dd769e0838b"/>
@@ -16706,7 +16730,7 @@ Black screen, incomplete dump? Has autoexec.bat without command.com, requires to
 		</part>
 	</software>
 
-	<software name="8088mphp" cloneof="8088mph" supported="partial">
+	<software name="8088mphp" cloneof="8088mph" supported="no">
 		<description>8088 MPH (Revision 2015 Party version)</description>
 		<year>2015</year>
 		<publisher>Hornet + CRTC + DESiRE</publisher>
