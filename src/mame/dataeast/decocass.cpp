@@ -811,6 +811,19 @@ static INPUT_PORTS_START( cmanhat )
 	/* other dips not verified */
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( cnebula )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( cluckypo )
 	PORT_INCLUDE( decocass )
 
@@ -2230,7 +2243,7 @@ void decocass_state::init_cdsteljn()
 /* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  cmanhat,  decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette) (Japan)", MACHINE_IMPERFECT_GRAPHICS ) // Colours don't match some videos, but probably different game version
 /* 04 */ GAME( 1981, cterrani,  decocass, cterrani, cterrani, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette) (US)", 0 )
 /* 05 */ // 1981.?? Missile Sprinter
-/* 06 */ GAME( 1981, cnebula,   decocass, cnebula,  cmanhat,  decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Nebula (DECO Cassette) (UK)", 0 ) // 1980.12 Nebula - "NEBULA2 01/021980.11.25" string in cassette data
+/* 06 */ GAME( 1981, cnebula,   decocass, cnebula,  cnebula,  decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Nebula (DECO Cassette) (UK)", 0 ) // 1980.12 Nebula - "NEBULA2 01/021980.11.25" string in cassette data
 /* 07 */ GAME( 1981, castfant,  decocass, castfant, castfant, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette) (US)", 0 )
 /* 08 */ GAME( 1981, ctower,    decocass, cfboy0a1, ctower,   decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "The Tower (DECO Cassette) (Europe)", 0 ) // 1981.03 The Tower (1981.02.04 in cassette data)
 /* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette) (US)", 0 )
