@@ -732,7 +732,7 @@ TODO:
 	</software>
 
 	<software name="win211a" cloneof="win211">
-		<description>Windows 2.11 (alt disk 1)</description>
+		<description>Windows 2.11 (alt Disk 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1170,7 +1170,7 @@ TODO:
 	</software>
 
 	<software name="turbocppb" cloneof="turbocpp">
-		<description>Turbo C++ (alt disk 1)</description>
+		<description>Turbo C++ (alt Disk 1)</description>
 		<year>1990</year>
 		<publisher>Borland</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3307,7 +3307,7 @@ TODO:
 	</software>
 
 	<software name="actor98a" cloneof="actor98">
-		<description>Actor 98 (alt disk 1)</description>
+		<description>Actor 98 (alt Disk 1)</description>
 		<year>1990</year>
 		<publisher>スタジオパンサー (Studio Panther)</publisher>
 		<info name="alt_title" value="Ａｃｔｏｒ９８" />
@@ -5654,7 +5654,7 @@ TODO:
 	</software>
 
 	<software name="area88ia" cloneof="area88i" supported="partial">
-		<description>Area 88 - Ikkakujuu no Kiseki (alt disk C)</description>
+		<description>Area 88 - Ikkakujuu no Kiseki (alt Disk C)</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="エリア８８ 一角獣の軌跡" />
@@ -6429,7 +6429,7 @@ TODO:
 	<!-- boot OK in vanilla, VM, RS classes -->
 	<!-- No kanji displayed for vanilla version (btanb?) -->
 	<software name="balpowera" cloneof="balpower" supported="partial">
-		<description>Balance of Power - Geopolitics in the Nuclear Age (alt disk 1)</description>
+		<description>Balance of Power - Geopolitics in the Nuclear Age (alt Disk A)</description>
 		<year>1988</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="バランス オブ パワー" />
@@ -10701,7 +10701,7 @@ TODO:
 	</software>
 
 	<software name="chromepa" cloneof="chromep">
-		<description>Chrome Paradise - Ginpaku-iro no Rakuen (alt disk 1)</description>
+		<description>Chrome Paradise - Ginpaku-iro no Rakuen (alt Disk 1)</description>
 		<year>1996</year>
 		<publisher>アシッドプラン (Acid Plan)</publisher>
 		<info name="alt_title" value="クロムパラダイス 銀白色の楽園" />
@@ -16964,7 +16964,7 @@ TODO:
 	<!-- This set has a different executable file -->
 	<software name="silka" cloneof="silk">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Dragon Master Silk - Ryuu Shoukan Musume - Episode II (alt disk 1)</description>
+		<description>Dragon Master Silk - Ryuu Shoukan Musume - Episode II (alt Disk 1)</description>
 		<year>1992</year>
 		<publisher>ギミックハウス (Gimmick House)</publisher>
 		<info name="alt_title" value="ドラゴンマスターシルク ～龍召還娘～ Ｅｐｉｓｏｄｅ II" />
@@ -29573,7 +29573,7 @@ TODO:
 	</software>
 
 	<software name="makyouda" cloneof="makyoud">
-		<description>Makyouden (alt disk 1)</description>
+		<description>Makyouden (alt Disk 1)</description>
 		<year>1992</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
 		<info name="alt_title" value="魔京伝" />
@@ -31815,7 +31815,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="monzetsua" cloneof="monzetsu">
-		<description>Monzetsu Fighter (alt disks 1 &amp; 6)</description>
+		<description>Monzetsu Fighter (alt Disk 1 &amp; Disk 6)</description>
 		<year>1995</year>
 		<publisher>トラッシュ (Trush)</publisher>
 		<info name="alt_title" value="悶絶ファイター" />
@@ -34425,7 +34425,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pensiona" cloneof="pension">
-		<description>Pension Story - Hana no Kiyosato (alt disk 1)</description>
+		<description>Pension Story - Hana no Kiyosato (alt Disk A)</description>
 		<year>1988</year>
 		<publisher>アダルティン (Adult Inn)</publisher>
 		<info name="alt_title" value="ペンションストーリー花の清里" />
@@ -35053,7 +35053,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksoxta" cloneof="pinksoxt">
-		<description>Pink Sox Mania Taizen (alt disk A)</description>
+		<description>Pink Sox Mania Taizen (alt Disk A)</description>
 		<year>1994</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックスマニア大全" />
@@ -42627,7 +42627,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="sworddn2a" cloneof="sworddn2">
-		<description>Sword Dancer 2 - Goddess of the Evil Blade (alt disk A)</description>
+		<description>Sword Dancer 2 - Goddess of the Evil Blade (alt Disk A)</description>
 		<year>1994</year>
 		<publisher>テイジイエル (TGL)</publisher>
 		<info name="alt_title" value="ソードダンサー２ 凶刃の女神 ~ Sword Dancer 2 - Kyoujin no Megami" />
@@ -49316,7 +49316,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="yuuwakua" cloneof="yuuwaku">
-		<description>Yuuwaku - Temptation (alt disk 1)</description>
+		<description>Yuuwaku - Temptation (alt Disk A)</description>
 		<year>1995</year>
 		<publisher>ティーツー (T2)</publisher>
 		<info name="alt_title" value="誘惑" />
@@ -56277,7 +56277,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="3x3eyesa" cloneof="3x3eyes" supported="partial">
-		<description>3x3 Eyes - Sanjiyan Henjou (alt disk 1)</description>
+		<description>3x3 Eyes - Sanjiyan Henjou (alt Disk A)</description>
 		<year>1993</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
 		<info name="alt_title" value="３Ｘ３ＥＹＥＳ ～三只眼變成～" />
@@ -62904,7 +62904,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="snowmema" cloneof="snowmem" supported="no">
-		<description>Snow Memory (alt disk 1)</description>
+		<description>Snow Memory (alt Disk 1)</description>
 		<year>1996</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
 		<info name="alt_title" value="スノーメモリー" />
