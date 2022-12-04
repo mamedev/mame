@@ -16,39 +16,27 @@ DEFINE_DEVICE_TYPE(RP2A03_CORE, rp2a03_core_device, "rp2a03_core", "Ricoh RP2A03
 DEFINE_DEVICE_TYPE(RP2A03,      rp2a03_device,      "rp2a03",      "Ricoh RP2A03")      // earliest version, found in punchout, spnchout, dkong3, VS. systems, and some early Famicoms
 DEFINE_DEVICE_TYPE(RP2A03G,     rp2a03g_device,     "rp2a03g",     "Ricoh RP2A03G")     // later revision, found in front-loader NES
 
-uint8_t rp2a03_device::psg1_4014_r()
+void rp2a03_device::apu_w(offs_t offset, uint8_t data)
 {
-	return m_apu->read(0x14);
+	m_apu->write(offset, data);
 }
 
-uint8_t rp2a03_device::psg1_4015_r()
+uint8_t rp2a03_device::apu_status_r()
 {
 	return m_apu->read(0x15);
 }
 
-void rp2a03_device::psg1_4015_w(uint8_t data)
-{
-	m_apu->write(0x15, data);
-}
-
-void rp2a03_device::psg1_4017_w(uint8_t data)
-{
-	m_apu->write(0x17, data);
-}
-
-
-// on various drivers          output port 0x4014 is used for external hardware   (not used by APU?)
-//                       input/output port 0x4016  ^                              (not used by APU?)
-//                       input        port 0x4017  ^                              ( APU_IRQCTRL )
-// is there a fall through where every write is seen by other hw, or do these addresses really not touch the APU?? APU_IRQCTRL can definitely be written by can it be read back?
 
 void rp2a03_device::rp2a03_map(address_map &map)
 {
-	map(0x4000, 0x4013).rw("nesapu", FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4014, 0x4014).r(FUNC(rp2a03_device::psg1_4014_r)); // .w(FUNC(nesapu_device::sprite_dma_0_w));
-	map(0x4015, 0x4015).rw(FUNC(rp2a03_device::psg1_4015_r), FUNC(rp2a03_device::psg1_4015_w)); /* PSG status / first control register */
-	//map(0x4016, 0x4016).rw(FUNC(rp2a03_device::vsnes_in0_r), FUNC(rp2a03_device::vsnes_in0_w));
-	map(0x4017, 0x4017) /*.r(FUNC(rp2a03_device::vsnes_in1_r))*/ .w(FUNC(rp2a03_device::psg1_4017_w));
+	map(0x4000, 0x4013).w(FUNC(rp2a03_device::apu_w));
+	map(0x4015, 0x4015).lw8(NAME([this](u8 data) { apu_w(0x15, data); }));
+	map(0x4017, 0x4017).lw8(NAME([this](u8 data) { apu_w(0x17, data); }));
+	map(0x4015, 0x4015).r(FUNC(rp2a03_device::apu_status_r));
+	// 0x4014 w -> NES sprite DMA (is this internal?)
+	// 0x4016 w -> d0-d2: RP2A03 OUT0,OUT1,OUT2
+	// 0x4016 r -> RP2A03 IN0
+	// 0x4017 r -> RP2A03 IN1
 }
 
 
