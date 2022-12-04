@@ -1855,12 +1855,10 @@ INPUT_PORTS_END
 
 void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 {
-	mpu4_oki_sampled_sound *const m_soundcard = subdevice<mpu4_oki_sampled_sound>("okicard");
+	space.install_readwrite_handler(0x0880, 0x0883, read8sm_delegate(*m_okicard, FUNC(mpu4_oki_sampled_sound::ic4_read)), write8sm_delegate(*m_okicard, FUNC(mpu4_oki_sampled_sound::ic4_write)));
 
-	space.install_readwrite_handler(0x0880, 0x0883, read8sm_delegate(*m_soundcard, FUNC(mpu4_oki_sampled_sound::ic4_read)), write8sm_delegate(*m_soundcard, FUNC(mpu4_oki_sampled_sound::ic4_write)));
-
-	space.install_read_handler(0x08c0, 0x08c7, read8sm_delegate(*m_soundcard, FUNC(mpu4_oki_sampled_sound::ic3_read)));
-	space.install_write_handler(0x08c0, 0x08c7, write8sm_delegate(*m_soundcard, FUNC(mpu4_oki_sampled_sound::ic3_write)));
+	space.install_read_handler(0x08c0, 0x08c7, read8sm_delegate(*m_okicard, FUNC(mpu4_oki_sampled_sound::ic3_read)));
+	space.install_write_handler(0x08c0, 0x08c7, write8sm_delegate(*m_okicard, FUNC(mpu4_oki_sampled_sound::ic3_write)));
 
 }
 

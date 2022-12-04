@@ -14,15 +14,25 @@ I've separated the channels here, to tie back at the game level
 
 #include "mpu4_oki_sampled_sound.h"
 
+#include "logmacro.h"
+
+//#define VERBOSE 1
+
 DEFINE_DEVICE_TYPE(MPU4_OKI_SAMPLED_SOUND, mpu4_oki_sampled_sound, "mpu4okisnd", "Barcrest Sampled Sound Program Card")
 
-mpu4_oki_sampled_sound::mpu4_oki_sampled_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MPU4_OKI_SAMPLED_SOUND, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_cb2_handler(*this),
-		m_ptm_ic3ss(*this, "ptm_ic3ss"),
-		m_pia_ic4ss(*this, "pia_ic4ss"),
-		m_msm6376(*this, "msm6376")
+mpu4_oki_sampled_sound::mpu4_oki_sampled_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MPU4_OKI_SAMPLED_SOUND, tag, owner, clock),
+	device_mixer_interface(mconfig, *this),
+	m_cb2_handler(*this),
+	m_ptm_ic3ss(*this, "ptm_ic3ss"),
+	m_pia_ic4ss(*this, "pia_ic4ss"),
+	m_msm6376(*this, "msm6376"),
+	m_expansion_latch(0),
+	m_global_volume(0),
+	m_t1(0),
+	m_t3l(0),
+	m_t3h(0),
+	m_last_reset(0)
 {
 }
 
@@ -91,7 +101,7 @@ uint8_t mpu4_oki_sampled_sound::ic4_read(offs_t offset)
 
 void mpu4_oki_sampled_sound::pia_gb_porta_w(uint8_t data)
 {
-	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", machine().describe_context(), data));
+	LOG("%s: PIA Port A Set to %2x\n", machine().describe_context(), data);
 	m_msm6376->write(data);
 }
 
@@ -99,7 +109,7 @@ void mpu4_oki_sampled_sound::pia_gb_portb_w(uint8_t data)
 {
 	uint8_t changed = m_expansion_latch^data;
 
-	LOG_SS(("%s: GAMEBOARD: PIA Port B Set to %2x\n", machine().describe_context(), data));
+	LOG("%s: PIA Port B Set to %2x\n", machine().describe_context(), data);
 
 	if (changed & 0x20)
 	{ // digital volume clock line changed
@@ -114,7 +124,7 @@ void mpu4_oki_sampled_sound::pia_gb_portb_w(uint8_t data)
 				if (m_global_volume > 0) m_global_volume--;
 			}
 
-			LOG_SS(("%s: GAMEBOARD: Volume Set to %2x\n", machine().describe_context(), data));
+			LOG("%s: Volume Set to %2x\n", machine().describe_context(), data);
 			float percent = (32-m_global_volume)/32.0;
 			m_msm6376->set_output_gain(0, percent);
 			m_msm6376->set_output_gain(1, percent);
@@ -126,7 +136,7 @@ void mpu4_oki_sampled_sound::pia_gb_portb_w(uint8_t data)
 
 uint8_t mpu4_oki_sampled_sound::pia_gb_portb_r()
 {
-	LOG_SS(("%s: GAMEBOARD: PIA Read of Port B\n", machine().describe_context()));
+	LOG("%s: PIA Read of Port B\n", machine().describe_context());
 	uint8_t data = 0;
 	// b7 NAR - we can load another address into Channel 1
 	// b6, 1 = OKI ready, 0 = OKI busy
@@ -145,11 +155,12 @@ uint8_t mpu4_oki_sampled_sound::pia_gb_portb_r()
 
 WRITE_LINE_MEMBER(mpu4_oki_sampled_sound::pia_gb_ca2_w)
 {
-	LOG_SS(("%s: GAMEBOARD: OKI RESET data = %02X\n", machine().describe_context(), state));
+	LOG("%s: OKI RESET data = %02X\n", machine().describe_context(), state);
 	if ((m_last_reset != state) && !state)
 	{
 		m_msm6376->reset();
 	}
+	m_last_reset = state;
 //  reset line
 }
 
@@ -192,8 +203,4 @@ void mpu4_oki_sampled_sound::device_start()
 	save_item(NAME(m_t3l));
 	save_item(NAME(m_t3h));
 	save_item(NAME(m_last_reset));
-}
-
-void mpu4_oki_sampled_sound::device_reset()
-{
 }
