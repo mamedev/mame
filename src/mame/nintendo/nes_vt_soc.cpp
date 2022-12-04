@@ -1043,11 +1043,11 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      // standard PPU registers
 	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));  //  extra VT PPU registers
 
-	map(0x4000, 0x4013).w(m_apu, FUNC(nes_apu_vt_device::write));
+	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 	map(0x4014, 0x4014).w(FUNC(nes_vt02_vt03_soc_device::vt_dma_w));
-	map(0x4015, 0x4015).r(m_apu, FUNC(nes_apu_vt_device::status_r)).lw8(NAME([this](u8 data) { m_apu->write(0x15, data); })); // PSG status / first control register
+	map(0x4015, 0x4015).r(m_apu, FUNC(nes_apu_vt_device::status_r)); // PSG status / first control register
 	map(0x4016, 0x4016).rw(FUNC(nes_vt02_vt03_soc_device::in0_r), FUNC(nes_vt02_vt03_soc_device::in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt02_vt03_soc_device::in1_r)).lw8(NAME([this](u8 data) { m_apu->write(0x17, data); }));
+	map(0x4017, 0x4017).r(FUNC(nes_vt02_vt03_soc_device::in1_r));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt02_vt03_soc_device::vt03_4034_w)); // secondary DMA
 

@@ -468,11 +468,11 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 
 	map(0x2040, 0x207f).rw(m_ppu, FUNC(ppu_sh6578_device::palette_read), FUNC(ppu_sh6578_device::palette_write));
 
-	map(0x4000, 0x4013).w(m_apu, FUNC(nesapu_device::write));
+	map(0x4000, 0x4017).w(m_apu, FUNC(nesapu_device::write));
 	map(0x4014, 0x4014).w(FUNC(nes_sh6578_state::sprite_dma_w));
-	map(0x4015, 0x4015).r(m_apu, FUNC(nesapu_device::status_r)).lw8(NAME([this](u8 data) { m_apu->write(0x15, data); }));
+	map(0x4015, 0x4015).r(m_apu, FUNC(nesapu_device::status_r));
 	map(0x4016, 0x4016).rw(FUNC(nes_sh6578_state::io0_r), FUNC(nes_sh6578_state::io_w));
-	map(0x4017, 0x4017).r(FUNC(nes_sh6578_state::io1_r)).lw8(NAME([this](u8 data) { m_apu->write(0x17, data); }));
+	map(0x4017, 0x4017).r(FUNC(nes_sh6578_state::io1_r));
 
 	map(0x4020, 0x4020).w(FUNC(nes_sh6578_state::timing_setting_control_w));
 	//4021 write keyboard output port
