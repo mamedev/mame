@@ -1397,7 +1397,6 @@ MACHINE_RESET_MEMBER(decocass_type1_state,ctsttape)
 
 MACHINE_RESET_MEMBER(decocass_type1_state,cnebula)
 {
-	printf("nebula");
 	machine_reset();
 	LOG(0,("dongle type #1 (DE-0061)\n"));
 	m_type1_map = type1_nebula_table;
