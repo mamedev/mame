@@ -3511,13 +3511,10 @@ Albero throws "read only disk" if no disk is in. Otherwise requires a missing Lo
 		</part>
 	</software>
 
-	<software name="pcglobe3" supported="partial">
+	<software name="pcglobe3" supported="yes">
 		<description>PC Globe 3.0</description>
 		<year>1990</year>
 		<publisher>PC Globe, Inc</publisher>
-		<notes><![CDATA[
-Text doesn't draw in menu boxes for [VGA] mode
-]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="PC Globe 3.0 [PC Globe] [1990] [5.25DD] [Disk 1 of 5].img" size="368640" crc="223af156" sha1="b195707c8fdfa1c21dec44c498104efc53e2b886"/>
@@ -3545,13 +3542,10 @@ Text doesn't draw in menu boxes for [VGA] mode
 		</part>
 	</software>
 
-	<software name="pcglobe4" supported="partial">
+	<software name="pcglobe4" supported="yes">
 		<description>PC Globe 4.0</description>
 		<year>1990</year>
 		<publisher>PC Globe, Inc</publisher>
-		<notes><![CDATA[
-Text doesn't draw in menu boxes for [VGA] mode
-]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="PC Globe 4.0 [PC Globe] [1990] [5.25DD] [Disk 1 of 5].img" size="368640" crc="5f6e5912" sha1="39d53b36612c5e7df96a753221a043ded4a88b1f"/>
@@ -3579,13 +3573,10 @@ Text doesn't draw in menu boxes for [VGA] mode
 		</part>
 	</software>
 
-	<software name="pcglobe504" supported="partial">
+	<software name="pcglobe504" supported="yes">
 		<description>PC Globe 5.04</description>
 		<year>1992</year>
 		<publisher>PC Globe, Inc</publisher>
-		<notes><![CDATA[
-Text doesn't draw in menu boxes for [VGA] mode
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="PC Globe 5.04 [PC Globe] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="284214e4" sha1="6c9a1fe9a0678d922fb994464fdba4abc0748d2c"/>
@@ -3598,13 +3589,10 @@ Text doesn't draw in menu boxes for [VGA] mode
 		</part>
 	</software>
 
-	<software name="pcglobe5es" cloneof="pcglobe504" supported="partial">
+	<software name="pcglobe5es" cloneof="pcglobe504" supported="yes">
 		<description>PC Globe 5.0 (Spanish)</description>
 		<year>1992</year>
 		<publisher>Broderbund</publisher>
-		<notes><![CDATA[
-Text doesn't draw in menu boxes for [VGA] mode
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="PC Globe 5.0 (Spanish) [Broderbund] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="8d611e3c" sha1="4ad8761012b869bb51f495470389cffef8032efd"/>
@@ -6405,15 +6393,22 @@ Throws "Null sized DOS image ! Invalid disk !" from HxC Disk Browser
 		</part>
 	</software>
 
-	<software name="pc1dos" supported="partial">
-		<description>Olivetti Prodest PC1 MS-DOS 3.20 / GW BASIC / Lode Runner</description>
+	<!-- TODO: Is this even an official disk or just an John Doe footprinted DOS? -->
+	<software name="pc1dos" supported="no">
+		<description>Olivetti Prodest PC1 MS-DOS 3.20 / GW BASIC / Lode Runner / Tetris</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
+		<notes><![CDATA[
+Several programs requires an olivpc1, fails recognition even on intended driver (cfr. crt.com)
+gwbasic.com has keyboard input stuck, unusable
+lr.com gets stuck on white screen, enables x86 single stepping
+]]></notes>
 		<info name="version" value="3.03" />
 		<info name="serial" value="020347" />
+		<!-- baddump: non-factory ranking screen for Tetris (at least) -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="PC1 DOS 3.2.dsk" size="737280" crc="4aef73af" sha1="5d270f7ad21bc4e6c406700259fd6a6d3e4f288c"/>
+				<rom name="PC1 DOS 3.2.dsk" size="737280" crc="4aef73af" sha1="5d270f7ad21bc4e6c406700259fd6a6d3e4f288c" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8878,12 +8873,17 @@ Prompts inserting a disc 3 which is undumped?
 		</part>
 	</software>
 
-	<!-- glitches on the bottom of the screen -->
 	<software name="batmanmv" supported="partial">
 		<!-- Dumped via Kryoflux -->
 		<description>Batman: The Movie</description>
 		<year>1990</year>
 		<publisher>Ocean Software / Data East</publisher>
+		<notes><![CDATA[
+Doesn't draw status bar in [EGA] mode [line_compare]
+Horizontal scrolling is a bit jerky in [VGA] mode, [pel_shift] timing?
+Stage 1 "nice outfit" has an extremely short [buzzer] pitch sound that should be a voice sample (verify)
+[EGA] mode doesn't draw stage 1 "nice outfit" screen like [VGA] mode (verify)
+]]></notes>
 		<info name="developer" value="Ocean Software" />
 		<info name="ported by" value="Astros Productions" />
 		<part name="flop1" interface="floppy_3_5">
@@ -11746,8 +11746,7 @@ Hangs after few seconds of gameplay
 		</part>
 	</software>
 
-	<!-- black square glitches behind sprites -->
-	<software name="intsocch" supported="partial">
+	<software name="intsocch" supported="yes">
 		<description>International Soccer Challenge (Virtual Reality Vol. 1 compilation)</description>
 		<year>1990</year>
 		<publisher>Elite</publisher>
@@ -11791,12 +11790,13 @@ Hangs after few seconds of gameplay
 		</part>
 	</software>
 
+	<!-- TODO: untested, no manual available -->
 	<software name="italy90">
-		<description>Italy '90 Soccer</description>
+		<description>Italy '90 Soccer (Italy)</description>
 		<year>1989</year>
 		<publisher>Simulmondo</publisher>
 		<info name="developer" value="Dardari Bros." />
-		<info name="usage" value="PC Booter" />
+		<info name="usage" value="PC Booter, sports manual copy protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "2152032">
 				<!-- 80-track disk with only the first 40 formatted -->
@@ -12634,13 +12634,10 @@ Hangs when launching soccer.com
 		</part>
 	</software>
 
-	<software name="lombrall" supported="partial">
+	<software name="lombrall" supported="yes">
 		<description>Lombard RAC Rally (5.25", France)</description>
 		<year>1989</year>
 		<publisher>Mandarin Software</publisher>
-		<notes><![CDATA[
-Draws transparent pens as opaque in [EGA] mode during gameplay
-]]></notes>
 		<info name="developer" value="Red Rat Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<!-- Dumped via Kryoflux, custom format with copy protection -->
@@ -12656,14 +12653,11 @@ Draws transparent pens as opaque in [EGA] mode during gameplay
 		</part>
 	</software>
 
-	<software name="lombrall35" cloneof="lombrall" supported="partial">
+	<software name="lombrall35" cloneof="lombrall" supported="yes">
 		<!-- English version -->
 		<description>Lombard RAC Rally (3.5")</description>
 		<year>1989</year>
 		<publisher>Mandarin Software</publisher>
-		<notes><![CDATA[
-Draws transparent pens as opaque in [EGA] mode during gameplay
-]]></notes>
 		<info name="developer" value="Red Rat Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
