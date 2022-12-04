@@ -237,6 +237,10 @@ private:
 	void sysbank_map(address_map &map);
 	void opna_map(address_map &map);
 
+	// SGP
+	void sgp_map(address_map &map);
+	void sgp_io(address_map &map);
+
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

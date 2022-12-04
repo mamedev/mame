@@ -102,47 +102,18 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 #define FM_CLOCK        (XTAL(31'948'800) / 4) // 3993600
 
 
-void pc88va_state::main_map(address_map &map)
-{
-	map(0x00000, 0x7ffff).ram();
-//  map(0x80000, 0x9ffff).ram(); // EMM
-	map(0xa0000, 0xdffff).m(m_sysbank, FUNC(address_map_bank_device::amap16));
-	map(0xe0000, 0xeffff).bankr("rom00_bank");
-	map(0xf0000, 0xfffff).bankr("rom10_bank");
-}
 
-/* 0x00000 - 0x3ffff Kanji ROM 1*/
-/* 0x40000 - 0x4ffff Kanji ROM 2*/
-/* 0x50000 - 0x53fff Backup RAM */
-/* above that is a NOP presumably */
 uint8_t pc88va_state::kanji_ram_r(offs_t offset)
 {
 	return m_kanjiram[offset];
 }
 
+// TODO: settings area should be write protected depending on the m_backupram_wp bit, separate from this
 void pc88va_state::kanji_ram_w(offs_t offset, uint8_t data)
 {
-	// TODO: there's an area that can be write protected
 	m_kanjiram[offset] = data;
 	m_gfxdecode->gfx(2)->mark_dirty(offset / 8);
 	m_gfxdecode->gfx(3)->mark_dirty(offset / 32);
-}
-
-
-void pc88va_state::sysbank_map(address_map &map)
-{
-	// 0 select bus slot
-	// 1 tvram
-	// NB: BASIC expects to r/w to 0x60000-0x7ffff on loading, assume mirror if not a core bug.
-	map(0x040000, 0x04ffff).mirror(0x30000).ram().share("tvram");
-	// 4 gvram
-	map(0x100000, 0x13ffff).ram().share("gvram");
-	// 8-9 kanji
-	map(0x200000, 0x23ffff).rom().region("kanji", 0x00000);
-	map(0x240000, 0x24ffff).rom().region("kanji", 0x40000);
-	map(0x250000, 0x253fff).rw(FUNC(pc88va_state::kanji_ram_r),FUNC(pc88va_state::kanji_ram_w));
-	// c-d dictionary
-	map(0x300000, 0x37ffff).rom().region("dictionary", 0);
 }
 
 u8 pc88va_state::port40_r()
@@ -602,8 +573,57 @@ void pc88va_state::misc_ctrl_w(uint8_t data)
 }
 
 
+/****************************************
+ * Address maps
+ ***************************************/
+
+void pc88va_state::main_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).ram();
+//  map(0x80000, 0x9ffff).ram(); // EMM
+	map(0xa0000, 0xdffff).m(m_sysbank, FUNC(address_map_bank_device::amap16));
+	map(0xe0000, 0xeffff).bankr("rom00_bank");
+	map(0xf0000, 0xfffff).bankr("rom10_bank");
+}
+
+void pc88va_state::sysbank_map(address_map &map)
+{
+	// 0 select bus slot
+	// 1 tvram
+	// NB: BASIC expects to r/w to 0x60000-0x7ffff on loading, assume mirror if not a core bug.
+	map(0x040000, 0x04ffff).mirror(0x30000).ram().share("tvram");
+	// 4 gvram
+	map(0x100000, 0x13ffff).ram().share("gvram");
+	// 8-9 kanji
+	// Kanji ROM
+	map(0x200000, 0x23ffff).rom().region("kanji", 0x00000);
+	// ANK ROM
+	map(0x240000, 0x24ffff).rom().region("kanji", 0x40000);
+	// Backup RAM & PCG
+	map(0x250000, 0x253fff).rw(FUNC(pc88va_state::kanji_ram_r),FUNC(pc88va_state::kanji_ram_w));
+	// c-d dictionary
+	map(0x300000, 0x37ffff).rom().region("dictionary", 0);
+}
+
+// SGP has its own window space about how and what it can see on RMW
+void pc88va_state::sgp_map(address_map &map)
+{
+//	map(0x000000, 0x09ffff) main RAM
+//	map(0x0a0000, 0x0fffff) EMM $a0000 to $fffff (?)
+	map(0x100000, 0x13ffff).rom().region("kanji", 0x00000);
+	map(0x140000, 0x14ffff).rom().region("kanji", 0x40000);
+	map(0x150000, 0x153fff).rw(FUNC(pc88va_state::kanji_ram_r),FUNC(pc88va_state::kanji_ram_w));
+	map(0x180000, 0x18ffff).ram().share("tvram");
+	map(0x200000, 0x23ffff).ram().share("gvram");
+}
 
 
+void pc88va_state::sgp_io(address_map &map)
+{
+//	map(0x00, 0x03) VDP execution start address
+//	map(0x04, 0x04) bit 1 force stop, bit 2 enable SGP irq (also clear?)
+//	map(0x06, 0x06) (r) bit 0 status (w) execution trigger
+}
 
 // TODO: I/O 0x00xx is almost same as pc8801
 // (*) are specific N88 V1 / V2 ports
@@ -681,7 +701,7 @@ void pc88va_state::io_map(address_map &map)
 	// TODO: shinraba writes to 0x340-0x37f on transition between opening and title screens (mirror? core bug?)
 	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
 
-//  map(0x0500, 0x05ff) SGP
+	map(0x0500, 0x05ff).m(*this, FUNC(pc88va_state::sgp_io));
 //  map(0x1000, 0xfeff) PC-88VA expansion boards
 //	map(0xe2d2, 0xe2d2) MIDI status in micromus
 //	map(0xff00, 0xffff).noprw(); // CPU internal use
@@ -1194,14 +1214,6 @@ void pc88va_state::pc88va(machine_config &config)
 	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
 
 	UPD4990A(config, m_rtc);
-
-#if 0
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
-	pit8253.set_clk<0>(MASTER_CLOCK); /* general purpose timer 1 */
-	pit8253.out_handler<0>().set(FUNC(pc88va_state::pc88va_pit_out0_changed));
-	pit8253.set_clk<1>(MASTER_CLOCK); /* BEEP frequency setting */
-	pit8253.set_clk<2>(MASTER_CLOCK); /* RS232C baud rate setting */
-#endif
 
 	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 18+4, 0x40000);
 
