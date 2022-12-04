@@ -237,8 +237,6 @@ private:
 	void sysbank_map(address_map &map);
 	void opna_map(address_map &map);
 
-	void pc88va_z80_io_map(address_map &map);
-	void pc88va_z80_map(address_map &map);
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
