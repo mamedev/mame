@@ -304,6 +304,9 @@ Fatal error: Incorrect layout on track 0 head 0, expected_size=50000, current_si
 		<description>Big Top (cracked)</description>
 		<year>1983</year>
 		<publisher>Funtastic</publisher>
+		<notes><![CDATA[
+Bugged version? cfr. https://github.com/mamedev/mame/pull/10635#issuecomment-1336339717
+]]></notes>
 		<info name="usage" value="PC Booter" />
 		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
@@ -15197,7 +15200,7 @@ Jack Nicklaus Ultimate Golf & Course Design:
 Road &amp; Track Presents Grand Prix Unlimited: goes autopilot when using keyboard (verify)
 F-19 Stealth Fighter: sports copy protection but it's skipped?
 Life &amp; Death -- You are the Surgeon:
-Gin King and Cribbage King: prints "packet file is corrupt after selection in batch file, both games shows a bit of [VGA] offset [pel_shift]
+Gin King and Cribbage King: prints "packet file is corrupt" after selection in batch file, both games shows a bit of [VGA] offset [pel_shift]
 ]]></notes>
 		<info name="version" value="3.0.1" />
 		<info name="usage" value="Requires HDD install, Jack Nicklaus and Grand Prix sports code wheel copy protection, F-19 sports manual copy protection"/>
