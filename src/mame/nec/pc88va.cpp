@@ -133,7 +133,7 @@ void pc88va_state::sysbank_map(address_map &map)
 {
 	// 0 select bus slot
 	// 1 tvram
-	// NB: BASIC expects to r/w to 0x60000-0x7ffff on loading, assume mirror.
+	// NB: BASIC expects to r/w to 0x60000-0x7ffff on loading, assume mirror if not a core bug.
 	map(0x040000, 0x04ffff).mirror(0x30000).ram().share("tvram");
 	// 4 gvram
 	map(0x100000, 0x13ffff).ram().share("gvram");
@@ -580,6 +580,7 @@ void pc88va_state::sys_port1_w(uint8_t data)
 	// ...
 }
 
+// TODO: convert to pc80s31k family
 uint8_t pc88va_state::fake_subfdc_r()
 {
 	return machine().rand();
@@ -677,13 +678,13 @@ void pc88va_state::io_map(address_map &map)
 	map(0x01c8, 0x01cf).rw("d8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8255 3 (byte access)
 //  map(0x01d0, 0x01d1) Expansion RAM bank selection
 	map(0x0200, 0x027f).ram().share("fb_regs"); // Frame buffer 0-1-2-3 control parameter
-	// TODO: shinraba writes to 0x340-0x37f on transition between opening and title screens
-	// (mirror? bug?)
+	// TODO: shinraba writes to 0x340-0x37f on transition between opening and title screens (mirror? core bug?)
 	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
 
 //  map(0x0500, 0x05ff) SGP
-//  map(0x1000, 0xfeff) user area (???)
-	map(0xff00, 0xffff).noprw(); // CPU internal use
+//  map(0x1000, 0xfeff) PC-88VA expansion boards
+//	map(0xe2d2, 0xe2d2) MIDI status in micromus
+//	map(0xff00, 0xffff).noprw(); // CPU internal use
 }
 
 void pc88va_state::opna_map(address_map &map)
@@ -705,7 +706,7 @@ INPUT_CHANGED_MEMBER(pc88va_state::key_stroke)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 	}
 
-	// TODO: eventually thrown away by the MCU
+	// TODO: eventually thrown away by the MCU after set time
 	if(oldval && !newval)
 	{
 		m_keyb.data = 0xff;
