@@ -187,6 +187,7 @@ No text for [gfx] status bar
 		<year>1989</year>
 		<publisher>Music Network</publisher>
 		<notes><![CDATA[
+Very broken GFXs with extensive $510 [ROP] writes
 Has unsupported MIF-201 [MIDI] interface cfr. http://www.pc88.gr.jp/vafaq/view.php/article/88va/vafaq/71
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">

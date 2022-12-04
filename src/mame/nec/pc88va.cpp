@@ -608,8 +608,8 @@ void pc88va_state::sysbank_map(address_map &map)
 // SGP has its own window space about how and what it can see on RMW
 void pc88va_state::sgp_map(address_map &map)
 {
-//	map(0x000000, 0x09ffff) main RAM
-//	map(0x0a0000, 0x0fffff) EMM $a0000 to $fffff (?)
+//  map(0x000000, 0x09ffff) main RAM
+//  map(0x0a0000, 0x0fffff) EMM $a0000 to $fffff (?)
 	map(0x100000, 0x13ffff).rom().region("kanji", 0x00000);
 	map(0x140000, 0x14ffff).rom().region("kanji", 0x40000);
 	map(0x150000, 0x153fff).rw(FUNC(pc88va_state::kanji_ram_r),FUNC(pc88va_state::kanji_ram_w));
@@ -620,9 +620,10 @@ void pc88va_state::sgp_map(address_map &map)
 
 void pc88va_state::sgp_io(address_map &map)
 {
-//	map(0x00, 0x03) VDP execution start address
-//	map(0x04, 0x04) bit 1 force stop, bit 2 enable SGP irq (also clear?)
-//	map(0x06, 0x06) (r) bit 0 status (w) execution trigger
+	// TODO: check if readable
+	map(0x00, 0x03).w(FUNC(pc88va_state::sgp_vdp_address_w));
+//  map(0x04, 0x04) bit 1 force stop, bit 2 enable SGP irq (also clear?)
+	map(0x06, 0x06).rw(FUNC(pc88va_state::sgp_status_r), FUNC(pc88va_state::sgp_trigger_w));
 }
 
 // TODO: I/O 0x00xx is almost same as pc8801
@@ -701,10 +702,28 @@ void pc88va_state::io_map(address_map &map)
 	// TODO: shinraba writes to 0x340-0x37f on transition between opening and title screens (mirror? core bug?)
 	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
 
-	map(0x0500, 0x05ff).m(*this, FUNC(pc88va_state::sgp_io));
+	map(0x0500, 0x0507).m(*this, FUNC(pc88va_state::sgp_io));
+	// GVRAM multiplane access regs
+//  map(0x0510, 0x0510) AACC extend access mode
+//  map(0x0512, 0x0512) GMAP block switch
+//  map(0x0514, 0x0514) XRPMn plane readback select
+//  map(0x0516, 0x0516) XWPMn plane write select
+//  map(0x0518, 0x0518) multiplane enable
+//  map(0x0520, 0x0527).umask16(0x00ff) extended access bit comparison
+//  map(0x0528, 0x0528) extended access plane comparison
+//  map(0x0530, 0x0537).umask16(0x00ff) extended access pattern low byte
+//  map(0x0540, 0x0547).umask16(0x00ff) extended access pattern high byte
+//  map(0x0550, 0x0550) PRRPn plane pattern usage start byte on read
+//  map(0x0552, 0x0552) PRWPn plane pattern usage start byte on write
+//  map(0x0560, 0x0567).umask16(0x00ff) ROP plane code
+	// GVRAM single plane access regs
+//  map(0x0580, 0x0580) single plane enable
+//  map(0x0590, 0x0593) GVRAM pattern register settings
+//  map(0x05a0, 0x05a3) ROP plane code
+
 //  map(0x1000, 0xfeff) PC-88VA expansion boards
-//	map(0xe2d2, 0xe2d2) MIDI status in micromus
-//	map(0xff00, 0xffff).noprw(); // CPU internal use
+//  map(0xe2d2, 0xe2d2) MIDI status in micromus
+//  map(0xff00, 0xffff).noprw(); // CPU internal use
 }
 
 void pc88va_state::opna_map(address_map &map)
@@ -1239,8 +1258,8 @@ ROM_START( pc88va )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 
 	// In pc80s31k device
-//	ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
-//	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
+//  ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
+//  ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
 
 	ROM_REGION( 0x100000, "rom00", ROMREGION_ERASEFF ) // 0xe0000 - 0xeffff
 	ROM_LOAD( "varom00.rom", 0x00000, 0x80000, CRC(8a853b00) SHA1(1266ba969959ff25433ecc900a2caced26ef1a9e))
@@ -1267,8 +1286,8 @@ ROM_END
 ROM_START( pc88va2 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 
-//	ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
-//	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
+//  ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
+//  ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
 
 	ROM_REGION( 0x100000, "rom00", ROMREGION_ERASEFF ) // 0xe0000 - 0xeffff
 	ROM_LOAD( "varom00_va2.rom",   0x00000, 0x80000, CRC(98c9959a) SHA1(bcaea28c58816602ca1e8290f534360f1ca03fe8) )

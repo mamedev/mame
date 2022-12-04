@@ -238,8 +238,20 @@ private:
 	void opna_map(address_map &map);
 
 	// SGP
+	struct sgp_t
+	{
+		u16 vdp_address[2];
+		u32 work_address;
+	};
+	sgp_t m_sgp;
+
 	void sgp_map(address_map &map);
 	void sgp_io(address_map &map);
+
+	void sgp_vdp_address_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 sgp_status_r();
+	void sgp_trigger_w(u8 data);
+	void sgp_exec();
 
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
