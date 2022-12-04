@@ -67,6 +67,9 @@ distomeb_slot_device::distomeb_slot_device(const machine_config &mconfig, const 
 void distomeb_slot_device::device_start()
 {
 	m_cart = get_card_device();
+    m_cart_callback.resolve_safe();
+
+   	save_item(NAME(m_cart_line));
 }
 
 
@@ -98,21 +101,10 @@ void distomeb_slot_device::meb_write(offs_t offset, u8 data)
 //  set_cart_line
 //-------------------------------------------------
 
-void distomeb_slot_device::set_cart_line(int value)
+WRITE_LINE_MEMBER(distomeb_slot_device::set_cart_line)
 {
-	m_cart_line = value;
-	if (!(m_cart_callback.isnull()))
-		m_cart_callback(value);
-}
-
-
-//-------------------------------------------------
-//  get_cart_line
-//-------------------------------------------------
-
-int distomeb_slot_device::get_cart_line() const
-{
-	return m_cart_line;
+	m_cart_line = state;
+	m_cart_callback(state);
 }
 
 
@@ -131,8 +123,8 @@ template class device_finder<device_distomeb_interface, true>;
 
 device_distomeb_interface::device_distomeb_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "distomeb")
-	, m_owning_slot(nullptr)
 {
+	m_owning_slot = dynamic_cast<distomeb_slot_device *>(device.owner());
 }
 
 
@@ -142,16 +134,6 @@ device_distomeb_interface::device_distomeb_interface(const machine_config &mconf
 
 device_distomeb_interface::~device_distomeb_interface()
 {
-}
-
-
-//-------------------------------------------------
-//  interface_config_complete
-//-------------------------------------------------
-
-void device_distomeb_interface::interface_config_complete()
-{
-	m_owning_slot = dynamic_cast<distomeb_slot_device *>(device().owner());
 }
 
 
@@ -191,7 +173,7 @@ void device_distomeb_interface::meb_write(offs_t offset, u8 data)
 
 void device_distomeb_interface::set_cart_value(int value)
 {
-	owning_slot().set_cart_line(value);
+	m_owning_slot->set_cart_line(value);
 }
 
 

@@ -39,22 +39,21 @@ public:
 
 	auto cart_callback() { return m_cart_callback.bind(); }
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// reading and writing to $FF50-$FF57
 	u8 meb_read(offs_t offset);
 	void meb_write(offs_t offset, u8 data);
 
 	// manipulation of CART signal
-	void set_cart_line(int value);
-	int get_cart_line() const;
+	DECLARE_WRITE_LINE_MEMBER(set_cart_line);
+	DECLARE_READ_LINE_MEMBER(get_cart_line) { return m_cart_line; }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 private:
-	int m_cart_line;
-public:
+	u8 m_cart_line;
 	devcb_write_line m_cart_callback;
-private:
 	device_distomeb_interface *m_cart;
 };
 
@@ -75,12 +74,8 @@ public:
 
 protected:
 	virtual void interface_pre_start() override;
-	virtual void interface_config_complete() override;
 
 	device_distomeb_interface(const machine_config &mconfig, device_t &device);
-
-	// accessors for containers
-	distomeb_slot_device &owning_slot()     { assert(m_owning_slot); return *m_owning_slot; }
 
 	// setting cart values
 	void set_cart_value(int value);

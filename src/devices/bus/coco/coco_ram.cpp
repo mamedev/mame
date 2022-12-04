@@ -15,7 +15,7 @@
 #include "coco_ram.h"
 #include "meb_intrf.h"
 
-//#define VERBOSE (LOG_GENERAL )
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 #define RAM_SIZE 1024 * 1024
@@ -143,9 +143,9 @@ void coco_pak_ram_device::scs_write(offs_t offset, u8 data)
 				m_offset = (m_offset & 0x00ffff) | (u32(data) << 16);
 				break;
 			case 3:
-					if (m_offset < RAM_SIZE)
+				if (m_offset < RAM_SIZE)
 				{
-						m_staticram[m_offset] = data;
+					m_staticram[m_offset] = data;
 				}
 				break;
 		}
@@ -184,7 +184,7 @@ u8 coco_pak_ram_device::scs_read(offs_t offset)
 			case 3:
 				if (m_offset < RAM_SIZE)
 				{
-						data = m_staticram[m_offset];
+					data = m_staticram[m_offset];
 				}
 				break;
 		}

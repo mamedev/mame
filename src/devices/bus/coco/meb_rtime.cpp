@@ -15,8 +15,8 @@
 #include "machine/msm6242.h"
 #include "bus/centronics/ctronics.h"
 
-#include "meb_intrf.h"
-
+#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 // ======================> disto_rtime_device
 
@@ -45,7 +45,7 @@ namespace
 			u8 m_double_write;
 			required_device<centronics_device> m_centronics;
 			required_device<output_latch_device> m_latch;
-			int m_centronics_busy;
+			u8 m_centronics_busy;
 	};
 
 
@@ -102,7 +102,7 @@ namespace
 
 	u8 disto_rtime_device::meb_read(offs_t offset)
 	{
-		u8 result= 0;
+		u8 result = 0;
 
 		switch(offset)
 		{
@@ -111,6 +111,7 @@ namespace
 				break;
 
 			case 0x02:  /* FF52 */
+			case 0x03:  /* FF53 */
 				result = m_centronics_busy << 7;
 		}
 
@@ -124,6 +125,8 @@ namespace
 
 	void disto_rtime_device::meb_write(offs_t offset, u8 data)
 	{
+		LOG("meb write: %02x %02x\n", offset, data);
+
 		switch(offset)
 		{
 			case 0x00: /* FF50 */
@@ -135,6 +138,7 @@ namespace
 				break;
 
 			case 0x02: /* FF52 */
+			case 0x03: /* FF53 */
 				if ((m_rtc_address == data) && !m_double_write)
 				{
 					m_double_write = 1;
