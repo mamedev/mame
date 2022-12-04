@@ -1394,7 +1394,18 @@ void decocass_type3_state::cfghtice(machine_config &config)
 	ROM_LOAD_BIOS( 3, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
 	ROM_LOAD_BIOS( 3, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */ \
 
-/* rms8.7e, New boardset bios, country code D */ \
+/* New boardset bios, country code C - UK */
+#define DECOCASS_BIOS_C_MAINCPU \
+	ROM_SYSTEM_BIOS( 5, "c",   "Bios C (UK)" ) \
+	ROM_LOAD_BIOS( 5, "v0c-.7e",    0xf000, 0x1000, CRC(9f505709) SHA1(a9c661ba5a0d3fa5e935fb9c10fa63e2d9809981) ) /* handcrafted (single byte changed) because cnebula requires region C */
+#define DECOCASS_BIOS_C_AUDIOCPU \
+	ROM_LOAD_BIOS( 5, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
+#define DECOCASS_BIOS_C_PROMS \
+	ROM_LOAD_BIOS( 5, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 5, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 5, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+
+/* rms8.7e, New boardset bios, country code D - Europe */ \
 #define DECOCASS_BIOS_D_MAINCPU \
 	ROM_SYSTEM_BIOS( 4, "d",   "Bios D (Europe)" ) \
 	ROM_LOAD_BIOS( 4, "v0d-.7e",    0xf000, 0x1000, CRC(1e0c22b1) SHA1(5fec8fef500bbebc13d0173406afc55235d3affb) ) /* handcrafted (single byte changed) because ctisland3 requires region D */
@@ -1405,15 +1416,6 @@ void decocass_type3_state::cfghtice(machine_config &config)
 	ROM_LOAD_BIOS( 4, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
 	ROM_LOAD_BIOS( 4, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
 
-#define DECOCASS_BIOS_C_MAINCPU \
-	ROM_SYSTEM_BIOS( 5, "c",   "Bios C (UK)" ) \
-	ROM_LOAD_BIOS( 5, "v0c-.7e",    0xf000, 0x1000, CRC(9f505709) SHA1(a9c661ba5a0d3fa5e935fb9c10fa63e2d9809981) ) /* handcrafted (single byte changed) because cnebula requires region C */
-#define DECOCASS_BIOS_C_AUDIOCPU \
-	ROM_LOAD_BIOS( 5, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
-#define DECOCASS_BIOS_C_PROMS \
-	ROM_LOAD_BIOS( 5, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
-	ROM_LOAD_BIOS( 5, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
-	ROM_LOAD_BIOS( 5, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
 
 
 
