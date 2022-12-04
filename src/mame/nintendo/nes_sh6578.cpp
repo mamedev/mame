@@ -106,10 +106,6 @@ private:
 	uint8_t io0_r();
 	uint8_t io1_r();
 
-	uint8_t psg1_4014_r();
-	uint8_t psg1_4015_r();
-	void psg1_4015_w(uint8_t data);
-	void psg1_4017_w(uint8_t data);
 	uint8_t apu_read_mem(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
@@ -452,26 +448,6 @@ void nes_sh6578_max10in1_state::extio_w(uint8_t data)
 
 
 
-uint8_t nes_sh6578_state::psg1_4014_r()
-{
-	return m_apu->read(0x14);
-}
-
-uint8_t nes_sh6578_state::psg1_4015_r()
-{
-	return m_apu->read(0x15);
-}
-
-void nes_sh6578_state::psg1_4015_w(uint8_t data)
-{
-	m_apu->write(0x15, data);
-}
-
-void nes_sh6578_state::psg1_4017_w(uint8_t data)
-{
-	m_apu->write(0x17, data);
-}
-
 WRITE_LINE_MEMBER(nes_sh6578_state::apu_irq)
 {
 	// unimplemented
@@ -492,11 +468,11 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 
 	map(0x2040, 0x207f).rw(m_ppu, FUNC(ppu_sh6578_device::palette_read), FUNC(ppu_sh6578_device::palette_write));
 
-	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4014, 0x4014).rw(FUNC(nes_sh6578_state::psg1_4014_r), FUNC(nes_sh6578_state::sprite_dma_w));
-	map(0x4015, 0x4015).rw(FUNC(nes_sh6578_state::psg1_4015_r), FUNC(nes_sh6578_state::psg1_4015_w));
+	map(0x4000, 0x4017).w(m_apu, FUNC(nesapu_device::write));
+	map(0x4014, 0x4014).w(FUNC(nes_sh6578_state::sprite_dma_w));
+	map(0x4015, 0x4015).r(m_apu, FUNC(nesapu_device::status_r));
 	map(0x4016, 0x4016).rw(FUNC(nes_sh6578_state::io0_r), FUNC(nes_sh6578_state::io_w));
-	map(0x4017, 0x4017).rw(FUNC(nes_sh6578_state::io1_r), FUNC(nes_sh6578_state::psg1_4017_w));
+	map(0x4017, 0x4017).r(FUNC(nes_sh6578_state::io1_r));
 
 	map(0x4020, 0x4020).w(FUNC(nes_sh6578_state::timing_setting_control_w));
 	//4021 write keyboard output port
