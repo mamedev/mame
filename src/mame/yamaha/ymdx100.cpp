@@ -154,6 +154,15 @@ service manual, but is still readily available.
     IPT_KEYBOARD is used, so use the UI mode key (default
     Scroll Lock) to re-enable the MAME UI.
 
+	No, I don't know why some voices (such as Pianobells)
+	seem to not let you turn off modulation even if you set
+	the mod wheel to its lowest point. You can set the pitch
+	sensitivity value ("PMS", Edit/Compare key 9) to 0 to
+	force it off. This might have to do with the YM2164
+	moving the LFO Reset register; if not, it might have to
+	do with the default pitch wheel position not being 0
+	(see TODO below).
+
 *** Test mode
 
     To enter test mode, hold 1 and 2 on the panel while powering the system
@@ -242,6 +251,8 @@ void yamaha_dx100_state::init_dx100()
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "dx100.lh"
 
 namespace {
 
@@ -627,6 +638,8 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("ymdx100_cass");
+
+	config.set_default_layout(layout_dx100);
 }
 
 ROM_START(dx100)
