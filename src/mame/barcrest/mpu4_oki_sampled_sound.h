@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, James Wallace
 
-#ifndef MAME_MACHINE_MPU4_OKI_SAMPLED_SOUND_H
-#define MAME_MACHINE_MPU4_OKI_SAMPLED_SOUND_H
+#ifndef MAME_BARCREST_MPU4_OKI_SAMPLED_SOUND_H
+#define MAME_BARCREST_MPU4_OKI_SAMPLED_SOUND_H
 
 #pragma once
 
@@ -26,25 +26,16 @@ public:
 	void ic4_write(offs_t offset, uint8_t data);
 	uint8_t ic4_read(offs_t offset);
 
-
-
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-	devcb_write_line m_cb2_handler;
-
 
 private:
+	devcb_write_line m_cb2_handler;
+
 	required_device<ptm6840_device> m_ptm_ic3ss;
 	required_device<pia6821_device> m_pia_ic4ss;
 	required_device<okim6376_device> m_msm6376;
-
-	void pia_gb_porta_w(uint8_t data);
-	void pia_gb_portb_w(uint8_t data);
-	uint8_t pia_gb_portb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(output_cb2) { m_cb2_handler(state); }
 
 	uint8_t m_expansion_latch;
 	uint8_t m_global_volume;
@@ -52,6 +43,13 @@ private:
 	uint8_t m_t3l;
 	uint8_t m_t3h;
 	uint8_t m_last_reset;
+
+	void pia_gb_porta_w(uint8_t data);
+	void pia_gb_portb_w(uint8_t data);
+	uint8_t pia_gb_portb_r();
+	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(output_cb2) { m_cb2_handler(state); }
 };
 
-#endif // MAME_MACHINE_MPU4_OKI_SAMPLED_SOUND_H
+#endif // MAME_BARCREST_MPU4_OKI_SAMPLED_SOUND_H
