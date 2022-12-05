@@ -141,6 +141,10 @@ cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const 
 
 void cococart_slot_device::device_start()
 {
+	m_cart_callback.resolve_safe();
+	m_nmi_callback.resolve_safe();
+	m_halt_callback.resolve_safe();
+
 	for(int i=0; i < TIMER_POOL; i++ )
 	{
 		m_cart_line.timer[i]    = timer_alloc(FUNC(cococart_slot_device::cart_line_timer_tick), this);
@@ -346,9 +350,8 @@ void cococart_slot_device::set_line(line ln, coco_cartridge_line &line, cococart
 				break;
 		}
 
-		/* invoke the callback, if present */
-		if (!(*line.callback).isnull())
-			(*line.callback)(line.line);
+		/* invoke the callback */
+		(*line.callback)(line.line);
 	}
 }
 
@@ -657,7 +660,7 @@ template class device_finder<device_cococart_interface, true>;
 
 device_cococart_interface::device_cococart_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "cococart")
-	, m_owning_slot(nullptr)
+	, m_owning_slot(dynamic_cast<cococart_slot_device *>(device.owner()))
 	, m_host(nullptr)
 {
 }
@@ -678,7 +681,6 @@ device_cococart_interface::~device_cococart_interface()
 
 void device_cococart_interface::interface_config_complete()
 {
-	m_owning_slot = dynamic_cast<cococart_slot_device *>(device().owner());
 	m_host = m_owning_slot
 			? dynamic_cast<device_cococart_host_interface *>(m_owning_slot->owner())
 			: nullptr;
