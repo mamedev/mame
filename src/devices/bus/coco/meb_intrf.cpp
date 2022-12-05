@@ -123,8 +123,8 @@ template class device_finder<device_distomeb_interface, true>;
 
 device_distomeb_interface::device_distomeb_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "distomeb")
-{
-	m_owning_slot = dynamic_cast<distomeb_slot_device *>(device.owner());
+	, m_owning_slot(dynamic_cast<distomeb_slot_device *>(device.owner()))
+{	
 }
 
 
