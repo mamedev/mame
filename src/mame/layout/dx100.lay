@@ -5,8 +5,7 @@ license:CC0
 <mamelayout version="2">
 	<element name="background">
 		<rect>
-<!--TODO			<color red="0.12" green="0.10" blue="0.05" />-->
-			<color red="0.2" green="0.2" blue="0.2" />
+			<color red="0.15" green="0.15" blue="0.15" />
 		</rect>
 	</element>
 
@@ -49,8 +48,7 @@ license:CC0
 	<element name="button-text-play">
 		<rect></rect>
 		<text align="0" valign="0" string="PLAY">
-			<!-- TODO background color -->
-			<color red="0.2" green="0.2" blue="0.2" />
+			<color red="0.15" green="0.15" blue="0.15" />
 		</text>
 	</element>
 
@@ -894,6 +892,70 @@ license:CC0
 		<element ref="whitekey" inputtag="P6_15" inputmask="0x10"><bounds x="2870" y="504" width="79" height="504" /></element>
 	</group>
 
+	<element name="slider-well">
+		<rect>
+			<bounds x="0" y="0" width="72" height="208" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds x="34" y="48" width="4" height="112" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
+	
+	<element name="slider-nub">
+		<rect>
+			<bounds x="0" y="0" width="68" height="10" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<rect>
+			<bounds x="0" y="4" width="68" height="2" />
+		</rect>
+	</element>
+	
+	<element name="slider-tick">
+		<rect>
+			<bounds x="0" y="0" width="14" height="1" />
+		</rect>
+	</element>
+
+	<element name="text-volume"><text align="1" string="VOLUME" /></element>	
+	<element name="text-data-entry"><text align="1" string="DATA ENTRY" /></element>
+	<element name="text-min"><text align="1" string="MIN" /></element>
+	<element name="text-max"><text align="1" string="MAX" /></element>
+
+	<group name="sliders">
+		<!-- Volume, which is not emulated in MAME (MAME provides its own volume control) and is therefore pegged to MAX here -->
+		<element ref="slider-well">
+			<bounds x="0" y="0" width="72" height="208" />
+		</element>
+		<element ref="slider-nub">
+			<bounds x="2" y="44" width="68" height="6" />
+		</element>
+		<element ref="text-volume">
+			<bounds x="0" y="208" width="72" height="16" />
+		</element>
+		<repeat count="13">
+			<param name="y" start="55" increment="7" />
+			<element ref="slider-tick">
+				<bounds x="0" y="~y~" width="14" height="1" />
+			</element>
+		</repeat>
+
+		<!-- Data Entry -->
+		<element ref="slider-well">
+			<bounds x="88" y="0" width="72" height="208" />
+		</element>
+		<element ref="slider-nub">
+			<animate inputtag="AN3" inputmask="0xFF" />
+			<bounds state="0" x="90" y="156" width="68" height="6" />
+			<bounds state="255" x="90" y="44" width="68" height="6" />
+		</element>
+		<element ref="text-data-entry">
+			<bounds x="88" y="208" width="72" height="16" />
+		</element>
+	</group>
+
 	<view name="Standard">
 		<element ref="background">
 			<bounds x="0" y="0" width="2020" height="566" />
@@ -907,8 +969,12 @@ license:CC0
 			<bounds x="548" y="24" width="1456" height="96" />
 		</group>
 
-		<group ref="group-logo">
+<!--		<group ref="group-logo">
 			<bounds x="24" y="152" width="500" height="96" />
+		</group>-->
+
+		<group ref="sliders">
+			<bounds x="24" y="24" width="176" height="224" />
 		</group>
 
 		<group ref="front-panel-buttons-row-2">
