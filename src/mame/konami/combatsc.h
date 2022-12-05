@@ -151,7 +151,7 @@ private:
 	memory_share_creator<uint8_t> m_io_ram;
 	memory_view m_bank_io_view;
 
-	uint8_t m_bank_select; // 0x00..0x1f
+	uint8_t m_bank_select = 0; // 0x00..0x1f
 
 	void priority_w(uint8_t data);
 	void io_w(offs_t offset, uint8_t data);

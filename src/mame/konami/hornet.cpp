@@ -469,6 +469,7 @@ private:
 	uint16_t m_gn680_ret0;
 	uint16_t m_gn680_ret1;
 	uint16_t m_gn680_check;
+	uint16_t m_gn680_reg0e;
 
 	bool m_sndres;
 
@@ -743,7 +744,8 @@ uint16_t hornet_state::gun_r(offs_t offset)
 
 	// TODO: Replace this with proper emulation of a CCD camera
 	// so the GN680's program can handle inputs normally.
-	if (offset == 0 || offset == 1)
+	// TODO: Check if this works when skip post is disabled (currently causes game to boot loop)
+	if (m_gn680_reg0e == 0 && (offset == 0 || offset == 1))
 	{
 		// All values are offset so that the range in-game is
 		// +/- 280 on the X and +/- 220 on the Y axis.
@@ -783,7 +785,10 @@ uint16_t hornet_state::gun_r(offs_t offset)
 	}
 	else
 	{
-		r = m_gn680_ret0<<16 | m_gn680_ret1;
+		if (offset == 0)
+			r = m_gn680_ret0;
+		else if (offset == 1)
+			r = m_gn680_ret1;
 	}
 
 	return r;
@@ -795,6 +800,11 @@ void hornet_state::gun_w(offs_t offset, uint16_t data)
 	{
 		m_gn680_latch = data;
 		m_gn680->set_input_line(M68K_IRQ_6, HOLD_LINE);
+	}
+	else if (offset == 0x0e/2)
+	{
+		// Always set to 0 when reading the gun inputs
+		m_gn680_reg0e = data;
 	}
 }
 

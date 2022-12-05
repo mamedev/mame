@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cartridge.h"
+#include "bus/msx/slot/cartridge.h"
 
 
 DECLARE_DEVICE_TYPE(MSX_CART_KANJI, msx_cart_kanji_device)
@@ -17,7 +17,7 @@ class msx_cart_kanji_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void initialize_cartridge() override;
+	virtual image_init_result initialize_cartridge(std::string &message) override;
 
 protected:
 	msx_cart_kanji_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -25,6 +25,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	image_init_result validate_kanji_regions(std::string &message);
+	void install_kanji_handlers();
 
 	u8 kanji_r(offs_t offset);
 	void kanji_w(offs_t offset, u8 data);
@@ -39,7 +42,7 @@ class msx_cart_msxwrite_device : public msx_cart_kanji_device
 public:
 	msx_cart_msxwrite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void initialize_cartridge() override;
+	virtual image_init_result initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides

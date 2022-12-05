@@ -23,17 +23,26 @@ void msx_cart_msxdos2_device::device_reset()
 	m_rombank->set_entry(1);
 }
 
-void msx_cart_msxdos2_device::initialize_cartridge()
+image_init_result msx_cart_msxdos2_device::initialize_cartridge(std::string &message)
 {
-	if (get_rom_size() != 0x10000)
+	if (!cart_rom_region())
 	{
-		fatalerror("msxdos2: Invalid ROM size\n");
+		message = "msx_cart_msxdos2_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
 	}
 
-	m_rombank->configure_entries(0, 4, get_rom_base(), 0x4000);
+	if (cart_rom_region()->bytes() != 0x10000)
+	{
+		message = "msx_cart_msxdos2_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
+
+	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), 0x4000);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank);
 	page(1)->install_write_handler(0x7ffe, 0x7ffe, write8smo_delegate(*this, FUNC(msx_cart_msxdos2_device::bank_w)));
+
+	return image_init_result::PASS;
 }
 
 void msx_cart_msxdos2_device::bank_w(u8 data)

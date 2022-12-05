@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "cartridge.h"
-#include "cpu/z80/tmpz84c015.h"
 #include "bus/midi/midi.h"
+#include "bus/msx/slot/cartridge.h"
+#include "cpu/z80/tmpz84c015.h"
 
 
 DECLARE_DEVICE_TYPE(MSX_CART_BM_012, msx_cart_bm_012_device)

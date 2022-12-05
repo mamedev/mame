@@ -72,7 +72,12 @@ image_init_result msx_cart_softcard_device::call_load()
 			}
 		}
 
-		m_softcard->initialize_cartridge();
+		std::string message;
+		image_init_result result = m_softcard->initialize_cartridge(message);
+		if (image_init_result::PASS != result)
+			seterror(image_error::INVALIDIMAGE, message.c_str());
+
+		return result;
 	}
 	return image_init_result::PASS;
 }
