@@ -814,9 +814,9 @@ protected:
 	// $(FF)FFF800
 	uint16_t  m_spimdata;   // SPIM Data Register
 	uint16_t  m_spimcont;   // SPIM Control/Status Register
-	int       m_spmtxd;     // SPIM Shift-register output (TODO: multiplex onto Port K)
-	int       m_spmrxd;     // SPIM Shift-register input  (TODO: multiplex onto Port K)
-	int       m_spmclk;     // SPIM Shift-register clock  (TODO: multiplex onto Port K)
+	bool      m_spmtxd;     // SPIM Shift-register output (TODO: multiplex onto Port K)
+	bool      m_spmrxd;     // SPIM Shift-register input  (TODO: multiplex onto Port K)
+	bool      m_spmclk;     // SPIM Shift-register clock  (TODO: multiplex onto Port K)
 
 	// $(FF)FFF900
 	uint16_t  m_ustcnt;     // UART Status/Control Register
@@ -885,7 +885,7 @@ protected:
 	std::unique_ptr<uint16_t[]> m_lcd_line_buffer;
 	uint32_t m_lcd_line_bit;
 	uint32_t m_lcd_line_word;
-	int m_lsclk;
+	bool m_lsclk;
 
 	devcb_write8  m_out_port_a_cb;
 	devcb_write8  m_out_port_b_cb;

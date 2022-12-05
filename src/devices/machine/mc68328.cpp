@@ -406,9 +406,9 @@ void mc68328_device::device_reset()
 
 	m_spimdata = 0x0000;
 	m_spimcont = 0x0000;
-	m_spmtxd = 0;
-	m_spmrxd = 0;
-	m_spmclk = 0;
+	m_spmtxd = false;
+	m_spmrxd = false;
+	m_spmclk = false;
 
 	m_ustcnt = 0x0000;
 	m_ubaud = 0x003f;
@@ -451,7 +451,7 @@ void mc68328_device::device_reset()
 	m_lcd_sysmem_ptr = 0;
 	m_lcd_line_bit = 0;
 	m_lcd_line_word = 0;
-	m_lsclk = 0;
+	m_lsclk = false;
 }
 
 void mc68328_device::register_state_save()
@@ -2106,8 +2106,8 @@ uint16_t mc68328_device::spisr_r() // 0x700
 
 TIMER_CALLBACK_MEMBER( mc68328_device::spim_tick )
 {
-	m_spmclk ^= 1;
-	const int idle_state = BIT(m_spimcont, SPIM_POL_BIT);
+	m_spmclk = !m_spmclk;
+	const bool idle_state = BIT(m_spimcont, SPIM_POL_BIT);
 	const bool invert_phase = BIT(m_spimcont, SPIM_PHA_BIT);
 
 	uint16_t spim_bit_index = m_spimcont & SPIM_BIT_COUNT;
@@ -2317,7 +2317,7 @@ TIMER_CALLBACK_MEMBER( mc68328_device::lcd_scan_tick )
 {
 	const uint16_t last_word = m_lvpw != m_llbar ? (m_llbar + 1) : m_llbar;
 	m_out_llp_cb(BIT(m_lpolcf, LPOLCF_LPPOL_BIT) ? 1 : 0);
-	m_lsclk ^= 1;
+	m_lsclk = !m_lsclk;
 
 	if (m_lsclk)
 	{
