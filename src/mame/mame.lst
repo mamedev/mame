@@ -43058,6 +43058,9 @@ vector06                        //
 @source:skeleton/vector3.cpp
 vector3                         //
 
+@source:vectorgraphic/vector4.cpp
+vector4                         //
+
 @source:miltonbradley/vectrex.cpp
 raaspec                         // (c) Roy Abel & Associates 1984
 vectrex                         // General Consumer Electric Vectrex - 1982-1984

@@ -401,6 +401,7 @@ const double XTAL::known_xtals[] = {
 	 32'256'000, /* 32.256_MHz_XTAL        Hitachi MB-6890 */
 	 32'317'400, /* 32.3174_MHz_XTAL       DEC VT330, VT340 */
 	 32'530'470, /* 32.53047_MHz_XTAL      Seta 2 */
+	 32'640'000, /* 32.64_MHz_XTAL         Vector 4 */
 	 32'768'000, /* 32.768_MHz_XTAL        Roland D-50 audio clock */
 	 33'000'000, /* 33_MHz_XTAL            Sega Model 3 video board */
 	 33'264'000, /* 33.264_MHz_XTAL        Hazeltine 1500 terminal */
