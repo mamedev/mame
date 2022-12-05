@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER(mpu4_oki_sampled_sound::pia_gb_ca2_w)
 
 WRITE_LINE_MEMBER(mpu4_oki_sampled_sound::pia_gb_cb2_w)
 {
-	output_cb2(state);
+	m_cb2_handler(state);
 }
 
 
