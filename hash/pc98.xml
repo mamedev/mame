@@ -3507,6 +3507,7 @@ TODO:
 		<description>Adventureland (alt)</description>
 		<year>1984</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes>Unofficial conversion to high density</notes>
 		<info name="alt_title" value="アドベンチャーランド" />
 		<info name="release" value="198407xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -4670,7 +4671,7 @@ TODO:
 	<!-- The main executable (AMARAN2.EXE) is slightly different in this set -->
 	<software name="amarant2a" cloneof="amarant2">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Amaranth II (alt system disk)</description>
+		<description>Amaranth II (alt System Disk)</description>
 		<year>1992</year>
 		<publisher>風雅システム (Fuga System)</publisher>
 		<info name="alt_title" value="アマランスII" />
@@ -14621,7 +14622,7 @@ TODO:
 	</software>
 
 	<software name="dinosaura" cloneof="dinosaur">
-		<description>Dinosaur (alt Program disk)</description>
+		<description>Dinosaur (alt Program Disk)</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ダイナソア" />
@@ -32686,7 +32687,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="3dgolfa" cloneof="3dgolf">
-		<description>New 3D Golf Simulation - Harukanaru Augusta (alt system disk)</description>
+		<description>New 3D Golf Simulation - Harukanaru Augusta (alt System Disk)</description>
 		<year>1989</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<info name="alt_title" value="３Ｄゴルフシュミレーション スーパーバージョン 遙かなるオーガスタ" />
