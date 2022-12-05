@@ -73,16 +73,16 @@ public:
 	virtual void meb_write(offs_t offset, u8 data);
 
 protected:
-	virtual void interface_pre_start() override;
-
 	device_distomeb_interface(const machine_config &mconfig, device_t &device);
+
+	virtual void interface_pre_start() override;
 
 	// setting cart values
 	void set_cart_value(int value);
 	void set_cart_value(bool value) { set_cart_value(value ? 1 : 0); }
 
 private:
-	distomeb_slot_device *m_owning_slot;
+	distomeb_slot_device *const m_owning_slot;
 };
 
 void disto_meb_add_basic_devices(device_slot_interface &device);
