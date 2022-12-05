@@ -26456,6 +26456,7 @@ m4toptak                        // Top Take (Barcrest)
 m4toptena                       //
 m4tribnk                        // Triple Bank (Barcrest)
 m4tricol                        // Tricolor (Barcrest)
+m4tst                           // MPU4 Unit Test (Program 4)
 m4tst2                          // MPU4 Unit Test (Program 2)
 m4ttak                          // Tic Tac Take (unknown)
 m4tupen                         // Tuppenny Cracker (Barcrest - Bootleg)
@@ -30212,7 +30213,6 @@ m4tropcla                       //
 m4tropclb                       //
 m4tropclc                       //
 m4tropcld                       //
-m4tst                           // MPU4 Unit Test (Program 4)
 m4vivalv                        // Viva Las Vegas (Barcrest)
 m4vivalv__0                     //
 m4vivalv__1                     //
