@@ -49,7 +49,6 @@ private:
 	uint8_t pia_gb_portb_r();
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(output_cb2) { m_cb2_handler(state); }
 };
 
 #endif // MAME_BARCREST_MPU4_OKI_SAMPLED_SOUND_H
