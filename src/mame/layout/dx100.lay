@@ -467,7 +467,7 @@ license:CC0
 			<bounds x="336" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-text-white-bank"><bounds x="340" y="34" width="64" height="15" /></element>
-		<element ref="button-text-white-right-a"><bounds x="340" y="34" width="64" height="30" /></element>
+		<element ref="button-text-white-right-a"><bounds x="340" y="34" width="64" height="28" /></element>
 		<element ref="button-text-brown-101-124"><bounds x="336" y="64" width="72" height="16" /></element>
 		<element ref="button-text-separator-brown"><bounds x="336" y="80" width="152" height="1" /></element>
 		<element ref="button-text-brown-preset-search"><bounds x="336" y="80" width="152" height="16" /></element>
@@ -478,7 +478,7 @@ license:CC0
 			<bounds x="416" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-text-white-bank"><bounds x="420" y="34" width="64" height="15" /></element>
-		<element ref="button-text-white-right-b"><bounds x="420" y="34" width="64" height="30" /></element>
+		<element ref="button-text-white-right-b"><bounds x="420" y="34" width="64" height="28" /></element>
 		<element ref="button-text-brown-201-224"><bounds x="416" y="64" width="72" height="16" /></element>
 
 		<!-- Button 1 -->
@@ -631,7 +631,7 @@ license:CC0
 			<bounds x="336" y="32" width="72" height="32" />
 		</element>
 		<element ref="button-text-white-bank"><bounds x="340" y="34" width="64" height="15" /></element>
-		<element ref="button-text-white-right-c"><bounds x="340" y="34" width="64" height="30" /></element>
+		<element ref="button-text-white-right-c"><bounds x="340" y="34" width="64" height="28" /></element>
 		<element ref="button-text-brown-301-324"><bounds x="336" y="64" width="72" height="16" /></element>
 		<element ref="button-text-separator-brown"><bounds x="336" y="80" width="152" height="1" /></element>
 		<element ref="button-text-brown-preset-search"><bounds x="336" y="80" width="152" height="16" /></element>
@@ -936,11 +936,17 @@ license:CC0
 			<bounds x="0" y="208" width="72" height="16" />
 		</element>
 		<repeat count="13">
-			<param name="y" start="55" increment="7" />
+			<param name="y" start="56" increment="8" />
 			<element ref="slider-tick">
-				<bounds x="0" y="~y~" width="14" height="1" />
+				<bounds x="73" y="~y~" width="14" height="1" />
 			</element>
 		</repeat>
+		<element ref="text-min">
+			<bounds x="73" y="152" width="14" height="16" />
+		</element>
+		<element ref="text-max">
+			<bounds x="73" y="40" width="14" height="16" />
+		</element>
 
 		<!-- Data Entry -->
 		<element ref="slider-well">
@@ -954,34 +960,40 @@ license:CC0
 		<element ref="text-data-entry">
 			<bounds x="88" y="208" width="72" height="16" />
 		</element>
+		<repeat count="13">
+			<param name="y" start="56" increment="8" />
+			<element ref="slider-tick">
+				<bounds x="161" y="~y~" width="14" height="1" />
+			</element>
+		</repeat>
 	</group>
 
 	<view name="Standard">
 		<element ref="background">
-			<bounds x="0" y="0" width="2020" height="566" />
+			<bounds x="0" y="0" width="2228" height="566" />
 		</element>
 
+		<group ref="sliders">
+			<bounds x="24" y="24" width="175" height="224" />
+		</group>
+
 		<group ref="group-screen-inset">
-			<bounds x="24" y="24" width="500" height="96" />
+			<bounds x="224" y="24" width="500" height="96" />
 		</group>
 
 		<group ref="front-panel-buttons-row-1">
-			<bounds x="548" y="24" width="1456" height="96" />
+			<bounds x="748" y="24" width="1456" height="96" />
 		</group>
 
-<!--		<group ref="group-logo">
-			<bounds x="24" y="152" width="500" height="96" />
-		</group>-->
-
-		<group ref="sliders">
-			<bounds x="24" y="24" width="176" height="224" />
+		<group ref="group-logo">
+			<bounds x="224" y="152" width="500" height="96" />
 		</group>
 
 		<group ref="front-panel-buttons-row-2">
-			<bounds x="548" y="152" width="1456" height="96" />
+			<bounds x="748" y="152" width="1456" height="96" />
 		</group>
 
-		<group ref="keyboard"><bounds x="24" y="280" width="1972" height="262" /></group>
+		<group ref="keyboard"><bounds x="24" y="280" width="2180" height="262" /></group>
 	</view>
 </mamelayout>
 
