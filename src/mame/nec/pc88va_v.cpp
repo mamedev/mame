@@ -1617,7 +1617,7 @@ void pc88va_state::kanji_cg_address_w(offs_t offset, u8 data)
 }
 
 /****************************************
- * SGP
+ * SGP (スーパーグラフィックプロセッサ)
  ***************************************/
 
 void pc88va_state::sgp_vdp_address_w(offs_t offset, u16 data, u16 mem_mask)
@@ -1648,7 +1648,8 @@ void pc88va_state::sgp_exec()
 	u32 vdp_pointer = (m_sgp.vdp_address[0]) | (m_sgp.vdp_address[1] << 16);
 	// TODO: the SGP should go indefinitely until an END is issued
 	// for now punt early until we find something that warrants a parallel execution
-	const u32 end_pointer = vdp_pointer + 0x200;
+	// boomer is the current upper limit, uses SGP to transfer rows on vertical scrolling.
+	const u32 end_pointer = vdp_pointer + 0x800;
 	LOGSGP("SGP: trigger start %08x\n", vdp_pointer);
 
 	// TODO: change me to true SGP space
