@@ -86,6 +86,7 @@ private:
 	void flipscreen_y_w(uint8_t data);
 	void gridiron_led0_w(uint8_t data);
 	void gridiron_led1_w(uint8_t data);
+	uint8_t teedoff_unk_r();
 	uint8_t portA_r();
 	uint8_t portB_r();
 	void portA_w(uint8_t data);

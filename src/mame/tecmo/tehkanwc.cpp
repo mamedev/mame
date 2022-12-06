@@ -23,7 +23,8 @@ About 'teedoff' :
 
 The main problem with that game is that it should sometimes jumps into shared memory
 (see 'init_teedoff' function below) depending on a value that is supposed to be
-in the palette RAM !
+in the palette RAM ! (maybe palette RAM is write only, and this is an open bus read
+or was used for debugging during the game development?)
 
 Palette RAM is reset here (main CPU) :
 
@@ -222,7 +223,11 @@ WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
 
 /* End of MSM with counters emulation */
 
-
+uint8_t tehkanwc_state::teedoff_unk_r()
+{
+	logerror("%s: teedoff_unk_r\n", machine().describe_context());
+	return 0x80;
+}
 
 void tehkanwc_state::main_mem(address_map &map)
 {
@@ -231,8 +236,9 @@ void tehkanwc_state::main_mem(address_map &map)
 	map(0xc800, 0xcfff).ram().share("share1");
 	map(0xd000, 0xd3ff).ram().w(FUNC(tehkanwc_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(tehkanwc_state::colorram_w)).share("colorram");
-	map(0xd800, 0xddff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xde00, 0xdfff).ram().share("share5"); /* unused part of the palette RAM, I think? Gridiron uses it */
+	map(0xd800, 0xddff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xda00, 0xda00).r(FUNC(tehkanwc_state::teedoff_unk_r));
+	map(0xde00, 0xdfff).writeonly().share("share5"); /* unused part of the palette RAM, I think? Gridiron uses it */
 	map(0xe000, 0xe7ff).ram().w(FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
 	map(0xe800, 0xebff).ram().share("spriteram"); /* sprites */
 	map(0xec00, 0xec01).ram().w(FUNC(tehkanwc_state::scroll_x_w));
@@ -258,8 +264,8 @@ void tehkanwc_state::sub_mem(address_map &map)
 	map(0xc800, 0xcfff).ram().share("share1");
 	map(0xd000, 0xd3ff).ram().w(FUNC(tehkanwc_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(tehkanwc_state::colorram_w)).share("colorram");
-	map(0xd800, 0xddff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xde00, 0xdfff).ram().share("share5"); /* unused part of the palette RAM, I think? Gridiron uses it */
+	map(0xd800, 0xddff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xde00, 0xdfff).writeonly().share("share5"); /* unused part of the palette RAM, I think? Gridiron uses it */
 	map(0xe000, 0xe7ff).ram().w(FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
 	map(0xe800, 0xebff).ram().share("spriteram"); /* sprites */
 	map(0xec00, 0xec01).ram().w(FUNC(tehkanwc_state::scroll_x_w));
@@ -726,45 +732,6 @@ void tehkanwc_state::tehkanwcb(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void tehkanwc_state::init_teedoffj()
-{
-	/* Patch to avoid the game jumping in shared memory */
-
-	/* Code at 0x0233 (main CPU) :
-
-	    0233: 3A 00 DA    ld   a,($DA00)
-	    0236: CB 7F       bit  7,a
-	    0238: CA 00 C8    jp   z,$C800
-
-	   changed to :
-
-	    0233: 3A 00 DA    ld   a,($DA00)
-	    0236: CB 7F       bit  7,a
-	    0238: 00          nop
-	    0239: 00          nop
-	    023A: 00          nop
-	*/
-	// Update 2022: sub CPU doesn't seem responsible for sharing code to main,
-	// and bit 7 write to 0xca00 happens after that main checks it out during attract.
-	// Notice that main CPU just fakes the ROM checksum check at startup, just drawing ROM # OK at PC=0x1726
-	// There's also this (nsfw link) -> https://sudden-desu.net/entry/tee-d-off-a-saucy-secret-and-hidden-dev-credits
-	// which combined could have potentially indicated a bad dump problem, but the clone set
-	// has the same "protection" code at a different address
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	ROM[0x0238] = 0x00;
-	ROM[0x0239] = 0x00;
-	ROM[0x023a] = 0x00;
-}
-
-
-void tehkanwc_state::init_teedoff()
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	ROM[0x023a] = 0x00;
-	ROM[0x023b] = 0x00;
-	ROM[0x023c] = 0x00;
-}
 
 /***************************************************************************
 
@@ -1046,5 +1013,5 @@ GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,
 
 GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
 
-GAME( 1987, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, init_teedoff, ROT90, "Tecmo",   "Tee'd Off (World)",                  MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
-GAME( 1986, teedoffj,  teedoff,  tehkanwc, teedoff,  tehkanwc_state, init_teedoffj,ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (World)",                  MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
+GAME( 1986, teedoffj,  teedoff,  tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )
