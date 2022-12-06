@@ -67,12 +67,12 @@ void pc88va_sgp_device::device_reset()
 void pc88va_sgp_device::sgp_io(address_map &map)
 {
 	// TODO: check if readable
-	map(0x00, 0x03).w(FUNC(pc88va_sgp_device::sgp_vdp_address_w));
+	map(0x00, 0x03).w(FUNC(pc88va_sgp_device::vdp_address_w));
 //  map(0x04, 0x04) bit 1 force stop, bit 2 enable SGP irq (also clear?)
-	map(0x06, 0x06).rw(FUNC(pc88va_sgp_device::sgp_status_r), FUNC(pc88va_sgp_device::sgp_trigger_w));
+	map(0x06, 0x06).rw(FUNC(pc88va_sgp_device::status_r), FUNC(pc88va_sgp_device::trigger_w));
 }
 
-void pc88va_sgp_device::sgp_vdp_address_w(offs_t offset, u16 data, u16 mem_mask)
+void pc88va_sgp_device::vdp_address_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vdp_address[offset]);
 }
@@ -80,22 +80,22 @@ void pc88va_sgp_device::sgp_vdp_address_w(offs_t offset, u16 data, u16 mem_mask)
 /*
  * ---- ---x (1) busy flag
  */
-u8 pc88va_sgp_device::sgp_status_r()
+u8 pc88va_sgp_device::status_r()
 {
 	return 0;
 }
 
-void pc88va_sgp_device::sgp_trigger_w(u8 data)
+void pc88va_sgp_device::trigger_w(u8 data)
 {
 	// TODO: under a timer
 	if (BIT(data, 0))
-		sgp_exec();
+		start_exec();
 
 	if (data != 1)
 		LOG("Warning: SGP trigger write %02x\n", data);
 }
 
-void pc88va_sgp_device::sgp_exec()
+void pc88va_sgp_device::start_exec()
 {
 	u32 vdp_pointer = (m_vdp_address[0]) | (m_vdp_address[1] << 16);
 	// TODO: the SGP should go indefinitely until an END is issued
@@ -170,9 +170,9 @@ void pc88va_sgp_device::sgp_exec()
 				ptr->address = (m_data->read_word(vdp_pointer + 10) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 12) << 16);
 
-				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x H %d V %d Pitch %d address %08x\n"
+				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x|H %4d|V %4d|Pitch %5d| address %08x\n"
 					, vdp_pointer
-					, mode ? "DESTINATION" : "SOURCE"
+					, mode ? "DESTINATION" : "SOURCE     "
 					, param1
 					, ptr->hsize
 					, ptr->vsize

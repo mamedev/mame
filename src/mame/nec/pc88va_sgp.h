@@ -42,10 +42,11 @@ private:
 
 	BufferArea m_src, m_dst;
 
-	void sgp_vdp_address_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u8 sgp_status_r();
-	void sgp_trigger_w(u8 data);
-	void sgp_exec();
+	void vdp_address_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 status_r();
+	void trigger_w(u8 data);
+
+	void start_exec();
 
 	// commands
 };
