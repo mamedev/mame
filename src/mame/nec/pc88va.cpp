@@ -579,7 +579,7 @@ void pc88va_state::misc_ctrl_w(uint8_t data)
 
 void pc88va_state::main_map(address_map &map)
 {
-	map(0x00000, 0x7ffff).ram();
+	map(0x00000, 0x7ffff).ram().share("workram");
 //  map(0x80000, 0x9ffff).ram(); // EMM
 	map(0xa0000, 0xdffff).m(m_sysbank, FUNC(address_map_bank_device::amap16));
 	map(0xe0000, 0xeffff).bankr("rom00_bank");
@@ -608,22 +608,14 @@ void pc88va_state::sysbank_map(address_map &map)
 // SGP has its own window space about how and what it can see on RMW
 void pc88va_state::sgp_map(address_map &map)
 {
-//  map(0x000000, 0x09ffff) main RAM
+	map(0x000000, 0x07ffff).ram().share("workram");
+//  map(0x080000, 0x09ffff) more main RAM or EMM
 //  map(0x0a0000, 0x0fffff) EMM $a0000 to $fffff (?)
 	map(0x100000, 0x13ffff).rom().region("kanji", 0x00000);
 	map(0x140000, 0x14ffff).rom().region("kanji", 0x40000);
 	map(0x150000, 0x153fff).rw(FUNC(pc88va_state::kanji_ram_r),FUNC(pc88va_state::kanji_ram_w));
 	map(0x180000, 0x18ffff).ram().share("tvram");
 	map(0x200000, 0x23ffff).ram().share("gvram");
-}
-
-
-void pc88va_state::sgp_io(address_map &map)
-{
-	// TODO: check if readable
-	map(0x00, 0x03).w(FUNC(pc88va_state::sgp_vdp_address_w));
-//  map(0x04, 0x04) bit 1 force stop, bit 2 enable SGP irq (also clear?)
-	map(0x06, 0x06).rw(FUNC(pc88va_state::sgp_status_r), FUNC(pc88va_state::sgp_trigger_w));
 }
 
 // TODO: I/O 0x00xx is almost same as pc8801
@@ -702,7 +694,7 @@ void pc88va_state::io_map(address_map &map)
 	// TODO: shinraba writes to 0x340-0x37f on transition between opening and title screens (mirror? core bug?)
 	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
 
-	map(0x0500, 0x0507).m(*this, FUNC(pc88va_state::sgp_io));
+	map(0x0500, 0x0507).m(m_sgp, FUNC(pc88va_sgp_device::sgp_io));
 	// GVRAM multiplane access regs
 //  map(0x0510, 0x0510) AACC extend access mode
 //  map(0x0512, 0x0512) GMAP block switch
@@ -1206,6 +1198,9 @@ void pc88va_state::pc88va(machine_config &config)
 //  m_palette->set_init(FUNC(pc88va_state::pc8801));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc88va);
 
+	PC88VA_SGP(config, m_sgp);
+	m_sgp->set_map(&pc88va_state::sgp_map);
+
 	i8255_device &d8255_3(I8255(config, "d8255_3"));
 	d8255_3.in_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_r));
 	d8255_3.out_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_w));
@@ -1214,13 +1209,7 @@ void pc88va_state::pc88va(machine_config &config)
 	d8255_3.in_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_r));
 	d8255_3.out_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_w));
 
-#if 0
-	PIC8259(config, m_pic1, 0);
-	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
-	m_pic1->in_sp_callback().set_constant(1);
-	m_pic1->read_slave_ack_callback().set(FUNC(pc88va_state::get_slave_ack));
-#endif
-
+	// external PIC
 	PIC8259(config, m_pic2, 0);
 	m_pic2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
 	m_pic2->in_sp_callback().set_constant(0);

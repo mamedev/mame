@@ -1,0 +1,43 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
+
+#ifndef MAME_NEC_PC88VA_SGP_H
+#define MAME_NEC_PC88VA_SGP_H
+
+#pragma once
+
+class pc88va_sgp_device :
+	public device_t,
+	public device_memory_interface
+{
+public:
+	pc88va_sgp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	template <typename... T> pc88va_sgp_device& set_map(T &&... args) { set_addrmap(AS_DATA, std::forward<T>(args)...); return *this; }
+
+	void sgp_io(address_map &map);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_config_complete() override;
+
+	virtual space_config_vector memory_space_config() const override;
+
+private:
+	address_space_config m_data_config;
+	address_space *m_data;
+
+	u16 m_vdp_address[2]{};
+	u32 m_work_address = 0;
+
+	void sgp_vdp_address_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 sgp_status_r();
+	void sgp_trigger_w(u8 data);
+	void sgp_exec();
+};
+
+
+DECLARE_DEVICE_TYPE(PC88VA_SGP, pc88va_sgp_device)
+
+#endif  // MAME_NEC_PC88VA_SGP_H

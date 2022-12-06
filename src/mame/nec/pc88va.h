@@ -14,15 +14,15 @@
 #include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
-//#include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
-//#include "machine/pit8253.h"
-//#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "machine/bankdev.h"
 #include "machine/upd1990a.h"
 #include "sound/ymopn.h"
+
+//#include "pc80s31k.h"
+#include "pc88va_sgp.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -48,10 +48,12 @@ public:
 		, m_rspeaker(*this, "rspeaker")
 		, m_palram(*this, "palram")
 		, m_sysbank(*this, "sysbank")
+		, m_workram(*this, "workram")
 		, m_tvram(*this, "tvram")
 		, m_gvram(*this, "gvram")
 		, m_fb_regs(*this, "fb_regs")
 		, m_kanji_rom(*this, "kanji")
+		, m_sgp(*this, "sgp")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 	{ }
@@ -106,10 +108,12 @@ private:
 	required_device<speaker_device> m_rspeaker;
 	required_shared_ptr<uint16_t> m_palram;
 	required_device<address_map_bank_device> m_sysbank;
+	required_shared_ptr<uint16_t> m_workram;
 	required_shared_ptr<uint16_t> m_tvram;
 	required_shared_ptr<uint16_t> m_gvram;
 	required_shared_ptr<uint16_t> m_fb_regs;
 	required_region_ptr<u16> m_kanji_rom;
+	required_device<pc88va_sgp_device> m_sgp;
 	std::unique_ptr<uint8_t[]> m_kanjiram;
 
 	uint16_t m_bank_reg = 0;
@@ -237,21 +241,7 @@ private:
 	void sysbank_map(address_map &map);
 	void opna_map(address_map &map);
 
-	// SGP
-	struct sgp_t
-	{
-		u16 vdp_address[2];
-		u32 work_address;
-	};
-	sgp_t m_sgp;
-
 	void sgp_map(address_map &map);
-	void sgp_io(address_map &map);
-
-	void sgp_vdp_address_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u8 sgp_status_r();
-	void sgp_trigger_w(u8 data);
-	void sgp_exec();
 
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
