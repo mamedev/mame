@@ -3282,6 +3282,9 @@
 			<param name="x" start="143" increment="17" />
 
 			<element name="vfd~i~" ref="vfd0">
+				<animate name="vfdduty0"/>
+				<color state="0" red="0.00" green="1.00" blue="1.00" alpha="0.0"/>
+				<color state="31" red="0.00" green="1.00" blue="1.00" alpha="1.0"/>
 				<bounds x="~x~" y="435" width="17" height="30"/>
 			</element>
 		</repeat>

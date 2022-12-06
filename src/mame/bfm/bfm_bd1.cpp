@@ -2,9 +2,9 @@
 // copyright-holders:James Wallace
 /**********************************************************************
 
-    Bellfruit BD1 VFD module interface and emulation by J.Wallace
+    Bellfruit BD1 VFD module interface and emulation 
 
-    TODO: Implement flashing (our only datasheet has that section
+    TODO: Verify flashing (our only datasheet has that section
     completely illegible)
 
     This is a simulation of code running on an NEC D78042GF-090
@@ -76,7 +76,7 @@ static const uint16_t BD1charset[]=
 	0xC62D, // 1100 0110 0010 1101 $.
 	0x0100, // 0000 0001 0000 0000 flash character
 	0x0000, // 0000 0000 0000 0000 not defined
-	0x0040, // 0000 0000 1000 0000 '.
+	0x0080, // 0000 0000 1000 0000 '.
 	0x0880, // 0000 1000 1000 0000 (.
 	0x0050, // 0000 0000 0101 0000 ).
 	0xCCD8, // 1100 1100 1101 1000 *.
@@ -88,7 +88,7 @@ static const uint16_t BD1charset[]=
 	0x22B7, // 0010 0010 1011 0111 0.
 	0x0408, // 0000 0100 0000 1000 1.
 	0xE206, // 1110 0010 0000 0110 2.
-	0x4226, // 0100 0010 0010 0110 3.
+	0xC226, // 0100 0010 0010 0110 3.
 	0xC023, // 1100 0000 0010 0011 4.
 	0xC225, // 1100 0010 0010 0101 5.
 	0xE225, // 1110 0010 0010 0101 6.
@@ -146,10 +146,12 @@ void bfm_bd1_device::device_reset()
 	m_shift_count = 0;
 	m_shift_data = 0;
 	m_pcursor_pos = 0;
-	m_scroll_active = 0;
+	m_scroll_active = false;
 	m_display_mode = 0;
 	m_flash_rate = 0;
 	m_flash_control = 0;
+    m_flash = false;
+    m_flash_timer = 0;
 	m_user_data = 0;
 	m_user_def = 0;
 	m_sclk = 0;
@@ -171,8 +173,53 @@ void bfm_bd1_device::device_post_load()
 
 void bfm_bd1_device::update_display()
 {
+	  if ( m_flash_timer ) {
+		m_flash_timer--;
+		if ( !m_flash_timer ) {
+		  m_flash_timer = 20;
+		  if ( !m_flash ) {
+			switch ( m_flash_control ) {
+			  case 1:    // Flash Inside Window
+				for ( int i = 0; i < 16; i++ ) {
+				  if ( (i >= m_window_start) && (i <= m_window_end) )
+					  m_attrs[i] = AT_FLASH;
+				  else
+					  m_attrs[i] = AT_NORMAL;
+				}
+				m_flash = true;
+				break;
+			  case 2:    // Flash Outside Window
+				for ( int i = 0; i < 16; i++ ) {
+				  if ( (i < m_window_start) || (i > m_window_end) )
+					  m_attrs[i] = AT_FLASH;
+				  else
+					  m_attrs[i] = AT_NORMAL;
+				}
+				m_flash = true;
+				break;
+			  case 3:    // Flash All
+				for ( int i = 0; i < 16; i++ )
+					m_attrs[i] = AT_FLASH;
+				m_flash = true;
+				break;
+			}
+		  } else {
+			m_flash_rate--;
+			if ( !m_flash_rate ) {
+			  m_flash_timer = 0;
+				for ( int i = 0; i < 16; i++ ) {
+					  m_attrs[i] = AT_NORMAL;
+				}
+			}
+			if ( m_flash_control ) {
+			  m_flash = false;
+			}
+		  }
+		}
+	  }
+	
 	for (int i = 0; i < 16; i++)
-		(*m_outputs)[i] = (m_attrs[i] != AT_BLANK) ? set_display(m_chars[i]) : 0;
+		(*m_outputs)[i] = (m_attrs[i] == AT_NORMAL) ? set_display(m_chars[i]) : 0;
 }
 ///////////////////////////////////////////////////////////////////////////
 void bfm_bd1_device::blank(int data)
@@ -240,41 +287,46 @@ int bfm_bd1_device::write_char(int data)
 			return 0;
 		}
 
-		setdata( m_user_data, data);
+		setdata(m_user_data, data);
 	}
 	else
 	{
 		if(data < 0x80)//characters
 		{
-			if (data > 0x3F)
+			if (data > 0x3f)
 			{
-				//  logerror("Undefined character %x \n", data);
+				logerror("Undefined character %x \n", data);
 			}
 
-			setdata(BD1charset[(data & 0x3F)], data);
+			setdata(BD1charset[(data & 0x3f)], data);
 		}
 		else
 		{
-			switch ( data & 0xF0 )
+			switch ( data & 0xf0 )
 			{
 			case 0x80:  // 0x80 - 0x8F Set display blanking
 				blank(data&0x03);//use the blanking data
+
+				if (data == 0x84)
+				{
+					popmessage("Duty control active, contact MAMEDEV");
+				}
 				break;
 
 			case 0x90:  // 0x90 - 0x9F Set cursor pos
-				m_cursor_pos = data & 0x0F;
-				m_scroll_active = 0;
+				m_cursor_pos = data & 0x0f;
+				m_scroll_active = false;
 				if ( m_display_mode == 2 )
 				{
 					if ( m_cursor_pos >= m_window_end) m_scroll_active = 1;
 				}
 				break;
 
-			case 0xA0:  // 0xA0 - 0xAF Set display mode
+			case 0xa0:  // 0xA0 - 0xAF Set display mode
 				m_display_mode = data &0x03;
 				break;
 
-			case 0xB0:  // 0xB0 - 0xBF Clear display area
+			case 0xb0:  // 0xB0 - 0xBF Clear display area
 
 				switch ( data & 0x03 )
 				{
@@ -319,21 +371,31 @@ int bfm_bd1_device::write_char(int data)
 				}
 				break;
 
-			case 0xC0:  // 0xC0 - 0xCF Set flash rate
-				m_flash_rate = data & 0x0F;
+			case 0xc0:  // 0xC0 - 0xCF Set flash rate
+				m_flash_rate = data & 0x0f;
+				if ( !m_flash_rate && m_flash ) 
+				{
+					m_flash_timer = 0;
+					m_flash = false;
+				}
+				m_flash_timer = 20;
 				break;
 
-			case 0xD0:  // 0xD0 - 0xDF Set Flash control
+			case 0xd0:  // 0xD0 - 0xDF Set Flash control
 				m_flash_control = data & 0x03;
+				if ( m_flash_control == 0 && m_flash ) {
+					m_flash_timer = 0;
+					m_flash = false;
+				}
 				break;
 
-			case 0xE0:  // 0xE0 - 0xEF Set window start pos
-				m_window_start = data &0x0F;
+			case 0xe0:  // 0xE0 - 0xEF Set window start pos
+				m_window_start = data &0x0f;
 				m_window_size  = (m_window_end - m_window_start)+1;
 				break;
 
-			case 0xF0:  // 0xF0 - 0xFF Set window end pos
-				m_window_end   = data &0x0F;
+			case 0xf0:  // 0xF0 - 0xFF Set window end pos
+				m_window_end   = data &0x0f;
 				m_window_size  = (m_window_end - m_window_start)+1;
 				m_scroll_active = 0;
 				if ( m_display_mode == 2 )
@@ -345,6 +407,9 @@ int bfm_bd1_device::write_char(int data)
 					}
 				}
 				break;
+
+			default:
+				popmessage("%x",data);
 			}
 		}
 	}
@@ -367,6 +432,7 @@ void bfm_bd1_device::setdata(int segdata, int data)
 		}
 		else
 		{
+			m_attrs[m_pcursor_pos] = AT_FLASH;
 			m_chars[m_pcursor_pos] |= (1<<8);
 		}
 		break;
@@ -374,8 +440,8 @@ void bfm_bd1_device::setdata(int segdata, int data)
 	case 0x26:  // undefined
 		break;
 
-	case 0x2C:  // semicolon
-	case 0x2E:  // decimal point
+	case 0x2c:  // semicolon
+	case 0x2e:  // decimal point
 		if( m_chars[m_pcursor_pos] & (1<<12))
 		{
 			move++;
@@ -386,13 +452,14 @@ void bfm_bd1_device::setdata(int segdata, int data)
 		}
 		break;
 
-	case 0x3B:  // dummy char
+	case 0x3a:
+		m_user_def = 2;
+		break;
+
+	case 0x3b:  // dummy char
 		move++;
 		break;
 
-	case 0x3A:
-		m_user_def = 2;
-		break;
 
 	default:
 		move++;
@@ -414,7 +481,7 @@ void bfm_bd1_device::setdata(int segdata, int data)
 		switch ( mode )
 		{
 		case 0: // rotate left
-			m_cursor_pos &= 0x0F;
+			m_cursor_pos &= 0x0f;
 
 			if ( change )
 			{
@@ -426,7 +493,7 @@ void bfm_bd1_device::setdata(int segdata, int data)
 
 
 		case 1: // Rotate right
-			m_cursor_pos &= 0x0F;
+			m_cursor_pos &= 0x0f;
 
 			if ( change )
 			{
