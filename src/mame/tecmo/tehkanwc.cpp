@@ -1046,5 +1046,5 @@ GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,
 
 GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
 
-GAME( 1986, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, init_teedoff, ROT90, "Tecmo",   "Tee'd Off (World)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
+GAME( 1987, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, init_teedoff, ROT90, "Tecmo",   "Tee'd Off (World)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
 GAME( 1986, teedoffj,  teedoff,  tehkanwc, teedoff,  tehkanwc_state, init_teedoffj,ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
