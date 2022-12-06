@@ -6,6 +6,10 @@ NEC SGP (スーパーグラフィックプロセッサ / Super Graphic Processor
 
 Unknown part number, used as GPU for PC88VA
 
+TODO:
+- timing details
+- specifics about what exactly happens in work area when either SGP runs or is idle.
+
 **************************************************************************************************/
 
 #include "emu.h"
@@ -14,15 +18,14 @@ Unknown part number, used as GPU for PC88VA
 #include <iostream>
 
 
-#define LOG_SGP     (1U << 2)
+#define LOG_COMMAND     (1U << 2)
 
-
-#define VERBOSE (LOG_GENERAL | LOG_SGP)
+#define VERBOSE (LOG_GENERAL | LOG_COMMAND)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
-#define LOGSGP(...)       LOGMASKED(LOG_SGP, __VA_ARGS__)
+#define LOGCOMMAND(...)       LOGMASKED(LOG_COMMAND, __VA_ARGS__)
 
 // device type definition
 DEFINE_DEVICE_TYPE(PC88VA_SGP, pc88va_sgp_device, "pc88va_sgp", "NEC PC88VA Super Graphic Processor")
@@ -99,7 +102,7 @@ void pc88va_sgp_device::sgp_exec()
 	// for now punt early until we find something that warrants a parallel execution
 	// boomer is the current upper limit, uses SGP to transfer rows on vertical scrolling.
 	const u32 end_pointer = vdp_pointer + 0x800;
-	LOGSGP("SGP: trigger start %08x\n", vdp_pointer);
+	LOGCOMMAND("SGP: trigger start %08x\n", vdp_pointer);
 
 	bool end_issued = false;
 
@@ -112,12 +115,12 @@ void pc88va_sgp_device::sgp_exec()
 		{
 			// END
 			case 0x0001:
-				LOGSGP("SGP: (PC=%08x) END\n", vdp_pointer);
+				LOGCOMMAND("SGP: (PC=%08x) END\n", vdp_pointer);
 				end_issued = true;
 				break;
 			// NOP
 			case 0x0002:
-				LOGSGP("SGP: (PC=%08x) NOP\n", vdp_pointer);
+				LOGCOMMAND("SGP: (PC=%08x) NOP\n", vdp_pointer);
 				break;
 			// SET WORK
 			case 0x0003:
@@ -133,7 +136,7 @@ void pc88va_sgp_device::sgp_exec()
 				const u16 upper_offset = m_data->read_word(vdp_pointer + 4);
 
 				m_work_address = lower_offset | upper_offset << 16;
-				LOGSGP("SGP: (PC=%08x) SET WORK %08x\n",
+				LOGCOMMAND("SGP: (PC=%08x) SET WORK %08x\n",
 					vdp_pointer,
 					m_work_address
 				);
@@ -164,7 +167,7 @@ void pc88va_sgp_device::sgp_exec()
 				const u32 src_address = (m_data->read_word(vdp_pointer + 10) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 12) << 16);
 
-				LOGSGP("SGP: (PC=%08x) SET %s %04x %04x %04x %04x %08x\n"
+				LOGCOMMAND("SGP: (PC=%08x) SET %s %04x %04x %04x %04x %08x\n"
 					, vdp_pointer
 					, mode ? "DESTINATION" : "SOURCE"
 					, param1
@@ -180,7 +183,7 @@ void pc88va_sgp_device::sgp_exec()
 			case 0x0006:
 			{
 				const u16 color_code = m_data->read_word(vdp_pointer + 2);
-				LOGSGP("SGP: (PC=%08x) SET COLOR %04x\n"
+				LOGCOMMAND("SGP: (PC=%08x) SET COLOR %04x\n"
 					, vdp_pointer
 					, color_code
 				);
@@ -223,7 +226,7 @@ void pc88va_sgp_device::sgp_exec()
 				const u8 mode = cur_opcode == 0x0008;
 				const u16 draw_mode = m_data->read_word(vdp_pointer + 2);
 
-				LOGSGP("SGP: (PC=%08x) %s %04x\n"
+				LOGCOMMAND("SGP: (PC=%08x) %s %04x\n"
 					, vdp_pointer
 					, mode ? "PATBLT" : "BITBLT"
 					, draw_mode
@@ -247,7 +250,7 @@ void pc88va_sgp_device::sgp_exec()
 					| (m_data->read_word(vdp_pointer + 14) << 16);
 
 				// Note: start dot position and pixel mode set by SET SOURCE
-				LOGSGP("SGP: (PC=%08x) LINE %04x %04x %04x %04x %04x %08x\n"
+				LOGCOMMAND("SGP: (PC=%08x) LINE %04x %04x %04x %04x %04x %08x\n"
 					, vdp_pointer
 					, draw_mode
 					, unk_param
@@ -267,7 +270,7 @@ void pc88va_sgp_device::sgp_exec()
 				const u32 word_size = (m_data->read_word(vdp_pointer + 6))
 					| (m_data->read_word(vdp_pointer + 8) << 16);
 
-				LOGSGP("SGP: (PC=%08x) CLS %08x %08x\n"
+				LOGCOMMAND("SGP: (PC=%08x) CLS %08x %08x\n"
 					, vdp_pointer
 					, src_address
 					, word_size
@@ -285,14 +288,14 @@ void pc88va_sgp_device::sgp_exec()
 				// It updates the horizontal size of destination if the color is found,
 				// returns 0 if the pixel is at origin, doesn't update if not found.
 				const u8 mode = cur_opcode == 0x000c;
-				LOGSGP("SGP: (PC=%08x) %s\n"
+				LOGCOMMAND("SGP: (PC=%08x) %s\n"
 					, vdp_pointer
 					, mode ? "SCAN LEFT" : "SCAN RIGHT"
 				);
 				break;
 			}
 			default:
-				LOGSGP("SGP: (PC=%08x) %04x???\n", vdp_pointer, cur_opcode);
+				LOGCOMMAND("SGP: (PC=%08x) %04x???\n", vdp_pointer, cur_opcode);
 		}
 
 		if (end_issued == true)
@@ -302,6 +305,6 @@ void pc88va_sgp_device::sgp_exec()
 	}
 
 	if (vdp_pointer >= end_pointer)
-		LOGSGP("Warning: execution punt without an END issued\n");
+		LOG("Warning: execution punt without an END issued\n");
 }
 
