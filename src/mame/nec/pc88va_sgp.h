@@ -31,10 +31,23 @@ private:
 	u16 m_vdp_address[2]{};
 	u32 m_work_address = 0;
 
+	struct BufferArea {
+		u8 start_dot = 0;
+		u8 pixel_mode = 0;
+		u16 hsize = 0;
+		u16 vsize = 0;
+		u16 fb_pitch = 0;
+		u32 address = 0;
+	};
+
+	BufferArea m_src, m_dst;
+
 	void sgp_vdp_address_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 sgp_status_r();
 	void sgp_trigger_w(u8 data);
 	void sgp_exec();
+
+	// commands
 };
 
 

@@ -150,6 +150,8 @@ void pc88va_sgp_device::sgp_exec()
 			case 0x0005:
 			{
 				const bool mode = cur_opcode == 5;
+				BufferArea *ptr = mode ? &m_dst : &m_src;
+
 				/*
 				 * ---- ---- xxxx ---- start dot position
 				 * ---- ---- ---- --xx SCRN_M: pixel mode
@@ -159,22 +161,23 @@ void pc88va_sgp_device::sgp_exec()
 				 * ---- ---- ---- --11 RGB565
 				 */
 				const u16 param1 = m_data->read_word(vdp_pointer + 2);
-				//const u8 start_dot = (param1 & 0xf0) >> 4;
-				//const u8 pixel_mode = (param1 & 0x03);
-				const u16 src_hsize = m_data->read_word(vdp_pointer + 4) & 0x0fff;
-				const u16 src_vsize = m_data->read_word(vdp_pointer + 6) & 0x0fff;
-				const u16 fb_pitch = m_data->read_word(vdp_pointer + 8) & 0xfffc;
-				const u32 src_address = (m_data->read_word(vdp_pointer + 10) & 0xfffe)
+				
+				ptr->start_dot = (param1 & 0xf0) >> 4;
+				ptr->pixel_mode = (param1 & 0x03);
+				ptr->hsize = m_data->read_word(vdp_pointer + 4) & 0x0fff;
+				ptr->vsize = m_data->read_word(vdp_pointer + 6) & 0x0fff;
+				ptr->fb_pitch = m_data->read_word(vdp_pointer + 8) & 0xfffc;
+				ptr->address = (m_data->read_word(vdp_pointer + 10) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 12) << 16);
 
-				LOGCOMMAND("SGP: (PC=%08x) SET %s %04x %04x %04x %04x %08x\n"
+				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x H %d V %d Pitch %d address %08x\n"
 					, vdp_pointer
 					, mode ? "DESTINATION" : "SOURCE"
 					, param1
-					, src_hsize
-					, src_vsize
-					, fb_pitch
-					, src_address
+					, ptr->hsize
+					, ptr->vsize
+					, ptr->fb_pitch
+					, ptr->address
 				);
 
 				next_pc += 12;
