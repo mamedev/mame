@@ -13,6 +13,7 @@
 #pragma once
 
 #include "flopimg.h"
+#include "flopimg_legacy.h"
 
 
 /***************************************************************************
@@ -21,14 +22,21 @@
 
 ***************************************************************************/
 
-#define APPLE2_NIBBLE_SIZE 416
-#define APPLE2_SMALL_NIBBLE_SIZE 374
-#define APPLE2_STD_TRACK_COUNT 35
-#define APPLE2_TRACK_COUNT 40
-#define APPLE2_SECTOR_COUNT 16
-#define APPLE2_SECTOR_SIZE 256
+#define APPLE2_NIBBLE_SIZE              416
+#define APPLE2_SMALL_NIBBLE_SIZE        374
+#define APPLE2_STD_TRACK_COUNT          35
+#define APPLE2_TRACK_COUNT              40
+#define APPLE2_SECTOR_COUNT             16
+#define APPLE2_SECTOR_SIZE              256
+
+
 
 /**************************************************************************/
+
+LEGACY_FLOPPY_OPTIONS_EXTERN(apple2);
+
+// new style code
+
 class a2_16sect_format : public floppy_image_format_t
 {
 public:

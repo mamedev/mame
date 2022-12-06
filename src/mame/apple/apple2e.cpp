@@ -5230,6 +5230,13 @@ void apple2e_state::apple2c(machine_config &config)
 	m_ram->set_default_size("128K").set_extra_options("128K");
 }
 
+static const floppy_interface floppy_interface =
+{
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
+	"floppy_5_25"
+};
+
 void apple2e_state::apple2cp(machine_config &config)
 {
 	apple2c(config);
