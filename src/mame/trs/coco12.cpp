@@ -812,6 +812,12 @@ ROM_START(coco2)
 	ROM_LOAD("extbas11.rom",    0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 ROM_END
 
+ROM_START(deluxecoco)
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("bas20.rom",   0x2000, 0x2000, NO_DUMP CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
+	ROM_LOAD("extbas20.rom",    0x0000, 0x2000, NO_DUMP CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
+ROM_END
+
 ROM_START(coco2b)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
 	ROM_LOAD("bas13.rom",   0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
@@ -866,7 +872,6 @@ ROM_END
 
 #define rom_cocoh rom_coco
 #define rom_cocoeh rom_cocoe
-#define rom_deluxecoco rom_coco2b
 #define rom_coco2h rom_coco2
 #define rom_coco2bh rom_coco2b
 
