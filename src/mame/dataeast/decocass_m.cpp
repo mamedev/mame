@@ -358,6 +358,15 @@ static uint8_t type1_pass_136_table[8] ={ T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM
 
 /***************************************************************************
  *
+ *  TYPE1 DONGLE
+ *  - Nebula
+ *
+ ***************************************************************************/
+
+static uint8_t type1_nebula_table[8] ={ T1PROM,T1PROM,T1DIRECT,T1DIRECT,   T1PROM,T1DIRECT,T1PROM,T1PROM };
+
+/***************************************************************************
+ *
  *  TYPE1 DONGLE (DE-0061)
  *  - Manhattan
  *
@@ -1385,6 +1394,14 @@ MACHINE_RESET_MEMBER(decocass_type1_state,ctsttape)
 	LOG(0,("dongle type #1 (DE-0061)\n"));
 	m_type1_map = type1_pass_136_table;
 }
+
+MACHINE_RESET_MEMBER(decocass_type1_state,cnebula)
+{
+	machine_reset();
+	LOG(0,("dongle type #1 (DE-0061)\n"));
+	m_type1_map = type1_nebula_table;
+}
+
 
 MACHINE_RESET_MEMBER(decocass_type1_state,chwy)
 {
