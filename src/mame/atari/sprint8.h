@@ -25,7 +25,9 @@ public:
 		m_video_ram(*this, "video_ram"),
 		m_pos_h_ram(*this, "pos_h_ram"),
 		m_pos_v_ram(*this, "pos_v_ram"),
-		m_pos_d_ram(*this, "pos_d_ram")
+		m_pos_d_ram(*this, "pos_d_ram"),
+		m_in(*this, "P%u", 1U),
+		m_dial(*this, "DIAL%u", 1U)
 	{ }
 
 	void sprint8(machine_config &config);
@@ -67,12 +69,14 @@ private:
 	required_shared_ptr<uint8_t> m_pos_v_ram;
 	required_shared_ptr<uint8_t> m_pos_d_ram;
 
-	int m_steer_dir[8]{};
-	int m_steer_flag[8]{};
-	int m_collision_reset = 0;
-	int m_collision_index = 0;
-	uint8_t m_dial[8]{};
-	int m_team = 0;
+	required_ioport_array<8> m_in;
+	required_ioport_array<8> m_dial;
+
+	uint8_t m_steering[8]{};
+	bool m_collision_reset = false;
+	uint8_t m_collision_index = 0;
+	uint8_t m_prev_dial[8]{};
+	bool m_team = false;
 
 	tilemap_t* m_tilemap1 = nullptr;
 	tilemap_t* m_tilemap2 = nullptr;
