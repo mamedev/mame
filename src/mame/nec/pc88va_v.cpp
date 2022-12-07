@@ -115,7 +115,7 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 		if(cur_pri_lv & 8) // enable layer
 		{
-			// why this is even a thing ...
+			// TODO: ballbrkr and tetris definitely wants this to have an higher priority
 			if(pri <= 1) // (direct color mode, priority 5 and 4)
 			{
 				switch(cur_pri_lv & 3)

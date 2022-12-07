@@ -332,9 +332,10 @@ void pc88va_sgp_device::cmd_blit(u16 draw_mode, bool is_patblt)
 	if (is_patblt == true)
 	{
 		LOG("PATBLT\n");
-		return;
+	//	return;
 	}
 
+	// ballbrkr: 6
 	if (logical_op != 5)
 	{
 		LOG("BITBLT logical_op == %d\n", logical_op);
