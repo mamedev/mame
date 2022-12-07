@@ -245,8 +245,6 @@ private:
 	// Fire Shark sound
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	u8 soundlatch_r();
-	void sound_done_w(u8 data);
 	u8 cmdavailable_r();
 	u8 port_6_word_r();
 
