@@ -233,6 +233,11 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			int fg_col = (tvram[(offs + i + 6) / 2] & 0xf0) >> 4;
 			int bc = (tvram[(offs + i + 6) / 2] & 0x08) >> 3;
 
+			// sprites don't draw if color is zero
+			// (shanghai exit from menuing)
+			if (!fg_col && !bc)
+				continue;
+
 			xsize = (xsize + 1) * 32;
 			ysize = (ysize + 1) * 4;
 
@@ -252,11 +257,11 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 							continue;
 
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
-						int pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15 - x_s)) & 1;
+						u8 pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15 - x_s)) & 1;
 
-						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
+						pen = pen & 1 ? fg_col : (bc) ? 8 : 0;
 
-						if(pen != -1) //transparent pen
+						if(pen != 0)
 							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 					}
 
