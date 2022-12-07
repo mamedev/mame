@@ -979,12 +979,12 @@ void toaplan1_state::vimana_hd647180_io_map(address_map &map)
 
 u8 toaplan1_state::vimana_dswb_invert_r()
 {
-	return m_dswb_io->read() ^ 0xFF;
+	return m_dswb_io->read() ^ 0xff;
 }
 
 u8 toaplan1_state::vimana_tjump_invert_r()
 {
-	return (m_tjump_io->read() ^ 0xFF)|0xC0; // high 2 bits of port G always read as 1
+	return (m_tjump_io->read() ^ 0xff) | 0xc0; // high 2 bits of port G always read as 1
 }
 
 void toaplan1_samesame_state::mcu_w(u8 data)
@@ -1014,7 +1014,7 @@ void toaplan1_samesame_state::hd647180_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x63, 0x63).nopr();
+	map(0x63, 0x63).nopr(); // read port D
 	map(0xa0, 0xa0).r(FUNC(toaplan1_samesame_state::soundlatch_r));
 	map(0xb0, 0xb0).w(FUNC(toaplan1_samesame_state::sound_done_w));
 
@@ -2118,7 +2118,7 @@ void toaplan1_samesame_state::samesame(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_samesame_state::main_map);
 	m_maincpu->reset_cb().set(FUNC(toaplan1_samesame_state::reset_callback));
 
-	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(28'000'000) / 4));   /* HD647180XOFS6 CPU */
+	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(10'000'000))); // HD647180XOFS6 CPU
 	// 16k byte ROM and 512 byte RAM are internal
 	audiocpu.set_addrmap(AS_IO, &toaplan1_samesame_state::hd647180_io_map);
 	audiocpu.in_pd_callback().set(FUNC(toaplan1_samesame_state::cmdavailable_r));
@@ -2212,7 +2212,7 @@ void toaplan1_state::vimana(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_main_map);
 	m_maincpu->reset_cb().set(FUNC(toaplan1_state::reset_callback));
 
-	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(28'000'000) / 4));   /* HD647180XOFS6 CPU */
+	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(10'000'000))); // HD647180XOFS6 CPU
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_hd647180_mem_map);
 	audiocpu.set_addrmap(AS_IO, &toaplan1_state::vimana_hd647180_io_map);
 	audiocpu.in_pa_callback().set(FUNC(toaplan1_state::vimana_dswb_invert_r)); // note these inputs seem to be inverted, unlike the DSWA ones.
@@ -3185,6 +3185,7 @@ ROM_START( vimanaj )
 ROM_END
 
 
+//    YEAR  NAME        PARENT    MACHINE   INPUT      CLASS                    INIT        ROT     COMPANY                        FULLNAME                   FLAGS
 GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1_rallybik_state, empty_init, ROT270, "Toaplan / Taito Corporation", "Rally Bike / Dash Yarou", 0 )
 
 GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1_state,          empty_init, ROT270, "Toaplan / Taito Corporation", "Truxton / Tatsujin", 0 )
