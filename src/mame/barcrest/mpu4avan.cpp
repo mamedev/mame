@@ -94,7 +94,7 @@ GAME_CUSTOM( 199?, m4robo__0,    m4robo, "rou2b317.bin", 0x0000, 0x010000, CRC(8
 #define M4ABEAUT_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "asm", 0 ) \
 	ROM_LOAD( "abbcz1.prn", 0x0000, 0x08e0c1, CRC(f333bd68) SHA1(05c30186116b043c0da2ca2b1fc2f1add7bd1574) ) /* this is the source code ASM? */ \
-	ROM_REGION( 0x100000, "msm6376", 0 ) /* which sound roms go with which sets?! */ \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) /* which sound roms go with which sets?! */ \
 	ROM_LOAD( "abs011.bin", 0x0000, 0x080000, CRC(e9364aa0) SHA1(775d94f8665387538d4d8d8ddec38e2ccec2e345) ) \
 	ROM_LOAD( "abs012.bin", 0x0000, 0x080000, CRC(72371572) SHA1(4504a91486952bc42e31632131d31cf5414853d6) ) \
 	ROM_LOAD( "abs021.bin", 0x0000, 0x080000, CRC(add61ab9) SHA1(1e611bc69f129c18ce460c051f78c726f5efdf68) ) \
@@ -313,7 +313,7 @@ GAME_CUSTOM( 199?, m4abeaut_k2,    m4abeaut,   "a2k0b618.bin", 0x0000, 0x010000,
 
 
 #define M4TRG_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "trgsound.dat", 0x0000, 0x080000, CRC(b9eeffbd) SHA1(9ab8005bbabb30358e3e1ccc007372542bc2e799) )
 
 #undef GAME_CUSTOM
@@ -363,7 +363,7 @@ GAME_CUSTOM( 199?, m4trg__4,  m4trg,  "rmtp4cz",      0x0000, 0x010000, CRC(1c5f
 
 
 #define M4RMTP_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "rm.s3", 0x0000, 0x080000, CRC(250e64f2) SHA1(627c4dc5cdc7d0a7cb6f74991ae91b71a2f4dbc6) )
 
 #undef GAME_CUSTOM
@@ -389,7 +389,7 @@ GAME_CUSTOM( 199?, m4rmtp__g,    m4rmtp, "r4iua205.bin", 0x0000, 0x010000, CRC(4
 #define M4RMTPD_EXTRA_ROMS \
 	ROM_REGION( 0x10000, "gal", 0 ) \
 	ROM_LOAD( "rmdxi", 0x0000, 0x000b57, CRC(c16021ec) SHA1(df77e410ea2edae1559e40a877e292f0d1969b0a) ) \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing */
 
 #undef GAME_CUSTOM
@@ -456,7 +456,7 @@ GAME_CUSTOM( 199?, m4rmtpd__am, m4rmtpd,    "rduhb511.bin", 0x0000, 0x010000, CR
 
 
 #define M4MBEL_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing */
 
 #undef GAME_CUSTOM
@@ -536,7 +536,7 @@ GAME_CUSTOM( 199?, m4mbel__a0,   m4mbel, "mbpl3.3c",         0x0000, 0x020000, C
 // cb apparently stands for 'credbottom' again hinting it might be a dual unit setup
 
 #define M4CMONT_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "mcsnd1.dat", 0x000000, 0x080000, CRC(9477e648) SHA1(1abefced0cf708ad035720d5e58dc7dae50de5d1) ) \
 	ROM_LOAD( "mcsnd2.dat", 0x080000, 0x080000, CRC(088796bd) SHA1(877bf21add8ef95f5384a88e1287bd9aa5dbfa95) )
 
@@ -625,7 +625,7 @@ GAME_CUSTOM( 199?, m4cmont_gt3, m4cmont,    "gtr58gaa",     0x0000, 0x020000, CR
 
 
 #define M4BLKMGC_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "bmsnd", 0x0000, 0x080000, CRC(81da8bc9) SHA1(a60fd689e2683b987f48e3a4c8817b169a9c3fdf) )
 
 #undef GAME_CUSTOM
@@ -652,7 +652,7 @@ GAME_CUSTOM( 199?, m4blkmgc_u6,    m4blkmgc,   "bau1b307.bin", 0x0000, 0x010000,
 
 
 #define M4AMALAD_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "aasnd", 0x0000, 0x080000, CRC(6b78f3de) SHA1(4f10afdc5cf7c84e2d048f7c9c5f83323f1e5a6e) )
 
 #undef GAME_CUSTOM
@@ -684,7 +684,7 @@ GAME_CUSTOM( 199?, m4amalad__n,    m4amalad,   "jpaltst2.dat",     0x0000, 0x020
 
 
 #define M4BBEN_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "bben1s.bin", 0x0000, 0x02dbc5, CRC(9240317e) SHA1(d9167e52a09ff1783bb10e2e34fb80bdf555f00e) )
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -711,7 +711,7 @@ GAME_CUSTOM( 199?, m4bben__i,    m4bben, "bbc2b106.bin", 0x0000, 0x010000, CRC(d
 
 
 #define M4BBOX_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "bb1snd.bin", 0x0000, 0x068880, CRC(69d53f5a) SHA1(dd7958060804fda97a1fdf69c230bfab092b9707) )
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -738,7 +738,7 @@ GAME_CUSTOM( 199?, m4bbox__i,    m4bbox, "bbb9.bin",     0x0000, 0x010000, CRC(1
 
 
 #define M4FRNUDG_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 )
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -755,7 +755,7 @@ GAME_CUSTOM( 199?, m4frnudg__c,    m4frnudg,   "fanhc9.bin",   0x0000, 0x010000,
 
 
 #define M4FRMTX_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "fmsnd1.bin", 0x0000, 0x080000, CRC(300fcb23) SHA1(c3a7424089e7893972e04a6a5e77cfb4e0ffc8ec)) \
 	ROM_REGION( 0x100000, "pals", 0 ) \
 	ROM_LOAD( "fm.jed", 0x0000, 0x000580, CRC(dc166c8e) SHA1(0cc49836b7ad57daa54e08f10f07aa279ccc53a0))
@@ -779,7 +779,7 @@ GAME_CUSTOM( 199?, m4frmtx__f,  m4frmtx,    "frmatx3",      0x0000, 0x010000, CR
 
 
 #define M4JOK2K_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 )
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -798,7 +798,7 @@ GAME_CUSTOM( 199?, m4jok2k__b,  m4jok2k,    "joker2000.dat",    0x0000, 0x020000
 
 
 #define M4MJP_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "mjsnd1.bin", 0x0000, 0x080000, CRC(e9b62ebb) SHA1(d930dffdb933f3359ae210d2c1ab5ada9964c398) )
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -821,7 +821,7 @@ GAME_CUSTOM( 199?, m4mjp__g,  m4mjp,  "tl01.bin",     0x0000, 0x010000, CRC(a36a
 
 
 #define M4MILROU_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 )
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -838,7 +838,7 @@ GAME_CUSTOM( 199?, m4milrou__a,    m4milrou,   "p1.dat",       0x0000, 0x020000,
 
 
 #define M4KINGG_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 )
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \

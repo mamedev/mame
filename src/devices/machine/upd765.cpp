@@ -521,11 +521,6 @@ uint8_t upd765_family_device::msr_r()
 		}
 	msr |= get_drive_busy();
 
-	if(data_irq && !machine().side_effects_disabled()) {
-		data_irq = false;
-		check_irq();
-	}
-
 	return msr;
 }
 
@@ -546,6 +541,8 @@ void upd765_family_device::set_rate(int rate)
 uint8_t upd765_family_device::fifo_r()
 {
 	uint8_t r = 0xff;
+	if(!machine().side_effects_disabled())
+		data_irq = false;
 	switch(main_phase) {
 	case PHASE_CMD:
 		if(machine().side_effects_disabled())
@@ -591,6 +588,7 @@ void upd765_family_device::fifo_w(uint8_t data)
 	if(!BIT(dor, 2))
 		LOGWARN("%s: fifo_w(%02x) in reset\n", machine().describe_context(), data);
 
+	data_irq = false;
 	switch(main_phase) {
 	case PHASE_CMD: {
 		command[command_pos++] = data;
@@ -1982,10 +1980,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			result[5] = command[4];
 			result[6] = command[5];
 			result_pos = 7;
-			// PC80S31K i/f is fussy on this:
-			// wants data_completion = false for anything that throws a scan_id failed,
-			// otherwise it will try to terminal count something that doesn't have data in the first place.
-			command_end(fi, (fi.st0 & 0xc0) == 0x00);
+			command_end(fi, true);
 			return;
 
 		default:
@@ -2136,7 +2131,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 			result[5] = command[4];
 			result[6] = command[5];
 			result_pos = 7;
-			command_end(fi, (fi.st0 & 0xc0) == 0x00);
+			command_end(fi, true);
 			return;
 
 		default:
@@ -2322,7 +2317,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			result[5] = command[4];
 			result[6] = command[5];
 			result_pos = 7;
-			command_end(fi, (fi.st0 & 0xc0) == 0x00);
+			command_end(fi, true);
 			return;
 
 		default:
@@ -2412,7 +2407,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 			result[5] = 0;
 			result[6] = command[2];
 			result_pos = 7;
-			command_end(fi, (fi.st0 & 0xc0) == 0x00);
+			command_end(fi, true);
 			return;
 
 		default:
@@ -2504,7 +2499,7 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 			result[5] = cur_live.idbuf[2];
 			result[6] = cur_live.idbuf[3];
 			result_pos = 7;
-			command_end(fi, (fi.st0 & 0xc0) == 0x00);
+			command_end(fi, true);
 			return;
 
 		default:

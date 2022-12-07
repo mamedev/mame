@@ -31,7 +31,6 @@
 
 INPUT_PORTS_EXTERN( coco_analog_control );
 INPUT_PORTS_EXTERN( coco_joystick );
-INPUT_PORTS_EXTERN( coco_rtc );
 INPUT_PORTS_EXTERN( coco_beckerport );
 INPUT_PORTS_EXTERN( coco_beckerport_dw );
 

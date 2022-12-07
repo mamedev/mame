@@ -45,59 +45,47 @@ Notes:
 #include "sportsjp.h"
 
 
+namespace {
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(SMS_SPORTS_PAD_JP, sms_sports_pad_jp_device, "sms_sports_pad_jp", "Sega SMS Sports Pad (JP)")
-
-// time interval not verified
-#define SPORTS_PAD_JP_INTERVAL attotime::from_hz(20000)
-
-
-
-// The returned value is inverted due to IP_ACTIVE_LOW mapping.
-READ_LINE_MEMBER( sms_sports_pad_jp_device::tl_pin_r ) { return ~m_tl_pin_state; }
-READ_LINE_MEMBER( sms_sports_pad_jp_device::tr_pin_r ) { return ~m_tr_pin_state; }
-CUSTOM_INPUT_MEMBER( sms_sports_pad_jp_device::rldu_pins_r ) { return ~(m_rldu_pins_state & 0x0f); }
-
-
-static INPUT_PORTS_START( sms_sports_pad_jp )
-	PORT_START("SPORTS_JP_IN")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(sms_sports_pad_jp_device, rldu_pins_r) // R,L,D,U
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(sms_sports_pad_jp_device, tl_pin_r) // TL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // TH
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(sms_sports_pad_jp_device, tr_pin_r) // TR
-
-	PORT_START("SPORTS_JP_BT")    /* Sports Pad buttons nibble */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+INPUT_PORTS_START( sms_sports_pad_jp )
+	PORT_START("SPORTS_JP_BT")    // buttons
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // TR
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SPORTS_JP_X")    /* Sports Pad X axis */
+	PORT_START("SPORTS_JP_X")    // X axis
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40)
 
-	PORT_START("SPORTS_JP_Y")    /* Sports Pad Y axis */
+	PORT_START("SPORTS_JP_Y")    // Y axis
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
 
-ioport_constructor sms_sports_pad_jp_device::device_input_ports() const
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class sms_sports_pad_jp_device : public device_t, public device_sms_control_interface
 {
-	return INPUT_PORTS_NAME( sms_sports_pad_jp );
-}
+public:
+	// construction/destruction
+	sms_sports_pad_jp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// device_sms_control_interface implementation
+	virtual uint8_t in_r() override;
 
+protected:
+	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(sms_sports_pad_jp); }
+	virtual void device_start() override { }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
+private:
+	required_ioport m_buttons;
+	required_ioport m_x_axis;
+	required_ioport m_y_axis;
+};
+
 
 //-------------------------------------------------
 //  sms_sports_pad_jp_device - constructor
@@ -105,31 +93,11 @@ ioport_constructor sms_sports_pad_jp_device::device_input_ports() const
 
 sms_sports_pad_jp_device::sms_sports_pad_jp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_SPORTS_PAD_JP, tag, owner, clock),
-	device_sms_control_port_interface(mconfig, *this),
-	m_sports_jp_in(*this, "SPORTS_JP_IN"),
-	m_sports_jp_bt(*this, "SPORTS_JP_BT"),
-	m_sports_jp_x(*this, "SPORTS_JP_X"),
-	m_sports_jp_y(*this, "SPORTS_JP_Y"),
-	m_rldu_pins_state(0x0f),
-	m_tl_pin_state(1),
-	m_tr_pin_state(1),
-	m_interval(SPORTS_PAD_JP_INTERVAL)
+	device_sms_control_interface(mconfig, *this),
+	m_buttons(*this, "SPORTS_JP_BT"),
+	m_x_axis(*this, "SPORTS_JP_X"),
+	m_y_axis(*this, "SPORTS_JP_Y")
 {
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void sms_sports_pad_jp_device::device_start()
-{
-	m_start_time = machine().time();
-
-	save_item(NAME(m_start_time));
-	save_item(NAME(m_rldu_pins_state));
-	save_item(NAME(m_tl_pin_state));
-	save_item(NAME(m_tr_pin_state));
 }
 
 
@@ -137,43 +105,32 @@ void sms_sports_pad_jp_device::device_start()
 //  sms_peripheral_r - sports pad read
 //-------------------------------------------------
 
-uint8_t sms_sports_pad_jp_device::peripheral_r()
+uint8_t sms_sports_pad_jp_device::in_r()
 {
-	int num_intervals = (machine().time() - m_start_time).as_double() / m_interval.as_double();
+	int const num_intervals = machine().time().as_ticks(20000); // time interval not verified
 
 	switch (num_intervals % 5)
 	{
-	case 0:
-		// X high nibble
-		m_rldu_pins_state = m_sports_jp_x->read() >> 4;
-		m_tl_pin_state = 0;
-		m_tr_pin_state = 0;
-		break;
-	case 1:
-		// X low nibble
-		m_rldu_pins_state = m_sports_jp_x->read();
-		m_tl_pin_state = 1;
-		m_tr_pin_state = 0;
-		break;
-	case 2:
-		// Y high nibble
-		m_rldu_pins_state = m_sports_jp_y->read() >> 4;
-		m_tl_pin_state = 0;
-		m_tr_pin_state = 0;
-		break;
-	case 3:
-		// Y low nibble
-		m_rldu_pins_state = m_sports_jp_y->read();
-		m_tl_pin_state = 1;
-		m_tr_pin_state = 0;
-		break;
-	case 4:
-		// buttons 1 and 2
-		m_rldu_pins_state = m_sports_jp_bt->read();
-		m_tl_pin_state = 1;
-		m_tr_pin_state = 1;
-		break;
+	default: // shut up dumb compilers
+	case 0: // X high nibble
+		return 0x00 | ((m_x_axis->read() >> 4) & 0x0f);
+	case 1: // X low nibble
+		return 0x10 | (m_x_axis->read() & 0x0f);
+	case 2: // Y high nibble
+		return 0x00 | ((m_y_axis->read() >> 4) & 0x0f);
+	case 3: // Y low nibble
+		return 0x10 | (m_y_axis->read() & 0x0f);
+	case 4: // buttons 1 and 2
+		return 0x30 | m_buttons->read();
 	}
-
-	return m_sports_jp_in->read();
 }
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(SMS_SPORTS_PAD_JP, device_sms_control_interface, sms_sports_pad_jp_device, "sms_sports_pad_jp", "Sega Mark III Sports Pad (Japan)")

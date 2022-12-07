@@ -24,7 +24,7 @@ previously added through expansion ports. However, there is no backwards compati
 reworked.
 
 Like MPU3, a 6840PTM is used for internal timing, and other miscellaneous control functions, including as a crude analogue sound device
-(a square wave from the PTM being used as the alarm sound generator). However, the main sound functionality is provided by
+(a square wave from the PTM being fed into a 1-bit DAC circuit as the alarm sound generator). However, the main sound functionality is provided by
 dedicated hardware (an AY8913).
 
 A MPU4 GAME CARD (cartridge) plugs into the MPU4 board containing the game, and a protection PAL (the 'characteriser').
@@ -81,7 +81,7 @@ In addition there are two auxiliary ports that can be accessed separately to the
                                                 |
                Output2 --+-> Clock3             |
                          |                      |
-                         |   Output3 ---> 'to audio amp' ??
+                         |   Output3 ---> 'to audio amp' (square wave)
                          |
                          +--------> CA1 IC3 (
 
@@ -514,6 +514,7 @@ WRITE_LINE_MEMBER(mpu4_state::ic2_o3_callback)
 	/* the output from timer3 is used as a square wave for the alarm output
 	and as an external clock source for timer 1! */
 	/* also runs lamp fade */
+	m_alarmdac->write(state);
 	m_6840ptm->set_c1(state);
 }
 
@@ -1192,68 +1193,6 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
 	m_vfd->sclk(!state);
 }
 
-// universal sampled sound program card PCB 683077
-// Sampled sound card, using a PIA and PTM for timing and data handling
-void mpu4_state::pia_gb_porta_w(uint8_t data)
-{
-	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", machine().describe_context(), data));
-	m_msm6376->write(data);
-}
-
-void mpu4_state::pia_gb_portb_w(uint8_t data)
-{
-	uint8_t changed = m_expansion_latch^data;
-
-	LOG_SS(("%s: GAMEBOARD: PIA Port B Set to %2x\n", machine().describe_context(), data));
-
-	if (changed & 0x20)
-	{ // digital volume clock line changed
-		if (!(data & 0x20))
-		{ // changed from high to low,
-			if (!(data & 0x10)) // down
-			{
-				if (m_global_volume < 32) m_global_volume++; //steps unknown
-			}
-			else // up
-			{
-				if (m_global_volume > 0) m_global_volume--;
-			}
-
-			LOG_SS(("%s: GAMEBOARD: Volume Set to %2x\n", machine().describe_context(), data));
-			float percent = (32-m_global_volume)/32.0;
-			m_msm6376->set_output_gain(0, percent);
-			m_msm6376->set_output_gain(1, percent);
-		}
-	}
-	m_msm6376->ch2_w(data & 0x02);
-	m_msm6376->st_w(data & 0x01);
-}
-
-uint8_t mpu4_state::pia_gb_portb_r()
-{
-	LOG_SS(("%s: GAMEBOARD: PIA Read of Port B\n", machine().describe_context()));
-	uint8_t data = 0;
-	// b7 NAR - we can load another address into Channel 1
-	// b6, 1 = OKI ready, 0 = OKI busy
-	// b5, vol clock
-	// b4, 1 = Vol down, 0 = Vol up
-	//
-
-	if ( m_msm6376->nar_r() ) data |= 0x80;
-	else                      data &= ~0x80;
-
-	if ( m_msm6376->busy_r() ) data |= 0x40;
-	else                       data &= ~0x40;
-
-	return data | m_expansion_latch;
-}
-
-WRITE_LINE_MEMBER(mpu4_state::pia_gb_ca2_w)
-{
-	LOG_SS(("%s: GAMEBOARD: OKI RESET data = %02X\n", machine().describe_context(), state));
-//  reset line
-}
-
 WRITE_LINE_MEMBER(mpu4_state::pia_gb_cb2_w)
 {
 	// Some BWB games use this to drive the bankswitching
@@ -1262,52 +1201,6 @@ WRITE_LINE_MEMBER(mpu4_state::pia_gb_cb2_w)
 	{
 		m_pageval = state;
 		m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
-	}
-}
-
-//Sampled sound timer
-/*
-The MSM6376 sound chip is configured in a slightly strange way, to enable dynamic
-sample rate changes (8Khz, 10.6 Khz, 16 KHz) by varying the clock.
-According to the BwB programmer's guide, the formula is:
-MSM6376 clock frequency:-
-freq = (1720000/((t3L+1)(t3H+1)))*[(t3H(T3L+1)+1)/(2(t1+1))]
-where [] means rounded up integer,
-t3L is the LSB of Clock 3,
-t3H is the MSB of Clock 3,
-and t1 is the initial value in clock 1.
-*/
-
-//O3 -> G1  O1 -> c2 o2 -> c1
-
-/* This is a bit of a cheat - since we don't clock into the OKI chip directly, we need to
-calculate the oscillation frequency in advance. We're running the timer for interrupt
-purposes, but the frequency calculation is done by plucking the values out as they are written.*/
-void mpu4_state::ic3ss_w(offs_t offset, uint8_t data)
-{
-	m_ptm_ic3ss->write(offset, data);
-
-	if (offset == 3)
-	{
-		m_t1 = data;
-	}
-	if (offset == 6)
-	{
-		m_t3h = data;
-	}
-	if (offset == 7)
-	{
-		m_t3l = data;
-	}
-
-	float const num = float(1'720'000) / ((m_t3l + 1) * (m_t3h + 1));
-	float const denom = std::ceil(float(m_t3h * (m_t3l + 1) + 1) / (2 * (m_t1 + 1))); //need to round up, this gives same precision as chip
-
-	int const freq = int(num * denom);
-
-	if (freq)
-	{
-		m_msm6376->set_unscaled_clock(freq);
 	}
 }
 
@@ -1958,16 +1851,15 @@ INPUT_PORTS_START( grtecp )
 INPUT_PORTS_END
 
 
-
 /* Common configurations */
 
 void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 {
-	pia6821_device *const pia_ic4ss = subdevice<pia6821_device>("pia_ic4ss");
+	space.install_readwrite_handler(0x0880, 0x0883, read8sm_delegate(*m_okicard, FUNC(mpu4_oki_sampled_sound::ic4_read)), write8sm_delegate(*m_okicard, FUNC(mpu4_oki_sampled_sound::ic4_write)));
 
-	space.install_readwrite_handler(0x0880, 0x0883, read8sm_delegate(*pia_ic4ss, FUNC(pia6821_device::read)), write8sm_delegate(*pia_ic4ss, FUNC(pia6821_device::write)));
-	space.install_read_handler(0x08c0, 0x08c7, read8sm_delegate(*m_ptm_ic3ss, FUNC(ptm6840_device::read)));
-	space.install_write_handler(0x08c0, 0x08c7, write8sm_delegate(*this, FUNC(mpu4_state::ic3ss_w)));
+	space.install_read_handler(0x08c0, 0x08c7, read8sm_delegate(*m_okicard, FUNC(mpu4_oki_sampled_sound::ic3_read)));
+	space.install_write_handler(0x08c0, 0x08c7, write8sm_delegate(*m_okicard, FUNC(mpu4_oki_sampled_sound::ic3_write)));
+
 }
 
 
@@ -1997,8 +1889,6 @@ void mpu4_state::mpu4_config_common()
 
 	save_item(NAME( m_reel_flag ));
 	save_item(NAME( m_ic23_active ));
-	save_item(NAME( m_expansion_latch ));
-	save_item(NAME( m_global_volume ));
 	save_item(NAME( m_input_strobe ));
 	save_item(NAME( m_lamp_strobe ));
 	save_item(NAME( m_lamp_strobe2 ));
@@ -2032,9 +1922,6 @@ void mpu4_state::mpu4_config_common()
 	save_item(NAME( m_hopper_type ));
 	save_item(NAME( m_reels ));
 	save_item(NAME( m_chrdata ));
-	save_item(NAME( m_t1 ));
-	save_item(NAME( m_t3l ));
-	save_item(NAME( m_t3h ));
 	save_item(NAME( m_serial_output ));
 
 	save_item(NAME( m_numbanks ));
@@ -2336,6 +2223,11 @@ void mpu4_state::tr_over(machine_config &config)
 	m_overcurrent_detect = true;
 }
 
+void mpu4_state::tr_lvdoff(machine_config &config)
+{
+	m_low_volt_detect = false;
+}
+
 void mpu4_state::tr_p4l(machine_config &config)
 {
 	m_use_pia4_porta_leds = true;
@@ -2419,22 +2311,12 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_dataport->rxd_handler().set(FUNC(mpu4_state::dataport_rxd));
 
 	HOPPER(config, m_hopper1, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-}
 
-void mpu4_state::mpu4_common2(machine_config &config)
-{
-	PTM6840(config, m_ptm_ic3ss, MPU4_MASTER_CLOCK / 4);
-	m_ptm_ic3ss->set_external_clocks(0, 0, 0);
-	m_ptm_ic3ss->o1_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c2));
-	m_ptm_ic3ss->o2_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c1));
-	m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
 
-	PIA6821(config, m_pia_ic4ss, 0);
-	m_pia_ic4ss->readpb_handler().set(FUNC(mpu4_state::pia_gb_portb_r));
-	m_pia_ic4ss->writepa_handler().set(FUNC(mpu4_state::pia_gb_porta_w));
-	m_pia_ic4ss->writepb_handler().set(FUNC(mpu4_state::pia_gb_portb_w));
-	m_pia_ic4ss->ca2_handler().set(FUNC(mpu4_state::pia_gb_ca2_w));
-	m_pia_ic4ss->cb2_handler().set(FUNC(mpu4_state::pia_gb_cb2_w));
+	SPEAKER(config, "mono").front_center();
+
+	DAC_1BIT(config, m_alarmdac, 0);
+	m_alarmdac->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 /***********************************************************************************************
@@ -2452,8 +2334,6 @@ void mpu4_state::mpu4base(machine_config &config)
 
 	mpu4_common(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2474,10 +2354,10 @@ void mpu4_state::mod2_f(machine_config &config)
 {
 	mpu4base(config);
 	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
+
 	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8913->set_resistors_load(820, 0, 0);
-	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void mpu4_state::mod2_no_bacta_f(machine_config &config)
@@ -2503,7 +2383,7 @@ void mpu4_state::mod2_cheatchr_f(machine_config &config)
 
   Configs for Mod4 with OKI
 
-  TODO: mod4oki should eventually become a subclass
+  TODO: OKI is its own device, should mod4oki eventually become a subclass
 
 ***********************************************************************************************/
 
@@ -2514,11 +2394,11 @@ void mpu4_state::mod4oki_f(machine_config &config)
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state, mpu4oki)
 
-	mpu4_common2(config);
+	MPU4_OKI_SAMPLED_SOUND(config, m_okicard, MPU4_MASTER_CLOCK/4);
+	m_okicard->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_okicard->cb2_handler().set(FUNC(mpu4_state::pia_gb_cb2_w));
+
 }
 
 void mpu4_state::mod4oki_no_bacta_f(machine_config &config)

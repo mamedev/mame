@@ -171,8 +171,8 @@ void rocvfd_device::device_reset()
 	m_shift_count = 0;
 	m_shift_data = 0;
 	m_pcursor_pos = 0;
-	m_count=0;
-	m_duty=31;
+	m_count = 0;
+	m_duty = 0;
 	m_disp = 0;
 
 	std::fill(std::begin(m_chars), std::end(m_chars), 0);

@@ -266,7 +266,7 @@ int mame_machine_manager::execute()
 			m_options.revert(OPTION_PRIORITY_INI);
 
 			std::ostringstream errors;
-			mame_options::parse_standard_inis(m_options, errors);
+			mame_options::parse_standard_inis(m_options, errors, system);
 		}
 
 		// otherwise, perform validity checks before anything else

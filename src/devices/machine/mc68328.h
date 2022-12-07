@@ -93,6 +93,8 @@
 class mc68328_device : public m68000_device
 {
 public:
+	typedef device_delegate<void (double, int, int)> lcd_info_changed_delegate;
+
 	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto out_port_a() { return m_out_port_a_cb.bind(); }
@@ -118,12 +120,20 @@ public:
 	auto out_pwm() { return m_out_pwm_cb.bind(); }
 	auto out_spim() { return m_out_spim_cb.bind(); }
 	auto in_spim() { return m_in_spim_cb.bind(); }
-	auto spim_xch_trigger() { return m_spim_xch_trigger_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(set_penirq_line);
 	void set_port_d_lines(uint8_t state, int bit);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	auto out_flm() { return m_out_flm_cb.bind(); }
+	auto out_llp() { return m_out_llp_cb.bind(); }
+	auto out_lsclk() { return m_out_lsclk_cb.bind(); }
+	auto out_ld() { return m_out_ld_cb.bind(); }
+
+	template <typename T>
+	std::enable_if_t<lcd_info_changed_delegate::supports_callback<T>::value> set_lcd_info_changed(T &&callback, const char *name)
+	{
+		m_lcd_info_changed_cb.set(std::forward<T>(callback), name);
+	}
 
 protected:
 	// device-level overrides
@@ -148,6 +158,7 @@ protected:
 		BLKC_BD                 = 0x7f,
 		BLKC_BKEN               = 0x80,
 
+		LPICF_GRAYSCALE_BIT     = 0,
 		LPICF_PBSIZ             = 0x06,
 		LPICF_PBSIZ_1           = 0x00,
 		LPICF_PBSIZ_2           = 0x02,
@@ -155,15 +166,15 @@ protected:
 		LPICF_PBSIZ_INVALID     = 0x06,
 
 		LPOLCF_PIXPOL           = 0x01,
-		LPOLCF_LPPOL            = 0x02,
-		LPOLCF_FLMPOL           = 0x04,
+		LPOLCF_LPPOL_BIT        = 1,
+		LPOLCF_FLMPOL_BIT       = 2,
 		LPOLCF_LCKPOL           = 0x08,
 
 		LACDRC_MASK             = 0x0f,
 
 		LPXCD_MASK              = 0x3f,
 
-		LCKCON_PCDS             = 0x01,
+		LCKCON_PCDS_BIT         = 0,
 		LCKCON_DWIDTH           = 0x02,
 		LCKCON_WS               = 0x30,
 		LCKCON_WS_1             = 0x00,
@@ -171,8 +182,7 @@ protected:
 		LCKCON_WS_3             = 0x20,
 		LCKCON_WS_4             = 0x30,
 		LCKCON_DMA16            = 0x40,
-		LCKCON_LCDON            = 0x80,
-		LCKCON_LCDC_EN          = 0x80,
+		LCKCON_LCDON_BIT        = 7,
 
 		LBAR_MASK               = 0x7f,
 
@@ -201,6 +211,7 @@ protected:
 		PLLCR_SYSCLK_SEL_DIV1_2 = 0x0600,
 		PLLCR_SYSCLK_SEL_DIV1_3 = 0x0700,
 		PLLCR_SYSCLK_SEL        = 0x0700,
+		PLLCR_SYSCLK_SHIFT      = 8,
 		PLLCR_PIXCLK_SEL_DIV2   = 0x0000,
 		PLLCR_PIXCLK_SEL_DIV4   = 0x0800,
 		PLLCR_PIXCLK_SEL_DIV8   = 0x1000,
@@ -210,6 +221,7 @@ protected:
 		PLLCR_PIXCLK_SEL_DIV1_2 = 0x3000,
 		PLLCR_PIXCLK_SEL_DIV1_3 = 0x3800,
 		PLLCR_PIXCLK_SEL        = 0x3800,
+		PLLCR_PIXCLK_SHIFT      = 11,
 
 		PLLFSR_PCNT             = 0x00ff,
 		PLLFSR_QCNT             = 0x0f00,
@@ -275,30 +287,15 @@ protected:
 		SPIS_IRQEN              = 0x4000,
 		SPIS_SPIS_IRQ           = 0x8000,
 
-		SPIM_CLOCK_COUNT        = 0x000f,
-		SPIM_POL                = 0x0010,
-		SPIM_POL_HIGH           = 0x0000,
-		SPIM_POL_LOW            = 0x0010,
-		SPIM_PHA                = 0x0020,
-		SPIM_PHA_NORMAL         = 0x0000,
-		SPIM_PHA_OPPOSITE       = 0x0020,
-		SPIM_IRQEN              = 0x0040,
-		SPIM_SPIMIRQ            = 0x0080,
-		SPIM_XCH                = 0x0100,
-		SPIM_XCH_IDLE           = 0x0000,
-		SPIM_XCH_INIT           = 0x0100,
-		SPIM_SPMEN              = 0x0200,
-		SPIM_SPMEN_DISABLE      = 0x0000,
-		SPIM_SPMEN_ENABLE       = 0x0200,
-		SPIM_RATE               = 0xe000,
-		SPIM_RATE_4             = 0x0000,
-		SPIM_RATE_8             = 0x2000,
-		SPIM_RATE_16            = 0x4000,
-		SPIM_RATE_32            = 0x6000,
-		SPIM_RATE_64            = 0x8000,
-		SPIM_RATE_128           = 0xa000,
-		SPIM_RATE_256           = 0xc000,
-		SPIM_RATE_512           = 0xe000,
+		SPIM_BIT_COUNT          = 0x000f,
+		SPIM_POL_BIT            = 4,
+		SPIM_PHA_BIT            = 5,
+		SPIM_IRQEN_BIT          = 6,
+		SPIM_SPIMIRQ_BIT        = 7,
+		SPIM_XCH_BIT            = 8,
+		SPIM_SPMEN_BIT          = 9,
+		SPIM_RATE_MASK          = 0xe000,
+		SPIM_RATE_SHIFT         = 13,
 
 		USTCNT_TX_AVAIL_EN      = 0x0001,
 		USTCNT_TX_HALF_EN       = 0x0002,
@@ -368,6 +365,10 @@ protected:
 
 		CWCH_CH                 = 0x001f,
 		CWCH_CW                 = 0x1f00,
+
+		LXMAX_MASK              = 0x03ff,
+
+		LYMAX_MASK              = 0x03ff,
 
 		LGPMR_PAL2              = 0x0007,
 		LGPMR_PAL3              = 0x0070,
@@ -813,6 +814,9 @@ protected:
 	// $(FF)FFF800
 	uint16_t  m_spimdata;   // SPIM Data Register
 	uint16_t  m_spimcont;   // SPIM Control/Status Register
+	bool      m_spmtxd;     // SPIM Shift-register output (TODO: multiplex onto Port K)
+	bool      m_spmrxd;     // SPIM Shift-register input  (TODO: multiplex onto Port K)
+	bool      m_spmclk;     // SPIM Shift-register clock  (TODO: multiplex onto Port K)
 
 	// $(FF)FFF900
 	uint16_t  m_ustcnt;     // UART Status/Control Register
@@ -857,6 +861,7 @@ protected:
 	void cpu_space_map(address_map &map);
 	uint8_t irq_callback(offs_t offset);
 
+	attotime get_pixclk_rate();
 	template<int Timer> uint32_t get_timer_frequency();
 	template<int Timer> void maybe_start_timer(uint32_t new_enable);
 
@@ -865,39 +870,57 @@ protected:
 	template<int Timer> TIMER_CALLBACK_MEMBER(timer_tick);
 	TIMER_CALLBACK_MEMBER(pwm_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
+	TIMER_CALLBACK_MEMBER(spim_tick);
+	TIMER_CALLBACK_MEMBER(lcd_scan_tick);
+	void fill_lcd_dma_buffer();
 
 	emu_timer *m_gptimer[2];
 	emu_timer *m_rtc;
 	emu_timer *m_pwm;
+	emu_timer *m_spim;
 
-	devcb_write8  m_out_port_a_cb;    /* 8-bit output */
-	devcb_write8  m_out_port_b_cb;    /* 8-bit output */
-	devcb_write8  m_out_port_c_cb;    /* 8-bit output */
-	devcb_write8  m_out_port_d_cb;    /* 8-bit output */
-	devcb_write8  m_out_port_e_cb;    /* 8-bit output */
-	devcb_write8  m_out_port_f_cb;    /* 8-bit output */
-	devcb_write8  m_out_port_g_cb;    /* 8-bit output */
-	devcb_write8  m_out_port_j_cb;    /* 8-bit output */
-	devcb_write8  m_out_port_k_cb;    /* 8-bit output */
-	devcb_write8  m_out_port_m_cb;    /* 8-bit output */
+	emu_timer *m_lcd_scan;
+	bool m_lcd_first_line;
+	uint32_t m_lcd_sysmem_ptr;
+	std::unique_ptr<uint16_t[]> m_lcd_line_buffer;
+	uint32_t m_lcd_line_bit;
+	uint32_t m_lcd_line_word;
+	bool m_lsclk;
 
-	devcb_read8   m_in_port_a_cb;     /* 8-bit input */
-	devcb_read8   m_in_port_b_cb;     /* 8-bit input */
-	devcb_read8   m_in_port_c_cb;     /* 8-bit input */
-	devcb_read8   m_in_port_d_cb;     /* 8-bit input */
-	devcb_read8   m_in_port_e_cb;     /* 8-bit input */
-	devcb_read8   m_in_port_f_cb;     /* 8-bit input */
-	devcb_read8   m_in_port_g_cb;     /* 8-bit input */
-	devcb_read8   m_in_port_j_cb;     /* 8-bit input */
-	devcb_read8   m_in_port_k_cb;     /* 8-bit input */
-	devcb_read8   m_in_port_m_cb;     /* 8-bit input */
+	devcb_write8  m_out_port_a_cb;
+	devcb_write8  m_out_port_b_cb;
+	devcb_write8  m_out_port_c_cb;
+	devcb_write8  m_out_port_d_cb;
+	devcb_write8  m_out_port_e_cb;
+	devcb_write8  m_out_port_f_cb;
+	devcb_write8  m_out_port_g_cb;
+	devcb_write8  m_out_port_j_cb;
+	devcb_write8  m_out_port_k_cb;
+	devcb_write8  m_out_port_m_cb;
 
-	devcb_write_line m_out_pwm_cb;    /* 1-bit output */
+	devcb_read8   m_in_port_a_cb;
+	devcb_read8   m_in_port_b_cb;
+	devcb_read8   m_in_port_c_cb;
+	devcb_read8   m_in_port_d_cb;
+	devcb_read8   m_in_port_e_cb;
+	devcb_read8   m_in_port_f_cb;
+	devcb_read8   m_in_port_g_cb;
+	devcb_read8   m_in_port_j_cb;
+	devcb_read8   m_in_port_k_cb;
+	devcb_read8   m_in_port_m_cb;
 
-	devcb_write16 m_out_spim_cb;      /* 16-bit output */
-	devcb_read16  m_in_spim_cb;       /* 16-bit input */
+	devcb_write_line m_out_pwm_cb;
 
-	devcb_write_line m_spim_xch_trigger_cb;    /* SPIM exchange trigger */ /*todo: not really a write line, fix*/
+	devcb_write_line m_out_spim_cb;
+	devcb_read_line  m_in_spim_cb;
+
+	devcb_write_line m_out_flm_cb;
+	devcb_write_line m_out_llp_cb;
+	devcb_write_line m_out_lsclk_cb;
+	devcb_write8     m_out_ld_cb;
+	lcd_info_changed_delegate m_lcd_info_changed_cb;
+
+	static const uint32_t VCO_DIVISORS[8];
 };
 
 
