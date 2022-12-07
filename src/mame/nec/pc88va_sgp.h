@@ -49,6 +49,7 @@ private:
 	void start_exec();
 
 	// commands
+	void cmd_blit(u16 draw_mode, bool is_patblt);
 };
 
 

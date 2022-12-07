@@ -1219,6 +1219,9 @@ void pc88va_state::pc88va(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>));
 	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);
+
+	// TODO: set pc98 compatible
+	// Needs a MS-Engine disk dump first, that applies an overlay on PC Engine OS so that it can run PC-98 software
 	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
 
 	UPD4990A(config, m_rtc);

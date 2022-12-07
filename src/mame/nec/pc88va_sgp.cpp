@@ -9,6 +9,9 @@ Unknown part number, used as GPU for PC88VA
 TODO:
 - timing details
 - specifics about what exactly happens in work area when either SGP runs or is idle.
+- famista: during gameplay it BITBLT same source to destination 0x00037076 
+  with tp_mode = 3 and pitch = 0 (!?);
+- rtype: during gameplay it does transfers with Pitch = 0xfff0 (!?);
 
 **************************************************************************************************/
 
@@ -161,7 +164,7 @@ void pc88va_sgp_device::start_exec()
 				 * ---- ---- ---- --11 RGB565
 				 */
 				const u16 param1 = m_data->read_word(vdp_pointer + 2);
-				
+
 				ptr->start_dot = (param1 & 0xf0) >> 4;
 				ptr->pixel_mode = (param1 & 0x03);
 				ptr->hsize = m_data->read_word(vdp_pointer + 4) & 0x0fff;
@@ -170,7 +173,7 @@ void pc88va_sgp_device::start_exec()
 				ptr->address = (m_data->read_word(vdp_pointer + 10) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 12) << 16);
 
-				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x|H %4d|V %4d|Pitch %5d| address %08x\n"
+				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x|H %4u|V %4u|Pitch %5u| address %08x\n"
 					, vdp_pointer
 					, mode ? "DESTINATION" : "SOURCE     "
 					, param1
@@ -198,42 +201,16 @@ void pc88va_sgp_device::start_exec()
 			// PATBLT
 			case 0x0008:
 			{
-				/*
-				 * ---x ---- ---- ---- SF (0) shift source according to destination position
-				 * ---- x--- ---- ---- VD vertical transfer direction (0) negative (1) positive
-				 * ---- -x-- ---- ---- HD horizontal transfer direction (0) negative (1) positive
-				 * ---- --xx ---- ---- TP/MOD
-				 * ---- --00 ---- ---- transfer source as-is
-				 * ---- --01 ---- ---- do not transfer if source is 0 (transparent pen)
-				 * ---- --10 ---- ---- transfer only if destination is 0
-				 * ---- --11 ---- ---- <undocumented>
-				 * ---- ---- ---- xxxx LOGICAL OP
-				 * ---- ---- ---- 0000 0
-				 * ---- ---- ---- 0001 Src AND Dst
-				 * ---- ---- ---- 0010 /Src AND Dst
-				 * ---- ---- ---- 0011 NOP
-				 * ---- ---- ---- 0100 Src AND /Dst
-				 * ---- ---- ---- 0101 Src
-				 * ---- ---- ---- 0110 Src XOR Dst
-				 * ---- ---- ---- 0111 Src OR Dst
-				 * ---- ---- ---- 1000 /(Src OR Dst)
-				 * ---- ---- ---- 1001 /(Src XOR Dst)
-				 * ---- ---- ---- 1010 /Src
-				 * ---- ---- ---- 1011 /Src OR Dst
-				 * ---- ---- ---- 1100 /Dst
-				 * ---- ---- ---- 1101 Src OR /Dst
-				 * ---- ---- ---- 1110 /(Src AND Dst)
-				 * ---- ---- ---- 1111 1
-				 */
-				// PATBLT is identical to BITBLT except it repeats source copy if it exceeds the clipping range.
-				const u8 mode = cur_opcode == 0x0008;
+				const bool cmd_mode = cur_opcode == 0x0008;
 				const u16 draw_mode = m_data->read_word(vdp_pointer + 2);
 
 				LOGCOMMAND("SGP: (PC=%08x) %s %04x\n"
 					, vdp_pointer
-					, mode ? "PATBLT" : "BITBLT"
+					, cmd_mode ? "PATBLT" : "BITBLT"
 					, draw_mode
 				);
+				cmd_blit(draw_mode, cmd_mode);
+
 				next_pc += 2;
 				break;
 			}
@@ -311,3 +288,101 @@ void pc88va_sgp_device::start_exec()
 		LOG("Warning: execution punt without an END issued\n");
 }
 
+/****************************************
+ * Commands
+ ***************************************/
+
+
+/*
+ * ---x ---- ---- ---- SF (0) shift source according to destination position
+ * ---- x--- ---- ---- VD vertical transfer direction (1) negative (0) positive
+ * ---- -x-- ---- ---- HD horizontal transfer direction (1) negative (0) positive
+ * ---- --xx ---- ---- TP/MOD
+ * ---- --00 ---- ---- transfer source as-is
+ * ---- --01 ---- ---- do not transfer if source is 0 (transparent pen)
+ * ---- --10 ---- ---- transfer only if destination is 0
+ * ---- --11 ---- ---- <undocumented>
+ * ---- ---- ---- xxxx LOGICAL OP
+ * ---- ---- ---- 0000 0
+ * ---- ---- ---- 0001 Src AND Dst
+ * ---- ---- ---- 0010 /Src AND Dst
+ * ---- ---- ---- 0011 NOP
+ * ---- ---- ---- 0100 Src AND /Dst
+ * ---- ---- ---- 0101 Src
+ * ---- ---- ---- 0110 Src XOR Dst
+ * ---- ---- ---- 0111 Src OR Dst
+ * ---- ---- ---- 1000 /(Src OR Dst)
+ * ---- ---- ---- 1001 /(Src XOR Dst)
+ * ---- ---- ---- 1010 /Src
+ * ---- ---- ---- 1011 /Src OR Dst
+ * ---- ---- ---- 1100 /Dst
+ * ---- ---- ---- 1101 Src OR /Dst
+ * ---- ---- ---- 1110 /(Src AND Dst)
+ * ---- ---- ---- 1111 1
+ *
+ * PATBLT is identical to BITBLT except it repeats source copy 
+ * if it exceeds the clipping range.
+ */
+void pc88va_sgp_device::cmd_blit(u16 draw_mode, bool is_patblt)
+{
+	const u8 logical_op = draw_mode & 0xf;
+	const u8 tp_mod = (draw_mode >> 8) & 0x3;
+
+	// TODO: boomer title screen
+	if (is_patblt == true)
+	{
+		LOG("PATBLT\n");
+		return;
+	}
+
+	if (logical_op != 5)
+	{
+		LOG("BITBLT logical_op == %d\n", logical_op);
+		return;
+	}
+
+	if (tp_mod > 1)
+	{
+		LOG("BITBLT tp_mod == %d\n", tp_mod);
+		return;
+	}
+
+	if (m_src.hsize != m_dst.hsize || m_src.vsize != m_dst.vsize)
+	{
+		LOG("BITBLT non-even sizes (%d x %d) x (%d x %d)\n", m_src.hsize, m_src.vsize, m_dst.hsize, m_dst.vsize);
+		return;
+	}
+
+	if (m_src.pixel_mode == 0 || m_src.pixel_mode == 3 || m_src.pixel_mode != m_dst.pixel_mode)
+	{
+		LOG("BITBLT pixel mode %d x %d\n", m_src.pixel_mode, m_dst.pixel_mode);
+		return;
+	}
+
+	for (int yi = 0; yi < m_src.vsize; yi ++)
+	{
+		u32 src_address = m_src.address + (yi * m_src.fb_pitch);
+		u32 dst_address = m_dst.address + (yi * m_dst.fb_pitch);
+
+		for (int xi = 0; xi < (m_src.hsize >> 1); xi ++)
+		{
+			// TODO: not very efficient, we need a cleaner per-pixel RMW phase
+			const u16 src_dot = m_data->read_word(src_address);
+			const u16 dst_dot = m_data->read_word(dst_address);
+			u16 result = 0;
+
+			for (int pixi = 0; pixi < 4; pixi ++)
+			{
+				u8 cur_pixel = (src_dot & 0xf);
+				if (cur_pixel || tp_mod == 0)
+					result |= (src_dot & 0xf) << (pixi * 4);
+				else
+					result |= (dst_dot & 0xf) << (pixi * 4);
+			}
+
+			m_data->write_word(dst_address, result);
+			src_address += 2;
+			dst_address += 2;
+		}
+	}
+}
