@@ -1109,7 +1109,7 @@ INTERRUPT_GEN_MEMBER(pc88va_state::vrtc_irq )
 
 WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 {
-	if(m_fdc_mode)
+	if(m_fdc_mode && state)
 	{
 		// TODO: ugh why it doesn't follow state?
 		//printf("%d\n",state);
