@@ -8176,6 +8176,7 @@ void downtown_state::calibr50(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
 	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_xoffsets(-2, -3);
+	m_layers[0]->do_partial_update_on_register_write();
 
 	PALETTE(config, m_palette).set_entries(512);
 

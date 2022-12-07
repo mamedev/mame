@@ -23,6 +23,7 @@ public:
 	template <typename... T> void set_tile_offset_callback(T &&... args) { m_tile_offset_callback.set(std::forward<T>(args)...); }
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	void set_xoffsets(int flip, int noflip) { m_xoffsets[1] = flip; m_xoffsets[0] = noflip; }
+	void do_partial_update_on_register_write() { m_do_partial_update_on_register_write = true; }
 
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 	u16 vctrl_r(offs_t offset, u16 mem_mask = 0xffff);
@@ -56,6 +57,8 @@ private:
 
 	u16 m_vctrl[3];
 	u8 m_rambank;
+
+	bool m_do_partial_update_on_register_write;
 };
 
 DECLARE_DEVICE_TYPE(X1_012, x1_012_device)
