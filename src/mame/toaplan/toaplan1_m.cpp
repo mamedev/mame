@@ -79,7 +79,6 @@ void toaplan1_demonwld_state::dsp_bio_w(u16 data)
 	/* data 0x0000  means set DSP BIO line active and disable */
 	/*              communication to main processor*/
 
-
 	logerror("DSP PC:%04x IO write %04x at port 3\n", m_dsp->pcbase(), data);
 	if (data & 0x8000)
 		m_dsp_bio = CLEAR_LINE;
@@ -205,7 +204,7 @@ void toaplan1_state::coin_w(u8 data)
 	{
 		case 0xee: machine().bookkeeping().coin_counter_w(1,1); machine().bookkeeping().coin_counter_w(1,0); break; /* Count slot B */
 		case 0xed: machine().bookkeeping().coin_counter_w(0,1); machine().bookkeeping().coin_counter_w(0,0); break; /* Count slot A */
-	/* The following are coin counts after coin-lock active (faulty coin-lock ?) */
+		/* The following are coin counts after coin-lock active (faulty coin-lock ?) */
 		case 0xe2: machine().bookkeeping().coin_counter_w(1,1); machine().bookkeeping().coin_counter_w(1,0); machine().bookkeeping().coin_lockout_w(1,1); break;
 		case 0xe1: machine().bookkeeping().coin_counter_w(0,1); machine().bookkeeping().coin_counter_w(0,0); machine().bookkeeping().coin_lockout_w(0,1); break;
 

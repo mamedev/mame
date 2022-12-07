@@ -991,12 +991,12 @@ void toaplan1_samesame_state::mcu_w(u8 data)
 {
 	m_to_mcu = data;
 	m_cmdavailable = 1;
-};
+}
 
 u8 toaplan1_samesame_state::soundlatch_r()
 {
 	return m_to_mcu;
-};
+}
 
 void toaplan1_samesame_state::sound_done_w(u8 data)
 {
@@ -1008,7 +1008,7 @@ u8 toaplan1_samesame_state::cmdavailable_r()
 {
 	if (m_cmdavailable) return 0xff;
 	else return 0x00;
-};
+}
 
 void toaplan1_samesame_state::hd647180_io_map(address_map &map)
 {
