@@ -2109,7 +2109,7 @@ void toaplan1_samesame_state::samesame(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch).set_separate_acknowledge(true);
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
