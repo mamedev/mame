@@ -288,6 +288,8 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
 		m_pic2->ir3_w(0);
 		m_pic2->ir3_w(1);
 	}
+
+	m_fdc_timer->adjust(attotime::from_msec(100));
 }
 
 TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_0)
@@ -452,29 +454,10 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 				, ttrg
 			);
 
-			if( ttrg )
+			if( ttrg && !BIT(m_fdc_ctrl_2, 0) )
 				m_fdc_timer->adjust(attotime::from_msec(100));
-
-			// TODO: confirm condition
-			// shanghai and famista (at very least) sends a motor off if left idle for a while,
-			// then any attempt to load/save will fail because there's no explicit motor on
-			// written back to $1b4.
-			// Note that this still isn't enough to avoid floppy errors, but makes failures
-			// to be eventually recoverable for now.
-			if (!m_xtmask && cur_xtmask && ttrg)
-			{
-				floppy_image_device *floppy0, *floppy1;
-				floppy0 = m_fdd[0]->get_device();
-				floppy1 = m_fdd[1]->get_device();
-
-				if (floppy0)
-					if (m_fdd[0]->get_device()->mon_r() == 1)
-						m_motor_start_timer[0]->adjust(attotime::from_msec(505));
-
-				if (floppy1)
-					if (m_fdd[1]->get_device()->mon_r() == 1)
-						m_motor_start_timer[1]->adjust(attotime::from_msec(505));
-			}
+			else if (!ttrg && BIT(m_fdc_ctrl_2, 0) )
+				m_fdc_timer->adjust(attotime::never);
 
 			m_xtmask = cur_xtmask;
 
