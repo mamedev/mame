@@ -109,7 +109,7 @@ void x1_012_device::vctrl_w(offs_t offset, u16 data, u16 mem_mask)
 		rectangle curvisarea = m_screen->visible_area();
 		if ((line >= curvisarea.min_y) && (line <= curvisarea.max_y))
 		{
-			LOGMASKED(LOG_IGNORED_PARTIALUPDATES, "%s: HACK: not doing partial update for sprite register %02x at scanline %d\n", machine().describe_context(), offset, line);
+			LOGMASKED(LOG_IGNORED_PARTIALUPDATES, "%s: HACK: not doing partial update for tilemap register %02x at scanline %d\n", machine().describe_context(), offset, line);
 		}
 	}
 
