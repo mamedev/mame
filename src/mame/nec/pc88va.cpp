@@ -1095,8 +1095,10 @@ void pc88va_state::machine_reset()
 	m_fdc_mode = 0;
 	m_xtmask = false;
 
-	m_misc_ctrl = 0x80;
-	m_sound_irq_enable = false;
+	// shinraba never write to port $32,
+	// and it expects that the sound irq actually runs otherwise it enters in debug mode
+	m_misc_ctrl = 0x00;
+	m_sound_irq_enable = true;
 	m_sound_irq_pending = false;
 }
 
@@ -1136,7 +1138,6 @@ static void pc88va_floppies(device_slot_interface &device)
 }
 
 // TODO: often dies
-// shinraba doesn't even unmask the irq not even in sound test wtf
 WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
 {
 	bool irq_state = m_sound_irq_enable & state;

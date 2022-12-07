@@ -541,10 +541,10 @@ Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bit
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
-No [OPNA] BGMs starting from Telenet logo
-Opening wants pressing key 0 pad to move on, debug feature?
+Hangs on opening due of [OPNA] irq misfiring
 Opening has a few weird places for [gfx] priority
-Has [SGP] artifacts
+Has [SGP] and [ROP] artifacts
+Omake: if sound irqs don't run then needs to press key 0 pad to move on
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
 		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
