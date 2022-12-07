@@ -2,17 +2,17 @@
 // copyright-holders:Vas Crabb
 /**********************************************************************
 
-    Sega Mark III "Paddle Control" emulation
+    Sega Mega Drive Control Pad emulation
 
 **********************************************************************/
-#ifndef MAME_BUS_SMS_CTRL_PADDLE_H
-#define MAME_BUS_SMS_CTRL_PADDLE_H
+#ifndef MAME_BUS_SMS_CTRL_MDPAD_H
+#define MAME_BUS_SMS_CTRL_MDPAD_H
 
 #pragma once
 
 #include "smsctrl.h"
 
 
-DECLARE_DEVICE_TYPE(SMS_PADDLE, device_sms_control_interface)
+DECLARE_DEVICE_TYPE(SMS_MDPAD, device_sms_control_interface)
 
-#endif // MAME_BUS_SMS_CTRL_PADDLE_H
+#endif // MAME_BUS_SMS_CTRL_MDPAD_H
