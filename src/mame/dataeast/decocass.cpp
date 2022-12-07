@@ -2,14 +2,6 @@
 // copyright-holders:Juergen Buchmueller, David Haywood
 /*******************************************************************************
 
-    DECO Cassette System driver
-    by Juergen Buchmueller
-
-    with contributions by: David Widel, Nicola Salmoria, Aaron Giles, Brian Troha,
-    Fabio Priuli, Lord Nightmare, The Dumping Union, Team Japump!!!, Hau,
-    Jean-Francois Del Nero, Omar Cornut, Game Preservation Society, Joseph Redon
-
-
     The DECO cassette system consists of three PCBs in a card cage:
 
     **** Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset) ****
