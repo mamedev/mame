@@ -142,7 +142,6 @@ void toaplan1_demonwld_state::dsp_ctrl_w(u8 data)
 u8 toaplan1_samesame_state::port_6_word_r()
 {
 	/* Bit 0x80 is secondary CPU (HD647180) ready signal */
-	logerror("PC:%08x Warning !!! IO reading from $14000b\n",m_maincpu->pcbase());
 	return (m_soundlatch->pending_r() ? 0 : 0x80) | m_tjump_io->read();
 }
 

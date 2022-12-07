@@ -755,6 +755,7 @@ void toaplan1_samesame_state::main_map(address_map &map)
 	map(0x140008, 0x140009).portr("SYSTEM");
 	map(0x14000b, 0x14000b).r(FUNC(toaplan1_samesame_state::port_6_word_r));    /* Territory, and MCU ready */
 	map(0x14000d, 0x14000d).w(FUNC(toaplan1_samesame_state::coin_w));  /* Coin counter/lockout */
+//  map(0x14000e, 0x14000f).nopr(); // irq ack?
 	map(0x14000f, 0x14000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));   /* Commands sent to HD647180 */
 	map(0x180001, 0x180001).w(FUNC(toaplan1_samesame_state::bcu_flipscreen_w));
 	map(0x180002, 0x180003).rw(FUNC(toaplan1_samesame_state::tileram_offs_r), FUNC(toaplan1_samesame_state::tileram_offs_w));
@@ -935,9 +936,9 @@ void toaplan1_demonwld_state::dsp_program_map(address_map &map)
 
 void toaplan1_demonwld_state::dsp_io_map(address_map &map)
 {
-	map(0, 0).w(FUNC(toaplan1_demonwld_state::dsp_addrsel_w));
-	map(1, 1).rw(FUNC(toaplan1_demonwld_state::dsp_r), FUNC(toaplan1_demonwld_state::dsp_w));
-	map(3, 3).w(FUNC(toaplan1_demonwld_state::dsp_bio_w));
+	map(0x0, 0x0).w(FUNC(toaplan1_demonwld_state::dsp_addrsel_w));
+	map(0x1, 0x1).rw(FUNC(toaplan1_demonwld_state::dsp_r), FUNC(toaplan1_demonwld_state::dsp_w));
+	map(0x3, 0x3).w(FUNC(toaplan1_demonwld_state::dsp_bio_w));
 }
 
 
@@ -989,8 +990,7 @@ u8 toaplan1_state::vimana_tjump_invert_r()
 
 u8 toaplan1_samesame_state::cmdavailable_r()
 {
-	if (m_soundlatch->pending_r()) return 0xff;
-	else return 0x00;
+	return m_soundlatch->pending_r() ? 1 : 0;
 }
 
 void toaplan1_samesame_state::hd647180_io_map(address_map &map)
