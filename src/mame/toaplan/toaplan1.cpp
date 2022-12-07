@@ -995,6 +995,7 @@ u8 toaplan1_samesame_state::cmdavailable_r()
 
 void toaplan1_samesame_state::hd647180_io_map(address_map &map)
 {
+	map.unmap_value_high();
 	map.global_mask(0xff);
 
 	map(0x63, 0x63).nopr(); // read port D
