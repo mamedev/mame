@@ -811,6 +811,19 @@ static INPUT_PORTS_START( cmanhat )
 	/* other dips not verified */
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( cnebula )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( cluckypo )
 	PORT_INCLUDE( decocass )
 
@@ -1079,6 +1092,15 @@ void decocass_type1_state::cdsteljn(machine_config &config)
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cdsteljn)
 }
+
+void decocass_type1_state::cnebula(machine_config &config)
+{
+	decocass(config);
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cnebula)
+}
+
 
 void decocass_type1_state::cmanhat(machine_config &config)
 {
@@ -1385,16 +1407,29 @@ void decocass_type3_state::cfghtice(machine_config &config)
 	ROM_LOAD_BIOS( 3, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
 	ROM_LOAD_BIOS( 3, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */ \
 
-/* rms8.7e, New boardset bios, country code D */ \
-#define DECOCASS_BIOS_D_MAINCPU \
-	ROM_SYSTEM_BIOS( 4, "d",   "Bios D (Europe?)" ) \
-	ROM_LOAD_BIOS( 4, "v0d-.7e",    0xf000, 0x1000, CRC(1e0c22b1) SHA1(5fec8fef500bbebc13d0173406afc55235d3affb) ) /* handcrafted (single byte changed) because ctisland3 requires region D */
-#define DECOCASS_BIOS_D_AUDIOCPU \
+/* New boardset bios, country code C - UK */
+#define DECOCASS_BIOS_C_MAINCPU \
+	ROM_SYSTEM_BIOS( 4, "c",   "Bios C (UK)" ) \
+	ROM_LOAD_BIOS( 4, "v0c-.7e",    0xf000, 0x1000, CRC(9f505709) SHA1(a9c661ba5a0d3fa5e935fb9c10fa63e2d9809981) ) /* handcrafted (single byte changed) because cnebula requires region C */
+#define DECOCASS_BIOS_C_AUDIOCPU \
 	ROM_LOAD_BIOS( 4, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
-#define DECOCASS_BIOS_D_PROMS \
+#define DECOCASS_BIOS_C_PROMS \
 	ROM_LOAD_BIOS( 4, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
 	ROM_LOAD_BIOS( 4, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
 	ROM_LOAD_BIOS( 4, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+
+/* rms8.7e, New boardset bios, country code D - Europe */ \
+#define DECOCASS_BIOS_D_MAINCPU \
+	ROM_SYSTEM_BIOS( 5, "d",   "Bios D (Europe)" ) \
+	ROM_LOAD_BIOS( 5, "v0d-.7e",    0xf000, 0x1000, CRC(1e0c22b1) SHA1(5fec8fef500bbebc13d0173406afc55235d3affb) ) /* handcrafted (single byte changed) because ctisland3 requires region D */
+#define DECOCASS_BIOS_D_AUDIOCPU \
+	ROM_LOAD_BIOS( 5, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
+#define DECOCASS_BIOS_D_PROMS \
+	ROM_LOAD_BIOS( 5, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 5, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 5, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+
+
 
 
 
@@ -1411,18 +1446,21 @@ void decocass_type3_state::cfghtice(machine_config &config)
 	DECOCASS_BIOS_A0_MAINCPU \
 	DECOCASS_BIOS_B_MAINCPU \
 	DECOCASS_BIOS_B0_MAINCPU \
+	DECOCASS_BIOS_C_MAINCPU \
 	DECOCASS_BIOS_D_MAINCPU \
 	ROM_REGION( 0x10000, "audiocpu", 0 ) \
 	DECOCASS_BIOS_A_AUDIOCPU \
 	DECOCASS_BIOS_A0_AUDIOCPU \
 	DECOCASS_BIOS_B_AUDIOCPU \
 	DECOCASS_BIOS_B0_AUDIOCPU \
+	DECOCASS_BIOS_C_AUDIOCPU \
 	DECOCASS_BIOS_D_AUDIOCPU \
 	ROM_REGION( 0x00060, "proms", 0 ) \
 	DECOCASS_BIOS_A_PROMS \
 	DECOCASS_BIOS_A0_PROMS \
 	DECOCASS_BIOS_B_PROMS \
 	DECOCASS_BIOS_B0_PROMS \
+	DECOCASS_BIOS_C_PROMS \
 	DECOCASS_BIOS_D_PROMS \
 	ROM_REGION( 0x10000, "mcu", 0 )   /* 4k for the 8041 MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \
 	DECOCASS_BIOS_MCU
@@ -1447,6 +1485,10 @@ void decocass_type3_state::cfghtice(machine_config &config)
 #define DECOCASS_BIOS_D_ROMS \
 	DECOCASS_BIOS_MAIN \
 	ROM_DEFAULT_BIOS( "d" )
+
+#define DECOCASS_BIOS_C_ROMS \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "c" )
 
 ROM_START( decocass )
 	DECOCASS_BIOS_MAIN
@@ -1497,6 +1539,18 @@ ROM_START( cterrani )
 
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "dt-1040.cas", 0x0000, 0x8000, CRC(eb71adbc) SHA1(67becfde39c034d4b8edc2eb100050de102773da) )
+ROM_END
+
+/* 06 Nebula */
+ROM_START( cnebula )
+	DECOCASS_BIOS_C_ROMS
+
+	ROM_REGION( 0x00020, "dongle", ROMREGION_ERASE00 )    /* dongle data */
+	/* The dongle data is reverse engineered from manual decryption */
+	ROM_LOAD( "nebula2.pro",   0x0000, 0x0020, CRC(75cae001) SHA1(59b2b47b91945857e6f40dd4baa0e92242fc3519) )
+
+	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
+	ROM_LOAD( "nebula2.cas", 0x000000, 0x005c00, CRC(ef05ce36) SHA1(824de511387eba1bd99c3c7935702d794eb46446) )
 ROM_END
 
 /* 07 Astro Fantasia */
@@ -2186,12 +2240,12 @@ void decocass_state::init_cdsteljn()
 /* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette) (US)", 0 )
 /* 01 */ GAME( 1980, chwy,      decocass, chwy,     chwy,     decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette) (US)", 0 )
 /* 02 */ // 1980.12 Sengoku Ninjatai
-/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  cmanhat,  decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  cmanhat,  decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette) (Japan)", MACHINE_IMPERFECT_GRAPHICS ) // Colours don't match some videos, but probably different game version
 /* 04 */ GAME( 1981, cterrani,  decocass, cterrani, cterrani, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette) (US)", 0 )
 /* 05 */ // 1981.?? Missile Sprinter
-/* 06 */ // 1980.12 Nebula
+/* 06 */ GAME( 1981, cnebula,   decocass, cnebula,  cnebula,  decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Nebula (DECO Cassette) (UK)", 0 ) // 1980.12 Nebula - "NEBULA2 01/021980.11.25" string in cassette data
 /* 07 */ GAME( 1981, castfant,  decocass, castfant, castfant, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette) (US)", 0 )
-/* 08 */ GAME( 1981, ctower,    decocass, cfboy0a1, ctower,   decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "The Tower (DECO Cassette) (Europe?)", 0 ) // 1981.03 The Tower (1981.02.04 in cassette data)
+/* 08 */ GAME( 1981, ctower,    decocass, cfboy0a1, ctower,   decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "The Tower (DECO Cassette) (Europe)", 0 ) // 1981.03 The Tower (1981.02.04 in cassette data)
 /* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette) (US)", 0 )
 /* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */

@@ -2,35 +2,28 @@
 // copyright-holders:Wilbert Pol, Charles MacDonald,Mathis Rosenhauer,Brad Oliver,Michael Luong,Fabio Priuli,Enik Land
 /*****************************************************************************
  *
- * includes/sms.h
+ * sega/sms.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_SMS_H
 #define MAME_INCLUDES_SMS_H
 
-#define LOG_REG
-#define LOG_PAGING
-#define LOG_COLOR
-
-#define NVRAM_SIZE             (0x08000)
-#define CPU_ADDRESSABLE_SIZE   (0x10000)
-
-#define MAX_CARTRIDGES        16
-
-#define CONTROL1_TAG   "ctrl1"
-#define CONTROL2_TAG   "ctrl2"
+#pragma once
 
 #include "bus/gamegear/ggext.h"
 #include "bus/sega8/sega8_slot.h"
 #include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/sms_exp/smsexp.h"
+#include "machine/timer.h"
 #include "sound/ymopl.h"
 #include "video/315_5124.h"
 
 #include "screen.h"
-#include "machine/timer.h"
+
+#define LOG_REG
+#define LOG_PAGING
+#define LOG_COLOR
 
 
 class sms_state : public driver_device
@@ -42,8 +35,8 @@ public:
 		m_vdp(*this, "sms_vdp"),
 		m_main_scr(*this, "screen"),
 		m_ym(*this, "ym2413"),
-		m_port_ctrl1(*this, CONTROL1_TAG),
-		m_port_ctrl2(*this, CONTROL2_TAG),
+		m_port_ctrl1(*this, "ctrl1"),
+		m_port_ctrl2(*this, "ctrl2"),
 		m_port_gg_ext(*this, "ext"),
 		m_port_gg_dc(*this, "GG_PORT_DC"),
 		m_port_pause(*this, "PAUSE"),

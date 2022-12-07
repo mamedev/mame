@@ -23,7 +23,7 @@ Notes:
   when it does not detect use by a Japanese SMS console, because the Sega
   Mark III lacks the TH line. There was a different Sports Pad model released
   in Japan and no information was found about it supporting both modes, so
-  that model is currently emulated as a different device (see sportsjp.c).
+  that model is currently emulated as a different device (see sportsjp.cpp).
 
   It was discovered that games designed for the Paddle Controller, released
   in Japan, will switch to a mode incompatible with the original Paddle when
@@ -41,111 +41,75 @@ Notes:
 #include "sports.h"
 
 
+namespace {
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+INPUT_PORTS_START( sms_sports_pad )
+	PORT_START("SPORTS_BT")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // TR
 
-DEFINE_DEVICE_TYPE(SMS_SPORTS_PAD, sms_sports_pad_device, "sms_sports_pad", "Sega SMS Sports Pad (US)")
-
-// time interval not verified
-#define SPORTS_PAD_INTERVAL attotime::from_hz(XTAL(10'738'635)/3/512)
-
-
-TIMER_CALLBACK_MEMBER(sms_sports_pad_device::read_tick)
-{
-	// values for x and y axis need to be reset for Sports Pad games, but
-	// are not reset for paddle games, so it was assumed the reset occurs
-	// only when this timer fires after the read state reaches its maximum value.
-	if (m_read_state == 3)
-	{
-		m_x_axis_reset_value = m_sports_x->read();
-		m_y_axis_reset_value = m_sports_y->read();
-	}
-	else
-	{
-		// set to maximum value, so it wraps to 0 at next increment
-		m_read_state = 3;
-	}
-}
-
-
-READ_LINE_MEMBER( sms_sports_pad_device::th_pin_r )
-{
-	return m_th_pin_state;
-}
-
-
-WRITE_LINE_MEMBER( sms_sports_pad_device::th_pin_w )
-{
-	m_read_state = (m_read_state + 1) & 3;
-	m_sportspad_timer->adjust(m_interval);
-	m_th_pin_state = state;
-}
-
-
-CUSTOM_INPUT_MEMBER( sms_sports_pad_device::rldu_pins_r )
-{
-	uint8_t data = 0;
-
-	switch (m_read_state)
-	{
-	case 0:
-		data = (m_sports_x->read() - m_x_axis_reset_value) >> 4;
-		break;
-	case 1:
-		data = (m_sports_x->read() - m_x_axis_reset_value);
-		break;
-	case 2:
-		data = (m_sports_y->read() - m_y_axis_reset_value) >> 4;
-		break;
-	case 3:
-		data = (m_sports_y->read() - m_y_axis_reset_value);
-		break;
-	}
-
-	// The returned value is inverted due to IP_ACTIVE_LOW mapping.
-	return ~(data & 0x0f);
-}
-
-
-static INPUT_PORTS_START( sms_sports_pad )
-	PORT_START("SPORTS_IN")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(sms_sports_pad_device, rldu_pins_r) // R,L,D,U
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL (Button 1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(sms_sports_pad_device, th_pin_r) // TH
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) // TR (Button 2)
-
-	PORT_START("SPORTS_OUT")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED ) // Directional pins
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) // TL (Button 1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(sms_sports_pad_device, th_pin_w) // TH
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // TR (Button 2)
-
-	PORT_START("SPORTS_X")    /* Sports Pad X axis */
+	PORT_START("SPORTS_X")    // X axis
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40) PORT_REVERSE
 
-	PORT_START("SPORTS_Y")    /* Sports Pad Y axis */
+	PORT_START("SPORTS_Y")    // Y axis
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40) PORT_REVERSE
 INPUT_PORTS_END
 
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
 
-ioport_constructor sms_sports_pad_device::device_input_ports() const
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class sms_sports_pad_device : public device_t, public device_sms_control_interface
 {
-	return INPUT_PORTS_NAME( sms_sports_pad );
+public:
+	// construction/destruction
+	sms_sports_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_sms_control_interface implementation
+	virtual uint8_t in_r() override;
+	virtual void out_w(uint8_t data, uint8_t mem_mask) override;
+
+protected:
+	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(sms_sports_pad); }
+	virtual void device_start() override;
+
+private:
+	TIMER_CALLBACK_MEMBER(timeout);
+
+	required_ioport m_buttons;
+	required_ioport m_x_axis;
+	required_ioport m_y_axis;
+
+	emu_timer *m_timeout_timer;
+
+	uint8_t m_phase;
+	uint8_t m_th_state;
+	uint8_t m_x_base;
+	uint8_t m_y_base;
+	uint8_t m_data;
+};
+
+
+TIMER_CALLBACK_MEMBER(sms_sports_pad_device::timeout)
+{
+	// values for x and y axis need to be reset for Sports Pad games, but
+	// are not reset for paddle games, so it was assumed the reset occurs
+	// only when this timer fires after the read state reaches its maximum value.
+	if (3U == m_phase)
+	{
+		m_x_base = m_x_axis->read();
+		m_y_base = m_y_axis->read();
+	}
+	else
+	{
+		// set to maximum value, so it wraps to 0 at next increment
+		m_phase = 3;
+	}
 }
 
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
 
 //-------------------------------------------------
 //  sms_sports_pad_device - constructor
@@ -153,17 +117,15 @@ ioport_constructor sms_sports_pad_device::device_input_ports() const
 
 sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_SPORTS_PAD, tag, owner, clock),
-	device_sms_control_port_interface(mconfig, *this),
-	m_sports_in(*this, "SPORTS_IN"),
-	m_sports_out(*this, "SPORTS_OUT"),
-	m_sports_x(*this, "SPORTS_X"),
-	m_sports_y(*this, "SPORTS_Y"),
-	m_read_state(0),
-	m_th_pin_state(0),
-	m_x_axis_reset_value(0x80), // value 0x80 helps when starting paddle games.
-	m_y_axis_reset_value(0x80),
-	m_interval(SPORTS_PAD_INTERVAL),
-	m_sportspad_timer(nullptr)
+	device_sms_control_interface(mconfig, *this),
+	m_buttons(*this, "SPORTS_BT"),
+	m_x_axis(*this, "SPORTS_X"),
+	m_y_axis(*this, "SPORTS_Y"),
+	m_timeout_timer(nullptr),
+	m_phase(0),
+	m_th_state(1),
+	m_x_base(0),
+	m_y_base(0)
 {
 }
 
@@ -174,20 +136,63 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 
 void sms_sports_pad_device::device_start()
 {
-	m_sportspad_timer = timer_alloc(FUNC(sms_sports_pad_device::read_tick), this);
+	m_timeout_timer = timer_alloc(FUNC(sms_sports_pad_device::timeout), this);
 
-	save_item(NAME(m_read_state));
-	save_item(NAME(m_th_pin_state));
-	save_item(NAME(m_x_axis_reset_value));
-	save_item(NAME(m_y_axis_reset_value));
+	m_phase = 0;
+	m_x_base = 0x80; // value 0x80 helps when starting paddle games.
+	m_y_base = 0x80;
+
+	save_item(NAME(m_phase));
+	save_item(NAME(m_th_state));
+	save_item(NAME(m_x_base));
+	save_item(NAME(m_y_base));
 }
 
-uint8_t sms_sports_pad_device::peripheral_r()
+
+uint8_t sms_sports_pad_device::in_r()
 {
-	return m_sports_in->read();
+	uint8_t result = m_buttons->read();
+
+	switch (m_phase)
+	{
+	case 0:
+		result |= BIT(m_x_axis->read() - m_x_base, 4, 4);
+		break;
+	case 1:
+		result |= BIT(m_x_axis->read() - m_x_base, 0, 4);
+		break;
+	case 2:
+		result |= BIT(m_y_axis->read() - m_y_base, 4, 4);
+		break;
+	case 3:
+		result |= BIT(m_y_axis->read() - m_y_base, 0, 4);
+		break;
+	}
+
+	return result;
 }
 
-void sms_sports_pad_device::peripheral_w(uint8_t data)
+
+void sms_sports_pad_device::out_w(uint8_t data, uint8_t mem_mask)
 {
-	m_sports_out->write(data);
+	uint8_t const th_state = BIT(data, 6);
+
+	// FIXME: this is definitely wrong - work out how it actually responds to edges
+	if (th_state != m_th_state)
+	{
+		m_phase = (m_phase + 1) & 3;
+		m_timeout_timer->adjust(attotime::from_hz(XTAL(10'738'635) / 3 / 512)); // timeout not verified
+	}
+
+	m_th_state = th_state;
 }
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(SMS_SPORTS_PAD, device_sms_control_interface, sms_sports_pad_device, "sms_sports_pad", "Sega SMS Sports Pad (US)")

@@ -12426,6 +12426,7 @@ clocknchj                       //
 cluckypo                        // 15 1981.?? Lucky Poker
 cmanhat                         // 03 1981.01 Manhattan
 cmissnx                         // 21 1982.04 Mission-X/Zoar
+cnebula                         //    1980.12 Nebula
 cnightst                        // 32 1983.04 Night Star
 cnightst2                       // 32
 cocean1a                        // DT-1[10]1-A   1981.03.17 Ocean to Ocean (Slot) (Japan) (DECO Cassette MD) (Ver 1) // version verified, no lever used
@@ -26455,6 +26456,7 @@ m4toptak                        // Top Take (Barcrest)
 m4toptena                       //
 m4tribnk                        // Triple Bank (Barcrest)
 m4tricol                        // Tricolor (Barcrest)
+m4tst                           // MPU4 Unit Test (Program 4)
 m4tst2                          // MPU4 Unit Test (Program 2)
 m4ttak                          // Tic Tac Take (unknown)
 m4tupen                         // Tuppenny Cracker (Barcrest - Bootleg)
@@ -30211,7 +30213,6 @@ m4tropcla                       //
 m4tropclb                       //
 m4tropclc                       //
 m4tropcld                       //
-m4tst                           // MPU4 Unit Test (Program 4)
 m4vivalv                        // Viva Las Vegas (Barcrest)
 m4vivalv__0                     //
 m4vivalv__1                     //
@@ -33984,7 +33985,8 @@ vandykejal                      // UPL-90064 (c) Jaleco
 vandykejal2                     // UPL-90064 (c) Jaleco
 
 @source:nmk/nmkmedal.cpp
-hpierrot                        // NMK
+drail                           // NTC / NMK
+hpierrot                        // NTC / NMK
 trocana                         // NTC / NMK
 
 @source:efo/nightmare.cpp
@@ -34826,6 +34828,7 @@ pcktgal                         // (c) 1987 Data East Corporation (Japan)
 pcktgal2                        // (c) 1989 Data East Corporation (World?)
 pcktgal2j                       // (c) 1989 Data East Corporation (World?)
 pcktgalb                        // bootleg
+pcktgalba                       // bootleg
 spool3                          // (c) 1989 Data East Corporation (World?)
 spool3i                         // (c) 1990 Data East Corporation + I-Vics license
 
@@ -41724,6 +41727,7 @@ tecnodargr                      // (c) 1991 Automatics Pasqual / Recreativos G.R
 @source:tecmo/tehkanwc.cpp
 gridiron                        // (c) 1985 Tehkan
 teedoff                         // 6102 - (c) 1986 Tecmo
+teedoffj                        // 
 tehkanwc                        // (c) 1985 Tehkan
 tehkanwcb                       // bootleg
 tehkanwcc                       // bootleg

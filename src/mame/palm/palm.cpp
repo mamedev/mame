@@ -20,6 +20,10 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "pilot1k.lh"
+
+namespace {
+
 class palm_state : public driver_device
 {
 public:
@@ -27,6 +31,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_io_penx(*this, "PENX"),
 		m_io_peny(*this, "PENY"),
 		m_io_penb(*this, "PENB"),
@@ -48,26 +54,62 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
-	void palm_port_f_out(uint8_t data);
-	uint8_t palm_port_c_in();
-	uint8_t palm_port_f_in();
-	void palm_spim_out(uint16_t data);
-	uint16_t palm_spim_in();
-	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
-	void palm_palette(palette_device &palette) const;
+	enum : uint8_t
+	{
+		PORTF_Y_VCCN_BIT		= 0,
+		PORTF_Y_GND_BIT			= 1,
+		PORTF_X_VCCN_BIT		= 2,
+		PORTF_X_GND_BIT			= 3,
+		PORTF_LCD_EN_BIT		= 4,
+		PORTF_LCD_VCCN_BIT		= 5,
+		PORTF_LCD_VEE_BIT		= 6,
+		PORTF_ADC_CSN_BIT		= 7,
 
-	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
-	void palm_map(address_map &map);
+		PORTF_PEN_MASK			= 0x8f,
+		PORTF_X_MASK			= (1 << PORTF_X_VCCN_BIT) | (1 << PORTF_Y_GND_BIT),
+		PORTF_Y_MASK			= (1 << PORTF_Y_VCCN_BIT) | (1 << PORTF_X_GND_BIT),
+	};
+
+private:
+	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+	void mem_map(address_map &map);
+
+	void flm_out(int state);
+	void llp_out(int state);
+	void lsclk_out(int state);
+	void ld_out(uint8_t data);
+	void lcd_info_changed(double refresh_hz, int width, int height);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void init_palette(palette_device &palette) const;
+
+	void port_f_out(uint8_t data);
+	uint8_t port_c_in();
+	uint8_t port_f_in();
+
+	int spi_in();
 
 	required_device<mc68328_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	uint8_t m_port_f_latch;
-	uint16_t m_spim_data;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
 	required_ioport m_io_penb;
 	required_ioport m_io_portd;
+
+	uint8_t m_port_f_latch;
+
+	uint16_t m_spim_data;
+
+	bitmap_rgb32 m_lcd_bitmap;
+	int m_lcd_first_line;
+	int m_lcd_line_pulse;
+	int m_lcd_shift_clk;
+	uint8_t m_lcd_data;
+	int m_lcd_scan_x;
+	int m_lcd_scan_y;
+
+	static const int EXTRA_ARTWORK_HEIGHT = 60;
 };
 
 
@@ -91,46 +133,43 @@ INPUT_CHANGED_MEMBER(palm_state::button_check)
 	m_maincpu->set_port_d_lines(button_state, (int)param);
 }
 
-void palm_state::palm_port_f_out(uint8_t data)
+void palm_state::port_f_out(uint8_t data)
 {
+	const uint8_t old = m_port_f_latch;
 	m_port_f_latch = data;
+	const uint8_t changed = old ^ data;
+
+	if (BIT(changed, PORTF_ADC_CSN_BIT) && !BIT(m_port_f_latch, PORTF_ADC_CSN_BIT))
+	{
+		switch (m_port_f_latch & PORTF_PEN_MASK)
+		{
+			case PORTF_X_MASK:
+				m_spim_data = (0xff - m_io_penx->read()) * 2;
+				break;
+
+			case PORTF_Y_MASK:
+				m_spim_data = (0xff - m_io_peny->read()) * 2;
+				break;
+		}
+	}
 }
 
-uint8_t palm_state::palm_port_c_in()
+uint8_t palm_state::port_c_in()
 {
 	return 0x10;
 }
 
-uint8_t palm_state::palm_port_f_in()
+uint8_t palm_state::port_f_in()
 {
 	return m_port_f_latch;
 }
 
-void palm_state::palm_spim_out(uint16_t data)
+int palm_state::spi_in()
 {
-	m_spim_data = data;
-}
-
-uint16_t palm_state::palm_spim_in()
-{
-	return m_spim_data;
-}
-
-WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
-{
-	uint8_t x = m_io_penx->read();
-	uint8_t y = m_io_peny->read();
-
-	switch (m_port_f_latch & 0x0f)
-	{
-		case 0x06:
-			m_spim_data = (0xff - x) * 2;
-			break;
-
-		case 0x09:
-			m_spim_data = (0xff - y) * 2;
-			break;
-	}
+	int out_state = BIT(m_spim_data, 15);
+	m_spim_data <<= 1;
+	m_spim_data |= 1;
+	return out_state;
 }
 
 void palm_state::machine_start()
@@ -140,6 +179,13 @@ void palm_state::machine_start()
 
 	save_item(NAME(m_port_f_latch));
 	save_item(NAME(m_spim_data));
+
+	save_item(NAME(m_lcd_first_line));
+	save_item(NAME(m_lcd_line_pulse));
+	save_item(NAME(m_lcd_shift_clk));
+	save_item(NAME(m_lcd_data));
+	save_item(NAME(m_lcd_scan_x));
+	save_item(NAME(m_lcd_scan_y));
 }
 
 void palm_state::machine_reset()
@@ -148,13 +194,87 @@ void palm_state::machine_reset()
 	uint8_t* bios = memregion("bios")->base();
 	memset(m_ram->pointer(), 0, m_ram->size());
 	memcpy(m_ram->pointer(), bios, 0x20000);
+
+	m_spim_data = 0xffff;
+
+	m_lcd_first_line = 1;
+	m_lcd_line_pulse = 0;
+	m_lcd_shift_clk = 0;
+	m_lcd_data = 0;
+	m_lcd_scan_x = 0;
+	m_lcd_scan_y = 0;
 }
 
-/* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-void palm_state::palm_palette(palette_device &palette) const
+/***************************************************************************
+    LCD HARDWARE
+***************************************************************************/
+
+void palm_state::init_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0x7b, 0x8c, 0x5a);
-	palette.set_pen_color(1, 0x00, 0x00, 0x00);
+	palette.set_pen_color(0, 0xbd, 0xbd, 0xaa);
+	palette.set_pen_color(1, 0x40, 0x40, 0x40);
+}
+
+void palm_state::flm_out(int state)
+{
+	m_lcd_first_line = state;
+}
+
+void palm_state::llp_out(int state)
+{
+	const int old = m_lcd_line_pulse;
+	m_lcd_line_pulse = state;
+	if (!state && old)
+	{
+		m_lcd_scan_x = 0;
+		if (m_lcd_first_line)
+		{
+			m_lcd_scan_y = 0;
+		}
+		else
+		{
+			m_lcd_scan_y++;
+		}
+	}
+}
+
+void palm_state::lsclk_out(int state)
+{
+	const int old = m_lcd_shift_clk;
+	m_lcd_shift_clk = state;
+	if (state && !old)
+	{
+		for (uint8_t i = 0; i < 4; i++)
+		{
+			m_lcd_bitmap.pix(m_lcd_scan_y, m_lcd_scan_x) = m_palette->pen_color(BIT(m_lcd_data, 3 - i));
+			m_lcd_scan_x++;
+		}
+	}
+}
+
+void palm_state::ld_out(uint8_t data)
+{
+	m_lcd_data = data;
+}
+
+void palm_state::lcd_info_changed(double refresh_hz, int width, int height)
+{
+	m_screen->set_refresh_hz(refresh_hz);
+	m_screen->set_size(width, height + EXTRA_ARTWORK_HEIGHT);
+	m_screen->set_visarea(0, width - 1, 0, (height + EXTRA_ARTWORK_HEIGHT) - 1);
+	m_lcd_bitmap.resize(width, height);
+}
+
+uint32_t palm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->pen_color(0));
+	if (m_lcd_bitmap.valid())
+	{
+		uint32_t *src = &m_lcd_bitmap.pix(0);
+		uint32_t *dst = &bitmap.pix(0);
+		std::copy_n(src, m_lcd_bitmap.width() * m_lcd_bitmap.height(), dst);
+	}
+	return 0;
 }
 
 
@@ -162,7 +282,7 @@ void palm_state::palm_palette(palette_device &palette) const
     ADDRESS MAPS
 ***************************************************************************/
 
-void palm_state::palm_map(address_map &map)
+void palm_state::mem_map(address_map &map)
 {
 	map(0xc00000, 0xe07fff).rom().region("bios", 0);
 }
@@ -176,29 +296,31 @@ void palm_state::palm(machine_config &config)
 {
 	/* basic machine hardware */
 	MC68328(config, m_maincpu, 32768*506);        /* 16.580608 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &palm_state::palm_map);
-	m_maincpu->set_dasm_override(FUNC(palm_state::palm_dasm_override));
-	m_maincpu->out_port_f().set(FUNC(palm_state::palm_port_f_out));
-	m_maincpu->in_port_c().set(FUNC(palm_state::palm_port_c_in));
-	m_maincpu->in_port_f().set(FUNC(palm_state::palm_port_f_in));
+	m_maincpu->set_addrmap(AS_PROGRAM, &palm_state::mem_map);
+	m_maincpu->set_dasm_override(FUNC(palm_state::dasm_override));
+	m_maincpu->out_port_f().set(FUNC(palm_state::port_f_out));
+	m_maincpu->in_port_c().set(FUNC(palm_state::port_c_in));
+	m_maincpu->in_port_f().set(FUNC(palm_state::port_f_in));
 	m_maincpu->out_pwm().set("dac", FUNC(dac_bit_interface::write));
-	m_maincpu->out_spim().set(FUNC(palm_state::palm_spim_out));
-	m_maincpu->in_spim().set(FUNC(palm_state::palm_spim_in));
-	m_maincpu->spim_xch_trigger().set(FUNC(palm_state::palm_spim_exchange));
+	m_maincpu->in_spim().set(FUNC(palm_state::spi_in));
+	m_maincpu->out_flm().set(FUNC(palm_state::flm_out));
+	m_maincpu->out_llp().set(FUNC(palm_state::llp_out));
+	m_maincpu->out_lsclk().set(FUNC(palm_state::lsclk_out));
+	m_maincpu->out_ld().set(FUNC(palm_state::ld_out));
+	m_maincpu->set_lcd_info_changed(FUNC(palm_state::lcd_info_changed));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1260));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_size(160, 220);
-	screen.set_visarea(0, 159, 0, 219);
-	screen.set_screen_update("maincpu", FUNC(mc68328_device::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_size(160, 160);
+	m_screen->set_visarea(0, 159, 0, 159);
+	m_screen->set_screen_update(FUNC(palm_state::screen_update));
 
-	PALETTE(config, "palette", FUNC(palm_state::palm_palette), 2);
+	PALETTE(config, m_palette, FUNC(palm_state::init_palette), 2);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -423,6 +545,8 @@ void palm_state::pilot1k(machine_config &config)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("512K,1M,2M,4M,8M");
+
+	config.set_default_layout(layout_pilot1k);
 }
 
 void palm_state::pilot5k(machine_config &config)
@@ -464,6 +588,8 @@ void palm_state::palmvx(machine_config &config)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8M");
 }
+
+} // anonymous namespace
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT CLASS       INIT        COMPANY          FULLNAME               FLAGS
 COMP( 1996, pilot1k,  0,       0,      pilot1k, palm, palm_state, empty_init, "U.S. Robotics", "Pilot 1000",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

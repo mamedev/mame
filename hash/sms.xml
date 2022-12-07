@@ -2842,7 +2842,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Notes: FM support; game uses input code for some unreleased international version of the paddle that must have been in development, glitches heavily on machines that fail Japan region check -->
+	<!-- Notes: FM support; glitches heavily on machines that fail Japan region check -->
 	<software name="galactpr">
 		<description>Galactic Protector (Japan)</description>
 		<year>1988</year>
@@ -3371,8 +3371,8 @@ license:CC0
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5062 (USA)"/>
-		<sharedfeat name="ctrl1_default" value="sportspad" />
-		<sharedfeat name="ctrl2_default" value="sportspad" />
+		<sharedfeat name="ctrl1_default" value="sports" />
+		<sharedfeat name="ctrl2_default" value="sports" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power (Jpn cart) -->
 			<feature name="pcb" value="171-5552" />
@@ -6615,8 +6615,8 @@ license:CC0
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5060"/>
-		<sharedfeat name="ctrl1_default" value="sportspad" />
-		<sharedfeat name="ctrl2_default" value="sportspad" />
+		<sharedfeat name="ctrl1_default" value="sports" />
+		<sharedfeat name="ctrl2_default" value="sports" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad football (usa).bin" size="131072" crc="e42e4998" sha1="556d9ab4ba3c3a34440b36c6fc8e972f70f16d72" offset="000000" />
@@ -6643,8 +6643,8 @@ license:CC0
 		<info name="serial" value="G-1365"/>
 		<info name="release" value="19881029"/>
 		<info name="alt_title" value="スポーツパッドサッカー" />
-		<sharedfeat name="ctrl1_default" value="sportspad" />
-		<sharedfeat name="ctrl2_default" value="sportspad" />
+		<sharedfeat name="ctrl1_default" value="sports" />
+		<sharedfeat name="ctrl2_default" value="sports" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad soccer (japan).bin" size="131072" crc="41c948bf" sha1="7634ce39e87049dad1ee4f32a80d728e4bd1f81f" offset="000000" />

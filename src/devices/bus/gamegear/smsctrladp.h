@@ -44,6 +44,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(th_pin_w);
 
 	required_device<sms_control_port_device> m_subctrl_port;
+
+	uint8_t m_th_state;
 };
 
 

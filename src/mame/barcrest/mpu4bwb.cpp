@@ -13,7 +13,7 @@
     This file is home to the following BWB originals
 
     Abracadabra
-    Big Match, ThE
+    Big Match, The
     Bingo Belle
     Bingo Belle (Showcase cabinet version)
     Bingo Club
@@ -128,11 +128,12 @@ void mpu4bwb_machines_state::bwboki_f(machine_config &config)
 {
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4bwb_machines_state,mpu4bwb)
-	mpu4_common2(config);
 
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
+	MPU4_OKI_SAMPLED_SOUND(config, m_okicard, MPU4_MASTER_CLOCK/4);
+	m_okicard->add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	m_okicard->cb2_handler().set(FUNC(mpu4_state::pia_gb_cb2_w));
 }
 
 template<const uint32_t* Key> void mpu4bwb_machines_state::bwboki_chr_cheat_f(machine_config &config)
@@ -263,7 +264,7 @@ using namespace mpu4_traits;
 static const uint32_t m4abra_keys[2] = { 0x11, 0x192703 };
 
 #define M4ABRA_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -292,9 +293,9 @@ GAME_CUSTOM( 199?, m4abra__c,    m4abra, bwboki_chr_cheat<m4abra_keys>(R5, RT3),
 static const uint32_t m4bigmt_keys[2] = { 0x10, 0x241215 };
 
 #define M4BIGMT_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "altmsm6376", 0 ) /* this is NOT the same, some samples are changed */ \
+	ROM_REGION( 0x180000, "okicard:altmsm6376", 0 ) /* this is NOT the same, some samples are changed */ \
 	ROM_LOAD( "bigmsnd", 0x0000, 0x07db60, CRC(876c53ae) SHA1(ea2511ec9ba4ff67879212c6e2ba908873130a4e) ) \
-	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "tbmsnd.hex", 0x0000, 0x080000, CRC(e98da8de) SHA1(36668f2b82778f441224c94831f5b95efb9fa92b) )
 
 #undef GAME_CUSTOM
@@ -324,7 +325,7 @@ GAME_CUSTOM( 199?, m4bigmt__f,  m4bigmt,    "tbi20___.7_1", 0x0000, 0x010000, CR
 static const uint32_t m4bingbl_keys[2] = { 0x10, 0x322214 };
 
 #define M4BINGBL_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* Missing, or not OKI? */
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -355,7 +356,7 @@ GAME_CUSTOM( 199?, m4bingbl__g,    m4bingbl,   "bbi20___.8_1", 0x0000, 0x010000,
 static const uint32_t m4bingbs_keys[2] = { 0x10, 0x322214 };
 
 #define M4BINGBS_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* Missing, or not OKI? */
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -385,7 +386,7 @@ GAME_CUSTOM( 199?, m4bingbs__f,    m4bingbs,   "bp_20sk_.2_1", 0x0000, 0x010000,
 static const uint32_t m4bingcl_keys[2] = { 0x03, 0x072114 };
 
 #define M4BINGCL_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* Missing, or not OKI? */
 
 #undef GAME_CUSTOM
@@ -413,7 +414,7 @@ static const uint32_t m4blsbys_keys[2] = { 0x42, 0x362709 };
 static const uint32_t m4blsbys_g_keys[2] = { 0x36, 0x010e20 };
 
 #define M4BLSBYS_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "bbsnd.p1",  0x000000, 0x080000,  CRC(715c9e95) SHA1(6a0c9c63e56cfc21bf77cf29c1b844b8e0844c1e) ) \
 	ROM_LOAD( "bbsnd.p2",  0x080000, 0x080000,  CRC(594a87f8) SHA1(edfef7d08fab41fb5814c92930f08a565371eae1) )
 
@@ -488,7 +489,7 @@ GAME_CUSTOM( 199?, m4blsbys__ad,   m4blsbys,   "bsix3___.2v1", 0x0000, 0x020000,
 static const uint32_t m4csoc_keys[2] = { 0x11, 0x101230 };
 
 #define M4CSOC_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "ch_socc.s1", 0x000000, 0x080000, CRC(abaea3f3) SHA1(cf3b6e4ee99680726efd2a839b49b4d86e2bd270) ) \
 	ROM_LOAD( "ch_socc.s2", 0x080000, 0x080000, CRC(2048f5b2) SHA1(b07addfd9d861b1d19d4db248e16c597cf79b159) ) \
 	ROM_LOAD( "ch_socc.s3", 0x100000, 0x080000, CRC(064224b0) SHA1(99a8bacfd3a42f72e40b93d1f7eeea633c3cf366) )
@@ -530,7 +531,7 @@ GAME_CUSTOM( 199?, m4csoc__j,    m4csoc, bwboki_chr_cheat<m4csoc_keys>(R5, RT3),
 static const uint32_t m4cpfinl_keys[2] = { 0x10, 0x241215 };
 
 #define M4CPFINL_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cupsnd_1.0_2", 0x000000, 0x080000, CRC(54384ce8) SHA1(ff78c4ea16722662a480bff1f85af7efe84b01e5) ) \
 	ROM_LOAD( "cupsnd_1.0_3", 0x080000, 0x080000, CRC(24d3d848) SHA1(64287c3cbe2e9693954bc880d6edf2bc17b0ed65) )
 
@@ -567,7 +568,7 @@ GAME_CUSTOM( 199?, m4cpfinl__k,    m4cpfinl,   "cui20_k_.5_1", 0x0000, 0x010000,
 static const uint32_t m4danced_keys[2] = { 0x10, 0x3b240d };
 
 #define M4DANCED_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "dd______.1_2", 0x0000, 0x080000, CRC(b9043a08) SHA1(5d87a30f23e8b5e3eaa0584d0d49efc08209882b) )
 
 #undef GAME_CUSTOM
@@ -615,7 +616,7 @@ GAME_CUSTOM( 199?, m4danced__w,    m4danced,   "dd_sja__.2_1", 0x0000, 0x020000,
 static const uint32_t m4daytn_keys[2] = { 0x13, 0x1f1e23 };
 
 #define M4DAYTN_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -654,7 +655,7 @@ GAME_CUSTOM( 199?, m4daytn__n,  m4daytn,    "da_92_d_.1_0", 0x0000, 0x040000, CR
 static const uint32_t m4excal_keys[2] = { 0xff, 0xffffffff };
 
 #define M4EXCAL_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "ex______.1_2", 0x000000, 0x080000, CRC(9305e516) SHA1(5a5c67f97761fe2e042ba31594d1881238d3227b) ) \
 	ROM_LOAD( "ex______.1_3", 0x080000, 0x080000, CRC(29e3709a) SHA1(2e2f089aa2a938158930f235bf821685932d698b) ) \
 	ROM_LOAD( "ex______.1_4", 0x100000, 0x080000, CRC(dd747003) SHA1(cf0a2936c897e3b833984c55f4825c358b723ab8) )
@@ -690,7 +691,7 @@ GAME_CUSTOM( 199?, m4excal__j,  m4excal,    "ex_20sd8.6_1", 0x0000, 0x020000, CR
 static const uint32_t m4exotic_keys[2] = { 0x34, 0x3f0e26 };
 
 #define M4EXOTIC_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -721,7 +722,7 @@ GAME_CUSTOM( 199?, m4exotic__e,    m4exotic, bwboki_chr_cheat<m4exotic_keys>(R5,
 static const uint32_t m4firice_keys[2] = { 0x11, 0x162413 };
 
 #define M4FIRICE_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "fire_ice.s1", 0x000000, 0x080000, CRC(74ee37c1) SHA1(bc9b419dd1fd1c66090f8946247e754c0267baa3) ) \
 	ROM_LOAD( "fire_ice.s2", 0x080000, 0x080000, CRC(b86bafeb) SHA1(ee237f601b970dc5be8096a4018cb6a3edac500f) ) \
 	ROM_LOAD( "fire_ice.s3", 0x100000, 0x080000, CRC(75f349b3) SHA1(1505bec7b69e1eabd679b70d95ae58fd264ca698) )
@@ -759,7 +760,7 @@ GAME_CUSTOM( 199?, m4firice__j,    m4firice, bwboki_chr_cheat<m4firice_keys>(R5,
 static const uint32_t m4harle_keys[2] = { 0x10, 0x220525 };
 
 #define M4HARLE_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "hq______.1_2", 0x000000, 0x080000, CRC(0c8c14be) SHA1(a1268e71ea43772a532b63327f24c64fabd7e715) ) \
 	ROM_LOAD( "hq______.1_3", 0x080000, 0x080000, CRC(5a07e514) SHA1(6e589756c0fc4b0458ca856e918fa3b7cd396c39) )
 
@@ -808,7 +809,7 @@ GAME_CUSTOM( 199?, m4harle__x,  m4harle,    "ph_20sk_.1_1", 0x0000, 0x010000, CR
 static const uint32_t m4hvhel_keys[2] = { 0x11, 0x3f0b26 };
 
 #define M4HVHEL_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "hh___snd.1_1", 0x000000, 0x080000, CRC(afa7ba60) SHA1(25278046252e49364d4a51de79295b87baf6018e) ) \
 	ROM_LOAD( "hh___snd.1_2", 0x080000, 0x080000, CRC(ec1ec822) SHA1(3fdee0526cb70f4951b7bbced74e32641ded9b7b) ) \
 	ROM_LOAD( "hh___snd.1_3", 0x100000, 0x080000, CRC(d4119155) SHA1(b61c71e1ee0dbfc0bb9eff1a8c019cf11731ee11) )
@@ -850,7 +851,7 @@ static const uint32_t m4indycr_keys[2] = { 0x13, 0x102233 };
 	ROM_REGION( 0x200000, "gals", 0 ) \
 	ROM_LOAD( "ic___.g", 0x0000, 0x000657, CRC(25cc2b32) SHA1(a065276fe4cc1e55f366ac216b5bc8cf934da9dd) ) \
 	ROM_LOAD( "ic___.p", 0x0000, 0x00058b, CRC(26388ec4) SHA1(e33183d0c3e75fe23ab6df01d561f5b65923d1db) ) \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "da______.1_1", 0x000000, 0x080000, CRC(99d36c12) SHA1(f8848a28b5546649d6a3f8599dbc4ca84bdac77c) ) \
 	ROM_LOAD( "da______.1_2", 0x080000, 0x080000, CRC(32b40094) SHA1(f02c3b088d76116f817b536cf7cec5188b2f73bf) ) \
 	ROM_LOAD( "da______.1_3", 0x100000, 0x080000, CRC(2df33d18) SHA1(40afa32d6c72c6a76e3e2e61db19a16003f4e176) ) \
@@ -884,7 +885,7 @@ GAME_CUSTOM( 199?, m4indycr__f,    m4indycr, bwboki_chr_cheat<m4indycr_keys>(R5,
 static const uint32_t m4jakjok_keys[2] = { 0x11, 0x103218 };
 
 #define M4JAKJOK_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "jj_____.1_1", 0x000000, 0x080000, CRC(e759a958) SHA1(b107f4ef5a2805e56d4024940bfc632155de1eb1) ) \
 	ROM_LOAD( "jj_____.1_2", 0x080000, 0x080000, CRC(aa215ff0) SHA1(4bf2c6f8153730cc3ca86f78ec14063ece7d8700) ) \
 	ROM_LOAD( "jj_____.1_3", 0x100000, 0x080000, CRC(03c0ffc3) SHA1(2572f62362325df8b235b487d4a764218e7f1589) )
@@ -906,7 +907,7 @@ GAME_CUSTOM( 2000, m4jakjok__b,    m4jakjok, bwboki_chr_cheat<m4jakjok_keys>(R5,
 GAME_CUSTOM( 2000, m4jakjok__c,    m4jakjok, bwboki_chr_cheat<m4jakjok_keys>(R5, RT3), mpu4impcoin_jackpot5_5p,        init_m4big,  "jj_vc___.7_0", 0x0000, 0x040000, CRC(4cdca8da) SHA1(ee7448b12380416a3bea2713ed5feca7473be8aa), "BWB",u8"Jackpot Jokers (BWB) (MPU4) (ver. 7) (5/10p stake / £5 jackpot)" )
 
 #define M4JAKJOKA_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "j_joker.s1", 0x0000, 0x080000, CRC(4ad711d2) SHA1(500381ac2a5075acd606a131cd1b382342cc3a80) ) \
 	ROM_LOAD( "j_joker.s2", 0x0000, 0x080000, CRC(840ba491) SHA1(f7f43d5d8e521a59fdccbd5f22935c525c3d43c2) ) \
 	ROM_LOAD( "j_joker.s3", 0x0000, 0x080000, CRC(2ed74890) SHA1(a3d039b4c3c9dd792300eb045e542a212d4d50ae) )
@@ -933,7 +934,7 @@ GAME_CUSTOM( 1998, m4jakjoka, m4jakjok, bwboki_chr_cheat<m4jakjok_keys>(R5, RT3)
 static const uint32_t m4jflash_keys[2] = { 0x10, 0x3c3801 };
 
 #define M4JFLASH_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -967,7 +968,7 @@ GAME_CUSTOM( 199?, m4jflash__i,    m4jflash,   "jf_25sbc.2_1", 0x0000, 0x020000,
 static const uint32_t m4ln7_keys[2] = { 0x10, 0x050107 };
 
 #define M4LN7_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "l7______.1_2", 0x000000, 0x080000, CRC(216209e3) SHA1(af274a7f27ba0e7ac03400e9919537ab36464e64) ) \
 	ROM_LOAD( "l7______.1_3", 0x080000, 0x080000, CRC(e909c3ec) SHA1(68ce743729aaefd6c20ee447af40d99e0f4c072b) )
 #undef GAME_CUSTOM
@@ -996,7 +997,7 @@ GAME_CUSTOM( 199?, m4ln7__d,  m4ln7,  "l7_20sk_.1_1", 0x0000, 0x010000, CRC(7d21
 static const uint32_t m4madmon_keys[2] = { 0x10, 0x351f3a };
 
 #define M4MADMON_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1032,7 +1033,7 @@ GAME_CUSTOM( 199?, m4madmon__k,    m4madmon,   "mm_25bdc.3_1", 0x0000, 0x020000,
 static const uint32_t m4madmnc_keys[2] = { 0x10, 0x351f3a };
 
 #define M4MADMNC_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1079,7 +1080,7 @@ GAME_CUSTOM( 199?, m4madmnc__w,    m4madmnc,   "cm_49btc.4_1", 0x0000, 0x020000,
 static const uint32_t m4mmm_keys[2] = { 0x11, 0x320926 };
 
 #define M4MMM_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "mu___snd.1_1", 0x000000, 0x080000, CRC(570cf5f8) SHA1(48b3703bf385d037e4e870dfb671b75e9bab84a7) ) \
 	ROM_LOAD( "mu___snd.1_2", 0x080000, 0x080000, CRC(6ec1910b) SHA1(4920fe0b7c7f4ddb14d56f50598aaf62e5867014) ) \
 	ROM_LOAD( "mu___snd.1_3", 0x100000, 0x080000, CRC(8699378c) SHA1(55c3e310cfde8046e58bf21a8788e697c8275b8d) ) \
@@ -1113,7 +1114,7 @@ GAME_CUSTOM( 199?, m4mmm__f,  m4mmm, bwboki_chr_cheat<m4mmm_keys>(R5, RT3), mpu4
 static const uint32_t m4orland_keys[2] = { 0x10, 0x2c081f };
 
 #define M4ORLAND_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "orlandosnd.p1", 0x000000, 0x080000, CRC(2735649d) SHA1(7b27bf2d4091ab581d399679b03f538f449f180c) ) \
 	ROM_LOAD( "orlandosnd.p2", 0x080000, 0x080000, CRC(0741e2ff) SHA1(c49a2809073dd058ba85ae14c888e19d3eb2b133) )
 
@@ -1147,7 +1148,7 @@ GAME_CUSTOM( 199?, m4orland__h,    m4orland,   "or_20sd_.7_1",         0x0000, 0
 static const uint32_t m4pzbing_keys[2] = { 0x10, 0x141531 };
 
 #define M4PZBING_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1177,7 +1178,7 @@ GAME_CUSTOM( 199?, m4pzbing__e,    m4pzbing,   "pb_20sb_.4_1", 0x0000, 0x010000,
 static const uint32_t m4quidin_keys[2] = { 0x10, 0x050107 };
 
 #define M4QUIDIN_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "qi_____.1_2", 0x000000, 0x080000, CRC(216209e3) SHA1(af274a7f27ba0e7ac03400e9919537ab36464e64) ) \
 	ROM_LOAD( "qi_____.1_3", 0x080000, 0x080000, CRC(e909c3ec) SHA1(68ce743729aaefd6c20ee447af40d99e0f4c072b) )
 
@@ -1205,7 +1206,7 @@ GAME_CUSTOM( 199?, m4quidin__b,    m4quidin,   "qi_20sb_.3_1", 0x0000, 0x010000,
 static const uint32_t m4quidis_keys[2] = { 0x10, 0x050107 };
 
 #define M4QUIDIS_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1233,7 +1234,7 @@ GAME_CUSTOM( 199?, m4quidis__d,    m4quidis,   "pq_20sk_.3_1", 0x0000, 0x010000,
 static const uint32_t m4rackem_keys[2] = { 0x11, 0x13222f };
 
 #define M4RACKEM_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "re_snd.p1", 0x000000, 0x080000, CRC(aea88892) SHA1(457dab5cddfb9762f7e0bd61187b8052aee71c28) ) \
 	ROM_LOAD( "re_snd.p2", 0x080000, 0x080000, CRC(57394ec6) SHA1(cba7abebd3ab165e9531017168f51ada6cf35991) ) \
 	ROM_LOAD( "re_snd.p3", 0x100000, 0x080000, CRC(5d5d5309) SHA1(402615633976410225a1ee50c454391dc69a68cb) )
@@ -1264,7 +1265,7 @@ GAME_CUSTOM( 1999, m4rackem__d,    m4rackem,   "re_sjsw_.2_0", 0x0000, 0x040000,
 static const uint32_t m4rbgold_keys[2] = { 0x10, 0x2d371b };
 
 #define M4RBGOLD_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1305,7 +1306,7 @@ GAME_CUSTOM( 199?, m4rbgold__q,    m4rbgold,   "rbixe___.2s1", 0x0000, 0x010000,
 static const uint32_t m4rhfev_keys[2] = { 0x11, 0x3f0e27 };
 
 #define M4RHFEV_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "rf_____.1_1", 0x000000, 0x080000, CRC(ac8d539d) SHA1(8baf14bece50774f93ae9eaf3effabb6882d2c43) ) \
 	ROM_LOAD( "rf_____.1_2", 0x080000, 0x080000, CRC(cc2fadd8) SHA1(681850e2e6164cf8af8e7501ac44f475cc07b742) ) \
 	ROM_LOAD( "rf_____.1_3", 0x100000, 0x080000, CRC(165aaf9f) SHA1(815224fe94a77628cef1dd0d8a238edcb4813006) ) \
@@ -1339,7 +1340,7 @@ GAME_CUSTOM( 1999, m4rhfev__d,  m4rhfev, bwboki_chr_cheat<m4rhfev_keys>(R5, RT3)
 static const uint32_t m4sinbd_keys[2] = { 0x10, 0x0c253d };
 
 #define M4SINBD_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/*These were with the last listed set, though I have no reason to believe they aren't valid for all BwB Sinbad games, both have OKI tables */ \
 	ROM_LOAD( "sinbadbwb1_2snd.bin", 0x000000, 0x080000, CRC(2ee60ce6) SHA1(865860639e8471f97ace0beac2f4c7fddb8ca97c) ) \
 	ROM_LOAD( "sinbadbwb1_3snd.bin", 0x080000, 0x080000, CRC(7701e5cc) SHA1(4f9ff91f2b6b15a9c08396b52fc8509ba476ed8d) )
@@ -1389,7 +1390,7 @@ GAME_CUSTOM( 199?, m4sinbd__x,  m4sinbd,    "sinbadbwb1_1game.bin", 0x0000, 0x02
 static const uint32_t m4sky_keys[2] = { 0x11, 0x1f2d3b };
 
 #define M4SKY_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1419,7 +1420,7 @@ GAME_CUSTOM( 199?, m4sky__d,  m4sky, bwboki_chr_cheat<m4sky_keys>(R5, RT3), mpu4
 static const uint32_t m4souls_keys[2] = { 0x10, 0x3e2f0b };
 
 #define M4SOULS_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "ss______.1_2", 0x000000, 0x080000, CRC(ddea9d75) SHA1(fe5f88d49434109d0f51425e790e179dc1a02767) ) \
 	ROM_LOAD( "ss______.1_3", 0x080000, 0x080000, CRC(23d1e57a) SHA1(b17afdaa95522fd7ea6c12f513fa338e1fcb06f6) ) \
 	ROM_LOAD( "ss______.1_4", 0x100000, 0x080000, CRC(0ba3046a) SHA1(ec21fa328669bc7a5baf1ce8b9ac05f38f98e360) )
@@ -1452,7 +1453,7 @@ GAME_CUSTOM( 199?, m4souls__f,  m4souls,    "ss_26sk_.2_1", 0x0000, 0x020000, CR
 static const uint32_t m4spinbt_keys[2] = { 0x45, 0x250603 };
 
 #define M4SPINBT_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1483,7 +1484,7 @@ GAME_CUSTOM( 199?, m4spinbt__g,    m4spinbt,   "sn_s7s__.5_0", 0x0000, 0x040000,
 static const uint32_t m4starst_keys[2] = { 0x11, 0x3f0a26 };
 
 #define M4STARST_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "starsnd3", 0x0000, 0x080000, CRC(96882952) SHA1(bf366670aec5cb545c56caac3c63855db03d8c14) )/* (?)strange id number? */
 
 #undef GAME_CUSTOM
@@ -1518,7 +1519,7 @@ GAME_CUSTOM( 199?, m4starst__j,    m4starst, bwboki_chr_cheat<m4starst_keys>(R5,
 static const uint32_t m4supleg_keys[2] = { 0x11, 0x310926 };
 
 #define M4SUPLEG_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "sls1.hex", 0x000000, 0x080000, CRC(341e3d3e) SHA1(b42ec737e95e766b1b26d6225416ee0c5cad2663) ) \
 	ROM_LOAD( "sls2.hex", 0x080000, 0x080000, CRC(f4ab6f0d) SHA1(4b59608ca16c9d158d4d1ac532e7fbe6ff0da959) ) \
 	ROM_LOAD( "sls3.hex", 0x100000, 0x080000, CRC(dcba96a1) SHA1(d474c63b37cb18a0b3b1299b5cacadfd8cd5458b) )
@@ -1541,7 +1542,7 @@ GAME_CUSTOM( 199?, m4supleg__c,    m4supleg, bwboki_chr_cheat<m4supleg_keys>(R5,
 GAME_CUSTOM( 199?, m4supleg__d,    m4supleg, bwboki_chr_cheat<m4supleg_keys>(R5, RT3), mpu4impcoin_jackpot15_20p, init_m4big, "sls.hex",      0x0000, 0x040000, CRC(5ad6dbb9) SHA1(ff6f9dcf14df22c7bb2b949fcd5c70f31d4c1928), "BWB",u8"Super League (BWB) (MPU4) (20/25/30p stake / £5/£10/£15 jackpot)" )
 
 #define M4SUPLEGW_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "s_leag.s1",0x000000, 0x080000, CRC(e8d90896) SHA1(4c67507f18b5dc966e2df3685dc6c257f5053e61) ) \
 	ROM_LOAD( "sls2.hex", 0x080000, 0x080000, CRC(f4ab6f0d) SHA1(4b59608ca16c9d158d4d1ac532e7fbe6ff0da959) ) \
 	ROM_LOAD( "sls3.hex", 0x100000, 0x080000, CRC(dcba96a1) SHA1(d474c63b37cb18a0b3b1299b5cacadfd8cd5458b) )
@@ -1568,7 +1569,7 @@ GAME_CUSTOM( 199?, m4suplegw, m4supleg, bwboki_chr_cheat<m4supleg_keys>(R5, RT3)
 static const uint32_t m4supscr_keys[2] = { 0x11, 0x101231 };
 
 #define M4SUPSCR_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 #undef GAME_CUSTOM
 
@@ -1607,7 +1608,7 @@ GAME_CUSTOM( 199?, m4supscr__n,    m4supscr,   "multistakesoccer.bin", 0x0000, 0
 static const uint32_t m4sure_keys[2] = {0x10, 0x281215};
 
 #define M4SURE_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 #undef GAME_CUSTOM
 
@@ -1635,7 +1636,7 @@ GAME_CUSTOM( 199?, m4sure__c,    m4sure, "suixf___.3_1", 0x0000, 0x010000, CRC(c
 static const uint32_t m4trex_keys[2] = {0x10, 0x112231};
 
 #define M4TREX_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "tr______.1_2", 0x000000, 0x080000, CRC(75687514) SHA1(dc8f5f1db7da164175c241187cf3f0db1dd71fc9) ) \
 	ROM_LOAD( "tr______.1_3", 0x080000, 0x080000, CRC(1e30d4ed) SHA1(8cd916d28f5060d74a0d795f9b75ab597de1cd60) )
 
@@ -1673,7 +1674,7 @@ GAME_CUSTOM( 199?, m4trex__l,    m4trex, "tr_20skp.2_1", 0x0000, 0x010000, CRC(9
 static const uint32_t m4tutbwb_keys[2] = { 0x01, 0x163428 };
 
 #define M4TUTBWB_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -1708,7 +1709,7 @@ GAME_CUSTOM( 199?, m4tutbwb_j,     m4tutbwb,   "tui05___.1a3",         0x0000, 0
 static const uint32_t m4volcan_keys[2] = { 0x11, 0x3f0d26 };
 
 #define M4VOLCAN_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "vo___snd.1_1", 0x000000, 0x080000, CRC(62bb0166) SHA1(17e5557cce4e7841cbcf5d67783fe78452aacc63) ) \
 	ROM_LOAD( "vo___snd.1_2", 0x080000, 0x080000, CRC(1eded545) SHA1(0010833e42b33fb0fd621a1059e1cf9a123c3fbd) ) \
 	ROM_LOAD( "vo___snd.1_3", 0x100000, 0x080000, CRC(915f4adf) SHA1(fac6644329ee6ef0026d65d8b94c971e01770d45) ) \
@@ -1743,7 +1744,7 @@ GAME_CUSTOM( 199?, m4volcan__g,    m4volcan, bwboki_chr_cheat<m4volcan_keys>(R5,
 static const uint32_t m4vdexpr_keys[2] = { 0x11, 0x3f0d27 };
 
 #define M4VDEXPR_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "vd___snd.1_1", 0x000000, 0x080000, CRC(d66b43a9) SHA1(087cf1571a9afb8c1c7cac13640fa453b614fd53) ) \
 	ROM_LOAD( "vd___snd.1_2", 0x080000, 0x080000, CRC(a501c887) SHA1(c56a05fd8196afb86e665fec3fe7d02b9bf94c1a) ) \
 	ROM_LOAD( "vd___snd.1_3", 0x100000, 0x080000, CRC(70c6bd96) SHA1(ecdd4276ff72939433630e04bba5be3df569e17e) ) \
@@ -1775,7 +1776,7 @@ GAME_CUSTOM( 199?, m4vdexpr__d,    m4vdexpr, bwboki_chr_cheat<m4vdexpr_keys>(R5,
 static const uint32_t m4xch_keys[2] = { 0x42, 0x3f0c26 };
 
 #define M4XCH_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "xchasnd.bin", 0x0000, 0x080000, CRC(32c44cd5) SHA1(baafb48e6f95ba152942d1e1c273ffb3c95afa82) ) // BADADDR     --xxxxxxxxxxxxxxxxx
 
 #undef GAME_CUSTOM
@@ -1817,7 +1818,7 @@ GAME_CUSTOM( 199?, m4xch__k,  m4xch, bwboki_chr_cheat<m4xch_keys>(R5, RT3), mpu4
 static const uint32_t m4xs_keys[2] = { 0x34, 0x3f0e26 };
 
 #define M4XS_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1850,7 +1851,7 @@ GAME_CUSTOM( 199?, m4xs__f,    m4xs, bwboki_chr_cheat<m4xs_keys>(R5, RT3), mpu4i
 static const uint32_t m4xtrm_keys[2] = { 0x36, 0x301210 };
 
 #define M4XTRM_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1889,7 +1890,7 @@ GAME_CUSTOM( 199?, m4xtrm__b,    m4xtrm, bwboki_chr_cheat<m4xtrm_keys>(R5, RT3),
 static const uint32_t m4bluesn_keys[2] = { 0x23, 0x1b0b36 };
 
 #define M4BLUESN_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "bluesboyz.bi2", 0x000000, 0x080000, CRC(7f19a61b) SHA1(dd8742d84df24e118bdbffb1efffad1c71eb2283) ) \
 	ROM_LOAD( "bluesboyz.bi3", 0x080000, 0x080000, CRC(32363184) SHA1(8f3f53ce4d9f9b54c441263def9d8e23880507a1) ) \
 	ROM_LOAD( "bluesboyz.bi4", 0x100000, 0x080000, CRC(aa94281d) SHA1(e15b7bf97b8e307ed465d9b8cb6e5de0044f6fb5) ) \
@@ -1917,7 +1918,7 @@ GAME_CUSTOM( 199?, m4bluesn,   m4blsbys,   "bluesboys.bin", 0x0000, 0x020000, CR
 static const uint32_t m4cfinln_keys[2] = { 0x10, 0x213623 };
 
 #define M4CFINLN_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1943,7 +1944,7 @@ GAME_CUSTOM( 199?, m4cfinln__a,    m4cpfinl,   "cfd_d0.bin",   0x0000, 0x020000,
 static const uint32_t m4wcnov_keys[2] = { 0x19, 0x0f2029 };
 
 #define M4WCNOV_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1968,7 +1969,7 @@ GAME_CUSTOM( 199?, m4wcnov,     0,  "wcdsxh__.5_0", 0x0000, 0x080000, CRC(a82d11
 static const uint32_t m4excaln_keys[2] = { 0x10, 0x010e20 };
 
 #define M4EXCALN_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -1994,7 +1995,7 @@ GAME_CUSTOM( 199?, m4excaln__a,m4excal,    "exdsx_e_.6_0", 0x0000, 0x080000, CRC
 static const uint32_t m4olygn_keys[2] = { 0x19, 0x0f2029};
 
 #define M4OLYGN_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -2020,7 +2021,7 @@ GAME_CUSTOM( 199?, m4olygn__a,  m4olygn,    "ogdsxe__.8_0", 0x0000, 0x040000, CR
 static const uint32_t m4ftladn_keys[2] = { 0x05, 0x200f03 };
 
 #define M4FTLADN_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -2048,7 +2049,7 @@ static const uint32_t m4sinbdn__b_keys[2] = { 0x10, 0x3e2f0b };
 
 
 #define M4SINBDN_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM

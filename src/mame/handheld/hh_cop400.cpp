@@ -2149,7 +2149,7 @@ ROM_END
 
 /***************************************************************************
 
-  National Semiconductor Cops Pocket Assistant (CPA)
+  National Semiconductor COPS Pocket Assistant (CPA)
   * COP444 MCU label COP444L-JXY/N
   * 8-digit 7seg display, 1-bit sound
 
@@ -2496,7 +2496,7 @@ CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  e
 CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   empty_init, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1979, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1982, copspa,     0,         0, mdallas,    copspa,     mdallas_state,   empty_init, "National Semiconductor", "Cops Pocket Assistant", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, copspa,     0,         0, mdallas,    copspa,     mdallas_state,   empty_init, "National Semiconductor", "COPS Pocket Assistant", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1984, solution,   0,         0, scat,       solution,   scat_state,      empty_init, "SCAT", "The Solution", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 

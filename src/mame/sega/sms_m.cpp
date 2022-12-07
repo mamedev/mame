@@ -1,14 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Charles MacDonald,Mathis Rosenhauer,Brad Oliver,Michael Luong,Fabio Priuli,Enik Land
 #include "emu.h"
-#include "crsshair.h"
-#include "cpu/z80/z80.h"
-#include "video/315_5124.h"
-#include "sound/ymopl.h"
 #include "sms.h"
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "cpu/z80/z80.h"
+
+#include "crsshair.h"
 
 #define ENABLE_NONE      0x00
 #define ENABLE_EXPANSION 0x01
@@ -26,8 +23,7 @@ TIMER_CALLBACK_MEMBER(sms_state::lphaser_th_generate)
 
 void sms_state::lphaser_hcount_latch()
 {
-	/* A delay seems to occur when the Light Phaser latches the
-	   VDP hcount, then an offset is added here to the hpos. */
+	// A delay seems to occur when the Light Phaser latches the VDP hcount, then an offset is added here to the hpos.
 	m_lphaser_th_timer->adjust(m_main_scr->time_until_pos(m_main_scr->vpos(), m_main_scr->hpos() + m_lphaser_x_offs));
 }
 
@@ -37,18 +33,18 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 	// Check if TH of controller port 1 is set to input (1)
 	if (m_io_ctrl_reg & 0x02)
 	{
-		if (state == 0)
+		if (!state)
 		{
 			m_ctrl1_th_latch = 1;
 		}
 		else
 		{
 			// State is 1. If changed from 0, hcount is latched.
-			if (m_ctrl1_th_state == 0)
+			if (!m_ctrl1_th_state)
 				lphaser_hcount_latch();
 		}
-		m_ctrl1_th_state = state;
 	}
+	m_ctrl1_th_state = state;
 }
 
 
@@ -57,18 +53,18 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 	// Check if TH of controller port 2 is set to input (1)
 	if (m_io_ctrl_reg & 0x08)
 	{
-		if (state == 0)
+		if (!state)
 		{
 			m_ctrl2_th_latch = 1;
 		}
 		else
 		{
 			// State is 1. If changed from 0, hcount is latched.
-			if (m_ctrl2_th_state == 0)
+			if (!m_ctrl2_th_state)
 				lphaser_hcount_latch();
 		}
-		m_ctrl2_th_state = state;
 	}
+	m_ctrl2_th_state = state;
 }
 
 
@@ -84,7 +80,6 @@ WRITE_LINE_MEMBER(gamegear_state::gg_ext_th_input)
 
 void sms_state::sms_get_inputs()
 {
-	uint8_t data1 = 0xff;
 	uint8_t data2 = 0xff;
 
 	m_port_dc_reg = 0xff;
@@ -96,43 +91,36 @@ void sms_state::sms_get_inputs()
 
 	if (m_is_gamegear)
 	{
+		// FIXME: make the Game Gear EXT port sane - it's more like a Mega Drive port
+
 		// For Game Gear, this function is used only if SMS mode is
 		// enabled, else only register $dc receives input data, through
 		// direct read of the m_port_gg_dc I/O port.
 
-		data1 = m_port_gg_dc->read();
+		uint8_t data1 = m_port_gg_dc->read();
 		m_port_dc_reg &= ~0x03f | data1;
 
 		data2 = m_port_gg_ext->port_r();
+		m_ctrl2_th_state = BIT(data2, 6);
+		data2 = bitswap<6>(data2, 7, 5, 3, 2, 1, 0);
 	}
 	else
 	{
-		data1 = m_port_ctrl1->port_r();
-		m_port_dc_reg &= ~0x0f | data1; // Up, Down, Left, Right
-		m_port_dc_reg &= ~0x10 | (data1 >> 1); // TL (Button 1)
-		m_port_dc_reg &= ~0x20 | (data1 >> 2); // TR (Button 2)
+		m_port_dc_reg &= ~0x3f | m_port_ctrl1->in_r(); // Up, Down, Left, Right, TL, TR
 
-		data2 = m_port_ctrl2->port_r();
+		data2 = m_port_ctrl2->in_r();
 	}
 
 	m_port_dc_reg &= ~0xc0 | (data2 << 6); // Up, Down
-	m_port_dd_reg &= ~0x03 | (data2 >> 2); // Left, Right
-	m_port_dd_reg &= ~0x04 | (data2 >> 3); // TL (Button 1)
-	m_port_dd_reg &= ~0x08 | (data2 >> 4); // TR (Button 2)
-
-	if (!m_is_mark_iii)
-	{
-		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
-		m_port_dd_reg &= ~0x80 | (data2 << 1); // TH ctrl2
-	}
+	m_port_dd_reg &= ~0x0f | (data2 >> 2); // Left, Right, TL, TR
+	m_port_dd_reg &= ~0x40 | (m_ctrl1_th_state << 6); // TH ctrl1
+	m_port_dd_reg &= ~0x80 | (m_ctrl2_th_state << 7); // TH ctrl2
 }
 
 
 void sms_state::sms_io_control_w(uint8_t data)
 {
 	bool latch_hcount = false;
-	uint8_t ctrl1_port_data = 0xff;
-	uint8_t ctrl2_port_data = 0xff;
 
 	if (m_is_gamegear && !(m_cartslot->exists() && m_cartslot->get_sms_mode()))
 	{
@@ -143,58 +131,46 @@ void sms_state::sms_io_control_w(uint8_t data)
 	// Controller Port 1:
 
 	// check if TR or TH are set to output (0).
-	if ((data & 0x03) != 0x03)
+	if (!m_is_gamegear && ((data & 0x33) != (m_io_ctrl_reg & 0x33)))
 	{
-		if (!(data & 0x01)) // TR set to output
-		{
-			ctrl1_port_data &= ~0x80 | (data << 3);
-		}
-		if (!(data & 0x02)) // TH set to output
-		{
-			ctrl1_port_data &= ~0x40 | (data << 1);
-		}
-		if (!m_is_gamegear)
-			m_port_ctrl1->port_w(ctrl1_port_data);
+		m_port_ctrl1->out_w(((BIT(data, 4, 2) | BIT(data, 0, 2)) << 5) | 0x1f, BIT(~data, 0, 2) << 5);
 	}
-	// check if TH is set to input (1).
-	if (data & 0x02)
-	{
-		if (!m_is_gamegear)
-			ctrl1_port_data &= ~0x40 | m_port_ctrl1->port_r();
 
-		// check if TH input level is high (1) and was output/low (0)
-		if ((ctrl1_port_data & 0x40) && !(m_io_ctrl_reg & 0x22))
+	// check if TH input level is high (1) and was output/low (0)
+	if ((data & 0x02) && !(m_io_ctrl_reg & 0x22))
+	{
+		if (m_is_gamegear || m_ctrl1_th_state)
 			latch_hcount = true;
 	}
 
 	// Controller Port 2:
 
 	// check if TR or TH are set to output (0).
-	if ((data & 0x0c) != 0x0c)
+	if (m_is_gamegear)
 	{
-		if (!(data & 0x04)) // TR set to output
+		if ((data & 0x0c) != 0x0c)
 		{
-			ctrl2_port_data &= ~0x80 | (data << 1);
-		}
-		if (!(data & 0x08)) // TH set to output
-		{
-			ctrl2_port_data &= ~0x40 | (data >> 1);
-		}
-		if (!m_is_gamegear)
-			m_port_ctrl2->port_w(ctrl2_port_data);
-		else
+			uint8_t ctrl2_port_data = 0xff;
+			if (!(data & 0x04)) // TR set to output
+			{
+				ctrl2_port_data &= ~0x80 | (data << 1);
+			}
+			if (!(data & 0x08)) // TH set to output
+			{
+				ctrl2_port_data &= ~0x40 | (data >> 1);
+			}
 			m_port_gg_ext->port_w(ctrl2_port_data);
+		}
 	}
-	// check if TH is set to input (1).
-	if (data & 0x08)
+	else if ((data & 0xcc) != (m_io_ctrl_reg & 0xcc))
 	{
-		if (!m_is_gamegear)
-			ctrl2_port_data &= ~0x40 | m_port_ctrl2->port_r();
-		else
-			ctrl2_port_data &= ~0x40 | m_port_gg_ext->port_r();
+		m_port_ctrl2->out_w(((BIT(data, 6, 2) | BIT(data, 2, 2)) << 5) | 0x1f, BIT(~data, 2, 2) << 5);
+	}
 
-		// check if TH input level is high (1) and was output/low (0)
-		if ((ctrl2_port_data & 0x40) && !(m_io_ctrl_reg & 0x88))
+	// check if TH input level is high (1) and was output/low (0)
+	if ((data & 0x08) && !(m_io_ctrl_reg & 0x88))
+	{
+		if (m_is_gamegear ? BIT(m_port_gg_ext->port_r(), 6) : m_ctrl2_th_state)
 			latch_hcount = true;
 	}
 
@@ -398,14 +374,11 @@ uint8_t sms_state::sms_input_port_dd_r()
 	// Check if TH of controller port 1 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x02))
 	{
-		if (m_ioctrl_region_is_japan)
-		{
-			m_port_dd_reg &= ~0x40;
-		}
-		else
+		m_port_dd_reg &= ~0x40;
+		if (!m_ioctrl_region_is_japan)
 		{
 			// Read TH state set through IO control port
-			m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x20) << 1);
+			m_port_dd_reg |= (m_io_ctrl_reg & 0x20) << 1;
 		}
 	}
 	else  // TH set to input (1)
@@ -422,14 +395,11 @@ uint8_t sms_state::sms_input_port_dd_r()
 	// Check if TH of controller port 2 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x08))
 	{
-		if (m_ioctrl_region_is_japan)
-		{
-			m_port_dd_reg &= ~0x80;
-		}
-		else
+		m_port_dd_reg &= ~0x80;
+		if (!m_ioctrl_region_is_japan)
 		{
 			// Read TH state set through IO control port
-			m_port_dd_reg &= ~0x80 | (m_io_ctrl_reg & 0x80);
+			m_port_dd_reg |= m_io_ctrl_reg & 0x80;
 		}
 	}
 	else  // TH set to input (1)
@@ -1009,6 +979,9 @@ void sms_state::setup_bios()
 
 void sms_state::machine_start()
 {
+	m_ctrl1_th_state = 1;
+	m_ctrl2_th_state = 1;
+
 	// turn on the Power LED
 	if (m_has_pwr_led)
 	{
@@ -1119,13 +1092,17 @@ void sms_state::machine_reset()
 			m_led_pwr = 1;
 	}
 
-	if (!m_is_mark_iii)
+	if (m_is_mark_iii)
+	{
+		// pin 7 is tied to ground on the Mark III
+		m_port_ctrl1->out_w(0x3f, 0x40);
+		m_port_ctrl2->out_w(0x3f, 0x40);
+	}
+	else
 	{
 		m_io_ctrl_reg = 0xff;
 		m_ctrl1_th_latch = 0;
 		m_ctrl2_th_latch = 0;
-		m_ctrl1_th_state = 1;
-		m_ctrl2_th_state = 1;
 	}
 
 	setup_bios();

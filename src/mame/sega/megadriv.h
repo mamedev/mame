@@ -21,9 +21,6 @@
 
 INPUT_PORTS_EXTERN( md_common );
 INPUT_PORTS_EXTERN( megadriv );
-INPUT_PORTS_EXTERN( megadri6 );
-INPUT_PORTS_EXTERN( ssf2mdb );
-INPUT_PORTS_EXTERN( mk3mdb );
 
 
 class md_base_state : public driver_device
@@ -39,8 +36,8 @@ public:
 		m_megadrive_ram(*this,"megadrive_ram"),
 		m_screen(*this,"megadriv"),
 		m_io_reset(*this, "RESET"),
-		m_megadrive_io_read_data_port_ptr(*this),
-		m_megadrive_io_write_data_port_ptr(*this)
+		m_io_read_data_port_ptr(*this),
+		m_io_write_data_port_ptr(*this)
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -96,11 +93,11 @@ public:
 	/* Megadrive / Genesis has 3 I/O ports */
 	emu_timer *m_io_timeout[3];
 	int m_io_stage[3];
-	uint8_t m_megadrive_io_data_regs[3];
-	uint8_t m_megadrive_io_ctrl_regs[3];
-	uint8_t m_megadrive_io_tx_regs[3];
-	read8sm_delegate m_megadrive_io_read_data_port_ptr;
-	write16sm_delegate m_megadrive_io_write_data_port_ptr;
+	uint8_t m_io_data_regs[3];
+	uint8_t m_io_ctrl_regs[3];
+	uint8_t m_io_tx_regs[3];
+	read8sm_delegate m_io_read_data_port_ptr;
+	write16sm_delegate m_io_write_data_port_ptr;
 
 	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
 	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
