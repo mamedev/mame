@@ -89,7 +89,6 @@ private:
 	uint8_t m_th_state;
 	uint8_t m_x_base;
 	uint8_t m_y_base;
-	uint8_t m_data;
 };
 
 
