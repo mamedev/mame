@@ -33,9 +33,6 @@ public:
 	void tehkanwcb(machine_config &config);
 	void tehkanwc(machine_config &config);
 
-	void init_teedoff();
-	void init_teedoffj();
-
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
