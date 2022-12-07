@@ -662,7 +662,7 @@ void pc88va_state::io_map(address_map &map)
 //  map(0x0130, 0x0137) Picture Mask Parameter
 	map(0x0142, 0x0142).rw(FUNC(pc88va_state::idp_status_r), FUNC(pc88va_state::idp_command_w)); //Text Controller (IDP) - (R) Status (W) command
 	map(0x0146, 0x0146).w(FUNC(pc88va_state::idp_param_w)); //Text Controller (IDP) - (R/W) Parameter
-//  map(0x0148, 0x0149) Text control port 1
+	map(0x0148, 0x0148).w(FUNC(pc88va_state::text_control_1_w));
 //  map(0x014c, 0x014f) Kanji CG Port, animefrm
 	map(0x014c, 0x014d).w(FUNC(pc88va_state::kanji_cg_address_w));
 	map(0x014e, 0x014e).r(FUNC(pc88va_state::kanji_cg_r));

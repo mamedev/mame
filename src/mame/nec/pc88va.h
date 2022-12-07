@@ -177,6 +177,7 @@ private:
 	u8 m_pltm, m_pltp = 0;
 
 	u16 m_text_transpen = 0;
+	bool m_td = false;
 	bitmap_rgb32 m_graphic_bitmap[2];
 
 	u16 screen_ctrl_r();
@@ -186,6 +187,7 @@ private:
 
 	void color_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void text_control_1_w(u8 data);
 
 	u8 m_kanji_cg_line = 0;
 	u8 m_kanji_cg_jis[2]{};

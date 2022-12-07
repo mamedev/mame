@@ -343,6 +343,10 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1, uint8_t jis2, int x, in
  */
 void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// punt if text disable is on
+	if(m_td == true)
+		return;
+
 	uint16_t const *const tvram = m_tvram;
 	uint8_t const *const kanji = memregion("kanji")->base();
 
@@ -1208,7 +1212,6 @@ void pc88va_state::execute_sync_cmd()
  */
 void pc88va_state::execute_dspon_cmd()
 {
-
 	m_tsp.tvram_vreg_offset = m_buf_ram[0] << 8;
 	m_tsp.disp_on = true;
 	LOGIDP("DSPON (%02x %02x %02x) %05x\n"
@@ -1613,4 +1616,23 @@ void pc88va_state::kanji_cg_raster_w(u8 data)
 void pc88va_state::kanji_cg_address_w(offs_t offset, u8 data)
 {
 	m_kanji_cg_jis[offset] = data;
+}
+
+/*
+ * $148 Text Control 1
+ * x--- ---- TD Text Disable (1)
+ * -xxx ---- VALT2/VALT1/VALT0 TVRAM access restriction (?)
+ * -000 ---- No limit
+ * -??? ---- value x4
+ * ---- x--- ATM text attribute mode (1) V3 Mode (0) V1/V2
+ * ---- -x-- ANKM character font mode (1) 16 (0) 8
+ * ---- --x- IDP memory mode (1) word mode
+ * ---- ---1 <unknown, always 1?>
+ */
+void pc88va_state::text_control_1_w(u8 data)
+{
+	m_td = bool(BIT(data, 7));
+
+	if ((data & 0x7d) != 1)
+		LOG("I/O $148 write %02x\n", data);
 }
