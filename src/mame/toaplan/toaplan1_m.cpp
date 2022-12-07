@@ -143,7 +143,7 @@ u8 toaplan1_samesame_state::port_6_word_r()
 {
 	/* Bit 0x80 is secondary CPU (HD647180) ready signal */
 	logerror("PC:%08x Warning !!! IO reading from $14000b\n",m_maincpu->pcbase());
-	return (0x80 | m_tjump_io->read()) & 0xff;
+	return (m_soundlatch->pending_r() ? 0 : 0x80) | m_tjump_io->read();
 }
 
 u8 toaplan1_state::shared_r(offs_t offset)
@@ -164,6 +164,12 @@ void toaplan1_state::reset_sound()
 	/* zerowing, fireshrk, outzone, vimana use a RESET instruction instead */
 	m_ymsnd->reset();
 	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
+void toaplan1_samesame_state::reset_sound()
+{
+	toaplan1_state::reset_sound();
+	m_soundlatch->acknowledge_w();
 }
 
 void toaplan1_state::reset_sound_w(u8 data)
@@ -257,11 +263,4 @@ void toaplan1_demonwld_state::machine_start()
 	save_item(NAME(m_main_ram_seg));
 	save_item(NAME(m_dsp_bio));
 	save_item(NAME(m_dsp_execute));
-}
-
-void toaplan1_samesame_state::machine_start()
-{
-	toaplan1_state::machine_start();
-	save_item(NAME(m_to_mcu));
-	save_item(NAME(m_cmdavailable));
 }

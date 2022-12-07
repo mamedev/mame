@@ -755,7 +755,7 @@ void toaplan1_samesame_state::main_map(address_map &map)
 	map(0x140008, 0x140009).portr("SYSTEM");
 	map(0x14000b, 0x14000b).r(FUNC(toaplan1_samesame_state::port_6_word_r));    /* Territory, and MCU ready */
 	map(0x14000d, 0x14000d).w(FUNC(toaplan1_samesame_state::coin_w));  /* Coin counter/lockout */
-	map(0x14000f, 0x14000f).w(FUNC(toaplan1_samesame_state::mcu_w));   /* Commands sent to HD647180 */
+	map(0x14000f, 0x14000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));   /* Commands sent to HD647180 */
 	map(0x180001, 0x180001).w(FUNC(toaplan1_samesame_state::bcu_flipscreen_w));
 	map(0x180002, 0x180003).rw(FUNC(toaplan1_samesame_state::tileram_offs_r), FUNC(toaplan1_samesame_state::tileram_offs_w));
 	map(0x180004, 0x180007).rw(FUNC(toaplan1_samesame_state::tileram_r), FUNC(toaplan1_samesame_state::tileram_w));
@@ -987,26 +987,9 @@ u8 toaplan1_state::vimana_tjump_invert_r()
 	return (m_tjump_io->read() ^ 0xff) | 0xc0; // high 2 bits of port G always read as 1
 }
 
-void toaplan1_samesame_state::mcu_w(u8 data)
-{
-	m_to_mcu = data;
-	m_cmdavailable = 1;
-}
-
-u8 toaplan1_samesame_state::soundlatch_r()
-{
-	return m_to_mcu;
-}
-
-void toaplan1_samesame_state::sound_done_w(u8 data)
-{
-	m_to_mcu = data;
-	m_cmdavailable = 0;
-}
-
 u8 toaplan1_samesame_state::cmdavailable_r()
 {
-	if (m_cmdavailable) return 0xff;
+	if (m_soundlatch->pending_r()) return 0xff;
 	else return 0x00;
 }
 
@@ -1015,8 +998,8 @@ void toaplan1_samesame_state::hd647180_io_map(address_map &map)
 	map.global_mask(0xff);
 
 	map(0x63, 0x63).nopr(); // read port D
-	map(0xa0, 0xa0).r(FUNC(toaplan1_samesame_state::soundlatch_r));
-	map(0xb0, 0xb0).w(FUNC(toaplan1_samesame_state::sound_done_w));
+	map(0xa0, 0xa0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xb0, 0xb0).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 
 	map(0x80, 0x81).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 }
@@ -2122,6 +2105,8 @@ void toaplan1_samesame_state::samesame(machine_config &config)
 	// 16k byte ROM and 512 byte RAM are internal
 	audiocpu.set_addrmap(AS_IO, &toaplan1_samesame_state::hd647180_io_map);
 	audiocpu.in_pd_callback().set(FUNC(toaplan1_samesame_state::cmdavailable_r));
+
+	GENERIC_LATCH_8(config, m_soundlatch).set_separate_acknowledge(true);
 
 	config.set_perfect_quantum(m_maincpu);
 
