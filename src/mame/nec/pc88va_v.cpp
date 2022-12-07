@@ -25,7 +25,6 @@
 #define LOGCRTC(...)      LOGMASKED(LOG_CRTC, __VA_ARGS__)
 #define LOGCOLOR(...)     LOGMASKED(LOG_COLOR, __VA_ARGS__)
 #define LOGTEXT(...)      LOGMASKED(LOG_TEXT, __VA_ARGS__)
-#define LOGSGP(...)       LOGMASKED(LOG_SGP, __VA_ARGS__)
 
 void pc88va_state::video_start()
 {
@@ -33,6 +32,7 @@ void pc88va_state::video_start()
 	m_kanjiram = std::make_unique<uint8_t[]>(kanjiram_size);
 	m_gfxdecode->gfx(2)->set_source(m_kanjiram.get());
 	m_gfxdecode->gfx(3)->set_source(m_kanjiram.get());
+	m_vrtc_irq_line = 432;
 
 	for (int i = 0; i < 2; i++)
 		m_screen->register_screen_bitmap(m_graphic_bitmap[i]);
@@ -46,6 +46,8 @@ void pc88va_state::video_start()
 	save_item(NAME(m_text_transpen));
 	save_pointer(NAME(m_video_pri_reg), 2);
 	save_pointer(NAME(m_kanjiram), kanjiram_size);
+
+	save_item(NAME(m_vrtc_irq_line));
 }
 
 void pc88va_state::palette_init(palette_device &palette) const
@@ -1178,10 +1180,10 @@ void pc88va_state::execute_sync_cmd()
 	LOGCRTC("V sync: %d", v_sync);
 
 	LOGCRTC("\n\t");
-	const u16 v_total = v_blank_start + v_blank_end + v_vis_area + v_border_start + v_border_end + v_sync;
+	m_vrtc_irq_line = v_blank_start + v_blank_end + v_vis_area + v_border_start + v_border_end;
+	const u16 v_total = m_vrtc_irq_line + v_sync;
 
-	LOGCRTC("V Total calc = %d", v_total);
-	LOGCRTC("\n");
+	LOGCRTC("V Total calc = %d (VRTC %d)\n", v_total, m_vrtc_irq_line);
 
 	// punt with message if values are off (shouldn't happen)
 	// TODO: more validation:
@@ -1485,6 +1487,12 @@ u16 pc88va_state::screen_ctrl_r()
 void pc88va_state::gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_gfx_ctrl_reg);
+}
+
+// upo wants a readback otherwise no layer appears on title/gameplay
+u16 pc88va_state::gfx_ctrl_r()
+{
+	return m_gfx_ctrl_reg;
 }
 
 /*

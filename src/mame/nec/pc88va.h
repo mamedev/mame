@@ -14,11 +14,12 @@
 #include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
+#include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
-#include "machine/upd765.h"
-#include "machine/bankdev.h"
+#include "machine/timer.h"
 #include "machine/upd1990a.h"
+#include "machine/upd765.h"
 #include "sound/ymopn.h"
 
 //#include "pc80s31k.h"
@@ -158,7 +159,7 @@ private:
 	uint8_t backupram_dsw_r(offs_t offset);
 	void sys_port1_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vrtc_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(vrtc_irq);
 
 	uint8_t r232_ctrl_porta_r();
 	uint8_t r232_ctrl_portb_r();
@@ -182,6 +183,7 @@ private:
 
 	u16 screen_ctrl_r();
 	void screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 gfx_ctrl_r();
 	void gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -221,6 +223,7 @@ private:
 	uint8_t m_buf_size = 0;
 	uint8_t m_buf_index = 0;
 	uint8_t m_buf_ram[16]{};
+	u16 m_vrtc_irq_line = 432;
 
 	uint8_t idp_status_r();
 	void idp_command_w(uint8_t data);

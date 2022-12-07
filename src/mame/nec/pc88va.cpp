@@ -119,8 +119,8 @@ void pc88va_state::kanji_ram_w(offs_t offset, uint8_t data)
 u8 pc88va_state::port40_r()
 {
 	u8 data = 0;
-	// TODO: vblank logic fails with upo
-	data = (m_screen->vblank()) ? 0x20 : 0x00; // vblank
+	// vrtc
+	data = m_screen->vblank() << 5;
 	data |= m_rtc->data_out_r() << 4;
 	data |= (ioport("DSW")->read() & 1) ? 2 : 0;
 
@@ -633,7 +633,7 @@ void pc88va_state::io_map(address_map &map)
 	map(0x00fc, 0x00ff).r(FUNC(pc88va_state::fake_subfdc_r)).nopw();
 
 	map(0x0100, 0x0101).rw(FUNC(pc88va_state::screen_ctrl_r), FUNC(pc88va_state::screen_ctrl_w)); // Screen Control Register
-	map(0x0102, 0x0103).w(FUNC(pc88va_state::gfx_ctrl_w));
+	map(0x0102, 0x0103).rw(FUNC(pc88va_state::gfx_ctrl_r), FUNC(pc88va_state::gfx_ctrl_w));
 	map(0x0106, 0x0109).w(FUNC(pc88va_state::video_pri_w)); // Palette Control Register (priority) / Direct Color Control Register (priority)
 //  map(0x010a, 0x010b) Picture Mask Mode Register
 	map(0x010c, 0x010d).w(FUNC(pc88va_state::color_mode_w)); // Color Palette Mode Register
@@ -1102,11 +1102,19 @@ void pc88va_state::machine_reset()
 	m_sound_irq_pending = false;
 }
 
-INTERRUPT_GEN_MEMBER(pc88va_state::vrtc_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(pc88va_state::vrtc_irq)
 {
-	// TODO: verify when ack should happen
-	m_maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
-	m_maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+	int scanline = param;
+
+	// upo and ballbrkr have a working vrtc irq routine and a vblank $40 readback at same time.
+	// there's no clear /VRMF write to $e6 so presuming the irq happening later than default
+	// screen_device first line after visible.
+	if (scanline == m_vrtc_irq_line)
+	{
+		// TODO: verify when ack should happen
+		m_maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
@@ -1118,6 +1126,20 @@ WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 		m_pic2->ir3_w(0);
 		m_pic2->ir3_w(1);
 	}
+}
+
+// TODO: often dies, which implicitly means "make the full system to hang" in PC-88 land ...
+WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
+{
+	bool irq_state = m_sound_irq_enable & state;
+
+	if (irq_state)
+	{
+		m_pic2->ir4_w(0);
+		m_pic2->ir4_w(1);
+	}
+//  m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
+	m_sound_irq_pending = state;
 }
 
 WRITE_LINE_MEMBER( pc88va_state::tc_w )
@@ -1137,32 +1159,16 @@ static void pc88va_floppies(device_slot_interface &device)
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
-// TODO: often dies
-WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
-{
-	bool irq_state = m_sound_irq_enable & state;
-
-	if (irq_state)
-	{
-		m_pic2->ir4_w(0);
-		m_pic2->ir4_w(1);
-	}
-//  m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
-	m_sound_irq_pending = state;
-}
-
 void pc88va_state::pc88va(machine_config &config)
 {
 	V50(config, m_maincpu, MASTER_CLOCK); // μPD9002, aka V50 + μPD70008AC (for PC8801 compatibility mode) in place of 8080
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::vrtc_irq));
+	TIMER(config, "scantimer").configure_scanline(FUNC(pc88va_state::vrtc_irq), "screen", 0, 1);
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
-//  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->set_tclk(MASTER_CLOCK);
 	// "timer 1"
 	m_maincpu->tout1_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-//  m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
 	// ch2 is FDC, ch0/3 are "user". ch1 is unused
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
@@ -1174,12 +1180,10 @@ void pc88va_state::pc88va(machine_config &config)
 	// TODO: pc80s31k here
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: fully convert to set_raw (timings available)
 	m_screen->set_raw(XTAL(42'105'200) / 2, 848, 0, 640, 448, 0, 400);
 	m_screen->set_screen_update(FUNC(pc88va_state::screen_update));
 
 	PALETTE(config, m_palette, FUNC(pc88va_state::palette_init)).set_entries(32);
-//  m_palette->set_init(FUNC(pc88va_state::pc8801));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc88va);
 
 	PC88VA_SGP(config, m_sgp);
@@ -1210,7 +1214,7 @@ void pc88va_state::pc88va(machine_config &config)
 
 	UPD4990A(config, m_rtc);
 
-	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 18+4, 0x40000);
+	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 22, 0x40000);
 
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
