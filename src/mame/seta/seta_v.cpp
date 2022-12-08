@@ -624,3 +624,9 @@ u32 usclssic_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &
 	usclssic_set_pens();
 	return screen_update_seta_layers(screen, bitmap, cliprect);
 }
+
+void seta_state::vram_layer0_vctrl_raster_trampoline_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_screen->update_partial(m_screen->vpos());
+	m_layers[0]->vctrl_w(offset, data, mem_mask);
+}
