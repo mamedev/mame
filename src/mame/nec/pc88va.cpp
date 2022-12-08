@@ -202,21 +202,22 @@ void pc88va_state::rtc_w(offs_t offset, u8 data)
 	// TODO: remaining bits
 }
 
-uint16_t pc88va_state::bios_bank_r()
-{
-	return m_bank_reg;
-}
-
 /*
- * -x-- ---- ---- ---- SMM (compatibility mode)
- * ---x ---- ---- ---- GMSP (VRAM drawing mode)
+ * $152
+ * -x-- ---- ---- ---- SMM compatibility mode (1) V3 (0) V1/V2
+ * ---x ---- ---- ---- GMSP VRAM drawing mode (0) multiplane (1) single plane
  * ---- xxxx ---- ---- SMBC (0xa0000 - 0xdffff RAM bank)
  * ---- ---- xxxx ---- RBC13-RBC10 (0xf0000 - 0xfffff ROM bank)
+ * ---- ---- 0xxx ---- internal ROM entry
+ *                     \- settings 2 to 5 are <prohibited>
+ *                     \- settings 6 and 7 are reserved
+ * ---- ---- 1xxx ---- select bus slot ROM
  * ---- ---- ---- xxxx RBC03-RBC00 (0xe0000 - 0xeffff ROM bank)
+ * ---- ---- ---- 0xxx internal ROM entry
+ * ---- ---- ---- 1xxx select bus slot ROM
  */
 void pc88va_state::bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-
 	COMBINE_DATA(&m_bank_reg);
 
 	/* SMBC */
@@ -233,9 +234,13 @@ void pc88va_state::bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	/* RBC0 */
 	{
 		uint8_t *ROM00 = memregion("rom00")->base();
-
-		membank("rom00_bank")->set_base(&ROM00[(m_bank_reg & 0xf)*0x10000]);
+		membank("rom00_bank")->set_base(&ROM00[(m_bank_reg & 0xf) * 0x10000]);
 	}
+}
+
+uint16_t pc88va_state::bios_bank_r()
+{
+	return m_bank_reg;
 }
 
 // TODO: status for bus slot ROM banking, at 0xf0000-0xfffff
@@ -583,8 +588,9 @@ void pc88va_state::sysbank_map(address_map &map)
 {
 	// 0 select bus slot
 	// 1 tvram
-	// NB: BASIC expects to r/w to 0x60000-0x7ffff on loading, assume mirror if not a core bug.
-	map(0x040000, 0x04ffff).mirror(0x30000).ram().share("tvram");
+	map(0x040000, 0x04ffff).ram().share("tvram");
+	// FIXME: BASIC and pacmana expects to r/w to 0x60000-0x7ffff on loading, assume mirror if not a core bug.
+	map(0x050000, 0x07ffff).ram();
 	// 4 gvram
 	map(0x100000, 0x13ffff).ram().share("gvram");
 	// 8-9 kanji

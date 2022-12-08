@@ -11,7 +11,8 @@ TODO:
 - specifics about what exactly happens in work area when either SGP runs or is idle.
 - famista: during gameplay it BITBLT same source to destination 0x00037076 
   with tp_mode = 3 and pitch = 0 (!?);
-- rtype: during gameplay it does transfers with Pitch = 0xfff0 (!?);
+- rtype: during gameplay it does transfers with Pitch = 0xfff0, alias for negative draw?
+- basic fires a VABOT on loading;
 
 **************************************************************************************************/
 
@@ -378,7 +379,7 @@ void pc88va_sgp_device::cmd_blit(u16 draw_mode, bool is_patblt)
 		u32 src_address = m_src.address + (yi * m_src.fb_pitch);
 		u32 dst_address = m_dst.address + (yi * m_dst.fb_pitch);
 
-		for (int xi = 0; xi < (m_src.hsize >> 1); xi ++)
+		for (int xi = 0; xi < (m_src.hsize >> 2); xi ++)
 		{
 			// TODO: not very efficient, we need a cleaner per-pixel RMW phase
 			const u16 src_dot = m_data->read_word(src_address);
