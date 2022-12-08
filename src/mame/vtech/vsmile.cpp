@@ -115,7 +115,21 @@ void vsmile_state::uart_rx(uint8_t data)
 
 uint16_t vsmile_state::portb_r()
 {
-	return VSMILE_PORTB_OFF_SW | VSMILE_PORTB_ON_SW | VSMILE_PORTB_RESET;
+	uint16_t data = m_dsw_system->read();
+	//bit 0 : extra address bit for the cartridge port, access second half of ROM (TODO)
+	//bit 1 : Set to 0 to enable cartridge ROM (TODO) -> getCS2
+	//bit 2 : Set to 0 to enable internal ROM (TODO)
+	//bit 3 : restart (see dipswitch)
+	//		VSMILE_PORTB_RESET
+	//bit 4 : ADC (TODO)
+	//bit 5 : Voltage detect (TODO)
+	//bit 6 : ON button, active low (see dipswitch)
+	//		VSMILE_PORTB_ON_SW
+	//bit 7 : OFF button, active low (see dipswitch)
+	//		VSMILE_PORTB_OFF_SW
+
+	//VSMILE_PORTB_OFF_SW and VSMILE_PORTB_ON_SW actives will trigger BIOS test screen
+	return data; 
 }
 
 void vsmile_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -229,6 +243,19 @@ static INPUT_PORTS_START( vsmile )
 	PORT_DIPSETTING(    0x00, "Off" )
 	PORT_DIPSETTING(    0x10, "On" )
 	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
+
+	//using dipswitches for OFF and ON buttons to be able to press them at boot
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x40, 0x40, "OFF switch" 	/*VSMILE_PORTB_OFF_SW*/)
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPNAME( 0x80, 0x80, "ON switch" 	/*VSMILE_PORTB_ON_SW*/)
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPNAME( 0x08, 0x08, "Restart" 	/*VSMILE_PORTB_RESET*/)
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsmilem )
