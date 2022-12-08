@@ -711,7 +711,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //      line_length = vga.crtc.offset << 4;
 //  }
 
-	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08)) ? 2 : 0;
+	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08) || svga.ignore_chain4) ? 2 : 0;
 	for (int addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		for (int yi = 0;yi < height; yi++)
