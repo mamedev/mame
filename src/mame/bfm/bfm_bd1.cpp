@@ -2,7 +2,7 @@
 // copyright-holders:James Wallace
 /**********************************************************************
 
-    Bellfruit BD1 VFD module interface and emulation 
+    Bellfruit BD1 VFD module interface and emulation
 
     TODO: Verify flashing (our only datasheet has that section
     completely illegible)
@@ -150,8 +150,8 @@ void bfm_bd1_device::device_reset()
 	m_display_mode = 0;
 	m_flash_rate = 0;
 	m_flash_control = 0;
-    m_flash = false;
-    m_flash_timer = 0;
+	m_flash = false;
+	m_flash_timer = 0;
 	m_user_data = 0;
 	m_user_def = 0;
 	m_sclk = 0;
@@ -217,7 +217,7 @@ void bfm_bd1_device::update_display()
 		  }
 		}
 	  }
-	
+
 	for (int i = 0; i < 16; i++)
 		(*m_outputs)[i] = (m_attrs[i] == AT_NORMAL) ? set_display(m_chars[i]) : 0;
 }
@@ -373,7 +373,7 @@ int bfm_bd1_device::write_char(int data)
 
 			case 0xc0:  // 0xC0 - 0xCF Set flash rate
 				m_flash_rate = data & 0x0f;
-				if ( !m_flash_rate && m_flash ) 
+				if ( !m_flash_rate && m_flash )
 				{
 					m_flash_timer = 0;
 					m_flash = false;
