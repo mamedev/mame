@@ -273,6 +273,7 @@ protected:
 		uint8_t rgb24_en;
 		uint8_t rgb32_en;
 		uint8_t id;
+		bool ignore_chain4;
 	} svga;
 };
 

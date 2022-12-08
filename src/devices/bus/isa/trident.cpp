@@ -182,6 +182,7 @@ void trident_vga_device::device_start()
 	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
 	vga.svga_intf.seq_regcount = 0x0f;
 	vga.svga_intf.crtc_regcount = 0x60;
+	svga.ignore_chain4 = true;
 	memset(&tri, 0, sizeof(tri));
 }
 
@@ -621,6 +622,7 @@ void trident_vga_device::trident_crtc_reg_write(uint8_t index, uint8_t data)
 		case 0x1e:  // Module Testing Register
 			tri.cr1e = data;
 			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffeffff) | ((data & 0x20)<<11);
+			trident_define_video_mode();
 			break;
 		case 0x1f:
 			tri.cr1f = data;  // "Software Programming Register"  written to by the BIOS

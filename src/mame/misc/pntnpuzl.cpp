@@ -392,7 +392,7 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 
 	TVGA9000_VGA(config, m_svga, 0);
 	m_svga->set_screen(m_screen);
-	m_svga->set_vram_size(0x200000);
+	m_svga->set_vram_size(0x100000);
 
 	// TODO: runs in external clock mode, needs setter to pc_vga. ~70 Hz is best guess
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

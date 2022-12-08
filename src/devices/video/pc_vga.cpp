@@ -533,7 +533,9 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 		{
 			uint32_t *const bitmapline = &bitmap.pix(line + yi);
 			// ibm_5150:batmanmv uses this on gameplay for both EGA and "VGA" modes
-			// TODO: EGA mode sets 663, should be 303 like the other mode
+			// NB: EGA mode in that game sets 663, should be 303 like the other mode
+			// causing no status bar to appear. This is a known btanb in how VGA
+			// handles EGA mode, cfr. https://www.os2museum.com/wp/fantasyland-on-vga/
 			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
 				addr = 0;
 
@@ -709,7 +711,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //      line_length = vga.crtc.offset << 4;
 //  }
 
-	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08)) ? 2 : 0;
+	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08) || svga.ignore_chain4) ? 2 : 0;
 	for (int addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		for (int yi = 0;yi < height; yi++)

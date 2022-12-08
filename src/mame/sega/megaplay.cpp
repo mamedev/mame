@@ -428,7 +428,7 @@ void mplay_state::bios_gamesel_w(uint8_t data)
 void mplay_state::mp_io_write(offs_t offset, uint16_t data)
 {
 	if (offset == 0x03)
-		m_megadrive_io_data_regs[2] = (data & m_megadrive_io_ctrl_regs[2]) | (m_megadrive_io_data_regs[2] & ~m_megadrive_io_ctrl_regs[2]);
+		m_io_data_regs[2] = (data & m_io_ctrl_regs[2]) | (m_io_data_regs[2] & ~m_io_ctrl_regs[2]);
 	else
 		megadriv_68k_io_write(offset & 0x1f, data);
 }
@@ -436,7 +436,7 @@ void mplay_state::mp_io_write(offs_t offset, uint16_t data)
 uint16_t mplay_state::mp_io_read(offs_t offset)
 {
 	if (offset == 0x03)
-		return m_megadrive_io_data_regs[2];
+		return m_io_data_regs[2];
 	else
 		return megadriv_68k_io_read(offset & 0x1f);
 }
@@ -504,25 +504,25 @@ void mplay_state::bank_w(offs_t offset, uint8_t data)
 
 uint8_t mplay_state::bios_6402_r()
 {
-	return m_megadrive_io_data_regs[2];// & 0xfe;
+	return m_io_data_regs[2];// & 0xfe;
 }
 
 void mplay_state::bios_6402_w(uint8_t data)
 {
-	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
+	m_io_data_regs[2] = (m_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
 //  logerror("BIOS: 0x6402 write: 0x%02x\n", data);
 }
 
 uint8_t mplay_state::bios_6204_r()
 {
-	return m_megadrive_io_data_regs[2];
+	return m_io_data_regs[2];
 //  return (m_bios_width & 0xf8) + (m_bios_6204 & 0x07);
 }
 
 void mplay_state::bios_width_w(uint8_t data)
 {
 	m_bios_width = data;
-	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
+	m_io_data_regs[2] = (m_io_data_regs[2] & 0x07) | ((data & 0xf8));
 //  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
 }
 
@@ -963,8 +963,8 @@ void mplay_state::init_megaplay()
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
 	init_megadrij();
-	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
-	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
+	m_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
+	m_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 
 	// for now ...
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16sm_delegate(*this, FUNC(mplay_state::mp_io_read)), write16sm_delegate(*this, FUNC(mplay_state::mp_io_write)));

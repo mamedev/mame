@@ -12,6 +12,7 @@
 #include "joystick.h"
 #include "libbler.h"
 #include "mouse.h"
+#include "sgadapt.h"
 #include "towns6b.h"
 #include "townspad.h"
 
@@ -46,6 +47,7 @@ void msx_general_purpose_port_devices(device_slot_interface &device)
 	device.option_add("libbler", MSX_LIBBLERPAD);
 	device.option_add("martypad", MSX_MARTYPAD);
 	device.option_add("mouse", MSX_MOUSE);
+	device.option_add("sega", MSX_SEGACTRL);
 	device.option_add("towns6b", MSX_TOWNS6B);
 	device.option_add("townspad", MSX_TOWNSPAD);
 }

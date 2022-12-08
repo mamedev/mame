@@ -245,6 +245,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "emu.h"
 #include "sms.h"
 
+#include "bus/sms_ctrl/controllers.h"
 #include "cpu/z80/z80.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -494,25 +495,25 @@ INPUT_PORTS_END
 
 void sms_state::sms_base(machine_config &config)
 {
-	/* basic machine hardware */
 	SPEAKER(config, "mono").front_center();
 
 	SMS_CART_SLOT(config, "slot", sms_cart, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("sms");
 
-	SMS_CONTROL_PORT(config, m_port_ctrl1, sms_control_port_devices, "joypad");
-	m_port_ctrl1->set_screen_tag(m_main_scr);
-	m_port_ctrl1->th_input_handler().set(FUNC(sms_state::sms_ctrl1_th_input));
+	SMS_CONTROL_PORT(config, m_port_ctrl1, sms_control_port_devices, SMS_CTRL_OPTION_JOYPAD);
+	m_port_ctrl1->set_screen(m_main_scr);
+	m_port_ctrl1->th_handler().set(FUNC(sms_state::sms_ctrl1_th_input));
 
-	SMS_CONTROL_PORT(config, m_port_ctrl2, sms_control_port_devices, "joypad");
-	m_port_ctrl2->set_screen_tag(m_main_scr);
-	m_port_ctrl2->th_input_handler().set(FUNC(sms_state::sms_ctrl2_th_input));
+	SMS_CONTROL_PORT(config, m_port_ctrl2, sms_control_port_devices, SMS_CTRL_OPTION_JOYPAD);
+	m_port_ctrl2->set_screen(m_main_scr);
+	m_port_ctrl2->th_handler().set(FUNC(sms_state::sms_ctrl2_th_input));
 }
 
 void sms_state::sms_ntsc_base(machine_config &config)
 {
 	sms_base(config);
+
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
 	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
@@ -937,8 +938,8 @@ void sms1_state::sg1000m3(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
 
 	// Mark III does not have TH connected.
-	m_port_ctrl1->th_input_handler().set_nop();
-	m_port_ctrl2->th_input_handler().set_nop();
+	m_port_ctrl1->th_handler().set_nop();
+	m_port_ctrl2->th_handler().set_nop();
 
 	m_has_bios_full = false;
 	m_is_mark_iii = true;
