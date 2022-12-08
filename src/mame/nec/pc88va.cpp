@@ -95,7 +95,7 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 #define LOG_FDC2    (1U << 3) // $1b4-$1b6 accesses (verbose)
 
 #define VERBOSE (LOG_GENERAL | LOG_FDC)
-#define LOG_OUTPUT_STREAM std::cout
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 

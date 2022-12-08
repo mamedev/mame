@@ -15,7 +15,7 @@
 #define LOG_TEXT    (1U << 7) // text strips (verbose)
 
 #define VERBOSE (LOG_GENERAL | LOG_IDP)
-#define LOG_OUTPUT_STREAM std::cout
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 

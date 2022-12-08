@@ -24,8 +24,8 @@ TODO:
 
 #define LOG_COMMAND     (1U << 2)
 
-#define VERBOSE (LOG_GENERAL | LOG_COMMAND)
-#define LOG_OUTPUT_STREAM std::cout
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
