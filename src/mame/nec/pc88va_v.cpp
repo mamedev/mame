@@ -168,6 +168,9 @@ inline u8 pc88va_state::get_layer_pal_bank(u8 which)
 	if (m_pltm == 3)
 		return 0;
 
+	// TODO: text and sprites may be joined when either one is selected in PLTP
+	// olteus sets sprite = 1, wants text to follow with the other bank too
+	// ballbrkr goes the other way around: writes 0, wants sprites to be 1
 	return (m_pltp == which) << 4;
 }
 
