@@ -33985,7 +33985,8 @@ vandykejal                      // UPL-90064 (c) Jaleco
 vandykejal2                     // UPL-90064 (c) Jaleco
 
 @source:nmk/nmkmedal.cpp
-hpierrot                        // NMK
+drail                           // NTC / NMK
+hpierrot                        // NTC / NMK
 trocana                         // NTC / NMK
 
 @source:efo/nightmare.cpp
@@ -41726,6 +41727,7 @@ tecnodargr                      // (c) 1991 Automatics Pasqual / Recreativos G.R
 @source:tecmo/tehkanwc.cpp
 gridiron                        // (c) 1985 Tehkan
 teedoff                         // 6102 - (c) 1986 Tecmo
+teedoffj                        // 
 tehkanwc                        // (c) 1985 Tehkan
 tehkanwcb                       // bootleg
 tehkanwcc                       // bootleg

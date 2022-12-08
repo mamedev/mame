@@ -7,8 +7,7 @@ RW93085 (C) NTC CO.      on main PCB
 
 RW93085-SUB (c)NTC CO.LTD 1993 MADE IN JAPAN     on sub (ROM) PCB
 
-various NMK customs including NMK005 near dipswitches, difficult to read the rest from PCB pics
-possible MCU or just IO extender?
+various NMK customs including NMK005 (GPIO controller) near dipswitches, difficult to read the rest from PCB pics
 
 developed by NTC on NMK hardware?
 
