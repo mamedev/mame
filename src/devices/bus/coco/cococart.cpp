@@ -141,10 +141,6 @@ cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const 
 
 void cococart_slot_device::device_start()
 {
-	m_cart_callback.resolve_safe();
-	m_nmi_callback.resolve_safe();
-	m_halt_callback.resolve_safe();
-
 	for(int i=0; i < TIMER_POOL; i++ )
 	{
 		m_cart_line.timer[i]    = timer_alloc(FUNC(cococart_slot_device::cart_line_timer_tick), this);
@@ -157,7 +153,7 @@ void cococart_slot_device::device_start()
 	m_cart_line.value           = line_value::CLEAR;
 	m_cart_line.line            = 0;
 	m_cart_line.q_count         = 0;
-	m_cart_callback.resolve();
+	m_cart_callback.resolve_safe();
 	m_cart_line.callback = &m_cart_callback;
 
 	m_nmi_line.timer_index      = 0;
@@ -165,7 +161,7 @@ void cococart_slot_device::device_start()
 	m_nmi_line.value            = line_value::CLEAR;
 	m_nmi_line.line             = 0;
 	m_nmi_line.q_count          = 0;
-	m_nmi_callback.resolve();
+	m_nmi_callback.resolve_safe();
 	m_nmi_line.callback = &m_nmi_callback;
 
 	m_halt_line.timer_index     = 0;
@@ -173,7 +169,7 @@ void cococart_slot_device::device_start()
 	m_halt_line.value           = line_value::CLEAR;
 	m_halt_line.line            = 0;
 	m_halt_line.q_count         = 0;
-	m_halt_callback.resolve();
+	m_halt_callback.resolve_safe();
 	m_halt_line.callback = &m_halt_callback;
 
 	m_cart = get_card_device();
