@@ -63,7 +63,10 @@ void fruit_samples_device::play(uint8_t index)
 		sample_params sample = params[index];
 		m_samples->start(sample.channel, sample.id, sample.loop);
 	}
-	else fatalerror("fruit_samples_device::play: Sample index %u out of range\n", index);
+	else
+	{
+		fatalerror("fruit_samples_device::play: Sample index %u out of range\n", index);
+	}
 }
 
 void fruit_samples_device::stop(uint8_t index)
@@ -73,5 +76,8 @@ void fruit_samples_device::stop(uint8_t index)
 		sample_params sample = params[index];
 		m_samples->stop(sample.channel);
 	}
-	else fatalerror("fruit_samples_device::stop: Sample index %u out of range\n", index);
+	else
+	{
+		fatalerror("fruit_samples_device::stop: Sample index %u out of range\n", index);
+	}
 }

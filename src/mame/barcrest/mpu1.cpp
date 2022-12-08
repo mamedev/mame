@@ -69,6 +69,9 @@ protected:
 private:
 	template <unsigned Lamp> DECLARE_WRITE_LINE_MEMBER(pia_lamp_w) { m_lamps[Lamp] = state; }
 
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
+	TIMER_CALLBACK_MEMBER(change_pia2a_bit7);
+
 	void pia1_portb_w(uint8_t data);
 	void pia1_portb_lg_w(uint8_t data);
 	uint8_t pia2_porta_r();
@@ -87,10 +90,6 @@ private:
 	uint8_t m_pia2a_bit7_value;
 	emu_timer *m_change_pia2a_bit7_timer;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
-	TIMER_CALLBACK_MEMBER(change_pia2a_bit7);
-
-	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_nmi_timer;
 	required_device<pia6821_device> m_pia1;
