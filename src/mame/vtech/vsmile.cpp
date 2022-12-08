@@ -231,17 +231,27 @@ void vsmile_state::banked_map(address_map &map)
 
 static INPUT_PORTS_START( vsmile )
 	PORT_START("REGION")
-	PORT_DIPNAME( 0x0f, 0x04, "sysrom Region" )
-	PORT_DIPSETTING(    0x04, "UK/US" )
-	PORT_DIPSETTING(    0x07, "China" )
-	PORT_DIPSETTING(    0x08, "Mexico" )
-	PORT_DIPSETTING(    0x0a, "Italy" ) // not valid on V.Smile Motion?
-	PORT_DIPSETTING(    0x0b, "Germany" )
-	PORT_DIPSETTING(    0x0c, "Spain" )
-	PORT_DIPSETTING(    0x0d, "France" )
+	//based on schematics and BIOS test screen
+	PORT_DIPNAME( 0x0f, 0x04, DEF_STR(Language) )
+	//PORT_DIPSETTING(    0x00, "0" ) //invalid UK
+	//PORT_DIPSETTING(    0x01, "1" ) //invalid US
+	PORT_DIPSETTING(    0x02, DEF_STR(Italian) ) //IT
+	//PORT_DIPSETTING(    0x03, "3" ) //invalid US
+	//PORT_DIPSETTING(    0x04, "4" ) //invalid US
+	//PORT_DIPSETTING(    0x05, "5" ) //invalid US
+	//PORT_DIPSETTING(    0x06, "6" ) //invalid UK
+	PORT_DIPSETTING(    0x07, DEF_STR(Chinese) ) //Chinese
+	PORT_DIPSETTING(    0x08, "Portuguese" ) //PO
+	PORT_DIPSETTING(    0x09, "Dutch" ) //DU
+	//PORT_DIPSETTING(    0x0a, "a" ) //invalid UK
+	PORT_DIPSETTING(    0x0b, DEF_STR(German) ) //GE
+	PORT_DIPSETTING(    0x0c, DEF_STR(Spanish) ) //SP
+	PORT_DIPSETTING(    0x0d, DEF_STR(French) ) //FR
+	PORT_DIPSETTING(    0x0e, "UK" ) //UK
+	PORT_DIPSETTING(    0x0f, "US" ) //US
 	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
-	PORT_DIPSETTING(    0x00, "Off" )
-	PORT_DIPSETTING(    0x10, "On" )
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )
 	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
 
 	//using dipswitches for OFF and ON buttons to be able to press them at boot
