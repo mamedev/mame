@@ -44,6 +44,7 @@ private:
 
 	void vdp_address_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 status_r();
+	void control_w(u8 data);
 	void trigger_w(u8 data);
 
 	void start_exec();

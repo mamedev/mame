@@ -46,6 +46,11 @@
     - Fix floppy motor hook-up (floppy believes to be always in even if empty drive);
     - Support for PC8801 compatible mode & PC80S31K (floppy interface);
 
+    Notes:
+    - hold F8 at POST to bring software dip settings menu
+    - PC-88VA-91 is a ROM upgrade kit for a PC-88VA -> VA2/VA3.
+      Has four roms, marked by VAEG as VUROM00.ROM, VUROM08.ROM, VUROM1.ROM, VUDIC.ROM.
+
     References:
     - PC-88VAテクニカルマニュアル
     - http://www.pc88.gr.jp/vafaq/view.php/articlelist/88va/vafaq
@@ -73,7 +78,7 @@ irq 14 - 16H - <reserved>
 irq 15 - 17H - <reserved>
 
 trap list (brief, for quick consultation):
-brk 82h AH=01h <undocumented>, "paint" uses it
+brk 82h AH=01h <undocumented>, animefrm uses it
 brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL = 0
 
 **************************************************************************************************/
@@ -202,15 +207,16 @@ uint16_t pc88va_state::bios_bank_r()
 	return m_bank_reg;
 }
 
+/*
+ * -x-- ---- ---- ---- SMM (compatibility mode)
+ * ---x ---- ---- ---- GMSP (VRAM drawing mode)
+ * ---- xxxx ---- ---- SMBC (0xa0000 - 0xdffff RAM bank)
+ * ---- ---- xxxx ---- RBC13-RBC10 (0xf0000 - 0xfffff ROM bank)
+ * ---- ---- ---- xxxx RBC03-RBC00 (0xe0000 - 0xeffff ROM bank)
+ */
 void pc88va_state::bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/*
-	-x-- ---- ---- ---- SMM (compatibility mode)
-	---x ---- ---- ---- GMSP (VRAM drawing mode)
-	---- xxxx ---- ---- SMBC (0xa0000 - 0xdffff RAM bank)
-	---- ---- xxxx ---- RBC1 (0xf0000 - 0xfffff ROM bank)
-	---- ---- ---- xxxx RBC0 (0xe0000 - 0xeffff ROM bank)
-	*/
+
 	COMBINE_DATA(&m_bank_reg);
 
 	/* SMBC */
@@ -228,18 +234,19 @@ void pc88va_state::bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		uint8_t *ROM00 = memregion("rom00")->base();
 
-		membank("rom00_bank")->set_base(&ROM00[(m_bank_reg & 0xf)*0x10000]); // TODO: docs says that only 0 - 5 are used, dunno why ...
+		membank("rom00_bank")->set_base(&ROM00[(m_bank_reg & 0xf)*0x10000]);
 	}
 }
 
+// TODO: status for bus slot ROM banking, at 0xf0000-0xfffff
 uint8_t pc88va_state::rom_bank_r()
 {
-	return 0xff; // bit 7 low is va91 rom bank status
+	// bit 7 low is PC-88VA-91 rom bank status
+	return 0xff;
 }
 
 uint8_t pc88va_state::key_r(offs_t offset)
 {
-	// holding F8 at POST to bring a service mode
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 											"KEY4", "KEY5", "KEY6", "KEY7",
 											"KEY8", "KEY9", "KEYA", "KEYB",
@@ -258,9 +265,36 @@ void pc88va_state::backupram_wp_0_w(uint16_t data)
 	m_backupram_wp = 0;
 }
 
+/*
+ * $190 system port 5
+ * ---x ---- FBEEP Force BEEP (1) allow
+ * ---- xx-- AVC2/AVC1 video output control
+ * ---- 00-- TV/video mode, offline (?)
+ * ---- 10-- Analog RGB mode (at reset, default)
+ * ---- x1-- <prohibited>
+ * ---- ---x RSTMD reset status
+ *           \- works as software Power On Reset flag during VA POST
+ */
+void pc88va_state::sys_port5_w(u8 data)
+{
+	m_rstmd = bool(BIT(data, 0));
+	LOG("I/O $190 %02x\n", data);
+}
+
+u8 pc88va_state::sys_port5_r()
+{
+	return m_rstmd | 8;
+}
+
 uint8_t pc88va_state::hdd_status_r()
 {
 	return 0x20;
+}
+
+// TODO: convert to pc80s31k family
+uint8_t pc88va_state::fake_subfdc_r()
+{
+	return machine().rand();
 }
 
 uint8_t pc88va_state::pc88va_fdc_r(offs_t offset)
@@ -302,25 +336,6 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_1)
 	m_fdd[1]->get_device()->mon_w(0);
 }
 
-#if 0
-void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
-{
-	bool ready = m_fdc_ctrl_2 & 0x40;
-
-	floppy_image_device *floppy;
-	floppy = m_fdd[0]->get_device();
-	if(floppy && ready)
-		ready = floppy->ready_r();
-
-	floppy = m_fdd[1]->get_device();
-	if(floppy && ready)
-		ready = floppy->ready_r();
-
-	m_fdc->ready_w(ready);
-}
-
-#else
-
 void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 {
 	if (!BIT(m_fdc_ctrl_2, 5))
@@ -349,8 +364,6 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 	else
 		m_fdc->set_ready_line_connected(1);
 }
-
-#endif
 
 void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 {
@@ -490,16 +503,6 @@ uint16_t pc88va_state::sysop_r()
 	return 0xfffc | sys_op; // docs says all the other bits are high
 }
 
-TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
-{
-	if(m_timer3_io_reg & 0x80)
-	{
-		m_pic2->ir5_w(0);
-		m_pic2->ir5_w(1);
-		m_t3_mouse_timer->adjust(attotime::from_hz(120 >> (m_timer3_io_reg & 3)));
-	}
-}
-
 /*
  * x--- ---- MINTEN (TCU irq enable)
  * ---- --xx MTP1/MTP0 general purpose timer 3 interval
@@ -516,10 +519,22 @@ void pc88va_state::timer3_ctrl_reg_w(uint8_t data)
 		m_t3_mouse_timer->adjust(attotime::from_hz(120 >> (m_timer3_io_reg & 3)));
 	else
 	{
-		m_pic2->ir5_w(0);
+		// TODO: confirm me
+		//m_pic2->ir5_w(0);
 		m_t3_mouse_timer->adjust(attotime::never);
 	}
 }
+
+TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
+{
+	if(m_timer3_io_reg & 0x80)
+	{
+		m_pic2->ir5_w(0);
+		m_pic2->ir5_w(1);
+		m_t3_mouse_timer->adjust(attotime::from_hz(120 >> (m_timer3_io_reg & 3)));
+	}
+}
+
 
 uint8_t pc88va_state::backupram_dsw_r(offs_t offset)
 {
@@ -529,15 +544,10 @@ uint8_t pc88va_state::backupram_dsw_r(offs_t offset)
 	return m_kanjiram[0x1fc6 / 2] & 0xff;
 }
 
+// TODO: pc8801_state::port31_w
 void pc88va_state::sys_port1_w(uint8_t data)
 {
-	// ...
-}
-
-// TODO: convert to pc80s31k family
-uint8_t pc88va_state::fake_subfdc_r()
-{
-	return machine().rand();
+	LOG("I/O $31 %02x\n", data);
 }
 
 uint8_t pc88va_state::misc_ctrl_r()
@@ -629,7 +639,6 @@ void pc88va_state::io_map(address_map &map)
 //  map(0x00e6, 0x00e6) 8214 IRQ mask (*)
 //  map(0x00e8, 0x00e9) ? (*)
 //  map(0x00ec, 0x00ed) ? (*)
-	// TODO: convert to pc80s31k family
 	map(0x00fc, 0x00ff).r(FUNC(pc88va_state::fake_subfdc_r)).nopw();
 
 	map(0x0100, 0x0101).rw(FUNC(pc88va_state::screen_ctrl_r), FUNC(pc88va_state::screen_ctrl_w)); // Screen Control Register
@@ -661,12 +670,13 @@ void pc88va_state::io_map(address_map &map)
 	map(0x0184, 0x0187).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 //  map(0x0188, 0x018b) V50 ICU
 //  map(0x0190, 0x0191) System Port 5
+	map(0x0190, 0x0190).rw(FUNC(pc88va_state::sys_port5_r), FUNC(pc88va_state::sys_port5_w));
 //  map(0x0196, 0x0197) Keyboard sub CPU command port
 	map(0x0198, 0x0199).w(FUNC(pc88va_state::backupram_wp_1_w)); //Backup RAM write inhibit
 	map(0x019a, 0x019b).w(FUNC(pc88va_state::backupram_wp_0_w)); //Backup RAM write permission
 //  map(0x01a0, 0x01a7) V50 TCU
 	map(0x01a8, 0x01a8).w(FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
-	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff);// FDC related (765)
+	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff); // FDC related (765)
 	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 //  map(0x01c0, 0x01c1) keyboard scan code, polled thru IRQ1 ...
 	map(0x01c1, 0x01c1).lr8(NAME([this] () { return m_keyb.data; }));
@@ -678,7 +688,7 @@ void pc88va_state::io_map(address_map &map)
 	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
 
 	map(0x0500, 0x0507).m(m_sgp, FUNC(pc88va_sgp_device::sgp_io));
-	// GVRAM multiplane access regs
+	// GVRAM multiplane access regs (ROP section)
 //  map(0x0510, 0x0510) AACC extend access mode
 //  map(0x0512, 0x0512) GMAP block switch
 //  map(0x0514, 0x0514) XRPMn plane readback select
@@ -1040,66 +1050,16 @@ void pc88va_state::r232_ctrl_portc_w(uint8_t data)
 	// ...
 }
 
+/****************************************
+ * IRQ lines
+ ***************************************/
+
 uint8_t pc88va_state::get_slave_ack(offs_t offset)
 {
 	if (offset == 7) {
 		return m_pic2->acknowledge();
 	}
 	return 0x00;
-}
-
-void pc88va_state::machine_start()
-{
-	m_rtc->cs_w(1);
-	m_rtc->oe_w(1);
-
-	m_fdc_timer = timer_alloc(FUNC(pc88va_state::pc88va_fdc_timer), this);
-	m_fdc_timer->adjust(attotime::never);
-
-	m_motor_start_timer[0] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_0), this);
-	m_motor_start_timer[1] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_1), this);
-	m_motor_start_timer[0]->adjust(attotime::never);
-	m_motor_start_timer[1]->adjust(attotime::never);
-
-	m_t3_mouse_timer = timer_alloc(FUNC(pc88va_state::t3_mouse_callback), this);
-	m_t3_mouse_timer->adjust(attotime::never);
-
-	floppy_image_device *floppy;
-	floppy = m_fdd[0]->get_device();
-	if(floppy)
-		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va_state::pc88va_fdc_update_ready, this));
-
-	floppy = m_fdd[1]->get_device();
-	if(floppy)
-		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va_state::pc88va_fdc_update_ready, this));
-
-	m_fdd[0]->get_device()->set_rpm(300);
-	m_fdd[1]->get_device()->set_rpm(300);
-	m_fdc->set_rate(250000);
-}
-
-void pc88va_state::machine_reset()
-{
-	uint8_t *ROM00 = memregion("rom00")->base();
-	uint8_t *ROM10 = memregion("rom10")->base();
-
-	membank("rom10_bank")->set_base(&ROM10[0x00000]);
-	membank("rom00_bank")->set_base(&ROM00[0x00000]);
-
-	m_bank_reg = 0x4100;
-	m_sysbank->set_bank(1);
-	m_backupram_wp = 1;
-
-	m_tsp.tvram_vreg_offset = 0;
-
-	m_fdc_mode = 0;
-	m_xtmask = false;
-
-	// shinraba never write to port $32,
-	// and it expects that the sound irq actually runs otherwise it enters in debug mode
-	m_misc_ctrl = 0x00;
-	m_sound_irq_enable = true;
-	m_sound_irq_pending = false;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc88va_state::vrtc_irq)
@@ -1157,6 +1117,61 @@ void pc88va_state::floppy_formats(format_registration &fr)
 static void pc88va_floppies(device_slot_interface &device)
 {
 	device.option_add("525hd", FLOPPY_525_HD);
+}
+
+void pc88va_state::machine_start()
+{
+	m_rtc->cs_w(1);
+	m_rtc->oe_w(1);
+
+	m_fdc_timer = timer_alloc(FUNC(pc88va_state::pc88va_fdc_timer), this);
+	m_fdc_timer->adjust(attotime::never);
+
+	m_motor_start_timer[0] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_0), this);
+	m_motor_start_timer[1] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_1), this);
+	m_motor_start_timer[0]->adjust(attotime::never);
+	m_motor_start_timer[1]->adjust(attotime::never);
+
+	m_t3_mouse_timer = timer_alloc(FUNC(pc88va_state::t3_mouse_callback), this);
+	m_t3_mouse_timer->adjust(attotime::never);
+
+	floppy_image_device *floppy;
+	floppy = m_fdd[0]->get_device();
+	if(floppy)
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va_state::pc88va_fdc_update_ready, this));
+
+	floppy = m_fdd[1]->get_device();
+	if(floppy)
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va_state::pc88va_fdc_update_ready, this));
+
+	m_fdd[0]->get_device()->set_rpm(300);
+	m_fdd[1]->get_device()->set_rpm(300);
+	m_fdc->set_rate(250000);
+}
+
+void pc88va_state::machine_reset()
+{
+	uint8_t *ROM00 = memregion("rom00")->base();
+	uint8_t *ROM10 = memregion("rom10")->base();
+
+	membank("rom10_bank")->set_base(&ROM10[0x00000]);
+	membank("rom00_bank")->set_base(&ROM00[0x00000]);
+
+	m_bank_reg = 0x4100;
+	m_sysbank->set_bank(1);
+	m_backupram_wp = 1;
+	m_rstmd = false;
+
+	m_tsp.tvram_vreg_offset = 0;
+
+	m_fdc_mode = 0;
+	m_xtmask = false;
+
+	// shinraba never write to port $32,
+	// and it expects that the sound irq actually runs otherwise it enters in debug mode
+	m_misc_ctrl = 0x00;
+	m_sound_irq_enable = true;
+	m_sound_irq_pending = false;
 }
 
 void pc88va_state::pc88va(machine_config &config)
@@ -1245,7 +1260,7 @@ ROM_START( pc88va )
 	ROM_LOAD( "varom00.rom", 0x00000, 0x80000, CRC(8a853b00) SHA1(1266ba969959ff25433ecc900a2caced26ef1a9e))
 	ROM_LOAD( "varom08.rom", 0x80000, 0x20000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95))
 
-	ROM_REGION( 0x20000, "rom10", 0 ) // 0xf0000 - 0xfffff
+	ROM_REGION( 0x20000, "rom10", ROMREGION_ERASEFF ) // 0xf0000 - 0xfffff
 	ROM_LOAD( "varom1.rom", 0x00000, 0x20000, CRC(0783b16a) SHA1(54536dc03238b4668c8bb76337efade001ec7826))
 
 	// TODO: identify this, likely don't even belong to pc88va internals
@@ -1273,7 +1288,7 @@ ROM_START( pc88va2 )
 	ROM_LOAD( "varom00_va2.rom",   0x00000, 0x80000, CRC(98c9959a) SHA1(bcaea28c58816602ca1e8290f534360f1ca03fe8) )
 	ROM_LOAD( "varom08_va2.rom",   0x80000, 0x20000, CRC(eef6d4a0) SHA1(47e5f89f8b0ce18ff8d5d7b7aef8ca0a2a8e3345) )
 
-	ROM_REGION( 0x20000, "rom10", 0 ) // 0xf0000 - 0xfffff
+	ROM_REGION( 0x20000, "rom10", ROMREGION_ERASEFF ) // 0xf0000 - 0xfffff
 	ROM_LOAD( "varom1_va2.rom",    0x00000, 0x20000, CRC(7e767f00) SHA1(dd4f4521bfbb068f15ab3bcdb8d47c7d82b9d1d4) )
 
 	// TODO: identify this, likely don't even belong to pc88va internals

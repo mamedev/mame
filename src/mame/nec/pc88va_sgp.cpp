@@ -71,7 +71,7 @@ void pc88va_sgp_device::sgp_io(address_map &map)
 {
 	// TODO: check if readable
 	map(0x00, 0x03).w(FUNC(pc88va_sgp_device::vdp_address_w));
-//  map(0x04, 0x04) bit 1 force stop, bit 2 enable SGP irq (also clear?)
+	map(0x04, 0x04).w(FUNC(pc88va_sgp_device::control_w));
 	map(0x06, 0x06).rw(FUNC(pc88va_sgp_device::status_r), FUNC(pc88va_sgp_device::trigger_w));
 }
 
@@ -81,13 +81,26 @@ void pc88va_sgp_device::vdp_address_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 /*
- * ---- ---x (1) busy flag
+ * ---- -x-- VINTF (1) enable irq on END execution, (0) clear irq
+ * ---- --x- VABOT suspend SGP execution (1)
+ */
+void pc88va_sgp_device::control_w(u8 data)
+{
+	if (data)
+		popmessage("SGP warning write %02x", data);
+}
+
+/*
+ * ---- ---x VBUSY (1) busy flag
  */
 u8 pc88va_sgp_device::status_r()
 {
 	return 0;
 }
 
+/*
+ * ---- ---x SGPCA start SGP execution (1)
+ */
 void pc88va_sgp_device::trigger_w(u8 data)
 {
 	// TODO: under a timer

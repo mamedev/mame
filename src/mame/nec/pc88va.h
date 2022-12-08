@@ -120,8 +120,8 @@ private:
 	uint16_t m_bank_reg = 0;
 	uint8_t m_timer3_io_reg = 0;
 	emu_timer *m_t3_mouse_timer = nullptr;
-	uint16_t m_video_pri_reg[2]{};
 	uint8_t m_backupram_wp = 0;
+	bool m_rstmd = false;
 
 	// FDC
 	emu_timer *m_fdc_timer = nullptr;
@@ -158,6 +158,8 @@ private:
 	void timer3_ctrl_reg_w(uint8_t data);
 	uint8_t backupram_dsw_r(offs_t offset);
 	void sys_port1_w(uint8_t data);
+	u8 sys_port5_r();
+	void sys_port5_w(u8 data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(vrtc_irq);
 
@@ -168,6 +170,8 @@ private:
 	void r232_ctrl_portb_w(uint8_t data);
 	void r232_ctrl_portc_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
+
+	uint16_t m_video_pri_reg[2]{};
 
 	u16 m_screen_ctrl_reg = 0;
 	bool m_dm = false;
