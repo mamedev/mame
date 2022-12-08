@@ -2842,7 +2842,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Notes: FM support; glitches heavily on machines that fail Japan region check -->
+	<!-- Notes: FM support; game uses input code for some unreleased international version of the paddle that must have been in development, glitches heavily on machines that fail Japan region check -->
 	<software name="galactpr">
 		<description>Galactic Protector (Japan)</description>
 		<year>1988</year>
