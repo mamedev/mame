@@ -128,7 +128,7 @@ uint16_t vsmile_state::portb_r()
 	//bit 7 : OFF button, active low (see dipswitch)
 	//		VSMILE_PORTB_OFF_SW
 
-	//VSMILE_PORTB_RESET, VSMILE_PORTB_OFF_SW and VSMILE_PORTB_ON_SW actives will trigger BIOS test screen
+	//On Vsmile, VSMILE_PORTB_RESET, VSMILE_PORTB_OFF_SW and VSMILE_PORTB_ON_SW actives will trigger BIOS test screen
 	return data; 
 }
 
@@ -144,7 +144,7 @@ uint16_t vsmile_state::portc_r()
 	uint16_t data = m_dsw_region->read();
 	data |= m_ctrl_rts[0] ? 0 : 0x0400;
 	data |= m_ctrl_rts[1] ? 0 : 0x1000;
-	data |= 0x0020;
+	data |= 0x0020; //IOC5 - TestPoint
 	data |= (m_ctrl_rts[0] && m_ctrl_rts[1]) ? 0x0000 : 0x2000;
 	//data = machine().rand() & 0xffff;
 	return data;
@@ -292,6 +292,11 @@ static INPUT_PORTS_START( vsmilem )
 	PORT_DIPSETTING(    0x00, "Off" )
 	PORT_DIPSETTING(    0x10, "On" )
 	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
+
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x80, 0x80, "ON switch" 	/*VSMILE_PORTB_ON_SW*/)
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
 INPUT_PORTS_END
 
 /************************************
