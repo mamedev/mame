@@ -272,13 +272,6 @@ bool score7_cpu_device::check_condition(uint8_t bc)
 	return false;
 }
 
-int32_t score7_cpu_device::sign_extend(uint32_t data, uint8_t len)
-{
-	data &= (1ULL << len) - 1;
-	uint32_t sign = 1 << (len - 1);
-	return (data ^ sign) - sign;
-}
-
 uint32_t score7_cpu_device::fetch()
 {
 	return m_cache.read_dword(m_pc & ~3);
@@ -580,7 +573,7 @@ void score7_cpu_device::op_specialform()
 			m_gpr[rd] = r;
 			break;
 		case 0x1b:  // sra
-			r = sign_extend(m_gpr[ra] >> (m_gpr[rb] & 0x1f), 32 - (m_gpr[rb] & 0x1f));
+			r = util::sext(m_gpr[ra] >> (m_gpr[rb] & 0x1f), 32 - (m_gpr[rb] & 0x1f));
 			if (cu)
 			{
 				CHECK_Z(r);
@@ -603,18 +596,14 @@ void score7_cpu_device::op_specialform()
 			break;
 		case 0x20:  // mul
 		{
-			int64_t a = (int32_t)m_gpr[ra];
-			int64_t b = (int32_t)m_gpr[rb];
-			uint64_t d = a * b;
+			uint64_t d = mul_32x32(m_gpr[ra], m_gpr[rb]);
 			REG_CEL = d & 0xffffffff;
 			REG_CEH = (d >> 32) & 0xffffffff;
 			break;
 		}
 		case 0x21:  // mulu
 		{
-			uint64_t a = (uint32_t)m_gpr[ra];
-			uint64_t b = (uint32_t)m_gpr[rb];
-			uint64_t d = a * b;
+			uint64_t d = mulu_32x32(m_gpr[ra], m_gpr[rb]);
 			REG_CEL = d & 0xffffffff;
 			REG_CEH = (d >> 32) & 0xffffffff;
 			break;
@@ -682,7 +671,7 @@ void score7_cpu_device::op_specialform()
 			break;
 		case 0x2c:  // extsb
 		case 0x2d:  // extsh
-			m_gpr[rd] = sign_extend(m_gpr[ra], (GET_S_FUNC6(m_op) & 1) ? 16 : 8);
+			m_gpr[rd] = util::sext(m_gpr[ra], (GET_S_FUNC6(m_op) & 1) ? 16 : 8);
 			if (cu)
 			{
 				CHECK_N(m_gpr[rd]);
@@ -737,7 +726,7 @@ void score7_cpu_device::op_specialform()
 			m_gpr[rd] = r;
 			break;
 		case 0x3b:  // srai
-			r = sign_extend(m_gpr[ra] >> rb, 32 - rb);
+			r = util::sext(m_gpr[ra] >> rb, 32 - rb);
 			if (cu)
 			{
 				CHECK_Z(r);
@@ -767,7 +756,7 @@ void score7_cpu_device::op_iform1()
 {
 	uint8_t rd = GET_I_RD(m_op);
 	uint32_t imm16 = GET_I_IMM16(m_op);
-	int32_t simm16 = sign_extend(imm16, 16);
+	int32_t simm16 = util::sext(imm16, 16);
 	uint8_t cu = GET_I_CU(m_op);
 	uint32_t r;
 
@@ -832,7 +821,7 @@ void score7_cpu_device::op_rixform1()
 	uint8_t rd = GET_RIX_RD(m_op);
 
 	// pre-increment
-	m_gpr[ra] += sign_extend(GET_RIX_IMM12(m_op), 12);
+	m_gpr[ra] += util::sext(GET_RIX_IMM12(m_op), 12);
 
 	switch(GET_RIX_FUNC3(m_op))
 	{
@@ -840,13 +829,13 @@ void score7_cpu_device::op_rixform1()
 			m_gpr[rd] = read_dword(m_gpr[ra]);
 			break;
 		case 1: // lh
-			m_gpr[rd] = sign_extend(read_word(m_gpr[ra]), 16);
+			m_gpr[rd] = util::sext(read_word(m_gpr[ra]), 16);
 			break;
 		case 2: // lhu
 			m_gpr[rd] = read_word(m_gpr[ra]);
 			break;
 		case 3: // lb
-			m_gpr[rd] = sign_extend(read_byte(m_gpr[ra]), 8);
+			m_gpr[rd] = util::sext(read_byte(m_gpr[ra]), 8);
 			break;
 		case 4: // sw
 			write_dword(m_gpr[ra], m_gpr[rd]);
@@ -867,7 +856,7 @@ void score7_cpu_device::op_branch()
 {
 	if (check_condition_branch(GET_BC_BC(m_op)))
 	{
-		int32_t disp = sign_extend(GET_BC_DISP19(m_op), 19) << 1;
+		int32_t disp = util::sext(GET_BC_DISP19(m_op), 19) << 1;
 		if (GET_BC_LK(m_op))
 			REG_LNK = m_pc;
 
@@ -971,13 +960,13 @@ void score7_cpu_device::op_rixform2()
 			m_gpr[rd] = read_dword(m_gpr[ra]);
 			break;
 		case 1: // lh
-			m_gpr[rd] = sign_extend(read_word(m_gpr[ra]), 16);
+			m_gpr[rd] = util::sext(read_word(m_gpr[ra]), 16);
 			break;
 		case 2: // lhu
 			m_gpr[rd] = read_word(m_gpr[ra]);
 			break;
 		case 3: // lb
-			m_gpr[rd] = sign_extend(read_byte(m_gpr[ra]), 8);
+			m_gpr[rd] = util::sext(read_byte(m_gpr[ra]), 8);
 			break;
 		case 4: // sw
 			write_dword(m_gpr[ra], m_gpr[rd]);
@@ -994,14 +983,14 @@ void score7_cpu_device::op_rixform2()
 	}
 
 	// post-increment
-	m_gpr[ra] += sign_extend(GET_RIX_IMM12(m_op), 12);
+	m_gpr[ra] += util::sext(GET_RIX_IMM12(m_op), 12);
 }
 
 void score7_cpu_device::op_addri()
 {
 	uint8_t ra = GET_RI_RA(m_op);
 	uint8_t rd = GET_RI_RD(m_op);
-	int32_t simm14 = sign_extend(GET_RI_IMM14(m_op), 14);
+	int32_t simm14 = util::sext(GET_RI_IMM14(m_op), 14);
 	uint8_t cu = GET_RI_CU(m_op);
 
 	uint32_t r = m_gpr[ra] + simm14;
@@ -1049,7 +1038,7 @@ void score7_cpu_device::op_lw()
 {
 	uint8_t rd = GET_LS_RD(m_op);
 	uint8_t ra = GET_LS_RA(m_op);
-	int32_t simm15 = sign_extend(GET_LS_IMM15(m_op), 15);
+	int32_t simm15 = util::sext(GET_LS_IMM15(m_op), 15);
 
 	m_gpr[rd] = read_dword(m_gpr[ra] + simm15);
 }
@@ -1058,16 +1047,16 @@ void score7_cpu_device::op_lh()
 {
 	uint8_t rd = GET_LS_RD(m_op);
 	uint8_t ra = GET_LS_RA(m_op);
-	int32_t simm15 = sign_extend(GET_LS_IMM15(m_op), 15);
+	int32_t simm15 = util::sext(GET_LS_IMM15(m_op), 15);
 
-	m_gpr[rd] = sign_extend(read_word(m_gpr[ra] + simm15), 16);
+	m_gpr[rd] = util::sext(read_word(m_gpr[ra] + simm15), 16);
 }
 
 void score7_cpu_device::op_lhu()
 {
 	uint8_t rd = GET_LS_RD(m_op);
 	uint8_t ra = GET_LS_RA(m_op);
-	int32_t simm15 = sign_extend(GET_LS_IMM15(m_op), 15);
+	int32_t simm15 = util::sext(GET_LS_IMM15(m_op), 15);
 
 	m_gpr[rd] = read_word(m_gpr[ra] + simm15);
 }
@@ -1076,16 +1065,16 @@ void score7_cpu_device::op_lb()
 {
 	uint8_t rd = GET_LS_RD(m_op);
 	uint8_t ra = GET_LS_RA(m_op);
-	int32_t simm15 = sign_extend(GET_LS_IMM15(m_op), 15);
+	int32_t simm15 = util::sext(GET_LS_IMM15(m_op), 15);
 
-	m_gpr[rd] = sign_extend(read_byte(m_gpr[ra] + simm15), 8);
+	m_gpr[rd] = util::sext(read_byte(m_gpr[ra] + simm15), 8);
 }
 
 void score7_cpu_device::op_sw()
 {
 	uint8_t rd = GET_LS_RD(m_op);
 	uint8_t ra = GET_LS_RA(m_op);
-	int32_t simm15 = sign_extend(GET_LS_IMM15(m_op), 15);
+	int32_t simm15 = util::sext(GET_LS_IMM15(m_op), 15);
 
 	write_dword(m_gpr[ra] + simm15, m_gpr[rd]);
 }
@@ -1094,7 +1083,7 @@ void score7_cpu_device::op_sh()
 {
 	uint8_t rd = GET_LS_RD(m_op);
 	uint8_t ra = GET_LS_RA(m_op);
-	int32_t simm15 = sign_extend(GET_LS_IMM15(m_op), 15);
+	int32_t simm15 = util::sext(GET_LS_IMM15(m_op), 15);
 
 	write_word(m_gpr[ra] + simm15, m_gpr[rd] & 0xffff);
 }
@@ -1103,7 +1092,7 @@ void score7_cpu_device::op_lbu()
 {
 	uint8_t rd = GET_LS_RD(m_op);
 	uint8_t ra = GET_LS_RA(m_op);
-	int32_t simm15 = sign_extend(GET_LS_IMM15(m_op), 15);
+	int32_t simm15 = util::sext(GET_LS_IMM15(m_op), 15);
 
 	m_gpr[rd] = read_byte(m_gpr[ra] + simm15);
 }
@@ -1112,7 +1101,7 @@ void score7_cpu_device::op_sb()
 {
 	uint8_t rd = GET_LS_RD(m_op);
 	uint8_t ra = GET_LS_RA(m_op);
-	int32_t simm15 = sign_extend(GET_LS_IMM15(m_op), 15);
+	int32_t simm15 = util::sext(GET_LS_IMM15(m_op), 15);
 
 	write_byte(m_gpr[ra] + simm15, m_gpr[rd] & 0xff);
 }
@@ -1167,7 +1156,7 @@ void score7_cpu_device::op_rform1()
 			m_gpr[rd] = m_gpr[rd] >> (m_gpr[ra] & 0x1f);
 			break;
 		case 0x0b:  // sra!
-			m_gpr[rd] = sign_extend(m_gpr[rd] >> (m_gpr[ra] & 0x1f), 32 - (m_gpr[ra] & 0x1f));
+			m_gpr[rd] = util::sext(m_gpr[rd] >> (m_gpr[ra] & 0x1f), 32 - (m_gpr[ra] & 0x1f));
 			break;
 		case 0x0c:  // brl!
 			if (check_condition_branch(rd))
@@ -1244,7 +1233,7 @@ void score7_cpu_device::op_rform2()
 			m_gpr[rd] = read_dword(m_gpr[ra]);
 			break;
 		case 0x09:  // lh!
-			m_gpr[rd] = sign_extend(read_word(m_gpr[ra]), 16);
+			m_gpr[rd] = util::sext(read_word(m_gpr[ra]), 16);
 			break;
 		case 0x0a:  // pop!
 			m_gpr[GET_P_RDG(m_op)] = read_dword(m_gpr[GET_P_RAG(m_op)]);
@@ -1280,7 +1269,7 @@ void score7_cpu_device::op_jform()
 void score7_cpu_device::op_branch16()
 {
 	if(check_condition_branch(GET_BX_EC(m_op)))
-		m_pc = m_ppc + (sign_extend(GET_BX_DISP8(m_op), 8) << 1);
+		m_pc = m_ppc + (util::sext(GET_BX_DISP8(m_op), 8) << 1);
 }
 
 void score7_cpu_device::op_ldiu()
@@ -1355,7 +1344,7 @@ void score7_cpu_device::op_iform1b()
 			m_gpr[rd] = read_dword(REG_BP + (imm5<<2));
 			break;
 		case 0x01:  // lhp!
-			m_gpr[rd] = sign_extend(read_word(REG_BP + (imm5<<1)), 16);
+			m_gpr[rd] = util::sext(read_word(REG_BP + (imm5<<1)), 16);
 			break;
 		case 0x03:  // lbup!
 			m_gpr[rd] = read_byte(REG_BP + imm5);

@@ -532,6 +532,12 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 		for (int yi=0;yi<height;yi++)
 		{
 			uint32_t *const bitmapline = &bitmap.pix(line + yi);
+			// ibm_5150:batmanmv uses this on gameplay for both EGA and "VGA" modes
+			// NB: EGA mode in that game sets 663, should be 303 like the other mode
+			// causing no status bar to appear. This is a known btanb in how VGA
+			// handles EGA mode, cfr. https://www.os2museum.com/wp/fantasyland-on-vga/
+			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
+				addr = 0;
 
 			for (int pos=addr, c=0, column=0; column<EGA_COLUMNS+1; column++, c+=8, pos=(pos+1)&0xffff)
 			{
@@ -705,7 +711,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //      line_length = vga.crtc.offset << 4;
 //  }
 
-	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08)) ? 2 : 0;
+	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08) || svga.ignore_chain4) ? 2 : 0;
 	for (int addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		for (int yi = 0;yi < height; yi++)
@@ -1025,6 +1031,7 @@ uint8_t svga_device::get_video_depth()
 uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t cur_mode = pc_vga_choosevideomode();
+
 	switch(cur_mode)
 	{
 		case SCREEN_OFF:   bitmap.fill  (black_pen(), cliprect);break;
@@ -2072,20 +2079,22 @@ uint8_t vga_device::mem_r(offs_t offset)
 
 		if (vga.gc.read_mode)
 		{
-			uint8_t byte,layer;
-			uint8_t fill_latch;
-			data=0;
+			// In Read Mode 1 latch is checked against this
+			// cfr. lombrall & intsocch where they RMW sprite-like objects
+			// and anything outside this formula goes transparent.
+			const u8 target_color = (vga.gc.color_compare & vga.gc.color_dont_care);
+			data = 0;
 
-			for(byte=0;byte<8;byte++)
+			for(u8 byte = 0; byte < 8; byte++)
 			{
-				fill_latch = 0;
-				for(layer=0;layer<4;layer++)
+				u8 fill_latch = 0;
+				for(u8 layer = 0; layer < 4; layer++)
 				{
 					if(vga.gc.latch[layer] & 1 << byte)
 						fill_latch |= 1 << layer;
 				}
 				fill_latch &= vga.gc.color_dont_care;
-				if(fill_latch == vga.gc.color_compare)
+				if(fill_latch == target_color)
 					data |= 1 << byte;
 			}
 		}

@@ -5,7 +5,7 @@
 
 Rockwell PPS-4/1 MCU series handhelds
 
-ROM source notes when dumped from another publisher, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - memoquiz: Mattel Mind Boggler
 
 ***************************************************************************/
@@ -928,7 +928,7 @@ ROM_END
   * 8-digit 14seg LED display, 2-bit sound
 
   This is not a toy, but a fortune forecast. Date format is mm-dd-yy, it is
-  valid only from June 1 1979 until December 31 1987
+  valid only from June 1 1979 until December 31 1987.
 
 ***************************************************************************/
 

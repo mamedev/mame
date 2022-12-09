@@ -170,61 +170,41 @@ INPUT_PORTS_START( megadriv )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( megadri6 )
-	PORT_INCLUDE( megadriv )
-
-	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Z") // z
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Y") // y
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 X") // x
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 MODE") // mode
-
-	PORT_START("EXTRA2")    /* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Z") // z
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Y") // y
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 X") // x
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 MODE") // mode
-INPUT_PORTS_END
-
 void md_base_state::megadrive_reset_io()
 {
-	int i;
+	m_io_data_regs[0] = 0x7f;
+	m_io_data_regs[1] = 0x7f;
+	m_io_data_regs[2] = 0x7f;
+	m_io_ctrl_regs[0] = 0x00;
+	m_io_ctrl_regs[1] = 0x00;
+	m_io_ctrl_regs[2] = 0x00;
+	m_io_tx_regs[0] = 0xff;
+	m_io_tx_regs[1] = 0xff;
+	m_io_tx_regs[2] = 0xff;
 
-	m_megadrive_io_data_regs[0] = 0x7f;
-	m_megadrive_io_data_regs[1] = 0x7f;
-	m_megadrive_io_data_regs[2] = 0x7f;
-	m_megadrive_io_ctrl_regs[0] = 0x00;
-	m_megadrive_io_ctrl_regs[1] = 0x00;
-	m_megadrive_io_ctrl_regs[2] = 0x00;
-	m_megadrive_io_tx_regs[0] = 0xff;
-	m_megadrive_io_tx_regs[1] = 0xff;
-	m_megadrive_io_tx_regs[2] = 0xff;
-
-	for (i=0; i<3; i++)
-	{
+	for (int i = 0; i < 3; i++)
 		m_io_stage[i] = -1;
-	}
 }
 
 /************* 6 buttons version **************************/
 uint8_t md_base_state::megadrive_io_read_data_port_6button(offs_t offset)
 {
 	int portnum = offset;
-	uint8_t retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from m_megadrive_io_data_regs
+	uint8_t retdata, helper = (m_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from m_io_data_regs
 
-	if (m_megadrive_io_data_regs[portnum] & 0x40)
+	if (m_io_data_regs[portnum] & 0x40)
 	{
 		if (m_io_stage[portnum] == 2)
 		{
 			/* here we read B, C & the additional buttons */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
+			retdata = (m_io_data_regs[portnum] & helper) |
 						((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x30) |
 							((m_io_pad_6b[portnum] ? m_io_pad_6b[portnum]->read() : 0) & 0x0f)) & ~helper);
 		}
 		else
 		{
 			/* here we read B, C & the directional buttons */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
+			retdata = (m_io_data_regs[portnum] & helper) |
 						(((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x3f) & ~helper);
 		}
 	}
@@ -233,19 +213,19 @@ uint8_t md_base_state::megadrive_io_read_data_port_6button(offs_t offset)
 		if (m_io_stage[portnum] == 1)
 		{
 			/* here we read ((Start & A) >> 2) | 0x00 */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
+			retdata = (m_io_data_regs[portnum] & helper) |
 						((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) & ~helper);
 		}
 		else if (m_io_stage[portnum]==2)
 		{
 			/* here we read ((Start & A) >> 2) | 0x0f */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
+			retdata = (m_io_data_regs[portnum] & helper) |
 						(((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) | 0x0f) & ~helper);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
+			retdata = (m_io_data_regs[portnum] & helper) |
 						(((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) |
 							((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x03)) & ~helper);
 		}
@@ -261,18 +241,18 @@ uint8_t md_base_state::megadrive_io_read_data_port_6button(offs_t offset)
 uint8_t md_base_state::megadrive_io_read_data_port_3button(offs_t offset)
 {
 	int portnum = offset;
-	uint8_t retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from m_megadrive_io_data_regs
+	uint8_t retdata, helper = (m_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from m_io_data_regs
 
-	if (m_megadrive_io_data_regs[portnum] & 0x40)
+	if (m_io_data_regs[portnum] & 0x40)
 	{
 		/* here we read B, C & the directional buttons */
-		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
+		retdata = (m_io_data_regs[portnum] & helper) |
 					((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x3f) | 0x40) & ~helper);
 	}
 	else
 	{
 		/* here we read ((Start & A) >> 2) | Up and Down */
-		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
+		retdata = (m_io_data_regs[portnum] & helper) |
 					(((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) |
 						((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x03) | 0x40) & ~helper);
 	}
@@ -283,7 +263,7 @@ uint8_t md_base_state::megadrive_io_read_data_port_3button(offs_t offset)
 uint8_t md_base_state::megadrive_io_read_ctrl_port(int portnum)
 {
 	uint8_t retdata;
-	retdata = m_megadrive_io_ctrl_regs[portnum];
+	retdata = m_io_ctrl_regs[portnum];
 	//osd_printf_debug("read io ctrl port %d %02x\n",portnum,retdata);
 
 	return retdata | (retdata << 8);
@@ -292,7 +272,7 @@ uint8_t md_base_state::megadrive_io_read_ctrl_port(int portnum)
 uint8_t md_base_state::megadrive_io_read_tx_port(int portnum)
 {
 	uint8_t retdata;
-	retdata = m_megadrive_io_tx_regs[portnum];
+	retdata = m_io_tx_regs[portnum];
 	return retdata | (retdata << 8);
 }
 
@@ -338,7 +318,7 @@ uint16_t md_base_state::megadriv_68k_io_read(offs_t offset)
 		case 0x1:
 		case 0x2:
 		case 0x3:
-			retdata = m_megadrive_io_read_data_port_ptr(offset-1);
+			retdata = m_io_read_data_port_ptr(offset-1);
 			break;
 
 		case 0x4:
@@ -370,7 +350,7 @@ uint16_t md_base_state::megadriv_68k_io_read(offs_t offset)
 void md_base_state::megadrive_io_write_data_port_3button(offs_t offset, uint16_t data)
 {
 	int portnum = offset;
-	m_megadrive_io_data_regs[portnum] = data;
+	m_io_data_regs[portnum] = data;
 	//osd_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
 
 }
@@ -381,9 +361,9 @@ void md_base_state::megadrive_io_write_data_port_3button(offs_t offset, uint16_t
 void md_base_state::megadrive_io_write_data_port_6button(offs_t offset, uint16_t data)
 {
 	int portnum = offset;
-	if (m_megadrive_io_ctrl_regs[portnum]&0x40)
+	if (m_io_ctrl_regs[portnum]&0x40)
 	{
-		if (((m_megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
+		if (((m_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			m_io_stage[portnum]++;
 			m_io_timeout[portnum]->adjust(m_maincpu->cycles_to_attotime(8192), portnum);
@@ -391,7 +371,7 @@ void md_base_state::megadrive_io_write_data_port_6button(offs_t offset, uint16_t
 
 	}
 
-	m_megadrive_io_data_regs[portnum] = data;
+	m_io_data_regs[portnum] = data;
 	//osd_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
 
 }
@@ -401,13 +381,13 @@ void md_base_state::megadrive_io_write_data_port_6button(offs_t offset, uint16_t
 
 void md_base_state::megadrive_io_write_ctrl_port(int portnum, uint16_t data)
 {
-	m_megadrive_io_ctrl_regs[portnum] = data;
+	m_io_ctrl_regs[portnum] = data;
 //  osd_printf_debug("Setting IO Control Register #%d data %04x\n",portnum,data);
 }
 
 void md_base_state::megadrive_io_write_tx_port(int portnum, uint16_t data)
 {
-	m_megadrive_io_tx_regs[portnum] = data;
+	m_io_tx_regs[portnum] = data;
 }
 
 void md_base_state::megadrive_io_write_rx_port(int portnum, uint16_t data)
@@ -435,7 +415,7 @@ void md_base_state::megadriv_68k_io_write(offs_t offset, uint16_t data, uint16_t
 		case 0x1:
 		case 0x2:
 		case 0x3:
-			m_megadrive_io_write_data_port_ptr(offset-1,data);
+			m_io_write_data_port_ptr(offset-1,data);
 			break;
 
 		case 0x4:
@@ -821,9 +801,9 @@ void md_base_state::machine_start()
 	m_io_pad_3b[3] = ioport("UNK");
 
 	save_item(NAME(m_io_stage));
-	save_item(NAME(m_megadrive_io_data_regs));
-	save_item(NAME(m_megadrive_io_ctrl_regs));
-	save_item(NAME(m_megadrive_io_tx_regs));
+	save_item(NAME(m_io_data_regs));
+	save_item(NAME(m_io_ctrl_regs));
+	save_item(NAME(m_io_tx_regs));
 
 	if (m_z80snd)
 		m_genz80.z80_run_timer = timer_alloc(FUNC(md_base_state::megadriv_z80_run_state), this);
@@ -1048,8 +1028,8 @@ void md_base_state::megadriv_init_common()
 
 	m_maincpu->set_tas_write_callback(*this, FUNC(md_base_state::megadriv_tas_callback));
 
-	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
-	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
+	m_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
+	m_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 }
 
 void md_base_state::init_megadriv()

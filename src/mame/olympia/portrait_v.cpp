@@ -25,7 +25,7 @@ void portrait_state::fgvideo_write(offs_t offset, uint8_t data)
 
 // NB: undisplayed areas gets filled at POST but never really used
 // $8x36-$8x3f / $8x76-$8x7f / $8xb6-$8xbf / $8xf6-$8xff
-// given that tilemap doesn't really cope well with live editing your best bet in debugging this is 
+// given that tilemap doesn't really cope well with live editing your best bet in debugging this is
 // potentially to subscribe these unused areas to a mark_all_dirty() fn.
 inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, const uint8_t *source )
 {

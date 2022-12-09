@@ -13,6 +13,10 @@
 
 #pragma once
 
+#include "x68k_crtc.h"
+
+#include "bus/msx/ctrl/ctrl.h"
+#include "bus/x68k/x68kexp.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68030.h"
 #include "imagedev/floppy.h"
@@ -27,8 +31,6 @@
 #include "sound/flt_vol.h"
 #include "sound/okim6258.h"
 #include "sound/ymopm.h"
-#include "x68k_crtc.h"
-#include "bus/x68k/x68kexp.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -58,19 +60,13 @@ public:
 		, m_ppi(*this, "ppi8255")
 		, m_screen(*this, "screen")
 		, m_upd72065(*this, "upd72065")
+		, m_joy(*this, "joy%u", 1U)
 		, m_expansion(*this, "exp%u", 1U)
 		, m_adpcm_out(*this, {"adpcm_outl", "adpcm_outr"})
 		, m_options(*this, "options")
 		, m_mouse1(*this, "mouse1")
 		, m_mouse2(*this, "mouse2")
 		, m_mouse3(*this, "mouse3")
-		, m_xpd1lr(*this, "xpd1lr")
-		, m_ctrltype(*this, "ctrltype")
-		, m_joy1(*this, "joy1")
-		, m_joy2(*this, "joy2")
-		, m_md3b(*this, "md3b")
-		, m_md6b(*this, "md6b")
-		, m_md6b_extra(*this, "md6b_extra")
 		, m_eject_drv_out(*this, "eject_drv%u", 0U)
 		, m_ctrl_drv_out(*this, "ctrl_drv%u", 0U)
 		, m_access_drv_out(*this, "access_drv%u", 0U)
@@ -109,6 +105,7 @@ protected:
 	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;
 	required_device<upd72065_device> m_upd72065;
+	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device_array<x68k_expansion_slot_device, 2> m_expansion;
 
 	required_device_array<filter_volume_device, 2> m_adpcm_out;
@@ -117,13 +114,6 @@ protected:
 	required_ioport m_mouse1;
 	required_ioport m_mouse2;
 	required_ioport m_mouse3;
-	required_ioport m_xpd1lr;
-	required_ioport m_ctrltype;
-	required_ioport m_joy1;
-	required_ioport m_joy2;
-	required_ioport m_md3b;
-	required_ioport m_md6b;
-	required_ioport m_md6b_extra;
 
 	output_finder<4> m_eject_drv_out;
 	output_finder<4> m_ctrl_drv_out;
@@ -163,13 +153,6 @@ protected:
 	} m_fdc;
 	struct
 	{
-		int ioc7 = 0;  // "Function B operation of joystick # one option"
-		int ioc6 = 0;  // "Function A operation of joystick # one option"
-		int joy1_enable = 0;  // IOC4
-		int joy2_enable = 0;  // IOC5
-	} m_joy;
-	struct
-	{
 		int rate = 0;  // ADPCM sample rate
 		int pan = 0;  // ADPCM output switch
 		int clock = 0;  // ADPCM clock speed
@@ -206,18 +189,7 @@ protected:
 		char last_mouse_y = 0;  // previous mouse y-axis value
 		int bufferempty = 0;  // non-zero if buffer is empty
 	} m_mouse;
-	struct
-	{
-		// port A
-		int mux1 = 0;  // multiplexer value
-		int seq1 = 0;  // part of 6-button input sequence.
-		emu_timer* io_timeout1 = nullptr;
-		// port B
-		int mux2 = 0;  // multiplexer value
-		int seq2 = 0;  // part of 6-button input sequence.
-		emu_timer* io_timeout2 = nullptr;
-	} m_mdctrl;
-	uint8_t m_ppi_port[3]{};
+	uint8_t m_ppi_portc = 0;
 	bool m_dmac_int = false;
 	bool m_mfp_int = false;
 	bool m_exp_irq2[2]{};
@@ -228,7 +200,6 @@ protected:
 	emu_timer* m_mouse_timer = nullptr;
 	emu_timer* m_led_timer = nullptr;
 	unsigned char m_scc_prev = 0;
-	uint16_t m_ppi_prev = 0;
 	emu_timer* m_fdc_tc = nullptr;
 	emu_timer* m_adpcm_timer = nullptr;
 	emu_timer* m_bus_error_timer = nullptr;
@@ -250,8 +221,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(adpcm_drq_tick);
 	TIMER_CALLBACK_MEMBER(led_callback);
 	TIMER_CALLBACK_MEMBER(scc_ack);
-	TIMER_CALLBACK_MEMBER(md_6button_port1_timeout);
-	TIMER_CALLBACK_MEMBER(md_6button_port2_timeout);
 	TIMER_CALLBACK_MEMBER(bus_error);
 	uint8_t ppi_port_a_r();
 	uint8_t ppi_port_b_r();
@@ -268,10 +237,6 @@ protected:
 
 	int read_mouse();
 	void set_adpcm();
-	uint8_t md_3button_r(int port);
-	void md_6button_init();
-	uint8_t md_6button_r(int port);
-	uint8_t xpd1lr_r(int port);
 
 	DECLARE_WRITE_LINE_MEMBER(fm_irq);
 	template <int N> DECLARE_WRITE_LINE_MEMBER(irq2_line);

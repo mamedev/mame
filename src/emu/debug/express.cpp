@@ -1953,14 +1953,14 @@ u64 parsed_expression::execute_tokens()
 				pop_token_rval(t2); pop_token_rval(t1);
 				if (t2.value() == 0)
 					throw expression_error(expression_error::DIVIDE_BY_ZERO, t2.offset());
-				push_token(result.configure_number(s64(t1.value()) / s64(t2.value())).set_offset(t1, t2));
+				push_token(result.configure_number(t1.value() / t2.value()).set_offset(t1, t2));
 				break;
 
 			case TVL_MODULO:
 				pop_token_rval(t2); pop_token_rval(t1);
 				if (t2.value() == 0)
 					throw expression_error(expression_error::DIVIDE_BY_ZERO, t2.offset());
-				push_token(result.configure_number(s64(t1.value()) % s64(t2.value())).set_offset(t1, t2));
+				push_token(result.configure_number(t1.value() % t2.value()).set_offset(t1, t2));
 				break;
 
 			case TVL_ADD:
@@ -1980,27 +1980,27 @@ u64 parsed_expression::execute_tokens()
 
 			case TVL_RSHIFT:
 				pop_token_rval(t2); pop_token_rval(t1);
-				push_token(result.configure_number(s64(t1.value()) >> t2.value()).set_offset(t1, t2));
+				push_token(result.configure_number(t1.value() >> t2.value()).set_offset(t1, t2));
 				break;
 
 			case TVL_LESS:
 				pop_token_rval(t2); pop_token_rval(t1);
-				push_token(result.configure_number(s64(t1.value()) < s64(t2.value())).set_offset(t1, t2));
+				push_token(result.configure_number(t1.value() < t2.value()).set_offset(t1, t2));
 				break;
 
 			case TVL_LESSOREQUAL:
 				pop_token_rval(t2); pop_token_rval(t1);
-				push_token(result.configure_number(s64(t1.value()) <= s64(t2.value())).set_offset(t1, t2));
+				push_token(result.configure_number(t1.value() <= t2.value()).set_offset(t1, t2));
 				break;
 
 			case TVL_GREATER:
 				pop_token_rval(t2); pop_token_rval(t1);
-				push_token(result.configure_number(s64(t1.value()) > s64(t2.value())).set_offset(t1, t2));
+				push_token(result.configure_number(t1.value() > t2.value()).set_offset(t1, t2));
 				break;
 
 			case TVL_GREATEROREQUAL:
 				pop_token_rval(t2); pop_token_rval(t1);
-				push_token(result.configure_number(s64(t1.value()) >= s64(t2.value())).set_offset(t1, t2));
+				push_token(result.configure_number(t1.value() >= t2.value()).set_offset(t1, t2));
 				break;
 
 			case TVL_EQUAL:
@@ -2054,7 +2054,7 @@ u64 parsed_expression::execute_tokens()
 				pop_token_rval(t2); pop_token_lval(t1);
 				if (t2.value() == 0)
 					throw expression_error(expression_error::DIVIDE_BY_ZERO, t2.offset());
-				push_token(result.configure_number(s64(t1.get_lval_value(m_symtable)) / s64(t2.value())).set_offset(t1, t2));
+				push_token(result.configure_number(t1.get_lval_value(m_symtable) / t2.value()).set_offset(t1, t2));
 				t1.set_lval_value(m_symtable, result.value());
 				break;
 
@@ -2062,7 +2062,7 @@ u64 parsed_expression::execute_tokens()
 				pop_token_rval(t2); pop_token_lval(t1);
 				if (t2.value() == 0)
 					throw expression_error(expression_error::DIVIDE_BY_ZERO, t2.offset());
-				push_token(result.configure_number(s64(t1.get_lval_value(m_symtable)) % s64(t2.value())).set_offset(t1, t2));
+				push_token(result.configure_number(t1.get_lval_value(m_symtable) % t2.value()).set_offset(t1, t2));
 				t1.set_lval_value(m_symtable, result.value());
 				break;
 
@@ -2086,7 +2086,7 @@ u64 parsed_expression::execute_tokens()
 
 			case TVL_ASSIGNRSHIFT:
 				pop_token_rval(t2); pop_token_lval(t1);
-				push_token(result.configure_number(s64(t1.get_lval_value(m_symtable)) >> t2.value()).set_offset(t1, t2));
+				push_token(result.configure_number(t1.get_lval_value(m_symtable) >> t2.value()).set_offset(t1, t2));
 				t1.set_lval_value(m_symtable, result.value());
 				break;
 

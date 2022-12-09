@@ -1121,7 +1121,7 @@ ROM_START( mk2r91 )
 ROM_END
 
 
-ROM_START( mk2chal )
+ROM_START( mk2chal ) // Known as the Challenger Hack because the version number has been replaced with "CHALLENGER.." in the Test Menu
 	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "l1_mortal_kombat_ii_sound_rom_u2.u2", 0x000000, 0x80000, CRC(5f23d71d) SHA1(54c2afef243759e0f3dbe2907edbc4302f5c8bad) )
 	ROM_RELOAD(                                             0x100000, 0x80000 )
@@ -1138,8 +1138,8 @@ ROM_START( mk2chal )
 	/* su8 and su9 are unpopulated */
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
-	ROM_LOAD16_BYTE( "uj12.chl", 0x00000, 0x80000, CRC(2d5c04e6) SHA1(85947876319c86bdcdeccda99ae1ddbcfb212484) )
-	ROM_LOAD16_BYTE( "ug12.chl", 0x00001, 0x80000, CRC(3e7a4bad) SHA1(9a8ad99e09badcea7f2bcf80a649c96a883a0463) )
+	ROM_LOAD16_BYTE( "immortal_kombat_ii_j-12.uj12", 0x00000, 0x80000, CRC(2d5c04e6) SHA1(85947876319c86bdcdeccda99ae1ddbcfb212484) ) // labeled IMMORTAL KOMBAT II J-12
+	ROM_LOAD16_BYTE( "immortal_kombat_ii_g-12.ug12", 0x00001, 0x80000, CRC(3e7a4bad) SHA1(9a8ad99e09badcea7f2bcf80a649c96a883a0463) ) // labeled IMMORTAL KOMBAT II G-12
 
 	ROM_REGION( 0xc00000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_ii_game_rom_ug14.ug14", 0x000000, 0x100000, CRC(01e73af6) SHA1(6598cfd704cc92a7f358a0e1f1c973ab79dcc493) )
@@ -1645,7 +1645,7 @@ GAME( 1993, mk2r14,     mk2,      tunit_dcs,   mk2,      midtunit_state, init_mk
 GAME( 1993, mk2r11,     mk2,      tunit_dcs,   mk2,      midtunit_state, init_mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L1.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, mk2r42,     mk2,      tunit_dcs,   mk2,      midtunit_state, init_mk2,      ROT0, "hack",     "Mortal Kombat II (rev L4.2, hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, mk2r91,     mk2,      tunit_dcs,   mk2,      midtunit_state, init_mk2,      ROT0, "hack",     "Mortal Kombat II (rev L9.1, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mk2chal,    mk2,      tunit_dcs,   mk2,      midtunit_state, init_mk2,      ROT0, "hack",     "Mortal Kombat II Challenger (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mk2chal,    mk2,      tunit_dcs,   mk2,      midtunit_state, init_mk2,      ROT0, "hack",     "Mortal Kombat II Challenger (hack)", MACHINE_SUPPORTS_SAVE ) // program ROMs labeled as IMMORTAL KOMBAT II
 
 GAME( 1993, jdreddp,    0,        tunit_adpcm, jdreddp,  midtunit_state, init_jdreddp,  ROT0, "Midway",   "Judge Dredd (rev TA1 7/12/92, location test)", MACHINE_SUPPORTS_SAVE )
 

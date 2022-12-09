@@ -521,11 +521,6 @@ uint8_t upd765_family_device::msr_r()
 		}
 	msr |= get_drive_busy();
 
-	if(data_irq && !machine().side_effects_disabled()) {
-		data_irq = false;
-		check_irq();
-	}
-
 	return msr;
 }
 
@@ -546,6 +541,8 @@ void upd765_family_device::set_rate(int rate)
 uint8_t upd765_family_device::fifo_r()
 {
 	uint8_t r = 0xff;
+	if(!machine().side_effects_disabled())
+		data_irq = false;
 	switch(main_phase) {
 	case PHASE_CMD:
 		if(machine().side_effects_disabled())
@@ -591,6 +588,7 @@ void upd765_family_device::fifo_w(uint8_t data)
 	if(!BIT(dor, 2))
 		LOGWARN("%s: fifo_w(%02x) in reset\n", machine().describe_context(), data);
 
+	data_irq = false;
 	switch(main_phase) {
 	case PHASE_CMD: {
 		command[command_pos++] = data;

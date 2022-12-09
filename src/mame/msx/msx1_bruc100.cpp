@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "msx.h"
 #include "msx_keyboard.h"
-#include "bus/msx_slot/bruc100.h"
-#include "bus/msx_slot/ram.h"
-#include "bus/msx_slot/ram_mm.h"
+#include "bus/msx/slot/bruc100.h"
+#include "bus/msx/slot/ram.h"
+#include "bus/msx/slot/ram_mm.h"
 
 using namespace msx_keyboard;
 

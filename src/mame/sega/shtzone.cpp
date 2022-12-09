@@ -59,9 +59,11 @@ TODO:
 
 #include "emu.h"
 #include "sms.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -72,13 +74,13 @@ namespace {
 class shtzone_state : public sms_state
 {
 public:
-	shtzone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sms_state(mconfig, type, tag),
+	shtzone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sms_state(mconfig, type, tag),
 		m_timercpu(*this, "timercpu"),
 		m_buzzer(*this, "buzzer"),
 		m_slots(*this, {"slot", "slot2", "slot3", "slot4", "slot5"}),
 		m_led(*this, "led")
-		{ }
+	{ }
 
 	void shtzone(machine_config &config);
 
@@ -354,7 +356,7 @@ ROM_START( shtzone )
 	ROM_FILL(0x0000, 0x4000, 0xff)
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 GAME( 1987, shtzone, 0, shtzone, shtzone, shtzone_state, empty_init, ROT0, "Sega", "Shooting Zone System BIOS", MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )

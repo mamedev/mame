@@ -60,7 +60,6 @@ private:
 	// helpers
 	bool check_condition_branch(uint8_t bc);
 	bool check_condition(uint8_t bc);
-	int32_t sign_extend(uint32_t data, uint8_t len);
 	uint32_t fetch();
 	uint8_t read_byte(offs_t offset);
 	uint16_t read_word(offs_t offset);

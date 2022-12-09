@@ -512,7 +512,6 @@ motorola/mvme162.cpp
 motorola/powerstack.cpp
 motorola/sys1121.cpp
 motorola/uchroma68.cpp
-msx/msx.cpp
 msx/msx1.cpp
 msx/msx1_bruc100.cpp
 msx/msx1_v9938.cpp
@@ -1097,6 +1096,7 @@ trainer/savia84.cpp
 trainer/selz80.cpp
 trainer/tk80.cpp
 trainer/zapcomputer.cpp
+trs/agvision.cpp
 trs/coco12.cpp
 trs/coco3.cpp
 trs/dgn_beta.cpp
@@ -1263,6 +1263,8 @@ yamaha/fb01.cpp
 yamaha/tg100.cpp
 yamaha/yman1x.cpp
 yamaha/ymdx100.cpp
+yamaha/ymdx7.cpp
+yamaha/ymdx9.cpp
 yamaha/ymdx11.cpp
 yamaha/ymmu100.cpp
 yamaha/ymmu5.cpp

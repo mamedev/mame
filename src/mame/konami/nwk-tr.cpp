@@ -268,23 +268,27 @@ Thrill Drive 713A13  -       713A14  -
 */
 
 #include "emu.h"
+
+#include "k001604.h"
+#include "k573mcal.h"
+#include "konami_gn676_lan.h"
+#include "konppc.h"
+#include "konppc_jvshost.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/adc1213x.h"
 #include "machine/k033906.h"
-#include "konami_gn676_lan.h"
-#include "konppc.h"
 #include "machine/timekpr.h"
-//#include "machine/x76f041.h"
+#include "machine/x76f041.h"
 #include "sound/k056800.h"
 #include "sound/rf5c400.h"
-#include "k001604.h"
 #include "video/voodoo.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
 
 namespace {
 
@@ -309,12 +313,15 @@ public:
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
-		m_cg_view(*this, "cg_view")
+		m_cg_view(*this, "cg_view"),
+		m_jvs_host(*this, "jvs_host"),
+		m_gn676_lan(*this, "gn676_lan")
 	{ }
 
-	void thrilld(machine_config &config);
 	void nwktr(machine_config &config);
+	void nwktr_lan_b(machine_config &config);
 
+	void init_nwktr();
 	void init_racingj();
 	void init_thrilld();
 
@@ -325,9 +332,10 @@ protected:
 private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
+	static constexpr int JVS_BUFFER_SIZE = 1024;
 
 	required_shared_ptr<uint32_t> m_work_ram;
-	required_device<ppc_device> m_maincpu;
+	required_device<ppc4xx_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<adsp21062_device, 2> m_dsp;
 	required_device<k056800_device> m_k056800;
@@ -343,6 +351,8 @@ private:
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	memory_view m_cg_view;
+	required_device<konppc_jvs_host_device> m_jvs_host;
+	required_device<konami_gn676_lan_device> m_gn676_lan;
 
 	emu_timer *m_sound_irq_timer;
 	bool m_exrgb;
@@ -353,6 +363,7 @@ private:
 	void soundtimer_en_w(uint16_t data);
 	void soundtimer_count_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
+	void jamma_jvs_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
 
@@ -402,7 +413,8 @@ uint8_t nwktr_state::sysreg_r(offs_t offset)
 			r = m_in[2]->read();
 			break;
 		case 3:
-			r = m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
+			r |= m_jvs_host->sense() << 7;
+			r |= m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
 			break;
 		case 4:
 			r = m_dsw->read();
@@ -423,12 +435,21 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			m_pcb_digit[offset] = bitswap<7>(~data , 0, 1, 2, 3, 4, 5, 6);
 			break;
 
+		case 3:
+			/*
+			    The bit used for JVSTXEN changes between 3 and 4 based on the lower 2 bits of IN2.
+			    If m_in[2]->read() & 3 != 0, bit 4 is used. Otherwise, bit 3 is used.
+			*/
+			break;
+
 		case 4:
 		{
-			int cs = (data >> 3) & 0x1;
-			int conv = (data >> 2) & 0x1;
-			int di = (data >> 1) & 0x1;
-			int sclk = data & 0x1;
+			m_gn676_lan->reset_fpga_state(BIT(data, 6));
+
+			int cs = BIT(data, 3);
+			int conv = BIT(data, 2);
+			int di = BIT(data, 1);
+			int sclk = BIT(data, 0);
 
 			m_adc12138->cs_w(cs);
 			m_adc12138->conv_w(conv);
@@ -531,8 +552,8 @@ void nwktr_state::ppc_map(address_map &map)
 	map(0x7d010000, 0x7d01ffff).w(FUNC(nwktr_state::sysreg_w));
 	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)); // M48T58Y RTC/NVRAM
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
-	map(0x7d040000, 0x7d04ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
-	map(0x7d050000, 0x7d05ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
+	map(0x7d040000, 0x7d04ffff).rw(m_gn676_lan, FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
+	map(0x7d050000, 0x7d05ffff).rw(m_gn676_lan, FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
 	map(0x7e000000, 0x7e7fffff).rom().region("datarom", 0);
 	map(0x7f000000, 0x7f1fffff).rom().region("prgrom", 0);
 	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
@@ -734,24 +755,45 @@ void nwktr_state::nwktr(machine_config &config)
 	m_konppc->set_num_boards(2);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
 
-	KONAMI_GN676_LAN(config, "gn676_lan", 0, m_work_ram);
+	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
+
+	KONPPC_JVS_HOST(config, m_jvs_host, 0);
+	m_jvs_host->output_callback().set([this](uint8_t c) { m_maincpu->ppc4xx_spu_receive_byte(c); });
 }
 
-void nwktr_state::thrilld(machine_config &config)
+void nwktr_state::nwktr_lan_b(machine_config &config)
 {
 	nwktr(config);
+
+	KONAMI_GN676B_LAN(config.replace(), m_gn676_lan, 0);
 }
 
 /*****************************************************************************/
 
+void nwktr_state::jamma_jvs_w(uint8_t data)
+{
+	bool accepted = m_jvs_host->write(data);
+	if (accepted)
+		m_jvs_host->read();
+}
+
+/*****************************************************************************/
+
+void nwktr_state::init_nwktr()
+{
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(nwktr_state::jamma_jvs_w)));
+}
+
 void nwktr_state::init_racingj()
 {
+	init_nwktr();
 	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
 	m_konppc->set_cgboard_texture_bank(0, "slave_cgboard_bank", memregion("slave_cgboard")->base()); // for some reason, additional CG roms are located on the slave CG board...
 }
 
 void nwktr_state::init_thrilld()
 {
+	init_nwktr();
 	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
 	m_konppc->set_cgboard_texture_bank(0, "slave_cgboard_bank", memregion("master_cgboard")->base()); // ...while this is not the case for thrilld
 }
@@ -781,8 +823,89 @@ ROM_START(racingj)
 	ROM_LOAD( "676a09.16p", 0x000000, 0x400000, CRC(f85c8dc6) SHA1(8b302c80be309b5cc68b75945fcd7b87a56a4c9b) )
 	ROM_LOAD( "676a10.14p", 0x400000, 0x400000, CRC(7b5b7828) SHA1(aec224d62e4b1e8fdb929d7947ce70d84ba676cf) )
 
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "676jac_m48t58y.35d", 0x000000, 0x002000, CRC(47e1628c) SHA1(7c42d06ae2f2cd24d083890f333552cbf4f1d3c9) )
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gq676ua_m48t58y.35d", 0x000000, 0x002000, CRC(cd182438) SHA1(101a4c4b7a9b4a4bb79ec793275c90b050780f6c) )
+ROM_END
+
+ROM_START(racingjj)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("676gnc01.27p", 0x000000, 0x200000, CRC(690346b5) SHA1(157ab6788382ef4f5a8772f08819f54d0856fcc8) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
+	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
+	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
+
+	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
+	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "676gna08.7s", 0x000000, 0x080000, CRC(8973f6f2) SHA1(f5648a7e0205f7e979ccacbb52936809ce14a184) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "676a09.16p", 0x000000, 0x400000, CRC(f85c8dc6) SHA1(8b302c80be309b5cc68b75945fcd7b87a56a4c9b) )
+	ROM_LOAD( "676a10.14p", 0x400000, 0x400000, CRC(7b5b7828) SHA1(aec224d62e4b1e8fdb929d7947ce70d84ba676cf) )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gq676ja_m48t58y.35d", 0x000000, 0x002000, CRC(0b83d595) SHA1(852600a82f34b3cde378c166368c1fb07004203d) )
+ROM_END
+
+ROM_START(racingja)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("676gnc01.27p", 0x000000, 0x200000, CRC(690346b5) SHA1(157ab6788382ef4f5a8772f08819f54d0856fcc8) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
+	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
+	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
+
+	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
+	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "676gna08.7s", 0x000000, 0x080000, CRC(8973f6f2) SHA1(f5648a7e0205f7e979ccacbb52936809ce14a184) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "676a09.16p", 0x000000, 0x400000, CRC(f85c8dc6) SHA1(8b302c80be309b5cc68b75945fcd7b87a56a4c9b) )
+	ROM_LOAD( "676a10.14p", 0x400000, 0x400000, CRC(7b5b7828) SHA1(aec224d62e4b1e8fdb929d7947ce70d84ba676cf) )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gq676aa_m48t58y.35d", 0x000000, 0x002000, CRC(0eb8209d) SHA1(eb5bc411378423f05f2708d673d5b06687c59dbf) )
+ROM_END
+
+ROM_START(racingje)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("676gnc01.27p", 0x000000, 0x200000, CRC(690346b5) SHA1(157ab6788382ef4f5a8772f08819f54d0856fcc8) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
+	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
+	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
+
+	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
+	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "676gna08.7s", 0x000000, 0x080000, CRC(8973f6f2) SHA1(f5648a7e0205f7e979ccacbb52936809ce14a184) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "676a09.16p", 0x000000, 0x400000, CRC(f85c8dc6) SHA1(8b302c80be309b5cc68b75945fcd7b87a56a4c9b) )
+	ROM_LOAD( "676a10.14p", 0x400000, 0x400000, CRC(7b5b7828) SHA1(aec224d62e4b1e8fdb929d7947ce70d84ba676cf) )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gq676ea_m48t58y.35d", 0x000000, 0x002000, CRC(c490ffc1) SHA1(170d736b7a07300f4e560cd384c8fd41f2aaaeff) )
 ROM_END
 
 ROM_START(racingj2)
@@ -809,11 +932,42 @@ ROM_START(racingj2)
 	ROM_LOAD( "888a09.16p",   0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
 	ROM_LOAD( "888a10.14p",   0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
 
-	ROM_REGION( 0x0000084, "laneeprom", 0 )
-	ROM_LOAD( "ge888ea.2g",   0x000000, 0x000084, NO_DUMP )
+	ROM_REGION( 0x0000224, "gn676_lan:eeprom", 0 )
+	ROM_LOAD( "ge888ua.2g",   0x000000, 0x000224, NO_DUMP ) // Unused?
 
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "676eae_m48t58y.35d", 0x000000, 0x002000, CRC(f691f5ab) SHA1(e81f652c5caa2caa8bd1c6d6db488d849bda058e) )
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gq888ua_m48t58y.35d", 0x000000, 0x002000, CRC(1903f6c1) SHA1(f8b6dedf585c014044c530b73014915874d6fb71) )
+ROM_END
+
+ROM_START(racingj2a)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("888a01.27p", 0x000000, 0x200000, CRC(d077890a) SHA1(08b252324cf46fbcdb95e8f9312287920cd87c5d) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP( "676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
+	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
+	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
+	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
+
+	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
+	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "888a08.7s", 0x000000, 0x080000, CRC(55fbea65) SHA1(ad953f758181731efccadcabc4326e6634c359e8) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "888a09.16p",   0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
+	ROM_LOAD( "888a10.14p",   0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
+
+	ROM_REGION( 0x0000224, "gn676_lan:eeprom", 0 )
+	ROM_LOAD( "ge888aa.2g",   0x000000, 0x000224, NO_DUMP ) // Unused?
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gq888aa_m48t58y.35d", 0x000000, 0x002000, CRC(85e8a67d) SHA1(fd799918437ed5d80247c58dfec7006781af657f) )
 ROM_END
 
 ROM_START(racingj2j)
@@ -840,11 +994,42 @@ ROM_START(racingj2j)
 	ROM_LOAD( "888a09.16p", 0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
 	ROM_LOAD( "888a10.14p", 0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
 
-	ROM_REGION( 0x0000084, "laneeprom", 0 )
-	ROM_LOAD( "ge888ja.2g",   0x000000, 0x000084, NO_DUMP )
+	ROM_REGION( 0x0000224, "gn676_lan:eeprom", 0 )
+	ROM_LOAD( "ge888ja.2g",   0x000000, 0x000224, NO_DUMP )
 
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "676jae_m48t58y.35d", 0x000000, 0x002000, CRC(1aa43a1f) SHA1(814b691b8a358bf1545a13d595d17070e612e9a4) )
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gq888ja_m48t58y.35d", 0x000000, 0x002000, CRC(0fd00769) SHA1(7d7ea94066bca2e589c0fe0f69c620a8f97916cc) )
+ROM_END
+
+ROM_START(racingj2e)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("888a01.27p", 0x000000, 0x200000, CRC(d077890a) SHA1(08b252324cf46fbcdb95e8f9312287920cd87c5d) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP( "676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
+	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
+	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
+	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
+
+	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
+	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "888a08.7s", 0x000000, 0x080000, CRC(55fbea65) SHA1(ad953f758181731efccadcabc4326e6634c359e8) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "888a09.16p", 0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
+	ROM_LOAD( "888a10.14p", 0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
+
+	ROM_REGION( 0x0000224, "gn676_lan:eeprom", 0 )
+	ROM_LOAD( "ge888ea.2g",   0x000000, 0x000224, NO_DUMP )
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gq888ea_m48t58y.35d", 0x000000, 0x002000, CRC(108b2d38) SHA1(7c55f592a0fc2b6809ec5d128e78283b77694345) )
 ROM_END
 
 ROM_START(thrilld)
@@ -866,11 +1051,141 @@ ROM_START(thrilld)
 	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
-	ROM_REGION( 0x0000084, "laneeprom", 0 )
-	ROM_LOAD( "gc713jc.2g",   0x000000, 0x000084, NO_DUMP )
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713ud.2g",   0x000000, 0x000224, BAD_DUMP CRC(fc9563f5) SHA1(1ed08482024f6d4353d4e4ea6c8092f6625d699b) ) // hand built
 
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "713jae_m48t58y.35d", 0x000000, 0x002000, CRC(5d8fbcb2) SHA1(74ad91544d2a200cf599a565005476623075e7d6) )
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676ua_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(2aeeda76) SHA1(ed63b5ebbd9ebb90afd7fdebc9ad4b4d9966012b) ) // hand built
+ROM_END
+
+ROM_START(thrilldj)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713be01.27p", 0x000000, 0x200000, CRC(d84a7723) SHA1(f4e9e08591b7e5e8419266dbe744d56a185384ed) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713jc.2g",   0x000000, 0x000224, BAD_DUMP CRC(98e326b7) SHA1(af532cf84eca02a3ed0bd0d49c2b142c7f21760c) ) // hand built
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676ja_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(e6eafce5) SHA1(167d957f7cf1e94a12070739a4103977512f6737) ) // hand built
+ROM_END
+
+ROM_START(thrilldja)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713be01.27p", 0x000000, 0x200000, CRC(d84a7723) SHA1(f4e9e08591b7e5e8419266dbe744d56a185384ed) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713ja.2g",   0x000000, 0x000224, BAD_DUMP CRC(600e21e1) SHA1(ca7b30ed4b564aee17a326d1d9729656b5101249) ) // hand built
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676ja_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(e6eafce5) SHA1(167d957f7cf1e94a12070739a4103977512f6737) ) // hand built
+ROM_END
+
+ROM_START(thrillde)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713be01.27p", 0x000000, 0x200000, CRC(d84a7723) SHA1(f4e9e08591b7e5e8419266dbe744d56a185384ed) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713ed.2g",   0x000000, 0x000224, BAD_DUMP CRC(8a5bdf3c) SHA1(7cb9b0e30177caf8a623af5ee6ff95ead5eae4f2) ) // hand built
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676ea_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(b4afab84) SHA1(e8c653df7ce0a5cb77bf7aedeca4c4ff91669047) ) // hand built
+ROM_END
+
+ROM_START(thrillda)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713be01.27p", 0x000000, 0x200000, CRC(d84a7723) SHA1(f4e9e08591b7e5e8419266dbe744d56a185384ed) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713ac.2g",   0x000000, 0x000224, BAD_DUMP CRC(8db4eed6) SHA1(f99120c18435866354c5deadfacd47453fb53c15) ) // hand built
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676aa_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(c011dcea) SHA1(39cbbe518bfc256cdb72bdaece03c539f705c807) ) // hand built
+ROM_END
+
+ROM_START(thrilldab)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713be01.27p", 0x000000, 0x200000, CRC(d84a7723) SHA1(f4e9e08591b7e5e8419266dbe744d56a185384ed) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713ab.2g",   0x000000, 0x000224, BAD_DUMP CRC(f1c26d7d) SHA1(2a3f45d18bc8e9278d077118d478a501531011f4) ) // hand built
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676aa_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(c011dcea) SHA1(39cbbe518bfc256cdb72bdaece03c539f705c807) ) // hand built
 ROM_END
 
 ROM_START(thrilldb)
@@ -882,8 +1197,8 @@ ROM_START(thrilldb)
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
 	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
-	ROM_LOAD32_WORD_SWAP( "713a13.8x",  0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
-	ROM_LOAD32_WORD_SWAP( "713a14.16x", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
 	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
 	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
@@ -892,11 +1207,63 @@ ROM_START(thrilldb)
 	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
-	ROM_REGION( 0x0000084, "laneeprom", 0 )
-	ROM_LOAD( "gc713jc.2g",   0x000000, 0x000084, NO_DUMP )
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713ud.2g",   0x000000, 0x000224, BAD_DUMP CRC(fc9563f5) SHA1(1ed08482024f6d4353d4e4ea6c8092f6625d699b) ) // hand built
 
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "713jab_m48t58y.35d", 0x000000, 0x002000, CRC(5d8fbcb2) SHA1(74ad91544d2a200cf599a565005476623075e7d6) )
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676ua_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(2aeeda76) SHA1(ed63b5ebbd9ebb90afd7fdebc9ad4b4d9966012b) ) // hand built
+ROM_END
+
+ROM_START(thrilldbj)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713bb01.27p", 0x000000, 0x200000, CRC(535fe4e8) SHA1(acd8194a4dafce289dbdfd874f0b799f25aeb73f) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713jc.2g",   0x000000, 0x000224, BAD_DUMP CRC(98e326b7) SHA1(af532cf84eca02a3ed0bd0d49c2b142c7f21760c) ) // hand built
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676ja_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(e6eafce5) SHA1(167d957f7cf1e94a12070739a4103977512f6737) ) // hand built
+ROM_END
+
+ROM_START(thrilldbja)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713bb01.27p", 0x000000, 0x200000, CRC(535fe4e8) SHA1(acd8194a4dafce289dbdfd874f0b799f25aeb73f) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713ja.2g",   0x000000, 0x000224, BAD_DUMP CRC(600e21e1) SHA1(ca7b30ed4b564aee17a326d1d9729656b5101249) ) // hand built
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676ja_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(e6eafce5) SHA1(167d957f7cf1e94a12070739a4103977512f6737) ) // hand built
 ROM_END
 
 ROM_START(thrilldbe)
@@ -908,8 +1275,8 @@ ROM_START(thrilldbe)
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
 	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
-	ROM_LOAD32_WORD_SWAP( "713a13.8x",  0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
-	ROM_LOAD32_WORD_SWAP( "713a14.16x", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
 	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
 	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
@@ -918,11 +1285,63 @@ ROM_START(thrilldbe)
 	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
-	ROM_REGION( 0x0000084, "laneeprom", 0 )
-	ROM_LOAD( "gc713ec.2g",   0x000000, 0x000084, NO_DUMP )
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713ed.2g",   0x000000, 0x000224, BAD_DUMP CRC(8a5bdf3c) SHA1(7cb9b0e30177caf8a623af5ee6ff95ead5eae4f2) ) // hand built
 
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "713eaa_m48t58y.35d", 0x000000, 0x002000, CRC(056ea8fa) SHA1(23574e0c1d011dab8644f3d98763d4a2d11a05b3)  )
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676ea_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(b4afab84) SHA1(e8c653df7ce0a5cb77bf7aedeca4c4ff91669047) ) // hand built
+ROM_END
+
+ROM_START(thrilldba)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713bb01.27p", 0x000000, 0x200000, CRC(535fe4e8) SHA1(acd8194a4dafce289dbdfd874f0b799f25aeb73f) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713ac.2g",   0x000000, 0x000224, BAD_DUMP CRC(8db4eed6) SHA1(f99120c18435866354c5deadfacd47453fb53c15) ) // hand built
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676aa_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(c011dcea) SHA1(39cbbe518bfc256cdb72bdaece03c539f705c807) ) // hand built
+ROM_END
+
+ROM_START(thrilldbab)
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
+	ROM_LOAD16_WORD_SWAP("713bb01.27p", 0x000000, 0x200000, CRC(535fe4e8) SHA1(acd8194a4dafce289dbdfd874f0b799f25aeb73f) )
+
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
+	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
+	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION( 0x000224, "gn676_lan:eeprom", 0)
+	ROM_LOAD( "gc713ab.2g",   0x000000, 0x000224, BAD_DUMP CRC(f1c26d7d) SHA1(2a3f45d18bc8e9278d077118d478a501531011f4) ) // hand built
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD( "gm676aa_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(c011dcea) SHA1(39cbbe518bfc256cdb72bdaece03c539f705c807) ) // hand built
 ROM_END
 
 } // Anonymous namespace
@@ -930,11 +1349,35 @@ ROM_END
 
 /*****************************************************************************/
 
-#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (JAC)",            GAME_FLAGS )
-GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", GAME_FLAGS )
-GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", GAME_FLAGS )
-GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAE)",          GAME_FLAGS )
-GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAB)",          GAME_FLAGS )
-GAME( 1998, thrilldbe,  thrilld, thrilld, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EAB)",          GAME_FLAGS )
+// GYxxx, GNxxx -> 5+R gear shift, clutch pedal, left/right panel buttons, hand brake lever
+// GPxxx, GExxx, GMxxx -> up/down gear shift, no left or right panel buttons, no clutch, hand brake lever
+// GQxxx -> up/down gear shift, no left or right panel buttons, no clutch, no hand brake lever
+// GQ picked because it uses the least number of devices that need to be emulated for controls and boots without device errors.
+// Change the first two bytes in the NVRAM and fix the checksum at 0x0e-0x0f (calculated as the negated sum of 0x00-0x0e as 16-bit big endian values)
+// to generate new NVRAMs in the future when more of the hardware is emulated.
+GAME( 1998, racingj,    0,       nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676UAC)",            GAME_FLAGS )
+GAME( 1998, racingje,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676EAC)",            GAME_FLAGS )
+GAME( 1998, racingjj,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676JAC)",            GAME_FLAGS )
+GAME( 1998, racingja,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676AAC)",            GAME_FLAGS )
+GAME( 1998, racingj2,   racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (GQ888UAA)", GAME_FLAGS )
+GAME( 1998, racingj2e,  racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (GQ888EAA)", GAME_FLAGS )
+GAME( 1998, racingj2j,  racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (GQ888JAA)", GAME_FLAGS )
+GAME( 1998, racingj2a,  racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (GQ888AAA)", GAME_FLAGS )
+
+// JAx and ABx revisions are for the DX cabinet type with a full 5+R type gear shifter and a clutch pedal.
+// The EDx version asks you to select if you have a hand brake lever installed, a clutch pedal installed,
+// gear shifter type (up/down, 4 pos, or 5+R), and gear shifter's display position.
+GAME( 1998, thrilld,    0,       nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (UDE)",          GAME_FLAGS )
+GAME( 1998, thrilldj,   thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JCE)",          GAME_FLAGS )
+GAME( 1998, thrilldja,  thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAE)",          GAME_FLAGS )
+GAME( 1998, thrillde,   thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EDE)",          GAME_FLAGS )
+GAME( 1998, thrillda,   thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ACE)",          GAME_FLAGS )
+GAME( 1998, thrilldab,  thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ABE)",          GAME_FLAGS )
+GAME( 1998, thrilldb,   thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (UDB)",          GAME_FLAGS )
+GAME( 1998, thrilldbj,  thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JCB)",          GAME_FLAGS )
+GAME( 1998, thrilldbja, thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAB)",          GAME_FLAGS )
+GAME( 1998, thrilldbe,  thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EDB)",          GAME_FLAGS )
+GAME( 1998, thrilldba,  thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ACB)",          GAME_FLAGS )
+GAME( 1998, thrilldbab, thrilld, nwktr_lan_b, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ABB)",          GAME_FLAGS )

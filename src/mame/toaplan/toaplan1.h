@@ -11,6 +11,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
+#include "machine/gen_latch.h"
 #include "sound/ymopl.h"
 #include "toaplan_scu.h"
 #include "emupal.h"
@@ -134,7 +135,7 @@ protected:
 	void register_common();
 	void log_vram();
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void reset_sound();
+	virtual void reset_sound();
 	DECLARE_WRITE_LINE_MEMBER(reset_callback);
 	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -230,23 +231,20 @@ class toaplan1_samesame_state : public toaplan1_state
 {
 public:
 	toaplan1_samesame_state(const machine_config &mconfig, device_type type, const char *tag) :
-		toaplan1_state(mconfig, type, tag)
+		toaplan1_state(mconfig, type, tag),
+		m_soundlatch(*this, "soundlatch")
 	{
 	}
 
 	void samesame(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void reset_sound() override;
 
 private:
 	// Fire Shark sound
-	u8 m_to_mcu = 0;
-	u8 m_cmdavailable = 0;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-	void mcu_w(u8 data);
-	u8 soundlatch_r();
-	void sound_done_w(u8 data);
 	u8 cmdavailable_r();
 	u8 port_6_word_r();
 

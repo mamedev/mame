@@ -563,6 +563,7 @@ void aerofgt_state::aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &
 	int attr_start, last;
 
 	last = ((m_rasterram[0x404 / 2] << 5) - 0x8000) / 2;
+	if (last < 0) last = 0;
 
 	for (attr_start = m_spriteram.bytes() / 2 - 4; attr_start >= last; attr_start -= 4)
 	{
@@ -601,6 +602,7 @@ void aerofgt_state::aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &
 	}
 
 	last = ((m_rasterram[0x402 / 2] << 5) - 0x8000) / 2;
+	if (last < 0) last = 0;
 
 	for (attr_start = ((m_spriteram.bytes() / 2) / 2) - 4; attr_start >= last; attr_start -= 4)
 	{
@@ -704,7 +706,6 @@ uint32_t aerofgt_state::screen_update_spikes91(screen_device &screen, bitmap_ind
 					(x*8)+24,(y*8)+8,15);
 
 			count++;
-
 		}
 
 	}

@@ -23,7 +23,8 @@ About 'teedoff' :
 
 The main problem with that game is that it should sometimes jumps into shared memory
 (see 'init_teedoff' function below) depending on a value that is supposed to be
-in the palette RAM !
+in the palette RAM ! (maybe palette RAM is write only, and this is an open bus read
+or was used for debugging during the game development?)
 
 Palette RAM is reset here (main CPU) :
 
@@ -222,7 +223,11 @@ WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
 
 /* End of MSM with counters emulation */
 
-
+uint8_t tehkanwc_state::teedoff_unk_r()
+{
+	logerror("%s: teedoff_unk_r\n", machine().describe_context());
+	return 0x80;
+}
 
 void tehkanwc_state::main_mem(address_map &map)
 {
@@ -231,8 +236,9 @@ void tehkanwc_state::main_mem(address_map &map)
 	map(0xc800, 0xcfff).ram().share("share1");
 	map(0xd000, 0xd3ff).ram().w(FUNC(tehkanwc_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(tehkanwc_state::colorram_w)).share("colorram");
-	map(0xd800, 0xddff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xde00, 0xdfff).ram().share("share5"); /* unused part of the palette RAM, I think? Gridiron uses it */
+	map(0xd800, 0xddff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xda00, 0xda00).r(FUNC(tehkanwc_state::teedoff_unk_r));
+	map(0xde00, 0xdfff).writeonly().share("share5"); /* unused part of the palette RAM, I think? Gridiron uses it */
 	map(0xe000, 0xe7ff).ram().w(FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
 	map(0xe800, 0xebff).ram().share("spriteram"); /* sprites */
 	map(0xec00, 0xec01).ram().w(FUNC(tehkanwc_state::scroll_x_w));
@@ -258,8 +264,8 @@ void tehkanwc_state::sub_mem(address_map &map)
 	map(0xc800, 0xcfff).ram().share("share1");
 	map(0xd000, 0xd3ff).ram().w(FUNC(tehkanwc_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(tehkanwc_state::colorram_w)).share("colorram");
-	map(0xd800, 0xddff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xde00, 0xdfff).ram().share("share5"); /* unused part of the palette RAM, I think? Gridiron uses it */
+	map(0xd800, 0xddff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xde00, 0xdfff).writeonly().share("share5"); /* unused part of the palette RAM, I think? Gridiron uses it */
 	map(0xe000, 0xe7ff).ram().w(FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
 	map(0xe800, 0xebff).ram().share("spriteram"); /* sprites */
 	map(0xec00, 0xec01).ram().w(FUNC(tehkanwc_state::scroll_x_w));
@@ -726,37 +732,6 @@ void tehkanwc_state::tehkanwcb(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void tehkanwc_state::init_teedoff()
-{
-	/* Patch to avoid the game jumping in shared memory */
-
-	/* Code at 0x0233 (main CPU) :
-
-	    0233: 3A 00 DA    ld   a,($DA00)
-	    0236: CB 7F       bit  7,a
-	    0238: CA 00 C8    jp   z,$C800
-
-	   changed to :
-
-	    0233: 3A 00 DA    ld   a,($DA00)
-	    0236: CB 7F       bit  7,a
-	    0238: 00          nop
-	    0239: 00          nop
-	    023A: 00          nop
-	*/
-	// Update 2022: sub CPU doesn't seem responsible for sharing code to main,
-	// and bit 7 write to 0xca00 happens after that main checks it out during attract.
-	// Notice that main CPU just fakes the ROM checksum check at startup, just drawing ROM # OK at PC=0x1726
-	// There's also this (nsfw link) -> https://sudden-desu.net/entry/tee-d-off-a-saucy-secret-and-hidden-dev-credits
-	// which implies that at least 1 ROM is bad here.
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	ROM[0x0238] = 0x00;
-	ROM[0x0239] = 0x00;
-	ROM[0x023a] = 0x00;
-}
-
-
 
 /***************************************************************************
 
@@ -973,31 +948,57 @@ ROM_END
 
 ROM_START( teedoff )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "to-1.bin",     0x0000, 0x4000, BAD_DUMP CRC(cc2aebc5) SHA1(358e77e53b35dd89fcfdb3b2484b8c4fbc34c1be) )
-	ROM_LOAD( "to-2.bin",     0x4000, 0x4000, BAD_DUMP CRC(f7c9f138) SHA1(2fe56059ef67387b5938bb4751aa2f74a58b04fb) )
-	ROM_LOAD( "to-3.bin",     0x8000, 0x4000, BAD_DUMP CRC(a0f0a6da) SHA1(72390c8dc5519d90e39a660e6ec18861fdbadcc8) )
+	ROM_LOAD( "1_m5m27c128_dip28.4a",     0x0000, 0x4000, CRC(0e18f6ee) SHA1(7e78b97ca343b6bdc7ee24e99063fbe9bc86e7a2) )
+	ROM_LOAD( "2_m5m27c128_dip28.4b",     0x4000, 0x4000, CRC(70635a77) SHA1(301794ef4761ed417ae211bd570d0cbc6a75bcc5) )
+	ROM_LOAD( "3_m5m27c128_dip28.4d",     0x8000, 0x4000, CRC(2c765def) SHA1(bf256104d8b89713b69dde3d84d03638241ba6af) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "to-4.bin",     0x0000, 0x8000, BAD_DUMP CRC(e922cbd2) SHA1(922c030be70150efb760fa81bda0bc54f2ec681a) )
+	ROM_LOAD( "4_hn27256g@dip28.9c",     0x0000, 0x8000, CRC(a21315bf) SHA1(a9dd2c1fea3a184ec5d40fa3246fa24c4d720bb3) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "to-6.bin",     0x0000, 0x4000, CRC(d8dfe1c8) SHA1(d00a71ad89b530339990780334588f5738c60f25) )
+	ROM_LOAD( "6_m5m27c128_dip28.8r",     0x0000, 0x4000, CRC(f87a43f5) SHA1(268da812846b9ec24cfeb8d89869e39fa01a6676) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "to-12.bin",    0x00000, 0x4000, CRC(4f44622c) SHA1(161c3646a3ec2274bffc957240d47d55a35a8416) )   /* fg tiles */
+	ROM_LOAD( "12_m5m27c128_dip28.8u",    0x00000, 0x4000, CRC(4f44622c) SHA1(161c3646a3ec2274bffc957240d47d55a35a8416) )   /* fg tiles */
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "to-8.bin",     0x00000, 0x8000, CRC(363bd1ba) SHA1(c5b7d56b0595712b18351403a9e3325a03de1676) )   /* sprites */
-	ROM_LOAD( "to-7.bin",     0x08000, 0x8000, CRC(6583fa5b) SHA1(1041181887350d860c517c0a031ab064a20f5cee) )
+	ROM_LOAD( "8_hn27256g_dip28.5j",     0x00000, 0x8000, CRC(363bd1ba) SHA1(c5b7d56b0595712b18351403a9e3325a03de1676) )   /* sprites */
+	ROM_LOAD( "7_hn27256g_dip28.5e",     0x08000, 0x8000, CRC(6583fa5b) SHA1(1041181887350d860c517c0a031ab064a20f5cee) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "to-11.bin",    0x00000, 0x8000, CRC(1ec00cb5) SHA1(0e61eed3d6fc44ff89d8b9e4f558f0989eb8094f) )   /* bg tiles */
-	ROM_LOAD( "to-9.bin",     0x08000, 0x8000, CRC(a14347f0) SHA1(00a34ed56ec32336bb524424fcb007d8160163ec) )
+	ROM_LOAD( "11_hn27256g_dip28.8m",    0x00000, 0x8000, CRC(1ec00cb5) SHA1(0e61eed3d6fc44ff89d8b9e4f558f0989eb8094f) )   /* bg tiles */
+	ROM_LOAD( "9_hn27256g_dip28.8j",     0x08000, 0x8000, CRC(a14347f0) SHA1(00a34ed56ec32336bb524424fcb007d8160163ec) )
 
 	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
-	ROM_LOAD( "to-5.bin",     0x0000, 0x8000, CRC(e5e4246b) SHA1(b2fe2e68fa86163ebe1ef00ecce73fb62cef6b19) )
+	ROM_LOAD( "5_m5m27c256k_dip28.4r",     0x0000, 0x8000, CRC(90141093) SHA1(e8983d8c47e47481c2a8ee2a0bac6df3b17f8e70) )
 ROM_END
 
+ROM_START( teedoffj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "to-1.4a",     0x0000, 0x4000, CRC(cc2aebc5) SHA1(358e77e53b35dd89fcfdb3b2484b8c4fbc34c1be) )
+	ROM_LOAD( "to-2.4b",     0x4000, 0x4000, CRC(f7c9f138) SHA1(2fe56059ef67387b5938bb4751aa2f74a58b04fb) )
+	ROM_LOAD( "to-3.4d",     0x8000, 0x4000, CRC(a0f0a6da) SHA1(72390c8dc5519d90e39a660e6ec18861fdbadcc8) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "to-4.9c",     0x0000, 0x8000, CRC(e922cbd2) SHA1(922c030be70150efb760fa81bda0bc54f2ec681a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "to-6.8r",     0x0000, 0x4000, CRC(d8dfe1c8) SHA1(d00a71ad89b530339990780334588f5738c60f25) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "12_m5m27c128_dip28.8u",    0x00000, 0x4000, CRC(4f44622c) SHA1(161c3646a3ec2274bffc957240d47d55a35a8416) )   /* fg tiles */
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "8_hn27256g_dip28.5j",     0x00000, 0x8000, CRC(363bd1ba) SHA1(c5b7d56b0595712b18351403a9e3325a03de1676) )   /* sprites */
+	ROM_LOAD( "7_hn27256g_dip28.5e",     0x08000, 0x8000, CRC(6583fa5b) SHA1(1041181887350d860c517c0a031ab064a20f5cee) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "11_hn27256g_dip28.8m",    0x00000, 0x8000, CRC(1ec00cb5) SHA1(0e61eed3d6fc44ff89d8b9e4f558f0989eb8094f) )   /* bg tiles */
+	ROM_LOAD( "9_hn27256g_dip28.8j",     0x08000, 0x8000, CRC(a14347f0) SHA1(00a34ed56ec32336bb524424fcb007d8160163ec) )
+
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
+	ROM_LOAD( "to-5.4r",     0x0000, 0x8000, CRC(e5e4246b) SHA1(b2fe2e68fa86163ebe1ef00ecce73fb62cef6b19) )
+ROM_END
 
 /* There are some dumps out there that only have the year hacked to 1986 and a little bunch of bytes
    from the graphics zone. I think that not worth to support these hacks...
@@ -1009,5 +1010,8 @@ GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,
 GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
 GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "hack",    "Tehkan World Cup (1986 year hack)",  MACHINE_SUPPORTS_SAVE )
+
 GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
-GAME( 1986, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, init_teedoff, ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )
+
+GAME( 1987, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (World)",                  MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
+GAME( 1986, teedoffj,  teedoff,  tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )

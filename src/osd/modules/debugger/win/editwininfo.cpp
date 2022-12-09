@@ -12,6 +12,8 @@
 #include "debugviewinfo.h"
 #include "uimetrics.h"
 
+#include "xmlfile.h"
+
 #include "strconv.h"
 
 #include "winutil.h"
@@ -25,7 +27,7 @@ constexpr DWORD EDIT_BOX_STYLE      = WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL;
 constexpr DWORD EDIT_BOX_STYLE_EX   = 0;
 
 constexpr int   MAX_EDIT_STRING     = 256;
-constexpr int   HISTORY_LENGTH      = 20;
+constexpr int   HISTORY_LENGTH      = 100;
 
 } // anonymous namespace
 
@@ -104,6 +106,43 @@ void editwin_info::draw_contents(HDC dc)
 	debugwin_info::draw_contents(dc);
 	if (m_editwnd)
 		draw_border(dc, m_editwnd);
+}
+
+
+void editwin_info::restore_configuration_from_node(util::xml::data_node const &node)
+{
+	m_history.clear();
+	m_last_history = 0;
+	util::xml::data_node const *const hist = node.get_child(NODE_WINDOW_HISTORY);
+	if (hist)
+	{
+		util::xml::data_node const *item = hist->get_child(NODE_HISTORY_ITEM);
+		while (item)
+		{
+			if (item->get_value() && *item->get_value())
+			{
+				while (m_history.size() >= HISTORY_LENGTH)
+					m_history.pop_back();
+				m_history.emplace_front(osd::text::to_tstring(item->get_value()));
+			}
+			item = item->get_next_sibling(NODE_HISTORY_ITEM);
+		}
+	}
+
+	debugwin_info::restore_configuration_from_node(node);
+}
+
+
+void editwin_info::save_configuration_to_node(util::xml::data_node &node)
+{
+	debugwin_info::save_configuration_to_node(node);
+
+	util::xml::data_node *const hist = node.add_child(NODE_WINDOW_HISTORY, nullptr);
+	if (hist)
+	{
+		for (auto it = m_history.crbegin(); m_history.crend() != it; ++it)
+			hist->add_child(NODE_HISTORY_ITEM, osd::text::from_tstring(*it).c_str());
+	}
 }
 
 

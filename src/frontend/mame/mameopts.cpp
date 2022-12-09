@@ -46,50 +46,53 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 	if (!cursystem)
 		return;
 
-	// parse "vertical.ini" or "horizont.ini"
-	if (cursystem->flags & ORIENTATION_SWAP_XY)
-		parse_one_ini(options, "vertical", OPTION_PRIORITY_ORIENTATION_INI, &error_stream);
-	else
-		parse_one_ini(options, "horizont", OPTION_PRIORITY_ORIENTATION_INI, &error_stream);
-
-	switch (cursystem->flags & machine_flags::MASK_TYPE)
+	if (&GAME_NAME(___empty) != cursystem) // hacky - this thing isn't a real system
 	{
-	case machine_flags::TYPE_ARCADE:
-		parse_one_ini(options, "arcade", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
-		break;
-	case machine_flags::TYPE_CONSOLE:
-		parse_one_ini(options ,"console", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
-		break;
-	case machine_flags::TYPE_COMPUTER:
-		parse_one_ini(options, "computer", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
-		break;
-	case machine_flags::TYPE_OTHER:
-		parse_one_ini(options, "othersys", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
-		break;
-	default:
-		break;
-	}
+		// parse "vertical.ini" or "horizont.ini"
+		if (cursystem->flags & ORIENTATION_SWAP_XY)
+			parse_one_ini(options, "vertical", OPTION_PRIORITY_ORIENTATION_INI, &error_stream);
+		else
+			parse_one_ini(options, "horizont", OPTION_PRIORITY_ORIENTATION_INI, &error_stream);
 
-	machine_config config(*cursystem, options);
-	for (const screen_device &device : screen_device_enumerator(config.root_device()))
-	{
-		// parse "raster.ini" for raster games
-		if (device.screen_type() == SCREEN_TYPE_RASTER)
+		switch (cursystem->flags & machine_flags::MASK_TYPE)
 		{
-			parse_one_ini(options, "raster", OPTION_PRIORITY_SCREEN_INI, &error_stream);
+		case machine_flags::TYPE_ARCADE:
+			parse_one_ini(options, "arcade", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
+			break;
+		case machine_flags::TYPE_CONSOLE:
+			parse_one_ini(options ,"console", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
+			break;
+		case machine_flags::TYPE_COMPUTER:
+			parse_one_ini(options, "computer", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
+			break;
+		case machine_flags::TYPE_OTHER:
+			parse_one_ini(options, "othersys", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
+			break;
+		default:
 			break;
 		}
-		// parse "vector.ini" for vector games
-		if (device.screen_type() == SCREEN_TYPE_VECTOR)
+
+		machine_config config(*cursystem, options);
+		for (const screen_device &device : screen_device_enumerator(config.root_device()))
 		{
-			parse_one_ini(options, "vector", OPTION_PRIORITY_SCREEN_INI, &error_stream);
-			break;
-		}
-		// parse "lcd.ini" for lcd games
-		if (device.screen_type() == SCREEN_TYPE_LCD)
-		{
-			parse_one_ini(options, "lcd", OPTION_PRIORITY_SCREEN_INI, &error_stream);
-			break;
+			// parse "raster.ini" for raster games
+			if (device.screen_type() == SCREEN_TYPE_RASTER)
+			{
+				parse_one_ini(options, "raster", OPTION_PRIORITY_SCREEN_INI, &error_stream);
+				break;
+			}
+			// parse "vector.ini" for vector games
+			if (device.screen_type() == SCREEN_TYPE_VECTOR)
+			{
+				parse_one_ini(options, "vector", OPTION_PRIORITY_SCREEN_INI, &error_stream);
+				break;
+			}
+			// parse "lcd.ini" for lcd games
+			if (device.screen_type() == SCREEN_TYPE_LCD)
+			{
+				parse_one_ini(options, "lcd", OPTION_PRIORITY_SCREEN_INI, &error_stream);
+				break;
+			}
 		}
 	}
 

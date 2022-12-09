@@ -212,6 +212,7 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
 	, c_bus_frequency(0)
+	, c_serial_clock(0)
 	, m_core(nullptr)
 	, m_bus_freq_multiplier(1)
 	, m_flavor(flavor)
@@ -718,6 +719,8 @@ void ppc_device::device_start()
 
 	m_debugger_temp = 0;
 
+	m_serial_clock = 0;
+
 	m_cache_line_size = 32;
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
@@ -751,6 +754,10 @@ void ppc_device::device_start()
 	m_dcr_write_func.set(nullptr);
 
 	m_tb_divisor = (m_tb_divisor * clock() + m_system_clock / 2 - 1) / m_system_clock;
+
+	m_serial_clock = c_serial_clock != 0 ? c_serial_clock : 3'686'400; // TODO: get rid of this hard-coded magic number
+	if (m_serial_clock > m_system_clock / 2)
+		fatalerror("%s: PPC: serial clock (%d) must not be more than half of the system clock (%d)\n", tag(), m_serial_clock, m_system_clock);
 
 	/* allocate a timer for the compare interrupt */
 	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor))
@@ -2684,7 +2691,7 @@ void ppc_device::ppc4xx_spu_timer_reset()
 	/* if we're enabled, reset at the current baud rate */
 	if (enabled)
 	{
-		attotime clockperiod = attotime::from_hz((m_dcr[DCR4XX_IOCR] & 0x02) ? 3686400 : 33333333);
+		attotime clockperiod = attotime::from_hz((m_dcr[DCR4XX_IOCR] & 0x02) ? m_serial_clock : m_system_clock);
 		int divisor = ((m_spu.regs[SPU4XX_BAUD_DIVISOR_H] * 256 + m_spu.regs[SPU4XX_BAUD_DIVISOR_L]) & 0xfff) + 1;
 		int bpc = 7 + ((m_spu.regs[SPU4XX_CONTROL] & 8) >> 3) + 1 + (m_spu.regs[SPU4XX_CONTROL] & 1);
 		attotime charperiod = clockperiod * (divisor * 16 * bpc);

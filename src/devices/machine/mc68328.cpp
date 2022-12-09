@@ -44,6 +44,8 @@
 
 DEFINE_DEVICE_TYPE(MC68328, mc68328_device, "mc68328", "MC68328 DragonBall Integrated Processor")
 
+const uint32_t mc68328_device::VCO_DIVISORS[8] = { 2, 4, 8, 16, 1, 1, 1, 1 };
+
 void mc68328_device::internal_map(address_map &map)
 {
 	map(0xfff000, 0xfff000).rw(FUNC(mc68328_device::scr_r), FUNC(mc68328_device::scr_w));
@@ -212,7 +214,9 @@ void mc68328_device::cpu_space_map(address_map &map)
 
 mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m68000_device(mconfig, tag, owner, clock, MC68328, 16, 24, address_map_constructor(FUNC(mc68328_device::internal_map), this))
-	, m_rtc(nullptr), m_pwm(nullptr)
+	, m_rtc(nullptr)
+	, m_pwm(nullptr)
+	, m_spim(nullptr)
 	, m_out_port_a_cb(*this)
 	, m_out_port_b_cb(*this)
 	, m_out_port_c_cb(*this)
@@ -236,7 +240,11 @@ mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, d
 	, m_out_pwm_cb(*this)
 	, m_out_spim_cb(*this)
 	, m_in_spim_cb(*this)
-	, m_spim_xch_trigger_cb(*this)
+	, m_out_flm_cb(*this)
+	, m_out_llp_cb(*this)
+	, m_out_lsclk_cb(*this)
+	, m_out_ld_cb(*this)
+	, m_lcd_info_changed_cb(*this)
 {
 	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68328_device::cpu_space_map), this);
 }
@@ -276,9 +284,14 @@ void mc68328_device::device_resolve_objects()
 	m_out_pwm_cb.resolve_safe();
 
 	m_out_spim_cb.resolve_safe();
-	m_in_spim_cb.resolve();
+	m_in_spim_cb.resolve_safe(0);
 
-	m_spim_xch_trigger_cb.resolve();
+	m_out_flm_cb.resolve_safe();
+	m_out_llp_cb.resolve_safe();
+	m_out_lsclk_cb.resolve_safe();
+	m_out_ld_cb.resolve_safe();
+
+	m_lcd_info_changed_cb.resolve();
 }
 
 //-------------------------------------------------
@@ -289,10 +302,14 @@ void mc68328_device::device_start()
 {
 	m68000_device::device_start();
 
-	m_gptimer[0] = timer_alloc(FUNC(mc68328_device::timer_tick<0>), this);
-	m_gptimer[1] = timer_alloc(FUNC(mc68328_device::timer_tick<1>), this);
-	m_rtc = timer_alloc(FUNC(mc68328_device::rtc_tick), this);
-	m_pwm = timer_alloc(FUNC(mc68328_device::pwm_tick), this);
+	m_gptimer[0] = timer_alloc(FUNC(mc68328_device::timer_tick<0>),this);
+	m_gptimer[1] = timer_alloc(FUNC(mc68328_device::timer_tick<1>),this);
+	m_rtc = timer_alloc(FUNC(mc68328_device::rtc_tick),this);
+	m_pwm = timer_alloc(FUNC(mc68328_device::pwm_tick),this);
+	m_spim = timer_alloc(FUNC(mc68328_device::spim_tick),this);
+	m_lcd_scan = timer_alloc(FUNC(mc68328_device::lcd_scan_tick),this);
+
+	m_lcd_line_buffer = std::make_unique<uint16_t[]>(1024 / 8); // 1024px wide, up to 8 pixels per word
 
 	register_state_save();
 }
@@ -389,6 +406,9 @@ void mc68328_device::device_reset()
 
 	m_spimdata = 0x0000;
 	m_spimcont = 0x0000;
+	m_spmtxd = false;
+	m_spmrxd = false;
+	m_spmclk = false;
 
 	m_ustcnt = 0x0000;
 	m_ubaud = 0x003f;
@@ -422,9 +442,430 @@ void mc68328_device::device_reset()
 	m_rtcienr = 0x00;
 	m_stpwtch = 0x00;
 
+	m_gptimer[0]->adjust(attotime::never);
+	m_gptimer[1]->adjust(attotime::never);
 	m_rtc->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
+	m_pwm->adjust(attotime::never);
+	m_spim->adjust(attotime::never);
+	m_lcd_scan->adjust(attotime::never);
+	m_lcd_sysmem_ptr = 0;
+	m_lcd_line_bit = 0;
+	m_lcd_line_word = 0;
+	m_lsclk = false;
 }
 
+void mc68328_device::register_state_save()
+{
+	save_item(NAME(m_scr));
+	save_item(NAME(m_grpbasea));
+	save_item(NAME(m_grpbaseb));
+	save_item(NAME(m_grpbasec));
+	save_item(NAME(m_grpbased));
+	save_item(NAME(m_grpmaska));
+	save_item(NAME(m_grpmaskb));
+	save_item(NAME(m_grpmaskc));
+	save_item(NAME(m_grpmaskd));
+	save_item(NAME(m_csa));
+	save_item(NAME(m_csb));
+	save_item(NAME(m_csc));
+	save_item(NAME(m_csd));
+
+	save_item(NAME(m_pllcr));
+	save_item(NAME(m_pllfsr));
+	save_item(NAME(m_pctlr));
+
+	save_item(NAME(m_ivr));
+	save_item(NAME(m_icr));
+	save_item(NAME(m_imr));
+	save_item(NAME(m_iwr));
+	save_item(NAME(m_isr));
+	save_item(NAME(m_ipr));
+
+	save_item(NAME(m_padir));
+	save_item(NAME(m_padata));
+	save_item(NAME(m_pasel));
+	save_item(NAME(m_pbdir));
+	save_item(NAME(m_pbdata));
+	save_item(NAME(m_pbsel));
+	save_item(NAME(m_pcdir));
+	save_item(NAME(m_pcdata));
+	save_item(NAME(m_pcsel));
+	save_item(NAME(m_pddir));
+	save_item(NAME(m_pddata));
+	save_item(NAME(m_pdpuen));
+	save_item(NAME(m_pdpol));
+	save_item(NAME(m_pdirqen));
+	save_item(NAME(m_pddataedge));
+	save_item(NAME(m_pdirqedge));
+	save_item(NAME(m_pedir));
+	save_item(NAME(m_pedata));
+	save_item(NAME(m_pepuen));
+	save_item(NAME(m_pesel));
+	save_item(NAME(m_pfdir));
+	save_item(NAME(m_pfdata));
+	save_item(NAME(m_pfpuen));
+	save_item(NAME(m_pfsel));
+	save_item(NAME(m_pgdir));
+	save_item(NAME(m_pgdata));
+	save_item(NAME(m_pgpuen));
+	save_item(NAME(m_pgsel));
+	save_item(NAME(m_pjdir));
+	save_item(NAME(m_pjdata));
+	save_item(NAME(m_pjsel));
+	save_item(NAME(m_pkdir));
+	save_item(NAME(m_pkdata));
+	save_item(NAME(m_pkpuen));
+	save_item(NAME(m_pksel));
+	save_item(NAME(m_pmdir));
+	save_item(NAME(m_pmdata));
+	save_item(NAME(m_pmpuen));
+	save_item(NAME(m_pmsel));
+
+	save_item(NAME(m_pwmc));
+	save_item(NAME(m_pwmp));
+	save_item(NAME(m_pwmw));
+	save_item(NAME(m_pwmcnt));
+
+	save_item(NAME(m_tctl));
+	save_item(NAME(m_tprer));
+	save_item(NAME(m_tcmp));
+	save_item(NAME(m_tcr));
+	save_item(NAME(m_tcn));
+	save_item(NAME(m_tstat));
+	save_item(NAME(m_wctlr));
+	save_item(NAME(m_wcmpr));
+	save_item(NAME(m_wcn));
+
+	save_item(NAME(m_spisr));
+
+	save_item(NAME(m_spimdata));
+	save_item(NAME(m_spimcont));
+	save_item(NAME(m_spmtxd));
+	save_item(NAME(m_spmrxd));
+	save_item(NAME(m_spmclk));
+
+	save_item(NAME(m_ustcnt));
+	save_item(NAME(m_ubaud));
+	save_item(NAME(m_urx));
+	save_item(NAME(m_utx));
+	save_item(NAME(m_umisc));
+
+	save_item(NAME(m_lssa));
+	save_item(NAME(m_lvpw));
+	save_item(NAME(m_lxmax));
+	save_item(NAME(m_lymax));
+	save_item(NAME(m_lcxp));
+	save_item(NAME(m_lcyp));
+	save_item(NAME(m_lcwch));
+	save_item(NAME(m_lblkc));
+	save_item(NAME(m_lpicf));
+	save_item(NAME(m_lpolcf));
+	save_item(NAME(m_lacdrc));
+	save_item(NAME(m_lpxcd));
+	save_item(NAME(m_lckcon));
+	save_item(NAME(m_llbar));
+	save_item(NAME(m_lotcr));
+	save_item(NAME(m_lposr));
+	save_item(NAME(m_lfrcm));
+	save_item(NAME(m_lgpmr));
+
+	save_item(NAME(m_hmsr));
+	save_item(NAME(m_alarm));
+	save_item(NAME(m_rtcctl));
+	save_item(NAME(m_rtcisr));
+	save_item(NAME(m_rtcienr));
+	save_item(NAME(m_stpwtch));
+
+	save_item(NAME(m_lcd_sysmem_ptr));
+	save_pointer(NAME(m_lcd_line_buffer), 1024 / 8);
+	save_item(NAME(m_lcd_line_bit));
+	save_item(NAME(m_lcd_line_word));
+	save_item(NAME(m_lsclk));
+}
+
+
+//-------------------------------------------------
+//  System control hardware
+//-------------------------------------------------
+
+void mc68328_device::scr_w(uint8_t data) // 0x000
+{
+	LOGMASKED(LOG_SCR, "scr_w: SCR = %02x\n", data);
+}
+
+uint8_t mc68328_device::scr_r() // 0x000
+{
+	LOGMASKED(LOG_SCR, "scr_r: SCR: %02x\n", m_scr);
+	return m_scr;
+}
+
+
+//-------------------------------------------------
+//  Memory-mapping/chip-select hardware
+//-------------------------------------------------
+
+void mc68328_device::grpbasea_w(uint16_t data) // 0x100
+{
+	LOGMASKED(LOG_CS_GRP, "grpbasea_w: GRPBASEA = %04x\n", data);
+	m_grpbasea = data;
+}
+
+uint16_t mc68328_device::grpbasea_r() // 0x100
+{
+	LOGMASKED(LOG_CS_GRP, "grpbasea_r: GRPBASEA: %04x\n", m_grpbasea);
+	return m_grpbasea;
+}
+
+void mc68328_device::grpbaseb_w(uint16_t data) // 0x102
+{
+	LOGMASKED(LOG_CS_GRP, "grpbaseb_w: GRPBASEB = %04x\n", data);
+	m_grpbaseb = data;
+}
+
+uint16_t mc68328_device::grpbaseb_r() // 0x102
+{
+	LOGMASKED(LOG_CS_GRP, "grpbaseb_r: GRPBASEB: %04x\n", m_grpbaseb);
+	return m_grpbaseb;
+}
+
+void mc68328_device::grpbasec_w(uint16_t data) // 0x104
+{
+	LOGMASKED(LOG_CS_GRP, "grpbasec_w: GRPBASEC = %04x\n", data);
+	m_grpbasec = data;
+}
+
+uint16_t mc68328_device::grpbasec_r() // 0x104
+{
+	LOGMASKED(LOG_CS_GRP, "grpbasec_r: GRPBASEC: %04x\n", m_grpbasec);
+	return m_grpbasec;
+}
+
+void mc68328_device::grpbased_w(uint16_t data) // 0x106
+{
+	LOGMASKED(LOG_CS_GRP, "grpbased_w: GRPBASED = %04x\n", data);
+	m_grpbased = data;
+}
+
+uint16_t mc68328_device::grpbased_r() // 0x106
+{
+	LOGMASKED(LOG_CS_GRP, "grpbased_r: GRPBASED: %04x\n", m_grpbased);
+	return m_grpbased;
+}
+
+void mc68328_device::grpmaska_w(uint16_t data) // 0x108
+{
+	LOGMASKED(LOG_CS_GRP, "grpmaska_w: GRPMASKA = %04x\n", data);
+	m_grpmaska = data;
+}
+
+uint16_t mc68328_device::grpmaska_r() // 0x108
+{
+	LOGMASKED(LOG_CS_GRP, "grpmaska_r: GRPMASKA: %04x\n", m_grpmaska);
+	return m_grpmaska;
+}
+
+void mc68328_device::grpmaskb_w(uint16_t data) // 0x10a
+{
+	LOGMASKED(LOG_CS_GRP, "grpmaskb_w: GRPMASKB = %04x\n", data);
+	m_grpmaskb = data;
+}
+
+uint16_t mc68328_device::grpmaskb_r() // 0x10a
+{
+	LOGMASKED(LOG_CS_GRP, "grpmaskb_r: GRPMASKB: %04x\n", m_grpmaskb);
+	return m_grpmaskb;
+}
+
+void mc68328_device::grpmaskc_w(uint16_t data) // 0x10c
+{
+	LOGMASKED(LOG_CS_GRP, "grpmaskc_w: GRPMASKC = %04x\n", data);
+	m_grpmaskc = data;
+}
+
+uint16_t mc68328_device::grpmaskc_r() // 0x10c
+{
+	LOGMASKED(LOG_CS_GRP, "grpmaskc_r: GRPMASKC: %04x\n", m_grpmaskc);
+	return m_grpmaskc;
+}
+
+void mc68328_device::grpmaskd_w(uint16_t data) // 0x10e
+{
+	LOGMASKED(LOG_CS_GRP, "grpmaskd_w: GRPMASKD = %04x\n", data);
+	m_grpmaskd = data;
+}
+
+uint16_t mc68328_device::grpmaskd_r() // 0x10e
+{
+	LOGMASKED(LOG_CS_GRP, "grpmaskd_r: GRPMASKD: %04x\n", m_grpmaskd);
+	return m_grpmaskd;
+}
+
+template<int ChipSelect>
+void mc68328_device::csa_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x110, 0x114, 0x118, 0x11c
+{
+	LOGMASKED(LOG_CS_SEL, "csa_msw_w<%d>: CSA%d(16) = %04x\n", ChipSelect, ChipSelect, data);
+	m_csa[ChipSelect] &= 0xffff0000 | (~mem_mask);
+	m_csa[ChipSelect] |= data & mem_mask;
+}
+
+template<int ChipSelect>
+uint16_t mc68328_device::csa_msw_r() // 0x110, 0x120, 0x130, 0x140
+{
+	LOGMASKED(LOG_CS_SEL, "csa_msw_r: CSA%d(MSW): %04x\n", ChipSelect, (uint16_t)(m_csa[ChipSelect] >> 16));
+	return (uint16_t)(m_csa[ChipSelect] >> 16);
+}
+
+template<int ChipSelect>
+void mc68328_device::csa_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x112, 0x116, 0x11a, 0x11e
+{
+	LOGMASKED(LOG_CS_SEL, "csa_lsw_w<%d>: CSA%d(0) = %04x\n", ChipSelect, ChipSelect, data);
+	m_csa[ChipSelect] &= ~(mem_mask << 16);
+	m_csa[ChipSelect] |= (data & mem_mask) << 16;
+}
+
+template<int ChipSelect>
+uint16_t mc68328_device::csa_lsw_r() // 0x112, 0x122, 0x132, 0x142
+{
+	LOGMASKED(LOG_CS_SEL, "csa_lsw_r: CSA%d(LSW): %04x\n", ChipSelect, (uint16_t)m_csa[ChipSelect]);
+	return (uint16_t)m_csa[ChipSelect];
+}
+
+template<int ChipSelect>
+void mc68328_device::csb_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x120, 0x124, 0x128, 0x12c
+{
+	LOGMASKED(LOG_CS_SEL, "csb_msw_w<%d>: CSB%d(MSW) = %04x\n", ChipSelect, ChipSelect, data);
+	m_csb[ChipSelect] &= 0xffff0000 | (~mem_mask);
+	m_csb[ChipSelect] |= data & mem_mask;
+}
+
+template<int ChipSelect>
+uint16_t mc68328_device::csb_msw_r() // 0x114, 0x124, 0x134, 0x144
+{
+	LOGMASKED(LOG_CS_SEL, "csb_msw_r: CSB%d(MSW): %04x\n", ChipSelect, (uint16_t)(m_csb[ChipSelect] >> 16));
+	return (uint16_t)(m_csb[ChipSelect] >> 16);
+}
+
+template<int ChipSelect>
+void mc68328_device::csb_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x122, 0x126, 0x12a, 0x12e
+{
+	LOGMASKED(LOG_CS_SEL, "csb_lsw_w<%d>: CSB%d(LSW) = %04x\n", ChipSelect, ChipSelect, data);
+	m_csb[ChipSelect] &= ~(mem_mask << 16);
+	m_csb[ChipSelect] |= (data & mem_mask) << 16;
+}
+
+template<int ChipSelect>
+uint16_t mc68328_device::csb_lsw_r() // 0x116, 0x126, 0x136, 0x146
+{
+	LOGMASKED(LOG_CS_SEL, "csb_lsw_r: CSB%d(LSW): %04x\n", ChipSelect, (uint16_t)m_csb[ChipSelect]);
+	return (uint16_t)m_csb[ChipSelect];
+}
+
+template<int ChipSelect>
+void mc68328_device::csc_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x130, 0x134, 0x138, 0x13c
+{
+	LOGMASKED(LOG_CS_SEL, "csc_msw_w<%d>: CSC%d(MSW) = %04x\n", ChipSelect, ChipSelect, data);
+	m_csc[ChipSelect] &= 0xffff0000 | (~mem_mask);
+	m_csc[ChipSelect] |= data & mem_mask;
+}
+
+template<int ChipSelect>
+uint16_t mc68328_device::csc_msw_r() // 0x118, 0x128, 0x138, 0x148
+{
+	LOGMASKED(LOG_CS_SEL, "csc_msw_r: CSC%d(MSW): %04x\n", ChipSelect, (uint16_t)(m_csc[ChipSelect] >> 16));
+	return (uint16_t)(m_csc[ChipSelect] >> 16);
+}
+
+template<int ChipSelect>
+void mc68328_device::csc_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x132, 0x136, 0x13a, 0x13e
+{
+	LOGMASKED(LOG_CS_SEL, "csc_lsw_w<%d>: CSC%d(LSW) = %04x\n", ChipSelect, ChipSelect, data);
+	m_csc[ChipSelect] &= ~(mem_mask << 16);
+	m_csc[ChipSelect] |= (data & mem_mask) << 16;
+}
+
+template<int ChipSelect>
+uint16_t mc68328_device::csc_lsw_r() // 0x11a, 0x12a, 0x13a, 0x14a
+{
+	LOGMASKED(LOG_CS_SEL, "csc_lsw_r: CSC%d(LSW): %04x\n", ChipSelect, (uint16_t)m_csc[ChipSelect]);
+	return (uint16_t)m_csc[ChipSelect];
+}
+
+template<int ChipSelect>
+void mc68328_device::csd_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x140, 0x144, 0x148, 0x14c
+{
+	LOGMASKED(LOG_CS_SEL, "csd_msw_w<%d>: CSD%d(MSW) = %04x\n", ChipSelect, ChipSelect, data);
+	m_csd[ChipSelect] &= 0xffff0000 | (~mem_mask);
+	m_csd[ChipSelect] |= data & mem_mask;
+}
+
+template<int ChipSelect>
+uint16_t mc68328_device::csd_msw_r() // 0x11c, 0x12c, 0x13c, 0x14c
+{
+	LOGMASKED(LOG_CS_SEL, "csd_msw_r: CSD%d(MSW): %04x\n", ChipSelect, (uint16_t)(m_csd[ChipSelect] >> 16));
+	return (uint16_t)(m_csd[ChipSelect] >> 16);
+}
+
+template<int ChipSelect>
+void mc68328_device::csd_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x142, 0x146, 0x14a, 0x14e
+{
+	LOGMASKED(LOG_CS_SEL, "csd_lsw_w<%d>: CSD%d(LSW) = %04x\n", ChipSelect, ChipSelect, data);
+	m_csd[ChipSelect] &= ~(mem_mask << 16);
+	m_csd[ChipSelect] |= (data & mem_mask) << 16;
+}
+
+template<int ChipSelect>
+uint16_t mc68328_device::csd_lsw_r() // 0x11e, 0x12e, 0x13e, 0x14e
+{
+	LOGMASKED(LOG_CS_SEL, "csd_lsw_r: CSD%d(LSW): %04x\n", ChipSelect, (uint16_t)m_csd[ChipSelect]);
+	return (uint16_t)m_csd[ChipSelect];
+}
+
+
+//-------------------------------------------------
+//  PLL/power hardware
+//-------------------------------------------------
+
+void mc68328_device::pllcr_w(uint16_t data) // 0x200
+{
+	LOGMASKED(LOG_PLL, "pllcr_w: PLLCR = %04x\n", data);
+	m_pllcr = data;
+}
+
+uint16_t mc68328_device::pllcr_r() // 0x200
+{
+	LOGMASKED(LOG_PLL, "pllcr_r: PLLCR: %04x\n", m_pllcr);
+	return m_pllcr;
+}
+
+void mc68328_device::pllfsr_w(uint16_t data) // 0x202
+{
+	LOGMASKED(LOG_PLL, "pllfsr_w: PLLFSR = %04x\n", data);
+	m_pllfsr = data;
+}
+
+uint16_t mc68328_device::pllfsr_r() // 0x202
+{
+	LOGMASKED(LOG_PLL, "pllfsr_r: PLLFSR: %04x\n", m_pllfsr);
+	m_pllfsr ^= 0x8000;
+	return m_pllfsr;
+}
+
+void mc68328_device::pctlr_w(uint8_t data) // 0x207
+{
+	LOGMASKED(LOG_PLL, "pctlr_w: PCTLR = %02x\n", data);
+	m_pctlr = data;
+}
+
+uint8_t mc68328_device::pctlr_r() // 0x207
+{
+	LOGMASKED(LOG_PLL, "pctlr_r: PCTLR: %02x\n", m_pctlr);
+	return m_pctlr;
+}
+
+
+//-------------------------------------------------
+//  Interrupt-related hardware
+//-------------------------------------------------
 
 void mc68328_device::set_interrupt_line(uint32_t line, uint32_t active)
 {
@@ -501,22 +942,6 @@ void mc68328_device::set_interrupt_line(uint32_t line, uint32_t active)
 	}
 }
 
-void mc68328_device::poll_port_d_interrupts()
-{
-	uint8_t line_transitions = m_pddataedge & m_pdirqedge;
-	uint8_t line_holds = m_pddata &~ m_pdirqedge;
-	uint8_t line_interrupts = (line_transitions | line_holds) & m_pdirqen;
-
-	if (line_interrupts)
-	{
-		set_interrupt_line(line_interrupts << 8, 1);
-	}
-	else
-	{
-		set_interrupt_line(INT_KBDINTS, 0);
-	}
-}
-
 WRITE_LINE_MEMBER( mc68328_device::set_penirq_line )
 {
 	if (state)
@@ -529,6 +954,316 @@ WRITE_LINE_MEMBER( mc68328_device::set_penirq_line )
 		set_interrupt_line(INT_PEN, 0);
 	}
 }
+
+uint8_t mc68328_device::irq_callback(offs_t offset)
+{
+	return m_ivr | offset;
+}
+
+void mc68328_device::ivr_w(uint8_t data) // 0x300
+{
+	LOGMASKED(LOG_INTS, "ivr_w: IVR = %02x\n", data);
+	m_ivr = data;
+}
+
+uint8_t mc68328_device::ivr_r() // 0x300
+{
+	LOGMASKED(LOG_INTS, "ivr_r: IVR: %02x\n", m_ivr);
+	return m_ivr;
+}
+
+void mc68328_device::icr_w(uint8_t data) // 0x302
+{
+	LOGMASKED(LOG_INTS, "icr_w: ICR = %02x\n", data);
+	m_icr = data;
+}
+
+uint16_t mc68328_device::icr_r() // 0x302
+{
+	LOGMASKED(LOG_INTS, "icr_r: ICR: %04x\n", m_icr);
+	return m_icr;
+}
+
+void mc68328_device::imr_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x304
+{
+	const uint32_t imr_old = m_imr;
+	LOGMASKED(LOG_INTS, "imr_msw_w: IMR(MSW) = %04x\n", data);
+	m_imr &= ~(mem_mask << 16);
+	m_imr |= (data & mem_mask) << 16;
+	m_isr &= ~((data & mem_mask) << 16);
+
+	const uint32_t imr_diff = imr_old ^ m_imr;
+	set_interrupt_line(imr_diff, 0);
+}
+
+uint16_t mc68328_device::imr_msw_r() // 0x304
+{
+	LOGMASKED(LOG_INTS, "imr_msw_r: IMR(MSW): %04x\n", (uint16_t)(m_imr >> 16));
+	return (uint16_t)(m_imr >> 16);
+}
+
+void mc68328_device::imr_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x306
+{
+	const uint32_t imr_old = m_imr;
+	LOGMASKED(LOG_INTS, "imr_lsw_w: IMR(LSW) = %04x\n", data);
+	m_imr &= 0xffff0000 | (~mem_mask);
+	m_imr |= data & mem_mask;
+	m_isr &= ~(data & mem_mask);
+
+	const uint32_t imr_diff = imr_old ^ m_imr;
+	set_interrupt_line(imr_diff, 0);
+}
+
+uint16_t mc68328_device::imr_lsw_r() // 0x306
+{
+	LOGMASKED(LOG_INTS, "imr_lsw_r: IMR(LSW): %04x\n", (uint16_t)m_imr);
+	return (uint16_t)m_imr;
+}
+
+void mc68328_device::iwr_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x308
+{
+	LOGMASKED(LOG_INTS, "iwr_msw_w: IWR(MSW) = %04x\n", data);
+	m_iwr &= ~(mem_mask << 16);
+	m_iwr |= (data & mem_mask) << 16;
+}
+
+uint16_t mc68328_device::iwr_msw_r() // 0x308
+{
+	LOGMASKED(LOG_INTS, "iwr_msw_r: IWR(MSW): %04x\n", (uint16_t)(m_iwr >> 16));
+	return (uint16_t)(m_iwr >> 16);
+}
+
+void mc68328_device::iwr_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x30a
+{
+	LOGMASKED(LOG_INTS, "iwr_lsw_w: IWR(LSW) = %04x\n", data);
+	m_iwr &= 0xffff0000 | (~mem_mask);
+	m_iwr |= data & mem_mask;
+}
+
+uint16_t mc68328_device::iwr_lsw_r() // 0x30a
+{
+	LOGMASKED(LOG_INTS, "iwr_lsw_r: IWR(LSW): %04x\n", (uint16_t)m_iwr);
+	return (uint16_t)m_iwr;
+}
+
+void mc68328_device::isr_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x30c
+{
+	LOGMASKED(LOG_INTS, "isr_msw_w: ISR(MSW) = %04x\n", data);
+	// Clear edge-triggered IRQ1
+	if ((m_icr & ICR_ET1) == ICR_ET1 && (data & INT_IRQ1_SHIFT) == INT_IRQ1_SHIFT)
+	{
+		m_isr &= ~INT_IRQ1;
+	}
+
+	// Clear edge-triggered IRQ2
+	if ((m_icr & ICR_ET2) == ICR_ET2 && (data & INT_IRQ2_SHIFT) == INT_IRQ2_SHIFT)
+	{
+		m_isr &= ~INT_IRQ2;
+	}
+
+	// Clear edge-triggered IRQ3
+	if ((m_icr & ICR_ET3) == ICR_ET3 && (data & INT_IRQ3_SHIFT) == INT_IRQ3_SHIFT)
+	{
+		m_isr &= ~INT_IRQ3;
+	}
+
+	// Clear edge-triggered IRQ6
+	if ((m_icr & ICR_ET6) == ICR_ET6 && (data & INT_IRQ6_SHIFT) == INT_IRQ6_SHIFT)
+	{
+		m_isr &= ~INT_IRQ6;
+	}
+
+	// Clear edge-triggered IRQ7
+	if ((data & INT_IRQ7_SHIFT) == INT_IRQ7_SHIFT)
+	{
+		m_isr &= ~INT_IRQ7;
+	}
+}
+
+uint16_t mc68328_device::isr_msw_r() // 0x30c
+{
+	LOGMASKED(LOG_INTS, "isr_msw_r: ISR(MSW): %04x\n", (uint16_t)(m_isr >> 16));
+	return (uint16_t)(m_isr >> 16);
+}
+
+void mc68328_device::isr_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x30e
+{
+	LOGMASKED(LOG_INTS, "isr_lsw_w: ISR(LSW) = %04x (Ignored)\n", data);
+}
+
+uint16_t mc68328_device::isr_lsw_r() // 0x30e
+{
+	LOGMASKED(LOG_INTS, "isr_lsw_r: ISR(LSW): %04x\n", (uint16_t)m_isr);
+	return (uint16_t)m_isr;
+}
+
+void mc68328_device::ipr_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x310
+{
+	LOGMASKED(LOG_INTS, "ipr_msw_w: IPR(MSW) = %04x (Ignored)\n", data);
+}
+
+uint16_t mc68328_device::ipr_msw_r() // 0x310
+{
+	LOGMASKED(LOG_INTS, "ipr_msw_r: IPR(MSW): %04x\n", (uint16_t)(m_ipr >> 16));
+	return (uint16_t)(m_ipr >> 16);
+}
+
+void mc68328_device::ipr_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x312
+{
+	LOGMASKED(LOG_INTS, "ipr_lsw_w: IPR(LSW) = %04x (Ignored)\n", data);
+}
+
+uint16_t mc68328_device::ipr_lsw_r() // 0x312
+{
+	LOGMASKED(LOG_INTS, "ipr_lsw_r: IPR(LSW): %04x\n", (uint16_t)m_ipr);
+	return (uint16_t)m_ipr;
+}
+
+
+//-------------------------------------------------
+//  GPIO hardware - Port A
+//-------------------------------------------------
+
+void mc68328_device::padir_w(uint8_t data) // 0x400
+{
+	LOGMASKED(LOG_GPIO_A, "padir_w: PADIR = %02x\n", data);
+	m_padir = data;
+}
+
+uint8_t mc68328_device::padir_r() // 0x400
+{
+	LOGMASKED(LOG_GPIO_A, "mc68328_r: PADIR: %02x\n", m_padir);
+	return m_padir;
+}
+
+void mc68328_device::padata_w(uint8_t data) // 0x401
+{
+	LOGMASKED(LOG_GPIO_A, "padata_w: PADATA = %02x\n", data);
+	m_padata = data;
+	m_out_port_a_cb(m_padata);
+}
+
+uint8_t mc68328_device::padata_r() // 0x401
+{
+	LOGMASKED(LOG_GPIO_A, "padata_r: PADATA: %02x\n", m_padata);
+	if (!m_in_port_a_cb.isnull())
+	{
+		return m_in_port_a_cb(0);
+	}
+	else
+	{
+		return m_padata;
+	}
+}
+
+void mc68328_device::pasel_w(uint8_t data) // 0x403
+{
+	LOGMASKED(LOG_GPIO_A, "pasel_w: PASEL = %02x\n", data);
+	m_pasel = data;
+}
+
+uint8_t mc68328_device::pasel_r() // 0x403
+{
+	LOGMASKED(LOG_GPIO_A, "mc68328_r: PASEL: %02x\n", m_pasel);
+	return m_pasel;
+}
+
+
+//-------------------------------------------------
+//  GPIO hardware - Port B
+//-------------------------------------------------
+
+void mc68328_device::pbdir_w(uint8_t data) // 0x408
+{
+	LOGMASKED(LOG_GPIO_B, "pbdir_w: PBDIR = %02x\n", data);
+	m_pbdir = data;
+}
+
+uint8_t mc68328_device::pbdir_r() // 0x408
+{
+	LOGMASKED(LOG_GPIO_B, "pbdir_r: PBDIR: %02x\n", m_pbdir);
+	return m_pbdir;
+}
+
+void mc68328_device::pbdata_w(uint8_t data) // 0x409
+{
+	LOGMASKED(LOG_GPIO_B, "pbdata_w: PBDATA = %02x\n", data);
+	m_pbdata = data;
+	m_out_port_b_cb(m_pbdata);
+}
+
+uint8_t mc68328_device::pbdata_r() // 0x409
+{
+	LOGMASKED(LOG_GPIO_B, "pbdata_r: PBDATA: %02x\n", m_pbdata);
+	if (!m_in_port_b_cb.isnull())
+	{
+		return m_in_port_b_cb(0);
+	}
+	return m_pbdata;
+}
+
+void mc68328_device::pbsel_w(uint8_t data) // 0x40b
+{
+	LOGMASKED(LOG_GPIO_B, "pbsel_w: PBSEL = %02x\n", data);
+	m_pbsel = data;
+}
+
+uint8_t mc68328_device::pbsel_r() // 0x40b
+{
+	LOGMASKED(LOG_GPIO_B, "pbsel_r: PBSEL: %02x\n", m_pbsel);
+	return m_pbsel;
+}
+
+
+//-------------------------------------------------
+//  GPIO hardware - Port C
+//-------------------------------------------------
+
+void mc68328_device::pcdir_w(uint8_t data) // 0x410
+{
+	LOGMASKED(LOG_GPIO_C, "pcdir_w: PCDIR = %02x\n", data);
+	m_pcdir = data;
+}
+
+uint8_t mc68328_device::pcdir_r() // 0x410
+{
+	LOGMASKED(LOG_GPIO_C, "pcdir_r: PCDIR: %02x\n", m_pcdir);
+	return m_pcdir;
+}
+
+void mc68328_device::pcdata_w(uint8_t data) // 0x411
+{
+	LOGMASKED(LOG_GPIO_C, "pcdata_w: PCDATA = %02x\n", data);
+	m_pcdata = data;
+	m_out_port_c_cb(m_pcdata);
+}
+
+uint8_t mc68328_device::pcdata_r() // 0x411
+{
+	LOGMASKED(LOG_GPIO_C, "pcdata_r: PCDATA: %02x\n", m_pcdata);
+	if (!m_in_port_c_cb.isnull())
+	{
+		return m_in_port_c_cb(0);
+	}
+	return m_pcdata;
+}
+
+void mc68328_device::pcsel_w(uint8_t data) // 0x413
+{
+	LOGMASKED(LOG_GPIO_C, "pcsel_w: PCSEL = %02x\n", data);
+	m_pcsel = data;
+}
+
+uint8_t mc68328_device::pcsel_r() // 0x413
+{
+	LOGMASKED(LOG_GPIO_C, "pcsel_r: PCSEL: %02x\n", m_pcsel);
+	return m_pcsel;
+}
+
+
+//-------------------------------------------------
+//  GPIO hardware - Port D
+//-------------------------------------------------
 
 void mc68328_device::set_port_d_lines(uint8_t state, int bit)
 {
@@ -548,10 +1283,568 @@ void mc68328_device::set_port_d_lines(uint8_t state, int bit)
 	poll_port_d_interrupts();
 }
 
-uint8_t mc68328_device::irq_callback(offs_t offset)
+void mc68328_device::poll_port_d_interrupts()
 {
-	return m_ivr | offset;
+	uint8_t line_transitions = m_pddataedge & m_pdirqedge;
+	uint8_t line_holds = m_pddata &~ m_pdirqedge;
+	uint8_t line_interrupts = (line_transitions | line_holds) & m_pdirqen;
+
+	if (line_interrupts)
+	{
+		set_interrupt_line(line_interrupts << 8, 1);
+	}
+	else
+	{
+		set_interrupt_line(INT_KBDINTS, 0);
+	}
 }
+
+void mc68328_device::pddir_w(uint8_t data) // 0x418
+{
+	LOGMASKED(LOG_GPIO_D, "pddir_w: PDDIR = %02x\n", data);
+	m_pddir = data;
+}
+
+uint8_t mc68328_device::pddir_r() // 0x418
+{
+	LOGMASKED(LOG_GPIO_D, "pddir_r: PDDIR: %02x\n", m_pddir);
+	return m_pddir;
+}
+
+void mc68328_device::pddata_w(uint8_t data) // 0x419
+{
+	LOGMASKED(LOG_GPIO_D, "pddata_w: PDDATA = %02x\n", data);
+	m_pddata = data;
+	m_out_port_d_cb(m_pddata);
+}
+
+uint8_t mc68328_device::pddata_r() // 0x419
+{
+	LOGMASKED(LOG_GPIO_D, "pddata_r: PDDATA: %02x\n", m_pddata);
+	if (!m_in_port_d_cb.isnull())
+	{
+		return m_in_port_d_cb(0);
+	}
+	return m_pddata;
+}
+
+void mc68328_device::pdpuen_w(uint8_t data) // 0x41a
+{
+	LOGMASKED(LOG_GPIO_D, "pdpuen_w: PDPUEN = %02x\n", data);
+	m_pdpuen = data;
+}
+
+uint8_t mc68328_device::pdpuen_r() // 0x41a
+{
+	LOGMASKED(LOG_GPIO_D, "pdpuen_r: PDPUEN: %02x\n", m_pdpuen);
+	return m_pdpuen;
+}
+
+void mc68328_device::pdpol_w(uint8_t data) // 0x41c
+{
+	LOGMASKED(LOG_GPIO_D, "pdpol_w: PDPOL = %02x\n", data);
+	m_pdpol = data;
+}
+
+uint8_t mc68328_device::pdpol_r() // 0x41c
+{
+	LOGMASKED(LOG_GPIO_D, "pdpol_r: PDPOL: %02x\n", m_pdpol);
+	return m_pdpol;
+}
+
+void mc68328_device::pdirqen_w(uint8_t data) // 0x41d
+{
+	LOGMASKED(LOG_GPIO_D, "pdirqen_w: PDIRQEN = %02x\n", data);
+	m_pdirqen = data & 0x00ff;
+	poll_port_d_interrupts();
+}
+
+uint8_t mc68328_device::pdirqen_r() // 0x41d
+{
+	LOGMASKED(LOG_GPIO_D, "pdirqen_r: PDIRQEN: %02x\n", m_pdirqen);
+	return m_pdirqen;
+}
+
+void mc68328_device::pdirqedge_w(uint8_t data) // 0x41f
+{
+	LOGMASKED(LOG_GPIO_D, "pdirqedge_w: PDIRQEDGE = %02x\n", data);
+	m_pdirqedge = data;
+}
+
+uint8_t mc68328_device::pdirqedge_r() // 0x41f
+{
+	LOGMASKED(LOG_GPIO_D, "pdirqedge_r: PDIRQEDGE: %02x\n", m_pdirqedge);
+	return m_pdirqedge;
+}
+
+
+//-------------------------------------------------
+//  GPIO hardware - Port E
+//-------------------------------------------------
+
+void mc68328_device::pedir_w(uint8_t data) // 0x420
+{
+	LOGMASKED(LOG_GPIO_E, "pedir_w: PEDIR = %02x\n", data);
+	m_pedir = data;
+}
+
+uint8_t mc68328_device::pedir_r() // 0x420
+{
+	LOGMASKED(LOG_GPIO_E, "pedir_r: PEDIR: %02x\n", m_pedir);
+	return m_pedir;
+}
+
+void mc68328_device::pedata_w(uint8_t data) // 0x421
+{
+	LOGMASKED(LOG_GPIO_E, "pedata_w: PEDATA = %02x\n", data);
+	m_pedata = data;
+	m_out_port_e_cb(m_pedata);
+}
+
+uint8_t mc68328_device::pedata_r() // 0x421
+{
+	LOGMASKED(LOG_GPIO_E, "pedata_r: PEDATA: %02x\n", m_pedata);
+	if (!m_in_port_e_cb.isnull())
+	{
+		return m_in_port_e_cb(0);
+	}
+	return m_pedata;
+}
+
+void mc68328_device::pepuen_w(uint8_t data) // 0x422
+{
+	LOGMASKED(LOG_GPIO_E, "pepuen_w: PEPUEN = %02x\n", data);
+	m_pepuen = data;
+}
+
+uint8_t mc68328_device::pepuen_r() // 0x422
+{
+	LOGMASKED(LOG_GPIO_E, "pepuen_r: PEPUEN: %02x\n", m_pepuen);
+	return m_pepuen;
+}
+
+void mc68328_device::pesel_w(uint8_t data) // 0x423
+{
+	LOGMASKED(LOG_GPIO_E, "pesel_w: PESEL = %02x\n", data);
+	m_pesel = data;
+}
+
+uint8_t mc68328_device::pesel_r() // 0x423
+{
+	LOGMASKED(LOG_GPIO_E, "pesel_r: PESEL: %02x\n", m_pesel);
+	return m_pesel;
+}
+
+
+//-------------------------------------------------
+//  GPIO hardware - Port F
+//-------------------------------------------------
+
+void mc68328_device::pfdir_w(uint8_t data) // 0x428
+{
+	LOGMASKED(LOG_GPIO_F, "pfdir_w: PFDIR = %02x\n", data);
+	m_pfdir = data;
+}
+
+uint8_t mc68328_device::pfdir_r() // 0x428
+{
+	LOGMASKED(LOG_GPIO_F, "pfdir_r: PFDIR: %02x\n", m_pfdir);
+	return m_pfdir;
+}
+
+void mc68328_device::pfdata_w(uint8_t data) // 0x429
+{
+	LOGMASKED(LOG_GPIO_F, "pfdata_w: PFDATA = %02x\n", data);
+	m_pfdata = data;
+	m_out_port_f_cb(m_pfdata);
+}
+
+uint8_t mc68328_device::pfdata_r() // 0x429
+{
+	LOGMASKED(LOG_GPIO_F, "pfdata_r: PFDATA: %02x\n", m_pfdata);
+	if (!m_in_port_f_cb.isnull())
+	{
+		return m_in_port_f_cb(0);
+	}
+	return m_pfdata;
+}
+
+void mc68328_device::pfpuen_w(uint8_t data) // 0x42a
+{
+	LOGMASKED(LOG_GPIO_F, "pfpuen_w: PFPUEN = %02x\n", data);
+	m_pfpuen = data;
+}
+
+uint8_t mc68328_device::pfpuen_r() // 0x42a
+{
+	LOGMASKED(LOG_GPIO_F, "pfpuen_r: PFPUEN: %02x\n", m_pfpuen);
+	return m_pfpuen;
+}
+
+void mc68328_device::pfsel_w(uint8_t data) // 0x42b
+{
+	LOGMASKED(LOG_GPIO_F, "pfsel_w: PFSEL = %02x\n", data);
+	m_pfsel = data;
+}
+
+uint8_t mc68328_device::pfsel_r() // 0x42b
+{
+	LOGMASKED(LOG_GPIO_F, "pfsel_r: PFSEL: %02x\n", m_pfsel);
+	return m_pfsel;
+}
+
+
+//-------------------------------------------------
+//  GPIO hardware - Port G
+//-------------------------------------------------
+
+void mc68328_device::pgdir_w(uint8_t data) // 0x430
+{
+	LOGMASKED(LOG_GPIO_G, "pgdir_w: PGDIR = %02x\n", data);
+	m_pgdir = data;
+}
+
+uint8_t mc68328_device::pgdir_r() // 0x430
+{
+	LOGMASKED(LOG_GPIO_G, "pgdir_r: PGDIR: %02x\n", m_pgdir);
+	return m_pgdir;
+}
+
+void mc68328_device::pgdata_w(uint8_t data) // 0x431
+{
+	LOGMASKED(LOG_GPIO_G, "pgdata_w: PGDATA = %02x\n", data);
+	m_pgdata = data;
+	m_out_port_g_cb(m_pgdata);
+}
+
+uint8_t mc68328_device::pgdata_r() // 0x431
+{
+	LOGMASKED(LOG_GPIO_G, "pgdata_r: PGDATA: %02x\n", m_pgdata);
+	if (!m_in_port_g_cb.isnull())
+	{
+		return m_in_port_g_cb(0);
+	}
+	return m_pgdata;
+}
+
+void mc68328_device::pgpuen_w(uint8_t data) // 0x432
+{
+	LOGMASKED(LOG_GPIO_G, "pgpuen_w: PGPUEN = %02x\n", data);
+	m_pgpuen = data;
+}
+
+uint8_t mc68328_device::pgpuen_r() // 0x432
+{
+	LOGMASKED(LOG_GPIO_G, "pgpuen_r: PGPUEN: %02x\n", m_pgpuen);
+	return m_pgpuen;
+}
+
+void mc68328_device::pgsel_w(uint8_t data) // 0x433
+{
+	LOGMASKED(LOG_GPIO_G, "pgsel_w: PGSEL = %02x\n", data);
+	m_pgsel = data;
+}
+
+uint8_t mc68328_device::pgsel_r() // 0x433
+{
+	LOGMASKED(LOG_GPIO_G, "pgsel_r: PGSEL: %02x\n", m_pgsel);
+	return m_pgsel;
+}
+
+
+//-------------------------------------------------
+//  GPIO hardware - Port J
+//-------------------------------------------------
+
+void mc68328_device::pjdir_w(uint8_t data) // 0x438
+{
+	LOGMASKED(LOG_GPIO_J, "pjdir_w: PJDIR = %02x\n", data);
+	m_pjdir = data;
+}
+
+uint8_t mc68328_device::pjdir_r() // 0x438
+{
+	LOGMASKED(LOG_GPIO_J, "pjdir_r: PJDIR: %02x\n", m_pjdir);
+	return m_pjdir;
+}
+
+void mc68328_device::pjdata_w(uint8_t data) // 0x439
+{
+	LOGMASKED(LOG_GPIO_J, "pjdata_w: PJDATA = %02x\n", data);
+	m_pjdata = data;
+	m_out_port_j_cb(m_pjdata);
+}
+
+uint8_t mc68328_device::pjdata_r() // 0x439
+{
+	LOGMASKED(LOG_GPIO_J, "pjdata_r: PJDATA: %02x\n", m_pjdata);
+	if (!m_in_port_j_cb.isnull())
+	{
+		return m_in_port_j_cb(0);
+	}
+	return m_pjdata;
+}
+
+void mc68328_device::pjsel_w(uint8_t data) // 0x43b
+{
+	LOGMASKED(LOG_GPIO_J, "pjsel_w: PJSEL = %02x\n", data);
+	m_pjsel = data;
+}
+
+uint8_t mc68328_device::pjsel_r() // 0x43b
+{
+	LOGMASKED(LOG_GPIO_J, "pjsel_r: PJSEL: %02x\n", m_pjsel);
+	return m_pjsel;
+}
+
+
+//-------------------------------------------------
+//  GPIO hardware - Port K
+//-------------------------------------------------
+
+void mc68328_device::pkdir_w(uint8_t data) // 0x440
+{
+	LOGMASKED(LOG_GPIO_K, "pkdir_w: PKDIR = %02x\n", data);
+	m_pkdir = data;
+}
+
+uint8_t mc68328_device::pkdir_r() // 0x440
+{
+	LOGMASKED(LOG_GPIO_K, "pkdir_r: PKDIR: %02x\n", m_pkdir);
+	return m_pkdir;
+}
+
+void mc68328_device::pkdata_w(uint8_t data) // 0x441
+{
+	LOGMASKED(LOG_GPIO_K, "pkdata_w: PKDATA = %02x\n", data);
+	m_pkdata = data;
+	m_out_port_k_cb(m_pkdata);
+}
+
+uint8_t mc68328_device::pkdata_r() // 0x441
+{
+	LOGMASKED(LOG_GPIO_K, "pkdata_r: PKDATA: %02x\n", m_pkdata);
+	if (!m_in_port_k_cb.isnull())
+	{
+		return m_in_port_k_cb(0);
+	}
+	return m_pkdata;
+}
+
+void mc68328_device::pkpuen_w(uint8_t data) // 0x442
+{
+	LOGMASKED(LOG_GPIO_K, "pkpuen_w: PKPUEN = %02x\n", data);
+	m_pkpuen = data;
+}
+
+uint8_t mc68328_device::pkpuen_r() // 0x442
+{
+	LOGMASKED(LOG_GPIO_K, "pkpuen_r: PKPUEN: %02x\n", m_pkpuen);
+	return m_pkpuen;
+}
+
+void mc68328_device::pksel_w(uint8_t data) // 0x443
+{
+	LOGMASKED(LOG_GPIO_K, "pksel_w: PKSEL = %02x\n", data);
+	m_pksel = data;
+}
+
+uint8_t mc68328_device::pksel_r() // 0x443
+{
+	LOGMASKED(LOG_GPIO_K, "pksel_r: PKSEL: %02x\n", m_pksel);
+	return m_pksel;
+}
+
+
+//-------------------------------------------------
+//  GPIO hardware - Port M
+//-------------------------------------------------
+
+void mc68328_device::pmdir_w(uint8_t data) // 0x448
+{
+	LOGMASKED(LOG_GPIO_M, "pmdir_w: PMDIR = %02x\n", data);
+	m_pmdir = data;
+}
+
+uint8_t mc68328_device::pmdir_r() // 0x448
+{
+	LOGMASKED(LOG_GPIO_M, "pmdir_r: PMDIR: %02x\n", m_pmdir);
+	return m_pmdir;
+}
+
+void mc68328_device::pmdata_w(uint8_t data) // 0x449
+{
+	LOGMASKED(LOG_GPIO_M, "pmdata_w: PMDATA = %02x\n", data);
+	m_pmdata = data;
+	m_out_port_m_cb(m_pmdata);
+}
+
+uint8_t mc68328_device::pmdata_r() // 0x449
+{
+	LOGMASKED(LOG_GPIO_M, "pmdata_r: PMDATA: %02x\n", m_pmdata);
+	if (!m_in_port_m_cb.isnull())
+	{
+		return m_in_port_m_cb(0);
+	}
+	return m_pmdata;
+}
+
+void mc68328_device::pmpuen_w(uint8_t data) // 0x44a
+{
+	LOGMASKED(LOG_GPIO_M, "pmpuen_w: PMPUEN = %02x\n", data);
+	m_pmpuen = data;
+}
+
+uint8_t mc68328_device::pmpuen_r() // 0x44a
+{
+	LOGMASKED(LOG_GPIO_M, "pmpuen_r: PMPUEN: %02x\n", m_pmpuen);
+	return m_pmpuen;
+}
+
+void mc68328_device::pmsel_w(uint8_t data) // 0x44b
+{
+	LOGMASKED(LOG_GPIO_M, "pmsel_w: PMSEL = %02x\n", data);
+	m_pmsel = data;
+}
+
+uint8_t mc68328_device::pmsel_r() // 0x44b
+{
+	LOGMASKED(LOG_GPIO_M, "pmsel_r: PMSEL: %02x\n", m_pmsel);
+	return m_pmsel;
+}
+
+
+//-------------------------------------------------
+//  PWM hardware
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER( mc68328_device::pwm_tick )
+{
+	if (m_pwmw >= m_pwmp || m_pwmw == 0 || m_pwmp == 0)
+	{
+		m_pwm->adjust(attotime::never);
+		return;
+	}
+
+	if (((m_pwmc & PWMC_POL) == 0 && (m_pwmc & PWMC_PIN) != 0) ||
+		((m_pwmc & PWMC_POL) != 0 && (m_pwmc & PWMC_PIN) == 0))
+	{
+		uint32_t frequency = 32768 * 506;
+		uint32_t divisor = 4 << (m_pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+		attotime period;
+
+		frequency /= divisor;
+		period = attotime::from_hz(frequency) * (m_pwmp - m_pwmw);
+
+		m_pwm->adjust(period);
+
+		if (m_pwmc & PWMC_IRQEN)
+		{
+			set_interrupt_line(INT_PWM, 1);
+		}
+	}
+	else
+	{
+		uint32_t frequency = 32768 * 506;
+		uint32_t divisor = 4 << (m_pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+		attotime period;
+
+		frequency /= divisor;
+		period = attotime::from_hz(frequency) * m_pwmw;
+
+		m_pwm->adjust(period);
+	}
+
+	m_pwmc ^= PWMC_PIN;
+
+	m_out_pwm_cb((m_pwmc & PWMC_PIN) ? 1 : 0);
+}
+
+void mc68328_device::pwmc_w(uint16_t data) // 0x500
+{
+	LOGMASKED(LOG_PWM, "pwmc_w: PWMC = %04x\n", data);
+
+	m_pwmc = data;
+
+	if (m_pwmc & PWMC_PWMIRQ)
+	{
+		set_interrupt_line(INT_PWM, 1);
+	}
+
+	m_pwmc &= ~PWMC_LOAD;
+
+	if ((m_pwmc & PWMC_PWMEN) != 0 && m_pwmw != 0 && m_pwmp != 0)
+	{
+		uint32_t frequency = 32768 * 506;
+		uint32_t divisor = 4 << (m_pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+		attotime period;
+		frequency /= divisor;
+		period = attotime::from_hz(frequency) * m_pwmw;
+		m_pwm->adjust(period);
+		if (m_pwmc & PWMC_IRQEN)
+		{
+			set_interrupt_line(INT_PWM, 1);
+		}
+		m_pwmc ^= PWMC_PIN;
+	}
+	else
+	{
+		m_pwm->adjust(attotime::never);
+	}
+}
+
+uint16_t mc68328_device::pwmc_r() // 0x500
+{
+	const uint16_t data = m_pwmc;
+	LOGMASKED(LOG_PWM, "pwmc_r: PWMC: %04x\n", data);
+	if (m_pwmc & PWMC_PWMIRQ)
+	{
+		m_pwmc &= ~PWMC_PWMIRQ;
+		set_interrupt_line(INT_PWM, 0);
+	}
+	return data;
+}
+
+void mc68328_device::pwmp_w(uint16_t data) // 0x502
+{
+	LOGMASKED(LOG_PWM, "pwmp_w: PWMP = %04x\n", data);
+	m_pwmp = data;
+}
+
+uint16_t mc68328_device::pwmp_r() // 0x502
+{
+	LOGMASKED(LOG_PWM, "pwmp_r: PWMP: %04x\n", m_pwmp);
+	return m_pwmp;
+}
+
+void mc68328_device::pwmw_w(uint16_t data) // 0x504
+{
+	LOGMASKED(LOG_PWM, "pwmw_w: PWMW = %04x\n", data);
+	m_pwmw = data;
+}
+
+uint16_t mc68328_device::pwmw_r() // 0x504
+{
+	LOGMASKED(LOG_PWM, "pwmw_r: PWMW: %04x\n", m_pwmw);
+	return m_pwmw;
+}
+
+void mc68328_device::pwmcnt_w(uint16_t data) // 0x506
+{
+	LOGMASKED(LOG_PWM, "pwmcnt_w: PWMCNT = %04x\n", data);
+	m_pwmcnt = 0;
+}
+
+uint16_t mc68328_device::pwmcnt_r() // 0x506
+{
+	LOGMASKED(LOG_PWM, "pwmcnt_r: PWMCNT: %04x\n", m_pwmcnt);
+	return m_pwmcnt;
+}
+
+
+//-------------------------------------------------
+//  Timer/Watchdog hardware
+//-------------------------------------------------
 
 template <int Timer>
 uint32_t mc68328_device::get_timer_frequency()
@@ -561,11 +1854,11 @@ uint32_t mc68328_device::get_timer_frequency()
 	switch (m_tctl[Timer] & TCTL_CLKSOURCE)
 	{
 		case TCTL_CLKSOURCE_SYSCLK:
-			frequency = 32768 * 506;
+			frequency = clock();
 			break;
 
 		case TCTL_CLKSOURCE_SYSCLK16:
-			frequency = (32768 * 506) / 16;
+			frequency = clock() / 16;
 			break;
 
 		case TCTL_CLKSOURCE_32KHZ4:
@@ -656,47 +1949,764 @@ TIMER_CALLBACK_MEMBER( mc68328_device::timer_tick )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( mc68328_device::pwm_tick )
+template <int Timer>
+void mc68328_device::tctl_w(uint16_t data) // 0x600, 0x60c
 {
-	if (m_pwmw >= m_pwmp || m_pwmw == 0 || m_pwmp == 0)
+	LOGMASKED(LOG_TIMERS, "tctl_w<%d>: TCTL%d = %04x\n", Timer, Timer + 1, data);
+	const uint16_t temp = m_tctl[Timer];
+	m_tctl[Timer] = data;
+	if ((temp & TCTL_TEN) == (m_tctl[Timer] & TCTL_TEN))
 	{
-		m_pwm->adjust(attotime::never);
-		return;
+		maybe_start_timer<Timer>(0);
 	}
-
-	if (((m_pwmc & PWMC_POL) == 0 && (m_pwmc & PWMC_PIN) != 0) ||
-		((m_pwmc & PWMC_POL) != 0 && (m_pwmc & PWMC_PIN) == 0))
+	else if ((temp & TCTL_TEN) != TCTL_TEN_ENABLE && (m_tctl[Timer] & TCTL_TEN) == TCTL_TEN_ENABLE)
 	{
-		uint32_t frequency = 32768 * 506;
-		uint32_t divisor = 4 << (m_pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
-		attotime period;
+		maybe_start_timer<Timer>(1);
+	}
+}
 
-		frequency /= divisor;
-		period = attotime::from_hz(frequency) * (m_pwmp - m_pwmw);
+template <int Timer>
+uint16_t mc68328_device::tctl_r() // 0x600, 0x60c
+{
+	LOGMASKED(LOG_TIMERS, "tctl_r: TCTL%d: %04x\n", Timer + 1, m_tctl[Timer]);
+	return m_tctl[Timer];
+}
 
-		m_pwm->adjust(period);
+template <int Timer>
+void mc68328_device::tprer_w(uint16_t data) // 0x602, 0x60e
+{
+	LOGMASKED(LOG_TIMERS, "tprer_w<%d>: TPRER%d = %04x\n", Timer, Timer + 1, data);
+	m_tprer[Timer] = data;
+	maybe_start_timer<Timer>(0);
+}
 
-		if (m_pwmc & PWMC_IRQEN)
-		{
-			set_interrupt_line(INT_PWM, 1);
-		}
+template <int Timer>
+uint16_t mc68328_device::tprer_r() // 0x602, 0x60e
+{
+	LOGMASKED(LOG_TIMERS, "tprer_r: TPRER%d: %04x\n", Timer + 1, m_tprer[Timer]);
+	return m_tprer[Timer];
+}
+
+template <int Timer>
+void mc68328_device::tcmp_w(uint16_t data) // 0x604, 0x610
+{
+	LOGMASKED(LOG_TIMERS, "tcmp_w<%d>: TCMP%d = %04x\n", Timer, Timer + 1, data);
+	m_tcmp[Timer] = data;
+	maybe_start_timer<Timer>(0);
+}
+
+template <int Timer>
+uint16_t mc68328_device::tcmp_r() // 0x604, 0x610
+{
+	LOGMASKED(LOG_TIMERS, "tcmp_r: TCMP%d: %04x\n", Timer + 1, m_tcmp[Timer]);
+	return m_tcmp[Timer];
+}
+
+template <int Timer>
+void mc68328_device::tcr_w(uint16_t data) // 0x606, 0x612
+{
+	LOGMASKED(LOG_TIMERS, "tcr_w<%d>: TCR%d = %04x (Ignored)\n", Timer, Timer + 1, data);
+}
+
+template <int Timer>
+uint16_t mc68328_device::tcr_r() // 0x606, 0x612
+{
+	LOGMASKED(LOG_TIMERS, "tcr_r: TCR%d: %04x\n", Timer + 1, m_tcr[Timer]);
+	return m_tcr[Timer];
+}
+
+template <int Timer>
+void mc68328_device::tcn_w(uint16_t data) // 0x608, 0x614
+{
+	LOGMASKED(LOG_TIMERS, "tcn_w<%d>: TCN%d = %04x (Ignored)\n", Timer, Timer + 1, data);
+}
+
+template <int Timer>
+uint16_t mc68328_device::tcn_r() // 0x608, 0x614
+{
+	LOGMASKED(LOG_TIMERS, "tcn_r: TCN%d: %04x\n", Timer + 1, m_tcn[Timer]);
+	return m_tcn[Timer];
+}
+
+template <int Timer>
+void mc68328_device::tstat_w(uint16_t data) // 0x60a, 0x616
+{
+	LOGMASKED(LOG_TSTAT, "tstat_w<%d>: TSTAT%d = %04x\n", Timer, Timer + 1, data);
+	m_tstat[Timer] &= ~m_tclear[Timer];
+	if (!(m_tstat[Timer] & TSTAT_COMP))
+	{
+		set_interrupt_line(Timer ? INT_TIMER2 : INT_TIMER1, 0);
+	}
+}
+
+template <int Timer>
+uint16_t mc68328_device::tstat_r() // 0x60a, 0x616
+{
+	LOGMASKED(LOG_TIMERS, "tstat_r: TSTAT%d: %04x\n", Timer + 1, m_tstat[Timer]);
+	m_tclear[Timer] |= m_tstat[Timer];
+	return m_tstat[Timer];
+}
+
+void mc68328_device::wctlr_w(uint16_t data) // 0x618
+{
+	LOGMASKED(LOG_WATCHDOG, "wctlr_w: WCTLR = %04x\n", data);
+	m_wctlr = data;
+}
+
+uint16_t mc68328_device::wctlr_r() // 0x618
+{
+	LOGMASKED(LOG_WATCHDOG, "wctlr_r: WCTLR: %04x\n", m_wctlr);
+	return m_wctlr;
+}
+
+void mc68328_device::wcmpr_w(uint16_t data) // 0x61a
+{
+	LOGMASKED(LOG_WATCHDOG, "wcmpr_w: WCMPR = %04x\n", data);
+	m_wcmpr = data;
+}
+
+uint16_t mc68328_device::wcmpr_r() // 0x61a
+{
+	LOGMASKED(LOG_WATCHDOG, "wcmpr_r: WCMPR: %04x\n", m_wcmpr);
+	return m_wcmpr;
+}
+
+void mc68328_device::wcn_w(uint16_t data) // 0x61c
+{
+	LOGMASKED(LOG_WATCHDOG, "wcn_w: WCN = %04x (Ignored)\n", data);
+}
+
+uint16_t mc68328_device::wcn_r() // 0x61c
+{
+	LOGMASKED(LOG_WATCHDOG, "wcn_r: WCN: %04x\n", m_wcn);
+	return m_wcn;
+}
+
+
+//-------------------------------------------------
+//  SPIS hardware
+//-------------------------------------------------
+
+void mc68328_device::spisr_w(uint16_t data) // 0x700
+{
+	LOGMASKED(LOG_SPIS, "spisr_w: SPISR = %04x\n", data);
+	m_spisr = data;
+}
+
+uint16_t mc68328_device::spisr_r() // 0x700
+{
+	LOGMASKED(LOG_SPIS, "spisr_r: SPISR: %04x\n", m_spisr);
+	return m_spisr;
+}
+
+
+//-------------------------------------------------
+//  SPIM hardware
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER( mc68328_device::spim_tick )
+{
+	m_spmclk = !m_spmclk;
+	const bool idle_state = BIT(m_spimcont, SPIM_POL_BIT);
+	const bool invert_phase = BIT(m_spimcont, SPIM_PHA_BIT);
+
+	uint16_t spim_bit_index = m_spimcont & SPIM_BIT_COUNT;
+
+	LOGMASKED(LOG_SPIM, "SPIM Tick:\n");
+	LOGMASKED(LOG_SPIM, "    CLK state: %d\n", m_spmclk);
+	LOGMASKED(LOG_SPIM, "    Bit index: %d\n", spim_bit_index);
+	LOGMASKED(LOG_SPIM, "    Data before: %04x\n", m_spimdata);
+
+	const bool clock_txd = (m_spmclk == idle_state && invert_phase) || (m_spmclk != idle_state && !invert_phase);
+	if (clock_txd)
+	{
+		m_spmtxd = BIT(m_spimdata, spim_bit_index);
+		LOGMASKED(LOG_SPIM, "    Clocking TxD: %d\n", m_spmtxd);
+		m_out_spim_cb(m_spmtxd);
 	}
 	else
 	{
-		uint32_t frequency = 32768 * 506;
-		uint32_t divisor = 4 << (m_pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
-		attotime period;
+		m_spmrxd = m_in_spim_cb();
+		LOGMASKED(LOG_SPIM, "    Clocking RxD: %d\n", m_spmrxd);
+		LOGMASKED(LOG_SPIM, "    Shifting\n");
+		m_spimdata = (m_spimdata << 1) | m_spmrxd;
+	}
+	LOGMASKED(LOG_SPIM, "    Data after: %04x\n", m_spimdata);
 
-		frequency /= divisor;
-		period = attotime::from_hz(frequency) * m_pwmw;
+	if (m_spmclk == idle_state)
+	{
+		if (spim_bit_index == 0)
+		{
+			LOGMASKED(LOG_SPIM, "    Bit 0 clocked out, ending transfer\n");
+			m_spim->adjust(attotime::never);
 
-		m_pwm->adjust(period);
+			if (BIT(m_spimcont, SPIM_IRQEN_BIT))
+			{
+				m_spimcont |= (1 << SPIM_SPIMIRQ_BIT);
+				LOGMASKED(LOG_SPIM, "Triggering SPIM Interrupt\n" );
+				set_interrupt_line(INT_SPIM, 1);
+			}
+		}
+		else
+		{
+			spim_bit_index--;
+			m_spimcont &= ~SPIM_BIT_COUNT;
+			m_spimcont |= spim_bit_index;
+		}
+	}
+}
+
+void mc68328_device::spimdata_w(uint16_t data) // 0x800
+{
+	LOGMASKED(LOG_SPIM, "spimdata_w: SPIMDATA = %04x\n", data);
+	m_spimdata = data;
+}
+
+uint16_t mc68328_device::spimdata_r() // 0x800
+{
+	LOGMASKED(LOG_SPIM, "spimdata_r: SPIMDATA: %04x\n", m_spimdata);
+	return m_spimdata;
+}
+
+void mc68328_device::spimcont_w(uint16_t data) // 0x802
+{
+	LOGMASKED(LOG_SPIM, "spimcont_w: SPIMCONT = %04x\n", data);
+	LOGMASKED(LOG_SPIM, "            Count = %d\n", data & SPIM_BIT_COUNT);
+	LOGMASKED(LOG_SPIM, "            Polarity = %s\n", BIT(data, SPIM_POL_BIT) ? "Inverted" : "Active-high");
+	LOGMASKED(LOG_SPIM, "            Phase = %s\n", BIT(data, SPIM_PHA_BIT) ? "Opposite" : "Normal");
+	LOGMASKED(LOG_SPIM, "            IRQ Enable = %s\n", BIT(data, SPIM_IRQEN_BIT) ? "Enable" : "Disable");
+	LOGMASKED(LOG_SPIM, "            IRQ Pending = %s\n", BIT(data, SPIM_SPIMIRQ_BIT) ? "Yes" : "No");
+	LOGMASKED(LOG_SPIM, "            Exchange = %s\n", BIT(data, SPIM_XCH_BIT) ? "Initiate" : "Idle");
+	LOGMASKED(LOG_SPIM, "            SPIM Enable = %s\n", BIT(data, SPIM_SPMEN_BIT) ? "Enable" : "Disable");
+	LOGMASKED(LOG_SPIM, "            Data Rate = Divide By %d\n", 4 << ((data & SPIM_RATE_MASK) >> SPIM_RATE_SHIFT) );
+
+	const uint16_t old = m_spimcont;
+	m_spimcont = data;
+
+	// HACK: We should probably emulate the ADS7843 A/D device properly.
+	if (BIT(data, SPIM_SPMEN_BIT) && BIT(data, SPIM_XCH_BIT) && !BIT(old, SPIM_XCH_BIT))
+	{
+		const uint64_t divisor = 2 << ((data & SPIM_RATE_MASK) >> SPIM_RATE_SHIFT);
+		const attotime rate = attotime::from_ticks(divisor, clock());
+		m_spim->adjust(rate, 0, rate);
+
+		m_spimcont &= ~(1 << SPIM_XCH_BIT);
 	}
 
-	m_pwmc ^= PWMC_PIN;
-
-	m_out_pwm_cb((m_pwmc & PWMC_PIN) ? 1 : 0);
+	if (!BIT(data, SPIM_IRQEN_BIT) || !BIT(data, SPIM_SPIMIRQ_BIT))
+	{
+		set_interrupt_line(INT_SPIM, 0);
+	}
+	else
+	{
+		set_interrupt_line(INT_SPIM, 1);
+	}
 }
+
+uint16_t mc68328_device::spimcont_r() // 0x802
+{
+	LOGMASKED(LOG_SPIM, "spimcont_r: SPIMCONT: %04x\n", m_spimcont);
+	return m_spimcont;
+}
+
+
+//-------------------------------------------------
+//  UART hardware
+//-------------------------------------------------
+
+void mc68328_device::ustcnt_w(uint16_t data) // 0x900
+{
+	LOGMASKED(LOG_UART, "ustcnt_w: USTCNT = %04x\n", data);
+	m_ustcnt = data;
+}
+
+uint16_t mc68328_device::ustcnt_r() // 0x900
+{
+	LOGMASKED(LOG_UART, "ustcnt_r: USTCNT: %04x\n", m_ustcnt);
+	return m_ustcnt;
+}
+
+void mc68328_device::ubaud_w(uint16_t data) // 0x902
+{
+	LOGMASKED(LOG_UART, "ubaud_w: UBAUD = %04x\n", data);
+	m_ubaud = data;
+}
+
+uint16_t mc68328_device::ubaud_r() // 0x902
+{
+	LOGMASKED(LOG_UART, "ubaud_r: UBAUD: %04x\n", m_ubaud);
+	return m_ubaud;
+}
+
+void mc68328_device::urx_w(uint16_t data) // 0x904
+{
+	LOGMASKED(LOG_UART, "urx_w: URX = %04x (Not Yet Implemented)\n", data);
+}
+
+uint16_t mc68328_device::urx_r() // 0x904
+{
+	LOGMASKED(LOG_UART, "urx_r: URX: %04x\n", m_urx);
+	return m_urx;
+}
+
+void mc68328_device::utx_w(uint16_t data) // 0x906
+{
+	LOGMASKED(LOG_UART, "utx_w: UTX = %04x (Not Yet Implemented)\n", data);
+}
+
+uint16_t mc68328_device::utx_r() // 0x906
+{
+	uint16_t data = m_utx | UTX_FIFO_EMPTY | UTX_FIFO_HALF | UTX_TX_AVAIL;
+	LOGMASKED(LOG_UART, "utx_r: UTX: %04x\n", data);
+	return data;
+}
+
+void mc68328_device::umisc_w(uint16_t data) // 0x908
+{
+	LOGMASKED(LOG_UART, "umisc_w: UMISC = %04x (Not Yet Implemented)\n", data);
+	m_umisc = data;
+}
+
+uint16_t mc68328_device::umisc_r() // 0x908
+{
+	LOGMASKED(LOG_UART, "umisc_r: UMISC: %04x\n", m_umisc);
+	return m_umisc;
+}
+
+
+//-------------------------------------------------
+//  LCD hardware
+//-------------------------------------------------
+
+void mc68328_device::fill_lcd_dma_buffer()
+{
+	if (m_lcd_sysmem_ptr == m_lssa)
+	{
+		m_out_flm_cb(BIT(m_lpolcf, LPOLCF_FLMPOL_BIT) ? 0 : 1);
+	}
+	else
+	{
+		m_out_flm_cb(BIT(m_lpolcf, LPOLCF_FLMPOL_BIT) ? 1 : 0);
+	}
+	m_out_llp_cb(BIT(m_lpolcf, LPOLCF_LPPOL_BIT) ? 0 : 1);
+
+	const uint32_t sysclk_divisor = VCO_DIVISORS[(m_pllcr & PLLCR_SYSCLK_SEL) >> PLLCR_SYSCLK_SHIFT];
+	attotime buffer_duration = attotime::from_ticks(m_llbar, clock() / sysclk_divisor);
+	m_lcd_scan->adjust(buffer_duration);
+
+	address_space &prg_space = space(AS_PROGRAM);
+	const uint16_t last_word = m_lvpw != m_llbar ? (m_llbar + 1) : m_llbar;
+	for (uint32_t word_index = 0; word_index < last_word; word_index++)
+	{
+		m_lcd_line_buffer[word_index] = prg_space.read_word(m_lcd_sysmem_ptr + (word_index << 1));
+	}
+
+	m_lcd_sysmem_ptr += m_lvpw << 1;
+
+	const uint32_t screen_max_addr = m_lssa + ((m_lvpw * (m_lymax + 1)) << 1);
+	if (m_lcd_sysmem_ptr >= screen_max_addr)
+	{
+		m_lcd_sysmem_ptr = m_lssa;
+	}
+
+	m_lcd_line_bit = 15;
+	m_lcd_line_word = 0;
+}
+
+TIMER_CALLBACK_MEMBER( mc68328_device::lcd_scan_tick )
+{
+	const uint16_t last_word = m_lvpw != m_llbar ? (m_llbar + 1) : m_llbar;
+	m_out_llp_cb(BIT(m_lpolcf, LPOLCF_LPPOL_BIT) ? 1 : 0);
+	m_lsclk = !m_lsclk;
+
+	if (m_lsclk)
+	{
+		uint8_t data = 0;
+		switch (m_lpicf & LPICF_PBSIZ)
+		{
+		case LPICF_PBSIZ_1:
+			data = BIT(m_lcd_line_buffer[m_lcd_line_word], m_lcd_line_bit);
+			if (m_lcd_line_bit == 0)
+			{
+				m_lcd_line_bit = 15;
+				m_lcd_line_word++;
+			}
+			else
+			{
+				m_lcd_line_bit--;
+			}
+			break;
+		case LPICF_PBSIZ_2:
+			data = (m_lcd_line_buffer[m_lcd_line_word] >> (m_lcd_line_bit - 1)) & 3;
+			if (m_lcd_line_bit <= 1)
+			{
+				m_lcd_line_bit = 15;
+				m_lcd_line_word++;
+			}
+			else
+			{
+				m_lcd_line_bit -= 2;
+			}
+			break;
+		case LPICF_PBSIZ_4:
+			data = (m_lcd_line_buffer[m_lcd_line_word] >> (m_lcd_line_bit - 3)) & 15;
+			if (m_lcd_line_bit <= 3)
+			{
+				m_lcd_line_bit = 15;
+				m_lcd_line_word++;
+			}
+			else
+			{
+				m_lcd_line_bit -= 4;
+			}
+			break;
+		default:
+			// Invalid mode; don't send anything
+			break;
+		}
+		m_out_ld_cb(data);
+	}
+	m_out_lsclk_cb(m_lsclk);
+
+	if (m_lcd_line_word == last_word)
+	{
+		fill_lcd_dma_buffer();
+	}
+	else
+	{
+		m_lcd_scan->adjust(get_pixclk_rate());
+	}
+}
+
+attotime mc68328_device::get_pixclk_rate()
+{
+	uint32_t divisor = 1;
+	if (BIT(m_lckcon, LCKCON_PCDS_BIT)) // Use PIXCLK from PLL
+		divisor = VCO_DIVISORS[(m_pllcr & PLLCR_PIXCLK_SEL) >> PLLCR_PIXCLK_SHIFT];
+	else // Use SYSCLK from PLL
+		divisor = VCO_DIVISORS[(m_pllcr & PLLCR_SYSCLK_SEL) >> PLLCR_SYSCLK_SHIFT];
+
+	return attotime::from_ticks((m_lpxcd & LPXCD_MASK) + 1, clock() / divisor);
+}
+
+void mc68328_device::lssa_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xa00
+{
+	LOGMASKED(LOG_LCD, "lssa_msw_w: LSSA(MSW) = %04x\n", data);
+	m_lssa &= ~(mem_mask << 16);
+	m_lssa |= (data & mem_mask) << 16;
+	LOGMASKED(LOG_LCD, "            Address: %08x\n", m_lssa);
+}
+
+uint16_t mc68328_device::lssa_msw_r() // 0xa00
+{
+	LOGMASKED(LOG_LCD, "lssa_msw_r: LSSA(MSW): %04x\n", (uint16_t)(m_lssa >> 16));
+	return (uint16_t)(m_lssa >> 16);
+}
+
+void mc68328_device::lssa_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xa02
+{
+	LOGMASKED(LOG_LCD, "lssa_lsw_w: LSSA(LSW) = %04x\n", data);
+	m_lssa &= 0xffff0000 | (~mem_mask);
+	m_lssa |= data & mem_mask;
+	LOGMASKED(LOG_LCD, "            Address: %08x\n", m_lssa);
+}
+
+uint16_t mc68328_device::lssa_lsw_r() // 0xa02
+{
+	LOGMASKED(LOG_LCD, "lssa_lsw_r: LSSA(LSW): %04x\n", (uint16_t)m_lssa);
+	return (uint16_t)m_lssa;
+}
+
+void mc68328_device::lvpw_w(uint8_t data) // 0xa05
+{
+	LOGMASKED(LOG_LCD, "lvpw_w: LVPW = %02x\n", data);
+	m_lvpw = data;
+	LOGMASKED(LOG_LCD, "        Page Width: %d\n", (m_lvpw << 1) * (BIT(m_lpicf, LPICF_GRAYSCALE_BIT) ? 8 : 16));
+}
+
+uint8_t mc68328_device::lvpw_r() // 0xa05
+{
+	LOGMASKED(LOG_LCD, "lvpw_r: LVPW: %02x\n", m_lvpw);
+	return m_lvpw;
+}
+
+void mc68328_device::lxmax_w(uint16_t data) // 0xa08
+{
+	LOGMASKED(LOG_LCD, "lxmax_w: LXMAX = %04x\n", data);
+	m_lxmax = data & LXMAX_MASK;
+	LOGMASKED(LOG_LCD, "         Width: %d\n", (data & 0x03ff) + 1);
+}
+
+uint16_t mc68328_device::lxmax_r() // 0xa08
+{
+	LOGMASKED(LOG_LCD, "lxmax_r: LXMAX: %04x\n", m_lxmax);
+	return m_lxmax;
+}
+
+void mc68328_device::lymax_w(uint16_t data) // 0xa0a
+{
+	LOGMASKED(LOG_LCD, "lymax_w: LYMAX = %04x\n", data);
+	m_lymax = data & LYMAX_MASK;
+	LOGMASKED(LOG_LCD, "         Height: %d\n", (data & 0x03ff) + 1);
+}
+
+uint16_t mc68328_device::lymax_r() // 0xa0a
+{
+	LOGMASKED(LOG_LCD, "lymax_r: LYMAX: %04x\n", m_lymax);
+	return m_lymax;
+}
+
+void mc68328_device::lcxp_w(uint16_t data) // 0xa18
+{
+	LOGMASKED(LOG_LCD, "lcxp_w: LCXP = %04x\n", data);
+	m_lcxp = data;
+	LOGMASKED(LOG_LCD, "        X Position: %d\n", data & 0x03ff);
+	switch (m_lcxp >> 14)
+	{
+		case 0:
+			LOGMASKED(LOG_LCD, "        Cursor Control: Transparent\n");
+			break;
+
+		case 1:
+			LOGMASKED(LOG_LCD, "        Cursor Control: Black\n");
+			break;
+
+		case 2:
+			LOGMASKED(LOG_LCD, "        Cursor Control: Reverse\n");
+			break;
+
+		case 3:
+			LOGMASKED(LOG_LCD, "        Cursor Control: Invalid\n");
+			break;
+	}
+}
+
+uint16_t mc68328_device::lcxp_r() // 0xa18
+{
+	LOGMASKED(LOG_LCD, "lcxp_r: LCXP: %04x\n", m_lcxp);
+	return m_lcxp;
+}
+
+void mc68328_device::lcyp_w(uint16_t data) // 0xa1a
+{
+	LOGMASKED(LOG_LCD, "lcyp_w: LCYP = %04x\n", data);
+	m_lcyp = data;
+	LOGMASKED(LOG_LCD, "        Y Position: %d\n", data & 0x01ff);
+}
+
+uint16_t mc68328_device::lcyp_r() // 0xa1a
+{
+	LOGMASKED(LOG_LCD, "lcyp_r: LCYP: %04x\n", m_lcyp);
+	return m_lcyp;
+}
+
+void mc68328_device::lcwch_w(uint16_t data) // 0xa1c
+{
+	LOGMASKED(LOG_LCD, "lcwch_w: LCWCH = %04x\n", data);
+	m_lcwch = data;
+	LOGMASKED(LOG_LCD, "         Width:  %d\n", (data >> 8) & 0x1f);
+	LOGMASKED(LOG_LCD, "         Height: %d\n", data & 0x1f);
+}
+
+uint16_t mc68328_device::lcwch_r() // 0xa1c
+{
+	LOGMASKED(LOG_LCD, "lcwch_r: LCWCH: %04x\n", m_lcwch);
+	return m_lcwch;
+}
+
+void mc68328_device::lblkc_w(uint8_t data) // 0xa1f
+{
+	LOGMASKED(LOG_LCD, "lblkc_w: LBLKC = %02x\n", data);
+	m_lblkc = data;
+	LOGMASKED(LOG_LCD, "         Blink Enable:  %d\n", m_lblkc >> 7);
+	LOGMASKED(LOG_LCD, "         Blink Divisor: %d\n", m_lblkc & 0x7f);
+}
+
+uint8_t mc68328_device::lblkc_r() // 0xa1f
+{
+	LOGMASKED(LOG_LCD, "lblkc_r: LBLKC: %02x\n", m_lblkc);
+	return m_lblkc;
+}
+
+void mc68328_device::lpicf_w(uint8_t data) // 0xa20
+{
+	LOGMASKED(LOG_LCD, "lpicf_w: LPICF = %02x\n", data);
+	m_lpicf = data;
+	switch((m_lpicf >> 1) & 0x03)
+	{
+		case 0:
+			LOGMASKED(LOG_LCD, "         Bus Size: 1-bit\n");
+			break;
+
+		case 1:
+			LOGMASKED(LOG_LCD, "         Bus Size: 2-bit\n");
+			break;
+
+		case 2:
+			LOGMASKED(LOG_LCD, "         Bus Size: 4-bit\n");
+			break;
+
+		case 3:
+			LOGMASKED(LOG_LCD, "         Bus Size: unused\n");
+			break;
+	}
+	LOGMASKED(LOG_LCD, "         Gray scale enable: %d\n", m_lpicf & 0x01);
+}
+
+uint8_t mc68328_device::lpicf_r() // 0xa20
+{
+	LOGMASKED(LOG_LCD, "lpicf_r: LPICF: %02x\n", m_lpicf);
+	return m_lpicf;
+}
+
+void mc68328_device::lpolcf_w(uint8_t data) // 0xa21
+{
+	LOGMASKED(LOG_LCD, "lpolcf_w: LPOLCF = %02x\n", data);
+	m_lpolcf = data;
+	LOGMASKED(LOG_LCD, "          LCD Shift Clock Polarity: %s\n", (m_lpicf & 0x08) ? "Active positive edge of LCLK" : "Active negative edge of LCLK");
+	LOGMASKED(LOG_LCD, "          First-line marker polarity: %s\n", (m_lpicf & 0x04) ? "Active Low" : "Active High");
+	LOGMASKED(LOG_LCD, "          Line-pulse polarity: %s\n", (m_lpicf & 0x02) ? "Active Low" : "Active High");
+	LOGMASKED(LOG_LCD, "          Pixel polarity: %s\n", (m_lpicf & 0x01) ? "Active Low" : "Active High");
+}
+
+uint8_t mc68328_device::lpolcf_r() // 0xa21
+{
+	LOGMASKED(LOG_LCD, "lpolcf_r: LPOLCF: %02x\n", m_lpolcf);
+	return m_lpolcf;
+}
+
+void mc68328_device::lacdrc_w(uint8_t data) // 0xa23
+{
+	LOGMASKED(LOG_LCD, "lacdrc_w: LACDRC = %02x\n", data);
+	m_lacdrc = data;
+}
+
+uint8_t mc68328_device::lacdrc_r() // 0xa23
+{
+	LOGMASKED(LOG_LCD, "lacdrc_r: LACDRC: %02x\n", m_lacdrc);
+	return m_lacdrc;
+}
+
+void mc68328_device::lpxcd_w(uint8_t data) // 0xa25
+{
+	LOGMASKED(LOG_LCD, "lpxcd_w: LPXCD = %02x\n", data);
+	m_lpxcd = data;
+	LOGMASKED(LOG_LCD, "         Clock Divisor: %d\n", m_lpxcd + 1);
+}
+
+uint8_t mc68328_device::lpxcd_r() // 0xa25
+{
+	LOGMASKED(LOG_LCD, "lpxcd_r: LPXCD: %02x\n", m_lpxcd);
+	return m_lpxcd;
+}
+
+void mc68328_device::lckcon_w(uint8_t data) // 0xa27
+{
+	LOGMASKED(LOG_LCD, "lckcon_w: LCKCON = %02x\n", data);
+	const uint16_t old = m_lckcon;
+	m_lckcon = data;
+	LOGMASKED(LOG_LCD, "          LCDC Enable: %d\n", (m_lckcon >> 7) & 0x01);
+	LOGMASKED(LOG_LCD, "          DMA Burst Length: %d\n", ((m_lckcon >> 6) & 0x01) ? 16 : 8);
+	LOGMASKED(LOG_LCD, "          DMA Bursting Clock Control: %d\n", ((m_lckcon >> 4) & 0x03) + 1);
+	LOGMASKED(LOG_LCD, "          Bus Width: %d\n", ((m_lckcon >> 1) & 0x01) ? 8 : 16);
+	LOGMASKED(LOG_LCD, "          Pixel Clock Divider Source: %s\n", (m_lckcon & 0x01) ? "PIX" : "SYS");
+
+	if (BIT(old, LCKCON_LCDON_BIT) && !BIT(m_lckcon, LCKCON_LCDON_BIT))
+	{
+		m_lcd_scan->adjust(attotime::never);
+	}
+	else if (!BIT(old, LCKCON_LCDON_BIT) && BIT(m_lckcon, LCKCON_LCDON_BIT))
+	{
+		const uint32_t sysclk_divisor = VCO_DIVISORS[(m_pllcr & PLLCR_SYSCLK_SEL) >> PLLCR_SYSCLK_SHIFT];
+		attotime lcd_dma_duration = attotime::from_ticks(m_llbar, clock() / sysclk_divisor);
+		attotime lcd_scan_duration = get_pixclk_rate() * (m_lxmax + 1);
+		attotime lcd_frame_duration = (lcd_scan_duration + lcd_dma_duration) * (m_lymax + 1);
+		m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), m_lxmax + 1, m_lymax + 1);
+
+		m_lcd_scan->adjust(attotime::never);
+		m_lcd_sysmem_ptr = m_lssa;
+		fill_lcd_dma_buffer();
+	}
+}
+
+uint8_t mc68328_device::lckcon_r() // 0xa27
+{
+	LOGMASKED(LOG_LCD, "lckcon_r: LCKCON: %02x\n", m_lckcon);
+	return m_lckcon;
+}
+
+void mc68328_device::llbar_w(uint8_t data) // 0xa29
+{
+	LOGMASKED(LOG_LCD, "llbar_w: LLBAR = %02x\n", data);
+	m_llbar = data;
+	LOGMASKED(LOG_LCD, "         Address: %d\n", m_llbar << (BIT(m_lpicf, LPICF_GRAYSCALE_BIT) ? 4 : 5));
+}
+
+uint8_t mc68328_device::llbar_r() // 0xa29
+{
+	LOGMASKED(LOG_LCD, "llbar_r: LLBAR: %02x\n", m_llbar);
+	return m_llbar;
+}
+
+void mc68328_device::lotcr_w(uint8_t data) // 0xa2b
+{
+	LOGMASKED(LOG_LCD, "lotcr_w: LOTCR = %02x (Ignored)\n", data);
+}
+
+uint8_t mc68328_device::lotcr_r() // 0xa2b
+{
+	LOGMASKED(LOG_LCD, "lotcr_r: LOTCR: %02x\n", m_lotcr);
+	return m_lotcr;
+}
+
+void mc68328_device::lposr_w(uint8_t data) // 0xa2d
+{
+	LOGMASKED(LOG_LCD, "lposr_w: LPOSR = %02x\n", data);
+	m_lposr = data;
+	LOGMASKED(LOG_LCD, "         Byte Offset: %d\n", (m_lposr >> 3) & 0x01);
+	LOGMASKED(LOG_LCD, "         Pixel Offset: %d\n", m_lposr & 0x07);
+}
+
+uint8_t mc68328_device::lposr_r() // 0xa2d
+{
+	LOGMASKED(LOG_LCD, "lposr_r: LPOSR: %02x\n", m_lposr);
+	return m_lposr;
+}
+
+void mc68328_device::lfrcm_w(uint8_t data) // 0xa31
+{
+	LOGMASKED(LOG_LCD, "lfrcm_w: LFRCM = %02x\n", data);
+	m_lfrcm = data;
+	LOGMASKED(LOG_LCD, "         X Modulation: %d\n", (m_lfrcm >> 4) & 0x0f);
+	LOGMASKED(LOG_LCD, "         Y Modulation: %d\n", m_lfrcm & 0x0f);
+}
+
+uint8_t mc68328_device::lfrcm_r() // 0xa31
+{
+	LOGMASKED(LOG_LCD, "lfrcm_r: LFRCM: %02x\n", m_lfrcm);
+	return m_lfrcm;
+}
+
+void mc68328_device::lgpmr_w(uint8_t data) // 0xa32
+{
+	LOGMASKED(LOG_LCD, "lgpmr_w: LGPMR = %04x\n", data);
+	m_lgpmr = data;
+	LOGMASKED(LOG_LCD, "         Palette 0: %d\n", (m_lgpmr >>  8) & 0x07);
+	LOGMASKED(LOG_LCD, "         Palette 1: %d\n", (m_lgpmr >> 12) & 0x07);
+	LOGMASKED(LOG_LCD, "         Palette 2: %d\n", (m_lgpmr >>  0) & 0x07);
+	LOGMASKED(LOG_LCD, "         Palette 3: %d\n", (m_lgpmr >>  4) & 0x07);
+}
+
+uint16_t mc68328_device::lgpmr_r() // 0xa32
+{
+	LOGMASKED(LOG_LCD, "lgpmr_r: LGPMR: %04x\n", m_lgpmr);
+	return m_lgpmr;
+}
+
+
+//-------------------------------------------------
+//  RTC/alarm hardware
+//-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
 {
@@ -776,864 +2786,18 @@ TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
 	}
 }
 
-void mc68328_device::scr_w(uint8_t data) // 0x000
-{
-	LOGMASKED(LOG_SCR, "scr_w: SCR = %02x\n", data);
-}
-
-void mc68328_device::grpbasea_w(uint16_t data) // 0x100
-{
-	LOGMASKED(LOG_CS_GRP, "grpbasea_w: GRPBASEA = %04x\n", data);
-	m_grpbasea = data;
-}
-
-void mc68328_device::grpbaseb_w(uint16_t data) // 0x102
-{
-	LOGMASKED(LOG_CS_GRP, "grpbaseb_w: GRPBASEB = %04x\n", data);
-	m_grpbaseb = data;
-}
-
-void mc68328_device::grpbasec_w(uint16_t data) // 0x104
-{
-	LOGMASKED(LOG_CS_GRP, "grpbasec_w: GRPBASEC = %04x\n", data);
-	m_grpbasec = data;
-}
-
-void mc68328_device::grpbased_w(uint16_t data) // 0x106
-{
-	LOGMASKED(LOG_CS_GRP, "grpbased_w: GRPBASED = %04x\n", data);
-	m_grpbased = data;
-}
-
-void mc68328_device::grpmaska_w(uint16_t data) // 0x108
-{
-	LOGMASKED(LOG_CS_GRP, "grpmaska_w: GRPMASKA = %04x\n", data);
-	m_grpmaska = data;
-}
-
-void mc68328_device::grpmaskb_w(uint16_t data) // 0x10a
-{
-	LOGMASKED(LOG_CS_GRP, "grpmaskb_w: GRPMASKB = %04x\n", data);
-	m_grpmaskb = data;
-}
-
-void mc68328_device::grpmaskc_w(uint16_t data) // 0x10c
-{
-	LOGMASKED(LOG_CS_GRP, "grpmaskc_w: GRPMASKC = %04x\n", data);
-	m_grpmaskc = data;
-}
-
-void mc68328_device::grpmaskd_w(uint16_t data) // 0x10e
-{
-	LOGMASKED(LOG_CS_GRP, "grpmaskd_w: GRPMASKD = %04x\n", data);
-	m_grpmaskd = data;
-}
-
-template<int ChipSelect>
-void mc68328_device::csa_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x110, 0x114, 0x118, 0x11c
-{
-	LOGMASKED(LOG_CS_SEL, "csa_msw_w<%d>: CSA%d(16) = %04x\n", ChipSelect, ChipSelect, data);
-	m_csa[ChipSelect] &= 0xffff0000 | (~mem_mask);
-	m_csa[ChipSelect] |= data & mem_mask;
-}
-
-template<int ChipSelect>
-void mc68328_device::csa_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x112, 0x116, 0x11a, 0x11e
-{
-	LOGMASKED(LOG_CS_SEL, "csa_lsw_w<%d>: CSA%d(0) = %04x\n", ChipSelect, ChipSelect, data);
-	m_csa[ChipSelect] &= ~(mem_mask << 16);
-	m_csa[ChipSelect] |= (data & mem_mask) << 16;
-}
-
-template<int ChipSelect>
-void mc68328_device::csb_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x120, 0x124, 0x128, 0x12c
-{
-	LOGMASKED(LOG_CS_SEL, "csb_msw_w<%d>: CSB%d(MSW) = %04x\n", ChipSelect, ChipSelect, data);
-	m_csb[ChipSelect] &= 0xffff0000 | (~mem_mask);
-	m_csb[ChipSelect] |= data & mem_mask;
-}
-
-template<int ChipSelect>
-void mc68328_device::csb_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x122, 0x126, 0x12a, 0x12e
-{
-	LOGMASKED(LOG_CS_SEL, "csb_lsw_w<%d>: CSB%d(LSW) = %04x\n", ChipSelect, ChipSelect, data);
-	m_csb[ChipSelect] &= ~(mem_mask << 16);
-	m_csb[ChipSelect] |= (data & mem_mask) << 16;
-}
-
-template<int ChipSelect>
-void mc68328_device::csc_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x130, 0x134, 0x138, 0x13c
-{
-	LOGMASKED(LOG_CS_SEL, "csc_msw_w<%d>: CSC%d(MSW) = %04x\n", ChipSelect, ChipSelect, data);
-	m_csc[ChipSelect] &= 0xffff0000 | (~mem_mask);
-	m_csc[ChipSelect] |= data & mem_mask;
-}
-
-template<int ChipSelect>
-void mc68328_device::csc_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x132, 0x136, 0x13a, 0x13e
-{
-	LOGMASKED(LOG_CS_SEL, "csc_lsw_w<%d>: CSC%d(LSW) = %04x\n", ChipSelect, ChipSelect, data);
-	m_csc[ChipSelect] &= ~(mem_mask << 16);
-	m_csc[ChipSelect] |= (data & mem_mask) << 16;
-}
-
-template<int ChipSelect>
-void mc68328_device::csd_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x140, 0x144, 0x148, 0x14c
-{
-	LOGMASKED(LOG_CS_SEL, "csd_msw_w<%d>: CSD%d(MSW) = %04x\n", ChipSelect, ChipSelect, data);
-	m_csd[ChipSelect] &= 0xffff0000 | (~mem_mask);
-	m_csd[ChipSelect] |= data & mem_mask;
-}
-
-template<int ChipSelect>
-void mc68328_device::csd_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x142, 0x146, 0x14a, 0x14e
-{
-	LOGMASKED(LOG_CS_SEL, "csd_lsw_w<%d>: CSD%d(LSW) = %04x\n", ChipSelect, ChipSelect, data);
-	m_csd[ChipSelect] &= ~(mem_mask << 16);
-	m_csd[ChipSelect] |= (data & mem_mask) << 16;
-}
-
-void mc68328_device::pllcr_w(uint16_t data) // 0x200
-{
-	LOGMASKED(LOG_PLL, "pllcr_w: PLLCR = %04x\n", data);
-	m_pllcr = data;
-}
-
-void mc68328_device::pllfsr_w(uint16_t data) // 0x202
-{
-	LOGMASKED(LOG_PLL, "pllfsr_w: PLLFSR = %04x\n", data);
-	m_pllfsr = data;
-}
-
-void mc68328_device::pctlr_w(uint8_t data) // 0x207
-{
-	LOGMASKED(LOG_PLL, "pctlr_w: PCTLR = %02x\n", data);
-	m_pctlr = data;
-}
-
-void mc68328_device::ivr_w(uint8_t data) // 0x300
-{
-	LOGMASKED(LOG_INTS, "ivr_w: IVR = %02x\n", data);
-	m_ivr = data;
-}
-
-void mc68328_device::icr_w(uint8_t data) // 0x302
-{
-	LOGMASKED(LOG_INTS, "icr_w: ICR = %02x\n", data);
-	m_icr = data;
-}
-
-void mc68328_device::imr_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x304
-{
-	const uint32_t imr_old = m_imr;
-	LOGMASKED(LOG_INTS, "imr_msw_w: IMR(MSW) = %04x\n", data);
-	m_imr &= ~(mem_mask << 16);
-	m_imr |= (data & mem_mask) << 16;
-	m_isr &= ~((data & mem_mask) << 16);
-
-	const uint32_t imr_diff = imr_old ^ m_imr;
-	set_interrupt_line(imr_diff, 0);
-}
-
-void mc68328_device::imr_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x306
-{
-	const uint32_t imr_old = m_imr;
-	LOGMASKED(LOG_INTS, "imr_lsw_w: IMR(LSW) = %04x\n", data);
-	m_imr &= 0xffff0000 | (~mem_mask);
-	m_imr |= data & mem_mask;
-	m_isr &= ~(data & mem_mask);
-
-	const uint32_t imr_diff = imr_old ^ m_imr;
-	set_interrupt_line(imr_diff, 0);
-}
-
-void mc68328_device::iwr_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x308
-{
-	LOGMASKED(LOG_INTS, "iwr_msw_w: IWR(MSW) = %04x\n", data);
-	m_iwr &= ~(mem_mask << 16);
-	m_iwr |= (data & mem_mask) << 16;
-}
-
-void mc68328_device::iwr_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x30a
-{
-	LOGMASKED(LOG_INTS, "iwr_lsw_w: IWR(LSW) = %04x\n", data);
-	m_iwr &= 0xffff0000 | (~mem_mask);
-	m_iwr |= data & mem_mask;
-}
-
-void mc68328_device::isr_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x30c
-{
-	LOGMASKED(LOG_INTS, "isr_msw_w: ISR(MSW) = %04x\n", data);
-	// Clear edge-triggered IRQ1
-	if ((m_icr & ICR_ET1) == ICR_ET1 && (data & INT_IRQ1_SHIFT) == INT_IRQ1_SHIFT)
-	{
-		m_isr &= ~INT_IRQ1;
-	}
-
-	// Clear edge-triggered IRQ2
-	if ((m_icr & ICR_ET2) == ICR_ET2 && (data & INT_IRQ2_SHIFT) == INT_IRQ2_SHIFT)
-	{
-		m_isr &= ~INT_IRQ2;
-	}
-
-	// Clear edge-triggered IRQ3
-	if ((m_icr & ICR_ET3) == ICR_ET3 && (data & INT_IRQ3_SHIFT) == INT_IRQ3_SHIFT)
-	{
-		m_isr &= ~INT_IRQ3;
-	}
-
-	// Clear edge-triggered IRQ6
-	if ((m_icr & ICR_ET6) == ICR_ET6 && (data & INT_IRQ6_SHIFT) == INT_IRQ6_SHIFT)
-	{
-		m_isr &= ~INT_IRQ6;
-	}
-
-	// Clear edge-triggered IRQ7
-	if ((data & INT_IRQ7_SHIFT) == INT_IRQ7_SHIFT)
-	{
-		m_isr &= ~INT_IRQ7;
-	}
-}
-
-void mc68328_device::isr_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x30e
-{
-	LOGMASKED(LOG_INTS, "isr_lsw_w: ISR(LSW) = %04x (Ignored)\n", data);
-}
-
-void mc68328_device::ipr_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x310
-{
-	LOGMASKED(LOG_INTS, "ipr_msw_w: IPR(MSW) = %04x (Ignored)\n", data);
-}
-
-void mc68328_device::ipr_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0x312
-{
-	LOGMASKED(LOG_INTS, "ipr_lsw_w: IPR(LSW) = %04x (Ignored)\n", data);
-}
-
-void mc68328_device::padir_w(uint8_t data) // 0x400
-{
-	LOGMASKED(LOG_GPIO_A, "padir_w: PADIR = %02x\n", data);
-	m_padir = data;
-}
-
-void mc68328_device::padata_w(uint8_t data) // 0x401
-{
-	LOGMASKED(LOG_GPIO_A, "padata_w: PADATA = %02x\n", data);
-	m_padata = data;
-	m_out_port_a_cb(m_padata);
-}
-
-void mc68328_device::pasel_w(uint8_t data) // 0x403
-{
-	LOGMASKED(LOG_GPIO_A, "pasel_w: PASEL = %02x\n", data);
-	m_pasel = data;
-}
-
-void mc68328_device::pbdir_w(uint8_t data) // 0x408
-{
-	LOGMASKED(LOG_GPIO_B, "pbdir_w: PBDIR = %02x\n", data);
-	m_pbdir = data;
-}
-
-void mc68328_device::pbdata_w(uint8_t data) // 0x409
-{
-	LOGMASKED(LOG_GPIO_B, "pbdata_w: PBDATA = %02x\n", data);
-	m_pbdata = data;
-	m_out_port_b_cb(m_pbdata);
-}
-
-void mc68328_device::pbsel_w(uint8_t data) // 0x40b
-{
-	LOGMASKED(LOG_GPIO_B, "pbsel_w: PBSEL = %02x\n", data);
-	m_pbsel = data;
-}
-
-void mc68328_device::pcdir_w(uint8_t data) // 0x410
-{
-	LOGMASKED(LOG_GPIO_C, "pcdir_w: PCDIR = %02x\n", data);
-	m_pcdir = data;
-}
-
-void mc68328_device::pcdata_w(uint8_t data) // 0x411
-{
-	LOGMASKED(LOG_GPIO_C, "pcdata_w: PCDATA = %02x\n", data);
-	m_pcdata = data;
-	m_out_port_c_cb(m_pcdata);
-}
-
-void mc68328_device::pcsel_w(uint8_t data) // 0x413
-{
-	LOGMASKED(LOG_GPIO_C, "pcsel_w: PCSEL = %02x\n", data);
-	m_pcsel = data;
-}
-
-void mc68328_device::pddir_w(uint8_t data) // 0x418
-{
-	LOGMASKED(LOG_GPIO_D, "pddir_w: PDDIR = %02x\n", data);
-	m_pddir = data;
-}
-
-void mc68328_device::pddata_w(uint8_t data) // 0x419
-{
-	LOGMASKED(LOG_GPIO_D, "pddata_w: PDDATA = %02x\n", data);
-	m_pddata = data;
-	m_out_port_d_cb(m_pddata);
-}
-
-void mc68328_device::pdpuen_w(uint8_t data) // 0x41a
-{
-	LOGMASKED(LOG_GPIO_D, "pdpuen_w: PDPUEN = %02x\n", data);
-	m_pdpuen = data;
-}
-
-void mc68328_device::pdpol_w(uint8_t data) // 0x41c
-{
-	LOGMASKED(LOG_GPIO_D, "pdpol_w: PDPOL = %02x\n", data);
-	m_pdpol = data;
-}
-
-void mc68328_device::pdirqen_w(uint8_t data) // 0x41d
-{
-	LOGMASKED(LOG_GPIO_D, "pdirqen_w: PDIRQEN = %02x\n", data);
-	m_pdirqen = data & 0x00ff;
-	poll_port_d_interrupts();
-}
-
-void mc68328_device::pdirqedge_w(uint8_t data) // 0x41f
-{
-	LOGMASKED(LOG_GPIO_D, "pdirqedge_w: PDIRQEDGE = %02x\n", data);
-	m_pdirqedge = data;
-}
-
-void mc68328_device::pedir_w(uint8_t data) // 0x420
-{
-	LOGMASKED(LOG_GPIO_E, "pedir_w: PEDIR = %02x\n", data);
-	m_pedir = data;
-}
-
-void mc68328_device::pedata_w(uint8_t data) // 0x421
-{
-	LOGMASKED(LOG_GPIO_E, "pedata_w: PEDATA = %02x\n", data);
-	m_pedata = data;
-	m_out_port_e_cb(m_pedata);
-}
-
-void mc68328_device::pepuen_w(uint8_t data) // 0x422
-{
-	LOGMASKED(LOG_GPIO_E, "pepuen_w: PEPUEN = %02x\n", data);
-	m_pepuen = data;
-}
-
-void mc68328_device::pesel_w(uint8_t data) // 0x423
-{
-	LOGMASKED(LOG_GPIO_E, "pesel_w: PESEL = %02x\n", data);
-	m_pesel = data;
-}
-
-void mc68328_device::pfdir_w(uint8_t data) // 0x428
-{
-	LOGMASKED(LOG_GPIO_F, "pfdir_w: PFDIR = %02x\n", data);
-	m_pfdir = data;
-}
-
-void mc68328_device::pfdata_w(uint8_t data) // 0x429
-{
-	LOGMASKED(LOG_GPIO_F, "pfdata_w: PFDATA = %02x\n", data);
-	m_pfdata = data;
-	m_out_port_f_cb(m_pfdata);
-}
-
-void mc68328_device::pfpuen_w(uint8_t data) // 0x42a
-{
-	LOGMASKED(LOG_GPIO_F, "pfpuen_w: PFPUEN = %02x\n", data);
-	m_pfpuen = data;
-}
-
-void mc68328_device::pfsel_w(uint8_t data) // 0x42b
-{
-	LOGMASKED(LOG_GPIO_F, "pfsel_w: PFSEL = %02x\n", data);
-	m_pfsel = data;
-}
-
-void mc68328_device::pgdir_w(uint8_t data) // 0x430
-{
-	LOGMASKED(LOG_GPIO_G, "pgdir_w: PGDIR = %02x\n", data);
-	m_pgdir = data;
-}
-
-void mc68328_device::pgdata_w(uint8_t data) // 0x431
-{
-	LOGMASKED(LOG_GPIO_G, "pgdata_w: PGDATA = %02x\n", data);
-	m_pgdata = data;
-	m_out_port_g_cb(m_pgdata);
-}
-
-void mc68328_device::pgpuen_w(uint8_t data) // 0x432
-{
-	LOGMASKED(LOG_GPIO_G, "pgpuen_w: PGPUEN = %02x\n", data);
-	m_pgpuen = data;
-}
-
-void mc68328_device::pgsel_w(uint8_t data) // 0x433
-{
-	LOGMASKED(LOG_GPIO_G, "pgsel_w: PGSEL = %02x\n", data);
-	m_pgsel = data;
-}
-
-void mc68328_device::pjdir_w(uint8_t data) // 0x438
-{
-	LOGMASKED(LOG_GPIO_J, "pjdir_w: PJDIR = %02x\n", data);
-	m_pjdir = data;
-}
-
-void mc68328_device::pjdata_w(uint8_t data) // 0x439
-{
-	LOGMASKED(LOG_GPIO_J, "pjdata_w: PJDATA = %02x\n", data);
-	m_pjdata = data;
-	m_out_port_j_cb(m_pjdata);
-}
-
-void mc68328_device::pjsel_w(uint8_t data) // 0x43b
-{
-	LOGMASKED(LOG_GPIO_J, "pjsel_w: PJSEL = %02x\n", data);
-	m_pjsel = data;
-}
-
-void mc68328_device::pkdir_w(uint8_t data) // 0x440
-{
-	LOGMASKED(LOG_GPIO_K, "pkdir_w: PKDIR = %02x\n", data);
-	m_pkdir = data;
-}
-
-void mc68328_device::pkdata_w(uint8_t data) // 0x441
-{
-	LOGMASKED(LOG_GPIO_K, "pkdata_w: PKDATA = %02x\n", data);
-	m_pkdata = data;
-	m_out_port_k_cb(m_pkdata);
-}
-
-void mc68328_device::pkpuen_w(uint8_t data) // 0x442
-{
-	LOGMASKED(LOG_GPIO_K, "pkpuen_w: PKPUEN = %02x\n", data);
-	m_pkpuen = data;
-}
-
-void mc68328_device::pksel_w(uint8_t data) // 0x443
-{
-	LOGMASKED(LOG_GPIO_K, "pksel_w: PKSEL = %02x\n", data);
-	m_pksel = data;
-}
-
-void mc68328_device::pmdir_w(uint8_t data) // 0x448
-{
-	LOGMASKED(LOG_GPIO_M, "pmdir_w: PMDIR = %02x\n", data);
-	m_pmdir = data;
-}
-
-void mc68328_device::pmdata_w(uint8_t data) // 0x449
-{
-	LOGMASKED(LOG_GPIO_M, "pmdata_w: PMDATA = %02x\n", data);
-	m_pmdata = data;
-	m_out_port_m_cb(m_pmdata);
-}
-
-void mc68328_device::pmpuen_w(uint8_t data) // 0x44a
-{
-	LOGMASKED(LOG_GPIO_M, "pmpuen_w: PMPUEN = %02x\n", data);
-	m_pmpuen = data;
-}
-
-void mc68328_device::pmsel_w(uint8_t data) // 0x44b
-{
-	LOGMASKED(LOG_GPIO_M, "pmsel_w: PMSEL = %02x\n", data);
-	m_pmsel = data;
-}
-
-void mc68328_device::pwmc_w(uint16_t data) // 0x500
-{
-	LOGMASKED(LOG_PWM, "pwmc_w: PWMC = %04x\n", data);
-
-	m_pwmc = data;
-
-	if (m_pwmc & PWMC_PWMIRQ)
-	{
-		set_interrupt_line(INT_PWM, 1);
-	}
-
-	m_pwmc &= ~PWMC_LOAD;
-
-	if ((m_pwmc & PWMC_PWMEN) != 0 && m_pwmw != 0 && m_pwmp != 0)
-	{
-		uint32_t frequency = 32768 * 506;
-		uint32_t divisor = 4 << (m_pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
-		attotime period;
-		frequency /= divisor;
-		period = attotime::from_hz(frequency) * m_pwmw;
-		m_pwm->adjust(period);
-		if (m_pwmc & PWMC_IRQEN)
-		{
-			set_interrupt_line(INT_PWM, 1);
-		}
-		m_pwmc ^= PWMC_PIN;
-	}
-	else
-	{
-		m_pwm->adjust(attotime::never);
-	}
-}
-
-void mc68328_device::pwmp_w(uint16_t data) // 0x502
-{
-	LOGMASKED(LOG_PWM, "pwmp_w: PWMP = %04x\n", data);
-	m_pwmp = data;
-}
-
-void mc68328_device::pwmw_w(uint16_t data) // 0x504
-{
-	LOGMASKED(LOG_PWM, "pwmw_w: PWMW = %04x\n", data);
-	m_pwmw = data;
-}
-
-void mc68328_device::pwmcnt_w(uint16_t data) // 0x506
-{
-	LOGMASKED(LOG_PWM, "pwmcnt_w: PWMCNT = %04x\n", data);
-	m_pwmcnt = 0;
-}
-
-template <int Timer>
-void mc68328_device::tctl_w(uint16_t data) // 0x600, 0x60c
-{
-	LOGMASKED(LOG_TIMERS, "tctl_w<%d>: TCTL%d = %04x\n", Timer, Timer + 1, data);
-	const uint16_t temp = m_tctl[Timer];
-	m_tctl[Timer] = data;
-	if ((temp & TCTL_TEN) == (m_tctl[Timer] & TCTL_TEN))
-	{
-		maybe_start_timer<Timer>(0);
-	}
-	else if ((temp & TCTL_TEN) != TCTL_TEN_ENABLE && (m_tctl[Timer] & TCTL_TEN) == TCTL_TEN_ENABLE)
-	{
-		maybe_start_timer<Timer>(1);
-	}
-}
-
-template <int Timer>
-void mc68328_device::tprer_w(uint16_t data) // 0x602, 0x60e
-{
-	LOGMASKED(LOG_TIMERS, "tprer_w<%d>: TPRER%d = %04x\n", Timer, Timer + 1, data);
-	m_tprer[Timer] = data;
-	maybe_start_timer<Timer>(0);
-}
-
-template <int Timer>
-void mc68328_device::tcmp_w(uint16_t data) // 0x604, 0x610
-{
-	LOGMASKED(LOG_TIMERS, "tcmp_w<%d>: TCMP%d = %04x\n", Timer, Timer + 1, data);
-	m_tcmp[Timer] = data;
-	maybe_start_timer<Timer>(0);
-}
-
-template <int Timer>
-void mc68328_device::tcr_w(uint16_t data) // 0x606, 0x612
-{
-	LOGMASKED(LOG_TIMERS, "tcr_w<%d>: TCR%d = %04x (Ignored)\n", Timer, Timer + 1, data);
-}
-
-template <int Timer>
-void mc68328_device::tcn_w(uint16_t data) // 0x608, 0x614
-{
-	LOGMASKED(LOG_TIMERS, "tcn_w<%d>: TCN%d = %04x (Ignored)\n", Timer, Timer + 1, data);
-}
-
-template <int Timer>
-void mc68328_device::tstat_w(uint16_t data) // 0x60a, 0x616
-{
-	LOGMASKED(LOG_TSTAT, "tstat_w<%d>: TSTAT%d = %04x\n", Timer, Timer + 1, data);
-	m_tstat[Timer] &= ~m_tclear[Timer];
-	if (!(m_tstat[Timer] & TSTAT_COMP))
-	{
-		set_interrupt_line(Timer ? INT_TIMER2 : INT_TIMER1, 0);
-	}
-}
-
-void mc68328_device::wctlr_w(uint16_t data) // 0x618
-{
-	LOGMASKED(LOG_WATCHDOG, "wctlr_w: WCTLR = %04x\n", data);
-	m_wctlr = data;
-}
-
-void mc68328_device::wcmpr_w(uint16_t data) // 0x61a
-{
-	LOGMASKED(LOG_WATCHDOG, "wcmpr_w: WCMPR = %04x\n", data);
-	m_wcmpr = data;
-}
-
-void mc68328_device::wcn_w(uint16_t data) // 0x61c
-{
-	LOGMASKED(LOG_WATCHDOG, "wcn_w: WCN = %04x (Ignored)\n", data);
-}
-
-void mc68328_device::spisr_w(uint16_t data) // 0x700
-{
-	LOGMASKED(LOG_SPIS, "spisr_w: SPISR = %04x\n", data);
-	m_spisr = data;
-}
-
-void mc68328_device::spimdata_w(uint16_t data) // 0x800
-{
-	LOGMASKED(LOG_SPIM, "spimdata_w: SPIMDATA = %04x\n", data);
-	m_spimdata = data;
-	m_out_spim_cb(data, 0xffff);
-}
-
-void mc68328_device::spimcont_w(uint16_t data) // 0x802
-{
-	LOGMASKED(LOG_SPIM, "spimcont_w: SPIMCONT = %04x\n", data);
-	LOGMASKED(LOG_SPIM, "            Count = %d\n", data & SPIM_CLOCK_COUNT);
-	LOGMASKED(LOG_SPIM, "            Polarity = %s\n", (data & SPIM_POL) ? "Inverted" : "Active-high");
-	LOGMASKED(LOG_SPIM, "            Phase = %s\n", (data & SPIM_PHA) ? "Opposite" : "Normal");
-	LOGMASKED(LOG_SPIM, "            IRQ Enable = %s\n", (data & SPIM_IRQEN) ? "Enable" : "Disable");
-	LOGMASKED(LOG_SPIM, "            IRQ Pending = %s\n", (data & SPIM_SPIMIRQ) ? "Yes" : "No");
-	LOGMASKED(LOG_SPIM, "            Exchange = %s\n", (data & SPIM_XCH) ? "Initiate" : "Idle");
-	LOGMASKED(LOG_SPIM, "            SPIM Enable = %s\n", (data & SPIM_SPMEN) ? "Enable" : "Disable");
-	LOGMASKED(LOG_SPIM, "            Data Rate = Divide By %d\n", 1 << ((((data & SPIM_RATE) >> 13) & 0x0007) + 2) );
-	m_spimcont = data;
-	// HACK: We should probably emulate the ADS7843 A/D device properly.
-	if (data & SPIM_XCH)
-	{
-		m_spimcont &= ~SPIM_XCH;
-		if (!m_spim_xch_trigger_cb.isnull())
-		{
-			m_spim_xch_trigger_cb(0);
-		}
-		if (data & SPIM_IRQEN)
-		{
-			m_spimcont |= SPIM_SPIMIRQ;
-			LOGMASKED(LOG_SPIM, "Triggering SPIM Interrupt\n" );
-			set_interrupt_line(INT_SPIM, 1);
-		}
-	}
-	if (!(data & SPIM_IRQEN))
-	{
-		set_interrupt_line(INT_SPIM, 0);
-	}
-}
-
-void mc68328_device::ustcnt_w(uint16_t data) // 0x900
-{
-	LOGMASKED(LOG_UART, "ustcnt_w: USTCNT = %04x\n", data);
-	m_ustcnt = data;
-}
-
-void mc68328_device::ubaud_w(uint16_t data) // 0x902
-{
-	LOGMASKED(LOG_UART, "ubaud_w: UBAUD = %04x\n", data);
-	m_ubaud = data;
-}
-
-void mc68328_device::urx_w(uint16_t data) // 0x904
-{
-	LOGMASKED(LOG_UART, "urx_w: URX = %04x (Not Yet Implemented)\n", data);
-}
-
-void mc68328_device::utx_w(uint16_t data) // 0x906
-{
-	LOGMASKED(LOG_UART, "utx_w: UTX = %04x (Not Yet Implemented)\n", data);
-}
-
-void mc68328_device::umisc_w(uint16_t data) // 0x908
-{
-	LOGMASKED(LOG_UART, "umisc_w: UMISC = %04x (Not Yet Implemented)\n", data);
-	m_umisc = data;
-}
-
-void mc68328_device::lssa_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xa00
-{
-	LOGMASKED(LOG_LCD, "lssa_msw_w: LSSA(MSW) = %04x\n", data);
-	m_lssa &= ~(mem_mask << 16);
-	m_lssa |= (data & mem_mask) << 16;
-	LOGMASKED(LOG_LCD, "            Address: %08x\n", m_lssa);
-}
-
-void mc68328_device::lssa_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xa02
-{
-	LOGMASKED(LOG_LCD, "lssa_lsw_w: LSSA(LSW) = %04x\n", data);
-	m_lssa &= 0xffff0000 | (~mem_mask);
-	m_lssa |= data & mem_mask;
-	LOGMASKED(LOG_LCD, "            Address: %08x\n", m_lssa);
-}
-
-void mc68328_device::lvpw_w(uint8_t data) // 0xa05
-{
-	LOGMASKED(LOG_LCD, "lvpw_w: LVPW = %02x\n", data);
-	m_lvpw = data;
-	LOGMASKED(LOG_LCD, "        Page Width: %d\n", (m_lvpw + 1) * ((m_lpicf & 0x01) ? 8 : 16));
-}
-
-void mc68328_device::lxmax_w(uint16_t data) // 0xa08
-{
-	LOGMASKED(LOG_LCD, "lxmax_w: LXMAX = %04x\n", data);
-	m_lxmax = data;
-	LOGMASKED(LOG_LCD, "         Width: %d\n", (data & 0x03ff) + 1);
-}
-
-void mc68328_device::lymax_w(uint16_t data) // 0xa0a
-{
-	LOGMASKED(LOG_LCD, "lymax_w: LYMAX = %04x\n", data);
-	m_lxmax = data;
-	LOGMASKED(LOG_LCD, "         Height: %d\n", (data & 0x03ff) + 1);
-}
-
-void mc68328_device::lcxp_w(uint16_t data) // 0xa18
-{
-	LOGMASKED(LOG_LCD, "lcxp_w: LCXP = %04x\n", data);
-	m_lcxp = data;
-	LOGMASKED(LOG_LCD, "        X Position: %d\n", data & 0x03ff);
-	switch (m_lcxp >> 14)
-	{
-		case 0:
-			LOGMASKED(LOG_LCD, "        Cursor Control: Transparent\n");
-			break;
-
-		case 1:
-			LOGMASKED(LOG_LCD, "        Cursor Control: Black\n");
-			break;
-
-		case 2:
-			LOGMASKED(LOG_LCD, "        Cursor Control: Reverse\n");
-			break;
-
-		case 3:
-			LOGMASKED(LOG_LCD, "        Cursor Control: Invalid\n");
-			break;
-	}
-}
-
-void mc68328_device::lcyp_w(uint16_t data) // 0xa1a
-{
-	LOGMASKED(LOG_LCD, "lcyp_w: LCYP = %04x\n", data);
-	m_lcyp = data;
-	LOGMASKED(LOG_LCD, "        Y Position: %d\n", data & 0x01ff);
-}
-
-void mc68328_device::lcwch_w(uint16_t data) // 0xa1c
-{
-	LOGMASKED(LOG_LCD, "lcwch_w: LCWCH = %04x\n", data);
-	m_lcwch = data;
-	LOGMASKED(LOG_LCD, "         Width:  %d\n", (data >> 8) & 0x1f);
-	LOGMASKED(LOG_LCD, "         Height: %d\n", data & 0x1f);
-}
-
-void mc68328_device::lblkc_w(uint8_t data) // 0xa1f
-{
-	LOGMASKED(LOG_LCD, "lblkc_w: LBLKC = %02x\n", data);
-	m_lblkc = data;
-	LOGMASKED(LOG_LCD, "         Blink Enable:  %d\n", m_lblkc >> 7);
-	LOGMASKED(LOG_LCD, "         Blink Divisor: %d\n", m_lblkc & 0x7f);
-}
-
-void mc68328_device::lpicf_w(uint8_t data) // 0xa20
-{
-	LOGMASKED(LOG_LCD, "lpicf_w: LPICF = %02x\n", data);
-	m_lpicf = data;
-	switch((m_lpicf >> 1) & 0x03)
-	{
-		case 0:
-			LOGMASKED(LOG_LCD, "         Bus Size: 1-bit\n");
-			break;
-
-		case 1:
-			LOGMASKED(LOG_LCD, "         Bus Size: 2-bit\n");
-			break;
-
-		case 2:
-			LOGMASKED(LOG_LCD, "         Bus Size: 4-bit\n");
-			break;
-
-		case 3:
-			LOGMASKED(LOG_LCD, "         Bus Size: unused\n");
-			break;
-	}
-	LOGMASKED(LOG_LCD, "         Gray scale enable: %d\n", m_lpicf & 0x01);
-}
-
-void mc68328_device::lpolcf_w(uint8_t data) // 0xa21
-{
-	LOGMASKED(LOG_LCD, "lpolcf_w: LPOLCF = %02x\n", data);
-	m_lpolcf = data;
-	LOGMASKED(LOG_LCD, "          LCD Shift Clock Polarity: %s\n", (m_lpicf & 0x08) ? "Active positive edge of LCLK" : "Active negative edge of LCLK");
-	LOGMASKED(LOG_LCD, "          First-line marker polarity: %s\n", (m_lpicf & 0x04) ? "Active Low" : "Active High");
-	LOGMASKED(LOG_LCD, "          Line-pulse polarity: %s\n", (m_lpicf & 0x02) ? "Active Low" : "Active High");
-	LOGMASKED(LOG_LCD, "          Pixel polarity: %s\n", (m_lpicf & 0x01) ? "Active Low" : "Active High");
-}
-
-void mc68328_device::lacdrc_w(uint8_t data) // 0xa23
-{
-	LOGMASKED(LOG_LCD, "lacdrc_w: LACDRC = %02x\n", data);
-	m_lacdrc = data;
-}
-
-void mc68328_device::lpxcd_w(uint8_t data) // 0xa25
-{
-	LOGMASKED(LOG_LCD, "lpxcd_w: LPXCD = %02x\n", data);
-	m_lpxcd = data;
-	LOGMASKED(LOG_LCD, "         Clock Divisor: %d\n", m_lpxcd + 1);
-}
-
-void mc68328_device::lckcon_w(uint8_t data) // 0xa27
-{
-	LOGMASKED(LOG_LCD, "lckcon_w: LCKCON = %02x\n", data);
-	m_lckcon = data;
-	LOGMASKED(LOG_LCD, "          LCDC Enable: %d\n", (m_lckcon >> 7) & 0x01);
-	LOGMASKED(LOG_LCD, "          DMA Burst Length: %d\n", ((m_lckcon >> 6) & 0x01) ? 16 : 8);
-	LOGMASKED(LOG_LCD, "          DMA Bursting Clock Control: %d\n", ((m_lckcon >> 4) & 0x03) + 1);
-	LOGMASKED(LOG_LCD, "          Bus Width: %d\n", ((m_lckcon >> 1) & 0x01) ? 8 : 16);
-	LOGMASKED(LOG_LCD, "          Pixel Clock Divider Source: %s\n", (m_lckcon & 0x01) ? "PIX" : "SYS");
-}
-
-void mc68328_device::llbar_w(uint8_t data) // 0xa29
-{
-	LOGMASKED(LOG_LCD, "llbar_w: LLBAR = %02x\n", data);
-	m_llbar = data;
-	LOGMASKED(LOG_LCD, "         Address: %d\n", (m_llbar & 0x7f) * ((m_lpicf & 0x01) ? 8 : 16));
-}
-
-void mc68328_device::lotcr_w(uint8_t data) // 0xa2b
-{
-	LOGMASKED(LOG_LCD, "lotcr_w: LOTCR = %02x (Ignored)\n", data);
-}
-
-void mc68328_device::lposr_w(uint8_t data) // 0xa2d
-{
-	LOGMASKED(LOG_LCD, "lposr_w: LPOSR = %02x\n", data);
-	m_lposr = data;
-	LOGMASKED(LOG_LCD, "         Byte Offset: %d\n", (m_lposr >> 3) & 0x01);
-	LOGMASKED(LOG_LCD, "         Pixel Offset: %d\n", m_lposr & 0x07);
-}
-
-void mc68328_device::lfrcm_w(uint8_t data) // 0xa31
-{
-	LOGMASKED(LOG_LCD, "lfrcm_w: LFRCM = %02x\n", data);
-	m_lfrcm = data;
-	LOGMASKED(LOG_LCD, "         X Modulation: %d\n", (m_lfrcm >> 4) & 0x0f);
-	LOGMASKED(LOG_LCD, "         Y Modulation: %d\n", m_lfrcm & 0x0f);
-}
-
-void mc68328_device::lgpmr_w(uint8_t data) // 0xa32
-{
-	LOGMASKED(LOG_LCD, "lgpmr_w: LGPMR = %04x\n", data);
-	m_lgpmr = data;
-	LOGMASKED(LOG_LCD, "         Palette 0: %d\n", (m_lgpmr >>  8) & 0x07);
-	LOGMASKED(LOG_LCD, "         Palette 1: %d\n", (m_lgpmr >> 12) & 0x07);
-	LOGMASKED(LOG_LCD, "         Palette 2: %d\n", (m_lgpmr >>  0) & 0x07);
-	LOGMASKED(LOG_LCD, "         Palette 3: %d\n", (m_lgpmr >>  4) & 0x07);
-}
-
 void mc68328_device::hmsr_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xb00
 {
 	LOGMASKED(LOG_RTC, "hmsr_msw_w: HMSR(MSW) = %04x\n", data);
 	m_hmsr &= ~(mem_mask << 16);
 	m_hmsr |= (data & mem_mask) << 16;
 	m_hmsr &= 0x1f3f003f;
+}
+
+uint16_t mc68328_device::hmsr_msw_r() // 0xb00
+{
+	LOGMASKED(LOG_RTC, "hmsr_msw_r: HMSR(MSW): %04x\n", (uint16_t)(m_hmsr >> 16));
+	return (uint16_t)(m_hmsr >> 16);
 }
 
 void mc68328_device::hmsr_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xb02
@@ -1644,12 +2808,24 @@ void mc68328_device::hmsr_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_hmsr &= 0x1f3f003f;
 }
 
+uint16_t mc68328_device::hmsr_lsw_r() // 0xb02
+{
+	LOGMASKED(LOG_RTC, "hmsr_lsw_r: HMSR(LSW): %04x\n", (uint16_t)m_hmsr);
+	return (uint16_t)m_hmsr;
+}
+
 void mc68328_device::alarm_msw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xb04
 {
 	LOGMASKED(LOG_RTC, "alarm_msw_w: ALARM(MSW) = %04x\n", data);
 	m_alarm &= ~(mem_mask << 16);
 	m_alarm |= (data & mem_mask) << 16;
 	m_alarm &= 0x1f3f003f;
+}
+
+uint16_t mc68328_device::alarm_msw_r() // 0xb04
+{
+	LOGMASKED(LOG_RTC, "alarm_msw_r: ALARM(MSW): %04x\n", (uint16_t)(m_alarm >> 16));
+	return (uint16_t)(m_alarm >> 16);
 }
 
 void mc68328_device::alarm_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xb06
@@ -1660,10 +2836,22 @@ void mc68328_device::alarm_lsw_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	m_alarm &= 0x1f3f003f;
 }
 
+uint16_t mc68328_device::alarm_lsw_r() // 0xb06
+{
+	LOGMASKED(LOG_RTC, "alarm_lsw_r: ALARM(LSW): %04x\n", (uint16_t)m_alarm);
+	return (uint16_t)m_alarm;
+}
+
 void mc68328_device::rtcctl_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xb0c
 {
 	LOGMASKED(LOG_RTC, "rtcctl_w: RTCCTL = %04x\n", data);
 	m_rtcctl = data & 0x00a0;
+}
+
+uint16_t mc68328_device::rtcctl_r() // 0xb0c
+{
+	LOGMASKED(LOG_RTC, "rtcctl_r: RTCCTL: %04x\n", m_rtcctl);
+	return m_rtcctl;
 }
 
 void mc68328_device::rtcisr_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xb0e
@@ -1676,785 +2864,16 @@ void mc68328_device::rtcisr_w(offs_t offset, uint16_t data, uint16_t mem_mask) /
 	}
 }
 
-void mc68328_device::rtcienr_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xb10
-{
-	LOGMASKED(LOG_RTC, "rtcienr_w: RTCIENR = %04x\n", data);
-	m_rtcienr = data & 0x001f;
-}
-
-void mc68328_device::stpwtch_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xb12
-{
-	LOGMASKED(LOG_RTC, "stpwtch_w: STPWTCH = %04x\n", data);
-	m_stpwtch = data & 0x003f;
-}
-
-
-uint8_t mc68328_device::scr_r() // 0x000
-{
-	LOGMASKED(LOG_SCR, "scr_r: SCR: %02x\n", m_scr);
-	return m_scr;
-}
-
-uint16_t mc68328_device::grpbasea_r() // 0x100
-{
-	LOGMASKED(LOG_CS_GRP, "grpbasea_r: GRPBASEA: %04x\n", m_grpbasea);
-	return m_grpbasea;
-}
-
-uint16_t mc68328_device::grpbaseb_r() // 0x102
-{
-	LOGMASKED(LOG_CS_GRP, "grpbaseb_r: GRPBASEB: %04x\n", m_grpbaseb);
-	return m_grpbaseb;
-}
-
-uint16_t mc68328_device::grpbasec_r() // 0x104
-{
-	LOGMASKED(LOG_CS_GRP, "grpbasec_r: GRPBASEC: %04x\n", m_grpbasec);
-	return m_grpbasec;
-}
-
-uint16_t mc68328_device::grpbased_r() // 0x106
-{
-	LOGMASKED(LOG_CS_GRP, "grpbased_r: GRPBASED: %04x\n", m_grpbased);
-	return m_grpbased;
-}
-
-uint16_t mc68328_device::grpmaska_r() // 0x108
-{
-	LOGMASKED(LOG_CS_GRP, "grpmaska_r: GRPMASKA: %04x\n", m_grpmaska);
-	return m_grpmaska;
-}
-
-uint16_t mc68328_device::grpmaskb_r() // 0x10a
-{
-	LOGMASKED(LOG_CS_GRP, "grpmaskb_r: GRPMASKB: %04x\n", m_grpmaskb);
-	return m_grpmaskb;
-}
-
-uint16_t mc68328_device::grpmaskc_r() // 0x10c
-{
-	LOGMASKED(LOG_CS_GRP, "grpmaskc_r: GRPMASKC: %04x\n", m_grpmaskc);
-	return m_grpmaskc;
-}
-
-uint16_t mc68328_device::grpmaskd_r() // 0x10e
-{
-	LOGMASKED(LOG_CS_GRP, "grpmaskd_r: GRPMASKD: %04x\n", m_grpmaskd);
-	return m_grpmaskd;
-}
-
-template<int ChipSelect>
-uint16_t mc68328_device::csa_msw_r() // 0x110, 0x120, 0x130, 0x140
-{
-	LOGMASKED(LOG_CS_SEL, "csa_msw_r: CSA%d(MSW): %04x\n", ChipSelect, (uint16_t)(m_csa[ChipSelect] >> 16));
-	return (uint16_t)(m_csa[ChipSelect] >> 16);
-}
-
-template<int ChipSelect>
-uint16_t mc68328_device::csa_lsw_r() // 0x112, 0x122, 0x132, 0x142
-{
-	LOGMASKED(LOG_CS_SEL, "csa_lsw_r: CSA%d(LSW): %04x\n", ChipSelect, (uint16_t)m_csa[ChipSelect]);
-	return (uint16_t)m_csa[ChipSelect];
-}
-
-template<int ChipSelect>
-uint16_t mc68328_device::csb_msw_r() // 0x114, 0x124, 0x134, 0x144
-{
-	LOGMASKED(LOG_CS_SEL, "csb_msw_r: CSB%d(MSW): %04x\n", ChipSelect, (uint16_t)(m_csb[ChipSelect] >> 16));
-	return (uint16_t)(m_csb[ChipSelect] >> 16);
-}
-
-template<int ChipSelect>
-uint16_t mc68328_device::csb_lsw_r() // 0x116, 0x126, 0x136, 0x146
-{
-	LOGMASKED(LOG_CS_SEL, "csb_lsw_r: CSB%d(LSW): %04x\n", ChipSelect, (uint16_t)m_csb[ChipSelect]);
-	return (uint16_t)m_csb[ChipSelect];
-}
-
-template<int ChipSelect>
-uint16_t mc68328_device::csc_msw_r() // 0x118, 0x128, 0x138, 0x148
-{
-	LOGMASKED(LOG_CS_SEL, "csc_msw_r: CSC%d(MSW): %04x\n", ChipSelect, (uint16_t)(m_csc[ChipSelect] >> 16));
-	return (uint16_t)(m_csc[ChipSelect] >> 16);
-}
-
-template<int ChipSelect>
-uint16_t mc68328_device::csc_lsw_r() // 0x11a, 0x12a, 0x13a, 0x14a
-{
-	LOGMASKED(LOG_CS_SEL, "csc_lsw_r: CSC%d(LSW): %04x\n", ChipSelect, (uint16_t)m_csc[ChipSelect]);
-	return (uint16_t)m_csc[ChipSelect];
-}
-
-template<int ChipSelect>
-uint16_t mc68328_device::csd_msw_r() // 0x11c, 0x12c, 0x13c, 0x14c
-{
-	LOGMASKED(LOG_CS_SEL, "csd_msw_r: CSD%d(MSW): %04x\n", ChipSelect, (uint16_t)(m_csd[ChipSelect] >> 16));
-	return (uint16_t)(m_csd[ChipSelect] >> 16);
-}
-
-template<int ChipSelect>
-uint16_t mc68328_device::csd_lsw_r() // 0x11e, 0x12e, 0x13e, 0x14e
-{
-	LOGMASKED(LOG_CS_SEL, "csd_lsw_r: CSD%d(LSW): %04x\n", ChipSelect, (uint16_t)m_csd[ChipSelect]);
-	return (uint16_t)m_csd[ChipSelect];
-}
-
-uint16_t mc68328_device::pllcr_r() // 0x200
-{
-	LOGMASKED(LOG_PLL, "pllcr_r: PLLCR: %04x\n", m_pllcr);
-	return m_pllcr;
-}
-
-uint16_t mc68328_device::pllfsr_r() // 0x202
-{
-	LOGMASKED(LOG_PLL, "pllfsr_r: PLLFSR: %04x\n", m_pllfsr);
-	m_pllfsr ^= 0x8000;
-	return m_pllfsr;
-}
-
-uint8_t mc68328_device::pctlr_r() // 0x207
-{
-	LOGMASKED(LOG_PLL, "pctlr_r: PCTLR: %02x\n", m_pctlr);
-	return m_pctlr;
-}
-
-uint8_t mc68328_device::ivr_r() // 0x300
-{
-	LOGMASKED(LOG_INTS, "ivr_r: IVR: %02x\n", m_ivr);
-	return m_ivr;
-}
-
-uint16_t mc68328_device::icr_r() // 0x302
-{
-	LOGMASKED(LOG_INTS, "icr_r: ICR: %04x\n", m_icr);
-	return m_icr;
-}
-
-uint16_t mc68328_device::imr_msw_r() // 0x304
-{
-	LOGMASKED(LOG_INTS, "imr_msw_r: IMR(MSW): %04x\n", (uint16_t)(m_imr >> 16));
-	return (uint16_t)(m_imr >> 16);
-}
-
-uint16_t mc68328_device::imr_lsw_r() // 0x306
-{
-	LOGMASKED(LOG_INTS, "imr_lsw_r: IMR(LSW): %04x\n", (uint16_t)m_imr);
-	return (uint16_t)m_imr;
-}
-
-uint16_t mc68328_device::iwr_msw_r() // 0x308
-{
-	LOGMASKED(LOG_INTS, "iwr_msw_r: IWR(MSW): %04x\n", (uint16_t)(m_iwr >> 16));
-	return (uint16_t)(m_iwr >> 16);
-}
-
-uint16_t mc68328_device::iwr_lsw_r() // 0x30a
-{
-	LOGMASKED(LOG_INTS, "iwr_lsw_r: IWR(LSW): %04x\n", (uint16_t)m_iwr);
-	return (uint16_t)m_iwr;
-}
-
-uint16_t mc68328_device::isr_msw_r() // 0x30c
-{
-	LOGMASKED(LOG_INTS, "isr_msw_r: ISR(MSW): %04x\n", (uint16_t)(m_isr >> 16));
-	return (uint16_t)(m_isr >> 16);
-}
-
-uint16_t mc68328_device::isr_lsw_r() // 0x30e
-{
-	LOGMASKED(LOG_INTS, "isr_lsw_r: ISR(LSW): %04x\n", (uint16_t)m_isr);
-	return (uint16_t)m_isr;
-}
-
-uint16_t mc68328_device::ipr_msw_r() // 0x310
-{
-	LOGMASKED(LOG_INTS, "ipr_msw_r: IPR(MSW): %04x\n", (uint16_t)(m_ipr >> 16));
-	return (uint16_t)(m_ipr >> 16);
-}
-
-uint16_t mc68328_device::ipr_lsw_r() // 0x312
-{
-	LOGMASKED(LOG_INTS, "ipr_lsw_r: IPR(LSW): %04x\n", (uint16_t)m_ipr);
-	return (uint16_t)m_ipr;
-}
-
-uint8_t mc68328_device::padir_r() // 0x400
-{
-	LOGMASKED(LOG_GPIO_A, "mc68328_r: PADIR: %02x\n", m_padir);
-	return m_padir;
-}
-
-uint8_t mc68328_device::padata_r() // 0x401
-{
-	LOGMASKED(LOG_GPIO_A, "padata_r: PADATA: %02x\n", m_padata);
-	if (!m_in_port_a_cb.isnull())
-	{
-		return m_in_port_a_cb(0);
-	}
-	else
-	{
-		return m_padata;
-	}
-}
-
-uint8_t mc68328_device::pasel_r() // 0x403
-{
-	LOGMASKED(LOG_GPIO_A, "mc68328_r: PASEL: %02x\n", m_pasel);
-	return m_pasel;
-}
-
-uint8_t mc68328_device::pbdir_r() // 0x408
-{
-	LOGMASKED(LOG_GPIO_B, "pbdir_r: PBDIR: %02x\n", m_pbdir);
-	return m_pbdir;
-}
-
-uint8_t mc68328_device::pbdata_r() // 0x409
-{
-	LOGMASKED(LOG_GPIO_B, "pbdata_r: PBDATA: %02x\n", m_pbdata);
-	if (!m_in_port_b_cb.isnull())
-	{
-		return m_in_port_b_cb(0);
-	}
-	else
-	{
-		return m_pbdata;
-	}
-}
-
-uint8_t mc68328_device::pbsel_r() // 0x40b
-{
-	LOGMASKED(LOG_GPIO_B, "pbsel_r: PBSEL: %02x\n", m_pbsel);
-	return m_pbsel;
-}
-
-uint8_t mc68328_device::pcdir_r() // 0x410
-{
-	LOGMASKED(LOG_GPIO_C, "pcdir_r: PCDIR: %02x\n", m_pcdir);
-	return m_pcdir;
-}
-
-uint8_t mc68328_device::pcdata_r() // 0x411
-{
-	LOGMASKED(LOG_GPIO_C, "pcdata_r: PCDATA: %02x\n", m_pcdata);
-	if (!m_in_port_c_cb.isnull())
-	{
-		return m_in_port_c_cb(0);
-	}
-	else
-	{
-		return m_pcdata;
-	}
-}
-
-uint8_t mc68328_device::pcsel_r() // 0x413
-{
-	LOGMASKED(LOG_GPIO_C, "pcsel_r: PCSEL: %02x\n", m_pcsel);
-	return m_pcsel;
-}
-
-uint8_t mc68328_device::pddir_r() // 0x418
-{
-	LOGMASKED(LOG_GPIO_D, "pddir_r: PDDIR: %02x\n", m_pddir);
-	return m_pddir;
-}
-
-uint8_t mc68328_device::pddata_r() // 0x419
-{
-	LOGMASKED(LOG_GPIO_D, "pddata_r: PDDATA: %02x\n", m_pddata);
-	if (!m_in_port_d_cb.isnull())
-	{
-		return m_in_port_d_cb(0);
-	}
-	return m_pddata;
-}
-
-uint8_t mc68328_device::pdpuen_r() // 0x41a
-{
-	LOGMASKED(LOG_GPIO_D, "pdpuen_r: PDPUEN: %02x\n", m_pdpuen);
-	return m_pdpuen;
-}
-
-uint8_t mc68328_device::pdpol_r() // 0x41c
-{
-	LOGMASKED(LOG_GPIO_D, "pdpol_r: PDPOL: %02x\n", m_pdpol);
-	return m_pdpol;
-}
-
-uint8_t mc68328_device::pdirqen_r() // 0x41d
-{
-	LOGMASKED(LOG_GPIO_D, "pdirqen_r: PDIRQEN: %02x\n", m_pdirqen);
-	return m_pdirqen;
-}
-
-uint8_t mc68328_device::pdirqedge_r() // 0x41f
-{
-	LOGMASKED(LOG_GPIO_D, "pdirqedge_r: PDIRQEDGE: %02x\n", m_pdirqedge);
-	return m_pdirqedge;
-}
-
-uint8_t mc68328_device::pedir_r() // 0x420
-{
-	LOGMASKED(LOG_GPIO_E, "pedir_r: PEDIR: %02x\n", m_pedir);
-	return m_pedir;
-}
-
-uint8_t mc68328_device::pedata_r() // 0x421
-{
-	LOGMASKED(LOG_GPIO_E, "pedata_r: PEDATA: %02x\n", m_pedata);
-	if (!m_in_port_e_cb.isnull())
-	{
-		return m_in_port_e_cb(0);
-	}
-	return m_pedata;
-}
-
-uint8_t mc68328_device::pepuen_r() // 0x422
-{
-	LOGMASKED(LOG_GPIO_E, "pepuen_r: PEPUEN: %02x\n", m_pepuen);
-	return m_pepuen;
-}
-
-uint8_t mc68328_device::pesel_r() // 0x423
-{
-	LOGMASKED(LOG_GPIO_E, "pesel_r: PESEL: %02x\n", m_pesel);
-	return m_pesel;
-}
-
-uint8_t mc68328_device::pfdir_r() // 0x428
-{
-	LOGMASKED(LOG_GPIO_F, "pfdir_r: PFDIR: %02x\n", m_pfdir);
-	return m_pfdir;
-}
-
-uint8_t mc68328_device::pfdata_r() // 0x429
-{
-	LOGMASKED(LOG_GPIO_F, "pfdata_r: PFDATA: %02x\n", m_pfdata);
-	if (!m_in_port_f_cb.isnull())
-	{
-		return m_in_port_f_cb(0);
-	}
-	return m_pfdata;
-}
-
-uint8_t mc68328_device::pfpuen_r() // 0x42a
-{
-	LOGMASKED(LOG_GPIO_F, "pfpuen_r: PFPUEN: %02x\n", m_pfpuen);
-	return m_pfpuen;
-}
-
-uint8_t mc68328_device::pfsel_r() // 0x42b
-{
-	LOGMASKED(LOG_GPIO_F, "pfsel_r: PFSEL: %02x\n", m_pfsel);
-	return m_pfsel;
-}
-
-uint8_t mc68328_device::pgdir_r() // 0x430
-{
-	LOGMASKED(LOG_GPIO_G, "pgdir_r: PGDIR: %02x\n", m_pgdir);
-	return m_pgdir;
-}
-
-uint8_t mc68328_device::pgdata_r() // 0x431
-{
-	LOGMASKED(LOG_GPIO_G, "pgdata_r: PGDATA: %02x\n", m_pgdata);
-	if (!m_in_port_g_cb.isnull())
-	{
-		return m_in_port_g_cb(0);
-	}
-	return m_pgdata;
-}
-
-uint8_t mc68328_device::pgpuen_r() // 0x432
-{
-	LOGMASKED(LOG_GPIO_G, "pgpuen_r: PGPUEN: %02x\n", m_pgpuen);
-	return m_pgpuen;
-}
-
-uint8_t mc68328_device::pgsel_r() // 0x433
-{
-	LOGMASKED(LOG_GPIO_G, "pgsel_r: PGSEL: %02x\n", m_pgsel);
-	return m_pgsel;
-}
-
-uint8_t mc68328_device::pjdir_r() // 0x438
-{
-	LOGMASKED(LOG_GPIO_J, "pjdir_r: PJDIR: %02x\n", m_pjdir);
-	return m_pjdir;
-}
-
-uint8_t mc68328_device::pjdata_r() // 0x439
-{
-	LOGMASKED(LOG_GPIO_J, "pjdata_r: PJDATA: %02x\n", m_pjdata);
-	if (!m_in_port_j_cb.isnull())
-	{
-		return m_in_port_j_cb(0);
-	}
-	return m_pjdata;
-}
-
-uint8_t mc68328_device::pjsel_r() // 0x43b
-{
-	LOGMASKED(LOG_GPIO_J, "pjsel_r: PJSEL: %02x\n", m_pjsel);
-	return m_pjsel;
-}
-
-uint8_t mc68328_device::pkdir_r() // 0x440
-{
-	LOGMASKED(LOG_GPIO_K, "pkdir_r: PKDIR: %02x\n", m_pkdir);
-	return m_pkdir;
-}
-
-uint8_t mc68328_device::pkdata_r() // 0x441
-{
-	LOGMASKED(LOG_GPIO_K, "pkdata_r: PKDATA: %02x\n", m_pkdata);
-	if (!m_in_port_k_cb.isnull())
-	{
-		return m_in_port_k_cb(0);
-	}
-	return m_pkdata;
-}
-
-uint8_t mc68328_device::pkpuen_r() // 0x442
-{
-	LOGMASKED(LOG_GPIO_K, "pkpuen_r: PKPUEN: %02x\n", m_pkpuen);
-	return m_pkpuen;
-}
-
-uint8_t mc68328_device::pksel_r() // 0x443
-{
-	LOGMASKED(LOG_GPIO_K, "pksel_r: PKSEL: %02x\n", m_pksel);
-	return m_pksel;
-}
-
-uint8_t mc68328_device::pmdir_r() // 0x448
-{
-	LOGMASKED(LOG_GPIO_M, "pmdir_r: PMDIR: %02x\n", m_pmdir);
-	return m_pmdir;
-}
-
-uint8_t mc68328_device::pmdata_r() // 0x449
-{
-	LOGMASKED(LOG_GPIO_M, "pmdata_r: PMDATA: %02x\n", m_pmdata);
-	if (!m_in_port_m_cb.isnull())
-	{
-		return m_in_port_m_cb(0);
-	}
-	return m_pmdata;
-}
-
-uint8_t mc68328_device::pmpuen_r() // 0x44a
-{
-	LOGMASKED(LOG_GPIO_M, "pmpuen_r: PMPUEN: %02x\n", m_pmpuen);
-	return m_pmpuen;
-}
-
-uint8_t mc68328_device::pmsel_r() // 0x44b
-{
-	LOGMASKED(LOG_GPIO_M, "pmsel_r: PMSEL: %02x\n", m_pmsel);
-	return m_pmsel;
-}
-
-uint16_t mc68328_device::pwmc_r() // 0x500
-{
-	const uint16_t data = m_pwmc;
-	LOGMASKED(LOG_PWM, "pwmc_r: PWMC: %04x\n", data);
-	if (m_pwmc & PWMC_PWMIRQ)
-	{
-		m_pwmc &= ~PWMC_PWMIRQ;
-		set_interrupt_line(INT_PWM, 0);
-	}
-	return data;
-}
-
-uint16_t mc68328_device::pwmp_r() // 0x502
-{
-	LOGMASKED(LOG_PWM, "pwmp_r: PWMP: %04x\n", m_pwmp);
-	return m_pwmp;
-}
-
-uint16_t mc68328_device::pwmw_r() // 0x504
-{
-	LOGMASKED(LOG_PWM, "pwmw_r: PWMW: %04x\n", m_pwmw);
-	return m_pwmw;
-}
-
-uint16_t mc68328_device::pwmcnt_r() // 0x506
-{
-	LOGMASKED(LOG_PWM, "pwmcnt_r: PWMCNT: %04x\n", m_pwmcnt);
-	return m_pwmcnt;
-}
-
-template <int Timer>
-uint16_t mc68328_device::tctl_r() // 0x600, 0x60c
-{
-	LOGMASKED(LOG_TIMERS, "tctl_r: TCTL%d: %04x\n", Timer + 1, m_tctl[Timer]);
-	return m_tctl[Timer];
-}
-
-template <int Timer>
-uint16_t mc68328_device::tprer_r() // 0x602, 0x60e
-{
-	LOGMASKED(LOG_TIMERS, "tprer_r: TPRER%d: %04x\n", Timer + 1, m_tprer[Timer]);
-	return m_tprer[Timer];
-}
-
-template <int Timer>
-uint16_t mc68328_device::tcmp_r() // 0x604, 0x610
-{
-	LOGMASKED(LOG_TIMERS, "tcmp_r: TCMP%d: %04x\n", Timer + 1, m_tcmp[Timer]);
-	return m_tcmp[Timer];
-}
-
-template <int Timer>
-uint16_t mc68328_device::tcr_r() // 0x606, 0x612
-{
-	LOGMASKED(LOG_TIMERS, "tcr_r: TCR%d: %04x\n", Timer + 1, m_tcr[Timer]);
-	return m_tcr[Timer];
-}
-
-template <int Timer>
-uint16_t mc68328_device::tcn_r() // 0x608, 0x614
-{
-	LOGMASKED(LOG_TIMERS, "tcn_r: TCN%d: %04x\n", Timer + 1, m_tcn[Timer]);
-	return m_tcn[Timer];
-}
-
-template <int Timer>
-uint16_t mc68328_device::tstat_r() // 0x60a, 0x616
-{
-	LOGMASKED(LOG_TIMERS, "tstat_r: TSTAT%d: %04x\n", Timer + 1, m_tstat[Timer]);
-	m_tclear[Timer] |= m_tstat[Timer];
-	return m_tstat[Timer];
-}
-
-uint16_t mc68328_device::wctlr_r() // 0x618
-{
-	LOGMASKED(LOG_WATCHDOG, "wctlr_r: WCTLR: %04x\n", m_wctlr);
-	return m_wctlr;
-}
-
-uint16_t mc68328_device::wcmpr_r() // 0x61a
-{
-	LOGMASKED(LOG_WATCHDOG, "wcmpr_r: WCMPR: %04x\n", m_wcmpr);
-	return m_wcmpr;
-}
-
-uint16_t mc68328_device::wcn_r() // 0x61c
-{
-	LOGMASKED(LOG_WATCHDOG, "wcn_r: WCN: %04x\n", m_wcn);
-	return m_wcn;
-}
-
-uint16_t mc68328_device::spisr_r() // 0x700
-{
-	LOGMASKED(LOG_SPIS, "spisr_r: SPISR: %04x\n", m_spisr);
-	return m_spisr;
-}
-
-uint16_t mc68328_device::spimdata_r() // 0x800
-{
-	uint16_t data = m_spimdata;
-	if (!m_in_spim_cb.isnull())
-	{
-		data = m_in_spim_cb(0, 0xffff);
-	}
-	LOGMASKED(LOG_SPIM, "spimdata_r: SPIMDATA: %04x\n", data);
-	return data;
-}
-
-uint16_t mc68328_device::spimcont_r() // 0x802
-{
-	uint16_t data = m_spimcont;
-	if (m_spimcont & SPIM_XCH)
-	{
-		m_spimcont &= ~SPIM_XCH;
-		m_spimcont |= SPIM_SPIMIRQ;
-		data = ((m_spimcont | SPIM_XCH) &~ SPIM_SPIMIRQ);
-	}
-	LOGMASKED(LOG_SPIM, "spimcont_r: SPIMCONT: %04x\n", data);
-	return data;
-}
-
-uint16_t mc68328_device::ustcnt_r() // 0x900
-{
-	LOGMASKED(LOG_UART, "ustcnt_r: USTCNT: %04x\n", m_ustcnt);
-	return m_ustcnt;
-}
-
-uint16_t mc68328_device::ubaud_r() // 0x902
-{
-	LOGMASKED(LOG_UART, "ubaud_r: UBAUD: %04x\n", m_ubaud);
-	return m_ubaud;
-}
-
-uint16_t mc68328_device::urx_r() // 0x904
-{
-	LOGMASKED(LOG_UART, "urx_r: URX: %04x\n", m_urx);
-	return m_urx;
-}
-
-uint16_t mc68328_device::utx_r() // 0x906
-{
-	uint16_t data = m_utx | UTX_FIFO_EMPTY | UTX_FIFO_HALF | UTX_TX_AVAIL;
-	LOGMASKED(LOG_UART, "utx_r: UTX: %04x\n", data);
-	return data;
-}
-
-uint16_t mc68328_device::umisc_r() // 0x908
-{
-	LOGMASKED(LOG_UART, "umisc_r: UMISC: %04x\n", m_umisc);
-	return m_umisc;
-}
-
-uint16_t mc68328_device::lssa_msw_r() // 0xa00
-{
-	LOGMASKED(LOG_LCD, "lssa_msw_r: LSSA(MSW): %04x\n", (uint16_t)(m_lssa >> 16));
-	return (uint16_t)(m_lssa >> 16);
-}
-
-uint16_t mc68328_device::lssa_lsw_r() // 0xa02
-{
-	LOGMASKED(LOG_LCD, "lssa_lsw_r: LSSA(LSW): %04x\n", (uint16_t)m_lssa);
-	return (uint16_t)m_lssa;
-}
-
-uint8_t mc68328_device::lvpw_r() // 0xa05
-{
-	LOGMASKED(LOG_LCD, "lvpw_r: LVPW: %02x\n", m_lvpw);
-	return m_lvpw;
-}
-
-uint16_t mc68328_device::lxmax_r() // 0xa08
-{
-	LOGMASKED(LOG_LCD, "lxmax_r: LXMAX: %04x\n", m_lxmax);
-	return m_lxmax;
-}
-
-uint16_t mc68328_device::lymax_r() // 0xa0a
-{
-	LOGMASKED(LOG_LCD, "lymax_r: LYMAX: %04x\n", m_lymax);
-	return m_lymax;
-}
-
-uint16_t mc68328_device::lcxp_r() // 0xa18
-{
-	LOGMASKED(LOG_LCD, "lcxp_r: LCXP: %04x\n", m_lcxp);
-	return m_lcxp;
-}
-
-uint16_t mc68328_device::lcyp_r() // 0xa1a
-{
-	LOGMASKED(LOG_LCD, "lcyp_r: LCYP: %04x\n", m_lcyp);
-	return m_lcyp;
-}
-
-uint16_t mc68328_device::lcwch_r() // 0xa1c
-{
-	LOGMASKED(LOG_LCD, "lcwch_r: LCWCH: %04x\n", m_lcwch);
-	return m_lcwch;
-}
-
-uint8_t mc68328_device::lblkc_r() // 0xa1f
-{
-	LOGMASKED(LOG_LCD, "lblkc_r: LBLKC: %02x\n", m_lblkc);
-	return m_lblkc;
-}
-
-uint8_t mc68328_device::lpicf_r() // 0xa20
-{
-	LOGMASKED(LOG_LCD, "lpicf_r: LPICF: %02x\n", m_lpicf);
-	return m_lpicf;
-}
-
-uint8_t mc68328_device::lpolcf_r() // 0xa21
-{
-	LOGMASKED(LOG_LCD, "lpolcf_r: LPOLCF: %02x\n", m_lpolcf);
-	return m_lpolcf;
-}
-
-uint8_t mc68328_device::lacdrc_r() // 0xa23
-{
-	LOGMASKED(LOG_LCD, "lacdrc_r: LACDRC: %02x\n", m_lacdrc);
-	return m_lacdrc;
-}
-
-uint8_t mc68328_device::lpxcd_r() // 0xa25
-{
-	LOGMASKED(LOG_LCD, "lpxcd_r: LPXCD: %02x\n", m_lpxcd);
-	return m_lpxcd;
-}
-
-uint8_t mc68328_device::lckcon_r() // 0xa27
-{
-	LOGMASKED(LOG_LCD, "lckcon_r: LCKCON: %02x\n", m_lckcon);
-	return m_lckcon;
-}
-
-uint8_t mc68328_device::llbar_r() // 0xa29
-{
-	LOGMASKED(LOG_LCD, "llbar_r: LLBAR: %02x\n", m_llbar);
-	return m_llbar;
-}
-
-uint8_t mc68328_device::lotcr_r() // 0xa2b
-{
-	LOGMASKED(LOG_LCD, "lotcr_r: LOTCR: %02x\n", m_lotcr);
-	return m_lotcr;
-}
-
-uint8_t mc68328_device::lposr_r() // 0xa2d
-{
-	LOGMASKED(LOG_LCD, "lposr_r: LPOSR: %02x\n", m_lposr);
-	return m_lposr;
-}
-
-uint8_t mc68328_device::lfrcm_r() // 0xa31
-{
-	LOGMASKED(LOG_LCD, "lfrcm_r: LFRCM: %02x\n", m_lfrcm);
-	return m_lfrcm;
-}
-
-uint16_t mc68328_device::lgpmr_r() // 0xa32
-{
-	LOGMASKED(LOG_LCD, "lgpmr_r: LGPMR: %04x\n", m_lgpmr);
-	return m_lgpmr;
-}
-
-uint16_t mc68328_device::hmsr_msw_r() // 0xb00
-{
-	LOGMASKED(LOG_RTC, "hmsr_msw_r: HMSR(MSW): %04x\n", (uint16_t)(m_hmsr >> 16));
-	return (uint16_t)(m_hmsr >> 16);
-}
-
-uint16_t mc68328_device::hmsr_lsw_r() // 0xb02
-{
-	LOGMASKED(LOG_RTC, "hmsr_lsw_r: HMSR(LSW): %04x\n", (uint16_t)m_hmsr);
-	return (uint16_t)m_hmsr;
-}
-
-uint16_t mc68328_device::alarm_msw_r() // 0xb04
-{
-	LOGMASKED(LOG_RTC, "alarm_msw_r: ALARM(MSW): %04x\n", (uint16_t)(m_alarm >> 16));
-	return (uint16_t)(m_alarm >> 16);
-}
-
-uint16_t mc68328_device::alarm_lsw_r() // 0xb06
-{
-	LOGMASKED(LOG_RTC, "alarm_lsw_r: ALARM(LSW): %04x\n", (uint16_t)m_alarm);
-	return (uint16_t)m_alarm;
-}
-
-uint16_t mc68328_device::rtcctl_r() // 0xb0c
-{
-	LOGMASKED(LOG_RTC, "rtcctl_r: RTCCTL: %04x\n", m_rtcctl);
-	return m_rtcctl;
-}
-
 uint16_t mc68328_device::rtcisr_r() // 0xb0e
 {
 	LOGMASKED(LOG_RTC, "rtcisr_r: RTCISR: %04x\n", m_rtcisr);
 	return m_rtcisr;
+}
+
+void mc68328_device::rtcienr_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xb10
+{
+	LOGMASKED(LOG_RTC, "rtcienr_w: RTCIENR = %04x\n", data);
+	m_rtcienr = data & 0x001f;
 }
 
 uint16_t mc68328_device::rtcienr_r() // 0xb10
@@ -2463,165 +2882,14 @@ uint16_t mc68328_device::rtcienr_r() // 0xb10
 	return m_rtcienr;
 }
 
+void mc68328_device::stpwtch_w(offs_t offset, uint16_t data, uint16_t mem_mask) // 0xb12
+{
+	LOGMASKED(LOG_RTC, "stpwtch_w: STPWTCH = %04x\n", data);
+	m_stpwtch = data & 0x003f;
+}
+
 uint16_t mc68328_device::stpwtch_r() // 0xb12
 {
 	LOGMASKED(LOG_RTC, "stpwtch_r: STPWTCH: %04x\n", m_stpwtch);
 	return m_stpwtch;
-}
-
-/* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-uint32_t mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint32_t vram_addr = m_lssa & 0x00fffffe;
-
-	if (m_lckcon & LCKCON_LCDC_EN)
-	{
-		for (int y = 0; y < 160; y++)
-		{
-			uint16_t *const line = &bitmap.pix(y);
-
-			for (int x = 0; x < 160; x += 16, vram_addr += 2)
-			{
-				uint16_t const word = space(AS_PROGRAM).read_word(vram_addr);
-				for (int b = 0; b < 16; b++)
-				{
-					line[x + b] = (word >> (15 - b)) & 0x0001;
-				}
-			}
-		}
-	}
-	else
-	{
-		for (int y = 0; y < 160; y++)
-		{
-			uint16_t *const line = &bitmap.pix(y);
-
-			for (int x = 0; x < 160; x++)
-			{
-				line[x] = 0;
-			}
-		}
-	}
-	return 0;
-}
-
-
-void mc68328_device::register_state_save()
-{
-	save_item(NAME(m_scr));
-	save_item(NAME(m_grpbasea));
-	save_item(NAME(m_grpbaseb));
-	save_item(NAME(m_grpbasec));
-	save_item(NAME(m_grpbased));
-	save_item(NAME(m_grpmaska));
-	save_item(NAME(m_grpmaskb));
-	save_item(NAME(m_grpmaskc));
-	save_item(NAME(m_grpmaskd));
-	save_item(NAME(m_csa));
-	save_item(NAME(m_csb));
-	save_item(NAME(m_csc));
-	save_item(NAME(m_csd));
-
-	save_item(NAME(m_pllcr));
-	save_item(NAME(m_pllfsr));
-	save_item(NAME(m_pctlr));
-
-	save_item(NAME(m_ivr));
-	save_item(NAME(m_icr));
-	save_item(NAME(m_imr));
-	save_item(NAME(m_iwr));
-	save_item(NAME(m_isr));
-	save_item(NAME(m_ipr));
-
-	save_item(NAME(m_padir));
-	save_item(NAME(m_padata));
-	save_item(NAME(m_pasel));
-	save_item(NAME(m_pbdir));
-	save_item(NAME(m_pbdata));
-	save_item(NAME(m_pbsel));
-	save_item(NAME(m_pcdir));
-	save_item(NAME(m_pcdata));
-	save_item(NAME(m_pcsel));
-	save_item(NAME(m_pddir));
-	save_item(NAME(m_pddata));
-	save_item(NAME(m_pdpuen));
-	save_item(NAME(m_pdpol));
-	save_item(NAME(m_pdirqen));
-	save_item(NAME(m_pddataedge));
-	save_item(NAME(m_pdirqedge));
-	save_item(NAME(m_pedir));
-	save_item(NAME(m_pedata));
-	save_item(NAME(m_pepuen));
-	save_item(NAME(m_pesel));
-	save_item(NAME(m_pfdir));
-	save_item(NAME(m_pfdata));
-	save_item(NAME(m_pfpuen));
-	save_item(NAME(m_pfsel));
-	save_item(NAME(m_pgdir));
-	save_item(NAME(m_pgdata));
-	save_item(NAME(m_pgpuen));
-	save_item(NAME(m_pgsel));
-	save_item(NAME(m_pjdir));
-	save_item(NAME(m_pjdata));
-	save_item(NAME(m_pjsel));
-	save_item(NAME(m_pkdir));
-	save_item(NAME(m_pkdata));
-	save_item(NAME(m_pkpuen));
-	save_item(NAME(m_pksel));
-	save_item(NAME(m_pmdir));
-	save_item(NAME(m_pmdata));
-	save_item(NAME(m_pmpuen));
-	save_item(NAME(m_pmsel));
-
-	save_item(NAME(m_pwmc));
-	save_item(NAME(m_pwmp));
-	save_item(NAME(m_pwmw));
-	save_item(NAME(m_pwmcnt));
-
-	save_item(NAME(m_tctl));
-	save_item(NAME(m_tprer));
-	save_item(NAME(m_tcmp));
-	save_item(NAME(m_tcr));
-	save_item(NAME(m_tcn));
-	save_item(NAME(m_tstat));
-	save_item(NAME(m_wctlr));
-	save_item(NAME(m_wcmpr));
-	save_item(NAME(m_wcn));
-
-	save_item(NAME(m_spisr));
-
-	save_item(NAME(m_spimdata));
-	save_item(NAME(m_spimcont));
-
-	save_item(NAME(m_ustcnt));
-	save_item(NAME(m_ubaud));
-	save_item(NAME(m_urx));
-	save_item(NAME(m_utx));
-	save_item(NAME(m_umisc));
-
-	save_item(NAME(m_lssa));
-	save_item(NAME(m_lvpw));
-	save_item(NAME(m_lxmax));
-	save_item(NAME(m_lymax));
-	save_item(NAME(m_lcxp));
-	save_item(NAME(m_lcyp));
-	save_item(NAME(m_lcwch));
-	save_item(NAME(m_lblkc));
-	save_item(NAME(m_lpicf));
-	save_item(NAME(m_lpolcf));
-	save_item(NAME(m_lacdrc));
-	save_item(NAME(m_lpxcd));
-	save_item(NAME(m_lckcon));
-	save_item(NAME(m_llbar));
-	save_item(NAME(m_lotcr));
-	save_item(NAME(m_lposr));
-	save_item(NAME(m_lfrcm));
-	save_item(NAME(m_lgpmr));
-
-	save_item(NAME(m_hmsr));
-	save_item(NAME(m_alarm));
-	save_item(NAME(m_rtcctl));
-	save_item(NAME(m_rtcisr));
-	save_item(NAME(m_rtcienr));
-	save_item(NAME(m_stpwtch));
 }

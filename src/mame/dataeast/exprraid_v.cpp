@@ -18,11 +18,7 @@ void exprraid_state::exprraid_colorram_w(offs_t offset, uint8_t data)
 
 void exprraid_state::exprraid_flipscreen_w(uint8_t data)
 {
-	if (flip_screen() != (data & 0x01))
-	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
-	}
+	flip_screen_set(data & 0x01);
 }
 
 void exprraid_state::exprraid_bgselect_w(offs_t offset, uint8_t data)
@@ -91,9 +87,7 @@ void exprraid_state::video_start()
 
 void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int offs;
-
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int attr = m_spriteram[offs + 1];
 		int code = m_spriteram[offs + 3] + ((attr & 0xe0) << 3);
@@ -112,18 +106,17 @@ void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-			code, color,
-			flipx, flipy,
-			sx, sy, 0);
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
 
-		/* double height */
-
+		// double height
 		if (attr & 0x10)
 		{
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				code + 1, color,
-				flipx, flipy,
-				sx, sy + (flip_screen() ? -16 : 16), 0);
+					code + 1, color,
+					flipx, flipy,
+					sx, sy + (flip_screen() ? -16 : 16), 0);
 		}
 	}
 }

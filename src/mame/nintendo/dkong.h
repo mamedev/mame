@@ -70,8 +70,6 @@
  * CONSTANTS
  ****************************************************************************/
 
-#define HARDWARE_TYPE_TAG       "HARDWARE_TYPE"
-
 enum
 {
 	HARDWARE_TKG04 = 0,
@@ -119,19 +117,6 @@ public:
 		, m_video_ram(*this,"video_ram")
 		, m_sprite_ram(*this,"sprite_ram")
 		, m_snd_rom(*this, "soundcpu")
-		, m_vidhw(DKONG_BOARD)
-		, m_sig30Hz(0)
-		, m_star_ff(0)
-		, m_blue_level(0)
-		, m_cv1(0)
-		, m_cv2(0)
-		, m_vg1(0)
-		, m_vg2(0)
-		, m_vg3(0)
-		, m_cv3(0)
-		, m_cv4(0)
-		, m_vc17(0)
-		, m_pixelcnt(0)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -172,6 +157,7 @@ public:
 	void init_drakton();
 	void init_dkonghs();
 	void init_dkongx();
+	void init_dkong3();
 	void init_dkong3hs();
 
 	DECLARE_WRITE_LINE_MEMBER(dk_braze_a15);
@@ -195,65 +181,70 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_ram;
 
 	/* machine states */
-	uint8_t               m_hardware_type = 0;
-	uint8_t               m_nmi_mask = 0U;
+	uint8_t           m_hardware_type = 0;
+	uint8_t           m_nmi_mask = 0U;
 
 	std::unique_ptr<uint8_t[]> m_decrypted;
 
 	/* sound state */
-	optional_region_ptr<uint8_t>  m_snd_rom;
+	optional_region_ptr<uint8_t> m_snd_rom;
 
 	/* video state */
-	tilemap_t           *m_bg_tilemap = nullptr;
+	tilemap_t         *m_bg_tilemap = nullptr;
 
-	bitmap_ind16  m_bg_bits;
-	const uint8_t *     m_color_codes = nullptr;
-	emu_timer *       m_scanline_timer = nullptr;
-	int8_t              m_vidhw;          /* Selected video hardware RS Conversion / TKG04 */
+	bitmap_ind16      m_bg_bits;
+	const uint8_t     *m_color_codes = nullptr;
+	emu_timer         *m_scanline_timer = nullptr;
+	int8_t            m_vidhw = DKONG_BOARD; // Selected video hardware RS Conversion / TKG04
 
 	/* radar scope */
-
-	uint8_t *           m_gfx4 = nullptr;
-	uint8_t *           m_gfx3 = nullptr;
+	uint8_t           *m_gfx4 = nullptr;
+	uint8_t           *m_gfx3 = nullptr;
 	int               m_gfx3_len = 0;
 
-	uint8_t             m_sig30Hz;
-	uint8_t             m_lfsr_5I = 0U;
-	uint8_t             m_grid_sig = 0U;
-	uint8_t             m_rflip_sig = 0U;
-	uint8_t             m_star_ff;
-	uint8_t             m_blue_level;
-	double            m_cd4049_a = 0;
-	double            m_cd4049_b = 0;
+	uint8_t           m_sig30Hz = 0;
+	uint8_t           m_lfsr_5I = 0;
+	uint8_t           m_grid_sig = 0;
+	uint8_t           m_rflip_sig = 0;
+	uint8_t           m_star_ff = 0;
+	uint8_t           m_blue_level = 0;
+	double            m_cd4049_a = 0.0;
+	double            m_cd4049_b = 0.0;
 
 	/* Specific states */
-	int8_t              m_decrypt_counter = 0;
+	int8_t            m_decrypt_counter = 0;
 
 	/* 2650 protection */
-	uint8_t             m_protect_type = 0U;
-	uint8_t             m_hunchloopback = 0U;
-	uint8_t             m_prot_cnt = 0U;
-	uint8_t             m_main_fo = 0U;
+	uint8_t           m_protect_type = 0;
+	uint8_t           m_hunchloopback = 0;
+	uint8_t           m_prot_cnt = 0;
+	uint8_t           m_main_fo = 0;
 
 	/* Save state relevant */
-	uint8_t             m_gfx_bank = 0U;
-	uint8_t             m_palette_bank = 0U;
-	uint8_t             m_grid_on = 0U;
-	uint16_t            m_grid_col = 0U;
-	uint8_t             m_sprite_bank = 0U;
-	uint8_t             m_dma_latch = 0U;
-	uint8_t             m_flip = 0U;
+	uint8_t           m_gfx_bank = 0;
+	uint8_t           m_palette_bank = 0;
+	uint8_t           m_grid_on = 0;
+	uint16_t          m_grid_col = 0;
+	uint8_t           m_sprite_bank = 0;
+	uint8_t           m_dma_latch = 0;
+	uint8_t           m_flip = 0;
 
 	/* radarscp_step */
-	double m_cv1;
-	double m_cv2;
-	double m_vg1;
-	double m_vg2;
-	double m_vg3;
-	double m_cv3;
-	double m_cv4;
-	double m_vc17;
-	int m_pixelcnt;
+	double            m_cv1 = 0.0;
+	double            m_cv2 = 0.0;
+	double            m_vg1 = 0.0;
+	double            m_vg2 = 0.0;
+	double            m_vg3 = 0.0;
+	double            m_cv3 = 0.0;
+	double            m_cv4 = 0.0;
+	double            m_vc17 = 0.0;
+	int               m_pixelcnt = 0;
+
+	/* radarscp_scanline */
+	int               m_counter = 0;
+
+	/* reverse address lookup map - hunchbkd */
+	int16_t           m_rev_map[0x200] = { };
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -262,12 +253,8 @@ private:
 	optional_device<i8257_device> m_dma8257;
 	memory_bank_creator m_bank1;
 	memory_bank_creator m_bank2;
+	memory_passthrough_handler m_dkong3_tap[2];
 
-	/* radarscp_scanline */
-	int m_counter = 0;
-
-	/* reverse address lookup map - hunchbkd */
-	int16_t             m_rev_map[0x200];
 	uint8_t hb_dma_read_byte(offs_t offset);
 	void hb_dma_write_byte(offs_t offset, uint8_t data);
 	void dkong3_coin_counter_w(offs_t offset, uint8_t data);
@@ -357,7 +344,6 @@ private:
 	void check_palette(void);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t mask_bank, uint32_t shift_bits);
 	void radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 };
 
 #endif // MAME_INCLUDES_DKONG_H

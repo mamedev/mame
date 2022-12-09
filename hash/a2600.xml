@@ -13903,7 +13903,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="sentinel">
+	<software name="sentinel" supported="no"> <!-- XEGS light gun not yet emulated -->
 		<description>Sentinel</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
@@ -13948,7 +13948,19 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="shootarc">
+	<software name="shootinge" cloneof="shooting">
+		<description>Shootin' Gallery (PAL, prototype)</description>
+		<year>1982?</year>
+		<publisher>Imagic</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="pfair.1" size="0x1000" crc="05e98494" sha1="25a280afdf057a070b1c1e48a91a4bd77e0068a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootarc" supported="no"> <!-- XEGS light gun not yet emulated -->
 		<description>Shooting Arcade (prototype 19890919)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
@@ -13963,7 +13975,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="shootarce" cloneof="shootarc">
+	<software name="shootarce" cloneof="shootarc" supported="no"> <!-- XEGS light gun not yet emulated -->
 		<description>Shooting Arcade (PAL) (prototype 19900116)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>

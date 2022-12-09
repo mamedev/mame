@@ -61,7 +61,7 @@ public:
 	//         pin 10 - Not connected
 	//
 	uint8_t port_r();
-	void port_w( uint8_t data );
+	void port_w(uint8_t data);
 
 	void th_pin_w(int state);
 
