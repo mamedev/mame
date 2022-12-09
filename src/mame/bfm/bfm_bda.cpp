@@ -247,7 +247,7 @@ int bfm_bda_device::write_char(int data)
 			{
 				if (data > 0x3F)
 				{
-					logerror(" BDA Undefined character %x, %u \n", data, data);
+					logerror("BDA Undefined character, needs populating 0x%1$02X\n", data);
 				}
 
 				setdata(BDAcharset[(data & 0x3F)], data);
@@ -323,7 +323,7 @@ int bfm_bda_device::write_char(int data)
 				else
 				{
 					m_flash_rate = data & 0x0F;
-					logerror(" BDA flash %x", m_flash_rate);
+					logerror("BDA flash %x", m_flash_rate);
 				}
 				break;
 

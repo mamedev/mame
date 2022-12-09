@@ -173,50 +173,61 @@ void bfm_bd1_device::device_post_load()
 
 void bfm_bd1_device::update_display()
 {
-	  if ( m_flash_timer ) {
+	if (m_flash_timer)
+	{
 		m_flash_timer--;
-		if ( !m_flash_timer ) {
-		  m_flash_timer = 20;
-		  if ( !m_flash ) {
-			switch ( m_flash_control ) {
-			  case 1:    // Flash Inside Window
-				for ( int i = 0; i < 16; i++ ) {
-				  if ( (i >= m_window_start) && (i <= m_window_end) )
-					  m_attrs[i] = AT_FLASH;
-				  else
-					  m_attrs[i] = AT_NORMAL;
+		if (!m_flash_timer)
+		{
+			m_flash_timer = 20;
+			if (!m_flash)
+			{
+				switch (m_flash_control)
+				{
+					case 1:    // Flash Inside Window
+						for (int i = 0; i < 16; i++)
+						{
+						  if ((i >= m_window_start) && (i <= m_window_end))
+							  m_attrs[i] = AT_FLASH;
+						  else
+							  m_attrs[i] = AT_NORMAL;
+						}
+						m_flash = true;
+					break;
+					case 2:    // Flash Outside Window
+						for (int i = 0; i < 16; i++)
+						{
+						  if ((i < m_window_start) || (i > m_window_end))
+							  m_attrs[i] = AT_FLASH;
+						  else
+							  m_attrs[i] = AT_NORMAL;
+						}
+						m_flash = true;
+					break;
+					case 3:    // Flash All
+						for ( int i = 0; i < 16; i++ )
+							m_attrs[i] = AT_FLASH;
+						m_flash = true;
+					break;
 				}
-				m_flash = true;
-				break;
-			  case 2:    // Flash Outside Window
-				for ( int i = 0; i < 16; i++ ) {
-				  if ( (i < m_window_start) || (i > m_window_end) )
-					  m_attrs[i] = AT_FLASH;
-				  else
-					  m_attrs[i] = AT_NORMAL;
-				}
-				m_flash = true;
-				break;
-			  case 3:    // Flash All
-				for ( int i = 0; i < 16; i++ )
-					m_attrs[i] = AT_FLASH;
-				m_flash = true;
-				break;
-			}
-		  } else {
+		  }
+		  else
+		  {
 			m_flash_rate--;
-			if ( !m_flash_rate ) {
-			  m_flash_timer = 0;
-				for ( int i = 0; i < 16; i++ ) {
-					  m_attrs[i] = AT_NORMAL;
+			if (!m_flash_rate)
+			{
+				m_flash_timer = 0;
+				for (int i = 0; i < 16; i++)
+				{
+					m_attrs[i] = AT_NORMAL;
 				}
 			}
-			if ( m_flash_control ) {
-			  m_flash = false;
+			if (m_flash_control)
+			{
+				m_flash = false;
 			}
 		  }
 		}
-	  }
+	}
 
 	for (int i = 0; i < 16; i++)
 		(*m_outputs)[i] = (m_attrs[i] == AT_NORMAL) ? set_display(m_chars[i]) : 0;
@@ -234,7 +245,7 @@ void bfm_bd1_device::blank(int data)
 		break;
 
 	case 0x01:  // blank inside window
-		if ( m_window_size > 0 )
+		if (m_window_size > 0)
 		{
 			for (int i = m_window_start; i < m_window_end ; i++)
 			{
@@ -244,9 +255,9 @@ void bfm_bd1_device::blank(int data)
 		break;
 
 	case 0x02:  // blank outside window
-		if ( m_window_size > 0 )
+		if (m_window_size > 0)
 		{
-			if ( m_window_start > 0 )
+			if (m_window_start > 0)
 			{
 				for (int i = 0; i < m_window_start; i++)
 				{
@@ -275,14 +286,14 @@ void bfm_bd1_device::blank(int data)
 
 int bfm_bd1_device::write_char(int data)
 {
-	if ( m_user_def )
+	if (m_user_def)
 	{
 		m_user_def--;
 
 		m_user_data <<= 8;
 		m_user_data |= data;
 
-		if ( m_user_def )
+		if (m_user_def)
 		{
 			return 0;
 		}
@@ -302,7 +313,7 @@ int bfm_bd1_device::write_char(int data)
 		}
 		else
 		{
-			switch ( data & 0xf0 )
+			switch (data & 0xf0)
 			{
 			case 0x80:  // 0x80 - 0x8F Set display blanking
 				blank(data&0x03);//use the blanking data
@@ -316,9 +327,9 @@ int bfm_bd1_device::write_char(int data)
 			case 0x90:  // 0x90 - 0x9F Set cursor pos
 				m_cursor_pos = data & 0x0f;
 				m_scroll_active = false;
-				if ( m_display_mode == 2 )
+				if (m_display_mode == 2)
 				{
-					if ( m_cursor_pos >= m_window_end) m_scroll_active = 1;
+					if (m_cursor_pos >= m_window_end) m_scroll_active = 1;
 				}
 				break;
 
@@ -328,13 +339,13 @@ int bfm_bd1_device::write_char(int data)
 
 			case 0xb0:  // 0xB0 - 0xBF Clear display area
 
-				switch ( data & 0x03 )
+				switch (data & 0x03)
 				{
 				case 0x00:  // clr nothing
 					break;
 
 				case 0x01:  // clr inside window
-					if ( m_window_size > 0 )
+					if (m_window_size > 0)
 					{
 						std::fill_n(m_chars + m_window_start, m_window_size, 0);
 						std::fill_n(m_attrs + m_window_start, m_window_size, 0);
@@ -343,9 +354,9 @@ int bfm_bd1_device::write_char(int data)
 					break;
 
 				case 0x02:  // clr outside window
-					if ( m_window_size > 0 )
+					if (m_window_size > 0)
 					{
-						if ( m_window_start > 0 )
+						if (m_window_start > 0)
 						{
 							for (int i = 0; i < m_window_start; i++)
 							{
@@ -354,7 +365,7 @@ int bfm_bd1_device::write_char(int data)
 							}
 						}
 
-						if (m_window_end < 15 )
+						if (m_window_end < 15)
 						{
 							for (int i = m_window_end; i < 15- m_window_end ; i++)
 							{
@@ -373,9 +384,8 @@ int bfm_bd1_device::write_char(int data)
 
 			case 0xc0:  // 0xC0 - 0xCF Set flash rate
 				m_flash_rate = data & 0x0f;
-				if ( !m_flash_rate && m_flash )
+				if (!m_flash_rate && m_flash)
 				{
-					m_flash_timer = 0;
 					m_flash = false;
 				}
 				m_flash_timer = 20;
@@ -383,8 +393,8 @@ int bfm_bd1_device::write_char(int data)
 
 			case 0xd0:  // 0xD0 - 0xDF Set Flash control
 				m_flash_control = data & 0x03;
-				if ( m_flash_control == 0 && m_flash ) {
-					m_flash_timer = 0;
+				if (m_flash_control == 0 && m_flash)
+				{
 					m_flash = false;
 				}
 				break;
@@ -398,9 +408,9 @@ int bfm_bd1_device::write_char(int data)
 				m_window_end   = data &0x0f;
 				m_window_size  = (m_window_end - m_window_start)+1;
 				m_scroll_active = 0;
-				if ( m_display_mode == 2 )
+				if (m_display_mode == 2)
 				{
-					if ( m_cursor_pos >= m_window_end)
+					if (m_cursor_pos >= m_window_end)
 					{
 						m_scroll_active = 1;
 						m_cursor_pos    = m_window_end;
@@ -423,7 +433,7 @@ void bfm_bd1_device::setdata(int segdata, int data)
 {
 	int move = 0;
 	int change =0;
-	switch ( data )
+	switch (data)
 	{
 	case 0x25:  // flash
 		if(m_chars[m_pcursor_pos] & (1<<8))
@@ -442,7 +452,7 @@ void bfm_bd1_device::setdata(int segdata, int data)
 
 	case 0x2c:  // semicolon
 	case 0x2e:  // decimal point
-		if( m_chars[m_pcursor_pos] & (1<<12))
+		if (m_chars[m_pcursor_pos] & (1<<12))
 		{
 			move++;
 		}
@@ -466,7 +476,7 @@ void bfm_bd1_device::setdata(int segdata, int data)
 		change++;
 	}
 
-	if ( move )
+	if (move)
 	{
 		int mode = m_display_mode;
 
@@ -474,40 +484,40 @@ void bfm_bd1_device::setdata(int segdata, int data)
 
 		if ( m_window_size <= 0 || (m_window_size > 16))
 		{ // if no window selected default to equivalent rotate mode
-				if ( mode == 2 )      mode = 0;
-				else if ( mode == 3 ) mode = 1;
+				if (mode == 2)      mode = 0;
+				else if (mode == 3) mode = 1;
 		}
 
-		switch ( mode )
+		switch (mode)
 		{
 		case 0: // rotate left
 			m_cursor_pos &= 0x0f;
 
-			if ( change )
+			if (change)
 			{
 				m_chars[m_cursor_pos] = segdata;
 			}
 			m_cursor_pos++;
-			if ( m_cursor_pos >= 16 ) m_cursor_pos = 0;
+			if (m_cursor_pos >= 16) m_cursor_pos = 0;
 			break;
 
 
 		case 1: // Rotate right
 			m_cursor_pos &= 0x0f;
 
-			if ( change )
+			if (change)
 			{
 				m_chars[m_cursor_pos] = segdata;
 			}
 			m_cursor_pos--;
-			if ( m_cursor_pos < 0  ) m_cursor_pos = 15;
+			if (m_cursor_pos < 0) m_cursor_pos = 15;
 			break;
 
 		case 2: // Scroll left
 			if ( m_cursor_pos < m_window_end )
 			{
 				m_scroll_active = 0;
-				if ( change )
+				if (change)
 				{
 					m_chars[m_cursor_pos] = segdata;
 				}
@@ -515,12 +525,12 @@ void bfm_bd1_device::setdata(int segdata, int data)
 			}
 			else
 			{
-				if ( move )
+				if (move)
 				{
-					if  ( m_scroll_active )
+					if  (m_scroll_active)
 					{
 						int i = m_window_start;
-						while ( i < m_window_end )
+						while (i < m_window_end)
 						{
 							m_chars[i] = m_chars[i+1];
 							i++;
@@ -529,7 +539,7 @@ void bfm_bd1_device::setdata(int segdata, int data)
 					else   m_scroll_active = 1;
 				}
 
-				if ( change )
+				if (change)
 				{
 					m_chars[m_window_end] = segdata;
 				}
@@ -541,24 +551,24 @@ void bfm_bd1_device::setdata(int segdata, int data)
 			break;
 
 		case 3: // Scroll right
-			if ( m_cursor_pos > m_window_start )
+			if (m_cursor_pos > m_window_start)
 			{
-				if ( change )
+				if (change)
 				{
 					m_chars[m_cursor_pos] = segdata;
 				}
 				m_cursor_pos--;
-				if ( m_cursor_pos > 15  ) m_cursor_pos = 0;
+				if (m_cursor_pos > 15) m_cursor_pos = 0;
 			}
 			else
 			{
-				if ( move )
+				if (move)
 				{
-					if  ( m_scroll_active )
+					if (m_scroll_active)
 					{
 						int i = m_window_end;
 
-						while ( i > m_window_start )
+						while (i > m_window_start)
 						{
 							m_chars[i] = m_chars[i-1];
 							i--;
@@ -566,13 +576,13 @@ void bfm_bd1_device::setdata(int segdata, int data)
 					}
 					else   m_scroll_active = 1;
 				}
-				if ( change )
+				if (change)
 				{
-						m_chars[m_window_start] = segdata;
-					}
+					m_chars[m_window_start] = segdata;
+				}
 				else
 				{
-						m_chars[m_window_start] = 0;
+					m_chars[m_window_start] = 0;
 				}
 			}
 			break;
