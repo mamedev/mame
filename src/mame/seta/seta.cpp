@@ -8172,7 +8172,7 @@ void downtown_state::calibr50(machine_config &config)
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(downtown_state::screen_update_seta));
 	screen.set_palette(m_palette);
-	//screen.set_video_attributes(VIDEO_UPDATE_SCANLINE); // causes performance issues due to devices/video/x1_001.cpp not being optimized for scanline drawing, we use a trampoline on video writes instead
+	//screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
 	m_layers[0]->set_screen(m_screen);

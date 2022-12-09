@@ -12,11 +12,6 @@
 #include "emu.h"
 #include "x1_012.h"
 
-#define LOG_IGNORED_PARTIALUPDATES  (1 << 1)
-
-#define VERBOSE             (LOG_IGNORED_PARTIALUPDATES) // (LOG_IGNORED_PARTIALUPDATES)
-#include "logmacro.h"
-
 DEFINE_DEVICE_TYPE(X1_012, x1_012_device, "x1_012", "Seta X1-012 Tile Layer")
 
 x1_012_device::x1_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
