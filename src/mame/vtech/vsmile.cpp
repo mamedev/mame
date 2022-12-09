@@ -127,7 +127,9 @@ uint16_t vsmile_state::portb_r()
 	//		VSMILE_PORTB_ON_SW
 	//bit 7 : OFF button, active low (see dipswitch)
 	//		VSMILE_PORTB_OFF_SW
-
+	
+	//LOG("%s: portb_r: %04x\n", machine().describe_context(), data);
+	
 	//On Vsmile, VSMILE_PORTB_RESET, VSMILE_PORTB_OFF_SW and VSMILE_PORTB_ON_SW actives will trigger BIOS test screen
 	return data; 
 }
@@ -254,11 +256,12 @@ static INPUT_PORTS_START( vsmile )
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )
 	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
 
-	//using dipswitches for Reset, OFF and ON buttons to be able to press them at boot to open test screen
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POWER_OFF )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POWER_ON )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_CONFNAME( 0x08, 0x08, "Restart")
+	PORT_CONFSETTING(    0x00, DEF_STR(On) )
+	PORT_CONFSETTING(    0x08, DEF_STR(Off) )
 	PORT_BIT( 0x37, 0x00, IPT_UNUSED )
 
 
