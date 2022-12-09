@@ -247,8 +247,8 @@ static INPUT_PORTS_START( vsmile )
 	PORT_DIPSETTING(    0x0b, DEF_STR(German) ) //GE
 	PORT_DIPSETTING(    0x0c, DEF_STR(Spanish) ) //SP
 	PORT_DIPSETTING(    0x0d, DEF_STR(French) ) //FR
-	PORT_DIPSETTING(    0x0e, "UK" ) //UK
-	PORT_DIPSETTING(    0x0f, "US" ) //US
+	PORT_DIPSETTING(    0x0e, "English (UK)" ) //UK
+	PORT_DIPSETTING(    0x0f, "English (US)" ) //US
 	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )
