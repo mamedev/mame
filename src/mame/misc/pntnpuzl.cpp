@@ -394,8 +394,9 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 	m_svga->set_screen(m_screen);
 	m_svga->set_vram_size(0x100000);
 
-	// TODO: runs in external clock mode, needs setter to pc_vga. ~70 Hz is best guess
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: XTAL is not right and likely not the source,
+	// selects xtal mode 3 (36 MHz) / 2 plus another / 2 for module testing bit 7
 	m_screen->set_raw(XTAL(40'000'000) / 2, 1080, 0, 400, 265, 0, 240);
 	m_screen->set_screen_update(m_svga, FUNC(tvga9000_device::screen_update));
 }
