@@ -550,7 +550,7 @@ void upd3301_device::dack_w(uint8_t data)
 
 		draw_scanline();
 
-		if (m_y == (m_l * m_r))
+		if (m_y >= (m_l * m_r))
 		{
 			// end DMA transfer
 			set_drq(0);
@@ -664,7 +664,10 @@ void upd3301_device::draw_scanline()
 		}
 	}
 
-	m_y += m_r;
+	// sorcer (pc8801) enables the "skip line" then sets up DMA for 12 rows (start address 0xf9e8, do the math).
+	// Other than applying pseudo-interlace effect over the graphic layer this also seems to skip strips,
+	// sorcer wants the very last row (0xff88) to be used as a mask over bottom-most 16 lines.
+	m_y += m_r << m_s;
 }
 
 
