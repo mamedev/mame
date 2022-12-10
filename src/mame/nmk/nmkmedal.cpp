@@ -258,8 +258,8 @@ ROM_START( drail ) // handwritten labels
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "1_dream rail v08c 2c0c v957220.u4", 0x00000, 0x10000, CRC(c14fae88) SHA1(f0478b563ac851372bc0b93772d89ab70ad61877) ) // 通ドリームレール V08C 2C0C V957220, 1xxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION(0x80000, "oki", 0)
-	ROM_LOAD( "2_dream rail pcm.u11", 0x00000, 0x80000, CRC(efdc1eea) SHA1(c39fed6f97b71556b468e0872a8240fe7b6495e6) ) // ドリームレールPCM
+	ROM_REGION(0xc0000, "oki", 0) // NMK112 device expects the first 0x40000 bytes to be left empty.
+	ROM_LOAD( "2_dream rail pcm.u11", 0x40000, 0x80000, CRC(efdc1eea) SHA1(c39fed6f97b71556b468e0872a8240fe7b6495e6) ) // ドリームレールPCM
 	// empty socket 3.u10
 ROM_END
 

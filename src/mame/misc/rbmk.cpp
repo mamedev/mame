@@ -88,6 +88,7 @@ public:
 	void rbspm(machine_config &config);
 
 	void magslot(machine_config &config);
+	void super555(machine_config &config);
 
 protected:
 	virtual void video_start() override;
@@ -106,6 +107,7 @@ private:
 	uint16_t m_tilebank = 0;
 	uint8_t m_mux_data = 0;
 	uint16_t m_dip_mux = 0;
+	//uint16_t m_prot_data = 0;
 
 	void mcu_io(address_map &map);
 	void mcu_mem(address_map &map);
@@ -113,6 +115,7 @@ private:
 	void rbspm_mem(address_map &map);
 
 	void magslot_mem(address_map &map);
+	void super555_mem(address_map &map);
 
 	uint16_t unk_r();
 	uint16_t dip_mux_r();
@@ -209,21 +212,29 @@ void rbmk_state::rbspm_mem(address_map &map)
 	map(0x9c0000, 0x9c0fff).ram().share(m_vidram[0]);
 }
 
-void rbmk_state::magslot_mem(address_map &map)
+void rbmk_state::super555_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
 	map(0x600000, 0x600001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
 	map(0x608000, 0x608001).portr("IN1").w(FUNC(rbmk_state::tilebank_w)); // ok
 	map(0x610000, 0x610001).portr("IN2");
+	// map(0x618080, 0x618081).lr16(NAME([this] () -> uint16_t { return m_prot_data; })); // reads something here from below, if these are hooked up booting stops with '0x09 U64 ERROR', like it's failing some checksum test
 	map(0x620000, 0x620001).portr("IN3");
+	// map(0x620080, 0x620081).lw16(NAME([this] (uint16_t data) { m_prot_data = data; })); // writes something here that expects to read above
 	map(0x628000, 0x628001).w(FUNC(rbmk_state::unk_w));
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x940000, 0x940fff).ram().share(m_vidram[1]);
 	map(0x980000, 0x983fff).ram();
 	map(0x9c0000, 0x9c0fff).ram().share(m_vidram[0]);
-	map(0x9e0000, 0x9e0fff).ram().share(m_vidram[2]);
 	//map(0xf00000, 0xf00001).w(FUNC(rbmk_state::eeprom_w)); // wrong?
+}
+
+void rbmk_state::magslot_mem(address_map &map)
+{
+	super555_mem(map);
+
+	map(0x9e0000, 0x9e0fff).ram().share(m_vidram[2]);
 }
 
 void rbmk_state::mcu_mem(address_map &map)
@@ -880,12 +891,18 @@ void rbmk_state::rbspm(machine_config &config)
 	// PIC16F84 but no CPU core available
 }
 
-void rbmk_state::magslot(machine_config &config)
+void rbmk_state::super555(machine_config &config)
 {
 	rbmk(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::magslot_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::super555_mem);
 
 	config.device_remove("mcu");
+}
+
+void rbmk_state::magslot(machine_config &config)
+{
+	super555(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::magslot_mem);
 
 	m_gfxdecode->set_info(gfx_magslot);
 }
@@ -950,6 +967,24 @@ ROM_START( rbspm )
 ROM_END
 
 
+ROM_START( super555 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD( "super555-v1.5e-0d9b.u64", 0x00000, 0x80000, CRC(9a9c16cc) SHA1(95609dbd45feb591190a2b62dee8846cdcec3462) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "pk-s1-s06.u83", 0x00000, 0x80000, CRC(e329b9ce) SHA1(9fc31daaacc7b3a1a1cf99ab30035021b7cbb78f) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "pk-a1-a09.u41", 0x00000, 0x80000, CRC(f48e74bd) SHA1(68e2a0384964e04c526e4002ffae5fa4f2835d66) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "super555-t1-e67d.u39", 0x00000, 0x80000,  CRC(ee092a9c) SHA1(4123d45d21ca60b0d38f36f59353c56d4fdfcddf) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u138", 0x00, 0x080, CRC(60407223) SHA1(10f766b5431709ab11b16bf5ad7adbfdced0e7ac) )
+ROM_END
+
+
 ROM_START( sc2in1 ) // Basically same PCB as magslot, but with only 1 dip bank. Most labels have been covered with other labels with 'TETRIS' hand-written
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "u64", 0x00000, 0x80000, CRC(c0ad5df0) SHA1(a51f30e76493ea9fb5313c0064dac9a2a4f70cc3) )
@@ -996,11 +1031,12 @@ ROM_END
 
 
 // mahjong
-GAME( 1998, rbmk,    0, rbmk,    rbmk,    rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",        MACHINE_NOT_WORKING )
-GAME( 1998, rbspm,   0, rbspm,   rbspm,   rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",    MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,     0, rbmk,     rbmk,    rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",        MACHINE_NOT_WORKING )
+GAME( 1998, rbspm,    0, rbspm,    rbspm,   rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",    MACHINE_NOT_WORKING )
 
-// card game
-GAME( 2001, sc2in1,  0, magslot, magslot, rbmk_state, empty_init, ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)", MACHINE_NOT_WORKING ) // stops during boot
+// card games
+GAME( 1999, super555, 0, super555, magslot, rbmk_state, empty_init, ROT0,  "GMS", "Super 555 (English version V1.5)",          MACHINE_NOT_WORKING ) // stops during boot
+GAME( 2001, sc2in1,   0, magslot,  magslot, rbmk_state, empty_init, ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)", MACHINE_NOT_WORKING ) // stops during boot
 
 // slot, on slightly different PCB
-GAME( 2003, magslot, 0, magslot, magslot, rbmk_state, empty_init, ROT0,  "GMS", "Magic Slot (normal 1.0C)",                  MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
+GAME( 2003, magslot,  0, magslot,  magslot, rbmk_state, empty_init, ROT0,  "GMS", "Magic Slot (normal 1.0C)",                  MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs

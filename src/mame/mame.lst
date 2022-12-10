@@ -36964,6 +36964,7 @@ magslot                         // (c) 2003 GMS
 rbmk                            // (c) 1998 GMS
 rbspm                           // (c) 1998 GMS
 sc2in1                          // (c) 2001 GMS
+super555                        // (c) 1999 GMS
 
 @source:namco/rbowlorama.cpp
 rbowlorama                      // (c) 2008 Cosmodog / Namco
@@ -41728,7 +41729,7 @@ tecnodargr                      // (c) 1991 Automatics Pasqual / Recreativos G.R
 @source:tecmo/tehkanwc.cpp
 gridiron                        // (c) 1985 Tehkan
 teedoff                         // 6102 - (c) 1986 Tecmo
-teedoffj                        // 
+teedoffj                        //
 tehkanwc                        // (c) 1985 Tehkan
 tehkanwcb                       // bootleg
 tehkanwcc                       // bootleg
