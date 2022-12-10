@@ -154,14 +154,14 @@ void mc6852_device::tra_callback()
 			m_tx_fifo.pop();
 			m_tx_bit_count=0;
 			size--;
+		}
 
-			int trigger = (m_cr[1] & C2_1_2_BYTE) ? 1 : 2;
-			int available = 3 - size;
+		int trigger = (m_cr[1] & C2_1_2_BYTE) ? 1 : 2;
+		int available = 3 - size;
 
-			if (available >= trigger)
-			{
-				m_status |= S_TDRA;
-			}
+		if (available >= trigger)
+		{
+			m_status |= S_TDRA;
 		}
 	}
 
