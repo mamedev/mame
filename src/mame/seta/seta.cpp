@@ -1822,7 +1822,7 @@ void downtown_state::calibr50_map(address_map &map)
 	map(0x500000, 0x500001).nopw();                        // ?
 	map(0x600000, 0x600003).r(FUNC(downtown_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
-	map(0x800000, 0x800005).w(m_layers[0], FUNC(x1_012_device::vctrl_w));// VRAM Ctrl
+	map(0x800000, 0x800005).w(FUNC(downtown_state::vram_layer0_vctrl_raster_trampoline_w));// VRAM Ctrl
 	map(0x900000, 0x903fff).ram().w(m_layers[0], FUNC(x1_012_device::vram_w)).share("layer1"); // VRAM
 
 	map(0x904000, 0x904fff).ram();                             //
@@ -8172,6 +8172,7 @@ void downtown_state::calibr50(machine_config &config)
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(downtown_state::screen_update_seta));
 	screen.set_palette(m_palette);
+	//screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
 	m_layers[0]->set_screen(m_screen);
