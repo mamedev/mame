@@ -9,7 +9,7 @@
 #include "cd90_015.h"
 #include "formats/thom_dsk.h"
 
-DEFINE_DEVICE_TYPE(CD90_015, cd90_015_device, "cd90_015", "Thomson CD90-015 floppy drive selectler")
+DEFINE_DEVICE_TYPE(CD90_015, cd90_015_device, "cd90_015", "Thomson CD 90-015 floppy drive selectler")
 
 cd90_015_device::cd90_015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CD90_015, tag, owner, clock),
@@ -32,8 +32,8 @@ void cd90_015_device::rom_map(address_map &map)
 
 void cd90_015_device::io_map(address_map &map)
 {
-	map(0, 7).m(m_fdc, FUNC(mc6843_device::map));
-	map(8, 9).rw(FUNC(cd90_015_device::motor_r), FUNC(cd90_015_device::select_w));
+	map(0x10, 0x17).m(m_fdc, FUNC(mc6843_device::map));
+	map(0x18, 0x19).rw(FUNC(cd90_015_device::motor_r), FUNC(cd90_015_device::select_w));
 }
 
 const tiny_rom_entry *cd90_015_device::device_rom_region() const
@@ -53,7 +53,7 @@ void cd90_015_device::floppy_formats(format_registration &fr)
 
 void cd90_015_device::device_add_mconfig(machine_config &config)
 {
-	MC6843(config, m_fdc, 16_MHz_XTAL / 32); // Comes from the main board
+	MC6843(config, m_fdc, DERIVED_CLOCK(1, 2)); // Comes from the main board
 	m_fdc->force_ready();
 	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "dd90_015", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], floppy_drives, nullptr,    floppy_formats).enable_sound(true);

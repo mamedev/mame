@@ -15,7 +15,7 @@
 class cd90_640_device : public device_t, public thomson_extension_interface
 {
 public:
-	cd90_640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cd90_640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cd90_640_device() = default;
 
 	virtual void rom_map(address_map &map) override;

@@ -5017,6 +5017,8 @@ if (BUSES["THOMSON"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/thomson/extension.cpp",
 		MAME_DIR .. "src/devices/bus/thomson/extension.h",
+		MAME_DIR .. "src/devices/bus/thomson/cc90_232.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/cc90_232.h",
 		MAME_DIR .. "src/devices/bus/thomson/cd90_015.cpp",
 		MAME_DIR .. "src/devices/bus/thomson/cd90_015.h",
 		MAME_DIR .. "src/devices/bus/thomson/cq90_028.cpp",
@@ -5025,8 +5027,16 @@ if (BUSES["THOMSON"]~=null) then
 		MAME_DIR .. "src/devices/bus/thomson/cd90_351.h",
 		MAME_DIR .. "src/devices/bus/thomson/cd90_640.cpp",
 		MAME_DIR .. "src/devices/bus/thomson/cd90_640.h",
+		MAME_DIR .. "src/devices/bus/thomson/md90_120.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/md90_120.h",
+		MAME_DIR .. "src/devices/bus/thomson/midipak.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/midipak.h",
 		MAME_DIR .. "src/devices/bus/thomson/nanoreseau.cpp",
 		MAME_DIR .. "src/devices/bus/thomson/nanoreseau.h",
+		MAME_DIR .. "src/devices/bus/thomson/rf57_932.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/rf57_932.h",
+		MAME_DIR .. "src/devices/bus/thomson/speech.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/speech.h",
 	}
 end
 
