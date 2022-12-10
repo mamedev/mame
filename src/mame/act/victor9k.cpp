@@ -53,8 +53,9 @@
 #define LOG_CONF      (1 << 1U)
 #define LOG_KEYBOARD  (1 << 2U)
 #define LOG_DISPLAY   (1 << 3U)
+#define LOG_SOUND     (1 << 4U)
 
-//#define VERBOSE (LOG_CONF|LOG_DISPLAY|LOG_KEYBOARD)
+//#define VERBOSE (LOG_CONF|LOG_DISPLAY|LOG_KEYBOARD|LOG_SOUND)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -575,6 +576,10 @@ void victor9k_state::via3_pb_w(uint8_t data)
 	m_ssda->rx_clk_w(!BIT(data, 7));
 	m_ssda->tx_clk_w(!BIT(data, 7));
 	m_cvsd->clock_w(!BIT(data, 7));
+
+	long now = machine().time().as_double();
+	LOGSOUND("VICTOR9K tx_clk_w %02x %d\n", !BIT(data, 7),  now);
+	
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
@@ -754,11 +759,11 @@ void victor9k_state::victor9k(machine_config &config)
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	pit8253_device &pit(PIT8253(config, I8253_TAG, 0));
-	pit.set_clk<0>(2500000);
+	pit.set_clk<0>(15_MHz_XTAL / 12);
 	pit.out_handler<0>().set(FUNC(victor9k_state::mux_serial_b_w));
-	pit.set_clk<1>(2500000);
+	pit.set_clk<1>(15_MHz_XTAL / 12);
 	pit.out_handler<1>().set(FUNC(victor9k_state::mux_serial_a_w));
-	pit.set_clk<2>(100000);
+	pit.set_clk<2>(15_MHz_XTAL / 150);
 	pit.out_handler<2>().set(I8259A_TAG, FUNC(pic8259_device::ir2_w));
 
 	UPD7201(config, m_upd7201, 15_MHz_XTAL / 6);
