@@ -272,7 +272,7 @@ uint16_t pntnpuzl_state::pntnpuzl_280014_r()
 
 uint16_t pntnpuzl_state::pntnpuzl_28001a_r()
 {
-	return 0x4c00;
+	return 0x0c00 | (m_via->read(0x1a/2) << 8);
 }
 
 uint16_t pntnpuzl_state::irq1_ack_r()
