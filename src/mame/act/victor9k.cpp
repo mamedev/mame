@@ -38,6 +38,8 @@
 #include "victor9k_fdc.h"
 #include "machine/z80sio.h"
 #include "sound/hc55516.h"
+#include "netlist/devices/net_lib.h"
+#include "sound/flt_biquad.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -100,6 +102,8 @@ public:
 		m_pic(*this, I8259A_TAG),
 		m_upd7201(*this, UPD7201_TAG),
 		m_ssda(*this, MC6852_TAG),
+		m_cvsd_filter(*this, "cvsd_filter"),
+        m_cvsd_filter2(*this, "cvsd_filter2"),
 		m_via1(*this, M6522_1_TAG),
 		m_via2(*this, M6522_2_TAG),
 		m_via3(*this, M6522_3_TAG),
@@ -134,6 +138,8 @@ private:
 	required_device<pic8259_device> m_pic;
 	required_device<upd7201_device> m_upd7201;
 	required_device<mc6852_device> m_ssda;
+	optional_device<filter_biquad_device> m_cvsd_filter;
+    optional_device<filter_biquad_device> m_cvsd_filter2;
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
 	required_device<via6522_device> m_via3;
@@ -739,10 +745,12 @@ void victor9k_state::victor9k(machine_config &config)
 	m_crtc->set_begin_update_callback(FUNC(victor9k_state::crtc_begin_update));
 
 	// sound hardware
+	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
+	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(1800), CAP_P(180));
+	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 0.25);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, "mono", 0.25);
+	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 0.25);
 	SPEAKER(config, "mono").front_center();
-	HC55516(config, m_cvsd, 0);
-	//MCFG_HC55516_DIG_OUT_CB(WRITELINE(MC6852_TAG, mc6852_device, rx_w))
-	m_cvsd->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MC6852(config, m_ssda, 0);
 	m_ssda->tx_data_callback().set(HC55516_TAG, FUNC(hc55516_device::digit_w));
