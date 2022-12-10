@@ -45107,3 +45107,6 @@ mtu130
 
 @source:yamaha/ymvl1.cpp
 vl1
+
+@source:ddr/sprachmg.cpp
+sprachmg						// 1985 Institut für Kosmosforschung
