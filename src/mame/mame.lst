@@ -12780,6 +12780,9 @@ dotriman
 @source:quantel/dpb7000.cpp
 dpb7000                         //
 
+@source:trs/dgnalpha.cpp
+dgnalpha                        // Dragon Alpha
+
 @source:skeleton/dps1.cpp
 dps1                            //
 
@@ -12788,7 +12791,6 @@ dpsv55                          //
 
 @source:trs/dragon.cpp
 d64plus                         // Dragon 64 + Compusense Plus addon
-dgnalpha                        // Dragon Alpha
 dragon200                       // Dragon 200
 dragon200e                      // Dragon 200E
 dragon32                        // Dragon 32
