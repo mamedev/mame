@@ -8,7 +8,7 @@
     Crazy Blocks
     (c)1983 Kiwako/ECI
 
-    Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 2000/03/20 -
+    Driver by Takahiro Nogi 2000/03/20 -
 
     Block Buster
     (c)1983 Kiwako/ECI

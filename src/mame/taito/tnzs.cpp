@@ -631,7 +631,7 @@ d23f=input port 1 value
   Kageki
   (c) 1988 Taito Corporation
 
-  Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
+  Driver by Takahiro Nogi 1999/11/06
 
 ***************************************************************************/
 
