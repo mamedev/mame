@@ -274,12 +274,68 @@ void md_boot_state::md_bootleg_map(address_map &map)
 	map(0x200000, 0x2023ff).ram(); // Tested
 }
 
-void md_boot_state::md_bootleg(machine_config &config)
+void md_boot_state::topshoot_68k_map(address_map &map)
+{
+	md_bootleg_map(map);
+
+	// these are shared RAM, MCU puts the inputs here
+	map(0x200042, 0x200043).portr("IN0");
+	map(0x200044, 0x200045).portr("IN1");
+	map(0x200046, 0x200047).portr("IN2");
+	map(0x200048, 0x200049).portr("IN3");
+	map(0x200050, 0x200051).r(FUNC(md_boot_state::topshoot_200051_r));
+}
+
+void md_boot_state::sbubsm_68k_map(address_map &map)
+{
+	topshoot_68k_map(map);
+
+	// these are shared RAM, MCU puts the inputs here
+	map(0x20007e, 0x20007f).portr("IN4");
+
+	// needed to boot, somme kind of hardware ident?
+	map(0x400000, 0x400001).r(FUNC(md_boot_state::sbubsm_400000_r));
+	map(0x400002, 0x400003).r(FUNC(md_boot_state::sbubsm_400002_r));
+}
+
+void md_boot_6button_state::ssf2mdb_68k_map(address_map &map)
+{
+	megadriv_68k_map(map);
+
+	map(0x400000, 0x5fffff).rom().region("maincpu", 0x400000).unmapw();
+	map(0x770070, 0x770075).r(FUNC(md_boot_6button_state::dsw_r));
+	map(0xa130f0, 0xa130ff).nopw(); // custom banking is disabled (!)
+}
+
+
+void md_boot_state::megadrvb(machine_config &config)
 {
 	md_ntsc(config);
 
+	m_ioports[2]->set_in_handler(NAME([this] () { return m_io_exp.read_safe(0x3f); }));
+}
+
+void md_boot_state::md_bootleg(machine_config &config)
+{
+	megadrvb(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::md_bootleg_map);
 }
+
+void md_boot_state::topshoot(machine_config &config)
+{
+	megadrvb(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::topshoot_68k_map);
+}
+
+void md_boot_state::sbubsm(machine_config &config)
+{
+	megadrvb(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::sbubsm_68k_map);
+}
+
 
 /*************************************
  *
@@ -409,77 +465,6 @@ uint16_t md_boot_state::sbubsm_400002_r()
 {
 	logerror("%s: sbubsm_400002_r\n", machine().describe_context().c_str());
 	return 0x0f00;
-}
-
-// jzth protection
-void md_boot_state::bl_710000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	int pc = m_maincpu->pc();
-
-	logerror("%06x writing to bl_710000_w %04x %04x\n", pc, data, mem_mask);
-
-	// protection value is read from  0x710000 after a series of writes.. and stored at ff0007
-	// startup
-	/*
-	059ce0 writing to bl_710000_w ff08 ffff
-	059d04 writing to bl_710000_w 000a ffff
-	059d04 writing to bl_710000_w 000b ffff
-	059d04 writing to bl_710000_w 000c ffff
-	059d04 writing to bl_710000_w 000f ffff
-	059d1c writing to bl_710000_w ff09 ffff
-	059d2a reading from bl_710000_r  (wants 0xe)
-	059ce0 writing to bl_710000_w ff08 ffff
-	059d04 writing to bl_710000_w 000a ffff
-	059d04 writing to bl_710000_w 000b ffff
-	059d04 writing to bl_710000_w 000c ffff
-	059d04 writing to bl_710000_w 000f ffff
-	059d1c writing to bl_710000_w ff09 ffff
-	059d2a reading from bl_710000_r  (wants 0xe)
-	*/
-	// before lv stage 3
-	/*
-	059ce0 writing to bl_710000_w 0008 ffff
-	059d04 writing to bl_710000_w 000b ffff
-	059d04 writing to bl_710000_w 000f ffff
-	059d1c writing to bl_710000_w ff09 ffff
-	059d2a reading from bl_710000_r  (wants 0x4)
-	*/
-	// start level 3
-	/*
-	059ce0 writing to bl_710000_w ff08 ffff
-	059d04 writing to bl_710000_w 000b ffff
-	059d04 writing to bl_710000_w 000c ffff
-	059d04 writing to bl_710000_w 000e ffff
-	059d1c writing to bl_710000_w ff09 ffff
-	059d2a reading from bl_710000_r  (wants 0x5)
-
-	// after end sequence
-	059ce0 writing to bl_710000_w 0008 ffff
-	059d04 writing to bl_710000_w 000a ffff
-	059d04 writing to bl_710000_w 000b ffff
-	059d04 writing to bl_710000_w 000c ffff
-	059d04 writing to bl_710000_w 000f ffff
-	059d1c writing to bl_710000_w ff09 ffff
-	059d2a reading from bl_710000_r  (wants 0xe)
-
-	*/
-	m_protcount++;
-}
-
-
-uint16_t md_boot_state::bl_710000_r()
-{
-	uint16_t ret;
-	int pc = m_maincpu->pc();
-	logerror("%06x reading from bl_710000_r\n", pc);
-
-	if (m_protcount==6) { ret = 0xe; }
-	else if (m_protcount==5) { ret = 0x5; }
-	else if (m_protcount==4) { ret = 0x4; }
-	else ret = 0xf;
-
-	m_protcount = 0;
-	return ret;
 }
 
 
@@ -1115,14 +1100,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void md_boot_state::megadrvb(machine_config &config)
-{
-	md_ntsc(config);
-
-	m_ioports[2]->set_in_handler(NAME([this] () { return m_io_exp.read_safe(0x3f); }));
-}
-
-
 void md_boot_6button_state::machine_start()
 {
 	md_boot_state::machine_start();
@@ -1140,6 +1117,13 @@ void md_boot_6button_state::megadrvb_6b(machine_config &config)
 	m_ioports[1]->set_out_handler(FUNC(md_boot_6button_state::ioport_out_6button<1>));
 }
 
+void md_boot_6button_state::ssf2mdb(machine_config &config)
+{
+	megadrvb_6b(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_6button_state::ssf2mdb_68k_map);
+}
+
 
 
 /*************************************
@@ -1153,10 +1137,10 @@ void md_boot_6button_state::megadrvb_6b(machine_config &config)
 void md_boot_state::init_aladmdb()
 {
 	// Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
-	#if ENERGY_CONSOLE_MODE
+#if ENERGY_CONSOLE_MODE
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	rom[0x1afc08/2] = 0x6600;
-	#endif
+#endif
 
 	// 220000 = writes to mcu? 330000 = reads?
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
@@ -1213,16 +1197,6 @@ void md_boot_6button_state::init_mk3mdb()
 	init_megadriv();
 }
 
-void md_boot_6button_state::init_ssf2mdb()
-{
-	m_maincpu->space(AS_PROGRAM).nop_write(0xa130f0, 0xa130ff); // custom banking is disabled (!)
-	m_maincpu->space(AS_PROGRAM).install_rom(0x400000, 0x5fffff, memregion( "maincpu" )->base() + 0x400000);
-	m_maincpu->space(AS_PROGRAM).unmap_write(0x400000, 0x5fffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_6button_state::dsw_r)));
-
-	init_megadrij();
-}
-
 void md_boot_state::init_srmdb()
 {
 	uint8_t* rom = memregion("maincpu")->base();
@@ -1247,37 +1221,6 @@ void md_boot_state::init_srmdb()
 	rom[0x07] = 0x00;
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::dsw_r)));
-
-	init_megadriv();
-}
-
-void md_boot_state::init_topshoot()
-{
-
-	// these are shared RAM, MCU puts the inputs here
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200050, 0x200051, read16smo_delegate(*this, FUNC(md_boot_state::topshoot_200051_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x200042, 0x200043, "IN0");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x200044, 0x200045, "IN1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x200046, 0x200047, "IN2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x200048, 0x200049, "IN3");
-
-	init_megadriv();
-}
-
-
-void md_boot_state::init_sbubsm()
-{
-	// needed to boot, somme kind of hardware ident?
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x400001, read16smo_delegate(*this, FUNC(md_boot_state::sbubsm_400000_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x400002, 0x400003, read16smo_delegate(*this, FUNC(md_boot_state::sbubsm_400002_r)));
-
-	// these are shared RAM, MCU puts the inputs here
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200050, 0x200051, read16smo_delegate(*this, FUNC(md_boot_state::topshoot_200051_r))); // needed for coins to work
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x200042, 0x200043, "IN0");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x200044, 0x200045, "IN1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x200046, 0x200047, "IN2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x200048, 0x200049, "IN3");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x20007e, 0x20007f, "IN4");
 
 	init_megadriv();
 }
@@ -1578,10 +1521,10 @@ ROM_END
 
 GAME( 1993, aladmdb,  0, megadrvb,     aladmdb,  md_boot_state,         init_aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Mega Drive version)",                                       0 )
 GAME( 1996, mk3mdb,   0, megadrvb_6b,  mk3mdb,   md_boot_6button_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Mega Drive version)",                                        0 )
-GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_6button_state, init_ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese Mega Drive version)", 0 )
+GAME( 1994, ssf2mdb,  0, ssf2mdb,      ssf2mdb,  md_boot_6button_state, init_megadrij, ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese Mega Drive version)", 0 )
 GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state,         init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Mega Drive version)",                                          0 )
-GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state,         init_topshoot, ROT0, "Sun Mixing",       "Top Shooter",                                                                            0 )
-GAME( 1996, sbubsm,   0, md_bootleg,   sbubsm,   md_boot_state,         init_sbubsm,   ROT0, "Sun Mixing",       "Super Bubble Bobble (Sun Mixing, Mega Drive clone hardware)",                            0 )
+GAME( 1995, topshoot, 0, topshoot,     topshoot, md_boot_state,         init_megadriv, ROT0, "Sun Mixing",       "Top Shooter",                                                                            0 )
+GAME( 1996, sbubsm,   0, sbubsm,       sbubsm,   md_boot_state,         init_megadriv, ROT0, "Sun Mixing",       "Super Bubble Bobble (Sun Mixing, Mega Drive clone hardware)",                            0 )
 GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state,         init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Mega Drive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
 GAME( 1993, sonic3mb, 0, md_bootleg,   sonic3mb, md_sonic3bl_state,     init_sonic3mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 3 (bootleg of Mega Drive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
 GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state,         init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Mega Drive version)",                                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC hook up

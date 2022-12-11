@@ -64,7 +64,7 @@ public:
 };
 
 
-static INPUT_PORTS_START( hshavoc )
+INPUT_PORTS_START( hshavoc )
 	PORT_START("IN0")   // 16 bit
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
