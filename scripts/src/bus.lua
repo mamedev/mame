@@ -3571,8 +3571,20 @@ end
 
 if (BUSES["TANBUS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/tanbus/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/tanbus/keyboard/mt006.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/keyboard/mt006.h",
+		MAME_DIR .. "src/devices/bus/tanbus/keyboard/mt009.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/keyboard/mt009.h",
+		MAME_DIR .. "src/devices/bus/tanbus/keyboard/spinveti.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/keyboard/spinveti.h",
 		MAME_DIR .. "src/devices/bus/tanbus/bullsnd.cpp",
 		MAME_DIR .. "src/devices/bus/tanbus/bullsnd.h",
+		MAME_DIR .. "src/devices/bus/tanbus/etirtc.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/etirtc.h",
+		MAME_DIR .. "src/devices/bus/tanbus/etisnd.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/etisnd.h",
 		MAME_DIR .. "src/devices/bus/tanbus/tanbus.cpp",
 		MAME_DIR .. "src/devices/bus/tanbus/tanbus.h",
 		MAME_DIR .. "src/devices/bus/tanbus/tanex.cpp",
@@ -3583,6 +3595,8 @@ if (BUSES["TANBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/tanbus/tanhrg.h",
 		MAME_DIR .. "src/devices/bus/tanbus/tanram.cpp",
 		MAME_DIR .. "src/devices/bus/tanbus/tanram.h",
+		MAME_DIR .. "src/devices/bus/tanbus/tanrtc.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/tanrtc.h",
 		MAME_DIR .. "src/devices/bus/tanbus/mpvdu.cpp",
 		MAME_DIR .. "src/devices/bus/tanbus/mpvdu.h",
 		MAME_DIR .. "src/devices/bus/tanbus/ra32k.cpp",
@@ -3595,6 +3609,8 @@ if (BUSES["TANBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/tanbus/tug64k.h",
 		MAME_DIR .. "src/devices/bus/tanbus/tug8082.cpp",
 		MAME_DIR .. "src/devices/bus/tanbus/tug8082.h",
+		MAME_DIR .. "src/devices/bus/tanbus/tugcombo.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/tugcombo.h",
 		MAME_DIR .. "src/devices/bus/tanbus/tugpgm.cpp",
 		MAME_DIR .. "src/devices/bus/tanbus/tugpgm.h",
 	}

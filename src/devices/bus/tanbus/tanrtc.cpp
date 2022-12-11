@@ -2,22 +2,29 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Tangerine TANRAM (MT013 Iss2)
-
-    http://www.microtan.ukpc.net/pageProducts.html#RAM
+    Microtanic Real Time Clock
 
 **********************************************************************/
 
 
 #include "emu.h"
-#include "tanram.h"
+#include "tanrtc.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(TANBUS_TANRAM, tanbus_tanram_device, "tanbus_tanram", "Tangerine Tanram Board")
+DEFINE_DEVICE_TYPE(TANBUS_TANRTC, tanbus_tanrtc_device, "tanbus_tanrtc", "Microtanic Real Time Clock")
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void tanbus_tanrtc_device::device_add_mconfig(machine_config &config)
+{
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+}
 
 
 //**************************************************************************
@@ -25,57 +32,55 @@ DEFINE_DEVICE_TYPE(TANBUS_TANRAM, tanbus_tanram_device, "tanbus_tanram", "Tanger
 //**************************************************************************
 
 //-------------------------------------------------
-//  tanbus_tanram_device - constructor
+//  tanbus_tanrtc_device - constructor
 //-------------------------------------------------
 
-tanbus_tanram_device::tanbus_tanram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TANBUS_TANRAM, tag, owner, clock)
+tanbus_tanrtc_device::tanbus_tanrtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TANBUS_TANRTC, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
+	, m_rtc(*this, "rtc")
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void tanbus_tanram_device::device_start()
+void tanbus_tanrtc_device::device_start()
 {
-	m_ram = std::make_unique<uint8_t[]>(0x9c00);
-
-	save_pointer(NAME(m_ram), 0x9c00);
 }
+
 
 //-------------------------------------------------
 //  read - card read
 //-------------------------------------------------
 
-uint8_t tanbus_tanram_device::read(offs_t offset, int inhrom, int inhram, int be)
+uint8_t tanbus_tanrtc_device::read(offs_t offset, int inhrom, int inhram, int be)
 {
 	uint8_t data = 0xff;
 
-	if (be && !inhram)
+	switch (offset & 0xffc0)
 	{
-		/* 32K dynamic ram + 7K static ram */
-		if ((offset >= 0x2000) && (offset < 0xbc00))
-		{
-			data = m_ram[offset - 0x2000];
-		}
+	case 0xbc00:
+		data = m_rtc->read_direct(offset);
+		break;
 	}
+
 	return data;
 }
+
 
 //-------------------------------------------------
 //  write - card write
 //-------------------------------------------------
 
-void tanbus_tanram_device::write(offs_t offset, uint8_t data, int inhrom, int inhram, int be)
+void tanbus_tanrtc_device::write(offs_t offset, uint8_t data, int inhrom, int inhram, int be)
 {
-	if (be && !inhram)
+	switch (offset & 0xffc0)
 	{
-		/* 32K dynamic ram + 7K static ram */
-		if ((offset >= 0x2000) && (offset < 0xbc00))
-		{
-			m_ram[offset - 0x2000] = data;
-		}
+	case 0xbc00:
+		m_rtc->write_direct(offset, data);
+		break;
 	}
 }
