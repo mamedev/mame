@@ -165,19 +165,16 @@ void bfm_bda_device::blank(int data)
 {
 	switch ( data & 0x03 ) // TODO: wrong case values???
 	{
-
-		case 0x00:  //blank all
+	case 0x00:  //blank all
+		for (int i = 0; i < 15; i++)
 		{
-			for (int i = 0; i < 15; i++)
-			{
-				m_attrs[i] = AT_BLANK;
-			}
+			m_attrs[i] = AT_BLANK;
 		}
 		break;
 
 
-		case 0x01:  // blank inside window
-		if ( m_window_size > 0 )
+	case 0x01:  // blank inside window
+		if (m_window_size > 0)
 		{
 			for (int i = m_window_start; i < m_window_end ; i++)
 			{
@@ -186,8 +183,8 @@ void bfm_bda_device::blank(int data)
 		}
 		break;
 
-		case 0x02:  // blank outside window
-		if ( m_window_size > 0 )
+	case 0x02:  // blank outside window
+		if (m_window_size > 0)
 		{
 			if ( m_window_start > 0 )
 			{
@@ -207,12 +204,10 @@ void bfm_bda_device::blank(int data)
 		}
 		break;
 
-		case 0x03:  // clear blanking
+	case 0x03:  // clear blanking
+		for (int i = 0; i < 15; i++)
 		{
-			for (int i = 0; i < 15; i++)
-			{
-				m_attrs[i] = 0;
-			}
+			m_attrs[i] = 0;
 		}
 		break;
 	}
@@ -220,7 +215,7 @@ void bfm_bda_device::blank(int data)
 
 int bfm_bda_device::write_char(int data)
 {
-	if ( m_user_def )
+	if (m_user_def)
 	{
 		m_user_def--;
 
@@ -255,47 +250,46 @@ int bfm_bda_device::write_char(int data)
 		}
 		else
 		{
-			switch ( data & 0xF0 )
+			switch (data & 0xf0)
 			{
 			case 0x80:  // 0x80 - 0x8F Set display blanking
-				if (data==0x84)// duty setup
+				if (data == 0x84)// duty setup
 				{
 					m_blank_flag = 1;
 					m_flash_flag = 0;
 				}
 				else
 				{
-					blank(data&0x03);//use the blanking data
+					blank(data & 0x03);//use the blanking data
 				}
 				break;
 
 			case 0x90:  // 0x90 - 0x9F Set cursor pos
-				m_cursor_pos = data & 0x0F;
+				m_cursor_pos = data & 0x0f;
 				m_scroll_active = 0;
-				if ( m_display_mode == 2 )
+				if (m_display_mode == 2)
 				{
 					if ( m_cursor_pos >= m_window_end) m_scroll_active = 1;
 				}
 				break;
 
-			case 0xA0:  // 0xA0 - 0xAF Set display mode
-				if (data==0xa8)// userdef
+			case 0xa0:  // 0xA0 - 0xAF Set display mode
+				if (data == 0xa8)// userdef
 				{
 					m_user_def = 2;
 				}
-				else if (data==0xac)
+				else if (data == 0xac)
 				{
 					popmessage("TEST MODE");
 				}
 				else
 				{
-					m_display_mode = data &0x03;
+					m_display_mode = data & 0x03;
 				}
 				break;
 
-			case 0xB0:  // 0xB0 - 0xBF Clear display area
-
-				if (data==0xbc)
+			case 0xb0:  // 0xB0 - 0xBF Clear display area
+				if (data == 0xbc)
 				{
 					popmessage("CLEAR USERDEF");
 				}
@@ -303,44 +297,46 @@ int bfm_bda_device::write_char(int data)
 				{
 					switch (data & 0x03)
 					{
-						case 0x00:  // clr nothing
-							break;
+					case 0x00:  // clr nothing
+						break;
 
-						case 0x01:  // clr inside window
-							if ( m_window_size > 0 )
-							{
-								std::fill_n(m_chars + m_window_start, m_window_size, 0);
-								std::fill_n(m_attrs + m_window_start, m_window_size, 0);
-							}
+					case 0x01:  // clr inside window
+						if (m_window_size > 0)
+						{
+							std::fill_n(m_chars + m_window_start, m_window_size, 0);
+							std::fill_n(m_attrs + m_window_start, m_window_size, 0);
+						}
+						break;
+					}
 				}
 				break;
 
-			case 0xC0:
-				if (data==0xc8)
+			case 0xc0:
+				if (data == 0xc8)
 				{
 					m_flash_flag = 1;
 				}
 				else
 				{
-					m_flash_rate = data & 0x0F;
+					m_flash_rate = data & 0x0f;
 					logerror("BDA flash %x", m_flash_rate);
 				}
 				break;
 
-			case 0xD0:  // 0xD0 - 0xDF Set Flash control
+			case 0xd0:  // 0xD0 - 0xDF Set Flash control
 				m_flash_control = data & 0x03;
 				break;
 
-			case 0xE0:  // 0xE0 - 0xEF Set window start pos
-				m_window_start = data &0x0F;
+			case 0xe0:  // 0xE0 - 0xEF Set window start pos
+				m_window_start = data & 0x0f;
 				m_window_size  = (m_window_end - m_window_start)+1;
 				break;
 
-			case 0xF0:  // 0xF0 - 0xFF Set window end pos
-				m_window_end   = data &0x0F;
-				m_window_size  = (m_window_end - m_window_start)+1;
+			case 0xf0:  // 0xF0 - 0xFF Set window end pos
+				m_window_end   = data & 0x0f;
+				m_window_size  = (m_window_end - m_window_start) + 1;
 				m_scroll_active = 0;
-				if ( m_display_mode == 2 )
+				if (m_display_mode == 2)
 				{
 					if ( m_cursor_pos >= m_window_end)
 					{
@@ -351,7 +347,6 @@ int bfm_bda_device::write_char(int data)
 				break;
 			}
 		}
-	}
 	}
 	update_display();
 
