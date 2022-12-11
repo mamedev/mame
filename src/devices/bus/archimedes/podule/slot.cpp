@@ -272,6 +272,7 @@ void device_archimedes_podule_interface::interface_post_start()
 #include "io.h"
 #include "io_hccs.h"
 #include "io_morley.h"
+//#include "io_oak.h"
 #include "io_we.h"
 #include "lark.h"
 #include "laserd.h"
@@ -284,11 +285,12 @@ void device_archimedes_podule_interface::interface_post_start()
 #include "rs423.h"
 #include "scan256.h"
 #include "scanlight.h"
-//#include "scsi_a500.h"
-//#include "scsi_acorn.h"
-//#include "scsi_ling.h"
-//#include "scsi_morley.h"
-//#include "scsi_oak.h"
+#include "scsi_a500.h"
+#include "scsi_acorn.h"
+#include "scsi_cumana.h"
+#include "scsi_ling.h"
+#include "scsi_morley.h"
+#include "scsi_oak.h"
 #include "scsi_vti.h"
 #include "serial.h"
 #include "spectra.h"
@@ -351,12 +353,13 @@ void archimedes_exp_devices(device_slot_interface &device)
 	device.option_add("scanjunior", ARC_SCANJUNIOR);      // Computer Concepts ScanLight Junior
 	device.option_add("scanjunior3", ARC_SCANJUNIOR3);    // Computer Concepts ScanLight Junior Mk3
 	device.option_add("scanvideo", ARC_SCANVIDEO);        // Computer Concepts ScanLight Video 256
-	//device.option_add("scsi_a500", ARC_SCSI_A500);        // Acorn A500 SCSI Interface
-	//device.option_add("scsi_aka31", ARC_SCSI_AKA31);      // Acorn AKA31 SCSI Expansion Card
-	//device.option_add("scsi_aka32", ARC_SCSI_AKA32);      // Acorn AKA32 CDFS & SCSI Expansion Card
-	//device.option_add("scsi_ling", ARC_SCSI_LING);        // Lingenuity SCSI Podule
-	//device.option_add("scsi_morley", ARC_SCSI_MORLEY);    // Morley Electronics 16bit Cached SCSI card
-	//device.option_add("scsi_oak", ARC_SCSI_OAK);          // Oak Solutions SCSI Interface
+	device.option_add("scsi_a500", ARC_SCSI_A500);        // Acorn A500 SCSI Interface
+	device.option_add("scsi_aka31", ARC_SCSI_AKA31);      // Acorn AKA31 SCSI Expansion Card
+	device.option_add("scsi_aka32", ARC_SCSI_AKA32);      // Acorn AKA32 CDFS & SCSI Expansion Card
+	device.option_add("scsi_cumana", ARC_SCSI_CUMANA);    // Cumana 16bit SCSI interface
+	device.option_add("scsi_ling", ARC_SCSI_LING);        // Lingenuity SCSI Podule
+	device.option_add("scsi_morley", ARC_SCSI_MORLEY);    // Morley Electronics 16bit Cached SCSI card
+	device.option_add("scsi_oak", ARC_SCSI_OAK);          // Oak Solutions SCSI Interface
 	device.option_add("scsi_vti", ARC_SCSI_VTI);          // VTI User Port and SCSI Podule
 	device.option_add("serial", ARC_SERIAL);              // Atomwide Serial Expansion Card
 	device.option_add("spectra", ARC_SPECTRA);            // Beebug Spectra Colour Scanner
@@ -371,6 +374,7 @@ void archimedes_exp_devices(device_slot_interface &device)
 
 void archimedes_mini_exp_devices(device_slot_interface &device)
 {
+	//device.option_add("a3user_oak", ARC_A3USER_OAK);      // Oak Solutions A3000 User/Analogue Port
 	device.option_add("bbcio_aga30", ARC_BBCIO_AGA30);    // Acorn AGA30 BBC I/O Podule
 	device.option_add("bbcio_we", ARC_BBCIO_WE);          // Watford BBC User I/O Card
 	//device.option_add("disc_a3k6", ARC_DISC_A3K6);        // PRES A3K6 Disc Buffer
