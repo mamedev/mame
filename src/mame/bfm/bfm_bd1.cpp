@@ -183,30 +183,30 @@ void bfm_bd1_device::update_display()
 			{
 				switch (m_flash_control)
 				{
-					case 1:    // Flash Inside Window
-						for (int i = 0; i < 16; i++)
-						{
-						  if ((i >= m_window_start) && (i <= m_window_end))
-							  m_attrs[i] = AT_FLASH;
-						  else
-							  m_attrs[i] = AT_NORMAL;
-						}
-						m_flash = true;
-					break;
-					case 2:    // Flash Outside Window
-						for (int i = 0; i < 16; i++)
-						{
-						  if ((i < m_window_start) || (i > m_window_end))
-							  m_attrs[i] = AT_FLASH;
-						  else
-							  m_attrs[i] = AT_NORMAL;
-						}
-						m_flash = true;
-					break;
-					case 3:    // Flash All
-						for ( int i = 0; i < 16; i++ )
+				case 1:    // Flash Inside Window
+					for (int i = 0; i < 16; i++)
+					{
+						if ((i >= m_window_start) && (i <= m_window_end))
 							m_attrs[i] = AT_FLASH;
-						m_flash = true;
+						else
+							m_attrs[i] = AT_NORMAL;
+					}
+					m_flash = true;
+					break;
+				case 2:    // Flash Outside Window
+					for (int i = 0; i < 16; i++)
+					{
+					  if ((i < m_window_start) || (i > m_window_end))
+						  m_attrs[i] = AT_FLASH;
+					  else
+						  m_attrs[i] = AT_NORMAL;
+					}
+					m_flash = true;
+					break;
+				case 3:    // Flash All
+					for ( int i = 0; i < 16; i++ )
+						m_attrs[i] = AT_FLASH;
+					m_flash = true;
 					break;
 				}
 		  }
