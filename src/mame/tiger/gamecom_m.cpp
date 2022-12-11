@@ -30,7 +30,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
 	if (m_sound0_cnt < 0x20)
 	{
 		m_dac0->write((m_sound.sg0w[m_sound0_cnt >> 1] >> (BIT(m_sound0_cnt, 0) * 4)) & 0xf);
-		m_dac0->set_output_gain(ALL_OUTPUTS, m_sound.sg0l/31.0f);
+		m_dac0->set_output_gain(ALL_OUTPUTS, m_sound.sg0l / 31.0F);
 		m_sound0_cnt++;
 	}
 }
@@ -49,7 +49,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound1_timer_callback)
 	if (m_sound1_cnt < 0x20)
 	{
 		m_dac1->write((m_sound.sg1w[m_sound1_cnt >> 1] >> (BIT(m_sound1_cnt, 0) * 4)) & 0xf);
-		m_dac1->set_output_gain(ALL_OUTPUTS, m_sound.sg1l/31.0f);
+		m_dac1->set_output_gain(ALL_OUTPUTS, m_sound.sg1l / 31.0F);
 		m_sound1_cnt++;
 	}
 }
