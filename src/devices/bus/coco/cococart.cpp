@@ -678,8 +678,8 @@ device_cococart_interface::~device_cococart_interface()
 void device_cococart_interface::interface_config_complete()
 {
 	m_host = m_owning_slot
-		? dynamic_cast<device_cococart_host_interface *>(m_owning_slot->owner())
-		: nullptr;
+			? dynamic_cast<device_cococart_host_interface *>(m_owning_slot->owner())
+			: nullptr;
 }
 
 
