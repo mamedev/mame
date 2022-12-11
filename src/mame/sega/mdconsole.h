@@ -48,6 +48,7 @@ protected:
 	void install_tmss();
 
 	void md_ctrl_ports(machine_config &config);
+	void md_exp_port(machine_config &config);
 
 	optional_device_array<sms_control_port_device, 3> m_ctrl_ports;
 	optional_device<sega_32x_device> m_32x;

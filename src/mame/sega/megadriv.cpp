@@ -777,7 +777,7 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 
 void md_base_state::megadriv_timers(machine_config &config)
 {
-	TIMER(config, m_scan_timer).configure_generic("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback));
+	TIMER(config, m_scan_timer).configure_generic(m_vdp, FUNC(sega315_5313_device::megadriv_scanline_timer_callback));
 }
 
 void md_base_state::megadriv_ioports(machine_config &config)
