@@ -286,7 +286,6 @@ void vendetta_state::eeprom_w(uint8_t data)
 	// bit 6 - IRQ enable
 	// bit 7 - Unused
 
-
 	if (data == 0xff ) // this is a bug in the EEPROM write code
 		return;
 
@@ -294,6 +293,8 @@ void vendetta_state::eeprom_w(uint8_t data)
 	m_eeprom_out->write(data, 0xff);
 
 	m_irq_enabled = (data >> 6) & 1;
+	if (!m_irq_enabled)
+		m_maincpu->set_input_line(KONAMI_IRQ_LINE, CLEAR_LINE);
 
 	m_videoview0.select(BIT(data, 0));
 	m_videoview1.select(BIT(data, 0));
@@ -552,7 +553,7 @@ INPUT_PORTS_END
 INTERRUPT_GEN_MEMBER(vendetta_state::irq)
 {
 	if (m_irq_enabled)
-		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+		device.execute().set_input_line(KONAMI_IRQ_LINE, ASSERT_LINE);
 }
 
 void vendetta_state::machine_start()
@@ -662,7 +663,7 @@ void vendetta_state::esckids(machine_config &config)
 
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 101, 6);
 
-	K053252(config, "k053252", 6000000).set_offsets(12*8, 1*8);
+	K053252(config, "k053252", XTAL(24'000'000) / 4).set_offsets(12*8, 1*8);
 }
 
 
