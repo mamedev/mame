@@ -14040,7 +14040,7 @@ ROM_START( sfzch )
 	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "sfz63b.1a",   0x0000, 0x0104, CRC(f5a351da) SHA1(a867947d784167b5284efb76a8634ca5713dafdb) )  // PAL16L8
 
-	// todo... confirm other pals (could be unique as this is the "cps changer" home console)
+	// TODO... confirm other pals (could be unique as this is the "cps changer" home console)
 ROM_END
 
 /* FIXME B-Board uncertain but should be 91634B from the program ROM names */
