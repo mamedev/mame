@@ -15,6 +15,8 @@
 
 #include "coco.h"
 #include "6883sam.h"
+#include "machine/mos6551.h"
+#include "sound/ay8910.h"
 #include "video/mc6847.h"
 
 
@@ -25,7 +27,9 @@
 
 #define SAM_TAG         "sam"
 #define VDG_TAG         "vdg"
-
+#define MOSACIA_TAG     "mosacia"
+#define ACIA_TAG        "acia"
+#define PSG_TAG         "psg"
 
 
 //**************************************************************************
@@ -84,6 +88,25 @@ private:
 
 protected:
 	required_device<mc6847_base_device> m_vdg;
+};
+
+class deluxecoco_state : public coco12_state
+{
+public:
+	deluxecoco_state(const machine_config &mconfig, device_type type, const char *tag)
+		: coco12_state(mconfig, type, tag)
+		, m_acia(*this, MOSACIA_TAG)
+		, m_psg(*this, PSG_TAG)
+	{
+	}
+
+	void deluxecoco(machine_config &config);
+
+protected:
+	void deluxecoco_io1(address_map &map);
+
+	required_device<mos6551_device> m_acia;
+	required_device<ay8913_device> m_psg;
 };
 
 #endif // MAME_INCLUDES_COCO12_H
