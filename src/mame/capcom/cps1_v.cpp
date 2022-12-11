@@ -1452,7 +1452,7 @@ static const struct gfx_range mapper_TN2292_table[] =
 };
 
 
-// RCM63B, SFZ63B (megaman, sfzch) are equivalent, should be interchangeable on real pcbs without issue
+// RCM63B, SFZ63B (megaman, sfzch) are equivalent, should be interchangeable on real PCBs without issue
 
 #define mapper_RCM63B   { 0x8000, 0x8000, 0x8000, 0x8000 }, mapper_RCM63B_table
 static const struct gfx_range mapper_RCM63B_table[] =
