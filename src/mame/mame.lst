@@ -24300,6 +24300,7 @@ mk1forth                        // (c) 2003 Andrew Holme
 
 @source:trainer/mk14.cpp
 mk14                            //
+mk14vdu                         //
 
 @source:ussr/mk85.cpp
 mk85                            //
