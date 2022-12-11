@@ -288,7 +288,6 @@ gamepark/gp2x.cpp
 gamepark/gp32.cpp
 gridcomp/gridcomp.cpp
 grundy/newbrain.cpp
-h01x/h01x.cpp
 handheld/gameking.cpp
 handheld/gmaster.cpp
 handheld/hh_cop400.cpp
@@ -484,6 +483,7 @@ miltonbradley/vectrex.cpp
 mips/mips.cpp
 misc/3do.cpp
 misc/eva.cpp
+misc/h01x.cpp
 misc/monon_color.cpp
 misc/mtu130.cpp
 misc/z80ne.cpp
