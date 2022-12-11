@@ -19,13 +19,13 @@
 class megadriv_sunplus_state : public md_base_state
 {
 public:
-	megadriv_sunplus_state(const machine_config &mconfig, device_type type, const char *tag)
+	megadriv_sunplus_state(const machine_config &mconfig, device_type type, const char *tag) :
 		// Mega Drive part
-		: md_base_state(mconfig, type, tag),
+		md_base_state(mconfig, type, tag),
 		m_md_is_running(true),
 		m_bank(0),
 		m_rom(*this, "maincpu")
-	{}
+	{ }
 
 	// Mega Drive part
 	uint16_t read(offs_t offset);
@@ -53,16 +53,9 @@ private:
 // todo, use actual MD map, easier once maps are part of base class.
 void megadriv_sunplus_state::megadriv_sunplus_map(address_map &map)
 {
+	megadriv_68k_base_map(map);
+
 	map(0x000000, 0x3fffff).r(FUNC(megadriv_sunplus_state::read)); /* Cartridge Program Rom */
-	map(0xa00000, 0xa01fff).rw(FUNC(megadriv_sunplus_state::megadriv_68k_read_z80_ram), FUNC(megadriv_sunplus_state::megadriv_68k_write_z80_ram));
-	map(0xa02000, 0xa03fff).w(FUNC(megadriv_sunplus_state::megadriv_68k_write_z80_ram));
-	map(0xa04000, 0xa04003).rw(FUNC(megadriv_sunplus_state::megadriv_68k_YM2612_read), FUNC(megadriv_sunplus_state::megadriv_68k_YM2612_write));
-	map(0xa06000, 0xa06001).w(FUNC(megadriv_sunplus_state::megadriv_68k_z80_bank_write));
-	map(0xa10000, 0xa1001f).rw(FUNC(megadriv_sunplus_state::megadriv_68k_io_read), FUNC(megadriv_sunplus_state::megadriv_68k_io_write));
-	map(0xa11100, 0xa11101).rw(FUNC(megadriv_sunplus_state::megadriv_68k_check_z80_bus), FUNC(megadriv_sunplus_state::megadriv_68k_req_z80_bus));
-	map(0xa11200, 0xa11201).w(FUNC(megadriv_sunplus_state::megadriv_68k_req_z80_reset));
-	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
-	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000).share("megadrive_ram");
 }
 
 uint16_t megadriv_sunplus_state::read(offs_t offset)
@@ -168,4 +161,3 @@ ROM_END
 // This should actually boot to a menu on the MD side, with the SunPlus only being enabled if selected from that menu.  MD side menu runs in some enhanced / custom MD mode though.
 // Badminton hangs, as it does in the 49-in-1 above
 CONS( 2009, reactmd,  0, 0, megadriv_sunplus_pal, megadriv_sunplus, megadriv_sunplus_state, init_reactmd, "AtGames / Sega / Waixing", "Reactor MD (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-

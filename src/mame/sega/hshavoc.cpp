@@ -55,7 +55,7 @@ class hshavoc_state : public md_boot_state
 {
 public:
 	hshavoc_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_boot_state(mconfig, type, tag)
+		: md_boot_state(mconfig, type, tag)
 	{ }
 
 	void hshavoc(machine_config &config);

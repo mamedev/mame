@@ -45,13 +45,13 @@ Notes:
 */
 
 #include "emu.h"
+#include "megadriv_acbl.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "sound/ymopn.h"
 
-#include "megadriv.h"
-#include "megadriv_acbl.h"
 
 /* Puckman Pockimon Input Ports */
 static INPUT_PORTS_START( puckpkmn )

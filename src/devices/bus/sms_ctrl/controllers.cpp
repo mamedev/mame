@@ -17,6 +17,7 @@
 #include "multitap.h"
 #include "paddle.h"
 #include "rfu.h"
+#include "rs232adapt.h"
 #include "sports.h"
 #include "sportsjp.h"
 
@@ -29,6 +30,7 @@ char const *const SMS_CTRL_OPTION_MULTITAP   = "multitap";
 char const *const SMS_CTRL_OPTION_JOYPAD     = "mspad";
 char const *const SMS_CTRL_OPTION_PADDLE     = "paddle";
 char const *const SMS_CTRL_OPTION_RAPID_FIRE = "rapidfire";
+char const *const SMS_CTRL_OPTION_RS232      = "rs232";
 char const *const SMS_CTRL_OPTION_SPORTS     = "sports";
 char const *const SMS_CTRL_OPTION_SPORTS_JP  = "sportsjp";
 
@@ -44,6 +46,7 @@ void sms_control_port_devices(device_slot_interface &device)
 	device.option_add(SMS_CTRL_OPTION_JOYPAD,     SMS_JOYPAD);
 	device.option_add(SMS_CTRL_OPTION_PADDLE,     SMS_PADDLE);
 	device.option_add(SMS_CTRL_OPTION_RAPID_FIRE, SMS_RAPID_FIRE);
+	device.option_add(SMS_CTRL_OPTION_RS232,      SMS_RS232);
 	device.option_add(SMS_CTRL_OPTION_SPORTS,     SMS_SPORTS_PAD);
 	device.option_add(SMS_CTRL_OPTION_SPORTS_JP,  SMS_SPORTS_PAD_JP);
 }

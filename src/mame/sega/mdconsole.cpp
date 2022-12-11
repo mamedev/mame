@@ -21,61 +21,29 @@
  *
  *************************************/
 
-/* These overwrite the MAME ones in DRIVER_INIT */
-/* They're needed to give the users the choice between different controllers */
-uint8_t md_cons_state::mess_md_io_read_data_port(offs_t offset)
-{
-	// get bits set to output first - bit 7 always reads the latch
-	uint8_t const mask = m_io_ctrl_regs[offset] | 0x80;
-	uint8_t result = mask & m_io_data_regs[offset];
-
-	switch (offset)
-	{
-	case 0:
-	case 1:
-		result |= ~mask & (m_io_ctrl_th_in[offset] | (m_ctrl_ports[offset]->in_r() & 0x3f));
-		break;
-
-	default: // TODO: where does this come from on a console?
-		result |= 0x7f;
-	}
-
-	// handle test input for SVP test
-	if (!offset && m_cart && m_cart->read_test())
-		result = m_io_data_regs[0] & 0xc0;
-
-	return result;
-}
-
-
-void md_cons_state::mess_md_io_write_data_port(offs_t offset, uint16_t data)
-{
-	// FIXME: need to update the port when I/O direction changes, too
-
-	switch (offset)
-	{
-	case 0:
-	case 1:
-		m_ctrl_ports[offset]->out_w((data | ~m_io_ctrl_regs[offset]) & 0x7f, m_io_ctrl_regs[offset] & 0x7f);
-		break;
-
-	default: // TODO: where does this go on a console?
-		break;
-	}
-
-	m_io_data_regs[offset] = data;
-}
-
-
 void md_cons_state::md_ctrl_ports(machine_config &config)
 {
 	SMS_CONTROL_PORT(config, m_ctrl_ports[0], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
-	m_ctrl_ports[0]->th_handler().set([this] (int state) { m_io_ctrl_th_in[0] = state ? 0x40 : 0x00; });
+	m_ctrl_ports[0]->th_handler().set(m_ioports[0], FUNC(megadrive_io_port_device::th_w));
 	m_ctrl_ports[0]->set_screen(m_screen);
 
+	m_ioports[0]->set_in_handler(m_ctrl_ports[0], FUNC(sms_control_port_device::in_r));
+	m_ioports[0]->set_out_handler(m_ctrl_ports[0], FUNC(sms_control_port_device::out_w));
+
 	SMS_CONTROL_PORT(config, m_ctrl_ports[1], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
-	m_ctrl_ports[1]->th_handler().set([this] (int state) { m_io_ctrl_th_in[1] = state ? 0x40 : 0x00; });
+	m_ctrl_ports[1]->th_handler().set(m_ioports[1], FUNC(megadrive_io_port_device::th_w));
 	m_ctrl_ports[1]->set_screen(m_screen);
+
+	m_ioports[1]->set_in_handler(m_ctrl_ports[1], FUNC(sms_control_port_device::in_r));
+	m_ioports[1]->set_out_handler(m_ctrl_ports[1], FUNC(sms_control_port_device::out_w));
+
+	// TODO: Mega Drive II, Mega Jet and Nomad lack EXP port
+	SMS_CONTROL_PORT(config, m_ctrl_ports[2], sms_control_port_devices, nullptr);
+	m_ctrl_ports[2]->th_handler().set(m_ioports[2], FUNC(megadrive_io_port_device::th_w));
+	m_ctrl_ports[2]->set_screen(m_screen);
+
+	m_ioports[2]->set_in_handler(m_ctrl_ports[2], FUNC(sms_control_port_device::in_r));
+	m_ioports[2]->set_out_handler(m_ctrl_ports[2], FUNC(sms_control_port_device::out_w));
 }
 
 
@@ -116,11 +84,6 @@ INPUT_PORTS_END
 
 void md_cons_state::machine_start()
 {
-	m_io_ctrl_th_in[0] = 0x40;
-	m_io_ctrl_th_in[1] = 0x40;
-
-	save_item(NAME(m_io_ctrl_th_in));
-
 	m_vdp->stop_timers();
 
 	if (m_cart)
@@ -162,6 +125,14 @@ void md_cons_state::tmss_swap_w(uint16_t data)
 	{
 		install_tmss();
 	}
+}
+
+
+void md_cons_state::dcat16_megadriv_map(address_map &map)
+{
+	megadriv_68k_base_map(map);
+
+	map(0x000000, 0x7fffff).rom();
 }
 
 
@@ -239,7 +210,7 @@ void md_cons_state::dcat16_megadriv_base(machine_config &config)
 {
 	md_ntsc(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::dcat16_megadriv_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_cons_state::dcat16_megadriv_map);
 }
 
 void md_cons_slot_state::ms_megadriv(machine_config &config)
@@ -361,16 +332,9 @@ ROM_END
  *
  *************************************/
 
-void md_cons_state::init_mess_md_common()
-{
-	m_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_cons_state::mess_md_io_read_data_port));
-	m_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_cons_state::mess_md_io_write_data_port));
-}
-
 void md_cons_state::init_genesis()
 {
 	init_megadriv();
-	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -392,7 +356,6 @@ void md_cons_state::init_genesis()
 void md_cons_state::init_md_eur()
 {
 	init_megadrie();
-	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -414,7 +377,6 @@ void md_cons_state::init_md_eur()
 void md_cons_state::init_md_jpn()
 {
 	init_megadrij();
-	init_mess_md_common();
 
 	if (m_32x)
 	{
