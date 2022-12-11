@@ -7571,6 +7571,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="crazyland" cloneof="trollscl">
+		<description>Crazy Land (USA, prototype)</description>
+		<year>1991</year>
+		<publisher>Vap</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="NES-TKEPROM-01" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="crazy land prg 5-27 3bdb.u1" size="0x20000" crc="96ddee6e" sha1="dd19c0437fb9efd0a27c4277c7b1b7d32c59a643" /> <!-- original label: CRAZY LAND PRG 5/27 3BDB -->
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="crazy land chr 5-27 6017.u5" size="0x20000" crc="cc045b61" sha1="c474fcb5af3440caec27870a705b19339e004ff2" /> <!-- original label: CRAZY LAND CHR 5/27 6017 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crisisf">
 		<description>Crisis Force (Japan)</description>
 		<year>1991</year>
@@ -13929,6 +13946,23 @@ license:CC0
 		<publisher>Activision</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="NES-TKEPROM-01" />
+			<feature name="mmc3_type" value="MMC3A" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="p.u1" size="0x20000" crc="6a28dab9" sha1="cee41dfc69e3a3a296a993ebf30a6da0311ace64" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="c.u5" size="0x20000" crc="18da922d" sha1="31af2992ffefef7bfe6b9c945c74e2d0a51d096a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxy5kup1" cloneof="galaxy5k">
+		<description>Galaxy 5000 - Racing in the 51st Century (USA, prototype, earlier)</description>
+		<year>1991</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3A" />
 			<dataarea name="prg" size="131072">
@@ -17296,6 +17330,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="hoopsup" cloneof="hoops">
+		<description>Hoops (USA, prototype)</description>
+		<year>1989</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb_model" value="NES-SKEPROM-01" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="hoops p.ic1" size="0x20000" crc="514b8c43" sha1="ea87587491a18fdb3b4a2f91b7aa733ea17ff11c" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="hoops c.ic3" size="0x20000" crc="0ea4d276" sha1="13866ec46255892f01d2c14a7b0e576c0a601331" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kirbyj" cloneof="kirby">
 		<description>Hoshi no Kirby - Yume no Izumi no Monogatari (Japan)</description>
 		<year>1993</year>
@@ -18472,6 +18523,23 @@ license:CC0
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-it-0 chr" size="131072" crc="c61175cc" sha1="bebc127b3cad2ff0448a0c48119c817c1ac98d29" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="irontankup" cloneof="irontank">
+		<description>Iron Tank - The Invasion of Normandy (USA, prototype)</description>
+		<year>1988</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb_model" value="HVC-SKEPROM-01" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="2 a7004 usa.prg" size="0x20000" crc="e767160a" sha1="296f56202a898126f018fc2fa18353834c4b0650" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="1 a7004 usa.chr" size="0x20000" crc="c2551ea2" sha1="719ca2a44a3ddd300e385aa30cc759d53d06a960" />
 			</dataarea>
 		</part>
 	</software>
@@ -30261,6 +30329,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="rbibb2p" cloneof="rbibb2">
+		<description>R.B.I. Baseball 2 (USA, prototype, 19900307)</description>
+		<year>1990</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="tengen_800032" />
+			<feature name="pcb" value="TENGEN-800032" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="rbi 2 nes prg 3-7 053c.prg" size="0x20000" crc="5e36afda" sha1="3dce69df6bfcbddb28b7e1ef94f4116d84482d1c" />
+			</dataarea>
+			<dataarea name="chr" size="0x10000">
+				<rom name="rbi 2 nes chr 2-28 1c8f.chr" size="0x10000" crc="8585d41c" sha1="22e01150578fff75f71697d3b29d43b0c68e1975" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rbibb3">
 		<description>R.B.I. Baseball 3 (USA)</description>
 		<year>1991</year>
@@ -30837,6 +30921,23 @@ license:CC0
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rallybikp" cloneof="rallybik">
+		<description>Rally Bike (USA, prototype, 19900226)</description>
+		<year>1990</year>
+		<publisher>Romstar</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb_model" value="NES-UNEPROM-01" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="rally bike death 2-26-90.prg" size="0x20000" crc="f43be259" sha1="22d4cca9d826d62731026448a41dde61b6766c23" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
@@ -33596,6 +33697,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="shadninjp" cloneof="blueshad">
+		<description>Shadow of the Ninja (USA, sample)</description>
+		<year>1990</year>
+		<publisher>Natsume</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="NES-TKEPROM-01" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="ninja prg 10-16.u1" size="0x20000" crc="8b2ffbcc" sha1="440ee7ff29af54de2ce526b0a66fa71b28d0a7e3" /> <!-- original label: NINJA PRG 10/16 -->
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="ninja chr 10-16.u5" size="0x20000" crc="49c1f66d" sha1="af9a84e55cae2fa646d36bdd8ea5eb4a4a9bffcc" /> <!-- original label: NINJA CHR 10/16 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shadgatej" cloneof="shadgate">
 		<description>Shadowgate (Japan)</description>
 		<year>1989</year>
@@ -34332,6 +34450,23 @@ license:CC0
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-lk-0 chr" size="131072" crc="b7000942" sha1="29b617582ed611715d1dbe06c8006295dda97f83" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silkwormp" cloneof="silkworm">
+		<description>Silkworm (USA, prototype)</description>
+		<year>1990</year>
+		<publisher>American Sammy</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb_model" value="NES-SKEPROM-01" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="silkworm prg nes ver 1.ic1" size="0x20000" crc="0530a8b7" sha1="cc54cd29674138ca5f11380cb703fe82bda7ab61" /> <!-- original label: シルクワーム PRG NES Ver 1 -->
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="sw nes chr ver 1 5-25.ic3" size="0x20000" crc="b7000942" sha1="29b617582ed611715d1dbe06c8006295dda97f83" /> <!-- original label: SW NES CHR Ver 1 5/25 -->
 			</dataarea>
 		</part>
 	</software>
@@ -50404,6 +50539,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-hz-0 chr" size="131072" crc="31ed51a8" sha1="024475acd8706f6228c2bf28496c8f9ea1864da1" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadblstup" cloneof="roadblst">
+		<description>RoadBlasters (USA, prototype)</description>
+		<year>1990</year>
+		<publisher>Mindscape</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="roadblasters (prototype).prg" size="0x20000" crc="c66bf6b6" sha1="aa7b2f6f17c7b84469afb20b4b835d4841883e72" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="roadblasters (prototype).chr" size="0x20000" crc="605caf59" sha1="010331e23cb615f0f89f810a2f3464216f5d2d55" />
 			</dataarea>
 		</part>
 	</software>
@@ -80495,6 +80647,24 @@ be better to redump them properly. -->
 
 <!-- These are more recent dumps of unlicensed homebrew games that have been released on cartridge. They need to be verified against physical carts. -->
 
+	<software name="2gemsiam">
+		<description>2 in 1 - GEMiNIM &amp; Siamond</description>
+		<year>2008</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="SIV-M1-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="axrom" />
+			<feature name="pcb_model" value="Sealie Computing ReproPak revC" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="39sf010a.prg" size="0x20000" crc="bf3c0601" sha1="ea92849c5e7285b61a00f3ac37cdc773ba6758a3" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="puritans">
 		<description>2A03Puritans</description>
 		<year>2013</year>
@@ -81297,6 +81467,23 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="nightbas">
+		<description>Nighttime Bastards</description>
+		<year>2014</year>
+		<publisher>Infinite NES Lives</publisher>
+		<info name="serial" value="OBG-01"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="nighttime bastards.prg" size="0x8000" crc="c45ca4db" sha1="afe7a747539bf64554a3edcdc781ffa12033c0c3" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="nighttime bastards.chr" size="0x2000" crc="39a54075" sha1="7336854e7ea9ae679aa3177aba456d2abb594587" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nomolos">
 		<description>Nomolos - Storming the Catsle (v1.01)</description>
 		<year>2014</year>
@@ -81412,6 +81599,24 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 32k VRAM on cartridge -->
 			<dataarea name="vram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Glitchy music continues to play during game. Should only have movement sfx? -->
+	<software name="sudoku07" supported="partial">
+		<description>Sudoku 2007</description>
+		<year>2007</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb_model" value="Sealie Computing ReproPak revC" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="at27c010.prg" size="0x8000" crc="737a2c4b" sha1="8113124890165d33b2828cf73c196d7de42c66f3" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="at27c512.chr" size="0x2000" crc="aaf8120e" sha1="bfbc8d480ff73b3af746401510f98b1b2c18af86" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
