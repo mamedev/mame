@@ -17,7 +17,7 @@ Preliminary driver by:
 #include "k052109.h"
 #include "konamipt.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"

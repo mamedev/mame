@@ -18,7 +18,7 @@
 #include "k053251.h"
 #include "konami_helper.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the FIRQ IRQ definition
+#include "cpu/m6809/konami.h"
 #include "machine/bankdev.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"

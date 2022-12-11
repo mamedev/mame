@@ -96,7 +96,7 @@
 #include "k054000.h"
 #include "konami_helper.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
@@ -172,10 +172,9 @@ private:
 	void z80_nmi_w(int state);
 	void z80_irq_w(uint8_t data = 0);
 	uint8_t z80_irq_r();
+	void vblank_irq(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	INTERRUPT_GEN_MEMBER(irq);
 
 	K052109_CB_MEMBER(vendetta_tile_callback);
 	K052109_CB_MEMBER(esckids_tile_callback);
@@ -550,10 +549,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(vendetta_state::irq)
+void vendetta_state::vblank_irq(int state)
 {
-	if (m_irq_enabled)
-		device.execute().set_input_line(KONAMI_IRQ_LINE, ASSERT_LINE);
+	if (state && m_irq_enabled)
+		m_maincpu->set_input_line(KONAMI_IRQ_LINE, ASSERT_LINE);
 }
 
 void vendetta_state::machine_start()
@@ -598,7 +597,6 @@ void vendetta_state::vendetta(machine_config &config)
 	// basic machine hardware
 	KONAMI(config, m_maincpu, XTAL(24'000'000) / 8); // 052001 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vendetta_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(vendetta_state::irq));
 	m_maincpu->line().set(FUNC(vendetta_state::banking_callback));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified with PCB
@@ -616,6 +614,7 @@ void vendetta_state::vendetta(machine_config &config)
 	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(vendetta_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(vendetta_state::vblank_irq));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();

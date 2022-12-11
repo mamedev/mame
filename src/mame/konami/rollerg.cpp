@@ -17,7 +17,7 @@
 #include "k053244_k053245.h"
 #include "konami_helper.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/k053252.h"
 #include "machine/watchdog.h"
