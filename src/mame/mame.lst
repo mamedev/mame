@@ -44656,6 +44656,7 @@ psr16                           // 1988 PSR-16
 psr36                           // 1988 PSR-36
 pss480                          // 1988 PSS-480
 pss680                          // 1988 PSS-680
+pss780                          // 1989 PSS-780
 
 @source:yamaha/ympsr40.cpp
 psr40                           // 1985 PSR-40

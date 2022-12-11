@@ -10,6 +10,15 @@
     paired with the YM3419AD (XE193A00) or YM3419BF (XF026A00) RYP7 rhythm
     generator, which has its own external ROM.
 
+    pss-680/780 are same machine, 780 is just different main rom and cosmetic changes.
+    Mainboard: XE421 TCMK-19EHB
+    IC1  YM3420B       QFP100   OPU
+    IC2  YM3419B       QFP64    Drum "rompler"
+    IC3  XE405B0-070   DIP32    ROM (rompler)
+    IC4  XG503B0-132   DIP32    ROM (main program)
+    IC6  TC5565APL-12  DIP28    8KB SRAM
+    IC7  XE415AO       QFP100   Custom ?
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -167,9 +176,18 @@ ROM_START(pss680)
 	ROM_LOAD("xe405b0-070.ic3", 0x00000, 0x40000, CRC(53336c52) SHA1(6bcad44fc93cfa5cd603cf24adfd736a911d3509)) // 32-pin mask ROM
 ROM_END
 
+ROM_START(pss780)
+	ROM_REGION(0x40000, "program", 0)
+	ROM_LOAD("xg503b0-132.ic4", 0x00000, 0x40000, CRC(0c055206) SHA1(33cc3f4ab27cf6e5068627625f6ab236209ad776)) // 32-pin mask ROM
+
+	ROM_REGION(0x40000, "waves", 0)
+	ROM_LOAD("xe405b0-070.ic3", 0x00000, 0x40000, CRC(53336c52) SHA1(6bcad44fc93cfa5cd603cf24adfd736a911d3509)) // 32-pin mask ROM
+ROM_END
+
 } // anonymous namespace
 
-SYST(1988, psr16,  0, 0, psr16,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-16",  MACHINE_IS_SKELETON)
-SYST(1988, psr36,  0, 0, psr36,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-36",  MACHINE_IS_SKELETON)
-SYST(1988, pss480, 0, 0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-480 / PSS-580", MACHINE_IS_SKELETON)
-SYST(1988, pss680, 0, 0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-680", MACHINE_IS_SKELETON)
+SYST(1988, psr16,  0,      0, psr16,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-16",  MACHINE_IS_SKELETON)
+SYST(1988, psr36,  0,      0, psr36,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-36",  MACHINE_IS_SKELETON)
+SYST(1988, pss480, 0,      0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-480 / PSS-580", MACHINE_IS_SKELETON)
+SYST(1988, pss680, 0,      0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-680", MACHINE_IS_SKELETON)
+SYST(1989, pss780, pss680, 0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-780", MACHINE_IS_SKELETON)
