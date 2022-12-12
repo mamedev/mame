@@ -42537,6 +42537,12 @@ vs4jc                           // 2004.09 Virtua Striker 4 (Japan) (Rev C)
 @source:atari/triplhnt.cpp
 triplhnt                        // 008422-008791    1977/04 [6800]
 
+@source:misc/triton.cpp
+triton41                        // 1978 Transam Triton L4.1
+triton51                        // 1979 Transam Triton L5.1
+triton52                        // 1979 Transam Triton L5.2
+triton72                        // 1980 Transam Triton L7.2
+
 @source:misc/triviaquiz.cpp
 triviaqz                        // 1985 Intermatic Manufacturing
 triviaqz2                       // 1985 Intermatic Manufacturing

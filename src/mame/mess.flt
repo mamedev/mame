@@ -486,6 +486,7 @@ misc/eva.cpp
 misc/h01x.cpp
 misc/monon_color.cpp
 misc/mtu130.cpp
+misc/triton.cpp
 misc/z80ne.cpp
 mit/tx0.cpp
 mits/altair.cpp
