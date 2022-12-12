@@ -4682,54 +4682,17 @@
 		<element ref="vfd0_background">
 			<bounds x="261" y="381" width="272" height="30"/>
 		</element>
-		<element name="vfd15" ref="vfd0" state="0">
-			<bounds x="261" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd14" ref="vfd0" state="0">
-			<bounds x="278" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd13" ref="vfd0" state="0">
-			<bounds x="295" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd12" ref="vfd0" state="0">
-			<bounds x="312" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd11" ref="vfd0" state="0">
-			<bounds x="329" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd10" ref="vfd0" state="0">
-			<bounds x="346" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd9" ref="vfd0" state="0">
-			<bounds x="363" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd8" ref="vfd0" state="0">
-			<bounds x="380" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd7" ref="vfd0" state="0">
-			<bounds x="397" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd6" ref="vfd0" state="0">
-			<bounds x="414" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd5" ref="vfd0" state="0">
-			<bounds x="431" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd4" ref="vfd0" state="0">
-			<bounds x="448" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd3" ref="vfd0" state="0">
-			<bounds x="465" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd2" ref="vfd0" state="0">
-			<bounds x="482" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd1" ref="vfd0" state="0">
-			<bounds x="499" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd0" ref="vfd0" state="0">
-			<bounds x="516" y="381" width="17" height="30"/>
-		</element>
+
+		<repeat count="16">
+			<param name="n" start="15" increment="-1"/>
+			<param name="x" start="261" increment="17"/>
+			<element name="vfd~n~" ref="vfd0" state="0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0"/>
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0"/>
+				<bounds x="~x~" y="381" width="17" height="30"/>
+			</element>
+		</repeat>
 		<element name="label5" ref="label_5">
 			<bounds x="2" y="2" width="91" height="44"/>
 		</element>

@@ -2,23 +2,27 @@
 // copyright-holders:Vas Crabb
 /**********************************************************************
 
-    Sega DE-9 controller port emulation
+    Sega 7-bit I/O port emulation
 
-    1  Up          in
-    2  Down        in
-    3  Left        in
-    4  Right       in
-    5  +5V
-    6  TL     TxD  in
-    7  TH          in/out  edge-sensitive
-    8  GND
-    9  TR     RxD  in/out
+     1  Up          in
+     2  Down        in
+     3  Left        in
+     4  Right       in
+     5  +5V
+     6  TL     TxD  in
+     7  TH          in/out  edge-sensitive
+     8  GND
+     9  TR     RxD  in/out
+    10  NC          -
+
+    DE-9 connector on most systems, or 10-pin tongue connector on
+    Game Gear.  Pin 10 is not connected if present.
 
     SG-1000 Mark III:
     * Pin 7 (TH) tied to ground
     * Pin 9 (TR) is input only
 
-    Mega Drive:
+    Mega Drive, Game Gear:
     * All pins besides +5V and GND are in/out
 
 **********************************************************************/

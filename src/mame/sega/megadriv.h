@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "mdioport.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
@@ -16,8 +18,6 @@
 
 #define MD_CPU_REGION_SIZE 0x800000
 
-
-/*----------- defined in machine/megadriv.cpp -----------*/
 
 INPUT_PORTS_EXTERN( md_common );
 INPUT_PORTS_EXTERN( megadriv );
@@ -36,8 +36,9 @@ public:
 		m_megadrive_ram(*this,"megadrive_ram"),
 		m_screen(*this,"megadriv"),
 		m_io_reset(*this, "RESET"),
-		m_io_read_data_port_ptr(*this),
-		m_io_write_data_port_ptr(*this)
+		m_ioports(*this, "ioport%u", 1U),
+		m_io_pad(*this, "PAD%u", 1U),
+		m_io_extra(*this, "EXTRA%u", 1U)
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -49,8 +50,6 @@ public:
 	optional_device<screen_device> m_screen;
 
 	optional_ioport m_io_reset;
-	ioport_port *m_io_pad_3b[4];
-	ioport_port *m_io_pad_6b[4];
 
 	struct genesis_z80_vars
 	{
@@ -76,8 +75,6 @@ public:
 	void megadriv_z80_bank_w(uint16_t data);
 	void megadriv_68k_z80_bank_write(uint16_t data);
 	void megadriv_z80_z80_bank_w(uint8_t data);
-	uint16_t megadriv_68k_io_read(offs_t offset);
-	void megadriv_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t megadriv_68k_read_z80_ram(offs_t offset, uint16_t mem_mask = ~0);
 	void megadriv_68k_write_z80_ram(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t megadriv_68k_check_z80_bus(offs_t offset, uint16_t mem_mask = ~0);
@@ -90,34 +87,9 @@ public:
 	uint8_t megadriv_z80_unmapped_read();
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
 
-	/* Megadrive / Genesis has 3 I/O ports */
-	emu_timer *m_io_timeout[3];
-	int m_io_stage[3];
-	uint8_t m_io_data_regs[3];
-	uint8_t m_io_ctrl_regs[3];
-	uint8_t m_io_tx_regs[3];
-	read8sm_delegate m_io_read_data_port_ptr;
-	write16sm_delegate m_io_write_data_port_ptr;
-
 	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
 	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
 	WRITE_LINE_MEMBER(vdp_lv4irqline_callback_genesis_68k);
-
-	TIMER_CALLBACK_MEMBER( io_timeout_timer_callback );
-	void megadrive_reset_io();
-	uint8_t megadrive_io_read_data_port_6button(offs_t offset);
-	uint8_t megadrive_io_read_data_port_3button(offs_t offset);
-	uint8_t megadrive_io_read_ctrl_port(int portnum);
-	uint8_t megadrive_io_read_tx_port(int portnum);
-	uint8_t megadrive_io_read_rx_port(int portnum);
-	uint8_t megadrive_io_read_sctrl_port(int portnum);
-
-	void megadrive_io_write_data_port_3button(offs_t offset, uint16_t data);
-	void megadrive_io_write_data_port_6button(offs_t offset, uint16_t data);
-	void megadrive_io_write_ctrl_port(int portnum, uint16_t data);
-	void megadrive_io_write_tx_port(int portnum, uint16_t data);
-	void megadrive_io_write_rx_port(int portnum, uint16_t data);
-	void megadrive_io_write_sctrl_port(int portnum, uint16_t data);
 
 	void megadriv_stop_scanline_timer();
 
@@ -126,23 +98,54 @@ public:
 
 	void megadriv_tas_callback(offs_t offset, uint8_t data);
 
-	void megadriv_timers(machine_config &config);
 	void md_ntsc(machine_config &config);
 	void md2_ntsc(machine_config &config);
 	void md_pal(machine_config &config);
 	void md2_pal(machine_config &config);
 	void md_bootleg(machine_config &config);
 
-	void dcat16_megadriv_base(machine_config &config);
-	void dcat16_megadriv_map(address_map &map);
-	void megadriv_map(address_map &map);
-	void megadriv_z80_io_map(address_map &map);
-	void megadriv_z80_map(address_map &map);
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+
+	void megadriv_68k_base_map(address_map &map);
+	void megadriv_68k_map(address_map &map);
+	void megadriv_z80_io_map(address_map &map);
+	void megadriv_z80_map(address_map &map);
+
+	template <unsigned N> uint8_t ioport_in_3button();
+	template <unsigned N> uint8_t ioport_in_6button();
+
+	template <unsigned N> void ioport_out_3button(uint8_t data, uint8_t mem_mask);
+	template <unsigned N> void ioport_out_6button(uint8_t data, uint8_t mem_mask);
+
+	required_device_array<megadrive_io_port_device, 3> m_ioports;
+
+private:
+	uint16_t m68k_version_read();
+	uint16_t m68k_ioport_data_read(offs_t offset);
+	uint16_t m68k_ioport_ctrl_read(offs_t offset);
+	template <unsigned N> uint16_t m68k_ioport_txdata_read();
+	template <unsigned N> uint16_t m68k_ioport_rxdata_read();
+	template <unsigned N> uint16_t m68k_ioport_s_ctrl_read();
+
+	void m68k_ioport_data_write(offs_t offset, uint16_t data);
+	void m68k_ioport_ctrl_write(offs_t offset, uint16_t data);
+	template <unsigned N> void m68k_ioport_txdata_write(uint16_t data);
+	template <unsigned N> void m68k_ioport_s_ctrl_write(uint16_t data);
+
+	TIMER_CALLBACK_MEMBER(ioport_timeout);
+
+	void megadriv_timers(machine_config &config);
+	void megadriv_ioports(machine_config &config);
+
+	optional_ioport_array<2> m_io_pad;
+	optional_ioport_array<2> m_io_extra;
+
+	emu_timer *m_ioport_idle[2];
+
+	uint8_t m_ioport_th[2];
+	uint8_t m_ioport_phase[2];
 };
 
 #endif // MAME_SHARED_MEGADRIV_H

@@ -331,8 +331,7 @@ u8 k052109_device::read(offs_t offset)
 			{   /* B y scroll */    }
 			else if (offset >= 0x3a00 && offset < 0x3c00)
 			{   /* B x scroll */    }
-//          else
-//logerror("%s: read from unknown 052109 address %04x\n",m_maincpu->pc(),offset);
+			//else logerror("%s: read from unknown 052109 address %04x\n",machine().describe_context(),offset);
 		}
 
 		return m_ram[offset];
@@ -350,15 +349,15 @@ u8 k052109_device::read(offs_t offset)
 
 		bank |= (m_charrombank_2[(color & 0x0c) >> 2] >> 2); // Surprise Attack uses this 2nd bank in the rom test
 
-	if (m_has_extra_video_ram)
-		code |= color << 8; /* kludge for X-Men */
-	else
-		m_k052109_cb(0, bank, &code, &color, &flags, &priority);
+		if (m_has_extra_video_ram)
+			code |= color << 8; /* kludge for X-Men */
+		else
+			m_k052109_cb(0, bank, &code, &color, &flags, &priority);
 
-	addr = (code << 5) + (offset & 0x1f);
-	addr &= m_char_rom.length() - 1;
+		addr = (code << 5) + (offset & 0x1f);
+		addr &= m_char_rom.length() - 1;
 
-//      logerror("%s: off = %04x sub = %02x (bnk = %x) adr = %06x\n", m_maincpu->pc(), offset, m_romsubbank, bank, addr);
+		//logerror("%s: off = %04x sub = %02x (bnk = %x) adr = %06x\n", machine().describe_context(), offset, m_romsubbank, bank, addr);
 
 		return m_char_rom[addr];
 	}
@@ -386,14 +385,14 @@ void k052109_device::write(offs_t offset, u8 data)
 		{
 			if (m_scrollctrl != data)
 			{
-//popmessage("scrollcontrol = %02x", data);
-//logerror("%s: rowscrollcontrol = %02x\n", m_maincpu->pc(), data);
+				//popmessage("scrollcontrol = %02x", data);
+				//logerror("%s: rowscrollcontrol = %02x\n", machine().describe_context(), data);
 				m_scrollctrl = data;
 			}
 		}
 		else if (offset == 0x1d00)
 		{
-//logerror("%s: 052109 register 1d00 = %02x\n", m_maincpu->pc(), data);
+			//logerror("%s: 052109 register 1d00 = %02x\n", machine().describe_context(), data);
 			/* bit 2 = irq enable */
 			/* the custom chip can also generate NMI and FIRQ, for use with a 6809 */
 			m_irq_enabled = data & 0x04;
@@ -428,12 +427,12 @@ void k052109_device::write(offs_t offset, u8 data)
 		}
 		else if (offset == 0x1e00 || offset == 0x3e00) // Surprise Attack uses offset 0x3e00
 		{
-//logerror("%s: 052109 register 1e00 = %02x\n",m_maincpu->pc(),data);
+			//logerror("%s: 052109 register 1e00 = %02x\n",machine().describe_context(),data);
 			m_romsubbank = data;
 		}
 		else if (offset == 0x1e80)
 		{
-//if ((data & 0xfe)) logerror("%s: 052109 register 1e80 = %02x\n",m_maincpu->pc(),data);
+			//if ((data & 0xfe)) logerror("%s: 052109 register 1e80 = %02x\n",machine().describe_context(),data);
 			m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -487,8 +486,7 @@ void k052109_device::write(offs_t offset, u8 data)
 			m_charrombank_2[2] = data & 0x0f;
 			m_charrombank_2[3] = (data >> 4) & 0x0f;
 		}
-//      else
-//          logerror("%s: write %02x to unknown 052109 address %04x\n",m_maincpu->pc(),data,offset);
+		//else logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
 	}
 }
 
@@ -527,16 +525,14 @@ void k052109_device::tilemap_update( )
 	int xscroll, yscroll, offs;
 
 #if 0
-{
-popmessage("%x %x %x %x",
-	m_charrombank[0],
-	m_charrombank[1],
-	m_charrombank[2],
-	m_charrombank[3]);
-}
+	popmessage("%x %x %x %x",
+		m_charrombank[0],
+		m_charrombank[1],
+		m_charrombank[2],
+		m_charrombank[3]);
 #endif
 
-// note: this chip can do both per-column and per-row scroll in the same time, currently not emulated.
+	// note: this chip can do both per-column and per-row scroll in the same time, currently not emulated.
 
 	if ((m_scrollctrl & 0x03) == 0x02)
 	{
@@ -654,24 +650,24 @@ popmessage("%x %x %x %x",
 	}
 
 #if 0
-if ((m_scrollctrl & 0x03) == 0x01 ||
-		(m_scrollctrl & 0x18) == 0x08 ||
-		((m_scrollctrl & 0x04) && (m_scrollctrl & 0x03)) ||
-		((m_scrollctrl & 0x20) && (m_scrollctrl & 0x18)) ||
-		(m_scrollctrl & 0xc0) != 0)
-	popmessage("scrollcontrol = %02x", m_scrollctrl);
+	if ((m_scrollctrl & 0x03) == 0x01 ||
+			(m_scrollctrl & 0x18) == 0x08 ||
+			((m_scrollctrl & 0x04) && (m_scrollctrl & 0x03)) ||
+			((m_scrollctrl & 0x20) && (m_scrollctrl & 0x18)) ||
+			(m_scrollctrl & 0xc0) != 0)
+		popmessage("scrollcontrol = %02x", m_scrollctrl);
 
-if (machine().input().code_pressed(KEYCODE_F))
-{
-	FILE *fp;
-	fp=fopen("TILE.DMP", "w+b");
-	if (fp)
+	if (machine().input().code_pressed(KEYCODE_F))
 	{
-		fwrite(m_ram, 0x6000, 1, fp);
-		popmessage("saved");
-		fclose(fp);
+		FILE *fp;
+		fp=fopen("TILE.DMP", "w+b");
+		if (fp)
+		{
+			fwrite(m_ram, 0x6000, 1, fp);
+			popmessage("saved");
+			fclose(fp);
+		}
 	}
-}
 #endif
 }
 

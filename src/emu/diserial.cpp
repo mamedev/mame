@@ -219,16 +219,16 @@ void device_serial_interface::receive_register_reset()
 WRITE_LINE_MEMBER(device_serial_interface::rx_w)
 {
 	m_rcv_line = state;
-	if(m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
+	if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
 		return;
 	receive_register_update_bit(state);
-	if(m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
+	if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
 	{
 		LOGMASKED(LOG_RX, "Receiver is synchronized\n");
-		if(m_rcv_clock && !(m_rcv_rate.is_never()))
+		if (m_rcv_clock && !(m_rcv_rate.is_never()))
 			// make start delay just a bit longer to make sure we are called after the sender
 			m_rcv_clock->adjust(((m_rcv_rate*3)/2), 0, m_rcv_rate);
-		else if(m_start_bit_hack_for_external_clocks)
+		else if (m_start_bit_hack_for_external_clocks)
 			m_rcv_bit_count_received--;
 	}
 	return;
@@ -274,8 +274,7 @@ void device_serial_interface::receive_register_update_bit(int bit)
 			}
 		}
 	}
-	else
-	if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
+	else if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
 	{
 		LOGMASKED(LOG_RX, "Received bit %d as %d\n", m_rcv_bit_count_received, bit);
 		m_rcv_bit_count_received++;

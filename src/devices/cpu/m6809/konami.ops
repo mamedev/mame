@@ -440,7 +440,7 @@ EXG:
 		write_exgtfr_register(param >> 0, reg2);
 		write_exgtfr_register(param >> 4, reg1);
 	}
-	eat(hd6309_native_mode() ? 3 : 6);
+	eat(3);
 	return;
 
 TFR:
@@ -450,7 +450,7 @@ TFR:
 		uint16_t reg = read_exgtfr_register(param >> 0);
 		write_exgtfr_register(param >> 4, reg);
 	}
-	eat(hd6309_native_mode() ? 2 : 4);
+	eat(2);
 	return;
 
 SETLINE:

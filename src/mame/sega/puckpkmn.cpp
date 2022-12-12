@@ -45,16 +45,59 @@ Notes:
 */
 
 #include "emu.h"
+#include "megadriv.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "sound/ymopn.h"
 
-#include "megadriv.h"
-#include "megadriv_acbl.h"
+
+namespace {
+
+class puckpkmn_state : public md_base_state
+{
+public:
+	using md_base_state::md_base_state;
+
+	void puckpkmn(machine_config &config) ATTR_COLD;
+	void puckpkmna(machine_config &config) ATTR_COLD;
+	void puckpkmnb(machine_config &config) ATTR_COLD;
+
+	void init_puckpkmn() ATTR_COLD;
+
+protected:
+	void puckpkmn_base_map(address_map &map) ATTR_COLD;
+
+private:
+	void puckpkmn_map(address_map &map) ATTR_COLD;
+	void puckpkmna_map(address_map &map) ATTR_COLD;
+	void puckpkmnb_map(address_map &map) ATTR_COLD;
+};
+
+
+class jzth_state : public puckpkmn_state
+{
+public:
+	using puckpkmn_state::puckpkmn_state;
+
+	void jzth(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void bl_710000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t bl_710000_r();
+
+	void jzth_map(address_map &map) ATTR_COLD;
+
+	int m_protcount = 0;
+};
+
 
 /* Puckman Pockimon Input Ports */
-static INPUT_PORTS_START( puckpkmn )
+INPUT_PORTS_START( puckpkmn )
 	PORT_START("P2")    /* $700011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -130,7 +173,7 @@ INPUT_PORTS_END
 
 
 
-static INPUT_PORTS_START( jzth )
+INPUT_PORTS_START( jzth )
 	PORT_START("P2")    /* $700011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -213,76 +256,143 @@ static INPUT_PORTS_START( jzth )
 INPUT_PORTS_END
 
 
-void md_boot_state::puckpkmn_map(address_map &map)
+void puckpkmn_state::puckpkmn_base_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom();                             /* Main 68k Program Roms */
+	map(0x000000, 0x3fffff).rom();                             // Main 68k Program ROMs
+
 	map(0x700010, 0x700011).portr("P2");
 	map(0x700012, 0x700013).portr("P1");
 	map(0x700014, 0x700015).portr("UNK");
 	map(0x700016, 0x700017).portr("DSW1");
 	map(0x700018, 0x700019).portr("DSW2");
 	map(0x700023, 0x700023).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa04000, 0xa04003).rw(FUNC(md_boot_state::megadriv_68k_YM2612_read), FUNC(md_boot_state::megadriv_68k_YM2612_write));
+	map(0xa04000, 0xa04003).rw(FUNC(puckpkmn_state::megadriv_68k_YM2612_read), FUNC(puckpkmn_state::megadriv_68k_YM2612_write));
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
-
-	/* Unknown reads/writes: */
-	map(0xa00000, 0xa00551).nopw();                            /* ? */
-//  map(0xa10000, 0xa10001).nopr();                                             /* ? once */
-	map(0xa10002, 0xa10005).noprw();                             /* ? alternative way of reading inputs ? */
-	map(0xa11100, 0xa11101).noprw();                             /* ? */
-//  map(0xa10008, 0xa1000d).nopw();                                            /* ? once */
-//  map(0xa14000, 0xa14003).nopw();                                            /* ? once */
-	map(0xa11200, 0xa11201).nopw();                            /* ? */
 }
 
 
-void md_boot_state::jzth_map(address_map &map)
+void puckpkmn_state::puckpkmn_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom();
-	map(0x700010, 0x700011).portr("P2");
-	map(0x700012, 0x700013).portr("P1");
-	map(0x700014, 0x700015).portr("UNK");
-	map(0x700016, 0x700017).portr("DSW1");
-	map(0x700018, 0x700019).portr("DSW2");
-	map(0x700023, 0x700023).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa04000, 0xa04003).rw(FUNC(md_boot_state::megadriv_68k_YM2612_read), FUNC(md_boot_state::megadriv_68k_YM2612_write));
-	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
+	puckpkmn_base_map(map);
 
-	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
-
-	map(0xa00000, 0xa00551).noprw();
-
-	map(0xA11100, 0xA11101).noprw();
-
-	map(0x710000, 0x710001).rw(FUNC(md_boot_state::bl_710000_r), FUNC(md_boot_state::bl_710000_w)); // protection, will erase the VDP address causing writes to 0 unless this returns 0xe
+	// Unknown reads/writes:
+	map(0xa00000, 0xa00551).nopw();                            // ?
+//  map(0xa10000, 0xa10001).nopr();                            // ? once
+	map(0xa10002, 0xa10005).noprw();                           // ? alternative way of reading inputs ?
+	map(0xa11100, 0xa11101).noprw();                           // ?
+//  map(0xa10008, 0xa1000d).nopw();                            // ? once
+//  map(0xa14000, 0xa14003).nopw();                            // ? once
+	map(0xa11200, 0xa11201).nopw();                            // ?
 }
 
-uint16_t md_boot_state::puckpkmna_70001c_r()
-{
-	return 0x0e;
-}
-
-uint16_t md_boot_state::puckpkmna_4b2476_r()
-{
-	if (!strcmp(machine().system().name, "puckpkmnb")) return 0x3100;
-
-	return 0x3400;
-}
-
-void md_boot_state::puckpkmna_map(address_map &map)
+void puckpkmn_state::puckpkmna_map(address_map &map)
 {
 	puckpkmn_map(map);
-	map(0x4b2476, 0x4b2477).r(FUNC(md_boot_state::puckpkmna_4b2476_r));
-	map(0x70001c, 0x70001d).r(FUNC(md_boot_state::puckpkmna_70001c_r));
+
+	map(0x4b2476, 0x4b2477).lr16(NAME([] () { return uint16_t(0x3400); }));
+	map(0x70001c, 0x70001d).lr16(NAME([] () { return uint16_t(0x000e); }));
 }
 
-void md_boot_state::puckpkmn(machine_config &config)
+void puckpkmn_state::puckpkmnb_map(address_map &map)
+{
+	puckpkmn_map(map);
+
+	map(0x4b2476, 0x4b2477).lr16(NAME([] () { return uint16_t(0x3100); }));
+	map(0x70001c, 0x70001d).lr16(NAME([] () { return uint16_t(0x000e); }));
+}
+
+
+void jzth_state::jzth_map(address_map &map)
+{
+	puckpkmn_base_map(map);
+
+	map(0x710000, 0x710001).rw(FUNC(jzth_state::bl_710000_r), FUNC(jzth_state::bl_710000_w)); // protection, will erase the VDP address causing writes to 0 unless this returns 0xe
+
+	map(0xa00000, 0xa00551).noprw();
+	map(0xa11100, 0xa11101).noprw();
+}
+
+
+// jzth protection
+void jzth_state::bl_710000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// protection value is read from  0x710000 after a series of writes.. and stored at ff0007
+	// startup
+	/*
+	059ce0 writing to bl_710000_w ff08 ffff
+	059d04 writing to bl_710000_w 000a ffff
+	059d04 writing to bl_710000_w 000b ffff
+	059d04 writing to bl_710000_w 000c ffff
+	059d04 writing to bl_710000_w 000f ffff
+	059d1c writing to bl_710000_w ff09 ffff
+	059d2a reading from bl_710000_r  (wants 0xe)
+	059ce0 writing to bl_710000_w ff08 ffff
+	059d04 writing to bl_710000_w 000a ffff
+	059d04 writing to bl_710000_w 000b ffff
+	059d04 writing to bl_710000_w 000c ffff
+	059d04 writing to bl_710000_w 000f ffff
+	059d1c writing to bl_710000_w ff09 ffff
+	059d2a reading from bl_710000_r  (wants 0xe)
+	*/
+	// before lv stage 3
+	/*
+	059ce0 writing to bl_710000_w 0008 ffff
+	059d04 writing to bl_710000_w 000b ffff
+	059d04 writing to bl_710000_w 000f ffff
+	059d1c writing to bl_710000_w ff09 ffff
+	059d2a reading from bl_710000_r  (wants 0x4)
+	*/
+	// start level 3
+	/*
+	059ce0 writing to bl_710000_w ff08 ffff
+	059d04 writing to bl_710000_w 000b ffff
+	059d04 writing to bl_710000_w 000c ffff
+	059d04 writing to bl_710000_w 000e ffff
+	059d1c writing to bl_710000_w ff09 ffff
+	059d2a reading from bl_710000_r  (wants 0x5)
+
+	// after end sequence
+	059ce0 writing to bl_710000_w 0008 ffff
+	059d04 writing to bl_710000_w 000a ffff
+	059d04 writing to bl_710000_w 000b ffff
+	059d04 writing to bl_710000_w 000c ffff
+	059d04 writing to bl_710000_w 000f ffff
+	059d1c writing to bl_710000_w ff09 ffff
+	059d2a reading from bl_710000_r  (wants 0xe)
+	*/
+
+	logerror("%s: writing to bl_710000_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+
+	m_protcount++;
+}
+
+uint16_t jzth_state::bl_710000_r()
+{
+	logerror("%s: reading from bl_710000_r\n", machine().describe_context());
+
+	uint16_t ret;
+	switch (m_protcount)
+	{
+	case 4: ret = 0x4; break;
+	case 5: ret = 0x5; break;
+	case 6: ret = 0xe; break;
+	default: ret = 0xf;
+	}
+
+	if (!machine().side_effects_disabled())
+		m_protcount = 0;
+
+	return ret;
+}
+
+
+void puckpkmn_state::puckpkmn(machine_config &config)
 {
 	md_ntsc(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::puckpkmn_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &puckpkmn_state::puckpkmn_map);
 
 	config.device_remove("genesis_snd_z80");
 
@@ -291,19 +401,38 @@ void md_boot_state::puckpkmn(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }
 
-void md_boot_state::puckpkmna(machine_config &config)
+void puckpkmn_state::puckpkmna(machine_config &config)
 {
 	puckpkmn(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::puckpkmna_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &puckpkmn_state::puckpkmna_map);
 }
 
-void md_boot_state::jzth(machine_config &config)
+void puckpkmn_state::puckpkmnb(machine_config &config)
 {
 	puckpkmn(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::jzth_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &puckpkmn_state::puckpkmnb_map);
 }
+
+
+void jzth_state::jzth(machine_config &config)
+{
+	puckpkmn(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jzth_state::jzth_map);
+}
+
+
+void jzth_state::machine_start()
+{
+	puckpkmn_state::machine_start();
+
+	m_protcount = 0;
+
+	save_item(NAME(m_protcount));
+}
+
 
 /* Genie's Hardware (contains no real sega parts) */
 
@@ -376,13 +505,13 @@ ROM sockets U63 & U64 empty
 
 ****************************************************************************/
 
-void md_boot_state::init_puckpkmn()
+void puckpkmn_state::init_puckpkmn()
 {
-	uint8_t *rom = memregion("maincpu")->base();
-	const size_t len = memregion("maincpu")->bytes();
+	uint8_t *const rom = memregion("maincpu")->base();
+	size_t const len = memregion("maincpu")->bytes();
 
 	for (size_t i = 0; i < len; i++)
-		rom[i] = bitswap<8>(rom[i],1,4,2,0,7,5,3,6);
+		rom[i] = bitswap<8>(rom[i], 1, 4, 2, 0, 7, 5, 3, 6);
 
 	init_megadriv();
 }
@@ -484,8 +613,12 @@ ROM_START( jzth )
 	ROM_CONTINUE(0x40000,0x40000)
 ROM_END
 
-/* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */  // is 'Genie 2000' part of the title, and the parent set a bootleg?
-GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, md_boot_state, init_puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
-GAME( 2000, puckpkmna, puckpkmn, puckpkmna, puckpkmn, md_boot_state, init_puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
-GAME( 2000, puckpkmnb, puckpkmn, puckpkmna, puckpkmn, md_boot_state, init_puckpkmn, ROT0, "Sun Mixing",             "Puckman Pockimon (set 3)", 0 )
-GAME( 2000, jzth,      0,        jzth,      jzth,     md_boot_state, init_puckpkmn, ROT0, "<unknown>",              "Juezhan Tianhuang", MACHINE_IMPERFECT_SOUND )
+} // anonymous namespace
+
+
+// Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile RAM
+// Is 'Genie 2000' part of the title, and the parent set a bootleg?
+GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Genie",      "Puckman Pockimon (set 1)", 0 )
+GAME( 2000, puckpkmna, puckpkmn, puckpkmna, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS",        "Puckman Pockimon (set 2)", 0 )
+GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Sun Mixing", "Puckman Pockimon (set 3)", 0 )
+GAME( 2000, jzth,      0,        jzth,      jzth,     jzth_state,     init_puckpkmn, ROT0, "<unknown>",  "Juezhan Tianhuang",        MACHINE_IMPERFECT_SOUND )

@@ -55,7 +55,7 @@ class hshavoc_state : public md_boot_state
 {
 public:
 	hshavoc_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_boot_state(mconfig, type, tag)
+		: md_boot_state(mconfig, type, tag)
 	{ }
 
 	void hshavoc(machine_config &config);
@@ -64,7 +64,7 @@ public:
 };
 
 
-static INPUT_PORTS_START( hshavoc )
+INPUT_PORTS_START( hshavoc )
 	PORT_START("IN0")   // 16 bit
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

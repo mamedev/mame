@@ -96,7 +96,7 @@
 #include "k054000.h"
 #include "konami_helper.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
@@ -172,10 +172,9 @@ private:
 	void z80_nmi_w(int state);
 	void z80_irq_w(uint8_t data = 0);
 	uint8_t z80_irq_r();
+	void vblank_irq(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	INTERRUPT_GEN_MEMBER(irq);
 
 	K052109_CB_MEMBER(vendetta_tile_callback);
 	K052109_CB_MEMBER(esckids_tile_callback);
@@ -286,7 +285,6 @@ void vendetta_state::eeprom_w(uint8_t data)
 	// bit 6 - IRQ enable
 	// bit 7 - Unused
 
-
 	if (data == 0xff ) // this is a bug in the EEPROM write code
 		return;
 
@@ -294,6 +292,8 @@ void vendetta_state::eeprom_w(uint8_t data)
 	m_eeprom_out->write(data, 0xff);
 
 	m_irq_enabled = (data >> 6) & 1;
+	if (!m_irq_enabled)
+		m_maincpu->set_input_line(KONAMI_IRQ_LINE, CLEAR_LINE);
 
 	m_videoview0.select(BIT(data, 0));
 	m_videoview1.select(BIT(data, 0));
@@ -549,10 +549,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(vendetta_state::irq)
+void vendetta_state::vblank_irq(int state)
 {
-	if (m_irq_enabled)
-		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+	if (state && m_irq_enabled)
+		m_maincpu->set_input_line(KONAMI_IRQ_LINE, ASSERT_LINE);
 }
 
 void vendetta_state::machine_start()
@@ -597,7 +597,6 @@ void vendetta_state::vendetta(machine_config &config)
 	// basic machine hardware
 	KONAMI(config, m_maincpu, XTAL(24'000'000) / 8); // 052001 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vendetta_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(vendetta_state::irq));
 	m_maincpu->line().set(FUNC(vendetta_state::banking_callback));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified with PCB
@@ -615,6 +614,7 @@ void vendetta_state::vendetta(machine_config &config)
 	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(vendetta_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(vendetta_state::vblank_irq));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
@@ -662,7 +662,7 @@ void vendetta_state::esckids(machine_config &config)
 
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 101, 6);
 
-	K053252(config, "k053252", 6000000).set_offsets(12*8, 1*8);
+	K053252(config, "k053252", XTAL(24'000'000) / 4).set_offsets(12*8, 1*8);
 }
 
 

@@ -10730,6 +10730,7 @@ cocoeh                          // Color Computer (Extended BASIC 1.0) with HD63
 cocoh                           // Color Computer with HD6309 CPU
 cp400                           // Prológica CP400
 cp400c2                         // Prológica CP400 Color II
+deluxecoco                      // Deluxe Color Computer
 lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
 ms1600                          // ILCE / SEP Micro-SEP 1600
 mx1600                          // Dynacom MX-1600
@@ -12779,6 +12780,9 @@ dotriman
 @source:quantel/dpb7000.cpp
 dpb7000                         //
 
+@source:trs/dgnalpha.cpp
+dgnalpha                        // Dragon Alpha
+
 @source:skeleton/dps1.cpp
 dps1                            //
 
@@ -12787,7 +12791,6 @@ dpsv55                          //
 
 @source:trs/dragon.cpp
 d64plus                         // Dragon 64 + Compusense Plus addon
-dgnalpha                        // Dragon Alpha
 dragon200                       // Dragon 200
 dragon200e                      // Dragon 200E
 dragon32                        // Dragon 32
@@ -16421,7 +16424,7 @@ gyrussb                         // bootleg or actual Taito NZ license?
 gyrussce                        // GX347 (c) 1983 + Centuri license
 venus                           // bootleg
 
-@source:h01x/h01x.cpp
+@source:misc/h01x.cpp
 h01b                            // H-01B  - TRS-80 Level II BASIC
 nf500a                          // NF500A - TRS-80 Level II BASIC
 h01jce                          // H-01 JCE - TRS-80 Level II BASIC
@@ -24297,6 +24300,7 @@ mk1forth                        // (c) 2003 Andrew Holme
 
 @source:trainer/mk14.cpp
 mk14                            //
+mk14vdu                         //
 
 @source:ussr/mk85.cpp
 mk85                            //

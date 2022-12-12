@@ -13839,7 +13839,7 @@ ROM_START( pokonyan )
 	*/
 ROM_END
 
-ROM_START( mpumpkin ) // B board: ? C board: 92631C-6
+ROM_START( mpumpkin ) // B board: 91634B-?  C board: 92631C-6
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "mpa_23.8f", 0x00000, 0x80000, CRC(38b9883a) SHA1(94a89a360a502f209aa905e7eb2f1d472960850f) )
 	// remaining sockets are empty
@@ -13994,6 +13994,9 @@ ROM_START( sfach )
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "sfz18",         0x00000, 0x20000, CRC(61022b2d) SHA1(6369d0c1d08a30ee19b94e52ab1463a7784b9de5) )
 	ROM_LOAD( "sfz19",         0x20000, 0x20000, CRC(3b5886d5) SHA1(7e1b7d40ef77b5df628dd663d45a9a13c742cf58) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "sfz63b.1a",     0x0000, 0x0104, CRC(f5a351da) SHA1(a867947d784167b5284efb76a8634ca5713dafdb) )
 ROM_END
 
 /* FIXME B-Board uncertain but should be 91634B from the program ROM names */
@@ -14032,6 +14035,12 @@ ROM_START( sfzch )
 	ROM_REGION( 0x40000, "oki",0 )  /* Samples */
 	ROM_LOAD( "sfz_18.11c",  0x00000, 0x20000, CRC(61022b2d) SHA1(6369d0c1d08a30ee19b94e52ab1463a7784b9de5) )
 	ROM_LOAD( "sfz_19.12c",  0x20000, 0x20000, CRC(3b5886d5) SHA1(7e1b7d40ef77b5df628dd663d45a9a13c742cf58) )
+
+	// SFZ63B was found on mpumpkin, assumed to be from SFZ
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "sfz63b.1a",   0x0000, 0x0104, CRC(f5a351da) SHA1(a867947d784167b5284efb76a8634ca5713dafdb) )  // PAL16L8
+
+	// TODO... confirm other pals (could be unique as this is the "cps changer" home console)
 ROM_END
 
 /* FIXME B-Board uncertain but should be 91634B from the program ROM names */
@@ -14070,6 +14079,9 @@ ROM_START( sfzbch )
 	ROM_REGION( 0x40000, "oki",0 )  /* Samples */
 	ROM_LOAD( "sfz_18.11c",  0x00000, 0x20000, CRC(61022b2d) SHA1(6369d0c1d08a30ee19b94e52ab1463a7784b9de5) )
 	ROM_LOAD( "sfz_19.12c",  0x20000, 0x20000, CRC(3b5886d5) SHA1(7e1b7d40ef77b5df628dd663d45a9a13c742cf58) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "sfz63b.1a",   0x0000, 0x0104, CRC(f5a351da) SHA1(a867947d784167b5284efb76a8634ca5713dafdb) )
 ROM_END
 
 
