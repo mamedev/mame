@@ -576,6 +576,8 @@ uint8_t pc8801_state::ext_rom_bank_r()
 
 void pc8801_state::ext_rom_bank_w(uint8_t data)
 {
+	// TODO: bits 1 to 3 written to at POST
+	// selection for EXP slot ROMs?
 	m_ext_rom_bank = data;
 }
 
@@ -627,16 +629,17 @@ void pc8801_state::port31_w(uint8_t data)
  */
 uint8_t pc8801_state::port40_r()
 {
+	// TODO: merge with PC8001
 	uint8_t data = 0x00;
 
-	data |= ioport("CTRL")->read() & 0xcf;
+	data |= m_centronics_busy;
+//	data |= m_centronics_ack << 1;
+	data |= ioport("CTRL")->read() & 0xca;
 	data |= m_rtc->data_out_r() << 4;
 	data |= m_crtc->vrtc_r() << 5;
 	// TODO: enable line from pc80s31k (bit 3, active_low)
 
 	return data;
-
-//  return ioport("CTRL")->read();
 }
 
 inline attotime pc8801_state::mouse_limit_hz()
@@ -667,6 +670,9 @@ inline attotime pc8801fh_state::mouse_limit_hz()
  */
 void pc8801_state::port40_w(uint8_t data)
 {
+	// TODO: merge with PC8001
+	m_centronics->write_strobe(BIT(data, 0));
+
 	m_rtc->stb_w((data & 2) >> 1);
 	m_rtc->clk_w((data & 4) >> 2);
 
@@ -924,6 +930,7 @@ template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_
 	// https://retrocomputerpeople.web.fc2.com/machines/nec/8801/io_map88.html
 }
 
+#if 0
 void pc8801_state::rtc_w(uint8_t data)
 {
 	m_rtc->c0_w((data & 1) >> 0);
@@ -933,6 +940,7 @@ void pc8801_state::rtc_w(uint8_t data)
 
 	// TODO: remaining bits
 }
+#endif
 
 /*
  * PC8801FH overrides (CPU clock switch)
@@ -1011,7 +1019,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x0d, 0x0d).portr("KEY13");
 	map(0x0e, 0x0e).portr("KEY14");
 	map(0x0f, 0x0f).portr("KEY15");
-	map(0x10, 0x10).w(FUNC(pc8801_state::rtc_w));
+	map(0x10, 0x10).w(FUNC(pc8801_state::port10_w));
 	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)); // CMT / RS-232C ch. 0
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
@@ -1441,9 +1449,6 @@ void pc8801_state::machine_start()
 {
 	pc8001_base_state::machine_start();
 
-	m_rtc->cs_w(1);
-	m_rtc->oe_w(1);
-
 	// TODO: ready signal connected to FDRDY, presumably for the floppy ch.0 and 1
 	m_dma->ready_w(1);
 
@@ -1726,7 +1731,13 @@ void pc8801_state::pc8801(machine_config &config)
 	m_pic->set_int_dis_hack(true);
 
 	UPD1990A(config, m_rtc);
-	//CENTRONICS(config, "centronics", centronics_devices, "printer");
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(pc8801_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(pc8801_state::write_centronics_busy));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// TODO: needs T88 format support
 	CASSETTE(config, m_cassette);
@@ -2076,29 +2087,27 @@ ROM_START( pc8801mc )
 	ROM_LOAD( "mc_jisyo.rom", 0x00000, 0x80000, CRC(bd6eb062) SHA1(deef0cc2a9734ba891a6d6c022aa70ffc66f783e) )
 ROM_END
 
-/* System Drivers */
 
-/*    YEAR  NAME         PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT        COMPANY  FULLNAME */
-
-COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING )
-COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING )
+COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 
 // internal OPN
-COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_NOT_WORKING )
-//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 
 // internal OPNA
-//COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
-COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_NOT_WORKING )
-COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_NOT_WORKING )
-COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_NOT_WORKING )
-//COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_NOT_WORKING )
-COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_NOT_WORKING )
-//COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_NOT_WORKING )
-COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING )
+//COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
+// belongs to own driver
 //COMP( 1989, pc98do,      0,      0,      pc98do,      pc98do, pc8801_state, empty_init, "NEC",   "PC-98DO",       MACHINE_NOT_WORKING )
 //COMP( 1990, pc98dop,     0,      0,      pc98do,      pc98do, pc8801_state, empty_init, "NEC",   "PC-98DO+",      MACHINE_NOT_WORKING )

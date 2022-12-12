@@ -198,7 +198,7 @@ uint32_t pc8001_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 
 /* Read/Write Handlers */
 
-void pc8001_state::port10_w(uint8_t data)
+void pc8001_base_state::port10_w(uint8_t data)
 {
 	/*
 
@@ -269,12 +269,12 @@ void pc8001mk2_state::port31_w(uint8_t data)
 	membank("bank2")->set_entry(data & 1);
 }
 
-WRITE_LINE_MEMBER( pc8001_state::write_centronics_busy )
+WRITE_LINE_MEMBER( pc8001_base_state::write_centronics_busy )
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( pc8001_state::write_centronics_ack )
+WRITE_LINE_MEMBER( pc8001_base_state::write_centronics_ack )
 {
 	m_centronics_ack = state;
 }
@@ -654,6 +654,10 @@ void pc8001_base_state::machine_start()
 {
 	m_screen_reverse = false;
 
+	/* initialize RTC */
+	m_rtc->cs_w(1);
+	m_rtc->oe_w(1);
+
 	save_item(NAME(m_width80));
 	save_item(NAME(m_color));
 	save_item(NAME(m_screen_reverse));
@@ -665,10 +669,6 @@ void pc8001_state::machine_start()
 	pc8001_base_state::machine_start();
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	/* initialize RTC */
-	m_rtc->cs_w(1);
-	m_rtc->oe_w(1);
 
 	/* initialize DMA */
 	m_dma->ready_w(1);

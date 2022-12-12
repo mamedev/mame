@@ -36,6 +36,9 @@ public:
 	pc8001_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, Z80_TAG)
+		, m_rtc(*this, UPD1990A_TAG)
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_cent_data_out(*this, "cent_data_out")
 		, m_crtc(*this, UPD3301_TAG)
 		, m_crtc_palette(*this, "crtc_palette")
 		, m_dma(*this, I8257_TAG)
@@ -43,13 +46,21 @@ public:
 		, m_cgrom(*this, CGROM_TAG)
 	{}
 
+	static constexpr feature_type unemulated_features() { return feature::TAPE | feature::PRINTER; }
+
+
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<upd1990a_device> m_rtc;
+	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	required_device<upd3301_device> m_crtc;
 	required_device<palette_device> m_crtc_palette;
 	required_device<i8257_device> m_dma;
 	required_device<cassette_image_device> m_cassette;
 	required_memory_region m_cgrom;
+
+	void port10_w(uint8_t data);
 
 	void port30_w(u8 data);
 	virtual void machine_start() override;
@@ -62,6 +73,11 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	virtual uint8_t dma_mem_r(offs_t offset);
 
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+
+	int m_centronics_busy = 0;
+	int m_centronics_ack = 0;
 private:
 	bool m_screen_reverse = false;
 	bool m_screen_is_24KHz = false;
@@ -78,10 +94,7 @@ public:
 	pc8001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8001_base_state(mconfig, type, tag)
 		, m_pc80s31(*this, "pc80s31")
-		, m_rtc(*this, UPD1990A_TAG)
 		, m_screen(*this, "screen")
-		, m_centronics(*this, CENTRONICS_TAG)
-		, m_cent_data_out(*this, "cent_data_out")
 		, m_beep(*this, "beeper")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, Z80_TAG)
@@ -99,24 +112,14 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<pc80s31_device> m_pc80s31;
-	required_device<upd1990a_device> m_rtc;
 	required_device<screen_device> m_screen;
-	required_device<centronics_device> m_centronics;
-	required_device<output_latch_device> m_cent_data_out;
 	required_device<beep_device> m_beep;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 
 private:
-	void port10_w(uint8_t data);
 	uint8_t port40_r();
 	void port40_w(uint8_t data);
-
-	int m_centronics_busy = 0;
-	int m_centronics_ack = 0;
-
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 };
 
 class pc8001mk2_state : public pc8001_state
