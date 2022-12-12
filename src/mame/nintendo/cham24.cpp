@@ -128,7 +128,8 @@ u8 cham24_state::cham24_in_r()
 	u8 ret = 0x40;
 
 	ret |= m_input_latch[Which] & 1;
-	m_input_latch[Which] >>= 1;
+	if (!machine().side_effects_disabled())
+		m_input_latch[Which] >>= 1;
 
 	return ret;
 }
