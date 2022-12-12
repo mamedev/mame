@@ -132,6 +132,8 @@ public:
 	void esckids(machine_config &config);
 	void vendetta(machine_config &config);
 
+	int obj_busy_r() { return m_obj_busy->enabled() ? 1 : 0; }
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -145,6 +147,7 @@ private:
 	// misc
 	uint8_t m_irq_enabled = 0;
 	emu_timer *m_nmi_blocked;
+	emu_timer *m_obj_busy;
 
 	// devices
 	required_device<konami_cpu_device> m_maincpu;
@@ -465,10 +468,10 @@ static INPUT_PORTS_START( vendet4p )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // not really vblank, object related. It's timed, otherwise sprites flicker
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vendetta_state, obj_busy_r)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
@@ -521,10 +524,10 @@ static INPUT_PORTS_START( esckids )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // not really vblank, object related. It's timed, otherwise sprites flicker
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vendetta_state, obj_busy_r)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
@@ -551,8 +554,15 @@ INPUT_PORTS_END
 
 void vendetta_state::vblank_irq(int state)
 {
-	if (state && m_irq_enabled)
-		m_maincpu->set_input_line(KONAMI_IRQ_LINE, ASSERT_LINE);
+	if (state)
+	{
+		if (m_irq_enabled)
+			m_maincpu->set_input_line(KONAMI_IRQ_LINE, ASSERT_LINE);
+
+		// OBJ DMA enabled
+		if (m_k053246->k053246_is_irq_enabled())
+			m_obj_busy->adjust(attotime::from_usec(250));
+	}
 }
 
 void vendetta_state::machine_start()
@@ -561,6 +571,7 @@ void vendetta_state::machine_start()
 	m_mainbank->set_entry(0);
 
 	m_nmi_blocked = timer_alloc(timer_expired_delegate());
+	m_obj_busy = timer_alloc(timer_expired_delegate());
 
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_sprite_colorbase));
