@@ -302,7 +302,7 @@ CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 void crimfght_state::crimfght(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/8); /* 052001 (verified on pcb) */
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); /* 052001 (verified on pcb) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &crimfght_state::crimfght_map);
 	m_maincpu->line().set(FUNC(crimfght_state::banking_callback));
 

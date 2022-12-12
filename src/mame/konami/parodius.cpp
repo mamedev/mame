@@ -355,7 +355,7 @@ void parodius_state::banking_callback(uint8_t data)
 void parodius_state::parodius(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 3000000); // 053248
+	KONAMI(config, m_maincpu, 12000000); // 053248
 	m_maincpu->set_addrmap(AS_PROGRAM, &parodius_state::main_map);
 	m_maincpu->line().set(FUNC(parodius_state::banking_callback));
 

@@ -296,7 +296,7 @@ void aliens_state::machine_start()
 void aliens_state::aliens(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2 / 4); // 052001 (verified on PCB)
+	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2); // 052001 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &aliens_state::main_map);
 	m_maincpu->line().set_membank(m_rombank).mask(0x1f);
 

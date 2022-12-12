@@ -606,7 +606,7 @@ void vendetta_state::banking_callback(uint8_t data)
 void vendetta_state::vendetta(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 8); // 052001 (verified on PCB)
+	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2); // 052001 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vendetta_state::main_map);
 	m_maincpu->line().set(FUNC(vendetta_state::banking_callback));
 

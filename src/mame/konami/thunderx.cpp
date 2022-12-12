@@ -48,7 +48,7 @@
 
 TIMER_CALLBACK_MEMBER(thunderx_state::thunderx_firq_cb)
 {
-		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
 #define PMC_BK (m_1f98_latch & 0x02)
@@ -628,7 +628,7 @@ void thunderx_state::machine_reset()
 void thunderx_state::scontra(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 052001 (verified on pcb) */
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); /* 052001 (verified on pcb) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &thunderx_state::scontra_map);
 
 	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
