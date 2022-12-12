@@ -2,15 +2,15 @@
 // copyright-holders:Erwin Jansen
 /**********************************************************************
 
-    Philips P2000T Mini Digital Cassette Recorder  emulation
+    Philips Mini Digital Cassette Recorder emulation
 
 **********************************************************************/
 
 #include "emu.h"
-#include "p2000t_mdcr.h"
+#include "mdcr.h"
 #include "formats/p2000t_cas.h"
 
-DEFINE_DEVICE_TYPE(MDCR, mdcr_device, "mdcr", "Philips Mini DCR")
+DEFINE_DEVICE_TYPE(MDCR, mdcr_device, "mdcr", "Philips Mini-DCR")
 
 READ_LINE_MEMBER(mdcr_device::rdc)
 {
@@ -86,21 +86,23 @@ WRITE_LINE_MEMBER(mdcr_device::wdc)
 void mdcr_device::device_add_mconfig(machine_config &config)
 {
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED |
-								  CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("p2000_cass");
 	m_cassette->set_formats(p2000t_cassette_formats);
 }
 
 mdcr_device::mdcr_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, MDCR, tag, owner, clock)
-, m_cassette(*this, "cassette")
-, m_read_timer(nullptr)
+	: device_t(mconfig, MDCR, tag, owner, clock)
+	, m_rdc_cb(*this)
+	, m_cassette(*this, "cassette")
+	, m_read_timer(nullptr)
 {
 }
 
 void mdcr_device::device_start()
 {
+	m_rdc_cb.resolve_safe();
+
 	m_read_timer = timer_alloc(FUNC(mdcr_device::read_timer_tick), this);
 	m_read_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 
@@ -148,6 +150,7 @@ TIMER_CALLBACK_MEMBER(mdcr_device::read_timer_tick)
 			m_rda = m_phase_decoder.pull_bit();
 		}
 	}
+	m_rdc_cb(m_rdc);
 	m_last_tape_time = m_cassette->get_position();
 }
 
@@ -184,8 +187,7 @@ void mdcr_device::forward()
 
 	m_fwd = true;
 	m_cassette->set_motor(true);
-	m_cassette->change_state(m_recording ? CASSETTE_RECORD : CASSETTE_PLAY,
-	CASSETTE_MASK_UISTATE);
+	m_cassette->change_state(m_recording ? CASSETTE_RECORD : CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
 	m_cassette->go_forward();
 }
 
@@ -198,8 +200,7 @@ void mdcr_device::stop()
 bool mdcr_device::tape_start_or_end()
 {
 	auto pos = m_cassette->get_position();
-	auto bet = m_cassette->motor_on() &&
-		   (pos <= 0 || pos >= m_cassette->get_length());
+	auto bet = m_cassette->motor_on() && (pos <= 0 || pos >= m_cassette->get_length());
 
 	// Reset phase decoder at tape start/end.
 	if (bet)
