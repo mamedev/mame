@@ -24169,6 +24169,9 @@ mindset                         // (c) 1984
 @source:skeleton/mini2440.cpp
 mini2440                        //
 
+@source:homebrew/minib.cpp
+minib                           //
+
 @source:misc/miniboy7.cpp
 bejpoker                        // (c) 1992?, Bonanza Enterprises
 miniboy7                        // (c) 1983, Bonanza Enterprises

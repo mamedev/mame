@@ -353,6 +353,7 @@ homebrew/homez80.cpp
 homebrew/lft_chiptune.cpp
 homebrew/lft_craft.cpp
 homebrew/lft_phasor.cpp
+homebrew/minib.cpp
 homebrew/mk1forth.cpp
 homebrew/p112.cpp
 homebrew/phunsy.cpp
