@@ -248,10 +248,10 @@ void device_archimedes_podule_interface::interface_post_start()
 //#include "colourcard.h"
 #include "eaglem2.h"
 #include "ether1.h"
-//#include "ether2.h"
-//#include "ether3.h"
+#include "ether2.h"
+#include "ether3.h"
 //#include "ether5.h"
-//#include "ethera.h"
+#include "ethera.h"
 #include "etherd.h"
 #include "etherr.h"
 #include "faxpack.h"
@@ -316,8 +316,8 @@ void archimedes_exp_devices(device_slot_interface &device)
 	//device.option_add("ccgold", ARC_CCGOLD);              // Wild Vision/Computer Concepts Colour Card Gold
 	device.option_add("eaglem2", ARC_EAGLEM2);            // Wild Vision/Computer Concepts Eagle M2
 	device.option_add("ether1", ARC_ETHER1_AKA25);        // Acorn AKA25 Ethernet
-	//device.option_add("ether2", ARC_ETHER2_AEH50);        // Acorn AEH50 Ethernet II
-	//device.option_add("ether3_aeh54", ARC_ETHER3_AEH54);  // Acorn AEH54 10Base2 Ethernet Podule
+	device.option_add("ether2", ARC_ETHER2_AEH50);        // Acorn AEH50 Ethernet II
+	device.option_add("ether3_aeh54", ARC_ETHER3_AEH54);  // Acorn AEH54 10Base2 Ethernet Podule
 	//device.option_add("ether5", ARC_ETHER5);              // Atomwide Ethernet V Podule
 	device.option_add("etherr", ARC_ETHERR);              // RISC Developments Ethernet Card
 	device.option_add("faxpack", ARC_FAXPACK);            // Computer Concepts Fax-Pack
@@ -378,7 +378,7 @@ void archimedes_mini_exp_devices(device_slot_interface &device)
 	device.option_add("bbcio_aga30", ARC_BBCIO_AGA30);    // Acorn AGA30 BBC I/O Podule
 	device.option_add("bbcio_we", ARC_BBCIO_WE);          // Watford BBC User I/O Card
 	//device.option_add("disc_a3k6", ARC_DISC_A3K6);        // PRES A3K6 Disc Buffer
-	//device.option_add("ethera", ARC_ETHERA);              // ANT Ethernet 10base2 mini-podule
+	device.option_add("ethera", ARC_ETHERA);              // ANT Ethernet 10base2 mini-podule
 	device.option_add("etherd", ARC_ETHERD);              // Digital Services Ethernet Podule
 	//device.option_add("ide_a3k_hccs", ARC_IDE_A3K_HCCS);  // HCCS IDE A3000 Interface
 	//device.option_add("ide_castle", ARC_IDE_CASTLE);      // Castle Technology A3000 IDE Expansion Card
