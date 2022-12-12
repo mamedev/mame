@@ -45149,5 +45149,5 @@ vl1
 @source:ddr/sprachmg.cpp
 sprachmg                        // 1985 Institut für Kosmosforschung
 
-@source:nabu/nabupc.cpp
+@source:misc/nabupc.cpp
 nabupc                          //

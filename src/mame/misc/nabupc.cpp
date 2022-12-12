@@ -11,16 +11,23 @@
  ***********************************************************************/
 
 #include "emu.h"
-#include "nabupc.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/nabupc/adapter.h"
 #include "bus/nabupc/keyboard/hlekeyboard.h"
 #include "bus/nabupc/keyboard/keyboard.h"
+#include "bus/nabupc/option.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/pty.h"
 #include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "machine/ay31015.h"
 #include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/ram.h"
+#include "sound/ay8910.h"
+#include "video/tms9928a.h"
+#include "speaker.h"
 
 #include "nabupc.lh"
 
@@ -64,8 +71,6 @@ enum f9318_in {
 	PRIO_I0_I7 = (PRIO_IN_I0 | PRIO_I1_I7),
 };
 
-DECLARE_ENUM_BITWISE_OPERATORS(f9318_in);
-
 /** @brief F9318 output lines */
 enum f9318_out {
 	PRIO_OUT_Q0 = (1<<0),
@@ -76,8 +81,6 @@ enum f9318_out {
 	/* masks */
 	PRIO_OUT_QZ = (PRIO_OUT_Q0 | PRIO_OUT_Q1 | PRIO_OUT_Q2)
 };
-
-DECLARE_ENUM_BITWISE_OPERATORS(f9318_out);
 
 /**
  * @brief F9318 priority encoder 8 to 3-bit
@@ -107,9 +110,9 @@ DECLARE_ENUM_BITWISE_OPERATORS(f9318_out);
  *         +---------+
  * </PRE>
  */
-inline f9318_out f9318(f9318_in in)
+inline uint8_t f9318(uint16_t in)
 {
-	f9318_out out;
+	uint8_t out;
 
 	if (in & PRIO_IN_EI) {
 		out = PRIO_OUT_EO | PRIO_OUT_GS | PRIO_OUT_QZ;
@@ -161,6 +164,90 @@ inline f9318_out f9318(f9318_in in)
 }
 
 }
+
+//**************************************************************************
+//  DRIVER CLASS
+//**************************************************************************
+
+class nabupc_state : public driver_device
+{
+public:
+	nabupc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_tms9928a(*this, "tms9928a")
+		, m_screen(*this, "screen")
+		, m_ay8910(*this, "ay8910")
+		, m_speaker(*this, "speaker")
+		, m_kbduart(*this, "kbduart")
+		, m_hccauart(*this, "hccauart")
+		, m_ram(*this, RAM_TAG)
+		, m_centronics(*this, "centronics")
+		, m_bus(*this, "bus")
+		, m_rom_base(*this, "bios")
+		, m_bios_sel(*this, "CONFIG")
+		, m_leds(*this, "led%u", 0U)
+		, m_irq_in_prio(PRIO_I0_I7)
+		, m_int_lines(0)
+		, m_porta(0)
+		, m_portb(0)
+		, m_control(0)
+	{
+	}
+
+	void nabupc(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void memory_map(address_map &map);
+	void io_map(address_map &map);
+	uint8_t read_mem(offs_t offset);
+
+	uint8_t psg_portb_r();
+	void psg_porta_w(uint8_t data);
+	void control_w(uint8_t data);
+	void centronics_busy_handler(uint8_t state);
+	void update_irq();
+
+	DECLARE_WRITE_LINE_MEMBER(hcca_fe_w);
+	DECLARE_WRITE_LINE_MEMBER(hcca_oe_w);
+	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
+	DECLARE_WRITE_LINE_MEMBER(hcca_dr_w);
+	DECLARE_WRITE_LINE_MEMBER(hcca_tbre_w);
+	DECLARE_WRITE_LINE_MEMBER(j9_int_w);
+	DECLARE_WRITE_LINE_MEMBER(j10_int_w);
+	DECLARE_WRITE_LINE_MEMBER(j11_int_w);
+	DECLARE_WRITE_LINE_MEMBER(j12_int_w);
+
+	IRQ_CALLBACK_MEMBER(int_ack_cb);
+
+	required_device<z80_device> m_maincpu;
+	required_device<tms9928a_device> m_tms9928a;
+	required_device<screen_device> m_screen;
+	required_device<ay8910_device> m_ay8910;
+	required_device<speaker_device> m_speaker;
+	required_device<i8251_device> m_kbduart;
+	required_device<ay31015_device> m_hccauart;
+	required_device<ram_device> m_ram;
+	required_device<centronics_device> m_centronics;
+	required_device<bus::nabupc::option_bus_device> m_bus;
+	required_region_ptr<uint8_t> m_rom_base;
+	required_ioport m_bios_sel;
+
+	output_finder<4> m_leds;
+
+	uint16_t m_irq_in_prio;
+	uint8_t m_int_lines;
+	uint8_t m_porta;
+	uint8_t m_portb;
+	uint8_t m_control;
+	uint16_t m_bios_size;
+};
+
 //**************************************************************************
 //  INPUT PORTS
 //**************************************************************************
@@ -302,7 +389,7 @@ void nabupc_state::machine_start()
 // Machine Reset
 void nabupc_state::machine_reset()
 {
-	m_irq_in_prio = 0xFF;
+	m_irq_in_prio = PRIO_I0_I7;
 	m_int_lines = 0;
 	m_porta = 0;
 	m_portb &= 0x70;
@@ -434,10 +521,9 @@ void nabupc_state::update_irq()
 	m_irq_in_prio = (m_irq_in_prio & 0xff00) | interrupts;
 
 	m_portb &= 0xf0;
-	f9318_out out = f9318(static_cast<f9318_in>(m_irq_in_prio));
-	m_portb |= ((out & 7) << 1);
-	m_portb |= ((out >> 3) & 1);
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, !((out >> 4) & 1));
+	uint8_t out = f9318(m_irq_in_prio);
+	m_portb |= bitswap(out, 2, 1, 0, 3);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, !(BIT(out, 4)));
 }
 
 

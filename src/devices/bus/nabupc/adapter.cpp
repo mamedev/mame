@@ -28,7 +28,7 @@ namespace bus::nabupc {
 //**************************************************************************
 
 // Load segment file from disk
-std::error_condition segment_file::load(std::string_view local_path, uint32_t segment_id)
+std::error_condition network_adapter::segment_file::load(std::string_view local_path, uint32_t segment_id)
 {
 	segment_id &= 0xFFFFFF;
 
@@ -90,7 +90,7 @@ std::error_condition segment_file::load(std::string_view local_path, uint32_t se
 	return err;
 }
 
-const segment_file::pak& segment_file::operator[](const int index) const
+const network_adapter::segment_file::pak& network_adapter::segment_file::operator[](const int index) const
 {
 	assert(index >= 0 && index < size());
 
@@ -98,7 +98,7 @@ const segment_file::pak& segment_file::operator[](const int index) const
 }
 
 // crc16 calculation
-uint16_t segment_file::update_crc(uint16_t crc, uint8_t data)
+uint16_t network_adapter::segment_file::update_crc(uint16_t crc, uint8_t data)
 {
 	uint8_t bc;
 
@@ -144,6 +144,8 @@ void network_adapter::device_start()
 {
 	m_segment_timer = timer_alloc(FUNC(network_adapter::segment_tick), this);
 
+	machine().save().register_postload(save_prepost_delegate(FUNC(network_adapter::postload), this));
+
 	save_item(NAME(m_state));
 	save_item(NAME(m_substate));
 	save_item(NAME(m_channel));
@@ -163,6 +165,11 @@ void network_adapter::device_reset()
 	set_rate(BAUD);
 	receive_register_reset();
 	transmit_register_reset();
+}
+
+void network_adapter::postload()
+{
+	m_cache.load(machine().options().share_directory(), m_segment);
 }
 
 //**************************************************************************
