@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_SHARED_MEGADRIV_H
-#define MAME_SHARED_MEGADRIV_H
+#ifndef MAME_SEGA_MEGADRIV_H
+#define MAME_SEGA_MEGADRIV_H
 
 #pragma once
 
@@ -23,33 +23,60 @@ INPUT_PORTS_EXTERN( md_common );
 INPUT_PORTS_EXTERN( megadriv );
 
 
-class md_base_state : public driver_device
+class md_core_state : public driver_device
+{
+protected:
+	md_core_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_scan_timer(*this, "md_scan_timer"),
+		m_vdp(*this,"gen_vdp"),
+		m_screen(*this,"megadriv"),
+		m_ymsnd(*this,"ymsnd"),
+		m_io_reset(*this, "RESET")
+	{
+	}
+
+	virtual void machine_reset() override;
+
+	void md_core_ntsc(machine_config &config);
+	void md_core_pal(machine_config &config);
+
+	void megadriv_tas_callback(offs_t offset, uint8_t data);
+
+	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
+
+	required_device<m68000_base_device> m_maincpu;
+	required_device<timer_device> m_scan_timer;
+	required_device<sega315_5313_device> m_vdp;
+	optional_device<screen_device> m_screen;
+	optional_device<ym_generic_device> m_ymsnd;
+
+	optional_ioport m_io_reset;
+
+private:
+	IRQ_CALLBACK_MEMBER(genesis_int_callback);
+
+	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
+	WRITE_LINE_MEMBER(vdp_lv4irqline_callback_genesis_68k);
+
+	void megadriv_timers(machine_config &config);
+};
+
+
+class md_base_state : public md_core_state
 {
 public:
 	md_base_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
+		md_core_state(mconfig, type, tag),
 		m_z80snd(*this,"genesis_snd_z80"),
-		m_ymsnd(*this,"ymsnd"),
-		m_scan_timer(*this, "md_scan_timer"),
-		m_vdp(*this,"gen_vdp"),
 		m_megadrive_ram(*this,"megadrive_ram"),
-		m_screen(*this,"megadriv"),
-		m_io_reset(*this, "RESET"),
-		m_ioports(*this, "ioport%u", 1U),
-		m_io_pad(*this, "PAD%u", 1U),
-		m_io_extra(*this, "EXTRA%u", 1U)
+		m_ioports(*this, "ioport%u", 1U)
 	{ }
 
-	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
-	optional_device<ym_generic_device> m_ymsnd;
-	optional_device<timer_device> m_scan_timer;
-	required_device<sega315_5313_device> m_vdp;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
-	optional_device<screen_device> m_screen;
-
-	optional_ioport m_io_reset;
 
 	struct genesis_z80_vars
 	{
@@ -69,7 +96,7 @@ public:
 
 	uint8_t megadriv_68k_YM2612_read(offs_t offset, uint8_t mem_mask = ~0);
 	void megadriv_68k_YM2612_write(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	IRQ_CALLBACK_MEMBER(genesis_int_callback);
+
 	void megadriv_init_common();
 
 	void megadriv_z80_bank_w(uint16_t data);
@@ -88,15 +115,8 @@ public:
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
 
 	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
-	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
-	WRITE_LINE_MEMBER(vdp_lv4irqline_callback_genesis_68k);
 
 	void megadriv_stop_scanline_timer();
-
-	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
-
-	void megadriv_tas_callback(offs_t offset, uint8_t data);
 
 	void md_ntsc(machine_config &config);
 	void md2_ntsc(machine_config &config);
@@ -113,12 +133,6 @@ protected:
 	void megadriv_z80_io_map(address_map &map);
 	void megadriv_z80_map(address_map &map);
 
-	template <unsigned N> uint8_t ioport_in_3button();
-	template <unsigned N> uint8_t ioport_in_6button();
-
-	template <unsigned N> void ioport_out_3button(uint8_t data, uint8_t mem_mask);
-	template <unsigned N> void ioport_out_6button(uint8_t data, uint8_t mem_mask);
-
 	required_device_array<megadrive_io_port_device, 3> m_ioports;
 
 private:
@@ -134,10 +148,35 @@ private:
 	template <unsigned N> void m68k_ioport_txdata_write(uint16_t data);
 	template <unsigned N> void m68k_ioport_s_ctrl_write(uint16_t data);
 
-	TIMER_CALLBACK_MEMBER(ioport_timeout);
-
-	void megadriv_timers(machine_config &config);
 	void megadriv_ioports(machine_config &config);
+};
+
+
+class md_ctrl_state : public md_base_state
+{
+protected:
+	md_ctrl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_base_state(mconfig, type, tag),
+		m_io_pad(*this, "PAD%u", 1U),
+		m_io_extra(*this, "EXTRA%u", 1U)
+	{
+	}
+
+	void ctrl1_3button(machine_config &config);
+	void ctrl2_3button(machine_config &config);
+	void ctrl1_6button(machine_config &config);
+	void ctrl2_6button(machine_config &config);
+
+	virtual void machine_start() override;
+
+private:
+	template <unsigned N> uint8_t ioport_in_3button();
+	template <unsigned N> uint8_t ioport_in_6button();
+
+	template <unsigned N> void ioport_out_3button(uint8_t data, uint8_t mem_mask);
+	template <unsigned N> void ioport_out_6button(uint8_t data, uint8_t mem_mask);
+
+	TIMER_CALLBACK_MEMBER(ioport_timeout);
 
 	optional_ioport_array<2> m_io_pad;
 	optional_ioport_array<2> m_io_extra;
@@ -148,4 +187,4 @@ private:
 	uint8_t m_ioport_phase[2];
 };
 
-#endif // MAME_SHARED_MEGADRIV_H
+#endif // MAME_SEGA_MEGADRIV_H

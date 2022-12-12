@@ -16,12 +16,14 @@
 #include "emu.h"
 #include "megadriv.h"
 
-class megadriv_sunplus_state : public md_base_state
+namespace {
+
+class megadriv_sunplus_state : public md_ctrl_state
 {
 public:
 	megadriv_sunplus_state(const machine_config &mconfig, device_type type, const char *tag) :
 		// Mega Drive part
-		md_base_state(mconfig, type, tag),
+		md_ctrl_state(mconfig, type, tag),
 		m_md_is_running(true),
 		m_bank(0),
 		m_rom(*this, "maincpu")
@@ -30,7 +32,6 @@ public:
 	// Mega Drive part
 	uint16_t read(offs_t offset);
 	void megadriv_sunplus_pal(machine_config &config);
-	void megadriv_sunplus_map(address_map &map);
 
 	void init_reactmd();
 
@@ -44,9 +45,11 @@ private:
 	// Mega Drive part
 	int m_bank;
 	required_region_ptr<uint16_t> m_rom;
+
 	uint32_t screen_update_hybrid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_hybrid);
 
+	void megadriv_sunplus_map(address_map &map);
 };
 
 
@@ -87,7 +90,7 @@ INPUT_PORTS_END
 void megadriv_sunplus_state::machine_start()
 {
 	logerror("megadriv_sunplus_state::machine_start\n");
-	md_base_state::machine_start();
+	md_ctrl_state::machine_start();
 
 	m_vdp->stop_timers();
 	save_item(NAME(m_bank));
@@ -96,7 +99,7 @@ void megadriv_sunplus_state::machine_start()
 void megadriv_sunplus_state::machine_reset()
 {
 	logerror("megadriv_sunplus_state::machine_reset\n");
-	md_base_state::machine_reset();
+	md_ctrl_state::machine_reset();
 }
 
 uint32_t megadriv_sunplus_state::screen_update_hybrid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -115,7 +118,7 @@ WRITE_LINE_MEMBER(megadriv_sunplus_state::screen_vblank_hybrid)
 	if (m_md_is_running)
 	{
 		/* Used to Sync the timing */
-		md_base_state::screen_vblank_megadriv(state);
+		md_ctrl_state::screen_vblank_megadriv(state);
 	}
 }
 
@@ -123,10 +126,14 @@ WRITE_LINE_MEMBER(megadriv_sunplus_state::screen_vblank_hybrid)
 void megadriv_sunplus_state::megadriv_sunplus_pal(machine_config &config)
 {
 	md_pal(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_sunplus_state::megadriv_sunplus_map);
 
 	m_screen->set_screen_update(FUNC(megadriv_sunplus_state::screen_update_hybrid));
 	m_screen->screen_vblank().set(FUNC(megadriv_sunplus_state::screen_vblank_hybrid));
+
+	ctrl1_3button(config);
+	ctrl2_3button(config);
 }
 
 
@@ -155,6 +162,8 @@ ROM_START( reactmd )
 	ROM_LOAD16_WORD_SWAP( "reactor_md_sunplus-full.bin", 0x0000, 0x4000000, CRC(843aa58c) SHA1(07cdc6d4aa0057939c145ece01a9aca73c7f1f2b) )
 	ROM_IGNORE(0x4000000) // the 2nd half of the ROM can't be accessed by the PCB (address line tied low) (contains garbage? data)
 ROM_END
+
+} // anonymous namespace
 
 
 // Two systems in one unit - Genesis on a Chip and SunPlus, only the SunPlus part is currently emulated.  Genesis on a chip is a very poor implementation with many issues on real hardware.

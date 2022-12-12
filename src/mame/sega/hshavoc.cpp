@@ -38,8 +38,6 @@ help with figuring out the encryption on the coin-op parts of the program.
 
 
 #include "emu.h"
-
-#include "megadriv.h"
 #include "megadriv_acbl.h"
 
 #include "cpu/m68000/m68000.h"

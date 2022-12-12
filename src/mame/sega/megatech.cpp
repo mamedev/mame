@@ -93,11 +93,11 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 
 namespace {
 
-class mtech_state : public md_base_state
+class mtech_state : public md_ctrl_state
 {
 public:
 	mtech_state(const machine_config &mconfig, device_type type, const char *tag) :
-		md_base_state(mconfig, type, tag),
+		md_ctrl_state(mconfig, type, tag),
 		m_vdp1(*this, "vdp1"),
 		m_cart1(*this, "mt_slot1"),
 		m_cart2(*this, "mt_slot2"),
@@ -652,7 +652,7 @@ WRITE_LINE_MEMBER(mtech_state::screen_vblank_main)
 
 void mtech_state::machine_start()
 {
-	md_base_state::machine_start();
+	md_ctrl_state::machine_start();
 
 	m_alarm_sound.resolve();
 	m_flash_screen.resolve();
@@ -661,7 +661,7 @@ void mtech_state::machine_start()
 void mtech_state::machine_reset()
 {
 	m_mt_bank_addr = 0;
-	md_base_state::machine_reset();
+	md_ctrl_state::machine_reset();
 
 	for (int i = 0; i < 8; i++)
 		m_cart_reg[i] = nullptr;
@@ -697,10 +697,14 @@ uint32_t mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bi
 
 void mtech_state::megatech(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	md_ntsc(config);
 
-	/* Megatech has an extra SMS based bios *and* an additional screen */
+	// integrated 3-button controllers
+	ctrl1_3button(config);
+	ctrl2_3button(config);
+
+	// Megatech has an extra SMS-based BIOS *and* an additional screen
 	Z80(config, m_bioscpu, MASTER_CLOCK / 15); /* ?? */
 	m_bioscpu->set_addrmap(AS_PROGRAM, &mtech_state::megatech_bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &mtech_state::megatech_bios_portmap);

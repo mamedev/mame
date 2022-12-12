@@ -297,20 +297,22 @@ void smssdisp_state::sms_store_mem(address_map &map)
 }
 
 // I/O ports $3E and $3F do not exist on Mark III
-void sms_state::sg1000m3_io(address_map &map)
+void sg1000m3_state::sg1000m3_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
+
+	map(0x40, 0x7f).r(FUNC(sg1000m3_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc7).mirror(0x38).rw(FUNC(sms_state::sg1000m3_peripheral_r), FUNC(sms_state::sg1000m3_peripheral_w));
+	map(0xc0, 0xc7).mirror(0x38).rw(FUNC(sg1000m3_state::sg1000m3_peripheral_r), FUNC(sg1000m3_state::sg1000m3_peripheral_w));
 }
 
 void sms_state::sms_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+
 	map(0x00, 0x00).mirror(0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x01, 0x01).mirror(0x3e).w(FUNC(sms_state::sms_io_control_w));
 	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
@@ -345,6 +347,7 @@ void sms_state::smsj_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+
 	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
 	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
@@ -366,6 +369,7 @@ void gamegear_state::gg_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+
 	map(0x00, 0x00).r(FUNC(gamegear_state::gg_input_port_00_r));
 	map(0x01, 0x05).rw(FUNC(gamegear_state::gg_sio_r), FUNC(gamegear_state::gg_sio_w));
 	map(0x06, 0x06).w(FUNC(gamegear_state::gg_psg_stereo_w));
@@ -484,7 +488,7 @@ static INPUT_PORTS_START( gg )
 
 	PORT_START("START")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start") /* Game Gear START */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start")
 
 	PORT_START("PERSISTENCE")
 	PORT_CONFNAME( 0x01, 0x01, "LCD Persistence Hack" )
@@ -920,11 +924,11 @@ void sms1_state::smsj(machine_config &config)
 	m_is_smsj = true;
 }
 
-void sms1_state::sg1000m3(machine_config &config)
+void sg1000m3_state::sg1000m3(machine_config &config)
 {
 	sms1_ntsc(config);
 
-	m_maincpu->set_addrmap(AS_IO, &sms1_state::sg1000m3_io);
+	m_maincpu->set_addrmap(AS_IO, &sg1000m3_state::sg1000m3_io);
 
 	// Remove and reinsert all media slots, as done with the sms1_kr config,
 	// and also replace the expansion slot with the SG-1000 version.
@@ -933,7 +937,7 @@ void sms1_state::sg1000m3(machine_config &config)
 	config.device_remove("smsexp");
 	SG1000MK3_CART_SLOT(config, "slot", sg1000mk3_cart, nullptr);
 	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
-	SG1000_EXPANSION_SLOT(config, "sgexp", sg1000_expansion_devices, nullptr, false);
+	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, nullptr, false);
 
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
 
@@ -1241,7 +1245,7 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT           COMPANY    FULLNAME                              FLAGS */
-CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sg1000m3, sms1_state,     empty_init,    "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
+CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sg1000m3, sg1000m3_state, empty_init,    "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
 CONS( 1986, sms1,     sms,      0,      sms1_ntsc, sms1,     sms1_state,     empty_init,    "Sega",    "Master System I",                    MACHINE_SUPPORTS_SAVE )
 CONS( 1986, sms1pal,  sms,      0,      sms1_pal,  sms1,     sms1_state,     empty_init,    "Sega",    "Master System I (PAL)" ,             MACHINE_SUPPORTS_SAVE )
 CONS( 1986, smssdisp, sms,      0,      sms_sdisp, smssdisp, smssdisp_state, empty_init,    "Sega",    "Master System Store Display Unit",   MACHINE_SUPPORTS_SAVE )

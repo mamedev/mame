@@ -290,12 +290,6 @@ WRITE_LINE_MEMBER(sms_state::rapid_n_csync_callback)
 
 uint8_t sms_state::sms_input_port_dc_r()
 {
-	if (m_is_mark_iii)
-	{
-		sms_get_inputs();
-		return m_port_dc_reg;
-	}
-
 	if (m_is_gamegear)
 	{
 		// If SMS mode is disabled, just return the data read from the
@@ -337,12 +331,6 @@ uint8_t sms_state::sms_input_port_dc_r()
 
 uint8_t sms_state::sms_input_port_dd_r()
 {
-	if (m_is_mark_iii)
-	{
-		sms_get_inputs();
-		return m_port_dd_reg;
-	}
-
 	if (m_is_gamegear)
 	{
 		if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
@@ -763,9 +751,9 @@ void sms_state::sms_mem_control_w(uint8_t data)
 }
 
 
-uint8_t sms_state::sg1000m3_peripheral_r(offs_t offset)
+uint8_t sg1000m3_state::sg1000m3_peripheral_r(offs_t offset)
 {
-	bool joy_ports_disabled = m_sgexpslot->is_readable(offset);
+	bool const joy_ports_disabled = m_sgexpslot->is_readable(offset);
 
 	if (joy_ports_disabled)
 	{
@@ -773,22 +761,21 @@ uint8_t sms_state::sg1000m3_peripheral_r(offs_t offset)
 	}
 	else
 	{
+		sms_get_inputs();
 		if (offset & 0x01)
-			return sms_input_port_dd_r();
+			return m_port_dd_reg;
 		else
-			return sms_input_port_dc_r();
+			return m_port_dc_reg;
 	}
 }
 
 
-void sms_state::sg1000m3_peripheral_w(offs_t offset, uint8_t data)
+void sg1000m3_state::sg1000m3_peripheral_w(offs_t offset, uint8_t data)
 {
-	bool joy_ports_disabled = m_sgexpslot->is_writeable(offset);
+	bool const joy_ports_disabled = m_sgexpslot->is_writeable(offset);
 
 	if (joy_ports_disabled)
-	{
 		m_sgexpslot->write(offset, data);
-	}
 }
 
 
@@ -1053,7 +1040,7 @@ void sms_state::machine_start()
 
 void smssdisp_state::machine_start()
 {
-	sms_state::machine_start();
+	sms1_state::machine_start();
 
 	save_item(NAME(m_store_control));
 	save_item(NAME(m_store_cart_selection_data));
@@ -1092,13 +1079,7 @@ void sms_state::machine_reset()
 			m_led_pwr = 1;
 	}
 
-	if (m_is_mark_iii)
-	{
-		// pin 7 is tied to ground on the Mark III
-		m_port_ctrl1->out_w(0x3f, 0x40);
-		m_port_ctrl2->out_w(0x3f, 0x40);
-	}
-	else
+	if (!m_is_mark_iii)
 	{
 		m_io_ctrl_reg = 0xff;
 		m_ctrl1_th_latch = 0;
@@ -1115,7 +1096,16 @@ void smssdisp_state::machine_reset()
 	m_store_cart_selection_data = 0;
 	store_select_cart(m_store_cart_selection_data);
 
-	sms_state::machine_reset();
+	sms1_state::machine_reset();
+}
+
+void sg1000m3_state::machine_reset()
+{
+	sms1_state::machine_reset();
+
+	// controller port pin 7 is tied to ground on the Mark III
+	m_port_ctrl1->out_w(0x3f, 0x40);
+	m_port_ctrl2->out_w(0x3f, 0x40);
 }
 
 void gamegear_state::machine_reset()

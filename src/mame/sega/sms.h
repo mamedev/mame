@@ -59,8 +59,7 @@ public:
 		m_has_pwr_led(false),
 		m_slot(*this, "slot"),
 		m_cardslot(*this, "mycard"),
-		m_smsexpslot(*this, "smsexp"),
-		m_sgexpslot(*this, "sgexp")
+		m_smsexpslot(*this, "smsexp")
 	{ }
 
 	void sms_base(machine_config &config);
@@ -94,8 +93,6 @@ protected:
 	uint8_t sms_count_r(offs_t offset);
 	uint8_t sms_input_port_dc_r();
 	uint8_t sms_input_port_dd_r();
-	uint8_t sg1000m3_peripheral_r(offs_t offset);
-	void sg1000m3_peripheral_w(offs_t offset, uint8_t data);
 	uint8_t smsj_audio_control_r();
 	void smsj_audio_control_w(uint8_t data);
 	void smsj_ym2413_register_port_w(uint8_t data);
@@ -105,7 +102,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
 
-	void sg1000m3_io(address_map &map);
 	void sms_io(address_map &map);
 	void sms_mem(address_map &map);
 	void smsj_io(address_map &map);
@@ -143,7 +139,7 @@ protected:
 	std::unique_ptr<uint8_t[]> m_mainram;
 	uint8_t *m_BIOS;
 
-	// for gamegear LCD persistence hack
+	// for Game Gear LCD persistence hack
 	bitmap_rgb32 m_prev_bitmap;
 	bool m_prev_bitmap_copied;
 
@@ -192,8 +188,8 @@ protected:
 	optional_device<sega8_cart_slot_device> m_slot;
 	optional_device<sega8_card_slot_device> m_cardslot;
 	optional_device<sms_expansion_slot_device> m_smsexpslot;
-	optional_device<sg1000_expansion_slot_device> m_sgexpslot;
 };
+
 
 class sms1_state : public sms_state
 {
@@ -212,7 +208,6 @@ public:
 	void sms1_br(machine_config &config);
 	void sms1_kr(machine_config &config);
 	void smsj(machine_config &config);
-	void sg1000m3(machine_config &config);
 
 protected:
 	virtual void video_start() override;
@@ -240,6 +235,7 @@ private:
 	uint8_t m_sscope_state;
 	uint8_t m_frame_sscope_state;
 };
+
 
 class smssdisp_state : public sms1_state
 {
@@ -278,6 +274,30 @@ private:
 	uint8_t m_store_cart_selection_data;
 };
 
+
+class sg1000m3_state : public sms1_state
+{
+public:
+	sg1000m3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sms1_state(mconfig, type, tag),
+		m_sgexpslot(*this, "sgexp")
+	{ }
+
+	void sg1000m3(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	uint8_t sg1000m3_peripheral_r(offs_t offset);
+	void sg1000m3_peripheral_w(offs_t offset, uint8_t data);
+
+	void sg1000m3_io(address_map &map);
+
+	required_device<sg1000_expansion_slot_device> m_sgexpslot;
+};
+
+
 class gamegear_state : public sms_state
 {
 public:
@@ -312,9 +332,10 @@ private:
 
 	// for gamegear SMS mode scaling
 	bitmap_rgb32 m_gg_sms_mode_bitmap;
+
 	// line_buffer will be used to hold 4 lines of line data as a kind of cache for
-	// vertical scaling in the gamegear sms compatibility mode.
-	std::unique_ptr<int[]> m_line_buffer;
+	// vertical scaling in the Game Gear SMS compatibility mode.
+	std::unique_ptr<int []> m_line_buffer;
 
 	uint8_t m_gg_sio[5]{};
 	int m_gg_paused = 0;

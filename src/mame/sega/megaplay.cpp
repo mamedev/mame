@@ -36,17 +36,20 @@ this reason.
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 
+
+namespace {
+
 #define MASTER_CLOCK        53693100
 
 #define MP_ROM  1
 #define MP_GAME 0
 
 
-class mplay_state : public md_base_state
+class mplay_state : public md_ctrl_state
 {
 public:
 	mplay_state(const machine_config &mconfig, device_type type, const char *tag) :
-		md_base_state(mconfig, type, tag),
+		md_ctrl_state(mconfig, type, tag),
 		m_ic3_ram(*this, "ic3_ram"),
 		m_vdp1(*this, "vdp1"),
 		m_bioscpu(*this, "mtbios")
@@ -429,6 +432,7 @@ void mplay_state::bios_gamesel_w(uint8_t data)
 
 void mplay_state::mp_io_exp_out(uint8_t data, uint8_t mem_mask)
 {
+	// TODO: TH (bit 6) is configured as an output and seems to be used for something, too
 	m_io_exp_data = (data & 0x07) | (m_io_exp_data & 0xf8);
 }
 
@@ -650,13 +654,17 @@ void mplay_state::machine_reset()
 	m_bios_mode = MP_ROM;
 	m_bios_bank_addr = 0;
 	m_readpos = 1;
-	md_base_state::machine_reset();
+	md_ctrl_state::machine_reset();
 }
 
 void mplay_state::megaplay(machine_config &config)
 {
 	// basic machine hardware
 	md_ntsc(config);
+
+	// integrated 3-button controllers
+	ctrl1_3button(config);
+	ctrl2_3button(config);
 
 	// for now ...
 	m_ioports[2]->set_in_handler(FUNC(mplay_state::mp_io_exp_in));
@@ -970,6 +978,9 @@ void mplay_state::init_megaplay()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa02000, 0xa03fff, read16sm_delegate(*this, FUNC(mplay_state::extra_ram_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa02000, 0xa03fff, write16s_delegate(*this, FUNC(mplay_state::extra_ram_w)));
 }
+
+} // anonymous namespace
+
 
 /*
 Sega Mega Play Cartridges

@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "controllers.h"
 
+#include "diypaddle.h"
 #include "graphic.h"
 #include "joypad.h"
 #include "lphaser.h"
@@ -22,6 +23,7 @@
 #include "sportsjp.h"
 
 
+char const *const SMS_CTRL_OPTION_DIY_PADDLE = "diypaddle";
 char const *const SMS_CTRL_OPTION_GRAPHIC    = "graphic";
 char const *const SMS_CTRL_OPTION_LPHASER    = "lphaser";
 char const *const SMS_CTRL_OPTION_MD_6BUTTON = "md6button";
@@ -38,6 +40,7 @@ char const *const SMS_CTRL_OPTION_SPORTS_JP  = "sportsjp";
 
 void sms_control_port_devices(device_slot_interface &device)
 {
+	device.option_add(SMS_CTRL_OPTION_DIY_PADDLE, SMS_DIY_PADDLE);
 	device.option_add(SMS_CTRL_OPTION_GRAPHIC,    SMS_GRAPHIC);
 	device.option_add(SMS_CTRL_OPTION_LPHASER,    SMS_LIGHT_PHASER);
 	device.option_add(SMS_CTRL_OPTION_MD_6BUTTON, SMS_MD6BUTTON);

@@ -6,18 +6,16 @@
 #include "megadriv.h"
 
 
-class md_boot_state : public md_base_state
+class md_boot_state : public md_ctrl_state
 {
 public:
 	md_boot_state(const machine_config &mconfig, device_type type, const char *tag) :
-		md_base_state(mconfig, type, tag),
+		md_ctrl_state(mconfig, type, tag),
 		m_io_exp(*this, "EXP")
 	{ }
 
 	void megadrvb(machine_config &config);
 	void md_bootleg(machine_config &config);
-	void topshoot(machine_config &config);
-	void sbubsm(machine_config &config);
 
 	void init_aladmdb();
 	void init_srmdb();
@@ -39,12 +37,6 @@ private:
 	uint16_t barek2mb_r();
 	uint16_t jparkmb_r();
 	uint16_t twinktmb_r();
-	uint16_t topshoot_200051_r();
-	uint16_t sbubsm_400000_r();
-	uint16_t sbubsm_400002_r();
-
-	void topshoot_68k_map(address_map &map);
-	void sbubsm_68k_map(address_map &map);
 
 	optional_ioport m_io_exp;
 

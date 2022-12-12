@@ -20,7 +20,99 @@
 */
 
 #include "emu.h"
-#include "megadriv_rad.h"
+#include "megadriv.h"
+
+
+namespace {
+
+class megadriv_radica_state_base : public md_ctrl_state
+{
+public:
+	megadriv_radica_state_base(const machine_config &mconfig, device_type type, const char *tag) :
+		md_ctrl_state(mconfig, type, tag),
+		m_bank(0),
+		m_romsize(0x400000),
+		m_rom(*this, "maincpu")
+	{ }
+
+protected:
+	uint16_t read(offs_t offset);
+	uint16_t read_a13(offs_t offset);
+
+	void megadriv_radica_map(address_map &map);
+
+	void radica_base_map(address_map &map);
+
+	int m_bank;
+	int m_romsize;
+
+private:
+	required_region_ptr<uint16_t> m_rom;
+};
+
+
+class megadriv_radica_state : public megadriv_radica_state_base
+{
+public:
+	megadriv_radica_state(const machine_config& mconfig, device_type type, const char* tag) :
+		megadriv_radica_state_base(mconfig, type, tag)
+	{ }
+
+	void megadriv_radica_3button_ntsc(machine_config &config);
+	void megadriv_radica_3button_pal(machine_config &config);
+
+	void megadriv_radica_6button_ntsc(machine_config &config);
+	void megadriv_radica_6button_pal(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+};
+
+
+class megadriv_dgunl_state : public megadriv_radica_state
+{
+public:
+	megadriv_dgunl_state(const machine_config& mconfig, device_type type, const char* tag) :
+		megadriv_radica_state(mconfig, type, tag)
+	{ }
+
+	void megadriv_dgunl_ntsc(machine_config &config);
+
+	void init_dgunl3227();
+
+protected:
+	virtual void machine_start() override;
+
+	uint16_t m_a1630a = 0;
+
+private:
+	uint16_t read_a16300(offs_t offset, uint16_t mem_mask);
+	uint16_t read_a16302(offs_t offset, uint16_t mem_mask);
+	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	void megadriv_dgunl_map(address_map &map);
+};
+
+
+class megadriv_ra145_state : public megadriv_dgunl_state
+{
+public:
+	megadriv_ra145_state(const machine_config& mconfig, device_type type, const char* tag) :
+		megadriv_dgunl_state(mconfig, type, tag)
+	{ }
+
+	void megadriv_ra145_ntsc(machine_config &config);
+
+	void init_ra145();
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask) override;
+};
+
 
 
 void megadriv_radica_state_base::radica_base_map(address_map &map)
@@ -368,13 +460,13 @@ void megadriv_dgunl_state::machine_start()
 void megadriv_ra145_state::machine_reset()
 {
 	m_bank = 4;
-	md_base_state::machine_reset();
+	megadriv_radica_state_base::machine_reset();
 }
 
 void megadriv_radica_state::machine_reset()
 {
 	m_bank = 0;
-	md_base_state::machine_reset();
+	megadriv_radica_state_base::machine_reset();
 }
 
 
@@ -382,41 +474,44 @@ void megadriv_radica_state::megadriv_radica_3button_ntsc(machine_config &config)
 {
 	md_ntsc(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state_base::megadriv_radica_map);
+	ctrl1_3button(config);
+	ctrl2_3button(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
 }
 
 void megadriv_radica_state::megadriv_radica_3button_pal(machine_config &config)
 {
 	md_pal(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state_base::megadriv_radica_map);
+	ctrl1_3button(config);
+	ctrl2_3button(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
 }
 
 void megadriv_radica_state::megadriv_radica_6button_pal(machine_config &config)
 {
 	megadriv_radica_3button_pal(config);
 
-	m_ioports[0]->set_in_handler(FUNC(megadriv_radica_state::ioport_in_6button<0>));
-	m_ioports[0]->set_out_handler(FUNC(megadriv_radica_state::ioport_out_6button<0>));
-
-	m_ioports[1]->set_in_handler(FUNC(megadriv_radica_state::ioport_in_6button<1>));
-	m_ioports[1]->set_out_handler(FUNC(megadriv_radica_state::ioport_out_6button<1>));
+	ctrl1_6button(config);
+	ctrl2_6button(config);
 }
 
 void megadriv_radica_state::megadriv_radica_6button_ntsc(machine_config &config)
 {
 	megadriv_radica_3button_ntsc(config);
 
-	m_ioports[0]->set_in_handler(FUNC(megadriv_radica_state::ioport_in_6button<0>));
-	m_ioports[0]->set_out_handler(FUNC(megadriv_radica_state::ioport_out_6button<0>));
-
-	m_ioports[1]->set_in_handler(FUNC(megadriv_radica_state::ioport_in_6button<1>));
-	m_ioports[1]->set_out_handler(FUNC(megadriv_radica_state::ioport_out_6button<1>));
+	ctrl1_6button(config);
+	ctrl2_6button(config);
 }
 
 void megadriv_dgunl_state::megadriv_dgunl_ntsc(machine_config &config)
 {
 	md_ntsc(config);
+
+	ctrl1_3button(config);
+	ctrl2_3button(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_dgunl_state::megadriv_dgunl_map);
 }
@@ -425,11 +520,8 @@ void megadriv_ra145_state::megadriv_ra145_ntsc(machine_config &config)
 {
 	megadriv_dgunl_ntsc(config);
 
-	m_ioports[0]->set_in_handler(FUNC(megadriv_ra145_state::ioport_in_6button<0>));
-	m_ioports[0]->set_out_handler(FUNC(megadriv_ra145_state::ioport_out_6button<0>));
-
-	m_ioports[1]->set_in_handler(FUNC(megadriv_ra145_state::ioport_in_6button<1>));
-	m_ioports[1]->set_out_handler(FUNC(megadriv_ra145_state::ioport_out_6button<1>));
+	ctrl1_6button(config);
+	ctrl2_6button(config);
 }
 
 
@@ -612,6 +704,9 @@ void megadriv_ra145_state::init_ra145()
 	init_megadriv();
 }
 
+} // anonymous namespace
+
+
 // US versions show 'Genesis' on the menu,    show a www.radicagames.com splash screen, and use NTSC versions of the ROMs, sometimes region locked
 // EU versions show 'Mega Drive' on the menu, show a www.radicagames.com splash screen, and use PAL versions of the ROMs, sometimes region locked
 // UK versions show "Mega Drive' on the menu, show a www.radicauk.com splash screen,    and use PAL versions of the ROMs, sometimes region locked
@@ -657,4 +752,3 @@ CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, msi_6button,  
 CONS( 2018, dgunl3227, 0,        0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
 
 CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           megadriv_ra145_state, init_ra145,        "<unknown>",            "Retro Arcade 16 Bits Classic Edition Mini TV Game Console - 145 Classic Games - TV Arcade Plug and Play (Mega Drive bootlegs)", MACHINE_NOT_WORKING )
-

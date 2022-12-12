@@ -52,13 +52,18 @@ Notes:
 #include "sound/sn76496.h"
 #include "sound/ymopn.h"
 
+#include "speaker.h"
+
 
 namespace {
 
-class puckpkmn_state : public md_base_state
+class puckpkmn_state : public md_core_state
 {
 public:
-	using md_base_state::md_base_state;
+	puckpkmn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_core_state(mconfig, type, tag)
+	{
+	}
 
 	void puckpkmn(machine_config &config) ATTR_COLD;
 	void puckpkmna(machine_config &config) ATTR_COLD;
@@ -266,7 +271,7 @@ void puckpkmn_state::puckpkmn_base_map(address_map &map)
 	map(0x700016, 0x700017).portr("DSW1");
 	map(0x700018, 0x700019).portr("DSW2");
 	map(0x700023, 0x700023).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa04000, 0xa04003).rw(FUNC(puckpkmn_state::megadriv_68k_YM2612_read), FUNC(puckpkmn_state::megadriv_68k_YM2612_write));
+	map(0xa04000, 0xa04003).rw(m_ymsnd, FUNC(ym_generic_device::read), FUNC(ym_generic_device::write));
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
@@ -390,11 +395,19 @@ uint16_t jzth_state::bl_710000_r()
 
 void puckpkmn_state::puckpkmn(machine_config &config)
 {
-	md_ntsc(config);
+	md_core_ntsc(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &puckpkmn_state::puckpkmn_map);
 
-	config.device_remove("genesis_snd_z80");
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+
+	// sound hardware
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	m_ymsnd->add_route(0, "lspeaker", 0.50);
+	m_ymsnd->add_route(1, "rspeaker", 0.50);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
@@ -513,7 +526,13 @@ void puckpkmn_state::init_puckpkmn()
 	for (size_t i = 0; i < len; i++)
 		rom[i] = bitswap<8>(rom[i], 1, 4, 2, 0, 7, 5, 3, 6);
 
-	init_megadriv();
+	m_maincpu->set_tas_write_callback(*this, FUNC(puckpkmn_state::megadriv_tas_callback));
+
+	// TODO: move this to the device interface?
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(false);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(262);
 }
 
 ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */

@@ -23331,12 +23331,10 @@ barek3mb                        // MegaDrive-based hack
 bk3ssrmb                        // MegaDrive-based hack
 jparkmb                         // MegaDrive-based hack
 mk3mdb                          // MegaDrive-based hack
-sbubsm                          // (c) 1996 Sun Mixing
 sonic2mb                        // MegaDrive-based hack
 sonic3mb                        // MegaDrive-based hack
 srmdb                           // MegaDrive-based hack
 ssf2mdb                         // MegaDrive-based hack
-topshoot                        // (c) 1995 Sun Mixing
 twinktmb                        // MegaDrive-based hack
 
 @source:sega/megadriv_rad.cpp
@@ -23353,6 +23351,10 @@ rad_orun
 msi_sf2
 dgunl3227
 ra145
+
+@source:sega/megadriv_sunmix.cpp
+sbubsm                          // (c) 1996 Sun Mixing
+topshoot                        // (c) 1995 Sun Mixing
 
 @source:sega/megadriv_sunplus_hybrid.cpp
 reactmd
