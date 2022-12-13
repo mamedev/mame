@@ -12,7 +12,7 @@ Puckman Pockimon - (c)2000 Genie? (there should be a way to show Sun Mixing copy
 
 |---------------------------------------|
 | VOL    4558    4MHz   PAL     62256   |
-| YM3812 YM3014                         |
+| U6612  U6614B                         |
 | 3.579545MHz    555    PAL     |------||
 | LM324     M6295        |----| |TV16B ||
 |          ROM.U3   PAL  |YBOX| |      ||
@@ -31,8 +31,9 @@ Puckman Pockimon - (c)2000 Genie? (there should be a way to show Sun Mixing copy
 Notes:
       Main CPU is 68000-based, but actual CPU chip is not known
       Master clock 53.693175MHz. CPU likely running at 53.693175/7 or /6 (??)
-      YM3812 clock 3.579545MHz
-      M6295 clock 1.000MHz (4/4]. Sample rate = 1000000/132
+      U6612 (YM2612 clone?) clock 3.579545MHz
+      U6614B (YM3014B clone?)
+      M6295 clock 1.000MHz (4/4). Sample rate = 1000000/132
       VSync 60Hz
       HSync 16.24kHz
       62256 - 8k x8 SRAM (DIP28)
@@ -409,8 +410,7 @@ void puckpkmn_state::puckpkmn(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	//YM3812(config, m_ymsnd, 3.579545_MHz_XTAL); breaks tutorial music - confirm PCB picture is correct
-	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
+	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC / 7); // TODO: confirm clock
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(1, "rspeaker", 0.50);
 
