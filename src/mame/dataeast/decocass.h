@@ -35,6 +35,7 @@ public:
 		, m_mcu(*this, "mcu")
 		, m_dongle_r(*this)
 		, m_dongle_w(*this)
+		, m_donglerom(*this, "dongle")
 		, m_audiocpu(*this, "audiocpu")
 		, m_watchdog(*this, "watchdog")
 		, m_cassette(*this, "cassette")
@@ -71,6 +72,8 @@ protected:
 	read8sm_delegate    m_dongle_r; // TODO: why isn't this a virtual method?
 	write8sm_delegate   m_dongle_w; // TODO: why isn't this a virtual method?
 
+	optional_region_ptr<uint8_t> m_donglerom;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -98,7 +101,7 @@ private:
 	required_shared_ptr<uint8_t> m_objectram;
 	required_shared_ptr<uint8_t> m_paletteram;
 	optional_memory_bank         m_bank1;
-
+ 
 	size_t    m_bgvideoram_size = 0U;
 
 	/* video-related */
@@ -170,8 +173,8 @@ private:
 
 	void decocass_reset_w(offs_t offset, uint8_t data);
 
-	uint8_t decocass_e5xx_r(offs_t offset);
-	void decocass_e5xx_w(offs_t offset, uint8_t data);
+	virtual uint8_t decocass_e5xx_r(offs_t offset);
+	virtual void decocass_e5xx_w(offs_t offset, uint8_t data);
 	void decocass_de0091_w(offs_t offset, uint8_t data);
 	void decocass_e900_w(uint8_t data);
 
@@ -448,6 +451,25 @@ private:
 	/* dongle type widel: status */
 	int32_t     m_widel_ctrs = 0;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
 	int32_t     m_widel_latch = 0;        /* latched enable PROM (1100xxxx written to E5x1) */
+};
+
+class decocass_darksoft_state : public decocass_state
+{
+public:
+	decocass_darksoft_state(const machine_config &mconfig, device_type type, const char *tag)
+		: decocass_state(mconfig, type, tag)
+	{
+	}
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+
+	uint8_t decocass_darksoft_r(offs_t offset);
+	void decocass_darksoft_w(offs_t offset, uint8_t data);
+
+	uint32_t m_address;
 };
 
 #endif // MAME_INCLUDES_DECOCASS_H

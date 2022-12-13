@@ -12459,6 +12459,8 @@ ctower                          // 1981.03 The Tower
 ctsttape                        // ?
 czeroize                        // 37 1983.10 Zeroize
 decocass                        //
+decodark                        //
+decodark15                      //
 decomult                        //
 
 @source:dec/decstation.cpp
