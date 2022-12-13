@@ -78,9 +78,6 @@ uint8_t md_base_state::megadriv_68k_YM2612_read(offs_t offset, uint8_t mem_mask)
 		LOG("%s: 68000 attempting to access YM2612 (read) without bus\n", machine().describe_context());
 		return 0;
 	}
-
-	// never executed
-	//return -1;
 }
 
 
@@ -681,8 +678,7 @@ void md_base_state::machine_start()
 {
 	md_core_state::machine_start();
 
-	if (m_z80snd)
-		m_genz80.z80_run_timer = timer_alloc(FUNC(md_base_state::megadriv_z80_run_state), this);
+	m_genz80.z80_run_timer = timer_alloc(FUNC(md_base_state::megadriv_z80_run_state), this);
 }
 
 void md_base_state::machine_reset()
@@ -692,14 +688,11 @@ void md_base_state::machine_reset()
 	// default state of z80 = reset, with bus
 	osd_printf_debug("Resetting Megadrive / Genesis\n");
 
-	if (m_z80snd)
-	{
-		m_genz80.z80_is_reset = 1;
-		m_genz80.z80_has_bus = 1;
-		m_genz80.z80_bank_addr = 0;
-		m_vdp->set_scanline_counter(-1);
-		m_genz80.z80_run_timer->adjust(attotime::zero);
-	}
+	m_genz80.z80_is_reset = 1;
+	m_genz80.z80_has_bus = 1;
+	m_genz80.z80_bank_addr = 0;
+	m_vdp->set_scanline_counter(-1);
+	m_genz80.z80_run_timer->adjust(attotime::zero);
 
 	if (m_megadrive_ram)
 		memset(m_megadrive_ram, 0x00, 0x10000);
@@ -732,17 +725,14 @@ void md_base_state::megadriv_stop_scanline_timer()
 // this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
 WRITE_LINE_MEMBER(md_base_state::vdp_sndirqline_callback_genesis_z80)
 {
-	if (m_z80snd)
+	if (state == ASSERT_LINE)
 	{
-		if (state == ASSERT_LINE)
-		{
-			if ((m_genz80.z80_has_bus == 1) && (m_genz80.z80_is_reset == 0))
-				m_z80snd->set_input_line(0, HOLD_LINE);
-		}
-		else if (state == CLEAR_LINE)
-		{
-			m_z80snd->set_input_line(0, CLEAR_LINE);
-		}
+		if ((m_genz80.z80_has_bus == 1) && (m_genz80.z80_is_reset == 0))
+			m_z80snd->set_input_line(0, HOLD_LINE);
+	}
+	else if (state == CLEAR_LINE)
+	{
+		m_z80snd->set_input_line(0, CLEAR_LINE);
 	}
 }
 
@@ -808,8 +798,6 @@ void md_core_state::md_core_ntsc(machine_config &config)
 	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
 	m_screen->set_screen_update(FUNC(md_core_state::screen_update_megadriv)); /* Copies a bitmap */
 	m_screen->screen_vblank().set(FUNC(md_core_state::screen_vblank_megadriv)); /* Used to Sync the timing */
-
-	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7); // 7.67 MHz
 }
 
 void md_core_state::md_core_pal(machine_config &config)
@@ -834,8 +822,6 @@ void md_core_state::md_core_pal(machine_config &config)
 	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
 	m_screen->set_screen_update(FUNC(md_core_state::screen_update_megadriv)); /* Copies a bitmap */
 	m_screen->screen_vblank().set(FUNC(md_core_state::screen_vblank_megadriv)); /* Used to Sync the timing */
-
-	YM2612(config, m_ymsnd, MASTER_CLOCK_PAL / 7); // 7.67 MHz
 }
 
 
@@ -887,22 +873,23 @@ void md_base_state::md_ntsc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_68k_map);
 
-	Z80(config, m_z80snd, MASTER_CLOCK_NTSC / 15); /* 3.58 MHz */
+	Z80(config, m_z80snd, MASTER_CLOCK_NTSC / 15); // 3.58 MHz
 	m_z80snd->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_z80_map);
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
-	/* IRQ handled via the timers */
+	// IRQ handled via the timers
 
-	/* I/O port controllers */
+	// I/O port controllers
 	megadriv_ioports(config);
 
 	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
+	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(1, "rspeaker", 0.50);
 }
@@ -925,22 +912,23 @@ void md_base_state::md_pal(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_68k_map);
 
-	Z80(config, m_z80snd, MASTER_CLOCK_PAL / 15); /* 3.58 MHz */
+	Z80(config, m_z80snd, MASTER_CLOCK_PAL / 15); // 3.58 MHz
 	m_z80snd->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_z80_map);
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
-	/* IRQ handled via the timers */
+	// IRQ handled via the timers
 
-	/* I/O port controllers */
+	// I/O port controllers
 	megadriv_ioports(config);
 
 	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
+	YM2612(config, m_ymsnd, MASTER_CLOCK_PAL / 7); // 7.67 MHz
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(1, "rspeaker", 0.50);
 }
@@ -963,16 +951,13 @@ void md_core_state::megadriv_tas_callback(offs_t offset, uint8_t data)
 
 void md_base_state::megadriv_init_common()
 {
-	/* Look to see if this system has the standard Sound Z80 */
-	if (m_z80snd)
-	{
-		m_genz80.z80_prgram = std::make_unique<uint8_t[]>(0x2000);
-		membank("bank1")->set_base(m_genz80.z80_prgram.get());
-		save_item(NAME(m_genz80.z80_is_reset));
-		save_item(NAME(m_genz80.z80_has_bus));
-		save_item(NAME(m_genz80.z80_bank_addr));
-		save_pointer(NAME(m_genz80.z80_prgram), 0x2000);
-	}
+	// This system has the standard Sound Z80
+	m_genz80.z80_prgram = std::make_unique<uint8_t[]>(0x2000);
+	membank("bank1")->set_base(m_genz80.z80_prgram.get());
+	save_item(NAME(m_genz80.z80_is_reset));
+	save_item(NAME(m_genz80.z80_has_bus));
+	save_item(NAME(m_genz80.z80_bank_addr));
+	save_pointer(NAME(m_genz80.z80_prgram), 0x2000);
 
 	m_maincpu->set_tas_write_callback(*this, FUNC(md_base_state::megadriv_tas_callback));
 }
@@ -1007,7 +992,7 @@ void md_base_state::init_megadrie()
 {
 	megadriv_init_common();
 
-	// todo: move this to the device interface?
+	// TODO: move this to the device interface?
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(true);
 	m_vdp->set_framerate(50);

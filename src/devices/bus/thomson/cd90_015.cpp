@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-// CD 90-015 - Floppy drive selectler built from a wd1770
+// CD 90-015 - Floppy drive controller built from a MC6843
 //
-// Handles up to two 5.25 dual-sided drives (DD 90-320)
+// Handles up to four 5.25 single-sided drives (UD 90-070)
 
 #include "emu.h"
 #include "cd90_015.h"
 #include "formats/thom_dsk.h"
 
-DEFINE_DEVICE_TYPE(CD90_015, cd90_015_device, "cd90_015", "Thomson CD 90-015 floppy drive selectler")
+DEFINE_DEVICE_TYPE(CD90_015, cd90_015_device, "cd90_015", "Thomson CD 90-015 floppy drive controller")
 
 cd90_015_device::cd90_015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CD90_015, tag, owner, clock),
@@ -43,7 +43,7 @@ const tiny_rom_entry *cd90_015_device::device_rom_region() const
 
 void cd90_015_device::floppy_drives(device_slot_interface &device)
 {
-	device.option_add("dd90_015", FLOPPY_525_SD);
+	device.option_add("ud90_070", FLOPPY_525_SSSD);
 }
 
 void cd90_015_device::floppy_formats(format_registration &fr)
@@ -55,7 +55,7 @@ void cd90_015_device::device_add_mconfig(machine_config &config)
 {
 	MC6843(config, m_fdc, DERIVED_CLOCK(1, 2)); // Comes from the main board
 	m_fdc->force_ready();
-	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "dd90_015", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "ud90_070", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], floppy_drives, nullptr,    floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[2], floppy_drives, nullptr,    floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[3], floppy_drives, nullptr,    floppy_formats).enable_sound(true);

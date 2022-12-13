@@ -89,8 +89,7 @@ void md_cons_state::machine_start()
 	if (m_cart)
 		m_cart->save_nvram();
 
-	if (m_z80snd)
-		m_genz80.z80_run_timer = timer_alloc(FUNC(md_base_state::megadriv_z80_run_state), this);
+	m_genz80.z80_run_timer = timer_alloc(FUNC(md_cons_state::megadriv_z80_run_state), this);
 }
 
 void md_cons_state::install_cartslot()

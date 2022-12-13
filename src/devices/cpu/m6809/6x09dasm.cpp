@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods,Sean Riddle,Tim Lindner
 /*****************************************************************************
 
-    6x09dasm.cpp - a 6809/6309/Konami opcode disassembler
+    a 6809/6309/Konami opcode disassembler
 
     Based on:
         6309dasm.c - a 6309 opcode disassembler
@@ -10,7 +10,6 @@
         Copyright Tim Lindner
 
     and
-
         6809dasm.c - a 6809 opcode disassembler
         Version 1.4 1-MAR-95
         Copyright Sean Riddle

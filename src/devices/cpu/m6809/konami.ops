@@ -410,7 +410,7 @@ INDEXED:
 		case 0xA7: case 0xB7: case 0xD7: case 0xE7: case 0xF7:
 			// relative to register D
 			m_temp.w = ireg() + (int16_t) m_q.r.d;
-			@eat(4);
+			@eat(2);
 			break;
 
 		default:
@@ -579,7 +579,6 @@ RORD:
 ABS8:
 	@m_temp.b.l = read_operand();
 	m_temp.b.l = set_flags<uint8_t>(CC_NZVC, 0, m_temp.b.l, ((int8_t) m_temp.b.l) >= 0 ? m_temp.b.l : -m_temp.b.l);
-	@eat(1);
 	write_operand(m_temp.b.l);
 	return;
 
@@ -587,7 +586,6 @@ ABS16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	m_temp.w = set_flags<uint16_t>(CC_NZVC, 0, m_temp.w, ((int16_t) m_temp.w) >= 0 ? m_temp.w : -m_temp.w);
-	@eat(1);
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;

@@ -2,8 +2,6 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    konami.h
-
     Portable Konami CPU emulator
 
 **********************************************************************/
@@ -43,6 +41,8 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	virtual bool hd6309_native_mode() override { return true; }
 
 private:
 	typedef m6809_base_device super;

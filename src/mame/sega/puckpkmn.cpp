@@ -12,7 +12,7 @@ Puckman Pockimon - (c)2000 Genie? (there should be a way to show Sun Mixing copy
 
 |---------------------------------------|
 | VOL    4558    4MHz   PAL     62256   |
-| YM3812 YM3014                         |
+| U6612  U6614B                         |
 | 3.579545MHz    555    PAL     |------||
 | LM324     M6295        |----| |TV16B ||
 |          ROM.U3   PAL  |YBOX| |      ||
@@ -31,8 +31,9 @@ Puckman Pockimon - (c)2000 Genie? (there should be a way to show Sun Mixing copy
 Notes:
       Main CPU is 68000-based, but actual CPU chip is not known
       Master clock 53.693175MHz. CPU likely running at 53.693175/7 or /6 (??)
-      YM3812 clock 3.579545MHz
-      M6295 clock 1.000MHz (4/4]. Sample rate = 1000000/132
+      U6612 (YM2612 clone?) clock 3.579545MHz
+      U6614B (YM3014B clone?)
+      M6295 clock 1.000MHz (4/4). Sample rate = 1000000/132
       VSync 60Hz
       HSync 16.24kHz
       62256 - 8k x8 SRAM (DIP28)
@@ -61,7 +62,8 @@ class puckpkmn_state : public md_core_state
 {
 public:
 	puckpkmn_state(const machine_config &mconfig, device_type type, const char *tag) :
-		md_core_state(mconfig, type, tag)
+		md_core_state(mconfig, type, tag),
+		m_ymsnd(*this,"ymsnd")
 	{
 	}
 
@@ -78,6 +80,8 @@ private:
 	void puckpkmn_map(address_map &map) ATTR_COLD;
 	void puckpkmna_map(address_map &map) ATTR_COLD;
 	void puckpkmnb_map(address_map &map) ATTR_COLD;
+
+	optional_device<ym_generic_device> m_ymsnd;
 };
 
 
@@ -406,6 +410,7 @@ void puckpkmn_state::puckpkmn(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
+	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC / 7); // TODO: confirm clock
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(1, "rspeaker", 0.50);
 
@@ -547,7 +552,7 @@ ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */
 ROM_END
 
 /*
-Puckman Pokimon (alt.)
+精靈家族/Jīnglíng Jiāzú (Traditional Chinese)
 
 
 PCB Layout
@@ -581,7 +586,7 @@ Notes:
       TK-20K - custom chip, probably the CPU (QFP100). Clock unknown.
       M6295  - clock 1.000MHz [4/4]
 
-      4x 1Mx8 flashROMs (B*.U59) are mounted onto a DIP42 carrier board to make a
+      4x 1Mx8 Flash ROMs (B*.U59) are mounted onto a DIP42 carrier board to make a
       32MBit EPROM equivalent. It appears to contain graphics plus the main program.
       ROM A.U3 contains samples for the M6295.
 
@@ -615,7 +620,7 @@ ROM_START( puckpkmnb )
 ROM_END
 
 
-//決戰天皇/Juézhàn tiānhuáng (Traditional Chinese)
+//決戰天皇/Juézhàn Tiānhuáng (Traditional Chinese)
 ROM_START( jzth )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s.y.u5", 0x000000, 0x080000, CRC(a4a526b5) SHA1(85d0299caf91ff50b6870f845b9aacbd358ed81f) )
@@ -638,6 +643,6 @@ ROM_END
 // Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile RAM
 // Is 'Genie 2000' part of the title, and the parent set a bootleg?
 GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Genie",      "Puckman Pockimon (set 1)", 0 )
-GAME( 2000, puckpkmna, puckpkmn, puckpkmna, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS",        "Puckman Pockimon (set 2)", 0 )
-GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Sun Mixing", "Puckman Pockimon (set 3)", 0 )
+GAME( 2000, puckpkmna, puckpkmn, puckpkmna, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS",        "Jingling Jiazu",           0 )
+GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Sun Mixing", "Puckman Pockimon (set 2)", 0 )
 GAME( 2000, jzth,      0,        jzth,      jzth,     jzth_state,     init_puckpkmn, ROT0, "<unknown>",  "Juezhan Tianhuang",        MACHINE_IMPERFECT_SOUND )
