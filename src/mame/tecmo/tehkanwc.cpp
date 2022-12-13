@@ -77,17 +77,6 @@ TO DO :
   - Confirm "Difficulty" Dip Switch in 'teedoff'
 
 ***************************************************************************/
-/* Notes: DJH 04 Jan 2008
-
-  fixed gridiron079gre (shared access to spriteram was broken)
-
-  The inputs seem to be a hacky mess (although there was reportedly a
-  hardware joystick hack for tehkanwc via plugin logic subboard, is this
-  attempting to simulate it?
-
-  Also there is a hack to reset the sound CPU...
-
-*/
 
 #include "emu.h"
 #include "tehkanwc.h"
@@ -124,21 +113,11 @@ void tehkanwc_state::sub_cpu_halt_w(uint8_t data)
 
 uint8_t tehkanwc_state::track_0_r(offs_t offset)
 {
-	int joy;
-
-	joy = ioport("FAKE")->read() >> (2 * offset);
-	if (joy & 1) return -63;
-	if (joy & 2) return 63;
 	return ioport(offset ? "P1Y" : "P1X")->read() - m_track0[offset];
 }
 
 uint8_t tehkanwc_state::track_1_r(offs_t offset)
 {
-	int joy;
-
-	joy = ioport("FAKE")->read() >> (4 + 2 * offset);
-	if (joy & 1) return -63;
-	if (joy & 2) return 63;
 	return ioport(offset ? "P2Y" : "P2X")->read() - m_track1[offset];
 }
 
@@ -377,19 +356,19 @@ static INPUT_PORTS_START( tehkanwc )
 	PORT_DIPSETTING (   0x08, DEF_STR( On ) )
 
 	PORT_START("P1X")   /* IN0 - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
 
 	PORT_START("P1Y")   /* IN0 - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
 
 	PORT_START("P1BUT") /* IN0 - BUTTON */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
 	PORT_START("P2X")    /* IN1 - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 
 	PORT_START("P2Y")   /* IN1 - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 
 	PORT_START("P2BUT") /* IN1 - BUTTON */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -400,16 +379,6 @@ static INPUT_PORTS_START( tehkanwc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("FAKE")  /* fake port to emulate trackballs with keyboard */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tehkanwcd )
@@ -536,9 +505,6 @@ static INPUT_PORTS_START( gridiron )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("FAKE")  /* no fake port here */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -613,9 +579,6 @@ static INPUT_PORTS_START( teedoff )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("FAKE")  /* no fake port here */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -999,10 +962,6 @@ ROM_START( teedoffj )
 	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
 	ROM_LOAD( "to-5.4r",     0x0000, 0x8000, CRC(e5e4246b) SHA1(b2fe2e68fa86163ebe1ef00ecce73fb62cef6b19) )
 ROM_END
-
-/* There are some dumps out there that only have the year hacked to 1986 and a little bunch of bytes
-   from the graphics zone. I think that not worth to support these hacks...
-*/
 
 
 GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
