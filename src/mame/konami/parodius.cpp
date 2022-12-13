@@ -234,7 +234,7 @@ void parodius_state::main_map(address_map &map)
 	map(0x3fc4, 0x3fc4).w(FUNC(parodius_state::videobank_w));
 	map(0x3fc8, 0x3fc8).w(FUNC(parodius_state::sh_irqtrigger_w));
 	map(0x3fcc, 0x3fcd).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
-	map(0x6000, 0x9fff).bankr(m_mainbank);            // banked ROM
+	map(0x6000, 0x9fff).bankr(m_mainbank);
 	map(0xa000, 0xffff).rom().region("maincpu", 0x3a000);
 }
 
@@ -261,7 +261,7 @@ void parodius_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( parodius )
 	PORT_START("P1")
-	KONAMI8_ALT_B123(1)                     // button1 = power-up, button2 = shoot, button3 = missile
+	KONAMI8_ALT_B123(1) // button1 = power-up, button2 = shoot, button3 = missile
 
 	PORT_START("P2")
 	KONAMI8_ALT_B123(2)

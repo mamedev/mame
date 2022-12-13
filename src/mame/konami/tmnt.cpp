@@ -4395,42 +4395,31 @@ void tmnt_state::init_tmnt()
 
 	for (int A = 0; A < len; A++)
 	{
-#define CA0 0
-#define CA1 1
-#define CA2 2
-#define CA3 3
-#define CA4 4
-#define CA5 5
-#define CA6 6
-#define CA7 7
-#define CA8 8
-#define CA9 9
-
-		/* following table derived from the schematics. It indicates, for each of the */
-		/* 9 low bits of the sprite line address, which bit to pick it from. */
-		/* For example, when the PROM contains 4, which applies to 4x2 sprites, */
-		/* bit OA1 comes from CA5, OA2 from CA0, and so on. */
+		// following table derived from the schematics. It indicates, for each of the
+		// 9 low bits of the sprite line address, which bit to pick it from.
+		// For example, when the PROM contains 4, which applies to 4x2 sprites,
+		// bit OA1 comes from CA5, OA2 from CA0, and so on.
 		static const uint8_t bit_pick_table[10][8] =
 		{
-			/*0(1x1) 1(2x1) 2(1x2) 3(2x2) 4(4x2) 5(2x4) 6(4x4) 7(8x8) */
-			{ CA3,   CA3,   CA3,   CA3,   CA3,   CA3,   CA3,   CA3 },   /* CA3 */
-			{ CA0,   CA0,   CA5,   CA5,   CA5,   CA5,   CA5,   CA5 },   /* OA1 */
-			{ CA1,   CA1,   CA0,   CA0,   CA0,   CA7,   CA7,   CA7 },   /* OA2 */
-			{ CA2,   CA2,   CA1,   CA1,   CA1,   CA0,   CA0,   CA9 },   /* OA3 */
-			{ CA4,   CA4,   CA2,   CA2,   CA2,   CA1,   CA1,   CA0 },   /* OA4 */
-			{ CA5,   CA6,   CA4,   CA4,   CA4,   CA2,   CA2,   CA1 },   /* OA5 */
-			{ CA6,   CA5,   CA6,   CA6,   CA6,   CA4,   CA4,   CA2 },   /* OA6 */
-			{ CA7,   CA7,   CA7,   CA7,   CA8,   CA6,   CA6,   CA4 },   /* OA7 */
-			{ CA8,   CA8,   CA8,   CA8,   CA7,   CA8,   CA8,   CA6 },   /* OA8 */
-			{ CA9,   CA9,   CA9,   CA9,   CA9,   CA9,   CA9,   CA8 }    /* OA9 */
+			//0(1x1) 1(2x1) 2(1x2) 3(2x2) 4(4x2) 5(2x4) 6(4x4) 7(8x8)
+			{ 3,     3,     3,     3,     3,     3,     3,     3 }, // CA3
+			{ 0,     0,     5,     5,     5,     5,     5,     5 }, // OA1
+			{ 1,     1,     0,     0,     0,     7,     7,     7 }, // OA2
+			{ 2,     2,     1,     1,     1,     0,     0,     9 }, // OA3
+			{ 4,     4,     2,     2,     2,     1,     1,     0 }, // OA4
+			{ 5,     6,     4,     4,     4,     2,     2,     1 }, // OA5
+			{ 6,     5,     6,     6,     6,     4,     4,     2 }, // OA6
+			{ 7,     7,     7,     7,     8,     6,     6,     4 }, // OA7
+			{ 8,     8,     8,     8,     7,     8,     8,     6 }, // OA8
+			{ 9,     9,     9,     9,     9,     9,     9,     8 }  // OA9
 		};
 
-		/* pick the correct entry in the PROM (top 8 bits of the address) */
+		// pick the correct entry in the PROM (top 8 bits of the address)
 		int entry = code_conv_table[(A & 0x7f800) >> 11] & 7;
 
 		int bits[32];
 
-		/* the bits to scramble are the low 10 ones */
+		// the bits to scramble are the low 10 ones
 		for (int i = 0; i < 10; i++)
 			bits[i] = (A >> i) & 0x01;
 

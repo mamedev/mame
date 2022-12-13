@@ -1070,7 +1070,6 @@ ROM_END
 
 ***************************************************************************/
 
-
 GAME( 1991, vendetta,     0,        vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendettar,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendettaz,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)",          MACHINE_SUPPORTS_SAVE )
