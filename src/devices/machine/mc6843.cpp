@@ -308,6 +308,10 @@ TIMER_CALLBACK_MEMBER(mc6843_device::update_tick)
 
 void mc6843_device::command_start()
 {
+	// clear errors
+	m_strb = 0;
+	m_isr &= 0x7;
+
 	assert(m_state == S_IDLE);
 	switch(m_cmr & 0xf) {
 
