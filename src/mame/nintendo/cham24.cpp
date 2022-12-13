@@ -167,7 +167,7 @@ void cham24_state::cham24_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram(); // NES RAM
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).lw8(NAME([this] (address_space &space, u8 data) { m_ppu->spriteram_dma(space, data); }));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(cham24_state::cham24_in_r<0>), FUNC(cham24_state::cham24_in0_w));            // IN0 - input port 1
 	map(0x4017, 0x4017).r(FUNC(cham24_state::cham24_in_r<1>));    // IN1 - input port 2 / PSG second control register
 	map(0x8000, 0xbfff).bankr(m_prg_banks[0]).w(FUNC(cham24_state::cham24_mapper_w));

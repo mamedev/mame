@@ -35,8 +35,6 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	void sprite_dma_w(address_space &space, uint8_t data);
-
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
@@ -246,12 +244,6 @@ private:
 };
 
 
-void nes_clone_state::sprite_dma_w(address_space &space, uint8_t data)
-{
-	int source = (data & 7);
-	m_ppu->spriteram_dma(space, source);
-}
-
 // Standard NES style inputs (not using bus device as there are no real NES controller ports etc. these are all-in-one units and can be custom
 uint8_t nes_clone_state::in0_r()
 {
@@ -292,10 +284,10 @@ void nes_clone_state::nes_clone_basemap(address_map& map)
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
 
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
+
 	map(0x4016, 0x4016).rw(FUNC(nes_clone_state::in0_r), FUNC(nes_clone_state::in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_clone_state::in1_r));
-
-	map(0x4014, 0x4014).w(FUNC(nes_clone_state::sprite_dma_w));
 }
 
 void nes_clone_state::nes_clone_map(address_map& map)

@@ -1513,7 +1513,7 @@ void playch10_state::cart_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).lw8(NAME([this] (address_space &space, u8 data) { m_ppu->spriteram_dma(space, data); }));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(playch10_state::pc10_in0_r), FUNC(playch10_state::pc10_in0_w));
 	map(0x4017, 0x4017).r(FUNC(playch10_state::pc10_in1_r));  // IN1 - input port 2 / PSG second control register
 	// Games that don't bank PRG
