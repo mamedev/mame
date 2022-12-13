@@ -373,7 +373,7 @@ INDEXED:
 			m_ea.w = ireg();	// need to do this now because ireg() might be PC
 			@m_temp.b.l = read_opcode_arg();
 			m_temp.w = m_ea.w + (int8_t) m_temp.b.l;
-			eat(1);
+			eat(2);
 			break;
 
 		case 0x25: case 0x35: case 0x55: case 0x65: case 0x75:
@@ -398,19 +398,19 @@ INDEXED:
 		case 0xA0: case 0xB0: case 0xD0: case 0xE0: case 0xF0:
 			// relative to register A
 			m_temp.w = ireg() + (int8_t) m_q.r.a;
-			@eat(1);
+			eat(2);
 			break;
 
 		case 0xA1: case 0xB1: case 0xD1: case 0xE1: case 0xF1:
 			// relative to register B
 			m_temp.w = ireg() + (int8_t) m_q.r.b;
-			@eat(1);
+			eat(2);
 			break;
 
 		case 0xA7: case 0xB7: case 0xD7: case 0xE7: case 0xF7:
 			// relative to register D
 			m_temp.w = ireg() + (int16_t) m_q.r.d;
-			@eat(2);
+			eat(2);
 			break;
 
 		default:
@@ -425,7 +425,7 @@ INDEXED:
 		set_ea(m_temp.w);
 		@m_temp.b.h = read_operand(0);
 		@m_temp.b.l = read_operand(1);
-		nop();
+		eat(1);
 	}
 
 	set_ea(m_temp.w);
