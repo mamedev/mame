@@ -2286,8 +2286,8 @@ void decocass_state::init_cdsteljn()
 /* UX8 */ // 1985.01 Tokyo MIE Clinic/Tokyo MIE Shinryoujo Part 2
 /* UX9 */ // 1985.05 Geinoujin Shikaku Shiken
 
-GAME( 2008, decomult,  decocass, decocass, decocass, decocass_widel_state,  init_decocass, ROT270, "bootleg (David Widel)", "Deco Cassette System Multigame (David Widel, ROM based)", 0 )
+GAME( 2008, decomult,  decocass, decocass, decocass, decocass_widel_state,  init_decocass, ROT270, "bootleg (David Widel)", "DECO Cassette System ROM Multigame (David Widel)", 0 )
 
-GAME( 2022, decodark,  decocass, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "Deco Cassette System Multigame (Darksoft, ROM based, v16)", 0 )
-GAME( 2022, decodark15,decodark, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "Deco Cassette System Multigame (Darksoft, ROM based, v15)", 0 )
+GAME( 2022, decodark,  decocass, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "DECO Cassette System ROM Multigame (Darksoft, v16)", 0 )
+GAME( 2022, decodark15,decodark, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "DECO Cassette System ROM Multigame (Darksoft, v15)", 0 )
 // earlier revisions of this kit were released as early as 2017
