@@ -41,9 +41,37 @@ const tiny_rom_entry *cd90_015_device::device_rom_region() const
 	return ROM_NAME(cd90_015);
 }
 
+class ud90_070_device : public floppy_image_device {
+public:
+	ud90_070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual const char *image_interface() const noexcept override { return "floppy_5_25"; }
+
+protected:
+	virtual void setup_characteristics() override;
+};
+
+DEFINE_DEVICE_TYPE(UD90_070, ud90_070_device, "ud90_070", "Thomson UD 90-070 5.25\" single-sided disk drive")
+
+ud90_070_device::ud90_070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, UD90_070, tag, owner, clock)
+{
+}
+
+void ud90_070_device::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 40;
+	sides = 1;
+	has_trk00_sensor = false;
+	set_rpm(300);
+
+	variants.push_back(floppy_image::SSSD);
+}
+
 void cd90_015_device::floppy_drives(device_slot_interface &device)
 {
-	device.option_add("ud90_070", FLOPPY_525_SSSD);
+	device.option_add("ud90_070", UD90_070);
 }
 
 void cd90_015_device::floppy_formats(format_registration &fr)
