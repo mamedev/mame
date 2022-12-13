@@ -367,7 +367,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(up8w_w);
 	u8 ram_8w_r(offs_t offset);
 	void ram_8w_w(offs_t offset, u8 data);
-	void sprite_dma_w(address_space &space, u8 data);
 	void time_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(sdcs_w);
 	DECLARE_WRITE_LINE_MEMBER(cntrl_mask_w);
@@ -644,11 +643,6 @@ void playch10_state::ram_8w_w(offs_t offset, u8 data)
 	if (!m_up_8w)
 		offset &= 0x3ff;
 	m_ram_8w[offset] = data;
-}
-
-void playch10_state::sprite_dma_w(address_space &space, u8 data)
-{
-	m_ppu->spriteram_dma(space, data);
 }
 
 // Only used in single monitor bios
@@ -1519,7 +1513,7 @@ void playch10_state::cart_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(playch10_state::sprite_dma_w));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(playch10_state::pc10_in0_r), FUNC(playch10_state::pc10_in0_w));
 	map(0x4017, 0x4017).r(FUNC(playch10_state::pc10_in1_r));  // IN1 - input port 2 / PSG second control register
 	// Games that don't bank PRG
