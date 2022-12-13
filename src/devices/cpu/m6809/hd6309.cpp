@@ -2,8 +2,6 @@
 // copyright-holders:Nathan Woods,Tim Lindner
 /*********************************************************************
 
-    hd6309.c
-
     Copyright John Butler
     Copyright Tim Lindner
 

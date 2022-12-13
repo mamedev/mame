@@ -2,9 +2,8 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    konami.c
-
     Portable Konami cpu emulator
+	Custom HD6309 in a gate array with ROM blocks for instruction decoding.
 
     Based on M6809 cpu core copyright John Butler
 
