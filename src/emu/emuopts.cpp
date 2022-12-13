@@ -227,6 +227,16 @@ const options_entry emu_options::s_option_entries[] =
 };
 
 
+//**************************************************************************
+//  TYPES
+//**************************************************************************
+
+struct emu_options::software_options
+{
+	std::unordered_map<std::string, std::string>    slot;
+	std::unordered_map<std::string, std::string>    image;
+};
+
 
 //**************************************************************************
 //  CUSTOM OPTION ENTRIES AND SUPPORT CLASSES
@@ -413,6 +423,27 @@ namespace
 		// to peg the priority of any associated core_options::entry at the maximum priority
 		if (peg_priority && !entry.expired())
 			entry.lock()->set_priority(OPTION_PRIORITY_MAXIMUM);
+	}
+
+
+	//-------------------------------------------------
+	//  parse_software_identifier
+	//-------------------------------------------------
+
+	std::tuple<std::string_view, std::string_view> parse_software_identifier(std::string_view software_identifier)
+	{
+		std::string_view list_name, software_name;
+		auto colon_pos = software_identifier.find_first_of(':');
+		if (colon_pos != std::string::npos)
+		{
+			list_name = software_identifier.substr(0, colon_pos);
+			software_name = software_identifier.substr(colon_pos + 1);
+		}
+		else
+		{
+			software_name = software_identifier;
+		}
+		return std::make_tuple(list_name, software_name);
 	}
 }
 
@@ -863,9 +894,9 @@ void emu_options::set_software(std::string &&new_software)
 //  evaluate_initial_softlist_options
 //-------------------------------------------------
 
-emu_options::software_options emu_options::evaluate_initial_softlist_options(const std::string &software_identifier)
+emu_options::software_options emu_options::evaluate_initial_softlist_options(std::string_view software_identifier)
 {
-	software_options results;
+	std::optional<software_options> results;
 
 	// load software specified at the command line (if any of course)
 	if (!software_identifier.empty())
@@ -880,114 +911,156 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 		if (iter.count() == 0)
 			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", software_identifier);
 
-		// and finally set up the stack
-		std::stack<std::string> software_identifier_stack;
-		software_identifier_stack.push(software_identifier);
+		// parse this software identifier
+		auto [list_name, software_name] = parse_software_identifier(software_identifier);
 
-		// we need to keep evaluating softlist identifiers until the stack is empty
-		while (!software_identifier_stack.empty())
+		// loop through all softlist devices, and try to find one capable of handling the requested software
+		bool found = false;
+		int compatible_count = 0;
+		for (software_list_device &swlistdev : iter)
 		{
-			// pop the identifier
-			std::string current_software_identifier = std::move(software_identifier_stack.top());
-			software_identifier_stack.pop();
-
-			// and parse it
-			std::string list_name, software_name;
-			auto colon_pos = current_software_identifier.find_first_of(':');
-			if (colon_pos != std::string::npos)
+			if (list_name.empty() || (list_name == swlistdev.list_name()))
 			{
-				list_name = current_software_identifier.substr(0, colon_pos);
-				software_name = current_software_identifier.substr(colon_pos + 1);
-			}
-			else
-			{
-				software_name = current_software_identifier;
-			}
-
-			// loop through all softlist devices, and try to find one capable of handling the requested software
-			bool found = false;
-			bool compatible = false;
-			for (software_list_device &swlistdev : iter)
-			{
-				if (list_name.empty() || (list_name == swlistdev.list_name()))
+				// we can use this software list, try to evaluate it
+				std::optional<software_options> this_results = evaluate_single_software(config, swlistdev, software_name);
+				if (this_results)
 				{
-					const software_info *swinfo = swlistdev.find(software_name);
-					if (swinfo != nullptr)
+					results = std::move(this_results);
+					compatible_count++;
+				}
+				found = true;
+			}
+		}
+
+		if (compatible_count != 1)
+		{
+			software_list_device::display_matches(config, nullptr, software_name);
+
+			// The text of this options_error_exception() is then passed to osd_printf_error() in cli_frontend::execute().  Therefore, it needs
+			// to be human readable text.  We want to snake through a message about software incompatibility while being silent if that is not
+			// the case.
+			//
+			// Arguably, anything related to user-visible text should really be done within src/frontend.  The invocation of
+			// software_list_device::display_matches() should really be done there as well
+			if (!found)
+				throw options_error_exception("");
+			else if (compatible_count > 1)
+				throw options_error_exception("Software '%s' for system '%s' is ambiguous\n", software_name, m_system->name);
+			else
+				throw options_error_exception("Software '%s' is incompatible with system '%s'\n", software_name, m_system->name);
+		}
+	}
+	return results.value_or(software_options());
+}
+
+
+//-------------------------------------------------
+//  evaluate_single_software
+//-------------------------------------------------
+
+std::optional<emu_options::software_options> emu_options::evaluate_single_software(const machine_config &config, software_list_device &swlistdev, std::string_view software_name) const
+{
+	bool is_compatible = false;
+	software_options result;
+
+	// set up a stack because loading one piece of software may trigger more required software
+	std::stack<std::tuple<software_list_device *, std::string_view>> software_identifier_stack;
+	software_identifier_stack.push(std::make_tuple(&swlistdev, software_name));
+
+	// we need to keep evaluating softlist identifiers until the stack is empty
+	while (!software_identifier_stack.empty())
+	{
+		// pop the identifier
+		auto [current_swlistdev, current_software_name] = software_identifier_stack.top();
+		software_identifier_stack.pop();
+
+		// find this software, and bail if we can't find it
+		const software_info *swinfo = current_swlistdev->find(current_software_name);
+		if (!swinfo)
+			return { };
+
+		// loop through all parts
+		for (const software_part &swpart : swinfo->parts())
+		{
+			// only load compatible software this way
+			if (current_swlistdev->is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
+			{
+				// it is compatible; so we want to return something
+				is_compatible = true;
+
+				// we need to find a mountable image slot, but we need to ensure it is a slot
+				// for which we have not already distributed a part to
+				device_image_interface *image = software_list_device::find_mountable_image(
+					config,
+					swpart,
+					[&result](const device_image_interface &candidate) { return result.image.count(candidate.instance_name()) == 0; });
+
+				// did we find a slot to put this part into?
+				if (image)
+				{
+					// we've resolved this software
+					result.image[image->instance_name()] = string_format("%s:%s:%s", current_swlistdev->list_name(), swinfo->shortname(), swpart.name());
+
+					// does this software part have a requirement on another part?
+					const char *requirement = swpart.feature("requirement");
+					if (requirement)
 					{
-						// loop through all parts
-						for (const software_part &swpart : swinfo->parts())
-						{
-							// only load compatible software this way
-							if (swlistdev.is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
-							{
-								// we need to find a mountable image slot, but we need to ensure it is a slot
-								// for which we have not already distributed a part to
-								device_image_interface *image = software_list_device::find_mountable_image(
-										config,
-										swpart,
-										[&results] (const device_image_interface &candidate)
-										{
-											return results.image.count(candidate.instance_name()) == 0;
-										});
+						// we do have a requirement - we need to parse it
+						auto [requirement_list_name, requirement_software_name] = parse_software_identifier(requirement);
 
-								// did we find a slot to put this part into?
-								if (image != nullptr)
+						// find the actual device
+						software_list_device *requirement_swdev = nullptr;
+						int requirement_swdevs_found = 0;
+
+						// see if we can find this requirement
+						software_list_device_enumerator swdevice_iter(config.root_device());
+						for (software_list_device &swdev : swdevice_iter)
+						{
+							if (requirement_list_name.empty() || swdev.list_name() == requirement_list_name)
+							{
+								if (swdev.find(requirement_software_name))
 								{
-									// we've resolved this software
-									results.image[image->instance_name()] = string_format("%s:%s:%s", swlistdev.list_name(), software_name, swpart.name());
-
-									// does this software part have a requirement on another part?
-									const char *requirement = swpart.feature("requirement");
-									if (requirement)
-										software_identifier_stack.push(requirement);
+									requirement_swdev = &swdev;
+									requirement_swdevs_found++;
 								}
-								compatible = true;
 							}
-							found = true;
 						}
 
-						// identify other shared features specified as '<<slot name>>_default'
-						//
-						// example from SMS:
-						//
-						//  <software name = "alexbmx">
-						//      ...
-						//      <sharedfeat name = "ctrl1_default" value = "paddle" />
-						//  </software>
-						for (const software_info_item &fi : swinfo->shared_features())
-						{
-							const std::string default_suffix = "_default";
-							if (fi.name().size() > default_suffix.size()
-								&& fi.name().compare(fi.name().size() - default_suffix.size(), default_suffix.size(), default_suffix) == 0)
-							{
-								std::string slot_name = fi.name().substr(0, fi.name().size() - default_suffix.size());
-								results.slot[slot_name] = fi.value();
-							}
-						}
+						// if we couldn't find the requirement, bail
+						if (!requirement_swdev || requirement_swdevs_found != 1)
+							return { };
+
+						// push the resolved identifier onto the stack
+						software_identifier_stack.push(std::make_tuple(requirement_swdev, requirement_software_name));
 					}
 				}
-				if (compatible)
-					break;
 			}
 
-			if (!compatible)
+			// identify other shared features specified as '<<slot name>>_default'
+			//
+			// example from SMS:
+			//
+			//  <software name = "alexbmx">
+			//      ...
+			//      <sharedfeat name = "ctrl1_default" value = "paddle" />
+			//  </software>
+			for (const software_info_item &fi : swinfo->shared_features())
 			{
-				software_list_device::display_matches(config, nullptr, software_name);
-
-				// The text of this options_error_exception() is then passed to osd_printf_error() in cli_frontend::execute().  Therefore, it needs
-				// to be human readable text.  We want to snake through a message about software incompatibility while being silent if that is not
-				// the case.
-				//
-				// Arguably, anything related to user-visible text should really be done within src/frontend.  The invocation of
-				// software_list_device::display_matches() should really be done there as well
-				if (!found)
-					throw options_error_exception("");
-				else
-					throw options_error_exception("Software '%s' is incompatible with system '%s'\n", software_name, m_system->name);
+				const std::string default_suffix = "_default";
+				if (fi.name().size() > default_suffix.size()
+					&& fi.name().compare(fi.name().size() - default_suffix.size(), default_suffix.size(), default_suffix) == 0)
+				{
+					std::string slot_name = fi.name().substr(0, fi.name().size() - default_suffix.size());
+					result.slot[slot_name] = fi.value();
+				}
 			}
 		}
 	}
-	return results;
+
+	// only return something if we're compatible
+	return is_compatible
+		? result
+		: std::optional<emu_options::software_options>();
 }
 
 
