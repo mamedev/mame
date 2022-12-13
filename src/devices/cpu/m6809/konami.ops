@@ -393,6 +393,7 @@ INDEXED:
 			// direct addressing mode
 			m_temp.b.h = m_dp;
 			@m_temp.b.l = read_opcode_arg();
+			eat(1);
 			break;
 
 		case 0xA0: case 0xB0: case 0xD0: case 0xE0: case 0xF0:
