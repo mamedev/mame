@@ -517,7 +517,7 @@ LSRD:
 	if (m_temp.b.l != 0x00)
 	{
 		// set C condition code
-		if (m_q.r.d & safe_shift_left(1, m_temp.b.l))
+		if (m_q.r.d & safe_shift_left(1, m_temp.b.l - 1))
 			m_cc |= CC_C;
 		else
 			m_cc &= ~CC_C;
@@ -547,7 +547,7 @@ ASRD:
 	if (m_temp.b.l != 0x00)
 	{
 		// set C condition code
-		if (m_q.r.d & safe_shift_left(1, m_temp.b.l))
+		if (m_q.r.d & safe_shift_left(1, m_temp.b.l - 1))
 			m_cc |= CC_C;
 		else
 			m_cc &= ~CC_C;
