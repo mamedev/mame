@@ -195,6 +195,7 @@ ddr/pcm.cpp
 ddr/poly880.cpp
 ddr/sc2.cpp
 ddr/slc1.cpp
+ddr/sprachmg.cpp
 ddr/vcs80.cpp
 dec/dct11em.cpp
 dec/decmate2.cpp
@@ -1102,6 +1103,7 @@ trs/agvision.cpp
 trs/coco12.cpp
 trs/coco3.cpp
 trs/dgn_beta.cpp
+trs/dgnalpha.cpp
 trs/dragon.cpp
 trs/lnw80.cpp
 trs/max80.cpp
