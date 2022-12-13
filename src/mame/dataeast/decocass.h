@@ -173,8 +173,8 @@ private:
 
 	void decocass_reset_w(offs_t offset, uint8_t data);
 
-	virtual uint8_t decocass_e5xx_r(offs_t offset);
-	virtual void decocass_e5xx_w(offs_t offset, uint8_t data);
+	uint8_t decocass_e5xx_r(offs_t offset);
+	void decocass_e5xx_w(offs_t offset, uint8_t data);
 	void decocass_de0091_w(offs_t offset, uint8_t data);
 	void decocass_e900_w(uint8_t data);
 
