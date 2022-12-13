@@ -152,7 +152,7 @@ UPD3301_FETCH_ATTRIBUTE( pc8801_state::attr_fetch )
 	const u8 attr_max_size = 80;
 	std::array<u16, attr_max_size> attr_extend_info = pc8001_base_state::attr_fetch(attr_row, gfx_mode, y, attr_fifo_size, row_size);
 	// In case we are in a b&w mode copy the attribute structure in an internal buffer for color processing.
-	// TBD if decoration attributes applies to bitmap as well (very likely)
+	// It's unknown at this time if decoration attributes applies to bitmap as well
 	if ((m_gfx_ctrl & 0x18) == 0x08 && gfx_mode == 2)
 	{
 		for (int ey = y; ey < y + m_crtc->lines_per_char(); ey ++)
@@ -235,7 +235,7 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 					if (!res)
 						return 0;
 
-					return m_crtc->get_display_status() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+					return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
 				});
 			}
 			else
@@ -244,20 +244,22 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				// - p1demo2d expects to use CRTC palette on demonstration
 				//   (white text that is set to black on previous title screen animation,
 				//    that runs in 3bpp)
+				// - byoin set a transparent text layer (ASCII=0x20 / attribute = 0x80 0x00)
+				//   but it's in gfx_mode = 0 (b&w) so it just draw white from here.
 				draw_bitmap(bitmap, cliprect, m_crtc_palette, [&](u32 bitmap_offset, int y, int x, int xi){
 					u8 res = 0;
 					// HW pick ups just the first two planes (R and B), G is unused for drawing purposes.
 					// Plane switch happens at half screen, VRAM areas 0x3e80-0x3fff is unused again.
 					// TODO: confirm that a 15 kHz monitor cannot work with this
 					// - jettermi just uses the other b&w mode;
-					// - casablan doesn't bother in changing resolution so only the upper part is drawn;
+					// - casablan/byoin doesn't bother in changing resolution so only the upper part is drawn;
 					int plane_offset = y >= 200 ? 384 : 0;
 
 					res |= ((m_gvram[bitmap_offset + plane_offset] >> xi) & 1);
 					if (!res)
 						return 0;
 
-					return m_crtc->get_display_status() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+					return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
 				});
 			}
 		}

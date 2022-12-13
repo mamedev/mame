@@ -727,6 +727,11 @@ bool upd3301_device::get_display_status()
 	return bool(m_status & STATUS_VE);
 }
 
+bool upd3301_device::is_gfx_color_mode()
+{
+	return get_display_status() && (m_gfx_mode == 2);
+}
+
 
 void upd3301_device::set_display(int state)
 {
