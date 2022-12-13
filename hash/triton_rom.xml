@@ -11,8 +11,8 @@ license:CC0
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="rom" interface="triton_rom">
-			<dataarea name="rom" size="2048">
-				<rom name="fastvdu.bin" size="2048" crc="e2c12ef1" sha1="e5121ecffd02b52a44d269f3b28ff36c6c634fd0"/>
+			<dataarea name="rom" size="1024">
+				<rom name="fastvdu.bin" size="1024" crc="e2c12ef1" sha1="e5121ecffd02b52a44d269f3b28ff36c6c634fd0"/>
 			</dataarea>
 		</part>
 	</software>
