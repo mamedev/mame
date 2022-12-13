@@ -10,7 +10,8 @@
 
 #pragma once
 
-#include "bus/gamegear/ggext.h"
+#include "mdioport.h"
+
 #include "bus/sega8/sega8_slot.h"
 #include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_ctrl/smsctrl.h"
@@ -37,8 +38,6 @@ public:
 		m_ym(*this, "ym2413"),
 		m_port_ctrl1(*this, "ctrl1"),
 		m_port_ctrl2(*this, "ctrl2"),
-		m_port_gg_ext(*this, "ext"),
-		m_port_gg_dc(*this, "GG_PORT_DC"),
 		m_port_pause(*this, "PAUSE"),
 		m_port_reset(*this, "RESET"),
 		m_port_rapid(*this, "RAPID"),
@@ -124,9 +123,7 @@ protected:
 	optional_device<ym2413_device> m_ym;
 	optional_device<sms_control_port_device> m_port_ctrl1;
 	optional_device<sms_control_port_device> m_port_ctrl2;
-	optional_device<gg_ext_port_device> m_port_gg_ext;
 
-	optional_ioport m_port_gg_dc;
 	optional_ioport m_port_pause;
 	optional_ioport m_port_reset;
 	optional_ioport m_port_rapid;
@@ -302,7 +299,11 @@ class gamegear_state : public sms_state
 {
 public:
 	gamegear_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sms_state(mconfig, type, tag)
+		sms_state(mconfig, type, tag),
+		m_io_view(*this, "io"),
+		m_gg_ioport(*this, "ioport"),
+		m_port_gg_ext(*this, "ext"),
+		m_port_gg_dc(*this, "GG_PORT_DC")
 	{ }
 
 	void gamegear(machine_config &config);
@@ -318,17 +319,25 @@ private:
 	template <typename X> static void screen_gg_raw_params(screen_device &screen, X &&pixelclock);
 
 	uint8_t gg_input_port_00_r();
-	uint8_t gg_sio_r(offs_t offset);
-	void gg_sio_w(offs_t offset, uint8_t data);
-	void gg_psg_stereo_w(uint8_t data);
+	uint8_t gg_input_port_dc_r();
+	uint8_t gg_input_port_dd_r();
+	void gg_io_control_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(gg_pause_callback);
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
+	DECLARE_WRITE_LINE_MEMBER(gg_nmi);
 
 	uint32_t screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void gg_io(address_map &map);
+
+	memory_view m_io_view;
+
+	required_device<gamegear_io_port_device> m_gg_ioport;
+	required_device<sms_control_port_device> m_port_gg_ext;
+
+	required_ioport m_port_gg_dc;
 
 	// for gamegear SMS mode scaling
 	bitmap_rgb32 m_gg_sms_mode_bitmap;
@@ -337,7 +346,6 @@ private:
 	// vertical scaling in the Game Gear SMS compatibility mode.
 	std::unique_ptr<int []> m_line_buffer;
 
-	uint8_t m_gg_sio[5]{};
 	int m_gg_paused = 0;
 };
 
