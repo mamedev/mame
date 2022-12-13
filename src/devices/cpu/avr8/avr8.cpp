@@ -2297,7 +2297,7 @@ void avr8_device::adc_start_conversion()
 	// get a sample - the sample-and-hold circuit will hold this for the duration of the conversion
 	if (AVR8_ADMUX_MUX < 0x8)
 	{
-		m_adc_sample = m_adc_in_cb[AVR8_ADMUX_MUX]();
+		m_adc_sample = m_adc_in_cb[AVR8_ADMUX_MUX]() & 0x3ff;
 	}
 	else if (AVR8_ADMUX_MUX == 0xe)
 	{

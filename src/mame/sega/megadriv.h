@@ -32,7 +32,6 @@ protected:
 		m_scan_timer(*this, "md_scan_timer"),
 		m_vdp(*this,"gen_vdp"),
 		m_screen(*this,"megadriv"),
-		m_ymsnd(*this,"ymsnd"),
 		m_io_reset(*this, "RESET")
 	{
 	}
@@ -51,7 +50,6 @@ protected:
 	required_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
 	optional_device<screen_device> m_screen;
-	optional_device<ym_generic_device> m_ymsnd;
 
 	optional_ioport m_io_reset;
 
@@ -68,16 +66,11 @@ private:
 class md_base_state : public md_core_state
 {
 public:
-	md_base_state(const machine_config &mconfig, device_type type, const char *tag) :
-		md_core_state(mconfig, type, tag),
-		m_z80snd(*this,"genesis_snd_z80"),
-		m_megadrive_ram(*this,"megadrive_ram"),
-		m_ioports(*this, "ioport%u", 1U)
-	{ }
+	void init_megadrie();
+	void init_megadriv();
+	void init_megadrij();
 
-	optional_device<cpu_device> m_z80snd;
-	optional_shared_ptr<uint16_t> m_megadrive_ram;
-
+protected:
 	struct genesis_z80_vars
 	{
 		int z80_is_reset = 0;
@@ -87,12 +80,13 @@ public:
 		emu_timer *z80_run_timer = nullptr;
 	};
 
-	genesis_z80_vars m_genz80;
-	int m_version_hi_nibble;
-
-	void init_megadrie();
-	void init_megadriv();
-	void init_megadrij();
+	md_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_core_state(mconfig, type, tag),
+		m_z80snd(*this,"genesis_snd_z80"),
+		m_ymsnd(*this,"ymsnd"),
+		m_megadrive_ram(*this,"megadrive_ram"),
+		m_ioports(*this, "ioport%u", 1U)
+	{ }
 
 	uint8_t megadriv_68k_YM2612_read(offs_t offset, uint8_t mem_mask = ~0);
 	void megadriv_68k_YM2612_write(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -124,7 +118,6 @@ public:
 	void md2_pal(machine_config &config);
 	void md_bootleg(machine_config &config);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -132,6 +125,13 @@ protected:
 	void megadriv_68k_map(address_map &map);
 	void megadriv_z80_io_map(address_map &map);
 	void megadriv_z80_map(address_map &map);
+
+	required_device<cpu_device> m_z80snd;
+	required_device<ym_generic_device> m_ymsnd;
+	optional_shared_ptr<uint16_t> m_megadrive_ram;
+
+	genesis_z80_vars m_genz80;
+	int m_version_hi_nibble;
 
 	required_device_array<megadrive_io_port_device, 3> m_ioports;
 
