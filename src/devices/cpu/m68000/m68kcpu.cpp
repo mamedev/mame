@@ -1692,7 +1692,7 @@ void m68000_musashi_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc, b
 	m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 }
 
-u16 m68000_musashi_device::get_fc()
+u16 m68000_musashi_device::get_fc() const noexcept
 {
 	return m_mmu_tmp_fc;
 }
@@ -2262,9 +2262,7 @@ m68000_musashi_device::m68000_musashi_device(const machine_config &mconfig, cons
 	: m68000_base_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
-		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_musashi_device::default_autovectors_map), this)),
-		m_cmpild_instr_callback(*this),
-		m_rte_instr_callback(*this)
+		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_musashi_device::default_autovectors_map), this))
 {
 	clear_all();
 }
@@ -2275,9 +2273,7 @@ m68000_musashi_device::m68000_musashi_device(const machine_config &mconfig, cons
 	: m68000_base_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
-		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_musashi_device::default_autovectors_map), this)),
-		m_cmpild_instr_callback(*this),
-		m_rte_instr_callback(*this)
+		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_musashi_device::default_autovectors_map), this))
 {
 	clear_all();
 }
@@ -2403,9 +2399,6 @@ void m68000_musashi_device::clear_all()
 void m68000_musashi_device::device_start()
 {
 	m_reset_cb.resolve_safe();
-	m_cmpild_instr_callback.resolve();
-	m_rte_instr_callback.resolve();
-	m_tas_write_callback.resolve();
 }
 
 void m68000_musashi_device::device_stop()

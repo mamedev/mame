@@ -166,7 +166,7 @@ void tmp68301_device::device_start()
 	m_in_parallel_cb.resolve_safe(0);
 	m_out_parallel_cb.resolve_safe();
 
-	m_program->install_device(0xfffc00, 0xffffff, *this, &tmp68301_device::tmp68301_regs);
+	m_s_program->install_device(0xfffc00, 0xffffff, *this, &tmp68301_device::tmp68301_regs);
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_icr));

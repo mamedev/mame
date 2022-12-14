@@ -678,7 +678,7 @@ void cat_state::cat_opr_w(offs_t offset, uint16_t data)
 	 */
 uint16_t cat_state::cat_wdt_r()
 {
-	uint16 Retval = 0x0100; // set pfail to 1; should this be a dipswitch?
+	uint16_t Retval = 0x0100; // set pfail to 1; should this be a dipswitch?
 	return Retval | m_wdt_counter;
 }
 

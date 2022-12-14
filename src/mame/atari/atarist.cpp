@@ -189,8 +189,6 @@ protected:
 	void dma_base_w(offs_t offset, uint8_t data);
 	uint8_t mmu_r();
 	void mmu_w(uint8_t data);
-	uint16_t berr_r();
-	void berr_w(uint16_t data);
 	uint8_t ikbd_port1_r();
 	uint8_t ikbd_port2_r();
 	void ikbd_port2_w(uint8_t data);
@@ -734,24 +732,6 @@ void st_state::mmu_w(uint8_t data)
 
 	m_mmu = data;
 }
-
-
-void st_state::berr_w(uint16_t data)
-{
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-}
-
-uint16_t st_state::berr_r()
-{
-	if (!machine().side_effects_disabled())
-	{
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
-	return 0xffff;
-}
-
 
 //**************************************************************************
 //  IKBD
@@ -1524,12 +1504,12 @@ void st_state::cpu_space_map(address_map &map)
 void st_state::st_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x000007).rom().region(M68000_TAG, 0).w(FUNC(st_state::berr_w));
+	map(0x000000, 0x000007).rom().region(M68000_TAG, 0).w(m_maincpu, FUNC(m68000_device::berr_w));
 	map(0x000008, 0x1fffff).ram();
 	map(0x200000, 0x3fffff).ram();
-	map(0x400000, 0xf9ffff).rw(FUNC(st_state::berr_r), FUNC(st_state::berr_w));
+	map(0x400000, 0xf9ffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
-	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(FUNC(st_state::berr_w));
+	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(m_maincpu, FUNC(m68000_device::berr_w));
 	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
 	map(0xff8200, 0xff8203).rw(m_video, FUNC(st_video_device::shifter_base_r), FUNC(st_video_device::shifter_base_w)).umask16(0x00ff);
 	map(0xff8204, 0xff8209).r(m_video, FUNC(st_video_device::shifter_counter_r)).umask16(0x00ff);
@@ -3098,6 +3078,7 @@ ROM_START( megaste )
 	ROMX_LOAD( "atari mega ste 205 019 tms27c010.bin", 0x00001, 0x20000, CRC(ea2a136d) SHA1(c3c259293de562d2a0fac4d41f95cf3d42ad6df4), ROM_BIOS(0) | ROM_SKIP(1) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, BAD_DUMP CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(1) )
+	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
