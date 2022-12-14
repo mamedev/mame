@@ -96,6 +96,7 @@ void tehkanwc_state::machine_start()
 	save_item(NAME(m_track1));
 	save_item(NAME(m_msm_data_offs));
 	save_item(NAME(m_toggle));
+	save_item(NAME(m_scroll_x));
 
 	m_digits.resolve();
 }
@@ -137,6 +138,22 @@ void tehkanwc_state::track_1_reset_w(offs_t offset, uint8_t data)
 {
 	/* reset the trackball counters */
 	m_track1[offset] = ioport(offset ? "P2Y" : "P2X")->read() + data;
+}
+
+
+/*
+   Gridiron Fight has a LED display on the control panel, to let each player
+   choose the formation without letting the other know.
+*/
+
+void tehkanwc_state::gridiron_led0_w(uint8_t data)
+{
+	m_digits[0] = (data & 0x80) ? (data & 0x7f) : 0;
+}
+
+void tehkanwc_state::gridiron_led1_w(uint8_t data)
+{
+	m_digits[1] = (data & 0x80) ? (data & 0x7f) : 0;
 }
 
 

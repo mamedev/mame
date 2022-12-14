@@ -55,14 +55,6 @@ void tehkanwc_state::flipscreen_y_w(uint8_t data)
 	flip_screen_y_set(data & 0x40);
 }
 
-void tehkanwc_state::gridiron_led0_w(uint8_t data)
-{
-	m_led0 = data;
-}
-void tehkanwc_state::gridiron_led1_w(uint8_t data)
-{
-	m_led1 = data;
-}
 
 TILE_GET_INFO_MEMBER(tehkanwc_state::get_bg_tile_info)
 {
@@ -98,35 +90,6 @@ void tehkanwc_state::video_start()
 			TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
-
-	save_item(NAME(m_scroll_x));
-	save_item(NAME(m_led0));
-	save_item(NAME(m_led1));
-}
-
-/*
-   Gridiron Fight has a LED display on the control panel, to let each player
-   choose the formation without letting the other know.
-
-    ---0---
-   |       |
-   5       1
-   |       |
-    ---6---
-   |       |
-   4       2
-   |       |
-    ---3---
-
-   bit 7 = enable (0 = display off)
- */
-
-void tehkanwc_state::gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t led, int player)
-{
-	if (led & 0x80)
-		m_digits[player] = led & 0x7f;
-	else
-		m_digits[player] = 0;
 }
 
 void tehkanwc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -153,8 +116,7 @@ void tehkanwc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-			code, color, flipx, flipy, sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -165,7 +127,6 @@ uint32_t tehkanwc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
-	gridiron_draw_led(bitmap, cliprect, m_led0, 0);
-	gridiron_draw_led(bitmap, cliprect, m_led1, 1);
+
 	return 0;
 }

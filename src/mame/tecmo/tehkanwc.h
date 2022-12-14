@@ -59,8 +59,6 @@ private:
 	int m_msm_data_offs = 0;
 	int m_toggle = 0;
 	uint8_t m_scroll_x[2]{};
-	uint8_t m_led0 = 0;
-	uint8_t m_led1 = 0;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 
@@ -92,7 +90,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t led,int player);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void shared_mem(address_map &map);
