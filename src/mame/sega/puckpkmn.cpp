@@ -7,8 +7,8 @@ Seems to be based around genesis hardware, despite containing no original Sega c
 
 Supported:
 
-Puckman Pockimon - (c)2000 Genie? (there should be a way to show Sun Mixing copyright, roms are the same
-                                   on a version with the SM (c)
+Puckman Pockimon - (c)2000 Genie?
+(there should be a way to show Sun Mixing copyright, ROMs are the same on a version with the SM (c))
 
 |---------------------------------------|
 | VOL    4558    4MHz   PAL     62256   |
@@ -31,7 +31,7 @@ Puckman Pockimon - (c)2000 Genie? (there should be a way to show Sun Mixing copy
 Notes:
       Main CPU is 68000-based, but actual CPU chip is not known
       Master clock 53.693175MHz. CPU likely running at 53.693175/7 or /6 (??)
-      U6612 (YM2612 clone?) clock 3.579545MHz
+      U6612 (YM3812 clone?) clock 3.579545MHz
       U6614B (YM3014B clone?)
       M6295 clock 1.000MHz (4/4). Sample rate = 1000000/132
       VSync 60Hz
@@ -43,6 +43,8 @@ Notes:
                   Y-BOX TA891945 (QFP100)
                   TA-06SD 9933 B816453 (QFP128)
                   TV16B 0010 ME251271 (QFP160)
+
+Some Puckman Pockimon boards have a different layout, lacking the U6612, U6614B and 3.579545MHz crystal.
 */
 
 #include "emu.h"
@@ -410,7 +412,8 @@ void puckpkmn_state::puckpkmn(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC / 7); // TODO: confirm clock
+	// Internalized YM3438 in VDP ASIC
+	YM3438(config, m_ymsnd, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(1, "rspeaker", 0.50);
 

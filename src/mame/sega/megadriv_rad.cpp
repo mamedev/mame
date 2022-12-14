@@ -366,68 +366,57 @@ uint16_t megadriv_radica_state_base::read_a13(offs_t offset)
 static INPUT_PORTS_START( radica_3button )
 	PORT_INCLUDE( md_common )
 
-	PORT_MODIFY("PAD1")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_MODIFY("PAD2")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+	// TODO: how do the MENU buttons on the two controllers work?
 INPUT_PORTS_END
 
 // the 6-in-1 and Sonic Gold units really only have a single wired controller, and no way to connect a 2nd one, despite having some 2 player games!
 static INPUT_PORTS_START( radica_3button_1player )
-	PORT_INCLUDE( radica_3button )
+	PORT_INCLUDE( md_common )
 
 	PORT_MODIFY("PAD2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// TODO: how does the MENU button on the controller work?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radica_6button )
-	PORT_INCLUDE( radica_3button )
+	PORT_INCLUDE( md_common )
 
-	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("PAD1") // Extra buttons for Joypad 1 (6 button + start + mode)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("%p Z")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("%p Y")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("%p X")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT )  PORT_PLAYER(1) PORT_NAME("%p Mode")
 
-	PORT_START("EXTRA2")    /* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("PAD2") // Extra buttons for Joypad 2 (6 button + start + mode)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("%p Z")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("%p Y")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("%p X")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT )  PORT_PLAYER(2) PORT_NAME("%p Mode")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( msi_6button )
-	PORT_INCLUDE( radica_3button )
+	PORT_INCLUDE( radica_6button )
 
 	PORT_MODIFY("PAD2") // no 2nd pad
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("EXTRA2") // no 2nd pad
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("RESET") // RESET button on controller to the left of START
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) PORT_NAME("Reset")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dgunl_1player )
-	PORT_INCLUDE( radica_3button )
+	PORT_INCLUDE( md_common )
 
 	PORT_MODIFY("PAD1")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED  )                PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED  )                                  PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("%p C") PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
 
-	PORT_MODIFY("PAD2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("PAD2") // no 2nd pad
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("RESET") // RESET button to the left of START
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) PORT_NAME("Reset")
 
 	// the unit only has 2 buttons, A and B, strings are changed to remove references to C, even if behavior in Pac-Mania still exists and differs between them
 	// however, Pac-Man still has a test mode which requires holding A+C on startup

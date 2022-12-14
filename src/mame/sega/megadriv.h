@@ -157,8 +157,7 @@ class md_ctrl_state : public md_base_state
 protected:
 	md_ctrl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		md_base_state(mconfig, type, tag),
-		m_io_pad(*this, "PAD%u", 1U),
-		m_io_extra(*this, "EXTRA%u", 1U)
+		m_io_pad(*this, "PAD%u", 1U)
 	{
 	}
 
@@ -179,7 +178,6 @@ private:
 	TIMER_CALLBACK_MEMBER(ioport_timeout);
 
 	optional_ioport_array<2> m_io_pad;
-	optional_ioport_array<2> m_io_extra;
 
 	emu_timer *m_ioport_idle[2];
 
