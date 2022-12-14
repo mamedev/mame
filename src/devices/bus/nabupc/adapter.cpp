@@ -198,7 +198,7 @@ void network_adapter::tra_callback()
 void network_adapter::received_byte(uint8_t byte)
 {
 	LOG("Received Byte 0x%02X\n", byte);
-	switch(m_state) {
+	switch (m_state) {
 	case state::START:
 		connect(byte, bool(m_config->read() & 1));
 		break;
@@ -250,7 +250,7 @@ void network_adapter::connect(uint8_t byte, bool channel_request = true)
 void network_adapter::idle(uint8_t byte)
 {
 	m_substate = 0;
-	switch(byte) {
+	switch (byte) {
 	case 0x85:
 		transmit_byte(0x10);
 		transmit_byte(0x06);
