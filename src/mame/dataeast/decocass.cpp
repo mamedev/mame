@@ -1350,21 +1350,21 @@ void decocass_type3_state::cfghtice(machine_config &config)
 
 /************ Version A bios roms *************/
 
-#define DECOCASS_BIOS_AUDIOCPU(region) \
-	ROM_LOAD_BIOS( region, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
+#define DECOCASS_BIOS_AUDIOCPU(biosindex) \
+	ROM_LOAD_BIOS( biosindex, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
 
-#define DECOCASS_BIOS_PROMS(region) \
-	ROM_LOAD_BIOS( region, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
-	ROM_LOAD_BIOS( region, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
-	ROM_LOAD_BIOS( region, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+#define DECOCASS_BIOS_PROMS(biosindex) \
+	ROM_LOAD_BIOS( biosindex, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( biosindex, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( biosindex, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
 
-#define DECOCASS_BIOS_AUDIOCPU_OLD(region) \
-	ROM_LOAD_BIOS( region, "rms-3_p2-.c9",       0xfc00, 0x0400, CRC(6c4a891f) SHA1(5c00cf8b1accfdbb1d61e9b3f6db1594dfbc608b) ) /* 2708 EPROM, contains audio cpu code */
+#define DECOCASS_BIOS_AUDIOCPU_OLD(biosindex) \
+	ROM_LOAD_BIOS( biosindex, "rms-3_p2-.c9",       0xfc00, 0x0400, CRC(6c4a891f) SHA1(5c00cf8b1accfdbb1d61e9b3f6db1594dfbc608b) ) /* 2708 EPROM, contains audio cpu code */
 
-#define DECOCASS_BIOS_PROMS_OLD(region) \
-	ROM_LOAD_BIOS( region, "dsp-3_p3-.e5",       0x0000, 0x0020, CRC(539a5a64) SHA1(7b7d3cc58ac6f95242240c97046e770d2fd20c96) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
-	ROM_LOAD_BIOS( region, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
-	ROM_LOAD_BIOS( region, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */
+#define DECOCASS_BIOS_PROMS_OLD(biosindex) \
+	ROM_LOAD_BIOS( biosindex, "dsp-3_p3-.e5",       0x0000, 0x0020, CRC(539a5a64) SHA1(7b7d3cc58ac6f95242240c97046e770d2fd20c96) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( biosindex, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( biosindex, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */
 
 /************ Common MCU bios rom *************/
 
