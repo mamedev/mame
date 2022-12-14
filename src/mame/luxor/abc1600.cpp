@@ -789,14 +789,6 @@ WRITE_LINE_MEMBER( abc1600_state::nmi_w )
 	}
 }
 
-void abc1600_state::buserr_w(offs_t offset, uint8_t data)
-{
-	m_maincpu->set_buserror_details(offset, data, m_maincpu->get_fc());
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-}
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -867,8 +859,7 @@ void abc1600_state::abc1600(machine_config &config)
 	// devices
 	ABC1600_MAC(config, m_mac, 0);
 	m_mac->set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
-	m_mac->fc_cb().set(m_maincpu, FUNC(m68000_musashi_device::get_fc));
-	m_mac->buserr_cb().set(FUNC(abc1600_state::buserr_w));
+	m_mac->set_cpu(m_maincpu);
 	m_mac->in_tren0_cb().set(m_bus0i, FUNC(abcbus_slot_device::read_tren)); // TODO bus0x
 	m_mac->out_tren0_cb().set(m_bus0i, FUNC(abcbus_slot_device::write_tren)); // TODO bus0x
 	m_mac->in_tren1_cb().set(m_bus1, FUNC(abcbus_slot_device::read_tren));

@@ -26,7 +26,7 @@ TODO:
 
 #pragma once
 
-#include "cpu/m68000/scc68070.h"
+#include "cpu/m68000/m68000.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,7 +43,7 @@ enum scc68070_ocr_bits
 
 // ======================> scc68070_device
 
-class scc68070_device : public scc68070_base_device
+class scc68070_device : public m68000_device
 {
 public:
 	scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -199,8 +199,7 @@ protected:
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
 
-	// m68000_base_device overrides
-	virtual void m68k_reset_peripherals() override;
+	DECLARE_WRITE_LINE_MEMBER(reset_peripherals);
 
 private:
 	void internal_map(address_map &map);

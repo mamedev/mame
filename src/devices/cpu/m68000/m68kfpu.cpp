@@ -2,7 +2,7 @@
 // copyright-holders:Karl Stenerud
 
 #include "emu.h"
-#include "m68000.h"
+#include "m68kmusashi.h"
 
 static constexpr int FPCC_N          = 0x08000000;
 static constexpr int FPCC_Z          = 0x04000000;

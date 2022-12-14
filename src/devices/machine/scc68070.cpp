@@ -239,7 +239,7 @@ void scc68070_device::cpu_space_map(address_map &map)
 //-------------------------------------------------
 
 scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: scc68070_base_device(mconfig, tag, owner, clock, SCC68070, address_map_constructor(FUNC(scc68070_device::internal_map), this))
+	: m68000_device(mconfig, SCC68070, tag, owner, clock)
 	, m_iack2_callback(*this)
 	, m_iack4_callback(*this)
 	, m_iack5_callback(*this)
@@ -258,6 +258,18 @@ scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag,
 	, m_int2_line(CLEAR_LINE)
 {
 	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(scc68070_device::cpu_space_map), this);
+
+	m_cpu_space_config.m_addr_width = 32;
+	m_program_config.m_addr_width = 32;
+	m_opcodes_config.m_addr_width = 32;
+	m_uprogram_config.m_addr_width = 32;
+	m_uopcodes_config.m_addr_width = 32;
+
+	auto imap = address_map_constructor(FUNC(scc68070_device::internal_map), this);
+	m_program_config.m_internal_map = imap;
+	m_opcodes_config.m_internal_map = imap;
+	m_uprogram_config.m_internal_map = imap;
+	m_uopcodes_config.m_internal_map = imap;
 }
 
 //-------------------------------------------------
@@ -268,7 +280,7 @@ scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag,
 
 void scc68070_device::device_resolve_objects()
 {
-	scc68070_base_device::device_resolve_objects();
+	m68000_device::device_resolve_objects();
 
 	m_iack2_callback.resolve_safe(autovector(2));
 	m_iack4_callback.resolve_safe(autovector(4));
@@ -287,7 +299,9 @@ void scc68070_device::device_resolve_objects()
 
 void scc68070_device::device_start()
 {
-	scc68070_base_device::device_start();
+	reset_cb().append(FUNC(scc68070_device::reset_peripherals));
+
+	m68000_device::device_start();
 
 	save_item(NAME(m_ipl));
 
@@ -378,7 +392,7 @@ void scc68070_device::device_start()
 
 void scc68070_device::device_reset()
 {
-	scc68070_base_device::device_reset();
+	m68000_device::device_reset();
 
 	m_lir = 0;
 
@@ -448,7 +462,7 @@ void scc68070_device::device_reset()
 	set_timer_callback(0);
 }
 
-void scc68070_device::m68k_reset_peripherals()
+WRITE_LINE_MEMBER(scc68070_device::reset_peripherals)
 {
 	m_lir = 0;
 
