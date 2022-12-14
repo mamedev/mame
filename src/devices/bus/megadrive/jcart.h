@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef MAME_BUS_NEGADRIVE_JCART_H
-#define MAME_BUS_NEGADRIVE_JCART_H
+#ifndef MAME_BUS_MEGADRIVE_JCART_H
+#define MAME_BUS_MEGADRIVE_JCART_H
 
 #include "md_slot.h"
 
@@ -85,4 +85,4 @@ DECLARE_DEVICE_TYPE(MD_JCART,           md_jcart_device)
 DECLARE_DEVICE_TYPE(MD_SEPROM_CODEMAST, md_seprom_codemast_device)
 DECLARE_DEVICE_TYPE(MD_SEPROM_MM96,     md_seprom_mm96_device)
 
-#endif // MAME_BUS_NEGADRIVE_JCART_H
+#endif // MAME_BUS_MEGADRIVE_JCART_H
