@@ -158,8 +158,9 @@ static INPUT_PORTS_START( crimfght )
 	PORT_DIPSETTING(   0x90, DEF_STR( 1C_7C ))
 	PORT_DIPSETTING(   0x00, DEF_STR( Unused ))
 
+	// defaults confirmed from World manual
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 		PORT_DIPSETTING(    0x03, "1" )
 		PORT_DIPSETTING(    0x02, "2" )
 		PORT_DIPSETTING(    0x01, "3" )
