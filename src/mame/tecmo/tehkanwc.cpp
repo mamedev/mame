@@ -201,6 +201,7 @@ void tehkanwc_state::sub_cpu_reset_w(uint8_t data)
 void tehkanwc_state::sound_cpu_reset_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	msm_reset_w(data);
 }
 
 void tehkanwc_state::sound_command_w(uint8_t data)
