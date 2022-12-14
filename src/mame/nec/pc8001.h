@@ -46,6 +46,8 @@ public:
 		, m_cgrom(*this, CGROM_TAG)
 	{}
 
+	// feature::PRINTER more to do with lacking specific PC-88 options
+	// cfr. -flop1 multipla:flop2 setprt.com
 	static constexpr feature_type unemulated_features() { return feature::TAPE | feature::PRINTER; }
 
 
