@@ -16,7 +16,8 @@
     10  NC          -
 
     DE-9 connector on most systems, or 10-pin tongue connector on
-    Game Gear.  Pin 10 is not connected if present.
+    Game Gear (Hoshiden HDC-0492).  Pin 10 is not connected if
+    present.
 
     SG-1000 Mark III:
     * Pin 7 (TH) tied to ground

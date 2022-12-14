@@ -323,14 +323,14 @@ void sms_state::sms_io(address_map &map)
 }
 
 
-// It seems the Korean versions do some more strict decoding on the I/O
-// addresses.
+// It seems the Korean versions do some more strict decoding on the I/O addresses.
 // At least the mirrors for I/O ports $3E/$3F don't seem to exist there.
 // Leaving the mirrors breaks the Korean cartridge bublboky.
 void sms_state::smskr_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+
 	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
 	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
@@ -370,18 +370,28 @@ void gamegear_state::gg_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 
-	map(0x00, 0x00).r(FUNC(gamegear_state::gg_input_port_00_r));
-	map(0x01, 0x05).rw(FUNC(gamegear_state::gg_sio_r), FUNC(gamegear_state::gg_sio_w));
-	map(0x06, 0x06).w(FUNC(gamegear_state::gg_psg_stereo_w));
-	map(0x3e, 0x3e).w(FUNC(gamegear_state::sms_mem_control_w));
-	map(0x3f, 0x3f).w(FUNC(gamegear_state::sms_io_control_w));
+	map(0x3e, 0x3e).w(FUNC(gamegear_state::sms_mem_control_w)); // TODO: only really exists in Master System mode
 	map(0x40, 0x7f).r(FUNC(gamegear_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc0).r(FUNC(gamegear_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).r(FUNC(gamegear_state::sms_input_port_dd_r));
-	map(0xdc, 0xdc).r(FUNC(gamegear_state::sms_input_port_dc_r));
-	map(0xdd, 0xdd).r(FUNC(gamegear_state::sms_input_port_dd_r));
+	map(0xc0, 0xc0).r(FUNC(gamegear_state::gg_input_port_dc_r));
+	map(0xc1, 0xc1).r(FUNC(gamegear_state::gg_input_port_dd_r));
+	map(0xdc, 0xdc).r(FUNC(gamegear_state::gg_input_port_dc_r));
+	map(0xdd, 0xdd).r(FUNC(gamegear_state::gg_input_port_dd_r));
+
+	map(0x00, 0x3f).view(m_io_view);
+
+	// Game Gear mode
+	m_io_view[0](0x00, 0x00).r(FUNC(gamegear_state::gg_input_port_00_r));
+	m_io_view[0](0x01, 0x01).rw(m_gg_ioport, FUNC(gamegear_io_port_device::data_r), FUNC(gamegear_io_port_device::data_w));
+	m_io_view[0](0x02, 0x02).rw(m_gg_ioport, FUNC(gamegear_io_port_device::ctrl_r), FUNC(gamegear_io_port_device::ctrl_w));
+	m_io_view[0](0x03, 0x03).rw(m_gg_ioport, FUNC(gamegear_io_port_device::txdata_r), FUNC(gamegear_io_port_device::txdata_w));
+	m_io_view[0](0x04, 0x04).r(m_gg_ioport, FUNC(gamegear_io_port_device::rxdata_r));
+	m_io_view[0](0x05, 0x05).rw(m_gg_ioport, FUNC(gamegear_io_port_device::s_ctrl_r), FUNC(gamegear_io_port_device::s_ctrl_w));
+	m_io_view[0](0x06, 0x06).w(m_vdp, FUNC(sega315_5124_device::psg_stereo_w));
+
+	// Master System mode
+	m_io_view[1](0x3f, 0x3f).w(FUNC(gamegear_state::gg_io_control_w));
 }
 
 
@@ -982,9 +992,14 @@ void gamegear_state::gamegear(machine_config &config)
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gamegear");
 
-	GG_EXT_PORT(config, m_port_gg_ext, gg_ext_port_devices, nullptr);
-	m_port_gg_ext->set_screen_tag(m_main_scr);
-	m_port_gg_ext->th_input_handler().set(FUNC(gamegear_state::gg_ext_th_input));
+	GAMEGEAR_IO_PORT(config, m_gg_ioport, 0);
+	m_gg_ioport->set_in_handler(m_port_gg_ext, FUNC(sms_control_port_device::in_r));
+	m_gg_ioport->set_out_handler(m_port_gg_ext, FUNC(sms_control_port_device::out_w));
+	m_gg_ioport->hl_handler().set(FUNC(gamegear_state::gg_nmi));
+
+	SMS_CONTROL_PORT(config, m_port_gg_ext, sms_control_port_devices, nullptr);
+	m_port_gg_ext->set_screen(m_main_scr);
+	m_port_gg_ext->th_handler().set(FUNC(gamegear_state::gg_ext_th_input));
 
 	m_is_gamegear = true;
 	m_has_bios_0400 = true;

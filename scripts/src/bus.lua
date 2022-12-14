@@ -3830,20 +3830,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/gamegear/ggext.h,BUSES["GAMEGEAR"] = true
----------------------------------------------------
-
-if (BUSES["GAMEGEAR"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/gamegear/ggext.cpp",
-		MAME_DIR .. "src/devices/bus/gamegear/ggext.h",
-		MAME_DIR .. "src/devices/bus/gamegear/smsctrladp.cpp",
-		MAME_DIR .. "src/devices/bus/gamegear/smsctrladp.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/bus/gba/gba_slot.h,BUSES["GBA"] = true
 ---------------------------------------------------
 
