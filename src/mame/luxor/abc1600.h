@@ -132,7 +132,6 @@ private:
 	void cio_pc_w(uint8_t data);
 
 	void nmi_w(int state);
-	void buserr_w(offs_t offset, uint8_t data);
 
 	void cpu_space_map(address_map &map);
 

@@ -47,8 +47,8 @@ DEFINE_DEVICE_TYPE(MC68EZ328, mc68ez328_device, "mc68ez328", "MC68EZ328 DragonBa
 
 const u32 mc68328_base_device::VCO_DIVISORS[8] = { 2, 4, 8, 16, 1, 1, 1, 1 };
 
-mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 addr_bits, address_map_constructor internal_map_ctor)
-	: m68000_device(mconfig, tag, owner, clock, type, 16, addr_bits, internal_map_ctor)
+mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: m68000_device(mconfig, type, tag, owner, clock)
 	, m_pwm(nullptr)
 	, m_rtc(nullptr)
 	, m_spim(nullptr)
@@ -78,7 +78,7 @@ mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_t
 }
 
 mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mc68328_base_device(mconfig, MC68328, tag, owner, clock, 24, address_map_constructor(FUNC(mc68328_device::internal_map), this))
+	: mc68328_base_device(mconfig, MC68328, tag, owner, clock)
 	, m_out_port_j_cb(*this)
 	, m_out_port_k_cb(*this)
 	, m_out_port_m_cb(*this)
@@ -87,12 +87,27 @@ mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, d
 	, m_in_port_m_cb(*this)
 {
 	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68328_device::cpu_space_map), this);
+	auto imap = address_map_constructor(FUNC(mc68328_device::internal_map), this);
+	m_program_config.m_internal_map = imap;
+	m_opcodes_config.m_internal_map = imap;
+	m_uprogram_config.m_internal_map = imap;
+	m_uopcodes_config.m_internal_map = imap;
 }
 
 mc68ez328_device::mc68ez328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mc68328_base_device(mconfig, MC68EZ328, tag, owner, clock, 32, address_map_constructor(FUNC(mc68ez328_device::internal_map), this))
+	: mc68328_base_device(mconfig, MC68EZ328, tag, owner, clock)
 {
 	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68ez328_device::cpu_space_map), this);
+	m_cpu_space_config.m_addr_width = 32;
+	m_program_config.m_addr_width = 32;
+	m_opcodes_config.m_addr_width = 32;
+	m_uprogram_config.m_addr_width = 32;
+	m_uopcodes_config.m_addr_width = 32;
+	auto imap = address_map_constructor(FUNC(mc68ez328_device::internal_map), this);
+	m_program_config.m_internal_map = imap;
+	m_opcodes_config.m_internal_map = imap;
+	m_uprogram_config.m_internal_map = imap;
+	m_uopcodes_config.m_internal_map = imap;
 }
 
 void mc68328_base_device::base_internal_map(u32 addr_bits, address_map &map)

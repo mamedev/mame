@@ -189,8 +189,6 @@ protected:
 	void dma_base_w(offs_t offset, uint8_t data);
 	uint8_t mmu_r();
 	void mmu_w(uint8_t data);
-	uint16_t berr_r();
-	void berr_w(uint16_t data);
 	uint8_t ikbd_port1_r();
 	uint8_t ikbd_port2_r();
 	void ikbd_port2_w(uint8_t data);
@@ -734,24 +732,6 @@ void st_state::mmu_w(uint8_t data)
 
 	m_mmu = data;
 }
-
-
-void st_state::berr_w(uint16_t data)
-{
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-}
-
-uint16_t st_state::berr_r()
-{
-	if (!machine().side_effects_disabled())
-	{
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
-	return 0xffff;
-}
-
 
 //**************************************************************************
 //  IKBD
@@ -1524,12 +1504,12 @@ void st_state::cpu_space_map(address_map &map)
 void st_state::st_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x000007).rom().region(M68000_TAG, 0).w(FUNC(st_state::berr_w));
+	map(0x000000, 0x000007).rom().region(M68000_TAG, 0).w(m_maincpu, FUNC(m68000_device::berr_w));
 	map(0x000008, 0x1fffff).ram();
 	map(0x200000, 0x3fffff).ram();
-	map(0x400000, 0xf9ffff).rw(FUNC(st_state::berr_r), FUNC(st_state::berr_w));
+	map(0x400000, 0xf9ffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
-	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(FUNC(st_state::berr_w));
+	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(m_maincpu, FUNC(m68000_device::berr_w));
 	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
 	map(0xff8200, 0xff8203).rw(m_video, FUNC(st_video_device::shifter_base_r), FUNC(st_video_device::shifter_base_w)).umask16(0x00ff);
 	map(0xff8204, 0xff8209).r(m_video, FUNC(st_video_device::shifter_counter_r)).umask16(0x00ff);
@@ -2178,6 +2158,26 @@ void st_state::machine_start()
 	m_mfp->i4_w(1);
 	m_mfp->i5_w(1);
 	m_mfp->i7_w(1);
+
+	if(0) {
+		u16 *rom = (u16 *)memregion("m68000")->base();
+		int a=0x10;
+
+		rom[a++] = 0x4ff8;
+		rom[a++] = 0x1000;
+		rom[a++] = 0x41fa;
+		rom[a++] = 0x0008;
+		rom[a++] = 0x21c8;
+		rom[a++] = 0x0008;
+		rom[a++] = 0x6002;
+		rom[a++] = 0x4e73;
+
+		rom[a++] = 0x7001;
+		rom[a++] = 0x4a78;
+		rom[a++] = 0x8000;
+		rom[a++] = 0x7002;
+		rom[a++] = 0x60fe;
+	}
 }
 
 
@@ -2659,11 +2659,11 @@ ROM_START( st )
 	ROM_SYSTEM_BIOS( 0, "tos099", "TOS 0.99 (Disk TOS)" )
 	ROMX_LOAD( "tos099.bin", 0x00000, 0x04000, CRC(cee3c664) SHA1(80c10b31b63b906395151204ec0a4984c8cb98d6), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos100", "TOS 1.0 (ROM TOS)" )
-	ROMX_LOAD( "tos100.bin", 0x00000, 0x30000, BAD_DUMP CRC(d331af30) SHA1(7bcc2311d122f451bd03c9763ade5a119b2f90da), ROM_BIOS(1) )
+	ROMX_LOAD( "tos100.bin", 0x00000, 0x30000, CRC(d331af30) SHA1(7bcc2311d122f451bd03c9763ade5a119b2f90da), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102.bin", 0x00000, 0x30000, BAD_DUMP CRC(d3c32283) SHA1(735793fdba07fe8d5295caa03484f6ef3de931f5), ROM_BIOS(2) )
+	ROMX_LOAD( "tos102.bin", 0x00000, 0x30000, CRC(d3c32283) SHA1(735793fdba07fe8d5295caa03484f6ef3de931f5), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, BAD_DUMP CRC(90f4fbff) SHA1(2487f330b0895e5d88d580d4ecb24061125e88ad), ROM_BIOS(3) )
+	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, CRC(90f4fbff) SHA1(2487f330b0895e5d88d580d4ecb24061125e88ad), ROM_BIOS(3) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2678,11 +2678,11 @@ ROM_START( st_uk )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos100")
 	ROM_SYSTEM_BIOS( 0, "tos100", "TOS 1.0 (ROM TOS)" )
-	ROMX_LOAD( "tos100uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(1a586c64) SHA1(9a6e4c88533a9eaa4d55cdc040e47443e0226eb2), ROM_BIOS(0) )
+	ROMX_LOAD( "tos100uk.bin", 0x00000, 0x30000, CRC(1a586c64) SHA1(9a6e4c88533a9eaa4d55cdc040e47443e0226eb2), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(1) )
+	ROMX_LOAD( "tos102uk.bin", 0x00000, 0x30000, CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(2) )
+	ROMX_LOAD( "tos104uk.bin", 0x00000, 0x30000, CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2697,11 +2697,11 @@ ROM_START( st_de )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos100")
 	ROM_SYSTEM_BIOS( 0, "tos100", "TOS 1.0 (ROM TOS)" )
-	ROMX_LOAD( "tos100de.bin", 0x00000, 0x30000, BAD_DUMP CRC(16e3e979) SHA1(663d9c87cfb44ae8ada855fe9ed3cccafaa7a4ce), ROM_BIOS(0) )
+	ROMX_LOAD( "tos100de.bin", 0x00000, 0x30000, CRC(16e3e979) SHA1(663d9c87cfb44ae8ada855fe9ed3cccafaa7a4ce), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102de.bin", 0x00000, 0x30000, BAD_DUMP CRC(36a0058e) SHA1(cad5d2902e875d8bf0a14dc5b5b8080b30254148), ROM_BIOS(1) )
+	ROMX_LOAD( "tos102de.bin", 0x00000, 0x30000, CRC(36a0058e) SHA1(cad5d2902e875d8bf0a14dc5b5b8080b30254148), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104de.bin", 0x00000, 0x30000, BAD_DUMP CRC(62b82b42) SHA1(5313733f91b083c6265d93674cb9d0b7efd02da8), ROM_BIOS(2) )
+	ROMX_LOAD( "tos104de.bin", 0x00000, 0x30000, CRC(62b82b42) SHA1(5313733f91b083c6265d93674cb9d0b7efd02da8), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "tos10x", "TOS 1.0?" )
 	ROMX_LOAD( "st 7c1 a4.u4", 0x00000, 0x08000, CRC(867fdd7e) SHA1(320d12acf510301e6e9ab2e3cf3ee60b0334baa0), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "st 7c1 a9.u7", 0x00001, 0x08000, CRC(30e8f982) SHA1(253f26ff64b202b2681ab68ffc9954125120baea), ROM_SKIP(1) | ROM_BIOS(3) )
@@ -2723,11 +2723,11 @@ ROM_START( st_fr )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos100")
 	ROM_SYSTEM_BIOS( 0, "tos100", "TOS 1.0 (ROM TOS)" )
-	ROMX_LOAD( "tos100fr.bin", 0x00000, 0x30000, BAD_DUMP CRC(2b7f2117) SHA1(ecb00a2e351a6205089a281b4ce6e08959953704), ROM_BIOS(0) )
+	ROMX_LOAD( "tos100fr.bin", 0x00000, 0x30000, CRC(2b7f2117) SHA1(ecb00a2e351a6205089a281b4ce6e08959953704), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102fr.bin", 0x00000, 0x30000, BAD_DUMP CRC(8688fce6) SHA1(f5a79aac0a4e812ca77b6ac51d58d98726f331fe), ROM_BIOS(1) )
+	ROMX_LOAD( "tos102fr.bin", 0x00000, 0x30000, CRC(8688fce6) SHA1(f5a79aac0a4e812ca77b6ac51d58d98726f331fe), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104fr.bin", 0x00000, 0x30000, BAD_DUMP CRC(a305a404) SHA1(20dba880344b810cf63cec5066797c5a971db870), ROM_BIOS(2) )
+	ROMX_LOAD( "tos104fr.bin", 0x00000, 0x30000, CRC(a305a404) SHA1(20dba880344b810cf63cec5066797c5a971db870), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "tos10x", "TOS 1.0?" )
 	ROMX_LOAD( "c101658-001.u63", 0x00000, 0x08000, CRC(9c937f6f) SHA1(d4a3ea47568ef6233f3f2056e384b09eedd84961), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "c101661-001.u67", 0x00001, 0x08000, CRC(997298f3) SHA1(9e06d42df88557252a36791b514afe455600f679), ROM_SKIP(1) | ROM_BIOS(3) )
@@ -2749,7 +2749,7 @@ ROM_START( st_es )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104es.bin", 0x00000, 0x30000, BAD_DUMP CRC(f4e8ecd2) SHA1(df63f8ac09125d0877b55d5ba1282779b7f99c16), ROM_BIOS(0) )
+	ROMX_LOAD( "tos104es.bin", 0x00000, 0x30000, CRC(f4e8ecd2) SHA1(df63f8ac09125d0877b55d5ba1282779b7f99c16), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2764,7 +2764,7 @@ ROM_START( st_nl )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104nl.bin", 0x00000, 0x30000, BAD_DUMP CRC(bb4370d4) SHA1(6de7c96b2d2e5c68778f4bce3eaf85a4e121f166), ROM_BIOS(0) )
+	ROMX_LOAD( "tos104nl.bin", 0x00000, 0x30000, CRC(bb4370d4) SHA1(6de7c96b2d2e5c68778f4bce3eaf85a4e121f166), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2779,9 +2779,9 @@ ROM_START( st_se )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos102")
 	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102se.bin", 0x00000, 0x30000, BAD_DUMP CRC(673fd0c2) SHA1(433de547e09576743ae9ffc43d43f2279782e127), ROM_BIOS(0) )
+	ROMX_LOAD( "tos102se.bin", 0x00000, 0x30000, CRC(673fd0c2) SHA1(433de547e09576743ae9ffc43d43f2279782e127), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104se.bin", 0x00000, 0x30000, BAD_DUMP CRC(80ecfdce) SHA1(b7ad34d5cdfbe86ea74ae79eca11dce421a7bbfd), ROM_BIOS(1) )
+	ROMX_LOAD( "tos104se.bin", 0x00000, 0x30000, CRC(80ecfdce) SHA1(b7ad34d5cdfbe86ea74ae79eca11dce421a7bbfd), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2796,9 +2796,9 @@ ROM_START( st_sg )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos102")
 	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(5fe16c66) SHA1(45acb2fc4b1b13bd806c751aebd66c8304fc79bc), ROM_BIOS(0) )
+	ROMX_LOAD( "tos102sg.bin", 0x00000, 0x30000, CRC(5fe16c66) SHA1(45acb2fc4b1b13bd806c751aebd66c8304fc79bc), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(e58f0bdf) SHA1(aa40bf7203f02b2251b9e4850a1a73ff1c7da106), ROM_BIOS(1) )
+	ROMX_LOAD( "tos104sg.bin", 0x00000, 0x30000, CRC(e58f0bdf) SHA1(aa40bf7203f02b2251b9e4850a1a73ff1c7da106), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2813,7 +2813,7 @@ ROM_START( megast )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" ) // came in both 6 rom and 2 rom formats; 6 roms are 27512, and 2 roms are non-jedec RP231024 (TC531000 equivalent) 28-pin roms with A16 instead of /OE on pin 22
-	ROMX_LOAD( "tos102.bin", 0x00000, 0x30000, BAD_DUMP CRC(d3c32283) SHA1(735793fdba07fe8d5295caa03484f6ef3de931f5), ROM_BIOS(0) )
+	ROMX_LOAD( "tos102.bin", 0x00000, 0x30000, CRC(d3c32283) SHA1(735793fdba07fe8d5295caa03484f6ef3de931f5), ROM_BIOS(0) )
 	//For a C100167-001 revision B Mega ST motherboard, jumpered for 2 roms:
 	//ROMX_LOAD( "c101629-001__(c)atari_1987__38__rp231024e__0564__8807_z07.rp231024.u9", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(0)|ROM_SKIP(1) ) // in u9 HI-0 socket
 	//ROMX_LOAD( "c101630-002__(c)atari_1987__38__rp231024e__0563__8809_z10.rp231024.u10", 0x00001, 0x20000, NO_DUMP, ROM_BIOS(0)|ROM_SKIP(1) ) // in u10 LO-0 socket
@@ -2825,7 +2825,7 @@ ROM_START( megast )
 	//ROMX_LOAD( "unknownmarkings_hi-2.27512.u3", 0x20000, 0x10000, NO_DUMP, ROM_BIOS(0)|ROM_SKIP(1) )
 	//ROMX_LOAD( "unknownmarkings_lo-2.27512.u4", 0x20001, 0x10000, NO_DUMP, ROM_BIOS(0)|ROM_SKIP(1) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )  // came in both 6 rom and 2 rom formats; 6 roms are 27512, and 2 roms are non-jedec RP231024 (TC531000 equivalent) 28-pin roms with A16 instead of /OE on pin 22
-	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, BAD_DUMP CRC(90f4fbff) SHA1(2487f330b0895e5d88d580d4ecb24061125e88ad), ROM_BIOS(1) )
+	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, CRC(90f4fbff) SHA1(2487f330b0895e5d88d580d4ecb24061125e88ad), ROM_BIOS(1) )
 	/*For a C100167-001 revision B Mega ST motherboard, jumpered for 2 roms:
 	These came in an upgrade kit pouch with label:
 	RAINBOW (TOS 1.4)
@@ -2855,9 +2855,9 @@ ROM_START( megast_uk )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(0) )
+	ROMX_LOAD( "tos102uk.bin", 0x00000, 0x30000, CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(1) )
+	ROMX_LOAD( "tos104uk.bin", 0x00000, 0x30000, CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2872,9 +2872,9 @@ ROM_START( megast_de )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102de.bin", 0x00000, 0x30000, BAD_DUMP CRC(36a0058e) SHA1(cad5d2902e875d8bf0a14dc5b5b8080b30254148), ROM_BIOS(0) )
+	ROMX_LOAD( "tos102de.bin", 0x00000, 0x30000, CRC(36a0058e) SHA1(cad5d2902e875d8bf0a14dc5b5b8080b30254148), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104de.bin", 0x00000, 0x30000, BAD_DUMP CRC(62b82b42) SHA1(5313733f91b083c6265d93674cb9d0b7efd02da8), ROM_BIOS(1) )
+	ROMX_LOAD( "tos104de.bin", 0x00000, 0x30000, CRC(62b82b42) SHA1(5313733f91b083c6265d93674cb9d0b7efd02da8), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2889,9 +2889,9 @@ ROM_START( megast_fr )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102fr.bin", 0x00000, 0x30000, BAD_DUMP CRC(8688fce6) SHA1(f5a79aac0a4e812ca77b6ac51d58d98726f331fe), ROM_BIOS(0) )
+	ROMX_LOAD( "tos102fr.bin", 0x00000, 0x30000, CRC(8688fce6) SHA1(f5a79aac0a4e812ca77b6ac51d58d98726f331fe), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104fr.bin", 0x00000, 0x30000, BAD_DUMP CRC(a305a404) SHA1(20dba880344b810cf63cec5066797c5a971db870), ROM_BIOS(1) )
+	ROMX_LOAD( "tos104fr.bin", 0x00000, 0x30000, CRC(a305a404) SHA1(20dba880344b810cf63cec5066797c5a971db870), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2906,9 +2906,9 @@ ROM_START( megast_se )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102se.bin", 0x00000, 0x30000, BAD_DUMP CRC(673fd0c2) SHA1(433de547e09576743ae9ffc43d43f2279782e127), ROM_BIOS(0) )
+	ROMX_LOAD( "tos102se.bin", 0x00000, 0x30000, CRC(673fd0c2) SHA1(433de547e09576743ae9ffc43d43f2279782e127), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104se.bin", 0x00000, 0x30000, BAD_DUMP CRC(80ecfdce) SHA1(b7ad34d5cdfbe86ea74ae79eca11dce421a7bbfd), ROM_BIOS(1) )
+	ROMX_LOAD( "tos104se.bin", 0x00000, 0x30000, CRC(80ecfdce) SHA1(b7ad34d5cdfbe86ea74ae79eca11dce421a7bbfd), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2923,9 +2923,9 @@ ROM_START( megast_sg )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" )
-	ROMX_LOAD( "tos102sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(5fe16c66) SHA1(45acb2fc4b1b13bd806c751aebd66c8304fc79bc), ROM_BIOS(0) )
+	ROMX_LOAD( "tos102sg.bin", 0x00000, 0x30000, CRC(5fe16c66) SHA1(45acb2fc4b1b13bd806c751aebd66c8304fc79bc), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(e58f0bdf) SHA1(aa40bf7203f02b2251b9e4850a1a73ff1c7da106), ROM_BIOS(1) )
+	ROMX_LOAD( "tos104sg.bin", 0x00000, 0x30000, CRC(e58f0bdf) SHA1(aa40bf7203f02b2251b9e4850a1a73ff1c7da106), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2940,7 +2940,7 @@ ROM_END
 ROM_START( stacy )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
-	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(0) )
+	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2956,11 +2956,11 @@ ROM_START( ste )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
-	ROMX_LOAD( "tos106.bin", 0x00000, 0x40000, BAD_DUMP CRC(a2e25337) SHA1(6a850810a92fdb1e64d005a06ea4079f51c97145), ROM_BIOS(0) )
+	ROMX_LOAD( "tos106.bin", 0x00000, 0x40000, CRC(a2e25337) SHA1(6a850810a92fdb1e64d005a06ea4079f51c97145), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos162", "TOS 1.62 (STE TOS, Revision 2)" )
-	ROMX_LOAD( "tos162.bin", 0x00000, 0x40000, BAD_DUMP CRC(1c1a4eba) SHA1(42b875f542e5b728905d819c83c31a095a6a1904), ROM_BIOS(1) )
+	ROMX_LOAD( "tos162.bin", 0x00000, 0x40000, CRC(1c1a4eba) SHA1(42b875f542e5b728905d819c83c31a095a6a1904), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, BAD_DUMP CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(2) )
+	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2975,11 +2975,11 @@ ROM_START( ste_uk )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
-	ROMX_LOAD( "tos106uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(d72fea29) SHA1(06f9ea322e74b682df0396acfaee8cb4d9c90cad), ROM_BIOS(0) )
+	ROMX_LOAD( "tos106uk.bin", 0x00000, 0x40000, CRC(d72fea29) SHA1(06f9ea322e74b682df0396acfaee8cb4d9c90cad), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos162", "TOS 1.62 (STE TOS, Revision 2)" )
-	ROMX_LOAD( "tos162uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(d1c6f2fa) SHA1(70db24a7c252392755849f78940a41bfaebace71), ROM_BIOS(1) )
+	ROMX_LOAD( "tos162uk.bin", 0x00000, 0x40000, CRC(d1c6f2fa) SHA1(70db24a7c252392755849f78940a41bfaebace71), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(2) )
+	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -2994,11 +2994,11 @@ ROM_START( ste_de )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
-	ROMX_LOAD( "tos106de.bin", 0x00000, 0x40000, BAD_DUMP CRC(7c67c5c9) SHA1(3b8cf5ffa41b252eb67f8824f94608fa4005d6dd), ROM_BIOS(0) )
+	ROMX_LOAD( "tos106de.bin", 0x00000, 0x40000, CRC(7c67c5c9) SHA1(3b8cf5ffa41b252eb67f8824f94608fa4005d6dd), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos162", "TOS 1.62 (STE TOS, Revision 2)" )
-	ROMX_LOAD( "tos162de.bin", 0x00000, 0x40000, BAD_DUMP CRC(2cdeb5e5) SHA1(10d9f61705048ee3dcbec67df741bed49b922149), ROM_BIOS(1) )
+	ROMX_LOAD( "tos162de.bin", 0x00000, 0x40000, CRC(2cdeb5e5) SHA1(10d9f61705048ee3dcbec67df741bed49b922149), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206de.bin", 0x00000, 0x40000, BAD_DUMP CRC(143cd2ab) SHA1(d1da866560734289c4305f1028c36291d331d417), ROM_BIOS(2) )
+	ROMX_LOAD( "tos206de.bin", 0x00000, 0x40000, CRC(143cd2ab) SHA1(d1da866560734289c4305f1028c36291d331d417), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3013,7 +3013,7 @@ ROM_START( ste_es )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos106")
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
-	ROMX_LOAD( "tos106es.bin", 0x00000, 0x40000, BAD_DUMP CRC(5cd2a540) SHA1(3a18f342c8288c0bc1879b7a209c73d5d57f7e81), ROM_BIOS(0) )
+	ROMX_LOAD( "tos106es.bin", 0x00000, 0x40000, CRC(5cd2a540) SHA1(3a18f342c8288c0bc1879b7a209c73d5d57f7e81), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3028,11 +3028,11 @@ ROM_START( ste_fr )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
-	ROMX_LOAD( "tos106fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(b6e58a46) SHA1(7d7e3cef435caa2fd7733a3fbc6930cb9ea7bcbc), ROM_BIOS(0) )
+	ROMX_LOAD( "tos106fr.bin", 0x00000, 0x40000, CRC(b6e58a46) SHA1(7d7e3cef435caa2fd7733a3fbc6930cb9ea7bcbc), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos162", "TOS 1.62 (STE TOS, Revision 2)" )
-	ROMX_LOAD( "tos162fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(0ab003be) SHA1(041e134da613f718fca8bd47cd7733076e8d7588), ROM_BIOS(1) )
+	ROMX_LOAD( "tos162fr.bin", 0x00000, 0x40000, CRC(0ab003be) SHA1(041e134da613f718fca8bd47cd7733076e8d7588), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(e3a99ca7) SHA1(387da431e6e3dd2e0c4643207e67d06cf33618c3), ROM_BIOS(2) )
+	ROMX_LOAD( "tos206fr.bin", 0x00000, 0x40000, CRC(e3a99ca7) SHA1(387da431e6e3dd2e0c4643207e67d06cf33618c3), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3047,7 +3047,7 @@ ROM_START( ste_it )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos106")
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
-	ROMX_LOAD( "tos106it.bin", 0x00000, 0x40000, BAD_DUMP CRC(d3a55216) SHA1(28dc74e5e0fa56b685bbe15f9837f52684fee9fd), ROM_BIOS(0) )
+	ROMX_LOAD( "tos106it.bin", 0x00000, 0x40000, CRC(d3a55216) SHA1(28dc74e5e0fa56b685bbe15f9837f52684fee9fd), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3062,9 +3062,9 @@ ROM_START( ste_se )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos162", "TOS 1.62 (STE TOS, Revision 2)" )
-	ROMX_LOAD( "tos162se.bin", 0x00000, 0x40000, BAD_DUMP CRC(90f124b1) SHA1(6e5454e861dbf4c46ce5020fc566c31202087b88), ROM_BIOS(0) )
+	ROMX_LOAD( "tos162se.bin", 0x00000, 0x40000, CRC(90f124b1) SHA1(6e5454e861dbf4c46ce5020fc566c31202087b88), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206se.bin", 0x00000, 0x40000, BAD_DUMP CRC(be61906d) SHA1(ebdf5a4cf08471cd315a91683fcb24e0f029d451), ROM_BIOS(1) )
+	ROMX_LOAD( "tos206se.bin", 0x00000, 0x40000, CRC(be61906d) SHA1(ebdf5a4cf08471cd315a91683fcb24e0f029d451), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3079,7 +3079,7 @@ ROM_START( ste_sg )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206sg.bin", 0x00000, 0x40000, BAD_DUMP CRC(8c4fe57d) SHA1(c7a9ae3162f020dcac0c2a46cf0c033f91b98644), ROM_BIOS(0) )
+	ROMX_LOAD( "tos206sg.bin", 0x00000, 0x40000, CRC(8c4fe57d) SHA1(c7a9ae3162f020dcac0c2a46cf0c033f91b98644), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3097,7 +3097,7 @@ ROM_START( megaste )
 	ROMX_LOAD( "atari mega ste 205 018 tms27c010.bin", 0x00000, 0x20000, CRC(befac3ab) SHA1(5b49f101f15a4d1c89cfd1d7ce3fec84a5ca36d0), ROM_BIOS(0) | ROM_SKIP(1) )
 	ROMX_LOAD( "atari mega ste 205 019 tms27c010.bin", 0x00001, 0x20000, CRC(ea2a136d) SHA1(c3c259293de562d2a0fac4d41f95cf3d42ad6df4), ROM_BIOS(0) | ROM_SKIP(1) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, BAD_DUMP CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(1) )
+	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3117,10 +3117,10 @@ ROM_START( megaste_uk )
 	ROM_SYSTEM_BIOS( 1, "tos205", "TOS 2.05 (Mega STE TOS)" )
 	ROMX_LOAD( "tos205uk.bin", 0x00000, 0x40000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(2) )
+	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(2) )
 #else
 	ROM_SYSTEM_BIOS( 0, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(0) )
+	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(0) )
 #endif
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
@@ -3136,9 +3136,9 @@ ROM_START( megaste_fr )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05 (Mega STE TOS)" )
-	ROMX_LOAD( "tos205fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(27b83d2f) SHA1(83963b0feb0d119b2ca6f51e483e8c20e6ab79e1), ROM_BIOS(0) )
+	ROMX_LOAD( "tos205fr.bin", 0x00000, 0x40000, CRC(27b83d2f) SHA1(83963b0feb0d119b2ca6f51e483e8c20e6ab79e1), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(e3a99ca7) SHA1(387da431e6e3dd2e0c4643207e67d06cf33618c3), ROM_BIOS(1) )
+	ROMX_LOAD( "tos206fr.bin", 0x00000, 0x40000, CRC(e3a99ca7) SHA1(387da431e6e3dd2e0c4643207e67d06cf33618c3), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3153,9 +3153,9 @@ ROM_START( megaste_de )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05 (Mega STE TOS)" )
-	ROMX_LOAD( "tos205de.bin", 0x00000, 0x40000, BAD_DUMP CRC(518b24e6) SHA1(084e083422f8fd9ac7a2490f19b81809c52b91b4), ROM_BIOS(0) )
+	ROMX_LOAD( "tos205de.bin", 0x00000, 0x40000, CRC(518b24e6) SHA1(084e083422f8fd9ac7a2490f19b81809c52b91b4), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206de.bin", 0x00000, 0x40000, BAD_DUMP CRC(143cd2ab) SHA1(d1da866560734289c4305f1028c36291d331d417), ROM_BIOS(1) )
+	ROMX_LOAD( "tos206de.bin", 0x00000, 0x40000, CRC(143cd2ab) SHA1(d1da866560734289c4305f1028c36291d331d417), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3170,7 +3170,7 @@ ROM_START( megaste_es )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos205")
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05 (Mega STE TOS)" )
-	ROMX_LOAD( "tos205es.bin", 0x00000, 0x40000, BAD_DUMP CRC(2a426206) SHA1(317715ad8de718b5acc7e27ecf1eb833c2017c91), ROM_BIOS(0) )
+	ROMX_LOAD( "tos205es.bin", 0x00000, 0x40000, CRC(2a426206) SHA1(317715ad8de718b5acc7e27ecf1eb833c2017c91), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3185,7 +3185,7 @@ ROM_START( megaste_it )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos205")
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05 (Mega STE TOS)" )
-	ROMX_LOAD( "tos205it.bin", 0x00000, 0x40000, BAD_DUMP CRC(b28bf5a1) SHA1(8e0581b442384af69345738849cf440d72f6e6ab), ROM_BIOS(0) )
+	ROMX_LOAD( "tos205it.bin", 0x00000, 0x40000, CRC(b28bf5a1) SHA1(8e0581b442384af69345738849cf440d72f6e6ab), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3200,9 +3200,9 @@ ROM_START( megaste_se )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05 (Mega STE TOS)" )
-	ROMX_LOAD( "tos205se.bin", 0x00000, 0x40000, BAD_DUMP CRC(6d49ccbe) SHA1(c065b1a9a2e42e5e373333e99be829028902acaa), ROM_BIOS(0) )
+	ROMX_LOAD( "tos205se.bin", 0x00000, 0x40000, CRC(6d49ccbe) SHA1(c065b1a9a2e42e5e373333e99be829028902acaa), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206se.bin", 0x00000, 0x40000, BAD_DUMP CRC(be61906d) SHA1(ebdf5a4cf08471cd315a91683fcb24e0f029d451), ROM_BIOS(1) )
+	ROMX_LOAD( "tos206se.bin", 0x00000, 0x40000, CRC(be61906d) SHA1(ebdf5a4cf08471cd315a91683fcb24e0f029d451), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3246,7 +3246,7 @@ ROM_START( tt030 )
 	ROM_REGION32_BE( 0x80000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
-	ROMX_LOAD( "tos306.bin", 0x00000, 0x80000, BAD_DUMP CRC(e65adbd7) SHA1(b15948786278e1f2abc4effbb6d40786620acbe8), ROM_BIOS(0) )
+	ROMX_LOAD( "tos306.bin", 0x00000, 0x80000, CRC(e65adbd7) SHA1(b15948786278e1f2abc4effbb6d40786620acbe8), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3261,7 +3261,7 @@ ROM_START( tt030_uk )
 	ROM_REGION32_BE( 0x80000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
-	ROMX_LOAD( "tos306uk.bin", 0x00000, 0x80000, BAD_DUMP CRC(75dda215) SHA1(6325bdfd83f1b4d3afddb2b470a19428ca79478b), ROM_BIOS(0) )
+	ROMX_LOAD( "tos306uk.bin", 0x00000, 0x80000, CRC(75dda215) SHA1(6325bdfd83f1b4d3afddb2b470a19428ca79478b), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3276,7 +3276,7 @@ ROM_START( tt030_de )
 	ROM_REGION32_BE( 0x80000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
-	ROMX_LOAD( "tos306de.bin", 0x00000, 0x80000, BAD_DUMP CRC(4fcbb59d) SHA1(80af04499d1c3b8551fc4d72142ff02c2182e64a), ROM_BIOS(0) )
+	ROMX_LOAD( "tos306de.bin", 0x00000, 0x80000, CRC(4fcbb59d) SHA1(80af04499d1c3b8551fc4d72142ff02c2182e64a), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3291,7 +3291,7 @@ ROM_START( tt030_fr )
 	ROM_REGION32_BE( 0x80000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
-	ROMX_LOAD( "tos306fr.bin", 0x00000, 0x80000, BAD_DUMP CRC(1945511c) SHA1(6bb19874e1e97dba17215d4f84b992c224a81b95), ROM_BIOS(0) )
+	ROMX_LOAD( "tos306fr.bin", 0x00000, 0x80000, CRC(1945511c) SHA1(6bb19874e1e97dba17215d4f84b992c224a81b95), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3306,7 +3306,7 @@ ROM_START( tt030_pl )
 	ROM_REGION32_BE( 0x80000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
-	ROMX_LOAD( "tos306pl.bin", 0x00000, 0x80000, BAD_DUMP CRC(4f2404bc) SHA1(d122b8ceb202b52754ff0d442b1c81f8b4de3436), ROM_BIOS(0) )
+	ROMX_LOAD( "tos306pl.bin", 0x00000, 0x80000, CRC(4f2404bc) SHA1(d122b8ceb202b52754ff0d442b1c81f8b4de3436), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3338,20 +3338,20 @@ ROM_START( falcon30 )
 	ROM_DEFAULT_BIOS("tos404")
 #if 0
 	ROM_SYSTEM_BIOS( 0, "tos400", "TOS 4.00" )
-	ROMX_LOAD( "tos400.bin", 0x00000, 0x7ffff, BAD_DUMP CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(0) )
+	ROMX_LOAD( "tos400.bin", 0x00000, 0x7ffff, CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos401", "TOS 4.01" )
 	ROMX_LOAD( "tos401.bin", 0x00000, 0x80000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos402", "TOS 4.02" )
-	ROMX_LOAD( "tos402.bin", 0x00000, 0x80000, BAD_DUMP CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(2) )
+	ROMX_LOAD( "tos402.bin", 0x00000, 0x80000, CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "tos404", "TOS 4.04" )
-	ROMX_LOAD( "tos404.bin", 0x00000, 0x80000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(2) )
+	ROMX_LOAD( "tos404.bin", 0x00000, 0x80000, CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(2) )
 #else
 	ROM_SYSTEM_BIOS( 0, "tos400", "TOS 4.00" )
-	ROMX_LOAD( "tos400.bin", 0x00000, 0x7ffff, BAD_DUMP CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(0) )
+	ROMX_LOAD( "tos400.bin", 0x00000, 0x7ffff, CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos402", "TOS 4.02" )
-	ROMX_LOAD( "tos402.bin", 0x00000, 0x80000, BAD_DUMP CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(1) )
+	ROMX_LOAD( "tos402.bin", 0x00000, 0x80000, CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos404", "TOS 4.04" )
-	ROMX_LOAD( "tos404.bin", 0x00000, 0x80000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(2) )
+	ROMX_LOAD( "tos404.bin", 0x00000, 0x80000, CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(2) )
 #endif
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
@@ -3366,7 +3366,7 @@ ROM_END
 ROM_START( falcon40 )
 	ROM_REGION32_BE( 0x80000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos492", "TOS 4.92" )
-	ROMX_LOAD( "tos492.bin", 0x00000, 0x7d314, BAD_DUMP CRC(bc8e497f) SHA1(747a38042844a6b632dcd9a76d8525fccb5eb892), ROM_BIOS(0) )
+	ROMX_LOAD( "tos492.bin", 0x00000, 0x7d314, CRC(bc8e497f) SHA1(747a38042844a6b632dcd9a76d8525fccb5eb892), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
@@ -3381,43 +3381,43 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT   CLASS          INIT        COMPANY  FULLNAME                 FLAGS
-COMP( 1985, st,         0,        0,      st,       st,     st_state,      empty_init, "Atari", "ST (USA)",              MACHINE_NOT_WORKING )
-COMP( 1985, st_uk,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (UK)",               MACHINE_NOT_WORKING )
-COMP( 1985, st_de,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Germany)",          MACHINE_NOT_WORKING )
-COMP( 1985, st_es,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Spain)",            MACHINE_NOT_WORKING )
-COMP( 1985, st_fr,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (France)",           MACHINE_NOT_WORKING )
-COMP( 1985, st_nl,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Netherlands)",      MACHINE_NOT_WORKING )
-COMP( 1985, st_se,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Sweden)",           MACHINE_NOT_WORKING )
-COMP( 1985, st_sg,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Switzerland)",      MACHINE_NOT_WORKING )
-COMP( 1987, megast,     st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (USA)",         MACHINE_NOT_WORKING )
-COMP( 1987, megast_uk,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (UK)",          MACHINE_NOT_WORKING )
-COMP( 1987, megast_de,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Germany)",     MACHINE_NOT_WORKING )
-COMP( 1987, megast_fr,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (France)",      MACHINE_NOT_WORKING )
-COMP( 1987, megast_se,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Sweden)",      MACHINE_NOT_WORKING )
-COMP( 1987, megast_sg,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Switzerland)", MACHINE_NOT_WORKING )
-COMP( 1989, ste,        0,        0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (USA)",             MACHINE_NOT_WORKING )
-COMP( 1989, ste_uk,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (UK)",              MACHINE_NOT_WORKING )
-COMP( 1989, ste_de,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Germany)",         MACHINE_NOT_WORKING )
-COMP( 1989, ste_es,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Spain)",           MACHINE_NOT_WORKING )
-COMP( 1989, ste_fr,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (France)",          MACHINE_NOT_WORKING )
-COMP( 1989, ste_it,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Italy)",           MACHINE_NOT_WORKING )
-COMP( 1989, ste_se,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Sweden)",          MACHINE_NOT_WORKING )
-COMP( 1989, ste_sg,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Switzerland)",     MACHINE_NOT_WORKING )
-//COMP( 1990, stbook,     ste,      0,      stbook,   stbook, stbook_state,  empty_init, "Atari", "STBook",                MACHINE_NOT_WORKING )
-COMP( 1990, tt030,      0,        0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (USA)",           MACHINE_NOT_WORKING )
-COMP( 1990, tt030_uk,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (UK)",            MACHINE_NOT_WORKING )
-COMP( 1990, tt030_de,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (Germany)",       MACHINE_NOT_WORKING )
-COMP( 1990, tt030_fr,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (France)",        MACHINE_NOT_WORKING )
-COMP( 1990, tt030_pl,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (Poland)",        MACHINE_NOT_WORKING )
-COMP( 1991, megaste,    ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (USA)",        MACHINE_NOT_WORKING )
-COMP( 1991, megaste_uk, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (UK)",         MACHINE_NOT_WORKING )
-COMP( 1991, megaste_de, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Germany)",    MACHINE_NOT_WORKING )
-COMP( 1991, megaste_es, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Spain)",      MACHINE_NOT_WORKING )
-COMP( 1991, megaste_fr, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (France)",     MACHINE_NOT_WORKING )
-COMP( 1991, megaste_it, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Italy)",      MACHINE_NOT_WORKING )
-COMP( 1991, megaste_se, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Sweden)",     MACHINE_NOT_WORKING )
-COMP( 1992, falcon30,   0,        0,      falcon,   falcon, ste_state,     empty_init, "Atari", "Falcon030",             MACHINE_NOT_WORKING )
-COMP( 1992, falcon40,   falcon30, 0,      falcon40, falcon, ste_state,     empty_init, "Atari", "Falcon040 (prototype)", MACHINE_NOT_WORKING )
-//COMP( 1989, stacy,      st,       0,      stacy,    stacy,  st_state,      empty_init, "Atari", "Stacy",                 MACHINE_NOT_WORKING )
-//COMP( 1991, stpad,      ste,      0,      stpad,    stpad,  st_state,      empty_init, "Atari", "STPad (prototype)",     MACHINE_NOT_WORKING )
-//COMP( 1992, fx1,        0,        0,      falcon,   falcon, ste_state,     empty_init, "Atari", "FX-1 (prototype)",      MACHINE_NOT_WORKING )
+COMP( 1985, st,         0,        0,      st,       st,     st_state,      empty_init, "Atari", "ST (USA)",              0 )
+COMP( 1985, st_uk,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (UK)",               0 )
+COMP( 1985, st_de,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Germany)",          0 )
+COMP( 1985, st_es,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Spain)",            0 )
+COMP( 1985, st_fr,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (France)",           0 )
+COMP( 1985, st_nl,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Netherlands)",      0 )
+COMP( 1985, st_se,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Sweden)",           0 )
+COMP( 1985, st_sg,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Switzerland)",      0 )
+COMP( 1987, megast,     st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (USA)",         0 )
+COMP( 1987, megast_uk,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (UK)",          0 )
+COMP( 1987, megast_de,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Germany)",     0 )
+COMP( 1987, megast_fr,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (France)",      0 )
+COMP( 1987, megast_se,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Sweden)",      0 )
+COMP( 1987, megast_sg,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Switzerland)", 0 )
+COMP( 1989, ste,        0,        0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (USA)",             0 )
+COMP( 1989, ste_uk,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (UK)",              0 )
+COMP( 1989, ste_de,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Germany)",         0 )
+COMP( 1989, ste_es,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Spain)",           0 )
+COMP( 1989, ste_fr,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (France)",          0 )
+COMP( 1989, ste_it,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Italy)",           0 )
+COMP( 1989, ste_se,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Sweden)",          0 )
+COMP( 1989, ste_sg,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Switzerland)",     0 )
+//COMP( 1990, stbook,     ste,      0,      stbook,   stbook, stbook_state,  empty_init, "Atari", "STBook",                0 )
+COMP( 1990, tt030,      0,        0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (USA)",           0 )
+COMP( 1990, tt030_uk,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (UK)",            0 )
+COMP( 1990, tt030_de,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (Germany)",       0 )
+COMP( 1990, tt030_fr,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (France)",        0 )
+COMP( 1990, tt030_pl,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (Poland)",        0 )
+COMP( 1991, megaste,    ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (USA)",        0 )
+COMP( 1991, megaste_uk, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (UK)",         0 )
+COMP( 1991, megaste_de, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Germany)",    0 )
+COMP( 1991, megaste_es, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Spain)",      0 )
+COMP( 1991, megaste_fr, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (France)",     0 )
+COMP( 1991, megaste_it, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Italy)",      0 )
+COMP( 1991, megaste_se, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Sweden)",     0 )
+COMP( 1992, falcon30,   0,        0,      falcon,   falcon, ste_state,     empty_init, "Atari", "Falcon030",             0 )
+COMP( 1992, falcon40,   falcon30, 0,      falcon40, falcon, ste_state,     empty_init, "Atari", "Falcon040 (prototype)", 0 )
+//COMP( 1989, stacy,      st,       0,      stacy,    stacy,  st_state,      empty_init, "Atari", "Stacy",                 0 )
+//COMP( 1991, stpad,      ste,      0,      stpad,    stpad,  st_state,      empty_init, "Atari", "STPad (prototype)",     0 )
+//COMP( 1992, fx1,        0,        0,      falcon,   falcon, ste_state,     empty_init, "Atari", "FX-1 (prototype)",      0 )

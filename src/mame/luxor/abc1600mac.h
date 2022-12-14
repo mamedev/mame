@@ -11,7 +11,7 @@
 #pragma once
 
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "machine/watchdog.h"
 
 
@@ -35,8 +35,7 @@ class abc1600_mac_device : public device_t,
 public:
 	abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto fc_cb() { return m_read_fc.bind(); }
-	auto buserr_cb() { return m_write_buserr.bind(); }
+	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	auto in_tren0_cb() { return m_read_tren[0].bind(); }
 	auto out_tren0_cb() { return m_write_tren[0].bind(); }
 	auto in_tren1_cb() { return m_read_tren[1].bind(); }
@@ -112,13 +111,11 @@ private:
 	const address_space_config m_mac_config;
 
 	required_memory_region m_rom;
+	required_device<m68008_device> m_cpu;
 	memory_share_creator<u8> m_segment_ram;
 	memory_share_creator<u16> m_page_ram;
 
 	required_device<watchdog_timer_device> m_watchdog;
-
-	devcb_read8        m_read_fc;
-	devcb_write8       m_write_buserr;
 
 	devcb_read8::array<3> m_read_tren;
 	devcb_write8::array<3> m_write_tren;

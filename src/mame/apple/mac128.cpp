@@ -608,7 +608,7 @@ WRITE_LINE_MEMBER(mac128_state::scsi_drq_w)
 
 void mac128_state::scsi_berr_w(uint8_t data)
 {
-	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+	m_maincpu->trigger_bus_error();
 }
 
 uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)

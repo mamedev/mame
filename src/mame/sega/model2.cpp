@@ -7308,7 +7308,7 @@ void model2_state::init_powsledm ()
 u32 model2_state::doa_prot_r(offs_t offset, u32 mem_mask)
 {
 	// doa only reads 16-bits at a time, while STV reads 32-bits
-	uint32 ret = 0;
+	uint32_t ret = 0;
 
 	if (mem_mask&0xffff0000) ret |= (m_0229crypt->data_r()<<16);
 	if (mem_mask&0x0000ffff) ret |= m_0229crypt->data_r();
