@@ -274,19 +274,19 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(triton_state::pushbutton_changed)
 {
-		switch (param)
-		{
-		case 0:
-			m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-			break;
-		case 1:
-			m_maincpu->set_input_line(INPUT_LINE_HALT, newval ? ASSERT_LINE : CLEAR_LINE);
-			break;
-		default:
-			m_int_vector = param;
-			m_maincpu->set_input_line(INPUT_LINE_IRQ0, newval ? ASSERT_LINE : CLEAR_LINE);
-			break;
-		}
+	switch (param)
+	{
+	case 0:
+		m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+		break;
+	case 1:
+		m_maincpu->set_input_line(INPUT_LINE_HALT, newval ? ASSERT_LINE : CLEAR_LINE);
+		break;
+	default:
+		m_int_vector = param;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, newval ? ASSERT_LINE : CLEAR_LINE);
+		break;
+	}
 }
 
 INPUT_CHANGED_MEMBER(triton_state::charset_changed)

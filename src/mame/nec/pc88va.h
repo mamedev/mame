@@ -6,10 +6,13 @@
 
 ********************************************************************************************/
 
+#ifndef MAME_NEC_PC88VA_H
+#define MAME_NEC_PC88VA_H
+
 #pragma once
 
-#ifndef MAME_INCLUDES_PC88VA_H
-#define MAME_INCLUDES_PC88VA_H
+//#include "pc80s31k.h"
+#include "pc88va_sgp.h"
 
 #include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
@@ -22,9 +25,6 @@
 #include "machine/upd765.h"
 #include "sound/ymopn.h"
 
-//#include "pc80s31k.h"
-#include "pc88va_sgp.h"
-
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -32,6 +32,7 @@
 
 #include "formats/pc98fdi_dsk.h"
 #include "formats/xdf_dsk.h"
+
 
 class pc88va_state : public driver_device
 {
@@ -284,4 +285,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_NEC_PC88VA_H

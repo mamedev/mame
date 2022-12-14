@@ -7351,7 +7351,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="driltanka" cloneof="driltank">
-		<description>Driller Tanks (Japan)[a]</description>
+		<description>Driller Tanks (Japan, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8179,7 +8179,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="fknighta" cloneof="fknight">
-		<description>Future Knight (UK)[a]</description>
+		<description>Future Knight (UK, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -10384,7 +10384,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="mask2a" cloneof="mask2">
-		<description>Mask II (UK)[a]</description>
+		<description>Mask II (UK, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -11453,7 +11453,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="octagona" cloneof="octagon">
-		<description>Octagon Squad (UK)[a]</description>
+		<description>Octagon Squad (UK, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
