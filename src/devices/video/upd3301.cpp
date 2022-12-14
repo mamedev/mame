@@ -45,7 +45,7 @@
 
 #define VERBOSE (LOG_WARN)
 //#define VERBOSE (LOG_WARN|LOG_CMD)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
