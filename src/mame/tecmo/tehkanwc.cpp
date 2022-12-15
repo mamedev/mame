@@ -142,8 +142,8 @@ private:
 	required_ioport_array<2> m_track_p2;
 	output_finder<2> m_digits;
 
-	int m_track0[2]{};
-	int m_track1[2]{};
+	int m_track_p1_reset[2]{};
+	int m_track_p2_reset[2]{};
 	int m_msm_data_offs = 0;
 	int m_toggle = 0;
 	uint8_t m_scroll_x[2]{};
@@ -190,8 +190,8 @@ private:
 void tehkanwc_state::machine_start()
 {
 	// register for savestates
-	save_item(NAME(m_track0));
-	save_item(NAME(m_track1));
+	save_item(NAME(m_track_p1_reset));
+	save_item(NAME(m_track_p2_reset));
 	save_item(NAME(m_msm_data_offs));
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_scroll_x));
@@ -219,24 +219,24 @@ void tehkanwc_state::sound_command_w(uint8_t data)
 
 uint8_t tehkanwc_state::track_0_r(offs_t offset)
 {
-	return m_track_p1[offset]->read() - m_track0[offset];
+	return m_track_p1[offset]->read() - m_track_p1_reset[offset];
 }
 
 uint8_t tehkanwc_state::track_1_r(offs_t offset)
 {
-	return m_track_p2[offset]->read() - m_track1[offset];
+	return m_track_p2[offset]->read() - m_track_p2_reset[offset];
 }
 
 void tehkanwc_state::track_0_reset_w(offs_t offset, uint8_t data)
 {
 	// reset the trackball counters
-	m_track0[offset] = m_track_p1[offset]->read() + data;
+	m_track_p1_reset[offset] = m_track_p1[offset]->read() + data;
 }
 
 void tehkanwc_state::track_1_reset_w(offs_t offset, uint8_t data)
 {
 	// reset the trackball counters
-	m_track1[offset] = m_track_p2[offset]->read() + data;
+	m_track_p2_reset[offset] = m_track_p2[offset]->read() + data;
 }
 
 

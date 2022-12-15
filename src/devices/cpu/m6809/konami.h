@@ -69,6 +69,8 @@ private:
 	template<class T> T safe_shift_left(T value, uint32_t shift);
 	void set_lines(uint8_t data);
 	void execute_one();
+
+	uint8_t m_bcount;
 };
 
 #define KONAMI_IRQ_LINE  M6809_IRQ_LINE   /* 0 - IRQ line number */

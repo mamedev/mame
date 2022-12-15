@@ -7,6 +7,12 @@
 
     Based on M6809 cpu core copyright John Butler
 
+    TODO:
+    - verify cycle timing
+    - verify status flag handling
+    - what happens with block/shift opcodes when count is 0? maybe a full loop?
+      parodius does an indexed LSRD and checks for A==0 to jump over the opcode
+
     References:
 
         6809 Simulator V09, By L.C. Benschop, Eindhoven The Netherlands.
@@ -97,6 +103,9 @@ konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *
 void konami_cpu_device::device_start()
 {
 	super::device_start();
+
+	m_bcount = 0;
+	save_item(NAME(m_bcount));
 
 	// resolve callbacks
 	m_set_lines.resolve();
