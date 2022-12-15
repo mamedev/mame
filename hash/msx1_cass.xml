@@ -4365,7 +4365,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="8534">
-				<rom name=" zero fighter - dog fighter (1985)(microbyte)(es)[bload'cas-',r].cas" size="8534" crc="94a480e2" sha1="da0f4e2660ca03e3403e7d22945ea9bae89ab571"/>
+				<rom name="zero fighter - dog fighter (1985)(microbyte)(es)[bload'cas-',r].cas" size="8534" crc="94a480e2" sha1="da0f4e2660ca03e3403e7d22945ea9bae89ab571"/>
 			</dataarea>
 		</part>
 	</software>
