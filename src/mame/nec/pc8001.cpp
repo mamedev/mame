@@ -123,6 +123,8 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 	}
 
 	lowerline = bool(BIT(attr, 5));
+	// FIXME: ninjakmb (pc8801) sets 0x50 0x50 for all attribute strips
+	// bit 6 is undefined in the specs, is it for masking decoration(s)?
 	upperline = bool(BIT(attr, 4));
 	reverse = bool(BIT(attr, 2));
 	attr_blink = bool(BIT(attr, 1));

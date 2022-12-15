@@ -84,7 +84,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<pc80s31_device> m_pc80s31;
 	optional_device<i8214_device> m_pic;
-//	required_device<upd1990a_device> m_rtc;
+//  required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_usart;
 //  required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
@@ -181,7 +181,7 @@ private:
 	void alu_ctrl2_w(uint8_t data);
 	template <unsigned kanji_level> uint8_t kanji_r(offs_t offset);
 	template <unsigned kanji_level> void kanji_w(offs_t offset, uint8_t data);
-//	void rtc_w(uint8_t data);
+//  void rtc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 

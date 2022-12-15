@@ -252,7 +252,10 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 					// Plane switch happens at half screen, VRAM areas 0x3e80-0x3fff is unused again.
 					// TODO: confirm that a 15 kHz monitor cannot work with this
 					// - jettermi just uses the other b&w mode;
-					// - casablan/byoin doesn't bother in changing resolution so only the upper part is drawn;
+					// - casablan/byoin doesn't bother in changing resolution so only the upper part is drawn.
+					// Update: real HW capture shows an ugly overlap with the two layers,
+					// implying that the second plane just latches on the same signals as the first,
+					// YAGNI unless found in concrete example.
 					int plane_offset = y >= 200 ? 384 : 0;
 
 					res |= ((m_gvram[bitmap_offset + plane_offset] >> xi) & 1);
@@ -635,7 +638,7 @@ uint8_t pc8801_state::port40_r()
 	uint8_t data = 0x00;
 
 	data |= m_centronics_busy;
-//	data |= m_centronics_ack << 1;
+//  data |= m_centronics_ack << 1;
 	data |= ioport("CTRL")->read() & 0xca;
 	data |= m_rtc->data_out_r() << 4;
 	data |= m_crtc->vrtc_r() << 5;
