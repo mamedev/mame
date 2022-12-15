@@ -47,6 +47,54 @@ DEFINE_DEVICE_TYPE(MC68EZ328, mc68ez328_device, "mc68ez328", "MC68EZ328 DragonBa
 
 const u32 mc68328_base_device::VCO_DIVISORS[8] = { 2, 4, 8, 16, 1, 1, 1, 1 };
 
+mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 addr_bits, address_map_constructor internal_map_ctor)
+	: m68000_device(mconfig, tag, owner, clock, type, 16, addr_bits, internal_map_ctor)
+	, m_pwm(nullptr)
+	, m_rtc(nullptr)
+	, m_spim(nullptr)
+	, m_out_port_a_cb(*this)
+	, m_out_port_b_cb(*this)
+	, m_out_port_c_cb(*this)
+	, m_out_port_d_cb(*this)
+	, m_out_port_e_cb(*this)
+	, m_out_port_f_cb(*this)
+	, m_out_port_g_cb(*this)
+	, m_in_port_a_cb(*this)
+	, m_in_port_b_cb(*this)
+	, m_in_port_c_cb(*this)
+	, m_in_port_d_cb(*this)
+	, m_in_port_e_cb(*this)
+	, m_in_port_f_cb(*this)
+	, m_in_port_g_cb(*this)
+	, m_out_pwm_cb(*this)
+	, m_out_spim_cb(*this)
+	, m_in_spim_cb(*this)
+	, m_out_flm_cb(*this)
+	, m_out_llp_cb(*this)
+	, m_out_lsclk_cb(*this)
+	, m_out_ld_cb(*this)
+	, m_lcd_info_changed_cb(*this)
+{
+}
+
+mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mc68328_base_device(mconfig, MC68328, tag, owner, clock, 24, address_map_constructor(FUNC(mc68328_device::internal_map), this))
+	, m_out_port_j_cb(*this)
+	, m_out_port_k_cb(*this)
+	, m_out_port_m_cb(*this)
+	, m_in_port_j_cb(*this)
+	, m_in_port_k_cb(*this)
+	, m_in_port_m_cb(*this)
+{
+	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68328_device::cpu_space_map), this);
+}
+
+mc68ez328_device::mc68ez328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mc68328_base_device(mconfig, MC68EZ328, tag, owner, clock, 32, address_map_constructor(FUNC(mc68ez328_device::internal_map), this))
+{
+	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68ez328_device::cpu_space_map), this);
+}
+
 void mc68328_base_device::base_internal_map(u32 addr_bits, address_map &map)
 {
 	map(addr_bits | 0x000, addr_bits | 0x000).rw(FUNC(mc68328_base_device::scr_r), FUNC(mc68328_base_device::scr_w));
@@ -254,54 +302,6 @@ void mc68ez328_device::cpu_space_map(address_map &map)
 	map(0xfffffff0, 0xffffffff).r(FUNC(mc68ez328_device::irq_callback)).umask16(0x00ff);
 }
 
-mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 addr_bits, address_map_constructor internal_map_ctor)
-	: m68000_device(mconfig, tag, owner, clock, type, 16, addr_bits, internal_map_ctor)
-	, m_pwm(nullptr)
-	, m_rtc(nullptr)
-	, m_spim(nullptr)
-	, m_out_port_a_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_out_port_b_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_out_port_c_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_out_port_d_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_out_port_e_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_out_port_f_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_out_port_g_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_in_port_a_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_in_port_b_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_in_port_c_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_in_port_d_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_in_port_e_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_in_port_f_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_in_port_g_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_out_pwm_cb(*this)
-	, m_out_spim_cb(*this)
-	, m_in_spim_cb(*this)
-	, m_out_flm_cb(*this)
-	, m_out_llp_cb(*this)
-	, m_out_lsclk_cb(*this)
-	, m_out_ld_cb(*this)
-	, m_lcd_info_changed_cb(*this)
-{
-}
-
-mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mc68328_base_device(mconfig, MC68328, tag, owner, clock, 24, address_map_constructor(FUNC(mc68328_device::internal_map), this))
-	, m_out_port_j_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_out_port_k_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_out_port_m_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_in_port_j_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_in_port_k_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-	, m_in_port_m_cb{ *this, *this, *this, *this, *this, *this, *this, *this }
-{
-	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68328_device::cpu_space_map), this);
-}
-
-mc68ez328_device::mc68ez328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mc68328_base_device(mconfig, MC68EZ328, tag, owner, clock, 32, address_map_constructor(FUNC(mc68ez328_device::internal_map), this))
-{
-	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68ez328_device::cpu_space_map), this);
-}
-
 //-------------------------------------------------
 //  device_resolve_objects - resolve objects that
 //  may be needed for other devices to set
@@ -312,24 +312,21 @@ void mc68328_base_device::device_resolve_objects()
 {
 	m68000_device::device_resolve_objects();
 
-	for (int bit = 0; bit < 8; bit++)
-	{
-		m_out_port_a_cb[bit].resolve();
-		m_out_port_b_cb[bit].resolve();
-		m_out_port_c_cb[bit].resolve();
-		m_out_port_d_cb[bit].resolve();
-		m_out_port_e_cb[bit].resolve();
-		m_out_port_f_cb[bit].resolve();
-		m_out_port_g_cb[bit].resolve();
+	m_out_port_a_cb.resolve_all_safe();
+	m_out_port_b_cb.resolve_all_safe();
+	m_out_port_c_cb.resolve_all_safe();
+	m_out_port_d_cb.resolve_all_safe();
+	m_out_port_e_cb.resolve_all_safe();
+	m_out_port_f_cb.resolve_all_safe();
+	m_out_port_g_cb.resolve_all_safe();
 
-		m_in_port_a_cb[bit].resolve();
-		m_in_port_b_cb[bit].resolve();
-		m_in_port_c_cb[bit].resolve();
-		m_in_port_d_cb[bit].resolve();
-		m_in_port_e_cb[bit].resolve();
-		m_in_port_f_cb[bit].resolve();
-		m_in_port_g_cb[bit].resolve();
-	}
+	m_in_port_a_cb.resolve_all();
+	m_in_port_b_cb.resolve_all();
+	m_in_port_c_cb.resolve_all();
+	m_in_port_d_cb.resolve_all();
+	m_in_port_e_cb.resolve_all();
+	m_in_port_f_cb.resolve_all();
+	m_in_port_g_cb.resolve_all();
 
 	m_out_pwm_cb.resolve_safe();
 
@@ -348,16 +345,13 @@ void mc68328_device::device_resolve_objects()
 {
 	mc68328_base_device::device_resolve_objects();
 
-	for (int bit = 0; bit < 8; bit++)
-	{
-		m_out_port_j_cb[bit].resolve();
-		m_out_port_k_cb[bit].resolve();
-		m_out_port_m_cb[bit].resolve();
+	m_out_port_j_cb.resolve_all();
+	m_out_port_k_cb.resolve_all();
+	m_out_port_m_cb.resolve_all();
 
-		m_in_port_j_cb[bit].resolve();
-		m_in_port_k_cb[bit].resolve();
-		m_in_port_m_cb[bit].resolve();
-	}
+	m_in_port_j_cb.resolve_all();
+	m_in_port_k_cb.resolve_all();
+	m_in_port_m_cb.resolve_all();
 }
 
 void mc68ez328_device::device_resolve_objects()
@@ -1523,7 +1517,7 @@ void mc68328_base_device::padata_w(u8 data) // 0x401
 	m_padata = data;
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_padir & m_pasel, i) && !m_out_port_a_cb[i].isnull())
+		if (BIT(m_padir & m_pasel, i))
 		{
 			m_out_port_a_cb[i](BIT(m_padata, i));
 		}
@@ -1586,7 +1580,7 @@ void mc68328_base_device::pbdata_w(u8 data) // 0x409
 	m_pbdata = data;
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_pbdir & m_pbsel, i) && !m_out_port_b_cb[i].isnull())
+		if (BIT(m_pbdir & m_pbsel, i))
 		{
 			m_out_port_b_cb[i](BIT(m_pbdata, i));
 		}
@@ -1649,16 +1643,13 @@ void mc68328_base_device::pcdata_w(u8 data) // 0x411
 	m_pcdata = data;
 	for (int i = 0; i < 8; i++)
 	{
-		if (!m_out_port_c_cb[i].isnull())
+		if (BIT(m_pcdir & m_pcsel, i))
 		{
-			if (BIT(m_pcdir & m_pcsel, i))
-			{
-				m_out_port_c_cb[i](BIT(m_pcdata, i));
-			}
-			else if (BIT(~m_pcdir & m_pcsel, i))
-			{
-				m_out_port_c_cb[i](1);
-			}
+			m_out_port_c_cb[i](BIT(m_pcdata, i));
+		}
+		else if (BIT(~m_pcdir & m_pcsel, i))
+		{
+			m_out_port_c_cb[i](1);
 		}
 	}
 }
@@ -1752,7 +1743,7 @@ void mc68328_base_device::pddata_w(u8 data) // 0x419
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_pddir, i) && !m_out_port_d_cb[i].isnull())
+		if (BIT(m_pddir, i))
 		{
 			m_out_port_d_cb[i](BIT(m_pddata, i));
 		}
@@ -1852,7 +1843,7 @@ void mc68328_base_device::pedata_w(u8 data) // 0x421
 	m_pedata = data;
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_pedir & m_pesel, i) && !m_out_port_e_cb[i].isnull())
+		if (BIT(m_pedir & m_pesel, i))
 		{
 			m_out_port_e_cb[i](BIT(m_pedata, i));
 		}
@@ -1931,7 +1922,7 @@ void mc68328_base_device::pfdata_w(u8 data) // 0x429
 	m_pfdata = data;
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_pfdir & m_pfsel, i) && !m_out_port_f_cb[i].isnull())
+		if (BIT(m_pfdir & m_pfsel, i))
 		{
 			m_out_port_f_cb[i](BIT(m_pfdata, i));
 		}
@@ -2010,7 +2001,7 @@ void mc68328_base_device::pgdata_w(u8 data) // 0x431
 	m_pgdata = data;
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_pgdir & m_pgsel, i) && !m_out_port_g_cb[i].isnull())
+		if (BIT(m_pgdir & m_pgsel, i))
 		{
 			m_out_port_g_cb[i](BIT(m_pgdata, i));
 		}
@@ -2089,7 +2080,7 @@ void mc68328_device::pjdata_w(u8 data) // 0x439
 	m_pjdata = data;
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_pjdir & m_pjsel, i) && !m_out_port_j_cb[i].isnull())
+		if (BIT(m_pjdir & m_pjsel, i))
 		{
 			m_out_port_j_cb[i](BIT(m_pjdata, i));
 		}
@@ -2152,7 +2143,7 @@ void mc68328_device::pkdata_w(u8 data) // 0x441
 	m_pkdata = data;
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_pkdir & m_pksel, i) && !m_out_port_k_cb[i].isnull())
+		if (BIT(m_pkdir & m_pksel, i))
 		{
 			m_out_port_k_cb[i](BIT(m_pkdata, i));
 		}
@@ -2231,7 +2222,7 @@ void mc68328_device::pmdata_w(u8 data) // 0x449
 	m_pmdata = data;
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_pmdir & m_pmsel, i) && !m_out_port_m_cb[i].isnull())
+		if (BIT(m_pmdir & m_pmsel, i))
 		{
 			m_out_port_m_cb[i](BIT(m_pmdata, i));
 		}

@@ -24,7 +24,7 @@
 
 #include "pilot1k.lh"
 
-#define VERBOSE (1)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 namespace {
@@ -32,6 +32,9 @@ namespace {
 class palm_base_state : public driver_device
 {
 public:
+	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
+
+protected:
 	palm_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -42,9 +45,6 @@ public:
 		, m_io_penb(*this, "PENB")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -87,8 +87,6 @@ public:
 		, m_io_portd(*this, "PORTD")
 	{ }
 
-	void palm_base(machine_config &config);
-
 	void palmiii(machine_config &config);
 	void pilot1k(machine_config &config);
 	void palmvx(machine_config &config);
@@ -101,6 +99,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void palm_base(machine_config &config);
 
 	void mem_map(address_map &map);
 

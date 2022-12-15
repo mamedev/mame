@@ -782,21 +782,21 @@ protected:
 	bool m_lsclk;
 	std::unique_ptr<u16[]> m_lcd_line_buffer;
 
-	devcb_write_line    m_out_port_a_cb[8];
-	devcb_write_line    m_out_port_b_cb[8];
-	devcb_write_line    m_out_port_c_cb[8];
-	devcb_write_line    m_out_port_d_cb[8];
-	devcb_write_line    m_out_port_e_cb[8];
-	devcb_write_line    m_out_port_f_cb[8];
-	devcb_write_line    m_out_port_g_cb[8];
+	devcb_write_line::array<8> m_out_port_a_cb;
+	devcb_write_line::array<8> m_out_port_b_cb;
+	devcb_write_line::array<8> m_out_port_c_cb;
+	devcb_write_line::array<8> m_out_port_d_cb;
+	devcb_write_line::array<8> m_out_port_e_cb;
+	devcb_write_line::array<8> m_out_port_f_cb;
+	devcb_write_line::array<8> m_out_port_g_cb;
 
-	devcb_read_line     m_in_port_a_cb[8];
-	devcb_read_line     m_in_port_b_cb[8];
-	devcb_read_line     m_in_port_c_cb[8];
-	devcb_read_line     m_in_port_d_cb[8];
-	devcb_read_line     m_in_port_e_cb[8];
-	devcb_read_line     m_in_port_f_cb[8];
-	devcb_read_line     m_in_port_g_cb[8];
+	devcb_read_line::array<8>  m_in_port_a_cb;
+	devcb_read_line::array<8>  m_in_port_b_cb;
+	devcb_read_line::array<8>  m_in_port_c_cb;
+	devcb_read_line::array<8>  m_in_port_d_cb;
+	devcb_read_line::array<8>  m_in_port_e_cb;
+	devcb_read_line::array<8>  m_in_port_f_cb;
+	devcb_read_line::array<8>  m_in_port_g_cb;
 
 	devcb_write_line m_out_pwm_cb;
 
@@ -824,12 +824,13 @@ public:
 	template <int Line> auto in_port_k() { return m_in_port_k_cb[Line].bind(); }
 	template <int Line> auto in_port_m() { return m_in_port_m_cb[Line].bind(); }
 
-private:
+protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+private:
 	enum : u8
 	{
 		LPICF_GS                = 0x01,
@@ -1031,13 +1032,13 @@ private:
 
 	emu_timer   *m_gptimer[2];
 
-	devcb_write_line    m_out_port_j_cb[8];
-	devcb_write_line    m_out_port_k_cb[8];
-	devcb_write_line    m_out_port_m_cb[8];
+	devcb_write_line::array<8> m_out_port_j_cb;
+	devcb_write_line::array<8> m_out_port_k_cb;
+	devcb_write_line::array<8> m_out_port_m_cb;
 
-	devcb_read_line     m_in_port_j_cb[8];
-	devcb_read_line     m_in_port_k_cb[8];
-	devcb_read_line     m_in_port_m_cb[8];
+	devcb_read_line::array<8>  m_in_port_j_cb;
+	devcb_read_line::array<8>  m_in_port_k_cb;
+	devcb_read_line::array<8>  m_in_port_m_cb;
 };
 
 class mc68ez328_device : public mc68328_base_device
@@ -1045,12 +1046,13 @@ class mc68ez328_device : public mc68328_base_device
 public:
 	mc68ez328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-private:
+protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+private:
 	enum : u8
 	{
 		LPICF_GS                = 0x03,
