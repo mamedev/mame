@@ -238,58 +238,6 @@ inline void konami_cpu_device::write_exgtfr_register(uint8_t reg, uint16_t value
 
 
 //-------------------------------------------------
-//  safe_shift_right
-//-------------------------------------------------
-
-template<class T> T konami_cpu_device::safe_shift_right(T value, uint32_t shift)
-{
-	T result;
-
-	if (shift < (sizeof(T) * 8))
-		result = value >> shift;
-	else if (value < 0)
-		result = (T) -1;
-	else
-		result = 0;
-
-	return result;
-}
-
-
-//-------------------------------------------------
-//  safe_shift_right_unsigned
-//-------------------------------------------------
-
-template<class T> T konami_cpu_device::safe_shift_right_unsigned(T value, uint32_t shift)
-{
-	T result;
-
-	if (shift < (sizeof(T) * 8))
-		result = value >> shift;
-	else
-		result = 0;
-
-	return result;
-}
-
-//-------------------------------------------------
-//  safe_shift_left
-//-------------------------------------------------
-
-template<class T> T konami_cpu_device::safe_shift_left(T value, uint32_t shift)
-{
-	T result;
-
-	if (shift < (sizeof(T) * 8))
-		result = value << shift;
-	else
-		result = 0;
-
-	return result;
-}
-
-
-//-------------------------------------------------
 //  lmul
 //-------------------------------------------------
 

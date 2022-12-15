@@ -64,9 +64,6 @@ private:
 	void divx();
 
 	// miscellaneous
-	template<class T> T safe_shift_right(T value, uint32_t shift);
-	template<class T> T safe_shift_right_unsigned(T value, uint32_t shift);
-	template<class T> T safe_shift_left(T value, uint32_t shift);
 	void set_lines(uint8_t data);
 	void execute_one();
 

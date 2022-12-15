@@ -521,19 +521,15 @@ LSRD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 
-	if (m_bcount != 0x00)
+	while(m_bcount--)
 	{
-		// set C condition code
-		if (m_temp.w & safe_shift_left(1, m_bcount - 1))
-			m_cc |= CC_C;
-		else
-			m_cc &= ~CC_C;
-
-		m_temp.w = set_flags<uint16_t>(CC_NZ, safe_shift_right_unsigned<uint16_t>(m_temp.w, m_bcount));
-		@write_operand(0, m_temp.b.h);
-		write_operand(1, m_temp.b.l);
+		@eat(1);
+		m_cc &= ~CC_C;
+		m_cc |= (m_temp.w & 1) ? CC_C : 0;
+		m_temp.w = set_flags<uint16_t>(CC_NZ, m_temp.w >> 1);
 	}
-	eat(m_bcount);
+	@write_operand(0, m_temp.b.h);
+	write_operand(1, m_temp.b.l);
 	return;
 
 ASLD:
@@ -546,19 +542,13 @@ ASLD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 
-	if (m_bcount != 0x00)
+	while(m_bcount--)
 	{
-		// set C condition code
-		if (m_temp.w & safe_shift_right(0x10000, m_bcount))
-			m_cc |= CC_C;
-		else
-			m_cc &= ~CC_C;
-
-		m_temp.w = set_flags<uint16_t>(CC_NZV, safe_shift_left<int16_t>(m_temp.w, m_bcount));
-		@write_operand(0, m_temp.b.h);
-		write_operand(1, m_temp.b.l);
+		@eat(1);
+		m_temp.w = set_flags<uint16_t>(CC_NZVC, m_temp.w, m_temp.w, m_temp.w << 1);
 	}
-	eat(m_bcount);
+	@write_operand(0, m_temp.b.h);
+	write_operand(1, m_temp.b.l);
 	return;
 
 ASRD:
@@ -571,19 +561,15 @@ ASRD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 
-	if (m_bcount != 0x00)
+	while(m_bcount--)
 	{
-		// set C condition code
-		if (m_temp.w & safe_shift_left(1, m_bcount - 1))
-			m_cc |= CC_C;
-		else
-			m_cc &= ~CC_C;
-
-		m_temp.w = set_flags<uint16_t>(CC_NZ, safe_shift_right<int16_t>(m_temp.w, m_bcount));
-		@write_operand(0, m_temp.b.h);
-		write_operand(1, m_temp.b.l);
+		@eat(1);
+		m_cc &= ~CC_C;
+		m_cc |= (m_temp.w & 1) ? CC_C : 0;
+		m_temp.w = set_flags<uint16_t>(CC_NZ, ((int16_t) m_temp.w) >> 1);
 	}
-	eat(m_bcount);
+	@write_operand(0, m_temp.b.h);
+	write_operand(1, m_temp.b.l);
 	return;
 
 ROLD:
@@ -596,11 +582,10 @@ ROLD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 
-	// doing this as a loop is lame
 	while(m_bcount--)
 	{
 		@eat(1);
-		m_temp.w = set_flags<uint16_t>(CC_NZ, rotate_left(m_temp.w));
+		m_temp.w = set_flags<uint16_t>(CC_NZV, rotate_left(m_temp.w));
 	}
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
@@ -616,7 +601,6 @@ RORD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 
-	// doing this as a loop is lame
 	while(m_bcount--)
 	{
 		@eat(1);
