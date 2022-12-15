@@ -28,10 +28,23 @@ class network_adapter
 	: public device_t
 	, public device_buffered_serial_interface<16U>
 	, public device_rs232_port_interface
+	, public device_image_interface
 {
 public:
 	// constructor/destructor
 	network_adapter(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	// image-level overrides
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual bool core_opens_image_file() const noexcept override { return true; }
+	virtual const char *file_extensions() const noexcept override { return "pak"; }
+	virtual const char *image_type_name() const noexcept override { return "Segment Pak"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "hcca"; }
+	virtual image_init_result call_load() override;
+
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) override;
 protected:
@@ -71,6 +84,7 @@ private:
 			uint8_t crc[2];
 		};
 	public:
+		std::error_condition read_archive(util::core_file &stream, uint32_t segment_id);
 		std::error_condition load(std::string_view local_path, uint32_t segment_id);
 		const pak& operator[](const int index) const;
 		uint32_t size() { return pak_list.size(); }
@@ -99,7 +113,10 @@ private:
 			0xef1f, 0xff3e, 0xcf5d, 0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8, 0x6e17, 0x7e36, 0x4e55, 0x5e74,
 			0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 		};
+		std::error_condition parse_segment(char * buffer, size_t length);
 		uint16_t update_crc(uint16_t crc, uint8_t data);
+
+		uint32_t m_segment_id;
 		std::vector<pak> pak_list;
 	};
 
