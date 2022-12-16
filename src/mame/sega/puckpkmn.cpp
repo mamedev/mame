@@ -107,9 +107,9 @@ private:
 };
 
 
-/* Puckman Pockimon Input Ports */
+// Puckman Pockimon Input Ports
 INPUT_PORTS_START( puckpkmn )
-	PORT_START("P2")    /* $700011.b */
+	PORT_START("P2")    // $700011.b
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -119,7 +119,7 @@ INPUT_PORTS_START( puckpkmn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START("P1")    /* $700013.b */
+	PORT_START("P1")    // $700013.b
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -129,9 +129,9 @@ INPUT_PORTS_START( puckpkmn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START("UNK")   /* $700015.b */
+	PORT_START("UNK")   // $700015.b
 
-	PORT_START("DSW1")  /* $700017.b */
+	PORT_START("DSW1")  // $700017.b
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
@@ -156,7 +156,7 @@ INPUT_PORTS_START( puckpkmn )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("DSW2")  /* $700019.b */
+	PORT_START("DSW2")  // $700019.b
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -182,10 +182,9 @@ INPUT_PORTS_START( puckpkmn )
 INPUT_PORTS_END
 
 
-
-
+// Juézhàn Tiānhuáng inputs
 INPUT_PORTS_START( jzth )
-	PORT_START("P2")    /* $700011.b */
+	PORT_START("P2")    // $700011.b
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -195,7 +194,7 @@ INPUT_PORTS_START( jzth )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START("P1")    /* $700013.b */
+	PORT_START("P1")    // $700013.b
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -205,7 +204,7 @@ INPUT_PORTS_START( jzth )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 
-	PORT_START("UNK")   /* $700015.b */
+	PORT_START("UNK")   // $700015.b
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -216,7 +215,7 @@ INPUT_PORTS_START( jzth )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 
-	PORT_START("DSW1")  /* $700017.b */
+	PORT_START("DSW1")  // $700017.b
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
@@ -241,7 +240,7 @@ INPUT_PORTS_START( jzth )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("DSW2")  /* $700019.b */
+	PORT_START("DSW2")  // $700019.b
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -326,7 +325,7 @@ void jzth_state::jzth_map(address_map &map)
 }
 
 
-// jzth protection
+// Juezhan Tiānhuáng protection
 void jzth_state::bl_710000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// protection value is read from  0x710000 after a series of writes.. and stored at ff0007
@@ -455,7 +454,7 @@ void jzth_state::machine_start()
 }
 
 
-/* Genie's Hardware (contains no real sega parts) */
+/* Genie's Hardware (contains no real Sega parts) */
 
 /***************************************************************************
 Puckman Pokemon Genie 2000
@@ -523,7 +522,6 @@ PUCKPOKE.U8 27C4001---/
 
 ROM sockets U63 & U64 empty
 
-
 ****************************************************************************/
 
 void puckpkmn_state::init_puckpkmn()
@@ -543,7 +541,9 @@ void puckpkmn_state::init_puckpkmn()
 	m_vdp->set_total_scanlines(262);
 }
 
-ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */
+
+// Puckman Pockimon  (c)2000 Genie
+ROM_START( puckpkmn )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "puckpoke.u5", 0x000000, 0x080000, CRC(fd334b91) SHA1(cf8bf6645a4082ea4392937e169b1686c9c7e246) )
 	ROM_LOAD16_BYTE( "puckpoke.u4", 0x000001, 0x080000, CRC(839cc76b) SHA1(e15662a7175db7a8e222dda176a8ed92e0d56e9d) )
@@ -554,8 +554,10 @@ ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */
 	ROM_LOAD( "puckpoke.u3", 0x00000, 0x40000, CRC(7b066bac) SHA1(429616e21c672b07e0705bc63234249cac3af56f) )
 ROM_END
 
+
 /*
 精靈家族/Jīnglíng Jiāzú (Traditional Chinese)
+(c)2000 IBS Co. Ltd
 
 
 PCB Layout
@@ -595,7 +597,7 @@ Notes:
 
 */
 
-ROM_START( puckpkmna ) /* Puckman Pockimon  (c)2000 IBS Co. Ltd */
+ROM_START( puckpkmna )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "b2.u59", 0x000000, 0x080000, CRC(3fbea2c7) SHA1(89f3770ae92c62714f0795ddd2f311a9532eb25a) ) // FIRST AND SECOND HALF IDENTICAL
 	ROM_IGNORE(0x080000)
@@ -611,6 +613,7 @@ ROM_START( puckpkmna ) /* Puckman Pockimon  (c)2000 IBS Co. Ltd */
 ROM_END
 
 
+// Puckman Pockimon  (c)2000 Sun Mixing
 ROM_START( puckpkmnb )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "200061.u5", 0x000000, 0x080000, CRC(502a5093) SHA1(6dc1c79d52ebb653cb2e4388f74fd975ec323566) )

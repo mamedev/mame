@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 /**********************************************************************
 
-    Sega DE-9 controllers
+    Sega 9-pin controllers
 
 **********************************************************************/
 #ifndef MAME_BUS_SMS_CTRL_CONTROLLERS_H

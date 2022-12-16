@@ -57,11 +57,6 @@ void md_cons_state::md_exp_port(machine_config &config)
 
 
 static INPUT_PORTS_START( md )
-	// Unemulated controllers:
-	// Sega Menacer
-	// Konami Justifier
-	// EA 4-Play
-
 	PORT_START("RESET")     // Buttons on Mega Drive console
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 INPUT_PORTS_END
