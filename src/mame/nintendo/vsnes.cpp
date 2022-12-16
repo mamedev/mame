@@ -1221,10 +1221,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vsnes_zapper )
 	PORT_START("IN0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED )            // ALM wire. 1: gun connected, 0: disconnected alarm (Duck Hunt and Hogan's Alley only?)
+	PORT_CONFNAME( 0x10, 0x10, "Gun Alarm Wire" )           // ALM wire (ignored by Gumshoe and Freedom Force?)
+	PORT_CONFSETTING(    0x00, "Disconnected" )
+	PORT_CONFSETTING(    0x10, "Connected" )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            // sprite hit
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )           // gun trigger
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )            // gun HIT
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )           // gun TRG
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
