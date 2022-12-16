@@ -77,7 +77,7 @@ int sdl_entered_debugger;
 
 const options_entry sdl_options::s_option_entries[] =
 {
-	{ SDLOPTION_INIPATH,                     INI_PATH,       core_options::option_type::PATH,     "path to ini files" },
+	{ SDLOPTION_INIPATH,                     INI_PATH,       core_options::option_type::MULTIPATH,  "path to ini files" },
 
 	// performance options
 	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL PERFORMANCE OPTIONS" },
@@ -99,7 +99,7 @@ const options_entry sdl_options::s_option_entries[] =
 	// keyboard mapping
 	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL KEYBOARD MAPPING" },
 	{ SDLOPTION_KEYMAP,                      "0",            core_options::option_type::BOOLEAN,    "enable keymap" },
-	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat",   core_options::option_type::PATH,     "keymap filename" },
+	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat",   core_options::option_type::PATH,       "keymap filename" },
 
 	// joystick mapping
 	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL JOYSTICK MAPPING" },
