@@ -1363,13 +1363,10 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<software name="cfodder" supported="partial">
+	<software name="cfodder">
 		<description>Cannon Fodder (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17322-H"/>
@@ -3188,13 +3185,10 @@ Crashes after EA logo, requires better [VDP] irq handling
 	</software>
 
 
-	<software name="funngame" supported="partial">
+	<software name="funngame">
 		<description>Fun 'N Games (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -4172,13 +4166,10 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 	</software>
 
 
-	<software name="jimmywws" supported="partial">
+	<software name="jimmywws">
 		<description>Jimmy White's Whirlwind Snooker (Europe)</description>
 		<year>1991</year>
 		<publisher>Virgin Games</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
@@ -4657,13 +4648,10 @@ Unsupported [Sega Mouse] peripheral
 	</software>
 
 
-	<software name="lemming2" supported="partial">
+	<software name="lemming2">
 		<description>Lemmings 2 - The Tribes (Europe)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -7263,13 +7251,10 @@ Unsupported [Menacer] peripheral
 	</software>
 
 
-	<software name="shangh2" supported="partial">
+	<software name="shangh2">
 		<description>Shanghai II - Dragon's Eye (USA)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="800057-02"/>
@@ -12285,7 +12270,6 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Unsupported [Menacer] peripheral (joypad works)
-Unsupported [Sega Mouse] peripheral
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
@@ -18123,13 +18107,10 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="janout" supported="partial">
+	<software name="janout">
 		<description>Janou Touryuumon (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<info name="serial" value="G-4096"/>
 		<info name="release" value="19931105"/>
 		<info name="alt_title" value="日本プロ麻雀連盟公認 雀皇登龍門"/>
@@ -19019,13 +19000,10 @@ Black screen
 		</part>
 	</software>
 
-	<software name="lemming2u" cloneof="lemming2" supported="partial">
+	<software name="lemming2u" cloneof="lemming2">
 		<description>Lemmings 2 - The Tribes (USA)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -19236,13 +19214,10 @@ Unsupported [Justifier] peripheral (joypad works)
 		</part>
 	</software>
 
-	<software name="lordmon" supported="partial">
+	<software name="lordmon">
 		<description>Lord Monarch - Tokoton Sentou Densetsu (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<info name="serial" value="G-5534"/>
 		<info name="release" value="19940624"/>
 		<info name="alt_title" value="ロードモナーク とことん戦闘伝説"/>
@@ -19623,13 +19598,10 @@ https://segaretro.org/Ma_Qiao_E_Mo_Ta:_Devilish_Mahjong_Tower
 		</part>
 	</software>
 
-	<software name="marblej" supported="partial">
+	<software name="marblej">
 		<description>Marble Madness (Japan)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral (trackball)
-]]></notes>
 		<info name="serial" value="T-48113"/>
 		<info name="release" value="19930813"/>
 		<info name="alt_title" value="マーブル マッドネス"/>
@@ -22322,13 +22294,10 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="nobuhao" supported="partial">
+	<software name="nobuhao">
 		<description>Nobunaga no Yabou - Haouden (Japan)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<info name="serial" value="T-76153"/>
 		<info name="release" value="19940225"/>
 		<info name="alt_title" value="信長の野望 覇王伝"/>
@@ -22342,13 +22311,10 @@ Unsupported [Sega Mouse] peripheral
 		</part>
 	</software>
 
-	<software name="nobuamb" supported="partial">
+	<software name="nobuamb">
 		<description>Nobunaga's Ambition (USA)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -22359,13 +22325,10 @@ Unsupported [Sega Mouse] peripheral
 		</part>
 	</software>
 
-	<software name="nobuzenk" cloneof="nobuamb" supported="partial">
+	<software name="nobuzenk" cloneof="nobuamb">
 		<description>Nobunaga no Yabou - Zenkokuban (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<info name="serial" value="T-76133"/>
 		<info name="release" value="19930915"/>
 		<info name="alt_title" value="信長の野望 全・国・版"/>
@@ -24536,13 +24499,10 @@ https://segaretro.org/Rastan_Saga_II
 		</part>
 	</software>
 
-	<software name="rsbt" supported="partial">
+	<software name="rsbt">
 		<description>Richard Scarry's BusyTown (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -30480,13 +30440,10 @@ No BGMs
 		</part>
 	</software>
 
-	<software name="wworlds" supported="partial">
+	<software name="wworlds">
 		<description>Wacky Worlds (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<info name="alt_title" value="Wacky Worlds Creativity Studio (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>

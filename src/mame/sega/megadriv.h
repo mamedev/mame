@@ -13,9 +13,6 @@
 #include "sound/ymopn.h"
 #include "video/315_5313.h"
 
-#define MASTER_CLOCK_NTSC 53693175
-#define MASTER_CLOCK_PAL  53203424
-
 #define MD_CPU_REGION_SIZE 0x800000
 
 
@@ -26,6 +23,9 @@ INPUT_PORTS_EXTERN( megadriv );
 class md_core_state : public driver_device
 {
 protected:
+	static inline constexpr XTAL MASTER_CLOCK_NTSC = 53.693175_MHz_XTAL;
+	static inline constexpr XTAL MASTER_CLOCK_PAL  = 53.203424_MHz_XTAL;
+
 	md_core_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),

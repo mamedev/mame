@@ -3557,6 +3557,8 @@ if (BUSES["SMS_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/sms_ctrl/md6bt.h",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/mdpad.cpp",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/mdpad.h",
+		MAME_DIR .. "src/devices/bus/sms_ctrl/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/sms_ctrl/mouse.h",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/multitap.cpp",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/multitap.h",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/paddle.cpp",
@@ -3571,6 +3573,8 @@ if (BUSES["SMS_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/sms_ctrl/sports.h",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/sportsjp.cpp",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/sportsjp.h",
+		MAME_DIR .. "src/devices/bus/sms_ctrl/teamplayer.cpp",
+		MAME_DIR .. "src/devices/bus/sms_ctrl/teamplayer.h",
 	}
 end
 

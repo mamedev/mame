@@ -58,13 +58,9 @@ void md_cons_state::md_exp_port(machine_config &config)
 
 static INPUT_PORTS_START( md )
 	// Unemulated controllers:
-	// Sega Mouse
 	// Sega Menacer
 	// Konami Justifier
-	// Sega Team Player
 	// EA 4-Play
-/* there exists both a 2 buttons version of the Mouse (Jpn ver, to be used with RPGs, it
-    can aslo be used as trackball) and a 3 buttons version (US ver, no trackball feats.) */
 
 	PORT_START("RESET")     // Buttons on Mega Drive console
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
