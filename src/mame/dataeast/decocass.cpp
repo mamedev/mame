@@ -1504,7 +1504,7 @@ ROM_START( cnebula )
 	ROM_LOAD( "nebula2.pro",   0x0000, 0x0020, CRC(75cae001) SHA1(59b2b47b91945857e6f40dd4baa0e92242fc3519) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
-	ROM_LOAD( "nebula2.cas", 0x000000, 0x005c00, CRC(ef05ce36) SHA1(824de511387eba1bd99c3c7935702d794eb46446) )
+	ROM_LOAD( "nebula2.cas", 0x000000, 0x005c00, CRC(aaac39e6) SHA1(890a5439825bef9eb26ca22562e3cc30860415b0) )
 ROM_END
 
 /* 07 Astro Fantasia */
@@ -2151,6 +2151,13 @@ ROM_START( decodark )
 	DECO_DARK_BIOS
 
 	ROM_REGION( 0x100000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD( "20221213_v17_dongl_27c800.bin",    0x00000, 0x100000, CRC(69553e2b) SHA1(3c7cb985611df06c771bc842d4125dc9220cdda9) )
+ROM_END
+
+ROM_START( decodark16 )
+	DECO_DARK_BIOS
+
+	ROM_REGION( 0x100000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD( "20221212_v16_dongl_27c800.bin",    0x00000, 0x100000, CRC(199707bd) SHA1(da936dae54b0f98f03328c8a23494fe323874983) )
 ROM_END
 
@@ -2288,6 +2295,7 @@ void decocass_state::init_cdsteljn()
 
 GAME( 2008, decomult,  decocass, decocass, decocass, decocass_widel_state,  init_decocass, ROT270, "bootleg (David Widel)", "DECO Cassette System ROM Multigame (David Widel)", 0 )
 
-GAME( 2022, decodark,  decocass, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "DECO Cassette System ROM Multigame (Darksoft, v16)", 0 )
+GAME( 2022, decodark,  decocass, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "DECO Cassette System ROM Multigame (Darksoft, v17)", 0 ) // fixed an issue with skater
+GAME( 2022, decodark16,decodark, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "DECO Cassette System ROM Multigame (Darksoft, v16)", 0 ) // added nebula
 GAME( 2022, decodark15,decodark, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "DECO Cassette System ROM Multigame (Darksoft, v15)", 0 )
 // earlier revisions of this kit were released as early as 2017
