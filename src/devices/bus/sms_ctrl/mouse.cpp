@@ -115,22 +115,6 @@ void sms_megamouse_device::out_w(u8 data, u8 mem_mask)
 			LOG("%s: TH falling, selected\n", machine().describe_context());
 			m_out = 0x3b;
 
-			for (unsigned i = 0; m_axes.size() > i; ++i)
-			{
-				u16 const current = m_axes[i]->read();
-				m_count[i] = s16(current) - s16(m_base[i]);
-				m_base[i] = current;
-				if (0x1000 < m_count[i])
-					m_count[i] -= 0x2000;
-				else if (-0x1000 > m_count[i])
-					m_count[i] += 0x2000;
-			}
-			LOG(
-					"%s: movement (%d %d)\n",
-					machine().describe_context(),
-					m_count[0],
-					m_count[1]);
-
 			if (!tr)
 			{
 				LOG("%s: TR low, wait for data update\n", machine().describe_context());
@@ -181,7 +165,6 @@ void sms_megamouse_device::device_start()
 
 
 TIMER_CALLBACK_MEMBER(sms_megamouse_device::next_step)
-
 {
 	if (BIT(param, 1))
 	{
@@ -204,6 +187,20 @@ TIMER_CALLBACK_MEMBER(sms_megamouse_device::next_step)
 		switch (m_phase)
 		{
 		case 0:
+			if (!BIT(param, 0))
+			{
+				for (unsigned i = 0; m_axes.size() > i; ++i)
+				{
+					u16 const current = m_axes[i]->read();
+					m_count[i] = s16(current) - s16(m_base[i]);
+					m_base[i] = current;
+					if (0x1000 < m_count[i])
+						m_count[i] -= 0x2000;
+					else if (-0x1000 > m_count[i])
+						m_count[i] += 0x2000;
+				}
+				LOG("movement (%d %d)\n", m_count[0], m_count[1]);
+			}
 			m_out = (m_out & 0x30) | 0x0f;
 			LOG("update data unused = 0x%X\n", m_out & 0x0f);
 			break;

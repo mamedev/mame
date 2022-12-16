@@ -46,6 +46,14 @@ protected:
 private:
 	enum : u8
 	{
+		IDENT_3BUTTON = 0x0,
+		IDENT_6BUTTON = 0x1,
+		IDENT_MOUSE = 0x2,
+		IDENT_UNSUPPORTED = 0xf
+	};
+
+	enum : u8
+	{
 		PHASE_START = 0,
 		PHASE_UNUSED,
 		PHASE_IDENT1,
@@ -145,7 +153,46 @@ INPUT_CHANGED_MEMBER(sms_teamplayer_device::reselect)
 u8 sms_teamplayer_device::in_r()
 {
 	u8 const sel = m_select->read();
-	return (m_ports.size() > sel) ? m_ports[sel]->in_r() : m_out;
+	if (m_ports.size() > sel)
+	{
+		u8 const result = m_ports[sel]->in_r();
+		LOG(
+				"%s: read passthrough %c = 0x%02X\n",
+				machine().describe_context(),
+				'A' + sel,
+				result);
+		return result;
+	}
+	else if (PHASE_UNUSED == m_phase)
+	{
+		bool ready = true;
+		for (unsigned i = 0; ready && (m_ports.size() > i); ++i)
+		{
+			if ((IDENT_MOUSE == m_ident[i]) && BIT(m_ports[i]->in_r() ^ m_out, 4))
+				ready = false;
+		}
+		u8 const result = m_out ^ (ready ? 0x00 : 0x10);
+
+		LOG("%s: read mouse ready = 0x%02X\n", machine().describe_context(), result);
+		return result;
+	}
+	else if ((PHASE_PORT_A <= m_phase) && (PHASE_PORT_D >= m_phase))
+	{
+		u8 const port = m_phase - PHASE_PORT_A;
+		if (IDENT_MOUSE == m_ident[port])
+		{
+			u8 const result = m_ports[port]->in_r() ^ ((BIT(m_nybble, 0) ^ BIT(m_out, 4)) << 4);
+			LOG(
+					"%s: read mouse passthrough %c = 0x%02X\n",
+					machine().describe_context(),
+					'A' + port,
+					result);
+			return result;
+		}
+	}
+
+	LOG("%s: read data = 0x%02X\n", machine().describe_context(), m_out);
+	return m_out;
 }
 
 
@@ -225,7 +272,7 @@ void sms_teamplayer_device::device_start()
 
 	for (auto &response : m_probe)
 		std::fill(std::begin(response), std::end(response), 0x3f);
-	std::fill(std::begin(m_ident), std::end(m_ident), 0x0f);
+	std::fill(std::begin(m_ident), std::end(m_ident), IDENT_UNSUPPORTED);
 
 	save_item(NAME(m_data_down));
 	save_item(NAME(m_mask_down));
@@ -265,6 +312,11 @@ TIMER_CALLBACK_MEMBER(sms_teamplayer_device::probe_step)
 		for (unsigned i = 0; m_ports.size() > i; ++i)
 		{
 			m_ident[i] = identify(m_probe[i]);
+			if (IDENT_MOUSE != m_ident[i])
+				m_ports[i]->out_w(0x7f, 0x00);
+			else if ((PHASE_UNUSED == m_phase) && !BIT(m_data_down, 5))
+				m_ports[i]->out_w(0x1f, 0x60);
+
 			LOG(
 					"port %c probe response %02X %02X %02X %02X %02X %02X %02X %02X ident %02X\n",
 					'A' + i,
@@ -279,11 +331,8 @@ TIMER_CALLBACK_MEMBER(sms_teamplayer_device::probe_step)
 					m_ident[i]);
 		}
 
-		if (PHASE_IDENT1 == m_phase)
-		{
-			LOG("report port A ident 0x%X\n", m_ident[0]);
-			m_out = 0x20 | m_ident[0];
-		}
+		if ((PHASE_UNUSED == m_phase) && !BIT(m_data_down, 5))
+			m_out = 0x20;
 	}
 }
 
@@ -319,15 +368,22 @@ void sms_teamplayer_device::th_falling()
 	switch (m_phase)
 	{
 	case PHASE_START:
-		m_out = 0x20;
+		if (!m_probe_timer->enabled())
+		{
+			for (unsigned i = 0; m_ports.size() > i; ++i)
+			{
+				if (IDENT_MOUSE == m_ident[i])
+					m_ports[i]->out_w(0x1f, 0x60);
+			}
+			m_out = 0x20;
+		}
 		++m_phase;
 		break;
 
 	case PHASE_UNUSED:
 	case PHASE_IDENT1:
-		++m_phase;
-		if (!m_probe_timer->enabled())
 		{
+			++m_phase;
 			u8 const val = m_ident[(m_phase - PHASE_IDENT1) * 2];
 			LOG(
 					"%s: report port %c ident 0x%X\n",
@@ -361,7 +417,12 @@ void sms_teamplayer_device::th_rising()
 	switch (m_phase)
 	{
 	case PHASE_UNUSED:
-		m_out = 0x3f;
+		for (unsigned i = 0; m_ports.size() > i; ++i)
+		{
+			if (IDENT_MOUSE == m_ident[i])
+				m_ports[i]->out_w(0x3f, 0x40);
+		}
+		m_out = 0x30;
 		break;
 
 	case PHASE_IDENT1:
@@ -402,7 +463,7 @@ void sms_teamplayer_device::next_port(u8 tl)
 {
 	++m_phase;
 	m_nybble = 0;
-	while ((PHASE_PORT_D >= m_phase) && (0x0f == m_ident[m_phase - PHASE_PORT_A]))
+	while ((PHASE_PORT_D >= m_phase) && (IDENT_UNSUPPORTED == m_ident[m_phase - PHASE_PORT_A]))
 		++m_phase;
 
 	if (PHASE_PORT_D >= m_phase)
@@ -414,12 +475,13 @@ void sms_teamplayer_device::next_port(u8 tl)
 				'A' + port);
 		switch (m_ident[port])
 		{
-		case 0:
-		case 1:
+		case IDENT_3BUTTON:
+		case IDENT_6BUTTON:
 			m_out = 0x20 | tl | (m_probe[port][0] & 0x0f);
 			break;
-		case 2:
-			m_out = 0x20 | tl; // FIXME: mouse support
+		case IDENT_MOUSE: // FIXME: mouse support
+			m_ports[port]->out_w(0x1f, 0x60);
+			m_out = 0x20 | tl;
 			break;
 		}
 	}
@@ -436,31 +498,38 @@ void sms_teamplayer_device::next_nybble(u8 tl)
 	u8 const port = m_phase - PHASE_PORT_A;
 	switch (m_ident[port])
 	{
-	case 0:
+	case IDENT_3BUTTON:
 		if (!m_nybble++)
-			m_out = 0x20 | tl | (BIT(m_probe[port][1], 4, 2) << 2) | BIT(m_probe[port][1], 4, 2);
+			m_out = 0x20 | tl | (BIT(m_probe[port][1], 4, 2) << 2) | BIT(m_probe[port][0], 4, 2);
 		else
 			next_port(tl);
 		break;
-	case 1:
+	case IDENT_6BUTTON:
 		switch (m_nybble++)
 		{
 		case 0:
-			m_out = 0x20 | tl | (BIT(m_probe[port][1], 4, 2) << 2) | BIT(m_probe[port][1], 4, 2);
+			m_out = 0x20 | tl | (BIT(m_probe[port][1], 4, 2) << 2) | BIT(m_probe[port][0], 4, 2);
 			break;
 		case 1:
-			m_out = 0x20 | tl | (m_probe[port][1] & 0x0f);
+			m_out = 0x20 | tl | (m_probe[port][6] & 0x0f);
 			break;
 		default:
 			next_port(tl);
 		}
 		break;
-	case 2:
+	case IDENT_MOUSE:
 		// FIXME: mouse support
 		if (5 > m_nybble++)
+		{
+			u8 const odd = BIT(m_nybble, 0);
+			m_ports[port]->out_w(odd ? 0x3f : 0x1f, odd ? 0x40 : 0x60);
 			m_out = 0x20 | tl;
+		}
 		else
+		{
+			m_ports[port]->out_w(0x7f, 0x40);
 			next_port(tl);
+		}
 		break;
 	default:
 		next_port(tl);
@@ -471,13 +540,13 @@ void sms_teamplayer_device::next_nybble(u8 tl)
 u8 sms_teamplayer_device::identify(u8 const (&response)[8])
 {
 	if (!(response[0] & 0x0f) && (0x0b == (response[1] & 0x0f)) && !(response[2] & 0x0f) && (0x0b == (response[3] & 0x0f)))
-		return 0x02; // mouse
+		return IDENT_MOUSE;
 	else if ((response[1] & 0x0c) || (response[3] & 0x0c) || (response[5] & 0x0c))
-		return 0x0f; // Mega Drive pads pull these bits down for detection
+		return IDENT_UNSUPPORTED; // Mega Drive pads pull these bits down for detection
 	else if (!(response[5] & 0x03))
-		return 0x01; // 6-button pad
+		return IDENT_6BUTTON;
 	else
-		return 0x00; // 3-button pad
+		return IDENT_3BUTTON;
 }
 
 } // anonymous namespace
