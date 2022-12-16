@@ -248,7 +248,7 @@ private:
 	private:
 		// internal state
 		std::string             m_data;             // data for this item
-		std::string				m_data_unsubst;		// data for this item, prior to any substitution
+		std::string             m_data_unsubst;     // data for this item, prior to any substitution
 		std::string             m_defdata;          // default data for this item
 		std::string             m_defdata_unsubst;  // default data for this item, prior to any substitution
 		std::string             m_minimum;          // minimum value

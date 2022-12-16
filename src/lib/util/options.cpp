@@ -21,6 +21,7 @@
 #include <cctype>
 #include <cstdarg>
 #include <cstdlib>
+#include <sstream>
 
 
 const int core_options::MAX_UNADORNED_OPTIONS;
@@ -114,7 +115,7 @@ options_error_exception::options_error_exception(std::string &&message)
 //  entry - constructor
 //-------------------------------------------------
 
-core_options::entry::entry(std::vector<std::string> &&names, core_options::option_type type, const char *description)
+core_options::entry::entry(std::vector<std::string> &&names, option_type type, const char *description)
 	: m_names(std::move(names))
 	, m_priority(OPTION_PRIORITY_DEFAULT)
 	, m_type(type)
@@ -123,7 +124,7 @@ core_options::entry::entry(std::vector<std::string> &&names, core_options::optio
 	assert(m_names.empty() == (m_type == option_type::HEADER));
 }
 
-core_options::entry::entry(std::string &&name, core_options::option_type type, const char *description)
+core_options::entry::entry(std::string &&name, option_type type, const char *description)
 	: entry(std::vector<std::string>({ std::move(name) }), type, description)
 {
 }
@@ -284,14 +285,14 @@ void core_options::entry::validate(const std::string &data)
 		}
 		break;
 
-	case core_options::option_type::STRING:
-	case core_options::option_type::PATH:
-	case core_options::option_type::MULTIPATH:
+	case option_type::STRING:
+	case option_type::PATH:
+	case option_type::MULTIPATH:
 		// strings can be anything
 		break;
 
-	case core_options::option_type::INVALID:
-	case core_options::option_type::HEADER:
+	case option_type::INVALID:
+	case option_type::HEADER:
 	default:
 		// anything else is invalid
 		throw options_error_exception("Attempted to set invalid option %s\n", name());
@@ -458,10 +459,36 @@ void core_options::simple_entry::set_default_value(std::string &&newvalue)
 
 std::string core_options::simple_entry::type_specific_substitutions(std::string_view s) const noexcept
 {
-	std::string result = type() == core_options::option_type::PATH || type() == core_options::option_type::MULTIPATH
-		? osd_subst_env(s)
-		: std::string(s);
-	return result;
+	switch (type())
+	{
+	case option_type::PATH:
+		return osd_subst_env(s);
+
+	case option_type::MULTIPATH:
+		{
+			std::ostringstream result;
+			while (!s.empty())
+			{
+				std::string_view::size_type split = s.find(';');
+				if (std::string_view::npos == split)
+					split = s.length();
+				result << osd_subst_env(s.substr(0, split));
+				if (s.length() > split)
+				{
+					result << s[split];
+					s.remove_prefix(split + 1);
+				}
+				else
+				{
+					s.remove_prefix(split);
+				}
+			}
+			return std::move(result).str();
+		}
+
+	default:
+		return std::string(s);
+	}
 }
 
 
