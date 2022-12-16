@@ -4195,11 +4195,13 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		</part>
 	</software>
 
-	<!-- Should be supported by PC8001mkIISR too (unemulated) -->
 	<software name="ballpani" supported="partial">
 		<description>Ball Panicker</description>
 		<year>1984</year>
 		<publisher>ポニカ (PonyCa)</publisher>
+		<notes><![CDATA[
+Should be supported by [PC8001mkIISR] too
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
 		<info name="alt_title" value="ボールパニカー"/>
@@ -5886,8 +5888,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- FDC stalls [tries to scan for missing CHRN=(00 01 01 01)] -->
-	<software name="carmine" supported="no">
+	<software name="carmine">
 		<description>Carmine</description>
 		<year>1987</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
@@ -5912,8 +5913,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- FDC stalls [tries to scan for missing CHRN=(00 01 01 01)] -->
-	<software name="carminea" cloneof="carmine" supported="no">
+	<software name="carminea" cloneof="carmine">
 		<description>Carmine (alt?)</description>
 		<year>1987</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
@@ -5984,11 +5984,13 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- erratic sound tempo during gameplay (regression) -->
 	<software name="castle" supported="partial">
 		<description>The Castle</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+erratic sound tempo during gameplay, [OPN] regression (runs on system timer irq)
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="ザ・キャッスル"/>
@@ -6561,12 +6563,13 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<!-- FDC stalls [never clears HALT state] -->
-	<software name="comsight" supported="no">
+	<software name="comsight" supported="partial">
 		<description>Comsight</description>
 		<year>1987</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
+		<notes><![CDATA[
+Has [3301] attribute bug
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198708xx"/>
 		<info name="alt_title" value="コムサイト"/>
@@ -6580,10 +6583,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 			</dataarea>
 		</part>
 
+		<!-- baddump: non-default factory save -->
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Default" />
 			<dataarea name="flop" size="348848">
-				<rom name="comsight (default).d88" size="348848" crc="510e8dfe" sha1="c3c21bd7648b0f67c87e342f3c02c3a9e4997f6f"/>
+				<rom name="comsight (default).d88" size="348848" crc="510e8dfe" sha1="c3c21bd7648b0f67c87e342f3c02c3a9e4997f6f" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6631,8 +6635,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- Disk I/O error [FDC tries to read a missing CHRN=(1, 1, 10, 1)] -->
-	<software name="corridor" supported="no">
+	<software name="corridor">
 		<description>Corridor</description>
 		<year>1984</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -7613,7 +7616,8 @@ Seldomly crashes (cannot reproduce reliably, "copy protection routine at PC=0x91
 		<publisher>テクノソフト (Techno Soft)</publisher>
 		<notes><![CDATA[
 [Incorrect layout on track 0 head 1, expected_size=100000, current_size=228096]
-Known to trigger copy protection at first terminal (game hangs)
+Known to trigger copy protection at first useful terminal, game throws "disk error" and shows to insert disk B (that should be already in), tries to access CHRN=(0, 1, 17, 256) multiple times before giving up at PC=0x89a/PC=0x89f, also has further check(s) down the road (i.e. patching 0x89f will throw a "wrong disk" message).
+NB: disk geometry makes it likely to have further copy protection checks later on too.
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198801xx"/>
@@ -10379,13 +10383,19 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
-	<!-- Heavy GFX corruption on gameplay [Caused by FDC code?] -->
 	<software name="dragonpr" supported="no">
 		<description>Dragon Princess - Meikyuu no Madoushi</description>
 		<year>1988</year>
 		<publisher>パソケット (Pasoket)</publisher>
+		<notes><![CDATA[
+Heavy GFX corruption on gameplay, [timing]?
+Looks a bit better at 8 MHz but still draws corrupted enemy encounters
+Not extensively tested
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
+		<!-- TODO: verify actual capitalization -->
+		<info name="developer" value="VIEWTECH"/>
 		<info name="alt_title" value="ドラゴンプリンセス 迷宮の魔道士"/>
 		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
@@ -10406,13 +10416,15 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
-	<!-- [Loading this causes a crash in floppy_image_format_t::generate_track_from_levels fn] -->
-	<software name="dragonpra" cloneof="dragonpr" supported="no">
-		<description>Dragon Princess - Meikyuu no Madoushi (alt)</description>
+	<!-- Was originally clone of dragonpr, looks different enough to be an own thing -->
+	<software name="dragonpra">
+		<description>The Dragon Princess</description>
 		<year>1988</year>
 		<publisher>パソケット (Pasoket)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
+		<!-- TODO: stylized with a cross between the two words -->
+		<info name="developer" value="Run Tech"/>
 		<info name="alt_title" value="ドラゴンプリンセス 迷宮の魔道士"/>
 		<info name="usage" value="Needs BASIC V2"/>
 
@@ -11149,11 +11161,13 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<!-- Should be supported by PC8001mkIISR too (unemulated) -->
 	<software name="eiyuden" supported="partial">
 		<description>Eiyuu Densetsu Saga</description>
 		<year>1984</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<notes><![CDATA[
+Should be supported by [PC8001mkIISR] too
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198408xx"/>
 		<info name="alt_title" value="英雄伝説サーガ"/>
@@ -11183,11 +11197,13 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<!-- Should be supported by PC8001mkIISR too (unemulated) -->
-	<software name="eiyudena" cloneof="eiyuden">
+	<software name="eiyudena" cloneof="eiyuden" supported="partial">
 		<description>Eiyuu Densetsu Saga (alt)</description>
 		<year>1984</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<notes><![CDATA[
+Should be supported by [PC8001mkIISR] too
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198408xx"/>
 		<info name="alt_title" value="英雄伝説サーガ"/>
@@ -11468,12 +11484,14 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<!-- Fails to boot (is it even working stand alone?) -->
-	<!-- FDC stalls [Tries to find a missing CHRN=(00 00 01 01)] -->
 	<software name="emeralddvu" cloneof="emeraldd" supported="no">
 		<description>Emerald Dragon Visual User Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Fails to boot (is it even working stand alone?)
+FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="28768">
 				<rom name="emerald dragon visual user disk.d88" size="28768" crc="c1fff259" sha1="3c99cbfe2762c876b4afba898322f2f3b6e0dfa0"/>
@@ -12254,13 +12272,14 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<!-- No inputs on PC8801MA -->
-	<!-- Sound gets stuck on PC8801mkIISR [i8214 sound irq] -->
-	<!-- "syntax error" and resets during boot (regression after hooking i8214 irqs) -->
 	<software name="finalcri" supported="no">
 		<description>Final Crisis</description>
 		<year>1991</year>
 		<publisher>テクノグラード (Techno Gurado)</publisher>
+		<notes><![CDATA[
+Crashes with any key press on title screen
+Sound gets stuck on PC8801mkIISR (verify)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199112xx"/>
 		<info name="alt_title" value="ファイナルクライシス"/>
@@ -15146,11 +15165,13 @@ Without it, game loads up to "PCM loading" then returns to BASIC prompt
 		</part>
 	</software>
 
-	<!-- Should be supported by PC8001mkIISR too (unemulated) -->
 	<software name="hangon" supported="partial">
 		<description>Hang On</description>
 		<year>1986</year>
 		<publisher>パックスエレクトロニカ (Pax Electronica)</publisher>
+		<notes><![CDATA[
+Should be supported by [PC8001mkIISR] too
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="ハングオン"/>
@@ -21674,9 +21695,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<!-- Doesn't load -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(12 01 0a 01)] -->
-	<software name="mmuku" supported="no">
+	<software name="mmuku">
 		<description>Maildog Muku</description>
 		<year>1984</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -22188,15 +22207,19 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<!-- Doesn't boot -->
-	<!-- TODO: most likely belongs to pc8001mkIISR -->
 	<software name="mappya" cloneof="mappy" supported="no">
 		<description>Mappy (alt?)</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<notes><![CDATA[
+Doesn't boot
+TODO: belongs to [PC8001mkIISR]
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="マッピー"/>
+		<info name="usage" value="Needs N[80SR] BASIC"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
 				<rom name="mappy_v80.d88" size="353200" crc="a9978924" sha1="0bf806b8f1ef54960d855c62af367dd2e1ff2351"/>
@@ -22246,12 +22269,14 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<!-- Hangs at BASIC -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(00 00 f8 02)] -->
 	<software name="mariosp" supported="no">
 		<description>Mario Bros. Special</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
+		<notes><![CDATA[
+Hangs at BASIC
+FDC stalls [Tries to read a missing CHRN=(00 00 f8 02)]
+]]></notes>
 		<!-- PC8801 -->
 		<info name="alt_title" value="マリオブラザーズ スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -23237,17 +23262,18 @@ Unsupported [floppy 2HD] image
 		</part>
 	</software>
 
-	<!-- Hangs on title screen -->
-	<!-- FDC stalls [never clears HALT state] -->
-	<!-- Should be supported by PC8001mkIISR too (unemulated) -->
 	<software name="milkyway" supported="no">
 		<description>Milkyway (v1.0)</description>
 		<year>1984</year>
 		<publisher>マイクロネット (Micronet)</publisher>
+		<notes><![CDATA[
+Runs too fast, requires [V1S]
+Should be supported by [PC8001mkIISR] too
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="ミルキーウェイ"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
+		<info name="usage" value="Needs N[80SR] BASIC, also needs V1 for pc8801 machines"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349248">
@@ -24565,11 +24591,13 @@ Unsupported [floppy 2HD] image
 		</part>
 	</software>
 
-	<!-- Gameplay is too fast -->
-	<software name="ninjakun" supported="partial">
+	<software name="ninjakun" supported="no">
 		<description>Ninja-kun</description>
 		<year>1983</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<notes><![CDATA[
+Gameplay is too fast, requires [V1S] support
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198307xx"/>
 		<info name="alt_title" value="忍者くん"/>
@@ -24582,11 +24610,13 @@ Unsupported [floppy 2HD] image
 		</part>
 	</software>
 
-	<!-- [uPD3301] text layer draws UL covering the full screen -->
 	<software name="ninjakmb" supported="partial">
 		<description>Ninja-kun - Majou no Bouken</description>
 		<year>1986</year>
 		<publisher>日本デクスタ (Nihon Dexter)</publisher>
+		<notes><![CDATA[
+[3301] text layer draws UL covering the full screen
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="忍者くん 魔城の冒険"/>
@@ -25175,11 +25205,13 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 		</part>
 	</software>
 
-	<!-- Should be supported by PC8001mkIISR too (unemulated) -->
 	<software name="okhotsk" supported="partial">
 		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!!</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+Should be supported by [PC8001mkIISR] too
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
@@ -25202,11 +25234,13 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 		</part>
 	</software>
 
-	<!-- Should be supported by PC8001mkIISR too (unemulated) -->
 	<software name="okhotska" cloneof="okhotsk" supported="partial">
 		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!! (alt Disk 1)</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+Should be supported by [PC8001mkIISR] too
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
@@ -25229,11 +25263,13 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 		</part>
 	</software>
 
-	<!-- Should be supported by PC8001mkIISR too (unemulated) -->
 	<software name="okhotskb" cloneof="okhotsk" supported="partial">
 		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!! (alt 2?)</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+Should be supported by [PC8001mkIISR] too
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
@@ -25833,11 +25869,13 @@ no sound on any non-vanilla PC-8801 (verify)
 		</part>
 	</software>
 
-	<!-- [Accesses I/O port $33, PC8001mkIISR check?] -->
-	<software name="panorama" supported="yes">
+	<software name="panorama" supported="partial">
 		<description>Panorama-to</description>
 		<year>1983</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Accesses I/O port $33, [PC8001mkIISR] check? (verify)
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198312xx"/>
 		<info name="alt_title" value="ぱのらま島"/>
@@ -30823,7 +30861,7 @@ ExtractDisk  [04]"DATA DISK    " -> "shin kugyokuden(with patch)_04.d88"
 -->
 	<software name="skugyokd">
 		<!-- Other image containing same disks was labeled as shin kugyokuden(with patch)... -->
-		<description>Shin Kugyokuden (Fixed??)</description>
+		<description>Shin Kugyokuden (fixed?)</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -30902,9 +30940,7 @@ ExtractDisk  [04]"DATA DISK    " -> "shin kugyokuden(with patch)_04.d88"
 		</part>
 	</software>
 
-	<!-- Black screen -->
-	<!-- FDC stalls [never clears HALT state] -->
-	<software name="skugyokdd" supported="no">
+	<software name="skugyokdd" supported="yes">
 		<description>Shin Kugyokuden Demo</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
@@ -32943,12 +32979,13 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		</part>
 	</software>
 
-	<!-- bad kanji data? (old note, cannot reproduce) -->
-	<!-- No BGMs -->
-	<software name="scruiser" supported="no">
+	<software name="scruiser" supported="partial">
 		<description>Star Cruiser</description>
 		<year>1988</year>
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198805xx"/>
 		<info name="alt_title" value="スタークルーザー"/>
@@ -34502,12 +34539,16 @@ To test Jast Sound: during gameplay press * numpad then enter twice (first comma
 		</part>
 	</software>
 
-	<!-- Writes "Missing operand" while returning to BASIC -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(f7 f7 f7 02)] -->
 	<software name="tenshitb" supported="no">
 		<description>Tenshi-tachi no Gogo Bangai-hen</description>
 		<year>1985</year>
 		<publisher>ジャスト (Jast)</publisher>
+		<notes><![CDATA[
+Hangs on mkIISR and onward
+pc8801/pc8801mk2: doesn't paint fill properly
+FDC stalls [Tries to read a missing CHRN=(f7 f7 f7 02)]
+Warning: very nsfw
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198512xx"/>
 		<info name="alt_title" value="天使たちの午後番外編"/>
@@ -34518,12 +34559,16 @@ To test Jast Sound: during gameplay press * numpad then enter twice (first comma
 		</part>
 	</software>
 
-	<!-- Writes "Missing operand" while returning to BASIC -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(f7 f7 f7 02)] -->
 	<software name="tenshitba" cloneof="tenshitb" supported="no">
 		<description>Tenshi-tachi no Gogo Bangai-hen (alt)</description>
 		<year>1985</year>
 		<publisher>ジャスト (Jast)</publisher>
+		<notes><![CDATA[
+Hangs on mkIISR and onward
+pc8801/pc8801mk2: doesn't paint fill properly
+FDC stalls [Tries to read a missing CHRN=(f7 f7 f7 02)]
+Warning: very nsfw
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198512xx"/>
 		<info name="alt_title" value="天使たちの午後番外編"/>
@@ -34793,11 +34838,12 @@ To test Jast Sound: during gameplay press * numpad then enter twice (first comma
 		</part>
 	</software>
 
-	<!-- Fails to load, is it standalone bootable? -->
-	<software name="testmentex" cloneof="testment" supported="no">
+	<software name="testmentex" cloneof="testment" supported="yes">
 		<description>Testament Expansion Map</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Data disk for Testament, insert this disk in drive 2 and testment Disk A in drive 1"/>
+		<!-- apparently same level layout as testmentb:flop3-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
 				<rom name="testament expansion map.d88" size="416688" crc="c0f4c871" sha1="e1695997c083592f6a259605ea2fcbfa110f869b"/>
@@ -34812,6 +34858,7 @@ To test Jast Sound: during gameplay press * numpad then enter twice (first comma
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198710xx"/>
 		<info name="alt_title" value="テスタメント"/>
+		<info name="usage" value="Insert Expansion disk in drive 2 and testment Disk A in drive 1 for alt level layouts"/>
 		<!--combined image-->
 		<!--rom name="testament(incl expansion map).d88" size="1249216" crc="b0346677" sha1="eb2e4a24ff66a98d926ffa08b0560b56d07956ff"/-->
 
@@ -34975,13 +35022,15 @@ Hangs on Game Arts logo, [FDC] stalls [Tries to read a missing CHRN=(07 00 01 05
 		</part>
 	</software>
 
-	<!-- Has subtle copy protection: talking to any character in-game shows a "COPY" message -->
-	<!-- TODO: used a timeempb created user disk, is it even possible to create one in this version? -->
 	<software name="timeemp" supported="no">
 		<description>Time Empire (Single drive version)</description>
 		<year>1985</year>
 		<!-- Koei / ARK -->
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Has subtle copy protection: talking to any character in-game shows a "COPY" message
+TODO: used a timeempb created user disk, is it even possible to create one in this version?
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="タイムエンパイア"/>
@@ -34994,12 +35043,15 @@ Hangs on Game Arts logo, [FDC] stalls [Tries to read a missing CHRN=(07 00 01 05
 		</part>
 	</software>
 
-	<!-- Gameplay is too fast -->
-	<software name="timeempa" cloneof="timeemp" supported="partial">
+	<software name="timeempa" cloneof="timeemp" supported="no">
+		<!-- cracked version? -->
 		<description>Time Empire (alt, Dual drive version)</description>
 		<year>1985</year>
 		<!-- Koei / ARK -->
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Gameplay is too fast, needs [V1S]
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="タイムエンパイア"/>
@@ -35022,12 +35074,14 @@ Hangs on Game Arts logo, [FDC] stalls [Tries to read a missing CHRN=(07 00 01 05
 		</part>
 	</software>
 
-	<!-- Has subtle copy protection: talking to any character in-game shows a "COPY" message -->
 	<software name="timeempb" cloneof="timeemp" supported="no">
 		<description>Time Empire (alt 2, Dual drive version)</description>
 		<year>1985</year>
 		<!-- Koei / ARK -->
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Has subtle copy protection: talking to any character in-game shows a "COPY" message
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="タイムエンパイア"/>
@@ -35183,16 +35237,19 @@ Hangs on Game Arts logo, [FDC] stalls [Tries to read a missing CHRN=(07 00 01 05
 		</part>
 	</software>
 
-	<!-- Shows System Soft logo then hangs with BGM playing -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(00 00 10 01)] -->
 	<software name="tirnanog" supported="no">
 		<description>Tir-Nan-Og - Kindan no Tou</description>
 		<year>1990</year>
 		<publisher>システムソフト (System Soft)</publisher>
+		<notes><![CDATA[
+Hangs if you escape from a battle, copy protection?
+FDC stalls [Tries to read a missing CHRN=(00 00 10 01)]
+NB: scenario creation is really slow, progress bar is given by the pixie moving left to right (btanb)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900824"/>
 		<info name="alt_title" value="ティルナノーグ 禁断の塔"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="usage" value="Needs BASIC V2. In order to start a game create an user disk from item 3 -> 2, then on title screen select option 2 to create a scenario on said user disk"/>
 		<!--combined image-->
 		<!--rom name="tir-nan-og.d88" size="1171472" crc="36d40ed1" sha1="0fecd94f2ad6e740cabf39c8be9225ff59b0fd39"/-->
 
@@ -35210,11 +35267,11 @@ Hangs on Game Arts logo, [FDC] stalls [Tries to read a missing CHRN=(07 00 01 05
 			</dataarea>
 		</part>
 
-		<!-- Common User Disk... is it blank?!? -->
+		<!-- baddump: blank disk -->
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="User" />
 			<dataarea name="flop" size="473776">
-				<rom name="tir-nan-og (user).d88" size="473776" crc="df1c43ca" sha1="2643a30e50ccd65fcc2ce35938ee8aa0610f43ae"/>
+				<rom name="tir-nan-og (user).d88" size="473776" crc="df1c43ca" sha1="2643a30e50ccd65fcc2ce35938ee8aa0610f43ae" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35232,13 +35289,14 @@ Hangs on Game Arts logo, [FDC] stalls [Tries to read a missing CHRN=(07 00 01 05
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(01 01 24 01), regression?] -->
-	<!-- Requires floppies to not be write protected -->
-	<software name="tobirawo" supported="no">
+	<software name="tobirawo" supported="partial">
 		<description>Tobira wo Hirakete</description>
 		<year>1987</year>
 		<publisher>キティエンタープライズ (Kitty Enterprise)</publisher>
+		<notes><![CDATA[
+Requires floppies to not be write protected (SW list default)
+Not extensively tested
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="扉を開けて"/>
@@ -35722,7 +35780,7 @@ No sound, [beeper]? (verify)
 		<year>1984</year>
 		<publisher>ウィンキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
-Runs too fast [timing]
+Runs too fast, requires [V1S] support
 ]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
