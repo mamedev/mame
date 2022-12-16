@@ -141,6 +141,7 @@ public:
 		bool has_range() const noexcept;
 
 		// mutators
+		void copy_from(const entry &that, bool always_override);
 		void set_value(std::string &&newvalue, int priority, bool always_override = false, bool perform_substitutions = false);
 		virtual void set_default_value(std::string &&newvalue);
 		void set_description(const char *description) { m_description = description; }
@@ -149,10 +150,11 @@ public:
 
 	protected:
 		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) = 0;
+		virtual bool internal_copy_value(const entry &that);
 
-	private:
 		void validate(const std::string &value);
 
+	private:
 		const std::vector<std::string>              m_names;
 		int                                         m_priority;
 		core_options::option_type                   m_type;
@@ -244,6 +246,7 @@ private:
 
 	protected:
 		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) override;
+		virtual bool internal_copy_value(const entry &that) override;
 
 	private:
 		// internal state

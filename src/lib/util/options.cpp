@@ -162,6 +162,30 @@ const char *core_options::entry::value_unsubstituted() const noexcept
 
 
 //-------------------------------------------------
+//  entry::copy_from
+//-------------------------------------------------
+
+void core_options::entry::copy_from(const entry &that, bool always_override)
+{
+	// it is invalid to set the value on a header
+	assert(type() != option_type::HEADER);
+
+	// only set the value if we have priority
+	if (always_override || that.priority() >= priority())
+	{
+		if (internal_copy_value(that))
+		{
+			m_priority = that.priority();
+
+			// invoke the value changed handler, if appropriate
+			if (m_value_changed_handler)
+				m_value_changed_handler(value());
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  entry::set_value
 //-------------------------------------------------
 
@@ -193,6 +217,29 @@ void core_options::entry::set_default_value(std::string &&newvalue)
 {
 	// set_default_value() is not necessarily supported for all entry types
 	throw false;
+}
+
+
+//-------------------------------------------------
+//  entry::internal_copy_value
+//-------------------------------------------------
+
+bool core_options::entry::internal_copy_value(const entry &that)
+{
+	char const *const newvalue = that.value();
+	if (newvalue)
+	{
+		std::string stringval = newvalue;
+		validate(stringval);
+
+		internal_set_value(std::move(stringval), false);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
@@ -430,7 +477,7 @@ const std::string &core_options::simple_entry::default_value() const noexcept
 
 
 //-------------------------------------------------
-//  internal_set_value
+//  simple_entry::internal_set_value
 //-------------------------------------------------
 
 void core_options::simple_entry::internal_set_value(std::string &&newvalue, bool perform_substitutions)
@@ -439,6 +486,29 @@ void core_options::simple_entry::internal_set_value(std::string &&newvalue, bool
 		? type_specific_substitutions(newvalue)
 		: newvalue;
 	m_data_unsubst = std::move(newvalue);
+}
+
+
+//-------------------------------------------------
+//  simple_entry::internal_copy_value
+//-------------------------------------------------
+
+bool core_options::simple_entry::internal_copy_value(const entry &that)
+{
+	simple_entry const *const simple = dynamic_cast<simple_entry const *>(&that);
+	if (!simple)
+	{
+		return entry::internal_copy_value(that);
+	}
+	else
+	{
+		validate(simple->m_data);
+
+		m_data = simple->m_data;
+		m_data_unsubst = simple->m_data_unsubst;
+
+		return true;
+	}
 }
 
 
@@ -922,11 +992,7 @@ void core_options::copy_from(const core_options &that)
 			// identify the source entry
 			const entry::shared_const_ptr source_entry = that.get_entry(dest_entry->name());
 			if (source_entry)
-			{
-				const char *value = source_entry->value();
-				if (value)
-					dest_entry->set_value(value, source_entry->priority(), false, true);
-			}
+				dest_entry->copy_from(*source_entry, false);
 		}
 	}
 }
