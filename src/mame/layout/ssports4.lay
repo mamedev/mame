@@ -12,7 +12,7 @@ license:CC0
 
 	<element name="led" defstate="0">
 		<rect>
-			<bounds x="-1.5" y="-1.5" width="4" height="4" />
+			<bounds x="-2" y="-2" width="5" height="5" />
 			<color alpha="0" />
 		</rect>
 		<disk state="0">
@@ -30,19 +30,27 @@ license:CC0
 	</element>
 
 
+<!-- digits -->
+
+	<group name="digits">
+		<bounds x="0" y="0" width="9" height="1" />
+
+		<element name="digit9" ref="digit"><bounds x="0" y="0" width="1" height="1" /></element>
+		<element name="digit8" ref="digit"><bounds x="2" y="0" width="1" height="1" /></element>
+		<element name="digit1" ref="digit"><bounds x="6" y="0" width="1" height="1" /></element>
+		<element name="digit0" ref="digit"><bounds x="8" y="0" width="1" height="1" /></element>
+	</group>
+
+
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="1.5" right="10.5" top="0" bottom="11" />
+		<bounds left="2.5" right="10.5" top="0" bottom="11" />
 
 		<!-- score panel leds -->
-		<element name="0.8" ref="led"><bounds x="2.25" y="8" width="1" height="1" /></element>
-		<element name="1.8" ref="led"><bounds x="2.25" y="2" width="1" height="1" /></element>
-
-		<element name="digit9" ref="digit"><bounds x="2.25" y="7.125" width="1" height="0.75" /><orientation rotate="270" /></element>
-		<element name="digit8" ref="digit"><bounds x="2.25" y="6.125" width="1" height="0.75" /><orientation rotate="270" /></element>
-		<element name="digit1" ref="digit"><bounds x="2.25" y="4.125" width="1" height="0.75" /><orientation rotate="270" /></element>
-		<element name="digit0" ref="digit"><bounds x="2.25" y="3.125" width="1" height="0.75" /><orientation rotate="270" /></element>
+		<group ref="digits"><bounds x="3.25" y="4" width="0.45" height="3" /><orientation rotate="270" /></group>
+		<element name="0.8" ref="led"><bounds x="2.975" y="7.5" width="1" height="1" /></element>
+		<element name="1.8" ref="led"><bounds x="2.975" y="2.5" width="1" height="1" /></element>
 
 		<!-- playfield leds -->
 		<element name="7.0" ref="led"><bounds x="5" y="9" width="1" height="1" /></element>

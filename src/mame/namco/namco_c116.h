@@ -34,8 +34,8 @@ protected:
 	virtual void device_start() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 0x2000; }
-	virtual bool palette_shadows_enabled() const override { return m_enable_shadows; }
+	virtual uint32_t palette_entries() const noexcept override { return 0x2000; }
+	virtual bool palette_shadows_enabled() const noexcept override { return m_enable_shadows; }
 
 private:
 	// internal state

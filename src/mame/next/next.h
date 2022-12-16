@@ -5,7 +5,8 @@
 #ifndef MAME_INCLUDES_NEXT_H
 #define MAME_INCLUDES_NEXT_H
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 #include "imagedev/floppy.h"
 #include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"

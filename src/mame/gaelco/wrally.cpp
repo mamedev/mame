@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia, Mike Coates, Nicola Salmoria, Miguel Angel Horna
+// copyright-holders: Manuel Abadia, Mike Coates, Nicola Salmoria, Miguel Angel Horna
+
 /***************************************************************************
 
 World Rally (c) 1993 Gaelco (Designed & Developed by Zigurat. Produced by Gaelco)
@@ -118,26 +119,195 @@ produces a high clock frequency, slow movements a low freq.
 
 PCB: REF.930217
 
-The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or larger
- roms at H8 & H12 for graphics as well as the ability to use different size sound sample
- roms at C1 & C3
+The PCB has a layout that can either use the 4 ROM set of I7, I9, I11 & I13 or larger
+ ROMs at H8 & H12 for graphics as well as the ability to use different size sound sample
+ ROMs at C1 & C3
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "wrally.h"
 
 #include "gaelco_ds5002fp.h"
+#include "gaelco_wrally_sprites.h"
+#include "gaelcrpt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/74259.h"
 #include "sound/okim6295.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
+namespace {
+
+class wrally_state : public driver_device
+{
+public:
+	wrally_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_outlatch(*this, "outlatch"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_sprites(*this, "sprites"),
+		m_okibank(*this, "okibank"),
+		m_vramcrypt(*this, "vramcrypt"),
+		m_videoram(*this, "videoram"),
+		m_vregs(*this, "vregs"),
+		m_spriteram(*this, "spriteram"),
+		m_shareram(*this, "shareram"),
+		m_analog(*this, "ANALOG%u", 0U),
+		m_tilemap{ nullptr, nullptr }
+	{
+	}
+
+	void wrally(machine_config &config);
+
+	template <int N> DECLARE_READ_LINE_MEMBER(analog_bit_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	uint8_t shareram_r(offs_t offset);
+	void shareram_w(offs_t offset, uint8_t data);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void okim6295_bankswitch_w(uint8_t data);
+	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
+
+	DECLARE_WRITE_LINE_MEMBER(adc_clk);
+	DECLARE_WRITE_LINE_MEMBER(adc_en);
+
+	template <int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void mcu_hostmem_map(address_map &map);
+	void oki_map(address_map &map);
+	void main_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_outlatch;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<gaelco_wrally_sprites_device> m_sprites;
+	required_memory_bank m_okibank;
+	required_device<gaelco_vram_encryption_device> m_vramcrypt;
+
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_vregs;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_shareram;
+
+	required_ioport_array<2> m_analog;
+
+	tilemap_t *m_tilemap[2]{};
+	uint8_t m_analog_ports[2]{};
+};
+
+
+// video
+
+/***************************************************************************
+
+    Callbacks for the TileMap code
+
+***************************************************************************/
+
+/*
+    Tile format
+    -----------
+
+    Screen 0 & 1: (64*32, 16x16 tiles)
+
+    Word | Bit(s)            | Description
+    -----+-FEDCBA98-76543210-+--------------------------
+      0  | --xxxxxx xxxxxxxx | code
+      0  | xx------ -------- | not used?
+      1  | -------- ---xxxxx | color
+      1  | -------- --x----- | priority
+      1  | -------- -x------ | flip y
+      1  | -------- x------- | flip x
+      1  | ---xxxxx -------- | data used to handle collisions, speed, etc
+      1  | xxx----- -------- | not used?
+*/
+
+template <int Layer>
+TILE_GET_INFO_MEMBER(wrally_state::get_tile_info)
+{
+	int const data = m_videoram[(Layer * 0x2000 / 2) + (tile_index << 1)];
+	int const data2 = m_videoram[(Layer * 0x2000 / 2) + (tile_index << 1) + 1];
+	int const code = data & 0x3fff;
+
+	tileinfo.category = (data2 >> 5) & 0x01;
+
+	tileinfo.set(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
+}
+
+/***************************************************************************
+
+    Start/Stop the video hardware emulation.
+
+***************************************************************************/
+
+void wrally_state::video_start()
+{
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+
+	m_tilemap[0]->set_transmask(0, 0xff01, 0x00ff); // this layer is split in two (pens 1..7, pens 8-15)
+	m_tilemap[1]->set_transparent_pen(0);
+}
+
+/***************************************************************************
+
+    Display Refresh
+
+***************************************************************************/
+
+uint32_t wrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_sprites->draw_sprites(cliprect, m_spriteram, flip_screen());
+
+	// set scroll registers
+	if (!flip_screen()) {
+		m_tilemap[0]->set_scrolly(0, m_vregs[0]);
+		m_tilemap[0]->set_scrollx(0, m_vregs[1] + 4);
+		m_tilemap[1]->set_scrolly(0, m_vregs[2]);
+		m_tilemap[1]->set_scrollx(0, m_vregs[3]);
+	} else {
+		m_tilemap[0]->set_scrolly(0, 248 - m_vregs[0]);
+		m_tilemap[0]->set_scrollx(0, 1024 - m_vregs[1] - 4);
+		m_tilemap[1]->set_scrolly(0, 248 - m_vregs[2]);
+		m_tilemap[1]->set_scrollx(0, 1024 - m_vregs[3]);
+	}
+
+	// draw tilemaps + sprites
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER0,0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER1,0);
+
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
+
+	m_sprites->mix_sprites(bitmap, cliprect, 0);
+
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
+
+	m_sprites->mix_sprites(bitmap, cliprect, 1);
+
+	return 0;
+}
+
+
+// machine
 
 void wrally_state::machine_start()
 {
@@ -155,13 +325,13 @@ void wrally_state::machine_start()
 void wrally_state::shareram_w(offs_t offset, uint8_t data)
 {
 	// why isn't there address map functionality for this?
-	util::big_endian_cast<u8>(m_shareram.target())[offset] = data;
+	util::big_endian_cast<uint8_t>(m_shareram.target())[offset] = data;
 }
 
 uint8_t wrally_state::shareram_r(offs_t offset)
 {
 	// why isn't there address map functionality for this?
-	return util::big_endian_cast<u8 const>(m_shareram.target())[offset];
+	return util::big_endian_cast<uint8_t const>(m_shareram.target())[offset];
 }
 
 void wrally_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -182,24 +352,16 @@ void wrally_state::okim6295_bankswitch_w(uint8_t data)
 	m_okibank->set_entry(data & 0x0f);
 }
 
-WRITE_LINE_MEMBER(wrally_state::coin1_counter_w)
+template <uint8_t Which>
+WRITE_LINE_MEMBER(wrally_state::coin_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(0, state);
+	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
-WRITE_LINE_MEMBER(wrally_state::coin2_counter_w)
+template <uint8_t Which>
+WRITE_LINE_MEMBER(wrally_state::coin_lockout_w)
 {
-	machine().bookkeeping().coin_counter_w(1, state);
-}
-
-WRITE_LINE_MEMBER(wrally_state::coin1_lockout_w)
-{
-	machine().bookkeeping().coin_lockout_w(0, !state);
-}
-
-WRITE_LINE_MEMBER(wrally_state::coin2_lockout_w)
-{
-	machine().bookkeeping().coin_lockout_w(1, !state);
+	machine().bookkeeping().coin_lockout_w(Which, !state);
 }
 
 // the following methods have been pilfered from gaelco2.cpp (wrally2). They seem to work fine for wrally, too
@@ -236,32 +398,32 @@ void wrally_state::mcu_hostmem_map(address_map &map)
 }
 
 
-void wrally_state::wrally_map(address_map &map)
+void wrally_state::main_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                // ROM
-	map(0x100000, 0x103fff).ram().w(FUNC(wrally_state::vram_w)).share("videoram");                // Encrypted Video RAM
-	map(0x108000, 0x108007).ram().share("vregs");                                                 // Video Registers
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x103fff).ram().w(FUNC(wrally_state::vram_w)).share(m_videoram);                // Encrypted
+	map(0x108000, 0x108007).ram().share(m_vregs);
 	map(0x10800c, 0x10800d).nopw();                                                               // CLR INT Video
-	map(0x200000, 0x203fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
+	map(0x200000, 0x203fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0x440000, 0x440fff).ram().share("spriteram");                                             // Sprite RAM
+	map(0x440000, 0x440fff).ram().share(m_spriteram);
 	map(0x700000, 0x700001).portr("DSW");
 	map(0x700002, 0x700003).portr("P1_P2");
 	map(0x700004, 0x700005).portr("WHEEL");
 	map(0x700008, 0x700009).portr("SYSTEM");
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
-	map(0x70000d, 0x70000d).w(FUNC(wrally_state::okim6295_bankswitch_w));                         // OKI6295 bankswitch
-	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // OKI6295 status/data register
+	map(0x70000d, 0x70000d).w(FUNC(wrally_state::okim6295_bankswitch_w));
+	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x70006a, 0x70006b).nopr();
 	map(0x70007a, 0x70007b).nopr();
-	map(0xfec000, 0xfeffff).ram().share("shareram");                                              // Work RAM (shared with DS5002FP)
+	map(0xfec000, 0xfeffff).ram().share(m_shareram);                                              // Work RAM (shared with DS5002FP)
 }
 
 
 void wrally_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x2ffff).rom();
-	map(0x30000, 0x3ffff).bankr("okibank");
+	map(0x30000, 0x3ffff).bankr(m_okibank);
 }
 
 
@@ -360,15 +522,15 @@ static const gfx_layout wrally_tilelayout16 =
 };
 
 static GFXDECODE_START( gfx_wrally )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, wrally_tilelayout16, 0, 64*8 )
+	GFXDECODE_ENTRY( "gfx", 0x000000, wrally_tilelayout16, 0, 64*8 )
 GFXDECODE_END
 
 
 void wrally_state::wrally(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(24'000'000)/2);        // Verified on PCB
-	m_maincpu->set_addrmap(AS_PROGRAM, &wrally_state::wrally_map);
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2);        // Verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &wrally_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wrally_state::irq6_line_hold));
 
 	gaelco_ds5002fp_device &ds5002(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); // verified on PCB
@@ -395,12 +557,12 @@ void wrally_state::wrally(machine_config &config)
 	m_sprites->set_screen_tag("screen");
 
 	LS259(config, m_outlatch);
-	m_outlatch->q_out_cb<0>().set(FUNC(wrally_state::coin1_lockout_w));
-	m_outlatch->q_out_cb<1>().set(FUNC(wrally_state::coin2_lockout_w));
-	m_outlatch->q_out_cb<2>().set(FUNC(wrally_state::coin1_counter_w));
-	m_outlatch->q_out_cb<3>().set(FUNC(wrally_state::coin2_counter_w));
+	m_outlatch->q_out_cb<0>().set(FUNC(wrally_state::coin_lockout_w<0>));
+	m_outlatch->q_out_cb<1>().set(FUNC(wrally_state::coin_lockout_w<1>));
+	m_outlatch->q_out_cb<2>().set(FUNC(wrally_state::coin_counter_w<0>));
+	m_outlatch->q_out_cb<3>().set(FUNC(wrally_state::coin_counter_w<1>));
 	m_outlatch->q_out_cb<4>().set_nop();                                // Sound muting
-	m_outlatch->q_out_cb<5>().set(FUNC(wrally_state::flipscreen_w));    // Flip screen
+	m_outlatch->q_out_cb<5>().set(FUNC(wrally_state::flipscreen_w));
 	m_outlatch->q_out_cb<6>().set(FUNC(wrally_state::adc_en));  // ENA/D, for pot wheel
 	m_outlatch->q_out_cb<7>().set(FUNC(wrally_state::adc_clk)); // CKA/D,      "
 
@@ -427,7 +589,7 @@ ROM_START( wrally )
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "worldr21.i13", 0x000000, 0x080000, CRC(b7fddb12) SHA1(619a75daac8cbba7e85c97ca19733e2196d66d5c) )
 	ROM_LOAD16_BYTE( "worldr20.i11", 0x000001, 0x080000, CRC(58b2809a) SHA1(8741ec544c54e2a2f5d17ac2f8400ee2ce382e83) )
 	ROM_LOAD16_BYTE( "worldr19.i09", 0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
@@ -460,7 +622,7 @@ ROM_START( wrallya )
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "worldr21.i13", 0x000000, 0x080000, CRC(b7fddb12) SHA1(619a75daac8cbba7e85c97ca19733e2196d66d5c) )
 	ROM_LOAD16_BYTE( "worldr20.i11", 0x000001, 0x080000, CRC(58b2809a) SHA1(8741ec544c54e2a2f5d17ac2f8400ee2ce382e83) )
 	ROM_LOAD16_BYTE( "worldr19.i09", 0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
@@ -493,7 +655,7 @@ ROM_START( wrallyb )
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "rally h-12.h12", 0x000000, 0x100000, CRC(3353dc00) SHA1(db3b1686751dcaa231d66c08b5be81fcfe299ad9) ) // Same data, different layout
 	ROM_LOAD( "rally h-8.h8",   0x100000, 0x100000, CRC(58dcd024) SHA1(384ff296d3c7c8e0c4469231d1940de3cea89fc2) )
 
@@ -522,7 +684,7 @@ ROM_START( wrallyc )
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "rally i13.i13", 0x000000, 0x080000, CRC(b7fddb12) SHA1(619a75daac8cbba7e85c97ca19733e2196d66d5c) )
 	ROM_LOAD16_BYTE( "rally i11.i11", 0x000001, 0x080000, CRC(58b2809a) SHA1(8741ec544c54e2a2f5d17ac2f8400ee2ce382e83) )
 	ROM_LOAD16_BYTE( "rally i9.i9",   0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
@@ -555,7 +717,7 @@ ROM_START( wrallyat ) // Board Marked 930217, Atari License
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "rally h-12.h12", 0x000000, 0x100000, CRC(3353dc00) SHA1(db3b1686751dcaa231d66c08b5be81fcfe299ad9) ) // Same data, different layout
 	ROM_LOAD( "rally h-8.h8",   0x100000, 0x100000, CRC(58dcd024) SHA1(384ff296d3c7c8e0c4469231d1940de3cea89fc2) )
 
@@ -569,6 +731,8 @@ ROM_START( wrallyat ) // Board Marked 930217, Atari License
 	ROM_LOAD( "pal16r4-e2.bin",       0x0000, 0x0104, CRC(15fee75c) SHA1(b9ee5121dd41f2535d9abd78ff5fcfeaa1ac6b62) )
 	ROM_LOAD( "pal16r8-b15.bin",      0x0000, 0x0104, CRC(b50337a6) SHA1(1f922753cb9982cad9a3c9246894ecd38273236e) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) // Dallas DS5002FP power failure shows as: "Tension baja"

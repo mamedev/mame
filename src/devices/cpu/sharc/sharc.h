@@ -52,10 +52,6 @@
 #define MODE2_CAFRZ         0x80000     /* Cache freeze */
 
 
-#define SIGN_EXTEND6(x)             (((x) & 0x20) ? (0xffffffc0 | (x)) : (x))
-#define SIGN_EXTEND24(x)            (((x) & 0x800000) ? (0xff000000 | (x)) : (x))
-#define MAKE_EXTRACT_MASK(start_bit, length)    ((0xffffffff << start_bit) & (((uint32_t)0xffffffff) >> (32 - (start_bit + length))))
-
 #define OP_USERFLAG_COUNTER_LOOP            0x00000001
 #define OP_USERFLAG_COND_LOOP               0x00000002
 #define OP_USERFLAG_COND_FIELD              0x000003fc

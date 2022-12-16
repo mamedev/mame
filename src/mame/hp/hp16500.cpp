@@ -49,6 +49,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/ds1386.h"
 #include "machine/scn_pci.h"
 #include "bus/hp_hil/hp_hil.h"

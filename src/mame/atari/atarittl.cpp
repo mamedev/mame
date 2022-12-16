@@ -107,7 +107,7 @@ namespace {
 #define TANK_HTOTAL     (952)
 #define TANK_VTOTAL     (262)
 
-#define GTRAK10_VIDCLOCK 14318181
+#define GTRAK10_VIDCLOCK (14318181 / 2)
 #define GTRAK10_HTOTAL 451
 #define GTRAK10_VTOTAL 521
 
@@ -178,6 +178,7 @@ private:
 };
 
 static NETLIST_START(atarikee)
+{
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
@@ -187,7 +188,7 @@ static NETLIST_START(atarikee)
 
 //  NETDEV_ANALOG_CALLBACK(sound_cb, sound, atarikee_state, sound_cb, "")
 //  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
-NETLIST_END()
+}
 
 
 void atarikee_state::atarikee(machine_config &config)
@@ -267,6 +268,12 @@ void gtrak10_state::gtrak10(machine_config &config)
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
+	NETLIST_LOGIC_INPUT(config, "maincpu:p1lup",    "P1_LEFT_UP.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p1lleft",  "P1_LEFT_LEFT.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p1lright", "P1_LEFT_RIGHT.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coin1",    "COIN1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw1", "STARTSW1.POS", 0);
+
 	/* video hardware */
 
 	/* Service Manual describes it as
@@ -278,30 +285,41 @@ void gtrak10_state::gtrak10(machine_config &config)
 	   Pixel Clock = 14.318MHz
 
 	   Horiz Total       = 451
-	   Horiz Front Porch =  0
-	   Horiz Sync        =  1
-	   Horiz Back Porch  = 31
+	   Horiz Front Porch =  ?
+	   Horiz Sync        =  32
+	   Horiz Back Porch  = ?
 
 	   Vert Total       = 521
-	   Vert Front Porch =   0
-	   Vert Sync        =   8
-	   Vert Back Porch  =   0
+	   Vert Front Porch =   ?
+	   Vert Sync        =   4
+	   Vert Back Porch  =   ?
 	*/
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(GTRAK10_VIDCLOCK);
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of line/frame
-	m_video->set_horz_params(GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 31,     GTRAK10_HTOTAL*1);
-	//m_video->set_horz_params(GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 31,     GTRAK10_HTOTAL);
-	m_video->set_vert_params( GTRAK10_VTOTAL - 8,   GTRAK10_VTOTAL - 8,       GTRAK10_VTOTAL,     GTRAK10_VTOTAL);
+	m_video->set_horz_params(GTRAK10_HTOTAL  - 96, GTRAK10_HTOTAL - 64, GTRAK10_HTOTAL - 32, GTRAK10_HTOTAL);
+	m_video->set_vert_params( GTRAK10_VTOTAL - 32, GTRAK10_VTOTAL -  8, GTRAK10_VTOTAL - 4,  GTRAK10_VTOTAL);
 	m_video->set_fieldcount(2);
 	m_video->set_threshold(1.0);
-	//m_video->set_gain(1.50);
+	m_video->set_gain(1.50);
+	m_video->set_vsync_threshold(0.1);
+	m_video->set_horz_scale(2);
 }
 
 static INPUT_PORTS_START( gtrak10 )
 	// TODO
+	// Temporary Controls to test car movement
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )    PORT_2WAY NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1lup")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )  PORT_2WAY NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1lleft")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_2WAY NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1lright")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) NETLIST_LOGIC_PORT_CHANGED("maincpu", "coin1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1) NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw1")
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( stuntcyc )

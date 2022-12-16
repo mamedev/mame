@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb
+// copyright-holders:Vas Crabb, Aaron Giles
 /***************************************************************************
 
     path.h
@@ -13,6 +13,7 @@
 #include "osdfile.h" // for PATH_SEPARATOR
 
 #include <string>
+#include <string_view>
 #include <utility>
 
 
@@ -53,8 +54,8 @@ inline std::string &path_append(std::string &path, T &&next, U &&... more)
 	if (!path.empty() && !is_directory_separator(path.back()))
 		path.append(PATH_SEPARATOR);
 	path.append(std::forward<T>(next));
-	if constexpr (sizeof...(U))
-		return path_append(std::forward<U>(more)...);
+	if constexpr (sizeof...(U) > 0U)
+		return path_append(path, std::forward<U>(more)...);
 	else
 		return path;
 }
@@ -71,7 +72,7 @@ template <typename T, typename... U>
 inline std::string path_concat(T &&first, U &&... more)
 {
 	std::string result(std::forward<T>(first));
-	if constexpr (sizeof...(U))
+	if constexpr (sizeof...(U) > 0U)
 		path_append(result, std::forward<U>(more)...);
 	return result;
 }
@@ -79,5 +80,21 @@ inline std::string path_concat(T &&first, U &&... more)
 /// \}
 
 } // namespace util
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+/* ----- filename utilities ----- */
+
+// extract the base part of a filename (remove extensions and paths)
+std::string_view core_filename_extract_base(std::string_view name, bool strip_extension = false) noexcept;
+
+// extracts the file extension from a filename
+std::string_view core_filename_extract_extension(std::string_view filename, bool strip_period = false) noexcept;
+
+// true if the given filename ends with a particular extension
+bool core_filename_ends_with(std::string_view filename, std::string_view extension) noexcept;
 
 #endif // MAME_LIB_UTIL_PATH_H

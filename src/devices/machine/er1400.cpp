@@ -323,7 +323,7 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 	m_clock_input = bool(state);
 
 	// Commands are clocked by a logical 1 -> 0 transition (i.e. rising edge)
-	if (!state)
+	if (state)
 	{
 		if (machine().time() >= m_write_time)
 			write_data();
@@ -398,5 +398,5 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 
 READ_LINE_MEMBER(er1400_device::data_r)
 {
-	return m_data_input | m_data_output;
+	return m_data_input & m_data_output;
 }

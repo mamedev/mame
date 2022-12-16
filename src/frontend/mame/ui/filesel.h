@@ -91,7 +91,7 @@ private:
 	file_selector_entry *append_dirent_entry(const osd::directory::entry *dirent);
 	void append_entry_menu_item(const file_selector_entry *entry);
 	void select_item(const file_selector_entry &entry);
-	void type_search_char(char32_t ch);
+	void update_search();
 };
 
 

@@ -128,9 +128,8 @@ Dumped by Chackn
 
 #include "emu.h"
 
-#include "segacrp2_device.h"
-
 #include "cpu/z80/z80.h"
+#include "machine/segacrp2_device.h"
 #include "machine/i8255.h"
 #include "sound/ymopn.h"
 

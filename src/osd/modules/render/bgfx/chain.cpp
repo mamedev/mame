@@ -6,7 +6,12 @@
 //
 //============================================================
 
+#include "chain.h"
+
 #include "emu.h"
+#include "render.h"
+#include "rendlay.h"
+#include "screen.h"
 
 #include <bx/timer.h>
 
@@ -19,12 +24,8 @@
 #include "chainmanager.h"
 #include "target.h"
 #include "vertex.h"
-#include "rendlay.h"
-#include "screen.h"
 #include "clear.h"
 #include "modules/osdwindow.h"
-
-#include "chain.h"
 
 bgfx_chain::bgfx_chain(std::string name, std::string author, bool transform, target_manager& targets, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries, std::vector<bgfx_target*> target_list, std::uint32_t screen_index)
 	: m_name(name)

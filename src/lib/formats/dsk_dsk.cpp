@@ -420,7 +420,6 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		}
 	}
 
-	int counter = 0;
 	for(int track=0; track < tracks; track++) {
 		for(int side=0; side < std::min(heads, img_heads); side++) {
 			if(track_offsets[(track<<1)+side] >= image_size)
@@ -491,7 +490,6 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			}
 			// larger cell count (was 100000) to allow for slightly out of spec images (theatre europe on einstein)
 			build_pc_track_mfm(track, side, image, 105000, tr.number_of_sector, sects, tr.gap3_length);
-			counter++;
 		}
 	}
 	return true;

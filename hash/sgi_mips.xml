@@ -804,8 +804,21 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="o2_oobe">
+	<software name="o2_oobe_96">
 		<description>O2 Out of Box Experience</description>
+		<year>1996</year> <!-- 12/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0598-002"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="o2_out_of_box_experience" sha1="551cc176b81fb191c4b1334e99a39f40513a6077" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="o2_oobe">
+		<description>O2 Out of Box Experience 2.1</description>
 		<year>1997</year> <!-- 08/97 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -813,6 +826,19 @@ license:CC0
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<disk name="o2_insert_first" sha1="d6c9b26e7345248facdd9864c380fe5f55261be2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="o2_oobe_2_2">
+		<description>O2 Out of Box Experience 2.2 for IRIX 6.5</description>
+		<year>1998</year> <!-- 06/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0782-001"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="o2_out_of_box_experience_2_2" sha1="41caadce118b481fc700905530ff2f9599689b33" />
 			</diskarea>
 		</part>
 	</software>
@@ -839,6 +865,19 @@ license:CC0
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="octane_demos_1_3" sha1="5c9864a6595ba46d4f04fa743497f8ee11043e02" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="oct2_demos_1_0">
+		<description>OCTANE Demos 1.3 and OCTANE2 Demos 1.0 for IRIX 6.5.9 and later</description>
+		<year>2000</year> <!-- 08/00 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0781-003"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="octane2_demos_1_0" sha1="006de465f11a088f462d1668701cd9cad23bbd51" />
 			</diskarea>
 		</part>
 	</software>
@@ -3085,6 +3124,19 @@ license:CC0
 
 	<!-- IRIX patches (loose CDs) -->
 
+	<software name="io4_prom_patch">
+		<description>IO4 PROM and flashio Patches</description>
+		<year>1996</year> <!-- 04/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0549-001"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="io4_prom_and_flashio_patches" sha1="da990089bc83e99edd7d8403d56087a2813c28de" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="maint_3_10_comp">
 		<description>3.10 Compilers Maintenance Update for IRIX 4.0.5</description>
 		<year>1992</year> <!--08/92 -->
@@ -3437,6 +3489,32 @@ license:CC0
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="varsity_update_aug1998" sha1="daaed02460b34fdeaff43b69660e9ab54d86a0d0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="oct2_vpro_patch1">
+		<description>Octane2 VPro Patches 3927 for 6.5.8m and 3928 for 6.5.8f</description>
+		<year>2000</year> <!-- 05/00 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0974-001"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="octane2_vpro_patches_3927_3928" sha1="a8462671b0fe4c3a5d39b3791b372ec198c9ef6b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="oct2_vpro_patch3">
+		<description>Octane2 VPro Patches 4103 for 6.5.10m and 4104 for 6.5.10f</description>
+		<year>2000</year> <!-- 11/00 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0974-003"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="octane2_vpro_patches_4103_4104" sha1="8713c6c1b262260500062574f3e622a60a25cc3d" />
 			</diskarea>
 		</part>
 	</software>
@@ -4215,6 +4293,14 @@ license:CC0
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-0779-004"/>
+			<feature name="part_id" value="IRIX 6.5.4 Base Documentation May 1999"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_4_doc" sha1="885d39c482a46c32f0382c61ae4a0815f0340b59" />
+			</diskarea>
+		</part>
+		<part name="cdrom5" interface="cdrom">
 			<feature name="part_number" value="812-0773-004"/>
 			<feature name="part_id" value="Freeware May 1999"/>
 			<!-- Origin: BitSavers -->
@@ -4222,12 +4308,20 @@ license:CC0
 				<disk name="freeware_may_1999" sha1="7f3a6050ea5a2079349798b3caaab449ecc98d87" />
 			</diskarea>
 		</part>
-		<part name="cdrom5" interface="cdrom">
+		<part name="cdrom6" interface="cdrom">
 			<feature name="part_number" value="812-0790-003"/>
 			<feature name="part_id" value="WorldView Japanese 6.5.4"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="worldview_japanese_6_5_4" sha1="24c590192217a3e87a4e48e4cfcc583f8f186425" />
+			</diskarea>
+		</part>
+		<part name="cdrom7" interface="cdrom">
+			<feature name="part_number" value="812-0774-002"/>
+			<feature name="part_id" value="ONC3/NFS Version 3 for IRIX 6.2, 6.3, 6.4 and 6.5"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="ONC3_NFS_Version_3" sha1="8db528aa63f4dde1e5832e9085358c47c93dc257" />
 			</diskarea>
 		</part>
 	</software>
@@ -4268,7 +4362,14 @@ license:CC0
 				<disk name="irix_6_5_5_base_documentation" sha1="378c206d4496b24c9e30163a33a43e93b77865ef" />
 			</diskarea>
 		</part>
-
+		<part name="cdrom5" interface="cdrom">
+			<feature name="part_number" value="812-0773-005"/>
+			<feature name="part_id" value="Freeware August 1999"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="freeware_aug_1999" sha1="53b24f2436a6b50f7603536acbb55d7e81d4e4bb" />
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="irix_6_5_6">

@@ -96,7 +96,7 @@
 #include "k054000.h"
 #include "konami_helper.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
@@ -132,6 +132,8 @@ public:
 	void esckids(machine_config &config);
 	void vendetta(machine_config &config);
 
+	int obj_busy_r() { return m_obj_busy->enabled() ? 1 : 0; }
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -144,7 +146,8 @@ private:
 
 	// misc
 	uint8_t m_irq_enabled = 0;
-	emu_timer *m_z80_nmi_timer;
+	emu_timer *m_nmi_blocked;
+	emu_timer *m_obj_busy;
 
 	// devices
 	required_device<konami_cpu_device> m_maincpu;
@@ -169,13 +172,12 @@ private:
 	void K052109_w(offs_t offset, uint8_t data);
 	void _5fe0_w(uint8_t data);
 	void z80_arm_nmi_w(uint8_t data);
-	void z80_irq_w(uint8_t data);
+	void z80_nmi_w(int state);
+	void z80_irq_w(uint8_t data = 0);
 	uint8_t z80_irq_r();
+	void vblank_irq(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	INTERRUPT_GEN_MEMBER(irq);
-	TIMER_CALLBACK_MEMBER(z80_nmi);
 
 	K052109_CB_MEMBER(vendetta_tile_callback);
 	K052109_CB_MEMBER(esckids_tile_callback);
@@ -286,7 +288,6 @@ void vendetta_state::eeprom_w(uint8_t data)
 	// bit 6 - IRQ enable
 	// bit 7 - Unused
 
-
 	if (data == 0xff ) // this is a bug in the EEPROM write code
 		return;
 
@@ -294,6 +295,8 @@ void vendetta_state::eeprom_w(uint8_t data)
 	m_eeprom_out->write(data, 0xff);
 
 	m_irq_enabled = (data >> 6) & 1;
+	if (!m_irq_enabled)
+		m_maincpu->set_input_line(KONAMI_IRQ_LINE, CLEAR_LINE);
 
 	m_videoview0.select(BIT(data, 0));
 	m_videoview1.select(BIT(data, 0));
@@ -335,16 +338,17 @@ void vendetta_state::_5fe0_w(uint8_t data)
 	m_k053246->k053246_set_objcha_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(vendetta_state::z80_nmi)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
 void vendetta_state::z80_arm_nmi_w(uint8_t data)
 {
+	// see notes in simpsons driver
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_nmi_blocked->adjust(m_audiocpu->cycles_to_attotime(4));
+}
 
-	m_z80_nmi_timer->adjust(attotime::from_usec(25));
+void vendetta_state::z80_nmi_w(int state)
+{
+	if (state && !m_nmi_blocked->enabled())
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void vendetta_state::z80_irq_w(uint8_t data)
@@ -354,7 +358,9 @@ void vendetta_state::z80_irq_w(uint8_t data)
 
 uint8_t vendetta_state::z80_irq_r()
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	if (!machine().side_effects_disabled())
+		z80_irq_w();
+
 	return 0x00;
 }
 
@@ -462,10 +468,10 @@ static INPUT_PORTS_START( vendet4p )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // not really vblank, object related. It's timed, otherwise sprites flicker
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vendetta_state, obj_busy_r)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
@@ -518,10 +524,10 @@ static INPUT_PORTS_START( esckids )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // not really vblank, object related. It's timed, otherwise sprites flicker
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vendetta_state, obj_busy_r)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
@@ -546,10 +552,17 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(vendetta_state::irq)
+void vendetta_state::vblank_irq(int state)
 {
-	if (m_irq_enabled)
-		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+	if (state)
+	{
+		if (m_irq_enabled)
+			m_maincpu->set_input_line(KONAMI_IRQ_LINE, ASSERT_LINE);
+
+		// OBJ DMA enabled
+		if (m_k053246->k053246_is_irq_enabled())
+			m_obj_busy->adjust(attotime::from_usec(250));
+	}
 }
 
 void vendetta_state::machine_start()
@@ -557,7 +570,8 @@ void vendetta_state::machine_start()
 	m_mainbank->configure_entries(0, 28, memregion("maincpu")->base(), 0x2000);
 	m_mainbank->set_entry(0);
 
-	m_z80_nmi_timer = timer_alloc(FUNC(vendetta_state::z80_nmi), this);
+	m_nmi_blocked = timer_alloc(timer_expired_delegate());
+	m_obj_busy = timer_alloc(timer_expired_delegate());
 
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_sprite_colorbase));
@@ -575,6 +589,10 @@ void vendetta_state::machine_reset()
 
 	m_sprite_colorbase = 0;
 	m_irq_enabled = 0;
+
+	// Z80 _NMI goes low at same time as reset
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void vendetta_state::banking_callback(uint8_t data)
@@ -588,9 +606,8 @@ void vendetta_state::banking_callback(uint8_t data)
 void vendetta_state::vendetta(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 8); // 052001 (verified on PCB)
+	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2); // 052001 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vendetta_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(vendetta_state::irq));
 	m_maincpu->line().set(FUNC(vendetta_state::banking_callback));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified with PCB
@@ -608,6 +625,7 @@ void vendetta_state::vendetta(machine_config &config)
 	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(vendetta_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(vendetta_state::vblank_irq));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
@@ -633,6 +651,7 @@ void vendetta_state::vendetta(machine_config &config)
 	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); // verified with PCB
 	k053260.add_route(0, "lspeaker", 0.75);
 	k053260.add_route(1, "rspeaker", 0.75);
+	k053260.sh1_cb().set(FUNC(vendetta_state::z80_nmi_w));
 }
 
 void vendetta_state::esckids(machine_config &config)
@@ -654,7 +673,7 @@ void vendetta_state::esckids(machine_config &config)
 
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 101, 6);
 
-	K053252(config, "k053252", 6000000).set_offsets(12*8, 1*8);
+	K053252(config, "k053252", XTAL(24'000'000) / 4).set_offsets(12*8, 1*8);
 }
 
 
@@ -1051,17 +1070,16 @@ ROM_END
 
 ***************************************************************************/
 
-
-GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaun,  vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
-GAME( 1991, vendetta2pw, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
-GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettan,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pp, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckids,     0,        esckids,  esckids,  vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Asia, 4 Players)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Japan, 2 Players)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta,     0,        vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettar,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaz,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaun,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
+GAME( 1991, vendetta2pw,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2peba,vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pun, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
+GAME( 1991, vendetta2pu,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pd,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettan,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pp,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckids,      0,        esckids,  esckids,  vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Asia, 4 Players)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckidsj,     esckids,  esckids,  esckidsj, vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Japan, 2 Players)",              MACHINE_SUPPORTS_SAVE )

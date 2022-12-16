@@ -46,52 +46,6 @@ void lisa_state::lisa210_fdc_map(address_map &map)
 	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000);         /* ROM */
 }
 
-
-
-/***************************************************************************
-    DEVICE CONFIG
-***************************************************************************/
-
-static void lisa2_set_iwm_enable_lines(device_t *device,int enable_mask)
-{
-	/* E1 & E2 is connected to the Sony SEL line (?) */
-	/*logerror("new sel line state %d\n", (enable_mask) ? 0 : 1);*/
-	sony_set_sel_line(device,(enable_mask) ? 0 : 1);
-}
-
-static void lisa210_set_iwm_enable_lines(device_t *device,int enable_mask)
-{
-	/* E2 is connected to the Sony enable line (?) */
-	sony_set_enable_lines(device,enable_mask >> 1);
-}
-
-static const applefdc_interface lisa2_fdc_interface =
-{
-	sony_set_lines,
-	lisa2_set_iwm_enable_lines,
-
-	sony_read_data,
-	sony_write_data,
-	sony_read_status
-};
-
-static const applefdc_interface lisa210_fdc_interface =
-{
-	sony_set_lines,
-	lisa210_set_iwm_enable_lines,
-
-	sony_read_data,
-	sony_write_data,
-	sony_read_status
-};
-
-static const floppy_interface lisa_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_5_25"
-};
-
 /***************************************************************************
     MACHINE DRIVER
 ***************************************************************************/
@@ -147,8 +101,12 @@ void lisa_state::lisa(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(lisa_state::nvram_init));
 
 	/* devices */
-	LEGACY_IWM(config, m_fdc, &lisa2_fdc_interface);
-	sonydriv_floppy_image_device::legacy_2_drives_add(config, &lisa_floppy_interface);
+	IWM(config, m_fdc, 8_MHz_XTAL);
+//  m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
+//  m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_w));
+
+	applefdintf_device::add_35(config, m_floppy[0]);
+	applefdintf_device::add_35(config, m_floppy[1]);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("lisa");
@@ -170,9 +128,6 @@ void lisa_state::lisa210(machine_config &config)
 {
 	lisa(config);
 	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa210_fdc_map);
-
-	/* Lisa 2/10 and MacXL had a slightly different FDC interface */
-	m_fdc->set_config(&lisa210_fdc_interface);
 
 	/* via */
 	m_via0->set_clock(1250000);
@@ -486,10 +441,6 @@ ROM_START( macxl )
 	ROM_LOAD("vidstatem.rom", 0x00, 0x100, BAD_DUMP CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 
-/*
-    Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
-    the MACHINE_NOT_WORKING flag...
-*/
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY           FULLNAME */
 COMP( 1983, lisa,    0,      0,      lisa,    lisa,  lisa_state, init_lisa2,   "Apple Computer", "Lisa",         MACHINE_NOT_WORKING )
 COMP( 1984, lisa2,   0,      0,      lisa,    lisa,  lisa_state, init_lisa2,   "Apple Computer", "Lisa2",        MACHINE_NOT_WORKING )

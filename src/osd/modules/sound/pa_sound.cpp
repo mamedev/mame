@@ -31,6 +31,8 @@
 #define LOG_FILE   "pa.log"
 #define LOG_BUFCNT 0
 
+using osd::s16;
+
 class sound_pa : public osd_module, public sound_module
 {
 public:

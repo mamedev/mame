@@ -5,7 +5,7 @@
 Mini Vaders (Space Invaders's mini game)
 (c)1990 Taito Corporation
 
-Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/19 -
+Driver by Takahiro Nogi 1999/12/19 -
 
 This is a test board sold together with the cabinet (as required by law in
 Japan). It has no sound.

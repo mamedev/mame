@@ -21,6 +21,7 @@
 #include "window.h"
 #include "osdmac.h"
 #include "modules/lib/osdlib.h"
+#include "modules/monitor/monitor_module.h"
 
 //============================================================
 //  CONSTANTS

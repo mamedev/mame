@@ -17,6 +17,7 @@
 //
 
 NETLIST_START(fireone)
+{
 	SOLVER(Solver, 48000)
 
 	ANALOG_INPUT(V12, 12)
@@ -601,4 +602,4 @@ NETLIST_START(fireone)
 	OPTIMIZE_FRONTIER(R11.1, RES_K(620), 50) // Isolation for NOISE going into TORPCOLL section
 	OPTIMIZE_FRONTIER(R87.1, RES_K(100), 50) // Isolation for RUMBLE going into L BOOM section
 	OPTIMIZE_FRONTIER(R105.1, RES_K(100), 50) // Isolation for RUMBLE going into R BOOM section
-NETLIST_END()
+}

@@ -6,14 +6,14 @@
 //
 //============================================================
 
-#include <string>
+#include "targetreader.h"
 
-#include "emu.h"
 #include <modules/lib/osdobj_common.h>
 
 #include "chainmanager.h"
-#include "targetreader.h"
 #include "target.h"
+
+#include <cmath>
 
 const target_reader::string_to_enum target_reader::STYLE_NAMES[target_reader::STYLE_COUNT] = {
 	{ "guest",  TARGET_STYLE_GUEST },

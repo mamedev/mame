@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="text_l1"><text string="playing" align="2"><color red="0.6" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l2"><text string="credit" align="2"><color red="0.6" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l3"><text string="selection" align="2"><color red="0.6" green="0.1" blue="0.1" /></text></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-26" right="37" top="-3" bottom="51" />
+
+		<element ref="text_l1"><bounds x="-30" y="3.5" width="27" height="6" /></element>
+		<element ref="text_l2"><bounds x="-30" y="20.5" width="27" height="6" /></element>
+		<element ref="text_l3"><bounds x="-30" y="37.5" width="27" height="6" /></element>
+
+		<element name="digit7" ref="digit"><bounds x="0" y="0" width="10" height="14" /></element>
+		<element name="digit6" ref="digit"><bounds x="12" y="0" width="10" height="14" /></element>
+		<element name="digit5" ref="digit"><bounds x="24" y="0" width="10" height="14" /></element>
+
+		<element name="digit4" ref="digit"><bounds x="12" y="17" width="10" height="14" /></element>
+		<element name="digit3" ref="digit"><bounds x="24" y="17" width="10" height="14" /></element>
+
+		<element name="digit2" ref="digit"><bounds x="0" y="34" width="10" height="14" /></element>
+		<element name="digit1" ref="digit"><bounds x="12" y="34" width="10" height="14" /></element>
+		<element name="digit0" ref="digit"><bounds x="24" y="34" width="10" height="14" /></element>
+
+	</view>
+</mamelayout>

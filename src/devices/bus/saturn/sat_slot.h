@@ -31,7 +31,7 @@ public:
 
 	int get_cart_type() const { return m_cart_type; }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void bram_alloc(uint32_t size);
 	void dram0_alloc(uint32_t size);
 	void dram1_alloc(uint32_t size);
@@ -112,12 +112,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(SATURN_CART_SLOT, sat_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define SATSLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_SATURN_SAT_SLOT_H

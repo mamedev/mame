@@ -4,7 +4,7 @@
 
 Side Pocket - (c) 1986 Data East
 
-The original board has an 8751 protection mcu
+The original board has an 8751 protection MCU
 
 Ernesto Corvi
 ernesto@imagina.com
@@ -68,7 +68,7 @@ Stephh's notes (based on the games M6809 code and some tests) :
       75DF: D6 0A            LDB   $0A
       75E1: F7 30 0C         STB   $300C
 
-    Surprinsingly, the screen might flip for player 2 after GAME OVER due to original code at 0x4de8 :
+    Surprisingly, the screen might flip for player 2 after GAME OVER due to original code at 0x4de8 :
 
       4DE8: D6 1A            LDB   $1A            A = 00 for player 1 and 01 for player 2
       4DEA: 27 03            BEQ   $4DEF
@@ -132,46 +132,293 @@ Additional notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "sidepckt.h"
 
-#include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/ymopn.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/mcs51/mcs51.h"
+#include "machine/gen_latch.h"
 #include "sound/ymopl.h"
+#include "sound/ymopn.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
+
+class sidepckt_state : public driver_device
+{
+public:
+	sidepckt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram")
+	{ }
+
+	void sidepcktb(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void bootleg_main_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+
+private:
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	uint8_t m_scroll_y = 0;
+
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	uint8_t scroll_y_r();
+	void scroll_y_w(uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	void palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+
+	void sound_map(address_map &map);
+};
+
+class sidepckt_mcu_state : public sidepckt_state
+{
+public:
+	sidepckt_mcu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sidepckt_state(mconfig, type, tag),
+		m_mcu(*this, "mcu")
+	{ }
+
+	void sidepckt(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<i8751_device> m_mcu;
+
+	uint8_t m_mcu_p1 = 0;
+	uint8_t m_mcu_p2 = 0;
+	uint8_t m_mcu_p3 = 0;
+
+	uint8_t mcu_r();
+	void mcu_w(uint8_t data);
+
+	void mcu_p1_w(uint8_t data);
+	uint8_t mcu_p2_r();
+	void mcu_p3_w(uint8_t data);
+
+	void original_main_map(address_map &map);
+};
+
+
+// video
+
+void sidepckt_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2, bit3;
+
+		// red component
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 5);
+		bit2 = BIT(color_prom[i], 6);
+		bit3 = BIT(color_prom[i], 7);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// green component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		bit3 = BIT(color_prom[i], 3);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// blue component
+		bit0 = BIT(color_prom[i + palette.entries()], 0);
+		bit1 = BIT(color_prom[i + palette.entries()], 1);
+		bit2 = BIT(color_prom[i + palette.entries()], 2);
+		bit3 = BIT(color_prom[i + palette.entries()], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(sidepckt_state::get_tile_info)
+{
+	uint8_t attr = m_colorram[tile_index];
+	tileinfo.set(0,
+			m_videoram[tile_index] + ((attr & 0x07) << 8),
+			((attr & 0x10) >> 3) | ((attr & 0x20) >> 5),
+			TILE_FLIPX);
+	tileinfo.group = (attr & 0x80) >> 7;
+}
+
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void sidepckt_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidepckt_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+
+	m_bg_tilemap->set_transmask(0, 0xff, 0x00); // split type 0 is totally transparent in front half
+	m_bg_tilemap->set_transmask(1, 0x01, 0xfe); // split type 1 has pen 0 transparent in front half
+
+	machine().tilemap().set_flip_all(TILEMAP_FLIPX);
+
+	save_item(NAME(m_scroll_y));
+}
+
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void sidepckt_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void sidepckt_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+uint8_t sidepckt_state::scroll_y_r()
+{
+	return m_scroll_y;
+}
+
+void sidepckt_state::scroll_y_w(uint8_t data)
+{
+	// Bits 0-5: Scroll y
+	m_scroll_y = data & 0x3f;
+
+	// Other bits: Unknown, but they seem never written
+	if (data > 0x3f)
+		logerror ("scroll_y_w: Unknown write -> data = 0x%02X\n", data);
+}
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+void sidepckt_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	{
+		int const attr  = m_spriteram[offs | 1];
+		int const code  = ((attr & 0x03) << 8) | m_spriteram[offs | 3];
+		int const color = (attr & 0xf0) >> 4;
+
+		int const sx = m_spriteram[offs | 2] - 2;
+		int const sy = m_spriteram[offs];
+
+		int const flipx = attr & 0x08;
+		int const flipy = attr & 0x04;
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx, sy, 0);
+
+		// wraparound
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx - 256, sy, 0);
+	}
+}
+
+
+uint32_t sidepckt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->set_scrolly(0, m_scroll_y);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	draw_sprites(bitmap, cliprect);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	return 0;
+}
+
+
+// machine
 
 //**************************************************************************
 //  PROTECTION MCU
 //**************************************************************************
 
-uint8_t sidepckt_state::mcu_r()
+uint8_t sidepckt_mcu_state::mcu_r()
 {
 	return m_mcu_p1;
 }
 
-void sidepckt_state::mcu_w(uint8_t data)
+void sidepckt_mcu_state::mcu_w(uint8_t data)
 {
 	m_mcu_p2 = data;
 	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
 }
 
-void sidepckt_state::mcu_p1_w(uint8_t data)
+void sidepckt_mcu_state::mcu_p1_w(uint8_t data)
 {
 	m_mcu_p1 = data;
 }
 
-uint8_t sidepckt_state::mcu_p2_r()
+uint8_t sidepckt_mcu_state::mcu_p2_r()
 {
 	return m_mcu_p2;
 }
 
-void sidepckt_state::mcu_p3_w(uint8_t data)
+void sidepckt_mcu_state::mcu_p3_w(uint8_t data)
 {
 	// 765432--  unused
-	// ------1-  mcu int ack
-	// -------0  cpu firq
+	// ------1-  MCU int ack
+	// -------0  CPU firq
 
 	if (BIT(data, 0) == 0 && BIT(m_mcu_p3, 0) == 1)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
@@ -186,14 +433,23 @@ void sidepckt_state::mcu_p3_w(uint8_t data)
 }
 
 
+void sidepckt_mcu_state::machine_start()
+{
+	sidepckt_state::machine_start();
+
+	save_item(NAME(m_mcu_p1));
+	save_item(NAME(m_mcu_p2));
+	save_item(NAME(m_mcu_p3));
+}
+
 /******************************************************************************/
 
-void sidepckt_state::sidepckt_map(address_map &map)
+void sidepckt_state::bootleg_main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x13ff).mirror(0x400).ram().w(FUNC(sidepckt_state::videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).mirror(0x400).ram().w(FUNC(sidepckt_state::colorram_w)).share("colorram");
-	map(0x2000, 0x20ff).ram().share("spriteram");
+	map(0x1000, 0x13ff).mirror(0x400).ram().w(FUNC(sidepckt_state::videoram_w)).share(m_videoram);
+	map(0x1800, 0x1bff).mirror(0x400).ram().w(FUNC(sidepckt_state::colorram_w)).share(m_colorram);
+	map(0x2000, 0x20ff).ram().share(m_spriteram);
 	map(0x2100, 0x24ff).nopw(); // ??? (Unused spriteram? The game writes some values at boot, but never read)
 	map(0x3000, 0x3000).portr("P1");
 	map(0x3001, 0x3001).portr("P2");
@@ -201,16 +457,15 @@ void sidepckt_state::sidepckt_map(address_map &map)
 	map(0x3003, 0x3003).portr("DSW2");
 	map(0x3004, 0x3004).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x300c, 0x300c).rw(FUNC(sidepckt_state::scroll_y_r), FUNC(sidepckt_state::scroll_y_w));
-	map(0x3014, 0x3014).r(FUNC(sidepckt_state::mcu_r));
-	map(0x3018, 0x3018).w(FUNC(sidepckt_state::mcu_w));
 	map(0x4000, 0xffff).rom();
 }
 
-void sidepckt_state::sidepcktb_map(address_map &map)
+void sidepckt_mcu_state::original_main_map(address_map &map)
 {
-	sidepckt_map(map);
-	map(0x3014, 0x3014).nopr();
-	map(0x3018, 0x3018).nopw();
+	bootleg_main_map(map);
+
+	map(0x3014, 0x3014).r(FUNC(sidepckt_mcu_state::mcu_r));
+	map(0x3018, 0x3018).w(FUNC(sidepckt_mcu_state::mcu_w));
 }
 
 
@@ -226,7 +481,7 @@ void sidepckt_state::sound_map(address_map &map)
 
 /******************************************************************************/
 
-/* verified from M6809 code */
+// verified from M6809 code
 static INPUT_PORTS_START( sidepckt )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -238,7 +493,7 @@ static INPUT_PORTS_START( sidepckt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("P2")     /* see notes */
+	PORT_START("P2")     // see notes
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
@@ -267,26 +522,26 @@ static INPUT_PORTS_START( sidepckt )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, "Timer Speed" )               /* table at 0x9d99 */
+	PORT_DIPNAME( 0x03, 0x03, "Timer Speed" )               // table at 0x9d99
 	PORT_DIPSETTING(    0x00, "Stopped (Cheat)")
-	PORT_DIPSETTING(    0x03, "Slow" )                      /* 0x40 - "Normal" in the Dip Switches page */
-	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )           /* 0x30 - "Bit fast" in the Dip Switches page */
-	PORT_DIPSETTING(    0x01, "Fast" )                      /* 0x20 - "Fast" in the Dip Switches page */
+	PORT_DIPSETTING(    0x03, "Slow" )                      // 0x40 - "Normal" in the Dip Switches page
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )           // 0x30 - "Bit fast" in the Dip Switches page
+	PORT_DIPSETTING(    0x01, "Fast" )                      // 0x20 - "Fast" in the Dip Switches page
 	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x0c, "6" )
 	PORT_DIPSETTING(    0x04, "9" )
-	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")           /* always gives 6 balls */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       /* table at 0x40af (4 * 2 words) - see notes */
-	PORT_DIPSETTING(    0x30, "10k 60k 50k+" )              /* "10000, after each 50000" in the Dip Switches page */
-	PORT_DIPSETTING(    0x20, "20k 70k 50k+" )              /* "20000, after each 70000" in the Dip Switches page */
-	PORT_DIPSETTING(    0x10, "30k 80k 50k+" )              /* "30000, after each 100000" in the Dip Switches page */
-//  PORT_DIPSETTING(    0x00, "20k 70k 50k+" )              /* "20000" in the Dip Switches page */
+	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")           // always gives 6 balls
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       // table at 0x40af (4 * 2 words) - see notes
+	PORT_DIPSETTING(    0x30, "10k 60k 50k+" )              // "10000, after each 50000" in the Dip Switches page
+	PORT_DIPSETTING(    0x20, "20k 70k 50k+" )              // "20000, after each 70000" in the Dip Switches page
+	PORT_DIPSETTING(    0x00, "20k 70k 50k+" )              // "20000" in the Dip Switches page
+	PORT_DIPSETTING(    0x10, "30k 80k 50k+" )              // "30000, after each 100000" in the Dip Switches page
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-/* verified from M6809 code */
+// verified from M6809 code
 static INPUT_PORTS_START( sidepcktj )
 	PORT_INCLUDE(sidepckt)
 
@@ -303,50 +558,50 @@ static INPUT_PORTS_START( sidepcktj )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 INPUT_PORTS_END
 
-/* verified from M6809 code */
+// verified from M6809 code
 static INPUT_PORTS_START( sidepcktb )
 	PORT_INCLUDE(sidepckt)
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Timer Speed" )
 	PORT_DIPSETTING(    0x00, "Stopped (Cheat)")
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )           /* 0x30 */
-	PORT_DIPSETTING(    0x02, "Fast" )                      /* 0x20 */
-	PORT_DIPSETTING(    0x01, "Fastest" )                   /* 0x18 */
+	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )           // 0x30
+	PORT_DIPSETTING(    0x02, "Fast" )                      // 0x20
+	PORT_DIPSETTING(    0x01, "Fastest" )                   // 0x18
 	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x0c, "6" )
-	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")           /* always gives 6 balls */
+	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")           // always gives 6 balls
 INPUT_PORTS_END
 
 
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	2048,   /* 2048 characters */
-	3,      /* 3 bits per pixel */
-	{ 0, 0x8000*8, 0x10000*8 },     /* the bitplanes are separated */
+	8,8,    // 8*8 characters
+	2048,   // 2048 characters
+	3,      // 3 bits per pixel
+	{ 0, 0x8000*8, 0x10000*8 },     // the bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every char takes 8 consecutive bytes */
+	8*8     // every char takes 8 consecutive bytes
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	1024,   /* 1024 sprites */
-	3,      /* 3 bits per pixel */
-	{ 0, 0x8000*8, 0x10000*8 },     /* the bitplanes are separated */
+	16,16,  // 16*16 sprites
+	1024,   // 1024 sprites
+	3,      // 3 bits per pixel
+	{ 0, 0x8000*8, 0x10000*8 },     // the bitplanes are separated
 	{ 128+0, 128+1, 128+2, 128+3, 128+4, 128+5, 128+6, 128+7, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8    /* every char takes 8 consecutive bytes */
+	32*8    // every char takes 8 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_sidepckt )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   128,  4 ) /* colors 128-159 */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 ) /* colors   0-127 */
+	GFXDECODE_ENTRY( "chars",   0, charlayout,   128,  4 ) // colors 128-159
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,   0, 16 ) // colors   0-127
 GFXDECODE_END
 
 
@@ -355,27 +610,19 @@ void sidepckt_state::machine_reset()
 	m_scroll_y = 0;
 }
 
-void sidepckt_state::sidepckt(machine_config &config)
+void sidepckt_state::sidepcktb(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 12_MHz_XTAL/6); /* MC68B09EP, 2 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sidepckt_map);
+	// basic machine hardware
+	MC6809E(config, m_maincpu, 12_MHz_XTAL / 6); // MC68B09EP, 2 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &sidepckt_state::bootleg_main_map);
 
-	M6502(config, m_audiocpu, 12_MHz_XTAL/8); /* 1.5 MHz */
+	M6502(config, m_audiocpu, 12_MHz_XTAL / 8); // 1.5 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sound_map);
 
-	I8751(config, m_mcu, 8_MHz_XTAL); // 8.0MHz OSC on PCB
-	m_mcu->port_out_cb<1>().set(FUNC(sidepckt_state::mcu_p1_w));
-	m_mcu->port_in_cb<2>().set(FUNC(sidepckt_state::mcu_p2_r));
-	m_mcu->port_out_cb<3>().set(FUNC(sidepckt_state::mcu_p3_w));
-
-	// needs a tight sync with the mcu
-	config.set_perfect_quantum(m_maincpu);
-
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58); /* VERIFY: May be 55 or 56 */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_refresh_hz(58); // VERIFY: May be 55 or 56
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(sidepckt_state::screen_update));
@@ -383,29 +630,36 @@ void sidepckt_state::sidepckt(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sidepckt);
-	PALETTE(config, m_palette, FUNC(sidepckt_state::sidepckt_palette), 256);
+	PALETTE(config, m_palette, FUNC(sidepckt_state::palette), 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL/8)); /* 1.5 MHz */
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8)); // 1.5 MHz
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL/4)); /* 3 MHz */
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL / 4)); // 3 MHz
 	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void sidepckt_state::sidepcktb(machine_config &config)
+void sidepckt_mcu_state::sidepckt(machine_config &config)
 {
-	sidepckt(config);
+	sidepcktb(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sidepcktb_map);
-	config.device_remove("mcu");
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &sidepckt_mcu_state::original_main_map);
+
+	I8751(config, m_mcu, 8_MHz_XTAL); // 8.0MHz OSC on PCB
+	m_mcu->port_out_cb<1>().set(FUNC(sidepckt_mcu_state::mcu_p1_w));
+	m_mcu->port_in_cb<2>().set(FUNC(sidepckt_mcu_state::mcu_p2_r));
+	m_mcu->port_out_cb<3>().set(FUNC(sidepckt_mcu_state::mcu_p3_w));
+
+	// needs a tight sync with the mcu
+	config.set_perfect_quantum(m_maincpu);
 }
 
 
@@ -425,13 +679,13 @@ ROM_START( sidepckt ) // DE-0245-2
 	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 MCU (BAD_DUMP because it was created from the Japanese version)
 	ROM_LOAD( "dh-e.6d", 0x0000, 0x1000, BAD_DUMP CRC(00654574) SHA1(7d775e7b7cbb548c50b9b838a525a12bf7a32f8e) )
 
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "dh07-e.13k", 0x00000, 0x8000, CRC(9d6f7969) SHA1(583852be0861a89c63ce09eb39146ec379b9e12d) ) // characters
+	ROM_REGION( 0x18000, "chars", 0 )
+	ROM_LOAD( "dh07-e.13k", 0x00000, 0x8000, CRC(9d6f7969) SHA1(583852be0861a89c63ce09eb39146ec379b9e12d) )
 	ROM_LOAD( "dh06-e.13j", 0x08000, 0x8000, CRC(580e4e43) SHA1(de152a5d4fbc52d80e3eb9af17835ecb6258d45e) )
 	ROM_LOAD( "dh05-e.13h", 0x10000, 0x8000, CRC(05ab71d2) SHA1(6f06d1d1440a5fb05c01f712457d0bb167e93099) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) ) // sprites
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) )
 	ROM_LOAD( "dh02.15a", 0x08000, 0x8000, CRC(eeb5c3e7) SHA1(57eda1cc29124e04fe5025a904634d8ca52c0f12) )
 	ROM_LOAD( "dh03.17a", 0x10000, 0x8000, CRC(8e18d21d) SHA1(74f0ddf1fcbed386332eba882b4136295b4f096d) )
 
@@ -450,13 +704,13 @@ ROM_START( sidepcktj ) // DE-0245-1
 	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 MCU
 	ROM_LOAD( "dh.6d", 0x0000, 0x1000, CRC(f7e099b6) SHA1(8e718384489a589acebc19ca361e0aa8a4c6b63b) )
 
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "dh07.13k", 0x00000, 0x8000, CRC(7d0ce858) SHA1(3a158f218a762e6841d2611f41ace67a1afefb35) ) // characters
+	ROM_REGION( 0x18000, "chars", 0 )
+	ROM_LOAD( "dh07.13k", 0x00000, 0x8000, CRC(7d0ce858) SHA1(3a158f218a762e6841d2611f41ace67a1afefb35) )
 	ROM_LOAD( "dh06.13j", 0x08000, 0x8000, CRC(b86ddf72) SHA1(7596dd1b646971d8df1bc4fd157ccf161a712d59) )
 	ROM_LOAD( "dh05.13h", 0x10000, 0x8000, CRC(df6f94f2) SHA1(605796191f37cb76d496aa459243655070bb90c0) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) ) // sprites
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) )
 	ROM_LOAD( "dh02.15a", 0x08000, 0x8000, CRC(eeb5c3e7) SHA1(57eda1cc29124e04fe5025a904634d8ca52c0f12) )
 	ROM_LOAD( "dh03.17a", 0x10000, 0x8000, CRC(8e18d21d) SHA1(74f0ddf1fcbed386332eba882b4136295b4f096d) )
 
@@ -473,13 +727,13 @@ ROM_START( sidepcktb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dh04.3h", 0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
 
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "dh07-e.13k", 0x00000, 0x8000, CRC(9d6f7969) SHA1(583852be0861a89c63ce09eb39146ec379b9e12d) ) // characters
+	ROM_REGION( 0x18000, "chars", 0 )
+	ROM_LOAD( "dh07-e.13k", 0x00000, 0x8000, CRC(9d6f7969) SHA1(583852be0861a89c63ce09eb39146ec379b9e12d) )
 	ROM_LOAD( "dh06-e.13j", 0x08000, 0x8000, CRC(580e4e43) SHA1(de152a5d4fbc52d80e3eb9af17835ecb6258d45e) )
 	ROM_LOAD( "dh05-e.13h", 0x10000, 0x8000, CRC(05ab71d2) SHA1(6f06d1d1440a5fb05c01f712457d0bb167e93099) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) ) // sprites
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) )
 	ROM_LOAD( "dh02.15a", 0x08000, 0x8000, CRC(eeb5c3e7) SHA1(57eda1cc29124e04fe5025a904634d8ca52c0f12) )
 	ROM_LOAD( "dh03.17a", 0x10000, 0x8000, CRC(8e18d21d) SHA1(74f0ddf1fcbed386332eba882b4136295b4f096d) )
 
@@ -488,15 +742,9 @@ ROM_START( sidepcktb )
 	ROM_LOAD( "dh-08.15l", 0x0100, 0x0100, CRC(cdf2180f) SHA1(123215d096f88b66396d40d7a579380d0b5b2b89) )
 ROM_END
 
-
-void sidepckt_state::init_sidepckt()
-{
-	save_item(NAME(m_mcu_p1));
-	save_item(NAME(m_mcu_p2));
-	save_item(NAME(m_mcu_p3));
-}
+} // anonymous namespace
 
 
-GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, init_sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, init_sidepckt, ROT0, "Data East Corporation", "Side Pocket (Japan, Cocktail)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, sidepckt_state, empty_init,    ROT0, "bootleg",               "Side Pocket (bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_mcu_state, empty_init, ROT0, "Data East Corporation", "Side Pocket (World)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_mcu_state, empty_init, ROT0, "Data East Corporation", "Side Pocket (Japan, Cocktail)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, sidepckt_state,     empty_init, ROT0, "bootleg",               "Side Pocket (bootleg)",         MACHINE_SUPPORTS_SAVE )

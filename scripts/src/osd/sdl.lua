@@ -493,7 +493,8 @@ project ("ocore_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/file/winfile.h",
 			MAME_DIR .. "src/osd/modules/file/winptty.cpp",
 			MAME_DIR .. "src/osd/modules/file/winsocket.cpp",
-			MAME_DIR .. "src/osd/windows/winutil.cpp", -- FIXME put the necessary functions somewhere more appropriate
+			MAME_DIR .. "src/osd/windows/winutil.cpp", -- FIXME put the necessary functions somewhere more appropriate?
+			MAME_DIR .. "src/osd/windows/winutil.h",
 		}
 	else
 		files {

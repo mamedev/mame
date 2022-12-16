@@ -27,6 +27,8 @@
 
 #include "cpu/mcs48/mcs48.h"
 
+#include "utf8.h"
+
 
 DEFINE_DEVICE_TYPE(UTS_400_KEYBOARD, uts_400_keyboard_device, "uts_400kbd", "UTS 400-Format Keyboard (F3621-04-000)")
 

@@ -17,6 +17,41 @@ TODO:
 - EEPROM timings are hacked (writes mostly fail otherwise);
 - Eventually needs AudioDrive ES688 / ES1688 / ES1788 & ES1868 devices and serial ports "for linking" before actually booting;
 
+INFO ABOUT SECURITY DONGLES:
+
+Photo Play machines were found with different types of security dongles. They weren't really
+dependant on the version, and you can find the same game version with different dongle type.
+
+Dongle types found on 486 machines:
+
+Blue parallel (without passthrough) dongle with the following components under expoxy resin:
+ -Atmel AT89C2051 MCU
+ -Xtal 11.05MHz
+ -24C08W6 SEEPROM
+ -HC132
+
+Blue or black Aladdin parallel dongle (with passthrough) with the following components:
+ -Aladdin Marvin2 MCU (unknown core)
+ -Custom Aladdin chip marked as ALDN1 V28 (serial EEPROM?)
+
+Yellow Marx CBN/CBV parallel dongle (with passthrough) with the following components:
+ -Marx CBN/CBV/CBS MCU (unknown core)
+ -74HC00
+
+Yellow serial dongle (with passthrough) with the following components:
+ -Smartcard (SAM, ID-000 size), with ATR "3B8281317643C002C5" (probably Siemens CardOS/M2 V2.01 with SLE44CxxS MCU)
+ -AT90S2313 MCU
+ -3.6864 Xtal
+ -3 x 74HC14D
+
+On newer models (Pentium and better), other kinds of dongles can also be found:
+
+Parallel (without passthrough) dongle with the following components:
+ -SX28AC/DP MCU (different manufacturers: Parallax, Ubicom, etc.)
+ -On some versions there's also a SEEPROM (93C46LN, etc.)
+
+USB Dongle
+ -GNT FNW USB Token (http://www.softidea.sk/doc/gnt_datasheet_en.pdf)
 
 *******************************************************************************************************/
 

@@ -38,11 +38,11 @@ device_ekara_cart_interface::~device_ekara_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_ekara_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_ekara_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(EKARASLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_BIG)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_BIG)->base();
 		m_rom_size = size;
 	}
 }
@@ -134,7 +134,7 @@ image_init_result ekara_cart_slot_device::call_load()
 		uint8_t *ROM;
 		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
-		m_cart->rom_alloc(len, tag());
+		m_cart->rom_alloc(len);
 
 		ROM = m_cart->get_rom_base();
 

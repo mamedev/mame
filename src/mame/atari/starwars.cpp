@@ -27,12 +27,11 @@
 #include "emu.h"
 #include "starwars.h"
 
-#include "avgdvg.h"
-
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"
 #include "machine/adc0808.h"
 #include "machine/watchdog.h"
+#include "video/avgdvg.h"
 #include "video/vector.h"
 #include "screen.h"
 #include "speaker.h"
@@ -316,11 +315,11 @@ void starwars_state::starwars(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(m_riot, FUNC(riot6532_device::pa7_w));
-	m_soundlatch->data_pending_callback().append(FUNC(starwars_state::boost_interleave_hack));
+	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	GENERIC_LATCH_8(config, m_mainlatch);
 	m_mainlatch->data_pending_callback().set(m_riot, FUNC(riot6532_device::pa6_w));
-	m_mainlatch->data_pending_callback().append(FUNC(starwars_state::boost_interleave_hack));
+	m_mainlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 }
 
 

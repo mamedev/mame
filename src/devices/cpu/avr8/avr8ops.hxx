@@ -1300,7 +1300,7 @@ void avr8_device::op_brset(uint16_t op)
 {
 	if (SREG_R(op & 0x0007))
 	{
-		m_pc += (((int32_t)(KCONST7(op)) << 25) >> 25);
+		m_pc += util::sext(KCONST7(op), 7);
 		m_opcycles++;
 	}
 }
@@ -1309,7 +1309,7 @@ void avr8_device::op_brclr(uint16_t op)
 {
 	if (SREG_R(op & 0x0007) == 0)
 	{
-		m_pc += (((int32_t)(KCONST7(op)) << 25) >> 25);
+		m_pc += util::sext(KCONST7(op), 7);
 		m_opcycles++;
 	}
 }

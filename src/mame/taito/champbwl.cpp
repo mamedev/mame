@@ -154,12 +154,11 @@ Notes:
 
 #include "emu.h"
 
-#include "seta001.h"
-
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/x1_010.h"
+#include "video/x1_001.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -174,7 +173,7 @@ public:
 	champbwl_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_seta001(*this, "spritegen"),
+		m_spritegen(*this, "spritegen"),
 		m_mainbank(*this, "mainbank")
 	{ }
 
@@ -182,7 +181,7 @@ protected:
 	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<seta001_device> m_seta001;
+	required_device<x1_001_device> m_spritegen;
 	required_memory_bank m_mainbank;
 
 	void palette(palette_device &palette) const;
@@ -194,7 +193,7 @@ class champbwl_state : public champbwl_base_state
 public:
 	champbwl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		champbwl_base_state(mconfig, type, tag),
-		m_nvram(*this, "nvram"),
+		m_inputs(*this, "IN%u", 0U),
 		m_fakex(*this, "FAKEX%u", 1U),
 		m_fakey(*this, "FAKEY%u", 1U)
 	{ }
@@ -206,11 +205,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_shared_ptr<uint8_t> m_nvram;
-	required_ioport_array<2> m_fakex;
-	required_ioport_array<2> m_fakey;
-	uint8_t m_last_trackball_val[2][2];
-
 	uint8_t trackball_r();
 	uint8_t trackball_reset_r();
 	void misc_w(uint8_t data);
@@ -218,6 +212,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void prg_map(address_map &map);
+
+	required_ioport_array<2> m_inputs;
+	required_ioport_array<2> m_fakex;
+	required_ioport_array<2> m_fakey;
+
+	bool m_input_select;
+	uint8_t m_last_trackball_val[2][2];
 };
 
 class doraemon_state : public champbwl_base_state
@@ -253,7 +254,7 @@ void champbwl_base_state::palette(palette_device &palette) const
 
 uint8_t champbwl_state::trackball_r()
 {
-	uint8_t which = BIT(m_nvram[0x400], 7);
+	uint8_t which = m_input_select;
 
 	uint8_t port4 = m_fakex[which]->read();
 	uint8_t port5 = m_fakey[which]->read();
@@ -265,7 +266,7 @@ uint8_t champbwl_state::trackball_r()
 
 uint8_t champbwl_state::trackball_reset_r()
 {
-	uint8_t which = BIT(m_nvram[0x400], 7);
+	uint8_t which = m_input_select;
 
 	if (!machine().side_effects_disabled())
 	{
@@ -285,6 +286,8 @@ void champbwl_state::misc_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_w(1, ~data & 4);
 
 	m_mainbank->set_entry((data & 0x30) >> 4);
+
+	m_input_select = BIT(data, 7);
 }
 
 
@@ -293,15 +296,15 @@ void champbwl_state::prg_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0xa000, 0xafff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0xb000, 0xbfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xa000, 0xafff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xb000, 0xbfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 	map(0xc000, 0xdfff).rw("x1snd", FUNC(x1_010_device::read), FUNC(x1_010_device::write));
-	map(0xe000, 0xe2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xe300, 0xe303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8)); // control registers (0x80 mirror used by Arkanoid 2)
-	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8)); // enable / disable background transparency
+	map(0xe000, 0xe2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xe300, 0xe303).mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8)); // control registers (0x80 mirror used by Arkanoid 2)
+	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8)); // enable / disable background transparency
 
 	map(0xf000, 0xf000).r(FUNC(champbwl_state::trackball_r));
-	map(0xf002, 0xf002).lr8(NAME([this] () -> u8 { return !BIT(m_nvram[0x400], 7) ? ioport("IN0")->read() : ioport("IN1")->read(); }));
+	map(0xf002, 0xf002).lr8(NAME([this] () -> u8 { return m_inputs[m_input_select]->read(); }));
 	map(0xf004, 0xf004).r(FUNC(champbwl_state::trackball_reset_r));
 	map(0xf006, 0xf006).portr("IN2");
 	map(0xf007, 0xf007).portr("IN3");
@@ -333,12 +336,12 @@ void doraemon_state::prg_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0xa000, 0xafff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0xb000, 0xbfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xa000, 0xafff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xb000, 0xbfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 	map(0xc000, 0xc07f).rw("x1snd", FUNC(x1_010_device::read), FUNC(x1_010_device::write)); // Sound
-	map(0xe000, 0xe2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xe300, 0xe303).w(m_seta001, FUNC(seta001_device::spritectrl_w8));
-	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8)); // enable / disable background transparency
+	map(0xe000, 0xe2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xe300, 0xe303).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));
+	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8)); // enable / disable background transparency
 	map(0xf000, 0xf000).portr("IN0").w(FUNC(doraemon_state::outputs_w));
 	map(0xf002, 0xf002).portr("IN1").nopw(); // Ack?
 	map(0xf004, 0xf004).nopw();              // Ack?
@@ -418,13 +421,13 @@ static INPUT_PORTS_START( champbwl )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("FAKEX1")     // FAKE
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0) PORT_REVERSE
 
 	PORT_START("FAKEY1")     // FAKE
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(45) PORT_CENTERDELTA(0) PORT_REVERSE
 
 	PORT_START("FAKEX2")     // FAKE
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0) PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0) PORT_REVERSE PORT_COCKTAIL
 
 	PORT_START("FAKEY2")     // FAKE
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(45) PORT_CENTERDELTA(0) PORT_REVERSE PORT_COCKTAIL
@@ -513,11 +516,13 @@ void champbwl_state::machine_start()
 {
 	champbwl_base_state::machine_start();
 
+	save_item(NAME(m_input_select));
 	save_item(NAME(m_last_trackball_val));
 }
 
 void champbwl_state::machine_reset()
 {
+	m_input_select = false;
 	m_last_trackball_val[0][0] = 0;
 	m_last_trackball_val[0][1] = 0;
 	m_last_trackball_val[1][0] = 0;
@@ -528,7 +533,7 @@ uint32_t champbwl_base_state::screen_update(screen_device &screen, bitmap_ind16 
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, 0x800);
 	return 0;
 }
 
@@ -536,7 +541,7 @@ WRITE_LINE_MEMBER(champbwl_state::screen_vblank)
 {
 	// rising edge
 	if (state)
-		m_seta001->tnzs_eof();
+		m_spritegen->tnzs_eof();
 }
 
 
@@ -549,9 +554,9 @@ void champbwl_state::champbwl(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 16_MHz_XTAL, "palette", gfx_champbwl);
-	m_seta001->set_fg_yoffsets(-0x0a, 0x0e);
-	m_seta001->set_bg_yoffsets(0x01, -0x01);
+	X1_001(config, m_spritegen, 16_MHz_XTAL, "palette", gfx_champbwl);
+	m_spritegen->set_fg_yoffsets(-0x0a, 0x0e);
+	m_spritegen->set_bg_yoffsets(0x01, -0x01);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -579,7 +584,7 @@ WRITE_LINE_MEMBER(doraemon_state::screen_vblank)
 {
 	// rising edge
 	if (state)
-		m_seta001->setac_eof();
+		m_spritegen->setac_eof();
 }
 
 
@@ -592,9 +597,9 @@ void doraemon_state::doraemon(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 14.318181_MHz_XTAL, "palette", gfx_champbwl);
-	m_seta001->set_bg_yoffsets(0x00, 0x01);
-	m_seta001->set_fg_yoffsets(0x00, 0x10);
+	X1_001(config, m_spritegen, 14.318181_MHz_XTAL, "palette", gfx_champbwl);
+	m_spritegen->set_bg_yoffsets(0x00, 0x01);
+	m_spritegen->set_fg_yoffsets(0x00, 0x10);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
@@ -638,6 +643,30 @@ ROM_START( champbwl )
 
 	ROM_REGION( 0x800, "nvram", 0 ) // default settings, allows game to boot first time without having to reset it
 	ROM_LOAD( "champbwl.nv",  0x000, 0x800, CRC(1d46aa8e) SHA1(a733cf86cfb26d98fb4c491d7f779a7a1c8ff228) )
+ROM_END
+
+ROM_START( champbwla ) // all labels handwritten, only difference is the program ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )     // Z80 Code
+	ROM_LOAD( "ab_v1.12.u1",  0x00000, 0x10000, CRC(98db1145) SHA1(c3a4190e43d829c8b9016892a30416449fb6bb87) ) // actual label: AB V1.12 8/31 Q=30
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "ab001007.u22", 0x00000, 0x20000, CRC(1ee9f6b1) SHA1(1a67e969b1f471ec7ada294b89185c15cde8c1ab) )
+	ROM_LOAD( "ab001006.u15", 0x20000, 0x20000, CRC(37baf753) SHA1(efa57d915a9e14393b62b161e1ac807b8fcb8501) )
+	ROM_LOAD( "ab001005.u9",  0x40000, 0x20000, CRC(b80a9ed6) SHA1(ac7a31ad82a60c4d2034770c59cf383b8a036e6a) )
+	ROM_LOAD( "ab001004.u7",  0x60000, 0x20000, CRC(584477b1) SHA1(296f96526044e9bd13673e5d817260e3f98f696c) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "ab001008.u26", 0x0000, 0x0200, CRC(30ac8d48) SHA1(af034de3f3b8548534effdf4e3717fe3838b7754) )
+	ROM_LOAD( "ab001009.u27", 0x0200, 0x0200, CRC(3bbd4bcd) SHA1(8c87ccc42ece2432b8ad25f8679cdf886e12a43c) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "ab002002.2-2", 0x00000, 0x40000, CRC(42ebe997) SHA1(1808b9e5e996a395c1d48ac001067f736f96feec) )
+	ROM_LOAD( "ab003002.3-2", 0x40000, 0x40000, CRC(7ede8f28) SHA1(b5519c09b4f0019dc76cadca725da1d581912540) )
+	ROM_LOAD( "ab002003.2-3", 0x80000, 0x40000, CRC(3051b8c3) SHA1(5f53596d7af1c79db1dde4bdca3878e07c67b5d1) )
+	ROM_LOAD( "ab003003.3-3", 0xc0000, 0x40000, CRC(ad40ad10) SHA1(db0e5744ea3fcda87345b545031f82fcb3fec175) )
+
+	ROM_REGION( 0x800, "nvram", 0 ) // default settings, allows game to boot first time without having to reset it
+	ROM_LOAD( "champbwla.nv",  0x000, 0x800, CRC(b8b1a40d) SHA1(e8f0af26ccfcee554c215e103d6a0101af4658cb) )
 ROM_END
 
 /*
@@ -738,5 +767,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1993?, doraemon, 0, doraemon, doraemon, doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
-GAME( 1989,  champbwl, 0, champbwl, champbwl, champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, doraemon,  0,        doraemon, doraemon, doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
+GAME( 1989,  champbwl,  0,        champbwl, champbwl, champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989,  champbwla, champbwl, champbwl, champbwl, champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling (location test)",   MACHINE_SUPPORTS_SAVE )

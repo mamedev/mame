@@ -73,15 +73,16 @@ private:
 	file_entry const *                              m_confirm_delete;
 	bool const                                      m_must_exist;
 	bool                                            m_keys_released;
+	input_code                                      m_slot_selected;
 
 	static void *itemref_from_file_entry(const file_entry &entry);
 	static const file_entry &file_entry_from_itemref(void *itemref);
 
-	void try_select_slot(std::string &&name);
+	bool try_select_slot(std::string &&name);
 	void slot_selected(std::string &&name);
 	std::string state_directory() const;
 	bool is_present(const std::string &name) const;
-	std::string poll_inputs();
+	std::string poll_inputs(input_code &code);
 	std::string get_visible_name(const std::string &file_name);
 };
 

@@ -740,7 +740,7 @@ ROM_END
  *
  *************************************/
 
-void policetr_state::driver_init()
+void policetr_state::driver_start()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(m_speedup_addr, m_speedup_addr+3, write32s_delegate(*this, FUNC(policetr_state::speedup_w)));
 	m_speedup_data = m_rambase + m_speedup_addr/4;

@@ -59,6 +59,29 @@ void tanbus_tandos_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppies[1], tandos_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[2], tandos_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[3], tandos_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+	TMS9914(config, m_tms9914, 8_MHz_XTAL / 2);
+	m_tms9914->dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	m_tms9914->dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
+	m_tms9914->eoi_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	m_tms9914->dav_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
+	m_tms9914->nrfd_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
+	m_tms9914->ndac_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
+	m_tms9914->ifc_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
+	m_tms9914->srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
+	m_tms9914->atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	m_tms9914->ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
+
+	IEEE488(config, m_ieee);
+	m_ieee->eoi_callback().set(m_tms9914, FUNC(tms9914_device::eoi_w));
+	m_ieee->dav_callback().set(m_tms9914, FUNC(tms9914_device::dav_w));
+	m_ieee->nrfd_callback().set(m_tms9914, FUNC(tms9914_device::nrfd_w));
+	m_ieee->ndac_callback().set(m_tms9914, FUNC(tms9914_device::ndac_w));
+	m_ieee->ifc_callback().set(m_tms9914, FUNC(tms9914_device::ifc_w));
+	m_ieee->srq_callback().set(m_tms9914, FUNC(tms9914_device::srq_w));
+	m_ieee->atn_callback().set(m_tms9914, FUNC(tms9914_device::atn_w));
+	m_ieee->ren_callback().set(m_tms9914, FUNC(tms9914_device::ren_w));
+	IEEE488_SLOT(config, "ieee_dev", 0, cbm_ieee488_devices, nullptr);
 }
 
 const tiny_rom_entry *tanbus_tandos_device::device_rom_region() const
@@ -78,10 +101,12 @@ tanbus_tandos_device::tanbus_tandos_device(const machine_config &mconfig, const 
 	: device_t(mconfig, TANBUS_TANDOS, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 	, m_dos_rom(*this, "dos_rom")
+	, m_ieee(*this, IEEE488_TAG)
+	, m_tms9914(*this, "hpib")
 	, m_fdc(*this, "fdc")
 	, m_floppies(*this, "fdc:%u", 0)
 	, m_floppy(nullptr)
-	, m_drive_control(0)
+	, m_status(0)
 {
 }
 
@@ -138,7 +163,7 @@ uint8_t tanbus_tandos_device::read(offs_t offset, int inhrom, int inhram, int be
 			// GPIB PCB Switches
 			break;
 		case 0xbf98: case 0xbf99: case 0xbf9a: case 0xbf9b: case 0xbf9c: case 0xbf9d: case 0xbf9e: case 0xbf9f:
-			// GPIB (9914)
+			data = m_tms9914->read(offset & 0x07);
 			break;
 		}
 		break;
@@ -169,7 +194,7 @@ void tanbus_tandos_device::write(offs_t offset, uint8_t data, int inhrom, int in
 			control_w(data);
 			break;
 		case 0xbf98: case 0xbf99: case 0xbf9a: case 0xbf9b: case 0xbf9c: case 0xbf9d: case 0xbf9e: case 0xbf9f:
-			// GPIB (9914)
+			m_tms9914->write(offset & 0x07, data);
 			break;
 		}
 		break;
@@ -195,8 +220,7 @@ void tanbus_tandos_device::set_inhibit_lines(offs_t offset, int &inhram, int &in
 
 void tanbus_tandos_device::control_w(uint8_t data)
 {
-	logerror("control_w %02x\n", data);
-	m_drive_control = data;
+	m_status = data & 0x3e;
 
 	// bit 0: irq enable
 	m_irq_enable = BIT(data, 0);
@@ -204,7 +228,7 @@ void tanbus_tandos_device::control_w(uint8_t data)
 	// bit 1: data select (data stream controller)
 
 	// bit 2, 3: drive select
-	m_floppy = m_floppies[(data >> 2) & 0x03]->get_device();
+	m_floppy = m_floppies[BIT(data, 2, 2)]->get_device();
 	m_fdc->set_floppy(m_floppy);
 
 	// bit 4: side select
@@ -225,14 +249,7 @@ void tanbus_tandos_device::control_w(uint8_t data)
 
 uint8_t tanbus_tandos_device::status_r()
 {
-	uint8_t data = 0x00;
-
-	data |= m_drive_control & 0x3c;
-	data |= m_fdc->intrq_r() << 0;
-	data |= m_fdc->hld_r() << 6;
-	data |= m_fdc->drq_r() << 7;
-
-	return data;
+	return m_status | (m_fdc->drq_r() << 7) | (m_fdc->hld_r() << 6) | (m_fdc->intrq_r() << 0);
 }
 
 
@@ -248,7 +265,6 @@ WRITE_LINE_MEMBER(tanbus_tandos_device::fdc_irq_w)
 
 WRITE_LINE_MEMBER(tanbus_tandos_device::fdc_hld_w)
 {
-	logerror("fdc_hld_w %d\n", state);
 	if (m_floppy)
 		m_floppy->mon_w(state);
 }

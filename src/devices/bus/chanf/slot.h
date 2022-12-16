@@ -37,7 +37,7 @@ public:
 	virtual void write_ram(offs_t offset, uint8_t data) { }
 	virtual void write_bank(uint8_t data)  { }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint8_t* get_ram_base() { return &m_ram[0]; }
@@ -110,12 +110,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(CHANF_CART_SLOT, channelf_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define CHANFSLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_CHANF_SLOT_H

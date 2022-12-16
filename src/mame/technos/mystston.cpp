@@ -16,11 +16,358 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "mystston.h"
 
 #include "cpu/m6502/m6502.h"
-#include "speaker.h"
+#include "sound/ay8910.h"
+#include "video/resnet.h"
 
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class mystston_state : public driver_device
+{
+public:
+	mystston_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ay8910(*this, "ay%u", 1U),
+		m_ay8910_data(*this, "ay8910_data"),
+		m_ay8910_select(*this, "ay8910_select"),
+		m_dsw1(*this, "DSW1"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
+		m_scroll(*this, "scroll"),
+		m_video_control(*this, "video_control"),
+		m_color_prom(*this, "proms"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
+
+	void mystston(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	virtual void video_start() override;
+	virtual void video_reset() override;
+
+private:
+	static constexpr XTAL MASTER_CLOCK = XTAL(12'000'000);
+
+	// machine state
+	required_device<cpu_device> m_maincpu;
+	required_device_array<ay8910_device, 2> m_ay8910;
+	required_shared_ptr<uint8_t> m_ay8910_data;
+	required_shared_ptr<uint8_t> m_ay8910_select;
+	required_ioport m_dsw1;
+
+	// video state
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	emu_timer *m_interrupt_timer = nullptr;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_video_control;
+	required_region_ptr<uint8_t> m_color_prom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	// HMC20
+	// set_raw(MASTER_CLOCK / 2, 384, 0, 256, 272, 8, 248)
+	static constexpr XTAL PIXEL_CLOCK    = (MASTER_CLOCK / 2);
+	static constexpr int HTOTAL          = (384);
+	static constexpr int HBEND           = (0);
+	static constexpr int HBSTART         = (256);
+	static constexpr int VTOTAL          = (272);  // counts from 0x08-0xff, then from 0xe8-0xff
+	static constexpr int VBEND           = (8);
+	static constexpr int VBSTART         = (248);
+	static constexpr int FIRST_INT_VPOS  = (0x008);
+	static constexpr int INT_HPOS        = (0x100);
+
+	void irq_clear_w(uint8_t data);
+	void ay8910_select_w(uint8_t data);
+	void video_control_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void set_palette();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip);
+	void on_scanline_interrupt();
+	void main_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+    There are only a few differences between the video hardware of Mysterious
+    Stones and Mat Mania. The tile bank select bit is different and the sprite
+    selection seems to be different as well. Additionally, the palette is stored
+    differently. I'm also not sure that the 2nd tile page is really used in
+    Mysterious Stones.
+
+***************************************************************************/
+
+
+/*************************************
+ *
+ *  Scanline interrupt system
+ *
+ *  There is an interrupt every 16
+ *  scanlines, starting with 8.
+ *
+ *************************************/
+
+TIMER_CALLBACK_MEMBER(mystston_state::interrupt_callback)
+{
+	int scanline = param;
+
+	on_scanline_interrupt();
+
+	scanline = scanline + 16;
+	if (scanline >= VTOTAL)
+		scanline = FIRST_INT_VPOS;
+
+	// the vertical synch chain is clocked by H256 -- this is probably not important, but oh well
+	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline - 1, INT_HPOS), scanline);
+}
+
+
+
+/*************************************
+ *
+ *  Palette handling
+ *
+ *************************************/
+
+void mystston_state::set_palette()
+{
+	static const int resistances_rg[3] = { 4700, 3300, 1500 };
+	static const int resistances_b [2] = { 3300, 1500 };
+	double weights_rg[3], weights_b[2];
+
+	compute_resistor_weights(0, 255, -1.0,
+			3, resistances_rg, weights_rg, 0, 4700,
+			2, resistances_b,  weights_b,  0, 4700,
+			0, nullptr, nullptr, 0, 0);
+
+	for (int i = 0; i < 0x40; i++)
+	{
+		uint8_t data;
+
+		// first half is dynamic, second half is from the PROM
+		if (i & 0x20)
+			data = m_color_prom[i & 0x1f];
+		else
+			data = m_paletteram[i];
+
+		// red component
+		int bit0 = (data >> 0) & 0x01;
+		int bit1 = (data >> 1) & 0x01;
+		int bit2 = (data >> 2) & 0x01;
+		int r = combine_weights(weights_rg, bit0, bit1, bit2);
+
+		// green component
+		bit0 = (data >> 3) & 0x01;
+		bit1 = (data >> 4) & 0x01;
+		bit2 = (data >> 5) & 0x01;
+		int g = combine_weights(weights_rg, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = (data >> 6) & 0x01;
+		bit1 = (data >> 7) & 0x01;
+		int b = combine_weights(weights_b, bit0, bit1);
+
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Video control register
+ *
+ *************************************/
+
+void mystston_state::video_control_w(uint8_t data)
+{
+	*m_video_control = data;
+
+	// D0-D1 - foreground text color
+	// D2 - background page select
+	// D3 - unused
+
+	// D4-D5 - coin counters in flipped order
+	machine().bookkeeping().coin_counter_w(0, data & 0x20);
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);
+
+	// D6 - unused
+	// D7 - screen flip
+}
+
+
+
+/*************************************
+ *
+ *  Tilemap callbacks
+ *
+ *************************************/
+
+TILE_GET_INFO_MEMBER(mystston_state::get_bg_tile_info)
+{
+	int page = (*m_video_control & 0x04) << 8;
+	int code = ((m_bg_videoram[page | 0x200 | tile_index] & 0x01) << 8) | m_bg_videoram[page | tile_index];
+	int flags = (tile_index & 0x10) ? TILE_FLIPY : 0;
+
+	tileinfo.set(1, code, 0, flags);
+}
+
+
+TILE_GET_INFO_MEMBER(mystston_state::get_fg_tile_info)
+{
+	int code = ((m_fg_videoram[0x400 | tile_index] & 0x07) << 8) | m_fg_videoram[tile_index];
+	int color = ((*m_video_control & 0x01) << 1) | ((*m_video_control & 0x02) >> 1);
+
+	tileinfo.set(0, code, color, 0);
+}
+
+
+
+/*************************************
+ *
+ *  Sprite drawing
+ *
+ *************************************/
+
+void mystston_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip)
+{
+	for (int offs = 0; offs < 0x60; offs += 4)
+	{
+		int const attr = m_spriteram[offs];
+
+		if (attr & 0x01)
+		{
+			int const code = ((attr & 0x10) << 4) | m_spriteram[offs + 1];
+			int const color = (attr & 0x08) >> 3;
+			int flipx = attr & 0x04;
+			int flipy = attr & 0x02;
+			int x = 240 - m_spriteram[offs + 3];
+			int y = (240 - m_spriteram[offs + 2]) & 0xff;
+
+			if (flip)
+			{
+				x = 240 - x;
+				y = 240 - y;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+			gfx->transpen(bitmap, cliprect, code, color, flipx, flipy, x, y, 0);
+		}
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Start
+ *
+ *************************************/
+
+void mystston_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mystston_state::get_bg_tile_info)), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 32);
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mystston_state::get_fg_tile_info)), TILEMAP_SCAN_COLS_FLIP_X,  8,  8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	// create the interrupt timer
+	m_interrupt_timer = timer_alloc(FUNC(mystston_state::interrupt_callback), this);
+}
+
+
+
+/*************************************
+ *
+ *  Reset
+ *
+ *************************************/
+
+void mystston_state::video_reset()
+{
+	m_interrupt_timer->adjust(m_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
+}
+
+
+
+/*************************************
+ *
+ *  Update
+ *
+ *************************************/
+
+uint32_t mystston_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int const flip = (*m_video_control & 0x80) ^ ((m_dsw1->read() & 0x20) << 2);
+
+	set_palette();
+
+	machine().tilemap().mark_all_dirty();
+	m_bg_tilemap->set_scrolly(0, *m_scroll);
+	machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(2), flip);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Graphics decoding
+ *
+ *************************************/
+
+static const gfx_layout spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
+		16*0+0, 16*0+1, 16*0+2, 16*0+3, 16*0+4, 16*0+5, 16*0+6, 16*0+7 },
+	{ 0*8, 1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	32*8
+};
+
+
+static GFXDECODE_START( gfx_mystston )
+	GFXDECODE_ENTRY( "fgtiles_sprites", 0, gfx_8x8x3_planar, 4*8, 4 )
+	GFXDECODE_ENTRY( "bgtiles",         0, spritelayout,     2*8, 1 )
+	GFXDECODE_ENTRY( "fgtiles_sprites", 0, spritelayout,     0*8, 2 )
+GFXDECODE_END
+
+
+// machine
 
 /*************************************
  *
@@ -180,8 +527,6 @@ static INPUT_PORTS_START( myststonoi )
 	PORT_DIPSETTING(   0x00, "3" )
 INPUT_PORTS_END
 
-
-
 /*************************************
  *
  *  Machine driver
@@ -195,7 +540,13 @@ void mystston_state::mystston(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mystston_state::main_map);
 
 	// video hardware
-	video(config);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mystston);
+	PALETTE(config, m_palette).set_entries(0x40);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(mystston_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	// audio hardware
 	SPEAKER(config, "mono").front_center();
@@ -222,7 +573,7 @@ ROM_START( mystston )
 	ROM_LOAD( "rom2.bin",     0xc000, 0x2000, CRC(bfd22cfc) SHA1(137cd61c8b1e997e7e50edd57f1671031d8e3ac5) )
 	ROM_LOAD( "rom1.bin",     0xe000, 0x2000, CRC(fb163e38) SHA1(d6f02e90bfd9badd7751bc0a87fdfdd1d0a7e202) )
 
-	ROM_REGION( 0x0c000, "gfx1", 0 )
+	ROM_REGION( 0x0c000, "fgtiles_sprites", 0 )
 	ROM_LOAD( "ms6",          0x00000, 0x2000, CRC(85c83806) SHA1(cdfed6c224754e8f79b154533b06b7de4a44b4d3) )
 	ROM_LOAD( "ms9",          0x02000, 0x2000, CRC(b146c6ab) SHA1(712c0c17780f222be5c8b09185a22e900ab23944) )
 	ROM_LOAD( "ms7",          0x04000, 0x2000, CRC(d025f84d) SHA1(eaaaa0bde3db850098d04a0af85993026e503fc5) )
@@ -230,7 +581,7 @@ ROM_START( mystston )
 	ROM_LOAD( "ms8",          0x08000, 0x2000, CRC(53765d89) SHA1(c8bfc311123b076dccae9f7e3b95460bf9fc843d) )
 	ROM_LOAD( "ms11",         0x0a000, 0x2000, CRC(919ee527) SHA1(609ee854ab3a4fdbf3404a68a4a657b85250f742) )
 
-	ROM_REGION( 0x0c000, "gfx2", 0 )
+	ROM_REGION( 0x0c000, "bgtiles", 0 )
 	ROM_LOAD( "ms12",         0x00000, 0x2000, CRC(72d8331d) SHA1(f0a3bc6c9d9966f169f4721c2453f7ee210f0feb) )
 	ROM_LOAD( "ms13",         0x02000, 0x2000, CRC(845a1f9b) SHA1(aa2eabd2a5e89e150b5d2fb3d88f91902e5ebb48) )
 	ROM_LOAD( "ms14",         0x04000, 0x2000, CRC(822874b0) SHA1(9376d48045bf67df91d103effd1d08bd8debad26) )
@@ -262,7 +613,7 @@ ROM_START( myststono ) // TA-0010-P1-1 + TA-0010-P2-1 PCBs
 	ROM_LOAD( "bw04.ic62",  0xc000, 0x2000, CRC(47cefe9b) SHA1(49422b664b1322373a9cd3cb2907f8f5492faf87) )
 	ROM_LOAD( "bw05.ic61",  0xe000, 0x2000, CRC(b37ae12b) SHA1(55ee1193088145c85adddd377d9e5ee58aca922f) )
 
-	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_REGION( 0xc000, "fgtiles_sprites", 0 )
 	ROM_LOAD( "bw06.ic105", 0x00000, 0x2000, CRC(85c83806) SHA1(cdfed6c224754e8f79b154533b06b7de4a44b4d3) )
 	ROM_LOAD( "bw09.ic93",  0x02000, 0x2000, CRC(b146c6ab) SHA1(712c0c17780f222be5c8b09185a22e900ab23944) )
 	ROM_LOAD( "bw07.ic107", 0x04000, 0x2000, CRC(d025f84d) SHA1(eaaaa0bde3db850098d04a0af85993026e503fc5) )
@@ -270,7 +621,7 @@ ROM_START( myststono ) // TA-0010-P1-1 + TA-0010-P2-1 PCBs
 	ROM_LOAD( "bw08.ic109", 0x08000, 0x2000, CRC(53765d89) SHA1(c8bfc311123b076dccae9f7e3b95460bf9fc843d) )
 	ROM_LOAD( "bw11.ic97",  0x0a000, 0x2000, CRC(919ee527) SHA1(609ee854ab3a4fdbf3404a68a4a657b85250f742) )
 
-	ROM_REGION( 0x0c000, "gfx2", 0 )
+	ROM_REGION( 0x0c000, "bgtiles", 0 )
 	ROM_LOAD( "bw12.ic15", 0x00000, 0x2000, CRC(72d8331d) SHA1(f0a3bc6c9d9966f169f4721c2453f7ee210f0feb) )
 	ROM_LOAD( "bw13.ic20", 0x02000, 0x2000, CRC(845a1f9b) SHA1(aa2eabd2a5e89e150b5d2fb3d88f91902e5ebb48) )
 	ROM_LOAD( "bw14.ic24", 0x04000, 0x2000, CRC(822874b0) SHA1(9376d48045bf67df91d103effd1d08bd8debad26) )
@@ -292,7 +643,7 @@ ROM_START( myststonoi )
 	ROM_LOAD( "8.bin",           0xc000, 0x2000, CRC(47cefe9b) SHA1(49422b664b1322373a9cd3cb2907f8f5492faf87) )
 	ROM_LOAD( "7.bin",           0xe000, 0x2000, CRC(b37ae12b) SHA1(55ee1193088145c85adddd377d9e5ee58aca922f) )
 
-	ROM_REGION( 0x0c000, "gfx1", 0 )
+	ROM_REGION( 0x0c000, "fgtiles_sprites", 0 )
 	ROM_LOAD( "18.bin",          0x00000, 0x2000, CRC(85c83806) SHA1(cdfed6c224754e8f79b154533b06b7de4a44b4d3) )
 	ROM_LOAD( "15.bin",          0x02000, 0x2000, CRC(b146c6ab) SHA1(712c0c17780f222be5c8b09185a22e900ab23944) )
 	ROM_LOAD( "19.bin",          0x04000, 0x2000, CRC(d025f84d) SHA1(eaaaa0bde3db850098d04a0af85993026e503fc5) )
@@ -300,7 +651,7 @@ ROM_START( myststonoi )
 	ROM_LOAD( "20.bin",          0x08000, 0x2000, CRC(53765d89) SHA1(c8bfc311123b076dccae9f7e3b95460bf9fc843d) )
 	ROM_LOAD( "17.bin",          0x0a000, 0x2000, CRC(919ee527) SHA1(609ee854ab3a4fdbf3404a68a4a657b85250f742) )
 
-	ROM_REGION( 0x0c000, "gfx2", 0 )
+	ROM_REGION( 0x0c000, "bgtiles", 0 )
 	ROM_LOAD( "1.bin",         0x00000, 0x2000, CRC(72d8331d) SHA1(f0a3bc6c9d9966f169f4721c2453f7ee210f0feb) )
 	ROM_LOAD( "2.bin",         0x02000, 0x2000, CRC(845a1f9b) SHA1(aa2eabd2a5e89e150b5d2fb3d88f91902e5ebb48) )
 	ROM_LOAD( "3.bin",         0x04000, 0x2000, CRC(822874b0) SHA1(9376d48045bf67df91d103effd1d08bd8debad26) )
@@ -317,6 +668,7 @@ ROM_START( myststonoi )
 	ROM_LOAD( "pal16r4-2.bin",       0x0000, 0x0104, CRC(c57555d0) SHA1(c1cda869de8457b9f8ca4f41f0ed49916110ff2e) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

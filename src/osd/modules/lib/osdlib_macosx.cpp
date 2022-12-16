@@ -85,7 +85,7 @@ void osd_break_into_debugger(const char *message)
 //  osd_get_clipboard_text
 //============================================================
 
-std::string osd_get_clipboard_text()
+std::string osd_get_clipboard_text() noexcept
 {
 	std::string result;
 	bool has_result = false;
@@ -121,31 +121,48 @@ std::string osd_get_clipboard_text()
 			CFStringEncoding encoding;
 			if (UTTypeConformsTo(flavor_type, kUTTypeUTF16PlainText))
 				encoding = kCFStringEncodingUTF16;
-			else if (UTTypeConformsTo (flavor_type, kUTTypeUTF8PlainText))
+			else if (UTTypeConformsTo(flavor_type, kUTTypeUTF8PlainText))
 				encoding = kCFStringEncodingUTF8;
-			else if (UTTypeConformsTo (flavor_type, kUTTypePlainText))
+			else if (UTTypeConformsTo(flavor_type, kUTTypePlainText))
 				encoding = kCFStringEncodingMacRoman;
 			else
 				continue;
 
 			CFDataRef flavor_data;
 			err = PasteboardCopyItemFlavorData(pasteboard_ref, item_id, flavor_type, &flavor_data);
+			if (err)
+				continue;
 
-			if (!err)
+			CFDataRef utf8_data;
+			if (kCFStringEncodingUTF8 == encoding)
+			{
+				utf8_data = flavor_data;
+			}
+			else
 			{
 				CFStringRef string_ref = CFStringCreateFromExternalRepresentation(kCFAllocatorDefault, flavor_data, encoding);
-				CFDataRef data_ref = CFStringCreateExternalRepresentation (kCFAllocatorDefault, string_ref, kCFStringEncodingUTF8, '?');
-				CFRelease(string_ref);
 				CFRelease(flavor_data);
+				if (!string_ref)
+					continue;
 
-				CFIndex const length = CFDataGetLength(data_ref);
+				utf8_data = CFStringCreateExternalRepresentation(kCFAllocatorDefault, string_ref, kCFStringEncodingUTF8, '?');
+				CFRelease(string_ref);
+			}
+
+			if (utf8_data)
+			{
+				CFIndex const length = CFDataGetLength(utf8_data);
 				CFRange const range = CFRangeMake(0, length);
-
-				result.resize(length);
-				CFDataGetBytes(data_ref, range, reinterpret_cast<unsigned char *>(&result[0]));
-				has_result = true;
-
-				CFRelease(data_ref);
+				try
+				{
+					result.resize(length);
+					CFDataGetBytes(utf8_data, range, reinterpret_cast<UInt8 *>(result.data()));
+					has_result = true;
+				}
+				catch (std::bad_alloc const &)
+				{
+				}
+				CFRelease(utf8_data);
 			}
 		}
 
@@ -156,6 +173,46 @@ std::string osd_get_clipboard_text()
 
 	return result;
 }
+
+
+//============================================================
+//  osd_set_clipboard_text
+//============================================================
+
+std::error_condition osd_set_clipboard_text(std::string_view text) noexcept
+{
+	// FIXME: better conversion of OSStatus to std::error_condition
+	OSStatus err;
+
+	CFDataRef const data = CFDataCreate(kCFAllocatorDefault, reinterpret_cast<UInt8 const *>(text.data()), text.length());
+	if (!data)
+		return std::errc::not_enough_memory;
+
+	PasteboardRef pasteboard_ref;
+	err = PasteboardCreate(kPasteboardClipboard, &pasteboard_ref);
+	if (err)
+	{
+		CFRelease(data);
+		return std::errc::io_error;
+	}
+
+	err = PasteboardClear(pasteboard_ref);
+	if (err)
+	{
+		CFRelease(data);
+		CFRelease(pasteboard_ref);
+		return std::errc::io_error;
+	}
+
+	err = PasteboardPutItemFlavor(pasteboard_ref, PasteboardItemID(1), kUTTypeUTF8PlainText, data, kPasteboardFlavorNoFlags);
+	CFRelease(data);
+	CFRelease(pasteboard_ref);
+	if (err)
+		return std::errc::io_error;
+
+	return std::error_condition();
+}
+
 
 //============================================================
 //  osd_getpid

@@ -56,7 +56,7 @@
                       W   -------- x-------      (ADPCM bank select)
                       W   -------- ---xxxxx      (Volume)
     640060            W   -------- --------   EEPROM enable
-    641000-641FFF   R/W   -------- xxxxxxxx   EEPROM
+    641000-6413FF   R/W   -------- xxxxxxxx   EEPROM
     642000-642001   R/W   xxxxxxxx --------   MSM6295 communications
     646000            W   -------- --------   32V IRQ acknowledge
     647000            W   -------- --------   Watchdog reset
@@ -159,7 +159,7 @@ void sparkz_state::main_map(address_map &map)
 	map(0x640026, 0x640027).portr("TRACKY1");
 	map(0x640041, 0x640041).mirror(0xe).w(FUNC(sparkz_state::latch_w));
 	map(0x640060, 0x64006f).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x641000, 0x641fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x641000, 0x6413ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x642000, 0x642000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x646000, 0x646001).mirror(0xffe).w(FUNC(sparkz_state::scanline_int_ack_w));
 	map(0x647000, 0x647fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));

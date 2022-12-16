@@ -7,7 +7,11 @@
  *******************************************************************/
 #include "emu.h"
 #include "option.h"
+
+#include "cr1510.h"
+#include "ide.h"
 #include "multifont.h"
+#include "sound_card.h"
 
 DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_BUS_SLOT, bus::epson_qx::option_slot_device, "epson_qx_option_slot", "QX-10 Option slot")
 DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_BUS, bus::epson_qx::option_bus_device, "epson_qx_option_bus", "QX-10 Option Bus")
@@ -206,7 +210,10 @@ void device_option_expansion_interface::interface_pre_start()
 
 void option_bus_devices(device_slot_interface &device)
 {
+	device.option_add("cr1510", EPSON_QX_OPTION_CR1510);
+	device.option_add("ide", EPSON_QX_OPTION_IDE);
 	device.option_add("multifont", EPSON_QX_OPTION_MULTIFONT);
+	device.option_add("ym2149", EPSON_QX_OPTION_YM2149);
 }
 
 }  // namespace bus::epson_qx

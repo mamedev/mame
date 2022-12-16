@@ -1,25 +1,25 @@
 # license:BSD-3-Clause
 # copyright-holders:Olivier Galibert
 # m740 device
-brk_m_imp   ora_m_idx   jsr_zpi     bbs_bar  nop_zpg     ora_zpg     asl_m_zpg   bbs_bzr     php_imp     ora_imm     asl_acc     seb_bac     nop_aba     ora_m_aba   asl_m_aba   seb_biz
+brk_m_imp   ora_m_idx   jsr_zpi     bbs_bar  nop_zpg     ora_zpg     asl_m_zpg   bbs_bzr     php_imp     ora_imm     asl_acc     seb_bac     nop_aba     ora_aba     asl_m_aba   seb_biz
 bpl_m_rel   ora_m_idy   clt_imp     bbc_bar  nop_zpx     ora_m_zpx   asl_m_zpx   bbc_bzr     clc_imp     ora_m_aby   dec_acc     clb_bac     nop_abx     ora_m_abx   asl_m_abx   clb_biz
-jsr_m_adr   and_m_idx   jsr_spg     bbs_bar  bit_zpg     and_zpg     rol_m_zpg   bbs_bzr     plp_m_imp   and_imm     rol_acc     seb_bac     bit_m_aba   and_m_aba   rol_m_aba   seb_biz
+jsr_m_adr   and_m_idx   jsr_spg     bbs_bar  bit_zpg     and_zpg     rol_m_zpg   bbs_bzr     plp_m_imp   and_imm     rol_acc     seb_bac     bit_aba     and_aba     rol_m_aba   seb_biz
 bmi_m_rel   and_m_idy   set_imp     bbc_bar  nop_zpx     and_m_zpx   rol_m_zpx   bbc_bzr     sec_imp     and_m_aby   inc_acc     clb_bac     ldm_imz     and_m_abx   rol_m_abx   clb_biz
-rti_m_imp   eor_m_idx   stp_imp     bbs_bar  com_zpg     eor_zpg     lsr_m_zpg   bbs_bzr     pha_imp     eor_imm     lsr_acc     seb_bac     jmp_adr     eor_m_aba   lsr_m_aba   seb_biz
+rti_m_imp   eor_m_idx   stp_imp     bbs_bar  com_zpg     eor_zpg     lsr_m_zpg   bbs_bzr     pha_imp     eor_imm     lsr_acc     seb_bac     jmp_adr     eor_aba     lsr_m_aba   seb_biz
 bvc_m_rel   eor_m_idy   kil_non     bbc_bar  nop_zpx     eor_m_zpx   lsr_m_zpx   bbc_bzr     cli_imp     eor_m_aby   nop_imp     clb_bac     nop_abx     eor_m_abx   lsr_m_abx   clb_biz
-rts_m_imp   adc_m_idx   kil_non     bbs_bar  tst_zpg     adc_zpg     ror_m_zpg   bbs_bzr     pla_m_imp   adc_imm     ror_acc     seb_bac     jmp_ind     adc_m_aba   ror_m_aba   seb_biz
+rts_m_imp   adc_m_idx   kil_non     bbs_bar  tst_zpg     adc_zpg     ror_m_zpg   bbs_bzr     pla_m_imp   adc_imm     ror_acc     seb_bac     jmp_ind     adc_aba     ror_m_aba   seb_biz
 bvs_m_rel   adc_m_idy   kil_non     bbc_bar  nop_zpx     adc_m_zpx   ror_m_zpx   bbc_bzr     sei_imp     adc_m_aby   nop_imp     clb_bac     nop_abx     adc_m_abx   ror_m_abx   clb_biz
 bra_rel     sta_m_idx   rrf_zpg     bbs_bar  sty_m_zpg   sta_m_zpg   stx_m_zpg   bbs_bzr     dey_imp     nop_imm     txa_imp     seb_bac     sty_m_aba   sta_m_aba   stx_m_aba   seb_biz
 bcc_m_rel   sta_m_idy   kil_non     bbc_bar  sty_m_zpx   sta_m_zpx   stx_m_zpy   bbc_bzr     tya_imp     sta_m_aby   txs_imp     clb_bac     shy_abx     sta_m_abx   shx_aby     clb_biz
-ldy_imm     lda_m_idx   ldx_imm     bbs_bar  ldy_zpg     lda_zpg     ldx_zpg     bbs_bzr     tay_imp     lda_imm     tax_imp     seb_bac     ldy_m_aba   lda_m_aba   ldx_m_aba   seb_biz
+ldy_imm     lda_m_idx   ldx_imm     bbs_bar  ldy_zpg     lda_zpg     ldx_zpg     bbs_bzr     tay_imp     lda_imm     tax_imp     seb_bac     ldy_aba     lda_aba     ldx_aba     seb_biz
 bcs_m_rel   lda_m_idy   jmp_zpi     bbc_bar  ldy_m_zpx   lda_m_zpx   ldx_m_zpy   bbc_bzr     clv_imp     lda_m_aby   tsx_imp     clb_bac     ldy_m_abx   lda_m_abx   ldx_m_aby   clb_biz
-cpy_imm     cmp_m_idx   wit_imp     bbs_bar  cpy_zpg     cmp_zpg     dec_m_zpg   bbs_bzr     iny_imp     cmp_imm     dex_imp     seb_bac     cpy_m_aba   cmp_aba     dec_m_aba   seb_biz
+cpy_imm     cmp_m_idx   wit_imp     bbs_bar  cpy_zpg     cmp_zpg     dec_m_zpg   bbs_bzr     iny_imp     cmp_imm     dex_imp     seb_bac     cpy_aba     cmp_aba     dec_m_aba   seb_biz
 bne_m_rel   cmp_m_idy   kil_non     bbc_bar  nop_zpx     cmp_m_zpx   dec_m_zpx   bbc_bzr     cld_imp     cmp_m_aby   nop_imp     clb_bac     nop_abx     cmp_m_abx   dec_m_abx   clb_biz
-cpx_imm     sbc_m_idx   nop_imm     bbs_bar  cpx_zpg     sbc_zpg     inc_m_zpg   bbs_bzr     inx_imp     sbc_imm     nop_imp     seb_bac     cpx_m_aba   sbc_aba     inc_m_aba   seb_biz
+cpx_imm     sbc_m_idx   nop_imm     bbs_bar  cpx_zpg     sbc_zpg     inc_m_zpg   bbs_bzr     inx_imp     sbc_imm     nop_imp     seb_bac     cpx_aba     sbc_aba     inc_m_aba   seb_biz
 beq_m_rel   sbc_m_idy   kil_non     bbc_bar  nop_zpx     sbc_zpx     inc_m_zpx   bbc_bzr     sed_imp     sbc_m_aby   nop_imp     clb_bac     nop_abx     sbc_m_abx   inc_m_abx   clb_biz
 brk_m_imp   ort_idx     jsr_zpi     bbs_bar  nop_zpg     ort_zpg     asl_m_zpg   bbs_bzr     php_imp     ort_imm     asl_acc     seb_bac     nop_aba     ort_aba     asl_m_aba   seb_biz
 bpl_m_rel   ort_idy     clt_imp     bbc_bar  nop_zpx     ort_zpx     asl_m_zpx   bbc_bzr     clc_imp     ort_aby     dec_acc     clb_bac     nop_abx     ort_abx     asl_m_abx   clb_biz
-jsr_m_adr   andt_idx    jsr_spg     bbs_bar  bit_zpg     andt_zpg    rol_m_zpg   bbs_bzr     plp_m_imp   andt_imm    rol_acc     seb_bac     bit_m_aba   andt_aba    rol_m_aba   seb_biz
+jsr_m_adr   andt_idx    jsr_spg     bbs_bar  bit_zpg     andt_zpg    rol_m_zpg   bbs_bzr     plp_m_imp   andt_imm    rol_acc     seb_bac     bit_aba     andt_aba    rol_m_aba   seb_biz
 bmi_m_rel   andt_idy    set_imp     bbc_bar  nop_zpx     andt_zpx    rol_m_zpx   bbc_bzr     sec_imp     andt_aby    inc_acc     clb_bac     ldm_imz     andt_abx    rol_m_abx   clb_biz
 rti_m_imp   eort_idx    stp_imp     bbs_bar  com_zpg     eort_zpg    lsr_m_zpg   bbs_bzr     pha_imp     eort_imm    lsr_acc     seb_bac     jmp_adr     eort_aba    lsr_m_aba   seb_biz
 bvc_m_rel   eort_idy    kil_non     bbc_bar  nop_zpx     eort_zpx    lsr_m_zpx   bbc_bzr     cli_imp     eort_aby    nop_imp     clb_bac     nop_abx     eort_abx    lsr_m_abx   clb_biz
@@ -27,10 +27,10 @@ rts_m_imp   adct_idx    kil_non     bbs_bar  tst_zpg     adct_zpg    ror_m_zpg  
 bvs_m_rel   adct_idy    kil_non     bbc_bar  nop_zpx     adct_zpx    ror_m_zpx   bbc_bzr     sei_imp     adct_aby    nop_imp     clb_bac     nop_abx     adct_abx    ror_m_abx   clb_biz
 bra_rel     sta_m_idx   rrf_zpg     bbs_bar  sty_m_zpg   sta_m_zpg   stx_m_zpg   bbs_bzr     dey_imp     nop_imm     txa_imp     seb_bac     sty_m_aba   sta_m_aba   stx_m_aba   seb_biz
 bcc_m_rel   sta_m_idy   kil_non     bbc_bar  sty_m_zpx   sta_m_zpx   stx_m_zpy   bbc_bzr     tya_imp     sta_m_aby   txs_imp     clb_bac     shy_abx     sta_m_abx   shx_aby     clb_biz
-ldy_imm     ldt_idx     ldx_imm     bbs_bar  ldy_zpg     ldt_zpg     ldx_zpg     bbs_bzr     tay_imp     ldt_imm     tax_imp     seb_bac     ldy_m_aba   ldt_aba     ldx_m_aba   seb_biz
+ldy_imm     ldt_idx     ldx_imm     bbs_bar  ldy_zpg     ldt_zpg     ldx_zpg     bbs_bzr     tay_imp     ldt_imm     tax_imp     seb_bac     ldy_aba     ldt_aba     ldx_aba     seb_biz
 bcs_m_rel   ldt_idy     jmp_zpi     bbc_bar  ldy_m_zpx   ldt_zpx     ldx_m_zpy   bbc_bzr     clv_imp     ldt_aby     tsx_imp     clb_bac     ldy_m_abx   ldt_abx     ldx_m_aby   clb_biz
-cpy_imm     cmp_m_idx   wit_imp     bbs_bar  cpy_zpg     cmpt_zpg    dec_m_zpg   bbs_bzr     iny_imp     cmpt_imm    dex_imp     seb_bac     cpy_m_aba   cmpt_aba    dec_m_aba   seb_biz
+cpy_imm     cmp_m_idx   wit_imp     bbs_bar  cpy_zpg     cmpt_zpg    dec_m_zpg   bbs_bzr     iny_imp     cmpt_imm    dex_imp     seb_bac     cpy_aba     cmpt_aba    dec_m_aba   seb_biz
 bne_m_rel   cmp_m_idy   kil_non     bbc_bar  nop_zpx     cmpt_zpx    dec_m_zpx   bbc_bzr     cld_imp     cmpt_aby    nop_imp     clb_bac     nop_abx     cmpt_abx    dec_m_abx   clb_biz
-cpx_imm     sbct_idx    nop_imm     bbs_bar  cpx_zpg     sbct_zpg    inc_m_zpg   bbs_bzr     inx_imp     sbc_imm     nop_imp     seb_bac     cpx_m_aba   sbct_aba    inc_m_aba   seb_biz
+cpx_imm     sbct_idx    nop_imm     bbs_bar  cpx_zpg     sbct_zpg    inc_m_zpg   bbs_bzr     inx_imp     sbc_imm     nop_imp     seb_bac     cpx_aba     sbct_aba    inc_m_aba   seb_biz
 beq_m_rel   sbct_idy    kil_non     bbc_bar  nop_zpx     sbct_zpx    inc_m_zpx   bbc_bzr     sed_imp     sbc_m_aby   nop_imp     clb_bac     nop_abx     sbct_abx    inc_m_abx   clb_biz
 reset_m

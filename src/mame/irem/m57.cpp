@@ -251,7 +251,6 @@ void m57_state::m57(machine_config &config)
 	PALETTE(config, m_palette, FUNC(m57_state::m57_palette), 32*8+32*8, 256+16);
 
 	/* sound hardware */
-	//m52_sound_c_audio(config);
 	IREM_M52_SOUNDC_AUDIO(config, "irem_audio", 0);
 }
 

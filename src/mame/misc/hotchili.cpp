@@ -153,12 +153,11 @@
 
 #include "emu.h"
 
-#include "seta001.h"
-
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
+#include "video/x1_001.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -170,6 +169,7 @@
 
 namespace {
 
+// FIXME: this is the wrong frequency
 #define MAIN_CLOCK XTAL(8'000'000)
 
 
@@ -180,7 +180,7 @@ public:
 	hotchili_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_seta001(*this, "spritegen")
+		, m_spritegen(*this, "spritegen")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_bank(*this, "bank")
@@ -223,7 +223,7 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<seta001_device> m_seta001;
+	required_device<x1_001_device> m_spritegen;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_bank;
@@ -255,7 +255,7 @@ uint32_t hotchili_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x1000);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, 0x1000);
 	return 0;
 }
 
@@ -278,12 +278,12 @@ void hotchili_state::hc_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank");
-	map(0xa000, 0xafff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0xb000, 0xbfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xa000, 0xafff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xb000, 0xbfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xe300, 0xe303).ram().w(m_seta001, FUNC(seta001_device::spritectrl_w8));
-	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));
+	map(0xe000, 0xe2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xe300, 0xe303).ram().w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));
+	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));
 	map(0xf000, 0xf00c).rw( FUNC(hotchili_state::extram_r), FUNC(hotchili_state::extram_w));
 	map(0xf200, 0xf200).w(FUNC(hotchili_state::outp2_w));       // outport (mem img ca85h)
 	map(0xf300, 0xf300).w(FUNC(hotchili_state::bankswitch_w));
@@ -563,9 +563,9 @@ void hotchili_state::hotchili(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 	m_screen->set_palette(m_palette);
 
-	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_hotchili);
-	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
-	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
+	X1_001(config, m_spritegen, 16'000'000, m_palette, gfx_hotchili);
+	m_spritegen->set_fg_yoffsets( -0x12, 0x0e );
+	m_spritegen->set_bg_yoffsets( 0x1, -0x1 );
 
 	PALETTE(config, m_palette, FUNC(hotchili_state::hc_palette), 512);
 

@@ -25,20 +25,20 @@ static const char copyright_notice[] =
 /* ======================================================================== */
 
 #include "emu.h"
-#include "m68000.h"
+#include "m68kmusashi.h"
 #include "m68kdasm.h"
 
 // Generated data
 
-u16 m68000_base_device::m68ki_instruction_state_table[NUM_CPU_TYPES][0x10000]; /* opcode handler jump table */
-unsigned char m68000_base_device::m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
+u16 m68000_musashi_device::m68ki_instruction_state_table[NUM_CPU_TYPES][0x10000]; /* opcode handler jump table */
+unsigned char m68000_musashi_device::m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 
 /* ======================================================================== */
 /* ================================= DATA ================================= */
 /* ======================================================================== */
 
 /* Used by shift & rotate instructions */
-const u8 m68000_base_device::m68ki_shift_8_table[65] =
+const u8 m68000_musashi_device::m68ki_shift_8_table[65] =
 {
 	0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -47,7 +47,7 @@ const u8 m68000_base_device::m68ki_shift_8_table[65] =
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff
 };
-const u16 m68000_base_device::m68ki_shift_16_table[65] =
+const u16 m68000_musashi_device::m68ki_shift_16_table[65] =
 {
 	0x0000, 0x8000, 0xc000, 0xe000, 0xf000, 0xf800, 0xfc00, 0xfe00, 0xff00,
 	0xff80, 0xffc0, 0xffe0, 0xfff0, 0xfff8, 0xfffc, 0xfffe, 0xffff, 0xffff,
@@ -58,7 +58,7 @@ const u16 m68000_base_device::m68ki_shift_16_table[65] =
 	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
 	0xffff, 0xffff
 };
-const u32 m68000_base_device::m68ki_shift_32_table[65] =
+const u32 m68000_musashi_device::m68ki_shift_32_table[65] =
 {
 	0x00000000, 0x80000000, 0xc0000000, 0xe0000000, 0xf0000000, 0xf8000000,
 	0xfc000000, 0xfe000000, 0xff000000, 0xff800000, 0xffc00000, 0xffe00000,
@@ -77,7 +77,7 @@ const u32 m68000_base_device::m68ki_shift_32_table[65] =
 /* Number of clock cycles to use for exception processing.
  * I used 4 for any vectors that are undocumented for processing times.
  */
-const u8 m68000_base_device::m68ki_exception_cycle_table[NUM_CPU_TYPES][256] =
+const u8 m68000_musashi_device::m68ki_exception_cycle_table[NUM_CPU_TYPES][256] =
 {
 	{ /* 000 */
 			40, /*  0: Reset - Initial Stack Pointer                      */
@@ -665,7 +665,7 @@ const u8 m68000_base_device::m68ki_exception_cycle_table[NUM_CPU_TYPES][256] =
 	},
 };
 
-const u8 m68000_base_device::m68ki_ea_idx_cycle_table[64] =
+const u8 m68000_musashi_device::m68ki_ea_idx_cycle_table[64] =
 {
 		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 		0, /* ..01.000 no memory indirect, base nullptr             */
@@ -705,7 +705,7 @@ const u8 m68000_base_device::m68ki_ea_idx_cycle_table[64] =
 /* ================================= API ================================== */
 /* ======================================================================== */
 
-void m68000_base_device::set_irq_line(int irqline, int state)
+void m68000_musashi_device::set_irq_line(int irqline, int state)
 {
 	u32 old_level = m_int_level;
 	u32 vstate = m_virq_state;
@@ -734,14 +734,14 @@ void m68000_base_device::set_irq_line(int irqline, int state)
 		m_nmi_pending = true;
 }
 
-void m68000_base_device::device_pre_save()
+void m68000_musashi_device::device_pre_save()
 {
 	m_save_sr = m68ki_get_sr();
 	m_save_stopped = (m_stopped & STOP_LEVEL_STOP) != 0;
 	m_save_halted  = (m_stopped & STOP_LEVEL_HALT) != 0;
 }
 
-void m68000_base_device::device_post_load()
+void m68000_musashi_device::device_post_load()
 {
 	m68ki_set_sr_noint_nosp(m_save_sr);
 	//fprintf(stderr, "Reloaded, pc=%x\n", REG_PC(m68k));
@@ -749,7 +749,7 @@ void m68000_base_device::device_post_load()
 	m68ki_jump(m_pc);
 }
 
-void m68000_base_device::m68k_cause_bus_error()
+void m68000_musashi_device::m68k_cause_bus_error()
 {
 	m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
 	m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
@@ -794,7 +794,7 @@ void m68000_base_device::m68k_cause_bus_error()
 	m_run_mode = RUN_MODE_BERR_AERR_RESET;
 }
 
-bool m68000_base_device::memory_translate(int space, int intention, offs_t &address)
+bool m68000_musashi_device::memory_translate(int space, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	{
@@ -834,7 +834,7 @@ bool m68000_base_device::memory_translate(int space, int intention, offs_t &addr
 
 
 
-void m68000_base_device::execute_run()
+void m68000_musashi_device::execute_run()
 {
 	m_initial_cycles = m_icount;
 
@@ -1014,7 +1014,7 @@ void m68000_base_device::execute_run()
 
 
 
-void m68000_base_device::init_cpu_common(void)
+void m68000_musashi_device::init_cpu_common(void)
 {
 	static u32 emulation_initialized = 0;
 
@@ -1096,7 +1096,7 @@ void m68000_base_device::init_cpu_common(void)
 
 }
 
-void m68000_base_device::device_reset()
+void m68000_musashi_device::device_reset()
 {
 	/* Disable the PMMU/HMMU on reset, if any */
 	m_pmmu_enabled = 0;
@@ -1150,7 +1150,7 @@ void m68000_base_device::device_reset()
  * STATE IMPORT/EXPORT
  **************************************************************************/
 
-void m68000_base_device::state_import(const device_state_entry &entry)
+void m68000_musashi_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
@@ -1196,7 +1196,7 @@ void m68000_base_device::state_import(const device_state_entry &entry)
 
 
 
-void m68000_base_device::state_export(const device_state_entry &entry)
+void m68000_musashi_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
@@ -1232,7 +1232,7 @@ void m68000_base_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void m68000_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void m68000_musashi_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	u16 sr;
 
@@ -1297,19 +1297,19 @@ void m68000_base_device::state_string_export(const device_state_entry &entry, st
 
 /* global access */
 
-void m68000_base_device::set_hmmu_enable(int enable)
+void m68000_musashi_device::set_hmmu_enable(int enable)
 {
 	m_hmmu_enabled = enable;
 }
 
 /* set for external MMU and instruction restart */
-void m68000_base_device::set_emmu_enable(int enable)
+void m68000_musashi_device::set_emmu_enable(int enable)
 {
 	m_emmu_enabled = enable;
 	m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 }
 
-void m68000_base_device::set_fpu_enable(int enable)
+void m68000_musashi_device::set_fpu_enable(int enable)
 {
 	m_has_fpu = enable;
 }
@@ -1318,7 +1318,7 @@ void m68000_base_device::set_fpu_enable(int enable)
  * 8-bit data memory interface
  ****************************************************************************/
 
-void m68000_base_device::init8(address_space &space, address_space &ospace)
+void m68000_musashi_device::init8(address_space &space, address_space &ospace)
 {
 	m_space = &space;
 	m_ospace = &ospace;
@@ -1338,7 +1338,7 @@ void m68000_base_device::init8(address_space &space, address_space &ospace)
  * 16-bit data memory interface
  ****************************************************************************/
 
-void m68000_base_device::init16(address_space &space, address_space &ospace)
+void m68000_musashi_device::init16(address_space &space, address_space &ospace)
 {
 	m_space = &space;
 	m_ospace = &ospace;
@@ -1363,7 +1363,7 @@ static inline u32 dword_from_word(u16 data) { return data * 0x00010001U; }
 static inline u32 dword_from_unaligned_word(u16 data) { return u32(data) << 8 | ((data >> 8) * 0x01000001U); }
 
 /* interface for 32-bit data bus (68EC020, 68020) */
-void m68000_base_device::init32(address_space &space, address_space &ospace)
+void m68000_musashi_device::init32(address_space &space, address_space &ospace)
 {
 	m_space = &space;
 	m_ospace = &ospace;
@@ -1415,14 +1415,14 @@ void m68000_base_device::init32(address_space &space, address_space &ospace)
 
 		case 3:
 			m_program32.write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address + 1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			m_program32.write_dword(address + 1, rotl_32(data, 8), 0xffffff00U);
 			break;
 		}
 	};
 }
 
 /* interface for 32-bit data bus with PMMU */
-void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
+void m68000_musashi_device::init32mmu(address_space &space, address_space &ospace)
 {
 	m_space = &space;
 	m_ospace = &ospace;
@@ -1585,14 +1585,14 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 					return;
 			}
 			m_program32.write_dword(address0 - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			m_program32.write_dword(address1, rotl_32(data, 8), 0xffffff00U);
 			break;
 		}
 		}
 	};
 }
 
-void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
+void m68000_musashi_device::init32hmmu(address_space &space, address_space &ospace)
 {
 	m_space = &space;
 	m_ospace = &ospace;
@@ -1676,7 +1676,7 @@ void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
 // fc = 3-bit function code of access (usually you'd just put what m68k_get_fc() returns here)
 // rerun = trigger bus error and rerun instruction after RTE, intended for external MMU use
 //         do not call set_input_line(M68K_LINE_BUSERROR) when using rerun flag
-void m68000_base_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun)
+void m68000_musashi_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun)
 {
 	if (m_instruction_restart && rerun) m_mmu_tmp_buserror_occurred = 1; // hack for external MMU
 
@@ -1692,7 +1692,7 @@ void m68000_base_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool
 	m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 }
 
-u16 m68000_base_device::get_fc()
+u16 m68000_musashi_device::get_fc()
 {
 	return m_mmu_tmp_fc;
 }
@@ -1701,7 +1701,7 @@ u16 m68000_base_device::get_fc()
  * State definition
  ****************************************************************************/
 
-void m68000_base_device::define_state(void)
+void m68000_musashi_device::define_state(void)
 {
 	u32 addrmask = (m_cpu_type & MASK_24BIT_SPACE) ? 0xffffff : 0xffffffff;
 
@@ -1794,7 +1794,7 @@ void m68000_base_device::define_state(void)
 ****************/
 
 
-void m68000_base_device::init_cpu_m68000(void)
+void m68000_musashi_device::init_cpu_m68000(void)
 {
 	init_cpu_common();
 
@@ -1823,7 +1823,7 @@ void m68000_base_device::init_cpu_m68000(void)
 }
 
 
-void m68000_base_device::init_cpu_m68008(void)
+void m68000_musashi_device::init_cpu_m68008(void)
 {
 	init_cpu_common();
 
@@ -1851,7 +1851,7 @@ void m68000_base_device::init_cpu_m68008(void)
 }
 
 
-void m68000_base_device::init_cpu_m68010(void)
+void m68000_musashi_device::init_cpu_m68010(void)
 {
 	init_cpu_common();
 	m_cpu_type         = CPU_TYPE_010;
@@ -1877,7 +1877,7 @@ void m68000_base_device::init_cpu_m68010(void)
 }
 
 
-void m68000_base_device::init_cpu_m68020(void)
+void m68000_musashi_device::init_cpu_m68020(void)
 {
 	init_cpu_common();
 	m_cpu_type         = CPU_TYPE_020;
@@ -1900,14 +1900,14 @@ void m68000_base_device::init_cpu_m68020(void)
 	define_state();
 }
 
-void m68000_base_device::init_cpu_m68020fpu(void)
+void m68000_musashi_device::init_cpu_m68020fpu(void)
 {
 	init_cpu_m68020();
 
 	m_has_fpu          = 1;
 }
 
-void m68000_base_device::init_cpu_m68020pmmu(void)
+void m68000_musashi_device::init_cpu_m68020pmmu(void)
 {
 	init_cpu_m68020();
 
@@ -1920,7 +1920,7 @@ void m68000_base_device::init_cpu_m68020pmmu(void)
 
 
 
-void m68000_base_device::init_cpu_m68020hmmu(void)
+void m68000_musashi_device::init_cpu_m68020hmmu(void)
 {
 	init_cpu_m68020();
 
@@ -1931,7 +1931,7 @@ void m68000_base_device::init_cpu_m68020hmmu(void)
 	init32hmmu(*m_program, *m_oprogram);
 }
 
-void m68000_base_device::init_cpu_m68ec020(void)
+void m68000_musashi_device::init_cpu_m68ec020(void)
 {
 	init_cpu_common();
 
@@ -1959,7 +1959,7 @@ void m68000_base_device::init_cpu_m68ec020(void)
 }
 
 
-void m68000_base_device::init_cpu_m68030(void)
+void m68000_musashi_device::init_cpu_m68030(void)
 {
 	init_cpu_common();
 
@@ -1988,7 +1988,7 @@ void m68000_base_device::init_cpu_m68030(void)
 
 
 
-void m68000_base_device::init_cpu_m68ec030(void)
+void m68000_musashi_device::init_cpu_m68ec030(void)
 {
 	init_cpu_common();
 
@@ -2017,7 +2017,7 @@ void m68000_base_device::init_cpu_m68ec030(void)
 
 
 
-void m68000_base_device::init_cpu_m68040(void)
+void m68000_musashi_device::init_cpu_m68040(void)
 {
 	init_cpu_common();
 
@@ -2045,7 +2045,7 @@ void m68000_base_device::init_cpu_m68040(void)
 }
 
 
-void m68000_base_device::init_cpu_m68ec040(void)
+void m68000_musashi_device::init_cpu_m68ec040(void)
 {
 	init_cpu_common();
 
@@ -2073,7 +2073,7 @@ void m68000_base_device::init_cpu_m68ec040(void)
 }
 
 
-void m68000_base_device::init_cpu_m68lc040(void)
+void m68000_musashi_device::init_cpu_m68lc040(void)
 {
 	init_cpu_common();
 
@@ -2101,7 +2101,7 @@ void m68000_base_device::init_cpu_m68lc040(void)
 }
 
 
-void m68000_base_device::init_cpu_scc68070(void)
+void m68000_musashi_device::init_cpu_scc68070(void)
 {
 	init_cpu_common();
 	m_cpu_type         = CPU_TYPE_SCC070;
@@ -2127,14 +2127,14 @@ void m68000_base_device::init_cpu_scc68070(void)
 }
 
 
-void m68000_base_device::init_cpu_fscpu32(void)
+void m68000_musashi_device::init_cpu_fscpu32(void)
 {
 	init_cpu_common();
 
 	m_cpu_type         = CPU_TYPE_FSCPU32;
 
 
-	init32(*m_program, *m_oprogram);
+	init16(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m_state_table      = m68ki_instruction_state_table[6];
 	m_cyc_instruction  = m68ki_cycles[6];
@@ -2154,7 +2154,7 @@ void m68000_base_device::init_cpu_fscpu32(void)
 
 
 
-void m68000_base_device::init_cpu_coldfire(void)
+void m68000_musashi_device::init_cpu_coldfire(void)
 {
 	init_cpu_common();
 
@@ -2179,99 +2179,14 @@ void m68000_base_device::init_cpu_coldfire(void)
 	define_state();
 }
 
-std::unique_ptr<util::disasm_interface> m68000_base_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68000_musashi_device::create_disassembler()
 {
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
-}
-
-std::unique_ptr<util::disasm_interface> m68000_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
-}
-
-std::unique_ptr<util::disasm_interface> m68008_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
-}
-
-std::unique_ptr<util::disasm_interface> m68008fn_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
-}
-
-std::unique_ptr<util::disasm_interface> m68010_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68010);
-}
-
-std::unique_ptr<util::disasm_interface> m68ec020_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
-}
-
-std::unique_ptr<util::disasm_interface> m68020_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
-}
-
-std::unique_ptr<util::disasm_interface> m68020fpu_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
-}
-
-std::unique_ptr<util::disasm_interface> m68020pmmu_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
-}
-
-std::unique_ptr<util::disasm_interface> m68020hmmu_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
-}
-
-std::unique_ptr<util::disasm_interface> m68ec030_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68030);
-}
-
-std::unique_ptr<util::disasm_interface> m68030_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68030);
-}
-
-std::unique_ptr<util::disasm_interface> m68ec040_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68040);
-}
-
-std::unique_ptr<util::disasm_interface> m68lc040_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68040);
-}
-
-std::unique_ptr<util::disasm_interface> m68040_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68040);
-}
-
-std::unique_ptr<util::disasm_interface> scc68070_base_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
-}
-
-std::unique_ptr<util::disasm_interface> fscpu32_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68340);
-}
-
-std::unique_ptr<util::disasm_interface> mcf5206e_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_COLDFIRE);
 }
 
 
 /* Service an interrupt request and start exception processing */
-void m68000_base_device::m68ki_exception_interrupt(u32 int_level)
+void m68000_musashi_device::m68ki_exception_interrupt(u32 int_level)
 {
 	u32 vector;
 	u32 sr;
@@ -2339,43 +2254,35 @@ void m68000_base_device::m68ki_exception_interrupt(u32 int_level)
 
 
 //-------------------------------------------------
-//  m68000_base_device - constructor
+//  m68000_musashi_device - constructor
 //-------------------------------------------------
 
-m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
+m68000_musashi_device::m68000_musashi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
 										const device_type type, u32 prg_data_width, u32 prg_address_bits, address_map_constructor internal_map)
-	: cpu_device(mconfig, type, tag, owner, clock),
+	: m68000_base_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
-		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
-		m_interrupt_mixer(true),
-		m_cpu_space_id(AS_CPU_SPACE),
-		m_reset_instr_callback(*this),
+		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_musashi_device::default_autovectors_map), this)),
 		m_cmpild_instr_callback(*this),
-		m_rte_instr_callback(*this),
-		m_tas_write_callback(*this)
+		m_rte_instr_callback(*this)
 {
 	clear_all();
 }
 
 
-m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
+m68000_musashi_device::m68000_musashi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
 										const device_type type, u32 prg_data_width, u32 prg_address_bits)
-	: cpu_device(mconfig, type, tag, owner, clock),
+	: m68000_base_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
-		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
-		m_interrupt_mixer(true),
-		m_cpu_space_id(AS_CPU_SPACE),
-		m_reset_instr_callback(*this),
+		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_musashi_device::default_autovectors_map), this)),
 		m_cmpild_instr_callback(*this),
-		m_rte_instr_callback(*this),
-		m_tas_write_callback(*this)
+		m_rte_instr_callback(*this)
 {
 	clear_all();
 }
 
-void m68000_base_device::clear_all()
+void m68000_musashi_device::clear_all()
 {
 	m_cpu_type= 0;
 //
@@ -2493,43 +2400,22 @@ void m68000_base_device::clear_all()
 	m_internal = nullptr;
 }
 
-void m68000_base_device::autovectors_map(address_map &map)
+void m68000_musashi_device::device_start()
 {
-	// Eventually add the sync to E due to vpa
-	// 8-bit handlers are used here to be compatible with all bus widths
-	map(0x3, 0x3).lr8(NAME([] () -> u8 { return autovector(1); }));
-	map(0x5, 0x5).lr8(NAME([] () -> u8 { return autovector(2); }));
-	map(0x7, 0x7).lr8(NAME([] () -> u8 { return autovector(3); }));
-	map(0x9, 0x9).lr8(NAME([] () -> u8 { return autovector(4); }));
-	map(0xb, 0xb).lr8(NAME([] () -> u8 { return autovector(5); }));
-	map(0xd, 0xd).lr8(NAME([] () -> u8 { return autovector(6); }));
-	map(0xf, 0xf).lr8(NAME([] () -> u8 { return autovector(7); }));
-}
-
-void m68000_base_device::default_autovectors_map(address_map &map)
-{
-	if(m_cpu_space_id == AS_CPU_SPACE && !has_configured_map(AS_CPU_SPACE)) {
-		offs_t mask = make_bitmask<offs_t>(m_program_config.addr_width());
-		map(mask - 0xf, mask).m(*this, FUNC(m68000_base_device::autovectors_map));
-	}
-}
-
-void m68000_base_device::device_start()
-{
-	m_reset_instr_callback.resolve();
+	m_reset_cb.resolve_safe();
 	m_cmpild_instr_callback.resolve();
 	m_rte_instr_callback.resolve();
 	m_tas_write_callback.resolve();
 }
 
-void m68000_base_device::device_stop()
+void m68000_musashi_device::device_stop()
 {
 }
 
 
 
 
-void m68000_base_device::execute_set_input(int inputnum, int state)
+void m68000_musashi_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
@@ -2556,7 +2442,7 @@ void m68000_base_device::execute_set_input(int inputnum, int state)
 }
 
 
-device_memory_interface::space_config_vector m68000_base_device::memory_space_config() const
+device_memory_interface::space_config_vector m68000_musashi_device::memory_space_config() const
 {
 	if(has_configured_map(AS_OPCODES))
 		if(m_cpu_space_id == AS_CPU_SPACE)
@@ -2582,271 +2468,7 @@ device_memory_interface::space_config_vector m68000_base_device::memory_space_co
 			};
 }
 
-
-
-DEFINE_DEVICE_TYPE(M68000,      m68000_device,      "m68000",       "Motorola MC68000")
-DEFINE_DEVICE_TYPE(M68008,      m68008_device,      "m68008",       "Motorola MC68008") // 48-pin plastic or ceramic DIP
-DEFINE_DEVICE_TYPE(M68008FN,    m68008fn_device,    "m68008fn",     "Motorola MC68008FN") // 52-pin PLCC
-DEFINE_DEVICE_TYPE(M68010,      m68010_device,      "m68010",       "Motorola MC68010")
-DEFINE_DEVICE_TYPE(M68EC020,    m68ec020_device,    "m68ec020",     "Motorola MC68EC020")
-DEFINE_DEVICE_TYPE(M68020,      m68020_device,      "m68020",       "Motorola MC68020")
-DEFINE_DEVICE_TYPE(M68020FPU,   m68020fpu_device,   "m68020fpu",    "Motorola MC68020FPU")
-DEFINE_DEVICE_TYPE(M68020PMMU,  m68020pmmu_device,  "m68020pmmu",   "Motorola MC68020PMMU")
-DEFINE_DEVICE_TYPE(M68020HMMU,  m68020hmmu_device,  "m68020hmmu",   "Motorola MC68020HMMU")
-DEFINE_DEVICE_TYPE(M68EC030,    m68ec030_device,    "m68ec030",     "Motorola MC68EC030")
-DEFINE_DEVICE_TYPE(M68030,      m68030_device,      "m68030",       "Motorola MC68030")
-DEFINE_DEVICE_TYPE(M68EC040,    m68ec040_device,    "m68ec040",     "Motorola MC68EC040")
-DEFINE_DEVICE_TYPE(M68LC040,    m68lc040_device,    "m68lc040",     "Motorola MC68LC040")
-DEFINE_DEVICE_TYPE(M68040,      m68040_device,      "m68040",       "Motorola MC68040")
-DEFINE_DEVICE_TYPE(FSCPU32,     fscpu32_device,     "fscpu32",      "Freescale CPU32 Core")
-DEFINE_DEVICE_TYPE(MCF5206E,    mcf5206e_device,    "mcf5206e",     "Freescale MCF5206E")
-
-m68000_device::m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_device(mconfig, M68000, tag, owner, clock)
-{
-}
-
-m68000_device::m68000_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, type, 16,24)
-{
-}
-
-void m68000_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68000();
-}
-
-m68000_device::m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
-										const device_type type, u32 prg_data_width, u32 prg_address_bits, address_map_constructor internal_map)
-	: m68000_base_device(mconfig, tag, owner, clock, type, prg_data_width, prg_address_bits, internal_map)
-{
-}
-
-
-
-
-
-
-/* m68008_device */
-
-m68008_device::m68008_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68008, 8,20)
-{
-}
-
-void m68008_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68008();
-}
-
-
-m68008fn_device::m68008fn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68008FN, 8,22)
-{
-}
-
-void m68008fn_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68008();
-}
-
-
-
-m68010_device::m68010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68010, 16,24)
-{
-}
-
-void m68010_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68010();
-}
-
-
-
-m68020_device::m68020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68020, 32,32)
-{
-}
-
-void m68020_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68020();
-}
-
-
-m68020fpu_device::m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68020FPU, 32,32)
-{
-}
-
-void m68020fpu_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68020fpu();
-}
-
-// 68020 with 68851 PMMU
-m68020pmmu_device::m68020pmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68020PMMU, 32,32)
-{
-}
-
-void m68020pmmu_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68020pmmu();
-}
-
-bool m68020hmmu_device::memory_translate(int space, int intention, offs_t &address)
-{
-	/* only applies to the program address space and only does something if the MMU's enabled */
-	{
-		if ((space == AS_PROGRAM) && (m_hmmu_enabled))
-		{
-			address = hmmu_translate_addr(address);
-		}
-	}
-	return true;
-}
-
-
-// 68020 with Apple HMMU & 68881 FPU
-//      case CPUINFO_FCT_TRANSLATE: info->translate = CPU_TRANSLATE_NAME(m68khmmu);     break;
-m68020hmmu_device::m68020hmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68020HMMU, 32,32)
-{
-}
-
-void m68020hmmu_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68020hmmu();
-}
-
-
-m68ec020_device::m68ec020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68EC020, 32,24)
-{
-}
-
-void m68ec020_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68ec020();
-}
-
-m68030_device::m68030_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68030, 32,32)
-{
-}
-
-void m68030_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68030();
-}
-
-m68ec030_device::m68ec030_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68EC030, 32,32)
-{
-}
-
-void m68ec030_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68ec030();
-}
-
-m68040_device::m68040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68040, 32,32)
-{
-}
-
-
-void m68040_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68040();
-}
-
-
-
-m68ec040_device::m68ec040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68EC040, 32,32)
-{
-}
-
-void m68ec040_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68ec040();
-}
-
-
-
-m68lc040_device::m68lc040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68LC040, 32,32)
-{
-}
-
-void m68lc040_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_m68lc040();
-}
-
-
-scc68070_base_device::scc68070_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
-						const device_type type, address_map_constructor internal_map)
-	: m68000_base_device(mconfig, tag, owner, clock, type, 16,32, internal_map)
-{
-}
-
-void scc68070_base_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_scc68070();
-}
-
-
-fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, FSCPU32, 32,32)
-{
-}
-
-fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
-										const device_type type, u32 prg_data_width, u32 prg_address_bits, address_map_constructor internal_map)
-	: m68000_base_device(mconfig, tag, owner, clock, type, prg_data_width, prg_address_bits, internal_map)
-{
-}
-
-
-void fscpu32_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_fscpu32();
-}
-
-
-
-mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, MCF5206E, 32,32)
-{
-}
-
-void mcf5206e_device::device_start()
-{
-	m68000_base_device::device_start();
-	init_cpu_coldfire();
-}
-
-void m68000_base_device::m68ki_set_one(unsigned short opcode, u16 state, const opcode_handler_struct &s)
+void m68000_musashi_device::m68ki_set_one(unsigned short opcode, u16 state, const opcode_handler_struct &s)
 {
 	for(int i=0; i<NUM_CPU_TYPES; i++)
 		if(s.cycles[i] != 0xff) {
@@ -2855,7 +2477,7 @@ void m68000_base_device::m68ki_set_one(unsigned short opcode, u16 state, const o
 		}
 }
 
-void m68000_base_device::m68ki_build_opcode_table()
+void m68000_musashi_device::m68ki_build_opcode_table()
 {
 	for(int i = 0; i < 0x10000; i++)
 	{
@@ -2878,3 +2500,17 @@ void m68000_base_device::m68ki_build_opcode_table()
 		} while(extraval);
 	}
 }
+
+void m68000_musashi_device::default_autovectors_map(address_map &map)
+{
+	if(m_cpu_space_id == AS_CPU_SPACE && !has_configured_map(AS_CPU_SPACE)) {
+		offs_t mask = make_bitmask<offs_t>(m_program_config.addr_width());
+		map(mask - 0xf, mask).m(*this, FUNC(m68000_musashi_device::autovectors_map));
+	}
+}
+
+bool m68000_musashi_device::supervisor_mode() const noexcept
+{
+	return m_s_flag;
+}
+

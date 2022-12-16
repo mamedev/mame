@@ -43,7 +43,7 @@ public:
 	virtual void write_ram(offs_t offset, uint8_t data) { }
 	virtual void write_bank(uint8_t data) { }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint32_t get_rom_size() { return m_rom_size; }
 
@@ -98,12 +98,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(VECTREX_CART_SLOT, vectrex_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define VECSLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_VECTREX_SLOT_H

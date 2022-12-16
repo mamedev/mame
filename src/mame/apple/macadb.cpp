@@ -206,7 +206,7 @@ macadb_device::macadb_device(const machine_config &mconfig, const char *tag, dev
 		write_via_data(*this),
 		write_adb_data(*this),
 		write_adb_irq(*this),
-		m_bIsMCUMode(false)
+		m_bIsMCUMode(true)
 {
 }
 
@@ -689,11 +689,6 @@ void macadb_device::adb_talk()
 					LOGMASKED(LOG_TALK_LISTEN, "ADB: talking to unconnected device %d (K %d M %d)\n", addr, m_adb_keybaddr, m_adb_mouseaddr);
 					m_adb_buffer[0] = m_adb_buffer[1] = 0;
 					m_adb_datasize = 0;
-
-					if ((adb_pollkbd(0)) || (adb_pollmouse()))
-					{
-						m_adb_srqflag = true;
-					}
 				}
 				break;
 		}

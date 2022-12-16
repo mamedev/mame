@@ -2,7 +2,7 @@
 // copyright-holders:Samuele Zannoli
 //============================================================
 //
-//  logviewinfo.c - Win32 debug log window handling
+//  logviewinfo.cpp - Win32 debug log window handling
 //
 //============================================================
 
@@ -11,6 +11,8 @@
 
 #include "debug/dvtext.h"
 
+
+namespace osd::debugger::win {
 
 logview_info::logview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent) :
 	debugview_info(debugger, owner, parent, DVT_LOG)
@@ -27,3 +29,5 @@ void logview_info::clear()
 {
 	view<debug_view_log>()->clear();
 }
+
+} // namespace osd::debugger::win

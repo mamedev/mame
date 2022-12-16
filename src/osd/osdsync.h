@@ -15,7 +15,7 @@
 #include <atomic>
 #include <condition_variable>
 
-#include "osdcomm.h"
+#include "osdcore.h"
 
 /***************************************************************************
     SYNCHRONIZATION INTERFACES - Events

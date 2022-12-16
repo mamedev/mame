@@ -52,12 +52,12 @@ void device_electron_cart_interface::rom_alloc(uint32_t size, const char *tag)
 	{
 		if (size <= 0x8000)
 		{
-			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG).c_str(), 0x8000, 1, ENDIANNESS_LITTLE)->base();
+			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG), 0x8000, 1, ENDIANNESS_LITTLE)->base();
 			m_rom_size = 0x8000;
 		}
 		else
 		{
-			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG), size, 1, ENDIANNESS_LITTLE)->base();
 			m_rom_size = size;
 		}
 	}

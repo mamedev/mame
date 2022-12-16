@@ -126,7 +126,7 @@ Titles, publishers and release dates taken from:
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198506xx"/>
-		<info name="alt_title" value="ザ・キャッスル "/>
+		<info name="alt_title" value="ザ・キャッスル"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="300004">
 				<rom name="castle.tap" size="300004" crc="2563d821" sha1="6bae59c7a18a6f07b66b6621016deb3c091a40fd"/>
@@ -139,7 +139,7 @@ Titles, publishers and release dates taken from:
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198506xx"/>
-		<info name="alt_title" value="ザ・キャッスル "/>
+		<info name="alt_title" value="ザ・キャッスル"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="300004">
 				<rom name="the castle.tap" size="300004" crc="0ba30a7d" sha1="732e04231f82f749ca2fe529d7ac5db3353d6894"/>
@@ -488,7 +488,7 @@ Titles, publishers and release dates taken from:
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="release" value="198506xx"/>
-		<info name="alt_title" value="任天堂のゴルフ "/>
+		<info name="alt_title" value="任天堂のゴルフ"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="golf.tap" size="180004" crc="d71eebf1" sha1="bd61d8af9ef4beebe6cc21f56edadb1c3bace59b"/>
@@ -501,7 +501,7 @@ Titles, publishers and release dates taken from:
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="release" value="198506xx"/>
-		<info name="alt_title" value="任天堂のゴルフ "/>
+		<info name="alt_title" value="任天堂のゴルフ"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="golfa.tap" size="180004" crc="d731667d" sha1="4e5dc0a29a04d5c1d494f472fbc50c1f72e6b526"/>

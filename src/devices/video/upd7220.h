@@ -97,13 +97,6 @@ protected:
 	void stop_dma();
 
 private:
-	enum
-	{
-		TIMER_VSYNC,
-		TIMER_HSYNC,
-		TIMER_BLANK
-	};
-
 	inline uint16_t readword(offs_t address);
 	inline void writeword(offs_t address, uint16_t data);
 	inline void fifo_clear();

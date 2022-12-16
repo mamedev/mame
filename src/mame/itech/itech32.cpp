@@ -394,6 +394,7 @@ Notes:
 
 #include "cpu/m6800/m6801.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32031/tms32031.h"
 #include "machine/input_merger.h"
@@ -837,7 +838,7 @@ void drivedge_state::tms1_68k_ram_w(offs_t offset, u32 data, u32 mem_mask)
 	if (offset == 0) COMBINE_DATA(m_tms1_boot);
 	if (offset == 0x382 && m_tms_spinning[0]) STOP_TMS_SPINNING(machine(), 0);
 	if (!m_tms_spinning[0])
-		machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+		machine().scheduler().add_quantum(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
@@ -846,21 +847,21 @@ void drivedge_state::tms2_68k_ram_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_tms2_ram[offset]);
 	if (offset == 0x382 && m_tms_spinning[1]) STOP_TMS_SPINNING(machine(), 1);
 	if (!m_tms_spinning[1])
-		machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+		machine().scheduler().add_quantum(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
 void drivedge_state::tms1_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_tms1_ram[offset]);
-	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+	machine().scheduler().add_quantum(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
 void drivedge_state::tms2_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_tms2_ram[offset]);
-	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+	machine().scheduler().add_quantum(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
@@ -2208,8 +2209,8 @@ ROM_END
 
 ROM_START( bloodstm221 ) // this board had generic stickers
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
-	ROM_LOAD16_BYTE( "bld00_v21.u83", 0x00000, 0x40000, CRC(01907aec) SHA1(a954366f2374c0836140e3b75a55ff47e4cfa645) )
-	ROM_LOAD16_BYTE( "bld01_v21.u88", 0x00001, 0x40000, CRC(eeae123e) SHA1(9fdd53d6651cac16402a9c3fe0ae15c9b1baa0db) )
+	ROM_LOAD16_BYTE( "bld00_v221.u83", 0x00000, 0x40000, CRC(01907aec) SHA1(a954366f2374c0836140e3b75a55ff47e4cfa645) )
+	ROM_LOAD16_BYTE( "bld01_v221.u88", 0x00001, 0x40000, CRC(eeae123e) SHA1(9fdd53d6651cac16402a9c3fe0ae15c9b1baa0db) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "bldsnd_v10.u17", 0x10000, 0x18000, CRC(dddeedbb) SHA1(f8ea786836630fc44bba968845fd2cb42cd81592) )
@@ -4851,7 +4852,7 @@ void itech32_state::init_bloodstm()
 }
 
 
-void drivedge_state::driver_init()
+void drivedge_state::driver_start()
 {
 	init_program_rom();
 	m_vram_height = 1024;
@@ -4997,7 +4998,7 @@ void itech32_state::init_gt3d()
 }
 
 
-void shoottv_state::driver_init()
+void shoottv_state::driver_start()
 {
 	init_program_rom();
 	m_vram_height = 1024;

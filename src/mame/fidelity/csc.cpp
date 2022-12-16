@@ -13,9 +13,7 @@ TODO:
 - do ca1_w/cb1_w better, it's annoying since it's going through sensorboard_device
   (it works fine though, since PIA interrupts are not connected)
 - hook up csce I/O properly, it doesn't have PIAs
-- verify csc/super9cc irq duration, it was measured 73.425us but that's too long,
-  so it's using the one from csce for now instead
-- is super9cc 101-1024B03 really 2KB? rom chip looks the same as the other ones
+- verify super9cc maskrom dump
 
 *******************************************************************************
 
@@ -619,12 +617,12 @@ INPUT_PORTS_END
 
 void csc_state::csc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 3.9_MHz_XTAL/2); // from 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::csc_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
-	irq_clock.set_pulse_width(attotime::from_nsec(10480)); // 74LS221 (4.7K, 5nF), measured ~10.48us
+	irq_clock.set_pulse_width(attotime::from_nsec(42750)); // measured ~42.75us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	PIA6821(config, m_pia[0], 0);
@@ -644,12 +642,12 @@ void csc_state::csc(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_csc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
 	m_speech->ext_read().set(FUNC(csc_state::speech_r));
@@ -662,30 +660,28 @@ void csc_state::csce(machine_config &config)
 {
 	csc(config);
 
-	/* basic machine hardware */
 	m_maincpu->set_clock(4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::csce_map);
+
+	// shorter irq, 74LS221 (4.7K, 5nF), measured ~10.48us
+	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_nsec(10480));
 }
 
 void csc_state::cscet(machine_config &config)
 {
 	csce(config);
-
-	/* basic machine hardware */
 	m_maincpu->set_clock(5_MHz_XTAL);
 }
 
 void su9_state::su9(machine_config &config)
 {
 	csc(config);
-
-	/* basic machine hardware */
 	config.set_default_layout(layout_fidel_su9);
 }
 
 void csc_state::rsc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 1800000); // measured approx 1.81MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::rsc_map);
 
@@ -704,11 +700,11 @@ void csc_state::rsc(machine_config &config)
 	m_board->set_spawnpoints(2);
 	m_board->set_delay(attotime::from_msec(300));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	config.set_default_layout(layout_fidel_rsc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }

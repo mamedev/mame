@@ -201,11 +201,11 @@ public:
 	void init_hb();
 
 private:
-	uint32_t* m_cpuregion = 0;
-	std::unique_ptr<uint32_t[]> m_mainram;
+	uint16_t* m_cpuregion = 0;
+	std::unique_ptr<uint16_t[]> m_mainram;
 
-	uint32_t pluto5_mem_r(offs_t offset, uint32_t mem_mask = ~0);
-	void pluto5_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t pluto5_mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pluto5_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void pluto5_map(address_map &map);
 
@@ -215,15 +215,14 @@ private:
 	virtual void machine_start() override;
 };
 
-uint32_t pluto5_state::pluto5_mem_r(offs_t offset, uint32_t mem_mask)
+uint16_t pluto5_state::pluto5_mem_r(offs_t offset, uint16_t mem_mask)
 {
 	int pc = m_maincpu->pc();
-	int cs = m_maincpu->get_cs(offset * 4);
-
+	int cs = m_maincpu->get_cs(offset * 2);
 	switch ( cs )
 	{
 		case 1:
-			if (offset < 0x100000) // If reading beyond end of region, log error instead of crashing
+			if (offset < 0x200000) // If reading beyond end of region, log error instead of crashing
 				return m_cpuregion[offset];
 			[[fallthrough]];
 		default:
@@ -234,10 +233,10 @@ uint32_t pluto5_state::pluto5_mem_r(offs_t offset, uint32_t mem_mask)
 	return 0x0000;
 }
 
-void pluto5_state::pluto5_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void pluto5_state::pluto5_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pc = m_maincpu->pc();
-	int cs = m_maincpu->get_cs(offset * 4);
+	int cs = m_maincpu->get_cs(offset * 2);
 
 	switch ( cs )
 	{
@@ -259,8 +258,8 @@ INPUT_PORTS_END
 
 void pluto5_state::machine_start()
 {
-	m_cpuregion = (uint32_t*)memregion( "maincpu" )->base();
-	m_mainram = make_unique_clear<uint32_t[]>(0x10000);
+	m_cpuregion = (uint16_t*)memregion( "maincpu" )->base();
+	m_mainram = make_unique_clear<uint16_t[]>(0x20000);
 
 }
 
@@ -903,8 +902,8 @@ static void astra_addresslines( uint16_t* src, size_t srcsize, int small )
 	{
 		for (int x = 0; x<blocksize/2;x+=2)
 		{
-			dst[((block/2)+(x/2))^1] = src[(block/2)+x+1];
-			dst[((block/2)+(x/2+blocksize/4))^1] = src[(block/2)+x];
+			dst[((block/2)+(x/2))] = src[(block/2)+x];
+			dst[((block/2)+(x/2+blocksize/4))] = src[(block/2)+x+1];
 		}
 	}
 

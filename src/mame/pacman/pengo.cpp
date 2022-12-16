@@ -66,8 +66,7 @@
 #include "emu.h"
 #include "pacman.h"
 
-#include "segacrpt_device.h"
-
+#include "machine/segacrpt_device.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"

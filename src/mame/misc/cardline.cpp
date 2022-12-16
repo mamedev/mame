@@ -280,19 +280,8 @@ static INPUT_PORTS_START( cardline )
 
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7  },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*8*8
-};
-
 static GFXDECODE_START( gfx_cardline )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x8_raw,     0, 2 )
 GFXDECODE_END
 
 void cardline_state::cardline_palette(palette_device &palette) const

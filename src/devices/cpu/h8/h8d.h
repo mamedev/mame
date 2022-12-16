@@ -70,6 +70,7 @@ protected:
 		DASM_abs32,    /* 32-bit address present at end of instruction */
 		DASM_abs8i,    /* 8-bit indirect jump address present at +1 */
 		DASM_abs16e,   /* 16-bit jump address present at +2 */
+		DASM_abs22e,   /* 22-bit jump address present at +1 (GT913) */
 		DASM_abs24e,   /* 24-bit jump address present at +1 */
 
 		DASM_rel8,     /* 8-bit pc-relative jump address at +1, offset=2 */
@@ -80,9 +81,8 @@ protected:
 		DASM_four,     /* immediate value 4 */
 
 		DASM_imm2,     /* 2-bit immediate in bits 4-5 (trapa) */
-		DASM_imm2l,    /* 2-bit immediate in bits 0-1 (GT913) */
 		DASM_imm3,     /* 3-bit immediate in bits 4-6 (bit selection */
-		DASM_imm4l,    /* 4-bit immediate in bits 0-3 (GT913) */
+		DASM_imm6l,    /* 6-bit immediate in bits 0-5 (GT913) */
 		DASM_imm8,     /* 8-bit immediate at +1 */
 		DASM_imm16,    /* 16-bit immediate at +2 */
 		DASM_imm32,    /* 32-bit immediate at +2 */
@@ -90,7 +90,7 @@ protected:
 		DASM_ccr,      /* internal register ccr */
 		DASM_exr,      /* internal register exr */
 		DASM_bankl,    /* internal register bankl (GT913) */
-		DASM_bankh,    /* internal register bankl (GT913) */
+		DASM_bankh,    /* internal register bankh (GT913) */
 		DASM_macl,     /* internal register macl */
 		DASM_mach      /* internal register mach */
 	};

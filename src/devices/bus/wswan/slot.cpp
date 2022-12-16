@@ -47,11 +47,11 @@ device_ws_cart_interface::~device_ws_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_ws_cart_interface::rom_alloc(u32 size, const char *tag)
+void device_ws_cart_interface::rom_alloc(u32 size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = (u16 *)device().machine().memory().region_alloc(std::string(tag).append(WSSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_LITTLE)->base();
+		m_rom = (u16 *)device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 2, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 		m_bank_mask = ((m_rom_size >> 16) - 1);
 	}
@@ -158,7 +158,7 @@ image_init_result ws_cart_slot_device::call_load()
 		u32 size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		u32 nvram_size = 0;
 
-		m_cart->rom_alloc(size, tag());
+		m_cart->rom_alloc(size);
 		ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())

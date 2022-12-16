@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    portmap.c
+    portmidi.cpp
 
     Midi implementation based on portmidi library
 
@@ -11,9 +11,10 @@
 #ifndef NO_USE_MIDI
 
 #include <portmidi.h>
-#include "osdcore.h"
 #include "modules/osdmodule.h"
 #include "midi_module.h"
+#include <cstdio>
+#include <cstring>
 
 class pm_module : public osd_module, public midi_module
 {

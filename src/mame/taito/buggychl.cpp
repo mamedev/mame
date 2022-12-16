@@ -226,8 +226,6 @@ void buggychl_state::video_start()
 
 	save_item(NAME(m_tmp_bitmap[0]));
 	save_item(NAME(m_tmp_bitmap[1]));
-
-	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
 void buggychl_state::chargen_w(offs_t offset, uint8_t data)
@@ -786,7 +784,7 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_buggychl )
-	GFXDECODE_ENTRY( nullptr,   0, charlayout,   0, 8 ) // decoded at runtime
+	GFXDECODE_RAM(   "charram", 0, charlayout,   0, 8 ) // decoded at runtime
 	// sprites are drawn pixel by pixel by draw_sprites()
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0, 8 )
 GFXDECODE_END

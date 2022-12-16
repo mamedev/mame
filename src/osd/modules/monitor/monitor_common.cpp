@@ -5,11 +5,14 @@
 *
 */
 
-#include "emu.h"
-#include <algorithm>
-
 #include "monitor_common.h"
+
+#include "modules/lib/osdobj_common.h"
 #include "modules/osdwindow.h"
+
+#include "osdcore.h"
+
+#include <algorithm>
 
 std::shared_ptr<osd_monitor_info> monitor_module_base::pick_monitor(osd_options& options, int index)
 {

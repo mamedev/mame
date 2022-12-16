@@ -17,8 +17,18 @@
 #include "../plib/pexception.h"
 #include "../plib/plists.h"
 #include "../plib/pmempool.h"
+#include "../plib/ppmf.h"
 
 #include <unordered_map>
+
+namespace netlist
+{
+	/// \brief Delegate type for device notification.
+	///
+	using nl_delegate = plib::pmfp<void()>;
+	using nl_delegate_ts = plib::pmfp<void(detail::time_step_type, nl_fptype)>;
+	using nl_delegate_dyn = plib::pmfp<void()>;
+} // namespace netlist
 
 namespace netlist::detail
 {
@@ -131,16 +141,16 @@ namespace netlist::detail
 
 		PCOPYASSIGNMOVE(netlist_object_t, delete)
 
-		netlist_state_t &      state() noexcept;
+		netlist_state_t       &state() noexcept;
 		const netlist_state_t &state() const noexcept;
 
-		constexpr netlist_t &      exec() noexcept { return m_netlist; }
+		constexpr netlist_t       &exec() noexcept { return m_netlist; }
 		constexpr const netlist_t &exec() const noexcept { return m_netlist; }
 
 		// to ease template design
 		template <typename T, typename... Args>
-		device_arena::unique_ptr<T> make_pool_object(Args &&...args) noexcept(
-			false)
+		device_arena::unique_ptr<T>
+		make_pool_object(Args &&...args) noexcept(false)
 		{
 			return state().make_pool_object<T>(std::forward<Args>(args)...);
 		}
@@ -174,13 +184,13 @@ namespace netlist::detail
 		/// \brief returns reference to owning device.
 		/// \returns reference to owning device.
 
-		core_device_t &      device() noexcept { return *m_device; }
+		core_device_t       &device() noexcept { return *m_device; }
 		const core_device_t &device() const noexcept { return *m_device; }
 
 		/// \brief The netlist owning the owner of this object.
 		/// \returns reference to netlist object.
 
-		netlist_state_t &      state() noexcept;
+		netlist_state_t       &state() noexcept;
 		const netlist_state_t &state() const noexcept;
 
 	private:
@@ -218,7 +228,7 @@ namespace netlist::detail
 		static constexpr netlist_sig_t OUT_TRISTATE() { return INP_MASK; }
 
 		static_assert(INP_BITS * 2 <= sizeof(netlist_sig_t) * 8,
-			"netlist_sig_t size not sufficient");
+					  "netlist_sig_t size not sufficient");
 
 		enum state_e
 		{
@@ -231,7 +241,7 @@ namespace netlist::detail
 		};
 
 		core_terminal_t(core_device_t &dev, const pstring &aname, state_e state,
-			nl_delegate delegate);
+						nl_delegate delegate);
 		virtual ~core_terminal_t() noexcept = default;
 
 		PCOPYASSIGNMOVE(core_terminal_t, delete)
@@ -271,12 +281,12 @@ namespace netlist::detail
 
 		void reset() noexcept
 		{
-			set_state(
-				is_type(terminal_type::OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE);
+			set_state(is_type(terminal_type::OUTPUT) ? STATE_OUT
+													 : STATE_INP_ACTIVE);
 		}
 
-		constexpr void set_copied_input(
-			[[maybe_unused]] netlist_sig_t val) noexcept
+		constexpr void
+		set_copied_input([[maybe_unused]] netlist_sig_t val) noexcept
 		{
 			if constexpr (config::use_copy_instead_of_reference::value)
 			{
@@ -298,7 +308,7 @@ namespace netlist::detail
 
 	private:
 		nl_delegate        m_delegate;
-		net_t *            m_net;
+		net_t             *m_net;
 		state_var<state_e> m_state;
 	};
 

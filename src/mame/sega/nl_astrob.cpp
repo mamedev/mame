@@ -87,6 +87,7 @@
 //
 
 NETLIST_START(astrob)
+{
 
 #if 1
 	SOLVER(Solver, 1000)
@@ -1214,4 +1215,4 @@ NETLIST_START(astrob)
 	OPTIMIZE_FRONTIER(C61.1, RES_M(10), RXX)
 #endif
 
-NETLIST_END()
+}

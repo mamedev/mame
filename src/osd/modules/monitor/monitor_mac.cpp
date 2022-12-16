@@ -8,7 +8,6 @@
 //
 //============================================================
 
-#include "emu.h"
 #include "modules/osdmodule.h"
 #include "monitor_module.h"
 
@@ -21,6 +20,7 @@
 
 #include "modules/osdwindow.h"
 #include "monitor_common.h"
+#include "osdcore.h"
 #include "window.h"
 
  //============================================================

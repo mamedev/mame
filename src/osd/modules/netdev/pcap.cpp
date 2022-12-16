@@ -4,6 +4,7 @@
 #if defined(OSD_NET_USE_PCAP)
 
 #include "emu.h"
+#include "dinetwork.h"
 #include "osdnet.h"
 #include "netdev_module.h"
 #include "modules/osdmodule.h"

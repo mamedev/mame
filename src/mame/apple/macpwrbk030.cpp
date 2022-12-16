@@ -92,12 +92,20 @@
     INT1: 60 Hz clock
     INT2: INT2 PULLUP (pulled up and otherwise N/C)
 
+    PG&E (68HC05 PMU) version spotting:
+    (find the text "BORG" in the system ROM, the next 32768 bytes are the PG&E image.
+     offset +4 in the image is the version byte).
+    01 - PowerBook Duo 210/230/250
+    02 - PowerBook 540c, PBDuo 270C, PBDuo 280/280C
+    03 - PowerBook 150
+    08 - PB190cs, PowerBook 540c PPC update, all PowerPC PowerBooks through WallStreet G3s
+
 ****************************************************************************/
 
 #include "emu.h"
 
 #include "macrtc.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "cpu/m6502/m5074x.h"
 #include "machine/6522via.h"
 #include "machine/ram.h"
@@ -107,6 +115,7 @@
 #include "machine/z80scc.h"
 #include "macadb.h"
 #include "macscsi.h"
+#include "mactoolbox.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
@@ -137,6 +146,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_swim(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
+		m_rtc(*this, "rtc"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_asc(*this, "asc"),
@@ -171,6 +181,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<applefdintf_device> m_swim;
 	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<rtc3430042_device> m_rtc;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<asc_device> m_asc;
@@ -209,9 +220,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
 	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_asc_interrupt = 0, m_last_taken_interrupt = 0;
-	int m_irq_count = 0, m_ca1_data = 0, m_ca2_data = 0, m_via2_ca1_hack = 0;
+	int m_ca1_data = 0, m_via2_ca1_hack = 0;
 
 	u32 rom_switch_r(offs_t offset);
 	bool m_overlay = false;
@@ -388,7 +398,7 @@ void macpb030_state::machine_start()
 	m_rom_size = memregion("bootrom")->bytes();
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = m_asc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-	m_irq_count = m_ca1_data = m_ca2_data = 0;
+	m_ca1_data = 0;
 
 	m_6015_timer = timer_alloc(FUNC(macpb030_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -399,7 +409,7 @@ void macpb030_state::machine_reset()
 	m_overlay = true;
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = m_asc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-	m_irq_count = m_ca1_data = m_ca2_data = 0;
+	m_ca1_data = 0;
 	m_via2_ca1_hack = 0;
 
 	m_cur_floppy = nullptr;
@@ -594,15 +604,6 @@ TIMER_CALLBACK_MEMBER(macpb030_state::mac_6015_tick)
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
 	m_macadb->adb_vblank();
-
-	if (++m_irq_count == 60)
-	{
-		m_irq_count = 0;
-
-		m_ca2_data ^= 1;
-		/* signal 1 Hz irq on CA2 input on the VIA */
-		m_via1->write_ca2(m_ca2_data);
-	}
 }
 
 u16 macpb030_state::scsi_r(offs_t offset, u16 mem_mask)
@@ -837,7 +838,7 @@ u8 macpb030_state::mac_via_in_a()
 
 u8 macpb030_state::mac_via_in_b()
 {
-	return 0x08;    // flag indicating no Target Disk Mode
+	return 0x08 | m_rtc->data_r();    // flag indicating no Target Disk Mode
 }
 
 void macpb030_state::mac_via_out_a(u8 data)
@@ -855,6 +856,9 @@ void macpb030_state::mac_via_out_a(u8 data)
 
 void macpb030_state::mac_via_out_b(u8 data)
 {
+	m_rtc->ce_w(BIT(data, 2));
+	m_rtc->data_w(BIT(data, 0));
+	m_rtc->clk_w(BIT(data, 1));
 }
 
 u8 macpb030_state::mac_via2_in_a()
@@ -888,6 +892,7 @@ void macpb030_state::macpb140(machine_config &config)
 {
 	M68030(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb140_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	M50753(config, m_pmu, 3.93216_MHz_XTAL);
 	m_pmu->read_p<2>().set(FUNC(macpb030_state::pmu_data_r));
@@ -912,8 +917,10 @@ void macpb030_state::macpb140(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
+
+	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
 
 	SWIM1(config, m_swim, C15M);
 	m_swim->phases_cb().set(FUNC(macpb030_state::phases_w));
@@ -946,13 +953,12 @@ void macpb030_state::macpb140(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 //  m_scc->intrq_callback().set(FUNC(macpb030_state::set_scc_interrupt));
 
-	R65NC22(config, m_via1, C7M/10);
+	R65C22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(macpb030_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macpb030_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macpb030_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(macpb030_state::mac_via_out_b));
 	m_via1->irq_handler().set(FUNC(macpb030_state::via_irq_w));
-	m_via1->cb2_handler().set(FUNC(macpb030_state::via_cb2_w));
 
 	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(macpb030_state::mac_via2_in_a));
@@ -963,7 +969,7 @@ void macpb030_state::macpb140(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
+	ASC(config, m_asc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
 	m_asc->irqf_callback().set(FUNC(macpb030_state::asc_irq_w));
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
@@ -1002,6 +1008,7 @@ void macpb030_state::macpb160(machine_config &config)
 {
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb160_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	M50753(config, m_pmu, 3.93216_MHz_XTAL);
 	m_pmu->read_p<2>().set(FUNC(macpb030_state::pmu_data_r));
@@ -1024,8 +1031,10 @@ void macpb030_state::macpb160(machine_config &config)
 	PALETTE(config, m_palette, FUNC(macpb030_state::macgsc_palette), 16);
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
+
+	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
 
 	SWIM1(config, m_swim, C15M);
 	m_swim->phases_cb().set(FUNC(macpb030_state::phases_w));
@@ -1058,13 +1067,12 @@ void macpb030_state::macpb160(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	//  m_scc->intrq_callback().set(FUNC(macpb030_state::set_scc_interrupt));
 
-	R65NC22(config, m_via1, C7M / 10);
+	R65C22(config, m_via1, C7M / 10);
 	m_via1->readpa_handler().set(FUNC(macpb030_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macpb030_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macpb030_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(macpb030_state::mac_via_out_b));
 	m_via1->irq_handler().set(FUNC(macpb030_state::via_irq_w));
-	m_via1->cb2_handler().set(FUNC(macpb030_state::via_cb2_w));
 
 	R65NC22(config, m_via2, C7M / 10);
 	m_via2->readpa_handler().set(FUNC(macpb030_state::mac_via2_in_a));
@@ -1075,7 +1083,7 @@ void macpb030_state::macpb160(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
+	ASC(config, m_asc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
 	m_asc->irqf_callback().set(FUNC(macpb030_state::asc_irq_w));
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);

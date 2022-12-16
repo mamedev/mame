@@ -10,6 +10,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(tank)
+{
 
 	SOLVER(Solver, 16000)
 	PARAM(Solver.ACCURACY, 5e-4)
@@ -1908,4 +1909,4 @@ NETLIST_START(tank)
 	NET_C(VCC, IC_J11.9, IC_J11.11, IC_J11.13)
 	NET_C(VCC, IC_J3.9)
 	NET_C(VCC, IC_N13.1, IC_N13.13)
-NETLIST_END()
+}

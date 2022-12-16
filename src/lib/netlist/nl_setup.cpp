@@ -36,11 +36,40 @@ namespace netlist
 	{
 	}
 
-	void nlparse_t::register_alias(const pstring &alias, const pstring &out)
+	void
+	nlparse_t::register_fqn_alias(detail::alias_type type, const pstring &alias,
+								  const pstring &points_to)
+	{
+		if (!m_abstract.m_aliases
+				 .insert({alias, detail::alias_t(type, alias, points_to)})
+				 .second)
+		{
+			log().fatal(MF_ALIAS_ALREAD_EXISTS_1(alias));
+			throw nl_exception(MF_ALIAS_ALREAD_EXISTS_1(alias));
+		}
+	}
+
+	void
+	nlparse_t::register_alias(const pstring &alias, const pstring &points_to)
+	{
+		detail::alias_type type = detail::alias_type::PACKAGE_PIN;
+		for (auto &c : alias)
+			if (c < '0' || c > '9')
+			{
+				type = detail::alias_type::READABILITY;
+				break;
+			}
+
+		register_alias(type, alias, points_to);
+	}
+
+	void
+	nlparse_t::register_alias(detail::alias_type type, const pstring &alias,
+							  const pstring &points_to)
 	{
 		pstring alias_fqn = build_fqn(alias);
-		pstring out_fqn = build_fqn(out);
-		register_alias_no_fqn(alias_fqn, out_fqn);
+		pstring points_to_fqn = build_fqn(points_to);
+		register_fqn_alias(type, alias_fqn, points_to_fqn);
 	}
 
 	void nlparse_t::register_dip_alias_arr(const pstring &terms)
@@ -56,8 +85,10 @@ namespace netlist
 		std::size_t n = list.size();
 		for (std::size_t i = 0; i < n / 2; i++)
 		{
-			register_alias(plib::pfmt("{1}")(i + 1), list[i * 2]);
-			register_alias(plib::pfmt("{1}")(n - i), list[i * 2 + 1]);
+			register_alias(detail::alias_type::PACKAGE_PIN,
+						   plib::pfmt("{1}")(i + 1), list[i * 2]);
+			register_alias(detail::alias_type::PACKAGE_PIN,
+						   plib::pfmt("{1}")(n - i), list[i * 2 + 1]);
 		}
 	}
 
@@ -126,7 +157,7 @@ namespace netlist
 					pstring output_name = *token_ptr;
 					log().debug("Link: {1} {2}", tp, output_name);
 
-					register_link(name + "." + tp.substr(1), output_name);
+					register_connection(name + "." + tp.substr(1), output_name);
 					++token_ptr;
 				}
 				else if (plib::startsWith(tp, "@"))
@@ -134,7 +165,7 @@ namespace netlist
 					pstring term = tp.substr(1);
 					log().debug("Link: {1} {2}", tp, term);
 
-					register_link(name + "." + term, term);
+					register_connection(name + "." + term, term);
 				}
 				else
 				{
@@ -178,13 +209,13 @@ namespace netlist
 		}
 	}
 
-	void nlparse_t::register_link(const pstring &sin, const pstring &sout)
+	void nlparse_t::register_connection(const pstring &sin, const pstring &sout)
 	{
-		register_link_fqn(build_fqn(plib::trim(sin)),
-						  build_fqn(plib::trim(sout)));
+		register_connection_fqn(build_fqn(plib::trim(sin)),
+								build_fqn(plib::trim(sout)));
 	}
 
-	void nlparse_t::register_link_arr(const pstring &terms)
+	void nlparse_t::register_connection_arr(const pstring &terms)
 	{
 		const auto list(plib::psplit(terms, pstring(", ")));
 		if (list.size() < 2)
@@ -194,7 +225,7 @@ namespace netlist
 		}
 		for (std::size_t i = 1; i < list.size(); i++)
 		{
-			register_link(list[0], list[i]);
+			register_connection(list[0], list[i]);
 		}
 	}
 
@@ -301,11 +332,11 @@ namespace netlist
 		register_dev("FRONTIER_DEV", frontier_name);
 		register_param(frontier_name + ".RIN", r_IN);
 		register_param(frontier_name + ".ROUT", r_OUT);
-		register_link(frontier_name + ".G", "GND");
+		register_connection(frontier_name + ".G", "GND");
 		pstring attach_fully_qualified_name = build_fqn(attach);
 		pstring front_fqn = build_fqn(frontier_name);
 		bool    found = false;
-		for (auto &link : m_abstract.m_links)
+		for (auto &link : m_abstract.m_connections)
 		{
 			if (link.first == attach_fully_qualified_name)
 			{
@@ -323,7 +354,7 @@ namespace netlist
 			log().fatal(MF_FOUND_NO_OCCURRENCE_OF_1(attach));
 			throw nl_exception(MF_FOUND_NO_OCCURRENCE_OF_1(attach));
 		}
-		register_link(attach, frontier_name + ".Q");
+		register_connection(attach, frontier_name + ".Q");
 	}
 
 	void nlparse_t::register_source_proc(const pstring &name, nlsetup_func func)
@@ -350,20 +381,11 @@ namespace netlist
 	}
 
 	void
-	nlparse_t::register_alias_no_fqn(const pstring &alias, const pstring &out)
+	nlparse_t::register_connection_fqn(const pstring &sin, const pstring &sout)
 	{
-		if (!m_abstract.m_alias.insert({alias, out}).second)
-		{
-			log().fatal(MF_ALIAS_ALREAD_EXISTS_1(alias));
-			throw nl_exception(MF_ALIAS_ALREAD_EXISTS_1(alias));
-		}
-	}
-
-	void nlparse_t::register_link_fqn(const pstring &sin, const pstring &sout)
-	{
-		detail::abstract_t::link_t temp(sin, sout);
+		detail::abstract_t::connection_t temp(sin, sout);
 		log().debug("link {1} <== {2}", sin, sout);
-		m_abstract.m_links.push_back(temp);
+		m_abstract.m_connections.push_back(temp);
 	}
 
 	bool nlparse_t::device_exists(const pstring &name) const
@@ -433,7 +455,7 @@ namespace netlist
 			pstring name = "log_" + ll;
 
 			register_dev("LOG", name);
-			register_link(name + ".I", ll);
+			register_connection(name + ".I", ll);
 		}
 	}
 
@@ -443,15 +465,15 @@ namespace netlist
 		pstring pin_fully_qualified_name = build_fqn(pin);
 		bool    found = false;
 
-		for (auto link = m_abstract.m_links.begin();
-			 link != m_abstract.m_links.end();)
+		for (auto link = m_abstract.m_connections.begin();
+			 link != m_abstract.m_connections.end();)
 		{
 			if ((link->first == pin_fully_qualified_name)
 				|| (link->second == pin_fully_qualified_name))
 			{
 				log().verbose("removing connection: {1} <==> {2}\n",
 							  link->first, link->second);
-				link = m_abstract.m_links.erase(link);
+				link = m_abstract.m_connections.erase(link);
 				found = true;
 			}
 			else
@@ -610,8 +632,9 @@ namespace netlist
 		do
 		{
 			ret = temp;
-			auto p = m_abstract.m_alias.find(ret);
-			temp = (p != m_abstract.m_alias.end() ? p->second : "");
+			auto p = m_abstract.m_aliases.find(ret);
+			temp = (p != m_abstract.m_aliases.end() ? p->second.references()
+													: "");
 		} while (!temp.empty() && temp != ret);
 
 		log().debug("{1}==>{2}\n", name, ret);
@@ -628,10 +651,10 @@ namespace netlist
 		{
 			ret = temp;
 			temp = "";
-			for (const auto &e : m_abstract.m_alias)
+			for (const auto &e : m_abstract.m_aliases)
 			{
 				// FIXME: this will resolve first one found
-				if (e.second == ret)
+				if (e.second.references() == ret)
 				{
 					temp = e.first;
 					break;
@@ -657,7 +680,7 @@ namespace netlist
 			}
 		}
 
-		for (const auto &t : m_abstract.m_alias)
+		for (const auto &t : m_abstract.m_aliases)
 		{
 			if (plib::startsWith(t.first, devname))
 			{
@@ -1175,6 +1198,7 @@ namespace netlist
 		//
 		// #include "netlist/devices/net_lib.h"
 		// NETLIST_START(charge_discharge)
+{
 		//     SOLVER(solver, 48000) // Fixed frequency solver
 		//     CLOCK(I, 200) // 200 Hz  clock as input, TTL logic output
 		//     RES(R, RES_K(1))
@@ -1185,7 +1209,7 @@ namespace netlist
 		//     NET_C(C.2, GND)
 		//
 		//     ALIAS(O, R.2) // Output O == C.1 == R.2
-		// // NETLIST_END()
+		// // }
 		//
 		// Just save the net list as /tmp/test1.cpp, run
 		// ./nltool --cmd=run -t 0.05 -l O -l I /tmp/test1.cpp
@@ -1193,10 +1217,10 @@ namespace netlist
 		//
 		// g++-7 (Ubuntu 7.4.0-1ubuntu1~16.04~ppa1) 7.4.0
 		//
-		while (!m_links.empty() && tries >  0)
+		while (!m_connections.empty() && tries >  0)
 		{
-			auto li = m_links.begin();
-			while (li != m_links.end())
+			auto li = m_connections.begin();
+			while (li != m_connections.end())
 			{
 				const pstring t1s = li->first;
 				const pstring t2s = li->second;
@@ -1204,24 +1228,24 @@ namespace netlist
 				detail::core_terminal_t *t2 = find_terminal(t2s);
 
 				if (connect(*t1, *t2))
-					li = m_links.erase(li);
+					li = m_connections.erase(li);
 				else
 					li++;
 			}
 			tries--;
 		}
 #else
-		while (!m_abstract.m_links.empty() && tries > 0)
+		while (!m_abstract.m_connections.empty() && tries > 0)
 		{
-			for (std::size_t i = 0; i < m_abstract.m_links.size();)
+			for (std::size_t i = 0; i < m_abstract.m_connections.size();)
 			{
-				const pstring            t1s(m_abstract.m_links[i].first);
-				const pstring            t2s(m_abstract.m_links[i].second);
+				const pstring t1s(m_abstract.m_connections[i].first);
+				const pstring t2s(m_abstract.m_connections[i].second);
 				detail::core_terminal_t *t1 = find_terminal(t1s);
 				detail::core_terminal_t *t2 = find_terminal(t2s);
 				if (connect(*t1, *t2))
-					m_abstract.m_links.erase(
-						m_abstract.m_links.begin()
+					m_abstract.m_connections.erase(
+						m_abstract.m_connections.begin()
 						+ plib::narrow_cast<std::ptrdiff_t>(i));
 				else
 					i++;
@@ -1231,7 +1255,7 @@ namespace netlist
 #endif
 		if (tries == 0)
 		{
-			for (auto &link : m_abstract.m_links)
+			for (auto &link : m_abstract.m_connections)
 				log().warning(MF_CONNECTING_1_TO_2(de_alias(link.first),
 												   de_alias(link.second)));
 

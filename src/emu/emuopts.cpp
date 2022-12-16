@@ -15,6 +15,7 @@
 #include "hashfile.h"
 
 #include "corestr.h"
+#include "path.h"
 
 #include <stack>
 
@@ -922,9 +923,12 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 								// we need to find a mountable image slot, but we need to ensure it is a slot
 								// for which we have not already distributed a part to
 								device_image_interface *image = software_list_device::find_mountable_image(
-									config,
-									swpart,
-									[&results](const device_image_interface &candidate) { return results.image.count(candidate.instance_name()) == 0; });
+										config,
+										swpart,
+										[&results] (const device_image_interface &candidate)
+										{
+											return results.image.count(candidate.instance_name()) == 0;
+										});
 
 								// did we find a slot to put this part into?
 								if (image != nullptr)
@@ -1050,7 +1054,7 @@ image_option &emu_options::image_option(const std::string &device_name)
 void emu_options::command_argument_processed()
 {
 	// some command line arguments require that the system name be set, so we can get slot options
-	if (command_arguments().size() == 1 && !core_iswildstr(command_arguments()[0].c_str()) &&
+	if (command_arguments().size() == 1 && !core_iswildstr(command_arguments()[0]) &&
 		(command() == "listdevices" || (command() == "listslots") || (command() == "listmedia") || (command() == "listsoftware")))
 	{
 		set_system_name(command_arguments()[0]);

@@ -326,9 +326,8 @@ void phantom_state::update_lcd(u8 select)
 
 void phantom_state::control_w(offs_t offset, u8 data)
 {
-	u8 lcd_prev = m_select;
-
 	// a0-a2,d1: 74259
+	u8 prev = m_select;
 	u8 mask = 1 << offset;
 	m_select = (m_select & ~mask) | ((data & 0x02) ? mask : 0);
 
@@ -342,7 +341,7 @@ void phantom_state::control_w(offs_t offset, u8 data)
 	m_rombank->set_entry(BIT(m_select, 6));
 
 	// 74259 Q7: lcd polarity
-	update_lcd(lcd_prev);
+	update_lcd(prev);
 }
 
 void chessterp_state::control_w(offs_t offset, u8 data)

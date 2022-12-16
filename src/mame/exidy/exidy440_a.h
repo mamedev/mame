@@ -45,7 +45,6 @@ private:
 		int start_counter;
 	};
 
-
 	/* channel_data structure holds info about each active sound channel */
 	struct sound_channel_data
 	{
@@ -53,7 +52,6 @@ private:
 		int offset;
 		int remaining;
 	};
-
 
 	/* sound_cache_entry structure contains info on each decoded sample */
 	struct sound_cache_entry
@@ -73,7 +71,6 @@ private:
 	uint8_t m_sound_command_ack;
 
 	uint8_t m_sound_banks[4];
-	//uint8_t m_m6844_data[0x20];
 	uint8_t m_sound_volume[0x10];
 	std::vector<int32_t> m_mixer_buffer_left;
 	std::vector<int32_t> m_mixer_buffer_right;

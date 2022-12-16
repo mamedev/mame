@@ -44,11 +44,6 @@ protected:
 private:
 	static constexpr unsigned MAX_COMMAND_SIZE = 4096;   // The maximum size of a command packet (the controller only has 5K of RAM...)
 
-	enum
-	{
-		TIMER_COMMAND
-	};
-
 	// Sector addressing scheme for Rev B/H drives used in various commands (Called a DADR in the docs)
 	struct dadr_t {
 		uint8_t address_msn_and_drive;// Most significant nibble: Most significant nibble of sector address, Least significant nibble: Drive #

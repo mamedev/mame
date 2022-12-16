@@ -276,7 +276,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	if (m == machine)
 	{
 		util::xml::data_node *parentnode = (util::xml::data_node *)[[[notification userInfo] objectForKey:@"MAMEDebugParentNode"] pointerValue];
-		util::xml::data_node *node = parentnode->add_child("window", nullptr);
+		util::xml::data_node *node = parentnode->add_child(osd::debugger::NODE_WINDOW, nullptr);
 		if (node)
 			[self saveConfigurationToNode:node];
 	}
@@ -285,19 +285,19 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	NSRect frame = [window frame];
-	node->set_attribute_float("position_x", frame.origin.x);
-	node->set_attribute_float("position_y", frame.origin.y);
-	node->set_attribute_float("size_x", frame.size.width);
-	node->set_attribute_float("size_y", frame.size.height);
+	node->set_attribute_float(osd::debugger::ATTR_WINDOW_POSITION_X, frame.origin.x);
+	node->set_attribute_float(osd::debugger::ATTR_WINDOW_POSITION_Y, frame.origin.y);
+	node->set_attribute_float(osd::debugger::ATTR_WINDOW_WIDTH, frame.size.width);
+	node->set_attribute_float(osd::debugger::ATTR_WINDOW_HEIGHT, frame.size.height);
 }
 
 
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	NSRect frame = [window frame];
-	frame.origin.x = node->get_attribute_float("position_x", frame.origin.x);
-	frame.origin.y = node->get_attribute_float("position_y", frame.origin.y);
-	frame.size.width = node->get_attribute_float("size_x", frame.size.width);
-	frame.size.height = node->get_attribute_float("size_y", frame.size.height);
+	frame.origin.x = node->get_attribute_float(osd::debugger::ATTR_WINDOW_POSITION_X, frame.origin.x);
+	frame.origin.y = node->get_attribute_float(osd::debugger::ATTR_WINDOW_POSITION_Y, frame.origin.y);
+	frame.size.width = node->get_attribute_float(osd::debugger::ATTR_WINDOW_WIDTH, frame.size.width);
+	frame.size.height = node->get_attribute_float(osd::debugger::ATTR_WINDOW_HEIGHT, frame.size.height);
 
 	NSSize min = [window minSize];
 	frame.size.width = std::max(frame.size.width, min.width);
@@ -493,15 +493,17 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
-	node->add_child("expression", [[self expression] UTF8String]);
+	node->add_child(osd::debugger::NODE_WINDOW_EXPRESSION, [[self expression] UTF8String]);
+	[history saveConfigurationToNode:node];
 }
 
 
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	[super restoreConfigurationFromNode:node];
-	util::xml::data_node const *const expr = node->get_child("expression");
+	util::xml::data_node const *const expr = node->get_child(osd::debugger::NODE_WINDOW_EXPRESSION);
 	if (expr && expr->get_value())
 		[self setExpression:[NSString stringWithUTF8String:expr->get_value()]];
+	[history restoreConfigurationFromNode:node];
 }
 
 @end

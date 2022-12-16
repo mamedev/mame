@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_TIMEX_H
-#define MAME_INCLUDES_TIMEX_H
+#ifndef MAME_SINCLAIR_TIMEX_H
+#define MAME_SINCLAIR_TIMEX_H
 
 #pragma once
 
@@ -100,4 +100,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_TIMEX_H
+#endif // MAME_SINCLAIR_TIMEX_H

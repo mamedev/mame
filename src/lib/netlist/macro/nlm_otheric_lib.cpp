@@ -20,6 +20,7 @@
  */
 
 static NETLIST_START(MC14584B_DIP)
+{
 	MC14584B_GATE(A)
 	MC14584B_GATE(B)
 	MC14584B_GATE(C)
@@ -39,7 +40,7 @@ static NETLIST_START(MC14584B_DIP)
 		A.VSS,/*   VSS |7            8| Y4   */ D.Q
 			  /*       +--------------+      */
 	)
-NETLIST_END()
+}
 
 //- Identifier:  NE566_DIP
 //- Title: NE566 Voltage Controlled Oscillator
@@ -57,6 +58,7 @@ NETLIST_END()
 //.
 
 static NETLIST_START(NE566_DIP)
+{
 
 	VCVS(VI, 1)
 	CCCS(CI1, -1)
@@ -126,7 +128,7 @@ static NETLIST_START(NE566_DIP)
 	NET_C(COMP.VCC, FO.A1)
 
 
-NETLIST_END()
+}
 
 //- Identifier:  NE555_DIP
 //- Title: NE555 PRECISION TIMERS
@@ -154,6 +156,7 @@ NETLIST_END()
 //-    |High | >1/3 VDD      | <2/3 VDD        | As previously established||
 //-
 static NETLIST_START(NE555_DIP)
+{
 
 	NE555(A)
 
@@ -166,9 +169,10 @@ static NETLIST_START(NE555_DIP)
 	ALIAS(7, A.DISCH)    // Pin 7
 	ALIAS(8, A.VCC)      // Pin 8
 
-NETLIST_END()
+}
 
 static NETLIST_START(MC1455P_DIP)
+{
 
 	MC1455P(A)
 
@@ -181,17 +185,19 @@ static NETLIST_START(MC1455P_DIP)
 	ALIAS(7, A.DISCH)    // Pin 7
 	ALIAS(8, A.VCC)      // Pin 8
 
-NETLIST_END()
+}
 
-static TRUTHTABLE_START(MC14584B_GATE, 1, 1, "")
+static TRUTH_TABLE(MC14584B_GATE, 1, 1, "")
+{
 	TT_HEAD(" A | Q ")
 	TT_LINE(" 0 | 1 |100")
 	TT_LINE(" 1 | 0 |100")
 	// 2.1V negative going and 2.7V positive going at 5V
 	TT_FAMILY("FAMILY(TYPE=CMOS IVL=0.42 IVH=0.54 OVL=0.05 OVH=0.05 ORL=10.0 ORH=10.0)")
-TRUTHTABLE_END()
+}
 
 NETLIST_START(otheric_lib)
+{
 
 	TRUTHTABLE_ENTRY(MC14584B_GATE)
 
@@ -199,5 +205,5 @@ NETLIST_START(otheric_lib)
 	LOCAL_LIB_ENTRY(NE566_DIP)
 	LOCAL_LIB_ENTRY(NE555_DIP)
 	LOCAL_LIB_ENTRY(MC1455P_DIP)
-NETLIST_END()
+}
 

@@ -10,7 +10,6 @@
 
 #include "ioprocs.h"
 
-#include "corefile.h"
 #include "ioprocsfill.h"
 
 #include "osdfile.h"

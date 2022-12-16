@@ -14,21 +14,21 @@
 #ifndef __DRAWBGFX_CHAIN_MANAGER__
 #define __DRAWBGFX_CHAIN_MANAGER__
 
-#include <vector>
-#include <map>
-#include <string>
-
 #include "texturemanager.h"
 #include "targetmanager.h"
 #include "effectmanager.h"
-#include "../frontend/mame/ui/menuitem.h"
-#include "render.h"
+
+#include <map>
+#include <string>
+#include <vector>
 
 class running_machine;
 class osd_window;
 struct slider_state;
 class slider_dirty_notifier;
 class render_primitive;
+
+namespace ui { class menu_item; }
 
 class bgfx_chain;
 class bgfx_slider;
@@ -81,19 +81,7 @@ public:
 		{
 		}
 
-		screen_prim(render_primitive *prim)
-		{
-			m_prim = prim;
-			m_screen_width = (uint16_t)floorf(prim->get_full_quad_width() + 0.5f);
-			m_screen_height = (uint16_t)floorf(prim->get_full_quad_height() + 0.5f);
-			m_quad_width = (uint16_t)floorf(prim->get_quad_width() + 0.5f);
-			m_quad_height = (uint16_t)floorf(prim->get_quad_height() + 0.5f);
-			m_tex_width = (float)prim->texture.width;
-			m_tex_height = (float)prim->texture.height;
-			m_rowpixels = prim->texture.rowpixels;
-			m_palette_length = prim->texture.palette_length;
-			m_flags = prim->flags;
-		}
+		screen_prim(render_primitive *prim);
 
 		render_primitive *m_prim;
 		uint16_t m_screen_width;

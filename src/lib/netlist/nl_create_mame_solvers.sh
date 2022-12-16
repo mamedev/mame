@@ -1,7 +1,7 @@
 #!/bin/sh
 
 GENERATED=src/lib/netlist/generated/static_solvers.cpp
-FILES=`ls src/mame/machine/nl_*.cpp src/mame/audio/nl_*.cpp | grep -v pongdoubles`
+FILES=`find src/mame -name "nl_*.cpp" | grep -v pongdoubles`
 
 OUTDIR=/tmp/static_syms
 

@@ -17,6 +17,7 @@
 namespace netlist
 {
 	// nothing in here. This should not change.
+
 } // namespace netlist
 
 #endif // NLBASE_H_

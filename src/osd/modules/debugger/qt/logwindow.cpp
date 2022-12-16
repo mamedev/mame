@@ -1,17 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
 #include "emu.h"
-#include <QtWidgets/QVBoxLayout>
-
 #include "logwindow.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/dvdisasm.h"
 
+#include "util/xmlfile.h"
 
-LogWindow::LogWindow(running_machine &machine, QWidget *parent) :
-	WindowQt(machine, nullptr)
+#include <QtWidgets/QVBoxLayout>
+
+
+namespace osd::debugger::qt {
+
+LogWindow::LogWindow(DebuggerQt &debugger, QWidget *parent) :
+	WindowQt(debugger, nullptr)
 {
 	setWindowTitle("Debug: Machine Log");
 
@@ -44,28 +48,21 @@ LogWindow::~LogWindow()
 }
 
 
-//=========================================================================
-//  LogWindowQtConfig
-//=========================================================================
-void LogWindowQtConfig::buildFromQWidget(QWidget *widget)
+void LogWindow::restoreConfiguration(util::xml::data_node const &node)
 {
-	WindowQtConfig::buildFromQWidget(widget);
+	WindowQt::restoreConfiguration(node);
+
+	m_logView->restoreConfigurationFromNode(node);
 }
 
 
-void LogWindowQtConfig::applyToQWidget(QWidget *widget)
+void LogWindow::saveConfigurationToNode(util::xml::data_node &node)
 {
-	WindowQtConfig::applyToQWidget(widget);
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_ERROR_LOG_VIEWER);
+
+	m_logView->saveConfigurationToNode(node);
 }
 
-
-void LogWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-}
-
-
-void LogWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
-}
+} // namespace osd::debugger::qt

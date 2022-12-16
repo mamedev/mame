@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Zsolt Vasvari
+// copyright-holders: Zsolt Vasvari
+
 /***************************************************************************
 
 Marine Boy hardware memory map (preliminary)
@@ -38,16 +39,549 @@ write
 ***************************************************************************/
 
 #include "emu.h"
-#include "marineb.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
-#define MASTER_CLOCK (XTAL(12'000'000))
-#define CPU_CLOCK (MASTER_CLOCK/4)
-#define SOUND_CLOCK (MASTER_CLOCK/8)
+
+namespace {
+
+class marineb_state : public driver_device
+{
+public:
+	marineb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"),
+		m_system(*this, "SYSTEM"),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_outlatch(*this, "outlatch"),
+		m_watchdog(*this, "watchdog")
+	{ }
+
+	void springer(machine_config &config);
+	void wanted(machine_config &config);
+	void hopprobo(machine_config &config);
+	void marineb(machine_config &config);
+	void bcruzm12(machine_config &config);
+	void hoccer(machine_config &config);
+	void changes(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_ioport m_system;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_palette_bank = 0;
+	uint8_t m_column_scroll = 0;
+	uint8_t m_flipscreen_x = 0;
+	uint8_t m_flipscreen_y = 0;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_outlatch;
+	required_device<watchdog_timer_device> m_watchdog;
+
+	bool m_irq_mask = false;
+
+	// common methods
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void column_scroll_w(uint8_t data);
+	void palette_bank_0_w(uint8_t data);
+	void palette_bank_1_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const;
+	void set_tilemap_scrolly(int cols);
+
+	// game specific screen update methods
+	uint32_t screen_update_marineb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_changes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_springer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hoccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hopprobo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+
+	// marineb, changes, springer, hoccer, hopprobo
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	uint8_t system_watchdog_r();
+	DECLARE_WRITE_LINE_MEMBER(marineb_vblank_irq);
+	void marineb_map(address_map &map);
+	void marineb_io_map(address_map &map);
+
+	// wanted, bcruzm12
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(wanted_vblank_irq);
+	void wanted_map(address_map &map);
+	void wanted_io_map(address_map &map);
+};
+
+
+// video
+
+void marineb_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3) & 0x01;
+		bit1 = BIT(color_prom[i + palette.entries()], 0);
+		bit2 = BIT(color_prom[i + palette.entries()], 1);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(color_prom[i + palette.entries()], 2);
+		bit2 = BIT(color_prom[i + palette.entries()], 3);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(marineb_state::get_tile_info)
+{
+	uint8_t const code = m_videoram[tile_index];
+	uint8_t const col = m_colorram[tile_index];
+
+	tileinfo.set(0,
+					code | ((col & 0xc0) << 2),
+					(col & 0x0f) | (m_palette_bank << 4),
+					TILE_FLIPXY((col >> 4) & 0x03));
+}
+
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+void marineb_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(marineb_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_cols(32);
+
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_column_scroll));
+	save_item(NAME(m_flipscreen_x));
+	save_item(NAME(m_flipscreen_y));
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+void marineb_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void marineb_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void marineb_state::column_scroll_w(uint8_t data)
+{
+	m_column_scroll = data;
+}
+
+
+void marineb_state::palette_bank_0_w(uint8_t data)
+{
+	uint8_t const old = m_palette_bank;
+
+	m_palette_bank = (m_palette_bank & 0x02) | (data & 0x01);
+
+	if (old != m_palette_bank)
+	{
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+
+void marineb_state::palette_bank_1_w(uint8_t data)
+{
+	uint8_t const old = m_palette_bank;
+
+	m_palette_bank = (m_palette_bank & 0x01) | ((data & 0x01) << 1);
+
+	if (old != m_palette_bank)
+	{
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+
+WRITE_LINE_MEMBER(marineb_state::flipscreen_x_w)
+{
+	m_flipscreen_x = state;
+	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
+}
+
+
+WRITE_LINE_MEMBER(marineb_state::flipscreen_y_w)
+{
+	m_flipscreen_y = state;
+	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
+}
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+void marineb_state::set_tilemap_scrolly(int cols)
+{
+	int col;
+
+	for (col = 0; col < cols; col++)
+		m_bg_tilemap->set_scrolly(col, m_column_scroll);
+
+	for (; col < 32; col++)
+		m_bg_tilemap->set_scrolly(col, 0);
+}
+
+
+uint32_t marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	set_tilemap_scrolly(24);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw the sprites
+	for (int offs = 0x0f; offs >= 0; offs--)
+	{
+		if ((offs == 0) || (offs == 2))
+			continue;  // no sprites here
+
+		int offs2;
+
+		if (offs < 8)
+			offs2 = 0x0018 + offs;
+		else
+			offs2 = 0x03d8 - 8 + offs;
+
+		int code = m_videoram[offs2];
+		int sx = m_videoram[offs2 + 0x20];
+		int sy = m_colorram[offs2];
+		int const col = (m_colorram[offs2 + 0x20] & 0x0f) + 16 * m_palette_bank;
+		int const flipx = code & 0x02;
+		int flipy = !(code & 0x01);
+
+		int gfx;
+
+		if (offs < 4)
+		{
+			// big sprite
+			gfx = 2;
+			code = (code >> 4) | ((code & 0x0c) << 2);
+		}
+		else
+		{
+			// small sprite
+			gfx = 1;
+			code >>= 2;
+		}
+
+		if (!m_flipscreen_y)
+		{
+			sy = 256 - m_gfxdecode->gfx(gfx)->width() - sy;
+			flipy = !flipy;
+		}
+
+		if (m_flipscreen_x)
+		{
+			sx++;
+		}
+
+		m_gfxdecode->gfx(gfx)->transpen(bitmap, cliprect,
+				code,
+				col,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+	return 0;
+}
+
+
+uint32_t marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int sx, sy, code, col, flipx, flipy;
+
+	set_tilemap_scrolly(26);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw the small sprites
+	for (int offs = 0x05; offs >= 0; offs--)
+	{
+		int const offs2 = 0x001a + offs;
+
+		code = m_videoram[offs2];
+		sx = m_videoram[offs2 + 0x20];
+		sy = m_colorram[offs2];
+		col = (m_colorram[offs2 + 0x20] & 0x0f) + 16 * m_palette_bank;
+		flipx = code & 0x02;
+		flipy = !(code & 0x01);
+
+		if (!m_flipscreen_y)
+		{
+			sy = 256 - m_gfxdecode->gfx(1)->width() - sy;
+			flipy = !flipy;
+		}
+
+		if (m_flipscreen_x)
+		{
+			sx++;
+		}
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				code >> 2,
+				col,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+
+	// draw the big sprite
+
+	code = m_videoram[0x3df];
+	sx = m_videoram[0x3ff];
+	sy = m_colorram[0x3df];
+	col = m_colorram[0x3ff];
+	flipx = code & 0x02;
+	flipy = !(code & 0x01);
+
+	if (!m_flipscreen_y)
+	{
+		sy = 256 - m_gfxdecode->gfx(2)->width() - sy;
+		flipy = !flipy;
+	}
+
+	if (m_flipscreen_x)
+	{
+		sx++;
+	}
+
+	code >>= 4;
+
+	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+			code,
+			col,
+			flipx, flipy,
+			sx, sy, 0);
+
+	// draw again for wrap around
+
+	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+			code,
+			col,
+			flipx, flipy,
+			sx - 256, sy, 0);
+	return 0;
+}
+
+
+uint32_t marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	set_tilemap_scrolly(0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw the sprites
+	for (int offs = 0x0f; offs >= 0; offs--)
+	{
+		if ((offs == 0) || (offs == 2))
+			continue;  // no sprites here
+
+		int const offs2 = 0x0010 + offs;
+
+		int code = m_videoram[offs2];
+		int sx = 240 - m_videoram[offs2 + 0x20];
+		int sy = m_colorram[offs2];
+		int const col = (m_colorram[offs2 + 0x20] & 0x0f) + 16 * m_palette_bank;
+		int const flipx = !(code & 0x02);
+		int flipy = !(code & 0x01);
+
+		int gfx;
+
+		if (offs < 4)
+		{
+			// big sprite
+			sx -= 0x10;
+			gfx = 2;
+			code = (code >> 4) | ((code & 0x0c) << 2);
+		}
+		else
+		{
+			// small sprite
+			gfx = 1;
+			code >>= 2;
+		}
+
+		if (!m_flipscreen_y)
+		{
+			sy = 256 - m_gfxdecode->gfx(gfx)->width() - sy;
+			flipy = !flipy;
+		}
+
+		if (!m_flipscreen_x)
+		{
+			sx--;
+		}
+
+		m_gfxdecode->gfx(gfx)->transpen(bitmap, cliprect,
+				code,
+				col,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+	return 0;
+}
+
+
+uint32_t marineb_state::screen_update_hoccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	set_tilemap_scrolly(0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw the sprites
+	for (int offs = 0x07; offs >= 0; offs--)
+	{
+		int const offs2 = 0x0018 + offs;
+
+		int const code = m_spriteram[offs2];
+		int sx = m_spriteram[offs2 + 0x20];
+		int sy = m_colorram[offs2];
+		int const col = m_colorram[offs2 + 0x20];
+		int flipx = code & 0x02;
+		int flipy = !(code & 0x01);
+
+		if (!m_flipscreen_y)
+		{
+			sy = 256 - m_gfxdecode->gfx(1)->width() - sy;
+			flipy = !flipy;
+		}
+
+		if (m_flipscreen_x)
+		{
+			sx = 256 - m_gfxdecode->gfx(1)->width() - sx;
+			flipx = !flipx;
+		}
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				code >> 2,
+				col,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+	return 0;
+}
+
+
+uint32_t marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	set_tilemap_scrolly(0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw the sprites
+	for (int offs = 0x0f; offs >= 0; offs--)
+	{
+		if ((offs == 0) || (offs == 2))
+			continue;  // no sprites here
+
+		int const offs2 = 0x0010 + offs;
+
+		int code = m_videoram[offs2];
+		int sx = m_videoram[offs2 + 0x20];
+		int sy = m_colorram[offs2];
+		int const col = (m_colorram[offs2 + 0x20] & 0x0f) + 16 * m_palette_bank;
+		int const flipx = code & 0x02;
+		int flipy = !(code & 0x01);
+
+		int gfx;
+
+		if (offs < 4)
+		{
+			// big sprite
+			gfx = 2;
+			code = (code >> 4) | ((code & 0x0c) << 2);
+		}
+		else
+		{
+			// small sprite
+			gfx = 1;
+			code >>= 2;
+		}
+
+		if (!m_flipscreen_y)
+		{
+			sy = 256 - m_gfxdecode->gfx(gfx)->width() - sy;
+			flipy = !flipy;
+		}
+
+		if (!m_flipscreen_x)
+		{
+			sx--;
+		}
+
+		m_gfxdecode->gfx(gfx)->transpen(bitmap, cliprect,
+				code,
+				col,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+	return 0;
+}
+
+
+// machine
 
 void marineb_state::machine_reset()
 {
@@ -88,12 +622,12 @@ void marineb_state::marineb_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(FUNC(marineb_state::marineb_videoram_w)).share("videoram");
-	map(0x8c00, 0x8c3f).ram().share("spriteram");  /* Hoccer only */
-	map(0x9000, 0x93ff).ram().w(FUNC(marineb_state::marineb_colorram_w)).share("colorram");
-	map(0x9800, 0x9800).w(FUNC(marineb_state::marineb_column_scroll_w));
-	map(0x9a00, 0x9a00).w(FUNC(marineb_state::marineb_palette_bank_0_w));
-	map(0x9c00, 0x9c00).w(FUNC(marineb_state::marineb_palette_bank_1_w));
+	map(0x8800, 0x8bff).ram().w(FUNC(marineb_state::videoram_w)).share(m_videoram);
+	map(0x8c00, 0x8c3f).ram().share(m_spriteram);  // Hoccer only
+	map(0x9000, 0x93ff).ram().w(FUNC(marineb_state::colorram_w)).share(m_colorram);
+	map(0x9800, 0x9800).w(FUNC(marineb_state::column_scroll_w));
+	map(0x9a00, 0x9a00).w(FUNC(marineb_state::palette_bank_0_w));
+	map(0x9c00, 0x9c00).w(FUNC(marineb_state::palette_bank_1_w));
 	map(0xa000, 0xa007).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P2");
 	map(0xa800, 0xa800).portr("P1");
@@ -143,9 +677,9 @@ static INPUT_PORTS_START( marineb )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4,5") /* coinage doesn't work?? - always 1C / 1C or Free Play?? */
+	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4,5") // coinage doesn't work?? - always 1C / 1C or Free Play??
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x14, DEF_STR( 2C_1C ) ) /* This is the correct Coinage according to manual */
+//  PORT_DIPSETTING(    0x14, DEF_STR( 2C_1C ) ) // This is the correct Coinage according to manual
 //  PORT_DIPSETTING(    0x18, DEF_STR( 3C_2C ) )
 //  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
@@ -193,8 +727,8 @@ static INPUT_PORTS_START( changes )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4") /* coinage doesn't work?? - always 1C / 1C or Free Play?? */
-//  PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) ) /* This is the correct Coinage according to manual */
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4") // coinage doesn't work?? - always 1C / 1C or Free Play??
+//  PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) ) // This is the correct Coinage according to manual
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 //  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
@@ -313,7 +847,7 @@ static INPUT_PORTS_START( wanted )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("SYSTEM")    /* we use same tags as above, to simplify reads */
+	PORT_START("SYSTEM")    // we use same tags as above, to simplify reads
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -385,7 +919,7 @@ static INPUT_PORTS_START( bcruzm12 )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
-	PORT_START("SYSTEM")    /* we use same tags as above, to simplify reads */
+	PORT_START("SYSTEM")    // we use same tags as above, to simplify reads
 	PORT_DIPNAME( 0x03, 0x01, "2nd Bonus Life" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x01, "60000" )
@@ -417,56 +951,56 @@ INPUT_PORTS_END
 
 static const gfx_layout marineb_charlayout =
 {
-	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
-	2,      /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 }, /* bits are packed in groups of four */
+	8,8,    // 8*8 characters
+	512,    // 512 characters
+	2,      // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes for 4 pixels are packed into one byte
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 }, // bits are packed in groups of four
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8    /* every char takes 16 bytes */
+	16*8    // every char takes 16 bytes
 };
 
 static const gfx_layout wanted_charlayout =
 {
-	8,8,    /* 8*8 characters */
-	1024,   /* 1024 characters */
-	2,      /* 2 bits per pixel */
-	{ 4, 0 },   /* the two bitplanes for 4 pixels are packed into one byte */
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 }, /* bits are packed in groups of four */
+	8,8,    // 8*8 characters
+	1024,   // 1024 characters
+	2,      // 2 bits per pixel
+	{ 4, 0 },   // the two bitplanes for 4 pixels are packed into one byte
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 }, // bits are packed in groups of four
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8    /* every char takes 16 bytes */
+	16*8    // every char takes 16 bytes
 };
 
 static const gfx_layout hopprobo_charlayout =
 {
-	8,8,    /* 8*8 characters */
-	1024,   /* 1024 characters */
-	2,      /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 }, /* bits are packed in groups of four */
+	8,8,    // 8*8 characters
+	1024,   // 1024 characters
+	2,      // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes for 4 pixels are packed into one byte
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 }, // bits are packed in groups of four
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8    /* every char takes 16 bytes */
+	16*8    // every char takes 16 bytes
 };
 
 static const gfx_layout marineb_small_spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	64,     /* 64 sprites */
-	2,      /* 2 bits per pixel */
-	{ 0, 256*32*8 },    /* the two bitplanes are separated */
+	16,16,  // 16*16 sprites
+	64,     // 64 sprites
+	2,      // 2 bits per pixel
+	{ 0, 256*32*8 },    // the two bitplanes are separated
 	{     0,     1,     2,     3,     4,     5,     6,     7,
 		8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
 		16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8    // every sprite takes 32 consecutive bytes
 };
 
 static const gfx_layout marineb_big_spritelayout =
 {
-	32,32,  /* 32*32 sprites */
-	64,     /* 64 sprites */
-	2,      /* 2 bits per pixel */
-	{ 0, 256*32*8 },    /* the two bitplanes are separated */
+	32,32,  // 32*32 sprites
+	64,     // 64 sprites
+	2,      // 2 bits per pixel
+	{ 0, 256*32*8 },    // the two bitplanes are separated
 	{      0,      1,      2,      3,      4,      5,      6,      7,
 		8*8+0,  8*8+1,  8*8+2,  8*8+3,  8*8+4,  8*8+5,  8*8+6,  8*8+7,
 		32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
@@ -475,28 +1009,28 @@ static const gfx_layout marineb_big_spritelayout =
 		16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,
 		64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
 		80*8, 81*8, 82*8, 83*8, 84*8, 85*8, 86*8, 87*8 },
-	4*32*8  /* every sprite takes 128 consecutive bytes */
+	4*32*8  // every sprite takes 128 consecutive bytes
 };
 
 static const gfx_layout changes_small_spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	64,     /* 64 sprites */
-	2,      /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
+	16,16,  // 16*16 sprites
+	64,     // 64 sprites
+	2,      // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes for 4 pixels are packed into one byte
 	{      0,      1,      2,      3,  8*8+0,  8*8+1,  8*8+2,  8*8+3,
 		16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
 		32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8    /* every sprite takes 64 consecutive bytes */
+	64*8    // every sprite takes 64 consecutive bytes
 };
 
 static const gfx_layout changes_big_spritelayout =
 {
-	32,32,  /* 32*3 sprites */
-	16,     /* 32 sprites */
-	2,      /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
+	32,32,  // 32*3 sprites
+	16,     // 32 sprites
+	2,      // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes for 4 pixels are packed into one byte
 	{      0,      1,      2,      3,  8*8+0,  8*8+1,  8*8+2,  8*8+3,
 		16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3,
 		64*8+0, 64*8+1, 64*8+2, 64*8+3, 72*8+0, 72*8+1, 72*8+2, 72*8+3,
@@ -505,37 +1039,37 @@ static const gfx_layout changes_big_spritelayout =
 		32*8,  33*8,  34*8,  35*8,  36*8,  37*8,  38*8,  39*8,
 		128*8, 129*8, 130*8, 131*8, 132*8, 133*8, 134*8, 135*8,
 		160*8, 161*8, 162*8, 163*8, 164*8, 165*8, 166*8, 167*8 },
-	4*64*8  /* every sprite takes 256 consecutive bytes */
+	4*64*8  // every sprite takes 256 consecutive bytes
 };
 
 
 static GFXDECODE_START( gfx_marineb )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, marineb_charlayout,          0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_small_spritelayout,  0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
+	GFXDECODE_ENTRY( "tiles",   0x0000, marineb_charlayout,          0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, marineb_small_spritelayout,  0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_wanted )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, wanted_charlayout,           0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_small_spritelayout,  0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
+	GFXDECODE_ENTRY( "tiles",   0x0000, wanted_charlayout,           0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, marineb_small_spritelayout,  0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_changes )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, marineb_charlayout,          0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, changes_small_spritelayout,  0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x1000, changes_big_spritelayout,    0, 64 )
+	GFXDECODE_ENTRY( "tiles",   0x0000, marineb_charlayout,          0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, changes_small_spritelayout,  0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0x1000, changes_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_hoccer )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, marineb_charlayout,          0, 16 )   /* no palette banks */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, changes_small_spritelayout,  0, 16 )   /* no palette banks */
+	GFXDECODE_ENTRY( "tiles",   0x0000, marineb_charlayout,          0, 16 )   // no palette banks
+	GFXDECODE_ENTRY( "sprites", 0x0000, changes_small_spritelayout,  0, 16 )   // no palette banks
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_hopprobo )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, hopprobo_charlayout,         0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_small_spritelayout,  0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
+	GFXDECODE_ENTRY( "tiles",   0x0000, hopprobo_charlayout,         0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, marineb_small_spritelayout,  0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
 WRITE_LINE_MEMBER(marineb_state::marineb_vblank_irq)
@@ -551,10 +1085,14 @@ WRITE_LINE_MEMBER(marineb_state::wanted_vblank_irq)
 }
 
 
+static constexpr XTAL MASTER_CLOCK = XTAL(12'000'000);
+static constexpr XTAL CPU_CLOCK = MASTER_CLOCK / 4;
+static constexpr XTAL SOUND_CLOCK = MASTER_CLOCK / 8;
+
 void marineb_state::marineb(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, CPU_CLOCK);   /* 3 MHz? */
+	// basic machine hardware
+	Z80(config, m_maincpu, CPU_CLOCK);   // 3 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &marineb_state::marineb_map);
 	m_maincpu->set_addrmap(AS_IO, &marineb_state::marineb_io_map);
 
@@ -565,10 +1103,10 @@ void marineb_state::marineb(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 16);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000)   /* frames per second, vblank duration */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000)); // frames per second, vblank duration
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(marineb_state::screen_update_marineb));
@@ -576,9 +1114,9 @@ void marineb_state::marineb(machine_config &config)
 	screen.screen_vblank().set(FUNC(marineb_state::marineb_vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_marineb);
-	PALETTE(config, m_palette, FUNC(marineb_state::marineb_palette), 256);
+	PALETTE(config, m_palette, FUNC(marineb_state::palette), 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "ay1", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -588,7 +1126,7 @@ void marineb_state::changes(machine_config &config)
 {
 	marineb(config);
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_changes);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_changes));
 }
@@ -609,7 +1147,7 @@ void marineb_state::hoccer(machine_config &config)
 {
 	marineb(config);
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_hoccer);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_hoccer));
 }
@@ -619,13 +1157,13 @@ void marineb_state::wanted(machine_config &config)
 {
 	marineb(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &marineb_state::wanted_map);
 	m_maincpu->set_addrmap(AS_IO, &marineb_state::wanted_io_map);
 
 	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::irq_mask_w));
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_wanted);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_springer));
 	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(marineb_state::wanted_vblank_irq));
@@ -641,7 +1179,7 @@ void marineb_state::hopprobo(machine_config &config)
 {
 	marineb(config);
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_hopprobo);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_hopprobo));
 }
@@ -669,16 +1207,16 @@ ROM_START( marineb )
 	ROM_LOAD( "marineb.4",     0x3000, 0x1000, CRC(a157a283) SHA1(741e44c75636e5349ad43308076e1a8533255711) )
 	ROM_LOAD( "marineb.5",     0x4000, 0x1000, CRC(9ffff9c0) SHA1(55fa22f28e56c69cee50d4054206cb7f63e24590) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "marineb.6",     0x0000, 0x2000, CRC(ee53ec2e) SHA1(a8aab0ad70a20884e30420a6956b503cf7fdfbb8) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "marineb.8",     0x0000, 0x2000, CRC(dc8bc46c) SHA1(5ac945d7632dbc24a47d4dd8816b931b5615e2cd) )
 	ROM_LOAD( "marineb.7",     0x2000, 0x2000, CRC(9d2e19ab) SHA1(a64460c9222447cc63094350f910a9f73c423edd) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "marineb.1b",    0x0000, 0x0100, CRC(f32d9472) SHA1(b965eabb313cdfa0d10f8f25f659e20b0abe9a97) ) /* palette low 4 bits */
-	ROM_LOAD( "marineb.1c",    0x0100, 0x0100, CRC(93c69d3e) SHA1(d13720fa4947e5058d4d699990b9a731e25e5595) ) /* palette high 4 bits */
+	ROM_LOAD( "marineb.1b",    0x0000, 0x0100, CRC(f32d9472) SHA1(b965eabb313cdfa0d10f8f25f659e20b0abe9a97) ) // palette low 4 bits
+	ROM_LOAD( "marineb.1c",    0x0100, 0x0100, CRC(93c69d3e) SHA1(d13720fa4947e5058d4d699990b9a731e25e5595) ) // palette high 4 bits
 ROM_END
 
 ROM_START( changes )
@@ -689,15 +1227,15 @@ ROM_START( changes )
 	ROM_LOAD( "changes.4",     0x3000, 0x1000, CRC(a8e9aa22) SHA1(fbccf017851eb099960ad51ef3060a16bc0107a5) )
 	ROM_LOAD( "changes.5",     0x4000, 0x1000, CRC(f4198e9e) SHA1(4a9aea2b38d3bf093d9e97c884a7a9d16c203a46) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "changes.7",     0x0000, 0x2000, CRC(2204194e) SHA1(97ee40dd804158e92a2a1034f8e910f1057a7b54) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "changes.6",     0x0000, 0x2000, CRC(985c9db4) SHA1(d95a8794b96aec9133fd49b7d5724c161c5478bf) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "changes.1b",    0x0000, 0x0100, CRC(f693c153) SHA1(463426b580fa02f00baf2fff9f42d34b52bd6be4) ) /* palette low 4 bits */
-	ROM_LOAD( "changes.1c",    0x0100, 0x0100, CRC(f8331705) SHA1(cbead7ed85f96219af14b6552301906f32260b69) ) /* palette high 4 bits */
+	ROM_LOAD( "changes.1b",    0x0000, 0x0100, CRC(f693c153) SHA1(463426b580fa02f00baf2fff9f42d34b52bd6be4) ) // palette low 4 bits
+	ROM_LOAD( "changes.1c",    0x0100, 0x0100, CRC(f8331705) SHA1(cbead7ed85f96219af14b6552301906f32260b69) ) // palette high 4 bits
 ROM_END
 
 ROM_START( changesa )
@@ -708,15 +1246,15 @@ ROM_START( changesa )
 	ROM_LOAD( "changes.4",     0x3000, 0x1000, CRC(a8e9aa22) SHA1(fbccf017851eb099960ad51ef3060a16bc0107a5) )
 	ROM_LOAD( "changes3.5",    0x4000, 0x1000, CRC(c197e64a) SHA1(86b9f5f51f208bc9cdda3d13176147dbcafdc913) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "changes.7",     0x0000, 0x2000, CRC(2204194e) SHA1(97ee40dd804158e92a2a1034f8e910f1057a7b54) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "changes.6",     0x0000, 0x2000, CRC(985c9db4) SHA1(d95a8794b96aec9133fd49b7d5724c161c5478bf) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "changes.1b",    0x0000, 0x0100, CRC(f693c153) SHA1(463426b580fa02f00baf2fff9f42d34b52bd6be4) ) /* palette low 4 bits */
-	ROM_LOAD( "changes.1c",    0x0100, 0x0100, CRC(f8331705) SHA1(cbead7ed85f96219af14b6552301906f32260b69) ) /* palette high 4 bits */
+	ROM_LOAD( "changes.1b",    0x0000, 0x0100, CRC(f693c153) SHA1(463426b580fa02f00baf2fff9f42d34b52bd6be4) ) // palette low 4 bits
+	ROM_LOAD( "changes.1c",    0x0100, 0x0100, CRC(f8331705) SHA1(cbead7ed85f96219af14b6552301906f32260b69) ) // palette high 4 bits
 ROM_END
 
 ROM_START( looper )
@@ -727,15 +1265,15 @@ ROM_START( looper )
 	ROM_LOAD( "changes.4",     0x3000, 0x1000, CRC(a8e9aa22) SHA1(fbccf017851eb099960ad51ef3060a16bc0107a5) )
 	ROM_LOAD( "changes.5",     0x4000, 0x1000, CRC(f4198e9e) SHA1(4a9aea2b38d3bf093d9e97c884a7a9d16c203a46) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "looper_7.bin",  0x0000, 0x2000, CRC(71a89975) SHA1(798b50af7348b20487c1c37a3e1b9b26585d50f6) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "looper_6.bin",  0x0000, 0x2000, CRC(1f3f70c2) SHA1(c3c04892961e83e3be7773fca8304651b98046cf) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "changes.1b",    0x0000, 0x0100, CRC(f693c153) SHA1(463426b580fa02f00baf2fff9f42d34b52bd6be4) ) /* palette low 4 bits */
-	ROM_LOAD( "changes.1c",    0x0100, 0x0100, CRC(f8331705) SHA1(cbead7ed85f96219af14b6552301906f32260b69) ) /* palette high 4 bits */
+	ROM_LOAD( "changes.1b",    0x0000, 0x0100, CRC(f693c153) SHA1(463426b580fa02f00baf2fff9f42d34b52bd6be4) ) // palette low 4 bits
+	ROM_LOAD( "changes.1c",    0x0100, 0x0100, CRC(f8331705) SHA1(cbead7ed85f96219af14b6552301906f32260b69) ) // palette high 4 bits
 ROM_END
 
 ROM_START( springer )
@@ -746,19 +1284,19 @@ ROM_START( springer )
 	ROM_LOAD( "springer.4",    0x3000, 0x1000, CRC(859d1bf5) SHA1(0f90e0c22d1a0fdf61b87738cd2c4113e1e9178f) )
 	ROM_LOAD( "springer.5",    0x4000, 0x1000, CRC(72adbbe3) SHA1(5e9d65eb524f7e0e8ea84eeebc698d8bdae6606c) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "springer.6",    0x0000, 0x1000, CRC(6a961833) SHA1(38f4b0ec73e404b3ec750a2f0c1e502dd75e3ee3) )
 	ROM_LOAD( "springer.7",    0x1000, 0x1000, CRC(95ab8fc0) SHA1(74dad6fe1edd38b22656cf6cd9e4a57012bf0d60) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "springer.9",    0x0000, 0x1000, CRC(fa302775) SHA1(412afdc620be95e70b3b782d1a08e4a46777e710) )
-							/* 0x1000-0x1fff empty for my convinience */
+							// 0x1000-0x1fff empty for my convenience
 	ROM_LOAD( "springer.8",    0x2000, 0x1000, CRC(a54bafdc) SHA1(70f1a9ab116dc2a195aa9026ed1004101897d274) )
-							/* 0x3000-0x3fff empty for my convinience */
+							// 0x3000-0x3fff empty for my convenience
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "1b.vid",        0x0000, 0x0100, CRC(a2f935aa) SHA1(575b0b0e67aeff664bdf00f1bfd9dc68fdf88074) ) /* palette low 4 bits */
-	ROM_LOAD( "1c.vid",        0x0100, 0x0100, CRC(b95421f4) SHA1(48ddf33d1094eb4343b7c54a2a221050f83b749b) ) /* palette high 4 bits */
+	ROM_LOAD( "1b.vid",        0x0000, 0x0100, CRC(a2f935aa) SHA1(575b0b0e67aeff664bdf00f1bfd9dc68fdf88074) ) // palette low 4 bits
+	ROM_LOAD( "1c.vid",        0x0100, 0x0100, CRC(b95421f4) SHA1(48ddf33d1094eb4343b7c54a2a221050f83b749b) ) // palette high 4 bits
 ROM_END
 
 ROM_START( hoccer )
@@ -768,15 +1306,15 @@ ROM_START( hoccer )
 	ROM_LOAD( "hr3.cpu",       0x4000, 0x2000, CRC(048a0659) SHA1(7dc0ba2046f8985d4e3bfbba5284090dd4382aa1) )
 	ROM_LOAD( "hr4.cpu",       0x6000, 0x2000, CRC(9a788a2c) SHA1(a49efa5bbebcb9f7cbe22a85494f24af9965b4dc) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "hr.d",          0x0000, 0x2000, CRC(d33aa980) SHA1(ba6cc0eed87a1561a584058bdcaac2c0a375e235) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "hr.c",          0x0000, 0x2000, CRC(02808294) SHA1(c4f5c6a8e3fbb156917821b4e7b1b25d23418ca3) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "hr.1b",         0x0000, 0x0100, CRC(896521d7) SHA1(54b295b4bb7357ffdb8916ff9618570867a950b2) ) /* palette low 4 bits */
-	ROM_LOAD( "hr.1c",         0x0100, 0x0100, CRC(2efdd70b) SHA1(1b4fc9e52aaa4600c535b04d40aac1e0dd85fd7b) ) /* palette high 4 bits */
+	ROM_LOAD( "hr.1b",         0x0000, 0x0100, CRC(896521d7) SHA1(54b295b4bb7357ffdb8916ff9618570867a950b2) ) // palette low 4 bits
+	ROM_LOAD( "hr.1c",         0x0100, 0x0100, CRC(2efdd70b) SHA1(1b4fc9e52aaa4600c535b04d40aac1e0dd85fd7b) ) // palette high 4 bits
 ROM_END
 
 ROM_START( hoccer2 )
@@ -786,15 +1324,15 @@ ROM_START( hoccer2 )
 	ROM_LOAD( "hr.3",          0x4000, 0x2000, CRC(4e67b0be) SHA1(2c2e6a7798325621d1b67ee90fc2f198731b4ab1) )
 	ROM_LOAD( "hr.4",          0x6000, 0x2000, CRC(d2b44f58) SHA1(6a3666b1b5f4da5a72f6712db8d242281ea634fa) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "hr.d",          0x0000, 0x2000, CRC(d33aa980) SHA1(ba6cc0eed87a1561a584058bdcaac2c0a375e235) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "hr.c",          0x0000, 0x2000, CRC(02808294) SHA1(c4f5c6a8e3fbb156917821b4e7b1b25d23418ca3) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "hr.1b",         0x0000, 0x0100, CRC(896521d7) SHA1(54b295b4bb7357ffdb8916ff9618570867a950b2) ) /* palette low 4 bits */
-	ROM_LOAD( "hr.1c",         0x0100, 0x0100, CRC(2efdd70b) SHA1(1b4fc9e52aaa4600c535b04d40aac1e0dd85fd7b) ) /* palette high 4 bits */
+	ROM_LOAD( "hr.1b",         0x0000, 0x0100, CRC(896521d7) SHA1(54b295b4bb7357ffdb8916ff9618570867a950b2) ) // palette low 4 bits
+	ROM_LOAD( "hr.1c",         0x0100, 0x0100, CRC(2efdd70b) SHA1(1b4fc9e52aaa4600c535b04d40aac1e0dd85fd7b) ) // palette high 4 bits
 ROM_END
 
 ROM_START( wanted )
@@ -803,17 +1341,17 @@ ROM_START( wanted )
 	ROM_LOAD( "prg-2",         0x2000, 0x2000, CRC(67ac0210) SHA1(29fd01289c9ba5a3a992ac6740badbf2e37f05ac) )
 	ROM_LOAD( "prg-3",         0x4000, 0x2000, CRC(373c7d82) SHA1(e68e1fd1d5e48c709280a714d7df330fc29df03a) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "vram-1",        0x0000, 0x2000, CRC(c4226e54) SHA1(4eb59db4d9688f62ecbaee7dde4cf3117e8f942d) )
 	ROM_LOAD( "vram-2",        0x2000, 0x2000, CRC(2a9b1e36) SHA1(daaf90753477f22dba8f9a9d28799c63622351a5) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "obj-a",         0x0000, 0x2000, CRC(90b60771) SHA1(67cf20fa47439a16f9ebe07aa128cb267b256704) )
 	ROM_LOAD( "obj-b",         0x2000, 0x2000, CRC(e14ee689) SHA1(797985c9b5b9a2c39c98defae56d119ce41714d6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "wanted.k7",     0x0000, 0x0100, CRC(2ba90a00) SHA1(ec545b4682be2875f4e6440a28306a36c6f1771d) )   /* palette low 4 bits */
-	ROM_LOAD( "wanted.k6",     0x0100, 0x0100, CRC(a93d87cc) SHA1(73920a2a2842efc8678f280e3b30177f4ca6ea9c) )   /* palette high 4 bits */
+	ROM_LOAD( "wanted.k7",     0x0000, 0x0100, CRC(2ba90a00) SHA1(ec545b4682be2875f4e6440a28306a36c6f1771d) )   // palette low 4 bits
+	ROM_LOAD( "wanted.k6",     0x0100, 0x0100, CRC(a93d87cc) SHA1(73920a2a2842efc8678f280e3b30177f4ca6ea9c) )   // palette high 4 bits
 ROM_END
 
 /*
@@ -827,8 +1365,8 @@ SND 2 x AY-3-8912
 XTAL: 12.000MHz
 DIPS: 2 x 8 position
 
-All roms type 2764
-Both proms type MB7052 (compatible to 82s129)
+All ROMs type 2764
+Both PROMs type MB7052 (compatible to 82s129)
 RAM: 1 x 8416, 1 x AM9122, 2 x D2125, 4 x M5L2114
 
 The topmost row is entirely unpopulated. This includes a space (at 19D) for
@@ -855,17 +1393,17 @@ ROM_START( bcruzm12 )
 	ROM_LOAD( "d-84_2.12b",    0x2000, 0x2000, CRC(1a788d1f) SHA1(5029f93f45d328a282d56e010eee68287b6b9306) )
 	ROM_LOAD( "d-84_1.12ab",   0x4000, 0x2000, CRC(9d5b3017) SHA1(bced3f39faf94ce25cba382010f2c2ed322e9d7b) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "d-84_5.17f",    0x0000, 0x2000, CRC(2e963f6a) SHA1(dcc32ab4a4fa241b6f4a211642d00f6e0438f466) )
 	ROM_LOAD( "d-84_4.17ef",   0x2000, 0x2000, CRC(fe186459) SHA1(3b0ee1fe98c835271f5b67de5ca0507827e25d71) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "d-84_6.17fh",   0x0000, 0x2000, CRC(1337dc01) SHA1(c55bfc6dd15a499dd71da0acc5016035a7c51f16) )
 	ROM_LOAD( "d-84_7.17h",    0x2000, 0x2000, CRC(a5be90ef) SHA1(6037d924296ba62999aafe665396fef142d73df2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "bcm12col.7k",   0x0000, 0x0100, CRC(bf4f2671) SHA1(dde6da568ecf0121910f4b507c83fe6230b07c8d) )   /* palette low 4 bits */
-	ROM_LOAD( "bcm12col.6k",   0x0100, 0x0100, CRC(59f955f6) SHA1(6d6d784971569e0af7cec8bd36659f24a652cd6a) )   /* palette high 4 bits */
+	ROM_LOAD( "bcm12col.7k",   0x0000, 0x0100, CRC(bf4f2671) SHA1(dde6da568ecf0121910f4b507c83fe6230b07c8d) )   // palette low 4 bits
+	ROM_LOAD( "bcm12col.6k",   0x0100, 0x0100, CRC(59f955f6) SHA1(6d6d784971569e0af7cec8bd36659f24a652cd6a) )   // palette high 4 bits
 ROM_END
 
 ROM_START( hopprobo )
@@ -876,29 +1414,31 @@ ROM_START( hopprobo )
 	ROM_LOAD( "hopper04.3p",   0x3000, 0x1000, CRC(0f4f3ca8) SHA1(22976fb63a8931c7db000ccf9de51417c0d512fe) )
 	ROM_LOAD( "hopper05.3r",   0x4000, 0x1000, CRC(9d77a37b) SHA1(a63419382cb86e3f762637692c646bbd6b1b664d) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "hopper06.5c",   0x0000, 0x2000, CRC(68f79bc8) SHA1(17a9891c98c34935831493e27bd0cf3239644de0) )
 	ROM_LOAD( "hopper07.5d",   0x2000, 0x1000, CRC(33d82411) SHA1(b112d76c9d35a2dbd051825e7818e894e8d9259f) )
 	ROM_RELOAD(                0x3000, 0x1000 )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "hopper09.6k",   0x0000, 0x2000, CRC(047921c7) SHA1(8ef4722a98be540e4b5c67965599c400511b4a52) )
 	ROM_LOAD( "hopper08.6f",   0x2000, 0x2000, CRC(06d37e64) SHA1(c0923a1a40dca43b66e14d755dacf7767d62ab8b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7052hop.1b",    0x0000, 0x0100, CRC(94450775) SHA1(e15fcf6d1cd7cfc0d98e82bd0559b6d342aac9ed) ) /* palette low 4 bits */
-	ROM_LOAD( "7052hop.1c",    0x0100, 0x0100, CRC(a76bbd51) SHA1(5c61d93ab1e9c80b30cfbc2cbd13ede32f0f4f61) ) /* palette high 4 bits */
+	ROM_LOAD( "7052hop.1b",    0x0000, 0x0100, CRC(94450775) SHA1(e15fcf6d1cd7cfc0d98e82bd0559b6d342aac9ed) ) // palette low 4 bits
+	ROM_LOAD( "7052hop.1c",    0x0100, 0x0100, CRC(a76bbd51) SHA1(5c61d93ab1e9c80b30cfbc2cbd13ede32f0f4f61) ) // palette high 4 bits
 ROM_END
 
+} // anonymous namespace
 
-/*    year  name      parent   machine   inputs */
-GAME( 1982, marineb,  0,       marineb,  marineb,  marineb_state, empty_init, ROT0,   "Orca", "Marine Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, changes,  0,       changes,  changes,  marineb_state, empty_init, ROT0,   "Orca", "Changes", MACHINE_SUPPORTS_SAVE )
+
+//    year  name      parent   machine   inputs
+GAME( 1982, marineb,  0,       marineb,  marineb,  marineb_state, empty_init, ROT0,   "Orca",                                           "Marine Boy",            MACHINE_SUPPORTS_SAVE )
+GAME( 1982, changes,  0,       changes,  changes,  marineb_state, empty_init, ROT0,   "Orca",                                           "Changes",               MACHINE_SUPPORTS_SAVE )
 GAME( 1982, changesa, changes, changes,  changes,  marineb_state, empty_init, ROT0,   "Orca (Eastern Micro Electronics, Inc. license)", "Changes (EME license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, looper,   changes, changes,  changes,  marineb_state, empty_init, ROT0,   "Orca", "Looper", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, springer, 0,       springer, marineb,  marineb_state, empty_init, ROT270, "Orca", "Springer", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hoccer,   0,       hoccer,   hoccer,   marineb_state, empty_init, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hoccer2,  hoccer,  hoccer,   hoccer,   marineb_state, empty_init, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 2)" , MACHINE_SUPPORTS_SAVE )  /* earlier */
-GAME( 1983, bcruzm12, 0,       bcruzm12, bcruzm12, marineb_state, empty_init, ROT90,  "Sigma Enterprises Inc.", "Battle Cruiser M-12", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hopprobo, 0,       hopprobo, marineb,  marineb_state, empty_init, ROT90,  "Sega", "Hopper Robo", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wanted,   0,       wanted,   wanted,   marineb_state, empty_init, ROT90,  "Sigma Enterprises Inc.", "Wanted", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, looper,   changes, changes,  changes,  marineb_state, empty_init, ROT0,   "Orca",                                           "Looper",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, springer, 0,       springer, marineb,  marineb_state, empty_init, ROT270, "Orca",                                           "Springer",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hoccer,   0,       hoccer,   hoccer,   marineb_state, empty_init, ROT90,  "Eastern Micro Electronics, Inc.",                "Hoccer (newer)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hoccer2,  hoccer,  hoccer,   hoccer,   marineb_state, empty_init, ROT90,  "Eastern Micro Electronics, Inc.",                "Hoccer (earlier)" ,     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bcruzm12, 0,       bcruzm12, bcruzm12, marineb_state, empty_init, ROT90,  "Sigma Enterprises Inc.",                         "Battle Cruiser M-12",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hopprobo, 0,       hopprobo, marineb,  marineb_state, empty_init, ROT90,  "Sega",                                           "Hopper Robo",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wanted,   0,       wanted,   wanted,   marineb_state, empty_init, ROT90,  "Sigma Enterprises Inc.",                         "Wanted",                MACHINE_SUPPORTS_SAVE )

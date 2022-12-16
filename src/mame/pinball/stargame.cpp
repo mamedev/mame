@@ -98,7 +98,7 @@ void stargame_state::maincpu_io(address_map &map)
 	map(0x20, 0x2f).r(FUNC(stargame_state::csw2_r)).w(FUNC(stargame_state::csw2_w)); // CSW2 - input lines (spcship), output lines (whtforce)
 	map(0x30, 0x3f).r(FUNC(stargame_state::csw1_r)); // CSW1 - input lines
 	map(0x40, 0x4f).w(FUNC(stargame_state::cdig_w)); // CDIG - score display
-	map(0x50, 0x57).mirror(0x08).w(FUNC(stargame_state::cdriv_w));; // CDRIV - lamps and solenoids
+	map(0x50, 0x57).mirror(0x08).w(FUNC(stargame_state::cdriv_w)); // CDRIV - lamps and solenoids
 	map(0x60, 0x67).mirror(0x08).w("mainlatch", FUNC(ls259_device::write_d0)); // CPOR
 	map(0x68, 0x68).mirror(0x06).w(FUNC(stargame_state::ckdis_w)); // 68=CKDIS (sch has 68 and 69 the wrong way around)
 	map(0x69, 0x69).mirror(0x06); // 69=CKPRI (not used?)

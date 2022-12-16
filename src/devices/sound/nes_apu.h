@@ -4,7 +4,7 @@
 
   MAME/MESS NES APU CORE
 
-  Based on the Nofrendo/Nosefart NES N2A03 sound emulation core written by
+  Based on the Nofrendo/Nosefart NES RP2A03 sound emulation core written by
   Matthew Conte (matt@conte.com) and redesigned for use in MAME/MESS by
   Who Wants to Know? (wwtk@mail.com)
 
@@ -52,7 +52,7 @@ public:
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 
-	u8 read(offs_t offset);
+	u8 status_r();
 	void write(offs_t offset, u8 data);
 
 protected:
@@ -63,6 +63,8 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+	virtual void update_lfsr(apu_t::noise_t &chan);
 
 private:
 	/* GLOBAL CONSTANTS */
@@ -92,6 +94,17 @@ private:
 	void apu_dpcm(apu_t::dpcm_t *chan);
 };
 
-DECLARE_DEVICE_TYPE(NES_APU, nesapu_device)
+class apu2a03_device : public nesapu_device
+{
+public:
+	apu2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void update_lfsr(apu_t::noise_t &chan) override;
+};
+
+
+DECLARE_DEVICE_TYPE(NES_APU,  nesapu_device)
+DECLARE_DEVICE_TYPE(APU_2A03, apu2a03_device)
 
 #endif // MAME_SOUND_NES_APU_H

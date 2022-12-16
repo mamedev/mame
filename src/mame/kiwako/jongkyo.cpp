@@ -28,8 +28,7 @@
 
 #include "emu.h"
 
-#include "segacrpt_device.h"
-
+#include "machine/segacrpt_device.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 

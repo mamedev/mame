@@ -38,11 +38,6 @@ public:
 	void cbombers(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_INTERRUPT5
-	};
-
 	virtual void video_start() override;
 
 private:

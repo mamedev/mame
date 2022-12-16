@@ -542,7 +542,7 @@ void stepstag_state::stepstag_soundlatch_word_w(u16 data)
 
 	m_subcpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 

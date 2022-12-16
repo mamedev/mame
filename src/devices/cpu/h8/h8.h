@@ -134,7 +134,7 @@ protected:
 	uint32_t  TMP1, TMP2;
 	uint32_t  TMPR;                   /* For debugger ER register import */
 
-	bool has_exr, has_trace, supports_advanced, mode_advanced, mode_a20, mac_saturating;
+	bool has_exr, has_mac, has_trace, supports_advanced, mode_advanced, mode_a20, mac_saturating;
 	bool has_hc; // GT913's CCR bit 5 is I, not H
 
 	int inst_state, inst_substate, requested_state;

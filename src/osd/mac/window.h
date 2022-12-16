@@ -12,7 +12,7 @@
 #define __MACWINDOW__
 
 #include "osdmac.h"
-#include "video.h"
+#include "osdsync.h"
 
 #include "modules/osdwindow.h"
 

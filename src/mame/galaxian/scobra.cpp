@@ -339,11 +339,7 @@ void scobra_state::minefldfe_map(address_map &map)
 	map(0x4C00, 0x4C03).mirror(0x00fc).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x4B00, 0x4B03).mirror(0x00fc).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-
-
-
 	map(0x1D98, 0x1D98).r("watchdog", FUNC(watchdog_timer_device::reset_r)); // 0xb000
-
 
 	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
 	map(0xf802, 0xf802).w(FUNC(scobra_state::galaxold_coin_counter_w));

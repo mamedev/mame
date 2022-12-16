@@ -544,6 +544,10 @@ void pci_bridge_device::device_reset()
 	primary_bus = 0x00;
 	secondary_bus = 0x00;
 	subordinate_bus = 0x00;
+}
+
+void pci_bridge_device::interface_post_reset()
+{
 	regenerate_config_mapping();
 }
 
@@ -893,9 +897,14 @@ void pci_host_device::device_reset()
 {
 	pci_bridge_device::device_reset();
 	reset_all_mappings();
-	regenerate_mapping();
 
 	config_address = 0;
+}
+
+void pci_host_device::interface_post_reset()
+{
+	pci_bridge_device::interface_post_reset();
+	regenerate_mapping();
 }
 
 void pci_host_device::regenerate_mapping()

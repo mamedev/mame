@@ -644,17 +644,6 @@ static const gfx_layout hedpanic_sprite_16x16x5 =
 	16*32,
 };
 
-static const gfx_layout hedpanic_layout_8x8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	64*8,
-};
-
 static const gfx_layout hedpanic_layout_16x16x8 =
 {
 	16,16,
@@ -669,13 +658,13 @@ static const gfx_layout hedpanic_layout_16x16x8 =
 
 static GFXDECODE_START( gfx_esd16 )
 	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 )      // [0] Sprites
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 2 )      // [1] Layers
+	GFXDECODE_ENTRY( "bgs", 0, gfx_8x8x8_raw,           0x000, 2 )      // [1] Layers
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 2 )      // [1] Layers
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_jumppop )
 	GFXDECODE_ENTRY( "spr", 0, jumppop_sprite_16x16x4,  0x000, 0x40 )   // Sprites 16x16 - has 4bpp sprites, unlike the others
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 4 )      // Characters 8x8
+	GFXDECODE_ENTRY( "bgs", 0, gfx_8x8x8_raw,           0x000, 4 )      // Characters 8x8
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 4 )      // Tiles 16x16
 GFXDECODE_END
 

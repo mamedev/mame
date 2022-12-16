@@ -69,29 +69,8 @@ give the leftmost column of the rectangle, the next four give the next column, a
 *************************************************************************************************************/
 
 #include "emu.h"
-#include <functional>
 
 #include "mbc55x.h"
-
-#define DEBUG_LINES     1
-#define DEBUG_VSYNC     2
-
-#define DEBUG_SET(flags)    ((m_debug_video & (flags))==(flags))
-
-void mbc55x_state::video_debug(const std::vector<std::string> &params)
-{
-	if (params.size() > 0)
-	{
-		int temp;
-		sscanf(params[0].c_str(), "%d", &temp);
-		m_debug_video = temp;
-	}
-	else
-	{
-		machine().debugger().console().printf("Error usage : mbc55x_vid_debug <debuglevel>\n");
-		machine().debugger().console().printf("Current debuglevel=%02X\n", m_debug_video);
-	}
-}
 
 MC6845_UPDATE_ROW( mbc55x_state::crtc_update_row )
 {
@@ -112,13 +91,7 @@ MC6845_UPDATE_ROW( mbc55x_state::crtc_update_row )
 			green=&ram[0x0C000];
 	}
 
-	if(DEBUG_SET(DEBUG_LINES))
-		logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
-
 	int offset=((ma*4) + ra) % COLOUR_PLANE_SIZE;
-
-	if(DEBUG_SET(DEBUG_LINES))
-		logerror("offset=%05X\n",offset);
 
 	for(int x_pos=0; x_pos<x_count; x_pos++)
 	{
@@ -190,15 +163,6 @@ void mbc55x_state::vram_page_w(uint8_t data)
 
 void mbc55x_state::video_start()
 {
-	m_debug_video=0;
-
-	logerror("video_start\n");
-
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-	{
-		using namespace std::placeholders;
-		machine().debugger().console().register_command("mbc55x_vid_debug", CMDFLAG_NONE, 0, 1, std::bind(&mbc55x_state::video_debug, this, _1));
-	}
 }
 
 void mbc55x_state::video_reset()

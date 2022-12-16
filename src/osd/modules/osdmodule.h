@@ -12,9 +12,6 @@
 
 #pragma once
 
-#include "osdcore.h"
-#include "osdepend.h"
-
 #include <functional>
 #include <memory>
 #include <string>

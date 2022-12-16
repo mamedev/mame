@@ -33,6 +33,7 @@ public:
 	void set_region(gtia_region region) { m_region = region; }
 	auto read_callback() { return m_read_cb.bind(); }
 	auto write_callback() { return m_write_cb.bind(); }
+	auto trigger_callback() { return m_trigger_cb.bind(); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -45,7 +46,7 @@ public:
 	uint8_t get_w_colpf2() { return m_w.colpf2; }
 	uint8_t get_w_prior() { return m_w.prior; }
 	void count_hitclr_frames() { m_h.hitclr_frames++; }
-	void button_interrupt(int button_count, uint8_t button_port);
+	void button_interrupt(int button_count);
 
 	void render(uint8_t *src, uint8_t *dst, uint8_t *pmbits, uint8_t *prio);
 
@@ -66,8 +67,8 @@ protected:
 	void recalc_m2();
 	void recalc_m3();
 
-	inline void player_render(uint8_t gfx, int size, uint8_t color, uint8_t *dst);
-	inline void missile_render(uint8_t gfx, int size, uint8_t color, uint8_t *dst);
+	inline void player_render(uint8_t gfx, u8 size_index, uint8_t color, uint8_t *dst);
+	inline void missile_render(uint8_t gfx, u8 size_index, uint8_t color, uint8_t *dst);
 
 private:
 	/* reading registers */
@@ -101,7 +102,7 @@ private:
 		uint8_t   gtia1c;     /* d01c nothing */
 		uint8_t   gtia1d;     /* d01d nothing */
 		uint8_t   gtia1e;     /* d01e nothing */
-		uint8_t   cons;       /* d01f console keys */
+		uint8_t   consol;     /* d01f console keys */
 	};
 
 	/* writing registers */
@@ -138,7 +139,7 @@ private:
 		uint8_t   vdelay;     /* d01c delay until vertical retrace */
 		uint8_t   gractl;     /* d01d graphics control */
 		uint8_t   hitclr;     /* d01e clear collisions */
-		uint8_t   cons;       /* d01f write console (speaker) */
+		uint8_t   consol;     /* d01f write console (speaker) */
 	};
 
 	/* helpers */
@@ -182,6 +183,7 @@ private:
 
 	devcb_read8 m_read_cb;
 	devcb_write8 m_write_cb;
+	devcb_read8 m_trigger_cb;
 };
 
 

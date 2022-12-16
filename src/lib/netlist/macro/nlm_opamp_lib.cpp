@@ -22,6 +22,7 @@
  */
 
 static NETLIST_START(opamp_layout_4_4_11)
+{
 	DIPPINS(        /*   +--------------+   */
 		A.OUT,      /*   |1     ++    14|   */ D.OUT,
 		A.MINUS,    /*   |2           13|   */ D.MINUS,
@@ -34,13 +35,14 @@ static NETLIST_START(opamp_layout_4_4_11)
 	)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
-NETLIST_END()
+}
 
 /*
  *   Generic layout with 2 opamps, VCC on pin 8 and GND on pin 4
  */
 
 static NETLIST_START(opamp_layout_2_8_4)
+{
 	DIPPINS(        /*   +--------------+   */
 		A.OUT,      /*   |1     ++     8|   */ A.VCC,
 		A.MINUS,    /*   |2            7|   */ B.OUT,
@@ -50,13 +52,14 @@ static NETLIST_START(opamp_layout_2_8_4)
 	)
 	NET_C(A.GND, B.GND)
 	NET_C(A.VCC, B.VCC)
-NETLIST_END()
+}
 
 /*
  *   Generic layout with 2 opamps, VCC+ on pins 9/13,  VCC- on pin 4 and compensation
  */
 
 static NETLIST_START(opamp_layout_2_13_9_4)
+{
 	DIPPINS(        /*   +--------------+   */
 		A.MINUS,    /*   |1     ++    14|   */ A.N2,
 		A.PLUS,     /*   |2           13|   */ A.VCC,
@@ -68,7 +71,7 @@ static NETLIST_START(opamp_layout_2_13_9_4)
 					/*   +--------------+   */
 	)
 	NET_C(A.GND, B.GND)
-NETLIST_END()
+}
 
 /*
  *   Generic layout with 1 opamp, VCC+ on pin 7, VCC- on pin 4 and compensation
@@ -76,6 +79,7 @@ NETLIST_END()
  */
 
 static NETLIST_START(opamp_layout_1_7_4)
+{
 	DIPPINS(             /*   +--------------+   */
 		NC /* OFFSET */, /*   |1     ++     8|   */ NC,
 		A.MINUS,         /*   |2            7|   */ A.VCC,
@@ -83,13 +87,14 @@ static NETLIST_START(opamp_layout_1_7_4)
 		A.GND,           /*   |4            5|   */ NC /* OFFSET */
 						 /*   +--------------+   */
 	)
-NETLIST_END()
+}
 
 /*
  *   Generic layout with 1 opamp, VCC+ on pin 8, VCC- on pin 5 and compensation
  */
 
 static NETLIST_START(opamp_layout_1_8_5)
+{
 	DIPPINS(        /*   +--------------+   */
 		NC.1,       /*   |1           10|   */ NC.3,
 		OFFSET.N1,  /*   |2            9|   */ NC.2,
@@ -103,13 +108,14 @@ static NETLIST_START(opamp_layout_1_8_5)
 	NET_C(A.MINUS, MINUS)
 	NET_C(A.PLUS, PLUS)
 	NET_C(A.OUT, OUT)
-NETLIST_END()
+}
 
 /*
  *   Generic layout with 1 opamp, VCC+ on pin 11, VCC- on pin 6 and compensation
  */
 
 static NETLIST_START(opamp_layout_1_11_6)
+{
 	DIPPINS(        /*   +--------------+   */
 		NC.1,       /*   |1     ++    14|   */ NC.7,
 		NC.2,       /*   |2           13|   */ NC.6,
@@ -125,9 +131,10 @@ static NETLIST_START(opamp_layout_1_11_6)
 	NET_C(A.MINUS, MINUS)
 	NET_C(A.PLUS, PLUS)
 	NET_C(A.OUT, OUT)
-NETLIST_END()
+}
 
 static NETLIST_START(MB3614_DIP)
+{
 	OPAMP(A, "MB3614")
 	OPAMP(B, "MB3614")
 	OPAMP(C, "MB3614")
@@ -135,9 +142,10 @@ static NETLIST_START(MB3614_DIP)
 
 	INCLUDE(opamp_layout_4_4_11)
 
-NETLIST_END()
+}
 
 static NETLIST_START(MC3340_DIP)
+{
 	// A netlist description of the Motorola MC3340 Electronic Attenuator
 	// IC, a voltage-controlled amplifier/attenuator. It amplifies or
 	// attenuates an input signal according to the voltage of a second,
@@ -305,24 +313,27 @@ static NETLIST_START(MC3340_DIP)
 	ALIAS(6, ROLLOFF)
 	ALIAS(7, OUTPUT)
 	ALIAS(8, VCC)
-NETLIST_END()
+}
 
 static NETLIST_START(TL081_DIP)
+{
 	OPAMP(A, "TL084")
 
 	INCLUDE(opamp_layout_1_7_4)
 
-NETLIST_END()
+}
 
 static NETLIST_START(TL082_DIP)
+{
 	OPAMP(A, "TL084")
 	OPAMP(B, "TL084")
 
 	INCLUDE(opamp_layout_2_8_4)
 
-NETLIST_END()
+}
 
 static NETLIST_START(TL084_DIP)
+{
 	OPAMP(A, "TL084")
 	OPAMP(B, "TL084")
 	OPAMP(C, "TL084")
@@ -330,9 +341,10 @@ static NETLIST_START(TL084_DIP)
 
 	INCLUDE(opamp_layout_4_4_11)
 
-NETLIST_END()
+}
 
 static NETLIST_START(LM324_DIP)
+{
 	OPAMP(A, "LM324")
 	OPAMP(B, "LM324")
 	OPAMP(C, "LM324")
@@ -340,9 +352,10 @@ static NETLIST_START(LM324_DIP)
 
 	INCLUDE(opamp_layout_4_4_11)
 
-NETLIST_END()
+}
 
 static NETLIST_START(LM2902_DIP)
+{
 	// Same datasheet and mostly same characteristics as LM324
 	OPAMP(A, "LM324")
 	OPAMP(B, "LM324")
@@ -351,9 +364,10 @@ static NETLIST_START(LM2902_DIP)
 
 	INCLUDE(opamp_layout_4_4_11)
 
-NETLIST_END()
+}
 
 static NETLIST_START(LM348_DIP)
+{
 	OPAMP(A, "UA741")
 	OPAMP(B, "UA741")
 	OPAMP(C, "UA741")
@@ -361,62 +375,69 @@ static NETLIST_START(LM348_DIP)
 
 	INCLUDE(opamp_layout_4_4_11)
 
-NETLIST_END()
+}
 
 static NETLIST_START(LM358_DIP)
+{
 	OPAMP(A, "LM358")
 	OPAMP(B, "LM358")
 
 	INCLUDE(opamp_layout_2_8_4)
 
-NETLIST_END()
+}
 
 static NETLIST_START(UA741_DIP8)
+{
 	OPAMP(A, "UA741")
 
 	INCLUDE(opamp_layout_1_7_4)
 
-NETLIST_END()
+}
 
 static NETLIST_START(UA741_DIP10)
+{
 	OPAMP(A, "UA741")
 
 	INCLUDE(opamp_layout_1_8_5)
 
-NETLIST_END()
+}
 
 static NETLIST_START(UA741_DIP14)
+{
 	OPAMP(A, "UA741")
 
 	INCLUDE(opamp_layout_1_11_6)
 
-NETLIST_END()
+}
 
 static NETLIST_START(MC1558_DIP)
+{
 	OPAMP(A, "UA741")
 	OPAMP(B, "UA741")
 
 	INCLUDE(opamp_layout_2_8_4)
 
-NETLIST_END()
+}
 
 static NETLIST_START(LM747_DIP)
+{
 	OPAMP(A, "LM747")
 	OPAMP(B, "LM747")
 
 	INCLUDE(opamp_layout_2_13_9_4)
 	NET_C(A.VCC, B.VCC)
 
-NETLIST_END()
+}
 
 static NETLIST_START(LM747A_DIP)
+{
 	OPAMP(A, "LM747A")
 	OPAMP(B, "LM747A")
 
 	INCLUDE(opamp_layout_2_13_9_4)
 	NET_C(A.VCC, B.VCC)
 
-NETLIST_END()
+}
 
 //- Identifier: AN6551_SIL
 //- Title: AN6551 Dual Operational Amplifier
@@ -427,6 +448,7 @@ NETLIST_END()
 //-   https://datasheetspdf.com/pdf-file/182163/PanasonicSemiconductor/AN6551/1
 //-
 static NETLIST_START(AN6551_SIL)
+{
 	OPAMP(A, "AN6551")
 	OPAMP(B, "AN6551")
 
@@ -441,10 +463,11 @@ static NETLIST_START(AN6551_SIL)
 	ALIAS(7, B.MINUS)
 	ALIAS(8, B.OUT)
 	ALIAS(9, B.VCC)
-NETLIST_END()
+}
 
 #if USE_LM3900_MODEL == 0
 static NETLIST_START(LM3900)
+{
 
 	/*
 	 *  Fast norton opamp model without bandwidth
@@ -472,7 +495,7 @@ static NETLIST_START(LM3900)
 	//PARAM(G1.RI, 1)
 	PARAM(G1.RO, RES_K(8))
 
-NETLIST_END()
+}
 #endif
 
 #if USE_LM3900_MODEL == 1
@@ -482,6 +505,7 @@ NETLIST_END()
 //
 //  PIN ORDER:    IN+ IN- VCC VSS OUT
 static NETLIST_START(LM3900)
+{
 	PARAM(E1.G, 0.5)
 	//ALIAS(IN+, Q2.B)
 	//ALIAS(IN-, Q2.C)
@@ -524,11 +548,12 @@ static NETLIST_START(LM3900)
 	NET_C(Q6.E, Q10.B, Q4.C)
 	NET_C(Q6.C, Q10.E, Q9.C, Q7.E)
 	NET_C(Q2.B, Q1.C, Q1.B, Q11.E)
-NETLIST_END()
+}
 #endif
 
 #if USE_LM3900_MODEL == 2
 static NETLIST_START(LM3900)
+{
 	OPAMP(A, "LM3900")
 
 	DIODE(D1, "D(IS=1e-15 N=1)")
@@ -545,11 +570,12 @@ static NETLIST_START(LM3900)
 	NET_C(CS1.ON, A.MINUS)
 	NET_C(CS1.OP, A.GND, D1.K)
 
-NETLIST_END()
+}
 #endif
 
 #if USE_LM3900_MODEL == 3
 static NETLIST_START(LM3900)
+{
 
 	ALIAS(VCC, Q5.C)
 	ALIAS(GND, Q1.E)
@@ -573,11 +599,12 @@ static NETLIST_START(LM3900)
 	NET_C(Q1.E, Q2.E, Q4.C, C1.2, I1.2, Q6.E)
 	NET_C(Q1.C, Q2.B)
 	NET_C(Q2.C, Q3.B, Q4.B, C1.1)
-NETLIST_END()
+}
 #endif
 
 #if USE_LM3900_MODEL == 4
 static NETLIST_START(LM3900)
+{
 	OPAMP(A, "OPAMP(TYPE=3 VLH=0.5 VLL=0.03 FPF=2k UGF=2.5M SLEW=1M RI=10M RO=100 DAB=0.0015)")
 
 	DIODE(D1, "D(IS=6e-15 N=1)")
@@ -604,10 +631,11 @@ static NETLIST_START(LM3900)
 	NET_C(D2.K, A.GND)
 	NET_C(VS1.OP, A.MINUS)
 	NET_C(VS1.ON, A.PLUS, A.GND)
-NETLIST_END()
+}
 #endif
 
 NETLIST_START(opamp_lib)
+{
 	LOCAL_LIB_ENTRY(opamp_layout_4_4_11)
 	LOCAL_LIB_ENTRY(opamp_layout_2_8_4)
 	LOCAL_LIB_ENTRY(opamp_layout_2_13_9_4)
@@ -654,4 +682,4 @@ NETLIST_START(opamp_lib)
 	LOCAL_LIB_ENTRY(LM3900)
 	LOCAL_LIB_ENTRY(AN6551_SIL)
 
-NETLIST_END()
+}

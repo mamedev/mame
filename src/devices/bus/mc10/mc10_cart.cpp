@@ -110,7 +110,7 @@ image_init_result mc10cart_slot_device::call_load()
 	if (!loaded_through_softlist())
 	{
 		LOG("Allocating %u byte cartridge ROM region\n", len);
-		romregion = machine().memory().region_alloc(subtag("rom").c_str(), len, 1, ENDIANNESS_BIG);
+		romregion = machine().memory().region_alloc(subtag("rom"), len, 1, ENDIANNESS_BIG);
 		u32 const cnt(fread(romregion->base(), len));
 		if (cnt != len)
 		{

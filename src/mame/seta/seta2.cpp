@@ -94,7 +94,7 @@ funcube series:
 #include "seta2.h"
 
 #include "cpu/h8/h83006.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/mcf5206e.h"
 #include "machine/mcf5206e.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"

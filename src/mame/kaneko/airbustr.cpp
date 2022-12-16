@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia
+// copyright-holders: Luca Elia
 /***************************************************************************
 
                                 Air Buster
@@ -11,12 +11,12 @@ CPU   : Z-80 x 3
 SOUND : YM2203C     M6295
 OSC.  : 12.000MHz   16.000MHz
 
-                    Interesting routines (main cpu)
+                    Interesting routines (main CPU)
                     -------------------------------
 
 fd-fe   address of int: 0x38    (must alternate? see e600/1)
 ff-100  address of int: 0x16
-66      print "sub cpu caused nmi" and die!
+66      print "sub CPU caused nmi" and die!
 
 7       after tests
 
@@ -26,7 +26,7 @@ ff-100  address of int: 0x16
 
 1642    A<- buttons status (bits 0&1)
 
-                    Interesting locations (main cpu)
+                    Interesting locations (main CPU)
                     --------------------------------
 
 2907    table of routines (f150 index = 1-3f, copied to e612)
@@ -43,7 +43,7 @@ ff-100  address of int: 0x16
     a:  29c6        b:  2a24        c:  16ce
 
     d:  3e7e>   *
-    e:  3ec5>   print "Sub Cpu / Ram Error"; **
+    e:  3ec5>   print "Sub CPU / Ram Error"; **
     f:  3e17>   print "Coin error"; **
     10: 3528>   print (c) notice, not shown                 next
     11: 3730>   show (c) notice, wait 0x100 calls           next
@@ -80,21 +80,17 @@ e624    sound code during sound test
 -- Shared RAM --
 
 f148<-  sound code (copied from e624)
-f14a->  read on nmi routine. main cpu writes the value and writes to port 02
+f14a->  read on nmi routine. main CPU writes the value and writes to port 02
 f150<-  index of table of routines at 2907
 
 ----------------
 
-
-
-
-
-                    Interesting routines (sub cpu)
+                    Interesting routines (sub CPU)
                     -------------------------------
 
 491     copy palette data   d000<-f200(a0)  d200<-f300(a0)  d400<-f400(200)
 
-61c     f150<-A     f151<-A (routine index of main cpu!)
+61c     f150<-A     f151<-A (routine index of main CPU!)
         if dsw1-2 active, it does nothing (?!)
 
 c8c     c000-c7ff<-0    c800-cfff<-0    f600<-f200(400)
@@ -104,7 +100,7 @@ c8c     c000-c7ff<-0    c800-cfff<-0    f600<-f200(400)
 22cf    copy 0x0FF bytes
 238d    copy 0x0A0 bytes
 
-                    Interesting locations (sub cpu)
+                    Interesting locations (sub CPU)
                     --------------------------------
 
 fd-fe   address of int: 0x36e   (same as 38)
@@ -130,7 +126,7 @@ f00b<-  coin/credit 2: dsw-1 & 0xc0 index; values: 11,12,21,23  (5e2 table)
 f00c<-  coin 2
 
 f00f    ?? outa (28h)
-f010    written by sub cpu, bit 4 read by main cpu.
+f010    written by sub CPU, bit 4 read by main CPU.
         bit 0   p1 playing
         bit 1   p2 playing
 
@@ -148,47 +144,39 @@ port 06 <- f100 + f140  x       port 04 <- f104 + f142  y
 port 0a <- f120 + f140  x       port 08 <- f124 + f142  y
 port 0c <- f14c = bit 0/1/2/3 = port 6/4/a/8 val < FF
 
-f148->  sound code (from main cpu)
+f148->  sound code (from main CPU)
 f14c    scroll regs high bits
 
 ----------------
 
-
-
-
-
-
-
-
-                    Interesting routines (sound cpu)
+                    Interesting routines (sound CPU)
                     -------------------------------
 
 50a     6295
 521     6295
 a96     2203 reg<-B     val<-A
 
-                    Interesting locations (sound cpu)
+                    Interesting locations (sound CPU)
                     ---------------------------------
 
 c715
 c716    pending sound command
-c760    rom bank
+c760    ROM bank
 
 
                                 To Do
                                 -----
 
-- Is the sub cpu / sound cpu communication status port (0e) correct ?
-- Main cpu: port  01 ? boot sub/sound cpu?
-- Sub  cpu: port 0x38 ? irq ack?
-- incomplete DSW's
+- Is the sub CPU / sound CPU communication status port (0x0e) correct ?
+- Main CPU: port 0x01 ? boot sub/sound CPU?
+- Sub  CPU: port 0x38 ? irq ack?
+- incomplete DSWs
 - Spriteram low 0x300 bytes (priority?)
-
 */
 
 /*
 **
-**              Main cpu data
+**              Main CPU data
 **
 */
 
@@ -197,7 +185,7 @@ c760    rom bank
 
 /*
 **
-**              Sub cpu data
+**              Sub CPU data
 **
 **
 */
@@ -205,10 +193,10 @@ c760    rom bank
 /*  Runs in IM 2    fd-fe   address of int: 0x36e   (same as 0x38)
                     ff-100  address of int: 0x4b0   (only writes to port 38h)   */
 /*
-   Sub cpu and Sound cpu communicate bidirectionally:
+   Sub CPU and Sound CPU communicate bidirectionally:
 
-       Sub   cpu writes to soundlatch,  reads from soundlatch2
-       Sound cpu writes to soundlatch2, reads from soundlatch
+       Sub   CPU writes to soundlatch,  reads from soundlatch2
+       Sound CPU writes to soundlatch2, reads from soundlatch
 
    Each latch raises a flag when it's been written.
    The flag is cleared when the latch is read.
@@ -220,46 +208,247 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 */
 
 #include "emu.h"
-#include "airbustr.h"
+
+#include "kaneko_hit.h"
+#include "kan_pand.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-/* Read/Write Handlers */
-uint8_t airbustr_state::devram_r(address_space &space, offs_t offset)
+// configurable logging
+#define LOG_SCROLLREGS     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_SCROLLREGS)
+
+#include "logmacro.h"
+
+#define LOGSCROLLREGS(...)     LOGMASKED(LOG_SCROLLREGS,     __VA_ARGS__)
+
+
+namespace {
+
+class airbustr_state : public driver_device
 {
-	// There's an MCU here, possibly
-	switch (offset)
+public:
+	airbustr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_devram(*this, "devram")
+		, m_videoram(*this, "videoram%u", 1)
+		, m_colorram(*this, "colorram%u", 1)
+		, m_masterbank(*this, "masterbank")
+		, m_slavebank(*this, "slavebank")
+		, m_audiobank(*this, "audiobank")
+		, m_master(*this, "master")
+		, m_slave(*this, "slave")
+		, m_audiocpu(*this, "audiocpu")
+		, m_pandora(*this, "pandora")
+		, m_calc1(*this, "calc1")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch%u", 1)
 	{
-		/* Reading efe0 probably resets a watchdog mechanism
-		   that would reset the main cpu. We avoid this and patch
-		   the rom instead (main cpu has to be reset once at startup) */
-		case 0xfe0:
-			return m_watchdog->reset_r(space);
-
-		/* Reading a word at eff2 probably yelds the product
-		   of the words written to eff0 and eff2 */
-		case 0xff2:
-		case 0xff3:
-		{
-			int x = (m_devram[0xff0] + m_devram[0xff1] * 256) * (m_devram[0xff2] + m_devram[0xff3] * 256);
-			if (offset == 0xff2)
-				return (x & 0x00ff) >> 0;
-			else
-				return (x & 0xff00) >> 8;
-		}
-
-		/* Reading eff4, F0 times must yield at most 80-1 consecutive
-		   equal values */
-		case 0xff4:
-			return machine().rand();
-
-		default:
-			return m_devram[offset];
 	}
+
+	void airbustr(machine_config &config);
+	void airbustrb(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr<uint8_t> m_devram;
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_colorram;
+
+	required_memory_bank m_masterbank;
+	required_memory_bank m_slavebank;
+	required_memory_bank m_audiobank;
+
+	// video-related
+	tilemap_t *m_tilemap[2]{};
+	uint8_t m_scrollx[2]{};
+	uint8_t m_scrolly[2]{};
+	uint8_t m_highbits = 0;
+
+	// devices
+	required_device<cpu_device> m_master;
+	required_device<cpu_device> m_slave;
+	required_device<cpu_device> m_audiocpu;
+	required_device<kaneko_pandora_device> m_pandora;
+	optional_device<kaneko_hit_device> m_calc1;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+
+	void calc1_w(offs_t offset, uint8_t data);
+	uint8_t calc1_r(offs_t offset);
+	void master_nmi_trigger_w(uint8_t data);
+	void master_bankswitch_w(uint8_t data);
+	void slave_bankswitch_w(uint8_t data);
+	void sound_bankswitch_w(uint8_t data);
+	uint8_t soundcommand_status_r();
+	void coin_counter_w(uint8_t data);
+	template<int Layer> void videoram_w(offs_t offset, uint8_t data);
+	template<int Layer> void colorram_w(offs_t offset, uint8_t data);
+	void scrollregs_w(offs_t offset, uint8_t data);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	INTERRUPT_GEN_MEMBER(slave_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+
+	void master_map(address_map &map);
+	void master_prot_map(address_map &map);
+	void master_io_map(address_map &map);
+	void slave_map(address_map &map);
+	void slave_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_io_map(address_map &map);
+};
+
+
+// Video
+
+/**************************************************************************
+
+[Screen]
+    Size:               256 x 256
+    Colors:             256 x 3
+    Color Space:        32R x 32G x 32B
+
+[Scrolling layers]
+    Number:             2
+    Size:               512 x 512
+    Scrolling:          X,Y
+    Tiles Size:         16 x 16
+    Tiles Number:       0x1000
+    Colors:             256 x 2 (0-511)
+    Format:
+                Offset:     0x400    0x000
+                Bit:        fedc---- --------   Color
+                            ----ba98 76543210   Code
+
+[Sprites]
+    On Screen:          256 x 2
+    In ROM:             0x2000
+    Colors:             256     (512-767)
+    Format:             See Below
+
+
+**************************************************************************/
+
+/*  Scroll Registers
+
+    Port:
+    4       Bg Y scroll, low 8 bits
+    6       Bg X scroll, low 8 bits
+    8       Fg Y scroll, low 8 bits
+    A       Fg X scroll, low 8 bits
+
+    C       3       2       1       0       <-Bit
+            Bg Y    Bg X    Fg Y    Fg X    <-Scroll High Bits (complemented!)
+*/
+
+void airbustr_state::scrollregs_w(offs_t offset, uint8_t data)
+{
+	switch (offset)     // offset 0 <-> port 4
+	{
+		case 0x00:
+		case 0x04:  m_scrolly[((offset & 4) >> 2) ^ 1] = data;    break;  // low 8 bits
+		case 0x02:
+		case 0x06:  m_scrollx[((offset & 4) >> 2) ^ 1] = data;    break;
+		case 0x08:  m_highbits   = ~data;   break;  // complemented high bits
+
+		default: LOGSCROLLREGS("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, m_slave->pc());
+	}
+
+	for (int layer = 0; layer < 2; layer++)
+	{
+		m_tilemap[layer]->set_scrolly(0, ((m_highbits << (5 + (layer << 1))) & 0x100) + m_scrolly[layer]);
+		m_tilemap[layer]->set_scrollx(0, ((m_highbits << (6 + (layer << 1))) & 0x100) + m_scrollx[layer]);
+	}
+}
+
+template<int Layer>
+TILE_GET_INFO_MEMBER(airbustr_state::get_tile_info)
+{
+	int const attr = m_colorram[Layer][tile_index];
+	int const code = m_videoram[Layer][tile_index] + ((attr & 0x0f) << 8);
+	int const color = (attr >> 4) + ((Layer ^ 1) << 4);
+
+	tileinfo.set(0, code, color, 0);
+}
+
+void airbustr_state::video_start()
+{
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(airbustr_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(airbustr_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+
+	m_tilemap[1]->set_transparent_pen(0);
+
+	for (int layer = 0; layer < 2; layer++)
+	{
+		m_tilemap[layer]->set_scrolldx(0x094, 0x06a);
+		m_tilemap[layer]->set_scrolldy(0x100, 0x1ff);
+	}
+}
+
+
+uint32_t airbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+
+	// copy the sprite bitmap to the screen
+	m_pandora->update(bitmap, cliprect);
+
+	return 0;
+}
+
+WRITE_LINE_MEMBER(airbustr_state::screen_vblank)
+{
+	// rising edge
+	if (state)
+	{
+		// update the sprite bitmap
+		m_pandora->eof();
+	}
+}
+
+
+// Machine
+
+// Read / Write Handlers
+
+void airbustr_state::calc1_w(offs_t offset, uint8_t data)
+{
+	offset += 0x1fe0;
+	m_devram[offset] = data;
+
+	// CALC1 chip is 16-bit
+	uint16_t data16 = m_devram[offset | 1] << 8 | m_devram[offset & ~1];
+	m_calc1->kaneko_hit_w((offset & 0x1f) / 2, data16);
+}
+
+uint8_t airbustr_state::calc1_r(offs_t offset)
+{
+	// CALC1 chip is 16-bit
+	uint16_t ret = m_calc1->kaneko_hit_r(offset / 2);
+	return (offset & 1) ? (ret >> 8) : (ret & 0xff);
 }
 
 void airbustr_state::master_nmi_trigger_w(uint8_t data)
@@ -319,15 +508,23 @@ void airbustr_state::coin_counter_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_w(1, ~data & 8);
 }
 
-/* Memory Maps */
+
+// Memory Maps
+
 void airbustr_state::master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("masterbank");
+	map(0x8000, 0xbfff).bankr(m_masterbank);
 	map(0xc000, 0xcfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
 	map(0xd000, 0xdfff).ram();
-	map(0xe000, 0xefff).ram().share("devram"); // shared with protection device
-	map(0xf000, 0xffff).ram().share("share1");
+	map(0xe000, 0xefff).ram().share(m_devram); // shared with protection device (see below)
+	map(0xf000, 0xffff).ram().share("master_slave");
+}
+
+void airbustr_state::master_prot_map(address_map &map)
+{
+	master_map(map);
+	map(0xefe0, 0xeff5).rw(FUNC(airbustr_state::calc1_r), FUNC(airbustr_state::calc1_w));
 }
 
 void airbustr_state::master_io_map(address_map &map)
@@ -341,15 +538,15 @@ void airbustr_state::master_io_map(address_map &map)
 void airbustr_state::slave_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("slavebank");
-	map(0xc000, 0xc3ff).ram().w(FUNC(airbustr_state::videoram_w<1>)).share("videoram2");
-	map(0xc400, 0xc7ff).ram().w(FUNC(airbustr_state::colorram_w<1>)).share("colorram2");
-	map(0xc800, 0xcbff).ram().w(FUNC(airbustr_state::videoram_w<0>)).share("videoram1");
-	map(0xcc00, 0xcfff).ram().w(FUNC(airbustr_state::colorram_w<0>)).share("colorram1");
+	map(0x8000, 0xbfff).bankr(m_slavebank);
+	map(0xc000, 0xc3ff).ram().w(FUNC(airbustr_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0xc400, 0xc7ff).ram().w(FUNC(airbustr_state::colorram_w<1>)).share(m_colorram[1]);
+	map(0xc800, 0xcbff).ram().w(FUNC(airbustr_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0xcc00, 0xcfff).ram().w(FUNC(airbustr_state::colorram_w<0>)).share(m_colorram[0]);
 	map(0xd000, 0xd5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xd600, 0xdfff).ram();
 	map(0xe000, 0xefff).ram();
-	map(0xf000, 0xffff).ram().share("share1");
+	map(0xf000, 0xffff).ram().share("master_slave");
 }
 
 void airbustr_state::slave_io_map(address_map &map)
@@ -369,7 +566,7 @@ void airbustr_state::slave_io_map(address_map &map)
 void airbustr_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xc000, 0xdfff).ram();
 }
 
@@ -382,7 +579,8 @@ void airbustr_state::sound_io_map(address_map &map)
 	map(0x06, 0x06).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 }
 
-/* Input Ports */
+
+// Input Ports
 
 static INPUT_PORTS_START( airbustr )
 	PORT_START("P1")
@@ -413,7 +611,7 @@ static INPUT_PORTS_START( airbustr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )        // used
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // used
 
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
@@ -422,9 +620,9 @@ static INPUT_PORTS_START( airbustr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
 	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )             PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "Mode 1" )            //     routine at 0x056d: 11 21 12 16 (bit 3 active)
-	PORT_DIPSETTING(    0x00, "Mode 2" )            //     11 21 13 14 (bit 3 not active)
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x08, "Mode 1" )            // routine at 0x056d: 11 21 12 16 (bit 3 active)
+	PORT_DIPSETTING(    0x00, "Mode 2" )            // 11 21 13 14 (bit 3 not active)
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
@@ -433,7 +631,7 @@ static INPUT_PORTS_START( airbustr )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
@@ -481,36 +679,38 @@ static INPUT_PORTS_START( airbustrj )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
-/* Graphics Decode Information */
+
+// Graphics Decode Information
 
 static GFXDECODE_START( gfx_airbustr )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_lsb,   0, 32 ) // tiles
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 512, 16 ) // sprites
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_row_2x2_group_packed_lsb,   0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_row_2x2_group_packed_msb, 512, 16 )
 GFXDECODE_END
 
 
-/* Interrupt Generators */
+// Interrupt Generators
 
-/* Main Z80 uses IM2 */
-TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::airbustr_scanline)
+// Main Z80 uses IM2
+TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240) // vblank-out irq
+	if (scanline == 240) // vblank-out irq
 		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
-	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
-	if(scanline == 64)
+	// Pandora "sprite end dma" irq? TODO: timing is likely off
+	if (scanline == 64)
 		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 }
 
-/* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
+// Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it
 INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 }
 
-/* Machine Initialization */
+
+// Machine Initialization
 
 void airbustr_state::machine_start()
 {
@@ -532,31 +732,30 @@ void airbustr_state::machine_reset()
 	m_highbits = 0;
 }
 
-/* Machine Driver */
 
-void airbustr_state::airbustr(machine_config &config)
+// Machine Driver
+
+void airbustr_state::airbustrb(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_master, XTAL(12'000'000)/2);   /* verified on pcb */
+	// basic machine hardware
+	Z80(config, m_master, XTAL(12'000'000) / 2); // verified on PCB
 	m_master->set_addrmap(AS_PROGRAM, &airbustr_state::master_map);
 	m_master->set_addrmap(AS_IO, &airbustr_state::master_io_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(airbustr_state::airbustr_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(airbustr_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_slave, XTAL(12'000'000)/2);    /* verified on pcb */
+	Z80(config, m_slave, XTAL(12'000'000) / 2); // verified on PCB
 	m_slave->set_addrmap(AS_PROGRAM, &airbustr_state::slave_map);
 	m_slave->set_addrmap(AS_IO, &airbustr_state::slave_io_map);
-	m_slave->set_vblank_int("screen", FUNC(airbustr_state::slave_interrupt)); /* nmi signal from master cpu */
+	m_slave->set_vblank_int("screen", FUNC(airbustr_state::slave_interrupt)); // nmi signal from master CPU
 
-	Z80(config, m_audiocpu, XTAL(12'000'000)/2); /* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(12'000'000) / 2); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &airbustr_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &airbustr_state::sound_io_map);
 
-	config.set_maximum_quantum(attotime::from_hz(6000));  // Palette RAM is filled by sub cpu with data supplied by main cpu
-							// Maybe a high value is safer in order to avoid glitches
+	// palette RAM is filled by sub CPU with data supplied by main CPU, maybe a high value is safer in order to avoid glitches
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
-
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57.4);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -573,7 +772,7 @@ void airbustr_state::airbustr(machine_config &config)
 	m_pandora->set_gfx_region(1);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
@@ -581,26 +780,30 @@ void airbustr_state::airbustr(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4));   /* verified on pcb */
-	ymsnd.port_a_read_callback().set_ioport("DSW1");       // DSW-1 connected to port A
-	ymsnd.port_b_read_callback().set_ioport("DSW2");       // DSW-2 connected to port B
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 4)); // verified on PCB
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 0.25);
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.50);
 
-	OKIM6295(config, "oki", XTAL(12'000'000)/4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.80);   /* verified on pcb */
+	OKIM6295(config, "oki", XTAL(12'000'000)/4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.80); // verified on PCB
 }
 
-void airbustr_state::airbustrb(machine_config &config)
+void airbustr_state::airbustr(machine_config &config)
 {
-	airbustr(config);
-	m_watchdog->set_time(attotime::from_seconds(0)); // no protection device or watchdog
+	airbustrb(config);
+
+	m_master->set_addrmap(AS_PROGRAM, &airbustr_state::master_prot_map);
+
+	KANEKO_HIT(config, m_calc1).set_type(0);
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3)); // a guess, and certainly wrong
 }
 
 
-/* ROMs */
+// ROMs
 
 ROM_START( airbustr )
 	ROM_REGION( 0x20000, "master", 0 )
@@ -612,17 +815,14 @@ ROM_START( airbustr )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "pr-21.bin",  0x00000, 0x20000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) //MCU is a 80c51 like DJ Boy / Heavy Unit?
-	ROM_LOAD( "i80c51", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x80000, "tiles", 0 )
+	ROM_LOAD( "pr-000.bin", 0x00000, 0x80000, CRC(8ca68f0d) SHA1(d60389e7e63e9850bcddecb486558de1414f1276) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "pr-000.bin", 0x00000, 0x80000, CRC(8ca68f0d) SHA1(d60389e7e63e9850bcddecb486558de1414f1276) ) // scrolling layers
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "pr-001.bin", 0x00000, 0x80000, CRC(7e6cb377) SHA1(005290f9f53a0c3a6a9d04486b16b7fd52cc94b6) ) // sprites
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD( "pr-001.bin", 0x00000, 0x80000, CRC(7e6cb377) SHA1(005290f9f53a0c3a6a9d04486b16b7fd52cc94b6) )
 	ROM_LOAD( "pr-02.bin",  0x80000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* OKI-M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "pr-200.bin", 0x00000, 0x40000, CRC(a4dd3390) SHA1(2d72b46b4979857f6b66489bebda9f48799f59cf) )
 ROM_END
 
@@ -636,17 +836,14 @@ ROM_START( airbustrj )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "pr-21.bin",  0x00000, 0x20000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) //MCU is a 80c51 like DJ Boy / Heavy Unit?
-	ROM_LOAD( "i80c51", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x80000, "tiles", 0 )
+	ROM_LOAD( "pr-000.bin", 0x00000, 0x80000, CRC(8ca68f0d) SHA1(d60389e7e63e9850bcddecb486558de1414f1276) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "pr-000.bin", 0x00000, 0x80000, CRC(8ca68f0d) SHA1(d60389e7e63e9850bcddecb486558de1414f1276) ) // scrolling layers
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "pr-001.bin", 0x000000, 0x80000, CRC(7e6cb377) SHA1(005290f9f53a0c3a6a9d04486b16b7fd52cc94b6) ) // sprites
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD( "pr-001.bin", 0x000000, 0x80000, CRC(7e6cb377) SHA1(005290f9f53a0c3a6a9d04486b16b7fd52cc94b6) )
 	ROM_LOAD( "pr-02.bin",  0x080000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* OKI-M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "pr-200.bin", 0x00000, 0x40000, CRC(a4dd3390) SHA1(2d72b46b4979857f6b66489bebda9f48799f59cf) )
 ROM_END
 
@@ -658,8 +855,8 @@ no title screen
 long attract modes of every level
 slow downs with corrupted screen (you can see the screen being redrawn!) when there are many sprites
 
-the board has 2 oscillators (12 and 16 mhz).  Rom 1 and 2 are program roms. 3 and 4 for sound.
-Rom 5 is on a piggyback daughterboard with a z80 and a PAL
+the board has 2 oscillators (12 and 16 MHz).  ROM 1 and 2 are program ROMs. 3 and 4 for sound.
+ROM 5 is on a piggyback daughterboard with a z80 and a PAL
 
 */
 
@@ -673,15 +870,15 @@ ROM_START( airbustrb )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "2.bin",  0x00000, 0x20000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	/* Same content as airbusj, pr-001.bin, different sized roms / interleave */
+	ROM_REGION( 0x80000, "tiles", 0 )
+	// Same content as airbusj, pr-001.bin, different sized ROMs / interleave
 	ROM_LOAD16_BYTE( "7.bin", 0x00000, 0x20000, CRC(2e3bf0a2) SHA1(84cabc753e5fd1164f0a8a9a9dee7d339a5607c5) )
 	ROM_LOAD16_BYTE( "9.bin", 0x00001, 0x20000, CRC(2c23c646) SHA1(41c0f8788c9715918b4138f076415f8640adc483) )
 	ROM_LOAD16_BYTE( "6.bin", 0x40000, 0x20000, CRC(0d6cd470) SHA1(329286bc6c9d1eccc74735d1c155a0f5f98f1444) )
 	ROM_LOAD16_BYTE( "8.bin", 0x40001, 0x20000, CRC(b3372e51) SHA1(aa8dcbb84c829994ae04ceecbef795ac53e72493) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	/* Same content as airbusj, pr-001.bin, different sized roms */
+	ROM_REGION( 0x100000, "sprites", 0 )
+	// Same content as airbusj, pr-001.bin, different sized ROMs
 	ROM_LOAD( "13.bin", 0x00000, 0x20000, CRC(75dee86d) SHA1(fe342fed5bb84ee6f35d3f91987141c559e94d5a) )
 	ROM_LOAD( "12.bin", 0x20000, 0x20000, CRC(c98a8333) SHA1(3a990460e232ee07a9297fcffdb02451406f5bf1) )
 	ROM_LOAD( "11.bin", 0x40000, 0x20000, CRC(4e9baebd) SHA1(6cf878a3fb3d344e3f5f4d031fbde6f14b653636) )
@@ -689,22 +886,17 @@ ROM_START( airbustrb )
 
 	ROM_LOAD( "14.bin", 0x80000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* OKI-M6295 samples */
-	/* Same content as airbusj, pr-200.bin, different sized roms */
+	ROM_REGION( 0x40000, "oki", 0 )
+	// Same content as airbusj, pr-200.bin, different sized ROMs
 	ROM_LOAD( "4.bin", 0x00000, 0x20000, CRC(21d9bfe3) SHA1(4a69458cd2a6309e389c9e7593ae29d3ef0f8daf) )
 	ROM_LOAD( "3.bin", 0x20000, 0x20000, CRC(58cd19e2) SHA1(479f22241bf29f7af67d9679fc6c20f10004fdd8) )
 ROM_END
 
-/* Driver Initialization */
-
-void airbustr_state::init_airbustr()
-{
-	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8m_delegate(*this, FUNC(airbustr_state::devram_r))); // protection device lives here
-}
+} // anonymous namespace
 
 
-/* Game Drivers */
+// Game Drivers
 
-GAME( 1990, airbustr,  0,        airbustr,  airbustr,  airbustr_state, init_airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)",   MACHINE_SUPPORTS_SAVE ) // 891220
-GAME( 1990, airbustrj, airbustr, airbustr,  airbustrj, airbustr_state, init_airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)",   MACHINE_SUPPORTS_SAVE ) // 891229
-GAME( 1990, airbustrb, airbustr, airbustrb, airbustrj, airbustr_state, empty_init,    ROT0, "bootleg",                "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE ) // based on Japan set (891229)
+GAME( 1990, airbustr,  0,        airbustr,  airbustr,  airbustr_state, empty_init, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)",   MACHINE_SUPPORTS_SAVE ) // 891220
+GAME( 1990, airbustrj, airbustr, airbustr,  airbustrj, airbustr_state, empty_init, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)",   MACHINE_SUPPORTS_SAVE ) // 891229
+GAME( 1990, airbustrb, airbustr, airbustrb, airbustrj, airbustr_state, empty_init, ROT0, "bootleg",                "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE ) // based on Japan set (891229)

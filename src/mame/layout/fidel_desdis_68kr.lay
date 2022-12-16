@@ -6,11 +6,9 @@ license:CC0
 
 <!-- define elements -->
 
-	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
-	<element name="blacka"><rect><color red="0.2" green="0.18" blue="0.18" /></rect></element>
+	<element name="black"><rect><color red="0.15" green="0.15" blue="0.15" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
-	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="disk_black"><disk><color red="0.17" green="0.15" blue="0.15" /></disk></element>
+	<element name="disk_black"><disk><color red="0.15" green="0.15" blue="0.15" /></disk></element>
 	<element name="disk_white"><disk><color red="0.81" green="0.8" blue="0.79" /></disk></element>
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 
@@ -180,12 +178,12 @@ license:CC0
 		<text string="ALTERNATE"><color red="0.81" green="0.3" blue="0.29" /></text>
 	</element>
 
-	<element name="text_p1"><image file="chess/bk.svg"/></element>
-	<element name="text_p2"><image file="chess/bq.svg"/></element>
-	<element name="text_p3"><image file="chess/br.svg"/></element>
-	<element name="text_p4"><image file="chess/bb.svg"/></element>
-	<element name="text_p5"><image file="chess/bn.svg"/></element>
-	<element name="text_p6"><image file="chess/bp.svg"/></element>
+	<element name="text_p1"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bk.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+	<element name="text_p2"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bq.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+	<element name="text_p3"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/br.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+	<element name="text_p4"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bb.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+	<element name="text_p5"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bn.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
+	<element name="text_p6"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1875" /></rect></element>
 
 
 <!-- sb board -->
@@ -517,15 +515,12 @@ license:CC0
 		<element name="1.7" ref="led"><bounds x="77.25" y="85.5" width="1.5" height="1.5" /></element>
 
 		<!-- bottom side -->
-		<element ref="whitew"><bounds x="5" y="98.2" width="80" height="4" /></element>
-		<element ref="text_p1"><bounds x="6.25"  y="98.35" width="3.5" height="3.5" /></element>
-		<element ref="text_p2"><bounds x="15.25" y="98.35" width="3.5" height="3.5" /></element>
-		<element ref="text_p3"><bounds x="24.25" y="98.35" width="3.5" height="3.5" /></element>
-		<element ref="text_p4"><bounds x="58.25" y="98.35" width="3.5" height="3.5" /></element>
-		<element ref="text_p5"><bounds x="67.25" y="98.35" width="3.5" height="3.5" /></element>
-		<element ref="text_p6"><bounds x="76.25" y="98.35" width="3.5" height="3.5" /></element>
-		<element ref="blacka" blend="add"><bounds x="5" y="98.2" width="80" height="4" /></element>
-		<element ref="white" blend="multiply"><bounds x="5" y="98.2" width="80" height="4" /></element>
+		<element ref="text_p1" blend="multiply"><bounds x="6.25"  y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="text_p2" blend="multiply"><bounds x="15.25" y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="text_p3" blend="multiply"><bounds x="24.25" y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="text_p4" blend="multiply"><bounds x="58.25" y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="text_p5" blend="multiply"><bounds x="67.25" y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="text_p6" blend="multiply"><bounds x="76.25" y="98.35" width="3.5" height="3.5" /></element>
 
 		<element ref="text_white"><bounds x="33" y="87.5" width="10" height="2" /></element>
 		<element ref="text_black"><bounds x="43" y="87.5" width="10" height="2" /></element>

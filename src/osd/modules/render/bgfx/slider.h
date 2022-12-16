@@ -13,10 +13,14 @@
 
 #include <bgfx/bgfx.h>
 
+#include <cmath>
+#include <memory>
 #include <string>
 #include <vector>
 
 struct slider_state;
+
+class running_machine;
 
 class bgfx_slider
 {

@@ -782,5 +782,5 @@ ROM_END
 
 GAME( 1983, cliffhgr,  0,        cliffhgr, cliffhgr,  cliffhgr_state, empty_init, ROT0, "Stern Electronics", "Cliff Hanger (set 1)", 0 )
 GAME( 1983, cliffhgra, cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, empty_init, ROT0, "Stern Electronics", "Cliff Hanger (set 2)", 0 )
-GAME( 1983, cliffhgra2,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, empty_init, ROT0, "Stern Electronics", "Cliff Hanger (set 3)", MACHINE_NOT_WORKING ) // seems to fail the third startup check, bypassable by doing bpset 0x3f5 and at the third occurance do PC = 0x3f7
+GAME( 1983, cliffhgra2,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, empty_init, ROT0, "Stern Electronics", "Cliff Hanger (set 3)", MACHINE_NOT_WORKING ) // seems to fail the third startup check, bypassable by doing bpset 0x3f5 and at the third occurrence do PC = 0x3f7
 GAME( 1983, goaltogo,  0,        cliffhgr, goaltogo,  cliffhgr_state, empty_init, ROT0, "Stern Electronics", "Goal To Go",           MACHINE_NOT_WORKING )

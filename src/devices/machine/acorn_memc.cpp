@@ -14,7 +14,6 @@
 #include "acorn_memc.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 
 #include <functional>
@@ -51,10 +50,10 @@ device_memory_interface::space_config_vector acorn_memc_device::memory_space_con
 	};
 }
 
-void acorn_memc_device::memc_map_debug_commands(const std::vector<std::string> &params)
+void acorn_memc_device::memc_map_debug_commands(const std::vector<std::string_view> &params)
 {
 	uint64_t offset;
-	if (params.size() != 1 || !machine().debugger().commands().validate_number_parameter(params[0], offset))
+	if (params.size() != 1 || !machine().debugger().console().validate_number_parameter(params[0], offset))
 		return;
 
 	// figure out the page number and offset in the page

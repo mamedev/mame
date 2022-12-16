@@ -146,7 +146,7 @@ uint16_t hp98034_io_card_device::reg_r(address_space &space, offs_t offset)
 	//   This is meant to gain some margin to NP in the race with
 	//   CPU (in real hw the margin was probably no more than a
 	//   couple of µs).
-	machine().scheduler().boost_interleave(attotime::from_usec(5) , attotime::from_usec(100));
+	machine().scheduler().add_quantum(attotime::from_usec(5) , attotime::from_usec(100));
 	space.device().execute().spin();
 	machine().scheduler().synchronize();
 	LOG("%.06f RD R%u=%04x %s\n" , machine().time().as_double() , offset + 4 , res , machine().describe_context());
@@ -169,7 +169,7 @@ void hp98034_io_card_device::reg_w(address_space &space, offs_t offset, uint16_t
 
 	update_flg();
 	// See reg_r above
-	machine().scheduler().boost_interleave(attotime::from_usec(5) , attotime::from_usec(100));
+	machine().scheduler().add_quantum(attotime::from_usec(5) , attotime::from_usec(100));
 	space.device().execute().spin();
 	machine().scheduler().synchronize();
 	LOG("%.06f WR R%u=%04x %s\n" , machine().time().as_double() , offset + 4 , data , machine().describe_context());
@@ -270,7 +270,7 @@ void hp98034_io_card_device::mode_reg_clear_w(uint8_t data)
 	m_force_flg = false;
 	if (update_flg()) {
 		// See reg_r above
-		machine().scheduler().boost_interleave(attotime::zero , attotime::from_usec(100));
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 		machine().scheduler().synchronize();
 	}
 }
@@ -302,7 +302,7 @@ void hp98034_io_card_device::update_dc()
 	sts_w(BIT(m_dc , 4));
 	if (update_flg()) {
 		// See reg_r above
-		machine().scheduler().boost_interleave(attotime::zero , attotime::from_usec(100));
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 		machine().scheduler().synchronize();
 	}
 	update_clr_hpib();

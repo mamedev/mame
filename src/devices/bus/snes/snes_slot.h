@@ -123,7 +123,7 @@ public:
 	virtual void chip_write(offs_t offset, uint8_t data) { }
 	virtual void speedup_addon_bios_access() {}
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void nvram_alloc(uint32_t size);
 	void rtc_ram_alloc(uint32_t size);
 	void addon_bios_alloc(uint32_t size);
@@ -311,13 +311,5 @@ public:
 DECLARE_DEVICE_TYPE(SNS_CART_SLOT,        sns_cart_slot_device)
 DECLARE_DEVICE_TYPE(SNS_SUFAMI_CART_SLOT, sns_sufami_cart_slot_device)
 DECLARE_DEVICE_TYPE(SNS_BSX_CART_SLOT,    sns_bsx_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define SNSSLOT_ROM_REGION_TAG ":cart:rom"
-
 
 #endif // MAME_BUS_SNES_SNES_SLOT_H

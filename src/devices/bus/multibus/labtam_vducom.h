@@ -17,8 +17,9 @@
 
 #include "bus/rs232/rs232.h"
 
-#include "screen.h"
 #include "emupal.h"
+#include "screen.h"
+
 
 class labtam_vducom_device
 	: public device_t

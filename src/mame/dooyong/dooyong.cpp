@@ -1367,17 +1367,6 @@ const gfx_layout spritelayout =
 	128*8
 };
 
-const gfx_layout rshark_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*16,4) },
-	{ STEP16(0,4*8) },
-	128*8
-};
-
 GFXDECODE_START( gfx_lastday )
 	GFXDECODE_ENTRY( "tx",     0, lastday_charlayout, 0, 16+64 )
 	GFXDECODE_ENTRY( "sprite", 0, spritelayout,     256, 16+64 )
@@ -1409,18 +1398,18 @@ GFXDECODE_END
 
 GFXDECODE_START( gfx_rshark )
 	/* no chars */
-	GFXDECODE_ENTRY( "sprite", 0, rshark_spritelayout,  0, 16 )
-	GFXDECODE_ENTRY( "fg1",    0, spritelayout,       256, 16 )
-	GFXDECODE_ENTRY( "fg0",    0, spritelayout,       512, 16 )
-	GFXDECODE_ENTRY( "bg1",    0, spritelayout,       768, 16 )
-	GFXDECODE_ENTRY( "bg0",    0, spritelayout,      1024, 16 )
+	GFXDECODE_ENTRY( "sprite", 0, gfx_8x8x4_col_2x2_group_packed_msb,    0, 16 )
+	GFXDECODE_ENTRY( "fg1",    0, spritelayout,                        256, 16 )
+	GFXDECODE_ENTRY( "fg0",    0, spritelayout,                        512, 16 )
+	GFXDECODE_ENTRY( "bg1",    0, spritelayout,                        768, 16 )
+	GFXDECODE_ENTRY( "bg0",    0, spritelayout,                       1024, 16 )
 GFXDECODE_END
 
 GFXDECODE_START( gfx_popbingo )
 	/* no chars */
-	GFXDECODE_ENTRY( "sprite", 0, rshark_spritelayout,  0, 16 )
-	GFXDECODE_ENTRY( "bg0",    0, tilelayout,           0,  1 )
-	GFXDECODE_ENTRY( "bg1",    0, tilelayout,           0,  1 )
+	GFXDECODE_ENTRY( "sprite", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0, 16 )
+	GFXDECODE_ENTRY( "bg0",    0, tilelayout,                         0,  1 )
+	GFXDECODE_ENTRY( "bg1",    0, tilelayout,                         0,  1 )
 
 GFXDECODE_END
 

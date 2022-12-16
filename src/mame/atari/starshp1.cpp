@@ -195,7 +195,7 @@ static INPUT_PORTS_START( starshp1 )
 	PORT_DIPNAME( 0x20, 0x20, "Extended Play" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Speed lever - spring-returned to SLOW unless held down for FAST
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Thrust Control") // Speed lever - spring-returned to SLOW unless held down for FAST
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("VBLANK")
@@ -311,8 +311,6 @@ void starshp1_state::starshp1(machine_config &config)
 	misclatch.q_out_cb<7>().set(FUNC(starshp1_state::led_w));
 
 	/* video hardware */
-
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(STARSHP1_PIXEL_CLOCK, STARSHP1_HTOTAL, STARSHP1_HBEND, STARSHP1_HBSTART, STARSHP1_VTOTAL, STARSHP1_VBEND, STARSHP1_VBSTART);
 	m_screen->set_screen_update(FUNC(starshp1_state::screen_update_starshp1));

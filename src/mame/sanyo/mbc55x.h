@@ -26,8 +26,6 @@
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
-#include "debug/debugcon.h"
-#include "debugger.h"
 #include "emupal.h"
 
 #include "formats/pc_dsk.h"
@@ -140,7 +138,6 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 
-	uint32_t      m_debug_video = 0;
 	uint8_t       m_video_mem[VIDEO_MEM_SIZE];
 	uint8_t       m_vram_page = 0;
 	uint8_t       m_printer_status = 0;
@@ -148,8 +145,6 @@ private:
 	double        m_x_calibration = 0, m_y_calibration = 0;
 	bool          m_ls123_strobe = false;
 	double        m_ls123_clear_time[4];
-
-	void video_debug(const std::vector<std::string> &params);
 };
 
 /*----------- defined in machine/mbc55x.c -----------*/

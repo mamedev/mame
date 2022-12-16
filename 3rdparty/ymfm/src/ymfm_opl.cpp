@@ -100,6 +100,11 @@ opl_registers_base<Revision>::opl_registers_base() :
 			}
 		}
 	}
+
+	// OPL3/OPL4 have dynamic operators, so initialize the fourop_enable value here
+	// since operator_map() is called right away, prior to reset()
+	if (Revision > 2)
+		m_regdata[0x104 % REGISTERS] = 0;
 }
 
 
@@ -2035,8 +2040,8 @@ void opll_base::generate(output_data *output, uint32_t numsamples)
 
 		// final output is multiplexed; we don't simulate that here except
 		// to average over everything
-		output->data[0] = (output->data[0] << 7) / 9;
-		output->data[1] = (output->data[1] << 7) / 9;
+		output->data[0] = (output->data[0] * 128) / 9;
+		output->data[1] = (output->data[1] * 128) / 9;
 	}
 }
 

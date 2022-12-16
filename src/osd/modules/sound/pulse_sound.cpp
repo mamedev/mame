@@ -20,10 +20,14 @@
 #include <stdlib.h>
 #include <poll.h>
 
+#include <mutex>
 #include <thread>
 #include <pulse/pulseaudio.h>
 
 #include "modules/lib/osdobj_common.h"
+
+using osd::s16;
+using osd::u32;
 
 class sound_pulse : public osd_module, public sound_module
 {
@@ -293,7 +297,11 @@ int sound_pulse::init(osd_options const &options)
 		return 1;
 
 	pa_sample_spec ss;
-	ss.format = ENDIANNESS_NATIVE == ENDIANNESS_BIG ? PA_SAMPLE_S16BE : PA_SAMPLE_S16LE;
+#ifdef LSB_FIRST
+	ss.format = PA_SAMPLE_S16LE;
+#else
+	ss.format = PA_SAMPLE_S16BE;
+#endif
 	ss.rate = sample_rate();
 	ss.channels = 2;
 	m_stream = pa_stream_new(m_context, "main output", &ss, nullptr);

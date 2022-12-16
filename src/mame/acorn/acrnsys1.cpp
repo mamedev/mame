@@ -53,6 +53,7 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "machine/timer.h"
 #include "imagedev/cassette.h"
 #include "speaker.h"
+#include "utf8.h"
 
 #include "acrnsys1.lh"
 

@@ -48,12 +48,6 @@ public:
 	void s2_w(int state);
 
 protected:
-	enum
-	{
-		TIMER_VCK,
-		TIMER_ADPCM_CAPTURE
-	};
-
 	msm5205_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 dac_bits);
 
 	// device-level overrides

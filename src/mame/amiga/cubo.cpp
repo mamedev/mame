@@ -1068,6 +1068,7 @@ void cubo_state::cubo(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cubo_state::cubo_mem);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cubo_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cubo_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);

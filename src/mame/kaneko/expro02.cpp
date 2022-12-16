@@ -418,7 +418,6 @@ uint32_t expro02_state::screen_update_zipzap(screen_device &screen, bitmap_ind16
  *************************************/
 
 static INPUT_PORTS_START( expro02 ) // TODO: at least for the 1994 version of New Fantasia running on the 940630 SWA and SWB should be inverted
-
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SWA:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
@@ -731,11 +730,11 @@ void expro02_state::expro02_map(address_map &map)
 	map(0x900000, 0x900000).w(FUNC(expro02_state::oki_bankswitch_w));
 	map(0xa00000, 0xa00001).nopw();    /* ??? */
 	map(0xc80000, 0xc8ffff).ram();
-	map(0xe00000, 0xe00015).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
+	map(0xe00000, 0xe00015).rw("calc1", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
 }
 
 
-// bigger ROM space, OKI commands moved, no CALC mcu
+// bigger ROM space, OKI commands moved, no CALC1 chip
 void expro02_state::fantasia_map(address_map &map)
 {
 	expro02_video_base_map(map);
@@ -922,8 +921,6 @@ void expro02_state::expro02(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::expro02_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(expro02_state::scanline), "screen", 0, 1);
 
-	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -947,7 +944,7 @@ void expro02_state::expro02(machine_config &config)
 	m_kaneko_spr->set_palette(m_palette);
 	m_kaneko_spr->set_color_base(0x100);
 
-	KANEKO_HIT(config, "calc1_mcu").set_type(0);
+	KANEKO_HIT(config, "calc1").set_type(0);
 
 	/* arm watchdog */
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
@@ -968,7 +965,7 @@ void expro02_state::comad(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::fantasia_map);
 
-	config.device_remove("calc1_mcu");
+	config.device_remove("calc1");
 
 	// these values might not be correct, behavior differs from original boards
 	m_view2->set_invert_flip(1);

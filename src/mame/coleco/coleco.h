@@ -54,7 +54,6 @@ public:
 	TIMER_CALLBACK_MEMBER(paddle_pulse_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_update_callback);
 	DECLARE_WRITE_LINE_MEMBER(coleco_vdp_interrupt);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(czz50_cart);
 
 	uint8_t coleco_paddle_read(int port, int joy_mode, uint8_t joy_status);
 	uint8_t coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1);

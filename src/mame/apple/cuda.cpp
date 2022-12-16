@@ -33,6 +33,14 @@
     -x--      ?  680x0 IPL 2 (used in both directions)
     --x-      ?  IPL 1/pull up for passive power, trickle sense for soft and secure
     ---x      ?  IPL 0 for passive power, pull-up for soft power, file server switch for secure power
+
+    Cuda version spotting:
+    341S0262 - 0x0003f200 (3.02) - some PMac 6500, Bondi blue iMac
+    341S0285 - No version (x.xx) - PMac 4400 + Mac clones ("Cuda Lite" with 768 bytes more ROM + PS/2 keyboard/mouse support)
+    341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, "Gossamer" G3, others?
+                                    (verified found in PMac 5500-225, G3-333)
+    341S0788 - 0x00020025 (2.37) - LC 475/575/Quadra 605, Quadra 660AV/840AV, PMac 7200
+    341S0417 - 0x00020023 (2.35) - Color Classic
 */
 
 
@@ -425,6 +433,25 @@ void cuda_device::device_start()
 	if (rom)
 	{
 		memcpy(rom, rom+rom_offset, 0x1100);
+
+		// HACK: there's as-yet undiagnosed weirdness in the 6805 program where the ADB
+		// autopoll timer never reaches zero and polling never occurs.  This patches
+		// the idle loop so polling runs.
+		// in 2.40:
+		// 101B: tst autopoll_timer (0x90)
+		// 101D: bne adb_poll_loop
+		// 101F: brset 7, flags, run_auto_poll
+
+		switch (rom_offset)
+		{
+			case CUDA_341S0060:
+				rom[0x101d-0xf00] = 0x27;   // patch for 2.40 (BNE to BEQ)
+				break;
+
+			case CUDA_341S0788:
+				rom[0x1035-0xf00] = 0x27;   // patch for 2.37 (BNE to BEQ)
+				break;
+		}
 	}
 }
 

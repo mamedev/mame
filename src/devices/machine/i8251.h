@@ -133,7 +133,7 @@ private:
 
 	/* data being received */
 	uint8_t m_rx_data;
-		/* tx buffer */
+	/* tx buffer */
 	uint8_t m_tx_data;
 	void sync1_w(uint8_t data);
 	void sync2_w(uint8_t data);

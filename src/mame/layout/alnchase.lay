@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<view name="Screen (Player 1)">
+		<screen index="0"><bounds x="0" y="0" width="~scr0width~" height="~scr0height~" /></screen>
+	</view>
+
+	<view name="Screen (Player 2)">
+		<screen index="0"><bounds x="0" y="0" width="~scr0width~" height="~scr0height~" /><orientation flipx="yes" /></screen>
+	</view>
+
+</mamelayout>

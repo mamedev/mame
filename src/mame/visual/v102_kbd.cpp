@@ -15,6 +15,8 @@ through software commands.
 #include "emu.h"
 #include "v102_kbd.h"
 
+#include "utf8.h"
+
 DEFINE_DEVICE_TYPE(V102_KEYBOARD, v102_keyboard_device, "v102_kbd", "Visual 102 Keyboard")
 DEFINE_DEVICE_TYPE(V550_KEYBOARD, v550_keyboard_device, "v550_kbd", "Visual 550 Keyboard")
 

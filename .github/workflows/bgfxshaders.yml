@@ -1,0 +1,41 @@
+name: Rebuild BGFX shaders
+
+on:
+  push:
+    paths:
+    - '.github/**'
+    - 'src/osd/modules/render/bgfx/shaders/**'
+  pull_request:
+    paths:
+    - '.github/**'
+    - 'src/osd/modules/render/bgfx/shaders/**'
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: msys2/setup-msys2@v2
+      with:
+        install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python mingw-w64-x86_64-libc++
+    - uses: actions/checkout@master
+    - name: Prevent make from rebuilding GLSL parser source
+      run: |
+        touch 3rdparty/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/glcpp-lex.c
+        touch 3rdparty/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/glcpp-parse.c
+        touch 3rdparty/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/glcpp-parse.h
+        touch 3rdparty/bgfx/3rdparty/glslang/glslang/MachineIndependent/glslang_tab.cpp
+        touch 3rdparty/bgfx/3rdparty/glslang/glslang/MachineIndependent/glslang_tab.cpp.h
+    - name: Build
+      env:
+        MINGW64: "/mingw64"
+      run: make shaders
+    - uses: actions/upload-artifact@master
+      with:
+        name: mame-bgfx-${{ github.sha }}
+        path: bgfx/shaders

@@ -153,6 +153,7 @@ Notes:
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
+#include "utf8.h"
 
 
 namespace {

@@ -257,9 +257,8 @@
 #include "zaxxon.h"
 #include "segausb.h"
 
-#include "segacrpt_device.h"
-
 #include "cpu/z80/z80.h"
+#include "machine/segacrpt_device.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/samples.h"

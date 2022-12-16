@@ -192,6 +192,7 @@ Beeper Circuit, all ICs shown:
 
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"        //Keyboard MCU ... talks to the 8278 on the keyboard circuit
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
@@ -200,12 +201,15 @@ Beeper Circuit, all ICs shown:
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/tms9927.h"          //Display hardware
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
 #include "formats/itt3030_dsk.h"
-#include "debugger.h"
+
+#include "utf8.h"
 
 #define MAIN_CLOCK XTAL_4.194MHz
 

@@ -1,15 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
 #include "emu.h"
+#include "deviceinformationwindow.h"
+
+#include "util/xmlfile.h"
+
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
 
-#include "deviceinformationwindow.h"
 
+namespace osd::debugger::qt {
 
-DeviceInformationWindow::DeviceInformationWindow(running_machine &machine, device_t *device, QWidget *parent) :
-	WindowQt(machine, nullptr),
+DeviceInformationWindow::DeviceInformationWindow(DebuggerQt &debugger, device_t *device, QWidget *parent) :
+	WindowQt(debugger, nullptr),
 	m_device(device)
 {
 	if (parent)
@@ -26,6 +30,26 @@ DeviceInformationWindow::DeviceInformationWindow(running_machine &machine, devic
 DeviceInformationWindow::~DeviceInformationWindow()
 {
 }
+
+
+void DeviceInformationWindow::restoreConfiguration(util::xml::data_node const &node)
+{
+	WindowQt::restoreConfiguration(node);
+
+	auto const tag = node.get_attribute_string(ATTR_WINDOW_DEVICE_TAG, ":");
+	set_device(tag);
+}
+
+
+void DeviceInformationWindow::saveConfigurationToNode(util::xml::data_node &node)
+{
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_DEVICE_INFO_VIEWER);
+
+	node.set_attribute(ATTR_WINDOW_DEVICE_TAG, m_device->tag());
+}
+
 
 void DeviceInformationWindow::fill_device_information()
 {
@@ -99,40 +123,4 @@ void DeviceInformationWindow::set_device(const char *tag)
 	fill_device_information();
 }
 
-const char *DeviceInformationWindow::device_tag() const
-{
-	return m_device->tag();
-}
-
-
-//=========================================================================
-//  DeviceInformationWindowQtConfig
-//=========================================================================
-void DeviceInformationWindowQtConfig::buildFromQWidget(QWidget *widget)
-{
-	WindowQtConfig::buildFromQWidget(widget);
-	DeviceInformationWindow *window = dynamic_cast<DeviceInformationWindow *>(widget);
-	m_device_tag = window->device_tag();
-}
-
-
-void DeviceInformationWindowQtConfig::applyToQWidget(QWidget *widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-	DeviceInformationWindow *window = dynamic_cast<DeviceInformationWindow *>(widget);
-	window->set_device(m_device_tag.c_str());
-}
-
-
-void DeviceInformationWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute("device-tag", m_device_tag.c_str());
-}
-
-
-void DeviceInformationWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
-	m_device_tag = node.get_attribute_string("device-tag", ":");
-}
+} // namespace osd::debugger::qt

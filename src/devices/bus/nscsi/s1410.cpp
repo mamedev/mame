@@ -174,3 +174,24 @@ void nscsi_s1410_device::scsi_put_data(int id, int pos, uint8_t data)
 		return nscsi_harddisk_device::scsi_put_data(id, pos, data);
 	}
 }
+
+// Byte transfer rate (5Mb/s)
+attotime nscsi_s1410_device::scsi_data_byte_period()
+{
+	return attotime::from_nsec(1600);
+}
+
+// Command execution delay
+attotime nscsi_s1410_device::scsi_data_command_delay()
+{
+	switch(scsi_cmdbuf[0]) {
+	case SC_READ:
+	case SC_WRITE:
+	case SC_SEEK:
+		// average seek time of NEC D5126A hard disk
+		return attotime::from_msec(85);
+
+	default:
+		return attotime::zero;
+	}
+}

@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NES_PACHINKO, nes_pachinko_device, "nes_pachinko", "Coconuts Japan Pachinko Controller")
+DEFINE_DEVICE_TYPE(NES_PACHINKO, nes_pachinko_device, "nes_pachinko", "Coconuts Japan Pachinko Controller CJPC-102")
 
 
 static INPUT_PORTS_START( nes_pachinko )

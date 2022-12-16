@@ -703,7 +703,7 @@ ROM_START( bingpty ) // 1994/05/01 string
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
-ROM_START( unkm1 ) // 1992.01.31 string
+ROM_START( carboule ) // 1992.01.31 string
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "epr-14427.ic8", 0x00000, 0x40000, CRC(2d904fc6) SHA1(7062f47d77d09906420118c85e1cb565bec345a7) )
 	ROM_LOAD16_BYTE( "epr-14428.ic7", 0x00001, 0x40000, CRC(97a317f4) SHA1(19bc4cf6b6c580caa44f36c929b445ed94b2d9eb) )
@@ -741,5 +741,5 @@ GAME(1990, tinkerbl, 0, m1base, tinkerbl, systemm1_state, empty_init, ROT0, "Seg
 GAME(1990, blicks, 0, m1base, tinkerbl, systemm1_state, empty_init, ROT0, "Sega", "Blicks", MACHINE_NOT_WORKING)
 
 // M1 comm multi-board games
-GAME(1994, bingpty, 0, m1comm, bingpty, systemm1_state, empty_init, ROT0, "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING)
-GAME(1992, unkm1, 0, m1comm, bingpty, systemm1_state, empty_init, ROT0, "Sega", "unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1994, bingpty,  0, m1comm, bingpty, systemm1_state, empty_init, ROT0, "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING)
+GAME(1992, carboule, 0, m1comm, bingpty, systemm1_state, empty_init, ROT0, "Sega", "Caribbean Boule (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

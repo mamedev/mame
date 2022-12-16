@@ -2,35 +2,29 @@
 // copyright-holders:Wilbert Pol, Charles MacDonald,Mathis Rosenhauer,Brad Oliver,Michael Luong,Fabio Priuli,Enik Land
 /*****************************************************************************
  *
- * includes/sms.h
+ * sega/sms.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_SMS_H
 #define MAME_INCLUDES_SMS_H
 
-#define LOG_REG
-#define LOG_PAGING
-#define LOG_COLOR
+#pragma once
 
-#define NVRAM_SIZE             (0x08000)
-#define CPU_ADDRESSABLE_SIZE   (0x10000)
+#include "mdioport.h"
 
-#define MAX_CARTRIDGES        16
-
-#define CONTROL1_TAG   "ctrl1"
-#define CONTROL2_TAG   "ctrl2"
-
-#include "bus/gamegear/ggext.h"
 #include "bus/sega8/sega8_slot.h"
 #include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/sms_exp/smsexp.h"
+#include "machine/timer.h"
 #include "sound/ymopl.h"
 #include "video/315_5124.h"
 
 #include "screen.h"
-#include "machine/timer.h"
+
+#define LOG_REG
+#define LOG_PAGING
+#define LOG_COLOR
 
 
 class sms_state : public driver_device
@@ -42,10 +36,8 @@ public:
 		m_vdp(*this, "sms_vdp"),
 		m_main_scr(*this, "screen"),
 		m_ym(*this, "ym2413"),
-		m_port_ctrl1(*this, CONTROL1_TAG),
-		m_port_ctrl2(*this, CONTROL2_TAG),
-		m_port_gg_ext(*this, "ext"),
-		m_port_gg_dc(*this, "GG_PORT_DC"),
+		m_port_ctrl1(*this, "ctrl1"),
+		m_port_ctrl2(*this, "ctrl2"),
 		m_port_pause(*this, "PAUSE"),
 		m_port_reset(*this, "RESET"),
 		m_port_rapid(*this, "RAPID"),
@@ -66,8 +58,7 @@ public:
 		m_has_pwr_led(false),
 		m_slot(*this, "slot"),
 		m_cardslot(*this, "mycard"),
-		m_smsexpslot(*this, "smsexp"),
-		m_sgexpslot(*this, "sgexp")
+		m_smsexpslot(*this, "smsexp")
 	{ }
 
 	void sms_base(machine_config &config);
@@ -101,8 +92,6 @@ protected:
 	uint8_t sms_count_r(offs_t offset);
 	uint8_t sms_input_port_dc_r();
 	uint8_t sms_input_port_dd_r();
-	uint8_t sg1000m3_peripheral_r(offs_t offset);
-	void sg1000m3_peripheral_w(offs_t offset, uint8_t data);
 	uint8_t smsj_audio_control_r();
 	void smsj_audio_control_w(uint8_t data);
 	void smsj_ym2413_register_port_w(uint8_t data);
@@ -112,7 +101,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
 
-	void sg1000m3_io(address_map &map);
 	void sms_io(address_map &map);
 	void sms_mem(address_map &map);
 	void smsj_io(address_map &map);
@@ -135,9 +123,7 @@ protected:
 	optional_device<ym2413_device> m_ym;
 	optional_device<sms_control_port_device> m_port_ctrl1;
 	optional_device<sms_control_port_device> m_port_ctrl2;
-	optional_device<gg_ext_port_device> m_port_gg_ext;
 
-	optional_ioport m_port_gg_dc;
 	optional_ioport m_port_pause;
 	optional_ioport m_port_reset;
 	optional_ioport m_port_rapid;
@@ -150,7 +136,7 @@ protected:
 	std::unique_ptr<uint8_t[]> m_mainram;
 	uint8_t *m_BIOS;
 
-	// for gamegear LCD persistence hack
+	// for Game Gear LCD persistence hack
 	bitmap_rgb32 m_prev_bitmap;
 	bool m_prev_bitmap_copied;
 
@@ -199,8 +185,8 @@ protected:
 	optional_device<sega8_cart_slot_device> m_slot;
 	optional_device<sega8_card_slot_device> m_cardslot;
 	optional_device<sms_expansion_slot_device> m_smsexpslot;
-	optional_device<sg1000_expansion_slot_device> m_sgexpslot;
 };
+
 
 class sms1_state : public sms_state
 {
@@ -219,7 +205,6 @@ public:
 	void sms1_br(machine_config &config);
 	void sms1_kr(machine_config &config);
 	void smsj(machine_config &config);
-	void sg1000m3(machine_config &config);
 
 protected:
 	virtual void video_start() override;
@@ -247,6 +232,7 @@ private:
 	uint8_t m_sscope_state;
 	uint8_t m_frame_sscope_state;
 };
+
 
 class smssdisp_state : public sms1_state
 {
@@ -285,11 +271,39 @@ private:
 	uint8_t m_store_cart_selection_data;
 };
 
+
+class sg1000m3_state : public sms1_state
+{
+public:
+	sg1000m3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sms1_state(mconfig, type, tag),
+		m_sgexpslot(*this, "sgexp")
+	{ }
+
+	void sg1000m3(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	uint8_t sg1000m3_peripheral_r(offs_t offset);
+	void sg1000m3_peripheral_w(offs_t offset, uint8_t data);
+
+	void sg1000m3_io(address_map &map);
+
+	required_device<sg1000_expansion_slot_device> m_sgexpslot;
+};
+
+
 class gamegear_state : public sms_state
 {
 public:
 	gamegear_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sms_state(mconfig, type, tag)
+		sms_state(mconfig, type, tag),
+		m_io_view(*this, "io"),
+		m_gg_ioport(*this, "ioport"),
+		m_port_gg_ext(*this, "ext"),
+		m_port_gg_dc(*this, "GG_PORT_DC")
 	{ }
 
 	void gamegear(machine_config &config);
@@ -305,25 +319,33 @@ private:
 	template <typename X> static void screen_gg_raw_params(screen_device &screen, X &&pixelclock);
 
 	uint8_t gg_input_port_00_r();
-	uint8_t gg_sio_r(offs_t offset);
-	void gg_sio_w(offs_t offset, uint8_t data);
-	void gg_psg_stereo_w(uint8_t data);
+	uint8_t gg_input_port_dc_r();
+	uint8_t gg_input_port_dd_r();
+	void gg_io_control_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(gg_pause_callback);
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
+	DECLARE_WRITE_LINE_MEMBER(gg_nmi);
 
 	uint32_t screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void gg_io(address_map &map);
 
+	memory_view m_io_view;
+
+	required_device<gamegear_io_port_device> m_gg_ioport;
+	required_device<sms_control_port_device> m_port_gg_ext;
+
+	required_ioport m_port_gg_dc;
+
 	// for gamegear SMS mode scaling
 	bitmap_rgb32 m_gg_sms_mode_bitmap;
-	// line_buffer will be used to hold 4 lines of line data as a kind of cache for
-	// vertical scaling in the gamegear sms compatibility mode.
-	std::unique_ptr<int[]> m_line_buffer;
 
-	uint8_t m_gg_sio[5]{};
+	// line_buffer will be used to hold 4 lines of line data as a kind of cache for
+	// vertical scaling in the Game Gear SMS compatibility mode.
+	std::unique_ptr<int []> m_line_buffer;
+
 	int m_gg_paused = 0;
 };
 

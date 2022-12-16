@@ -36,6 +36,7 @@ protected:
 	enum { MAX_VECTORS = 256 };
 
 	int irq_vector_base;
+	int irq_vector_count;
 	int irq_vector_nmi;
 
 	required_device<h8_device> cpu;
@@ -64,8 +65,11 @@ class gt913_intc_device : public h8_intc_device {
 public:
 	gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	void clear_interrupt(int vector);
 protected:
 	gt913_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_reset() override;
 };
 
 class h8h_intc_device : public h8_intc_device {

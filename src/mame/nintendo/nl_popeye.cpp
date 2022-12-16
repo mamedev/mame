@@ -11,6 +11,7 @@
  */
 
 static NETLIST_START(popeye_imp_changer)
+{
 	RES(R62, 510000)
 	RES(R63, 100)
 	RES(R64, 510000)
@@ -28,9 +29,10 @@ static NETLIST_START(popeye_imp_changer)
 	NET_C(R66.2, Q9.E, R67.1)
 
 	NET_C(GND, Q9.C, R65.2, R64.2)
-NETLIST_END()
+}
 
 NETLIST_START(popeye)
+{
 
 	/* register hard coded netlists */
 
@@ -90,4 +92,4 @@ NETLIST_START(popeye)
 
 	NET_C(GND, ROUT.2)
 
-NETLIST_END()
+}

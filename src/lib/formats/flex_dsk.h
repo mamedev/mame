@@ -44,6 +44,19 @@ private:
 		uint8_t last_sec = 0;
 		uint8_t unused2[216]{};
 	};
+	// FLEX 1.0 SIR (System Information Record)
+	// Ref: https://deramp.com/downloads/swtpc/software/FLEX/FLEX%201.0%20(MiniFLEX)/Source/NEWDISK.LST
+	struct sysinfo_sector_flex10
+	{
+		uint8_t unused[21]{};
+		uint8_t fc_start_trk = 0;
+		uint8_t fc_start_sec = 0;
+		uint8_t fc_end_trk = 0;
+		uint8_t fc_end_sec = 0;
+		uint8_t free[2]{};
+		uint8_t unused2[101]{};
+	};
+
 	static const format formats[];
 	static const format formats_head1[];
 	static const format formats_track0[];

@@ -64,7 +64,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 0x100; }
+	virtual uint32_t palette_entries() const noexcept override { return 0x100; }
 
 	void vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect);
@@ -273,6 +273,7 @@ protected:
 		uint8_t rgb24_en;
 		uint8_t rgb32_en;
 		uint8_t id;
+		bool ignore_chain4;
 	} svga;
 };
 

@@ -76,7 +76,7 @@ def process_file(srcfile):
                     if m is not None:
                         process_entry(srcfile, m.group(1), "")
                     else:
-                        m = re.match(r"(static)*TRUTHTABLE_START\((\w+),(\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
+                        m = re.match(r"(static)*TRUTH_TABLE\((\w+),(\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
                         if m is not None:
                             process_entry(srcfile, m.group(2), m.group(5))
                         else:

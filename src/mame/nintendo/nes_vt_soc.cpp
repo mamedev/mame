@@ -849,29 +849,6 @@ void nes_vt02_vt03_soc_device::vt03_8000_mapper_w(offs_t offset, uint8_t data)
 	//logerror("%s: vt03_8000_mapper_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
 }
 
-/* APU plumbing, this is because we have a plain M6502 core in the VT03, otherwise this is handled in the core */
-
-uint8_t nes_vt02_vt03_soc_device::psg1_4014_r()
-{
-	//return m_apu->read(0x14);
-	return 0x00;
-}
-
-uint8_t nes_vt02_vt03_soc_device::psg1_4015_r()
-{
-	return m_apu->read(0x15);
-}
-
-void nes_vt02_vt03_soc_device::psg1_4015_w(uint8_t data)
-{
-	m_apu->write(0x15, data);
-}
-
-void nes_vt02_vt03_soc_device::psg1_4017_w(uint8_t data)
-{
-	m_apu->write(0x17, data);
-}
-
 // early units (VT03?) have a DMA bug in NTSC mode
 void nes_vt02_vt03_soc_device::vt_dma_w(uint8_t data)
 {
@@ -1066,13 +1043,11 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      // standard PPU registers
 	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));  //  extra VT PPU registers
 
-	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-
-	map(0x4014, 0x4014).r(FUNC(nes_vt02_vt03_soc_device::psg1_4014_r)).w(FUNC(nes_vt02_vt03_soc_device::vt_dma_w));
-	map(0x4015, 0x4015).rw(FUNC(nes_vt02_vt03_soc_device::psg1_4015_r), FUNC(nes_vt02_vt03_soc_device::psg1_4015_w)); // PSG status / first control register
+	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
+	map(0x4014, 0x4014).w(FUNC(nes_vt02_vt03_soc_device::vt_dma_w));
+	map(0x4015, 0x4015).r(m_apu, FUNC(nes_apu_vt_device::status_r)); // PSG status / first control register
 	map(0x4016, 0x4016).rw(FUNC(nes_vt02_vt03_soc_device::in0_r), FUNC(nes_vt02_vt03_soc_device::in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt02_vt03_soc_device::in1_r)).w(FUNC(nes_vt02_vt03_soc_device::psg1_4017_w));
-
+	map(0x4017, 0x4017).r(FUNC(nes_vt02_vt03_soc_device::in1_r));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt02_vt03_soc_device::vt03_4034_w)); // secondary DMA
 
@@ -1100,7 +1075,7 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 WRITE_LINE_MEMBER(nes_vt02_vt03_soc_device::apu_irq)
 {
 	// TODO
-//  set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+//  set_input_line(RP2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t nes_vt02_vt03_soc_device::apu_read_mem(offs_t offset)
@@ -1126,7 +1101,7 @@ void nes_vt02_vt03_soc_device::do_pal_timings_and_ppu_replacement(machine_config
 {
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 
-	PPU_VT03PAL(config.replace(), m_ppu, N2A03_PAL_XTAL);
+	PPU_VT03PAL(config.replace(), m_ppu, RP2A03_PAL_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu->read_bg().set(FUNC(nes_vt02_vt03_soc_device::chr_r));
@@ -1143,7 +1118,7 @@ void nes_vt02_vt03_soc_device::do_pal_timings_and_ppu_replacement(machine_config
 
 void nes_vt02_vt03_soc_device::device_add_mconfig(machine_config &config)
 {
-	N2A03_CORE(config, m_maincpu, NTSC_APU_CLOCK); // Butterfly Catch in vgpocket confirms N2A03 core type, not 6502
+	RP2A03_CORE(config, m_maincpu, NTSC_APU_CLOCK); // Butterfly Catch in vgpocket confirms RP2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_device::nes_vt_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1154,7 +1129,7 @@ void nes_vt02_vt03_soc_device::device_add_mconfig(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(nes_vt02_vt03_soc_device::screen_update));
 
-	PPU_VT03(config, m_ppu, N2A03_NTSC_XTAL);
+	PPU_VT03(config, m_ppu, RP2A03_NTSC_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu->read_bg().set(FUNC(nes_vt02_vt03_soc_device::chr_r));
@@ -1185,6 +1160,6 @@ void nes_vt02_vt03_soc_scramble_device::device_add_mconfig(machine_config& confi
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 
-	N2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms N2A03 core type, not 6502
+	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms RP2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_scramble_device::nes_vt_map);
 }

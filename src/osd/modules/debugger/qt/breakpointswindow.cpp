@@ -6,6 +6,8 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#include "util/xmlfile.h"
+
 #include <QtWidgets/QActionGroup>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMenu>
@@ -13,8 +15,10 @@
 #include <QtWidgets/QVBoxLayout>
 
 
-BreakpointsWindow::BreakpointsWindow(running_machine &machine, QWidget *parent) :
-	WindowQt(machine, nullptr)
+namespace osd::debugger::qt {
+
+BreakpointsWindow::BreakpointsWindow(DebuggerQt &debugger, QWidget *parent) :
+	WindowQt(debugger, nullptr)
 {
 	setWindowTitle("Debug: All Breakpoints");
 
@@ -79,6 +83,47 @@ BreakpointsWindow::~BreakpointsWindow()
 }
 
 
+void BreakpointsWindow::restoreConfiguration(util::xml::data_node const &node)
+{
+	WindowQt::restoreConfiguration(node);
+
+	auto const type = node.get_attribute_int(ATTR_WINDOW_POINTS_TYPE, -1);
+	QActionGroup *typeGroup = findChild<QActionGroup *>("typegroup");
+	if ((0 <= type) && (typeGroup->actions().size() > type))
+		typeGroup->actions()[type]->trigger();
+
+	m_breakpointsView->restoreConfigurationFromNode(node);
+
+}
+
+
+void BreakpointsWindow::saveConfigurationToNode(util::xml::data_node &node)
+{
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_POINTS_VIEWER);
+	if (m_breakpointsView)
+	{
+		switch (m_breakpointsView->view()->type())
+		{
+		case DVT_BREAK_POINTS:
+			node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 0);
+			break;
+		case DVT_WATCH_POINTS:
+			node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 1);
+			break;
+		case DVT_REGISTER_POINTS:
+			node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 2);
+			break;
+		default:
+			break;
+		}
+	}
+
+	m_breakpointsView->saveConfigurationToNode(node);
+}
+
+
 void BreakpointsWindow::typeChanged(QAction* changedTo)
 {
 	// Clean
@@ -107,45 +152,4 @@ void BreakpointsWindow::typeChanged(QAction* changedTo)
 	layout->addWidget(m_breakpointsView);
 }
 
-
-
-//=========================================================================
-//  BreakpointsWindowQtConfig
-//=========================================================================
-void BreakpointsWindowQtConfig::buildFromQWidget(QWidget *widget)
-{
-	WindowQtConfig::buildFromQWidget(widget);
-	BreakpointsWindow *window = dynamic_cast<BreakpointsWindow *>(widget);
-
-	QActionGroup* typeGroup = window->findChild<QActionGroup*>("typegroup");
-	if (typeGroup->checkedAction()->text() == "Breakpoints")
-		m_bwType = 0;
-	else if (typeGroup->checkedAction()->text() == "Watchpoints")
-		m_bwType = 1;
-	else if (typeGroup->checkedAction()->text() == "Registerpoints")
-		m_bwType = 2;
-}
-
-
-void BreakpointsWindowQtConfig::applyToQWidget(QWidget* widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-	BreakpointsWindow *window = dynamic_cast<BreakpointsWindow *>(widget);
-
-	QActionGroup *typeGroup = window->findChild<QActionGroup *>("typegroup");
-	typeGroup->actions()[m_bwType]->trigger();
-}
-
-
-void BreakpointsWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute_int("bwtype", m_bwType);
-}
-
-
-void BreakpointsWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
-	m_bwType = node.get_attribute_int("bwtype", m_bwType);
-}
+} // namespace osd::debugger::qt

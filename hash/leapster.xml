@@ -820,7 +820,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 	</software>
 
 	<software name="brunobls" supported="no">
-		<description>Lernst du Malen &amp; Schreiben - Mit Bruno Bleistift  (Germany)</description>
+		<description>Lernst du Malen &amp; Schreiben - Mit Bruno Bleistift (Germany)</description>
 		<year>2004?</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11493-A" />

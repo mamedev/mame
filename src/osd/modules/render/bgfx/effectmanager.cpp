@@ -9,19 +9,21 @@
 //
 //============================================================
 
+#include "effectmanager.h"
+
+#include "effectreader.h"
+#include "effect.h"
+
+#include "osdfile.h"
+#include "modules/lib/osdobj_common.h"
+
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
 #include <bx/readerwriter.h>
 #include <bx/file.h>
 
-#include "emu.h"
-
 #include <bgfx/bgfx.h>
-
-#include "effectmanager.h"
-#include "effectreader.h"
-#include "effect.h"
 
 static bool prepare_effect_document(std::string &name, osd_options &options, rapidjson::Document &document)
 {

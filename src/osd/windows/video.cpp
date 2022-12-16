@@ -20,6 +20,7 @@
 #include "window.h"
 #include "strconv.h"
 
+#include "modules/monitor/monitor_module.h"
 #include "modules/osdwindow.h"
 
 //============================================================

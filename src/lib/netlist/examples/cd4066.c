@@ -9,6 +9,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(cd4066)
+{
 	/* Standard stuff */
 
 	CLOCK(clk, 1000) // 1000 Hz
@@ -43,4 +44,4 @@ NETLIST_START(cd4066)
 	LOG(logB, clk)
 	LOG(logC, R1.1)
 
-NETLIST_END()
+}

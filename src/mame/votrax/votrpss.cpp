@@ -626,7 +626,6 @@ ROM_START(votrpss)
 
 	// this rom is on the 1871G/H/J mainboard, underneath the cpu module daughterboard, in a socket. Technically it is the 'user rom', but it contains the self test code. A user dictionary could in theory be put in this rom, and larger roms than a 2764 could be used.
 	ROM_LOAD("u-4.v3.1.bin", 0xc000, 0x2000, CRC(0b7c4260) SHA1(56f0b6b1cd7b1104e09a9962583121c112337984)) /* the 1987/1988 version's rom is marked "3.1 10/09/85" but the actual rom data is the same from at least as far back as 1982; the 1982 version is marked "U4" in handwriting on a sticker, or "U-4" dot-matrix printed on a sticker */
-
 ROM_END
 
 } // Anonymous namespace

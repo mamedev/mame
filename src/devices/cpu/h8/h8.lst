@@ -120,6 +120,7 @@ macro jsr32 %opc %spreg
 	TMP1 = r16_r(7) - 2;
 	r16_w(7, TMP1);
 	write16(TMP1, (CCR << 8) | ((PC >> 16) & 0xff));
+	debugger_exception_hook(taken_irq_vector);
 	PC = read16i(2*taken_irq_vector);
 	internal(1);
 	irq_setup();
@@ -140,6 +141,7 @@ macro jsr32 %opc %spreg
 		r32_w(7, TMP1);
 		write16(TMP1, EXR << 8);
 	}
+	debugger_exception_hook(taken_irq_vector);
 	if(mode_advanced) {
 		IR[0] = read16i(4*taken_irq_vector);
 		IR[1] = read16i(4*taken_irq_vector+2);
@@ -165,6 +167,7 @@ macro jsr32 %opc %spreg
 	r32_w(7, TMP1);
 	write16(TMP1, EXR << 8);
 	taken_irq_vector = trace_setup();
+	debugger_exception_hook(taken_irq_vector);
 	if(mode_advanced) {
 		IR[0] = read16i(4*taken_irq_vector);
 		IR[1] = read16i(4*taken_irq_vector+2);
@@ -729,7 +732,7 @@ macro jsr32 %opc %spreg
 	TMP1 = int8_t(r16_r(IR[1])) * int8_t(r8_r(IR[1] >> 4));
 	set_nz16(TMP1);
 	r16_w(IR[1], TMP1);
-	internal(2);
+	internal(has_mac ? 2 : 11);
 	prefetch_done();
 
 01c05200     ffffff08     0 mulxs.w  r16h     r32l     h
@@ -737,7 +740,7 @@ macro jsr32 %opc %spreg
 	TMP1 = int16_t(r32_r(IR[1])) * int16_t(r16_r(IR[1] >> 4));
 	set_nz32(TMP1);
 	r32_w(IR[1], TMP1);
-	internal(3);
+	internal(has_mac ? 3 : 19);
 	prefetch_done();
 
 01d05100     ffffff00     0 divxs.b  r8h      r16l     h
@@ -1463,7 +1466,7 @@ macro jsr32 %opc %spreg
 5000         ff00         0 mulxu.b  r8h      r16l
 	prefetch_start();
 	r16_w(IR[0], uint8_t(r16_r(IR[0])) * r8_r(IR[0] >> 4));
-	internal(2);
+	internal(has_mac ? 2 : 11);
 	prefetch_done();
 
 5100         ff00         0 divxu.b  r8h      r16l
@@ -1486,7 +1489,7 @@ macro jsr32 %opc %spreg
 5200         ff08         0 mulxu.w  r16h     r32l     h
 	prefetch_start();
 	r32_w(IR[0], uint16_t(r32_r(IR[0])) * r16_r(IR[0] >> 4));
-	internal(3);
+	internal(has_mac ? 3 : 19);
 	prefetch_done();
 
 5300         ff08         0 divxu.w  r16h     r32l     h
@@ -1588,6 +1591,7 @@ macro jsr32 %opc %spreg
 		write16(TMP1, EXR << 8);
 	}
 	taken_irq_vector = trapa_setup() + ((IR[0] >> 4) & 3);
+	debugger_exception_hook(taken_irq_vector);
 	if(mode_advanced) {
 		IR[0] = read16i(4*taken_irq_vector);
 		IR[1] = read16i(4*taken_irq_vector+2);

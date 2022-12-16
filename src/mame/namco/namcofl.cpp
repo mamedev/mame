@@ -161,15 +161,175 @@ OSC3: 48.384MHz
 */
 
 #include "emu.h"
-#include "namcofl.h"
 
+#include "namco_c123tmap.h"
+#include "namco_c116.h"
+#include "namco_c169roz.h"
+#include "namco_c355spr.h"
+#include "namcomcu.h"
+
+#include "cpu/i960/i960.h"
 #include "sound/c352.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 #include "finalapr.lh"
 
 #include <algorithm>
+
+
+namespace {
+
+class namcofl_state : public driver_device
+{
+public:
+	namcofl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_c116(*this, "c116"),
+		m_screen(*this, "screen"),
+		m_c123tmap(*this, "c123tmap"),
+		m_c169roz(*this, "c169roz"),
+		m_c355spr(*this, "c355spr"),
+		m_mcu(*this, "mcu"),
+		m_workram(*this, "workram"),
+		m_shareram(*this, "shareram"),
+		m_mainbank(*this, "mainbank"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_in2(*this, "IN2"),
+		m_misc(*this, "MISC"),
+		m_accel(*this, "ACCEL"),
+		m_brake(*this, "BRAKE"),
+		m_wheel(*this, "WHEEL")
+	{ }
+
+	void namcofl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<i960_cpu_device> m_maincpu;
+	required_device<namco_c116_device> m_c116;
+	required_device<screen_device> m_screen;
+	required_device<namco_c123tmap_device> m_c123tmap;
+	required_device<namco_c169roz_device> m_c169roz;
+	required_device<namco_c355spr_device> m_c355spr;
+	required_device<m37710_cpu_device> m_mcu;
+
+	required_shared_ptr<uint32_t> m_workram;
+	required_shared_ptr<uint32_t> m_shareram;
+	memory_view m_mainbank;
+
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_in2;
+	required_ioport m_misc;
+	required_ioport m_accel;
+	optional_ioport m_brake;
+	required_ioport m_wheel;
+
+	emu_timer *m_raster_interrupt_timer = nullptr;
+	emu_timer *m_vblank_interrupt_timer = nullptr;
+	emu_timer *m_network_interrupt_timer = nullptr;
+	uint8_t m_mcu_port6 = 0;
+	uint32_t m_sprbank = 0;
+
+	uint32_t unk1_r();
+	uint8_t network_r(offs_t offset);
+	uint32_t sysreg_r();
+	void sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void c116_w(offs_t offset, uint8_t data);
+	uint16_t mcu_shared_r(offs_t offset);
+	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint8_t port6_r();
+	void port6_w(uint8_t data);
+	uint8_t port7_r();
+	uint8_t dac6_r();
+	void spritebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(network_interrupt_callback);
+	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
+	TIMER_CALLBACK_MEMBER(raster_interrupt_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
+	int objcode2tile(int code);
+	void tilemap_cb(uint16_t code, int *tile, int *mask);
+	void roz_cb(uint16_t code, int *tile, int *mask, int which);
+	void namcoc75_am(address_map &map);
+	void main_map(address_map &map);
+};
+
+
+// video
+
+void namcofl_state::tilemap_cb(uint16_t code, int *tile, int *mask)
+{
+	*tile = code;
+	*mask = code;
+}
+
+void namcofl_state::roz_cb(uint16_t code, int *tile, int *mask, int which)
+{
+	*tile = code;
+	*mask = code;
+}
+
+
+uint32_t namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// compute window for custom screen blanking
+	rectangle clip;
+	//004c 016b 0021 0101 004a 0060 (finalapr*)
+	//004b 016b 0021 0101 0144 0047 (speedrcr)
+	clip.min_x = m_c116->get_reg(0) - 0x4b;
+	clip.max_x = m_c116->get_reg(1) - 0x4b - 1;
+	clip.min_y = m_c116->get_reg(2) - 0x21;
+	clip.max_y = m_c116->get_reg(3) - 0x21 - 1;
+	// intersect with master clip rectangle
+	clip &= cliprect;
+
+	bitmap.fill(m_c116->black_pen(), cliprect );
+
+	for (int pri = 0; pri < 16; pri++)
+	{
+		m_c169roz->draw(screen, bitmap, clip, pri);
+		if ((pri & 1) == 0)
+		{
+			m_c123tmap->draw(screen, bitmap, clip, pri >> 1);
+		}
+
+		m_c355spr->draw(screen, bitmap, clip, pri);
+	}
+
+	return 0;
+}
+
+// NOTE : The two low bits toggle banks (code + 0x4000) for two
+//        groups of sprites.  I am unsure how to differentiate those groups
+//        at this time however.
+
+void namcofl_state::spritebank_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_sprbank);
+}
+
+int namcofl_state::objcode2tile(int code)
+{
+	if (BIT(code, 13))
+		return (m_sprbank << 13) | (code & 0x1fff);
+
+	return code;
+}
+
+
+// machine
 
 uint32_t namcofl_state::unk1_r()
 {
@@ -211,27 +371,27 @@ void namcofl_state::c116_w(offs_t offset, uint8_t data)
 	}
 }
 
-void namcofl_state::namcofl_mem(address_map &map)
+void namcofl_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x1fffffff).view(m_mainbank);
-	m_mainbank[0](0x00000000, 0x000fffff).flags(i960_cpu_device::BURST).ram().share("workram");
+	m_mainbank[0](0x00000000, 0x000fffff).flags(i960_cpu_device::BURST).ram().share(m_workram);
 	m_mainbank[0](0x10000000, 0x100fffff).flags(i960_cpu_device::BURST).rom().region("maincpu", 0);
 	m_mainbank[1](0x00000000, 0x000fffff).flags(i960_cpu_device::BURST).rom().region("maincpu", 0);
-	m_mainbank[1](0x10000000, 0x100fffff).flags(i960_cpu_device::BURST).ram().share("workram");
+	m_mainbank[1](0x10000000, 0x100fffff).flags(i960_cpu_device::BURST).ram().share(m_workram);
 
 	map(0x20000000, 0x201fffff).flags(i960_cpu_device::BURST).rom().region("data", 0);
-	map(0x30000000, 0x30001fff).flags(i960_cpu_device::BURST).ram().share("nvram"); /* nvram */
+	map(0x30000000, 0x30001fff).flags(i960_cpu_device::BURST).ram().share("nvram");
 	map(0x30100000, 0x30100003).flags(i960_cpu_device::BURST).w(FUNC(namcofl_state::spritebank_w));
-	map(0x30284000, 0x3028bfff).flags(i960_cpu_device::BURST).ram().share("shareram");
-	map(0x30300000, 0x30303fff).flags(i960_cpu_device::BURST).ram(); /* COMRAM */
-	map(0x30380000, 0x303800ff).flags(i960_cpu_device::BURST).r(FUNC(namcofl_state::network_r)).umask32(0x00ff00ff); /* network registers */
+	map(0x30284000, 0x3028bfff).flags(i960_cpu_device::BURST).ram().share(m_shareram);
+	map(0x30300000, 0x30303fff).flags(i960_cpu_device::BURST).ram(); // COMRAM
+	map(0x30380000, 0x303800ff).flags(i960_cpu_device::BURST).r(FUNC(namcofl_state::network_r)).umask32(0x00ff00ff); // network registers
 	map(0x30400000, 0x30407fff).flags(i960_cpu_device::BURST).r(m_c116, FUNC(namco_c116_device::read)).w(FUNC(namcofl_state::c116_w));
 	map(0x30800000, 0x3080ffff).flags(i960_cpu_device::BURST).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
 	map(0x30a00000, 0x30a0003f).flags(i960_cpu_device::BURST).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
 	map(0x30c00000, 0x30c1ffff).flags(i960_cpu_device::BURST).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0x30d00000, 0x30d0001f).flags(i960_cpu_device::BURST).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 	map(0x30e00000, 0x30e1ffff).flags(i960_cpu_device::BURST).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
-	map(0x30f00000, 0x30f0000f).flags(i960_cpu_device::BURST).ram(); /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
+	map(0x30f00000, 0x30f0000f).flags(i960_cpu_device::BURST).ram(); // NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it
 	map(0x40000000, 0x4000005f).flags(i960_cpu_device::BURST).rw(FUNC(namcofl_state::sysreg_r), FUNC(namcofl_state::sysreg_w));
 	map(0xfffffffc, 0xffffffff).flags(i960_cpu_device::BURST).r(FUNC(namcofl_state::unk1_r));
 }
@@ -263,7 +423,7 @@ void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 uint16_t namcofl_state::mcu_shared_r(offs_t offset)
 {
-	if(offset & 1)
+	if (offset & 1)
 		return m_shareram[offset >> 1] >> 16;
 	else
 		return m_shareram[offset >> 1];
@@ -302,26 +462,10 @@ uint8_t namcofl_state::port7_r()
 	return 0xff;
 }
 
-uint8_t namcofl_state::dac7_r()
-{
-	return m_accel.read_safe(0xff);
-}
-
 uint8_t namcofl_state::dac6_r()
 {
 	return m_brake.read_safe(0xff);
 }
-
-uint8_t namcofl_state::dac5_r()
-{
-	return m_wheel.read_safe(0xff);
-}
-
-uint8_t namcofl_state::dac4_r(){ return 0xff; }
-uint8_t namcofl_state::dac3_r(){ return 0xff; }
-uint8_t namcofl_state::dac2_r(){ return 0xff; }
-uint8_t namcofl_state::dac1_r(){ return 0xff; }
-uint8_t namcofl_state::dac0_r(){ return 0xff; }
 
 void namcofl_state::namcoc75_am(address_map &map)
 {
@@ -387,8 +531,7 @@ static INPUT_PORTS_START( speedrcr )
 	PORT_START("ACCEL")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("BRAKE")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // no brake
+	// no brake
 
 	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
@@ -498,6 +641,9 @@ void namcofl_state::machine_start()
 	m_vblank_interrupt_timer =  timer_alloc(FUNC(namcofl_state::vblank_interrupt_callback), this);
 
 	m_mainbank.select(1);
+
+	save_item(NAME(m_mcu_port6));
+	save_item(NAME(m_sprbank));
 }
 
 
@@ -513,30 +659,30 @@ void namcofl_state::machine_reset()
 
 void namcofl_state::namcofl(machine_config &config)
 {
-	I960(config, m_maincpu, 80_MHz_XTAL/4); // i80960KA-20 == 20 MHz part
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::namcofl_mem);
+	I960(config, m_maincpu, 80_MHz_XTAL / 4); // i80960KA-20 == 20 MHz part
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::main_map);
 
-	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL/3);
+	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL / 3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcofl_state::namcoc75_am);
 	m_mcu->p6_in_cb().set(FUNC(namcofl_state::port6_r));
 	m_mcu->p6_out_cb().set(FUNC(namcofl_state::port6_w));
 	m_mcu->p7_in_cb().set(FUNC(namcofl_state::port7_r));
-	m_mcu->an7_cb().set(FUNC(namcofl_state::dac7_r));
+	m_mcu->an7_cb().set_ioport("ACCEL");
 	m_mcu->an6_cb().set(FUNC(namcofl_state::dac6_r));
-	m_mcu->an5_cb().set(FUNC(namcofl_state::dac5_r));
-	m_mcu->an4_cb().set(FUNC(namcofl_state::dac4_r));
-	m_mcu->an3_cb().set(FUNC(namcofl_state::dac3_r));
-	m_mcu->an2_cb().set(FUNC(namcofl_state::dac2_r));
-	m_mcu->an1_cb().set(FUNC(namcofl_state::dac1_r));
-	m_mcu->an0_cb().set(FUNC(namcofl_state::dac0_r));
-	/* TODO: irq generation for these */
+	m_mcu->an5_cb().set_ioport("WHEEL");
+	m_mcu->an4_cb().set_constant(0xff);
+	m_mcu->an3_cb().set_constant(0xff);
+	m_mcu->an2_cb().set_constant(0xff);
+	m_mcu->an1_cb().set_constant(0xff);
+	m_mcu->an0_cb().set_constant(0xff);
+	// TODO: IRQ generation for these
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcofl_state::mcu_irq0_cb), attotime::from_hz(60));
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcofl_state::mcu_irq2_cb), attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(48.384_MHz_XTAL/8, 384, 0, 288, 264, 0, 224); // same as namconb1.cpp?
+	m_screen->set_raw(48.384_MHz_XTAL / 8, 384, 0, 288, 264, 0, 224); // same as namconb1.cpp?
 	m_screen->set_screen_update(FUNC(namcofl_state::screen_update));
 	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
 	m_screen->set_palette(m_c116);
@@ -544,22 +690,22 @@ void namcofl_state::namcofl(machine_config &config)
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_palette(m_c116);
 	m_c169roz->set_is_namcofl(true);
-	m_c169roz->set_ram_words(0x20000/2);
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcofl_state::RozCB, this));
+	m_c169roz->set_ram_words(0x20000 / 2);
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcofl_state::roz_cb, this));
 	m_c169roz->set_color_base(0x1800);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0, 0);
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::objcode2tile, this));
 	m_c355spr->set_palxor(0x0);
 	m_c355spr->set_color_base(0);
 	m_c355spr->set_buffer(1);
 
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcofl_state::TilemapCB, this));
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcofl_state::tilemap_cb, this));
 	m_c123tmap->set_color_base(0x1000);
 
 	NAMCO_C116(config, m_c116, 0);
@@ -567,7 +713,7 @@ void namcofl_state::namcofl(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	c352_device &c352(C352(config, "c352", 48.384_MHz_XTAL/2, 288));
+	c352_device &c352(C352(config, "c352", 48.384_MHz_XTAL / 2, 288));
 	c352.add_route(0, "lspeaker", 1.00);
 	c352.add_route(1, "rspeaker", 1.00);
 	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
@@ -579,13 +725,13 @@ ROM_START( speedrcr )
 	ROM_LOAD32_WORD("se2_mp_ea4.19a",   0x000000, 0x080000, CRC(95ab3fd7) SHA1(273a536f8512f3c55260ac1b78533bc35b8390ed) )
 	ROM_LOAD32_WORD("se2_mp_oa4.18a",   0x000002, 0x080000, CRC(5b5ef1eb) SHA1(3e9e4abb1a32269baef772079de825dfe1ea230c) )
 
-	ROM_REGION32_LE( 0x200000, "data", 0 ) // Data
+	ROM_REGION32_LE( 0x200000, "data", 0 )
 	ROM_LOAD32_BYTE("se1_dat0.13a",   0x000000, 0x080000, CRC(cc5d6ff5) SHA1(6fad40a1fac75bc64d3b7a7562cf7ce2a3abd36a) )
 	ROM_LOAD32_BYTE("se1_dat1.14a",   0x000001, 0x080000, CRC(ddc8b306) SHA1(f169d521b800c108deffdef9fc6b0058621ee909) )
 	ROM_LOAD32_BYTE("se1_dat2.15a",   0x000002, 0x080000, CRC(2a29abbb) SHA1(945419ed61e9a656a340214a63a01818396fbe98) )
 	ROM_LOAD32_BYTE("se1_dat3.16a",   0x000003, 0x080000, CRC(49849aff) SHA1(b7c7eea1d56304e40e996ee998c971313ff03614) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
+	ROM_REGION16_LE( 0x80000, "c75data", 0 )
 	ROM_LOAD("se1_spr.21l",   0x000000,  0x80000, CRC(850a27ac) SHA1(7d5db840ec67659a1f2e69a62cdb03ce6ee0b47b) )
 
 	ROM_REGION( 0x200000, "c169roz", 0 ) // "RCHAR" (roz characters)
@@ -604,21 +750,21 @@ ROM_START( speedrcr )
 	ROM_LOAD32_WORD("se1obj1l.ic3", 0x400000, 0x200000, CRC(c4809fd5) SHA1(e0b80fccc17c83fb9d08f7f1cf2cd2f0f3a510b4) )
 	ROM_LOAD32_WORD("se1obj1u.ic4", 0x400002, 0x200000, CRC(0beefa56) SHA1(012fb7b330dbf851ab2217da0a0e7136ddc3d23f) )
 
-	ROM_REGION( 0x100000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
-	ROM_LOAD("se1_rsh.14k",    0x000000, 0x100000, CRC(7aa5a962) SHA1(ff936dfcfcc4ee1f5f2232df62def76ff99e671e) )
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_LOAD("se1_rsh.14k",    0x000000, 0x080000, CRC(f6408a1f) SHA1(3a299719090de3915331fc1ddbe0f41834da063a) )
 
-	ROM_REGION( 0x100000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
-	ROM_LOAD("se1_ssh.18u",    0x000000, 0x100000, CRC(7a8e0bda) SHA1(f6a508d90274d0205fec0c46f5f783a2715c0c6e) )
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_LOAD("se1_ssh.18u",    0x000000, 0x080000, CRC(cb534142) SHA1(935a377c72b3a815ed46dfdb6ea6734d312da373) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD("se1_voi.23s",   0x000000, 0x400000, CRC(b95e2ffb) SHA1(7669232d772caa9afa4c7593d018e8b6e534114a) )
+	ROM_LOAD("se1_voi.23s",   0x000000, 0x400000, CRC(0cfa2d8a) SHA1(e029b39432cf35071eec8da27df8beeccd458eba) )
 
-	ROM_REGION( 0x000005, "pals", 0) /* PAL's */
-	ROM_LOAD( "sysfl-1.bin",  0x000000, 0x000001, NO_DUMP ) /* PAL16L8BCN at 2S */
-	ROM_LOAD( "sysfl-2.bin",  0x000000, 0x000001, NO_DUMP ) /* PAL16L8BCN at 3L */
-	ROM_LOAD( "sysfl-3.bin",  0x000000, 0x000001, NO_DUMP ) /* PALCE16V8H-15PC/4 at 12S */
-	ROM_LOAD( "sysfl-4.bin",  0x000000, 0x000001, NO_DUMP ) /* PAL20L8BCNS at 20N */
-	ROM_LOAD( "sysfl-5.bin",  0x000000, 0x000001, NO_DUMP ) /* PALCE16V8H-15PC/4 at 19D */
+	ROM_REGION( 0x000005, "pals", 0)
+	ROM_LOAD( "sysfl-1.bin",  0x000000, 0x000001, NO_DUMP ) // PAL16L8BCN at 2S
+	ROM_LOAD( "sysfl-2.bin",  0x000000, 0x000001, NO_DUMP ) // PAL16L8BCN at 3L
+	ROM_LOAD( "sysfl-3.bin",  0x000000, 0x000001, NO_DUMP ) // PALCE16V8H-15PC/4 at 12S
+	ROM_LOAD( "sysfl-4.bin",  0x000000, 0x000001, NO_DUMP ) // PAL20L8BCNS at 20N
+	ROM_LOAD( "sysfl-5.bin",  0x000000, 0x000001, NO_DUMP ) // PALCE16V8H-15PC/4 at 19D
 
 	ROM_REGION( 0x2000, "nvram", 0 ) // default settings, including calibration
 	ROM_LOAD("speedrcr.nv",   0x000000, 0x2000, CRC(58b41c70) SHA1(c30ea7f4951ce208781deafef8d99bdb4902e5b8) )
@@ -630,9 +776,9 @@ ROM_START( finalapr )
 	ROM_LOAD32_WORD("flr2_mp_eb.19a",   0x000000, 0x080000, CRC(8bfe615f) SHA1(7b867eb261268a83177f1f873689f77d1b6c47ca) )
 	ROM_LOAD32_WORD("flr2_mp_ob.18a",   0x000002, 0x080000, CRC(91c14e4f) SHA1(934a86daaef0e3e2c2b3066f4677ccb3aaab6eaf) )
 
-	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
+	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
+	ROM_REGION16_LE( 0x80000, "c75data", 0 )
 	ROM_LOAD("flr1_spr.21l", 0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 
 	ROM_REGION( 0x200000, "c169roz", 0 ) // "RCHAR" (roz characters)
@@ -669,9 +815,9 @@ ROM_START( finalapr1 )
 	ROM_LOAD32_WORD("flr2_mp_e.19a",   0x000000, 0x080000, CRC(cc8961ae) SHA1(08ce4d27a723101370d1c536b26256ce0d8a1b6c) )
 	ROM_LOAD32_WORD("flr2_mp_o.18a",   0x000002, 0x080000, CRC(8118f465) SHA1(c4b79878a82fd36b5707e92aa893f69c2b942d57) )
 
-	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
+	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
+	ROM_REGION16_LE( 0x80000, "c75data", 0 )
 	ROM_LOAD("flr1_spr.21l", 0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 
 	ROM_REGION( 0x200000, "c169roz", 0 ) // "RCHAR" (roz characters)
@@ -708,9 +854,9 @@ ROM_START( finalaprj )
 	ROM_LOAD32_WORD("flr1_mp_ec.19a", 0x000000, 0x080000, CRC(52735494) SHA1(db9873cb39bcfdd3dbe2e5079249fecac2c46df9) )
 	ROM_LOAD32_WORD("flr1_mp_oc.18a", 0x000002, 0x080000, CRC(b11fe577) SHA1(70b51a1e66a3bb92f027aad7ba0f358c0e139b3c) )
 
-	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
+	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
+	ROM_REGION16_LE( 0x80000, "c75data", 0 )
 	ROM_LOAD("flr1_spr.21l", 0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 
 	ROM_REGION( 0x200000, "c169roz", 0 ) // "RCHAR" (roz characters)
@@ -747,9 +893,9 @@ ROM_START( finalaprj1 )
 	ROM_LOAD32_WORD("flr1_mp_eb.19a", 0x000000, 0x080000, CRC(1a77bcc0) SHA1(4090917afcd0346ea78e6e307879a980cf196204) )
 	ROM_LOAD32_WORD("flr1_mp_ob.18a", 0x000002, 0x080000, CRC(5f64eb2b) SHA1(0011ceeedefcf16c333c7ab28f334dd228eac4cf) )
 
-	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
+	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
+	ROM_REGION16_LE( 0x80000, "c75data", 0 )
 	ROM_LOAD("flr1_spr.21l", 0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 
 	ROM_REGION( 0x200000, "c169roz", 0 ) // "RCHAR" (roz characters)
@@ -781,16 +927,13 @@ ROM_START( finalaprj1 )
 	ROM_LOAD("finalapr.nv",   0x000000, 0x2000, CRC(d51d65fe) SHA1(8a0a523cb6ba2880951e41ca04db23584f0a108c) )
 ROM_END
 
-void namcofl_state::driver_init()
-{
-	save_item(NAME(m_mcu_port6));
-	save_item(NAME(m_sprbank));
-}
+} // anonymous namespace
 
-GAME(  1995, speedrcr,   0,        namcofl, speedrcr, namcofl_state, driver_init, ROT0, "Namco", "Speed Racer",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+
+GAME(  1995, speedrcr,   0,        namcofl, speedrcr, namcofl_state, empty_init, ROT0, "Namco", "Speed Racer",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
 // Final Lap R was released 02/94, a 1993 copyright date is displayed on the title screen
-GAMEL( 1994, finalapr,   0,        namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Rev. B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
-GAMEL( 1994, finalapr1,  finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
-GAMEL( 1994, finalaprj,  finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
-GAMEL( 1994, finalaprj1, finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1994, finalapr,   0,        namcofl, finalapr, namcofl_state, empty_init, ROT0, "Namco", "Final Lap R (Rev. B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1994, finalapr1,  finalapr, namcofl, finalapr, namcofl_state, empty_init, ROT0, "Namco", "Final Lap R",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1994, finalaprj,  finalapr, namcofl, finalapr, namcofl_state, empty_init, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1994, finalaprj1, finalapr, namcofl, finalapr, namcofl_state, empty_init, ROT0, "Namco", "Final Lap R (Japan Rev. B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )

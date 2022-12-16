@@ -44,6 +44,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "utf8.h"
 
 #include "accomm.lh"
 

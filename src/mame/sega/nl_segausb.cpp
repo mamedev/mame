@@ -37,6 +37,7 @@
 
 
 NETLIST_START(segausb)
+{
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -541,4 +542,4 @@ NETLIST_START(segausb)
     OPTIMIZE_FRONTIER(R35.1, RES_M(1), 50)
 */
 
-NETLIST_END()
+}

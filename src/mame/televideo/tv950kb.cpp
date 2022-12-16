@@ -2,12 +2,13 @@
 // copyright-holders:AJR
 /***********************************************************************************************************************************
 
-TeleVideo 950 101-key serial keyboard emulation.
+    TeleVideo 950 101-key serial keyboard emulation.
 
 ************************************************************************************************************************************/
 
 #include "emu.h"
 #include "tv950kb.h"
+#include "utf8.h"
 
 DEFINE_DEVICE_TYPE(TV950_KEYBOARD, tv950kb_device, "tv950kb", "TeleVideo 950 Keyboard")
 

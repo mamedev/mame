@@ -158,8 +158,9 @@ static INPUT_PORTS_START( crimfght )
 	PORT_DIPSETTING(   0x90, DEF_STR( 1C_7C ))
 	PORT_DIPSETTING(   0x00, DEF_STR( Unused ))
 
+	// defaults confirmed from World manual
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 		PORT_DIPSETTING(    0x03, "1" )
 		PORT_DIPSETTING(    0x02, "2" )
 		PORT_DIPSETTING(    0x01, "3" )
@@ -302,7 +303,7 @@ CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 void crimfght_state::crimfght(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/8); /* 052001 (verified on pcb) */
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); /* 052001 (verified on pcb) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &crimfght_state::crimfght_map);
 	m_maincpu->line().set(FUNC(crimfght_state::banking_callback));
 

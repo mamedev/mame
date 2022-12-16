@@ -136,6 +136,11 @@ template<int HighBits, int Width, int AddrShift> u16 handler_entry_write_dispatc
 	return dispatch_write_flags<Level, Width, AddrShift>(HIGHMASK, offset, data, mem_mask, m_a_dispatch);
 }
 
+template<int HighBits, int Width, int AddrShift> u16 handler_entry_write_dispatch<HighBits, Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	return dispatch_lookup_write_flags<Level, Width, AddrShift>(HIGHMASK, offset, mem_mask, m_a_dispatch);
+}
+
 template<int HighBits, int Width, int AddrShift> void *handler_entry_write_dispatch<HighBits, Width, AddrShift>::get_ptr(offs_t offset) const
 {
 	return m_a_dispatch[(offset & HIGHMASK) >> LowBits]->get_ptr(offset);
@@ -195,6 +200,8 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_nomirror(start, end, ostart, oend, handler);
+		range_cut_before((entry << LowBits) - 1, entry);
+		range_cut_after((entry + 1) << LowBits, entry);
 	}
 }
 
@@ -270,6 +277,8 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_mirror(start, end, ostart, oend, mirror, handler);
+		range_cut_before((entry << LowBits) - 1, entry);
+		range_cut_after((entry + 1) << LowBits, entry);
 	}
 }
 

@@ -84,7 +84,7 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual u32 palette_entries() const override { return m_palette_colors + m_overlay_colors; }
+	virtual u32 palette_entries() const noexcept override { return m_palette_colors + m_overlay_colors; }
 
 	virtual u8 palette_r(address_space &space) override;
 	virtual void palette_w(u8 data) override;

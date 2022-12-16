@@ -11,7 +11,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/mc68681.h"
 #include "machine/msm58321.h"
 #include "machine/timer.h"
@@ -83,8 +83,6 @@ void micro20_state::machine_reset()
 	pRAM[0] = pROM[2];
 	pRAM[1] = pROM[3];
 	m_maincpu->reset();
-
-	m_maincpu->set_reset_callback(*this, FUNC(micro20_state::m68k_reset_callback));
 
 	m_tin = 0;
 }
@@ -168,6 +166,7 @@ void micro20_state::micro20(machine_config &config)
 	/* basic machine hardware */
 	M68020(config, m_maincpu, 16.67_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &micro20_state::micro20_map);
+	m_maincpu->reset_cb().set(FUNC(micro20_state::m68k_reset_callback));
 
 	mc68681_device &duart_a(MC68681(config, DUART_A_TAG, 3.6864_MHz_XTAL));
 	duart_a.a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));

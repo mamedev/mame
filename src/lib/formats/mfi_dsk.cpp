@@ -143,7 +143,7 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			unsigned int cell_count = src.size();
 			uint32_t mg = src[0] & MG_MASK;
 			uint32_t wmg = src[cell_count - 1] & MG_MASK;
-			if(mg != wmg && (mg == OLD_MG_A || mg == OLD_MG_B) && (wmg == OLD_MG_A && wmg == OLD_MG_B))
+			if(mg != wmg && (mg == OLD_MG_A || mg == OLD_MG_B) && (wmg == OLD_MG_A || wmg == OLD_MG_B))
 				// Flux change at 0, add it
 				track.push_back(MG_F | 0);
 

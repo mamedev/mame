@@ -55,11 +55,6 @@ e00e-e00f    W  ???
 TODO
 ----
 
-- The readme claims there is a GI-SP0256A-AL ADPCM on the PCB. Needs to be
-  emulated. Done (couriersud)
-
-- Verify all clock speeds
-
 - I'm only using colors 0-15. The other 3 banks are mostly the same, but,
   for example, the color that's used to paint the gradients of the sky (color 2)
   is different, so there might be a palette select. I don't see anything
@@ -126,88 +121,416 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "sauro.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/sp0256.h"
 #include "sound/ymopl.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-void sauro_state::machine_start()
+namespace {
+
+class base_state : public driver_device
+{
+public:
+	base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_mainlatch(*this, "mainlatch"),
+		m_spriteram(*this, "spriteram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_bg_colorram(*this, "bg_colorram")
+	{ }
+
+	void tecfri(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_mainlatch;
+
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_bg_colorram;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_palette_bank = 0U;
+
+	bool m_irq_enable = 0;
+
+	// common
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(irq_reset_w);
+	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
+	void bg_videoram_w(offs_t offset, uint8_t data);
+	void bg_colorram_w(offs_t offset, uint8_t data);
+	void scroll_bg_w(uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+};
+
+class trckydoc_state : public base_state
+{
+public:
+	trckydoc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		base_state(mconfig, type, tag)
+	{ }
+
+	void trckydoc(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void prg_map(address_map &map);
+};
+
+class sauro_state : public base_state
+{
+public:
+	sauro_state(const machine_config &mconfig, device_type type, const char *tag) :
+		base_state(mconfig, type, tag),
+		m_soundlatch(*this, "soundlatch"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_fg_colorram(*this, "fg_colorram")
+	{ }
+
+	void sauro(machine_config &config);
+	void saurobl(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_fg_colorram;
+
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	void sound_command_w(uint8_t data);
+	uint8_t sound_command_r();
+	DECLARE_WRITE_LINE_MEMBER(palette_bank0_w);
+	DECLARE_WRITE_LINE_MEMBER(palette_bank1_w);
+	void scroll_fg_w(uint8_t data);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void fg_colorram_w(offs_t offset, uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_tile_info_fg);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_io_map(address_map &map);
+	void main_prg_map(address_map &map);
+	void sauro_sound_map(address_map &map);
+	void saurobl_sound_map(address_map &map);
+};
+
+
+// video
+
+// General
+
+void base_state::bg_videoram_w(offs_t offset, uint8_t data)
+{
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void base_state::bg_colorram_w(offs_t offset, uint8_t data)
+{
+	m_bg_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void sauro_state::fg_videoram_w(offs_t offset, uint8_t data)
+{
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void sauro_state::fg_colorram_w(offs_t offset, uint8_t data)
+{
+	m_fg_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void base_state::scroll_bg_w(uint8_t data)
+{
+	m_bg_tilemap->set_scrollx(0, data);
+}
+
+TILE_GET_INFO_MEMBER(base_state::get_tile_info_bg)
+{
+	int const code = m_bg_videoram[tile_index] + ((m_bg_colorram[tile_index] & 0x07) << 8);
+	int const color = ((m_bg_colorram[tile_index] >> 4) & 0x0f) | m_palette_bank;
+	int const flags = m_bg_colorram[tile_index] & 0x08 ? TILE_FLIPX : 0;
+
+	tileinfo.set(0, code, color, flags);
+}
+
+TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
+{
+	int const code = m_fg_videoram[tile_index] + ((m_fg_colorram[tile_index] & 0x07) << 8);
+	int const color = ((m_fg_colorram[tile_index] >> 4) & 0x0f) | m_palette_bank;
+	int const flags = m_fg_colorram[tile_index] & 0x08 ? TILE_FLIPX : 0;
+
+	tileinfo.set(1, code, color, flags);
+}
+
+// Sauro
+
+static const int scroll2_map[8] = {2, 1, 4, 3, 6, 5, 0, 7};
+static const int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
+
+WRITE_LINE_MEMBER(sauro_state::palette_bank0_w)
+{
+	if (state)
+		m_palette_bank |= 0x10;
+	else
+		m_palette_bank &= ~0x10;
+	machine().tilemap().mark_all_dirty();
+}
+
+WRITE_LINE_MEMBER(sauro_state::palette_bank1_w)
+{
+	if (state)
+		m_palette_bank |= 0x20;
+	else
+		m_palette_bank &= ~0x20;
+	machine().tilemap().mark_all_dirty();
+}
+
+void sauro_state::scroll_fg_w(uint8_t data)
+{
+	const int *map = (flip_screen() ? scroll2_map_flip : scroll2_map);
+	int const scroll = (data & 0xf8) | map[data & 7];
+
+	m_fg_tilemap->set_scrollx(0, scroll);
+}
+
+void sauro_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sauro_state::get_tile_info_bg)), TILEMAP_SCAN_COLS,
+			8, 8, 32, 32);
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sauro_state::get_tile_info_fg)), TILEMAP_SCAN_COLS,
+			8, 8, 32, 32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+	m_palette_bank = 0;
+
+	save_item(NAME(m_palette_bank));
+}
+
+void sauro_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int const flipy = flip_screen();
+
+	for (int offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)
+	{
+		int sy = m_spriteram[offs];
+		if (sy == 0xf8) continue;
+
+		int const code = m_spriteram[offs + 1] + ((m_spriteram[offs + 3] & 0x03) << 8);
+		int sx = m_spriteram[offs + 2];
+		sy = 236 - sy;
+		int const color = ((m_spriteram[offs + 3] >> 4) & 0x0f) | m_palette_bank;
+
+		// I'm not really sure how this bit works
+		if (m_spriteram[offs + 3] & 0x08)
+		{
+			if (sx > 0xc0)
+			{
+				// Sign extend
+				sx = (signed int)(signed char)sx;
+			}
+		}
+		else
+		{
+			if (sx < 0x40) continue;
+		}
+
+		int flipx = m_spriteram[offs + 3] & 0x04;
+
+		if (flipy)
+		{
+			flipx = !flipx;
+			sx = (235 - sx) & 0xff;  // The &0xff is not 100% percent correct
+			sy = 240 - sy;
+		}
+
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+}
+
+uint32_t sauro_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+// Tricky Doc
+
+void trckydoc_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(trckydoc_state::get_tile_info_bg)), TILEMAP_SCAN_COLS,
+			8, 8, 32, 32);
+
+	m_palette_bank = 0;
+}
+
+void trckydoc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int const flipy = flip_screen();
+
+	// Weird, sprites entries don't start on DWORD boundary
+	for (int offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)
+	{
+		int sy = m_spriteram[offs];
+
+		if (m_spriteram[offs + 3] & 0x08)
+		{
+			// needed by the elevator cable (2nd stage), balls bouncing (3rd stage) and maybe other things
+			sy += 6;
+		}
+
+		int const code = m_spriteram[offs + 1] + ((m_spriteram[offs + 3] & 0x01) << 8);
+
+		int sx = m_spriteram[offs + 2] - 2;
+		int const color = (m_spriteram[offs + 3] >> 4) & 0x0f;
+
+		sy = 236 - sy;
+
+		// similar to sauro but different bit is used ..
+		if (m_spriteram[offs + 3] & 0x02)
+		{
+			if (sx > 0xc0)
+			{
+				// Sign extend
+				sx = (signed int)(signed char)sx;
+			}
+		}
+		else
+		{
+			if (sx < 0x40) continue;
+		}
+
+		int flipx = m_spriteram[offs + 3] & 0x04;
+
+		if (flipy)
+		{
+			flipx = !flipx;
+			sx = (235 - sx) & 0xff;  // The &0xff is not 100% percent correct
+			sy = 240 - sy;
+		}
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+}
+
+uint32_t trckydoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+
+// machine
+
+void base_state::machine_start()
 {
 	save_item(NAME(m_irq_enable));
 }
 
-void sauro_state::sauro_sound_command_w(uint8_t data)
+void sauro_state::sound_command_w(uint8_t data)
 {
 	data |= 0x80;
 	m_soundlatch->write(data);
 }
 
-uint8_t sauro_state::sauro_sound_command_r()
+uint8_t sauro_state::sound_command_r()
 {
 	int ret = m_soundlatch->read();
 	m_soundlatch->clear_w();
 	return ret;
 }
 
-WRITE_LINE_MEMBER(sauro_state::vblank_irq)
+WRITE_LINE_MEMBER(base_state::vblank_irq)
 {
 	if (state && m_irq_enable)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(sauro_state::irq_reset_w)
+WRITE_LINE_MEMBER(base_state::irq_reset_w)
 {
 	m_irq_enable = !state;
 	if (m_irq_enable)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(sauro_state::coin1_w)
+template <uint8_t Which>
+WRITE_LINE_MEMBER(base_state::coin_w)
 {
-	machine().bookkeeping().coin_counter_w(0, state);
+	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
-WRITE_LINE_MEMBER(sauro_state::coin2_w)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
-}
-
-WRITE_LINE_MEMBER(sauro_state::flip_screen_w)
+WRITE_LINE_MEMBER(base_state::flip_screen_w)
 {
 	flip_screen_set(state);
 }
 
-void sauro_state::adpcm_w(uint8_t data)
-{
-	m_sp0256->ald_w(data);
-}
-
-void sauro_state::sauro_map(address_map &map)
+void sauro_state::main_prg_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
-	map(0xe800, 0xebff).ram().share("spriteram");
-	map(0xf000, 0xf3ff).ram().w(FUNC(sauro_state::videoram_w)).share("videoram");
-	map(0xf400, 0xf7ff).ram().w(FUNC(sauro_state::colorram_w)).share("colorram");
-	map(0xf800, 0xfbff).ram().w(FUNC(sauro_state::sauro_videoram2_w)).share("videoram2");
-	map(0xfc00, 0xffff).ram().w(FUNC(sauro_state::sauro_colorram2_w)).share("colorram2");
+	map(0xe800, 0xebff).ram().share(m_spriteram);
+	map(0xf000, 0xf3ff).ram().w(FUNC(sauro_state::bg_videoram_w)).share(m_bg_videoram);
+	map(0xf400, 0xf7ff).ram().w(FUNC(sauro_state::bg_colorram_w)).share(m_bg_colorram);
+	map(0xf800, 0xfbff).ram().w(FUNC(sauro_state::fg_videoram_w)).share(m_fg_videoram);
+	map(0xfc00, 0xffff).ram().w(FUNC(sauro_state::fg_colorram_w)).share(m_fg_colorram);
 }
 
-void sauro_state::sauro_io_map(address_map &map)
+void sauro_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("DSW1");
 	map(0x20, 0x20).portr("DSW2");
 	map(0x40, 0x40).portr("P1");
 	map(0x60, 0x60).portr("P2");
-	map(0x80, 0x80).w(FUNC(sauro_state::sauro_sound_command_w));
+	map(0x80, 0x80).w(FUNC(sauro_state::sound_command_w));
 	map(0xa0, 0xa0).w(FUNC(sauro_state::scroll_bg_w));
-	map(0xa1, 0xa1).w(FUNC(sauro_state::sauro_scroll_fg_w));
+	map(0xa1, 0xa1).w(FUNC(sauro_state::scroll_fg_w));
 	map(0xc0, 0xcf).w(m_mainlatch, FUNC(ls259_device::write_a0));
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
@@ -217,8 +540,8 @@ void sauro_state::sauro_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
-	map(0xa000, 0xa000).w(FUNC(sauro_state::adpcm_w));
-	map(0xe000, 0xe000).r(FUNC(sauro_state::sauro_sound_command_r));
+	map(0xa000, 0xa000).w("speech", FUNC(sp0256_device::ald_w));
+	map(0xe000, 0xe000).r(FUNC(sauro_state::sound_command_r));
 	map(0xe000, 0xe006).nopw();    // echo from write to e0000
 	map(0xe00e, 0xe00f).nopw();
 }
@@ -230,26 +553,26 @@ void sauro_state::saurobl_sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xa000, 0xa000).nopw();
-	map(0xe000, 0xe000).r(FUNC(sauro_state::sauro_sound_command_r));
+	map(0xe000, 0xe000).r(FUNC(sauro_state::sound_command_r));
 	map(0xe000, 0xe006).nopw();    // echo from write to e0000
 	map(0xe00e, 0xe00f).nopw();
 }
 
 
-void sauro_state::trckydoc_map(address_map &map)
+void trckydoc_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
-	map(0xe800, 0xebff).ram().mirror(0x400).share("spriteram");
-	map(0xf000, 0xf3ff).ram().w(FUNC(sauro_state::videoram_w)).share("videoram");
-	map(0xf400, 0xf7ff).ram().w(FUNC(sauro_state::colorram_w)).share("colorram");
+	map(0xe800, 0xebff).ram().mirror(0x400).share(m_spriteram);
+	map(0xf000, 0xf3ff).ram().w(FUNC(trckydoc_state::bg_videoram_w)).share(m_bg_videoram);
+	map(0xf400, 0xf7ff).ram().w(FUNC(trckydoc_state::bg_colorram_w)).share(m_bg_colorram);
 	map(0xf800, 0xf800).portr("DSW1");
 	map(0xf808, 0xf808).portr("DSW2");
 	map(0xf810, 0xf810).portr("P1");
 	map(0xf818, 0xf818).portr("P2");
 	map(0xf820, 0xf821).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xf828, 0xf828).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xf830, 0xf830).w(FUNC(sauro_state::scroll_bg_w));
+	map(0xf830, 0xf830).w(FUNC(trckydoc_state::scroll_bg_w));
 	map(0xf838, 0xf83f).w(m_mainlatch, FUNC(ls259_device::write_d0));
 }
 
@@ -438,24 +761,24 @@ static const gfx_layout sauro_spritelayout =
 };
 
 static GFXDECODE_START( gfx_sauro )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 64 )
-	GFXDECODE_ENTRY( "gfx3", 0, sauro_spritelayout, 0, 64 )
+	GFXDECODE_ENTRY( "bgtiles", 0, charlayout, 0, 64 )
+	GFXDECODE_ENTRY( "fgtiles", 0, charlayout, 0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, sauro_spritelayout, 0, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_trckydoc )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, trckydoc_spritelayout, 0, 64 )
+	GFXDECODE_ENTRY( "bgtiles", 0, charlayout, 0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, trckydoc_spritelayout, 0, 64 )
 GFXDECODE_END
 
 
-void sauro_state::tecfri(machine_config &config)
+void base_state::tecfri(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, XTAL(20'000'000)/4);       // Verified on PCB
+	Z80(config, m_maincpu, XTAL(20'000'000) / 4);       // Verified on PCB
 
 	LS259(config, m_mainlatch);
-	m_mainlatch->q_out_cb<4>().set(FUNC(sauro_state::irq_reset_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(base_state::irq_reset_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -468,73 +791,69 @@ void sauro_state::tecfri(machine_config &config)
 	screen.set_size(32 * 8, 32 * 8);
 	screen.set_visarea(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1);
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(sauro_state::vblank_irq));
+	screen.screen_vblank().set(FUNC(base_state::vblank_irq));
 
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 1024);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(20'000'000)/8).add_route(ALL_OUTPUTS, "mono", 1.0);       // Verified on PCB
+	YM3812(config, "ymsnd", XTAL(20'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0);       // Verified on PCB
 }
 
-void sauro_state::trckydoc(machine_config &config)
+void trckydoc_state::trckydoc(machine_config &config)
 {
 	tecfri(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &sauro_state::trckydoc_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trckydoc_state::prg_map);
 
-	m_mainlatch->q_out_cb<1>().set(FUNC(sauro_state::flip_screen_w));
-	m_mainlatch->q_out_cb<2>().set(FUNC(sauro_state::coin1_w));
-	m_mainlatch->q_out_cb<3>().set(FUNC(sauro_state::coin2_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(trckydoc_state::flip_screen_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(trckydoc_state::coin_w<0>));
+	m_mainlatch->q_out_cb<3>().set(FUNC(trckydoc_state::coin_w<1>));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trckydoc);
 
-	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(sauro_state::screen_update_trckydoc));
-}
-
-void sauro_state::sauro(machine_config &config)
-{
-	tecfri(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &sauro_state::sauro_map);
-	m_maincpu->set_addrmap(AS_IO, &sauro_state::sauro_io_map);
-
-	// Z3
-	m_mainlatch->q_out_cb<0>().set(FUNC(sauro_state::flip_screen_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(sauro_state::coin1_w));
-	m_mainlatch->q_out_cb<2>().set(FUNC(sauro_state::coin2_w));
-	m_mainlatch->q_out_cb<3>().set_nop(); // sound IRQ trigger?
-	m_mainlatch->q_out_cb<5>().set(FUNC(sauro_state::sauro_palette_bank0_w));
-	m_mainlatch->q_out_cb<6>().set(FUNC(sauro_state::sauro_palette_bank1_w));
-
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(20'000'000) / 5));     // Verified on PCB
-	audiocpu.set_addrmap(AS_PROGRAM, &sauro_state::sauro_sound_map);
-	audiocpu.set_periodic_int(FUNC(sauro_state::irq0_line_hold), attotime::from_hz(8 * 60)); // ?
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sauro);
-
-	MCFG_VIDEO_START_OVERRIDE(sauro_state, sauro)
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(sauro_state::screen_update_sauro));
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-
-	subdevice<ym3812_device>("ymsnd")->set_clock(XTAL(20'000'000) / 5);     // Verified on PCB
-
-	SP0256(config, m_sp0256, XTAL(20'000'000) / 5);     // Verified on PCB
-	m_sp0256->data_request_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
-	m_sp0256->add_route(ALL_OUTPUTS, "mono", 1.0);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(trckydoc_state::screen_update));
 }
 
 void sauro_state::saurobl(machine_config &config)
 {
-	sauro(config);
+	tecfri(config);
 
-	subdevice<z80_device>("audiocpu")->set_addrmap(AS_PROGRAM, &sauro_state::saurobl_sound_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sauro_state::main_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &sauro_state::main_io_map);
+
+	// Z3
+	m_mainlatch->q_out_cb<0>().set(FUNC(sauro_state::flip_screen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(sauro_state::coin_w<0>));
+	m_mainlatch->q_out_cb<2>().set(FUNC(sauro_state::coin_w<1>));
+	m_mainlatch->q_out_cb<3>().set_nop(); // sound IRQ trigger?
+	m_mainlatch->q_out_cb<5>().set(FUNC(sauro_state::palette_bank0_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(sauro_state::palette_bank1_w));
+
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(20'000'000) / 5));     // Verified on PCB
+	audiocpu.set_addrmap(AS_PROGRAM, &sauro_state::saurobl_sound_map);
+	audiocpu.set_periodic_int(FUNC(sauro_state::irq0_line_hold), attotime::from_hz(8 * 60)); // ?
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sauro);
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(sauro_state::screen_update));
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+
+	subdevice<ym3812_device>("ymsnd")->set_clock(XTAL(20'000'000) / 5);     // Verified on PCB
+}
+
+void sauro_state::sauro(machine_config &config)
+{
+	saurobl(config);
+
+	subdevice<z80_device>("audiocpu")->set_addrmap(AS_PROGRAM, &sauro_state::sauro_sound_map);
 
 	// Sound hardware
-	config.device_remove("speech");
+	sp0256_device &sp0256(SP0256(config, "speech", XTAL(20'000'000) / 5));     // Verified on PCB
+	sp0256.data_request_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	sp0256.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 /***************************************************************************
@@ -551,15 +870,15 @@ ROM_START( sauro )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sauro-3.bin",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "sauro-6.bin",     0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) )
 	ROM_LOAD( "sauro-7.bin",     0x08000, 0x8000, CRC(187da060) SHA1(1df156e58379bb39acade02aabab6ff1cb7cc288) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "fgtiles", 0 )
 	ROM_LOAD( "sauro-4.bin",     0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) )
 	ROM_LOAD( "sauro-5.bin",     0x08000, 0x8000, CRC(a6e2640d) SHA1(346ffcf62e27ce8134f4e5e0dbcf11f110e19e04) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "sauro-8.bin",     0x00000, 0x8000, CRC(e08b5d5e) SHA1(eaaeaa08b19c034ab2a2140f887edffca5f441b9) )
 	ROM_LOAD( "sauro-9.bin",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) )
 	ROM_LOAD( "sauro-10.bin",    0x10000, 0x8000, CRC(c93380d1) SHA1(fc9655cc94c2d2058f83eb341be7e7856a08194f) )
@@ -583,15 +902,15 @@ ROM_START( sauroa )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sauro-3.bin",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "sauro-6.bin",     0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) )
 	ROM_LOAD( "sauro-7.bin",     0x08000, 0x8000, CRC(187da060) SHA1(1df156e58379bb39acade02aabab6ff1cb7cc288) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "fgtiles", 0 )
 	ROM_LOAD( "sauro-4.bin",     0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) )
 	ROM_LOAD( "sauro-5.bin",     0x08000, 0x8000, CRC(a6e2640d) SHA1(346ffcf62e27ce8134f4e5e0dbcf11f110e19e04) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "sauro-8.bin",     0x00000, 0x8000, CRC(e08b5d5e) SHA1(eaaeaa08b19c034ab2a2140f887edffca5f441b9) )
 	ROM_LOAD( "sauro-9.bin",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) )
 	ROM_LOAD( "sauro-10.bin",    0x10000, 0x8000, CRC(c93380d1) SHA1(fc9655cc94c2d2058f83eb341be7e7856a08194f) )
@@ -615,15 +934,15 @@ ROM_START( saurob )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3 tecfri",     0x00000, 0x8000, CRC(3eca1c5c) SHA1(0a16ddfbc3bb948023456f1c9a32593cbca5d9b0) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "6 tecfri",     0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) )
 	ROM_LOAD( "7 tecfri",     0x08000, 0x8000, CRC(187da060) SHA1(1df156e58379bb39acade02aabab6ff1cb7cc288) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "fgtiles", 0 )
 	ROM_LOAD( "4 tecfri",     0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) )
 	ROM_LOAD( "5 tecfri",     0x08000, 0x8000, CRC(a6e2640d) SHA1(346ffcf62e27ce8134f4e5e0dbcf11f110e19e04) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "8 tecfri",     0x00000, 0x8000, CRC(e08b5d5e) SHA1(eaaeaa08b19c034ab2a2140f887edffca5f441b9) )
 	ROM_LOAD( "9 tecfri",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) )
 	ROM_LOAD( "10 tecfri",    0x10000, 0x8000, CRC(c93380d1) SHA1(fc9655cc94c2d2058f83eb341be7e7856a08194f) )
@@ -647,15 +966,15 @@ ROM_START( saurop )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s3.5x",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "s6.7x",     0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) )
 	ROM_LOAD( "s7.7z",     0x08000, 0x8000, CRC(187da060) SHA1(1df156e58379bb39acade02aabab6ff1cb7cc288) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "fgtiles", 0 )
 	ROM_LOAD( "s4.7h",     0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) )
 	ROM_LOAD( "s5.7k",     0x08000, 0x8000, CRC(de5cd249) SHA1(e3752b88b539e1057a35619ffbad01720ab60d7d) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "s8.10l",     0x00000, 0x8000, CRC(e08b5d5e) SHA1(eaaeaa08b19c034ab2a2140f887edffca5f441b9) )
 	ROM_LOAD( "s9.10p",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) )
 	ROM_LOAD( "s10.10r",    0x10000, 0x8000, CRC(c93380d1) SHA1(fc9655cc94c2d2058f83eb341be7e7856a08194f) )
@@ -679,15 +998,15 @@ ROM_START( saurorr ) // all roms have original Tecfri stickers
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sauro-3.bin",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "sauro-6.bin",     0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) )
 	ROM_LOAD( "sauro-7.bin",     0x08000, 0x8000, CRC(187da060) SHA1(1df156e58379bb39acade02aabab6ff1cb7cc288) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "fgtiles", 0 )
 	ROM_LOAD( "sauro-4.bin",     0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) )
 	ROM_LOAD( "27256-5.bin",     0x08000, 0x8000, CRC(9aabdbe5) SHA1(ef008e368024f9377a8d2bc5863b01c63bc8f55b) ) // contains the changed license logo
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "sauro-8.bin",     0x00000, 0x8000, CRC(e08b5d5e) SHA1(eaaeaa08b19c034ab2a2140f887edffca5f441b9) )
 	ROM_LOAD( "sauro-9.bin",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) )
 	ROM_LOAD( "sauro-10.bin",    0x10000, 0x8000, CRC(c93380d1) SHA1(fc9655cc94c2d2058f83eb341be7e7856a08194f) )
@@ -711,15 +1030,15 @@ ROM_START( seawolft )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tmm24256ap.bin",  0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) ) // Same as parent
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "4.bin",           0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) ) // Same as parent
 	ROM_LOAD( "3.bin",           0x08000, 0x8000, CRC(883bb7d1) SHA1(7320e5cddb5c2127b3679b7bc72b273860d178b9) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "fgtiles", 0 )
 	ROM_LOAD( "6.bin",           0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) ) // Same as parent
 	ROM_LOAD( "5.bin",           0x08000, 0x8000, CRC(a6e2640d) SHA1(346ffcf62e27ce8134f4e5e0dbcf11f110e19e04) ) // Same as parent
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "10.bin",          0x00000, 0x8000, CRC(b93f5487) SHA1(a3f36793ded053db7b370bc54a1b59d7b0603590) )
 	ROM_LOAD( "9.bin",           0x08000, 0x8000, CRC(0964ac95) SHA1(acc55ed318adee33c76ac24002a0cd7d35f38d98) )
 	ROM_LOAD( "8.bin",           0x10000, 0x8000, CRC(e71726a9) SHA1(2ef83432eb02ea0849547e5cb2b2215b8e68d714) )
@@ -760,15 +1079,15 @@ ROM_START( saurobl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sauro03.16e",     0x00000, 0x8000, CRC(a30b60fc) SHA1(48ea586a333e42852a6c9a5df48b2f2ccace6d36) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "sauro-6.bin",     0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) ) // sauro06.16g
 	ROM_LOAD( "sauro-7.bin",     0x08000, 0x8000, CRC(187da060) SHA1(1df156e58379bb39acade02aabab6ff1cb7cc288) ) // sauro07.18g
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "fgtiles", 0 )
 	ROM_LOAD( "sauro-4.bin",     0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) ) // sauro04.7g
 	ROM_LOAD( "sauro-5.bin",     0x08000, 0x8000, CRC(a6e2640d) SHA1(346ffcf62e27ce8134f4e5e0dbcf11f110e19e04) ) // sauro05.8g
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "sauro-8.bin",     0x00000, 0x8000, CRC(e08b5d5e) SHA1(eaaeaa08b19c034ab2a2140f887edffca5f441b9) ) // sauro08.9j
 	ROM_LOAD( "sauro-9.bin",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) ) // sauro09.11j
 	ROM_LOAD( "sauro-10.bin",    0x10000, 0x8000, CRC(c93380d1) SHA1(fc9655cc94c2d2058f83eb341be7e7856a08194f) ) // sauro10.12j
@@ -789,17 +1108,17 @@ ROM_START( trckydoc )
 	ROM_LOAD( "trckydoc.d9",  0x0000,  0x8000, CRC(c6242fc3) SHA1(c8a6f6abe8b51061a113ed75fead0479df68ec40) )
 	ROM_LOAD( "trckydoc.b9",  0x8000,  0x8000, CRC(8645c840) SHA1(79c2acfc1aeafbe94afd9d230200bd7cdd7bcd1b) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "trckydoc.e6",     0x00000, 0x8000, CRC(ec326392) SHA1(e6954fecc501a821caa21e67597914519fbbe58f) )
 	ROM_LOAD( "trckydoc.g6",     0x08000, 0x8000, CRC(6a65c088) SHA1(4a70c104809d86b4eef6cc0df9452966fe7c9859) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "trckydoc.h1",    0x00000, 0x4000, CRC(8b73cbf3) SHA1(d10f79a38c1596c90bac9cf4c64ba38ae6ecd8cb) )
 	ROM_LOAD( "trckydoc.e1",    0x04000, 0x4000, CRC(841be98e) SHA1(82da07490b73edcbffc3b9247205aab3a1f7d7ad) )
 	ROM_LOAD( "trckydoc.c1",    0x08000, 0x4000, CRC(1d25574b) SHA1(924e4376a7fe6cdfff0fa6045aaa3f7c0633d275) )
 	ROM_LOAD( "trckydoc.a1",    0x0c000, 0x4000, CRC(436c59ba) SHA1(2aa9c155c432a3c81420520c53bb944dcc613a94) )
 
-	ROM_REGION( 0x0c00, "proms", 0 ) // colour proms
+	ROM_REGION( 0x0c00, "proms", 0 ) // colour PROMs
 	ROM_LOAD( "tdclr3.prm",    0x0000, 0x0100, CRC(671d0140) SHA1(7d5fcd9589c46590b0a240cac428f993201bec2a) )
 	ROM_LOAD( "tdclr2.prm",    0x0400, 0x0100, CRC(874f9050) SHA1(db40d68f5166657fce0eadcd82143112b0388894) )
 	ROM_LOAD( "tdclr1.prm",    0x0800, 0x0100, CRC(57f127b0) SHA1(3d2b18a7a31933579f06d92fa0cc3f0e1fe8b98a) )
@@ -813,17 +1132,17 @@ ROM_START( trckydoca )
 	ROM_LOAD( "trckydca.d9",  0x0000,  0x8000, CRC(99c38aa4) SHA1(298a19439cc17743e10d101c50a26b9a7348299e) )
 	ROM_LOAD( "trckydca.b9",  0x8000,  0x8000, CRC(b6048a15) SHA1(d982fafbfa391ef9bab50bfd52607494e2a9eedf) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "trckydoc.e6",     0x00000, 0x8000, CRC(ec326392) SHA1(e6954fecc501a821caa21e67597914519fbbe58f) )
 	ROM_LOAD( "trckydoc.g6",     0x08000, 0x8000, CRC(6a65c088) SHA1(4a70c104809d86b4eef6cc0df9452966fe7c9859) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "trckydoc.h1",    0x00000, 0x4000, CRC(8b73cbf3) SHA1(d10f79a38c1596c90bac9cf4c64ba38ae6ecd8cb) )
 	ROM_LOAD( "trckydoc.e1",    0x04000, 0x4000, CRC(841be98e) SHA1(82da07490b73edcbffc3b9247205aab3a1f7d7ad) )
 	ROM_LOAD( "trckydoc.c1",    0x08000, 0x4000, CRC(1d25574b) SHA1(924e4376a7fe6cdfff0fa6045aaa3f7c0633d275) )
 	ROM_LOAD( "trckydoc.a1",    0x0c000, 0x4000, CRC(436c59ba) SHA1(2aa9c155c432a3c81420520c53bb944dcc613a94) )
 
-	ROM_REGION( 0x0c00, "proms", 0 ) // colour proms
+	ROM_REGION( 0x0c00, "proms", 0 ) // colour PROMs
 	ROM_LOAD( "tdclr3.prm",    0x0000, 0x0100, CRC(671d0140) SHA1(7d5fcd9589c46590b0a240cac428f993201bec2a) )
 	ROM_LOAD( "tdclr2.prm",    0x0400, 0x0100, CRC(874f9050) SHA1(db40d68f5166657fce0eadcd82143112b0388894) )
 	ROM_LOAD( "tdclr1.prm",    0x0800, 0x0100, CRC(57f127b0) SHA1(3d2b18a7a31933579f06d92fa0cc3f0e1fe8b98a) )
@@ -832,24 +1151,16 @@ ROM_START( trckydoca )
 	ROM_LOAD( "tdprm.prm",    0x0000, 0x0200,  CRC(5261bc11) SHA1(1cc7a9a7376e65f4587b75ef9382049458656372) )
 ROM_END
 
-void sauro_state::init_tecfri()
-{
-	/* This game doesn't like all memory to be initialized to zero, it won't
-	   initialize the high scores */
+} // anonymous namespace
 
-	uint8_t *RAM = memregion("maincpu")->base();
 
-	memset(&RAM[0xe000], 0, 0x100);
-	RAM[0xe000] = 1;
-}
+GAME( 1987, sauro,    0,        sauro,    tecfri,    sauro_state, empty_init, ROT0, "Tecfri",                                "Sauro (set 1)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sauroa,   sauro,    sauro,    tecfri,    sauro_state, empty_init, ROT0, "Tecfri",                                "Sauro (set 2)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurob,   sauro,    sauro,    tecfri,    sauro_state, empty_init, ROT0, "Tecfri",                                "Sauro (set 3)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurop,   sauro,    sauro,    tecfri,    sauro_state, empty_init, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurorr,  sauro,    sauro,    tecfri,    sauro_state, empty_init, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurobl,  sauro,    saurobl,  saurobl,   sauro_state, empty_init, ROT0, "bootleg",                               "Sauro (bootleg)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, seawolft, sauro,    sauro,    tecfri,    sauro_state, empty_init, ROT0, "Tecfri",                                "Sea Wolf (Tecfri)",                     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, sauro,    0,        sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri",                                "Sauro (set 1)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sauroa,   sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri",                                "Sauro (set 2)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, saurob,   sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri",                                "Sauro (set 3)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, saurop,   sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1987, saurorr,  sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, saurobl,  sauro,    saurobl,  saurobl,   sauro_state, init_tecfri, ROT0, "bootleg",                               "Sauro (bootleg)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1987, seawolft, sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri",                                "Sea Wolf (Tecfri)",                     MACHINE_SUPPORTS_SAVE )
-
-GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, init_tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, trckydoc,  0,        trckydoc, tecfri,    trckydoc_state, empty_init, ROT0, "Tecfri", "Tricky Doc (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, trckydoca, trckydoc, trckydoc, trckydoca, trckydoc_state, empty_init, ROT0, "Tecfri", "Tricky Doc (set 2)", MACHINE_SUPPORTS_SAVE )

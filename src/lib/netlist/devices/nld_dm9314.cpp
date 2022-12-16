@@ -64,7 +64,19 @@ namespace netlist::devices {
 					if (m_SQ[i]())
 					{
 						/* R-S Mode */
-						// FIXME: R-S mode is not yet implemented!
+						// RS mode is just an "extension of regular D mode"
+						// The way RS mode works is that D and S bar go high (keeps old value)
+						// S bar going low sets output high
+						// D going low and S bar high sets output low
+						// S bar going low AND D going low sets output low (D takes precedence)
+						if (!m_EQ())
+						{
+							if (!m_D[i]())  // if D low and SQ high we clear the bit
+							{
+								m_last_Q &= ~(1 << i);
+								m_Q[i].push((m_last_Q & (1<<i))>>i, delay);
+							}
+						}
 					}
 					else
 					{

@@ -33,7 +33,7 @@ namespace netlist
 		friend class factory::device_element_t;
 		friend class factory::library_element_t;
 
-		template <typename CX>
+		template <typename DEVICE>
 		friend struct sub_device_wrapper;
 
 		friend class solver::matrix_solver_t;
@@ -103,7 +103,7 @@ namespace netlist
 		log_type &log();
 
 	public:
-		virtual void time_step([[maybe_unused]] time_step_type ts_type,
+		virtual void time_step([[maybe_unused]] detail::time_step_type ts_type,
 			[[maybe_unused]] nl_fptype                         st) noexcept
 		{
 		}

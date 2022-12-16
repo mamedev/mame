@@ -751,6 +751,10 @@
 #define SYS_COMPD(...)                                                   \
 	NET_REGISTER_DEVEXT(SYS_COMPD, __VA_ARGS__)
 
+// usage       : SYS_PULSE(name, DELAY, DURATION, INVERT_INPUT, INVERT_OUTPUT)
+#define SYS_PULSE(...)                                                   \
+	NET_REGISTER_DEVEXT(SYS_PULSE, __VA_ARGS__)
+
 // usage       : SYS_NOISE_MT_U(name, SIGMA)
 #define SYS_NOISE_MT_U(...)                                                   \
 	NET_REGISTER_DEVEXT(SYS_NOISE_MT_U, __VA_ARGS__)
@@ -1267,8 +1271,7 @@ NETLIST_EXTERNAL(roms_lib)
 #define TTL_74279B(...)                                                   \
 	NET_REGISTER_DEVEXT(TTL_74279B, __VA_ARGS__)
 
-// usage       : TTL_9312(name, A, B, C, G, D0, D1, D2, D3, D4, D5, D6, D7)
-// auto connect: VCC, GND
+// usage       : TTL_9312(name, )
 #define TTL_9312(...)                                                   \
 	NET_REGISTER_DEVEXT(TTL_9312, __VA_ARGS__)
 

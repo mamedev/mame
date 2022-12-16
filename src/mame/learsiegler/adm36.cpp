@@ -87,7 +87,7 @@ u8 adm36_state::pio_pb_r()
 
 void adm36_state::pio_pb_w(u8 data)
 {
-	m_earom->clock_w(!BIT(data, 4));
+	m_earom->clock_w(BIT(data, 4));
 	m_earom->c3_w(BIT(data, 3));
 	m_earom->c2_w(BIT(data, 2));
 	m_earom->c1_w(BIT(data, 1));

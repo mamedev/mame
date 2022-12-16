@@ -62,9 +62,11 @@ Notes/ToDo:
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/ppu2c0x.h"
-#include "cpu/m6502/n2a03.h"
+
 #include "bus/nes_ctrl/ctrl.h"
+#include "cpu/m6502/rp2a03.h"
+#include "video/ppu2c0x.h"
+
 #include "debugger.h"
 #include "screen.h"
 #include "speaker.h"
@@ -98,7 +100,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<n2a03_device> m_maincpu;
+	required_device<rp2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_device<screen_device> m_screen;
 	optional_device_array<nes_control_port_device, 3> m_ctrl;
@@ -124,7 +126,6 @@ private:
 	uint8_t       m_money_reg = 0;
 
 	void set_mirroring(int mirroring);
-	void sprite_dma_w(address_space &space, uint8_t data);
 	uint8_t famibox_IN0_r();
 	uint8_t famibox_IN1_r();
 	void famibox_IN0_w(uint8_t data);
@@ -167,19 +168,6 @@ void famibox_state::set_mirroring(int mirroring)
 			break;
 	}
 }
-
-/******************************************************
-
-   NES interface
-
-*******************************************************/
-
-void famibox_state::sprite_dma_w(address_space &space, uint8_t data)
-{
-	int source = data & 7;
-	m_ppu->spriteram_dma(space, source);
-}
-
 
 /******************************************************
 
@@ -394,7 +382,7 @@ void famibox_state::famibox_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(famibox_state::sprite_dma_w));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(famibox_state::famibox_IN0_r), FUNC(famibox_state::famibox_IN0_w)); // IN0 - input port 1
 	map(0x4017, 0x4017).r(FUNC(famibox_state::famibox_IN1_r));     // IN1 - input port 2 / PSG second control register
 	map(0x5000, 0x5fff).rw(FUNC(famibox_state::famibox_system_r), FUNC(famibox_state::famibox_system_w));
@@ -523,7 +511,7 @@ void famibox_state::machine_start()
 void famibox_state::famibox(machine_config &config)
 {
 	// basic machine hardware
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	RP2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &famibox_state::famibox_map);
 
 	// video hardware

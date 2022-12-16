@@ -96,7 +96,7 @@ uint32_t arm7_disassembler::ExtractImmediateOperand( uint32_t opcode )
 	/* rrrrbbbbbbbb */
 	uint32_t imm = opcode&0xff;
 	int r = ((opcode>>8)&0xf)*2;
-	return (imm>>r)|(r?(imm<<(32-r)):0);
+	return rotr_32(imm, r);
 }
 
 void arm7_disassembler::WriteShiftCount( std::ostream &stream, uint32_t opcode )

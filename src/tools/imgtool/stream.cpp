@@ -14,13 +14,14 @@
 
 #include "corefile.h"
 #include "ioprocs.h"
+#include "path.h"
 #include "unzip.h"
 
 #include <cassert>
+#include <cstdarg>
 #include <cstdio>
 #include <cstring>
 
-#include <zlib.h> // for crc32
 
 
 namespace imgtool {
@@ -483,28 +484,6 @@ uint64_t stream::size() const
 
 
 //-------------------------------------------------
-//  getptr
-//-------------------------------------------------
-
-void *stream::getptr()
-{
-	void *ptr;
-
-	switch(imgtype)
-	{
-		case IMG_MEM:
-			ptr = buffer;
-			break;
-
-		default:
-			ptr = nullptr;
-			break;
-	}
-	return ptr;
-}
-
-
-//-------------------------------------------------
 //  seek
 //-------------------------------------------------
 
@@ -569,58 +548,6 @@ uint64_t stream::transfer(stream &dest, stream &source, uint64_t sz)
 uint64_t stream::transfer_all(stream &dest, stream &source)
 {
 	return transfer(dest, source, source.size());
-}
-
-
-//-------------------------------------------------
-//  crc
-//-------------------------------------------------
-
-int stream::crc(unsigned long *result)
-{
-	size_t sz;
-	void *ptr;
-
-	switch(imgtype)
-	{
-		case IMG_MEM:
-			*result = crc32(0, (unsigned char *) buffer, (size_t) filesize);
-			break;
-
-		default:
-			sz = size();
-			ptr = malloc(sz);
-			if (!ptr)
-				return IMGTOOLERR_OUTOFMEMORY;
-			seek(0, SEEK_SET);
-			if (read(ptr, sz) != sz)
-			{
-				free(ptr);
-				return IMGTOOLERR_READERROR;
-			}
-			*result = crc32(0, (const Bytef*)ptr, sz);
-			free(ptr);
-			break;
-	}
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  file_crc
-//-------------------------------------------------
-
-int stream::file_crc(const char *fname, unsigned long *result)
-{
-	int err;
-	stream::ptr f;
-
-	f = stream::open(fname, OSD_FOPEN_READ);
-	if (!f)
-		return IMGTOOLERR_FILENOTFOUND;
-
-	err = f->crc(result);
-	return err;
 }
 
 

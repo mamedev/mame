@@ -37,6 +37,8 @@
 #include "formats/2d_dsk.h"
 #include "formats/mz_cas.h"
 
+#include "utf8.h"
+
 
 #define MASTER_CLOCK 17.73447_MHz_XTAL  / 5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
 

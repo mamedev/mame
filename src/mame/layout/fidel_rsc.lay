@@ -93,13 +93,19 @@ license:CC0
 		<text string="H"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 
+	<!-- generic speaker icon, (C) Mobius, public domain -->
+	<element name="speaker">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="500" height="500" viewBox="0 0 75 75">
+				<path d="M39.389,13.769 L22.235,28.606 L6,28.606 L6,47.699 L21.989,47.699 L39.389,62.75 L39.389,13.769z" style="stroke:#101210;stroke-width:5;stroke-linejoin:round;fill:#101210;"/>
+				<path d="M48,27.6a19.5,19.5 0 0 1 0,21.4M55.1,20.5a30,30 0 0 1 0,35.6M61.6,14a38.8,38.8 0 0 1 0,48.6" style="fill:none;stroke:#101210;stroke-width:5;stroke-linecap:round"/>
+			</svg>
+		]]></data></image>
+	</element>
+
 	<element name="text_re">
 		<disk><color red="0.1" green="0.65" blue="0.35" /></disk>
 		<text string="RE"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_spk">
-		<disk><color red="0.1" green="0.65" blue="0.35" /></disk>
-		<text string="spk"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_pv">
 		<disk><color red="0.1" green="0.65" blue="0.35" /></disk>
@@ -369,8 +375,7 @@ license:CC0
 		<group ref="sb_board"><bounds x="2" y="2" width="81" height="81" /></group>
 		<group ref="sb_ui"><bounds x="-13" y="11.25" width="10" height="62.5" /></group>
 
-	<!-- board coords -->
-
+		<!-- board coords -->
 		<element ref="text_1"><bounds x="-0.8" y="6.5" width="2" height="2" /></element>
 		<element ref="text_2"><bounds x="-0.8" y="16.5" width="2" height="2" /></element>
 		<element ref="text_3"><bounds x="-0.8" y="26.5" width="2" height="2" /></element>
@@ -389,8 +394,7 @@ license:CC0
 		<element ref="text_g"><bounds x="66.5" y="84" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="76.5" y="84" width="2" height="2" /></element>
 
-	<!-- right side -->
-
+		<!-- right side -->
 		<element name="8.8" ref="led"><bounds x="88.95" y="6.75" width="1.5" height="1.5" /></element>
 
 		<element ref="disk_black"><bounds x="86" y="13" width="7.4" height="7.4" /></element>
@@ -412,7 +416,7 @@ license:CC0
 		<element ref="disk_green"><bounds x="87.2" y="75.8" width="5" height="5" /></element>
 
 		<element ref="text_re"><bounds x="87.2" y="15.2" width="5" height="3" /></element>
-		<element ref="text_spk"><bounds x="87.2" y="24" width="5" height="3" /></element>
+		<element ref="speaker"><bounds x="88" y="23.8" width="3.4" height="3.4" /></element>
 		<element ref="text_pv"><bounds x="87.2" y="32.8" width="5" height="3" /></element>
 		<element ref="text_lv"><bounds x="87.2" y="41.6" width="5" height="3" /></element>
 		<element ref="text_cl"><bounds x="87.2" y="50.4" width="5" height="3" /></element>

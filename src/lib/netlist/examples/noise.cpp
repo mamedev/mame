@@ -14,6 +14,7 @@
 //  X.4 : Triangle out
 
 NETLIST_START(noise)
+{
 
 	SOLVER(Solver, 48000)
 
@@ -32,5 +33,5 @@ NETLIST_START(noise)
 	NET_C(noise.2, R2.1)
 	NET_C(GND, R2.2, nclk.GND)
 
-NETLIST_END()
+}
 //! [noise_example]

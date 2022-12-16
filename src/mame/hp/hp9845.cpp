@@ -3768,7 +3768,7 @@ void hp9845t_state::hp9845t(machine_config &config)
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
 }
 
-	ROM_START( hp9845a )
+ROM_START( hp9845a )
 	ROM_REGION( 0200000, "lpu", ROMREGION_16BIT | ROMREGION_BE )
 	ROM_LOAD( "09845-65544-65547-03-system_lpu.bin", 0000000, 0200000, CRC(47beb87f) SHA1(456caefacafcf19435e1e7e68b1c1e4010841664) )
 

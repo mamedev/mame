@@ -9,6 +9,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(cccs)
+{
 
 	CLOCK(clk, 1000) // 1000 Hz
 	SOLVER(Solver, 48000)
@@ -36,4 +37,4 @@ NETLIST_START(cccs)
 	NET_C(R3.1, CS1.P)
 	NET_C(GND, CS1.N, R3.2)
 
-NETLIST_END()
+}

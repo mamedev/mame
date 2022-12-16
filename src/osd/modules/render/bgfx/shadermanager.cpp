@@ -9,15 +9,18 @@
 //
 //============================================================
 
+#include "shadermanager.h"
+
+#include "emucore.h"
+
+#include "osdfile.h"
+#include "modules/lib/osdobj_common.h"
+
 #include <bx/math.h>
 #include <bx/readerwriter.h>
 #include <bx/file.h>
 
-#include "emu.h"
-
 #include <bgfx/bgfx.h>
-
-#include "shadermanager.h"
 
 shader_manager::~shader_manager()
 {

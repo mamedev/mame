@@ -8,6 +8,11 @@ license:CC0
 			<color red="1.0" green="0.0" blue="0.0" />
 		</led7seg>
 	</element>
+	<element name="digitinv">
+		<led7seg invert="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
 	<element name="matrixlamp">
 		<rect state ="0">
 			<color red="0.7" green="0.7" blue="0.7" />
@@ -351,13 +356,22 @@ license:CC0
 			</repeat>
 		</repeat>
 
-		<repeat count="8">
+		<repeat count="16">
 			<param name="n" start="0" increment="1" />
 			<param name="x" start="300" increment="8" />
 			<element name="digit~n~" ref="digit" state="0">
 				<bounds x="~x~" y="280" width="8" height="10" />
 			</element>
 		</repeat>
+
+		<repeat count="16">
+			<param name="n" start="0" increment="1" />
+			<param name="x" start="300" increment="8" />
+			<element name="digit~n~" ref="digitinv" state="0">
+				<bounds x="~x~" y="295" width="8" height="10" />
+			</element>
+		</repeat>
+
 		<group ref="vfd">
 			<bounds x="17" y="280" width="112" height="24" />
 		</group>

@@ -9,6 +9,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(cs)
+{
 
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-12)
@@ -24,4 +25,4 @@ NETLIST_START(cs)
 	NET_C(GND, CS1.2, R1.2)
 
 	LOG(log_P, R1.1)
-NETLIST_END()
+}

@@ -108,6 +108,7 @@
  */
 #endif
 static NETLIST_START(_MB4391)
+{
 	// MB4391 (fake implementation)
 	// 2020 by beta-tester (https://github.com/beta-tester)
 	//
@@ -154,10 +155,11 @@ static NETLIST_START(_MB4391)
 
 	// OUTPUT
 	ALIAS(OUT, Rout.2)  // OUT
-NETLIST_END()
+}
 
 
 static NETLIST_START(_MB4391_DIP)
+{
 	SUBMODEL(_MB4391, A)
 	SUBMODEL(_MB4391, B)
 
@@ -174,7 +176,7 @@ static NETLIST_START(_MB4391_DIP)
 		  NC.I, /*      |8            9|       */ NC.I
 				/*      +--------------+       */
 	)
-NETLIST_END()
+}
 /* ----------------------------------------------------------------------------
  *  Library section content END
  * ---------------------------------------------------------------------------*/
@@ -259,6 +261,7 @@ NETLIST_END()
 //                                         B1,C1)
 // ---------------------------------------------------------------------------
 static NETLIST_START(brdrline_schematics)
+{
 
 	/* ------------------------------------------------------------------------
 	 *  UNUSED_OP_REF
@@ -1357,12 +1360,13 @@ static NETLIST_START(brdrline_schematics)
 	// OUTPUT
 	NET_C(CRY_SOUND, C27.2)
 
-NETLIST_END()
+}
 
 
 
 
 static NETLIST_START(brdrline_sound_out)
+{
 	LM324_DIP(IC38) // shared by HIT_SOUND, SOUND_OUT, POINT_SOUND, POINT_SOUND
 	NET_C(GND, IC38.11/*GND*/)
 	NET_C(V12, IC38.4/*VCC*/)
@@ -1482,12 +1486,13 @@ static NETLIST_START(brdrline_sound_out)
 	ALIAS(SOUND_OUT, Rsound.1)
 #endif
 
-NETLIST_END()
+}
 
 
 
 
 NETLIST_START(brdrline)
+{
 
 #if 1
 	SOLVER(Solver, 1000)
@@ -1603,7 +1608,7 @@ NETLIST_START(brdrline)
 	// --------------------------------
 	ALIAS(OUTPUT, SOUND_OUT)
 
-NETLIST_END()
+}
 
 
 

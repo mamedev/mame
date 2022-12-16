@@ -1,6 +1,9 @@
-#include "emu.h"
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+
+#include "view.h"
+
 #include "window.h"
-#include "rendutil.h"
 #include "../drawbgfx.h"
 
 #include <bx/math.h>
@@ -8,7 +11,6 @@
 #include <bgfx/platform.h>
 
 #include "target.h"
-#include "view.h"
 
 void bgfx_view::update() {
 	std::shared_ptr<osd_window> win = m_renderer->assert_window();

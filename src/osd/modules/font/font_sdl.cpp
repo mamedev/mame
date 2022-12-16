@@ -11,8 +11,10 @@
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID)
 
 #include "corestr.h"
+#include "emucore.h"
 #include "fileio.h"
 #include "unicode.h"
+#include "osdcore.h"
 
 #ifdef SDLMAME_EMSCRIPTEN
 #include <SDL_ttf.h>
@@ -349,10 +351,10 @@ bool font_sdl::get_font_families(std::string const &font_path, std::vector<std::
 		{
 			auto const compare_fonts = [](std::pair<std::string, std::string> const &a, std::pair<std::string, std::string> const &b) -> bool
 			{
-				int const second = core_stricmp(a.second.c_str(), b.second.c_str());
+				int const second = core_stricmp(a.second, b.second);
 				if (second < 0) return true;
 				else if (second > 0) return false;
-				else return core_stricmp(b.first.c_str(), b.first.c_str()) < 0;
+				else return core_stricmp(b.first, b.first) < 0;
 			};
 			std::string config((const char *)val.u.s);
 			std::string display(config);

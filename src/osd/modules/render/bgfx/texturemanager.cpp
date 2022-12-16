@@ -9,13 +9,14 @@
 //
 //============================================================
 
-#include <bgfx/bgfx.h>
-
 #include "texturemanager.h"
+
 #include "texture.h"
 #include "bgfxutil.h"
+#include "emucore.h"
 #include "fileio.h"
 #include "rendutil.h"
+#include "osdcore.h"
 #include "modules/render/copyutil.h"
 
 texture_manager::~texture_manager()

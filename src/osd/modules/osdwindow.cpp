@@ -8,6 +8,8 @@
 
 #include "emu.h"
 #include "osdwindow.h"
+#include "modules/lib/osdobj_common.h"
+#include "modules/monitor/monitor_module.h"
 
 #include "render/drawnone.h"
 #include "render/drawbgfx.h"
@@ -55,6 +57,23 @@ osd_window::osd_window(running_machine &machine, int index, std::shared_ptr<osd_
 float osd_window::pixel_aspect() const
 {
 	return monitor()->pixel_aspect();
+}
+
+bool osd_window::swap_xy() const
+{
+	bool orientation_swap_xy =
+		(machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+	bool rotation_swap_xy =
+		(target()->orientation() & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+	return orientation_swap_xy ^ rotation_swap_xy;
+};
+
+bool osd_window::keepaspect() const
+{
+	if (m_target != nullptr)
+		return m_target->keepaspect();
+	else
+		return false;
 }
 
 std::unique_ptr<osd_renderer> osd_renderer::make_for_type(int mode, std::shared_ptr<osd_window> window, int extra_flags)

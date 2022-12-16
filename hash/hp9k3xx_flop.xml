@@ -385,7 +385,7 @@ license:CC0
 				<rom name="51TOOL9.TD0" size="643854" crc="5cdb67d4" sha1="2a9bf0cc44564a26d7193abe09af8a89500c7555"/>
 			</dataarea>
 		</part>
-		<part name="51tool"  interface="floppy_3_5">
+		<part name="51tool" interface="floppy_3_5">
 			<dataarea name="flop" size="673898">
 				<rom name="51TOOL.TD0" size="673898" crc="c533e6f2" sha1="ec2a23c15f9356eeab20731fc22c7dd4bc7ca5ca"/>
 			</dataarea>

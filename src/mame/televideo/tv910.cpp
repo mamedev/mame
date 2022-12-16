@@ -24,6 +24,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/input_merger.h"
@@ -31,8 +32,11 @@
 #include "machine/mos6551.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+
 #include "screen.h"
 #include "speaker.h"
+
+#include "utf8.h"
 
 #define ACIA_TAG    "acia"
 #define CRTC_TAG    "crtc"

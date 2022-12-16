@@ -145,6 +145,7 @@ An example entry is given here:
 	//-    http://pdf.datasheetcatalog.com/datasheets/400/335051_DS.pdf
 	//-
 	static NETLIST_START(SN74LS629_DIP)
+{
 
 If you add an example in the examples folder this will be included in the 
 documentation as well.

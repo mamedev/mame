@@ -20,10 +20,12 @@
 #include "softlist_dev.h"
 
 #include "corestr.h"
+#include "path.h"
 
 #include <algorithm>
 #include <cstring>
 #include <iterator>
+#include <locale>
 
 
 namespace {
@@ -56,7 +58,17 @@ inifile_manager::inifile_manager(ui_options &options)
 			}
 		}
 	}
-	std::stable_sort(m_ini_index.begin(), m_ini_index.end(), [] (auto const &x, auto const &y) { return 0 > core_stricmp(x.first.c_str(), y.first.c_str()); });
+	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+	std::stable_sort(
+			m_ini_index.begin(),
+			m_ini_index.end(),
+			[&coll] (auto const &x, auto const &y)
+			{
+				std::wstring const wx = wstring_from_utf8(x.first);
+				std::wstring const wy = wstring_from_utf8(y.first);
+				return 0 > coll.compare(wx.data(), wx.data() + wx.size(), wy.data(), wy.data() + wy.size());
+			}
+	);
 }
 
 //-------------------------------------------------
@@ -118,9 +130,21 @@ void inifile_manager::init_category(std::string &&filename, util::core_file &fil
 			}
 		}
 	}
-	std::stable_sort(index.begin(), index.end(), [] (auto const &x, auto const &y) { return 0 > core_stricmp(x.first.c_str(), y.first.c_str()); });
 	if (!index.empty())
+	{
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		std::stable_sort(
+				index.begin(),
+				index.end(),
+				[&coll] (auto const &x, auto const &y)
+				{
+					std::wstring const wx = wstring_from_utf8(x.first);
+					std::wstring const wy = wstring_from_utf8(y.first);
+					return 0 > coll.compare(wx.data(), wx.data() + wx.size(), wy.data(), wy.data() + wy.size());
+				}
+		);
 		m_ini_index.emplace_back(std::move(filename), std::move(index));
+	}
 }
 
 
@@ -509,7 +533,7 @@ void favorite_manager::update_sorted()
 
 					int cmp;
 
-					cmp = core_stricmp(lhs.longname.c_str(), rhs.longname.c_str());
+					cmp = core_stricmp(lhs.longname, rhs.longname);
 					if (0 > cmp)
 						return true;
 					else if (0 < cmp)

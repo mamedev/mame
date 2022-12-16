@@ -69,28 +69,66 @@ void osd_break_into_debugger(const char *message)
 }
 
 #ifdef SDLMAME_ANDROID
-std::string osd_get_clipboard_text()
+std::string osd_get_clipboard_text() noexcept
 {
 	return std::string();
+}
+
+std::error_condition osd_set_clipboard_text(std::string_view text) noexcept
+{
+	return std::errc::io_error; // TODO: better error code?
 }
 #else
 //============================================================
 //  osd_get_clipboard_text
 //============================================================
 
-std::string osd_get_clipboard_text()
+std::string osd_get_clipboard_text() noexcept
 {
+	// TODO: better error handling
 	std::string result;
 
 	if (SDL_HasClipboardText())
 	{
-		char *temp = SDL_GetClipboardText();
-		result.assign(temp);
-		SDL_free(temp);
+		char *const temp = SDL_GetClipboardText();
+		if (temp)
+		{
+			try
+			{
+				result.assign(temp);
+			}
+			catch (std::bad_alloc const &)
+			{
+			}
+			SDL_free(temp);
+		}
 	}
 	return result;
 }
 
+
+//============================================================
+//  osd_set_clipboard_text
+//============================================================
+
+std::error_condition osd_set_clipboard_text(std::string_view text) noexcept
+{
+	try
+	{
+		std::string const clip(text); // need to do this to ensure there's a terminating NUL for SDL
+		if (0 > SDL_SetClipboardText(clip.c_str()))
+		{
+			// SDL_GetError returns a message, can't really convert it to an error condition
+			return std::errc::io_error; // TODO: better error code?
+		}
+
+		return std::error_condition();
+	}
+	catch (std::bad_alloc const &)
+	{
+		return std::errc::not_enough_memory;
+	}
+}
 #endif
 
 //============================================================

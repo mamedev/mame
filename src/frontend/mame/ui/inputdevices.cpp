@@ -13,6 +13,9 @@
 
 #include "inputdev.h"
 
+// FIXME: allow OSD module headers to be included in a less ugly way
+#include "../osd/modules/lib/osdlib.h"
+
 
 namespace ui {
 
@@ -82,6 +85,9 @@ protected:
 private:
 	virtual void populate(float &customtop, float &custombottom) override
 	{
+		item_append(_("menu-inputdev", "Copy Device ID"), 0U, nullptr);
+		item_append(menu_item_type::SEPARATOR);
+
 		bool haveanalog = false;
 		for (input_item_id itemid = ITEM_ID_FIRST_VALID; m_device.maxitem() >= itemid; ++itemid)
 		{
@@ -109,6 +115,15 @@ private:
 
 	virtual void handle(event const *ev) override
 	{
+		// FIXME: hacky, depending on first item being "copy ID", but need a better model for item reference values
+		if (ev && ev->item && (IPT_UI_SELECT == ev->iptkey) && (&item(0) == ev->item))
+		{
+			if (!osd_set_clipboard_text(m_device.id()))
+				machine().popmessage(_("menu-inputdev", "Copied device ID to clipboard"));
+			else
+				machine().popmessage(_("menu-inputdev", "Error copying device ID to clipboard"));
+		}
+
 		for (int i = 0; item_count() > i; ++i)
 		{
 			void *const ref(item(i).ref());

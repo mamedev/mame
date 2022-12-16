@@ -154,7 +154,7 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68040.h"
 #include "machine/z80scc.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"

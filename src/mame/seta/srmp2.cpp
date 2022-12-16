@@ -393,9 +393,9 @@ void srmp2_state::srmp2_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x0c0000, 0x0c3fff).ram().share("nvram");
-	map(0x140000, 0x143fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     /* Sprites Code + X + Attr */
-	map(0x180000, 0x1805ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     /* Sprites Y */
-	map(0x180600, 0x180607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0x140000, 0x143fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));     /* Sprites Code + X + Attr */
+	map(0x180000, 0x1805ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));     /* Sprites Y */
+	map(0x180600, 0x180607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
 	map(0x1c0000, 0x1c0001).nopw();                        /* ??? */
 	map(0x800000, 0x800001).w(FUNC(srmp2_state::srmp2_flags_w));            /* ADPCM bank, Color bank, etc. */
 	map(0x900000, 0x900001).portr("SYSTEM");             /* Coinage */
@@ -443,11 +443,11 @@ void srmp2_state::mjyuugi_map(address_map &map)
 	map(0xb00001, 0xb00001).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xb00000, 0xb00003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0xc00000, 0xc00001).nopw();                    /* ??? */
-	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); /* Sprites Y */
-	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0xd00000, 0xd005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16)); /* Sprites Y */
+	map(0xd00600, 0xd00607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
 
 	map(0xd02000, 0xd023ff).ram();                         /* ??? only writes $00fa */
-	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16)); /* Sprites Code + X + Attr */
+	map(0xe00000, 0xe03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16)); /* Sprites Code + X + Attr */
 	map(0xffc000, 0xffffff).ram().share("nvram");
 }
 
@@ -475,11 +475,11 @@ void srmp2_state::srmp3_map(address_map &map)
 	map(0x8000, 0x9fff).bankr("mainbank");                            /* rom bank */
 	map(0xa000, 0xa7ff).ram().share("nvram");   /* work ram */
 	map(0xa800, 0xa800).nopw();                            /* flag ? */
-	map(0xb000, 0xb2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xb300, 0xb303).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r8), FUNC(seta001_device::spritectrl_w8));
+	map(0xb000, 0xb2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xb300, 0xb303).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r8), FUNC(x1_001_device::spritectrl_w8));
 	map(0xb800, 0xb800).nopw();                            /* flag ? */
-	map(0xc000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8)); /* Sprites Code + X + Attr */
-	map(0xe000, 0xffff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xc000, 0xdfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8)); /* Sprites Code + X + Attr */
+	map(0xe000, 0xffff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 }
 
 void srmp2_state::srmp3_io_map(address_map &map)
@@ -501,11 +501,11 @@ void srmp2_state::rmgoldyh_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("mainbank");                            /* rom bank */
 	map(0xa000, 0xafff).ram().share("nvram");   /* work ram */
-	map(0xb000, 0xb2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xb300, 0xb303).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r8), FUNC(seta001_device::spritectrl_w8));
+	map(0xb000, 0xb2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xb300, 0xb303).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r8), FUNC(x1_001_device::spritectrl_w8));
 	map(0xb800, 0xb800).nopw();                            /* flag ? */
-	map(0xc000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8)); /* Sprites Code + X + Attr */
-	map(0xe000, 0xffff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xc000, 0xdfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8)); /* Sprites Code + X + Attr */
+	map(0xe000, 0xffff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 }
 
 void srmp2_state::rmgoldyh_rombank_w(uint8_t data)
@@ -1140,7 +1140,7 @@ GFXDECODE_END
 void srmp2_state::srmp2(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000/2);  /* 8.00 MHz */
+	M68000(config, m_maincpu, 8_MHz_XTAL);  /* 8.00 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &srmp2_state::srmp2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(srmp2_state::irq4_line_assert));
 	m_maincpu->set_periodic_int(FUNC(srmp2_state::irq2_line_assert), attotime::from_hz(15*60)); /* Interrupt times is not understood */
@@ -1148,12 +1148,12 @@ void srmp2_state::srmp2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 16000000, "palette", gfx_srmp2);
-	m_seta001->set_transpen(15);
-	m_seta001->set_fg_xoffsets( 0x10, 0x10 );
-	m_seta001->set_fg_yoffsets( 0x05, 0x07 );
-	m_seta001->set_bg_xoffsets( 0x00, 0x00 ); // bg not used?
-	m_seta001->set_bg_yoffsets( 0x00, 0x00 ); // bg not used?
+	X1_001(config, m_spritegen, 20_MHz_XTAL, "palette", gfx_srmp2);
+	m_spritegen->set_transpen(15);
+	m_spritegen->set_fg_xoffsets( 0x10, 0x10 );
+	m_spritegen->set_fg_yoffsets( 0x05, 0x07 );
+	m_spritegen->set_bg_xoffsets( 0x00, 0x00 ); // bg not used?
+	m_spritegen->set_bg_yoffsets( 0x00, 0x00 ); // bg not used?
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1169,7 +1169,7 @@ void srmp2_state::srmp2(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000/16));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 20_MHz_XTAL / 16));
 	aysnd.port_a_read_callback().set_ioport("DSW2");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
@@ -1191,12 +1191,12 @@ void srmp2_state::srmp3(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 16000000, "palette", gfx_srmp3);
-	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback));
-	m_seta001->set_fg_xoffsets( 0x10, 0x10 );
-	m_seta001->set_fg_yoffsets( 0x06, 0x06 );
-	m_seta001->set_bg_xoffsets( -0x01, 0x10 );
-	m_seta001->set_bg_yoffsets( -0x06, 0x06 );
+	X1_001(config, m_spritegen, 16000000, "palette", gfx_srmp3);
+	m_spritegen->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback));
+	m_spritegen->set_fg_xoffsets( 0x10, 0x10 );
+	m_spritegen->set_fg_yoffsets( 0x06, 0x06 );
+	m_spritegen->set_bg_xoffsets( -0x01, 0x10 );
+	m_spritegen->set_bg_yoffsets( -0x06, 0x06 );
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1236,7 +1236,7 @@ void srmp2_state::rmgoldyh(machine_config &config)
 void srmp2_state::mjyuugi(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000/2);  /* 8.00 MHz */
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2);  /* 8.00 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &srmp2_state::mjyuugi_map);
 	m_maincpu->set_vblank_int("screen", FUNC(srmp2_state::irq4_line_assert));
 	m_maincpu->set_periodic_int(FUNC(srmp2_state::irq2_line_assert), attotime::from_hz(15*60)); /* Interrupt times is not understood */
@@ -1245,12 +1245,12 @@ void srmp2_state::mjyuugi(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 16000000, "palette", gfx_srmp3);
-	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback));
-	m_seta001->set_fg_xoffsets( 0x10, 0x10 );
-	m_seta001->set_fg_yoffsets( 0x06, 0x06 );
-	m_seta001->set_bg_yoffsets( 0x09, 0x07 );
-	m_seta001->set_spritelimit( 0x1ff-6 );
+	X1_001(config, m_spritegen, 16_MHz_XTAL, "palette", gfx_srmp3);
+	m_spritegen->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback));
+	m_spritegen->set_fg_xoffsets( 0x10, 0x10 );
+	m_spritegen->set_fg_yoffsets( 0x06, 0x06 );
+	m_spritegen->set_bg_yoffsets( 0x09, 0x07 );
+	m_spritegen->set_spritelimit( 0x1ff-6 );
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1266,7 +1266,7 @@ void srmp2_state::mjyuugi(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 16000000/16));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 16_MHz_XTAL / 16));
 	aysnd.port_a_read_callback().set_ioport("DSW2");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);

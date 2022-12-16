@@ -204,7 +204,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cpm68ka"  cloneof="cpm68k"> <!-- CP/M-68k -->
+	<software name="cpm68ka" cloneof="cpm68k"> <!-- CP/M-68k -->
 		<description>CP/M-68k (Alt)</description>
 		<year>198?</year>
 		<publisher>NCR Corporation</publisher>

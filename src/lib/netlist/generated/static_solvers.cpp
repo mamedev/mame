@@ -4889,182 +4889,6 @@ static void nl_gcr_95_double_double_24643c159711f292(double * __restrict V, cons
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-// armora,solarq,starcas,wotw
-static void nl_gcr_22_double_double_1250f340dea396ae(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
-
-{
-
-	plib::unused_var(cnV);
-	double m_A0(0.0);
-	double m_A1(0.0);
-	double m_A2(0.0);
-	double m_A3(0.0);
-	double m_A4(0.0);
-	double m_A5(0.0);
-	double m_A6(0.0);
-	double m_A7(0.0);
-	double m_A8(0.0);
-	double m_A9(0.0);
-	double m_A10(0.0);
-	double m_A11(0.0);
-	double m_A12(0.0);
-	double m_A13(0.0);
-	double m_A14(0.0);
-	double m_A15(0.0);
-	double m_A16(0.0);
-	double m_A17(0.0);
-	double m_A18(0.0);
-	double m_A19(0.0);
-	double m_A20(0.0);
-	double m_A21(0.0);
-	m_A0 += gt[0];
-	m_A0 += gt[1];
-	m_A0 += gt[2];
-	m_A0 += gt[3];
-	m_A1 += go[0];
-	double RHS0 = Idr[0];
-	RHS0 += Idr[1];
-	RHS0 += Idr[2];
-	RHS0 += Idr[3];
-	RHS0 -= go[1] * *cnV[1];
-	RHS0 -= go[2] * *cnV[2];
-	RHS0 -= go[3] * *cnV[3];
-	m_A2 += gt[4];
-	m_A2 += gt[5];
-	m_A3 += go[4];
-	double RHS1 = Idr[4];
-	RHS1 += Idr[5];
-	RHS1 -= go[5] * *cnV[5];
-	m_A4 += gt[6];
-	m_A4 += gt[7];
-	m_A4 += gt[8];
-	m_A4 += gt[9];
-	m_A4 += gt[10];
-	m_A4 += gt[11];
-	m_A4 += gt[12];
-	m_A4 += gt[13];
-	m_A7 += go[6];
-	m_A6 += go[7];
-	m_A6 += go[8];
-	m_A5 += go[9];
-	m_A5 += go[10];
-	double RHS2 = Idr[6];
-	RHS2 += Idr[7];
-	RHS2 += Idr[8];
-	RHS2 += Idr[9];
-	RHS2 += Idr[10];
-	RHS2 += Idr[11];
-	RHS2 += Idr[12];
-	RHS2 += Idr[13];
-	RHS2 -= go[11] * *cnV[11];
-	RHS2 -= go[12] * *cnV[12];
-	RHS2 -= go[13] * *cnV[13];
-	m_A10 += gt[14];
-	m_A10 += gt[15];
-	m_A10 += gt[16];
-	m_A10 += gt[17];
-	m_A10 += gt[18];
-	m_A10 += gt[19];
-	m_A9 += go[14];
-	m_A9 += go[15];
-	m_A8 += go[16];
-	double RHS3 = Idr[14];
-	RHS3 += Idr[15];
-	RHS3 += Idr[16];
-	RHS3 += Idr[17];
-	RHS3 += Idr[18];
-	RHS3 += Idr[19];
-	RHS3 -= go[17] * *cnV[17];
-	RHS3 -= go[18] * *cnV[18];
-	RHS3 -= go[19] * *cnV[19];
-	m_A15 += gt[20];
-	m_A15 += gt[21];
-	m_A15 += gt[22];
-	m_A15 += gt[23];
-	m_A15 += gt[24];
-	m_A16 += go[20];
-	m_A16 += go[21];
-	m_A13 += go[22];
-	m_A13 += go[23];
-	double RHS4 = Idr[20];
-	RHS4 += Idr[21];
-	RHS4 += Idr[22];
-	RHS4 += Idr[23];
-	RHS4 += Idr[24];
-	RHS4 -= go[24] * *cnV[24];
-	m_A21 += gt[25];
-	m_A21 += gt[26];
-	m_A21 += gt[27];
-	m_A21 += gt[28];
-	m_A21 += gt[29];
-	m_A20 += go[25];
-	m_A20 += go[26];
-	m_A18 += go[27];
-	m_A17 += go[28];
-	double RHS5 = Idr[25];
-	RHS5 += Idr[26];
-	RHS5 += Idr[27];
-	RHS5 += Idr[28];
-	RHS5 += Idr[29];
-	RHS5 -= go[29] * *cnV[29];
-	const double f0 = 1.0 / m_A0;
-	const double f0_3 = -f0 * m_A8;
-	m_A10 += m_A1 * f0_3;
-	RHS3 += f0_3 * RHS0;
-	const double f1 = 1.0 / m_A2;
-	const double f1_5 = -f1 * m_A17;
-	m_A21 += m_A3 * f1_5;
-	RHS5 += f1_5 * RHS1;
-	const double f2 = 1.0 / m_A4;
-	const double f2_3 = -f2 * m_A9;
-	m_A10 += m_A5 * f2_3;
-	m_A11 += m_A6 * f2_3;
-	m_A12 += m_A7 * f2_3;
-	RHS3 += f2_3 * RHS2;
-	const double f2_4 = -f2 * m_A13;
-	m_A14 += m_A5 * f2_4;
-	m_A15 += m_A6 * f2_4;
-	m_A16 += m_A7 * f2_4;
-	RHS4 += f2_4 * RHS2;
-	const double f2_5 = -f2 * m_A18;
-	m_A19 += m_A5 * f2_5;
-	m_A20 += m_A6 * f2_5;
-	m_A21 += m_A7 * f2_5;
-	RHS5 += f2_5 * RHS2;
-	const double f3 = 1.0 / m_A10;
-	const double f3_4 = -f3 * m_A14;
-	m_A15 += m_A11 * f3_4;
-	m_A16 += m_A12 * f3_4;
-	RHS4 += f3_4 * RHS3;
-	const double f3_5 = -f3 * m_A19;
-	m_A20 += m_A11 * f3_5;
-	m_A21 += m_A12 * f3_5;
-	RHS5 += f3_5 * RHS3;
-	const double f4 = 1.0 / m_A15;
-	const double f4_5 = -f4 * m_A20;
-	m_A21 += m_A16 * f4_5;
-	RHS5 += f4_5 * RHS4;
-	V[5] = RHS5 / m_A21;
-	double tmp4 = 0.0;
-	tmp4 += m_A16 * V[5];
-	V[4] = (RHS4 - tmp4) / m_A15;
-	double tmp3 = 0.0;
-	tmp3 += m_A11 * V[4];
-	tmp3 += m_A12 * V[5];
-	V[3] = (RHS3 - tmp3) / m_A10;
-	double tmp2 = 0.0;
-	tmp2 += m_A5 * V[3];
-	tmp2 += m_A6 * V[4];
-	tmp2 += m_A7 * V[5];
-	V[2] = (RHS2 - tmp2) / m_A4;
-	double tmp1 = 0.0;
-	tmp1 += m_A3 * V[5];
-	V[1] = (RHS1 - tmp1) / m_A2;
-	double tmp0 = 0.0;
-	tmp0 += m_A1 * V[3];
-	V[0] = (RHS0 - tmp0) / m_A0;
-}
-
 // armora
 static void nl_gcr_22_double_double_a6cfda6668b153c2(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
@@ -12112,63 +11936,6 @@ static void nl_gcr_46_double_double_536c3652eb3bc075(double * __restrict V, cons
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-// astrob,cheekyms,fireone,speedfrk,rebound
-static void nl_gcr_7_double_double_7c86a9bc1c6aef4c(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
-
-{
-
-	plib::unused_var(cnV);
-	double m_A0(0.0);
-	double m_A1(0.0);
-	double m_A2(0.0);
-	double m_A3(0.0);
-	double m_A4(0.0);
-	double m_A5(0.0);
-	double m_A6(0.0);
-	m_A0 += gt[0];
-	m_A0 += gt[1];
-	m_A0 += gt[2];
-	m_A1 += go[0];
-	double RHS0 = Idr[0];
-	RHS0 += Idr[1];
-	RHS0 += Idr[2];
-	RHS0 -= go[1] * *cnV[1];
-	RHS0 -= go[2] * *cnV[2];
-	m_A2 += gt[3];
-	m_A2 += gt[4];
-	m_A3 += go[3];
-	double RHS1 = Idr[3];
-	RHS1 += Idr[4];
-	RHS1 -= go[4] * *cnV[4];
-	m_A6 += gt[5];
-	m_A6 += gt[6];
-	m_A6 += gt[7];
-	m_A6 += gt[8];
-	m_A5 += go[5];
-	m_A4 += go[6];
-	double RHS2 = Idr[5];
-	RHS2 += Idr[6];
-	RHS2 += Idr[7];
-	RHS2 += Idr[8];
-	RHS2 -= go[7] * *cnV[7];
-	RHS2 -= go[8] * *cnV[8];
-	const double f0 = 1.0 / m_A0;
-	const double f0_2 = -f0 * m_A4;
-	m_A6 += m_A1 * f0_2;
-	RHS2 += f0_2 * RHS0;
-	const double f1 = 1.0 / m_A2;
-	const double f1_2 = -f1 * m_A5;
-	m_A6 += m_A3 * f1_2;
-	RHS2 += f1_2 * RHS1;
-	V[2] = RHS2 / m_A6;
-	double tmp1 = 0.0;
-	tmp1 += m_A3 * V[2];
-	V[1] = (RHS1 - tmp1) / m_A2;
-	double tmp0 = 0.0;
-	tmp0 += m_A1 * V[2];
-	V[0] = (RHS0 - tmp0) / m_A0;
-}
-
 // barrier,spacewar
 static void nl_gcr_10_double_double_a50a4b733e95414a(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
@@ -13220,79 +12987,6 @@ static void nl_gcr_47_double_double_6ef39a62161d596c(double * __restrict V, cons
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-// boxingb,solarq
-static void nl_gcr_10_double_double_d7d45dc58b08cab9(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
-
-{
-
-	plib::unused_var(cnV);
-	double m_A0(0.0);
-	double m_A1(0.0);
-	double m_A2(0.0);
-	double m_A3(0.0);
-	double m_A4(0.0);
-	double m_A5(0.0);
-	double m_A6(0.0);
-	double m_A7(0.0);
-	double m_A8(0.0);
-	double m_A9(0.0);
-	m_A0 += gt[0];
-	m_A0 += gt[1];
-	m_A1 += go[0];
-	double RHS0 = Idr[0];
-	RHS0 += Idr[1];
-	RHS0 -= go[1] * *cnV[1];
-	m_A2 += gt[2];
-	m_A2 += gt[3];
-	m_A2 += gt[4];
-	m_A2 += gt[5];
-	m_A3 += go[2];
-	double RHS1 = Idr[2];
-	RHS1 += Idr[3];
-	RHS1 += Idr[4];
-	RHS1 += Idr[5];
-	RHS1 -= go[3] * *cnV[3];
-	RHS1 -= go[4] * *cnV[4];
-	RHS1 -= go[5] * *cnV[5];
-	m_A5 += gt[6];
-	m_A5 += gt[7];
-	m_A5 += gt[8];
-	m_A6 += go[6];
-	m_A4 += go[7];
-	double RHS2 = Idr[6];
-	RHS2 += Idr[7];
-	RHS2 += Idr[8];
-	RHS2 -= go[8] * *cnV[8];
-	m_A9 += gt[9];
-	m_A9 += gt[10];
-	m_A7 += go[9];
-	m_A8 += go[10];
-	double RHS3 = Idr[9];
-	RHS3 += Idr[10];
-	const double f0 = 1.0 / m_A0;
-	const double f0_2 = -f0 * m_A4;
-	m_A5 += m_A1 * f0_2;
-	RHS2 += f0_2 * RHS0;
-	const double f1 = 1.0 / m_A2;
-	const double f1_3 = -f1 * m_A7;
-	m_A9 += m_A3 * f1_3;
-	RHS3 += f1_3 * RHS1;
-	const double f2 = 1.0 / m_A5;
-	const double f2_3 = -f2 * m_A8;
-	m_A9 += m_A6 * f2_3;
-	RHS3 += f2_3 * RHS2;
-	V[3] = RHS3 / m_A9;
-	double tmp2 = 0.0;
-	tmp2 += m_A6 * V[3];
-	V[2] = (RHS2 - tmp2) / m_A5;
-	double tmp1 = 0.0;
-	tmp1 += m_A3 * V[3];
-	V[1] = (RHS1 - tmp1) / m_A2;
-	double tmp0 = 0.0;
-	tmp0 += m_A1 * V[2];
-	V[0] = (RHS0 - tmp0) / m_A0;
-}
-
 // boxingb
 static void nl_gcr_16_double_double_50f5194a994d56ec(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
@@ -13884,188 +13578,6 @@ static void nl_gcr_23_double_double_53e1117fdb16f546(double * __restrict V, cons
 	RHS6 -= go[28] * *cnV[28];
 	RHS6 -= go[29] * *cnV[29];
 	RHS6 -= go[30] * *cnV[30];
-	const double f0 = 1.0 / m_A0;
-	const double f0_4 = -f0 * m_A10;
-	m_A12 += m_A1 * f0_4;
-	RHS4 += f0_4 * RHS0;
-	const double f1 = 1.0 / m_A2;
-	const double f1_4 = -f1 * m_A11;
-	m_A12 += m_A3 * f1_4;
-	m_A13 += m_A4 * f1_4;
-	RHS4 += f1_4 * RHS1;
-	const double f1_5 = -f1 * m_A14;
-	m_A16 += m_A3 * f1_5;
-	m_A17 += m_A4 * f1_5;
-	RHS5 += f1_5 * RHS1;
-	const double f2 = 1.0 / m_A5;
-	const double f2_5 = -f2 * m_A15;
-	m_A17 += m_A6 * f2_5;
-	m_A18 += m_A7 * f2_5;
-	RHS5 += f2_5 * RHS2;
-	const double f2_6 = -f2 * m_A19;
-	m_A21 += m_A6 * f2_6;
-	m_A22 += m_A7 * f2_6;
-	RHS6 += f2_6 * RHS2;
-	const double f3 = 1.0 / m_A8;
-	const double f3_6 = -f3 * m_A20;
-	m_A22 += m_A9 * f3_6;
-	RHS6 += f3_6 * RHS3;
-	const double f4 = 1.0 / m_A12;
-	const double f4_5 = -f4 * m_A16;
-	m_A17 += m_A13 * f4_5;
-	RHS5 += f4_5 * RHS4;
-	const double f5 = 1.0 / m_A17;
-	const double f5_6 = -f5 * m_A21;
-	m_A22 += m_A18 * f5_6;
-	RHS6 += f5_6 * RHS5;
-	V[6] = RHS6 / m_A22;
-	double tmp5 = 0.0;
-	tmp5 += m_A18 * V[6];
-	V[5] = (RHS5 - tmp5) / m_A17;
-	double tmp4 = 0.0;
-	tmp4 += m_A13 * V[5];
-	V[4] = (RHS4 - tmp4) / m_A12;
-	double tmp3 = 0.0;
-	tmp3 += m_A9 * V[6];
-	V[3] = (RHS3 - tmp3) / m_A8;
-	double tmp2 = 0.0;
-	tmp2 += m_A6 * V[5];
-	tmp2 += m_A7 * V[6];
-	V[2] = (RHS2 - tmp2) / m_A5;
-	double tmp1 = 0.0;
-	tmp1 += m_A3 * V[4];
-	tmp1 += m_A4 * V[5];
-	V[1] = (RHS1 - tmp1) / m_A2;
-	double tmp0 = 0.0;
-	tmp0 += m_A1 * V[4];
-	V[0] = (RHS0 - tmp0) / m_A0;
-}
-
-// boxingb,starcas,wotw
-static void nl_gcr_23_double_double_ea2b6e3a05e6ef0b(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
-
-{
-
-	plib::unused_var(cnV);
-	double m_A0(0.0);
-	double m_A1(0.0);
-	double m_A2(0.0);
-	double m_A3(0.0);
-	double m_A4(0.0);
-	double m_A5(0.0);
-	double m_A6(0.0);
-	double m_A7(0.0);
-	double m_A8(0.0);
-	double m_A9(0.0);
-	double m_A10(0.0);
-	double m_A11(0.0);
-	double m_A12(0.0);
-	double m_A13(0.0);
-	double m_A14(0.0);
-	double m_A15(0.0);
-	double m_A16(0.0);
-	double m_A17(0.0);
-	double m_A18(0.0);
-	double m_A19(0.0);
-	double m_A20(0.0);
-	double m_A21(0.0);
-	double m_A22(0.0);
-	m_A0 += gt[0];
-	m_A0 += gt[1];
-	m_A0 += gt[2];
-	m_A0 += gt[3];
-	m_A1 += go[0];
-	double RHS0 = Idr[0];
-	RHS0 += Idr[1];
-	RHS0 += Idr[2];
-	RHS0 += Idr[3];
-	RHS0 -= go[1] * *cnV[1];
-	RHS0 -= go[2] * *cnV[2];
-	RHS0 -= go[3] * *cnV[3];
-	m_A2 += gt[4];
-	m_A2 += gt[5];
-	m_A2 += gt[6];
-	m_A2 += gt[7];
-	m_A2 += gt[8];
-	m_A2 += gt[9];
-	m_A4 += go[4];
-	m_A3 += go[5];
-	m_A3 += go[6];
-	double RHS1 = Idr[4];
-	RHS1 += Idr[5];
-	RHS1 += Idr[6];
-	RHS1 += Idr[7];
-	RHS1 += Idr[8];
-	RHS1 += Idr[9];
-	RHS1 -= go[7] * *cnV[7];
-	RHS1 -= go[8] * *cnV[8];
-	RHS1 -= go[9] * *cnV[9];
-	m_A5 += gt[10];
-	m_A5 += gt[11];
-	m_A5 += gt[12];
-	m_A5 += gt[13];
-	m_A7 += go[10];
-	m_A6 += go[11];
-	m_A6 += go[12];
-	double RHS2 = Idr[10];
-	RHS2 += Idr[11];
-	RHS2 += Idr[12];
-	RHS2 += Idr[13];
-	RHS2 -= go[13] * *cnV[13];
-	m_A8 += gt[14];
-	m_A8 += gt[15];
-	m_A9 += go[14];
-	double RHS3 = Idr[14];
-	RHS3 += Idr[15];
-	RHS3 -= go[15] * *cnV[15];
-	m_A12 += gt[16];
-	m_A12 += gt[17];
-	m_A12 += gt[18];
-	m_A12 += gt[19];
-	m_A12 += gt[20];
-	m_A12 += gt[21];
-	m_A11 += go[16];
-	m_A11 += go[17];
-	m_A10 += go[18];
-	double RHS4 = Idr[16];
-	RHS4 += Idr[17];
-	RHS4 += Idr[18];
-	RHS4 += Idr[19];
-	RHS4 += Idr[20];
-	RHS4 += Idr[21];
-	RHS4 -= go[19] * *cnV[19];
-	RHS4 -= go[20] * *cnV[20];
-	RHS4 -= go[21] * *cnV[21];
-	m_A17 += gt[22];
-	m_A17 += gt[23];
-	m_A17 += gt[24];
-	m_A17 += gt[25];
-	m_A17 += gt[26];
-	m_A15 += go[22];
-	m_A15 += go[23];
-	m_A14 += go[24];
-	double RHS5 = Idr[22];
-	RHS5 += Idr[23];
-	RHS5 += Idr[24];
-	RHS5 += Idr[25];
-	RHS5 += Idr[26];
-	RHS5 -= go[25] * *cnV[25];
-	RHS5 -= go[26] * *cnV[26];
-	m_A22 += gt[27];
-	m_A22 += gt[28];
-	m_A22 += gt[29];
-	m_A22 += gt[30];
-	m_A22 += gt[31];
-	m_A20 += go[27];
-	m_A19 += go[28];
-	double RHS6 = Idr[27];
-	RHS6 += Idr[28];
-	RHS6 += Idr[29];
-	RHS6 += Idr[30];
-	RHS6 += Idr[31];
-	RHS6 -= go[29] * *cnV[29];
-	RHS6 -= go[30] * *cnV[30];
-	RHS6 -= go[31] * *cnV[31];
 	const double f0 = 1.0 / m_A0;
 	const double f0_4 = -f0 * m_A10;
 	m_A12 += m_A1 * f0_4;
@@ -18961,7 +18473,7 @@ static void nl_gcr_77_double_double_437326911721091(double * __restrict V, const
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-// brdrline,dpatrol,stuntcyc
+// brdrline,stuntcyc
 static void nl_gcr_7_double_double_59cb6bf7cb9d17dc(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
 {
@@ -25442,383 +24954,6 @@ static void nl_gcr_399_double_double_4334c95878d1be92(double * __restrict V, con
 	V[1] = (RHS1 - tmp1) / m_A2;
 	double tmp0 = 0.0;
 	tmp0 += m_A1 * V[38];
-	V[0] = (RHS0 - tmp0) / m_A0;
-}
-
-// dpatrol,stuntcyc
-static void nl_gcr_10_double_double_85652d3e3ada285a(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
-
-{
-
-	plib::unused_var(cnV);
-	double m_A0(0.0);
-	double m_A1(0.0);
-	double m_A2(0.0);
-	double m_A3(0.0);
-	double m_A4(0.0);
-	double m_A5(0.0);
-	double m_A6(0.0);
-	double m_A7(0.0);
-	double m_A8(0.0);
-	double m_A9(0.0);
-	m_A0 += gt[0];
-	m_A0 += gt[1];
-	m_A0 += gt[2];
-	m_A1 += go[0];
-	double RHS0 = Idr[0];
-	RHS0 += Idr[1];
-	RHS0 += Idr[2];
-	RHS0 -= go[1] * *cnV[1];
-	RHS0 -= go[2] * *cnV[2];
-	m_A2 += gt[3];
-	m_A2 += gt[4];
-	m_A2 += gt[5];
-	m_A3 += go[3];
-	double RHS1 = Idr[3];
-	RHS1 += Idr[4];
-	RHS1 += Idr[5];
-	RHS1 -= go[4] * *cnV[4];
-	RHS1 -= go[5] * *cnV[5];
-	m_A4 += gt[6];
-	m_A4 += gt[7];
-	m_A4 += gt[8];
-	m_A5 += go[6];
-	double RHS2 = Idr[6];
-	RHS2 += Idr[7];
-	RHS2 += Idr[8];
-	RHS2 -= go[7] * *cnV[7];
-	RHS2 -= go[8] * *cnV[8];
-	m_A9 += gt[9];
-	m_A9 += gt[10];
-	m_A9 += gt[11];
-	m_A9 += gt[12];
-	m_A8 += go[9];
-	m_A7 += go[10];
-	m_A6 += go[11];
-	double RHS3 = Idr[9];
-	RHS3 += Idr[10];
-	RHS3 += Idr[11];
-	RHS3 += Idr[12];
-	RHS3 -= go[12] * *cnV[12];
-	const double f0 = 1.0 / m_A0;
-	const double f0_3 = -f0 * m_A6;
-	m_A9 += m_A1 * f0_3;
-	RHS3 += f0_3 * RHS0;
-	const double f1 = 1.0 / m_A2;
-	const double f1_3 = -f1 * m_A7;
-	m_A9 += m_A3 * f1_3;
-	RHS3 += f1_3 * RHS1;
-	const double f2 = 1.0 / m_A4;
-	const double f2_3 = -f2 * m_A8;
-	m_A9 += m_A5 * f2_3;
-	RHS3 += f2_3 * RHS2;
-	V[3] = RHS3 / m_A9;
-	double tmp2 = 0.0;
-	tmp2 += m_A5 * V[3];
-	V[2] = (RHS2 - tmp2) / m_A4;
-	double tmp1 = 0.0;
-	tmp1 += m_A3 * V[3];
-	V[1] = (RHS1 - tmp1) / m_A2;
-	double tmp0 = 0.0;
-	tmp0 += m_A1 * V[3];
-	V[0] = (RHS0 - tmp0) / m_A0;
-}
-
-// dpatrol
-static void nl_gcr_20_double_double_18f4d9160b51d613(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
-
-{
-
-	plib::unused_var(cnV);
-	double m_A0(0.0);
-	double m_A1(0.0);
-	double m_A2(0.0);
-	double m_A3(0.0);
-	double m_A4(0.0);
-	double m_A5(0.0);
-	double m_A6(0.0);
-	double m_A7(0.0);
-	double m_A8(0.0);
-	double m_A9(0.0);
-	double m_A10(0.0);
-	double m_A11(0.0);
-	double m_A12(0.0);
-	double m_A13(0.0);
-	double m_A14(0.0);
-	double m_A15(0.0);
-	double m_A16(0.0);
-	double m_A17(0.0);
-	double m_A18(0.0);
-	double m_A19(0.0);
-	m_A0 += gt[0];
-	m_A0 += gt[1];
-	m_A0 += gt[2];
-	m_A0 += gt[3];
-	m_A1 += go[0];
-	double RHS0 = Idr[0];
-	RHS0 += Idr[1];
-	RHS0 += Idr[2];
-	RHS0 += Idr[3];
-	RHS0 -= go[1] * *cnV[1];
-	RHS0 -= go[2] * *cnV[2];
-	RHS0 -= go[3] * *cnV[3];
-	m_A2 += gt[4];
-	m_A3 += go[4];
-	double RHS1 = Idr[4];
-	m_A4 += gt[5];
-	m_A4 += gt[6];
-	m_A4 += gt[7];
-	m_A4 += gt[8];
-	m_A4 += gt[9];
-	m_A6 += go[5];
-	m_A5 += go[6];
-	double RHS2 = Idr[5];
-	RHS2 += Idr[6];
-	RHS2 += Idr[7];
-	RHS2 += Idr[8];
-	RHS2 += Idr[9];
-	RHS2 -= go[7] * *cnV[7];
-	RHS2 -= go[8] * *cnV[8];
-	RHS2 -= go[9] * *cnV[9];
-	m_A8 += gt[10];
-	m_A8 += gt[11];
-	m_A8 += gt[12];
-	m_A8 += gt[13];
-	m_A8 += gt[14];
-	m_A8 += gt[15];
-	m_A8 += gt[16];
-	m_A10 += go[10];
-	m_A9 += go[11];
-	m_A7 += go[12];
-	double RHS3 = Idr[10];
-	RHS3 += Idr[11];
-	RHS3 += Idr[12];
-	RHS3 += Idr[13];
-	RHS3 += Idr[14];
-	RHS3 += Idr[15];
-	RHS3 += Idr[16];
-	RHS3 -= go[13] * *cnV[13];
-	RHS3 -= go[14] * *cnV[14];
-	RHS3 -= go[15] * *cnV[15];
-	RHS3 -= go[16] * *cnV[16];
-	m_A14 += gt[17];
-	m_A14 += gt[18];
-	m_A14 += gt[19];
-	m_A14 += gt[20];
-	m_A11 += go[17];
-	m_A12 += go[18];
-	m_A13 += go[19];
-	double RHS4 = Idr[17];
-	RHS4 += Idr[18];
-	RHS4 += Idr[19];
-	RHS4 += Idr[20];
-	RHS4 -= go[20] * *cnV[20];
-	m_A19 += gt[21];
-	m_A19 += gt[22];
-	m_A19 += gt[23];
-	m_A16 += go[21];
-	m_A17 += go[22];
-	double RHS5 = Idr[21];
-	RHS5 += Idr[22];
-	RHS5 += Idr[23];
-	RHS5 -= go[23] * *cnV[23];
-	const double f0 = 1.0 / m_A0;
-	const double f0_3 = -f0 * m_A7;
-	m_A8 += m_A1 * f0_3;
-	RHS3 += f0_3 * RHS0;
-	const double f1 = 1.0 / m_A2;
-	const double f1_4 = -f1 * m_A11;
-	m_A14 += m_A3 * f1_4;
-	RHS4 += f1_4 * RHS1;
-	const double f2 = 1.0 / m_A4;
-	const double f2_4 = -f2 * m_A12;
-	m_A14 += m_A5 * f2_4;
-	m_A15 += m_A6 * f2_4;
-	RHS4 += f2_4 * RHS2;
-	const double f2_5 = -f2 * m_A16;
-	m_A18 += m_A5 * f2_5;
-	m_A19 += m_A6 * f2_5;
-	RHS5 += f2_5 * RHS2;
-	const double f3 = 1.0 / m_A8;
-	const double f3_4 = -f3 * m_A13;
-	m_A14 += m_A9 * f3_4;
-	m_A15 += m_A10 * f3_4;
-	RHS4 += f3_4 * RHS3;
-	const double f3_5 = -f3 * m_A17;
-	m_A18 += m_A9 * f3_5;
-	m_A19 += m_A10 * f3_5;
-	RHS5 += f3_5 * RHS3;
-	const double f4 = 1.0 / m_A14;
-	const double f4_5 = -f4 * m_A18;
-	m_A19 += m_A15 * f4_5;
-	RHS5 += f4_5 * RHS4;
-	V[5] = RHS5 / m_A19;
-	double tmp4 = 0.0;
-	tmp4 += m_A15 * V[5];
-	V[4] = (RHS4 - tmp4) / m_A14;
-	double tmp3 = 0.0;
-	tmp3 += m_A9 * V[4];
-	tmp3 += m_A10 * V[5];
-	V[3] = (RHS3 - tmp3) / m_A8;
-	double tmp2 = 0.0;
-	tmp2 += m_A5 * V[4];
-	tmp2 += m_A6 * V[5];
-	V[2] = (RHS2 - tmp2) / m_A4;
-	double tmp1 = 0.0;
-	tmp1 += m_A3 * V[4];
-	V[1] = (RHS1 - tmp1) / m_A2;
-	double tmp0 = 0.0;
-	tmp0 += m_A1 * V[3];
-	V[0] = (RHS0 - tmp0) / m_A0;
-}
-
-// dpatrol,stuntcyc
-static void nl_gcr_22_double_double_ca68d70bd8f2f62e(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
-
-{
-
-	plib::unused_var(cnV);
-	double m_A0(0.0);
-	double m_A1(0.0);
-	double m_A2(0.0);
-	double m_A3(0.0);
-	double m_A4(0.0);
-	double m_A5(0.0);
-	double m_A6(0.0);
-	double m_A7(0.0);
-	double m_A8(0.0);
-	double m_A9(0.0);
-	double m_A10(0.0);
-	double m_A11(0.0);
-	double m_A12(0.0);
-	double m_A13(0.0);
-	double m_A14(0.0);
-	double m_A15(0.0);
-	double m_A16(0.0);
-	double m_A17(0.0);
-	double m_A18(0.0);
-	double m_A19(0.0);
-	double m_A20(0.0);
-	double m_A21(0.0);
-	m_A0 += gt[0];
-	m_A0 += gt[1];
-	m_A0 += gt[2];
-	m_A0 += gt[3];
-	m_A2 += go[0];
-	m_A2 += go[1];
-	m_A1 += go[2];
-	double RHS0 = Idr[0];
-	RHS0 += Idr[1];
-	RHS0 += Idr[2];
-	RHS0 += Idr[3];
-	RHS0 -= go[3] * *cnV[3];
-	m_A3 += gt[4];
-	m_A3 += gt[5];
-	m_A3 += gt[6];
-	m_A3 += gt[7];
-	m_A5 += go[4];
-	m_A5 += go[5];
-	m_A4 += go[6];
-	double RHS1 = Idr[4];
-	RHS1 += Idr[5];
-	RHS1 += Idr[6];
-	RHS1 += Idr[7];
-	RHS1 -= go[7] * *cnV[7];
-	m_A6 += gt[8];
-	m_A6 += gt[9];
-	m_A6 += gt[10];
-	m_A7 += go[8];
-	double RHS2 = Idr[8];
-	RHS2 += Idr[9];
-	RHS2 += Idr[10];
-	RHS2 -= go[9] * *cnV[9];
-	RHS2 -= go[10] * *cnV[10];
-	m_A10 += gt[11];
-	m_A10 += gt[12];
-	m_A10 += gt[13];
-	m_A12 += go[11];
-	m_A9 += go[12];
-	m_A8 += go[13];
-	double RHS3 = Idr[11];
-	RHS3 += Idr[12];
-	RHS3 += Idr[13];
-	m_A16 += gt[14];
-	m_A16 += gt[15];
-	m_A16 += gt[16];
-	m_A16 += gt[17];
-	m_A16 += gt[18];
-	m_A17 += go[14];
-	m_A14 += go[15];
-	m_A14 += go[16];
-	m_A13 += go[17];
-	m_A13 += go[18];
-	double RHS4 = Idr[14];
-	RHS4 += Idr[15];
-	RHS4 += Idr[16];
-	RHS4 += Idr[17];
-	RHS4 += Idr[18];
-	m_A21 += gt[19];
-	m_A21 += gt[20];
-	m_A21 += gt[21];
-	m_A18 += go[19];
-	m_A20 += go[20];
-	m_A19 += go[21];
-	double RHS5 = Idr[19];
-	RHS5 += Idr[20];
-	RHS5 += Idr[21];
-	const double f0 = 1.0 / m_A0;
-	const double f0_3 = -f0 * m_A8;
-	m_A10 += m_A1 * f0_3;
-	m_A11 += m_A2 * f0_3;
-	RHS3 += f0_3 * RHS0;
-	const double f0_4 = -f0 * m_A13;
-	m_A15 += m_A1 * f0_4;
-	m_A16 += m_A2 * f0_4;
-	RHS4 += f0_4 * RHS0;
-	const double f1 = 1.0 / m_A3;
-	const double f1_3 = -f1 * m_A9;
-	m_A10 += m_A4 * f1_3;
-	m_A11 += m_A5 * f1_3;
-	RHS3 += f1_3 * RHS1;
-	const double f1_4 = -f1 * m_A14;
-	m_A15 += m_A4 * f1_4;
-	m_A16 += m_A5 * f1_4;
-	RHS4 += f1_4 * RHS1;
-	const double f2 = 1.0 / m_A6;
-	const double f2_5 = -f2 * m_A18;
-	m_A21 += m_A7 * f2_5;
-	RHS5 += f2_5 * RHS2;
-	const double f3 = 1.0 / m_A10;
-	const double f3_4 = -f3 * m_A15;
-	m_A16 += m_A11 * f3_4;
-	m_A17 += m_A12 * f3_4;
-	RHS4 += f3_4 * RHS3;
-	const double f3_5 = -f3 * m_A19;
-	m_A20 += m_A11 * f3_5;
-	m_A21 += m_A12 * f3_5;
-	RHS5 += f3_5 * RHS3;
-	const double f4 = 1.0 / m_A16;
-	const double f4_5 = -f4 * m_A20;
-	m_A21 += m_A17 * f4_5;
-	RHS5 += f4_5 * RHS4;
-	V[5] = RHS5 / m_A21;
-	double tmp4 = 0.0;
-	tmp4 += m_A17 * V[5];
-	V[4] = (RHS4 - tmp4) / m_A16;
-	double tmp3 = 0.0;
-	tmp3 += m_A11 * V[4];
-	tmp3 += m_A12 * V[5];
-	V[3] = (RHS3 - tmp3) / m_A10;
-	double tmp2 = 0.0;
-	tmp2 += m_A7 * V[5];
-	V[2] = (RHS2 - tmp2) / m_A6;
-	double tmp1 = 0.0;
-	tmp1 += m_A4 * V[3];
-	tmp1 += m_A5 * V[4];
-	V[1] = (RHS1 - tmp1) / m_A3;
-	double tmp0 = 0.0;
-	tmp0 += m_A1 * V[3];
-	tmp0 += m_A2 * V[4];
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
@@ -32851,6 +31986,63 @@ static void nl_gcr_79_double_double_c1d22fe6e895255d(double * __restrict V, cons
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
+// fireone,astrob,rebound,speedfrk,cheekyms
+static void nl_gcr_7_double_double_7c86a9bc1c6aef4c(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
+
+{
+
+	plib::unused_var(cnV);
+	double m_A0(0.0);
+	double m_A1(0.0);
+	double m_A2(0.0);
+	double m_A3(0.0);
+	double m_A4(0.0);
+	double m_A5(0.0);
+	double m_A6(0.0);
+	m_A0 += gt[0];
+	m_A0 += gt[1];
+	m_A0 += gt[2];
+	m_A1 += go[0];
+	double RHS0 = Idr[0];
+	RHS0 += Idr[1];
+	RHS0 += Idr[2];
+	RHS0 -= go[1] * *cnV[1];
+	RHS0 -= go[2] * *cnV[2];
+	m_A2 += gt[3];
+	m_A2 += gt[4];
+	m_A3 += go[3];
+	double RHS1 = Idr[3];
+	RHS1 += Idr[4];
+	RHS1 -= go[4] * *cnV[4];
+	m_A6 += gt[5];
+	m_A6 += gt[6];
+	m_A6 += gt[7];
+	m_A6 += gt[8];
+	m_A5 += go[5];
+	m_A4 += go[6];
+	double RHS2 = Idr[5];
+	RHS2 += Idr[6];
+	RHS2 += Idr[7];
+	RHS2 += Idr[8];
+	RHS2 -= go[7] * *cnV[7];
+	RHS2 -= go[8] * *cnV[8];
+	const double f0 = 1.0 / m_A0;
+	const double f0_2 = -f0 * m_A4;
+	m_A6 += m_A1 * f0_2;
+	RHS2 += f0_2 * RHS0;
+	const double f1 = 1.0 / m_A2;
+	const double f1_2 = -f1 * m_A5;
+	m_A6 += m_A3 * f1_2;
+	RHS2 += f1_2 * RHS1;
+	V[2] = RHS2 / m_A6;
+	double tmp1 = 0.0;
+	tmp1 += m_A3 * V[2];
+	V[1] = (RHS1 - tmp1) / m_A2;
+	double tmp0 = 0.0;
+	tmp0 += m_A1 * V[2];
+	V[0] = (RHS0 - tmp0) / m_A0;
+}
+
 // fireone
 static void nl_gcr_7_double_double_e7fb484f621b3ab9(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
@@ -37695,151 +36887,6 @@ static void nl_gcr_10_double_double_934712b55bb3b2b2(double * __restrict V, cons
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-// gamemachine,tank
-static void nl_gcr_19_double_double_491f95430bfdfd05(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
-
-{
-
-	plib::unused_var(cnV);
-	double m_A0(0.0);
-	double m_A1(0.0);
-	double m_A2(0.0);
-	double m_A3(0.0);
-	double m_A4(0.0);
-	double m_A5(0.0);
-	double m_A6(0.0);
-	double m_A7(0.0);
-	double m_A8(0.0);
-	double m_A9(0.0);
-	double m_A10(0.0);
-	double m_A11(0.0);
-	double m_A12(0.0);
-	double m_A13(0.0);
-	double m_A14(0.0);
-	double m_A15(0.0);
-	double m_A16(0.0);
-	double m_A17(0.0);
-	double m_A18(0.0);
-	m_A0 += gt[0];
-	m_A0 += gt[1];
-	m_A0 += gt[2];
-	m_A1 += go[0];
-	double RHS0 = Idr[0];
-	RHS0 += Idr[1];
-	RHS0 += Idr[2];
-	RHS0 -= go[1] * *cnV[1];
-	RHS0 -= go[2] * *cnV[2];
-	m_A2 += gt[3];
-	m_A2 += gt[4];
-	m_A2 += gt[5];
-	m_A3 += go[3];
-	double RHS1 = Idr[3];
-	RHS1 += Idr[4];
-	RHS1 += Idr[5];
-	RHS1 -= go[4] * *cnV[4];
-	RHS1 -= go[5] * *cnV[5];
-	m_A4 += gt[6];
-	m_A4 += gt[7];
-	m_A4 += gt[8];
-	m_A5 += go[6];
-	double RHS2 = Idr[6];
-	RHS2 += Idr[7];
-	RHS2 += Idr[8];
-	RHS2 -= go[7] * *cnV[7];
-	RHS2 -= go[8] * *cnV[8];
-	m_A6 += gt[9];
-	m_A6 += gt[10];
-	m_A6 += gt[11];
-	m_A7 += go[9];
-	double RHS3 = Idr[9];
-	RHS3 += Idr[10];
-	RHS3 += Idr[11];
-	RHS3 -= go[10] * *cnV[10];
-	RHS3 -= go[11] * *cnV[11];
-	m_A8 += gt[12];
-	m_A8 += gt[13];
-	m_A8 += gt[14];
-	m_A9 += go[12];
-	double RHS4 = Idr[12];
-	RHS4 += Idr[13];
-	RHS4 += Idr[14];
-	RHS4 -= go[13] * *cnV[13];
-	RHS4 -= go[14] * *cnV[14];
-	m_A10 += gt[15];
-	m_A10 += gt[16];
-	m_A10 += gt[17];
-	m_A11 += go[15];
-	double RHS5 = Idr[15];
-	RHS5 += Idr[16];
-	RHS5 += Idr[17];
-	RHS5 -= go[16] * *cnV[16];
-	RHS5 -= go[17] * *cnV[17];
-	m_A18 += gt[18];
-	m_A18 += gt[19];
-	m_A18 += gt[20];
-	m_A18 += gt[21];
-	m_A18 += gt[22];
-	m_A18 += gt[23];
-	m_A18 += gt[24];
-	m_A17 += go[18];
-	m_A16 += go[19];
-	m_A15 += go[20];
-	m_A14 += go[21];
-	m_A13 += go[22];
-	m_A12 += go[23];
-	double RHS6 = Idr[18];
-	RHS6 += Idr[19];
-	RHS6 += Idr[20];
-	RHS6 += Idr[21];
-	RHS6 += Idr[22];
-	RHS6 += Idr[23];
-	RHS6 += Idr[24];
-	RHS6 -= go[24] * *cnV[24];
-	const double f0 = 1.0 / m_A0;
-	const double f0_6 = -f0 * m_A12;
-	m_A18 += m_A1 * f0_6;
-	RHS6 += f0_6 * RHS0;
-	const double f1 = 1.0 / m_A2;
-	const double f1_6 = -f1 * m_A13;
-	m_A18 += m_A3 * f1_6;
-	RHS6 += f1_6 * RHS1;
-	const double f2 = 1.0 / m_A4;
-	const double f2_6 = -f2 * m_A14;
-	m_A18 += m_A5 * f2_6;
-	RHS6 += f2_6 * RHS2;
-	const double f3 = 1.0 / m_A6;
-	const double f3_6 = -f3 * m_A15;
-	m_A18 += m_A7 * f3_6;
-	RHS6 += f3_6 * RHS3;
-	const double f4 = 1.0 / m_A8;
-	const double f4_6 = -f4 * m_A16;
-	m_A18 += m_A9 * f4_6;
-	RHS6 += f4_6 * RHS4;
-	const double f5 = 1.0 / m_A10;
-	const double f5_6 = -f5 * m_A17;
-	m_A18 += m_A11 * f5_6;
-	RHS6 += f5_6 * RHS5;
-	V[6] = RHS6 / m_A18;
-	double tmp5 = 0.0;
-	tmp5 += m_A11 * V[6];
-	V[5] = (RHS5 - tmp5) / m_A10;
-	double tmp4 = 0.0;
-	tmp4 += m_A9 * V[6];
-	V[4] = (RHS4 - tmp4) / m_A8;
-	double tmp3 = 0.0;
-	tmp3 += m_A7 * V[6];
-	V[3] = (RHS3 - tmp3) / m_A6;
-	double tmp2 = 0.0;
-	tmp2 += m_A5 * V[6];
-	V[2] = (RHS2 - tmp2) / m_A4;
-	double tmp1 = 0.0;
-	tmp1 += m_A3 * V[6];
-	V[1] = (RHS1 - tmp1) / m_A2;
-	double tmp0 = 0.0;
-	tmp0 += m_A1 * V[6];
-	V[0] = (RHS0 - tmp0) / m_A0;
-}
-
 // gamemachine
 static void nl_gcr_7_double_double_782d79b5cbe953b1(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
@@ -39052,6 +38099,352 @@ static void nl_gcr_14_double_double_d05b3dbe370c7904(double * __restrict V, cons
 	double tmp0 = 0.0;
 	tmp0 += m_A1 * V[1];
 	tmp0 += m_A2 * V[2];
+	V[0] = (RHS0 - tmp0) / m_A0;
+}
+
+// jpmsru
+static void nl_gcr_55_double_double_4963a2f104e4c797(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
+
+{
+
+	plib::unused_var(cnV);
+	double m_A0(0.0);
+	double m_A1(0.0);
+	double m_A2(0.0);
+	double m_A3(0.0);
+	double m_A4(0.0);
+	double m_A5(0.0);
+	double m_A6(0.0);
+	double m_A7(0.0);
+	double m_A8(0.0);
+	double m_A9(0.0);
+	double m_A10(0.0);
+	double m_A11(0.0);
+	double m_A12(0.0);
+	double m_A13(0.0);
+	double m_A14(0.0);
+	double m_A15(0.0);
+	double m_A16(0.0);
+	double m_A17(0.0);
+	double m_A18(0.0);
+	double m_A19(0.0);
+	double m_A20(0.0);
+	double m_A21(0.0);
+	double m_A22(0.0);
+	double m_A23(0.0);
+	double m_A24(0.0);
+	double m_A25(0.0);
+	double m_A26(0.0);
+	double m_A27(0.0);
+	double m_A28(0.0);
+	double m_A29(0.0);
+	double m_A30(0.0);
+	double m_A31(0.0);
+	double m_A32(0.0);
+	double m_A33(0.0);
+	double m_A34(0.0);
+	double m_A35(0.0);
+	double m_A36(0.0);
+	double m_A37(0.0);
+	double m_A38(0.0);
+	double m_A39(0.0);
+	double m_A40(0.0);
+	double m_A41(0.0);
+	double m_A42(0.0);
+	double m_A43(0.0);
+	double m_A44(0.0);
+	double m_A45(0.0);
+	double m_A46(0.0);
+	double m_A47(0.0);
+	double m_A48(0.0);
+	double m_A49(0.0);
+	double m_A50(0.0);
+	double m_A51(0.0);
+	double m_A52(0.0);
+	double m_A53(0.0);
+	double m_A54(0.0);
+	m_A0 += gt[0];
+	m_A0 += gt[1];
+	m_A1 += go[0];
+	double RHS0 = Idr[0];
+	RHS0 += Idr[1];
+	RHS0 -= go[1] * *cnV[1];
+	m_A2 += gt[2];
+	m_A2 += gt[3];
+	m_A2 += gt[4];
+	m_A2 += gt[5];
+	m_A4 += go[2];
+	m_A3 += go[3];
+	m_A5 += go[4];
+	double RHS1 = Idr[2];
+	RHS1 += Idr[3];
+	RHS1 += Idr[4];
+	RHS1 += Idr[5];
+	RHS1 -= go[5] * *cnV[5];
+	m_A6 += gt[6];
+	m_A6 += gt[7];
+	m_A6 += gt[8];
+	m_A7 += go[6];
+	double RHS2 = Idr[6];
+	RHS2 += Idr[7];
+	RHS2 += Idr[8];
+	RHS2 -= go[7] * *cnV[7];
+	RHS2 -= go[8] * *cnV[8];
+	m_A8 += gt[9];
+	m_A8 += gt[10];
+	m_A9 += go[9];
+	double RHS3 = Idr[9];
+	RHS3 += Idr[10];
+	RHS3 -= go[10] * *cnV[10];
+	m_A10 += gt[11];
+	m_A10 += gt[12];
+	m_A11 += go[11];
+	double RHS4 = Idr[11];
+	RHS4 += Idr[12];
+	RHS4 -= go[12] * *cnV[12];
+	m_A12 += gt[13];
+	m_A12 += gt[14];
+	m_A13 += go[13];
+	double RHS5 = Idr[13];
+	RHS5 += Idr[14];
+	RHS5 -= go[14] * *cnV[14];
+	m_A14 += gt[15];
+	m_A14 += gt[16];
+	m_A15 += go[15];
+	double RHS6 = Idr[15];
+	RHS6 += Idr[16];
+	RHS6 -= go[16] * *cnV[16];
+	m_A16 += gt[17];
+	m_A16 += gt[18];
+	m_A18 += go[17];
+	m_A17 += go[18];
+	double RHS7 = Idr[17];
+	RHS7 += Idr[18];
+	m_A19 += gt[19];
+	m_A19 += gt[20];
+	m_A20 += go[19];
+	double RHS8 = Idr[19];
+	RHS8 += Idr[20];
+	RHS8 -= go[20] * *cnV[20];
+	m_A21 += gt[21];
+	m_A21 += gt[22];
+	m_A21 += gt[23];
+	m_A22 += go[21];
+	double RHS9 = Idr[21];
+	RHS9 += Idr[22];
+	RHS9 += Idr[23];
+	RHS9 -= go[22] * *cnV[22];
+	RHS9 -= go[23] * *cnV[23];
+	m_A25 += gt[24];
+	m_A25 += gt[25];
+	m_A25 += gt[26];
+	m_A25 += gt[27];
+	m_A25 += gt[28];
+	m_A23 += go[24];
+	m_A27 += go[25];
+	double RHS10 = Idr[24];
+	RHS10 += Idr[25];
+	RHS10 += Idr[26];
+	RHS10 += Idr[27];
+	RHS10 += Idr[28];
+	RHS10 -= go[26] * *cnV[26];
+	RHS10 -= go[27] * *cnV[27];
+	RHS10 -= go[28] * *cnV[28];
+	m_A29 += gt[29];
+	m_A29 += gt[30];
+	m_A30 += go[29];
+	double RHS11 = Idr[29];
+	RHS11 += Idr[30];
+	RHS11 -= go[30] * *cnV[30];
+	m_A33 += gt[31];
+	m_A33 += gt[32];
+	m_A33 += gt[33];
+	m_A33 += gt[34];
+	m_A33 += gt[35];
+	m_A35 += go[31];
+	m_A31 += go[32];
+	m_A32 += go[33];
+	double RHS12 = Idr[31];
+	RHS12 += Idr[32];
+	RHS12 += Idr[33];
+	RHS12 += Idr[34];
+	RHS12 += Idr[35];
+	RHS12 -= go[34] * *cnV[34];
+	RHS12 -= go[35] * *cnV[35];
+	m_A39 += gt[36];
+	m_A39 += gt[37];
+	m_A39 += gt[38];
+	m_A39 += gt[39];
+	m_A40 += go[36];
+	m_A37 += go[37];
+	m_A36 += go[38];
+	double RHS13 = Idr[36];
+	RHS13 += Idr[37];
+	RHS13 += Idr[38];
+	RHS13 += Idr[39];
+	RHS13 -= go[39] * *cnV[39];
+	m_A45 += gt[40];
+	m_A45 += gt[41];
+	m_A45 += gt[42];
+	m_A43 += go[40];
+	m_A46 += go[41];
+	m_A42 += go[42];
+	double RHS14 = Idr[40];
+	RHS14 += Idr[41];
+	RHS14 += Idr[42];
+	m_A54 += gt[43];
+	m_A54 += gt[44];
+	m_A54 += gt[45];
+	m_A54 += gt[46];
+	m_A54 += gt[47];
+	m_A54 += gt[48];
+	m_A54 += gt[49];
+	m_A54 += gt[50];
+	m_A54 += gt[51];
+	m_A52 += go[43];
+	m_A51 += go[44];
+	m_A50 += go[45];
+	m_A49 += go[46];
+	m_A48 += go[47];
+	m_A47 += go[48];
+	m_A53 += go[49];
+	double RHS15 = Idr[43];
+	RHS15 += Idr[44];
+	RHS15 += Idr[45];
+	RHS15 += Idr[46];
+	RHS15 += Idr[47];
+	RHS15 += Idr[48];
+	RHS15 += Idr[49];
+	RHS15 += Idr[50];
+	RHS15 += Idr[51];
+	RHS15 -= go[50] * *cnV[50];
+	RHS15 -= go[51] * *cnV[51];
+	const double f0 = 1.0 / m_A0;
+	const double f0_12 = -f0 * m_A31;
+	m_A33 += m_A1 * f0_12;
+	RHS12 += f0_12 * RHS0;
+	const double f1 = 1.0 / m_A2;
+	const double f1_10 = -f1 * m_A23;
+	m_A24 += m_A3 * f1_10;
+	m_A25 += m_A4 * f1_10;
+	m_A26 += m_A5 * f1_10;
+	RHS10 += f1_10 * RHS1;
+	const double f3 = 1.0 / m_A8;
+	const double f3_15 = -f3 * m_A47;
+	m_A54 += m_A9 * f3_15;
+	RHS15 += f3_15 * RHS3;
+	const double f4 = 1.0 / m_A10;
+	const double f4_15 = -f4 * m_A48;
+	m_A54 += m_A11 * f4_15;
+	RHS15 += f4_15 * RHS4;
+	const double f5 = 1.0 / m_A12;
+	const double f5_15 = -f5 * m_A49;
+	m_A54 += m_A13 * f5_15;
+	RHS15 += f5_15 * RHS5;
+	const double f6 = 1.0 / m_A14;
+	const double f6_15 = -f6 * m_A50;
+	m_A54 += m_A15 * f6_15;
+	RHS15 += f6_15 * RHS6;
+	const double f7 = 1.0 / m_A16;
+	const double f7_10 = -f7 * m_A24;
+	m_A26 += m_A17 * f7_10;
+	m_A28 += m_A18 * f7_10;
+	RHS10 += f7_10 * RHS7;
+	const double f7_12 = -f7 * m_A32;
+	m_A33 += m_A17 * f7_12;
+	m_A34 += m_A18 * f7_12;
+	RHS12 += f7_12 * RHS7;
+	const double f7_13 = -f7 * m_A36;
+	m_A38 += m_A17 * f7_13;
+	m_A40 += m_A18 * f7_13;
+	RHS13 += f7_13 * RHS7;
+	const double f7_14 = -f7 * m_A42;
+	m_A44 += m_A17 * f7_14;
+	m_A45 += m_A18 * f7_14;
+	RHS14 += f7_14 * RHS7;
+	const double f8 = 1.0 / m_A19;
+	const double f8_15 = -f8 * m_A51;
+	m_A54 += m_A20 * f8_15;
+	RHS15 += f8_15 * RHS8;
+	const double f9 = 1.0 / m_A21;
+	const double f9_14 = -f9 * m_A43;
+	m_A45 += m_A22 * f9_14;
+	RHS14 += f9_14 * RHS9;
+	const double f10 = 1.0 / m_A25;
+	const double f10_13 = -f10 * m_A37;
+	m_A38 += m_A26 * f10_13;
+	m_A39 += m_A27 * f10_13;
+	m_A40 += m_A28 * f10_13;
+	RHS13 += f10_13 * RHS10;
+	const double f11 = 1.0 / m_A29;
+	const double f11_15 = -f11 * m_A52;
+	m_A54 += m_A30 * f11_15;
+	RHS15 += f11_15 * RHS11;
+	const double f12 = 1.0 / m_A33;
+	const double f12_13 = -f12 * m_A38;
+	m_A40 += m_A34 * f12_13;
+	m_A41 += m_A35 * f12_13;
+	RHS13 += f12_13 * RHS12;
+	const double f12_14 = -f12 * m_A44;
+	m_A45 += m_A34 * f12_14;
+	m_A46 += m_A35 * f12_14;
+	RHS14 += f12_14 * RHS12;
+	const double f14 = 1.0 / m_A45;
+	const double f14_15 = -f14 * m_A53;
+	m_A54 += m_A46 * f14_15;
+	RHS15 += f14_15 * RHS14;
+	V[15] = RHS15 / m_A54;
+	double tmp14 = 0.0;
+	tmp14 += m_A46 * V[15];
+	V[14] = (RHS14 - tmp14) / m_A45;
+	double tmp13 = 0.0;
+	tmp13 += m_A40 * V[14];
+	tmp13 += m_A41 * V[15];
+	V[13] = (RHS13 - tmp13) / m_A39;
+	double tmp12 = 0.0;
+	tmp12 += m_A34 * V[14];
+	tmp12 += m_A35 * V[15];
+	V[12] = (RHS12 - tmp12) / m_A33;
+	double tmp11 = 0.0;
+	tmp11 += m_A30 * V[15];
+	V[11] = (RHS11 - tmp11) / m_A29;
+	double tmp10 = 0.0;
+	tmp10 += m_A26 * V[12];
+	tmp10 += m_A27 * V[13];
+	tmp10 += m_A28 * V[14];
+	V[10] = (RHS10 - tmp10) / m_A25;
+	double tmp9 = 0.0;
+	tmp9 += m_A22 * V[14];
+	V[9] = (RHS9 - tmp9) / m_A21;
+	double tmp8 = 0.0;
+	tmp8 += m_A20 * V[15];
+	V[8] = (RHS8 - tmp8) / m_A19;
+	double tmp7 = 0.0;
+	tmp7 += m_A17 * V[12];
+	tmp7 += m_A18 * V[14];
+	V[7] = (RHS7 - tmp7) / m_A16;
+	double tmp6 = 0.0;
+	tmp6 += m_A15 * V[15];
+	V[6] = (RHS6 - tmp6) / m_A14;
+	double tmp5 = 0.0;
+	tmp5 += m_A13 * V[15];
+	V[5] = (RHS5 - tmp5) / m_A12;
+	double tmp4 = 0.0;
+	tmp4 += m_A11 * V[15];
+	V[4] = (RHS4 - tmp4) / m_A10;
+	double tmp3 = 0.0;
+	tmp3 += m_A9 * V[15];
+	V[3] = (RHS3 - tmp3) / m_A8;
+	double tmp2 = 0.0;
+	tmp2 += m_A7 * V[10];
+	V[2] = (RHS2 - tmp2) / m_A6;
+	double tmp1 = 0.0;
+	tmp1 += m_A3 * V[7];
+	tmp1 += m_A4 * V[10];
+	tmp1 += m_A5 * V[12];
+	V[1] = (RHS1 - tmp1) / m_A2;
+	double tmp0 = 0.0;
+	tmp0 += m_A1 * V[12];
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
@@ -47417,6 +46810,79 @@ static void nl_gcr_84_double_double_c61e08cf5e35918(double * __restrict V, const
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
+// solarq,boxingb
+static void nl_gcr_10_double_double_d7d45dc58b08cab9(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
+
+{
+
+	plib::unused_var(cnV);
+	double m_A0(0.0);
+	double m_A1(0.0);
+	double m_A2(0.0);
+	double m_A3(0.0);
+	double m_A4(0.0);
+	double m_A5(0.0);
+	double m_A6(0.0);
+	double m_A7(0.0);
+	double m_A8(0.0);
+	double m_A9(0.0);
+	m_A0 += gt[0];
+	m_A0 += gt[1];
+	m_A1 += go[0];
+	double RHS0 = Idr[0];
+	RHS0 += Idr[1];
+	RHS0 -= go[1] * *cnV[1];
+	m_A2 += gt[2];
+	m_A2 += gt[3];
+	m_A2 += gt[4];
+	m_A2 += gt[5];
+	m_A3 += go[2];
+	double RHS1 = Idr[2];
+	RHS1 += Idr[3];
+	RHS1 += Idr[4];
+	RHS1 += Idr[5];
+	RHS1 -= go[3] * *cnV[3];
+	RHS1 -= go[4] * *cnV[4];
+	RHS1 -= go[5] * *cnV[5];
+	m_A5 += gt[6];
+	m_A5 += gt[7];
+	m_A5 += gt[8];
+	m_A6 += go[6];
+	m_A4 += go[7];
+	double RHS2 = Idr[6];
+	RHS2 += Idr[7];
+	RHS2 += Idr[8];
+	RHS2 -= go[8] * *cnV[8];
+	m_A9 += gt[9];
+	m_A9 += gt[10];
+	m_A7 += go[9];
+	m_A8 += go[10];
+	double RHS3 = Idr[9];
+	RHS3 += Idr[10];
+	const double f0 = 1.0 / m_A0;
+	const double f0_2 = -f0 * m_A4;
+	m_A5 += m_A1 * f0_2;
+	RHS2 += f0_2 * RHS0;
+	const double f1 = 1.0 / m_A2;
+	const double f1_3 = -f1 * m_A7;
+	m_A9 += m_A3 * f1_3;
+	RHS3 += f1_3 * RHS1;
+	const double f2 = 1.0 / m_A5;
+	const double f2_3 = -f2 * m_A8;
+	m_A9 += m_A6 * f2_3;
+	RHS3 += f2_3 * RHS2;
+	V[3] = RHS3 / m_A9;
+	double tmp2 = 0.0;
+	tmp2 += m_A6 * V[3];
+	V[2] = (RHS2 - tmp2) / m_A5;
+	double tmp1 = 0.0;
+	tmp1 += m_A3 * V[3];
+	V[1] = (RHS1 - tmp1) / m_A2;
+	double tmp0 = 0.0;
+	tmp0 += m_A1 * V[2];
+	V[0] = (RHS0 - tmp0) / m_A0;
+}
+
 // solarq
 static void nl_gcr_15_double_double_7caaa135bff3d9f3(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
@@ -47674,198 +47140,6 @@ static void nl_gcr_20_double_double_66496d6073aca98e(double * __restrict V, cons
 	double tmp1 = 0.0;
 	tmp1 += m_A3 * V[3];
 	tmp1 += m_A4 * V[4];
-	V[1] = (RHS1 - tmp1) / m_A2;
-	double tmp0 = 0.0;
-	tmp0 += m_A1 * V[3];
-	V[0] = (RHS0 - tmp0) / m_A0;
-}
-
-// solarq,starcas,wotw
-static void nl_gcr_25_double_double_4cb524006206eb1a(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
-
-{
-
-	plib::unused_var(cnV);
-	double m_A0(0.0);
-	double m_A1(0.0);
-	double m_A2(0.0);
-	double m_A3(0.0);
-	double m_A4(0.0);
-	double m_A5(0.0);
-	double m_A6(0.0);
-	double m_A7(0.0);
-	double m_A8(0.0);
-	double m_A9(0.0);
-	double m_A10(0.0);
-	double m_A11(0.0);
-	double m_A12(0.0);
-	double m_A13(0.0);
-	double m_A14(0.0);
-	double m_A15(0.0);
-	double m_A16(0.0);
-	double m_A17(0.0);
-	double m_A18(0.0);
-	double m_A19(0.0);
-	double m_A20(0.0);
-	double m_A21(0.0);
-	double m_A22(0.0);
-	double m_A23(0.0);
-	double m_A24(0.0);
-	m_A0 += gt[0];
-	m_A0 += gt[1];
-	m_A0 += gt[2];
-	m_A0 += gt[3];
-	m_A1 += go[0];
-	double RHS0 = Idr[0];
-	RHS0 += Idr[1];
-	RHS0 += Idr[2];
-	RHS0 += Idr[3];
-	RHS0 -= go[1] * *cnV[1];
-	RHS0 -= go[2] * *cnV[2];
-	RHS0 -= go[3] * *cnV[3];
-	m_A2 += gt[4];
-	m_A2 += gt[5];
-	m_A2 += gt[6];
-	m_A2 += gt[7];
-	m_A2 += gt[8];
-	m_A2 += gt[9];
-	m_A2 += gt[10];
-	m_A2 += gt[11];
-	m_A5 += go[4];
-	m_A4 += go[5];
-	m_A4 += go[6];
-	m_A3 += go[7];
-	m_A3 += go[8];
-	double RHS1 = Idr[4];
-	RHS1 += Idr[5];
-	RHS1 += Idr[6];
-	RHS1 += Idr[7];
-	RHS1 += Idr[8];
-	RHS1 += Idr[9];
-	RHS1 += Idr[10];
-	RHS1 += Idr[11];
-	RHS1 -= go[9] * *cnV[9];
-	RHS1 -= go[10] * *cnV[10];
-	RHS1 -= go[11] * *cnV[11];
-	m_A6 += gt[12];
-	m_A6 += gt[13];
-	m_A7 += go[12];
-	double RHS2 = Idr[12];
-	RHS2 += Idr[13];
-	RHS2 -= go[13] * *cnV[13];
-	m_A10 += gt[14];
-	m_A10 += gt[15];
-	m_A10 += gt[16];
-	m_A10 += gt[17];
-	m_A10 += gt[18];
-	m_A10 += gt[19];
-	m_A9 += go[14];
-	m_A9 += go[15];
-	m_A8 += go[16];
-	double RHS3 = Idr[14];
-	RHS3 += Idr[15];
-	RHS3 += Idr[16];
-	RHS3 += Idr[17];
-	RHS3 += Idr[18];
-	RHS3 += Idr[19];
-	RHS3 -= go[17] * *cnV[17];
-	RHS3 -= go[18] * *cnV[18];
-	RHS3 -= go[19] * *cnV[19];
-	m_A15 += gt[20];
-	m_A15 += gt[21];
-	m_A15 += gt[22];
-	m_A15 += gt[23];
-	m_A15 += gt[24];
-	m_A16 += go[20];
-	m_A16 += go[21];
-	m_A13 += go[22];
-	m_A13 += go[23];
-	double RHS4 = Idr[20];
-	RHS4 += Idr[21];
-	RHS4 += Idr[22];
-	RHS4 += Idr[23];
-	RHS4 += Idr[24];
-	RHS4 -= go[24] * *cnV[24];
-	m_A18 += gt[25];
-	m_A18 += gt[26];
-	m_A18 += gt[27];
-	m_A19 += go[25];
-	m_A17 += go[26];
-	double RHS5 = Idr[25];
-	RHS5 += Idr[26];
-	RHS5 += Idr[27];
-	RHS5 -= go[27] * *cnV[27];
-	m_A24 += gt[28];
-	m_A24 += gt[29];
-	m_A24 += gt[30];
-	m_A24 += gt[31];
-	m_A23 += go[28];
-	m_A22 += go[29];
-	m_A22 += go[30];
-	m_A20 += go[31];
-	double RHS6 = Idr[28];
-	RHS6 += Idr[29];
-	RHS6 += Idr[30];
-	RHS6 += Idr[31];
-	const double f0 = 1.0 / m_A0;
-	const double f0_3 = -f0 * m_A8;
-	m_A10 += m_A1 * f0_3;
-	RHS3 += f0_3 * RHS0;
-	const double f1 = 1.0 / m_A2;
-	const double f1_3 = -f1 * m_A9;
-	m_A10 += m_A3 * f1_3;
-	m_A11 += m_A4 * f1_3;
-	m_A12 += m_A5 * f1_3;
-	RHS3 += f1_3 * RHS1;
-	const double f1_4 = -f1 * m_A13;
-	m_A14 += m_A3 * f1_4;
-	m_A15 += m_A4 * f1_4;
-	m_A16 += m_A5 * f1_4;
-	RHS4 += f1_4 * RHS1;
-	const double f1_6 = -f1 * m_A20;
-	m_A21 += m_A3 * f1_6;
-	m_A22 += m_A4 * f1_6;
-	m_A24 += m_A5 * f1_6;
-	RHS6 += f1_6 * RHS1;
-	const double f2 = 1.0 / m_A6;
-	const double f2_5 = -f2 * m_A17;
-	m_A18 += m_A7 * f2_5;
-	RHS5 += f2_5 * RHS2;
-	const double f3 = 1.0 / m_A10;
-	const double f3_4 = -f3 * m_A14;
-	m_A15 += m_A11 * f3_4;
-	m_A16 += m_A12 * f3_4;
-	RHS4 += f3_4 * RHS3;
-	const double f3_6 = -f3 * m_A21;
-	m_A22 += m_A11 * f3_6;
-	m_A24 += m_A12 * f3_6;
-	RHS6 += f3_6 * RHS3;
-	const double f4 = 1.0 / m_A15;
-	const double f4_6 = -f4 * m_A22;
-	m_A24 += m_A16 * f4_6;
-	RHS6 += f4_6 * RHS4;
-	const double f5 = 1.0 / m_A18;
-	const double f5_6 = -f5 * m_A23;
-	m_A24 += m_A19 * f5_6;
-	RHS6 += f5_6 * RHS5;
-	V[6] = RHS6 / m_A24;
-	double tmp5 = 0.0;
-	tmp5 += m_A19 * V[6];
-	V[5] = (RHS5 - tmp5) / m_A18;
-	double tmp4 = 0.0;
-	tmp4 += m_A16 * V[6];
-	V[4] = (RHS4 - tmp4) / m_A15;
-	double tmp3 = 0.0;
-	tmp3 += m_A11 * V[4];
-	tmp3 += m_A12 * V[6];
-	V[3] = (RHS3 - tmp3) / m_A10;
-	double tmp2 = 0.0;
-	tmp2 += m_A7 * V[5];
-	V[2] = (RHS2 - tmp2) / m_A6;
-	double tmp1 = 0.0;
-	tmp1 += m_A3 * V[3];
-	tmp1 += m_A4 * V[4];
-	tmp1 += m_A5 * V[6];
 	V[1] = (RHS1 - tmp1) / m_A2;
 	double tmp0 = 0.0;
 	tmp0 += m_A1 * V[3];
@@ -61450,6 +60724,556 @@ static void nl_gcr_12_double_double_88a8ef5f6bd43d48(double * __restrict V, cons
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
+// starcas,wotw,solarq,armora
+static void nl_gcr_22_double_double_1250f340dea396ae(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
+
+{
+
+	plib::unused_var(cnV);
+	double m_A0(0.0);
+	double m_A1(0.0);
+	double m_A2(0.0);
+	double m_A3(0.0);
+	double m_A4(0.0);
+	double m_A5(0.0);
+	double m_A6(0.0);
+	double m_A7(0.0);
+	double m_A8(0.0);
+	double m_A9(0.0);
+	double m_A10(0.0);
+	double m_A11(0.0);
+	double m_A12(0.0);
+	double m_A13(0.0);
+	double m_A14(0.0);
+	double m_A15(0.0);
+	double m_A16(0.0);
+	double m_A17(0.0);
+	double m_A18(0.0);
+	double m_A19(0.0);
+	double m_A20(0.0);
+	double m_A21(0.0);
+	m_A0 += gt[0];
+	m_A0 += gt[1];
+	m_A0 += gt[2];
+	m_A0 += gt[3];
+	m_A1 += go[0];
+	double RHS0 = Idr[0];
+	RHS0 += Idr[1];
+	RHS0 += Idr[2];
+	RHS0 += Idr[3];
+	RHS0 -= go[1] * *cnV[1];
+	RHS0 -= go[2] * *cnV[2];
+	RHS0 -= go[3] * *cnV[3];
+	m_A2 += gt[4];
+	m_A2 += gt[5];
+	m_A3 += go[4];
+	double RHS1 = Idr[4];
+	RHS1 += Idr[5];
+	RHS1 -= go[5] * *cnV[5];
+	m_A4 += gt[6];
+	m_A4 += gt[7];
+	m_A4 += gt[8];
+	m_A4 += gt[9];
+	m_A4 += gt[10];
+	m_A4 += gt[11];
+	m_A4 += gt[12];
+	m_A4 += gt[13];
+	m_A7 += go[6];
+	m_A6 += go[7];
+	m_A6 += go[8];
+	m_A5 += go[9];
+	m_A5 += go[10];
+	double RHS2 = Idr[6];
+	RHS2 += Idr[7];
+	RHS2 += Idr[8];
+	RHS2 += Idr[9];
+	RHS2 += Idr[10];
+	RHS2 += Idr[11];
+	RHS2 += Idr[12];
+	RHS2 += Idr[13];
+	RHS2 -= go[11] * *cnV[11];
+	RHS2 -= go[12] * *cnV[12];
+	RHS2 -= go[13] * *cnV[13];
+	m_A10 += gt[14];
+	m_A10 += gt[15];
+	m_A10 += gt[16];
+	m_A10 += gt[17];
+	m_A10 += gt[18];
+	m_A10 += gt[19];
+	m_A9 += go[14];
+	m_A9 += go[15];
+	m_A8 += go[16];
+	double RHS3 = Idr[14];
+	RHS3 += Idr[15];
+	RHS3 += Idr[16];
+	RHS3 += Idr[17];
+	RHS3 += Idr[18];
+	RHS3 += Idr[19];
+	RHS3 -= go[17] * *cnV[17];
+	RHS3 -= go[18] * *cnV[18];
+	RHS3 -= go[19] * *cnV[19];
+	m_A15 += gt[20];
+	m_A15 += gt[21];
+	m_A15 += gt[22];
+	m_A15 += gt[23];
+	m_A15 += gt[24];
+	m_A16 += go[20];
+	m_A16 += go[21];
+	m_A13 += go[22];
+	m_A13 += go[23];
+	double RHS4 = Idr[20];
+	RHS4 += Idr[21];
+	RHS4 += Idr[22];
+	RHS4 += Idr[23];
+	RHS4 += Idr[24];
+	RHS4 -= go[24] * *cnV[24];
+	m_A21 += gt[25];
+	m_A21 += gt[26];
+	m_A21 += gt[27];
+	m_A21 += gt[28];
+	m_A21 += gt[29];
+	m_A20 += go[25];
+	m_A20 += go[26];
+	m_A18 += go[27];
+	m_A17 += go[28];
+	double RHS5 = Idr[25];
+	RHS5 += Idr[26];
+	RHS5 += Idr[27];
+	RHS5 += Idr[28];
+	RHS5 += Idr[29];
+	RHS5 -= go[29] * *cnV[29];
+	const double f0 = 1.0 / m_A0;
+	const double f0_3 = -f0 * m_A8;
+	m_A10 += m_A1 * f0_3;
+	RHS3 += f0_3 * RHS0;
+	const double f1 = 1.0 / m_A2;
+	const double f1_5 = -f1 * m_A17;
+	m_A21 += m_A3 * f1_5;
+	RHS5 += f1_5 * RHS1;
+	const double f2 = 1.0 / m_A4;
+	const double f2_3 = -f2 * m_A9;
+	m_A10 += m_A5 * f2_3;
+	m_A11 += m_A6 * f2_3;
+	m_A12 += m_A7 * f2_3;
+	RHS3 += f2_3 * RHS2;
+	const double f2_4 = -f2 * m_A13;
+	m_A14 += m_A5 * f2_4;
+	m_A15 += m_A6 * f2_4;
+	m_A16 += m_A7 * f2_4;
+	RHS4 += f2_4 * RHS2;
+	const double f2_5 = -f2 * m_A18;
+	m_A19 += m_A5 * f2_5;
+	m_A20 += m_A6 * f2_5;
+	m_A21 += m_A7 * f2_5;
+	RHS5 += f2_5 * RHS2;
+	const double f3 = 1.0 / m_A10;
+	const double f3_4 = -f3 * m_A14;
+	m_A15 += m_A11 * f3_4;
+	m_A16 += m_A12 * f3_4;
+	RHS4 += f3_4 * RHS3;
+	const double f3_5 = -f3 * m_A19;
+	m_A20 += m_A11 * f3_5;
+	m_A21 += m_A12 * f3_5;
+	RHS5 += f3_5 * RHS3;
+	const double f4 = 1.0 / m_A15;
+	const double f4_5 = -f4 * m_A20;
+	m_A21 += m_A16 * f4_5;
+	RHS5 += f4_5 * RHS4;
+	V[5] = RHS5 / m_A21;
+	double tmp4 = 0.0;
+	tmp4 += m_A16 * V[5];
+	V[4] = (RHS4 - tmp4) / m_A15;
+	double tmp3 = 0.0;
+	tmp3 += m_A11 * V[4];
+	tmp3 += m_A12 * V[5];
+	V[3] = (RHS3 - tmp3) / m_A10;
+	double tmp2 = 0.0;
+	tmp2 += m_A5 * V[3];
+	tmp2 += m_A6 * V[4];
+	tmp2 += m_A7 * V[5];
+	V[2] = (RHS2 - tmp2) / m_A4;
+	double tmp1 = 0.0;
+	tmp1 += m_A3 * V[5];
+	V[1] = (RHS1 - tmp1) / m_A2;
+	double tmp0 = 0.0;
+	tmp0 += m_A1 * V[3];
+	V[0] = (RHS0 - tmp0) / m_A0;
+}
+
+// starcas,wotw,boxingb
+static void nl_gcr_23_double_double_ea2b6e3a05e6ef0b(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
+
+{
+
+	plib::unused_var(cnV);
+	double m_A0(0.0);
+	double m_A1(0.0);
+	double m_A2(0.0);
+	double m_A3(0.0);
+	double m_A4(0.0);
+	double m_A5(0.0);
+	double m_A6(0.0);
+	double m_A7(0.0);
+	double m_A8(0.0);
+	double m_A9(0.0);
+	double m_A10(0.0);
+	double m_A11(0.0);
+	double m_A12(0.0);
+	double m_A13(0.0);
+	double m_A14(0.0);
+	double m_A15(0.0);
+	double m_A16(0.0);
+	double m_A17(0.0);
+	double m_A18(0.0);
+	double m_A19(0.0);
+	double m_A20(0.0);
+	double m_A21(0.0);
+	double m_A22(0.0);
+	m_A0 += gt[0];
+	m_A0 += gt[1];
+	m_A0 += gt[2];
+	m_A0 += gt[3];
+	m_A1 += go[0];
+	double RHS0 = Idr[0];
+	RHS0 += Idr[1];
+	RHS0 += Idr[2];
+	RHS0 += Idr[3];
+	RHS0 -= go[1] * *cnV[1];
+	RHS0 -= go[2] * *cnV[2];
+	RHS0 -= go[3] * *cnV[3];
+	m_A2 += gt[4];
+	m_A2 += gt[5];
+	m_A2 += gt[6];
+	m_A2 += gt[7];
+	m_A2 += gt[8];
+	m_A2 += gt[9];
+	m_A4 += go[4];
+	m_A3 += go[5];
+	m_A3 += go[6];
+	double RHS1 = Idr[4];
+	RHS1 += Idr[5];
+	RHS1 += Idr[6];
+	RHS1 += Idr[7];
+	RHS1 += Idr[8];
+	RHS1 += Idr[9];
+	RHS1 -= go[7] * *cnV[7];
+	RHS1 -= go[8] * *cnV[8];
+	RHS1 -= go[9] * *cnV[9];
+	m_A5 += gt[10];
+	m_A5 += gt[11];
+	m_A5 += gt[12];
+	m_A5 += gt[13];
+	m_A7 += go[10];
+	m_A6 += go[11];
+	m_A6 += go[12];
+	double RHS2 = Idr[10];
+	RHS2 += Idr[11];
+	RHS2 += Idr[12];
+	RHS2 += Idr[13];
+	RHS2 -= go[13] * *cnV[13];
+	m_A8 += gt[14];
+	m_A8 += gt[15];
+	m_A9 += go[14];
+	double RHS3 = Idr[14];
+	RHS3 += Idr[15];
+	RHS3 -= go[15] * *cnV[15];
+	m_A12 += gt[16];
+	m_A12 += gt[17];
+	m_A12 += gt[18];
+	m_A12 += gt[19];
+	m_A12 += gt[20];
+	m_A12 += gt[21];
+	m_A11 += go[16];
+	m_A11 += go[17];
+	m_A10 += go[18];
+	double RHS4 = Idr[16];
+	RHS4 += Idr[17];
+	RHS4 += Idr[18];
+	RHS4 += Idr[19];
+	RHS4 += Idr[20];
+	RHS4 += Idr[21];
+	RHS4 -= go[19] * *cnV[19];
+	RHS4 -= go[20] * *cnV[20];
+	RHS4 -= go[21] * *cnV[21];
+	m_A17 += gt[22];
+	m_A17 += gt[23];
+	m_A17 += gt[24];
+	m_A17 += gt[25];
+	m_A17 += gt[26];
+	m_A15 += go[22];
+	m_A15 += go[23];
+	m_A14 += go[24];
+	double RHS5 = Idr[22];
+	RHS5 += Idr[23];
+	RHS5 += Idr[24];
+	RHS5 += Idr[25];
+	RHS5 += Idr[26];
+	RHS5 -= go[25] * *cnV[25];
+	RHS5 -= go[26] * *cnV[26];
+	m_A22 += gt[27];
+	m_A22 += gt[28];
+	m_A22 += gt[29];
+	m_A22 += gt[30];
+	m_A22 += gt[31];
+	m_A20 += go[27];
+	m_A19 += go[28];
+	double RHS6 = Idr[27];
+	RHS6 += Idr[28];
+	RHS6 += Idr[29];
+	RHS6 += Idr[30];
+	RHS6 += Idr[31];
+	RHS6 -= go[29] * *cnV[29];
+	RHS6 -= go[30] * *cnV[30];
+	RHS6 -= go[31] * *cnV[31];
+	const double f0 = 1.0 / m_A0;
+	const double f0_4 = -f0 * m_A10;
+	m_A12 += m_A1 * f0_4;
+	RHS4 += f0_4 * RHS0;
+	const double f1 = 1.0 / m_A2;
+	const double f1_4 = -f1 * m_A11;
+	m_A12 += m_A3 * f1_4;
+	m_A13 += m_A4 * f1_4;
+	RHS4 += f1_4 * RHS1;
+	const double f1_5 = -f1 * m_A14;
+	m_A16 += m_A3 * f1_5;
+	m_A17 += m_A4 * f1_5;
+	RHS5 += f1_5 * RHS1;
+	const double f2 = 1.0 / m_A5;
+	const double f2_5 = -f2 * m_A15;
+	m_A17 += m_A6 * f2_5;
+	m_A18 += m_A7 * f2_5;
+	RHS5 += f2_5 * RHS2;
+	const double f2_6 = -f2 * m_A19;
+	m_A21 += m_A6 * f2_6;
+	m_A22 += m_A7 * f2_6;
+	RHS6 += f2_6 * RHS2;
+	const double f3 = 1.0 / m_A8;
+	const double f3_6 = -f3 * m_A20;
+	m_A22 += m_A9 * f3_6;
+	RHS6 += f3_6 * RHS3;
+	const double f4 = 1.0 / m_A12;
+	const double f4_5 = -f4 * m_A16;
+	m_A17 += m_A13 * f4_5;
+	RHS5 += f4_5 * RHS4;
+	const double f5 = 1.0 / m_A17;
+	const double f5_6 = -f5 * m_A21;
+	m_A22 += m_A18 * f5_6;
+	RHS6 += f5_6 * RHS5;
+	V[6] = RHS6 / m_A22;
+	double tmp5 = 0.0;
+	tmp5 += m_A18 * V[6];
+	V[5] = (RHS5 - tmp5) / m_A17;
+	double tmp4 = 0.0;
+	tmp4 += m_A13 * V[5];
+	V[4] = (RHS4 - tmp4) / m_A12;
+	double tmp3 = 0.0;
+	tmp3 += m_A9 * V[6];
+	V[3] = (RHS3 - tmp3) / m_A8;
+	double tmp2 = 0.0;
+	tmp2 += m_A6 * V[5];
+	tmp2 += m_A7 * V[6];
+	V[2] = (RHS2 - tmp2) / m_A5;
+	double tmp1 = 0.0;
+	tmp1 += m_A3 * V[4];
+	tmp1 += m_A4 * V[5];
+	V[1] = (RHS1 - tmp1) / m_A2;
+	double tmp0 = 0.0;
+	tmp0 += m_A1 * V[4];
+	V[0] = (RHS0 - tmp0) / m_A0;
+}
+
+// starcas,wotw,solarq
+static void nl_gcr_25_double_double_4cb524006206eb1a(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
+
+{
+
+	plib::unused_var(cnV);
+	double m_A0(0.0);
+	double m_A1(0.0);
+	double m_A2(0.0);
+	double m_A3(0.0);
+	double m_A4(0.0);
+	double m_A5(0.0);
+	double m_A6(0.0);
+	double m_A7(0.0);
+	double m_A8(0.0);
+	double m_A9(0.0);
+	double m_A10(0.0);
+	double m_A11(0.0);
+	double m_A12(0.0);
+	double m_A13(0.0);
+	double m_A14(0.0);
+	double m_A15(0.0);
+	double m_A16(0.0);
+	double m_A17(0.0);
+	double m_A18(0.0);
+	double m_A19(0.0);
+	double m_A20(0.0);
+	double m_A21(0.0);
+	double m_A22(0.0);
+	double m_A23(0.0);
+	double m_A24(0.0);
+	m_A0 += gt[0];
+	m_A0 += gt[1];
+	m_A0 += gt[2];
+	m_A0 += gt[3];
+	m_A1 += go[0];
+	double RHS0 = Idr[0];
+	RHS0 += Idr[1];
+	RHS0 += Idr[2];
+	RHS0 += Idr[3];
+	RHS0 -= go[1] * *cnV[1];
+	RHS0 -= go[2] * *cnV[2];
+	RHS0 -= go[3] * *cnV[3];
+	m_A2 += gt[4];
+	m_A2 += gt[5];
+	m_A2 += gt[6];
+	m_A2 += gt[7];
+	m_A2 += gt[8];
+	m_A2 += gt[9];
+	m_A2 += gt[10];
+	m_A2 += gt[11];
+	m_A5 += go[4];
+	m_A4 += go[5];
+	m_A4 += go[6];
+	m_A3 += go[7];
+	m_A3 += go[8];
+	double RHS1 = Idr[4];
+	RHS1 += Idr[5];
+	RHS1 += Idr[6];
+	RHS1 += Idr[7];
+	RHS1 += Idr[8];
+	RHS1 += Idr[9];
+	RHS1 += Idr[10];
+	RHS1 += Idr[11];
+	RHS1 -= go[9] * *cnV[9];
+	RHS1 -= go[10] * *cnV[10];
+	RHS1 -= go[11] * *cnV[11];
+	m_A6 += gt[12];
+	m_A6 += gt[13];
+	m_A7 += go[12];
+	double RHS2 = Idr[12];
+	RHS2 += Idr[13];
+	RHS2 -= go[13] * *cnV[13];
+	m_A10 += gt[14];
+	m_A10 += gt[15];
+	m_A10 += gt[16];
+	m_A10 += gt[17];
+	m_A10 += gt[18];
+	m_A10 += gt[19];
+	m_A9 += go[14];
+	m_A9 += go[15];
+	m_A8 += go[16];
+	double RHS3 = Idr[14];
+	RHS3 += Idr[15];
+	RHS3 += Idr[16];
+	RHS3 += Idr[17];
+	RHS3 += Idr[18];
+	RHS3 += Idr[19];
+	RHS3 -= go[17] * *cnV[17];
+	RHS3 -= go[18] * *cnV[18];
+	RHS3 -= go[19] * *cnV[19];
+	m_A15 += gt[20];
+	m_A15 += gt[21];
+	m_A15 += gt[22];
+	m_A15 += gt[23];
+	m_A15 += gt[24];
+	m_A16 += go[20];
+	m_A16 += go[21];
+	m_A13 += go[22];
+	m_A13 += go[23];
+	double RHS4 = Idr[20];
+	RHS4 += Idr[21];
+	RHS4 += Idr[22];
+	RHS4 += Idr[23];
+	RHS4 += Idr[24];
+	RHS4 -= go[24] * *cnV[24];
+	m_A18 += gt[25];
+	m_A18 += gt[26];
+	m_A18 += gt[27];
+	m_A19 += go[25];
+	m_A17 += go[26];
+	double RHS5 = Idr[25];
+	RHS5 += Idr[26];
+	RHS5 += Idr[27];
+	RHS5 -= go[27] * *cnV[27];
+	m_A24 += gt[28];
+	m_A24 += gt[29];
+	m_A24 += gt[30];
+	m_A24 += gt[31];
+	m_A23 += go[28];
+	m_A22 += go[29];
+	m_A22 += go[30];
+	m_A20 += go[31];
+	double RHS6 = Idr[28];
+	RHS6 += Idr[29];
+	RHS6 += Idr[30];
+	RHS6 += Idr[31];
+	const double f0 = 1.0 / m_A0;
+	const double f0_3 = -f0 * m_A8;
+	m_A10 += m_A1 * f0_3;
+	RHS3 += f0_3 * RHS0;
+	const double f1 = 1.0 / m_A2;
+	const double f1_3 = -f1 * m_A9;
+	m_A10 += m_A3 * f1_3;
+	m_A11 += m_A4 * f1_3;
+	m_A12 += m_A5 * f1_3;
+	RHS3 += f1_3 * RHS1;
+	const double f1_4 = -f1 * m_A13;
+	m_A14 += m_A3 * f1_4;
+	m_A15 += m_A4 * f1_4;
+	m_A16 += m_A5 * f1_4;
+	RHS4 += f1_4 * RHS1;
+	const double f1_6 = -f1 * m_A20;
+	m_A21 += m_A3 * f1_6;
+	m_A22 += m_A4 * f1_6;
+	m_A24 += m_A5 * f1_6;
+	RHS6 += f1_6 * RHS1;
+	const double f2 = 1.0 / m_A6;
+	const double f2_5 = -f2 * m_A17;
+	m_A18 += m_A7 * f2_5;
+	RHS5 += f2_5 * RHS2;
+	const double f3 = 1.0 / m_A10;
+	const double f3_4 = -f3 * m_A14;
+	m_A15 += m_A11 * f3_4;
+	m_A16 += m_A12 * f3_4;
+	RHS4 += f3_4 * RHS3;
+	const double f3_6 = -f3 * m_A21;
+	m_A22 += m_A11 * f3_6;
+	m_A24 += m_A12 * f3_6;
+	RHS6 += f3_6 * RHS3;
+	const double f4 = 1.0 / m_A15;
+	const double f4_6 = -f4 * m_A22;
+	m_A24 += m_A16 * f4_6;
+	RHS6 += f4_6 * RHS4;
+	const double f5 = 1.0 / m_A18;
+	const double f5_6 = -f5 * m_A23;
+	m_A24 += m_A19 * f5_6;
+	RHS6 += f5_6 * RHS5;
+	V[6] = RHS6 / m_A24;
+	double tmp5 = 0.0;
+	tmp5 += m_A19 * V[6];
+	V[5] = (RHS5 - tmp5) / m_A18;
+	double tmp4 = 0.0;
+	tmp4 += m_A16 * V[6];
+	V[4] = (RHS4 - tmp4) / m_A15;
+	double tmp3 = 0.0;
+	tmp3 += m_A11 * V[4];
+	tmp3 += m_A12 * V[6];
+	V[3] = (RHS3 - tmp3) / m_A10;
+	double tmp2 = 0.0;
+	tmp2 += m_A7 * V[5];
+	V[2] = (RHS2 - tmp2) / m_A6;
+	double tmp1 = 0.0;
+	tmp1 += m_A3 * V[3];
+	tmp1 += m_A4 * V[4];
+	tmp1 += m_A5 * V[6];
+	V[1] = (RHS1 - tmp1) / m_A2;
+	double tmp0 = 0.0;
+	tmp0 += m_A1 * V[3];
+	V[0] = (RHS0 - tmp0) / m_A0;
+}
+
 // starcas,wotw
 static void nl_gcr_62_double_double_a582a424cb61c678(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
@@ -68962,6 +68786,85 @@ static void nl_gcr_7_double_double_723fa454468a93d(double * __restrict V, const 
 }
 
 // stuntcyc
+static void nl_gcr_10_double_double_85652d3e3ada285a(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
+
+{
+
+	plib::unused_var(cnV);
+	double m_A0(0.0);
+	double m_A1(0.0);
+	double m_A2(0.0);
+	double m_A3(0.0);
+	double m_A4(0.0);
+	double m_A5(0.0);
+	double m_A6(0.0);
+	double m_A7(0.0);
+	double m_A8(0.0);
+	double m_A9(0.0);
+	m_A0 += gt[0];
+	m_A0 += gt[1];
+	m_A0 += gt[2];
+	m_A1 += go[0];
+	double RHS0 = Idr[0];
+	RHS0 += Idr[1];
+	RHS0 += Idr[2];
+	RHS0 -= go[1] * *cnV[1];
+	RHS0 -= go[2] * *cnV[2];
+	m_A2 += gt[3];
+	m_A2 += gt[4];
+	m_A2 += gt[5];
+	m_A3 += go[3];
+	double RHS1 = Idr[3];
+	RHS1 += Idr[4];
+	RHS1 += Idr[5];
+	RHS1 -= go[4] * *cnV[4];
+	RHS1 -= go[5] * *cnV[5];
+	m_A4 += gt[6];
+	m_A4 += gt[7];
+	m_A4 += gt[8];
+	m_A5 += go[6];
+	double RHS2 = Idr[6];
+	RHS2 += Idr[7];
+	RHS2 += Idr[8];
+	RHS2 -= go[7] * *cnV[7];
+	RHS2 -= go[8] * *cnV[8];
+	m_A9 += gt[9];
+	m_A9 += gt[10];
+	m_A9 += gt[11];
+	m_A9 += gt[12];
+	m_A8 += go[9];
+	m_A7 += go[10];
+	m_A6 += go[11];
+	double RHS3 = Idr[9];
+	RHS3 += Idr[10];
+	RHS3 += Idr[11];
+	RHS3 += Idr[12];
+	RHS3 -= go[12] * *cnV[12];
+	const double f0 = 1.0 / m_A0;
+	const double f0_3 = -f0 * m_A6;
+	m_A9 += m_A1 * f0_3;
+	RHS3 += f0_3 * RHS0;
+	const double f1 = 1.0 / m_A2;
+	const double f1_3 = -f1 * m_A7;
+	m_A9 += m_A3 * f1_3;
+	RHS3 += f1_3 * RHS1;
+	const double f2 = 1.0 / m_A4;
+	const double f2_3 = -f2 * m_A8;
+	m_A9 += m_A5 * f2_3;
+	RHS3 += f2_3 * RHS2;
+	V[3] = RHS3 / m_A9;
+	double tmp2 = 0.0;
+	tmp2 += m_A5 * V[3];
+	V[2] = (RHS2 - tmp2) / m_A4;
+	double tmp1 = 0.0;
+	tmp1 += m_A3 * V[3];
+	V[1] = (RHS1 - tmp1) / m_A2;
+	double tmp0 = 0.0;
+	tmp0 += m_A1 * V[3];
+	V[0] = (RHS0 - tmp0) / m_A0;
+}
+
+// stuntcyc
 static void nl_gcr_20_double_double_c924fe5960b1479e(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
 {
@@ -69115,6 +69018,156 @@ static void nl_gcr_20_double_double_c924fe5960b1479e(double * __restrict V, cons
 	V[1] = (RHS1 - tmp1) / m_A2;
 	double tmp0 = 0.0;
 	tmp0 += m_A1 * V[3];
+	V[0] = (RHS0 - tmp0) / m_A0;
+}
+
+// stuntcyc
+static void nl_gcr_22_double_double_ca68d70bd8f2f62e(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
+
+{
+
+	plib::unused_var(cnV);
+	double m_A0(0.0);
+	double m_A1(0.0);
+	double m_A2(0.0);
+	double m_A3(0.0);
+	double m_A4(0.0);
+	double m_A5(0.0);
+	double m_A6(0.0);
+	double m_A7(0.0);
+	double m_A8(0.0);
+	double m_A9(0.0);
+	double m_A10(0.0);
+	double m_A11(0.0);
+	double m_A12(0.0);
+	double m_A13(0.0);
+	double m_A14(0.0);
+	double m_A15(0.0);
+	double m_A16(0.0);
+	double m_A17(0.0);
+	double m_A18(0.0);
+	double m_A19(0.0);
+	double m_A20(0.0);
+	double m_A21(0.0);
+	m_A0 += gt[0];
+	m_A0 += gt[1];
+	m_A0 += gt[2];
+	m_A0 += gt[3];
+	m_A2 += go[0];
+	m_A2 += go[1];
+	m_A1 += go[2];
+	double RHS0 = Idr[0];
+	RHS0 += Idr[1];
+	RHS0 += Idr[2];
+	RHS0 += Idr[3];
+	RHS0 -= go[3] * *cnV[3];
+	m_A3 += gt[4];
+	m_A3 += gt[5];
+	m_A3 += gt[6];
+	m_A3 += gt[7];
+	m_A5 += go[4];
+	m_A5 += go[5];
+	m_A4 += go[6];
+	double RHS1 = Idr[4];
+	RHS1 += Idr[5];
+	RHS1 += Idr[6];
+	RHS1 += Idr[7];
+	RHS1 -= go[7] * *cnV[7];
+	m_A6 += gt[8];
+	m_A6 += gt[9];
+	m_A6 += gt[10];
+	m_A7 += go[8];
+	double RHS2 = Idr[8];
+	RHS2 += Idr[9];
+	RHS2 += Idr[10];
+	RHS2 -= go[9] * *cnV[9];
+	RHS2 -= go[10] * *cnV[10];
+	m_A10 += gt[11];
+	m_A10 += gt[12];
+	m_A10 += gt[13];
+	m_A12 += go[11];
+	m_A9 += go[12];
+	m_A8 += go[13];
+	double RHS3 = Idr[11];
+	RHS3 += Idr[12];
+	RHS3 += Idr[13];
+	m_A16 += gt[14];
+	m_A16 += gt[15];
+	m_A16 += gt[16];
+	m_A16 += gt[17];
+	m_A16 += gt[18];
+	m_A17 += go[14];
+	m_A14 += go[15];
+	m_A14 += go[16];
+	m_A13 += go[17];
+	m_A13 += go[18];
+	double RHS4 = Idr[14];
+	RHS4 += Idr[15];
+	RHS4 += Idr[16];
+	RHS4 += Idr[17];
+	RHS4 += Idr[18];
+	m_A21 += gt[19];
+	m_A21 += gt[20];
+	m_A21 += gt[21];
+	m_A18 += go[19];
+	m_A20 += go[20];
+	m_A19 += go[21];
+	double RHS5 = Idr[19];
+	RHS5 += Idr[20];
+	RHS5 += Idr[21];
+	const double f0 = 1.0 / m_A0;
+	const double f0_3 = -f0 * m_A8;
+	m_A10 += m_A1 * f0_3;
+	m_A11 += m_A2 * f0_3;
+	RHS3 += f0_3 * RHS0;
+	const double f0_4 = -f0 * m_A13;
+	m_A15 += m_A1 * f0_4;
+	m_A16 += m_A2 * f0_4;
+	RHS4 += f0_4 * RHS0;
+	const double f1 = 1.0 / m_A3;
+	const double f1_3 = -f1 * m_A9;
+	m_A10 += m_A4 * f1_3;
+	m_A11 += m_A5 * f1_3;
+	RHS3 += f1_3 * RHS1;
+	const double f1_4 = -f1 * m_A14;
+	m_A15 += m_A4 * f1_4;
+	m_A16 += m_A5 * f1_4;
+	RHS4 += f1_4 * RHS1;
+	const double f2 = 1.0 / m_A6;
+	const double f2_5 = -f2 * m_A18;
+	m_A21 += m_A7 * f2_5;
+	RHS5 += f2_5 * RHS2;
+	const double f3 = 1.0 / m_A10;
+	const double f3_4 = -f3 * m_A15;
+	m_A16 += m_A11 * f3_4;
+	m_A17 += m_A12 * f3_4;
+	RHS4 += f3_4 * RHS3;
+	const double f3_5 = -f3 * m_A19;
+	m_A20 += m_A11 * f3_5;
+	m_A21 += m_A12 * f3_5;
+	RHS5 += f3_5 * RHS3;
+	const double f4 = 1.0 / m_A16;
+	const double f4_5 = -f4 * m_A20;
+	m_A21 += m_A17 * f4_5;
+	RHS5 += f4_5 * RHS4;
+	V[5] = RHS5 / m_A21;
+	double tmp4 = 0.0;
+	tmp4 += m_A17 * V[5];
+	V[4] = (RHS4 - tmp4) / m_A16;
+	double tmp3 = 0.0;
+	tmp3 += m_A11 * V[4];
+	tmp3 += m_A12 * V[5];
+	V[3] = (RHS3 - tmp3) / m_A10;
+	double tmp2 = 0.0;
+	tmp2 += m_A7 * V[5];
+	V[2] = (RHS2 - tmp2) / m_A6;
+	double tmp1 = 0.0;
+	tmp1 += m_A4 * V[3];
+	tmp1 += m_A5 * V[4];
+	V[1] = (RHS1 - tmp1) / m_A3;
+	double tmp0 = 0.0;
+	tmp0 += m_A1 * V[3];
+	tmp0 += m_A2 * V[4];
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
@@ -71784,6 +71837,151 @@ static void nl_gcr_31_double_double_5ccf7da1202da2e5(double * __restrict V, cons
 	V[1] = (RHS1 - tmp1) / m_A2;
 	double tmp0 = 0.0;
 	tmp0 += m_A1 * V[9];
+	V[0] = (RHS0 - tmp0) / m_A0;
+}
+
+// tank,gamemachine
+static void nl_gcr_19_double_double_491f95430bfdfd05(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
+
+{
+
+	plib::unused_var(cnV);
+	double m_A0(0.0);
+	double m_A1(0.0);
+	double m_A2(0.0);
+	double m_A3(0.0);
+	double m_A4(0.0);
+	double m_A5(0.0);
+	double m_A6(0.0);
+	double m_A7(0.0);
+	double m_A8(0.0);
+	double m_A9(0.0);
+	double m_A10(0.0);
+	double m_A11(0.0);
+	double m_A12(0.0);
+	double m_A13(0.0);
+	double m_A14(0.0);
+	double m_A15(0.0);
+	double m_A16(0.0);
+	double m_A17(0.0);
+	double m_A18(0.0);
+	m_A0 += gt[0];
+	m_A0 += gt[1];
+	m_A0 += gt[2];
+	m_A1 += go[0];
+	double RHS0 = Idr[0];
+	RHS0 += Idr[1];
+	RHS0 += Idr[2];
+	RHS0 -= go[1] * *cnV[1];
+	RHS0 -= go[2] * *cnV[2];
+	m_A2 += gt[3];
+	m_A2 += gt[4];
+	m_A2 += gt[5];
+	m_A3 += go[3];
+	double RHS1 = Idr[3];
+	RHS1 += Idr[4];
+	RHS1 += Idr[5];
+	RHS1 -= go[4] * *cnV[4];
+	RHS1 -= go[5] * *cnV[5];
+	m_A4 += gt[6];
+	m_A4 += gt[7];
+	m_A4 += gt[8];
+	m_A5 += go[6];
+	double RHS2 = Idr[6];
+	RHS2 += Idr[7];
+	RHS2 += Idr[8];
+	RHS2 -= go[7] * *cnV[7];
+	RHS2 -= go[8] * *cnV[8];
+	m_A6 += gt[9];
+	m_A6 += gt[10];
+	m_A6 += gt[11];
+	m_A7 += go[9];
+	double RHS3 = Idr[9];
+	RHS3 += Idr[10];
+	RHS3 += Idr[11];
+	RHS3 -= go[10] * *cnV[10];
+	RHS3 -= go[11] * *cnV[11];
+	m_A8 += gt[12];
+	m_A8 += gt[13];
+	m_A8 += gt[14];
+	m_A9 += go[12];
+	double RHS4 = Idr[12];
+	RHS4 += Idr[13];
+	RHS4 += Idr[14];
+	RHS4 -= go[13] * *cnV[13];
+	RHS4 -= go[14] * *cnV[14];
+	m_A10 += gt[15];
+	m_A10 += gt[16];
+	m_A10 += gt[17];
+	m_A11 += go[15];
+	double RHS5 = Idr[15];
+	RHS5 += Idr[16];
+	RHS5 += Idr[17];
+	RHS5 -= go[16] * *cnV[16];
+	RHS5 -= go[17] * *cnV[17];
+	m_A18 += gt[18];
+	m_A18 += gt[19];
+	m_A18 += gt[20];
+	m_A18 += gt[21];
+	m_A18 += gt[22];
+	m_A18 += gt[23];
+	m_A18 += gt[24];
+	m_A17 += go[18];
+	m_A16 += go[19];
+	m_A15 += go[20];
+	m_A14 += go[21];
+	m_A13 += go[22];
+	m_A12 += go[23];
+	double RHS6 = Idr[18];
+	RHS6 += Idr[19];
+	RHS6 += Idr[20];
+	RHS6 += Idr[21];
+	RHS6 += Idr[22];
+	RHS6 += Idr[23];
+	RHS6 += Idr[24];
+	RHS6 -= go[24] * *cnV[24];
+	const double f0 = 1.0 / m_A0;
+	const double f0_6 = -f0 * m_A12;
+	m_A18 += m_A1 * f0_6;
+	RHS6 += f0_6 * RHS0;
+	const double f1 = 1.0 / m_A2;
+	const double f1_6 = -f1 * m_A13;
+	m_A18 += m_A3 * f1_6;
+	RHS6 += f1_6 * RHS1;
+	const double f2 = 1.0 / m_A4;
+	const double f2_6 = -f2 * m_A14;
+	m_A18 += m_A5 * f2_6;
+	RHS6 += f2_6 * RHS2;
+	const double f3 = 1.0 / m_A6;
+	const double f3_6 = -f3 * m_A15;
+	m_A18 += m_A7 * f3_6;
+	RHS6 += f3_6 * RHS3;
+	const double f4 = 1.0 / m_A8;
+	const double f4_6 = -f4 * m_A16;
+	m_A18 += m_A9 * f4_6;
+	RHS6 += f4_6 * RHS4;
+	const double f5 = 1.0 / m_A10;
+	const double f5_6 = -f5 * m_A17;
+	m_A18 += m_A11 * f5_6;
+	RHS6 += f5_6 * RHS5;
+	V[6] = RHS6 / m_A18;
+	double tmp5 = 0.0;
+	tmp5 += m_A11 * V[6];
+	V[5] = (RHS5 - tmp5) / m_A10;
+	double tmp4 = 0.0;
+	tmp4 += m_A9 * V[6];
+	V[4] = (RHS4 - tmp4) / m_A8;
+	double tmp3 = 0.0;
+	tmp3 += m_A7 * V[6];
+	V[3] = (RHS3 - tmp3) / m_A6;
+	double tmp2 = 0.0;
+	tmp2 += m_A5 * V[6];
+	V[2] = (RHS2 - tmp2) / m_A4;
+	double tmp1 = 0.0;
+	tmp1 += m_A3 * V[6];
+	V[1] = (RHS1 - tmp1) / m_A2;
+	double tmp0 = 0.0;
+	tmp0 += m_A1 * V[6];
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
@@ -80133,8 +80331,6 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_57_double_double_bb501e6a23177009", reinterpret_cast<void *>(&nl_gcr_57_double_double_bb501e6a23177009)}, // NOLINT
 // 280zzzap
 	{"nl_gcr_95_double_double_24643c159711f292", reinterpret_cast<void *>(&nl_gcr_95_double_double_24643c159711f292)}, // NOLINT
-// armora,solarq,starcas,wotw
-	{"nl_gcr_22_double_double_1250f340dea396ae", reinterpret_cast<void *>(&nl_gcr_22_double_double_1250f340dea396ae)}, // NOLINT
 // armora
 	{"nl_gcr_22_double_double_a6cfda6668b153c2", reinterpret_cast<void *>(&nl_gcr_22_double_double_a6cfda6668b153c2)}, // NOLINT
 // armora,boxingb
@@ -80163,8 +80359,6 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_43_double_double_cf1018e7ed626623", reinterpret_cast<void *>(&nl_gcr_43_double_double_cf1018e7ed626623)}, // NOLINT
 // astrob
 	{"nl_gcr_46_double_double_536c3652eb3bc075", reinterpret_cast<void *>(&nl_gcr_46_double_double_536c3652eb3bc075)}, // NOLINT
-// astrob,cheekyms,fireone,speedfrk,rebound
-	{"nl_gcr_7_double_double_7c86a9bc1c6aef4c", reinterpret_cast<void *>(&nl_gcr_7_double_double_7c86a9bc1c6aef4c)}, // NOLINT
 // barrier,spacewar
 	{"nl_gcr_10_double_double_a50a4b733e95414a", reinterpret_cast<void *>(&nl_gcr_10_double_double_a50a4b733e95414a)}, // NOLINT
 // barrier,spacewar
@@ -80179,8 +80373,6 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_31_double_double_79e756c5892cf87d", reinterpret_cast<void *>(&nl_gcr_31_double_double_79e756c5892cf87d)}, // NOLINT
 // barrier,spacewar
 	{"nl_gcr_47_double_double_6ef39a62161d596c", reinterpret_cast<void *>(&nl_gcr_47_double_double_6ef39a62161d596c)}, // NOLINT
-// boxingb,solarq
-	{"nl_gcr_10_double_double_d7d45dc58b08cab9", reinterpret_cast<void *>(&nl_gcr_10_double_double_d7d45dc58b08cab9)}, // NOLINT
 // boxingb
 	{"nl_gcr_16_double_double_50f5194a994d56ec", reinterpret_cast<void *>(&nl_gcr_16_double_double_50f5194a994d56ec)}, // NOLINT
 // boxingb
@@ -80189,8 +80381,6 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_22_double_double_a6b734322b3ea924", reinterpret_cast<void *>(&nl_gcr_22_double_double_a6b734322b3ea924)}, // NOLINT
 // boxingb
 	{"nl_gcr_23_double_double_53e1117fdb16f546", reinterpret_cast<void *>(&nl_gcr_23_double_double_53e1117fdb16f546)}, // NOLINT
-// boxingb,starcas,wotw
-	{"nl_gcr_23_double_double_ea2b6e3a05e6ef0b", reinterpret_cast<void *>(&nl_gcr_23_double_double_ea2b6e3a05e6ef0b)}, // NOLINT
 // boxingb
 	{"nl_gcr_23_double_double_f43cf2a28a5a5561", reinterpret_cast<void *>(&nl_gcr_23_double_double_f43cf2a28a5a5561)}, // NOLINT
 // boxingb
@@ -80221,7 +80411,7 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_75_double_double_75400df5d559a266", reinterpret_cast<void *>(&nl_gcr_75_double_double_75400df5d559a266)}, // NOLINT
 // brdrline
 	{"nl_gcr_77_double_double_437326911721091", reinterpret_cast<void *>(&nl_gcr_77_double_double_437326911721091)}, // NOLINT
-// brdrline,dpatrol,stuntcyc
+// brdrline,stuntcyc
 	{"nl_gcr_7_double_double_59cb6bf7cb9d17dc", reinterpret_cast<void *>(&nl_gcr_7_double_double_59cb6bf7cb9d17dc)}, // NOLINT
 // brdrline
 	{"nl_gcr_83_double_double_f99b1245e708ec85", reinterpret_cast<void *>(&nl_gcr_83_double_double_f99b1245e708ec85)}, // NOLINT
@@ -80257,12 +80447,6 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_16_double_double_8c0f7f2284333de5", reinterpret_cast<void *>(&nl_gcr_16_double_double_8c0f7f2284333de5)}, // NOLINT
 // destroyr
 	{"nl_gcr_399_double_double_4334c95878d1be92", reinterpret_cast<void *>(&nl_gcr_399_double_double_4334c95878d1be92)}, // NOLINT
-// dpatrol,stuntcyc
-	{"nl_gcr_10_double_double_85652d3e3ada285a", reinterpret_cast<void *>(&nl_gcr_10_double_double_85652d3e3ada285a)}, // NOLINT
-// dpatrol
-	{"nl_gcr_20_double_double_18f4d9160b51d613", reinterpret_cast<void *>(&nl_gcr_20_double_double_18f4d9160b51d613)}, // NOLINT
-// dpatrol,stuntcyc
-	{"nl_gcr_22_double_double_ca68d70bd8f2f62e", reinterpret_cast<void *>(&nl_gcr_22_double_double_ca68d70bd8f2f62e)}, // NOLINT
 // elim,zektor
 	{"nl_gcr_10_double_double_11c2ae166b240b6e", reinterpret_cast<void *>(&nl_gcr_10_double_double_11c2ae166b240b6e)}, // NOLINT
 // elim,zektor
@@ -80307,6 +80491,8 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_73_double_double_643133e86b2b1628", reinterpret_cast<void *>(&nl_gcr_73_double_double_643133e86b2b1628)}, // NOLINT
 // fireone
 	{"nl_gcr_79_double_double_c1d22fe6e895255d", reinterpret_cast<void *>(&nl_gcr_79_double_double_c1d22fe6e895255d)}, // NOLINT
+// fireone,astrob,rebound,speedfrk,cheekyms
+	{"nl_gcr_7_double_double_7c86a9bc1c6aef4c", reinterpret_cast<void *>(&nl_gcr_7_double_double_7c86a9bc1c6aef4c)}, // NOLINT
 // fireone
 	{"nl_gcr_7_double_double_e7fb484f621b3ab9", reinterpret_cast<void *>(&nl_gcr_7_double_double_e7fb484f621b3ab9)}, // NOLINT
 // fireone
@@ -80337,8 +80523,6 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_9_double_double_815733e3f2e05029", reinterpret_cast<void *>(&nl_gcr_9_double_double_815733e3f2e05029)}, // NOLINT
 // gamemachine
 	{"nl_gcr_10_double_double_934712b55bb3b2b2", reinterpret_cast<void *>(&nl_gcr_10_double_double_934712b55bb3b2b2)}, // NOLINT
-// gamemachine,tank
-	{"nl_gcr_19_double_double_491f95430bfdfd05", reinterpret_cast<void *>(&nl_gcr_19_double_double_491f95430bfdfd05)}, // NOLINT
 // gamemachine
 	{"nl_gcr_7_double_double_782d79b5cbe953b1", reinterpret_cast<void *>(&nl_gcr_7_double_double_782d79b5cbe953b1)}, // NOLINT
 // gtrak10
@@ -80347,6 +80531,8 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_112_double_double_743595e64cee0a5e", reinterpret_cast<void *>(&nl_gcr_112_double_double_743595e64cee0a5e)}, // NOLINT
 // gunfight
 	{"nl_gcr_14_double_double_d05b3dbe370c7904", reinterpret_cast<void *>(&nl_gcr_14_double_double_d05b3dbe370c7904)}, // NOLINT
+// jpmsru
+	{"nl_gcr_55_double_double_4963a2f104e4c797", reinterpret_cast<void *>(&nl_gcr_55_double_double_4963a2f104e4c797)}, // NOLINT
 // kidniki
 	{"nl_gcr_198_double_double_43f7ff9bc651cc7a", reinterpret_cast<void *>(&nl_gcr_198_double_double_43f7ff9bc651cc7a)}, // NOLINT
 // kidniki
@@ -80407,12 +80593,12 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_30_double_double_8cc4eb213eaeef9b", reinterpret_cast<void *>(&nl_gcr_30_double_double_8cc4eb213eaeef9b)}, // NOLINT
 // segausb
 	{"nl_gcr_84_double_double_c61e08cf5e35918", reinterpret_cast<void *>(&nl_gcr_84_double_double_c61e08cf5e35918)}, // NOLINT
+// solarq,boxingb
+	{"nl_gcr_10_double_double_d7d45dc58b08cab9", reinterpret_cast<void *>(&nl_gcr_10_double_double_d7d45dc58b08cab9)}, // NOLINT
 // solarq
 	{"nl_gcr_15_double_double_7caaa135bff3d9f3", reinterpret_cast<void *>(&nl_gcr_15_double_double_7caaa135bff3d9f3)}, // NOLINT
 // solarq
 	{"nl_gcr_20_double_double_66496d6073aca98e", reinterpret_cast<void *>(&nl_gcr_20_double_double_66496d6073aca98e)}, // NOLINT
-// solarq,starcas,wotw
-	{"nl_gcr_25_double_double_4cb524006206eb1a", reinterpret_cast<void *>(&nl_gcr_25_double_double_4cb524006206eb1a)}, // NOLINT
 // solarq
 	{"nl_gcr_303_double_double_62612f71055b8fd4", reinterpret_cast<void *>(&nl_gcr_303_double_double_62612f71055b8fd4)}, // NOLINT
 // solarq
@@ -80465,6 +80651,12 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_109_double_double_5d550fc7441617a2", reinterpret_cast<void *>(&nl_gcr_109_double_double_5d550fc7441617a2)}, // NOLINT
 // starcas,wotw
 	{"nl_gcr_12_double_double_88a8ef5f6bd43d48", reinterpret_cast<void *>(&nl_gcr_12_double_double_88a8ef5f6bd43d48)}, // NOLINT
+// starcas,wotw,solarq,armora
+	{"nl_gcr_22_double_double_1250f340dea396ae", reinterpret_cast<void *>(&nl_gcr_22_double_double_1250f340dea396ae)}, // NOLINT
+// starcas,wotw,boxingb
+	{"nl_gcr_23_double_double_ea2b6e3a05e6ef0b", reinterpret_cast<void *>(&nl_gcr_23_double_double_ea2b6e3a05e6ef0b)}, // NOLINT
+// starcas,wotw,solarq
+	{"nl_gcr_25_double_double_4cb524006206eb1a", reinterpret_cast<void *>(&nl_gcr_25_double_double_4cb524006206eb1a)}, // NOLINT
 // starcas,wotw
 	{"nl_gcr_62_double_double_a582a424cb61c678", reinterpret_cast<void *>(&nl_gcr_62_double_double_a582a424cb61c678)}, // NOLINT
 // starcas,wotw
@@ -80500,7 +80692,11 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 // starhawk
 	{"nl_gcr_7_double_double_723fa454468a93d", reinterpret_cast<void *>(&nl_gcr_7_double_double_723fa454468a93d)}, // NOLINT
 // stuntcyc
+	{"nl_gcr_10_double_double_85652d3e3ada285a", reinterpret_cast<void *>(&nl_gcr_10_double_double_85652d3e3ada285a)}, // NOLINT
+// stuntcyc
 	{"nl_gcr_20_double_double_c924fe5960b1479e", reinterpret_cast<void *>(&nl_gcr_20_double_double_c924fe5960b1479e)}, // NOLINT
+// stuntcyc
+	{"nl_gcr_22_double_double_ca68d70bd8f2f62e", reinterpret_cast<void *>(&nl_gcr_22_double_double_ca68d70bd8f2f62e)}, // NOLINT
 // sundance
 	{"nl_gcr_100_double_double_e02a162cb515a958", reinterpret_cast<void *>(&nl_gcr_100_double_double_e02a162cb515a958)}, // NOLINT
 // sundance,warrior
@@ -80519,6 +80715,8 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_23_double_double_c4cec7aed23b7b94", reinterpret_cast<void *>(&nl_gcr_23_double_double_c4cec7aed23b7b94)}, // NOLINT
 // tailg
 	{"nl_gcr_31_double_double_5ccf7da1202da2e5", reinterpret_cast<void *>(&nl_gcr_31_double_double_5ccf7da1202da2e5)}, // NOLINT
+// tank,gamemachine
+	{"nl_gcr_19_double_double_491f95430bfdfd05", reinterpret_cast<void *>(&nl_gcr_19_double_double_491f95430bfdfd05)}, // NOLINT
 // tank
 	{"nl_gcr_328_double_double_930b64361c2cdba8", reinterpret_cast<void *>(&nl_gcr_328_double_double_930b64361c2cdba8)}, // NOLINT
 // tank

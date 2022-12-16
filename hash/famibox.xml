@@ -30,20 +30,18 @@ SSS-UNROM-01, SSS-UN1ROM-01, SSS-UNEPROM-02: these have 8K VRAM, and H/V solder 
 
 SSS-SLROM-0*: MMC1 boards.
 
-SSS-PNROM-01: MMC2 board.
+SSS-PNROM-0*: MMC2 boards.
 
 SSS-TLEPROM-01: EPROM variant of a TLROM board with MMC3.
 
 
 TODO
 ====
-Unverified dumps: 1943, Donald Land, Kame no Ongaeshi
-
-Missing dumps: Punch-Out!!
+Unverified dumps: Donald Land, Kame no Ongaeshi
 
 Unverified PCB info: Bomberman, Devil World, Donald Land, Donkey Kong, Donkey Kong Jr., Fighting Golf,
 Gomoku Narabe Renju, Hogan's Alley, Ice Climber, Ice Hockey, Kame no Ongaeshi - Urashima Densetsu,
-Knight Rider, Mike Tyson's Punch-Out!!, Ninja Ryukenden, Punch-Out!!, Rockman, Senjou no Ookami,
+Knight Rider, Mike Tyson's Punch-Out!!, Ninja Ryukenden, Rockman, Senjou no Ookami,
 Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 -->
 
@@ -54,9 +52,11 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="SSS-UNEPROM-02" />
-			<feature name="mirroring" value="horizontal" /> <!-- real dump is vertical? -->
+			<!-- PCBs with the H pad soldered and neither H/V pads soldered have been seen.
+			     Both seem to be manufacturing errors and result in glitches on hardware (and in MAME). -->
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="0x20000">
-				<rom name="sss-43 prg" size="0x20000" crc="4e42f13a" sha1="619c8c45c14bb26fee93d0f8646127f30e336128" status="baddump" /> <!-- dump taken from Famicom -->
+				<rom name="sss-43 prg" size="0x20000" crc="b4b16c39" sha1="13c006381f6d293328f2a445e1a467eb87cdab39" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="0x2000">
@@ -530,23 +530,21 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 		</part>
 	</software>
 
-<!--
-    <software name="punchout">
-        <description>Punch-Out!!</description>
-        <year>1990</year>
-        <publisher>Nintendo</publisher>
-        <part name="cart" interface="nes_cart">
-            <feature name="slot" value="pxrom" />
-            <feature name="pcb" value="SSS-PNROM??" />
-            <dataarea name="prg" size="0x20000">
-                <rom name="nes-qp-0 prg" size="0x20000" crc="" sha1="" />
-            </dataarea>
-            <dataarea name="chr" size="0x20000">
-                <rom name="nes-qp-0 chr" size="0x20000" crc="" sha1="" />
-            </dataarea>
-        </part>
-    </software>
--->
+	<software name="punchout" cloneof="tysonpo">
+		<description>Punch-Out!!</description>
+		<year>1990</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="pxrom" />
+			<feature name="pcb" value="SSS-PNROM-02" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="sss-qp prg.u1" size="0x20000" crc="6bfb33d2" sha1="5aa784bb8512657ad0fa6c2feac9d35b0574876b" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="sss-qp chr.u2" size="0x20000" crc="45d0c815" sha1="aafeb629784bdd93035b4607eeec5446d7aeb7e9" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="rockman">
 		<description>Rockman</description>

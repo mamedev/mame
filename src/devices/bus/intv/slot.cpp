@@ -116,11 +116,11 @@ device_intv_cart_interface::~device_intv_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_intv_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_intv_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(INTVSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		memset(m_rom, 0xff, size);
 		m_rom_size = size;
 	}
@@ -251,7 +251,7 @@ image_init_result intv_cart_slot_device::load_fullpath()
 		if (temp != (num_segments ^ 0xff))
 			return image_init_result::FAIL;
 
-		m_cart->rom_alloc(0x20000, tag());
+		m_cart->rom_alloc(0x20000);
 		ROM = (uint8_t *)m_cart->get_rom_base();
 
 		for (int i = 0; i < num_segments; i++)
@@ -300,7 +300,7 @@ image_init_result intv_cart_slot_device::load_fullpath()
 		int mapper, rom[5], ram, extra;
 		std::string extrainfo;
 
-		m_cart->rom_alloc(0x20000, tag());
+		m_cart->rom_alloc(0x20000);
 		ROM = (uint8_t *)m_cart->get_rom_base();
 
 		if (!hashfile_extrainfo(*this, extrainfo))
@@ -401,7 +401,7 @@ image_init_result intv_cart_slot_device::call_load()
 			uint16_t address;
 			uint8_t *ROM, *region;
 
-			m_cart->rom_alloc(extra_bank ? 0x22000 : 0x20000, tag());
+			m_cart->rom_alloc(extra_bank ? 0x22000 : 0x20000);
 			ROM = m_cart->get_rom_base();
 
 			for (int i = 0; i < 16; i++)

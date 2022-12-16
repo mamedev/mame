@@ -63,6 +63,15 @@ void pcf2100_device::device_start()
 	attotime period = attotime::from_hz(clock());
 	m_lcd_timer->adjust(period, 0, period);
 
+	// zerofill
+	m_shift = 0;
+	m_count = 0;
+	m_bpout = 0;
+	std::fill_n(m_latch, std::size(m_latch), 0);
+	m_clb = 0;
+	m_data = 0;
+	m_dlen = 0;
+
 	// register for savestates
 	save_item(NAME(m_shift));
 	save_item(NAME(m_count));

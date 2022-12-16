@@ -31,7 +31,7 @@ void srmp2_state::srmp3_palette(palette_device &palette) const
 	}
 }
 
-SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp2_state::srmp3_gfxbank_callback)
+X1_001_SPRITE_GFXBANK_CB_MEMBER(srmp2_state::srmp3_gfxbank_callback)
 {
 	return (code & 0x3fff) + ((code & 0x2000) ? (m_gfx_bank<<13) : 0);
 }
@@ -41,9 +41,9 @@ uint32_t srmp2_state::screen_update_srmp2(screen_device &screen, bitmap_ind16 &b
 {
 	bitmap.fill(0x1ff, cliprect);
 
-	m_seta001->set_colorbase(m_color_bank<<5);
+	m_spritegen->set_colorbase(m_color_bank<<5);
 
-	m_seta001->draw_sprites(screen,bitmap,cliprect,0x1000);
+	m_spritegen->draw_sprites(screen,bitmap,cliprect,0x1000);
 	return 0;
 }
 
@@ -51,6 +51,6 @@ uint32_t srmp2_state::screen_update_srmp3(screen_device &screen, bitmap_ind16 &b
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(screen,bitmap,cliprect,0x1000);
+	m_spritegen->draw_sprites(screen,bitmap,cliprect,0x1000);
 	return 0;
 }

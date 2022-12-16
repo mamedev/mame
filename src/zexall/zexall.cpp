@@ -4,7 +4,7 @@
 
   This is a simplified version of the zexall driver, merely as an example for a standalone
   emulator build. Video terminal and user interface is removed. For full notes and proper
-  emulation driver, see src/drivers/zexall.cpp.
+  emulation driver, see src/mame/homebrew/zexall.cpp.
 
 ******************************************************************************/
 
@@ -16,8 +16,8 @@
 class zexall_state : public driver_device
 {
 public:
-	zexall_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	zexall_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_main_ram(*this, "main_ram")
 	{
@@ -32,6 +32,7 @@ public:
 
 	void z80_mem(address_map &map);
 	void zexall(machine_config &config);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_main_ram;

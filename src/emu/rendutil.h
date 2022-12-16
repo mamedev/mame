@@ -15,6 +15,8 @@
 
 #include "rendertypes.h"
 
+#include "utilfwd.h"
+
 #include <algorithm>
 #include <cmath>
 #include <utility>

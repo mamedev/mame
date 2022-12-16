@@ -1998,7 +1998,7 @@ void n64_rdp::draw_triangle(uint64_t *cmd_buf, bool shade, bool texture, bool zb
 	const int32_t dzdy_dz = (dzdy >> 16) & 0xffff;
 	const int32_t dzdx_dz = (dzdx >> 16) & 0xffff;
 
-	extent_t spans[2048];
+	extent_t spans[4096];
 #ifdef MAME_DEBUG
 	memset(spans, 0xcc, sizeof(spans));
 #endif
@@ -2111,7 +2111,7 @@ void n64_rdp::draw_triangle(uint64_t *cmd_buf, bool shade, bool texture, bool zb
 		const int32_t  spix = k & 3;
 		bool valid_y = !(k < yh || k >= yl);
 
-		if (spanidx >= 0 && spanidx < 2048)
+		if (spanidx >= 0 && spanidx < 4096)
 		{
 			majorxint[spix] = xend;
 			minorxint[spix] = xstart;

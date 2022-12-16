@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "dma.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL ( 0 )
 
 static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
@@ -35,24 +37,23 @@ psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, dev
 
 void psxdma_device::device_reset()
 {
-	int n;
-
 	m_dpcp = 0;
 	m_dicr = 0;
 
-	for( n = 0; n < 7; n++ )
+	for (int n = 0; n < 7; n++)
 	{
-		dma_stop_timer( n );
+		// FIXME: proper reset values
+		m_channel[n].n_channelcontrol = 0;
+		m_channel[n].b_running = 0;
+		dma_stop_timer(n);
 	}
 }
 
 void psxdma_device::device_post_load()
 {
-	int n;
-
-	for( n = 0; n < 7; n++ )
+	for (int n = 0; n < 7; n++)
 	{
-		dma_timer_adjust( n );
+		dma_timer_adjust(n);
 	}
 }
 
@@ -90,7 +91,7 @@ void psxdma_device::dma_stop_timer( int index )
 {
 	psx_dma_channel *dma = &m_channel[ index ];
 
-	dma->timer->adjust( attotime::never);
+	dma->timer->adjust(attotime::never);
 	dma->b_running = 0;
 }
 

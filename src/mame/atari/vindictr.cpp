@@ -22,7 +22,7 @@
 #include "emu.h"
 #include "vindictr.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
@@ -79,7 +79,7 @@ void vindictr_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x3fffff);
 	map(0x000000, 0x05ffff).rom();
-	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x0e0000, 0x0e03ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
 	map(0x260010, 0x26001f).r(FUNC(vindictr_state::port1_r));

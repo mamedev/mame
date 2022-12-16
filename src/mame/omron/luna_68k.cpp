@@ -26,7 +26,7 @@
  */
 #include "emu.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 
 // memory
 #include "machine/ram.h"

@@ -422,7 +422,7 @@ public:
 		m_iec->host_clk_w(!BIT(data, 4));
 		m_iec->host_data_w(!BIT(data, 5));
 
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(2000));
+		machine().scheduler().perfect_quantum(attotime::from_usec(2000));
 	}
 
 	WRITE_LINE_MEMBER(write_sl)

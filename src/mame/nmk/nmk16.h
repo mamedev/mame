@@ -67,6 +67,7 @@ public:
 	void blkheart(machine_config &config);
 	void manybloc(machine_config &config);
 	void acrobatm(machine_config &config);
+	void acrobatmbl(machine_config &config);
 	void strahl(machine_config &config);
 	void strahljbl(machine_config &config);
 	void tdragon3h(machine_config &config);
@@ -89,6 +90,7 @@ public:
 	void init_banked_audiocpu();
 	void init_gunnailb();
 	void init_bjtwin();
+	void init_acrobatmbl();
 
 protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
@@ -206,6 +208,7 @@ protected:
 	void decode_ssmissin();
 
 	void acrobatm_map(address_map &map);
+	void acrobatmbl_map(address_map &map);
 	void bioship_map(address_map &map);
 	void bjtwin_map(address_map &map);
 	void gunnail_map(address_map &map);

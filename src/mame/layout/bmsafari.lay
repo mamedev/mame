@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<element name="green"><rect><color red="0.4" green="1.0" blue="0.4" /></rect></element>
+
+	<view name="Internal Layout">
+		<screen index="0"><bounds x="0" y="0" width="~scr0width~" height="~scr0height~" /></screen>
+		<collection name="Color Overlay">
+			<element ref="green" blend="multiply"><bounds x="0" y="0" width="~scr0width~" height="~scr0height~" /></element>
+		</collection>
+	</view>
+
+</mamelayout>

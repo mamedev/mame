@@ -2,19 +2,15 @@
 // copyright-holders:F. Ulivi
 // I/O controller for Intel Intellec MDS series-II
 //
-// NOTE:
-// Firmware running on PIO is NOT original because a dump is not available at the moment.
-// Emulator runs a version of PIO firmware that was specifically developed by me to implement
-// line printer output.
-//
 // TODO:
-// - Find a dump of the original PIO firmware
 // - Adjust speed of processors. Wait states are not accounted for yet.
 
 #include "emu.h"
 #include "imds2ioc.h"
 #include "screen.h"
 #include "speaker.h"
+#include "formats/img_dsk.h"
+#include "formats/fs_isis.h"
 
 // Main oscillator of IOC board: 22.032 MHz
 #define IOC_XTAL_Y2     22.032_MHz_XTAL
@@ -328,20 +324,10 @@ WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_ack_w)
 
 WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_busy_w)
 {
-	// Busy is active high in centronics_device whereas it's active low in MDS
-	if (!state) {
+	if (state) {
 		m_device_status_byte |= 0x10;
 	} else {
 		m_device_status_byte &= ~0x10;
-	}
-}
-
-WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_select_w)
-{
-	if (state) {
-		m_device_status_byte |= 0x40;
-	} else {
-		m_device_status_byte &= ~0x40;
 	}
 }
 
@@ -562,6 +548,13 @@ static void imds2_floppies(device_slot_interface &device)
 	device.option_add("8sssd", FLOPPY_8_SSSD);
 }
 
+static void imds2_floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_IMG_FORMAT);
+	fr.add(fs::ISIS);
+}
+
 void imds2ioc_device::device_add_mconfig(machine_config &config)
 {
 	I8080A(config, m_ioccpu, IOC_XTAL_Y2 / 18);     // 2.448 MHz but running at 50% (due to wait states & DMA usage of bus)
@@ -624,7 +617,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 
 	I8271(config, m_iocfdc, IOC_XTAL_Y1 / 2);
 	m_iocfdc->drq_wr_callback().set(m_iocdma, FUNC(i8257_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, "iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "iocfdc:0", imds2_floppies, "8sssd", imds2_floppy_formats, true);
 
 	I8041A(config, m_iocpio, IOC_XTAL_Y3);
 	m_iocpio->p1_in_cb().set(FUNC(imds2ioc_device::pio_port_p1_r));
@@ -641,7 +634,6 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(FUNC(imds2ioc_device::pio_lpt_ack_w));
 	m_centronics->busy_handler().set(FUNC(imds2ioc_device::pio_lpt_busy_w));
-	m_centronics->perror_handler().set(FUNC(imds2ioc_device::pio_lpt_select_w));
 }
 
 ROM_START(imds2ioc)
@@ -665,10 +657,8 @@ ROM_START(imds2ioc)
 	ROMX_LOAD("104593-004.a53", 0x1800, 0x0800, CRC(04407e2a) SHA1(ecd65e4337d2bb7f5f6fdaae95696c9207ba57ee), ROM_BIOS(2))
 
 	// ROM definition of PIO controller (8041A)
-	// For the time being a specially developed PIO firmware is used until a dump of the original PIO is
-	// available.
 	ROM_REGION(0x400, "iocpio", 0)
-	ROM_LOAD("pio_a72.bin", 0, 0x400, BAD_DUMP CRC(8c8e740b) SHA1(9b9333a9dc9585aa8f630721d13e551a5c87defc))
+	ROM_LOAD("104566-0012.bin", 0, 0x400, CRC(f999e5da) SHA1(77ac1fab5443a16f906b25926ab3ba3ae42db6bb))
 
 	// ROM definition of keyboard controller (8741)
 	ROM_REGION(0x400, "kbcpu", 0)

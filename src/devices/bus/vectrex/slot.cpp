@@ -44,11 +44,11 @@ device_vectrex_cart_interface::~device_vectrex_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vectrex_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_vectrex_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(VECSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -149,7 +149,7 @@ image_init_result vectrex_cart_slot_device::call_load()
 			return image_init_result::FAIL;
 		}
 
-		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size, tag());
+		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size);
 		ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())

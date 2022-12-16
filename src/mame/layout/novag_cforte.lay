@@ -142,12 +142,12 @@ license:CC0
 	<element name="text_r8a"><text string="Go"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_r8b"><text string=" "><color red="0.51" green="0.5" blue="0.49" /></text></element>
 
-	<element name="text_p1"><image file="chess/bk.svg"><color alpha="0.85" /></image></element>
-	<element name="text_p2"><image file="chess/bq.svg"><color alpha="0.85" /></image></element>
-	<element name="text_p3"><image file="chess/bb.svg"><color alpha="0.85" /></image></element>
-	<element name="text_p4"><image file="chess/bn.svg"><color alpha="0.85" /></image></element>
-	<element name="text_p5"><image file="chess/br.svg"><color alpha="0.85" /></image></element>
-	<element name="text_p6"><image file="chess/bp.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p1"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bk.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p2"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bq.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p3"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bb.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p4"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bn.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p5"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/br.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p6"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
 
 
 <!-- sb board -->
@@ -536,12 +536,12 @@ license:CC0
 		<element ref="white"><bounds x="101.4" y="70.44" width="5.7" height="3.7" /></element>
 		<element ref="static_red"><bounds x="101.4" y="78.15" width="5.7" height="3.7" /></element>
 
-		<element ref="text_p1"><bounds x="93.18" y="24.50" width="2.9" height="2.9" /></element>
-		<element ref="text_p2"><bounds x="93.18" y="32.21" width="2.9" height="2.9" /></element>
-		<element ref="text_p3"><bounds x="93.18" y="39.93" width="2.9" height="2.9" /></element>
-		<element ref="text_p4"><bounds x="93.18" y="47.64" width="2.9" height="2.9" /></element>
-		<element ref="text_p5"><bounds x="93.18" y="55.36" width="2.9" height="2.9" /></element>
-		<element ref="text_p6"><bounds x="93.18" y="63.07" width="2.9" height="2.9" /></element>
+		<element ref="text_p1" blend="multiply"><bounds x="93.18" y="24.50" width="2.9" height="2.9" /></element>
+		<element ref="text_p2" blend="multiply"><bounds x="93.18" y="32.21" width="2.9" height="2.9" /></element>
+		<element ref="text_p3" blend="multiply"><bounds x="93.18" y="39.93" width="2.9" height="2.9" /></element>
+		<element ref="text_p4" blend="multiply"><bounds x="93.18" y="47.64" width="2.9" height="2.9" /></element>
+		<element ref="text_p5" blend="multiply"><bounds x="93.18" y="55.36" width="2.9" height="2.9" /></element>
+		<element ref="text_p6" blend="multiply"><bounds x="93.18" y="63.07" width="2.9" height="2.9" /></element>
 
 		<element ref="text_r2x"><bounds x="101.4" y="33.01" width="5.7" height="1.4" /></element>
 		<element ref="text_r3x"><bounds x="101.4" y="40.73" width="5.7" height="1.4" /></element>

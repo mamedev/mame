@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+
 #include "emu.h"
 #include "osdnet.h"
+
+#include "dinetwork.h"
 
 static class std::vector<std::unique_ptr<osd_netdev::entry_t>> netdev_list;
 

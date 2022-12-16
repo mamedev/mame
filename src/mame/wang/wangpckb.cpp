@@ -54,6 +54,8 @@ Notes:
 
 #include "speaker.h"
 
+#include "utf8.h"
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS

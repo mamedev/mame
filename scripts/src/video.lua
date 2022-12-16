@@ -10,6 +10,8 @@
 ---------------------------------------------------------------------------
 
 files {
+	MAME_DIR .. "src/devices/video/cgapal.cpp",
+	MAME_DIR .. "src/devices/video/cgapal.h",
 	MAME_DIR .. "src/devices/video/poly.h",
 	MAME_DIR .. "src/devices/video/sprite.cpp",
 	MAME_DIR .. "src/devices/video/sprite.h",
@@ -771,12 +773,6 @@ if (VIDEOS["MOS6566"]~=null) then
 	}
 end
 
-
-files {
-	MAME_DIR .. "src/devices/video/cgapal.cpp",
-	MAME_DIR .. "src/devices/video/cgapal.h",
-}
-
 --------------------------------------------------
 --
 --@src/devices/video/pc_vga.h,VIDEOS["PC_VGA"] = true
@@ -918,6 +914,17 @@ if (VIDEOS["SED1356"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/sed1356.cpp",
 		MAME_DIR .. "src/devices/video/sed1356.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/sed1375.h,VIDEOS["SED1375"] = true
+--------------------------------------------------
+if (VIDEOS["SED1375"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/sed1375.cpp",
+		MAME_DIR .. "src/devices/video/sed1375.h",
 	}
 end
 
@@ -1411,5 +1418,29 @@ if (VIDEOS["VRENDER0"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/vrender0.cpp",
 		MAME_DIR .. "src/devices/video/vrender0.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/avgdvg.h,VIDEOS["AVGDVG"] = true
+--------------------------------------------------
+
+if (VIDEOS["AVGDVG"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/avgdvg.cpp",
+		MAME_DIR .. "src/devices/video/avgdvg.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/x1_001.h,VIDEOS["X1_001"] = true
+--------------------------------------------------
+
+if (VIDEOS["X1_001"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/x1_001.cpp",
+		MAME_DIR .. "src/devices/video/x1_001.h",
 	}
 end

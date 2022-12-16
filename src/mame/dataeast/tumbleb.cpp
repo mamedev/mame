@@ -846,7 +846,7 @@ void tumbleb_state::semicom_soundcmd_w(offs_t offset, uint16_t data, uint16_t me
 		m_soundlatch->write(data & 0xff);
 		// needed for Super Trio which reads the sound with polling
 		// m_maincpu->spin_until_time(attotime::from_usec(100));
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+		machine().scheduler().perfect_quantum(attotime::from_usec(20));
 
 	}
 }

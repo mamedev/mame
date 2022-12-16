@@ -157,6 +157,8 @@ Notes:
 #include "softlist.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 
 void v1050_state::set_interrupt(int line, int state)
 {

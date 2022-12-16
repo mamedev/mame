@@ -1022,17 +1022,16 @@ void coco_state::poll_hires_joystick(void)
 
 			if (is_cocomax3)
 			{
-				value *= 2500.0;
-				value += 400.0;
-				duration = m_maincpu->clocks_to_attotime((uint64_t) value) * 2;
+				value *= 2885.0;
+				value += 380.0;
 			}
 			else /* Tandy Hi-Res Joystick Interface */
 			{
 				value *= 5850.0;
 				value += 535.0;
-				duration = attotime::from_usec(value);
 			}
 
+			duration = attotime::from_usec(value);
 			m_hiresjoy_transition_timer[axis]->adjust(duration);
 		}
 		else if (!m_hiresjoy_ca && newvalue)

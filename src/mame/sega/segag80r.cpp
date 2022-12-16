@@ -110,8 +110,7 @@
 #include "segag80r.h"
 #include "segag80_m.h"
 
-#include "segacrpt_device.h"
-
+#include "machine/segacrpt_device.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "speaker.h"

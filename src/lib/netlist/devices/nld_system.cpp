@@ -13,9 +13,9 @@
 
 namespace netlist::devices {
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// extclock
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	NETLIB_OBJECT(extclock)
 	{
@@ -107,6 +107,62 @@ namespace netlist::devices {
 		std::array<netlist_time, 32> m_inc;
 	};
 
+	// -------------------------------------------------------------------------
+	// sys_pulse
+	// -------------------------------------------------------------------------
+
+	NETLIB_OBJECT(sys_pulse)
+	{
+		NETLIB_CONSTRUCTOR(sys_pulse)
+		, m_I(*this, "I", NETLIB_DELEGATE(input))
+		, m_FB(*this, "FB", NETLIB_DELEGATE(feedback))
+		, m_Q(*this, "Q")
+		, m_delay(*this, "DELAY", 10)
+		, m_duration(*this, "DURATION", 100)
+		, m_invert_input(*this, "INVERT_INPUT", 1)
+		, m_invert_output(*this, "INVERT_OUTPUT", 1)
+		, m_last(*this, "m_last", 0)
+		{
+			connect(m_Q, m_FB);
+		}
+
+		//NETLIB_UPDATE_PARAMI();
+		NETLIB_RESETI()
+		{
+			//m_Q.initial(0);
+		}
+
+	private:
+		NETLIB_HANDLERI(input)
+		{
+			netlist_sig_t nval = m_I() ^ m_invert_input;
+			if (nval && !m_last)
+			{
+				// L_to_H
+				m_Q.push(1 ^ m_invert_output, NLTIME_FROM_NS(static_cast<unsigned>(m_delay())));
+			}
+			m_last = nval;
+		}
+
+		NETLIB_HANDLERI(feedback)
+		{
+			if (m_FB() == (1 ^ m_invert_output))
+				m_Q.push(0 ^ m_invert_output, NLTIME_FROM_NS(static_cast<unsigned>(m_duration())));
+		}
+
+		logic_input_t m_I;
+		logic_input_t m_FB;
+		logic_output_t m_Q;
+
+		param_int_t m_delay;
+		param_int_t m_duration;
+		param_logic_t m_invert_input;
+		param_logic_t m_invert_output;
+
+		state_var<netlist_sig_t> m_last;
+	};
+
+
 	NETLIB_DEVICE_IMPL(netlistparams,       "PARAMETER",              "")
 	NETLIB_DEVICE_IMPL(nc_pin,              "NC_PIN",                 "")
 
@@ -119,6 +175,7 @@ namespace netlist::devices {
 	NETLIB_DEVICE_IMPL(sys_dsw1,            "SYS_DSW",                "+I,+1,+2")
 	NETLIB_DEVICE_IMPL(sys_dsw2,            "SYS_DSW2",               "")
 	NETLIB_DEVICE_IMPL(sys_compd,           "SYS_COMPD",              "")
+	NETLIB_DEVICE_IMPL(sys_pulse,           "SYS_PULSE",              "DELAY,DURATION,INVERT_INPUT,INVERT_OUTPUT")
 
 	using NETLIB_NAME(sys_noise_mt_u) =
 		NETLIB_NAME(sys_noise)<plib::mt19937_64, plib::uniform_distribution_t>;

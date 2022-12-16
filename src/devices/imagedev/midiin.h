@@ -27,6 +27,7 @@ class midiin_device :    public device_t,
 public:
 	// construction/destruction
 	midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~midiin_device();
 
 	auto input_callback() { return m_input_cb.bind(); }
 

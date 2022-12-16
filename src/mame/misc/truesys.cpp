@@ -15,14 +15,14 @@ M4T28 TimeKeeper
 IS42S16 SDRAM
 2x RAMs (type not readable)
 
-It seems the game is run by a soft CPU core programmed in the FPGA.
+It seems the game is run by a Nios II soft CPU core programmed in the FPGA.
 The main CPU ROMs contains strings in English (system stuff) and Spanish (game strings).
 Manufacturer is unknown. There is an Azkoyen string in ROM, but it's probably the bill validator manufacturer.
 */
 
 #include "emu.h"
 
-#include "cpu/h8/h8s2320.h"
+#include "cpu/nios2/nios2.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -55,6 +55,14 @@ uint32_t truesys_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void truesys_state::main_map(address_map &map)
 {
+	map(0x00000000, 0x0000001f).rom().region("maincpu", 0);
+	map(0x00000020, 0x007fffff).ram();
+	map(0x00800000, 0x0087ffff).rom().region("maincpu", 0);
+	map(0x00900000, 0x009003ff).ram(); // video RAM or debug RAM?
+	map(0x009092f0, 0x009092f3).nopw(); // semaphore?
+	map(0x00909300, 0x00909303).noprw(); // byte-wide peripheral (SPI?)
+	map(0x00909304, 0x00909307).noprw();
+	map(0x00909308, 0x0090930b).nopw(); // byte-wide peripheral control?
 }
 
 
@@ -74,7 +82,7 @@ INPUT_PORTS_END
 void truesys_state::unkts(machine_config &config)
 {
 	// basic machine hardware
-	H8S2328(config, m_maincpu, 32_MHz_XTAL); // TODO: there's no actual CPU, it appears to be run from the FPGA
+	NIOS2(config, m_maincpu, 32'000'000); // there's no actual CPU, it appears to be run from the FPGA
 	m_maincpu->set_addrmap(AS_PROGRAM, &truesys_state::main_map);
 
 	// PIC16F874. TODO: not emulated

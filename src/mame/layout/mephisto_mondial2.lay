@@ -56,20 +56,53 @@ license:CC0
 	<element name="text_err">    <text align="1" string="ERR">                 <color red="0.86" green="0.85" blue="0.85" /></text> </element>
 	<element name="text_lev">    <text align="1" string="LEV">                 <color red="0.86" green="0.85" blue="0.85" /></text> </element>
 	<element name="text_plus">   <text align="1" string="+">                   <color red="0.86" green="0.85" blue="0.85" /></text> </element>
-	<element name="text_black">  <text align="1" string="&#x25a1;">            <color red="0.86" green="0.85" blue="0.85" /></text> </element>
-	<element name="text_white">  <text align="1" string="&#x25a0;">            <color red="0.86" green="0.85" blue="0.85" /></text> </element>
-	<element name="text_b1">     <text align="1" string="[P] 1">               <color red="0.86" green="0.85" blue="0.85" /></text> </element>
-	<element name="text_b2">     <text align="1" string="[N] 2">               <color red="0.86" green="0.85" blue="0.85" /></text> </element>
-	<element name="text_b3">     <text align="1" string="[B] 3">               <color red="0.86" green="0.85" blue="0.85" /></text> </element>
-	<element name="text_b4">     <text align="1" string="[R] 4">               <color red="0.86" green="0.85" blue="0.85" /></text> </element>
-	<element name="text_b5">     <text align="1" string="[Q] 5">               <color red="0.86" green="0.85" blue="0.85" /></text> </element>
-	<element name="text_b6">     <text align="1" string="[K] 6">               <color red="0.86" green="0.85" blue="0.85" /></text> </element>
-	<element name="text_b7">     <text align="1" string="&#x25a1; 7">          <color red="0.86" green="0.85" blue="0.85" /></text> </element>
-	<element name="text_b8">     <text align="1" string="&#x25a0; 8">          <color red="0.86" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b1">     <text align="1" string="1">                   <color red="0.86" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b2">     <text align="1" string="2">                   <color red="0.86" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b3">     <text align="1" string="3">                   <color red="0.86" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b4">     <text align="1" string="4">                   <color red="0.86" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b5">     <text align="1" string="5">                   <color red="0.86" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b6">     <text align="1" string="6">                   <color red="0.86" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b7">     <text align="1" string="7">                   <color red="0.86" green="0.85" blue="0.85" /></text> </element>
+	<element name="text_b8">     <text align="1" string="8">                   <color red="0.86" green="0.85" blue="0.85" /></text> </element>
 	<element name="text_play">   <text align="1" string="PLAY">                <color red="0.86" green="0.85" blue="0.85" /></text> </element>
 	<element name="text_cl">     <text align="1" string="CL">                  <color red="0.86" green="0.85" blue="0.85" /></text> </element>
 	<element name="text_ent">    <text align="1" string="ENT">                 <color red="0.86" green="0.85" blue="0.85" /></text> </element>
 	<element name="text_res">    <text align="1" string="RES">                 <color red="0.86" green="0.85" blue="0.85" /></text> </element>
+
+	<element name="text_p1"><image file="chess/wp.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p2"><image file="chess/wn.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p3"><image file="chess/wb.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p4"><image file="chess/wr.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p5"><image file="chess/wq.svg"><color alpha="0.85" /></image></element>
+	<element name="text_p6"><image file="chess/wk.svg"><color alpha="0.85" /></image></element>
+
+	<element name="text_black">
+		<rect>
+			<bounds x="0" y="0" width="1" height="1" />
+			<color red="0.86" green="0.85" blue="0.85" />
+		</rect>
+		<rect>
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="text_white">
+		<rect><color red="0.86" green="0.85" blue="0.85" /></rect>
+	</element>
+
+
+<!-- sb board -->
+
+	<element name="cwhite"><rect><color red="0.86" green="0.85" blue="0.85" /></rect></element>
+	<element name="cblack"><rect><color red="0.4" green="0.4" blue="0.4" /></rect></element>
+
+	<element name="hlbb" defstate="0">
+		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<disk state="1">
+			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+	</element>
 
 	<element name="piece" defstate="0">
 		<image file="chess/wp.svg" state="1"/>
@@ -100,20 +133,6 @@ license:CC0
 		<image file="chess/br.svg" state="22"><color alpha="0.5" /></image>
 		<image file="chess/bq.svg" state="23"><color alpha="0.5" /></image>
 		<image file="chess/bk.svg" state="24"><color alpha="0.5" /></image>
-	</element>
-
-
-<!-- sb board -->
-
-	<element name="cwhite"><rect><color red="0.86" green="0.85" blue="0.85" /></rect></element>
-	<element name="cblack"><rect><color red="0.4" green="0.4" blue="0.4" /></rect></element>
-
-	<element name="hlbb" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
-		<disk state="1">
-			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
-			<color red="0" green="0" blue="0" />
-		</disk>
 	</element>
 
 	<group name="sb_board">
@@ -354,7 +373,7 @@ license:CC0
 <!-- button panel -->
 
 	<group name="panel">
-		<bounds left="0" right="78" top="0" bottom="12" />
+		<bounds left="0" right="78" top="-1" bottom="12" />
 		<element ref="panel_background"><bounds x="0" y="0" width="78" height="12" /></element>
 
 		<element name="0.0" ref="led">     <bounds x="1"  y="0.4" width="1.5" height="0.8" />  </element>
@@ -383,23 +402,32 @@ license:CC0
 		<element ref="hlb" inputtag="KEY.3" inputmask="0x04">     <bounds x="61" y="7.5" width="6" height="4" />      </element>
 		<element ref="hlb" inputtag="KEY.3" inputmask="0x08">     <bounds x="71" y="7.5" width="6" height="4" />      </element>
 
-		<element ref="text_play">         <bounds x="3"    y="0"   width="4" height="1.5" />  </element>
-		<element ref="text_pos">          <bounds x="13"   y="0"   width="3" height="1.5" />  </element>
-		<element ref="text_mem">          <bounds x="23"   y="0"   width="3" height="1.5" />  </element>
-		<element ref="text_info">         <bounds x="33"   y="0"   width="4" height="1.5" />  </element>
-		<element ref="text_err">          <bounds x="43"   y="0"   width="3" height="1.5" />  </element>
-		<element ref="text_plus">         <bounds x="53"   y="0"   width="3" height="1.5" />  </element>
-		<element ref="text_black">        <bounds x="63"   y="0"   width="1" height="1.5" />  </element>
-		<element ref="text_white">        <bounds x="73"   y="0"   width="1" height="1.5" />  </element>
+		<element ref="text_play">         <bounds x="3"    y="-0.1"   width="4" height="1.5" />  </element>
+		<element ref="text_pos">          <bounds x="13"   y="-0.1"   width="3" height="1.5" />  </element>
+		<element ref="text_mem">          <bounds x="23"   y="-0.1"   width="3" height="1.5" />  </element>
+		<element ref="text_info">         <bounds x="33"   y="-0.1"   width="4" height="1.5" />  </element>
+		<element ref="text_err">          <bounds x="43"   y="-0.1"   width="3" height="1.5" />  </element>
+		<element ref="text_plus">         <bounds x="53"   y="-0.3"   width="3" height="1.8" />  </element>
+		<element ref="text_black">        <bounds x="63.1" y="0.2"    width="1" height="1" />    </element>
+		<element ref="text_white">        <bounds x="73.1" y="0.2"    width="1" height="1" />    </element>
 
-		<element ref="text_b1">           <bounds x="2"  y="2.5"   width="4" height="1.5" />  </element>
-		<element ref="text_b2">           <bounds x="12" y="2.5"   width="4" height="1.5" />  </element>
-		<element ref="text_b3">           <bounds x="22" y="2.5"   width="4" height="1.5" />  </element>
-		<element ref="text_b4">           <bounds x="32" y="2.5"   width="4" height="1.5" />  </element>
-		<element ref="text_b5">           <bounds x="42" y="2.5"   width="4" height="1.5" />  </element>
-		<element ref="text_b6">           <bounds x="52" y="2.5"   width="4" height="1.5" />  </element>
-		<element ref="text_b7">           <bounds x="62" y="2.5"   width="4" height="1.5" />  </element>
-		<element ref="text_b8">           <bounds x="72" y="2.5"   width="4" height="1.5" />  </element>
+		<element ref="text_p1">           <bounds x="1.7"  y="2.3"   width="1.8" height="1.8" />  </element>
+		<element ref="text_p2">           <bounds x="11.7" y="2.3"   width="1.8" height="1.8" />  </element>
+		<element ref="text_p3">           <bounds x="21.7" y="2.3"   width="1.8" height="1.8" />  </element>
+		<element ref="text_p4">           <bounds x="31.7" y="2.3"   width="1.8" height="1.8" />  </element>
+		<element ref="text_p5">           <bounds x="41.7" y="2.3"   width="1.8" height="1.8" />  </element>
+		<element ref="text_p6">           <bounds x="51.7" y="2.3"   width="1.8" height="1.8" />  </element>
+		<element ref="text_black">        <bounds x="62.0" y="2.7"   width="1" height="1" />      </element>
+		<element ref="text_white">        <bounds x="72.0" y="2.7"   width="1" height="1" />      </element>
+
+		<element ref="text_b1">           <bounds x="3.8"  y="2.5"   width="4" height="1.5" />  </element>
+		<element ref="text_b2">           <bounds x="13.8" y="2.5"   width="4" height="1.5" />  </element>
+		<element ref="text_b3">           <bounds x="23.8" y="2.5"   width="4" height="1.5" />  </element>
+		<element ref="text_b4">           <bounds x="33.8" y="2.5"   width="4" height="1.5" />  </element>
+		<element ref="text_b5">           <bounds x="43.8" y="2.5"   width="4" height="1.5" />  </element>
+		<element ref="text_b6">           <bounds x="53.8" y="2.5"   width="4" height="1.5" />  </element>
+		<element ref="text_b7">           <bounds x="63.8" y="2.5"   width="4" height="1.5" />  </element>
+		<element ref="text_b8">           <bounds x="73.8" y="2.5"   width="4" height="1.5" />  </element>
 
 		<element ref="text_play">         <bounds x="2"  y="9.5"   width="4" height="1.5" />  </element>
 		<element ref="text_pos">          <bounds x="12" y="9.5"   width="4" height="1.5" />  </element>
@@ -418,7 +446,7 @@ license:CC0
 		<bounds left="0" right="103" top="-2" bottom="103" />
 
 		<!-- button panel -->
-		<group ref="panel"><bounds x="18" y="90" width="78" height="12" /></group>
+		<group ref="panel"><bounds x="18" y="89" width="78" height="13" /></group>
 
 		<element ref="background"><bounds x="13" y="-2" width="90" height="90" /></element>
 

@@ -9,13 +9,12 @@
 //
 //============================================================
 
-#include "emu.h"
+#include "chainmanager.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
 #include <cmath>
 
-#include "chainmanager.h"
 #include "chainentry.h"
 
 #include "effect.h"
@@ -27,6 +26,7 @@
 #include "vertex.h"
 #include "suppressor.h"
 
+#include "emucore.h"
 #include "render.h"
 
 

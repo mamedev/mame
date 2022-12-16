@@ -12,12 +12,12 @@ TODO:
 */
 
 #include "emu.h"
-#include "seta001.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
+#include "video/x1_001.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -48,7 +48,7 @@ private:
 	void prg_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<seta001_device> m_sprites;
+	required_device<x1_001_device> m_sprites;
 	required_device<ticket_dispenser_device> m_hopper;
 };
 
@@ -127,11 +127,11 @@ void albazc_state::out_2_w(uint8_t data)
 void albazc_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).rw(m_sprites, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0x9000, 0x97ff).rw(m_sprites, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
-	map(0xa000, 0xa2ff).rw(m_sprites, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xa300, 0xa303).w(m_sprites, FUNC(seta001_device::spritectrl_w8));   // ???
-	map(0xb000, 0xb000).w(m_sprites, FUNC(seta001_device::spritebgflag_w8));    // ??? always 0x40
+	map(0x8000, 0x87ff).rw(m_sprites, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0x9000, 0x97ff).rw(m_sprites, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
+	map(0xa000, 0xa2ff).rw(m_sprites, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xa300, 0xa303).w(m_sprites, FUNC(x1_001_device::spritectrl_w8));   // ???
+	map(0xb000, 0xb000).w(m_sprites, FUNC(x1_001_device::spritebgflag_w8));    // ??? always 0x40
 	map(0xc000, 0xc3ff).ram();         // main RAM
 	map(0xc400, 0xc4ff).ram().share("nvram");
 	map(0xd000, 0xd000).r("aysnd", FUNC(ay8910_device::data_r));
@@ -240,7 +240,7 @@ void albazc_state::hanaroku(machine_config &config)
 	screen.set_screen_update(FUNC(albazc_state::screen_update));
 	screen.set_palette("palette");
 
-	SETA001_SPRITE(config, m_sprites, 16_MHz_XTAL, "palette", gfx_hanaroku);
+	X1_001(config, m_sprites, 16_MHz_XTAL, "palette", gfx_hanaroku);
 	m_sprites->set_fg_yoffsets( -0x12, 0x0e );
 	m_sprites->set_bg_yoffsets( 2, -2 );
 

@@ -10,6 +10,7 @@
 #define USE_FRONTIERS 1
 
 NETLIST_START(zac1b11142_schematics)
+{
 
 	// Shared chips
 
@@ -266,9 +267,10 @@ NETLIST_START(zac1b11142_schematics)
 	NET_C(GND, P1.3, T7.E, R117.1, U4B.2, U4B.8, U4B.14)
 	NET_C(GND, U5B3.GND)
 
-NETLIST_END()
+}
 
 NETLIST_START(zac1b11142_schematics_speech)
+{
 
 	CS(I_SP, 0) // Fed through stream ...
 
@@ -301,9 +303,10 @@ NETLIST_START(zac1b11142_schematics_speech)
 
 	NET_C(C8.2, R1.1)
 
-NETLIST_END()
+}
 
 NETLIST_START(zac1b11142_schematics_dac)
+{
 
 	CS(I_DAC, 0)    // Fed through stream ...
 
@@ -327,9 +330,10 @@ NETLIST_START(zac1b11142_schematics_dac)
 	NET_C(P3.2, R18.1)
 	NET_C(R18.2, C21.1)
 	NET_C(C21.2, C8.2)
-NETLIST_END()
+}
 
 NETLIST_START(zac1b11142)
+{
 
 	SOLVER(Solver, 48000)
 	#if (USE_FRONTIERS)
@@ -430,4 +434,4 @@ NETLIST_START(zac1b11142)
 	PARAM(P1.REVERSE, 1)
 	PARAM(P2.REVERSE, 1)
 	PARAM(P3.REVERSE, 1)
-NETLIST_END()
+}

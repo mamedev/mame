@@ -14,12 +14,16 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/h8/h83003.h"
-#include "machine/nvram.h"
 #include "machine/at28c16.h"
+#include "machine/nvram.h"
+#include "machine/timer.h"
+
 #include "screen.h"
 #include "speaker.h"
-#include "machine/timer.h"
+
+#include "utf8.h"
 
 class lw700i_state : public driver_device
 {

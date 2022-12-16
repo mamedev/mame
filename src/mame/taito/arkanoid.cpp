@@ -1536,7 +1536,7 @@ void arkanoid_state::brixian(machine_config &config)
     A75 35   = PROM blue Tournament
     A75 36   = Z80 code 1/2 (Tournament v2.0?)
     A75 37   = Z80 code 2/2 (Tournament v2.0?)
-    A75 38   = MC68705P5 MCU code (NOT DUMPED)
+    A75 38   = MC68705P5 MCU code, Tournament (v2.0?) (NOT DUMPED)
 */
 
 ROM_START( arkanoid ) // v1.0 World
@@ -1703,8 +1703,8 @@ ROM_END
 
 ROM_START( arkatour2 ) // Tournament version, newer
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a75-36.ic16",   0x0000, 0x8000, CRC(f3b1923e) SHA1(377a417ad99c9de2eadad7338bc2c7e83d08cb2f) )
-	ROM_LOAD( "a75-37.ic17",   0x8000, 0x8000, CRC(7c74987b) SHA1(fb7612ea2af87a3e1bc794c25b004881930d4dc8) ) // 1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "a75-36.ic17",   0x0000, 0x8000, CRC(f3b1923e) SHA1(377a417ad99c9de2eadad7338bc2c7e83d08cb2f) )
+	ROM_LOAD( "a75-37.ic16",   0x8000, 0x8000, CRC(7c74987b) SHA1(fb7612ea2af87a3e1bc794c25b004881930d4dc8) ) // 1xxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )
 	ROM_LOAD( "a75_38.ic14",  0x0000, 0x0800, NO_DUMP )
@@ -1744,7 +1744,6 @@ ROM_START( arkanoidjbl ) // bootleg with MCU copied from real Taito code, but no
 	ROM_LOAD( "a75-07.bpr",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )   /* red component */
 	ROM_LOAD( "a75-08.bpr",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )   /* green component */
 	ROM_LOAD( "a75-09.bpr",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )   /* blue component */
-
 ROM_END
 
 // this pcb has the coin lockout module bypassed with some resistors
@@ -2126,7 +2125,6 @@ ROM_START( brixian )
 	ROM_LOAD( "n82s131n.6l", 0x0000, 0x0200, CRC(0fa51a5b) SHA1(8c5cb69fbff8a3ba90f945c35f72754f9cc8f18c) )
 	ROM_LOAD( "n82s131n.6p", 0x0200, 0x0200, CRC(d833ad33) SHA1(a7c17c96a670916e7102afc94dc2f0cb0455f0ce) )
 	ROM_LOAD( "n82s131n.6m", 0x0400, 0x0200, CRC(05297649) SHA1(35f99cf8dddd66e26e2110619eb46bd6ccff41df) )
-
 ROM_END
 
 

@@ -1793,7 +1793,8 @@ psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, c
 	m_spu_write_handler( *this ),
 	m_cd_read_handler( *this ),
 	m_cd_write_handler( *this ),
-	m_ram( *this, "ram" )
+	m_ram( *this, "ram" ),
+	m_rom( *this, "rom" )
 {
 	m_disable_rom_berr = false;
 }
@@ -1835,7 +1836,7 @@ cxd8606cq_device::cxd8606cq_device( const machine_config &mconfig, const char *t
 void psxcpu_device::device_start()
 {
 	// get our address spaces
-	m_program = &space( AS_PROGRAM );
+	m_program = &space(AS_PROGRAM);
 	m_program->cache(m_instruction);
 	m_program->specific(m_data);
 
@@ -1983,8 +1984,7 @@ void psxcpu_device::device_start()
 	state_add( PSXCPU_CP2CR31, "flag", m_gte.m_cp2cr[ 31 ].d );
 
 	// initialize the registers once
-	for(int i=0; i != 32; i++)
-		m_r[i] = 0;
+	std::fill(std::begin(m_r), std::end(m_r), 0);
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -1995,8 +1995,6 @@ void psxcpu_device::device_start()
 	m_spu_write_handler.resolve_safe();
 	m_cd_read_handler.resolve_safe( 0 );
 	m_cd_write_handler.resolve_safe();
-
-	m_rom = memregion( "rom" );
 }
 
 

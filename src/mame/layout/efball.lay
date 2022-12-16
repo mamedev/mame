@@ -42,7 +42,6 @@ license:CC0
 	<element name="text_50"><text string="50"><color red="0.83" green="0.84" blue="0.83" /></text></element>
 
 	<!-- 7segs are not italic here, so let's make custom ones -->
-
 	<element name="seg" defstate="0">
 		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
 		<rect state="1"><color red="0.2" green="1.0" blue="0.9" /></rect>
@@ -65,8 +64,7 @@ license:CC0
 			<bounds left="-8" right="298" top="-46" bottom="121" />
 		</element>
 
-	<!-- outer bezel -->
-
+		<!-- outer bezel -->
 		<element ref="static_white"><bounds left="-8" right="298" top="-42" bottom="117" /></element>
 		<element ref="static_green"><bounds left="-8" right="298" top="-22" bottom="-20" /></element>
 		<element ref="static_green"><bounds left="-8" right="298" top="95" bottom="97" /></element>
@@ -98,175 +96,173 @@ license:CC0
 		<element ref="static_green"><bounds x="219" y="-43" width="2" height="22" /></element>
 		<element ref="static_green"><bounds x="219" y="96" width="2" height="22" /></element>
 
-	<!-- vfd -->
+		<!-- vfd -->
+		<element name="0.7" ref="ind"><bounds x="0" y="1" width="20" height="17" /></element>
+		<element name="1.7" ref="ind"><bounds x="30" y="1" width="20" height="17" /></element>
+		<element name="2.7" ref="ind"><bounds x="60" y="1" width="20" height="17" /></element>
+		<element name="3.7" ref="ind"><bounds x="90" y="1" width="20" height="17" /></element>
+		<element name="4.7" ref="ind"><bounds x="120" y="1" width="20" height="17" /></element>
+		<element name="5.7" ref="ind"><bounds x="150" y="1" width="20" height="17" /></element>
+		<element name="6.7" ref="ind"><bounds x="180" y="1" width="20" height="17" /></element>
+		<element name="7.7" ref="ind"><bounds x="210" y="1" width="20" height="17" /></element>
+		<element name="8.7" ref="ind"><bounds x="240" y="1" width="20" height="17" /></element>
+		<element name="9.7" ref="ind"><bounds x="270" y="1" width="20" height="17" /></element>
 
-		<element name="0.0" ref="ind"><bounds x="0" y="1" width="20" height="17" /></element>
-		<element name="1.0" ref="ind"><bounds x="30" y="1" width="20" height="17" /></element>
-		<element name="2.0" ref="ind"><bounds x="60" y="1" width="20" height="17" /></element>
-		<element name="3.0" ref="ind"><bounds x="90" y="1" width="20" height="17" /></element>
-		<element name="4.0" ref="ind"><bounds x="120" y="1" width="20" height="17" /></element>
-		<element name="5.0" ref="ind"><bounds x="150" y="1" width="20" height="17" /></element>
-		<element name="6.0" ref="ind"><bounds x="180" y="1" width="20" height="17" /></element>
-		<element name="7.0" ref="ind"><bounds x="210" y="1" width="20" height="17" /></element>
-		<element name="8.0" ref="ind"><bounds x="240" y="1" width="20" height="17" /></element>
-		<element name="9.0" ref="ind"><bounds x="270" y="1" width="20" height="17" /></element>
+		<element name="0.4" ref="led"><bounds x="6" y="17" width="8" height="6" /></element>
+		<element name="0.4" ref="led"><bounds x="6" y="22" width="8" height="6" /></element>
+		<element name="0.5" ref="led"><bounds x="6" y="41" width="8" height="6" /></element>
+		<element name="0.5" ref="led"><bounds x="6" y="46" width="8" height="6" /></element>
+		<element name="0.6" ref="led"><bounds x="6" y="65" width="8" height="6" /></element>
+		<element name="0.6" ref="led"><bounds x="6" y="70" width="8" height="6" /></element>
 
-		<element name="0.10" ref="led"><bounds x="6" y="17" width="8" height="6" /></element>
-		<element name="0.10" ref="led"><bounds x="6" y="22" width="8" height="6" /></element>
-		<element name="0.2" ref="led"><bounds x="6" y="41" width="8" height="6" /></element>
-		<element name="0.2" ref="led"><bounds x="6" y="46" width="8" height="6" /></element>
-		<element name="0.5" ref="led"><bounds x="6" y="65" width="8" height="6" /></element>
-		<element name="0.5" ref="led"><bounds x="6" y="70" width="8" height="6" /></element>
+		<element name="1.4" ref="led"><bounds x="36" y="17" width="8" height="6" /></element>
+		<element name="1.4" ref="led"><bounds x="36" y="22" width="8" height="6" /></element>
+		<element name="1.5" ref="led"><bounds x="36" y="41" width="8" height="6" /></element>
+		<element name="1.5" ref="led"><bounds x="36" y="46" width="8" height="6" /></element>
+		<element name="1.6" ref="led"><bounds x="36" y="65" width="8" height="6" /></element>
+		<element name="1.6" ref="led"><bounds x="36" y="70" width="8" height="6" /></element>
 
-		<element name="1.10" ref="led"><bounds x="36" y="17" width="8" height="6" /></element>
-		<element name="1.10" ref="led"><bounds x="36" y="22" width="8" height="6" /></element>
-		<element name="1.2" ref="led"><bounds x="36" y="41" width="8" height="6" /></element>
-		<element name="1.2" ref="led"><bounds x="36" y="46" width="8" height="6" /></element>
-		<element name="1.5" ref="led"><bounds x="36" y="65" width="8" height="6" /></element>
-		<element name="1.5" ref="led"><bounds x="36" y="70" width="8" height="6" /></element>
+		<element name="2.4" ref="led"><bounds x="66" y="17" width="8" height="6" /></element>
+		<element name="2.4" ref="led"><bounds x="66" y="22" width="8" height="6" /></element>
+		<element name="2.5" ref="led"><bounds x="66" y="41" width="8" height="6" /></element>
+		<element name="2.5" ref="led"><bounds x="66" y="46" width="8" height="6" /></element>
+		<element name="2.6" ref="led"><bounds x="66" y="65" width="8" height="6" /></element>
+		<element name="2.6" ref="led"><bounds x="66" y="70" width="8" height="6" /></element>
 
-		<element name="2.10" ref="led"><bounds x="66" y="17" width="8" height="6" /></element>
-		<element name="2.10" ref="led"><bounds x="66" y="22" width="8" height="6" /></element>
-		<element name="2.2" ref="led"><bounds x="66" y="41" width="8" height="6" /></element>
-		<element name="2.2" ref="led"><bounds x="66" y="46" width="8" height="6" /></element>
-		<element name="2.5" ref="led"><bounds x="66" y="65" width="8" height="6" /></element>
-		<element name="2.5" ref="led"><bounds x="66" y="70" width="8" height="6" /></element>
+		<element name="3.4" ref="led"><bounds x="96" y="17" width="8" height="6" /></element>
+		<element name="3.4" ref="led"><bounds x="96" y="22" width="8" height="6" /></element>
+		<element name="3.5" ref="led"><bounds x="96" y="41" width="8" height="6" /></element>
+		<element name="3.5" ref="led"><bounds x="96" y="46" width="8" height="6" /></element>
+		<element name="3.6" ref="led"><bounds x="96" y="65" width="8" height="6" /></element>
+		<element name="3.6" ref="led"><bounds x="96" y="70" width="8" height="6" /></element>
 
-		<element name="3.10" ref="led"><bounds x="96" y="17" width="8" height="6" /></element>
-		<element name="3.10" ref="led"><bounds x="96" y="22" width="8" height="6" /></element>
-		<element name="3.2" ref="led"><bounds x="96" y="41" width="8" height="6" /></element>
-		<element name="3.2" ref="led"><bounds x="96" y="46" width="8" height="6" /></element>
-		<element name="3.5" ref="led"><bounds x="96" y="65" width="8" height="6" /></element>
-		<element name="3.5" ref="led"><bounds x="96" y="70" width="8" height="6" /></element>
+		<element name="4.4" ref="led"><bounds x="126" y="17" width="8" height="6" /></element>
+		<element name="4.4" ref="led"><bounds x="126" y="22" width="8" height="6" /></element>
+		<element name="4.5" ref="led"><bounds x="126" y="41" width="8" height="6" /></element>
+		<element name="4.5" ref="led"><bounds x="126" y="46" width="8" height="6" /></element>
+		<element name="4.6" ref="led"><bounds x="126" y="65" width="8" height="6" /></element>
+		<element name="4.6" ref="led"><bounds x="126" y="70" width="8" height="6" /></element>
 
-		<element name="4.10" ref="led"><bounds x="126" y="17" width="8" height="6" /></element>
-		<element name="4.10" ref="led"><bounds x="126" y="22" width="8" height="6" /></element>
-		<element name="4.2" ref="led"><bounds x="126" y="41" width="8" height="6" /></element>
-		<element name="4.2" ref="led"><bounds x="126" y="46" width="8" height="6" /></element>
-		<element name="4.5" ref="led"><bounds x="126" y="65" width="8" height="6" /></element>
-		<element name="4.5" ref="led"><bounds x="126" y="70" width="8" height="6" /></element>
+		<element name="5.4" ref="led"><bounds x="156" y="17" width="8" height="6" /></element>
+		<element name="5.4" ref="led"><bounds x="156" y="22" width="8" height="6" /></element>
+		<element name="5.5" ref="led"><bounds x="156" y="41" width="8" height="6" /></element>
+		<element name="5.5" ref="led"><bounds x="156" y="46" width="8" height="6" /></element>
+		<element name="5.6" ref="led"><bounds x="156" y="65" width="8" height="6" /></element>
+		<element name="5.6" ref="led"><bounds x="156" y="70" width="8" height="6" /></element>
 
-		<element name="5.10" ref="led"><bounds x="156" y="17" width="8" height="6" /></element>
-		<element name="5.10" ref="led"><bounds x="156" y="22" width="8" height="6" /></element>
-		<element name="5.2" ref="led"><bounds x="156" y="41" width="8" height="6" /></element>
-		<element name="5.2" ref="led"><bounds x="156" y="46" width="8" height="6" /></element>
-		<element name="5.5" ref="led"><bounds x="156" y="65" width="8" height="6" /></element>
-		<element name="5.5" ref="led"><bounds x="156" y="70" width="8" height="6" /></element>
+		<element name="6.4" ref="led"><bounds x="186" y="17" width="8" height="6" /></element>
+		<element name="6.4" ref="led"><bounds x="186" y="22" width="8" height="6" /></element>
+		<element name="6.5" ref="led"><bounds x="186" y="41" width="8" height="6" /></element>
+		<element name="6.5" ref="led"><bounds x="186" y="46" width="8" height="6" /></element>
+		<element name="6.6" ref="led"><bounds x="186" y="65" width="8" height="6" /></element>
+		<element name="6.6" ref="led"><bounds x="186" y="70" width="8" height="6" /></element>
 
-		<element name="6.10" ref="led"><bounds x="186" y="17" width="8" height="6" /></element>
-		<element name="6.10" ref="led"><bounds x="186" y="22" width="8" height="6" /></element>
-		<element name="6.2" ref="led"><bounds x="186" y="41" width="8" height="6" /></element>
-		<element name="6.2" ref="led"><bounds x="186" y="46" width="8" height="6" /></element>
-		<element name="6.5" ref="led"><bounds x="186" y="65" width="8" height="6" /></element>
-		<element name="6.5" ref="led"><bounds x="186" y="70" width="8" height="6" /></element>
+		<element name="7.4" ref="led"><bounds x="216" y="17" width="8" height="6" /></element>
+		<element name="7.4" ref="led"><bounds x="216" y="22" width="8" height="6" /></element>
+		<element name="7.5" ref="led"><bounds x="216" y="41" width="8" height="6" /></element>
+		<element name="7.5" ref="led"><bounds x="216" y="46" width="8" height="6" /></element>
+		<element name="7.6" ref="led"><bounds x="216" y="65" width="8" height="6" /></element>
+		<element name="7.6" ref="led"><bounds x="216" y="70" width="8" height="6" /></element>
 
-		<element name="7.10" ref="led"><bounds x="216" y="17" width="8" height="6" /></element>
-		<element name="7.10" ref="led"><bounds x="216" y="22" width="8" height="6" /></element>
-		<element name="7.2" ref="led"><bounds x="216" y="41" width="8" height="6" /></element>
-		<element name="7.2" ref="led"><bounds x="216" y="46" width="8" height="6" /></element>
-		<element name="7.5" ref="led"><bounds x="216" y="65" width="8" height="6" /></element>
-		<element name="7.5" ref="led"><bounds x="216" y="70" width="8" height="6" /></element>
+		<element name="8.4" ref="led"><bounds x="246" y="17" width="8" height="6" /></element>
+		<element name="8.4" ref="led"><bounds x="246" y="22" width="8" height="6" /></element>
+		<element name="8.5" ref="led"><bounds x="246" y="41" width="8" height="6" /></element>
+		<element name="8.5" ref="led"><bounds x="246" y="46" width="8" height="6" /></element>
+		<element name="8.6" ref="led"><bounds x="246" y="65" width="8" height="6" /></element>
+		<element name="8.6" ref="led"><bounds x="246" y="70" width="8" height="6" /></element>
 
-		<element name="8.10" ref="led"><bounds x="246" y="17" width="8" height="6" /></element>
-		<element name="8.10" ref="led"><bounds x="246" y="22" width="8" height="6" /></element>
-		<element name="8.2" ref="led"><bounds x="246" y="41" width="8" height="6" /></element>
-		<element name="8.2" ref="led"><bounds x="246" y="46" width="8" height="6" /></element>
-		<element name="8.5" ref="led"><bounds x="246" y="65" width="8" height="6" /></element>
-		<element name="8.5" ref="led"><bounds x="246" y="70" width="8" height="6" /></element>
-
-		<element name="9.10" ref="led"><bounds x="276" y="17" width="8" height="6" /></element>
-		<element name="9.10" ref="led"><bounds x="276" y="22" width="8" height="6" /></element>
-		<element name="9.2" ref="led"><bounds x="276" y="41" width="8" height="6" /></element>
-		<element name="9.2" ref="led"><bounds x="276" y="46" width="8" height="6" /></element>
-		<element name="9.5" ref="led"><bounds x="276" y="65" width="8" height="6" /></element>
-		<element name="9.5" ref="led"><bounds x="276" y="70" width="8" height="6" /></element>
+		<element name="9.4" ref="led"><bounds x="276" y="17" width="8" height="6" /></element>
+		<element name="9.4" ref="led"><bounds x="276" y="22" width="8" height="6" /></element>
+		<element name="9.5" ref="led"><bounds x="276" y="41" width="8" height="6" /></element>
+		<element name="9.5" ref="led"><bounds x="276" y="46" width="8" height="6" /></element>
+		<element name="9.6" ref="led"><bounds x="276" y="65" width="8" height="6" /></element>
+		<element name="9.6" ref="led"><bounds x="276" y="70" width="8" height="6" /></element>
 
 		<element ref="static_black"><bounds x="0" y="19" width="290" height="7" /></element>
 		<element ref="static_black"><bounds x="0" y="43" width="290" height="7" /></element>
 		<element ref="static_black"><bounds x="0" y="67" width="290" height="7" /></element>
 
-		<element name="0.1" ref="seg"><bounds x="0" y="20" width="20" height="5" /></element>
-		<element name="0.3" ref="seg"><bounds x="0" y="44" width="20" height="5" /></element>
-		<element name="0.4" ref="seg"><bounds x="0" y="68" width="20" height="5" /></element>
-		<element name="0.9" ref="seg"><bounds x="0" y="26" width="5" height="17" /></element>
-		<element name="0.7" ref="seg"><bounds x="0" y="50" width="5" height="17" /></element>
-		<element name="0.8" ref="seg"><bounds x="15" y="26" width="5" height="17" /></element>
-		<element name="0.6" ref="seg"><bounds x="15" y="50" width="5" height="17" /></element>
+		<element name="0.8" ref="seg"><bounds x="0" y="20" width="20" height="5" /></element>
+		<element name="0.9" ref="seg"><bounds x="0" y="44" width="20" height="5" /></element>
+		<element name="0.10" ref="seg"><bounds x="0" y="68" width="20" height="5" /></element>
+		<element name="0.3" ref="seg"><bounds x="0" y="26" width="5" height="17" /></element>
+		<element name="0.2" ref="seg"><bounds x="0" y="50" width="5" height="17" /></element>
+		<element name="0.0" ref="seg"><bounds x="15" y="26" width="5" height="17" /></element>
+		<element name="0.1" ref="seg"><bounds x="15" y="50" width="5" height="17" /></element>
 
-		<element name="1.1" ref="seg"><bounds x="30" y="20" width="20" height="5" /></element>
-		<element name="1.3" ref="seg"><bounds x="30" y="44" width="20" height="5" /></element>
-		<element name="1.4" ref="seg"><bounds x="30" y="68" width="20" height="5" /></element>
-		<element name="1.9" ref="seg"><bounds x="30" y="26" width="5" height="17" /></element>
-		<element name="1.7" ref="seg"><bounds x="30" y="50" width="5" height="17" /></element>
-		<element name="1.8" ref="seg"><bounds x="45" y="26" width="5" height="17" /></element>
-		<element name="1.6" ref="seg"><bounds x="45" y="50" width="5" height="17" /></element>
+		<element name="1.8" ref="seg"><bounds x="30" y="20" width="20" height="5" /></element>
+		<element name="1.9" ref="seg"><bounds x="30" y="44" width="20" height="5" /></element>
+		<element name="1.10" ref="seg"><bounds x="30" y="68" width="20" height="5" /></element>
+		<element name="1.3" ref="seg"><bounds x="30" y="26" width="5" height="17" /></element>
+		<element name="1.2" ref="seg"><bounds x="30" y="50" width="5" height="17" /></element>
+		<element name="1.0" ref="seg"><bounds x="45" y="26" width="5" height="17" /></element>
+		<element name="1.1" ref="seg"><bounds x="45" y="50" width="5" height="17" /></element>
 
-		<element name="2.1" ref="seg"><bounds x="60" y="20" width="20" height="5" /></element>
-		<element name="2.3" ref="seg"><bounds x="60" y="44" width="20" height="5" /></element>
-		<element name="2.4" ref="seg"><bounds x="60" y="68" width="20" height="5" /></element>
-		<element name="2.9" ref="seg"><bounds x="60" y="26" width="5" height="17" /></element>
-		<element name="2.7" ref="seg"><bounds x="60" y="50" width="5" height="17" /></element>
-		<element name="2.8" ref="seg"><bounds x="75" y="26" width="5" height="17" /></element>
-		<element name="2.6" ref="seg"><bounds x="75" y="50" width="5" height="17" /></element>
+		<element name="2.8" ref="seg"><bounds x="60" y="20" width="20" height="5" /></element>
+		<element name="2.9" ref="seg"><bounds x="60" y="44" width="20" height="5" /></element>
+		<element name="2.10" ref="seg"><bounds x="60" y="68" width="20" height="5" /></element>
+		<element name="2.3" ref="seg"><bounds x="60" y="26" width="5" height="17" /></element>
+		<element name="2.2" ref="seg"><bounds x="60" y="50" width="5" height="17" /></element>
+		<element name="2.0" ref="seg"><bounds x="75" y="26" width="5" height="17" /></element>
+		<element name="2.1" ref="seg"><bounds x="75" y="50" width="5" height="17" /></element>
 
-		<element name="3.1" ref="seg"><bounds x="90" y="20" width="20" height="5" /></element>
-		<element name="3.3" ref="seg"><bounds x="90" y="44" width="20" height="5" /></element>
-		<element name="3.4" ref="seg"><bounds x="90" y="68" width="20" height="5" /></element>
-		<element name="3.9" ref="seg"><bounds x="90" y="26" width="5" height="17" /></element>
-		<element name="3.7" ref="seg"><bounds x="90" y="50" width="5" height="17" /></element>
-		<element name="3.8" ref="seg"><bounds x="105" y="26" width="5" height="17" /></element>
-		<element name="3.6" ref="seg"><bounds x="105" y="50" width="5" height="17" /></element>
+		<element name="3.8" ref="seg"><bounds x="90" y="20" width="20" height="5" /></element>
+		<element name="3.9" ref="seg"><bounds x="90" y="44" width="20" height="5" /></element>
+		<element name="3.10" ref="seg"><bounds x="90" y="68" width="20" height="5" /></element>
+		<element name="3.3" ref="seg"><bounds x="90" y="26" width="5" height="17" /></element>
+		<element name="3.2" ref="seg"><bounds x="90" y="50" width="5" height="17" /></element>
+		<element name="3.0" ref="seg"><bounds x="105" y="26" width="5" height="17" /></element>
+		<element name="3.1" ref="seg"><bounds x="105" y="50" width="5" height="17" /></element>
 
-		<element name="4.1" ref="seg"><bounds x="120" y="20" width="20" height="5" /></element>
-		<element name="4.3" ref="seg"><bounds x="120" y="44" width="20" height="5" /></element>
-		<element name="4.4" ref="seg"><bounds x="120" y="68" width="20" height="5" /></element>
-		<element name="4.9" ref="seg"><bounds x="120" y="26" width="5" height="17" /></element>
-		<element name="4.7" ref="seg"><bounds x="120" y="50" width="5" height="17" /></element>
-		<element name="4.8" ref="seg"><bounds x="135" y="26" width="5" height="17" /></element>
-		<element name="4.6" ref="seg"><bounds x="135" y="50" width="5" height="17" /></element>
+		<element name="4.8" ref="seg"><bounds x="120" y="20" width="20" height="5" /></element>
+		<element name="4.9" ref="seg"><bounds x="120" y="44" width="20" height="5" /></element>
+		<element name="4.10" ref="seg"><bounds x="120" y="68" width="20" height="5" /></element>
+		<element name="4.3" ref="seg"><bounds x="120" y="26" width="5" height="17" /></element>
+		<element name="4.2" ref="seg"><bounds x="120" y="50" width="5" height="17" /></element>
+		<element name="4.0" ref="seg"><bounds x="135" y="26" width="5" height="17" /></element>
+		<element name="4.1" ref="seg"><bounds x="135" y="50" width="5" height="17" /></element>
 
-		<element name="5.1" ref="seg"><bounds x="150" y="20" width="20" height="5" /></element>
-		<element name="5.3" ref="seg"><bounds x="150" y="44" width="20" height="5" /></element>
-		<element name="5.4" ref="seg"><bounds x="150" y="68" width="20" height="5" /></element>
-		<element name="5.9" ref="seg"><bounds x="150" y="26" width="5" height="17" /></element>
-		<element name="5.7" ref="seg"><bounds x="150" y="50" width="5" height="17" /></element>
-		<element name="5.8" ref="seg"><bounds x="165" y="26" width="5" height="17" /></element>
-		<element name="5.6" ref="seg"><bounds x="165" y="50" width="5" height="17" /></element>
+		<element name="5.8" ref="seg"><bounds x="150" y="20" width="20" height="5" /></element>
+		<element name="5.9" ref="seg"><bounds x="150" y="44" width="20" height="5" /></element>
+		<element name="5.10" ref="seg"><bounds x="150" y="68" width="20" height="5" /></element>
+		<element name="5.3" ref="seg"><bounds x="150" y="26" width="5" height="17" /></element>
+		<element name="5.2" ref="seg"><bounds x="150" y="50" width="5" height="17" /></element>
+		<element name="5.0" ref="seg"><bounds x="165" y="26" width="5" height="17" /></element>
+		<element name="5.1" ref="seg"><bounds x="165" y="50" width="5" height="17" /></element>
 
-		<element name="6.1" ref="seg"><bounds x="180" y="20" width="20" height="5" /></element>
-		<element name="6.3" ref="seg"><bounds x="180" y="44" width="20" height="5" /></element>
-		<element name="6.4" ref="seg"><bounds x="180" y="68" width="20" height="5" /></element>
-		<element name="6.9" ref="seg"><bounds x="180" y="26" width="5" height="17" /></element>
-		<element name="6.7" ref="seg"><bounds x="180" y="50" width="5" height="17" /></element>
-		<element name="6.8" ref="seg"><bounds x="195" y="26" width="5" height="17" /></element>
-		<element name="6.6" ref="seg"><bounds x="195" y="50" width="5" height="17" /></element>
+		<element name="6.8" ref="seg"><bounds x="180" y="20" width="20" height="5" /></element>
+		<element name="6.9" ref="seg"><bounds x="180" y="44" width="20" height="5" /></element>
+		<element name="6.10" ref="seg"><bounds x="180" y="68" width="20" height="5" /></element>
+		<element name="6.3" ref="seg"><bounds x="180" y="26" width="5" height="17" /></element>
+		<element name="6.2" ref="seg"><bounds x="180" y="50" width="5" height="17" /></element>
+		<element name="6.0" ref="seg"><bounds x="195" y="26" width="5" height="17" /></element>
+		<element name="6.1" ref="seg"><bounds x="195" y="50" width="5" height="17" /></element>
 
-		<element name="7.1" ref="seg"><bounds x="210" y="20" width="20" height="5" /></element>
-		<element name="7.3" ref="seg"><bounds x="210" y="44" width="20" height="5" /></element>
-		<element name="7.4" ref="seg"><bounds x="210" y="68" width="20" height="5" /></element>
-		<element name="7.9" ref="seg"><bounds x="210" y="26" width="5" height="17" /></element>
-		<element name="7.7" ref="seg"><bounds x="210" y="50" width="5" height="17" /></element>
-		<element name="7.8" ref="seg"><bounds x="225" y="26" width="5" height="17" /></element>
-		<element name="7.6" ref="seg"><bounds x="225" y="50" width="5" height="17" /></element>
+		<element name="7.8" ref="seg"><bounds x="210" y="20" width="20" height="5" /></element>
+		<element name="7.9" ref="seg"><bounds x="210" y="44" width="20" height="5" /></element>
+		<element name="7.10" ref="seg"><bounds x="210" y="68" width="20" height="5" /></element>
+		<element name="7.3" ref="seg"><bounds x="210" y="26" width="5" height="17" /></element>
+		<element name="7.2" ref="seg"><bounds x="210" y="50" width="5" height="17" /></element>
+		<element name="7.0" ref="seg"><bounds x="225" y="26" width="5" height="17" /></element>
+		<element name="7.1" ref="seg"><bounds x="225" y="50" width="5" height="17" /></element>
 
-		<element name="8.1" ref="seg"><bounds x="240" y="20" width="20" height="5" /></element>
-		<element name="8.3" ref="seg"><bounds x="240" y="44" width="20" height="5" /></element>
-		<element name="8.4" ref="seg"><bounds x="240" y="68" width="20" height="5" /></element>
-		<element name="8.9" ref="seg"><bounds x="240" y="26" width="5" height="17" /></element>
-		<element name="8.7" ref="seg"><bounds x="240" y="50" width="5" height="17" /></element>
-		<element name="8.8" ref="seg"><bounds x="255" y="26" width="5" height="17" /></element>
-		<element name="8.6" ref="seg"><bounds x="255" y="50" width="5" height="17" /></element>
+		<element name="8.8" ref="seg"><bounds x="240" y="20" width="20" height="5" /></element>
+		<element name="8.9" ref="seg"><bounds x="240" y="44" width="20" height="5" /></element>
+		<element name="8.10" ref="seg"><bounds x="240" y="68" width="20" height="5" /></element>
+		<element name="8.3" ref="seg"><bounds x="240" y="26" width="5" height="17" /></element>
+		<element name="8.2" ref="seg"><bounds x="240" y="50" width="5" height="17" /></element>
+		<element name="8.0" ref="seg"><bounds x="255" y="26" width="5" height="17" /></element>
+		<element name="8.1" ref="seg"><bounds x="255" y="50" width="5" height="17" /></element>
 
-		<element name="9.1" ref="seg"><bounds x="270" y="20" width="20" height="5" /></element>
-		<element name="9.3" ref="seg"><bounds x="270" y="44" width="20" height="5" /></element>
-		<element name="9.4" ref="seg"><bounds x="270" y="68" width="20" height="5" /></element>
-		<element name="9.9" ref="seg"><bounds x="270" y="26" width="5" height="17" /></element>
-		<element name="9.7" ref="seg"><bounds x="270" y="50" width="5" height="17" /></element>
-		<element name="9.8" ref="seg"><bounds x="285" y="26" width="5" height="17" /></element>
-		<element name="9.6" ref="seg"><bounds x="285" y="50" width="5" height="17" /></element>
+		<element name="9.8" ref="seg"><bounds x="270" y="20" width="20" height="5" /></element>
+		<element name="9.9" ref="seg"><bounds x="270" y="44" width="20" height="5" /></element>
+		<element name="9.10" ref="seg"><bounds x="270" y="68" width="20" height="5" /></element>
+		<element name="9.3" ref="seg"><bounds x="270" y="26" width="5" height="17" /></element>
+		<element name="9.2" ref="seg"><bounds x="270" y="50" width="5" height="17" /></element>
+		<element name="9.0" ref="seg"><bounds x="285" y="26" width="5" height="17" /></element>
+		<element name="9.1" ref="seg"><bounds x="285" y="50" width="5" height="17" /></element>
 
-	<!-- inner bezel -->
-
+		<!-- inner bezel -->
 		<element ref="static_white"><bounds x="24" y="-4" width="2" height="83" /></element>
 		<element ref="static_white"><bounds x="54" y="-4" width="2" height="83" /></element>
 		<element ref="static_white"><bounds x="84" y="-4" width="2" height="83" /></element>

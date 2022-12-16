@@ -8,6 +8,19 @@ import glob
 import io
 import os.path
 import sys
+import xml.sax
+
+
+def path_components(path):
+    result = [ ]
+    while True:
+        path, basename = os.path.split(path)
+        if basename:
+            result.append(basename)
+        else:
+            if path:
+                result.append(path)
+            return tuple(reversed(result))
 
 
 class ParserBase:
@@ -424,7 +437,7 @@ class DriverFilter:
                     sys.stderr.write('%s:%s: Pattern "%s" did not match any source files\n' % (path, parser.input_line, text))
                     sys.exit(1)
                 for source in paths:
-                    sourcefile('/'.join(os.path.split(os.path.relpath(source, basepath))))
+                    sourcefile('/'.join(path_components(os.path.relpath(source, basepath))))
 
         try:
             filterfile = io.open(path, 'r', encoding='utf-8')
@@ -581,6 +594,128 @@ class DriverCollector(DriverFilter):
         self.sources = sorted(sources)
 
 
+class DriverReconciler(DriverFilter):
+    class InfoHandler:
+        def __init__(self, drivers, **kwargs):
+            super().__init__(**kwargs)
+            self.drivers = drivers
+            self.bad = False
+            self.locator = None
+            self.ignored_depth = 0
+            self.in_document = False
+            self.in_mame = False
+
+        def startElement(self, name, attrs):
+            if not self.in_document:
+                raise xml.sax.SAXParseException('Unexpected start of element "%s"' % (name, ), None, self.locator)
+            elif self.ignored_depth > 0:
+                self.ignored_depth += 1
+            elif not self.in_mame:
+                if name != 'mame':
+                    raise xml.sax.SAXParseException('Unexpected start of element "%s"' % (name, ), None, self.locator)
+                self.in_mame = True
+            elif name != 'machine':
+                raise xml.sax.SAXParseException('Unexpected start of element "%s"' % (name, ), None, self.locator)
+            else:
+                runnable = attrs.get('runnable', 'yes')
+                if runnable == 'yes':
+                    shortname = attrs['name']
+                    source = attrs['sourcefile'].replace('\\', '/')
+                    declared = self.drivers.get(shortname)
+                    if declared is None:
+                        sys.stderr.write('Driver "%s" not declared in list file\n' % (shortname, ))
+                        self.bad = True
+                    elif declared != source:
+                        sys.stderr.write('Driver "%s" found for source file "%s" but defined in source file "%s"\n' % (shortname, declared, source))
+                        self.bad = True
+                self.ignored_depth = 1
+
+        def endElement(self, name):
+            if self.ignored_depth > 0:
+                self.ignored_depth -= 1
+            elif self.in_mame:
+                if name != 'mame':
+                    raise xml.sax.SAXParseException('Unexpected end of element "%s"' % (name, ), None, self.locator)
+                self.in_mame = False
+            else:
+                raise xml.sax.SAXParseException('Unexpected end of element "%s"' % (name, ), None, self.locator)
+
+        def startDocument(self):
+            if self.in_document:
+                raise xml.sax.SAXParseException('Unexpected start of document', None, self.locator)
+            self.in_document = True
+
+        def endDocument(self):
+            if not self.in_document:
+                raise xml.sax.SAXParseException('Unexpected end of document', None, self.locator)
+            self.in_document = False
+
+        def setDocumentLocator(self, locator):
+            self.locator = locator
+
+        def startPrefixMapping(self, prefix, uri):
+            pass
+
+        def endPrefixMapping(self, prefix):
+            pass
+
+        def characters(self, content):
+            pass
+
+        def ignorableWhitespace(self, whitespace):
+            pass
+
+        def processingInstruction(self, target, data):
+            pass
+
+
+    def __init__(self, options, **kwargs):
+        super().__init__(**kwargs)
+
+        def sourcefile(filename):
+            if (state['prevsource'] is not None) and (not state['prevdrivers']):
+                sys.stderr.write('No drivers for source file "%s"\n' % (state['prevsource'], ))
+                self.bad = True
+            if filename in self.sources:
+                sys.stderr.write('Duplicate source file "%s"\n' % (filename, ))
+                state['prevdrivers'] = self.sources[filename]
+                self.bad = True
+            else:
+                drivers = set()
+                state['prevdrivers'] = drivers
+                self.sources[filename] = drivers
+            state['prevsource'] = filename
+
+        def driver(shortname):
+            if shortname in self.drivers:
+                sys.stderr.write('Duplicate driver "%s" for source file "%s" (previously seen for source file "%s")\n' % (shortname, state['prevsource'], self.drivers[shortname]))
+                self.bad = True
+            else:
+                self.drivers[shortname] = state['prevsource']
+            drivers = state['prevdrivers']
+            if drivers is None:
+                sys.stderr.write('Driver "%s" found outside source file section\n' % (shortname, ))
+                self.bad = True
+            else:
+                drivers.add(shortname)
+
+        state = { 'prevsource': None, 'prevdrivers': None }
+        self.bad = False
+        self.sources = { }
+        self.drivers = { }
+        self.parse_list(options.list, sourcefile, driver)
+
+    def reconcile_xml(self, xmlfile):
+        handler = self.InfoHandler(self.drivers)
+        try:
+            xml.sax.parse(xmlfile, handler=handler)
+            if handler.bad:
+                self.bad = True
+        except xml.sax.SAXException as err:
+            sys.stderr.write('Error parsing system information file: %s\n' % (err, ))
+            self.bad = True
+
+
 def split_path(path):
     path = os.path.normpath(path)
     result = [ ]
@@ -604,6 +739,7 @@ def parse_command_line():
 
     subparser = subparsers.add_parser('sourcesproject', help='generate project directives for source files')
     subparser.add_argument('-t', '--target', metavar='<target>', required=True, help='generated emulator target name')
+    subparser.add_argument('-l', '--list', metavar='<lstfile>', required=True, help='master driver list file')
     subparser.add_argument('sources', metavar='<srcfile>', nargs='+', help='source files to include')
 
     subparser = subparsers.add_parser('filterproject', help='generate project directives using filter file')
@@ -618,6 +754,10 @@ def parse_command_line():
     subparser = subparsers.add_parser('driverlist', help='generate driver list source')
     subparser.add_argument('-f', '--filter', metavar='<fltfile>', help='input filter file')
     subparser.add_argument('list', metavar='<lstfile>', help='input list file')
+
+    subparser = subparsers.add_parser('reconcilelist', help='reconcile driver list')
+    subparser.add_argument('-l', '--list', metavar='<lstfile>', required=True, help='master driver list file')
+    subparser.add_argument('infoxml', metavar='<xmlfile>', nargs='?', help='XML system information file')
 
     return parser.parse_args()
 
@@ -874,7 +1014,34 @@ def collect_sources(root, sources):
     return result
 
 
-def write_filter(options, filterfile):
+def write_sources_project(options, projectfile):
+    def sourcefile(filename):
+        if tuple(filename.split('/')) in splitsources:
+            state['havedrivers'] = True
+
+    def driver(shortname):
+        pass
+
+    header_to_optional = collect_lua_directives(options)
+    sources = collect_sources(options.root, options.sources)
+    splitsources = frozenset(s[2:] for s in (path_components(s) for s in sources) if s[:2] == ('src', 'mame'))
+    state = { 'havedrivers': False }
+    DriverFilter().parse_list(options.list, sourcefile, driver)
+    if not state['havedrivers']:
+        sys.stderr.write('None of the specified source files contain system drivers\n')
+        sys.exit(1)
+    source_dependencies = scan_source_dependencies(options.root, sources)
+    write_project(options, projectfile, header_to_optional, source_dependencies, True)
+
+
+def write_filter_project(options, projectfile):
+    header_to_optional = collect_lua_directives(options)
+    sources = DriverCollector(options).sources
+    source_dependencies = scan_source_dependencies(options.root, (os.path.join('src', 'mame', *n.split('/')) for n in sources))
+    write_project(options, projectfile, header_to_optional, source_dependencies, False)
+
+
+def write_sources_filter(options, filterfile):
     sources = set()
     DriverFilter().parse_list(options.list, lambda n: sources.add(n), lambda n: None)
 
@@ -893,15 +1060,24 @@ def write_filter(options, filterfile):
 if __name__ == '__main__':
     options = parse_command_line()
     if options.command == 'sourcesproject':
-        header_to_optional = collect_lua_directives(options)
-        source_dependencies = scan_source_dependencies(options.root, collect_sources(options.root, options.sources))
-        write_project(options, sys.stdout, header_to_optional, source_dependencies, True)
+        write_sources_project(options, sys.stdout)
     elif options.command == 'filterproject':
-        header_to_optional = collect_lua_directives(options)
-        sources = DriverCollector(options).sources
-        source_dependencies = scan_source_dependencies(options.root, (os.path.join('src', 'mame', *n.split('/')) for n in sources))
-        write_project(options, sys.stdout, header_to_optional, source_dependencies, False)
+        write_filter_project(options, sys.stdout)
     elif options.command == 'sourcesfilter':
-        write_filter(options, sys.stdout)
+        write_sources_filter(options, sys.stdout)
     elif options.command == 'driverlist':
         DriverLister(options).write_source(sys.stdout)
+    elif options.command == 'reconcilelist':
+        reconciler = DriverReconciler(options)
+        if options.infoxml == '-':
+            reconciler.reconcile_xml(sys.stdin)
+        elif options.infoxml is not None:
+            try:
+                xmlfile = io.open(options.infoxml, 'rb')
+                with xmlfile:
+                    reconciler.reconcile_xml(xmlfile)
+            except IOError:
+                sys.stderr.write('Unable to open system information file "%s"\n' % (options.infoxml, ))
+                sys.exit(1)
+        if reconciler.bad:
+            sys.exit(1)

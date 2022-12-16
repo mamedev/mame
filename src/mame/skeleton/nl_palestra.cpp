@@ -35,6 +35,7 @@
 #endif
 
 NETLIST_START(palestra)
+{
 
 //  SOLVER(Solver, 10000000) to maintain accuracy when SLOW is set and CAP()s are connected
 	SOLVER(Solver, 50000)
@@ -720,5 +721,5 @@ NETLIST_START(palestra)
 	NET_C(VCC, N1X1.VCC, N1X2.VCC, N1X3.VCC, N1X4.VCC, N1X5.VCC, N1X6a.VCC, N1X7a.VCC, N1X8.VCC)
 	NET_C(GND, N1X1.GND, N1X2.GND, N1X3.GND, N1X4.GND, N1X5.GND, N1X7a.GND, N1X6a.GND, N1X8.GND)
 
-NETLIST_END()
+}
 

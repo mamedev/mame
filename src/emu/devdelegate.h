@@ -21,6 +21,14 @@
 #include <utility>
 
 
+// older versions of libc++ are missing deduction guides that the things using this constructor require
+#if defined(_LIBCPP_VERSION) && (_LIBCPP_VERSION < 10000)
+namespace std { inline namespace __1 {
+template<class R, class... ArgTypes > function( R(*)(ArgTypes...) ) -> function<R(ArgTypes...)>;
+} }
+#endif
+
+
 namespace emu {
 
 //**************************************************************************
@@ -203,7 +211,7 @@ public:
 	device_delegate(device_t &owner, T &&funcptr, std::enable_if_t<suitable_functoid<T>::value, char const *> name)
 		: basetype(std::forward<T>(funcptr), name)
 		, detail::device_delegate_helper(owner)
-	{ basetype::operator=(basetype(std::forward<T>(funcptr), name)); }
+	{ }
 
 	// setters that implicitly bind to the current device
 	template <class D> void set(ReturnType (D::*funcptr)(Params...), char const *name)

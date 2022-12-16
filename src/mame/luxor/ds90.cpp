@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "softlist_dev.h"
 #include "bus/nscsi/devices.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "formats/abc1600_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/e0516.h"

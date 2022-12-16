@@ -1162,7 +1162,7 @@ static const char *lookup_trap(uint16_t opcode)
 	return nullptr;
 }
 
-offs_t palm_state::palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
+offs_t palm_base_state::dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
 	unsigned result = 0;
 	const char *trap;

@@ -9,6 +9,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(cmos_inverter)
+{
 	/* Standard stuff */
 
 	//EXTERNAL_SOURCE(modules_lib)
@@ -46,4 +47,4 @@ NETLIST_START(cmos_inverter)
 	LOG(log_G, M.G)
 	LOG(log_D, M.D)
 
-NETLIST_END()
+}

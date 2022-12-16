@@ -80,7 +80,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
 #include "sound/i5000.h"
 #include "emupal.h"
@@ -92,11 +92,6 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 class rabbit_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLIT_DONE
-	};
-
 	rabbit_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),

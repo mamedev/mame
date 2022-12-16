@@ -12,6 +12,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(flyball)
+{
 
 	SOLVER(Solver, 48000)
 	ANALOG_INPUT(V5, 5)
@@ -167,4 +168,4 @@ NETLIST_START(flyball)
 	HINT(IC_C7.12, NC)
 	HINT(IC_D7.6, NC)
 	HINT(IC_E7.6, NC)
-NETLIST_END()
+}

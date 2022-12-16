@@ -63,7 +63,7 @@ This is a full list of known WonderSwan and WonderSwan Color games.
 | X | 052 | aa525c04 | SWJ-SRV001 |  0  | Harobots / ハロボッツ
 | X | 053 | 3ad194eb | SWJ-SUM005 |  0  | Shougi Touryuumon / 将棋 登龍門
 | X | 054 | 9baac7bb | SWJ-HAL002 |  1  | Mingle Magnet / ミングルマグネット
-| X | 055 | cd206a9e | SWJ-BAN013 |  0  | Rockman & Forte - Mirai Kara no Chousensha / ロックマン&フォルテ 未来からの挑戦者
+| X | 055 | cd206a9e | SWJ-BAN013 |  0  | Rockman & Forte - Mirai kara no Chousensha / ロックマン&フォルテ 未来からの挑戦者
 | X | 056 | 0d5171f0 | SWJ-BAN017 |  0  | Turntablist - DJ Battle / タ→ンテ→ブリスト DJバトル
 | X | 057 | ecfbcb1d | SWJ-BEC001 |  1  | Kyousouba Ikusei Simulation - Keiba / 競走馬育成シミュレーション ケイバ
 | X | 058 | 3b4c60c6 | SWJ-KDX001 |  2  | Kiss Yori... - Seaside Serenade / キスより... ～シーサイドセレナーデ～
@@ -2270,7 +2270,7 @@ The Wonder Borg itself uses an Elan EM78P451AQ MCU (undumped).
 	</software>
 
 	<software name="rockmanf">
-		<description>Rockman &amp; Forte - Mirai Kara no Chousensha</description>
+		<description>Rockman &amp; Forte - Mirai kara no Chousensha</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN013"/>

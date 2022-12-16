@@ -340,8 +340,8 @@ void eeprom_serial_base_device::set_state(eeprom_state newstate)
 	// switch to the new state
 	m_state = newstate;
 
-	// set DO high (actually high impedance; pullup assumed)
-	m_do_cb(1);
+	// set DO high (actually high impedance; pullup assumed) except when entering STATE_READING_DATA
+	m_do_cb(m_state != STATE_READING_DATA);
 }
 
 

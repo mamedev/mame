@@ -318,6 +318,7 @@ void mquake_state::mquake(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mquake_state::main_map);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&mquake_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&mquake_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);

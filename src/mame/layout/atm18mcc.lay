@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- NOTE: no chesspieces simulation here -->
+
+<!-- define elements -->
+
+	<element name="lcdw"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="lcdm"><rect><color red="0.37" green="0.45" blue="0.1" /></rect></element>
+	<element name="lcda"><rect><color red="0.02" green="0.06" blue="0.08" /></rect></element>
+
+	<element name="but" defstate="0">
+		<disk state="0"><color red="0.21" green="0.2" blue="0.2" /></disk>
+		<disk state="1"><color red="0.31" green="0.3" blue="0.3" /></disk>
+	</element>
+
+	<element name="text_1"><text string="A1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_2"><text string="B2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_3"><text string="C3"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_4"><text string="D4"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_5"><text string="E5"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_6"><text string="F6"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_7"><text string="G7"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_8"><text string="H8"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="text_fn"><text string="FN"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_cl"><text string="CL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_go"><text string="GO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-13.492" right="80" top="5" bottom="47" />
+
+		<element ref="lcdw"><bounds x="-8.492" y="10" width="48.492" height="15" /></element>
+		<screen index="0"><bounds x="-7.792" y="10.3" width="47.092" height="14.4" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="-8.492" y="10" width="48.492" height="15" /></element>
+		<element ref="lcda" blend="add"><bounds x="-8.492" y="10" width="48.492" height="15" /></element>
+
+		<element ref="text_1"><bounds x="50" y="6" width="5" height="4" /></element>
+		<element ref="text_2"><bounds x="60" y="6" width="5" height="4" /></element>
+		<element ref="text_3"><bounds x="70" y="6" width="5" height="4" /></element>
+		<element ref="text_4"><bounds x="50" y="16" width="5" height="4" /></element>
+		<element ref="text_5"><bounds x="60" y="16" width="5" height="4" /></element>
+		<element ref="text_6"><bounds x="70" y="16" width="5" height="4" /></element>
+		<element ref="text_7"><bounds x="50" y="26" width="5" height="4" /></element>
+		<element ref="text_8"><bounds x="60" y="26" width="5" height="4" /></element>
+		<element ref="text_fn"><bounds x="50" y="36" width="5" height="4" /></element>
+		<element ref="text_cl"><bounds x="60" y="36" width="5" height="4" /></element>
+		<element ref="text_go"><bounds x="70" y="36" width="5" height="4" /></element>
+
+		<element ref="but" inputtag="IN.0" inputmask="0x01"><bounds x="50" y="10" width="5" height="5" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x01"><bounds x="60" y="10" width="5" height="5" /></element>
+		<element ref="but" inputtag="IN.2" inputmask="0x01"><bounds x="70" y="10" width="5" height="5" /></element>
+		<element ref="but" inputtag="IN.3" inputmask="0x01"><bounds x="50" y="20" width="5" height="5" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x02"><bounds x="60" y="20" width="5" height="5" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x02"><bounds x="70" y="20" width="5" height="5" /></element>
+		<element ref="but" inputtag="IN.2" inputmask="0x02"><bounds x="50" y="30" width="5" height="5" /></element>
+		<element ref="but" inputtag="IN.3" inputmask="0x02"><bounds x="60" y="30" width="5" height="5" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x04"><bounds x="50" y="40" width="5" height="5" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x04"><bounds x="60" y="40" width="5" height="5" /></element>
+		<element ref="but" inputtag="IN.2" inputmask="0x04"><bounds x="70" y="40" width="5" height="5" /></element>
+
+	</view>
+</mamelayout>

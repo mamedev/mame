@@ -61,10 +61,8 @@ protected:
 			const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider, bool supports_partial_body_scanlines);
 
 	// fonts
-	static const uint8_t pal_round_fontdata8x12[];
-	static const uint8_t pal_square_fontdata8x12[];
-	static const uint8_t ntsc_round_fontdata8x12[];
-	static const uint8_t ntsc_square_fontdata8x12[];
+	static const uint8_t vdg_t1_fontdata8x12[];
+	static const uint8_t vdg_fontdata8x12[];
 	static const uint8_t semigraphics4_fontdata8x12[];
 	static const uint8_t semigraphics6_fontdata8x12[];
 	static const uint8_t s68047_fontdata8x12[];

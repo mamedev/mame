@@ -178,15 +178,15 @@
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
-	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_MEMORY_VIEWER);
-	node->set_attribute_int("memoryregion", [memoryView selectedSubviewIndex]);
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_MEMORY_VIEWER);
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REGION, [memoryView selectedSubviewIndex]);
 	[memoryView saveConfigurationToNode:node];
 }
 
 
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	[super restoreConfigurationFromNode:node];
-	int const region = node->get_attribute_int("memoryregion", [memoryView selectedSubviewIndex]);
+	int const region = node->get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REGION, [memoryView selectedSubviewIndex]);
 	[memoryView selectSubviewAtIndex:region];
 	[window setTitle:[NSString stringWithFormat:@"Memory: %@", [memoryView selectedSubviewName]]];
 	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[memoryView selectedSubviewIndex]]];

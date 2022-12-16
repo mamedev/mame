@@ -1001,7 +1001,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 						}
 					}
 					else if (m_mode & 0xf)
-						logerror("warning: activated unknown mode %02x at %s\n", m_mode & 0xf, name());
+						logerror("%s: warning: activated unknown mode %02x at %s\n", machine().describe_context(), m_mode & 0xf, name());
 				}
 			}
 			m_envelope[0].set_shape(m_regs[AY_EASHAPE], m_env_step_mask);
@@ -1012,12 +1012,12 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_a_write_cb.isnull())
 					m_port_a_write_cb((offs_t)0, m_regs[AY_PORTA]);
 				else
-					logerror("warning: unmapped write %02x to %s Port A\n", v, name());
+					logerror("%s: warning: unmapped write %02x to %s Port A\n", machine().describe_context(), v, name());
 			}
 			else
 			{
 #if LOG_IGNORED_WRITES
-				logerror("warning: write %02x to %s Port A set as input - ignored\n", v, name());
+				logerror("%s: warning: write %02x to %s Port A set as input - ignored\n", machine().describe_context(), v, name());
 #endif
 			}
 			break;
@@ -1027,12 +1027,12 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_b_write_cb.isnull())
 					m_port_b_write_cb((offs_t)0, m_regs[AY_PORTB]);
 				else
-					logerror("warning: unmapped write %02x to %s Port B\n", v, name());
+					logerror("%s: warning: unmapped write %02x to %s Port B\n", machine().describe_context(), v, name());
 			}
 			else
 			{
 #if LOG_IGNORED_WRITES
-				logerror("warning: write %02x to %s Port B set as input - ignored\n", v, name());
+				logerror("%s: warning: write %02x to %s Port B set as input - ignored\n", machine().describe_context(), v, name());
 #endif
 			}
 			break;
@@ -1451,7 +1451,7 @@ u8 ay8910_device::ay8910_read_ym()
 		   specifies those pull up resistors as 60k to 600k (min / max).
 		   We do need a callback for those two flags. Kid Niki (Irem m62) is one such
 		   case were it makes a difference in comparison to a standard TTL output.
-		 */
+		*/
 		if (!m_port_a_read_cb.isnull())
 			m_regs[AY_PORTA] = m_port_a_read_cb(0);
 		else
@@ -1593,35 +1593,34 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
-								psg_type_t psg_type, int streams, int ioports, int feature)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_type(psg_type),
-		m_streams(streams),
-		m_ioports(ioports),
-		m_ready(0),
-		m_channel(nullptr),
-		m_active(false),
-		m_register_latch(0),
-		m_last_enable(0),
-		m_prescale_noise(0),
-		m_noise_value(0),
-		m_count_noise(0),
-		m_rng(0),
-		m_noise_out(0),
-		m_mode(0),
-		m_env_step_mask((!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 0x0f : 0x1f),
-		m_step(         (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 2 : 1),
-		m_zero_is_off(  (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 1 : 0),
-		m_par(          (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param),
-		m_par_env(      (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param_env),
-		m_flags(AY8910_LEGACY_OUTPUT),
-		m_feature(feature),
-		m_port_a_read_cb(*this),
-		m_port_b_read_cb(*this),
-		m_port_a_write_cb(*this),
-		m_port_b_write_cb(*this)
+ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, psg_type_t psg_type, int streams, int ioports, int feature) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_type(psg_type),
+	m_streams(streams),
+	m_ioports(ioports),
+	m_ready(0),
+	m_channel(nullptr),
+	m_active(false),
+	m_register_latch(0),
+	m_last_enable(0),
+	m_prescale_noise(0),
+	m_noise_value(0),
+	m_count_noise(0),
+	m_rng(0),
+	m_noise_out(0),
+	m_mode(0),
+	m_env_step_mask((!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 0x0f : 0x1f),
+	m_step(         (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 2 : 1),
+	m_zero_is_off(  (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 1 : 0),
+	m_par(          (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param),
+	m_par_env(      (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param_env),
+	m_flags(AY8910_LEGACY_OUTPUT),
+	m_feature(feature),
+	m_port_a_read_cb(*this),
+	m_port_b_read_cb(*this),
+	m_port_a_write_cb(*this),
+	m_port_b_write_cb(*this)
 {
 	memset(&m_regs,0,sizeof(m_regs));
 	memset(&m_tone,0,sizeof(m_tone));

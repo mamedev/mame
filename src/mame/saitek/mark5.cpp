@@ -264,8 +264,7 @@ void mark5_state::cb_w(u8 data)
 		return;
 
 	// d0-d2: chessboard led mux 1/input mux
-	// d3-d5: chessboard led mux 2
-	// d6: led state
+	// d3-d6: chessboard led mux 2
 	m_display[3]->matrix(1 << (data & 7), 1 << (data >> 3 & 0xf));
 	m_cb_mux = data;
 }
@@ -458,7 +457,7 @@ void mark5_state::mark6(machine_config &config)
 	m_board->set_nvram_enable(true);
 
 	PWM_DISPLAY(config, m_display[3]).set_size(8, 8);
-	m_display[3]->set_bri_levels(0.001);
+	m_display[3]->set_interpolation(0.3);
 	config.set_default_layout(layout_saitek_mark6);
 }
 

@@ -37,7 +37,7 @@ public:
 	virtual bool is_writeable() const noexcept override { return false; }
 	virtual bool is_creatable() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
-	virtual const char *file_extensions() const noexcept override { return "png"; }
+	virtual const char *file_extensions() const noexcept override { return "png,jpg,jpeg,jfif,bmp,dib"; }
 	virtual const char *image_type_name() const noexcept override { return "picture"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "pic"; }
 

@@ -945,6 +945,18 @@ private:
 	required_ioport m_p2;
 };
 
+class xavix_evio_cart_state : public xavix_cart_state
+{
+public:
+	xavix_evio_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_cart_state(mconfig,type,tag)
+	{ }
+
+	DECLARE_READ_LINE_MEMBER(i2c_r);
+
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
 
 class xavix_ekara_state : public xavix_cart_state
 {

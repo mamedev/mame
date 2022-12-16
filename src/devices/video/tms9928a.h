@@ -100,7 +100,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 16; }
+	virtual uint32_t palette_entries() const noexcept override { return 16; }
 
 	TIMER_CALLBACK_MEMBER(clock_grom);
 	TIMER_CALLBACK_MEMBER(update_line);

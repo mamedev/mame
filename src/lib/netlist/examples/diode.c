@@ -7,6 +7,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(diode)
+{
 	/* Standard stuff */
 
 	CLOCK(clk, 1000) // 1000 Hz
@@ -28,4 +29,4 @@ NETLIST_START(diode)
 	LOG(logB, clk)
 	LOG(logC, D.A)
 
-NETLIST_END()
+}

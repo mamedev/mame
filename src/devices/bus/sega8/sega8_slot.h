@@ -64,7 +64,7 @@ public:
 	virtual uint8_t read_io(offs_t offset) { return 0xff; }
 	virtual void write_io(offs_t offset, uint8_t data) { }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 
 	virtual void late_bank_setup() { }
@@ -345,12 +345,6 @@ DECLARE_DEVICE_TYPE(SMS_CART_SLOT,       sms_cart_slot_device)
 DECLARE_DEVICE_TYPE(GAMEGEAR_CART_SLOT,  gamegear_cart_slot_device)
 DECLARE_DEVICE_TYPE(SMS_CARD_SLOT,       sms_card_slot_device)
 DECLARE_DEVICE_TYPE(SG1000_CARD_SLOT,    sg1000_card_slot_device)
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define S8SLOT_ROM_REGION_TAG ":cart:rom"
 
 
 // slot interfaces

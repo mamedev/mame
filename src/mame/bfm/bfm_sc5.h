@@ -6,7 +6,7 @@
 #pragma once
 
 #include "bfm_sc4.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/mcf5206e.h"
 
 class bfm_sc5_state : public bfm_sc45_state
 {

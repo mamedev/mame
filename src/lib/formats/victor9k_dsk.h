@@ -49,7 +49,9 @@ protected:
 	static const int speed_zone[2][80];
 	static const int rpm[9];
 
+	static int find_size(util::random_read &io);
 	static int find_size(util::random_read &io, uint32_t form_factor);
+	static int identify(floppy_image *image);
 	static void log_boot_sector(uint8_t *data);
 	static floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count);
 	static void build_sector_description(const format &f, uint8_t *sectdata, uint32_t sect_offs, desc_s *sectors, int sector_count);

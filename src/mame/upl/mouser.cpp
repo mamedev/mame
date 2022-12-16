@@ -15,18 +15,228 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "mouser.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-/* Mouser has external masking circuitry around
- * the NMI input on the main CPU */
+namespace {
+
+class mouser_state : public driver_device
+{
+public:
+	mouser_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
+
+	void mouser(machine_config &config);
+
+	void init_mouser();
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	// misc
+	bool m_nmi_enable = false;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_decrypted_opcodes;
+
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	void sound_nmi_clear_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(nmi_interrupt);
+	INTERRUPT_GEN_MEMBER(sound_nmi_assert);
+	void decrypted_opcodes_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+/*******************************************************************************
+
+     Mouser - Video Hardware:
+
+     Character map with scrollable rows, 1024 possible characters.
+        - index = byte from videoram + 2 bits from colorram)
+        - (if row is scrolled, videoram is offset, colorram is not)
+        - 16 4-color combinations for each char, from colorram
+
+     15 Sprites controlled by 4-byte records
+        - 16 4-color combinations
+        - 2 banks of 64 sprite characters each
+
+*******************************************************************************/
+
+void mouser_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x4f * bit0 + 0xa8 * bit1;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+WRITE_LINE_MEMBER(mouser_state::flip_screen_x_w)
+{
+	flip_screen_x_set(!state);
+}
+
+WRITE_LINE_MEMBER(mouser_state::flip_screen_y_w)
+{
+	flip_screen_y_set(!state);
+}
+
+uint32_t mouser_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *const spriteram = m_spriteram;
+
+	// for every character in the Video RAM
+	for (int offs = 0x3ff; offs >= 0; offs--)
+	{
+		int sx = offs % 32;
+		if (flip_screen_x())
+			sx = 31 - sx;
+
+		int sy = offs / 32;
+		if (flip_screen_y())
+			sy = 31 - sy;
+
+		/* This bit of spriteram appears to be for row scrolling
+		   Note: this is dependant on flipping in y */
+		int const scrolled_y_position = (256 + 8 * sy - spriteram[offs % 32]) % 256;
+		/* I think we still need to fetch the colorram bits to from the ram underneath, which is not scrolled
+		   Ideally we would merge these on a pixel-by-pixel basis, but it's ok to do this char-by-char,
+		   Since it's only for the MOUSER logo and it looks fine
+		   Note: this is _not_ dependant on flipping */
+		int const color_offs = offs % 32 + ((256 + 8 * (offs / 32) - spriteram[offs % 32] )% 256) / 8 * 32;
+
+		m_gfxdecode->gfx(0)->opaque(bitmap, cliprect,
+				m_videoram[offs] | (m_colorram[color_offs] >> 5) * 256 | ((m_colorram[color_offs] >> 4) & 1) * 512,
+				m_colorram[color_offs] % 16,
+				flip_screen_x(), flip_screen_y(),
+				8 * sx, scrolled_y_position);
+	}
+
+	// There seem to be two sets of sprites, each decoded identically
+
+	// This is the first set of 7 sprites
+	for (int offs = 0x0084; offs < 0x00a0; offs += 4)
+	{
+		if (BIT(spriteram[offs + 1], 4))
+		{
+			int flipx = BIT(spriteram[offs], 6);
+			int flipy = BIT(spriteram[offs], 7);
+
+			int sx = spriteram[offs + 3];
+			if (flip_screen_x())
+			{
+				flipx = !flipx;
+				sx = 240 - sx;
+			}
+
+			int sy = 0xef - spriteram[offs + 2];
+			if (flip_screen_y())
+			{
+				flipy = !flipy;
+				sy = 238 - sy;
+			}
+
+			m_gfxdecode->gfx(1 + ((spriteram[offs + 1] & 0x20) >> 5))->transpen(bitmap, cliprect,
+					spriteram[offs] & 0x3f,
+					spriteram[offs + 1] % 16,
+					flipx, flipy,
+					sx, sy, 0);
+		}
+	}
+
+	// This is the second set of 8 sprites
+	for (int offs = 0x00c4; offs < 0x00e4; offs += 4)
+	{
+		if (BIT(spriteram[offs + 1], 4))
+		{
+			int flipx = BIT(spriteram[offs], 6);
+			int flipy = BIT(spriteram[offs], 7);
+
+			int sx = spriteram[offs + 3];
+			if (flip_screen_x())
+			{
+				flipx = !flipx;
+				sx = 240 - sx;
+			}
+
+			int sy = 0xef - spriteram[offs + 2];
+			if (flip_screen_y())
+			{
+				flipy = !flipy;
+				sy = 238 - sy;
+			}
+
+			m_gfxdecode->gfx(1 + ((spriteram[offs + 1] & 0x20) >> 5))->transpen(bitmap, cliprect,
+					spriteram[offs] & 0x3f,
+					spriteram[offs + 1] % 16,
+					flipx, flipy,
+					sx, sy, 0);
+		}
+	}
+
+	return 0;
+}
+
+
+// machine
+
+// Mouser has external masking circuitry around the NMI input on the main CPU
 WRITE_LINE_MEMBER(mouser_state::nmi_enable_w)
 {
 	m_nmi_enable = state;
@@ -34,54 +244,54 @@ WRITE_LINE_MEMBER(mouser_state::nmi_enable_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mouser_state::mouser_nmi_interrupt)
+WRITE_LINE_MEMBER(mouser_state::nmi_interrupt)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-/* Sound CPU interrupted on write */
+// Sound CPU interrupted on write
 
-void mouser_state::mouser_sound_nmi_clear_w(uint8_t data)
+void mouser_state::sound_nmi_clear_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mouser_state::mouser_sound_nmi_assert)
+INTERRUPT_GEN_MEMBER(mouser_state::sound_nmi_assert)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-void mouser_state::mouser_map(address_map &map)
+void mouser_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6bff).ram();
-	map(0x8800, 0x88ff).nopw(); /* unknown */
-	map(0x9000, 0x93ff).ram().share("videoram");
-	map(0x9800, 0x9bff).ram().share("spriteram");
-	map(0x9c00, 0x9fff).ram().share("colorram");
+	map(0x8800, 0x88ff).nopw(); // unknown
+	map(0x9000, 0x93ff).ram().share(m_videoram);
+	map(0x9800, 0x9bff).ram().share(m_spriteram);
+	map(0x9c00, 0x9fff).ram().share(m_colorram);
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xa800, 0xa800).portr("SYSTEM");
 	map(0xb000, 0xb000).portr("DSW");
-	map(0xb800, 0xb800).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write)); /* byte to sound cpu */
+	map(0xb800, 0xb800).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write)); // byte to sound CPU
 }
 
 void mouser_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom().share("decrypted_opcodes");
+	map(0x0000, 0x5fff).rom().share(m_decrypted_opcodes);
 }
 
-void mouser_state::mouser_sound_map(address_map &map)
+void mouser_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x4000, 0x4000).w(FUNC(mouser_state::mouser_sound_nmi_clear_w));
+	map(0x4000, 0x4000).w(FUNC(mouser_state::sound_nmi_clear_w));
 }
 
-void mouser_state::mouser_sound_io_map(address_map &map)
+void mouser_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::data_address_w));
@@ -95,7 +305,7 @@ static INPUT_PORTS_START( mouser )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )       /* guess ! - check code at 0x29a1 */
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )       // guess ! - check code at 0x29a1
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -175,9 +385,9 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( gfx_mouser )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x1800, spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, charlayout,       0, 16 )
+	GFXDECODE_ENTRY( "gfx", 0x1000, spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( "gfx", 0x1800, spritelayout,     0, 16 )
 GFXDECODE_END
 
 
@@ -186,21 +396,17 @@ void mouser_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-void mouser_state::machine_reset()
-{
-}
-
 void mouser_state::mouser(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);   /* 4 MHz ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &mouser_state::mouser_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, 4'000'000);   // 4 MHz ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &mouser_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &mouser_state::decrypted_opcodes_map);
 
-	Z80(config, m_audiocpu, 4000000);  /* ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &mouser_state::mouser_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &mouser_state::mouser_sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(mouser_state::mouser_sound_nmi_assert), attotime::from_hz(4*60)); /* ??? This controls the sound tempo */
+	Z80(config, m_audiocpu, 4'000'000);  // ???
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mouser_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &mouser_state::sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(mouser_state::sound_nmi_assert), attotime::from_hz(4 * 60)); // ??? This controls the sound tempo
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // type unconfirmed
 	mainlatch.q_out_cb<0>().set(FUNC(mouser_state::nmi_enable_w));
@@ -209,29 +415,29 @@ void mouser_state::mouser(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(mouser_state::screen_update_mouser));
+	screen.set_screen_update(FUNC(mouser_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(mouser_state::mouser_nmi_interrupt));
+	screen.screen_vblank().set(FUNC(mouser_state::nmi_interrupt));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mouser);
-	PALETTE(config, m_palette, FUNC(mouser_state::mouser_palette), 64);
+	PALETTE(config, m_palette, FUNC(mouser_state::palette), 64);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", 4000000/2).add_route(ALL_OUTPUTS, "mono", 0.50);
-	AY8910(config, "ay2", 4000000/2).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "ay1", 4'000'000 / 2).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "ay2", 4'000'000 / 2).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
 ROM_START( mouser )
-	ROM_REGION( 0x6000, "maincpu", 0 ) /* 64K for data, 64K for encrypted opcodes */
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "m0.5e",         0x0000, 0x2000, CRC(b56e00bc) SHA1(f3b23212590d91f1d19b1c7a98c560fbe5943185) )
 	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )
 	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )
@@ -239,11 +445,11 @@ ROM_START( mouser )
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "m3.11h",        0x0000, 0x2000, CRC(aca2834e) SHA1(c4f457fd8ea46386431ef8dffe54a232631870be) )
 	ROM_LOAD( "m4.11k",        0x2000, 0x2000, CRC(943ab2e2) SHA1(ef9fc31dc8fe7a62f7bc6c817ce0d65091cb9a03) )
 
-	/* Opcode Decryption PROMS */
+	// Opcode Decryption PROMS
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD_NIB_HIGH( "bprom.4b",0x0000,0x0100,CRC(dd233851) SHA1(25eab1ec2227910c6fcd2803986f1cf206624da7) )
 	ROM_LOAD_NIB_LOW(  "bprom.4c",0x0000,0x0100,CRC(60aaa686) SHA1(bb2ad555da51f6b30ab8b55833fe8d461a1e67f4) )
@@ -255,7 +461,7 @@ ROM_END
 
 
 ROM_START( mouserc )
-	ROM_REGION( 0x6000, "maincpu", 0 ) /* 64K for data, 64K for encrypted opcodes */
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "83001.0",       0x0000, 0x2000, CRC(e20f9601) SHA1(f559a470784bda0bee9cab257a548238365acaa6) )
 	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )   // 83001.1
 	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )   // 83001.2
@@ -263,11 +469,11 @@ ROM_START( mouserc )
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )   // 83001.5
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "m3.11h",        0x0000, 0x2000, CRC(aca2834e) SHA1(c4f457fd8ea46386431ef8dffe54a232631870be) )   // 83001.3
 	ROM_LOAD( "m4.11k",        0x2000, 0x2000, CRC(943ab2e2) SHA1(ef9fc31dc8fe7a62f7bc6c817ce0d65091cb9a03) )   // 83001.4
 
-	/* Opcode Decryption PROMS (originally from the UPL romset!) */
+	// Opcode Decryption PROMS (originally from the UPL romset!)
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD_NIB_HIGH( "bprom.4b",0x0000,0x0100,CRC(dd233851) SHA1(25eab1ec2227910c6fcd2803986f1cf206624da7) )
 	ROM_LOAD_NIB_LOW(  "bprom.4c",0x0000,0x0100,CRC(60aaa686) SHA1(bb2ad555da51f6b30ab8b55833fe8d461a1e67f4) )
@@ -280,7 +486,7 @@ ROM_END
 
 void mouser_state::init_mouser()
 {
-	/* Decode the opcodes */
+	// Decode the opcodes
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *table = memregion("user1")->base();
 
@@ -289,6 +495,8 @@ void mouser_state::init_mouser()
 		m_decrypted_opcodes[i] = table[rom[i]];
 	}
 }
+
+} // anonymous namespace
 
 
 GAME( 1983, mouser,   0,      mouser, mouser, mouser_state, init_mouser, ROT90, "UPL",                  "Mouser",          MACHINE_SUPPORTS_SAVE )

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/fscpu32.h"
 
 #include "68340sim.h"
 #include "68340dma.h"
@@ -83,16 +83,16 @@ private:
 		m_clock_mode |= (m68340_sim::CLOCK_MODCK | m68340_sim::CLOCK_PLL);
 	}
 
-	uint32_t m68340_internal_base_r(offs_t offset, uint32_t mem_mask = ~0);
-	void m68340_internal_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t m68340_internal_dma_r(offs_t offset, uint32_t mem_mask = ~0);
-	void m68340_internal_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t m68340_internal_base_r(offs_t offset, uint16_t mem_mask = ~0);
+	void m68340_internal_base_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t m68340_internal_dma_r(offs_t offset, uint16_t mem_mask = ~0);
+	void m68340_internal_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t m68340_internal_sim_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint8_t m68340_internal_sim_ports_r(offs_t offset);
-	uint32_t m68340_internal_sim_cs_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint16_t m68340_internal_sim_cs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void m68340_internal_sim_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void m68340_internal_sim_ports_w(offs_t offset, uint8_t data);
-	void m68340_internal_sim_cs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void m68340_internal_sim_cs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// Clock/VCO setting TODO: support external clock with PLL and Limp mode
 	DECLARE_WRITE_LINE_MEMBER( set_modck );

@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods,Sean Riddle,Tim Lindner
 /*****************************************************************************
 
-    6x09dasm.cpp - a 6809/6309/Konami opcode disassembler
+    a 6809/6309/Konami opcode disassembler
 
     Based on:
         6309dasm.c - a 6309 opcode disassembler
@@ -10,7 +10,6 @@
         Copyright Tim Lindner
 
     and
-
         6809dasm.c - a 6809 opcode disassembler
         Version 1.4 1-MAR-95
         Copyright Sean Riddle
@@ -155,8 +154,8 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x08)
 			util::stream_format(stream, "%sDP", (pb&0xf0)?",":"");
 		if (pb & 0x04)
-			util::stream_format(stream, "%sB",  (pb&0xf8)?",":"");
-		if (pb & 0x02)
+			util::stream_format(stream, "%s%s", (pb&0xf8)?",":"", (pb & 0x02) ? "D" : "B");
+		else if (pb & 0x02)
 			util::stream_format(stream, "%sA",  (pb&0xfc)?",":"");
 		if (pb & 0x01)
 			util::stream_format(stream, "%sCC", (pb&0xfe)?",":"");
@@ -168,8 +167,8 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x01)
 			util::stream_format(stream, "CC");
 		if (pb & 0x02)
-			util::stream_format(stream, "%sA",  (pb&0x01)?",":"");
-		if (pb & 0x04)
+			util::stream_format(stream, "%s%s", (pb&0x01)?",":"", (pb & 0x04) ? "D" : "A");
+		else if (pb & 0x04)
 			util::stream_format(stream, "%sB",  (pb&0x03)?",":"");
 		if (pb & 0x08)
 			util::stream_format(stream, "%sDP", (pb&0x07)?",":"");

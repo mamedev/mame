@@ -16,7 +16,7 @@
 #include "k053251.h"
 #include "konami_helper.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/watchdog.h"
@@ -69,13 +69,13 @@ private:
 	int m_layerpri[3]{};
 
 	// misc
-	emu_timer *m_nmi_timer = nullptr;
+	emu_timer *m_nmi_blocked = nullptr;
 
 	void videobank_w(uint8_t data);
 	void _3fc0_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
 	void sound_arm_nmi_w(uint8_t data);
-	TIMER_CALLBACK_MEMBER(nmi_timer);
+	void z80_nmi_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K05324X_CB_MEMBER(sprite_callback);
 	K052109_CB_MEMBER(tile_callback);
@@ -200,15 +200,17 @@ void parodius_state::sh_irqtrigger_w(uint8_t data)
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-TIMER_CALLBACK_MEMBER(parodius_state::nmi_timer)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
 void parodius_state::sound_arm_nmi_w(uint8_t data)
 {
+	// see notes in simpsons driver
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	m_nmi_timer->adjust(attotime::from_usec(50));  // kludge until the K053260 is emulated correctly
+	m_nmi_blocked->adjust(m_audiocpu->cycles_to_attotime(4));
+}
+
+void parodius_state::z80_nmi_w(int state)
+{
+	if (state && !m_nmi_blocked->enabled())
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 /********************************************/
@@ -232,7 +234,7 @@ void parodius_state::main_map(address_map &map)
 	map(0x3fc4, 0x3fc4).w(FUNC(parodius_state::videobank_w));
 	map(0x3fc8, 0x3fc8).w(FUNC(parodius_state::sh_irqtrigger_w));
 	map(0x3fcc, 0x3fcd).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
-	map(0x6000, 0x9fff).bankr(m_mainbank);            // banked ROM
+	map(0x6000, 0x9fff).bankr(m_mainbank);
 	map(0xa000, 0xffff).rom().region("maincpu", 0x3a000);
 }
 
@@ -259,7 +261,7 @@ void parodius_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( parodius )
 	PORT_START("P1")
-	KONAMI8_ALT_B123(1)                     // button1 = power-up, button2 = shoot, button3 = missile
+	KONAMI8_ALT_B123(1) // button1 = power-up, button2 = shoot, button3 = missile
 
 	PORT_START("P2")
 	KONAMI8_ALT_B123(2)
@@ -319,7 +321,7 @@ void parodius_state::machine_start()
 	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base(), 0x4000);
 	m_mainbank->set_entry(0);
 
-	m_nmi_timer = timer_alloc(FUNC(parodius_state::nmi_timer), this);
+	m_nmi_blocked = timer_alloc(timer_expired_delegate());
 
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
@@ -336,6 +338,10 @@ void parodius_state::machine_reset()
 
 	m_sprite_colorbase = 0;
 	m_bank0000->set_bank(0);
+
+	// Z80 _NMI goes low at same time as reset
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void parodius_state::banking_callback(uint8_t data)
@@ -349,7 +355,7 @@ void parodius_state::banking_callback(uint8_t data)
 void parodius_state::parodius(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 3000000); // 053248
+	KONAMI(config, m_maincpu, 12000000); // 053248
 	m_maincpu->set_addrmap(AS_PROGRAM, &parodius_state::main_map);
 	m_maincpu->line().set(FUNC(parodius_state::banking_callback));
 
@@ -392,6 +398,7 @@ void parodius_state::parodius(machine_config &config)
 	k053260_device &k053260(K053260(config, "k053260", 3579545));
 	k053260.add_route(0, "lspeaker", 0.70);
 	k053260.add_route(1, "rspeaker", 0.70);
+	k053260.sh1_cb().set(FUNC(parodius_state::z80_nmi_w));
 }
 
 /***************************************************************************

@@ -21,6 +21,7 @@
 #define OPAMP_TEST "MB3614(DAB=0.0015)"
 
 NETLIST_START(main)
+{
 
 	/* Standard stuff */
 
@@ -91,4 +92,4 @@ NETLIST_START(main)
 	LOG(log_Y, R1.1)
 	LOG(log_Z, f)
 #endif
-NETLIST_END()
+}

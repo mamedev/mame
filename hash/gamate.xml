@@ -356,7 +356,7 @@ C1066 - ??
 
 <!-- This maybe comes from a cart with "Bomb Blaster" label? -->
 	<software name="bomblasta" cloneof="bomblast">
-		<description>Bomb Blaster (Alt)</description>
+		<description>Bomb Blaster (alt)</description>
 		<year>1990</year>
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1031" />

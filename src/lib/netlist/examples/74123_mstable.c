@@ -8,6 +8,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(74123_mstable)
+{
 
 	/*
 	 * Monoflog
@@ -44,4 +45,4 @@ NETLIST_START(74123_mstable)
 	LOG(log_Q, mf.Q)
 	LOG(log_X, clk.Q)
 
-NETLIST_END()
+}

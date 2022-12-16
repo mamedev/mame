@@ -15,7 +15,6 @@
 #include "bgfx/chain.h"
 #include "bgfx/chainmanager.h"
 #include "sliderdirtynotifier.h"
-#include "../frontend/mame/ui/menuitem.h"
 
 class texture_manager;
 class target_manager;
@@ -58,29 +57,7 @@ public:
 	uint32_t get_window_width(uint32_t index) const;
 	uint32_t get_window_height(uint32_t index) const;
 
-	virtual render_primitive_list *get_primitives() override
-	{
-		auto win = try_getwindow();
-		if (win == nullptr)
-			return nullptr;
-
-		// determines whether the screen container is transformed by the chain's shaders
-		bool chain_transform = false;
-
-		// check the first chain
-		bgfx_chain* chain = this->m_chains->screen_chain(0);
-		if (chain != nullptr)
-		{
-			chain_transform = chain->transform();
-		}
-
-		osd_dim wdim = win->get_size();
-		if (wdim.width() > 0 && wdim.height() > 0)
-			win->target()->set_bounds(wdim.width(), wdim.height(), win->pixel_aspect());
-
-		win->target()->set_transform_container(!chain_transform);
-		return &win->target()->get_primitives();
-	}
+	virtual render_primitive_list *get_primitives() override;
 
 	static char const *const WINDOW_PREFIX;
 

@@ -72,7 +72,6 @@
 #include "divideo.h"
 #include "dinvram.h"
 #include "schedule.h"
-#include "dinetwork.h"
 
 // machine and driver configuration
 #include "mconfig.h"

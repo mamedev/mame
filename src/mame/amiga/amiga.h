@@ -15,6 +15,9 @@ Ernesto Corvi & Mariusz Wojcieszek
 #pragma once
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 #include "machine/bankdev.h"
 #include "bus/rs232/rs232.h"
 #include "bus/centronics/ctronics.h"

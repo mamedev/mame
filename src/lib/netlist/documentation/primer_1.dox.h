@@ -19,6 +19,7 @@ Now in netlist syntax this looks like:
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(charge_discharge)
+{
 
     ANALOG_INPUT(V5, 5) // Clock needs a 5V power supply
 
@@ -34,7 +35,7 @@ NETLIST_START(charge_discharge)
     NET_C(V5, I.VCC)
 
     ALIAS(O, R.2) // Output O == C.1 == R.2
-NETLIST_END()
+}
 ~~~
 
 Save this example as e.g. test1.cpp. Now that's a c++ extension. The background

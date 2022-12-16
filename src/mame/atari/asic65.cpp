@@ -189,7 +189,7 @@ void asic65_device::data_w(offs_t offset, u16 data)
 	if (m_asic65_type == ASIC65_ROMBASED)
 	{
 		m_synced_write_timer->adjust(attotime::zero, data | (offset << 16));
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+		machine().scheduler().perfect_quantum(attotime::from_usec(20));
 		return;
 	}
 
@@ -228,7 +228,7 @@ u16 asic65_device::read()
 		if (!machine().side_effects_disabled())
 		{
 			m_68full = 0;
-			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
+			machine().scheduler().perfect_quantum(attotime::from_usec(5));
 		}
 		return m_68data;
 	}
@@ -461,7 +461,7 @@ u16 asic65_device::io_r()
 		/* bit 13 = XFLG */
 		/* bit 12 = controlled by jumper */
 		if (!machine().side_effects_disabled())
-			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
+			machine().scheduler().perfect_quantum(attotime::from_usec(5));
 		return (m_tfull << 15) | (m_68full << 14) | (m_xflg << 13) | 0x0000;
 	}
 	else

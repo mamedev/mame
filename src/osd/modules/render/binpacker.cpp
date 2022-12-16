@@ -6,9 +6,10 @@
 //
 //============================================================
 
-#include "emu.h"
 #include "binpacker.h"
+
 #include <algorithm>
+#include <cstddef>
 
 bool rectangle_packer::pack(const std::vector<packable_rectangle>& rects, std::vector<std::vector<packed_rectangle>>& packs,  int pack_size)
 {

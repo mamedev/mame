@@ -70,4 +70,5 @@ void ata_devices(device_slot_interface &device)
 	device.option_add("hdd", IDE_HARDDISK);
 	device.option_add("cdrom", ATAPI_CDROM);
 	device.option_add("px320a", PX320A);
+	device.option_add("cf", ATA_CF);
 }

@@ -132,6 +132,18 @@ Acorn BBC Master ROM Cartridges
 		</part>
 	</software>
 
+	<software name="mastersdr2" cloneof="mastersd">
+		<description>Master SD R2</description>
+		<year>2020</year>
+		<publisher>Ramtop</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="mastersdr2" />
+			<dataarea name="rom" size="16384">
+				<rom name="swmmfs-1.44r2.rom" size="16384" crc="36bc3af1" sha1="6086e31b3dd46595403a03e3027a5acd4d74d60b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mega256">
 		<description>Master Mega 256</description>
 		<year>1987</year>

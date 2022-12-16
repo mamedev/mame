@@ -569,6 +569,9 @@ elseif (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
 			string.format(
 				"%s %s -r %s filterproject -t %s -f %s %s",
 				PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, driverlist))
+		if #OUT_STR == 0 then
+			error("Error creating projects from driver filter file for subtarget " .. _OPTIONS["subtarget"])
+		end
 		load(OUT_STR)()
 	else
 		error("Definition file for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
@@ -1264,6 +1267,10 @@ configuration { "linux-*" }
 		end
 
 
+configuration { "netbsd" }
+		flags {
+			"LinkSupportCircularDependencies",
+		}
 
 configuration { "osx*" }
 		links {
@@ -1436,15 +1443,23 @@ if _OPTIONS["SOURCES"] ~= nil then
 	for word in string.gmatch(str, '([^,]+)') do
 		local fullpath = path.join(MAME_DIR, word)
 		if (not os.isfile(fullpath)) and (not os.isdir(fullpath)) then
-			error("File/directory " .. word .. " does not exist")
+			word = path.join("src", _OPTIONS["target"], word)
+			fullpath = path.join(MAME_DIR, word)
+			if (not os.isfile(fullpath)) and (not os.isdir(fullpath)) then
+				error("File/directory " .. word .. " does not exist")
+			end
 		end
 		sourceargs = sourceargs .. " " .. word
 	end
 
+	local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
 	local OUT_STR = os.outputof(
 		string.format(
-			"%s %s -r %s sourcesproject -t %s %s",
-			PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], sourceargs))
+			"%s %s -r %s sourcesproject -t %s -l %s %s",
+			PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], driverlist, sourceargs))
+	if #OUT_STR == 0 then
+		error("Error creating projects from specified source files")
+	end
 	load(OUT_STR)()
 
 	local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
@@ -1465,6 +1480,9 @@ elseif _OPTIONS["SOURCEFILTER"] ~= nil then
 		string.format(
 			"%s %s -r %s filterproject -t %s -f %s %s",
 			PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], driverfilter, driverlist))
+	if #OUT_STR == 0 then
+		error("Error creating projects from specified driver filter file")
+	end
 	load(OUT_STR)()
 end
 

@@ -53,6 +53,8 @@
 #include "formats/dfi_dsk.h"
 #include "formats/ipf_dsk.h"
 
+#include "utf8.h"
+
 
 //**************************************************************************
 //  CONSTANTS / MACROS
@@ -276,12 +278,6 @@ public:
 class ste_state : public st_state
 {
 public:
-	enum
-	{
-		TIMER_DMASOUND_TICK,
-		TIMER_MICROWIRE_TICK
-	};
-
 	ste_state(const machine_config &mconfig, device_type type, const char *tag)
 		: st_state(mconfig, type, tag),
 			m_lmc1992(*this, LMC1992_TAG)
@@ -2305,7 +2301,7 @@ void st_state::common(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, Y2/4);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &st_state::cpu_space_map);
-	m_maincpu->set_reset_callback(FUNC(st_state::reset_w));
+	m_maincpu->reset_cb().set(FUNC(st_state::reset_w));
 
 	keyboard(config);
 
@@ -2529,7 +2525,7 @@ void stbook_state::stbook(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, U517/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stbook_state::stbook_map);
-	m_maincpu->set_reset_callback(FUNC(st_state::reset_w));
+	m_maincpu->reset_cb().set(FUNC(st_state::reset_w));
 
 	//COP888(config, COP888_TAG, Y700);
 

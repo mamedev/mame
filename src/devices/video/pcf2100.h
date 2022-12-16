@@ -54,15 +54,15 @@ protected:
 
 	const u8 m_bpmax; // number of BP pins
 	const u8 m_smax; // number of S pins
-	u64 m_shift = 0;
-	u8 m_count = 0;
-	u8 m_bpout = 0;
-	u32 m_latch[2] = { 0, 0 };
+	u64 m_shift;
+	u8 m_count;
+	u8 m_bpout;
+	u32 m_latch[2];
 
 	// pin state
-	int m_clb = 0;
-	int m_data = 0;
-	int m_dlen = 0;
+	int m_clb;
+	int m_data;
+	int m_dlen;
 
 	// callbacks
 	devcb_write32 m_write_segs;

@@ -10,7 +10,7 @@ Excel 68000 I/O is very similar to EAG, so it's handled in this driver as well
 
 TODO:
 - unemulated waitstates with DTACK
-- EAG USART is not emulated
+- EAG USART is not emulated, conflict with input2_r?
 - V10 CPU emulation is too slow, MAME 68040 opcode timing is same as 68030 but in
   reality it is much faster, same goes for V11 of course (see note below)
 - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
@@ -77,7 +77,7 @@ to be compatible with EAG though and will load fine with an adapter.
 The USART allows for a serial connection between the chess computer and another
 device, for example a PC. Fidelity released a DOS tool called EAGLINK which
 featured PC printer support, complete I/O control, detailed information while
-the program is 'thinking', etc.
+the program is 'thinking', etc. It can be enabled with POP3 H3.
 
 Memory map: (of what is known)
 -----------
@@ -168,6 +168,9 @@ B0000x-xxxxxx: see V7, -800000
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 #include "machine/clock.h"
 #include "machine/gen_latch.h"
 #include "machine/ram.h"
@@ -747,13 +750,25 @@ ROM_START( fex68km2a ) // model 6097, PCB label 510.1120B01
 	ROM_LOAD16_BYTE("o8_red.u7",    0x00001, 0x08000, CRC(26da3424) SHA1(e0cec467bf1249ce89a27c45f5013859e6581ecd) ) // "
 ROM_END
 
-ROM_START( fex68km3 ) // model 6098, PCB label 510.1120B01
+ROM_START( fex68km3 ) // model 6098, PCB label 510.1120B01 - checksum DB53
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("me_white.u6",  0x00000, 0x08000, CRC(4b14cd9f) SHA1(4d41196900a71bf0699dae50f4726acc0ed3dced) ) // 27c256
 	ROM_LOAD16_BYTE("mo_yellow.u7", 0x00001, 0x08000, CRC(b96b0b5f) SHA1(281145be802efb38ed764aecb26b511dcd71cb87) ) // "
 ROM_END
 
-ROM_START( fex68km4 ) // model 6110, PCB label 510.1120B01
+ROM_START( fex68km3a ) // model 6098, PCB label 510.1120B01 - checksum F806
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("me_white.u6",  0x00000, 0x08000, CRC(434b68ec) SHA1(eaf6d2b1db3c0145adfd9d2c5d5d5ec65524b5de) ) // 27c256
+	ROM_LOAD16_BYTE("mo_yellow.u7", 0x00001, 0x08000, CRC(5e78ee99) SHA1(70e5e47b6daa35dc4d5675d4d1c6a4093fb47ea6) ) // "
+ROM_END
+
+ROM_START( fex68km3b ) // model 6098, PCB label 510.1120B01 - checksum E2DA
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("me_white.u6",  0x00000, 0x08000, CRC(39e17293) SHA1(61d557f96ae2bb164108f53d7d48239f8f2a7f6b) ) // 27c256
+	ROM_LOAD16_BYTE("mo_yellow.u7", 0x00001, 0x08000, CRC(572b208a) SHA1(cd50982d8fa5bde9ac83472fddd14d56fa6ead3b) ) // "
+ROM_END
+
+ROM_START( fex68km4 ) // model 6110, PCB label 510.1120B01 - checksum FD96
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("68020_even_master_2325.u6", 0x00000, 0x08000, CRC(13ea816c) SHA1(98d00fc382ddcbccb0a47c3f8d7fc73f30a15fbd) )
 	ROM_LOAD16_BYTE("68020_odd_master_2325.u7",  0x00001, 0x08000, CRC(d24c7b54) SHA1(3204fd600786792a618965715990c44890cc7119) )
@@ -830,7 +845,9 @@ CONS( 1987, fex68ka,   fex68k,  0, fex68k,   excel68k, excel68k_state, empty_ini
 CONS( 1987, fex68kb,   fex68k,  0, fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, fex68km2,  fex68k,  0, fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, fex68km2a, fex68k,  0, fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fex68km3,  fex68k,  0, fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fex68km3,  fex68k,  0, fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fex68km3a, fex68k,  0, fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fex68km3b, fex68k,  0, fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, fex68km4,  fex68k,  0, fex68km4, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1989, feagv2,    0,       0, eagv2,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

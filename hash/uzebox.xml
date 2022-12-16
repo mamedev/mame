@@ -788,7 +788,7 @@ license:CC0
 	</software>
 
 	<software name="arkanoida" cloneof="arkanoid">
-		<description>Arkanoid (Alt)</description>
+		<description>Arkanoid (alt)</description>
 		<year>2008</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -799,7 +799,7 @@ license:CC0
 	</software>
 
 	<software name="bitmapda" cloneof="bitmapd">
-		<description>DitmapDemo (Alt)</description>
+		<description>DitmapDemo (alt)</description>
 		<year>2009</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -810,7 +810,7 @@ license:CC0
 	</software>
 
 	<software name="chessa" cloneof="chess">
-		<description>chess4uzebox (Alt)</description>
+		<description>chess4uzebox (alt)</description>
 		<year>2011</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -821,7 +821,7 @@ license:CC0
 	</software>
 
 	<software name="ctestera" cloneof="ctester">
-		<description>Controller Tester (Alt)</description>
+		<description>Controller Tester (alt)</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -832,7 +832,7 @@ license:CC0
 	</software>
 
 	<software name="emuzea" cloneof="emuze">
-		<description>Emuze EEPROM Viewer (Alt)</description>
+		<description>Emuze EEPROM Viewer (alt)</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -854,7 +854,7 @@ license:CC0
 	</software>
 
 	<software name="loloa" cloneof="lolo">
-		<description>Adventures of Lolo (Alt)</description>
+		<description>Adventures of Lolo (alt)</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -865,7 +865,7 @@ license:CC0
 	</software>
 
 	<software name="mazea" cloneof="maze">
-		<description>The Great Maze (Alt)</description>
+		<description>The Great Maze (alt)</description>
 		<year>2008</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -876,7 +876,7 @@ license:CC0
 	</software>
 
 	<software name="megatrisa" cloneof="megatris">
-		<description>Megatris (Alt)</description>
+		<description>Megatris (alt)</description>
 		<year>2008</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -899,7 +899,7 @@ license:CC0
 	</software>
 
 	<software name="pacmana" cloneof="pacman">
-		<description>Pac-Man (Alt)</description>
+		<description>Pac-Man (alt)</description>
 		<year>2009</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -922,7 +922,7 @@ license:CC0
 	</software>
 
 	<software name="redbulla" cloneof="redbull">
-		<description>Redbull Create Demo (Alt)</description>
+		<description>Redbull Create Demo (alt)</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -934,7 +934,7 @@ license:CC0
 
 	<software name="sdcardda" cloneof="sdcardd" supported="no">
 		<!-- required SD Card emulation -->
-		<description>SD Card Demo (Alt)</description>
+		<description>SD Card Demo (alt)</description>
 		<year>2009</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -945,7 +945,7 @@ license:CC0
 	</software>
 
 	<software name="spaceinva" cloneof="spaceinv">
-		<description>Space Invaders (Alt)</description>
+		<description>Space Invaders (alt)</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -979,7 +979,7 @@ license:CC0
 	</software>
 
 	<software name="smarioda" cloneof="smariod">
-		<description>Super Mario Demo (Alt)</description>
+		<description>Super Mario Demo (alt)</description>
 		<year>2009</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -1002,7 +1002,7 @@ license:CC0
 
 	<software name="videoda" cloneof="videod" supported="no">
 		<!-- required SD Card emulation -->
-		<description>Video Demo (Alt)</description>
+		<description>Video Demo (alt)</description>
 		<year>2009</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -1013,7 +1013,7 @@ license:CC0
 	</software>
 
 	<software name="wamolea" cloneof="wamole">
-		<description>Whack-a-Mole (Alt)</description>
+		<description>Whack-a-Mole (alt)</description>
 		<year>2009</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -1024,7 +1024,7 @@ license:CC0
 	</software>
 
 	<software name="arkanoidb" cloneof="arkanoid">
-		<description>Arkanoid (Alt 2)</description>
+		<description>Arkanoid (alt 2)</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -1035,7 +1035,7 @@ license:CC0
 	</software>
 
 	<software name="bitmapdb" cloneof="bitmapd">
-		<description>Bitmap Demo (Alt 2)</description>
+		<description>Bitmap Demo (alt 2)</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -1046,7 +1046,7 @@ license:CC0
 	</software>
 
 	<software name="drmarioa" cloneof="drmario">
-		<description>Dr.Mario (Alt)</description>
+		<description>Dr.Mario (alt)</description>
 		<year>2008</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -1057,7 +1057,7 @@ license:CC0
 	</software>
 
 	<software name="mazeb" cloneof="maze">
-		<description>The Great Maze (Alt 2)</description>
+		<description>The Great Maze (alt 2)</description>
 		<year>2008</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -1068,7 +1068,7 @@ license:CC0
 	</software>
 
 	<software name="musicda">
-		<description>Music Demo (Alt)</description>
+		<description>Music Demo (alt)</description>
 		<year>2008</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -1079,7 +1079,7 @@ license:CC0
 	</software>
 
 	<software name="sprited2a" cloneof="sprited2">
-		<description>Sprite Demo 2 (Alt)</description>
+		<description>Sprite Demo 2 (alt)</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
@@ -1102,7 +1102,7 @@ license:CC0
 	</software>
 
 	<software name="wamoleb" cloneof="wamole" supported="no">
-		<description>Whack-a-Mole (Alt 2)</description>
+		<description>Whack-a-Mole (alt 2)</description>
 		<year>2009</year>
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">

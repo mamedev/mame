@@ -44,7 +44,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="aigleor" supported="no">
-		<description>L'Aigle d'Or (Bad?)</description>
+		<description>L'Aigle d'Or (bad?)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -124,7 +124,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="histheata" cloneof="histheat">
-		<description>Histoire de Theatre (Alt)</description>
+		<description>Histoire de Theatre (alt)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -149,7 +149,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="karatea" cloneof="karate">
-		<description>Karate (Alt)</description>
+		<description>Karate (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -248,7 +248,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mbridgea" cloneof="mbridge">
-		<description>Mini Bridge (Alt)</description>
+		<description>Mini Bridge (alt)</description>
 		<year>1986</year>
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 

@@ -83,40 +83,210 @@ EB26IC73.BIN    27C240      /  Main Program
 ******************************************************************************/
 
 #include "emu.h"
-#include "suprslam.h"
+
+#include "vs9209.h"
+#include "vsystem_spr.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "vs9209.h"
+#include "machine/gen_latch.h"
 #include "sound/ymopn.h"
+#include "video/k053936.h"
+
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
+
+class suprslam_state : public driver_device
+{
+public:
+	suprslam_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k053936(*this, "k053936"),
+		m_spr(*this, "vsystem_spr"),
+		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_soundlatch(*this, "soundlatch"),
+		m_screen_videoram(*this, "screen_videoram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_sp_videoram(*this, "sp_videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_screen_vregs(*this, "screen_vregs"),
+		m_soundbank(*this, "soundbank")
+	{ }
+
+	void suprslam(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k053936_device> m_k053936;
+	required_device<vsystem_spr_device> m_spr;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	// memory pointers
+	required_shared_ptr<uint16_t> m_screen_videoram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_sp_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_screen_vregs;
+	required_memory_bank m_soundbank;
+
+	// video-related
+	tilemap_t *m_screen_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint16_t m_screen_bank = 0;
+	uint16_t m_bg_bank = 0;
+	uint8_t m_spr_ctrl = 0;
+
+	uint32_t tile_callback(uint32_t code);
+	void sh_bankswitch_w(uint8_t data);
+	void screen_videoram_w(offs_t offset, uint16_t data);
+	void bg_videoram_w(offs_t offset, uint16_t data);
+	void bank_w(uint16_t data);
+	void spr_ctrl_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void main_map(address_map &map);
+};
+
+
+// video
+
+// FG 'SCREEN' LAYER
+
+void suprslam_state::screen_videoram_w(offs_t offset, uint16_t data)
+{
+	m_screen_videoram[offset] = data;
+	m_screen_tilemap->mark_tile_dirty(offset);
+}
+
+
+TILE_GET_INFO_MEMBER(suprslam_state::get_tile_info)
+{
+	int tileno = m_screen_videoram[tile_index] & 0x0fff;
+	int colour = m_screen_videoram[tile_index] & 0xf000;
+
+	tileno += m_screen_bank;
+	colour = colour >> 12;
+
+	tileinfo.set(0, tileno, colour, 0);
+}
+
+
+// BG LAYER
+void suprslam_state::bg_videoram_w(offs_t offset, uint16_t data)
+{
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+TILE_GET_INFO_MEMBER(suprslam_state::get_bg_tile_info)
+{
+	int tileno = m_bg_videoram[tile_index] & 0x0fff;
+	int colour = m_bg_videoram[tile_index] & 0xf000;
+
+	tileno += m_bg_bank;
+	colour = colour >> 12;
+
+	tileinfo.set(2, tileno, colour, 0);
+}
+
+
+uint32_t suprslam_state::tile_callback(uint32_t code)
+{
+	return m_sp_videoram[code];
+}
+
+
+
+void suprslam_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprslam_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_screen_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprslam_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_spr_ctrl = 0;
+	m_screen_tilemap->set_transparent_pen(15);
+}
+
+void suprslam_state::spr_ctrl_w(uint8_t data)
+{
+	m_spr_ctrl = data;
+}
+
+uint32_t suprslam_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_screen_tilemap->set_scrollx(0, m_screen_vregs[0x04 / 2] );
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	m_k053936->zoom_draw(screen, bitmap, cliprect, m_bg_tilemap, 0, 0, 1);
+	if (!(m_spr_ctrl & 8))
+		m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect);
+	m_screen_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (m_spr_ctrl & 8)
+		m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect);
+	return 0;
+}
+
+void suprslam_state::bank_w(uint16_t data)
+{
+	uint16_t old_screen_bank = m_screen_bank;
+	uint16_t old_bg_bank = m_bg_bank;
+
+	m_screen_bank = data & 0xf000;
+	m_bg_bank = (data & 0x0f00) << 4;
+
+	if (m_screen_bank != old_screen_bank)
+		m_screen_tilemap->mark_all_dirty();
+	if (m_bg_bank != old_bg_bank)
+		m_bg_tilemap->mark_all_dirty();
+}
+
+
+// machine
 
 /*** SOUND *******************************************************************/
 
-void suprslam_state::suprslam_sh_bankswitch_w(uint8_t data)
+void suprslam_state::sh_bankswitch_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x03);
+	m_soundbank->set_entry(data & 0x03);
 }
 
 /*** MEMORY MAPS *************************************************************/
 
-void suprslam_state::suprslam_map(address_map &map)
+void suprslam_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0xfb0000, 0xfb1fff).ram().share("spriteram");
-	map(0xfc0000, 0xfcffff).ram().share("sp_videoram");
+	map(0xfb0000, 0xfb1fff).ram().share(m_spriteram);
+	map(0xfc0000, 0xfcffff).ram().share(m_sp_videoram);
 	map(0xfd0000, 0xfdffff).ram();
-	map(0xfe0000, 0xfe0fff).ram().w(FUNC(suprslam_state::suprslam_screen_videoram_w)).share("screen_videoram");
-	map(0xff0000, 0xff1fff).ram().w(FUNC(suprslam_state::suprslam_bg_videoram_w)).share("bg_videoram");
-	map(0xff2000, 0xff203f).ram().share("screen_vregs");
+	map(0xfe0000, 0xfe0fff).ram().w(FUNC(suprslam_state::screen_videoram_w)).share(m_screen_videoram);
+	map(0xff0000, 0xff1fff).ram().w(FUNC(suprslam_state::bg_videoram_w)).share(m_bg_videoram);
+	map(0xff2000, 0xff203f).ram().share(m_screen_vregs);
 	map(0xff3000, 0xff3001).nopw(); // sprite buffer trigger?
 	map(0xff8000, 0xff8fff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
 	map(0xff9001, 0xff9001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xffa000, 0xffafff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffd000, 0xffd01f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0xffe000, 0xffe001).w(FUNC(suprslam_state::suprslam_bank_w));
+	map(0xffe000, 0xffe001).w(FUNC(suprslam_state::bank_w));
 	map(0xfff000, 0xfff01f).rw("io", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
 }
 
@@ -124,13 +294,13 @@ void suprslam_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("bank1");
+	map(0x8000, 0xffff).bankr(m_soundbank);
 }
 
 void suprslam_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(suprslam_state::suprslam_sh_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(suprslam_state::sh_bankswitch_w));
 	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
@@ -234,9 +404,9 @@ static const gfx_layout suprslam_16x16x4_layout =
 };
 
 static GFXDECODE_START( gfx_suprslam )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,    0x000, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, suprslam_16x16x4_layout, 0x200, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, suprslam_16x16x4_layout, 0x100, 16 )
+	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_packed_lsb,    0x000, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, suprslam_16x16x4_layout, 0x200, 16 )
+	GFXDECODE_ENTRY( "bgtiles", 0, suprslam_16x16x4_layout, 0x100, 16 )
 GFXDECODE_END
 
 
@@ -248,7 +418,7 @@ void suprslam_state::machine_start()
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_spr_ctrl));
 
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
+	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 }
 
 void suprslam_state::machine_reset()
@@ -259,11 +429,11 @@ void suprslam_state::machine_reset()
 
 void suprslam_state::suprslam(machine_config &config)
 {
-	M68000(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &suprslam_state::suprslam_map);
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // divider not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &suprslam_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(suprslam_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 8000000/2); /* 4 MHz ??? */
+	Z80(config, m_audiocpu, 32_MHz_XTAL / 8); // 4 MHz ??? not verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suprslam_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &suprslam_state::sound_io_map);
 
@@ -280,16 +450,16 @@ void suprslam_state::suprslam(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2300)); /* hand-tuned */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2300)); // hand-tuned
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(suprslam_state::screen_update_suprslam));
+	screen.set_screen_update(FUNC(suprslam_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 0x800);
 
 	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(suprslam_state::suprslam_tile_callback));
+	m_spr->set_tile_indirect_cb(FUNC(suprslam_state::tile_callback));
 	m_spr->set_gfx_region(1);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
@@ -304,7 +474,7 @@ void suprslam_state::suprslam(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 32_MHz_XTAL / 4)); // not verified
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -315,33 +485,35 @@ void suprslam_state::suprslam(machine_config &config)
 /*** ROM LOADING *************************************************************/
 
 ROM_START( suprslam )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_WORD_SWAP( "eb26ic47.bin", 0x000000, 0x080000, CRC(8d051fd8) SHA1(1820209306116e5b09cc10a8b3661d232c688b24) )
 	ROM_LOAD16_WORD_SWAP( "eb26ic73.bin", 0x080000, 0x080000, CRC(ca4ad383) SHA1(143ee475761fa54d5b3a9f4e3fb3acc8408972fd) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Z80 Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 ) // Z80 Code
 	ROM_LOAD( "eb26ic38.bin", 0x000000, 0x020000, CRC(153f2c50) SHA1(b70f248cfb18239fcd26e36fb36159f219debf2c) )
-	ROM_RELOAD(               0x010000, 0x020000 )
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "eb26ic66.bin", 0x000000, 0x200000, CRC(8cb33682) SHA1(0e6189ef0673227d35b9a154e333cc6cf9b65df6) )
 
-	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) // Samples
 	ROM_LOAD( "eb26ic59.bin", 0x000000, 0x100000, CRC(4ae4095b) SHA1(62b0600b18febb6cecb6370b03a2d6b7756840a2) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* 8x8x4 'Screen' Layer GFX */
+	ROM_REGION( 0x200000, "fgtiles", 0 ) // 8x8x4 'Screen' Layer GFX
 	ROM_LOAD( "eb26ic43.bin", 0x000000, 0x200000, CRC(9dfb0959) SHA1(ba479192a422a55efcf8aa7ff995c914525b4a56) )
 
-	ROM_REGION( 0x800000, "gfx2", 0 ) /* 16x16x4 Sprites GFX */
+	ROM_REGION( 0x800000, "sprites", 0 ) // 16x16x4 Sprites GFX
 	ROM_LOAD( "eb26ic09.bin", 0x000000, 0x200000, CRC(5a415365) SHA1(a59a4ab231980b0540e9a8356a02530217779dbd) )
 	ROM_LOAD( "eb26ic10.bin", 0x200000, 0x200000, CRC(a04f3140) SHA1(621ff823d93fecdde801912064ac951727b71677) )
 	ROM_LOAD( "eb26_100.bin", 0x400000, 0x200000, CRC(c2ee5eb6) SHA1(4b61e77a0d0f38b542d5e32fa25799a4c85bf651) )
 	ROM_LOAD( "eb26_101.bin", 0x600000, 0x200000, CRC(7df654b7) SHA1(3a5ed6ee7cc31566e908b835a065e9bce60389fb) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 ) /* 16x16x4 BG GFX */
+	ROM_REGION( 0x400000, "bgtiles", 0 ) // 16x16x4 BG GFX
 	ROM_LOAD( "eb26ic12.bin", 0x000000, 0x200000, CRC(14561bd7) SHA1(5f69f68a305aba9acb21b844c8aa5b1de60f89ff) )
 	ROM_LOAD( "eb26ic36.bin", 0x200000, 0x200000, CRC(92019d89) SHA1(dbf6f8384341707996e4b9e07a3d4f536cf4905b) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*** GAME DRIVERS ************************************************************/
 

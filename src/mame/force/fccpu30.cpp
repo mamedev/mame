@@ -195,7 +195,7 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "bus/vme/vme.h"
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
@@ -308,7 +308,7 @@ private:
 
 	void cpu30_mem(address_map &map);
 
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
 	required_device<duscc68562_device> m_dusccterm;

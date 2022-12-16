@@ -494,7 +494,7 @@ void monsterb_sound_device::n7751_command_w(uint8_t data)
 	*/
 	m_n7751_command = data & 0x07;
 	m_audiocpu->set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 

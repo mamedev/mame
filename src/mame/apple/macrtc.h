@@ -34,8 +34,12 @@ public:
 	DECLARE_READ_LINE_MEMBER( data_r );
 	DECLARE_WRITE_LINE_MEMBER( data_w );
 
+	// 1 second square wave output
+	auto cko_cb() { return m_cko_cb.bind(); }
+
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -48,9 +52,11 @@ protected:
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
-	TIMER_CALLBACK_MEMBER(seconds_tick);
+	TIMER_CALLBACK_MEMBER(half_seconds_tick);
 
 private:
+	devcb_write_line m_cko_cb;
+
 	/* state of rTCEnb and rTCClk lines */
 	uint8_t m_rtc_rTCEnb = 0;
 	uint8_t m_rtc_rTCClk = 0;
@@ -78,6 +84,7 @@ private:
 	uint8_t m_rtc_xpaddr = 0;
 	uint8_t m_rtc_state = 0;
 	uint8_t m_data_latch = 0;
+	bool m_cko = false;
 
 	// timers
 	emu_timer *m_clock_timer = nullptr;

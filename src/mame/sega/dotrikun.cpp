@@ -5,7 +5,7 @@
 Dottori Kun (Head On's mini game)
 (c)1990 SEGA
 
-Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/15 -
+Driver by Takahiro Nogi 1999/12/15 -
 
 
 CPU   : Z-80 (4MHz)

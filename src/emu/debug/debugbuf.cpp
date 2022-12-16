@@ -220,14 +220,12 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
 					auto dis = m_space->device().machine().disable_side_effects();
 					u8 *dest = get_ptr<u8>(lstart);
-					u32 steps = 0;
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = m_intf.pc_linear_to_real(lpc);
 						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
 							*dest++ = m_space->read_byte(tpc);
 						else
 							*dest++ = 0;
-						steps++;
 					}
 				};
 				break;

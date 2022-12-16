@@ -8,8 +8,12 @@
 #ifndef NL_CORE_OBJECT_ARRAY_H_
 #define NL_CORE_OBJECT_ARRAY_H_
 
+#include "base_objects.h"
+#include "logic.h"
+
 #include "../nltypes.h"
 
+#include "../plib/pfmtlog.h"
 #include "../plib/plists.h"
 #include "../plib/pstring.h"
 

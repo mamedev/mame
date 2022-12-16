@@ -11,12 +11,10 @@
 
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
-#include "font_module.h"
-#include "modules/osdmodule.h"
-
 #include "strconv.h"
 #include "unicode.h"
 #include "corestr.h"
+#include "osdcore.h"
 
 #include <cstring>
 
@@ -111,7 +109,7 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 
 	// if it doesn't match our request, fail
 	std::string utf = osd::text::from_tstring(&realname[0]);
-	int result = core_stricmp(utf.c_str(), name.c_str());
+	int result = core_stricmp(utf, name);
 
 	// if we didn't match, nuke our font and fall back
 	if (result != 0)
