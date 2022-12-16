@@ -4,6 +4,7 @@
 
 #include "ataristb.h"
 #include "atarist_v.h"
+#include "stkbd.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
@@ -11,7 +12,6 @@
 #include "bus/midi/midi.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6800/m6801.h"
 #include "imagedev/floppy.h"
 #include "machine/6850acia.h"
 #include "machine/8530scc.h"
@@ -65,7 +65,6 @@
 namespace {
 
 #define M68000_TAG      "m68000"
-#define HD6301V1_TAG    "hd6301"
 #define YM2149_TAG      "ym2149"
 #define MC6850_0_TAG    "mc6850_0"
 #define MC6850_1_TAG    "mc6850_1"
@@ -111,24 +110,14 @@ namespace {
 
 static const double DMASOUND_RATE[] = { Y2/640.0/8.0, Y2/640.0/4.0, Y2/640.0/2.0, Y2/640.0 };
 
-static const int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
-static const int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
-
-enum
-{
-	IKBD_MOUSE_PHASE_STATIC = 0,
-	IKBD_MOUSE_PHASE_POSITIVE,
-	IKBD_MOUSE_PHASE_NEGATIVE
-};
-
 class st_state : public driver_device
 {
 public:
 	st_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
+			m_ikbd(*this, "ikbd"),
 			m_stb(*this, "stb"),
-			m_ikbd(*this, HD6301V1_TAG),
 			m_fdc(*this, WD1772_TAG),
 			m_floppy(*this, WD1772_TAG ":%u", 0U),
 			m_mfp(*this, MC68901_TAG),
@@ -138,21 +127,10 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_rs232(*this, RS232_TAG),
 			m_ymsnd(*this, YM2149_TAG),
-			m_keys(*this, "P%o", 030),
-			m_joy(*this, "IKBD_JOY%u", 0U),
-			m_mousex(*this, "IKBD_MOUSEX"),
-			m_mousey(*this, "IKBD_MOUSEY"),
 			m_config(*this, "config"),
-			m_ikbd_mouse_x(0),
-			m_ikbd_mouse_y(0),
-			m_ikbd_mouse_px(IKBD_MOUSE_PHASE_STATIC),
-			m_ikbd_mouse_py(IKBD_MOUSE_PHASE_STATIC),
-			m_ikbd_mouse_pc(0),
-			m_ikbd_joy(1),
 			m_monochrome(1),
 			m_video(*this, "video"),
-			m_screen(*this, "screen"),
-			m_led(*this, "led1")
+			m_screen(*this, "screen")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
@@ -160,9 +138,9 @@ public:
 	void st(machine_config &config);
 
 protected:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
+	required_device<st_kbd_device> m_ikbd;
 	optional_device<st_blitter_device> m_stb;
-	required_device<cpu_device> m_ikbd;
 	required_device<wd1772_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mc68901_device> m_mfp;
@@ -172,10 +150,6 @@ protected:
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
 	required_device<ym2149_device> m_ymsnd;
-	required_ioport_array<16> m_keys;
-	optional_ioport_array<2> m_joy;
-	optional_ioport m_mousex;
-	optional_ioport m_mousey;
 	optional_ioport m_config;
 
 	TIMER_CALLBACK_MEMBER(mouse_tick);
@@ -189,18 +163,10 @@ protected:
 	void dma_base_w(offs_t offset, uint8_t data);
 	uint8_t mmu_r();
 	void mmu_w(uint8_t data);
-	uint8_t ikbd_port1_r();
-	uint8_t ikbd_port2_r();
-	void ikbd_port2_w(uint8_t data);
-	void ikbd_port3_w(uint8_t data);
-	uint8_t ikbd_port4_r();
-	void ikbd_port4_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	void psg_pa_w(uint8_t data);
-
-	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
 
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
@@ -214,18 +180,6 @@ protected:
 
 	/* memory state */
 	uint8_t m_mmu = 0U;
-
-	/* keyboard state */
-	uint16_t m_ikbd_keylatch = 0U;
-	uint8_t m_ikbd_mouse = 0U;
-	uint8_t m_ikbd_mouse_x;
-	uint8_t m_ikbd_mouse_y;
-	uint8_t m_ikbd_mouse_px;
-	uint8_t m_ikbd_mouse_py;
-	uint8_t m_ikbd_mouse_pc;
-	int m_ikbd_tx = 0;
-	int m_ikbd_joy;
-	int m_midi_tx = 0;
 
 	/* floppy state */
 	uint32_t m_dma_base = 0U;
@@ -249,18 +203,14 @@ protected:
 	required_device<screen_device> m_screen;
 
 	void common(machine_config &config);
-	void ikbd_map(address_map &map);
 	void cpu_space_map(address_map &map);
 	void st_map(address_map &map);
 	void megast_map(address_map &map);
-	void keyboard(machine_config &config);
 
 	uint16_t fpu_r();
 	void fpu_w(uint16_t data);
 
 	virtual void machine_start() override;
-
-	output_finder<> m_led;
 };
 
 class megast_state : public st_state
@@ -734,247 +684,6 @@ void st_state::mmu_w(uint8_t data)
 }
 
 //**************************************************************************
-//  IKBD
-//**************************************************************************
-
-//-------------------------------------------------
-//  mouse_tick -
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(st_state::mouse_tick)
-{
-	/*
-
-	        Right   Left        Up      Down
-
-	    XA  1100    0110    YA  1100    0110
-	    XB  0110    1100    YB  0110    1100
-
-	*/
-
-	uint8_t x = m_mousex->read();
-	uint8_t y = m_mousey->read();
-
-	if (m_ikbd_mouse_pc == 0)
-	{
-		if (x == m_ikbd_mouse_x)
-		{
-			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_STATIC;
-		}
-		else if ((x > m_ikbd_mouse_x) || (x == 0 && m_ikbd_mouse_x == 0xff))
-		{
-			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_POSITIVE;
-		}
-		else if ((x < m_ikbd_mouse_x) || (x == 0xff && m_ikbd_mouse_x == 0))
-		{
-			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_NEGATIVE;
-		}
-
-		if (y == m_ikbd_mouse_y)
-		{
-			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_STATIC;
-		}
-		else if ((y > m_ikbd_mouse_y) || (y == 0 && m_ikbd_mouse_y == 0xff))
-		{
-			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_POSITIVE;
-		}
-		else if ((y < m_ikbd_mouse_y) || (y == 0xff && m_ikbd_mouse_y == 0))
-		{
-			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_NEGATIVE;
-		}
-
-		m_ikbd_mouse_x = x;
-		m_ikbd_mouse_y = y;
-	}
-
-	m_ikbd_mouse = 0;
-
-	m_ikbd_mouse |= IKBD_MOUSE_XYB[m_ikbd_mouse_px][m_ikbd_mouse_pc];      // XB
-	m_ikbd_mouse |= IKBD_MOUSE_XYA[m_ikbd_mouse_px][m_ikbd_mouse_pc] << 1; // XA
-	m_ikbd_mouse |= IKBD_MOUSE_XYB[m_ikbd_mouse_py][m_ikbd_mouse_pc] << 2; // YA
-	m_ikbd_mouse |= IKBD_MOUSE_XYA[m_ikbd_mouse_py][m_ikbd_mouse_pc] << 3; // YB
-
-	m_ikbd_mouse_pc++;
-	m_ikbd_mouse_pc &= 0x03;
-}
-
-
-//-------------------------------------------------
-//  ikbd_port1_r -
-//-------------------------------------------------
-
-uint8_t st_state::ikbd_port1_r()
-{
-	/*
-
-	    bit     description
-
-	    0       Keyboard column input
-	    1       Keyboard column input
-	    2       Keyboard column input
-	    3       Keyboard column input
-	    4       Keyboard column input
-	    5       Keyboard column input
-	    6       Keyboard column input
-	    7       Keyboard column input
-
-	*/
-
-	uint8_t data = 0xff;
-
-	// keyboard data
-	for (int i = 1; i < 16; i++)
-		if (!BIT(m_ikbd_keylatch, i))
-			data &= m_keys[i]->read();
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  ikbd_port2_r -
-//-------------------------------------------------
-
-uint8_t st_state::ikbd_port2_r()
-{
-	/*
-
-	    bit     description
-
-	    0       JOY 1-5
-	    1       JOY 0-6
-	    2       JOY 1-6
-	    3       SD FROM CPU
-	    4
-
-	*/
-
-	uint8_t data = m_joy[1].read_safe(0x06) & 0x06;
-
-	// serial receive
-	data |= m_ikbd_tx << 3;
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  ikbd_port2_w -
-//-------------------------------------------------
-
-void st_state::ikbd_port2_w(uint8_t data)
-{
-	/*
-
-	    bit     description
-
-	    0       joystick enable
-	    1
-	    2
-	    3
-	    4       SD TO CPU
-
-	*/
-
-	// joystick enable
-	m_ikbd_joy = BIT(data, 0);
-
-	// serial transmit
-	m_acia[0]->write_rxd(BIT(data, 4));
-}
-
-
-//-------------------------------------------------
-//  ikbd_port3_w -
-//-------------------------------------------------
-
-void st_state::ikbd_port3_w(uint8_t data)
-{
-	/*
-
-	    bit     description
-
-	    0       CAPS LOCK LED
-	    1       Keyboard row select
-	    2       Keyboard row select
-	    3       Keyboard row select
-	    4       Keyboard row select
-	    5       Keyboard row select
-	    6       Keyboard row select
-	    7       Keyboard row select
-
-	*/
-
-	// caps lock led
-	m_led = BIT(data, 0);
-
-	// keyboard row select
-	m_ikbd_keylatch = (m_ikbd_keylatch & 0xff00) | data;
-}
-
-
-//-------------------------------------------------
-//  ikbd_port4_r -
-//-------------------------------------------------
-
-uint8_t st_state::ikbd_port4_r()
-{
-	/*
-
-	    bit     description
-
-	    0       JOY 0-1 or mouse XB
-	    1       JOY 0-2 or mouse XA
-	    2       JOY 0-3 or mouse YA
-	    3       JOY 0-4 or mouse YB
-	    4       JOY 1-1
-	    5       JOY 1-2
-	    6       JOY 1-3
-	    7       JOY 1-4
-
-	*/
-
-	if (m_ikbd_joy) return 0xff;
-
-	uint8_t data = m_joy[0].read_safe(0xff);
-
-	if ((m_config->read() & 0x01) == 0)
-	{
-		data = (data & 0xf0) | m_ikbd_mouse;
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  ikbd_port4_w -
-//-------------------------------------------------
-
-void st_state::ikbd_port4_w(uint8_t data)
-{
-	/*
-
-	    bit     description
-
-	    0       Keyboard row select
-	    1       Keyboard row select
-	    2       Keyboard row select
-	    3       Keyboard row select
-	    4       Keyboard row select
-	    5       Keyboard row select
-	    6       Keyboard row select
-	    7       Keyboard row select
-
-	*/
-
-	// keyboard row select
-	m_ikbd_keylatch = (data << 8) | (m_ikbd_keylatch & 0xff);
-}
-
-
-
-//**************************************************************************
 //  FPU
 //**************************************************************************
 
@@ -1005,7 +714,7 @@ WRITE_LINE_MEMBER( st_state::reset_w )
 	if (m_stb.found())
 		m_stb->reset();
 	m_mfp->reset();
-	m_ikbd->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	m_ikbd->reset();
 	m_ymsnd->reset();
 	m_fdc->soft_reset();
 	//m_acsi->reset();
@@ -1476,18 +1185,6 @@ void stbook_state::lcd_control_w(uint16_t data)
 //**************************************************************************
 
 //-------------------------------------------------
-//  ADDRESS_MAP( ikbd_map )
-//-------------------------------------------------
-
-void st_state::ikbd_map(address_map &map)
-{
-	map(0x0000, 0x001f).m(HD6301V1_TAG, FUNC(hd6301_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
-	map(0xf000, 0xffff).rom().region(HD6301V1_TAG, 0);
-}
-
-
-//-------------------------------------------------
 //  ADDRESS_MAP( cpu_space_map )
 //-------------------------------------------------
 
@@ -1686,144 +1383,6 @@ void stbook_state::stbook_map(address_map &map)
 //  INPUT PORTS
 //**************************************************************************
 
-//-------------------------------------------------
-//  INPUT_PORTS( ikbd )
-//-------------------------------------------------
-
-static INPUT_PORTS_START( ikbd )
-	PORT_START("P30")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P31")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P32")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("F1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0xde, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P33")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("F2")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(DEF_STR( Alternate )) PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
-	PORT_BIT( 0xbe, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P34")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_NAME("F3")
-	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-
-	PORT_START("P35")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4) PORT_NAME("F4")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-
-	PORT_START("P36")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F5) PORT_NAME("F5")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-
-	PORT_START("P37")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F6) PORT_NAME("F6")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-
-	PORT_START("P40")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F7) PORT_NAME("F7")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-
-	PORT_START("P41")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F8) PORT_NAME("F8")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-
-	PORT_START("P42")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F9) PORT_NAME("F9")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-
-	PORT_START("P43")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F10) PORT_NAME("F10")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00B4) PORT_CHAR('`')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-
-	PORT_START("P44")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Help") PORT_CODE(KEYCODE_F11)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Delete") PORT_CODE(KEYCODE_DEL)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Insert") PORT_CODE(KEYCODE_INSERT)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')
-
-	PORT_START("P45")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Undo") PORT_CODE(KEYCODE_F12)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Clr Home") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)
-
-	PORT_START("P46")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad (")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad )")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD)
-
-	PORT_START("P47")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad /") PORT_CODE(KEYCODE_SLASH_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad Enter") PORT_CODE(KEYCODE_ENTER_PAD)
-INPUT_PORTS_END
-
 
 //-------------------------------------------------
 //  INPUT_PORTS( st )
@@ -1831,35 +1390,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( st )
 	PORT_START("config")
-	PORT_CONFNAME( 0x01, 0x00, "Input Port 0 Device")
-	PORT_CONFSETTING( 0x00, "Mouse" )
-	PORT_CONFSETTING( 0x01, DEF_STR( Joystick ) )
 	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, st_state, write_monochrome)
 	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
 	PORT_CONFSETTING( 0x80, "Color (Atari SC1224)" )
-
-	PORT_INCLUDE( ikbd )
-
-	PORT_START("IKBD_JOY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XB
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XA
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YA
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YB
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
-
-	PORT_START("IKBD_JOY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-
-	PORT_START("IKBD_MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CONDITION("config", 0x01, EQUALS, 0x00)
-
-	PORT_START("IKBD_MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CONDITION("config", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 
@@ -1869,14 +1402,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ste )
 	PORT_START("config")
-	PORT_CONFNAME( 0x01, 0x00, "Input Port 0 Device")
-	PORT_CONFSETTING( 0x00, "Mouse" )
-	PORT_CONFSETTING( 0x01, DEF_STR( Joystick ) )
 	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ste_state, write_monochrome)
 	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
 	PORT_CONFSETTING( 0x80, "Color (Atari SC1435)" )
-
-	PORT_INCLUDE( ikbd )
 
 	PORT_START("JOY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -2058,12 +1586,6 @@ void stbook_state::psg_pa_w(uint8_t data)
 	m_fdc->dden_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( st_state::ikbd_tx_w )
-{
-	m_ikbd_tx = state;
-}
-
-
 WRITE_LINE_MEMBER( st_state::fdc_drq_w )
 {
 	if (state && (!(m_fdc_mode & DMA_MODE_ENABLED)) && (m_fdc_mode & DMA_MODE_FDC_HDC_ACK))
@@ -2117,16 +1639,6 @@ void st_state::state_save()
 	save_item(NAME(m_fdc_mode));
 	save_item(NAME(m_fdc_sectors));
 	save_item(NAME(m_fdc_dmabytes));
-	save_item(NAME(m_ikbd_keylatch));
-	save_item(NAME(m_ikbd_mouse));
-	save_item(NAME(m_ikbd_mouse_x));
-	save_item(NAME(m_ikbd_mouse_y));
-	save_item(NAME(m_ikbd_mouse_px));
-	save_item(NAME(m_ikbd_mouse_py));
-	save_item(NAME(m_ikbd_mouse_pc));
-	save_item(NAME(m_ikbd_tx));
-	save_item(NAME(m_ikbd_joy));
-	save_item(NAME(m_midi_tx));
 }
 
 //-------------------------------------------------
@@ -2135,20 +1647,11 @@ void st_state::state_save()
 
 void st_state::machine_start()
 {
-	m_led.resolve();
-
 	// configure RAM banking
 	configure_memory();
 
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-
-	// allocate timers
-	if (m_mousex.found())
-	{
-		m_mouse_timer = timer_alloc(FUNC(st_state::mouse_tick), this);
-		m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
-	}
 
 	// register for state saving
 	state_save();
@@ -2191,8 +1694,6 @@ void ste_state::state_save()
 
 void ste_state::machine_start()
 {
-	m_led.resolve();
-
 	/* configure RAM banking */
 	configure_memory();
 
@@ -2232,8 +1733,6 @@ void megaste_state::machine_start()
 
 void stbook_state::machine_start()
 {
-	m_led.resolve();
-
 	/* configure RAM banking */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -2283,8 +1782,6 @@ void st_state::common(machine_config &config)
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &st_state::cpu_space_map);
 	m_maincpu->reset_cb().set(FUNC(st_state::reset_w));
 
-	keyboard(config);
-
 	// sound
 	YM2149(config, m_ymsnd, Y2/16);
 	m_ymsnd->set_flags(AY8910_SINGLE_OUTPUT);
@@ -2318,8 +1815,11 @@ void st_state::common(machine_config &config)
 	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
 	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
 
+	ST_KBD(config, m_ikbd);
+
 	ACIA6850(config, m_acia[0]);
-	m_acia[0]->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia[0]->txd_handler().set(m_ikbd, FUNC(st_kbd_device::tx_w));
+	m_ikbd->rx_cb().set(m_acia[0], FUNC(acia6850_device::write_rxd));
 	m_acia[0]->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 	m_acia[0]->write_cts(0);
 	m_acia[0]->write_dcd(0);
@@ -2350,18 +1850,6 @@ void st_state::common(machine_config &config)
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("st_flop");
 	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
-}
-
-void st_state::keyboard(machine_config &config)
-{
-	hd6301v1_cpu_device &ikbd(HD6301V1(config, HD6301V1_TAG, 4_MHz_XTAL));
-	ikbd.set_addrmap(AS_PROGRAM, &st_state::ikbd_map);
-	ikbd.in_p1_cb().set(FUNC(st_state::ikbd_port1_r));
-	ikbd.in_p2_cb().set(FUNC(st_state::ikbd_port2_r));
-	ikbd.out_p2_cb().set(FUNC(st_state::ikbd_port2_w));
-	ikbd.out_p3_cb().set(FUNC(st_state::ikbd_port3_w));
-	ikbd.in_p4_cb().set(FUNC(st_state::ikbd_port4_r));
-	ikbd.out_p4_cb().set(FUNC(st_state::ikbd_port4_w));
 }
 
 //-------------------------------------------------
@@ -2559,8 +2047,11 @@ void stbook_state::stbook(machine_config &config)
 	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
 	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
 
+	ST_KBD(config, m_ikbd);
+
 	ACIA6850(config, m_acia[0]);
-	m_acia[0]->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia[0]->txd_handler().set(m_ikbd, FUNC(st_kbd_device::tx_w));
+	m_ikbd->rx_cb().set(m_acia[0], FUNC(acia6850_device::write_rxd));
 	m_acia[0]->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 	m_acia[0]->write_cts(0);
 	m_acia[0]->write_dcd(0);
@@ -2644,9 +2135,6 @@ ROM_START( st )
 	ROMX_LOAD( "tos102.bin", 0x00000, 0x30000, BAD_DUMP CRC(d3c32283) SHA1(735793fdba07fe8d5295caa03484f6ef3de931f5), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, BAD_DUMP CRC(90f4fbff) SHA1(2487f330b0895e5d88d580d4ecb24061125e88ad), ROM_BIOS(3) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2663,9 +2151,6 @@ ROM_START( st_uk )
 	ROMX_LOAD( "tos102uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(2) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2689,9 +2174,6 @@ ROM_START( st_de )
 	ROMX_LOAD( "st 7a4 a6.u6", 0x10001, 0x08000, CRC(969d7bbe) SHA1(72b998c1f25211c2a96c81a038d71b6a390585c2), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "st 7c1 a2.u2", 0x20000, 0x08000, CRC(d0513329) SHA1(49855a3585e2f75b2af932dd4414ed64e6d9501f), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "st 7c1 b1.u5", 0x20001, 0x08000, CRC(c115cbc8) SHA1(2b52b81a1a4e0818d63f98ee4b25c30e2eba61cb), ROM_SKIP(1) | ROM_BIOS(3) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2715,9 +2197,6 @@ ROM_START( st_fr )
 	ROMX_LOAD( "c101660-001.u62", 0x10001, 0x08000, CRC(a813892c) SHA1(d041c113050dfb00166c4a7a52766e1b7eac9cab), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "c101656-001.u48", 0x20000, 0x08000, CRC(dbd93fb8) SHA1(cf9ec11e4bc2465490e7e6c981d9f61eae6cb359), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "c101659-001.u53", 0x20001, 0x08000, CRC(67c9785a) SHA1(917a17e9f83bee015c25b327780eebb11cb2c5a5), ROM_SKIP(1) | ROM_BIOS(3) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2730,9 +2209,6 @@ ROM_START( st_es )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104es.bin", 0x00000, 0x30000, BAD_DUMP CRC(f4e8ecd2) SHA1(df63f8ac09125d0877b55d5ba1282779b7f99c16), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2745,9 +2221,6 @@ ROM_START( st_nl )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104nl.bin", 0x00000, 0x30000, BAD_DUMP CRC(bb4370d4) SHA1(6de7c96b2d2e5c68778f4bce3eaf85a4e121f166), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2762,9 +2235,6 @@ ROM_START( st_se )
 	ROMX_LOAD( "tos102se.bin", 0x00000, 0x30000, BAD_DUMP CRC(673fd0c2) SHA1(433de547e09576743ae9ffc43d43f2279782e127), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104se.bin", 0x00000, 0x30000, BAD_DUMP CRC(80ecfdce) SHA1(b7ad34d5cdfbe86ea74ae79eca11dce421a7bbfd), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2779,9 +2249,6 @@ ROM_START( st_sg )
 	ROMX_LOAD( "tos102sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(5fe16c66) SHA1(45acb2fc4b1b13bd806c751aebd66c8304fc79bc), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(e58f0bdf) SHA1(aa40bf7203f02b2251b9e4850a1a73ff1c7da106), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2822,8 +2289,6 @@ ROM_START( megast )
 	//ROMX_LOAD( "rainbow_(tos_1.4)__c300791-002_l1__(c)atari_corp.27512.u7", 0x10001, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
 	//ROMX_LOAD( "rainbow_(tos_1.4)__c300787-002_h2__(c)atari_corp.27512.u3", 0x20000, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
 	//ROMX_LOAD( "rainbow_(tos_1.4)__c300790-002_l2__(c)atari_corp.27512.u4", 0x20001, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2838,9 +2303,6 @@ ROM_START( megast_uk )
 	ROMX_LOAD( "tos102uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2855,9 +2317,6 @@ ROM_START( megast_de )
 	ROMX_LOAD( "tos102de.bin", 0x00000, 0x30000, BAD_DUMP CRC(36a0058e) SHA1(cad5d2902e875d8bf0a14dc5b5b8080b30254148), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104de.bin", 0x00000, 0x30000, BAD_DUMP CRC(62b82b42) SHA1(5313733f91b083c6265d93674cb9d0b7efd02da8), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2872,9 +2331,6 @@ ROM_START( megast_fr )
 	ROMX_LOAD( "tos102fr.bin", 0x00000, 0x30000, BAD_DUMP CRC(8688fce6) SHA1(f5a79aac0a4e812ca77b6ac51d58d98726f331fe), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104fr.bin", 0x00000, 0x30000, BAD_DUMP CRC(a305a404) SHA1(20dba880344b810cf63cec5066797c5a971db870), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2889,9 +2345,6 @@ ROM_START( megast_se )
 	ROMX_LOAD( "tos102se.bin", 0x00000, 0x30000, BAD_DUMP CRC(673fd0c2) SHA1(433de547e09576743ae9ffc43d43f2279782e127), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104se.bin", 0x00000, 0x30000, BAD_DUMP CRC(80ecfdce) SHA1(b7ad34d5cdfbe86ea74ae79eca11dce421a7bbfd), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2906,9 +2359,6 @@ ROM_START( megast_sg )
 	ROMX_LOAD( "tos102sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(5fe16c66) SHA1(45acb2fc4b1b13bd806c751aebd66c8304fc79bc), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(e58f0bdf) SHA1(aa40bf7203f02b2251b9e4850a1a73ff1c7da106), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2921,9 +2371,6 @@ ROM_START( stacy )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 #endif
 
@@ -2941,9 +2388,6 @@ ROM_START( ste )
 	ROMX_LOAD( "tos162.bin", 0x00000, 0x40000, BAD_DUMP CRC(1c1a4eba) SHA1(42b875f542e5b728905d819c83c31a095a6a1904), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, BAD_DUMP CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(2) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2960,9 +2404,6 @@ ROM_START( ste_uk )
 	ROMX_LOAD( "tos162uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(d1c6f2fa) SHA1(70db24a7c252392755849f78940a41bfaebace71), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(2) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2979,9 +2420,6 @@ ROM_START( ste_de )
 	ROMX_LOAD( "tos162de.bin", 0x00000, 0x40000, BAD_DUMP CRC(2cdeb5e5) SHA1(10d9f61705048ee3dcbec67df741bed49b922149), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206de.bin", 0x00000, 0x40000, BAD_DUMP CRC(143cd2ab) SHA1(d1da866560734289c4305f1028c36291d331d417), ROM_BIOS(2) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -2994,9 +2432,6 @@ ROM_START( ste_es )
 	ROM_DEFAULT_BIOS("tos106")
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
 	ROMX_LOAD( "tos106es.bin", 0x00000, 0x40000, BAD_DUMP CRC(5cd2a540) SHA1(3a18f342c8288c0bc1879b7a209c73d5d57f7e81), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3013,9 +2448,6 @@ ROM_START( ste_fr )
 	ROMX_LOAD( "tos162fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(0ab003be) SHA1(041e134da613f718fca8bd47cd7733076e8d7588), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(e3a99ca7) SHA1(387da431e6e3dd2e0c4643207e67d06cf33618c3), ROM_BIOS(2) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3028,9 +2460,6 @@ ROM_START( ste_it )
 	ROM_DEFAULT_BIOS("tos106")
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
 	ROMX_LOAD( "tos106it.bin", 0x00000, 0x40000, BAD_DUMP CRC(d3a55216) SHA1(28dc74e5e0fa56b685bbe15f9837f52684fee9fd), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3045,9 +2474,6 @@ ROM_START( ste_se )
 	ROMX_LOAD( "tos162se.bin", 0x00000, 0x40000, BAD_DUMP CRC(90f124b1) SHA1(6e5454e861dbf4c46ce5020fc566c31202087b88), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206se.bin", 0x00000, 0x40000, BAD_DUMP CRC(be61906d) SHA1(ebdf5a4cf08471cd315a91683fcb24e0f029d451), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3060,9 +2486,6 @@ ROM_START( ste_sg )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206sg.bin", 0x00000, 0x40000, BAD_DUMP CRC(8c4fe57d) SHA1(c7a9ae3162f020dcac0c2a46cf0c033f91b98644), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3079,9 +2502,6 @@ ROM_START( megaste )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, BAD_DUMP CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(1) )
 	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3103,9 +2523,6 @@ ROM_START( megaste_uk )
 	ROM_SYSTEM_BIOS( 0, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(0) )
 #endif
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3120,9 +2537,6 @@ ROM_START( megaste_fr )
 	ROMX_LOAD( "tos205fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(27b83d2f) SHA1(83963b0feb0d119b2ca6f51e483e8c20e6ab79e1), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(e3a99ca7) SHA1(387da431e6e3dd2e0c4643207e67d06cf33618c3), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3137,9 +2551,6 @@ ROM_START( megaste_de )
 	ROMX_LOAD( "tos205de.bin", 0x00000, 0x40000, BAD_DUMP CRC(518b24e6) SHA1(084e083422f8fd9ac7a2490f19b81809c52b91b4), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206de.bin", 0x00000, 0x40000, BAD_DUMP CRC(143cd2ab) SHA1(d1da866560734289c4305f1028c36291d331d417), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3152,9 +2563,6 @@ ROM_START( megaste_es )
 	ROM_DEFAULT_BIOS("tos205")
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05 (Mega STE TOS)" )
 	ROMX_LOAD( "tos205es.bin", 0x00000, 0x40000, BAD_DUMP CRC(2a426206) SHA1(317715ad8de718b5acc7e27ecf1eb833c2017c91), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3167,9 +2575,6 @@ ROM_START( megaste_it )
 	ROM_DEFAULT_BIOS("tos205")
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05 (Mega STE TOS)" )
 	ROMX_LOAD( "tos205it.bin", 0x00000, 0x40000, BAD_DUMP CRC(b28bf5a1) SHA1(8e0581b442384af69345738849cf440d72f6e6ab), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3184,9 +2589,6 @@ ROM_START( megaste_se )
 	ROMX_LOAD( "tos205se.bin", 0x00000, 0x40000, BAD_DUMP CRC(6d49ccbe) SHA1(c065b1a9a2e42e5e373333e99be829028902acaa), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206se.bin", 0x00000, 0x40000, BAD_DUMP CRC(be61906d) SHA1(ebdf5a4cf08471cd315a91683fcb24e0f029d451), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3228,9 +2630,6 @@ ROM_START( tt030 )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306.bin", 0x00000, 0x80000, BAD_DUMP CRC(e65adbd7) SHA1(b15948786278e1f2abc4effbb6d40786620acbe8), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3243,9 +2642,6 @@ ROM_START( tt030_uk )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306uk.bin", 0x00000, 0x80000, BAD_DUMP CRC(75dda215) SHA1(6325bdfd83f1b4d3afddb2b470a19428ca79478b), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3258,9 +2654,6 @@ ROM_START( tt030_de )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306de.bin", 0x00000, 0x80000, BAD_DUMP CRC(4fcbb59d) SHA1(80af04499d1c3b8551fc4d72142ff02c2182e64a), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3273,9 +2666,6 @@ ROM_START( tt030_fr )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306fr.bin", 0x00000, 0x80000, BAD_DUMP CRC(1945511c) SHA1(6bb19874e1e97dba17215d4f84b992c224a81b95), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3288,9 +2678,6 @@ ROM_START( tt030_pl )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306pl.bin", 0x00000, 0x80000, BAD_DUMP CRC(4f2404bc) SHA1(d122b8ceb202b52754ff0d442b1c81f8b4de3436), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3303,9 +2690,6 @@ ROM_START( fx1 )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos207", "TOS 2.07" )
 	ROMX_LOAD( "tos207.bin", 0x00000, 0x40000, NO_DUMP, ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 #endif
 
@@ -3334,9 +2718,6 @@ ROM_START( falcon30 )
 	ROM_SYSTEM_BIOS( 2, "tos404", "TOS 4.04" )
 	ROMX_LOAD( "tos404.bin", 0x00000, 0x80000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(2) )
 #endif
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 
@@ -3348,9 +2729,6 @@ ROM_START( falcon40 )
 	ROM_REGION32_BE( 0x80000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos492", "TOS 4.92" )
 	ROMX_LOAD( "tos492.bin", 0x00000, 0x7d314, BAD_DUMP CRC(bc8e497f) SHA1(747a38042844a6b632dcd9a76d8525fccb5eb892), ROM_BIOS(0) )
-
-	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 } // anonymous namespace
