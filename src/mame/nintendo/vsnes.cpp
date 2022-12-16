@@ -1221,7 +1221,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vsnes_zapper )
 	PORT_START("IN0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED )            // low 6 bits always read 0b010000
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED )            // ALM wire. 1: gun connected, 0: disconnected alarm (Duck Hunt and Hogan's Alley only?)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            // sprite hit
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )           // gun trigger

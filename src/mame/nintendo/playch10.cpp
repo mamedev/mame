@@ -324,6 +324,7 @@ public:
 		, m_in(*this, "P%u", 1U)
 		, m_gunx(*this, "GUNX")
 		, m_guny(*this, "GUNY")
+		, m_trigger(*this, "TRIGGER")
 		, m_nt_page(*this, "nt_page%u", 0U)
 		, m_prg_banks(*this, "prg%u", 0U)
 		, m_prg_view(*this, "prg_view")
@@ -450,6 +451,7 @@ private:
 	required_ioport_array<2> m_in;
 	optional_ioport m_gunx;
 	optional_ioport m_guny;
+	optional_ioport m_trigger;
 
 	required_memory_bank_array<4> m_nt_page;
 	std::unique_ptr<u8[]> m_nt_ram;
@@ -858,14 +860,12 @@ u8 playch10_state::pc10_in1_r()
 	// do the gun thing
 	if (m_pc10_gun_controller)
 	{
-		int trigger = m_in[0]->read();
-
 		if (!m_sensor->detect_light(m_gunx->read(), m_guny->read()))
 			ret |= 0x08;
 
 		// now, add the trigger if not masked
 		if (!m_cntrl_mask)
-			ret |= (trigger & 2) << 3;
+			ret |= m_trigger->read() << 4;
 	}
 
 	// some games expect bit 6 to be set because the last entry on the data bus shows up
@@ -1834,18 +1834,18 @@ static INPUT_PORTS_START( playch10 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Free_Play ) )
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p A") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p B") PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Game Select")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Button A") PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Button B") PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p A") PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p B") PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )    // wired to 1p select button
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )    // wired to 1p start button
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
@@ -1857,6 +1857,9 @@ INPUT_PORTS_END
 // Input Ports for gun games
 static INPUT_PORTS_START( playc10g )
 	PORT_INCLUDE(playch10)
+
+	PORT_START("TRIGGER")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gun Trigger")
 
 	PORT_START("GUNX")  // IN2 - FAKE - Gun X pos
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_MINMAX(0, 255)
