@@ -6945,12 +6945,13 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 		</part>
 	</software>
 
-	<!-- Keeps resetting to BASIC after "Heart Denshi" logo kicks-in -->
-	<!-- [tries to self-modify program data via the window offset?] -->
 	<software name="craze" supported="no">
 		<description>Craze</description>
 		<year>1988</year>
 		<publisher>ハート電子 (Heart Denshi)</publisher>
+		<notes><![CDATA[
+Keeps resetting to BASIC after "Heart Denshi" logo kicks-in, tries to self-modify program data via the window offset?
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198806xx"/>
 		<info name="alt_title" value="クレイズ"/>
@@ -11452,12 +11453,14 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
-	<!-- Displays Glodia transition then logo keeps scrolling left -->
-	<!-- Same as Vain Dream? -->
 	<software name="emeraldd" supported="no">
 		<description>Emerald Dragon</description>
 		<year>1989</year>
 		<publisher>バショウハウス (Bashou House)</publisher>
+		<notes><![CDATA[
+Displays Glodia transition then logo keeps scrolling left
+Same as vaindrea, requiring write-protect on?
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
 		<info name="alt_title" value="エメラルドドラゴン"/>
@@ -16472,15 +16475,17 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
-	<!-- Prints system disk loading then hangs -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(00 00 f6 03)] -->
-	<software name="hydlide3" supported="no">
+	<software name="hydlide3" supported="partial">
 		<description>Hydlide 3 - The Space Memories</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198711xx"/>
 		<info name="alt_title" value="ハイドライド3"/>
+		<info name="usage" value="On main menu press space bar on item 5 twice (change language) for full English support"/>
 		<!--combined image-->
 		<!--rom name="hydlide 3.d88" size="1176560" crc="19d5f7b7" sha1="10498457f82515a48a0de0baa39b2e3bb41f25df"/-->
 
@@ -19170,13 +19175,14 @@ ExtractDisk  [04]"四             " -> "Kohakuiro no Yuigon 04.d88"
 		</part>
 	</software>
 
-	<software name="komoriai">
+	<software name="komoriai" supported="yes">
 		<description>Komori Ai no Dokidoki Rally</description>
 		<year>1988</year>
 		<publisher>宇宙企画 (Uchuu Kikaku)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="小森愛のどきどきラリー"/>
+		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="komori ai no dokidoki rally.d88" size="697696" crc="7071b012" sha1="e6a14bdb07dccc646ef6831a8b21a8d89604b0c5"/-->
 
@@ -19195,13 +19201,14 @@ ExtractDisk  [04]"四             " -> "Kohakuiro no Yuigon 04.d88"
 		</part>
 	</software>
 
-	<software name="komoriaia" cloneof="komoriai">
+	<software name="komoriaia" cloneof="komoriai" supported="yes">
 		<description>Komori Ai no Dokidoki Rally (alt)</description>
 		<year>1988</year>
 		<publisher>宇宙企画 (Uchuu Kikaku)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="小森愛のどきどきラリー"/>
+		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="komori ai no dokidoki rally.d88" size="697696" crc="2b45930c" sha1="ec7b6c80988a24a210a840d7e2ee1edbc5389613"/-->
 
@@ -19220,13 +19227,14 @@ ExtractDisk  [04]"四             " -> "Kohakuiro no Yuigon 04.d88"
 		</part>
 	</software>
 
-	<software name="komoriaib" cloneof="komoriai">
+	<software name="komoriaib" cloneof="komoriai" supported="yes">
 		<description>Komori Ai no Dokidoki Rally (alt 2)</description>
 		<year>1988</year>
 		<publisher>宇宙企画 (Uchuu Kikaku)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="小森愛のどきどきラリー"/>
+		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="komori ai no dokidoki rally.d88" size="697696" crc="9ebc7696" sha1="2f641d472c226cd96e9490f14a89b3f937b25944"/-->
 
@@ -23496,15 +23504,18 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
-	<!-- No CD-Rom support -->
-	<!-- FDC stalls [Tries to match CHRN=(00 00 0x 01) with existing N=03, 2DD image?]-->
+	<!-- TODO: consider moving to pc8801_cdrom.xml -->
 	<software name="mirrors" supported="no">
 		<description>Mirrors</description>
 		<year>1990</year>
 		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
+		<notes><![CDATA[
+No CD-Rom support
+FDC stalls [Tries to match CHRN=(00 00 0x 01) with existing N=03, 2DD image?]
+]]></notes>
 		<info name="release" value="19901210"/>
 		<info name="alt_title" value="ミラーズ"/>
-		<info name="usage" value="Works on PC8801MC only (needs CD-ROM support)"/>
+		<info name="usage" value="Works on PC8801MC only (needs CD-ROM support) or in MA+ with specific EXP i/f"/>
 		<!--combined image-->
 		<!--rom name="mirrors.d88" size="1250128" crc="6534e06f" sha1="d704a29480c476b50638e7c7ac28fcd5f91fa376"/-->
 
