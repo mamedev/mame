@@ -7610,6 +7610,7 @@ Seldomly crashes (cannot reproduce reliably, "copy protection routine at PC=0x91
 		</part>
 	</software>
 
+	<!-- TODO: user disks for ddash/ddasha aren't verified -->
 	<software name="ddash" supported="no">
 		<description>D'</description>
 		<year>1988</year>
@@ -7642,6 +7643,77 @@ NB: disk geometry makes it likely to have further copy protection checks later o
 			<feature name="part_id" value="User" />
 			<dataarea name="flop" size="370608">
 				<rom name="d' (user).d88" size="370608" crc="b739819e" sha1="507051bf335582af5054d232d1e0afe90e6d3cdf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddasha" supported="no">
+		<description>D' (alt)</description>
+		<year>1988</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<notes><![CDATA[
+[Incorrect layout on track 0 head 1, expected_size=100000, current_size=228096]
+Known to trigger copy protection at first useful terminal, game throws "disk error" and shows to insert disk B (that should be already in), tries to access CHRN=(0, 1, 17, 256) multiple times before giving up at PC=0x89a/PC=0x89f, also has further check(s) down the road (i.e. patching 0x89f will throw a "wrong disk" message).
+NB: disk geometry makes it likely to have further copy protection checks later on too.
+]]></notes>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198801xx"/>
+		<!--combined image-->
+		<!--rom name="d'.d88" size="1119984" crc="e20d14ee" sha1="3ba0aefee46cf8636a78a03e854681b08bed119a"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="370608">
+				<rom name="disk a.d88" size="370608" crc="21e87aa2" sha1="c289cecaf154af4f8918933a3f57dc341abbd366"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="378768">
+				<rom name="disk b.d88" size="378768" crc="d44b38d8" sha1="20352d2528bca6b1428a3ec0f2ed93ca42f11852"/>
+			</dataarea>
+		</part>
+
+		<!-- baddump: non-factory default save -->
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="User" />
+			<dataarea name="flop" size="370608">
+				<rom name="user disk.d88" size="370608" crc="c1be51fd" sha1="c612f1b60913245407db3d423e6fd645d0670fd7" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddashb" supported="partial">
+		<description>D' (cracked)</description>
+		<year>1988</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198801xx"/>
+		<!--combined image-->
+		<!--rom name="d'.d88" size="1119984" crc="e20d14ee" sha1="3ba0aefee46cf8636a78a03e854681b08bed119a"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="370608">
+				<rom name="disk a.d88" size="370608" crc="28b8a82e" sha1="52d16aa387dd04f7fdebed03e6f1ccf6ac86bd74"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="361360">
+				<rom name="disk b.d88" size="361360" crc="e4ddaede" sha1="6528eafb1923fb28c0ab2356630164790f5913d1"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="User" />
+			<dataarea name="flop" size="370608">
+				<rom name="user disk.d88" size="370608" crc="1b05ac8b" sha1="5c8ca0d6c66726f25d2cfe030e9de85a49e103ad"/>
 			</dataarea>
 		</part>
 	</software>
