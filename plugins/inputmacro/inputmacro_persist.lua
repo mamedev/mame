@@ -5,7 +5,7 @@
 -- Helpers
 
 local function settings_path()
-	return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/inputmacro'
+	return manager.machine.options.entries.homepath:value():match('([^;]+)') .. '/inputmacro'
 end
 
 local function settings_filename()

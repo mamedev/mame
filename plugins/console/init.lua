@@ -243,7 +243,7 @@ function console.startplugin()
 		end
 		if (not started) then
 			-- options are not available in startplugin, so we load the history here
-			local homepath = emu.subst_env(manager.options.entries.homepath:value():match("([^;]+)"))
+			local homepath = manager.options.entries.homepath:value():match("([^;]+)")
 			history_fullpath = homepath .. '/' .. history_file
 			ln.loadhistory(history_fullpath)
 			started = true

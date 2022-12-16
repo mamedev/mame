@@ -29,50 +29,46 @@ namespace ui {
 
 namespace {
 
-constexpr int ADDING = 1;
-constexpr int CHANGE = 2;
-
 struct folders_entry
 {
 	const char *name;
 	const char *option;
-	const int   action;
 };
 
 const folders_entry f_folders[] =
 {
-	{ N_p("path-option", "ROMs"),               OPTION_MEDIAPATH,          ADDING },
-	{ N_p("path-option", "Software Media"),     OPTION_SWPATH,             CHANGE },
-	{ N_p("path-option", "Sound Samples"),      OPTION_SAMPLEPATH,         ADDING },
-	{ N_p("path-option", "Artwork"),            OPTION_ARTPATH,            ADDING },
-	{ N_p("path-option", "Crosshairs"),         OPTION_CROSSHAIRPATH,      ADDING },
-	{ N_p("path-option", "Cheat Files"),        OPTION_CHEATPATH,          ADDING },
-	{ N_p("path-option", "Plugins"),            OPTION_PLUGINSPATH,        ADDING },
-	{ N_p("path-option", "UI Translations"),    OPTION_LANGUAGEPATH,       CHANGE },
-	{ N_p("path-option", "Software Lists"),     OPTION_HASHPATH,           ADDING },
-	{ N_p("path-option", "INIs"),               OPTION_INIPATH,            ADDING },
-	{ N_p("path-option", "UI Settings"),        OPTION_UI_PATH,            CHANGE },
-	{ N_p("path-option", "Plugin Data"),        OPTION_PLUGINDATAPATH,     CHANGE },
-	{ N_p("path-option", "DATs"),               OPTION_HISTORY_PATH,       ADDING },
-	{ N_p("path-option", "Category INIs"),      OPTION_CATEGORYINI_PATH,   CHANGE },
-	{ N_p("path-option", "Snapshots"),          OPTION_SNAPSHOT_DIRECTORY, ADDING },
-	{ N_p("path-option", "Icons"),              OPTION_ICONS_PATH,         ADDING },
-	{ N_p("path-option", "Control Panels"),     OPTION_CPANELS_PATH,       ADDING },
-	{ N_p("path-option", "Cabinets"),           OPTION_CABINETS_PATH,      ADDING },
-	{ N_p("path-option", "Marquees"),           OPTION_MARQUEES_PATH,      ADDING },
-	{ N_p("path-option", "PCBs"),               OPTION_PCBS_PATH,          ADDING },
-	{ N_p("path-option", "Flyers"),             OPTION_FLYERS_PATH,        ADDING },
-	{ N_p("path-option", "Title Screens"),      OPTION_TITLES_PATH,        ADDING },
-	{ N_p("path-option", "Game Endings"),       OPTION_ENDS_PATH,          ADDING },
-	{ N_p("path-option", "Bosses"),             OPTION_BOSSES_PATH,        ADDING },
-	{ N_p("path-option", "Artwork Previews"),   OPTION_ARTPREV_PATH,       ADDING },
-	{ N_p("path-option", "Select"),             OPTION_SELECT_PATH,        ADDING },
-	{ N_p("path-option", "Game Over Screens"),  OPTION_GAMEOVER_PATH,      ADDING },
-	{ N_p("path-option", "HowTo"),              OPTION_HOWTO_PATH,         ADDING },
-	{ N_p("path-option", "Logos"),              OPTION_LOGOS_PATH,         ADDING },
-	{ N_p("path-option", "Scores"),             OPTION_SCORES_PATH,        ADDING },
-	{ N_p("path-option", "Versus"),             OPTION_VERSUS_PATH,        ADDING },
-	{ N_p("path-option", "Covers"),             OPTION_COVER_PATH,         ADDING }
+	{ N_p("path-option", "ROMs"),               OPTION_MEDIAPATH          },
+	{ N_p("path-option", "Software Media"),     OPTION_SWPATH             },
+	{ N_p("path-option", "Sound Samples"),      OPTION_SAMPLEPATH         },
+	{ N_p("path-option", "Artwork"),            OPTION_ARTPATH            },
+	{ N_p("path-option", "Crosshairs"),         OPTION_CROSSHAIRPATH      },
+	{ N_p("path-option", "Cheat Files"),        OPTION_CHEATPATH          },
+	{ N_p("path-option", "Plugins"),            OPTION_PLUGINSPATH        },
+	{ N_p("path-option", "UI Translations"),    OPTION_LANGUAGEPATH       },
+	{ N_p("path-option", "Software Lists"),     OPTION_HASHPATH           },
+	{ N_p("path-option", "INIs"),               OPTION_INIPATH            },
+	{ N_p("path-option", "UI Settings"),        OPTION_UI_PATH            },
+	{ N_p("path-option", "Plugin Data"),        OPTION_PLUGINDATAPATH     },
+	{ N_p("path-option", "DATs"),               OPTION_HISTORY_PATH       },
+	{ N_p("path-option", "Category INIs"),      OPTION_CATEGORYINI_PATH   },
+	{ N_p("path-option", "Snapshots"),          OPTION_SNAPSHOT_DIRECTORY },
+	{ N_p("path-option", "Icons"),              OPTION_ICONS_PATH         },
+	{ N_p("path-option", "Control Panels"),     OPTION_CPANELS_PATH       },
+	{ N_p("path-option", "Cabinets"),           OPTION_CABINETS_PATH      },
+	{ N_p("path-option", "Marquees"),           OPTION_MARQUEES_PATH      },
+	{ N_p("path-option", "PCBs"),               OPTION_PCBS_PATH          },
+	{ N_p("path-option", "Flyers"),             OPTION_FLYERS_PATH        },
+	{ N_p("path-option", "Title Screens"),      OPTION_TITLES_PATH        },
+	{ N_p("path-option", "Game Endings"),       OPTION_ENDS_PATH          },
+	{ N_p("path-option", "Bosses"),             OPTION_BOSSES_PATH        },
+	{ N_p("path-option", "Artwork Previews"),   OPTION_ARTPREV_PATH       },
+	{ N_p("path-option", "Select"),             OPTION_SELECT_PATH        },
+	{ N_p("path-option", "Game Over Screens"),  OPTION_GAMEOVER_PATH      },
+	{ N_p("path-option", "HowTo"),              OPTION_HOWTO_PATH         },
+	{ N_p("path-option", "Logos"),              OPTION_LOGOS_PATH         },
+	{ N_p("path-option", "Scores"),             OPTION_SCORES_PATH        },
+	{ N_p("path-option", "Versus"),             OPTION_VERSUS_PATH        },
+	{ N_p("path-option", "Covers"),             OPTION_COVER_PATH         }
 };
 
 
@@ -166,7 +162,7 @@ void menu_remove_folder::populate(float &customtop, float &custombottom)
 class menu_add_change_folder : public menu
 {
 public:
-	menu_add_change_folder(mame_ui_manager &mui, render_container &container, int ref);
+	menu_add_change_folder(mame_ui_manager &mui, render_container &container, int ref, bool multipath);
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -180,9 +176,9 @@ private:
 	void update_search();
 
 	int const    m_ref;
+	bool const   m_multipath;
 	std::string  m_current_path;
 	std::string  m_search;
-	bool const   m_change;
 	std::vector<std::string> m_folders;
 };
 
@@ -190,10 +186,10 @@ private:
 //  ctor
 //-------------------------------------------------
 
-menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_container &container, int ref)
+menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_container &container, int ref, bool multipath)
 	: menu(mui, container)
 	, m_ref(ref)
-	, m_change(f_folders[ref].action == CHANGE)
+	, m_multipath(multipath)
 {
 	// configure the starting path
 	osd_get_full_path(m_current_path, ".");
@@ -255,7 +251,7 @@ void menu_add_change_folder::handle(event const *ev)
 			{
 				// Tab key, save current path
 				std::string error_string;
-				if (m_change)
+				if (!m_multipath)
 				{
 					if (ui().options().exists(f_folders[m_ref].option))
 						ui().options().set_value(f_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
@@ -349,7 +345,7 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 {
 	std::string const toptext[] = {
 			util::string_format(
-					m_change ? _("Change %1$s Folder - Search: %2$s_") : _("Add %1$s Folder - Search: %2$s_"),
+					m_multipath ? _("Add %1$s Folder - Search: %2$s_") : _("Change %1$s Folder - Search: %2$s_"),
 					_("path-option", f_folders[m_ref].name),
 					m_search),
 			m_current_path };
@@ -428,8 +424,9 @@ class menu_display_actual : public menu
 public:
 	menu_display_actual(mame_ui_manager &mui, render_container &container, int selectedref)
 		: menu(mui, container)
-		, m_heading{ util::string_format((f_folders[selectedref].action == ADDING) ? _("%1$s Folders") : _("%1$s Folder"), _("path-option", f_folders[selectedref].name)) }
 		, m_ref(selectedref)
+		, m_multipath(is_multipath(f_folders[selectedref].option))
+		, m_heading{ util::string_format(m_multipath ? _("%1$s Folders") : _("%1$s Folder"), _("path-option", f_folders[selectedref].name)) }
 	{
 	}
 
@@ -446,11 +443,28 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
 
+	bool is_multipath(std::string_view folder) const;
+
+	int const                m_ref;
+	bool const               m_multipath;
 	std::string const        m_heading[1];
 	std::string              m_searchpath;
 	std::vector<std::string> m_folders;
-	int const                m_ref;
 };
+
+//-------------------------------------------------
+//  is_multipath
+//-------------------------------------------------
+
+bool menu_display_actual::is_multipath(std::string_view folder) const
+{
+	auto option = ui().options().get_entry(folder);
+	if (!option)
+		option = machine().options().get_entry(folder);
+	assert(option);
+
+	return option->type() == core_options::option_type::MULTIPATH;
+}
 
 //-------------------------------------------------
 //  handle
@@ -468,7 +482,7 @@ void menu_display_actual::handle(event const *ev)
 			break;
 
 		case ADD_CHANGE:
-			menu::stack_push<menu_add_change_folder>(ui(), container(), m_ref);
+			menu::stack_push<menu_add_change_folder>(ui(), container(), m_ref, m_multipath);
 			break;
 		}
 	}
@@ -480,21 +494,31 @@ void menu_display_actual::handle(event const *ev)
 
 void menu_display_actual::populate(float &customtop, float &custombottom)
 {
-	if (ui().options().exists(f_folders[m_ref].option))
-		m_searchpath.assign(ui().options().value(f_folders[m_ref].option));
-	else
-		m_searchpath.assign(machine().options().value(f_folders[m_ref].option));
+	auto const &folder = f_folders[m_ref];
+	auto option = ui().options().get_entry(folder.option);
+	if (!option)
+		option = machine().options().get_entry(folder.option);
+	assert(option);
 
-	path_iterator path(m_searchpath);
-	std::string curpath;
+	m_searchpath.assign(option->value());
+
 	m_folders.clear();
-	while (path.next(curpath))
-		m_folders.push_back(curpath);
+	if (m_multipath)
+	{
+		path_iterator path(m_searchpath);
+		std::string curpath;
+		while (path.next(curpath))
+			m_folders.push_back(curpath);
 
-	item_append((f_folders[m_ref].action == CHANGE) ? _("Change Folder") : _("Add Folder"), 0, (void *)ADD_CHANGE);
-
-	if (m_folders.size() > 1)
-		item_append(_("Remove Folder"), 0, (void *)REMOVE);
+		item_append(_("Add Folder"), 0, (void *)ADD_CHANGE);
+		if (m_folders.size() > 1)
+			item_append(_("Remove Folder"), 0, (void *)REMOVE);
+	}
+	else
+	{
+		m_folders.push_back(m_searchpath);
+		item_append(_("Change Folder"), 0, (void *)ADD_CHANGE);
+	}
 
 	item_append(menu_item_type::SEPARATOR);
 
@@ -559,7 +583,7 @@ void menu_directory::handle(event const *ev)
 void menu_directory::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : f_folders)
-		item_append(_("path-option", elem.name), 0, (void *)(uintptr_t)elem.action);
+		item_append(_("path-option", elem.name), 0, this); // need a non-null reference pointer - value is immaterial
 
 	item_append(menu_item_type::SEPARATOR);
 }
