@@ -480,7 +480,17 @@ static INPUT_PORTS_START( vendet4p )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( vendetta )
+static INPUT_PORTS_START( vendettan )
+	PORT_INCLUDE( vendet4p )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vendet2p )
 	PORT_INCLUDE( vendet4p )
 
 	PORT_MODIFY("P3")
@@ -500,50 +510,38 @@ static INPUT_PORTS_START( vendetta )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( esckids )
-	PORT_START("P1")
-	KONAMI8_RL_B12_COIN(1)      // Player 1 Control
+static INPUT_PORTS_START( esckids4p )
+	PORT_INCLUDE( vendet4p )
 
-	PORT_START("P2")
-	KONAMI8_RL_B12_COIN(2)      // Player 2 Control
-
-	PORT_START("P3")
-	KONAMI8_RL_B12_COIN(3)      // Player 3 Control ???  (Not used)
-
-	PORT_START("P4")
-	KONAMI8_RL_B12_COIN(4)      // Player 4 Control ???  (Not used)
-
-	PORT_START("SERVICE")       // Start, Service
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vendetta_state, obj_busy_r)
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( esckidsj )
-	PORT_INCLUDE( esckids )
+static INPUT_PORTS_START( esckids2p )
+	PORT_INCLUDE( esckids4p )
 
 	PORT_MODIFY("P3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("P4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -1070,16 +1068,17 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1991, vendetta,     0,        vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettar,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaz,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaun,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
-GAME( 1991, vendetta2pw,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2peba,vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pun, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
-GAME( 1991, vendetta2pu,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pd,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettan,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pp,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckids,      0,        esckids,  esckids,  vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Asia, 4 Players)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckidsj,     esckids,  esckids,  esckidsj, vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Japan, 2 Players)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta,     0,        vendetta, vendet4p,  vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettar,    vendetta, vendetta, vendet4p,  vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaz,    vendetta, vendetta, vendet4p,  vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaun,   vendetta, vendetta, vendet4p,  vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
+GAME( 1991, vendetta2pw,  vendetta, vendetta, vendet2p,  vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2peba,vendetta, vendetta, vendet2p,  vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pun, vendetta, vendetta, vendet2p,  vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
+GAME( 1991, vendetta2pu,  vendetta, vendetta, vendet2p,  vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pd,  vendetta, vendetta, vendet2p,  vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettan,    vendetta, vendetta, vendettan, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pp,  vendetta, vendetta, vendet2p,  vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1991, esckids,      0,        esckids,  esckids4p, vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Asia, 4 Players)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckidsj,     esckids,  esckids,  esckids2p, vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Japan, 2 Players)",              MACHINE_SUPPORTS_SAVE )
