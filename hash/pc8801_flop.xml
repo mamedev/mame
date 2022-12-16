@@ -7718,6 +7718,18 @@ Not extensively tested
 		</part>
 	</software>
 
+	<software name="dkong3dg">
+		<description>Donkey Kong 3 - Dai Gyakushuu</description>
+		<year>1984</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="ドンキーコング3 大逆襲"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1106654">
+				<rom name="dk3.mfm" size="1106654" crc="de1e77b3" sha1="0fe1569ce3dd7bb0879ae896e90ecfa57426860d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dps">
 		<description>D.P.S - Dream Program System</description>
 		<year>1990</year>
