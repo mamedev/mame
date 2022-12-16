@@ -345,9 +345,9 @@ void mc68328_device::device_resolve_objects()
 {
 	mc68328_base_device::device_resolve_objects();
 
-	m_out_port_j_cb.resolve_all();
-	m_out_port_k_cb.resolve_all();
-	m_out_port_m_cb.resolve_all();
+	m_out_port_j_cb.resolve_all_safe();
+	m_out_port_k_cb.resolve_all_safe();
+	m_out_port_m_cb.resolve_all_safe();
 
 	m_in_port_j_cb.resolve_all();
 	m_in_port_k_cb.resolve_all();
