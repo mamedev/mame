@@ -3549,6 +3549,8 @@ if (BUSES["SMS_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/sms_ctrl/controllers.h",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/diypaddle.cpp",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/diypaddle.h",
+		MAME_DIR .. "src/devices/bus/sms_ctrl/hypershot.cpp",
+		MAME_DIR .. "src/devices/bus/sms_ctrl/hypershot.h",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/graphic.cpp",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/graphic.h",
 		MAME_DIR .. "src/devices/bus/sms_ctrl/joypad.cpp",

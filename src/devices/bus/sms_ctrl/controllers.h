@@ -12,6 +12,7 @@
 
 
 extern char const *const SMS_CTRL_OPTION_DIY_PADDLE;
+extern char const *const SMS_CTRL_OPTION_HYPERSHOT;
 extern char const *const SMS_CTRL_OPTION_GRAPHIC;
 extern char const *const SMS_CTRL_OPTION_LPHASER;
 extern char const *const SMS_CTRL_OPTION_MD_6BUTTON;
