@@ -20,7 +20,7 @@
 const options_entry ui_options::s_option_entries[] =
 {
 	// search path options
-	{ nullptr,                              nullptr,                       core_options::option_type::HEADER,  "UI SEARCH PATH OPTIONS" },
+	{ nullptr,                              nullptr,                       core_options::option_type::HEADER,     "UI SEARCH PATH OPTIONS" },
 	{ OPTION_HISTORY_PATH,                  "history;dats;.",              core_options::option_type::MULTIPATH,  "path to system/software info files" },
 	{ OPTION_CATEGORYINI_PATH,              "folders",                     core_options::option_type::MULTIPATH,  "path to category ini files" },
 	{ OPTION_CABINETS_PATH,                 "cabinets;cabdevs",            core_options::option_type::MULTIPATH,  "path to cabinets / devices image" },
@@ -44,7 +44,7 @@ const options_entry ui_options::s_option_entries[] =
 
 	// misc options
 	{ nullptr,                              nullptr,    core_options::option_type::HEADER,      "UI MISC OPTIONS" },
-	{ OPTION_SYSTEM_NAMES,                  "",         core_options::option_type::PATH,      "translated system names file" },
+	{ OPTION_SYSTEM_NAMES,                  "",         core_options::option_type::MULTIPATH,   "translated system names file" },
 	{ OPTION_SKIP_WARNINGS,                 "0",        core_options::option_type::BOOLEAN,     "display fewer repeated warnings about imperfect emulation" },
 	{ OPTION_REMEMBER_LAST,                 "1",        core_options::option_type::BOOLEAN,     "initially select last used system in main menu" },
 	{ OPTION_ENLARGE_SNAPS,                 "1",        core_options::option_type::BOOLEAN,     "enlarge artwork (snapshot, title, etc.) in right panel (keeping aspect ratio)" },
