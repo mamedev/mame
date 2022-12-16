@@ -1045,14 +1045,14 @@ void tristar9000_state::init_tristar9000()
  *************************************/
 
 // EPOS TRISTAR 8000 PCB based
-GAME( 1982, megadon,  0,        tristar8000,   megadon,  tristar8000_state, empty_init, ROT270, "Epos Corporation (Photar Industries license)", "Megadon", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catapult, 0,        tristar8000,   catapult, tristar8000_state, empty_init, ROT270, "Epos Corporation", "Catapult",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad ROM, hold f2 for test mode
-GAME( 1983, suprglob, 0,        tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "Super Glob",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob,  suprglob, tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "The Glob",           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob2, suprglob, tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob3, suprglob, tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, igmo,     0,        tristar8000,   igmo,     tristar8000_state, empty_init, ROT270, "Epos Corporation", "IGMO",               MACHINE_SUPPORTS_SAVE )
-GAME( 1983, eeekk,    0,        tristar8000,   eeekk,    tristar8000_state, empty_init, ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, megadon,  0,        tristar8000, megadon,  tristar8000_state, empty_init,       ROT270, "Epos Corporation (Photar Industries license)", "Megadon", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catapult, 0,        tristar8000, catapult, tristar8000_state, empty_init,       ROT270, "Epos Corporation", "Catapult",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad ROM, hold f2 for test mode
+GAME( 1983, suprglob, 0,        tristar8000, suprglob, tristar8000_state, empty_init,       ROT270, "Epos Corporation", "Super Glob",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob,  suprglob, tristar8000, suprglob, tristar8000_state, empty_init,       ROT270, "Epos Corporation", "The Glob",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob2, suprglob, tristar8000, suprglob, tristar8000_state, empty_init,       ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob3, suprglob, tristar8000, suprglob, tristar8000_state, empty_init,       ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, igmo,     0,        tristar8000, igmo,     tristar8000_state, empty_init,       ROT270, "Epos Corporation", "IGMO",               MACHINE_SUPPORTS_SAVE )
+GAME( 1983, eeekk,    0,        tristar8000, eeekk,    tristar8000_state, empty_init,       ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
 
 // EPOS TRISTAR 9000 PCB based
 GAME( 1984, dealer,   0,        tristar9000, dealer,   tristar9000_state, init_tristar9000, ROT270, "Epos Corporation", "The Dealer",           MACHINE_SUPPORTS_SAVE )
