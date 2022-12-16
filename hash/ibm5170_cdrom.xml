@@ -68,7 +68,7 @@ license:CC0
 	<!-- <rom name="Blues Brothers, The (Europe).cue" size="94" crc="22379e3c" sha1="aaa704acbe4dcc90e8153f81227f00a83cbdaadd"/> -->
 	<!-- <rom name="Blues Brothers, The (Europe).bin" size="8979936" crc="346e8d8f" sha1="3b775aedf36fcbc33b6a04159d2c4887ec3d611d"/> -->
 	<software name="5plus1_10">
-		<description>5 Plus One: Pack 10 - The Blues Brothers (compilation)</description>
+		<description>5 Plus One: Pack 10 - The Blues Brothers</description>
 		<year>1994</year>
 		<publisher>Prism Leisure Corporation PLC</publisher>
 		<notes><![CDATA[
@@ -90,7 +90,7 @@ Demo/Shareware: "Bodycount", "Zone 66", "Save Our Pizzas", "Dangerous Dave", "Ca
 	<!-- <rom name="TV Sports Football (Europe).cue" size="93" crc="64a640a0" sha1="fbc6fcb695b38c0792312a23ae3c79a4aab6ee7b"/> -->
 	<!-- <rom name="TV Sports Football (Europe).bin" size="6905472" crc="11800913" sha1="6660a474a49f71485cc5ee802dafca90736c53fc"/> -->
 	<software name="5plus1_25">
-		<description>5 Plus One: Pack 25 - TV Sports Football (compilation)</description>
+		<description>5 Plus One: Pack 25 - TV Sports Football</description>
 		<year>1994</year>
 		<publisher>Prism Leisure Corporation PLC</publisher>
 		<notes><![CDATA[
@@ -113,7 +113,7 @@ Demo/Shareware: "Ranger Fox", "Monster Bash", "Onesimus", "Turoid", "Peristroka"
 	<!-- Super Tetris has manual copy protection -->
 	<!-- Other games (shareware): Green, Aldo II Adventure, Phylox, Draw Poker, Space Miner -->
 	<software name="5plus1_34">
-		<description>5 Plus One: Pack 34 - Super Tetris (compilation)</description>
+		<description>5 Plus One: Pack 34 - Super Tetris</description>
 		<year>1996</year>
 		<publisher>Prism Leisure Corporation PLC</publisher>
 		<notes><![CDATA[
@@ -978,7 +978,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	<!-- <rom name="Bitmap Brothers Compilation, The (Europe).cue" size="130" crc="63ce6c43" sha1="3b6e3a6031fd0c5b1fa5e29ff9192d67192d573b"/> -->
 	<!-- <rom name="Bitmap Brothers Compilation, The (Europe).bin" size="6190464" crc="0969c11f" sha1="53b7f78990fbc64763eb5224df8618367e6ae003"/> -->
 	<software name="bitmpbro">
-		<description>The Bitmap Brothers Compilation (compilation)</description>
+		<description>The Bitmap Brothers Compilation</description>
 		<year>1995</year>
 		<publisher>Renegade Software</publisher>
 		<notes>CD-ROM includes: "Cadaver", "Cadaver: The Payoff", "Gods", "Magic Pockets", "Speedball 2", "Xenon 2"</notes>
@@ -1961,7 +1961,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	<!-- <rom name="Delphine Classic Collection (Europe) (En,De).cue" size="133" crc="64a640a0" sha1="fbc6fcb695b38c0792312a23ae3c79a4aab6ee7b"/> -->
 	<!-- <rom name="Delphine Classic Collection (Europe) (En,De).bin" size="24286752" crc="b9459f8e" sha1="be30d01753846885dd0f517baf22c035e80e9e00"/> -->
 	<software name="delphicc">
-		<description>Delphine Classic Collection - Adventure (compilation)</description>
+		<description>Delphine Classic Collection - Adventure</description>
 		<year>1994</year>
 		<publisher>Kixx</publisher>
 		<notes>CD-ROM includes: "Another World", "Cruise for a Corpse", "Flashback", "Future Wars", "Operation Stealth"</notes>
@@ -2435,7 +2435,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	<!-- <rom name="id Anthology (USA) (Disc 2) (Doom) (Rev 1).cue" size="131" crc="535b4387" sha1="128683f7e261db349ff2fccba14a9f1b3c7b2ebe"/> -->
 	<!-- <rom name="id Anthology (USA) (Disc 2) (Doom) (Rev 1).bin" size="223225968" crc="6ff080ba" sha1="26856c342897ba02edb326f8657ef69429eaddc7"/> -->
 	<software name="idanthol">
-		<description>id Anthology (rev 1, compilation)</description>
+		<description>id Anthology (rev 1)</description>
 		<year>1996</year>
 		<publisher>id Software</publisher>
 		<notes><![CDATA[
@@ -2482,13 +2482,15 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 	<!-- <rom name="id Anthology (USA) (Disc 2) (Doom).cue" size="123" crc="d9bd95e5" sha1="77f887a39c46b6da72b296fe410b2db46e034362"/> -->
 	<!-- <rom name="id Anthology (USA) (Disc 2) (Doom).bin" size="221391408" crc="7d7d5916" sha1="8652b4195f9796c471880b5150f71022390d9db4"/> -->
 	<software name="idanthola" cloneof= "idanthol">
-		<description>id Anthology (compilation)</description>
+		<description>id Anthology</description>
 		<year>1996</year>
 		<publisher>id Software</publisher>
 		<notes><![CDATA[
 CD-ROM 1: "Catacomb 3-D", "Commander Keen: Invasion of the Vorticons", "Commander Keen: Goodbye Galaxy", "Commander Keen: Aliens Ate My Babysitter!", "Commander Keen: Keen Dreams",
 		  "Dangerous Dave", "Hover Tank 3D", "Rescue Rover", "Rescue Rover 2", "Shadow Knights", "Slordax: The Unknown Enemy", "Spear of Destiny", "The Catacomb", "Wolfenstein 3D"
 CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "The Ultimate DOOM"
+CD-ROM 3: "Quake"
+CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D"
 ]]></notes>
 		<info name="usage" value="DOS" />
 		<info name="region" value="USA" />
