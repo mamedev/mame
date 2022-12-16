@@ -324,6 +324,7 @@ public:
 		, m_in(*this, "P%u", 1U)
 		, m_gunx(*this, "GUNX")
 		, m_guny(*this, "GUNY")
+		, m_trigger(*this, "TRIGGER")
 		, m_nt_page(*this, "nt_page%u", 0U)
 		, m_prg_banks(*this, "prg%u", 0U)
 		, m_prg_view(*this, "prg_view")
@@ -367,7 +368,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(up8w_w);
 	u8 ram_8w_r(offs_t offset);
 	void ram_8w_w(offs_t offset, u8 data);
-	void sprite_dma_w(address_space &space, u8 data);
 	void time_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(sdcs_w);
 	DECLARE_WRITE_LINE_MEMBER(cntrl_mask_w);
@@ -451,6 +451,7 @@ private:
 	required_ioport_array<2> m_in;
 	optional_ioport m_gunx;
 	optional_ioport m_guny;
+	optional_ioport m_trigger;
 
 	required_memory_bank_array<4> m_nt_page;
 	std::unique_ptr<u8[]> m_nt_ram;
@@ -644,11 +645,6 @@ void playch10_state::ram_8w_w(offs_t offset, u8 data)
 	if (!m_up_8w)
 		offset &= 0x3ff;
 	m_ram_8w[offset] = data;
-}
-
-void playch10_state::sprite_dma_w(address_space &space, u8 data)
-{
-	m_ppu->spriteram_dma(space, data);
 }
 
 // Only used in single monitor bios
@@ -864,14 +860,12 @@ u8 playch10_state::pc10_in1_r()
 	// do the gun thing
 	if (m_pc10_gun_controller)
 	{
-		int trigger = m_in[0]->read();
-
 		if (!m_sensor->detect_light(m_gunx->read(), m_guny->read()))
 			ret |= 0x08;
 
 		// now, add the trigger if not masked
 		if (!m_cntrl_mask)
-			ret |= (trigger & 2) << 3;
+			ret |= m_trigger->read() << 4;
 	}
 
 	// some games expect bit 6 to be set because the last entry on the data bus shows up
@@ -1519,7 +1513,7 @@ void playch10_state::cart_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(playch10_state::sprite_dma_w));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(playch10_state::pc10_in0_r), FUNC(playch10_state::pc10_in0_w));
 	map(0x4017, 0x4017).r(FUNC(playch10_state::pc10_in1_r));  // IN1 - input port 2 / PSG second control register
 	// Games that don't bank PRG
@@ -1840,18 +1834,18 @@ static INPUT_PORTS_START( playch10 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Free_Play ) )
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p A") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p B") PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Game Select")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Button A") PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Button B") PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p A") PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p B") PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )    // wired to 1p select button
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )    // wired to 1p start button
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
@@ -1863,6 +1857,9 @@ INPUT_PORTS_END
 // Input Ports for gun games
 static INPUT_PORTS_START( playc10g )
 	PORT_INCLUDE(playch10)
+
+	PORT_START("TRIGGER")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gun Trigger")
 
 	PORT_START("GUNX")  // IN2 - FAKE - Gun X pos
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_MINMAX(0, 255)

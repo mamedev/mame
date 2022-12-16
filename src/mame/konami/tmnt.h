@@ -64,8 +64,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
-
-	TIMER_CALLBACK_MEMBER(audio_nmi);
+	virtual void machine_reset() override;
 
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -89,7 +88,7 @@ protected:
 	int        m_dim_v = 0; /* lgtnfght, ssriders, tmnt2 only */
 
 	/* misc */
-	emu_timer *m_audio_nmi_timer = nullptr;
+	emu_timer  *m_nmi_blocked = nullptr;
 	int        m_tmnt_soundlatch = 0;
 	int        m_toggle = 0;
 	int        m_last = 0;
@@ -127,6 +126,7 @@ protected:
 	uint8_t tmnt_sres_r();
 	void tmnt_sres_w(uint8_t data);
 	void sound_arm_nmi_w(uint8_t data);
+	void z80_nmi_w(int state);
 	uint16_t punkshot_kludge_r();
 	uint16_t ssriders_protection_r(address_space &space);
 	void ssriders_protection_w(address_space &space, offs_t offset, uint16_t data);
@@ -149,7 +149,6 @@ protected:
 	void tmnt_upd_start_w(uint8_t data);
 	uint8_t tmnt_upd_busy_r();
 
-	DECLARE_MACHINE_RESET(common);
 	DECLARE_VIDEO_START(cuebrick);
 	DECLARE_VIDEO_START(mia);
 	DECLARE_MACHINE_RESET(tmnt);

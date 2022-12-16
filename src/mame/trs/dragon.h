@@ -13,11 +13,11 @@
 
 #pragma once
 
-
 #include "coco12.h"
+
 #include "imagedev/printer.h"
-#include "machine/mos6551.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 
 
@@ -26,7 +26,9 @@
 //**************************************************************************
 
 #define PRINTER_TAG     "printer"
-#define ACIA_TAG        "acia"
+
+
+INPUT_PORTS_EXTERN( dragon );
 
 
 
@@ -46,8 +48,11 @@ public:
 	void dragon_base(machine_config &config);
 	void dragon32(machine_config &config);
 	void dragon_mem(address_map &map);
+
 protected:
 	virtual void pia1_pa_changed(uint8_t data) override;
+
+	static void dragon_cart(device_slot_interface &device);
 
 private:
 	required_device<printer_image_device> m_printer;
@@ -60,7 +65,7 @@ class dragon64_state : public dragon_state
 public:
 	dragon64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dragon_state(mconfig, type, tag)
-		, m_acia(*this, ACIA_TAG)
+		, m_acia(*this, "acia")
 		, m_rombank(*this, "rombank%u", 0U)
 	{
 	}
@@ -75,8 +80,9 @@ protected:
 	void d64_rom1(address_map &map);
 	void d64_io0(address_map &map);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	virtual void pia1_pb_changed(uint8_t data) override;
 	void page_rom(bool romswitch);
 
@@ -129,8 +135,8 @@ public:
 
 	void d64plus(machine_config &config);
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<hd6845s_device> m_crtc;

@@ -202,16 +202,16 @@ MAIN:
 		case 0xB5:													%DIVX;		return;
 		case 0xB6:													%BMOVE;		return;
 		case 0xB7:													%MOVE;		return;
-		case 0xB8:										set_imm();	%LSRD;		return;
+		case 0xB8:										set_d();	%LSRD;		return;
 		case 0xB9:										%INDEXED;	%LSRD;		return;
-		case 0xBA:										set_imm();	%RORD;		return;
+		case 0xBA:										set_d();	%RORD;		return;
 		case 0xBB:										%INDEXED;	%RORD;		return;
-		case 0xBC:										set_imm();	%ASRD;		return;
+		case 0xBC:										set_d();	%ASRD;		return;
 		case 0xBD:										%INDEXED;	%ASRD;		return;
-		case 0xBE:										set_imm();	%ASLD;		return;
+		case 0xBE:										set_d();	%ASLD;		return;
 		case 0xBF:										%INDEXED;	%ASLD;		return;
 
-		case 0xC0:										set_imm();	%ROLD;		return;
+		case 0xC0:										set_d();	%ROLD;		return;
 		case 0xC1:										%INDEXED;	%ROLD;		return;
 		case 0xC2:										set_d();	%CLR16;		return;
 		case 0xC3:										%INDEXED;	%CLR16;		return;
@@ -338,6 +338,7 @@ INDEXED:
 			// extended addressing mode
 			@m_temp.b.h = read_opcode_arg();
 			@m_temp.b.l = read_opcode_arg();
+			eat(1);
 			break;
 
 		case 0x20: case 0x30: case 0x50: case 0x60: case 0x70:
@@ -373,7 +374,7 @@ INDEXED:
 			m_ea.w = ireg();	// need to do this now because ireg() might be PC
 			@m_temp.b.l = read_opcode_arg();
 			m_temp.w = m_ea.w + (int8_t) m_temp.b.l;
-			eat(1);
+			eat(2);
 			break;
 
 		case 0x25: case 0x35: case 0x55: case 0x65: case 0x75:
@@ -387,30 +388,32 @@ INDEXED:
 
 		case 0x26: case 0x36: case 0x56: case 0x66: case 0x76:
 			m_temp.w = ireg();
+			eat(1);
 			break;
 
 		case 0xC4:
 			// direct addressing mode
 			m_temp.b.h = m_dp;
 			@m_temp.b.l = read_opcode_arg();
+			eat(1);
 			break;
 
 		case 0xA0: case 0xB0: case 0xD0: case 0xE0: case 0xF0:
 			// relative to register A
 			m_temp.w = ireg() + (int8_t) m_q.r.a;
-			@eat(1);
+			eat(2);
 			break;
 
 		case 0xA1: case 0xB1: case 0xD1: case 0xE1: case 0xF1:
 			// relative to register B
 			m_temp.w = ireg() + (int8_t) m_q.r.b;
-			@eat(1);
+			eat(2);
 			break;
 
 		case 0xA7: case 0xB7: case 0xD7: case 0xE7: case 0xF7:
 			// relative to register D
 			m_temp.w = ireg() + (int16_t) m_q.r.d;
-			@eat(4);
+			eat(2);
 			break;
 
 		default:
@@ -425,7 +428,7 @@ INDEXED:
 		set_ea(m_temp.w);
 		@m_temp.b.h = read_operand(0);
 		@m_temp.b.l = read_operand(1);
-		nop();
+		eat(1);
 	}
 
 	set_ea(m_temp.w);
@@ -440,7 +443,7 @@ EXG:
 		write_exgtfr_register(param >> 0, reg2);
 		write_exgtfr_register(param >> 4, reg1);
 	}
-	eat(hd6309_native_mode() ? 3 : 6);
+	eat(3);
 	return;
 
 TFR:
@@ -450,7 +453,7 @@ TFR:
 		uint16_t reg = read_exgtfr_register(param >> 0);
 		write_exgtfr_register(param >> 4, reg);
 	}
-	eat(hd6309_native_mode() ? 2 : 4);
+	eat(2);
 	return;
 
 SETLINE:
@@ -464,8 +467,7 @@ MOVE:
 	return;
 
 BMOVE:
-	// BMOVE does not appear to be interruptable, at least judging from the
-	// old implementation
+	// BMOVE does not appear to be interruptable, at least judging from the old implementation
 	while(m_u.w != 0)
 	{
 		@m_temp.b.l = read_memory(m_y.w++);
@@ -475,8 +477,7 @@ BMOVE:
 	return;
 
 BSET:
-	// BSET does not appear to be interruptable, at least judging from the
-	// old implementation
+	// BSET does not appear to be interruptable, at least judging from the old implementation
 	while(m_u.w != 0)
 	{
 		@eat(1);
@@ -486,8 +487,7 @@ BSET:
 	return;
 
 BSET2:
-	// BSET2 does not appear to be interruptable, at least judging from the
-	// old implementation
+	// BSET2 does not appear to be interruptable, at least judging from the old implementation
 	while(m_u.w != 0)
 	{
 		@eat(1);
@@ -512,74 +512,107 @@ DECBJNZ:
 	goto BRANCH;
 
 LSRD:
-	@m_temp.b.l = read_operand();
-	if (m_temp.b.l != 0x00)
-	{
-		// set C condition code
-		if (m_q.r.d & safe_shift_left(1, m_temp.b.l))
-			m_cc |= CC_C;
-		else
-			m_cc &= ~CC_C;
+	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
+	if (is_register_addressing_mode())
+		m_bcount = read_opcode_arg();
+	else
+		m_bcount = m_q.r.a;
 
-		m_q.r.d = set_flags<uint16_t>(CC_NZ, safe_shift_right_unsigned<uint16_t>(m_q.r.d, m_temp.b.l));
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+
+	while(m_bcount--)
+	{
+		@eat(1);
+		m_cc &= ~CC_C;
+		m_cc |= (m_temp.w & 1) ? CC_C : 0;
+		m_temp.w = set_flags<uint16_t>(CC_NZ, m_temp.w >> 1);
 	}
-	eat(1);
+	@write_operand(0, m_temp.b.h);
+	write_operand(1, m_temp.b.l);
 	return;
 
 ASLD:
-	@m_temp.b.l = read_operand();
-	if (m_temp.b.l != 0x00)
-	{
-		// set C condition code
-		if (m_q.r.d & safe_shift_right(0x10000, m_temp.b.l))
-			m_cc |= CC_C;
-		else
-			m_cc &= ~CC_C;
+	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
+	if (is_register_addressing_mode())
+		m_bcount = read_opcode_arg();
+	else
+		m_bcount = m_q.r.a;
 
-		m_q.r.d = set_flags<uint16_t>(CC_NZV, safe_shift_left<int16_t>(m_q.r.d, m_temp.b.l));
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+
+	while(m_bcount--)
+	{
+		@eat(1);
+		m_temp.w = set_flags<uint16_t>(CC_NZVC, m_temp.w, m_temp.w, m_temp.w << 1);
 	}
-	eat(1);
+	@write_operand(0, m_temp.b.h);
+	write_operand(1, m_temp.b.l);
 	return;
 
 ASRD:
-	@m_temp.b.l = read_operand();
-	if (m_temp.b.l != 0x00)
-	{
-		// set C condition code
-		if (m_q.r.d & safe_shift_left(1, m_temp.b.l))
-			m_cc |= CC_C;
-		else
-			m_cc &= ~CC_C;
+	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
+	if (is_register_addressing_mode())
+		m_bcount = read_opcode_arg();
+	else
+		m_bcount = m_q.r.a;
 
-		m_q.r.d = set_flags<uint16_t>(CC_NZ, safe_shift_right<int16_t>(m_q.r.d, m_temp.b.l));
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+
+	while(m_bcount--)
+	{
+		@eat(1);
+		m_cc &= ~CC_C;
+		m_cc |= (m_temp.w & 1) ? CC_C : 0;
+		m_temp.w = set_flags<uint16_t>(CC_NZ, ((int16_t) m_temp.w) >> 1);
 	}
-	eat(1);
+	@write_operand(0, m_temp.b.h);
+	write_operand(1, m_temp.b.l);
 	return;
 
 ROLD:
-	@m_temp.b.l = read_operand();
+	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
+	if (is_register_addressing_mode())
+		m_bcount = read_opcode_arg();
+	else
+		m_bcount = m_q.r.a;
 
-	// doing this as a loop is lame
-	while(m_temp.b.l--)
-		m_q.r.d = set_flags<uint16_t>(CC_NZ, rotate_left(m_q.r.d));
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
 
-	eat(1);
+	while(m_bcount--)
+	{
+		@eat(1);
+		m_temp.w = set_flags<uint16_t>(CC_NZV, rotate_left(m_temp.w));
+	}
+	@write_operand(0, m_temp.b.h);
+	write_operand(1, m_temp.b.l);
 	return;
 
 RORD:
-	@m_temp.b.l = read_operand();
+	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
+	if (is_register_addressing_mode())
+		m_bcount = read_opcode_arg();
+	else
+		m_bcount = m_q.r.a;
 
-	// doing this as a loop is lame
-	while(m_temp.b.l--)
-		m_q.r.d = set_flags<uint16_t>(CC_NZ, rotate_right(m_q.r.d));
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
 
-	eat(1);
+	while(m_bcount--)
+	{
+		@eat(1);
+		m_temp.w = set_flags<uint16_t>(CC_NZ, rotate_right(m_temp.w));
+	}
+	@write_operand(0, m_temp.b.h);
+	write_operand(1, m_temp.b.l);
 	return;
 
 ABS8:
 	@m_temp.b.l = read_operand();
 	m_temp.b.l = set_flags<uint8_t>(CC_NZVC, 0, m_temp.b.l, ((int8_t) m_temp.b.l) >= 0 ? m_temp.b.l : -m_temp.b.l);
-	@eat(1);
 	write_operand(m_temp.b.l);
 	return;
 
@@ -587,7 +620,6 @@ ABS16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	m_temp.w = set_flags<uint16_t>(CC_NZVC, 0, m_temp.w, ((int16_t) m_temp.w) >= 0 ? m_temp.w : -m_temp.w);
-	@eat(1);
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;

@@ -13,8 +13,6 @@
 DEFINE_DEVICE_TYPE(BFM_BDA, bfm_bda_device, "bfm_bda", "BFM BDA VFD controller")
 
 
-//I currently use the BDA character set, until a suitable image can be programmed
-
 static const uint16_t BDAcharset[]=
 {           // FEDC BA98 7654 3210
 	0xA626, // 1010 0110 0010 0110 @.
@@ -95,10 +93,13 @@ void bfm_bda_device::device_start()
 	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", unsigned(m_port_val) << 4);
 	m_outputs->resolve();
 
+	m_brightness = std::make_unique<output_finder<1> >(*this, "vfdduty%u", unsigned(m_port_val));
+	m_brightness->resolve();
+
 	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_start));        // display window start pos 0-15
-	save_item(NAME(m_window_end));      // display window end   pos 0-15
-	save_item(NAME(m_window_size));     // window  size
+	save_item(NAME(m_window_end));          // display window end   pos 0-15
+	save_item(NAME(m_window_size));         // window  size
 	save_item(NAME(m_shift_count));
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_pcursor_pos));
@@ -114,6 +115,7 @@ void bfm_bda_device::device_start()
 	save_item(NAME(m_attrs));
 	save_item(NAME(m_user_data));           // user defined character data (16 bit)
 	save_item(NAME(m_user_def));            // user defined character state
+	save_item(NAME(m_duty));
 }
 
 void bfm_bda_device::device_reset()
@@ -134,6 +136,9 @@ void bfm_bda_device::device_reset()
 	m_flash_control = 0;
 	m_user_data = 0;
 	m_user_def = 0;
+	m_duty = 0;
+
+	(*m_brightness)[0] = 0;
 
 	std::fill(std::begin(m_chars), std::end(m_chars), 0);
 	std::fill(std::begin(m_attrs), std::end(m_attrs), 0);
@@ -152,24 +157,24 @@ void bfm_bda_device::device_post_load()
 void bfm_bda_device::update_display()
 {
 	for (int i = 0; i < 16; i++)
-		(*m_outputs)[i] = (m_attrs[i] != AT_BLANK) ? set_display(m_chars[i]) : 0;
+		(*m_outputs)[i] = (m_attrs[i] == AT_NORMAL) ? set_display(m_chars[i]) : 0;
+	(*m_brightness)[0] = m_duty;
 }
 ///////////////////////////////////////////////////////////////////////////
 void bfm_bda_device::blank(int data)
 {
 	switch ( data & 0x03 ) // TODO: wrong case values???
 	{
-	case 0x00:  // clear blanking
+	case 0x00:  //blank all
+		for (int i = 0; i < 15; i++)
 		{
-			for (int i = 0; i < 15; i++)
-			{
-				m_attrs[i] = 0;
-			}
+			m_attrs[i] = AT_BLANK;
 		}
 		break;
 
+
 	case 0x01:  // blank inside window
-		if ( m_window_size > 0 )
+		if (m_window_size > 0)
 		{
 			for (int i = m_window_start; i < m_window_end ; i++)
 			{
@@ -179,7 +184,7 @@ void bfm_bda_device::blank(int data)
 		break;
 
 	case 0x02:  // blank outside window
-		if ( m_window_size > 0 )
+		if (m_window_size > 0)
 		{
 			if ( m_window_start > 0 )
 			{
@@ -199,12 +204,10 @@ void bfm_bda_device::blank(int data)
 		}
 		break;
 
-	case 0x03:  //blank all
+	case 0x03:  // clear blanking
+		for (int i = 0; i < 15; i++)
 		{
-			for (int i = 0; i < 15; i++)
-			{
-				m_attrs[i] = AT_BLANK;
-			}
+			m_attrs[i] = 0;
 		}
 		break;
 	}
@@ -212,7 +215,7 @@ void bfm_bda_device::blank(int data)
 
 int bfm_bda_device::write_char(int data)
 {
-	if ( m_user_def )
+	if (m_user_def)
 	{
 		m_user_def--;
 
@@ -228,26 +231,18 @@ int bfm_bda_device::write_char(int data)
 	}
 	else
 	{
-		if(data < 0x80)//characters
+		if (!(data & 0x80))//characters
 		{
-			if (m_blank_flag || m_flash_flag)
+			if (m_blank_flag)
 			{
-				if (m_blank_flag)
-				{
-					logerror("Brightness data %x \n", data) ;
-					m_blank_flag = 0;
-				}
-				if (m_flash_flag)
-				{
-					//not setting yet
-					m_flash_flag = 0;
-				}
+				m_duty = 7 - data;
+				m_blank_flag = 0;
 			}
 			else
 			{
 				if (data > 0x3F)
 				{
-					logerror("Undefined character %x \n", data);
+					logerror("BDA Undefined character, needs populating 0x%1$02X\n", data);
 				}
 
 				setdata(BDAcharset[(data & 0x3F)], data);
@@ -255,96 +250,93 @@ int bfm_bda_device::write_char(int data)
 		}
 		else
 		{
-			switch ( data & 0xF0 )
+			switch (data & 0xf0)
 			{
 			case 0x80:  // 0x80 - 0x8F Set display blanking
-				if (data==0x84)// futaba setup
+				if (data == 0x84)// duty setup
 				{
 					m_blank_flag = 1;
+					m_flash_flag = 0;
 				}
 				else
 				{
-					logerror("80s %x \n",data);
-					//blank(data&0x03);//use the blanking data
+					blank(data & 0x03);//use the blanking data
 				}
 				break;
 
 			case 0x90:  // 0x90 - 0x9F Set cursor pos
-				m_cursor_pos = data & 0x0F;
+				m_cursor_pos = data & 0x0f;
 				m_scroll_active = 0;
-				if ( m_display_mode == 2 )
+				if (m_display_mode == 2)
 				{
 					if ( m_cursor_pos >= m_window_end) m_scroll_active = 1;
 				}
 				break;
 
-			case 0xA0:  // 0xA0 - 0xAF Set display mode
-				m_display_mode = data &0x03;
-				break;
-
-			case 0xB0:  // 0xB0 - 0xBF Clear display area
-
-				switch ( data & 0x03 )
+			case 0xa0:  // 0xA0 - 0xAF Set display mode
+				if (data == 0xa8)// userdef
 				{
-				case 0x00:  // clr nothing
-					break;
-
-				case 0x01:  // clr inside window
-					if ( m_window_size > 0 )
-					{
-						std::fill_n(m_chars + m_window_start, m_window_size, 0);
-						std::fill_n(m_attrs + m_window_start, m_window_size, 0);
-					}
-
-					break;
-
-				case 0x02:  // clr outside window
-					if ( m_window_size > 0 )
-					{
-						if ( m_window_start > 0 )
-						{
-							for (int i = 0; i < m_window_start; i++)
-							{
-								memset(m_chars+i,0,i);
-								memset(m_attrs+i,0,i);
-							}
-						}
-
-						if (m_window_end < 15 )
-						{
-							for (int i = m_window_end; i < 15- m_window_end ; i++)
-							{
-								memset(m_chars+i,0,i);
-								memset(m_attrs+i,0,i);
-							}
-						}
-					}
-					break;
-
-				case 0x03:  // clr entire display
-					std::fill(std::begin(m_chars), std::end(m_chars), 0);
-					std::fill(std::begin(m_attrs), std::end(m_attrs), 0);
+					m_user_def = 2;
+				}
+				else if (data == 0xac)
+				{
+					popmessage("TEST MODE");
+				}
+				else
+				{
+					m_display_mode = data & 0x03;
 				}
 				break;
 
-			case 0xC0:  // 0xC0 - 0xCF Set flash rate
-				m_flash_rate = data & 0x0F;
+			case 0xb0:  // 0xB0 - 0xBF Clear display area
+				if (data == 0xbc)
+				{
+					popmessage("CLEAR USERDEF");
+				}
+				else
+				{
+					switch (data & 0x03)
+					{
+					case 0x00:  // clr nothing
+						break;
+
+					case 0x01:  // clr inside window
+						if (m_window_size > 0)
+						{
+							std::fill_n(m_chars + m_window_start, m_window_size, 0);
+							std::fill_n(m_attrs + m_window_start, m_window_size, 0);
+						}
+						break;
+					}
+				}
 				break;
 
-			case 0xD0:  // 0xD0 - 0xDF Set Flash control
+			case 0xc0:
+				if (data == 0xc8)
+				{
+					m_flash_flag = 1;
+				}
+				else
+				{
+					m_flash_rate = data & 0x0f;
+					logerror("BDA flash %x", m_flash_rate);
+				}
+				break;
+
+			case 0xd0:  // 0xD0 - 0xDF Set Flash control
 				m_flash_control = data & 0x03;
 				break;
 
-			case 0xE0:  // 0xE0 - 0xEF Set window start pos
-				m_window_start = data &0x0F;
+			case 0xe0:  // 0xE0 - 0xEF Set window start pos
+				m_window_start = data & 0x0f;
 				m_window_size  = (m_window_end - m_window_start)+1;
 				break;
 
-			case 0xF0:  // 0xF0 - 0xFF Set window end pos
-				m_window_end   = data &0x0F;
-				m_window_size  = (m_window_end - m_window_start)+1;
+			case 0xf0:  // 0xF0 - 0xFF Set window end pos
+				m_window_end   = data & 0x0f;
+				m_window_size  = (m_window_end - m_window_start) + 1;
 				m_scroll_active = 0;
-				if ( m_display_mode == 2 )
+				if (m_display_mode == 2)
 				{
 					if ( m_cursor_pos >= m_window_end)
 					{
@@ -360,6 +352,7 @@ int bfm_bda_device::write_char(int data)
 
 	return 0;
 }
+
 ///////////////////////////////////////////////////////////////////////////
 
 void bfm_bda_device::setdata(int segdata, int data)

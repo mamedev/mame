@@ -2,11 +2,16 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    konami.c
-
     Portable Konami cpu emulator
+	Custom HD6309 in a gate array with ROM blocks for instruction decoding.
 
     Based on M6809 cpu core copyright John Butler
+
+    TODO:
+    - verify cycle timing
+    - verify status flag handling
+    - what happens with block/shift opcodes when count is 0? maybe a full loop?
+      parodius does an indexed LSRD and checks for A==0 to jump over the opcode
 
     References:
 
@@ -85,7 +90,7 @@ DEFINE_DEVICE_TYPE(KONAMI, konami_cpu_device, "konami_cpu", "KONAMI CPU")
 //-------------------------------------------------
 
 konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6809_base_device(mconfig, tag, owner, clock, KONAMI, 1)
+	: m6809_base_device(mconfig, tag, owner, clock, KONAMI, 4)
 	, m_set_lines(*this)
 {
 }
@@ -98,6 +103,9 @@ konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *
 void konami_cpu_device::device_start()
 {
 	super::device_start();
+
+	m_bcount = 0;
+	save_item(NAME(m_bcount));
 
 	// resolve callbacks
 	m_set_lines.resolve();
@@ -226,58 +234,6 @@ inline void konami_cpu_device::write_exgtfr_register(uint8_t reg, uint16_t value
 		case  4: m_s.w   = value;    break;  // S
 		case  5: m_u.w   = value;    break;  // U
 	}
-}
-
-
-//-------------------------------------------------
-//  safe_shift_right
-//-------------------------------------------------
-
-template<class T> T konami_cpu_device::safe_shift_right(T value, uint32_t shift)
-{
-	T result;
-
-	if (shift < (sizeof(T) * 8))
-		result = value >> shift;
-	else if (value < 0)
-		result = (T) -1;
-	else
-		result = 0;
-
-	return result;
-}
-
-
-//-------------------------------------------------
-//  safe_shift_right_unsigned
-//-------------------------------------------------
-
-template<class T> T konami_cpu_device::safe_shift_right_unsigned(T value, uint32_t shift)
-{
-	T result;
-
-	if (shift < (sizeof(T) * 8))
-		result = value >> shift;
-	else
-		result = 0;
-
-	return result;
-}
-
-//-------------------------------------------------
-//  safe_shift_left
-//-------------------------------------------------
-
-template<class T> T konami_cpu_device::safe_shift_left(T value, uint32_t shift)
-{
-	T result;
-
-	if (shift < (sizeof(T) * 8))
-		result = value << shift;
-	else
-		result = 0;
-
-	return result;
 }
 
 

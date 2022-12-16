@@ -40,6 +40,10 @@ Notes:
 #include "emu.h"
 #include "sports.h"
 
+//#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
 
 namespace {
 
@@ -80,34 +84,16 @@ private:
 	TIMER_CALLBACK_MEMBER(timeout);
 
 	required_ioport m_buttons;
-	required_ioport m_x_axis;
-	required_ioport m_y_axis;
+	required_ioport_array<2> m_axes;
 
 	emu_timer *m_timeout_timer;
 
-	uint8_t m_phase;
 	uint8_t m_th_state;
-	uint8_t m_x_base;
-	uint8_t m_y_base;
+	uint8_t m_phase;
+	uint8_t m_output;
+	uint8_t m_base[2];
+	uint8_t m_data[2];
 };
-
-
-TIMER_CALLBACK_MEMBER(sms_sports_pad_device::timeout)
-{
-	// values for x and y axis need to be reset for Sports Pad games, but
-	// are not reset for paddle games, so it was assumed the reset occurs
-	// only when this timer fires after the read state reaches its maximum value.
-	if (3U == m_phase)
-	{
-		m_x_base = m_x_axis->read();
-		m_y_base = m_y_axis->read();
-	}
-	else
-	{
-		// set to maximum value, so it wraps to 0 at next increment
-		m_phase = 3;
-	}
-}
 
 
 //-------------------------------------------------
@@ -118,13 +104,11 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 	device_t(mconfig, SMS_SPORTS_PAD, tag, owner, clock),
 	device_sms_control_interface(mconfig, *this),
 	m_buttons(*this, "SPORTS_BT"),
-	m_x_axis(*this, "SPORTS_X"),
-	m_y_axis(*this, "SPORTS_Y"),
+	m_axes(*this, "SPORTS_%c", 'X'),
 	m_timeout_timer(nullptr),
-	m_phase(0),
 	m_th_state(1),
-	m_x_base(0),
-	m_y_base(0)
+	m_phase(0),
+	m_output(0x0f)
 {
 }
 
@@ -138,52 +122,76 @@ void sms_sports_pad_device::device_start()
 	m_timeout_timer = timer_alloc(FUNC(sms_sports_pad_device::timeout), this);
 
 	m_phase = 0;
-	m_x_base = 0x80; // value 0x80 helps when starting paddle games.
-	m_y_base = 0x80;
+	m_output = 0x0f;
+	m_base[0] = 0x80; // value 0x80 helps when starting paddle games.
+	m_base[1] = 0x80;
+	m_data[0] = 0x00;
+	m_data[1] = 0x00;
 
-	save_item(NAME(m_phase));
 	save_item(NAME(m_th_state));
-	save_item(NAME(m_x_base));
-	save_item(NAME(m_y_base));
+	save_item(NAME(m_phase));
+	save_item(NAME(m_output));
+	save_item(NAME(m_base));
+	save_item(NAME(m_data));
 }
 
 
 uint8_t sms_sports_pad_device::in_r()
 {
-	uint8_t result = m_buttons->read();
-
-	switch (m_phase)
-	{
-	case 0:
-		result |= BIT(m_x_axis->read() - m_x_base, 4, 4);
-		break;
-	case 1:
-		result |= BIT(m_x_axis->read() - m_x_base, 0, 4);
-		break;
-	case 2:
-		result |= BIT(m_y_axis->read() - m_y_base, 4, 4);
-		break;
-	case 3:
-		result |= BIT(m_y_axis->read() - m_y_base, 0, 4);
-		break;
-	}
-
-	return result;
+	return m_buttons->read() | m_output;
 }
 
 
 void sms_sports_pad_device::out_w(uint8_t data, uint8_t mem_mask)
 {
+	// Sequence used to read Sports Pad:
+	// * TH = 0, spin for 80 microseconds, read X high nybble
+	// * TH = 1, spin for 40 microseconds, read X low nybble
+	// * TH = 0, spin for 40 microseconds, read Y high nybble
+	// * TH = 1, spin for 40 microseconds, read Y low nybble
 	uint8_t const th_state = BIT(data, 6);
-
-	// FIXME: this is definitely wrong - work out how it actually responds to edges
 	if (th_state != m_th_state)
 	{
-		m_phase = (m_phase + 1) & 3;
-		m_timeout_timer->adjust(attotime::from_hz(XTAL(10'738'635) / 3 / 512)); // timeout not verified
+		if (!th_state)
+		{
+			LOG(
+					"%s: TH falling, output %c high nybble\n",
+					machine().describe_context(),
+					m_phase ? 'Y' : 'X');
+
+			m_timeout_timer->reset();
+			m_data[m_phase] = m_axes[m_phase]->read();
+			m_output = BIT(m_data[m_phase] - m_base[m_phase], 4, 4);
+		}
+		else
+		{
+			LOG(
+					"%s: TH rising, output %c low nybble%s\n",
+					machine().describe_context(),
+					m_phase ? 'Y' : 'X',
+					m_phase ? ", zero counts" : "");
+
+			m_timeout_timer->adjust(attotime::from_hz(XTAL(10'738'635) / 3 / 512)); // timeout not verified
+			m_output = BIT(m_data[m_phase] - m_base[m_phase], 0, 4);
+			if (m_phase)
+			{
+				// assume the rising edge when Y is output zeroes the axes
+				m_base[0] = m_data[0];
+				m_base[1] = m_data[1];
+			}
+			m_phase ^= 1;
+		}
 	}
 
 	m_th_state = th_state;
+}
+
+
+TIMER_CALLBACK_MEMBER(sms_sports_pad_device::timeout)
+{
+	// assume it just flips back to X, allowing paddle games to "work"
+	LOG("timeout, select X axis\n");
+	m_phase = 0;
 }
 
 } // anonymous namespace

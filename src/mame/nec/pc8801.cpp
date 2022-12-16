@@ -687,7 +687,7 @@ void pc8801_state::port40_w(uint8_t data)
 	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 		m_beeper->set_state(0);
 
-	// TODO: send to joyport implementation
+	// TODO: send to joyport DE-9 implementation
 	if((m_device_ctrl_data & 0x40) != (data & 0x40))
 	{
 		attotime new_time = machine().time();
@@ -1602,7 +1602,7 @@ void pc8801mc_state::machine_reset()
 	m_cdrom_bank = true;
 }
 
-// TODO: to joyport DB9 option slot
+// TODO: to joyport DE-9 option slot
 uint8_t pc8801mk2sr_state::opn_porta_r()
 {
 	if(ioport("BOARD_CONFIG")->read() & 2)

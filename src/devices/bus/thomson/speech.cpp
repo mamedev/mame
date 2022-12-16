@@ -32,7 +32,7 @@ void thomson_speech_device::io_map(address_map &map)
 void thomson_speech_device::device_add_mconfig(machine_config &config)
 {
 	mea8000_device &mea8000(MEA8000(config, "mea8000", 4_MHz_XTAL));
-	mea8000.add_route(ALL_OUTPUTS, "mono", 1.0);
+	mea8000.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	// FIXME: actually drives main speaker through the sound line on the bus
 	SPEAKER(config, "speaker").front_center();

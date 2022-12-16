@@ -1,7 +1,7 @@
 local lib = {}
 
 local function get_settings_path()
-	return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/autofire'
+	return manager.machine.options.entries.homepath:value():match('([^;]+)') .. '/autofire'
 end
 
 local function get_settings_filename()

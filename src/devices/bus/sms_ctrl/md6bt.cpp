@@ -95,7 +95,7 @@ u8 sms_md6button_device::in_r()
 		if (m_th)
 			result = BIT(lines, 0, 6);                              // CBRLDU
 		else
-			result = (BIT(lines, 6, 2) << 4);                       // SA0000
+			result = BIT(lines, 6, 2) << 4;                         // SA0000
 		break;
 	case 3:
 		if (m_th)

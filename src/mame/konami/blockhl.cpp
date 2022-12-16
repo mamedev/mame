@@ -282,7 +282,7 @@ INPUT_PORTS_END
 void blockhl_state::blockhl(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/8); // Konami 052526
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); // Konami 052526
 	m_maincpu->set_addrmap(AS_PROGRAM, &blockhl_state::main_map);
 	m_maincpu->line().set(FUNC(blockhl_state::banking_callback));
 

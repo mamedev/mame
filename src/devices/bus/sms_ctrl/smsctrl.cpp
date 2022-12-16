@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 /**********************************************************************
 
-    Sega DE-9 controller port emulation
+    Sega 7-bit I/O port emulation
 
 **********************************************************************/
 
@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SMS_CONTROL_PORT, sms_control_port_device, "sms_control_port", "Sega DE-9 controller port")
+DEFINE_DEVICE_TYPE(SMS_CONTROL_PORT, sms_control_port_device, "sms_control_port", "Sega 9-pin I/O port")
 
 
 

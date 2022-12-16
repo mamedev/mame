@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "k052109.h"
 #include "k053251.h"
 #include "k053246_k053247_k055673.h"

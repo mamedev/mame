@@ -14,14 +14,16 @@
     - Expanded IIe: ROM 00/01 motherboard in a IIe case with a IIe keyboard rather than ADB
 
     Timing in terms of the 14M 14.3181818 MHz clock (1/2 of the 28.6363636 master clock):
-    - 1 65816 cycle is 5 14M clocks
-    - Every 50 14M clocks (10 65816 cycles) DRAM refresh occurs for 5 14M clocks
-      * During this time, CPU accesses to ROM, Mega II side I/O, or banks E0/E1 are not penalized (but a side-sync penalty is incurred)
-      * Accesses to banks 00-7F are penalized except for I/O in banks 0/1.
+    - 1 2.8 MHz 65816 cycle is 5 14M clocks.
     - The Mega II 1 MHz side runs for 64 cycles at 14 14M clocks and every 65th is stretched to 16 14M clocks.
       This allows 8-bit Apple II raster demos to work.  Each scanline is (64*14) + 16 = 912 14M clocks.
       Due to this stretch, which does not occur on the fast side, the fast and 1 Mhz sides drift from each other
       and sync up every 22800 14M clocks (25 scan lines).
+    - Accesses to the 1 MHz side incur a side-sync penalty (waiting for the start of the next 1 MHz cycle).
+    - Every 50 14M clocks (10 65816 cycles) DRAM refresh occurs for 5 14M clocks
+      * During this time, CPU accesses to ROM, Mega II side I/O, or banks E0/E1 are not penalized (but a side-sync penalty is incurred for the 1 MHz side)
+      * Accesses to banks 00-7F are penalized except for I/O in banks 0/1.
+    - ROM accesses always run at full speed.
 
     One video line is: 6 cycles of right border, 13 cycles of hblank, 6 cycles of left border, and 40 cycles of active video
 
@@ -57,8 +59,9 @@
 #define LOG_ADB (0)             // log ADB activity in the old-style HLE simulation of the microcontroller and GLU
 
 #include "apple2common.h"
-//#include "machine/apple2host.h"
+// #include "machine/apple2host.h"
 #include "macadb.h"
+#include "macrtc.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/cards.h"
@@ -68,7 +71,6 @@
 #include "cpu/m6502/m5074x.h"
 #include "machine/bankdev.h"
 #include "machine/kb3600.h"
-#include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
@@ -130,8 +132,8 @@ public:
 		  m_ram(*this, "ram"),
 		  m_rom(*this, "maincpu"),
 		  m_docram(*this, "docram"),
-		  m_nvram(*this, "nvram"),
 		  m_video(*this, "a2video"),
+		  m_rtc(*this, "rtc"),
 		  m_a2bus(*this, "a2bus"),
 		  m_a2common(*this, "a2common"),
 		  //      m_a2host(*this, "a2host"),
@@ -198,8 +200,8 @@ private:
 	required_device<ram_device> m_ram;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_docram;
-	required_device<nvram_device> m_nvram;
 	required_device<a2_video_device> m_video;
+	required_device<rtc3430042_device> m_rtc;
 	required_device<a2bus_device> m_a2bus;
 	required_device<apple2_common_device> m_a2common;
 //  required_device<apple2_host_device> m_a2host;
@@ -304,15 +306,6 @@ private:
 	static constexpr u8 VGCINT_SCANLINE     = 0x20;
 	static constexpr u8 VGCINT_SECOND       = 0x40;
 	static constexpr u8 VGCINT_ANYVGCINT    = 0x80;
-
-	enum apple2gs_clock_mode
-	{
-		CLOCKMODE_IDLE,
-		CLOCKMODE_TIME,
-		CLOCKMODE_INTERNALREGS,
-		CLOCKMODE_BRAM1,
-		CLOCKMODE_BRAM2
-	};
 
 	enum adbstate_t
 	{
@@ -501,12 +494,8 @@ private:
 	u32 m_slow_counter = 0;
 
 	// clock/BRAM
-	u8 m_clkdata = 0, m_clock_control = 0, m_clock_read = 0, m_clock_reg1 = 0;
-	apple2gs_clock_mode m_clock_mode;
-	u32 m_clock_curtime;
-	seconds_t m_clock_curtime_interval;
-	u8 m_clock_bram[256]{};
-	int m_clock_frame = 0;
+	u8 m_clkdata = 0, m_clock_control = 0;
+	u8 m_clock_frame = 0;
 
 	// ADB simulation
 	#if !RUN_ADB_MICRO
@@ -1353,8 +1342,6 @@ void apple2gs_state::machine_start()
 #endif
 	std::fill(std::begin(m_megaii_ram), std::end(m_megaii_ram), 0);
 
-	m_nvram->set_base(m_clock_bram, sizeof(m_clock_bram));
-
 	// setup speaker toggle volumes.  this should be done mathematically probably,
 	// but these ad-hoc values aren't too bad.
 #define LVL(x) (double(x) / 32768.0)
@@ -1430,6 +1417,7 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_textcol));
 	save_item(NAME(m_clock_control));
 	save_item(NAME(m_clkdata));
+	save_item(NAME(m_clock_frame));
 	save_item(NAME(m_motors_active));
 	save_item(NAME(m_slotromsel));
 	save_item(NAME(m_diskreg));
@@ -1451,13 +1439,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_megaii_ram));
 	save_item(m_clkdata, "CLKDATA");
 	save_item(m_clock_control, "CLKCTRL");
-	save_item(m_clock_read, "CLKRD");
-	save_item(m_clock_reg1, "CLKREG1");
-	save_item(m_clock_curtime, "CLKCURTIME");
-	save_item(m_clock_curtime_interval, "CLKCURTIMEINT");
-//  save_item(m_clock_mode, "CLKMODE");
-	save_item(NAME(m_clock_bram));
-	save_item(NAME(m_clock_frame));
 #if !RUN_ADB_MICRO
 	save_item(NAME(m_adb_memory));
 	save_item(NAME(m_adb_command_bytes));
@@ -1550,34 +1531,6 @@ void apple2gs_state::machine_reset()
 	/* init time */
 	m_clkdata = 0;
 	m_clock_control =0;
-	m_clock_read = 0;
-	m_clock_reg1 = 0;
-	m_clock_mode = CLOCKMODE_IDLE;
-	m_clock_curtime_interval = 0;
-
-	// seed the clock with real time
-	struct tm cur_time, mac_reference;
-	system_time curtime;
-	machine().current_datetime(curtime);
-
-	cur_time.tm_sec = curtime.local_time.second;
-	cur_time.tm_min = curtime.local_time.minute;
-	cur_time.tm_hour = curtime.local_time.hour;
-	cur_time.tm_mday = curtime.local_time.mday;
-	cur_time.tm_mon = curtime.local_time.month;
-	cur_time.tm_year = curtime.local_time.year-1900;
-	cur_time.tm_isdst = 0;
-
-	/* The count starts on 1st January 1904 */
-	mac_reference.tm_sec = 0;
-	mac_reference.tm_min = 0;
-	mac_reference.tm_hour = 0;
-	mac_reference.tm_mday = 1;
-	mac_reference.tm_mon = 0;
-	mac_reference.tm_year = 4;
-	mac_reference.tm_isdst = 0;
-
-	m_clock_curtime = difftime(mktime(&cur_time), mktime(&mac_reference));
 
 	m_shadow = 0x00;
 	m_speed = 0x80;
@@ -1841,7 +1794,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 		{
 			//printf("one sec, vgcint = %02x\n", m_vgcint);
 			m_clock_frame = 0;
-			m_clock_curtime++;
 
 			if ((m_vgcint & VGCINT_SECONDENABLE) && !(m_vgcint & VGCINT_SECOND))
 			{
@@ -2237,95 +2189,20 @@ int apple2gs_state::get_vpos()
 
 void apple2gs_state::process_clock()
 {
-	u8 operation;
-
-	switch(m_clock_mode)
+	for (int i = 0; i < 8; i++)
 	{
-		case CLOCKMODE_IDLE:
-			m_clock_read = (m_clkdata >> 7);
-			m_clock_reg1 = (m_clkdata >> 2) & 0x03;
-			operation = (m_clkdata >> 4) & 0x07;
-			if ((m_clkdata & 0x40) == 0x00)
-			{
-				switch(operation)
-				{
-					case 0x00:
-						/* read/write seconds register */
-						m_clock_mode = CLOCKMODE_TIME;
-						break;
-
-					case 0x03:
-						/* internal registers */
-						if (m_clock_reg1 & 0x02)
-						{
-							m_clock_mode = CLOCKMODE_BRAM2;
-							m_clock_reg1 = (m_clkdata & 0x07) << 5;
-						}
-						else
-						{
-							m_clock_mode = CLOCKMODE_INTERNALREGS;
-						}
-						break;
-
-					default:
-						//fatalerror("NYI\n");
-						break;
-				}
-			}
-			break;
-
-		case CLOCKMODE_BRAM1:
-			if (m_clock_read)
-			{
-				m_clkdata = m_clock_bram[m_clock_reg1];
-				//printf("Read BRAM %02x = %02x\n", m_clock_reg1, m_clkdata);
-			}
-			else
-			{
-				//printf("Write BRAM %02x = %02x\n", m_clock_reg1, m_clkdata);
-				m_clock_bram[m_clock_reg1] = m_clkdata;
-			}
-			m_clock_mode = CLOCKMODE_IDLE;
-			break;
-
-		case CLOCKMODE_BRAM2:
-			m_clock_reg1 |= (m_clkdata >> 2) & 0x1F;
-			m_clock_mode = CLOCKMODE_BRAM1;
-			break;
-
-		case CLOCKMODE_INTERNALREGS:
-			//printf("internalregs, reg %d, read %x\n", m_clock_reg1, m_clock_read);
-			switch (m_clock_reg1)
-			{
-				case 0x00:
-					/* test register */
-					break;
-
-				case 0x01:
-					/* write protect register */
-					break;
-			}
-			m_clock_mode = CLOCKMODE_IDLE;
-			break;
-
-		case CLOCKMODE_TIME:
-			if (m_clock_control & 0x40)
-			{
-				m_clkdata = m_clock_curtime >> (m_clock_reg1 * 8);
-				//printf("Read time reg %x = %x\n", m_clock_reg1, m_clkdata);
-			}
-			else
-			{
-				m_clock_curtime &= ~(0xFF << (m_clock_reg1 * 8));
-				m_clock_curtime |= m_clkdata << (m_clock_reg1 * 8);
-				//printf("Write time reg %x = %x\n", m_clock_reg1, m_clkdata);
-			}
-			m_clock_mode = CLOCKMODE_IDLE;
-			break;
-
-		default:
-			//fatalerror("NYI\n");
-			break;
+		m_rtc->clk_w(ASSERT_LINE);
+		if (!BIT(m_clock_control, 6))
+		{
+			m_rtc->data_w(BIT(m_clkdata, 7-i));
+			m_rtc->clk_w(CLEAR_LINE);
+		}
+		else
+		{
+			m_rtc->clk_w(CLEAR_LINE);
+			m_clkdata <<= 1;
+			m_clkdata |= m_rtc->data_r() & 1;
+		}
 	}
 }
 
@@ -2937,6 +2814,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			}
 			m_clock_control = data & 0x7f;
 			m_video->m_GSborder = data & 0xf;
+			m_rtc->ce_w(BIT(data, 7) ^ 1);
 			if (data & 0x80)
 			{
 				process_clock();
@@ -4877,7 +4755,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	TIMER(config, "repttmr").configure_periodic(FUNC(apple2gs_state::ay3600_repeat), attotime::from_hz(15));
 #endif
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	RTC3430042(config, m_rtc, XTAL(32'768));
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
 

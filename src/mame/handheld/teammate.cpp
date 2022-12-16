@@ -60,15 +60,19 @@ private:
 	void main_io(address_map &map);
 
 	void select_w(u8 data);
+	u8 select_r();
 	void led_w(u8 data);
-	u8 input_r();
+	u8 led_r();
 	void input_w(u8 data);
-	u8 sound_r();
+	u8 input_r();
 	void sound_w(u8 data);
+	u8 sound_r();
 
 	u8 m_inp_sel = 0;
 	u8 m_input = 0;
 	u8 m_sound = 0;
+	u8 m_select = 0;
+	u8 m_led_data = 0;
 };
 
 void teammate_state::machine_start()
@@ -76,6 +80,8 @@ void teammate_state::machine_start()
 	save_item(NAME(m_inp_sel));
 	save_item(NAME(m_input));
 	save_item(NAME(m_sound));
+	save_item(NAME(m_select));
+	save_item(NAME(m_led_data));
 }
 
 
@@ -92,12 +98,29 @@ void teammate_state::select_w(u8 data)
 	// P02,P03,P05: input select
 	// P04: N/C
 	m_inp_sel = (data >> 3 & 4) | (data >> 2 & 3);
+	m_select = data;
+}
+
+u8 teammate_state::select_r()
+{
+	return m_select;
 }
 
 void teammate_state::led_w(u8 data)
 {
 	// P10-P17: DS8817N to leds
 	m_display->write_mx(bitswap<8>(~data,0,1,2,3,4,5,6,7));
+	m_led_data = data;
+}
+
+u8 teammate_state::led_r()
+{
+	return m_led_data;
+}
+
+void teammate_state::input_w(u8 data)
+{
+	m_input = data;
 }
 
 u8 teammate_state::input_r()
@@ -110,11 +133,6 @@ u8 teammate_state::input_r()
 			data |= m_inputs[i]->read();
 
 	return data | m_input;
-}
-
-void teammate_state::input_w(u8 data)
-{
-	m_input = data;
 }
 
 void teammate_state::sound_w(u8 data)
@@ -143,8 +161,8 @@ void teammate_state::main_map(address_map &map)
 
 void teammate_state::main_io(address_map &map)
 {
-	map(0x00, 0x00).w(FUNC(teammate_state::select_w));
-	map(0x01, 0x01).w(FUNC(teammate_state::led_w));
+	map(0x00, 0x00).rw(FUNC(teammate_state::select_r), FUNC(teammate_state::select_w));
+	map(0x01, 0x01).rw(FUNC(teammate_state::led_r), FUNC(teammate_state::led_w));
 	map(0x04, 0x07).rw("psu", FUNC(f38t56_device::read), FUNC(f38t56_device::write));
 }
 

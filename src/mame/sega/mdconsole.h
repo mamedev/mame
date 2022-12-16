@@ -20,14 +20,13 @@ class md_cons_state : public md_base_state
 public:
 	md_cons_state(const machine_config &mconfig, device_type type, const char *tag) :
 		md_base_state(mconfig, type, tag),
+		m_ctrl_ports(*this, { "ctrl1", "ctrl2", "exp" }),
 		m_32x(*this,"sega32x"),
 		m_segacd(*this,"segacd"),
 		m_cart(*this, "mdslot"),
-		m_tmss(*this, "tmss"),
-		m_ctrl_ports(*this, "ctrl%u", 1U)
+		m_tmss(*this, "tmss")
 	{ }
 
-	void init_mess_md_common();
 	void init_genesis();
 	void init_md_eur();
 	void init_md_jpn();
@@ -48,27 +47,26 @@ protected:
 	void install_cartslot();
 	void install_tmss();
 
+	void md_ctrl_ports(machine_config &config);
+	void md_exp_port(machine_config &config);
+
+	optional_device_array<sms_control_port_device, 3> m_ctrl_ports;
 	optional_device<sega_32x_device> m_32x;
 	optional_device<sega_segacd_device> m_segacd;
 	optional_device<md_cart_slot_device> m_cart;
 	optional_region_ptr<uint16_t> m_tmss;
-	optional_device_array<sms_control_port_device, 2> m_ctrl_ports;
-
-	void md_ctrl_ports(machine_config &config);
 
 private:
-	uint8_t mess_md_io_read_data_port(offs_t offset);
-	void mess_md_io_write_data_port(offs_t offset, uint16_t data);
-
 	void _32x_scanline_callback(int x, uint32_t priority, uint32_t &lineptr);
 	void _32x_interrupt_callback(int scanline, int irq6);
 	void _32x_scanline_helper_callback(int scanline);
 
 	uint16_t tmss_r(offs_t offset);
 	void tmss_swap_w(uint16_t data);
+
 	void dcat16_megadriv_base(machine_config &config);
 
-	uint8_t m_io_ctrl_th_in[2];
+	void dcat16_megadriv_map(address_map &map);
 };
 
 

@@ -1210,6 +1210,7 @@ sega/hshavoc.cpp
 sega/kopunch.cpp
 sega/lindbergh.cpp
 sega/megadriv_acbl.cpp
+sega/megadriv_sunmix.cpp
 sega/megaplay.cpp
 sega/megatech.cpp
 sega/model1.cpp

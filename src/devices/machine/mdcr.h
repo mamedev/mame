@@ -2,7 +2,7 @@
 // copyright-holders:Erwin Jansen
 /**********************************************************************
 
-    Philips P2000t  Mini Digital Cassette Recorder Emulation
+    Philips Mini Digital Cassette Recorder Emulation
 
 **********************************************************************
 
@@ -16,8 +16,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_P2000T_MDCR_H
-#define MAME_MACHINE_P2000T_MDCR_H
+#ifndef MAME_MACHINE_MDCR_H
+#define MAME_MACHINE_MDCR_H
 
 #pragma once
 
@@ -34,7 +34,7 @@
 class mdcr_device : public device_t
 {
 public:
-	mdcr_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	mdcr_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
 	/// \brief The read clock, switches state when a bit is available.
 	///
@@ -71,6 +71,8 @@ public:
 	/// True if the current wda should be written to tape.
 	DECLARE_WRITE_LINE_MEMBER(wdc);
 
+	auto rdc_cb() { return m_rdc_cb.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_pre_save() override;
@@ -80,6 +82,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(read_timer_tick);
 
 private:
+	devcb_write_line m_rdc_cb;
+
 	/// \brief A Phase Decoder used in a Philips MDCR220 Mini Cassette Recorder
 	///
 	/// A phase decoder is capable of converting a signal stream into a
@@ -125,7 +129,7 @@ private:
 		// add a bit and reset the current clock.
 		void add_bit(bool bit);
 
-		// tries to sync up the signal and calculate the clockperiod.
+		// tries to sync up the signal and calculate the clock period.
 		bool sync_signal(bool state);
 
 		// y * (1 - tolerance) < x < y * (1 + tolerance)
@@ -174,4 +178,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MDCR, mdcr_device)
 
-#endif // MAME_MACHINE_P2000T_MDCR_H
+#endif // MAME_MACHINE_MDCR_H
