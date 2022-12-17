@@ -566,8 +566,10 @@ void sg1000_state::machine_start()
 	if (m_cart)
 		m_cart->save_ram();
 
-	m_ctrlports[0]->out_w(0x3f, 0x40);
-	m_ctrlports[1]->out_w(0x3f, 0x40);
+	if (m_ctrlports[0])
+		m_ctrlports[0]->out_w(0x3f, 0x40);
+	if (m_ctrlports[1])
+		m_ctrlports[1]->out_w(0x3f, 0x40);
 }
 
 /*-------------------------------------------------
@@ -666,7 +668,7 @@ void sg1000_state::sg1000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sg1000_state::sg1000_io_map);
 
 	/* controller ports */
-	SMS_CONTROL_PORT(config, m_ctrlports[0], sms_control_port_passive_devices, SMS_CTRL_OPTION_JOYPAD);
+	SMS_CONTROL_PORT(config, m_ctrlports[0], sms_control_port_passive_devices, SMS_CTRL_OPTION_JOYPAD).set_fixed(true);
 	SMS_CONTROL_PORT(config, m_ctrlports[1], sms_control_port_passive_devices, SMS_CTRL_OPTION_JOYPAD);
 
 	/* expansion slot */
