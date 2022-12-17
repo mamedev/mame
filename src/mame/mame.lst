@@ -39560,6 +39560,10 @@ sm7238                          //
 @source:sony/smc777.cpp
 smc777                          //
 
+@source:misc/smd2144c.cpp
+thecastle                       //
+therock                         //
+
 @source:sega/sms.cpp
 gamegeaj                        // Sega GameGear (Japan)
 gamegear                        // Sega GameGear
@@ -45126,4 +45130,4 @@ mtu130
 vl1
 
 @source:ddr/sprachmg.cpp
-sprachmg						// 1985 Institut für Kosmosforschung
+sprachmg                        // 1985 Institut für Kosmosforschung

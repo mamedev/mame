@@ -872,6 +872,7 @@ misc/skopro.cpp
 misc/skyarmy.cpp
 misc/skylncr.cpp
 misc/sliver.cpp
+misc/smd2144c.cpp
 misc/smotor.cpp
 misc/smsmcorp.cpp
 misc/sothello.cpp
