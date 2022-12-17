@@ -20,7 +20,7 @@
             ____    __    __    __    __    __    __    __    __
     Ack         \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/
                     _____       _____       _____       _____
-    L/H     XX\____/     \_____/     \_____/     \_____/     \_____X
+    L/H     XX\____/     \_____/     \_____/     \_____/     \_____/
                ____ _____ _____ _____ _____ _____ _____ _____ _____
     D       XXX____X_____X_____X_____X_____X_____X_____X_____X_____X
 
@@ -60,10 +60,18 @@
 
     TODO:
     * Measure timings.
-	* What do the A/B Normal/Auto switches do?
-    * Confirm direction of RZ (throttle twist).
+    * Confirm reported value for unused analog channel 4.
     * Confirm A', B', E1 and E2 bit mappings in analog mode.
     * Confirm buttons mapping in digital mode.
+     - Is the mapping different in PC vs MD mode?
+    * Implement trigger A/B rapid fire switches.
+    * Implement channel shift switch (Y->X, X->Z, Z->X).
+    * Implement special modes (holding buttons on power-on):
+     - Double displacement modes:
+      + X/Y (hold SELECT + A')
+      + Z (hold SELECT + B')
+      + X/Y/Z (hold SELECT + A' + B')
+     - Up/down reverse mode (hold C)
 
 **********************************************************************/
 
@@ -121,16 +129,16 @@ INPUT_PORTS_START( sms_xe1ap )
 	PORT_BIT(0x0c00, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("CH0")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X)              PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
-
-	PORT_START("CH1")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y)              PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
 
+	PORT_START("CH1")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X)              PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
+
 	PORT_START("CH2")
-	PORT_BIT(0xff, 0x80, IPT_PADDLE)                  PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
+	PORT_BIT(0xff, 0x80, IPT_PADDLE_V)   PORT_REVERSE PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
 
 	PORT_START("CH3")
-	PORT_BIT(0xff, 0x80, IPT_PADDLE_V)   PORT_REVERSE PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
+	PORT_BIT(0xff, 0x80, IPT_UNUSED)
 
 	PORT_START("MODE")
 	PORT_CONFNAME(0x01, 0x01, "Mode") PORT_CHANGED_MEMBER(DEVICE_SELF, sms_xe1ap_device, mode_changed, 0)
@@ -274,7 +282,7 @@ TIMER_CALLBACK_MEMBER(sms_xe1ap_device::step_output)
 			case 7:
 			case 8:
 			case 9:
-				m_out = BIT(m_axes[(step - 2) & 0x03]->read(), (step < 6) ? 4 : 0, 4);
+				m_out = BIT(m_axes[((step - 2) & 0x03) ^ 0x01]->read(), (step < 6) ? 4 : 0, 4);
 				break;
 			case 10:
 				m_out = BIT(m_buttons->read(), 8, 4);
