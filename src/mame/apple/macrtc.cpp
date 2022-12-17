@@ -182,7 +182,7 @@ void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_
 		seconds = difftime(mktime(&cur_time), mktime(&mac_reference));
 	}
 
-	LOGMASKED(LOG_COMMANDS, "second count 0x%lX\n", (unsigned long) seconds);
+	LOGMASKED(LOG_GENERAL, "second count 0x%lX\n", (unsigned long) seconds);
 
 	m_seconds[0] = seconds & 0xff;
 	m_seconds[1] = (seconds >> 8) & 0xff;
