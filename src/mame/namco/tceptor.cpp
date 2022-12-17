@@ -314,7 +314,7 @@ void tceptor_state::machine_reset()
 void tceptor_state::tceptor(machine_config &config)
 {
 	/* basic machine hardware */
-	M6809(config, m_maincpu, XTAL(49'152'000)/32);
+	MC6809E(config, m_maincpu, XTAL(49'152'000)/32);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tceptor_state::m6809_map);
 
 	M65C02(config, m_audiocpu[0], XTAL(49'152'000)/24);
