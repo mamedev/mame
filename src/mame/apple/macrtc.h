@@ -59,6 +59,7 @@ protected:
 
 private:
 	bool m_is_big_PRAM;
+	bool m_time_was_set;
 
 	devcb_write_line m_cko_cb;
 

@@ -64,6 +64,7 @@ rtc3430042_device::rtc3430042_device(const machine_config &mconfig, device_type 
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_is_big_PRAM(hasBigPRAM),
+		m_time_was_set(false),
 		m_cko_cb(*this)
 {
 }
@@ -111,6 +112,7 @@ void rtc3430042_device::device_start()
 	save_item(NAME(m_state));
 	save_item(NAME(m_data_latch));
 	save_item(NAME(m_cko));
+	save_item(NAME(m_time_was_set));
 }
 
 void rtc3430042_device::device_reset()
@@ -139,7 +141,9 @@ TIMER_CALLBACK_MEMBER(rtc3430042_device::half_seconds_tick)
 
 	// seconds register increments following rising edge of CKO
 	if (m_cko)
+	{
 		advance_seconds();
+	}
 }
 
 //-------------------------------------------------
@@ -151,26 +155,34 @@ void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_
 	struct tm cur_time, mac_reference;
 	uint32_t seconds;
 
-	cur_time.tm_sec = second;
-	cur_time.tm_min = minute;
-	cur_time.tm_hour = hour;
-	cur_time.tm_mday = day;
-	cur_time.tm_mon = month-1;
-	cur_time.tm_year = year+100;    // assumes post-2000 current system time
-	cur_time.tm_isdst = 0;
+	if (m_time_was_set)
+	{
+		seconds = m_seconds[0] | (m_seconds[1] << 8) | (m_seconds[2] << 16) | (m_seconds[3] << 24);
+		seconds++;
+	}
+	else
+	{
+		cur_time.tm_sec = second;
+		cur_time.tm_min = minute;
+		cur_time.tm_hour = hour;
+		cur_time.tm_mday = day;
+		cur_time.tm_mon = month-1;
+		cur_time.tm_year = year+100;    // assumes post-2000 current system time
+		cur_time.tm_isdst = 0;
 
-	// The count starts on January 1, 1904 at midnight
-	mac_reference.tm_sec = 0;
-	mac_reference.tm_min = 0;
-	mac_reference.tm_hour = 0;
-	mac_reference.tm_mday = 1;
-	mac_reference.tm_mon = 0;
-	mac_reference.tm_year = 4;
-	mac_reference.tm_isdst = 0;
+		// The count starts on January 1, 1904 at midnight
+		mac_reference.tm_sec = 0;
+		mac_reference.tm_min = 0;
+		mac_reference.tm_hour = 0;
+		mac_reference.tm_mday = 1;
+		mac_reference.tm_mon = 0;
+		mac_reference.tm_year = 4;
+		mac_reference.tm_isdst = 0;
 
-	seconds = difftime(mktime(&cur_time), mktime(&mac_reference));
+		seconds = difftime(mktime(&cur_time), mktime(&mac_reference));
+	}
 
-	LOGMASKED(LOG_GENERAL, "second count 0x%lX\n", (unsigned long) seconds);
+	LOGMASKED(LOG_COMMANDS, "second count 0x%lX\n", (unsigned long) seconds);
 
 	m_seconds[0] = seconds & 0xff;
 	m_seconds[1] = (seconds >> 8) & 0xff;
@@ -299,6 +311,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 		case 4: case 5: case 6: case 7: // bit 4 is don't care
 			LOGMASKED(LOG_COMMANDS, "RTC clock write, address = %X, data = %X\n", i, (int)m_data_byte);
 			m_seconds[i & 3] = m_data_byte;
+			m_time_was_set = true;
 			break;
 
 		case 8: case 9: case 10: case 11:   // PRAM addresses 0x10-0x13
