@@ -8,7 +8,6 @@
     * Mega Modem (connects to EXP port on Mega Drive)
     * Sega Menacer (infrared wireless lightgun)
     * Konami Justifier (dual wired lightguns)
-    * Dempa XE-1AP (3-axis analog "Cyber Stick" pad)
     * EA 4-Play (impractical - connects to both CTRL1 and CTRL2)
 
 **********************************************************************/
@@ -31,6 +30,7 @@
 #include "sports.h"
 #include "sportsjp.h"
 #include "teamplayer.h"
+#include "xe1ap.h"
 
 
 char const *const SMS_CTRL_OPTION_DIY_PADDLE  = "diypaddle";
@@ -49,6 +49,7 @@ char const *const SMS_CTRL_OPTION_SEGA_MOUSE  = "mouse";
 char const *const SMS_CTRL_OPTION_SPORTS      = "sports";
 char const *const SMS_CTRL_OPTION_SPORTS_JP   = "sportsjp";
 char const *const SMS_CTRL_OPTION_TEAM_PLAYER = "teamplay";
+char const *const SMS_CTRL_OPTION_XE1AP       = "xe1ap";
 
 
 
@@ -70,6 +71,7 @@ void sms_control_port_devices(device_slot_interface &device)
 	device.option_add(SMS_CTRL_OPTION_SPORTS,      SMS_SPORTS_PAD);
 	device.option_add(SMS_CTRL_OPTION_SPORTS_JP,   SMS_SPORTS_PAD_JP);
 	device.option_add(SMS_CTRL_OPTION_TEAM_PLAYER, SMS_TEAM_PLAYER);
+	device.option_add(SMS_CTRL_OPTION_XE1AP,       SMS_XE1AP);
 }
 
 

@@ -27,6 +27,7 @@ extern char const *const SMS_CTRL_OPTION_SEGA_MOUSE;
 extern char const *const SMS_CTRL_OPTION_SPORTS;
 extern char const *const SMS_CTRL_OPTION_SPORTS_JP;
 extern char const *const SMS_CTRL_OPTION_TEAM_PLAYER;
+extern char const *const SMS_CTRL_OPTION_XE1AP;
 
 void sms_control_port_devices(device_slot_interface &device);
 void sms_control_port_passive_devices(device_slot_interface &device);
