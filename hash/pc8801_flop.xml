@@ -13005,19 +13005,16 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		</part>
 	</software>
 
-	<software name="fruitpan" supported="no">
+	<software name="fruitpan">
 		<description>Fruit Panic</description>
 		<year>1984</year>
 		<publisher>ポニカ (PonyCa)</publisher>
-		<notes><![CDATA[
-[FDC] stalls on initial boot [Finds a scan ID of CHRN=(00 00 01 01) but still fails?]
-]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198402xx"/>
 		<info name="alt_title" value="フルーツパニック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348576">
-				<rom name="fruits panic.d88" size="348576" crc="f5c5c00c" sha1="b41e82aef0e95175224d405dd7d6fb46a35a0cc3"/>
+				<rom name="fruits panic.d88" size="348576" crc="de8c8be5" sha1="4a91c67b42ccfd4da8db6a79fc0b787032d56424"/>
 			</dataarea>
 		</part>
 	</software>
