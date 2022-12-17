@@ -4,27 +4,24 @@
 
     Sega 7-bit I/O port emulation
 
-     1  Up          in
-     2  Down        in
-     3  Left        in
-     4  Right       in
-     5  +5V
-     6  TL     TxD  in
-     7  TH          in/out  edge-sensitive
-     8  GND
-     9  TR     RxD  in/out
-    10  NC          -
+    Pin                  1      2      3      4      5      6      7      8      9     10
+                        Up    Down   Left   Right          TL     TH            TR
+                                                           TxD                  RXD
+                        PC0    PC1    PC2    PC3           PC4    PC6           PC5
+    SC-3000              I      I      I      I     N/C     I     N/C    GND     I
+    SG-1000              I      I      I      I     N/C     I     GND    GND     I
+    SG-1000 Mark III     I      I      I      I     +5V     I     GND    GND     I
+    Master System        I      I      I      I     +5V     I     I/O    GND    I/O
+    Mega Drive          I/O    I/O    I/O    I/O    +5V    I/O    I/O    GND    I/O
+    Game Gear           I/O    I/O    I/O    I/O    +5V    I/O    I/O    GND    I/O    N/C
 
-    DE-9 connector on most systems, or 10-pin tongue connector on
-    Game Gear (Hoshiden HDC-0492).  Pin 10 is not connected if
-    present.
-
-    SG-1000 Mark III:
-    * Pin 7 (TH) tied to ground
-    * Pin 9 (TR) is input only
-
-    Mega Drive, Game Gear:
-    * All pins besides +5V and GND are in/out
+    * Male DE-9 connector on most systems.
+    * Female DE-9 connector for Mega Drive EXP port.
+    * 10-pin tongue connector on Game Gear (Hoshiden HDC-0492).
+    * TH/PC6 can latch the VDP's horizontal counter and/or raise
+      interrupts on some systems.
+    * Mega Drive and Game Gear can route TL/PC4 and TR/PC5 to a
+      UART for serial communication.
 
 **********************************************************************/
 #ifndef MAME_BUS_SMS_CTRL_SMSCTRL_H
