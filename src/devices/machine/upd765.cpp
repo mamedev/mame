@@ -1897,6 +1897,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				return;
 			}
 			st1 &= ~ST1_ND;
+			st2 &= ~ST2_WC;
 			LOGRW("reading sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],
 						cur_live.idbuf[1],
