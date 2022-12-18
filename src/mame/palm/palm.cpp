@@ -12,12 +12,12 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "palm_lcd.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68328.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "video/sed1375.h"
+#include "video/mc68328lcd.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -102,7 +102,7 @@ protected:
 		PORTF_ADC_CSN_BIT		= 7
 	};
 
-	required_device<palm_screen_device> m_screen;
+	required_device<mc68328_lcd_device> m_screen;
 	required_ioport m_io_portd;
 
 	u8 m_port_f_latch;
@@ -188,7 +188,7 @@ public:
 protected:
 	template <int Line> int hardware_subid_r();
 
-	required_device<palm_screen_device> m_screen;
+	required_device<mc68328_lcd_device> m_screen;
 };
 
 
@@ -584,14 +584,14 @@ void palm_state::palm_base(machine_config &config)
 	m_maincpu->out_pwm().set("dac", FUNC(dac_bit_interface::write));
 	m_maincpu->in_spim().set(FUNC(palm_state::spi_from_hw));
 
-	m_maincpu->out_flm().set(m_screen, FUNC(palm_screen_device::flm_w));
-	m_maincpu->out_llp().set(m_screen, FUNC(palm_screen_device::llp_w));
-	m_maincpu->out_lsclk().set(m_screen, FUNC(palm_screen_device::lsclk_w));
-	m_maincpu->out_ld().set(m_screen, FUNC(palm_screen_device::ld_w));
-	m_maincpu->set_lcd_info_changed(m_screen, FUNC(palm_screen_device::lcd_info_changed));
+	m_maincpu->out_flm().set(m_screen, FUNC(mc68328_lcd_device::flm_w));
+	m_maincpu->out_llp().set(m_screen, FUNC(mc68328_lcd_device::llp_w));
+	m_maincpu->out_lsclk().set(m_screen, FUNC(mc68328_lcd_device::lsclk_w));
+	m_maincpu->out_ld().set(m_screen, FUNC(mc68328_lcd_device::ld_w));
+	m_maincpu->set_lcd_info_changed(m_screen, FUNC(mc68328_lcd_device::lcd_info_changed));
 
 	/* video hardware */
-	PALM_SCREEN(config, m_screen);
+	MC68328_LCD_SCREEN(config, m_screen, 0, 160, 220);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -695,17 +695,17 @@ void palmm100_state::palmm100(machine_config &config)
 	m_maincpu->in_spim().set(FUNC(palmm100_state::spi_from_hw));
 	m_maincpu->out_spim().set(FUNC(palmm100_state::spi_to_hw));
 
-	m_maincpu->out_flm().set(m_screen, FUNC(palm_screen_device::flm_w));
-	m_maincpu->out_llp().set(m_screen, FUNC(palm_screen_device::llp_w));
-	m_maincpu->out_lsclk().set(m_screen, FUNC(palm_screen_device::lsclk_w));
-	m_maincpu->out_ld().set(m_screen, FUNC(palm_screen_device::ld_w));
-	m_maincpu->set_lcd_info_changed(m_screen, FUNC(palm_screen_device::lcd_info_changed));
+	m_maincpu->out_flm().set(m_screen, FUNC(mc68328_lcd_device::flm_w));
+	m_maincpu->out_llp().set(m_screen, FUNC(mc68328_lcd_device::llp_w));
+	m_maincpu->out_lsclk().set(m_screen, FUNC(mc68328_lcd_device::lsclk_w));
+	m_maincpu->out_ld().set(m_screen, FUNC(mc68328_lcd_device::ld_w));
+	m_maincpu->set_lcd_info_changed(m_screen, FUNC(mc68328_lcd_device::lcd_info_changed));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("2M");
 
 	/* video hardware */
-	PALM_SCREEN(config, m_screen);
+	MC68328_LCD_SCREEN(config, m_screen, 0, 160, 220);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

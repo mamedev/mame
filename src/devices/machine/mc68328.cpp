@@ -3274,7 +3274,7 @@ void mc68328_base_device::lvpw_w(u8 data) // 0xa05
 {
 	LOGMASKED(LOG_LCD, "%s: lvpw_w: LVPW = %02x\n", machine().describe_context(), data);
 	m_lvpw = data;
-	LOGMASKED(LOG_LCD, "%s:         Virtual Page Width: %d words\n", machine().describe_context(), m_lvpw << 1);
+	LOGMASKED(LOG_LCD, "%s:         Virtual Page Width: %d words\n", machine().describe_context(), m_lvpw);
 }
 
 u8 mc68328_base_device::lvpw_r() // 0xa05
