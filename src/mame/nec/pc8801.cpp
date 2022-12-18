@@ -890,6 +890,7 @@ uint8_t pc8801_state::extram_bank_r()
 
 void pc8801_state::extram_bank_w(uint8_t data)
 {
+	// TODO: bits 2 and 3 also accesses bank for PC-8801-17 "VAB" card
 	m_extram_bank = data;
 }
 
@@ -1052,6 +1053,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
 	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
+//  map(0x82, 0x82).w access window for PC8801-16
 //  map(0x8e, 0x8e).r <unknown>, accessed by scruiser on boot (a board ID?)
 //  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
 //  map(0xa0, 0xa3) GSX-8800 or network board
@@ -1079,7 +1081,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r<0>), FUNC(pc8801_state::kanji_w<0>));
 	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_r<1>), FUNC(pc8801_state::kanji_w<1>));
 //  map(0xf0, 0xf1) dictionary bank (8801MA and later)
-//  map(0xf3, 0xf3) DMA floppy (unknown)
+//  map(0xf3, 0xf3) DMA floppy (direct access like PC88VA?)
 //  map(0xf4, 0xf7) DMA 5'25-inch floppy (?)
 //  map(0xf8, 0xfb) DMA 8-inch floppy (?)
 	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));

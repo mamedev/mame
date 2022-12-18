@@ -610,6 +610,8 @@ UPD3301_FETCH_ATTRIBUTE( upd3301_device::default_attr_fetch )
 	// - N88 Basic (status on bottom)
 	// - jettermi
 	// - play6lim
+	// TODO: comsight uses an attr_row of 2 as first param when entering in code edit mode.
+	// Most likely a delay side effect with DMA that *shouldn't* pickup this branch.
 	if (attr_row[0] != 0)
 	{
 		// tdown (pc8801) unintentionally requires to clamp against max size while loading
