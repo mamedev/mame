@@ -6575,7 +6575,7 @@ Crashes while loading, [FDC]?
 		<year>1987</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
 		<notes><![CDATA[
-Has [3301] attribute bug
+Has [3301] attribute bug in code edit mode
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198708xx"/>
@@ -39153,12 +39153,12 @@ Mounting provided user disk causes a [Incorrect layout on track 0 head 0, expect
 		<description>Xak II: Rising of the Redmoon (alt)</description>
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
-		<!-- PC8801mk2SR -->
-		<info name="release" value="199009xx"/>
-		<info name="alt_title" value="サークII"/>
 		<notes><![CDATA[
 Throws a "cannot write" when creating user disk
 ]]></notes>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="199009xx"/>
+		<info name="alt_title" value="サークII"/>
 		<!--combined image-->
 		<!--rom name="xak ii.d88" size="2666480" crc="fb1e73f4" sha1="f957d0293922be0a1c3d99c3e75b333734dcd329"/-->
 
