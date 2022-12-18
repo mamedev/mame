@@ -74,8 +74,8 @@ MAIN:
 		case 0x39:                                      %INDEXED;   %SETLINE;   return;
 		case 0x3A:              set_regop8(m_q.r.a);    %INDEXED;   %ST8;       return;
 		case 0x3B:              set_regop8(m_q.r.b);    %INDEXED;   %ST8;       return;
-		case 0x3C:              set_imm();                          %ANDCC;     return;
-		case 0x3D:              set_imm();                          %ORCC;      return;
+		case 0x3C:                                      set_imm();  %ANDCC;     return;
+		case 0x3D:                                      set_imm();  %ORCC;      return;
 		case 0x3E:                                                  %EXG;       return;
 		case 0x3F:                                                  %TFR;       return;
 
@@ -233,7 +233,7 @@ MAIN:
 	}
 	return;
 
-#include "base6x09.ops"
+#include "base6x09.lst"
 
 PUSH_REGISTERS:
 	if (m_temp.w & 0x80)
