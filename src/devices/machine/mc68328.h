@@ -93,7 +93,7 @@
 class mc68328_base_device : public m68000_device
 {
 public:
-	typedef device_delegate<void (double, int, int)> lcd_info_changed_delegate;
+	typedef device_delegate<void (double, int, int, u8, u8)> lcd_info_changed_delegate;
 
 	template <int Line> auto out_port_a() { return m_out_port_a_cb[Line].bind(); }
 	template <int Line> auto out_port_b() { return m_out_port_b_cb[Line].bind(); }
@@ -124,10 +124,15 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(irq5_w);
 
-	template <typename T>
-	std::enable_if_t<lcd_info_changed_delegate::supports_callback<T>::value> set_lcd_info_changed(T &&callback, const char *name)
+	template <typename F>
+	std::enable_if_t<lcd_info_changed_delegate::supports_callback<F>::value> set_lcd_info_changed(F &&callback, const char *name)
 	{
-		m_lcd_info_changed_cb.set(std::forward<T>(callback), name);
+		m_lcd_info_changed_cb.set(std::forward<F>(callback), name);
+	}
+	template <typename T, typename F>
+	std::enable_if_t<lcd_info_changed_delegate::supports_callback<F>::value> set_lcd_info_changed(T &&target, F &&callback, const char *name)
+	{
+		m_lcd_info_changed_cb.set(std::forward<T>(target), std::forward<F>(callback), name);
 	}
 
 protected:
@@ -345,11 +350,6 @@ protected:
 		LXMAX_MASK              = 0x03ff,
 
 		LYMAX_MASK              = 0x03ff,
-
-		LGPMR_PAL2              = 0x0007,
-		LGPMR_PAL3              = 0x0070,
-		LGPMR_PAL0              = 0x0700,
-		LGPMR_PAL1              = 0x7000,
 
 		RTCCTL_38_4_BIT         = 5,
 		RTCCTL_ENABLE_BIT       = 7,
@@ -706,6 +706,7 @@ protected:
 
 	// $(FF)FFFA00
 	u32  m_lssa;        // Screen Starting Address Register
+	u32  m_lssa_end;    // Screen Starting Address Register, buffer end address (not memory-mapped)
 	u8   m_lvpw;        // Virtual Page Width Register
 	u16  m_lxmax;       // Screen Width Register
 	u16  m_lymax;       // Screen Height Register
@@ -718,11 +719,9 @@ protected:
 	u8   m_lacdrc;      // ACD (M) Rate Control Register
 	u8   m_lpxcd;       // Pixel Clock Divider Register
 	u8   m_lckcon;      // Clocking Control Register
-	u8   m_llbar;       // Last Buffer Address Register
-	u8   m_lotcr;       // Octet Terminal Count Register
 	u8   m_lposr;       // Panning Offset Register
 	u8   m_lfrcm;       // Frame Rate Control Modulation Register
-	u16  m_lgpmr;       // Gray Palette Mapping Register
+	bool m_lcd_update_pending;
 
 	// $(FF)FFFB00
 	u32  m_hmsr;        // RTC Hours Minutes Seconds Register
@@ -751,7 +750,9 @@ protected:
 	template<int Timer> void update_gptimer_state();
 	template<int Timer> TIMER_CALLBACK_MEMBER(timer_tick);
 
+	virtual void lcd_update_info() = 0;
 	virtual u16 lcd_get_lxmax_mask() = 0;
+	virtual int lcd_get_width() = 0;
 	virtual u32 lcd_get_line_word_count() = 0;
 	virtual attotime lcd_get_line_rate() = 0;
 	virtual u8 lcd_get_panel_bit_size() = 0;
@@ -864,6 +865,11 @@ private:
 		PWMC_LOAD               = 0x0100,
 		PWMC_IRQEN              = 0x4000,
 		PWMC_PWMIRQ             = 0x8000,
+
+		LGPMR_PAL2              = 0x0007,
+		LGPMR_PAL3              = 0x0070,
+		LGPMR_PAL0              = 0x0700,
+		LGPMR_PAL1              = 0x7000,
 
 		WCTLR_WDRST             = 0x0008,
 		WCTLR_LOCK              = 0x0004,
@@ -1005,6 +1011,11 @@ private:
 	// $(FF)FFF700
 	u16 m_spisr;        // SPIS Register
 
+	// $(FF)FFFA00
+	u8  m_llbar;        // Last Buffer Address Register
+	u8  m_lotcr;        // Octet Terminal Count Register
+	u16 m_lgpmr;        // Gray Palette Mapping Register
+
 	void internal_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
@@ -1020,7 +1031,9 @@ private:
 	virtual timer_regs &get_timer_regs(int timer) override;
 	virtual u32 get_timer_int(int timer) override;
 
+	virtual void lcd_update_info() override;
 	virtual u16 lcd_get_lxmax_mask() override;
+	virtual int lcd_get_width() override;
 	virtual u32 lcd_get_line_word_count() override;
 	virtual attotime lcd_get_line_rate() override;
 	virtual u8 lcd_get_panel_bit_size() override;
@@ -1225,7 +1238,9 @@ private:
 	virtual timer_regs &get_timer_regs(int timer) override;
 	virtual u32 get_timer_int(int timer) override;
 
+	virtual void lcd_update_info() override;
 	virtual u16 lcd_get_lxmax_mask() override;
+	virtual int lcd_get_width() override;
 	virtual u32 lcd_get_line_word_count() override;
 	virtual attotime lcd_get_line_rate() override;
 	virtual u8 lcd_get_panel_bit_size() override;
