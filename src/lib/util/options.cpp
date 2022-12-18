@@ -519,7 +519,7 @@ bool core_options::simple_entry::internal_copy_value(const entry &that)
 void core_options::simple_entry::set_default_value(std::string &&newvalue)
 {
 	m_data = m_defdata = type_specific_substitutions(newvalue);
-	m_data_unsubst = std::move(newvalue);
+	m_data_unsubst = m_defdata_unsubst = std::move(newvalue);
 }
 
 
