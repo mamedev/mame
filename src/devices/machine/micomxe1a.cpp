@@ -58,6 +58,16 @@
     Start appears as simultaneous Left/Right
     Select appears as simultaneous Up/Down
 
+    Digital MD mode emulates a 3-button Mega Drive pad:
+
+    Req     0       1
+    D0      Up      Up
+    D1      Down    Down
+    D2      0       Left
+    D3      0       Right
+    L/H     A       B
+    Ack     Start   C
+
     This mode is almost compatible with a 6-button Towns Pad (on a
     real 6-button Towns Pad, buttons A and B can be read in either
     state, they bypass the multiplexer).
@@ -66,9 +76,8 @@
     * Dump MB88513 microcontroller from original controller.
     * Measure timings.
     * Latch data at beginning of packet.
-    * Confirm A', B', E1 and E2 bit mappings in analog mode.
-    * Confirm buttons mapping in digital mode.
-     - Is the mapping different in PC vs MD mode?
+    * Confirm button mapping in digital mode.
+    * Estimate thresholds in digital modes.
     * Implement trigger A/B rapid fire switches.
     * Implement channel shift switch (Y->X, X->Z, Z->X).
     * Implement special modes (holding buttons on power-on):
@@ -128,38 +137,74 @@ u8 micom_xe_1a_device::out_r()
 	else
 	{
 		u16 const buttons = m_buttons_callback();
-		if (m_req)
+		if (m_interface)
 		{
-			u8 const z = m_analog_callback(2);
-			u8 const result =
-					((0xc0 > z)  ? 0x01 : 0x00) | // Throttle Up
-					((0x40 <= z) ? 0x02 : 0x00) | // Throttle Down
-					(BIT(buttons, 1) << 2) |      // C
-					(BIT(buttons, 0) << 3) |      // D
-					(BIT(buttons, 7) << 4) |      // E1
-					(BIT(buttons, 6) << 5);       // E2
-			LOG(
-					"%s: digital mode extended read = 0x%02X\n",
-					machine().describe_context(),
-					result);
-			return result;
+			u8 const y = m_analog_callback(0);
+			if (m_req)
+			{
+				u8 const x = m_analog_callback(1);
+				u8 const result =
+						((0x40 <= y) ? 0x01 : 0x00) |                      // Up
+						((0xc0 > y)  ? 0x02 : 0x00) |                      // Down
+						((0x40 <= x) ? 0x04 : 0x00) |                      // Left
+						((0xc0 > x)  ? 0x08 : 0x00) |                      // Right
+						((BIT(buttons, 2) & BIT(buttons, 8)) << 4) |       // B/B'
+						(BIT(buttons, 1) << 5);                            // C
+				LOG(
+						"%s: MD digital mode basic read = 0x%02X\n",
+						machine().describe_context(),
+						result);
+				return result;
+			}
+			else
+			{
+				u8 const result =
+						((0x40 <= y) ? 0x01 : 0x00) |                      // Up
+						((0xc0 > y)  ? 0x02 : 0x00) |                      // Down
+						((BIT(buttons, 3) & BIT(buttons, 9)) << 4) |       // A/A'
+						(BIT(buttons, 5) << 5);                            // Start
+				LOG(
+						"%s: MD digital mode extended read = 0x%02X\n",
+						machine().describe_context(),
+						result);
+				return result;
+			}
 		}
 		else
 		{
-			u8 const y = m_analog_callback(0);
-			u8 const x = m_analog_callback(1);
-			u8 const result =
-					((BIT(buttons, 4) && (0x40 <= y)) ? 0x01 : 0x00) | // Select/Up
-					((BIT(buttons, 4) && (0xc0 > y))  ? 0x02 : 0x00) | // Select/Down
-					((BIT(buttons, 5) && (0x40 <= x)) ? 0x04 : 0x00) | // Start/Left
-					((BIT(buttons, 5) && (0xc0 > x))  ? 0x08 : 0x00) | // Start/Right
-					((BIT(buttons, 3) & BIT(buttons, 9)) << 4) |       // A/A'
-					((BIT(buttons, 2) & BIT(buttons, 8)) << 5);        // B/B'
-			LOG(
-					"%s: digital mode basic read = 0x%02X\n",
-					machine().describe_context(),
-					result);
-			return result;
+			if (m_req)
+			{
+				u8 const z = m_analog_callback(2);
+				u8 const result =
+						((0xc0 > z)  ? 0x01 : 0x00) | // Throttle Up
+						((0x40 <= z) ? 0x02 : 0x00) | // Throttle Down
+						(BIT(buttons, 1) << 2) |      // C
+						(BIT(buttons, 0) << 3) |      // D
+						(BIT(buttons, 7) << 4) |      // E1
+						(BIT(buttons, 6) << 5);       // E2
+				LOG(
+						"%s: digital mode extended read = 0x%02X\n",
+						machine().describe_context(),
+						result);
+				return result;
+			}
+			else
+			{
+				u8 const y = m_analog_callback(0);
+				u8 const x = m_analog_callback(1);
+				u8 const result =
+						((BIT(buttons, 4) && (0x40 <= y)) ? 0x01 : 0x00) | // Select/Up
+						((BIT(buttons, 4) && (0xc0 > y))  ? 0x02 : 0x00) | // Select/Down
+						((BIT(buttons, 5) && (0x40 <= x)) ? 0x04 : 0x00) | // Start/Left
+						((BIT(buttons, 5) && (0xc0 > x))  ? 0x08 : 0x00) | // Start/Right
+						((BIT(buttons, 3) & BIT(buttons, 9)) << 4) |       // A/A'
+						((BIT(buttons, 2) & BIT(buttons, 8)) << 5);        // B/B'
+				LOG(
+						"%s: digital mode basic read = 0x%02X\n",
+						machine().describe_context(),
+						result);
+				return result;
+			}
 		}
 	}
 }
