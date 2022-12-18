@@ -5101,3 +5101,15 @@ if (MACHINES["AM9516"]~=null) then
 		MAME_DIR .. "src/devices/machine/am9516.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/micomxe1a.h,MACHINES["MICOMXE1A"] = true
+---------------------------------------------------
+
+if (MACHINES["MICOMXE1A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/micomxe1a.cpp",
+		MAME_DIR .. "src/devices/machine/micomxe1a.h",
+	}
+end
