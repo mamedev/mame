@@ -1411,7 +1411,7 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="usage" value="Needs BASIC V2, scenario disk must be in drive 2 at boot otherwise game will crash"/>
 		<!--combined image-->
 		<!--rom name="advanced fantasian.d88" size="1395328" crc="9e0d4f83" sha1="d8b593e3384d3bc3573fbeb5bdff64ac8a7680d6"/-->
 
@@ -1422,11 +1422,10 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 			</dataarea>
 		</part>
 
-		<!-- baddump: has non-factory save -->
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 57367 -->
-				<rom name="advanced fantasian (user).d88" size="348832" crc="cf122c34" sha1="43fa80a9f65de2fe202cb2e4f86ff87a94f9d6ae" status="baddump"/>
+			<feature name="part_id" value="Scenario" />
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 40067 -->
+				<rom name="advanced fantasian (scenario).d88" size="348832" crc="3b28f0c0" sha1="d62d4bce2c0735fd6df70068568c56eba164cb01"/>
 			</dataarea>
 		</part>
 
@@ -1437,22 +1436,23 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 			</dataarea>
 		</part>
 
+		<!-- baddump: has non-factory save -->
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario" />
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 40067 -->
-				<rom name="advanced fantasian (scenario).d88" size="348832" crc="3b28f0c0" sha1="d62d4bce2c0735fd6df70068568c56eba164cb01"/>
+			<feature name="part_id" value="User" />
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 57367 -->
+				<rom name="advanced fantasian (user).d88" size="348832" crc="cf122c34" sha1="43fa80a9f65de2fe202cb2e4f86ff87a94f9d6ae" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- hits FDC read ID copy protection, hangs by selecting anything -->
-	<software name="advfanta" cloneof="advfant" supported="no">
+	<software name="advfanta" cloneof="advfant">
 		<description>Advanced Fantasian - Quest for Lost Sanctuary (alt User Disk)</description>
 		<year>1988</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
+		<info name="usage" value="Needs BASIC V2, scenario disk must be in drive 2 at boot otherwise game will crash"/>
 		<!--combined image-->
 		<!--rom name="advanced fantasian.d88" size="1395328" crc="873791ba" sha1="1b98bf46f0c30bba4f1484fc299421f199bf4b40"/-->
 
@@ -1464,9 +1464,9 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 29643 -->
-				<rom name="advanced fantasian (a) (user).d88" size="348832" crc="a91d3c0f" sha1="4c1d7ae8c39db79503a54453e2711e82702a512c" status="baddump"/>
+			<feature name="part_id" value="Scenario" />
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 40067 -->
+				<rom name="advanced fantasian (a) (scenario).d88" size="348832" crc="3b28f0c0" sha1="d62d4bce2c0735fd6df70068568c56eba164cb01"/>
 			</dataarea>
 		</part>
 
@@ -1478,21 +1478,21 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario" />
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 40067 -->
-				<rom name="advanced fantasian (a) (scenario).d88" size="348832" crc="3b28f0c0" sha1="d62d4bce2c0735fd6df70068568c56eba164cb01"/>
+			<feature name="part_id" value="User" />
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 29643 -->
+				<rom name="advanced fantasian (a) (user).d88" size="348832" crc="a91d3c0f" sha1="4c1d7ae8c39db79503a54453e2711e82702a512c" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- hits FDC read ID copy protection, hangs by selecting anything -->
-	<software name="advfantb" cloneof="advfant" supported="no">
+	<software name="advfantb" cloneof="advfant">
 		<description>Advanced Fantasian - Quest for Lost Sanctuary (alt 2)</description>
 		<year>1988</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
+		<info name="usage" value="Needs BASIC V2, scenario disk must be in drive 2 at boot otherwise game will crash"/>
 		<!--combined image (main/scenario/demo/user) -->
 		<!--rom name="fantasian 2.d88" size="1520320" crc="876b83d0" sha1="6a26a77c90d83fd82a1ba2ca70c1606fb9b5d002"/-->
 
@@ -1504,9 +1504,9 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
-			<dataarea name="flop" size="473776">    <!-- Data CRC16: 27383 -->
-				<rom name="fantasian 2 (user).d88" size="473776" crc="c5fc10ee" sha1="bb13bb47323082eaf8caf57a821155efbeac38bc" status="baddump"/>
+			<feature name="part_id" value="Scenario" />
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 11952 -->
+				<rom name="fantasian 2 (scenario).d88" size="348848" crc="4b06698c" sha1="69ed1258cfc3bc90646610bb1b98622f4f97a71f"/>
 			</dataarea>
 		</part>
 
@@ -1518,9 +1518,9 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario" />
-			<dataarea name="flop" size="348848">    <!-- Data CRC16: 11952 -->
-				<rom name="fantasian 2 (scenario).d88" size="348848" crc="4b06698c" sha1="69ed1258cfc3bc90646610bb1b98622f4f97a71f"/>
+			<feature name="part_id" value="User" />
+			<dataarea name="flop" size="473776">    <!-- Data CRC16: 27383 -->
+				<rom name="fantasian 2 (user).d88" size="473776" crc="c5fc10ee" sha1="bb13bb47323082eaf8caf57a821155efbeac38bc" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1530,7 +1530,6 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 		<year>1984</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
-Boot OK
 Not extensively tested (language barrier)
 ]]></notes>
 		<!-- PC8801 -->
@@ -5620,11 +5619,13 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- Doesn't accept any input (including mouse enabled) -->
 	<software name="caligrap" supported="no">
 		<description>Caligraph Construction ver 1.00</description>
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
+		<notes><![CDATA[
+Doesn't accept any input (including mouse enabled)
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198602xx"/>
 		<info name="alt_title" value="カリグラフコンストラクション"/>
@@ -5645,12 +5646,13 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- Hangs while loading main program -->
-	<!-- FDC stalls [tries to scan for missing CHRN=(00 00 10 01)] -->
-	<software name="cdaisen2" supported="no">
+	<software name="cdaisen2" supported="partial">
 		<description>Campaign-ban Daisenryaku 2</description>
 		<year>1989</year>
 		<publisher>システムソフト (System Soft)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198911xx"/>
 		<info name="alt_title" value="キャンペーン版・大戦略2"/>
@@ -5732,12 +5734,13 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- Crashes the first way around (works on soft reset) -->
-	<!-- No sound -->
-	<software name="cancanbs" supported="no">
+	<software name="cancanbs" supported="partial">
 		<description>Can Can Bunny Superior</description>
 		<year>1990</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900601"/>
 		<info name="alt_title" value="きゃんきゃんバニー スペリオール"/>
@@ -5774,12 +5777,13 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- Crashes the first way around (works on soft reset) -->
-	<!-- No sound -->
-	<software name="cancanbsa" cloneof="cancanbs" supported="no">
+	<software name="cancanbsa" cloneof="cancanbs" supported="partial">
 		<description>Can Can Bunny Superior (alt?)</description>
 		<year>1990</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900601"/>
 		<info name="alt_title" value="きゃんきゃんバニー スペリオール"/>
@@ -5816,12 +5820,13 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- Crashes the first way around (works on soft reset) -->
-	<!-- No sound -->
-	<software name="cancanbsb" cloneof="cancanbs" supported="no">
+	<software name="cancanbsb" cloneof="cancanbs" supported="partial">
 		<description>Can Can Bunny Superior (alt 2)</description>
 		<year>1990</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900601"/>
 		<info name="alt_title" value="きゃんきゃんバニー スペリオール"/>
@@ -6285,13 +6290,15 @@ erratic sound tempo during gameplay, [OPN] regression (runs on system timer irq)
 		</part>
 	</software>
 
-	<!-- Crashes while loading, [FDC]? -->
-	<!-- [old note: disk i/o error during "ESDF SYSTEM LOADING", regressed with current floppy code] -->
 	<software name="chikyubo" supported="no">
 		<description>Chikyu Boeigun</description>
 		<!-- "1987" on loading -->
 		<year>1986</year>
 		<publisher>アートディンク (Artdink)</publisher>
+		<notes><![CDATA[
+Crashes while loading, [FDC]?
+[old note: disk i/o error during "ESDF SYSTEM LOADING", regressed with current floppy code]
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="地球防衛軍"/>
@@ -23956,9 +23963,7 @@ FDC stalls [Tries to match CHRN=(00 00 0x 01) with existing N=03, 2DD image?]
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<!-- FDC stalls [never clears HALT state] -->
-	<software name="motohime" supported="no">
+	<software name="motohime">
 		<description>Motoko-hime Adventure</description>
 		<year>1987</year>
 		<publisher>辰巳出版 (Tatsumi Publishing)</publisher>
@@ -24375,11 +24380,10 @@ FDC stalls [Tries to match CHRN=(00 00 0x 01) with existing N=03, 2DD image?]
 		</part>
 	</software>
 
-	<!-- Hangs after BASIC loading, eventually throws "Disk I/O error" -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(01 01 10 01)] -->
-	<software name="mylolita" supported="no">
+	<software name="mylolita">
 		<description>My Lolita</description>
 		<year>1985</year>
+		<!-- Under COMIX label -->
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198503xx"/>
@@ -25676,9 +25680,7 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
-	<!-- Prints "K2.SYSTEM SET IPL" then hangs -->
-	<!-- FDC stalls [never clears HALT state] -->
-	<software name="operatio" supported="no">
+	<software name="operatio" supported="yes">
 		<description>Operation L</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
@@ -26109,9 +26111,7 @@ Accesses I/O port $33, [PC8001mkIISR] check? (verify)
 		</part>
 	</software>
 
-	<!-- Black screen -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(04 00 01 01) existing N=2] -->
-	<software name="penguinw" supported="no">
+	<software name="penguinw" supported="yes">
 		<description>Penguin-kun Wars</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -26125,9 +26125,7 @@ Accesses I/O port $33, [PC8001mkIISR] check? (verify)
 		</part>
 	</software>
 
-	<!-- Black screen -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(04 00 01 01) existing N=2] -->
-	<software name="penguinwa" cloneof="penguinw" supported="no">
+	<software name="penguinwa" cloneof="penguinw" supported="yes">
 		<description>Penguin-kun Wars (alt)</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -26141,8 +26139,7 @@ Accesses I/O port $33, [PC8001mkIISR] check? (verify)
 		</part>
 	</software>
 
-	<!-- Uses Bg Pal -->
-	<software name="pengvill" supported="partial">
+	<software name="pengvill">
 		<description>Penguin Village</description>
 		<year>1984</year>
 		<publisher>ポニカ (PonyCa)</publisher>
@@ -33301,9 +33298,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<!-- FDC stalls [Tries to match CHR=(00 00 01 03) on existing CHRN=(27 01 01 01)] -->
-	<software name="stilswrd" supported="no">
+	<software name="stilswrd">
 		<description>Still Sword</description>
 		<year>1988</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
@@ -39088,7 +39083,7 @@ Shows Telenet Japan logo (!?) then hangs. PC=140 tries to jump to bad program fl
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Hangs while trying to create user disk, [FDC] stalls (verify)
+Throws a "cannot write" when creating user disk
 Mounting provided user disk causes a [Incorrect layout on track 0 head 0, expected_size=100000, current_size=100320]
 ]]></notes>
 		<!-- PC8801mk2SR -->
@@ -39154,7 +39149,6 @@ Mounting provided user disk causes a [Incorrect layout on track 0 head 0, expect
 		</part>
 	</software>
 
-	<!-- Hangs while trying to create user disk, [FDC] stalls -->
 	<software name="xak2a" cloneof="xak2" supported="no">
 		<description>Xak II: Rising of the Redmoon (alt)</description>
 		<year>1990</year>
@@ -39162,6 +39156,9 @@ Mounting provided user disk causes a [Incorrect layout on track 0 head 0, expect
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199009xx"/>
 		<info name="alt_title" value="サークII"/>
+		<notes><![CDATA[
+Throws a "cannot write" when creating user disk
+]]></notes>
 		<!--combined image-->
 		<!--rom name="xak ii.d88" size="2666480" crc="fb1e73f4" sha1="f957d0293922be0a1c3d99c3e75b333734dcd329"/-->
 
