@@ -15,14 +15,14 @@
 
     In analog mode, data is shifted out as eleven nybbles:
 
-            _           ____________________________________________
-    Req      \_________/
-            ____    __    __    __    __    __    __    __    __
-    Ack         \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/
-                    _____       _____       _____       _____
-    L/H     XX\____/     \_____/     \_____/     \_____/     \_____/
-               ____ _____ _____ _____ _____ _____ _____ _____ _____
-    D       XXX____X_____X_____X_____X_____X_____X_____X_____X_____X
+          _           ____________________________________________
+    Req    \_________/
+          ____    __    __    __    __    __    __    __    __
+    Ack       \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/
+                  _____       _____       _____       _____
+    L/H   XX\____/     \_____/     \_____/     \_____/     \_____/
+             ____ _____ _____ _____ _____ _____ _____ _____ _____
+    D     XXX____X_____X_____X_____X_____X_____X_____X_____X_____X
 
     The falling edge on Req causes data output to start.  The host
     can't control the speed, it just polls the L/H and Ack lines to
@@ -58,6 +58,10 @@
     Start appears as simultaneous Left/Right
     Select appears as simultaneous Up/Down
 
+    This mode is almost compatible with a 6-button Towns Pad (on a
+    real 6-button Towns Pad, buttons A and B can be read in either
+    state, they bypass the multiplexer).
+
     Digital MD mode emulates a 3-button Mega Drive pad:
 
     Req     0       1
@@ -68,13 +72,10 @@
     L/H     A       B
     Ack     Start   C
 
-    This mode is almost compatible with a 6-button Towns Pad (on a
-    real 6-button Towns Pad, buttons A and B can be read in either
-    state, they bypass the multiplexer).
-
     TODO:
     * Dump MB88513 microcontroller from original controller.
     * Measure timings.
+     - Timings currently fudged for CRI games in FM Towns.
     * Latch data at beginning of packet.
     * Confirm button mapping in digital mode.
     * Estimate thresholds in digital modes.
@@ -235,7 +236,7 @@ WRITE_LINE_MEMBER(micom_xe_1a_device::req_w)
 				m_data[5] = BIT(buttons, 8, 8) & ((BIT(buttons, 6, 2) << 2) | 0xf3);
 
 				// takes a while to respond
-				m_output_timer->adjust(attotime::from_nsec(46'600), 0);
+				m_output_timer->adjust(attotime::from_nsec(50), 0);
 			}
 		}
 		else
@@ -293,47 +294,37 @@ void micom_xe_1a_device::device_start()
 
 TIMER_CALLBACK_MEMBER(micom_xe_1a_device::step_output)
 {
-	auto const step = param >> 2;
-	auto const phase = param & 0x03;
-	switch (phase)
+	auto const step = param >> 1;
+	if (!BIT(param, 0))
 	{
-	case 0:
+		m_out = (m_out & 0x0f) | (BIT(step, 0) ? 0x30 : 0x20);
+		LOG(
+				"Set nybble %u data = 0x%X, L/H = %u, /Ack = %u\n",
+				step,
+				BIT(m_out, 0, 4),
+				BIT(m_out, 4),
+				BIT(m_out, 5));
+		if ((std::size(m_data) * 2) > step)
+		{
+			m_output_timer->adjust(attotime::from_nsec(20'000), param + 1);
+		}
+	}
+	else
+	{
+		if ((std::size(m_data) * 2) > step)
 		{
 			auto const nybble = step ^ m_interface;
 			if ((std::size(m_data) * 2) > step)
-				m_out = BIT(m_data[nybble >> 1], BIT(nybble, 0) ? 4 : 0, 4);
+				m_out = BIT(m_data[nybble >> 1], BIT(nybble, 0) ? 4 : 0, 4) | (m_out & 0x10);
 			else
-				m_out = 0x0f;
-			m_out |= BIT(step, 0) ? 0x30 : 0x20;
+				m_out = 0x0f | (m_out & 0x10);
 			LOG(
-					"Set nybble %u data = 0x%X, L/H = %d, /Ack = 1\n",
+					"Set nybble %u data = 0x%X, L/H = %u, /Ack = %u\n",
 					step,
 					BIT(m_out, 0, 4),
-					BIT(m_out, 4));
-			if ((std::size(m_data) * 2) > step)
-			{
-				m_output_timer->adjust(
-						attotime::from_nsec(BIT(step, 0) ? 3'800 : 18'000),
-						param + 1);
-			}
+					BIT(m_out, 4),
+					BIT(m_out, 5));
+			m_output_timer->adjust(attotime::from_nsec(10'000), param + 1);
 		}
-		break;
-
-	case 1:
-		if ((std::size(m_data) * 2) > step)
-		{
-			m_out &= 0x1f;
-			LOG("Set nybble %u /Ack = 0\n", step);
-			m_output_timer->adjust(
-					attotime::from_nsec(12'100),
-					param + (BIT(step, 0) ? 1 : 3));
-		}
-		break;
-
-	case 2:
-		m_out |= 0x20;
-		LOG("Set nybble %u /Ack = 1\n", step);
-		m_output_timer->adjust(attotime::from_nsec(3'800), param + 2);
-		break;
 	}
 }
