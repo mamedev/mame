@@ -236,7 +236,7 @@ WRITE_LINE_MEMBER(micom_xe_1a_device::req_w)
 				m_data[5] = BIT(buttons, 8, 8) & ((BIT(buttons, 6, 2) << 2) | 0xf3);
 
 				// takes a while to respond
-				m_output_timer->adjust(attotime::from_nsec(50), 0);
+				m_output_timer->adjust(attotime::from_nsec(50'000), 0);
 			}
 		}
 		else
@@ -306,7 +306,7 @@ TIMER_CALLBACK_MEMBER(micom_xe_1a_device::step_output)
 				BIT(m_out, 5));
 		if ((std::size(m_data) * 2) > step)
 		{
-			m_output_timer->adjust(attotime::from_nsec(20'000), param + 1);
+			m_output_timer->adjust(attotime::from_nsec(10'000), param + 1);
 		}
 	}
 	else
