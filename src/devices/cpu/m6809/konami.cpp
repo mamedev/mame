@@ -89,9 +89,9 @@ DEFINE_DEVICE_TYPE(KONAMI, konami_cpu_device, "konami_cpu", "KONAMI CPU")
 //  konami_cpu_device - constructor
 //-------------------------------------------------
 
-konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6809_base_device(mconfig, tag, owner, clock, KONAMI, 4)
-	, m_set_lines(*this)
+konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	m6809_base_device(mconfig, tag, owner, clock, KONAMI, 4),
+	m_set_lines(*this)
 {
 }
 
@@ -104,11 +104,16 @@ void konami_cpu_device::device_start()
 {
 	super::device_start();
 
-	m_bcount = 0;
-	save_item(NAME(m_bcount));
-
 	// resolve callbacks
 	m_set_lines.resolve();
+
+	// initialize variables
+	m_temp_im = 0;
+	m_bcount = 0;
+
+	// setup regtable
+	save_item(NAME(m_temp_im));
+	save_item(NAME(m_bcount));
 }
 
 

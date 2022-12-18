@@ -68,6 +68,7 @@ private:
 	void execute_one();
 
 	uint8_t m_bcount;
+	uint8_t m_temp_im;
 };
 
 #define KONAMI_IRQ_LINE  M6809_IRQ_LINE   /* 0 - IRQ line number */

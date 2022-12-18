@@ -131,9 +131,7 @@ DEFINE_DEVICE_TYPE(HD6309E, hd6309e_device, "hd6309e", "Hitachi HD6309E")
 //-------------------------------------------------
 
 hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int divider) :
-	m6809_base_device(mconfig, tag, owner, clock, type, divider),
-	m_md(0),
-	m_temp_im(0)
+	m6809_base_device(mconfig, tag, owner, clock, type, divider)
 {
 }
 

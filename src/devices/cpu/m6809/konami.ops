@@ -202,16 +202,16 @@ MAIN:
 		case 0xB5:													%DIVX;		return;
 		case 0xB6:													%BMOVE;		return;
 		case 0xB7:													%MOVE;		return;
-		case 0xB8:										set_d();	%LSRD;		return;
+		case 0xB8:				%IMM_IM;				set_d();	%LSRD;		return;
 		case 0xB9:										%INDEXED;	%LSRD;		return;
-		case 0xBA:										set_d();	%RORD;		return;
+		case 0xBA:				%IMM_IM;				set_d();	%RORD;		return;
 		case 0xBB:										%INDEXED;	%RORD;		return;
-		case 0xBC:										set_d();	%ASRD;		return;
+		case 0xBC:				%IMM_IM;				set_d();	%ASRD;		return;
 		case 0xBD:										%INDEXED;	%ASRD;		return;
-		case 0xBE:										set_d();	%ASLD;		return;
+		case 0xBE:				%IMM_IM;				set_d();	%ASLD;		return;
 		case 0xBF:										%INDEXED;	%ASLD;		return;
 
-		case 0xC0:										set_d();	%ROLD;		return;
+		case 0xC0:				%IMM_IM;				set_d();	%ROLD;		return;
 		case 0xC1:										%INDEXED;	%ROLD;		return;
 		case 0xC2:										set_d();	%CLR16;		return;
 		case 0xC3:										%INDEXED;	%CLR16;		return;
@@ -460,6 +460,10 @@ SETLINE:
 	@set_lines(read_operand());
 	return;
 
+IMM_IM:
+	@m_temp_im = read_opcode_arg();
+	return;
+
 MOVE:
 	@m_temp.b.l = read_memory(m_y.w++);
 	@write_memory(m_x.w++, m_temp.b.l);
@@ -513,10 +517,7 @@ DECBJNZ:
 
 LSRD:
 	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
-	if (is_register_addressing_mode())
-		m_bcount = read_opcode_arg();
-	else
-		m_bcount = m_q.r.a;
+	m_bcount = is_register_addressing_mode() ? m_temp_im : m_q.r.a;
 
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
@@ -534,10 +535,7 @@ LSRD:
 
 ASLD:
 	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
-	if (is_register_addressing_mode())
-		m_bcount = read_opcode_arg();
-	else
-		m_bcount = m_q.r.a;
+	m_bcount = is_register_addressing_mode() ? m_temp_im : m_q.r.a;
 
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
@@ -553,10 +551,7 @@ ASLD:
 
 ASRD:
 	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
-	if (is_register_addressing_mode())
-		m_bcount = read_opcode_arg();
-	else
-		m_bcount = m_q.r.a;
+	m_bcount = is_register_addressing_mode() ? m_temp_im : m_q.r.a;
 
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
@@ -574,10 +569,7 @@ ASRD:
 
 ROLD:
 	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
-	if (is_register_addressing_mode())
-		m_bcount = read_opcode_arg();
-	else
-		m_bcount = m_q.r.a;
+	m_bcount = is_register_addressing_mode() ? m_temp_im : m_q.r.a;
 
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
@@ -593,10 +585,7 @@ ROLD:
 
 RORD:
 	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
-	if (is_register_addressing_mode())
-		m_bcount = read_opcode_arg();
-	else
-		m_bcount = m_q.r.a;
+	m_bcount = is_register_addressing_mode() ? m_temp_im : m_q.r.a;
 
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
