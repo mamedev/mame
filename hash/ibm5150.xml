@@ -16128,13 +16128,13 @@ Disk 1 has a modified "go.bat" file
 		<info name="alt_title" value="Tortugas Ninjas" />
 		<info name="developer" value="Konami" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 & 2" />
+			<feature name="part_id" value="Disk 1 &amp; 2" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Teenage Mutant Hero Turtles (Spain) [MCM] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="7aed9f2e" sha1="d6dd066b0504c8cc6ab31d726d6fa46ced89d08e" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3 & 4" />
+			<feature name="part_id" value="Disk 3 &amp; 4" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Teenage Mutant Hero Turtles (Spain) [MCM] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="b68eb50c" sha1="348b6c8b58a1da393328f884c08b76d4b73c7739"/>
 			</dataarea>
