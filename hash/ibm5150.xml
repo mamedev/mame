@@ -14016,7 +14016,7 @@ Black screen after listing control scheme. Doesn't pass the protection check, th
 		<info name="usage" value="only works on drive A:" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "184320">
-				<rom name="Pole Position [Thunder Mountain] [1988] [5.25SS] [disk 1 of 1].img" size="184320" crc="2cb270ac" sha1="2ed2eb92335f3a0902bed1dc277901f667d18ab6"/>
+				<rom name="Pole Position [Thunder Mountain] [1988] [5.25SS] [Disk 1 of 1].img" size="184320" crc="2cb270ac" sha1="2ed2eb92335f3a0902bed1dc277901f667d18ab6"/>
 			</dataarea>
 		</part>
 	</software>
