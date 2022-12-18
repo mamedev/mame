@@ -122,7 +122,7 @@ micom_xe_1a_device::micom_xe_1a_device(
 	m_req(1),
 	m_mode(1),
 	m_interface(0),
-	m_out(0x2e)
+	m_out(0x2f)
 {
 }
 
@@ -260,7 +260,7 @@ WRITE_LINE_MEMBER(micom_xe_1a_device::mode_w)
 		{
 			LOG("Digital mode selected\n");
 			m_output_timer->enable(false);
-			m_out = 0x2e;
+			m_out = 0x2f;
 		}
 		m_mode = mode;
 	}
@@ -281,7 +281,7 @@ void micom_xe_1a_device::device_start()
 	m_output_timer = timer_alloc(FUNC(micom_xe_1a_device::step_output), this);
 
 	std::fill(std::begin(m_data), std::end(m_data), 0x00);
-	m_out = 0x2e;
+	m_out = 0x2f;
 
 	save_item(NAME(m_req));
 	save_item(NAME(m_mode));
@@ -293,31 +293,47 @@ void micom_xe_1a_device::device_start()
 
 TIMER_CALLBACK_MEMBER(micom_xe_1a_device::step_output)
 {
-	auto const step = param >> 1;
-	if (!BIT(param, 0))
+	auto const step = param >> 2;
+	auto const phase = param & 0x03;
+	switch (phase)
 	{
-		auto const nybble = step ^ m_interface;
-		if ((std::size(m_data) * 2) > step)
-			m_out = BIT(m_data[nybble >> 1], BIT(nybble, 0) ? 4 : 0, 4);
-		else
-			m_out = 0xe;
-		m_out |= BIT(step, 0) ? 0x30 : 0x20;
-		LOG(
-				"Set nybble %u data = 0x%X, L/H = %d, /Ack = 1\n",
-				step,
-				BIT(m_out, 0, 4),
-				BIT(m_out, 4));
+	case 0:
+		{
+			auto const nybble = step ^ m_interface;
+			if ((std::size(m_data) * 2) > step)
+				m_out = BIT(m_data[nybble >> 1], BIT(nybble, 0) ? 4 : 0, 4);
+			else
+				m_out = 0x0f;
+			m_out |= BIT(step, 0) ? 0x30 : 0x20;
+			LOG(
+					"Set nybble %u data = 0x%X, L/H = %d, /Ack = 1\n",
+					step,
+					BIT(m_out, 0, 4),
+					BIT(m_out, 4));
+			if ((std::size(m_data) * 2) > step)
+			{
+				m_output_timer->adjust(
+						attotime::from_nsec(BIT(step, 0) ? 3'800 : 18'000),
+						param + 1);
+			}
+		}
+		break;
+
+	case 1:
 		if ((std::size(m_data) * 2) > step)
 		{
+			m_out &= 0x1f;
+			LOG("Set nybble %u /Ack = 0\n", step);
 			m_output_timer->adjust(
-					attotime::from_nsec(BIT(step, 0) ? 3'800 : 21'800),
-					param + 1);
+					attotime::from_nsec(12'100),
+					param + (BIT(step, 0) ? 1 : 3));
 		}
-	}
-	else if ((std::size(m_data) * 2) > step)
-	{
-		m_out &= 0x1f;
-		LOG("Set nybble %u /Ack = 0\n", step);
-		m_output_timer->adjust(attotime::from_nsec(12'100), param + 1);
+		break;
+
+	case 2:
+		m_out |= 0x20;
+		LOG("Set nybble %u /Ack = 1\n", step);
+		m_output_timer->adjust(attotime::from_nsec(3'800), param + 2);
+		break;
 	}
 }
