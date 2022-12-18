@@ -3285,7 +3285,7 @@ u8 mc68328_base_device::lvpw_r() // 0xa05
 
 void mc68328_base_device::lxmax_w(u16 data) // 0xa08
 {
-	m_lcd_update_pending = (m_lxmax != (data & lcd_get_lxmax_mask()));
+	m_lcd_update_pending = m_lcd_update_pending || (m_lxmax != (data & lcd_get_lxmax_mask()));
 	LOGMASKED(LOG_LCD, "%s: lxmax_w: LXMAX = %04x\n", machine().describe_context(), data);
 	m_lxmax = data & lcd_get_lxmax_mask();
 	LOGMASKED(LOG_LCD, "%s:          Width: %d\n", machine().describe_context(), lcd_get_width());
@@ -3299,7 +3299,7 @@ u16 mc68328_base_device::lxmax_r() // 0xa08
 
 void mc68328_base_device::lymax_w(u16 data) // 0xa0a
 {
-	m_lcd_update_pending = (m_lxmax != (data & LYMAX_MASK));
+	m_lcd_update_pending = m_lcd_update_pending || (m_lxmax != (data & LYMAX_MASK));
 	LOGMASKED(LOG_LCD, "%s: lymax_w: LYMAX = %04x\n", machine().describe_context(), data);
 	m_lymax = data & LYMAX_MASK;
 	LOGMASKED(LOG_LCD, "%s:          Height: %d\n", machine().describe_context(), (data & 0x03ff) + 1);
@@ -3607,7 +3607,7 @@ void mc68ez328_device::lpicf_w(u8 data) // 0xa20
 	LOGMASKED(LOG_LCD, "%s: lpicf_w: LPICF = %02x\n", machine().describe_context(), data);
 	LOGMASKED(LOG_LCD, "%s:          Grayscale Mode: %d\n", machine().describe_context(), GS_NAMES[data & LPICF_GS]);
 	LOGMASKED(LOG_LCD, "%s:          Bus Size: %s\n", machine().describe_context(), PBSIZ_NAMES[(data & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT]);
-	m_lcd_update_pending = (m_lpicf != data);
+	m_lcd_update_pending = m_lcd_update_pending || (m_lpicf != data);
 	m_lpicf = data;
 }
 
@@ -3637,7 +3637,7 @@ void mc68ez328_device::lckcon_w(u8 data) // 0xa27
 void mc68ez328_device::lrra_w(u8 data) // 0xa29
 {
 	LOGMASKED(LOG_LCD, "%s: lrra_w: LRRA = %02x\n", machine().describe_context(), data);
-	m_lcd_update_pending = (m_lpicf != data);
+	m_lcd_update_pending = m_lcd_update_pending || (m_lrra != data);
 	m_lrra = data;
 }
 

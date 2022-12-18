@@ -132,8 +132,6 @@ void mc68328_lcd_device::ld_w(u8 data)
 void mc68328_lcd_device::lcd_info_changed(double refresh_hz, int width, int height, u8 bus_width, u8 bpp)
 {
 	m_screen->set_refresh_hz(refresh_hz);
-	m_screen->set_size(width, height);
-	m_screen->set_visarea(0, width - 1, 0, height - 1);
 	m_lcd_bitmap.resize(width, height);
 	m_bus_width = bus_width;
 	m_bpp = bpp;
