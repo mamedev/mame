@@ -816,10 +816,10 @@ void emu_options::set_software(std::string &&new_software)
 	// identify any options as a result of softlists
 	software_options softlist_opts = evaluate_initial_softlist_options(new_software);
 
-	while (!softlist_opts.slot.empty() || !softlist_opts.image.empty())
+	while (!softlist_opts.slot.empty() || !softlist_opts.slot_defaults.empty() || !softlist_opts.image.empty())
 	{
 		// track how many options we have
-		size_t before_size = softlist_opts.slot.size() + softlist_opts.image.size();
+		size_t before_size = softlist_opts.slot.size() + softlist_opts.slot_defaults.size() + softlist_opts.image.size();
 
 		// keep a list of deferred options, in case anything is applied
 		// out of order
@@ -833,6 +833,16 @@ void emu_options::set_software(std::string &&new_software)
 				iter->second.specify(std::move(slot_opt.second));
 			else
 				deferred_opts.slot[slot_opt.first] = std::move(slot_opt.second);
+		}
+
+		// distribute slot option defaults
+		for (auto &slot_opt : softlist_opts.slot_defaults)
+		{
+			auto iter = m_slot_options.find(slot_opt.first);
+			if (iter != m_slot_options.end())
+				iter->second.set_default_card_software(std::move(slot_opt.second));
+			else
+				deferred_opts.slot_defaults[slot_opt.first] = std::move(slot_opt.second);
 		}
 
 		// distribute image options
@@ -849,7 +859,7 @@ void emu_options::set_software(std::string &&new_software)
 		softlist_opts = std::move(deferred_opts);
 
 		// do we have any pending options after failing to distribute any?
-		size_t after_size = softlist_opts.slot.size() + softlist_opts.image.size();
+		size_t after_size = softlist_opts.slot.size() + softlist_opts.slot_defaults.size() + softlist_opts.image.size();
 		if ((after_size > 0) && after_size >= before_size)
 			throw options_error_exception("Could not assign software option");
 	}
@@ -961,7 +971,15 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 								&& fi.name().compare(fi.name().size() - default_suffix.size(), default_suffix.size(), default_suffix) == 0)
 							{
 								std::string slot_name = fi.name().substr(0, fi.name().size() - default_suffix.size());
-								results.slot[slot_name] = fi.value();
+
+								// only add defaults if they exist in this configuration
+								device_t *device = config.root_device().subdevice(slot_name.c_str());
+								if (device)
+								{
+									device_slot_interface *intf;
+									if (device->interface(intf) && intf->option(fi.value().c_str()))
+										results.slot_defaults[slot_name] = fi.value();
+								}
 							}
 						}
 					}
