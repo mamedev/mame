@@ -514,24 +514,26 @@ uint8_t buckrog_state::subcpu_command_r()
 
 uint8_t buckrog_state::port_0_r()
 {
-	if (m_config->read())     // cocktail w/ pedal
-		return (m_in0->read() & ~0x30) | pedal_r() << 4;
-	else                      // upright w/ buttons
+	if (m_dsw[1]->read() & 0x02)   // upright w/ buttons
 		return m_in0->read();
+	else                           // cocktail w/ pedal
+		return (m_in0->read() & ~0x30) | pedal_r() << 4;
 }
 
 
 uint8_t buckrog_state::port_2_r()
 {
-	return bitswap<4>(m_dsw[1]->read(), 6, 4, 3, 0) << 4
-	     | bitswap<4>(m_dsw[0]->read(), 6, 4, 3, 0);
+	uint8_t inp1 = bitswap<4>(m_dsw[0]->read(), 6, 4, 3, 0);
+	uint8_t inp2 = bitswap<4>(m_dsw[1]->read(), 6, 4, 3, 0);
+	return inp1 | inp2 << 4;
 }
 
 
 uint8_t buckrog_state::port_3_r()
 {
-	return bitswap<4>(m_dsw[1]->read(), 7, 5, 2, 1) << 4
-	     | bitswap<4>(m_dsw[0]->read(), 7, 5, 2, 1);
+	uint8_t inp1 = bitswap<4>(m_dsw[0]->read(), 7, 5, 2, 1);
+	uint8_t inp2 = bitswap<4>(m_dsw[1]->read(), 7, 5, 2, 1);
+	return inp1 | inp2 << 4;
 }
 
 
@@ -824,17 +826,12 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( buckrog )
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_CONFSETTING(    0x01, "Cockpit" )
-
 	PORT_START("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )  PORT_CONDITION("CONFIG", 0x01, EQUALS, 0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("CONFIG", 0x01, EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("CONFIG", 0x01, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )  PORT_CONDITION("CONFIG", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CONDITION("CONFIG", 0x01, EQUALS, 0x01)   // pedal
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )  PORT_CONDITION("DSW2", 0x80, EQUALS, 0x00) // cockpit
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )  PORT_CONDITION("DSW2", 0x80, EQUALS, 0x80) // upright
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00) // pedal
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
@@ -900,7 +897,7 @@ static INPUT_PORTS_START( buckrog )
 	PORT_DIPSETTING(    0x00, "Cockpit" )
 
 	PORT_START("PEDAL")
-	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CONDITION("CONFIG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
 INPUT_PORTS_END
 
 
