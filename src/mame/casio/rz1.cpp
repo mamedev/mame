@@ -93,8 +93,8 @@ private:
 	output_finder<> m_led_startstop;
 
 	void map(address_map &map);
-	void pg0_map(address_map& map);
-	void pg1_map(address_map& map);
+	void pg0_map(address_map &map);
+	void pg1_map(address_map &map);
 
 	uint8_t key_r();
 
@@ -134,17 +134,18 @@ void rz1_state::map(address_map &map)
 	map(0xe000, 0xe001).w(FUNC(rz1_state::leds_w));
 }
 
-void rz1_state::pg0_map(address_map& map)
+void rz1_state::pg0_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram().share("sample1");
 	map(0xa000, 0xbfff).ram().share("sample2");
 }
 
-void rz1_state::pg1_map(address_map& map)
+void rz1_state::pg1_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 }
+
 
 //**************************************************************************
 //  INPUT PORT DEFINITIONS
