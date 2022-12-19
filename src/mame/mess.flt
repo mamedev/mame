@@ -980,7 +980,7 @@ skeleton/unistar.cpp
 skeleton/v6809.cpp
 skeleton/vanguardmk1.cpp
 skeleton/vd56sp.cpp
-skeleton/vector4.cpp
+skeleton/vector3.cpp
 skeleton/vectrix.cpp
 skeleton/vp415.cpp
 skeleton/vp60.cpp
