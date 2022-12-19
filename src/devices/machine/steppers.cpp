@@ -189,7 +189,7 @@ void stepper_device::advance_phase()
 {
 	//Standard drive table is 2,6,4,5,1,9,8,a
 	//NOTE: This runs through the stator patterns in such a way as to drive the reel forward (downwards from the player's view, clockwise on our rose)
-	//The Heber 'Pluto' controller runs this in reverse
+	//The Heber 'Pluto' controller runs this in reverse, this needs checking on real hardware
 	switch (m_pattern)
 	{             //Black  Blue  Red  Yellow
 		case 0x02://  0     0     1     0
@@ -257,7 +257,8 @@ void reel_device::advance_phase()
 		case STARPOINT_48STEP_REEL : /* STARPOINT RMxxx */
 		case GAMESMAN_200STEP_REEL : /* Gamesman GMxxxx */
 		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
-		case STARPOINT_200STEP_REEL :/* STARPOINT 1DCU DICE mechanism */
+		case STARPOINT_200STEP_REEL :
+		case SYS5_100STEP_REEL :
 		stepper_device::advance_phase();
 		break;
 
