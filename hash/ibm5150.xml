@@ -13283,7 +13283,7 @@ Hangs when launching soccer.com
 		<year>1990</year>
 		<publisher>Hi-Tech Expressions</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "368640">
+			<dataarea name="flop" size = "737280">
 				<rom name="Mega Man [Hi-Tech Expressions] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="36071b36" sha1="fce8195960bf0c6d43949a718217e7fb545ffd43"/>
 			</dataarea>
 		</part>
@@ -16889,12 +16889,12 @@ Black screen, incomplete dump? Has autoexec.bat without command.com, requires to
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Game Arts" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "368640">
+			<dataarea name="flop" size = "737280">
 				<rom name="Zeliard [Sierra] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="aa42915e" sha1="7e90ba433d1c8d0ff13e415a64a5c59904811719"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "368640">
+			<dataarea name="flop" size = "737280">
 				<rom name="Zeliard [Sierra] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="96181d15" sha1="f17c3f8c6f149a269bfe5ac9007556fdf3bb3257"/>
 			</dataarea>
 		</part>
@@ -16909,12 +16909,12 @@ Disk 1 has a created "RESOURCE.CFG" file
 ]]></notes>
 		<info name="developer" value="Game Arts" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "368640">
+			<dataarea name="flop" size = "737280">
 				<rom name="Zeliard (v2.0) [Sierra] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="1262c699" sha1="a7b70e74143a086d5c15f167ade43371782e93ef" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "368640">
+			<dataarea name="flop" size = "737280">
 				<rom name="Zeliard (v2.0) [Sierra] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="1fb34823" sha1="94777bea1cfd5659fedc9c83c05806e857a84e2a"/>
 			</dataarea>
 		</part>
