@@ -353,7 +353,7 @@ void subroc3d_state::ppi0b_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	m_lamp = BIT(data, 2);
-	m_flip = (data >> 4) & 1;
+	m_flip = BIT(data, 4);
 }
 
 /*************************************
@@ -420,7 +420,25 @@ void turbo_base_state::digit_w(uint8_t data)
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	m_digits[m_i8279_scanlines * 2] = ls48_map[data & 0x0f];
-	m_digits[m_i8279_scanlines * 2 + 1] = ls48_map[data>>4];
+	m_digits[m_i8279_scanlines * 2 + 1] = ls48_map[data >> 4];
+}
+
+/*************************************
+ *
+ *  Shared pedal reading
+ *
+ *************************************/
+
+uint8_t turbo_base_state::pedal_r()
+{
+	if (m_pedal)
+	{
+		// inverted 2-bit Gray code from a pair of optos in mechanical pedal
+		uint8_t pedal = m_pedal->read();
+		return (pedal >> 6) ^ (pedal >> 7) ^ 0x03;
+	}
+	else
+		return 0xff;
 }
 
 /*************************************
@@ -428,6 +446,12 @@ void turbo_base_state::digit_w(uint8_t data)
  *  Misc Turbo inputs/outputs
  *
  *************************************/
+
+uint8_t turbo_state::port_0_r()
+{
+	return m_in0->read() | pedal_r();
+}
+
 
 uint8_t turbo_state::collision_r()
 {
@@ -488,35 +512,28 @@ uint8_t buckrog_state::subcpu_command_r()
 }
 
 
+uint8_t buckrog_state::port_0_r()
+{
+	if (m_dsw[1]->read() & 0x02)   // upright w/ buttons
+		return m_in0->read();
+	else                           // cocktail w/ pedal
+		return (m_in0->read() & ~0x30) | pedal_r() << 4;
+}
+
+
 uint8_t buckrog_state::port_2_r()
 {
-	int inp1 = m_dsw[0]->read();
-	int inp2 = m_dsw[1]->read();
-
-	return  (((inp2 >> 6) & 1) << 7) |
-			(((inp2 >> 4) & 1) << 6) |
-			(((inp2 >> 3) & 1) << 5) |
-			(((inp2 >> 0) & 1) << 4) |
-			(((inp1 >> 6) & 1) << 3) |
-			(((inp1 >> 4) & 1) << 2) |
-			(((inp1 >> 3) & 1) << 1) |
-			(((inp1 >> 0) & 1) << 0);
+	uint8_t inp1 = bitswap<4>(m_dsw[0]->read(), 6, 4, 3, 0);
+	uint8_t inp2 = bitswap<4>(m_dsw[1]->read(), 6, 4, 3, 0);
+	return inp1 | inp2 << 4;
 }
 
 
 uint8_t buckrog_state::port_3_r()
 {
-	int inp1 = m_dsw[0]->read();
-	int inp2 = m_dsw[1]->read();
-
-	return  (((inp2 >> 7) & 1) << 7) |
-			(((inp2 >> 5) & 1) << 6) |
-			(((inp2 >> 2) & 1) << 5) |
-			(((inp2 >> 1) & 1) << 4) |
-			(((inp1 >> 7) & 1) << 3) |
-			(((inp1 >> 5) & 1) << 2) |
-			(((inp1 >> 2) & 1) << 1) |
-			(((inp1 >> 1) & 1) << 0);
+	uint8_t inp1 = bitswap<4>(m_dsw[0]->read(), 7, 5, 2, 1);
+	uint8_t inp2 = bitswap<4>(m_dsw[1]->read(), 7, 5, 2, 1);
+	return inp1 | inp2 << 4;
 }
 
 
@@ -566,7 +583,7 @@ void turbo_state::prg_map(address_map &map)
 	map(0xfa00, 0xfa03).mirror(0x00fc).rw(m_i8255[2], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfb00, 0xfb03).mirror(0x00fc).rw(m_i8255[3], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfc00, 0xfc01).mirror(0x00fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xfd00, 0xfdff).portr("INPUT");
+	map(0xfd00, 0xfdff).r(FUNC(turbo_state::port_0_r));
 	map(0xfe00, 0xfeff).r(FUNC(turbo_state::collision_r));
 }
 
@@ -612,7 +629,7 @@ void buckrog_state::main_prg_map(address_map &map)
 	map(0xd800, 0xd801).mirror(0x07fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xe000, 0xe3ff).ram().share(m_sprite_position);                           // CONT RAM
 	map(0xe400, 0xe7ff).ram().share(m_spriteram);                           // CONT RAM
-	map(0xe800, 0xe800).mirror(0x07fc).portr("IN0");                  // INPUT
+	map(0xe800, 0xe800).mirror(0x07fc).r(FUNC(buckrog_state::port_0_r));    // INPUT
 	map(0xe801, 0xe801).mirror(0x07fc).portr("IN1");
 	map(0xe802, 0xe802).mirror(0x07fc).r(FUNC(buckrog_state::port_2_r));
 	map(0xe803, 0xe803).mirror(0x07fc).r(FUNC(buckrog_state::port_3_r));
@@ -648,10 +665,10 @@ void buckrog_state::sub_portmap(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( turbo )
-	PORT_START("INPUT") // IN0
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )                // ACCEL B
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )                // ACCEL A
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE    // SHIFT
+	PORT_START("IN0") // IN0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )                // ACCEL A
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM )                // ACCEL B
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Shift") PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -723,8 +740,11 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, "Cockpit")
 
-	PORT_START("DIAL")  // IN0
+	PORT_START("DIAL")
 	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(30)
+
+	PORT_START("PEDAL")
+	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
 	// this is actually a variable resistor
 	PORT_START("VR1")
@@ -807,9 +827,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( buckrog )
 	PORT_START("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Accel Hi
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Accel Lo
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )  PORT_CONDITION("DSW2", 0x80, EQUALS, 0x00) // cockpit
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )  PORT_CONDITION("DSW2", 0x80, EQUALS, 0x80) // upright
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00) // pedal
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
@@ -870,9 +892,12 @@ static INPUT_PORTS_START( buckrog )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x60, "6" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, "Cockpit" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, "Cockpit" )
+
+	PORT_START("PEDAL")
+	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
 INPUT_PORTS_END
 
 
