@@ -5,6 +5,7 @@
 #include "ataristb.h"
 #include "atarist_v.h"
 #include "stkbd.h"
+#include "stmmu.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
@@ -93,21 +94,6 @@ namespace {
 #define Y200    XTAL(2'457'600)
 #define Y700    XTAL(10'000'000)
 
-#define DMA_STATUS_DRQ              0x04
-#define DMA_STATUS_SECTOR_COUNT     0x02
-#define DMA_STATUS_ERROR            0x01
-
-#define DMA_MODE_READ_WRITE         0x100
-#define DMA_MODE_FDC_HDC_ACK        0x080
-#define DMA_MODE_ENABLED            0x040
-#define DMA_MODE_SECTOR_COUNT       0x010
-#define DMA_MODE_FDC_HDC_CS         0x008
-#define DMA_MODE_A1                 0x004
-#define DMA_MODE_A0                 0x002
-#define DMA_MODE_ADDRESS_MASK       0x006
-
-#define DMA_SECTOR_SIZE             512
-
 static const double DMASOUND_RATE[] = { Y2/640.0/8.0, Y2/640.0/4.0, Y2/640.0/2.0, Y2/640.0 };
 
 class st_state : public driver_device
@@ -116,7 +102,9 @@ public:
 	st_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
+			m_mainram(*this, "mainram", 0x400000, ENDIANNESS_BIG),
 			m_ikbd(*this, "ikbd"),
+			m_mmu(*this, "mmu"),
 			m_stb(*this, "stb"),
 			m_fdc(*this, WD1772_TAG),
 			m_floppy(*this, WD1772_TAG ":%u", 0U),
@@ -124,7 +112,7 @@ public:
 			m_acia(*this, {MC6850_0_TAG, MC6850_1_TAG}),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_cart(*this, "cartslot"),
-			m_ram(*this, RAM_TAG),
+			m_ramcfg(*this, RAM_TAG),
 			m_rs232(*this, RS232_TAG),
 			m_ymsnd(*this, YM2149_TAG),
 			m_config(*this, "config"),
@@ -139,7 +127,9 @@ public:
 
 protected:
 	required_device<m68000_device> m_maincpu;
+	memory_share_creator<u16> m_mainram;
 	required_device<st_kbd_device> m_ikbd;
+	required_device<st_mmu_device> m_mmu;
 	optional_device<st_blitter_device> m_stb;
 	required_device<wd1772_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -147,54 +137,16 @@ protected:
 	required_device_array<acia6850_device, 2> m_acia;
 	required_device<centronics_device> m_centronics;
 	required_device<generic_slot_device> m_cart;
-	required_device<ram_device> m_ram;
+	required_device<ram_device> m_ramcfg;
 	required_device<rs232_port_device> m_rs232;
 	required_device<ym2149_device> m_ymsnd;
 	optional_ioport m_config;
 
 	TIMER_CALLBACK_MEMBER(mouse_tick);
 
-	// driver
-	uint16_t fdc_data_r(offs_t offset);
-	void fdc_data_w(offs_t offset, uint16_t data);
-	uint16_t dma_status_r();
-	void dma_mode_w(uint16_t data);
-	uint8_t dma_counter_r(offs_t offset);
-	void dma_base_w(offs_t offset, uint8_t data);
-	uint8_t mmu_r();
-	void mmu_w(uint8_t data);
-
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-
 	void psg_pa_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
-
-	void toggle_dma_fifo();
-	void flush_dma_fifo();
-	void fill_dma_fifo();
-	void fdc_dma_transfer();
-
-	void configure_memory();
-	void state_save();
-
-	/* memory state */
-	uint8_t m_mmu = 0U;
-
-	/* floppy state */
-	uint32_t m_dma_base = 0U;
-	uint16_t m_dma_error = 0U;
-	uint16_t m_fdc_mode = 0U;
-	uint8_t m_fdc_sectors = 0U;
-	uint16_t m_fdc_fifo[2][8]{};
-	int m_fdc_fifo_sel = 0;
-	int m_fdc_fifo_index = 0;
-	int m_fdc_fifo_msb = 0;
-	int m_fdc_fifo_empty[2]{};
-	int m_fdc_dmabytes = 0;
-
-	/* timers */
-	emu_timer *m_mouse_timer = nullptr;
 
 	static void floppy_formats(format_registration &fr);
 
@@ -204,8 +156,9 @@ protected:
 
 	void common(machine_config &config);
 	void cpu_space_map(address_map &map);
-	void st_map(address_map &map);
-	void megast_map(address_map &map);
+	void st_super_map(address_map &map);
+	void st_user_map(address_map &map);
+	void megast_super_map(address_map &map);
 
 	uint16_t fpu_r();
 	void fpu_w(uint16_t data);
@@ -280,7 +233,7 @@ public:
 	void tt030(machine_config &config);
 	void falcon(machine_config &config);
 	void ste(machine_config &config);
-	void ste_map(address_map &map);
+	void ste_super_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 };
@@ -297,7 +250,7 @@ public:
 
 	uint16_t m_cache = 0;
 	void megaste(machine_config &config);
-	void megaste_map(address_map &map);
+	void megaste_super_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -323,365 +276,6 @@ protected:
 	virtual void machine_start() override;
 };
 
-
-//**************************************************************************
-//  FLOPPY
-//**************************************************************************
-
-//-------------------------------------------------
-//  toggle_dma_fifo -
-//-------------------------------------------------
-
-void st_state::toggle_dma_fifo()
-{
-	if (LOG) logerror("Toggling DMA FIFO\n");
-
-	m_fdc_fifo_sel = !m_fdc_fifo_sel;
-	m_fdc_fifo_index = 0;
-}
-
-
-//-------------------------------------------------
-//  flush_dma_fifo -
-//-------------------------------------------------
-
-void st_state::flush_dma_fifo()
-{
-	if (m_fdc_fifo_empty[m_fdc_fifo_sel]) return;
-
-	if (m_fdc_dmabytes)
-	{
-		address_space &program = m_maincpu->space(AS_PROGRAM);
-		for (int i = 0; i < 8; i++)
-		{
-			uint16_t data = m_fdc_fifo[m_fdc_fifo_sel][i];
-
-			if (LOG) logerror("Flushing DMA FIFO %u data %04x to address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
-
-			if (m_dma_base >= 8)
-				program.write_word(m_dma_base, data);
-			m_dma_base += 2;
-		}
-		m_fdc_dmabytes -= 16;
-		if (!m_fdc_dmabytes)
-		{
-			m_fdc_sectors--;
-
-			if (m_fdc_sectors)
-				m_fdc_dmabytes = DMA_SECTOR_SIZE;
-		}
-	}
-	else
-		m_dma_error = 0;
-
-	m_fdc_fifo_empty[m_fdc_fifo_sel] = 1;
-}
-
-
-//-------------------------------------------------
-//  fill_dma_fifo -
-//-------------------------------------------------
-
-void st_state::fill_dma_fifo()
-{
-	if (m_fdc_dmabytes)
-	{
-		address_space &program = m_maincpu->space(AS_PROGRAM);
-		for (int i = 0; i < 8; i++)
-		{
-			uint16_t data = program.read_word(m_dma_base);
-
-			if (LOG) logerror("Filling DMA FIFO %u with data %04x from memory address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
-
-			m_fdc_fifo[m_fdc_fifo_sel][i] = data;
-			m_dma_base += 2;
-		}
-		m_fdc_dmabytes -= 16;
-		if (!m_fdc_dmabytes)
-		{
-			m_fdc_sectors--;
-
-			if (m_fdc_sectors)
-				m_fdc_dmabytes = DMA_SECTOR_SIZE;
-		}
-	}
-	else
-		m_dma_error = 0;
-
-	m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
-}
-
-
-//-------------------------------------------------
-//  fdc_dma_transfer -
-//-------------------------------------------------
-
-void st_state::fdc_dma_transfer()
-{
-	if (m_fdc_mode & DMA_MODE_READ_WRITE)
-	{
-		uint16_t data = m_fdc_fifo[m_fdc_fifo_sel][m_fdc_fifo_index];
-
-		if (m_fdc_fifo_msb)
-		{
-			// write LSB to disk
-			m_fdc->data_w(data & 0xff);
-
-			if (LOG) logerror("DMA Write to FDC %02x\n", data & 0xff);
-
-			m_fdc_fifo_index++;
-		}
-		else
-		{
-			// write MSB to disk
-			m_fdc->data_w(data >> 8);
-
-			if (LOG) logerror("DMA Write to FDC %02x\n", data >> 8);
-		}
-
-		// toggle MSB/LSB
-		m_fdc_fifo_msb = !m_fdc_fifo_msb;
-
-		if (m_fdc_fifo_index == 8)
-		{
-			m_fdc_fifo_index--;
-			m_fdc_fifo_empty[m_fdc_fifo_sel] = 1;
-
-			toggle_dma_fifo();
-
-			if (m_fdc_fifo_empty[m_fdc_fifo_sel])
-			{
-				fill_dma_fifo();
-			}
-		}
-	}
-	else
-	{
-		// read from controller to FIFO
-		uint8_t data = m_fdc->data_r();
-
-		m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
-
-		if (LOG) logerror("DMA Read from FDC %02x\n", data);
-
-		if (m_fdc_fifo_msb)
-		{
-			// write MSB to FIFO
-			m_fdc_fifo[m_fdc_fifo_sel][m_fdc_fifo_index] |= data;
-			m_fdc_fifo_index++;
-		}
-		else
-		{
-			// write LSB to FIFO
-			m_fdc_fifo[m_fdc_fifo_sel][m_fdc_fifo_index] = data << 8;
-		}
-
-		// toggle MSB/LSB
-		m_fdc_fifo_msb = !m_fdc_fifo_msb;
-
-		if (m_fdc_fifo_index == 8)
-		{
-			flush_dma_fifo();
-			toggle_dma_fifo();
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  fdc_data_r -
-//-------------------------------------------------
-
-uint16_t st_state::fdc_data_r(offs_t offset)
-{
-	uint8_t data = 0;
-
-	if (m_fdc_mode & DMA_MODE_SECTOR_COUNT)
-	{
-		if (LOG) logerror("Indeterminate DMA Sector Count Read!\n");
-
-		// sector count register is write only, reading it returns unpredictable values
-		data = machine().rand() & 0xff;
-	}
-	else
-	{
-		if (!(m_fdc_mode & DMA_MODE_FDC_HDC_CS))
-		{
-			// floppy controller
-			offs_t offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
-
-			data = m_fdc->read(offset);
-
-			if (LOG) logerror("FDC Register %u Read %02x\n", offset, data);
-		}
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  fdc_data_w -
-//-------------------------------------------------
-
-void st_state::fdc_data_w(offs_t offset, uint16_t data)
-{
-	if (m_fdc_mode & DMA_MODE_SECTOR_COUNT)
-	{
-		if (LOG) logerror("DMA Sector Count %u\n", data);
-
-		// sector count register
-		m_fdc_sectors = data;
-
-		if (m_fdc_sectors)
-		{
-			m_fdc_dmabytes = DMA_SECTOR_SIZE;
-		}
-
-		if (m_fdc_mode & DMA_MODE_READ_WRITE)
-		{
-			// fill both FIFOs with data
-			fill_dma_fifo();
-			toggle_dma_fifo();
-			fill_dma_fifo();
-			toggle_dma_fifo();
-		}
-	}
-	else
-	{
-		if (!(m_fdc_mode & DMA_MODE_FDC_HDC_CS))
-		{
-			// floppy controller
-			offs_t offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
-
-			if (LOG) logerror("FDC Register %u Write %02x\n", offset, data);
-
-			m_fdc->write(offset, data);
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  dma_status_r -
-//-------------------------------------------------
-
-uint16_t st_state::dma_status_r()
-{
-	uint16_t data = 0;
-
-	// DMA error
-	data |= m_dma_error;
-
-	// sector count null
-	data |= !(m_fdc_sectors == 0) << 1;
-
-	// DRQ state
-	data |= m_fdc->drq_r() << 2;
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  dma_mode_w -
-//-------------------------------------------------
-
-void st_state::dma_mode_w(uint16_t data)
-{
-	if (LOG) logerror("DMA Mode %04x\n", data);
-
-	if ((data & DMA_MODE_READ_WRITE) != (m_fdc_mode & DMA_MODE_READ_WRITE))
-	{
-		if (LOG) logerror("DMA reset\n");
-
-		m_dma_error = 1;
-		m_fdc_sectors = 0;
-		m_fdc_fifo_sel = 0;
-		m_fdc_fifo_msb = 0;
-		m_fdc_fifo_index = 0;
-	}
-
-	m_fdc_mode = data;
-}
-
-
-//-------------------------------------------------
-//  dma_counter_r -
-//-------------------------------------------------
-
-uint8_t st_state::dma_counter_r(offs_t offset)
-{
-	uint8_t data = 0;
-
-	switch (offset)
-	{
-	case 0:
-		data = (m_dma_base >> 16) & 0xff;
-		break;
-	case 1:
-		data = (m_dma_base >> 8) & 0xff;
-		break;
-	case 2:
-		data = m_dma_base & 0xff;
-		break;
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  dma_base_w -
-//-------------------------------------------------
-
-void st_state::dma_base_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-	case 0:
-		m_dma_base = (m_dma_base & 0x00ffff) | (data << 16);
-		if (LOG) logerror("DMA Address High %02x (%06x)\n", data & 0xff, m_dma_base);
-		break;
-
-	case 1:
-		m_dma_base = (m_dma_base & 0xff00ff) | (data << 8);
-		if (LOG) logerror("DMA Address Mid %02x (%06x)\n", data & 0xff, m_dma_base);
-		break;
-
-	case 2:
-		m_dma_base = (m_dma_base & 0xffff00) | data;
-		if (LOG) logerror("DMA Address Low %02x (%06x)\n", data & 0xff, m_dma_base);
-		break;
-	}
-}
-
-
-
-//**************************************************************************
-//  MMU
-//**************************************************************************
-
-//-------------------------------------------------
-//  mmu_r -
-//-------------------------------------------------
-
-uint8_t st_state::mmu_r()
-{
-	return m_mmu;
-}
-
-
-//-------------------------------------------------
-//  mmu_w -
-//-------------------------------------------------
-
-void st_state::mmu_w(uint8_t data)
-{
-	if (LOG) logerror("Memory Configuration Register: %02x\n", data);
-
-	m_mmu = data;
-}
 
 //**************************************************************************
 //  FPU
@@ -762,11 +356,9 @@ TIMER_CALLBACK_MEMBER(ste_state::dmasound_tick)
 {
 	if (m_dmasnd_samples == 0)
 	{
-		uint8_t *RAM = m_ram->pointer();
-
 		for (auto & elem : m_dmasnd_fifo)
 		{
-			elem = RAM[m_dmasnd_cntr];
+			elem = m_mainram[m_dmasnd_cntr];
 			m_dmasnd_cntr++;
 			m_dmasnd_samples++;
 
@@ -1198,30 +790,40 @@ void st_state::cpu_space_map(address_map &map)
 //  ADDRESS_MAP( st_map )
 //-------------------------------------------------
 
-void st_state::st_map(address_map &map)
+void st_state::st_super_map(address_map &map)
 {
+	// Ram mapped by the mmu
 	map.unmap_value_high();
 	map(0x000000, 0x000007).rom().region(M68000_TAG, 0).w(m_maincpu, FUNC(m68000_device::berr_w));
-	map(0x000008, 0x1fffff).ram();
-	map(0x200000, 0x3fffff).ram();
 	map(0x400000, 0xf9ffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(m_maincpu, FUNC(m68000_device::berr_w));
-	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
+	map(0xff8000, 0xff8fff).m(m_mmu, FUNC(st_mmu_device::map));
+
 	map(0xff8200, 0xff8203).rw(m_video, FUNC(st_video_device::shifter_base_r), FUNC(st_video_device::shifter_base_w)).umask16(0x00ff);
 	map(0xff8204, 0xff8209).r(m_video, FUNC(st_video_device::shifter_counter_r)).umask16(0x00ff);
 	map(0xff820a, 0xff820a).rw(m_video, FUNC(st_video_device::shifter_sync_r), FUNC(st_video_device::shifter_sync_w));
 	map(0xff8240, 0xff825f).rw(m_video, FUNC(st_video_device::shifter_palette_r), FUNC(st_video_device::shifter_palette_w));
 	map(0xff8260, 0xff8260).rw(m_video, FUNC(st_video_device::shifter_mode_r), FUNC(st_video_device::shifter_mode_w));
-	map(0xff8604, 0xff8605).rw(FUNC(st_state::fdc_data_r), FUNC(st_state::fdc_data_w));
-	map(0xff8606, 0xff8607).rw(FUNC(st_state::dma_status_r), FUNC(st_state::dma_mode_w));
-	map(0xff8608, 0xff860d).rw(FUNC(st_state::dma_counter_r), FUNC(st_state::dma_base_w)).umask16(0x00ff);
+
 	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0xfc);
 	map(0xff8802, 0xff8802).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xfc);
+
 	// no blitter on original ST
+
 	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xfffc00, 0xfffc03).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0xfffc04, 0xfffc07).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+}
+
+void st_state::st_user_map(address_map &map)
+{
+	// Ram mapped by the mmu
+	map.unmap_value_high();
+	map(0x000000, 0x0007ff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0x400000, 0xfbffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(m_maincpu, FUNC(m68000_device::berr_w));
+	map(0xff0000, 0xffffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 }
 
 
@@ -1229,24 +831,20 @@ void st_state::st_map(address_map &map)
 //  ADDRESS_MAP( megast_map )
 //-------------------------------------------------
 
-void st_state::megast_map(address_map &map)
+void st_state::megast_super_map(address_map &map)
 {
 	map.unmap_value_high();
+	map(0x000000, 0x3fffff).ram().share(m_mainram);
 	map(0x000000, 0x000007).rom().region(M68000_TAG, 0);
-	map(0x000008, 0x1fffff).ram();
-	map(0x200000, 0x3fffff).ram();
 	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
 //  map(0xff7f30, 0xff7f31).rw(m_stb, FUNC(st_blitter_device::dst_inc_y_r), FUNC(st_blitter_device::dst_inc_y_w) // for TOS 1.02
-	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
+	map(0xff8000, 0xff8fff).m(m_mmu, FUNC(st_mmu_device::map));
 	map(0xff8200, 0xff8203).rw(m_video, FUNC(st_video_device::shifter_base_r), FUNC(st_video_device::shifter_base_w)).umask16(0x00ff);
 	map(0xff8204, 0xff8209).r(m_video, FUNC(st_video_device::shifter_counter_r)).umask16(0x00ff);
 	map(0xff820a, 0xff820a).rw(m_video, FUNC(st_video_device::shifter_sync_r), FUNC(st_video_device::shifter_sync_w));
 	map(0xff8240, 0xff825f).rw(m_video, FUNC(st_video_device::shifter_palette_r), FUNC(st_video_device::shifter_palette_w));
 	map(0xff8260, 0xff8260).rw(m_video, FUNC(st_video_device::shifter_mode_r), FUNC(st_video_device::shifter_mode_w));
-	map(0xff8604, 0xff8605).rw(FUNC(st_state::fdc_data_r), FUNC(st_state::fdc_data_w));
-	map(0xff8606, 0xff8607).rw(FUNC(st_state::dma_status_r), FUNC(st_state::dma_mode_w));
-	map(0xff8608, 0xff860d).rw(FUNC(st_state::dma_counter_r), FUNC(st_state::dma_base_w)).umask16(0x00ff);
 	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xff8802, 0xff8802).w(YM2149_TAG, FUNC(ay8910_device::data_w));
 	map(0xff8a00, 0xff8a1f).rw(m_stb, FUNC(st_blitter_device::halftone_r), FUNC(st_blitter_device::halftone_w));
@@ -1273,9 +871,9 @@ void st_state::megast_map(address_map &map)
 //  ADDRESS_MAP( ste_map )
 //-------------------------------------------------
 
-void ste_state::ste_map(address_map &map)
+void ste_state::ste_super_map(address_map &map)
 {
-	st_map(map);
+	st_super_map(map);
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
 	map(0xff8901, 0xff8901).rw(FUNC(ste_state::sound_dma_control_r), FUNC(ste_state::sound_dma_control_w));
 	map(0xff8902, 0xff8907).rw(FUNC(ste_state::sound_dma_base_r), FUNC(ste_state::sound_dma_base_w)).umask16(0x00ff);
@@ -1311,9 +909,9 @@ void ste_state::ste_map(address_map &map)
 //  ADDRESS_MAP( megaste_map )
 //-------------------------------------------------
 
-void megaste_state::megaste_map(address_map &map)
+void megaste_state::megaste_super_map(address_map &map)
 {
-	megast_map(map);
+	megast_super_map(map);
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
 	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w)).umask16(0x00ff);
 	map(0xff8901, 0xff8901).rw(FUNC(megaste_state::sound_dma_control_r), FUNC(megaste_state::sound_dma_control_w));
@@ -1332,8 +930,7 @@ void megaste_state::megaste_map(address_map &map)
 #if 0
 void stbook_state::stbook_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).ram();
-	map(0x200000, 0x3fffff).ram();
+	map(0x000000, 0x3fffff).ram().share(m_mainram);
 //  map(0xd40000, 0xd7ffff).rom();
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
 //  map(0xe80000, 0xebffff).rom();
@@ -1586,60 +1183,9 @@ void stbook_state::psg_pa_w(uint8_t data)
 	m_fdc->dden_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( st_state::fdc_drq_w )
-{
-	if (state && (!(m_fdc_mode & DMA_MODE_ENABLED)) && (m_fdc_mode & DMA_MODE_FDC_HDC_ACK))
-		fdc_dma_transfer();
-}
-
-
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  configure_memory -
-//-------------------------------------------------
-
-void st_state::configure_memory()
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	switch (m_ram->size())
-	{
-	case 256 * 1024:
-		program.unmap_readwrite(0x040000, 0x3fffff);
-		break;
-
-	case 512 * 1024:
-		program.unmap_readwrite(0x080000, 0x3fffff);
-		break;
-
-	case 1024 * 1024:
-		program.unmap_readwrite(0x100000, 0x3fffff);
-		break;
-
-	case 2048 * 1024:
-		program.unmap_readwrite(0x200000, 0x3fffff);
-		break;
-	}
-}
-
-//-------------------------------------------------
-//  state_save -
-//-------------------------------------------------
-
-void st_state::state_save()
-{
-	m_dma_error = 1;
-
-	save_item(NAME(m_mmu));
-	save_item(NAME(m_dma_base));
-	save_item(NAME(m_dma_error));
-	save_item(NAME(m_fdc_mode));
-	save_item(NAME(m_fdc_sectors));
-	save_item(NAME(m_fdc_dmabytes));
-}
 
 //-------------------------------------------------
 //  MACHINE_START( st )
@@ -1647,14 +1193,10 @@ void st_state::state_save()
 
 void st_state::machine_start()
 {
-	// configure RAM banking
-	configure_memory();
+	m_mmu->set_ram_size(m_ramcfg->size());
 
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-
-	// register for state saving
-	state_save();
 
 	/// TODO: get callbacks to trigger these.
 	m_mfp->i0_w(1);
@@ -1670,8 +1212,6 @@ void st_state::machine_start()
 
 void ste_state::state_save()
 {
-	st_state::state_save();
-
 	save_item(NAME(m_dmasnd_base));
 	save_item(NAME(m_dmasnd_end));
 	save_item(NAME(m_dmasnd_cntr));
@@ -1694,8 +1234,7 @@ void ste_state::state_save()
 
 void ste_state::machine_start()
 {
-	/* configure RAM banking */
-	configure_memory();
+	m_mmu->set_ram_size(m_ramcfg->size());
 
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
@@ -1733,10 +1272,10 @@ void megaste_state::machine_start()
 
 void stbook_state::machine_start()
 {
-	/* configure RAM banking */
+	/* configure RAM size */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	switch (m_ram->size())
+	switch (m_ramcfg->size())
 	{
 	case 1024 * 1024:
 		program.unmap_readwrite(0x100000, 0x3fffff);
@@ -1780,7 +1319,13 @@ void st_state::common(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, Y2/4);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &st_state::cpu_space_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_USER_PROGRAM, &st_state::st_user_map);
 	m_maincpu->reset_cb().set(FUNC(st_state::reset_w));
+
+	ST_MMU(config, m_mmu);
+	m_mmu->set_ram(m_mainram);
+	m_mmu->set_cpu(m_maincpu);
+	m_mmu->set_fdc(m_fdc);
 
 	// sound
 	YM2149(config, m_ymsnd, Y2/16);
@@ -1792,7 +1337,7 @@ void st_state::common(machine_config &config)
 	// devices
 	WD1772(config, m_fdc, Y2/4);
 	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
-	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
+	m_fdc->drq_wr_callback().set(m_mmu, FUNC(st_mmu_device::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, WD1772_TAG ":0", atari_floppies, "35dd",  st_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, WD1772_TAG ":1", atari_floppies, nullptr, st_state::floppy_formats);
 
@@ -1861,7 +1406,7 @@ void st_state::st(machine_config &config)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &st_state::st_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &st_state::st_super_map);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1878,9 +1423,9 @@ void st_state::st(machine_config &config)
 	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// internal ram
-	RAM(config, m_ram);
-	m_ram->set_default_size("1M"); // 1040ST
-	m_ram->set_extra_options("512K,256K"); // 520ST, 260ST
+	RAM(config, m_ramcfg);
+	m_ramcfg->set_default_size("1M"); // 1040ST
+	m_ramcfg->set_extra_options("512K,256K"); // 520ST, 260ST
 }
 
 
@@ -1893,7 +1438,7 @@ void megast_state::megast(machine_config &config)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &megast_state::megast_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &megast_state::megast_super_map);
 
 	ST_BLITTER(config, m_stb, Y2/4);
 	m_stb->set_space(m_maincpu, AS_PROGRAM);
@@ -1917,9 +1462,9 @@ void megast_state::megast(machine_config &config)
 	RP5C15(config, RP5C15_TAG, XTAL(32'768));
 
 	// internal ram
-	RAM(config, m_ram);
-	m_ram->set_default_size("4M"); // Mega ST 4
-	m_ram->set_extra_options("2M,1M"); // Mega ST 2, Mega ST 1
+	RAM(config, m_ramcfg);
+	m_ramcfg->set_default_size("4M"); // Mega ST 4
+	m_ramcfg->set_extra_options("2M,1M"); // Mega ST 2, Mega ST 1
 }
 
 
@@ -1932,7 +1477,7 @@ void ste_state::ste(machine_config &config)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &ste_state::ste_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ste_state::ste_super_map);
 
 	ST_BLITTER(config, m_stb, Y2/4);
 	m_stb->set_space(m_maincpu, AS_PROGRAM);
@@ -1961,9 +1506,9 @@ void ste_state::ste(machine_config &config)
 	LMC1992(config, LMC1992_TAG);
 
 	// internal ram
-	RAM(config, m_ram);
-	m_ram->set_default_size("1M"); // 1040STe
-	m_ram->set_extra_options("512K"); // 520STe
+	RAM(config, m_ramcfg);
+	m_ramcfg->set_default_size("1M"); // 1040STe
+	m_ramcfg->set_extra_options("512K"); // 520STe
 }
 
 
@@ -1974,13 +1519,13 @@ void ste_state::ste(machine_config &config)
 void megaste_state::megaste(machine_config &config)
 {
 	ste(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &megaste_state::megaste_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &megaste_state::megaste_super_map);
 	RP5C15(config, RP5C15_TAG, XTAL(32'768));
 	SCC8530(config, Z8530_TAG, Y2/4);
 
 	/* internal ram */
-	m_ram->set_default_size("4M"); // Mega STe 4
-	m_ram->set_extra_options("2M,1M"); // Mega STe 2, Mega STe 1
+	m_ramcfg->set_default_size("4M"); // Mega STe 4
+	m_ramcfg->set_extra_options("2M,1M"); // Mega STe 2, Mega STe 1
 }
 
 
@@ -2081,7 +1626,7 @@ void stbook_state::stbook(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M");
+	RAM(config, m_ramcfg).set_default_size("4M").set_extra_options("1M");
 }
 #endif
 

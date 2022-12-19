@@ -301,7 +301,7 @@ void m68000_device::device_reset()
 
 void m68000_device::update_user_super()
 {
-	if(m_sr & 0x2000) {
+	if(m_sr & SR_S) {
 		m_sp = 16;
 		m_program = m_r_program;
 		m_opcodes = m_r_opcodes;
