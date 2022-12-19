@@ -509,7 +509,9 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						(((~grn >> mx) & 1) << 5) |     //    A5: CDG
 						(((~blu >> mx) & 1) << 6) |     //    A6: CDB
 						((m_fbcol & 6) << 6);           // A7-A8: COL1-2
-				dest[x + ix] = pr1121[offs];
+
+				if (cliprect.contains(x + ix, y))
+					dest[x + ix] = pr1121[offs];
 			}
 		}
 	}
@@ -772,7 +774,9 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				offs = (finalbits & 0x0f) |    // A0-A3: CD0-CD3
 						((mux & 0x08) << 1) |  //    A4: MUX3
 						(m_col << 5);          // A5-A8: COL0-COL3
-				dest[x + ix] = pr1419[offs];
+
+				if (cliprect.contains(x + ix, y))
+					dest[x + ix] = pr1419[offs];
 			}
 		}
 	}
@@ -1000,7 +1004,8 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				}
 
 				// store the final bits for this pixel
-				dest[x + ix] = palbits;
+				if (cliprect.contains(x + ix, y))
+					dest[x + ix] = palbits;
 			}
 		}
 	}

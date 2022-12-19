@@ -110,7 +110,7 @@
     Here is a complete list of the ROMs:
 
     Turbo ROMLIST - Frank Palazzolo
-    Name     Loc             Function
+    Name         Loc    Function
     -----------------------------------------------------------------------------
     Images Acquired:
     EPR1262,3,4  IC76, IC89, IC103
@@ -130,19 +130,19 @@
     EPR1246-1258        Sprite ROMS
     EPR1288-1300
 
-    PR-1114     IC13    Color 1 (road, etc.)
-    PR-1115     IC18    Road gfx
-    PR-1116     IC20    Crash (collision detection?)
-    PR-1117     IC21    Color 2 (road, etc.)
-    PR-1118     IC99    256x4 Character Color PROM
-    PR-1119     IC50    512x8 Vertical Timing PROM
-    PR-1120     IC62    Horizontal Timing PROM
-    PR-1121     IC29    Color PROM
-    PR-1122     IC11    Pattern 1
-    PR-1123     IC21    Pattern 2
+    PR-1114      IC13   Color 1 (road, etc.)
+    PR-1115      IC18   Road gfx
+    PR-1116      IC20   Crash (collision detection?)
+    PR-1117      IC21   Color 2 (road, etc.)
+    PR-1118      IC99   256x4 Character Color PROM
+    PR-1119      IC50   512x8 Vertical Timing PROM
+    PR-1120      IC62   Horizontal Timing PROM
+    PR-1121      IC29   Color PROM
+    PR-1122      IC11   Pattern 1
+    PR-1123      IC21   Pattern 2
 
-    PA-06R      IC22    Mathbox Timing PAL
-    PA-06L      IC90    Address Decode PAL
+    PA-06R       IC22   Mathbox Timing PAL
+    PA-06L       IC90   Address Decode PAL
 
 **************************************************************************/
 
@@ -423,35 +423,26 @@ void turbo_base_state::digit_w(uint8_t data)
 	m_digits[m_i8279_scanlines * 2 + 1] = ls48_map[data >> 4];
 }
 
+
 /*************************************
  *
  *  Shared pedal reading
  *
  *************************************/
 
-uint8_t turbo_base_state::pedal_r()
+CUSTOM_INPUT_MEMBER(turbo_base_state::pedal_r)
 {
-	if (m_pedal)
-	{
-		// inverted 2-bit Gray code from a pair of optos in mechanical pedal
-		uint8_t pedal = m_pedal->read();
-		return (pedal >> 6) ^ (pedal >> 7) ^ 0x03;
-	}
-	else
-		return 0xff;
+	// inverted 2-bit Gray code from a pair of optos in mechanical pedal
+	uint8_t pedal = m_pedal->read();
+	return (pedal >> 6) ^ (pedal >> 7) ^ 0x03;
 }
+
 
 /*************************************
  *
  *  Misc Turbo inputs/outputs
  *
  *************************************/
-
-uint8_t turbo_state::port_0_r()
-{
-	return m_in0->read() | pedal_r();
-}
-
 
 uint8_t turbo_state::collision_r()
 {
@@ -509,15 +500,6 @@ uint8_t buckrog_state::subcpu_command_r()
 	// assert ACK
 	m_i8255[0]->pc6_w(CLEAR_LINE);
 	return m_command;
-}
-
-
-uint8_t buckrog_state::port_0_r()
-{
-	if (m_dsw[1]->read() & 0x02)   // upright w/ buttons
-		return m_in0->read();
-	else                           // cocktail w/ pedal
-		return (m_in0->read() & ~0x30) | pedal_r() << 4;
 }
 
 
@@ -583,7 +565,7 @@ void turbo_state::prg_map(address_map &map)
 	map(0xfa00, 0xfa03).mirror(0x00fc).rw(m_i8255[2], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfb00, 0xfb03).mirror(0x00fc).rw(m_i8255[3], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfc00, 0xfc01).mirror(0x00fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xfd00, 0xfdff).r(FUNC(turbo_state::port_0_r));
+	map(0xfd00, 0xfdff).portr("IN0");
 	map(0xfe00, 0xfeff).r(FUNC(turbo_state::collision_r));
 }
 
@@ -598,15 +580,15 @@ void turbo_state::prg_map(address_map &map)
 void subroc3d_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
-	map(0xa000, 0xa3ff).ram().share(m_sprite_position);                           // CONT RAM
-	map(0xa400, 0xa7ff).ram().share(m_spriteram);                           // CONT RAM
+	map(0xa000, 0xa3ff).ram().share(m_sprite_position);               // CONT RAM
+	map(0xa400, 0xa7ff).ram().share(m_spriteram);                     // CONT RAM
 	map(0xa800, 0xa800).mirror(0x07fc).portr("IN0");                  // INPUT 253
 	map(0xa801, 0xa801).mirror(0x07fc).portr("IN1");                  // INPUT 253
 	map(0xa802, 0xa802).mirror(0x07fc).portr("DSW2");                 // INPUT 253
 	map(0xa803, 0xa803).mirror(0x07fc).portr("DSW3");                 // INPUT 253
-	map(0xb000, 0xb7ff).ram();                                                 // SCRATCH
-	map(0xb800, 0xbfff);                                                        // HANDLE CL
-	map(0xe000, 0xe7ff).ram().w(FUNC(subroc3d_state::videoram_w)).share(m_videoram);    // FIX PAGE
+	map(0xb000, 0xb7ff).ram();                                        // SCRATCH
+	map(0xb800, 0xbfff);                                              // HANDLE CL
+	map(0xe000, 0xe7ff).ram().w(FUNC(subroc3d_state::videoram_w)).share(m_videoram); // FIX PAGE
 	map(0xe800, 0xe803).mirror(0x07fc).rw(m_i8255[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf000, 0xf003).mirror(0x07fc).rw(m_i8255[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf800, 0xf801).mirror(0x07fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
@@ -623,18 +605,18 @@ void subroc3d_state::prg_map(address_map &map)
 void buckrog_state::main_prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(FUNC(buckrog_state::videoram_w)).share(m_videoram);    // FIX PAGE
-	map(0xc800, 0xc803).mirror(0x07fc).r(m_i8255[0], FUNC(i8255_device::read)).w(FUNC(buckrog_state::i8255_0_w));    // 8255
-	map(0xd000, 0xd003).mirror(0x07fc).rw(m_i8255[1], FUNC(i8255_device::read), FUNC(i8255_device::write));            // 8255
+	map(0xc000, 0xc7ff).ram().w(FUNC(buckrog_state::videoram_w)).share(m_videoram); // FIX PAGE
+	map(0xc800, 0xc803).mirror(0x07fc).r(m_i8255[0], FUNC(i8255_device::read)).w(FUNC(buckrog_state::i8255_0_w));
+	map(0xd000, 0xd003).mirror(0x07fc).rw(m_i8255[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xd800, 0xd801).mirror(0x07fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xe000, 0xe3ff).ram().share(m_sprite_position);                           // CONT RAM
+	map(0xe000, 0xe3ff).ram().share(m_sprite_position);                     // CONT RAM
 	map(0xe400, 0xe7ff).ram().share(m_spriteram);                           // CONT RAM
-	map(0xe800, 0xe800).mirror(0x07fc).r(FUNC(buckrog_state::port_0_r));    // INPUT
+	map(0xe800, 0xe800).mirror(0x07fc).portr("IN0");                        // INPUT
 	map(0xe801, 0xe801).mirror(0x07fc).portr("IN1");
 	map(0xe802, 0xe802).mirror(0x07fc).r(FUNC(buckrog_state::port_2_r));
 	map(0xe803, 0xe803).mirror(0x07fc).r(FUNC(buckrog_state::port_3_r));
 	map(0xf000, 0xf000);
-	map(0xf800, 0xffff).ram();                                                 // SCRATCH
+	map(0xf800, 0xffff).ram();                                              // SCRATCH
 }
 
 void buckrog_state::decrypted_opcodes_map(address_map &map)
@@ -666,8 +648,7 @@ void buckrog_state::sub_portmap(address_map &map)
 
 static INPUT_PORTS_START( turbo )
 	PORT_START("IN0") // IN0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )                // ACCEL A
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM )                // ACCEL B
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(turbo_base_state, pedal_r)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Shift") PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
@@ -829,9 +810,9 @@ static INPUT_PORTS_START( buckrog )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )  PORT_CONDITION("DSW2", 0x80, EQUALS, 0x00) // cockpit
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )  PORT_CONDITION("DSW2", 0x80, EQUALS, 0x80) // upright
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00) // pedal
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00) PORT_CUSTOM_MEMBER(turbo_base_state, pedal_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02) // speed up
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02) // speed down
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
@@ -1829,10 +1810,12 @@ void turbo_state::rom_decode()
 		// 0x0800-0xbff
 		// 0x4000-0x43ff
 		// 0x4800-0x4bff
-		{ 0x00,0x44,0x0c,0x48,0x00,0x44,0x0c,0x48,
+		{
+			0x00,0x44,0x0c,0x48,0x00,0x44,0x0c,0x48,
 			0xa0,0xe4,0xac,0xe8,0xa0,0xe4,0xac,0xe8,
 			0x60,0x24,0x6c,0x28,0x60,0x24,0x6c,0x28,
-			0xc0,0x84,0xcc,0x88,0xc0,0x84,0xcc,0x88 },
+			0xc0,0x84,0xcc,0x88,0xc0,0x84,0xcc,0x88
+		},
 
 		// Table 1 */
 		// 0x0400-0x07ff
@@ -1847,30 +1830,36 @@ void turbo_state::rom_decode()
 		// 0x4c00-0x4fff
 		// 0x5400-0x57ff
 		// 0x5c00-0x5fff
-		{ 0x00,0x44,0x18,0x5c,0x14,0x50,0x0c,0x48,
+		{
+			0x00,0x44,0x18,0x5c,0x14,0x50,0x0c,0x48,
 			0x28,0x6c,0x30,0x74,0x3c,0x78,0x24,0x60,
 			0x60,0x24,0x78,0x3c,0x74,0x30,0x6c,0x28,
-			0x48,0x0c,0x50,0x14,0x5c,0x18,0x44,0x00 }, //0x00 --> 0x10 ?
+			0x48,0x0c,0x50,0x14,0x5c,0x18,0x44,0x00 //0x00 --> 0x10 ?
+		},
 
 		// Table 2 */
 		// 0x1000-0x13ff
 		// 0x1800-0x1bff
 		// 0x5000-0x53ff
 		// 0x5800-0x5bff
-		{ 0x00,0x00,0x28,0x28,0x90,0x90,0xb8,0xb8,
+		{
+			0x00,0x00,0x28,0x28,0x90,0x90,0xb8,0xb8,
 			0x28,0x28,0x00,0x00,0xb8,0xb8,0x90,0x90,
 			0x00,0x00,0x28,0x28,0x90,0x90,0xb8,0xb8,
-			0x28,0x28,0x00,0x00,0xb8,0xb8,0x90,0x90 },
+			0x28,0x28,0x00,0x00,0xb8,0xb8,0x90,0x90
+		},
 
 		// Table 3 */
 		// 0x2000-0x23ff
 		// 0x2800-0x2bff
 		// 0x3000-0x33ff
 		// 0x3800-0x3bff
-		{ 0x00,0x14,0x88,0x9c,0x30,0x24,0xb8,0xac,
+		{
+			0x00,0x14,0x88,0x9c,0x30,0x24,0xb8,0xac,
 			0x24,0x30,0xac,0xb8,0x14,0x00,0x9c,0x88,
 			0x48,0x5c,0xc0,0xd4,0x78,0x6c,0xf0,0xe4,
-			0x6c,0x78,0xe4,0xf0,0x5c,0x48,0xd4,0xc0 }
+			0x6c,0x78,0xe4,0xf0,0x5c,0x48,0xd4,0xc0
+		}
 	};
 
 	static const int findtable[]=

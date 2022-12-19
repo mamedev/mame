@@ -23,7 +23,6 @@
 #define TURBO_X_SCALE       2
 
 
-
 class turbo_base_state : public driver_device
 {
 public:
@@ -39,11 +38,12 @@ public:
 		, m_discrete(*this, "discrete")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
-		, m_in0(*this, "IN0")
 		, m_pedal(*this, "PEDAL")
 		, m_digits(*this, "digit%u", 0U)
 		, m_lamp(*this, "lamp")
 	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(pedal_r);
 
 protected:
 	virtual void machine_start() override;
@@ -65,35 +65,32 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 
-	required_ioport m_in0;
 	optional_ioport m_pedal;
-
 	output_finder<32> m_digits;
 	output_finder<> m_lamp;
 
 	// machine state
-	uint8_t       m_i8279_scanlines = 0;
+	uint8_t m_i8279_scanlines = 0;
 
 	// sound state
-	uint8_t       m_sound_state[3]{};
+	uint8_t m_sound_state[3]{};
 
 	// video state
-	tilemap_t * m_fg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	struct sprite_info
 	{
-		uint16_t  ve = 0;                 // VE0-15 signals for this row
-		uint8_t   lst = 0;                // LST0-7 signals for this row
-		uint32_t  latched[8]{};         // latched pixel data
-		uint8_t   plb[8]{};             // latched PLB state
-		uint32_t  offset[8]{};          // current offset for this row
-		uint32_t  frac[8]{};            // leftover fraction
-		uint32_t  step[8]{};            // stepping value
+		uint16_t ve = 0;        // VE0-15 signals for this row
+		uint8_t lst = 0;        // LST0-7 signals for this row
+		uint32_t latched[8]{};  // latched pixel data
+		uint8_t plb[8]{};       // latched PLB state
+		uint32_t offset[8]{};   // current offset for this row
+		uint32_t frac[8]{};     // leftover fraction
+		uint32_t step[8]{};     // stepping value
 	};
 
 	sprite_info m_sprite_info;
 
-	uint8_t pedal_r();
 	void scanlines_w(uint8_t data);
 	void digit_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
@@ -131,15 +128,14 @@ private:
 	required_region_ptr<uint8_t> m_bgcolorrom;
 	required_ioport_array<2> m_dsw;
 
-	uint8_t       m_fchg;
-	uint8_t       m_mov;
-	uint8_t       m_obch;
-	uint8_t       m_command;
-	uint8_t       m_myship;
-	uint8_t       m_last_sound_a;
+	uint8_t m_fchg;
+	uint8_t m_mov;
+	uint8_t m_obch;
+	uint8_t m_command;
+	uint8_t m_myship;
+	uint8_t m_last_sound_a;
 
 	uint8_t subcpu_command_r();
-	uint8_t port_0_r();
 	uint8_t port_2_r();
 	uint8_t port_3_r();
 	void bitmap_w(offs_t offset, uint8_t data);
@@ -180,17 +176,17 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	uint8_t       m_col = 0;
-	uint8_t       m_ply = 0;
-	uint8_t       m_flip = 0;
-	uint8_t       m_mdis = 0;
-	uint8_t       m_mdir = 0;
-	uint8_t       m_tdis = 0;
-	uint8_t       m_tdir = 0;
-	uint8_t       m_fdis = 0;
-	uint8_t       m_fdir = 0;
-	uint8_t       m_hdis = 0;
-	uint8_t       m_hdir = 0;
+	uint8_t m_col = 0;
+	uint8_t m_ply = 0;
+	uint8_t m_flip = 0;
+	uint8_t m_mdis = 0;
+	uint8_t m_mdir = 0;
+	uint8_t m_tdis = 0;
+	uint8_t m_tdir = 0;
+	uint8_t m_fdis = 0;
+	uint8_t m_fdir = 0;
+	uint8_t m_hdis = 0;
+	uint8_t m_hdir = 0;
 
 	void ppi0a_w(uint8_t data);
 	void ppi0b_w(uint8_t data);
@@ -238,19 +234,19 @@ private:
 	output_finder<> m_tachometer;
 	output_finder<> m_speed;
 
-	uint8_t       m_osel;
-	uint8_t       m_bsel;
-	uint8_t       m_opa;
-	uint8_t       m_opb;
-	uint8_t       m_opc;
-	uint8_t       m_ipa;
-	uint8_t       m_ipb;
-	uint8_t       m_ipc;
-	uint8_t       m_fbpla;
-	uint8_t       m_fbcol;
-	uint8_t       m_collision;
-	uint8_t       m_last_analog;
-	uint8_t       m_accel;
+	uint8_t m_osel;
+	uint8_t m_bsel;
+	uint8_t m_opa;
+	uint8_t m_opb;
+	uint8_t m_opc;
+	uint8_t m_ipa;
+	uint8_t m_ipb;
+	uint8_t m_ipc;
+	uint8_t m_fbpla;
+	uint8_t m_fbcol;
+	uint8_t m_collision;
+	uint8_t m_last_analog;
+	uint8_t m_accel;
 
 	uint8_t collision_r();
 	void collision_clear_w(uint8_t data);
@@ -266,7 +262,6 @@ private:
 	void ppi1c_w(uint8_t data);
 	void ppi3c_w(uint8_t data);
 	uint8_t analog_r();
-	uint8_t port_0_r();
 	uint8_t spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint8_t data);
 	void palette(palette_device &palette) const;
