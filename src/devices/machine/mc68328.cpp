@@ -1380,25 +1380,25 @@ void mc68328_base_device::isr_msw_w(offs_t offset, u16 data, u16 mem_mask) // 0x
 {
 	LOGMASKED(LOG_INTS, "%s: isr_msw_w: ISR(MSW) = %04x\n", machine().describe_context(), data);
 	// Clear edge-triggered IRQ1
-	if ((m_icr & ICR_ET1) == ICR_ET1 && (data & INT_IRQ1_MASK) == INT_IRQ1_MASK)
+	if ((m_icr & ICR_ET1) == ICR_ET1 && ((data << 16) INT_IRQ1_MASK) == INT_IRQ1_MASK)
 	{
 		m_isr &= ~INT_IRQ1_MASK;
 	}
 
 	// Clear edge-triggered IRQ2
-	if ((m_icr & ICR_ET2) == ICR_ET2 && (data & INT_IRQ2_MASK) == INT_IRQ2_MASK)
+	if ((m_icr & ICR_ET2) == ICR_ET2 && ((data << 16) & INT_IRQ2_MASK) == INT_IRQ2_MASK)
 	{
 		m_isr &= ~INT_IRQ2_MASK;
 	}
 
 	// Clear edge-triggered IRQ3
-	if ((m_icr & ICR_ET3) == ICR_ET3 && (data & INT_IRQ3_MASK) == INT_IRQ3_MASK)
+	if ((m_icr & ICR_ET3) == ICR_ET3 && ((data << 16) & INT_IRQ3_MASK) == INT_IRQ3_MASK)
 	{
 		m_isr &= ~INT_IRQ3_MASK;
 	}
 
 	// Clear edge-triggered IRQ6
-	if ((m_icr & ICR_ET6) == ICR_ET6 && (data & INT_IRQ6_MASK) == INT_IRQ6_MASK)
+	if ((m_icr & ICR_ET6) == ICR_ET6 && ((data << 16) & INT_IRQ6_MASK) == INT_IRQ6_MASK)
 	{
 		m_isr &= ~INT_IRQ6_MASK;
 	}
