@@ -39,6 +39,8 @@ public:
 		, m_discrete(*this, "discrete")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
+		, m_in0(*this, "IN0")
+		, m_pedal(*this, "PEDAL")
 		, m_digits(*this, "digit%u", 0U)
 		, m_lamp(*this, "lamp")
 	{ }
@@ -62,6 +64,10 @@ protected:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+
+	required_ioport m_in0;
+	optional_ioport m_pedal;
+
 	output_finder<32> m_digits;
 	output_finder<> m_lamp;
 
@@ -87,6 +93,7 @@ protected:
 
 	sprite_info m_sprite_info;
 
+	uint8_t pedal_r();
 	void scanlines_w(uint8_t data);
 	void digit_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
@@ -105,6 +112,7 @@ public:
 		, m_bitmap_ram(*this, "bitmap_ram", 0xe000, ENDIANNESS_LITTLE)
 		, m_bgcolorrom(*this, "bgcolor")
 		, m_dsw(*this, "DSW%u", 1U)
+		, m_config(*this, "CONFIG")
 	{ }
 
 	void buckrog(machine_config &config);
@@ -123,6 +131,7 @@ private:
 	memory_share_creator<uint8_t> m_bitmap_ram;
 	required_region_ptr<uint8_t> m_bgcolorrom;
 	required_ioport_array<2> m_dsw;
+	required_ioport m_config;
 
 	uint8_t       m_fchg;
 	uint8_t       m_mov;
@@ -132,6 +141,7 @@ private:
 	uint8_t       m_last_sound_a;
 
 	uint8_t subcpu_command_r();
+	uint8_t port_0_r();
 	uint8_t port_2_r();
 	uint8_t port_3_r();
 	void bitmap_w(offs_t offset, uint8_t data);
@@ -258,6 +268,7 @@ private:
 	void ppi1c_w(uint8_t data);
 	void ppi3c_w(uint8_t data);
 	uint8_t analog_r();
+	uint8_t port_0_r();
 	uint8_t spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint8_t data);
 	void palette(palette_device &palette) const;
