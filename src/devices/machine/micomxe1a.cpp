@@ -13,16 +13,16 @@
     7       TRIG2   9       TR      In      Ack
     8       STROBE  7       TH      Out     Req
 
-    In analog mode, data is shifted out as eleven nybbles:
+    In analog mode, data is shifted out as twelve nybbles:
 
-          _           ____________________________________________
+          _           ________________________________________________________________
     Req    \_________/
-          ____    __    __    __    __    __    __    __    __
-    Ack       \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/
-                  _____       _____       _____       _____
-    L/H   XX\____/     \_____/     \_____/     \_____/     \_____/
-             ____ _____ _____ _____ _____ _____ _____ _____ _____
-    D     XXX____X_____X_____X_____X_____X_____X_____X_____X_____X
+          ____    __    __    __    __    __    __    __    __    __    __    __    __
+    Ack       \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/
+                  _____       _____       _____       _____       _____       _____
+    L/H   _______/     \_____/     \_____/     \_____/     \_____/     \_____/     \__
+              _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____
+    D     XXXX_____X_____X_____X_____X_____X_____X_____X_____X_____X_____X_____X_____X
 
     The falling edge on Req causes data output to start.  The host
     can't control the speed, it just polls the L/H and Ack lines to
@@ -81,6 +81,7 @@
     * Estimate thresholds in digital modes.
     * Implement trigger A/B rapid fire switches.
     * Implement channel shift switch (Y->X, X->Z, Z->X).
+    * Does channel shift affect digital mode?
     * Implement special modes (holding buttons on power-on):
      - Double displacement modes:
       + X/Y (hold SELECT + A')
