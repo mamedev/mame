@@ -1001,11 +1001,11 @@ ROM_END
 
 // this information is not displayed onscreen
 
-GAME( 1985, gunsmoke,   0,        gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (World, 19851115)",                 MACHINE_SUPPORTS_SAVE ) // GSE_03
-GAME( 1985, gunsmokeb,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "bootleg",                  "Gun.Smoke (World, 19851115) (bootleg)",       MACHINE_SUPPORTS_SAVE ) // based on above version, warning message patched out
-GAME( 1985, gunsmokej,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (Japan, 19851115)",                 MACHINE_SUPPORTS_SAVE ) // GSJ_03
-GAME( 1986, gunsmokeu,  gunsmoke, gunsmoke, gunsmokeu, gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (USA and Canada, 19860408)",        MACHINE_SUPPORTS_SAVE ) // GSA_03
-GAME( 1985, gunsmokeua, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (USA and Canada, 19860120)",        MACHINE_SUPPORTS_SAVE ) // GSA_03Y (GSR 03Y on the chip)
-GAME( 1985, gunsmokeub, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (USA and Canada, 19851115, set 1)", MACHINE_SUPPORTS_SAVE ) // GSR_03 (03A on the chip)
-GAME( 1985, gunsmokeuc, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (USA and Canada, 19851115, set 2)", MACHINE_SUPPORTS_SAVE ) // GSR_03
-GAME( 1985, gunsmokeg,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (Germany, 19851115, censored)",     MACHINE_SUPPORTS_SAVE ) // GSG_03, has 'World' regional warning, but game censored for German market
+GAME( 1985, gunsmoke,   0,        gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (World, 1985-11-15)",                 MACHINE_SUPPORTS_SAVE ) // GSE_03
+GAME( 1985, gunsmokeb,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "bootleg",                  "Gun.Smoke (World, 1985-11-15) (bootleg)",       MACHINE_SUPPORTS_SAVE ) // based on above version, warning message patched out
+GAME( 1985, gunsmokej,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (Japan, 1985-11-15)",                 MACHINE_SUPPORTS_SAVE ) // GSJ_03
+GAME( 1986, gunsmokeu,  gunsmoke, gunsmoke, gunsmokeu, gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (USA and Canada, 1986-04-08)",        MACHINE_SUPPORTS_SAVE ) // GSA_03
+GAME( 1985, gunsmokeua, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (USA and Canada, 1986-01-20)",        MACHINE_SUPPORTS_SAVE ) // GSA_03Y (GSR 03Y on the chip)
+GAME( 1985, gunsmokeub, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (USA and Canada, 1985-11-15, set 1)", MACHINE_SUPPORTS_SAVE ) // GSR_03 (03A on the chip)
+GAME( 1985, gunsmokeuc, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (USA and Canada, 1985-11-15, set 2)", MACHINE_SUPPORTS_SAVE ) // GSR_03
+GAME( 1985, gunsmokeg,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (Germany, 1985-11-15, censored)",     MACHINE_SUPPORTS_SAVE ) // GSG_03, has 'World' regional warning, but game censored for German market
