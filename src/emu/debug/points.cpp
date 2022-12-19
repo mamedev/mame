@@ -408,7 +408,7 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 		const device_state_interface *state;
 		if (debug.cpu().live_cpu() == &m_debugInterface->device() && m_debugInterface->device().interface(state))
 		{
-			debug.console().printf("%s (PC=%s)\n", buffer, state->state_string(STATE_GENPCBASE));
+			debug.console().printf("%s (PC=%X)\n", buffer, state->pcbase());
 			m_debugInterface->compute_debug_flags();
 		}
 		else if (!was_stopped)
