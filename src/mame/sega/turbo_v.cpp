@@ -300,6 +300,7 @@ uint32_t turbo_state::get_sprite_bits(uint8_t road)
 
 	// loop over all live levels
 	for (int level = 0; level < 8; level++)
+	{
 		if (sprlive & (1 << level))
 		{
 			// latch the data and advance the offset
@@ -330,6 +331,7 @@ uint32_t turbo_state::get_sprite_bits(uint8_t road)
 				m_sprite_info.frac[level] -= 0x1000000;
 			}
 		}
+	}
 
 	return sprdata;
 }
@@ -515,6 +517,7 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -648,6 +651,7 @@ uint32_t subroc3d_state::get_sprite_bits(uint8_t *plb)
 
 	// loop over all live levels
 	for (int level = 0; level < 8; level++)
+	{
 		if (m_sprite_info.lst & (1 << level))
 		{
 			// latch the data and advance the offset
@@ -677,6 +681,7 @@ uint32_t subroc3d_state::get_sprite_bits(uint8_t *plb)
 				m_sprite_info.frac[level] -= 0x800000;
 			}
 		}
+	}
 
 	return sprdata;
 }
@@ -760,8 +765,7 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					mux = 0;
 
 				// CD0-3 are selected from the sprite bits and MUX0-2 (p. 141)
-				sprbits >>= mux & 0x07;
-				uint8_t cd = bitswap<4>(sprbits, 24, 16, 8, 0);
+				uint8_t cd = bitswap<4>(sprbits >> (mux & 0x07), 24, 16, 8, 0);
 
 				// MUX3 selects either CD0-3 or the foreground output (p. 141)
 				int finalbits;
@@ -780,6 +784,7 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -862,6 +867,7 @@ uint32_t buckrog_state::get_sprite_bits(uint8_t *plb)
 
 	// loop over all live levels
 	for (int level = 0; level < 8; level++)
+	{
 		if (m_sprite_info.lst & (1 << level))
 		{
 			// latch the data and advance the offset
@@ -890,6 +896,7 @@ uint32_t buckrog_state::get_sprite_bits(uint8_t *plb)
 				m_sprite_info.frac[level] -= 0x800000;
 			}
 		}
+	}
 
 	return sprdata;
 }
@@ -959,8 +966,7 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				if (mux == 8) mux = 0xf;
 
 				// MUX then selects one of the sprites and selects CD0-3
-				sprbits >>= mux & 0x07;
-				uint8_t cd = bitswap<4>(sprbits, 24, 16, 8, 0);
+				uint8_t cd = bitswap<4>(sprbits >> (mux & 0x07), 24, 16, 8, 0);
 
 				// this info goes into an LS148 8-to-3 decoder to determine the priorities (SH 5/5)
 
@@ -1009,5 +1015,6 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			}
 		}
 	}
+
 	return 0;
 }

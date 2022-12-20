@@ -357,7 +357,7 @@ void subroc3d_state::ppi0b_w(uint8_t data)
 	m_lamp = BIT(data, 2);
 	m_flip = BIT(data, 4);
 
-	// flip also goes to 3D scope shutter
+	// flip also goes to 3D scope shutter (motor to rotating disc)
 	m_shutter = BIT(data, 4);
 }
 
@@ -719,15 +719,15 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Tachometer" )            PORT_DIPLOCATION("SW3:3")
+	PORT_DIPNAME( 0x40, 0x00, "Tachometer" )            PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x40, "Analog (Meter)")
 	PORT_DIPSETTING(    0x00, "Digital (LED)")
-	PORT_DIPNAME( 0x80, 0x80, "Sound System" )          PORT_DIPLOCATION("SW3:4")
+	PORT_DIPNAME( 0x80, 0x00, "Sound System" )          PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, "Cockpit")
 
 	PORT_START("DIAL")
-	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
 	PORT_START("PEDAL")
 	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
