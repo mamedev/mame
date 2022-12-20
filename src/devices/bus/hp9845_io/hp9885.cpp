@@ -146,8 +146,8 @@
 
 #include "emu.h"
 #include "hp9885.h"
-#include "formats/hpi_dsk.h"
 #include "formats/fs_hp98x5.h"
+#include "formats/hpi_dsk.h"
 
 // Debugging
 #include "logmacro.h"
