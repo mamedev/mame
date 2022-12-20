@@ -214,6 +214,8 @@ void subroc3d_state::machine_start()
 {
 	turbo_base_state::machine_start();
 
+	m_shutter.resolve();
+
 	save_item(NAME(m_col));
 	save_item(NAME(m_ply));
 	save_item(NAME(m_flip));
@@ -354,6 +356,9 @@ void subroc3d_state::ppi0b_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	m_lamp = BIT(data, 2);
 	m_flip = BIT(data, 4);
+
+	// flip also goes to 3D scope shutter
+	m_shutter = BIT(data, 4);
 }
 
 /*************************************

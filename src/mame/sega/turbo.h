@@ -165,6 +165,7 @@ public:
 	subroc3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: turbo_base_state(mconfig, type, tag)
 		, m_spriteram(*this, "spriteram")
+		, m_shutter(*this, "shutter")
 	{ }
 
 	void subroc3d(machine_config &config);
@@ -175,6 +176,7 @@ protected:
 
 private:
 	required_shared_ptr<uint8_t> m_spriteram;
+	output_finder<> m_shutter;
 
 	uint8_t m_col = 0;
 	uint8_t m_ply = 0;
