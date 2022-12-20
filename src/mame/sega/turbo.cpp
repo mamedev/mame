@@ -8,9 +8,12 @@
     and Aaron Giles
 
     Games supported:
-        * Turbo
-        * Subroc 3D
-        * Buck Rogers: Planet of Zoom
+    - Turbo
+    - Subroc 3D
+    - Buck Rogers: Planet of Zoom
+
+    BTANB:
+    - subroc3d 'seafoam' appears as black spots on top of some sprites
 
 **************************************************************************
     TURBO
@@ -357,7 +360,8 @@ void subroc3d_state::ppi0b_w(uint8_t data)
 	m_lamp = BIT(data, 2);
 	m_flip = BIT(data, 4);
 
-	// flip also goes to 3D scope shutter (motor to rotating disc)
+	// flip also goes to 3D scope shutter sync
+	// (it's a motor to 2 rotating discs, half painted black)
 	m_shutter = BIT(data, 4);
 }
 

@@ -3,11 +3,24 @@
 license:CC0
 -->
 <mamelayout version="2">
-	<element name="digit" defstate="10">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
 		<led7seg>
 			<color red="1.0" green="0.3" blue="0.0" />
 		</led7seg>
 	</element>
+
+	<element name="shutter1" defstate="0">
+		<rect state="0"><color red="0" green="0" blue="0" /></rect>
+	</element>
+	<element name="shutter2" defstate="0">
+		<rect state="1"><color red="0" green="0" blue="0" /></rect>
+	</element>
+
+
+<!-- build screen -->
 
 	<view name="Simple LEDs">
 		<bounds left="0" top="-0.472" right="4" bottom="3" />
@@ -92,4 +105,33 @@ license:CC0
 			<bounds left="3.770" top="-0.306" right="3.870" bottom="-0.136" />
 		</element>
 	</view>
+
+	<view name="3D Scope Straight View">
+		<!-- parallel-eyed -->
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
+
+		<screen index="0"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
+		<element name="shutter" ref="shutter2"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
+	</view>
+
+	<view name="3D Scope Cross View">
+		<!-- cross-eyed -->
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
+
+		<screen index="0"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
+		<element name="shutter" ref="shutter1"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
+	</view>
+
+	<view name="3D Scope Left">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
+	</view>
+
+	<view name="3D Scope Right">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
+	</view>
+
 </mamelayout>
