@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(UPD934G, upd934g_device, "upd934g", "NEC uPD934G")
 upd934g_device::upd934g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, UPD934G, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_data_cb(*this),
+	device_rom_interface(mconfig, *this),
 	m_stream(nullptr),
 	m_sample(0),
 	m_ready(false)
@@ -50,9 +50,6 @@ void upd934g_device::device_start()
 {
 	// create sound stream
 	m_stream = stream_alloc(0, 4, 20000);
-
-	// resolve callbacks
-	m_data_cb.resolve_safe(0);
 
 	// register for save states
 	save_pointer(NAME(m_addr), 16);
@@ -96,7 +93,7 @@ void upd934g_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 			for (unsigned i = 0; i < outputs[ch].samples(); i++)
 			{
-				int8_t raw = static_cast<int8_t>(m_data_cb(m_channel[ch].pos));
+				int8_t raw = static_cast<int8_t>(read_byte(m_channel[ch].pos));
 
 				// normal, muted, accented
 				const double adjust[] = { 0, 0.7, 0.4, 1.0 };
