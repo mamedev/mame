@@ -11891,11 +11891,11 @@ license:CC0
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-R-128-01" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-1 a" size="16384" crc="12b97208" sha1="2fc97bdb035d308f0ecd7b58e44fa1571b99fe27" offset="00000" />
 				<rom name="hvc-fb1-1 b" size="16384" crc="b099376c" sha1="17fb9644dc23173d77d288c1428e560ea8a7a9ef" offset="0x04000" />
@@ -11917,11 +11917,11 @@ license:CC0
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-N-128-02" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-2 a" size="16384" crc="1048e43d" sha1="d50b0352a358e73e29199b981456f33f6cc78131" offset="00000" />
 				<rom name="hvc-fb1-2 b" size="16384" crc="9fbfb6ba" sha1="39e7d7ede468036d04db0bf40f34a07c958f874a" offset="0x04000" />
@@ -11943,11 +11943,11 @@ license:CC0
 		<info name="serial" value="HVC-VT"/>
 		<info name="release" value="19850221"/>
 		<info name="alt_title" value="ファミリーベーシックV3"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="VT-N-256-41" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-vt-0w" size="32768" crc="3aaeed3f" sha1="dcb8e7d48afcc0f5b4b7e98874f9c79da419cf04" offset="00000" />
 			</dataarea>
@@ -12211,11 +12211,11 @@ license:CC0
 		<info name="serial" value="FT-01"/>
 		<info name="release" value="19861112"/>
 		<info name="alt_title" value="ファミリートレーナー① アスレチックワールド"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="bandai 86 sp p" size="32768" crc="8c8fa83b" sha1="0ab64ab0a5629f60aebe7fe32910a4136e99e6b0" offset="00000" />
 			</dataarea>
@@ -12232,11 +12232,11 @@ license:CC0
 		<info name="serial" value="FT-01"/>
 		<info name="release" value="19861112"/>
 		<info name="alt_title" value="ファミリートレーナー① アスレチックワールド"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="sp p" size="32768" crc="87738f85" sha1="5c8a3081990e6a9ef127e70e05b38c5c37cd58c6" offset="00000" />
 			</dataarea>
@@ -12253,11 +12253,11 @@ license:CC0
 		<info name="serial" value="FT-02"/>
 		<info name="release" value="19861223"/>
 		<info name="alt_title" value="ファミリートレーナー② ランニングスタジアム"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="horizontal" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="runp" size="32768" crc="8a5b72c0" sha1="796122db71ecf4cc639d5c45b6b824b1f8b02957" offset="00000" />
 			</dataarea>
@@ -12274,11 +12274,11 @@ license:CC0
 		<info name="serial" value="FT-03"/>
 		<info name="release" value="19870226"/>
 		<info name="alt_title" value="ファミリートレーナー③ エアロビスタジオ"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bandai_pt554" />
 			<feature name="pcb" value="BANDAI-PT-554" />
 			<feature name="mirroring" value="horizontal" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="aerob pr" size="32768" crc="f8da2506" sha1="c14075b1b7c98b684870e8d85b7ff2b462e3cd10" offset="00000" />
 			</dataarea>
@@ -12299,11 +12299,11 @@ license:CC0
 		<info name="serial" value="FT-04"/>
 		<info name="release" value="19870528"/>
 		<info name="alt_title" value="ファミリートレーナー④ ジョギングレース"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-74*161/32" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="bandai87 jg pr" size="32768" crc="7e704a14" sha1="4b5af9b5622e1cec310e8cb741db642ac38126ef" offset="00000" />
 			</dataarea>
@@ -12320,11 +12320,11 @@ license:CC0
 		<info name="serial" value="FT-05"/>
 		<info name="release" value="19870731"/>
 		<info name="alt_title" value="ファミリートレーナー⑤ 迷路大作戦"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="131072">
 				<rom name="ba-87 md-p" size="131072" crc="ad3df455" sha1="a8a5d1e7cc7d8a726a8edc66d947ef0de9f94ba4" offset="00000" />
 			</dataarea>
@@ -12341,11 +12341,11 @@ license:CC0
 		<info name="serial" value="FT-07"/>
 		<info name="release" value="19871127"/>
 		<info name="alt_title" value="ファミリートレーナー⑦ ファミトレ大運動会"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="ba-87 ft7-prg" size="32768" crc="ca26a0f1" sha1="f4bcd81e2eba429e0c4bd829ba034a8f1a05ff42" offset="00000" />
 			</dataarea>
@@ -12362,11 +12362,11 @@ license:CC0
 		<info name="serial" value="FT-08"/>
 		<info name="release" value="19871201"/>
 		<info name="alt_title" value="ファミリートレーナー⑧ 突撃!風雲たけし城"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="ba-takeshi-prg" size="32768" crc="59794f2d" sha1="06f424509451b30682362b7bc6c23d02d34ee930" offset="00000" />
 			</dataarea>
@@ -12383,11 +12383,11 @@ license:CC0
 		<info name="serial" value="FT-09"/>
 		<info name="release" value="19881220"/>
 		<info name="alt_title" value="ファミリートレーナー⑨ 風雲たけし城二"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="gxrom" />
 			<feature name="pcb" value="BANDAI-GNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="131072">
 				<rom name="ba-takeshi 2 pro" size="131072" crc="ee11fe78" sha1="e95b3a144d6e43f7f7d583339e1ef244f1eb08c8" offset="00000" />
 			</dataarea>
@@ -15961,11 +15961,11 @@ license:CC0
 		<info name="serial" value="HVC-GY, NES-GY-USA, NES-GY-(FRA/GBR)"/>
 		<info name="release" value="19850813 (JPN), 198510xx (USA), 1985xxxx (Euro)"/>
 		<info name="alt_title" value="ジャイロ"/>
+		<sharedfeat name="special_default" value="rob"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="HVC-NROM-256" /> <!-- also found with NES-NROM-256 pcb -->
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="rob" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-gy-0 prg" size="32768" crc="21b099f3" sha1="76103abe07c1cca6fc4107e35847f4e959f5e5bb" offset="00000" />
 			</dataarea>
@@ -35898,11 +35898,11 @@ license:CC0
 		<info name="release" value="198510xx (USA)"/>
 		<info name="release" value="1985? (Europe)"/>
 		<info name="alt_title" value="ブロック"/>
+		<sharedfeat name="special_default" value="rob"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="HVC-NROM-256" /> <!-- also found with NES-NROM-256 pcb -->
 			<feature name="mirroring" value="horizontal" />
-			<feature name="peripheral" value="rob" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-bl-0 prg" size="32768" crc="4ee735c1" sha1="36b6b30f451c3b4a48464bee9a144c873ae04cc7" offset="00000" />
 			</dataarea>
@@ -44635,10 +44635,10 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		<description>Playbox BASIC (Japan, V1.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="playbox basic v1.0.prg" size="32768" crc="da03d908" sha1="474869bb5882928a481e58ced0adcbb1b1ad18f9" status="baddump" />
 			</dataarea>
@@ -44656,11 +44656,11 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		<description>Playbox BASIC (Japan, V0.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb" value="HVC-FAMILYBASIC" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="2" size="16384" crc="c8c15b11" sha1="eba73a34e44191e60b4411886b83f53cc92d69b1" offset="0x0000" />
 				<rom name="1" size="16384" crc="2a5e0348" sha1="aa09440f89b0ecd6a4a6e00a90b79e0d313c753e" offset="0x4000" />
@@ -47131,11 +47131,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-R-128-01" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-0 a" size="16384" crc="8ece0244" sha1="fa16715f19dc326b855687a701459f3f46353d9f" offset="0x00000" />
 				<rom name="hvc-fb1-0 b" size="16384" crc="e61e0cda" sha1="d415da86ae1d36f9924183dc8c1ab0ce61b5a270" offset="0x04000" />
