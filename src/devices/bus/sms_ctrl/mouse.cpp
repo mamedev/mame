@@ -63,6 +63,7 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(next_step);
+
 	required_ioport m_buttons;
 	required_ioport_array<2> m_axes;
 
@@ -88,6 +89,7 @@ sms_megamouse_device::sms_megamouse_device(machine_config const &mconfig, device
 	device_sms_control_interface(mconfig, *this),
 	m_buttons(*this, "BUTTONS"),
 	m_axes(*this, "%c", 'X'),
+	m_busy_timer(nullptr),
 	m_th_in(1),
 	m_tr_in(1),
 	m_out(0x30),
