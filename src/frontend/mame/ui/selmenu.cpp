@@ -42,12 +42,17 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <tuple>
 #include <utility>
 
 
 namespace ui {
 
 namespace {
+
+std::pair<char const *, char const *> RIGHT_PANEL_NAMES[RP_LAST + 1] = {
+		{ "image", N_("Images") },
+		{ "info",  N_("Info") } };
 
 enum
 {
@@ -72,25 +77,25 @@ enum
 	LAST_VIEW = COVERS_VIEW
 };
 
-std::pair<char const *, char const *> const arts_info[] =
+std::tuple<char const *, char const *, char const *> const ARTS_INFO[] =
 {
-	{ N_p("selmenu-artwork", "Snapshots"),       OPTION_SNAPSHOT_DIRECTORY },
-	{ N_p("selmenu-artwork", "Cabinet"),         OPTION_CABINETS_PATH },
-	{ N_p("selmenu-artwork", "Control Panel"),   OPTION_CPANELS_PATH },
-	{ N_p("selmenu-artwork", "PCB"),             OPTION_PCBS_PATH },
-	{ N_p("selmenu-artwork", "Flyer"),           OPTION_FLYERS_PATH },
-	{ N_p("selmenu-artwork", "Title Screen"),    OPTION_TITLES_PATH },
-	{ N_p("selmenu-artwork", "Ending"),          OPTION_ENDS_PATH },
-	{ N_p("selmenu-artwork", "Artwork Preview"), OPTION_ARTPREV_PATH },
-	{ N_p("selmenu-artwork", "Bosses"),          OPTION_BOSSES_PATH },
-	{ N_p("selmenu-artwork", "Logo"),            OPTION_LOGOS_PATH },
-	{ N_p("selmenu-artwork", "Versus"),          OPTION_VERSUS_PATH },
-	{ N_p("selmenu-artwork", "Game Over"),       OPTION_GAMEOVER_PATH },
-	{ N_p("selmenu-artwork", "HowTo"),           OPTION_HOWTO_PATH },
-	{ N_p("selmenu-artwork", "Scores"),          OPTION_SCORES_PATH },
-	{ N_p("selmenu-artwork", "Select"),          OPTION_SELECT_PATH },
-	{ N_p("selmenu-artwork", "Marquee"),         OPTION_MARQUEES_PATH },
-	{ N_p("selmenu-artwork", "Covers"),          OPTION_COVER_PATH },
+	{ "snap",       N_p("selmenu-artwork", "Snapshots"),       OPTION_SNAPSHOT_DIRECTORY },
+	{ "cabinet",    N_p("selmenu-artwork", "Cabinet"),         OPTION_CABINETS_PATH },
+	{ "cpanel",     N_p("selmenu-artwork", "Control Panel"),   OPTION_CPANELS_PATH },
+	{ "pcb",        N_p("selmenu-artwork", "PCB"),             OPTION_PCBS_PATH },
+	{ "flyer",      N_p("selmenu-artwork", "Flyer"),           OPTION_FLYERS_PATH },
+	{ "title",      N_p("selmenu-artwork", "Title Screen"),    OPTION_TITLES_PATH },
+	{ "ending",     N_p("selmenu-artwork", "Ending"),          OPTION_ENDS_PATH },
+	{ "artpreview", N_p("selmenu-artwork", "Artwork Preview"), OPTION_ARTPREV_PATH },
+	{ "boss",       N_p("selmenu-artwork", "Bosses"),          OPTION_BOSSES_PATH },
+	{ "logo",       N_p("selmenu-artwork", "Logo"),            OPTION_LOGOS_PATH },
+	{ "versus",     N_p("selmenu-artwork", "Versus"),          OPTION_VERSUS_PATH },
+	{ "gameover",   N_p("selmenu-artwork", "Game Over"),       OPTION_GAMEOVER_PATH },
+	{ "howto",      N_p("selmenu-artwork", "HowTo"),           OPTION_HOWTO_PATH },
+	{ "scores",     N_p("selmenu-artwork", "Scores"),          OPTION_SCORES_PATH },
+	{ "select",     N_p("selmenu-artwork", "Select"),          OPTION_SELECT_PATH },
+	{ "marquee",    N_p("selmenu-artwork", "Marquee"),         OPTION_MARQUEES_PATH },
+	{ "cover",      N_p("selmenu-artwork", "Covers"),          OPTION_COVER_PATH },
 };
 
 char const *const hover_msg[] = {
@@ -482,6 +487,7 @@ menu_select_launch::~menu_select_launch()
 
 menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &container, bool is_swlist)
 	: menu(mui, container)
+	, m_skip_main_items(0)
 	, m_prev_selected(nullptr)
 	, m_total_lines(0)
 	, m_topline_datsview(0)
@@ -499,9 +505,9 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_pressed(false)
 	, m_repeat(0)
 	, m_right_visible_lines(0)
+	, m_right_panel(RP_FIRST)
 	, m_has_icons(false)
 	, m_switch_image(false)
-	, m_default_image(true)
 	, m_image_view(FIRST_VIEW)
 	, m_flags(256)
 {
@@ -516,7 +522,6 @@ void menu_select_launch::next_image_view()
 	{
 		++m_image_view;
 		set_switch_image();
-		m_default_image = false;
 	}
 }
 
@@ -527,7 +532,6 @@ void menu_select_launch::previous_image_view()
 	{
 		--m_image_view;
 		set_switch_image();
-		m_default_image = false;
 	}
 }
 
@@ -742,20 +746,7 @@ void menu_select_launch::rotate_focus(int dir)
 	switch (get_focus())
 	{
 	case focused_menu::MAIN:
-		if (selected_index() <= m_available_items)
-		{
-			if (skip_main_items || (ui_globals::panels_status != HIDE_BOTH))
-			{
-				m_prev_selected = get_selection_ref();
-				if ((0 < dir) || (ui_globals::panels_status == HIDE_BOTH))
-					set_selected_index(m_available_items + 1);
-				else if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
-					set_focus(focused_menu::LEFT);
-				else
-					set_focus(focused_menu::RIGHTBOTTOM);
-			}
-		}
-		else
+		if (selected_index() > m_available_items)
 		{
 			if ((0 > dir) || (ui_globals::panels_status == HIDE_BOTH))
 				select_prev();
@@ -764,13 +755,38 @@ void menu_select_launch::rotate_focus(int dir)
 			else
 				set_focus(focused_menu::LEFT);
 		}
+		else if (m_skip_main_items || (ui_globals::panels_status != HIDE_BOTH))
+		{
+			m_prev_selected = get_selection_ref();
+			if (0 < dir)
+			{
+				if (m_skip_main_items)
+					set_selected_index(m_available_items + 1);
+				else if (ui_globals::panels_status == HIDE_LEFT_PANEL)
+					set_focus(focused_menu::RIGHTTOP);
+				else
+					set_focus(focused_menu::LEFT);
+			}
+			else if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
+			{
+				set_focus(focused_menu::LEFT);
+			}
+			else if (ui_globals::panels_status != HIDE_BOTH)
+			{
+				set_focus(focused_menu::RIGHTBOTTOM);
+			}
+			else
+			{
+				set_selected_index(m_available_items + 1);
+			}
+		}
 		break;
 
 	case focused_menu::LEFT:
 		if (0 > dir)
 		{
 			set_focus(focused_menu::MAIN);
-			if (skip_main_items)
+			if (m_skip_main_items)
 				set_selected_index(m_available_items + 1);
 			else
 				select_prev();
@@ -798,7 +814,10 @@ void menu_select_launch::rotate_focus(int dir)
 		else
 		{
 			set_focus(focused_menu::MAIN);
-			set_selected_index(m_available_items + 1);
+			if (m_skip_main_items)
+				set_selected_index(m_available_items + 1);
+			else
+				select_prev();
 		}
 		break;
 
@@ -1336,21 +1355,21 @@ void menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, flo
 void menu_select_launch::get_title_search(std::string &snaptext, std::string &searchstr)
 {
 	// get arts title text
-	snaptext.assign(_("selmenu-artwork", arts_info[m_image_view].first));
+	snaptext.assign(_("selmenu-artwork", std::get<1>(ARTS_INFO[m_image_view])));
 
 	// get search path
 	std::string addpath;
 	if (m_image_view == SNAPSHOT_VIEW)
 	{
 		emu_options moptions;
-		searchstr = machine().options().value(arts_info[m_image_view].second);
-		addpath = moptions.value(arts_info[m_image_view].second);
+		searchstr = machine().options().value(std::get<2>(ARTS_INFO[m_image_view]));
+		addpath = moptions.value(std::get<2>(ARTS_INFO[m_image_view]));
 	}
 	else
 	{
 		ui_options moptions;
-		searchstr = ui().options().value(arts_info[m_image_view].second);
-		addpath = moptions.value(arts_info[m_image_view].second);
+		searchstr = ui().options().value(std::get<2>(ARTS_INFO[m_image_view]));
+		addpath = moptions.value(std::get<2>(ARTS_INFO[m_image_view]));
 	}
 
 	std::string tmp(searchstr);
@@ -1427,7 +1446,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		if (m_focus == focused_menu::RIGHTTOP)
 		{
 			// Swap the right panel and swallow it
-			ui_globals::rpanel = RP_IMAGES;
+			m_right_panel = RP_IMAGES;
 			iptkey = IPT_INVALID;
 		}
 		else
@@ -1441,7 +1460,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		if (m_focus == focused_menu::RIGHTTOP)
 		{
 			// Swap the right panel and swallow it
-			ui_globals::rpanel = RP_INFOS;
+			m_right_panel = RP_INFOS;
 			iptkey = IPT_INVALID;
 		}
 		else
@@ -1746,7 +1765,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else if (hover() >= HOVER_RP_FIRST && hover() <= HOVER_RP_LAST)
 				{
-					ui_globals::rpanel = (HOVER_RP_FIRST - hover()) * (-1);
+					m_right_panel = (HOVER_RP_FIRST - hover()) * (-1);
 					stop = true;
 				}
 				else if (hover() >= HOVER_FILTER_FIRST && hover() <= HOVER_FILTER_LAST)
@@ -1770,7 +1789,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 
 		// caught scroll event
 		case ui_event::type::MOUSE_WHEEL:
-			if (hover() >= 0 && hover() < item_count() - skip_main_items)
+			if (hover() >= 0 && hover() < item_count() - m_skip_main_items)
 			{
 				if (local_menu_event.zdelta > 0)
 				{
@@ -1817,7 +1836,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		case ui_event::type::MOUSE_RDOWN:
-			if (hover() >= 0 && hover() < item_count() - skip_main_items)
+			if (hover() >= 0 && hover() < item_count() - m_skip_main_items)
 			{
 				set_selected_index(hover());
 				m_prev_selected = get_selection_ref();
@@ -1883,8 +1902,8 @@ void menu_select_launch::draw(uint32_t flags)
 	draw_background();
 
 	clear_hover();
-	m_available_items = item_count() - skip_main_items;
-	float extra_height = skip_main_items * line_height;
+	m_available_items = item_count() - m_skip_main_items;
+	float extra_height = m_skip_main_items * line_height;
 	float visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
 
 	// locate mouse
@@ -2196,7 +2215,7 @@ void menu_select_launch::draw_right_panel(float origx1, float origy1, float orig
 	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
 	origy1 = draw_right_box_title(x2, origy1, origx2, origy2);
 
-	if (ui_globals::rpanel == RP_IMAGES)
+	if (m_right_panel == RP_IMAGES)
 		arts_render(x2, origy1, origx2, origy2);
 	else
 		infos_render(x2, origy1, origx2, origy2);
@@ -2218,9 +2237,7 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 	// add separator line
 	container().add_line(x1 + midl, y1, x1 + midl, y1 + line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
-	std::string buffer[RP_LAST + 1];
-	buffer[RP_IMAGES] = _("Images");
-	buffer[RP_INFOS] = _("Infos");
+	std::string buffer[RP_LAST + 1] = { _(RIGHT_PANEL_NAMES[0].second), _(RIGHT_PANEL_NAMES[1].second) };
 
 	// check size
 	float text_size = 1.0f;
@@ -2238,7 +2255,7 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 
 		if (mouse_in_rect(x1, y1, x1 + midl, y1 + line_height))
 		{
-			if (ui_globals::rpanel != cells)
+			if (m_right_panel != cells)
 			{
 				bgcolor = ui().colors().mouseover_bg_color();
 				fgcolor = ui().options().mouseover_color();
@@ -2246,7 +2263,7 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 			}
 		}
 
-		if (ui_globals::rpanel != cells)
+		if (m_right_panel != cells)
 		{
 			container().add_line(x1, y1 + line_height, x1 + midl, y1 + line_height, UI_LINE_WIDTH,
 					ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -2254,7 +2271,7 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 				fgcolor = ui().colors().clone_color();
 		}
 
-		if (m_focus == focused_menu::RIGHTTOP && ui_globals::rpanel == cells)
+		if (m_focus == focused_menu::RIGHTTOP && m_right_panel == cells)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff);
@@ -2296,9 +2313,6 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 	{
 		m_cache.set_snapx_driver(nullptr);
 
-		if (m_default_image)
-			m_image_view = (software->startempty == 0) ? SNAPSHOT_VIEW : CABINETS_VIEW;
-
 		// arts title and searchpath
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
@@ -2334,9 +2348,6 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 	else if (system)
 	{
 		m_cache.set_snapx_software(nullptr);
-
-		if (m_default_image)
-			m_image_view = ((system->driver->flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE) ? CABINETS_VIEW : SNAPSHOT_VIEW;
 
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
@@ -2376,7 +2387,7 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 	{
 		float text_length;
 		ui().draw_text_full(container(),
-				_("selmenu-artwork", arts_info[x].first), origx1, origy1, origx2 - origx1,
+				_("selmenu-artwork", std::get<1>(ARTS_INFO[m_image_view])), origx1, origy1, origx2 - origx1,
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
 				&text_length, nullptr);
 		title_size = (std::max)(text_length + 0.01f, title_size);
@@ -2522,6 +2533,55 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 		// apply texture
 		container().add_quad(x1, y1, x2, y2, rgb_t::white(), m_cache.snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
+}
+
+
+char const *menu_select_launch::right_panel_config_string() const
+{
+	assert(std::size(RIGHT_PANEL_NAMES) > m_right_panel);
+	return RIGHT_PANEL_NAMES[m_right_panel].first;
+}
+
+char const *menu_select_launch::right_image_config_string() const
+{
+	assert(std::size(ARTS_INFO) > m_image_view);
+	return std::get<0>(ARTS_INFO[m_image_view]);
+}
+
+void menu_select_launch::set_right_panel(u8 index)
+{
+	assert(std::size(RIGHT_PANEL_NAMES) > index);
+	m_right_panel = index;
+}
+
+void menu_select_launch::set_right_image(u8 index)
+{
+	assert(std::size(ARTS_INFO) > index);
+	if (index != m_image_view)
+	{
+		m_image_view = index;
+		set_switch_image();
+	}
+}
+
+void menu_select_launch::set_right_panel(std::string_view value)
+{
+	auto const found = std::find_if(
+			std::begin(RIGHT_PANEL_NAMES),
+			std::end(RIGHT_PANEL_NAMES),
+			[&value] (auto const &that) { return value == that.first; });
+	if (std::end(RIGHT_PANEL_NAMES) != found)
+		m_right_panel = found - std::begin(RIGHT_PANEL_NAMES);
+}
+
+void menu_select_launch::set_right_image(std::string_view value)
+{
+	auto const found = std::find_if(
+			std::begin(ARTS_INFO),
+			std::end(ARTS_INFO),
+			[&value] (auto const &that) { return value == std::get<0>(that); });
+	if (std::end(ARTS_INFO) != found)
+		m_image_view = found - std::begin(ARTS_INFO);
 }
 
 

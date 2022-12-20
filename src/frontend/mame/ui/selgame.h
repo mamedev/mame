@@ -34,6 +34,7 @@ public:
 
 protected:
 	void menu_activated() override;
+	void menu_deactivated() override;
 
 private:
 	enum

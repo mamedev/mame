@@ -28,18 +28,18 @@
     can't control the speed, it just polls the L/H and Ack lines to
     know when the data is ready to read.
 
-    Step    D0      D1      D2      D3
-     1      D       C       B/B'    A/A'
-     2      Select  Start   E2      E1
-     3      Y4      Y5      Y6      Y7
-     4      X4      X5      X6      X7
-     5      Z4      Z5      Z6      Z7
-     6      RZ4     RZ5     RZ6     RZ7
-     7      Y0      Y1      Y2      Y3
-     8      X0      X1      X2      X3
-     9      Z0      Z1      Z2      Z3
-    10      RZ0     RZ1     RZ2     RZ3
-    11      B'      A'      B       A
+    Step    D3      D2      D1      D0
+     1      A/A'    B/B'    C       D
+     2      E1      E2      Start   Select
+     3      Y7      Y6      Y5      Y4
+     4      X7      X6      X5      X4
+     5      Z7      Z6      Z5      Z4
+     6      RZ7     RZ6     RZ5     RZ4
+     7      Y3      Y2      Y1      Y0
+     8      X3      X2      X1      X0
+     9      Z3      Z2      Z1      Z0
+    10      RZ3     RZ2     RZ1     RZ0
+    11      A       B       A'      B'
     12      -       -       -       -
 
     In MD mode, each pair of nybbles is transmitted in reverse
