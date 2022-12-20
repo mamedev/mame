@@ -144,6 +144,8 @@ files {
 	MAME_DIR .. "src/emu/emumem_hep.h",
 	MAME_DIR .. "src/emu/emumem_het.cpp",
 	MAME_DIR .. "src/emu/emumem_het.h",
+	MAME_DIR .. "src/emu/emumem_hws.cpp",
+	MAME_DIR .. "src/emu/emumem_hws.h",
 	MAME_DIR .. "src/emu/emuopts.cpp",
 	MAME_DIR .. "src/emu/emuopts.h",
 	MAME_DIR .. "src/emu/emupal.cpp",

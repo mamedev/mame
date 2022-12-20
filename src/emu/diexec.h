@@ -304,7 +304,9 @@ private:
 
 	// cycle counting and executing
 	profile_type            m_profiler;                 // profiler tag
+protected:  // TODO: decide whether to bring up the wait-state methods
 	int *                   m_icountptr;                // pointer to the icount
+private:
 	int                     m_cycles_running;           // number of cycles we are executing
 	int                     m_cycles_stolen;            // number of cycles we artificially stole
 

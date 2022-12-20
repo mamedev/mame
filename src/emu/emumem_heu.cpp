@@ -104,6 +104,11 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 	return result;
 }
 
+template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_units<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+{
+	return read(offset, mem_mask);
+}
+
 template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_units<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	this->ref();
@@ -283,6 +288,11 @@ template<int Width, int AddrShift> void handler_entry_write_units<Width, AddrShi
 	}
 
 	this->unref();
+}
+
+template<int Width, int AddrShift> void handler_entry_write_units<Width, AddrShift>::write_interruptible(offs_t offset, uX data, uX mem_mask) const
+{
+	write(offset, data, mem_mask);
 }
 
 template<int Width, int AddrShift> u16 handler_entry_write_units<Width, AddrShift>::write_flags(offs_t offset, uX data, uX mem_mask) const
