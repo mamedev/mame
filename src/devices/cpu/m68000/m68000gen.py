@@ -1910,7 +1910,7 @@ def propagate_bus_access(blocks, code, critical):
                     ci += bus_access[1:]
                     ci.append(critical)
                     bus_access = None
-                    bid += 1
+                    bid += 2
             elif ci[0] == "drop_critical":
                 critical = False
         for nc in blocks[i][3]:
@@ -2092,6 +2092,8 @@ def generate_source_from_code(code, gen_mode):
                     ssw += " | SSW_CRITICAL"
                 ssw += ";"
                 source.append(ssw)
+                if not (gen_mode & GEN.full):
+                    source.append("\t[[fallthrough]]; case %d:" % (ci[1]))
                 if ci[4]:
                     if ci[3]:
                         if ci[8]:
@@ -2099,16 +2101,16 @@ def generate_source_from_code(code, gen_mode):
                             source.append("\t\tm_tas_write_callback(m_aob, m_dbout);")
                             source.append("\telse")
                             if gen_mode & GEN.direct:
-                                source.append("\t\t%s.write_word(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
+                                source.append("\t\t%s.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
                             else:
                                 source.append("\t\tm_mmu->write_%s(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["program", "data"][ci[2]]))
                         elif gen_mode & GEN.direct:
-                            source.append("\t%s.write_word(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
+                            source.append("\t%s.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
                         else:
                             source.append("\tm_mmu->write_%s(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["program", "data"][ci[2]]))
                     else:
                         if gen_mode & GEN.direct:
-                            source.append("\t%s.write_word(m_aob & ~1, m_dbout);" % (["m_opcodes", "m_program"][ci[2]]))
+                            source.append("\t%s.write_interruptible(m_aob & ~1, m_dbout);" % (["m_opcodes", "m_program"][ci[2]]))
                         else:
                             source.append("\tm_mmu->write_%s(m_aob & ~1, m_dbout, 0xffff);" % (["program", "data"][ci[2]]))
                 else:
@@ -2116,23 +2118,33 @@ def generate_source_from_code(code, gen_mode):
                         # cpu space access, e.g. interrupt vector lookup
                         source.append("\tstart_interrupt_vector_lookup();")
                         if gen_mode & GEN.direct:
-                            source.append("\tm_edb = m_cpu_space.read_word(m_aob);")
+                            source.append("\tm_edb = m_cpu_space.read_interruptible(m_aob);")
                         else:
                             source.append("\tm_edb = m_mmu->read_cpu(m_aob, 0xffff);")
                         source.append("\tend_interrupt_vector_lookup();")
                     elif ci[3]:
                         if gen_mode & GEN.direct:
-                            source.append("\tm_edb = %s.read_word(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
+                            source.append("\tm_edb = %s.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
                         else:
                             source.append("\tm_edb = m_mmu->read_%s(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);" % (["program", "data"][ci[2]]))
                         source.append("\tif(!(m_aob & 1))")
                         source.append("\t\tm_edb >>= 8;")
                     else:
                         if gen_mode & GEN.direct:
-                            source.append("\tm_edb = %s.read_word(m_aob & ~1);" % (["m_opcodes", "m_program"][ci[2]]))
+                            source.append("\tm_edb = %s.read_interruptible(m_aob & ~1);" % (["m_opcodes", "m_program"][ci[2]]))
                         else:
                             source.append("\tm_edb = m_mmu->read_%s(m_aob & ~1, 0xffff);" % (["program", "data"][ci[2]]))
                 source.append("\tm_icount -= 4;")
+                source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
+                source.append("\t\tif(access_to_be_redone()) {")
+                source.append("\t\t\tm_icount += 4;")
+                source.append("\t\t\tm_inst_substate = %d;" % ci[1])
+                source.append("\t\t} else")
+                source.append("\t\t\tm_inst_substate = %d;" % (ci[1]+1))
+                source.append("\t\treturn;")
+                source.append("\t}")
+                if not (gen_mode & GEN.full):
+                    source.append("\t[[fallthrough]]; case %d:" % (ci[1]+1))
                 if not ci[3]:
                     source.append("\tif(m_aob & 1) {")
                     source.append("\t\tm_icount -= 4;")
@@ -2141,12 +2153,6 @@ def generate_source_from_code(code, gen_mode):
                         source.append("\t\tm_inst_substate = 0;")
                     source.append("\t\treturn;")
                     source.append("\t}")
-                source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
-                source.append("\t\tm_inst_substate = %s;" % ci[1])
-                source.append("\t\treturn;")
-                source.append("\t}")
-                if not (gen_mode & GEN.full):
-                    source.append("\t[[fallthrough]]; case %d:" % ci[1])
             elif ci[0] == "=":
                 source.append("\t%s = %s;" % (regname[ci[1]], make_expression(ci[2:])))
             elif ci[0] == "=sr":

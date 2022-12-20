@@ -32,6 +32,7 @@ public:
 	// Infrastructure interfaces
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 	virtual void execute_run() override;
@@ -47,6 +48,8 @@ public:
 	template <typename... T> void set_tas_write_callback(T &&... args) { m_tas_write_callback.set(std::forward<T>(args)...); }
 	template <typename... T> void set_cmpild_callback(T &&... args) { m_cmpild_instr_callback.set(std::forward<T>(args)...); }
 	template <typename... T> void set_rte_callback(T &&... args) { m_rte_instr_callback.set(std::forward<T>(args)...); }
+
+	u64 vpa_sync(offs_t address, u64 current_time);
 
 protected:
 	// Processor special states

@@ -98,6 +98,8 @@ private:
 
 	void fifo_schedule_block_transfer_to_ram();
 	void fifo_schedule_block_transfer_from_ram();
+
+	u64 bus_contention(offs_t address, u64 current_time) const;
 };
 
 DECLARE_DEVICE_TYPE(ST_MMU, st_mmu_device)
