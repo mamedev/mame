@@ -178,8 +178,8 @@ u8 micom_xe_1a_device::out_r()
 			{
 				u8 const z = m_analog_callback(2);
 				u8 const result =
-						((0xc0 > z)  ? 0x01 : 0x00) | // Throttle Up
-						((0x40 <= z) ? 0x02 : 0x00) | // Throttle Down
+						((0x40 <= z) ? 0x01 : 0x00) | // Throttle Up
+						((0xc0 > z)  ? 0x02 : 0x00) | // Throttle Down
 						(BIT(buttons, 1) << 2) |      // C
 						(BIT(buttons, 0) << 3) |      // D
 						(BIT(buttons, 7) << 4) |      // E1
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER(micom_xe_1a_device::req_w)
 				m_data[2] = BIT(analog[2], 4, 4) | (BIT(analog[3], 4, 4) << 4);
 				m_data[3] = BIT(analog[0], 0, 4) | (BIT(analog[1], 0, 4) << 4);
 				m_data[4] = BIT(analog[2], 0, 4) | (BIT(analog[3], 0, 4) << 4);
-				m_data[5] = BIT(buttons, 8, 8) & ((BIT(buttons, 6, 2) << 2) | 0xf3);
+				m_data[5] = BIT(buttons, 8, 8) & ((BIT(buttons, 2, 2) << 2) | 0xf3);
 
 				// takes a while to respond
 				m_output_timer->adjust(attotime::from_nsec(50'000), 0);
