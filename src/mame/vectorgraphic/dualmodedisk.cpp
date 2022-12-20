@@ -32,7 +32,7 @@ TODO:
 #include "logmacro.h"
 
 micropolis_image_device::micropolis_image_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VECTOR_DUALMODE, tag, owner, clock)
+	: device_t(mconfig, MICROPOLIS_IMAGE, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 {
 }
