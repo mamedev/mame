@@ -760,8 +760,8 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					mux = 0;
 
 				// CD0-3 are selected from the sprite bits and MUX0-2 (p. 141)
-				sprbits = (sprbits >> (mux & 0x07)) & 0x01010101;
-				uint8_t cd = (sprbits >> (24-3)) | (sprbits >> (16-2)) | (sprbits >> (8-1)) | sprbits;
+				sprbits >>= mux & 0x07;
+				uint8_t cd = bitswap<4>(sprbits, 24, 16, 8, 0);
 
 				// MUX3 selects either CD0-3 or the foreground output (p. 141)
 				int finalbits;
@@ -959,8 +959,8 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				if (mux == 8) mux = 0xf;
 
 				// MUX then selects one of the sprites and selects CD0-3
-				sprbits = (sprbits >> (mux & 0x07)) & 0x01010101;
-				uint8_t cd = (sprbits >> (24-3)) | (sprbits >> (16-2)) | (sprbits >> (8-1)) | sprbits;
+				sprbits >>= mux & 0x07;
+				uint8_t cd = bitswap<4>(sprbits, 24, 16, 8, 0);
 
 				// this info goes into an LS148 8-to-3 decoder to determine the priorities (SH 5/5)
 
