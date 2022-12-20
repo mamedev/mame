@@ -1404,7 +1404,7 @@ void mc68328_base_device::isr_msw_w(offs_t offset, u16 data, u16 mem_mask) // 0x
 	}
 
 	// Clear edge-triggered IRQ7
-	if ((data & INT_IRQ7_MASK) == INT_IRQ7_MASK)
+	if (((data << 16) & INT_IRQ7_MASK) == INT_IRQ7_MASK)
 	{
 		m_isr &= ~INT_IRQ7_MASK;
 	}
