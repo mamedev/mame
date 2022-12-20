@@ -905,8 +905,6 @@ meta_data hp98x5_impl::get_metadata(const entry& e)
 		}
 		// System flags
 		meta.set(meta_name::attributes, util::string_format("%u", e.m_attrs));
-		// Bytes-per-record
-		meta.set(meta_name::rec_size, e.m_bpr);
 	}
 
 	meta.set(meta_name::length, e.m_size);
@@ -1412,7 +1410,6 @@ std::vector<meta_description> hp9845_image::file_meta_description() const
 	res.emplace_back(meta_description(meta_name::name, "Empty", false, [](const meta_value &m) { return m.as_string().size() <= 6; }, "File name, up to 6 characters"));
 	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "File size"));
 	res.emplace_back(meta_description(meta_name::file_type, "", true, nullptr, "File type"));
-	res.emplace_back(meta_description(meta_name::rec_size, 0, true, nullptr, "Record size"));
 	res.emplace_back(meta_description(meta_name::attributes, "", true, nullptr, "File attributes"));
 
 	return res;
