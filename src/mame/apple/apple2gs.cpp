@@ -2507,7 +2507,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_gameio->sw2_r() | uFloatingBus7;
 #else
 		case 0x61:  // button 0 or Open Apple
-			return ((m_gameio->sw0_r() ) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62:  // button 1 or Option
 			return ((m_gameio->sw1_r() || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
