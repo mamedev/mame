@@ -415,8 +415,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 #endif
 
-	u8 keyglu_mcu_read(u8 offset);
-	void keyglu_mcu_write(u8 offset, u8 data);
+	[[maybe_unused]] u8 keyglu_mcu_read(u8 offset);
+	[[maybe_unused]] void keyglu_mcu_write(u8 offset, u8 data);
 #if RUN_ADB_MICRO
 	u8 keyglu_816_read(u8 offset);
 	void keyglu_816_write(u8 offset, u8 data);
