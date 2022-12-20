@@ -498,4 +498,15 @@ void st_mmu_device::configure_ram()
 		m_cpu->space(AS_PROGRAM).nop_readwrite(ub, 0x3fffff);
 		m_cpu->space(m68000_device::AS_USER_PROGRAM).nop_readwrite(ub, 0x3fffff);
 	}
+
+	m_cpu->space(AS_PROGRAM).install_readwrite_before_time(st_s, 0x3fffff, ws_time_delegate(*this, FUNC(st_mmu_device::bus_contention)));
+	m_cpu->space(m68000_device::AS_USER_PROGRAM).install_readwrite_before_time(st_u, 0x3fffff, ws_time_delegate(*this, FUNC(st_mmu_device::bus_contention)));
 }
+
+u64 st_mmu_device::bus_contention(offs_t address, u64 current_time) const
+{
+	if(current_time & 3)
+		current_time = (current_time | 3) + 1;
+	return current_time;
+}
+
