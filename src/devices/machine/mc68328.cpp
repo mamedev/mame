@@ -1380,7 +1380,7 @@ void mc68328_base_device::isr_msw_w(offs_t offset, u16 data, u16 mem_mask) // 0x
 {
 	LOGMASKED(LOG_INTS, "%s: isr_msw_w: ISR(MSW) = %04x\n", machine().describe_context(), data);
 	// Clear edge-triggered IRQ1
-	if ((m_icr & ICR_ET1) == ICR_ET1 && ((data << 16) INT_IRQ1_MASK) == INT_IRQ1_MASK)
+	if ((m_icr & ICR_ET1) == ICR_ET1 && ((data << 16) & INT_IRQ1_MASK) == INT_IRQ1_MASK)
 	{
 		m_isr &= ~INT_IRQ1_MASK;
 	}
