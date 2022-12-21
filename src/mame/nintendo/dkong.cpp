@@ -3686,7 +3686,8 @@ void dkong_state::init_dkongx()
 void dkong_state::init_dkong3()
 {
 	// RP2A03 bus conflict between internal APU and external RAM.
-	// dkong3 relies on it, eg. sound effect when player dies.
+	// dkong3 relies on it, eg. sound effects when player dies, jumps down a platform, Creepy inchworm appears/gets hit
+	// BTANB: squeak that randomly interrupts Creepy inchworm's sound effect
 	m_dkong3_tap[0] = m_dev_rp2a03a->space(AS_PROGRAM).install_write_tap(
 			0x4000, 0x4017,
 			"rp2a03a_conflict_w",
