@@ -145,6 +145,7 @@ void sbc_video_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(crtc, FUNC(c6545_1_device::screen_update));
+	screen.set_size(1280, 312);
 }
 
 void sbc_video_device::device_start()

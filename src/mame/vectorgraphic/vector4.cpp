@@ -79,7 +79,6 @@ public:
 	{ }
 
 	void vector4(machine_config &config);
-	void init_vector4();
 
 private:
 	void vector4_io(address_map &map);
@@ -89,6 +88,7 @@ private:
 	uint8_t msc_r();
 	void msc_w(uint8_t data) { machine_reset(); }
 	void addrmap_w(offs_t offset, uint8_t data);
+	void machine_start() override;
 	void machine_reset() override;
 
 	uint8_t ram_r(offs_t offset) { return m_ram[offset]; }
@@ -118,12 +118,10 @@ void vector4_state::vector4_z80mem(address_map &map)
 
 void vector4_state::vector4_8088mem(address_map &map)
 {
-	uint32_t high_addr = m_256k ? 0x3ffff : 0x1ffff;
+	const uint32_t high_addr = m_256k ? 0x3ffff : 0x1ffff;
 	map.unmap_value_high();
 	map.global_mask(high_addr);
-	// TODO: why does share not work with CPU switching?
-	//map(0x0000, high_addr).share(m_ram);
-	map(0x0000, high_addr).rw(FUNC(vector4_state::ram_r), FUNC(vector4_state::ram_w));
+	map(0x0000, high_addr).ram().share(m_ram);
 }
 
 void vector4_state::vector4_io(address_map &map)
@@ -158,8 +156,8 @@ DEVICE_INPUT_DEFAULTS_END
 
 void vector4_state::vector4(machine_config &config)
 {
-	XTAL _32m(32'640'000);
-	XTAL _2m = _32m/16;
+	const XTAL _32m(32'640'000);
+	const XTAL _2m = _32m/16;
 
 	/* processors */
 	// Manual says 5.1 MHz. Schematic shows it is driven by the 32.64 MHz xtal.
@@ -234,7 +232,7 @@ void vector4_state::vector4(machine_config &config)
 	m_sn->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void vector4_state::init_vector4()
+void vector4_state::machine_start()
 {
 	for (int bank = 0; bank < (1<<5); bank++)
 		for (int page = 0; page < (1<<7); page++)
@@ -301,4 +299,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY            FULLNAME    FLAGS
-COMP( 1982, vector4, 0,      0,      vector4, vector4, vector4_state, init_vector4, "Vector Graphic", "Vector 4", MACHINE_NODEVICE_PRINTER | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, vector4, 0,      0,      vector4, vector4, vector4_state, empty_init,   "Vector Graphic", "Vector 4", MACHINE_NODEVICE_PRINTER | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )

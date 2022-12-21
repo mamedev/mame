@@ -8,8 +8,6 @@
 #include "video/mc6845.h"
 
 
-INPUT_PORTS_EXTERN( sbc_video );
-
 class sbc_video_device : public device_t
 {
 public:

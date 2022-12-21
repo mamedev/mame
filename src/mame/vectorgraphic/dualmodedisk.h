@@ -17,7 +17,7 @@ public:
 	bool is_writeable() const noexcept override { return true; }
 	bool is_creatable() const noexcept override { return true; }
 	const char *image_type_name() const noexcept override { return "micropolisimage"; }
-	const char *image_brief_type_name() const noexcept override { return "vgi"; }
+	const char *image_brief_type_name() const noexcept override { return "flop"; }
 	const char *image_interface() const noexcept override { return "micropolis_image"; }
 	const char *file_extensions() const noexcept override { return "vgi"; }
 	image_init_result call_load() override;
