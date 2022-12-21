@@ -451,7 +451,6 @@ static inline void apu_dpcmreset(apu_t::dpcm_t *chan)
 	chan->address = 0xc000 + u16(chan->regs[2] << 6);
 	chan->length = u16(chan->regs[3] << 4) + 1;
 	chan->bits_left = chan->length << 3;
-	chan->irq_occurred = false;
 	chan->enabled = true; /* Fixed * Proper DPCM channel ENABLE/DISABLE flag behaviour*/
 }
 
@@ -491,7 +490,6 @@ void nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 					break;
 				}
 			}
-
 
 			chan->bits_left--;
 			bit_pos = 7 - (chan->bits_left & 7);
@@ -633,7 +631,8 @@ void nesapu_device::write(offs_t offset, u8 value)
 	/* DMC */
 	case apu_t::WRE0:
 		m_APU.dpcm.regs[0] = value;
-		if (!(value & 0x80)) {
+		if (!(value & 0x80))
+		{
 			m_APU.dpcm.irq_occurred = false;
 			if (!m_APU.frame_irq_occurred)
 				m_irq_handler(false);
