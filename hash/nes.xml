@@ -1186,8 +1186,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound. Could this be related to sound issue in early Enix games? -->
-	<software name="ajyureir" supported="no">
+	<software name="ajyureir">
 		<description>Akagawa Jirou no Yuurei Ressha (Japan)</description>
 		<year>1991</year>
 		<publisher>King Records</publisher>
@@ -3800,7 +3799,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="btoadsdd">
+<!-- Same issue as US release -->
+	<software name="btoadsdd" supported="no">
 		<description>Battletoads &amp; Double Dragon - The Ultimate Team (Europe)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
@@ -3818,7 +3818,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="btoadsddu" cloneof="btoadsdd">
+<!-- Crashes at level 1-2 Abobo. Code falls off the rails at D2B2: jmp ($0021). Apparently game depends on an open bus read from $6xxx some time before that. -->
+	<software name="btoadsddu" cloneof="btoadsdd" supported="no">
 		<description>Battletoads &amp; Double Dragon - The Ultimate Team (USA)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
@@ -5941,7 +5942,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="castelnu" cloneof="casteln">
+<!-- no background music in game -->
+	<software name="castelnu" cloneof="casteln" supported="partial">
 		<description>Castelian (USA)</description>
 		<year>1991</year>
 		<publisher>Triffix</publisher>
@@ -5961,7 +5963,7 @@ license:CC0
 	</software>
 
 <!-- a proto has been found too, containing the same data, with labels "CASTELIAN 2/4/92 CHK$985A" -->
-	<software name="casteln" supported="no"> <!-- freezes when you start game -->
+	<software name="casteln" supported="partial"> <!-- buzz instead of music -->
 		<description>Castelian (Europe)</description>
 		<year>1992</year>
 		<publisher>Storm</publisher>
@@ -6153,7 +6155,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cvania3u" cloneof="cvania3">
+<!-- Graphics corrupt on parts of attract mode film reel. Once those have been viewed, in-game graphics flicker (wild nametable flipping) when picking up weapon upgrades, going through doors, etc. -->
+	<software name="cvania3u" cloneof="cvania3" supported="partial">
 		<description>Castlevania III - Dracula's Curse (USA)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
@@ -6179,7 +6182,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cvania3">
+<!-- Crashes if you watch the attract mode film roll reel -->
+	<software name="cvania3" supported="partial">
 		<description>Castlevania III - Dracula's Curse (Europe)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
@@ -9100,8 +9104,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes as soon as you get killed by any enemy -->
-	<software name="doordoor" supported="no">
+	<software name="doordoor">
 		<description>Door Door (Japan)</description>
 		<year>1985</year>
 		<publisher>Enix</publisher>
@@ -10081,8 +10084,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes once you win any battle -->
-	<software name="dquest" cloneof="dwarr" supported="no">
+	<software name="dquest" cloneof="dwarr">
 		<description>Dragon Quest (Japan)</description>
 		<year>1986</year>
 		<publisher>Enix</publisher>
@@ -10102,8 +10104,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound. Will this freeze up at some point like the other early Enix games? -->
-	<software name="dquest2" cloneof="dwarr2" supported="no">
+	<software name="dquest2" cloneof="dwarr2">
 		<description>Dragon Quest II - Akuryou no Kamigami (Japan)</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
@@ -14361,7 +14362,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gegege" cloneof="ninjakid" supported="no">
+	<software name="gegege" cloneof="ninjakid">
 		<description>GeGeGe no Kitarou - Youkai Daimakyou (Japan)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -15676,7 +15677,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgnu" cloneof="guardlgn" supported="no">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="guardlgnu" cloneof="guardlgn" supported="partial">
 		<description>The Guardian Legend (USA)</description>
 		<year>1989</year>
 		<publisher>Brøderbund</publisher>
@@ -15695,7 +15697,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgn" supported="no">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="guardlgn" supported="partial">
 		<description>The Guardian Legend (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -15714,7 +15717,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardic" cloneof="guardlgn" supported="no">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="guardic" cloneof="guardlgn" supported="partial">
 		<description>Guardic Gaiden (Japan)</description>
 		<year>1987</year>
 		<publisher>Irem</publisher>
@@ -19111,7 +19115,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jesus" supported="no">
+	<software name="jesus">
 		<description>Jesus - Kyoufu no Bio Monster (Japan)</description>
 		<year>1989</year>
 		<publisher>King Records</publisher>
@@ -23214,7 +23218,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mjtaikai" supported="no">
+	<software name="mjtaikai">
 		<description>Mahjong Taikai (Japan)</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
@@ -24475,7 +24479,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mendel" supported="no">
+	<software name="mendel">
 		<description>Mendel Palace (USA)</description>
 		<year>1990</year>
 		<publisher>Hudson Soft</publisher>
@@ -26292,7 +26296,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mutantv" supported="no">
+	<software name="mutantv">
 		<description>The Mutant Virus (USA)</description>
 		<year>1992</year>
 		<publisher>American Softworks</publisher>
@@ -27162,8 +27166,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Missing sprites -->
-	<software name="ninjajag" cloneof="squashed" supported="no">
+	<software name="ninjajag" cloneof="squashed">
 		<description>Ninja Jajamaru - Ginga Daisakusen (Japan)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -27182,7 +27185,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ninjakid" supported="no">
+	<software name="ninjakid">
 		<description>Ninja Kid (USA)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -27221,6 +27224,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Unlike the other clones this plays the entire intro song to a black screen THEN plays the intro story scenes sans music -->
 	<software name="nryuken2" cloneof="shadwar2" supported="partial">
 		<description>Ninja Ryukenden II - Ankoku no Jashinken (Japan)</description>
 		<year>1990</year>
@@ -29404,8 +29408,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes when you dial a phone number -->
-	<software name="portopia" supported="no">
+	<software name="portopia">
 		<description>Portopia Renzoku Satsujin Jiken (Japan)</description>
 		<year>1985</year>
 		<publisher>Enix</publisher>
@@ -30137,7 +30140,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="qix" supported="no">
+	<software name="qix">
 		<description>Qix (USA)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
@@ -30255,7 +30258,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="quinty" cloneof="mendel" supported="no">
+	<software name="quinty" cloneof="mendel">
 		<description>Quinty (Japan)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
@@ -32181,7 +32184,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="romancia" supported="no"> <!-- frozen on black screen at power on -->
+<!-- severe status bar flickering (DMC IRQ timing issue?) -->
+	<software name="romancia" supported="no">
 		<description>Romancia (Japan)</description>
 		<year>1987</year>
 		<publisher>Tokyo Shoseki</publisher>
@@ -33971,6 +33975,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Among the many issues the entire screen oddly and incessantly scrolls down no matter what's on it -->
 	<software name="shin4num" supported="no">
 		<description>Shin 4-nin Uchi Mahjong - Yakuman Tengoku (Japan)</description>
 		<year>1991</year>
@@ -35869,8 +35874,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Missing sprites -->
-	<software name="squashed" supported="no">
+	<software name="squashed">
 		<description>Squashed (USA, prototype)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -39812,7 +39816,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="timelordu" cloneof="timelord">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="timelordu" cloneof="timelord" supported="partial">
 		<description>Time Lord (USA)</description>
 		<year>1990</year>
 		<publisher>Milton Bradley</publisher>
@@ -39830,7 +39835,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="timelord">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="timelord" supported="partial">
 		<description>Time Lord (Europe)</description>
 		<year>1991</year>
 		<publisher>Milton Bradley</publisher>
@@ -42092,7 +42098,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wmaniau" cloneof="wmania" supported="no">
+	<software name="wmaniau" cloneof="wmania">
 		<description>WWF WrestleMania (USA)</description>
 		<year>1989</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -42118,7 +42124,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wmania" supported="no">
+	<software name="wmania">
 		<description>WWF WrestleMania (Europe)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -47509,7 +47515,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="gegegep" cloneof="ninjakid" supported="no">
+	<software name="gegegep" cloneof="ninjakid">
 		<description>GeGeGe no Kitarou - Youkai Daimakyou (Japan, prototype)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -48646,7 +48652,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="kyorolnd" cloneof="casteln">
+<!-- has buzz instead of background music in game -->
+	<software name="kyorolnd" cloneof="casteln" supported="partial">
 		<description>Kyoro-chan Land (Japan)</description>
 		<year>1992</year>
 		<publisher>Hiro</publisher>
@@ -49867,8 +49874,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Missing sprites -->
-	<software name="ninjajagp" cloneof="squashed" supported="no">
+	<software name="ninjajagp" cloneof="squashed">
 		<description>Ninja Jajamaru - Ginga Daisakusen (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -71486,8 +71492,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes as soon as you get killed by any enemy -->
-	<software name="doordoorh" cloneof="doordoor" supported="no">
+	<software name="doordoorh" cloneof="doordoor">
 		<description>Door Door (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -71786,7 +71791,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="gegegeh" cloneof="ninjakid" supported="no">
+	<software name="gegegeh" cloneof="ninjakid">
 		<description>GeGeGe no Kitarou - Youkai Daimakyou (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -75792,7 +75797,7 @@ Other
 	</software>
 
 <!-- is the following also hacked?!? -->
-	<software name="btoadsddh" cloneof="btoadsdd">
+	<software name="btoadsddh" cloneof="btoadsdd" supported="no"> <!-- Same issue as US release -->
 		<description>Battletoads &amp; Double Dragon - The Ultimate Team (pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -78731,7 +78736,8 @@ We include them here as reference if they should coincide with later revisions o
 		</part>
 	</software>
 
-	<software name="cvania3kc" cloneof="cvania3">
+<!-- Same issue as US release -->
+	<software name="cvania3kc" cloneof="cvania3" supported="partial">
 		<description>Castlevania III - Dracula's Curse (ripped from PC Konami Classics)</description>
 		<year>200?</year>
 		<publisher>Konami</publisher>
