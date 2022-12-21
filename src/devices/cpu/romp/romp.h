@@ -65,8 +65,8 @@ protected:
 							   // reserved
 		MCS_PCC = 0x0000'8000, // processor channel check
 
-		MCS_ALL = 0x0000'ff00,
-		PCS_ALL = 0x0000'00ff,
+		MCS_ALL = 0x0000'be00,
+		PCS_ALL = 0x0000'00fe,
 	};
 
 	enum irb_mask : u16
@@ -142,8 +142,7 @@ private:
 
 	void interrupt_check();
 	void machine_check(u32 mcs);
-	void program_check(u32 pcs, u32 iar);
-	void program_check(u32 pcs) { program_check(pcs, m_scr[IAR]); }
+	void program_check(u32 pcs);
 	void interrupt_enter(unsigned vector, u32 iar, u16 svc = 0);
 
 	using rsc_mode = rsc_bus_interface::rsc_mode;
@@ -289,6 +288,7 @@ private:
 	m_branch_state;
 	u32 m_branch_source;
 	u32 m_branch_target;
+	bool m_defer_int;
 };
 
 DECLARE_DEVICE_TYPE(ROMP, romp_device)
