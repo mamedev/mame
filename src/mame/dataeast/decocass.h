@@ -101,7 +101,7 @@ private:
 	required_shared_ptr<uint8_t> m_objectram;
 	required_shared_ptr<uint8_t> m_paletteram;
 	optional_memory_bank         m_bank1;
- 
+
 	size_t    m_bgvideoram_size = 0U;
 
 	/* video-related */
@@ -461,11 +461,11 @@ public:
 	{
 	}
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
-
 	uint8_t decocass_darksoft_r(offs_t offset);
 	void decocass_darksoft_w(offs_t offset, uint8_t data);
 
