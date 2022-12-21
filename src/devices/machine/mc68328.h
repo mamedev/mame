@@ -124,15 +124,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(irq5_w);
 
-	template <typename F>
-	std::enable_if_t<lcd_info_changed_delegate::supports_callback<F>::value> set_lcd_info_changed(F &&callback, const char *name)
+	template <typename... T>
+	void set_lcd_info_changed(T &&... args)
 	{
-		m_lcd_info_changed_cb.set(std::forward<F>(callback), name);
-	}
-	template <typename T, typename F>
-	std::enable_if_t<lcd_info_changed_delegate::supports_callback<F>::value> set_lcd_info_changed(T &&target, F &&callback, const char *name)
-	{
-		m_lcd_info_changed_cb.set(std::forward<T>(target), std::forward<F>(callback), name);
+		m_lcd_info_changed_cb.set(std::forward<T>(args)...);
 	}
 
 protected:

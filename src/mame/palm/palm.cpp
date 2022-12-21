@@ -16,10 +16,9 @@
 #include "machine/mc68328.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "video/sed1375.h"
 #include "video/mc68328lcd.h"
+#include "video/sed1375.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -27,6 +26,8 @@
 
 #define VERBOSE (0)
 #include "logmacro.h"
+
+namespace {
 
 class palm_base_state : public driver_device
 {
@@ -38,6 +39,7 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
+		, m_screen(*this, "screen")
 		, m_io_penx(*this, "PENX")
 		, m_io_peny(*this, "PENY")
 		, m_io_penb(*this, "PENB")
@@ -52,6 +54,7 @@ protected:
 
 	required_device<mc68328_base_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<screen_device> m_screen;
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
 	required_ioport m_io_penb;
@@ -64,7 +67,7 @@ class palm_state : public palm_base_state
 public:
 	palm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: palm_base_state(mconfig, type, tag)
-		, m_screen(*this, "screen")
+		, m_lcdctrl(*this, "lcdctrl")
 		, m_io_portd(*this, "PORTD")
 	{ }
 
@@ -85,6 +88,8 @@ protected:
 
 	void mem_map(address_map &map);
 
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void check_pen_adc_read();
 	void adc_vcc_y_w(int state);
 	void adc_gnd_y_w(int state);
@@ -102,7 +107,7 @@ protected:
 		PORTF_ADC_CSN_BIT		= 7
 	};
 
-	required_device<mc68328_lcd_device> m_screen;
+	required_device<mc68328_lcd_device> m_lcdctrl;
 	required_ioport m_io_portd;
 
 	u8 m_port_f_latch;
@@ -163,7 +168,6 @@ public:
 	palmiiic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: palmez_base_state(mconfig, type, tag, 0x09)
 		, m_sed1375(*this, "lcdctrl")
-		, m_screen(*this, "screen")
 	{ }
 
 	void palmiiic(machine_config &config);
@@ -172,7 +176,6 @@ protected:
 	void mem_map(address_map &map);
 
 	required_device<sed1375_device> m_sed1375;
-	required_device<screen_device> m_screen;
 };
 
 class palmm100_state : public palmez_base_state
@@ -180,7 +183,7 @@ class palmm100_state : public palmez_base_state
 public:
 	palmm100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: palmez_base_state(mconfig, type, tag, 0x05)
-		, m_screen(*this, "screen")
+		, m_lcdctrl(*this, "lcdctrl")
 	{ }
 
 	void palmm100(machine_config &config);
@@ -188,7 +191,9 @@ public:
 protected:
 	template <int Line> int hardware_subid_r();
 
-	required_device<mc68328_lcd_device> m_screen;
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_device<mc68328_lcd_device> m_lcdctrl;
 };
 
 
@@ -226,6 +231,7 @@ int palm_base_state::spi_from_hw()
 	return out_state;
 }
 
+
 // First-generation Palm hardware ("IDT")
 
 void palm_state::machine_start()
@@ -251,6 +257,12 @@ void palm_state::machine_reset()
 	m_adc_gnd_x = false;
 	m_adc_vcc_y = false;
 	m_adc_gnd_y = false;
+}
+
+u32 palm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_lcdctrl->video_update(bitmap, cliprect);
+	return 0;
 }
 
 INPUT_CHANGED_MEMBER(palm_state::button_check)
@@ -452,7 +464,15 @@ void palmez_base_state::hardware_id_req_w(int state)
 	m_hardware_id_asserted = !state;
 }
 
+
 // Palm m100 ("Brad") hardware
+
+u32 palmm100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_lcdctrl->video_update(bitmap, cliprect);
+	return 0;
+}
+
 template <int Line> int palmm100_state::hardware_subid_r()
 {
 	return BIT(~0x00, Line);
@@ -584,14 +604,20 @@ void palm_state::palm_base(machine_config &config)
 	m_maincpu->out_pwm().set("dac", FUNC(dac_bit_interface::write));
 	m_maincpu->in_spim().set(FUNC(palm_state::spi_from_hw));
 
-	m_maincpu->out_flm().set(m_screen, FUNC(mc68328_lcd_device::flm_w));
-	m_maincpu->out_llp().set(m_screen, FUNC(mc68328_lcd_device::llp_w));
-	m_maincpu->out_lsclk().set(m_screen, FUNC(mc68328_lcd_device::lsclk_w));
-	m_maincpu->out_ld().set(m_screen, FUNC(mc68328_lcd_device::ld_w));
-	m_maincpu->set_lcd_info_changed(m_screen, FUNC(mc68328_lcd_device::lcd_info_changed));
+	m_maincpu->out_flm().set(m_lcdctrl, FUNC(mc68328_lcd_device::flm_w));
+	m_maincpu->out_llp().set(m_lcdctrl, FUNC(mc68328_lcd_device::llp_w));
+	m_maincpu->out_lsclk().set(m_lcdctrl, FUNC(mc68328_lcd_device::lsclk_w));
+	m_maincpu->out_ld().set(m_lcdctrl, FUNC(mc68328_lcd_device::ld_w));
+	m_maincpu->set_lcd_info_changed(m_lcdctrl, FUNC(mc68328_lcd_device::lcd_info_changed));
 
 	/* video hardware */
-	MC68328_LCD_SCREEN(config, m_screen, 0, 160, 220);
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(160, 220);
+	m_screen->set_visarea(0, 160 - 1, 0, 220 - 1);
+	m_screen->set_screen_update(FUNC(palm_state::screen_update));
+
+	MC68328_LCD(config, m_lcdctrl, 0);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -695,17 +721,23 @@ void palmm100_state::palmm100(machine_config &config)
 	m_maincpu->in_spim().set(FUNC(palmm100_state::spi_from_hw));
 	m_maincpu->out_spim().set(FUNC(palmm100_state::spi_to_hw));
 
-	m_maincpu->out_flm().set(m_screen, FUNC(mc68328_lcd_device::flm_w));
-	m_maincpu->out_llp().set(m_screen, FUNC(mc68328_lcd_device::llp_w));
-	m_maincpu->out_lsclk().set(m_screen, FUNC(mc68328_lcd_device::lsclk_w));
-	m_maincpu->out_ld().set(m_screen, FUNC(mc68328_lcd_device::ld_w));
-	m_maincpu->set_lcd_info_changed(m_screen, FUNC(mc68328_lcd_device::lcd_info_changed));
+	m_maincpu->out_flm().set(m_lcdctrl, FUNC(mc68328_lcd_device::flm_w));
+	m_maincpu->out_llp().set(m_lcdctrl, FUNC(mc68328_lcd_device::llp_w));
+	m_maincpu->out_lsclk().set(m_lcdctrl, FUNC(mc68328_lcd_device::lsclk_w));
+	m_maincpu->out_ld().set(m_lcdctrl, FUNC(mc68328_lcd_device::ld_w));
+	m_maincpu->set_lcd_info_changed(m_lcdctrl, FUNC(mc68328_lcd_device::lcd_info_changed));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("2M");
 
 	/* video hardware */
-	MC68328_LCD_SCREEN(config, m_screen, 0, 160, 220);
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(160, 220);
+	m_screen->set_visarea(0, 160 - 1, 0, 220 - 1);
+	m_screen->set_screen_update(FUNC(palmm100_state::screen_update));
+
+	MC68328_LCD(config, m_lcdctrl, 0);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -952,6 +984,8 @@ ROM_START( spt1740 )
 	ROMX_LOAD( "spt1740v103-nopim.rom",   0x008000, 0x200000, CRC(8ea7e652) SHA1(2a4b5d6a426e627b3cb82c47109cfe2497eba29a), ROM_GROUPWORD | ROM_BIOS(2) )
 	ROM_RELOAD(0x000000, 0x004000)
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY          FULLNAME               FLAGS
 COMP( 1996, pilot1k,  0,       0,      pilot1k,  palm,     palm_state,     empty_init, "U.S. Robotics", "Pilot 1000",          MACHINE_SUPPORTS_SAVE )

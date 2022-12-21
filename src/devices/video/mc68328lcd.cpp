@@ -7,14 +7,17 @@
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "mc68328lcd.h"
 
-DEFINE_DEVICE_TYPE(MC68328_LCD_SCREEN, mc68328_lcd_device, "mc68328_lcd", "Generic MC68328-compatible LCD Screen")
+#include "screen.h"
+
+DEFINE_DEVICE_TYPE(MC68328_LCD, mc68328_lcd_device, "mc68328_lcd", "MC68328-compatible LCD Controller")
 
 mc68328_lcd_device::mc68328_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MC68328_LCD_SCREEN, tag, owner, clock)
-	, m_screen(*this, "screen")
-	, m_palette(*this, "palette")
+	: device_t(mconfig, MC68328_LCD, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
 {
 }
 
@@ -28,6 +31,8 @@ void mc68328_lcd_device::device_start()
 	save_item(NAME(m_lcd_scan_y));
 	save_item(NAME(m_bus_width));
 	save_item(NAME(m_bpp));
+
+	palette_init();
 }
 
 void mc68328_lcd_device::device_reset()
@@ -42,18 +47,7 @@ void mc68328_lcd_device::device_reset()
 	m_bpp = 1;
 }
 
-void mc68328_lcd_device::device_add_mconfig(machine_config &config)
-{
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(m_screen_width, m_screen_height);
-	m_screen->set_visarea(0, m_screen_width - 1, 0, m_screen_height - 1);
-	m_screen->set_screen_update(FUNC(mc68328_lcd_device::screen_update));
-
-	PALETTE(config, m_palette, FUNC(mc68328_lcd_device::init_palette), 16);
-}
-
-void mc68328_lcd_device::init_palette(palette_device &palette) const
+void mc68328_lcd_device::palette_init()
 {
 	constexpr u8 LCD_OFF_R = 0xbd;
 	constexpr u8 LCD_OFF_G = 0xbd;
@@ -67,7 +61,7 @@ void mc68328_lcd_device::init_palette(palette_device &palette) const
 		const u8 blend_r = (u8)(LCD_OFF_R * (1.f - lerp_factor) + LCD_ON_R * lerp_factor);
 		const u8 blend_g = (u8)(LCD_OFF_G * (1.f - lerp_factor) + LCD_ON_G * lerp_factor);
 		const u8 blend_b = (u8)(LCD_OFF_B * (1.f - lerp_factor) + LCD_ON_B * lerp_factor);
-		palette.set_pen_color(i, blend_r, blend_g, blend_b);
+		set_pen_color(i, blend_r, blend_g, blend_b);
 	}
 }
 
@@ -117,7 +111,7 @@ DECLARE_WRITE_LINE_MEMBER(mc68328_lcd_device::lsclk_w)
 			}
 			if (m_lcd_scan_x < m_lcd_bitmap.width() && m_lcd_scan_y < m_lcd_bitmap.height())
 			{
-				m_lcd_bitmap.pix(m_lcd_scan_y, m_lcd_scan_x) = m_palette->pen_color(value);
+				m_lcd_bitmap.pix(m_lcd_scan_y, m_lcd_scan_x) = pen_color(value);
 			}
 			m_lcd_scan_x++;
 		}
@@ -131,7 +125,10 @@ void mc68328_lcd_device::ld_w(u8 data)
 
 void mc68328_lcd_device::lcd_info_changed(double refresh_hz, int width, int height, u8 bus_width, u8 bpp)
 {
-	m_screen->set_refresh_hz(refresh_hz);
+	if (has_screen())
+	{
+		screen().set_refresh_hz(refresh_hz);
+	}
 	m_lcd_bitmap.resize(width, height);
 	m_bus_width = bus_width;
 	m_bpp = bpp;
@@ -139,9 +136,9 @@ void mc68328_lcd_device::lcd_info_changed(double refresh_hz, int width, int heig
 	m_lcd_scan_y = 0;
 }
 
-u32 mc68328_lcd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void mc68328_lcd_device::video_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->pen_color(0));
+	bitmap.fill(pen_color(0));
 	if (m_lcd_bitmap.valid())
 	{
 		u32 *src = &m_lcd_bitmap.pix(0);
@@ -149,5 +146,4 @@ u32 mc68328_lcd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		const int word_count = std::min(bitmap.width() * bitmap.height(), m_lcd_bitmap.width() * m_lcd_bitmap.height());
 		std::copy_n(src, word_count, dst);
 	}
-	return 0;
 }

@@ -11,19 +11,12 @@
 
 #pragma once
 
-#include "screen.h"
-#include "emupal.h"
-
-class mc68328_lcd_device : public device_t
+class mc68328_lcd_device : public device_t,
+                           public device_palette_interface,
+                           public device_video_interface
 {
 public:
 	mc68328_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	mc68328_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 screen_width, u32 screen_height)
-		: mc68328_lcd_device(mconfig, tag, owner, clock)
-	{
-		m_screen_width = screen_width;
-		m_screen_height = screen_height;
-	}
 
 	DECLARE_WRITE_LINE_MEMBER(flm_w);
 	DECLARE_WRITE_LINE_MEMBER(llp_w);
@@ -31,16 +24,17 @@ public:
 	void ld_w(u8 data);
 	void lcd_info_changed(double refresh_hz, int width, int height, u8 bus_width, u8 bpp);
 
+	void video_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 protected:
+	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void init_palette(palette_device &palette) const;
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const noexcept override { return 16; }
 
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	void palette_init();
 
 	bitmap_rgb32 m_lcd_bitmap;
 	bool m_lcd_first_line;
@@ -51,11 +45,9 @@ protected:
 	u16 m_lcd_scan_y;
 	u8 m_bus_width;
 	u8 m_bpp;
-	u32 m_screen_width;
-	u32 m_screen_height;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(MC68328_LCD_SCREEN, mc68328_lcd_device)
+DECLARE_DEVICE_TYPE(MC68328_LCD, mc68328_lcd_device)
 
 #endif // MAME_VIDEO_MC68328LCD_H

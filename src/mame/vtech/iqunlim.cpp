@@ -56,12 +56,11 @@ A4 = MAX232
 #include "machine/ram.h"
 #include "video/mc68328lcd.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 
-#include "softlist_dev.h"
 #include "screen.h"
-#include "emupal.h"
+#include "softlist_dev.h"
 
 #define LOG_CARD_A_READ     (1 << 1u)
 #define LOG_CARD_A_WRITE    (1 << 2u)
@@ -82,6 +81,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
+		m_lcdctrl(*this, "lcdctrl"),
 		m_screen(*this, "screen"),
 		m_cart(*this, "cartslot")
 	{ }
@@ -94,6 +94,8 @@ protected:
 
 	void mem_map(address_map &map);
 
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void card4x_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t card4x_r(offs_t offset, uint16_t mem_mask = 0xffff);
 	void card5x_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -103,7 +105,8 @@ protected:
 
 	required_device<mc68ez328_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<mc68328_lcd_device> m_screen;
+	required_device<mc68328_lcd_device> m_lcdctrl;
+	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
 };
 
@@ -125,6 +128,12 @@ void iqunlim_state::mem_map(address_map &map)
 	map(0x03000000, 0x0307ffff).ram(); // Region used by the internal flash memory
 	map(0x04000000, 0x04ffffff).rw(FUNC(iqunlim_state::card4x_r), FUNC(iqunlim_state::card4x_w)); // Region used by Card B
 	map(0x05000000, 0x05ffffff).rw(FUNC(iqunlim_state::card5x_r), FUNC(iqunlim_state::card5x_w)); // Region used by Card A
+}
+
+uint32_t iqunlim_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_lcdctrl->video_update(bitmap, cliprect);
+	return 0;
 }
 
 uint16_t iqunlim_state::card4x_r(offs_t offset, uint16_t mem_mask)
@@ -175,16 +184,22 @@ void iqunlim_state::iqunlim(machine_config &config)
 	MC68EZ328(config, m_maincpu, 32768*506);
 	m_maincpu->set_addrmap(AS_PROGRAM, &iqunlim_state::mem_map);
 
-	m_maincpu->out_flm().set(m_screen, FUNC(mc68328_lcd_device::flm_w));
-	m_maincpu->out_llp().set(m_screen, FUNC(mc68328_lcd_device::llp_w));
-	m_maincpu->out_lsclk().set(m_screen, FUNC(mc68328_lcd_device::lsclk_w));
-	m_maincpu->out_ld().set(m_screen, FUNC(mc68328_lcd_device::ld_w));
-	m_maincpu->set_lcd_info_changed(m_screen, FUNC(mc68328_lcd_device::lcd_info_changed));
+	m_maincpu->out_flm().set(m_lcdctrl, FUNC(mc68328_lcd_device::flm_w));
+	m_maincpu->out_llp().set(m_lcdctrl, FUNC(mc68328_lcd_device::llp_w));
+	m_maincpu->out_lsclk().set(m_lcdctrl, FUNC(mc68328_lcd_device::lsclk_w));
+	m_maincpu->out_ld().set(m_lcdctrl, FUNC(mc68328_lcd_device::ld_w));
+	m_maincpu->set_lcd_info_changed(m_lcdctrl, FUNC(mc68328_lcd_device::lcd_info_changed));
 
 	RAM(config, RAM_TAG).set_default_size("2M");
 
 	// Video hardware
-	MC68328_LCD_SCREEN(config, m_screen, 0, 480, 260);
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(480, 260);
+	m_screen->set_visarea(0, 480 - 1, 0, 260 - 1);
+	m_screen->set_screen_update(FUNC(iqunlim_state::screen_update));
+
+	MC68328_LCD(config, m_lcdctrl, 0);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "iqunlim_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
