@@ -3617,7 +3617,6 @@ void dkong_state::init_drakton()
 	/* While the PAL supports up to 16 decryption methods, only four
 	    are actually used in the PAL.  Therefore, we'll take a little
 	    memory overhead and decrypt the ROMs using each method in advance. */
-
 	drakton_decrypt_rom(0x02, 0x10000, bs[0]);
 	drakton_decrypt_rom(0x40, 0x14000, bs[1]);
 	drakton_decrypt_rom(0x8a, 0x18000, bs[2]);
@@ -3644,7 +3643,7 @@ void dkong_state::init_strtheat()
 	drakton_decrypt_rom(0x0a, 0x18000, bs[2]);
 	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
 
-	/* custom handlers supporting Joystick or Steering Wheel */
+	// custom handlers supporting Joystick or Steering Wheel
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8smo_delegate(*this, FUNC(dkong_state::strtheat_inputport_0_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8smo_delegate(*this, FUNC(dkong_state::strtheat_inputport_1_r)));
 }
@@ -3686,12 +3685,14 @@ void dkong_state::init_dkongx()
 
 void dkong_state::init_dkong3()
 {
-	// RP2A03 bus conflict between internal APU and external RAM
+	// RP2A03 bus conflict between internal APU and external RAM.
+	// dkong3 relies on it, eg. sound effect when player dies.
 	m_dkong3_tap[0] = m_dev_rp2a03a->space(AS_PROGRAM).install_write_tap(
 			0x4000, 0x4017,
 			"rp2a03a_conflict_w",
 			[this] (offs_t offset, u8 &data, u8 mem_mask)
 			{
+				// write to RAM
 				m_dev_rp2a03a->space(AS_PROGRAM).write_byte(offset & 0x07ff, data);
 			},
 			&m_dkong3_tap[0]);
@@ -3701,6 +3702,7 @@ void dkong_state::init_dkong3()
 			"rp2a03b_conflict_w",
 			[this] (offs_t offset, u8 &data, u8 mem_mask)
 			{
+				// write to RAM
 				m_dev_rp2a03b->space(AS_PROGRAM).write_byte(offset & 0x07ff, data);
 			},
 			&m_dkong3_tap[1]);

@@ -6,7 +6,7 @@
     Gomoku Narabe Renju
     (c)1981 Nihon Bussan Co.,Ltd.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 1999/11/06 -
+    Driver by Takahiro Nogi 1999/11/06 -
     Updated to compile again by David Haywood 19th Oct 2002
 
 ******************************************************************************/

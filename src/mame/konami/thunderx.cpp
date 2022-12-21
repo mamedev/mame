@@ -48,7 +48,7 @@
 
 TIMER_CALLBACK_MEMBER(thunderx_state::thunderx_firq_cb)
 {
-		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
 #define PMC_BK (m_1f98_latch & 0x02)
@@ -179,7 +179,8 @@ void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int
 		int l0, r0, b0, t0;
 
 		// check valid
-		if (!(p0[0] & cm))          continue;
+		if (!(p0[0] & cm))
+			continue;
 
 		// get area
 		l0 = p0[3] - p0[1];
@@ -193,7 +194,8 @@ void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int
 			int l1,r1,b1,t1;
 
 			// check valid
-			if (!(p1[0] & hm))      continue;
+			if (!(p1[0] & hm))
+				continue;
 
 			// get area
 			l1 = p1[3] - p1[1];
@@ -202,10 +204,10 @@ void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int
 			b1 = p1[4] + p1[2];
 
 			// overlap check
-			if (l1 >= r0)   continue;
-			if (l0 >= r1)   continue;
-			if (t1 >= b0)   continue;
-			if (t0 >= b1)   continue;
+			if (l1 >= r0) continue;
+			if (l0 >= r1) continue;
+			if (t1 >= b0) continue;
+			if (t0 >= b1) continue;
 
 			// set flags
 			p0[0] = (p0[0] & 0x9f) | (p1[0] & 0x04) | 0x10;
@@ -628,7 +630,7 @@ void thunderx_state::machine_reset()
 void thunderx_state::scontra(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 052001 (verified on pcb) */
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); /* 052001 (verified on pcb) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &thunderx_state::scontra_map);
 
 	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */

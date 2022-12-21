@@ -19,7 +19,7 @@ or more of the "color attribute" bits of the sprites as bank selectors.
 Moreover a few games store the gfx data in the ROMs in a format different from
 the one expected by the 051960, and use external logic to reorder the address
 and/or data lines.
-The 051960 can also genenrate IRQ, FIRQ and NMI signals.
+The 051960 can also generate IRQ, FIRQ and NMI signals.
 
 memory map:
 000-007 is for the 051937, but also seen by the 051960

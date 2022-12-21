@@ -37,30 +37,30 @@ const options_entry emu_options::s_option_entries[] =
 
 	// search path options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE SEARCH PATH OPTIONS" },
-	{ OPTION_PLUGINDATAPATH,                             ".",         core_options::option_type::STRING,     "path to base folder for plugin data (read/write)" },
-	{ OPTION_MEDIAPATH ";rp;biospath;bp",                "roms",      core_options::option_type::STRING,     "path to ROM sets and hard disk images" },
-	{ OPTION_HASHPATH ";hash_directory;hash",            "hash",      core_options::option_type::STRING,     "path to software definition files" },
-	{ OPTION_SAMPLEPATH ";sp",                           "samples",   core_options::option_type::STRING,     "path to audio sample sets" },
-	{ OPTION_ARTPATH,                                    "artwork",   core_options::option_type::STRING,     "path to artwork files" },
-	{ OPTION_CTRLRPATH,                                  "ctrlr",     core_options::option_type::STRING,     "path to controller definitions" },
-	{ OPTION_INIPATH,                                    ".;ini;ini/presets",     core_options::option_type::STRING,     "path to ini files" },
-	{ OPTION_FONTPATH,                                   ".",         core_options::option_type::STRING,     "path to font files" },
-	{ OPTION_CHEATPATH,                                  "cheat",     core_options::option_type::STRING,     "path to cheat files" },
-	{ OPTION_CROSSHAIRPATH,                              "crosshair", core_options::option_type::STRING,     "path to crosshair files" },
-	{ OPTION_PLUGINSPATH,                                "plugins",   core_options::option_type::STRING,     "path to plugin files" },
-	{ OPTION_LANGUAGEPATH,                               "language",  core_options::option_type::STRING,     "path to UI translation files" },
-	{ OPTION_SWPATH,                                     "software",  core_options::option_type::STRING,     "path to loose software" },
+	{ OPTION_PLUGINDATAPATH,                             ".",         core_options::option_type::PATH,       "path to base folder for plugin data (read/write)" },
+	{ OPTION_MEDIAPATH ";rp;biospath;bp",                "roms",      core_options::option_type::MULTIPATH,  "path to ROM sets and hard disk images" },
+	{ OPTION_HASHPATH ";hash_directory;hash",            "hash",      core_options::option_type::MULTIPATH,  "path to software definition files" },
+	{ OPTION_SAMPLEPATH ";sp",                           "samples",   core_options::option_type::MULTIPATH,  "path to audio sample sets" },
+	{ OPTION_ARTPATH,                                    "artwork",   core_options::option_type::MULTIPATH,  "path to artwork files" },
+	{ OPTION_CTRLRPATH,                                  "ctrlr",     core_options::option_type::MULTIPATH,  "path to controller definitions" },
+	{ OPTION_INIPATH,                                    ".;ini;ini/presets",     core_options::option_type::MULTIPATH,     "path to ini files" },
+	{ OPTION_FONTPATH,                                   ".",         core_options::option_type::MULTIPATH,  "path to font files" },
+	{ OPTION_CHEATPATH,                                  "cheat",     core_options::option_type::MULTIPATH,  "path to cheat files" },
+	{ OPTION_CROSSHAIRPATH,                              "crosshair", core_options::option_type::MULTIPATH,  "path to crosshair files" },
+	{ OPTION_PLUGINSPATH,                                "plugins",   core_options::option_type::MULTIPATH,  "path to plugin files" },
+	{ OPTION_LANGUAGEPATH,                               "language",  core_options::option_type::MULTIPATH,  "path to UI translation files" },
+	{ OPTION_SWPATH,                                     "software",  core_options::option_type::MULTIPATH,  "path to loose software" },
 
 	// output directory options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
-	{ OPTION_CFG_DIRECTORY,                              "cfg",       core_options::option_type::STRING,     "directory to save configurations" },
-	{ OPTION_NVRAM_DIRECTORY,                            "nvram",     core_options::option_type::STRING,     "directory to save NVRAM contents" },
-	{ OPTION_INPUT_DIRECTORY,                            "inp",       core_options::option_type::STRING,     "directory to save input device logs" },
-	{ OPTION_STATE_DIRECTORY,                            "sta",       core_options::option_type::STRING,     "directory to save states" },
-	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      core_options::option_type::STRING,     "directory to save/load screenshots" },
-	{ OPTION_DIFF_DIRECTORY,                             "diff",      core_options::option_type::STRING,     "directory to save hard drive image difference files" },
-	{ OPTION_COMMENT_DIRECTORY,                          "comments",  core_options::option_type::STRING,     "directory to save debugger comments" },
-	{ OPTION_SHARE_DIRECTORY,                            "share",     core_options::option_type::STRING,     "directory to share with emulated machines" },
+	{ OPTION_CFG_DIRECTORY,                              "cfg",       core_options::option_type::PATH,       "directory to save configurations" },
+	{ OPTION_NVRAM_DIRECTORY,                            "nvram",     core_options::option_type::PATH,       "directory to save NVRAM contents" },
+	{ OPTION_INPUT_DIRECTORY,                            "inp",       core_options::option_type::PATH,       "directory to save input device logs" },
+	{ OPTION_STATE_DIRECTORY,                            "sta",       core_options::option_type::PATH,       "directory to save states" },
+	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      core_options::option_type::PATH,       "directory to save/load screenshots" },
+	{ OPTION_DIFF_DIRECTORY,                             "diff",      core_options::option_type::PATH,       "directory to save hard drive image difference files" },
+	{ OPTION_COMMENT_DIRECTORY,                          "comments",  core_options::option_type::PATH,       "directory to save debugger comments" },
+	{ OPTION_SHARE_DIRECTORY,                            "share",     core_options::option_type::PATH,       "directory to share with emulated machines" },
 
 	// state/playback options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE STATE/PLAYBACK OPTIONS" },
@@ -72,9 +72,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_RECORD ";rec",                              nullptr,     core_options::option_type::STRING,     "record an input file" },
 	{ OPTION_EXIT_AFTER_PLAYBACK,                        "0",         core_options::option_type::BOOLEAN,    "close the program at the end of playback" },
 
-	{ OPTION_MNGWRITE,                                   nullptr,     core_options::option_type::STRING,     "optional filename to write a MNG movie of the current session" },
-	{ OPTION_AVIWRITE,                                   nullptr,     core_options::option_type::STRING,     "optional filename to write an AVI movie of the current session" },
-	{ OPTION_WAVWRITE,                                   nullptr,     core_options::option_type::STRING,     "optional filename to write a WAV file of the current session" },
+	{ OPTION_MNGWRITE,                                   nullptr,     core_options::option_type::PATH,       "optional filename to write a MNG movie of the current session" },
+	{ OPTION_AVIWRITE,                                   nullptr,     core_options::option_type::PATH,       "optional filename to write an AVI movie of the current session" },
+	{ OPTION_WAVWRITE,                                   nullptr,     core_options::option_type::PATH,       "optional filename to write a WAV file of the current session" },
 	{ OPTION_SNAPNAME,                                   "%g/%i",     core_options::option_type::STRING,     "override of the default snapshot/movie naming; %g == gamename, %i == index" },
 	{ OPTION_SNAPSIZE,                                   "auto",      core_options::option_type::STRING,     "specify snapshot/movie resolution (<width>x<height>) or 'auto' to use minimal size " },
 	{ OPTION_SNAPVIEW,                                   "auto",      core_options::option_type::STRING,     "snapshot/movie view - 'auto' for default, or 'native' for per-screen pixel-aspect views" },
@@ -181,7 +181,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_OSLOG,                                      "0",         core_options::option_type::BOOLEAN,    "output error.log data to system diagnostic output (debugger or standard error)" },
 	{ OPTION_DEBUG ";d",                                 "0",         core_options::option_type::BOOLEAN,    "enable/disable debugger" },
 	{ OPTION_UPDATEINPAUSE,                              "0",         core_options::option_type::BOOLEAN,    "keep calling video updates while in pause" },
-	{ OPTION_DEBUGSCRIPT,                                nullptr,     core_options::option_type::STRING,     "script for debugger" },
+	{ OPTION_DEBUGSCRIPT,                                nullptr,     core_options::option_type::PATH,       "script for debugger" },
 	{ OPTION_DEBUGLOG,                                   "0",         core_options::option_type::BOOLEAN,    "write debug console output to debug.log" },
 
 	// comm options
@@ -212,7 +212,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "SCRIPTING OPTIONS" },
 	{ OPTION_AUTOBOOT_COMMAND ";ab",                     nullptr,     core_options::option_type::STRING,     "command to execute after machine boot" },
 	{ OPTION_AUTOBOOT_DELAY,                             "0",         core_options::option_type::INTEGER,    "delay before executing autoboot command (seconds)" },
-	{ OPTION_AUTOBOOT_SCRIPT ";script",                  nullptr,     core_options::option_type::STRING,     "Lua script to execute after machine boot" },
+	{ OPTION_AUTOBOOT_SCRIPT ";script",                  nullptr,     core_options::option_type::PATH,       "Lua script to execute after machine boot" },
 	{ OPTION_CONSOLE,                                    "0",         core_options::option_type::BOOLEAN,    "enable emulator Lua console" },
 	{ OPTION_PLUGINS,                                    "1",         core_options::option_type::BOOLEAN,    "enable Lua plugin support" },
 	{ OPTION_PLUGIN,                                     nullptr,     core_options::option_type::STRING,     "list of plugins to enable" },
@@ -221,7 +221,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "HTTP SERVER OPTIONS" },
 	{ OPTION_HTTP,                                       "0",         core_options::option_type::BOOLEAN,    "enable HTTP server" },
 	{ OPTION_HTTP_PORT,                                  "8080",      core_options::option_type::INTEGER,    "HTTP server port" },
-	{ OPTION_HTTP_ROOT,                                  "web",       core_options::option_type::STRING,     "HTTP server document root" },
+	{ OPTION_HTTP_ROOT,                                  "web",       core_options::option_type::PATH,       "HTTP server document root" },
 
 	{ nullptr }
 };
@@ -255,7 +255,7 @@ namespace
 		}
 
 	protected:
-		virtual void internal_set_value(std::string &&newvalue) override
+		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) override
 		{
 			m_host.set_system_name(std::move(newvalue));
 		}
@@ -275,7 +275,7 @@ namespace
 		}
 
 	protected:
-		virtual void internal_set_value(std::string &&newvalue) override
+		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) override
 		{
 			m_host.set_software(std::move(newvalue));
 		}
@@ -313,7 +313,7 @@ namespace
 		}
 
 	protected:
-		virtual void internal_set_value(std::string &&newvalue) override
+		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) override
 		{
 			m_host.specify(std::move(newvalue), false);
 		}
@@ -339,7 +339,7 @@ namespace
 		}
 
 	protected:
-		virtual void internal_set_value(std::string &&newvalue) override
+		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) override
 		{
 			m_host.specify(std::move(newvalue), false);
 		}
@@ -615,8 +615,8 @@ bool emu_options::add_and_remove_slot_options()
 
 
 //-------------------------------------------------
-//  add_and_remove_slot_options - add any missing
-//  and/or purge extraneous slot options
+//  add_and_remove_image_options - add any missing
+//  and/or purge extraneous image options
 //-------------------------------------------------
 
 bool emu_options::add_and_remove_image_options()
@@ -719,7 +719,7 @@ bool emu_options::add_and_remove_image_options()
 
 //-------------------------------------------------
 //  reevaluate_default_card_software - based on recent
-//  changes in what images are mounted, give drivers
+//  changes in what images are mounted, give devices
 //  a chance to specify new default slot options
 //-------------------------------------------------
 
@@ -758,6 +758,16 @@ void emu_options::reevaluate_default_card_software()
 			std::string default_card_software = get_default_card_software(slot);
 			if (slot_opt.default_card_software() != default_card_software)
 			{
+				// HACK: prevent option values set from "XXX_default" in software list entries
+				// from getting cleared out, using crude heuristic to distinguish these from
+				// values representing cartridge types and such
+				if (default_card_software.empty())
+				{
+					auto *opt = slot.option(slot_opt.default_card_software().c_str());
+					if (opt && opt->selectable())
+						continue;
+				}
+
 				slot_opt.set_default_card_software(std::move(default_card_software));
 
 				// calling set_default_card_software() can cause a cascade of slot/image
@@ -846,12 +856,21 @@ void emu_options::set_software(std::string &&new_software)
 		}
 
 		// keep any deferred options for the next round
-		softlist_opts = std::move(deferred_opts);
+		softlist_opts.slot = std::move(deferred_opts.slot);
+		softlist_opts.image = std::move(deferred_opts.image);
 
 		// do we have any pending options after failing to distribute any?
 		size_t after_size = softlist_opts.slot.size() + softlist_opts.image.size();
 		if ((after_size > 0) && after_size >= before_size)
 			throw options_error_exception("Could not assign software option");
+	}
+
+	// distribute slot option defaults
+	for (auto &slot_opt : softlist_opts.slot_defaults)
+	{
+		auto iter = m_slot_options.find(slot_opt.first);
+		if (iter != m_slot_options.end())
+			iter->second.set_default_card_software(std::move(slot_opt.second));
 	}
 
 	// we've succeeded; update the set name
@@ -961,7 +980,15 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 								&& fi.name().compare(fi.name().size() - default_suffix.size(), default_suffix.size(), default_suffix) == 0)
 							{
 								std::string slot_name = fi.name().substr(0, fi.name().size() - default_suffix.size());
-								results.slot[slot_name] = fi.value();
+
+								// only add defaults if they exist in this configuration
+								device_t *device = config.root_device().subdevice(slot_name.c_str());
+								if (device)
+								{
+									device_slot_interface *intf;
+									if (device->interface(intf) && intf->option(fi.value().c_str()))
+										results.slot_defaults[slot_name] = fi.value();
+								}
 							}
 						}
 					}

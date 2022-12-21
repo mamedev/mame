@@ -186,7 +186,6 @@ protected:
 
 	virtual void machine_reset() override;
 
-	template <u8 Side> void sprite_dma_w(address_space &space, u8 data);
 	template <u8 Side> void vsnes_coin_counter_w(offs_t offset, u8 data);
 	template <u8 Side> u8 vsnes_coin_counter_r(offs_t offset);
 	template <u8 Side> void vsnes_in0_w(u8 data);
@@ -354,15 +353,6 @@ private:
 
 //******************************************************************************
 
-
-template <u8 Side>
-void vs_base_state::sprite_dma_w(address_space &space, u8 data)
-{
-	if (Side == MAIN)
-		m_ppu1->spriteram_dma(space, data & 0x07);
-	else
-		m_ppu2->spriteram_dma(space, data & 0x07);
-}
 
 template <u8 Side>
 void vs_base_state::vsnes_coin_counter_w(offs_t offset, u8 data)
@@ -996,7 +986,7 @@ void vs_base_state::vsnes_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(vs_base_state::sprite_dma_w<MAIN>));
+	map(0x4014, 0x4014).w(m_ppu1, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(vs_base_state::vsnes_in0_r<MAIN>), FUNC(vs_base_state::vsnes_in0_w<MAIN>));
 	map(0x4017, 0x4017).r(FUNC(vs_base_state::vsnes_in1_r<MAIN>)); // IN1 - input port 2 / PSG second control register
 	map(0x4020, 0x5fff).rw(FUNC(vs_base_state::vsnes_coin_counter_r<MAIN>), FUNC(vs_base_state::vsnes_coin_counter_w<MAIN>));
@@ -1015,7 +1005,7 @@ void vs_base_state::vsnes_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu2, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(vs_base_state::sprite_dma_w<SUB>));
+	map(0x4014, 0x4014).w(m_ppu2, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(vs_base_state::vsnes_in0_r<SUB>), FUNC(vs_base_state::vsnes_in0_w<SUB>));
 	map(0x4017, 0x4017).r(FUNC(vs_base_state::vsnes_in1_r<SUB>));  // IN1 - input port 2 / PSG second control register
 	map(0x4020, 0x5fff).rw(FUNC(vs_base_state::vsnes_coin_counter_r<SUB>), FUNC(vs_base_state::vsnes_coin_counter_w<SUB>));
@@ -1231,10 +1221,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vsnes_zapper )
 	PORT_START("IN0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED )            // low 6 bits always read 0b010000
+	PORT_CONFNAME( 0x10, 0x10, "Gun Alarm Wire" )           // ALM wire (ignored by Gumshoe and Freedom Force?)
+	PORT_CONFSETTING(    0x00, "Disconnected" )
+	PORT_CONFSETTING(    0x10, "Connected" )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            // sprite hit
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )           // gun trigger
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )            // gun HIT
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )           // gun TRG
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )

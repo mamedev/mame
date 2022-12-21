@@ -25,8 +25,11 @@ class rtc3430042_device :  public device_t,
 						public device_rtc_interface,
 						public device_nvram_interface
 {
+	friend class rtc3430040_device;
+
 public:
 	// construction/destruction
+	rtc3430042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool hasBigPRAM);
 	rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
@@ -55,35 +58,41 @@ protected:
 	TIMER_CALLBACK_MEMBER(half_seconds_tick);
 
 private:
+	bool m_is_big_PRAM;
+	bool m_time_was_set;
+
 	devcb_write_line m_cko_cb;
 
 	/* state of rTCEnb and rTCClk lines */
-	uint8_t m_rtc_rTCEnb = 0;
-	uint8_t m_rtc_rTCClk = 0;
+	u8 m_rTCEnb = 0;
+	u8 m_rTCClk = 0;
 
 	/* serial transmit/receive register : bits are shifted in/out of this byte */
-	uint8_t m_rtc_data_byte = 0;
+	u8 m_data_byte = 0;
 	/* serial transmitted/received bit count */
-	uint8_t m_rtc_bit_count = 0;
+	u8 m_bit_count = 0;
 	/* direction of the current transfer (0 : VIA->RTC, 1 : RTC->VIA) */
-	uint8_t m_rtc_data_dir = 0;
+	u8 m_data_dir = 0;
 	/* when rtc_data_dir == 1, state of rTCData as set by RTC (-> data bit seen by VIA) */
-	uint8_t m_rtc_data_out = 0;
+	u8 m_data_out = 0;
 
 	/* set to 1 when command in progress */
-	uint8_t m_rtc_cmd = 0;
+	u8 m_cmd = 0;
 
 	/* write protect flag */
-	uint8_t m_rtc_write_protect = 0;
+	u8 m_write_protect = 0;
+
+	// test mode flag
+	u8 m_test_mode = 0;
 
 	/* internal seconds register */
-	uint8_t m_rtc_seconds[/*8*/4]{};
+	u8 m_seconds[/*8*/4]{};
 	/* 20-byte long PRAM, or 256-byte long XPRAM */
-	uint8_t m_pram[256]{};
+	u8 m_pram[256]{};
 	/* current extended address and RTC state */
-	uint8_t m_rtc_xpaddr = 0;
-	uint8_t m_rtc_state = 0;
-	uint8_t m_data_latch = 0;
+	u8 m_xpaddr = 0;
+	u8 m_state = 0;
+	u8 m_data_latch = 0;
 	bool m_cko = false;
 
 	// timers
@@ -93,8 +102,19 @@ private:
 	void rtc_execute_cmd(int data);
 };
 
+class rtc3430040_device: public rtc3430042_device
+{
+public:
+	rtc3430040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+};
+
 
 // device type definition
+DECLARE_DEVICE_TYPE(RTC3430040, rtc3430040_device)
 DECLARE_DEVICE_TYPE(RTC3430042, rtc3430042_device)
 
 #endif // MAME_MACHINE_MACRTC_H

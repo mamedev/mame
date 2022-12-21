@@ -143,7 +143,7 @@ static const uint16_t overdriv_default_eeprom[64] =
 
 void overdriv_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-//logerror("%s: write %04x to eeprom_w\n",machine().describe_context(),data);
+	//logerror("%s: write %04x to eeprom_w\n",machine().describe_context(),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */

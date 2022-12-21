@@ -29,7 +29,7 @@ PCB Layout
 |                |NTA0002|           |
 |                |(QFP80)|   24-1.U1 |
 |                --------            |
-|   2003        -----------          |
+|  ULN2003A    -----------           |
 |              |LATTICE  |           |
 |      DSW1    |PLSI 1016|           |
 |J             |(PLCC44) |  24-2.U2  |
@@ -38,8 +38,8 @@ PCB Layout
 |M    SW1   21.4771MHz               |
 |A                                   |
 | GW6582  LS02                       |
-|          |-----------| 4040        |
-|  74HC245 |Philips    | 4040        |
+|          |-----------| MC14040BCP  |
+|  74HC245 |Philips    | MC14040BCP  |
 |          |SAA71111AH2|             |
 |          |20505650   |             |
 |          |bP0219     | 24-3.U3     |
@@ -71,12 +71,13 @@ class cham24_state : public driver_device
 {
 public:
 	cham24_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ppu(*this, "ppu"),
-		m_nt_page(*this, "nt_page%u", 0U),
-		m_prg_banks(*this, "prg%u", 0U),
-		m_chr_bank(*this, "chr")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ppu(*this, "ppu")
+		, m_nt_page(*this, "nt_page%u", 0U)
+		, m_prg_banks(*this, "prg%u", 0U)
+		, m_chr_bank(*this, "chr")
+		, m_in(*this, "P%u", 1U)
 	{ }
 
 	void cham24(machine_config &config);
@@ -93,18 +94,16 @@ private:
 	required_memory_bank_array<2> m_prg_banks;
 	required_memory_bank m_chr_bank;
 
-	uint8_t m_prg_chunks;
+	required_ioport_array<2> m_in;
 
-	std::unique_ptr<uint8_t[]> m_nt_ram;
-	uint32_t m_in_0;
-	uint32_t m_in_1;
-	uint32_t m_in_0_shift;
-	uint32_t m_in_1_shift;
-	void sprite_dma_w(address_space &space, uint8_t data);
-	uint8_t cham24_IN0_r();
-	void cham24_IN0_w(uint8_t data);
-	uint8_t cham24_IN1_r();
-	void cham24_mapper_w(offs_t offset, uint8_t data);
+	std::unique_ptr<u8 []> m_nt_ram;
+	u8 m_prg_chunks;
+	u8 m_input_latch[2];
+	u8 m_input_strobe;
+
+	template <u8 Which> u8 cham24_in_r();
+	void cham24_in0_w(u8 data);
+	void cham24_mapper_w(offs_t offset, u8 data);
 	void cham24_set_mirroring(int mirroring);
 	void cham24_map(address_map &map);
 	void cham24_ppu_map(address_map &map);
@@ -114,61 +113,46 @@ private:
 
 void cham24_state::cham24_set_mirroring(int mirroring)
 {
-	switch (mirroring)
-	{
-		case PPU_MIRROR_HORZ:
-			for (int i = 0; i < 4; i++)
-				m_nt_page[i]->set_entry(BIT(i, 1));
-			break;
-		case PPU_MIRROR_VERT:
-		default:
-			for (int i = 0; i < 4; i++)
-				m_nt_page[i]->set_entry(i & 1);
-			break;
-	}
+	int bit = mirroring == PPU_MIRROR_HORZ;
+
+	for (int i = 0; i < 4; i++)
+		m_nt_page[i]->set_entry(BIT(i, bit));
 }
 
-void cham24_state::sprite_dma_w(address_space &space, uint8_t data)
+template <u8 Which>
+u8 cham24_state::cham24_in_r()
 {
-	int source = (data & 7);
-	m_ppu->spriteram_dma(space, source);
+	if (m_input_strobe)
+		m_input_latch[Which] = m_in[Which]->read();
+
+	u8 ret = 0x40;
+
+	ret |= m_input_latch[Which] & 1;
+	if (!machine().side_effects_disabled())
+		m_input_latch[Which] >>= 1;
+
+	return ret;
 }
 
-uint8_t cham24_state::cham24_IN0_r()
-{
-	return ((m_in_0 >> m_in_0_shift++) & 0x01) | 0x40;
-}
-
-void cham24_state::cham24_IN0_w(uint8_t data)
+void cham24_state::cham24_in0_w(u8 data)
 {
 	if (data & 0xfe)
 	{
-		//logerror("Unhandled cham24_IN0_w write: data = %02X\n", data);
+		//logerror("Unhandled cham24_in0_w write: data = %02X\n", data);
 	}
 
-	if (data & 0x01)
-	{
-		return;
-	}
+	if (m_input_strobe & ~data & 1)
+		for (int i = 0; i < 2; i++)
+			m_input_latch[i] = m_in[i]->read();
 
-	m_in_0_shift = 0;
-	m_in_1_shift = 0;
-
-	m_in_0 = ioport("P1")->read();
-	m_in_1 = ioport("P2")->read();
-
+	m_input_strobe = data & 1;
 }
 
-uint8_t cham24_state::cham24_IN1_r()
-{
-	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
-}
-
-void cham24_state::cham24_mapper_w(offs_t offset, uint8_t data)
+void cham24_state::cham24_mapper_w(offs_t offset, u8 data)
 {
 	// switch PRG bank
-	uint8_t prg_bank = BIT(offset, 6, 6);
-	uint8_t prg_mode = !BIT(offset, 12);
+	u8 prg_bank = BIT(offset, 6, 6);
+	u8 prg_mode = !BIT(offset, 12);
 	m_prg_banks[0]->set_entry(prg_bank & ~prg_mode);
 	m_prg_banks[1]->set_entry(prg_bank | prg_mode);
 
@@ -181,11 +165,11 @@ void cham24_state::cham24_mapper_w(offs_t offset, uint8_t data)
 
 void cham24_state::cham24_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x0000, 0x07ff).mirror(0x1800).ram(); // NES RAM
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(cham24_state::sprite_dma_w));
-	map(0x4016, 0x4016).rw(FUNC(cham24_state::cham24_IN0_r), FUNC(cham24_state::cham24_IN0_w));            /* IN0 - input port 1 */
-	map(0x4017, 0x4017).r(FUNC(cham24_state::cham24_IN1_r));    /* IN1 - input port 2 / PSG second control register */
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
+	map(0x4016, 0x4016).rw(FUNC(cham24_state::cham24_in_r<0>), FUNC(cham24_state::cham24_in0_w));            // IN0 - input port 1
+	map(0x4017, 0x4017).r(FUNC(cham24_state::cham24_in_r<1>));    // IN1 - input port 2 / PSG second control register
 	map(0x8000, 0xbfff).bankr(m_prg_banks[0]).w(FUNC(cham24_state::cham24_mapper_w));
 	map(0xc000, 0xffff).bankr(m_prg_banks[1]).w(FUNC(cham24_state::cham24_mapper_w));
 }
@@ -201,20 +185,20 @@ void cham24_state::cham24_ppu_map(address_map &map)
 }
 
 static INPUT_PORTS_START( cham24 )
-	PORT_START("P1") /* IN0 */
+	PORT_START("P1") // IN0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)    /* Select */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)    // Select
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
-	PORT_START("P2") /* IN1 */
+	PORT_START("P2") // IN1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)    /* Select */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)    // Select
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -226,8 +210,8 @@ INPUT_PORTS_END
 void cham24_state::machine_start()
 {
 	m_nt_ram = std::make_unique<u8[]>(0x800);
-	for (int i = 0; i < 4; i++)
-		m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
+	for (auto &page : m_nt_page)
+		page->configure_entries(0, 2, m_nt_ram.get(), 0x400);
 
 	// set up code banking to be done in 16K chunks
 	m_prg_chunks = memregion("user1")->bytes() / 0x4000;
@@ -236,6 +220,10 @@ void cham24_state::machine_start()
 
 	// gfx banking always done in 8K chunks
 	m_chr_bank->configure_entries(0, memregion("gfx1")->bytes() / 0x2000, memregion("gfx1")->base(), 0x2000);
+
+	save_item(NAME(m_input_latch));
+	save_item(NAME(m_input_strobe));
+	save_pointer(NAME(m_nt_ram), 0x800);
 }
 
 void cham24_state::machine_reset()
@@ -251,23 +239,23 @@ void cham24_state::machine_reset()
 
 void cham24_state::cham24(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	RP2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cham24_state::cham24_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(32*8, 262);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
+	screen.set_screen_update(m_ppu, FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C02(config, m_ppu);
 	m_ppu->set_addrmap(0, &cham24_state::cham24_ppu_map);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -291,4 +279,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2002, cham24, 0, cham24, cham24, cham24_state, empty_init, ROT0, "bootleg", "Chameleon 24", MACHINE_NOT_WORKING )
+GAME( 2002, cham24, 0, cham24, cham24, cham24_state, empty_init, ROT0, "bootleg", "Chameleon 24", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -2400,6 +2400,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mdcr.h,MACHINES["MDCR"] = true
+---------------------------------------------------
+
+if (MACHINES["MDCR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mdcr.cpp",
+		MAME_DIR .. "src/devices/machine/mdcr.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/meters.h,MACHINES["METERS"] = true
 ---------------------------------------------------
 
@@ -5087,5 +5099,17 @@ if (MACHINES["AM9516"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/am9516.cpp",
 		MAME_DIR .. "src/devices/machine/am9516.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/micomxe1a.h,MACHINES["MICOMXE1A"] = true
+---------------------------------------------------
+
+if (MACHINES["MICOMXE1A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/micomxe1a.cpp",
+		MAME_DIR .. "src/devices/machine/micomxe1a.h",
 	}
 end

@@ -204,7 +204,7 @@ double device_state_entry::entry_dvalue() const
 std::string device_state_entry::format(const char *string, bool maxout) const
 {
 	std::string dest;
-	u64 result = entry_value() & m_datamask;
+	u64 result = value();
 
 	// parse the format
 	bool leadzero = false;

@@ -115,7 +115,23 @@ void vsmile_state::uart_rx(uint8_t data)
 
 uint16_t vsmile_state::portb_r()
 {
-	return VSMILE_PORTB_OFF_SW | VSMILE_PORTB_ON_SW | VSMILE_PORTB_RESET;
+	uint16_t data = m_dsw_system->read();
+	//bit 0 : extra address bit for the cartridge port, access second half of ROM (TODO)
+	//bit 1 : Set to 0 to enable cartridge ROM (TODO) -> getCS2
+	//bit 2 : Set to 0 to enable internal ROM (TODO)
+	//bit 3 : restart (see dipswitch)
+	//		VSMILE_PORTB_RESET
+	//bit 4 : ADC (TODO)
+	//bit 5 : Voltage detect (TODO)
+	//bit 6 : ON button, active low (see dipswitch)
+	//		VSMILE_PORTB_ON_SW
+	//bit 7 : OFF button, active low (see dipswitch)
+	//		VSMILE_PORTB_OFF_SW
+	
+	//LOG("%s: portb_r: %04x\n", machine().describe_context(), data);
+	
+	//On Vsmile, VSMILE_PORTB_RESET, VSMILE_PORTB_OFF_SW and VSMILE_PORTB_ON_SW actives will trigger BIOS test screen
+	return data; 
 }
 
 void vsmile_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -130,7 +146,7 @@ uint16_t vsmile_state::portc_r()
 	uint16_t data = m_dsw_region->read();
 	data |= m_ctrl_rts[0] ? 0 : 0x0400;
 	data |= m_ctrl_rts[1] ? 0 : 0x1000;
-	data |= 0x0020;
+	data |= 0x0020; //IOC5 - TestPoint
 	data |= (m_ctrl_rts[0] && m_ctrl_rts[1]) ? 0x0000 : 0x2000;
 	//data = machine().rand() & 0xffff;
 	return data;
@@ -217,44 +233,53 @@ void vsmile_state::banked_map(address_map &map)
 
 static INPUT_PORTS_START( vsmile )
 	PORT_START("REGION")
-	PORT_DIPNAME( 0x0f, 0x04, "sysrom Region" )
-	PORT_DIPSETTING(    0x04, "UK/US" )
-	PORT_DIPSETTING(    0x07, "China" )
-	PORT_DIPSETTING(    0x08, "Mexico" )
-	PORT_DIPSETTING(    0x0a, "Italy" ) // not valid on V.Smile Motion?
-	PORT_DIPSETTING(    0x0b, "Germany" )
-	PORT_DIPSETTING(    0x0c, "Spain" )
-	PORT_DIPSETTING(    0x0d, "France" )
-	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
-	PORT_DIPSETTING(    0x00, "Off" )
-	PORT_DIPSETTING(    0x10, "On" )
+	//based on schematics and BIOS test screen
+	PORT_CONFNAME( 0x0f, 0x0f, DEF_STR(Language) )
+	PORT_CONFSETTING(    0x02, DEF_STR(Italian) ) //IT
+	PORT_CONFSETTING(    0x07, DEF_STR(Chinese) ) //Chinese
+	PORT_CONFSETTING(    0x08, "Portuguese" ) //PO
+	PORT_CONFSETTING(    0x09, "Dutch" ) //DU
+	PORT_CONFSETTING(    0x0b, DEF_STR(German) ) //GE
+	PORT_CONFSETTING(    0x0c, DEF_STR(Spanish) ) //SP
+	PORT_CONFSETTING(    0x0d, DEF_STR(French) ) //FR
+	PORT_CONFSETTING(    0x0e, "English (UK)" ) //UK
+	PORT_CONFSETTING(    0x0f, "English (US)" ) //US
+	PORT_CONFNAME( 0x10, 0x10, "VTech Intro" )
+	PORT_CONFSETTING(    0x00, DEF_STR(Off) )
+	PORT_CONFSETTING(    0x10, DEF_STR(On) )
 	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POWER_OFF )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POWER_ON )
+	PORT_CONFNAME( 0x08, 0x08, "Restart")
+	PORT_CONFSETTING(    0x08, DEF_STR(Off) )
+	PORT_CONFSETTING(    0x00, DEF_STR(On) )
+	PORT_BIT( 0x37, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsmilem )
 	PORT_START("REGION")
-	PORT_DIPNAME( 0x0f, 0x0f, "sysrom Region" )
-	//PORT_DIPSETTING(    0x00, "0" ) // no V.Smile Motion logo, blank cartridge image, "Please insert a Learning Game" text
-	//PORT_DIPSETTING(    0x01, "1" ) // no V.Smile Motion logo, blank cartridge image, no text
-	PORT_DIPSETTING(    0x02, "Italy" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, "Per favore inserisci una cartuccia di gioco" text (possibly invalid as text on logo is still in English and Italy was previously 0x0a)
-	//PORT_DIPSETTING(    0x03, "3" ) // V.Smile Motion logo with no text, voice 2, regular cartridge image, no text
-	//PORT_DIPSETTING(    0x04, "4" ) // V.Smile Motion logo with no text, voice 2, regular cartridge image, "Please insert a Learning Game" text
-	PORT_DIPSETTING(    0x05, "English (1)" ) // V.Smile Motion logo with "Active Learning System", voice 2, regular cartridge image, "Please insert a Learning Game" text
-	PORT_DIPSETTING(    0x06, "English (2)" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, "Please insert a Learning Game" text
-	PORT_DIPSETTING(    0x07, "China" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, Chinese text
-	PORT_DIPSETTING(    0x08, "Mexico" ) // V.Smile Motion logo with "Sistema Educativo", voice 1, regular cartridge image, "TV Learning System" text
-	PORT_DIPSETTING(    0x09, "Netherlands?" ) // V.Smile Motion logo with "Active Learning System", voice 3, regular cartridge image, "Plaats een game"
-	//PORT_DIPSETTING(    0x0a, "a" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, "Please insert a Learning Game" text  (was 'Italy' on regular vsmile)
-	PORT_DIPSETTING(    0x0b, "Germany" ) // V.Smile Motion logo with "Aktives Lernspiel - System", voice 4, regular cartridge image, "Bitte Lernspiel einstecken"
-	PORT_DIPSETTING(    0x0c, "Spain" ) // V.Smile Motion logo with "Aprendizaje Inteligente En Accion", voice 5, regular cartridge image, "Por favor, inserta un cartuncho"
-	PORT_DIPSETTING(    0x0d, "France" ) // V.Smile Motion logo with "Apprendre En Mouvements", voice 6, regular cartridge image, "Inserer une cartouche"
-	//PORT_DIPSETTING(    0x0e, "e" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, "Please insert a Learning Game" text (same as 0x06?)
-	PORT_DIPSETTING(    0x0f, "English (3)" ) // V.Smile Motion logo with "Active Learning System", voice 2, regular cartridge image, "Please insert a Smartridge(tm)" text   (Smartridge must be a region specific term?)
+	PORT_CONFNAME( 0x0f, 0x0f, "sysrom Region" )
+	PORT_CONFSETTING(    0x02, "Italy" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, "Per favore inserisci una cartuccia di gioco" text (possibly invalid as text on logo is still in English and Italy was previously 0x0a)
+	PORT_CONFSETTING(    0x05, "English (1)" ) // V.Smile Motion logo with "Active Learning System", voice 2, regular cartridge image, "Please insert a Learning Game" text
+	PORT_CONFSETTING(    0x06, "English (2)" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, "Please insert a Learning Game" text
+	PORT_CONFSETTING(    0x07, "China" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, Chinese text
+	PORT_CONFSETTING(    0x08, "Mexico" ) // V.Smile Motion logo with "Sistema Educativo", voice 1, regular cartridge image, "TV Learning System" text
+	PORT_CONFSETTING(    0x09, "Netherlands?" ) // V.Smile Motion logo with "Active Learning System", voice 3, regular cartridge image, "Plaats een game"
+	PORT_CONFSETTING(    0x0b, "Germany" ) // V.Smile Motion logo with "Aktives Lernspiel - System", voice 4, regular cartridge image, "Bitte Lernspiel einstecken"
+	PORT_CONFSETTING(    0x0c, "Spain" ) // V.Smile Motion logo with "Aprendizaje Inteligente En Accion", voice 5, regular cartridge image, "Por favor, inserta un cartuncho"
+	PORT_CONFSETTING(    0x0d, "France" ) // V.Smile Motion logo with "Apprendre En Mouvements", voice 6, regular cartridge image, "Inserer une cartouche"
+	PORT_CONFSETTING(    0x0f, "English (3)" ) // V.Smile Motion logo with "Active Learning System", voice 2, regular cartridge image, "Please insert a Smartridge(tm)" text   (Smartridge must be a region specific term?)
 
-	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
-	PORT_DIPSETTING(    0x00, "Off" )
-	PORT_DIPSETTING(    0x10, "On" )
+	PORT_CONFNAME( 0x10, 0x10, "VTech Intro" )
+	PORT_CONFSETTING(    0x00, "Off" )
+	PORT_CONFSETTING(    0x10, "On" )
 	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POWER_ON )
+	PORT_BIT( 0x7F, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
 /************************************

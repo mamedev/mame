@@ -4,6 +4,25 @@
 
     Sega controller adapter emulation
 
+    Simple wired adapter:
+
+            PC Pin  Sega pin
+             Up  1  1  Up
+           Down  2  2  Down
+           Left  3  3  Left
+          Right  4  4  Right
+            +5V  5  5  +5V
+      Trigger 1  6  6  TL
+      Trigger 2  7  9  TR
+         Strobe  8  7  TH
+            GND  9  8  GND
+
+    An adapter with this wiring was included with the game Chelnov
+    for Sharp X68000, to be used with a 3-button Sega Mega Drive
+    Control Pad.  The same adapters were supported by Super Street
+    Figher II for Sharp X68000 for use with 6-button Sega Mega
+    Drive controllers.
+
 **********************************************************************/
 
 #include "emu.h"

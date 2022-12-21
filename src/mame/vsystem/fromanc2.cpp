@@ -13,7 +13,7 @@
     Taisen Mahjong Final Romance 4 (Japan)
     (c)1998 Video System Co.,Ltd.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2001/02/28 -
+    Driver by Takahiro Nogi 2001/02/28 -
     Special thanks to Uki.
 
 ******************************************************************************/

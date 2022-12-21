@@ -502,6 +502,7 @@ private:
 	struct software_options
 	{
 		std::unordered_map<std::string, std::string>    slot;
+		std::unordered_map<std::string, std::string>    slot_defaults;
 		std::unordered_map<std::string, std::string>    image;
 	};
 

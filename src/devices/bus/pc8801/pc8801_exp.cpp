@@ -13,6 +13,9 @@
         (Modem board, full duplex 300bps);
     \- NEC PC-8801-13
         (Parallel I/F board);
+    \- NEC PC-8801-16
+        (extra μPD8086 CPU + 8253, 8255 and 8259 i/f, able to run MS-DOS 1.25,
+         requires extra ROMs for both sides);
     \- NEC PC-8801-17 / -18
         (VTR capture card "Video art board" / "Video digitizing unit", 16-bit color);
     \- NEC PC-8801-21

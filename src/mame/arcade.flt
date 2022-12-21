@@ -872,6 +872,7 @@ misc/skopro.cpp
 misc/skyarmy.cpp
 misc/skylncr.cpp
 misc/sliver.cpp
+misc/smd2144c.cpp
 misc/smotor.cpp
 misc/smsmcorp.cpp
 misc/sothello.cpp
@@ -1210,6 +1211,7 @@ sega/hshavoc.cpp
 sega/kopunch.cpp
 sega/lindbergh.cpp
 sega/megadriv_acbl.cpp
+sega/megadriv_sunmix.cpp
 sega/megaplay.cpp
 sega/megatech.cpp
 sega/model1.cpp

@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders: Luca Elia
-
 /***************************************************************************
 
-                            Ginga NinkyouDen
+                            Ginga Ninkyouden
                             (C) 1987 Jaleco
 
                     driver by Luca Elia (l.elia@tin.it)
@@ -103,8 +102,6 @@ public:
 
 	void ginganin(machine_config &config);
 
-	void init_ginganin();
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -116,8 +113,14 @@ private:
 	required_shared_ptr<u16> m_spriteram;
 	required_shared_ptr<u16> m_vregs;
 	required_shared_ptr<u16> m_fgram;
-
 	required_region_ptr<u8> m_bgrom;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -126,16 +129,9 @@ private:
 	u16 m_layers_ctrl = 0;
 	u8 m_flipscreen = 0;
 #ifdef MAME_DEBUG
-	int           m_posx = 0;
-	int           m_posy = 0;
+	int m_posx = 0;
+	int m_posy = 0;
 #endif
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
 
 	void fgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void txtram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -210,7 +206,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
   Callbacks for the TileMap code
 
 ***************************************************************************/
-
 
 // Background - Resides in ROM
 
@@ -370,7 +365,6 @@ void ginganin_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				attr >> 12,
 				flipx, flipy,
 				x, y, 15);
-
 	}
 }
 
@@ -387,7 +381,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	if (machine().input().code_pressed(KEYCODE_Q)) { msk |= 0xfff1;}
 	if (machine().input().code_pressed(KEYCODE_W)) { msk |= 0xfff2;}
 	if (machine().input().code_pressed(KEYCODE_E)) { msk |= 0xfff4;}
-	if (machine().input().code_pressed(KEYCODE_A))  { msk |= 0xfff8;}
+	if (machine().input().code_pressed(KEYCODE_A)) { msk |= 0xfff8;}
 	if (msk != 0) layers_ctrl1 &= msk;
 
 #define SETSCROLL \
@@ -397,12 +391,11 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	m_fg_tilemap->set_scrolly(0, m_posy); \
 	popmessage("B>%04X:%04X F>%04X:%04X",m_posx%(BG_NX*16),m_posy%(BG_NY*16),m_posx%(FG_NX*16),m_posy%(FG_NY*16));
 
-	if (machine().input().code_pressed(KEYCODE_L))  { m_posx +=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_J))  { m_posx -=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_K))  { m_posy +=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_I))  { m_posy -=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_H))  { m_posx = m_posy = 0;  SETSCROLL }
-
+	if (machine().input().code_pressed(KEYCODE_L)) { m_posx +=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_J)) { m_posx -=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_K)) { m_posy +=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_I)) { m_posy -=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_H)) { m_posx = m_posy = 0; SETSCROLL }
 }
 #endif
 
@@ -545,20 +538,21 @@ void ginganin_state::machine_reset()
 
 void ginganin_state::ginganin(machine_config &config)
 {
-	static constexpr XTAL MAIN_CLOCK = XTAL(6'000'000);
-	static constexpr XTAL SOUND_CLOCK = XTAL(3'579'545);
-
 	// basic machine hardware
-	M68000(config, m_maincpu, MAIN_CLOCK);
+	M68000(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ginganin_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ginganin_state::irq1_line_hold)); // ? (vectors 1-7 contain the same address)
+
+	static constexpr XTAL SOUND_CLOCK = 3.579545_MHz_XTAL;
 
 	MC6809(config, m_audiocpu, SOUND_CLOCK); // MBL68B09?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ginganin_state::sound_map);
 
-	ptm6840_device &ptm(PTM6840(config, "6840ptm", SOUND_CLOCK / 2));
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", SOUND_CLOCK / 4));
 	ptm.set_external_clocks(0, 0, 0);
-	ptm.o1_callback().set_inputline(m_audiocpu, 0);
+	ptm.o1_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
+
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -574,11 +568,7 @@ void ginganin_state::ginganin(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-
 	YM2149(config, "psg", SOUND_CLOCK / 2).add_route(ALL_OUTPUTS, "mono", 0.10);
-
 	Y8950(config, "ymsnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0); // The Y8950 is basically a YM3526 with ADPCM built in
 }
 
@@ -659,19 +649,8 @@ ROM_START( ginganina )
 	ROM_LOAD( "gn_03.bin", 0x10000, 0x10000, CRC(f1ba222c) SHA1(780c0bd0045bac1e1bb3209576383db90504fbf3) )
 ROM_END
 
-
-void ginganin_state::init_ginganin()
-{
-	// pending full removal of this patch ...
-	/* main CPU patches */
-//  u16 *rom = (u16 *)memregion("maincpu")->base();
-	/* avoid writes to ROM getting to the log */
-//  rom[0x408 / 2] = 0x6000;
-//  rom[0x40a / 2] = 0x001c;
-}
-
 } // anonymous namespace
 
 
-GAME( 1987, ginganin,  0,        ginganin, ginganin, ginganin_state, init_ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ginganina, ginganin, ginganin, ginganin, ginganin_state, init_ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ginganin,  0,        ginganin, ginganin, ginganin_state, empty_init, ROT0, "Jaleco", "Ginga Ninkyouden (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ginganina, ginganin, ginganin, ginganin, ginganin_state, empty_init, ROT0, "Jaleco", "Ginga Ninkyouden (set 2)", MACHINE_SUPPORTS_SAVE )

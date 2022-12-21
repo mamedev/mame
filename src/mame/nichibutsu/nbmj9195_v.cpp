@@ -4,7 +4,7 @@
 
     Video Hardware for Nichibutsu Mahjong series.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 1999/11/05 -
+    Driver by Takahiro Nogi 1999/11/05 -
     Special thanks to Tatsuyuki Satoh
 
 ******************************************************************************/

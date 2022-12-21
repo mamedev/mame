@@ -3973,7 +3973,7 @@
 			</element>
 			<element name="vfd~i~" ref="vfd0">
 				<animate name="vfdduty0"/>
-				<color state="0" red="0.00" green="1.00" blue="1.00" alpha="0.0"/>
+				<color state="0" red="0.14" green="0.14" blue="0.14" alpha="1.0"/>
 				<color state="31" red="0.00" green="1.00" blue="1.00" alpha="1.0"/>
 				<bounds x="~x~" y="364" width="17" height="29"/>
 			</element>

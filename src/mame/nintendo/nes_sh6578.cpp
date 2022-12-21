@@ -55,8 +55,6 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	void sprite_dma_w(address_space &space, uint8_t data);
-
 	virtual void io_w(uint8_t data);
 	virtual void extio_w(uint8_t data);
 	bool m_isbanked;
@@ -177,11 +175,6 @@ void nes_sh6578_state::bank_w(int bank, uint16_t offset, uint8_t data)
 	address = offset & 0x00fff;                   // 0x00fff part of address
 	address |= (m_bankswitch[bank] & 0xff) << 12; // 0xff000 part of address
 	m_fullrom->write8(address, data);
-}
-
-void nes_sh6578_state::sprite_dma_w(address_space &space, uint8_t data)
-{
-	m_ppu->spriteram_dma(space, data);
 }
 
 uint8_t nes_sh6578_state::bankswitch_r(offs_t offset)
@@ -469,7 +462,7 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 	map(0x2040, 0x207f).rw(m_ppu, FUNC(ppu_sh6578_device::palette_read), FUNC(ppu_sh6578_device::palette_write));
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nesapu_device::write));
-	map(0x4014, 0x4014).w(FUNC(nes_sh6578_state::sprite_dma_w));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu_sh6578_device::spriteram_dma));
 	map(0x4015, 0x4015).r(m_apu, FUNC(nesapu_device::status_r));
 	map(0x4016, 0x4016).rw(FUNC(nes_sh6578_state::io0_r), FUNC(nes_sh6578_state::io_w));
 	map(0x4017, 0x4017).r(FUNC(nes_sh6578_state::io1_r));
