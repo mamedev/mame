@@ -289,6 +289,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<description>After Burner II (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Supports XE-1AP analog pad." />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-13261-H"/>
@@ -804,6 +805,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<info name="serial" value="G-5514 (Jpn), MK-1135-50 (Euro)"/>
 		<info name="release" value="19920717"/>
 		<info name="alt_title" value="アイルトン・セナ スーパーモナコGP II"/>
+		<info name="usage" value="Supports XE-1AP analog pad." />
 		<sharedfeat name="compatibility" value="PAL,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -827,6 +829,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-1135"/>
+		<info name="usage" value="Supports XE-1AP analog pad." />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -1367,6 +1370,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<description>Cannon Fodder (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
+		<info name="usage" value="Supports mouse." />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17322-H"/>
@@ -3244,6 +3248,7 @@ Crashes after EA logo, requires better [VDP] irq handling
 		<info name="serial" value="T-68013 (JPN)"/>
 		<info name="release" value="19910913 (JPN)"/>
 		<info name="alt_title" value="ギャラクシーフォースII"/>
+		<info name="usage" value="Supports XE-1AP analog pad." />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-14248B-F"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -10583,6 +10588,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<info name="serial" value="T-17013"/>
 		<info name="release" value="19900323"/>
 		<info name="alt_title" value="アフターバーナーII"/>
+		<info name="usage" value="Supports XE-1AP analog pad." />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="mpr-12941.bin" size="524288" crc="4ff37e66" sha1="8f1e6a3e83094e5d0e237d6a1ffcc87171595ea5"/>
@@ -13578,6 +13584,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Columns III - Revenge of Columns (USA)</description>
 		<year>1993</year>
 		<publisher>Vic Tokai</publisher>
+		<info name="usage" value="Supports up to five players with 4-Player Adaptor connected to second controller port." />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -16837,10 +16844,13 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		</part>
 	</software>
 
+	<!-- heavy graphical corruption on PAL consoles -->
 	<software name="gforce2a" cloneof="gforce2">
 		<description>Galaxy Force II (World)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Supports XE-1AP analog pad." />
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="galaxy force ii (world).bin" size="1048576" crc="cae883c5" sha1="d4143bf5f49b0d03f4b8fe270c2ecc23fa6627e0"/>
@@ -30444,7 +30454,8 @@ No BGMs
 		<description>Wacky Worlds (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<info name="alt_title" value="Wacky Worlds Creativity Studio (Box)"/>
+		<info name="alt_title" value="Wacky Worlds Creativity Studio"/> <!-- on box -->
+		<info name="usage" value="Supports mouse." />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
