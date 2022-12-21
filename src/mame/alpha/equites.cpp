@@ -829,18 +829,12 @@ GFXDECODE_END
 
 void equites_state::machine_start()
 {
-	// zerofill
-	m_bgcolor = 0;
-
-	// register for savestates
 	save_item(NAME(m_bgcolor));
 }
 
 void gekisou_state::machine_start()
 {
 	equites_state::machine_start();
-
-	m_gekisou_unknown_bit = 0;
 
 	save_item(NAME(m_gekisou_unknown_bit));
 }
@@ -852,10 +846,6 @@ void splndrbt_state::machine_start()
 	save_item(NAME(m_fg_char_bank));
 	save_item(NAME(m_splndrbt_bg_scrollx));
 	save_item(NAME(m_splndrbt_bg_scrolly));
-
-	m_fg_char_bank = 0;
-	m_splndrbt_bg_scrollx = 0;
-	m_splndrbt_bg_scrolly = 0;
 }
 
 void equites_state::equites(machine_config &config)
@@ -919,7 +909,7 @@ void splndrbt_state::splndrbt(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(splndrbt_state::splndrbt_scanline), "screen", 0, 1);
 
 	LS259(config, m_mainlatch);
-	m_mainlatch->q_out_cb<0>().set(FUNC(equites_state::flip_screen_w));
+	m_mainlatch->q_out_cb<0>().set(FUNC(splndrbt_state::flip_screen_w));
 	m_mainlatch->q_out_cb<1>().set(m_alpha_8201, FUNC(alpha_8201_device::mcu_start_w));
 	m_mainlatch->q_out_cb<2>().set(m_alpha_8201, FUNC(alpha_8201_device::bus_dir_w)).invert();
 	m_mainlatch->q_out_cb<3>().set(FUNC(splndrbt_state::splndrbt_selchar_w));
@@ -1256,7 +1246,7 @@ ROM_START( kouyakyu )
 	ROM_LOAD( "epr-6698.bin", 0x0a000, 0x2000, CRC(7adfd1ff) SHA1(b543dd6734a681a187dabf602bea390de663039c) )
 
 	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
-	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, BAD_DUMP CRC(1f5a1405) SHA1(23f2e23db402f88037a5cbdab2935ec1b9a05298) ) // 8304 is not dumped yet, using 8505 instead
+	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, BAD_DUMP CRC(1f5a1405) SHA1(23f2e23db402f88037a5cbdab2935ec1b9a05298) ) // 8304 is not dumped yet, using 8505 instead, works ok
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "epr-6710.bin", 0x00000, 0x1000, CRC(accda190) SHA1(265d2fd92574d65e7890e48d5f305bf903a67bc8) )
@@ -1321,7 +1311,7 @@ ROM_START( gekisou )
 	ROM_LOAD( "v3.1e", 0x08000, 0x4000, CRC(0ab5e777) SHA1(9177c42418f022a65d73c3302873b894c5a137a4) )
 
 	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
-	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, BAD_DUMP CRC(1f5a1405) SHA1(23f2e23db402f88037a5cbdab2935ec1b9a05298) ) // 8304 is not dumped yet, using 8505 instead
+	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, BAD_DUMP CRC(1f5a1405) SHA1(23f2e23db402f88037a5cbdab2935ec1b9a05298) ) // 8304 is not dumped yet, using 8505 instead, works ok
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "0.5c",  0x00000, 0x1000, CRC(7e8bf4d1) SHA1(8abb82be006e8d1df449a5f83d59637314405119) )
@@ -1417,11 +1407,11 @@ ROM_START( splndrbt )
 	ROM_REGION( 0x0020, "prom", 0 )
 	ROM_LOAD( "3h.bpr", 0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
 
-	ROM_REGION( 0x2100, "user1", 0 ) // bg scaling
+	ROM_REGION( 0x2100, "scale1", 0 ) // bg scaling
 	ROM_LOAD( "0.8h",   0x0000, 0x2000, CRC(12681fb5) SHA1(7a0930819d4cd00475d1897128daa6ac865e07d0) ) // x
 	ROM_LOAD( "1.9j",   0x2000, 0x0100, CRC(f5b9b777) SHA1(a4ec731be77306db6baf319391c4fe78517fe43e) ) // y
 
-	ROM_REGION( 0x0200, "user2", 0 ) // sprite scaling
+	ROM_REGION( 0x0200, "scale2", 0 ) // sprite scaling
 	ROM_LOAD( "4.7m",   0x0000, 0x0100, CRC(12cbcd2c) SHA1(a7946820bbf3f7e110a328b673123988af97ce7e) ) // x
 	ROM_LOAD( "s3.8l",  0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END
@@ -1465,11 +1455,11 @@ ROM_START( splndrbta )
 	ROM_REGION( 0x0020, "prom", 0 )
 	ROM_LOAD( "3h.bpr", 0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
 
-	ROM_REGION( 0x2100, "user1", 0 ) // bg scaling
+	ROM_REGION( 0x2100, "scale1", 0 ) // bg scaling
 	ROM_LOAD( "0.8h",   0x0000, 0x2000, CRC(12681fb5) SHA1(7a0930819d4cd00475d1897128daa6ac865e07d0) ) // x
 	ROM_LOAD( "1.9j",   0x2000, 0x0100, CRC(f5b9b777) SHA1(a4ec731be77306db6baf319391c4fe78517fe43e) ) // y
 
-	ROM_REGION( 0x0200, "user2", 0 ) // sprite scaling
+	ROM_REGION( 0x0200, "scale2", 0 ) // sprite scaling
 	ROM_LOAD( "4.7m",   0x0000, 0x0100, CRC(12cbcd2c) SHA1(a7946820bbf3f7e110a328b673123988af97ce7e) ) // x
 	ROM_LOAD( "s3.8l",  0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END
@@ -1515,11 +1505,11 @@ ROM_START( splndrbtb )
 	ROM_REGION( 0x0020, "prom", 0 )
 	ROM_LOAD( "3h.bpr", 0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
 
-	ROM_REGION( 0x2100, "user1", 0 ) // bg scaling
+	ROM_REGION( 0x2100, "scale1", 0 ) // bg scaling
 	ROM_LOAD( "0.8h",   0x0000, 0x2000, CRC(12681fb5) SHA1(7a0930819d4cd00475d1897128daa6ac865e07d0) ) // x
 	ROM_LOAD( "1.9j",   0x2000, 0x0100, CRC(f5b9b777) SHA1(a4ec731be77306db6baf319391c4fe78517fe43e) ) // y
 
-	ROM_REGION( 0x0200, "user2", 0 ) // sprite scaling
+	ROM_REGION( 0x0200, "scale2", 0 ) // sprite scaling
 	ROM_LOAD( "4.7m",   0x0000, 0x0100, CRC(12cbcd2c) SHA1(a7946820bbf3f7e110a328b673123988af97ce7e) ) // x
 	ROM_LOAD( "s3.8l",  0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END
@@ -1567,11 +1557,11 @@ ROM_START( splndrbt2 )
 	ROM_REGION( 0x0020, "prom", 0 )
 	ROM_LOAD( "3h.bpr", 0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
 
-	ROM_REGION( 0x2100, "user1", 0 ) // bg scaling
+	ROM_REGION( 0x2100, "scale1", 0 ) // bg scaling
 	ROM_LOAD( "0.h7",   0x0000, 0x2000, CRC(12681fb5) SHA1(7a0930819d4cd00475d1897128daa6ac865e07d0) ) // x
 	ROM_LOAD( "1.9j",   0x2000, 0x0100, CRC(f5b9b777) SHA1(a4ec731be77306db6baf319391c4fe78517fe43e) ) // y
 
-	ROM_REGION( 0x0200, "user2", 0 ) // sprite scaling
+	ROM_REGION( 0x0200, "scale2", 0 ) // sprite scaling
 	ROM_LOAD( "4.7m",   0x0000, 0x0100, CRC(12cbcd2c) SHA1(a7946820bbf3f7e110a328b673123988af97ce7e) ) // x
 	ROM_LOAD( "s3.8l",  0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END
@@ -1606,7 +1596,7 @@ ROM_START( hvoltage )
 	ROM_LOAD( "7_v.1e", 0x08000, 0x4000, CRC(44d38554) SHA1(6765971376eafa218fda1accb1e173a7c1850cc8) )
 
 	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
-	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, BAD_DUMP CRC(1f5a1405) SHA1(23f2e23db402f88037a5cbdab2935ec1b9a05298) ) // 8304 is not dumped yet, using 8505 instead
+	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, BAD_DUMP CRC(1f5a1405) SHA1(23f2e23db402f88037a5cbdab2935ec1b9a05298) ) // 8304 is not dumped yet, using 8505 instead, works ok
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars
 	ROM_LOAD( "5.8c",   0x00000, 0x2000, CRC(656d53cd) SHA1(9971ed7e7da0e8bf46e97e8f75a2c2201b33fc2f) )
@@ -1633,11 +1623,11 @@ ROM_START( hvoltage )
 	ROM_REGION( 0x0020, "prom", 0 )
 	ROM_LOAD( "3h.bpr", 0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
 
-	ROM_REGION( 0x2100, "user1", 0 ) // bg scaling
+	ROM_REGION( 0x2100, "scale1", 0 ) // bg scaling
 	ROM_LOAD( "0.8h",   0x0000, 0x2000, CRC(12681fb5) SHA1(7a0930819d4cd00475d1897128daa6ac865e07d0) ) // x
 	ROM_LOAD( "1.9j",   0x2000, 0x0100, CRC(f5b9b777) SHA1(a4ec731be77306db6baf319391c4fe78517fe43e) ) // y
 
-	ROM_REGION( 0x0200, "user2", 0 ) // sprite scaling
+	ROM_REGION( 0x0200, "scale2", 0 ) // sprite scaling
 	ROM_LOAD( "4.7m",   0x0000, 0x0100, CRC(12cbcd2c) SHA1(a7946820bbf3f7e110a328b673123988af97ce7e) ) // x
 	ROM_LOAD( "3.8l",   0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END

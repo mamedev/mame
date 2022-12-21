@@ -264,7 +264,7 @@ void equites_state::equites_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 
 
 /*
-This is (probabbly) the sprite x scaling PROM.
+This is (probably) the sprite x scaling PROM.
 The layout is strange. Clearly every line os for one xscale setting. However,
 it seems that bytes 0-3 are handled separately from bytes 4-F.
 Also, note that sprites are 30x30, not 32x32.
@@ -288,7 +288,7 @@ Also, note that sprites are 30x30, not 32x32.
 
 void splndrbt_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t * const xrom = memregion("user2")->base();
+	const uint8_t * const xrom = m_scale_rom[1];
 	const uint8_t * const yrom = xrom + 0x100;
 	gfx_element* gfx = m_gfxdecode->gfx(2);
 
@@ -364,7 +364,7 @@ void splndrbt_state::splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle 
 {
 	bitmap_ind16 &src_bitmap = m_bg_tilemap->pixmap();
 	bitmap_ind8 &flags_bitmap = m_bg_tilemap->flagsmap();
-	const uint8_t * const xrom = memregion("user1")->base();
+	const uint8_t * const xrom = m_scale_rom[0];
 	const uint8_t * const yrom = xrom + 0x2000;
 	int scroll_x = m_splndrbt_bg_scrollx;
 	int scroll_y = m_splndrbt_bg_scrolly;
