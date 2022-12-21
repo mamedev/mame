@@ -1372,28 +1372,29 @@ void decocass_type3_state::cfghtice(machine_config &config)
 	ROM_LOAD( "cassmcu.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) ) /* from B10-B board: "NEC // JAPAN // X1202D-108 // D8041C 535" 8041 MCU @1C, handles cassette and other stuff; This info needs additional verification, as the d8041-535 mcu has not been dumped yet to prove code is the same. */
 
 #define DECOCASS_BIOS_MAIN \
-	/* New boardset BIOS */ \
-	ROM_REGION( 0x10000, "maincpu", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "a",    "Bios A (Japan)" ) \
-	ROM_LOAD_BIOS(   0, "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), bios code */ \
 	ROM_SYSTEM_BIOS( 1, "b",    "Bios B (USA)" ) \
-	ROM_LOAD_BIOS(   1, "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), bios code */ \
 	ROM_SYSTEM_BIOS( 2, "c",    "Bios C (UK)" ) \
-	ROM_LOAD_BIOS(   2, "v0c-.7e",    0xf000, 0x1000, CRC(9f505709) SHA1(a9c661ba5a0d3fa5e935fb9c10fa63e2d9809981) ) /* handcrafted (single byte changed) because cnebula requires region C */ \
 	ROM_SYSTEM_BIOS( 3, "d",    "Bios D (Europe)" ) \
+	ROM_SYSTEM_BIOS( 4, "a0",   "Bios A (Japan, older PCB)" ) \
+	ROM_SYSTEM_BIOS( 5, "b0",   "Bios B (USA, older PCB)" ) \
+	ROM_SYSTEM_BIOS( 6, "c0",   "Bios C (UK, older PCB)" ) \
+	ROM_SYSTEM_BIOS( 7, "d0",   "Bios D (Europe, older PCB)" ) \
+	\
+	ROM_REGION( 0x10000, "maincpu", 0 ) \
+	/* New boardset BIOS */ \
+	ROM_LOAD_BIOS(   0, "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), bios code */ \
+	ROM_LOAD_BIOS(   1, "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), bios code */ \
+	ROM_LOAD_BIOS(   2, "v0c-.7e",    0xf000, 0x1000, CRC(9f505709) SHA1(a9c661ba5a0d3fa5e935fb9c10fa63e2d9809981) ) /* handcrafted (single byte changed) because cnebula requires region C */ \
 	ROM_LOAD_BIOS(   3, "v0d-.7e",    0xf000, 0x1000, CRC(1e0c22b1) SHA1(5fec8fef500bbebc13d0173406afc55235d3affb) ) /* handcrafted (single byte changed) because ctisland3 requires region D */ \
 	\
 	/* Old boardset BIOS, 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
-	ROM_SYSTEM_BIOS( 4, "a0",   "Bios A (Japan, older PCB)" ) \
 	ROM_LOAD_BIOS(   4, "dsp-3_p0-a.m9",      0xf000, 0x0800, CRC(2541e34b) SHA1(4f983513dbae1350c83a433dea77a4465748b9c6) ) \
 	ROM_LOAD_BIOS(   4, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
-	ROM_SYSTEM_BIOS( 5, "b0",   "Bios B (USA, older PCB)" ) \
 	ROM_LOAD_BIOS(   5, "dsp-3_p0-b.m9",      0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
 	ROM_LOAD_BIOS(   5, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
-	ROM_SYSTEM_BIOS( 6, "c0",   "Bios C (UK, older PCB)" ) \
 	ROM_LOAD_BIOS(   6, "dsp-3_p0-c.m9",      0xf000, 0x0800, CRC(c76c4057) SHA1(4093d4ac44feff595e34f361ed1ed84113c9225e) ) \
 	ROM_LOAD_BIOS(   6, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
-	ROM_SYSTEM_BIOS( 7, "d0",   "Bios D (Europe, older PCB)" ) \
 	ROM_LOAD_BIOS(   7, "dsp-3_p0-d.m9",      0xf000, 0x0800, CRC(4b7d72bc) SHA1(a70c5ba88404dafee2cc717071c4a249f67ab645) ) \
 	ROM_LOAD_BIOS(   7, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
 	\
