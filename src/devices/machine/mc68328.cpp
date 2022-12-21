@@ -373,7 +373,7 @@ void mc68328_base_device::device_start()
 	m_spim = timer_alloc(FUNC(mc68328_base_device::spim_tick), this);
 	m_lcd_scan = timer_alloc(FUNC(mc68328_base_device::lcd_scan_tick), this);
 
-	m_lcd_line_buffer = std::make_unique<u16[]>(1024 / 8); // 1024px wide, up to 8 pixels per word
+	m_lcd_line_buffer = std::make_unique<u16[]>(1024 / 16); // 1024px wide, up to 16 pixels per word
 
 	register_state_save();
 }
@@ -466,6 +466,7 @@ void mc68328_base_device::device_reset()
 	m_umisc = 0x0000;
 
 	m_lssa = 0x00000000;
+	m_lssa_end = 0x00000000;
 	m_lvpw = 0xff;
 	m_lxmax = 0x03ff;
 	m_lymax = 0x01ff;
@@ -480,6 +481,7 @@ void mc68328_base_device::device_reset()
 	m_lckcon = 0x40;
 	m_lposr = 0x00;
 	m_lfrcm = 0xb9;
+	m_lcd_update_pending = true;
 
 	m_hmsr = 0x00000000;
 	m_alarm = 0x00000000;
@@ -496,6 +498,7 @@ void mc68328_base_device::device_reset()
 	m_spim->adjust(attotime::never);
 	m_lcd_scan->adjust(attotime::never);
 	m_lcd_sysmem_ptr = 0;
+	m_lssa_end = 0;
 	m_lcd_line_bit = 0;
 	m_lcd_line_word = 0;
 	m_lsclk = false;
@@ -647,6 +650,7 @@ void mc68328_base_device::register_state_save()
 	save_item(NAME(m_umisc));
 
 	save_item(NAME(m_lssa));
+	save_item(NAME(m_lssa_end));
 	save_item(NAME(m_lvpw));
 	save_item(NAME(m_lxmax));
 	save_item(NAME(m_lymax));
@@ -659,11 +663,9 @@ void mc68328_base_device::register_state_save()
 	save_item(NAME(m_lacdrc));
 	save_item(NAME(m_lpxcd));
 	save_item(NAME(m_lckcon));
-	save_item(NAME(m_llbar));
-	save_item(NAME(m_lotcr));
 	save_item(NAME(m_lposr));
 	save_item(NAME(m_lfrcm));
-	save_item(NAME(m_lgpmr));
+	save_item(NAME(m_lcd_update_pending));
 
 	save_item(NAME(m_hmsr));
 	save_item(NAME(m_alarm));
@@ -723,6 +725,10 @@ void mc68328_device::register_state_save()
 	save_item(NAME(m_wcn));
 
 	save_item(NAME(m_spisr));
+
+	save_item(NAME(m_llbar));
+	save_item(NAME(m_lotcr));
+	save_item(NAME(m_lgpmr));
 }
 
 void mc68ez328_device::register_state_save()
@@ -1374,31 +1380,31 @@ void mc68328_base_device::isr_msw_w(offs_t offset, u16 data, u16 mem_mask) // 0x
 {
 	LOGMASKED(LOG_INTS, "%s: isr_msw_w: ISR(MSW) = %04x\n", machine().describe_context(), data);
 	// Clear edge-triggered IRQ1
-	if ((m_icr & ICR_ET1) == ICR_ET1 && (data & INT_IRQ1_MASK) == INT_IRQ1_MASK)
+	if ((m_icr & ICR_ET1) == ICR_ET1 && ((data << 16) & INT_IRQ1_MASK) == INT_IRQ1_MASK)
 	{
 		m_isr &= ~INT_IRQ1_MASK;
 	}
 
 	// Clear edge-triggered IRQ2
-	if ((m_icr & ICR_ET2) == ICR_ET2 && (data & INT_IRQ2_MASK) == INT_IRQ2_MASK)
+	if ((m_icr & ICR_ET2) == ICR_ET2 && ((data << 16) & INT_IRQ2_MASK) == INT_IRQ2_MASK)
 	{
 		m_isr &= ~INT_IRQ2_MASK;
 	}
 
 	// Clear edge-triggered IRQ3
-	if ((m_icr & ICR_ET3) == ICR_ET3 && (data & INT_IRQ3_MASK) == INT_IRQ3_MASK)
+	if ((m_icr & ICR_ET3) == ICR_ET3 && ((data << 16) & INT_IRQ3_MASK) == INT_IRQ3_MASK)
 	{
 		m_isr &= ~INT_IRQ3_MASK;
 	}
 
 	// Clear edge-triggered IRQ6
-	if ((m_icr & ICR_ET6) == ICR_ET6 && (data & INT_IRQ6_MASK) == INT_IRQ6_MASK)
+	if ((m_icr & ICR_ET6) == ICR_ET6 && ((data << 16) & INT_IRQ6_MASK) == INT_IRQ6_MASK)
 	{
 		m_isr &= ~INT_IRQ6_MASK;
 	}
 
 	// Clear edge-triggered IRQ7
-	if ((data & INT_IRQ7_MASK) == INT_IRQ7_MASK)
+	if (((data << 16) & INT_IRQ7_MASK) == INT_IRQ7_MASK)
 	{
 		m_isr &= ~INT_IRQ7_MASK;
 	}
@@ -3081,10 +3087,36 @@ u16 mc68328_base_device::umisc_r() // 0x908
 //  LCD hardware - Shared and Standard MC68328
 //-------------------------------------------------
 
+void mc68328_device::lcd_update_info()
+{
+	if (!m_lcd_update_pending)
+	{
+		return;
+	}
+	const u32 sysclk_divisor = VCO_DIVISORS[(m_pllcr & PLLCR_SYSCLK_SEL) >> PLLCR_SYSCLK_SHIFT];
+	attotime lcd_dma_duration = attotime::from_ticks(lcd_get_line_word_count() * sysclk_divisor, clock());
+	attotime lcd_scan_duration = lcd_get_line_rate();
+	attotime lcd_frame_duration = (lcd_scan_duration + lcd_dma_duration) * (m_lymax + 1);
+	LOGMASKED(LOG_LCD, "lxmax %d, lymax %d, divisor %d, lrra %02x, lpxcd %02x\n", m_lxmax, m_lymax + 1, sysclk_divisor, m_lpxcd + 1);
+
+	constexpr u8 BIT_WIDTHS[4] = { 1, 2, 4, 0xff };
+	if (!m_lcd_info_changed_cb.isnull())
+	{
+		m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), lcd_get_width(), m_lymax + 1, BIT_WIDTHS[(m_lpicf & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT], BIT_WIDTHS[m_lpicf & LPICF_GS]);
+	}
+
+	m_lcd_update_pending = false;
+}
+
 u16 mc68328_device::lcd_get_lxmax_mask()
 {
 	constexpr u16 LXMAX_MASK = 0x03ff;
 	return LXMAX_MASK;
+}
+
+int mc68328_device::lcd_get_width()
+{
+	return (m_lxmax & lcd_get_lxmax_mask()) + 1;
 }
 
 u32 mc68328_device::lcd_get_line_word_count()
@@ -3119,7 +3151,9 @@ void mc68328_base_device::fill_lcd_dma_buffer()
 {
 	if (m_lcd_sysmem_ptr == m_lssa)
 	{
+		lcd_update_info();
 		m_out_flm_cb(BIT(m_lpolcf, LPOLCF_FLMPOL_BIT) ? 0 : 1);
+		m_lssa_end = m_lssa + ((m_lvpw * (m_lymax + 1)) << 1);
 	}
 	else
 	{
@@ -3138,9 +3172,7 @@ void mc68328_base_device::fill_lcd_dma_buffer()
 	}
 
 	m_lcd_sysmem_ptr += m_lvpw << 1;
-
-	const u32 screen_max_addr = m_lssa + ((m_lvpw * (m_lymax + 1)) << 1);
-	if (m_lcd_sysmem_ptr >= screen_max_addr)
+	if (m_lcd_sysmem_ptr >= m_lssa_end)
 	{
 		m_lcd_sysmem_ptr = m_lssa;
 	}
@@ -3245,7 +3277,7 @@ void mc68328_base_device::lvpw_w(u8 data) // 0xa05
 {
 	LOGMASKED(LOG_LCD, "%s: lvpw_w: LVPW = %02x\n", machine().describe_context(), data);
 	m_lvpw = data;
-	LOGMASKED(LOG_LCD, "%s:         Virtual Page Width: %d words\n", machine().describe_context(), m_lvpw << 1);
+	LOGMASKED(LOG_LCD, "%s:         Virtual Page Width: %d words\n", machine().describe_context(), m_lvpw);
 }
 
 u8 mc68328_base_device::lvpw_r() // 0xa05
@@ -3256,9 +3288,10 @@ u8 mc68328_base_device::lvpw_r() // 0xa05
 
 void mc68328_base_device::lxmax_w(u16 data) // 0xa08
 {
+	m_lcd_update_pending = m_lcd_update_pending || (m_lxmax != (data & lcd_get_lxmax_mask()));
 	LOGMASKED(LOG_LCD, "%s: lxmax_w: LXMAX = %04x\n", machine().describe_context(), data);
 	m_lxmax = data & lcd_get_lxmax_mask();
-	LOGMASKED(LOG_LCD, "%s:          Width: %d\n", machine().describe_context(), (data & 0x03ff) + 1);
+	LOGMASKED(LOG_LCD, "%s:          Width: %d\n", machine().describe_context(), lcd_get_width());
 }
 
 u16 mc68328_base_device::lxmax_r() // 0xa08
@@ -3269,6 +3302,7 @@ u16 mc68328_base_device::lxmax_r() // 0xa08
 
 void mc68328_base_device::lymax_w(u16 data) // 0xa0a
 {
+	m_lcd_update_pending = m_lcd_update_pending || (m_lxmax != (data & LYMAX_MASK));
 	LOGMASKED(LOG_LCD, "%s: lymax_w: LYMAX = %04x\n", machine().describe_context(), data);
 	m_lymax = data & LYMAX_MASK;
 	LOGMASKED(LOG_LCD, "%s:          Height: %d\n", machine().describe_context(), (data & 0x03ff) + 1);
@@ -3420,18 +3454,13 @@ void mc68328_device::lckcon_w(u8 data) // 0xa27
 	const u16 old = m_lckcon;
 	m_lckcon = data;
 
+	lcd_update_info();
 	if (BIT(old, LCKCON_LCDON_BIT) && !BIT(m_lckcon, LCKCON_LCDON_BIT))
 	{
 		m_lcd_scan->adjust(attotime::never);
 	}
 	else if (!BIT(old, LCKCON_LCDON_BIT) && BIT(m_lckcon, LCKCON_LCDON_BIT))
 	{
-		const u32 sysclk_divisor = VCO_DIVISORS[(m_pllcr & PLLCR_SYSCLK_SEL) >> PLLCR_SYSCLK_SHIFT];
-		attotime lcd_dma_duration = attotime::from_ticks(m_llbar, clock() / sysclk_divisor);
-		attotime lcd_scan_duration = get_pixclk_rate() * (m_lxmax + 1);
-		attotime lcd_frame_duration = (lcd_scan_duration + lcd_dma_duration) * (m_lymax + 1);
-		m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), m_lxmax + 1, m_lymax + 1);
-
 		m_lcd_scan->adjust(attotime::never);
 		m_lcd_sysmem_ptr = m_lssa;
 		fill_lcd_dma_buffer();
@@ -3517,24 +3546,52 @@ u16 mc68328_device::lgpmr_r() // 0xa32
 //  LCD hardware - EZ variant
 //-------------------------------------------------
 
+void mc68ez328_device::lcd_update_info()
+{
+	if (!m_lcd_update_pending)
+	{
+		return;
+	}
+
+	const u32 sysclk_divisor = VCO_DIVISORS[(m_pllcr & PLLCR_SYSCLK_SEL) >> PLLCR_SYSCLK_SHIFT];
+	attotime lcd_dma_duration = attotime::from_ticks(lcd_get_line_word_count() * sysclk_divisor, clock());
+	attotime lcd_scan_duration = lcd_get_line_rate();
+	attotime lcd_frame_duration = (lcd_scan_duration + lcd_dma_duration) * (m_lymax + 1) * 2;
+
+	constexpr u8 BIT_WIDTHS[4] = { 1, 2, 4, 0xff };
+	if (!m_lcd_info_changed_cb.isnull())
+	{
+		m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), lcd_get_width(), m_lymax + 1, BIT_WIDTHS[(m_lpicf & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT], BIT_WIDTHS[m_lpicf & LPICF_GS]);
+	}
+
+	m_lcd_update_pending = false;
+}
+
 u16 mc68ez328_device::lcd_get_lxmax_mask()
 {
 	constexpr u16 LXMAX_MASK = 0x03f0;
 	return LXMAX_MASK;
 }
 
+int mc68ez328_device::lcd_get_width()
+{
+	return m_lxmax & lcd_get_lxmax_mask();
+}
+
 u32 mc68ez328_device::lcd_get_line_word_count()
 {
-	const u32 pixels_per_word = 16 / lcd_get_panel_bit_size();
-	return ((m_lxmax & lcd_get_lxmax_mask()) + 16) / pixels_per_word;
+	const u32 pixels_per_word = 16 / (1 << (m_lpicf & LPICF_GS));
+	const u32 data = (m_lxmax & lcd_get_lxmax_mask()) / pixels_per_word;
+	return data;
 }
 
 attotime mc68ez328_device::lcd_get_line_rate()
 {
 	const u32 pixclk_divisor = VCO_DIVISORS[(m_pllcr & PLLCR_PIXCLK_SEL) >> PLLCR_PIXCLK_SHIFT];
 	const u32 pxcd = (m_lpxcd & LPXCD_MASK) + 1;
-	const u32 lrra_factor = 6 + m_lrra + (m_lxmax & lcd_get_lxmax_mask()) + 16;
-	return attotime::from_ticks(lrra_factor * pxcd * pixclk_divisor, clock());
+	const u32 lrra_factor = 6 + m_lrra + (m_lxmax & lcd_get_lxmax_mask()) * 4;
+	const u32 ticks = lrra_factor * pxcd * pixclk_divisor;
+	return attotime::from_ticks(ticks, clock());
 }
 
 u8 mc68ez328_device::lcd_get_panel_bit_size()
@@ -3556,6 +3613,7 @@ void mc68ez328_device::lpicf_w(u8 data) // 0xa20
 	LOGMASKED(LOG_LCD, "%s: lpicf_w: LPICF = %02x\n", machine().describe_context(), data);
 	LOGMASKED(LOG_LCD, "%s:          Grayscale Mode: %d\n", machine().describe_context(), GS_NAMES[data & LPICF_GS]);
 	LOGMASKED(LOG_LCD, "%s:          Bus Size: %s\n", machine().describe_context(), PBSIZ_NAMES[(data & LPICF_PBSIZ) >> LPICF_PBSIZ_SHIFT]);
+	m_lcd_update_pending = m_lcd_update_pending || (m_lpicf != data);
 	m_lpicf = data;
 }
 
@@ -3569,18 +3627,13 @@ void mc68ez328_device::lckcon_w(u8 data) // 0xa27
 	const u16 old = m_lckcon;
 	m_lckcon = data;
 
+	lcd_update_info();
 	if (BIT(old, LCKCON_LCDON_BIT) && !BIT(m_lckcon, LCKCON_LCDON_BIT))
 	{
 		m_lcd_scan->adjust(attotime::never);
 	}
 	else if (!BIT(old, LCKCON_LCDON_BIT) && BIT(m_lckcon, LCKCON_LCDON_BIT))
 	{
-		const u32 sysclk_divisor = VCO_DIVISORS[(m_pllcr & PLLCR_SYSCLK_SEL) >> PLLCR_SYSCLK_SHIFT];
-		attotime lcd_dma_duration = attotime::from_ticks(m_llbar, clock() / sysclk_divisor);
-		attotime lcd_scan_duration = get_pixclk_rate() * (m_lxmax + 1);
-		attotime lcd_frame_duration = (lcd_scan_duration + lcd_dma_duration) * (m_lymax + 1);
-		m_lcd_info_changed_cb(lcd_frame_duration.as_hz(), m_lxmax + 1, m_lymax + 1);
-
 		m_lcd_scan->adjust(attotime::never);
 		m_lcd_sysmem_ptr = m_lssa;
 		fill_lcd_dma_buffer();
@@ -3590,6 +3643,7 @@ void mc68ez328_device::lckcon_w(u8 data) // 0xa27
 void mc68ez328_device::lrra_w(u8 data) // 0xa29
 {
 	LOGMASKED(LOG_LCD, "%s: lrra_w: LRRA = %02x\n", machine().describe_context(), data);
+	m_lcd_update_pending = m_lcd_update_pending || (m_lrra != data);
 	m_lrra = data;
 }
 
