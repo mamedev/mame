@@ -87,7 +87,7 @@ private:
 	devcb_write_line m_irq_handler;
 	devcb_read8 m_mem_read_cb;
 
-	emu_timer* m_frame_timer;
+	emu_timer *m_frame_timer;
 	attotime m_frame_period;
 	u16 m_frame_clocks;
 
