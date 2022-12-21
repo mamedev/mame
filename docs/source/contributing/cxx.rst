@@ -399,8 +399,8 @@ channels:
 
 The above example also makes use of a helper function which is available
 in all derivatives of ``device_t``: ``machine().describe_context()``.
-This function will return a string that describe the emulation context
-in which the function is being run.  This includes the full-qualified
+This function will return a string that describes the emulation context
+in which the function is being run.  This includes the fully-qualified
 tag of the currently executing device (if any).  If the relevant device
 implements ``device_state_interface``, it will also include the current
 program-counter value reported by the device.
