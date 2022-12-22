@@ -16,6 +16,12 @@ license:CC0
 
 <!-- build screen -->
 
+	<view name="3D Scope Off">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+	</view>
+
+	<!-- for the 3D Scope views, enable stereoscopic 3D DIP switch first -->
+
 	<view name="3D Scope Straight View">
 		<!-- parallel-eyed -->
 		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>

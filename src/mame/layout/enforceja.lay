@@ -96,6 +96,8 @@ license:CC0
 		</element>
 	</view>
 
+	<!-- for the 3D Scope views, enable stereoscopic 3D DIP switch first -->
+
 	<view name="3D Scope Straight View">
 		<!-- parallel-eyed -->
 		<screen index="0"><bounds x="0" y="0" width="640" height="480" /></screen>
