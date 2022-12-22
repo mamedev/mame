@@ -420,27 +420,27 @@ protected:
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	virtual void machine_start() override;
+	virtual void video_start() override;
 
-	uint16_t equites_spriteram_kludge_r();
-	uint8_t equites_fg_videoram_r(offs_t offset);
-	void equites_fg_videoram_w(offs_t offset, uint8_t data);
-	void equites_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void equites_bgcolor_w(offs_t offset, uint8_t data);
-	void equites_scrollreg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(equites_fg_info);
-	TILE_GET_INFO_MEMBER(equites_bg_info);
-	DECLARE_VIDEO_START(equites);
-	void equites_palette(palette_device &palette) const;
-	uint32_t screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(equites_scanline);
-	void equites_draw_sprites_block(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end);
-	void equites_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint16_t spriteram_kludge_r();
+	uint8_t fg_videoram_r(offs_t offset);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bgcolor_w(offs_t offset, uint8_t data);
+	void scrollreg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	TILE_GET_INFO_MEMBER(fg_info);
+	TILE_GET_INFO_MEMBER(bg_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void draw_sprites_block(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void unpack_block(const char *region, int offset, int size);
 	void unpack_region(const char *region);
 
 	void bngotime_map(address_map &map);
 	void equites_map(address_map &map);
-	void equites_common_map(address_map &map);
+	void common_map(address_map &map);
 
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -454,7 +454,7 @@ public:
 		equites_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(gekisou_unknown_bit_r);
+	DECLARE_READ_LINE_MEMBER(unknown_bit_r);
 	void gekisou(machine_config &config);
 
 protected:
@@ -462,9 +462,9 @@ protected:
 
 private:
 	void gekisou_map(address_map &map);
-	void gekisou_unknown_bit_w(offs_t offset, uint16_t data);
+	void unknown_bit_w(offs_t offset, uint16_t data);
 
-	int m_gekisou_unknown_bit = 0;
+	int m_unknown_bit = 0;
 };
 
 
@@ -490,6 +490,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	// devices
@@ -506,21 +507,20 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_spriteram;
 	required_region_ptr_array<uint8_t, 2> m_scale_rom;
 
-	uint8_t equites_fg_videoram_r(offs_t offset);
-	void equites_fg_videoram_w(offs_t offset, uint8_t data);
-	void equites_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void equites_bgcolor_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(splndrbt_selchar_w);
-	void splndrbt_bg_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void splndrbt_bg_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
-	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
-	DECLARE_VIDEO_START(splndrbt);
-	void splndrbt_palette(palette_device &palette) const;
-	uint32_t screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);
-	void splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect);
+	uint8_t fg_videoram_r(offs_t offset);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bgcolor_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(selchar_w);
+	void bg_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	TILE_GET_INFO_MEMBER(fg_info);
+	TILE_GET_INFO_MEMBER(bg_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect);
 
 	void splndrbt_map(address_map &map);
 
@@ -531,18 +531,15 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_bgcolor = 0U;
 	int m_fg_char_bank = 0;
-	uint16_t m_splndrbt_bg_scrollx = 0U;
-	uint16_t m_splndrbt_bg_scrolly = 0U;
+	uint16_t m_bg_scrollx = 0U;
+	uint16_t m_bg_scrolly = 0U;
 };
 
 
-/*************************************
- *
- *  Palette handling
- *
- *************************************/
+/******************************************************************************/
+// Palette handling
 
-void equites_state::equites_palette(palette_device &palette) const
+void equites_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -559,7 +556,7 @@ void equites_state::equites_palette(palette_device &palette) const
 		palette.set_pen_indirect(i + 0x100, color_prom[i]);
 }
 
-void splndrbt_state::splndrbt_palette(palette_device &palette) const
+void splndrbt_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -584,13 +581,10 @@ void splndrbt_state::splndrbt_palette(palette_device &palette) const
 
 
 
-/*************************************
- *
- *  Callbacks for the TileMap code
- *
- *************************************/
+/******************************************************************************/
+// Callbacks for the tilemap code
 
-TILE_GET_INFO_MEMBER(equites_state::equites_fg_info)
+TILE_GET_INFO_MEMBER(equites_state::fg_info)
 {
 	int tile = m_fg_videoram[2 * tile_index];
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x1f;
@@ -600,7 +594,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_fg_info)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
 
-TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_fg_info)
+TILE_GET_INFO_MEMBER(splndrbt_state::fg_info)
 {
 	int tile = m_fg_videoram[2 * tile_index] + (m_fg_char_bank << 8);
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x3f;
@@ -610,7 +604,7 @@ TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_fg_info)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
 
-TILE_GET_INFO_MEMBER(equites_state::equites_bg_info)
+TILE_GET_INFO_MEMBER(equites_state::bg_info)
 {
 	int data = m_bg_videoram[tile_index];
 	int tile = data & 0x1ff;
@@ -620,7 +614,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_bg_info)
 	tileinfo.set(1, tile, color, TILE_FLIPXY(fxy));
 }
 
-TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_bg_info)
+TILE_GET_INFO_MEMBER(splndrbt_state::bg_info)
 {
 	int data = m_bg_videoram[tile_index];
 	int tile = data & 0x1ff;
@@ -633,125 +627,37 @@ TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_bg_info)
 
 
 
-/*************************************
- *
- *  Video system start
- *
- *************************************/
+/******************************************************************************/
+// Video system start
 
-VIDEO_START_MEMBER(equites_state,equites)
+void equites_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(equites_state::equites_fg_info)), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(equites_state::fg_info)), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(equites_state::equites_bg_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(equites_state::bg_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(0, -10);
 }
 
-VIDEO_START_MEMBER(splndrbt_state,splndrbt)
+void splndrbt_state::video_start()
 {
 	assert(m_screen->format() == BITMAP_FORMAT_IND16);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splndrbt_state::splndrbt_fg_info)), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splndrbt_state::fg_info)), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrolldx(8, -8);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splndrbt_state::splndrbt_bg_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splndrbt_state::bg_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(1), 0x10);
 }
 
 
 
-/*************************************
- *
- *  Memory handlers
- *
- *************************************/
+/******************************************************************************/
+// Video update
 
-uint8_t equites_state::equites_fg_videoram_r(offs_t offset)
-{
-	// 8-bit
-	return m_fg_videoram[offset];
-}
-
-void equites_state::equites_fg_videoram_w(offs_t offset, uint8_t data)
-{
-	m_fg_videoram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset >> 1);
-}
-
-void equites_state::equites_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(m_bg_videoram + offset);
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-void equites_state::equites_bgcolor_w(offs_t offset, uint8_t data)
-{
-	m_bgcolor = data;
-}
-
-void equites_state::equites_scrollreg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		m_bg_tilemap->set_scrolly(0, data & 0xff);
-
-	if (ACCESSING_BITS_8_15)
-		m_bg_tilemap->set_scrollx(0, data >> 8);
-}
-
-
-
-uint8_t splndrbt_state::equites_fg_videoram_r(offs_t offset)
-{
-	// 8-bit
-	return m_fg_videoram[offset];
-}
-
-void splndrbt_state::equites_fg_videoram_w(offs_t offset, uint8_t data)
-{
-	m_fg_videoram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset >> 1);
-}
-
-void splndrbt_state::equites_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(m_bg_videoram + offset);
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-void splndrbt_state::equites_bgcolor_w(offs_t offset, uint8_t data)
-{
-	m_bgcolor = data;
-}
-
-WRITE_LINE_MEMBER(splndrbt_state::splndrbt_selchar_w)
-{
-	// select active char map
-	m_fg_char_bank = (state == 0) ? 0 : 1;
-	m_fg_tilemap->mark_all_dirty();
-}
-
-void splndrbt_state::splndrbt_bg_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_splndrbt_bg_scrollx);
-}
-
-void splndrbt_state::splndrbt_bg_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_splndrbt_bg_scrolly);
-}
-
-
-
-/*************************************
- *
- *  Video update
- *
- *************************************/
-
-void equites_state::equites_draw_sprites_block(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end)
+void equites_state::draw_sprites_block(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end)
 {
 	for (int offs = end - 2; offs >= start; offs -= 2)
 	{
@@ -789,13 +695,13 @@ void equites_state::equites_draw_sprites_block(bitmap_ind16 &bitmap, const recta
 	}
 }
 
-void equites_state::equites_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void equites_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// note that we draw the sprites in three blocks; in each blocks, sprites at
 	// a lower address have priority. This gives good priorities in gekisou.
-	equites_draw_sprites_block(bitmap, cliprect, 0x000/2, 0x060/2);
-	equites_draw_sprites_block(bitmap, cliprect, 0x0e0/2, 0x100/2);
-	equites_draw_sprites_block(bitmap, cliprect, 0x1a4/2, 0x200/2);
+	draw_sprites_block(bitmap, cliprect, 0x000/2, 0x060/2);
+	draw_sprites_block(bitmap, cliprect, 0x0e0/2, 0x100/2);
+	draw_sprites_block(bitmap, cliprect, 0x1a4/2, 0x200/2);
 }
 
 
@@ -822,7 +728,7 @@ Also, note that sprites are 30x30, not 32x32.
 03020303 03030303 03030303 03030303
 */
 
-void splndrbt_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void splndrbt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const uint8_t * const xrom = m_scale_rom[1];
 	const uint8_t * const yrom = xrom + 0x100;
@@ -898,14 +804,14 @@ void splndrbt_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 }
 
 
-void splndrbt_state::splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect)
+void splndrbt_state::copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &src_bitmap = m_bg_tilemap->pixmap();
 	bitmap_ind8 &flags_bitmap = m_bg_tilemap->flagsmap();
 	const uint8_t * const xrom = m_scale_rom[0];
 	const uint8_t * const yrom = xrom + 0x2000;
-	int scroll_x = m_splndrbt_bg_scrollx;
-	int scroll_y = m_splndrbt_bg_scrolly;
+	int scroll_x = m_bg_scrollx;
+	int scroll_y = m_bg_scrolly;
 	int const dinvert = flip_screen() ? 0xff : 0x00;
 	int src_y = 0;
 	int dst_y;
@@ -952,29 +858,29 @@ void splndrbt_state::splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle 
 
 
 
-uint32_t equites_state::screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t equites_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgcolor, cliprect);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	equites_draw_sprites(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
-uint32_t splndrbt_state::screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t splndrbt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgcolor, cliprect);
 
-	splndrbt_copy_bg(bitmap, cliprect);
+	copy_bg(bitmap, cliprect);
 
 	if (m_fg_char_bank)
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	splndrbt_draw_sprites(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	if (!m_fg_char_bank)
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -987,7 +893,7 @@ uint32_t splndrbt_state::screen_update_splndrbt(screen_device &screen, bitmap_in
 /******************************************************************************/
 // Interrupt Handlers
 
-TIMER_DEVICE_CALLBACK_MEMBER(equites_state::equites_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(equites_state::scanline)
 {
 	int scanline = param;
 
@@ -998,7 +904,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::equites_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_state::splndrbt_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_state::scanline)
 {
 	int scanline = param;
 
@@ -1014,19 +920,94 @@ TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_state::splndrbt_scanline)
 /******************************************************************************/
 // CPU Handlers
 
-READ_LINE_MEMBER(gekisou_state::gekisou_unknown_bit_r)
+uint8_t equites_state::fg_videoram_r(offs_t offset)
 {
-	return m_gekisou_unknown_bit;
+	// 8-bit
+	return m_fg_videoram[offset];
 }
 
-void gekisou_state::gekisou_unknown_bit_w(offs_t offset, uint16_t data)
+void equites_state::fg_videoram_w(offs_t offset, uint8_t data)
+{
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
+}
+
+void equites_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(m_bg_videoram + offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void equites_state::bgcolor_w(offs_t offset, uint8_t data)
+{
+	m_bgcolor = data;
+}
+
+void equites_state::scrollreg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_bg_tilemap->set_scrolly(0, data & 0xff);
+
+	if (ACCESSING_BITS_8_15)
+		m_bg_tilemap->set_scrollx(0, data >> 8);
+}
+
+
+
+uint8_t splndrbt_state::fg_videoram_r(offs_t offset)
+{
+	// 8-bit
+	return m_fg_videoram[offset];
+}
+
+void splndrbt_state::fg_videoram_w(offs_t offset, uint8_t data)
+{
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
+}
+
+void splndrbt_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(m_bg_videoram + offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void splndrbt_state::bgcolor_w(offs_t offset, uint8_t data)
+{
+	m_bgcolor = data;
+}
+
+WRITE_LINE_MEMBER(splndrbt_state::selchar_w)
+{
+	// select active char map
+	m_fg_char_bank = (state == 0) ? 0 : 1;
+	m_fg_tilemap->mark_all_dirty();
+}
+
+void splndrbt_state::bg_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_bg_scrollx);
+}
+
+void splndrbt_state::bg_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_bg_scrolly);
+}
+
+
+READ_LINE_MEMBER(gekisou_state::unknown_bit_r)
+{
+	return m_unknown_bit;
+}
+
+void gekisou_state::unknown_bit_w(offs_t offset, uint16_t data)
 {
 	// data bit is A17 (offset)
-	m_gekisou_unknown_bit = (offset == 0) ? 0 : 1;
+	m_unknown_bit = (offset == 0) ? 0 : 1;
 }
 
 
-uint16_t equites_state::equites_spriteram_kludge_r()
+uint16_t equites_state::spriteram_kludge_r()
 {
 	if (m_spriteram[0] == 0x5555)
 		return 0;
@@ -1039,41 +1020,41 @@ uint16_t equites_state::equites_spriteram_kludge_r()
 /******************************************************************************/
 // CPU Memory Maps
 
-void equites_state::equites_common_map(address_map &map)
+void equites_state::common_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom(); // ROM area is written several times (dev system?)
-	map(0x080000, 0x080fff).rw(FUNC(equites_state::equites_fg_videoram_r), FUNC(equites_state::equites_fg_videoram_w)).umask16(0x00ff);
-	map(0x0c0000, 0x0c01ff).ram().w(FUNC(equites_state::equites_bg_videoram_w)).share("bg_videoram");
+	map(0x080000, 0x080fff).rw(FUNC(equites_state::fg_videoram_r), FUNC(equites_state::fg_videoram_w)).umask16(0x00ff);
+	map(0x0c0000, 0x0c01ff).ram().w(FUNC(equites_state::bg_videoram_w)).share("bg_videoram");
 	map(0x0c0200, 0x0c0fff).ram();
 	map(0x100000, 0x1001ff).ram().share("spriteram");
-	map(0x100000, 0x100001).r(FUNC(equites_state::equites_spriteram_kludge_r));
+	map(0x100000, 0x100001).r(FUNC(equites_state::spriteram_kludge_r));
 	map(0x140000, 0x1407ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w)).umask16(0x00ff);
 	map(0x180000, 0x180001).portr("IN1");
 	map(0x180000, 0x180000).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
-	map(0x1c0000, 0x1c0001).portr("IN0").w(FUNC(equites_state::equites_scrollreg_w));
-	map(0x380000, 0x380000).w(FUNC(equites_state::equites_bgcolor_w));
+	map(0x1c0000, 0x1c0001).portr("IN0").w(FUNC(equites_state::scrollreg_w));
+	map(0x380000, 0x380000).w(FUNC(equites_state::bgcolor_w));
 	map(0x780000, 0x780001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 }
 
 void equites_state::equites_map(address_map &map)
 {
-	equites_common_map(map);
+	common_map(map);
 	map(0x040000, 0x040fff).ram();
 	map(0x180001, 0x180001).w("sound_board", FUNC(ad_59mc07_device::sound_command_w));
 }
 
 void gekisou_state::gekisou_map(address_map &map)
 {
-	equites_common_map(map);
+	common_map(map);
 	map(0x040000, 0x040fff).ram().share("nvram"); // mainram is battery-backed
 	map(0x180001, 0x180001).w("sound_board", FUNC(ad_59mc07_device::sound_command_w));
-	map(0x580000, 0x580001).select(0x020000).w(FUNC(gekisou_state::gekisou_unknown_bit_w));
+	map(0x580000, 0x580001).select(0x020000).w(FUNC(gekisou_state::unknown_bit_w));
 }
 
 void equites_state::bngotime_map(address_map &map)
 {
-	equites_common_map(map);
+	common_map(map);
 	map(0x040000, 0x040fff).ram();
 	map(0x180001, 0x180001).w("sound_board", FUNC(ad_60mc01_device::sound_command_w));
 }
@@ -1085,14 +1066,14 @@ void splndrbt_state::splndrbt_map(address_map &map)
 	map(0x040000, 0x040fff).ram();
 	map(0x080000, 0x080001).portr("IN0");
 	map(0x0c0000, 0x0c0001).portr("IN1");
-	map(0x0c0000, 0x0c0000).select(0x020000).w(FUNC(splndrbt_state::equites_bgcolor_w));
+	map(0x0c0000, 0x0c0000).select(0x020000).w(FUNC(splndrbt_state::bgcolor_w));
 	map(0x0c0001, 0x0c0001).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
-	map(0x100000, 0x100001).w(FUNC(splndrbt_state::splndrbt_bg_scrollx_w));
+	map(0x100000, 0x100001).w(FUNC(splndrbt_state::bg_scrollx_w));
 	map(0x140001, 0x140001).w("sound_board", FUNC(ad_59mc07_device::sound_command_w));
-	map(0x1c0000, 0x1c0001).w(FUNC(splndrbt_state::splndrbt_bg_scrolly_w));
+	map(0x1c0000, 0x1c0001).w(FUNC(splndrbt_state::bg_scrolly_w));
 	map(0x180000, 0x1807ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w)).umask16(0x00ff);
-	map(0x200000, 0x200fff).mirror(0x001000).rw(FUNC(splndrbt_state::equites_fg_videoram_r), FUNC(splndrbt_state::equites_fg_videoram_w)).umask16(0x00ff);
-	map(0x400000, 0x4007ff).ram().w(FUNC(splndrbt_state::equites_bg_videoram_w)).share("bg_videoram");
+	map(0x200000, 0x200fff).mirror(0x001000).rw(FUNC(splndrbt_state::fg_videoram_r), FUNC(splndrbt_state::fg_videoram_w)).umask16(0x00ff);
+	map(0x400000, 0x4007ff).ram().w(FUNC(splndrbt_state::bg_videoram_w)).share("bg_videoram");
 	map(0x400800, 0x400fff).ram();
 	map(0x600000, 0x6000ff).ram().share("spriteram1"); // sprite RAM 0,1 (2*8 bit)
 	map(0x600100, 0x6001ff).ram().share("spriteram2"); // sprite RAM 2,none (8 bit)
@@ -1174,7 +1155,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gekisou_state, gekisou_unknown_bit_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gekisou_state, unknown_bit_r)
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
@@ -1457,23 +1438,23 @@ void gekisou_state::machine_start()
 {
 	equites_state::machine_start();
 
-	save_item(NAME(m_gekisou_unknown_bit));
+	save_item(NAME(m_unknown_bit));
 }
 
 void splndrbt_state::machine_start()
 {
 	save_item(NAME(m_bgcolor));
 	save_item(NAME(m_fg_char_bank));
-	save_item(NAME(m_splndrbt_bg_scrollx));
-	save_item(NAME(m_splndrbt_bg_scrolly));
+	save_item(NAME(m_bg_scrollx));
+	save_item(NAME(m_bg_scrolly));
 }
 
 void equites_state::equites(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 12_MHz_XTAL/4); /* 68000P8 running at 3mhz! verified on pcb */
+	// basic machine hardware
+	M68000(config, m_maincpu, 12_MHz_XTAL/4); // 68000P8 running at 3mhz! verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &equites_state::equites_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(equites_state::equites_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(equites_state::scanline), "screen", 0, 1);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::flip_screen_set));
@@ -1487,25 +1468,22 @@ void equites_state::equites(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 3*8, 29*8-1);
-	m_screen->set_screen_update(FUNC(equites_state::screen_update_equites));
+	m_screen->set_screen_update(FUNC(equites_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_equites);
-	PALETTE(config, m_palette, FUNC(equites_state::equites_palette), 0x180, 0x100);
-
-	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
+	PALETTE(config, m_palette, FUNC(equites_state::palette), 0x180, 0x100);
 }
 
 void gekisou_state::gekisou(machine_config &config)
 {
 	equites(config);
 
-	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gekisou_state::gekisou_map);
 
 	// gekisou has battery-backed RAM to store settings
@@ -1523,34 +1501,32 @@ void equites_state::bngotime(machine_config &config)
 
 void splndrbt_state::splndrbt(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 24_MHz_XTAL/4); /* 68000P8 running at 6mhz, verified on pcb */
+	// basic machine hardware
+	M68000(config, m_maincpu, 24_MHz_XTAL/4); // 68000P8 running at 6mhz, verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &splndrbt_state::splndrbt_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(splndrbt_state::splndrbt_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(splndrbt_state::scanline), "screen", 0, 1);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(splndrbt_state::flip_screen_set));
 	m_mainlatch->q_out_cb<1>().set(m_alpha_8201, FUNC(alpha_8201_device::mcu_start_w));
 	m_mainlatch->q_out_cb<2>().set(m_alpha_8201, FUNC(alpha_8201_device::bus_dir_w)).invert();
-	m_mainlatch->q_out_cb<3>().set(FUNC(splndrbt_state::splndrbt_selchar_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(splndrbt_state::selchar_w));
 
 	AD_59MC07(config, "sound_board");
 
 	ALPHA_8201(config, m_alpha_8201, 4000000/8); // 8303 or 8304 (same device!)
 	config.set_perfect_quantum("alpha_8201:mcu");
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
-	m_screen->set_screen_update(FUNC(splndrbt_state::screen_update_splndrbt));
+	m_screen->set_screen_update(FUNC(splndrbt_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_splndrbt);
-	PALETTE(config, m_palette, FUNC(splndrbt_state::splndrbt_palette), 0x280, 0x100);
-
-	MCFG_VIDEO_START_OVERRIDE(splndrbt_state,splndrbt)
+	PALETTE(config, m_palette, FUNC(splndrbt_state::palette), 0x280, 0x100);
 }
 
 
@@ -2363,10 +2339,8 @@ void splndrbt_state::init_splndrbt()
 
 
 /******************************************************************************/
-
 // Game Entries
 
-// Equites Hardware
 GAME( 1984, equites,   0,        equites,  equites,  equites_state,  init_equites,  ROT90, "Alpha Denshi Co.", "Equites", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, equitess,  equites,  equites,  equites,  equites_state,  init_equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bullfgtr,  0,        equites,  bullfgtr, equites_state,  init_equites,  ROT90, "Alpha Denshi Co.", "Bull Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -2375,7 +2349,6 @@ GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state,  init_equite
 GAME( 1985, gekisou,   0,        gekisou,  gekisou,  gekisou_state,  init_equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bngotime,  0,        bngotime, bngotime, equites_state,  init_equites,  ROT90, "CLS", "Bingo Time", MACHINE_SUPPORTS_SAVE ) // emulation of the sound board is imperfect (flag is in the audio device)
 
-// Splendor Blast Hardware
 GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, splndrbt_state, init_splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, splndrbta, splndrbt, splndrbt, splndrbt, splndrbt_state, init_splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, splndrbtb, splndrbt, splndrbt, splndrbt, splndrbt_state, init_splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
