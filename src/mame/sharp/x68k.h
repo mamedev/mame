@@ -292,7 +292,7 @@ protected:
 	bool draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 	void draw_bg(bitmap_ind16 &bitmap, screen_device &screen, int layer, bool opaque, rectangle rect);
-	rgb_t get_gfx_pixel(int scanline, int pixel, bool gfxblend, rgb_t blendpix, bool textblend);
+	template <bool Blend> rgb_t get_gfx_pixel(int scanline, int pixel, bool gfxblend, rgb_t blendpix);
 
 public:
 	static rgb_t GGGGGRRRRRBBBBBI(uint32_t raw);

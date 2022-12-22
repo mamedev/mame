@@ -426,7 +426,7 @@ bool x68k_state::draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 	return gfxblend;
 }
 
-rgb_t x68k_state::get_gfx_pixel(int scanline, int pixel, bool gfxblend, rgb_t blendpix, bool textblend)
+template <bool Blend> rgb_t x68k_state::get_gfx_pixel(int scanline, int pixel, bool gfxblend, rgb_t blendpix)
 {
 	uint16_t colour;
 	int divisor = 1;
@@ -442,7 +442,7 @@ rgb_t x68k_state::get_gfx_pixel(int scanline, int pixel, bool gfxblend, rgb_t bl
 	else if(gfxblend)
 	{
 		colour = m_gfxbitmap.pix(scanline / divisor, pixel);
-		if(textblend && (colour & 1))
+		if(Blend && (colour & 1))
 			blend = true;
 		else
 			blend = false;
@@ -457,7 +457,7 @@ rgb_t x68k_state::get_gfx_pixel(int scanline, int pixel, bool gfxblend, rgb_t bl
 	else
 	{
 		colour = m_gfxbitmap.pix(scanline / divisor, pixel) & 0xff;
-		if(textblend && (colour & 1))
+		if(Blend && (colour & 1))
 		{
 			blend = true;
 			colour &= 0xfe;
@@ -701,6 +701,43 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		}
 	}
 
+	bool clear = false;
+	if(m_video.reg[2] & 0x0040)
+	{
+		rectangle pcgrect = rect;
+		if(!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan())
+		{
+			pcgrect.max_y >>= 1;
+			pcgrect.min_y >>= 1;
+		}
+		if(m_spritereg[0x404] & 0x0008)
+		{
+			clear = true;
+			draw_bg(m_pcgbitmap, screen, 1, true, pcgrect);
+		}
+		else if(m_spritereg[0x404] & 0x0001)
+		{
+			clear = true;
+			draw_bg(m_pcgbitmap, screen, 0, true, pcgrect);
+		}
+	}
+	if(clear)
+	{
+		int divisor = 1;
+		if(!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan())
+			divisor = 2;
+		for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
+		{
+			for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
+			{
+				uint8_t colour = m_pcgbitmap.pix(scanline / divisor, pixel) & 0xff;
+				bitmap.pix(scanline, pixel) = m_pcgpalette->pen(colour);
+			}
+		}
+	}
+	else
+		bitmap.fill(m_pcgpalette->pen(0), rect);
+
 	bool gfx16bcol = false; // if the gfx layer was blended so gfxbitmap is 16bit color
 	int divisor = 1;
 	// Graphics screen(s)
@@ -728,8 +765,8 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		draw_sprites(m_pcgbitmap,3,pcgrect);
 	}
 
-	// Set up priorities
 	int gfxprio = -1, textprio = -1, pcgprio = -1, currprio = 0;
+
 	for(int priority = 0; priority < 3; priority++)
 	{
 		if((m_video.text_pri == priority) && (m_video.reg[2] & 0x0020) && !m_crtc->text_layer_buffer())
@@ -749,10 +786,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		}
 	}
 
-	// Blend gfx with priority winner of text/PCG
-	bool textblend = (((m_video.reg[2] & 0x1900) == 0x1900) && (m_video.gfx_pri != 2));
-
-	// Combine layers per pixel
+	bool blend = (((m_video.reg[2] & 0x1900) == 0x1900) && (m_video.gfx_pri != 2));
 	for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
 	{
 		for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
@@ -760,59 +794,75 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 			if((m_video.reg[2] & 0x1800) == 0x1000) // special priority
 			{
 				uint16_t colour = m_special.pix(scanline / divisor, pixel) & 0xff;
+				// XXX: this might check the pen color not the palette index
 				if(colour & ~1)
 				{
 					bitmap.pix(scanline, pixel) = m_gfxpalette->pen(colour & ~1);
 					continue;
 				}
 			}
-
-			rgb_t outpix = m_pcgpalette->pen(0); // default colour if BGs+Sprites are disabled.
-			rgb_t pix = 0;
+			rgb_t outpix = bitmap.pix(scanline, pixel), pix = 0;
 			bool pcgpix = false, gfxpix = false;
 			for(priority = 0; priority < 3; priority++)
 			{
-				if((priority == textprio) && !pcgpix)
+				if(blend)
 				{
-					uint16_t colour;
-					if(get_text_pixel(scanline, pixel, &colour))
+					if((priority == textprio) && !pcgpix)
 					{
-						pix = m_pcgpalette->pen(colour);
-						pcgpix = true;
+						uint16_t colour;
+						if(get_text_pixel(scanline, pixel, &colour))
+						{
+							pix = m_pcgpalette->pen(colour);
+							pcgpix = true;
+						}
 					}
-				}
-				else if((priority == pcgprio) && !pcgpix)
-				{
-					uint16_t colour = m_pcgbitmap.pix(scanline / divisor, pixel) & 0xff;
-					if(colour)
+					else if((priority == pcgprio) && !pcgpix)
 					{
-						pix = m_pcgpalette->pen(colour);
-						pcgpix = true;
+						uint16_t colour = m_pcgbitmap.pix(scanline / divisor, pixel) & 0xff;
+						if(colour)
+						{
+							pix = m_pcgpalette->pen(colour);
+							pcgpix = true;
+						}
 					}
-				}
-				else if(priority == gfxprio)
-				{
-					if(textblend)
+					else if(priority == gfxprio)
 						gfxpix = true;
-					else
-						pix = get_gfx_pixel(scanline, pixel, gfx16bcol, 0, textblend);
-				}
-
-				if(textblend)
-				{
 					if((pix & 0xffffff) || ((priority == 2) && gfxpix))
 					{
-						if(!(pix & 0xffffff)) // With no other layers, blend gfx with default colour
+						if(!(pix & 0xffffff))
 							pix = outpix;
-						rgb_t blendpix = get_gfx_pixel(scanline, pixel, gfx16bcol, pix, textblend);
+						rgb_t blendpix = get_gfx_pixel<true>(scanline, pixel, gfx16bcol, pix);
 						outpix = blendpix & 0xffffff ? blendpix : pix;
 						break;
 					}
 				}
-				else if(pix & 0xffffff)
+				else
 				{
-					outpix = pix;
-					break;
+					if((priority == textprio) && !pcgpix)
+					{
+						uint16_t colour;
+						if(get_text_pixel(scanline, pixel, &colour))
+						{
+							pix = m_pcgpalette->pen(colour);
+							pcgpix = true;
+						}
+					}
+					else if((priority == pcgprio) && !pcgpix)
+					{
+						uint16_t colour = m_pcgbitmap.pix(scanline / divisor, pixel) & 0xff;
+						if(colour)
+						{
+							pix = m_pcgpalette->pen(colour);
+							pcgpix = true;
+						}
+					}
+					else if(priority == gfxprio)
+						pix = get_gfx_pixel<false>(scanline, pixel, gfx16bcol, 0);
+					if(pix & 0xffffff)
+					{
+						outpix = pix;
+						break;
+					}
 				}
 			}
 			bitmap.pix(scanline, pixel) = outpix;
