@@ -6,9 +6,11 @@ license:CC0-1.0
 
 <!-- define elements -->
 
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
 	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="1.0" green="0.3" blue="0.0" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</led7seg>
 	</element>
 
@@ -20,14 +22,11 @@ license:CC0-1.0
 	</element>
 
 
-<!-- build screen -->
+<!-- score panel -->
 
-	<view name="Simple LEDs">
-		<bounds left="0" top="-0.472" right="4" bottom="3" />
-
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
+	<group name="panel">
+		<bounds left="0" top="-0.472" right="4" bottom="0" />
+		<element ref="nothing"><bounds x="0" y="-0.472" width="4" height="0.1" /></element>
 
 		<element name="digit4" ref="digit">
 			<bounds left="0.166" top="-0.336" right="0.300" bottom="-0.136" />
@@ -104,6 +103,17 @@ license:CC0-1.0
 		<element name="digit19" ref="digit">
 			<bounds left="3.770" top="-0.306" right="3.870" bottom="-0.136" />
 		</element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="3D Scope Off">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+
+		<collection name="Score Panel">
+			<group ref="panel"><bounds x="0" y="-0.472" width="4" height="0.472" /></group>
+		</collection>
 	</view>
 
 	<!-- for the 3D Scope views, enable stereoscopic 3D DIP switch first -->
@@ -115,6 +125,11 @@ license:CC0-1.0
 
 		<screen index="0"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
 		<element name="shutter" ref="shutter2"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
+
+		<collection name="Score Panel">
+			<group ref="panel"><bounds x="0" y="-0.472" width="4" height="0.472" /></group>
+			<group ref="panel"><bounds x="4.03" y="-0.472" width="4" height="0.472" /></group>
+		</collection>
 	</view>
 
 	<view name="3D Scope Cross View">
@@ -124,16 +139,29 @@ license:CC0-1.0
 
 		<screen index="0"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
 		<element name="shutter" ref="shutter1"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
+
+		<collection name="Score Panel">
+			<group ref="panel"><bounds x="0" y="-0.472" width="4" height="0.472" /></group>
+			<group ref="panel"><bounds x="4.03" y="-0.472" width="4" height="0.472" /></group>
+		</collection>
 	</view>
 
 	<view name="3D Scope Left">
 		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
 		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
+
+		<collection name="Score Panel">
+			<group ref="panel"><bounds x="0" y="-0.472" width="4" height="0.472" /></group>
+		</collection>
 	</view>
 
 	<view name="3D Scope Right">
 		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
 		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
+
+		<collection name="Score Panel">
+			<group ref="panel"><bounds x="0" y="-0.472" width="4" height="0.472" /></group>
+		</collection>
 	</view>
 
 </mamelayout>

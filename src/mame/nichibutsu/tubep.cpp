@@ -1113,8 +1113,8 @@ ROM_END
  *
  *************************************/
 
-//    year  rom      parent  machine  inp      state        init
-GAME( 1984, tubep,   0,      tubep,   tubep,   tubep_state, empty_init, ROT0, "Nichibutsu / Fujitek", "Tube Panic",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, tubepb,  tubep,  tubepb,  tubepb,  tubep_state, empty_init, ROT0, "bootleg",              "Tube Panic (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    year  rom      parent  machine  inp      state          init
+GAME( 1984, tubep,   0,      tubep,   tubep,   tubep_state,   empty_init, ROT0, "Nichibutsu / Fujitek", "Tube Panic",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, tubepb,  tubep,  tubepb,  tubepb,  tubep_state,   empty_init, ROT0, "bootleg",              "Tube Panic (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1984, rjammer, 0,      rjammer, rjammer, rjammer_state, empty_init, ROT0, "Nichibutsu / Alice",   "Roller Jammer",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
