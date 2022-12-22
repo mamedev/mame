@@ -10,6 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "machine/74157.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -43,6 +44,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_joy(*this, "joy%u", 1U)
+		, m_joymux(*this, "joymux")
 		, m_cassette(*this, "cassette")
 		, m_cas_hack(*this, "cas_hack")
 		, m_cart(*this, "cartslot")
@@ -78,6 +80,10 @@ public:
 	void ppi_portc_w(uint8_t data);
 	uint8_t ppi_portc_r();
 
+	uint8_t joystick_r();
+	uint8_t joystick_out_r();
+	void joystick_out_w(uint8_t data);
+
 	void pc6001(machine_config &config);
 protected:
 	required_device<i8255_device> m_ppi;
@@ -85,6 +91,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
+	required_device<ls157_x2_device> m_joymux;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
@@ -149,6 +156,8 @@ private:
 	uint32_t m_old_key2 = 0;
 	uint32_t m_old_key3 = 0;
 	u8 m_old_key_fn;
+
+	uint8_t m_joystick_out = 0xff;
 
 	emu_timer *m_sub_trig_timer = nullptr;
 
