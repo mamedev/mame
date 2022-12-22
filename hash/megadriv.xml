@@ -3240,7 +3240,7 @@ Crashes after EA logo, requires better [VDP] irq handling
 	</software>
 
 
-<!-- Only Euro is confirmed -->
+	<!-- Only Euro is confirmed - this revision fixes graphical corruption on PAL consoles -->
 	<software name="gforce2">
 		<description>Galaxy Force II (World, rev. B)</description>
 		<year>1991</year>
@@ -16844,7 +16844,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		</part>
 	</software>
 
-	<!-- heavy graphical corruption on PAL consoles -->
+	<!-- Heavy graphical corruption on PAL consoles - original game bug, fixed in rev. B (gforce2) -->
 	<software name="gforce2a" cloneof="gforce2">
 		<description>Galaxy Force II (World)</description>
 		<year>1991</year>

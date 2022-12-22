@@ -42,6 +42,23 @@ Llama case:
     capitalised, with no separators between words: ``LlamaCaseSample``
 
 
+.. _contributing-cxx-fileformat:
+
+Source file format
+------------------
+
+MAME C++ source files are encoded as UTF-8 text, assuming fixed-width
+characters, with tab stops at four-space intervals.  Source files should
+end with a terminating end-of-line.  Any valid printable Unicode text is
+permitted in comments.  Outside comments and strings, only the printable
+ASCII subset of Unicode is permitted.
+
+The ``srcclean`` tool is used to enforce file format rules before each
+release.  You can build this tool and apply it to the files you modify
+before opening a pull request to avoid conflicts or surprising changes
+later.
+
+
 .. _contributing-cxx-naming:
 
 Naming conventions
@@ -84,6 +101,18 @@ Template parameters
     Template parameters should use llama case (both type and value
     parameters).
 
+Identifiers containing two consecutive underscores or starting with an
+underscore followed by an uppercase letter are always reserved and
+should not be used.
+
+Type names and other identifiers with a leading underscore should be
+avoided within the global namespace, as they are explicitly reserved
+according to the C++ standard.  Additionally, identifiers suffixed with
+``_t`` should be avoided within the global namespace, as they are also
+reserved according to POSIX standards.  While MAME violates this policy
+occasionally – most notably with ``device_t`` – it’s considered to be an
+unfortunate legacy decision that should be avoided in any new code.
+
 
 .. _contributing-cxx-literals:
 
@@ -108,6 +137,13 @@ but is not strictly required in other cases.  It can, however, clarify
 the intended use of a given literal at a glance.  Uppercase long integer
 literal suffixes should be used to avoid confusion with the digit 1,
 e.g.  ``7LL`` rather than ``7ll``.
+
+Digit grouping should be used for longer numeric literals, as it aids in
+recognising order of magnitude or bit field positions at a glance.
+Decimal literals should use groups of three digits, and hexadecimal
+literals should use groups of four digits, outside of specific
+situations where different grouping would be easier to understand, e.g.
+``4'433'619`` or ``0xfff8'1fff``.
 
 Types that do not have a specifically defined size should be avoided if
 they are to be registered with MAME’s save-state system, as it harms
@@ -450,6 +486,16 @@ a pull request.
 Structural organization
 -----------------------
 
+All C++ source files must begin with a two comments listing the
+distribution license and copyright holders in a standard format.
+Licenses are specified by their SPDX short identifier if available.
+Here is an example of the standard format:
+
+.. code-block:: C++
+
+    // license:BSD-3-Clause
+    // copyright-holders:David Haywood, Tomasz Slanina
+
 Header includes should generally be grouped from most-dependent to
 least-dependent, and sorted alphabetically within said groups:
 
@@ -491,20 +537,37 @@ follows:
     #define VERBOSE (0)
     #include "logmacro.h"
 
-The class declaration for a machine driver should be within the
-corresponding source file.  In such cases, the class declaration and all
-contents of the source file, excluding the ``GAME``, ``COMP``, or
-``CONS`` macro, should be enclosed in an anonymous namespace.
+In most cases, the class declaration for a system driver should be
+within the corresponding source file along with the implementation.  In
+such cases, the class declaration and all contents of the source file,
+excluding the ``GAME``, ``COMP``, or ``CONS`` macro, should be enclosed
+in an anonymous namespace (this produces better compiler diagnostics,
+allows more aggressive optimisation, reduces the chance of duplicate
+symbols, and reduces linking time).
+
+Within a class declaration, there should be one section for each member
+access level (``public``, ``protected`` and ``private``) if practical.
+This may not be possible in cases where private constants and/or types
+need to be declared before public members.  Members should use the least
+public access level necessary.  Overridden virtual member functions
+should generally use the same access level as the corresponding member
+function in the base class.
+
+Class member declarations should be grouped to aid understanding:
+
+* Within a member access level section, constants, types, data members,
+  instance member functions and static member functions should be
+  grouped.
+* In device classes, configuration member functions should be grouped
+  separately from live signal member functions.
+* Overridden virtual member functions should be grouped according to the
+  base classes they are inherited from.
+
+For classes with multiple overloaded constructors, constructor
+delegation should be used where possible to avoid repeated member
+initialiser lists.
 
 Constants which are used by a device or machine driver should be in the
 form of explicitly-sized enumerated values within the class declaration,
 or be relegated to ``#define`` macros within the source file.  This
 helps avoid polluting the preprocessor.
-
-Type names and other identifiers with a leading underscore should be
-avoided within the global namespace, as they are explicitly reserved
-according to the C++ standard.  Additionally, identifiers suffixed with
-``_t`` should be avoided within the global namespace, as they are also
-reserved according to POSIX standards.  While MAME violates this policy
-occasionally – most notably with ``device_t`` – it’s considered to be an
-unfortunate legacy decision that should be avoided in any new code.

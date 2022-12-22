@@ -173,5 +173,5 @@ ROM_START(mps1230)
 ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                        FULLNAME */
-COMP( 1986, mps1000, 0,      0,      mps1000, mps1230, mps1230_state, empty_init, "Commodore Business Machines", "MPS-1000 Printer",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )
-COMP( 1988, mps1230, 0,      0,      mps1230, mps1230, mps1230_state, empty_init, "Commodore Business Machines", "MPS-1230 NLQ Printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )
+SYST( 1986, mps1000, 0,      0,      mps1000, mps1230, mps1230_state, empty_init, "Commodore Business Machines", "MPS-1000 Printer",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+SYST( 1988, mps1230, 0,      0,      mps1230, mps1230, mps1230_state, empty_init, "Commodore Business Machines", "MPS-1230 NLQ Printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
