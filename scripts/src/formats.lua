@@ -1093,6 +1093,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/hp_ipc_dsk.h,FORMATS["HP300_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "HP300_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/hp300_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/hp300_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/hpi_dsk.h,FORMATS["HPI_DSK"] = true
 --------------------------------------------------
 
