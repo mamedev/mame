@@ -558,27 +558,32 @@ void rjammer_state::rjammer_sound_portmap(address_map &map)
 
 void tubep_state::ay8910_portA_0_w(uint8_t data)
 {
-		//analog sound control
+	//analog sound control
 }
+
 void tubep_state::ay8910_portB_0_w(uint8_t data)
 {
-		//analog sound control
+	//analog sound control
 }
+
 void tubep_state::ay8910_portA_1_w(uint8_t data)
 {
-		//analog sound control
+	//analog sound control
 }
+
 void tubep_state::ay8910_portB_1_w(uint8_t data)
 {
-		//analog sound control
+	//analog sound control
 }
+
 void tubep_state::ay8910_portA_2_w(uint8_t data)
 {
-		//analog sound control
+	//analog sound control
 }
+
 void tubep_state::ay8910_portB_2_w(uint8_t data)
 {
-		//analog sound control
+	//analog sound control
 }
 
 
