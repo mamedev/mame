@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders: beta-tester (https://github.com/beta-tester)
 
 #ifndef MAME_AUDIO_NL_BRDRLINE_H
