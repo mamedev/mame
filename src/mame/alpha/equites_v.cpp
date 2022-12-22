@@ -265,7 +265,7 @@ void equites_state::equites_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 
 /*
 This is (probably) the sprite x scaling PROM.
-The layout is strange. Clearly every line os for one xscale setting. However,
+The layout is strange. Clearly every line is for one xscale setting. However,
 it seems that bytes 0-3 are handled separately from bytes 4-F.
 Also, note that sprites are 30x30, not 32x32.
 00020200 00000000 00000000 00000000
