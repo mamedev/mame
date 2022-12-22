@@ -24806,6 +24806,94 @@ license:CC0
 		</part>
 	</software>
 
+<!-- These five prototypes were development builds found in zip files -->
+	<software name="mickmack">
+		<!-- Build date: 9 July 1993 11:32:06 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930709)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="38960ce6" sha1="973ecc6714098115719235e68f4bd5d49710f7d6" />
+				<!-- "Fixed" ROM had this change. Changes an IRQ disable to a bank select. Needed? -->
+				<!-- <rom value="0x80" size="1" offset="0x1e028" loadflag="fill" /> -->
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x1e400" crc="e708cfcf" sha1="4267be581c9aa147024eea020736aa0435df9e5f" />
+				<rom value="0x00" size="0x1c00" offset="0x1e400" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack1" cloneof="mickmack">
+		<!-- Build date: 30 June 1993 14:11:52 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930630)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="38593a7d" sha1="9f0dde1399073f4d66496308bfa32c2193cce138" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x1e400" crc="e708cfcf" sha1="4267be581c9aa147024eea020736aa0435df9e5f" />
+				<rom value="0x00" size="0x1c00" offset="0x1e400" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack2" cloneof="mickmack">
+		<!-- Build date: 16 June 1993 16:27:08 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930616)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="363cf68f" sha1="0b6a02662893618197f14ed97660074073915363" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x16400" crc="0f6b18b5" sha1="a41ae5747c149e91b92889f7f3338eef07a6d7bb" />
+				<rom value="0x00" size="0x9c00" offset="0x16400" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack3" cloneof="mickmack">
+		<!-- Build date: 28 May 1993 18:16:30 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930528)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="dd4ca37f" sha1="ad6c20f26781a5d804a82b8b19eef5c2f5feba0f" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x15800" crc="5df34bc5" sha1="a7fb017a86143aaabb9e8162f0d3d4406fdee7a4" />
+				<rom value="0x00" size="0xa800" offset="0x15800" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack4" cloneof="mickmack">
+		<!-- Build date: 28 May 1993 19:18:24 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930528, alt)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="251b679f" sha1="6354c17c54e76daee57748a325650e0439fb4ca7" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x15800" crc="5df34bc5" sha1="a7fb017a86143aaabb9e8162f0d3d4406fdee7a4" />
+				<rom value="0x00" size="0xa800" offset="0x15800" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mickey3" cloneof="kidklown">
 		<description>Mickey Mouse III - Yume Fuusen (Japan)</description>
 		<year>1992</year>
