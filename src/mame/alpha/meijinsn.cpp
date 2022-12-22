@@ -114,11 +114,11 @@ private:
 	required_ioport m_dsw;
 
 	// misc
-	uint8_t m_deposits1;
-	uint8_t m_deposits2;
-	uint8_t m_credits;
-	uint8_t m_coinvalue;
-	uint8_t m_mcu_latch;
+	uint8_t m_deposits1 = 0;
+	uint8_t m_deposits2 = 0;
+	uint8_t m_credits = 0;
+	uint8_t m_coinvalue = 0;
+	uint8_t m_mcu_latch = 0;
 };
 
 
