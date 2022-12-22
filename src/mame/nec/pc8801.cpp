@@ -647,16 +647,6 @@ uint8_t pc8801_state::port40_r()
 	return data;
 }
 
-inline attotime pc8801_state::mouse_limit_hz()
-{
-	return attotime::from_hz(900);
-}
-
-inline attotime pc8801fh_state::mouse_limit_hz()
-{
-	return attotime::from_hz(m_clock_setting ? 900 : 1800);
-}
-
 /*
  * I/O Port $40 writes "Strobe Port"
  * N88-BASIC buffer port $e6c1
@@ -687,35 +677,7 @@ void pc8801_state::port40_w(uint8_t data)
 	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 		m_beeper->set_state(0);
 
-	// TODO: send to joyport DE-9 implementation
-	if((m_device_ctrl_data & 0x40) != (data & 0x40))
-	{
-		attotime new_time = machine().time();
-
-		if(data & 0x40 && (new_time - m_mouse.time) > mouse_limit_hz())
-		{
-			m_mouse.phase = 0;
-		}
-		else
-		{
-			m_mouse.phase ++;
-			m_mouse.phase &= 3;
-		}
-
-		if(m_mouse.phase == 0)
-		{
-			const u8 mouse_x = ioport("MOUSEX")->read();
-			const u8 mouse_y = ioport("MOUSEY")->read();
-
-			m_mouse.lx = (mouse_x - m_mouse.prev_dx) & 0xff;
-			m_mouse.ly = (mouse_y - m_mouse.prev_dy) & 0xff;
-
-			m_mouse.prev_dx = mouse_x;
-			m_mouse.prev_dy = mouse_y;
-		}
-
-		m_mouse.time = machine().time();
-	}
+	m_mouse_port->pin_8_w(BIT(data, 6));
 
 	// TODO: is SING a buzzer mask? bastard leaves beeper to ON state otherwise
 	if(m_device_ctrl_data & 0x80)
@@ -1358,27 +1320,6 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
 
-	PORT_START("OPN_PA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("OPN_PB")
-	// TODO: yojukiko and grobda maps Joystick buttons in reverse than expected?
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Mouse Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Mouse Button 2") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
-
-	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
-
 	PORT_START("MEM")
 	PORT_CONFNAME( 0x0f, 0x0a, "Extension memory" )
 	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
@@ -1401,9 +1342,6 @@ static INPUT_PORTS_START( pc8801 )
 //  PORT_CONFNAME( 0x01, 0x01, "Sound Board" )
 //  PORT_CONFSETTING(    0x00, "OPN (YM2203)" )
 //  PORT_CONFSETTING(    0x01, "OPNA (YM2608)" )
-	PORT_CONFNAME( 0x02, 0x00, "Port 1 Connection" )
-	PORT_CONFSETTING(    0x00, "Joystick" )
-	PORT_CONFSETTING(    0x02, "Mouse" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc8801fh )
@@ -1468,13 +1406,6 @@ void pc8801_state::machine_start()
 	save_pointer(NAME(m_hi_work_ram), 0x1000);
 	save_pointer(NAME(m_ext_work_ram), 0x8000*0x100);
 	save_pointer(NAME(m_gvram), 0xc000);
-	save_item(STRUCT_MEMBER(m_mouse, phase));
-	save_item(STRUCT_MEMBER(m_mouse, prev_dx));
-	save_item(STRUCT_MEMBER(m_mouse, prev_dy));
-	save_item(STRUCT_MEMBER(m_mouse, lx));
-	save_item(STRUCT_MEMBER(m_mouse, ly));
-//  save_item(STRUCT_MEMBER(m_mouse, time));
-	save_item(NAME(m_mouse.time));
 	save_item(NAME(m_gfx_ctrl));
 	save_item(NAME(m_ext_rom_bank));
 	save_item(NAME(m_vram_sel));
@@ -1516,15 +1447,9 @@ void pc8801_state::machine_reset()
 	m_bitmap_layer_mask = 0;
 	m_vram_sel = 3;
 
-	m_mouse.phase = 0;
-
 	// initialize ALU
-	{
-		int i;
-
-		for(i = 0; i < 3; i++)
-			m_alu_reg[i] = 0x00;
-	}
+	for(int i = 0; i < 3; i++)
+		m_alu_reg[i] = 0x00;
 
 	m_beeper->set_state(0);
 
@@ -1604,25 +1529,18 @@ void pc8801mc_state::machine_reset()
 	m_cdrom_bank = true;
 }
 
-// TODO: to joyport DE-9 option slot
+// DE-9 mouse port on front panel (labelled "マウス") - MSX-compatible
 uint8_t pc8801mk2sr_state::opn_porta_r()
 {
-	if(ioport("BOARD_CONFIG")->read() & 2)
-	{
-		uint8_t shift, res;
-
-		shift = (m_mouse.phase & 1) ? 0 : 4;
-		res = (m_mouse.phase & 2) ? m_mouse.ly : m_mouse.lx;
-
-//      logerror("%d\n",m_mouse.phase);
-
-		return ((res >> shift) & 0x0f) | 0xf0;
-	}
-
-	return ioport("OPN_PA")->read();
+	return BIT(m_mouse_port->read(), 0, 4) | 0xf0;
 }
 
-/* Cassette Configuration */
+uint8_t pc8801mk2sr_state::opn_portb_r()
+{
+	return BIT(m_mouse_port->read(), 4, 2) | 0xfc;
+}
+
+// Cassette Configuration
 WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
 {
 	//m_cassette->output( (state) ? 1.0 : -1.0);
@@ -1806,6 +1724,8 @@ void pc8801_state::pc8801(machine_config &config)
 		m_beeper->add_route(ALL_OUTPUTS, speaker, 0.10);
 	}
 
+	MSX_GENERAL_PURPOSE_PORT(config, m_mouse_port, msx_general_purpose_port_devices, "mouse");
+
 	PC8801_EXP_SLOT(config, m_exp, pc8801_exp_devices, nullptr);
 	m_exp->set_iospace(m_maincpu, AS_IO);
 	m_exp->int3_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
@@ -1820,7 +1740,7 @@ void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 	YM2203(config, m_opn, MASTER_CLOCK);
 	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));
 	m_opn->port_a_read_callback().set(FUNC(pc8801mk2sr_state::opn_porta_r));
-	m_opn->port_b_read_callback().set_ioport("OPN_PB");
+	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
 
 	for (auto &speaker : { m_lspeaker, m_rspeaker })
 	{
@@ -1848,7 +1768,8 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	m_opna->set_addrmap(0, &pc8801fh_state::opna_map);
 	m_opna->irq_handler().set(FUNC(pc8801fh_state::int4_irq_w));
 	m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
-	m_opna->port_b_read_callback().set_ioport("OPN_PB");
+	m_opna->port_b_read_callback().set(FUNC(pc8801fh_state::opn_portb_r));
+
 	// TODO: per-channel mixing is unconfirmed
 	m_opna->add_route(0, m_lspeaker, 0.25);
 	m_opna->add_route(0, m_rspeaker, 0.25);

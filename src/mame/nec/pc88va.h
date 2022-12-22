@@ -14,6 +14,7 @@
 //#include "pc80s31k.h"
 #include "pc88va_sgp.h"
 
+#include "bus/msx/ctrl/ctrl.h"
 #include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
@@ -45,6 +46,7 @@ public:
 		, m_fdd(*this, "upd765:%u", 0U)
 		, m_pic2(*this, "pic8259_slave")
 		, m_rtc(*this, "rtc")
+		, m_mouse_port(*this, "mouseport") // labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_opna(*this, "opna")
 		, m_lspeaker(*this, "lspeaker")
 		, m_rspeaker(*this, "rspeaker")
@@ -105,6 +107,7 @@ private:
 //  required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<upd4990a_device> m_rtc;
+	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<ym2608_device> m_opna;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
@@ -265,23 +268,13 @@ private:
 	void port40_w(offs_t offset, u8 data);
 	void rtc_w(offs_t offset, u8 data);
 	u8 opn_porta_r();
+	u8 opn_portb_r();
 
 	u8 m_device_ctrl_data = 0;
 	u8 m_misc_ctrl = 0x80;
 	bool m_sound_irq_enable = false;
 	bool m_sound_irq_pending = false;
 	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
-
-	struct mouse_t {
-		uint8_t phase = 0;
-		int8_t prev_dx = 0, prev_dy = 0;
-		uint8_t lx = 0, ly = 0;
-
-		attotime time = attotime::never;
-	};
-	attotime mouse_limit_hz();
-
-	mouse_t m_mouse;
 };
 
 

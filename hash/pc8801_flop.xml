@@ -17056,8 +17056,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Mouse pointer is jumpy -->
-	<software name="ishido" supported="partial">
+	<software name="ishido">
 		<description>Ishido - The Way of Stones</description>
 		<year>1990</year>
 		<publisher>アスキー (ASCII)</publisher>
