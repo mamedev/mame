@@ -390,15 +390,15 @@ class equites_state : public driver_device
 public:
 	equites_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_spriteram_2(*this, "spriteram_2"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_alpha_8201(*this, "alpha_8201"),
-		m_mainlatch(*this, "mainlatch")
+		m_mainlatch(*this, "mainlatch"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_fg_videoram(*this, "fg_videoram", 0x800, ENDIANNESS_BIG),
+		m_spriteram(*this, "spriteram")
 	{ }
 
 	void equites(machine_config &config);
@@ -406,12 +406,6 @@ public:
 	void init_equites();
 
 protected:
-	// memory pointers
-	required_shared_ptr<uint16_t> m_bg_videoram;
-	std::unique_ptr<uint8_t[]> m_fg_videoram; // 8bits
-	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_spriteram_2;
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -420,10 +414,12 @@ protected:
 	required_device<alpha_8201_device> m_alpha_8201;
 	required_device<ls259_device> m_mainlatch;
 
-	// video-related
-	tilemap_t *m_fg_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_bgcolor = 0U;
+	// memory pointers
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	memory_share_creator<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+
+	virtual void machine_start() override;
 
 	uint16_t equites_spriteram_kludge_r();
 	uint8_t equites_fg_videoram_r(offs_t offset);
@@ -431,7 +427,6 @@ protected:
 	void equites_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void equites_bgcolor_w(offs_t offset, uint8_t data);
 	void equites_scrollreg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	TILE_GET_INFO_MEMBER(equites_fg_info);
 	TILE_GET_INFO_MEMBER(equites_bg_info);
 	DECLARE_VIDEO_START(equites);
@@ -443,12 +438,14 @@ protected:
 	void unpack_block(const char *region, int offset, int size);
 	void unpack_region(const char *region);
 
-	virtual void machine_start() override;
 	void bngotime_map(address_map &map);
 	void equites_map(address_map &map);
 	void equites_common_map(address_map &map);
-};
 
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_bgcolor = 0U;
+};
 
 class gekisou_state : public equites_state
 {
@@ -471,11 +468,20 @@ private:
 };
 
 
-class splndrbt_state : public equites_state
+class splndrbt_state : public driver_device
 {
 public:
 	splndrbt_state(const machine_config &mconfig, device_type type, const char *tag) :
-		equites_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_alpha_8201(*this, "alpha_8201"),
+		m_mainlatch(*this, "mainlatch"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_fg_videoram(*this, "fg_videoram", 0x800, ENDIANNESS_BIG),
+		m_spriteram(*this, "spriteram%u", 1U),
 		m_scale_rom(*this, "scale%u", 1U)
 	{ }
 
@@ -486,9 +492,24 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<alpha_8201_device> m_alpha_8201;
+	required_device<ls259_device> m_mainlatch;
+
+	// memory pointers
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	memory_share_creator<uint8_t> m_fg_videoram;
+	required_shared_ptr_array<uint16_t, 2> m_spriteram;
 	required_region_ptr_array<uint8_t, 2> m_scale_rom;
 
-	void splndrbt_map(address_map &map);
+	uint8_t equites_fg_videoram_r(offs_t offset);
+	void equites_fg_videoram_w(offs_t offset, uint8_t data);
+	void equites_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void equites_bgcolor_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(splndrbt_selchar_w);
 	void splndrbt_bg_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void splndrbt_bg_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -501,6 +522,14 @@ private:
 	void splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect);
 
+	void splndrbt_map(address_map &map);
+
+	void unpack_block(const char *region, int offset, int size);
+	void unpack_region(const char *region);
+
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_bgcolor = 0U;
 	int m_fg_char_bank = 0;
 	uint16_t m_splndrbt_bg_scrollx = 0U;
 	uint16_t m_splndrbt_bg_scrolly = 0U;
@@ -612,9 +641,6 @@ TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_bg_info)
 
 VIDEO_START_MEMBER(equites_state,equites)
 {
-	m_fg_videoram = std::make_unique<uint8_t[]>(0x800);
-	save_pointer(NAME(m_fg_videoram), 0x800);
-
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(equites_state::equites_fg_info)), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -626,9 +652,6 @@ VIDEO_START_MEMBER(equites_state,equites)
 VIDEO_START_MEMBER(splndrbt_state,splndrbt)
 {
 	assert(m_screen->format() == BITMAP_FORMAT_IND16);
-
-	m_fg_videoram = std::make_unique<uint8_t[]>(0x800);
-	save_pointer(NAME(m_fg_videoram), 0x800);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splndrbt_state::splndrbt_fg_info)), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -678,16 +701,36 @@ void equites_state::equites_scrollreg_w(offs_t offset, uint16_t data, uint16_t m
 		m_bg_tilemap->set_scrollx(0, data >> 8);
 }
 
+
+
+uint8_t splndrbt_state::equites_fg_videoram_r(offs_t offset)
+{
+	// 8-bit
+	return m_fg_videoram[offset];
+}
+
+void splndrbt_state::equites_fg_videoram_w(offs_t offset, uint8_t data)
+{
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
+}
+
+void splndrbt_state::equites_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(m_bg_videoram + offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void splndrbt_state::equites_bgcolor_w(offs_t offset, uint8_t data)
+{
+	m_bgcolor = data;
+}
+
 WRITE_LINE_MEMBER(splndrbt_state::splndrbt_selchar_w)
 {
 	// select active char map
 	m_fg_char_bank = (state == 0) ? 0 : 1;
 	m_fg_tilemap->mark_all_dirty();
-}
-
-WRITE_LINE_MEMBER(equites_state::flip_screen_w)
-{
-	flip_screen_set(state);
 }
 
 void splndrbt_state::splndrbt_bg_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -789,17 +832,19 @@ void splndrbt_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 
 	for (int offs = 0x3f; offs < 0x6f; offs += 2)   // 24 sprites
 	{
-		int data = m_spriteram[offs];
+		int data = m_spriteram[0][offs];
+		int tile = data & 0x007f;
 		int fx = (data & 0x2000) >> 13;
 		int fy = (data & 0x1000) >> 12;
-		int tile = data & 0x007f;
 		int scaley = (data & 0x0f00) >> 8;
-		int data2 = m_spriteram[offs + 1];
-		int color = (data2 & 0x1f00) >> 8;
+
+		int data2 = m_spriteram[0][offs + 1];
 		int sx = data2 & 0x00ff;
-		int sy = m_spriteram_2[offs + 0] & 0x00ff;
-		int scalex = m_spriteram_2[offs + 1] & 0x000f;
+		int color = (data2 & 0x1f00) >> 8;
 		int transmask = m_palette->transpen_mask(*gfx, color, 0);
+
+		int sy = m_spriteram[1][offs + 0] & 0x00ff;
+		int scalex = m_spriteram[1][offs + 1] & 0x000f;
 
 //      const uint8_t * const xromline = xrom + (scalex << 4);
 		const uint8_t * const yromline = yrom + (scaley << 4) + (15 - scaley);
@@ -837,7 +882,7 @@ void splndrbt_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 
 						if (bx >= cliprect.left() && bx <= cliprect.right())
 						{
-							int xx = scalex ? (x * 29 + scalex) / (scalex << 1) + 1 : 16;   // FIXME This is wrong. Should use the PROM.
+							int xx = scalex ? (x * 29 + scalex) / (scalex << 1) + 1 : 16; // FIXME This is wrong. Should use the PROM.
 							int const offset = (fx ? (31 - xx) : xx) + ((fy ^ yhalf) ? (16 + line) : (15 - line)) * gfx->rowbytes();
 
 							int pen = srcgfx[offset];
@@ -1049,8 +1094,8 @@ void splndrbt_state::splndrbt_map(address_map &map)
 	map(0x200000, 0x200fff).mirror(0x001000).rw(FUNC(splndrbt_state::equites_fg_videoram_r), FUNC(splndrbt_state::equites_fg_videoram_w)).umask16(0x00ff);
 	map(0x400000, 0x4007ff).ram().w(FUNC(splndrbt_state::equites_bg_videoram_w)).share("bg_videoram");
 	map(0x400800, 0x400fff).ram();
-	map(0x600000, 0x6000ff).ram().share("spriteram");   // sprite RAM 0,1
-	map(0x600100, 0x6001ff).ram().share("spriteram_2"); // sprite RAM 2 (8-bit)
+	map(0x600000, 0x6000ff).ram().share("spriteram1"); // sprite RAM 0,1 (2*8 bit)
+	map(0x600100, 0x6001ff).ram().share("spriteram2"); // sprite RAM 2,none (8 bit)
 }
 
 
@@ -1207,8 +1252,22 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( splndrbt )
 	PORT_START("IN0")
-	EQUITES_PLAYER_INPUT_LSB( IPT_BUTTON1, IPT_BUTTON2, IPT_UNKNOWN, IPT_START1 )
-	EQUITES_PLAYER_INPUT_MSB( IPT_BUTTON1, IPT_BUTTON2, IPT_UNKNOWN, IPT_START2 )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -1403,8 +1462,7 @@ void gekisou_state::machine_start()
 
 void splndrbt_state::machine_start()
 {
-	equites_state::machine_start();
-
+	save_item(NAME(m_bgcolor));
 	save_item(NAME(m_fg_char_bank));
 	save_item(NAME(m_splndrbt_bg_scrollx));
 	save_item(NAME(m_splndrbt_bg_scrolly));
@@ -1418,7 +1476,7 @@ void equites_state::equites(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(equites_state::equites_scanline), "screen", 0, 1);
 
 	LS259(config, m_mainlatch);
-	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::flip_screen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::flip_screen_set));
 	m_mainlatch->q_out_cb<2>().set(m_alpha_8201, FUNC(alpha_8201_device::mcu_start_w));
 	m_mainlatch->q_out_cb<3>().set(m_alpha_8201, FUNC(alpha_8201_device::bus_dir_w)).invert();
 
@@ -1471,7 +1529,7 @@ void splndrbt_state::splndrbt(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(splndrbt_state::splndrbt_scanline), "screen", 0, 1);
 
 	LS259(config, m_mainlatch);
-	m_mainlatch->q_out_cb<0>().set(FUNC(splndrbt_state::flip_screen_w));
+	m_mainlatch->q_out_cb<0>().set(FUNC(splndrbt_state::flip_screen_set));
 	m_mainlatch->q_out_cb<1>().set(m_alpha_8201, FUNC(alpha_8201_device::mcu_start_w));
 	m_mainlatch->q_out_cb<2>().set(m_alpha_8201, FUNC(alpha_8201_device::bus_dir_w)).invert();
 	m_mainlatch->q_out_cb<3>().set(FUNC(splndrbt_state::splndrbt_selchar_w));
@@ -2274,6 +2332,25 @@ void equites_state::init_equites()
 {
 	unpack_region("gfx2");
 	unpack_region("gfx3");
+}
+
+
+
+void splndrbt_state::unpack_block(const char *region, int offset, int size)
+{
+	uint8_t *rom = memregion(region)->base();
+
+	for (int i = 0; i < size; i++)
+	{
+		rom[(offset + i + size)] = (rom[(offset + i)] >> 4);
+		rom[(offset + i)] &= 0x0f;
+	}
+}
+
+void splndrbt_state::unpack_region(const char *region)
+{
+	unpack_block(region, 0x0000, 0x2000);
+	unpack_block(region, 0x4000, 0x2000);
 }
 
 void splndrbt_state::init_splndrbt()
