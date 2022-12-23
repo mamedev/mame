@@ -5,12 +5,12 @@
 
 #pragma once
 
-class micropolis_image_device :
+class vector_micropolis_image_device :
 		public device_t,
 		public device_image_interface
 {
 public:
-	micropolis_image_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	vector_micropolis_image_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// device_image_interface implementation
 	bool is_readable()  const noexcept override { return true; }
@@ -42,7 +42,7 @@ protected:
 	void device_add_mconfig(machine_config &config) override;
 
 private:
-	required_device_array<micropolis_image_device, 4> m_floppy;
+	required_device_array<vector_micropolis_image_device, 4> m_floppy;
 	uint8_t m_ram[512];
 	uint16_t m_cmar;
 	uint8_t m_drive;
@@ -53,7 +53,7 @@ private:
 	emu_timer *m_motor_on_timer;
 };
 
-DECLARE_DEVICE_TYPE(MICROPOLIS_IMAGE, micropolis_image_device)
+DECLARE_DEVICE_TYPE(MICROPOLIS_IMAGE, vector_micropolis_image_device)
 DECLARE_DEVICE_TYPE(VECTOR_DUALMODE, vector_dualmode_device)
 
 #endif // MAME_VECTORGRAPHIC_DUALMODEDISK_H

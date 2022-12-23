@@ -96,7 +96,7 @@ private:
 	bool m_256k;
 	required_shared_ptr<uint8_t> m_ram;
 	memory_view m_romenbl;
-	required_device<sbc_video_device> m_sbc_video;
+	required_device<vector_sbc_video_device> m_sbc_video;
 };
 
 
@@ -133,7 +133,7 @@ void vector4_state::vector4_io(address_map &map)
 	map(0x10, 0x13).mirror(0xff00).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // baud generator and timer
 	map(0x16, 0x17).select(0xff00).w(FUNC(vector4_state::addrmap_w)); // RAM address map
 	map(0x18, 0x19).mirror(0xff00).w("sn", FUNC(sn76489_device::write)); // tone generator
-	map(0x1c, 0x1f).mirror(0xff00).w(m_sbc_video, FUNC(sbc_video_device::res320_mapping_ram_w)); // resolution 320 mapping RAM
+	map(0x1c, 0x1f).mirror(0xff00).w(m_sbc_video, FUNC(vector_sbc_video_device::res320_mapping_ram_w)); // resolution 320 mapping RAM
 	map(0xc0, 0xc3).mirror(0xff00).rw("dualmode", FUNC(vector_dualmode_device::read), FUNC(vector_dualmode_device::write)); // disk controller
 }
 

@@ -31,17 +31,17 @@ TODO:
 
 #include "logmacro.h"
 
-micropolis_image_device::micropolis_image_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+vector_micropolis_image_device::vector_micropolis_image_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MICROPOLIS_IMAGE, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 {
 }
 
-void micropolis_image_device::device_start()
+void vector_micropolis_image_device::device_start()
 {
 }
 
-image_init_result micropolis_image_device::call_load()
+image_init_result vector_micropolis_image_device::call_load()
 {
 	uint64_t length;
 	image_core_file().length(length);
@@ -200,5 +200,5 @@ void vector_dualmode_device::device_add_mconfig(machine_config &config)
 	MICROPOLIS_IMAGE(config, m_floppy[3], 0);
 }
 
-DEFINE_DEVICE_TYPE(MICROPOLIS_IMAGE, micropolis_image_device, "micropolisimage", "Micropolis Image (VGI)")
+DEFINE_DEVICE_TYPE(MICROPOLIS_IMAGE, vector_micropolis_image_device, "micropolisimage", "Micropolis Image (VGI)")
 DEFINE_DEVICE_TYPE(VECTOR_DUALMODE, vector_dualmode_device, "vectordualmodedisk", "Vector Dual-Mode Disk Controller")

@@ -8,10 +8,10 @@
 #include "video/mc6845.h"
 
 
-class sbc_video_device : public device_t
+class vector_sbc_video_device : public device_t
 {
 public:
-	sbc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vector_sbc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_buffer(T &&tag) { m_buffer.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_chrroml(T &&tag) { m_chrroml.set_tag(std::forward<T>(tag)); }
@@ -37,6 +37,6 @@ private:
 	uint8_t m_res320_ram[4];
 };
 
-DECLARE_DEVICE_TYPE(SBC_VIDEO, sbc_video_device)
+DECLARE_DEVICE_TYPE(SBC_VIDEO, vector_sbc_video_device)
 
 #endif // MAME_VECTORGRAPHIC_SBCVIDEO_H

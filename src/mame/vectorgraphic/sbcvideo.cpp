@@ -8,7 +8,7 @@
 
 #include "screen.h"
 
-sbc_video_device::sbc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vector_sbc_video_device::vector_sbc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SBC_VIDEO, tag, owner, clock)
 	, m_io_sbc_video_conf(*this, "SBC_VIDEO_CONF")
 	, m_buffer(*this, finder_base::DUMMY_TAG)
@@ -18,12 +18,12 @@ sbc_video_device::sbc_video_device(const machine_config &mconfig, const char *ta
 {
 }
 
-void sbc_video_device::spr_w(uint8_t data)
+void vector_sbc_video_device::spr_w(uint8_t data)
 {
 	m_spr = data;
 }
 
-void sbc_video_device::res320_mapping_ram_w(offs_t offset, uint8_t data)
+void vector_sbc_video_device::res320_mapping_ram_w(offs_t offset, uint8_t data)
 {
 	// 7200-0001 page 209 (VI A-6) C6
 	m_res320_ram[offset & 0x3] = data & 0x0F;
@@ -41,7 +41,7 @@ static inline rgb_t raw_4bit_to_rgb(uint8_t enc, bool color)
 	}
 }
 
-MC6845_UPDATE_ROW(sbc_video_device::update_row)
+MC6845_UPDATE_ROW(vector_sbc_video_device::update_row)
 {
 	uint32_t monochrome_color = rgb_t(0x00, 0xff, 0x00);
 	bool graph = BIT(m_spr, 1); // ALPHA|/GRAPH
@@ -132,13 +132,13 @@ MC6845_UPDATE_ROW(sbc_video_device::update_row)
 	}
 }
 
-void sbc_video_device::device_add_mconfig(machine_config &config)
+void vector_sbc_video_device::device_add_mconfig(machine_config &config)
 {
 	c6545_1_device &crtc(C6545_1(config, "crtc", DERIVED_CLOCK(1, 16)));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(16*2);
-	crtc.set_update_row_callback(FUNC(sbc_video_device::update_row));
+	crtc.set_update_row_callback(FUNC(vector_sbc_video_device::update_row));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -146,13 +146,13 @@ void sbc_video_device::device_add_mconfig(machine_config &config)
 	screen.set_size(1280, 312);
 }
 
-void sbc_video_device::device_start()
+void vector_sbc_video_device::device_start()
 {
 	save_item(NAME(m_spr));
 	save_item(NAME(m_res320_ram));
 }
 
-void sbc_video_device::device_reset()
+void vector_sbc_video_device::device_reset()
 {
 	m_spr = 0;
 }
@@ -164,9 +164,9 @@ INPUT_PORTS_START( sbc_video )
 	PORT_CONFSETTING(     0x001, DEF_STR(Yes)    )
 INPUT_PORTS_END
 
-ioport_constructor sbc_video_device::device_input_ports() const
+ioport_constructor vector_sbc_video_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(sbc_video);
 }
 
-DEFINE_DEVICE_TYPE(SBC_VIDEO, sbc_video_device, "vectorsbcvideo", "Vector SBC Video Output")
+DEFINE_DEVICE_TYPE(SBC_VIDEO, vector_sbc_video_device, "vectorsbcvideo", "Vector SBC Video Output")
