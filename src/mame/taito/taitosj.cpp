@@ -2081,7 +2081,7 @@ ROM_START( junglekj2a )
 	ROM_LOAD( "kn60.bin",     0x11000, 0x1000, CRC(1a9c0a26) SHA1(82f4cebeba90419e83a00427b671985824babd7a) ) // banked at 7000
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "kn37.bin",   0x0000, 0x1000, CRC(60d13095) SHA1(c9a3bdc3a5432945cd09588708b8a24ff7d772c3) ) // significant differences from junglekj2 (but same label?)
+	ROM_LOAD( "kn37.bin",   0x0000, 0x1000, CRC(60d13095) SHA1(c9a3bdc3a5432945cd09588708b8a24ff7d772c3) ) // significant differences from junglekj2 (but same label as junglehbr?)
 	ROM_LOAD( "kn38.bin",   0x1000, 0x1000, CRC(6950413d) SHA1(263472a25213f411a8be7d30f5dec6aec186c1d4) ) //  ^^
 	ROM_LOAD( "kn59.bin",   0x2000, 0x1000, CRC(cee485fc) SHA1(1e0c52ec6b1d3cfd47247db71bcf3fe476c32039) )
 
