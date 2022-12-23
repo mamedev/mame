@@ -16388,7 +16388,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="sxwin31b" cloneof="sxwin31">
-		<description>SX-Window v3.1 (Alt 2)</description>
+		<description>SX-Window v3.1 (alt 2)</description>
 		<year>1994</year>
 		<publisher>Sharp</publisher>
 		<part name="flop1" interface="floppy_5_25">
