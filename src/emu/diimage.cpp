@@ -566,7 +566,7 @@ std::vector<u32> device_image_interface::determine_open_plan(bool is_create)
 	{
 		if (is_writeable())
 			open_plan.push_back(is_readable() ? (OPEN_FLAG_READ | OPEN_FLAG_WRITE) : OPEN_FLAG_WRITE);
-		else if (is_readable())
+		if (is_readable())
 			open_plan.push_back(OPEN_FLAG_READ);
 	}
 	else if (is_writeable() && is_creatable())
