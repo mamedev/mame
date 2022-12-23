@@ -1024,14 +1024,11 @@ WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 {
 	if(m_fdc_mode && state)
 	{
-		// TODO: ugh why it doesn't follow state?
-		//printf("%d\n",state);
 		m_pic2->ir3_w(0);
 		m_pic2->ir3_w(1);
 	}
 }
 
-// TODO: often dies, which implicitly means "make the full system to hang" in PC-88 land ...
 WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
 {
 	bool irq_state = m_sound_irq_enable & state;
@@ -1117,6 +1114,20 @@ void pc88va_state::machine_reset()
 	m_sound_irq_pending = false;
 }
 
+WRITE_LINE_MEMBER(pc88va_state::slave_irq7)
+{
+	// If we don't follow this dispatch like the other irqs it will mismatch
+	// between sound and FDC, causing an hang or a disk failure during intros
+	// in rtype, olteus, shinraba, 88va2d.
+	// TODO: how pc88va even acknowledge any irq?
+	if (state)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_IRQ7, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ7, ASSERT_LINE);
+	}
+
+}
+
 void pc88va_state::pc88va(machine_config &config)
 {
 	V50(config, m_maincpu, MASTER_CLOCK); // μPD9002, aka V50 + μPD70008AC (for PC8801 compatibility mode) in place of 8080
@@ -1157,7 +1168,8 @@ void pc88va_state::pc88va(machine_config &config)
 
 	// external PIC
 	PIC8259(config, m_pic2, 0);
-	m_pic2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
+//	m_pic2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
+	m_pic2->out_int_callback().set(FUNC(pc88va_state::slave_irq7));
 	m_pic2->in_sp_callback().set_constant(0);
 
 	UPD765A(config, m_fdc, 4000000, true, true);

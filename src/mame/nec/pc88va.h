@@ -156,6 +156,8 @@ private:
 	uint8_t kanji_ram_r(offs_t offset);
 	void kanji_ram_w(offs_t offset, uint8_t data);
 
+	DECLARE_WRITE_LINE_MEMBER(slave_irq7);
+
 	uint8_t hdd_status_r();
 
 	uint16_t sysop_r();
