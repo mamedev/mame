@@ -328,9 +328,8 @@ uint8_t omegrace_state::vg_go_r()
 
 inline uint8_t omegrace_state::encode_spinner(uint8_t data)
 {
-	// Inverted 6-bit Gray code with origin having alternating bits
-	data = (data + 0b101010) & 0x3f;
-	return data ^ (data >> 1) ^ 0x3f;
+	data &= 0x3f;
+	return data ^ (data >> 1) ^ 0x3f; // Inverted 6-bit Gray code
 }
 
 uint8_t omegrace_state::spinner1_r()
