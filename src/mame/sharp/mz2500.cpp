@@ -806,24 +806,17 @@ void mz2500_state::mz2500_irq_data_w(uint8_t data)
 
 void mz2500_state::floppy_select_w(uint8_t data)
 {
-	switch ((data & 0x03) ^ m_fdc_reverse)
-	{
-	case 0: m_floppy = m_floppy0->get_device(); break;
-	case 1: m_floppy = m_floppy1->get_device(); break;
-	case 2: m_floppy = m_floppy2->get_device(); break;
-	case 3: m_floppy = m_floppy3->get_device(); break;
-	}
+	m_selected_floppy = m_floppy[(data & 0x03) ^ m_fdc_reverse]->get_device();
+	m_fdc->set_floppy(m_selected_floppy);
 
-	m_fdc->set_floppy(m_floppy);
-
-	if (m_floppy)
-		m_floppy->mon_w(!BIT(data, 7));
+	if (m_selected_floppy)
+		m_selected_floppy->mon_w(!BIT(data, 7));
 }
 
 void mz2500_state::floppy_side_w(uint8_t data)
 {
-	if (m_floppy)
-		m_floppy->ss_w(BIT(data, 0));
+	if (m_selected_floppy)
+		m_selected_floppy->ss_w(BIT(data, 0));
 }
 
 void mz2500_state::mz2500_map(address_map &map)
@@ -1143,7 +1136,7 @@ uint8_t mz2500_state::mz2500_joystick_r()
 	uint8_t res,dir_en,in_r;
 
 	res = 0xff;
-	in_r = ~ioport(m_joy_mode & 0x40 ? "JOY_2P" : "JOY_1P")->read();
+	in_r = ~m_joy[BIT(m_joy_mode, 6)]->read();
 
 	if(m_joy_mode & 0x40)
 	{
@@ -1169,6 +1162,12 @@ uint8_t mz2500_state::mz2500_joystick_r()
 void mz2500_state::mz2500_joystick_w(uint8_t data)
 {
 	m_joy_mode = data;
+	m_joy[0]->pin_6_w(BIT(data, 0));
+	m_joy[0]->pin_7_w(BIT(data, 1));
+	m_joy[1]->pin_6_w(BIT(data, 2));
+	m_joy[1]->pin_7_w(BIT(data, 3));
+	m_joy[0]->pin_8_w(BIT(data, 4));
+	m_joy[1]->pin_8_w(BIT(data, 5));
 }
 
 
@@ -1432,26 +1431,6 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("JOY_1P")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("JOY_2P")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 void mz2500_state::reset_banks(uint8_t type)
@@ -1534,6 +1513,8 @@ void mz2500_state::machine_reset()
 	m_beeper->set_state(0);
 
 //  m_monitor_type = ioport("DSW1")->read() & 0x40 ? 1 : 0;
+
+	mz2500_joystick_w(0x3f); // LS273 reset
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -1827,17 +1808,16 @@ void mz2500_state::mz2500(machine_config &config)
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(31250);
 	m_pit->out_handler<0>().set(FUNC(mz2500_state::pit8253_clk0_irq));
-	// TODO: is this really right?
-	m_pit->set_clk<1>(0);
-	m_pit->set_clk<2>(16); //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
-	m_pit->out_handler<2>().set(m_pit, FUNC(pit8253_device::write_clk1));
+	m_pit->out_handler<0>().append(m_pit, FUNC(pit8253_device::write_clk1));
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2)); //CH2, used by Super MZ demo / The Black Onyx and a few others
 
 	MB8877(config, m_fdc, 1_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:2", mz2500_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:3", mz2500_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
+
+	for (auto &fd : m_floppy)
+		FLOPPY_CONNECTOR(config, fd, mz2500_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mz2500");
 

@@ -10,7 +10,7 @@
 
 #pragma once
 
-
+#include "bus/msx/ctrl/ctrl.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -43,11 +43,9 @@ public:
 		m_beeper(*this, "beeper"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_fdc(*this, "mb8877a"),
-		m_floppy0(*this, "mb8877a:0"),
-		m_floppy1(*this, "mb8877a:1"),
-		m_floppy2(*this, "mb8877a:2"),
-		m_floppy3(*this, "mb8877a:3"),
-		m_floppy(nullptr),
+		m_floppy(*this, "mb8877a:%u", 0U),
+		m_selected_floppy(nullptr),
+		m_joy(*this, "joy%u", 1U),
 		m_palette(*this, "palette"),
 		m_rambank(*this, "rambank%u", 0),
 		m_tvram(*this, "tvram"),
@@ -65,11 +63,9 @@ private:
 	required_device<beep_device> m_beeper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<mb8877_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	floppy_image_device *m_floppy;
+	required_device_array<floppy_connector, 4> m_floppy;
+	floppy_image_device *m_selected_floppy;
+	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device<palette_device> m_palette;
 	required_device_array<address_map_bank_device, 8> m_rambank;
 	required_shared_ptr<uint8_t> m_tvram;
