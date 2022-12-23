@@ -134,9 +134,7 @@ MC6845_UPDATE_ROW(sbc_video_device::update_row)
 
 void sbc_video_device::device_add_mconfig(machine_config &config)
 {
-	XTAL _32m(32'640'000);
-	XTAL _2m = _32m/16;
-	c6545_1_device &crtc(C6545_1(config, "crtc", _2m));
+	c6545_1_device &crtc(C6545_1(config, "crtc", DERIVED_CLOCK(1, 16)));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(16*2);

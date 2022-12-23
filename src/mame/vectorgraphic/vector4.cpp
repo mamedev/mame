@@ -72,9 +72,8 @@ public:
 		, m_8088cpu(*this, "8088cpu")
 		, m_rambanks(*this, "rambank%u", 0U)
 		, m_256k(false)
-		, m_ram(*this, "mainram", (m_256k ? 256 : 128)*1024, endianness_t::little)
+		, m_ram(*this, "mainram")
 		, m_romenbl(*this, "romenbl")
-		, m_sn(*this, "sn")
 		, m_sbc_video(*this, "video")
 	{ }
 
@@ -91,16 +90,12 @@ private:
 	void machine_start() override;
 	void machine_reset() override;
 
-	uint8_t ram_r(offs_t offset) { return m_ram[offset]; }
-	void ram_w(offs_t offset, uint8_t data) { m_ram[offset] = data; }
-
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_8088cpu;
 	required_memory_bank_array<32> m_rambanks;
 	bool m_256k;
-	memory_share_creator<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	memory_view m_romenbl;
-	required_device<sn76489_device> m_sn;
 	required_device<sbc_video_device> m_sbc_video;
 };
 
@@ -138,7 +133,7 @@ void vector4_state::vector4_io(address_map &map)
 	map(0x10, 0x13).mirror(0xff00).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // baud generator and timer
 	map(0x16, 0x17).select(0xff00).w(FUNC(vector4_state::addrmap_w)); // RAM address map
 	map(0x18, 0x19).mirror(0xff00).w("sn", FUNC(sn76489_device::write)); // tone generator
-	map(0x1c, 0x1f).mirror(0xff00).w("video", FUNC(sbc_video_device::res320_mapping_ram_w)); // resolution 320 mapping RAM
+	map(0x1c, 0x1f).mirror(0xff00).w(m_sbc_video, FUNC(sbc_video_device::res320_mapping_ram_w)); // resolution 320 mapping RAM
 	map(0xc0, 0xc3).mirror(0xff00).rw("dualmode", FUNC(vector_dualmode_device::read), FUNC(vector_dualmode_device::write)); // disk controller
 }
 
@@ -171,7 +166,7 @@ void vector4_state::vector4(machine_config &config)
 	m_8088cpu->set_addrmap(AS_IO, &vector4_state::vector4_io);
 
 	/* video hardware */
-	SBC_VIDEO(config, m_sbc_video, 0);
+	SBC_VIDEO(config, m_sbc_video, _32m);
 	m_sbc_video->set_buffer(m_ram);
 	m_sbc_video->set_chrroml("chargenl");
 	m_sbc_video->set_chrromr("chargenr");
@@ -228,15 +223,14 @@ void vector4_state::vector4(machine_config &config)
 	I8255A(config, "ppi");
 
 	SPEAKER(config, "mono").front_center();
-	SN76489(config, m_sn, _2m);
-	m_sn->add_route(ALL_OUTPUTS, "mono", 1.0);
+	sn76489_device &sn(SN76489(config, "sn", _2m));
+	sn.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void vector4_state::machine_start()
 {
 	for (int bank = 0; bank < (1<<5); bank++)
-		for (int page = 0; page < (1<<7); page++)
-			m_rambanks[bank]->configure_entry(page, &m_ram[page << 11]);
+		m_rambanks[bank]->configure_entries(0, 1<<7, &m_ram[0], 1<<11);
 }
 
 void vector4_state::machine_reset()
