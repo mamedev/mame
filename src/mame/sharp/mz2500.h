@@ -42,8 +42,8 @@ public:
 		m_pit(*this, "pit"),
 		m_beeper(*this, "beeper"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_fdc(*this, "mb8877a"),
-		m_floppy(*this, "mb8877a:%u", 0U),
+		m_fdc(*this, "mb8876"),
+		m_floppy(*this, "mb8876:%u", 0U),
 		m_selected_floppy(nullptr),
 		m_joy(*this, "joy%u", 1U),
 		m_palette(*this, "palette"),
@@ -62,7 +62,7 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_device<beep_device> m_beeper;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<mb8877_device> m_fdc;
+	required_device<mb8876_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 	floppy_image_device *m_selected_floppy;
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
@@ -170,10 +170,9 @@ private:
 	uint32_t screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mz2500_vbl);
 
-	uint8_t fdc_r(offs_t offset);
-	void fdc_w(offs_t offset, uint8_t data);
 	void floppy_select_w(uint8_t data);
 	void floppy_side_w(uint8_t data);
+	void floppy_dden_w(uint8_t data);
 
 	uint8_t mz2500_porta_r();
 	uint8_t mz2500_portb_r();

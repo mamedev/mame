@@ -819,6 +819,11 @@ void mz2500_state::floppy_side_w(uint8_t data)
 		m_selected_floppy->ss_w(BIT(data, 0));
 }
 
+void mz2500_state::floppy_dden_w(uint8_t data)
+{
+	m_fdc->dden_w(BIT(data, 0));
+}
+
 void mz2500_state::mz2500_map(address_map &map)
 {
 	map(0x0000, 0x1fff).m(m_rambank[0], FUNC(address_map_bank_device::amap8));
@@ -990,16 +995,6 @@ void mz2500_state::palette4096_io_w(uint8_t data)
 	}
 
 	m_palette->set_pen_color(pal_entry+0x10, pal4bit(m_pal[pal_entry].r), pal4bit(m_pal[pal_entry].g), pal4bit(m_pal[pal_entry].b));
-}
-
-uint8_t mz2500_state::fdc_r(offs_t offset)
-{
-	return m_fdc->read(offset) ^ 0xff;
-}
-
-void mz2500_state::fdc_w(offs_t offset, uint8_t data)
-{
-	m_fdc->write(offset, data ^ 0xff);
 }
 
 uint8_t mz2500_state::mz2500_bplane_latch_r()
@@ -1262,10 +1257,10 @@ void mz2500_state::mz2500_io(address_map &map)
 	map(0xcc, 0xcc).rw(FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
 	map(0xce, 0xce).w(FUNC(mz2500_state::mz2500_dictionary_bank_w));
 	map(0xcf, 0xcf).w(FUNC(mz2500_state::mz2500_kanji_bank_w));
-	map(0xd8, 0xdb).rw(FUNC(mz2500_state::fdc_r), FUNC(mz2500_state::fdc_w));
+	map(0xd8, 0xdb).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));
 	map(0xdc, 0xdc).w(FUNC(mz2500_state::floppy_select_w));
 	map(0xdd, 0xdd).w(FUNC(mz2500_state::floppy_side_w));
-	map(0xde, 0xde).nopw();
+	map(0xde, 0xde).w(FUNC(mz2500_state::floppy_dden_w));
 	map(0xe0, 0xe3).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe4, 0xe7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
@@ -1776,7 +1771,7 @@ static void mz2500_floppies(device_slot_interface &device)
 void mz2500_state::mz2500(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz2500_state::mz2500_map);
 	m_maincpu->set_addrmap(AS_IO, &mz2500_state::mz2500_io);
 	m_maincpu->set_vblank_int("screen", FUNC(mz2500_state::mz2500_vbl));
@@ -1795,23 +1790,23 @@ void mz2500_state::mz2500(machine_config &config)
 	ppi.in_pc_callback().set(FUNC(mz2500_state::mz2500_portc_r));
 	ppi.out_pc_callback().set(FUNC(mz2500_state::mz2500_portc_w));
 
-	z80pio_device& pio(Z80PIO(config, "z80pio_1", 6000000));
+	z80pio_device& pio(Z80PIO(config, "z80pio_1", 24_MHz_XTAL / 4));
 	pio.in_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));
 	pio.out_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_w));
 	pio.in_pb_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));
 
-	Z80SIO(config, "z80sio", 6000000);
+	Z80SIO(config, "z80sio", 24_MHz_XTAL / 4);
 
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm().set(FUNC(mz2500_state::mz2500_rtc_alarm_irq));
 
-	PIT8253(config, m_pit, 0);
-	m_pit->set_clk<0>(31250);
+	PIT8253(config, m_pit);
+	m_pit->set_clk<0>(24_MHz_XTAL / 768);
 	m_pit->out_handler<0>().set(FUNC(mz2500_state::pit8253_clk0_irq));
 	m_pit->out_handler<0>().append(m_pit, FUNC(pit8253_device::write_clk1));
 	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2)); //CH2, used by Super MZ demo / The Black Onyx and a few others
 
-	MB8877(config, m_fdc, 1_MHz_XTAL);
+	MB8876(config, m_fdc, 8_MHz_XTAL / 8); // clocked by MB4107 VFO
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
@@ -1823,7 +1818,7 @@ void mz2500_state::mz2500(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(21'477'272, 640+108, 0, 640, 480, 0, 200); //unknown clock / divider
+	m_screen->set_raw(42.954545_MHz_XTAL / 2, 640+108, 0, 640, 480, 0, 200); //unknown clock / divider
 	m_screen->set_screen_update(FUNC(mz2500_state::screen_update_mz2500));
 	m_screen->set_palette(m_palette);
 
@@ -1834,7 +1829,7 @@ void mz2500_state::mz2500(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ym(YM2203(config, "ym", 2000000)); //unknown clock / divider
+	ym2203_device &ym(YM2203(config, "ym", 24_MHz_XTAL / 12));
 	ym.port_a_read_callback().set(FUNC(mz2500_state::opn_porta_r));
 	ym.port_b_read_callback().set_ioport("DSW1");
 	ym.port_a_write_callback().set(FUNC(mz2500_state::opn_porta_w));
