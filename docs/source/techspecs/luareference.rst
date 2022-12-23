@@ -615,10 +615,6 @@ driver.rotation (read-only)
     A string indicating the rotation applied to all screens in the system after
     the screen orientation specified in the machine configuration is applied.
     Will be one of ``"rot0"``, ``"rot90"``, ``"rot180"`` or ``"rot270"``.
-driver.type (read-only)
-    A string providing a system type.  Will be one of ``"arcade"``,
-    ``"console"``, ``"computer"`` or ``"other"``.  This is for informational
-    purposes only, and may not be supported in the future.
 driver.not_working (read-only)
     A Boolean indicating whether the system is marked as not working.
 driver.supports_save (read-only)

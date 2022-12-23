@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 To load and run a tape:
 Some programs run from the monitor prompt, while Basic programs must be loaded in the monitor and run from Basic.

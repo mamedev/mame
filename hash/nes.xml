@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="nes" description="Nintendo Entertainment System cartridges">
 
@@ -1186,8 +1186,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound. Could this be related to sound issue in early Enix games? -->
-	<software name="ajyureir" supported="no">
+	<software name="ajyureir">
 		<description>Akagawa Jirou no Yuurei Ressha (Japan)</description>
 		<year>1991</year>
 		<publisher>King Records</publisher>
@@ -3800,7 +3799,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="btoadsdd">
+<!-- Same issue as US release -->
+	<software name="btoadsdd" supported="no">
 		<description>Battletoads &amp; Double Dragon - The Ultimate Team (Europe)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
@@ -3818,7 +3818,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="btoadsddu" cloneof="btoadsdd">
+<!-- Crashes at level 1-2 Abobo. Code falls off the rails at D2B2: jmp ($0021). Apparently game depends on an open bus read from $6xxx some time before that. -->
+	<software name="btoadsddu" cloneof="btoadsdd" supported="no">
 		<description>Battletoads &amp; Double Dragon - The Ultimate Team (USA)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
@@ -5941,7 +5942,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="castelnu" cloneof="casteln">
+<!-- no background music in game -->
+	<software name="castelnu" cloneof="casteln" supported="partial">
 		<description>Castelian (USA)</description>
 		<year>1991</year>
 		<publisher>Triffix</publisher>
@@ -5961,7 +5963,7 @@ license:CC0
 	</software>
 
 <!-- a proto has been found too, containing the same data, with labels "CASTELIAN 2/4/92 CHK$985A" -->
-	<software name="casteln" supported="no"> <!-- freezes when you start game -->
+	<software name="casteln" supported="partial"> <!-- buzz instead of music -->
 		<description>Castelian (Europe)</description>
 		<year>1992</year>
 		<publisher>Storm</publisher>
@@ -6153,7 +6155,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cvania3u" cloneof="cvania3">
+<!-- Graphics corrupt on parts of attract mode film reel. Once those have been viewed, in-game graphics flicker (wild nametable flipping) when picking up weapon upgrades, going through doors, etc. -->
+	<software name="cvania3u" cloneof="cvania3" supported="partial">
 		<description>Castlevania III - Dracula's Curse (USA)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
@@ -6179,7 +6182,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cvania3">
+<!-- Crashes if you watch the attract mode film roll reel -->
+	<software name="cvania3" supported="partial">
 		<description>Castlevania III - Dracula's Curse (Europe)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
@@ -9100,8 +9104,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes as soon as you get killed by any enemy -->
-	<software name="doordoor" supported="no">
+	<software name="doordoor">
 		<description>Door Door (Japan)</description>
 		<year>1985</year>
 		<publisher>Enix</publisher>
@@ -10081,8 +10084,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes once you win any battle -->
-	<software name="dquest" cloneof="dwarr" supported="no">
+	<software name="dquest" cloneof="dwarr">
 		<description>Dragon Quest (Japan)</description>
 		<year>1986</year>
 		<publisher>Enix</publisher>
@@ -10102,8 +10104,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound. Will this freeze up at some point like the other early Enix games? -->
-	<software name="dquest2" cloneof="dwarr2" supported="no">
+	<software name="dquest2" cloneof="dwarr2">
 		<description>Dragon Quest II - Akuryou no Kamigami (Japan)</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
@@ -11891,11 +11892,11 @@ license:CC0
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-R-128-01" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-1 a" size="16384" crc="12b97208" sha1="2fc97bdb035d308f0ecd7b58e44fa1571b99fe27" offset="00000" />
 				<rom name="hvc-fb1-1 b" size="16384" crc="b099376c" sha1="17fb9644dc23173d77d288c1428e560ea8a7a9ef" offset="0x04000" />
@@ -11917,11 +11918,11 @@ license:CC0
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-N-128-02" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-2 a" size="16384" crc="1048e43d" sha1="d50b0352a358e73e29199b981456f33f6cc78131" offset="00000" />
 				<rom name="hvc-fb1-2 b" size="16384" crc="9fbfb6ba" sha1="39e7d7ede468036d04db0bf40f34a07c958f874a" offset="0x04000" />
@@ -11943,11 +11944,11 @@ license:CC0
 		<info name="serial" value="HVC-VT"/>
 		<info name="release" value="19850221"/>
 		<info name="alt_title" value="ファミリーベーシックV3"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="VT-N-256-41" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-vt-0w" size="32768" crc="3aaeed3f" sha1="dcb8e7d48afcc0f5b4b7e98874f9c79da419cf04" offset="00000" />
 			</dataarea>
@@ -12211,11 +12212,11 @@ license:CC0
 		<info name="serial" value="FT-01"/>
 		<info name="release" value="19861112"/>
 		<info name="alt_title" value="ファミリートレーナー① アスレチックワールド"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="bandai 86 sp p" size="32768" crc="8c8fa83b" sha1="0ab64ab0a5629f60aebe7fe32910a4136e99e6b0" offset="00000" />
 			</dataarea>
@@ -12232,11 +12233,11 @@ license:CC0
 		<info name="serial" value="FT-01"/>
 		<info name="release" value="19861112"/>
 		<info name="alt_title" value="ファミリートレーナー① アスレチックワールド"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="sp p" size="32768" crc="87738f85" sha1="5c8a3081990e6a9ef127e70e05b38c5c37cd58c6" offset="00000" />
 			</dataarea>
@@ -12253,11 +12254,11 @@ license:CC0
 		<info name="serial" value="FT-02"/>
 		<info name="release" value="19861223"/>
 		<info name="alt_title" value="ファミリートレーナー② ランニングスタジアム"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="horizontal" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="runp" size="32768" crc="8a5b72c0" sha1="796122db71ecf4cc639d5c45b6b824b1f8b02957" offset="00000" />
 			</dataarea>
@@ -12274,11 +12275,11 @@ license:CC0
 		<info name="serial" value="FT-03"/>
 		<info name="release" value="19870226"/>
 		<info name="alt_title" value="ファミリートレーナー③ エアロビスタジオ"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bandai_pt554" />
 			<feature name="pcb" value="BANDAI-PT-554" />
 			<feature name="mirroring" value="horizontal" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="aerob pr" size="32768" crc="f8da2506" sha1="c14075b1b7c98b684870e8d85b7ff2b462e3cd10" offset="00000" />
 			</dataarea>
@@ -12299,11 +12300,11 @@ license:CC0
 		<info name="serial" value="FT-04"/>
 		<info name="release" value="19870528"/>
 		<info name="alt_title" value="ファミリートレーナー④ ジョギングレース"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-74*161/32" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="bandai87 jg pr" size="32768" crc="7e704a14" sha1="4b5af9b5622e1cec310e8cb741db642ac38126ef" offset="00000" />
 			</dataarea>
@@ -12320,11 +12321,11 @@ license:CC0
 		<info name="serial" value="FT-05"/>
 		<info name="release" value="19870731"/>
 		<info name="alt_title" value="ファミリートレーナー⑤ 迷路大作戦"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="131072">
 				<rom name="ba-87 md-p" size="131072" crc="ad3df455" sha1="a8a5d1e7cc7d8a726a8edc66d947ef0de9f94ba4" offset="00000" />
 			</dataarea>
@@ -12341,11 +12342,11 @@ license:CC0
 		<info name="serial" value="FT-07"/>
 		<info name="release" value="19871127"/>
 		<info name="alt_title" value="ファミリートレーナー⑦ ファミトレ大運動会"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="ba-87 ft7-prg" size="32768" crc="ca26a0f1" sha1="f4bcd81e2eba429e0c4bd829ba034a8f1a05ff42" offset="00000" />
 			</dataarea>
@@ -12362,11 +12363,11 @@ license:CC0
 		<info name="serial" value="FT-08"/>
 		<info name="release" value="19871201"/>
 		<info name="alt_title" value="ファミリートレーナー⑧ 突撃!風雲たけし城"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="ba-takeshi-prg" size="32768" crc="59794f2d" sha1="06f424509451b30682362b7bc6c23d02d34ee930" offset="00000" />
 			</dataarea>
@@ -12383,11 +12384,11 @@ license:CC0
 		<info name="serial" value="FT-09"/>
 		<info name="release" value="19881220"/>
 		<info name="alt_title" value="ファミリートレーナー⑨ 風雲たけし城二"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="gxrom" />
 			<feature name="pcb" value="BANDAI-GNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="131072">
 				<rom name="ba-takeshi 2 pro" size="131072" crc="ee11fe78" sha1="e95b3a144d6e43f7f7d583339e1ef244f1eb08c8" offset="00000" />
 			</dataarea>
@@ -14361,7 +14362,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gegege" cloneof="ninjakid" supported="no">
+	<software name="gegege" cloneof="ninjakid">
 		<description>GeGeGe no Kitarou - Youkai Daimakyou (Japan)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -15676,7 +15677,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgnu" cloneof="guardlgn" supported="no">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="guardlgnu" cloneof="guardlgn" supported="partial">
 		<description>The Guardian Legend (USA)</description>
 		<year>1989</year>
 		<publisher>Brøderbund</publisher>
@@ -15695,7 +15697,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgn" supported="no">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="guardlgn" supported="partial">
 		<description>The Guardian Legend (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -15714,7 +15717,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardic" cloneof="guardlgn" supported="no">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="guardic" cloneof="guardlgn" supported="partial">
 		<description>Guardic Gaiden (Japan)</description>
 		<year>1987</year>
 		<publisher>Irem</publisher>
@@ -15961,11 +15965,11 @@ license:CC0
 		<info name="serial" value="HVC-GY, NES-GY-USA, NES-GY-(FRA/GBR)"/>
 		<info name="release" value="19850813 (JPN), 198510xx (USA), 1985xxxx (Euro)"/>
 		<info name="alt_title" value="ジャイロ"/>
+		<sharedfeat name="special_default" value="rob"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="HVC-NROM-256" /> <!-- also found with NES-NROM-256 pcb -->
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="rob" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-gy-0 prg" size="32768" crc="21b099f3" sha1="76103abe07c1cca6fc4107e35847f4e959f5e5bb" offset="00000" />
 			</dataarea>
@@ -19111,7 +19115,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jesus" supported="no">
+	<software name="jesus">
 		<description>Jesus - Kyoufu no Bio Monster (Japan)</description>
 		<year>1989</year>
 		<publisher>King Records</publisher>
@@ -23214,7 +23218,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mjtaikai" supported="no">
+	<software name="mjtaikai">
 		<description>Mahjong Taikai (Japan)</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
@@ -24475,7 +24479,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mendel" supported="no">
+	<software name="mendel">
 		<description>Mendel Palace (USA)</description>
 		<year>1990</year>
 		<publisher>Hudson Soft</publisher>
@@ -24798,6 +24802,94 @@ license:CC0
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-w4-0 chr" size="131072" crc="45784a2c" sha1="1aa46bb47d15d2b4ccaaa3af7eb6ebc875f3e21f" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- These five prototypes were development builds found in zip files -->
+	<software name="mickmack">
+		<!-- Build date: 9 July 1993 11:32:06 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930709)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="38960ce6" sha1="973ecc6714098115719235e68f4bd5d49710f7d6" />
+				<!-- "Fixed" ROM had this change. Changes an IRQ disable to a bank select. Needed? -->
+				<!-- <rom value="0x80" size="1" offset="0x1e028" loadflag="fill" /> -->
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x1e400" crc="e708cfcf" sha1="4267be581c9aa147024eea020736aa0435df9e5f" />
+				<rom value="0x00" size="0x1c00" offset="0x1e400" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack1" cloneof="mickmack">
+		<!-- Build date: 30 June 1993 14:11:52 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930630)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="38593a7d" sha1="9f0dde1399073f4d66496308bfa32c2193cce138" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x1e400" crc="e708cfcf" sha1="4267be581c9aa147024eea020736aa0435df9e5f" />
+				<rom value="0x00" size="0x1c00" offset="0x1e400" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack2" cloneof="mickmack">
+		<!-- Build date: 16 June 1993 16:27:08 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930616)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="363cf68f" sha1="0b6a02662893618197f14ed97660074073915363" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x16400" crc="0f6b18b5" sha1="a41ae5747c149e91b92889f7f3338eef07a6d7bb" />
+				<rom value="0x00" size="0x9c00" offset="0x16400" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack3" cloneof="mickmack">
+		<!-- Build date: 28 May 1993 18:16:30 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930528)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="dd4ca37f" sha1="ad6c20f26781a5d804a82b8b19eef5c2f5feba0f" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x15800" crc="5df34bc5" sha1="a7fb017a86143aaabb9e8162f0d3d4406fdee7a4" />
+				<rom value="0x00" size="0xa800" offset="0x15800" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack4" cloneof="mickmack">
+		<!-- Build date: 28 May 1993 19:18:24 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930528, alt)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="251b679f" sha1="6354c17c54e76daee57748a325650e0439fb4ca7" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x15800" crc="5df34bc5" sha1="a7fb017a86143aaabb9e8162f0d3d4406fdee7a4" />
+				<rom value="0x00" size="0xa800" offset="0x15800" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -26292,7 +26384,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mutantv" supported="no">
+	<software name="mutantv">
 		<description>The Mutant Virus (USA)</description>
 		<year>1992</year>
 		<publisher>American Softworks</publisher>
@@ -27162,8 +27254,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Missing sprites -->
-	<software name="ninjajag" cloneof="squashed" supported="no">
+	<software name="ninjajag" cloneof="squashed">
 		<description>Ninja Jajamaru - Ginga Daisakusen (Japan)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -27182,7 +27273,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ninjakid" supported="no">
+	<software name="ninjakid">
 		<description>Ninja Kid (USA)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -27221,6 +27312,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Unlike the other clones this plays the entire intro song to a black screen THEN plays the intro story scenes sans music -->
 	<software name="nryuken2" cloneof="shadwar2" supported="partial">
 		<description>Ninja Ryukenden II - Ankoku no Jashinken (Japan)</description>
 		<year>1990</year>
@@ -29404,8 +29496,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes when you dial a phone number -->
-	<software name="portopia" supported="no">
+	<software name="portopia">
 		<description>Portopia Renzoku Satsujin Jiken (Japan)</description>
 		<year>1985</year>
 		<publisher>Enix</publisher>
@@ -30137,7 +30228,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="qix" supported="no">
+	<software name="qix">
 		<description>Qix (USA)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
@@ -30255,7 +30346,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="quinty" cloneof="mendel" supported="no">
+	<software name="quinty" cloneof="mendel">
 		<description>Quinty (Japan)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
@@ -32181,7 +32272,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="romancia" supported="no"> <!-- frozen on black screen at power on -->
+<!-- severe status bar flickering (DMC IRQ timing issue?) -->
+	<software name="romancia" supported="no">
 		<description>Romancia (Japan)</description>
 		<year>1987</year>
 		<publisher>Tokyo Shoseki</publisher>
@@ -33971,6 +34063,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Among the many issues the entire screen oddly and incessantly scrolls down no matter what's on it -->
 	<software name="shin4num" supported="no">
 		<description>Shin 4-nin Uchi Mahjong - Yakuman Tengoku (Japan)</description>
 		<year>1991</year>
@@ -35869,8 +35962,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Missing sprites -->
-	<software name="squashed" supported="no">
+	<software name="squashed">
 		<description>Squashed (USA, prototype)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -35898,11 +35990,11 @@ license:CC0
 		<info name="release" value="198510xx (USA)"/>
 		<info name="release" value="1985? (Europe)"/>
 		<info name="alt_title" value="ブロック"/>
+		<sharedfeat name="special_default" value="rob"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="HVC-NROM-256" /> <!-- also found with NES-NROM-256 pcb -->
 			<feature name="mirroring" value="horizontal" />
-			<feature name="peripheral" value="rob" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-bl-0 prg" size="32768" crc="4ee735c1" sha1="36b6b30f451c3b4a48464bee9a144c873ae04cc7" offset="00000" />
 			</dataarea>
@@ -39812,7 +39904,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="timelordu" cloneof="timelord">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="timelordu" cloneof="timelord" supported="partial">
 		<description>Time Lord (USA)</description>
 		<year>1990</year>
 		<publisher>Milton Bradley</publisher>
@@ -39830,7 +39923,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="timelord">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="timelord" supported="partial">
 		<description>Time Lord (Europe)</description>
 		<year>1991</year>
 		<publisher>Milton Bradley</publisher>
@@ -42092,7 +42186,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wmaniau" cloneof="wmania" supported="no">
+	<software name="wmaniau" cloneof="wmania">
 		<description>WWF WrestleMania (USA)</description>
 		<year>1989</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -42118,7 +42212,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wmania" supported="no">
+	<software name="wmania">
 		<description>WWF WrestleMania (Europe)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -44635,10 +44729,10 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		<description>Playbox BASIC (Japan, V1.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="playbox basic v1.0.prg" size="32768" crc="da03d908" sha1="474869bb5882928a481e58ced0adcbb1b1ad18f9" status="baddump" />
 			</dataarea>
@@ -44656,11 +44750,11 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		<description>Playbox BASIC (Japan, V0.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb" value="HVC-FAMILYBASIC" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="2" size="16384" crc="c8c15b11" sha1="eba73a34e44191e60b4411886b83f53cc92d69b1" offset="0x0000" />
 				<rom name="1" size="16384" crc="2a5e0348" sha1="aa09440f89b0ecd6a4a6e00a90b79e0d313c753e" offset="0x4000" />
@@ -47131,11 +47225,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-R-128-01" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-0 a" size="16384" crc="8ece0244" sha1="fa16715f19dc326b855687a701459f3f46353d9f" offset="0x00000" />
 				<rom name="hvc-fb1-0 b" size="16384" crc="e61e0cda" sha1="d415da86ae1d36f9924183dc8c1ab0ce61b5a270" offset="0x04000" />
@@ -47509,7 +47603,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="gegegep" cloneof="ninjakid" supported="no">
+	<software name="gegegep" cloneof="ninjakid">
 		<description>GeGeGe no Kitarou - Youkai Daimakyou (Japan, prototype)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -48646,7 +48740,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="kyorolnd" cloneof="casteln">
+<!-- has buzz instead of background music in game -->
+	<software name="kyorolnd" cloneof="casteln" supported="partial">
 		<description>Kyoro-chan Land (Japan)</description>
 		<year>1992</year>
 		<publisher>Hiro</publisher>
@@ -49867,8 +49962,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Missing sprites -->
-	<software name="ninjajagp" cloneof="squashed" supported="no">
+	<software name="ninjajagp" cloneof="squashed">
 		<description>Ninja Jajamaru - Ginga Daisakusen (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -71486,8 +71580,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes as soon as you get killed by any enemy -->
-	<software name="doordoorh" cloneof="doordoor" supported="no">
+	<software name="doordoorh" cloneof="doordoor">
 		<description>Door Door (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -71786,7 +71879,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="gegegeh" cloneof="ninjakid" supported="no">
+	<software name="gegegeh" cloneof="ninjakid">
 		<description>GeGeGe no Kitarou - Youkai Daimakyou (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -75792,7 +75885,7 @@ Other
 	</software>
 
 <!-- is the following also hacked?!? -->
-	<software name="btoadsddh" cloneof="btoadsdd">
+	<software name="btoadsddh" cloneof="btoadsdd" supported="no"> <!-- Same issue as US release -->
 		<description>Battletoads &amp; Double Dragon - The Ultimate Team (pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -78731,7 +78824,8 @@ We include them here as reference if they should coincide with later revisions o
 		</part>
 	</software>
 
-	<software name="cvania3kc" cloneof="cvania3">
+<!-- Same issue as US release -->
+	<software name="cvania3kc" cloneof="cvania3" supported="partial">
 		<description>Castlevania III - Dracula's Curse (ripped from PC Konami Classics)</description>
 		<year>200?</year>
 		<publisher>Konami</publisher>

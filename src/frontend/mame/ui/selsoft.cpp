@@ -87,6 +87,8 @@ public:
 		, m_filter_type(software_filter::ALL)
 		, m_swinfo()
 		, m_searchlist()
+		, m_right_panel(menu.right_panel())
+		, m_right_image(menu.right_image())
 	{
 		// add start empty item
 		m_swinfo.emplace_back(*menu.m_system.driver);
@@ -347,6 +349,11 @@ public:
 		return m_searchlist;
 	}
 
+	u8 right_panel() const { return m_right_panel; }
+	u8 right_image() const { return m_right_image; }
+	void set_right_panel(u8 index) { m_right_panel = index; }
+	void set_right_image(u8 index) { m_right_image = index; }
+
 private:
 	icon_cache                      m_icons;
 	bool                            m_has_empty_start;
@@ -355,6 +362,9 @@ private:
 	software_filter::type           m_filter_type;
 	std::vector<ui_software_info>   m_swinfo;
 	std::vector<search_item>        m_searchlist;
+
+	u8                              m_right_panel;
+	u8                              m_right_image;
 
 	std::unique_ptr<std::thread>    m_search_thread;
 };
@@ -374,8 +384,21 @@ menu_select_software::menu_select_software(mame_ui_manager &mui, render_containe
 
 	using machine_data_cache = util::lru_cache_map<game_driver const *, std::shared_ptr<machine_data> >;
 	auto &cached(mui.get_session_data<menu_select_software, machine_data_cache>(8)[system.driver]);
-	if (!cached)
+	if (cached)
+	{
+		// restore last right panel settings for this machine
+		set_right_panel(cached->right_panel());
+		set_right_image(cached->right_image());
+	}
+	else
+	{
+		// restore last right panel settings from UI options
+		ui_options &moptions = ui().options();
+		set_right_panel(moptions.software_right_panel());
+		set_right_image(moptions.software_right_image());
+
 		cached = std::make_shared<machine_data>(*this);
+	}
 	m_data = cached;
 
 	m_filter_highlight = m_data->filter_type();
@@ -419,12 +442,12 @@ void menu_select_software::handle(event const *ev)
 			break;
 
 		case IPT_UI_LEFT:
-			if (ui_globals::rpanel == RP_IMAGES)
+			if (right_panel() == RP_IMAGES)
 			{
 				// Images
 				previous_image_view();
 			}
-			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
+			else if (right_panel() == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view--;
@@ -433,12 +456,12 @@ void menu_select_software::handle(event const *ev)
 			break;
 
 		case IPT_UI_RIGHT:
-			if (ui_globals::rpanel == RP_IMAGES)
+			if (right_panel() == RP_IMAGES)
 			{
 				// Images
 				next_image_view();
 			}
-			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
+			else if (right_panel() == RP_INFOS && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view++;
@@ -500,6 +523,22 @@ void menu_select_software::handle(event const *ev)
 
 	// if we're in an error state, overlay an error message
 	draw_error_text();
+}
+
+//-------------------------------------------------
+//  menu_deactivated
+//-------------------------------------------------
+
+void menu_select_software::menu_deactivated()
+{
+	menu_select_launch::menu_deactivated();
+
+	// save last right panel settings
+	m_data->set_right_panel(right_panel());
+	m_data->set_right_image(right_image());
+	ui_options &mopt = ui().options();
+	mopt.set_value(OPTION_SOFTWARE_RIGHT_PANEL, right_panel_config_string(), OPTION_PRIORITY_CMDLINE);
+	mopt.set_value(OPTION_SOFTWARE_RIGHT_IMAGE, right_image_config_string(), OPTION_PRIORITY_CMDLINE);
 }
 
 //-------------------------------------------------
@@ -567,7 +606,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 	}
 
 	// configure the custom rendering
-	skip_main_items = 0;
+	m_skip_main_items = 0;
 	customtop = 4.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
 	custombottom = 4.0f * ui().get_line_height() + 4.0f * ui().box_tb_border();
 

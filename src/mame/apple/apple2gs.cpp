@@ -415,11 +415,14 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 #endif
 
-	u8 keyglu_mcu_read(u8 offset);
-	void keyglu_mcu_write(u8 offset, u8 data);
+	[[maybe_unused]] u8 keyglu_mcu_read(u8 offset);
+	[[maybe_unused]] void keyglu_mcu_write(u8 offset, u8 data);
 #if RUN_ADB_MICRO
 	u8 keyglu_816_read(u8 offset);
 	void keyglu_816_write(u8 offset, u8 data);
+
+	u8 m_adb_p2_last, m_adb_p3_last;
+	int m_adb_reset_freeze = 0;
 #endif
 	void keyglu_regen_irqs();
 
@@ -1460,6 +1463,10 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_transchar));
 	save_item(NAME(m_anykeydown));
 	save_item(NAME(m_repeatdelay));
+#else
+	save_item(NAME(m_adb_p2_last));
+	save_item(NAME(m_adb_p3_last));
+	save_item(NAME(m_adb_reset_freeze));
 #endif
 	save_item(m_mouse_x, "MX");
 	save_item(m_mouse_y, "MY");
@@ -1480,6 +1487,10 @@ void apple2gs_state::machine_start()
 
 void apple2gs_state::machine_reset()
 {
+	#if RUN_ADB_MICRO
+	m_adb_p2_last = m_adb_p3_last = 0;
+	m_adb_reset_freeze = 0;
+	#endif
 	m_page2 = false;
 	m_romswitch = false;
 	m_video->m_page2 = false;
@@ -2260,49 +2271,49 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return uKeyboardC010;
 #endif
 		case 0x11:  // read LCRAM2 (LC Dxxx bank)
-			return uKeyboardC010 | (m_lcram2 ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_lcram2 ? 0x80 : 0x00);
 
 		case 0x12:  // read LCRAM (is LC readable?)
-			return uKeyboardC010 | (m_lcram ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_lcram ? 0x80 : 0x00);
 
 		case 0x13:  // read RAMRD
-			return uKeyboardC010 | (m_ramrd ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_ramrd ? 0x80 : 0x00);
 
 		case 0x14:  // read RAMWRT
-			return uKeyboardC010 | (m_ramwrt ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_ramwrt ? 0x80 : 0x00);
 
 		case 0x15:  // read INTCXROM
-			return uKeyboardC010 | (m_intcxrom ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_intcxrom ? 0x80 : 0x00);
 
 		case 0x16:  // read ALTZP
-			return uKeyboardC010 | (m_altzp ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_altzp ? 0x80 : 0x00);
 
 		case 0x17:  // read SLOTC3ROM
-			return uKeyboardC010 | (m_slotc3rom ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_slotc3rom ? 0x80 : 0x00);
 
 		case 0x18:  // read 80STORE
-			return uKeyboardC010 | (m_80store ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_80store ? 0x80 : 0x00);
 
 		case 0x19:  // read VBLBAR
-			return uKeyboardC010 | (m_screen->vblank() ? 0x00 : 0x80);
+			return (uKeyboardC010 & 0x7f) | (m_screen->vblank() ? 0x00 : 0x80);
 
 		case 0x1a:  // read TEXT
-			return uKeyboardC010 | (m_video->m_graphics ? 0x00 : 0x80);
+			return (uKeyboardC010 & 0x7f) | (m_video->m_graphics ? 0x00 : 0x80);
 
 		case 0x1b:  // read MIXED
-			return uKeyboardC010 | (m_video->m_mix ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->m_mix ? 0x80 : 0x00);
 
 		case 0x1c:  // read PAGE2
-			return uKeyboardC010 | (m_page2 ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_page2 ? 0x80 : 0x00);
 
 		case 0x1d:  // read HIRES
-			return uKeyboardC010 | (m_video->m_hires ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->m_hires ? 0x80 : 0x00);
 
 		case 0x1e:  // read ALTCHARSET
-			return uKeyboardC010 | (m_video->m_altcharset ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->m_altcharset ? 0x80 : 0x00);
 
 		case 0x1f:  // read 80COL
-			return uKeyboardC010 | (m_video->m_80col ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->m_80col ? 0x80 : 0x00);
 
 		case 0x22:  // TEXTCOL
 			return m_textcol;
@@ -2485,10 +2496,12 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_gameio->sw3_r() | uFloatingBus7;
 #if RUN_ADB_MICRO
 		case 0x61: // button 0 or Open Apple
-			return m_gameio->sw0_r() | uFloatingBus7;
+			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
+			if (m_adb_reset_freeze > 0) m_adb_reset_freeze--;
+			return m_gameio->sw0_r() | uFloatingBus7 | ((m_adb_p3_last & 0x20) ? 0x80 : 0);
 
 		case 0x62: // button 1 or Option
-			return m_gameio->sw1_r() | uFloatingBus7;
+			return m_gameio->sw1_r() | uFloatingBus7 | ((m_adb_p3_last & 0x10) ? 0x80 : 0);
 
 		case 0x63: // button 2 or SHIFT key
 			return m_gameio->sw2_r() | uFloatingBus7;
@@ -4178,7 +4191,14 @@ u8 apple2gs_state::adbmicro_p2_in()
 
 u8 apple2gs_state::adbmicro_p3_in()
 {
-	return 0xc7;
+	if (m_is_rom3)
+	{
+		return 0x00;    // TODO: 0x40 to remove Control Panel from the Control-Open Apple-Esc menu
+	}
+	else
+	{
+		return 0x07;
+	}
 }
 
 void apple2gs_state::adbmicro_p0_out(u8 data)
@@ -4192,6 +4212,14 @@ void apple2gs_state::adbmicro_p1_out(u8 data)
 
 void apple2gs_state::adbmicro_p2_out(u8 data)
 {
+	#if RUN_ADB_MICRO
+	if (!BIT(data, 5) && BIT(m_adb_p2_last, 5))
+	{
+		m_adb_reset_freeze = 2;
+		m_maincpu->reset();
+		m_video->m_newvideo = m_newvideo = 0x41;
+	}
+
 	if (!(data & 0x10))
 	{
 		if (m_adbmicro->are_port_bits_output(0, 0xff))
@@ -4207,6 +4235,9 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 	{
 		m_glu_kbd_y = data & 0xf;
 	}
+
+	m_adb_p2_last = data;
+	#endif
 }
 
 void apple2gs_state::adbmicro_p3_out(u8 data)
@@ -4218,6 +4249,13 @@ void apple2gs_state::adbmicro_p3_out(u8 data)
 		m_macadb->adb_linechange_w(!m_adb_line);
 #endif
 	}
+
+#if RUN_ADB_MICRO
+	if (m_adb_reset_freeze == 0)
+	{
+		m_adb_p3_last = data;
+	}
+#endif
 }
 #if ADB_HLE
 void apple2gs_state::set_adb_line(int linestate)
@@ -4237,7 +4275,6 @@ u8 apple2gs_state::keyglu_mcu_read(u8 offset)
 	{
 		m_glu_regs[GLU_KG_STATUS] &= ~KGS_COMMAND_FULL;
 		m_glu_mcu_read_kgs = false;
-//      printf("MCU reads COMMAND = %02x (drop command full)\n", rv);
 	}
 
 	// prime for the next command register read to clear the command full flag
@@ -4251,16 +4288,6 @@ u8 apple2gs_state::keyglu_mcu_read(u8 offset)
 
 void  apple2gs_state::keyglu_mcu_write(u8 offset, u8 data)
 {
-	// eat ADB SRQ notices - this shouldn't be necessary and breaks ROM 0/1 :(
-	//if ((offset == GLU_DATA) && (data == 0x08))
-	//{
-	//  return;
-	//}
-
-//  if (m_glu_regs[offset] != data)
-//  {
-//      printf("MCU writes %02x to GLU reg %x (PC=%x)\n", data, offset, m_adbmicro->pc());
-//  }
 	m_glu_regs[offset] = data;
 
 	switch (offset)
@@ -4289,14 +4316,13 @@ void  apple2gs_state::keyglu_mcu_write(u8 offset, u8 data)
 			break;
 
 		case GLU_MOUSEX:
-		case GLU_MOUSEY:
 			m_glu_regs[GLU_KG_STATUS] |= KGS_MOUSEX_FULL;
 			m_glu_regs[GLU_SYSSTAT] |= GLU_STATUS_MOUSEIRQ;
-			if (offset == GLU_MOUSEX)
-			{
-				keyglu_regen_irqs();
-			}
+			keyglu_regen_irqs();
 			m_glu_mouse_read_stat = false;  // signal next read will be mouse X
+			break;
+
+		case GLU_MOUSEY:
 			break;
 
 		case GLU_ANY_KEY_DOWN:  // bit 7 is the actual flag here
@@ -4311,9 +4337,7 @@ void  apple2gs_state::keyglu_mcu_write(u8 offset, u8 data)
 			m_glu_regs[GLU_KG_STATUS] |= KGS_DATA_FULL;
 			m_glu_regs[GLU_SYSSTAT] |= GLU_STATUS_DATAIRQ;
 			keyglu_regen_irqs();
-
 			m_glu_816_read_dstat = false;
-//          printf("MCU writes %02x to DATA\n", data);
 			break;
 	}
 }
@@ -4353,6 +4377,7 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 			{
 				m_glu_mouse_read_stat = 1;
 				m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
+				m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
 				keyglu_regen_irqs();
 				return m_glu_regs[GLU_MOUSEX];
 			}
@@ -4445,7 +4470,6 @@ void apple2gs_state::keyglu_regen_irqs()
 	{
 		bIRQ = true;
 	}
-
 	if (bIRQ)
 	{
 		raise_irq(IRQS_ADB);
@@ -4719,6 +4743,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	M50741(config, m_adbmicro, A2GS_MASTER_CLOCK/8);
+	m_adbmicro->set_pullups<2>(0x20);
 	m_adbmicro->read_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_in));
 	m_adbmicro->write_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_out));
 	m_adbmicro->read_p<1>().set(FUNC(apple2gs_state::adbmicro_p1_in));
@@ -4731,6 +4756,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 #if ADB_HLE
 	MACADB(config, m_macadb, A2GS_MASTER_CLOCK/8);
 	m_macadb->set_mcu_mode(true);
+	m_macadb->set_iigs_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
 #endif
 
@@ -4854,6 +4880,7 @@ void apple2gs_state::apple2gsr1(machine_config &config)
 	m_ram->set_default_size("1280K").set_extra_options("256K,512K,768K,1M,2M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
 
 	M50740(config.replace(), m_adbmicro, A2GS_MASTER_CLOCK/8);
+	m_adbmicro->set_pullups<2>(0x20);
 	m_adbmicro->read_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_in));
 	m_adbmicro->write_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_out));
 	m_adbmicro->read_p<1>().set(FUNC(apple2gs_state::adbmicro_p1_in));

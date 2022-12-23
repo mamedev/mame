@@ -1780,6 +1780,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightj3",    CPS_B_03,     mapper_S222B },   // equivalent to S224B
 	{"ffightj4",    CPS_B_05,     mapper_S222B },   // equivalent to S224B
 	{"ffightjh",    CPS_B_01,     mapper_S224B },   // wrong, ffightjh hack doesn't even use the S222B PAL, since replaced with a GAL.
+	{"ffightae",    CPS_B_21_DEF, mapper_S224B,  0x36 },
 	{"1941",        CPS_B_05,     mapper_YI24B },
 	{"1941r1",      CPS_B_05,     mapper_YI24B },
 	{"1941u",       CPS_B_05,     mapper_YI24B },

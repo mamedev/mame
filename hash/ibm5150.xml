@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Initial compilation work by K1W1 and Telanus
 
@@ -2599,7 +2599,7 @@ Draws half height in CGA mode if a [VGA] is attached (verify)
 	</software>
 
 	<software name="zaxxon">
-		<description>Zaxxon</description>
+		<description>Zaxxon (cracked)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="usage" value="PC Booter" />
@@ -2671,7 +2671,7 @@ Draws half height in CGA mode if a [VGA] is attached (verify)
 	</software>
 
 	<software name="zyll">
-		<description>Zyll</description>
+		<description>Zyll (cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="usage" value="PC Booter" />
@@ -2894,6 +2894,30 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Banner Blue Movie Guide.img" size="737280" crc="d3a65e62" sha1="c68a88d351119502a8a6112a8b4d7c76a522c40b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombuzal">
+		<description>Bombuzal</description>
+		<year>1989</year>
+		<publisher>Image Works</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="Bombuzal [Image Works] [1989] [5.25DD] [Disk 1 of 3].img" size="368640" crc="01e773bb" sha1="4aa64f68e3e7e044461454774a2d2b219ccad570"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="EGA + Tandy"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="Bombuzal [Image Works] [1989] [5.25DD] [Disk 2 of 3].img" size="368640" crc="c195547d" sha1="92dede1856756ac71e28aa4361ba5622d63dcc5d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="CGA"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="Bombuzal [Image Works] [1989] [5.25DD] [Disk 3 of 3].img" size="368640" crc="da9473dd" sha1="5dd0d47e48d2a84611e4a1000a50211c437ddf5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8506,9 +8530,12 @@ No title screen if running from floppy, btanb?
 	</software>
 
 	<software name="arcblock">
-		<description>Arcade Blockbusters! (Ghosts'n Goblins &amp; Sarge)</description>
+		<description>Arcade Blockbusters!</description>
 		<year>1991</year>
-		<publisher>Capcom</publisher>
+		<publisher>Capcom / Hi-Tech Expressions</publisher>
+		<notes><![CDATA[
+Compilation includes: Ghosts'n Goblins / Pocket Rockets / Sarge
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Arcade Blockbusters (USA).img" size="737280" crc="73e7a7bd" sha1="00bd672d6284b08782777c7005be13b3b8d3c1cc"/>
@@ -8523,6 +8550,29 @@ No title screen if running from floppy, btanb?
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="arcadefb.360" size="368640" crc="da3a302f" sha1="61a3b9dcb9ffd72326abf4df89c35ffa2a288288"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcahits">
+		<description>Arcade Hits</description>
+		<year>1991</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<notes><![CDATA[
+Compilation includes:
+Disk 1: Cabal
+Disk 2: Side Arms / Street Fighter
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Cabal" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Arcade Hits [Hi-Tech] [1991] [5.25DD] [Disk 1 of 2].img" size="368640" crc="47b4d1c7" sha1="81feab1b381da26bfa158bf1de41c055ccfdb6df"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Sidearms / Street Fighter" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Arcade Hits [Hi-Tech] [1991] [5.25DD] [Disk 2 of 2].img" size="368640" crc="e2b11c16" sha1="94984c2827eee98e725a95419dd5992bc076c3bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9401,16 +9451,17 @@ ibmpcjr: hangs on title screen with stuck note
 
 	<software name="cprogolf">
 		<description>California Pro Golf</description>
-		<year>1988</year>
+		<year>1989</year>
 		<publisher>Mastertronic</publisher>
+		<info name="developer" value="Andromeda Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="California Pro Golf [Mastertronic] [1988] [5.25DD] [Disk 1 of 2].img" size="368640" crc="e42f8d35" sha1="34703e62bc5d808cc6839e376785faafacc7236e"/>
+				<rom name="California Pro Golf [Mastertronic] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="e42f8d35" sha1="34703e62bc5d808cc6839e376785faafacc7236e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="California Pro Golf [Mastertronic] [1988] [5.25DD] [Disk 2 of 2].img" size="368640" crc="b76cf980" sha1="9b307fc2f9545edc4d678069348b5f37710ef63c"/>
+				<rom name="California Pro Golf [Mastertronic] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="b76cf980" sha1="9b307fc2f9545edc4d678069348b5f37710ef63c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13217,9 +13268,9 @@ Hangs when launching soccer.com
 	</software>
 
 	<software name="megaman">
-		<description>Mega Man</description>
+		<description>Mega Man (5.25")</description>
 		<year>1990</year>
-		<publisher>Capcom</publisher>
+		<publisher>Hi-Tech Expressions</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Mega Man (USA).img" size="368640" crc="1d82bd43" sha1="39f02096d6c9b20cf19bdc3542f3129f2e464bc2"/>
@@ -13227,10 +13278,21 @@ Hangs when launching soccer.com
 		</part>
 	</software>
 
+	<software name="megaman_35" cloneof="megaman">
+		<description>Mega Man (3.5")</description>
+		<year>1990</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Mega Man [Hi-Tech Expressions] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="36071b36" sha1="fce8195960bf0c6d43949a718217e7fb545ffd43"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="megaman3">
 		<description>Mega Man III (5.25")</description>
 		<year>1992</year>
-		<publisher>Hi Tech Expressions</publisher>
+		<publisher>Hi-Tech Expressions</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Mega Man 3 (USA) (v1.2) (5.25'') (Disk 1).img" size="368640" crc="c179fcd5" sha1="69d396c08f2401f650b012d6f2636a9c9fe9781e"/>
@@ -13246,7 +13308,7 @@ Hangs when launching soccer.com
 	<software name="megaman3_35" cloneof="megaman3">
 		<description>Mega Man III (3.5")</description>
 		<year>1992</year>
-		<publisher>Hi Tech Expressions</publisher>
+		<publisher>Hi-Tech Expressions</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Mega Man 3 (USA) (v1.2) (3.5'').img" size="737280" crc="9f40613b" sha1="f196af28dd74526294b4a790de76e81bbffc4c81"/>
@@ -13942,6 +14004,19 @@ Black screen after listing control scheme. Doesn't pass the protection check, th
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Platoon [Data East] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="d7ffc94f" sha1="7e2abcd1ea0173a66ec7f93827cd6b2223a8c232"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polepos">
+		<description>Pole Position</description>
+		<year>1988</year>
+		<publisher>Thunder Mountain</publisher>
+		<info name="developer" value="Namco" />
+		<info name="usage" value="only works on drive A:" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="Pole Position [Thunder Mountain] [1988] [5.25SS] [Disk 1 of 1].img" size="184320" crc="2cb270ac" sha1="2ed2eb92335f3a0902bed1dc277901f667d18ab6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15656,6 +15731,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>Street Fighting Man</description>
 		<year>1989</year>
 		<publisher>Mastertronic</publisher>
+		<info name="developer" value="Sculptured Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Street Fighting Man (1989)(Mastertronic)(Disk 1 of 2).dsk" size="368640" crc="949cdf13" sha1="89d6b45d0ec0a0ca46a90c27ad9376b827cf68a1"/>
@@ -15664,6 +15740,23 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Street Fighting Man (1989)(Mastertronic)(Disk 2 of 2).dsk" size="368640" crc="2e02db73" sha1="17bd0ca7c558e9908a9cb8de19024ade0ef70c24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfightmna" cloneof="sfightmn">
+		<description>Street Fighting Man (alt)</description>
+		<year>1989</year>
+		<publisher>Mastertronic</publisher>
+		<info name="developer" value="Sculptured Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Street Fighting Man [Mastertronic] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="949cdf13" sha1="89d6b45d0ec0a0ca46a90c27ad9376b827cf68a1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Street Fighting Man [Mastertronic] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="329f904a" sha1="a85d3f442e9ada0d89d8d11d4210fee8b1d67141"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15954,6 +16047,96 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Teenage Mutant Hero Turtles - The Coin-Op [Image Works] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="a9a418bf" sha1="2cddbacdb027d39f888845f78e7610ac601c7c22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmht">
+		<description>Teenage Mutant Hero Turtles (5.25")</description>
+		<year>1990</year>
+		<publisher>Ultra Games</publisher>
+		<notes><![CDATA[
+Disk 1 has a modified OEM ID and accessed file stamp
+]]></notes>
+		<info name="alt_title" value="Tortugas Ninjas" />
+		<info name="developer" value="Konami" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Teenage Mutant Hero Turtles [Ultra Games] [1990] [5.25DD] [Disk 1 of 4].img" size="368640" crc="7c959ffe" sha1="3a5d8bb595f90dffb8ae7059faaf4081ec87e78c" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Teenage Mutant Hero Turtles [Ultra Games] [1990] [5.25DD] [Disk 2 of 4].img" size="368640" crc="27bb035e" sha1="48de740a6ef7a7e7ef6425af31e604254c969891"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Teenage Mutant Hero Turtles [Ultra Games] [1990] [5.25DD] [Disk 3 of 4].img" size="368640" crc="d1b117ad" sha1="12be275954f1824a3ece233f03d49899e47f8e77"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Teenage Mutant Hero Turtles [Ultra Games] [1990] [5.25DD] [Disk 4 of 4].img" size="368640" crc="7e97fb7e" sha1="84d7d56ec39084275bd369c634d673c08fb699d9"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="tmht_es" cloneof="tmht">
+		<description>Teenage Mutant Hero Turtles (Spain, 5.25")</description>
+		<year>1990</year>
+		<publisher>MCM</publisher>
+		<info name="alt_title" value="Tortugas Ninjas" />
+		<info name="developer" value="Konami" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Teenage Mutant Hero Turtles (Spain) [MCM] [1990] [5.25DD] [Disk 1 of 4].img" size="368640" crc="c741f1fe" sha1="579c45c9076cab0970132d6f09172eb85e7dc832"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Teenage Mutant Hero Turtles (Spain) [MCM] [1990] [5.25DD] [Disk 2 of 4].img" size="368640" crc="5abff359" sha1="38eb129548176fb29d16e8def86a6be597893a67"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Teenage Mutant Hero Turtles (Spain) [MCM] [1990] [5.25DD] [Disk 3 of 4].img" size="368640" crc="187b0539" sha1="e4cf04c8d0f7a30a555426391710e2cd8178666b"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Teenage Mutant Hero Turtles (Spain) [MCM] [1990] [5.25DD] [Disk 4 of 4].img" size="368640" crc="7e97fb7e" sha1="84d7d56ec39084275bd369c634d673c08fb699d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmht_35es" cloneof="tmht">
+		<description>Teenage Mutant Hero Turtles (Spain, 3.5")</description>
+		<year>1990</year>
+		<publisher>MCM</publisher>
+		<notes><![CDATA[
+Disk 1 has a modified "go.bat" file
+]]></notes>
+		<info name="alt_title" value="Tortugas Ninjas" />
+		<info name="developer" value="Konami" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 &amp; 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Teenage Mutant Hero Turtles (Spain) [MCM] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="7aed9f2e" sha1="d6dd066b0504c8cc6ab31d726d6fa46ced89d08e" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 &amp; 4" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Teenage Mutant Hero Turtles (Spain) [MCM] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="b68eb50c" sha1="348b6c8b58a1da393328f884c08b76d4b73c7739"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16671,6 +16854,68 @@ Black screen, incomplete dump? Has autoexec.bat without command.com, requires to
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Zany Golf Program Disk 2.bin" size="368640" crc="a8cddc3d" sha1="1302026fe22d921dc4513330d33bc16566b583b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeliard">
+		<description>Zeliard (5.25")</description>
+		<year>1990</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Game Arts" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Zeliard [Sierra] [1990] [5.25DD] [Disk 1 of 3].img" size="368640" crc="7c0d3382" sha1="b87f7db6326b31ebf17cded19bb50a212ba51b81"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Zeliard [Sierra] [1990] [5.25DD] [Disk 2 of 3].img" size="368640" crc="60b2ab4e" sha1="0c51db72ae0540f5917c641f768d1d141ac429c0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Zeliard [Sierra] [1990] [5.25DD] [Disk 3 of 3].img" size="368640" crc="5d06480d" sha1="675c557dfee5d9e31f34eb39b2bea25f93f1286b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeliard_35" cloneof="zeliard">
+		<description>Zeliard (3.5")</description>
+		<year>1990</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Game Arts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Zeliard [Sierra] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="aa42915e" sha1="7e90ba433d1c8d0ff13e415a64a5c59904811719"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Zeliard [Sierra] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="96181d15" sha1="f17c3f8c6f149a269bfe5ac9007556fdf3bb3257"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeliard_35a" cloneof="zeliard">
+		<description>Zeliard (3.5", v2.0)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<notes><![CDATA[
+Disk 1 has a created "RESOURCE.CFG" file
+]]></notes>
+		<info name="developer" value="Game Arts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Zeliard (v2.0) [Sierra] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="1262c699" sha1="a7b70e74143a086d5c15f167ade43371782e93ef" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Zeliard (v2.0) [Sierra] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="1fb34823" sha1="94777bea1cfd5659fedc9c83c05806e857a84e2a"/>
 			</dataarea>
 		</part>
 	</software>

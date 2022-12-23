@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Aaron Giles
 
 //NL_CONTAINS elim zektor

@@ -13,7 +13,6 @@
 #include "pcectrl.h"
 
 
-// device type definition
 DECLARE_DEVICE_TYPE(PCE_JOYPAD2,       device_pce_control_port_interface)
 DECLARE_DEVICE_TYPE(PCE_JOYPAD2_TURBO, device_pce_control_port_interface)
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 TODO compatibility notes:
 - identify/translate all "loading Abort" causes;
@@ -13819,6 +13819,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<year>1990</year>
 		<publisher>Sharp</publisher>
 		<info name="alt_title" value="サイバリオン" />
+		<info name="usage" value="Supports analog joystick." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">

@@ -10986,6 +10986,7 @@ dynwarj                         // 4/1989 (c) 1989 (Japan)
 dynwarjr                        // 4/1989 (c) 1989 (Japan)
 ffight                          // 12/1989 (c) 1989 (World)
 ffighta                         // 12/1989 (c) 1989 (World)
+ffightae
 ffightj                         // 12/1989 (c) 1989 (Japan)
 ffightj1                        // 12/01/1990 (c) 1989 (Japan)
 ffightj2                        // 05/03/1990 (c) 1989 (Japan)
@@ -12459,6 +12460,9 @@ ctower                          // 1981.03 The Tower
 ctsttape                        // ?
 czeroize                        // 37 1983.10 Zeroize
 decocass                        //
+decodark                        //
+decodark16                      //
+decodark15                      //
 decomult                        //
 
 @source:dec/decstation.cpp
@@ -13611,12 +13615,7 @@ bullfgtrs                       // (c) 1984 Alpha Denshi Co./Sega
 equites                         // (c) 1984 Alpha Denshi Co.
 equitess                        // (c) 1984 Alpha Denshi Co./Sega
 gekisou                         // (c) 1985 Eastern
-hvoltage                        // (c) 1985 Alpha Denshi Co.
 kouyakyu                        // (c) 1985 Alpha Denshi Co.
-splndrbt                        // (c) 1985 Alpha Denshi Co.
-splndrbt2                       // (c) 1985 Alpha Denshi Co.
-splndrbta                       // (c) 1985 Alpha Denshi Co.
-splndrbtb                       // (c) 1985 Alpha Denshi Co.
 
 @source:ericsson/eispc.cpp
 epc                             // 1984 Ericsson PC
@@ -16413,10 +16412,11 @@ gunpey                          // (c) 2000 Banpresto
 gunsmoke                        // 11/1985 (c) 1985 (World)
 gunsmokeb                       //
 gunsmokej                       // 11/1985 (c) 1985 (Japan)
-gunsmokeu                       // 11/1985 (c) 1985 + Romstar (US)
-gunsmokeua                      // 11/1985 (c) 1985 (US)
-gunsmokeub                      // 11/1985 (c) 1985 (US)
-gunsmokeg                       //
+gunsmokeu                       // 04/1986 (c) 1986 + Romstar (US)
+gunsmokeua                      // 01/1986 (c) 1985 + Romstar (US)
+gunsmokeub                      // 11/1985 (c) 1985 + Romstar (US)
+gunsmokeuc                      // 11/1985 (c) 1985 + Romstar (US)
+gunsmokeg                       // 11/1985 (c) 1985 (Germany)
 
 @source:konami/gyruss.cpp
 gyruss                          // GX347 (c) 1983
@@ -40205,6 +40205,13 @@ ringball                        // not a gaelco game but based on splash code
 @source:gaelco/splash_ms.cpp
 splashms
 
+@source:alpha/splendor.cpp
+hvoltage                        // (c) 1985 Alpha Denshi Co.
+splndrbt                        // (c) 1985 Alpha Denshi Co.
+splndrbt2                       // (c) 1985 Alpha Denshi Co.
+splndrbta                       // (c) 1985 Alpha Denshi Co.
+splndrbtb                       // (c) 1985 Alpha Denshi Co.
+
 @source:igt/splus.cpp
 spset005                        // (c) 1993 IGT - International Game Technology
 spset015                        // (c) 1993 IGT - International Game Technology
@@ -43054,8 +43061,8 @@ pk6128c                         //
 vec1200                         //
 vector06                        //
 
-@source:skeleton/vector4.cpp
-vector4                         //
+@source:skeleton/vector3.cpp
+vector3                         //
 
 @source:miltonbradley/vectrex.cpp
 raaspec                         // (c) Roy Abel & Associates 1984
@@ -44319,7 +44326,7 @@ ww_l4                           //
 ww_l5                           //
 ww_lh5                          //
 ww_lh6                          //
-ww_p1                           //
+ww_p6                           //
 ww_p8                           //
 
 @source:pinball/wpc_s.cpp

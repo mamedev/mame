@@ -12,6 +12,7 @@
 #pragma once
 
 #include "bus/centronics/ctronics.h"
+#include "bus/msx/ctrl/ctrl.h"
 #include "imagedev/cassette.h"
 #include "machine/bankdev.h"
 #include "machine/74145.h"
@@ -44,42 +45,25 @@ public:
 		, m_cursor_timer(*this, "cursor")
 	{ }
 
-	void mz800(machine_config &config);
 	void mz700(machine_config &config);
 
-	void init_mz800();
 	void init_mz700();
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-private:
 	uint8_t mz700_e008_r();
 	void mz700_e008_w(uint8_t data);
-	uint8_t mz800_bank_0_r();
 	void mz700_bank_0_w(uint8_t data);
-	void mz800_bank_0_w(uint8_t data);
-	uint8_t mz800_bank_1_r();
 	void mz700_bank_1_w(uint8_t data);
 	void mz700_bank_2_w(uint8_t data);
 	void mz700_bank_3_w(uint8_t data);
 	void mz700_bank_4_w(uint8_t data);
 	void mz700_bank_5_w(uint8_t data);
 	void mz700_bank_6_w(uint8_t data);
-	uint8_t mz800_crtc_r();
-	void mz800_write_format_w(uint8_t data);
-	void mz800_read_format_w(uint8_t data);
-	void mz800_display_mode_w(uint8_t data);
-	void mz800_scroll_border_w(uint8_t data);
-	uint8_t mz800_ramdisk_r();
-	void mz800_ramdisk_w(uint8_t data);
-	void mz800_ramaddr_w(uint8_t data);
-	void mz800_palette_w(uint8_t data);
-	void mz800_cgram_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_RESET(mz700);
-	DECLARE_MACHINE_RESET(mz800);
 	uint32_t screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_cursor_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_other_callback);
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
@@ -88,18 +72,12 @@ private:
 	uint8_t pio_port_c_r();
 	void pio_port_a_w(uint8_t data);
 	void pio_port_c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mz800_z80pio_irq);
-	uint8_t mz800_z80pio_port_a_r();
-	void mz800_z80pio_port_a_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
 	void mz700_banke(address_map &map);
 	void mz700_io(address_map &map);
 	void mz700_mem(address_map &map);
-	void mz800_bankf(address_map &map);
-	void mz800_io(address_map &map);
-	void mz800_mem(address_map &map);
 
 	int m_mz700 = 0;                /* 1 if running on an mz700 */
 
@@ -111,8 +89,6 @@ private:
 	int m_mz700_ram_lock = 0;       /* 1 if ram lock is active */
 	int m_mz700_ram_vram = 0;       /* 1 if vram is banked in */
 
-	/* mz800 specific */
-	std::unique_ptr<uint8_t[]> m_cgram;
 	uint8_t *m_p_chargen = nullptr;
 
 	int m_mz700_mode = 0;           /* 1 if in mz700 mode */
@@ -129,7 +105,6 @@ private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t m_speaker_level = 0;
 	uint8_t m_prev_state = 0;
-	uint16_t m_mz800_ramaddr = 0;
 	uint8_t m_mz800_palette[4];
 	uint8_t m_mz800_palette_bank = 0;
 
@@ -147,6 +122,52 @@ private:
 
 	required_device<ttl74145_device> m_ls145;
 	required_device<timer_device> m_cursor_timer;
+};
+
+class mz800_state : public mz_state
+{
+public:
+	mz800_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mz_state(mconfig, type, tag)
+		, m_joy(*this, "joy%u", 1U)
+	{ }
+
+	void mz800(machine_config &config);
+
+	void init_mz800();
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	uint8_t mz800_bank_0_r();
+	void mz800_bank_0_w(uint8_t data);
+	uint8_t mz800_bank_1_r();
+
+	uint8_t mz800_crtc_r();
+	void mz800_write_format_w(uint8_t data);
+	void mz800_read_format_w(uint8_t data);
+	void mz800_display_mode_w(uint8_t data);
+	void mz800_scroll_border_w(uint8_t data);
+	uint8_t mz800_ramdisk_r();
+	void mz800_ramdisk_w(uint8_t data);
+	void mz800_ramaddr_w(uint8_t data);
+	void mz800_palette_w(uint8_t data);
+	void mz800_cgram_w(offs_t offset, uint8_t data);
+	uint32_t screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint8_t mz800_z80pio_port_a_r();
+	void mz800_z80pio_port_a_w(uint8_t data);
+	void pio_port_a_w(uint8_t data);
+
+	void mz800_bankf(address_map &map);
+	void mz800_io(address_map &map);
+	void mz800_mem(address_map &map);
+
+	required_device_array<msx_general_purpose_port_device, 2> m_joy;
+
+	std::unique_ptr<uint8_t[]> m_cgram;
+
+	uint16_t m_mz800_ramaddr = 0;
 };
 
 #endif // MAME_INCLUDES_MZ700_H

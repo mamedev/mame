@@ -1,143 +1,113 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
-	<element name="digit" defstate="10">
+	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="1.0" green="0.3" blue="0.0" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</led7seg>
 	</element>
 
-	<view name="Simple LEDs">
+	<view name="Score Panel">
 		<bounds left="-59" top="0" right="330" bottom="248" />
 
 		<screen index="0">
 			<bounds left="0" top="0" right="330" bottom="248" />
 		</screen>
 
-
 		<element name="digit0" ref="digit">
 			<bounds left="-15" top="18" right="-8" bottom="31" />
 		</element>
-
 		<element name="digit1" ref="digit">
 			<bounds left="-24" top="18" right="-17" bottom="31" />
 		</element>
-
 		<element name="digit2" ref="digit">
 			<bounds left="-33" top="18" right="-26" bottom="31" />
 		</element>
-
 		<element name="digit3" ref="digit">
 			<bounds left="-42" top="18" right="-35" bottom="31" />
 		</element>
-
 		<element name="digit4" ref="digit">
 			<bounds left="-51" top="18" right="-44" bottom="31" />
 		</element>
 
-
 		<element name="digit25" ref="digit">
 			<bounds left="-20" top="110" right="-15" bottom="120" />
 		</element>
-
 		<element name="digit26" ref="digit">
 			<bounds left="-26" top="110" right="-21" bottom="120" />
 		</element>
-
 		<element name="digit27" ref="digit">
 			<bounds left="-32" top="110" right="-27" bottom="120" />
 		</element>
-
 		<element name="digit28" ref="digit">
 			<bounds left="-38" top="110" right="-33" bottom="120" />
 		</element>
-
 		<element name="digit29" ref="digit">
 			<bounds left="-44" top="110" right="-39" bottom="120" />
 		</element>
 
-
 		<element name="digit20" ref="digit">
 			<bounds left="-20" top="95" right="-15" bottom="105" />
 		</element>
-
 		<element name="digit21" ref="digit">
 			<bounds left="-26" top="95" right="-21" bottom="105" />
 		</element>
-
 		<element name="digit22" ref="digit">
 			<bounds left="-32" top="95" right="-27" bottom="105" />
 		</element>
-
 		<element name="digit23" ref="digit">
 			<bounds left="-38" top="95" right="-33" bottom="105" />
 		</element>
-
 		<element name="digit24" ref="digit">
 			<bounds left="-44" top="95" right="-39" bottom="105" />
 		</element>
 
-
 		<element name="digit15" ref="digit">
 			<bounds left="-20" top="80" right="-15" bottom="90" />
 		</element>
-
 		<element name="digit16" ref="digit">
 			<bounds left="-26" top="80" right="-21" bottom="90" />
 		</element>
-
 		<element name="digit17" ref="digit">
 			<bounds left="-32" top="80" right="-27" bottom="90" />
 		</element>
-
 		<element name="digit18" ref="digit">
 			<bounds left="-38" top="80" right="-33" bottom="90" />
 		</element>
-
 		<element name="digit19" ref="digit">
 			<bounds left="-44" top="80" right="-39" bottom="90" />
 		</element>
 
-
 		<element name="digit10" ref="digit">
 			<bounds left="-20" top="65" right="-15" bottom="75" />
 		</element>
-
 		<element name="digit11" ref="digit">
 			<bounds left="-26" top="65" right="-21" bottom="75" />
 		</element>
-
 		<element name="digit12" ref="digit">
 			<bounds left="-32" top="65" right="-27" bottom="75" />
 		</element>
-
 		<element name="digit13" ref="digit">
 			<bounds left="-38" top="65" right="-33" bottom="75" />
 		</element>
-
 		<element name="digit14" ref="digit">
 			<bounds left="-44" top="65" right="-39" bottom="75" />
 		</element>
 
-
 		<element name="digit5" ref="digit">
 			<bounds left="-20" top="50" right="-15" bottom="60" />
 		</element>
-
 		<element name="digit6" ref="digit">
 			<bounds left="-26" top="50" right="-21" bottom="60" />
 		</element>
-
 		<element name="digit7" ref="digit">
 			<bounds left="-32" top="50" right="-27" bottom="60" />
 		</element>
-
 		<element name="digit8" ref="digit">
 			<bounds left="-38" top="50" right="-33" bottom="60" />
 		</element>
-
 		<element name="digit9" ref="digit">
 			<bounds left="-44" top="50" right="-39" bottom="60" />
 		</element>

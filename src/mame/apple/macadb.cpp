@@ -152,10 +152,10 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keyboard Enter : */
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")     PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command / Open Apple") PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command / Open Apple") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option / Solid Apple") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option / Solid Apple") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Arrow") PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Arrow") PORT_CODE(KEYCODE_RIGHT)    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -193,7 +193,8 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x5a
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)             PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) // 0x5b
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)             PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) // 0x5c
-	PORT_BIT(0xE000, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset / Power")           PORT_CODE(KEYCODE_F12)          // 0x5d (converted to 0x7f7f)
+	PORT_BIT(0xc000, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 macadb_device::macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -396,10 +397,15 @@ int macadb_device::adb_pollkbd(int update)
 		}
 	}
 
-//  if ((codes[0] != 0xff) || (codes[1] != 0xff))
-//  {
-//      printf("ADB keyboard: update %d keys %02x %02x\n", update, codes[0], codes[1]);
-//  }
+	// reset handling
+	if (codes[0] == 0x5d)
+	{
+		codes[0] = codes[1] = 0x7f;
+	}
+	else if (codes[0] == 0xdd)
+	{
+		codes[0] = codes[1] = 0xff;
+	}
 
 	// figure out if there was a change
 	if ((m_adb_currentkeys[0] != codes[0]) || (m_adb_currentkeys[1] != codes[1]))
@@ -592,7 +598,7 @@ void macadb_device::adb_talk()
 							break;
 					}
 
-					if (adb_pollkbd(0))
+					if ((adb_pollkbd(0)) && (!m_bIsIIGSMode))
 					{
 						m_adb_srqflag = true;
 					}
@@ -679,7 +685,7 @@ void macadb_device::adb_talk()
 							break;
 					}
 
-					if (adb_pollmouse())
+					if ((adb_pollmouse()) && (!m_bIsIIGSMode))
 					{
 						m_adb_srqflag = true;
 					}

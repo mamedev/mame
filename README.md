@@ -69,9 +69,9 @@ make vs2019 MSBUILD=1
 Where can I find out more?
 =============
 
-* [Official MAME Development Team Site](http://mamedev.org/) (includes binary downloads, wiki, forums, and more)
+* [Official MAME Development Team Site](https://mamedev.org/) (includes binary downloads, wiki, forums, and more)
 * [Official MESS Wiki](http://mess.redump.net/)
-* [MAME Testers](http://mametesters.org/) (official bug tracker for MAME and MESS)
+* [MAME Testers](https://mametesters.org/) (official bug tracker for MAME and MESS)
 
 
 Contributing
@@ -85,8 +85,12 @@ Some parts of the code follow [Allman style](https://en.wikipedia.org/wiki/Inden
 
 All contributors need to either add a standard header for license info (on new files) or inform us of their wishes regarding which of the following licenses they would like their code to be made available under: the [BSD-3-Clause](http://opensource.org/licenses/BSD-3-Clause) license, the [LGPL-2.1](http://opensource.org/licenses/LGPL-2.1), or the [GPL-2.0](http://opensource.org/licenses/GPL-2.0).
 
+See more specific [C++ Coding Guidelines](https://docs.mamedev.org/contributing/cxx.html) on our documentation web site.
+
+
 License
 =======
+
 The MAME project as a whole is made available under the terms of the
 [GNU General Public License, version 2](http://opensource.org/licenses/GPL-2.0)
 or later (GPL-2.0+), since it contains code made available under multiple

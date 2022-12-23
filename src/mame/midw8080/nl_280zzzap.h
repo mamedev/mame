@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Colin Douglas Howell
 #ifndef MAME_AUDIO_NL_280ZZZAP_H
 #define MAME_AUDIO_NL_280ZZZAP_H

@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Ivan Vangelista, Ryan Holtz
 #ifndef MAME_AUDIO_NL_FLYBALL_H
 #define MAME_AUDIO_NL_FLYBALL_H

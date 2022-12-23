@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="ibm5170_cdrom" description="IBM PC/AT CD-ROM images">
 
@@ -96,7 +96,7 @@ Demo/Shareware: "Bodycount", "Zone 66", "Save Our Pizzas", "Dangerous Dave", "Ca
 		<notes><![CDATA[
 CD-ROM includes
 Complete Game: "TV Sports Football"
-Demo/Shareware: "Ranger Fox", "Monster Bash", "Onesimus", "Turoid", "Peristroka"
+Demo/Shareware: "Ranger Fox", "Monster Bash", "Onesimus", "Turoid", "Perestroika"
 ]]></notes>
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />

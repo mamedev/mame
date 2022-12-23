@@ -158,8 +158,17 @@ protected:
 	void *get_selection_ptr() const
 	{
 		void *const selected_ref(get_selection_ref());
-		return (uintptr_t(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
+		return (uintptr_t(selected_ref) > m_skip_main_items) ? selected_ref : m_prev_selected;
 	}
+
+	u8 const right_panel() const { return m_right_panel; }
+	u8 const right_image() const { return m_image_view; }
+	char const *right_panel_config_string() const;
+	char const *right_image_config_string() const;
+	void set_right_panel(u8 index);
+	void set_right_image(u8 index);
+	void set_right_panel(std::string_view value);
+	void set_right_image(std::string_view value);
 
 	static std::string make_system_audit_fail_text(media_auditor const &auditor, media_auditor::summary summary);
 	static std::string make_software_audit_fail_text(media_auditor const &auditor, media_auditor::summary summary);
@@ -169,7 +178,7 @@ protected:
 	}
 
 	int         m_available_items;
-	int         skip_main_items;
+	int         m_skip_main_items;
 	void        *m_prev_selected;
 	int         m_total_lines;
 	int         m_topline_datsview;
@@ -322,9 +331,9 @@ private:
 
 	int                     m_right_visible_lines;  // right box lines
 
+	uint8_t                 m_right_panel;
 	bool                    m_has_icons;
 	bool                    m_switch_image;
-	bool                    m_default_image;
 	uint8_t                 m_image_view;
 	flags_cache             m_flags;
 };

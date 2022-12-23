@@ -13,33 +13,33 @@
     7       TRIG2   9       TR      In      Ack
     8       STROBE  7       TH      Out     Req
 
-    In analog mode, data is shifted out as eleven nybbles:
+    In analog mode, data is shifted out as twelve nybbles:
 
-          _           ____________________________________________
+          _           ________________________________________________________________
     Req    \_________/
-          ____    __    __    __    __    __    __    __    __
-    Ack       \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/
-                  _____       _____       _____       _____
-    L/H   XX\____/     \_____/     \_____/     \_____/     \_____/
-             ____ _____ _____ _____ _____ _____ _____ _____ _____
-    D     XXX____X_____X_____X_____X_____X_____X_____X_____X_____X
+          ____    __    __    __    __    __    __    __    __    __    __    __    __
+    Ack       \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/
+                  _____       _____       _____       _____       _____       _____
+    L/H   _______/     \_____/     \_____/     \_____/     \_____/     \_____/     \__
+              _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____
+    D     XXXX_____X_____X_____X_____X_____X_____X_____X_____X_____X_____X_____X_____X
 
     The falling edge on Req causes data output to start.  The host
     can't control the speed, it just polls the L/H and Ack lines to
     know when the data is ready to read.
 
-    Step    D0      D1      D2      D3
-     1      D       C       B/B'    A/A'
-     2      Select  Start   E2      E1
-     3      Y4      Y5      Y6      Y7
-     4      X4      X5      X6      X7
-     5      Z4      Z5      Z6      Z7
-     6      RZ4     RZ5     RZ6     RZ7
-     7      Y0      Y1      Y2      Y3
-     8      X0      X1      X2      X3
-     9      Z0      Z1      Z2      Z3
-    10      RZ0     RZ1     RZ2     RZ3
-    11      B'      A'      B       A
+    Step    D3      D2      D1      D0
+     1      A/A'    B/B'    C       D
+     2      E1      E2      Start   Select
+     3      Y7      Y6      Y5      Y4
+     4      X7      X6      X5      X4
+     5      Z7      Z6      Z5      Z4
+     6      RZ7     RZ6     RZ5     RZ4
+     7      Y3      Y2      Y1      Y0
+     8      X3      X2      X1      X0
+     9      Z3      Z2      Z1      Z0
+    10      RZ3     RZ2     RZ1     RZ0
+    11      A       B       A'      B'
     12      -       -       -       -
 
     In MD mode, each pair of nybbles is transmitted in reverse
@@ -81,6 +81,7 @@
     * Estimate thresholds in digital modes.
     * Implement trigger A/B rapid fire switches.
     * Implement channel shift switch (Y->X, X->Z, Z->X).
+    * Does channel shift affect digital mode?
     * Implement special modes (holding buttons on power-on):
      - Double displacement modes:
       + X/Y (hold SELECT + A')
@@ -177,8 +178,8 @@ u8 micom_xe_1a_device::out_r()
 			{
 				u8 const z = m_analog_callback(2);
 				u8 const result =
-						((0xc0 > z)  ? 0x01 : 0x00) | // Throttle Up
-						((0x40 <= z) ? 0x02 : 0x00) | // Throttle Down
+						((0x40 <= z) ? 0x01 : 0x00) | // Throttle Up
+						((0xc0 > z)  ? 0x02 : 0x00) | // Throttle Down
 						(BIT(buttons, 1) << 2) |      // C
 						(BIT(buttons, 0) << 3) |      // D
 						(BIT(buttons, 7) << 4) |      // E1
@@ -233,7 +234,7 @@ WRITE_LINE_MEMBER(micom_xe_1a_device::req_w)
 				m_data[2] = BIT(analog[2], 4, 4) | (BIT(analog[3], 4, 4) << 4);
 				m_data[3] = BIT(analog[0], 0, 4) | (BIT(analog[1], 0, 4) << 4);
 				m_data[4] = BIT(analog[2], 0, 4) | (BIT(analog[3], 0, 4) << 4);
-				m_data[5] = BIT(buttons, 8, 8) & ((BIT(buttons, 6, 2) << 2) | 0xf3);
+				m_data[5] = BIT(buttons, 8, 8) & ((BIT(buttons, 2, 2) << 2) | 0xf3);
 
 				// takes a while to respond
 				m_output_timer->adjust(attotime::from_nsec(50'000), 0);

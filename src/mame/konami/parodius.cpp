@@ -496,7 +496,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, parodius,  0,        parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius DA! (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiuse, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius DA! (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiusj, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius DA! (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiusa, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius DA! (Asia)",         MACHINE_SUPPORTS_SAVE )
+// note that export versions kept in the Japanese titlescreen
+GAME( 1990, parodius,  0,        parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius Da!: Shinwa kara Owarai e (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiuse, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius Da!: Shinwa kara Owarai e (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiusj, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius Da!: Shinwa kara Owarai e (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiusa, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius Da!: Shinwa kara Owarai e (Asia)",         MACHINE_SUPPORTS_SAVE )

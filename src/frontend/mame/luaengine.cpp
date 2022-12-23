@@ -1315,29 +1315,6 @@ void lua_engine::initialize()
 				}
 				return rot;
 			});
-	game_driver_type["type"] = sol::property(
-			[] (game_driver const &driver)
-			{
-				// FIXME: this shouldn't be called type - there's potendial for confusion with the device type
-				// also, this should eventually go away in favour of richer flags
-				std::string type;
-				switch (driver.flags & machine_flags::MASK_TYPE)
-				{
-				case machine_flags::TYPE_ARCADE:
-					type = "arcade";
-					break;
-				case machine_flags::TYPE_CONSOLE:
-					type = "console";
-					break;
-				case machine_flags::TYPE_COMPUTER:
-					type = "computer";
-					break;
-				default:
-					type = "other";
-					break;
-				}
-				return type;
-			});
 	game_driver_type["not_working"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) != 0; });
 	game_driver_type["supports_save"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) != 0; });
 	game_driver_type["no_cocktail"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) != 0; });

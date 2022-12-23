@@ -425,12 +425,12 @@ const char *core_options::simple_entry::value() const noexcept
 {
 	switch (type())
 	{
-	case core_options::option_type::BOOLEAN:
-	case core_options::option_type::INTEGER:
-	case core_options::option_type::FLOAT:
-	case core_options::option_type::STRING:
-	case core_options::option_type::PATH:
-	case core_options::option_type::MULTIPATH:
+	case option_type::BOOLEAN:
+	case option_type::INTEGER:
+	case option_type::FLOAT:
+	case option_type::STRING:
+	case option_type::PATH:
+	case option_type::MULTIPATH:
 		return m_data.c_str();
 
 	default:
@@ -502,12 +502,24 @@ bool core_options::simple_entry::internal_copy_value(const entry &that)
 	}
 	else
 	{
-		validate(simple->m_data);
+		switch (simple->type())
+		{
+		case option_type::BOOLEAN:
+		case option_type::INTEGER:
+		case option_type::FLOAT:
+		case option_type::STRING:
+		case option_type::PATH:
+		case option_type::MULTIPATH:
+			validate(simple->m_data);
 
-		m_data = simple->m_data;
-		m_data_unsubst = simple->m_data_unsubst;
+			m_data = simple->m_data;
+			m_data_unsubst = simple->m_data_unsubst;
 
-		return true;
+			return true;
+
+		default:
+			return false;
+		}
 	}
 }
 

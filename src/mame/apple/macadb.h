@@ -20,6 +20,10 @@ public:
 	macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_mcu_mode(bool bMCUMode) { m_bIsMCUMode = bMCUMode; }
+	// TODO: the IIgs microcontroller programs hate how we generate SRQs, and they already
+	// do round-robin polling so no data will be missed.  This lets us turn off SRQs for that case.
+	// We should see if we can make them happier, or just work on LLE ADB devices...
+	void set_iigs_mode(bool bIIGSMode) { m_bIsIIGSMode = bIIGSMode; }
 
 	auto via_clock_callback() { return write_via_clock.bind(); }
 	auto via_data_callback() { return write_via_data.bind(); }
@@ -44,7 +48,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	bool m_bIsMCUMode;
+	bool m_bIsMCUMode, m_bIsIIGSMode;
 
 	uint64_t m_last_adb_time;
 

@@ -1951,7 +1951,6 @@ extern const char UI_VERSION_TAG[];
 const char UI_VERSION_TAG[] = "# UI INFO ";
 
 // Globals
-uint8_t ui_globals::rpanel = 0;
 uint8_t ui_globals::curdats_view = 0;
 uint8_t ui_globals::cur_sw_dats_total = 0;
 uint8_t ui_globals::curdats_total = 0;

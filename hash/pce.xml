@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="pce" description="NEC PC-Engine cartridges">
 	<software name="1943kai">
@@ -67,6 +67,7 @@ license:CC0
 		<info name="serial" value="NAPH-1011"/>
 		<info name="release" value="19900928"/>
 		<info name="alt_title" value="アフターバーナーII"/>
+		<info name="usage" value="Supports XE-1AJ or XE-1AP analog controller via XHE-3 adapter." />
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="after burner ii (japan).pce" size="524288" crc="ca72a828" sha1="50b9d22fe5179aee5cb95022472714ef8483841f" />
@@ -2632,6 +2633,7 @@ license:CC0
 		<info name="serial" value="NAPH-1010"/>
 		<info name="release" value="19900831"/>
 		<info name="alt_title" value="オペレーション ウルフ"/>
+		<info name="usage" value="Supports XE-1AJ or XE-1AP analog controller via XHE-3 adapter." />
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="operation wolf (japan).pce" size="524288" crc="ff898f87" sha1="da2a28e2961fa295c4b8f55bd5a6ce6f1c58beb7" />
@@ -2674,6 +2676,7 @@ license:CC0
 		<info name="serial" value="NAPH-1016"/>
 		<info name="release" value="19901221"/>
 		<info name="alt_title" value="アウトラン"/>
+		<info name="usage" value="Supports XE-1AJ or XE-1AP analog controller via XHE-3 adapter." />
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="out run (japan).pce" size="524288" crc="e203f223" sha1="4db6d354171a6e5f81d17d11e1aca7278a1fa95e" />
@@ -3930,6 +3933,7 @@ license:CC0
 		<info name="serial" value="NAPH-1015"/>
 		<info name="release" value="19901207"/>
 		<info name="alt_title" value="サンダーブレード"/>
+		<info name="usage" value="Supports XE-1AJ or XE-1AP analog controller via XHE-3 adapter." />
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="thunder blade (japan).pce" size="524288" crc="ddc3e809" sha1="553f8026dd68e85cd17855adbf920b3971acfdc4" />
@@ -4415,7 +4419,7 @@ license:CC0
 
 
 	<software name="cdsysb" cloneof="cdsys">
-		<description>CD-Rom System Card (v1.0)</description>
+		<description>CD-ROM System Card (v1.0)</description>
 		<year>19??</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
@@ -4426,7 +4430,7 @@ license:CC0
 	</software>
 
 	<software name="cdsysa" cloneof="cdsys">
-		<description>CD-Rom System Card (v2.0)</description>
+		<description>CD-ROM System Card (v2.0)</description>
 		<year>19??</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
@@ -4437,7 +4441,7 @@ license:CC0
 	</software>
 
 	<software name="cdsys">
-		<description>CD-Rom System Card (v2.1)</description>
+		<description>CD-ROM System Card (v2.1)</description>
 		<year>19??</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
@@ -4459,7 +4463,7 @@ license:CC0
 	</software>
 
 	<software name="scdsys">
-		<description>Super CD-Rom System Card (v3.0)</description>
+		<description>CD-ROM² Super System Card (v3.0)</description>
 		<year>19??</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">

@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Couriersud
 
 //#rewritten with sed -e "s_^\(.*\)/\*\(.*\)\*/\(.*\)\$_\1\3 // \2_g"  ../macro/nlm_ttl74xx_lib.cpp

@@ -300,6 +300,7 @@ uint32_t turbo_state::get_sprite_bits(uint8_t road)
 
 	// loop over all live levels
 	for (int level = 0; level < 8; level++)
+	{
 		if (sprlive & (1 << level))
 		{
 			// latch the data and advance the offset
@@ -330,6 +331,7 @@ uint32_t turbo_state::get_sprite_bits(uint8_t road)
 				m_sprite_info.frac[level] -= 0x1000000;
 			}
 		}
+	}
 
 	return sprdata;
 }
@@ -509,10 +511,13 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						(((~grn >> mx) & 1) << 5) |     //    A5: CDG
 						(((~blu >> mx) & 1) << 6) |     //    A6: CDB
 						((m_fbcol & 6) << 6);           // A7-A8: COL1-2
-				dest[x + ix] = pr1121[offs];
+
+				if (cliprect.contains(x + ix, y))
+					dest[x + ix] = pr1121[offs];
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -646,6 +651,7 @@ uint32_t subroc3d_state::get_sprite_bits(uint8_t *plb)
 
 	// loop over all live levels
 	for (int level = 0; level < 8; level++)
+	{
 		if (m_sprite_info.lst & (1 << level))
 		{
 			// latch the data and advance the offset
@@ -675,6 +681,7 @@ uint32_t subroc3d_state::get_sprite_bits(uint8_t *plb)
 				m_sprite_info.frac[level] -= 0x800000;
 			}
 		}
+	}
 
 	return sprdata;
 }
@@ -758,8 +765,7 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					mux = 0;
 
 				// CD0-3 are selected from the sprite bits and MUX0-2 (p. 141)
-				sprbits = (sprbits >> (mux & 0x07)) & 0x01010101;
-				uint8_t cd = (sprbits >> (24-3)) | (sprbits >> (16-2)) | (sprbits >> (8-1)) | sprbits;
+				uint8_t cd = bitswap<4>(sprbits >> (mux & 0x07), 24, 16, 8, 0);
 
 				// MUX3 selects either CD0-3 or the foreground output (p. 141)
 				int finalbits;
@@ -772,10 +778,13 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				offs = (finalbits & 0x0f) |    // A0-A3: CD0-CD3
 						((mux & 0x08) << 1) |  //    A4: MUX3
 						(m_col << 5);          // A5-A8: COL0-COL3
-				dest[x + ix] = pr1419[offs];
+
+				if (cliprect.contains(x + ix, y))
+					dest[x + ix] = pr1419[offs];
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -858,6 +867,7 @@ uint32_t buckrog_state::get_sprite_bits(uint8_t *plb)
 
 	// loop over all live levels
 	for (int level = 0; level < 8; level++)
+	{
 		if (m_sprite_info.lst & (1 << level))
 		{
 			// latch the data and advance the offset
@@ -886,6 +896,7 @@ uint32_t buckrog_state::get_sprite_bits(uint8_t *plb)
 				m_sprite_info.frac[level] -= 0x800000;
 			}
 		}
+	}
 
 	return sprdata;
 }
@@ -955,8 +966,7 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				if (mux == 8) mux = 0xf;
 
 				// MUX then selects one of the sprites and selects CD0-3
-				sprbits = (sprbits >> (mux & 0x07)) & 0x01010101;
-				uint8_t cd = (sprbits >> (24-3)) | (sprbits >> (16-2)) | (sprbits >> (8-1)) | sprbits;
+				uint8_t cd = bitswap<4>(sprbits >> (mux & 0x07), 24, 16, 8, 0);
 
 				// this info goes into an LS148 8-to-3 decoder to determine the priorities (SH 5/5)
 
@@ -1000,9 +1010,11 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				}
 
 				// store the final bits for this pixel
-				dest[x + ix] = palbits;
+				if (cliprect.contains(x + ix, y))
+					dest[x + ix] = palbits;
 			}
 		}
 	}
+
 	return 0;
 }
