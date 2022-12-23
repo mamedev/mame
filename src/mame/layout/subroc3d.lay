@@ -22,6 +22,36 @@ license:CC0-1.0
 	</element>
 
 
+<!-- viewfinder (it's inside the cabinet, not in the scope) -->
+
+	<element name="view">
+		<disk>
+			<bounds x="0" y="0" width="100" height="100" />
+			<color red="0.3" green="0.3" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="1" y="1" width="98" height="98" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<disk>
+			<bounds x="25" y="25" width="50" height="50" />
+			<color red="0.3" green="0.3" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="26" y="26" width="48" height="48" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<rect>
+			<bounds x="49.5" y="0" width="1" height="100" />
+			<color red="0.3" green="0.3" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds x="0" y="49.5" width="100" height="1" />
+			<color red="0.3" green="0.3" blue="0.0" />
+		</rect>
+	</element>
+
+
 <!-- score panel -->
 
 	<group name="panel">
@@ -114,54 +144,71 @@ license:CC0-1.0
 		<collection name="Score Panel">
 			<group ref="panel"><bounds x="0" y="-0.472" width="4" height="0.472" /></group>
 		</collection>
+		<collection name="Viewfinder">
+			<element ref="view" blend="add"><bounds x="1.4" y="0.9" width="1.2" height="1.2" /></element>
+		</collection>
 	</view>
 
 	<!-- for the 3D Scope views, enable stereoscopic 3D DIP switch first -->
 
 	<view name="3D Scope Straight View">
-		<!-- parallel-eyed -->
-		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
-		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
-
-		<screen index="0"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
-		<element name="shutter" ref="shutter2"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
-
 		<collection name="Score Panel">
 			<group ref="panel"><bounds x="0" y="-0.472" width="4" height="0.472" /></group>
 			<group ref="panel"><bounds x="4.03" y="-0.472" width="4" height="0.472" /></group>
 		</collection>
+		<collection name="Viewfinder">
+			<element ref="view"><bounds x="1.4" y="0.9" width="1.2" height="1.2" /></element>
+			<element ref="view"><bounds x="5.43" y="0.9" width="1.2" height="1.2" /></element>
+		</collection>
+
+		<!-- parallel-eyed -->
+		<screen index="0" blend="add"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
+
+		<screen index="0" blend="add"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
+		<element name="shutter" ref="shutter2"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
 	</view>
 
 	<view name="3D Scope Cross View">
-		<!-- cross-eyed -->
-		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
-		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
-
-		<screen index="0"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
-		<element name="shutter" ref="shutter1"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
-
 		<collection name="Score Panel">
 			<group ref="panel"><bounds x="0" y="-0.472" width="4" height="0.472" /></group>
 			<group ref="panel"><bounds x="4.03" y="-0.472" width="4" height="0.472" /></group>
 		</collection>
+		<collection name="Viewfinder">
+			<element ref="view"><bounds x="1.4" y="0.9" width="1.2" height="1.2" /></element>
+			<element ref="view"><bounds x="5.43" y="0.9" width="1.2" height="1.2" /></element>
+		</collection>
+
+		<!-- cross-eyed -->
+		<screen index="0" blend="add"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
+
+		<screen index="0" blend="add"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
+		<element name="shutter" ref="shutter1"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
 	</view>
 
 	<view name="3D Scope Left">
-		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
-		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
-
 		<collection name="Score Panel">
 			<group ref="panel"><bounds x="0" y="-0.472" width="4" height="0.472" /></group>
 		</collection>
+		<collection name="Viewfinder">
+			<element ref="view"><bounds x="1.4" y="0.9" width="1.2" height="1.2" /></element>
+		</collection>
+
+		<screen index="0" blend="add"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
 	</view>
 
 	<view name="3D Scope Right">
-		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
-		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
-
 		<collection name="Score Panel">
 			<group ref="panel"><bounds x="0" y="-0.472" width="4" height="0.472" /></group>
 		</collection>
+		<collection name="Viewfinder">
+			<element ref="view"><bounds x="1.4" y="0.9" width="1.2" height="1.2" /></element>
+		</collection>
+
+		<screen index="0" blend="add"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
 	</view>
 
 </mamelayout>

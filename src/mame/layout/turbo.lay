@@ -134,67 +134,66 @@ license:CC0-1.0
 		<!-- leds -->
 		<rect state="1"> <bounds x="1" y="0" width="1"  height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="2"> <bounds x="1" y="0" width="1"  height="1" /><color red="1" green="1" blue="1" /></rect>
-
 		<rect state="3"> <bounds x="1" y="0" width="1"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="4"> <bounds x="1" y="0" width="1"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="4"> <bounds x="1" y="0" width="2"  height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="5"> <bounds x="1" y="0" width="2"  height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="6"> <bounds x="1" y="0" width="2"  height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="7"> <bounds x="1" y="0" width="3"  height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="8"> <bounds x="1" y="0" width="3"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="9"> <bounds x="1" y="0" width="4"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="9"> <bounds x="1" y="0" width="3"  height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="10"><bounds x="1" y="0" width="4"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="11"><bounds x="1" y="0" width="5"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="12"><bounds x="1" y="0" width="5"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="13"><bounds x="1" y="0" width="6"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="14"><bounds x="1" y="0" width="6"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="15"><bounds x="1" y="0" width="7"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="16"><bounds x="1" y="0" width="7"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="17"><bounds x="1" y="0" width="8"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="18"><bounds x="1" y="0" width="8"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="19"><bounds x="1" y="0" width="9"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="20"><bounds x="1" y="0" width="9"  height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="21"><bounds x="1" y="0" width="10" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="22"><bounds x="1" y="0" width="10" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="23"><bounds x="1" y="0" width="11" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="24"><bounds x="1" y="0" width="11" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="25"><bounds x="1" y="0" width="12" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="26"><bounds x="1" y="0" width="12" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="27"><bounds x="1" y="0" width="13" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="28"><bounds x="1" y="0" width="13" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="29"><bounds x="1" y="0" width="14" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="30"><bounds x="1" y="0" width="14" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="31"><bounds x="1" y="0" width="15" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="32"><bounds x="1" y="0" width="15" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="33"><bounds x="1" y="0" width="16" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="34"><bounds x="1" y="0" width="16" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="35"><bounds x="1" y="0" width="17" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="36"><bounds x="1" y="0" width="17" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="37"><bounds x="1" y="0" width="18" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="38"><bounds x="1" y="0" width="18" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="39"><bounds x="1" y="0" width="19" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="40"><bounds x="1" y="0" width="19" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="41"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="42"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-
-		<!-- voltage higher than threshold -->
-		<rect state="43"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="44"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="45"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="46"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="47"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="48"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="49"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="50"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="51"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="52"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="53"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="54"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="55"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="56"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="57"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="11"><bounds x="1" y="0" width="4"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="12"><bounds x="1" y="0" width="4"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="13"><bounds x="1" y="0" width="5"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="14"><bounds x="1" y="0" width="5"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="15"><bounds x="1" y="0" width="5"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="16"><bounds x="1" y="0" width="6"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="17"><bounds x="1" y="0" width="6"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="18"><bounds x="1" y="0" width="6"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="19"><bounds x="1" y="0" width="7"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="20"><bounds x="1" y="0" width="7"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="21"><bounds x="1" y="0" width="7"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="22"><bounds x="1" y="0" width="8"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="23"><bounds x="1" y="0" width="8"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="24"><bounds x="1" y="0" width="8"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="25"><bounds x="1" y="0" width="9"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="26"><bounds x="1" y="0" width="9"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="27"><bounds x="1" y="0" width="9"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="28"><bounds x="1" y="0" width="10" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="29"><bounds x="1" y="0" width="10" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="30"><bounds x="1" y="0" width="10" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="31"><bounds x="1" y="0" width="11" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="32"><bounds x="1" y="0" width="11" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="33"><bounds x="1" y="0" width="11" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="34"><bounds x="1" y="0" width="12" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="35"><bounds x="1" y="0" width="12" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="36"><bounds x="1" y="0" width="12" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="37"><bounds x="1" y="0" width="13" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="38"><bounds x="1" y="0" width="13" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="39"><bounds x="1" y="0" width="13" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="40"><bounds x="1" y="0" width="14" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="41"><bounds x="1" y="0" width="14" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="42"><bounds x="1" y="0" width="14" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="43"><bounds x="1" y="0" width="15" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="44"><bounds x="1" y="0" width="15" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="45"><bounds x="1" y="0" width="15" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="46"><bounds x="1" y="0" width="16" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="47"><bounds x="1" y="0" width="16" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="48"><bounds x="1" y="0" width="16" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="49"><bounds x="1" y="0" width="17" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="50"><bounds x="1" y="0" width="17" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="51"><bounds x="1" y="0" width="17" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="52"><bounds x="1" y="0" width="18" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="53"><bounds x="1" y="0" width="18" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="54"><bounds x="1" y="0" width="18" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="55"><bounds x="1" y="0" width="19" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="56"><bounds x="1" y="0" width="19" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="57"><bounds x="1" y="0" width="19" height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="58"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="59"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="60"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
+
+		<!-- voltage higher than threshold -->
 		<rect state="61"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="62"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="63"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
