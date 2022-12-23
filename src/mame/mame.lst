@@ -24572,6 +24572,9 @@ mpf1                            // 1979 Multitech Micro Professor 1
 mpf1b                           // 1979 Multitech Micro Professor 1B
 mpf1p                           //
 
+@source:multitech/mpf1_88.cpp
+mpf1_88                         // 1985 Multitech Micro-Professor I/88
+
 @source:commodore/mps1230.cpp
 mps1000                         // 1986 Commodore MPS-1000 (dot matrix printer)
 mps1230                         // 1988 Commodore MPS-1230 near-letter-quality dot matrix printer

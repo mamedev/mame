@@ -521,6 +521,7 @@ msx/msx1_v9938.cpp
 msx/msx2.cpp
 multitech/mkit09.cpp
 multitech/mpf1.cpp
+multitech/mpf1_88.cpp
 mupid/mdisk.cpp
 mupid/mupid2.cpp
 nakajima/nakajies.cpp
