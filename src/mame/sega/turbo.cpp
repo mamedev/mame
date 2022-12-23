@@ -365,6 +365,7 @@ void subroc3d_state::ppi0b_w(uint8_t data)
 	m_shutter = BIT(data, 4);
 }
 
+
 /*************************************
  *
  *  Buck Rogers PPI handling
@@ -456,7 +457,7 @@ CUSTOM_INPUT_MEMBER(turbo_base_state::pedal_r)
 uint8_t turbo_state::collision_r()
 {
 	m_screen->update_partial(m_screen->vpos());
-	return m_dsw3->read() | (m_collision & 15);
+	return (m_dsw[2]->read() & 0xf0) | (m_collision & 0xf);
 }
 
 
@@ -507,7 +508,9 @@ WRITE_LINE_MEMBER(turbo_state::start_lamp_w)
 uint8_t buckrog_state::subcpu_command_r()
 {
 	// assert ACK
-	m_i8255[0]->pc6_w(CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_i8255[0]->pc6_w(CLEAR_LINE);
+
 	return m_command;
 }
 
@@ -543,13 +546,13 @@ void buckrog_state::i8255_0_w(offs_t offset, uint8_t data)
 uint8_t turbo_state::spriteram_r(offs_t offset)
 {
 	offset = (offset & 0x07) | ((offset & 0xf0) >> 1);
-	return m_alt_spriteram[offset];
+	return m_spriteram[offset];
 }
 
 void turbo_state::spriteram_w(offs_t offset, uint8_t data)
 {
 	offset = (offset & 0x07) | ((offset & 0xf0) >> 1);
-	m_alt_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 }
 
 
@@ -677,9 +680,9 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
-	PORT_DIPNAME( 0x10, 0x10, "Game Mode" )             PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x00, "No Collisions (cheat)" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x10, 0x10, "Collisions" )            PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, "Off (Cheat)" )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Initial Entry" )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
@@ -761,6 +764,9 @@ static INPUT_PORTS_START( subroc3d )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
+	PORT_START("DSW1")  // DSW1                 // Unused
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_START("DSW2")  // DSW2
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ))        PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
@@ -810,8 +816,6 @@ static INPUT_PORTS_START( subroc3d )
 	PORT_DIPNAME( 0x80, 0x80, "Game" )                  PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x00, "Endless" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
-
-	PORT_START("DSW1")  // DSW1                 // Unused
 INPUT_PORTS_END
 
 
@@ -820,8 +824,8 @@ static INPUT_PORTS_START( buckrog )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )  PORT_CONDITION("DSW2", 0x80, EQUALS, 0x00) // cockpit
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )  PORT_CONDITION("DSW2", 0x80, EQUALS, 0x80) // upright
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00) PORT_CUSTOM_MEMBER(turbo_base_state, pedal_r)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02) // speed up
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02) // speed down
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02) // fast
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02) // slow
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
@@ -862,8 +866,8 @@ static INPUT_PORTS_START( buckrog )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  // DSW2
-	PORT_DIPNAME( 0x01, 0x00, "Collisions" )            PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x01, 0x00, "Collisions" )            PORT_DIPLOCATION("SW2:1") // manual calls it collisions, but actually it's infinite lives
+	PORT_DIPSETTING(    0x01, "Off (Cheat)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Accel by" )              PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, "Pedal" )
@@ -938,9 +942,9 @@ void turbo_state::turbo(machine_config &config)
 	m_i8255[3]->out_pc_callback().set(FUNC(turbo_state::ppi3c_w));
 
 	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // clock = H1
-	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
-	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
-	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
+	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w));  // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));    // display A&B
+	kbdc.in_rl_callback().set_ioport("DSW1");                    // kbd RL lines
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // IC125 - outputs passed through CN5
 	outlatch.q_out_cb<0>().set(FUNC(turbo_state::coin_meter_1_w));
@@ -979,10 +983,10 @@ void subroc3d_state::subroc3d(machine_config &config)
 	m_i8255[1]->out_pb_callback().set(FUNC(subroc3d_state::sound_b_w));
 	m_i8255[1]->out_pc_callback().set(FUNC(subroc3d_state::sound_c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // unknown clock
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16));   // unknown clock
 	kbdc.out_sl_callback().set(FUNC(subroc3d_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(subroc3d_state::digit_w));   // display A&B
-	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
+	kbdc.in_rl_callback().set_ioport("DSW1");                      // kbd RL lines
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
@@ -1023,10 +1027,10 @@ void buckrog_state::buckrog(machine_config &config)
 	m_i8255[1]->out_pb_callback().set(FUNC(buckrog_state::sound_b_w));
 	m_i8255[1]->out_pc_callback().set(FUNC(buckrog_state::ppi1c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // unknown clock
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16));  // unknown clock
 	kbdc.out_sl_callback().set(FUNC(buckrog_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(buckrog_state::digit_w));   // display A&B
-	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
+	kbdc.in_rl_callback().set_ioport("DSW1");                     // kbd RL lines
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
@@ -1062,6 +1066,7 @@ void buckrog_state::buckroge(machine_config &config)
 	maincpu.set_vblank_int("screen", FUNC(buckrog_state::irq0_line_hold));
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 }
+
 
 /*************************************
  *
@@ -1906,23 +1911,25 @@ void turbo_state::init_turbo_enc()
 	rom_decode();
 }
 
+
+
 /*************************************
  *
  *  Game drivers
  *
  *************************************/
 
-GAMEL( 1981, turbo,     0,       turbo,    turbo,    turbo_state,    empty_init,       ROT270,             "Sega",    "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboa,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1262-1264)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbob,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev C)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboc,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbod,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboe,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // but still reports 1262-1264 in the test mode?
-GAMEL( 1981, turbobl,   turbo,   turbo,    turbo,    turbo_state,    empty_init,       ROT270,             "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // decrypted bootleg of a 1262-1264 set
+GAMEL( 1981, turbo,     0,       turbo,    turbo,    turbo_state,    empty_init,       ROT270,             "Sega",    "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND, layout_turbo )
+GAMEL( 1981, turboa,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1262-1264)", MACHINE_IMPERFECT_SOUND, layout_turbo )
+GAMEL( 1981, turbob,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev C)", MACHINE_IMPERFECT_SOUND, layout_turbo )
+GAMEL( 1981, turboc,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND, layout_turbo )
+GAMEL( 1981, turbod,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND, layout_turbo )
+GAMEL( 1981, turboe,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND, layout_turbo ) // but still reports 1262-1264 in the test mode?
+GAMEL( 1981, turbobl,   turbo,   turbo,    turbo,    turbo_state,    empty_init,       ROT270,             "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND, layout_turbo ) // decrypted bootleg of a 1262-1264 set
 
-GAMEL( 1982, subroc3d,  0,       subroc3d, subroc3d, subroc3d_state, empty_init,       ORIENTATION_FLIP_X, "Sega",    "Subroc-3D", MACHINE_IMPERFECT_SOUND , layout_subroc3d )
+GAMEL( 1982, subroc3d,  0,       subroc3d, subroc3d, subroc3d_state, empty_init,       ORIENTATION_FLIP_X, "Sega",    "Subroc-3D", MACHINE_IMPERFECT_SOUND, layout_subroc3d )
 
-GAMEL( 1982, buckrog,   0,       buckroge, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom", MACHINE_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, buckrogn,  buckrog, buckrogu, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 1)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, buckrogn2, buckrog, buckrogu, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 2)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrog,   0,       buckroge, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom", MACHINE_IMPERFECT_SOUND, layout_buckrog )
+GAMEL( 1982, buckrogn,  buckrog, buckrogu, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 1)", MACHINE_IMPERFECT_SOUND, layout_buckrog )
+GAMEL( 1982, buckrogn2, buckrog, buckrogu, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 2)", MACHINE_IMPERFECT_SOUND, layout_buckrog )
 GAMEL( 1982, zoom909,   buckrog, buckroge, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Zoom 909", MACHINE_IMPERFECT_SOUND, layout_buckrog )
