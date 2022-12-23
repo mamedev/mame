@@ -267,7 +267,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(periodic_int);
 	uint8_t vg_go_r();
-	inline uint8_t encode_spinner(uint8_t data);
+	static constexpr uint8_t encode_spinner(uint8_t data);
 	uint8_t spinner1_r();
 	uint8_t spinner2_r();
 	void outputs_w(uint8_t data);
@@ -326,7 +326,7 @@ uint8_t omegrace_state::vg_go_r()
  *
  *************************************/
 
-inline uint8_t omegrace_state::encode_spinner(uint8_t data)
+constexpr uint8_t omegrace_state::encode_spinner(uint8_t data)
 {
 	data &= 0x3f;
 	return data ^ (data >> 1) ^ 0x3f; // Inverted 6-bit Gray code
