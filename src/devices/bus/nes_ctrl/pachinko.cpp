@@ -20,7 +20,7 @@ static INPUT_PORTS_START( nes_pachinko )
 	PORT_INCLUDE( nes_joypad )
 
 	PORT_START("TRIGGER")
-	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_MINMAX(0, 0x63) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
+	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_MINMAX(0, 0x74) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_INVERT // max from hardware tests, games clamp to 0x63
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -41,7 +41,7 @@ ioport_constructor nes_pachinko_device::device_input_ports() const
 //-------------------------------------------------
 
 nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_fcpadexp_device(mconfig, NES_PACHINKO, tag, owner, clock, 0)
+	: nes_fcpadexp_device(mconfig, NES_PACHINKO, tag, owner, clock, 0x8000)
 	, m_trigger(*this, "TRIGGER")
 {
 }
@@ -50,5 +50,6 @@ nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const ch
 void nes_pachinko_device::set_latch()
 {
 	m_latch = m_joypad->read();
-	m_latch |= ~bitswap<8>(m_trigger->read(), 0, 1, 2, 3, 4, 5, 6, 7) << 8;
+	// pot counter is 7-bit, but bit 8 of latch MUST be 1, as it is here
+	m_latch |= bitswap<8>(m_trigger->read(), 0, 1, 2, 3, 4, 5, 6, 7) << 8;
 }
