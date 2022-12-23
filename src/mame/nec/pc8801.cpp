@@ -1724,7 +1724,7 @@ void pc8801_state::pc8801(machine_config &config)
 		m_beeper->add_route(ALL_OUTPUTS, speaker, 0.10);
 	}
 
-	MSX_GENERAL_PURPOSE_PORT(config, m_mouse_port, msx_general_purpose_port_devices, "mouse");
+	MSX_GENERAL_PURPOSE_PORT(config, m_mouse_port, msx_general_purpose_port_devices, "joystick");
 
 	PC8801_EXP_SLOT(config, m_exp, pc8801_exp_devices, nullptr);
 	m_exp->set_iospace(m_maincpu, AS_IO);
