@@ -5,7 +5,7 @@
 MAGMAX
 (c)1985 NihonBussan Co.,Ltd.
 
-Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/05 -
+Driver by Takahiro Nogi 1999/11/05 -
 Additional tweaking by Jarek Burczynski
 
 

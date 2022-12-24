@@ -7,7 +7,6 @@
 ****************************************************************************
 
 TODO:
-
 - write a shootgal palette_init
 - Pestplce colors and origin
 - Shooting Gallery: Shootgal.txt mentions speech pcb,
@@ -566,8 +565,8 @@ MACHINE_RESET_MEMBER(dkong_state,drakton)
 
 uint8_t dkong_state::hb_dma_read_byte(offs_t offset)
 {
-	int   bucket = m_rev_map[(offset>>10) & 0x1ff];
-	int   addr;
+	int bucket = m_rev_map[(offset>>10) & 0x1ff];
+	int addr;
 
 	if (bucket < 0)
 		fatalerror("hb_dma_read_byte - unmapped access for 0x%02x - bucket 0x%02x\n", offset, bucket);
@@ -579,8 +578,8 @@ uint8_t dkong_state::hb_dma_read_byte(offs_t offset)
 
 void dkong_state::hb_dma_write_byte(offs_t offset, uint8_t data)
 {
-	int   bucket = m_rev_map[(offset>>10) & 0x1ff];
-	int   addr;
+	int bucket = m_rev_map[(offset>>10) & 0x1ff];
+	int addr;
 
 	if (bucket < 0)
 		fatalerror("hb_dma_read_byte - unmapped access for 0x%02x - bucket 0x%02x\n", offset, bucket);
@@ -2906,10 +2905,10 @@ ROM_START( dkong3 )
 	ROM_LOAD( "dk3c.7e",      0x8000, 0x2000, CRC(615f14b7) SHA1(145674073e95d97c9131b6f2b03303eadb57ca78) )
 
 	ROM_REGION( 0x10000, "rp2a03a", 0 )  /* sound #1 */
-	ROM_LOAD( "dk3c.5l",      0xe000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
+	ROM_LOAD( "dk3c.5l",      0x8000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
 
 	ROM_REGION( 0x10000, "rp2a03b", 0 )  /* sound #2 */
-	ROM_LOAD( "dk3c.6h",      0xe000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
+	ROM_LOAD( "dk3c.6h",      0x8000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "dk3v.3n",      0x0000, 0x1000, CRC(415a99c7) SHA1(e0855b03bb1dc0d8ae46da9fe33ca30ecf6a2e96) )
@@ -2939,10 +2938,10 @@ ROM_START( dkong3j )
 	ROM_LOAD( "dk3cj.7e",     0x8000, 0x2000, CRC(25b5be23) SHA1(43cf2a676922e60d9d637777a7721ab7582129fc) )
 
 	ROM_REGION( 0x10000, "rp2a03a", 0 )  /* sound #1 */
-	ROM_LOAD( "dk3c.5l",      0xe000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
+	ROM_LOAD( "dk3c.5l",      0x8000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
 
 	ROM_REGION( 0x10000, "rp2a03b", 0 )  /* sound #2 */
-	ROM_LOAD( "dk3c.6h",      0xe000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
+	ROM_LOAD( "dk3c.6h",      0x8000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "dk3v.3n",      0x0000, 0x1000, CRC(415a99c7) SHA1(e0855b03bb1dc0d8ae46da9fe33ca30ecf6a2e96) )
@@ -3009,10 +3008,10 @@ ROM_START( dkong3hs )
 	ROM_LOAD( "dk3_10a.bin", 0x0000, 0x10000, CRC(0008652b) SHA1(f1d90bb18373a6f24634b6d2cd766a28d07ab9f4) ) /* Version 1.0a */
 
 	ROM_REGION( 0x10000, "rp2a03a", 0 )  /* sound #1 */
-	ROM_LOAD( "dk3c.5l",      0xe000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
+	ROM_LOAD( "dk3c.5l",      0x8000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
 
 	ROM_REGION( 0x10000, "rp2a03b", 0 )  /* sound #2 */
-	ROM_LOAD( "dk3c.6h",      0xe000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
+	ROM_LOAD( "dk3c.6h",      0x8000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "dk3v.3n",      0x0000, 0x1000, CRC(415a99c7) SHA1(e0855b03bb1dc0d8ae46da9fe33ca30ecf6a2e96) )
@@ -3618,7 +3617,6 @@ void dkong_state::init_drakton()
 	/* While the PAL supports up to 16 decryption methods, only four
 	    are actually used in the PAL.  Therefore, we'll take a little
 	    memory overhead and decrypt the ROMs using each method in advance. */
-
 	drakton_decrypt_rom(0x02, 0x10000, bs[0]);
 	drakton_decrypt_rom(0x40, 0x14000, bs[1]);
 	drakton_decrypt_rom(0x8a, 0x18000, bs[2]);
@@ -3645,7 +3643,7 @@ void dkong_state::init_strtheat()
 	drakton_decrypt_rom(0x0a, 0x18000, bs[2]);
 	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
 
-	/* custom handlers supporting Joystick or Steering Wheel */
+	// custom handlers supporting Joystick or Steering Wheel
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8smo_delegate(*this, FUNC(dkong_state::strtheat_inputport_0_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8smo_delegate(*this, FUNC(dkong_state::strtheat_inputport_1_r)));
 }
@@ -3685,8 +3683,36 @@ void dkong_state::init_dkongx()
 	space.install_write_handler(0xc800, 0xc800, write8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
+void dkong_state::init_dkong3()
+{
+	// RP2A03 bus conflict between internal APU and external RAM.
+	// dkong3 relies on it, eg. sound effects when player dies, jumps down a platform, Creepy inchworm appears/gets hit
+	// BTANB: squeak that randomly interrupts Creepy inchworm's sound effect
+	m_dkong3_tap[0] = m_dev_rp2a03a->space(AS_PROGRAM).install_write_tap(
+			0x4000, 0x4017,
+			"rp2a03a_conflict_w",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				// write to RAM
+				m_dev_rp2a03a->space(AS_PROGRAM).write_byte(offset & 0x07ff, data);
+			},
+			&m_dkong3_tap[0]);
+
+	m_dkong3_tap[1] = m_dev_rp2a03b->space(AS_PROGRAM).install_write_tap(
+			0x4000, 0x4017,
+			"rp2a03b_conflict_w",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				// write to RAM
+				m_dev_rp2a03b->space(AS_PROGRAM).write_byte(offset & 0x07ff, data);
+			},
+			&m_dkong3_tap[1]);
+}
+
 void dkong_state::init_dkong3hs()
 {
+	init_dkong3();
+
 	m_decrypted = std::make_unique<uint8_t[]>(0x10000);
 
 	braze_decrypt_rom(m_decrypted.get());
@@ -3749,10 +3775,10 @@ GAME( 1982, jrking,    dkongjr,  dkongjr,   dkongjr,  dkong_state, empty_init,  
 GAME( 1982, dkingjr,   dkongjr,  dkongjr,   dkongjr,  dkong_state, init_dkingjr,  ROT270, "bootleg",             "Donkey King Jr. (bootleg of Donkey Kong Jr.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, maguila,   dkongjr,  dkongjr,   dkongjr,  dkong_state, init_dkingjr,  ROT270, "bootleg (Aguipa)",    "Up Maguila (bootleg of Donkey Kong Jr.)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, dkong3,    0,        dkong3,    dkong3,   dkong_state, empty_init,    ROT270, "Nintendo of America", "Donkey Kong 3 (US)",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dkong3j,   dkong3,   dkong3,    dkong3,   dkong_state, empty_init,    ROT270, "Nintendo",            "Donkey Kong 3 (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3,    0,        dkong3,    dkong3,   dkong_state, init_dkong3,   ROT270, "Nintendo of America", "Donkey Kong 3 (US)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3j,   dkong3,   dkong3,    dkong3,   dkong_state, init_dkong3,   ROT270, "Nintendo",            "Donkey Kong 3 (Japan)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dkong3b,   dkong3,   dkong3b,   dkong3b,  dkong_state, empty_init,    ROT270, "bootleg",             "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dkong3hs,  dkong3,   dk3_braze, dkong3,   dkong_state, init_dkong3hs, ROT270, "hack (Braze Technologies)", "Donkey Kong High Score Kit (hack,V1.0a)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3hs,  dkong3,   dk3_braze, dkong3,   dkong_state, init_dkong3hs, ROT270, "hack (Braze Technologies)", "Donkey Kong High Score Kit (hack,V1.0a)",       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, pestplce,  mario,    pestplce,  pestplce, dkong_state, empty_init,    ROT0,   "bootleg", "Pest Place", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 

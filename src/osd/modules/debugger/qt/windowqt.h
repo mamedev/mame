@@ -9,8 +9,33 @@
 
 #include <QtWidgets/QMainWindow>
 
+#include <deque>
+#include <memory>
+
 
 namespace osd::debugger::qt {
+
+//============================================================
+//  The Qt debugger module interface
+//============================================================
+class DebuggerQt : public QObject
+{
+	Q_OBJECT
+
+public:
+	virtual ~DebuggerQt() { }
+
+	virtual running_machine &machine() const = 0;
+
+	void hideAll() { emit hideAllWindows(); }
+
+signals:
+	void exitDebugger();
+	void hideAllWindows();
+	void showAllWindows();
+	void saveConfiguration(util::xml::data_node &parentnode);
+};
+
 
 //============================================================
 //  The Qt window that everyone derives from.
@@ -20,19 +45,9 @@ class WindowQt : public QMainWindow
 	Q_OBJECT
 
 public:
-	WindowQt(running_machine &machine, QWidget *parent = nullptr);
 	virtual ~WindowQt();
 
-	// The interface to an all-window refresh
-	void refreshAll() { s_refreshAll = true; }
-	bool wantsRefresh() { return s_refreshAll; }
-	void clearRefreshFlag() { s_refreshAll = false; }
-
-	void hideAll() { s_hideAll = true; }
-	bool wantsHide() { return s_hideAll; }
-	void clearHideFlag() { s_hideAll = false; }
-
-	void saveConfiguration(util::xml::data_node &parentnode);
+	virtual void restoreConfiguration(util::xml::data_node const &node);
 
 protected slots:
 	void debugActOpenMemory();
@@ -52,38 +67,46 @@ protected slots:
 	void debugActHardReset();
 	virtual void debugActClose();
 	void debugActQuit();
+	virtual void debuggerExit();
 
+private slots:
+	void saveConfiguration(util::xml::data_node &parentnode);
 
 protected:
+	WindowQt(DebuggerQt &debugger, QWidget *parent = nullptr);
+
 	virtual void saveConfigurationToNode(util::xml::data_node &node);
 
+	DebuggerQt &m_debugger;
 	running_machine &m_machine;
-
-	static bool s_refreshAll;
-	static bool s_hideAll;
 };
 
 
-//=========================================================================
-//  A way to store the configuration of a window long enough to read/write.
-//=========================================================================
-class WindowQtConfig
+//============================================================
+//  Command history helper
+//============================================================
+class CommandHistory
 {
 public:
-	WindowQtConfig(int type) :
-		m_type(type),
-		m_size(800, 600),
-		m_position(120, 120)
-	{}
-	virtual ~WindowQtConfig() {}
+	CommandHistory();
+	~CommandHistory();
 
-	// Settings
-	int m_type;
-	QPoint m_size;
-	QPoint m_position;
+	void add(QString const &entry);
+	QString const *previous(QString const &current);
+	QString const *next(QString const &current);
+	void edit();
+	void reset();
+	void clear();
 
-	virtual void applyToQWidget(QWidget *widget);
-	virtual void recoverFromXmlNode(util::xml::data_node const &node);
+	void restoreConfigurationFromNode(util::xml::data_node const &node);
+	void saveConfigurationToNode(util::xml::data_node &node);
+
+private:
+	static inline constexpr unsigned CAPACITY = 100U;
+
+	std::deque<QString> m_history;
+	std::unique_ptr<QString> m_current;
+	int m_position;
 };
 
 } // namespace osd::debugger::qt

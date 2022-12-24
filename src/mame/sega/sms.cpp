@@ -245,6 +245,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "emu.h"
 #include "sms.h"
 
+#include "bus/sms_ctrl/controllers.h"
 #include "cpu/z80/z80.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -296,20 +297,22 @@ void smssdisp_state::sms_store_mem(address_map &map)
 }
 
 // I/O ports $3E and $3F do not exist on Mark III
-void sms_state::sg1000m3_io(address_map &map)
+void sg1000m3_state::sg1000m3_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
+
+	map(0x40, 0x7f).r(FUNC(sg1000m3_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc7).mirror(0x38).rw(FUNC(sms_state::sg1000m3_peripheral_r), FUNC(sms_state::sg1000m3_peripheral_w));
+	map(0xc0, 0xc7).mirror(0x38).rw(FUNC(sg1000m3_state::sg1000m3_peripheral_r), FUNC(sg1000m3_state::sg1000m3_peripheral_w));
 }
 
 void sms_state::sms_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+
 	map(0x00, 0x00).mirror(0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x01, 0x01).mirror(0x3e).w(FUNC(sms_state::sms_io_control_w));
 	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
@@ -320,14 +323,14 @@ void sms_state::sms_io(address_map &map)
 }
 
 
-// It seems the Korean versions do some more strict decoding on the I/O
-// addresses.
+// It seems the Korean versions do some more strict decoding on the I/O addresses.
 // At least the mirrors for I/O ports $3E/$3F don't seem to exist there.
 // Leaving the mirrors breaks the Korean cartridge bublboky.
 void sms_state::smskr_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+
 	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
 	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
@@ -344,6 +347,7 @@ void sms_state::smsj_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+
 	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
 	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
@@ -365,18 +369,29 @@ void gamegear_state::gg_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x00).r(FUNC(gamegear_state::gg_input_port_00_r));
-	map(0x01, 0x05).rw(FUNC(gamegear_state::gg_sio_r), FUNC(gamegear_state::gg_sio_w));
-	map(0x06, 0x06).w(FUNC(gamegear_state::gg_psg_stereo_w));
-	map(0x3e, 0x3e).w(FUNC(gamegear_state::sms_mem_control_w));
-	map(0x3f, 0x3f).w(FUNC(gamegear_state::sms_io_control_w));
+
+	map(0x3e, 0x3e).w(FUNC(gamegear_state::sms_mem_control_w)); // TODO: only really exists in Master System mode
 	map(0x40, 0x7f).r(FUNC(gamegear_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc0).r(FUNC(gamegear_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).r(FUNC(gamegear_state::sms_input_port_dd_r));
-	map(0xdc, 0xdc).r(FUNC(gamegear_state::sms_input_port_dc_r));
-	map(0xdd, 0xdd).r(FUNC(gamegear_state::sms_input_port_dd_r));
+	map(0xc0, 0xc0).r(FUNC(gamegear_state::gg_input_port_dc_r));
+	map(0xc1, 0xc1).r(FUNC(gamegear_state::gg_input_port_dd_r));
+	map(0xdc, 0xdc).r(FUNC(gamegear_state::gg_input_port_dc_r));
+	map(0xdd, 0xdd).r(FUNC(gamegear_state::gg_input_port_dd_r));
+
+	map(0x00, 0x3f).view(m_io_view);
+
+	// Game Gear mode
+	m_io_view[0](0x00, 0x00).r(FUNC(gamegear_state::gg_input_port_00_r));
+	m_io_view[0](0x01, 0x01).rw(m_gg_ioport, FUNC(gamegear_io_port_device::data_r), FUNC(gamegear_io_port_device::data_w));
+	m_io_view[0](0x02, 0x02).rw(m_gg_ioport, FUNC(gamegear_io_port_device::ctrl_r), FUNC(gamegear_io_port_device::ctrl_w));
+	m_io_view[0](0x03, 0x03).rw(m_gg_ioport, FUNC(gamegear_io_port_device::txdata_r), FUNC(gamegear_io_port_device::txdata_w));
+	m_io_view[0](0x04, 0x04).r(m_gg_ioport, FUNC(gamegear_io_port_device::rxdata_r));
+	m_io_view[0](0x05, 0x05).rw(m_gg_ioport, FUNC(gamegear_io_port_device::s_ctrl_r), FUNC(gamegear_io_port_device::s_ctrl_w));
+	m_io_view[0](0x06, 0x06).w(m_vdp, FUNC(sega315_5124_device::psg_stereo_w));
+
+	// Master System mode
+	m_io_view[1](0x3f, 0x3f).w(FUNC(gamegear_state::gg_io_control_w));
 }
 
 
@@ -483,7 +498,7 @@ static INPUT_PORTS_START( gg )
 
 	PORT_START("START")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start") /* Game Gear START */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start")
 
 	PORT_START("PERSISTENCE")
 	PORT_CONFNAME( 0x01, 0x01, "LCD Persistence Hack" )
@@ -494,25 +509,25 @@ INPUT_PORTS_END
 
 void sms_state::sms_base(machine_config &config)
 {
-	/* basic machine hardware */
 	SPEAKER(config, "mono").front_center();
 
 	SMS_CART_SLOT(config, "slot", sms_cart, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("sms");
 
-	SMS_CONTROL_PORT(config, m_port_ctrl1, sms_control_port_devices, "joypad");
-	m_port_ctrl1->set_screen_tag(m_main_scr);
-	m_port_ctrl1->th_input_handler().set(FUNC(sms_state::sms_ctrl1_th_input));
+	SMS_CONTROL_PORT(config, m_port_ctrl1, sms_control_port_devices, SMS_CTRL_OPTION_JOYPAD);
+	m_port_ctrl1->set_screen(m_main_scr);
+	m_port_ctrl1->th_handler().set(FUNC(sms_state::sms_ctrl1_th_input));
 
-	SMS_CONTROL_PORT(config, m_port_ctrl2, sms_control_port_devices, "joypad");
-	m_port_ctrl2->set_screen_tag(m_main_scr);
-	m_port_ctrl2->th_input_handler().set(FUNC(sms_state::sms_ctrl2_th_input));
+	SMS_CONTROL_PORT(config, m_port_ctrl2, sms_control_port_devices, SMS_CTRL_OPTION_JOYPAD);
+	m_port_ctrl2->set_screen(m_main_scr);
+	m_port_ctrl2->th_handler().set(FUNC(sms_state::sms_ctrl2_th_input));
 }
 
 void sms_state::sms_ntsc_base(machine_config &config)
 {
 	sms_base(config);
+
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
 	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
@@ -919,11 +934,11 @@ void sms1_state::smsj(machine_config &config)
 	m_is_smsj = true;
 }
 
-void sms1_state::sg1000m3(machine_config &config)
+void sg1000m3_state::sg1000m3(machine_config &config)
 {
 	sms1_ntsc(config);
 
-	m_maincpu->set_addrmap(AS_IO, &sms1_state::sg1000m3_io);
+	m_maincpu->set_addrmap(AS_IO, &sg1000m3_state::sg1000m3_io);
 
 	// Remove and reinsert all media slots, as done with the sms1_kr config,
 	// and also replace the expansion slot with the SG-1000 version.
@@ -932,13 +947,13 @@ void sms1_state::sg1000m3(machine_config &config)
 	config.device_remove("smsexp");
 	SG1000MK3_CART_SLOT(config, "slot", sg1000mk3_cart, nullptr);
 	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
-	SG1000_EXPANSION_SLOT(config, "sgexp", sg1000_expansion_devices, nullptr, false);
+	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, nullptr, false);
 
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
 
 	// Mark III does not have TH connected.
-	m_port_ctrl1->th_input_handler().set_nop();
-	m_port_ctrl2->th_input_handler().set_nop();
+	m_port_ctrl1->th_handler().set_nop();
+	m_port_ctrl2->th_handler().set_nop();
 
 	m_has_bios_full = false;
 	m_is_mark_iii = true;
@@ -977,9 +992,14 @@ void gamegear_state::gamegear(machine_config &config)
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gamegear");
 
-	GG_EXT_PORT(config, m_port_gg_ext, gg_ext_port_devices, nullptr);
-	m_port_gg_ext->set_screen_tag(m_main_scr);
-	m_port_gg_ext->th_input_handler().set(FUNC(gamegear_state::gg_ext_th_input));
+	GAMEGEAR_IO_PORT(config, m_gg_ioport, 0);
+	m_gg_ioport->set_in_handler(m_port_gg_ext, FUNC(sms_control_port_device::in_r));
+	m_gg_ioport->set_out_handler(m_port_gg_ext, FUNC(sms_control_port_device::out_w));
+	m_gg_ioport->hl_handler().set(FUNC(gamegear_state::gg_nmi));
+
+	SMS_CONTROL_PORT(config, m_port_gg_ext, sms_control_port_devices, nullptr);
+	m_port_gg_ext->set_screen(m_main_scr);
+	m_port_gg_ext->th_handler().set(FUNC(gamegear_state::gg_ext_th_input));
 
 	m_is_gamegear = true;
 	m_has_bios_0400 = true;
@@ -1240,7 +1260,7 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT           COMPANY    FULLNAME                              FLAGS */
-CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sg1000m3, sms1_state,     empty_init,    "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
+CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sg1000m3, sg1000m3_state, empty_init,    "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
 CONS( 1986, sms1,     sms,      0,      sms1_ntsc, sms1,     sms1_state,     empty_init,    "Sega",    "Master System I",                    MACHINE_SUPPORTS_SAVE )
 CONS( 1986, sms1pal,  sms,      0,      sms1_pal,  sms1,     sms1_state,     empty_init,    "Sega",    "Master System I (PAL)" ,             MACHINE_SUPPORTS_SAVE )
 CONS( 1986, smssdisp, sms,      0,      sms_sdisp, smssdisp, smssdisp_state, empty_init,    "Sega",    "Master System Store Display Unit",   MACHINE_SUPPORTS_SAVE )

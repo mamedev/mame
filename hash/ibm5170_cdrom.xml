@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="ibm5170_cdrom" description="IBM PC/AT CD-ROM images">
 
@@ -64,14 +64,65 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/34886/ -->
+	<!-- <rom name="Blues Brothers, The (Europe).cue" size="94" crc="22379e3c" sha1="aaa704acbe4dcc90e8153f81227f00a83cbdaadd"/> -->
+	<!-- <rom name="Blues Brothers, The (Europe).bin" size="8979936" crc="346e8d8f" sha1="3b775aedf36fcbc33b6a04159d2c4887ec3d611d"/> -->
+	<software name="5plus1_10">
+		<description>5 Plus One: Pack 10 - The Blues Brothers</description>
+		<year>1994</year>
+		<publisher>Prism Leisure Corporation PLC</publisher>
+		<notes><![CDATA[
+CD-ROM includes
+Complete Game: "The Blues Brothers"
+Demo/Shareware: "Bodycount", "Zone 66", "Save Our Pizzas", "Dangerous Dave", "Casino Slots"
+]]></notes>
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Blues Brothers, The (Europe)" sha1="a9a4f1071e7ed928e73535d9bffcd11ee47ac56f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/35748/ -->
+	<!-- <rom name="TV Sports Football (Europe).cue" size="93" crc="64a640a0" sha1="fbc6fcb695b38c0792312a23ae3c79a4aab6ee7b"/> -->
+	<!-- <rom name="TV Sports Football (Europe).bin" size="6905472" crc="11800913" sha1="6660a474a49f71485cc5ee802dafca90736c53fc"/> -->
+	<software name="5plus1_25">
+		<description>5 Plus One: Pack 25 - TV Sports Football</description>
+		<year>1994</year>
+		<publisher>Prism Leisure Corporation PLC</publisher>
+		<notes><![CDATA[
+CD-ROM includes
+Complete Game: "TV Sports Football"
+Demo/Shareware: "Ranger Fox", "Monster Bash", "Onesimus", "Turoid", "Perestroika"
+]]></notes>
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="TV Sports Football (Europe)" sha1="4765a2400d6e480a5656a7889331002ee7e910a6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS (with Adobe Acrobat 2.1 for Windows) -->
 	<!-- disc label: pack34 -->
 	<!-- Super Tetris has manual copy protection -->
 	<!-- Other games (shareware): Green, Aldo II Adventure, Phylox, Draw Poker, Space Miner -->
-	<software name="5p1stet">
-		<description>5 Plus One - Super Tetris (Compilation)</description>
+	<software name="5plus1_34">
+		<description>5 Plus One: Pack 34 - Super Tetris</description>
 		<year>1996</year>
 		<publisher>Prism Leisure Corporation PLC</publisher>
+		<notes><![CDATA[
+CD-ROM includes
+Complete Game: "Super Tetris"
+Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Miner"
+]]></notes>
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -155,9 +206,15 @@ license:CC0
 	<!-- disc label: Actionpack5 -->
 	<!-- Multi-5 language support: English, French, German, Italian, Spanish -->
 	<software name="actatari">
-		<description>Activision's Atari 2600 Action Pack (Megapak 8) (Multi 5)</description>
+		<description>Activision's Atari 2600 Action Pack (Megapak 8 release)</description>
 		<year>1997</year>
 		<publisher>Megamedia</publisher>
+		<notes><![CDATA[
+CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "Fishing Derby", "Freeway", "Frostbite", "Grand Prix",
+				 "H.E.R.O.", "Kaboom!", "Pitfall!", "River Raid", "Seaquest", "Sky Jinks", "Spider Fighter"
+]]></notes>
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="Europe" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -256,7 +313,7 @@ license:CC0
 
 	<!-- DOS -->
 	<software name="aftlifeu">
-		<description>Afterlife (US v1.1)</description>
+		<description>Afterlife (USA, v1.1)</description>
 		<year>1996</year>
 		<publisher>LucasArts</publisher>
 		<info name="version" value="1.1" />
@@ -404,7 +461,7 @@ license:CC0
 		    L384 9614 05921024 B51103-30 M1S4
 		    IFPI6100
 		-->
-		<description>Alien Odyssey (US)</description>
+		<description>Alien Odyssey (USA)</description>
 		<year>1995</year>
 		<publisher>Philips / Argonaut Software LTD</publisher>
 
@@ -917,6 +974,25 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/32647/ -->
+	<!-- <rom name="Bitmap Brothers Compilation, The (Europe).cue" size="130" crc="63ce6c43" sha1="3b6e3a6031fd0c5b1fa5e29ff9192d67192d573b"/> -->
+	<!-- <rom name="Bitmap Brothers Compilation, The (Europe).bin" size="6190464" crc="0969c11f" sha1="53b7f78990fbc64763eb5224df8618367e6ae003"/> -->
+	<software name="bitmpbro">
+		<description>The Bitmap Brothers Compilation</description>
+		<year>1995</year>
+		<publisher>Renegade Software</publisher>
+		<notes>CD-ROM includes: "Cadaver", "Cadaver: The Payoff", "Gods", "Magic Pockets", "Speedball 2", "Xenon 2"</notes>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Bitmap Brothers Compilation, The (Europe)" sha1="5f543f56ef0bbee1ddcfd528459b0d0367a6ef3e" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Source: redump.org/disc/33449/ -->
 	<!-- <rom name="Blackhawk (Europe) (En,Fr,De).cue" size="95" crc="daf74d25" sha1="5b069e6a4c2f673f4462b1d92f771429565de5d3"/> -->
 	<!-- <rom name="Blackhawk (Europe) (En,Fr,De).bin" size="6218688" crc="8fe67eb5" sha1="0bee0c935c00ec7564610ad365288c6a32bf1664"/> -->
@@ -925,6 +1001,10 @@ license:CC0
 		<year>1994</year>
 		<publisher>Interplay</publisher>
 		<info name="developer" value="Blizzard Entertainment" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Blackhawk (Europe) (En,Fr,De)" sha1="7031e0b00ade177a62d0df78c3f2f69fbc3e4e33" />
@@ -1877,6 +1957,25 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/56227/ -->
+	<!-- <rom name="Delphine Classic Collection (Europe) (En,De).cue" size="133" crc="64a640a0" sha1="fbc6fcb695b38c0792312a23ae3c79a4aab6ee7b"/> -->
+	<!-- <rom name="Delphine Classic Collection (Europe) (En,De).bin" size="24286752" crc="b9459f8e" sha1="be30d01753846885dd0f517baf22c035e80e9e00"/> -->
+	<software name="delphicc">
+		<description>Delphine Classic Collection - Adventure</description>
+		<year>1994</year>
+		<publisher>Kixx</publisher>
+		<notes>CD-ROM includes: "Another World", "Cruise for a Corpse", "Flashback", "Future Wars", "Operation Stealth"</notes>
+		<info name="language" value="English/German" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Delphine Classic Collection (Europe) (En,De)" sha1="e910498db33534ad63ab62108069e7eda17bd8de" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- TODO: selecting SB16 hangs on the sound test -->
 	<software name="detritus" supported="partial">
@@ -2165,6 +2264,255 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="heavybarrel_cd" sha1="0d6ea927d897d36f71d49950ccb805e807b92857" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/35407/ -->
+	<!-- <rom name="Hocus Pocus (Europe).cue" size="109" crc="2302a503" sha1="5aff47012d84c8b996510186c209e7d9c1f3079e"/> -->
+	<!-- <rom name="Hocus Pocus (Europe).bin" size="8460144" crc="e599cc4a" sha1="3fb55a8a2e8ceb3c21588b97a5527497d1a7a909"/> -->
+	<software name="hocuspoc">
+		<description>Hocus Pocus (Europe)</description>
+		<year>1995</year>
+		<publisher>Kixx XL</publisher>
+		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Hocus Pocus (Europe)" sha1="bfd4f851c81965448daf9e2087723c50ec8a7ed8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/42356/ -->
+	<!-- <rom name="Hocus Pocus (Germany).cue" size="87" crc="6f93c55e" sha1="115762931a1cf964382acea9ef70d279339ce6e3"/> -->
+	<!-- <rom name="Hocus Pocus (Germany).bin" size="43220352" crc="59836a87" sha1="61ace4a5f435da423c5c41575b41fe5c276814f2"/> -->
+	<software name="hocuspcde" cloneof="hocuspoc">
+		<description>Hocus Pocus (Germany)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Germany" />
+		<info name="version" value="1.0" />
+		<sharedfeat name="platform" value="DOS" />
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Hocus Pocus (Germany)" sha1="d52bdffdb451b91f5bd65c880ba8009198ff5856" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/38104/ -->
+	<!-- <rom name="Hocus Pocus (Germany) (Demo).cue" size="117" crc="2640e7cb" sha1="afef8ebd94d91e01491d9de5f17c886a5d4c15c1"/> -->
+	<!-- <rom name="Hocus Pocus (Germany) (Demo).bin" size="68113920" crc="d18b9889" sha1="5b8bcbda4b5c8c9ce16e828aa17fa7f3f8aa6353"/> -->
+	<software name="hocuspcdesw" cloneof="hocuspoc">
+		<description>Hocus Pocus (Germany, shareware)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Germany" />
+		<info name="version" value="Shareware Version 1.1" />
+		<sharedfeat name="platform" value="DOS" />
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Hocus Pocus (Germany) (Demo)" sha1="9fde44d5eb760c1c5847c14165894a8c6073b78f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/57955/ -->
+	<!-- <rom name="Hocus Pocus (Spain) (Rerelease).cue" size="97" crc="884f4778" sha1="3f47b53d8750ac7b8e92361d0a42686212686ada"/> -->
+	<!-- <rom name="Hocus Pocus (Spain) (Rerelease).bin" size="11632992" crc="dfafa2af" sha1="a9582756355d941144ce4f17d0a7e76ebdebad60"/> -->
+	<software name="hocuspces" cloneof="hocuspoc">
+		<description>Hocus Pocus (Spain)</description>
+		<year>1997</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Spain" />
+		<info name="version" value="1.0" />
+		<sharedfeat name="platform" value="DOS" />
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Hocus Pocus (Spain) (Rerelease)" sha1="7f54622d68dd68da0b5185d6a5475f083315ded3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/49593/ -->
+	<!-- <rom name="Hocus Pocus (USA).cue" size="106" crc="e2f7db08" sha1="51ea3cdab89678fa08be5e5443e4a32bdd15dd1f"/> -->
+	<!-- <rom name="Hocus Pocus (USA).bin" size="8107344" crc="30da926c" sha1="7c6fd6f0a82a9e17678ea9146a91433e1c4200b2"/> -->
+	<software name="hocuspcus" cloneof="hocuspoc">
+		<description>Hocus Pocus (USA)</description>
+		<year>1995</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Hocus Pocus (USA)" sha1="2635c948b4b0503bd616e71a950b5a02d0c40578" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/33333/ -->
+	<!-- <rom name="Hocus Pocus (USA) (Alt).cue" size="112" crc="8ce5c2e1" sha1="0841678b5668bb19e8b1796a182e553bec264b56"/> -->
+	<!-- <rom name="Hocus Pocus (USA) (Alt).bin" size="8464848" crc="6770169f" sha1="6699abaf6c22dd15ef89ed477d995faa8928e531"/> -->
+	<software name="hocuspcus1" cloneof="hocuspoc">
+		<description>Hocus Pocus (USA, rerelease)</description>
+		<year>1995</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Hocus Pocus (USA) (Alt)" sha1="04711c1e225b6127e13cda3358fb7a314c1c0b39" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/33334/ -->
+	<!-- <rom name="Hocus Pocus (USA) (Alt 2).cue" size="91" crc="ff8950f2" sha1="0603f7aa9d23fc6b79c5c1b3106095400ad848ed"/> -->
+	<!-- <rom name="Hocus Pocus (USA) (Alt 2).bin" size="8112048" crc="5c004fab" sha1="2859f099a0c4636ee64b88549c4088eb7500e009"/> -->
+	<software name="hocuspcus2" cloneof="hocuspoc">
+		<description>Hocus Pocus (USA, rerelease, alt)</description>
+		<year>1995</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Hocus Pocus (USA) (Alt 2)" sha1="46799b8b4e1fa697c23ebee08db3dc00818839a3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/62329/ -->
+	<!-- <rom name="Hocus Pocus (USA) (Rerelease).cue" size="118" crc="2fb78e3e" sha1="8f7bab658af61e2114557c68e38220957aafc138"/> -->
+	<!-- <rom name="Hocus Pocus (USA) (Rerelease).bin" size="24790080" crc="9392092e" sha1="11303fd657bb4ba8e2a5df06f31fe681b66ddd49"/> -->
+	<software name="hocuspcus3" cloneof="hocuspoc">
+		<description>Hocus Pocus (USA, mail order release)</description>
+		<year>1997</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Moonlite Software" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Hocus Pocus (USA) (Rerelease)" sha1="7e7a696f365f79304ed68bf98bb46bcaa2dcdd13" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/28673/ -->
+	<!-- Source: http://redump.org/disc/28675/ -->
+	<!-- <rom name="id Anthology (USA) (Disc 1) (Vintage).cue" size="103" crc="f25a3f47" sha1="c4c9b803f8896960d5e622b71f1ea37202824675"/> -->
+	<!-- <rom name="id Anthology (USA) (Disc 1) (Vintage).bin" size="13034784" crc="59efce1d" sha1="0d68ef00815c2f18817372dacd120e5a2d5ed3c9"/> -->
+	<!-- <rom name="id Anthology (USA) (Disc 2) (Doom) (Rev 1).cue" size="131" crc="535b4387" sha1="128683f7e261db349ff2fccba14a9f1b3c7b2ebe"/> -->
+	<!-- <rom name="id Anthology (USA) (Disc 2) (Doom) (Rev 1).bin" size="223225968" crc="6ff080ba" sha1="26856c342897ba02edb326f8657ef69429eaddc7"/> -->
+	<software name="idanthol">
+		<description>id Anthology (rev 1)</description>
+		<year>1996</year>
+		<publisher>id Software</publisher>
+		<notes><![CDATA[
+CD-ROM 1: "Catacomb 3-D", "Commander Keen: Invasion of the Vorticons", "Commander Keen: Goodbye Galaxy", "Commander Keen: Aliens Ate My Babysitter!", "Commander Keen: Keen Dreams",
+		  "Dangerous Dave", "Hover Tank 3D", "Rescue Rover", "Rescue Rover 2", "Shadow Knights", "Slordax: The Unknown Enemy", "Spear of Destiny", "The Catacomb", "Wolfenstein 3D"
+CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "The Ultimate DOOM"
+CD-ROM 3: "Quake"
+CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D"
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Vintage"/>
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 1) (Vintage)" sha1="f2e0dcc8252d0b11cc770452f6513fc1d2653452" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="DOOM"/>
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 2) (Doom) (Rev 1)" sha1="0cc44f09c53368ac0a5360db9b16d5d1ddf4380b" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Quake"/>
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 3) (Quake)" status="nodump" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="Mac"/>
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 4) (Mac)" status="nodump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/28673/ -->
+	<!-- Source: http://redump.org/disc/28674/ -->
+	<!-- <rom name="id Anthology (USA) (Disc 1) (Vintage).cue" size="103" crc="f25a3f47" sha1="c4c9b803f8896960d5e622b71f1ea37202824675"/> -->
+	<!-- <rom name="id Anthology (USA) (Disc 1) (Vintage).bin" size="13034784" crc="59efce1d" sha1="0d68ef00815c2f18817372dacd120e5a2d5ed3c9"/> -->
+	<!-- <rom name="id Anthology (USA) (Disc 2) (Doom).cue" size="123" crc="d9bd95e5" sha1="77f887a39c46b6da72b296fe410b2db46e034362"/> -->
+	<!-- <rom name="id Anthology (USA) (Disc 2) (Doom).bin" size="221391408" crc="7d7d5916" sha1="8652b4195f9796c471880b5150f71022390d9db4"/> -->
+	<software name="idanthola" cloneof= "idanthol">
+		<description>id Anthology</description>
+		<year>1996</year>
+		<publisher>id Software</publisher>
+		<notes><![CDATA[
+CD-ROM 1: "Catacomb 3-D", "Commander Keen: Invasion of the Vorticons", "Commander Keen: Goodbye Galaxy", "Commander Keen: Aliens Ate My Babysitter!", "Commander Keen: Keen Dreams",
+		  "Dangerous Dave", "Hover Tank 3D", "Rescue Rover", "Rescue Rover 2", "Shadow Knights", "Slordax: The Unknown Enemy", "Spear of Destiny", "The Catacomb", "Wolfenstein 3D"
+CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "The Ultimate DOOM"
+CD-ROM 3: "Quake"
+CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D"
+]]></notes>
+		<info name="usage" value="DOS" />
+		<info name="region" value="USA" />
+
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 1) (Vintage)" sha1="f2e0dcc8252d0b11cc770452f6513fc1d2653452" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 2) (Doom)" sha1="b32a547d78a19d2e0a47fdfc64e270b2ecfa000e" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 3) (Quake)" status="nodump" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 4) (Mac)" status="nodump" />
 			</diskarea>
 		</part>
 	</software>
@@ -3025,6 +3373,43 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="zwgam01" sha1="5b79550e2b5f4f1342c1bad105712e3e5c01d925" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/36034/ -->
+	<!-- <rom name="Zool - Ninja of the Nth Dimension (Europe).cue" size="131" crc="84bb26c9" sha1="86f539941279a5f00c5e26ea5af7666968f0081b"/> -->
+	<!-- <rom name="Zool - Ninja of the Nth Dimension (Europe).bin" size="15431472" crc="96336177" sha1="5881217a5704d7864282a0524f679cd87d6f6e2e"/> -->
+	<software name="zool">
+		<description>Zool: Ninja of the "Nth" Dimension</description>
+		<year>1996</year>
+		<publisher>Gremlin Interactive</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="24/02/94" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Zool - Ninja of the Nth Dimension (Europe)" sha1="eaf97c3fbf6f78a55fabf316c258f14201bf4be1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/17972/ -->
+	<!-- <rom name="Zool 2 (Europe).cue" size="81" crc="952d4ced" sha1="e6e7dd8241ae01f1d02530a3584fd6a39c4374a0"/> -->
+	<!-- <rom name="Zool 2 (Europe).bin" size="42731136" crc="7369b7e2" sha1="c6dd4cba9cdaa8c240109252a5356b9dc6ff1707"/> -->
+	<software name="zool2">
+		<description>Zool 2</description>
+		<year>1994</year>
+		<publisher>Gremlin Interactive</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Zool 2 (Europe)" sha1="7609f9de95f75227849b307b590063a9d34f3d31" />
 			</diskarea>
 		</part>
 	</software>

@@ -114,8 +114,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_buffered_data(0),
 	m_sprite_page(0),
 	m_scan_scale(1), // set the scan scale (this is for dual monitor vertical setups)
-	m_draw_phase(0),
-	m_use_sprite_write_limitation(true)
+	m_draw_phase(0)
 {
 	for (auto& elem : m_regs)
 		elem = 0;
@@ -1284,12 +1283,13 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case PPU_SPRITE_DATA: /* 4 */
-		// If the PPU is currently rendering the screen, 0xff is written instead of the desired data.
-		if (m_use_sprite_write_limitation)
-			if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
-				data = 0xff;
-		m_spriteram[m_regs[PPU_SPRITE_ADDRESS]] = data;
-		m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+		// writes to sprite data during rendering do not modify memory
+		// TODO: however writes during rendering do perform a glitchy increment to the address
+		if (m_scanline > BOTTOM_VISIBLE_SCANLINE || !(m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)))
+		{
+			m_spriteram[m_regs[PPU_SPRITE_ADDRESS]] = data;
+			m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+		}
 		break;
 
 	case PPU_SCROLL: /* 5 */

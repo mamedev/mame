@@ -126,11 +126,11 @@ void tceptor_state::m6809_map(address_map &map)
 	map(0x0000, 0x17ff).ram();
 	map(0x1800, 0x1bff).ram().w(FUNC(tceptor_state::tceptor_tile_ram_w)).share("tile_ram");
 	map(0x1c00, 0x1fff).ram().w(FUNC(tceptor_state::tceptor_tile_attr_w)).share("tile_attr");
-	map(0x2000, 0x3fff).ram().w(FUNC(tceptor_state::tceptor_bg_ram_w)).share("bg_ram");  // background (VIEW RAM)
+	map(0x2000, 0x3fff).ram().w(FUNC(tceptor_state::tceptor_bg_ram_w)).share("bg_ram"); // background (VIEW RAM)
 	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
 	map(0x4800, 0x4800).w(FUNC(tceptor_state::tceptor2_shutter_w));
 	map(0x4f00, 0x4f07).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
-	map(0x5000, 0x5006).w(FUNC(tceptor_state::tceptor_bg_scroll_w));  // bg scroll
+	map(0x5000, 0x5006).w(FUNC(tceptor_state::tceptor_bg_scroll_w));
 	map(0x6000, 0x7fff).ram().share("m68k_shared_ram"); // COM RAM
 	map(0x8000, 0x8000).w(FUNC(tceptor_state::m6809_irq_disable_w));
 	map(0x8800, 0x8800).w(FUNC(tceptor_state::m6809_irq_enable_w));
@@ -156,20 +156,20 @@ void tceptor_state::m6502_b_map(address_map &map)
 	map(0x0000, 0x00ff).ram().share("share2");
 	map(0x0100, 0x01ff).ram();
 	map(0x4000, 0x4000).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0x5000, 0x5000).nopw();           // voice ctrl??
+	map(0x5000, 0x5000).nopw(); // voice ctrl??
 	map(0x8000, 0xffff).rom();
 }
 
 
 void tceptor_state::m68k_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).rom();         // M68K ERROR 1
-	map(0x100000, 0x10ffff).rom();         // not sure
-	map(0x200000, 0x203fff).ram();         // M68K ERROR 0
+	map(0x000000, 0x00ffff).rom(); // M68K ERROR 1
+	map(0x100000, 0x10ffff).rom(); // not sure
+	map(0x200000, 0x203fff).ram(); // M68K ERROR 0
 	map(0x300000, 0x300001).nopw();
 	map(0x400000, 0x4001ff).writeonly().share("sprite_ram");
 	map(0x500000, 0x51ffff).w(m_c45_road, FUNC(namco_c45_road_device::write));
-	map(0x600000, 0x600001).w(FUNC(tceptor_state::m68k_irq_enable_w));    // not sure
+	map(0x600000, 0x600001).w(FUNC(tceptor_state::m68k_irq_enable_w)); // not sure
 	map(0x700000, 0x703fff).rw(FUNC(tceptor_state::m68k_shared_r), FUNC(tceptor_state::m68k_shared_w)).umask16(0x00ff);
 }
 
@@ -190,7 +190,7 @@ void tceptor_state::mcu_map(address_map &map)
 	map(0x8800, 0x8800).w(FUNC(tceptor_state::mcu_irq_enable_w));
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xdfff).ram().share("nvram");   // Battery Backup
+	map(0xc800, 0xdfff).ram().share("nvram"); // Battery Backup
 	map(0xf000, 0xffff).rom();
 }
 
@@ -199,7 +199,7 @@ void tceptor_state::mcu_map(address_map &map)
 /*******************************************************************/
 
 static INPUT_PORTS_START( tceptor )
-	PORT_START("DSW1")  /* DSW 1 */
+	PORT_START("DSW1") // DSW 1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( tceptor )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW2")  /* DSW 2 */
+	PORT_START("DSW2") // DSW 2
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, "A" )
 	PORT_DIPSETTING(    0x03, "B" )
@@ -230,35 +230,35 @@ static INPUT_PORTS_START( tceptor )
 	PORT_DIPSETTING(    0x00, "D" )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("BUTTONS")   /* Memory Mapped Port */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    // shot
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    // bomb
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )    // shot
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )    // bomb
+	PORT_START("BUTTONS") // Memory Mapped Port
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shot
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // bomb
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // shot
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // bomb
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SERVICE")   /* Memory Mapped Port */
+	PORT_START("SERVICE") // Memory Mapped Port
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )     // TEST SW
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW ) // TEST SW
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("PEDAL") /* ADC0809 - 8 CHANNEL ANALOG - CHANNEL 1 */
+	PORT_START("PEDAL") // ADC0809 - 8 CHANNEL ANALOG - CHANNEL 1
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xd6) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_CODE_INC(KEYCODE_Z)
 
-	PORT_START("STICKX")    /* ADC0809 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT(  0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
+	PORT_START("STICKX") // ADC0809 - 8 CHANNEL ANALOG - CHANNEL 2
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START("STICKY")    /* ADC08090 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT(  0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
+	PORT_START("STICKY") // ADC08090 - 8 CHANNEL ANALOG - CHANNEL 3
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tceptor2 )
 	PORT_INCLUDE( tceptor )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x04, 0x04, "Mode" )
+	PORT_DIPNAME( 0x04, 0x00, "Mode" )
 	PORT_DIPSETTING(    0x00, "2D" )
 	PORT_DIPSETTING(    0x04, "3D" )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -314,7 +314,7 @@ void tceptor_state::machine_reset()
 void tceptor_state::tceptor(machine_config &config)
 {
 	/* basic machine hardware */
-	M6809(config, m_maincpu, XTAL(49'152'000)/32);
+	MC6809E(config, m_maincpu, XTAL(49'152'000)/32);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tceptor_state::m6809_map);
 
 	M65C02(config, m_audiocpu[0], XTAL(49'152'000)/24);

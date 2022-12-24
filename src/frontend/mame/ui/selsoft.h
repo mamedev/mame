@@ -32,6 +32,9 @@ public:
 	menu_select_software(mame_ui_manager &mui, render_container &container, ui_system_info const &system);
 	virtual ~menu_select_software() override;
 
+protected:
+	virtual void menu_deactivated() override;
+
 private:
 	using filter_map = std::map<software_filter::type, software_filter::ptr>;
 	using icon_cache = texture_lru<ui_software_info const *>;

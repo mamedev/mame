@@ -35,6 +35,7 @@ public:
 		, m_mcu(*this, "mcu")
 		, m_dongle_r(*this)
 		, m_dongle_w(*this)
+		, m_donglerom(*this, "dongle")
 		, m_audiocpu(*this, "audiocpu")
 		, m_watchdog(*this, "watchdog")
 		, m_cassette(*this, "cassette")
@@ -60,6 +61,7 @@ public:
 	void init_decocass();
 	void init_decocrom();
 	void init_cdsteljn();
+	void init_nebula();
 
 protected:
 	/* devices */
@@ -69,6 +71,8 @@ protected:
 	/* dongles-related */
 	read8sm_delegate    m_dongle_r; // TODO: why isn't this a virtual method?
 	write8sm_delegate   m_dongle_w; // TODO: why isn't this a virtual method?
+
+	optional_region_ptr<uint8_t> m_donglerom;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -257,6 +261,7 @@ public:
 	void ctsttape(machine_config &config);
 	void castfant(machine_config &config);
 	void ctisland(machine_config &config);
+	void cnebula(machine_config &config);
 
 private:
 	DECLARE_MACHINE_RESET(ctsttape);
@@ -276,6 +281,7 @@ private:
 	DECLARE_MACHINE_RESET(cocean1a); /* 10 */
 	DECLARE_MACHINE_RESET(cfboy0a1); /* 12 */
 	DECLARE_MACHINE_RESET(clocknchj); /* 11 */
+	DECLARE_MACHINE_RESET(cnebula);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -445,6 +451,25 @@ private:
 	/* dongle type widel: status */
 	int32_t     m_widel_ctrs = 0;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
 	int32_t     m_widel_latch = 0;        /* latched enable PROM (1100xxxx written to E5x1) */
+};
+
+class decocass_darksoft_state : public decocass_state
+{
+public:
+	decocass_darksoft_state(const machine_config &mconfig, device_type type, const char *tag)
+		: decocass_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	uint8_t decocass_darksoft_r(offs_t offset);
+	void decocass_darksoft_w(offs_t offset, uint8_t data);
+
+	uint32_t m_address;
 };
 
 #endif // MAME_INCLUDES_DECOCASS_H

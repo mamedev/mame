@@ -1,14 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Charles MacDonald,Mathis Rosenhauer,Brad Oliver,Michael Luong,Fabio Priuli,Enik Land
 #include "emu.h"
-#include "crsshair.h"
-#include "cpu/z80/z80.h"
-#include "video/315_5124.h"
-#include "sound/ymopl.h"
 #include "sms.h"
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "cpu/z80/z80.h"
+
+#include "crsshair.h"
 
 #define ENABLE_NONE      0x00
 #define ENABLE_EXPANSION 0x01
@@ -26,8 +23,7 @@ TIMER_CALLBACK_MEMBER(sms_state::lphaser_th_generate)
 
 void sms_state::lphaser_hcount_latch()
 {
-	/* A delay seems to occur when the Light Phaser latches the
-	   VDP hcount, then an offset is added here to the hpos. */
+	// A delay seems to occur when the Light Phaser latches the VDP hcount, then an offset is added here to the hpos.
 	m_lphaser_th_timer->adjust(m_main_scr->time_until_pos(m_main_scr->vpos(), m_main_scr->hpos() + m_lphaser_x_offs));
 }
 
@@ -37,18 +33,18 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 	// Check if TH of controller port 1 is set to input (1)
 	if (m_io_ctrl_reg & 0x02)
 	{
-		if (state == 0)
+		if (!state)
 		{
 			m_ctrl1_th_latch = 1;
 		}
 		else
 		{
 			// State is 1. If changed from 0, hcount is latched.
-			if (m_ctrl1_th_state == 0)
+			if (!m_ctrl1_th_state)
 				lphaser_hcount_latch();
 		}
-		m_ctrl1_th_state = state;
 	}
+	m_ctrl1_th_state = state;
 }
 
 
@@ -57,151 +53,85 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 	// Check if TH of controller port 2 is set to input (1)
 	if (m_io_ctrl_reg & 0x08)
 	{
-		if (state == 0)
+		if (!state)
 		{
 			m_ctrl2_th_latch = 1;
 		}
 		else
 		{
 			// State is 1. If changed from 0, hcount is latched.
-			if (m_ctrl2_th_state == 0)
+			if (!m_ctrl2_th_state)
 				lphaser_hcount_latch();
 		}
-		m_ctrl2_th_state = state;
 	}
+	m_ctrl2_th_state = state;
 }
 
 
 WRITE_LINE_MEMBER(gamegear_state::gg_ext_th_input)
 {
-	if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
-		return;
+	m_gg_ioport->th_w(state);
 
-	// The EXT port act as the controller port 2 on SMS compatibility mode.
-	sms_ctrl2_th_input(state);
+	// TODO: verify behaviour in SMS mode
+	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
+		sms_ctrl2_th_input(state);
+}
+
+
+WRITE_LINE_MEMBER(gamegear_state::gg_nmi)
+{
+	if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 
 void sms_state::sms_get_inputs()
 {
-	uint8_t data1 = 0xff;
-	uint8_t data2 = 0xff;
-
 	m_port_dc_reg = 0xff;
 	m_port_dd_reg = 0xff;
 
-	// The bit order of the emulated controller port tries to follow its
-	// physical pins numbering. For register bits whose order differs,
-	// it's necessary move the equivalent controller bits to match.
+	m_port_dc_reg &= ~0x3f | m_port_ctrl1->in_r(); // Up, Down, Left, Right, TL, TR
 
-	if (m_is_gamegear)
-	{
-		// For Game Gear, this function is used only if SMS mode is
-		// enabled, else only register $dc receives input data, through
-		// direct read of the m_port_gg_dc I/O port.
-
-		data1 = m_port_gg_dc->read();
-		m_port_dc_reg &= ~0x03f | data1;
-
-		data2 = m_port_gg_ext->port_r();
-	}
-	else
-	{
-		data1 = m_port_ctrl1->port_r();
-		m_port_dc_reg &= ~0x0f | data1; // Up, Down, Left, Right
-		m_port_dc_reg &= ~0x10 | (data1 >> 1); // TL (Button 1)
-		m_port_dc_reg &= ~0x20 | (data1 >> 2); // TR (Button 2)
-
-		data2 = m_port_ctrl2->port_r();
-	}
+	uint8_t const data2 = m_port_ctrl2->in_r();
 
 	m_port_dc_reg &= ~0xc0 | (data2 << 6); // Up, Down
-	m_port_dd_reg &= ~0x03 | (data2 >> 2); // Left, Right
-	m_port_dd_reg &= ~0x04 | (data2 >> 3); // TL (Button 1)
-	m_port_dd_reg &= ~0x08 | (data2 >> 4); // TR (Button 2)
-
-	if (!m_is_mark_iii)
-	{
-		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
-		m_port_dd_reg &= ~0x80 | (data2 << 1); // TH ctrl2
-	}
+	m_port_dd_reg &= ~0x0f | (data2 >> 2); // Left, Right, TL, TR
+	m_port_dd_reg &= ~0x40 | (m_ctrl1_th_state << 6); // TH ctrl1
+	m_port_dd_reg &= ~0x80 | (m_ctrl2_th_state << 7); // TH ctrl2
 }
 
 
 void sms_state::sms_io_control_w(uint8_t data)
 {
 	bool latch_hcount = false;
-	uint8_t ctrl1_port_data = 0xff;
-	uint8_t ctrl2_port_data = 0xff;
-
-	if (m_is_gamegear && !(m_cartslot->exists() && m_cartslot->get_sms_mode()))
-	{
-		m_io_ctrl_reg = data;
-		return;
-	}
 
 	// Controller Port 1:
 
 	// check if TR or TH are set to output (0).
-	if ((data & 0x03) != 0x03)
+	if ((data & 0x33) != (m_io_ctrl_reg & 0x33))
 	{
-		if (!(data & 0x01)) // TR set to output
-		{
-			ctrl1_port_data &= ~0x80 | (data << 3);
-		}
-		if (!(data & 0x02)) // TH set to output
-		{
-			ctrl1_port_data &= ~0x40 | (data << 1);
-		}
-		if (!m_is_gamegear)
-			m_port_ctrl1->port_w(ctrl1_port_data);
+		m_port_ctrl1->out_w(((BIT(data, 4, 2) | BIT(data, 0, 2)) << 5) | 0x1f, BIT(~data, 0, 2) << 5);
 	}
-	// check if TH is set to input (1).
-	if (data & 0x02)
-	{
-		if (!m_is_gamegear)
-			ctrl1_port_data &= ~0x40 | m_port_ctrl1->port_r();
 
-		// check if TH input level is high (1) and was output/low (0)
-		if ((ctrl1_port_data & 0x40) && !(m_io_ctrl_reg & 0x22))
-			latch_hcount = true;
-	}
+	// check if TH input level is high (1) and was output/low (0)
+	if ((data & 0x02) && !(m_io_ctrl_reg & 0x22) && m_ctrl1_th_state)
+		latch_hcount = true;
 
 	// Controller Port 2:
 
 	// check if TR or TH are set to output (0).
-	if ((data & 0x0c) != 0x0c)
+	if ((data & 0xcc) != (m_io_ctrl_reg & 0xcc))
 	{
-		if (!(data & 0x04)) // TR set to output
-		{
-			ctrl2_port_data &= ~0x80 | (data << 1);
-		}
-		if (!(data & 0x08)) // TH set to output
-		{
-			ctrl2_port_data &= ~0x40 | (data >> 1);
-		}
-		if (!m_is_gamegear)
-			m_port_ctrl2->port_w(ctrl2_port_data);
-		else
-			m_port_gg_ext->port_w(ctrl2_port_data);
+		m_port_ctrl2->out_w(((BIT(data, 6, 2) | BIT(data, 2, 2)) << 5) | 0x1f, BIT(~data, 2, 2) << 5);
 	}
-	// check if TH is set to input (1).
-	if (data & 0x08)
-	{
-		if (!m_is_gamegear)
-			ctrl2_port_data &= ~0x40 | m_port_ctrl2->port_r();
-		else
-			ctrl2_port_data &= ~0x40 | m_port_gg_ext->port_r();
 
-		// check if TH input level is high (1) and was output/low (0)
-		if ((ctrl2_port_data & 0x40) && !(m_io_ctrl_reg & 0x88))
-			latch_hcount = true;
-	}
+	// check if TH input level is high (1) and was output/low (0)
+	if ((data & 0x08) && !(m_io_ctrl_reg & 0x88) && m_ctrl2_th_state)
+		latch_hcount = true;
 
 	if (latch_hcount)
-	{
 		m_vdp->hcount_latch();
-	}
+
 	m_io_ctrl_reg = data;
 }
 
@@ -314,26 +244,10 @@ WRITE_LINE_MEMBER(sms_state::rapid_n_csync_callback)
 
 uint8_t sms_state::sms_input_port_dc_r()
 {
-	if (m_is_mark_iii)
-	{
-		sms_get_inputs();
-		return m_port_dc_reg;
-	}
-
-	if (m_is_gamegear)
-	{
-		// If SMS mode is disabled, just return the data read from the
-		// input port. Its mapped port bits match the bits of register $dc.
-		if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
-			return m_port_gg_dc->read();
-	}
-	else
-	{
-		// Return if the I/O chip is disabled (1). This check isn't performed
-		// for the Game Gear because has no effect on it, even in SMS mode.
-		if (m_mem_ctrl_reg & IO_CHIP)
-			return 0xff;
-	}
+	// Return if the I/O chip is disabled (1). This check isn't performed
+	// for the Game Gear because has no effect on it, even in SMS mode.
+	if (m_mem_ctrl_reg & IO_CHIP)
+		return 0xff;
 
 	sms_get_inputs();
 
@@ -361,24 +275,10 @@ uint8_t sms_state::sms_input_port_dc_r()
 
 uint8_t sms_state::sms_input_port_dd_r()
 {
-	if (m_is_mark_iii)
-	{
-		sms_get_inputs();
-		return m_port_dd_reg;
-	}
-
-	if (m_is_gamegear)
-	{
-		if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
-			return 0xff;
-	}
-	else
-	{
-		// Return if the I/O chip is disabled (1). This check isn't performed
-		// for the Game Gear because has no effect on it, even in SMS mode.
-		if (m_mem_ctrl_reg & IO_CHIP)
-			return 0xff;
-	}
+	// Return if the I/O chip is disabled (1). This check isn't performed
+	// for the Game Gear because has no effect on it, even in SMS mode.
+	if (m_mem_ctrl_reg & IO_CHIP)
+		return 0xff;
 
 	sms_get_inputs();
 
@@ -398,14 +298,11 @@ uint8_t sms_state::sms_input_port_dd_r()
 	// Check if TH of controller port 1 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x02))
 	{
-		if (m_ioctrl_region_is_japan)
-		{
-			m_port_dd_reg &= ~0x40;
-		}
-		else
+		m_port_dd_reg &= ~0x40;
+		if (!m_ioctrl_region_is_japan)
 		{
 			// Read TH state set through IO control port
-			m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x20) << 1);
+			m_port_dd_reg |= (m_io_ctrl_reg & 0x20) << 1;
 		}
 	}
 	else  // TH set to input (1)
@@ -422,14 +319,11 @@ uint8_t sms_state::sms_input_port_dd_r()
 	// Check if TH of controller port 2 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x08))
 	{
-		if (m_ioctrl_region_is_japan)
-		{
-			m_port_dd_reg &= ~0x80;
-		}
-		else
+		m_port_dd_reg &= ~0x80;
+		if (!m_ioctrl_region_is_japan)
 		{
 			// Read TH state set through IO control port
-			m_port_dd_reg &= ~0x80 | (m_io_ctrl_reg & 0x80);
+			m_port_dd_reg |= m_io_ctrl_reg & 0x80;
 		}
 	}
 	else  // TH set to input (1)
@@ -528,32 +422,77 @@ void sms_state::smsj_ym2413_data_port_w(uint8_t data)
 }
 
 
-void gamegear_state::gg_psg_stereo_w(uint8_t data)
+void gamegear_state::gg_io_control_w(uint8_t data)
 {
-	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
-		return;
+	// Only used in SMS mode
+	// TODO: confirm behaviour
 
-	m_vdp->psg_stereo_w(data);
+	m_gg_ioport->data_w(0x9f | (BIT(data, 6, 2) << 5));
+	m_gg_ioport->ctrl_w(0x9f | (BIT(data, 2, 2) << 5));
+
+	bool const latch_hcount1 = (data & 0x02) && !(m_io_ctrl_reg & 0x22);
+	bool const latch_hcount2 = (data & 0x08) && !(m_io_ctrl_reg & 0x88) && m_ctrl2_th_state;
+
+	if (latch_hcount1 || latch_hcount2)
+		m_vdp->hcount_latch();
+
+	m_io_ctrl_reg = data;
 }
 
 
 uint8_t gamegear_state::gg_input_port_00_r()
 {
+	// bit 6 is NJAP (0=domestic/1=overseas); bit 7 is STT (START button)
+	uint8_t data = (m_ioctrl_region_is_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
+
+	// According to GG official docs, bits 0-4 are meaningless and bit 5
+	// is NNTS (0=NTSC, 1=PAL). All games run in NTSC and no original GG
+	// allows the user to change that mode, but there are NTSC and PAL
+	// versions of the TV Tuner.
+
+	//logerror("port $00 read, val: %02x, pc: %04x\n", data, activecpu_get_pc());
+	return data;
+}
+
+
+uint8_t gamegear_state::gg_input_port_dc_r()
+{
+	// TODO: does setting TL/TR to output in SMS mode affect this?
+	return (m_port_gg_dc->read() & 0x3f) | (m_gg_ioport->data_r() << 6);
+}
+
+
+uint8_t gamegear_state::gg_input_port_dd_r()
+{
+	uint8_t const ext = m_gg_ioport->data_r();
+	uint8_t result = 0x70 | ((ext >> 2) & 0x0f) | (BIT(ext, 6) << 7);
+
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
-		return 0xff;
-	else
 	{
-		// bit 6 is NJAP (0=domestic/1=overseas); bit 7 is STT (START button)
-		uint8_t data = (m_ioctrl_region_is_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
+		// TODO: confirm behaviour in SMS mode
 
-		// According to GG official docs, bits 0-4 are meaningless and bit 5
-		// is NNTS (0=NTSC, 1=PAL). All games run in NTSC and no original GG
-		// allows the user to change that mode, but there are NTSC and PAL
-		// versions of the TV Tuner.
+		if (!(m_io_ctrl_reg & 0x02))
+		{
+			result &= ~0x40;
+			if (!m_ioctrl_region_is_japan)
+				result |= BIT(m_io_ctrl_reg, 5) << 6;
+		}
 
-		//logerror("port $00 read, val: %02x, pc: %04x\n", data, activecpu_get_pc());
-		return data;
+		if (!(m_io_ctrl_reg & 0x08))
+		{
+			if (m_ioctrl_region_is_japan)
+				result &= ~0x80;
+		}
+		else if (m_ctrl2_th_latch)
+		{
+			if (m_vdp->hcount_latched())
+				result &= ~0x80;
+
+			m_ctrl2_th_latch = 0;
+		}
 	}
+
+	return result;
 }
 
 
@@ -793,9 +732,9 @@ void sms_state::sms_mem_control_w(uint8_t data)
 }
 
 
-uint8_t sms_state::sg1000m3_peripheral_r(offs_t offset)
+uint8_t sg1000m3_state::sg1000m3_peripheral_r(offs_t offset)
 {
-	bool joy_ports_disabled = m_sgexpslot->is_readable(offset);
+	bool const joy_ports_disabled = m_sgexpslot->is_readable(offset);
 
 	if (joy_ports_disabled)
 	{
@@ -803,79 +742,21 @@ uint8_t sms_state::sg1000m3_peripheral_r(offs_t offset)
 	}
 	else
 	{
+		sms_get_inputs();
 		if (offset & 0x01)
-			return sms_input_port_dd_r();
+			return m_port_dd_reg;
 		else
-			return sms_input_port_dc_r();
+			return m_port_dc_reg;
 	}
 }
 
 
-void sms_state::sg1000m3_peripheral_w(offs_t offset, uint8_t data)
+void sg1000m3_state::sg1000m3_peripheral_w(offs_t offset, uint8_t data)
 {
-	bool joy_ports_disabled = m_sgexpslot->is_writeable(offset);
+	bool const joy_ports_disabled = m_sgexpslot->is_writeable(offset);
 
 	if (joy_ports_disabled)
-	{
 		m_sgexpslot->write(offset, data);
-	}
-}
-
-
-void gamegear_state::gg_sio_w(offs_t offset, uint8_t data)
-{
-	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
-		return;
-
-	logerror("*** write %02X to SIO register #%d\n", data, offset);
-
-	m_gg_sio[offset & 0x07] = data;
-	switch (offset & 7)
-	{
-		case 0x00: /* Parallel Data */
-			break;
-
-		case 0x01: /* Data Direction / NMI Enable */
-			break;
-
-		case 0x02: /* Serial Output */
-			break;
-
-		case 0x03: /* Serial Input */
-			break;
-
-		case 0x04: /* Serial Control / Status */
-			break;
-	}
-}
-
-
-uint8_t gamegear_state::gg_sio_r(offs_t offset)
-{
-	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
-		return 0xff;
-
-	logerror("*** read SIO register #%d\n", offset);
-
-	switch (offset & 7)
-	{
-		case 0x00: /* Parallel Data */
-			break;
-
-		case 0x01: /* Data Direction / NMI Enable */
-			break;
-
-		case 0x02: /* Serial Output */
-			break;
-
-		case 0x03: /* Serial Input */
-			break;
-
-		case 0x04: /* Serial Control / Status */
-			break;
-	}
-
-	return m_gg_sio[offset];
 }
 
 
@@ -1009,6 +890,9 @@ void sms_state::setup_bios()
 
 void sms_state::machine_start()
 {
+	m_ctrl1_th_state = 1;
+	m_ctrl2_th_state = 1;
+
 	// turn on the Power LED
 	if (m_has_pwr_led)
 	{
@@ -1080,7 +964,7 @@ void sms_state::machine_start()
 
 void smssdisp_state::machine_start()
 {
-	sms_state::machine_start();
+	sms1_state::machine_start();
 
 	save_item(NAME(m_store_control));
 	save_item(NAME(m_store_cart_selection_data));
@@ -1091,7 +975,6 @@ void gamegear_state::machine_start()
 	sms_state::machine_start();
 
 	save_item(NAME(m_gg_paused));
-	save_item(NAME(m_gg_sio));
 
 	// The game Ecco requires SP to be initialized, so, to run on a BIOS-less Game
 	// Gear, probably a custom chip like the 315-5378 does the initialization, as
@@ -1124,8 +1007,6 @@ void sms_state::machine_reset()
 		m_io_ctrl_reg = 0xff;
 		m_ctrl1_th_latch = 0;
 		m_ctrl2_th_latch = 0;
-		m_ctrl1_th_state = 1;
-		m_ctrl2_th_state = 1;
 	}
 
 	setup_bios();
@@ -1138,20 +1019,30 @@ void smssdisp_state::machine_reset()
 	m_store_cart_selection_data = 0;
 	store_select_cart(m_store_cart_selection_data);
 
-	sms_state::machine_reset();
+	sms1_state::machine_reset();
+}
+
+void sg1000m3_state::machine_reset()
+{
+	sms1_state::machine_reset();
+
+	// controller port pin 7 is tied to ground on the Mark III
+	m_port_ctrl1->out_w(0x3f, 0x40);
+	m_port_ctrl2->out_w(0x3f, 0x40);
 }
 
 void gamegear_state::machine_reset()
 {
+	// TODO: default with SMS mode pin floating is SMS compatibility mode
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
+	{
 		m_vdp->set_sega315_5124_compatibility_mode(true);
-
-	/* Initialize SIO stuff for GG */
-	m_gg_sio[0] = 0x7f;
-	m_gg_sio[1] = 0xff;
-	m_gg_sio[2] = 0x00;
-	m_gg_sio[3] = 0xff;
-	m_gg_sio[4] = 0x00;
+		m_io_view.select(1);
+	}
+	else
+	{
+		m_io_view.select(0);
+	}
 
 	sms_state::machine_reset();
 }

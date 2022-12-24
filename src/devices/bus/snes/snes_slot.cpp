@@ -1371,7 +1371,7 @@ void base_sns_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t l
 	logerror( "HEADER DETAILS\n" );
 	logerror( "==============\n\n" );
 	logerror( "\tName:          %.21s\n", title );
-	logerror( "\tSpeed:         %s [%d]\n", (ROM[hilo_mode + 0x15] & 0xf0) ? "FastROM" : "SlowROM", (ROM[hilo_mode + 0x15] & 0xf0) >> 4);
+	logerror( "\tSpeed:         %s [%d]\n", (ROM[hilo_mode + 0x15] & 0x10) ? "FastROM" : "SlowROM", (ROM[hilo_mode + 0x15] & 0xf0) >> 4);
 	logerror( "\tBank size:     %s [%d]\n", (ROM[hilo_mode + 0x15] & 0xf) ? "HiROM" : "LoROM", ROM[hilo_mode + 0x15] & 0xf);
 
 	logerror( "\tType:          %s", cart_types[type]);

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Atari 7800 Software List
 Prototype information obtained from http://www.atariprotos.com
@@ -863,8 +863,8 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_act" />
-			<dataarea name="rom" size="131072">
-				<rom name="dbledrgn.bin" size="131072" crc="aa265865" sha1="c3fb140836a4ed84cda7a999832703e8b72c0d21"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="dbledrgn.bin" size="0x20000" crc="f20773d5" sha1="df67dad8bbf3813e7b96362c55ed4af40d831277"/>
 			</dataarea>
 		</part>
 	</software>
@@ -877,8 +877,8 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_act" />
-			<dataarea name="rom" size="131072">
-				<rom name="dbledreu.bin" size="131072" crc="f29abdb2" sha1="210f3ac989549e89425e7677127715aee713af32"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="dbledreu.bin" size="0x20000" crc="4d634bf5" sha1="da7d495ac858c3b1f66aeb6e981c25bd08d44bd8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -891,8 +891,8 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_abs" />
-			<dataarea name="rom" size="65536">
-				<rom name="f18hornt.bin" size="65536" crc="63d1c7c1" sha1="13a18a6b85db6222b01d37800e5e57db616a85a6"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="dei353am-hornt.u4" size="0x10000" crc="63d1c7c1" sha1="13a18a6b85db6222b01d37800e5e57db616a85a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1633,8 +1633,8 @@ Saarna for debugging the problem)
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="131072">
-				<rom name="midmutnt.bin" size="131072" crc="187ec84e" sha1="db5ea4c1456f3b403f6b8978432ecbcdac89d432"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="c300051-089a.u1" size="0x20000" crc="187ec84e" sha1="db5ea4c1456f3b403f6b8978432ecbcdac89d432"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2019,8 +2019,8 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_act" />
-			<dataarea name="rom" size="131072">
-				<rom name="rampage.bin" size="131072" crc="39a316aa" sha1="13745b5eaaab7e2c992f3312285e112cdeb424f6"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="rampage.bin" size="0x20000" crc="d2876ee2" sha1="17401f85fe8b453a6b43b3d0035d993b90568efc"/>
 			</dataarea>
 		</part>
 	</software>

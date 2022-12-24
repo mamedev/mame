@@ -176,10 +176,10 @@ const options_entry windows_options::s_option_entries[] =
 
 	// post-processing options
 	{ nullptr,                                                  nullptr,             core_options::option_type::HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
-	{ WINOPTION_HLSLPATH,                                       "hlsl",              core_options::option_type::STRING,     "path to HLSL support files" },
+	{ WINOPTION_HLSLPATH,                                       "hlsl",              core_options::option_type::PATH,       "path to HLSL support files" },
 	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",                 core_options::option_type::BOOLEAN,    "enable HLSL post-processing (PS3.0 required)" },
 	{ WINOPTION_HLSL_OVERSAMPLING,                              "0",                 core_options::option_type::BOOLEAN,    "enable HLSL oversampling" },
-	{ WINOPTION_HLSL_WRITE,                                     OSDOPTVAL_AUTO,      core_options::option_type::STRING,     "enable HLSL AVI writing (huge disk bandwidth suggested)" },
+	{ WINOPTION_HLSL_WRITE,                                     OSDOPTVAL_AUTO,      core_options::option_type::PATH,       "enable HLSL AVI writing (huge disk bandwidth suggested)" },
 	{ WINOPTION_HLSL_SNAP_WIDTH,                                "2048",              core_options::option_type::STRING,     "HLSL upscaled-snapshot width" },
 	{ WINOPTION_HLSL_SNAP_HEIGHT,                               "1536",              core_options::option_type::STRING,     "HLSL upscaled-snapshot height" },
 	{ WINOPTION_SHADOW_MASK_TILE_MODE,                          "0",                 core_options::option_type::INTEGER,    "shadow mask tile mode (0 for screen based, 1 for source based)" },
@@ -262,9 +262,9 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_BLOOM_LEVEL6_WEIGHT,                            "0.04",              core_options::option_type::FLOAT,      "bloom level 6 weight (1/4 smaller that level 5 target)" },
 	{ WINOPTION_BLOOM_LEVEL7_WEIGHT,                            "0.02",              core_options::option_type::FLOAT,      "bloom level 7 weight (1/4 smaller that level 6 target)" },
 	{ WINOPTION_BLOOM_LEVEL8_WEIGHT,                            "0.01",              core_options::option_type::FLOAT,      "bloom level 8 weight (1/4 smaller that level 7 target)" },
-	{ WINOPTION_LUT_TEXTURE,                                    "lut-default.png",   core_options::option_type::STRING,     "3D LUT texture filename for screen, PNG format" },
+	{ WINOPTION_LUT_TEXTURE,                                    "lut-default.png",   core_options::option_type::PATH,       "3D LUT texture filename for screen, PNG format" },
 	{ WINOPTION_LUT_ENABLE,                                     "0",                 core_options::option_type::BOOLEAN,    "Enables 3D LUT to be applied to screen after post-processing" },
-	{ WINOPTION_UI_LUT_TEXTURE,                                 "lut-default.png",   core_options::option_type::STRING,     "3D LUT texture filename of UI, PNG format" },
+	{ WINOPTION_UI_LUT_TEXTURE,                                 "lut-default.png",   core_options::option_type::PATH,       "3D LUT texture filename of UI, PNG format" },
 	{ WINOPTION_UI_LUT_ENABLE,                                  "0",                 core_options::option_type::BOOLEAN,    "enable 3D LUT to be applied to UI and artwork after post-processing" },
 
 	// full screen options

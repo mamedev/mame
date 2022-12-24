@@ -319,11 +319,9 @@ function qtdebuggerbuild()
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
 		configuration { "gmake or ninja" }
-			if (version >= 30600) then
-				buildoptions {
-					"-Wno-inconsistent-missing-override",
-				}
-			end
+			buildoptions {
+				"-Wno-error=inconsistent-missing-override",
+			}
 		configuration { }
 	end
 

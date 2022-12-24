@@ -195,6 +195,7 @@ ddr/pcm.cpp
 ddr/poly880.cpp
 ddr/sc2.cpp
 ddr/slc1.cpp
+ddr/sprachmg.cpp
 ddr/vcs80.cpp
 dec/dct11em.cpp
 dec/decmate2.cpp
@@ -288,7 +289,6 @@ gamepark/gp2x.cpp
 gamepark/gp32.cpp
 gridcomp/gridcomp.cpp
 grundy/newbrain.cpp
-h01x/h01x.cpp
 handheld/gameking.cpp
 handheld/gmaster.cpp
 handheld/hh_cop400.cpp
@@ -354,6 +354,7 @@ homebrew/homez80.cpp
 homebrew/lft_chiptune.cpp
 homebrew/lft_craft.cpp
 homebrew/lft_phasor.cpp
+homebrew/minib.cpp
 homebrew/mk1forth.cpp
 homebrew/p112.cpp
 homebrew/phunsy.cpp
@@ -484,8 +485,10 @@ miltonbradley/vectrex.cpp
 mips/mips.cpp
 misc/3do.cpp
 misc/eva.cpp
+misc/h01x.cpp
 misc/monon_color.cpp
 misc/mtu130.cpp
+misc/triton.cpp
 misc/z80ne.cpp
 mit/tx0.cpp
 mits/altair.cpp
@@ -518,6 +521,7 @@ msx/msx1_v9938.cpp
 msx/msx2.cpp
 multitech/mkit09.cpp
 multitech/mpf1.cpp
+multitech/mpf1_88.cpp
 mupid/mdisk.cpp
 mupid/mupid2.cpp
 nakajima/nakajies.cpp
@@ -977,7 +981,7 @@ skeleton/unistar.cpp
 skeleton/v6809.cpp
 skeleton/vanguardmk1.cpp
 skeleton/vd56sp.cpp
-skeleton/vector4.cpp
+skeleton/vector3.cpp
 skeleton/vectrix.cpp
 skeleton/vp415.cpp
 skeleton/vp60.cpp
@@ -1100,6 +1104,7 @@ trs/agvision.cpp
 trs/coco12.cpp
 trs/coco3.cpp
 trs/dgn_beta.cpp
+trs/dgnalpha.cpp
 trs/dragon.cpp
 trs/lnw80.cpp
 trs/max80.cpp

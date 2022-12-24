@@ -5,7 +5,7 @@
 Syusse Oozumou
 (c) 1984 Technos Japan (Licensed by Data East)
 
-Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
+Driver by Takahiro Nogi 1999/10/04
 
 ***************************************************************************/
 

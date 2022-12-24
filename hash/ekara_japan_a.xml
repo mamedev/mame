@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="ekara_japan_a" description="Takara e-pitch / e-kara (Japan) A-x series cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
@@ -17,7 +17,7 @@ license:CC0
 	* = dumped
 
 	*A-1   Pichi Pichi Pitch vol.1 / ぴちぴちピッチvol.1
-	 A-2   Pichi Pichi Pitch vol.2 / ぴちぴちピッチvol.2
+	*A-2   Pichi Pichi Pitch vol.2 / ぴちぴちピッチvol.2
 	*A-3   Pichi Pichi Pitch vol.3 / ぴちぴちピッチvol.3
 	*A-4   Pichi Pichi Pitch Pure Chapter 1 / ぴちぴちピッチピュア第１章
 	*A-5   Pichi Pichi Pitch Karaoke Party / ぴちぴちピッチカラオケパーティー
@@ -28,10 +28,10 @@ license:CC0
 	-->
 
 	<software name="a1" supported="no">
-		<description>A-1 Pichi Pichi Pitch vol.1 (Japan)</description>
+		<description>A-1 Mermaid Melody Pichi Pichi Pitch vol.1 (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ぴちぴちピッチ vol.1" />
+		<info name="alt_title" value="マーメイドメロディー ぴちぴちピッチ vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -40,11 +40,24 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="a2" supported="no">
+		<description>A-2 Mermaid Melody Pichi Pichi Pitch vol.2 (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="マーメイドメロディー ぴちぴちピッチ vol.2" />
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekara_a2.bin" size="0x200000" crc="b6fef794" sha1="be006eacd157f9c2d896730d66f1cd746ad7b9b4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="a3" supported="no">
-		<description>A-3 Pichi Pichi Pitch vol.3 (Japan)</description>
+		<description>A-3 Mermaid Melody Pichi Pichi Pitch vol.3 (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ぴちぴちピッチ vol.3" />
+		<info name="alt_title" value="マーメイドメロディー ぴちぴちピッチ vol.3" />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 The softwarelist is sorted alphabetically per title, not counting clone sets.
 ROM hacks are not included(exceptions aside), but those can still be loaded with -cart.

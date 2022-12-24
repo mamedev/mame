@@ -14,26 +14,18 @@
 #pragma once
 
 #include "cpu/m6809/m6809.h"
-#include "formats/thom_cas.h"
-#include "formats/thom_dsk.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
-#include "machine/6850acia.h"
 #include "machine/input_merger.h"
-#include "machine/mc6843.h"
 #include "machine/mc6846.h"
-#include "machine/mc6846.h"
-#include "machine/mos6551.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "sound/mea8000.h"
 #include "bus/thomson/extension.h"
 #include "bus/thomson/nanoreseau.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "bus/rs232/rs232.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -42,13 +34,6 @@
 /* 6821 PIAs */
 #define THOM_PIA_SYS    "pia_0"  /* system PIA */
 #define THOM_PIA_GAME   "pia_1"  /* music & game PIA (joypad + sound) */
-#define THOM_PIA_IO     "pia_2"  /* CC 90-232 I/O extension (parallel & RS-232) */
-#define THOM_PIA_MODEM  "pia_3"  /* MD 90-120 MODEM extension */
-
-/* sound ports */
-#define THOM_SOUND_BUZ    0 /* 1-bit buzzer */
-#define THOM_SOUND_GAME   1 /* 6-bit game port DAC */
-#define THOM_SOUND_SPEECH 2 /* speech synthesis */
 
 /* bank-switching */
 #define THOM_CART_BANK  "bank2" /* cartridge ROM */
@@ -77,12 +62,6 @@
    Emulated screen can have smaller borders.
  */
 
-/* maximum number of video pages:
-   1 for TO7 generation (including MO5)
-   4 for TO8 generation (including TO9, MO6)
- */
-#define THOM_NB_PAGES 4
-
 /* page 0 is banked */
 #define THOM_VRAM_BANK "bank1"
 
@@ -104,15 +83,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_dac(*this, "dac"),
-		m_centronics(*this, "centronics"),
-		m_cent_data_out(*this, "cent_data_out"),
 		m_pia_sys(*this, THOM_PIA_SYS),
 		m_pia_game(*this, THOM_PIA_GAME),
-		m_acia(*this, "acia6850"),
-		m_mea8000(*this, "mea8000"),
 		m_ram(*this, RAM_TAG),
 		m_mc6846(*this, "mc6846"),
-		m_mc6843(*this, "mc6843"),
 		m_screen(*this, "screen"),
 		m_mainirq(*this, "mainirq"),
 		m_mainfirq(*this, "mainfirq"),
@@ -127,7 +101,6 @@ public:
 		m_io_lightpen_button(*this, "lightpen_button"),
 		m_io_config(*this, "config"),
 		m_io_vconfig(*this, "vconfig"),
-		m_io_mconfig(*this, "mconfig"),
 		m_io_keyboard(*this, "keyboard.%u", 0),
 		m_vrambank(*this, THOM_VRAM_BANK),
 		m_cartbank(*this, THOM_CART_BANK),
@@ -196,18 +169,11 @@ protected:
 	void to7_sys_portb_out(uint8_t data);
 	uint8_t to7_sys_porta_in();
 	uint8_t to7_sys_portb_in();
-	DECLARE_WRITE_LINE_MEMBER( to7_modem_cb );
-	DECLARE_WRITE_LINE_MEMBER( to7_modem_tx_w);
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
-	uint8_t to7_modem_mea8000_r(offs_t offset);
-	void to7_modem_mea8000_w(offs_t offset, uint8_t data);
 	uint8_t to7_game_porta_in();
 	uint8_t to7_game_portb_in();
 	void to7_game_portb_out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( to7_game_cb2_out );
 	TIMER_CALLBACK_MEMBER( to7_game_update_cb );
-	uint8_t to7_midi_r();
-	void to7_midi_w(uint8_t data);
 	DECLARE_MACHINE_RESET( to7 );
 	DECLARE_MACHINE_START( to7 );
 	DECLARE_WRITE_LINE_MEMBER( to770_sys_cb2_out );
@@ -241,24 +207,16 @@ protected:
 	TIMER_CALLBACK_MEMBER( ans );
 	void thom_palette(palette_device &palette);
 
-	int m_centronics_busy = 0;
-	int m_centronics_perror = 0;
-
 	void to7_map(address_map &map);
 	void to770_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<dac_byte_interface> m_dac;
-	optional_device<centronics_device> m_centronics;
-	optional_device<output_latch_device> m_cent_data_out;
 	required_device<pia6821_device> m_pia_sys;
 	required_device<pia6821_device> m_pia_game;
-	required_device<acia6850_device> m_acia;
-	required_device<mea8000_device> m_mea8000;
 	required_device<ram_device> m_ram;
 	optional_device<mc6846_device> m_mc6846;
-	optional_device<mc6843_device> m_mc6843;
 	required_device<screen_device> m_screen;
 	required_device<input_merger_device> m_mainirq;
 	required_device<input_merger_device> m_mainfirq;
@@ -273,7 +231,6 @@ protected:
 	required_ioport m_io_lightpen_button;
 	required_ioport m_io_config;
 	required_ioport m_io_vconfig;
-	optional_ioport m_io_mconfig;
 	required_ioport_array<10> m_io_keyboard;
 	required_memory_bank m_vrambank;
 	optional_memory_bank m_cartbank;
@@ -295,7 +252,6 @@ protected:
 	uint8_t m_thom_cart_bank = 0;     /* current bank */
 	uint8_t m_to7_lightpen_step = 0;
 	uint8_t m_to7_lightpen = 0;
-	uint8_t m_to7_modem_tx = 0;
 	/* calls to7_game_update_cb periodically */
 	emu_timer* m_to7_game_timer = nullptr;
 	uint8_t m_to7_game_sound = 0;
@@ -359,14 +315,10 @@ protected:
 	void thom_irq_reset();
 	void to7_update_cart_bank();
 	void to7_set_init( int init );
-	void to7_modem_reset();
-	void to7_modem_init();
 	uint8_t to7_get_mouse_signal();
 	void to7_game_sound_update();
 	void to7_game_init();
 	void to7_game_reset();
-	void to7_midi_reset();
-	void to7_midi_init();
 	void to770_update_ram_bank();
 
 	TIMER_CALLBACK_MEMBER( mo5_periodic_cb );
@@ -432,6 +384,8 @@ class to9_state : public thomson_state
 public:
 	to9_state(const machine_config &mconfig, device_type type, const char *tag) :
 		thomson_state(mconfig, type, tag),
+		m_centronics(*this, "centronics"),
+		m_cent_data_out(*this, "cent_data_out"),
 		m_syslobank(*this, TO8_SYS_LO),
 		m_syshibank(*this, TO8_SYS_HI),
 		m_datalobank(*this, TO8_DATA_LO),
@@ -446,11 +400,16 @@ public:
 	void to9p(machine_config &config);
 
 protected:
+	optional_device<centronics_device> m_centronics;
+	optional_device<output_latch_device> m_cent_data_out;
+
 	required_memory_bank m_syslobank;
 	optional_memory_bank m_syshibank;
 	optional_memory_bank m_datalobank;
 	optional_memory_bank m_datahibank;
 	optional_memory_bank m_biosbank;
+
+	int m_centronics_busy = 0;
 
 	uint8_t  m_to8_kbd_ack = 0;       /* 1 = cpu inits / accepts transfers */
 	uint16_t m_to8_kbd_data = 0;      /* data to transmit */
@@ -640,8 +599,6 @@ protected:
 
 	uint8_t mo5nr_net_r(offs_t offset);
 	void mo5nr_net_w(offs_t offset, uint8_t data);
-	uint8_t mo5nr_prn_r();
-	void mo5nr_prn_w(uint8_t data);
 	uint8_t mo5nr_sys_portb_in();
 	void mo5nr_sys_porta_out(uint8_t data);
 };
@@ -695,38 +652,5 @@ protected:
 #define THOM_VMODE_NB         16
 
 
-class to7_io_line_device : public device_t
-{
-public:
-	// construction/destruction
-	to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	required_device<pia6821_device> m_pia_io;
-	required_device<rs232_port_device> m_rs232;
-	int m_last_low = 0;
-	int m_centronics_busy = 0;
-	int m_rxd = 0;
-	int m_cts = 0;
-	int m_dsr = 0;
-
-	/* read data register */
-	uint8_t porta_in();
-
-	/* write data register */
-	void porta_out(uint8_t data);
-
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
-	DECLARE_WRITE_LINE_MEMBER(write_cts);
-	DECLARE_WRITE_LINE_MEMBER(write_dsr);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-};
-
-DECLARE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device)
 
 #endif // MAME_INCLUDES_THOMSON_H

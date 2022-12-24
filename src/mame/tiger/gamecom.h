@@ -286,9 +286,9 @@ private:
 	required_shared_ptr<uint8_t> m_p_nvram;
 	required_device<sm8500_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<dac_byte_interface> m_dac;
-	required_device<dac_byte_interface> m_dac0;
-	required_device<dac_byte_interface> m_dac1;
+	required_device<dac_8bit_r2r_device> m_dac;
+	required_device<dac_4bit_r2r_device> m_dac0;
+	required_device<dac_4bit_r2r_device> m_dac1;
 	required_device<generic_slot_device> m_cart1;
 	required_device<generic_slot_device> m_cart2;
 	required_memory_bank m_bank1;

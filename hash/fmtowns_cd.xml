@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="fmtowns_cd" description="Fujitsu FM Towns CD-ROMs">
 
@@ -2092,7 +2092,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HMD-119 / T2061-206"/>
 		<info name="alt_title" value="アフターバーナーIII" />
 		<info name="release" value="199206xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
+		<info name="usage" value="Requires 2 MB RAM. Supports XE-1AP analog pad in analog MD mode on second controller port.  Use a Towns Pad on first port to navigate menus." />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="after burner iii (japan)" sha1="fe11d382c3efef8ed4a698f6a9832fb6bcd09167" />
@@ -4549,7 +4549,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HMC-142"/>
 		<info name="alt_title" value="TAITO チェイスＨＱ" />
 		<info name="release" value="199108xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
+		<info name="usage" value="Requires 2 MB RAM. Supports analog joystick on second controller port (Personal Computer mode).  Use a Towns Pad on first port to navigate menus." />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="taito chase h.q. (japan)" sha1="8ec3b12763866865ace239e717297b2defcaba43" />
@@ -9645,7 +9645,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HMB-168 / T2034-104"/>
 		<info name="alt_title" value="ギャラクシーフォースII" />
 		<info name="release" value="199103xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
+		<info name="usage" value="Requires 2 MB RAM. Supports XE-1AP analog pad in analog MD mode on second controller port.  Use a Towns Pad on first port to navigate menus." />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="galaxy force ii (japan)" sha1="90c869b43bc7f846251f35ef5e5b741f641c6184" />

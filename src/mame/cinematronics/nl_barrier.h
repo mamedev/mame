@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Aaron Giles
 #ifndef MAME_AUDIO_NL_BARRIER_H
 #define MAME_AUDIO_NL_BARRIER_H

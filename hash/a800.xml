@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Compiled by K1W1
 
@@ -413,7 +413,7 @@ Align test never completes, burn-in test requires a test disk and writing to flo
 	</software>
 
 	<software name="1400salt">
-		<description>1400 Super SALT Diagnostic Cartridge (Rev.C01)</description>
+		<description>1400 Super SALT Diagnostic Cartridge (rev.C01)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -425,7 +425,7 @@ Align test never completes, burn-in test requires a test disk and writing to flo
 	</software>
 
 	<software name="1400tele" supported="no">
-		<description>1400 Telecommunicator (Prototype)</description>
+		<description>1400 Telecommunicator (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8050" />
@@ -505,7 +505,7 @@ Align test never completes, burn-in test requires a test disk and writing to flo
 	</software>
 
 	<software name="action36a" cloneof="action36">
-		<description>Action! Programming Language v3.6 (Alt)</description>
+		<description>Action! Programming Language v3.6 (alt)</description>
 		<!-- Two chip cartridge. -->
 		<year>1983</year>
 		<publisher>OSS</publisher>
@@ -644,7 +644,7 @@ Unsupported [AtariLab] module
 	</software>
 
 	<software name="animpuzl">
-		<description>Animated Puzzle (Prototype)</description>
+		<description>Animated Puzzle (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -670,7 +670,7 @@ Unsupported [AtariLab] module
 	</software>
 
 	<software name="anteatra" cloneof="anteater">
-		<description>Ant Eater (Earlier Version)</description>
+		<description>Ant Eater (earlier version)</description>
 		<year>1982</year>
 		<publisher>Romox</publisher>
 		<info name="serial" value="05023" />
@@ -683,7 +683,7 @@ Unsupported [AtariLab] module
 	</software>
 
 	<software name="arex" supported="partial">
-		<description>Arex (Pirate)</description>
+		<description>Arex (pirate)</description>
 		<year>1983</year>
 		<publisher>Adventure International</publisher>
 		<notes><![CDATA[
@@ -800,7 +800,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="achase1" cloneof="achase">
-		<description>Astro Chase (Re-Badge)</description>
+		<description>Astro Chase (re-badged)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="developer" value="First Star" />
@@ -829,7 +829,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="basicc">
-		<description>Atari BASIC Programming Language (Rev. C)</description>
+		<description>Atari BASIC Programming Language (rev. C)</description>
 		<year>1986</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8002" />
@@ -842,7 +842,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="basicb" cloneof="basicc">
-		<description>Atari BASIC Programming Language (Rev. B)</description>
+		<description>Atari BASIC Programming Language (rev. B)</description>
 		<!-- Never released in cartridge form. Only built into Atari XL series. -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -855,7 +855,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="basica" cloneof="basicc">
-		<description>Atari BASIC Programming Language (Rev. A)</description>
+		<description>Atari BASIC Programming Language (rev. A)</description>
 		<year>1979</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CXL4002" />
@@ -881,7 +881,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="alogof" cloneof="alogo">
-		<description>Atari LOGO Computing Language (Fra)</description>
+		<description>Atari LOGO Computing Language (France)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RXF80??" />
@@ -933,7 +933,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="awriterc">
-		<description>AtariWriter (Rev. C)</description>
+		<description>AtariWriter (rev. C)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8084" />
@@ -946,7 +946,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="awriterb" cloneof="awriterc">
-		<description>AtariWriter (Rev. B)</description>
+		<description>AtariWriter (rev. B)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8084" />
@@ -959,7 +959,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="awritera" cloneof="awriterc">
-		<description>AtariWriter (Rev. A)</description>
+		<description>AtariWriter (rev. A)</description>
 		<!-- Contains a joystick-checking routine at $8563. While in the main menu, it checks if the value under $8278 (stick 0) equals $8.
 		     If so, it displays the author's name on the screen. However, the author's name (stored at $8585) is erased from this image, so nothing gets displayed.
 		     It appears Atari noticed the easter egg and removed it in later version. -->
@@ -975,7 +975,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="atexte" cloneof="awriterc">
-		<description>AtariTexte (Fra)</description>
+		<description>AtariTexte (France)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RXF8036" />
@@ -988,7 +988,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="atexte1" cloneof="awriterc">
-		<description>AtariTexte (Fra, Prototype)</description>
+		<description>AtariTexte (France, prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RXF8036" />
@@ -1001,7 +1001,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="aschreib" cloneof="awriterc" supported="no">
-		<description>AtariSchreiber (Ger)</description>
+		<description>AtariSchreiber (Germany)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RXG8036" />
@@ -1132,7 +1132,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="bxl102a" cloneof="bxl103">
-		<description>Basic XL Programming Language v1.02 (Alt)</description>
+		<description>Basic XL Programming Language v1.02 (alt)</description>
 		<!-- Different cartridge mapping. -->
 		<year>1983</year>
 		<publisher>OSS</publisher>
@@ -1185,7 +1185,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="bearjamf" supported="no">
-		<description>BearJam (Fixed)</description>
+		<description>BearJam (fixed)</description>
 		<!-- This ROM has been fixed to load on the A800 but will not play without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
@@ -1201,7 +1201,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="berzerk">
-		<description>Berzerk (Prototype)</description>
+		<description>Berzerk (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1240,7 +1240,7 @@ a certain time, and this isn't currently emulated.
 	</software>
 
 	<software name="blaster">
-		<description>Blaster (Prototype)</description>
+		<description>Blaster (prototype)</description>
 		<year>1984</year>
 		<publisher>Williams</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1315,7 +1315,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="bbsba" cloneof="bbsb" supported="partial">
-		<description>Bounty Bob Strikes Back! (Alt)</description>
+		<description>Bounty Bob Strikes Back! (alt)</description>
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
 		<notes><![CDATA[
@@ -1384,7 +1384,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="carnmassa" cloneof="carnmass">
-		<description>Carnival Massacre (Earlier Version)</description>
+		<description>Carnival Massacre (earlier version)</description>
 		<!-- Original release version without copy protection. -->
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
@@ -1439,7 +1439,7 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 	</software>
 
 	<software name="turbo2ka" cloneof="turbo2k">
-		<description>Cartridge dla Turbo 2000 v1.0 (Alt)</description>
+		<description>Cartridge dla Turbo 2000 v1.0 (alt)</description>
 		<year>1991</year>
 		<publisher>DOMAIN SOFT</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
@@ -1566,7 +1566,7 @@ Game seldomly crashes (timer keeps running on death without respawning player), 
 	</software>
 
 	<software name="centpedp" cloneof="centiped">
-		<description>Centipede (Prototype)</description>
+		<description>Centipede (prototype)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1578,7 +1578,7 @@ Game seldomly crashes (timer keeps running on death without respawning player), 
 	</software>
 
 	<software name="checkbk" supported="no">
-		<description>Checkbook (Prototype)</description>
+		<description>Checkbook (prototype)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
@@ -1622,7 +1622,7 @@ http://www.atariage.com/forums/topic/194283-checkbook-cartridge-cxl8001/
 	</software>
 
 	<software name="chiffres">
-		<description>Des Chiffres et des Lettres (Fra)</description>
+		<description>Des Chiffres et des Lettres (France)</description>
 		<year>1983</year>
 		<publisher>Atari France</publisher>
 		<info name="serial" value="RXF52001" />
@@ -1635,7 +1635,7 @@ http://www.atariage.com/forums/topic/194283-checkbook-cartridge-cxl8001/
 	</software>
 
 	<software name="chifresa" cloneof="chiffres">
-		<description>Des Chiffres et des Lettres (Fra, Alt)</description>
+		<description>Des Chiffres et des Lettres (France, alt)</description>
 		<!-- Probably an earlier version. Attempts to boot from disk on restart. -->
 		<year>1983</year>
 		<publisher>Atari France</publisher>
@@ -1726,7 +1726,7 @@ http://www.atariage.com/forums/topic/194283-checkbook-cartridge-cxl8001/
 	</software>
 
 	<software name="sprsalt">
-		<description>CPS Super SALT 400/800/XL Diagnostic (Rev. A)</description>
+		<description>CPS Super SALT 400/800/XL Diagnostic (rev. A)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="FD100335" />
@@ -1809,7 +1809,7 @@ It was meant to help point a satellite dish in the right direction to receive TV
 	</software>
 
 	<software name="cosmtnls">
-		<description>Cosmic Tunnels (Prototype)</description>
+		<description>Cosmic Tunnels (prototype)</description>
 		<year>1983</year>
 		<publisher>Datamost</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1834,7 +1834,7 @@ It was meant to help point a satellite dish in the right direction to receive TV
 	</software>
 
 	<software name="ccastles">
-		<description>Crystal Castles (Prototype)</description>
+		<description>Crystal Castles (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1846,7 +1846,7 @@ It was meant to help point a satellite dish in the right direction to receive TV
 	</software>
 
 	<software name="crystalr">
-		<description>Crystal Raiders (Reproduction)</description>
+		<description>Crystal Raiders (reproduction)</description>
 		<!-- Re-package & Re-release of Mastertronic 1986 release. -->
 		<year>2001</year>
 		<publisher>Video 61 / Mastertronic</publisher>
@@ -1871,7 +1871,7 @@ It was meant to help point a satellite dish in the right direction to receive TV
 	</software>
 
 	<software name="dngrrngr">
-		<description>Danger Ranger (Pirate)</description>
+		<description>Danger Ranger (pirate)</description>
 		<year>1984</year>
 		<publisher>Microdeal</publisher>
 		<sharedfeat name="compatibility" value="OSb"/>
@@ -1928,7 +1928,7 @@ One line off on title screen GFX top portion
 	</software>
 
 	<software name="defendr2" cloneof="defender">
-		<description>Defender Rev. 2</description>
+		<description>Defender (rev. 2)</description>
 		<!-- Appears to be an ealier prototype version. -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
@@ -1985,7 +1985,7 @@ One line off on playfield (enemy colors, player shape)
 	</software>
 
 	<software name="destiny" supported="partial">
-		<description>Destiny: The Cruiser (Prototype)</description>
+		<description>Destiny: The Cruiser (prototype)</description>
 		<year>198?</year>
 		<publisher>Adventure International</publisher>
 		<notes><![CDATA[
@@ -2043,7 +2043,7 @@ Continously prints "BOOT ERROR"
 	</software>
 
 	<software name="diamonde" cloneof="diamond3" supported="no">
-		<description>Diamond Graphic OS v1.0 (Earlier Release)</description>
+		<description>Diamond Graphic OS v1.0 (earlier release)</description>
 		<year>1988</year>
 		<publisher>Reeve Software</publisher>
 		<info name="usage" value="Requires mouse"/>
@@ -2083,7 +2083,7 @@ Continously prints "BOOT ERROR"
 	</software>
 
 	<software name="digduga" cloneof="digdug">
-		<description>Dig Dug (Earlier Release)</description>
+		<description>Dig Dug (earlier release)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8026" />
@@ -2137,7 +2137,7 @@ Continously prints "BOOT ERROR"
 	</software>
 
 	<software name="daccessa" cloneof="daccess" supported="no">
-		<description>Direct Access (Alt)</description>
+		<description>Direct Access (alt)</description>
 		<!-- Cartridge dated 12/24/84. -->
 		<year>1984</year>
 		<publisher>Citibank</publisher>
@@ -2192,7 +2192,7 @@ Glitchy title screen the first time around (fixes after one playthrough)
 	</software>
 
 	<software name="dynakill" supported="no">
-		<description>DynaKillers (Reproduction)</description>
+		<description>DynaKillers (reproduction)</description>
 		<!-- Re-package & Re-release of GMG's 1997 release. -->
 		<year>1999</year>
 		<publisher>Video 61 / GMG</publisher>
@@ -2266,7 +2266,7 @@ Requires unhandled (and undumped?) cassette lesson tapes
 	</software>
 
 	<software name="edusysd" cloneof="edusys" supported="no">
-		<description>Educational System Master Cartridge (Re-Badged)</description>
+		<description>Educational System Master Cartridge (re-badged)</description>
 		<year>1983</year>
 		<publisher>Dorsett Educational Systems</publisher>
 		<notes><![CDATA[
@@ -2326,7 +2326,7 @@ Sprites gets stuck on title screen after a playthough [GTIA] GRACTL
 	</software>
 
 	<software name="excelsor">
-		<description>Excelsor (Pirate)</description>
+		<description>Excelsor (pirate)</description>
 		<year>1986</year>
 		<publisher>Players</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -2450,7 +2450,7 @@ Glitchy score display
 	</software>
 
 	<software name="flegacy">
-		<description>Final Legacy (Text Menu Version)</description>
+		<description>Final Legacy (text menu version)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8067" />
@@ -2463,7 +2463,7 @@ Glitchy score display
 	</software>
 
 	<software name="flegacym" cloneof="flegacy">
-		<description>Final Legacy (Graphic Menu Version)</description>
+		<description>Final Legacy (graphic menu version)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8067" />
@@ -2476,7 +2476,7 @@ Glitchy score display
 	</software>
 
 	<software name="legacy" cloneof="flegacy">
-		<description>The Legacy (Prototype)</description>
+		<description>The Legacy (prototype)</description>
 		<!-- Name changed to 'Final Legacy' on release. -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
@@ -2818,7 +2818,7 @@ Some enemies never collides with player bullets
 	</software>
 
 	<software name="instados">
-		<description>InstaDOS (Pirate)</description>
+		<description>InstaDOS (pirate)</description>
 		<year>2002</year>
 		<publisher>Sunmark</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -2964,7 +2964,7 @@ Hangs on boot if [keyboard] caps lock is enabled
 	</software>
 
 	<software name="jrpacman">
-		<description>Jr. Pac-Man (Reproduction)</description>
+		<description>Jr. Pac-Man (reproduction)</description>
 		<year>1997</year>
 		<publisher>Video 61 / Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -3028,7 +3028,7 @@ Hangs on boot if [keyboard] caps lock is enabled
 	</software>
 
 	<software name="kritterc" supported="partial">
-		<description>K-Razy Kritters (Re-Badged)</description>
+		<description>K-Razy Kritters (re-badged)</description>
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
 		<notes><![CDATA[
@@ -3062,7 +3062,7 @@ Glitchy ship sprite on respawn animation
 	</software>
 
 	<software name="kshootc">
-		<description>K-Razy Shout Out (Re-Badged)</description>
+		<description>K-Razy Shout Out (re-badged)</description>
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
 		<info name="serial" value="M8784" />
@@ -3118,7 +3118,7 @@ Reads joystick trigger pressed at soon as it boots, i.e. booting to "number of p
 	</software>
 
 	<software name="kangaroo">
-		<description>Kangaroo (Prototype)</description>
+		<description>Kangaroo (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<sharedfeat name="compatibility" value="OSb"/>
@@ -3201,7 +3201,7 @@ Playfield has offset vertical lines in two rows
 	</software>
 
 	<software name="lasrgats" supported="no">
-		<description>Laser Gates (Pirate)</description>
+		<description>Laser Gates (pirate)</description>
 		<year>1984</year>
 		<publisher>Imagic</publisher>
 		<notes><![CDATA[
@@ -3247,7 +3247,7 @@ Hangs on green screen, looping on [PIO porta] read/writes, expects tablet comms 
 	</software>
 
 	<software name="llpaintf" cloneof="llpaint" supported="no">
-		<description>Leo's 'Lectric Paintbrush (Fixed)</description>
+		<description>Leo's 'Lectric Paintbrush (fixed)</description>
 		<!-- This ROM has been fixed to run on the A800 but will not play without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
@@ -3263,7 +3263,7 @@ Hangs on green screen, looping on [PIO porta] read/writes, expects tablet comms 
 	</software>
 
 	<software name="lprfct40">
-		<description>Letter Perfect (40 Column Version)</description>
+		<description>Letter Perfect (40 column version)</description>
 		<year>1981</year>
 		<publisher>LJK</publisher>
 		<sharedfeat name="compatibility" value="OSb"/>
@@ -3276,7 +3276,7 @@ Hangs on green screen, looping on [PIO porta] read/writes, expects tablet comms 
 	</software>
 
 	<software name="lprfct40a" cloneof="lprfct40">
-		<description>Letter Perfect (40 Column Version, Alt)</description>
+		<description>Letter Perfect (40 column version, alt)</description>
 		<year>1981</year>
 		<publisher>LJK</publisher>
 		<sharedfeat name="compatibility" value="OSb"/>
@@ -3289,7 +3289,7 @@ Hangs on green screen, looping on [PIO porta] read/writes, expects tablet comms 
 	</software>
 
 	<software name="lprfct80" supported ="no">
-		<description>Letter Perfect (80 Column Version)</description>
+		<description>Letter Perfect (80 column version)</description>
 		<year>1981</year>
 		<publisher>LJK</publisher>
 		<info name="usage" value="Needs an Bit-3 80 Column Board or Austin-Franklin 80-Column Board to run." />
@@ -3303,7 +3303,7 @@ Hangs on green screen, looping on [PIO porta] read/writes, expects tablet comms 
 	</software>
 
 	<software name="lettrtut" supported="no">
-		<description>Letter Tutor (Prototype)</description>
+		<description>Letter Tutor (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="usage" value="Requires light pen" />
@@ -3317,7 +3317,7 @@ Hangs on green screen, looping on [PIO porta] read/writes, expects tablet comms 
 	</software>
 
 	<software name="lifespan">
-		<description>Lifespan (Prototype)</description>
+		<description>Lifespan (prototype)</description>
 		<year>1983</year>
 		<publisher>Roklan</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -3370,7 +3370,7 @@ Hangs on green screen, looping on [PIO porta] read/writes, expects tablet comms 
 	</software>
 
 	<software name="logcmstrf" cloneof="logcmstr" supported="no">
-		<description>LogicMaster (Fixed)</description>
+		<description>LogicMaster (fixed)</description>
 		<!-- This ROM has been fixed to load on the A800 but will not play without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
@@ -3454,7 +3454,7 @@ Offset sprites on specific rows [GTIA] mixing
 	<!-- TODO: mega* carts untested beyond if they boots -->
 
 	<software name="mega1" supported="no">
-		<description>Mega Cartridge 01 (Spa, Pirate)</description>
+		<description>Mega Cartridge 01 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3470,7 +3470,7 @@ Riveraid: doesn't boot
 	</software>
 
 	<software name="mega2" supported="no">
-		<description>Mega Cartridge 02 (Spa, Pirate)</description>
+		<description>Mega Cartridge 02 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3485,7 +3485,7 @@ Rambo: doesn't boot
 	</software>
 
 	<software name="mega3" supported="no">
-		<description>Mega Cartridge 03 (Spa, Pirate)</description>
+		<description>Mega Cartridge 03 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3502,7 +3502,7 @@ Hot Lips: doesn't boot, possibly bad dump (crashes in Altirra too)
 	</software>
 
 	<software name="mega4" supported="partial">
-		<description>Mega Cartridge 04 (Spa, Pirate)</description>
+		<description>Mega Cartridge 04 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3518,7 +3518,7 @@ Rally Spedway: black screen
 	</software>
 
 	<software name="mega5" supported="no">
-		<description>Mega Cartridge 05 (Spa, Pirate)</description>
+		<description>Mega Cartridge 05 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3534,7 +3534,7 @@ Keystone Kapers: doesn't boot
 	</software>
 
 	<software name="mega6" supported="no">
-		<description>Mega Cartridge 06 (Spa, Pirate)</description>
+		<description>Mega Cartridge 06 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3549,7 +3549,7 @@ Outlaw: doesn't display any sprite
 	</software>
 
 	<software name="mega7" supported="no">
-		<description>Mega Cartridge 07 (Spa, Pirate)</description>
+		<description>Mega Cartridge 07 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3565,7 +3565,7 @@ Space Invaders: doesn't boot
 	</software>
 
 	<software name="mega8" supported="partial">
-		<description>Mega Cartridge 08 (Spa, Pirate)</description>
+		<description>Mega Cartridge 08 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3580,7 +3580,7 @@ Choplifter: black screen
 	</software>
 
 	<software name="mega9" supported="no">
-		<description>Mega Cartridge 09 (Spa, Pirate)</description>
+		<description>Mega Cartridge 09 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3597,7 +3597,7 @@ The Empire Strikes B.: doesn't boot
 	</software>
 
 	<software name="mega10" supported="no">
-		<description>Mega Cartridge 10 (Spa, Pirate)</description>
+		<description>Mega Cartridge 10 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3613,7 +3613,7 @@ River Raid: black screen
 	</software>
 
 	<software name="mega11" supported="partial">
-		<description>Mega Cartridge 11 (Spa, Pirate)</description>
+		<description>Mega Cartridge 11 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3630,7 +3630,7 @@ Kaboom: black screen
 	</software>
 
 	<software name="mega12" supported="no">
-		<description>Mega Cartridge 12 (Spa, Pirate)</description>
+		<description>Mega Cartridge 12 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3646,7 +3646,7 @@ Rescue on Fractalus: doesn't boot, possibly bad dump
 	</software>
 
 	<software name="mega13" supported="no">
-		<description>Mega Cartridge 13 (Spa, Pirate)</description>
+		<description>Mega Cartridge 13 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3662,7 +3662,7 @@ Wargames: black screen
 	</software>
 
 	<software name="mega14" supported="no">
-		<description>Mega Cartridge 14 (Spa, Pirate)</description>
+		<description>Mega Cartridge 14 (Spain, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3678,7 +3678,7 @@ Star Raiders: draws glitchy [GTIA] sprites
 	</software>
 
 	<software name="mega15" supported="no">
-		<description>Mega Cartridge 15 (Pirate)</description>
+		<description>Mega Cartridge 15 (pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
@@ -3694,7 +3694,7 @@ Keystone Kapers: doesn't boot with stuck note
 	</software>
 
 	<software name="meteor" supported="partial">
-		<description>Meteor (Pirate)</description>
+		<description>Meteor (pirate)</description>
 		<year>198?</year>
 		<publisher>Germ-Soft</publisher>
 		<notes><![CDATA[
@@ -3799,7 +3799,7 @@ Unresponsive inputs [GTIA] latch trigger
 	</software>
 
 	<software name="pacmacb2">
-		<description>McDonald's Pac-Mac (Beta 2)</description>
+		<description>McDonald's Pac-Mac (beta 2)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<!-- TODO: confirm not working on XL -->
@@ -3813,7 +3813,7 @@ Unresponsive inputs [GTIA] latch trigger
 	</software>
 
 	<software name="pacmacb1" cloneof="pacmacb2">
-		<description>McDonald's Pac-Mac (Beta 1)</description>
+		<description>McDonald's Pac-Mac (beta 1)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<!-- TODO: confirm not working on XL -->
@@ -3881,7 +3881,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="microcal">
-		<description>Microcalc XE v2.2 (Mex)</description>
+		<description>Microcalc XE v2.2 (Mexico)</description>
 		<year>19??</year>
 		<publisher>Grupo SITSA</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -3947,7 +3947,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="maestrof" cloneof="maestro" supported="no">
-		<description>MicroMaestro (Fixed)</description>
+		<description>MicroMaestro (fixed)</description>
 		<!-- This ROM has been fixed to load on the A800 but will not play without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
@@ -3977,7 +3977,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="millpedp" cloneof="milliped">
-		<description>Millipede (Prototype)</description>
+		<description>Millipede (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4001,7 +4001,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="min2049e" cloneof="mine2049">
-		<description>Miner 2049er (Earlier Release)</description>
+		<description>Miner 2049er (earlier release)</description>
 		<!-- This earlier version had a game play bug on level 6. -->
 		<year>1982</year>
 		<publisher>Big Five Software</publisher>
@@ -4028,7 +4028,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="missilep" cloneof="missile">
-		<description>Missile Command+ (Hack)</description>
+		<description>Missile Command+ (hack)</description>
 		<year>2006</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4069,7 +4069,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="montezum">
-		<description>Montezuma's Revenge (Prototype)</description>
+		<description>Montezuma's Revenge (prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4081,7 +4081,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="moogles">
-		<description>Moogles (Pirate)</description>
+		<description>Moogles (pirate)</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4133,7 +4133,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="docastle">
-		<description>Mr. Do!'s Castle (Prototype)</description>
+		<description>Mr. Do!'s Castle (prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4185,7 +4185,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="mspacmang" cloneof="mspacman">
-		<description>Ms. Pac-Man (Green Cherry Version)</description>
+		<description>Ms. Pac-Man (Green Cherry version)</description>
 		<!-- Re-released in 1987 -->
 		<!-- When run in PAL, cherry in title screen is green. -->
 		<year>1983</year>
@@ -4200,7 +4200,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="fischa" cloneof="micfiler">
-		<description>Multi Fischa (Mex)</description>
+		<description>Multi Fischa (Mexico)</description>
 		<year>1985</year>
 		<publisher>Grupo SITSA</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4225,7 +4225,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="mydos316">
-		<description>MyDOS v3.116 (Pirate)</description>
+		<description>MyDOS v3.116 (pirate)</description>
 		<year>1985</year>
 		<publisher>Wordmark</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4275,7 +4275,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="orcattka" cloneof="orcattk">
-		<description>Orc Attack (Alt)</description>
+		<description>Orc Attack (alt)</description>
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
 		<info name="serial" value="THA12008" />
@@ -4314,7 +4314,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="paddlec">
-		<description>Paddle Jitter Test (Rev. C)</description>
+		<description>Paddle Jitter Test (rev. C)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4339,7 +4339,7 @@ Enemy playfield has strip glitch on topmost row
 	</software>
 
 	<software name="explorer" cloneof="pastfind">
-		<description>Explorer (Prototype)</description>
+		<description>Explorer (prototype)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4499,7 +4499,7 @@ Activision logo glitches out on vertical scrolls
 	</software>
 
 	<software name="rackemup" cloneof="pool400">
-		<description>Rack 'em Up! (Re-Badged)</description>
+		<description>Rack 'em Up! (re-badged)</description>
 		<year>1983</year>
 		<publisher>Roklan</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4524,7 +4524,7 @@ Activision logo glitches out on vertical scrolls
 	</software>
 
 	<software name="popeyee" cloneof="popeye">
-		<description>Popeye (Euro)</description>
+		<description>Popeye (Europe)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="1150" />
@@ -4589,7 +4589,7 @@ Highway stage has offset rows (player sprite cuts off) [GTIA] mixing
 	</software>
 
 	<software name="preppie" supported="partial">
-		<description>Preppie (Reproduction)</description>
+		<description>Preppie (reproduction)</description>
 		<!-- Re-package & Re-release of Adventure International 1982 release. -->
 		<year>2001</year>
 		<publisher>Video 61 / Adventure International</publisher>
@@ -4605,7 +4605,7 @@ Offset rows (player sprite cuts off) [GTIA] mixing
 	</software>
 
 	<software name="prevue" supported="no">
-		<description>Prevue (Rev. 06)</description>
+		<description>Prevue (rev. 06)</description>
 		<!-- Part of the EPG Jr. on-line cable TV guide system -->
 		<year>1991</year>
 		<publisher>Prevue Networks</publisher>
@@ -4641,7 +4641,7 @@ Attract mode has glitchy text
 	<!-- (cfr. mega* collection, they all crashes in one way or another) -->
 
 	<software name="prisma1" supported="no">
-		<description>Prisma 1 (Spa, Pirate)</description>
+		<description>Prisma 1 (Spain, pirate)</description>
 		<year>199?</year>
 		<publisher>Prismasoft</publisher>
 		<notes><![CDATA[
@@ -4656,7 +4656,7 @@ No game in list boots
 	</software>
 
 	<software name="prisma2" supported="no">
-		<description>Prisma 2 (Spa, Pirate)</description>
+		<description>Prisma 2 (Spain, pirate)</description>
 		<year>199?</year>
 		<publisher>Prismasoft</publisher>
 		<notes><![CDATA[
@@ -4671,7 +4671,7 @@ No game in list boots
 	</software>
 
 	<software name="prisma3" supported="no">
-		<description>Prisma 3 (Spa, Pirate)</description>
+		<description>Prisma 3 (Spain, pirate)</description>
 		<!-- The last game (Crystal Raider) doesn't run. Possible Bad dump. -->
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
@@ -4687,7 +4687,7 @@ No game in list boots
 	</software>
 
 	<software name="prisma4" supported="no">
-		<description>Prisma 4 (Spa, Pirate)</description>
+		<description>Prisma 4 (Spain, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4699,7 +4699,7 @@ No game in list boots
 	</software>
 
 	<software name="prisma5" supported="no">
-		<description>Prisma 5 (Spa, Pirate)</description>
+		<description>Prisma 5 (Spain, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4711,7 +4711,7 @@ No game in list boots
 	</software>
 
 	<software name="prisma6" supported="no">
-		<description>Prisma 6 (Spa, Pirate)</description>
+		<description>Prisma 6 (Spain, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4723,7 +4723,7 @@ No game in list boots
 	</software>
 
 	<software name="prismas" supported="no">
-		<description>Prisma Super 15-2 (Spa, Pirate)</description>
+		<description>Prisma Super 15-2 (Spain, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4850,7 +4850,7 @@ Doesn't draw game over "the end" screen properly, [ANTIC] vertical scroll?
 	</software>
 
 	<software name="risk">
-		<description>Risk (Prototype)</description>
+		<description>Risk (prototype)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4901,7 +4901,7 @@ Doesn't draw game over "the end" screen properly, [ANTIC] vertical scroll?
 	</software>
 
 	<software name="satan">
-		<description>Satan's Hollow (Unreleased)</description>
+		<description>Satan's Hollow (unreleased)</description>
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
 		<info name="usage" value="Supports Booster-Grip Joystick Adaptor" />
@@ -5057,7 +5057,7 @@ Crashes on boot, same as prisma* and mega* entries
 	</software>
 
 	<software name="smartdos">
-		<description>SmartDOS v6.1D (Pirate)</description>
+		<description>SmartDOS v6.1D (pirate)</description>
 		<year>1984</year>
 		<publisher>Rana Systems</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -5464,7 +5464,7 @@ Doesn't mask sprites on top/bottom of screen [GTIA] GRACTL
 
 
 	<software name="startrux">
-		<description>Star Trux (Prototype)</description>
+		<description>Star Trux (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<sharedfeat name="compatibility" value="OSb"/>
@@ -5503,7 +5503,7 @@ Doesn't mask sprites on top/bottom of screen [GTIA] GRACTL
 	</software>
 
 	<software name="stargate">
-		<description>Stargate (Prototype)</description>
+		<description>Stargate (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -5613,7 +5613,7 @@ EPROM dumper, throws disk error #130 when trying to read, presumably accesses ex
 	</software>
 
 	<software name="spacman">
-		<description>Super Pac-Man (Prototype)</description>
+		<description>Super Pac-Man (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -5679,7 +5679,7 @@ EPROM dumper, throws disk error #130 when trying to read, presumably accesses ex
 	</software>
 
 	<software name="supermn3" supported="partial">
-		<description>Superman III (Prototype)</description>
+		<description>Superman III (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
@@ -5826,7 +5826,7 @@ File saving unsupported [disk] or [tape]
 	</software>
 
 	<software name="laststar">
-		<description>The Last Starfighter (Prototype)</description>
+		<description>The Last Starfighter (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -5884,7 +5884,7 @@ Requires PLATO dial-up modem connection
 	</software>
 
 	<software name="mwrench2a" cloneof="mwrnchxl">
-		<description>The Monkey Wrench II (Alt)</description>
+		<description>The Monkey Wrench II (alt)</description>
 		<!-- This cartridge could only be used in the A800 Right Cartridge Slot. -->
 		<year>1983</year>
 		<publisher>Eastern House</publisher>
@@ -5972,7 +5972,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc1" supported="no">
-		<description>Turbo Cartridge C1 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C1 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -5984,7 +5984,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc2" supported="no">
-		<description>Turbo Cartridge C2 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C2 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -5996,7 +5996,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc3" supported="no">
-		<description>Turbo Cartridge C3 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C3 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6008,7 +6008,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc4" supported="no">
-		<description>Turbo Cartridge C4 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C4 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6020,7 +6020,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc5" supported="no">
-		<description>Turbo Cartridge C5 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C5 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6032,7 +6032,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc6" supported="no">
-		<description>Turbo Cartridge C6 (Spa, Pirate)</description>
+		<description>Turbo Cartridge C6 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6044,7 +6044,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod1" supported="no">
-		<description>Turbo Cartridge D1 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D1 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6056,7 +6056,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod2" supported="no">
-		<description>Turbo Cartridge D2 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D2 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6068,7 +6068,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod3" supported="no">
-		<description>Turbo Cartridge D3 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D3 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6080,7 +6080,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod4" supported="no">
-		<description>Turbo Cartridge D4 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D4 (Spain, pirate)</description>
 		<!-- Half of the games don't run. Possible Bad dump. -->
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
@@ -6093,7 +6093,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod5" supported="no">
-		<description>Turbo Cartridge D5 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D5 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6105,7 +6105,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod6" supported="no">
-		<description>Turbo Cartridge D6 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D6 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6117,7 +6117,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod7" supported="no">
-		<description>Turbo Cartridge D7 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D7 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6129,7 +6129,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod8" supported="no">
-		<description>Turbo Cartridge D8 (Spa, Pirate)</description>
+		<description>Turbo Cartridge D8 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6141,7 +6141,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboe1" supported="no">
-		<description>Turbo Cartridge E1 (Spa, Pirate)</description>
+		<description>Turbo Cartridge E1 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6153,7 +6153,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboe2" supported="no">
-		<description>Turbo Cartridge E2 (Spa, Pirate)</description>
+		<description>Turbo Cartridge E2 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6165,7 +6165,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbox1" supported="no">
-		<description>Turbo Cartridge X1 (Spa, Pirate)</description>
+		<description>Turbo Cartridge X1 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6177,7 +6177,7 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbox2" supported="no">
-		<description>Turbo Cartridge X2 (Spa, Pirate)</description>
+		<description>Turbo Cartridge X2 (Spain, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6302,7 +6302,7 @@ Flickering enemy sprites
 	</software>
 
 	<software name="upupaway">
-		<description>Up Up and Away (Prototype)</description>
+		<description>Up Up and Away (prototype)</description>
 		<year>1983</year>
 		<publisher>Ringblack Software</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -6365,7 +6365,7 @@ Flickering enemy sprites
 	</software>
 
 	<software name="weltraum" cloneof="cosmiclf">
-		<description>Weltraumkolonie (Ger)</description>
+		<description>Weltraumkolonie (Germany)</description>
 		<year>1984</year>
 		<publisher>Spinnaker / Ravensburger</publisher>
 		<part name="cart" interface="a8bit_cart">

@@ -144,7 +144,7 @@ public:
 		m_iwm(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_mackbd(*this, "kbd"),
-		m_rtc(*this,"rtc"),
+		m_rtc(*this, "rtc"),
 		m_screen(*this, "screen"),
 		m_dac(*this, "macdac"),
 		m_filter(*this, "dacfilter"),
@@ -1181,6 +1181,8 @@ void mac128_state::mac128k(machine_config &config)
 {
 	mac512ke(config);
 	m_ram->set_default_size("128K");
+
+	RTC3430040(config.replace(), m_rtc, 32.768_kHz_XTAL);
 
 	IWM(config.replace(), m_iwm, C7M);
 	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));

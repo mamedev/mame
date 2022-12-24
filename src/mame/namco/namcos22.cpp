@@ -25,6 +25,7 @@ TODO:
   the MOTHER PCB at J2 Pin 7 /TXD
 - tokyowar garbage tile at right edge in attract mode. It's part of the cabinet link message, maybe BTANB?
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
+- improve vertex lighting (is it phong shading?)
 - global offset is wrong in non-super22 testmode video test
 - acedrive/victlap testmode video test flickers
 - ss22 testmode video test screen#04 translucent polygon should be higher priority than sprite
@@ -38,17 +39,6 @@ TODO:
   + timecris stage 2-1 final section, steel beam appears through plank
   + cybrcycc speed dial should be more to the left
   + most of it is zsort related, there's plenty more, but need clearly visible cases with PCB evidence
-- improve ss22 lighting:
-  + acedrive/victlap sparks
-  + adillor title logo
-  + alpinr2b spinning yellow best times in attract mode
-  + alpinr2b mountains in selection screen
-  + propcycl score/time
-  + propcycl Solitar pillars
-  + ridgerac car when entering highscore
-  + ridgerac waving flag
-  + ridgerac rotating sign before 2nd tunnel
-  + timecris Sherudo's knives
 - improve ss22 spot, used in dirtdash, alpines highscore entry, testmode screen#14 - not understood well:
   + does not work at all in alpines (uses spot_factor, not spotram, should show a spotlight with darkened background)
   + should be done before global fade, see dirtdash when starting at jungle level
@@ -5288,10 +5278,10 @@ ROM_END
 
 ROM_START( alpinr2b )
 	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "ars2ver-b.2",  0x000003, 0x200000, CRC(ed977f83) SHA1(26c57cdfc15f799a999ee22f141e1c0cabfc91dc) )
-	ROM_LOAD32_BYTE( "ars2ver-b.3",  0x000001, 0x200000, CRC(8e7a9983) SHA1(34c82e5f080efe04d6b77a77a8391cb48b69c1af) )
-	ROM_LOAD32_BYTE( "ars2ver-b.4",  0x000002, 0x200000, CRC(610e49c2) SHA1(433c6d2216551bac31584306f748af1c912c3b07) )
-	ROM_LOAD32_BYTE( "ars2ver-b.5",  0x000000, 0x200000, CRC(7f3517b0) SHA1(3e6ba1a51bf235f40f933aae1f00638b88bba522) )
+	ROM_LOAD32_BYTE( "ars2ver-b.2",  0x000003, 0x200000, CRC(ed977f83) SHA1(26c57cdfc15f799a999ee22f141e1c0cabfc91dc) ) // 2nd half empty
+	ROM_LOAD32_BYTE( "ars2ver-b.3",  0x000001, 0x200000, CRC(8e7a9983) SHA1(34c82e5f080efe04d6b77a77a8391cb48b69c1af) ) // "
+	ROM_LOAD32_BYTE( "ars2ver-b.4",  0x000002, 0x200000, CRC(610e49c2) SHA1(433c6d2216551bac31584306f748af1c912c3b07) ) // "
+	ROM_LOAD32_BYTE( "ars2ver-b.5",  0x000000, 0x200000, CRC(7f3517b0) SHA1(3e6ba1a51bf235f40f933aae1f00638b88bba522) ) // "
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -5341,10 +5331,10 @@ ROM_END
 
 ROM_START( alpinr2a )
 	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "ars2ver-a.2",  0x000003, 0x200000, CRC(b07b15a4) SHA1(ea3b2d7b4ef4ccf3aafeef7e7eac92e8d446f4e7) )
-	ROM_LOAD32_BYTE( "ars2ver-a.3",  0x000002, 0x200000, CRC(90a92e40) SHA1(bf8083256e56e7e33e61b4cdaf9fd03dabfb36ba) )
-	ROM_LOAD32_BYTE( "ars2ver-a.4",  0x000001, 0x200000, CRC(9e9d771d) SHA1(6fb983e3f4f8233544667b1bbf87864e4fb8698c) )
-	ROM_LOAD32_BYTE( "ars2ver-a.5",  0x000000, 0x200000, CRC(e93c7771) SHA1(305f35488a55be1b845702df972bba8334c0726c) )
+	ROM_LOAD32_BYTE( "ars2ver-a.2",  0x000003, 0x200000, CRC(b07b15a4) SHA1(ea3b2d7b4ef4ccf3aafeef7e7eac92e8d446f4e7) ) // 2nd half empty
+	ROM_LOAD32_BYTE( "ars2ver-a.3",  0x000002, 0x200000, CRC(90a92e40) SHA1(bf8083256e56e7e33e61b4cdaf9fd03dabfb36ba) ) // "
+	ROM_LOAD32_BYTE( "ars2ver-a.4",  0x000001, 0x200000, CRC(9e9d771d) SHA1(6fb983e3f4f8233544667b1bbf87864e4fb8698c) ) // "
+	ROM_LOAD32_BYTE( "ars2ver-a.5",  0x000000, 0x200000, CRC(e93c7771) SHA1(305f35488a55be1b845702df972bba8334c0726c) ) // "
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )

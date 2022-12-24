@@ -154,14 +154,14 @@ private:
 	void impact_non_video_map(address_map &map);
 
 	uint8_t m_Lamps[256]{};
-	int m_optic_pattern = 0;
-	int m_payen = 0;
-	int m_hopinhibit = 0;
-	int m_slidesout = 0;
-	int m_hopper[3]{};
-	int m_motor[3]{};
-	int m_volume_latch = 0;
-	int m_global_volume = 0;
+	uint8_t m_optic_pattern = 0;
+	bool m_payen = false;
+	uint8_t m_hopinhibit = 0;
+	uint8_t m_slidesout = 0;
+	uint8_t m_hopper[3]{};
+	uint8_t m_motor[3]{};
+	uint8_t m_volume_latch = 0;
+	uint8_t m_global_volume = 0;
 	uint16_t m_coinstate = 0;
 	required_device_array<timer_device, 6> m_cointimer;
 

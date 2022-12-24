@@ -80,13 +80,16 @@
 #include "thomson.h"
 
 #include "bus/centronics/ctronics.h"
-#include "bus/rs232/rs232.h"
+#include "bus/thomson/cc90_232.h"
 #include "bus/thomson/cd90_015.h"
 #include "bus/thomson/cq90_028.h"
 #include "bus/thomson/cd90_351.h"
 #include "bus/thomson/cd90_640.h"
+#include "bus/thomson/md90_120.h"
+#include "bus/thomson/midipak.h"
 #include "bus/thomson/nanoreseau.h"
-#include "machine/6821pia.h"
+#include "bus/thomson/rf57_932.h"
+#include "bus/thomson/speech.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -96,6 +99,8 @@
 
 #include "formats/basicdsk.h"
 #include "formats/cd90_640_dsk.h"
+#include "formats/thom_cas.h"
+#include "formats/thom_dsk.h"
 
 #include "utf8.h"
 
@@ -324,11 +329,6 @@ void thomson_state::to7_map(address_map &map)
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7e0, 0xe7e3).rw("to7_io:pia_2", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xe7f2, 0xe7f3).rw(FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
-	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7fe, 0xe7ff).rw(FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
 	map(0xe800, 0xffff).rom();       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -390,15 +390,6 @@ static INPUT_PORTS_START ( to7_vconfig )
 	PORT_CONFSETTING ( 0x00, DEF_STR ( Low ) )
 	PORT_CONFSETTING ( 0x04, DEF_STR ( High  ) )
 	PORT_CONFSETTING ( 0x08, "Auto"  )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START ( to7_mconfig )
-	PORT_START ( "mconfig" )
-
-	PORT_CONFNAME ( 0x01, 0x01, "E7FE-F port" )
-	PORT_CONFSETTING ( 0x00, "Modem (unemulated)" )
-	PORT_CONFSETTING ( 0x01, "Speech" )
 
 INPUT_PORTS_END
 
@@ -482,7 +473,6 @@ static INPUT_PORTS_START ( to7 )
 	PORT_INCLUDE ( to7_keyboard )
 	PORT_INCLUDE ( to7_config )
 	PORT_INCLUDE ( to7_vconfig )
-	PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( t9000 )
@@ -520,9 +510,6 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 	DAC_1BIT(config, "buzzer", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // 6-bit game extension R-2R DAC (R=10K)
 
-/* speech synthesis */
-	MEA8000(config, m_mea8000, 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
-
 /* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(to7_cassette_formats);
@@ -530,11 +517,18 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 	m_cassette->set_interface("to_cass");
 
 /* extension port */
-	THOMSON_EXTENSION(config, m_extension);
+	THOMSON_EXTENSION(config, m_extension, 16_MHz_XTAL / 16);
+	m_extension->firq_callback().set("mainfirq", FUNC(input_merger_device::in_w<3>));
+	m_extension->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<3>));
+	m_extension->option_add("cc90_232", CC90_232);
 	m_extension->option_add("cd90_015", CD90_015);
 	m_extension->option_add("cq90_028", CQ90_028);
 	m_extension->option_add("cd90_351", CD90_351);
 	m_extension->option_add("cd90_640", CD90_640);
+	m_extension->option_add("md90_120", MD90_120);
+	m_extension->option_add("midipak", LOGIMUS_MIDIPAK);
+	m_extension->option_add("rf57_932", RF57_932);
+	m_extension->option_add("speech", THOMSON_SPEECH);
 	if(is_mo)
 		m_extension->option_add("nanoreseau", NANORESEAU_MO);
 	else
@@ -547,7 +541,7 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to7_sys_portb_out));
 	m_pia_sys->ca2_handler().set(FUNC(thomson_state::to7_set_cassette_motor));
 	m_pia_sys->cb2_handler().set(FUNC(thomson_state::to7_sys_cb2_out));
-	m_pia_sys->irqa_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
+	m_pia_sys->irqa_handler().set("mainfirq", FUNC(input_merger_device::in_w<0>));
 	m_pia_sys->irqb_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
 
 	PIA6821(config, m_pia_game, 0);
@@ -556,34 +550,7 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 	m_pia_game->writepb_handler().set(FUNC(thomson_state::to7_game_portb_out));
 	m_pia_game->cb2_handler().set(FUNC(thomson_state::to7_game_cb2_out));
 	m_pia_game->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
-	m_pia_game->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
-
-/* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
-	mos6551_device &acia(MOS6551(config, "acia", 0));
-	acia.set_xtal(1.8432_MHz_XTAL);
-	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-
-	/// 2400 7N2
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
-	rs232.dcd_handler().set("acia", FUNC(mos6551_device::write_dcd));
-	rs232.dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
-	rs232.cts_handler().set("acia", FUNC(mos6551_device::write_cts));
-
-
-/* TODO: CONVERT THIS TO A SLOT DEVICE (CC 90-232) */
-	TO7_IO_LINE(config, "to7_io", 0);
-
-
-/* TODO: CONVERT THIS TO A SLOT DEVICE (MD 90-120) */
-	PIA6821(config, THOM_PIA_MODEM, 0);
-
-	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().set(FUNC(thomson_state::to7_modem_tx_w));
-	m_acia->irq_handler().set(FUNC(thomson_state::to7_modem_cb));
-
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 1200)); /* 1200 bauds, might be divided by 16 */
-	acia_clock.signal_handler().set(FUNC(thomson_state::write_acia_clock));
+	m_pia_game->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 /* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "to_cart", "m7,rom").set_device_load(FUNC(thomson_state::to7_cartridge));
@@ -681,12 +648,7 @@ void thomson_state::to770_map(address_map &map)
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7e0, 0xe7e3).rw("to7_io:pia_2", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7e4, 0xe7e7).rw(FUNC(thomson_state::to770_gatearray_r), FUNC(thomson_state::to770_gatearray_w));
-	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xe7f2, 0xe7f3).rw(FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
-	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7fe, 0xe7ff).rw(FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
 	map(0xe800, 0xffff).rom();       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -877,11 +839,7 @@ void mo5_state::mo5_map(address_map &map)
 	map(0xa7c0, 0xa7c3).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xa7cb, 0xa7cb).w(FUNC(mo5_state::mo5_ext_w));
 	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xa7e0, 0xa7e3).rw("to7_io:pia_2", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xa7e4, 0xa7e7).rw(FUNC(mo5_state::mo5_gatearray_r), FUNC(mo5_state::mo5_gatearray_w));
-	map(0xa7e8, 0xa7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xa7f2, 0xa7f3).rw(FUNC(mo5_state::to7_midi_r), FUNC(mo5_state::to7_midi_w));
-	map(0xa7fe, 0xa7ff).rw(m_mea8000, FUNC(mea8000_device::read), FUNC(mea8000_device::write));
 	map(0xb000, 0xefff).bankr(THOM_CART_BANK).w(FUNC(mo5_state::mo5_cartridge_w));
 	map(0xf000, 0xffff).rom();       /* system bios */
 
@@ -986,7 +944,7 @@ void mo5_state::mo5(machine_config &config)
 	m_pia_sys->writepb_handler().set("buzzer", FUNC(dac_bit_interface::data_w));
 	m_pia_sys->ca2_handler().set(FUNC(mo5_state::mo5_set_cassette_motor));
 	m_pia_sys->cb2_handler().set_nop();
-	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // WARNING: differs from TO7 !
+	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<0>)); // WARNING: differs from TO7 !
 
 	GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "mo_cart", "m5,rom").set_device_load(FUNC(mo5_state::mo5_cartridge));
 
@@ -1100,11 +1058,7 @@ void to9_state::to9_map(address_map &map)
 	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to9_vreg_r), FUNC(to9_state::to9_vreg_w));
 	map(0xe7de, 0xe7df).rw(FUNC(to9_state::to9_kbd_r), FUNC(to9_state::to9_kbd_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to9_gatearray_r), FUNC(to9_state::to9_gatearray_w));
-	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 /*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
-	map(0xe7f2, 0xe7f3).rw(FUNC(to9_state::to7_midi_r), FUNC(to9_state::to7_midi_w));
-	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7fe, 0xe7ff).rw(FUNC(to9_state::to7_modem_mea8000_r), FUNC(to9_state::to7_modem_mea8000_w));
 	map(0xe800, 0xffff).rom();       /* system bios  */
 
 /* 0x10000 - 0x1ffff:  64 KB external ROM cartridge */
@@ -1266,7 +1220,6 @@ static INPUT_PORTS_START ( to9 )
 	PORT_INCLUDE ( to9_keyboard )
 	PORT_INCLUDE ( to7_config )
 	PORT_INCLUDE ( to7_vconfig )
-	PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
 /* ------------ driver ------------ */
@@ -1377,11 +1330,7 @@ void to9_state::to8_map(address_map &map)
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to8_vreg_r), FUNC(to9_state::to8_vreg_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
-	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 /*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
-	map(0xe7f2, 0xe7f3).rw(FUNC(to9_state::to7_midi_r), FUNC(to9_state::to7_midi_w));
-	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7fe, 0xe7ff).rw(FUNC(to9_state::to7_modem_mea8000_r), FUNC(to9_state::to7_modem_mea8000_w));
 	map(0xe800, 0xffff).bankr(TO8_BIOS_BANK); /* 2 * 6 KB */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -1477,7 +1426,6 @@ static INPUT_PORTS_START ( to8 )
 	PORT_INCLUDE ( to9_keyboard )
 	PORT_INCLUDE ( to8_config )
 	PORT_INCLUDE ( to7_vconfig )
-	PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
 
@@ -1583,11 +1531,7 @@ void to9_state::to9p_map(address_map &map)
 	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to8_vreg_r), FUNC(to9_state::to8_vreg_w));
 	map(0xe7de, 0xe7df).rw(FUNC(to9_state::to9_kbd_r), FUNC(to9_state::to9_kbd_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
-	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 /*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
-	map(0xe7f2, 0xe7f3).rw(FUNC(to9_state::to7_midi_r), FUNC(to9_state::to7_midi_w));
-	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7fe, 0xe7ff).rw(FUNC(to9_state::to7_modem_mea8000_r), FUNC(to9_state::to7_modem_mea8000_w));
 	map(0xe800, 0xffff).bankr(TO8_BIOS_BANK); /* 2 * 6 KB */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -1640,7 +1584,6 @@ static INPUT_PORTS_START ( to9p )
 	PORT_INCLUDE ( to9_keyboard )
 	PORT_INCLUDE ( to7_config )
 	PORT_INCLUDE ( to7_vconfig )
-	PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
 /* ------------ driver ------------ */
@@ -1752,10 +1695,7 @@ void mo6_state::mo6_map(address_map &map)
 	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xa7da, 0xa7dd).rw(FUNC(mo6_state::mo6_vreg_r), FUNC(mo6_state::mo6_vreg_w));
 	map(0xa7e4, 0xa7e7).rw(FUNC(mo6_state::mo6_gatearray_r), FUNC(mo6_state::mo6_gatearray_w));
-	map(0xa7e8, 0xa7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 /*  map(0xa7f0, 0xa7f7).rw(FUNC(mo6_state::to9_ieee_r), FUNC(homson_state::to9_ieee_w));*/
-	map(0xa7f2, 0xa7f3).rw(FUNC(mo6_state::to7_midi_r), FUNC(mo6_state::to7_midi_w));
-	map(0xa7fe, 0xa7ff).rw(m_mea8000, FUNC(mea8000_device::read), FUNC(mea8000_device::write));
 	map(0xb000, 0xbfff).bankr(MO6_CART_LO).w(FUNC(mo6_state::mo6_cartridge_w));
 	map(0xc000, 0xefff).bankr(MO6_CART_HI).w(FUNC(mo6_state::mo6_cartridge_w));
 	map(0xf000, 0xffff).bankr(TO8_BIOS_BANK);
@@ -2001,7 +1941,7 @@ void mo6_state::mo6(machine_config &config)
 	m_pia_sys->writepb_handler().set("buzzer", FUNC(dac_bit_interface::data_w));
 	m_pia_sys->ca2_handler().set(FUNC(mo6_state::mo5_set_cassette_motor));
 	m_pia_sys->cb2_handler().set(FUNC(mo6_state::mo6_sys_cb2_out));
-	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // differs from TO
+	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<0>)); // differs from TO
 
 	m_pia_game->writepa_handler().set(FUNC(mo6_state::mo6_game_porta_out));
 	m_pia_game->cb2_handler().set(FUNC(mo6_state::mo6_game_cb2_out));
@@ -2076,7 +2016,7 @@ Here are the differences between the MO6 and MO5NR:
 
 * devices:
   - AZERTY keyboard has only 58 keys, and no caps-lock led
-  - CENTRONICS printer handled differently
+  - CENTRONICS printer interface not built in (requires CC 90-232 extension)
   - MO5-compatible network (probably identical to NR 07-005 extension)
   - extern floppy controller & drive possible, masks the network
 
@@ -2096,15 +2036,8 @@ void mo5nr_state::mo5nr_map(address_map &map)
 	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	m_extension_view[1](0xa7d8, 0xa7d9).r(FUNC(mo5nr_state::id_r));
 	map(0xa7da, 0xa7dd).rw(FUNC(mo5nr_state::mo6_vreg_r), FUNC(mo5nr_state::mo6_vreg_w));
-	map(0xa7e1, 0xa7e1).r("cent_data_in", FUNC(input_buffer_device::read));
-	map(0xa7e1, 0xa7e1).w(m_cent_data_out, FUNC(output_latch_device::write));
-	map(0xa7e3, 0xa7e3).rw(FUNC(mo5nr_state::mo5nr_prn_r), FUNC(mo5nr_state::mo5nr_prn_w));
 	map(0xa7e4, 0xa7e7).rw(FUNC(mo5nr_state::mo6_gatearray_r), FUNC(mo5nr_state::mo6_gatearray_w));
-	map(0xa7e8, 0xa7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 /*  map(0xa7f0, 0xa7f7).rw(FUNC(mo5nr_state::to9_ieee_r), FUNC(homson_state::to9_ieee_w));*/
-	map(0xa7f2, 0xa7f3).rw(FUNC(mo5nr_state::to7_midi_r), FUNC(mo5nr_state::to7_midi_w));
-	map(0xa7f8, 0xa7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xa7fe, 0xa7ff).rw(m_mea8000, FUNC(mea8000_device::read), FUNC(mea8000_device::write));
 	map(0xb000, 0xbfff).bankr(MO6_CART_LO).w(FUNC(mo5nr_state::mo6_cartridge_w));
 	map(0xc000, 0xefff).bankr(MO6_CART_HI).w(FUNC(mo5nr_state::mo6_cartridge_w));
 	map(0xf000, 0xffff).bankr(TO8_BIOS_BANK);
@@ -2302,22 +2235,13 @@ void mo5nr_state::mo5nr(machine_config &config)
 	m_pia_sys->writepb_handler().set("buzzer", FUNC(dac_bit_interface::data_w));
 	m_pia_sys->ca2_handler().set(FUNC(mo5nr_state::mo5_set_cassette_motor));
 	m_pia_sys->cb2_handler().set(FUNC(mo5nr_state::mo6_sys_cb2_out));
-	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // differs from TO
-
-	m_pia_game->writepa_handler().set(FUNC(mo5nr_state::mo6_game_porta_out));
-
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->set_data_input_buffer("cent_data_in");
-	m_centronics->busy_handler().set(FUNC(mo5nr_state::write_centronics_busy));
-
-	INPUT_BUFFER(config, "cent_data_in");
-
-	OUTPUT_LATCH(config, m_cent_data_out);
-	m_centronics->set_output_latch(*m_cent_data_out);
+	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<0>)); // differs from TO
 
 	GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "mo_cart", "m5,rom").set_device_load(FUNC(mo5nr_state::mo5_cartridge));
 
 	NANORESEAU_MO(config, m_nanoreseau, 0, true);
+
+	m_extension->option_remove("nanoreseau");
 
 	/* internal ram */
 	m_ram->set_default_size("128K");

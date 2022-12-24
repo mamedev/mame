@@ -1617,8 +1617,7 @@ tilemap_manager::~tilemap_manager()
 
 
 //-------------------------------------------------
-//  set_flip_all - set a global flip for all the
-//  tilemaps
+//  create - allocate a tilemap
 //-------------------------------------------------
 
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated)

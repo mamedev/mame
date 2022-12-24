@@ -60,7 +60,7 @@ public:
 	//         pin 5 - +5V
 	// bit 4 - pin 6 - Button 1 (I/O)
 	// bit 5 - pin 7 - Button 2 (I/O)
-	//         pin 8 - Strobe (O)
+	// bit 6 - pin 8 - Strobe (O for MSX, I/O for FM Towns)
 	//         pin 9 - GND
 	//
 	u8 read() { return exists() ? m_device->read() : 0xff; }

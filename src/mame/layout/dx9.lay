@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 	<element name="background">
@@ -47,7 +47,7 @@ license:CC0
 	<element name="button-text-function"><text align="1" string="FUNCTION" /></element>
 	<element name="button-text-edit"><text align="1" string="EDIT / COMPARE" /></element>
 	<element name="button-text-memory"><text align="1" string="MEMORY SELECT" /></element>
-	
+
 	<!-- Up/Down Yes/No Button Labels -->
 	<element name="button-text-no"><text align="1" string="NO" /></element>
 	<element name="button-text-off"><text align="1" string="OFF" /></element>
@@ -197,7 +197,7 @@ license:CC0
 	<element name="button-text-select">
 		<text align="1" string="SELECT"><color red="0.13" green="0.65" blue="0.9" /></text>
 	</element>
-	
+
 	<element name="button-text-oscillator">
 		<text align="1" string="OSCILLATOR"><color red="0.13" green="0.65" blue="0.9" /></text>
 	</element>
@@ -554,7 +554,7 @@ license:CC0
 		<group ref="group-screen-inset">
 			<bounds x="368" y="24" width="400" height="80" />
 		</group>
-	
+
 		<group ref="front-panel-buttons-main">
 			<bounds x="168" y="0" width="152" height="112" />
 		</group>

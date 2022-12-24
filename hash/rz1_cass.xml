@@ -3,7 +3,7 @@
 
 <!--
 
-license:CC0
+license:CC0-1.0
 
 Casio RZ-1 tapes
 
@@ -35,7 +35,7 @@ Casio RZ-1 tapes
 
 	<!-- Provided by R-Massive from http://zine.r-massive.com/casio-rz-1-mt-jack/ -->
 	<software name="80sdrums">
-		<description>80's Drums (Samples)</description>
+		<description>80's Drums (samples)</description>
 		<year>2016</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="usage" value="Push MT LOAD, push NO to select samples, push YES to load" />
@@ -48,7 +48,7 @@ Casio RZ-1 tapes
 
 	<!-- Provided by R-Massive from http://zine.r-massive.com/casio-rz-1-mt-jack/ -->
 	<software name="fourcymb">
-		<description>Four Cymbals (Samples)</description>
+		<description>Four Cymbals (samples)</description>
 		<year>2016</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="usage" value="Push MT LOAD, push NO to select samples, push YES to load" />
@@ -61,7 +61,7 @@ Casio RZ-1 tapes
 
 	<!-- Provided by R-Massive from http://zine.r-massive.com/casio-rz-1-mt-jack/ -->
 	<software name="harddrum">
-		<description>Hard Drums (Samples)</description>
+		<description>Hard Drums (samples)</description>
 		<year>2016</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="usage" value="Push MT LOAD, push NO to select samples, push YES to load" />

@@ -1953,9 +1953,9 @@ void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xff9000, 0xff900f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	map(0xffa040, 0xffa04f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0x00ff);  // 6840PTM on sampled sound board
-	map(0xffa040, 0xffa04f).w(FUNC(mpu4vid_state::ic3ss_vid_w)).umask16(0x00ff);  // 6840PTM on sampled sound board
-	map(0xffa060, 0xffa067).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);    // PIA6821 on sampled sound board
+
+	map(0xffa040, 0xffa04f).rw("okicard", FUNC(mpu4_oki_sampled_sound::ic3_read), FUNC(mpu4_oki_sampled_sound::ic3_write)).umask16(0x00ff);  // 6840PTM on sampled sound board
+	map(0xffa060, 0xffa067).rw("okicard", FUNC(mpu4_oki_sampled_sound::ic4_read), FUNC(mpu4_oki_sampled_sound::ic4_write)).umask16(0x00ff);  // 6821PIA on sampled sound board
 	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
 //  map(0xfff000, 0xffffff).noprw(); /* Possible bug, reads and writes here */
 }
@@ -1986,9 +1986,11 @@ void mpu4vid_state::bwbvidoki_68k_base_map(address_map &map)
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	map(0xe02000, 0xe02007).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00);
-	map(0xe03000, 0xe0300f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0xff00);  // 6840PTM on sampled sound board
-	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_vid_w)).umask16(0xff00);  // 6840PTM on sampled sound board
+
+
+	map(0xe02000, 0xe02007).rw("okicard", FUNC(mpu4_oki_sampled_sound::ic4_read), FUNC(mpu4_oki_sampled_sound::ic4_write)).umask16(0xff00);  // 6821PIA on sampled sound board
+	map(0xe03000, 0xe0300f).rw("okicard", FUNC(mpu4_oki_sampled_sound::ic3_read), FUNC(mpu4_oki_sampled_sound::ic3_write)).umask16(0xff00);  // 6840PTM on sampled sound board
+
 	map(0xe05000, 0xe05001).noprw();
 }
 
@@ -2073,52 +2075,6 @@ void mpu4vid_state::mpu4_6809_german_map(address_map &map)
 	map(0x4000, 0xbfff).ram();
 }
 
-//Sampled sound timer
-/*
-Unlike the standard setup, in MPU4 Video, the E clock is used for computation, so the chip frequency
-freq = (1000000/((t3L+1)(t3H+1)))*[(t3H(T3L+1)+1)/(2(t1+1))]
-where [] means rounded up integer,
-t3L is the LSB of Clock 3,
-t3H is the MSB of Clock 3,
-and t1 is the initial value in clock 1.
-*/
-
-//O3 -> G1  O1 -> c2 o2 -> c1
-
-/* This is a bit of a cheat - since we don't clock into the OKI chip directly, we need to
-calculate the oscillation frequency in advance. We're running the timer for interrupt
-purposes, but the frequency calculation is done by plucking the values out as they are written.*/
-void mpu4vid_state::ic3ss_vid_w(offs_t offset, uint8_t data)
-{
-	m_ptm_ic3ss->write(offset,data);
-
-	if (offset == 3)
-	{
-		m_t1 = data;
-	}
-	if (offset == 6)
-	{
-		m_t3h = data;
-	}
-	if (offset == 7)
-	{
-		m_t3l = data;
-	}
-
-	// E clock = VIDEO_MASTER_CLOCK / 10
-
-	float num = (1000000/((m_t3l + 1)*(m_t3h + 1)));
-	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
-
-	int denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
-	int freq=num*denom2;
-	if (freq)
-	{
-		m_msm6376->set_unscaled_clock(freq);
-	}
-}
-
-
 void mpu4vid_state::mpu4_vid(machine_config &config)
 {
 	MC6809(config, m_maincpu, MPU4_MASTER_CLOCK);
@@ -2166,9 +2122,10 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	m_ptm->o3_callback().set(FUNC(mpu4vid_state::vid_o3_callback));
 	m_ptm->irq_callback().set(FUNC(mpu4vid_state::cpu1_ptm_irq));
 
-	/* Present on all video cards */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+
+	/* Present on all video cards */
 	saa1099_device &saa(SAA1099(config, "saa", 8000000));
 	saa.add_route(0, "lspeaker", 0.5);
 	saa.add_route(1, "rspeaker", 0.5);
@@ -2226,22 +2183,13 @@ void mpu4vid_state::vid_oki(machine_config &config)
 {
 	//On MPU4 Video, the sound board is clocked via the 68k E clock,
 	//and all samples are adjusted to fit the different clock speed.
-	PTM6840(config, m_ptm_ic3ss, VIDEO_MASTER_CLOCK / 10);
-	m_ptm_ic3ss->set_external_clocks(0, 0, 0);
-	m_ptm_ic3ss->o1_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c2));
-	m_ptm_ic3ss->o2_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c1));
-	m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
 
-	PIA6821(config, m_pia_ic4ss, 0);
-	m_pia_ic4ss->readpb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_r));
-	m_pia_ic4ss->writepa_handler().set(FUNC(mpu4vid_state::pia_gb_porta_w));
-	m_pia_ic4ss->writepb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_w));
-	m_pia_ic4ss->ca2_handler().set(FUNC(mpu4vid_state::pia_gb_ca2_w));
-	m_pia_ic4ss->cb2_handler().set(FUNC(mpu4vid_state::pia_gb_cb2_w));
+	MPU4_OKI_SAMPLED_SOUND(config, m_okicard, VIDEO_MASTER_CLOCK/10);
+	m_okicard->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_okicard->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //Adjusted by IC3 on sound board
-	msm6376.add_route(0, "lspeaker", 0.5);
-	msm6376.add_route(1, "rspeaker", 0.5);
+	m_okicard->cb2_handler().set(FUNC(mpu4vid_state::pia_gb_cb2_w));
+
 }
 
 void mpu4vid_state::mating(machine_config &config)
@@ -2488,7 +2436,7 @@ void mpu4vid_state::init_bwbhack()
 
 	logerror("option byte is %02x\n", option);
 	logerror("bit 0: Datapak     = %d\n", (option >> 0) & 1);
-	logerror("bit 1: Fixed %     = %d\n", (option >> 1) & 1);
+	logerror("bit 1: Fixed %%    = %d\n", (option >> 1) & 1);
 	logerror("bit 2: Arcade      = %d\n", (option >> 2) & 1);
 	logerror("bit 3: Switchable  = %d\n", (option >> 3) & 1);
 	logerror("bit 4: Irish       = %d\n", (option >> 4) & 1);
@@ -2700,7 +2648,7 @@ ROM_START( v4reno )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2713,7 +2661,7 @@ ROM_START( v4renoa )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2726,7 +2674,7 @@ ROM_START( v4renob )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2739,7 +2687,7 @@ ROM_START( v4renoc )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2752,7 +2700,7 @@ ROM_START( v4renod )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2765,7 +2713,7 @@ ROM_START( v4renoe )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2779,7 +2727,7 @@ ROM_START( v4renof )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2792,7 +2740,7 @@ ROM_START( v4renog )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2805,7 +2753,7 @@ ROM_START( v4renoh )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2818,7 +2766,7 @@ ROM_START( v4renoi )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2831,7 +2779,7 @@ ROM_START( v4renoj )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2844,7 +2792,7 @@ ROM_START( v4renok )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2857,7 +2805,7 @@ ROM_START( v4renol )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2870,7 +2818,7 @@ ROM_START( v4renom )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2883,7 +2831,7 @@ ROM_START( v4renon )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2896,7 +2844,7 @@ ROM_START( v4renoo )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2910,7 +2858,7 @@ ROM_START( v4renop )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2923,7 +2871,7 @@ ROM_START( v4renoq )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2936,7 +2884,7 @@ ROM_START( v4renor )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2949,7 +2897,7 @@ ROM_START( v4renos )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2962,7 +2910,7 @@ ROM_START( v4renot )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2975,7 +2923,7 @@ ROM_START( v4renou )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -2990,7 +2938,7 @@ ROM_START( v4reno8 )
 	ROM_LOAD16_BYTE( "rr______.8_1",      0x000001, 0x080000,  CRC(eca43ed4) SHA1(e2e4e5d3d4b659ddd74c120316b9658708e188f1) )
 	ROM_LOAD16_BYTE( "rr______.8_2",      0x000000, 0x080000,  CRC(c3f25586) SHA1(7335708a7d90c7fbd0088bb6ee5ce0255b9b18ab) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -3003,7 +2951,7 @@ ROM_START( v4reno7 )
 	ROM_LOAD16_BYTE( "rr8p1",             0x000001, 0x080000,  CRC(68992dd3) SHA1(75ab1cd02ac627b6191e9b61ee7c072029becaeb) )
 	ROM_LOAD16_BYTE( "rr8p2",             0x000000, 0x080000,  CRC(b859020e) SHA1(811ccac82d022ceccc83f1bf6c6b4de6cc313e14) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -3016,7 +2964,7 @@ ROM_START( v4reno5 )
 	ROM_LOAD16_BYTE( "reno reels 5-1",    0x000000, 0x080000,  CRC(9ebd0eaf) SHA1(3d326509240fe8a83df9d2369f184838bee2b407) )
 	ROM_LOAD16_BYTE( "reno reels 5-2",    0x000001, 0x080000,  CRC(1cbcd9b5) SHA1(989d64e10c67dab7d20229e5c63d24111d556138) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 ROM_END
@@ -3034,7 +2982,7 @@ ROM_START( v4redhtp ) // ok
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3050,7 +2998,7 @@ ROM_START( v4redhtpa )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3066,7 +3014,7 @@ ROM_START( v4redhtpb )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3082,7 +3030,7 @@ ROM_START( v4redhtpc )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3098,7 +3046,7 @@ ROM_START( v4redhtpd )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3114,7 +3062,7 @@ ROM_START( v4redhtpe )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3130,7 +3078,7 @@ ROM_START( v4redhtpf )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3146,7 +3094,7 @@ ROM_START( v4redhtpg )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3162,7 +3110,7 @@ ROM_START( v4redhtph )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3178,7 +3126,7 @@ ROM_START( v4redhtpi )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3194,7 +3142,7 @@ ROM_START( v4redhtpj )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3210,7 +3158,7 @@ ROM_START( v4redhtpk )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3226,7 +3174,7 @@ ROM_START( v4redhtpl )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3242,7 +3190,7 @@ ROM_START( v4redhtpm )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3258,7 +3206,7 @@ ROM_START( v4redhtpn )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3274,7 +3222,7 @@ ROM_START( v4redhtpo )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3290,7 +3238,7 @@ ROM_START( v4redhtpp )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3306,7 +3254,7 @@ ROM_START( v4redhtpq )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3322,7 +3270,7 @@ ROM_START( v4redhtpr )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3338,7 +3286,7 @@ ROM_START( v4redhtps )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3354,7 +3302,7 @@ ROM_START( v4redhtpt )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3370,7 +3318,7 @@ ROM_START( v4redhtpu )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3386,7 +3334,7 @@ ROM_START( v4redhtpv )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3402,7 +3350,7 @@ ROM_START( v4redhtpw )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3418,7 +3366,7 @@ ROM_START( v4redhtpx )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3434,7 +3382,7 @@ ROM_START( v4redhtpy )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3450,7 +3398,7 @@ ROM_START( v4redhtpz )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3466,7 +3414,7 @@ ROM_START( v4redhtpaa )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3482,7 +3430,7 @@ ROM_START( v4redhtpab )
 	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
 	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3494,7 +3442,7 @@ ROM_START( v4redhtpunk )
 	ROM_REGION( 0x800000, "video", 0 ) // none of the ROMs are have are commpatible with this?
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3511,7 +3459,7 @@ ROM_START( v4redhtparc ) // ok
 	ROM_LOAD16_BYTE( "redhotpokervideoboardp5.bin", 0x040000, 0x010000, CRC(d36189b7) SHA1(7757ce9879754d4b8a450ba1f6067c17c151c13c) )
 	ROM_LOAD16_BYTE( "redhotpokervideoboardp6.bin", 0x040001, 0x010000, CRC(c89d164d) SHA1(0cf33db0f85958251624dd7bc2c3024814489040) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3528,7 +3476,7 @@ ROM_START( v4redhtp2 ) // ok
 	ROM_LOAD16_BYTE( "rp_05___.2_5", 0x040000, 0x010000, CRC(cc79187b) SHA1(b2e556fd7a1667203dcb196b1dc2d89bff785675) )
 	ROM_LOAD16_BYTE( "rp_05___.2_6", 0x040001, 0x010000, CRC(57d1cf7b) SHA1(c8d6f4d0e8a5a383c47300e8d56e13d62295f60f) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3544,7 +3492,7 @@ ROM_START( v4redhtp2a )
 	ROM_LOAD16_BYTE( "rp_05___.2_5", 0x040000, 0x010000, CRC(cc79187b) SHA1(b2e556fd7a1667203dcb196b1dc2d89bff785675) )
 	ROM_LOAD16_BYTE( "rp_05___.2_6", 0x040001, 0x010000, CRC(57d1cf7b) SHA1(c8d6f4d0e8a5a383c47300e8d56e13d62295f60f) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3560,7 +3508,7 @@ ROM_START( v4redhtp2b )
 	ROM_LOAD16_BYTE( "rp_05___.2_5", 0x040000, 0x010000, CRC(cc79187b) SHA1(b2e556fd7a1667203dcb196b1dc2d89bff785675) )
 	ROM_LOAD16_BYTE( "rp_05___.2_6", 0x040001, 0x010000, CRC(57d1cf7b) SHA1(c8d6f4d0e8a5a383c47300e8d56e13d62295f60f) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3576,7 +3524,7 @@ ROM_START( v4redhtp2c )
 	ROM_LOAD16_BYTE( "rp_05___.2_5", 0x040000, 0x010000, CRC(cc79187b) SHA1(b2e556fd7a1667203dcb196b1dc2d89bff785675) )
 	ROM_LOAD16_BYTE( "rp_05___.2_6", 0x040001, 0x010000, CRC(57d1cf7b) SHA1(c8d6f4d0e8a5a383c47300e8d56e13d62295f60f) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3592,7 +3540,7 @@ ROM_START( v4redhtp2d )
 	ROM_LOAD16_BYTE( "rp_05___.2_5", 0x040000, 0x010000, CRC(cc79187b) SHA1(b2e556fd7a1667203dcb196b1dc2d89bff785675) )
 	ROM_LOAD16_BYTE( "rp_05___.2_6", 0x040001, 0x010000, CRC(57d1cf7b) SHA1(c8d6f4d0e8a5a383c47300e8d56e13d62295f60f) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3608,7 +3556,7 @@ ROM_START( v4redhtp2e )
 	ROM_LOAD16_BYTE( "rp_05___.2_5", 0x040000, 0x010000, CRC(cc79187b) SHA1(b2e556fd7a1667203dcb196b1dc2d89bff785675) )
 	ROM_LOAD16_BYTE( "rp_05___.2_6", 0x040001, 0x010000, CRC(57d1cf7b) SHA1(c8d6f4d0e8a5a383c47300e8d56e13d62295f60f) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3624,7 +3572,7 @@ ROM_START( v4redhtp2f )
 	ROM_LOAD16_BYTE( "rp_05___.2_5", 0x040000, 0x010000, CRC(cc79187b) SHA1(b2e556fd7a1667203dcb196b1dc2d89bff785675) )
 	ROM_LOAD16_BYTE( "rp_05___.2_6", 0x040001, 0x010000, CRC(57d1cf7b) SHA1(c8d6f4d0e8a5a383c47300e8d56e13d62295f60f) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3640,7 +3588,7 @@ ROM_START( v4redhtp2g )
 	ROM_LOAD16_BYTE( "rp_05___.2_5", 0x040000, 0x010000, CRC(cc79187b) SHA1(b2e556fd7a1667203dcb196b1dc2d89bff785675) )
 	ROM_LOAD16_BYTE( "rp_05___.2_6", 0x040001, 0x010000, CRC(57d1cf7b) SHA1(c8d6f4d0e8a5a383c47300e8d56e13d62295f60f) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -3660,7 +3608,7 @@ ROM_START( v4redhtp2z ) // ok
 	ROM_LOAD16_BYTE( "rhp1.6p5", 0x040000, 0x010000, CRC(750436a1) SHA1(006a31fc5c22969bd79dbc54e618348ad7832ac7) )
 	ROM_LOAD16_BYTE( "rhp1.6p6", 0x040001, 0x010000, CRC(d78839c2) SHA1(e82b769cba4b8d50dcf5c301c03d4ca66e893f70) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	// none present
 ROM_END
 
@@ -4209,7 +4157,7 @@ ROM_START( v4mate )
 	ROM_LOAD16_BYTE( "matq.p10", 0x400001, 0x040000,  CRC(90364c3c) SHA1(6a4d2a3dd2cf9040887503888e6f38341578ad64) )
 
 	/* Mating Game has an extra OKI sound chip */
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "matsnd.p1",  0x000000, 0x080000,  CRC(f16df9e3) SHA1(fd9b82d73e18e635a9ea4aabd8c0b4aa2c8c6fdb) )
 	ROM_LOAD( "matsnd.p2",  0x080000, 0x080000,  CRC(0c041621) SHA1(9156bf17ef6652968d9fbdc0b2bde64d3a67459c) )
 	ROM_LOAD( "matsnd.p3",  0x100000, 0x080000,  CRC(c7435af9) SHA1(bd6080afaaaecca0d65e6d4125b46849aa4d1f33) )
@@ -4233,7 +4181,7 @@ ROM_START( v4mated )
 	ROM_LOAD16_BYTE( "matq.p10", 0x400001, 0x040000,  CRC(90364c3c) SHA1(6a4d2a3dd2cf9040887503888e6f38341578ad64) )
 
 	/* Mating Game has an extra OKI sound chip */
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "matsnd.p1",  0x000000, 0x080000,  CRC(f16df9e3) SHA1(fd9b82d73e18e635a9ea4aabd8c0b4aa2c8c6fdb) )
 	ROM_LOAD( "matsnd.p2",  0x080000, 0x080000,  CRC(0c041621) SHA1(9156bf17ef6652968d9fbdc0b2bde64d3a67459c) )
 	ROM_LOAD( "matsnd.p3",  0x100000, 0x080000,  CRC(c7435af9) SHA1(bd6080afaaaecca0d65e6d4125b46849aa4d1f33) )
@@ -5190,7 +5138,7 @@ ROM_START( v4cybcas )
 	ROM_LOAD16_BYTE( "ccd_____.6_7", 0x300001, 0x080000, CRC(4cd1461c) SHA1(00379212130d5e9c1c364191f67a35cc5eca8b72) )
 	ROM_LOAD16_BYTE( "ccd_____.6_8", 0x300000, 0x080000, CRC(08ce378f) SHA1(035b0ff4d18c09a385002db73c54b8dac92dfa8a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5204,7 +5152,7 @@ ROM_START( v4mdiceger )
 	ROM_LOAD16_BYTE( "md43.p3", 0x100001, 0x080000, CRC(9bceb3f6) SHA1(5be84d5f1635f80a9fe8072c2d94012ed00d97be) )
 	ROM_LOAD16_BYTE( "md44.p4", 0x100000, 0x080000, CRC(54b8fbfa) SHA1(ca2fb67972507a2eb33d2800a3b2d45d3ee49289) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "md41snd.p1", 0x000000, 0x080000, CRC(7a3ba770) SHA1(e620f521d16b39be9b41b934435812afff3993b2) )
 	ROM_LOAD( "md42snd.p2", 0x080000, 0x080000, CRC(8ebc7329) SHA1(82ce25c1486a8619355f363125a26d8cdeb05d33) )
 	ROM_LOAD( "md43snd.p3", 0x100000, 0x080000, CRC(14f4d838) SHA1(0508890a9884fbef0e194a38fe3afc5cf5282091) )
@@ -5223,7 +5171,7 @@ ROM_START( v4missis )
 	ROM_LOAD16_BYTE( "mld_____.6_5", 0x200000, 0x080000, CRC(cd6c39d2) SHA1(c4d4b5c7a1f3dcfdc464fff29f10ccee932f265a) )
 	ROM_LOAD16_BYTE( "mld_____.6_6", 0x200001, 0x080000, CRC(5ad997a3) SHA1(0fd75b4a9b5991fda9cc3373b86f466492c3b4bb) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mld_snd_.1_1", 0x000000, 0x080000, CRC(8c26fe12) SHA1(0532126d8e283b4567a4cdf2bb807f5471c84832) )
 	ROM_LOAD( "mld_snd_.1_2", 0x080000, 0x080000, CRC(9ab841b6) SHA1(7828c6144777621859b85a3ec92760d353576527) )
 	ROM_LOAD( "mld_snd_.1_3", 0x100000, 0x080000, CRC(3f068632) SHA1(5e43da287b3aa163493c1be03ebee28ef58c44a1) )
@@ -5242,7 +5190,7 @@ ROM_START( v4picdil )
 	ROM_LOAD16_BYTE( "pcd_____.a_5", 0x200001, 0x080000, CRC(275f3c1c) SHA1(1d0f8f7d0388d5072ae404f10b2481153979a217) )
 	ROM_LOAD16_BYTE( "pcd_____.a_6", 0x200000, 0x080000, CRC(148ecba0) SHA1(2ae0f5529fa3951025539fe19f4e8fdf10f13374) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5258,7 +5206,7 @@ ROM_START( v4picdila )
 	ROM_LOAD16_BYTE( "pcd_____.a_5", 0x200001, 0x080000, CRC(275f3c1c) SHA1(1d0f8f7d0388d5072ae404f10b2481153979a217) )
 	ROM_LOAD16_BYTE( "pcd_____.a_6", 0x200000, 0x080000, CRC(148ecba0) SHA1(2ae0f5529fa3951025539fe19f4e8fdf10f13374) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5275,7 +5223,7 @@ ROM_START( v4picdilz )
 	ROM_LOAD16_BYTE( "pcd_____.a_5", 0x200001, 0x080000, CRC(275f3c1c) SHA1(1d0f8f7d0388d5072ae404f10b2481153979a217) )
 	ROM_LOAD16_BYTE( "pcd_____.a_6", 0x200000, 0x080000, CRC(148ecba0) SHA1(2ae0f5529fa3951025539fe19f4e8fdf10f13374) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "pcdsnd_v1_p1.bin", 0x000000, 0x080000, CRC(01c0bec3) SHA1(a755f939d02500f0a03e399bbf7f842173bf5a71) )
 	ROM_LOAD( "pcdsnd_v1_p2.bin", 0x080000, 0x080000, CRC(a9f66e67) SHA1(eba1ff2023356face1d9a6be93417b54a132fe6f) )
 	ROM_LOAD( "pcdsnd_v1_p3.bin", 0x100000, 0x080000, BAD_DUMP CRC(d15ea1bd) SHA1(f47e4d901a89ccf83784e582414f3dce08fc4e18) ) // mostly empty, corrupt?
@@ -5291,7 +5239,7 @@ ROM_START( v4big40 )
 	ROM_LOAD16_BYTE( "b4______.3_1", 0x000001, 0x080000, CRC(c388e5a9) SHA1(baafe2da91891f288debd89907d36438494e876a) )
 	ROM_LOAD16_BYTE( "b4______.3_2", 0x000000, 0x080000, CRC(cc3ab5c3) SHA1(a3778b462a823fd73c1a3463c53ef0537e8d5ed4) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5303,7 +5251,7 @@ ROM_START( v4big40a )
 	ROM_LOAD16_BYTE( "b4______.4_1", 0x000001, 0x080000, CRC(fc33c0fc) SHA1(838a7ef4252f9f736639858fe97a4982a89be09f) )
 	ROM_LOAD16_BYTE( "b4______.4_2", 0x000000, 0x080000, CRC(f2211865) SHA1(5bcb95a079f57305d3e58fae3899bceec211f44a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5315,7 +5263,7 @@ ROM_START( v4big40b )
 	ROM_LOAD16_BYTE( "b4______.6_1", 0x000001, 0x080000, CRC(75532ad3) SHA1(0584261faede35f6e846ee398081fac66aea8368) )
 	ROM_LOAD16_BYTE( "b4______.6_2", 0x000000, 0x080000, CRC(03ef74c5) SHA1(fa5d27b0e94c8d05f1c50b28b96f7a4ae3ecda4a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5327,7 +5275,7 @@ ROM_START( v4big40c )
 	ROM_LOAD16_BYTE( "b4______.6_1", 0x000001, 0x080000, CRC(75532ad3) SHA1(0584261faede35f6e846ee398081fac66aea8368) )
 	ROM_LOAD16_BYTE( "b4______.6_2", 0x000000, 0x080000, CRC(03ef74c5) SHA1(fa5d27b0e94c8d05f1c50b28b96f7a4ae3ecda4a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5339,7 +5287,7 @@ ROM_START( v4big40d )
 	ROM_LOAD16_BYTE( "b4______.6_1", 0x000001, 0x080000, CRC(75532ad3) SHA1(0584261faede35f6e846ee398081fac66aea8368) )
 	ROM_LOAD16_BYTE( "b4______.6_2", 0x000000, 0x080000, CRC(03ef74c5) SHA1(fa5d27b0e94c8d05f1c50b28b96f7a4ae3ecda4a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5351,7 +5299,7 @@ ROM_START( v4big40e )
 	ROM_LOAD16_BYTE( "b4______.6_1", 0x000001, 0x080000, CRC(75532ad3) SHA1(0584261faede35f6e846ee398081fac66aea8368) )
 	ROM_LOAD16_BYTE( "b4______.6_2", 0x000000, 0x080000, CRC(03ef74c5) SHA1(fa5d27b0e94c8d05f1c50b28b96f7a4ae3ecda4a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5363,7 +5311,7 @@ ROM_START( v4big40f )
 	ROM_LOAD16_BYTE( "b4______.6_1", 0x000001, 0x080000, CRC(75532ad3) SHA1(0584261faede35f6e846ee398081fac66aea8368) )
 	ROM_LOAD16_BYTE( "b4______.6_2", 0x000000, 0x080000, CRC(03ef74c5) SHA1(fa5d27b0e94c8d05f1c50b28b96f7a4ae3ecda4a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5375,7 +5323,7 @@ ROM_START( v4big40g )
 	ROM_LOAD16_BYTE( "b4______.6_1", 0x000001, 0x080000, CRC(75532ad3) SHA1(0584261faede35f6e846ee398081fac66aea8368) )
 	ROM_LOAD16_BYTE( "b4______.6_2", 0x000000, 0x080000, CRC(03ef74c5) SHA1(fa5d27b0e94c8d05f1c50b28b96f7a4ae3ecda4a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5387,7 +5335,7 @@ ROM_START( v4big40h )
 	ROM_LOAD16_BYTE( "b4______.6_1", 0x000001, 0x080000, CRC(75532ad3) SHA1(0584261faede35f6e846ee398081fac66aea8368) )
 	ROM_LOAD16_BYTE( "b4______.6_2", 0x000000, 0x080000, CRC(03ef74c5) SHA1(fa5d27b0e94c8d05f1c50b28b96f7a4ae3ecda4a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5399,7 +5347,7 @@ ROM_START( v4big40i )
 	ROM_LOAD16_BYTE( "b4______.6_1", 0x000001, 0x080000, CRC(75532ad3) SHA1(0584261faede35f6e846ee398081fac66aea8368) )
 	ROM_LOAD16_BYTE( "b4______.6_2", 0x000000, 0x080000, CRC(03ef74c5) SHA1(fa5d27b0e94c8d05f1c50b28b96f7a4ae3ecda4a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5411,7 +5359,7 @@ ROM_START( v4big40j )
 	ROM_LOAD16_BYTE( "b4______.6_1", 0x000001, 0x080000, CRC(75532ad3) SHA1(0584261faede35f6e846ee398081fac66aea8368) )
 	ROM_LOAD16_BYTE( "b4______.6_2", 0x000000, 0x080000, CRC(03ef74c5) SHA1(fa5d27b0e94c8d05f1c50b28b96f7a4ae3ecda4a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5423,7 +5371,7 @@ ROM_START( v4big40k )
 	ROM_LOAD16_BYTE( "b4______.6_1", 0x000001, 0x080000, CRC(75532ad3) SHA1(0584261faede35f6e846ee398081fac66aea8368) )
 	ROM_LOAD16_BYTE( "b4______.6_2", 0x000000, 0x080000, CRC(03ef74c5) SHA1(fa5d27b0e94c8d05f1c50b28b96f7a4ae3ecda4a) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
 
@@ -5440,7 +5388,7 @@ ROM_START( v4bulblx )
 	ROM_LOAD16_BYTE( "bv______.2_5", 0x040000, 0x010000, CRC(c5775387) SHA1(b301392ae39298284ae256c819877ae287861cc8) )
 	ROM_LOAD16_BYTE( "bv______.2_6", 0x040001, 0x010000, CRC(4443fddc) SHA1(fb4972620f9aa07f8bd62701f64b7902567d34db) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5456,7 +5404,7 @@ ROM_START( v4bulblxa )
 	ROM_LOAD16_BYTE( "bv______.2_5", 0x040000, 0x010000, CRC(c5775387) SHA1(b301392ae39298284ae256c819877ae287861cc8) )
 	ROM_LOAD16_BYTE( "bv______.2_6", 0x040001, 0x010000, CRC(4443fddc) SHA1(fb4972620f9aa07f8bd62701f64b7902567d34db) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5472,7 +5420,7 @@ ROM_START( v4bulblxb )
 	ROM_LOAD16_BYTE( "bv______.2_5", 0x040000, 0x010000, CRC(c5775387) SHA1(b301392ae39298284ae256c819877ae287861cc8) )
 	ROM_LOAD16_BYTE( "bv______.2_6", 0x040001, 0x010000, CRC(4443fddc) SHA1(fb4972620f9aa07f8bd62701f64b7902567d34db) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5488,7 +5436,7 @@ ROM_START( v4bulblxc )
 	ROM_LOAD16_BYTE( "bv______.2_5", 0x040000, 0x010000, CRC(c5775387) SHA1(b301392ae39298284ae256c819877ae287861cc8) )
 	ROM_LOAD16_BYTE( "bv______.2_6", 0x040001, 0x010000, CRC(4443fddc) SHA1(fb4972620f9aa07f8bd62701f64b7902567d34db) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5509,7 +5457,7 @@ ROM_START( v4cshinf )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5529,7 +5477,7 @@ ROM_START( v4cshinfa )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5549,7 +5497,7 @@ ROM_START( v4cshinfb )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5570,7 +5518,7 @@ ROM_START( v4cshinfd )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5590,7 +5538,7 @@ ROM_START( v4cshinfe )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5610,7 +5558,7 @@ ROM_START( v4cshinff )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5630,7 +5578,7 @@ ROM_START( v4cshinfg )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5650,7 +5598,7 @@ ROM_START( v4cshinfh )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5670,7 +5618,7 @@ ROM_START( v4cshinfi )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5690,7 +5638,7 @@ ROM_START( v4cshinfj )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5710,7 +5658,7 @@ ROM_START( v4cshinfk )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5730,7 +5678,7 @@ ROM_START( v4cshinfl )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5750,7 +5698,7 @@ ROM_START( v4cshinfm )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5770,7 +5718,7 @@ ROM_START( v4cshinfn )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5790,7 +5738,7 @@ ROM_START( v4cshinfo )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5810,7 +5758,7 @@ ROM_START( v4cshinfp )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5830,7 +5778,7 @@ ROM_START( v4cshinfq )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5850,7 +5798,7 @@ ROM_START( v4cshinfr )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5870,7 +5818,7 @@ ROM_START( v4cshinfs )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5893,7 +5841,7 @@ ROM_START( v4cshinfu )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5914,7 +5862,7 @@ ROM_START( v4cshinfw )
 	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
 	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5925,7 +5873,7 @@ ROM_START( v4cshinf3 )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD( "release3_video_roms", 0x000000, 0x010000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5936,7 +5884,7 @@ ROM_START( v4cshinf3a )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD( "release3_video_roms", 0x000000, 0x010000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5951,7 +5899,7 @@ ROM_START( v4dbltak )
 	ROM_LOAD16_BYTE( "dt______.4_3", 0x100001, 0x080000, CRC(b715bff9) SHA1(be8ef30b50c235e78a03ea83eadd7541ad96f7a1) )
 	ROM_LOAD16_BYTE( "dt______.4_4", 0x100000, 0x080000, CRC(f41f2566) SHA1(e18e019bb04003e0fdce3a3051da0c618bdaef3d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5965,7 +5913,7 @@ ROM_START( v4dbltaka )
 	ROM_LOAD16_BYTE( "dt______.4_3", 0x100001, 0x080000, CRC(b715bff9) SHA1(be8ef30b50c235e78a03ea83eadd7541ad96f7a1) )
 	ROM_LOAD16_BYTE( "dt______.4_4", 0x100000, 0x080000, CRC(f41f2566) SHA1(e18e019bb04003e0fdce3a3051da0c618bdaef3d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5979,7 +5927,7 @@ ROM_START( v4dbltakb )
 	ROM_LOAD16_BYTE( "dt______.4_3", 0x100001, 0x080000, CRC(b715bff9) SHA1(be8ef30b50c235e78a03ea83eadd7541ad96f7a1) )
 	ROM_LOAD16_BYTE( "dt______.4_4", 0x100000, 0x080000, CRC(f41f2566) SHA1(e18e019bb04003e0fdce3a3051da0c618bdaef3d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -5992,7 +5940,7 @@ ROM_START( v4gldrsh )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6004,7 +5952,7 @@ ROM_START( v4gldrsha )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6016,7 +5964,7 @@ ROM_START( v4gldrshb )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6028,7 +5976,7 @@ ROM_START( v4gldrshc )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6040,7 +5988,7 @@ ROM_START( v4gldrshd )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6052,7 +6000,7 @@ ROM_START( v4gldrshe )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6064,7 +6012,7 @@ ROM_START( v4gldrshf )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6076,7 +6024,7 @@ ROM_START( v4gldrshg )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6088,7 +6036,7 @@ ROM_START( v4gldrshh )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6100,7 +6048,7 @@ ROM_START( v4gldrshi )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6112,7 +6060,7 @@ ROM_START( v4gldrshj )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6124,7 +6072,7 @@ ROM_START( v4gldrshk )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6136,7 +6084,7 @@ ROM_START( v4gldrshl )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6148,7 +6096,7 @@ ROM_START( v4gldrshm )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6160,7 +6108,7 @@ ROM_START( v4gldrshn )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6172,7 +6120,7 @@ ROM_START( v4gldrsho )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6184,7 +6132,7 @@ ROM_START( v4gldrshp )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6196,7 +6144,7 @@ ROM_START( v4gldrshq )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6209,7 +6157,7 @@ ROM_START( v4gldrshr )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6221,7 +6169,7 @@ ROM_START( v4gldrshs )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6233,7 +6181,7 @@ ROM_START( v4gldrsht )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6245,7 +6193,7 @@ ROM_START( v4gldrshu )
 	ROM_LOAD16_BYTE( "go______.8_1", 0x000001, 0x080000, CRC(42700f68) SHA1(3050e790292c8afcc0e27e01dffa22c46d97bcc4) )
 	ROM_LOAD16_BYTE( "go______.8_2", 0x000000, 0x080000, CRC(a5d3c42e) SHA1(1398d5c8d1402a1dbf7910d00e6201f413dbd898) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6257,7 +6205,7 @@ ROM_START( v4gldrsh3 )
 	ROM_LOAD16_BYTE( "go_3.1.bin", 0x000000, 0x080000, CRC(5edc8226) SHA1(c231978be89db23c1b1d38307510ef7e2a278492) )
 	ROM_LOAD16_BYTE( "go_3.2.bin", 0x000001, 0x080000, CRC(95c10e74) SHA1(73b230e2281d4e2a564f070c752479af2af32757) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -6272,7 +6220,7 @@ ROM_START( v4mdicee )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6287,7 +6235,7 @@ ROM_START( v4mdice )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6302,7 +6250,7 @@ ROM_START( v4mdicea )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6317,7 +6265,7 @@ ROM_START( v4mdiceb )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6332,7 +6280,7 @@ ROM_START( v4mdicec )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6347,7 +6295,7 @@ ROM_START( v4mdiced )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6365,7 +6313,7 @@ ROM_START( v4mdicef )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6380,7 +6328,7 @@ ROM_START( v4mdiceg )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6395,7 +6343,7 @@ ROM_START( v4mdiceh )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6410,7 +6358,7 @@ ROM_START( v4mdicei )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6425,7 +6373,7 @@ ROM_START( v4mdicej )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6440,7 +6388,7 @@ ROM_START( v4mdicek )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6455,7 +6403,7 @@ ROM_START( v4mdicel )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6470,7 +6418,7 @@ ROM_START( v4mdicem )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6485,7 +6433,7 @@ ROM_START( v4mdicen )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6500,7 +6448,7 @@ ROM_START( v4mdiceo )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6515,7 +6463,7 @@ ROM_START( v4mdicep )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6530,7 +6478,7 @@ ROM_START( v4mdiceq )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6545,7 +6493,7 @@ ROM_START( v4mdicer )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6560,7 +6508,7 @@ ROM_START( v4mdices )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6575,7 +6523,7 @@ ROM_START( v4mdicet )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6590,7 +6538,7 @@ ROM_START( v4mdiceu )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6605,7 +6553,7 @@ ROM_START( v4mdicev )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6620,7 +6568,7 @@ ROM_START( v4mdicew )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6643,7 +6591,7 @@ ROM_START( v4mdice5 )
 	ROM_LOAD16_BYTE( "mdv58p3", 0x100001, 0x080000, CRC(0d907e37) SHA1(b6ad78a4a7bc877d2152907df2317621f00bdc1c) )
 	ROM_LOAD16_BYTE( "mdv58p4", 0x100000, 0x080000, CRC(2e21c249) SHA1(d5192339313a8dd234cb164ca0094d9a7b64ccc2) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6658,7 +6606,7 @@ ROM_START( v4mdice6 )
 	ROM_LOAD16_BYTE( "md_6_30", 0x100001, 0x080000, CRC(c1526309) SHA1(c6961813310a3873540c9174db3c7ce2347620d5) )
 	ROM_LOAD16_BYTE( "md_6_34", 0x100000, 0x080000, CRC(f6b8cc2f) SHA1(d1022b4a8ab3266dab5401127610c864e6e40a7f) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
@@ -6684,7 +6632,7 @@ ROM_START( v4monte )
 	ROM_LOAD16_BYTE( "mcop3vd",  0x100001, 0x080000, CRC(721e9ad1) SHA1(fb926debd57301c9c0c3ecb9bb1ac36b0b60ee40) )
 	ROM_LOAD16_BYTE( "mcop4vd",  0x100000, 0x080000, CRC(6eba1107) SHA1(c696b620781782c3b4045fe3550ab8e7e905661d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6699,7 +6647,7 @@ ROM_START( v4montea )
 	ROM_LOAD16_BYTE( "mcop3vd",  0x100001, 0x080000, CRC(721e9ad1) SHA1(fb926debd57301c9c0c3ecb9bb1ac36b0b60ee40) )
 	ROM_LOAD16_BYTE( "mcop4vd",  0x100000, 0x080000, CRC(6eba1107) SHA1(c696b620781782c3b4045fe3550ab8e7e905661d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6714,7 +6662,7 @@ ROM_START( v4montec )
 	ROM_LOAD16_BYTE( "mcop3vd",  0x100001, 0x080000, CRC(721e9ad1) SHA1(fb926debd57301c9c0c3ecb9bb1ac36b0b60ee40) )
 	ROM_LOAD16_BYTE( "mcop4vd",  0x100000, 0x080000, CRC(6eba1107) SHA1(c696b620781782c3b4045fe3550ab8e7e905661d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6729,7 +6677,7 @@ ROM_START( v4monted )
 	ROM_LOAD16_BYTE( "mcop3vd",  0x100001, 0x080000, CRC(721e9ad1) SHA1(fb926debd57301c9c0c3ecb9bb1ac36b0b60ee40) )
 	ROM_LOAD16_BYTE( "mcop4vd",  0x100000, 0x080000, CRC(6eba1107) SHA1(c696b620781782c3b4045fe3550ab8e7e905661d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6744,7 +6692,7 @@ ROM_START( v4montee )
 	ROM_LOAD16_BYTE( "mcop3vd",  0x100001, 0x080000, CRC(721e9ad1) SHA1(fb926debd57301c9c0c3ecb9bb1ac36b0b60ee40) )
 	ROM_LOAD16_BYTE( "mcop4vd",  0x100000, 0x080000, CRC(6eba1107) SHA1(c696b620781782c3b4045fe3550ab8e7e905661d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6759,7 +6707,7 @@ ROM_START( v4monteg )
 	ROM_LOAD16_BYTE( "mcop3vd",  0x100001, 0x080000, CRC(721e9ad1) SHA1(fb926debd57301c9c0c3ecb9bb1ac36b0b60ee40) )
 	ROM_LOAD16_BYTE( "mcop4vd",  0x100000, 0x080000, CRC(6eba1107) SHA1(c696b620781782c3b4045fe3550ab8e7e905661d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6779,7 +6727,7 @@ ROM_START( v4monteb )
 	ROM_LOAD16_BYTE( "mn_b3.releaseb.lo", 0x100001, 0x080000, CRC(b6de7ca1) SHA1(944e6c6ee20d187148c7cd4b20119422663780fd) )
 	ROM_LOAD16_BYTE( "mn_b4.releaseb.hi", 0x100000, 0x080000, CRC(5b6ff013) SHA1(ea08978ad469a521a6080fb6ab12033c31134a9d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6794,7 +6742,7 @@ ROM_START( v4monteba )
 	ROM_LOAD16_BYTE( "mn_b3.releaseb.lo", 0x100001, 0x080000, CRC(b6de7ca1) SHA1(944e6c6ee20d187148c7cd4b20119422663780fd) )
 	ROM_LOAD16_BYTE( "mn_b4.releaseb.hi", 0x100000, 0x080000, CRC(5b6ff013) SHA1(ea08978ad469a521a6080fb6ab12033c31134a9d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6809,7 +6757,7 @@ ROM_START( v4montebb )
 	ROM_LOAD16_BYTE( "mn_b3.releaseb.lo", 0x100001, 0x080000, CRC(b6de7ca1) SHA1(944e6c6ee20d187148c7cd4b20119422663780fd) )
 	ROM_LOAD16_BYTE( "mn_b4.releaseb.hi", 0x100000, 0x080000, CRC(5b6ff013) SHA1(ea08978ad469a521a6080fb6ab12033c31134a9d) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6824,7 +6772,7 @@ ROM_START( v4monte5 )
 	ROM_LOAD16_BYTE( "mn_b3.release5.lo", 0x100001, 0x080000, CRC(a38cfb78) SHA1(3af87c03890bf02dc5bf222fab4ec1326c98ef94) )
 	ROM_LOAD16_BYTE( "mn_b4.release5.hi", 0x100000, 0x080000, CRC(ae260cda) SHA1(7139f61c08d2c9f9fdc7314bd89776349c5c1b60) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6839,7 +6787,7 @@ ROM_START( v4monte5a )
 	ROM_LOAD16_BYTE( "mn_b3.release5.lo", 0x100001, 0x080000, CRC(a38cfb78) SHA1(3af87c03890bf02dc5bf222fab4ec1326c98ef94) )
 	ROM_LOAD16_BYTE( "mn_b4.release5.hi", 0x100000, 0x080000, CRC(ae260cda) SHA1(7139f61c08d2c9f9fdc7314bd89776349c5c1b60) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6855,7 +6803,7 @@ ROM_START( v4monte5b )
 	ROM_LOAD16_BYTE( "mn_b3.release5.lo", 0x100001, 0x080000, CRC(a38cfb78) SHA1(3af87c03890bf02dc5bf222fab4ec1326c98ef94) )
 	ROM_LOAD16_BYTE( "mn_b4.release5.hi", 0x100000, 0x080000, CRC(ae260cda) SHA1(7139f61c08d2c9f9fdc7314bd89776349c5c1b60) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6869,7 +6817,7 @@ ROM_START( v4montek )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6882,7 +6830,7 @@ ROM_START( v4montel )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6894,7 +6842,7 @@ ROM_START( v4montem )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6906,7 +6854,7 @@ ROM_START( v4monten )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6918,7 +6866,7 @@ ROM_START( v4monteo )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6930,7 +6878,7 @@ ROM_START( v4montep )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6942,7 +6890,7 @@ ROM_START( v4monteq )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6954,7 +6902,7 @@ ROM_START( v4monter )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6966,7 +6914,7 @@ ROM_START( v4montes )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6978,7 +6926,7 @@ ROM_START( v4montet )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -6990,7 +6938,7 @@ ROM_START( v4monteu )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7002,7 +6950,7 @@ ROM_START( v4montev )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7014,7 +6962,7 @@ ROM_START( v4montew )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7026,7 +6974,7 @@ ROM_START( v4montex )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7038,7 +6986,7 @@ ROM_START( v4montey )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7050,7 +6998,7 @@ ROM_START( v4montez )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7062,7 +7010,7 @@ ROM_START( v4monteaa )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7074,7 +7022,7 @@ ROM_START( v4monteab )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7086,7 +7034,7 @@ ROM_START( v4monteac )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7098,7 +7046,7 @@ ROM_START( v4montead )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7110,7 +7058,7 @@ ROM_START( v4monteae )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7122,7 +7070,7 @@ ROM_START( v4monteaf )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7134,7 +7082,7 @@ ROM_START( v4monteag )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7146,7 +7094,7 @@ ROM_START( v4monteah )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7158,7 +7106,7 @@ ROM_START( v4monteai )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7170,7 +7118,7 @@ ROM_START( v4monteaj )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7182,7 +7130,7 @@ ROM_START( v4monteak )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7194,7 +7142,7 @@ ROM_START( v4monteal )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7206,7 +7154,7 @@ ROM_START( v4monteam )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7218,7 +7166,7 @@ ROM_START( v4montean )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7230,7 +7178,7 @@ ROM_START( v4monteao )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7247,7 +7195,7 @@ ROM_START( v4monte9 )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7262,7 +7210,7 @@ ROM_START( v4monte9a )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7278,7 +7226,7 @@ ROM_START( v4monte9b )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7293,7 +7241,7 @@ ROM_START( v4monte9c )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7308,7 +7256,7 @@ ROM_START( v4monte9d )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7323,7 +7271,7 @@ ROM_START( v4monte9e )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7338,7 +7286,7 @@ ROM_START( v4monte9f )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7353,7 +7301,7 @@ ROM_START( v4monte9g )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7368,7 +7316,7 @@ ROM_START( v4monte9h )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7383,7 +7331,7 @@ ROM_START( v4monte9i )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7398,7 +7346,7 @@ ROM_START( v4monte9j )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7413,7 +7361,7 @@ ROM_START( v4monte9k )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7428,7 +7376,7 @@ ROM_START( v4monte9l )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7443,7 +7391,7 @@ ROM_START( v4monte9m )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7458,7 +7406,7 @@ ROM_START( v4monte9n )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7473,7 +7421,7 @@ ROM_START( v4monte9o )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7487,7 +7435,7 @@ ROM_START( v4montezz )
 	// this seems to be a loose video ROM from an otherwise undumped set? investigate, might belong to something else entirely.
 	ROM_LOAD( "mn______.f_1", 0x0000, 0x080000, CRC(1a81b3fb) SHA1(bbf0fe7e48404962a2f2120734efe71dc1eed64c) ) // unmatched rom? (significant changes)
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
@@ -7502,7 +7450,7 @@ ROM_START( v4monteger )
 	ROM_LOAD16_BYTE( "mnd-a4_vid.bin", 0x100000, 0x080000, CRC(5fa9d451) SHA1(539438d237b869e97176d031f0014f3e33374eed) )
 	ROM_LOAD16_BYTE( "mnd-a3_vid.bin", 0x100001, 0x080000, CRC(5e3a95a4) SHA1(305a7f8b1c5072d86d6f381501886587a2e186ea) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mnd-1a-snd.bin", 0x000000, 0x080000, CRC(98bcf6fb) SHA1(b2c0d305f64be10f5ff40518ebb1b66c44559578) )
 	ROM_LOAD( "mnd-1b-snd.bin", 0x080000, 0x080000, CRC(df2118b4) SHA1(6126baff9dfef7c573e3f77847ea58bdc242fdc2) )
 ROM_END
@@ -7524,7 +7472,7 @@ ROM_START( v4ovrmn3 )
 	ROM_LOAD16_BYTE( "o3______.4_9", 0x080000, 0x010000, CRC(6201a444) SHA1(a4a419fd94c571a85259f0f0092e1c99ef6b5797) )
 	ROM_LOAD16_BYTE( "o3______.4_a", 0x080001, 0x010000, CRC(5b526937) SHA1(dd9de97ee48a157a26e8e70211819aed0a87921c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7544,7 +7492,7 @@ ROM_START( v4ovrmn3a )
 	ROM_LOAD16_BYTE( "o3______.4_9", 0x080000, 0x010000, CRC(6201a444) SHA1(a4a419fd94c571a85259f0f0092e1c99ef6b5797) )
 	ROM_LOAD16_BYTE( "o3______.4_a", 0x080001, 0x010000, CRC(5b526937) SHA1(dd9de97ee48a157a26e8e70211819aed0a87921c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7564,7 +7512,7 @@ ROM_START( v4ovrmn3b )
 	ROM_LOAD16_BYTE( "o3______.4_9", 0x080000, 0x010000, CRC(6201a444) SHA1(a4a419fd94c571a85259f0f0092e1c99ef6b5797) )
 	ROM_LOAD16_BYTE( "o3______.4_a", 0x080001, 0x010000, CRC(5b526937) SHA1(dd9de97ee48a157a26e8e70211819aed0a87921c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7584,7 +7532,7 @@ ROM_START( v4ovrmn3c )
 	ROM_LOAD16_BYTE( "o3______.4_9", 0x080000, 0x010000, CRC(6201a444) SHA1(a4a419fd94c571a85259f0f0092e1c99ef6b5797) )
 	ROM_LOAD16_BYTE( "o3______.4_a", 0x080001, 0x010000, CRC(5b526937) SHA1(dd9de97ee48a157a26e8e70211819aed0a87921c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7604,7 +7552,7 @@ ROM_START( v4ovrmn3d )
 	ROM_LOAD16_BYTE( "o3______.4_9", 0x080000, 0x010000, CRC(6201a444) SHA1(a4a419fd94c571a85259f0f0092e1c99ef6b5797) )
 	ROM_LOAD16_BYTE( "o3______.4_a", 0x080001, 0x010000, CRC(5b526937) SHA1(dd9de97ee48a157a26e8e70211819aed0a87921c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7621,7 +7569,7 @@ ROM_START( v4pztet )
 	ROM_LOAD16_BYTE( "tc______.2_5", 0x040000, 0x010000, CRC(a2a50948) SHA1(57bf6c0738363da93ec6f379a23e706d1a6fc237) )
 	ROM_LOAD16_BYTE( "tc______.2_6", 0x040001, 0x010000, CRC(de2146e4) SHA1(4e65c5d59d561d052834c9a0d139c286839fcf86) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7637,7 +7585,7 @@ ROM_START( v4pzteta )
 	ROM_LOAD16_BYTE( "tc______.2_5", 0x040000, 0x010000, CRC(a2a50948) SHA1(57bf6c0738363da93ec6f379a23e706d1a6fc237) )
 	ROM_LOAD16_BYTE( "tc______.2_6", 0x040001, 0x010000, CRC(de2146e4) SHA1(4e65c5d59d561d052834c9a0d139c286839fcf86) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7653,7 +7601,7 @@ ROM_START( v4pztetb )
 	ROM_LOAD16_BYTE( "tp______.2_5", 0x040000, 0x010000, CRC(e35cb24b) SHA1(a1c32c195b1d61a99b784c646ad78fa59b8270c4) )
 	ROM_LOAD16_BYTE( "tp______.2_6", 0x040001, 0x010000, CRC(fecd48d0) SHA1(67ee3bee7aade5ec5fce1fcfe7ef3982264f1762) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7669,7 +7617,7 @@ ROM_START( v4pztetc )
 	ROM_LOAD16_BYTE( "tp______.2_5", 0x040000, 0x010000, CRC(e35cb24b) SHA1(a1c32c195b1d61a99b784c646ad78fa59b8270c4) )
 	ROM_LOAD16_BYTE( "tp______.2_6", 0x040001, 0x010000, CRC(fecd48d0) SHA1(67ee3bee7aade5ec5fce1fcfe7ef3982264f1762) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7686,7 +7634,7 @@ ROM_START( v4rhmaz )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7702,7 +7650,7 @@ ROM_START( v4rhmaza )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7718,7 +7666,7 @@ ROM_START( v4rhmazb )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7734,7 +7682,7 @@ ROM_START( v4rhmazc )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7750,7 +7698,7 @@ ROM_START( v4rhmazd )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7766,7 +7714,7 @@ ROM_START( v4rhmaze )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7782,7 +7730,7 @@ ROM_START( v4rhmazf )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7798,7 +7746,7 @@ ROM_START( v4rhmazg )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7814,7 +7762,7 @@ ROM_START( v4rhmazh )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7830,7 +7778,7 @@ ROM_START( v4rhmazi )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7846,7 +7794,7 @@ ROM_START( v4rhmazj )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7862,7 +7810,7 @@ ROM_START( v4rhmazk )
 	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
 	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7885,7 +7833,7 @@ ROM_START( v4sunbst )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7903,7 +7851,7 @@ ROM_START( v4sunbsta )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7921,7 +7869,7 @@ ROM_START( v4sunbstb )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7939,7 +7887,7 @@ ROM_START( v4sunbstc )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7957,7 +7905,7 @@ ROM_START( v4sunbstd )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7975,7 +7923,7 @@ ROM_START( v4sunbste )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -7993,7 +7941,7 @@ ROM_START( v4sunbstf )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8011,7 +7959,7 @@ ROM_START( v4sunbstg )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8030,7 +7978,7 @@ ROM_START( v4sunbsth )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8048,7 +7996,7 @@ ROM_START( v4sunbsti )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8066,7 +8014,7 @@ ROM_START( v4sunbstj )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8084,7 +8032,7 @@ ROM_START( v4sunbstk )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8102,7 +8050,7 @@ ROM_START( v4sunbstl )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8120,7 +8068,7 @@ ROM_START( v4sunbstm )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8138,7 +8086,7 @@ ROM_START( v4sunbstn )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8156,7 +8104,7 @@ ROM_START( v4sunbsto )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8174,7 +8122,7 @@ ROM_START( v4sunbstp )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8192,7 +8140,7 @@ ROM_START( v4sunbstq )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8210,7 +8158,7 @@ ROM_START( v4sunbstr )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8228,7 +8176,7 @@ ROM_START( v4sunbsts )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8246,7 +8194,7 @@ ROM_START( v4sunbstt )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8264,7 +8212,7 @@ ROM_START( v4sunbstu )
 	ROM_LOAD16_BYTE( "st______.4_7", 0x060000, 0x010000, CRC(d54ef568) SHA1(acce3b37dcd05ca335bbc44bc05d9093a6cebd3c) )
 	ROM_LOAD16_BYTE( "st______.4_8", 0x060001, 0x010000, CRC(d9aa0643) SHA1(6de6b14dcc9cb0a3eef3635dd07e5f1c16928e6e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8280,7 +8228,7 @@ ROM_START( v4timebn )
 	ROM_LOAD16_BYTE( "ba______.1_1", 0x000000, 0x080000, CRC(df853e0e) SHA1(07b0b9aa8a6dc3a70991236f8c1f88b4a6c6755f) )
 	ROM_LOAD16_BYTE( "ba______.1_2", 0x000001, 0x080000, CRC(9a2ab155) SHA1(582b33f9ddbf7fb2da71ec6ad5fbbb20a03eda19) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "ba______.1_a", 0x000000, 0x080000, CRC(976d761b) SHA1(32cceff2cd9bc6ad48caac0a2d95d815a5f24aa9) )
 	ROM_LOAD( "ba______.1_b", 0x080000, 0x080000, CRC(25a6c7ef) SHA1(cb614c7b2142e47862127d9fdfc7db50978f7f00) )
 ROM_END
@@ -8293,7 +8241,7 @@ ROM_START( v4timebna )
 	ROM_LOAD16_BYTE( "ba______.1_1", 0x000000, 0x080000, CRC(df853e0e) SHA1(07b0b9aa8a6dc3a70991236f8c1f88b4a6c6755f) )
 	ROM_LOAD16_BYTE( "ba______.1_2", 0x000001, 0x080000, CRC(9a2ab155) SHA1(582b33f9ddbf7fb2da71ec6ad5fbbb20a03eda19) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "ba______.1_a", 0x000000, 0x080000, CRC(976d761b) SHA1(32cceff2cd9bc6ad48caac0a2d95d815a5f24aa9) )
 	ROM_LOAD( "ba______.1_b", 0x080000, 0x080000, CRC(25a6c7ef) SHA1(cb614c7b2142e47862127d9fdfc7db50978f7f00) )
 ROM_END
@@ -8306,7 +8254,7 @@ ROM_START( v4timebnb )
 	ROM_LOAD16_BYTE( "ba______.1_1", 0x000000, 0x080000, CRC(df853e0e) SHA1(07b0b9aa8a6dc3a70991236f8c1f88b4a6c6755f) )
 	ROM_LOAD16_BYTE( "ba______.1_2", 0x000001, 0x080000, CRC(9a2ab155) SHA1(582b33f9ddbf7fb2da71ec6ad5fbbb20a03eda19) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "ba______.1_a", 0x000000, 0x080000, CRC(976d761b) SHA1(32cceff2cd9bc6ad48caac0a2d95d815a5f24aa9) )
 	ROM_LOAD( "ba______.1_b", 0x080000, 0x080000, CRC(25a6c7ef) SHA1(cb614c7b2142e47862127d9fdfc7db50978f7f00) )
 ROM_END
@@ -8319,7 +8267,7 @@ ROM_START( v4timebnc )
 	ROM_LOAD16_BYTE( "ba______.1_1", 0x000000, 0x080000, CRC(df853e0e) SHA1(07b0b9aa8a6dc3a70991236f8c1f88b4a6c6755f) )
 	ROM_LOAD16_BYTE( "ba______.1_2", 0x000001, 0x080000, CRC(9a2ab155) SHA1(582b33f9ddbf7fb2da71ec6ad5fbbb20a03eda19) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "ba______.1_a", 0x000000, 0x080000, CRC(976d761b) SHA1(32cceff2cd9bc6ad48caac0a2d95d815a5f24aa9) )
 	ROM_LOAD( "ba______.1_b", 0x080000, 0x080000, CRC(25a6c7ef) SHA1(cb614c7b2142e47862127d9fdfc7db50978f7f00) )
 ROM_END
@@ -8332,7 +8280,7 @@ ROM_START( v4timebnd )
 	ROM_LOAD16_BYTE( "ba______.1_1", 0x000000, 0x080000, CRC(df853e0e) SHA1(07b0b9aa8a6dc3a70991236f8c1f88b4a6c6755f) )
 	ROM_LOAD16_BYTE( "ba______.1_2", 0x000001, 0x080000, CRC(9a2ab155) SHA1(582b33f9ddbf7fb2da71ec6ad5fbbb20a03eda19) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "ba______.1_a", 0x000000, 0x080000, CRC(976d761b) SHA1(32cceff2cd9bc6ad48caac0a2d95d815a5f24aa9) )
 	ROM_LOAD( "ba______.1_b", 0x080000, 0x080000, CRC(25a6c7ef) SHA1(cb614c7b2142e47862127d9fdfc7db50978f7f00) )
 ROM_END
@@ -8345,7 +8293,7 @@ ROM_START( v4timebne )
 	ROM_LOAD16_BYTE( "ba______.1_1", 0x000000, 0x080000, CRC(df853e0e) SHA1(07b0b9aa8a6dc3a70991236f8c1f88b4a6c6755f) )
 	ROM_LOAD16_BYTE( "ba______.1_2", 0x000001, 0x080000, CRC(9a2ab155) SHA1(582b33f9ddbf7fb2da71ec6ad5fbbb20a03eda19) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "ba______.1_a", 0x000000, 0x080000, CRC(976d761b) SHA1(32cceff2cd9bc6ad48caac0a2d95d815a5f24aa9) )
 	ROM_LOAD( "ba______.1_b", 0x080000, 0x080000, CRC(25a6c7ef) SHA1(cb614c7b2142e47862127d9fdfc7db50978f7f00) )
 ROM_END
@@ -8363,7 +8311,7 @@ ROM_START( v4sixx )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8377,7 +8325,7 @@ ROM_START( v4sixxa )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8391,7 +8339,7 @@ ROM_START( v4sixxb )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8405,7 +8353,7 @@ ROM_START( v4sixxc)
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8419,7 +8367,7 @@ ROM_START( v4sixxd )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8433,7 +8381,7 @@ ROM_START( v4sixxe )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8447,7 +8395,7 @@ ROM_START( v4sixxf )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8461,7 +8409,7 @@ ROM_START( v4sixxg )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8475,7 +8423,7 @@ ROM_START( v4sixxh )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8489,7 +8437,7 @@ ROM_START( v4sixxi )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8503,7 +8451,7 @@ ROM_START( v4sixxj )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8517,7 +8465,7 @@ ROM_START( v4sixxk )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8531,7 +8479,7 @@ ROM_START( v4sixxl )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8545,7 +8493,7 @@ ROM_START( v4sixxm )
 	ROM_LOAD16_BYTE( "6x______.3_3", 0x020000, 0x010000, CRC(e8a4531d) SHA1(c816b3b270f1aeaf3ee90aa65dfeea59e8862d1a) )
 	ROM_LOAD16_BYTE( "6x______.3_4", 0x020001, 0x010000, CRC(4129b8af) SHA1(30ad007f543e570021292f3eef728b0697c31bb5) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8563,7 +8511,7 @@ ROM_START( v4megbuk )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8574,7 +8522,7 @@ ROM_START( v4megbuka )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8585,7 +8533,7 @@ ROM_START( v4megbukb )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8596,7 +8544,7 @@ ROM_START( v4megbukc )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8610,7 +8558,7 @@ ROM_START( v4rencas )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8621,7 +8569,7 @@ ROM_START( v4rencasa )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8632,7 +8580,7 @@ ROM_START( v4rencasb )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8643,7 +8591,7 @@ ROM_START( v4rencasc )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8654,7 +8602,7 @@ ROM_START( v4rencasd )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8665,7 +8613,7 @@ ROM_START( v4rencase )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8676,7 +8624,7 @@ ROM_START( v4rencasf )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8687,7 +8635,7 @@ ROM_START( v4rencasg )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8698,7 +8646,7 @@ ROM_START( v4rencash )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 
@@ -8709,7 +8657,7 @@ ROM_START( v4rencasi )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
 

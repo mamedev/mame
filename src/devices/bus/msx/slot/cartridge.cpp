@@ -96,7 +96,6 @@ void msx_slot_cartridge_device::device_resolve_objects()
 	m_cartridge = dynamic_cast<msx_cart_interface *>(get_card_device());
 	if (m_cartridge)
 	{
-		m_cartridge->m_exp = this;
 		m_cartridge->set_views(page(0), page(1), page(2), page(3));
 	}
 }
@@ -111,46 +110,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 {
 	if (m_cartridge)
 	{
-		if (loaded_through_softlist())
-		{
-			u32 length;
-
-			// Allocate and copy rom contents
-			length = get_software_region_length("rom");
-			m_cartridge->rom_alloc(length);
-			if (length > 0)
-			{
-				u8 *rom_base = m_cartridge->get_rom_base();
-				memcpy(rom_base, get_software_region("rom"), length);
-			}
-
-			// Allocate and copy vlm5030 rom contents
-			length = get_software_region_length("vlm5030");
-			m_cartridge->rom_vlm5030_alloc(length);
-			if (length > 0)
-			{
-				u8 *rom_base = m_cartridge->get_rom_vlm5030_base();
-				memcpy(rom_base, get_software_region("vlm5030"), length);
-			}
-
-			// Allocate ram
-			length = get_software_region_length("ram");
-			m_cartridge->ram_alloc(length);
-
-			// Allocate sram
-			length = get_software_region_length("sram");
-			m_cartridge->sram_alloc(length);
-
-			// Allocate and copy kanji rom contents
-			length = get_software_region_length("kanji");
-			m_cartridge->kanji_alloc(length);
-			if (length > 0)
-			{
-				u8 *rom_base = m_cartridge->get_kanji_base();
-				memcpy(rom_base, get_software_region("kanji"), length);
-			}
-		}
-		else
+		if (!loaded_through_softlist())
 		{
 			u32 length = this->length();
 
@@ -171,11 +131,8 @@ image_init_result msx_slot_cartridge_device::call_load()
 					length_aligned *= 2;
 			}
 
-			m_cartridge->rom_alloc(length_aligned);
-			m_cartridge->ram_alloc(0);
-			m_cartridge->sram_alloc(0);
-
-			if (fread(m_cartridge->get_rom_base(), length) != length)
+			memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), length_aligned, 1, ENDIANNESS_LITTLE);
+			if (fread(romregion->base(), length) != length)
 			{
 				seterror(image_error::UNSPECIFIED, "Unable to fully read file");
 				return image_init_result::FAIL;
@@ -188,12 +145,17 @@ image_init_result msx_slot_cartridge_device::call_load()
 			}
 		}
 
-		m_cartridge->m_exp = this;
-		m_cartridge->initialize_cartridge();
-
-		if (m_cartridge->get_sram_size() > 0)
+		std::string message;
+		image_init_result result = m_cartridge->initialize_cartridge(message);
+		if (image_init_result::PASS != result)
 		{
-			battery_load(m_cartridge->get_sram_base(), m_cartridge->get_sram_size(), 0x00);
+			seterror(image_error::INVALIDIMAGE, message.c_str());
+			return result;
+		}
+
+		if (m_cartridge->cart_sram_region())
+		{
+			battery_load(m_cartridge->cart_sram_region()->base(), m_cartridge->cart_sram_region()->bytes(), 0x00);
 		}
 	}
 	return image_init_result::PASS;
@@ -202,12 +164,9 @@ image_init_result msx_slot_cartridge_device::call_load()
 
 void msx_slot_cartridge_device::call_unload()
 {
-	if (m_cartridge)
+	if (m_cartridge && m_cartridge->cart_sram_region())
 	{
-		if (m_cartridge->get_sram_size() > 0)
-		{
-			battery_save(m_cartridge->get_sram_base(), m_cartridge->get_sram_size());
-		}
+		battery_save(m_cartridge->cart_sram_region()->base(), m_cartridge->cart_sram_region()->bytes());
 	}
 }
 
@@ -361,4 +320,41 @@ msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine
 
 void msx_slot_yamaha_expansion_device::device_start()
 {
+}
+
+
+msx_cart_interface::msx_cart_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "msxcart")
+	, m_exp(dynamic_cast<msx_slot_cartridge_device *>(device.owner()))
+{
+	for (int i = 0; i < 4; i++)
+		m_page[i] = nullptr;
+}
+
+WRITE_LINE_MEMBER(msx_cart_interface::irq_out)
+{
+	m_exp->irq_out(state);
+}
+
+address_space &msx_cart_interface::memory_space() const
+{
+	return m_exp->memory_space();
+}
+
+address_space &msx_cart_interface::io_space() const
+{
+	return m_exp->io_space();
+}
+
+cpu_device &msx_cart_interface::maincpu() const
+{
+	return m_exp->maincpu();
+}
+
+void msx_cart_interface::set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
+{
+	m_page[0] = page0;
+	m_page[1] = page1;
+	m_page[2] = page2;
+	m_page[3] = page3;
 }

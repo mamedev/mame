@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="apple2_flop_orig" description="Apple II original disks">
@@ -4195,7 +4195,7 @@ license:CC0
 	<software name="prntshpc">
 		<description>The Print Shop Color</description>
 		<year>1986</year>
-		<publisher>Brøderbund software</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="release" value="2019-03-29"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->

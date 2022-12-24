@@ -64,9 +64,9 @@ public:
 		m_i8243(*this, "n7751_8243"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_gfx_data(*this, "gfx"),
 		m_n7751_data(*this, "n7751data")
-	{
-	}
+	{ }
 
 	void othello(machine_config &config);
 
@@ -96,6 +96,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	required_region_ptr<uint8_t> m_gfx_data;
 	required_region_ptr<uint8_t> m_n7751_data;
 
 	uint8_t unk_87_r();
@@ -129,18 +130,17 @@ private:
 MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-
-	uint8_t const *const gfx = memregion("gfx")->base();
+	uint8_t const *const gfx = m_gfx_data;
 
 	for(int cx = 0; cx < x_count; ++cx)
 	{
-		uint32_t data_address = ((m_videoram[ma + cx] + m_tile_bank) << 4) | ra;
-		uint32_t tmp = gfx[data_address] | (gfx[data_address + 0x2000] << 8) | (gfx[data_address + 0x4000] << 16);
+		uint32_t address = ((m_videoram[ma + cx] + m_tile_bank) << 4) | ra;
+		uint32_t tile_data = gfx[address] | (gfx[address + 0x2000] << 8) | (gfx[address + 0x4000] << 16);
 
 		for(int x = 0; x < TILE_WIDTH; ++x)
 		{
-			bitmap.pix(y, (cx * TILE_WIDTH + x) ^ 1) = palette[tmp & 0x0f];
-			tmp >>= 4;
+			bitmap.pix(y, (cx * TILE_WIDTH + x) ^ 1) = palette[tile_data & 0x0f];
+			tile_data >>= 4;
 		}
 	}
 }

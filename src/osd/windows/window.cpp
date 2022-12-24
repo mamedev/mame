@@ -1403,7 +1403,10 @@ void win_window_info::draw_video_contents(HDC dc, bool update)
 		{
 			// update DC
 			m_dc = dc;
-			renderer().draw(update);
+			if (has_renderer())
+			{
+				renderer().draw(update);
+			}
 		}
 	}
 }

@@ -12,7 +12,7 @@
 #include "cd90_351.h"
 #include "formats/thom_dsk.h"
 
-DEFINE_DEVICE_TYPE(CD90_351, cd90_351_device, "cd90_351", "Thomson CD90-351 floppy drive controller")
+DEFINE_DEVICE_TYPE(CD90_351, cd90_351_device, "cd90_351", "Thomson CD 90-351 Diskette Controller")
 
 cd90_351_device::cd90_351_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CD90_351, tag, owner, 16000000),
@@ -41,15 +41,15 @@ void cd90_351_device::rom_map(address_map &map)
 
 void cd90_351_device::io_map(address_map &map)
 {
-	map(0, 0).rw(FUNC(cd90_351_device::stat0_r), FUNC(cd90_351_device::cmd0_w));
-	map(1, 1).rw(FUNC(cd90_351_device::stat1_r), FUNC(cd90_351_device::cmd1_w));
-	map(2, 2).w(FUNC(cd90_351_device::cmd2_w));
-	map(3, 3).rw(FUNC(cd90_351_device::rdata_r), FUNC(cd90_351_device::wdata_w));
-	map(4, 4).w(FUNC(cd90_351_device::wclk_w));
-	map(5, 5).w(FUNC(cd90_351_device::wsect_w));
-	map(6, 6).w(FUNC(cd90_351_device::wtrck_w));
-	map(7, 7).w(FUNC(cd90_351_device::wcell_w));
-	map(8, 8).w(FUNC(cd90_351_device::bank_w));
+	map(0x10, 0x10).rw(FUNC(cd90_351_device::stat0_r), FUNC(cd90_351_device::cmd0_w));
+	map(0x11, 0x11).rw(FUNC(cd90_351_device::stat1_r), FUNC(cd90_351_device::cmd1_w));
+	map(0x12, 0x12).w(FUNC(cd90_351_device::cmd2_w));
+	map(0x13, 0x13).rw(FUNC(cd90_351_device::rdata_r), FUNC(cd90_351_device::wdata_w));
+	map(0x14, 0x14).w(FUNC(cd90_351_device::wclk_w));
+	map(0x15, 0x15).w(FUNC(cd90_351_device::wsect_w));
+	map(0x16, 0x16).w(FUNC(cd90_351_device::wtrck_w));
+	map(0x17, 0x17).w(FUNC(cd90_351_device::wcell_w));
+	map(0x18, 0x18).w(FUNC(cd90_351_device::bank_w));
 }
 
 const tiny_rom_entry *cd90_351_device::device_rom_region() const

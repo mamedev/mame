@@ -17,21 +17,20 @@
 
 namespace {
 
-class megadriv_vt0203_state : public md_base_state
+class megadriv_vt0203_state : public md_ctrl_state
 {
 public:
-	megadriv_vt0203_state(const machine_config &mconfig, device_type type, const char *tag)
+	megadriv_vt0203_state(const machine_config &mconfig, device_type type, const char *tag) :
 		// Mega Drive part
-		: md_base_state(mconfig, type, tag),
+		md_ctrl_state(mconfig, type, tag),
 		m_md_is_running(true),
 		m_bank(0),
 		m_rom(*this, "maincpu")
-	{}
+	{ }
 
 	// Mega Drive part
 	uint16_t read(offs_t offset);
 	void megadriv_vt0203_pal(machine_config &config);
-	void megadriv_vt0203_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -43,25 +42,20 @@ private:
 	// Mega Drive part
 	int m_bank;
 	required_region_ptr<uint16_t> m_rom;
+
 	uint32_t screen_update_hybrid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_hybrid);
 
+	void megadriv_vt0203_map(address_map &map);
 };
 
 
 // todo, use actual MD map, easier once maps are part of base class.
 void megadriv_vt0203_state::megadriv_vt0203_map(address_map &map)
 {
+	megadriv_68k_base_map(map);
+
 	map(0x000000, 0x3fffff).r(FUNC(megadriv_vt0203_state::read)); /* Cartridge Program Rom */
-	map(0xa00000, 0xa01fff).rw(FUNC(megadriv_vt0203_state::megadriv_68k_read_z80_ram), FUNC(megadriv_vt0203_state::megadriv_68k_write_z80_ram));
-	map(0xa02000, 0xa03fff).w(FUNC(megadriv_vt0203_state::megadriv_68k_write_z80_ram));
-	map(0xa04000, 0xa04003).rw(FUNC(megadriv_vt0203_state::megadriv_68k_YM2612_read), FUNC(megadriv_vt0203_state::megadriv_68k_YM2612_write));
-	map(0xa06000, 0xa06001).w(FUNC(megadriv_vt0203_state::megadriv_68k_z80_bank_write));
-	map(0xa10000, 0xa1001f).rw(FUNC(megadriv_vt0203_state::megadriv_68k_io_read), FUNC(megadriv_vt0203_state::megadriv_68k_io_write));
-	map(0xa11100, 0xa11101).rw(FUNC(megadriv_vt0203_state::megadriv_68k_check_z80_bus), FUNC(megadriv_vt0203_state::megadriv_68k_req_z80_bus));
-	map(0xa11200, 0xa11201).w(FUNC(megadriv_vt0203_state::megadriv_68k_req_z80_reset));
-	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
-	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000).share("megadrive_ram");
 }
 
 uint16_t megadriv_vt0203_state::read(offs_t offset)
@@ -99,7 +93,7 @@ INPUT_PORTS_END
 void megadriv_vt0203_state::machine_start()
 {
 	logerror("megadriv_vt0203_state::machine_start\n");
-	md_base_state::machine_start();
+	md_ctrl_state::machine_start();
 
 	m_vdp->stop_timers();
 	save_item(NAME(m_bank));
@@ -108,7 +102,7 @@ void megadriv_vt0203_state::machine_start()
 void megadriv_vt0203_state::machine_reset()
 {
 	logerror("megadriv_vt0203_state::machine_reset\n");
-	md_base_state::machine_reset();
+	md_ctrl_state::machine_reset();
 }
 
 uint32_t megadriv_vt0203_state::screen_update_hybrid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -127,7 +121,7 @@ WRITE_LINE_MEMBER(megadriv_vt0203_state::screen_vblank_hybrid)
 	if (m_md_is_running)
 	{
 		/* Used to Sync the timing */
-		md_base_state::screen_vblank_megadriv(state);
+		md_ctrl_state::screen_vblank_megadriv(state);
 	}
 }
 
@@ -135,10 +129,14 @@ WRITE_LINE_MEMBER(megadriv_vt0203_state::screen_vblank_hybrid)
 void megadriv_vt0203_state::megadriv_vt0203_pal(machine_config &config)
 {
 	md_pal(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_vt0203_state::megadriv_vt0203_map);
 
 	m_screen->set_screen_update(FUNC(megadriv_vt0203_state::screen_update_hybrid));
 	m_screen->screen_vblank().set(FUNC(megadriv_vt0203_state::screen_vblank_hybrid));
+
+	ctrl1_3button(config);
+	ctrl2_3button(config);
 
 	// TODO: add the VT part, this might require refactoring of the VT stuff as the SoC currently contains the screen
 	//       but instead we'll need to use a shared screen that is reconfigured depending on which part is enabled

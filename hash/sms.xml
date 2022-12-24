@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
   Undumped games
 
@@ -3371,8 +3371,8 @@ license:CC0
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5062 (USA)"/>
-		<sharedfeat name="ctrl1_default" value="sportspad" />
-		<sharedfeat name="ctrl2_default" value="sportspad" />
+		<sharedfeat name="ctrl1_default" value="sports" />
+		<sharedfeat name="ctrl2_default" value="sports" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power (Jpn cart) -->
 			<feature name="pcb" value="171-5552" />
@@ -3941,6 +3941,18 @@ license:CC0
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="king's quest - quest for the crown (usa) (beta).bin" size="131072" crc="b7fe0a9d" sha1="1b6330199444e303aafb9a2fd3f2119cedab0712" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqstp1" cloneof="kingqst">
+		<description>King's Quest - Quest for the Crown (USA, prototype, 19890203)</description>
+		<year>1989</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="ic3" value="315-5235" /> <!-- Sega Memory Controller -->
+			<dataarea name="rom" size="0x20000">
+				<rom name="king's quest 2-3-89.ic1" size="0x20000" crc="fd27bef1" sha1="9811eb06f4e67bea9c08c4e3446eafed78e2d275" /> <!-- original label: KING'S QUEST 2/3/89 -->
 			</dataarea>
 		</part>
 	</software>
@@ -4610,6 +4622,20 @@ license:CC0
 
 	<software name="monopolyp" cloneof="monopoly">
 		<description>Monopoly (USA, prototype)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="battery" value="yes" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="monopoly [proto 1].bin" size="0x20000" crc="e0d1049b" sha1="6d100d43cddfb761d3560786c26e345873452a4b" />
+			</dataarea>
+			<dataarea name="ram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monopolyp1" cloneof="monopoly">
+		<description>Monopoly (USA, prototype, alt)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6311,6 +6337,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="smgpup" cloneof="smgp">
+		<description>Super Monaco GP (USA, prototype)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="pcb" value="171-5486" />
+			<feature name="ic3" value="315-5235" /> <!-- Sega Memory Controller -->
+			<dataarea name="rom" size="0x40000">
+				<!-- Differs from final release by only 3 header bytes -->
+				<rom name="super monaco 7-18-90.ic1" size="0x20000" crc="e17df02f" sha1="deb24d9b3bbb740ab4e1834328e190b689e85329" offset="0x00000" /> <!-- original label: SUPER MONACO 7/18/90 -->
+				<rom name="ic2" size="0x20000" crc="22418c88" sha1="ddf9c5089cae542d4c752edc98d20dfba81696e7" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sms3samp">
 		<description>Promocao Especial M. System III Compact (Brazil, sample)</description>
 		<year>19??</year>
@@ -6615,8 +6656,8 @@ license:CC0
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5060"/>
-		<sharedfeat name="ctrl1_default" value="sportspad" />
-		<sharedfeat name="ctrl2_default" value="sportspad" />
+		<sharedfeat name="ctrl1_default" value="sports" />
+		<sharedfeat name="ctrl2_default" value="sports" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad football (usa).bin" size="131072" crc="e42e4998" sha1="556d9ab4ba3c3a34440b36c6fc8e972f70f16d72" offset="000000" />
@@ -6643,8 +6684,8 @@ license:CC0
 		<info name="serial" value="G-1365"/>
 		<info name="release" value="19881029"/>
 		<info name="alt_title" value="スポーツパッドサッカー" />
-		<sharedfeat name="ctrl1_default" value="sportspad" />
-		<sharedfeat name="ctrl2_default" value="sportspad" />
+		<sharedfeat name="ctrl1_default" value="sports" />
+		<sharedfeat name="ctrl2_default" value="sports" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad soccer (japan).bin" size="131072" crc="41c948bf" sha1="7634ce39e87049dad1ee4f32a80d728e4bd1f81f" offset="000000" />

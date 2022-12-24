@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="pc98" description="NEC PC-9801 disk images">
 <!--
@@ -732,7 +732,7 @@ TODO:
 	</software>
 
 	<software name="win211a" cloneof="win211">
-		<description>Windows 2.11 (Alt Disk 1)</description>
+		<description>Windows 2.11 (alt Disk 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -982,7 +982,7 @@ TODO:
 	</software>
 
 	<software name="win31a" cloneof="win31">
-		<description>Windows 3.1 (Alt Format)</description>
+		<description>Windows 3.1 (alt format)</description>
 		<year>199?</year>
 		<publisher>Microsoft?</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1146,7 +1146,7 @@ TODO:
 	</software>
 
 	<software name="turbocppa" cloneof="turbocpp">
-		<description>Turbo C++ (Alt Format)</description>
+		<description>Turbo C++ (alt format)</description>
 		<year>1990</year>
 		<publisher>Borland</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1170,7 +1170,7 @@ TODO:
 	</software>
 
 	<software name="turbocppb" cloneof="turbocpp">
-		<description>Turbo C++ (Alt Disk 1)</description>
+		<description>Turbo C++ (alt Disk 1)</description>
 		<year>1990</year>
 		<publisher>Borland</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1608,7 +1608,7 @@ TODO:
 	</software>
 
 	<software name="ichihana" supported="no">
-		<description>Ichitaro ver4.0 + Hanako Ver2.0 (Demo)</description>
+		<description>Ichitaro ver4.0 + Hanako Ver2.0 (demo)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1845,7 +1845,7 @@ TODO:
 	</software>
 
 	<software name="msdos33d" cloneof="msdos33" supported="no">
-		<description>MS-DOS 3.30D (Alt)</description>
+		<description>MS-DOS 3.30D (alt)</description>
 		<year>1991</year>
 		<publisher>NEC / Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2563,7 +2563,7 @@ TODO:
 	</software>
 
 	<software name="alaskanm">
-		<description>Alaskan Malamute G.C. (Alt Format)</description>
+		<description>Alaskan Malamute G.C. (alt format)</description>
 		<year>1992</year>
 		<publisher>ホームデータ (Home Data)</publisher>
 		<info name="alt_title" value="アラスカンマラミュートＧ．Ｃ．" />
@@ -2693,7 +2693,7 @@ TODO:
 
 <!-- in d88 format, perhaps same thing as the one above -->
 	<software name="4ddrivina" cloneof="4ddrivin">
-		<description>4D Driving (Alt)</description>
+		<description>4D Driving (alt)</description>
 		<year>1993</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
 		<info name="alt_title" value="４Ｄドライビング" />
@@ -3307,7 +3307,7 @@ TODO:
 	</software>
 
 	<software name="actor98a" cloneof="actor98">
-		<description>Actor 98 (Alt Disk 1)</description>
+		<description>Actor 98 (alt Disk 1)</description>
 		<year>1990</year>
 		<publisher>スタジオパンサー (Studio Panther)</publisher>
 		<info name="alt_title" value="Ａｃｔｏｒ９８" />
@@ -3327,7 +3327,7 @@ TODO:
 
 	<!-- Black screen on boot -->
 	<software name="adrecona" cloneof="adrecon" supported="no">
-		<description>Adrenalin Connection (Fix?)</description>
+		<description>Adrenalin Connection (fix?)</description>
 		<year>1987</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="alt_title" value="アドレナリン・コネクション" />
@@ -3503,11 +3503,11 @@ TODO:
 		-->
 	</software>
 
-<!-- is this hacked as well? if so it shall be removed -->
 	<software name="advlanda" cloneof="advland">
-		<description>Adventureland (Alt)</description>
+		<description>Adventureland (alt)</description>
 		<year>1984</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes>Unofficial conversion to high density</notes>
 		<info name="alt_title" value="アドベンチャーランド" />
 		<info name="release" value="198407xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3980,7 +3980,7 @@ TODO:
 	</software>
 
 	<software name="aizaa" cloneof="aiza">
-		<description>Aiza - New Generation (Alt Format)</description>
+		<description>Aiza - New Generation (alt format)</description>
 		<year>1991</year>
 		<publisher>ティールハイト (Tierheit)</publisher>
 		<info name="alt_title" value="エイジア" />
@@ -4479,7 +4479,7 @@ TODO:
 	</software>
 
 	<software name="alphaa" cloneof="alpha">
-		<description>Alpha (Alt Format)</description>
+		<description>Alpha (alt format)</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
 		<info name="alt_title" value="アルファ α" />
@@ -4671,7 +4671,7 @@ TODO:
 	<!-- The main executable (AMARAN2.EXE) is slightly different in this set -->
 	<software name="amarant2a" cloneof="amarant2">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Amaranth II (Alt System Disk)</description>
+		<description>Amaranth II (alt System Disk)</description>
 		<year>1992</year>
 		<publisher>風雅システム (Fuga System)</publisher>
 		<info name="alt_title" value="アマランスII" />
@@ -5033,7 +5033,7 @@ TODO:
 
 	<software name="animjxpfa" cloneof="animjxpf">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Animahjong X Perfect File (Alt)</description>
+		<description>Animahjong X Perfect File (alt)</description>
 		<year>1994</year>
 		<publisher>ソニア (Sogna)</publisher>
 		<info name="alt_title" value="あにまーじゃんX パーフェクトファイル" />
@@ -5654,7 +5654,7 @@ TODO:
 	</software>
 
 	<software name="area88ia" cloneof="area88i" supported="partial">
-		<description>Area 88 - Ikkakujuu no Kiseki (Alt Disk C)</description>
+		<description>Area 88 - Ikkakujuu no Kiseki (alt Disk C)</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="エリア８８ 一角獣の軌跡" />
@@ -6429,7 +6429,7 @@ TODO:
 	<!-- boot OK in vanilla, VM, RS classes -->
 	<!-- No kanji displayed for vanilla version (btanb?) -->
 	<software name="balpowera" cloneof="balpower" supported="partial">
-		<description>Balance of Power - Geopolitics in the Nuclear Age (Alt Disk 1)</description>
+		<description>Balance of Power - Geopolitics in the Nuclear Age (alt Disk A)</description>
 		<year>1988</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="バランス オブ パワー" />
@@ -6940,7 +6940,7 @@ TODO:
 	</software>
 
 	<software name="beyondd" cloneof="beyond">
-		<description>Be-Yond (Demo)</description>
+		<description>Be-Yond (demo)</description>
 		<year>1996</year>
 		<publisher>シルキーズ (Silky's)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -7244,7 +7244,7 @@ TODO:
 	</software>
 
 	<software name="biblemasa" cloneof="biblemas">
-		<description>Bible Master - Crash of the Blleot Rutz (Alt)</description>
+		<description>Bible Master - Crash of the Blleot Rutz (alt)</description>
 		<year>1993</year>
 		<publisher>グローディア (Glodia)</publisher>
 		<info name="alt_title" value="バイブルマスター" />
@@ -7537,7 +7537,7 @@ TODO:
 
 <!-- is this a different Bishoujo Shashinkan game? -->
 	<software name="bshashsca" cloneof="bshashsc" supported="no">
-		<description>Bishoujo Shashinkan - Studio Cut (Alt)</description>
+		<description>Bishoujo Shashinkan - Studio Cut (alt)</description>
 		<year>1987</year>
 		<publisher>ハード (Hard)</publisher>
 		<info name="alt_title" value="美少女写真館 スタジオ・カット" />
@@ -7563,7 +7563,7 @@ TODO:
 	</software>
 
 	<software name="bshash3a" cloneof="bshash3">
-		<description>Bishoujo Shashinkan III - Photo Club Kyofu no Yakata hen (Alt Format)</description>
+		<description>Bishoujo Shashinkan III - Photo Club Kyofu no Yakata hen (alt format)</description>
 		<year>1989</year>
 		<publisher>ハード (Hard)</publisher>
 		<info name="alt_title" value="美少女写真館Ⅲ 恐怖の館編" />
@@ -8413,7 +8413,7 @@ TODO:
 	</software>
 
 	<software name="brand2pba" cloneof="brand2pb" supported="no">
-		<description>Brandish 2 - The Planet Buster (Alt Program Disk)</description>
+		<description>Brandish 2 - The Planet Buster (alt Program disk)</description>
 		<year>1993</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュ２ ザ プラネット バスター" />
@@ -8567,7 +8567,7 @@ TODO:
 	</software>
 
 	<software name="brandnewca" cloneof="brandnew">
-		<description>Brandish Renewal (Alt, cracked)</description>
+		<description>Brandish Renewal (alt, cracked)</description>
 		<year>1995</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュ リニューアル" />
@@ -9825,7 +9825,7 @@ TODO:
 	<!-- boot OK by running CENTURIO.EXE from MSDOS -->
 	<software name="centurioa" cloneof="centurio" supported="no">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Centurion - Defender of Rome (Alt)</description>
+		<description>Centurion - Defender of Rome (alt)</description>
 		<year>1993</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -10357,7 +10357,7 @@ TODO:
 
 	<software name="samadhia" cloneof="samadhi">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Chou Shinri Samâdhi (Alt)</description>
+		<description>Chou Shinri Samâdhi (alt)</description>
 		<year>1994</year>
 		<publisher>M.M.S. ~ Mighty Mycom System</publisher>
 		<info name="alt_title" value="超心理サマーディ" />
@@ -10585,7 +10585,7 @@ TODO:
 
 	<software name="chrryjama" cloneof="chrryjam">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Cherry Jam - Kanojo ga Hadaka ni Kigaetara (Alt)</description>
+		<description>Cherry Jam - Kanojo ga Hadaka ni Kigaetara (alt)</description>
 		<year>1996</year>
 		<publisher>ジャム (Jam)</publisher>
 		<info name="alt_title" value="チェリージャム ～彼女が裸に着替えたら～" />
@@ -10701,7 +10701,7 @@ TODO:
 	</software>
 
 	<software name="chromepa" cloneof="chromep">
-		<description>Chrome Paradise - Ginpaku-iro no Rakuen (Alt Disk 1)</description>
+		<description>Chrome Paradise - Ginpaku-iro no Rakuen (alt Disk 1)</description>
 		<year>1996</year>
 		<publisher>アシッドプラン (Acid Plan)</publisher>
 		<info name="alt_title" value="クロムパラダイス 銀白色の楽園" />
@@ -11552,7 +11552,7 @@ TODO:
 
 	<!-- This set has a non-standard disk layout with 26 sectors per track, probably used as copy protection -->
 	<software name="cresmoona" cloneof="cresmoon" supported="no">
-		<description>Crescent Moon Girl (Alt Format)</description>
+		<description>Crescent Moon Girl (alt format)</description>
 		<year>1989</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="クレセントムーンがぁる" />
@@ -12042,7 +12042,7 @@ TODO:
 	</software>
 
 	<software name="azurebnda" cloneof="azurebnd" supported="no">
-		<description>Curse of the Azure Bonds (Alt)</description>
+		<description>Curse of the Azure Bonds (alt)</description>
 		<year>1991</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ カース オブ アジュアボンド" />
@@ -12551,7 +12551,7 @@ TODO:
 
 	<!-- Seems to work only on 286-based machines (e.g. PC-9801UX) -->
 	<software name="dpsa" cloneof="dps">
-		<description>D.P.S. - Dream Program System (Alt)</description>
+		<description>D.P.S. - Dream Program System (alt)</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<info name="alt_title" value="ディー・ピー・エス" />
@@ -12603,7 +12603,7 @@ TODO:
 	</software>
 
 	<software name="dpssga" cloneof="dpssg">
-		<description>D.P.S. SG - Dream Program System SG (Alt Format)</description>
+		<description>D.P.S. SG - Dream Program System SG (alt format)</description>
 		<year>1990</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<info name="alt_title" value="ディー・ピー・エス SG" />
@@ -13194,7 +13194,7 @@ TODO:
 
 	<!-- Can't run the game, it asks for the system disk even when it's inserted -->
 	<software name="daivaa" cloneof="daiva" supported="no">
-		<description>Daiva Story 7: Light of Kari Yuga (Alt)</description>
+		<description>Daiva Story 7: Light of Kari Yuga (alt)</description>
 		<year>1987</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<info name="alt_title" value="ディーヴァ ストーリー7·カリ・ユガの光輝" />
@@ -13215,7 +13215,7 @@ TODO:
 
 	<!-- Can't run the game, it asks for the system disk even when it's inserted -->
 	<software name="daivacal" cloneof="daiva" supported="no">
-		<description>Daiva Story 7: Light of Kari Yuga (Alt 2)</description>
+		<description>Daiva Story 7: Light of Kari Yuga (alt 2)</description>
 		<year>1987</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<info name="alt_title" value="ディーヴァ ストーリー7·カリ・ユガの光輝" />
@@ -14290,7 +14290,7 @@ TODO:
 
 	<!-- Doesn't recognize disk changes, so it's not possible to create a user disk -->
 	<software name="dstalla" cloneof="dstall" supported="no">
-		<description>Derby Stallion 98 (Alt)</description>
+		<description>Derby Stallion 98 (alt)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ダービースタリオン９８" />
@@ -14622,7 +14622,7 @@ TODO:
 	</software>
 
 	<software name="dinosaura" cloneof="dinosaur">
-		<description>Dinosaur (Alt Program Disk)</description>
+		<description>Dinosaur (alt Program Disk)</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ダイナソア" />
@@ -15596,7 +15596,7 @@ TODO:
 	</software>
 
 	<software name="dstat_07a" cloneof="dstat_07">
-		<description>Disc Station Vol. 07 (Alt)</description>
+		<description>Disc Station Vol. 07 (alt)</description>
 		<year>1995</year>
 		<publisher>コンパイル (Compile)</publisher>
 		<info name="alt_title" value="ディスクステーション Ｖｏｌ．０７" />
@@ -16603,7 +16603,7 @@ TODO:
 	</software>
 
 	<software name="drstopa" cloneof="drstop">
-		<description>Dr. Stop! (Alt Format)</description>
+		<description>Dr. Stop! (alt format)</description>
 		<year>1992</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="19920415" />
@@ -16964,7 +16964,7 @@ TODO:
 	<!-- This set has a different executable file -->
 	<software name="silka" cloneof="silk">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Dragon Master Silk - Ryuu Shoukan Musume - Episode II (Alt Disk 1)</description>
+		<description>Dragon Master Silk - Ryuu Shoukan Musume - Episode II (alt Disk 1)</description>
 		<year>1992</year>
 		<publisher>ギミックハウス (Gimmick House)</publisher>
 		<info name="alt_title" value="ドラゴンマスターシルク ～龍召還娘～ Ｅｐｉｓｏｄｅ II" />
@@ -17349,7 +17349,7 @@ TODO:
 	<!-- This set contains fragments of source code and compiler logs for the installer program -->
 	<software name="dtheatera" cloneof="dtheater">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Dream Theater (Alt)</description>
+		<description>Dream Theater (alt)</description>
 		<year>1994</year>
 		<publisher>ワイルドライフ (Wild Life)</publisher>
 		<info name="alt_title" value="ドリームシアター" />
@@ -17948,7 +17948,7 @@ TODO:
 
 	<!-- Coverdisk for "PC Dolphin Dennou Bishoujo H+ .001" magazine -->
 	<software name="eimmydem">
-		<description>Eimmy to Yobanaide (Demo)</description>
+		<description>Eimmy to Yobanaide (demo)</description>
 		<year>1995</year>
 		<publisher>シーズウェア (C's Ware)</publisher>
 		<info name="alt_title" value="エイミーと呼ばないでっ" />
@@ -18309,7 +18309,7 @@ TODO:
 	</software>
 
 	<software name="elmknigtd">
-		<description>Elm Knight - A Living Body Armor (Demo)</description>
+		<description>Elm Knight - A Living Body Armor (demo)</description>
 		<year>1992</year>
 		<publisher>マイクロキャビン (Microcabin)</publisher>
 		<info name="alt_title" value="エルムナイト" />
@@ -18790,7 +18790,7 @@ TODO:
 	</software>
 
 	<software name="exondemo">
-		<description>eXOn (Demo)</description>
+		<description>eXOn (demo)</description>
 		<year>1991</year>
 		<publisher>日本ソフテック (Nihon Softec)</publisher>
 		<info name="alt_title" value="エグゾン" />
@@ -19663,7 +19663,7 @@ TODO:
 	</software>
 
 	<software name="figurea" cloneof="figure">
-		<description>Figure - Ubawareta Houkago (Alt)</description>
+		<description>Figure - Ubawareta Houkago (alt)</description>
 		<year>1995</year>
 		<publisher>シルキーズ (Silky's)</publisher>
 		<info name="alt_title" value="フィギュア ～奪われた放課後～" />
@@ -19997,7 +19997,7 @@ TODO:
 	</software>
 
 	<software name="fqueena" cloneof="fqueen">
-		<description>First Queen (Alt)</description>
+		<description>First Queen (alt)</description>
 		<year>1988</year>
 		<publisher>呉ソフトウエア工房 (KSK)</publisher>
 		<info name="alt_title" value="ファーストクィーン" />
@@ -20631,7 +20631,7 @@ TODO:
 	</software>
 
 	<software name="fraya" cloneof="fray">
-		<description>Fray - In Magical Adventure (Alt Format)</description>
+		<description>Fray - In Magical Adventure (alt format)</description>
 		<year>1991</year>
 		<publisher>マイクロキャビン (Microcabin)</publisher>
 		<info name="alt_title" value="フレイ ～Ｉｎ ｍａｇｉｃａｌ ａｄｖｅｎｔｕｒｅ～" />
@@ -21466,7 +21466,7 @@ TODO:
 	</software>
 
 	<software name="garyuohha" cloneof="garyuohh">
-		<description>Garyuoh Hidensho (Alt)</description>
+		<description>Garyuoh Hidensho (alt)</description>
 		<year>1994</year>
 		<publisher>日本ソフテック (Nihon Softec)</publisher>
 		<info name="alt_title" value="牙龍王 秘伝書" />
@@ -21635,7 +21635,7 @@ TODO:
 	</software>
 
 	<software name="genjia" cloneof="genji">
-		<description>Genji - Time Suspense Adventure (Alt Format)</description>
+		<description>Genji - Time Suspense Adventure (alt format)</description>
 		<year>1988</year>
 		<publisher>HOT・B</publisher>
 		<info name="alt_title" value="Ｇｅｎｊｉ タイムサスペンスアドベンチャー" />
@@ -22357,7 +22357,7 @@ TODO:
 	</software>
 
 	<software name="golflpra" cloneof="golflpr">
-		<description>Golf Links Champion - Course Pinehurst Resort and Country Club (Alt Format)</description>
+		<description>Golf Links Champion - Course Pinehurst Resort and Country Club (alt format)</description>
 		<year>1995?</year>
 		<publisher>サイベル (Cybelle)</publisher>
 		<info name="alt_title" value="リンクス　パインハースト" />
@@ -22381,7 +22381,7 @@ TODO:
 	</software>
 
 	<software name="golflbba" cloneof="golflbb">
-		<description>Golf Links Champion - Course The Belfry Brabozon Course (Alt Format)</description>
+		<description>Golf Links Champion - Course The Belfry Brabozon Course (alt format)</description>
 		<year>1995?</year>
 		<publisher>サイベル (Cybelle)</publisher>
 		<info name="alt_title" value="リンクス　ベルフライ" />
@@ -23674,7 +23674,7 @@ TODO:
 	</software>
 
 	<software name="hhga" cloneof="hhg">
-		<description>HHG - Heart Heat Girls (Alt)</description>
+		<description>HHG - Heart Heat Girls (alt)</description>
 		<year>1993</year>
 		<publisher>Cat's Pro.</publisher>
 		<info name="alt_title" value="Ｈ．Ｈ．Ｇ ハートヒートガールズ" />
@@ -24679,7 +24679,7 @@ TODO:
 	</software>
 
 	<software name="impforcea" cloneof="impforce">
-		<description>Imperial Force (Alt Format)</description>
+		<description>Imperial Force (alt format)</description>
 		<year>1990</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="インペリアルフォース" />
@@ -24822,7 +24822,7 @@ TODO:
 	</software>
 
 	<software name="intrudera" cloneof="intruder">
-		<description>Intruder - Sakura Yashiki no Tansaku (Alt Format)</description>
+		<description>Intruder - Sakura Yashiki no Tansaku (alt format)</description>
 		<year>1989?</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="イントリューダー 桜屋敷の探索" />
@@ -26267,7 +26267,7 @@ TODO:
 	</software>
 
 	<software name="dismix1a" cloneof="dismix1">
-		<description>Kikan Dismix Soukan-gou (Alt)</description>
+		<description>Kikan Dismix Soukan-gou (alt)</description>
 		<year>1990</year>
 		<publisher>ソフパル (Softpal)</publisher>
 		<info name="alt_title" value="電脳アクセス 季刊ディスミックス創刊号" />
@@ -26319,7 +26319,7 @@ TODO:
 	</software>
 
 	<software name="dismix2a" cloneof="dismix2">
-		<description>Kikan Dismix Dai-2-Gou (Alt)</description>
+		<description>Kikan Dismix Dai-2-Gou (alt)</description>
 		<year>1990?</year>
 		<publisher>ソフパル (Softpal)</publisher>
 		<info name="alt_title" value="電脳アクセス 季刊ディスミックス第２号" />
@@ -26892,7 +26892,7 @@ TODO:
 	</software>
 
 	<software name="koseibfa" cloneof="koseibf">
-		<description>KO Seiki Beast Sanjuushi - Gaia no Fukkatsu (Alt Format)</description>
+		<description>KO Seiki Beast Sanjuushi - Gaia no Fukkatsu (alt format)</description>
 		<year>1992</year>
 		<publisher>マトリクス (Matrix)</publisher>
 		<info name="alt_title" value="ＫＯ世紀ビースト三獣士 ～ガイアの復活～" />
@@ -28459,7 +28459,7 @@ TODO:
 	</software>
 
 	<software name="ldb_manha" cloneof="ldb_manh">
-		<description>LOGiN Disk &amp; Book Series - Manhattan Requiem - Angels Flying in the Dark (Alt Format)</description>
+		<description>LOGiN Disk &amp; Book Series - Manhattan Requiem - Angels Flying in the Dark (alt format)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ マンハッタンレクイエム" />
@@ -28497,7 +28497,7 @@ TODO:
 	</software>
 
 	<software name="ldb_simaa" cloneof="ldb_sima">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (Alt)</description>
+		<description>LOGiN Disk &amp; Book Series - SimAnt (alt)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ シムアント" />
@@ -28611,7 +28611,7 @@ TODO:
 	</software>
 
 	<software name="lovelyhoa" cloneof="lovelyho">
-		<description>Lovely Horror - Ochame na Yuurei (Alt Format)</description>
+		<description>Lovely Horror - Ochame na Yuurei (alt format)</description>
 		<year>1988</year>
 		<publisher>全流通 (Zenryutsu)</publisher>
 		<info name="alt_title" value="ラブリーホラー おちゃめなゆうれい" />
@@ -28862,7 +28862,7 @@ TODO:
 	</software>
 
 	<software name="magcandla" cloneof="magcandl">
-		<description>The Magic Candle (Alt Format)</description>
+		<description>The Magic Candle (alt format)</description>
 		<year>1991</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="alt_title" value="ザ・マジックキャンドル" />
@@ -28908,7 +28908,7 @@ TODO:
 	</software>
 
 	<software name="mknighta" cloneof="mknight">
-		<description>Magic Knight (Alt Format)</description>
+		<description>Magic Knight (alt format)</description>
 		<year>1992</year>
 		<publisher>NIC</publisher>
 		<info name="alt_title" value="マジックナイト" />
@@ -29573,7 +29573,7 @@ TODO:
 	</software>
 
 	<software name="makyouda" cloneof="makyoud">
-		<description>Makyouden (Alt Disk 1)</description>
+		<description>Makyouden (alt Disk 1)</description>
 		<year>1992</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
 		<info name="alt_title" value="魔京伝" />
@@ -29832,7 +29832,7 @@ TODO:
 	</software>
 
 	<software name="marchen2a" cloneof="marchen2">
-		<description>Märchen Veil II (Alt)</description>
+		<description>Märchen Veil II (alt)</description>
 		<year>1986</year>
 		<publisher>システムサコム (System Sacom)</publisher>
 		<info name="alt_title" value="メルヘン・ヴェール２" />
@@ -30857,7 +30857,7 @@ TODO:
 
 <!-- This should contain a single disk?!? -->
 	<software name="msfsim40a" cloneof="msfsim40">
-		<description>Microsoft Flight Simulator Version 4.0 (Alt?)</description>
+		<description>Microsoft Flight Simulator Version 4.0 (alt?)</description>
 		<year>1992</year>
 		<publisher>マイクロソフト (Microsoft)</publisher>
 		<info name="alt_title" value="マイクロソフト フライトシミュレーター Ｖｅｒ４．０" />
@@ -31445,7 +31445,7 @@ TODO:
 	</software>
 
 	<software name="misty1a" cloneof="misty1">
-		<description>Misty Vol. 1 (Alt Format)</description>
+		<description>Misty Vol. 1 (alt format)</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="alt_title" value="ミスティ 第１号" />
@@ -31815,7 +31815,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="monzetsua" cloneof="monzetsu">
-		<description>Monzetsu Fighter (Alt Disks 1 &amp; 6)</description>
+		<description>Monzetsu Fighter (alt Disk 1 &amp; Disk 6)</description>
 		<year>1995</year>
 		<publisher>トラッシュ (Trush)</publisher>
 		<info name="alt_title" value="悶絶ファイター" />
@@ -32687,7 +32687,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="3dgolfa" cloneof="3dgolf">
-		<description>New 3D Golf Simulation - Harukanaru Augusta (Alt System Disk)</description>
+		<description>New 3D Golf Simulation - Harukanaru Augusta (alt System Disk)</description>
 		<year>1989</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<info name="alt_title" value="３Ｄゴルフシュミレーション スーパーバージョン 遙かなるオーガスタ" />
@@ -32708,7 +32708,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- confirmed as good by peter_j -->
 	<software name="3dgolfb" cloneof="3dgolf">
-		<description>New 3D Golf Simulation - Harukanaru Augusta (Alt Format)</description>
+		<description>New 3D Golf Simulation - Harukanaru Augusta (alt format)</description>
 		<year>1989</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<info name="alt_title" value="３Ｄゴルフシュミレーション スーパーバージョン 遙かなるオーガスタ" />
@@ -32744,7 +32744,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- confirmed as good by peter_j -->
 	<software name="3dgolf8la" cloneof="3dgolf">
-		<description>New 3D Golf Simulation - Eight Lakes G.C. (Alt Format)</description>
+		<description>New 3D Golf Simulation - Eight Lakes G.C. (alt format)</description>
 		<year>1990</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<info name="alt_title" value="エイトレイクス ゴルフクラブ" />
@@ -32789,7 +32789,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- confirmed as good by peter_j -->
 	<software name="3dgolfwka" cloneof="3dgolf">
-		<description>New 3D Golf Simulation - Waialae no Kiseki (Alt Format)</description>
+		<description>New 3D Golf Simulation - Waialae no Kiseki (alt format)</description>
 		<year>1991</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<info name="alt_title" value="ワイアラエの奇蹟" />
@@ -33175,7 +33175,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="nobuhaoa" cloneof="nobuhao">
-		<description>Nobunaga no Yabou - Haouden (Alt)</description>
+		<description>Nobunaga no Yabou - Haouden (alt)</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="alt_title" value="信長の野望 覇王伝" />
@@ -34425,7 +34425,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pensiona" cloneof="pension">
-		<description>Pension Story - Hana no Kiyosato (Alt Disk 1)</description>
+		<description>Pension Story - Hana no Kiyosato (alt Disk A)</description>
 		<year>1988</year>
 		<publisher>アダルティン (Adult Inn)</publisher>
 		<info name="alt_title" value="ペンションストーリー花の清里" />
@@ -34963,7 +34963,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksxm2a" cloneof="pinksxm2">
-		<description>Pink Sox Mania 2 (Alt)</description>
+		<description>Pink Sox Mania 2 (alt)</description>
 		<year>1992</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックスマニア２" />
@@ -35053,7 +35053,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksoxta" cloneof="pinksoxt">
-		<description>Pink Sox Mania Taizen (Alt Disk A)</description>
+		<description>Pink Sox Mania Taizen (alt Disk A)</description>
 		<year>1994</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックスマニア大全" />
@@ -35305,7 +35305,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pockya" cloneof="pocky">
-		<description>Pocky (Alt Format)</description>
+		<description>Pocky (alt format)</description>
 		<year>1989</year>
 		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="ポッキー" />
@@ -35351,7 +35351,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pocky2a" cloneof="pocky2">
-		<description>Pocky 2 - Kaijin Aka Mantle no Chousen (Alt Format)</description>
+		<description>Pocky 2 - Kaijin Aka Mantle no Chousen (alt format)</description>
 		<year>1991</year>
 		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="ポッキー２ ～怪人赤マントの挑戦～" />
@@ -36128,7 +36128,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ppersiaa" cloneof="ppersia">
-		<description>Prince of Persia (Alt)</description>
+		<description>Prince of Persia (alt)</description>
 		<year>1990</year>
 		<publisher>ブロダーバンドジャパン (Brøderbund Japan)</publisher>
 		<info name="alt_title" value="プリンス オブ ペルシャ" />
@@ -36149,7 +36149,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ppersiab" cloneof="ppersia">
-		<description>Prince of Persia (Alt 2)</description>
+		<description>Prince of Persia (alt 2)</description>
 		<year>1990</year>
 		<publisher>ブロダーバンドジャパン (Brøderbund Japan)</publisher>
 		<info name="alt_title" value="プリンス オブ ペルシャ" />
@@ -37418,7 +37418,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="rance41a" cloneof="rance41">
-		<description>Rance 4.1 - Okusuri Koujou o Sukue (Alt Format)</description>
+		<description>Rance 4.1 - Okusuri Koujou o Sukue (alt format)</description>
 		<year>1995</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="ランス４．１ ～お薬工場を救え～" />
@@ -38163,7 +38163,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- Notice that disk 2 and 3 coincide with the ones above when converted to FDI! -->
 	<software name="rxanadua" cloneof="rxanadu">
-		<description>Revival Xanadu (Alt Format)</description>
+		<description>Revival Xanadu (alt format)</description>
 		<year>1995</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="リバイバル ザナドゥ" />
@@ -38670,7 +38670,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ryunakia" cloneof="ryunaki">
-		<description>Ryu - Naki no Ryuu yori (Alt?)</description>
+		<description>Ryu - Naki no Ryuu yori (alt?)</description>
 		<year>1990</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
 		<info name="alt_title" value="ＲＹＵ ～哭きの竜より～ アナログ版" />
@@ -38833,7 +38833,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="sabnackd" cloneof="sabnack">
-		<description>Sabnack (Demo)</description>
+		<description>Sabnack (demo)</description>
 		<year>1991</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="サブナック" />
@@ -39435,7 +39435,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="schwarz3a" cloneof="schwarz3">
-		<description>Schwarzschild III - Wakusei Desperan (Alt)</description>
+		<description>Schwarzschild III - Wakusei Desperan (alt)</description>
 		<year>1992</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="シュヴァルツシルト３ 惑星デスペラン" />
@@ -39793,7 +39793,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="sekigahaa" cloneof="sekigaha">
-		<description>Sekigahara (Alt)</description>
+		<description>Sekigahara (alt)</description>
 		<year>1991</year>
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="戦国合戦絵巻 関ヶ原" />
@@ -40958,7 +40958,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="sokoperfa" cloneof="sokoperf">
-		<description>Sokoban Perfect (Alt Kaitou disk)</description>
+		<description>Sokoban Perfect (alt Kaitou disk)</description>
 		<year>1989</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
 		<info name="alt_title" value="倉庫番パーフェクト" />
@@ -41261,7 +41261,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="spaceinva" cloneof="spaceinv">
-		<description>Space Invaders (Alt)</description>
+		<description>Space Invaders (alt)</description>
 		<year>1992</year>
 		<publisher>ウィズ (Wiz)</publisher>
 		<info name="alt_title" value="スペースインベーダー" />
@@ -42163,7 +42163,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="spinks3pa" cloneof="spinks3p">
-		<description>Super Pink Sox 3+ (Alt)</description>
+		<description>Super Pink Sox 3+ (alt)</description>
 		<year>1994</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="スーパーピンクソックス３＋" />
@@ -42627,7 +42627,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="sworddn2a" cloneof="sworddn2">
-		<description>Sword Dancer 2 - Goddess of the Evil Blade (Alt Disk A)</description>
+		<description>Sword Dancer 2 - Goddess of the Evil Blade (alt Disk A)</description>
 		<year>1994</year>
 		<publisher>テイジイエル (TGL)</publisher>
 		<info name="alt_title" value="ソードダンサー２ 凶刃の女神 ~ Sword Dancer 2 - Kyoujin no Megami" />
@@ -43125,7 +43125,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="dantea" cloneof="dante">
-		<description>Tamashii no Mon - Dante Shinkyoku yori (Alt Format)</description>
+		<description>Tamashii no Mon - Dante Shinkyoku yori (alt format)</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="alt_title" value="魂の門 ～ダンテ「神曲」より～" />
@@ -44349,7 +44349,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="tirnanoga" cloneof="tirnanog">
-		<description>Tir-nan-óg - Dana no Matsuei (Alt)</description>
+		<description>Tir-nan-óg - Dana no Matsuei (alt)</description>
 		<year>1987</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="ティル・ナ・ノーグ ダーナの末裔" />
@@ -44739,7 +44739,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="kohakuira" cloneof="kohakuir">
-		<description>Toudou Ryunosuke Tantei Nikki - Kohaku-iro no Yuigon - Seiyou Koppai Renzoku Satsujin Jiken (Alt)</description>
+		<description>Toudou Ryunosuke Tantei Nikki - Kohaku-iro no Yuigon - Seiyou Koppai Renzoku Satsujin Jiken (alt)</description>
 		<year>1988</year>
 		<publisher>リバーヒルソフト (Riverhill Soft)</publisher>
 		<info name="alt_title" value="藤堂竜之介探偵日記 琥珀色の遺言 西洋骨牌連続殺人事件" />
@@ -44990,7 +44990,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="trial4a" cloneof="trial4">
-		<description>Trial of Fours (Alt Format)</description>
+		<description>Trial of Fours (alt format)</description>
 		<year>1992</year>
 		<publisher>ウエストサイド (WestSide)</publisher>
 		<info name="alt_title" value="トライアル オブ フォース" />
@@ -45593,7 +45593,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="uchiyamaa" cloneof="uchiyama">
-		<description>Uchiyama Aki no Chou Bangai Seifuku Zukan+ (Alt)</description>
+		<description>Uchiyama Aki no Chou Bangai Seifuku Zukan+ (alt)</description>
 		<year>1989</year>
 		<publisher>システムハウスオー！ (System House Oh!)</publisher>
 		<info name="alt_title" value="内山亜紀の超番外制服図鑑＋" />
@@ -46600,7 +46600,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="vga" cloneof="vg">
-		<description>V.G. - Variable Geo (Alt)</description>
+		<description>V.G. - Variable Geo (alt)</description>
 		<year>1993</year>
 		<publisher>戯画 (Giga)</publisher>
 		<info name="alt_title" value="ヴァリアブル・ジオ" />
@@ -47554,7 +47554,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="wizardr6a" cloneof="wizardr6">
-		<description>Wizardry 6 - Bane of the Cosmic Forge (Alt Format)</description>
+		<description>Wizardry 6 - Bane of the Cosmic Forge (alt format)</description>
 		<year>1991</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ウィザードリィ６ ベイン・オブ・ザ・コズミックフォージ" />
@@ -47594,7 +47594,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="wizardr7a" cloneof="wizardr7">
-		<description>Wizardry 7 - Crusaders of the Dark Savant (Alt)</description>
+		<description>Wizardry 7 - Crusaders of the Dark Savant (alt)</description>
 		<year>1994</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ウィザードリィ７ クルセーダーズ・オブ・ザ・ダーク・サヴァント" />
@@ -47666,7 +47666,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- What is this? -->
 	<software name="wolfishga" cloneof="wolfishg">
-		<description>Wolfish Gallop - Legacy of the Solomon (Alt Disk?)</description>
+		<description>Wolfish Gallop - Legacy of the Solomon (alt disk?)</description>
 		<year>1994</year>
 		<publisher>パンドラボックス (Pandora Box)</publisher>
 		<info name="alt_title" value="ウルフィッシュギャロップ ソロモンの遺産" />
@@ -47894,7 +47894,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="wangoa" cloneof="wang">
-		<description>Wrestle Angels Omake Disk (Alt)</description>
+		<description>Wrestle Angels Omake Disk (alt)</description>
 		<year>1992?</year>
 		<publisher>グレイト (Great)</publisher>
 		<info name="alt_title" value="レッスルエンジェルス おまけDISK" />
@@ -49172,7 +49172,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="yudisk6a" cloneof="yudisk6">
-		<description>Yuu Disk Vol. 6 - Heart de Ron!! Midnight Hen (Alt)</description>
+		<description>Yuu Disk Vol. 6 - Heart de Ron!! Midnight Hen (alt)</description>
 		<year>1994</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="遊ディスクＶｏｌ．６ ハートでロン！ＭＩＤＮＩＧＨＴ編" />
@@ -49316,7 +49316,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="yuuwakua" cloneof="yuuwaku">
-		<description>Yuuwaku - Temptation (Alt Disk 1)</description>
+		<description>Yuuwaku - Temptation (alt Disk A)</description>
 		<year>1995</year>
 		<publisher>ティーツー (T2)</publisher>
 		<info name="alt_title" value="誘惑" />
@@ -49439,7 +49439,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- Does this contain the scenario collection disks too? -->
 	<software name="zana" cloneof="zan">
-		<description>Zan - Kagerou no Jidai (Alt?)</description>
+		<description>Zan - Kagerou no Jidai (alt?)</description>
 		<year>1989</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="斬 陽炎の時代" />
@@ -49893,7 +49893,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="zokuwba" cloneof="zokuwb">
-		<description>Zoku - Wedding Bell wa Takaraka ni (Alt Format)</description>
+		<description>Zoku - Wedding Bell wa Takaraka ni (alt format)</description>
 		<year>1993</year>
 		<publisher>真実プロ (Shinjitsu Pro)</publisher>
 		<info name="alt_title" value="続・ウエディングベルは高らかに" />
@@ -49991,7 +49991,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 	<!-- Black screen on boot -->
 	<software name="abunatena" cloneof="abunaten" supported="no">
-		<description>Abunai Tengu Densetsu - Yomigaetta Tengu ga Yozora o Mau (Alt Format)</description>
+		<description>Abunai Tengu Densetsu - Yomigaetta Tengu ga Yozora o Mau (alt format)</description>
 		<year>1989</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="あぶない天狗伝説 －よみがえった天狗が夜空を舞う－" />
@@ -50045,7 +50045,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="alantiaa" cloneof="alantia" supported="no">
-		<description>Alantia (Alt Format)</description>
+		<description>Alantia (alt format)</description>
 		<year>1988</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="alt_title" value="アランティア" />
@@ -50213,7 +50213,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="asscardd">
-		<description>Assist Card (Demo)</description>
+		<description>Assist Card (demo)</description>
 		<year>19??</year>
 		<publisher>アシスト (Assist)</publisher>
 		<info name="usage" value="Run ACD.BAT from DOS" />
@@ -50237,7 +50237,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="begirla" cloneof="begirl">
-		<description>Be Girl (Alt Format)</description>
+		<description>Be Girl (alt format)</description>
 		<year>1988</year>
 		<publisher>パスカル2 (Pascal2)</publisher>
 		<info name="alt_title" value="Ｂｅガール" />
@@ -50311,7 +50311,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="bestplayd" cloneof="bestplay">
-		<description>The Best Play Baseball (Demo)</description>
+		<description>The Best Play Baseball (demo)</description>
 		<year>1991?</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -50445,7 +50445,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="check6d" cloneof="check6">
-		<description>Check Six (Demo)</description>
+		<description>Check Six (demo)</description>
 		<year>1993?</year>
 		<publisher>ペガサスジャパン (Pegasus Japan)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -50751,7 +50751,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="dpsb" cloneof="dps" supported="no">
-		<description>D.P.S. - Dream Program System (Alt Format)</description>
+		<description>D.P.S. - Dream Program System (alt format)</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<info name="alt_title" value="ディー・ピー・エス" />
@@ -50837,7 +50837,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- confirmed as good by peter_j -->
 	<software name="nankaisha" cloneof="nankaish" supported="no">
-		<description>Daikairei - Nankai no Shitou (Alt Format)</description>
+		<description>Daikairei - Nankai no Shitou (alt format)</description>
 		<year>1989</year>
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="大海令 南海の死闘" />
@@ -50858,7 +50858,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 	<!-- Black screen on boot -->
 	<software name="daisenr3a" cloneof="daisenr3" supported="no">
-		<description>Daisenryaku III - Great Commander (Alt Format)</description>
+		<description>Daisenryaku III - Great Commander (alt format)</description>
 		<year>1989</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="大戦略３ グレートコマンダー" />
@@ -50878,7 +50878,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="daisn390a" cloneof="daisn390" supported="no">
-		<description>Daisenryaku III '90 (Alt Format)</description>
+		<description>Daisenryaku III '90 (alt format)</description>
 		<year>1990</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="大戦略３＇９０" />
@@ -50904,7 +50904,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="daysduela" cloneof="daysduel" supported="no">
-		<description>Days in Duel (Alt Format)</description>
+		<description>Days in Duel (alt format)</description>
 		<year>1994</year>
 		<publisher>スワット (Swat)</publisher>
 		<info name="alt_title" value="デイズ イン デュエル" />
@@ -51097,7 +51097,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ds98_11a" cloneof="ds98_11">
-		<description>Disc Station 98 #11 (Alt Format)</description>
+		<description>Disc Station 98 #11 (alt format)</description>
 		<year>1992</year>
 		<publisher>コンパイル (Compile)</publisher>
 		<info name="alt_title" value="ディスクステーション９８＃１１" />
@@ -51222,7 +51222,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 	<!-- boot OK -->
 	<software name="f1datad" supported="yes">
-		<description>F-1 Databox (Demo)</description>
+		<description>F-1 Databox (demo)</description>
 		<year>1990</year>
 		<publisher>リード・レックス (Reed Rex)</publisher>
 		<info name="usage" value="Run DB.BAT from DOS" />
@@ -51340,7 +51340,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- confirmed as good by peter_j -->
 	<software name="fundatna" cloneof="fundatn" supported="no">
-		<description>Fundation - Shinjuku Story (Alt Format)</description>
+		<description>Fundation - Shinjuku Story (alt format)</description>
 		<year>1990</year>
 		<publisher>ドット企画 (Dott Plan)</publisher>
 		<info name="alt_title" value="ファンデーション 新宿ストーリー" />
@@ -51426,7 +51426,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="gakusenka" cloneof="gakusenk" supported="no">
-		<description>Gakuen Senki - Kyoufu no Puppet Keikaku (Alt Format)</description>
+		<description>Gakuen Senki - Kyoufu no Puppet Keikaku (alt format)</description>
 		<year>1994</year>
 		<publisher>フォーサイト (Foresight)</publisher>
 		<info name="alt_title" value="学園戦記 ～恐怖のパペット計画～" />
@@ -51522,7 +51522,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="gaplusa" cloneof="gaplus" supported="no">
-		<description>Gaplus (Alt Format)</description>
+		<description>Gaplus (alt format)</description>
 		<year>1985</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<info name="alt_title" value="ギャプラス" />
@@ -52047,7 +52047,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="jlps93a" cloneof="jlps93" supported="no">
-		<description>J. League Professional Soccer 1993 (Alt Format)</description>
+		<description>J. League Professional Soccer 1993 (alt format)</description>
 		<year>1993</year>
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
 		<info name="alt_title" value="Ｊリーグプロフェッショナルサッカー１９９３" />
@@ -52143,7 +52143,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="mistyflsa" cloneof="mistyfls" supported="no">
-		<description>Jikuu Sousakan Pretty Angel - Misty Flash (Alt Format)</description>
+		<description>Jikuu Sousakan Pretty Angel - Misty Flash (alt format)</description>
 		<year>1994</year>
 		<publisher>ペパーミント・Ｋｉｄｓ (Peppermint Kids)</publisher>
 		<info name="alt_title" value="時空捜査官プリティエンジェル ミスティフラッシュ" />
@@ -52618,7 +52618,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="lessermd" cloneof="lesserm" supported="no">
-		<description>Lesser Mern (Demo)</description>
+		<description>Lesser Mern (demo)</description>
 		<year>1992?</year>
 		<publisher>パンサーソフトウェア (Panther Software)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -52778,7 +52778,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="logicald" cloneof="logical" supported="no">
-		<description>Logical (Demo)</description>
+		<description>Logical (demo)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -53122,7 +53122,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_dntea" cloneof="ldb_dnte" supported="no">
-		<description>LOGiN Disk &amp; Book Series - RPG Tsukuuru Dante98 (Alt)</description>
+		<description>LOGiN Disk &amp; Book Series - RPG Tsukuuru Dante98 (alt)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -53224,7 +53224,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<!-- Is this a partial user massaged dump to be autobootable? -->
 	<software name="lotus123" supported="partial">
 		<!-- based off R2.2J according to LOTUS.COM -->
-		<description>Lotus 1-2-3 (Demo)</description>
+		<description>Lotus 1-2-3 (demo)</description>
 		<!-- all files sports a 1989 timestamp but AUTOEXEC.BAT (1990-08-02) -->
 		<year>1989?</year>
 		<!-- "Lotus Development Japan Ltd." -->
@@ -53249,7 +53249,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="freelncd">
-		<description>Lotus Freelance (Demo)</description>
+		<description>Lotus Freelance (demo)</description>
 		<year>19??</year>
 		<publisher>Lotus</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -53412,7 +53412,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="majaventa" cloneof="majavent" supported="no">
-		<description>Majaventure - Negi Mahjong (Alt Format)</description>
+		<description>Majaventure - Negi Mahjong (alt format)</description>
 		<year>1988</year>
 		<publisher>ＧＡＭＥテクノポリス (Game Technopolis)</publisher>
 		<info name="alt_title" value="まじゃべんちゃー・ねぎ麻雀" />
@@ -53425,7 +53425,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="marchenpa" cloneof="marchenp" supported="no">
-		<description>Märchen Paradise (Alt Format)</description>
+		<description>Märchen Paradise (alt format)</description>
 		<year>1990</year>
 		<publisher>グレイト (Great)</publisher>
 		<info name="alt_title" value="メルヘン・パラダイス" />
@@ -53708,7 +53708,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="moonmista" cloneof="moonmist" supported="no">
-		<description>Moonmist (Alt Format)</description>
+		<description>Moonmist (alt format)</description>
 		<year>1992</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="ムーンミスト" />
@@ -53728,7 +53728,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="valis2a" cloneof="valis2" supported="no">
-		<description>Mugen Senshi Valis II (Alt Format)</description>
+		<description>Mugen Senshi Valis II (alt format)</description>
 		<year>1989</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="夢幻戦士ヴァリス２" />
@@ -53990,7 +53990,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksox1a" cloneof="pinksox1" supported="no">
-		<description>Pink Sox 1 (Alt Format)</description>
+		<description>Pink Sox 1 (alt format)</description>
 		<year>1989</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックス１" />
@@ -54003,7 +54003,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksox2a" cloneof="pinksox2" supported="no">
-		<description>Pink Sox 2 (Alt Format)</description>
+		<description>Pink Sox 2 (alt format)</description>
 		<year>1990</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックス２" />
@@ -54016,7 +54016,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksox3a" cloneof="pinksox3" supported="no">
-		<description>Pink Sox 3 (Alt Format)</description>
+		<description>Pink Sox 3 (alt format)</description>
 		<year>1990</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックス３" />
@@ -54029,7 +54029,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksox4a" cloneof="pinksox4" supported="no">
-		<description>Pink Sox 4 (Alt Format)</description>
+		<description>Pink Sox 4 (alt format)</description>
 		<year>1991</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックス４" />
@@ -54049,7 +54049,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksox5a" cloneof="pinksox5" supported="no">
-		<description>Pink Sox 5 (Alt Format)</description>
+		<description>Pink Sox 5 (alt format)</description>
 		<year>1991</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックス５" />
@@ -54069,7 +54069,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksox6a" cloneof="pinksox6" supported="no">
-		<description>Pink Sox 6 (Alt Format)</description>
+		<description>Pink Sox 6 (alt format)</description>
 		<year>1991</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックス６" />
@@ -54089,7 +54089,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksox7a" cloneof="pinksox7" supported="no">
-		<description>Pink Sox 7 (Alt Format)</description>
+		<description>Pink Sox 7 (alt format)</description>
 		<year>1992</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックス７" />
@@ -54109,7 +54109,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="pinksox8a" cloneof="pinksox8" supported="no">
-		<description>Pink Sox 8 (Alt Format)</description>
+		<description>Pink Sox 8 (alt format)</description>
 		<year>1992</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ピンクソックス８" />
@@ -54161,7 +54161,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="poisona" cloneof="poison" supported="no">
-		<description>Poison - 6 Nin no Majo (Alt Format)</description>
+		<description>Poison - 6 Nin no Majo (alt format)</description>
 		<year>1995</year>
 		<publisher>トラッシュ (Trush)</publisher>
 		<info name="alt_title" value="ぽわぞん ～６人の魔女～" />
@@ -54305,7 +54305,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="puyopuyoa" cloneof="puyopuyo" supported="no">
-		<description>Puyo Puyo (Alt Format)</description>
+		<description>Puyo Puyo (alt format)</description>
 		<year>1993</year>
 		<publisher>コンパイル (Compile)</publisher>
 		<info name="alt_title" value="ぷよぷよ" />
@@ -54326,7 +54326,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- confirmed as good by peter_j -->
 	<software name="puyopuyob" cloneof="puyopuyo" supported="no">
-		<description>Puyo Puyo (Alt Format 2)</description>
+		<description>Puyo Puyo (alt format 2)</description>
 		<year>1993</year>
 		<publisher>コンパイル (Compile)</publisher>
 		<info name="alt_title" value="ぷよぷよ" />
@@ -54346,7 +54346,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="qtono1a" cloneof="qtono1" supported="no">
-		<description>Quiz Tonosama no Yabou Zenkoku-ban (Alt Format)</description>
+		<description>Quiz Tonosama no Yabou Zenkoku-ban (alt format)</description>
 		<year>1993</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="クイズ殿様の野望 全国版" />
@@ -54416,7 +54416,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="rancea" cloneof="rance" supported="no">
-		<description>Rance - Hikari o Motomete (Alt Format)</description>
+		<description>Rance - Hikari o Motomete (alt format)</description>
 		<year>1989</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="ランス 光をもとめて" />
@@ -54531,7 +54531,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="relicsa" cloneof="relics" supported="no">
-		<description>Relics (Alt)</description>
+		<description>Relics (alt)</description>
 		<year>1986</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<info name="alt_title" value="レリクス" />
@@ -54684,7 +54684,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="yugekioua" cloneof="yugekiou" supported="no">
-		<description>Rittai Ban - Yuugeki Ou (Alt Fomat)</description>
+		<description>Rittai Ban - Yuugeki Ou (alt format)</description>
 		<year>1985</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="立体版 遊撃王" />
@@ -54697,7 +54697,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="roadwr2ka" cloneof="roadwr2k" supported="no">
-		<description>Road War 2000 (Alt Format)</description>
+		<description>Road War 2000 (alt format)</description>
 		<year>1988</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="alt_title" value="ロードウォー２０００" />
@@ -54757,7 +54757,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="rougea" cloneof="rouge" supported="no">
-		<description>Rouge - Manatsu no Kuchibeni (Alt Format)</description>
+		<description>Rouge - Manatsu no Kuchibeni (alt format)</description>
 		<year>1990</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
 		<info name="alt_title" value="ルージュ ～真夏の口紅～ ~ Rouge - Manatsu no Kuchibeni" />
@@ -54777,7 +54777,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="sacchana" cloneof="sacchan" supported="no">
-		<description>Max Series 2 - Sacchan no Daibouken!! (Alt Format)</description>
+		<description>Max Series 2 - Sacchan no Daibouken!! (alt format)</description>
 		<year>1988</year>
 		<publisher>アグミックス (Agumix)</publisher>
 		<info name="alt_title" value="サッちゃんの大冒険！！" />
@@ -54967,7 +54967,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- confirmed as good by peter_j -->
 	<software name="slayersa" cloneof="slayers" supported="no">
-		<description>Slayers (Alt Format)</description>
+		<description>Slayers (alt format)</description>
 		<year>1994</year>
 		<publisher>バンプレスト (Banpresto)</publisher>
 		<info name="alt_title" value="スレイヤーズ" />
@@ -55070,7 +55070,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- confirmed as good by peter_j -->
 	<software name="slipst93a" cloneof="slipst93" supported="no">
-		<description>Slip Stream '93 Rev-LIMIT (Alt Format)</description>
+		<description>Slip Stream '93 Rev-LIMIT (alt format)</description>
 		<year>1994</year>
 		<publisher>ビットタウン (Bit Town)</publisher>
 		<info name="alt_title" value="スリップストリーム＇９３ レブ・リミット" />
@@ -55109,7 +55109,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 	<!-- unsupported ".fix" format -->
 	<software name="solitaira" cloneof="solitair" supported="no">
-		<description>Solitaire Royale (Alt Format)</description>
+		<description>Solitaire Royale (alt format)</description>
 		<year>1988</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<info name="alt_title" value="ソリティアロイヤル" />
@@ -55377,7 +55377,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!-- confirmed as good by peter_j -->
 	<software name="tenchia" cloneof="tenchi" supported="no">
-		<description>Tenchi Muyo! - Ryououki (Alt Format)</description>
+		<description>Tenchi Muyo! - Ryououki (alt format)</description>
 		<year>1994</year>
 		<publisher>バンプレスト (Banpresto)</publisher>
 		<info name="alt_title" value="天地無用！ 魎皇鬼" />
@@ -55545,7 +55545,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="tenshis2a" cloneof="tenshis2" supported="no">
-		<description>Tenshi-tachi no Gogo Special II (Alt Format)</description>
+		<description>Tenshi-tachi no Gogo Special II (alt format)</description>
 		<year>1993</year>
 		<publisher>ジャスト (Jast)</publisher>
 		<info name="alt_title" value="天使たちの午後 スペシャル２" />
@@ -55608,7 +55608,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="towercaba" cloneof="towercab" supported="no">
-		<description>The Tower? of Cabin - Cabin Panic (Alt Format)</description>
+		<description>The Tower? of Cabin - Cabin Panic (alt format)</description>
 		<year>1992</year>
 		<publisher>マイクロキャビン (Microcabin)</publisher>
 		<info name="alt_title" value="ＴＨＥ ＴＯＷＥＲ？ ＯＦ ＣＡＢＩＮ キャビンパニック" />
@@ -55781,7 +55781,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 	<!-- unsupported ".fix" format -->
 	<software name="vermilna" cloneof="vermiln" supported="no">
-		<description>Vermilion (Alt Format)</description>
+		<description>Vermilion (alt format)</description>
 		<year>1990</year>
 		<publisher>グレイト (Great)</publisher>
 		<info name="alt_title" value="バーミリオン" />
@@ -55817,7 +55817,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="vipev16da" cloneof="vipev16d" supported="no">
-		<description>Viper V16 Demo (Alt Format)</description>
+		<description>Viper V16 Demo (alt format)</description>
 		<year>1995?</year>
 		<publisher>ソニア (Sogna)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -55997,7 +55997,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="zan2a" cloneof="zan2" supported="no">
-		<description>Zan II - Kagerou no Jidai (Alt Format)</description>
+		<description>Zan II - Kagerou no Jidai (alt format)</description>
 		<year>1991</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="斬２ 陽炎の時代" />
@@ -56277,7 +56277,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="3x3eyesa" cloneof="3x3eyes" supported="partial">
-		<description>3x3 Eyes - Sanjiyan Henjou (Alt Disk 1)</description>
+		<description>3x3 Eyes - Sanjiyan Henjou (alt Disk A)</description>
 		<year>1993</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
 		<info name="alt_title" value="３Ｘ３ＥＹＥＳ ～三只眼變成～" />
@@ -57350,7 +57350,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="cherrymod" cloneof="cherrymo">
-		<description>Cherry Moderate (Demo)</description>
+		<description>Cherry Moderate (demo)</description>
 		<year>1996</year>
 		<publisher>ユーコム (Ucom)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -60571,7 +60571,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="genkaisra" cloneof="genkaisr" supported="no">
-		<description>Kisou Shinden Gen-Kaiser (Alt Format)</description>
+		<description>Kisou Shinden Gen-Kaiser (alt format)</description>
 		<year>1995</year>
 		<publisher>テイジイエル (TGL)</publisher>
 		<info name="alt_title" value="機装神伝ゲンカイザー" />
@@ -61128,7 +61128,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="libido7a" cloneof="libido7" supported="no">
-		<description>Libido 7 (Alt Disk 1)</description>
+		<description>Libido 7 (alt disk 1)</description>
 		<year>1994</year>
 		<publisher>リビドー (Libido)</publisher>
 		<info name="release" value="19940603" />
@@ -61217,7 +61217,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="mparadoxa" cloneof="mparadox" supported="no">
-		<description>Mad Paradox (Alt Format)</description>
+		<description>Mad Paradox (alt format)</description>
 		<year>1992</year>
 		<publisher>クィーンソフト (Queensoft)</publisher>
 		<info name="alt_title" value="マッドパラドックス" />
@@ -61301,7 +61301,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="mandalaid" cloneof="mandalai" supported="no">
-		<description>Mandala-ke Ichizoku (Demo)</description>
+		<description>Mandala-ke Ichizoku (demo)</description>
 		<year>1995</year>
 		<publisher>フォーサイト (Foresight)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -61786,7 +61786,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="mugenhoya" cloneof="mugenhoy" supported="no">
-		<description>Mugen Houyou (Alt Format)</description>
+		<description>Mugen Houyou (alt format)</description>
 		<year>1995</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="Mugen Houyou" />
@@ -62296,7 +62296,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="rance4d" supported="no">
-		<description>Rance IV (Demo)</description>
+		<description>Rance IV (demo)</description>
 		<year>1993</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="ランス４ デモ" />
@@ -62904,7 +62904,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="snowmema" cloneof="snowmem" supported="no">
-		<description>Snow Memory (Alt Disk 1)</description>
+		<description>Snow Memory (alt Disk 1)</description>
 		<year>1996</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
 		<info name="alt_title" value="スノーメモリー" />
@@ -63458,7 +63458,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="vgd" cloneof="vg" supported="no">
-		<description>V.G. - Variable Geo (Demo)</description>
+		<description>V.G. - Variable Geo (demo)</description>
 		<year>1993?</year>
 		<publisher>戯画 (Giga)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -63469,7 +63469,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="vg2d" cloneof="vg2" supported="no">
-		<description>V.G. II (Demo)</description>
+		<description>V.G. II (demo)</description>
 		<year>1993?</year>
 		<publisher>戯画 (Giga)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -64294,7 +64294,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="io9103a" cloneof="io9103" supported="no">
-		<description>I/O Magazine Disk - March 1991 (Alt)</description>
+		<description>I/O Magazine Disk - March 1991 (alt)</description>
 		<year>1991</year>
 		<publisher>&lt;coverdisc&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -64338,7 +64338,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="io9106a" cloneof="io9106" supported="no">
-		<description>I/O Magazine Disk - June 1991 (Alt)</description>
+		<description>I/O Magazine Disk - June 1991 (alt)</description>
 		<year>1991</year>
 		<publisher>&lt;coverdisc&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -64576,7 +64576,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="login08a" cloneof="login08" supported="no">
-		<description>Login Omake Disk Tsuushin No. 8 (Alt)</description>
+		<description>Login Omake Disk Tsuushin No. 8 (alt)</description>
 		<year>1992</year>
 		<publisher>&lt;coverdisc&gt;</publisher>
 		<info name="magazine" value="Login 1992/24" />
@@ -65663,7 +65663,7 @@ SPACE EMPIRE
 
 <!-- confirmed as good by peter_j -->
 	<software name="bio100a" cloneof="bio100">
-		<description>Bio 100% Free Games Collection (Alt Format)</description>
+		<description>Bio 100% Free Games Collection (alt format)</description>
 		<year>199?</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="Bio 100% フリーゲームコレクション" />
@@ -65809,7 +65809,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="goggle2a" cloneof="goggle2">
-		<description>Goggle-II (Alt)</description>
+		<description>Goggle-II (alt)</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -65831,7 +65831,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="goggle3a" cloneof="goggle3">
-		<description>Goggle-III (Alt)</description>
+		<description>Goggle-III (alt)</description>
 		<year>1995</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -65864,7 +65864,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="markadiaa" cloneof="markadia">
-		<description>Markadia (Alt)</description>
+		<description>Markadia (alt)</description>
 		<year>1993</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -66083,7 +66083,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="chinghaia" cloneof="chinghai">
-		<description>ChingHai (Alt)</description>
+		<description>ChingHai (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -66307,7 +66307,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="mogupokoa" cloneof="mogupoko">
-		<description>MoguPoko (Alt)</description>
+		<description>MoguPoko (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -66395,7 +66395,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="seena2a" cloneof="seena2">
-		<description>SeeNa 2 (Alt)</description>
+		<description>SeeNa 2 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -66439,7 +66439,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="stardusta" cloneof="stardust">
-		<description>Stardust Chaser (Alt)</description>
+		<description>Stardust Chaser (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -66528,7 +66528,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="towerzara" cloneof="towerzar">
-		<description>The Tower of Zarbartz (Alt)</description>
+		<description>The Tower of Zarbartz (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -66605,7 +66605,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="volley2a" cloneof="volley2">
-		<description>Volleyball 2 on 2 (Alt)</description>
+		<description>Volleyball 2 on 2 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -67007,7 +67007,7 @@ doujin?!?
 	</software>
 
 	<software name="chikaikea" cloneof="chikaike">
-		<description>Chikashitsu no Ikenie (Alt)</description>
+		<description>Chikashitsu no Ikenie (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="ソフトさーくる　クレージュ ~ Soft Circle Courreges" />
@@ -67197,7 +67197,7 @@ doujin?!?
 
 	<!-- MAME fails to mount the disk: "Incorrect layout on track 0 head 0, expected_size=166666, current_size=167648" -->
 	<software name="destructa" cloneof="destruct" supported="no">
-		<description>Destructor (Alt)</description>
+		<description>Destructor (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="HoeHoe Club" />
@@ -67521,7 +67521,7 @@ doujin?!?
 	</software>
 
 	<software name="dendbusa" cloneof="dendbus">
-		<description>Ike Ike Dendai Bus (Alt)</description>
+		<description>Ike Ike Dendai Bus (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="行け行け電大バス" />
@@ -68174,7 +68174,7 @@ doujin?!?
 	</software>
 
 	<software name="napcity2a" cloneof="napcity">
-		<description>Napple City 2 (Alt)</description>
+		<description>Napple City 2 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Daimanji - Gakusyu-Jyuku" />
@@ -68186,7 +68186,7 @@ doujin?!?
 	</software>
 
 	<software name="napcity2b" cloneof="napcity">
-		<description>Napple City 2 (Alt 2)</description>
+		<description>Napple City 2 (alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Daimanji - Gakusyu-Jyuku" />
@@ -68638,7 +68638,7 @@ doujin?!?
 	</software>
 
 	<software name="sailvena" cloneof="sailven" supported="no">
-		<description>Sailor Venus CG (Alt)</description>
+		<description>Sailor Venus CG (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -68708,7 +68708,7 @@ doujin?!?
 	</software>
 
 	<software name="sinoraq2a" cloneof="sinoraq2">
-		<description>Sinora's Quest 2 (Alt)</description>
+		<description>Sinora's Quest 2 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Roronworld" />
@@ -68867,7 +68867,7 @@ doujin?!?
 	</software>
 
 	<software name="teqsuna" cloneof="teqsun">
-		<description>Tequila Sunrise (Alt)</description>
+		<description>Tequila Sunrise (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -68878,7 +68878,7 @@ doujin?!?
 	</software>
 
 	<software name="teqsunb" cloneof="teqsun">
-		<description>Tequila Sunrise (Alt 2)</description>
+		<description>Tequila Sunrise (alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -69024,7 +69024,7 @@ doujin?!?
 	</software>
 
 	<software name="unoa" cloneof="uno">
-		<description>UNO (Alt Format)</description>
+		<description>UNO (alt format)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="I.G.I. Limited" />
@@ -69222,7 +69222,7 @@ doujin?!?
 	</software>
 
 	<software name="zettmj2a" cloneof="zettmj2">
-		<description>Zettai Mahjong II EG - Renaissance no Houkago (Alt)</description>
+		<description>Zettai Mahjong II EG - Renaissance no Houkago (alt)</description>
 		<year>1996?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Hell++" />
@@ -69249,7 +69249,7 @@ doujin?!?
 	</software>
 
 	<software name="zettmj2da" cloneof="zettmj2d">
-		<description>Zettai Mahjong II' EG (Alt)</description>
+		<description>Zettai Mahjong II' EG (alt)</description>
 		<year>1996?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Hell++" />

@@ -8,7 +8,7 @@
     driver by Angelo Salese, original MESS PC-88SR driver by ???
 
     TODO:
-	- cassette support;
+    - cassette support;
     - waitstates;
     - support for partial palette updates (pretty off in p8suite analog RGB test if enabled);
     - understand why i8214 needs a dis hack setter (depends on attached i8212?);
@@ -152,7 +152,7 @@ UPD3301_FETCH_ATTRIBUTE( pc8801_state::attr_fetch )
 	const u8 attr_max_size = 80;
 	std::array<u16, attr_max_size> attr_extend_info = pc8001_base_state::attr_fetch(attr_row, gfx_mode, y, attr_fifo_size, row_size);
 	// In case we are in a b&w mode copy the attribute structure in an internal buffer for color processing.
-	// TBD if decoration attributes applies to bitmap as well (very likely)
+	// It's unknown at this time if decoration attributes applies to bitmap as well
 	if ((m_gfx_ctrl & 0x18) == 0x08 && gfx_mode == 2)
 	{
 		for (int ey = y; ey < y + m_crtc->lines_per_char(); ey ++)
@@ -235,7 +235,7 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 					if (!res)
 						return 0;
 
-					return m_crtc->get_display_status() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+					return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
 				});
 			}
 			else
@@ -244,20 +244,25 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				// - p1demo2d expects to use CRTC palette on demonstration
 				//   (white text that is set to black on previous title screen animation,
 				//    that runs in 3bpp)
+				// - byoin set a transparent text layer (ASCII=0x20 / attribute = 0x80 0x00)
+				//   but it's in gfx_mode = 0 (b&w) so it just draw white from here.
 				draw_bitmap(bitmap, cliprect, m_crtc_palette, [&](u32 bitmap_offset, int y, int x, int xi){
 					u8 res = 0;
 					// HW pick ups just the first two planes (R and B), G is unused for drawing purposes.
 					// Plane switch happens at half screen, VRAM areas 0x3e80-0x3fff is unused again.
 					// TODO: confirm that a 15 kHz monitor cannot work with this
 					// - jettermi just uses the other b&w mode;
-					// - casablan doesn't bother in changing resolution so only the upper part is drawn;
+					// - casablan/byoin doesn't bother in changing resolution so only the upper part is drawn.
+					// Update: real HW capture shows an ugly overlap with the two layers,
+					// implying that the second plane just latches on the same signals as the first,
+					// YAGNI unless found in concrete example.
 					int plane_offset = y >= 200 ? 384 : 0;
 
 					res |= ((m_gvram[bitmap_offset + plane_offset] >> xi) & 1);
 					if (!res)
 						return 0;
 
-					return m_crtc->get_display_status() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+					return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
 				});
 			}
 		}
@@ -576,6 +581,8 @@ uint8_t pc8801_state::ext_rom_bank_r()
 
 void pc8801_state::ext_rom_bank_w(uint8_t data)
 {
+	// TODO: bits 1 to 3 written to at POST
+	// selection for EXP slot ROMs?
 	m_ext_rom_bank = data;
 }
 
@@ -627,26 +634,17 @@ void pc8801_state::port31_w(uint8_t data)
  */
 uint8_t pc8801_state::port40_r()
 {
+	// TODO: merge with PC8001
 	uint8_t data = 0x00;
 
-	data |= ioport("CTRL")->read() & 0xcf;
+	data |= m_centronics_busy;
+//  data |= m_centronics_ack << 1;
+	data |= ioport("CTRL")->read() & 0xca;
 	data |= m_rtc->data_out_r() << 4;
 	data |= m_crtc->vrtc_r() << 5;
 	// TODO: enable line from pc80s31k (bit 3, active_low)
 
 	return data;
-
-//  return ioport("CTRL")->read();
-}
-
-inline attotime pc8801_state::mouse_limit_hz()
-{
-	return attotime::from_hz(900);
-}
-
-inline attotime pc8801fh_state::mouse_limit_hz()
-{
-	return attotime::from_hz(m_clock_setting ? 900 : 1800);
 }
 
 /*
@@ -667,6 +665,9 @@ inline attotime pc8801fh_state::mouse_limit_hz()
  */
 void pc8801_state::port40_w(uint8_t data)
 {
+	// TODO: merge with PC8001
+	m_centronics->write_strobe(BIT(data, 0));
+
 	m_rtc->stb_w((data & 2) >> 1);
 	m_rtc->clk_w((data & 4) >> 2);
 
@@ -676,35 +677,7 @@ void pc8801_state::port40_w(uint8_t data)
 	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 		m_beeper->set_state(0);
 
-	// TODO: send to joyport implementation
-	if((m_device_ctrl_data & 0x40) != (data & 0x40))
-	{
-		attotime new_time = machine().time();
-
-		if(data & 0x40 && (new_time - m_mouse.time) > mouse_limit_hz())
-		{
-			m_mouse.phase = 0;
-		}
-		else
-		{
-			m_mouse.phase ++;
-			m_mouse.phase &= 3;
-		}
-
-		if(m_mouse.phase == 0)
-		{
-			const u8 mouse_x = ioport("MOUSEX")->read();
-			const u8 mouse_y = ioport("MOUSEY")->read();
-
-			m_mouse.lx = (mouse_x - m_mouse.prev_dx) & 0xff;
-			m_mouse.ly = (mouse_y - m_mouse.prev_dy) & 0xff;
-
-			m_mouse.prev_dx = mouse_x;
-			m_mouse.prev_dy = mouse_y;
-		}
-
-		m_mouse.time = machine().time();
-	}
+	m_mouse_port->pin_8_w(BIT(data, 6));
 
 	// TODO: is SING a buzzer mask? bastard leaves beeper to ON state otherwise
 	if(m_device_ctrl_data & 0x80)
@@ -879,6 +852,7 @@ uint8_t pc8801_state::extram_bank_r()
 
 void pc8801_state::extram_bank_w(uint8_t data)
 {
+	// TODO: bits 2 and 3 also accesses bank for PC-8801-17 "VAB" card
 	m_extram_bank = data;
 }
 
@@ -924,6 +898,7 @@ template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_
 	// https://retrocomputerpeople.web.fc2.com/machines/nec/8801/io_map88.html
 }
 
+#if 0
 void pc8801_state::rtc_w(uint8_t data)
 {
 	m_rtc->c0_w((data & 1) >> 0);
@@ -933,6 +908,7 @@ void pc8801_state::rtc_w(uint8_t data)
 
 	// TODO: remaining bits
 }
+#endif
 
 /*
  * PC8801FH overrides (CPU clock switch)
@@ -1011,7 +987,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x0d, 0x0d).portr("KEY13");
 	map(0x0e, 0x0e).portr("KEY14");
 	map(0x0f, 0x0f).portr("KEY15");
-	map(0x10, 0x10).w(FUNC(pc8801_state::rtc_w));
+	map(0x10, 0x10).w(FUNC(pc8801_state::port10_w));
 	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)); // CMT / RS-232C ch. 0
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
@@ -1039,6 +1015,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
 	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
+//  map(0x82, 0x82).w access window for PC8801-16
 //  map(0x8e, 0x8e).r <unknown>, accessed by scruiser on boot (a board ID?)
 //  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
 //  map(0xa0, 0xa3) GSX-8800 or network board
@@ -1066,7 +1043,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r<0>), FUNC(pc8801_state::kanji_w<0>));
 	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_r<1>), FUNC(pc8801_state::kanji_w<1>));
 //  map(0xf0, 0xf1) dictionary bank (8801MA and later)
-//  map(0xf3, 0xf3) DMA floppy (unknown)
+//  map(0xf3, 0xf3) DMA floppy (direct access like PC88VA?)
 //  map(0xf4, 0xf7) DMA 5'25-inch floppy (?)
 //  map(0xf8, 0xfb) DMA 8-inch floppy (?)
 	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
@@ -1343,27 +1320,6 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
 
-	PORT_START("OPN_PA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("OPN_PB")
-	// TODO: yojukiko and grobda maps Joystick buttons in reverse than expected?
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Mouse Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Mouse Button 2") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
-
-	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
-
 	PORT_START("MEM")
 	PORT_CONFNAME( 0x0f, 0x0a, "Extension memory" )
 	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
@@ -1386,9 +1342,6 @@ static INPUT_PORTS_START( pc8801 )
 //  PORT_CONFNAME( 0x01, 0x01, "Sound Board" )
 //  PORT_CONFSETTING(    0x00, "OPN (YM2203)" )
 //  PORT_CONFSETTING(    0x01, "OPNA (YM2608)" )
-	PORT_CONFNAME( 0x02, 0x00, "Port 1 Connection" )
-	PORT_CONFSETTING(    0x00, "Joystick" )
-	PORT_CONFSETTING(    0x02, "Mouse" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc8801fh )
@@ -1441,9 +1394,6 @@ void pc8801_state::machine_start()
 {
 	pc8001_base_state::machine_start();
 
-	m_rtc->cs_w(1);
-	m_rtc->oe_w(1);
-
 	// TODO: ready signal connected to FDRDY, presumably for the floppy ch.0 and 1
 	m_dma->ready_w(1);
 
@@ -1456,13 +1406,6 @@ void pc8801_state::machine_start()
 	save_pointer(NAME(m_hi_work_ram), 0x1000);
 	save_pointer(NAME(m_ext_work_ram), 0x8000*0x100);
 	save_pointer(NAME(m_gvram), 0xc000);
-	save_item(STRUCT_MEMBER(m_mouse, phase));
-	save_item(STRUCT_MEMBER(m_mouse, prev_dx));
-	save_item(STRUCT_MEMBER(m_mouse, prev_dy));
-	save_item(STRUCT_MEMBER(m_mouse, lx));
-	save_item(STRUCT_MEMBER(m_mouse, ly));
-//  save_item(STRUCT_MEMBER(m_mouse, time));
-	save_item(NAME(m_mouse.time));
 	save_item(NAME(m_gfx_ctrl));
 	save_item(NAME(m_ext_rom_bank));
 	save_item(NAME(m_vram_sel));
@@ -1504,15 +1447,9 @@ void pc8801_state::machine_reset()
 	m_bitmap_layer_mask = 0;
 	m_vram_sel = 3;
 
-	m_mouse.phase = 0;
-
 	// initialize ALU
-	{
-		int i;
-
-		for(i = 0; i < 3; i++)
-			m_alu_reg[i] = 0x00;
-	}
+	for(int i = 0; i < 3; i++)
+		m_alu_reg[i] = 0x00;
 
 	m_beeper->set_state(0);
 
@@ -1592,25 +1529,18 @@ void pc8801mc_state::machine_reset()
 	m_cdrom_bank = true;
 }
 
-// TODO: to joyport DB9 option slot
+// DE-9 mouse port on front panel (labelled "マウス") - MSX-compatible
 uint8_t pc8801mk2sr_state::opn_porta_r()
 {
-	if(ioport("BOARD_CONFIG")->read() & 2)
-	{
-		uint8_t shift, res;
-
-		shift = (m_mouse.phase & 1) ? 0 : 4;
-		res = (m_mouse.phase & 2) ? m_mouse.ly : m_mouse.lx;
-
-//      logerror("%d\n",m_mouse.phase);
-
-		return ((res >> shift) & 0x0f) | 0xf0;
-	}
-
-	return ioport("OPN_PA")->read();
+	return BIT(m_mouse_port->read(), 0, 4) | 0xf0;
 }
 
-/* Cassette Configuration */
+uint8_t pc8801mk2sr_state::opn_portb_r()
+{
+	return BIT(m_mouse_port->read(), 4, 2) | 0xfc;
+}
+
+// Cassette Configuration
 WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
 {
 	//m_cassette->output( (state) ? 1.0 : -1.0);
@@ -1726,7 +1656,13 @@ void pc8801_state::pc8801(machine_config &config)
 	m_pic->set_int_dis_hack(true);
 
 	UPD1990A(config, m_rtc);
-	//CENTRONICS(config, "centronics", centronics_devices, "printer");
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(pc8801_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(pc8801_state::write_centronics_busy));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// TODO: needs T88 format support
 	CASSETTE(config, m_cassette);
@@ -1788,6 +1724,8 @@ void pc8801_state::pc8801(machine_config &config)
 		m_beeper->add_route(ALL_OUTPUTS, speaker, 0.10);
 	}
 
+	MSX_GENERAL_PURPOSE_PORT(config, m_mouse_port, msx_general_purpose_port_devices, "joystick");
+
 	PC8801_EXP_SLOT(config, m_exp, pc8801_exp_devices, nullptr);
 	m_exp->set_iospace(m_maincpu, AS_IO);
 	m_exp->int3_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
@@ -1802,7 +1740,7 @@ void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 	YM2203(config, m_opn, MASTER_CLOCK);
 	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));
 	m_opn->port_a_read_callback().set(FUNC(pc8801mk2sr_state::opn_porta_r));
-	m_opn->port_b_read_callback().set_ioport("OPN_PB");
+	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
 
 	for (auto &speaker : { m_lspeaker, m_rspeaker })
 	{
@@ -1830,7 +1768,8 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	m_opna->set_addrmap(0, &pc8801fh_state::opna_map);
 	m_opna->irq_handler().set(FUNC(pc8801fh_state::int4_irq_w));
 	m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
-	m_opna->port_b_read_callback().set_ioport("OPN_PB");
+	m_opna->port_b_read_callback().set(FUNC(pc8801fh_state::opn_portb_r));
+
 	// TODO: per-channel mixing is unconfirmed
 	m_opna->add_route(0, m_lspeaker, 0.25);
 	m_opna->add_route(0, m_rspeaker, 0.25);
@@ -2076,29 +2015,27 @@ ROM_START( pc8801mc )
 	ROM_LOAD( "mc_jisyo.rom", 0x00000, 0x80000, CRC(bd6eb062) SHA1(deef0cc2a9734ba891a6d6c022aa70ffc66f783e) )
 ROM_END
 
-/* System Drivers */
 
-/*    YEAR  NAME         PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT        COMPANY  FULLNAME */
-
-COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING )
-COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING )
+COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 
 // internal OPN
-COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_NOT_WORKING )
-//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 
 // internal OPNA
-//COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
-COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_NOT_WORKING )
-COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_NOT_WORKING )
-COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_NOT_WORKING )
-//COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_NOT_WORKING )
-COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_NOT_WORKING )
-//COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_NOT_WORKING )
-COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING )
+//COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
+// belongs to own driver
 //COMP( 1989, pc98do,      0,      0,      pc98do,      pc98do, pc8801_state, empty_init, "NEC",   "PC-98DO",       MACHINE_NOT_WORKING )
 //COMP( 1990, pc98dop,     0,      0,      pc98do,      pc98do, pc8801_state, empty_init, "NEC",   "PC-98DO+",      MACHINE_NOT_WORKING )

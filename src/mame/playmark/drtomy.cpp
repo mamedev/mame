@@ -4,8 +4,32 @@
 
 Dr. Tomy    -   (c) 1993 Playmark
 
-A rip-off of Dr. Mario by Playmark, using some code from Gaelco's Big Karnak on
-similar hardware.
+A rip-off of Dr. Mario by Playmark, using some code from Gaelco's Big Karnak on similar hardware.
+
+TOMY
++---------------------------------------------+
+| VR1   14             MCM2118                |
+|     M6295  1MHz      MCM2118                |
+|                                             |
+|        MCM2118                           17 |
+|J       MCM2118       GAL                 18 |
+|A                          TPC1020AFN     19 |
+|M                                         20 |
+|M                                            |
+|A                                     MS6264 |
+|  DSW1                        MCM2118        |
+|        MS6264 MS6264         MCM2118        |
+|  DSW2    15    16                           |
+|20MHz    TS68000P12           26MHz          |
++---------------------------------------------+
+
+  CPU: ST TS68000P12
+Sound: OKI M6295
+Video: TMS TCP1020AFN-084C
+  OSC: 26MHz, 20MHz & 1MHz resonator
+  GAL: Lattice GAL22V10B-25LP
+  VR1: Volume pot
+  DSW: Two 8 switch dipswitches
 
 */
 
@@ -310,7 +334,7 @@ void drtomy_state::machine_reset()
 void drtomy_state::drtomy(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 24000000/2);          /* ? MHz */
+	M68000(config, m_maincpu, XTAL(20'000'000)/2); // 10 MHz - Need to verify
 	m_maincpu->set_addrmap(AS_PROGRAM, &drtomy_state::drtomy_map);
 	m_maincpu->set_vblank_int("screen", FUNC(drtomy_state::irq6_line_hold));
 
@@ -330,7 +354,7 @@ void drtomy_state::drtomy(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 26000000/16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.8);
+	OKIM6295(config, m_oki, XTAL(1'000'000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.8); // 1MHz resonator - pin 7 not verified
 }
 
 

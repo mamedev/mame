@@ -10,7 +10,7 @@ local function check_db_result(msg)
 end
 
 local function settings_path()
-	return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/data'
+	return manager.machine.options.entries.homepath:value():match('([^;]+)') .. '/data'
 end
 
 local function check_version_table()
@@ -147,7 +147,7 @@ end
 function dbtable.open_data_file(file)
 	local fh, filepath
 	for path in mame_manager.ui.options.entries.historypath:value():gmatch('([^;]+)') do
-		filepath = emu.subst_env(path) .. '/' .. file
+		filepath = path .. '/' .. file
 		fh = io.open(filepath, 'r')
 		if fh then
 			break

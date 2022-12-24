@@ -1,6 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/*
+/**************************************************************************************************
+
+Notes:
+- most BIOSes needs SH-4 MMU
+- exception is with earlier games/BIOSes, for example:
+  mamefoo scatmag2sa -bios au-sa1
+  will run the program up to "vidgam.c: could not set the desired video mode"
+  bp 800795a, 1, {r0=0;g}
+- "v_scene.c: Could not initialize Display Manager" & "spin.c: cannot load assets",
+  both related to PLX controller not DMA-ing?
+
+TODO:
+- Identify irq sources;
+- Irq acknowledge doesn't work as intended;
+- Emulate PLX9054 controller & PCI root;
+- PMX1 likely runs under PCI bus too;
+- Eventually gets to "flyback" errors, pings $12000130-$3f for strobe and/or irq enable.
+  Flyback is an alias for vblank, cfr. Acorn Archimedes.
+
+===================================================================================================
 
 Aristocrat MK6 (2000)
 Product numbers: 410480, 410481, 410556, 410557
@@ -68,7 +87,7 @@ The South Australian system set and game (only one dumped so far) uses the VLC (
 
 Victorian games (none are dumped) use either VLC or QCOM depending on the game and/or the operator the machines were designed for. Victoria had two "rival" gaming operators during the MK6's lifetime.
 
-*/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/sh/sh4.h"
@@ -102,17 +121,12 @@ private:
 	uint8_t test_r(offs_t offset);
 	void eeprom_w(uint64_t data);
 	uint64_t hwver_r();
-	uint32_t screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	void aristmk6_map(address_map &map);
 	void aristmk6_port(address_map &map);
-
-#if 0
-	u32 m_test_x = 0, m_test_y = 0, m_start_offs = 0;
-	u8 m_type = 0;
-#endif
 
 	u8 irl0pend = 0, irl0en = 0;
 	u8 irl1pend = 0, irl1en = 0;
@@ -137,16 +151,13 @@ void aristmk6_state::machine_reset()
 	irl0pend = irl0en = irl1pend = irl1en = irl2pend = irl2en = irl3pend0 = irl3en0 = irl3pend1 = irl3en1 = 0;
 }
 
-uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t aristmk6_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 #if 0
 	int x,y,count;
 	const uint8_t *blit_ram = memregion("maincpu")->base();
-
-	if (machine().input().code_pressed(KEYCODE_U)) {
-		irl2pend |= 2;
-		testIrq();
-	}
+	static u32 m_test_x = 0, m_test_y = 0, m_start_offs = 0;
+	static u8 m_type = 0;
 
 	if(machine().input().code_pressed(KEYCODE_Z))
 		m_test_x++;
@@ -220,26 +231,37 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 	}
 #else
 
+/*
+    if (machine().input().code_pressed_once(KEYCODE_U))
+    {
+        irl2pend |= 2;
+        testIrq();
+        machine().debug_break();
+    }
+*/
+
+	// TODO: honor cliprect, remove count variable, RGB565 format is unconfirmed, likely double buffered
 	int count = 0;
-	for (int y = 0;y < 480;y++)
+	for (int y = 0; y < 480; y++)
 	{
-		for (int x = 0;x < 640/2;x++)
+		for (int x = 0; x < 640 / 2; x++)
 		{
 			uint64_t pix = m_vram[count];
 
 			uint32_t pix1;
-			int col;
+			u8 r, g, b;
 
 			pix1 = pix & 0xffffffff;
-			col = 0;
-			if (pix1) col = 1;
-			bitmap.pix(y, x*2) = m_palette->pen(col);
+			r = pal5bit((pix1 & 0x001f) >> 0);
+			g = pal6bit((pix1 & 0x07e0) >> 5);
+			b = pal5bit((pix1 & 0xf800) >> 11);
+			bitmap.pix(y, x * 2) = r | g << 8 | b << 16;
 
 			pix1 = pix >> 32;
-			col = 0;
-			if (pix1) col = 1;
-			bitmap.pix(y, x*2+1) = m_palette->pen(col);
-
+			r = pal5bit((pix1 & 0x001f) >> 0);
+			g = pal6bit((pix1 & 0x07e0) >> 5);
+			b = pal5bit((pix1 & 0xf800) >> 11);
+			bitmap.pix(y, x * 2 + 1) = r | g << 8 | b << 16;
 
 			count++;
 		}
@@ -356,6 +378,7 @@ void aristmk6_state::aristmk6_map(address_map &map)
 	map(0x11000000, 0x1107ffff).ram(); // SRAM1 512KB
 	map(0x11800000, 0x1187ffff).ram(); // SRAM2 512KB
 // 12000xxx main control registers area
+//  map(0x12000000, another eeprom or SPI bus
 	map(0x12000010, 0x12000017).w(FUNC(aristmk6_state::eeprom_w));
 	map(0x12000078, 0x1200007f).nopw(); // watchdog ??
 	map(0x12000080, 0x12000087).nopw(); // 0-1-2 written here repeatedly, diag LED or smth ?
@@ -364,6 +387,7 @@ void aristmk6_state::aristmk6_map(address_map &map)
 	map(0x12000108, 0x12000127).w(FUNC(aristmk6_state::irqen_w));
 	map(0x12400010, 0x12400017).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x12400018, 0x1240001f).rw(m_uart0, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+//  map(0x13000000 MMIO space for PLX9054?
 	map(0x13800000, 0x13800007).r(FUNC(aristmk6_state::test_r));
 }
 
@@ -409,7 +433,7 @@ void aristmk6_state::aristmk6(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(aristmk6_state::screen_update_aristmk6));
+	screen.set_screen_update(FUNC(aristmk6_state::screen_update));
 
 	PALETTE(config, m_palette).set_entries(0x1000);
 }

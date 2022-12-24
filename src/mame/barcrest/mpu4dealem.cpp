@@ -231,7 +231,6 @@ void mpu4dealem_state::dealem(machine_config &config)
 
 	mpu4_common(config);
 
-	SPEAKER(config, "mono").front_center();
 	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
 	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8913->set_resistors_load(820, 0, 0);

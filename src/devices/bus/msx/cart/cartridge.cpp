@@ -5,6 +5,7 @@
 #include "cartridge.h"
 #include "arc.h"
 #include "ascii.h"
+#include "beepack.h"
 #include "bm_012.h"
 #include "crossblaim.h"
 #include "disk.h"
@@ -25,6 +26,7 @@
 #include "msxdos2.h"
 #include "nomapper.h"
 #include "rtype.h"
+#include "softcard.h"
 #include "superloderunner.h"
 #include "super_swangi.h"
 #include "yamaha.h"
@@ -71,75 +73,10 @@ void msx_cart(device_slot_interface &device)
 	device.option_add_internal("superloderunner", MSX_CART_SUPERLODERUNNER);
 	device.option_add_internal("synthesizer", MSX_CART_SYNTHESIZER);
 	device.option_add_internal("ec701", MSX_CART_EC701);
+	device.option_add("beepack", MSX_CART_BEEPACK);
 	device.option_add("bm_012", MSX_CART_BM_012);
 	device.option_add("moonsound", MSX_CART_MOONSOUND);
-}
-
-
-msx_cart_interface::msx_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "msxcart")
-	, m_exp(nullptr)
-{
-	for (int i = 0; i < 4; i++)
-		m_page[i] = nullptr;
-}
-
-void msx_cart_interface::rom_alloc(u32 size)
-{
-	m_rom.resize(size);
-	std::fill_n(m_rom.begin(), size, 0xff);
-}
-
-void msx_cart_interface::rom_vlm5030_alloc(u32 size)
-{
-	m_rom_vlm5030.resize(size);
-	std::fill_n(m_rom_vlm5030.begin(), size, 0xff);
-}
-
-void msx_cart_interface::ram_alloc(u32 size)
-{
-	m_ram.resize(size);
-	std::fill_n(m_ram.begin(), size, 0x00);
-}
-
-void msx_cart_interface::sram_alloc(u32 size)
-{
-	m_sram.resize(size);
-	std::fill_n(m_sram.begin(), size, 0x00);
-}
-
-void msx_cart_interface::kanji_alloc(u32 size)
-{
-	m_kanji.resize(size);
-	std::fill_n(m_kanji.begin(), size, 0x00);
-}
-
-WRITE_LINE_MEMBER(msx_cart_interface::irq_out)
-{
-	m_exp->irq_out(state);
-}
-
-address_space &msx_cart_interface::memory_space() const
-{
-	return m_exp->memory_space();
-}
-
-address_space &msx_cart_interface::io_space() const
-{
-	return m_exp->io_space();
-}
-
-cpu_device &msx_cart_interface::maincpu() const
-{
-	return m_exp->maincpu();
-}
-
-void msx_cart_interface::set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
-{
-	m_page[0] = page0;
-	m_page[1] = page1;
-	m_page[2] = page2;
-	m_page[3] = page3;
+	device.option_add("softcard", MSX_CART_SOFTCARD);
 }
 
 

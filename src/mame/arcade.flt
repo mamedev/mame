@@ -17,6 +17,7 @@ alpha/champbas.cpp
 alpha/equites.cpp
 alpha/meijinsn.cpp
 alpha/shougi.cpp
+alpha/splendor.cpp
 amiga/alg.cpp
 amiga/arsystems.cpp
 amiga/cubo.cpp
@@ -644,7 +645,6 @@ misc/bailey.cpp
 misc/beaminv.cpp
 misc/beezer.cpp
 misc/belatra.cpp
-misc/bgt.cpp
 misc/bingoman.cpp
 misc/bingor.cpp
 misc/blitz68k.cpp
@@ -873,6 +873,7 @@ misc/skopro.cpp
 misc/skyarmy.cpp
 misc/skylncr.cpp
 misc/sliver.cpp
+misc/smd2144c.cpp
 misc/smotor.cpp
 misc/smsmcorp.cpp
 misc/sothello.cpp
@@ -1211,6 +1212,7 @@ sega/hshavoc.cpp
 sega/kopunch.cpp
 sega/lindbergh.cpp
 sega/megadriv_acbl.cpp
+sega/megadriv_sunmix.cpp
 sega/megaplay.cpp
 sega/megatech.cpp
 sega/model1.cpp

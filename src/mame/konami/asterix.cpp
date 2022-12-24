@@ -59,7 +59,7 @@ INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 
 void asterix_state::sound_arm_nmi_w(uint8_t data)
 {
-	// see notes in simpsons driver (though judging from disasm, it seems asterix does not rely on it)
+	// see notes in simpsons driver
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_nmi_blocked->adjust(m_audiocpu->cycles_to_attotime(4));
 }

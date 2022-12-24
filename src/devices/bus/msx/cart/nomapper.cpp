@@ -31,7 +31,7 @@ void msx_cart_nomapper_device::install_memory()
 		{
 			if (page(i))
 			{
-				page(i)->install_rom(start_address, std::min<uint32_t>(start_address + 0x3fff, m_end_address - 1), get_rom_base() + rom_offset);
+				page(i)->install_rom(start_address, std::min<uint32_t>(start_address + 0x3fff, m_end_address - 1), cart_rom_region()->base() + rom_offset);
 			}
 			rom_offset += 0x4000;
 			start_address += 0x4000;
@@ -39,10 +39,16 @@ void msx_cart_nomapper_device::install_memory()
 	}
 }
 
-void msx_cart_nomapper_device::initialize_cartridge()
+image_init_result msx_cart_nomapper_device::initialize_cartridge(std::string &message)
 {
-	u32 size = get_rom_size();
-	u8 *rom = get_rom_base();
+	if (!cart_rom_region())
+	{
+		message = "msx_cart_nomapper_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
+	}
+
+	const u32 size = cart_rom_region()->bytes();
+	u8 *rom = cart_rom_region()->base();
 
 	// determine start address, default to 0x4000
 	m_start_address = 0x4000;
@@ -103,4 +109,6 @@ void msx_cart_nomapper_device::initialize_cartridge()
 	m_end_address = std::min<u32>(m_start_address + size, 0x10000);
 
 	install_memory();
+
+	return image_init_result::PASS;
 }

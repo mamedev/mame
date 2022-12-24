@@ -148,11 +148,18 @@ protected:
 private:
 	required_shared_ptr<uint16_t> m_blit_ram;
 	optional_memory_bank m_mainbank;
-
 	output_finder<6> m_lamps;
-	uint16_t m_vblank_bit;
-	uint16_t m_brasil_prot_latch;
-	uint16_t m_grancapi_prot_latch;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<okim6376_device> m_okim6376;
+	required_device<palette_device> m_palette;
+	required_ioport_array<3> m_inputs;
+
+	uint16_t m_vblank_bit = 0;
+	uint16_t m_brasil_prot_latch = 0;
+	uint16_t m_grancapi_prot_latch = 0;
+	uint8_t m_resetpulse = 0;
+
 	uint16_t read0_r();
 	uint16_t read1_r();
 	uint16_t read2_r();
@@ -188,11 +195,6 @@ private:
 	uint32_t screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<okim6376_device> m_okim6376;
-	required_device<palette_device> m_palette;
-	required_ioport_array<3> m_inputs;
-
 	void brasil_io(address_map &map);
 	void brasil_map(address_map &map);
 	void ciclone_io(address_map &map);
@@ -214,8 +216,6 @@ private:
 	void tv_tcf_map(address_map &map);
 	void tv_vcf_io(address_map &map);
 	void tv_vcf_map(address_map &map);
-
-	uint8_t m_resetpulse;
 };
 
 void highvdeo_state::machine_start()
@@ -361,7 +361,7 @@ void highvdeo_state::tv_vcf_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram(); /*irq vector area*/
 	map(0x00400, 0x03fff).ram().share("nvram");
-	map(0x40000, 0x4ffff).ram().share("blit_ram"); /*blitter ram*/
+	map(0x40000, 0x4ffff).writeonly().share("blit_ram");
 	map(0x80000, 0xbffff).bankr("mainbank");
 	map(0xc0000, 0xfffff).rom().region("maincpu", 0xc0000);
 }
@@ -401,7 +401,7 @@ void highvdeo_state::tv_ncf_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram(); /*irq vector area*/
 	map(0x00400, 0x03fff).ram().share("nvram");
-	map(0x20000, 0x2ffff).ram().share("blit_ram"); /*blitter ram*/
+	map(0x20000, 0x2ffff).writeonly().share("blit_ram");
 	map(0x40000, 0xfffff).rom().region("maincpu", 0x40000);
 }
 
@@ -424,7 +424,7 @@ void highvdeo_state::nyjoker_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram(); /*irq vector area*/
 	map(0x00400, 0x03fff).ram().share("nvram");
-	map(0x10000, 0x1ffff).ram().share("blit_ram"); /*blitter ram*/
+	map(0x10000, 0x1ffff).writeonly().share("blit_ram");
 	map(0x40000, 0xfffff).rom().region("maincpu", 0x40000);
 }
 
@@ -466,7 +466,7 @@ void highvdeo_state::tv_tcf_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram(); /*irq vector area*/
 	map(0x00400, 0x03fff).ram().share("nvram");
-	map(0x40000, 0x5d4bf).ram().share("blit_ram"); /*blitter ram*/
+	map(0x40000, 0x5ffff).writeonly().share("blit_ram");
 	map(0x7fe00, 0x7ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x80000, 0xbffff).bankr("mainbank");
 	map(0xc0000, 0xfffff).rom().region("maincpu", 0x1c0000);
@@ -574,7 +574,7 @@ void highvdeo_state::newmcard_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram(); /*irq vector area*/
 	map(0x00400, 0x0ffff).ram().share("nvram");
-	map(0x40000, 0x7ffff).ram().share("blit_ram"); /*blitter ram*/
+	map(0x40000, 0x7ffff).writeonly().share("blit_ram");
 	map(0x80000, 0xbffff).bankr("mainbank");
 	map(0xc0000, 0xfffff).rom().region("maincpu", 0xc0000);
 }
@@ -675,7 +675,7 @@ void highvdeo_state::brasil_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram(); /*irq vector area*/
 	map(0x00400, 0x0ffff).ram().share("nvram");
-	map(0x40000, 0x7ffff).ram().share("blit_ram"); /*blitter ram*/
+	map(0x40000, 0x7ffff).writeonly().share("blit_ram");
 	map(0x80000, 0xbffff).bankr("mainbank");
 	map(0xc0000, 0xfffff).rom().region("maincpu", 0x1c0000);
 }

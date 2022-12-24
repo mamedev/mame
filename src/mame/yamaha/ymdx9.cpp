@@ -59,7 +59,7 @@ private:
 
 	/**
 	 * @brief Which input line on the keyboard/switch scan driver is currently selected.
-	 * This driver is used to read the analog switch values from the synth's keyboard, and 
+	 * This driver is used to read the analog switch values from the synth's keyboard, and
 	 * front-panel switches.
 	 * TODO: I'm currently not sure of the actual implementation of this circuit. This
 	 * implementation is based off the *very* limited description in the service manual, and
@@ -102,13 +102,13 @@ private:
 	/**
 	 * @brief Handles a read from the keyboard/switch scan driver.
 	 * This multiplexing driver circuit is used to read the states of the synth's front-panel
-	 * switches, and keyboard. The driver's input is wired to the CPU's IO port 1, and the 
+	 * switches, and keyboard. The driver's input is wired to the CPU's IO port 1, and the
 	 * output is wired into the address map.
 	 * Input line 0 covers the 'main' front-panel switches.
 	 * Input line 1 covers the numeric front-panel switches 1 through 8.
 	 * Input line 2 covers the numeric front-panel switches 9 though 16.
 	 * Input line 3 covers the numeric front-panel switches 17 though 20, as well as the
-	 * modulation pedal inputs: The Portamento, and Sustain pedals are mapped to 
+	 * modulation pedal inputs: The Portamento, and Sustain pedals are mapped to
 	 * bits 6, and 7 respectively.
 	 * Note: Input lines 4-15 are used to map the keyboard, which is not implemented here.
 	 * When the keyboard state is read, the default value of 0 will be returned.
@@ -159,6 +159,14 @@ private:
 	 * @return uint8_t The value read from the port.
 	 */
 	uint8_t p1_r(offs_t offset);
+
+	/**
+	 * @brief Handle a read from the synth's IO Port 2.
+	 * This function is used to handle incoming serial data.
+	 * @param offset The offset into the memory mapped region being read.
+	 * @return uint8_t The value read from the port.
+	 */
+	uint8_t p2_r(offs_t offset);
 };
 
 
@@ -242,6 +250,7 @@ void yamaha_dx9_state::dx9(machine_config &config)
 	// Unlike the DX7 only IO port 1 is used.
 	// The direction flags of other ports are set, however they are never read, or written.
 	m_maincpu->in_p1_cb().set(FUNC(yamaha_dx9_state::p1_r));
+	m_maincpu->in_p2_cb().set(FUNC(yamaha_dx9_state::p2_r));
 	m_maincpu->out_p1_cb().set(FUNC(yamaha_dx9_state::p1_w));
 
 	NVRAM(config, "ram1", nvram_device::DEFAULT_ALL_0);
@@ -255,7 +264,7 @@ void yamaha_dx9_state::dx9(machine_config &config)
 	m_adc->in_callback<4>().set_constant(0x80);
 
 	// Configure MIDI.
-	auto &midiclock(CLOCK(config, "midiclock", 500_kHz_XTAL));
+	auto &midiclock(CLOCK(config, "midiclock", 500_kHz_XTAL / 2));
 	midiclock.signal_handler().set(FUNC(yamaha_dx9_state::midiclock_w));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(yamaha_dx9_state::midi_r));
@@ -323,7 +332,16 @@ uint8_t yamaha_dx9_state::p1_r(offs_t offset)
 	return m_adc->eoc_r() << 4;
 }
 
+	
+/**
+ * yamaha_dx9_state::p2_r
+ */
+uint8_t yamaha_dx9_state::p2_r(offs_t offset)
+{
+	return m_rx_data << 3;
+}
 
+	
 /**
  * yamaha_dx9_state::p1_w
  */
@@ -378,8 +396,8 @@ static INPUT_PORTS_START(dx9)
 
 	// These IO ports belong to the keyboard scan circuit.
 	// Each of these 12 ports represents an individual key within an octave.
-	// The keyboard is wired so that when each key's line is selected, reading the keyboard 
-	// scan driver output will return a power of two indicating the octave the pressed key 
+	// The keyboard is wired so that when each key's line is selected, reading the keyboard
+	// scan driver output will return a power of two indicating the octave the pressed key
 	// is in, from 0 to 7.
 	PORT_START("KEY_SWITCH_INPUT.4")
 	PORT_START("KEY_SWITCH_INPUT.5")

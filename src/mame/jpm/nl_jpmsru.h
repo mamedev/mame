@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:SomeRandomGuyIdk
 #ifndef MAME_AUDIO_NL_JPMSRU_H
 #define MAME_AUDIO_NL_JPMSRU_H

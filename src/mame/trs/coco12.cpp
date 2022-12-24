@@ -21,6 +21,10 @@
     coco3p  1.2 2.0         1.1
     coco3h  1.2 2.0         1.1
 
+    TRS-80 Deluxe Color Computer
+
+    Prototype Color Computer with added MOS6551 and AY-3-8913
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -46,7 +50,6 @@ void coco12_state::coco_mem(address_map &map)
 {
 	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
 }
-
 
 void coco12_state::coco_ram(address_map &map)
 {
@@ -100,6 +103,14 @@ void coco12_state::ms1600_rom2(address_map &map)
 	// $C000-$FEFF
 	map(0x0000, 0x2fff).rw(m_cococart, FUNC(cococart_slot_device::cts_read), FUNC(cococart_slot_device::cts_write));
 	map(0x3000, 0x3eff).rom().region(MAINCPU_TAG, 0x7000).nopw();
+}
+
+void deluxecoco_state::deluxecoco_io1(address_map &map)
+{
+	// $FF20-$FF3F
+	map(0x00, 0x03).mirror(0x1c).r(PIA1_TAG, FUNC(pia6821_device::read)).w(FUNC(coco12_state::ff20_write));
+	map(0x18, 0x19).w(m_psg, FUNC(ay8913_device::data_address_w));
+	map(0x1c, 0x1f).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 }
 
 
@@ -175,17 +186,6 @@ INPUT_PORTS_START( coco_beckerport_dw )
 	PORT_CONFNAME( 0x01, 0x01, "Becker Port" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(    0x01, DEF_STR( On ))
-INPUT_PORTS_END
-
-//-------------------------------------------------
-//  INPUT_PORTS( coco_rtc )
-//-------------------------------------------------
-
-INPUT_PORTS_START( coco_rtc )
-	PORT_START("real_time_clock")
-	PORT_CONFNAME( 0x03, 0x00, "Real Time Clock" )
-	PORT_CONFSETTING(    0x00, "Disto" )
-	PORT_CONFSETTING(    0x01, "Cloud-9" )
 INPUT_PORTS_END
 
 
@@ -285,9 +285,23 @@ static INPUT_PORTS_START( coco )
 	PORT_INCLUDE( coco_keyboard )
 	PORT_INCLUDE( coco_joystick )
 	PORT_INCLUDE( coco_analog_control )
-	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport )
 INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( deluxecoco )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( deluxecoco )
+	PORT_INCLUDE( coco )
+	PORT_MODIFY("row6")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("ALT") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL), UCHAR_SHIFT_2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+INPUT_PORTS_END
+
 
 
 //-------------------------------------------------
@@ -387,7 +401,6 @@ static INPUT_PORTS_START( cp400c2 )
 	PORT_INCLUDE( cp400c2_keyboard )
 	PORT_INCLUDE( coco_joystick )
 	PORT_INCLUDE( coco_analog_control )
-	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport )
 INPUT_PORTS_END
 
@@ -460,6 +473,20 @@ static DEVICE_INPUT_DEFAULTS_START( rs_printer )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
+
+
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS_START( acia )
+//-------------------------------------------------
+
+static DEVICE_INPUT_DEFAULTS_START(acia)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_300)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_300)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
 
 //-------------------------------------------------
 //  machine_config
@@ -575,6 +602,38 @@ void coco12_state::cocoeh(machine_config &config)
 	m_ram->set_default_size("64K");
 }
 
+void deluxecoco_state::deluxecoco(machine_config &config)
+{
+	coco12_state::coco2b(config);
+
+	m_ram->set_default_size("64K");
+
+	// Asynchronous Communications Interface Adapter
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+	m_acia->txd_handler().set(ACIA_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set(ACIA_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia->dtr_handler().set(ACIA_TAG, FUNC(rs232_port_device::write_dtr));
+
+	rs232_port_device &rs232(RS232_PORT(config, ACIA_TAG, default_rs232_devices, nullptr));
+	rs232.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(acia));
+	rs232.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(acia));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(acia));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
+
+	// Programable Sound Generator
+	AY8913(config, m_psg, DERIVED_CLOCK(2, 1));
+	m_psg->set_flags(AY8910_SINGLE_OUTPUT);
+	m_psg->add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	// Adjust Memory Map
+	m_sam->set_addrmap(5, &deluxecoco_state::deluxecoco_io1);
+}
+
 void coco12_state::coco2(machine_config &config)
 {
 	coco(config);
@@ -657,30 +716,38 @@ ROM_END
 
 ROM_START(cocoe)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas11.rom",   0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3))
-	ROM_LOAD("extbas10.rom",    0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e))
+	ROM_LOAD("bas11.rom",    0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3))
+	ROM_LOAD("extbas10.rom", 0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e))
 ROM_END
 
 ROM_START(coco2)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas12.rom",   0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f))
-	ROM_LOAD("extbas11.rom",    0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
+	ROM_LOAD("bas12.rom",    0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f))
+	ROM_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
+ROM_END
+
+ROM_START(deluxecoco)
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("bas20.rom",    0x2000, 0x2000, NO_DUMP)
+	ROM_LOAD("extbas20.rom", 0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("bas13.rom",    0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
+	ROM_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 ROM_END
 
 ROM_START(coco2b)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas13.rom",   0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
-	ROM_LOAD("extbas11.rom",    0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
+	ROM_LOAD("bas13.rom",    0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
+	ROM_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 ROM_END
 
 ROM_START(cp400)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("cp400bas.rom",  0x0000, 0x4000, CRC(878396a5) SHA1(292c545da3c77978e043b00a3dbc317201d18c3b))
+	ROM_LOAD("cp400bas.rom", 0x0000, 0x4000, CRC(878396a5) SHA1(292c545da3c77978e043b00a3dbc317201d18c3b))
 ROM_END
 
 ROM_START(cp400c2)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("cp400bas.rom",  0x0000, 0x4000, CRC(878396a5) SHA1(292c545da3c77978e043b00a3dbc317201d18c3b))
+	ROM_LOAD("cp400bas.rom", 0x0000, 0x4000, CRC(878396a5) SHA1(292c545da3c77978e043b00a3dbc317201d18c3b))
 ROM_END
 
 ROM_START(mx1600)
@@ -716,7 +783,7 @@ ROM_END
 
 ROM_START(ms1600)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("ms1600.rom",  0x0000, 0x8000, CRC(66f0fafc) SHA1(6e709b8b44aa34a3235a889eb1c3615c0235c3d0))
+	ROM_LOAD("ms1600.rom", 0x0000, 0x8000, CRC(66f0fafc) SHA1(6e709b8b44aa34a3235a889eb1c3615c0235c3d0))
 ROM_END
 
 #define rom_cocoh rom_coco
@@ -728,19 +795,20 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR   NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY                         FULLNAME                               FLAGS
-COMP( 1980,  coco,      0,      0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1981,  cocoe,     coco,   0,      cocoe,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  cocoh,     coco,   0,      cocoh,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
-COMP( 19??,  cocoeh,    coco,   0,      cocoeh,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
-COMP( 1983,  coco2,     coco,   0,      coco2,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2",                    MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  coco2h,    coco,   0,      coco2h,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
-COMP( 1985?, coco2b,    coco,   0,      coco2b,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  coco2bh,   coco,   0,      coco2bh, coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
-COMP( 1983,  cp400,     coco,   0,      cp400,   coco,    coco12_state, empty_init, "Prológica",                    "CP400",                               MACHINE_SUPPORTS_SAVE )
-COMP( 1985,  cp400c2,   coco,   0,      cp400,   cp400c2, coco12_state, empty_init, "Prológica",                    "CP400 Color II",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1984,  mx1600,    coco,   0,      coco,    coco,    coco12_state, empty_init, "Dynacom",                      "MX-1600",                             MACHINE_SUPPORTS_SAVE )
-COMP( 1986,  t4426,     coco,   0,      t4426,   coco,    coco12_state, empty_init, "Terco AB",                     "Terco 4426 CNC Programming station",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983,  lzcolor64, coco,   0,      coco,    coco,    coco12_state, empty_init, "Novo Tempo / LZ Equipamentos", "Color64",                             MACHINE_SUPPORTS_SAVE )
-COMP( 1983,  cd6809,    coco,   0,      cd6809,  coco,    coco12_state, empty_init, "Codimex",                      "CD-6809",                             MACHINE_SUPPORTS_SAVE )
-COMP( 1987,  ms1600,    coco,   0,      ms1600,  coco,    coco12_state, empty_init, "ILCE / SEP",                   "Micro-SEP 1600",                      MACHINE_SUPPORTS_SAVE )
+//    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                         FULLNAME                               FLAGS
+COMP( 1980,  coco,       0,      0,      coco,       coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer",                      MACHINE_SUPPORTS_SAVE )
+COMP( 1981,  cocoe,      coco,   0,      cocoe,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 19??,  cocoeh,     coco,   0,      cocoeh,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1983,  deluxecoco, coco,   0,      deluxecoco, deluxecoco, deluxecoco_state, empty_init, "Tandy Radio Shack",            "Deluxe Color Computer",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1983,  coco2,      coco,   0,      coco2,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2",                    MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  coco2h,     coco,   0,      coco2h,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1985?, coco2b,     coco,   0,      coco2b,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  coco2bh,    coco,   0,      coco2bh,    coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1983,  cp400,      coco,   0,      cp400,      coco,       coco12_state,     empty_init, "Prológica",                    "CP400",                               MACHINE_SUPPORTS_SAVE )
+COMP( 1985,  cp400c2,    coco,   0,      cp400,      cp400c2,    coco12_state,     empty_init, "Prológica",                    "CP400 Color II",                      MACHINE_SUPPORTS_SAVE )
+COMP( 1984,  mx1600,     coco,   0,      coco,       coco,       coco12_state,     empty_init, "Dynacom",                      "MX-1600",                             MACHINE_SUPPORTS_SAVE )
+COMP( 1986,  t4426,      coco,   0,      t4426,      coco,       coco12_state,     empty_init, "Terco AB",                     "Terco 4426 CNC Programming station",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983,  lzcolor64,  coco,   0,      coco,       coco,       coco12_state,     empty_init, "Novo Tempo / LZ Equipamentos", "Color64",                             MACHINE_SUPPORTS_SAVE )
+COMP( 1983,  cd6809,     coco,   0,      cd6809,     coco,       coco12_state,     empty_init, "Codimex",                      "CD-6809",                             MACHINE_SUPPORTS_SAVE )
+COMP( 1987,  ms1600,     coco,   0,      ms1600,     coco,       coco12_state,     empty_init, "ILCE / SEP",                   "Micro-SEP 1600",                      MACHINE_SUPPORTS_SAVE )

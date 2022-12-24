@@ -45,24 +45,26 @@ private:
 	std::unique_ptr<output_finder<16> > m_outputs;
 	uint8_t m_port_val;
 
-	int m_cursor_pos = 0;
-	int m_window_start = 0;     // display window start pos 0-15
-	int m_window_end = 0;       // display window end   pos 0-15
-	int m_window_size = 0;      // window  size
-	int m_shift_count = 0;
-	int m_shift_data = 0;
-	int m_pcursor_pos = 0;
-	int m_scroll_active = 0;
-	int m_display_mode = 0;
-	int m_flash_rate = 0;
-	int m_flash_control = 0;
-	int m_sclk = 0;
-	int m_data = 0;
+	uint8_t m_cursor_pos = 0;
+	uint8_t m_window_start = 0;     // display window start pos 0-15
+	uint8_t m_window_end = 0;       // display window end   pos 0-15
+	uint8_t m_window_size = 0;      // window  size
+	uint8_t m_shift_count = 0;
+	uint8_t m_shift_data = 0;
+	uint8_t m_pcursor_pos = 0;
+	bool m_scroll_active = false;
+	uint8_t m_display_mode = 0;
+	bool m_flash = false;
+	uint8_t m_flash_rate = 0;
+	uint8_t m_flash_control = 0;
+	uint8_t m_flash_timer = 0;
+	uint8_t m_sclk = 0;
+	uint8_t m_data = 0;
 
 	uint8_t m_cursor = 0;
 	uint16_t m_chars[16]{};
 	uint8_t m_attrs[16]{};
-	uint16_t m_user_data = 0;             // user defined character data (16 bit)
+	uint16_t m_user_data = 0;         // user defined character data (16 bit)
 	uint16_t m_user_def = 0;          // user defined character state
 };
 

@@ -25,27 +25,42 @@ void msx_cart_halnote_device::device_reset()
 	m_view1.select(0);
 }
 
-void msx_cart_halnote_device::initialize_cartridge()
+image_init_result msx_cart_halnote_device::initialize_cartridge(std::string &message)
 {
-	if (get_rom_size() != 0x100000)
+	if (!cart_rom_region())
 	{
-		fatalerror("halnote: Invalid ROM size\n");
+		message = "msx_cart_halnote_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
 	}
-	if (get_sram_size() != 0x4000)
+
+	if (!cart_sram_region())
 	{
-		fatalerror("halnote: Invalid SRAM size\n");
+		message = "msx_cart_halnote_device: Required region 'sram' was not found.";
+		return image_init_result::FAIL;
+	}
+
+	if (cart_rom_region()->bytes() != 0x100000)
+	{
+		message = "msx_cart_halnote_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
+
+	if (cart_sram_region()->bytes() < 0x4000)
+	{
+		message = "msx_cart_halnote_device: Region 'sram' has unsupported size.";
+		return image_init_result::FAIL;
 	}
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_rombank[i]->configure_entries(0, 0x80, get_rom_base(), 0x2000);
+		m_rombank[i]->configure_entries(0, 0x80, cart_rom_region()->base(), 0x2000);
 	}
-	m_rombank[4]->configure_entries(0, 0x100, get_rom_base() + 0x80000, 0x800);
-	m_rombank[5]->configure_entries(0, 0x100, get_rom_base() + 0x80000, 0x800);
+	m_rombank[4]->configure_entries(0, 0x100, cart_rom_region()->base() + 0x80000, 0x800);
+	m_rombank[5]->configure_entries(0, 0x100, cart_rom_region()->base() + 0x80000, 0x800);
 
 	page(0)->install_view(0x0000, 0x3fff, m_view0);
 	m_view0[0];
-	m_view0[1].install_ram(0x0000, 0x3fff, get_sram_base());
+	m_view0[1].install_ram(0x0000, 0x3fff, cart_sram_region()->base());
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_write_handler(0x4fff, 0x4fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank0_w)));
 	page(1)->install_view(0x6000, 0x7fff, m_view1);
@@ -63,6 +78,8 @@ void msx_cart_halnote_device::initialize_cartridge()
 	page(2)->install_write_handler(0x8fff, 0x8fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank2_w)));
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 	page(2)->install_write_handler(0xafff, 0xafff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank3_w)));
+
+	return image_init_result::PASS;
 }
 
 void msx_cart_halnote_device::bank0_w(u8 data)
