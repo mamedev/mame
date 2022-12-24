@@ -20,7 +20,7 @@ Compiled by F.Ulivi with data from http://www.hpmuseum.net/
 		</part>
 	</software>
 
-	<software name="matrix">
+	<software name="matrix" supported="no">
 		<description>Matrix/plotter ROM for 9831</description>
 		<year>1977</year>
 		<publisher>Hewlett-Packard</publisher>
