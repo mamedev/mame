@@ -5000,7 +5000,10 @@ gamtor.cpp implementation
 
 ******************************************/
 
-// TODO: looks like custom SVGA implementation, move to own file
+// TODO: Chips & Technologies 65550 with swapped address lines? Move to separate file regardless
+// 65550 is used by Apple PowerBook 2400c
+// 65535 is used by IBM PC-110
+
 uint8_t gamtor_vga_device::mem_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
