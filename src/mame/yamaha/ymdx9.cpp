@@ -332,7 +332,7 @@ uint8_t yamaha_dx9_state::p1_r(offs_t offset)
 	return m_adc->eoc_r() << 4;
 }
 
-	
+
 /**
  * yamaha_dx9_state::p2_r
  */
@@ -341,7 +341,7 @@ uint8_t yamaha_dx9_state::p2_r(offs_t offset)
 	return m_rx_data << 3;
 }
 
-	
+
 /**
  * yamaha_dx9_state::p1_w
  */

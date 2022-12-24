@@ -7,7 +7,7 @@
     http://www.microtan.ukpc.net/pageProducts.html#ROM
 
     Usage:
-	G EFFC
+    G EFFC
 
 **********************************************************************/
 

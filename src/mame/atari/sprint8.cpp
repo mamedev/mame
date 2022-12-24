@@ -126,7 +126,7 @@ void sprint8_state::sprint8_map(address_map &map)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNUSED ) \
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED ) \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED ) \
-                                                 \
+												 \
 	PORT_START("DIAL" #player) \
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(player)
 

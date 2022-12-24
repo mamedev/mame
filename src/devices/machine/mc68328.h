@@ -374,7 +374,7 @@ protected:
 		CSCD_COMPARE            = 0xfff00000,
 
 		INT_SPIM                = 0,
-		INT_SPIM_MASK			= (1 << INT_SPIM),
+		INT_SPIM_MASK           = (1 << INT_SPIM),
 		INT_TIMER2              = 1,
 		INT_TIMER2_MASK         = (1 << INT_TIMER2),
 		INT_UART                = 2,
@@ -871,7 +871,7 @@ private:
 		WCTLR_FI                = 0x0002,
 		WCTLR_WDEN              = 0x0001,
 
-		RTCIENR_MASK			= 0x001f,
+		RTCIENR_MASK            = 0x001f,
 	};
 
 	void grpmaska_w(u16 data);
@@ -1087,7 +1087,7 @@ private:
 		CSC_MASK                = 0xf9ff,
 		CSD_MASK                = 0xffff,
 		EMUCS_MASK              = 0x0070,
-		CS_EN_BIT				= 0,
+		CS_EN_BIT               = 0,
 		CS_SIZ_MASK             = 0x000e,
 		CS_SIZ_SHIFT            = 1,
 		CS_WS_MASK              = 0x0070,

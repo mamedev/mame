@@ -94,7 +94,7 @@ void x1_012_device::vctrl_w(offs_t offset, u16 data, u16 mem_mask)
 	//
 	// For the time being, we simply use a trampoline in the seta.cpp driver for Caliber 50 _only_, rather than
 	// correctly reflecting current register values in all games.
-	
+
 	// m_screen->update_partial(m_screen->vpos()); // causes breakage, see note above
 
 

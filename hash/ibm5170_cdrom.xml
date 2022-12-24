@@ -1004,7 +1004,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="language" value="English/French/German" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Blackhawk (Europe) (En,Fr,De)" sha1="7031e0b00ade177a62d0df78c3f2f69fbc3e4e33" />
@@ -2280,7 +2280,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="region" value="Europe" />
 		<info name="version" value="1.1" />
 		<sharedfeat name="platform" value="DOS" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Hocus Pocus (Europe)" sha1="bfd4f851c81965448daf9e2087723c50ec8a7ed8" />
@@ -2300,7 +2300,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="region" value="Germany" />
 		<info name="version" value="1.0" />
 		<sharedfeat name="platform" value="DOS" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Hocus Pocus (Germany)" sha1="d52bdffdb451b91f5bd65c880ba8009198ff5856" />
@@ -2320,7 +2320,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="region" value="Germany" />
 		<info name="version" value="Shareware Version 1.1" />
 		<sharedfeat name="platform" value="DOS" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Hocus Pocus (Germany) (Demo)" sha1="9fde44d5eb760c1c5847c14165894a8c6073b78f" />
@@ -2340,7 +2340,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="region" value="Spain" />
 		<info name="version" value="1.0" />
 		<sharedfeat name="platform" value="DOS" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Hocus Pocus (Spain) (Rerelease)" sha1="7f54622d68dd68da0b5185d6a5475f083315ded3" />
@@ -2360,7 +2360,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="region" value="USA" />
 		<info name="version" value="1.1" />
 		<sharedfeat name="platform" value="DOS" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Hocus Pocus (USA)" sha1="2635c948b4b0503bd616e71a950b5a02d0c40578" />
@@ -2380,7 +2380,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="region" value="USA" />
 		<info name="version" value="1.1" />
 		<sharedfeat name="platform" value="DOS" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Hocus Pocus (USA) (Alt)" sha1="04711c1e225b6127e13cda3358fb7a314c1c0b39" />
@@ -2400,7 +2400,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="region" value="USA" />
 		<info name="version" value="1.1" />
 		<sharedfeat name="platform" value="DOS" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Hocus Pocus (USA) (Alt 2)" sha1="46799b8b4e1fa697c23ebee08db3dc00818839a3" />
@@ -2420,7 +2420,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="region" value="USA" />
 		<info name="version" value="1.1" />
 		<sharedfeat name="platform" value="DOS" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Hocus Pocus (USA) (Rerelease)" sha1="7e7a696f365f79304ed68bf98bb46bcaa2dcdd13" />

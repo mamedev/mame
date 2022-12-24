@@ -1033,7 +1033,7 @@ Loads N88 BASIC then jumps to lalaland [FDC]
 		<info name="release" value="199008xx"/>
 		<info name="alt_title" value="ディー・ピー・エス SG"/>
 		<!-- Data disk for dps? -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="1261568">

@@ -57,12 +57,12 @@ service manual, but is still readily available.
       tape audio to MSX .cas files. dxconvert uses the command-line parameters
       "-p -e 4 -t 10"; I'm not sure how to interpret this, even after reading
       the code.
-      
+
       The constant used below for testing against m_cassette->input() was guessed
       through trial and error until I could get a successful load at least somewhat
       consistently. It still isn't perfect, but I don't know how to refine this
       further.
-      
+
       "dxconvert": https://github.com/rarepixel/dxconvert
       "castools": https://github.com/joyrex2001/castools
       The sample voices that I used to test can be found at
@@ -154,27 +154,27 @@ service manual, but is still readily available.
     IPT_KEYBOARD is used, so use the UI mode key (default
     Scroll Lock) to re-enable the MAME UI.
 
-	No, I don't know why some voices (such as Pianobells)
-	seem to not let you turn off modulation even if you set
-	the mod wheel to its lowest point. You can set the pitch
-	sensitivity value ("PMS", Edit/Compare key 9) to 0 to
-	force it off. This might have to do with the YM2164
-	moving the LFO Reset register; if not, it might have to
-	do with the default pitch wheel position not being 0
-	(see TODO below).
+    No, I don't know why some voices (such as Pianobells)
+    seem to not let you turn off modulation even if you set
+    the mod wheel to its lowest point. You can set the pitch
+    sensitivity value ("PMS", Edit/Compare key 9) to 0 to
+    force it off. This might have to do with the YM2164
+    moving the LFO Reset register; if not, it might have to
+    do with the default pitch wheel position not being 0
+    (see TODO below).
 
 *** Test mode
 
     To enter test mode, hold 1 and 2 on the panel while powering the system
     on. You'll see the version number, and then a prompt asking if you want
     to enter test mode; press +1 to enter test mode.
-    
+
     If 1 and 3 or 1 and 4 are held instead of 1 and 2, different subsets of the
     test mode will run instead. Furthermore, some tests will only be run on
     the DX100.
-    
+
     For more details on the individual tests, refer to the service manual.
-    
+
     To make developing this driver easier I wrote an init function for the
     DX100 1.1 driver which allows me to pick and choose which tests to actually
     run. I've disabled it in the final version of the driver, but here it is
@@ -182,57 +182,57 @@ service manual, but is still readily available.
 
 void yamaha_dx100_state::init_dx100()
 {
-	// Since test mode forcibly halts on the first failed test, and we can only choose to not run certain tests, use these blocks of code to skip specific tests.
-	// The numbering and naming below is from the service manual, which, surprise, doesn't quite line up with the way the tests are written in the code.
-	u8 *rom = (u8 *) (memregion("program")->base());
-	auto skip = [rom](u16 whichAddr, u16 jumpTo, u8 extraInst = 0, u16 nop2 = 0) {
-		if (extraInst != 0) {
-			rom[whichAddr & 0x7fff] = extraInst;
-			whichAddr++;
-		}
-		rom[whichAddr & 0x7fff] = 0x7e;
-		rom[(whichAddr + 1) & 0x7fff] = (u8) ((jumpTo >> 8) & 0xff);
-		rom[(whichAddr + 2) & 0x7fff] = (u8) (jumpTo & 0xff);
-		if (nop2 != 0) {
-			rom[nop2 & 0x7fff] = 0x01;
-			rom[(nop2 + 1) & 0x7fff] = 0x01;
-		}
-	};
-	// 1. Output level, RAM battery voltage
-	skip(0xc464, 0xc4b3);
-	// 2. RAM, cassette interface, MIDI in/out, MIDI thru
-	// This is hard to skip as a unit in the code, so you need to skip them individually:
-		// Or to only disable a subset of these tests:
-		// 2a. RAM test
-		rom[0xc55f & 0x7fff] = 0x39;
-		// 2b. Cassette interface test (I'm not entirely sure MAME's cassette interface
-		//     supports the direct writing; I *think* this is MSX format?)
-		rom[0xc66e & 0x7fff] = 0x39;
-		// 2c. MIDI in/out (I'm not sure why this is failing, but something's not right)
-		rom[0xc631 & 0x7fff] = 0x39;
-		// 2d. MIDI thru
-		skip(0xc6b0, 0xc52a, 0, 0xc4dd);
-	// 3. LCD test
-	// This is actually two tests in the code, so you need to skip them individually:
-		// 2a. LCD solid flashing test
-		skip(0xc6e1, 0xc52a, 0, 0xc4e6);
-		// 2b. LCD checkerboard test
-		skip(0xc6d1, 0xc52a, 0, 0xc4ef);
-	// 4. Pitch wheel, mod wheel, data entry slider, breath controller, foot switch
-	// AND (run as part of 4 in the code)
-	// 5. Foot switch detecting circuit
-	skip(0xc70f, 0xc7a9);
-		// Or to only disable a subset of these tests:
-		// 4a/5. Foot switch tests
-		skip(0xc7b3, 0xc7a9, 0x38);
-	// 6. Keyboard
-	skip(0xc86e, 0xc927);
-	// 7. LCD contrast
-	// AND (run as part of 7 in the code)
-	// 8. Main power, LED flash on low power
-	skip(0xc927, 0xc98f);
-	// 9. Panel switches
-	skip(0xc9d3, 0xca50);
+    // Since test mode forcibly halts on the first failed test, and we can only choose to not run certain tests, use these blocks of code to skip specific tests.
+    // The numbering and naming below is from the service manual, which, surprise, doesn't quite line up with the way the tests are written in the code.
+    u8 *rom = (u8 *) (memregion("program")->base());
+    auto skip = [rom](u16 whichAddr, u16 jumpTo, u8 extraInst = 0, u16 nop2 = 0) {
+        if (extraInst != 0) {
+            rom[whichAddr & 0x7fff] = extraInst;
+            whichAddr++;
+        }
+        rom[whichAddr & 0x7fff] = 0x7e;
+        rom[(whichAddr + 1) & 0x7fff] = (u8) ((jumpTo >> 8) & 0xff);
+        rom[(whichAddr + 2) & 0x7fff] = (u8) (jumpTo & 0xff);
+        if (nop2 != 0) {
+            rom[nop2 & 0x7fff] = 0x01;
+            rom[(nop2 + 1) & 0x7fff] = 0x01;
+        }
+    };
+    // 1. Output level, RAM battery voltage
+    skip(0xc464, 0xc4b3);
+    // 2. RAM, cassette interface, MIDI in/out, MIDI thru
+    // This is hard to skip as a unit in the code, so you need to skip them individually:
+        // Or to only disable a subset of these tests:
+        // 2a. RAM test
+        rom[0xc55f & 0x7fff] = 0x39;
+        // 2b. Cassette interface test (I'm not entirely sure MAME's cassette interface
+        //     supports the direct writing; I *think* this is MSX format?)
+        rom[0xc66e & 0x7fff] = 0x39;
+        // 2c. MIDI in/out (I'm not sure why this is failing, but something's not right)
+        rom[0xc631 & 0x7fff] = 0x39;
+        // 2d. MIDI thru
+        skip(0xc6b0, 0xc52a, 0, 0xc4dd);
+    // 3. LCD test
+    // This is actually two tests in the code, so you need to skip them individually:
+        // 2a. LCD solid flashing test
+        skip(0xc6e1, 0xc52a, 0, 0xc4e6);
+        // 2b. LCD checkerboard test
+        skip(0xc6d1, 0xc52a, 0, 0xc4ef);
+    // 4. Pitch wheel, mod wheel, data entry slider, breath controller, foot switch
+    // AND (run as part of 4 in the code)
+    // 5. Foot switch detecting circuit
+    skip(0xc70f, 0xc7a9);
+        // Or to only disable a subset of these tests:
+        // 4a/5. Foot switch tests
+        skip(0xc7b3, 0xc7a9, 0x38);
+    // 6. Keyboard
+    skip(0xc86e, 0xc927);
+    // 7. LCD contrast
+    // AND (run as part of 7 in the code)
+    // 8. Main power, LED flash on low power
+    skip(0xc927, 0xc98f);
+    // 9. Panel switches
+    skip(0xc9d3, 0xca50);
 }
 
 *******************************************************************************/
@@ -525,7 +525,7 @@ static INPUT_PORTS_START(dx100)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("AN0")
 	// The pitch wheel returns to center once released.
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_CODE_INC(KEYCODE_QUOTE) PORT_CODE_DEC(KEYCODE_SLASH)
