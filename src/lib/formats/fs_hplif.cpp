@@ -37,18 +37,18 @@ public:
 		u8 hour;
 		u8 minute;
 		u8 second;
-	} __attribute__((packed));
+	};
 
 	struct hplif_dirent
 	{
 		char		m_file_name[10];
-		u16		m_file_type;
-		u32		m_starting_sector;
-		u32		m_sector_count;
+		u16			m_file_type;
+		u32			m_starting_sector;
+		u32			m_sector_count;
 		hplif_time	m_time;
-		u16		m_volume_number;
-		u32		m_general_purpose;
-	} __attribute__((packed));
+		u16			m_volume_number;
+		u32			m_general_purpose;
+	};
 
 	class block_iterator
 	{
@@ -62,8 +62,8 @@ public:
 	private:
 		const impl &		m_fs;
 		fsblk_t::block_t	m_block;
-		u8			m_sector;
-		u32			m_sector_count;
+		u8					m_sector;
+		u32					m_sector_count;
 	};
 
 	impl(fsblk_t &blockdev);
@@ -119,7 +119,7 @@ void fs::hplif_image::enumerate_f(floppy_enumerator &fe) const
 	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSDD,  630784,  "hp_lif_9121_format_1",   "HP 9212 LIF 3.5\" dual-sided double density Format 1");
 	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSDD,  709632,  "hp_lif_9121_format_2",   "HP 9121 LIF 3.5\" dual-sided double density Format 2");
 	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSDD,  788480,  "hp_lif_9121_format_3",   "HP 9121 LIF 3.5\" dual-sided double density Format 3");
-	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::SSDD,  286720,  "hp_lif_9121_format_4",   "HP 9121 LIF 3.5\" singe-sided double density Format 4");
+	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::SSDD,  286720,  "hp_lif_9121_format_4",   "HP 9121 LIF 3.5\" single-sided double density Format 4");
 	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSDD,  737280,  "hp_lif_9121_format_16",  "HP 9121 LIF 3.5\" dual-sided double density Format 16");
 
 	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSHD, 1261568, "hp_lif_9122_format_014", "HP 9122 LIF 3.5\" dual-sided high density Format 0, 1, 4");
@@ -404,9 +404,7 @@ util::arbitrary_datetime impl::decode_datetime(const hplif_time *time) const
 
 meta_data impl::metadata_from_dirent(const hplif_dirent &dirent) const
 {
-	std::string file_type;
-
-	file_type = util::string_format("0x%04X", (int)big_endianize_int16(dirent.m_file_type));
+	std::string file_type = util::string_format("0x%04X", big_endianize_int16(dirent.m_file_type));
 
 	// build the metadata and return it
 	meta_data result;
