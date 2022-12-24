@@ -4996,18 +4996,24 @@ void s3_vga_device::mem_w(offs_t offset, uint8_t data)
 
 /******************************************
 
-gamtor.c implementation (TODO: identify the video card)
+gamtor.cpp implementation
 
 ******************************************/
 
+// TODO: looks like custom SVGA implementation, move to own file
 uint8_t gamtor_vga_device::mem_r(offs_t offset)
 {
+	if (!machine().side_effects_disabled())
+		logerror("Reading gamtor SVGA memory %08x\n", offset);
 	return vga.memory[offset];
 }
 
 void gamtor_vga_device::mem_w(offs_t offset, uint8_t data)
 {
-	vga.memory[offset] = data;
+	if (offset & 2)
+		vga.memory[(offset >> 2) + 0x20000] = data;
+	else
+		vga.memory[(offset & 1) | (offset >> 1)] = data;
 }
 
 
@@ -5081,6 +5087,12 @@ void gamtor_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 			vga_device::port_03d0_w(offset ^ 3,data);
 			break;
 	}
+}
+
+uint16_t gamtor_vga_device::offset()
+{
+	// TODO: pinpoint whatever extra register that wants this shifted by 1
+	return vga_device::offset() << 1;
 }
 
 uint16_t ati_vga_device::offset()
