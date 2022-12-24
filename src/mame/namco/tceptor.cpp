@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "tceptor.h"
 
+#include "cpu/m6502/r65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6801.h"
 #include "cpu/m68000/m68000.h"
@@ -317,10 +318,10 @@ void tceptor_state::tceptor(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(49'152'000)/32);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tceptor_state::m6809_map);
 
-	M65C02(config, m_audiocpu[0], XTAL(49'152'000)/24);
+	R65C02(config, m_audiocpu[0], XTAL(49'152'000)/24);
 	m_audiocpu[0]->set_addrmap(AS_PROGRAM, &tceptor_state::m6502_a_map);
 
-	M65C02(config, m_audiocpu[1], XTAL(49'152'000)/24);
+	R65C02(config, m_audiocpu[1], XTAL(49'152'000)/24);
 	m_audiocpu[1]->set_addrmap(AS_PROGRAM, &tceptor_state::m6502_b_map);
 
 	M68000(config, m_subcpu, XTAL(49'152'000)/4);
@@ -333,7 +334,7 @@ void tceptor_state::tceptor(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	adc0809_device &adc(ADC0809(config, "adc", 1000000)); // unknown clock (needs to >640khz or the wait loop is too fast)
+	adc0809_device &adc(ADC0809(config, "adc", 768000)); // unknown clock
 	adc.in_callback<0>().set_constant(0); // unknown
 	adc.in_callback<1>().set_ioport("PEDAL");
 	adc.in_callback<2>().set_ioport("STICKX");
@@ -384,10 +385,10 @@ ROM_START( tceptor )
 	ROM_REGION( 0x10000, "maincpu", 0 )         // 68A09EP
 	ROM_LOAD( "tc1-1.10f",  0x08000, 0x08000, CRC(4c6b063e) SHA1(d9701657186f8051391084f51a720037f9f418b1) )
 
-	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RC65C02
+	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RP65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
-	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RC65C02
+	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RP65C02
 	ROM_LOAD( "tc1-22.3m",  0x08000, 0x08000, CRC(9f5a3e98) SHA1(2b2ffe39fe647a3039b92721817bddc9e9a92d82) )
 
 	ROM_REGION( 0x110000, "sub", 0 )            // MC68000-12
@@ -440,10 +441,10 @@ ROM_START( tceptor2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )         // 68A09EP
 	ROM_LOAD( "tc2-1.10f",  0x08000, 0x08000, CRC(f953f153) SHA1(f4cd0a133d23b4bf3c24c70c28c4ecf8ad4daf6f) )
 
-	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RC65C02
+	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RP65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
-	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RC65C02
+	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RP65C02
 	ROM_LOAD( "tc1-22.3m",  0x08000, 0x08000, CRC(9f5a3e98) SHA1(2b2ffe39fe647a3039b92721817bddc9e9a92d82) )
 
 	ROM_REGION( 0x110000, "sub", 0 )            // MC68000-12
