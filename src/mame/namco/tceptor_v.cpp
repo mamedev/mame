@@ -273,8 +273,8 @@ void tceptor_state::decode_sprite16(const char * region)
 			2*8, 2*8+1, 2*8+2, 2*8+3, 3*8, 3*8+1, 3*8+2, 3*8+3
 		},
 		{
-				0*2*16,  1*2*16,  2*2*16,  3*2*16,  4*2*16,  5*2*16,  6*2*16,  7*2*16,
-				8*2*16,  9*2*16, 10*2*16, 11*2*16, 12*2*16, 13*2*16, 14*2*16, 15*2*16
+			0*2*16,  1*2*16,  2*2*16,  3*2*16,  4*2*16,  5*2*16,  6*2*16,  7*2*16,
+			8*2*16,  9*2*16, 10*2*16, 11*2*16, 12*2*16, 13*2*16, 14*2*16, 15*2*16
 		},
 		2*16*16
 	};
@@ -422,9 +422,8 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	uint16_t *mem1 = &m_sprite_ram_buffered[0x000/2];
 	uint16_t *mem2 = &m_sprite_ram_buffered[0x100/2];
 	int need_mask = 0;
-	int i;
 
-	for (i = 0; i < 0x100; i += 2)
+	for (int i = 0; i < 0x100; i += 2)
 	{
 		int scalex = (mem1[1 + i] & 0xfc00) << 1;
 		int scaley = (mem1[0 + i] & 0xfc00) << 1;
@@ -469,16 +468,15 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			x -= 64;
 			y -= 78;
 
-
-						m_gfxdecode->gfx(gfx)->zoom_transmask(bitmap,
-						cliprect,
-						code,
-						color,
-						flipx, flipy,
-						x, y,
-						scalex,
-						scaley,
-						m_palette->transpen_mask(*m_gfxdecode->gfx(gfx), color, SPR_TRANS_COLOR));
+			m_gfxdecode->gfx(gfx)->zoom_transmask(bitmap,
+					cliprect,
+					code,
+					color,
+					flipx, flipy,
+					x, y,
+					scalex,
+					scaley,
+					m_palette->transpen_mask(*m_gfxdecode->gfx(gfx), color, SPR_TRANS_COLOR));
 		}
 	}
 

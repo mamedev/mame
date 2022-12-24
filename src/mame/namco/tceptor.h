@@ -30,6 +30,8 @@ public:
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_inp(*this, "IN%u", 0U),
+		m_dsw(*this, "DSW%u", 1U),
 		m_shutter(*this, "shutter")
 	{ }
 
@@ -58,6 +60,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	required_ioport_array<2> m_inp;
+	required_ioport_array<2> m_dsw;
 	output_finder<> m_shutter;
 
 	uint8_t m_m6809_irq_enable = 0;
