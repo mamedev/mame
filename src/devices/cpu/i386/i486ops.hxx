@@ -526,7 +526,12 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 			CYCLES(CYCLES_MOV_REG_CR3);
 			vtlb_flush_dynamic();
 			break;
-		case 4: CYCLES(1); break; // TODO
+		case 4:
+			//Check for modifications to CR4's PGE and PAE bits. If they've been modified, flush TLB.
+			if((oldcr ^ m_cr[cr]) & 0x000000a0)
+				vtlb_flush_dynamic();
+			CYCLES(1);
+			break;
 		default:
 			logerror("i386: mov_cr_r32 CR%d!\n", cr);
 			return;

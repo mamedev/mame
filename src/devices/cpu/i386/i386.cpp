@@ -167,7 +167,7 @@ uint32_t i386_device::i386_translate(int segment, uint32_t ip, int rwn)
 	return m_sreg[segment].base + ip;
 }
 
-vtlb_entry i386_device::get_permissions(uint32_t pte, int wp)
+vtlb_entry i386_device::get_permissions(uint64_t pte, int wp)
 {
 	vtlb_entry ret = VTLB_READ_ALLOWED | ((pte & 4) ? VTLB_USER_READ_ALLOWED : 0);
 	if (!wp)
@@ -177,7 +177,7 @@ vtlb_entry i386_device::get_permissions(uint32_t pte, int wp)
 	return ret;
 }
 
-bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_entry *entry)
+bool i386_device::i386_translate_address_normal(int intention, offs_t *address, vtlb_entry *entry)
 {
 	uint32_t a = *address;
 	uint32_t pdbr = m_cr[3] & 0xfffff000;
@@ -265,6 +265,102 @@ bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_en
 	return ret;
 }
 
+//This really needs 64-bit emumem to be complete, but this should be enough to appease OSes that expect PAE but not 36-bit physaddrs.
+bool i386_device::i386_translate_address_pae(int intention, offs_t *address, vtlb_entry *entry)
+{
+	uint32_t a = *address;
+	uint32_t pdbr = m_cr[3] & 0xffffffe0;
+	uint32_t directory_table = (a >> 30) & 0x3;
+	uint32_t directory = (a >> 21) & 0x3ff;
+	uint32_t table = (a >> 12) & 0x1ff;
+	vtlb_entry perm = 0;
+	bool ret;
+	bool user = (intention & TRANSLATE_USER_MASK) ? true : false;
+	bool write = (intention & TRANSLATE_WRITE) ? true : false;
+	bool debug = (intention & TRANSLATE_DEBUG_MASK) ? true : false;
+
+	if (!(m_cr[0] & 0x80000000))
+	{
+		if (entry)
+			*entry = 0x77;
+		return true;
+	}
+
+	uint64_t page_dir_table_ent = m_program->read_qword(pdbr + directory_table * 8);
+	if (page_dir_table_ent & 1)
+	{
+		uint32_t page_dir_addr = (page_dir_table_ent & 0xffffc000) + directory * 8;
+		uint64_t page_dir = m_program->read_qword(page_dir_addr);
+		if (page_dir & 1)
+		{
+			if ((page_dir & 0x80) && (m_cr[4] & 0x10))
+			{
+				a = (page_dir & 0xffc00000) | (a & 0x001fffff);
+				if (debug)
+				{
+					*address = a;
+					return true;
+				}
+				perm = get_permissions(page_dir, WP);
+				if (write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+					ret = false;
+				else if (user && !(perm & VTLB_USER_READ_ALLOWED))
+					ret = false;
+				else
+				{
+					if (write)
+						perm |= VTLB_FLAG_DIRTY;
+					if (!(page_dir & 0x40) && write)
+						m_program->write_qword(page_dir_addr, page_dir | 0x60);
+					else if (!(page_dir & 0x20))
+						m_program->write_qword(page_dir_addr, page_dir | 0x20);
+					ret = true;
+				}
+			}
+			else
+			{
+				uint32_t page_entry_addr = (page_dir & 0xfffff000) + table * 8;
+				uint64_t page_entry = m_program->read_qword(page_entry_addr);
+				if (page_entry & 1)
+				{
+					a = (page_entry & 0xfffff000) + (a & 0xfff);
+					if (debug)
+					{
+						*address = a;
+						return true;
+					}
+					perm = get_permissions(page_entry, WP);
+					if (write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+						ret = false;
+					else if (user && !(perm & VTLB_USER_READ_ALLOWED))
+						ret = false;
+					else
+					{
+						if (write)
+							perm |= VTLB_FLAG_DIRTY;
+						if (!(page_entry & 0x40) && write)
+							m_program->write_qword(page_entry_addr, page_entry | 0x60);
+						else if (!(page_entry & 0x20))
+							m_program->write_qword(page_entry_addr, page_entry | 0x20);
+						ret = true;
+					}
+				}
+				else
+					ret = false;
+			}
+		}
+		else
+			ret = false;
+	}
+	else
+		ret = false;
+	if (entry)
+		*entry = perm;
+	if (ret)
+		*address = a;
+	return ret;
+}
+
 //#define TEST_TLB
 
 bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t *error)
@@ -285,15 +381,30 @@ bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_
 
 	if (!(entry & VTLB_FLAG_VALID) || ((type & TRANSLATE_WRITE) && !(entry & VTLB_FLAG_DIRTY)))
 	{
-		if (!i386_translate_address(type, address, &entry))
+		if (!(m_cr[4] & 0x00000020))
 		{
-			*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
-			if (entry)
-				*error |= 1;
-			return false;
+			if (!i386_translate_address_normal(type, address, &entry))
+			{
+				*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
+				if (entry)
+					*error |= 1;
+				return false;
+			}
+			vtlb_dynload(index, *address, entry);
+			return true;
 		}
-		vtlb_dynload(index, *address, entry);
-		return true;
+		else
+		{
+			if (!i386_translate_address_pae(type, address, &entry))
+			{
+				*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
+				if (entry)
+					*error |= 1;
+				return false;
+			}
+			vtlb_dynload(index, *address, entry);
+			return true;
+		}
 	}
 	if (!(entry & (1 << type)))
 	{
@@ -302,7 +413,7 @@ bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_
 	}
 	*address = (entry & 0xfffff000) | (*address & 0xfff);
 #ifdef TEST_TLB
-	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
+	int test_ret = i386_translate_address_normal(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
 	if (!test_ret || (test_addr != *address))
 		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, m_pc);
 #endif
@@ -1728,8 +1839,12 @@ uint8_t i386_device::read8_debug(uint32_t ea, uint8_t *data)
 {
 	uint32_t address = ea;
 
-	if(!i386_translate_address(TRANSLATE_DEBUG_MASK,&address,nullptr))
-		return 0;
+	if (!(m_cr[4] & 0x20))
+	{
+		if (!i386_translate_address_normal(TRANSLATE_DEBUG_MASK,&address,nullptr))
+			return 0;
+	}
+	else if (!i386_translate_address_pae(TRANSLATE_DEBUG_MASK,&address,nullptr))
 
 	address &= m_a20_mask;
 	*data = m_program->read_byte(address);
@@ -1863,7 +1978,12 @@ uint64_t i386_device::debug_virttophys(int params, const uint64_t *param)
 {
 	uint32_t result = param[0];
 
-	if(!i386_translate_address(TRANSLATE_DEBUG_MASK,&result,nullptr))
+	if (!(m_cr[4] & 0x20))
+	{
+		if (!i386_translate_address_normal(TRANSLATE_DEBUG_MASK,&result,nullptr))
+			return 0;
+	}
+	else if (!i386_translate_address_pae(TRANSLATE_DEBUG_MASK,&result,nullptr))
 		return 0;
 	return result;
 }
@@ -2826,8 +2946,11 @@ void i386_device::execute_run()
 bool i386_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	bool ret = true;
-	if(spacenum == AS_PROGRAM)
-		ret = i386_translate_address(intention, &address, nullptr);
+	if (spacenum == AS_PROGRAM)
+	{
+		if (!(m_cr[4] & 0x20)) ret = i386_translate_address_normal(intention, &address, nullptr);
+		else ret = i386_translate_address_pae(intention, &address, nullptr);
+	}
 	address &= m_a20_mask;
 	return ret;
 }
@@ -3126,11 +3249,13 @@ void pentium_pro_device::device_reset()
 	// [ 2:2] I/O breakpoints
 	// [ 4:4] Time Stamp Counter
 	// [ 5:5] Pentium CPU style model specific registers
+	// [ 6:6] Physical Address Extension
 	// [ 7:7] Machine Check Exception
 	// [ 8:8] CMPXCHG8B instruction
+	// [13:13] Page Global Extension
 	// [15:15] CMOV and FCMOV
 	// No MMX
-	m_feature_flags = 0x000081bf;
+	m_feature_flags = 0x0000a1ff;
 
 	CHANGE_PC(m_eip);
 }
@@ -3267,7 +3392,13 @@ void pentium2_device::device_reset()
 	m_cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
-	m_feature_flags = 0x008081bf;       // TODO: enable relevant flags here
+	// [ 6:6] Physical Address Extension
+	// [ 7:7] Machine Check Exception
+	// [ 8:8] CMPXCHG8B instruction
+	// [13:13] Page Global Extension
+	// [23:23] MMX
+	// [24:24] FXSAVE/FXRSTOR
+	m_feature_flags = 0x0180a1ff;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
 }
@@ -3332,12 +3463,14 @@ void pentium3_device::device_reset()
 	m_cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
-	// [ 4:4] Time Stamp Counter
+	// [ 4:4] Time Stamp Counter// [ 6:6] Physical Address Extension
+	// [ 7:7] Machine Check Exception
 	// [ 8:8] CMPXCHG8B instruction
-	// [ D:D] PTE Global Bit
+	// [13:13] Page Global Extension
 	// [15:15] CMOV and FCMOV
 	// [18:18] PSN (Processor Serial Number, P3 only)
-	m_feature_flags = 0x0004a111;       // TODO: enable relevant flags here
+	// [25:25] SSE1
+	m_feature_flags = 0x0384a1ff;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
 }
@@ -3430,7 +3563,9 @@ void pentium4_device::device_reset()
 	// [ 0:0] FPU on chip
 	// [ 8:8] CMPXCHG8B instruction
 	// [15:15] CMOV and FCMOV
-	m_feature_flags = 0x00008101;       // TODO: enable relevant flags here
+	// [25:25] SSE1
+	// [26:26] SSE2
+	m_feature_flags = 0x0780a1ff;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
 }
