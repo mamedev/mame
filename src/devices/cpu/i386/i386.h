@@ -396,8 +396,9 @@ protected:
 	void register_state_i386_x87();
 	void register_state_i386_x87_xmm();
 	uint32_t i386_translate(int segment, uint32_t ip, int rwn);
-	inline vtlb_entry get_permissions(uint32_t pte, int wp);
-	bool i386_translate_address(int intention, offs_t *address, vtlb_entry *entry);
+	inline vtlb_entry get_permissions(uint64_t pte, int wp);
+	bool i386_translate_address_normal(int intention, offs_t *address, vtlb_entry *entry);
+	bool i386_translate_address_pae(int intention, offs_t *address, vtlb_entry *entry);
 	bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
 	void CHANGE_PC(uint32_t pc);
 	inline void NEAR_BRANCH(int32_t offs);
