@@ -387,30 +387,15 @@ bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_
 
 	if (!(entry & VTLB_FLAG_VALID) || ((type & TRANSLATE_WRITE) && !(entry & VTLB_FLAG_DIRTY)))
 	{
-		if (!(m_cr[4] & 0x00000020))
+		if (!i386_translate_address(type, address, &entry))
 		{
-			if (!i386_translate_address_normal(type, address, &entry))
-			{
-				*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
-				if (entry)
-					*error |= 1;
-				return false;
-			}
-			vtlb_dynload(index, *address, entry);
-			return true;
+			*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
+			if (entry)
+				*error |= 1;
+			return false;
 		}
-		else
-		{
-			if (!i386_translate_address_pae(type, address, &entry))
-			{
-				*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
-				if (entry)
-					*error |= 1;
-				return false;
-			}
-			vtlb_dynload(index, *address, entry);
-			return true;
-		}
+		vtlb_dynload(index, *address, entry);
+		return true;
 	}
 	if (!(entry & (1 << type)))
 	{
@@ -419,7 +404,7 @@ bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_
 	}
 	*address = (entry & 0xfffff000) | (*address & 0xfff);
 #ifdef TEST_TLB
-	int test_ret = i386_translate_address_normal(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
+	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
 	if (!test_ret || (test_addr != *address))
 		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, m_pc);
 #endif
@@ -1845,12 +1830,8 @@ uint8_t i386_device::read8_debug(uint32_t ea, uint8_t *data)
 {
 	uint32_t address = ea;
 
-	if (!(m_cr[4] & 0x20))
-	{
-		if (!i386_translate_address_normal(TRANSLATE_DEBUG_MASK,&address,nullptr))
-			return 0;
-	}
-	else if (!i386_translate_address_pae(TRANSLATE_DEBUG_MASK,&address,nullptr))
+	if (!i386_translate_address(TRANSLATE_DEBUG_MASK,&address,nullptr))
+		return 0;
 
 	address &= m_a20_mask;
 	*data = m_program->read_byte(address);
@@ -1984,12 +1965,7 @@ uint64_t i386_device::debug_virttophys(int params, const uint64_t *param)
 {
 	uint32_t result = param[0];
 
-	if (!(m_cr[4] & 0x20))
-	{
-		if (!i386_translate_address_normal(TRANSLATE_DEBUG_MASK,&result,nullptr))
-			return 0;
-	}
-	else if (!i386_translate_address_pae(TRANSLATE_DEBUG_MASK,&result,nullptr))
+	if (!i386_translate_address(TRANSLATE_DEBUG_MASK,&result,nullptr))
 		return 0;
 	return result;
 }
@@ -2953,10 +2929,7 @@ bool i386_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	bool ret = true;
 	if (spacenum == AS_PROGRAM)
-	{
-		if (!(m_cr[4] & 0x20)) ret = i386_translate_address_normal(intention, &address, nullptr);
-		else ret = i386_translate_address_pae(intention, &address, nullptr);
-	}
+		ret = i386_translate_address(intention, &address, nullptr);
 	address &= m_a20_mask;
 	return ret;
 }
