@@ -5123,6 +5123,8 @@ if (BUSES["PC8801"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc8801/pcg8100.h",
 		MAME_DIR .. "src/devices/bus/pc8801/jmbx1.cpp",
 		MAME_DIR .. "src/devices/bus/pc8801/jmbx1.h",
+		MAME_DIR .. "src/devices/bus/pc8801/hmb20.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/hmb20.h",
 	}
 end
 

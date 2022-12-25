@@ -119,11 +119,14 @@ void pc8801_exp_device::device_start()
 #include "pcg8100.h"
 #include "pc8801_23.h"
 #include "jmbx1.h"
+#include "hmb20.h"
 
 void pc8801_exp_devices(device_slot_interface &device)
 {
 	device.option_add("sbii", PC8801_23);
 
 	device.option_add("pcg8100", PCG8100);
+
 	device.option_add("jmbx1", JMBX1);
+	device.option_add("hmb20", HMB20);
 }
