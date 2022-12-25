@@ -5004,14 +5004,14 @@ gamtor.cpp implementation
 // 65550 is used by Apple PowerBook 2400c
 // 65535 is used by IBM PC-110
 
-uint8_t gamtor_vga_device::mem_r(offs_t offset)
+uint8_t gamtor_vga_device::mem_linear_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		logerror("Reading gamtor SVGA memory %08x\n", offset);
 	return vga.memory[offset];
 }
 
-void gamtor_vga_device::mem_w(offs_t offset, uint8_t data)
+void gamtor_vga_device::mem_linear_w(offs_t offset, uint8_t data)
 {
 	if (offset & 2)
 		vga.memory[(offset >> 2) + 0x20000] = data;
