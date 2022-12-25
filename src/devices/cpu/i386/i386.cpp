@@ -361,6 +361,12 @@ bool i386_device::i386_translate_address_pae(int intention, offs_t *address, vtl
 	return ret;
 }
 
+bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_entry *entry)
+{
+	if (!m_cr[4] & 0x20) return i386_translate_address_normal(intention, address, entry);
+	else return i386_translate_address_pae(intention, address, entry);
+}
+
 //#define TEST_TLB
 
 bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t *error)
