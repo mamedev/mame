@@ -2,14 +2,14 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-	HAL HMB-20
+    HAL HMB-20
 
-	Used by NRTDRV88 for PC-8801
+    Used by NRTDRV88 for PC-8801
 
-	TODO:
-	- Not extensively tested beyond on-disk songs, which in turn barely has an
-	  OPM-driven "TESTTONE.NRD";
-	- Implement HIBIKI-8800 (same as this plus extra YM3802-X MIDI controller?)
+    TODO:
+    - Not extensively tested beyond on-disk songs, which in turn barely has an
+      OPM-driven "TESTTONE.NRD";
+    - Implement HIBIKI-8800 (same as this plus extra YM3802-X MIDI controller?)
 
 **************************************************************************************************/
 
@@ -36,7 +36,7 @@ void hmb20_device::device_add_mconfig(machine_config &config)
 
 	// TODO: OPM mixing
 	YM2151(config, m_opm, hmb20_x1_clock);
-//	m_opm->irq_handler().set(FUNC(hmb20_device::int4_w));
+//  m_opm->irq_handler().set(FUNC(hmb20_device::int4_w));
 	m_opm->add_route(ALL_OUTPUTS, "^^lspeaker", 0.50);
 	m_opm->add_route(ALL_OUTPUTS, "^^rspeaker", 0.50);
 }
