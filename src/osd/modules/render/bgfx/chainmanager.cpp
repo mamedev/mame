@@ -65,6 +65,7 @@ chain_manager::chain_manager(running_machine& machine, osd_options& options, tex
 	, m_window_index(window_index)
 	, m_slider_notifier(slider_notifier)
 	, m_screen_count(0)
+	, m_default_chain_index(-1)
 {
 	m_converters.clear();
 	refresh_available_chains();
@@ -87,6 +88,20 @@ void chain_manager::init_texture_converters()
 	m_adjuster = m_effects.get_or_load_effect(m_options, "misc/bcg_adjust");
 }
 
+void chain_manager::get_default_chain_info(std::string &out_chain_name, int32_t &out_chain_index)
+{
+	if (m_default_chain_index == -1)
+	{
+		out_chain_index = CHAIN_NONE;
+		out_chain_name = "";
+		return;
+	}
+
+	out_chain_index = m_default_chain_index;
+	out_chain_name = "default";
+	return;
+}
+
 void chain_manager::refresh_available_chains()
 {
 	m_available_chains.clear();
@@ -94,6 +109,16 @@ void chain_manager::refresh_available_chains()
 
 	const std::string chains_path  = util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path());
 	find_available_chains(chains_path, "");
+	if (m_default_chain_index == -1)
+	{
+		for (size_t i = 0; i < m_available_chains.size(); i++)
+		{
+			if (m_available_chains[i].m_name == "default")
+			{
+				m_default_chain_index = int32_t(i);
+			}
+		}
+	}
 
 	destroy_unloaded_chains();
 }
@@ -112,8 +137,7 @@ void chain_manager::destroy_unloaded_chains()
 				{
 					delete m_screen_chains[i];
 					m_screen_chains[i] = nullptr;
-					m_chain_names[i] = "";
-					m_current_chain[i] = CHAIN_NONE;
+					get_default_chain_info(m_chain_names[i], m_current_chain[i]);
 					break;
 				}
 			}
@@ -332,7 +356,7 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, screen_p
 	}
 
 	bgfx_chain* chain = screen_chain(screen);
-	chain->process(prim, view, screen, m_textures, window, bgfx_util::get_blend_state(PRIMFLAG_GET_BLENDMODE(prim.m_flags)));
+	chain->process(prim, view, screen, m_textures, window);
 	view += chain->applicable_passes();
 }
 
@@ -381,8 +405,12 @@ void chain_manager::update_screen_count(uint32_t screen_count)
 		while (m_screen_chains.size() < m_screen_count)
 		{
 			m_screen_chains.push_back(nullptr);
-			m_chain_names.push_back("");
-			m_current_chain.push_back(CHAIN_NONE);
+
+			int32_t chain_index = CHAIN_NONE;
+			std::string chain_name = "";
+			get_default_chain_info(chain_name, chain_index);
+			m_chain_names.push_back(chain_name);
+			m_current_chain.push_back(chain_index);
 		}
 
 		// Ensure we have a screen chain selection slider per screen

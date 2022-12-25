@@ -47,7 +47,8 @@ void bgfx_effect::submit(int view, uint64_t blend)
 	{
 		(uniform_pair.second)->upload();
 	}
-	bgfx::setState(m_state | blend);
+	const uint64_t final_blend = (blend != ~0ULL) ? ((m_state & ~BGFX_STATE_BLEND_MASK) | blend) : m_state;
+	bgfx::setState(final_blend);
 	bgfx::submit(view, m_program_handle);
 }
 
