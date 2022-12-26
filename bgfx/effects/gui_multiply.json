@@ -10,7 +10,9 @@
 	"blend": {
 		"equation": "add",
 		"srcColor": "dstcolor",
-		"dstColor": "0"
+		"dstColor": "0",
+		"srcAlpha": "dstalpha",
+		"dstAlpha": "0"
 	},
 	"depth": {
 		"function": "always"

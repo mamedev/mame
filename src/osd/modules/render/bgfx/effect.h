@@ -25,7 +25,7 @@ public:
 	bgfx_effect(uint64_t state, bgfx::ShaderHandle vertex_shader, bgfx::ShaderHandle fragment_shader, std::vector<bgfx_uniform*> uniforms);
 	~bgfx_effect();
 
-	void submit(int view, uint64_t blend = ~0ULL);
+	void submit(int view, uint64_t blend = 0L);
 	bgfx_uniform *uniform(std::string name);
 	bool is_valid() { return m_program_handle.idx != bgfx::kInvalidHandle; }
 
