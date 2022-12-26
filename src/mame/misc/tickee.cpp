@@ -29,6 +29,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
+#include "sound/ymopm.h"
 #include "video/tlc34076.h"
 
 #include "screen.h"
@@ -133,8 +134,6 @@ private:
 	uint16_t ffff_r();
 	uint16_t rapidfir_gun1_r();
 	uint16_t rapidfir_gun2_r();
-	uint16_t ff7f_r();
-	void ff7f_w(uint16_t data);
 	void rapidfir_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// Sound
@@ -408,17 +407,6 @@ uint16_t tickee_gun_state::rapidfir_gun2_r()
 }
 
 
-uint16_t tickee_gun_state::ff7f_r()
-{
-	/* Ticket dispenser status? */
-	return 0xff7f;
-}
-
-void tickee_gun_state::ff7f_w(uint16_t data)
-{
-	/* Ticket dispenser output? */
-}
-
 void tickee_gun_state::rapidfir_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* other bits like control on tickee? */
@@ -538,7 +526,7 @@ void tickee_gun_state::rapidfir_map(address_map &map)
 	map(0xfc100000, 0xfc1000ff).mirror(0x80000).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0xfc200000, 0xfc207fff).ram().share("nvram");
 	map(0xfc300000, 0xfc30000f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0xfc400010, 0xfc40001f).rw(FUNC(tickee_gun_state::ff7f_r), FUNC(tickee_gun_state::ff7f_w));
+	map(0xfc400000, 0xfc40001f).rw("ym", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0xfe000000, 0xffffffff).rom().region("user1", 0);
 }
 
@@ -855,7 +843,9 @@ void tickee_gun_state::rapidfir(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);
+	YM2151(config, "ym", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.75);
+
+	OKIM6295(config, m_oki, OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
