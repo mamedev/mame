@@ -27,14 +27,30 @@ private:
 	required_shared_ptr<uint8_t> m_mainram;
 
 	void chesskng_map(address_map &map);
+	void chesskng_io(address_map &map);
+
+	uint8_t unk_3f_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
+uint8_t chesskng_state::unk_3f_r()
+{
+	return machine().rand();
+}
+
 void chesskng_state::chesskng_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram().share(m_mainram); // 2x SRM20256 RAM
-	map(0xc0000, 0xfffff).rom().region("maincpu", 0x00000);
+	map(0x80000, 0x9ffff).rom().region("maincpu", 0x00000);
+
+	// where does ROM address 0x20000 map?
+	map(0xf0000, 0xfffff).rom().region("maincpu", 0x30000);
+}
+
+void chesskng_state::chesskng_io(address_map &map)
+{
+	map(0x3f, 0x3f).r(FUNC(chesskng_state::unk_3f_r));
 }
 
 uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -75,6 +91,7 @@ void chesskng_state::chesskng(machine_config &config)
 	// Basic machine hardware
 	V20(config, m_maincpu, 9600000); // D70108HG-10 V20, Unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesskng_state::chesskng_map);
+	m_maincpu->set_addrmap(AS_IO, &chesskng_state::chesskng_io);
 
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
