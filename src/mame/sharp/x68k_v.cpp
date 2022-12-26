@@ -675,8 +675,6 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	rect.min_x=m_crtc->hbegin();
 	rect.min_y=m_crtc->vbegin();
-//  rect.max_x=rect.min_x + m_crtc->visible_width()-1;
-//  rect.max_y=rect.min_y + m_crtc->visible_height()-1;
 	rect.max_x=m_crtc->hend();
 	rect.max_y=m_crtc->vend();
 
@@ -701,6 +699,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		}
 	}
 
+	// draw the lowest priority BG with TILEMAP_DRAW_OPAQUE as a fallback
 	bool clear = false;
 	if(m_video.reg[2] & 0x0040)
 	{
@@ -765,8 +764,8 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		draw_sprites(m_pcgbitmap,3,pcgrect);
 	}
 
+	// Set up priorities
 	int gfxprio = -1, textprio = -1, pcgprio = -1, currprio = 0;
-
 	for(int priority = 0; priority < 3; priority++)
 	{
 		if((m_video.text_pri == priority) && (m_video.reg[2] & 0x0020) && !m_crtc->text_layer_buffer())
@@ -786,7 +785,10 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		}
 	}
 
-	bool blend = (((m_video.reg[2] & 0x1900) == 0x1900) && (m_video.gfx_pri != 2));
+	// Blend gfx with priority winner of text/PCG
+	bool textblend = (((m_video.reg[2] & 0x1900) == 0x1900) && (m_video.gfx_pri != 2));
+
+	// Combine layers per pixel
 	for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
 	{
 		for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
@@ -794,39 +796,45 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 			if((m_video.reg[2] & 0x1800) == 0x1000) // special priority
 			{
 				uint16_t colour = m_special.pix(scanline / divisor, pixel) & 0xff;
-				// XXX: this might check the pen color not the palette index
 				if(colour & ~1)
 				{
 					bitmap.pix(scanline, pixel) = m_gfxpalette->pen(colour & ~1);
 					continue;
 				}
 			}
+
 			rgb_t outpix = bitmap.pix(scanline, pixel), pix = 0;
 			bool pcgpix = false, gfxpix = false;
 			for(priority = 0; priority < 3; priority++)
 			{
-				if(blend)
+				if((priority == textprio) && !pcgpix)
 				{
-					if((priority == textprio) && !pcgpix)
+					uint16_t colour;
+					if(get_text_pixel(scanline, pixel, &colour))
 					{
-						uint16_t colour;
-						if(get_text_pixel(scanline, pixel, &colour))
-						{
-							pix = m_pcgpalette->pen(colour);
-							pcgpix = true;
-						}
+						pix = m_pcgpalette->pen(colour);
+						pcgpix = true;
 					}
-					else if((priority == pcgprio) && !pcgpix)
+				}
+				else if((priority == pcgprio) && !pcgpix)
+				{
+					uint16_t colour = m_pcgbitmap.pix(scanline / divisor, pixel) & 0xff;
+					if(colour)
 					{
-						uint16_t colour = m_pcgbitmap.pix(scanline / divisor, pixel) & 0xff;
-						if(colour)
-						{
-							pix = m_pcgpalette->pen(colour);
-							pcgpix = true;
-						}
+						pix = m_pcgpalette->pen(colour);
+						pcgpix = true;
 					}
-					else if(priority == gfxprio)
+				}
+				else if(priority == gfxprio)
+				{
+					if(textblend)
 						gfxpix = true;
+					else
+						pix = get_gfx_pixel<false>(scanline, pixel, gfx16bcol, 0);
+				}
+
+				if(textblend)
+				{
 					if((pix & 0xffffff) || ((priority == 2) && gfxpix))
 					{
 						if(!(pix & 0xffffff))
@@ -836,33 +844,10 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 						break;
 					}
 				}
-				else
+				else if(pix & 0xffffff)
 				{
-					if((priority == textprio) && !pcgpix)
-					{
-						uint16_t colour;
-						if(get_text_pixel(scanline, pixel, &colour))
-						{
-							pix = m_pcgpalette->pen(colour);
-							pcgpix = true;
-						}
-					}
-					else if((priority == pcgprio) && !pcgpix)
-					{
-						uint16_t colour = m_pcgbitmap.pix(scanline / divisor, pixel) & 0xff;
-						if(colour)
-						{
-							pix = m_pcgpalette->pen(colour);
-							pcgpix = true;
-						}
-					}
-					else if(priority == gfxprio)
-						pix = get_gfx_pixel<false>(scanline, pixel, gfx16bcol, 0);
-					if(pix & 0xffffff)
-					{
-						outpix = pix;
-						break;
-					}
+					outpix = pix;
+					break;
 				}
 			}
 			bitmap.pix(scanline, pixel) = outpix;
