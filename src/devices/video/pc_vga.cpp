@@ -3295,8 +3295,12 @@ void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 		src = ibm8514.fgcolour;
 		break;
 	case 0x0040:
-		src = ibm8514.pixel_xfer;
+	{
+		// Windows 95 in svga 8bpp mode wants this (start logo, moving icons around, games etc.)
+		u32 shift_values[4] = { 0, 8, 16, 24 };
+		src = (ibm8514.pixel_xfer >> shift_values[(ibm8514.curr_x - ibm8514.prev_x) & 3]) & 0xff;
 		break;
+	}
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
 		src = m_vga->mem_linear_r(((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x));
