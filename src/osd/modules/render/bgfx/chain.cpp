@@ -108,12 +108,11 @@ void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen,
 	}
 
 	int current_view = view;
-	for (size_t i = 0; i < m_entries.size(); i++)
+	for (bgfx_chain_entry* entry : m_entries)
 	{
-		if (!m_entries[i]->skip())
+		if (!entry->skip())
 		{
-			m_entries[i]->submit(current_view, prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y,
-				rotation_type, swap_xy, i == (m_entries.size() - 1) ? blend : ~0ULL, screen);
+			entry->submit(current_view, prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, blend, screen);
 			current_view++;
 		}
 	}
