@@ -324,7 +324,7 @@ discrete_op_amp_1sht_info const invaders_missle_1sht =
 	RES_M(1),                           // R31
 	RES_M(1),                           // R33
 	RES_M(2.2),                         // R34
-	CAP_U(1),                           // C12, CAP_U(0.22) on Taito PCB
+	CAP_U(0.22),                        // C12, CAP_U(1) on Midway PCB
 	CAP_P(470),                         // C15
 	0,                                  // vN
 	12                                  // vP
