@@ -42,19 +42,22 @@ uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	// quickly draw from memory (should be handled by LCDC?)
 	int count = 0;
 
-	for (int y = 0; y < 512; y++)
+	for (int y = 0; y < 256; y++)
 	{
 		uint32_t *dst = &bitmap.pix(y);
 		for (int x = 0; x < 256 / 8; x++)
 		{
-			// seem to be 2 256x256 images, one at c000, one at d000, maybe 2bpp graphics?
+			// seem to be 2 256x256 images, one at c000, one at e000, maybe 2bpp graphics?
 			uint8_t data = m_mainram[0xc000 + count];	
+			uint8_t data2 = m_mainram[0xe000 + count];				
 
 			for (int xx = 0; xx < 8; xx++)
 			{
 				uint8_t pix = (data >> (7 - xx)) & 1;
+				pix |= ((data2 >> (7 - xx)) & 1)<<1;
 
-				dst[x * 8 + xx] = pix ? rgb_t::white() : rgb_t::black();
+				rgb_t pens[4] = { rgb_t::black(), rgb_t(0x40,0x40,0x40), rgb_t(0xc0,0xc0,0xc0),	rgb_t::white() };
+				dst[x * 8 + xx] = pens[pix];
 			}
 
 			count++;
@@ -76,8 +79,8 @@ void chesskng_state::chesskng(machine_config &config)
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 512); // unknown resolution
-	m_screen->set_visarea(0, 256-1, 0, 512-1);
+	m_screen->set_size(256, 256); // unknown resolution
+	m_screen->set_visarea(0, 256-1, 0, 256-1);
 	m_screen->set_screen_update(FUNC(chesskng_state::screen_update));
 
 	// There are 2x HD66204F (LCDC)
