@@ -149,13 +149,13 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 	<!-- Windows 95 -->
 	<!-- 486 class with 8MB RAM and 256 colors -->
 	<!-- has some game demos on disc -->
-	<!-- TODO: Unreadable install strings -->
-	<!-- TODO: black screen/hangs when launching a demo play in 640x480 resolution (ibm8514_cmd_w with invalid BitBLT params) -->
-	<software name="a10cuba" supported="partial">
+	<software name="a10cuba" supported="no">
 		<description>A-10 Cuba!</description>
 		<year>1996</year>
 		<publisher>Activision / Parsoft Interactive</publisher>
-
+		<notes><![CDATA[
+black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8514_cmd_w with invalid BitBLT params
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="a-10 cuba (1996)(activision)" sha1="a9bc7e3b7306c46acf33b93ae168862d18734245" />
@@ -163,7 +163,7 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		</part>
 	</software>
 
-	<software name="a10cubam" cloneof="a10cuba" supported="partial">
+	<software name="a10cubam" cloneof="a10cuba" supported="no">
 		<description>A-10 Cuba! (Megamedia Megaten Pack)</description>
 		<year>1997</year>
 		<publisher>Megamedia / Parsoft Interactive</publisher>
@@ -817,11 +817,14 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	</software>
 
 	<!-- Windows 95 -->
-	<!-- TODO: uses High Color -->
-	<software name="banzaib" supported="partial">
+	<!-- Pentium class 90 MHz -->
+	<software name="banzaib" supported="no">
 		<description>Banzai Bug</description>
 		<year>1996</year>
 		<publisher>Multi Media International</publisher>
+		<notes><![CDATA[
+Runs in 16-bit High Color, has [8514] bugs
+]]></notes>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1990,6 +1993,23 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<!-- Windows 95 / NT 4.0 -->
+	<!-- Pentium class 60 MHz -->
+	<software name="diablo" supported="partial">
+		<description>Diablo (v1.00)</description>
+		<year>1996</year>
+		<publisher>Blizzard Entertainment</publisher>
+		<notes><![CDATA[
+Reports extremely irrealistic [cdrom] speeds in "Test Your PC" in setup menu
+Untested (and likely unsupported) Spawned Diablo and multi player mode
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="diablo" sha1="c9d7819a9a9b3fe0927c89a9d9d220b0b7307300" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<software name="discdeep">
 		<description>Discoveries of the Deep</description>
@@ -2748,6 +2768,7 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- Windows 95J -->
 	<software name="moon" supported="no">
 		<description>Moon (Japan)</description>
 		<year>1998</year>
@@ -2873,9 +2894,8 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
-	<!-- Windows 3.x -->
-	<!-- TODO: 256 colors shifting issue, sound is too slow? -->
-	<software name="plumber" supported="partial">
+	<!-- Windows 3.x  / 95 -->
+	<software name="plumber" supported="yes">
 		<description>Plumbers don't Wear Ties</description>
 		<year>1993</year>
 		<publisher>Kirin Entertainment</publisher>
@@ -3032,6 +3052,24 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- Windows 95 / 98 -->
+	<!-- Pentium class 75 MHz -->
+	<software name="roadrashi" supported="no">
+		<description>Road Rash (Italy)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+On 486 has popup and sometimes punts to Windows with no exception (verify)
+Sound mixing uses [8514] 16bpp
+https://www.pcgamingwiki.com/wiki/Road_Rash
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="roadrash" sha1="8029d895fda77b46fa9ca3b34a52dd5cb2a72fad" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sasuberi">
 		<description>Saru Suberi (Japan)</description>
 		<year>1997</year>
@@ -3072,6 +3110,24 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- MS-DOS 6.0 / Windows 3.1 -->
+	<!-- Windows 95 not officially supported but seems to work fine -->
+	<!-- 486 33 MHz -->
+	<software name="shangmom" supported="partial">
+		<description>Shanghai: Great Moments</description>
+		<year>1995</year>
+		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Install screen has wrong [8514] header text
+Bit of desync when Rosalind Chao starts talking at beginning of an attract cycle (verify)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="shanghai" sha1="1d3cd20e23a94c6d5568687da3fc56579e2b6a26" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 95 & Macintosh -->
 	<software name="silicon" supported="partial">
 		<description>Silicon Scream (Japan)</description>
@@ -3104,7 +3160,7 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 	<!-- Pentium class 133 MHz -->
 	<!-- Direct X 5 -->
 	<software name="silkroad">
-		<description>Silkroad Hoshi no Shima no Monogatari</description>
+		<description>Silkroad Hoshi no Shima no Monogatari (Japan)</description>
 		<year>1998</year>
 		<publisher>Anjin / Sprite</publisher>
 		<info name="alt_title" value="シルクロード 星の島の物語" />
@@ -3129,9 +3185,28 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
-	<!-- TODO: gfx shift issue on 256 color mode -->
-	<software name="spaceinv" supported="partial">
+	<!-- Windows 3.1/95/NT 3.51/NT 4.0 -->
+	<!-- A separate Macintosh version known to exist -->
+	<software name="skulcrck" supported="partial">
+		<!-- 7/23/96 -->
+		<description>Skull Cracker (Windows)</description>
+		<year>1996</year>
+		<publisher>GTE Entertainment</publisher>
+		<notes><![CDATA[
+Optional [pc_joy] 4-button joystick, work around by mapping b3 and b4 to player 2 side
+]]></notes>
+		<info name="developer" value="Cyberflix"/>
+		<info name="usage" value="ALT pauses the game (including title screen and videos)"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="skull cracker (1996)(gte)" sha1="a15057c0648695daf6939220c3fd285be3fb1d91" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1 / 95 -->
+	<software name="spaceinv" supported="yes">
 		<description>Space Invaders for Windows</description>
 		<year>1997</year>
 		<publisher>Wiz / Taito</publisher>
@@ -3314,10 +3389,13 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 
 	<!-- Windows 95/98/ME/XP and Mac OS supported -->
 	<!-- Requires 256 colors minimum otherwise they crashes at boot -->
-	<software name="v16imagine">
+	<software name="v16imagine" supported="partial">
 		<description>Viper -V16- Imagine (International)</description>
 		<year>2001</year>
 		<publisher>Sogna / Hobibox Europe</publisher>
+		<notes><![CDATA[
+Has [8514] icon glitch
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="GX" sha1="5de4abf4a883a56ec389bb255d176b5a39a63420" />
@@ -3325,10 +3403,13 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
-	<software name="v16rise">
+	<software name="v16rise" supported="partial">
 		<description>Viper -V16- RISE (International)</description>
 		<year>2001</year>
 		<publisher>Sogna / Hobibox Europe</publisher>
+		<notes><![CDATA[
+Has [8514] icon glitch
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="GX4" sha1="a600a961b5127d3a5ee368c20d9f54e6ede23b81" />
@@ -3414,10 +3495,16 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
-	<software name="zyclunt" supported="no">
+	<!-- DOS -->
+	<!-- Crashes in Windows 95 -->
+	<software name="zyclunt" supported="partial">
 		<description>Zyclunt</description>
 		<year>1995</year>
 		<publisher>Phantagram</publisher>
+		<notes><![CDATA[
+No [soundblaster] BGMs no matter the setting set in CONFIG.EXE
+Shows Phantagram logo with bottom red strip (DOS 6.22)
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="zyclunt" sha1="cc6e69cdd5bdda70361778c3515571114a97b662" />
