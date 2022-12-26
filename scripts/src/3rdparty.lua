@@ -1227,6 +1227,9 @@ project "bimg"
 			"-Wno-unused-but-set-variable",
 			"-Wno-undef",
 		}
+		buildoptions_c {
+			"-Wno-strict-prototypes",
+		}
 
 	configuration { }
 
