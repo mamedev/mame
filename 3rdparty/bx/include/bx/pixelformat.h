@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_PIXEL_FORMAT_H_HEADER_GUARD
@@ -209,6 +209,10 @@ namespace bx
 	void packRgba32F(void* _dst, const float* _src);
 	void unpackRgba32F(float* _dst, const void* _src);
 
+	// B5G6R5
+	void packB5G6R5(void* _dst, const float* _src);
+	void unpackB5G6R5(float* _dst, const void* _src);
+
 	// R5G6B5
 	void packR5G6B5(void* _dst, const float* _src);
 	void unpackR5G6B5(float* _dst, const void* _src);
@@ -217,7 +221,7 @@ namespace bx
 	void packRgba4(void* _dst, const float* _src);
 	void unpackRgba4(float* _dst, const void* _src);
 
-	// RGBA4
+	// BGRA4
 	void packBgra4(void* _dst, const float* _src);
 	void unpackBgra4(float* _dst, const void* _src);
 

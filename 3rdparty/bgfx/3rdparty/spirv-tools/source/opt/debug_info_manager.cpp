@@ -1,4 +1,5 @@
-// Copyright (c) 2020 Google LLC
+// Copyright (c) 2020-2022 Google LLC
+// Copyright (c) 2022 LunarG Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +25,7 @@
 static const uint32_t kOpLineOperandLineIndex = 1;
 static const uint32_t kLineOperandIndexDebugFunction = 7;
 static const uint32_t kLineOperandIndexDebugLexicalBlock = 5;
+static const uint32_t kLineOperandIndexDebugLine = 5;
 static const uint32_t kDebugFunctionOperandFunctionIndex = 13;
 static const uint32_t kDebugFunctionDefinitionOperandDebugFunctionIndex = 4;
 static const uint32_t kDebugFunctionDefinitionOperandOpFunctionIndex = 5;
@@ -146,6 +148,25 @@ void DebugInfoManager::RegisterDbgDeclare(uint32_t var_id,
   }
 }
 
+// Create new constant directly into global value area, bypassing the
+// Constant manager. This is used when the DefUse or Constant managers
+// are invalid and cannot be regenerated due to the module being in an
+// inconsistent state e.g. in the middle of significant modification
+// such as inlining. Invalidate Constant and DefUse managers if used.
+uint32_t AddNewConstInGlobals(IRContext* context, uint32_t const_value) {
+  uint32_t id = context->TakeNextId();
+  std::unique_ptr<Instruction> new_const(new Instruction(
+      context, SpvOpConstant, context->get_type_mgr()->GetUIntTypeId(), id,
+      {
+          {spv_operand_type_t::SPV_OPERAND_TYPE_TYPED_LITERAL_NUMBER,
+           {const_value}},
+      }));
+  context->module()->AddGlobalValue(std::move(new_const));
+  context->InvalidateAnalyses(IRContext::kAnalysisConstants);
+  context->InvalidateAnalyses(IRContext::kAnalysisDefUse);
+  return id;
+}
+
 uint32_t DebugInfoManager::CreateDebugInlinedAt(const Instruction* line,
                                                 const DebugScope& scope) {
   uint32_t setId = GetDbgSetImportId();
@@ -191,13 +212,30 @@ uint32_t DebugInfoManager::CreateDebugInlinedAt(const Instruction* line,
         break;
     }
   } else {
-    line_number = line->GetSingleWordOperand(kOpLineOperandLineIndex);
+    if (line->opcode() == SpvOpLine) {
+      line_number = line->GetSingleWordOperand(kOpLineOperandLineIndex);
+    } else if (line->GetShader100DebugOpcode() ==
+               NonSemanticShaderDebugInfo100DebugLine) {
+      line_number = line->GetSingleWordOperand(kLineOperandIndexDebugLine);
+    } else {
+      assert(false &&
+             "Unreachable. A line instruction must be OpLine or DebugLine");
+    }
 
     // If we need the line number as an ID, generate that constant now.
-    if (line_number_type == spv_operand_type_t::SPV_OPERAND_TYPE_ID) {
-      uint32_t line_id =
-          context()->get_constant_mgr()->GetUIntConst(line_number);
-      line_number = line_id;
+    // If Constant or DefUse managers are invalid, generate constant
+    // directly into the global value section of the module; do not
+    // use Constant manager which may attempt to invoke building of the
+    // DefUse manager which cannot be done during inlining. The extra
+    // constants that may be generated here is likely not significant
+    // and will likely be cleaned up in later passes.
+    if (line_number_type == spv_operand_type_t::SPV_OPERAND_TYPE_ID &&
+        line->opcode() == SpvOpLine) {
+      if (!context()->AreAnalysesValid(IRContext::Analysis::kAnalysisDefUse) ||
+          !context()->AreAnalysesValid(IRContext::Analysis::kAnalysisConstants))
+        line_number = AddNewConstInGlobals(context(), line_number);
+      else
+        line_number = context()->get_constant_mgr()->GetUIntConst(line_number);
     }
   }
 
@@ -519,10 +557,10 @@ bool DebugInfoManager::IsDeclareVisibleToInstr(Instruction* dbg_declare,
   return false;
 }
 
-bool DebugInfoManager::AddDebugValueIfVarDeclIsVisible(
-    Instruction* scope_and_line, uint32_t variable_id, uint32_t value_id,
-    Instruction* insert_pos,
-    std::unordered_set<Instruction*>* invisible_decls) {
+bool DebugInfoManager::AddDebugValueForVariable(Instruction* scope_and_line,
+                                                uint32_t variable_id,
+                                                uint32_t value_id,
+                                                Instruction* insert_pos) {
   assert(scope_and_line != nullptr);
 
   auto dbg_decl_itr = var_id_to_dbg_decl_.find(variable_id);
@@ -530,11 +568,6 @@ bool DebugInfoManager::AddDebugValueIfVarDeclIsVisible(
 
   bool modified = false;
   for (auto* dbg_decl_or_val : dbg_decl_itr->second) {
-    if (!IsDeclareVisibleToInstr(dbg_decl_or_val, scope_and_line)) {
-      if (invisible_decls) invisible_decls->insert(dbg_decl_or_val);
-      continue;
-    }
-
     // Avoid inserting the new DebugValue between OpPhi or OpVariable
     // instructions.
     Instruction* insert_before = insert_pos->NextNode();
@@ -822,7 +855,7 @@ void DebugInfoManager::ClearDebugInfo(Instruction* instr) {
     fn_id_to_dbg_fn_.erase(fn_id);
   }
   if (instr->GetShader100DebugOpcode() ==
-      NonSemanticShaderDebugInfo100DebugFunction) {
+      NonSemanticShaderDebugInfo100DebugFunctionDefinition) {
     auto fn_id = instr->GetSingleWordOperand(
         kDebugFunctionDefinitionOperandOpFunctionIndex);
     fn_id_to_dbg_fn_.erase(fn_id);
