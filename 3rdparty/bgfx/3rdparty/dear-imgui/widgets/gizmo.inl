@@ -1414,6 +1414,7 @@ namespace IMGUIZMO_NAMESPACE
                   drawList->AddLine(baseSSpace, worldDirSSpaceNoScale, IM_COL32(0x40, 0x40, 0x40, 0xFF), 3.f);
                   drawList->AddCircleFilled(worldDirSSpaceNoScale, 6.f, IM_COL32(0x40, 0x40, 0x40, 0xFF));
                }
+               */
                /*
                if (!hasTranslateOnAxis || gContext.mbUsing)
                {
