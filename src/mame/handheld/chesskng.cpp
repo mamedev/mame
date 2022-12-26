@@ -29,10 +29,16 @@ private:
 	void chesskng_map(address_map &map);
 	void chesskng_io(address_map &map);
 
+	uint8_t unk_0f_r();
 	uint8_t unk_3f_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
+
+uint8_t chesskng_state::unk_0f_r()
+{
+	return 0x0f; // 0x0f puts the unit in some kind of service mode
+}
 
 uint8_t chesskng_state::unk_3f_r()
 {
@@ -50,6 +56,7 @@ void chesskng_state::chesskng_map(address_map &map)
 
 void chesskng_state::chesskng_io(address_map &map)
 {
+	map(0x0f, 0x0f).r(FUNC(chesskng_state::unk_0f_r));
 	map(0x3f, 0x3f).r(FUNC(chesskng_state::unk_3f_r));
 }
 
@@ -92,12 +99,13 @@ void chesskng_state::chesskng(machine_config &config)
 	V20(config, m_maincpu, 9600000); // D70108HG-10 V20, Unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesskng_state::chesskng_map);
 	m_maincpu->set_addrmap(AS_IO, &chesskng_state::chesskng_io);
+	m_maincpu->set_vblank_int("screen", FUNC(chesskng_state::nmi_line_pulse)); // source?
 
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 256); // unknown resolution
-	m_screen->set_visarea(0, 256-1, 0, 256-1);
+	m_screen->set_visarea(0, 160-1, 0, 160-1);
 	m_screen->set_screen_update(FUNC(chesskng_state::screen_update));
 
 	// There are 2x HD66204F (LCDC)
