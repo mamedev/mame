@@ -3,7 +3,6 @@
 
 #include "emu.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -15,7 +14,8 @@ public:
 	chesskng_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_mainram(*this, "mainram")
 	{ }
 
 	void chesskng(machine_config &config);
@@ -24,20 +24,41 @@ private:
 	// Devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<uint8_t> m_mainram;
 
 	void chesskng_map(address_map &map);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 void chesskng_state::chesskng_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).ram(); // 2x SRM20256 RAM
+	map(0x00000, 0x0ffff).ram().share(m_mainram); // 2x SRM20256 RAM
 	map(0xc0000, 0xfffff).rom().region("maincpu", 0x00000);
 }
 
-uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// quickly draw from memory (should be handled by LCDC?)
+	int count = 0;
+
+	for (int y = 0; y < 256; y++)
+	{
+		uint32_t *dst = &bitmap.pix(y);
+		for (int x = 0; x < 256 / 8; x++)
+		{
+			uint8_t data = m_mainram[0xc000 + count];
+
+			for (int xx = 0; xx < 8; xx++)
+			{
+				uint8_t pix = (data >> (7 - xx)) & 1;
+
+				dst[x * 8 + xx] = pix ? rgb_t::white() : rgb_t::black();
+			}
+
+			count++;
+		}
+	}
 	return 0;
 }
 
@@ -54,10 +75,9 @@ void chesskng_state::chesskng(machine_config &config)
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(64, 64); // unknown resolution
-	m_screen->set_visarea(0, 64-1, 0, 64-1);
+	m_screen->set_size(256, 256); // unknown resolution
+	m_screen->set_visarea(0, 256-1, 0, 256-1);
 	m_screen->set_screen_update(FUNC(chesskng_state::screen_update));
-	m_screen->set_palette("palette");
 
 	// There are 2x HD66204F (LCDC)
 	// and 1x HD66205F (LCDC)
@@ -65,8 +85,6 @@ void chesskng_state::chesskng(machine_config &config)
 	// 16160
 	// S2RB
 	// 94.10
-
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x200/2);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
