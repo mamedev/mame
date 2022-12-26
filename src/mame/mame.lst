@@ -34901,13 +34901,13 @@ pengadvb2                       // (c) 1988 Comet
 @source:pacman/pengo.cpp
 jrpacmbl                        // bootleg on Pengo HW
 pengo                           // 834-0386 (c) 1982 Sega
-pengo2                          // 834-0386 (c) 1982 Sega
-pengo2u                         // 834-0386 (c) 1982 Sega
-pengo3u                         // 834-0386 (c) 1982 Sega
-pengo4                          // 834-0386 (c) 1982 Sega
-pengo5                          // 834-0386 (c) 1982 Sega
-pengo6                          // 834-0386 (c) 1982 Sega
-pengob                          // bootleg
+pengoa                          // 834-0386 (c) 1982 Sega
+pengob                          // 834-0386 (c) 1982 Sega
+pengoc                          // 834-0386 (c) 1982 Sega
+pengoj                          // 834-0386 (c) 1982 Sega
+pengoja                         // 834-0386 (c) 1982 Sega
+pengojb                         // 834-0386 (c) 1982 Sega
+pengojbl                        // bootleg
 penta                           // bootleg
 
 @source:handheld/pensebem.cpp
