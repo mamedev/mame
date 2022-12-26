@@ -65,11 +65,12 @@ bool shader_manager::is_shader_present(osd_options &options, std::string name)
 	std::string shader_path = make_path_string(options, name);
 	std::string file_name = shader_path + name + ".bin";
 	bx::FileReader reader;
+	bx::ErrorAssert err;
 	if (bx::open(&reader, file_name.c_str()))
 	{
 		uint32_t expected_size(bx::getSize(&reader));
 		uint8_t *data = new uint8_t[expected_size];
-		uint32_t read_size = (uint32_t)bx::read(&reader, data, expected_size);
+		uint32_t read_size = (uint32_t)bx::read(&reader, data, expected_size, &err);
 		delete [] data;
 		bx::close(&reader);
 
@@ -127,9 +128,10 @@ const bgfx::Memory* shader_manager::load_mem(std::string name)
 	bx::FileReader reader;
 	if (bx::open(&reader, name.c_str()))
 	{
+		bx::ErrorAssert err;
 		uint32_t size(bx::getSize(&reader));
 		const bgfx::Memory* mem = bgfx::alloc(size + 1);
-		bx::read(&reader, mem->data, size);
+		bx::read(&reader, mem->data, size, &err);
 		bx::close(&reader);
 
 		mem->data[mem->size - 1] = '\0';
