@@ -1314,7 +1314,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bimg/include",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/dxsdk/include",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/directx-headers/include/directx",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 	}
 
@@ -1349,8 +1349,6 @@ end
 
 	configuration { "linux*" }
 		includedirs {
-			MAME_DIR .. "3rdparty/bgfx/3rdparty/directx-headers/include/directx",
-			MAME_DIR .. "3rdparty/bgfx/3rdparty/directx-headers/include",
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/directx-headers/include/wsl/stubs",
 			MAME_DIR .. "3rdparty/bx/include/compat/linux",
 		}
