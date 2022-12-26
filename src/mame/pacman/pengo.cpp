@@ -831,9 +831,9 @@ GAME( 1982, pengob,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  RO
 GAME( 1982, pengoc,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (World, 315-5010 type) (set 3)",   MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5081 PENGO
 
 
-// Japan releases draw the maze slowly, and use the better known 'popcorn' music.  Most bootlegs were based off these versions.
+// Japan releases draw the maze slowly, use the better known 'popcorn' music and have default high score of 20,000. Most bootlegs were based off these versions.
 GAME( 1982, pengoj,   pengo,    pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (Japan, not encrypted)",           MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5091 PENGO
-// sets below have default high score of 20,000 and high score names spelling out AKIRA and use 'ACT' instead of 'RD'
+// sets below have high score names spelling out AKIRA and use 'ACT' instead of 'RD'
 GAME( 1982, pengoja,  pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (Japan, 315-5010 type, rev C)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pengojb,  pengo,    pengo,    pengo,    pengo_state, init_pengo6, ROT90, "Sega",                     "Pengo (Japan, 315-5007 type, rev A)",    MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5078 PENGO REV.A
 GAME( 1982, pengojbl, pengo,    pengo,    pengo,    pengo_state, init_pengo6, ROT90, "bootleg",                  "Pengo (Japan) (bootleg)",                MACHINE_SUPPORTS_SAVE ) // bootleg of pengojb with cloned encryption
