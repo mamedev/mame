@@ -143,7 +143,7 @@ uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		uint32_t *dst = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			// seem to be 2 256x256 images (160x160 area used) one at c000, one at e000, maybe 2bpp graphics?
+			// 2 256x256 images (160x160 area used) one at c000, one at e000 to form 2bpp graphics
 			uint8_t data = m_mainram[0xc000 + offset + x/8];
 			uint8_t data2 = m_mainram[0xe000 + offset + x/8];
 
