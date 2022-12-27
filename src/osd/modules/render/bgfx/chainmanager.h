@@ -49,7 +49,8 @@ public:
 class chain_manager
 {
 public:
-	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier);
+	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index,
+		slider_dirty_notifier& slider_notifier, uint16_t user_prescale, uint16_t max_prescale_size);
 	~chain_manager();
 
 	uint32_t update_screen_textures(uint32_t view, render_primitive *starting_prim, osd_window& window);
@@ -123,6 +124,8 @@ private:
 	target_manager&             m_targets;
 	effect_manager&             m_effects;
 	uint32_t                    m_window_index;
+	uint16_t                    m_user_prescale;
+	uint16_t                    m_max_prescale_size;
 	slider_dirty_notifier&      m_slider_notifier;
 	uint32_t                    m_screen_count;
 	std::vector<chain_desc>     m_available_chains;

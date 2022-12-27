@@ -104,3 +104,17 @@ uint64_t bgfx_util::get_blend_state(uint32_t blend)
 	}
 	return 0L;
 }
+
+void bgfx_util::find_prescale_factor(uint16_t width, uint16_t height, uint16_t max_prescale_size, uint16_t &xprescale, uint16_t &yprescale)
+{
+	printf("x,y prescale: %d,%d\n", (int)xprescale, (int)yprescale);
+	printf("prescaled starting: %d,%d vs. %d\n", (int)(width * xprescale), (int)(height * yprescale), (int)max_prescale_size);
+	while (xprescale > 1 && width * xprescale > max_prescale_size)
+	{
+		xprescale--;
+	}
+	while (yprescale > 1 && height * yprescale > max_prescale_size)
+	{
+		yprescale--;
+	}
+}

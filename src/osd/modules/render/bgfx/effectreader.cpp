@@ -17,7 +17,7 @@
 #include "uniformreader.h"
 #include "uniform.h"
 
-bgfx_effect *effect_reader::read_from_value(const Value& value, std::string prefix, osd_options &options, shader_manager& shaders)
+bgfx_effect *effect_reader::read_from_value(std::string name, const Value& value, std::string prefix, osd_options &options, shader_manager& shaders)
 {
 	uint64_t flags = 0;
 	std::string vertex_name;
@@ -37,7 +37,7 @@ bgfx_effect *effect_reader::read_from_value(const Value& value, std::string pref
 		return nullptr;
 	}
 
-	bgfx_effect *effect = new bgfx_effect(flags, vertex_shader, fragment_shader, uniforms);
+	bgfx_effect *effect = new bgfx_effect(name, flags, vertex_shader, fragment_shader, uniforms);
 	if (effect->is_valid())
 	{
 		return effect;

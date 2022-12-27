@@ -120,7 +120,6 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	// Color
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
-	BaseColor.a = 1.0f;
 
 	// clip border
 	if (BaseCoord.x < 0.0f || BaseCoord.y < 0.0f ||

@@ -82,6 +82,7 @@ uint32_t renderer_bgfx::s_current_view = 0;
 bool renderer_bgfx::s_bgfx_library_initialized = false;
 uint32_t renderer_bgfx::s_width[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 uint32_t renderer_bgfx::s_height[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+uint32_t renderer_bgfx::s_max_texture_size = 16384; // Relatively safe default on modern GPUs
 
 //============================================================
 //  renderer_bgfx - constructor
@@ -100,6 +101,8 @@ renderer_bgfx::renderer_bgfx(std::shared_ptr<osd_window> w)
 	, m_chains(nullptr)
 	, m_ortho_view(nullptr)
 	, m_max_view(0)
+	, m_view_width(1)
+	, m_view_height(1)
 	, m_avi_view(nullptr)
 	, m_avi_writer(nullptr)
 	, m_avi_target(nullptr)
@@ -199,6 +202,9 @@ void renderer_bgfx::init_bgfx_library()
 	bool bgfx_debug = m_options.bgfx_debug();
 	bgfx::setDebug(bgfx_debug ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
 
+	const bgfx::Caps* caps = bgfx::getCaps();
+	s_max_texture_size = caps->limits.maxTextureSize;
+
 	ScreenVertex::init();
 
 	imguiCreate();
@@ -289,8 +295,10 @@ int renderer_bgfx::create()
 {
 	std::shared_ptr<osd_window> win = assert_window();
 	osd_dim wdim = win->get_size();
-	s_width[win->index()] = wdim.width();
-	s_height[win->index()] = wdim.height();
+	const uint32_t width = wdim.width();
+	const uint32_t height = wdim.height();
+	s_width[win->index()] = width;
+	s_height[win->index()] = height;
 	m_dimensions = wdim;
 
 	if (s_bgfx_library_initialized)
@@ -345,7 +353,9 @@ int renderer_bgfx::create()
 		}
 	}
 
-	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->index(), *this);
+	uint32_t max_prescale_size = std::min(2u * std::max(width, height), s_max_texture_size);
+	printf("max_prescale_size is %d, std::min(2 * std::max(%d, %d), %d)\n", (int)max_prescale_size, (int)width, (int)height, (int)s_max_texture_size);
+	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->index(), *this, win->prescale(), max_prescale_size);
 	m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
@@ -391,7 +401,7 @@ void renderer_bgfx::record()
 	else
 	{
 		m_avi_writer->record(m_options.bgfx_avi_name());
-		m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::BGRA8, s_width[0], s_height[0], TARGET_STYLE_CUSTOM, false, true, 1, 0);
+		m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::BGRA8, s_width[0], s_height[0], 1, 1, TARGET_STYLE_CUSTOM, false, true, 1, 0);
 		m_avi_texture = bgfx::createTexture2D(s_width[0], s_height[0], false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
 
 		if (m_avi_view == nullptr)
@@ -480,14 +490,14 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, uint32_t hash, Scree
 	float u[4] = { u0, u1, u0, u1 };
 	float v[4] = { v0, v0, v1, v1 };
 
-	if (bgfx::getRendererType() == bgfx::RendererType::Direct3D9)
+	/*if (bgfx::getRendererType() == bgfx::RendererType::Direct3D9)
 	{
 		for (int i = 0; i < 4; i++)
 		{
 			u[i] += 0.5f / size;
 			v[i] += 0.5f / size;
 		}
-	}
+	}*/
 
 	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
 	{
@@ -529,7 +539,7 @@ void renderer_bgfx::vertex(ScreenVertex* vertex, float x, float y, float z, uint
 	vertex->m_v = v;
 }
 
-void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen)
+void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen, int window_index)
 {
 	auto* vertices = reinterpret_cast<ScreenVertex*>(buffer->data);
 
@@ -554,6 +564,16 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 	uint32_t blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
 	bgfx::setVertexBuffer(0,buffer);
 	bgfx::setTexture(0, m_screen_effect[blend]->uniform("s_tex")->handle(), m_targets->target(screen, "output")->texture(), texture_flags);
+
+	bgfx_uniform* inv_view_dims = m_screen_effect[blend]->uniform("u_inv_view_dims");
+	if (inv_view_dims)
+	{
+		float values[2] = { -1.0f / s_width[window_index], 1.0f / s_height[window_index] };
+		inv_view_dims->set(values, sizeof(float) * 2);
+		inv_view_dims->upload();
+	}
+
+	printf("Rendering post-screen quad for screen %d using blend mode %d\n", screen, (int)blend);
 	m_screen_effect[blend]->submit(m_ortho_view->get_index());
 }
 
@@ -563,7 +583,7 @@ void renderer_bgfx::render_avi_quad()
 	m_avi_view->setup();
 
 	bgfx::setViewRect(s_current_view, 0, 0, s_width[0], s_height[0]);
-	bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+	bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 
 	bgfx::TransientVertexBuffer buffer;
 	bgfx::allocTransientVertexBuffer(&buffer, 6, ScreenVertex::ms_decl);
@@ -584,11 +604,21 @@ void renderer_bgfx::render_avi_quad()
 
 	bgfx::setVertexBuffer(0,&buffer);
 	bgfx::setTexture(0, m_gui_effect[PRIMFLAG_GET_BLENDMODE(BLENDMODE_NONE)]->uniform("s_tex")->handle(), m_avi_target->texture());
-	m_gui_effect[PRIMFLAG_GET_BLENDMODE(BLENDMODE_NONE)]->submit(s_current_view);
+
+	bgfx_effect* effect = m_gui_effect[PRIMFLAG_GET_BLENDMODE(BLENDMODE_NONE)];
+	bgfx_uniform* inv_view_dims = effect->uniform("u_inv_view_dims");
+	if (inv_view_dims)
+	{
+		float values[2] = { -1.0f / s_width[0], 1.0f / s_height[0] };
+		inv_view_dims->set(values, sizeof(float) * 2);
+		inv_view_dims->upload();
+	}
+
+	effect->submit(s_current_view);
 	s_current_view++;
 }
 
-void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
+void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int window_index)
 {
 	auto* vertices = reinterpret_cast<ScreenVertex*>(buffer->data);
 	uint32_t rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
@@ -634,6 +664,16 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	uint32_t blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
 	bgfx::setVertexBuffer(0,buffer);
 	bgfx::setTexture(0, effects[blend]->uniform("s_tex")->handle(), texture);
+
+	bgfx_uniform* inv_view_dims = effects[blend]->uniform("u_inv_view_dims");
+	if (inv_view_dims)
+	{
+		float values[2] = { -1.0f / s_width[window_index], 1.0f / s_height[window_index] };
+		inv_view_dims->set(values, sizeof(float) * 2);
+		inv_view_dims->upload();
+	}
+
+	printf("Rendering a textured quad using blend mode %d and tint %08x\n", (int)blend, rgba);
 	effects[blend]->submit(m_ortho_view->get_index());
 
 	if (is_screen)
@@ -926,12 +966,21 @@ int renderer_bgfx::draw(int update)
 			}
 		}
 
-		buffer_status status = buffer_primitives(atlas_valid, &prim, &buffer, screen);
+		buffer_status status = buffer_primitives(atlas_valid, &prim, &buffer, screen, window_index);
 
 		if (status != BUFFER_EMPTY && status != BUFFER_SCREEN)
 		{
-			bgfx::setVertexBuffer(0,&buffer);
+			bgfx::setVertexBuffer(0, &buffer);
 			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->texture());
+
+			bgfx_uniform* inv_view_dims = m_gui_effect[blend]->uniform("u_inv_view_dims");
+			if (inv_view_dims)
+			{
+				float values[2] = { -1.0f / s_width[window_index], 1.0f / s_height[window_index] };
+				inv_view_dims->set(values, sizeof(float) * 2);
+				inv_view_dims->upload();
+			}
+
 			m_gui_effect[blend]->submit(m_ortho_view->get_index());
 		}
 
@@ -1026,7 +1075,8 @@ bool renderer_bgfx::update_dimensions()
 			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());
 		}
 
-		bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+		printf("Touching clear to %08x\n", 0xff000000);
+		bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 		bgfx::setViewMode(s_current_view, bgfx::ViewMode::Sequential);
 		bgfx::touch(s_current_view);
 		bgfx::frame();
@@ -1074,7 +1124,7 @@ render_primitive_list *renderer_bgfx::get_primitives()
 	return &win->target()->get_primitives();
 }
 
-renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen)
+renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen, int window_index)
 {
 	int vertices = 0;
 
@@ -1116,18 +1166,18 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, 
 						{
 #if SCENE_VIEW
 							setup_view(s_current_view, true);
-							render_post_screen_quad(s_current_view, *prim, buffer, screen);
+							render_post_screen_quad(s_current_view, *prim, buffer, screen, window_index);
 							s_current_view++;
 #else
 							setup_ortho_view();
-							render_post_screen_quad(m_ortho_view->get_index(), *prim, buffer, screen);
+							render_post_screen_quad(m_ortho_view->get_index(), *prim, buffer, screen, window_index);
 #endif
 							return BUFFER_SCREEN;
 						}
 						else
 						{
 							setup_ortho_view();
-							render_textured_quad(*prim, buffer);
+							render_textured_quad(*prim, buffer, window_index);
 							return BUFFER_EMPTY;
 						}
 					}

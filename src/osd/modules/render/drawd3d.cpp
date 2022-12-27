@@ -432,6 +432,7 @@ d3d_texture_manager::d3d_texture_manager(renderer_d3d9 *d3d)
 	// set the max texture size
 	win->target()->set_max_texture_size(m_texture_max_width, m_texture_max_height);
 	osd_printf_verbose("Direct3D: Max texture size = %dx%d\n", (int)m_texture_max_width, (int)m_texture_max_height);
+	printf("Direct3D: Max texture size = %dx%d\n", (int)m_texture_max_width, (int)m_texture_max_height);
 }
 
 void d3d_texture_manager::create_resources()
@@ -652,7 +653,7 @@ void renderer_d3d9::begin_frame()
 {
 	auto win = assert_window();
 
-	HRESULT result = m_device->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+	HRESULT result = m_device->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0xff,0,0,0), 0, 0);
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device clear call\n", result);
 
@@ -1721,10 +1722,10 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	}
 
 	// determine the color, allowing for over modulation
-	auto r = (int32_t)(prim.color.r * 255.0f);
-	auto g = (int32_t)(prim.color.g * 255.0f);
-	auto b = (int32_t)(prim.color.b * 255.0f);
-	auto a = (int32_t)(prim.color.a * 255.0f);
+	auto r = (int32_t)std::round(prim.color.r * 255.0f);
+	auto g = (int32_t)std::round(prim.color.g * 255.0f);
+	auto b = (int32_t)std::round(prim.color.b * 255.0f);
+	auto a = (int32_t)std::round(prim.color.a * 255.0f);
 	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
 
 	// adjust half pixel X/Y offset, set the color, Z parameters to standard values

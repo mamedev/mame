@@ -44,7 +44,7 @@ public:
 	// Setters
 	void set_has_converter(bool has_converter) { m_has_converter = has_converter; }
 	void set_has_adjuster(bool has_adjuster) { m_has_adjuster = has_adjuster; }
-	void insert_effect(uint32_t index, bgfx_effect *effect, std::string name, std::string source, chain_manager &chains);
+	void insert_effect(uint32_t index, bgfx_effect *effect, const bool apply_tint, std::string name, std::string source, chain_manager &chains);
 
 private:
 	std::string                         m_name;

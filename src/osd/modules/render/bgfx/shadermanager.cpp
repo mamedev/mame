@@ -69,7 +69,7 @@ bool shader_manager::is_shader_present(osd_options &options, std::string name)
 	{
 		uint32_t expected_size(bx::getSize(&reader));
 		uint8_t *data = new uint8_t[expected_size];
-		uint32_t read_size = (uint32_t)bx::read(&reader, data, expected_size);
+		uint32_t read_size = uint32_t(bx::read(&reader, data, expected_size));
 		delete [] data;
 		bx::close(&reader);
 

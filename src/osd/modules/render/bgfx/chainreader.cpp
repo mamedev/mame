@@ -22,7 +22,7 @@
 #include "slider.h"
 #include "parameter.h"
 
-bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix, chain_manager& chains, uint32_t screen_index)
+bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix, chain_manager& chains, uint32_t screen_index, uint16_t user_prescale, uint16_t max_prescale_size)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -96,7 +96,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		// TODO: Move into its own reader
 		for (uint32_t i = 0; i < target_array.Size(); i++)
 		{
-			bgfx_target* target = target_reader::read_from_value(target_array[i], prefix + "targets[" + std::to_string(i) + "]: ", chains, screen_index);
+			bgfx_target* target = target_reader::read_from_value(target_array[i], prefix + "targets[" + std::to_string(i) + "]: ", chains, screen_index, user_prescale, max_prescale_size);
 			if (target == nullptr)
 			{
 				return nullptr;

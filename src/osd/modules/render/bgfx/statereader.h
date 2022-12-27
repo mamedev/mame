@@ -45,6 +45,7 @@ protected:
 
 protected:
 	static bool READER_CHECK(bool condition, const char* format, ...);
+	static bool READER_WARN(bool condition, const char* format, ...);
 
 private:
 	static void get_vec_values(const Value& value_array, float* data, const unsigned int count);

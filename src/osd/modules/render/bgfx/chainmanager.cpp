@@ -45,24 +45,27 @@ const uint32_t chain_manager::CHAIN_NONE = 0;
 chain_manager::screen_prim::screen_prim(render_primitive *prim)
 {
 	m_prim = prim;
-	m_screen_width = (uint16_t)floorf(prim->get_full_quad_width() + 0.5f);
-	m_screen_height = (uint16_t)floorf(prim->get_full_quad_height() + 0.5f);
-	m_quad_width = (uint16_t)floorf(prim->get_quad_width() + 0.5f);
-	m_quad_height = (uint16_t)floorf(prim->get_quad_height() + 0.5f);
-	m_tex_width = (float)prim->texture.width;
-	m_tex_height = (float)prim->texture.height;
+	m_screen_width = uint16_t(floorf(prim->get_full_quad_width() + 0.5f));
+	m_screen_height = uint16_t(floorf(prim->get_full_quad_height() + 0.5f));
+	m_quad_width = uint16_t(floorf(prim->get_quad_width() + 0.5f));
+	m_quad_height = uint16_t(floorf(prim->get_quad_height() + 0.5f));
+	m_tex_width = float(prim->texture.width);
+	m_tex_height = float(prim->texture.height);
 	m_rowpixels = prim->texture.rowpixels;
 	m_palette_length = prim->texture.palette_length;
 	m_flags = prim->flags;
 }
 
-chain_manager::chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier)
+chain_manager::chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index,
+	slider_dirty_notifier& slider_notifier, uint16_t user_prescale, uint16_t max_prescale_size)
 	: m_machine(machine)
 	, m_options(options)
 	, m_textures(textures)
 	, m_targets(targets)
 	, m_effects(effects)
 	, m_window_index(window_index)
+	, m_user_prescale(user_prescale)
+	, m_max_prescale_size(max_prescale_size)
 	, m_slider_notifier(slider_notifier)
 	, m_screen_count(0)
 {
@@ -199,7 +202,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 		return nullptr;
 	}
 
-	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", *this, screen_index);
+	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", *this, screen_index, m_user_prescale, m_max_prescale_size);
 
 	if (chain == nullptr)
 	{
@@ -319,7 +322,7 @@ bgfx_chain* chain_manager::screen_chain(uint32_t screen)
 
 void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, screen_prim &prim, osd_window& window)
 {
-	const bool any_targets_rebuilt = m_targets.update_target_sizes(screen, prim.m_tex_width, prim.m_tex_height, TARGET_STYLE_GUEST);
+	const bool any_targets_rebuilt = m_targets.update_target_sizes(screen, prim.m_tex_width, prim.m_tex_height, TARGET_STYLE_GUEST, m_user_prescale, m_max_prescale_size);
 	if (any_targets_rebuilt)
 	{
 		for (bgfx_chain* chain : m_screen_chains)
@@ -359,7 +362,7 @@ uint32_t chain_manager::count_screens(render_primitive* prim)
 	if (screen_count > 0)
 	{
 		update_screen_count(screen_count);
-		m_targets.update_screen_count(screen_count);
+		m_targets.update_screen_count(screen_count, m_user_prescale, m_max_prescale_size);
 	}
 
 	if (screen_count < m_screen_prims.size())
@@ -493,8 +496,8 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 			if (prim.m_prim->texture.palette)
 			{
-				uint16_t palette_width = (uint16_t)std::min(prim.m_palette_length, 256U);
-				uint16_t palette_height = (uint16_t)std::max((prim.m_palette_length + 255) / 256, 1U);
+				uint16_t palette_width = uint16_t(std::min(prim.m_palette_length, 256U));
+				uint16_t palette_height = uint16_t(std::max((prim.m_palette_length + 255) / 256, 1U));
 				m_palette_temp.resize(palette_width * palette_height * 4);
 				memcpy(&m_palette_temp[0], prim.m_prim->texture.palette, prim.m_palette_length * 4);
 				const bgfx::Memory *palmem = bgfx::copy(&m_palette_temp[0], palette_width * palette_height * 4);
@@ -523,8 +526,8 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 			if (prim.m_prim->texture.palette)
 			{
-				uint16_t palette_width = (uint16_t)std::min(prim.m_palette_length, 256U);
-				uint16_t palette_height = (uint16_t)std::max((prim.m_palette_length + 255) / 256, 1U);
+				uint16_t palette_width = uint16_t(std::min(prim.m_palette_length, 256U));
+				uint16_t palette_height = uint16_t(std::max((prim.m_palette_length + 255) / 256, 1U));
 				const uint32_t palette_size = palette_width * palette_height * 4;
 				m_palette_temp.resize(palette_size);
 				memcpy(&m_palette_temp[0], prim.m_prim->texture.palette, prim.m_palette_length * 4);
@@ -547,15 +550,17 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 			}
 		}
 
+		const bool has_tint = (prim.m_prim->color.a != 1.0f) || (prim.m_prim->color.r != 1.0f) || (prim.m_prim->color.g != 1.0f) || (prim.m_prim->color.b != 1.0f);
 		bgfx_chain* chain = screen_chain(screen);
 		if (chain && needs_adjust && !chain->has_adjuster())
 		{
-			chain->insert_effect(chain->has_converter() ? 1 : 0, m_adjuster, "XXadjust", needs_conversion ? "screen" : "source", *this);
+			const bool apply_tint = !needs_conversion && has_tint;
+			chain->insert_effect(chain->has_converter() ? 1 : 0, m_adjuster, apply_tint, "XXadjust", needs_conversion ? "screen" : "source", *this);
 			chain->set_has_adjuster(true);
 		}
 		if (chain && needs_conversion && !chain->has_converter())
 		{
-			chain->insert_effect(0, m_converters[src_format], "XXconvert", "source", *this);
+			chain->insert_effect(0, m_converters[src_format], has_tint, "XXconvert", "source", *this);
 			chain->set_has_converter(true);
 		}
 	}
@@ -565,6 +570,7 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 uint32_t chain_manager::process_screen_chains(uint32_t view, osd_window& window)
 {
+	printf("\nProcessing screen chains\n");
 	// Process each screen as necessary
 	uint32_t used_views = 0;
 	uint32_t screen_index = 0;
@@ -572,9 +578,12 @@ uint32_t chain_manager::process_screen_chains(uint32_t view, osd_window& window)
 	{
 		if (m_current_chain[screen_index] == CHAIN_NONE || screen_chain(screen_index) == nullptr)
 		{
+			printf("    Screen %d has no chain, skipping it\n", (int)screen_index);
 			screen_index++;
 			continue;
 		}
+
+		printf("\nProcessing screen %d\n\n", (int)screen_index);
 
 		uint16_t screen_width = prim.m_screen_width;
 		uint16_t screen_height = prim.m_screen_height;
@@ -583,7 +592,7 @@ uint32_t chain_manager::process_screen_chains(uint32_t view, osd_window& window)
 			std::swap(screen_width, screen_height);
 		}
 
-		const bool any_targets_rebuilt = m_targets.update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
+		const bool any_targets_rebuilt = m_targets.update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE, m_user_prescale, m_max_prescale_size);
 		if (any_targets_rebuilt)
 		{
 			for (bgfx_chain* chain : m_screen_chains)

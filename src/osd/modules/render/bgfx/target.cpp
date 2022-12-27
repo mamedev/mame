@@ -10,13 +10,16 @@
 
 #include "target.h"
 
-bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen)
+bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint16_t xprescale, uint16_t yprescale,
+	uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen)
 	: m_name(name)
 	, m_format(format)
 	, m_targets(nullptr)
 	, m_textures(nullptr)
 	, m_width(width)
 	, m_height(height)
+	, m_xprescale(xprescale)
+	, m_yprescale(yprescale)
 	, m_double_buffer(double_buffer)
 	, m_style(style)
 	, m_filter(filter)
@@ -35,14 +38,15 @@ bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uin
 		uint32_t filter_mode = filter ? (BGFX_SAMPLER_MIN_ANISOTROPIC | BGFX_SAMPLER_MAG_ANISOTROPIC) : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
 		uint32_t depth_flags = wrap_mode | (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
 
+		printf("Creating %sfiltered target %s, for screen %d, %dx%d\n", filter ? "" : "un", m_name.c_str(), (int)screen, (int)width, (int)height);
 		m_textures = new bgfx::TextureHandle[m_page_count * 2];
 		m_targets = new bgfx::FrameBufferHandle[m_page_count];
 		for (int page = 0; page < m_page_count; page++)
 		{
-			m_textures[page] = bgfx::createTexture2D(m_width, m_height, false, 1, format, wrap_mode | filter_mode | BGFX_TEXTURE_RT);
+			m_textures[page] = bgfx::createTexture2D(m_width * xprescale, m_height * yprescale, false, 1, format, wrap_mode | filter_mode | BGFX_TEXTURE_RT);
 			assert(m_textures[page].idx != 0xffff);
 
-			m_textures[m_page_count + page] = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::D32F, depth_flags | BGFX_TEXTURE_RT);
+			m_textures[m_page_count + page] = bgfx::createTexture2D(m_width * xprescale, m_height * yprescale, false, 1, bgfx::TextureFormat::D32F, depth_flags | BGFX_TEXTURE_RT);
 			assert(m_textures[m_page_count + page].idx != 0xffff);
 
 			bgfx::TextureHandle handles[2] = { m_textures[page], m_textures[m_page_count + page] };
@@ -62,6 +66,8 @@ bgfx_target::bgfx_target(void *handle, uint16_t width, uint16_t height)
 	, m_textures(nullptr)
 	, m_width(width)
 	, m_height(height)
+	, m_xprescale(1)
+	, m_yprescale(1)
 	, m_double_buffer(false)
 	, m_style(TARGET_STYLE_CUSTOM)
 	, m_filter(false)
@@ -74,6 +80,7 @@ bgfx_target::bgfx_target(void *handle, uint16_t width, uint16_t height)
 	m_targets = new bgfx::FrameBufferHandle[1];
 	m_targets[0] = bgfx::createFrameBuffer(handle, width, height, bgfx::TextureFormat::Count, bgfx::TextureFormat::D32F);
 
+	printf("Creating backbuffer target, %dx%d\n", (int)width, (int)height);
 	// No backing texture
 }
 

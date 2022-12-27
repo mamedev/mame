@@ -19,7 +19,7 @@ class chain_manager;
 class chain_reader : public state_reader
 {
 public:
-	static bgfx_chain* read_from_value(const Value& value, std::string prefix, chain_manager& chains, uint32_t screen_index);
+	static bgfx_chain* read_from_value(const Value& value, std::string prefix, chain_manager& chains, uint32_t screen_index, uint16_t user_prescale, uint16_t max_prescale_size);
 
 private:
 	static bool validate_parameters(const Value& value, std::string prefix);
