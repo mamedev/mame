@@ -18,13 +18,14 @@ Main:
 - NEC D70108HG-10 V20, 9.600MHz XTAL
 - 64KB ROM (2*SRM20256), 256KB ROM (custom label)
 - unknown 80 pin QFP, label CCH01 ET-MATE F3X0 713, assume custom I/O chip
+- 1-bit sound
 - cartridge slot
 
 LCD module:
 - PCB label: P102-2, DATA VISION
 - 2*Hitachi HD66204F, Hitachi HD66205F
 - unknown 80 pin QFP, label 16160 S2RB 94.10
-- 160*160 LCD screen
+- 2bpp 160*160 LCD screen
 
 */
 
@@ -73,7 +74,7 @@ private:
 	void irq_clear_w(uint8_t data);
 	void unk_5f_w(uint8_t data);
 	void unk_6f_w(uint8_t data);
-	void unk_7f_w(uint8_t data);
+	void cart_bank_w(uint8_t data);
 	void beeper_freq_low_w(uint8_t data);
 	void beeper_freq_high_w(uint8_t data);
 	void beeper_enable_w(uint8_t data);
@@ -135,11 +136,13 @@ uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 void chessking_state::unk_1f_w(uint8_t data)
 {
+	// writes at start-up only
 	logerror("%s: 1f write %02x\n", machine().describe_context(), data);
 }
 
 void chessking_state::unk_2f_w(uint8_t data)
 {
+	// writes at start-up only
 	logerror("%s: 2f write %02x\n", machine().describe_context(), data);
 }
 
@@ -152,6 +155,7 @@ uint8_t chessking_state::unk_3f_r()
 
 void chessking_state::unk_3f_w(uint8_t data)
 {
+	// writes frequently, at the same times as 7f/8f/9f/af writes, note address is also read
 	//logerror("%s: 3f write %02x\n", machine().describe_context(), data);
 	m_3f_data = data;
 }
@@ -164,6 +168,7 @@ void chessking_state::irq_clear_w(uint8_t data)
 
 void chessking_state::unk_5f_w(uint8_t data)
 {
+	// writes at start-up only
 	logerror("%s: 5f write %02x\n", machine().describe_context(), data);
 }
 
@@ -172,10 +177,10 @@ void chessking_state::unk_6f_w(uint8_t data)
 	logerror("%s: 6f write %02x\n", machine().describe_context(), data);
 }
 
-void chessking_state::unk_7f_w(uint8_t data)
+void chessking_state::cart_bank_w(uint8_t data)
 {
-	// writes values from 0x07 to 0x00 before menu appears, also writes 0x00 / 0x01 when audio is playing
-	logerror("%s: 7f write %02x\n", machine().describe_context(), data);
+	// writes values from 0x07 to 0x00 before checking cartridge
+	//logerror("%s: 7f write %02x\n", machine().describe_context(), data);
 }
 
 
@@ -225,20 +230,16 @@ void chessking_state::chesskng_map(address_map &map)
 void chessking_state::chesskng_io(address_map &map)
 {
 	map(0x0f, 0x0f).portr("BUTTONS");
-	map(0x3f, 0x3f).r(FUNC(chessking_state::unk_3f_r));
-
-	map(0x1f, 0x1f).w(FUNC(chessking_state::unk_1f_w)); // start-up only
-	map(0x2f, 0x2f).w(FUNC(chessking_state::unk_2f_w)); // start-up only
-	map(0x3f, 0x3f).w(FUNC(chessking_state::unk_3f_w)); // frequently, at the same times as 7f/8f/9f/af writes, note address is also read
-	map(0x4f, 0x4f).w(FUNC(chessking_state::irq_clear_w)); // irq clear?
-	map(0x5f, 0x5f).w(FUNC(chessking_state::unk_5f_w)); // start-up only
-	map(0x6f, 0x6f).w(FUNC(chessking_state::unk_6f_w)); // less frequently than below
-
-	// are these all sound related? they all occur when sounds might be expected
-	map(0x7f, 0x7f).w(FUNC(chessking_state::unk_7f_w)); // frequently written at a similar time to the audio
-	map(0x8f, 0x8f).w(FUNC(chessking_state::beeper_freq_low_w)); // beeper freq low?
-	map(0x9f, 0x9f).w(FUNC(chessking_state::beeper_freq_high_w)); // beeper freq high?
-	map(0xaf, 0xaf).w(FUNC(chessking_state::beeper_enable_w)); // beeper enable?
+	map(0x1f, 0x1f).w(FUNC(chessking_state::unk_1f_w));
+	map(0x2f, 0x2f).w(FUNC(chessking_state::unk_2f_w));
+	map(0x3f, 0x3f).rw(FUNC(chessking_state::unk_3f_r), FUNC(chessking_state::unk_3f_w));
+	map(0x4f, 0x4f).w(FUNC(chessking_state::irq_clear_w));
+	map(0x5f, 0x5f).w(FUNC(chessking_state::unk_5f_w));
+	map(0x6f, 0x6f).w(FUNC(chessking_state::unk_6f_w));
+	map(0x7f, 0x7f).w(FUNC(chessking_state::cart_bank_w));
+	map(0x8f, 0x8f).w(FUNC(chessking_state::beeper_freq_low_w));
+	map(0x9f, 0x9f).w(FUNC(chessking_state::beeper_freq_high_w));
+	map(0xaf, 0xaf).w(FUNC(chessking_state::beeper_enable_w));
 }
 
 
