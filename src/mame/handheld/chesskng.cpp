@@ -79,6 +79,8 @@ void chesskng_state::unk_2f_w(uint8_t data)
 
 uint8_t chesskng_state::unk_3f_r()
 {
+	// could this be the volume dial? gets used for writes to 0xaf
+	//  - unlikely as there's little reason for it to work this way
 	return m_3f_data;
 }
 
@@ -105,6 +107,7 @@ void chesskng_state::unk_6f_w(uint8_t data)
 
 void chesskng_state::unk_7f_w(uint8_t data)
 {
+	// writes values from 0x07 to 0x00 before menu appears, also writes 00 / 01 when audio is playing
 	logerror("%s: 7f write %02x\n", machine().describe_context(), data);
 }
 
@@ -125,7 +128,11 @@ void chesskng_state::beeper_freq_high_w(uint8_t data)
 
 void chesskng_state::unk_af_w(uint8_t data)
 {
-	logerror("%s: af write %02x\n", machine().describe_context(), data);
+	// writes 0x10 at startup and 0x00 / 0x08 when audio is playing
+	if ((data != 0x08) && (data != 0x00))
+	{
+		logerror("%s: af write %02x\n", machine().describe_context(), data);
+	}
 }
 
 void chesskng_state::update_beeper()
@@ -155,10 +162,10 @@ void chesskng_state::chesskng_io(address_map &map)
 	map(0x6f, 0x6f).w(FUNC(chesskng_state::unk_6f_w)); // less frequently than below
 
 	// are these all sound related? they all occur when sounds might be expected
-	map(0x7f, 0x7f).w(FUNC(chesskng_state::unk_7f_w)); // often written with 01 along with other writes below, but also sometimes 02/03 (seems like a high byte)
+	map(0x7f, 0x7f).w(FUNC(chesskng_state::unk_7f_w)); // frequently written at a similar time to the audio
 	map(0x8f, 0x8f).w(FUNC(chesskng_state::beeper_freq_low_w)); // beeper freq low?
 	map(0x9f, 0x9f).w(FUNC(chesskng_state::beeper_freq_high_w)); // beeper freq high?
-	map(0xaf, 0xaf).w(FUNC(chesskng_state::unk_af_w)); // frequently written at a similar time to the audio (seems like a low byte?)
+	map(0xaf, 0xaf).w(FUNC(chesskng_state::unk_af_w)); // frequently written at a similar time to the audio
 }
 
 uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
