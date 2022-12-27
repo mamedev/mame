@@ -46,7 +46,6 @@ public:
 	tickee_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
-		m_control(*this, "control"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_oki(*this, "oki"),
@@ -59,8 +58,9 @@ public:
 	void mouseatk(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+
 	required_shared_ptr<uint16_t> m_vram;
-	optional_shared_ptr<uint16_t> m_control;
 
 	required_device<tms34010_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -69,11 +69,13 @@ protected:
 	required_device<tlc34076_device> m_tlc34076;
 	optional_device_array<ticket_dispenser_device, 2> m_ticket;
 
+	int m_palette_blank = 0;
+
 	// Video update
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
 	// Miscellaneous control bits
-	void tickee_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tickee_control_w(offs_t offset, uint8_t data);
 
 private:
 	// Memory maps
@@ -111,7 +113,6 @@ private:
 
 	int m_beamxadd = 0;
 	int m_beamyadd = 0;
-	int m_palette_bank = 0;
 	uint8_t m_gunx[2] = { };
 
 	void set_beamadd(int x, int y) { m_beamxadd = x; m_beamyadd = y; }
@@ -124,20 +125,16 @@ private:
 	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
 
-	// Video update
-	TMS340X0_SCANLINE_RGB32_CB_MEMBER(rapidfir_scanline_update);
-
 	// Video related
 	void rapidfir_transparent_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t rapidfir_transparent_r(offs_t offset);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(rapidfir_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(rapidfir_from_shiftreg);
 
-	// Unknowns
-	uint16_t ffff_r();
+	// Control
 	uint16_t rapidfir_gun1_r();
 	uint16_t rapidfir_gun2_r();
-	void palette_bank_w(uint8_t data);
+	void palette_blank_w(uint8_t data);
 	void rapidfir_output_w(uint8_t data);
 
 	// Sound
@@ -198,7 +195,7 @@ TIMER_CALLBACK_MEMBER(tickee_gun_state::setup_gun_interrupts)
 	m_setup_gun_timer->adjust(m_screen->time_until_pos(0));
 
 	// only do work if the palette is flashed
-	if (!m_control || m_control[2])
+	if (m_palette_blank)
 	{
 		int beamx, beamy;
 
@@ -222,6 +219,11 @@ TIMER_CALLBACK_MEMBER(tickee_gun_state::setup_gun_interrupts)
  *
  *************************************/
 
+void tickee_state::machine_start()
+{
+	save_item(NAME(m_palette_blank));
+}
+
 void tickee_gun_state::machine_start()
 {
 	tickee_state::machine_start();
@@ -235,7 +237,6 @@ void tickee_gun_state::machine_start()
 	m_clear_gun_int_timer[0] = timer_alloc(FUNC(tickee_gun_state::clear_gun_interrupt), this);
 	m_clear_gun_int_timer[1] = timer_alloc(FUNC(tickee_gun_state::clear_gun_interrupt), this);
 
-	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_gunx));
 }
 
@@ -265,33 +266,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 	pen_t const *const pens = m_tlc34076->pens();
 	int coladdr = params->coladdr << 1;
 
-	// blank palette: fill with pen 255
-	if (m_control[2])
-	{
-		for (int x = params->heblnk; x < params->hsblnk; x++)
-			dest[x] = pens[0xff];
-	}
-	else
-	{
-		// copy the non-blanked portions of this scanline
-		for (int x = params->heblnk; x < params->hsblnk; x += 2)
-		{
-			uint16_t pixels = src[coladdr++ & 0xff];
-			dest[x + 0] = pens[pixels & 0xff];
-			dest[x + 1] = pens[pixels >> 8];
-		}
-	}
-}
-
-
-TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_gun_state::rapidfir_scanline_update)
-{
-	uint16_t const *const src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	uint32_t *const dest = &bitmap.pix(scanline);
-	const pen_t *pens = m_tlc34076->pens();
-	int coladdr = params->coladdr << 1;
-
-	if (m_palette_bank)
+	if (m_palette_blank)
 	{
 		// blank palette: fill with pen 255
 		for (int x = params->heblnk; x < params->hsblnk; x += 2)
@@ -354,10 +329,8 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_gun_state::rapidfir_from_shiftreg)
  *
  *************************************/
 
-void tickee_state::tickee_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void tickee_state::tickee_control_w(offs_t offset, uint8_t data)
 {
-	uint16_t olddata = m_control[offset];
-
 	/* offsets:
 
 	    2 = palette flash (0 normally, 1 when trigger is pressed)
@@ -365,47 +338,20 @@ void tickee_state::tickee_control_w(offs_t offset, uint16_t data, uint16_t mem_m
 	    6 = lamps? (changing all the time)
 	*/
 
-	COMBINE_DATA(&m_control[offset]);
-
-	if (offset == 3)
+	switch (offset)
 	{
-		m_ticket[0]->motor_w(BIT(data, 3));
-		m_ticket[1]->motor_w(BIT(data, 2));
+		case 2:
+			m_palette_blank = data & 1;
+			break;
+
+		case 3:
+			m_ticket[0]->motor_w(BIT(data, 3));
+			m_ticket[1]->motor_w(BIT(data, 2));
+			break;
+
+		default:
+			break;
 	}
-
-	if (olddata != m_control[offset])
-		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", m_maincpu->pc(), offset, m_control[offset], olddata);
-}
-
-
-
-/*************************************
- *
- *  Unknowns
- *
- *************************************/
-
-uint16_t tickee_gun_state::ffff_r()
-{
-	return 0xffff;
-}
-
-
-uint16_t tickee_gun_state::rapidfir_gun1_r()
-{
-	return m_gunx[0];
-}
-
-
-uint16_t tickee_gun_state::rapidfir_gun2_r()
-{
-	return m_gunx[1];
-}
-
-
-void tickee_gun_state::palette_bank_w(uint8_t data)
-{
-	m_palette_bank = data & 1;
 }
 
 
@@ -424,6 +370,25 @@ void tickee_gun_state::rapidfir_output_w(uint8_t data)
 	if (m_ticket[0])
 		m_ticket[0]->motor_w(BIT(data, 4));
 }
+
+
+void tickee_gun_state::palette_blank_w(uint8_t data)
+{
+	m_palette_blank = data & 1;
+}
+
+
+uint16_t tickee_gun_state::rapidfir_gun1_r()
+{
+	return m_gunx[0];
+}
+
+
+uint16_t tickee_gun_state::rapidfir_gun2_r()
+{
+	return m_gunx[1];
+}
+
 
 
 
@@ -477,7 +442,7 @@ void tickee_gun_state::tickee_map(address_map &map)
 	map(0x04200000, 0x0420001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04200100, 0x0420010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04200100, 0x0420011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
-	map(0x04400000, 0x0440007f).w(FUNC(tickee_gun_state::tickee_control_w)).share(m_control);
+	map(0x04400000, 0x0440007f).w(FUNC(tickee_gun_state::tickee_control_w)).umask16(0x00ff);
 	map(0x04400040, 0x0440004f).portr("IN2");
 	map(0xc0000240, 0xc000025f).nopw(); // seems to be a bug in their code
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
@@ -495,7 +460,7 @@ void tickee_gun_state::ghoshunt_map(address_map &map)
 	map(0x04300000, 0x0430001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04300100, 0x0430010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04300100, 0x0430011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
-	map(0x04500000, 0x0450007f).w(FUNC(tickee_gun_state::tickee_control_w)).share(m_control);
+	map(0x04500000, 0x0450007f).w(FUNC(tickee_gun_state::tickee_control_w)).umask16(0x00ff);
 	map(0xc0000240, 0xc000025f).nopw(); // seems to be a bug in their code
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
 }
@@ -510,7 +475,7 @@ void tickee_state::mouseatk_map(address_map &map)
 	map(0x04200000, 0x0420000f).r("ym", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04200000, 0x0420000f).w("ym", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04200100, 0x0420010f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).share(m_control);
+	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).umask16(0x00ff);
 	map(0x04400040, 0x0440004f).portr("IN2"); // ?
 	map(0xc0000240, 0xc000025f).nopw(); // seems to be a bug in their code
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
@@ -520,13 +485,14 @@ void tickee_state::mouseatk_map(address_map &map)
 // newer hardware
 void tickee_gun_state::rapidfir_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x00000000, 0x007fffff).ram().share("vram");
 	map(0x02000000, 0x027fffff).rw(FUNC(tickee_gun_state::rapidfir_transparent_r), FUNC(tickee_gun_state::rapidfir_transparent_w));
 	map(0xfc000000, 0xfc00000f).r(FUNC(tickee_gun_state::rapidfir_gun1_r));
 	map(0xfc000100, 0xfc00010f).r(FUNC(tickee_gun_state::rapidfir_gun2_r));
-	map(0xfc000400, 0xfc00040f).r(FUNC(tickee_gun_state::ffff_r));
-	map(0xfc000500, 0xfc00050f).w(FUNC(tickee_gun_state::rapidfir_output_w)).umask16(0x00ff);
-	map(0xfc000600, 0xfc00060f).w(FUNC(tickee_gun_state::palette_bank_w)).umask16(0x00ff);
+	map(0xfc000400, 0xfc00040f).nopr();
+	map(0xfc000500, 0xfc00050f).w(FUNC(tickee_gun_state::rapidfir_output_w)).umask16(0x00ff).nopr();
+	map(0xfc000600, 0xfc00060f).w(FUNC(tickee_gun_state::palette_blank_w)).umask16(0x00ff);
 	map(0xfc000700, 0xfc00070f).w(FUNC(tickee_gun_state::sound_bank_w)).umask16(0x00ff);
 	map(0xfc000800, 0xfc00080f).portr("IN0");
 	map(0xfc000900, 0xfc00090f).portr("IN1");
@@ -891,7 +857,7 @@ void tickee_gun_state::rapidfir(machine_config &config)
 	m_maincpu->set_halt_on_reset(false);
 	m_maincpu->set_pixel_clock(18_MHz_XTAL/2);
 	m_maincpu->set_pixels_per_clock(1);
-	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_gun_state::rapidfir_scanline_update));
+	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_gun_state::scanline_update));
 	m_maincpu->set_shiftreg_in_callback(FUNC(tickee_gun_state::rapidfir_to_shiftreg));
 	m_maincpu->set_shiftreg_out_callback(FUNC(tickee_gun_state::rapidfir_from_shiftreg));
 
@@ -1216,13 +1182,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_gun_state, empty_init, ROT0, "Raster Elite",                  "Tickee Tickats",              0 )
-GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Ghost Hunter",                0 )
-GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Island Design",                 "Tut's Tomb",                  0 )
+GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_gun_state, empty_init, ROT0, "Raster Elite",                  "Tickee Tickats",              MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Ghost Hunter",                MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Island Design",                 "Tut's Tomb",                  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state,     empty_init, ROT0, "ICE",                           "Mouse Attack",                0 )
+GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state,     empty_init, ROT0, "ICE",                           "Mouse Attack",                MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.1 (Build 239)", 0 )
-GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.1 (Build 238)", 0 )
-GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.0 (Build 236)", 0 )
-GAME( 1999, maletmad,  0,        maletmad, maletmad, tickee_gun_state, empty_init, ROT0, "Hanaho Games (Capcom license)", "Mallet Madness v2.1",         0 )
+GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.1 (Build 239)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.1 (Build 238)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.0 (Build 236)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, maletmad,  0,        maletmad, maletmad, tickee_gun_state, empty_init, ROT0, "Hanaho Games (Capcom license)", "Mallet Madness v2.1",         MACHINE_SUPPORTS_SAVE )
