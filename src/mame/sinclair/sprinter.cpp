@@ -694,8 +694,7 @@ void sprinter_state::accel_r(u16 offset, u8 &data)
 		LOGACCEL("Accel rCOPY: %s%02x\n", m, offset);
 		for (auto i = 0; i < m_accel_buffer_size; i++)
 		{
-			data = sprinter_mem_r(offset + i);
-			update_accel_buffer(i, data);
+			update_accel_buffer(i, sprinter_mem_r(offset + i));
 		}
 		adjust_icount = true;
 	}
@@ -704,8 +703,7 @@ void sprinter_state::accel_r(u16 offset, u8 &data)
 		LOGACCEL("Accel rCOPY_GR: %s%02x (%x)\n", m, offset, m_port_y);
 		for (auto i = 0; i < m_accel_buffer_size; i++)
 		{
-			data = sprinter_mem_r(offset);
-			update_accel_buffer(i, data);
+			update_accel_buffer(i, sprinter_mem_r(offset));
 			m_port_y++;
 		}
 		adjust_icount = true;
