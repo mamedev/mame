@@ -15063,7 +15063,7 @@ gcus                            // (c) 2001 Nintendo
 gceu                            // (c) 2002 Nintendo
 gcbr                            // (c) 2002 Nintendo
 
-@source:handheld/chesskng.cpp
+@source:handheld/chessking.cpp
 chesskng                        //
 
 @source:handheld/gameking.cpp
