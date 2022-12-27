@@ -30,6 +30,7 @@ private:
 	void chesskng_io(address_map &map);
 
 	uint8_t unk_3f_r();
+	void unk_4f_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
@@ -39,6 +40,11 @@ private:
 uint8_t chesskng_state::unk_3f_r()
 {
 	return machine().rand();
+}
+
+void chesskng_state::unk_4f_w(uint8_t data)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 void chesskng_state::chesskng_map(address_map &map)
@@ -53,8 +59,17 @@ void chesskng_state::chesskng_io(address_map &map)
 {
 	map(0x0f, 0x0f).portr("BUTTONS");
 	map(0x3f, 0x3f).r(FUNC(chesskng_state::unk_3f_r));
-	//map(0x4f, 0x4f) // irq clear?
-	//map(0x7f, 0x7f) // beeper?
+
+	map(0x1f, 0x1f).nopw();
+	map(0x2f, 0x2f).nopw();
+	map(0x3f, 0x3f).nopw();
+	map(0x4f, 0x4f).w(FUNC(chesskng_state::unk_4f_w)); // irq clear?
+	map(0x5f, 0x5f).nopw();
+	map(0x6f, 0x6f).nopw();
+	map(0x7f, 0x7f).nopw(); // beeper?
+	map(0x8f, 0x8f).nopw();
+	map(0x9f, 0x9f).nopw();
+	map(0xaf, 0xaf).nopw();
 }
 
 uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -99,7 +114,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(chesskng_state::interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x20/4);
+	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 0x20/4);
 }
 
 void chesskng_state::chesskng(machine_config &config)
@@ -138,4 +153,4 @@ ROM_START( chesskng )
 	// there is also a CCH01 ET-MATE F3X0 713 near the CPU, what is it?
 ROM_END
 
-CONS( 1994, chesskng,         0, 0, chesskng, chesskng, chesskng_state, empty_init, "I-Star Co.,Ltd", "Chess King (Model ET-6)", MACHINE_IS_SKELETON )
+CONS( 1994, chesskng,         0, 0, chesskng, chesskng, chesskng_state, empty_init, "I-Star Co.,Ltd", "Chess King (Model ET-6)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
